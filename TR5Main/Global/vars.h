@@ -19,7 +19,7 @@
 #define Effects						VAR_U_(0x00E5C5E0, FX_INFO*)
 #define InItemControlLoop			VAR_U_(0x0051CA53, byte)
 #define ItemNewRoomNo				VAR_U_(0x0051CA54, short)
-#define ItemNewRooms				ARRAY_(0x00EEF4C0, short, 512)
+#define ItemNewRooms				ARRAY_(0x00EEF4C0, short, [512])
 #define NextFxActive				VAR_U_(0x00E5C5FC, short)
 #define NextFxFree					VAR_U_(0x00E5C5F4, short)
 #define NextItemActive				VAR_U_(0x00E5BF22, short)
@@ -31,13 +31,13 @@
 // Level data
 #define Boxes						VAR_U_(0x00EEFB64, BOX_INFO*)
 #define NumberBoxes					VAR_U_(0x00EEFB68, int)
-#define GroundZones					ARRAY_(0x00EEFB20, __int16*, 10)
+#define GroundZones					ARRAY_(0x00EEFB20, __int16*, [10])
 #define Overlaps					VAR_U_(0x00EEFB5C, __int16*)
 #define LevelItems					VAR_U_(0x0051CEB8, int)
 #define BaddieSlots					VAR_U_(0x00E5B834, CREATURE_INFO*)
 #define AIObjects					VAR_U_(0x00E5B844, AIOBJECT*)
 #define Rooms						VAR_U_(0x00875154, ROOM_INFO*)
-#define Objects						ARRAY_(0x0086CF50, OBJECT_INFO, 460)
+#define Objects						ARRAY_(0x0086CF50, OBJECT_INFO, [460])
 #define Anims						VAR_U_(0x00875158, ANIM_STRUCT*)
 #define Bones						VAR_U_(0x00875178, __int32*)
 #define Changes						VAR_U_(0x0087515C, CHANGE_STRUCT*)
@@ -55,20 +55,20 @@
 #define NumberRooms					VAR_U_(0x0087514C, __int16)
 #define nAnimUVRanges				VAR_U_(0x0087495C, __int32)
 #define LevelFilePtr				VAR_U_(0x00875164, FILE*)
-//#define StaticObjects				ARRAY_(0x00874988, STATIC_INFO, 70)
+//#define StaticObjects				ARRAY_(0x00874988, STATIC_INFO, [70])
 
 // Lara
 #define LaraItem					VAR_U_(0x00E5BF08, ITEM_INFO*)
 #define Lara						VAR_U_(0x00E5BD60, LARA_INFO)
 #define LaraDrawType				VAR_U_(0x00EEEAD0, __int8)
-#define Hairs						ARRAY_(0x00E5C000, HAIR_STRUCT, 14)
+#define Hairs						ARRAY_(0x00E5C000, HAIR_STRUCT, [14])
 
-#define SequenceUsed				ARRAY_(0x00E4EA78, __int8, 6)
-#define SequenceResults				ARRAY_(0x00E4EA80, __int8, 27)
+#define SequenceUsed				ARRAY_(0x00E4EA78, __int8, [6])
+#define SequenceResults				ARRAY_(0x00E4EA80, __int8, [27])
 #define gfNumMips					VAR_U_(0x0051CE37, __int8)
 #define CurrentSequence				VAR_U_(0x00E4EA61, __int8)
 #define Frames						VAR_U_(0x00875174, __int16*)
-#define gfMips						ARRAY_(0x00E5C2C0, __int8, 8)
+#define gfMips						ARRAY_(0x00E5C2C0, __int8, [8])
 #define OldPickupPos				VAR_U_(0x00E59700, GAME_VECTOR)
 #define Rats						VAR_U_(0x00EEEFEC, char*)
 #define Bats						VAR_U_(0x00EEEFE8, char*)
@@ -90,7 +90,7 @@
 #define TrInput						VAR_U_(0x00878D98, __int32)
 
 // Math
-#define MatrixStack					ARRAY_(0x0055D66C, __int32, 480)
+#define MatrixStack					ARRAY_(0x0055D66C, __int32, [480])
 #define MatrixPtr					VAR_U_(0x00E4B0F8, __int32*)
 #define DxMatrixPtr					VAR_U_(0x0055DA2C, byte*)
 
@@ -130,18 +130,18 @@
 #define GameStatus					VAR_U_(0x00E5C2B0, __int32)
 #define GotLaraSpheres				VAR_U_(0x00E51F2E, byte)
 
-#define EffectRoutines				ARRAY_(0x00507964, (void*)(ITEM_INFO*))
+#define EffectRoutines				ARRAY_(0x00507964, ITEM_INFO*, [1]) // TODO: redefine this array properly
 #define DashTimer					VAR_U_(0x00E5BF04, __int16)
 
-#define ShockWaves					ARRAY_(0x00E4C1A0, SHOCKWAVE_STRUCT, 16)
-//#define Drips						ARRAY_(0x00E4D740, DRIP_STRUCT, 32)
-#define Bubbles						ARRAY_(0x00E4D160, BUBBLE_STRUCT, 40)
-#define Ripples						ARRAY_(0x00E5C600, RIPPLE_STRUCT, 32)
-#define Blood						ARRAY_(0x00E4C1A0, BLOOD_STRUCT, 32)
+#define ShockWaves					ARRAY_(0x00E4C1A0, SHOCKWAVE_STRUCT, [16])
+//#define Drips						ARRAY_(0x00E4D740, DRIP_STRUCT, [32])
+#define Bubbles						ARRAY_(0x00E4D160, BUBBLE_STRUCT, [40])
+#define Ripples						ARRAY_(0x00E5C600, RIPPLE_STRUCT, [32])
+#define Blood						ARRAY_(0x00E4C1A0, BLOOD_STRUCT, [32])
 
 #define CurrentFOV					VAR_U_(0x00E4F504, __int16)
 
-#define SpotCam						ARRAY_(0x00E4F6C0, SPOTCAM, 64)
+#define SpotCam						ARRAY_(0x00E4F6C0, SPOTCAM, [64])
 #define CurrentSplineCamera			VAR_U_(0x00E4F500, __int16)
 #define OldHitPoints				VAR_U_(0x005084DC, __int16)
 

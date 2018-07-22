@@ -2,7 +2,7 @@
 
 #include "vodoo.h"
 
-#define rcossin_tbl	ARRAY_(0x0050B46C, __int16, 1000)
+#define rcossin_tbl	ARRAY_(0x0050B46C, __int16, [1000])
 
 #define SQUARE(x) ((x)*(x))
 #define CLAMP(x, a, b) ((x)<(a)?(a):((x)>(b)?(b):(x)))

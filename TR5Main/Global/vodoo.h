@@ -16,4 +16,4 @@ typedef struct {
 
 #define VAR_U_(address, type)			(*(type*)(address)) // uninitialized variable
 #define VAR_I_(address, type, value)	(*(type*)(address)) // initialized variable (value is just for info)
-#define ARRAY_(address, type, length)	( (type*)(address)) // array (length is just for info)
+#define ARRAY_(address, type, length)	(*(type(*)length)(address)) // array (can be multidimensional)
