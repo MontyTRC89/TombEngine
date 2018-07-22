@@ -1,0 +1,28 @@
+#include "deltapak.h"
+#include "..\Global\global.h"
+#include <stdio.h>
+
+ITEM_INFO* __cdecl FindItem(__int16 objectNumber)
+{
+#ifdef DEBUG
+	printf("Called FindItem()\n");
+#endif
+
+	DB_Log(0, "FindItem - DLL");
+
+	if (LevelItems > 0)
+	{
+		for (__int32 i = 0; i < LevelItems; i++)
+		{
+			if (Items[i].objectNumber == objectNumber)
+				return &Items[i];
+		}
+	}
+
+	return NULL;
+}
+
+void Inject_DeltaPak()
+{
+	INJECT(0x00423470, FindItem);
+}

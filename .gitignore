@@ -1,0 +1,9 @@
+Build/audio
+Build/data
+Build/movie
+Build/screens
+TR5Main/CustomObjects/
+TR5Main/x64/
+TR5Main/Debug/
+x64/
+.vs/
