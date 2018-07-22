@@ -881,10 +881,10 @@ struct tr4_object_texture // 38 bytes
 };
 
 typedef struct stats_t {
-	unsigned long Timer; // size=0, offset=0
-	unsigned long Distance; // size=0, offset=4
-	unsigned long AmmoUsed; // size=0, offset=8
-	unsigned long AmmoHits; // size=0, offset=12
+	unsigned __int32 Timer; // size=0, offset=0
+	unsigned __int32 Distance; // size=0, offset=4
+	unsigned __int32 AmmoUsed; // size=0, offset=8
+	unsigned __int32 AmmoHits; // size=0, offset=12
 	unsigned short Kills; // size=0, offset=16
 	unsigned char Secrets; // size=0, offset=18
 	unsigned char HealthUsed; // size=0, offset=19
@@ -908,8 +908,8 @@ typedef struct savegame_info
 	short WeaponFrame; // size=0, offset=412
 	short WeaponCurrent; // size=0, offset=414
 	short WeaponGoal; // size=0, offset=416
-	unsigned long CutSceneTriggered1; // size=0, offset=420
-	unsigned long CutSceneTriggered2; // size=0, offset=424
+	unsigned __int32 CutSceneTriggered1; // size=0, offset=420
+	unsigned __int32 CutSceneTriggered2; // size=0, offset=424
 	char GameComplete; // size=0, offset=428
 	unsigned char CurrentLevel; // size=0, offset=429
 	unsigned char CampaignSecrets[4]; // size=4, offset=430
@@ -1047,9 +1047,9 @@ struct SPLASH_SETUP
 
 struct FIRE_LIST
 {
-	long x; // size=0, offset=0
-	long y; // size=0, offset=4
-	long z; // size=0, offset=8
+	__int32 x; // size=0, offset=0
+	__int32 y; // size=0, offset=4
+	__int32 z; // size=0, offset=8
 	char on; // size=0, offset=12
 	char size; // size=0, offset=13
 	short room_number; // size=0, offset=14
