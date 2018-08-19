@@ -330,10 +330,10 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	if (m_shaderBasic->GetEffect() == NULL)
 		return false;
 
-	m_shaderFXAA = new Shader(m_device, (char*)"FXAA.fx");
+	/*m_shaderFXAA = new Shader(m_device, (char*)"FXAA.fx");
 	m_shaderFXAA->Compile();
 	if (m_shaderFXAA->GetEffect() == NULL)
-		return false;
+		return false;*/
 
 	m_shaderReconstructZBuffer = new Shader(m_device, (char*)"ReconstructZBuffer.fx");
 	m_shaderReconstructZBuffer->Compile();

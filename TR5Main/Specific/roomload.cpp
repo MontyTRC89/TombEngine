@@ -415,6 +415,8 @@ unsigned __stdcall LoadLevel(void* data)
 	LevelDataPtr = NULL;
 	LevelFilePtr = 0;
 
+	//char* fn = "data\\Andrea3.tRc";
+
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
 	{
