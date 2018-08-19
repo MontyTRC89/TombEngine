@@ -397,6 +397,7 @@ class Renderer
 	vector<__int32>					m_roomsToDraw;
 	__int32*						m_meshTrees;
 	LPDIRECT3DVERTEXDECLARATION9	m_vertexDeclaration;
+	LPDIRECT3DVERTEXDECLARATION9	m_spriteVertexDeclaration;
 	__int32							m_numVertices;
 	__int32							m_numTriangles;
 	RendererLine2D*					m_lines;
@@ -437,7 +438,7 @@ class Renderer
 	vector<RendererLight*>			m_testLights;
 	vector<RendererItemToDraw*>		m_itemsToDraw;
 	vector<RendererSpriteToDraw*>	m_spritesToDraw;
-
+	
 	LPDIRECT3DSURFACE9				m_backBufferTarget;
 	LPDIRECT3DSURFACE9				m_backBufferDepth;
 
@@ -457,6 +458,7 @@ class Renderer
 	Shader*							m_shaderBasic;
 	Shader*							m_shaderFXAA;
 	Shader*							m_shaderReconstructZBuffer;
+	Shader*							m_shaderSprites;
 	RendererVertex					m_quadVertices[4];
 	__int32							m_quadIndices[6];
 	RendererSphere*					m_sphereMesh;
@@ -477,6 +479,8 @@ class Renderer
 	LPDIRECT3DTEXTURE9				m_randomTexture;
 	LPDIRECT3DTEXTURE9				m_skyTexture;
 	__int32							m_skyTimer;
+	vector<RendererVertex>			m_spritesVertices;
+	vector<__int32>					m_spritesIndices;
 
 public:
 	D3DXMATRIX						ViewMatrix;
@@ -550,8 +554,11 @@ public:
 	void							UpdateFires();
 	void							AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
 	void							ClearDynamicLights();
-	void							AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale);
+	void							AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale, float width, float height);
 	void							DrawFires();
+	void							DrawSmokes();
+	void							DrawBlood();
+	void							CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos);
 
 	// New light pre-pass renderer
 	bool							DrawSceneLightPrePass(bool dump);

@@ -213,7 +213,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		}
 	}
 
-	return float4(saturate(diffuseColor * (ambientColor + diffuseLight) + specularLight), 1);
+	return float4((diffuseColor * (ambientColor + diffuseLight) + specularLight), 1);
 }
 
 technique CombineFinal

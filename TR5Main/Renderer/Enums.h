@@ -57,8 +57,8 @@ typedef enum BLEND_MODES {
 #define MAX_SHADOW_MAPS 8
 
 
-#define GET_ATLAS_PAGE_X(p) (p % NUM_TEXTURE_PAGES_PER_ROW) * 256.0f
-#define GET_ATLAS_PAGE_Y(p) floor(p / NUM_TEXTURE_PAGES_PER_ROW) * 256.0f
+#define GET_ATLAS_PAGE_X(p) ((p) % NUM_TEXTURE_PAGES_PER_ROW) * 256.0f
+#define GET_ATLAS_PAGE_Y(p) floor((p) / NUM_TEXTURE_PAGES_PER_ROW) * 256.0f
 
 #define SHAPE_RECTANGLE 0
 #define SHAPE_TRIANGLE	1

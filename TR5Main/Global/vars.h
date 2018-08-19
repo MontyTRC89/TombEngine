@@ -198,6 +198,8 @@
 #define Sprites						VAR_U_(0x008751B4, SPRITE*)
 #define FireSparks					ARRAY_(0x00E4CE40, FIRE_SPARKS, [20])
 #define NextFreeFireSpark			VAR_U_(0x0050A17C, __int16)
+#define SmokeSparks					ARRAY_(0x00E4B940, SMOKE_SPARKS, [32])
+#define Blood						ARRAY_(0x00E4C9C0, BLOOD_STRUCT, [32])
 
 extern bool MonksAttackLara;
 

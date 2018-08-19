@@ -340,6 +340,11 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	if (m_shaderReconstructZBuffer->GetEffect() == NULL)
 		return false;
 
+	m_shaderSprites = new Shader(m_device, (char*)"Sprites.fx");
+	m_shaderSprites->Compile();
+	if (m_shaderSprites->GetEffect() == NULL)
+		return false;
+
 	m_sphereMesh = new RendererSphere(m_device, 1280.0f, 6);
 	m_quad = new RendererQuad(m_device, 1024.0f);
 
@@ -762,7 +767,7 @@ bool Renderer::PrepareDataForTheRenderer()
 	memcpy(dest, buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 	m_textureAtlas->UnlockRect(0);
 
-	//D3DXSaveTextureToFile("E:\\Atlas.png", D3DXIMAGE_FILEFORMAT::D3DXIFF_PNG, m_textureAtlas, NULL);
+	D3DXSaveTextureToFile("E:\\Atlas.png", D3DXIMAGE_FILEFORMAT::D3DXIFF_PNG, m_textureAtlas, NULL);
 
 	// Release the temp buffer
 	free(buffer);
@@ -1078,11 +1083,27 @@ bool Renderer::PrepareDataForTheRenderer()
 	// Step 3: prepare moveables
 	for (__int32 i = 0; i < MoveablesIds.size(); i++)
 	{
-		OBJECT_INFO* obj = &Objects[MoveablesIds[i]];
-
+		__int32 objNum = MoveablesIds[i];
+		OBJECT_INFO* obj = &Objects[objNum];
+		
 		if (obj->nmeshes > 0)
 		{
 			RendererObject* moveable = new RendererObject(m_device, MoveablesIds[i], obj->nmeshes);
+
+			// Assign the draw routine
+			if (objNum == ID_FLAME || objNum == ID_FLAME_EMITTER || objNum == ID_FLAME_EMITTER2 || objNum == ID_FLAME_EMITTER3 ||
+				objNum == ID_TRIGGER_TRIGGERER || objNum == ID_TIGHT_ROPE || objNum == ID_AI_AMBUSH ||
+				objNum == ID_AI_FOLLOW || objNum == ID_AI_GUARD || objNum == ID_AI_MODIFY ||
+				objNum == ID_AI_PATROL1 || objNum == ID_AI_PATROL2 || objNum == ID_AI_X1 ||
+				objNum == ID_AI_X2 || objNum == ID_DART_EMITTER || objNum == ID_HOMING_DART_EMITTER ||
+				objNum == ID_ROPE || objNum == ID_KILL_ALL_TRIGGERS)
+			{
+				moveable->DoNotDraw = true;
+			}
+			else
+			{
+				moveable->DoNotDraw = false;
+			}
 
 			for (__int32 j = 0; j < obj->nmeshes; j++)
 			{
@@ -1273,6 +1294,27 @@ bool Renderer::PrepareDataForTheRenderer()
 	}
 
 	// Step 5: prepare sprites
+	for (__int32 i = 0; i < 41; i++)
+	{
+		SPRITE* oldSprite = &Sprites[i];
+		RendererSprite* sprite = new RendererSprite();
+
+		sprite->Width = (oldSprite->right - oldSprite->left)*256.0f;
+		sprite->Height = (oldSprite->bottom - oldSprite->top)*256.0f;
+
+		float left = (oldSprite->left * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
+		float top = (oldSprite->top * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
+		float right = (oldSprite->right * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
+		float bottom = (oldSprite->bottom * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
+
+		sprite->UV[0] = D3DXVECTOR2(left / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[1] = D3DXVECTOR2(right / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[2] = D3DXVECTOR2(right / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[3] = D3DXVECTOR2(left / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
+
+		m_sprites.insert(pair<__int32, RendererSprite*>(i, sprite));
+	}
+
 	for (__int32 i = 0; i < MoveablesIds.size(); i++)
 	{
 		OBJECT_INFO* obj = &Objects[MoveablesIds[i]];
@@ -1286,30 +1328,7 @@ bool Renderer::PrepareDataForTheRenderer()
 			
 			for (__int32 j = baseSprite; j < baseSprite + numSprites; j++)
 			{
-				RendererSprite* sprite = NULL;
-				if (m_sprites.find(j) != m_sprites.end())
-					sprite = m_sprites[j];
-				else
-				{
-					SPRITE* oldSprite = &Sprites[j];
-					RendererSprite* sprite = new RendererSprite();
-
-					sprite->Width = (oldSprite->right - oldSprite->left)*256.0f;
-					sprite->Height = (oldSprite->bottom - oldSprite->top)*256.0f;
-
-					float left = (oldSprite->left * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_X(oldSprite->tile)) / (float)TEXTURE_ATLAS_SIZE;
-					float top = (oldSprite->top * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_Y(oldSprite->tile)) / (float)TEXTURE_ATLAS_SIZE;
-					float right = (oldSprite->right * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_X(oldSprite->tile)) / (float)TEXTURE_ATLAS_SIZE;
-					float bottom = (oldSprite->bottom * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_Y(oldSprite->tile)) / (float)TEXTURE_ATLAS_SIZE;
-
-					sprite->UV[0] = D3DXVECTOR2(left, top);
-					sprite->UV[1] = D3DXVECTOR2(right, top);
-					sprite->UV[2] = D3DXVECTOR2(right, bottom);
-					sprite->UV[3] = D3DXVECTOR2(left, bottom);
-
-					m_sprites.insert(pair<__int32, RendererSprite*>(j, sprite));
-				}
-
+				RendererSprite* sprite = m_sprites[j];
 				sequence->SpritesList.push_back(sprite);
 			}
 
@@ -3919,6 +3938,9 @@ void Renderer::UpdateFires()
 
 bool Renderer::DrawSceneLightPrePass(bool dump)
 {
+	// HACK:
+	LaraItem->hitPoints = 1000;
+
 	m_timeClearGBuffer = 0;
 	m_timePrepareShadowMap = 0;
 	m_timeFillGBuffer = 0;
@@ -4027,6 +4049,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
+		RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
 		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	}
@@ -4230,31 +4253,6 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	time1 = time2;
 
 	// FXAA
-	/*RestoreBackBuffer();
-	
-	if (dump)
-		BindRenderTargets(m_renderTarget, NULL, NULL, NULL);
-
-	effect = m_shaderFXAA->GetEffect();
-	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-	m_device->BeginScene();
-	effect->Begin(&cPasses, 0);
-
-	effect->SetTexture(effect->GetParameterByName(NULL, "TheTexture"), m_postprocessBuffer->GetTexture());
-	/*effect->SetTexture(effect->GetParameterByName(NULL, "LightMap"), m_lightBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "VertexColorMap"), m_vertexLightBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "ShadowMap"), m_shadowBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "NormalMap"), m_normalBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "DepthMap"), m_depthBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "RandomMap"), m_randomTexture);
-
-	effect->BeginPass(0);
-	effect->CommitChanges();
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_quadIndices, D3DFORMAT::D3DFMT_INDEX32,
-		m_quadVertices, sizeof(RendererVertex));
-	effect->EndPass();
-	effect->End();
-	m_device->EndScene();*/
 
 	// Clear depth and start reconstructing Z-Buffer
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
@@ -4347,7 +4345,40 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_device->SetRenderState(D3DRS_COLORWRITEENABLE2, true);
 	m_device->SetRenderState(D3DRS_COLORWRITEENABLE3, true);*/
 
+	// Draw sprites
+	m_spritesVertices.clear();
+	m_spritesIndices.clear();
+	
 	DrawFires();
+	DrawSmokes();
+	DrawBlood();
+
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
+	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+	effect = m_shaderSprites->GetEffect();
+	m_device->BeginScene();
+	effect->Begin(&cPasses, 0);
+
+	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
+	effect->BeginPass(0);
+	effect->CommitChanges();
+	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesIndices.size(), 
+									 m_spritesIndices.size() / 3, m_spritesIndices.data(), 
+									 D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
+	effect->EndPass();
+	effect->End();
+	m_device->EndScene();
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -4646,7 +4677,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 }
 
 bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
-{
+{ 
 	D3DXMATRIX world;
 	UINT cPasses = 1;
 
@@ -4656,6 +4687,8 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	RendererObject* moveableObj = m_moveableObjects[item->objectNumber];
+	if (moveableObj->DoNotDraw)
+		return true;
 
 	if (!moveableObj->HasDataInBucket[bucketIndex])
 		return true;
@@ -5096,7 +5129,7 @@ bool Renderer::DrawSkyLPP()
 
 	return true;
 }
-
+ 
 void Renderer::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b)
 {
 	RendererLight* dynamicLight = new RendererLight();
@@ -5106,7 +5139,7 @@ void Renderer::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff,
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
 	dynamicLight->Dynamic = true;
-	dynamicLight->Intensity = 1.0f;
+	dynamicLight->Intensity = 2.0f;
 
 	m_dynamicLights.push_back(dynamicLight);
 	NumDynamics++;
@@ -5120,77 +5153,129 @@ void Renderer::ClearDynamicLights()
 	NumDynamics = 0;
 }
 
-void Renderer::AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale)
+void Renderer::CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos)
 {
-	RendererSpriteToDraw* spr = new RendererSpriteToDraw();
-	spr->Sprite = sprite;
-	spr->X = x;
-	spr->Y = y;
-	spr->Z = z;
-	spr->Rotation = rotation;
-	spr->Scale = scale;
-	spr->R = r;
-	spr->G = g;
-	spr->B = b;
+	// compute billboard basis
+	D3DXVECTOR3 look = *particlePos;
+	look = look - *cameraPos;
+	D3DXVec3Normalize(&look, &look);
 
-	spr->Vertices[0].x = -128.0f;
-	spr->Vertices[0].y = -128.0f;
-	spr->Vertices[0].z = 0.0f;
-	spr->Vertices[0].u = sprite->UV[0].x;
-	spr->Vertices[0].v = sprite->UV[0].y;
-	spr->Vertices[0].r = r / 255.0f;
-	spr->Vertices[0].g = g / 255.0f;
-	spr->Vertices[0].b = b / 255.0f;
-	spr->Vertices[0].a = 1.0f;
+	D3DXVECTOR3 cameraUp = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
 
-	spr->Vertices[1].x = 128.0f;
-	spr->Vertices[1].y = -128.0f;
-	spr->Vertices[1].z = 0.0f;
-	spr->Vertices[1].u = sprite->UV[1].x;
-	spr->Vertices[1].v = sprite->UV[1].y;
-	spr->Vertices[1].r = r / 255.0f;
-	spr->Vertices[1].g = g / 255.0f;
-	spr->Vertices[1].b = b / 255.0f;
-	spr->Vertices[1].a = 1.0f;
+	D3DXVECTOR3 right;
+	D3DXVec3Cross(&right, &cameraUp, &look);
+	D3DXVec3Normalize(&right, &right);
 
-	spr->Vertices[2].x = 128.0f;
-	spr->Vertices[2].y = 128.0f;
-	spr->Vertices[2].z = 0.0f;
-	spr->Vertices[2].u = sprite->UV[2].x;
-	spr->Vertices[2].v = sprite->UV[2].y;
-	spr->Vertices[2].r = r / 255.0f;
-	spr->Vertices[2].g = g / 255.0f;
-	spr->Vertices[2].b = b / 255.0f;
-	spr->Vertices[2].a = 1.0f;
+	D3DXVECTOR3 up;
+	D3DXVec3Cross(&up, &look, &right);
+	D3DXVec3Normalize(&up, &up);
 
-	spr->Vertices[3].x = -128.0f;
-	spr->Vertices[3].y = 128.0f;
-	spr->Vertices[3].z = 0.0f;
-	spr->Vertices[3].u = sprite->UV[3].x;
-	spr->Vertices[3].v = sprite->UV[3].y;
-	spr->Vertices[3].r = r / 255.0f;
-	spr->Vertices[3].g = g / 255.0f;
-	spr->Vertices[3].b = b / 255.0f;
-	spr->Vertices[3].a = 1.0f;
+	// set matrix values
 
-	m_spritesToDraw.push_back(spr);
+	D3DXMatrixIdentity(out);
+	
+	out->_11 = right.x;
+	out->_12 = right.y;
+	out->_13 = right.z;
+
+	out->_21 = up.x;
+	out->_22 = up.y;
+	out->_23 = up.z;
+
+	out->_31 = look.x;
+	out->_32 = look.y;
+	out->_33 = look.z;
+
+	out->_41 = particlePos->x;
+	out->_42 = particlePos->y;
+	out->_43 = particlePos->z;
+}
+
+void Renderer::AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale, float width, float height)
+{
+	scale = 1.0f;
+
+	width *= scale;
+	height *= scale;
+
+	float halfWidth = width / 2.0f;
+	float halfHeight = height / 2.0f;
+
+	D3DXMATRIX billboardMatrix;
+	CreateBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(x, y, z), &D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z));
+
+	D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
+	D3DXVECTOR3 p1 = D3DXVECTOR3(halfWidth, -halfHeight, 0);
+	D3DXVECTOR3 p2 = D3DXVECTOR3(halfWidth, halfHeight, 0);
+	D3DXVECTOR3 p3 = D3DXVECTOR3(-halfWidth, halfHeight, 0);
+
+	D3DXVECTOR4 p0t;
+	D3DXVECTOR4 p1t;
+	D3DXVECTOR4 p2t;
+	D3DXVECTOR4 p3t;
+
+	D3DXVec3Transform(&p0t, &p0, &billboardMatrix);
+	D3DXVec3Transform(&p1t, &p1, &billboardMatrix);
+	D3DXVec3Transform(&p2t, &p2, &billboardMatrix);
+	D3DXVec3Transform(&p3t, &p3, &billboardMatrix);
+
+	RendererVertex v;
+	__int32 baseVertex = m_spritesVertices.size();
+
+	v.x = p0t.x;
+	v.y = p0t.y;
+	v.z = p0t.z;
+	v.u = sprite->UV[0].x;
+	v.v = sprite->UV[0].y;
+	v.r = r / 255.0f;
+	v.g = g / 255.0f;
+	v.b = b / 255.0f;
+	v.a = 1.0f;
+	m_spritesVertices.push_back(v);
+
+	v.x = p1t.x;
+	v.y = p1t.y;
+	v.z = p1t.z;
+	v.u = sprite->UV[1].x;
+	v.v = sprite->UV[1].y;
+	v.r = r / 255.0f;
+	v.g = g / 255.0f;
+	v.b = b / 255.0f;
+	v.a = 1.0f;
+	m_spritesVertices.push_back(v);
+
+	v.x = p2t.x;
+	v.y = p2t.y;
+	v.z = p2t.z;
+	v.u = sprite->UV[2].x;
+	v.v = sprite->UV[2].y;
+	v.r = r / 255.0f;
+	v.g = g / 255.0f;
+	v.b = b / 255.0f;
+	v.a = 1.0f;
+	m_spritesVertices.push_back(v);
+
+	v.x = p3t.x;
+	v.y = p3t.y;
+	v.z = p3t.z;
+	v.u = sprite->UV[3].x;
+	v.v = sprite->UV[3].y;
+	v.r = r / 255.0f;
+	v.g = g / 255.0f;
+	v.b = b / 255.0f;
+	v.a = 1.0f;
+	m_spritesVertices.push_back(v);
+
+	m_spritesIndices.push_back(baseVertex + 0);
+	m_spritesIndices.push_back(baseVertex + 1);
+	m_spritesIndices.push_back(baseVertex + 2);
+	m_spritesIndices.push_back(baseVertex + 0);
+	m_spritesIndices.push_back(baseVertex + 2);
+	m_spritesIndices.push_back(baseVertex + 3);
 }
 
 void Renderer::DrawFires()
 {
-	D3DXMATRIX world;
-	D3DXMATRIX translation;
-	D3DXMATRIX viewProjection;
-	D3DXMatrixMultiply(&viewProjection, &ViewMatrix, &ProjectionMatrix);
-	D3DXMATRIX scale;
-	UINT cPasses = 1;
-
-	LPD3DXEFFECT effect;
-	effect = m_shaderBasic->GetEffect();
-	effect->Begin(&cPasses, 0);
-
-	printf("Spark: %d\n", NextFreeFireSpark);
-
 	for (__int32 k = 0; k < 32; k++)
 	{
 		FIRE_LIST* fire = &Fires[k];
@@ -5201,58 +5286,42 @@ void Renderer::DrawFires()
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
 				{
-					D3DXMatrixTranslation(&translation, fire->x + spark->x, fire->y + spark->y, fire->z + spark->z);
-
-					RendererObject* moveableObj = m_moveableObjects[ID_FLAME_EMITTER];
-
-					effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-					effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
-					effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &translation);
-					effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
-					effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
-
-					for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
-					{
-						RendererMesh* mesh = moveableObj->ObjectMeshes[n];
-						RendererBucket* bucket = mesh->GetBucket(0);
-						if (bucket->NumVertices == 0)
-							continue;
-
-						m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-						m_device->SetIndices(bucket->GetIndexBuffer());
-
-						for (int iPass = 0; iPass < cPasses; iPass++)
-						{
-							effect->BeginPass(iPass);
-							effect->CommitChanges();
-
-							DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-							effect->EndPass();
-						}
-					}
+					AddSprite(m_sprites[spark->def], 
+								fire->x + spark->x, fire->y + spark->y, fire->z + spark->z, 
+								spark->r, spark->g, spark->b, 
+								TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f);
 				}
 			}
 		}
 	}
+}
 
-	effect->End();
-
-	/*m_sprite->Begin(D3DXSPRITE_ALPHABLEND);
+void Renderer::DrawSmokes()
+{
 	for (__int32 i = 0; i < 32; i++)
 	{
-		FIRE_LIST* fire = &Fires[i];
-		if (fire->on)
+		SMOKE_SPARKS* spark = &SmokeSparks[i];
+		if (spark->On)
 		{
-			D3DXVECTOR3 pos = D3DXVECTOR3(fire->x, fire->y, fire->z);
-			D3DXMatrixTranslation(&translation, fire->x, fire->y, fire->z);
-			D3DXMatrixMultiply(&world, &translation, &viewProjection);
-			D3DXVECTOR3 screen;
-			D3DVIEWPORT9 vp;
-			m_device->GetViewport(&vp);
-			D3DXVec3Project(&screen, &pos, &vp, &ProjectionMatrix, &ViewMatrix, &translation);
-			m_sprite->Draw(m_skyTexture, NULL, &D3DXVECTOR3(0, 0, 0), &pos, 0xFFFFFFFF);
+			AddSprite(m_sprites[spark->Def],
+				spark->x, spark->y, spark->z,
+				spark->Shade, spark->Shade, spark->Shade,
+				TR_ANGLE_TO_RAD(spark->RotAng), spark->Scalar, spark->Size * 4.0f, spark->Size * 4.0f);
 		}
 	}
-	m_sprite->End();*/
+}
+
+void Renderer::DrawBlood()
+{
+	for (__int32 i = 0; i < 32; i++)
+	{
+		BLOOD_STRUCT* blood = &Blood[i];
+		if (blood->On)
+		{
+			AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
+				blood->x, blood->y, blood->z,
+				blood->Shade * 244, blood->Shade * 0, blood->Shade * 0,
+				TR_ANGLE_TO_RAD(blood->RotAng), 1.0f, blood->Size * 8.0f, blood->Size * 8.0f);
+		}
+	}
 }

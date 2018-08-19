@@ -135,6 +135,8 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		
 		UpdateSparks();
 		UpdateFireSparks();
+		UpdateSmoke();
+		UpdateBlood();
 
 		//CalculateSpotCameras();
 	}

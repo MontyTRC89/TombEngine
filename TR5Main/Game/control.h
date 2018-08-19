@@ -16,6 +16,9 @@
 #define ClearFires ((void (__cdecl*)()) 0x00481B10)
 #define UpdateSparks ((void (__cdecl*)()) 0x0042E8B0)	
 #define UpdateFireSparks ((void (__cdecl*)()) 0x004813B0)	
+#define UpdateSmoke ((void (__cdecl*)()) 0x00481DD0)	
+#define UpdateBlood ((void (__cdecl*)()) 0x00482610)	
+
 
 void __cdecl DoTitle(__int32 index);
 void __cdecl DoLevel(__int32 index);
