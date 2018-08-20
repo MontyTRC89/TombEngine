@@ -202,6 +202,11 @@
 #define Blood						ARRAY_(0x00E4C9C0, BLOOD_STRUCT, [32])
 #define GunShells					ARRAY_(0x00E4BEC0, GUNSHELL_STRUCT, [24])
 
+#define SkyPos1						VAR_U_(0x00E6E4B0, __int16)
+#define SkyPos2						VAR_U_(0x00E6D73E, __int16)
+#define Layer1Velocity				VAR_U_(0x00E5C276, byte)
+#define Layer2Velocity				VAR_U_(0x00E5C275, byte)
+
 extern bool MonksAttackLara;
 
 // Remapped variables

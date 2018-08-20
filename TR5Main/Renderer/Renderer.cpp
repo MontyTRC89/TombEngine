@@ -347,6 +347,7 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 
 	m_sphereMesh = new RendererSphere(m_device, 1280.0f, 6);
 	m_quad = new RendererQuad(m_device, 1024.0f);
+	m_skyQuad = new RendererQuad(m_device, 9728.0f);
 
 	m_halfPixelX = 0.5f / (float)ScreenWidth;
 	m_halfPixelY = 0.5f / (float)ScreenHeight;
@@ -3195,6 +3196,9 @@ void Renderer::DrawDebugInfo()
 	sprintf_s(&m_message[0], 255, "DrawSceneTime = %d", m_timeDrawScene);
 	PrintDebugMessage(10, 410 + y, 255, 255, 255, 255, m_message);
 
+	sprintf_s(&m_message[0], 255, "SkyPos = %d", SkyPos1);
+	PrintDebugMessage(10, 420 + y, 255, 255, 255, 255, m_message);
+
 //	sprintf_s(&m_message[0], 255, "Lara.lightActive = %d", m_itemsLightInfo[0].Active);
 //	PrintDebugMessage(10, 380, 255, 255, 255, 255, m_message);
 
@@ -5065,11 +5069,48 @@ bool Renderer::DrawSkyLPP()
 	D3DXMATRIX scale;
 	UINT cPasses = 1;
 
+	LPD3DXEFFECT effect = m_shaderFillGBuffer->GetEffect();
+	
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_skyTexture);
+	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f));
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_SKY);
+
+	m_device->SetStreamSource(0, m_skyQuad->VertexBuffer, 0, sizeof(RendererVertex));
+	m_device->SetIndices(m_skyQuad->IndexBuffer);
+
+	// Quads have normal up, so I must rotate the plane by X (or Z)
+	D3DXMatrixRotationX(&m_tempRotation, PI);
+
+	// Hardcoded kingdom :)
+	for (__int32 i = 0; i < 2; i++)
+	{
+		D3DXMatrixTranslation(&m_tempTranslation, Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
+		D3DXMatrixMultiply(&world, &m_tempRotation, &m_tempTranslation);
+		effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
+
+		for (int iPass = 0; iPass < cPasses; iPass++)
+		{
+			effect->BeginPass(iPass);
+			effect->CommitChanges();
+
+			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_quad->NumVertices, 0, m_quad->NumIndices / 3);
+
+			effect->EndPass();
+		}
+	}
+
+	// Draw the horizon
 	RendererObject* horizonObj = m_moveableObjects[ID_HORIZON];
 	RendererMesh* mesh = horizonObj->ObjectMeshes[0];
-
-	LPD3DXEFFECT effect = m_shaderFillGBuffer->GetEffect();
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_HORIZON);
+
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
+	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
+	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+
+	D3DXMatrixTranslation(&world, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
+
 
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
 	{
@@ -5082,12 +5123,6 @@ bool Renderer::DrawSkyLPP()
 		for (int iPass = 0; iPass < cPasses; iPass++)
 		{
 			effect->BeginPass(iPass);
-
-			D3DXMatrixTranslation(&world, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-			D3DXMatrixScaling(&scale, 16.0f, 16.0f, 16.0f);
-			D3DXMatrixMultiply(&world, &scale, &world);
-			effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
-
 			effect->CommitChanges();
 
 			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
@@ -5096,42 +5131,9 @@ bool Renderer::DrawSkyLPP()
 		}
 	}
 
-	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
-	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_skyTexture);
-	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f));
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_SKY);
-	effect->SetInt(effect->GetParameterByName(NULL, "SkyTimer"), m_skyTimer);
-
-	m_skyTimer++;
-	/*if (m_skyTimer >= 256)
-		m_skyTimer = 0; */
-
-	m_device->SetStreamSource(0, m_quad->VertexBuffer, 0, sizeof(RendererVertex));
-	m_device->SetIndices(m_quad->IndexBuffer);
-	//m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-
-	for (int iPass = 0; iPass < cPasses; iPass++)
-	{
-		effect->BeginPass(iPass);
-
-		D3DXMatrixTranslation(&translation, LaraItem->pos.xPos, LaraItem->pos.yPos - 5 * 1024.0f, LaraItem->pos.zPos);
-		D3DXMatrixRotationZ(&rotation, PI);
-		D3DXMatrixScaling(&scale, 32.0f, 32.0f, 32.0f);
-		D3DXMatrixMultiply(&world, &scale, &rotation);
-		D3DXMatrixMultiply(&world, &world, &translation);
-		effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
-
-		effect->CommitChanges();
-
-		DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_quad->NumVertices, 0, m_quad->NumIndices / 3);
-
-		effect->EndPass();
-	}
+	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
 
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
-
-	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
-	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	return true;
 }

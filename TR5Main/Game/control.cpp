@@ -41,8 +41,8 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 	{
 		GlobalCounter++;
 
-		// UpdateSky();
-
+		UpdateSky();
+		
 		// Poll the keyboard and update input variables
 		if (S_UpdateInput() == -1)
 			return 0;
@@ -170,7 +170,7 @@ void __cdecl DoTitle(__int32 index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
-	DoLevel(3);
+	DoLevel(10);
 	return;
 
 	S_LoadLevelFile(0);

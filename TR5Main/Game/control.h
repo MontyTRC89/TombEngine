@@ -23,7 +23,7 @@
 #define UpdateDebris ((void (__cdecl*)()) 0x0041D500)
 #define UpdateDrips ((void (__cdecl*)()) 0x00483D90)
 #define UpdateGunShells ((void (__cdecl*)()) 0x00482D80)
-
+#define UpdateSky ((void (__cdecl*)()) 0x00414720)
 
 void __cdecl DoTitle(__int32 index);
 void __cdecl DoLevel(__int32 index);

@@ -48,7 +48,6 @@ float3 CameraPosition;
 float HalfPixelX;
 float HalfPixelY;
 float4 Color;
-int SkyTimer;
 
 // Bones used for Lara skinning
 float4x4 Bones[24];
@@ -94,9 +93,6 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	output.WorldPosition = worldPosition;
 	output.PositionCopy = output.Position;
 	output.Depth = output.Position.z / output.Position.w;
-
-	if (ModelType == MODELTYPE_SKY)
-		output.TextureCoordinate.y += 1.0f / SkyTimer;
 
 	return output;
 }

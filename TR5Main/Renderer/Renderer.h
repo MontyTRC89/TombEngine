@@ -463,6 +463,7 @@ class Renderer
 	__int32							m_quadIndices[6];
 	RendererSphere*					m_sphereMesh;
 	RendererQuad*					m_quad;
+	RendererQuad*					m_skyQuad;
 	float							m_halfPixelX;
 	float							m_halfPixelY;
 	D3DXMATRIX						m_viewProjection;
