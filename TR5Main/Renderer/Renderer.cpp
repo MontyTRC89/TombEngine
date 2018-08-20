@@ -4054,6 +4054,9 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	}
 
+	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
 	// Draw alpha tested geometry
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -4088,6 +4091,9 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	}
+
+	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
 	DrawGunFlashes(RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
@@ -4352,12 +4358,12 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawFires();
 	DrawSmokes();
 	DrawBlood();
-
+	
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
+	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -5155,7 +5161,6 @@ void Renderer::ClearDynamicLights()
 
 void Renderer::CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos)
 {
-	// compute billboard basis
 	D3DXVECTOR3 look = *particlePos;
 	look = look - *cameraPos;
 	D3DXVec3Normalize(&look, &look);
@@ -5169,8 +5174,6 @@ void Renderer::CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, 
 	D3DXVECTOR3 up;
 	D3DXVec3Cross(&up, &look, &right);
 	D3DXVec3Normalize(&up, &up);
-
-	// set matrix values
 
 	D3DXMatrixIdentity(out);
 	
@@ -5324,4 +5327,68 @@ void Renderer::DrawBlood()
 				TR_ANGLE_TO_RAD(blood->RotAng), 1.0f, blood->Size * 8.0f, blood->Size * 8.0f);
 		}
 	}
+}
+
+bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+{
+	D3DXMATRIX world;
+	UINT cPasses = 1;
+
+	LPD3DXEFFECT effect;
+	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+		effect = m_depthShader->GetEffect();
+	else
+		effect = m_shaderFillGBuffer->GetEffect();
+
+	for (__int32 i = 0; i < 24; i++)
+	{
+		GUNSHELL_STRUCT* gunshell = &GunShells[i];
+		if (gunshell->counter > 0)
+		{
+			OBJECT_INFO* obj = &Objects[gunshell->objectNumber];
+			RendererObject* moveableObj = m_moveableObjects[gunshell->objectNumber];
+			
+			if (!moveableObj->HasDataInBucket[bucketIndex])
+				return true;
+			
+			effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+			
+			D3DXMatrixTranslation(&m_tempTranslation, gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
+			D3DXMatrixRotationYawPitchRoll(&m_tempRotation, TR_ANGLE_TO_RAD(gunshell->pos.yRot),
+				TR_ANGLE_TO_RAD(gunshell->pos.xRot),
+				TR_ANGLE_TO_RAD(gunshell->pos.zRot));
+			D3DXMatrixMultiply(&world, &m_tempRotation, &m_tempTranslation);
+			effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
+
+			if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
+				effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+			else
+				effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+
+			for (__int32 i = 0; i < moveableObj->ObjectMeshes.size(); i++)
+			{
+				RendererMesh* mesh = moveableObj->ObjectMeshes[i];
+				RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+				if (bucket->NumVertices == 0)
+					continue;
+
+				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+				m_device->SetIndices(bucket->GetIndexBuffer());
+
+				for (int iPass = 0; iPass < cPasses; iPass++)
+				{
+					effect->BeginPass(iPass);
+					effect->CommitChanges();
+
+					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+					effect->EndPass();
+				}
+			}
+		}
+
+	}
+
+	return true;
 }

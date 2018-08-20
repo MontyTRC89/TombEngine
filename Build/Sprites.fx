@@ -41,10 +41,11 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
 	float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
-	clip(textureColor.a - 0.6f);
+	//clip(textureColor.a - 0.6f);
 
+	float a = textureColor.r;
 	textureColor *= input.Color;
-	textureColor.a = 1.0f;
+	textureColor.a = a;
 
 	return textureColor;
 }

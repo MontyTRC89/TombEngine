@@ -558,6 +558,7 @@ public:
 	void							DrawFires();
 	void							DrawSmokes();
 	void							DrawBlood();
+	bool							DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	void							CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos);
 
 	// New light pre-pass renderer

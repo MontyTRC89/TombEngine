@@ -200,6 +200,7 @@
 #define NextFreeFireSpark			VAR_U_(0x0050A17C, __int16)
 #define SmokeSparks					ARRAY_(0x00E4B940, SMOKE_SPARKS, [32])
 #define Blood						ARRAY_(0x00E4C9C0, BLOOD_STRUCT, [32])
+#define GunShells					ARRAY_(0x00E4BEC0, GUNSHELL_STRUCT, [24])
 
 extern bool MonksAttackLara;
 

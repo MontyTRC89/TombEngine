@@ -18,6 +18,11 @@
 #define UpdateFireSparks ((void (__cdecl*)()) 0x004813B0)	
 #define UpdateSmoke ((void (__cdecl*)()) 0x00481DD0)	
 #define UpdateBlood ((void (__cdecl*)()) 0x00482610)	
+#define UpdateBubbles ((void (__cdecl*)()) 0x00483540)
+#define UpdateSplashes ((void (__cdecl*)()) 0x00430710)
+#define UpdateDebris ((void (__cdecl*)()) 0x0041D500)
+#define UpdateDrips ((void (__cdecl*)()) 0x00483D90)
+#define UpdateGunShells ((void (__cdecl*)()) 0x00482D80)
 
 
 void __cdecl DoTitle(__int32 index);
