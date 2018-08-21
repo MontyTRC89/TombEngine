@@ -103,8 +103,15 @@
 // Sound
 #define SampleLUT					VAR_U_(0x00E528A4, __int16*)
 #define SampleInfo					VAR_U_(0x00E528A8, SAMPLE_INFO*)
-#define SamplePointer               ARRAY_(0x0086BEF0, char*, [SOUND_MAX_SAMPLES])
+#define SamplePointer               ARRAY_(0x0086BEF0, HSAMPLE, [SOUND_MAX_SAMPLES])
 #define SoundSlot					ARRAY_(0x00E52430, SoundEffectSlot, [SOUND_MAX_CHANNELS])
+
+#define TrackNamePrefix				VAR_U_(0x00511828, char)
+#define TrackNameTable				ARRAY_(0x005108C0, char*, [SOUND_LEGACY_TRACKTABLE_SIZE])
+#define TrackMap					ARRAY_(0x00EEEA40, byte,  [SOUND_LEGACY_TRACKTABLE_SIZE])
+
+#define IsAtmospherePlaying			VAR_U_(0x00EEEFFC, byte)
+#define CurrentAtmosphere			VAR_U_(0x00EEEB90, byte)
 
 // Gameflow
 #define gfFilenameOffset			VAR_U_(0x00E5C34C, __int16*)
@@ -124,7 +131,6 @@
 #define InventoryItemChosen			VAR_U_(0x00508E1C, __int32)
 #define DelCutSeqPlayer				VAR_U_(0x0051CE2C, __int16)
 #define TitleControlsLockedOut		VAR_U_(0x00E5C2A8, byte)
-#define IsAtmospherePlaying			VAR_U_(0x00EEEFFC, byte)
 
 #define TrackCameraInit				VAR_U_(0x0051D010, __int32)
 #define CheckTrigger				VAR_U_(0x0051D014, __int32)
