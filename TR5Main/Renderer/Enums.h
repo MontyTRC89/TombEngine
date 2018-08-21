@@ -69,6 +69,8 @@ typedef enum BLEND_MODES {
 
 #define NUM_BUCKETS 6
 
+#define NUM_RAIN_DROPS 256
+
 #define	FADEMODE_NONE 0
 #define FADEMODE_FADEIN 1
 #define FADEMODE_FADEOUT 2

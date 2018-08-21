@@ -170,7 +170,7 @@ void __cdecl DoTitle(__int32 index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
-	DoLevel(10);
+	DoLevel(8);
 	return;
 
 	S_LoadLevelFile(0);

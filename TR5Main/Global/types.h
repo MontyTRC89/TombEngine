@@ -1023,6 +1023,23 @@ struct SPLASH_STRUCT
 	unsigned char life; // size=0, offset=39
 };
 
+struct DRIP_STRUCT
+{
+	__int32 x; // size=0, offset=0
+	__int32 y; // size=0, offset=4
+	__int32 z; // size=0, offset=8
+	byte On; // size=0, offset=12
+	byte R; // size=0, offset=13
+	byte G; // size=0, offset=14
+	byte B; // size=0, offset=15
+	__int16 Yvel; // size=0, offset=16
+	byte Gravity; // size=0, offset=18
+	byte Life; // size=0, offset=19
+	__int16 RoomNumber; // size=0, offset=20
+	byte Outside; // size=0, offset=22
+	byte Pad; // size=0, offset=23
+};
+
 struct RIPPLE_STRUCT
 {
 	__int32 x; // size=0, offset=0

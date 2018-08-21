@@ -330,6 +330,11 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	if (m_shaderBasic->GetEffect() == NULL)
 		return false;
 
+	m_shaderRain = new Shader(m_device, (char*)"Rain.fx");
+	m_shaderRain->Compile();
+	if (m_shaderRain->GetEffect() == NULL)
+		return false;
+
 	/*m_shaderFXAA = new Shader(m_device, (char*)"FXAA.fx");
 	m_shaderFXAA->Compile();
 	if (m_shaderFXAA->GetEffect() == NULL)
@@ -367,6 +372,9 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_itemsToDraw.reserve(1024);
 
 	ResetBlink();
+
+	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+		m_rainDrops[i].Reset = true;
 
 	return true;
 }
@@ -816,6 +824,7 @@ bool Renderer::PrepareDataForTheRenderer()
 		__int32 lastRectangle = 0;
 		__int32 lastTriangle = 0;
 
+		RendererTempVertex* normals = (RendererTempVertex*)malloc(room->NumVertices * sizeof(RendererTempVertex));
 		tr5_room_layer* layers = (tr5_room_layer*)room->LayerOffset;
 
 		for (__int32 l = 0; l < room->NumLayers; l++)
@@ -4262,16 +4271,19 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_timeCombine = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
 
-	// FXAA
-
 	// Clear depth and start reconstructing Z-Buffer
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
-	/*m_device->SetRenderState(D3DRS_COLORWRITEENABLE, false);
-	m_device->SetRenderState(D3DRS_COLORWRITEENABLE1, false);
-	m_device->SetRenderState(D3DRS_COLORWRITEENABLE2, false);
-	m_device->SetRenderState(D3DRS_COLORWRITEENABLE3, false);*/
 
-	/*effect = m_shaderReconstructZBuffer->GetEffect();
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+	effect = m_shaderReconstructZBuffer->GetEffect();
 	m_device->BeginScene();
 	effect->Begin(&cPasses, 0);
 
@@ -4362,7 +4374,9 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawFires();
 	DrawSmokes();
 	DrawBlood();
-	
+
+	DoRain();
+
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
@@ -5391,6 +5405,85 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		}
 
 	}
+
+	return true;
+}
+
+bool Renderer::DoRain()
+{
+	RendererVertex vertices[NUM_RAIN_DROPS * 2];
+
+	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+	{
+		RendererRainDrop* drop = &m_rainDrops[i];
+		if (drop->Reset)
+		{ 
+			drop->X = (LaraItem->pos.xPos + rand() % 18000) - 9000.0f;
+			drop->Y = LaraItem->pos.yPos - 3072.0f + (rand() % 512);
+			drop->Z = LaraItem->pos.zPos + rand() % 18000 - 9000.0f;
+			drop->Size = 256.0f + (rand() % 64);
+			drop->AngleH = (rand() % 360) * RADIAN;
+			drop->AngleV = (rand() % 5) * RADIAN;
+			drop->Reset = false;
+		}
+
+		RendererVertex* vertex = &vertices[2 * i];
+		
+		vertex->x = drop->X;
+		vertex->y = drop->Y;
+		vertex->z = drop->Z;
+		vertex->r = 0.25f;
+		vertex->g = 0.25f;
+		vertex->b = 0.25f;
+
+		vertex = &vertices[2 * i + 1];
+
+		float radius = drop->Size * sin(drop->AngleV);
+		
+		float dx = sin(drop->AngleH) * radius;
+		float dy = drop->Size * cos(drop->AngleH);
+		float dz = cos(drop->AngleH) * radius;
+		
+		drop->X += dx;
+		drop->Y += 256.0f;
+		drop->Z += dz;
+
+		vertex->x = drop->X;
+		vertex->y = drop->Y;
+		vertex->z = drop->Z;
+		vertex->r = 0.25f;
+		vertex->g = 0.25f;
+		vertex->b = 0.25f;
+
+		__int16 roomNumber = Camera.pos.roomNumber;
+		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+		ROOM_INFO* room = &Rooms[roomNumber];
+		if (drop->Y >= room->y + room->minfloor)
+			drop->Reset = true;
+	}
+
+	//D3DXMATRIX world;
+	//D3DXMatrixTranslation(&world, Camera.pos.x, Camera.pos.y, Camera.pos.z)
+	 
+	LPD3DXEFFECT effect = m_shaderRain->GetEffect();
+	UINT cPasses = 1;
+
+	m_device->BeginScene();
+	effect->Begin(&cPasses, 0);
+
+	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
+
+	for (int iPass = 0; iPass < cPasses; iPass++)
+	{
+		effect->BeginPass(iPass);
+		effect->CommitChanges();
+		m_device->DrawPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_LINELIST, NUM_RAIN_DROPS, &vertices[0], sizeof(RendererVertex));
+		effect->EndPass();
+	}
+
+	effect->End();
+	m_device->EndScene();
 
 	return true;
 }

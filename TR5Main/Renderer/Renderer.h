@@ -376,6 +376,23 @@ typedef struct RendererSpriteToDraw {
 	__int32	Indices[6];
 };
 
+typedef struct RendererTempVertex {
+	D3DXVECTOR3 Position;
+	vector<D3DXVECTOR3> Normals;
+	D3DXVECTOR3 AveragedNormal;
+};
+
+typedef struct RendererRainDrop {
+	float X;
+	float Y;
+	float Z;
+	float AngleH;
+	float AngleV;
+	float Size;
+	__int16 Room;
+	bool Reset;
+};
+
 class Renderer
 {
 	LPDIRECT3D9						m_d3D = NULL;
@@ -459,6 +476,7 @@ class Renderer
 	Shader*							m_shaderFXAA;
 	Shader*							m_shaderReconstructZBuffer;
 	Shader*							m_shaderSprites;
+	Shader*							m_shaderRain;
 	RendererVertex					m_quadVertices[4];
 	__int32							m_quadIndices[6];
 	RendererSphere*					m_sphereMesh;
@@ -482,6 +500,7 @@ class Renderer
 	__int32							m_skyTimer;
 	vector<RendererVertex>			m_spritesVertices;
 	vector<__int32>					m_spritesIndices;
+	RendererRainDrop				m_rainDrops[NUM_RAIN_DROPS];
 
 public:
 	D3DXMATRIX						ViewMatrix;
@@ -572,4 +591,5 @@ public:
 	bool							DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							DrawSkyLPP();
 	void							CollectLightsLPP();
+	bool							DoRain();
 };
