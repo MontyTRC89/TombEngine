@@ -1,19 +1,20 @@
 #pragma once
 
 #include <bass.h>
-#include <bassmix.h>
 #include <bass_fx.h>
 #include <d3dx9math.h>
+
 #include "..\Game\control.h"
 #include "..\Global\global.h"
 
+#define SOUND_BASS_UNITS			1.0f / 1024.0f	// TR->BASS distance unit coefficient
+#define SOUND_MAXVOL_RADIUS			1024.0f			// Max. volume hearing distance
+
 #define SOUND_MAX_SAMPLES 3072 // Original was 1024, reallocate original 3-byte DX handle struct to just 1-byte memory pointer
-#define SOUND_MAX_CHANNELS  32 // Original was 24, reallocate original 36-byte struct with 26-byte SoundEffectChannel struct
+#define SOUND_MAX_CHANNELS  32 // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
 
-#define SOUND_LEGACY_SOUNDMAP_SIZE	450
-
-#define SOUND_MAXVOL_RANGE			1
-#define SOUND_MAXVOL_RADIUS			(SOUND_MAXVOL_RANGE << 10)
+#define SOUND_LEGACY_SOUNDMAP_SIZE	 450
+#define SOUND_LEGACY_TRACKTABLE_SIZE 136
 
 #define SOUND_FLAG_NO_PAN			(1<<12)	// Unused flag
 #define SOUND_FLAG_RND_PITCH		(1<<13)
@@ -23,13 +24,45 @@
 #define SOUND_MAX_GAIN_CHANGE		0.0625f
 
 #define SOUND_32BIT_SILENCE_LEVEL	4.9e-04f
-#define SOUND_OMNIPRESENT_ORIGIN    D3DXVECTOR3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)
+
+#define SOUND_SAMPLE_FLAGS			(BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT)
 
 typedef struct SoundEffectSlot
 {
-	HSTREAM channel;
-	__int32 effectID;
+	short state;
+	short effectID;
+	float gain;
+	HCHANNEL channel;
 	D3DXVECTOR3 origin;
+};
+
+typedef struct SoundTrackSlot
+{
+	HSTREAM channel;
+	short   trackID;
+};
+
+enum sound_track_types
+{
+	SOUND_TRACK_ONESHOT,
+	SOUND_TRACK_BACKGROUND,
+
+	NUM_SOUND_TRACK_TYPES
+};
+
+enum sound_filters
+{
+	SOUND_FILTER_REVERB,
+	SOUND_FILTER_COMPRESSOR,
+
+	NUM_SOUND_FILTERS
+};
+
+enum sound_states
+{
+	SOUND_STATE_IDLE,
+	SOUND_STATE_ENDING,
+	SOUND_STATE_ENDED
 };
 
 enum sound_flags
@@ -55,22 +88,24 @@ enum reverb_type
 
 long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flags);
 void __cdecl StopSoundEffect(__int16 effectID);
-bool __cdecl Sound_MakeSample(char *buffer, __int32 compSize, __int32 uncompSize, __int32 currentIndex);
+bool __cdecl Sound_LoadSample(char *buffer, __int32 compSize, __int32 uncompSize, __int32 currentIndex);
 void __cdecl Sound_FreeSamples();
 void __cdecl SOUND_Stop();
+void __cdecl S_CDPlay(short index, unsigned int mode);
+void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown);
+void __cdecl S_CDStop();
 
-static void CALLBACK Sound_ClearSoundSlot(HSYNC handle, DWORD channel, DWORD data, void* slot);
-
-void Sound_Init();
-void Sound_DeInit();
-bool Sound_CheckBASSError(char* message, ...);
-void Sound_UpdateScene();
-void Sound_FreeSample(__int32 index);
-bool Sound_LoadLegacySample(__int32 index, char *pointer, __int32 compSize, __int32 uncompSize);
-int  Sound_GetFreeSlot();
-void Sound_FreeSlot(int index);
-int  Sound_EffectIsPlaying(int effectID, D3DXVECTOR3 origin);
-bool Sound_IsInRange(D3DXVECTOR3 position, float range);
-bool Sound_UpdateEffectPosition(int index, D3DXVECTOR3 origin);
+void  Sound_Init();
+void  Sound_DeInit();
+bool  Sound_CheckBASSError(char* message, ...);
+void  Sound_UpdateScene();
+void  Sound_FreeSample(__int32 index);
+int   Sound_GetFreeSlot();
+void  Sound_FreeSlot(int index, unsigned int fadeout);
+int   Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position);
+float Sound_DistanceToListener(PHD_3DPOS *position);
+float Sound_DistanceToListener(D3DXVECTOR3 position);
+float Sound_Attenuate(float gain, float distance, float radius);
+bool  Sound_UpdateEffectPosition(int index, PHD_3DPOS *position);
 
 void Inject_Sound();

@@ -240,6 +240,7 @@ void __cdecl DoLevel(__int32 index)
 	{
 		nframes = DrawPhaseGame();
 		GameStatus = ControlPhase(nframes, 0);
+		Sound_UpdateScene();
 	}
 }
 
