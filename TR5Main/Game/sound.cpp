@@ -2,19 +2,20 @@
 
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];
-BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES]; // Reverb presets
 SoundTrackSlot BASS_Soundtrack[NUM_SOUND_TRACK_TYPES];
+
+const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb presets
+
+{ // Dry Mix | Wet Mix |  Size   |  Damp   |  Width  |  Mode  | Channel
+  {  1.0f,     0.20f,     0.05f,    0.90f,    0.7f,     0,      -1     },	// 0 = Outside
+  {  1.0f,     0.20f,     0.35f,    0.15f,    0.8f,     0,      -1     },	// 1 = Small room
+  {  1.0f,     0.25f,     0.55f,    0.20f,    1.0f,     0,      -1     },	// 2 = Medium room
+  {  1.0f,     0.25f,     0.80f,    0.50f,    1.0f,     0,      -1     },	// 3 = Large room
+  {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
+}; 
 
 bool __cdecl Sound_LoadSample(char *pointer, __int32 compSize, __int32 uncompSize, __int32 index)	// Replaces DXCreateSampleADPCM()
 {
-	printf("Loading sample %d  \n", index);
-
-	if (BASS_GetDevice() == -1)
-	{
-		printf("No valid BASS devices found. \n");
-		return 0;
-	}
-
 	if (index >= SOUND_MAX_SAMPLES)
 	{
 		printf("Sample index is larger than max. amount of samples (%d) \n", index);
@@ -89,7 +90,6 @@ bool __cdecl Sound_LoadSample(char *pointer, __int32 compSize, __int32 uncompSiz
 
 	// Create actual sample
 	SamplePointer[index] = BASS_SampleLoad(true, uncompBuffer, 0, cleanLength + 44, 65535, SOUND_SAMPLE_FLAGS | BASS_SAMPLE_3D);
-	printf("Sample loaded into buffer, size %d \n", info.length);
 	return true;
 }
 
@@ -197,24 +197,17 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 		return 0;
 	}
 
-	// We need to set stream buffer to minimum before assigning channel
-	// It's okay to use such small buffer, because whole processing happens in RAM.
-	BASS_SetConfig(BASS_CONFIG_BUFFER, 10);
-
-	HSAMPLE handle = SamplePointer[sampleToPlay];
-
 	// Create sample's stream and reset buffer back to normal value.
-	HSTREAM channel = BASS_SampleGetChannel(handle, true);
-	BASS_SetConfig(BASS_CONFIG_BUFFER, 300);
+	HSTREAM channel = BASS_SampleGetChannel(SamplePointer[sampleToPlay], true);
 
-	if (Sound_CheckBASSError("Trying to create channel for sample %d", sampleToPlay))
+	if (Sound_CheckBASSError("Trying to create channel for sample %d", false, sampleToPlay))
 		return 0;
 
 	// Set pitch/volume settings appropriately
 	BASS_ChannelSetAttribute(channel, BASS_ATTRIB_FREQ, 22050.0f * pitch);
 	BASS_ChannelSetAttribute(channel, BASS_ATTRIB_VOL, Sound_Attenuate(gain, distance, radius));
 
-	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", channel, sampleToPlay))
+	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", false, channel, sampleToPlay))
 		return 0;
 
 	// Finally ready to play sound, assign it to sound slot.
@@ -222,17 +215,15 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 	SoundSlot[freeSlot].effectID = effectID;
 	SoundSlot[freeSlot].channel = channel;
 	SoundSlot[freeSlot].gain = gain;
-	SoundSlot[freeSlot].origin = position ? D3DXVECTOR3(position->xPos, position->yPos, position->zPos) : D3DXVECTOR3(0, 0, 0);
-
+	SoundSlot[freeSlot].origin = position ? D3DXVECTOR3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
+	
 	// Set 3D attributes
-	if (position)
-	{
-		BASS_ChannelSet3DAttributes(channel, position ? BASS_3DMODE_NORMAL : BASS_3DMODE_OFF, SOUND_MAXVOL_RADIUS, radius, 360, 360, 0.0f);
-		Sound_UpdateEffectPosition(freeSlot, position);
+	
+	BASS_ChannelSet3DAttributes(channel, position ? BASS_3DMODE_NORMAL : BASS_3DMODE_OFF, SOUND_MAXVOL_RADIUS, radius, 360, 360, 0.0f);
+	Sound_UpdateEffectPosition(freeSlot, position, true);
 
-		if (Sound_CheckBASSError("Applying 3D attribs on channel %x, sound %d", channel, effectID))
-			return 0;
-	}
+	if (Sound_CheckBASSError("Applying 3D attribs on channel %x, sound %d", false, channel, effectID))
+		return 0;
 
 	// Set looped flag, if necessary
 	if(playType == SOUND_LOOPED)
@@ -241,7 +232,7 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 	// Play channel
 	BASS_ChannelPlay(channel, false);
 
-	if (Sound_CheckBASSError("Queuing channel %x on sample mixer", freeSlot))
+	if (Sound_CheckBASSError("Queuing channel %x on sample mixer", false, freeSlot))
 		return 0;
 
 	return 1;
@@ -251,11 +242,7 @@ void __cdecl StopSoundEffect(__int16 effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 		if (SoundSlot[i].effectID == effectID && SoundSlot[i].channel != 0 && BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING)
-		{
-			BASS_ChannelStop(SoundSlot[i].channel);
-			SoundSlot[i].channel = NULL;
-			SoundSlot[i].effectID = -1;
-		}
+			Sound_FreeSlot(i, 100);
 }
 
 void __cdecl SOUND_Stop()
@@ -284,11 +271,9 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 
 	mode = (mode >= NUM_SOUND_TRACK_TYPES) ? SOUND_TRACK_BACKGROUND : mode;
 
-	if (BASS_ChannelIsActive(BASS_Soundtrack[mode].channel))
-	{
-		if (BASS_Soundtrack[mode].trackID == index)
-			return;
-	}
+	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[mode].channel);
+	if (channelActive && (BASS_Soundtrack[mode].trackID == index))
+		return;
 
 	switch (mode)
 	{
@@ -298,12 +283,13 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 
 		case SOUND_TRACK_BACKGROUND:
 			crossfade = true;
-			crossfadeTime = 5000;
+			crossfadeTime = channelActive ? 5000 : 1500;
 			flags |= BASS_SAMPLE_LOOP;
 			break;
 	}
 
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[mode].channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
+	if(channelActive)
+		BASS_ChannelSlideAttribute(BASS_Soundtrack[mode].channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
 	
 	static char fullTrackName[1024];
 
@@ -314,8 +300,14 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName, 0, 0, flags);
 
+	if (Sound_CheckBASSError("Opening soundtrack %s", false, fullTrackName))
+		return;
+
 	BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.6f); // @TODO: Patch volume into original settings!
 	BASS_ChannelPlay(stream, false);
+
+	if (Sound_CheckBASSError("Playing soundtrack %s", false, fullTrackName))
+		return;
 
 	// BGM tracks are crossfaded, and additionally shuffled a bit to make things more natural.
 	// Think everybody are fed up with same start-up sounds of Caves ambience...
@@ -478,7 +470,7 @@ float Sound_Attenuate(float gain, float distance, float radius)
 
 // Stop and free desired sound slot.
 
-void Sound_FreeSlot(int index, unsigned int fadeout = 0)
+void Sound_FreeSlot(int index, unsigned int fadeout)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return;
@@ -490,11 +482,12 @@ void Sound_FreeSlot(int index, unsigned int fadeout = 0)
 
 	SoundSlot[index].channel = NULL;
 	SoundSlot[index].state = SOUND_STATE_IDLE;
+	SoundSlot[index].effectID = -1;
 }
 
 // Update sound position in a level.
 
-bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position)
+bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
@@ -503,7 +496,10 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position)
 	{
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(SoundSlot[index].channel, &info);
-		if (info.flags & BASS_SAMPLE_3D)
+		if ((info.flags & BASS_SAMPLE_3D) && 
+			!(!force && SoundSlot[index].origin.x == position->xPos &&
+						SoundSlot[index].origin.y == position->yPos &&
+						SoundSlot[index].origin.z == position->zPos))
 		{
 			BASS_ChannelSet3DPosition(SoundSlot[index].channel, &BASS_3DVECTOR(position->xPos, position->yPos, position->zPos),
 				&BASS_3DVECTOR(position->xRot, position->yRot, position->zRot), NULL);
@@ -529,16 +525,19 @@ void Sound_UpdateScene()
 
 	if (currentReverb == -1 || Rooms[Camera.pos.roomNumber].reverbType != currentReverb)
 	{
-		currentReverb = Rooms[Camera.pos.roomNumber].reverbType;
-		if (currentReverb < NUM_REVERB_TYPES)
-			BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[currentReverb]);
+		//currentReverb = Rooms[Camera.pos.roomNumber].reverbType;
+		//if (currentReverb < NUM_REVERB_TYPES)
+		//	BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[currentReverb]);
 	}
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
 		if ((SoundSlot[i].channel != 0) && (BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING))
 		{
-			// Stop and clean up sounds which were in ending state in previous frame
+			SAMPLE_INFO *sampleInfo = &SampleInfo[SampleLUT[SoundSlot[i].effectID]];
+
+			// Stop and clean up sounds which were in ending state in previous frame.
+			// In case sound is looping, make it ending unless they are re-fired in next frame.
 
 			if (SoundSlot[i].state == SOUND_STATE_ENDING)
 			{
@@ -546,30 +545,28 @@ void Sound_UpdateScene()
 				Sound_FreeSlot(i, 100);
 				continue;
 			}
-
-			// Calculate attenuation and clean up sounds which are out of listener range
-
-			SAMPLE_INFO *sampleInfo = &SampleInfo[SampleLUT[SoundSlot[i].effectID]];
-
-			float radius = (float)(sampleInfo->radius) * 1024.0f;
-			float distance = Sound_DistanceToListener(SoundSlot[i].origin);
-
-			if (distance > radius)
-			{
-				Sound_FreeSlot(i);
-				continue;
-			}
-			else
-				BASS_ChannelSetAttribute(SoundSlot[i].channel, BASS_ATTRIB_VOL, Sound_Attenuate(SoundSlot[i].gain, distance, radius));
-
-			// Switch looped samples to ending state to stop them in case they aren't re-fired in next frame
-
-			if (sampleInfo->flags & 3 == SOUND_LOOPED)
+			else if (sampleInfo->flags & 3 == SOUND_LOOPED)
 				SoundSlot[i].state = SOUND_STATE_ENDING;
+
+			// Calculate attenuation and clean up sounds which are out of listener range (only for 3D sounds).
+
+			if (SoundSlot[i].origin != SOUND_OMNIPRESENT_ORIGIN)
+			{
+				float radius = (float)(sampleInfo->radius) * 1024.0f;
+				float distance = Sound_DistanceToListener(SoundSlot[i].origin);
+
+				if (distance > radius)
+				{
+					Sound_FreeSlot(i);
+					continue;
+				}
+				else
+					BASS_ChannelSetAttribute(SoundSlot[i].channel, BASS_ATTRIB_VOL, Sound_Attenuate(SoundSlot[i].gain, distance, radius));
+			}
 		}
 	}
 
-	// Apply current listener position
+	// Apply current listener position.
 
 	D3DXVECTOR3 at;
 	D3DXVec3Normalize(&at, &(D3DXVECTOR3(Camera.target.x, Camera.target.y, Camera.target.z) -
@@ -592,8 +589,12 @@ void Sound_UpdateScene()
 void Sound_Init()
 {
 	BASS_Init(-1, 44100, BASS_DEVICE_3D, WindowsHandle, NULL);
+	if (Sound_CheckBASSError("Initializing BASS sound device", true))
+		return;
 
-	if (Sound_CheckBASSError("Initializing BASS sound device"))
+	// Initialize BASS_FX plugin
+	BASS_FX_GetVersion();
+	if (Sound_CheckBASSError("Initializing FX plugin", true))
 		return;
 
 	// Set 3D world parameters.
@@ -615,61 +616,27 @@ void Sound_Init()
 	// Reset buffer back to normal value.
 	BASS_SetConfig(BASS_CONFIG_BUFFER, 300);
 
-	if (Sound_CheckBASSError("Starting 3D mixdown"))
+	if (Sound_CheckBASSError("Starting 3D mixdown", true))
 		return;
 
 	// Initialize channels and tracks array
 	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * NUM_SOUND_TRACK_TYPES));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
-	// Set up reverb presets
-	
-	BASS_ReverbTypes[RVB_OUTSIDE].fDryMix = 1.0f;
-	BASS_ReverbTypes[RVB_OUTSIDE].fWetMix = 0.2f;
-	BASS_ReverbTypes[RVB_OUTSIDE].fWidth = 1.0f;
-	BASS_ReverbTypes[RVB_OUTSIDE].fRoomSize = 0.05f;
-	BASS_ReverbTypes[RVB_OUTSIDE].fDamp = 0.65f;
-	BASS_ReverbTypes[RVB_OUTSIDE].lChannel = -1;
-
-	BASS_ReverbTypes[RVB_SMALL_ROOM].fDryMix = 1.0f;
-	BASS_ReverbTypes[RVB_SMALL_ROOM].fWetMix = 0.2f;
-	BASS_ReverbTypes[RVB_SMALL_ROOM].fWidth = 0.8f;
-	BASS_ReverbTypes[RVB_SMALL_ROOM].fRoomSize = 0.3f;
-	BASS_ReverbTypes[RVB_SMALL_ROOM].fDamp = 0.15f;
-	BASS_ReverbTypes[RVB_SMALL_ROOM].lChannel = -1;
-
-	BASS_ReverbTypes[RVB_MEDIUM_ROOM].fDryMix = 1.0f;
-	BASS_ReverbTypes[RVB_MEDIUM_ROOM].fWetMix = 0.2f;
-	BASS_ReverbTypes[RVB_MEDIUM_ROOM].fWidth = 1.0f;
-	BASS_ReverbTypes[RVB_MEDIUM_ROOM].fRoomSize = 0.55f;
-	BASS_ReverbTypes[RVB_MEDIUM_ROOM].fDamp = 0.20f;
-	BASS_ReverbTypes[RVB_MEDIUM_ROOM].lChannel = -1;
-
-	BASS_ReverbTypes[RVB_LARGE_ROOM].fDryMix = 1.0f;
-	BASS_ReverbTypes[RVB_LARGE_ROOM].fWetMix = 0.2f;
-	BASS_ReverbTypes[RVB_LARGE_ROOM].fWidth = 1.0f;
-	BASS_ReverbTypes[RVB_LARGE_ROOM].fRoomSize = 0.75f;
-	BASS_ReverbTypes[RVB_LARGE_ROOM].fDamp = 0.50f;
-	BASS_ReverbTypes[RVB_LARGE_ROOM].lChannel = -1;
-
-	BASS_ReverbTypes[RVB_PIPE].fDryMix = 1.0f;
-	BASS_ReverbTypes[RVB_PIPE].fWetMix = 0.2f;
-	BASS_ReverbTypes[RVB_PIPE].fWidth = 1.0f;
-	BASS_ReverbTypes[RVB_PIPE].fRoomSize = 0.9f;
-	BASS_ReverbTypes[RVB_PIPE].fDamp = 1.0f;
-	BASS_ReverbTypes[RVB_PIPE].lChannel = -1;	
-
-	// Initialize BASS_FX plugin
-	BASS_FX_GetVersion();
-
 	// Attach reverb effect to 3D channel
  	BASS_FXHandler[SOUND_FILTER_REVERB] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_FREEVERB, 0);
 	BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[RVB_OUTSIDE]);
+
+	if (Sound_CheckBASSError("Attaching environmental FX", true))
+		return;
 
 	// Apply slight compression to 3D channel
 	BASS_FXHandler[SOUND_FILTER_COMPRESSOR] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_COMPRESSOR2, 1);
 	auto comp = BASS_BFX_COMPRESSOR2{ 4.0f, -18.0f, 2.5f, 10.0f, 100.0f, -1 };
 	BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_COMPRESSOR], &comp);
+
+	if (Sound_CheckBASSError("Attaching compressor", true))
+		return;
 
 	return;
 }
@@ -682,19 +649,18 @@ void Sound_DeInit()
 	BASS_Free();
 }
 
-bool Sound_CheckBASSError(char* message, ...)
+bool Sound_CheckBASSError(char* message, bool verbose, ...)
 {
 	va_list argptr;
 	static char data[4096];
 
 	int bassError = BASS_ErrorGetCode();
-	if (bassError != 0)
+	if (verbose || bassError)
 	{
-		va_start(argptr, message);
+		va_start(argptr, verbose);
 		int32_t written = vsprintf(data, message, argptr);	// @TODO: replace with debug/console/message output later...
 		va_end(argptr);
-
-		snprintf(data + written, sizeof(data) - written, ": error #%d \n", bassError);
+		snprintf(data + written, sizeof(data) - written, bassError ? ": error #%d \n" : ": success \n", bassError);
 		printf(data);
 	}
 	return bassError != 0;
