@@ -824,7 +824,6 @@ bool Renderer::PrepareDataForTheRenderer()
 		__int32 lastRectangle = 0;
 		__int32 lastTriangle = 0;
 
-		RendererTempVertex* normals = (RendererTempVertex*)malloc(room->NumVertices * sizeof(RendererTempVertex));
 		tr5_room_layer* layers = (tr5_room_layer*)room->LayerOffset;
 
 		for (__int32 l = 0; l < room->NumLayers; l++)
@@ -913,6 +912,7 @@ bool Renderer::PrepareDataForTheRenderer()
 
 						bucket->NumVertices++;
 						bucket->Vertices.push_back(vertex);
+						roomObject->NumVertices++;
 					}
 
 					bucket->Indices.push_back(baseVertices);
@@ -1012,6 +1012,7 @@ bool Renderer::PrepareDataForTheRenderer()
 
 						bucket->NumVertices++;
 						bucket->Vertices.push_back(vertex);
+						roomObject->NumVertices++;
 					}
 
 					bucket->Indices.push_back(baseVertices);
@@ -4375,7 +4376,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawSmokes();
 	DrawBlood();
 
-	DoRain();
+	//DoRain();
 
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
@@ -5077,6 +5078,29 @@ void Renderer::CollectLightsLPP()
 
 bool Renderer::DrawSkyLPP()
 {
+	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
+
+	// First update the sky in the case of storm
+	if (gfLevelFlags & 0x40 || true)
+	{
+		if (Unk_00E6D74C || Unk_00E6D73C)
+		{
+			UpdateStorm();
+			if (StormTimer > -1)
+				StormTimer--;
+			if (!StormTimer)
+				SoundEffect(182, 0, 0);
+		}
+		else if (!(rand() & 0x7F))
+		{
+			Unk_00E6D74C = (rand() & 0x1F) + 16;
+			Unk_00E6E4DC = rand() + 256;
+			StormTimer = (rand() & 3) + 12;
+		}
+
+		color = D3DXVECTOR4((SkyStormColor.r + 44) / 255.0f, SkyStormColor.g / 255.0f, SkyStormColor.b / 255.0f, 1.0f);
+	}
+
 	D3DXMATRIX world;
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
@@ -5086,7 +5110,7 @@ bool Renderer::DrawSkyLPP()
 	LPD3DXEFFECT effect = m_shaderFillGBuffer->GetEffect();
 	
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_skyTexture);
-	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &color);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_SKY);
 
 	m_device->SetStreamSource(0, m_skyQuad->VertexBuffer, 0, sizeof(RendererVertex));

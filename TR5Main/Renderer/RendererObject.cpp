@@ -7,6 +7,8 @@
 #include <DxErr.h>
 #include <vector>
 
+class RendererBucket;
+
 RendererObject::RendererObject(LPDIRECT3DDEVICE9 device, __int32 id, __int32 numMeshes)
 {
 	m_device = device;
@@ -36,8 +38,12 @@ RendererObject::~RendererObject()
 	Skeleton = NULL;
 }
 
-
 __int32 RendererObject::GetId()
 {
 	return m_id;
+}
+
+void RendererObject::AverageNormals()
+{
+
 }

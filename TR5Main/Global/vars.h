@@ -207,6 +207,14 @@
 #define Layer1Velocity				VAR_U_(0x00E5C276, byte)
 #define Layer2Velocity				VAR_U_(0x00E5C275, byte)
 
+#define SkyColor1					VAR_U_(0x00E5C2A4, CVECTOR)
+#define SkyStormColor				VAR_U_(0x00E6CAF0, CVECTOR)
+#define StormTimer					VAR_U_(0x0051CD5C, __int16)
+#define Unk_00E6D74C				VAR_U_(0x00E6D74C, __int16)
+#define Unk_00E6D73C				VAR_U_(0x00E6D73C, __int16)
+#define Unk_00E6D74C				VAR_U_(0x00E6D74C, __int16)
+#define Unk_00E6E4DC				VAR_U_(0x00E6E4DC, __int16)
+
 extern bool MonksAttackLara;
 
 // Remapped variables

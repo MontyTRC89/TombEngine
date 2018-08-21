@@ -183,6 +183,9 @@ void __cdecl DoLevel(__int32 index)
 	CreditsDone = false;
 	//j_DoTitleFMV();
 	CanLoad = false;
+	SkyStormColor.r = 80;
+	SkyStormColor.g = 96;
+	SkyStormColor.b = 160;
 
 	//InitialiseTitleOptionsMaybe(255, 0);
 

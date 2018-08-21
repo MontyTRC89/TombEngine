@@ -23,6 +23,7 @@ private:
 public:
 	RendererObject(LPDIRECT3DDEVICE9 device, __int32 id, __int32 numMeshes);
 	~RendererObject();
+	void						AverageNormals();
 
 	vector<RendererMesh*>		ObjectMeshes;
 	RendererBone*				Skeleton;
@@ -32,5 +33,6 @@ public:
 	__int32						GetId();
 	bool						HasDataInBucket[NUM_BUCKETS];
 	bool						DoNotDraw;
+	__int32						NumVertices;
 	//bool(Renderer::*DrawRoutine)(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 };

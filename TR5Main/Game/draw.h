@@ -10,7 +10,8 @@
 #define phd_PushUnitMatrix ((void (__cdecl*)()) 0x0048FA90)
 #define Sync ((__int32 (__cdecl*)()) 0x004D1A40)
 #define WeaponObject ((__int16 (__cdecl*)(__int32)) 0x00453AE0)  
-#define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0)  
+#define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
+#define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 
 extern Renderer* g_Renderer;
 
