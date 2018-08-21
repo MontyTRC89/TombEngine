@@ -270,3 +270,10 @@ enum LaraMeshes {
 	UARM_L, LARM_L, HAND_L,
 	HEAD
 };
+
+enum WEATHER_TYPES
+{
+	WEATHER_NORMAL = 0,
+	WEATHER_RAIN = 1,
+	WEATHER_SNOW = 2
+};

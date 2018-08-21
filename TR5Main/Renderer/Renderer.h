@@ -501,6 +501,7 @@ class Renderer
 	vector<RendererVertex>			m_spritesVertices;
 	vector<__int32>					m_spritesIndices;
 	RendererRainDrop				m_rainDrops[NUM_RAIN_DROPS];
+	bool							m_firstWeather;
 
 public:
 	D3DXMATRIX						ViewMatrix;
@@ -592,4 +593,5 @@ public:
 	bool							DrawSkyLPP();
 	void							CollectLightsLPP();
 	bool							DoRain();
+	bool							DoSnow();
 };

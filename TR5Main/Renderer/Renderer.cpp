@@ -370,6 +370,7 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_dynamicLights.reserve(1024);
 	m_lights.reserve(1024);
 	m_itemsToDraw.reserve(1024);
+	m_firstWeather = true;
 
 	ResetBlink();
 
@@ -4376,7 +4377,9 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawSmokes();
 	DrawBlood();
 
-	//DoRain();
+	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
+	//	DoSnow(); 
+		DoRain();
 
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
@@ -4396,9 +4399,21 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
 	effect->BeginPass(0);
 	effect->CommitChanges();
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesIndices.size(), 
-									 m_spritesIndices.size() / 3, m_spritesIndices.data(), 
-									 D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
+
+	__int32 numSpriteBuckets = m_spritesIndices.size() / 288;
+	if (m_spritesIndices.size() % 288 != 0) numSpriteBuckets++;
+
+	/*for (__int32 i = 0; i < numSpriteBuckets; i++)
+	{
+		__int32 numSprites = 48;
+		__int32 numSpriteVertices = (i == numSpriteBuckets - 1 ? m_spritesVertices.size() - 192 * i : 192);
+		__int32 numSpriteIndices = (i == numSpriteBuckets - 1 ? m_spritesIndices.size() - 288 * i : 288);
+		*/
+		m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesVertices.size(),
+			m_spritesIndices.size() / 3, m_spritesIndices.data(),
+			D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
+	//}
+
 	effect->EndPass();
 	effect->End();
 	m_device->EndScene();
@@ -5443,7 +5458,7 @@ bool Renderer::DoRain()
 		if (drop->Reset)
 		{ 
 			drop->X = (LaraItem->pos.xPos + rand() % 18000) - 9000.0f;
-			drop->Y = LaraItem->pos.yPos - 3072.0f + (rand() % 512);
+			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % 6 * 1024.0f : 6 * 1024.0f) + (rand() % 512);
 			drop->Z = LaraItem->pos.zPos + rand() % 18000 - 9000.0f;
 			drop->Size = 256.0f + (rand() % 64);
 			drop->AngleH = (rand() % 360) * RADIAN;
@@ -5486,9 +5501,6 @@ bool Renderer::DoRain()
 			drop->Reset = true;
 	}
 
-	//D3DXMATRIX world;
-	//D3DXMatrixTranslation(&world, Camera.pos.x, Camera.pos.y, Camera.pos.z)
-	 
 	LPD3DXEFFECT effect = m_shaderRain->GetEffect();
 	UINT cPasses = 1;
 
@@ -5498,16 +5510,67 @@ bool Renderer::DoRain()
 	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
 
+	__int32 numBuckets = 2;
 	for (int iPass = 0; iPass < cPasses; iPass++)
 	{
 		effect->BeginPass(iPass);
 		effect->CommitChanges();
-		m_device->DrawPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_LINELIST, NUM_RAIN_DROPS, &vertices[0], sizeof(RendererVertex));
+		for (__int32 i = 0; i < numBuckets; i++)
+			m_device->DrawPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_LINELIST, NUM_RAIN_DROPS / 2, &vertices[0], sizeof(RendererVertex));
 		effect->EndPass();
 	}
 
 	effect->End();
 	m_device->EndScene();
+
+	m_firstWeather = false;
+
+	return true;
+}
+
+bool Renderer::DoSnow()
+{
+	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+	{
+		RendererRainDrop* drop = &m_rainDrops[i];
+		if (drop->Reset)
+		{
+			drop->X = (LaraItem->pos.xPos + rand() % 18000) - 9000.0f;
+			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % 6 * 1024.0f : 6 * 1024.0f) + (rand() % 512);
+			drop->Z = LaraItem->pos.zPos + rand() % 18000 - 9000.0f;
+			drop->Size = 128.0f + (rand() % 64);
+			drop->AngleH = (rand() % 360) * RADIAN;
+			drop->AngleV = (rand() % 30) * RADIAN;
+			drop->Reset = false;
+		}
+
+		float radius = drop->Size * sin(drop->AngleV);
+
+		float dx = sin(drop->AngleH) * radius;
+		float dy = drop->Size * cos(drop->AngleH);
+		float dz = cos(drop->AngleH) * radius;
+
+		drop->X += dx;
+		drop->Y += 128.0f;
+		drop->Z += dz;
+
+		if (drop->X <= 0 || drop->Z <= 0 || drop->X >= 100 * 1024.0f || drop->Z >= 100 * 1024.0f)
+		{
+			drop->Reset = true;
+			continue;
+		}
+
+		AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], drop->X, drop->Y, drop->Z, 255, 255, 255,
+			0.0f, 1.0f, 72.0f, 72.0f);
+
+		__int16 roomNumber = Camera.pos.roomNumber;
+		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+		ROOM_INFO* room = &Rooms[roomNumber];
+		if (drop->Y >= room->y + room->minfloor)
+			drop->Reset = true;
+	}
+
+	m_firstWeather = false;
 
 	return true;
 }
