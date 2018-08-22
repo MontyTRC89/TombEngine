@@ -4050,8 +4050,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_DRAW);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 			}
 		}
 	}
@@ -4089,8 +4089,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_DRAW);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 			}
 		}
 	}
@@ -4281,7 +4281,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-
+	 
 	effect = m_shaderReconstructZBuffer->GetEffect();
 	m_device->BeginScene();
 	effect->Begin(&cPasses, 0);
@@ -4295,8 +4295,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4308,19 +4308,19 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_DRAW);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 			}
 		}
 	}
 
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 	}
 
 	// Draw alpha tested geometry
@@ -4330,8 +4330,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4343,19 +4343,19 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_DRAW);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 			}
 		}
 	}
 
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 	}
 
 	m_device->EndScene();
@@ -4375,8 +4375,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawBlood();
 
 	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
-		DoSnow(); 
-	//	DoRain();
+	//	DoSnow(); 
+		DoRain();
 
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
@@ -4547,7 +4547,9 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
-	else 
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
+	else  
 		effect = m_shaderFillGBuffer->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
@@ -4733,6 +4735,8 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
 	else
 		effect = m_shaderFillGBuffer->GetEffect();
 
@@ -4791,6 +4795,8 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
 	else
 		effect = m_shaderFillGBuffer->GetEffect();
 	  
@@ -4841,6 +4847,8 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
 	else
 		effect = m_shaderFillGBuffer->GetEffect();
 
@@ -4890,6 +4898,8 @@ bool Renderer::DrawGunFlashes(RENDERER_PASSES pass)
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
 	else
 		effect = m_shaderFillGBuffer->GetEffect();
 
@@ -5447,11 +5457,13 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 bool Renderer::DoRain()
 {
-	RendererVertex vertices[NUM_RAIN_DROPS];
+	RendererVertex vertices[NUM_RAIN_DROPS * 2];
 
 	if (m_firstWeather)
+	{
 		for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
 			m_rain[i].Reset = true;
+	}
 
 	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
 	{
@@ -5462,6 +5474,13 @@ bool Renderer::DoRain()
 			drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
 			drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+
+			__int16 roomNumber = Camera.pos.roomNumber;
+			FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+			ROOM_INFO* room = &Rooms[roomNumber];
+			if (!(room->flags & 32))
+				continue;
+
 			drop->Size = RAIN_SIZE + (rand() % 64);
 			drop->AngleH = (rand() % RAIN_MAX_ANGLE_H) * RADIAN;
 			drop->AngleV = (rand() % RAIN_MAX_ANGLE_V) * RADIAN;

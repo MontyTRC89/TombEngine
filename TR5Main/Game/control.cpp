@@ -236,8 +236,8 @@ void __cdecl DoLevel(__int32 index, __int32 ambient)
 
 	InitialiseHair();
 
-	ControlPhase(2, 0);
-	printf("After control\n");
+	//ControlPhase(2, 0);
+	//printf("After control\n");
 
 	__int32 nframes = 2;
 	GameStatus = ControlPhase(nframes, 0);
