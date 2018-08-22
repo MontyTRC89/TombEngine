@@ -221,6 +221,9 @@
 #define Unk_00E6D74C				VAR_U_(0x00E6D74C, __int16)
 #define Unk_00E6E4DC				VAR_U_(0x00E6E4DC, __int16)
 
+#define CurrentAtmosphere			VAR_U_(0x00EEEB90, byte)
+#define IsAtmospherePlaying			VAR_U_(0x00EEEFFC, byte)
+
 extern bool MonksAttackLara;
 
 // Remapped variables

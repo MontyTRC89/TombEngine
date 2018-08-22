@@ -374,9 +374,6 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 
 	ResetBlink();
 
-	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
-		m_rainDrops[i].Reset = true;
-
 	return true;
 }
 
@@ -4378,8 +4375,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawBlood();
 
 	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
-	//	DoSnow(); 
-		DoRain();
+		DoSnow(); 
+	//	DoRain();
 
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
@@ -5450,19 +5447,24 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 bool Renderer::DoRain()
 {
-	RendererVertex vertices[NUM_RAIN_DROPS * 2];
+	RendererVertex vertices[NUM_RAIN_DROPS];
+
+	if (m_firstWeather)
+		for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+			m_rain[i].Reset = true;
 
 	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
 	{
-		RendererRainDrop* drop = &m_rainDrops[i];
+		RendererWeatherParticle* drop = &m_rain[i];
+
 		if (drop->Reset)
 		{ 
-			drop->X = (LaraItem->pos.xPos + rand() % 18000) - 9000.0f;
-			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % 6 * 1024.0f : 6 * 1024.0f) + (rand() % 512);
-			drop->Z = LaraItem->pos.zPos + rand() % 18000 - 9000.0f;
-			drop->Size = 256.0f + (rand() % 64);
-			drop->AngleH = (rand() % 360) * RADIAN;
-			drop->AngleV = (rand() % 5) * RADIAN;
+			drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
+			drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+			drop->Size = RAIN_SIZE + (rand() % 64);
+			drop->AngleH = (rand() % RAIN_MAX_ANGLE_H) * RADIAN;
+			drop->AngleV = (rand() % RAIN_MAX_ANGLE_V) * RADIAN;
 			drop->Reset = false;
 		}
 
@@ -5471,9 +5473,9 @@ bool Renderer::DoRain()
 		vertex->x = drop->X;
 		vertex->y = drop->Y;
 		vertex->z = drop->Z;
-		vertex->r = 0.25f;
-		vertex->g = 0.25f;
-		vertex->b = 0.25f;
+		vertex->r = RAIN_COLOR;
+		vertex->g = RAIN_COLOR;
+		vertex->b = RAIN_COLOR;
 
 		vertex = &vertices[2 * i + 1];
 
@@ -5484,15 +5486,15 @@ bool Renderer::DoRain()
 		float dz = cos(drop->AngleH) * radius;
 		
 		drop->X += dx;
-		drop->Y += 256.0f;
+		drop->Y += RAIN_DELTA_Y;
 		drop->Z += dz;
 
 		vertex->x = drop->X;
 		vertex->y = drop->Y;
 		vertex->z = drop->Z;
-		vertex->r = 0.25f;
-		vertex->g = 0.25f;
-		vertex->b = 0.25f;
+		vertex->r = RAIN_COLOR;
+		vertex->g = RAIN_COLOR;
+		vertex->b = RAIN_COLOR;
 
 		__int16 roomNumber = Camera.pos.roomNumber;
 		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
@@ -5530,44 +5532,49 @@ bool Renderer::DoRain()
 
 bool Renderer::DoSnow()
 {
-	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+	if (m_firstWeather)
+		for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
+			m_snow[i].Reset = true;
+
+	for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
 	{
-		RendererRainDrop* drop = &m_rainDrops[i];
-		if (drop->Reset)
+		RendererWeatherParticle* snow = &m_snow[i];
+
+		if (snow->Reset)
 		{
-			drop->X = (LaraItem->pos.xPos + rand() % 18000) - 9000.0f;
-			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % 6 * 1024.0f : 6 * 1024.0f) + (rand() % 512);
-			drop->Z = LaraItem->pos.zPos + rand() % 18000 - 9000.0f;
-			drop->Size = 128.0f + (rand() % 64);
-			drop->AngleH = (rand() % 360) * RADIAN;
-			drop->AngleV = (rand() % 30) * RADIAN;
-			drop->Reset = false;
+			snow->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+			snow->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
+			snow->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+			snow->Size = SNOW_DELTA_Y + (rand() % 64);
+			snow->AngleH = (rand() % SNOW_MAX_ANGLE_H) * RADIAN;
+			snow->AngleV = (rand() % SNOW_MAX_ANGLE_V) * RADIAN;
+			snow->Reset = false;
 		}
 
-		float radius = drop->Size * sin(drop->AngleV);
+		float radius = snow->Size * sin(snow->AngleV);
 
-		float dx = sin(drop->AngleH) * radius;
-		float dy = drop->Size * cos(drop->AngleH);
-		float dz = cos(drop->AngleH) * radius;
+		float dx = sin(snow->AngleH) * radius;
+		float dy = snow->Size * cos(snow->AngleH);
+		float dz = cos(snow->AngleH) * radius;
 
-		drop->X += dx;
-		drop->Y += 128.0f;
-		drop->Z += dz;
+		snow->X += dx;
+		snow->Y += SNOW_DELTA_Y;
+		snow->Z += dz;
 
-		if (drop->X <= 0 || drop->Z <= 0 || drop->X >= 100 * 1024.0f || drop->Z >= 100 * 1024.0f)
+		if (snow->X <= 0 || snow->Z <= 0 || snow->X >= 100 * 1024.0f || snow->Z >= 100 * 1024.0f)
 		{
-			drop->Reset = true;
+			snow->Reset = true;
 			continue;
 		}
 
-		AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], drop->X, drop->Y, drop->Z, 255, 255, 255,
-			0.0f, 1.0f, 72.0f, 72.0f);
+		AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
+			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE);
 
 		__int16 roomNumber = Camera.pos.roomNumber;
-		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+		FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
 		ROOM_INFO* room = &Rooms[roomNumber];
-		if (drop->Y >= room->y + room->minfloor)
-			drop->Reset = true;
+		if (snow->Y >= room->y + room->minfloor)
+			snow->Reset = true;
 	}
 
 	m_firstWeather = false;

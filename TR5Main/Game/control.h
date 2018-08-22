@@ -26,7 +26,7 @@
 #define UpdateSky ((void (__cdecl*)()) 0x00414720)
 
 void __cdecl DoTitle(__int32 index);
-void __cdecl DoLevel(__int32 index);
+void __cdecl DoLevel(__int32 index, __int32 ambient);
 __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
 
 unsigned __stdcall GameMain(void*);

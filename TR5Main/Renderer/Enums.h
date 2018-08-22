@@ -70,6 +70,18 @@ typedef enum BLEND_MODES {
 #define NUM_BUCKETS 6
 
 #define NUM_RAIN_DROPS 256
+#define NUM_SNOW_PARTICLES 256
+#define WEATHER_RADIUS 20000
+#define RAIN_SIZE 384
+#define RAIN_MAX_ANGLE_V 5
+#define RAIN_MAX_ANGLE_H 360
+#define WEATHER_HEIGHT 6 * 1024.0f
+#define RAIN_COLOR 0.15f;
+#define RAIN_DELTA_Y 256.0f
+#define SNOW_SIZE 72.0f
+#define SNOW_MAX_ANGLE_V 30
+#define SNOW_MAX_ANGLE_H 360
+#define SNOW_DELTA_Y 128.0f
 
 #define	FADEMODE_NONE 0
 #define FADEMODE_FADEIN 1

@@ -382,7 +382,7 @@ typedef struct RendererTempVertex {
 	D3DXVECTOR3 AveragedNormal;
 };
 
-typedef struct RendererRainDrop {
+typedef struct RendererWeatherParticle {
 	float X;
 	float Y;
 	float Z;
@@ -500,7 +500,8 @@ class Renderer
 	__int32							m_skyTimer;
 	vector<RendererVertex>			m_spritesVertices;
 	vector<__int32>					m_spritesIndices;
-	RendererRainDrop				m_rainDrops[NUM_RAIN_DROPS];
+	RendererWeatherParticle			m_rain[NUM_RAIN_DROPS];
+	RendererWeatherParticle			m_snow[NUM_SNOW_PARTICLES];
 	bool							m_firstWeather;
 
 public:
