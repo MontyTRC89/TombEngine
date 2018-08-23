@@ -2237,6 +2237,15 @@ void Renderer::UpdateLaraAnimations()
 					m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
 					m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
 
+					D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
+					D3DXVec3Normalize(&n, &n);
+					D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[i]);
+					D3DXVec3Normalize(&n, &n);
+
+					m_hairVertices[lastVertex].nx = n.x;
+					m_hairVertices[lastVertex].ny = n.y;
+					m_hairVertices[lastVertex].nz = n.z;
+
 					lastVertex++;
 				}
 				else
@@ -2258,6 +2267,15 @@ void Renderer::UpdateLaraAnimations()
 					m_hairVertices[lastVertex].z = out.z;
 					m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
 					m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
+
+					D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
+					D3DXVec3Normalize(&n, &n);
+					D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[i]);
+					D3DXVec3Normalize(&n, &n);
+
+					m_hairVertices[lastVertex].nx = n.x;
+					m_hairVertices[lastVertex].ny = n.y;
+					m_hairVertices[lastVertex].nz = n.z;
 
 					lastVertex++;
 				}
@@ -4178,19 +4196,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 			D3DXMATRIX translation;
 			D3DXMATRIX scale;
 
-			/*if (light == m_shadowLight)
-			{
-				effect->SetBool(effect->GetParameterByName(NULL, "CastShadows"), true);
-				effect->SetMatrix(effect->GetParameterByName(NULL, "LightView"), &m_lightView);
-				effect->SetMatrix(effect->GetParameterByName(NULL, "LightProjection"), &m_lightProjection);
-				//effect->SetTexture(effect->GetParameterByName(NULL, "ShadowMapCube"), m_shadowMapCube->GetTexture());
-				effect->SetTexture(effect->GetParameterByName(NULL, "ShadowMap"), m_shadowMap->GetTexture());
-			}
-			else
-			{*/
-				effect->SetBool(effect->GetParameterByName(NULL, "CastShadows"), false);
-			//}
-
+			effect->SetBool(effect->GetParameterByName(NULL, "CastShadows"), false);
 			effect->SetBool(effect->GetParameterByName(NULL, "AmbientPass"), false);
 			effect->SetBool(effect->GetParameterByName(NULL, "LightDynamic"), light->Dynamic);
 			effect->SetVector(effect->GetParameterByName(NULL, "LightPosition"), &light->Position);
@@ -4224,8 +4230,6 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		BindRenderTargets(m_renderTarget, NULL, NULL, NULL);
 
 	// Combine stage
-	//BindRenderTargets(m_postprocessBuffer, NULL, NULL, NULL);
-
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
@@ -4273,14 +4277,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	// Clear depth and start reconstructing Z-Buffer
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
 
+	// We need to use alpha blending because we need to write only to the Z-Buffer
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	 
 	effect = m_shaderReconstructZBuffer->GetEffect();
 	m_device->BeginScene();
@@ -4361,12 +4359,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_device->EndScene();
 	effect->End();
 
-	/*m_device->SetRenderState(D3DRS_COLORWRITEENABLE, true);
-	m_device->SetRenderState(D3DRS_COLORWRITEENABLE1, true);
-	m_device->SetRenderState(D3DRS_COLORWRITEENABLE2, true);
-	m_device->SetRenderState(D3DRS_COLORWRITEENABLE3, true);*/
-
-	// Draw sprites
+	// Prepare sprites
 	m_spritesVertices.clear();
 	m_spritesIndices.clear();
 	
@@ -4374,17 +4367,22 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawSmokes();
 	DrawBlood();
 
+	// Do weather
 	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
-	//	DoSnow(); 
 		DoRain();
+	else if (WeatherType == WEATHER_TYPES::WEATHER_SNOW)
+		DoSnow();
 
+	// Draw sprites
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
+	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
 	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+	//m_device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
 	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	effect = m_shaderSprites->GetEffect();
@@ -4400,22 +4398,16 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	__int32 numSpriteBuckets = m_spritesIndices.size() / 288;
 	if (m_spritesIndices.size() % 288 != 0) numSpriteBuckets++;
 
-	/*for (__int32 i = 0; i < numSpriteBuckets; i++)
-	{
-		__int32 numSprites = 48;
-		__int32 numSpriteVertices = (i == numSpriteBuckets - 1 ? m_spritesVertices.size() - 192 * i : 192);
-		__int32 numSpriteIndices = (i == numSpriteBuckets - 1 ? m_spritesIndices.size() - 288 * i : 288);
-		*/
-		m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesVertices.size(),
-			m_spritesIndices.size() / 3, m_spritesIndices.data(),
-			D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
-	//}
+	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesVertices.size(),
+									 m_spritesIndices.size() / 3, m_spritesIndices.data(),
+									 D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
 
 	effect->EndPass();
 	effect->End();
 	m_device->EndScene();
 	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -4431,16 +4423,6 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	}
 	else
 		RestoreBackBuffer();
-
-	/*m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
-	m_device->BeginScene();
-
-	m_sprite->Begin(0);
-	m_sprite->Draw(m_depthBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
-	m_sprite->End();
-
-	m_device->EndScene();
-	m_device->Present(NULL, NULL, NULL, NULL);*/
 
 	return true;
 }
@@ -4563,7 +4545,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
 
 	for (__int32 i = 0; i < laraObj->ObjectMeshes.size(); i++)
-	{
+	{ 
 		// Lara has meshes overriden by weapons, crowbar, etc
 		RendererMesh* mesh = MeshPointersToMesh[Lara.meshPtrs[i]];
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
@@ -5103,7 +5085,7 @@ bool Renderer::DrawSkyLPP()
 	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
 	// First update the sky in the case of storm
-	if (gfLevelFlags & 0x40 || true)
+	if (gfLevelFlags & 0x40)
 	{
 		if (Unk_00E6D74C || Unk_00E6D73C)
 		{
@@ -5475,6 +5457,7 @@ bool Renderer::DoRain()
 			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
 			drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 
+			// Check if in inside room
 			__int16 roomNumber = Camera.pos.roomNumber;
 			FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
 			ROOM_INFO* room = &Rooms[roomNumber];
@@ -5552,8 +5535,10 @@ bool Renderer::DoRain()
 bool Renderer::DoSnow()
 {
 	if (m_firstWeather)
+	{
 		for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
 			m_snow[i].Reset = true;
+	}
 
 	for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
 	{
@@ -5564,6 +5549,14 @@ bool Renderer::DoSnow()
 			snow->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 			snow->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
 			snow->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+
+			// Check if in inside room
+			__int16 roomNumber = Camera.pos.roomNumber;
+			FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
+			ROOM_INFO* room = &Rooms[roomNumber];
+			if (!(room->flags & 32))
+				continue;
+
 			snow->Size = SNOW_DELTA_Y + (rand() % 64);
 			snow->AngleH = (rand() % SNOW_MAX_ANGLE_H) * RADIAN;
 			snow->AngleV = (rand() % SNOW_MAX_ANGLE_V) * RADIAN;
@@ -5573,7 +5566,6 @@ bool Renderer::DoSnow()
 		float radius = snow->Size * sin(snow->AngleV);
 
 		float dx = sin(snow->AngleH) * radius;
-		float dy = snow->Size * cos(snow->AngleH);
 		float dz = cos(snow->AngleH) * radius;
 
 		snow->X += dx;

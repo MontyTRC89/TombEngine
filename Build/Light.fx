@@ -219,7 +219,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		lightVector = normalize(lightVector);
 		
 		// Compute diffuse light
-		float NdL = max(0, dot(normal, lightVector));
+		float NdL = pow((dot(normal, lightVector) * 0.5f) + 0.5f, 2); //max(0, dot(normal, lightVector));
 		float3 diffuseLight = NdL * LightColor.rgb;
 
 		// Reflection vector
@@ -232,7 +232,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		float specularLight = specularIntensity * pow(saturate(dot(reflectionVector, directionToCamera)), specularPower);
 
 		// Take into account attenuation and lightIntensity.
-		output = attenuation * LightIntensity * float4(diffuseLight.rgb, specularLight);
+		output = attenuation * LightIntensity * float4(diffuseLight.rgb, specularLight) * 0.75f;
 	}
 	
 	//output.a = 0.5f;
