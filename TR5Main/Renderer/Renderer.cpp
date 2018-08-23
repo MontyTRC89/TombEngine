@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stack> 
 #include <chrono> 
+#include <thread>
 
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -361,6 +362,16 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 		D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
 		D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_randomTexture);
 
+	res = m_device->CreateVertexBuffer(NUM_SPRITES_PER_BUCKET * 4 * sizeof(RendererVertex), D3DUSAGE_WRITEONLY,
+		0, D3DPOOL_MANAGED, &m_spritesVertexBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	res = m_device->CreateIndexBuffer(NUM_SPRITES_PER_BUCKET * 6 * 4, D3DUSAGE_WRITEONLY, D3DFMT_INDEX32, D3DPOOL_MANAGED,
+		&m_spritesIndexBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
 	printf("DX initialised\n");
 
 	// Initialise last non-DX stuff
@@ -370,8 +381,10 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_dynamicLights.reserve(1024);
 	m_lights.reserve(1024);
 	m_itemsToDraw.reserve(1024);
-	m_firstWeather = true;
+	m_spritesToDraw.reserve(4096);
 
+	m_firstWeather = true;
+	
 	ResetBlink();
 
 	return true;
@@ -1028,55 +1041,55 @@ bool Renderer::PrepareDataForTheRenderer()
 					polygons += sizeof(tr4_mesh_face3);
 				}
 			}
+		}
 
-			if (room->numLights != 0)
+		if (room->numLights != 0)
+		{
+			tr5_room_light* oldLight = room->light;
+
+			for (__int32 l = 0; l < room->numLights; l++)
 			{
-				tr5_room_light* oldLight = room->light;
+				// DEBUG: only point lights
 
-				for (__int32 l = 0; l < room->numLights; l++)
+				RendererLight* light = new RendererLight();
+				/*if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SUN)
 				{
-					// DEBUG: only point lights
-
-					RendererLight* light = new RendererLight();
-					/*if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SUN)
-					{
-						light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-						light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
-						light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
-					}
-					else*/ if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_POINT)
-					{
-						light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-						light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-						light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
-						light->Intensity = 1.0f;
-						light->In = oldLight->In;
-						light->Out = oldLight->Out;
-						light->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-					}
-					/*else if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SHADOW)
-					{
-						light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-						light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-						light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
-						light->In = oldLight->In;
-						light->Out = oldLight->Out;
-						light->Type = LIGHT_TYPES::LIGHT_TYPE_SHADOW;
-					}*/
-					else if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SPOT)
-					{
-						light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-						light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-						light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
-						light->Intensity = 1.0f;
-						light->In = oldLight->In;
-						light->Out = oldLight->Range;  //oldLight->Out;
-						light->Range = oldLight->Range;
-						light->Type = LIGHT_TYPES::LIGHT_TYPE_POINT; // LIGHT_TYPES::LIGHT_TYPE_SPOT;
-					}
-
-					r->Lights.push_back(light);
+					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
 				}
+				else*/ if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_POINT)
+				{
+					light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->Intensity = 1.0f;
+					light->In = oldLight->In;
+					light->Out = oldLight->Out;
+					light->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
+				}
+				/*else if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SHADOW)
+				{
+					light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->In = oldLight->In;
+					light->Out = oldLight->Out;
+					light->Type = LIGHT_TYPES::LIGHT_TYPE_SHADOW;
+				}*/
+				else if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SPOT)
+				{
+					light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->Intensity = 1.0f;
+					light->In = oldLight->In;
+					light->Out = oldLight->Range;  //oldLight->Out;
+					light->Range = oldLight->Range;
+					light->Type = LIGHT_TYPES::LIGHT_TYPE_POINT; // LIGHT_TYPES::LIGHT_TYPE_SPOT;
+				}
+
+				r->Lights.push_back(light);
 			}
 		}
 
@@ -2295,10 +2308,6 @@ void Renderer::UpdateItemsAnimations()
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
 
-	// Alloc matrices of needed
-	//if (m_itemsObjectMatrices == NULL)
-	//	m_itemsObjectMatrices = (D3DXMATRIX*)malloc(sizeof(D3DXMATRIX) * NumItems);
-
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
 		RendererItemToDraw* itemToDraw = m_itemsToDraw[i];
@@ -2328,663 +2337,9 @@ void Renderer::UpdateItemsAnimations()
 	}
 }
 
-bool Renderer::DrawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
-{
-	/*D3DXMATRIX world;
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
-	UINT cPasses = 1;
-
-	RendererObject* laraObj = m_moveableObjects[ID_LARA];
-	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
-	 
-	ITEM_INFO* item = LaraItem;
-	OBJECT_INFO* obj = &Objects[0];
-
-	RendererLightInfo* light = &m_itemsLightInfo[0];
-	LPD3DXEFFECT effect;
-	
-	if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-	{
-		effect = m_depthShader->GetEffect();
-
-		m_depthShader->SetUseSkinning(true);
-		m_depthShader->SetBones(laraObj->AnimationTransforms, laraObj->ObjectMeshes.size());
-	}
-	else
-	{
-		effect = m_mainShader->GetEffect();
-
-		m_mainShader->SetUseSkinning(true);
-		m_mainShader->SetBones(laraObj->AnimationTransforms, laraObj->ObjectMeshes.size());
-		m_mainShader->SetModelType(MODEL_TYPES::MODEL_TYPE_LARA);
-
-		RendererLightInfo* light = &m_itemsLightInfo[m_itemsToDraw[m_itemsToDraw[0]]];
-		m_mainShader->SetLightActive(light->Active);
-		if (light->Active)
-		{
-			m_mainShader->SetLightPosition(&light->Light->Position);
-			m_mainShader->SetLightDirection(&light->Light->Direction);
-			m_mainShader->SetLightColor(&light->Light->Color);
-			m_mainShader->SetLightIn(light->Light->In);
-			m_mainShader->SetLightOut(light->Light->Out);
-			m_mainShader->SetLightRange(light->Light->Range);
-			m_mainShader->SetLightType(light->Light->Type);
-		}
-	}
-
-	for (__int32 i = 0; i < laraObj->ObjectMeshes.size(); i++)
-	{
-		// Lara has meshes overriden by weapons, crowbar, etc
-		RendererMesh* mesh = MeshPointersToMesh[Lara.meshPtrs[i]];
-		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
-
-		if (bucket->NumVertices == 0)
-			continue;
-				
-		// Bind buffers
-		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-		m_device->SetIndices(bucket->GetIndexBuffer());
-
-		for (int iPass = 0; iPass < cPasses; iPass++)
-		{
-			effect->BeginPass(iPass);
-
-			if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-				m_depthShader->SetWorld(&m_LaraWorldMatrix);
-			else
-				m_mainShader->SetWorld(&m_LaraWorldMatrix);
-
-			effect->CommitChanges();
-
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-			effect->EndPass();
-		}
-
-		// Draw joints, if present
-		if (m_moveableObjects.find(ID_LARA_SKIN_JOINTS) != m_moveableObjects.end())
-		{
-			RendererObject* laraSkinJoints = m_moveableObjects[ID_LARA_SKIN_JOINTS];
-			RendererMesh* jointMesh = laraSkinJoints->ObjectMeshes[i];
-			bucket = jointMesh->GetBucket(bucketIndex);
-
-			// Bind buffers
-			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-			m_device->SetIndices(bucket->GetIndexBuffer());
-
-			for (int iPass = 0; iPass < cPasses; iPass++)
-			{
-				effect->BeginPass(iPass);
-
-				if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-					m_depthShader->SetWorld(&m_LaraWorldMatrix);
-				else
-					m_mainShader->SetWorld(&m_LaraWorldMatrix);
-
-				effect->CommitChanges();
-
-				DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-				effect->EndPass();
-			}
-		}
-	}
-
-	// Disable skinning, following will use the old way
-	if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-		m_depthShader->SetUseSkinning(false);
-	else
-		m_mainShader->SetUseSkinning(false);
-
-	if (!(gfLevelFlags & 1))
-	{
-		// Draw holsters
-		OBJECT_INFO* objHolsters = &Objects[Lara.holster];
-		RendererObject* modelHolster = m_moveableObjects[Lara.holster];
-
-		RendererMesh* leftHolster = modelHolster->ObjectMeshes[4];
-		RendererMesh* rightHolster = modelHolster->ObjectMeshes[8];
-
-		RendererBucket* bucket = leftHolster->GetBucket(bucketIndex);
-
-		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-		m_device->SetIndices(bucket->GetIndexBuffer());
-
-		D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[THIGH_L], &m_LaraWorldMatrix);
-
-		for (int iPass = 0; iPass < cPasses; iPass++)
-		{
-			effect->BeginPass(iPass);
-
-			if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-				m_depthShader->SetWorld(&world);
-			else
-				m_mainShader->SetWorld(&world);
-
-			effect->CommitChanges();
-
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0,
-				bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-			effect->EndPass();
-		}
-
-		bucket = rightHolster->GetBucket(bucketIndex);
-
-		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-		m_device->SetIndices(bucket->GetIndexBuffer());
-
-		D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[THIGH_R], &m_LaraWorldMatrix);
-
-		for (int iPass = 0; iPass < cPasses; iPass++)
-		{
-			effect->BeginPass(iPass);
-
-			if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-				m_depthShader->SetWorld(&world);
-			else
-				m_mainShader->SetWorld(&world);
-
-			effect->CommitChanges();
-
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-			effect->EndPass();
-		}
-
-		// Draw back gun
-		if (Lara.backGun)
-		{
-			OBJECT_INFO* backGunObject = &Objects[Lara.backGun];
-			RendererObject* modelBackGun = m_moveableObjects[Lara.backGun];
-			RendererMesh* backGunMesh = modelBackGun->ObjectMeshes[HEAD];
-
-			RendererBucket* bucket = backGunMesh->GetBucket(bucketIndex);
-
-			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-			m_device->SetIndices(bucket->GetIndexBuffer());
-
-			D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HEAD], &m_LaraWorldMatrix);
-
-			for (int iPass = 0; iPass < cPasses; iPass++)
-			{
-				effect->BeginPass(iPass);
-
-				if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-					m_depthShader->SetWorld(&world);
-				else
-					m_mainShader->SetWorld(&world);
-
-				effect->CommitChanges();
-
-				DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-				effect->EndPass();
-			}
-		}
-	}
-
-	// Draw Lara's hairs
-	if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
-	{
-		RendererObject* hairsObj = m_moveableObjects[ID_HAIR];
-		D3DXMatrixIdentity(&world);
-
-		for (int iPass = 0; iPass < cPasses; iPass++)
-		{
-			effect->BeginPass(iPass);
-
-			if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-				m_depthShader->SetWorld(&world);
-			else
-				m_mainShader->SetWorld(&world);
-
-			effect->CommitChanges();
-
-			m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_numHairVertices, m_numHairIndices / 3,
-											 m_hairIndices, D3DFMT_INDEX32, m_hairVertices, sizeof(RendererVertex));
-
-			effect->EndPass();
-		}
-	}
-
-	// Draw gunflashes
-	__int16 length = 0;
-	__int16 zOffset = 0;
-	__int16 rotationX = 0;
-
-	if (Lara.weaponItem != WEAPON_FLARE && Lara.weaponItem != WEAPON_SHOTGUN && Lara.weaponItem != WEAPON_CROSSBOW)
-	{
-		if (Lara.weaponItem == WEAPON_REVOLVER)
-		{
-			length = 192;
-			zOffset = 68;
-			rotationX = -14560;
-		}
-		else if (Lara.weaponItem == WEAPON_UZI)
-		{
-			length = 190;
-			zOffset = 50;
-		}
-		else if (Lara.weaponItem == WEAPON_HK)
-		{
-			length = 300;
-			zOffset = 92;
-			rotationX = -14560;
-		}
-		else
-		{
-			length = 180;
-			zOffset = 40;
-			rotationX = -16830;
-		}
-
-		OBJECT_INFO* flashObj = &Objects[ID_GUN_FLASH];
-		RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
-		RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
-		RendererBucket* flashBucket = flashMesh->GetBucket(bucketIndex);
-
-		if (flashBucket->NumVertices != 0)
-		{
-			m_device->SetStreamSource(0, flashBucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-			m_device->SetIndices(flashBucket->GetIndexBuffer());
-
-			D3DXMATRIX offset;
-			D3DXMatrixTranslation(&offset, 0, length, zOffset);
-
-			D3DXMATRIX rotation2;
-			D3DXMatrixRotationX(&rotation2, TR_ANGLE_TO_RAD(rotationX));
-
-			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-			m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
-			m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
-
-			if (Lara.leftArm.flash_gun)
-			{
-				D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_L], &m_LaraWorldMatrix);
-				D3DXMatrixMultiply(&world, &offset, &world);
-				D3DXMatrixMultiply(&world, &rotation2, &world);
-
-				for (int iPass = 0; iPass < cPasses; iPass++)
-				{
-					effect->BeginPass(iPass);
-					
-					if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-						m_depthShader->SetWorld(&world);
-					else
-						m_mainShader->SetWorld(&world);
-					
-					effect->CommitChanges();
-
-					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
-
-					effect->EndPass();
-				}
-			}
-
-			if (Lara.rightArm.flash_gun)
-			{
-				D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_R], &m_LaraWorldMatrix);
-				D3DXMatrixMultiply(&world, &offset, &world);
-				D3DXMatrixMultiply(&world, &rotation2, &world);
-
-				for (int iPass = 0; iPass < cPasses; iPass++)
-				{
-					effect->BeginPass(iPass);
-
-					if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-						m_depthShader->SetWorld(&world);
-					else
-						m_mainShader->SetWorld(&world);
-
-					effect->CommitChanges();
-
-					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
-
-					effect->EndPass();
-				}
-			}
-
-			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-		}
-	}*/
-
-	return true;
-}
-
-bool Renderer::DrawItem(__int32 itemIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
-{
-	/*D3DXMATRIX world;
-	UINT cPasses = 1;
-	 
-	ITEM_INFO* item = &Items[m_itemsToDraw[itemIndex]];
-	if (item->objectNumber == ID_LARA || item->objectNumber == 434)
-		return true;
-	   
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
-	RendererObject* moveableObj = m_moveableObjects[item->objectNumber];
-	   
-	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-	{
-		effect = m_depthShader->GetEffect();
-		m_depthShader->SetUseSkinning(true);
-		m_depthShader->SetBones(moveableObj->AnimationTransforms, moveableObj->ObjectMeshes.size());
-	}
-	else
-	{
-		effect = m_mainShader->GetEffect();
-		m_mainShader->SetModelType(MODEL_TYPES::MODEL_TYPE_MOVEABLE);
-		m_mainShader->SetEnableShadows(false);
-		m_mainShader->SetUseSkinning(true);
-		m_mainShader->SetBones(moveableObj->AnimationTransforms, moveableObj->ObjectMeshes.size());
-
-		RendererLightInfo* light = &m_itemsLightInfo[itemIndex];
-		m_mainShader->SetLightActive(light->Active);
-		if (light->Active)
-		{
-			m_mainShader->SetLightPosition(&light->Light->Position);
-			m_mainShader->SetLightDirection(&light->Light->Direction);
-			m_mainShader->SetLightColor(&light->Light->Color);
-			m_mainShader->SetLightIn(light->Light->In);
-			m_mainShader->SetLightOut(light->Light->Out);
-			m_mainShader->SetLightRange(light->Light->Range);
-			m_mainShader->SetLightType(light->Light->Type);
-		}
-	}
-
-	for (__int32 i = 0; i < moveableObj->ObjectMeshes.size(); i++)
-	{
-		RendererMesh* mesh = moveableObj->ObjectMeshes[i];
-		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
-		if (bucket->NumVertices == 0)
-			continue;
-
-
-		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-		m_device->SetIndices(bucket->GetIndexBuffer());
-
-		for (int iPass = 0; iPass < cPasses; iPass++)
-		{
-			effect->BeginPass(iPass);
-
-			if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-				m_depthShader->SetWorld(&m_itemsObjectMatrices[m_itemsToDraw[itemIndex]]);
-			else
-				m_mainShader->SetWorld(&m_itemsObjectMatrices[m_itemsToDraw[itemIndex]]);
-
-			effect->CommitChanges();
-
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-			effect->EndPass();
-		}
-	}*/
-
-	return true;
-}
-
-void Renderer::DrawSky()
-{
-	D3DXMATRIX world;
-	D3DXMATRIX scale;
-	UINT cPasses = 1;
-
-	RendererObject* horizonObj = m_moveableObjects[ID_HORIZON];
-	RendererMesh* mesh = horizonObj->ObjectMeshes[0];
-
-	m_mainShader->SetModelType(MODEL_TYPES::MODEL_TYPE_HORIZON);
-
-	for (__int32 i = 0; i < NUM_BUCKETS; i++)
-	{
-		RendererBucket* bucket = mesh->GetBucket(i);
-
-		// Bind buffers
-		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-		m_device->SetIndices(bucket->GetIndexBuffer());
-
-		for (int iPass = 0; iPass < cPasses; iPass++)
-		{
-			m_mainShader->GetEffect()->BeginPass(iPass);
-
-			D3DXMatrixTranslation(&world, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-			D3DXMatrixScaling(&scale, 16.0f, 16.0f, 16.0f);
-			D3DXMatrixMultiply(&world, &scale, &world);
-
-			m_mainShader->SetWorld(&world);
-
-			m_mainShader->GetEffect()->CommitChanges();
-
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-			m_mainShader->GetEffect()->EndPass();
-		}
-	}
-
-	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
-}
-
-__int32 Renderer::DrawScene()
-{
-
-	DrawSceneLightPrePass(false);
-	return 1;
-
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
-	D3DXMATRIX scale;
-	D3DXMATRIX world;
-	 
-	m_numLines = 0;
-
-	// Clip and collect rooms and items
-	CollectRooms();
-	CollectItems();
-
-	// Update dynamic lights
-	for (vector<RendererLight*>::iterator it = m_dynamicLights.begin(); it != m_dynamicLights.end(); ++it)
-		delete (*it);
-	m_dynamicLights.clear();
-	UpdateGunFlashes();
-	
-	// Collect lights
-	CollectLights();
-
-	// Update all animations
-	UpdateLaraAnimations();
-	UpdateItemsAnimations();
-
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_device->SetRenderState(D3DRS_ALPHATESTENABLE, false);
-
-	PrepareShadowMaps();
-
-	m_numVertices = 0;
-	m_numTriangles = 0;
-	 
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	  
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	m_device->SetRenderState(D3DRS_ALPHATESTENABLE, false);
-	 
-	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-	m_device->BeginScene();
-	  
-	UINT cPasses = 1;
-	m_mainShader->GetEffect()->Begin(&cPasses, 0);
-
-	m_mainShader->SetTexture(m_textureAtlas);
-	m_mainShader->SetView(&ViewMatrix);
-	m_mainShader->SetProjection(&ProjectionMatrix);
-
-	m_device->SetVertexDeclaration(m_vertexDeclaration);
-	 	
-	/*if (m_fadeTimer < 30)
-		m_shader->SetFloat(m_shader->GetParameterByName(NULL, "FadeTimer"), m_fadeTimer++);
-	
-	if (UseSpotCam && SpotCam[CurrentSplineCamera].flags & 0x400)
-		m_shader->SetBool(m_shader->GetParameterByName(NULL, "CinematicMode"), true);
-	else
-		m_shader->SetBool(m_shader->GetParameterByName(NULL, "CinematicMode"), false);*/
-
-	// Draw skybox if needed
-	if (m_moveableObjects.find(ID_HORIZON) != m_moveableObjects.end())
-	{
-		DrawSky();
-	}
-	 
-	// Solid faces buckets
-	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
-	{
-		RendererRoom* room = m_rooms[m_roomsToDraw[i]];
-		RendererObject* obj = room->RoomObject;
-		if (obj == NULL)
-			continue;
-
-		if (obj->ObjectMeshes.size() == 0)
-			continue;
-
-		RendererMesh* mesh = obj->ObjectMeshes[0];
-
-		if (mesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID)->NumVertices != 0)
-			DrawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-		if (mesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)->NumVertices != 0)
-		{
-			m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-			DrawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-			m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-		}
-
-		// Draw static objects
-		ROOM_INFO* r = room->Room;
-		if (r->numMeshes != 0)
-		{
-			for (__int32 j = 0; j < r->numMeshes; j++)
-			{
-				MESH_INFO* sobj = &r->mesh[j];
-				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
-				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
-
-				if (staticMesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID)->NumVertices != 0)
-					DrawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-				if (staticMesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)->NumVertices != 0)
-				{
-					m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-					DrawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-					m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-				}
-			}
-		}
-	}
-
-	// Draw Lara
-	DrawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	DrawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-
-	// Draw items
-	for (__int32 k = 0; k < m_itemsToDraw.size(); k++)
-	{
-		DrawItem(k, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-		DrawItem(k, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	}
-
-	// Transparent and alpha test faces
-	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
-	{
-		DrawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_DRAW);
-		DrawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-		DrawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-		DrawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-
-		// Draw static objects
-		ROOM_INFO* room = &Rooms[m_roomsToDraw[i]];
-		if (room->numMeshes != 0)
-		{
-			for (__int32 j = 0; j < room->numMeshes; j++)
-			{
-				DrawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_DRAW);
-				DrawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-				m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-				DrawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-				DrawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-				m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-			}
-		}
-	}
-
-	// Draw Lara
-	DrawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_DRAW);
-	DrawLara(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	DrawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-	DrawLara(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	
-	// Draw items
-	for (__int32 k = 0; k <  m_itemsToDraw.size(); k++)
-	{
-		/*DrawItem(k, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_DRAW);
-		DrawItem(k, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_DRAW);
-
-		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-		DrawItem(k, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-		DrawItem(k, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_DRAW);
-		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);*/
-	}
-	
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-
-	//DrawObjectOn2DPosition(0, 0, 349, 0, 0, 0);
-	DrawAllPickups();
-
-	m_mainShader->GetEffect()->End();
-
-	DrawGameInfo();
-	DrawDebugInfo();
-
-	DrawAllLines2D();
-
-	//DoPauseMenu(0);
-
-	m_device->EndScene();
-	m_device->Present(NULL, NULL, NULL, NULL);
-
-	return 1;
-}
-
 __int32 Renderer::DumpGameScene()
 {
-	//BeginRenderToTexture();
-	//m_renderTarget->Bind();
-	DrawSceneLightPrePass(true);
-	//m_renderTarget->Unbind();
-	//EndRenderToTexture();
-	//D3DXSaveTextureToFile("E:\\rt.png", D3DXIMAGE_FILEFORMAT::D3DXIFF_PNG, m_renderTarget->GetTexture(), NULL);
-
-	return 1;
+	return DrawSceneLightPrePass(true);
 }
 
 __int32	Renderer::BeginRenderToTexture()
@@ -3014,12 +2369,7 @@ __int32 Renderer::EndRenderToTexture()
 
 __int32 Renderer::Draw()
 {
-	//umpScreen();
-	//D3DXSaveTextureToFile("E:\\RenderTarget.png", D3DXIMAGE_FILEFORMAT::D3DXIFF_PNG, m_renderTarget, NULL);
-
-	DrawScene();
-
-	return 1;
+	return DrawSceneLightPrePass(false);
 }
 
 void Renderer::InsertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
@@ -3966,6 +3316,13 @@ void Renderer::UpdateFires()
 	}
 }
 
+void Renderer::CollectSceneItems()
+{
+	CollectRooms();
+	CollectItems();
+	CollectLightsLPP();
+}
+
 bool Renderer::DrawSceneLightPrePass(bool dump)
 {
 	// HACK:
@@ -3992,10 +3349,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	D3DXMatrixMultiply(&m_viewProjection, &ViewMatrix, &ProjectionMatrix);
 	D3DXMatrixInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
 
-	CollectRooms();
-	CollectItems();
-	CollectLightsLPP();
-
+	CollectSceneItems();
 	UpdateLaraAnimations();
 	UpdateItemsAnimations();
 
@@ -4362,52 +3716,24 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	// Prepare sprites
 	m_spritesVertices.clear();
 	m_spritesIndices.clear();
-	
+	/*for (vector<RendererSpriteToDraw*>::iterator it = m_spritesToDraw.begin(); it != m_spritesToDraw.end(); ++it)
+		delete (*it);*/
+	m_spritesToDraw.clear();
+
 	DrawFires();
 	DrawSmokes();
 	DrawBlood();
 
 	// Do weather
-	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
+	/*if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
 		DoRain();
 	else if (WeatherType == WEATHER_TYPES::WEATHER_SNOW)
-		DoSnow();
+		DoSnow();*/
+
+	DoSnow();
 
 	// Draw sprites
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
-	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
-	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
-	//m_device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-
-	effect = m_shaderSprites->GetEffect();
-	m_device->BeginScene();
-	effect->Begin(&cPasses, 0);
-
-	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
-	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
-	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
-	effect->BeginPass(0);
-	effect->CommitChanges();
-
-	__int32 numSpriteBuckets = m_spritesIndices.size() / 288;
-	if (m_spritesIndices.size() % 288 != 0) numSpriteBuckets++;
-
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesVertices.size(),
-									 m_spritesIndices.size() / 3, m_spritesIndices.data(),
-									 D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
-
-	effect->EndPass();
-	effect->End();
-	m_device->EndScene();
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	DrawSprites();
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -5000,10 +4326,9 @@ void Renderer::CollectLightsLPP()
 		for (__int32 j = 0; j < room->Lights.size(); j++)
 		{
 			D3DXVECTOR3 laraPos = D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-			D3DXVECTOR3 lightVector = D3DXVECTOR3(room->Lights[j]->Position.x,
-				room->Lights[j]->Position.y, room->Lights[j]->Position.z);
+			D3DXVECTOR3 lightVector = D3DXVECTOR3(room->Lights[j]->Position.x, room->Lights[j]->Position.y, room->Lights[j]->Position.z);
 
-			if (D3DXVec3Length(&(laraPos-lightVector)) >= 1024.0f * 32.0f)
+			if (D3DXVec3Length(&(laraPos-lightVector)) >= 1024.0f * 20.0f)
 				continue;
 
 			m_lights.push_back(room->Lights[j]);
@@ -5238,6 +4563,174 @@ void Renderer::CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, 
 	out->_43 = particlePos->z;
 }
 
+bool Renderer::DrawSprites()
+{
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
+	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
+	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+	UINT cPasses = 1;
+	LPD3DXEFFECT effect = m_shaderSprites->GetEffect();
+	m_device->BeginScene();
+	effect->Begin(&cPasses, 0);
+
+	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
+
+	__int32 numSpritesToDraw = m_spritesToDraw.size();
+	__int32 lastSprite = 0;
+	while (numSpritesToDraw > 0)
+	{
+		m_spritesVertices.clear();
+		m_spritesIndices.clear();
+
+		// Fill the buffer for sprites
+		__int32 maxSprite = min(m_spritesToDraw.size(), lastSprite + NUM_SPRITES_PER_BUCKET);
+		for (__int32 i = lastSprite; i < maxSprite; i++)
+		{
+			RendererSpriteToDraw* spr = m_spritesToDraw[i];
+
+			float halfWidth = spr->Width / 2.0f;
+			float halfHeight = spr->Height / 2.0f;
+
+			D3DXMATRIX billboardMatrix;
+			CreateBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(spr->X, spr->Y, spr->Z),
+				&D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z));
+
+			D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
+			D3DXVECTOR3 p1 = D3DXVECTOR3(halfWidth, -halfHeight, 0);
+			D3DXVECTOR3 p2 = D3DXVECTOR3(halfWidth, halfHeight, 0);
+			D3DXVECTOR3 p3 = D3DXVECTOR3(-halfWidth, halfHeight, 0);
+
+			D3DXVECTOR4 p0t;
+			D3DXVECTOR4 p1t;
+			D3DXVECTOR4 p2t;
+			D3DXVECTOR4 p3t;
+
+			D3DXVec3Transform(&p0t, &p0, &billboardMatrix);
+			D3DXVec3Transform(&p1t, &p1, &billboardMatrix);
+			D3DXVec3Transform(&p2t, &p2, &billboardMatrix);
+			D3DXVec3Transform(&p3t, &p3, &billboardMatrix);
+
+			RendererVertex v;
+			__int32 baseVertex = m_spritesVertices.size();
+
+			v.x = p0t.x;
+			v.y = p0t.y;
+			v.z = p0t.z;
+			v.u = spr->Sprite->UV[0].x;
+			v.v = spr->Sprite->UV[0].y;
+			v.r = spr->R / 255.0f;
+			v.g = spr->G / 255.0f;
+			v.b = spr->B / 255.0f;
+			v.a = 1.0f;
+			m_spritesVertices.push_back(v);
+
+			v.x = p1t.x;
+			v.y = p1t.y;
+			v.z = p1t.z;
+			v.u = spr->Sprite->UV[1].x;
+			v.v = spr->Sprite->UV[1].y;
+			v.r = spr->R / 255.0f;
+			v.g = spr->G / 255.0f;
+			v.b = spr->B / 255.0f;
+			v.a = 1.0f;
+			m_spritesVertices.push_back(v);
+
+			v.x = p2t.x;
+			v.y = p2t.y;
+			v.z = p2t.z;
+			v.u = spr->Sprite->UV[2].x;
+			v.v = spr->Sprite->UV[2].y;
+			v.r = spr->R / 255.0f;
+			v.g = spr->G / 255.0f;
+			v.b = spr->B / 255.0f;
+			v.a = 1.0f;
+			m_spritesVertices.push_back(v);
+
+			v.x = p3t.x;
+			v.y = p3t.y;
+			v.z = p3t.z;
+			v.u = spr->Sprite->UV[3].x;
+			v.v = spr->Sprite->UV[3].y;
+			v.r = spr->R / 255.0f;
+			v.g = spr->G / 255.0f;
+			v.b = spr->B / 255.0f;
+			v.a = 1.0f;
+			m_spritesVertices.push_back(v);
+
+			m_spritesIndices.push_back(baseVertex + 0);
+			m_spritesIndices.push_back(baseVertex + 1);
+			m_spritesIndices.push_back(baseVertex + 2);
+			m_spritesIndices.push_back(baseVertex + 0);
+			m_spritesIndices.push_back(baseVertex + 2);
+			m_spritesIndices.push_back(baseVertex + 3);
+
+			lastSprite++;
+		}
+
+		numSpritesToDraw -= NUM_SPRITES_PER_BUCKET;
+
+		HRESULT res;
+
+		void* vertices;
+
+		res = m_spritesVertexBuffer->Lock(0, 0, &vertices, 0);
+		if (res != S_OK)
+			return false;
+
+		memcpy(vertices, m_spritesVertices.data(), m_spritesVertices.size() * sizeof(RendererVertex));
+
+		res = m_spritesVertexBuffer->Unlock();
+		if (res != S_OK)
+			return false;
+
+		void* indices;
+
+		res = m_spritesIndexBuffer->Lock(0, 0, &indices, 0);
+		if (res != S_OK)
+			return false;
+
+		memcpy(indices, m_spritesIndices.data(), m_spritesIndices.size() * 4);
+
+		m_spritesIndexBuffer->Unlock();
+		if (res != S_OK)
+			return false;
+
+		m_device->SetStreamSource(0, m_spritesVertexBuffer, 0, sizeof(RendererVertex));
+		m_device->SetIndices(m_spritesIndexBuffer);
+
+		// Draw the sprites
+		effect->BeginPass(0);
+		effect->CommitChanges();
+
+		DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_spritesVertices.size(), 0, m_spritesIndices.size() / 3);
+
+		/*m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesVertices.size(),
+											m_spritesIndices.size() / 3, m_spritesIndices.data(),
+											D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
+*/
+
+		effect->EndPass();
+	}	
+
+	effect->End();
+	m_device->EndScene();
+
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+
+	return true;
+}
+
 void Renderer::AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale, float width, float height)
 {
 	scale = 1.0f;
@@ -5245,80 +4738,20 @@ void Renderer::AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z
 	width *= scale;
 	height *= scale;
 
-	float halfWidth = width / 2.0f;
-	float halfHeight = height / 2.0f;
+	RendererSpriteToDraw* spr = new RendererSpriteToDraw();
+	spr->Sprite = sprite;
+	spr->X = x;
+	spr->Y = y;
+	spr->Z = z;
+	spr->R = r;
+	spr->G = g;
+	spr->B = b;
+	spr->Rotation = rotation;
+	spr->Scale = scale;
+	spr->Width = width;
+	spr->Height = height;
 
-	D3DXMATRIX billboardMatrix;
-	CreateBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(x, y, z), &D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z));
-
-	D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
-	D3DXVECTOR3 p1 = D3DXVECTOR3(halfWidth, -halfHeight, 0);
-	D3DXVECTOR3 p2 = D3DXVECTOR3(halfWidth, halfHeight, 0);
-	D3DXVECTOR3 p3 = D3DXVECTOR3(-halfWidth, halfHeight, 0);
-
-	D3DXVECTOR4 p0t;
-	D3DXVECTOR4 p1t;
-	D3DXVECTOR4 p2t;
-	D3DXVECTOR4 p3t;
-
-	D3DXVec3Transform(&p0t, &p0, &billboardMatrix);
-	D3DXVec3Transform(&p1t, &p1, &billboardMatrix);
-	D3DXVec3Transform(&p2t, &p2, &billboardMatrix);
-	D3DXVec3Transform(&p3t, &p3, &billboardMatrix);
-
-	RendererVertex v;
-	__int32 baseVertex = m_spritesVertices.size();
-
-	v.x = p0t.x;
-	v.y = p0t.y;
-	v.z = p0t.z;
-	v.u = sprite->UV[0].x;
-	v.v = sprite->UV[0].y;
-	v.r = r / 255.0f;
-	v.g = g / 255.0f;
-	v.b = b / 255.0f;
-	v.a = 1.0f;
-	m_spritesVertices.push_back(v);
-
-	v.x = p1t.x;
-	v.y = p1t.y;
-	v.z = p1t.z;
-	v.u = sprite->UV[1].x;
-	v.v = sprite->UV[1].y;
-	v.r = r / 255.0f;
-	v.g = g / 255.0f;
-	v.b = b / 255.0f;
-	v.a = 1.0f;
-	m_spritesVertices.push_back(v);
-
-	v.x = p2t.x;
-	v.y = p2t.y;
-	v.z = p2t.z;
-	v.u = sprite->UV[2].x;
-	v.v = sprite->UV[2].y;
-	v.r = r / 255.0f;
-	v.g = g / 255.0f;
-	v.b = b / 255.0f;
-	v.a = 1.0f;
-	m_spritesVertices.push_back(v);
-
-	v.x = p3t.x;
-	v.y = p3t.y;
-	v.z = p3t.z;
-	v.u = sprite->UV[3].x;
-	v.v = sprite->UV[3].y;
-	v.r = r / 255.0f;
-	v.g = g / 255.0f;
-	v.b = b / 255.0f;
-	v.a = 1.0f;
-	m_spritesVertices.push_back(v);
-
-	m_spritesIndices.push_back(baseVertex + 0);
-	m_spritesIndices.push_back(baseVertex + 1);
-	m_spritesIndices.push_back(baseVertex + 2);
-	m_spritesIndices.push_back(baseVertex + 0);
-	m_spritesIndices.push_back(baseVertex + 2);
-	m_spritesIndices.push_back(baseVertex + 3);
+	m_spritesToDraw.push_back(spr);
 }
 
 void Renderer::DrawFires()

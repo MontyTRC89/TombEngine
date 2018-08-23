@@ -372,8 +372,8 @@ typedef struct RendererSpriteToDraw {
 	byte G;
 	byte B;
 	float Rotation;
-	RendererVertex Vertices[4];
-	__int32	Indices[6];
+	float Width;
+	float Height;
 };
 
 typedef struct RendererTempVertex {
@@ -503,6 +503,8 @@ class Renderer
 	RendererWeatherParticle			m_rain[NUM_RAIN_DROPS];
 	RendererWeatherParticle			m_snow[NUM_SNOW_PARTICLES];
 	bool							m_firstWeather;
+	PDIRECT3DVERTEXBUFFER9			m_spritesVertexBuffer;
+	PDIRECT3DINDEXBUFFER9			m_spritesIndexBuffer;
 
 public:
 	D3DXMATRIX						ViewMatrix;
@@ -532,18 +534,16 @@ public:
 	void							CollectRooms();
 	void							CollectItems();
 	void							CollectLights();
+	void							CollectSceneItems();
 	void							PrepareShadowMaps();
 	bool							DrawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexIndex, UINT minVertexIndex, UINT numVertices, UINT baseIndex, UINT primitiveCount);
 	bool							DrawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							DrawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
-	bool							DrawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							DrawGunFlashes(RENDERER_PASSES pass);
 	void							DrawNormalLara(__int32 bucketIndex);
 	void							DrawDivesuitLara(__int32 bucketIndex);
 	void							DrawCatsuitLara(__int32 bucketIndex);
 	void							DrawYoungLara(__int32 bucketIndex);
-	bool							DrawItem(__int32 itemIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
-	void							DrawSky();
 	void							InsertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b);
 	void							DrawAllLines2D();
 	void							DrawGameInfo();
@@ -553,7 +553,6 @@ public:
 	void							DrawDebugInfo();
 	void							DrawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2);
 	void							PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color, __int32 flags);
-	__int32							DrawScene();
 	__int32							DumpGameScene();
 	void							ResetBlink();
 	__int32							BeginRenderToTexture();
@@ -595,4 +594,5 @@ public:
 	void							CollectLightsLPP();
 	bool							DoRain();
 	bool							DoSnow();
+	bool							DrawSprites();
 };
