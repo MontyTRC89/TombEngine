@@ -107,23 +107,59 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		g_Renderer->ClearDynamicLights();
 
 		GotLaraSpheres = false;
-		InItemControlLoop = 1;
+
+		InItemControlLoop = true;
+
 		__int16 itemNum = NextItemActive;
 		while (itemNum != NO_ITEM)
 		{
-			__int16 nextItem = Items[itemNum].nextActive;
-			if (Objects[Items[itemNum].objectNumber].control)
-				(*Objects[Items[itemNum].objectNumber].control)(itemNum);
+			ITEM_INFO* item = &Items[itemNum];
+			__int16 nextItem = item->nextActive;
+
+			if (item->afterDeath > 127)
+				KillItem(itemNum);
+			else
+			{
+				if (Objects[Items[itemNum].objectNumber].control)
+					(*Objects[Items[itemNum].objectNumber].control)(itemNum);
+			}
+
 			itemNum = nextItem;
 		}
-		InItemControlLoop = 0;
+
+		InItemControlLoop = false;
+
+		KillMoveItems();
+
+		InItemControlLoop = true;
+
+		__int16 fxNum = NextFxActive;
+		while (fxNum != NO_ITEM)
+		{
+			__int16 nextFx = Effects[fxNum].nextActive;
+			if (Objects[Effects[fxNum].objectNumber].control)
+				(*Objects[Effects[fxNum].objectNumber].control)(fxNum);
+			fxNum = nextFx;
+		}
+
+		InItemControlLoop = false;
+
+		KillMoveEffects();
+
+		if (SmokeCountL)
+			SmokeCountL--;
+		if (SmokeCountR)
+			SmokeCountR--;
+		if (SplashCount)
+			SplashCount--;
+		if (WeaponDelay)
+			WeaponDelay--;
 
 		InItemControlLoop = true;
 		Lara.skelebob = NULL;
 		LaraControl();
 		InItemControlLoop = false;
-		KillMoveItems();
-
+		
 		j_HairControl(0, 0, 0);
 
 		if (UseSpotCam)
@@ -141,6 +177,14 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		UpdateDebris();
 		UpdateGunShells();
 		UpdateSplashes();
+		UpdateDrips();
+		UpdateRats();
+		UpdateBats();
+		UpdateSpiders();
+		UpdateShockwaves();
+		UpdateLightning();
+
+		HealtBarTimer--;
 	}
 }
 

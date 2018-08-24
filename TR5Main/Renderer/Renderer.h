@@ -393,6 +393,18 @@ typedef struct RendererWeatherParticle {
 	bool Reset;
 };
 
+typedef struct RendererLine3DToDraw {
+	float X1;
+	float Y1;
+	float Z1;
+	float X2;
+	float Y2;
+	float Z2;
+	byte R;
+	byte G;
+	byte B;
+};
+
 class Renderer
 {
 	LPDIRECT3D9						m_d3D = NULL;
@@ -455,6 +467,7 @@ class Renderer
 	vector<RendererLight*>			m_testLights;
 	vector<RendererItemToDraw*>		m_itemsToDraw;
 	vector<RendererSpriteToDraw*>	m_spritesToDraw;
+	vector<RendererLine3DToDraw*>	m_lines3DToDraw;
 	
 	LPDIRECT3DSURFACE9				m_backBufferTarget;
 	LPDIRECT3DSURFACE9				m_backBufferDepth;
@@ -505,7 +518,9 @@ class Renderer
 	bool							m_firstWeather;
 	PDIRECT3DVERTEXBUFFER9			m_spritesVertexBuffer;
 	PDIRECT3DINDEXBUFFER9			m_spritesIndexBuffer;
-
+	PDIRECT3DVERTEXBUFFER9			m_linesVertexBuffer;
+	vector<RendererVertex>			m_lines3DVertices;
+	
 public:
 	D3DXMATRIX						ViewMatrix;
 	D3DXMATRIX						ProjectionMatrix;
@@ -576,9 +591,12 @@ public:
 	void							AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
 	void							ClearDynamicLights();
 	void							AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale, float width, float height);
+	void							AddLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);
 	void							DrawFires();
+	void							DrawSparks();
 	void							DrawSmokes();
 	void							DrawBlood();
+	void							DrawDrips();
 	bool							DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	void							CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos);
 
@@ -595,4 +613,5 @@ public:
 	bool							DoRain();
 	bool							DoSnow();
 	bool							DrawSprites();
+	bool							DrawLines3D();
 };

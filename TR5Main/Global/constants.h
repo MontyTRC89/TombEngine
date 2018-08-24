@@ -56,4 +56,18 @@
 #define ENV_FLAG_CAUSTICS			0x0200
 #define ENV_FLAG_UNKNOWN3			0x0400
 
-
+// From TR3, we need to check
+#define	SP_FLAT		1
+#define	SP_SCALE		2
+#define	SP_BLOOD		4
+#define	SP_DEF		8
+#define	SP_ROTATE		16
+#define	SP_EXPLOSION	32
+#define	SP_FX		64
+#define	SP_ITEM		128
+#define	SP_WIND		256
+#define	SP_EXPDEF		512
+#define	SP_USEFXOBJPOS	1024
+#define	SP_UNDERWEXP	2048
+#define	SP_NODEATTATCH	4096
+#define	SP_PLASMAEXP	8192

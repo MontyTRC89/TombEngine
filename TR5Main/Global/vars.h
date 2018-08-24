@@ -207,6 +207,8 @@
 #define SmokeSparks					ARRAY_(0x00E4B940, SMOKE_SPARKS, [32])
 #define Blood						ARRAY_(0x00E4C9C0, BLOOD_STRUCT, [32])
 #define GunShells					ARRAY_(0x00E4BEC0, GUNSHELL_STRUCT, [24])
+#define Sparks						ARRAY_(0x00E5F380, SPARKS, [128])
+#define Drips						ARRAY_(0x00E4D740, DRIP_STRUCT, [32])
 
 #define SkyPos1						VAR_U_(0x00E6E4B0, __int16)
 #define SkyPos2						VAR_U_(0x00E6D73E, __int16)
@@ -223,6 +225,13 @@
 
 #define CurrentAtmosphere			VAR_U_(0x00EEEB90, byte)
 #define IsAtmospherePlaying			VAR_U_(0x00EEEFFC, byte)
+
+#define SmokeCountL					VAR_U_(0x00E6C9E8, byte)
+#define SmokeCountR					VAR_U_(0x00E6C9EC, byte)
+#define SplashCount					VAR_U_(0x0051CDF8, byte)
+#define WeaponDelay					VAR_U_(0x0051CA52, byte)
+
+#define HealtBarTimer				VAR_U_(0x0051CEA8, __int32)
 
 extern bool MonksAttackLara;
 

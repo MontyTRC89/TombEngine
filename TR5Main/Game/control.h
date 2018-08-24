@@ -12,6 +12,7 @@
 #define TriggerActive ((__int32 (__cdecl*)(ITEM_INFO*)) 0x004175B0)
 #define GetChange ((__int32 (__cdecl*)(ITEM_INFO*, ANIM_STRUCT*)) 0x00415890)
 #define KillMoveItems ((void (__cdecl*)()) 0x00414620)
+#define KillMoveEffects ((void (__cdecl*)()) 0x004146A0)
 #define ClearDynamics ((void (__cdecl*)()) 0x00431530)
 #define ClearFires ((void (__cdecl*)()) 0x00481B10)
 #define UpdateSparks ((void (__cdecl*)()) 0x0042E8B0)	
@@ -24,6 +25,13 @@
 #define UpdateDrips ((void (__cdecl*)()) 0x00483D90)
 #define UpdateGunShells ((void (__cdecl*)()) 0x00482D80)
 #define UpdateSky ((void (__cdecl*)()) 0x00414720)
+#define UpdateBats ((void (__cdecl*)()) 0x00407FD0)
+#define UpdateRats ((void (__cdecl*)()) 0x0046AC70)
+#define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
+#define UpdateShockwaves ((void (__cdecl*)()) 0x004849A0)
+#define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
+
+
 
 void __cdecl DoTitle(__int32 index);
 void __cdecl DoLevel(__int32 index, __int32 ambient);

@@ -28,6 +28,7 @@
 #include "..\Game\inventory.h"
 #include "..\Game\gameflow.h"
 #include "..\Game\lara.h"
+#include "..\Game\effect2.h"
 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
@@ -372,6 +373,11 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	if (res != S_OK)
 		return false;
 
+	res = m_device->CreateVertexBuffer(NUM_LINES_PER_BUCKET * 2 * sizeof(RendererVertex), D3DUSAGE_WRITEONLY,
+		0, D3DPOOL_MANAGED, &m_linesVertexBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
 	printf("DX initialised\n");
 
 	// Initialise last non-DX stuff
@@ -381,8 +387,9 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_dynamicLights.reserve(1024);
 	m_lights.reserve(1024);
 	m_itemsToDraw.reserve(1024);
-	m_spritesToDraw.reserve(4096);
-
+	m_spritesToDraw.reserve(NUM_SPRITES_PER_BUCKET * 4);
+	m_lines3DToDraw.reserve(NUM_LINES_PER_BUCKET * 4);
+	m_lines3DVertices.reserve(NUM_LINES_PER_BUCKET * 2);
 	m_firstWeather = true;
 	
 	ResetBlink();
@@ -479,7 +486,8 @@ bool Renderer::PrintDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, by
 	return true;
 }
  
-RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs)
+RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, 
+												  __int16 boneIndex, __int32 isJoints, __int32 isHairs)
 {  
 	RendererMesh* mesh = new RendererMesh(m_device);
 
@@ -1118,7 +1126,7 @@ bool Renderer::PrepareDataForTheRenderer()
 				objNum == ID_AI_FOLLOW || objNum == ID_AI_GUARD || objNum == ID_AI_MODIFY ||
 				objNum == ID_AI_PATROL1 || objNum == ID_AI_PATROL2 || objNum == ID_AI_X1 ||
 				objNum == ID_AI_X2 || objNum == ID_DART_EMITTER || objNum == ID_HOMING_DART_EMITTER ||
-				objNum == ID_ROPE || objNum == ID_KILL_ALL_TRIGGERS)
+				objNum == ID_ROPE || objNum == ID_KILL_ALL_TRIGGERS || objNum == ID_EARTHQUAKE)
 			{
 				moveable->DoNotDraw = true;
 			}
@@ -1129,11 +1137,17 @@ bool Renderer::PrepareDataForTheRenderer()
 
 			for (__int32 j = 0; j < obj->nmeshes; j++)
 			{
-				__int16* meshPtr = &RawMeshData[RawMeshPointers[obj->meshIndex / 2 + j] / 2];
+				// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
+				// We need to override the box index because the engine will take mesh 0 while drawing pistols anim,
+				// and vertices have bone index 0 and not 10
+				__int32 meshPtrIndex = RawMeshPointers[obj->meshIndex / 2 + j] / 2;
+				__int32 boneIndex = (meshPtrIndex == 0 ? HAND_R : j);
+
+				__int16* meshPtr = &RawMeshData[meshPtrIndex];
 				RendererMesh* mesh = GetRendererMeshFromTrMesh(moveable,
 															   meshPtr, 
 															   Meshes[obj->meshIndex + 2 * j],
-															   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
+															   boneIndex, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 															   MoveablesIds[i] == ID_HAIR);
 				moveable->ObjectMeshes.push_back(mesh);
 			}
@@ -2193,6 +2207,23 @@ void Renderer::UpdateLaraAnimations()
 			BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
 		}
 	}
+
+	D3DXMATRIX m0 = laraObj->AnimationTransforms[0];
+	D3DXMATRIX m1 = laraObj->AnimationTransforms[1];
+	D3DXMATRIX m2 = laraObj->AnimationTransforms[2];
+	D3DXMATRIX m3 = laraObj->AnimationTransforms[3];
+	D3DXMATRIX m4 = laraObj->AnimationTransforms[4];
+	D3DXMATRIX m5 = laraObj->AnimationTransforms[5];
+	D3DXMATRIX m6 = laraObj->AnimationTransforms[6];
+	D3DXMATRIX m7 = laraObj->AnimationTransforms[7];
+	D3DXMATRIX m8 = laraObj->AnimationTransforms[8];
+	D3DXMATRIX m9 = laraObj->AnimationTransforms[9];
+	D3DXMATRIX m10 = laraObj->AnimationTransforms[10];
+	D3DXMATRIX m11 = laraObj->AnimationTransforms[11];
+	D3DXMATRIX m12 = laraObj->AnimationTransforms[12];
+	D3DXMATRIX m13 = laraObj->AnimationTransforms[13];
+	D3DXMATRIX m14 = laraObj->AnimationTransforms[14];
+
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
 	if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
@@ -3716,13 +3747,17 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	// Prepare sprites
 	m_spritesVertices.clear();
 	m_spritesIndices.clear();
-	/*for (vector<RendererSpriteToDraw*>::iterator it = m_spritesToDraw.begin(); it != m_spritesToDraw.end(); ++it)
-		delete (*it);*/
+	for (vector<RendererSpriteToDraw*>::iterator it = m_spritesToDraw.begin(); it != m_spritesToDraw.end(); ++it)
+		delete (*it);
 	m_spritesToDraw.clear();
+	for (vector<RendererLine3DToDraw*>::iterator it = m_lines3DToDraw.begin(); it != m_lines3DToDraw.end(); ++it)
+		delete (*it);
+	m_lines3DToDraw.clear();
 
 	DrawFires();
 	DrawSmokes();
 	DrawBlood();
+	DrawSparks();
 
 	// Do weather
 	/*if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
@@ -3730,10 +3765,11 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	else if (WeatherType == WEATHER_TYPES::WEATHER_SNOW)
 		DoSnow();*/
 
-	DoSnow();
+	DoRain();
 
 	// Draw sprites
 	DrawSprites();
+	DrawLines3D();
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -4791,6 +4827,30 @@ void Renderer::DrawSmokes()
 	}
 }
 
+void Renderer::DrawSparks()
+{
+	for (__int32 i = 0; i < 128; i++)
+	{
+		SPARKS* spark = &Sparks[i];
+		if (spark->on)
+		{
+			if (spark->flags & SP_DEF)
+			{
+				AddSprite(m_sprites[spark->def],
+					spark->x, spark->y, spark->z,
+					spark->r, spark->g, spark->b,
+					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f);
+			}
+			else if (spark->flags == 0)
+			{
+				D3DXVECTOR3 v = D3DXVECTOR3(spark->xVel, spark->yVel, spark->zVel);
+				D3DXVec3Normalize(&v, &v);
+				AddLine3D(spark->x, spark->y, spark->z, spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f, spark->r, spark->g, spark->b);
+			}
+		}
+	}
+}
+
 void Renderer::DrawBlood()
 {
 	for (__int32 i = 0; i < 32; i++)
@@ -4894,7 +4954,7 @@ bool Renderer::DoRain()
 			__int16 roomNumber = Camera.pos.roomNumber;
 			FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
 			ROOM_INFO* room = &Rooms[roomNumber];
-			if (!(room->flags & 32))
+			if (!(room->flags & ENV_FLAG_OUTSIDE))
 				continue;
 
 			drop->Size = RAIN_SIZE + (rand() % 64);
@@ -4903,7 +4963,23 @@ bool Renderer::DoRain()
 			drop->Reset = false;
 		}
 
-		RendererVertex* vertex = &vertices[2 * i];
+		float x1 = drop->X;
+		float y1 = drop->Y;
+		float z1 = drop->Z;
+
+		float radius = drop->Size * sin(drop->AngleV);
+
+		float dx = sin(drop->AngleH) * radius;
+		float dy = drop->Size * cos(drop->AngleH);
+		float dz = cos(drop->AngleH) * radius;
+
+		drop->X += dx;
+		drop->Y += RAIN_DELTA_Y;
+		drop->Z += dz;
+
+		AddLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
+
+		/*RendererVertex* vertex = &vertices[2 * i];
 		
 		vertex->x = drop->X;
 		vertex->y = drop->Y;
@@ -4929,16 +5005,19 @@ bool Renderer::DoRain()
 		vertex->z = drop->Z;
 		vertex->r = RAIN_COLOR;
 		vertex->g = RAIN_COLOR;
-		vertex->b = RAIN_COLOR;
+		vertex->b = RAIN_COLOR;*/
 
 		__int16 roomNumber = Camera.pos.roomNumber;
 		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
 		ROOM_INFO* room = &Rooms[roomNumber];
 		if (drop->Y >= room->y + room->minfloor)
+		{
 			drop->Reset = true;
+			AddWaterSparks(drop->X, room->y + room->minfloor, drop->Z, 1);
+		}
 	}
 
-	LPD3DXEFFECT effect = m_shaderRain->GetEffect();
+	/*LPD3DXEFFECT effect = m_shaderRain->GetEffect();
 	UINT cPasses = 1;
 
 	m_device->BeginScene();
@@ -4958,7 +5037,7 @@ bool Renderer::DoRain()
 	}
 
 	effect->End();
-	m_device->EndScene();
+	m_device->EndScene();*/
 
 	m_firstWeather = false;
 
@@ -4987,7 +5066,7 @@ bool Renderer::DoSnow()
 			__int16 roomNumber = Camera.pos.roomNumber;
 			FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
 			ROOM_INFO* room = &Rooms[roomNumber];
-			if (!(room->flags & 32))
+			if (!(room->flags & ENV_FLAG_OUTSIDE))
 				continue;
 
 			snow->Size = SNOW_DELTA_Y + (rand() % 64);
@@ -5024,4 +5103,123 @@ bool Renderer::DoSnow()
 	m_firstWeather = false;
 
 	return true;
+}
+
+void Renderer::AddLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b)
+{
+	RendererLine3DToDraw* line = new RendererLine3DToDraw();
+
+	line->X1 = x1;
+	line->Y1 = y1;
+	line->Z1 = z1;
+	line->X2 = x2;
+	line->Y2 = y2;
+	line->Z2 = z2;
+	line->R = r;
+	line->G = g;
+	line->B = b;
+
+	m_lines3DToDraw.push_back(line);
+}
+
+bool Renderer::DrawLines3D()
+{
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
+	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
+	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+	UINT cPasses = 1;
+	LPD3DXEFFECT effect = m_shaderRain->GetEffect();
+	m_device->BeginScene();
+	effect->Begin(&cPasses, 0);
+
+	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
+
+	__int32 numLinesToDraw = m_lines3DToDraw.size();
+	__int32 lastLine = 0;
+	while (numLinesToDraw > 0)
+	{
+		m_lines3DVertices.clear();
+
+		// Fill the buffer for lines
+		__int32 maxLine = min(m_lines3DToDraw.size(), lastLine + NUM_LINES_PER_BUCKET);
+		for (__int32 i = lastLine; i < maxLine; i++)
+		{
+			RendererLine3DToDraw* line = m_lines3DToDraw[i];
+
+			RendererVertex v;
+
+			v.x = line->X1;
+			v.y = line->Y1;
+			v.z = line->Z1;
+			v.r = line->R / 255.0f;
+			v.g = line->G / 255.0f;
+			v.b = line->B / 255.0f;
+			v.a = 1.0f;
+			m_lines3DVertices.push_back(v);
+
+			v.x = line->X2;
+			v.y = line->Y2;
+			v.z = line->Z2;
+			v.r = line->R / 255.0f;
+			v.g = line->G / 255.0f;
+			v.b = line->B / 255.0f;
+			v.a = 1.0f;
+			m_lines3DVertices.push_back(v);
+
+			lastLine++;
+		}
+
+		numLinesToDraw -= NUM_LINES_PER_BUCKET;
+
+		HRESULT res;
+
+		void* vertices;
+
+		res = m_linesVertexBuffer->Lock(0, 0, &vertices, 0);
+		if (res != S_OK)
+			return false;
+
+		memcpy(vertices, m_lines3DVertices.data(), m_lines3DVertices.size() * sizeof(RendererVertex));
+
+		res = m_linesVertexBuffer->Unlock();
+		if (res != S_OK)
+			return false;
+		
+		m_device->SetStreamSource(0, m_linesVertexBuffer, 0, sizeof(RendererVertex));
+		m_device->SetIndices(NULL);
+
+		// Draw the sprites
+		effect->BeginPass(0);
+		effect->CommitChanges();
+
+		m_device->DrawPrimitive(D3DPRIMITIVETYPE::D3DPT_LINELIST, 0, m_lines3DVertices.size());
+
+		effect->EndPass();
+	}
+
+	effect->End();
+	m_device->EndScene();
+
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+
+	return true;
+}
+
+void Renderer::DrawDrips()
+{
+	/*for (__int32 i = 0; i < 32; i++)
+	{
+		DRIP_STRUCT* drip = &Drips[i];
+		drip->
+	}*/
 }

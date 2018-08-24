@@ -4,6 +4,7 @@
 #include "larafire.h"
 #include "sound.h"
 #include "gameflow.h"
+#include "sound.h"
 
 #include "..\Global\global.h"
 #include "..\Specific\input.h"
@@ -336,6 +337,8 @@ __int32 Inventory::DoInventory()
 		// Handle input
 		if (DbInput & 0x200000)
 		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
 			// Exit from inventory
 			GlobalEnterInventory = -1;
 			return 0;
@@ -344,6 +347,8 @@ __int32 Inventory::DoInventory()
 				 (m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
 				  m_activeRing == INV_RING_OPTIONS))
 		{
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
 			// Go to the upper ring
 			for (__int32 i = 0; i < 8; i++)
 			{
@@ -363,6 +368,8 @@ __int32 Inventory::DoInventory()
 		}
 		else if (DbInput & 2 && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
 		{
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
 			// Go to the lower ring
 			for (__int32 i = 0; i < 8; i++)
 			{
@@ -382,6 +389,8 @@ __int32 Inventory::DoInventory()
 		}
 		else if (DbInput & 4)
 		{
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
 			// Change object right
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / 8.0f;
 			m_rings[m_activeRing].movement = 0;
@@ -403,6 +412,8 @@ __int32 Inventory::DoInventory()
 		}
 		else if (DbInput & 8)
 		{
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
 			// Change object left
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / 8.0f;
 			m_rings[m_activeRing].movement = 0;
@@ -430,6 +441,7 @@ __int32 Inventory::DoInventory()
 				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
 					DoPassport();
 
+				// DEPRECATED: all the followings will be done by passaport
 				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_TIMEX)
 					DoStatisticsMenu();
 
@@ -484,6 +496,8 @@ void Inventory::UseCurrentItem()
 		SoundEffect(116, 0, 2);
 		Savegame.Game.HealthUsed++;
 
+		SoundEffect(SFX_MENU_MEDI, NULL, 0);
+
 		return;
 	}
 
@@ -506,6 +520,8 @@ void Inventory::UseCurrentItem()
 
 		SoundEffect(116, 0, 2);
 		Savegame.Game.HealthUsed++;
+
+		SoundEffect(SFX_MENU_MEDI, NULL, 0);
 
 		return;
 	}
@@ -547,6 +563,9 @@ void Inventory::UseCurrentItem()
 		if (Lara.waterStatus == LW_ABOVE_WATER)
 		{
 			InventoryItemChosen = objectNumber;
+			
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			
 			return;
 		}
 		else
@@ -562,6 +581,9 @@ void Inventory::UseCurrentItem()
 		if (Lara.waterStatus == LW_ABOVE_WATER)
 		{
 			InventoryItemChosen = objectNumber;
+			
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			
 			return;
 		}
 		else
@@ -585,6 +607,8 @@ void Inventory::UseCurrentItem()
 			Lara.requestGunType = WEAPON_PISTOLS; 
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_PISTOLS)
 				Lara.gunStatus = LG_DRAW_GUNS;
+		
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -601,6 +625,8 @@ void Inventory::UseCurrentItem()
 			Lara.requestGunType = WEAPON_UZI;
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_UZI)
 				Lara.gunStatus = LG_DRAW_GUNS;
+		
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -617,6 +643,8 @@ void Inventory::UseCurrentItem()
 			Lara.requestGunType = WEAPON_REVOLVER;
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_REVOLVER)
 				Lara.gunStatus = LG_DRAW_GUNS;
+	
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -633,6 +661,8 @@ void Inventory::UseCurrentItem()
 			Lara.requestGunType = WEAPON_SHOTGUN;
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_SHOTGUN)
 				Lara.gunStatus = LG_DRAW_GUNS;
+		
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -649,6 +679,8 @@ void Inventory::UseCurrentItem()
 			Lara.requestGunType = WEAPON_CROSSBOW;
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
 				Lara.gunStatus = LG_DRAW_GUNS;
+		
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -665,6 +697,8 @@ void Inventory::UseCurrentItem()
 			Lara.requestGunType = WEAPON_HK;
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_HK)
 				Lara.gunStatus = LG_DRAW_GUNS;
+		
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else
 		{
@@ -691,6 +725,8 @@ void Inventory::UseCurrentItem()
 					TrInput = 0x80000;
 					LaraGun();
 					TrInput = 0;
+
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 				}
 				return;
 			}
