@@ -575,6 +575,13 @@ RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 			else
 				bucketIndex = RENDERER_BUCKET_ALPHA_TEST_DS;
 		}
+
+		// ColAddHorizon special handling
+		if (obj->GetId() == ID_HORIZON && (texture->attribute == 2 || (effects & 1)) && (gfLevelFlags & 0x200))
+			bucketIndex = RENDERER_BUCKET_TRANSPARENT;
+		else
+			bucketIndex = RENDERER_BUCKET_SOLID;
+
 		bucket = mesh->GetBucket(bucketIndex);
 		obj->HasDataInBucket[bucketIndex] = true;
 
@@ -2156,7 +2163,7 @@ void Renderer::UpdateLaraAnimations()
 		TR_ANGLE_TO_RAD(Lara.torsoYrot), TR_ANGLE_TO_RAD(Lara.torsoZrot));
 	laraObj->LinearizedBones[HEAD]->ExtraRotation = D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.headXrot),
 		TR_ANGLE_TO_RAD(Lara.headYrot), TR_ANGLE_TO_RAD(Lara.headZrot));
-
+	
 	// First calculate matrices for legs, hips, head and torso
 	__int32 mask = (1 << HIPS) | (1 << THIGH_L) | (1 << CALF_L) | (1 << FOOT_L) |
 				   (1 << THIGH_R) | (1 << CALF_R) | (1 << FOOT_R) | (1 << TORSO) | (1 << HEAD);
@@ -2177,22 +2184,38 @@ void Renderer::UpdateLaraAnimations()
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[UARM_L]->ExtraRotation = D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),
+		laraObj->LinearizedBones[UARM_L]->ExtraRotation += D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),
 			TR_ANGLE_TO_RAD(Lara.leftArm.yRot), TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
-		laraObj->LinearizedBones[UARM_R]->ExtraRotation = D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot),
+		laraObj->LinearizedBones[UARM_R]->ExtraRotation += D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot),
 			TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
 
 		if (Lara.gunType != WEAPON_FLARE)
 		{
-			// Left arm
-			mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
-			frac = GetFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-			BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
-
-			// Right arm
-			mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
-			frac = GetFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
-			BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+			// HACK: shotgun must be handled differently (and probably also crossbow)
+			if (Lara.gunType == WEAPON_SHOTGUN)
+			{
+				// Left arm
+				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
+				__int16* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+				BuildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
+				
+				// Right arm
+				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
+				shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+				BuildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
+			}
+			else
+			{
+				// Left arm
+				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
+				frac = GetFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
+				BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+				
+				// Right arm
+				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
+				frac = GetFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
+				BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+			}			
 		}
 		else
 		{
@@ -2207,23 +2230,6 @@ void Renderer::UpdateLaraAnimations()
 			BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
 		}
 	}
-
-	D3DXMATRIX m0 = laraObj->AnimationTransforms[0];
-	D3DXMATRIX m1 = laraObj->AnimationTransforms[1];
-	D3DXMATRIX m2 = laraObj->AnimationTransforms[2];
-	D3DXMATRIX m3 = laraObj->AnimationTransforms[3];
-	D3DXMATRIX m4 = laraObj->AnimationTransforms[4];
-	D3DXMATRIX m5 = laraObj->AnimationTransforms[5];
-	D3DXMATRIX m6 = laraObj->AnimationTransforms[6];
-	D3DXMATRIX m7 = laraObj->AnimationTransforms[7];
-	D3DXMATRIX m8 = laraObj->AnimationTransforms[8];
-	D3DXMATRIX m9 = laraObj->AnimationTransforms[9];
-	D3DXMATRIX m10 = laraObj->AnimationTransforms[10];
-	D3DXMATRIX m11 = laraObj->AnimationTransforms[11];
-	D3DXMATRIX m12 = laraObj->AnimationTransforms[12];
-	D3DXMATRIX m13 = laraObj->AnimationTransforms[13];
-	D3DXMATRIX m14 = laraObj->AnimationTransforms[14];
-
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
 	if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
@@ -3396,6 +3402,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 
 	// Clear the G-Buffer
 	BindRenderTargets(m_colorBuffer, m_normalBuffer, m_depthBuffer, m_vertexLightBuffer);
+	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_COLORVALUE(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
 	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	m_device->SetVertexDeclaration(m_vertexDeclaration);
@@ -3509,8 +3516,6 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 
 	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-
-	DrawGunFlashes(RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
 	effect->EndPass();
 	effect->End();
@@ -3745,8 +3750,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	effect->End();
 
 	// Prepare sprites
-	m_spritesVertices.clear();
-	m_spritesIndices.clear();
+	// TODO: preallocate big buffer and avoica memory allocations!
 	for (vector<RendererSpriteToDraw*>::iterator it = m_spritesToDraw.begin(); it != m_spritesToDraw.end(); ++it)
 		delete (*it);
 	m_spritesToDraw.clear();
@@ -3769,8 +3773,9 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 
 	// Draw sprites
 	DrawSprites();
+	DrawGunFlashes();
 	DrawLines3D();
-
+	
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
@@ -4225,7 +4230,7 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 	return true;
 }
 
-bool Renderer::DrawGunFlashes(RENDERER_PASSES pass)
+bool Renderer::DrawGunFlashes(/*RENDERER_PASSES pass*/)
 {
 	D3DXMATRIX world;
 	D3DXMATRIX translation;
@@ -4240,16 +4245,19 @@ bool Renderer::DrawGunFlashes(RENDERER_PASSES pass)
 
 	RendererLightInfo* light = &m_itemsLightInfo[0];
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	/*if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
 	else
-		effect = m_shaderFillGBuffer->GetEffect();
+		effect = m_shaderFillGBuffer->GetEffect();*/
+	effect = m_shaderBasic->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
-	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+	effect->SetTexture(effect->GetParameterByName(NULL, "ModelTexture"), m_textureAtlas);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
 
 	__int16 length = 0;
 	__int16 zOffset = 0;
@@ -4284,64 +4292,58 @@ bool Renderer::DrawGunFlashes(RENDERER_PASSES pass)
 		OBJECT_INFO* flashObj = &Objects[ID_GUN_FLASH];
 		RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
 		RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
-		RendererBucket* flashBucket = flashMesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST);
 
-		if (flashBucket->NumVertices != 0)
+		for (__int32 b = 0; b < NUM_BUCKETS; b++)
 		{
-			m_device->SetStreamSource(0, flashBucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-			m_device->SetIndices(flashBucket->GetIndexBuffer());
+			RendererBucket* flashBucket = flashMesh->GetBucket(b);
 
-			D3DXMATRIX offset;
-			D3DXMatrixTranslation(&offset, 0, length, zOffset);
-
-			D3DXMATRIX rotation2;
-			D3DXMatrixRotationX(&rotation2, TR_ANGLE_TO_RAD(rotationX));
-
-			//m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-			//m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
-			//m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
-
-			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-			m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-			if (Lara.leftArm.flash_gun)
+			if (flashBucket->NumVertices != 0)
 			{
-				D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_L], &m_LaraWorldMatrix);
-				D3DXMatrixMultiply(&world, &offset, &world);
-				D3DXMatrixMultiply(&world, &rotation2, &world);
+				m_device->SetStreamSource(0, flashBucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+				m_device->SetIndices(flashBucket->GetIndexBuffer());
 
-				for (int iPass = 0; iPass < cPasses; iPass++)
+				D3DXMATRIX offset;
+				D3DXMatrixTranslation(&offset, 0, length, zOffset);
+
+				D3DXMATRIX rotation2;
+				D3DXMatrixRotationX(&rotation2, TR_ANGLE_TO_RAD(rotationX));
+
+				if (Lara.leftArm.flash_gun)
 				{
-					effect->BeginPass(iPass);
-					effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
-					effect->CommitChanges();
+					D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_L], &m_LaraWorldMatrix);
+					D3DXMatrixMultiply(&world, &offset, &world);
+					D3DXMatrixMultiply(&world, &rotation2, &world);
 
-					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
+					for (int iPass = 0; iPass < cPasses; iPass++)
+					{
+						effect->BeginPass(iPass);
+						effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
+						effect->CommitChanges();
 
-					effect->EndPass();
+						DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
+
+						effect->EndPass();
+					}
+				}
+
+				if (Lara.rightArm.flash_gun)
+				{
+					D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_R], &m_LaraWorldMatrix);
+					D3DXMatrixMultiply(&world, &offset, &world);
+					D3DXMatrixMultiply(&world, &rotation2, &world);
+
+					for (int iPass = 0; iPass < cPasses; iPass++)
+					{
+						effect->BeginPass(iPass);
+						effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
+						effect->CommitChanges();
+
+						DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
+
+						effect->EndPass();
+					}
 				}
 			}
-
-			if (Lara.rightArm.flash_gun)
-			{
-				D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_R], &m_LaraWorldMatrix);
-				D3DXMatrixMultiply(&world, &offset, &world);
-				D3DXMatrixMultiply(&world, &rotation2, &world);
-
-				for (int iPass = 0; iPass < cPasses; iPass++)
-				{
-					effect->BeginPass(iPass);
-					effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
-					effect->CommitChanges();
-
-					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
-
-					effect->EndPass();
-				}
-			}
-
-			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 		}
 	}
 
@@ -4446,7 +4448,7 @@ bool Renderer::DrawSkyLPP()
 	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
 	// First update the sky in the case of storm
-	if (gfLevelFlags & 0x40)
+	if (gfLevelFlags & 0x40 || true)
 	{
 		if (Unk_00E6D74C || Unk_00E6D73C)
 		{
@@ -4454,7 +4456,7 @@ bool Renderer::DrawSkyLPP()
 			if (StormTimer > -1)
 				StormTimer--;
 			if (!StormTimer)
-				SoundEffect(182, 0, 0);
+				SoundEffect(SFX_THUNDER_RUMBLE, NULL, 0);
 		}
 		else if (!(rand() & 0x7F))
 		{
@@ -4463,7 +4465,7 @@ bool Renderer::DrawSkyLPP()
 			StormTimer = (rand() & 3) + 12;
 		}
 
-		color = D3DXVECTOR4((SkyStormColor.r + 44) / 255.0f, SkyStormColor.g / 255.0f, SkyStormColor.b / 255.0f, 1.0f);
+		color = D3DXVECTOR4((SkyStormColor[0] + 44) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
 	}
 
 	D3DXMATRIX world;
@@ -4509,12 +4511,11 @@ bool Renderer::DrawSkyLPP()
 
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
 	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
-	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
 
 	D3DXMatrixTranslation(&world, Camera.pos.x, Camera.pos.y, Camera.pos.z);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
-
-
+	
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
 	{
 		RendererBucket* bucket = mesh->GetBucket(i);
@@ -4522,6 +4523,22 @@ bool Renderer::DrawSkyLPP()
 		// Bind buffers
 		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 		m_device->SetIndices(bucket->GetIndexBuffer());
+
+		if (i == RENDERER_BUCKET_TRANSPARENT || i == RENDERER_BUCKET_TRANSPARENT_DS)
+		{
+			// Setup additive blending
+			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+			m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+			m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+			m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
+			m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
+			m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+			m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+		}
+		else
+		{
+			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+		}
 
 		for (int iPass = 0; iPass < cPasses; iPass++)
 		{
@@ -4537,6 +4554,7 @@ bool Renderer::DrawSkyLPP()
 	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
 
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
+	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 
 	return true;
 }
@@ -4841,7 +4859,7 @@ void Renderer::DrawSparks()
 					spark->r, spark->g, spark->b,
 					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f);
 			}
-			else if (spark->flags == 0)
+			else
 			{
 				D3DXVECTOR3 v = D3DXVECTOR3(spark->xVel, spark->yVel, spark->zVel);
 				D3DXVec3Normalize(&v, &v);
@@ -4955,7 +4973,10 @@ bool Renderer::DoRain()
 			FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
 			ROOM_INFO* room = &Rooms[roomNumber];
 			if (!(room->flags & ENV_FLAG_OUTSIDE))
+			{
+				drop->Reset = true;
 				continue;
+			}
 
 			drop->Size = RAIN_SIZE + (rand() % 64);
 			drop->AngleH = (rand() % RAIN_MAX_ANGLE_H) * RADIAN;
@@ -4979,34 +5000,7 @@ bool Renderer::DoRain()
 
 		AddLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
 
-		/*RendererVertex* vertex = &vertices[2 * i];
-		
-		vertex->x = drop->X;
-		vertex->y = drop->Y;
-		vertex->z = drop->Z;
-		vertex->r = RAIN_COLOR;
-		vertex->g = RAIN_COLOR;
-		vertex->b = RAIN_COLOR;
-
-		vertex = &vertices[2 * i + 1];
-
-		float radius = drop->Size * sin(drop->AngleV);
-		
-		float dx = sin(drop->AngleH) * radius;
-		float dy = drop->Size * cos(drop->AngleH);
-		float dz = cos(drop->AngleH) * radius;
-		
-		drop->X += dx;
-		drop->Y += RAIN_DELTA_Y;
-		drop->Z += dz;
-
-		vertex->x = drop->X;
-		vertex->y = drop->Y;
-		vertex->z = drop->Z;
-		vertex->r = RAIN_COLOR;
-		vertex->g = RAIN_COLOR;
-		vertex->b = RAIN_COLOR;*/
-
+		// If rain drop has hit the ground, then reset it and add a little drip
 		__int16 roomNumber = Camera.pos.roomNumber;
 		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
 		ROOM_INFO* room = &Rooms[roomNumber];
@@ -5016,28 +5010,6 @@ bool Renderer::DoRain()
 			AddWaterSparks(drop->X, room->y + room->minfloor, drop->Z, 1);
 		}
 	}
-
-	/*LPD3DXEFFECT effect = m_shaderRain->GetEffect();
-	UINT cPasses = 1;
-
-	m_device->BeginScene();
-	effect->Begin(&cPasses, 0);
-
-	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
-	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
-
-	__int32 numBuckets = 2;
-	for (int iPass = 0; iPass < cPasses; iPass++)
-	{
-		effect->BeginPass(iPass);
-		effect->CommitChanges();
-		for (__int32 i = 0; i < numBuckets; i++)
-			m_device->DrawPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_LINELIST, NUM_RAIN_DROPS / 2, &vertices[0], sizeof(RendererVertex));
-		effect->EndPass();
-	}
-
-	effect->End();
-	m_device->EndScene();*/
 
 	m_firstWeather = false;
 

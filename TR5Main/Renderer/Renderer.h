@@ -554,7 +554,7 @@ public:
 	bool							DrawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexIndex, UINT minVertexIndex, UINT numVertices, UINT baseIndex, UINT primitiveCount);
 	bool							DrawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							DrawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
-	bool							DrawGunFlashes(RENDERER_PASSES pass);
+	bool							DrawGunFlashes(/*RENDERER_PASSES pass*/);
 	void							DrawNormalLara(__int32 bucketIndex);
 	void							DrawDivesuitLara(__int32 bucketIndex);
 	void							DrawCatsuitLara(__int32 bucketIndex);

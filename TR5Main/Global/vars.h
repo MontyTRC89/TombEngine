@@ -216,7 +216,7 @@
 #define Layer2Velocity				VAR_U_(0x00E5C275, byte)
 
 #define SkyColor1					VAR_U_(0x00E5C2A4, CVECTOR)
-#define SkyStormColor				VAR_U_(0x00E6CAF0, CVECTOR)
+#define SkyStormColor				ARRAY_(0x00E6CAF0, __int16, [3])
 #define StormTimer					VAR_U_(0x0051CD5C, __int16)
 #define Unk_00E6D74C				VAR_U_(0x00E6D74C, __int16)
 #define Unk_00E6D73C				VAR_U_(0x00E6D73C, __int16)

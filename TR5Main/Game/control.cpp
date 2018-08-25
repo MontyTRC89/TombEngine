@@ -214,7 +214,7 @@ void __cdecl DoTitle(__int32 index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
-	DoLevel(3, 124);
+	DoLevel(8, 124);
 	return;
 
 	S_LoadLevelFile(0);
@@ -227,9 +227,13 @@ void __cdecl DoLevel(__int32 index, __int32 ambient)
 	CreditsDone = false;
 	//j_DoTitleFMV();
 	CanLoad = false;
-	SkyStormColor.r = 80;
-	SkyStormColor.g = 96;
-	SkyStormColor.b = 160;
+	SkyColor1.r = 80;
+	SkyColor1.g = 96;
+	SkyColor1.b = 160;
+
+	SkyStormColor[0] = 80;
+	SkyStormColor[1] = 96;
+	SkyStormColor[2] = 160;
 
 	//InitialiseTitleOptionsMaybe(255, 0);
 
