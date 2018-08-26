@@ -35,95 +35,186 @@ using get_time = chrono::steady_clock;
 
 Renderer::Renderer()
 {
-	memset(m_skinJointRemap, -1, 15 * 128 * 2);
+	memset(m_normalLaraSkinJointRemap, -1, 15 * 32 * 2);
+	memset(m_youngLaraSkinJointRemap, -1, 15 * 32 * 2);
 
-	m_skinJointRemap[1][0] = 0;
-	m_skinJointRemap[1][1] = 0;
-	m_skinJointRemap[1][2] = 0;
-	m_skinJointRemap[1][3] = 0;
-	m_skinJointRemap[1][4] = 0;
-	m_skinJointRemap[1][5] = 0;
+	// Normal Lara
+	m_normalLaraSkinJointRemap[1][0] = 0;
+	m_normalLaraSkinJointRemap[1][1] = 0;
+	m_normalLaraSkinJointRemap[1][2] = 0;
+	m_normalLaraSkinJointRemap[1][3] = 0;
+	m_normalLaraSkinJointRemap[1][4] = 0;
+	m_normalLaraSkinJointRemap[1][5] = 0;
 
-	m_skinJointRemap[2][0] = 1;
-	m_skinJointRemap[2][1] = 1;
-	m_skinJointRemap[2][2] = 1;
-	m_skinJointRemap[2][3] = 1;
-	m_skinJointRemap[2][4] = 1;
+	m_normalLaraSkinJointRemap[2][0] = 1;
+	m_normalLaraSkinJointRemap[2][1] = 1;
+	m_normalLaraSkinJointRemap[2][2] = 1;
+	m_normalLaraSkinJointRemap[2][3] = 1;
+	m_normalLaraSkinJointRemap[2][4] = 1;
 
-	m_skinJointRemap[3][4] = 2;
-	m_skinJointRemap[3][5] = 2;
-	m_skinJointRemap[3][6] = 2;
-	m_skinJointRemap[3][7] = 2;
+	m_normalLaraSkinJointRemap[3][4] = 2;
+	m_normalLaraSkinJointRemap[3][5] = 2;
+	m_normalLaraSkinJointRemap[3][6] = 2;
+	m_normalLaraSkinJointRemap[3][7] = 2;
 
-	m_skinJointRemap[4][0] = 0;
-	m_skinJointRemap[4][1] = 0;
-	m_skinJointRemap[4][2] = 0;
-	m_skinJointRemap[4][3] = 0;
-	m_skinJointRemap[4][4] = 0;
-	m_skinJointRemap[4][5] = 0;
+	m_normalLaraSkinJointRemap[4][0] = 0;
+	m_normalLaraSkinJointRemap[4][1] = 0;
+	m_normalLaraSkinJointRemap[4][2] = 0;
+	m_normalLaraSkinJointRemap[4][3] = 0;
+	m_normalLaraSkinJointRemap[4][4] = 0;
+	m_normalLaraSkinJointRemap[4][5] = 0;
 
-	m_skinJointRemap[5][0] = 4;
-	m_skinJointRemap[5][1] = 4;
-	m_skinJointRemap[5][2] = 4;
-	m_skinJointRemap[5][3] = 4;
-	m_skinJointRemap[5][4] = 4;
+	m_normalLaraSkinJointRemap[5][0] = 4;
+	m_normalLaraSkinJointRemap[5][1] = 4;
+	m_normalLaraSkinJointRemap[5][2] = 4;
+	m_normalLaraSkinJointRemap[5][3] = 4;
+	m_normalLaraSkinJointRemap[5][4] = 4;
 
-	m_skinJointRemap[6][4] = 5;
-	m_skinJointRemap[6][5] = 5;
-	m_skinJointRemap[6][6] = 5;
-	m_skinJointRemap[6][7] = 5;
+	m_normalLaraSkinJointRemap[6][4] = 5;
+	m_normalLaraSkinJointRemap[6][5] = 5;
+	m_normalLaraSkinJointRemap[6][6] = 5;
+	m_normalLaraSkinJointRemap[6][7] = 5;
 
-	m_skinJointRemap[7][0] = 0;
-	m_skinJointRemap[7][1] = 0;
-	m_skinJointRemap[7][2] = 0;
-	m_skinJointRemap[7][3] = 0;
-	m_skinJointRemap[7][4] = 0;
-	m_skinJointRemap[7][5] = 0;
+	m_normalLaraSkinJointRemap[7][0] = 0;
+	m_normalLaraSkinJointRemap[7][1] = 0;
+	m_normalLaraSkinJointRemap[7][2] = 0;
+	m_normalLaraSkinJointRemap[7][3] = 0;
+	m_normalLaraSkinJointRemap[7][4] = 0;
+	m_normalLaraSkinJointRemap[7][5] = 0;
 
-	m_skinJointRemap[8][6] = 7;
-	m_skinJointRemap[8][7] = 7;
-	m_skinJointRemap[8][8] = 7;
-	m_skinJointRemap[8][9] = 7;
-	m_skinJointRemap[8][10] = 7;
-	m_skinJointRemap[8][11] = 7;
+	m_normalLaraSkinJointRemap[8][6] = 7;
+	m_normalLaraSkinJointRemap[8][7] = 7;
+	m_normalLaraSkinJointRemap[8][8] = 7;
+	m_normalLaraSkinJointRemap[8][9] = 7;
+	m_normalLaraSkinJointRemap[8][10] = 7;
+	m_normalLaraSkinJointRemap[8][11] = 7;
 
-	m_skinJointRemap[9][5] = 8;
-	m_skinJointRemap[9][6] = 8;
-	m_skinJointRemap[9][7] = 8;
-	m_skinJointRemap[9][8] = 8;
-	m_skinJointRemap[9][9] = 8;
+	m_normalLaraSkinJointRemap[9][5] = 8;
+	m_normalLaraSkinJointRemap[9][6] = 8;
+	m_normalLaraSkinJointRemap[9][7] = 8;
+	m_normalLaraSkinJointRemap[9][8] = 8;
+	m_normalLaraSkinJointRemap[9][9] = 8;
 
-	m_skinJointRemap[10][0] = 9;
-	m_skinJointRemap[10][1] = 9;
-	m_skinJointRemap[10][2] = 9;
-	m_skinJointRemap[10][3] = 9;
-	m_skinJointRemap[10][4] = 9;
+	m_normalLaraSkinJointRemap[10][0] = 9;
+	m_normalLaraSkinJointRemap[10][1] = 9;
+	m_normalLaraSkinJointRemap[10][2] = 9;
+	m_normalLaraSkinJointRemap[10][3] = 9;
+	m_normalLaraSkinJointRemap[10][4] = 9;
 
-	m_skinJointRemap[11][6] = 7;
-	m_skinJointRemap[11][7] = 7;
-	m_skinJointRemap[11][8] = 7;
-	m_skinJointRemap[11][9] = 7;
-	m_skinJointRemap[11][10] = 7;
-	m_skinJointRemap[11][11] = 7;
+	m_normalLaraSkinJointRemap[11][6] = 7;
+	m_normalLaraSkinJointRemap[11][7] = 7;
+	m_normalLaraSkinJointRemap[11][8] = 7;
+	m_normalLaraSkinJointRemap[11][9] = 7;
+	m_normalLaraSkinJointRemap[11][10] = 7;
+	m_normalLaraSkinJointRemap[11][11] = 7;
 
-	m_skinJointRemap[12][5] = 11;
-	m_skinJointRemap[12][6] = 11;
-	m_skinJointRemap[12][7] = 11;
-	m_skinJointRemap[12][8] = 11;
-	m_skinJointRemap[12][9] = 11;
+	m_normalLaraSkinJointRemap[12][5] = 11;
+	m_normalLaraSkinJointRemap[12][6] = 11;
+	m_normalLaraSkinJointRemap[12][7] = 11;
+	m_normalLaraSkinJointRemap[12][8] = 11;
+	m_normalLaraSkinJointRemap[12][9] = 11;
 
-	m_skinJointRemap[13][0] = 12;
-	m_skinJointRemap[13][1] = 12;
-	m_skinJointRemap[13][2] = 12;
-	m_skinJointRemap[13][3] = 12;
-	m_skinJointRemap[13][4] = 12;
+	m_normalLaraSkinJointRemap[13][0] = 12;
+	m_normalLaraSkinJointRemap[13][1] = 12;
+	m_normalLaraSkinJointRemap[13][2] = 12;
+	m_normalLaraSkinJointRemap[13][3] = 12;
+	m_normalLaraSkinJointRemap[13][4] = 12;
 
-	m_skinJointRemap[14][6] = 7;
-	m_skinJointRemap[14][7] = 7;
-	m_skinJointRemap[14][8] = 7;
-	m_skinJointRemap[14][9] = 7;
-	m_skinJointRemap[14][10] = 7;
-	m_skinJointRemap[14][11] = 7;
+	m_normalLaraSkinJointRemap[14][6] = 7;
+	m_normalLaraSkinJointRemap[14][7] = 7;
+	m_normalLaraSkinJointRemap[14][8] = 7;
+	m_normalLaraSkinJointRemap[14][9] = 7;
+	m_normalLaraSkinJointRemap[14][10] = 7;
+	m_normalLaraSkinJointRemap[14][11] = 7;
+
+	// Young Lara
+	m_youngLaraSkinJointRemap[1][0] = 0; // Left up leg
+	m_youngLaraSkinJointRemap[1][1] = 0;
+	m_youngLaraSkinJointRemap[1][2] = 0;
+	m_youngLaraSkinJointRemap[1][3] = 0;
+	m_youngLaraSkinJointRemap[1][4] = 0;
+	m_youngLaraSkinJointRemap[1][5] = 0;
+
+	m_youngLaraSkinJointRemap[2][0] = 1; // Bottom left leg
+	m_youngLaraSkinJointRemap[2][1] = 1;
+	m_youngLaraSkinJointRemap[2][2] = 1;
+	m_youngLaraSkinJointRemap[2][3] = 1;
+	m_youngLaraSkinJointRemap[2][4] = 1;
+
+	m_youngLaraSkinJointRemap[3][0] = 2; // Left foot
+	m_youngLaraSkinJointRemap[3][1] = 2;
+	m_youngLaraSkinJointRemap[3][2] = 2;
+	m_youngLaraSkinJointRemap[3][3] = 2;
+
+	m_youngLaraSkinJointRemap[4][6] = 0; // Right upper leg
+	m_youngLaraSkinJointRemap[4][7] = 0;
+	m_youngLaraSkinJointRemap[4][8] = 0;
+	m_youngLaraSkinJointRemap[4][9] = 0;
+	m_youngLaraSkinJointRemap[4][10] = 0;
+	m_youngLaraSkinJointRemap[4][11] = 0;
+
+	m_youngLaraSkinJointRemap[5][0] = 4; // Right bottom leg
+	m_youngLaraSkinJointRemap[5][1] = 4;
+	m_youngLaraSkinJointRemap[5][2] = 4;
+	m_youngLaraSkinJointRemap[5][3] = 4;
+	m_youngLaraSkinJointRemap[5][4] = 4;
+
+	m_youngLaraSkinJointRemap[6][0] = 5; // Right foot
+	m_youngLaraSkinJointRemap[6][1] = 5;
+	m_youngLaraSkinJointRemap[6][2] = 5;
+	m_youngLaraSkinJointRemap[6][3] = 5;
+
+	m_youngLaraSkinJointRemap[7][0] = 0; // Torso
+	m_youngLaraSkinJointRemap[7][1] = 0;
+	m_youngLaraSkinJointRemap[7][2] = 0;
+	m_youngLaraSkinJointRemap[7][3] = 0;
+	m_youngLaraSkinJointRemap[7][4] = 0;
+	m_youngLaraSkinJointRemap[7][5] = 0;
+
+	m_youngLaraSkinJointRemap[8][0] = 7; // Left upper arm
+	m_youngLaraSkinJointRemap[8][1] = 7;
+	m_youngLaraSkinJointRemap[8][2] = 7;
+	m_youngLaraSkinJointRemap[8][3] = 7;
+	m_youngLaraSkinJointRemap[8][4] = 7;
+	m_youngLaraSkinJointRemap[8][5] = 7;
+
+	m_youngLaraSkinJointRemap[9][5] = 8; // Left bottom arm
+	m_youngLaraSkinJointRemap[9][6] = 8;
+	m_youngLaraSkinJointRemap[9][7] = 8;
+	m_youngLaraSkinJointRemap[9][8] = 8;
+	m_youngLaraSkinJointRemap[9][9] = 8;
+
+	m_youngLaraSkinJointRemap[10][0] = 9; // Left hand
+	m_youngLaraSkinJointRemap[10][1] = 9;
+	m_youngLaraSkinJointRemap[10][2] = 9;
+	m_youngLaraSkinJointRemap[10][3] = 9;
+	m_youngLaraSkinJointRemap[10][4] = 9;
+
+	m_youngLaraSkinJointRemap[11][0] = 7; // Right upper arm
+	m_youngLaraSkinJointRemap[11][1] = 7;
+	m_youngLaraSkinJointRemap[11][2] = 7;
+	m_youngLaraSkinJointRemap[11][3] = 7;
+	m_youngLaraSkinJointRemap[11][4] = 7;
+	m_youngLaraSkinJointRemap[11][5] = 7;
+
+	m_youngLaraSkinJointRemap[12][5] = 11; // Right low arm
+	m_youngLaraSkinJointRemap[12][6] = 11;
+	m_youngLaraSkinJointRemap[12][7] = 11;
+	m_youngLaraSkinJointRemap[12][8] = 11;
+	m_youngLaraSkinJointRemap[12][9] = 11;
+
+	m_youngLaraSkinJointRemap[13][0] = 12; // Right arm
+	m_youngLaraSkinJointRemap[13][1] = 12;
+	m_youngLaraSkinJointRemap[13][2] = 12;
+	m_youngLaraSkinJointRemap[13][3] = 12;
+	m_youngLaraSkinJointRemap[13][4] = 12;
+
+	m_youngLaraSkinJointRemap[14][0] = 7; // Head
+	m_youngLaraSkinJointRemap[14][1] = 7;
+	m_youngLaraSkinJointRemap[14][2] = 7;
+	m_youngLaraSkinJointRemap[14][3] = 7;
+	m_youngLaraSkinJointRemap[14][4] = 7;
+	m_youngLaraSkinJointRemap[14][5] = 7;
 
 	m_quadVertices[0].x = -1;
 	m_quadVertices[0].y = 1;
@@ -617,11 +708,11 @@ RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 			vertex.u = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 			vertex.v = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 
-			vertex.bone = boneIndex;
-			if (isJoints && boneIndex != 0 && m_skinJointRemap[boneIndex][indices[v]] != -1)
-				vertex.bone = m_skinJointRemap[boneIndex][indices[v]];
+			vertex.boneAndFlags = boneIndex;
+			if (isJoints && boneIndex != 0 && m_laraSkinJointRemap[boneIndex][indices[v]] != -1)
+				vertex.boneAndFlags = m_laraSkinJointRemap[boneIndex][indices[v]];
 			if (isHairs)
-				vertex.bone = indices[v];
+				vertex.boneAndFlags = indices[v];
 			/*if (isHairs && boneIndex == 0 && indices[v] < 4)
 				vertex.bone = 6;
 			if (isHairs && boneIndex != 0 && indices[v] < 4)
@@ -710,11 +801,11 @@ RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 			vertex.u = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 			vertex.v = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 		
-			vertex.bone = boneIndex;
-			if (isJoints && boneIndex != 0 && m_skinJointRemap[boneIndex][indices[v]] != -1)
-				vertex.bone = m_skinJointRemap[boneIndex][indices[v]];
+			vertex.boneAndFlags = boneIndex;
+			if (isJoints && boneIndex != 0 && m_laraSkinJointRemap[boneIndex][indices[v]] != -1)
+				vertex.boneAndFlags = m_laraSkinJointRemap[boneIndex][indices[v]];
 			if (isHairs)
-				vertex.bone = indices[v];
+				vertex.boneAndFlags = indices[v];
 			/*if (isHairs && boneIndex == 0 && indices[v] < 4)
 				vertex.bone = 6;
 			if (isHairs && boneIndex != 0 && indices[v] < 4)
@@ -767,6 +858,16 @@ bool Renderer::PrepareDataForTheRenderer()
 	__int32 blockY = 0;
 
 	ZeroMemory(buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
+
+	__int32 typ = LaraDrawType;
+	if (gfLevelFlags & 1 || m_youngLara)
+	{
+		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
+	}
+	else
+	{ 
+		memcpy(m_laraSkinJointRemap, m_normalLaraSkinJointRemap, 15 * 32 * 2);
+	}
 
 	for (int p = 0; p < NumTexturePages; p++)
 	{
@@ -1262,10 +1363,10 @@ bool Renderer::PrepareDataForTheRenderer()
 						for (__int32 v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
 						{
 							RendererVertex* jointVertex = &jointBucket->Vertices[v1];
-							if (jointVertex->bone != j)
+							if (jointVertex->boneAndFlags != j)
 							{
-								RendererMesh* skinMesh = objSkin->ObjectMeshes[jointVertex->bone];
-								RendererBone* skinBone = objSkin->LinearizedBones[jointVertex->bone];
+								RendererMesh* skinMesh = objSkin->ObjectMeshes[jointVertex->boneAndFlags];
+								RendererBone* skinBone = objSkin->LinearizedBones[jointVertex->boneAndFlags];
 
 								for (__int32 b2 = 0; b2 < NUM_BUCKETS; b2++)
 								{
@@ -1316,8 +1417,8 @@ bool Renderer::PrepareDataForTheRenderer()
 					}
 				}
 
-				m_hairVertices = (RendererVertex*)malloc(m_numHairVertices * sizeof(RendererVertex));
-				m_hairIndices = (__int32*)malloc(m_numHairIndices * 4);
+				m_hairVertices = (RendererVertex*)malloc(m_numHairVertices * 2 * sizeof(RendererVertex));
+				m_hairIndices = (__int32*)malloc(m_numHairIndices * 2 * 4);
 			}
 
 			// Initialise buffers
@@ -2262,92 +2363,115 @@ void Renderer::UpdateLaraAnimations()
 
 		D3DXMatrixMultiply(&world, &objLara->AnimationTransforms[HEAD], &m_LaraWorldMatrix);
 
-		// We can't use hardware skinning here, however hairs have just a few vertices so 
-		// it's not so bad doing skinning in software
-		D3DXVec3TransformCoord(&parentVertices[0][0], &parentMesh->Positions[37], &world);
-		D3DXVec3TransformCoord(&parentVertices[0][1], &parentMesh->Positions[39], &world);
-		D3DXVec3TransformCoord(&parentVertices[0][2], &parentMesh->Positions[40], &world);
-		D3DXVec3TransformCoord(&parentVertices[0][3], &parentMesh->Positions[38], &world);
-
 		__int32 lastVertex = 0;
 		__int32 lastIndex = 0;
 
-		ZeroMemory(m_hairVertices, m_numHairVertices * sizeof(RendererObject));
-		ZeroMemory(m_hairIndices, m_numHairIndices * 4);
+		ZeroMemory(m_hairVertices, m_numHairVertices * 2 * sizeof(RendererObject));
+		ZeroMemory(m_hairIndices, m_numHairIndices * 2 * 4);
 
-		for (__int32 i = 0; i < 6; i++)
+		for (__int32 p = 0; p < (m_youngLara ? 2 : 1); p++)
 		{
-			RendererMesh* mesh = hairsObj->ObjectMeshes[i];
-			RendererBucket* bucket = mesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID);
-
-			D3DXMatrixTranslation(&translation, Hairs[i].pos.xPos, Hairs[i].pos.yPos, Hairs[i].pos.zPos);
-			D3DXMatrixRotationYawPitchRoll(&rotation, 
-										   TR_ANGLE_TO_RAD(Hairs[i].pos.yRot),
-										   TR_ANGLE_TO_RAD(Hairs[i].pos.xRot), 
-										   TR_ANGLE_TO_RAD(Hairs[i].pos.zRot));
-			D3DXMatrixMultiply(&m_hairsMatrices[i], &rotation, &translation);
-
-			__int32 baseVertex = lastVertex;
-
-			for (__int32 j = 0; j < bucket->Vertices.size(); j++)
+			// We can't use hardware skinning here, however hairs have just a few vertices so 
+			// it's not so bad doing skinning in software
+			if (m_youngLara)
 			{
-				__int32 oldVertexIndex = (__int32)bucket->Vertices[j].bone;
-				if (oldVertexIndex < 4)
+				if (p == 1)
 				{
-					m_hairVertices[lastVertex].x = parentVertices[i][oldVertexIndex].x;
-					m_hairVertices[lastVertex].y = parentVertices[i][oldVertexIndex].y;
-					m_hairVertices[lastVertex].z = parentVertices[i][oldVertexIndex].z;
-					m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
-					m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
-
-					D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
-					D3DXVec3Normalize(&n, &n);
-					D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[i]);
-					D3DXVec3Normalize(&n, &n);
-
-					m_hairVertices[lastVertex].nx = n.x;
-					m_hairVertices[lastVertex].ny = n.y;
-					m_hairVertices[lastVertex].nz = n.z;
-
-					lastVertex++;
+					D3DXVec3TransformCoord(&parentVertices[0][0], &parentMesh->Positions[68], &world);
+					D3DXVec3TransformCoord(&parentVertices[0][1], &parentMesh->Positions[69], &world);
+					D3DXVec3TransformCoord(&parentVertices[0][2], &parentMesh->Positions[70], &world);
+					D3DXVec3TransformCoord(&parentVertices[0][3], &parentMesh->Positions[71], &world);
 				}
 				else
 				{
-					D3DXVECTOR3 in = D3DXVECTOR3(bucket->Vertices[j].x, bucket->Vertices[j].y, bucket->Vertices[j].z);
-					D3DXVECTOR4 out;
-
-					D3DXVec3Transform(&out, &in, &m_hairsMatrices[i]);
-
-					if (i < 5)
-					{
-						parentVertices[i + 1][oldVertexIndex - 4].x = out.x;
-						parentVertices[i + 1][oldVertexIndex - 4].y = out.y;
-						parentVertices[i + 1][oldVertexIndex - 4].z = out.z;
-					}
-
-					m_hairVertices[lastVertex].x = out.x;
-					m_hairVertices[lastVertex].y = out.y;
-					m_hairVertices[lastVertex].z = out.z;
-					m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
-					m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
-
-					D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
-					D3DXVec3Normalize(&n, &n);
-					D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[i]);
-					D3DXVec3Normalize(&n, &n);
-
-					m_hairVertices[lastVertex].nx = n.x;
-					m_hairVertices[lastVertex].ny = n.y;
-					m_hairVertices[lastVertex].nz = n.z;
-
-					lastVertex++;
+					D3DXVec3TransformCoord(&parentVertices[0][0], &parentMesh->Positions[79], &world);
+					D3DXVec3TransformCoord(&parentVertices[0][1], &parentMesh->Positions[78], &world);
+					D3DXVec3TransformCoord(&parentVertices[0][2], &parentMesh->Positions[76], &world);
+					D3DXVec3TransformCoord(&parentVertices[0][3], &parentMesh->Positions[77], &world);
 				}
 			}
-
-			for (__int32 j = 0; j < bucket->Indices.size(); j++)
+			else
 			{
-				m_hairIndices[lastIndex] = baseVertex + bucket->Indices[j];
-				lastIndex++;
+				D3DXVec3TransformCoord(&parentVertices[0][0], &parentMesh->Positions[37], &world);
+				D3DXVec3TransformCoord(&parentVertices[0][1], &parentMesh->Positions[39], &world);
+				D3DXVec3TransformCoord(&parentVertices[0][2], &parentMesh->Positions[40], &world);
+				D3DXVec3TransformCoord(&parentVertices[0][3], &parentMesh->Positions[38], &world);
+			}
+
+			for (__int32 i = 0; i < 6; i++)
+			{
+				RendererMesh* mesh = hairsObj->ObjectMeshes[i];
+				RendererBucket* bucket = mesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID);
+
+				D3DXMatrixTranslation(&translation, Hairs[7 * p + i].pos.xPos, Hairs[7 * p + i].pos.yPos, Hairs[7 * p + i].pos.zPos);
+				D3DXMatrixRotationYawPitchRoll(&rotation,
+					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.yRot),
+					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.xRot),
+					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
+				D3DXMatrixMultiply(&m_hairsMatrices[6 * p + i], &rotation, &translation);
+
+				__int32 baseVertex = lastVertex;
+
+				for (__int32 j = 0; j < bucket->Vertices.size(); j++)
+				{
+					__int32 oldVertexIndex = (__int32)bucket->Vertices[j].boneAndFlags;
+					if (oldVertexIndex < 4)
+					{
+						m_hairVertices[lastVertex].x = parentVertices[i][oldVertexIndex].x;
+						m_hairVertices[lastVertex].y = parentVertices[i][oldVertexIndex].y;
+						m_hairVertices[lastVertex].z = parentVertices[i][oldVertexIndex].z;
+						m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
+						m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
+
+						D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
+						D3DXVec3Normalize(&n, &n);
+						D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[6 * p + i]);
+						D3DXVec3Normalize(&n, &n);
+
+						m_hairVertices[lastVertex].nx = n.x;
+						m_hairVertices[lastVertex].ny = n.y;
+						m_hairVertices[lastVertex].nz = n.z;
+
+						lastVertex++;
+					}
+					else
+					{
+						D3DXVECTOR3 in = D3DXVECTOR3(bucket->Vertices[j].x, bucket->Vertices[j].y, bucket->Vertices[j].z);
+						D3DXVECTOR4 out;
+
+						D3DXVec3Transform(&out, &in, &m_hairsMatrices[6 * p + i]);
+
+						if (i < 5)
+						{
+							parentVertices[i + 1][oldVertexIndex - 4].x = out.x;
+							parentVertices[i + 1][oldVertexIndex - 4].y = out.y;
+							parentVertices[i + 1][oldVertexIndex - 4].z = out.z;
+						}
+
+						m_hairVertices[lastVertex].x = out.x;
+						m_hairVertices[lastVertex].y = out.y;
+						m_hairVertices[lastVertex].z = out.z;
+						m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
+						m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
+
+						D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
+						D3DXVec3Normalize(&n, &n);
+						D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[6 * p + i]);
+						D3DXVec3Normalize(&n, &n);
+
+						m_hairVertices[lastVertex].nx = n.x;
+						m_hairVertices[lastVertex].ny = n.y;
+						m_hairVertices[lastVertex].nz = n.z;
+
+						lastVertex++;
+					}
+				}
+
+				for (__int32 j = 0; j < bucket->Indices.size(); j++)
+				{
+					m_hairIndices[lastIndex] = baseVertex + bucket->Indices[j];
+					lastIndex++;
+				}
 			}
 		}
 	}
@@ -4111,7 +4235,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
 
 	for (__int32 i = 0; i < laraObj->ObjectMeshes.size(); i++)
-	{ 
+	{
 		// Lara has meshes overriden by weapons, crowbar, etc
 		RendererMesh* mesh = MeshPointersToMesh[Lara.meshPtrs[i]];
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
@@ -4262,7 +4386,9 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 				effect->CommitChanges();
 
-				m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_numHairVertices, m_numHairIndices / 3,
+				m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0,
+					m_numHairVertices*(m_youngLara ? 2 : 1),
+					m_numHairIndices*(m_youngLara ? 2 : 1) / 3,
 					m_hairIndices, D3DFMT_INDEX32, m_hairVertices, sizeof(RendererVertex));
 
 				effect->EndPass();
@@ -4377,6 +4503,14 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	else
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
 
+	if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	{
+		if (IsRoomUnderwater(roomIndex))
+			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), true);
+		else
+			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), false);
+	}
+
 	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 	m_device->SetIndices(bucket->GetIndexBuffer());
 
@@ -4434,6 +4568,14 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
 	else
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+
+	/*if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	{
+		if (IsRoomUnderwater(roomIndex))
+			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), true);
+		else
+			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), false);
+	}*/
 
 	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 	m_device->SetIndices(bucket->GetIndexBuffer());
@@ -5539,4 +5681,9 @@ void Renderer::DrawBubbles()
 				0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f);
 		}
 	}
+}
+
+bool Renderer::IsRoomUnderwater(__int16 roomNumber)
+{
+	return (m_rooms[roomNumber]->Room->flags & 1);
 }

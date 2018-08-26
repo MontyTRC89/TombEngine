@@ -56,6 +56,7 @@ float4x4 Bones[24];
 int ModelType;
 int BlendMode;
 bool UseSkinning;
+bool Underwater;
 
 texture TextureAtlas;
 sampler2D TextureAtlasSampler = sampler_state {
@@ -117,7 +118,9 @@ PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
 	output.Color.a = 0.1f;
 
 	output.Normal.xyz = 0.5f * (input.Normal.xyz + 1.0f);
-	output.Normal.w = ModelType / 16.0f;  
+	float pixelFlags = ModelType;
+	if (Underwater) pixelFlags += 32.0f;
+	output.Normal.w = pixelFlags / 64.0f;
 	//output.Normal.w = 1.0f;
 
 	output.Depth = input.PositionCopy.z / input.PositionCopy.w; // , 0.0f, 0.0f, 1.0f); //   float4(d, 0.0f, 0.0f, 1.0f);

@@ -59,7 +59,7 @@ typedef struct RendererVertex {
 	float nx, ny, nz;
 	float u, v;
 	float r, g, b, a;
-	float bone;
+	float boneAndFlags;
 };
 
 typedef struct RendererPolygon {
@@ -432,8 +432,9 @@ class Renderer
 	RendererLine2D*					m_lines;
 	__int32							m_numLines;
 	LPD3DXLINE						m_line;
-	__int16							m_skinJointRemap[15][128];
-	__int16							m_hairsRemap[8][32];
+	__int16							m_normalLaraSkinJointRemap[15][32];
+	__int16							m_youngLaraSkinJointRemap[15][32];
+	__int16							m_laraSkinJointRemap[15][32];
 	__int32							m_fadeTimer;
 	__int32							m_fadeMode;
 	__int16							m_numHairVertices;
@@ -452,7 +453,7 @@ class Renderer
 	D3DXMATRIX						m_tempWorld;
 	D3DXMATRIX						m_tempView;
 	D3DXMATRIX						m_tempProjection;
-	D3DXMATRIX						m_hairsMatrices[6];
+	D3DXMATRIX						m_hairsMatrices[12];
 	D3DXMATRIX						m_LaraWorldMatrix;
 	RendererLightInfo*				m_itemsLightInfo;
 	RenderTarget2D*					m_shadowMap;
@@ -474,6 +475,7 @@ class Renderer
 
 	RENDERER_CULLMODE				m_cullMode;
 	RENDERER_BLENDSTATE				m_blendState;
+	bool							m_youngLara = true;
 
 	// New light pre-pass renderer
 	RenderTarget2D*					m_depthBuffer;
@@ -626,4 +628,5 @@ public:
 	void							SetDepthWrite(bool value);
 	void							SetGpuStateForBucket(RENDERER_BUCKETS bucket);
 	bool							DrawScene(RENDERER_PASSES pass);
+	bool							IsRoomUnderwater(__int16 roomNumber);
 };

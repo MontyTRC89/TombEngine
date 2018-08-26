@@ -136,7 +136,12 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float3 diffuseColor = tex2D(ColorSampler, input.TextureCoordinate).rgb;
 	float3 ambientColor = tex2D(VertexColorSampler, input.TextureCoordinate).rgb;
 	float4 light = tex2D(LightSampler, input.TextureCoordinate);
-	int modelType = tex2D(NormalSampler, input.TextureCoordinate).w * 16.0f;
+	int pixelFlags = tex2D(NormalSampler, input.TextureCoordinate).w * 64.0f;
+	int modelType = pixelFlags % 32;
+	bool underwater = (pixelFlags / 32 == 1);
+	//if (underwater)
+	//	return float4(0, 0, 1, 1);
+
 	float3 diffuseLight = light.rgb;
 	float specularLight = 0; // light.a;
 

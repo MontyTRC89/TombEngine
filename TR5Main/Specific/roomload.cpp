@@ -83,10 +83,10 @@ __int32 __cdecl LoadItems()
 			// DEBUG: set Lara position
 			/*if (item->objectNumber == ID_LARA)
 			{
-				item->pos.xPos = 62050;
-				item->pos.yPos = 0;
-				item->pos.zPos = 42162;
-				item->roomNumber = 144;
+				item->pos.xPos = 33050;
+				item->pos.yPos = 10000;
+				item->pos.zPos = 21162;
+				item->roomNumber = 0;
 			}*/
 		}
 
@@ -101,7 +101,7 @@ __int32 __cdecl LoadItems()
 		for (int m = 0; m < Rooms[r].numMeshes; m++)
 		{
 			FLOOR_INFO* floor = &Rooms[r].floor[((mesh->z - Rooms[r].z) >> 10) + Rooms[r].xSize * ((mesh->x - Rooms[r].x) >> 10)];
-
+			 
 			if (!(Boxes[floor->box].overlapIndex & 0x4000)
 				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
 			{
@@ -114,7 +114,7 @@ __int32 __cdecl LoadItems()
 						(st->xMaxc ^ st->xMinc) & 0x8000 &&
 						(st->xMaxc ^ st->zMinc) & 0x8000)
 					{
-						floor->box |= 8;
+						floor->box |= 8; 
 					}
 				}
 			}

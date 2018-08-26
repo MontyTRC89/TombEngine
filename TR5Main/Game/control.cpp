@@ -161,6 +161,8 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		InItemControlLoop = false;
 		
 		j_HairControl(0, 0, 0);
+		if (gfLevelFlags & 1 || true)
+			j_HairControl(0, 1, 0);
 
 		if (UseSpotCam)
 			CalculateSpotCameras();
@@ -214,7 +216,8 @@ void __cdecl DoTitle(__int32 index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
-	DoLevel(2, 124);
+	gfLevelFlags |= 1;
+	DoLevel(10, 124);
 	return;
 
 	S_LoadLevelFile(0);
@@ -286,11 +289,6 @@ void __cdecl DoLevel(__int32 index, __int32 ambient)
 
 	//ControlPhase(2, 0);
 	//printf("After control\n");
-
-	/*LaraItem->pos.xPos = 88457;
-	LaraItem->pos.yPos = -4096;
-	LaraItem->pos.zPos = 47865;
-	LaraItem->roomNumber = 37;*/
 	
 	__int32 nframes = 2;
 	GameStatus = ControlPhase(nframes, 0);
