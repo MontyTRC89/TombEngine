@@ -79,6 +79,15 @@ __int32 __cdecl LoadItems()
 			item->shade = ReadInt16();
 			item->triggerFlags = ReadInt16();
 			item->flags = ReadInt16();
+
+			// DEBUG: set Lara position
+			/*if (item->objectNumber == ID_LARA)
+			{
+				item->pos.xPos = 62050;
+				item->pos.yPos = 0;
+				item->pos.zPos = 42162;
+				item->roomNumber = 144;
+			}*/
 		}
 
 		for (__int32 i = 0; i < NumItems; i++)

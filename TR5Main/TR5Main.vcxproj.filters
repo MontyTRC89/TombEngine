@@ -521,5 +521,6 @@
     <None Include="Shaders\ReconstructZBuffer.fx" />
     <None Include="Shaders\Sprites.fx" />
     <None Include="Shaders\Rain.fx" />
+    <None Include="Shaders\Transparent.fx" />
   </ItemGroup>
 </Project>

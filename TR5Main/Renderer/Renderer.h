@@ -472,6 +472,9 @@ class Renderer
 	LPDIRECT3DSURFACE9				m_backBufferTarget;
 	LPDIRECT3DSURFACE9				m_backBufferDepth;
 
+	RENDERER_CULLMODE				m_cullMode;
+	RENDERER_BLENDSTATE				m_blendState;
+
 	// New light pre-pass renderer
 	RenderTarget2D*					m_depthBuffer;
 	RenderTarget2D*					m_normalBuffer;
@@ -490,6 +493,7 @@ class Renderer
 	Shader*							m_shaderReconstructZBuffer;
 	Shader*							m_shaderSprites;
 	Shader*							m_shaderRain;
+	Shader*							m_shaderTransparent;
 	RendererVertex					m_quadVertices[4];
 	__int32							m_quadIndices[6];
 	RendererSphere*					m_sphereMesh;
@@ -520,7 +524,9 @@ class Renderer
 	PDIRECT3DINDEXBUFFER9			m_spritesIndexBuffer;
 	PDIRECT3DVERTEXBUFFER9			m_linesVertexBuffer;
 	vector<RendererVertex>			m_lines3DVertices;
-	
+	bool							m_enableZwrite;
+	bool							m_enableZtest;
+
 public:
 	D3DXMATRIX						ViewMatrix;
 	D3DXMATRIX						ProjectionMatrix;
@@ -597,6 +603,7 @@ public:
 	void							DrawSmokes();
 	void							DrawBlood();
 	void							DrawDrips();
+	void							DrawBubbles();
 	bool							DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	void							CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos);
 
@@ -614,4 +621,9 @@ public:
 	bool							DoSnow();
 	bool							DrawSprites();
 	bool							DrawLines3D();
+	void							SetCullMode(RENDERER_CULLMODE mode);
+	void							SetBlendState(RENDERER_BLENDSTATE state);
+	void							SetDepthWrite(bool value);
+	void							SetGpuStateForBucket(RENDERER_BUCKETS bucket);
+	bool							DrawScene(RENDERER_PASSES pass);
 };

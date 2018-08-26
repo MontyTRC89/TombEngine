@@ -106,10 +106,11 @@ void Inventory::Initialise()
 
 		Lara.numRevolverAmmo = 1000;
 		Lara.numShotgunAmmo2 = 1000;
+		Lara.crowbar = 1;
 
 		Lara.sixshooterTypeCarried = 1;
-		Lara.uzisTypeCarried = 1;
-		Lara.numUziAmmo = 10000;
+		//Lara.uzisTypeCarried = 1;
+		//Lara.numUziAmmo = 10000;
 				//Lara.crossbowTypeCarried = 1;
 		//Lara.numCrossbowAmmo1 = 1000;
 	}

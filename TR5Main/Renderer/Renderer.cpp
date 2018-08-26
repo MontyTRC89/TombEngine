@@ -352,6 +352,16 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	if (m_shaderSprites->GetEffect() == NULL)
 		return false;
 
+	m_shaderRain = new Shader(m_device, (char*)"Rain.fx");
+	m_shaderRain->Compile();
+	if (m_shaderRain->GetEffect() == NULL)
+		return false;
+
+	m_shaderTransparent = new Shader(m_device, (char*)"Transparent.fx");
+	m_shaderTransparent->Compile();
+	if (m_shaderTransparent->GetEffect() == NULL)
+		return false;
+
 	m_sphereMesh = new RendererSphere(m_device, 1280.0f, 6);
 	m_quad = new RendererQuad(m_device, 1024.0f);
 	m_skyQuad = new RendererQuad(m_device, 9728.0f);
@@ -577,10 +587,13 @@ RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 		}
 
 		// ColAddHorizon special handling
-		if (obj->GetId() == ID_HORIZON && (texture->attribute == 2 || (effects & 1)) && (gfLevelFlags & 0x200))
-			bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-		else
-			bucketIndex = RENDERER_BUCKET_SOLID;
+		if (obj->GetId() == ID_HORIZON && (gfLevelFlags & 0x200))
+		{
+			if (texture->attribute == 2 || (effects & 1))
+				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
+			else
+				bucketIndex = RENDERER_BUCKET_SOLID;
+		}
 
 		bucket = mesh->GetBucket(bucketIndex);
 		obj->HasDataInBucket[bucketIndex] = true;
@@ -924,9 +937,9 @@ bool Renderer::PrepareDataForTheRenderer()
 						vertex.y = vertices[poly->Vertices[v]].Vertex.y;
 						vertex.z = vertices[poly->Vertices[v]].Vertex.z;
 
-						vertex.nx = normal.x; // vertices[poly->Vertices[v]].Normal.x;
-						vertex.ny = normal.y; // vertices[poly->Vertices[v]].Normal.y;
-						vertex.nz = normal.z; // vertices[poly->Vertices[v]].Normal.z;
+						vertex.nx = vertices[poly->Vertices[v]].Normal.x;
+						vertex.ny = vertices[poly->Vertices[v]].Normal.y;
+						vertex.nz = vertices[poly->Vertices[v]].Normal.z;
 
 						vertex.u = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 						vertex.v = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
@@ -1024,9 +1037,9 @@ bool Renderer::PrepareDataForTheRenderer()
 						vertex.y = vertices[poly->Vertices[v]].Vertex.y;
 						vertex.z = vertices[poly->Vertices[v]].Vertex.z;
 
-						vertex.nx = normal.x; // vertices[poly->Vertices[v]].Normal.x;
-						vertex.ny = normal.y; // vertices[poly->Vertices[v]].Normal.y;
-						vertex.nz = normal.z; // vertices[poly->Vertices[v]].Normal.z;
+						vertex.nx = vertices[poly->Vertices[v]].Normal.x;
+						vertex.ny = vertices[poly->Vertices[v]].Normal.y;
+						vertex.nz = vertices[poly->Vertices[v]].Normal.z;
 
 						vertex.u = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 						vertex.v = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
@@ -2498,6 +2511,10 @@ void Renderer::DrawHealthBar(__int32 percentual)
 
 void Renderer::DrawDebugInfo()
 {
+	SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	SetDepthWrite(true);
+
 	if (UseSpotCam)
 	{
 		sprintf_s(&m_message[0], 255, "Spotcam.camera = %d    Spotcam.flags = %d     Current: %d", SpotCam[CurrentSplineCamera].camera, SpotCam[CurrentSplineCamera].flags, CurrentSplineCamera);
@@ -2612,9 +2629,6 @@ void Renderer::DrawDebugInfo()
 	sprintf_s(&m_message[0], 255, "SkyPos = %d", SkyPos1);
 	PrintDebugMessage(10, 420 + y, 255, 255, 255, 255, m_message);
 
-//	sprintf_s(&m_message[0], 255, "Lara.lightActive = %d", m_itemsLightInfo[0].Active);
-//	PrintDebugMessage(10, 380, 255, 255, 255, 255, m_message);
-
 	m_sprite->Begin(0);
 
 	D3DXMATRIX scale;
@@ -2625,11 +2639,9 @@ void Renderer::DrawDebugInfo()
 	m_sprite->SetTransform(&scale);
 	m_sprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(800, 0, 0), 0xFFFFFFFF);
 	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_shadowBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1600, 0, 0), 0xFFFFFFFF);
+	m_sprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1600, 0, 0), 0xFFFFFFFF);
 	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
-	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3200, 0, 0), 0xFFFFFFFF);
+	m_sprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
 
 	m_sprite->End();
 
@@ -3360,6 +3372,130 @@ void Renderer::CollectSceneItems()
 	CollectLightsLPP();
 }
 
+bool Renderer::DrawScene(RENDERER_PASSES pass)
+{
+	if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	{
+		for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+		{
+			RendererRoom* room = m_rooms[m_roomsToDraw[i]];
+			if (room == NULL)
+				continue;
+
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+			// Draw static objects
+			ROOM_INFO* r = room->Room;
+			if (r->numMeshes != 0)
+			{
+				for (__int32 j = 0; j < r->numMeshes; j++)
+				{
+					MESH_INFO* sobj = &r->mesh[j];
+					RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
+					RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
+
+					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				}
+			}
+		}
+
+		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+		for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
+		{
+			RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
+			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		}
+
+		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+		// Draw alpha tested geometry
+		for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+		{
+			RendererRoom* room = m_rooms[m_roomsToDraw[i]];
+			if (room == NULL)
+				continue;
+
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+			// Draw static objects
+			ROOM_INFO* r = room->Room;
+			if (r->numMeshes != 0)
+			{
+				for (__int32 j = 0; j < r->numMeshes; j++)
+				{
+					MESH_INFO* sobj = &r->mesh[j];
+					RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
+					RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
+
+					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				}
+			}
+		}
+
+		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+		for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
+		{
+			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		}
+
+		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	}
+	else
+	{
+		for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+		{
+			RendererRoom* room = m_rooms[m_roomsToDraw[i]];
+			if (room == NULL)
+				continue;
+
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+
+			// Draw static objects
+			ROOM_INFO* r = room->Room;
+			if (r->numMeshes != 0)
+			{
+				for (__int32 j = 0; j < r->numMeshes; j++)
+				{
+					MESH_INFO* sobj = &r->mesh[j];
+					RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
+					RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
+
+					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+				}
+			}
+		}
+
+		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+
+		for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
+		{
+			RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
+			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		}
+
+		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	}
+
+	return true;
+}
+
 bool Renderer::DrawSceneLightPrePass(bool dump)
 {
 	// HACK:
@@ -3386,6 +3522,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	D3DXMatrixMultiply(&m_viewProjection, &ViewMatrix, &ProjectionMatrix);
 	D3DXMatrixInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
 
+	// Collect scene items and update animations
 	CollectSceneItems();
 	UpdateLaraAnimations();
 	UpdateItemsAnimations();
@@ -3394,18 +3531,22 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
 
+	// Prepare the shadow map for the main light
 	PrepareShadowMaps();
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timePrepareShadowMap = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
 
+	// Set basic GPU state
+	SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	SetDepthWrite(true);
+	m_device->SetVertexDeclaration(m_vertexDeclaration);
+
 	// Clear the G-Buffer
 	BindRenderTargets(m_colorBuffer, m_normalBuffer, m_depthBuffer, m_vertexLightBuffer);
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_COLORVALUE(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
-
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	m_device->SetVertexDeclaration(m_vertexDeclaration);
 
 	effect = m_shaderClearGBuffer->GetEffect();
 	m_device->BeginScene();
@@ -3417,8 +3558,6 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	effect->EndPass();
 	effect->End();
 	m_device->EndScene();
-
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeClearGBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -3541,19 +3680,23 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	effect = m_shaderLight->GetEffect();
 
 	// Setup additive blending
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+/*	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	  
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);*/
+
+	SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ALPHABLEND);
+	 
 	// Clear the screen and disable Z write
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	  
+	//m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+	SetDepthWrite(false);
+
 	m_device->BeginScene();
   	effect->Begin(&cPasses, 0); 
 
@@ -3620,9 +3763,9 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		BindRenderTargets(m_renderTarget, NULL, NULL, NULL);
 
 	// Combine stage
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	SetDepthWrite(true);
 
 	effect = m_shaderCombine->GetEffect();
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
@@ -3668,8 +3811,9 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
 
 	// We need to use alpha blending because we need to write only to the Z-Buffer
+	//SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_SPECIAL_Z_BUFFER);
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	 
+
 	effect = m_shaderReconstructZBuffer->GetEffect();
 	m_device->BeginScene();
 	effect->Begin(&cPasses, 0);
@@ -3749,6 +3893,59 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_device->EndScene();
 	effect->End();
 
+	// Transparent pass:
+	effect = m_shaderTransparent->GetEffect();
+	m_device->BeginScene();
+	effect->Begin(&cPasses, 0);
+
+	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
+	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+	{
+		RendererRoom* room = m_rooms[m_roomsToDraw[i]];
+		if (room == NULL)
+			continue;
+
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+
+		// Draw static objects
+		ROOM_INFO* r = room->Room;
+		if (r->numMeshes != 0)
+		{
+			for (__int32 j = 0; j < r->numMeshes; j++)
+			{
+				MESH_INFO* sobj = &r->mesh[j];
+				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
+				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
+
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+			}
+		}
+	}
+
+	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+
+	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
+	{
+		RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
+		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	}
+
+	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+
+	effect->End();
+	m_device->EndScene();
+
 	// Prepare sprites
 	// TODO: preallocate big buffer and avoica memory allocations!
 	for (vector<RendererSpriteToDraw*>::iterator it = m_spritesToDraw.begin(); it != m_spritesToDraw.end(); ++it)
@@ -3762,14 +3959,14 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawSmokes();
 	DrawBlood();
 	DrawSparks();
+	DrawBubbles();
+	DrawDrips();
 
 	// Do weather
-	/*if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
+	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
 		DoRain();
 	else if (WeatherType == WEATHER_TYPES::WEATHER_SNOW)
-		DoSnow();*/
-
-	DoRain();
+		DoSnow();
 
 	// Draw sprites
 	DrawSprites();
@@ -3898,8 +4095,10 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		effect = m_depthShader->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else  
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
+	else
+		effect = m_shaderTransparent->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_LARA);
@@ -3919,6 +4118,8 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 		if (bucket->NumVertices != 0)
 		{
+			SetGpuStateForBucket(bucketIndex);
+
 			// Bind buffers
 			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 			m_device->SetIndices(bucket->GetIndexBuffer());
@@ -3943,6 +4144,8 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 			if (bucket->NumVertices != 0)
 			{
+				SetGpuStateForBucket(bucketIndex);
+
 				// Bind buffers
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(bucket->GetIndexBuffer());
@@ -3975,6 +4178,8 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		RendererBucket* bucket = leftHolster->GetBucket(bucketIndex);
 		if (bucket->NumVertices != 0)
 		{
+			SetGpuStateForBucket(bucketIndex);
+
 			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 			m_device->SetIndices(bucket->GetIndexBuffer());
 
@@ -4020,6 +4225,8 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 			RendererBucket* bucket = backGunMesh->GetBucket(bucketIndex);
 			if (bucket->NumVertices != 0)
 			{
+				SetGpuStateForBucket(bucketIndex);
+
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(bucket->GetIndexBuffer());
 
@@ -4042,6 +4249,8 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	// Draw Lara's hairs
 	if (bucketIndex == 0)
 	{
+		SetGpuStateForBucket(bucketIndex);
+
 		if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
 		{
 			RendererObject* hairsObj = m_moveableObjects[ID_HAIR];
@@ -4086,8 +4295,10 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 		effect = m_depthShader->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
+	else
+		effect = m_shaderTransparent->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
@@ -4105,6 +4316,8 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 		if (bucket->NumVertices == 0)
 			continue;
+
+		SetGpuStateForBucket(bucketIndex);
 
 		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 		m_device->SetIndices(bucket->GetIndexBuffer());
@@ -4141,13 +4354,17 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	RendererMesh* mesh = roomObj->ObjectMeshes[0];
 	RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 
+	SetGpuStateForBucket(bucketIndex);
+
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
+	else
+		effect = m_shaderTransparent->GetEffect();
 	  
 	D3DXMatrixTranslation(&world, r->x, r->y, r->z);
 	   
@@ -4193,13 +4410,17 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 	if (bucket->NumVertices == 0)
 		return true;
 
+	SetGpuStateForBucket(bucketIndex);
+
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
 		effect = m_depthShader->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
+	else
+		effect = m_shaderTransparent->GetEffect();
 
 	D3DXMatrixTranslation(&world, sobj->x, sobj->y, sobj->z);
 	D3DXMatrixRotationY(&rotation, TR_ANGLE_TO_RAD(sobj->yRot));
@@ -4619,7 +4840,11 @@ void Renderer::CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, 
 
 bool Renderer::DrawSprites()
 {
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+	SetDepthWrite(false);
+
+	/*m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
@@ -4627,7 +4852,7 @@ bool Renderer::DrawSprites()
 	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);*/
 
 	UINT cPasses = 1;
 	LPD3DXEFFECT effect = m_shaderSprites->GetEffect();
@@ -4778,10 +5003,6 @@ bool Renderer::DrawSprites()
 	effect->End();
 	m_device->EndScene();
 
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
-
 	return true;
 }
 
@@ -4928,6 +5149,8 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				if (bucket->NumVertices == 0)
 					continue;
 
+				SetGpuStateForBucket(bucketIndex);
+
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(bucket->GetIndexBuffer());
 
@@ -4950,8 +5173,6 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 bool Renderer::DoRain()
 {
-	RendererVertex vertices[NUM_RAIN_DROPS * 2];
-
 	if (m_firstWeather)
 	{
 		for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
@@ -4965,7 +5186,7 @@ bool Renderer::DoRain()
 		if (drop->Reset)
 		{ 
 			drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
-			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
+			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT);
 			drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 
 			// Check if in inside room
@@ -4991,7 +5212,7 @@ bool Renderer::DoRain()
 		float radius = drop->Size * sin(drop->AngleV);
 
 		float dx = sin(drop->AngleH) * radius;
-		float dy = drop->Size * cos(drop->AngleH);
+		float dy = drop->Size * cos(drop->AngleV);
 		float dz = cos(drop->AngleH) * radius;
 
 		drop->X += dx;
@@ -5096,7 +5317,11 @@ void Renderer::AddLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32
 
 bool Renderer::DrawLines3D()
 {
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+	SetDepthWrite(false);
+
+	/*m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
@@ -5104,7 +5329,7 @@ bool Renderer::DrawLines3D()
 	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
 	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);*/
 
 	UINT cPasses = 1;
 	LPD3DXEFFECT effect = m_shaderRain->GetEffect();
@@ -5172,7 +5397,7 @@ bool Renderer::DrawLines3D()
 		effect->BeginPass(0);
 		effect->CommitChanges();
 
-		m_device->DrawPrimitive(D3DPRIMITIVETYPE::D3DPT_LINELIST, 0, m_lines3DVertices.size());
+		m_device->DrawPrimitive(D3DPRIMITIVETYPE::D3DPT_LINELIST, 0, m_lines3DVertices.size() / 2);
 
 		effect->EndPass();
 	}
@@ -5180,18 +5405,138 @@ bool Renderer::DrawLines3D()
 	effect->End();
 	m_device->EndScene();
 
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, true);
-
 	return true;
 }
 
 void Renderer::DrawDrips()
 {
-	/*for (__int32 i = 0; i < 32; i++)
+	for (__int32 i = 0; i < 32; i++)
 	{
 		DRIP_STRUCT* drip = &Drips[i];
-		drip->
-	}*/
+		
+		if (drip->On)
+		{
+			AddLine3D(drip->x, drip->y, drip->z, drip->x, drip->y + 24.0f, drip->z, drip->R, drip->G, drip->B);
+		}
+	}
+}
+
+void Renderer::SetCullMode(RENDERER_CULLMODE mode)
+{
+	if (m_cullMode == mode)
+		return;
+
+	m_cullMode = mode;
+
+	if (m_cullMode == RENDERER_CULLMODE::CULLMODE_NONE)
+		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	else if (m_cullMode == RENDERER_CULLMODE::CULLMODE_CW)
+		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+	else
+		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+}
+
+void Renderer::SetBlendState(RENDERER_BLENDSTATE state)
+{
+	if (m_blendState == state)
+		return;
+
+	m_blendState = state;
+
+	if (m_blendState == RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE)
+	{
+		m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	}
+	else if (m_blendState == RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE)
+	{
+		m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+		m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+		m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
+		m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
+		m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+	}
+	else if (m_blendState == RENDERER_BLENDSTATE::BLENDSTATE_ALPHABLEND)
+	{
+		m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+		m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+		m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
+		m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
+		m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
+	}
+	else if (m_blendState == RENDERER_BLENDSTATE::BLENDSTATE_SPECIAL_Z_BUFFER)
+	{
+		m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	}
+}
+
+void Renderer::SetDepthWrite(bool value)
+{
+	if (m_enableZwrite == value)
+		return;
+
+	m_enableZwrite = value;
+
+	m_device->SetRenderState(D3DRS_ZWRITEENABLE, value);
+}
+
+void Renderer::SetGpuStateForBucket(RENDERER_BUCKETS bucket)
+{
+	switch (bucket)
+	{
+	case RENDERER_BUCKETS::RENDERER_BUCKET_SOLID:
+		SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		SetDepthWrite(true);
+		break;
+
+	case RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS:
+		SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		SetDepthWrite(true);
+		break;
+
+	case RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST:
+		SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		SetDepthWrite(true);
+		break;
+
+	case RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS:
+		SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		SetDepthWrite(true);
+		break;
+
+	case RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT:
+		SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+		SetDepthWrite(false);
+		break;
+
+	case RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS:
+		SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+		SetDepthWrite(false);
+		break;
+	}
+}
+
+void Renderer::DrawBubbles()
+{
+	for (__int32 i = 0; i < 40; i++)
+	{
+		BUBBLE_STRUCT* bubble = &Bubbles[i];
+
+		if (bubble->size)
+		{
+			AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 13],
+				bubble->pos.x, bubble->pos.y, bubble->pos.z,
+				bubble->shade * 255, bubble->shade * 255, bubble->shade * 255,
+				0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f);
+		}
+	}
 }
