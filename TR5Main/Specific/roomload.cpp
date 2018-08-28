@@ -88,6 +88,13 @@ __int32 __cdecl LoadItems()
 				item->pos.zPos = 21162;
 				item->roomNumber = 0;
 			}*/
+			if (item->objectNumber == ID_LARA)
+			{
+				item->pos.xPos = 58*1024;
+				item->pos.yPos = 0;
+				item->pos.zPos = 39*1024;
+				item->roomNumber = 144;
+			}
 		}
 
 		for (__int32 i = 0; i < NumItems; i++)

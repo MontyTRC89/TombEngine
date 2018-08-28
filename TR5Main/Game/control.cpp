@@ -168,7 +168,7 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			CalculateSpotCameras();
 		else
 			CalculateCamera();
-
+		    
 		Wibble = (Wibble + 4) & 0xFC;
 		
 		UpdateSparks();
@@ -216,8 +216,8 @@ void __cdecl DoTitle(__int32 index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
-	gfLevelFlags |= 1;
-	DoLevel(10, 124);
+	//gfLevelFlags |= 1;
+	DoLevel(2, 124);
 	return;
 
 	S_LoadLevelFile(0);

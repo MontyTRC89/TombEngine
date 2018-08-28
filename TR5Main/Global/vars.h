@@ -210,6 +210,8 @@
 #define Sparks						ARRAY_(0x00E5F380, SPARKS, [128])
 #define Drips						ARRAY_(0x00E4D740, DRIP_STRUCT, [32])
 #define Bubbles						ARRAY_(0x00E4D160, BUBBLE_STRUCT, [40])
+#define Splashes					ARRAY_(0x00E6CA00, SPLASH_STRUCT, [4])
+#define Ripples						ARRAY_(0x00E5C600, RIPPLE_STRUCT, [32])
 
 #define SkyPos1						VAR_U_(0x00E6E4B0, __int16)
 #define SkyPos2						VAR_U_(0x00E6D73E, __int16)

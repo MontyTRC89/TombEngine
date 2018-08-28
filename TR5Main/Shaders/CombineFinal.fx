@@ -6,6 +6,8 @@
 #define MODELTYPE_PICKUP			5
 #define MODELTYPE_LARA				6
 #define MODELTYPE_SKY				7
+#define MODELTYPE_WATER_SURFACE		8
+#define MODELTYPE_ROOM_UNDERWATER	9
 
 #define DEPTH_BIAS					0.0f
 #define TEXEL_SIZE					1.0f / 2048.0f
@@ -42,7 +44,7 @@ sampler VertexColorSampler = sampler_state
 	MinFilter = LINEAR;
 	Mipfilter = LINEAR;
 };
-
+ 
 /*texture2D ShadowMap;
 sampler ShadowSampler = sampler_state
 {
@@ -136,9 +138,14 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float3 diffuseColor = tex2D(ColorSampler, input.TextureCoordinate).rgb;
 	float3 ambientColor = tex2D(VertexColorSampler, input.TextureCoordinate).rgb;
 	float4 light = tex2D(LightSampler, input.TextureCoordinate);
-	int pixelFlags = tex2D(NormalSampler, input.TextureCoordinate).w * 64.0f;
+	/*int pixelFlags = tex2D(NormalSampler, input.TextureCoordinate).w * 64.0f;
 	int modelType = pixelFlags % 32;
 	bool underwater = (pixelFlags / 32 == 1);
+	int pixelFlags = normalData.w * 64.0f;
+	bool underwater = ((pixelFlags / 32) == 1);
+	if (pixelFlags >= 32) pixelFlags -= 32;
+	int modelType = pixelFlags;*/
+	int modelType = round(tex2D(NormalSampler, input.TextureCoordinate).w * 16.0f);
 	//if (underwater)
 	//	return float4(0, 0, 1, 1);
 
@@ -150,7 +157,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 	float shadowOcclusion = 1.0f;
 
-	if (modelType == MODELTYPE_ROOM)
+	if (modelType == MODELTYPE_ROOM || modelType == MODELTYPE_ROOM_UNDERWATER)
 	{
 		if (CastShadows)
 		{

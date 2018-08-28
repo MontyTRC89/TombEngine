@@ -452,23 +452,37 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_shaderTransparent->Compile();
 	if (m_shaderTransparent->GetEffect() == NULL)
 		return false;
-
+	   
 	m_sphereMesh = new RendererSphere(m_device, 1280.0f, 6);
 	m_quad = new RendererQuad(m_device, 1024.0f);
 	m_skyQuad = new RendererQuad(m_device, 9728.0f);
-
+	 
 	m_halfPixelX = 0.5f / (float)ScreenWidth;
 	m_halfPixelY = 0.5f / (float)ScreenHeight;
-	 
+	    
 	D3DXCreateTextureFromFileEx(m_device, "SSAO.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
 		D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
 		D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_randomTexture);
+	 
+	char* causticsNames[NUM_CAUSTICS_TEXTURES] = { "CausticsRender_001.bmp","CausticsRender_002.bmp", "CausticsRender_003.bmp",
+		"CausticsRender_004.bmp", "CausticsRender_005.bmp", "CausticsRender_006.bmp",
+		"CausticsRender_007.bmp", "CausticsRender_008.bmp","CausticsRender_009.bmp","CausticsRender_010.bmp", 
+		"CausticsRender_011.bmp",
+		"CausticsRender_012.bmp", "CausticsRender_013.bmp", "CausticsRender_014.bmp",
+		"CausticsRender_015.bmp", "CausticsRender_016.bmp" };
+	 
+	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
+	{
+		D3DXCreateTextureFromFileEx(m_device, causticsNames[i], D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
+			D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
+			D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_caustics[i]);
+	}
 
 	res = m_device->CreateVertexBuffer(NUM_SPRITES_PER_BUCKET * 4 * sizeof(RendererVertex), D3DUSAGE_WRITEONLY,
 		0, D3DPOOL_MANAGED, &m_spritesVertexBuffer, NULL);
 	if (res != S_OK)
 		return false;
-
+				      
 	res = m_device->CreateIndexBuffer(NUM_SPRITES_PER_BUCKET * 6 * 4, D3DUSAGE_WRITEONLY, D3DFMT_INDEX32, D3DPOOL_MANAGED,
 		&m_spritesIndexBuffer, NULL);
 	if (res != S_OK)
@@ -860,7 +874,7 @@ bool Renderer::PrepareDataForTheRenderer()
 	ZeroMemory(buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 
 	__int32 typ = LaraDrawType;
-	if (gfLevelFlags & 1 || m_youngLara)
+	if (gfLevelFlags & 1)
 	{
 		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
 	}
@@ -971,7 +985,7 @@ bool Renderer::PrepareDataForTheRenderer()
 			tr5_room_layer* layer = &layers[l];
 			if (layer->NumLayerVertices == 0)
 				continue;
-
+			 
 			byte* polygons = (byte*)layer->PolyOffset;
 			tr5_room_vertex* vertices = (tr5_room_vertex*)layer->VerticesOffset;
 
@@ -982,7 +996,7 @@ bool Renderer::PrepareDataForTheRenderer()
 					tr4_mesh_face4* poly = (tr4_mesh_face4*)polygons;
 
 					// Get the real texture index and if double sided
-					__int16 textureIndex = poly->Texture & 0x7FFF;
+					__int16 textureIndex = poly->Texture & 0x3FFF;
 					bool doubleSided = (poly->Texture & 0x8000) >> 15;
 
 					// Get the object texture
@@ -1082,7 +1096,7 @@ bool Renderer::PrepareDataForTheRenderer()
 					tr4_mesh_face3* poly = (tr4_mesh_face3*)polygons;
 
 					// Get the real texture index and if double sided
-					__int16 textureIndex = poly->Texture & 0x7FFF;
+					__int16 textureIndex = poly->Texture & 0x3FFF;
 					bool doubleSided = (poly->Texture & 0x8000) >> 15;
 
 					// Get the object texture
@@ -1247,7 +1261,8 @@ bool Renderer::PrepareDataForTheRenderer()
 				objNum == ID_AI_FOLLOW || objNum == ID_AI_GUARD || objNum == ID_AI_MODIFY ||
 				objNum == ID_AI_PATROL1 || objNum == ID_AI_PATROL2 || objNum == ID_AI_X1 ||
 				objNum == ID_AI_X2 || objNum == ID_DART_EMITTER || objNum == ID_HOMING_DART_EMITTER ||
-				objNum == ID_ROPE || objNum == ID_KILL_ALL_TRIGGERS || objNum == ID_EARTHQUAKE)
+				objNum == ID_ROPE || objNum == ID_KILL_ALL_TRIGGERS || objNum == ID_EARTHQUAKE || 
+				objNum == ID_CAMERA_TARGET || objNum == ID_WATERFALLMIST)
 			{
 				moveable->DoNotDraw = true;
 			}
@@ -2369,11 +2384,11 @@ void Renderer::UpdateLaraAnimations()
 		ZeroMemory(m_hairVertices, m_numHairVertices * 2 * sizeof(RendererObject));
 		ZeroMemory(m_hairIndices, m_numHairIndices * 2 * 4);
 
-		for (__int32 p = 0; p < (m_youngLara ? 2 : 1); p++)
+		for (__int32 p = 0; p < ((gfLevelFlags & 1) ? 2 : 1); p++)
 		{
 			// We can't use hardware skinning here, however hairs have just a few vertices so 
 			// it's not so bad doing skinning in software
-			if (m_youngLara)
+			if (gfLevelFlags & 1)
 			{
 				if (p == 1)
 				{
@@ -3694,10 +3709,13 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 
 	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
 	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
+	effect->SetTexture(effect->GetParameterByName(NULL, "CausticsMap"), m_caustics[m_currentCausticsFrame / 2]);
+
+	m_currentCausticsFrame++;
+	m_currentCausticsFrame %= 32;
 
 	D3DXMATRIX world;
 
@@ -3831,7 +3849,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	effect->SetTexture(effect->GetParameterByName(NULL, "ColorMap"), m_colorBuffer->GetTexture());
 	effect->SetTexture(effect->GetParameterByName(NULL, "NormalMap"), m_normalBuffer->GetTexture());
 	effect->SetTexture(effect->GetParameterByName(NULL, "DepthMap"), m_depthBuffer->GetTexture());
-	  
+	
 	effect->SetBool(effect->GetParameterByName(NULL, "AmbientPass"), false);
 	effect->SetVector(effect->GetParameterByName(NULL, "CameraPosition"), &D3DXVECTOR4(Camera.pos.x, Camera.pos.y, Camera.pos.z, 1.0f));
 	effect->SetFloat(effect->GetParameterByName(NULL, "HalfPixelX"), m_halfPixelX);
@@ -4085,6 +4103,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	DrawSparks();
 	DrawBubbles();
 	DrawDrips();
+	DrawRipples();
+	DrawUnderwaterDust();
 
 	// Do weather
 	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
@@ -4212,7 +4232,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 	ITEM_INFO* item = LaraItem;
 	OBJECT_INFO* obj = &Objects[0];
-
+	
 	RendererLightInfo* light = &m_itemsLightInfo[0];
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
@@ -4228,6 +4248,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_LARA);
 	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), laraObj->AnimationTransforms, laraObj->ObjectMeshes.size());
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_LaraWorldMatrix);
+	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[LaraItem->roomNumber]->AmbientLight);
 
 	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
@@ -4372,8 +4393,8 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 	// Draw Lara's hairs
 	if (bucketIndex == 0)
-	{
-		SetGpuStateForBucket(bucketIndex);
+	{  
+		SetGpuStateForBucket(bucketIndex); 
 
 		if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
 		{
@@ -4387,8 +4408,8 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->CommitChanges();
 
 				m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0,
-					m_numHairVertices*(m_youngLara ? 2 : 1),
-					m_numHairIndices*(m_youngLara ? 2 : 1) / 3,
+					m_numHairVertices*((gfLevelFlags & 1) ? 2 : 1),
+					m_numHairIndices*((gfLevelFlags & 1) ? 2 : 1) / 3,
 					m_hairIndices, D3DFMT_INDEX32, m_hairVertices, sizeof(RendererVertex));
 
 				effect->EndPass();
@@ -4430,6 +4451,7 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
 	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), moveableObj->AnimationTransforms, moveableObj->ObjectMeshes.size());
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &itemToDraw->World);
+	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[item->roomNumber]->AmbientLight);
 	
 	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
@@ -4461,7 +4483,7 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 
 	return true;
 }
-
+         
 bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
 	D3DXMATRIX world;
@@ -4490,14 +4512,13 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
-		effect = m_shaderTransparent->GetEffect();
-	  
+		effect = m_shaderTransparent->GetEffect();  
+	       
 	D3DXMatrixTranslation(&world, r->x, r->y, r->z);
 	   
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
-
+	      
 	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
 	else
@@ -4506,9 +4527,9 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 	{
 		if (IsRoomUnderwater(roomIndex))
-			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), true);
+			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM_UNDERWATER);
 		else
-			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), false);
+			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
 	}
 
 	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
@@ -4563,6 +4584,7 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_STATIC);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
+	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[roomIndex]->AmbientLight);
 
 	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
@@ -4830,13 +4852,13 @@ bool Renderer::DrawSkyLPP()
 
 		color = D3DXVECTOR4((SkyStormColor[0] + 44) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
 	}
-
+	    
 	D3DXMATRIX world;
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
 	D3DXMATRIX scale;
 	UINT cPasses = 1;
-
+	        
 	LPD3DXEFFECT effect = m_shaderFillGBuffer->GetEffect();
 	
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_skyTexture);
@@ -4887,21 +4909,7 @@ bool Renderer::DrawSkyLPP()
 		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 		m_device->SetIndices(bucket->GetIndexBuffer());
 
-		if (i == RENDERER_BUCKET_TRANSPARENT || i == RENDERER_BUCKET_TRANSPARENT_DS)
-		{
-			// Setup additive blending
-			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-			m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-			m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-			m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
-			m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
-			m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-			m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
-		}
-		else
-		{
-			m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-		}
+		SetGpuStateForBucket((RENDERER_BUCKETS)i);
 
 		for (int iPass = 0; iPass < cPasses; iPass++)
 		{
@@ -4986,16 +4994,6 @@ bool Renderer::DrawSprites()
 	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
 	SetDepthWrite(false);
 
-	/*m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
-	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
-	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);*/
-
 	UINT cPasses = 1;
 	LPD3DXEFFECT effect = m_shaderSprites->GetEffect();
 	m_device->BeginScene();
@@ -5018,81 +5016,145 @@ bool Renderer::DrawSprites()
 		{
 			RendererSpriteToDraw* spr = m_spritesToDraw[i];
 
-			float halfWidth = spr->Width / 2.0f;
-			float halfHeight = spr->Height / 2.0f;
+			if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+			{
+				float halfWidth = spr->Width / 2.0f;
+				float halfHeight = spr->Height / 2.0f;
 
-			D3DXMATRIX billboardMatrix;
-			CreateBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(spr->X, spr->Y, spr->Z),
-				&D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z));
+				D3DXMATRIX billboardMatrix;
+				CreateBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(spr->X, spr->Y, spr->Z),
+					&D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z));
 
-			D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
-			D3DXVECTOR3 p1 = D3DXVECTOR3(halfWidth, -halfHeight, 0);
-			D3DXVECTOR3 p2 = D3DXVECTOR3(halfWidth, halfHeight, 0);
-			D3DXVECTOR3 p3 = D3DXVECTOR3(-halfWidth, halfHeight, 0);
+				D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
+				D3DXVECTOR3 p1 = D3DXVECTOR3(halfWidth, -halfHeight, 0);
+				D3DXVECTOR3 p2 = D3DXVECTOR3(halfWidth, halfHeight, 0);
+				D3DXVECTOR3 p3 = D3DXVECTOR3(-halfWidth, halfHeight, 0);
 
-			D3DXVECTOR4 p0t;
-			D3DXVECTOR4 p1t;
-			D3DXVECTOR4 p2t;
-			D3DXVECTOR4 p3t;
+				D3DXVECTOR4 p0t;
+				D3DXVECTOR4 p1t;
+				D3DXVECTOR4 p2t;
+				D3DXVECTOR4 p3t;
 
-			D3DXVec3Transform(&p0t, &p0, &billboardMatrix);
-			D3DXVec3Transform(&p1t, &p1, &billboardMatrix);
-			D3DXVec3Transform(&p2t, &p2, &billboardMatrix);
-			D3DXVec3Transform(&p3t, &p3, &billboardMatrix);
+				D3DXVec3Transform(&p0t, &p0, &billboardMatrix);
+				D3DXVec3Transform(&p1t, &p1, &billboardMatrix);
+				D3DXVec3Transform(&p2t, &p2, &billboardMatrix);
+				D3DXVec3Transform(&p3t, &p3, &billboardMatrix);
 
-			RendererVertex v;
-			__int32 baseVertex = m_spritesVertices.size();
+				RendererVertex v;
+				__int32 baseVertex = m_spritesVertices.size();
 
-			v.x = p0t.x;
-			v.y = p0t.y;
-			v.z = p0t.z;
-			v.u = spr->Sprite->UV[0].x;
-			v.v = spr->Sprite->UV[0].y;
-			v.r = spr->R / 255.0f;
-			v.g = spr->G / 255.0f;
-			v.b = spr->B / 255.0f;
-			v.a = 1.0f;
-			m_spritesVertices.push_back(v);
+				v.x = p0t.x;
+				v.y = p0t.y;
+				v.z = p0t.z;
+				v.u = spr->Sprite->UV[0].x;
+				v.v = spr->Sprite->UV[0].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
 
-			v.x = p1t.x;
-			v.y = p1t.y;
-			v.z = p1t.z;
-			v.u = spr->Sprite->UV[1].x;
-			v.v = spr->Sprite->UV[1].y;
-			v.r = spr->R / 255.0f;
-			v.g = spr->G / 255.0f;
-			v.b = spr->B / 255.0f;
-			v.a = 1.0f;
-			m_spritesVertices.push_back(v);
+				v.x = p1t.x;
+				v.y = p1t.y;
+				v.z = p1t.z;
+				v.u = spr->Sprite->UV[1].x;
+				v.v = spr->Sprite->UV[1].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
 
-			v.x = p2t.x;
-			v.y = p2t.y;
-			v.z = p2t.z;
-			v.u = spr->Sprite->UV[2].x;
-			v.v = spr->Sprite->UV[2].y;
-			v.r = spr->R / 255.0f;
-			v.g = spr->G / 255.0f;
-			v.b = spr->B / 255.0f;
-			v.a = 1.0f;
-			m_spritesVertices.push_back(v);
+				v.x = p2t.x;
+				v.y = p2t.y;
+				v.z = p2t.z;
+				v.u = spr->Sprite->UV[2].x;
+				v.v = spr->Sprite->UV[2].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
 
-			v.x = p3t.x;
-			v.y = p3t.y;
-			v.z = p3t.z;
-			v.u = spr->Sprite->UV[3].x;
-			v.v = spr->Sprite->UV[3].y;
-			v.r = spr->R / 255.0f;
-			v.g = spr->G / 255.0f;
-			v.b = spr->B / 255.0f;
-			v.a = 1.0f;
-			m_spritesVertices.push_back(v);
+				v.x = p3t.x;
+				v.y = p3t.y;
+				v.z = p3t.z;
+				v.u = spr->Sprite->UV[3].x;
+				v.v = spr->Sprite->UV[3].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
 
-			m_spritesIndices.push_back(baseVertex + 0);
-			m_spritesIndices.push_back(baseVertex + 1);
-			m_spritesIndices.push_back(baseVertex + 2);
-			m_spritesIndices.push_back(baseVertex + 0);
-			m_spritesIndices.push_back(baseVertex + 2);
-			m_spritesIndices.push_back(baseVertex + 3);
+				m_spritesIndices.push_back(baseVertex + 0);
+				m_spritesIndices.push_back(baseVertex + 1);
+				m_spritesIndices.push_back(baseVertex + 2);
+				m_spritesIndices.push_back(baseVertex + 0);
+				m_spritesIndices.push_back(baseVertex + 2);
+				m_spritesIndices.push_back(baseVertex + 3);
+			}
+			else
+			{
+				D3DXVECTOR3 p0t = D3DXVECTOR3(spr->X1, spr->Y1, spr->Z1);
+				D3DXVECTOR3 p1t = D3DXVECTOR3(spr->X2, spr->Y2, spr->Z2);
+				D3DXVECTOR3 p2t = D3DXVECTOR3(spr->X3, spr->Y3, spr->Z3);
+				D3DXVECTOR3 p3t = D3DXVECTOR3(spr->X4, spr->Y4, spr->Z4);
+
+				RendererVertex v;
+				__int32 baseVertex = m_spritesVertices.size();
+
+				v.x = p0t.x;
+				v.y = p0t.y;
+				v.z = p0t.z;
+				v.u = spr->Sprite->UV[0].x;
+				v.v = spr->Sprite->UV[0].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
+
+				v.x = p1t.x;
+				v.y = p1t.y;
+				v.z = p1t.z;
+				v.u = spr->Sprite->UV[1].x;
+				v.v = spr->Sprite->UV[1].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
+
+				v.x = p2t.x;
+				v.y = p2t.y;
+				v.z = p2t.z;
+				v.u = spr->Sprite->UV[2].x;
+				v.v = spr->Sprite->UV[2].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
+
+				v.x = p3t.x;
+				v.y = p3t.y;
+				v.z = p3t.z;
+				v.u = spr->Sprite->UV[3].x;
+				v.v = spr->Sprite->UV[3].y;
+				v.r = spr->R / 255.0f;
+				v.g = spr->G / 255.0f;
+				v.b = spr->B / 255.0f;
+				v.a = 1.0f;
+				m_spritesVertices.push_back(v);
+
+				m_spritesIndices.push_back(baseVertex + 0);
+				m_spritesIndices.push_back(baseVertex + 1);
+				m_spritesIndices.push_back(baseVertex + 2);
+				m_spritesIndices.push_back(baseVertex + 0);
+				m_spritesIndices.push_back(baseVertex + 2);
+				m_spritesIndices.push_back(baseVertex + 3);
+			}
 
 			lastSprite++;
 		}
@@ -5148,7 +5210,7 @@ bool Renderer::DrawSprites()
 	return true;
 }
 
-void Renderer::AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale, float width, float height)
+void Renderer::AddSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height)
 {
 	scale = 1.0f;
 
@@ -5156,6 +5218,7 @@ void Renderer::AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z
 	height *= scale;
 
 	RendererSpriteToDraw* spr = new RendererSpriteToDraw();
+	spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD;
 	spr->Sprite = sprite;
 	spr->X = x;
 	spr->Y = y;
@@ -5183,7 +5246,7 @@ void Renderer::DrawFires()
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
 				{
-					AddSprite(m_sprites[spark->def], 
+					AddSpriteBillboard(m_sprites[spark->def],
 								fire->x + spark->x, fire->y + spark->y, fire->z + spark->z, 
 								spark->r, spark->g, spark->b, 
 								TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f);
@@ -5200,7 +5263,7 @@ void Renderer::DrawSmokes()
 		SMOKE_SPARKS* spark = &SmokeSparks[i];
 		if (spark->On)
 		{
-			AddSprite(m_sprites[spark->Def],
+			AddSpriteBillboard(m_sprites[spark->Def],
 				spark->x, spark->y, spark->z,
 				spark->Shade, spark->Shade, spark->Shade,
 				TR_ANGLE_TO_RAD(spark->RotAng), spark->Scalar, spark->Size * 4.0f, spark->Size * 4.0f);
@@ -5210,14 +5273,14 @@ void Renderer::DrawSmokes()
 
 void Renderer::DrawSparks()
 {
-	for (__int32 i = 0; i < 128; i++)
+	for (__int32 i = 0; i < 1024; i++)
 	{
 		SPARKS* spark = &Sparks[i];
 		if (spark->on)
 		{
 			if (spark->flags & SP_DEF)
 			{
-				AddSprite(m_sprites[spark->def],
+				AddSpriteBillboard(m_sprites[spark->def],
 					spark->x, spark->y, spark->z,
 					spark->r, spark->g, spark->b,
 					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f);
@@ -5239,7 +5302,7 @@ void Renderer::DrawBlood()
 		BLOOD_STRUCT* blood = &Blood[i];
 		if (blood->On)
 		{
-			AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
+			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
 				blood->x, blood->y, blood->z,
 				blood->Shade * 244, blood->Shade * 0, blood->Shade * 0,
 				TR_ANGLE_TO_RAD(blood->RotAng), 1.0f, blood->Size * 8.0f, blood->Size * 8.0f);
@@ -5425,7 +5488,7 @@ bool Renderer::DoSnow()
 			continue;
 		}
 
-		AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
+		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
 			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE);
 
 		__int16 roomNumber = Camera.pos.roomNumber;
@@ -5675,7 +5738,7 @@ void Renderer::DrawBubbles()
 
 		if (bubble->size)
 		{
-			AddSprite(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 13],
+			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 13],
 				bubble->pos.x, bubble->pos.y, bubble->pos.z,
 				bubble->shade * 255, bubble->shade * 255, bubble->shade * 255,
 				0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f);
@@ -5684,6 +5747,133 @@ void Renderer::DrawBubbles()
 }
 
 bool Renderer::IsRoomUnderwater(__int16 roomNumber)
-{
+{ 
 	return (m_rooms[roomNumber]->Room->flags & 1);
+}
+ 
+bool Renderer::IsInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
+{
+	RendererRoom* room = m_rooms[roomNumber];
+	ROOM_INFO* r = room->Room;
+
+	return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
+			y >= r->maxceiling && y <= r->minfloor &&
+			z >= r->z && z <= r->z + r->ySize * 1024.0f);
+}
+
+void Renderer::DrawSplahes()
+{
+	for (__int32 i = 0; i < 4; i++)
+	{
+		SPLASH_STRUCT* splash = &Splashes[i];
+
+		int x = 0;
+	}
+}
+
+void Renderer::AddSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height)
+{
+	scale = 1.0f;
+
+	width *= scale;
+	height *= scale;
+
+	RendererSpriteToDraw* spr = new RendererSpriteToDraw();
+	spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+	spr->Sprite = sprite;
+	spr->X1 = x1;
+	spr->Y1 = y1;
+	spr->Z1 = z1;
+	spr->X2 = x2;
+	spr->Y2 = y2;
+	spr->Z2 = z2;
+	spr->X3 = x3;
+	spr->Y3 = y3;
+	spr->Z3 = z3;
+	spr->X4 = x4;
+	spr->Y4 = y4;
+	spr->Z4 = z4;
+	spr->R = r;
+	spr->G = g;
+	spr->B = b;
+	spr->Rotation = rotation;
+	spr->Scale = scale;
+	spr->Width = width;
+	spr->Height = height;
+
+	m_spritesToDraw.push_back(spr);
+}
+
+void Renderer::DrawRipples()
+{
+	for (__int32 i = 0; i < 32; i++)
+	{
+		RIPPLE_STRUCT* ripple = &Ripples[i];
+
+		if (ripple->flags & 1)
+		{
+			float x1 = ripple->x - ripple->size;
+			float z1 = ripple->z - ripple->size;
+			float x2 = ripple->x + ripple->size;
+			float z2 = ripple->z + ripple->size;
+			float y = ripple->y;
+
+			byte color = (ripple->init ? ripple->init << 1 : ripple->life << 1);
+
+			AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 9],
+				x1, y, z2, x2, y, z2, x2, y, z1, x1, y, z1, color, color, color, 0.0f, 1.0f, ripple->size, ripple->size);
+		}
+	}
+}
+
+void Renderer::DrawUnderwaterDust()
+{
+	if (!IsRoomUnderwater(Camera.pos.roomNumber))
+		return;
+
+	if (m_firstUnderwaterDustParticles)
+	{
+		for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+			m_underwaterDustParticles[i].Reset = true;
+	}
+
+	for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+	{
+		RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
+
+		if (dust->Reset)
+		{
+			dust->X = LaraItem->pos.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+			dust->Y = LaraItem->pos.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+			dust->Z = LaraItem->pos.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+
+			// Check if water room
+			__int16 roomNumber = Camera.pos.roomNumber;
+			FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
+			if (!IsRoomUnderwater(roomNumber))
+				continue;
+
+			if (!IsInRoom(dust->X, dust->Y, dust->Z, roomNumber))
+			{
+				dust->Reset = true;
+				continue;
+			}
+
+			dust->Life = 0;
+			dust->Reset = false;
+		}
+
+		dust->Life++;
+		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
+		
+		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], dust->X, dust->Y, dust->Z, color, color, color,
+			0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE);
+
+		if (dust->Life >= 32)
+			dust->Reset = true;
+	}
+
+	m_firstUnderwaterDustParticles = false;
+
+	return;
 }

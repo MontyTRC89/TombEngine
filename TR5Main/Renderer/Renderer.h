@@ -362,12 +362,15 @@ typedef struct RendererSpriteSequence {
 };
 
 typedef struct RendererSpriteToDraw {
+	RENDERER_SPRITE_TYPE Type;
 	RendererSprite* Sprite;
 	float Distance;
 	float Scale;
-	float X;
-	float Y;
-	float Z;
+	float X, Y, Z;
+	float X1, Y1, Z1;
+	float X2, Y2, Z2;
+	float X3, Y3, Z3;
+	float X4, Y4, Z4;
 	byte R;
 	byte G;
 	byte B;
@@ -383,12 +386,17 @@ typedef struct RendererTempVertex {
 };
 
 typedef struct RendererWeatherParticle {
-	float X;
-	float Y;
-	float Z;
+	float X, Y, Z;
 	float AngleH;
 	float AngleV;
 	float Size;
+	__int16 Room;
+	bool Reset;
+};
+
+typedef struct RendererUnderwaterDustParticle {
+	float X, Y, Z;
+	__int16 Life;
 	__int16 Room;
 	bool Reset;
 };
@@ -412,6 +420,7 @@ class Renderer
 	LPDIRECT3DTEXTURE9				m_textureAtlas;
 	LPDIRECT3DTEXTURE9				m_fontAndMiscTexture;
 	LPDIRECT3DTEXTURE9				m_titleScreen;
+	LPDIRECT3DTEXTURE9				m_caustics[NUM_CAUSTICS_TEXTURES];
 	LPD3DXFONT						m_debugFont;
 	LPD3DXFONT						m_gameFont;
 	LPD3DXSPRITE					m_sprite;
@@ -475,7 +484,8 @@ class Renderer
 
 	RENDERER_CULLMODE				m_cullMode;
 	RENDERER_BLENDSTATE				m_blendState;
-	bool							m_youngLara = true;
+	RendererUnderwaterDustParticle  m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
+	bool							m_firstUnderwaterDustParticles = true;
 
 	// New light pre-pass renderer
 	RenderTarget2D*					m_depthBuffer;
@@ -528,6 +538,7 @@ class Renderer
 	vector<RendererVertex>			m_lines3DVertices;
 	bool							m_enableZwrite;
 	bool							m_enableZtest;
+	__int32							m_currentCausticsFrame = 0;
 
 public:
 	D3DXMATRIX						ViewMatrix;
@@ -598,7 +609,8 @@ public:
 	void							UpdateFires();
 	void							AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
 	void							ClearDynamicLights();
-	void							AddSprite(RendererSprite* sprite, __int32 x, __int32 y, __int32 z, byte r, byte g, byte b, float rotation, float scale, float width, float height);
+	void							AddSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height);
+	void							AddSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height);
 	void							AddLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);
 	void							DrawFires();
 	void							DrawSparks();
@@ -606,6 +618,9 @@ public:
 	void							DrawBlood();
 	void							DrawDrips();
 	void							DrawBubbles();
+	void							DrawSplahes();
+	void							DrawRipples();
+	void							DrawUnderwaterDust();
 	bool							DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	void							CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos);
 
@@ -629,4 +644,5 @@ public:
 	void							SetGpuStateForBucket(RENDERER_BUCKETS bucket);
 	bool							DrawScene(RENDERER_PASSES pass);
 	bool							IsRoomUnderwater(__int16 roomNumber);
+	bool							IsInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
 };

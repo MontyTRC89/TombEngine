@@ -11,6 +11,8 @@
 #define MODELTYPE_PICKUP			5
 #define MODELTYPE_LARA				6
 #define MODELTYPE_SKY				7
+#define MODELTYPE_WATER_SURFACE		8
+#define MODELTYPE_ROOM_UNDERWATER	9
 
 struct VertexShaderInput
 {
@@ -100,6 +102,17 @@ sampler VertexColorSampler = sampler_state
 	Mipfilter = LINEAR;
 };
 
+/*texture2D CausticsMap;
+sampler CausticsSampler = sampler_state
+{
+	Texture = (CausticsMap);
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	MagFilter = LINEAR;
+	MinFilter = LINEAR;
+	Mipfilter = LINEAR;
+};*/
+
 /*textureCUBE ShadowMapCube;
 samplerCUBE ShadowMapCubeSampler = sampler_state {
 	texture = (ShadowMapCube);
@@ -144,21 +157,54 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 	// Get the normal and transform back to -1 ... 1
 	float4 normalData = tex2D(NormalSampler, texCoord);
-	float3 normal = 2.0f * normalData - 1.0f;
+	int modelType = round(normalData.w * 16.0f);
+	float3 normal = normalize(2.0f * normalData.xyz - 1.0f);
 	 
 	//normal.z = sqrt(1.0f - normal.x * normal.x - normal.y * normal.y);
-	
-	int modelType = (int)(normalData.w * 16.0f);
+
 	float specularPower = 1.0f; // normalData.w;
 
 	// Get the depth value
 	float depthVal = tex2D(DepthSampler, texCoord).r;
 
+	// Sample caustics if needed
+	/*float4 caustics = float4(0.0f, 0.0f, 0.0f, 0.0f); 
+	if (modelType == MODELTYPE_ROOM_UNDERWATER)
+	{
+		//return float4(1, 0, 0, 1);
+
+		// Compute screen-space position
+		float4 position;
+		position.xy = input.ScreenPosition.xy;
+		position.z = depthVal;
+		position.w = 1.0f;
+
+		// Transform to world space
+		position = mul(position, ViewProjectionInverse);
+		position /= position.w;
+
+		float fracX = position.x - floor(position.x / 2048.0f) * 2048.0f;
+		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
+		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
+		float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
+
+		float3 blending = abs(normal);
+		blending = normalize(max(blending, 0.00001f));
+		float b = (blending.x + blending.y + blending.z);
+		blending /= float3(b, b, b);
+
+		float3 p = float3(fracX, fracY, fracZ) / 2048.0f;
+		float3 xaxis = tex2D(CausticsSampler, p.yz).rgb;
+		float3 yaxis = tex2D(CausticsSampler, p.xz).rgb;
+		float3 zaxis = tex2D(CausticsSampler, p.xy).rgb;
+		output += float4((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz, 0.0f) * 0.10f * attenuation;
+	}*/
+
 	// We lit room geometry only in the case of dynamic lights
-	if (modelType == MODELTYPE_ROOM && !LightDynamic)
+	if ((modelType == MODELTYPE_ROOM || modelType == MODELTYPE_ROOM_UNDERWATER) && !LightDynamic)
 	{
 		// Is this light dynamic? In not, then I don't do any further calculations
-		return output;
+		return (output);
 	}
 
 	// Get specular intensity

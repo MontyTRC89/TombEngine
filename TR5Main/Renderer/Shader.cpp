@@ -16,7 +16,7 @@ Shader::~Shader()
 bool Shader::Compile()
 {
 	printf("Compiling shader %s ...\n", m_fileName);
-
+	  
 	__int64 flags = D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY;
 	LPD3DXBUFFER errors = NULL;
 
@@ -24,9 +24,9 @@ bool Shader::Compile()
 
 	if (res != S_OK)
 	{
-		//char* message = (char*)errors->GetBufferPointer();
-		//printf("%s\n", message);
-		//errors->Release();
+		char* message = (char*)errors->GetBufferPointer();
+		printf("%s\n", message);
+		errors->Release();
 
 		return false;
 	}
