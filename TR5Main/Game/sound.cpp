@@ -407,7 +407,8 @@ int Sound_GetFreeSlot()
 		}
 	}
 
-	printf("Hijacked sound effect slot %d", farSlot);
+	printf("Hijacking sound effect slot %d  \n", farSlot);
+	Sound_FreeSlot(farSlot, 50);
 	return farSlot;
 }
 
@@ -525,9 +526,9 @@ void Sound_UpdateScene()
 
 	if (currentReverb == -1 || Rooms[Camera.pos.roomNumber].reverbType != currentReverb)
 	{
-		//currentReverb = Rooms[Camera.pos.roomNumber].reverbType;
-		//if (currentReverb < NUM_REVERB_TYPES)
-		//	BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[currentReverb]);
+		currentReverb = Rooms[Camera.pos.roomNumber].reverbType;
+		if (currentReverb < NUM_REVERB_TYPES)
+			BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[currentReverb]);
 	}
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
@@ -632,7 +633,7 @@ void Sound_Init()
 
 	// Apply slight compression to 3D channel
 	BASS_FXHandler[SOUND_FILTER_COMPRESSOR] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_COMPRESSOR2, 1);
-	auto comp = BASS_BFX_COMPRESSOR2{ 4.0f, -18.0f, 2.5f, 10.0f, 100.0f, -1 };
+	auto comp = BASS_BFX_COMPRESSOR2{ 4.0f, -18.0f, 1.5f, 10.0f, 100.0f, -1 };
 	BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_COMPRESSOR], &comp);
 
 	if (Sound_CheckBASSError("Attaching compressor", true))
