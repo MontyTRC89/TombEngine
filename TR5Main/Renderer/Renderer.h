@@ -64,6 +64,8 @@ typedef struct RendererVertex {
 
 typedef struct RendererPolygon {
 	byte Shape;
+	__int32 AnimatedSet;
+	__int32 TextureId;
 	__int32 Distance;
 	__int32 Indices[4];
 };
@@ -100,6 +102,15 @@ typedef struct RendererDynamicLight {
 	D3DXVECTOR4 Position;
 	D3DXVECTOR4 Color;
 	float Out;
+};
+
+typedef struct RendererAnimatedTexture {
+	__int32 Id;
+	D3DXVECTOR2 UV[4];
+};
+
+typedef struct RendererAnimatedTextureSet {
+	vector<RendererAnimatedTexture*> Textures;
 };
 
 typedef struct RendererRoom {
@@ -539,7 +550,10 @@ class Renderer
 	bool							m_enableZwrite;
 	bool							m_enableZtest;
 	__int32							m_currentCausticsFrame = 0;
+	vector<RendererAnimatedTextureSet*> m_animatedTextureSets;
 
+	__int32							getAnimatedTextureInfo(__int16 textureId);
+	
 public:
 	D3DXMATRIX						ViewMatrix;
 	D3DXMATRIX						ProjectionMatrix;
@@ -628,7 +642,7 @@ public:
 	bool							DrawSceneLightPrePass(bool dump);
 	bool							BindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, RenderTarget2D* rt3, RenderTarget2D* rt4);
 	bool							RestoreBackBuffer();
-	bool							DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
+	bool							DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass, bool animated);
 	bool							DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
@@ -645,4 +659,5 @@ public:
 	bool							DrawScene(RENDERER_PASSES pass);
 	bool							IsRoomUnderwater(__int16 roomNumber);
 	bool							IsInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
+	void							UpdateAnimatedTextures();
 };

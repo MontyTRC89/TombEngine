@@ -100,7 +100,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	//DXInitialise(App.WindowHandle);
 	g_Renderer = new Renderer();
-	g_Renderer->Initialise(800, 600, true, App.WindowHandle);
+	g_Renderer->Initialise(Rect.right, Rect.bottom, true, App.WindowHandle);
 
 	// Initialize audio
 	Sound_Init();

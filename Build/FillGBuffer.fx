@@ -161,7 +161,7 @@ PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
 		float3 yaxis = tex2D(CausticsSampler, p.xz).rgb;
 		float3 zaxis = tex2D(CausticsSampler, p.xy).rgb;
 
-		vertexColors += float4((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz, 0.0f) * attenuation;
+		vertexColors += float4((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz, 0.0f) * attenuation * 2.0f;
 	}
 
 	if (ModelType == MODELTYPE_ROOM || ModelType == MODELTYPE_ROOM_UNDERWATER)

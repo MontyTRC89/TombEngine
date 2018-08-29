@@ -135,6 +135,8 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
  
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
+	int modelType = round(tex2D(NormalSampler, input.TextureCoordinate).w * 16.0f);
+	
 	float3 diffuseColor = tex2D(ColorSampler, input.TextureCoordinate).rgb;
 	float3 ambientColor = tex2D(VertexColorSampler, input.TextureCoordinate).rgb;
 	float4 light = tex2D(LightSampler, input.TextureCoordinate);
@@ -145,7 +147,6 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	bool underwater = ((pixelFlags / 32) == 1);
 	if (pixelFlags >= 32) pixelFlags -= 32;
 	int modelType = pixelFlags;*/
-	int modelType = round(tex2D(NormalSampler, input.TextureCoordinate).w * 16.0f);
 	//if (underwater)
 	//	return float4(0, 0, 1, 1);
 

@@ -55,8 +55,8 @@ float4x4 LightProjection;
 
 bool AmbientPass;
 
-float HalfPixelX = 1.0f / 800.0f;
-float HalfPixelY = 1.0f / 600.0f;
+float HalfPixelX;
+float HalfPixelY;
 
 texture2D ColorMap;
 sampler ColorSampler = sampler_state
@@ -152,7 +152,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	{
 		input.ScreenPosition.xy /= input.ScreenPosition.w;
 		texCoord = 0.5f * (float2(input.ScreenPosition.x, -input.ScreenPosition.y) + 1);
-		texCoord -= float2(0.5f / 800.0f, 0.5f / 600.0f);
+		texCoord -= float2(HalfPixelX, HalfPixelY);
 	}
 
 	// Get the normal and transform back to -1 ... 1

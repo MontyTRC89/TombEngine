@@ -236,6 +236,8 @@
 
 #define HealtBarTimer				VAR_U_(0x0051CEA8, __int32)
 
+#define AnimatedTextureRanges		VAR_U_(0x00D9ADA0, __int16*)
+
 extern bool MonksAttackLara;
 
 // Remapped variables

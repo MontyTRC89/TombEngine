@@ -26,6 +26,7 @@ public:
 	vector<RendererVertex>		Vertices;
 	vector<__int32>				Indices;
 	vector<RendererPolygon>		Polygons;
+	vector<RendererPolygon>		AnimatedPolygons;
 	__int32						StartVertex;
 	__int32						NumTriangles;
 	__int32						NumVertices;

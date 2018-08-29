@@ -853,6 +853,42 @@ RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 
 bool Renderer::PrepareDataForTheRenderer()
 {
+	// Step -1 XD: prepare animated textures
+	__int16 numSets = *AnimatedTextureRanges;
+	__int16* animatedPtr = AnimatedTextureRanges;
+	animatedPtr++;
+
+	for (__int32 i = 0; i < numSets; i++)
+	{
+		RendererAnimatedTextureSet* set = new RendererAnimatedTextureSet();
+		__int16 numTextures = *animatedPtr + 1;
+		animatedPtr++;
+
+		for (__int32 j = 0; j < numTextures; j++)
+		{
+			__int16 textureId = *animatedPtr;
+			animatedPtr++;
+
+			OBJECT_TEXTURE* texture = &ObjectTextures[textureId];
+			__int32 tile = texture->tileAndFlag & 0x7FFF;
+
+			RendererAnimatedTexture* newTexture = new RendererAnimatedTexture();
+			newTexture->Id = textureId;
+
+			for (__int32 k = 0; k < 4; k++)
+			{
+				float x = (texture->vertices[k].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+				float y = (texture->vertices[k].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+				
+				newTexture->UV[k] = D3DXVECTOR2(x, y);
+			}
+
+			set->Textures.push_back(newTexture);
+		}
+
+		m_animatedTextureSets.push_back(set);
+	}
+
 	// Step 0: free all previus resources
 	for (map<__int32, RendererRoom*>::iterator it = m_rooms.begin(); it != m_rooms.end(); ++it)
 		delete (it->second);
@@ -1005,7 +1041,10 @@ bool Renderer::PrepareDataForTheRenderer()
 
 					// Create vertices
 					RendererBucket* bucket;
+
+					__int32 animatedSetIndex = getAnimatedTextureInfo(textureIndex);
 					__int32 bucketIndex = RENDERER_BUCKET_SOLID;
+					
 					if (!doubleSided)
 					{
 						if (texture->attribute == 2)
@@ -1024,8 +1063,17 @@ bool Renderer::PrepareDataForTheRenderer()
 						else
 							bucketIndex = RENDERER_BUCKET_ALPHA_TEST_DS;
 					}
-					bucket = mesh->GetBucket(bucketIndex);
-					roomObject->HasDataInBucket[bucketIndex] = true;
+
+					if (animatedSetIndex == -1)
+					{
+						bucket = mesh->GetBucket(bucketIndex);
+						roomObject->HasDataInBucket[bucketIndex] = true;
+					}
+					else
+					{
+						bucket = mesh->GetAnimatedBucket(bucketIndex);
+						roomObject->HasDataInAnimatedBucket[bucketIndex] = true;
+					}
 
 					// Calculate face normal
 					D3DXVECTOR3 p0 = D3DXVECTOR3(vertices[poly->Vertices[0]].Vertex.x,
@@ -1079,6 +1127,8 @@ bool Renderer::PrepareDataForTheRenderer()
 
 					RendererPolygon newPolygon;
 					newPolygon.Shape = SHAPE_RECTANGLE;
+					newPolygon.AnimatedSet = animatedSetIndex;
+					newPolygon.TextureId = textureIndex;
 					newPolygon.Indices[0] = baseVertices;
 					newPolygon.Indices[1] = baseVertices + 1;
 					newPolygon.Indices[2] = baseVertices + 2;
@@ -1105,7 +1155,10 @@ bool Renderer::PrepareDataForTheRenderer()
 
 					// Create vertices
 					RendererBucket* bucket;
+
+					__int32 animatedSetIndex = getAnimatedTextureInfo(textureIndex);
 					__int32 bucketIndex = RENDERER_BUCKET_SOLID;
+
 					if (!doubleSided)
 					{
 						if (texture->attribute == 2)
@@ -1124,8 +1177,17 @@ bool Renderer::PrepareDataForTheRenderer()
 						else
 							bucketIndex = RENDERER_BUCKET_ALPHA_TEST_DS;
 					}
-					bucket = mesh->GetBucket(bucketIndex);
-					roomObject->HasDataInBucket[bucketIndex] = true;
+
+					if (animatedSetIndex == -1)
+					{
+						bucket = mesh->GetBucket(bucketIndex);
+						roomObject->HasDataInBucket[bucketIndex] = true;
+					}
+					else
+					{
+						bucket = mesh->GetAnimatedBucket(bucketIndex);
+						roomObject->HasDataInAnimatedBucket[bucketIndex] = true;
+					}
 
 					// Calculate face normal
 					D3DXVECTOR3 p0 = D3DXVECTOR3(vertices[poly->Vertices[0]].Vertex.x,
@@ -1176,6 +1238,8 @@ bool Renderer::PrepareDataForTheRenderer()
 
 					RendererPolygon newPolygon;
 					newPolygon.Shape = SHAPE_TRIANGLE;
+					newPolygon.AnimatedSet = animatedSetIndex;
+					newPolygon.TextureId = textureIndex;
 					newPolygon.Indices[0] = baseVertices;
 					newPolygon.Indices[1] = baseVertices + 1;
 					newPolygon.Indices[2] = baseVertices + 2;
@@ -2776,11 +2840,11 @@ void Renderer::DrawDebugInfo()
 	m_sprite->SetTransform(&scale);
 	m_sprite->Draw(m_colorBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
 	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(800, 0, 0), 0xFFFFFFFF);
+	m_sprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
 	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1600, 0, 0), 0xFFFFFFFF);
+	m_sprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
 	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
+	m_sprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
 
 	m_sprite->End();
 
@@ -3513,7 +3577,7 @@ void Renderer::CollectSceneItems()
 
 bool Renderer::DrawScene(RENDERER_PASSES pass)
 {
-	if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	/*if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 	{
 		for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 		{
@@ -3521,8 +3585,8 @@ bool Renderer::DrawScene(RENDERER_PASSES pass)
 			if (room == NULL)
 				continue;
 
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
 
 			// Draw static objects
 			ROOM_INFO* r = room->Room;
@@ -3560,8 +3624,8 @@ bool Renderer::DrawScene(RENDERER_PASSES pass)
 			if (room == NULL)
 				continue;
 
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
 
 			// Draw static objects
 			ROOM_INFO* r = room->Room;
@@ -3599,8 +3663,8 @@ bool Renderer::DrawScene(RENDERER_PASSES pass)
 			if (room == NULL)
 				continue;
 
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
+			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
 
 			// Draw static objects
 			ROOM_INFO* r = room->Room;
@@ -3630,7 +3694,7 @@ bool Renderer::DrawScene(RENDERER_PASSES pass)
 
 		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
 		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-	}
+	}*/
 
 	return true;
 }
@@ -3665,6 +3729,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	CollectSceneItems();
 	UpdateLaraAnimations();
 	UpdateItemsAnimations();
+	if (GnFrameCounter % 2 == 0)
+		UpdateAnimatedTextures();
 
 	auto time2 = chrono::high_resolution_clock::now();
 	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -3728,9 +3794,12 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
 		if (r->numMeshes != 0)
@@ -3767,9 +3836,12 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
 		if (r->numMeshes != 0)
@@ -3969,8 +4041,11 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
+		
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4004,8 +4079,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4053,8 +4128,11 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
+		
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
+		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4484,7 +4562,7 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 	return true;
 }
          
-bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass, bool animated)
 {
 	D3DXMATRIX world;
 	UINT cPasses = 1;
@@ -4493,16 +4571,14 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	ROOM_INFO* r = room->Room;
 	RendererObject* roomObj = room->RoomObject;
 	
-	if (!roomObj->HasDataInBucket[bucketIndex])
+	if ((!animated && !roomObj->HasDataInBucket[bucketIndex]) || 
+		(animated && !roomObj->HasDataInAnimatedBucket[bucketIndex]))
 		return true;
 
 	if (roomObj->ObjectMeshes.size() == 0)
 		return true;
 
 	RendererMesh* mesh = roomObj->ObjectMeshes[0];
-	RendererBucket* bucket = mesh->GetBucket(bucketIndex);
-
-	SetGpuStateForBucket(bucketIndex);
 
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
@@ -4532,17 +4608,40 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
 	}
 
-	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-	m_device->SetIndices(bucket->GetIndexBuffer());
-
-	for (int iPass = 0; iPass < cPasses; iPass++)
+	if (!animated)
 	{
-		effect->BeginPass(iPass);
-		effect->CommitChanges();
-		  
-		DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+		// Non animated buckets are rendered with vertex buffers
+		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+		SetGpuStateForBucket(bucketIndex);
 
-		effect->EndPass();
+		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+		m_device->SetIndices(bucket->GetIndexBuffer());
+
+		for (int iPass = 0; iPass < cPasses; iPass++)
+		{
+			effect->BeginPass(iPass);
+			effect->CommitChanges();
+
+			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+			effect->EndPass();
+		}
+	}
+	else
+	{
+		RendererBucket* bucket = mesh->GetAnimatedBucket(bucketIndex);
+		SetGpuStateForBucket(bucketIndex);
+
+		for (int iPass = 0; iPass < cPasses; iPass++)
+		{
+			effect->BeginPass(iPass);
+			effect->CommitChanges();
+
+			m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, bucket->NumVertices, bucket->NumIndices / 3,
+				bucket->Indices.data(), D3DFORMAT::D3DFMT_INDEX32, bucket->Vertices.data(), sizeof(RendererVertex));
+
+			effect->EndPass();
+		}
 	}
 
 	return true;
@@ -5828,19 +5927,16 @@ void Renderer::DrawRipples()
 
 void Renderer::DrawUnderwaterDust()
 {
-	if (!IsRoomUnderwater(Camera.pos.roomNumber))
-		return;
-
 	if (m_firstUnderwaterDustParticles)
 	{
 		for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 			m_underwaterDustParticles[i].Reset = true;
 	}
-
+	 
 	for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 	{
 		RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
-
+		 
 		if (dust->Reset)
 		{
 			dust->X = LaraItem->pos.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
@@ -5876,4 +5972,69 @@ void Renderer::DrawUnderwaterDust()
 	m_firstUnderwaterDustParticles = false;
 
 	return;
+}
+
+__int32 Renderer::getAnimatedTextureInfo(__int16 textureId)
+{
+	for (__int32 i = 0; i < m_animatedTextureSets.size(); i++)
+	{
+		RendererAnimatedTextureSet* set = m_animatedTextureSets[i];
+		for (__int32 j = 0; j < set->Textures.size(); j++)
+		{
+			if (set->Textures[j]->Id == textureId)
+				return i;
+		}
+	}
+
+	return -1;
+}
+
+void Renderer::UpdateAnimatedTextures()
+{
+	for (__int32 i = 0; i < m_rooms.size(); i++)
+	{
+		RendererRoom* room = m_rooms[i];
+		RendererObject* roomObj = room->RoomObject;
+		if (roomObj->ObjectMeshes.size() == 0)
+			continue;
+
+		RendererMesh* mesh = roomObj->ObjectMeshes[0];
+
+		for (__int32 bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++)
+		{
+			RendererBucket* bucket = mesh->GetAnimatedBucket(bucketIndex);
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			for (__int32 p = 0; p < bucket->Polygons.size(); p++)
+			{
+				RendererPolygon* polygon = &bucket->Polygons[p];
+				RendererAnimatedTextureSet* set = m_animatedTextureSets[polygon->AnimatedSet];
+				__int32 textureIndex = -1;
+				for (__int32 j = 0; j < set->Textures.size(); j++)
+				{
+					if (set->Textures[j]->Id == polygon->TextureId)
+					{
+						textureIndex = j;
+						break;
+					}
+				}
+				if (textureIndex == -1)
+					continue;
+
+				if (textureIndex == set->Textures.size() - 1)
+					textureIndex = 0;
+				else
+					textureIndex++;
+
+				polygon->TextureId = set->Textures[textureIndex]->Id;
+
+				for (__int32 v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
+				{
+					bucket->Vertices[polygon->Indices[v]].u = set->Textures[textureIndex]->UV[v].x;
+					bucket->Vertices[polygon->Indices[v]].v = set->Textures[textureIndex]->UV[v].y;
+				}
+			}
+		}
+	}
 }

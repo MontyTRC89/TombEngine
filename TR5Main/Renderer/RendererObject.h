@@ -32,6 +32,7 @@ public:
 	vector<RendererBone*>		LinearizedBones;
 	__int32						GetId();
 	bool						HasDataInBucket[NUM_BUCKETS];
+	bool						HasDataInAnimatedBucket[NUM_BUCKETS];
 	bool						DoNotDraw;
 	__int32						NumVertices;
 	//bool(Renderer::*DrawRoutine)(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);

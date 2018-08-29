@@ -12,6 +12,7 @@ class RendererMesh
 {
 private:
 	RendererBucket**			m_buckets;
+	RendererBucket**			m_animatedBuckets;
 	LPDIRECT3DDEVICE9			m_device;
 
 public:
@@ -20,4 +21,5 @@ public:
 
 	vector<D3DXVECTOR3>			Positions;
 	RendererBucket*				GetBucket(__int32 bucketIndex);
+	RendererBucket*				GetAnimatedBucket(__int32 bucketIndex);
 };
