@@ -217,7 +217,7 @@ void __cdecl DoTitle(__int32 index)
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
 	//gfLevelFlags |= 1;
-	DoLevel(2, 124);
+	DoLevel(8, 124);
 	return;
 
 	S_LoadLevelFile(0);
@@ -256,6 +256,10 @@ void __cdecl DoLevel(__int32 index, __int32 ambient)
 	//fmv_to_play[0] = 0;
 
 	//IsLevelLoading = true;
+	//S_LoadLevelFile(0);
+	//InitialiseFXArray(true);
+	//InitialiseLOTarray(true);
+
 	S_LoadLevelFile(index);
 	//while (IsLevelLoading);
 

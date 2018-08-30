@@ -246,25 +246,6 @@ Renderer::Renderer()
 	m_quadIndices[3] = 0;
 	m_quadIndices[4] = 1;
 	m_quadIndices[5] = 3;
-	 
-	for (__int32 i = 0; i < 1000; i++)
-	{ 
-		float x = rand() % 16000 + 2048;
-		float y = rand() % 2048 + 256;
-		float z = rand() % 16000 + 2048;
-
-		float r = (rand() % 255) / 255.0f;
-		float g = (rand() % 255) / 255.0f;
-		float b = (rand() % 255) / 255.0f;
-
-		RendererLight* light = new RendererLight();
-		light->Position = D3DXVECTOR4(x, y, z, 1);
-		light->Color = D3DXVECTOR4(r, g, b, 1);
-		light->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-		light->Out = 1024.0f;
-
-		m_testLights.push_back(light);
-	}
 }
 
 Renderer::~Renderer()
@@ -428,11 +409,6 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	if (m_shaderRain->GetEffect() == NULL)
 		return false;
 
-	/*m_shaderFXAA = new Shader(m_device, (char*)"FXAA.fx");
-	m_shaderFXAA->Compile();
-	if (m_shaderFXAA->GetEffect() == NULL)
-		return false;*/
-
 	m_shaderReconstructZBuffer = new Shader(m_device, (char*)"ReconstructZBuffer.fx");
 	m_shaderReconstructZBuffer->Compile();
 	if (m_shaderReconstructZBuffer->GetEffect() == NULL)
@@ -459,17 +435,26 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	 
 	m_halfPixelX = 0.5f / (float)ScreenWidth;
 	m_halfPixelY = 0.5f / (float)ScreenHeight;
-	    
-	D3DXCreateTextureFromFileEx(m_device, "SSAO.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
-		D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
-		D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_randomTexture);
-	 
-	char* causticsNames[NUM_CAUSTICS_TEXTURES] = { "CausticsRender_001.bmp","CausticsRender_002.bmp", "CausticsRender_003.bmp",
-		"CausticsRender_004.bmp", "CausticsRender_005.bmp", "CausticsRender_006.bmp",
-		"CausticsRender_007.bmp", "CausticsRender_008.bmp","CausticsRender_009.bmp","CausticsRender_010.bmp", 
+
+	// Load caustics
+	char* causticsNames[NUM_CAUSTICS_TEXTURES] = { 
+		"CausticsRender_001.bmp",
+		"CausticsRender_002.bmp", 
+		"CausticsRender_003.bmp",
+		"CausticsRender_004.bmp", 
+		"CausticsRender_005.bmp", 
+		"CausticsRender_006.bmp",
+		"CausticsRender_007.bmp", 
+		"CausticsRender_008.bmp",
+		"CausticsRender_009.bmp",
+		"CausticsRender_010.bmp", 
 		"CausticsRender_011.bmp",
-		"CausticsRender_012.bmp", "CausticsRender_013.bmp", "CausticsRender_014.bmp",
-		"CausticsRender_015.bmp", "CausticsRender_016.bmp" };
+		"CausticsRender_012.bmp", 
+		"CausticsRender_013.bmp", 
+		"CausticsRender_014.bmp",
+		"CausticsRender_015.bmp", 
+		"CausticsRender_016.bmp" 
+	};
 	 
 	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
 	{
@@ -478,6 +463,7 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 			D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_caustics[i]);
 	}
 
+	// Initialise buffer for sprites and lines
 	res = m_device->CreateVertexBuffer(NUM_SPRITES_PER_BUCKET * 4 * sizeof(RendererVertex), D3DUSAGE_WRITEONLY,
 		0, D3DPOOL_MANAGED, &m_spritesVertexBuffer, NULL);
 	if (res != S_OK)
@@ -498,7 +484,6 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	// Initialise last non-DX stuff
 	m_fadeTimer = 0;
 	m_pickupRotation = 0;
-	//m_itemsObjectMatrices = NULL;
 	m_dynamicLights.reserve(1024);
 	m_lights.reserve(1024);
 	m_itemsToDraw.reserve(1024);
@@ -507,12 +492,12 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_lines3DVertices.reserve(NUM_LINES_PER_BUCKET * 2);
 	m_firstWeather = true;
 	
-	ResetBlink();
+	resetBlink();
 
 	return true;
 }
 
-void Renderer::ResetBlink()
+void Renderer::resetBlink()
 {
 	m_blinkColorDirection = -1;
 	m_blinkColorValue = 255;
@@ -588,7 +573,7 @@ void Renderer::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color, _
 	m_gameFont->DrawTextA(NULL, string, -1, &rect, 0, color);
 }
 
-bool Renderer::PrintDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message)
+bool Renderer::printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message)
 {
 	D3DCOLOR fontColor = D3DCOLOR_ARGB(alpha, r, g, b);
 	RECT rct;
@@ -601,7 +586,7 @@ bool Renderer::PrintDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, by
 	return true;
 }
  
-RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, 
+RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, 
 												  __int16 boneIndex, __int32 isJoints, __int32 isHairs)
 {  
 	RendererMesh* mesh = new RendererMesh(m_device);
@@ -727,10 +712,6 @@ RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 				vertex.boneAndFlags = m_laraSkinJointRemap[boneIndex][indices[v]];
 			if (isHairs)
 				vertex.boneAndFlags = indices[v];
-			/*if (isHairs && boneIndex == 0 && indices[v] < 4)
-				vertex.bone = 6;
-			if (isHairs && boneIndex != 0 && indices[v] < 4)
-				vertex.bone = boneIndex - 1;*/
 
 			bucket->NumVertices++;
 			bucket->Vertices.push_back(vertex);
@@ -820,10 +801,6 @@ RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 				vertex.boneAndFlags = m_laraSkinJointRemap[boneIndex][indices[v]];
 			if (isHairs)
 				vertex.boneAndFlags = indices[v];
-			/*if (isHairs && boneIndex == 0 && indices[v] < 4)
-				vertex.bone = 6;
-			if (isHairs && boneIndex != 0 && indices[v] < 4)
-				vertex.bone = boneIndex - 1;*/
 
 			bucket->NumVertices++;
 			bucket->Vertices.push_back(vertex);
@@ -933,9 +910,6 @@ bool Renderer::PrepareDataForTheRenderer()
 				byte b = Texture32[oldPixelIndex + 2];
 				byte a = Texture32[oldPixelIndex + 3];
 
-				//if (r == 0 && g == 0 && b == 0)
-				//	a = 0;
-
 				buffer[pixelIndex] = r;
 				buffer[pixelIndex + 1] = g;
 				buffer[pixelIndex + 2] = b;
@@ -966,8 +940,6 @@ bool Renderer::PrepareDataForTheRenderer()
 	memcpy(dest, buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 	m_textureAtlas->UnlockRect(0);
 
-	D3DXSaveTextureToFile("E:\\Atlas.png", D3DXIMAGE_FILEFORMAT::D3DXIFF_PNG, m_textureAtlas, NULL);
-
 	// Release the temp buffer
 	free(buffer);
 
@@ -986,7 +958,6 @@ bool Renderer::PrepareDataForTheRenderer()
 	dest = static_cast<unsigned char*>(rect.pBits);
 	memcpy(dest, MiscTextures, 256 * 768 * 4);
 	m_fontAndMiscTexture->UnlockRect(0);
-	//D3DXSaveTextureToFile("E:\\Misc.png", D3DXIMAGE_FILEFORMAT::D3DXIFF_PNG, m_fontAndMiscTexture, NULL);
 
 	D3DXCreateTexture(m_device, 256, 256, 0, D3DX_DEFAULT, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_skyTexture);
 	
@@ -1344,7 +1315,7 @@ bool Renderer::PrepareDataForTheRenderer()
 				__int32 boneIndex = (meshPtrIndex == 0 ? HAND_R : j);
 
 				__int16* meshPtr = &RawMeshData[meshPtrIndex];
-				RendererMesh* mesh = GetRendererMeshFromTrMesh(moveable,
+				RendererMesh* mesh = getRendererMeshFromTrMesh(moveable,
 															   meshPtr, 
 															   Meshes[obj->meshIndex + 2 * j],
 															   boneIndex, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
@@ -1424,7 +1395,7 @@ bool Renderer::PrepareDataForTheRenderer()
 					moveable->LinearizedBones[n]->Translation.z);
 
 			moveable->Skeleton = moveable->LinearizedBones[0];
-			BuildHierarchy(moveable);
+			buildHierarchy(moveable);
 
 			// Fix Lara skin joints and hairs
 			if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
@@ -1519,7 +1490,7 @@ bool Renderer::PrepareDataForTheRenderer()
 		RendererObject* staticObject = new RendererObject(m_device, StaticObjectsIds[i], 1);
 
 		__int16* meshPtr = &RawMeshData[RawMeshPointers[obj->meshNumber / 2] / 2];
-		RendererMesh* mesh = GetRendererMeshFromTrMesh(staticObject, meshPtr, Meshes[obj->meshNumber], 0, false, false);
+		RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, meshPtr, Meshes[obj->meshNumber], 0, false, false);
 
 		for (__int32 i = 0; i < NUM_BUCKETS; i++)
 			mesh->GetBucket((RENDERER_BUCKETS)i)->UpdateBuffers();
@@ -1538,10 +1509,10 @@ bool Renderer::PrepareDataForTheRenderer()
 		sprite->Width = (oldSprite->right - oldSprite->left)*256.0f;
 		sprite->Height = (oldSprite->bottom - oldSprite->top)*256.0f;
 
-		float left = (oldSprite->left * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
-		float top = (oldSprite->top * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
-		float right = (oldSprite->right * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
-		float bottom = (oldSprite->bottom * 256.0f /*+ 0.5f*/ + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
+		float left = (oldSprite->left * 256.0f + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
+		float top = (oldSprite->top * 256.0f + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
+		float right = (oldSprite->right * 256.0f + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
+		float bottom = (oldSprite->bottom * 256.0f + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
 
 		sprite->UV[0] = D3DXVECTOR2(left / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
 		sprite->UV[1] = D3DXVECTOR2(right / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
@@ -1575,7 +1546,7 @@ bool Renderer::PrepareDataForTheRenderer()
 	return true;
 }
 
-void Renderer::BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode)
+void Renderer::buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode)
 {
 	D3DXMatrixMultiply(&node->GlobalTransform, &node->Transform, &parentNode->GlobalTransform);
 	obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
@@ -1584,11 +1555,11 @@ void Renderer::BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, 
 
 	for (int j = 0; j < node->Children.size(); j++)
 	{
-		BuildHierarchyRecursive(obj, node->Children[j], node);
+		buildHierarchyRecursive(obj, node->Children[j], node);
 	}
 }
 
-void Renderer::BuildHierarchy(RendererObject* obj)
+void Renderer::buildHierarchy(RendererObject* obj)
 {
 	obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 	obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
@@ -1596,11 +1567,11 @@ void Renderer::BuildHierarchy(RendererObject* obj)
 
 	for (int j = 0; j < obj->Skeleton->Children.size(); j++)
 	{
-		BuildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
+		buildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
 	}
 }
 
-void Renderer::FromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
+void Renderer::fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
 {
 	__int16* ptr = &frameptr[0];
 
@@ -1645,7 +1616,7 @@ void Renderer::FromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
 	}
 }
 
-void Renderer::BuildAnimationPoseRecursive(RendererObject* obj, __int16** frmptr, D3DXMATRIX* parentTransform, 
+void Renderer::buildAnimationPoseRecursive(RendererObject* obj, __int16** frmptr, D3DXMATRIX* parentTransform, 
 										   __int16 frac, __int16 rate, RendererBone* bone, __int32 mask)
 {
 	bool calculateMatrix = (mask >> bone->Index) & 1;
@@ -1653,12 +1624,12 @@ void Renderer::BuildAnimationPoseRecursive(RendererObject* obj, __int16** frmptr
 	D3DXMATRIX rotation;
 	if (calculateMatrix)
 	{
-		FromTrAngle(&rotation, frmptr[0], bone->Index);
+		fromTrAngle(&rotation, frmptr[0], bone->Index);
 
 		if (frac)
 		{
 			D3DXMATRIX rotation2;
-			FromTrAngle(&rotation2, frmptr[1], bone->Index);
+			fromTrAngle(&rotation2, frmptr[1], bone->Index);
 
 			D3DXQUATERNION q1, q2, q3;
 
@@ -1680,12 +1651,12 @@ void Renderer::BuildAnimationPoseRecursive(RendererObject* obj, __int16** frmptr
 
 	for (int j = 0; j < bone->Children.size(); j++)
 	{
-		BuildAnimationPoseRecursive(obj, frmptr, &obj->AnimationTransforms[bone->Index], frac, rate, 
+		buildAnimationPoseRecursive(obj, frmptr, &obj->AnimationTransforms[bone->Index], frac, rate, 
 									bone->Children[j], mask);
 	}
 }
 
-void Renderer::BuildAnimationPose(RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
+void Renderer::buildAnimationPose(RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
 {
 	D3DXVECTOR3 p = D3DXVECTOR3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
 
@@ -1694,7 +1665,7 @@ void Renderer::BuildAnimationPose(RendererObject* obj, __int16** frmptr, __int16
 	D3DXMATRIX rotation;
 	if (calculateMatrix)
 	{
-		FromTrAngle(&rotation, frmptr[0], obj->Skeleton->Index);
+		fromTrAngle(&rotation, frmptr[0], obj->Skeleton->Index);
 
 		if (frac)
 		{
@@ -1702,7 +1673,7 @@ void Renderer::BuildAnimationPose(RendererObject* obj, __int16** frmptr, __int16
 			D3DXVec3Lerp(&p, &p, &p2, frac / ((float)rate));
 
 			D3DXMATRIX rotation2;
-			FromTrAngle(&rotation2, frmptr[1], obj->Skeleton->Index);
+			fromTrAngle(&rotation2, frmptr[1], obj->Skeleton->Index);
 
 			D3DXQUATERNION q1, q2, q3;
 
@@ -1726,12 +1697,12 @@ void Renderer::BuildAnimationPose(RendererObject* obj, __int16** frmptr, __int16
 
 	for (int j = 0; j < obj->Skeleton->Children.size(); j++)
 	{
-		BuildAnimationPoseRecursive(obj, frmptr, &obj->AnimationTransforms[obj->Skeleton->Index], frac, rate, 
+		buildAnimationPoseRecursive(obj, frmptr, &obj->AnimationTransforms[obj->Skeleton->Index], frac, rate, 
 									obj->Skeleton->Children[j], mask);
 	}
 }
 
-void Renderer::GetVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count) 
+void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count) 
 {
 	if (count > 8) {
 		return;
@@ -1752,15 +1723,15 @@ void Renderer::GetVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool wat
 		for (int i = 0; i < numDoors; i++) {
 			__int16 adjoiningRoom = *(door);
 
-			if (from != adjoiningRoom && CheckPortal(to, door, viewPort, &clipPort))
-				GetVisibleRooms(to, adjoiningRoom, &clipPort, water, count + 1);
+			if (from != adjoiningRoom && checkPortal(to, door, viewPort, &clipPort))
+				getVisibleRooms(to, adjoiningRoom, &clipPort, water, count + 1);
 
 			door += 16;
 		}
 	}
 }
 
-bool Renderer::CheckPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* viewPort, D3DXVECTOR4* clipPort) 
+bool Renderer::checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* viewPort, D3DXVECTOR4* clipPort) 
 {
 	ROOM_INFO* room = &Rooms[roomIndex];
 
@@ -1848,7 +1819,7 @@ bool Renderer::CheckPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* view
 	return true;
 }
 
-void Renderer::CollectRooms()
+void Renderer::collectRooms()
 {
 	__int16 baseRoomIndex = Camera.pos.roomNumber;
 
@@ -1857,10 +1828,10 @@ void Renderer::CollectRooms()
 			m_rooms[i]->Visited = false;
 
 	m_roomsToDraw.clear();
-	GetVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
+	getVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
 }
 
-void Renderer::CollectItems()
+void Renderer::collectItems()
 {
 	for (vector<RendererItemToDraw*>::iterator it = m_itemsToDraw.begin(); it != m_itemsToDraw.end(); ++it)
 		delete (*it);
@@ -1890,185 +1861,7 @@ void Renderer::CollectItems()
 	}
 }
 
-void Renderer::CollectLights()
-{
-	/*if (m_itemsLightInfo == NULL)
-		m_itemsLightInfo = (RendererLightInfo*)malloc(NumItems * sizeof(RendererLightInfo));
-
-	// Reset shadow map
-	m_litItems.clear();
-	m_enableShadows = false;
-
-	for (__int32 i = 0; i < NumItems; i++)
-		m_itemsLightInfo[i].Active = false;
-
-	// Take the brightest/nearest light only for drawn items
-	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
-	{
-		// NB: first item is always Lara
-		//__int32 itemIndex = m_itemsToDraw[i];
-		RendererItemToDraw* itemToDraw = m_itemsToDraw[i];
-		ITEM_INFO* item = itemToDraw->Item;
-		RendererRoom* room = m_rooms[item->roomNumber];
-
-		// Search for the brightest light. We do a simple version of the classic calculation done in pixel shader.
-		if (room->Lights.size() != 0)
-		{
-			m_itemsLightInfo[itemIndex].Active = false;
-
-			RendererLight* brightestLight = NULL;
-			float brightest = 0.0f;
-
-			for (__int32 j = 0; j < room->Lights.size(); j++)
-			{
-				RendererLight* light = room->Lights[j];
-
-				D3DXVECTOR4 itemPos = D3DXVECTOR4(item->pos.xPos, item->pos.yPos, item->pos.zPos, 1.0f);
-				D3DXVECTOR4 lightVector = itemPos - light->Position;
-
-				float distance = D3DXVec4Length(&lightVector);
-				D3DXVec4Normalize(&lightVector, &lightVector);
-
-				float intensity;
-				float attenuation;
-				float angle;
-				float d;
-				float attenuationRange;
-				float attenuationAngle;
-
-				switch (light->Type)
-				{
-				case LIGHT_TYPES::LIGHT_TYPE_POINT:
-					if (distance > light->Out)
-						continue;
-
-					attenuation = 1.0f - distance / light->Out;
-					intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-					if (intensity >= brightest)
-					{
-						brightest = intensity;
-						brightestLight = light;
-					}
-
-					break;
-
-				case  LIGHT_TYPES::LIGHT_TYPE_SPOT:
-					if (distance > light->Range)
-						continue;
-
-					attenuation = 1.0f - distance / light->Range;
-					intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-					if (intensity >= brightest)
-					{
-						brightest = intensity;
-						brightestLight = light;
-					}
-
-					break;
-					/*case LIGHTTYPE_SPOT:
-						if (distance > light->Range)
-							continue;
-
-						d = D3DXVec3Dot(&lightDir, &lightVector);
-						angle = acosf(d);
-
-						if (angle > light->RadOut)
-							continue;
-
-						attenuationRange = 1.0f - distance / light->Range;
-						attenuationAngle = 1.0f - angle / light->RadOut;
-						intensity = max(0.0f, attenuationRange * attenuationAngle * (light->r + light->g + light->b) / 3.0f);
-
-						if (intensity >= brightest)
-						{
-							brightest = intensity;
-							brightestLight = light;
-						}
-
-						break;
-				}
-
-				light++;
-			}
-
-			// Try also dynamic lights
-			for (__int32 j = 0; j < m_dynamicLights.size(); j++)
-			{
-				RendererLight* dynamicLight = m_dynamicLights[j];
-
-				D3DXVECTOR4 itemPos = D3DXVECTOR4(item->pos.xPos, item->pos.yPos, item->pos.zPos, 1.0f);
-				D3DXVECTOR4 lightVector = itemPos - dynamicLight->Position;
-
-				float distance = D3DXVec4Length(&lightVector);
-				D3DXVec4Normalize(&lightVector, &lightVector);
-
-				float intensity;
-				float attenuation;
-				float angle;
-				float d;
-				float attenuationRange;
-				float attenuationAngle;
-
-				switch (dynamicLight->Type)
-				{
-				case LIGHT_TYPES::LIGHT_TYPE_POINT:
-					if (distance > dynamicLight->Out)
-						continue;
-
-					attenuation = 1.0f - distance / dynamicLight->Out;
-					intensity = max(0.0f, attenuation * (dynamicLight->Color.x + dynamicLight->Color.y + dynamicLight->Color.z) / 3.0f);
-
-					if (intensity >= brightest)
-					{
-						brightest = intensity;
-						brightestLight = dynamicLight;
-					}
-
-					break;
-
-				case  LIGHT_TYPES::LIGHT_TYPE_SPOT:
-					if (distance > dynamicLight->Range)
-						continue;
-
-					attenuation = 1.0f - distance / dynamicLight->Range;
-					intensity = max(0.0f, attenuation * (dynamicLight->Color.x + dynamicLight->Color.y + dynamicLight->Color.z) / 3.0f);
-
-					if (intensity >= brightest)
-					{
-						brightest = intensity;
-						brightestLight = dynamicLight;
-					}
-
-					break;
-				}
-			}
-
-			// If the brightest light is found, then fill the data structure
-			if (brightestLight != NULL)
-			{
-				m_itemsLightInfo[itemIndex].Active = true;
-				m_itemsLightInfo[itemIndex].AmbientLight = room->AmbientLight;
-				m_itemsLightInfo[itemIndex].Light = brightestLight;
-
-				// Add the light to shadow maps caster, if possible
-				if (m_shadowLight == NULL)
-				{
-					m_shadowLight = brightestLight;
-				}
-
-				if (m_shadowLight == brightestLight)
-				{
-					m_litItems.push_back(i);
-					break;
-				}
-			}
-		}*
-	}*/
-}
- 
-void Renderer::PrepareShadowMaps()
+void Renderer::prepareShadowMap()
 {
 	UINT cPasses = 1;
 	D3DXMATRIX world;
@@ -2085,95 +1878,59 @@ void Renderer::PrepareShadowMaps()
 		return;
 
 	D3DXVECTOR3 lightPos = D3DXVECTOR3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
-	 
+
 	m_depthShader->GetEffect()->Begin(&cPasses, 0);
 	m_depthShader->SetTexture(m_textureAtlas);
 
 	D3DXMatrixPerspectiveFovRH(&m_lightProjection, 90.0f * RADIAN, 1.0f, 1.0f, m_shadowLight->Out * 1.5f);
 	m_depthShader->SetProjection(&m_lightProjection);
 
-	/*for (__int32 f = 0; f < 6; f++)
-	{ 
-		D3DXVECTOR3 direction = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		switch (f)
-		{
-		case D3DCUBEMAP_FACES::D3DCUBEMAP_FACE_POSITIVE_X:
-			direction = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
-			break;
-		case D3DCUBEMAP_FACES::D3DCUBEMAP_FACE_NEGATIVE_X:
-			direction = D3DXVECTOR3(-1.0f, 0.0f, 0.0f);
-			break;
-		case D3DCUBEMAP_FACES::D3DCUBEMAP_FACE_POSITIVE_Y:
-			direction = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-			break;
-		case D3DCUBEMAP_FACES::D3DCUBEMAP_FACE_NEGATIVE_Y:
-			direction = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-			break;
-		case D3DCUBEMAP_FACES::D3DCUBEMAP_FACE_POSITIVE_Z:
-			direction = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-			break;
-		case D3DCUBEMAP_FACES::D3DCUBEMAP_FACE_NEGATIVE_Z:
-			direction = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-			break;
-		}
-
-		D3DXMatrixLookAtRH(&m_lightView,
-			&lightPos, 
-			&direction,
-			&D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos),
-			&D3DXVECTOR3(0.0f, -1.0f, 0.0f));
-		*/
-
 	D3DXMatrixLookAtRH(&m_lightView,
 		&lightPos,
 		&D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos),
 		&D3DXVECTOR3(0.0f, -1.0f, 0.0f));
 
-		m_depthShader->SetView(&m_lightView);
-		
-		// Bind the shadow map
-		//m_shadowMapCube->Bind((D3DCUBEMAP_FACES)f);
-		m_shadowMap->Bind();
+	m_depthShader->SetView(&m_lightView);
 
-		// Begin the scene 
-		m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
-		m_device->BeginScene();
+	// Bind the shadow map
+	m_shadowMap->Bind();
 
-		//Draw Lara
+	// Begin the scene 
+	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
+	m_device->BeginScene();
+
+	//Draw Lara
+	for (__int32 k = 0; k < 4; k++)
+	{
+		drawLara((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+	}
+
+	// Draw visible items
+	for (__int32 j = 0; j < m_itemsToDraw.size(); j++)
+	{
+		RendererItemToDraw* itemToDraw = m_itemsToDraw[j];
+		ITEM_INFO* item = itemToDraw->Item;
+
+		D3DXVECTOR3 itemPos = D3DXVECTOR3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		D3DXVECTOR3 lightVector = (itemPos - lightPos);
+		float distance = D3DXVec3Length(&lightVector);
+
+		if (distance > m_shadowLight->Out*1.5f)
+			continue;
+
 		for (__int32 k = 0; k < 4; k++)
 		{
-			DrawLaraLPP((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+			drawItem(m_itemsToDraw[j], (RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
 		}
-		   
-		// Draw visible items
-		for (__int32 j = 0; j < m_itemsToDraw.size(); j++)
-		{
-			RendererItemToDraw* itemToDraw = m_itemsToDraw[j];
-			ITEM_INFO* item = itemToDraw->Item;
+	}
 
-			D3DXVECTOR3 itemPos = D3DXVECTOR3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			D3DXVECTOR3 lightVector = (itemPos - lightPos);
-			float distance = D3DXVec3Length(&lightVector);
+	m_device->EndScene();
+	m_shadowMap->Unbind();
 
-			if (distance > m_shadowLight->Out*1.5f)
-				continue;
-
-			for (__int32 k = 0; k < 4; k++)
-			{
-				DrawItemLPP(m_itemsToDraw[j], (RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
-			}
-		}
-
-		m_device->EndScene();
-		m_shadowMap->Unbind();
-
-		//m_shadowMapCube->Unbind();
-	//}
- 
 	m_depthShader->GetEffect()->End();
 }
 
-bool Renderer::DrawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexIndex, UINT minVertexIndex, UINT numVertices, UINT baseIndex, UINT primitiveCount)
+bool Renderer::drawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexIndex, UINT minVertexIndex, UINT numVertices, UINT baseIndex, UINT primitiveCount)
 {
 	m_numVertices += numVertices;
 	m_numTriangles += primitiveCount;
@@ -2183,156 +1940,7 @@ bool Renderer::DrawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexInd
 	return (res == S_OK);
 }
 
-bool Renderer::DrawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
-{
-	/*D3DXMATRIX world;
-	UINT cPasses = 1;
-
-	// If nothing to render then exit
-	RendererRoom* room = m_rooms[roomIndex];
-	RendererObject* obj = room->RoomObject;
-	if (obj == NULL)
-		return true;
-	if (obj->ObjectMeshes.size() == 0)
-		return true;
-
-	RendererMesh* mesh = obj->ObjectMeshes[0];
-	ROOM_INFO* r = room->Room;
-	RendererBucket* bucket;
-
-	// Draw room geometry first
-	bucket = mesh->GetBucket(bucketIndex);
-	if (bucket->NumVertices == 0)
-		return true;
-	 
-	// Bind buffers
-	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-	m_device->SetIndices(bucket->GetIndexBuffer());
-
-	// Set shader parameters
-	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-	{
-		effect = m_depthShader->GetEffect();
-	}
-	else
-	{
-		effect = m_mainShader->GetEffect();
-
-		if (m_shadowLight != NULL && LaraItem->roomNumber == roomIndex)
-		{
-			m_mainShader->SetEnableShadows(true);
-			m_mainShader->SetShadowMap(m_shadowMap->GetTexture());
-			m_mainShader->SetLightView(&m_lightView);
-			m_mainShader->SetLightProjection(&m_lightProjection);
-
-			RendererLightInfo* light = &m_itemsLightInfo[m_itemsToDraw[0]];
-			m_mainShader->SetLightActive(light->Active);
-			if (light->Active)
-			{
-				m_mainShader->SetLightPosition(&light->Light->Position);
-				m_mainShader->SetLightDirection(&light->Light->Direction);
-				m_mainShader->SetLightColor(&light->Light->Color);
-				m_mainShader->SetLightIn(light->Light->In);
-				m_mainShader->SetLightOut(light->Light->Out);
-				m_mainShader->SetLightRange(light->Light->Range);
-				m_mainShader->SetLightType(light->Light->Type);
-			}
-		}
-		else
-		{
-			m_mainShader->SetEnableShadows(false);
-			m_mainShader->SetShadowMap(NULL);
-			m_mainShader->SetLightActive(false);
-		}
-
-		m_mainShader->SetAmbientLight(&room->AmbientLight);
-		m_mainShader->SetModelType(MODEL_TYPES::MODEL_TYPE_ROOM);
-	}
-	       
-	for (int iPass = 0; iPass < cPasses; iPass++)
-	{
-		effect->BeginPass(iPass);
-		D3DXMatrixTranslation(&world, r->x, r->y, r->z);
-		
-		if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-			m_depthShader->SetWorld(&world);
-		else
-			m_mainShader->SetWorld(&world);
-
-		effect->CommitChanges();
-
-		DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-		effect->EndPass();
-	}*/
-
-	return true;
-}
-
-bool Renderer::DrawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
-{
-	D3DXMATRIX world;
-	D3DXMATRIX rotation;
-	UINT cPasses = 1;
-
-	ROOM_INFO* room = &Rooms[roomIndex];
-	MESH_INFO* sobj = &room->mesh[staticIndex];
-	RendererObject* obj = m_staticObjects[sobj->staticNumber];
-	RendererMesh* mesh = obj->ObjectMeshes[0];
-	RendererBucket* bucket = mesh->GetBucket(bucketIndex);
-	if (bucket->NumVertices == 0)
-		return true;
-
-	// Bind buffers
-	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-	m_device->SetIndices(bucket->GetIndexBuffer());
-
-	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-	{
-		effect = m_depthShader->GetEffect();
-		if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST ||
-			bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS)
-		{
-			m_depthShader->SetBlendMode(BLENDMODE_ALPHATEST);
-		}
-		else
-		{
-			m_depthShader->SetBlendMode(BLENDMODE_OPAQUE);
-		}
-	}
-	else
-	{
-		effect = m_mainShader->GetEffect();
-		m_mainShader->SetModelType(MODEL_TYPES::MODEL_TYPE_STATIC);
-	}
-	
-	for (int iPass = 0; iPass < cPasses; iPass++)
-	{
-		effect->BeginPass(iPass);
-
-		D3DXMatrixTranslation(&world, sobj->x, sobj->y, sobj->z);
-		D3DXMatrixRotationY(&rotation, TR_ANGLE_TO_RAD(sobj->yRot));
-		D3DXMatrixMultiply(&world, &rotation, &world);
-
-		if (pass == RENDERER_PASSES::RENDERER_PASS_DEPTH)
-			m_depthShader->SetWorld(&world);
-		else
-			m_mainShader->SetWorld(&world);
-
-		effect->CommitChanges();
-
-		DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0,
-			bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-		effect->EndPass();
-	}
-
-	return true;
-}
-
-void Renderer::UpdateLaraAnimations()
+void Renderer::updateLaraAnimations()
 {
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
@@ -2363,7 +1971,7 @@ void Renderer::UpdateLaraAnimations()
 	__int16	*framePtr[2];
 	__int32 rate;
 	__int32 frac = GetFrame_D2(LaraItem, framePtr, &rate);
-	BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+	buildAnimationPose(laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
 	if ((Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) && Lara.gunType != WEAPON_FLARE)
@@ -2372,7 +1980,7 @@ void Renderer::UpdateLaraAnimations()
 		mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L) | (1 << UARM_R) |
 			   (1 << LARM_R) | (1 << HAND_R);
 		frac = GetFrame_D2(LaraItem, framePtr, &rate);
-		BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+		buildAnimationPose(laraObj, framePtr, frac, rate, mask);
 	}
 	else
 	{
@@ -2390,37 +1998,37 @@ void Renderer::UpdateLaraAnimations()
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
 				__int16* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
-				BuildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
+				buildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
 				
 				// Right arm
 				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 				shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
-				BuildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
+				buildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
 			}
 			else
 			{
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
-				frac = GetFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-				BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+				frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
+				buildAnimationPose(laraObj, framePtr, frac, rate, mask);
 				
 				// Right arm
 				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
-				frac = GetFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
-				BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+				frac = getFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
+				buildAnimationPose(laraObj, framePtr, frac, rate, mask);
 			}			
 		}
 		else
 		{
 			// Left arm
 			mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
-			frac = GetFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-			BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
+			buildAnimationPose(laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
 			mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 			frac = GetFrame_D2(LaraItem, framePtr, &rate);
-			BuildAnimationPose(laraObj, framePtr, frac, rate, mask);
+			buildAnimationPose(laraObj, framePtr, frac, rate, mask);
 		}
 	}
 
@@ -2556,7 +2164,7 @@ void Renderer::UpdateLaraAnimations()
 	}
 }
 
-void Renderer::UpdateItemsAnimations()
+void Renderer::updateItemsAnimations()
 {
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
@@ -2579,7 +2187,7 @@ void Renderer::UpdateItemsAnimations()
 			__int16	*framePtr[2];
 			__int32 rate;
 			__int32 frac = GetFrame_D2(item, framePtr, &rate);
-			BuildAnimationPose(moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+			buildAnimationPose(moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 		}
 
 		// Update world matrix
@@ -2592,40 +2200,15 @@ void Renderer::UpdateItemsAnimations()
 
 __int32 Renderer::DumpGameScene()
 {
-	return DrawSceneLightPrePass(true);
-}
-
-__int32	Renderer::BeginRenderToTexture()
-{
-	/*m_backBufferTarget = NULL;
-	m_device->GetRenderTarget(0, &m_backBufferTarget);
-
-	LPDIRECT3DSURFACE9 surface;
-	m_renderTarget->GetSurfaceLevel(0, &surface);
-	m_device->SetRenderTarget(0, surface);
-	surface->Release();
-	
-	m_backBufferDepth = NULL;
-	m_device->GetDepthStencilSurface(&m_backBufferDepth);
-	m_device->SetDepthStencilSurface(m_renderTargetDepth);
-*/
-	return 1;
-}
-
-__int32 Renderer::EndRenderToTexture()
-{
-	/*m_device->SetRenderTarget(0, m_backBufferTarget);
-	m_device->SetDepthStencilSurface(m_backBufferDepth);*/
-
-	return 1;
+	return drawScene(true);
 }
 
 __int32 Renderer::Draw()
 {
-	return DrawSceneLightPrePass(false);
+	return drawScene(false);
 }
 
-void Renderer::InsertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
+void Renderer::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
 {
 	m_lines[m_numLines].Vertices[0] = D3DXVECTOR2(x1, y1);
 	m_lines[m_numLines].Vertices[1] = D3DXVECTOR2(x2, y2);
@@ -2633,7 +2216,7 @@ void Renderer::InsertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte
 	m_numLines++;
 }
 
-void Renderer::DrawAllLines2D()
+void Renderer::drawAllLines2D()
 {
 	m_line->SetWidth(1);
 	m_line->SetPattern(0xffffffff);
@@ -2647,7 +2230,7 @@ void Renderer::DrawAllLines2D()
 	m_line->End();
 }
 
-void Renderer::DrawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2)
+void Renderer::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2)
 {
 	byte r1 = (color1 >> 16) & 0xFF;
 	byte g1 = (color1 >> 8) & 0xFF;
@@ -2667,18 +2250,18 @@ void Renderer::DrawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 perce
 	__int32 realPercent = percent / 100.0f * realW;
 
 	for (__int32 i = 0; i < realH; i++)
-		InsertLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0);
+		insertLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0);
 
 	for (__int32 i = 0; i < realH; i++)
-		InsertLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1);
+		insertLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1);
 
-	InsertLine2D(realX, realY, realX + realW, realY, 255, 255, 255);
-	InsertLine2D(realX, realY + realH, realX + realW, realY + realH, 255, 255, 255);
-	InsertLine2D(realX, realY, realX, realY + realH, 255, 255, 255);
-	InsertLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255);
+	insertLine2D(realX, realY, realX + realW, realY, 255, 255, 255);
+	insertLine2D(realX, realY + realH, realX + realW, realY + realH, 255, 255, 255);
+	insertLine2D(realX, realY, realX, realY + realH, 255, 255, 255);
+	insertLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255);
 }
 
-void Renderer::DrawGameInfo()
+void Renderer::drawGameInfo()
 {
 	__int32 flashState = FlashIt();
 
@@ -2690,147 +2273,141 @@ void Renderer::DrawGameInfo()
 void Renderer::DrawDashBar()
 {
 	if (DashTimer < 120)
-		DrawBar(460, 32, 150, 12, 100 * (unsigned __int16)DashTimer / 120, 0xA0A000, 0xA000);
+		drawBar(460, 32, 150, 12, 100 * (unsigned __int16)DashTimer / 120, 0xA0A000, 0xA000);
 }
 
 void Renderer::DrawAirBar(__int32 percentual)
 {
-	//if (CurrentLevel)
-	//{
-	DrawBar(450, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
-	//}
+	drawBar(450, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
 }
 
 void Renderer::DrawHealthBar(__int32 percentual)
 {
-	//if (CurrentLevel)
-	//{
-		__int32 color2 = 0xA00000;
-		if (Lara.poisoned || Lara.gassed)
-			color2 = 0xA0A000;
-		DrawBar(10, 10, 150, 12, percentual, 0xA00000, color2);
-	//}
+	__int32 color2 = 0xA00000;
+	if (Lara.poisoned || Lara.gassed)
+		color2 = 0xA0A000;
+	drawBar(10, 10, 150, 12, percentual, 0xA00000, color2);
 }
 
-void Renderer::DrawDebugInfo()
+void Renderer::drawDebugInfo()
 {
-	SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-	SetDepthWrite(true);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	setDepthWrite(true);
 
 	if (UseSpotCam)
 	{
 		sprintf_s(&m_message[0], 255, "Spotcam.camera = %d    Spotcam.flags = %d     Current: %d", SpotCam[CurrentSplineCamera].camera, SpotCam[CurrentSplineCamera].flags, CurrentSplineCamera);
-		PrintDebugMessage(10, 70, 255, 255, 255, 255, m_message);
+		printDebugMessage(10, 70, 255, 255, 255, 255, m_message);
 	}
 
 	__int32 y = 100;
 
 	sprintf_s(&m_message[0], 255, "TR5Main Alpha");
-	PrintDebugMessage(10, 80+y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 80+y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "LaraItem.currentAnimState = %d", LaraItem->currentAnimState);
-	PrintDebugMessage(10, 90 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 90 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "LaraItem.animNumber = %d", LaraItem->animNumber);
-	PrintDebugMessage(10, 100 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 100 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "LaraItem.frameNumber = %d", LaraItem->frameNumber);
-	PrintDebugMessage(10, 110 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 110 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "LaraItem.roomNumber = %d", LaraItem->roomNumber);
-	PrintDebugMessage(10, 120 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 120 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "LaraItem.pos = < %d %d %d >", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	PrintDebugMessage(10, 130 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 130 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "NumVertices = %d", m_numVertices);
-	PrintDebugMessage(10, 140 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 140 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "NumTriangles = %d", m_numTriangles);
-	PrintDebugMessage(10, 150 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 150 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Camera.pos = < %d %d %d >", Camera.pos.x, Camera.pos.y, Camera.pos.z);
-	PrintDebugMessage(10, 160 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 160 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Camera.target = < %d %d %d >", Camera.target.x, Camera.target.y, Camera.target.z);
-	PrintDebugMessage(10, 170 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 170 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "CurrentLevel: %d", CurrentLevel);
-	PrintDebugMessage(10, 180 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 180 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.backGun: %d", Lara.backGun);
-	PrintDebugMessage(10, 190 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 190 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.leftArm.animNumber: %d", Lara.leftArm.animNumber);
-	PrintDebugMessage(10, 200 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 200 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.leftArm.frameNumber: %d", Lara.leftArm.frameNumber);
-	PrintDebugMessage(10, 210 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 210 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.rightArm.animNumber: %d", Lara.rightArm.animNumber);
-	PrintDebugMessage(10, 220 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 220 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.rightArm.frameNumber: %d", Lara.rightArm.frameNumber);
-	PrintDebugMessage(10, 230 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 230 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.weaponItem: %d", Lara.weaponItem);
-	PrintDebugMessage(10, 240 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 240 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.gunType: %d", Lara.gunType);
-	PrintDebugMessage(10, 250 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 250 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.gunStatus: %d", Lara.gunStatus);
-	PrintDebugMessage(10, 260 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 260 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.crowbar: %d", Lara.crowbar);
-	PrintDebugMessage(10, 270 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 270 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.leftArm.rot: %d %d %d", Lara.leftArm.xRot, Lara.leftArm.yRot, Lara.leftArm.zRot);
-	PrintDebugMessage(10, 280 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 280 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.rightArm.rot: %d %d %d", Lara.rightArm.xRot, Lara.rightArm.yRot, Lara.rightArm.zRot);
-	PrintDebugMessage(10, 290 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 290 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.torsoRot: < %d %d %d >", Lara.torsoXrot, Lara.torsoYrot, Lara.torsoZrot);
-	PrintDebugMessage(10, 300 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 300 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.headRot: < %d %d %d >", Lara.headXrot, Lara.headYrot, Lara.headZrot);
-	PrintDebugMessage(10, 310 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 310 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.leftArm.lock: %d", Lara.leftArm.lock);
-	PrintDebugMessage(10, 320 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 320 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Lara.rightArm.lock: %d", Lara.rightArm.lock);
-	PrintDebugMessage(10, 330 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 330 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Autotarget: %d", OptionAutoTarget);
-	PrintDebugMessage(10, 340 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 340 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "NumberDrawnRooms: %d", m_roomsToDraw.size());
-	PrintDebugMessage(10, 350 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 350 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Camera.pos.roomNumber = %d", Camera.pos.roomNumber);
-	PrintDebugMessage(10, 360 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 360 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "NumberDrawnItems = %d", m_itemsToDraw.size());
-	PrintDebugMessage(10, 370 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 370 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "Update = %d, ShadowMap = %d, Clear = %d, Fill = %d, Light = %d, Final = %d, Z-Buffer = %d", 
 			  m_timeUpdate, m_timePrepareShadowMap, m_timeClearGBuffer, m_timeFillGBuffer, m_timeLight, m_timeCombine, m_timeReconstructZBuffer);
-	PrintDebugMessage(10, 380 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 380 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "DrawCalls = %d", m_numDrawCalls);
-	PrintDebugMessage(10, 390 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 390 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "NumLights = %d", m_lights.size());
-	PrintDebugMessage(10, 400 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 400 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "DrawSceneTime = %d", m_timeDrawScene);
-	PrintDebugMessage(10, 410 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 410 + y, 255, 255, 255, 255, m_message);
 
 	sprintf_s(&m_message[0], 255, "SkyPos = %d", SkyPos1);
-	PrintDebugMessage(10, 420 + y, 255, 255, 255, 255, m_message);
+	printDebugMessage(10, 420 + y, 255, 255, 255, 255, m_message);
 
 	m_sprite->Begin(0);
 
@@ -2850,10 +2427,10 @@ void Renderer::DrawDebugInfo()
 
 }
 
-__int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool resetBlink)
+__int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool reset)
 {
-	if (resetBlink)
-		ResetBlink();
+	if (reset)
+		resetBlink();
 
 	RECT rect;
 	rect.left = 0;
@@ -2932,10 +2509,10 @@ __int32 Renderer::DrawSettingsMenu(__int32 selectedIndex, bool resetBlink)
 
 __int32 Renderer::DrawInventory()
 {
-	return DrawInventoryScene();
+	return drawInventoryScene();
 }
 
-__int32	Renderer::DrawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ)
+__int32	Renderer::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ)
 {
 	/*D3DXMATRIX translation;
 	D3DXMATRIX rotation;
@@ -3012,7 +2589,7 @@ __int32	Renderer::DrawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum
 
 __int32 Renderer::DrawPickup(__int16 objectNum)
 {
-	DrawObjectOn2DPosition(600 + PickupX, 450, objectNum, 0, m_pickupRotation, 0);
+	drawObjectOn2DPosition(600 + PickupX, 450, objectNum, 0, m_pickupRotation, 0);
 	m_pickupRotation += 45 * 360 / 30;
 	return 0;
 }
@@ -3063,7 +2640,7 @@ __int32	Renderer::DrawLoadGameMenu(__int32 selectedIndex, bool resetBlink)
 	for (__int32 i = 0; i < MAX_SAVEGAMES; i++)
 	{
 		if (!g_SavegameInfos[i].present)
-			PrintString(400, lastY, (char*)"Not saved", D3DCOLOR_ARGB(255, 255, 255, 255), 
+			PrintString(400, lastY, (char*)"Not saved", D3DCOLOR_ARGB(255, 255, 255, 255),
 						PRINTSTRING_CENTER | (selectedIndex == i ? PRINTSTRING_BLINK : 0));
 		else
 		{
@@ -3090,7 +2667,7 @@ __int32	Renderer::DrawSaveGameMenu(__int32 selectedIndex, bool resetBlink)
 	return 0;
 }
 
-__int32 Renderer::DrawInventoryScene()
+__int32 Renderer::drawInventoryScene()
 {
 	char stringBuffer[255];
 
@@ -3224,13 +2801,13 @@ __int32 Renderer::DrawInventoryScene()
 			{
 				__int16* framePtr[2];
 				__int32 rate = 0;
-				GetFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
-				BuildAnimationPose(moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
+				getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
+				buildAnimationPose(moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
 			}
 			else
 			{
 				if (obj->animIndex != -1)
-					BuildAnimationPose(moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
+					buildAnimationPose(moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
 			}
 
 			for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
@@ -3258,8 +2835,7 @@ __int32 Renderer::DrawInventoryScene()
 						effect->BeginPass(iPass);
 						effect->CommitChanges();
 
-						DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0,
-							bucket->NumVertices, 0, bucket->NumIndices / 3);
+						drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 						effect->EndPass();
 					}
@@ -3425,7 +3001,7 @@ __int32 Renderer::DrawInventoryScene()
 	return 0;
 }
 
-__int32 Renderer::GetFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate)
+__int32 Renderer::getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate)
 {
 	ITEM_INFO item;
 	item.animNumber = animation;
@@ -3434,272 +3010,14 @@ __int32 Renderer::GetFrame(__int16 animation, __int16 frame, __int16** framePtr,
 	return GetFrame_D2(&item, framePtr, rate);
 }
 
-void Renderer::UpdateGunFlashes()
+void Renderer::collectSceneItems()
 {
-	/*RendererObject* laraObj = m_moveableObjects[ID_LARA];
-
-	__int32 numArms = 0;
-	D3DXVECTOR4 flashPosition = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 1.0f);
-
-	if (Lara.leftArm.flash_gun)
-	{
-		numArms++;
-
-		// Get Lara left joint absolute position
-		D3DXVECTOR4 handPos;
-		D3DXMATRIX world;
-		D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_L], &m_LaraWorldMatrix);
-		D3DXVec3Transform(&handPos, &laraObj->LinearizedBones[HAND_L]->GlobalTranslation, &world);
-
-		flashPosition += handPos;
-	}
-
-	if (Lara.rightArm.flash_gun)
-	{
-		numArms++;
-
-		// Get Lara right joint absolute position
-		D3DXVECTOR4 handPos;
-		D3DXMATRIX world;
-		D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_R], &m_LaraWorldMatrix);
-		D3DXVec3Transform(&handPos, &laraObj->LinearizedBones[HAND_R]->GlobalTranslation, &world);
-
-		flashPosition += handPos;
-	}
-
-	if (numArms != 0)
-	{
-		RendererLight* flashLight = new RendererLight();
-
-		flashLight->Position = flashPosition / numArms;
-		flashLight->Color = D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f);
-		flashLight->Out = 3072.0f;
-		flashLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-		flashLight->Dynamic = true;
-		flashLight->Intensity = 2.0f;
-
-		m_dynamicLights.push_back(flashLight);
-	}*/
+	collectRooms();
+	collectItems();
+	collectLights();
 }
 
-void Renderer::UpdateFlares()
-{
-	// Flare in Lara's hand
-	/*if (Lara.flareAge > 0)
-	{
-		RendererObject* laraObj = m_moveableObjects[ID_LARA];
-
-		D3DXVECTOR4 handPos;
-		D3DXMATRIX world;
-		D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_L], &m_LaraWorldMatrix);
-		D3DXVec3Transform(&handPos, &laraObj->LinearizedBones[HAND_L]->GlobalTranslation, &world);
-
-		RendererLight* flareLight = new RendererLight();
-
-		flareLight->Position = handPos;
-		flareLight->Color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
-		flareLight->Out = 3072.0f;
-		flareLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-		flareLight->Dynamic = true;
-		flareLight->Intensity = 2.0f;
-
-		m_dynamicLights.push_back(flareLight);
-	}
-
-	// Flares throwed away
-	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
-	{
-		RendererItemToDraw* itemToDraw = m_itemsToDraw[i];
-		ITEM_INFO* item = itemToDraw->Item;
-		if (item->objectNumber != ID_FLARE_ITEM)
-			continue;
-
-		RendererLight* flareLight = new RendererLight();
-
-		flareLight->Position = D3DXVECTOR4(item->pos.xPos, item->pos.yPos - 128.0f, item->pos.zPos, 1.0f);
-		flareLight->Color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
-		flareLight->Out = 3072.0f;
-		flareLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-		flareLight->Dynamic = true;
-		flareLight->Intensity = 2.0f;
-
-		m_dynamicLights.push_back(flareLight);
-	}*/
-}
-
-void Renderer::UpdateFires()
-{
-	/*for (__int32 i = 0; i < 32; i++)
-	{
-		FIRE_LIST* fire = &Fires[i];
-
-		// Is the fire active and visible?
-		if (!fire->on)
-			continue;
-
-		RendererLight* flareLight = new RendererLight();
-
-		flareLight->Position = D3DXVECTOR4(fire->x, fire->y, fire->z, 1.0f);
-		flareLight->Color = D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f);
-		flareLight->Out = 2048.0f;
-		flareLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-		flareLight->Dynamic = true;
-		flareLight->Intensity = 2.0f;
-
-		m_dynamicLights.push_back(flareLight);		
-	}*/
-
-	for (__int32 i = 0; i < 64; i++)
-	{
-		DYNAMIC* dynamic = &Dynamics[i];
-		if (dynamic->on)
-		{
-			RendererLight* flareLight = new RendererLight();
-
-			flareLight->Position = D3DXVECTOR4(dynamic->x, dynamic->y, dynamic->z, 1.0f);
-			flareLight->Color = D3DXVECTOR4(dynamic->r / 255.0f, dynamic->g / 255.0f, dynamic->b / 255.0f, 1.0f);
-			flareLight->Out = dynamic->falloff;
-			flareLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-			flareLight->Dynamic = true;
-			flareLight->Intensity = 1.0f;
-
-			m_dynamicLights.push_back(flareLight);
-		}
-	}
-}
-
-void Renderer::CollectSceneItems()
-{
-	CollectRooms();
-	CollectItems();
-	CollectLightsLPP();
-}
-
-bool Renderer::DrawScene(RENDERER_PASSES pass)
-{
-	/*if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
-	{
-		for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
-		{
-			RendererRoom* room = m_rooms[m_roomsToDraw[i]];
-			if (room == NULL)
-				continue;
-
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-
-			// Draw static objects
-			ROOM_INFO* r = room->Room;
-			if (r->numMeshes != 0)
-			{
-				for (__int32 j = 0; j < r->numMeshes; j++)
-				{
-					MESH_INFO* sobj = &r->mesh[j];
-					RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
-					RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
-
-					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-				}
-			}
-		}
-
-		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-
-		for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
-		{
-			RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
-			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		}
-
-		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-
-		// Draw alpha tested geometry
-		for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
-		{
-			RendererRoom* room = m_rooms[m_roomsToDraw[i]];
-			if (room == NULL)
-				continue;
-
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-
-			// Draw static objects
-			ROOM_INFO* r = room->Room;
-			if (r->numMeshes != 0)
-			{
-				for (__int32 j = 0; j < r->numMeshes; j++)
-				{
-					MESH_INFO* sobj = &r->mesh[j];
-					RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
-					RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
-
-					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-				}
-			}
-		}
-
-		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-
-		for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
-		{
-			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		}
-
-		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	}
-	else
-	{
-		for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
-		{
-			RendererRoom* room = m_rooms[m_roomsToDraw[i]];
-			if (room == NULL)
-				continue;
-
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
-			DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
-
-			// Draw static objects
-			ROOM_INFO* r = room->Room;
-			if (r->numMeshes != 0)
-			{
-				for (__int32 j = 0; j < r->numMeshes; j++)
-				{
-					MESH_INFO* sobj = &r->mesh[j];
-					RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
-					RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
-
-					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-					DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-				}
-			}
-		}
-
-		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-		DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-
-		for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
-		{
-			RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
-			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-			DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-		}
-
-		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-		DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-	}*/
-
-	return true;
-}
-
-bool Renderer::DrawSceneLightPrePass(bool dump)
+bool Renderer::drawScene(bool dump)
 {
 	// HACK:
 	LaraItem->hitPoints = 1000;
@@ -3726,31 +3044,33 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	D3DXMatrixInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
 
 	// Collect scene items and update animations
-	CollectSceneItems();
-	UpdateLaraAnimations();
-	UpdateItemsAnimations();
+	collectSceneItems();
+	updateLaraAnimations();
+	updateItemsAnimations();
+
+	// Update animated textures every 2 frames
 	if (GnFrameCounter % 2 == 0)
-		UpdateAnimatedTextures();
+		updateAnimatedTextures();
 
 	auto time2 = chrono::high_resolution_clock::now();
 	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
 
 	// Prepare the shadow map for the main light
-	PrepareShadowMaps();
+	prepareShadowMap();
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timePrepareShadowMap = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
 
 	// Set basic GPU state
-	SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-	SetDepthWrite(true);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	setDepthWrite(true);
 	m_device->SetVertexDeclaration(m_vertexDeclaration);
 
 	// Clear the G-Buffer
-	BindRenderTargets(m_colorBuffer, m_normalBuffer, m_depthBuffer, m_vertexLightBuffer);
+	bindRenderTargets(m_colorBuffer, m_normalBuffer, m_depthBuffer, m_vertexLightBuffer);
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_COLORVALUE(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
 	effect = m_shaderClearGBuffer->GetEffect();
@@ -3786,7 +3106,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	D3DXMATRIX world;
 
 	// Draw opaque geometry
-	DrawSkyLPP();
+	drawHorizonAndSky();
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3794,11 +3114,11 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -3810,24 +3130,24 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 			}
 		}
 	}
 
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
 		RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	}
 
-	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
 	// Draw alpha tested geometry
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
@@ -3836,11 +3156,11 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
 		
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -3852,23 +3172,23 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 			}
 		}
 	}
 
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	}
 
-	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
 	effect->EndPass();
 	effect->End();
@@ -3879,37 +3199,27 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	time1 = time2;
 
 	// Reset the back-buffer
-	RestoreBackBuffer();
+	restoreBackBuffer();
 	   
 	// Bind the light target
-	RestoreBackBuffer();
-	BindRenderTargets(m_shadowBuffer, NULL, NULL, NULL);
+	restoreBackBuffer();
+	bindRenderTargets(m_shadowBuffer, NULL, NULL, NULL);
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_COLORVALUE(1.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 	m_device->BeginScene();
 	m_device->EndScene();
 
-	RestoreBackBuffer();
-	BindRenderTargets(m_lightBuffer, NULL, NULL, NULL);
+	restoreBackBuffer();
+	bindRenderTargets(m_lightBuffer, NULL, NULL, NULL);
 	
 	effect = m_shaderLight->GetEffect();
 
 	// Setup additive blending
-/*	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);*/
-
-	SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
-	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ALPHABLEND);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ALPHABLEND);
 	 
 	// Clear the screen and disable Z write
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-	//m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	SetDepthWrite(false);
+	setDepthWrite(false);
 
 	m_device->BeginScene();
   	effect->Begin(&cPasses, 0); 
@@ -3958,7 +3268,7 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 			effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 			effect->CommitChanges();
 
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_sphereMesh->NumVertices, 0, m_sphereMesh->NumIndices / 3);
+			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_sphereMesh->NumVertices, 0, m_sphereMesh->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -3971,15 +3281,15 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 	m_timeLight = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
 
-	RestoreBackBuffer();
+	restoreBackBuffer();
 	         
 	if (dump)
-		BindRenderTargets(m_renderTarget, NULL, NULL, NULL);
+		bindRenderTargets(m_renderTarget, NULL, NULL, NULL);
 
 	// Combine stage
-	SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-	SetDepthWrite(true);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	setDepthWrite(true);
 
 	effect = m_shaderCombine->GetEffect();
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
@@ -4041,11 +3351,11 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
 		
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4057,19 +3367,19 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 			}
 		}
 	}
 
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 	}
 
 	// Draw alpha tested geometry
@@ -4079,8 +3389,8 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4092,19 +3402,19 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 			}
 		}
 	}
 
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 	}
 
 	m_device->EndScene();
@@ -4128,11 +3438,11 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		if (room == NULL)
 			continue;
 
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
 		
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
-		DrawRoomLPP(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -4144,24 +3454,24 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber];
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0];
 
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-				DrawStaticLPP(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
 			}
 		}
 	}
 
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-	DrawLaraLPP(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
 		RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber];
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-		DrawItemLPP(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		drawItem(m_itemsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
 	}
 
-	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-	DrawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
 
 	effect->End();
 	m_device->EndScene();
@@ -4175,25 +3485,25 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 		delete (*it);
 	m_lines3DToDraw.clear();
 
-	DrawFires();
-	DrawSmokes();
-	DrawBlood();
-	DrawSparks();
-	DrawBubbles();
-	DrawDrips();
-	DrawRipples();
-	DrawUnderwaterDust();
+	drawFires();
+	drawSmokes();
+	drawBlood();
+	drawSparks();
+	drawBubbles();
+	drawDrips();
+	drawRipples();
+	drawUnderwaterDust();
 
 	// Do weather
 	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
-		DoRain();
+		doRain();
 	else if (WeatherType == WEATHER_TYPES::WEATHER_SNOW)
-		DoSnow();
+		doSnow();
 
 	// Draw sprites
-	DrawSprites();
-	DrawGunFlashes();
-	DrawLines3D();
+	drawSprites();
+	drawGunFlashes();
+	drawLines3D();
 	
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -4204,16 +3514,16 @@ bool Renderer::DrawSceneLightPrePass(bool dump)
 
 	if (!dump)
 	{
-		DrawDebugInfo();
+		drawDebugInfo();
 		m_device->Present(NULL, NULL, NULL, NULL);
 	}
 	else
-		RestoreBackBuffer();
+		restoreBackBuffer();
 
 	return true;
 }
 
-bool Renderer::BindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, RenderTarget2D* rt3, RenderTarget2D* rt4)
+bool Renderer::bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, RenderTarget2D* rt3, RenderTarget2D* rt4)
 {
 	HRESULT res;
 
@@ -4286,7 +3596,7 @@ bool Renderer::BindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, Rende
 	return true;
 }
 
-bool Renderer::RestoreBackBuffer()
+bool Renderer::restoreBackBuffer()
 {
 	m_device->SetRenderTarget(0, m_backBufferTarget);
 	m_device->SetRenderTarget(1, NULL);
@@ -4298,7 +3608,7 @@ bool Renderer::RestoreBackBuffer()
 	return true;
 }
 
-bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
 	D3DXMATRIX world;
 	D3DXMATRIX translation;
@@ -4341,7 +3651,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 		if (bucket->NumVertices != 0)
 		{
-			SetGpuStateForBucket(bucketIndex);
+			setGpuStateForBucket(bucketIndex);
 
 			// Bind buffers
 			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
@@ -4352,7 +3662,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->BeginPass(iPass);
 				effect->CommitChanges();
 
-				DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+				drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 				effect->EndPass();
 			}
@@ -4367,7 +3677,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 			if (bucket->NumVertices != 0)
 			{
-				SetGpuStateForBucket(bucketIndex);
+				setGpuStateForBucket(bucketIndex);
 
 				// Bind buffers
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
@@ -4378,7 +3688,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->BeginPass(iPass);
 					effect->CommitChanges();
 
-					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -4401,7 +3711,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		RendererBucket* bucket = leftHolster->GetBucket(bucketIndex);
 		if (bucket->NumVertices != 0)
 		{
-			SetGpuStateForBucket(bucketIndex);
+			setGpuStateForBucket(bucketIndex);
 
 			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 			m_device->SetIndices(bucket->GetIndexBuffer());
@@ -4414,7 +3724,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 				effect->CommitChanges();
 
-				DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+				drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 				effect->EndPass();
 			}
@@ -4432,7 +3742,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 				effect->CommitChanges();
 
-				DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+				drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 				effect->EndPass();
 			}
@@ -4448,7 +3758,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 			RendererBucket* bucket = backGunMesh->GetBucket(bucketIndex);
 			if (bucket->NumVertices != 0)
 			{
-				SetGpuStateForBucket(bucketIndex);
+				setGpuStateForBucket(bucketIndex);
 
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(bucket->GetIndexBuffer());
@@ -4461,7 +3771,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 					effect->CommitChanges();
 
-					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -4472,7 +3782,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	// Draw Lara's hairs
 	if (bucketIndex == 0)
 	{  
-		SetGpuStateForBucket(bucketIndex); 
+		setGpuStateForBucket(bucketIndex); 
 
 		if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
 		{
@@ -4498,7 +3808,7 @@ bool Renderer::DrawLaraLPP(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	return true;
 }
 
-bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 { 
 	D3DXMATRIX world;
 	UINT cPasses = 1;
@@ -4543,7 +3853,7 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 		if (bucket->NumVertices == 0)
 			continue;
 
-		SetGpuStateForBucket(bucketIndex);
+		setGpuStateForBucket(bucketIndex);
 
 		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 		m_device->SetIndices(bucket->GetIndexBuffer());
@@ -4553,7 +3863,7 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -4562,7 +3872,7 @@ bool Renderer::DrawItemLPP(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS buck
 	return true;
 }
          
-bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass, bool animated)
+bool Renderer::drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass, bool animated)
 {
 	D3DXMATRIX world;
 	UINT cPasses = 1;
@@ -4602,7 +3912,7 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 
 	if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
 	{
-		if (IsRoomUnderwater(roomIndex))
+		if (isRoomUnderwater(roomIndex))
 			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM_UNDERWATER);
 		else
 			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
@@ -4612,7 +3922,7 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	{
 		// Non animated buckets are rendered with vertex buffers
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
-		SetGpuStateForBucket(bucketIndex);
+		setGpuStateForBucket(bucketIndex);
 
 		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 		m_device->SetIndices(bucket->GetIndexBuffer());
@@ -4622,7 +3932,7 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -4630,7 +3940,7 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	else
 	{
 		RendererBucket* bucket = mesh->GetAnimatedBucket(bucketIndex);
-		SetGpuStateForBucket(bucketIndex);
+		setGpuStateForBucket(bucketIndex);
 
 		for (int iPass = 0; iPass < cPasses; iPass++)
 		{
@@ -4647,7 +3957,7 @@ bool Renderer::DrawRoomLPP(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, REND
 	return true;
 }
 
-bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+bool Renderer::drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
 	D3DXMATRIX world;
 	D3DXMATRIX rotation;
@@ -4664,7 +3974,7 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 	if (bucket->NumVertices == 0)
 		return true;
 
-	SetGpuStateForBucket(bucketIndex);
+	setGpuStateForBucket(bucketIndex);
 
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
@@ -4690,14 +4000,6 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 	else
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
 
-	/*if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
-	{
-		if (IsRoomUnderwater(roomIndex))
-			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), true);
-		else
-			effect->SetBool(effect->GetParameterByName(NULL, "Underwater"), false);
-	}*/
-
 	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 	m_device->SetIndices(bucket->GetIndexBuffer());
 
@@ -4706,7 +4008,7 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 		effect->BeginPass(iPass);
 		effect->CommitChanges();
 
-		DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+		drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 		effect->EndPass();
 	}
@@ -4714,7 +4016,7 @@ bool Renderer::DrawStaticLPP(__int32 roomIndex, __int32 staticIndex, RENDERER_BU
 	return true;
 }
 
-bool Renderer::DrawGunFlashes(/*RENDERER_PASSES pass*/)
+bool Renderer::drawGunFlashes()
 {
 	D3DXMATRIX world;
 	D3DXMATRIX translation;
@@ -4729,12 +4031,6 @@ bool Renderer::DrawGunFlashes(/*RENDERER_PASSES pass*/)
 
 	RendererLightInfo* light = &m_itemsLightInfo[0];
 	LPD3DXEFFECT effect;
-	/*if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
-		effect = m_depthShader->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
-		effect = m_shaderReconstructZBuffer->GetEffect();
-	else
-		effect = m_shaderFillGBuffer->GetEffect();*/
 	effect = m_shaderBasic->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
@@ -4804,7 +4100,7 @@ bool Renderer::DrawGunFlashes(/*RENDERER_PASSES pass*/)
 						effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 						effect->CommitChanges();
 
-						DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
+						drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
 
 						effect->EndPass();
 					}
@@ -4822,7 +4118,7 @@ bool Renderer::DrawGunFlashes(/*RENDERER_PASSES pass*/)
 						effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 						effect->CommitChanges();
 
-						DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
+						drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
 
 						effect->EndPass();
 					}
@@ -4834,7 +4130,7 @@ bool Renderer::DrawGunFlashes(/*RENDERER_PASSES pass*/)
 	return true;
 }
 
-void Renderer::CollectLightsLPP()
+void Renderer::collectLights()
 { 
 	m_lights.clear();
 
@@ -4927,7 +4223,7 @@ void Renderer::CollectLightsLPP()
 	m_shadowLight = brightestLight;
 }
 
-bool Renderer::DrawSkyLPP()
+bool Renderer::drawHorizonAndSky()
 {
 	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
@@ -4982,7 +4278,7 @@ bool Renderer::DrawSkyLPP()
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_quad->NumVertices, 0, m_quad->NumIndices / 3);
+			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_quad->NumVertices, 0, m_quad->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -5008,14 +4304,14 @@ bool Renderer::DrawSkyLPP()
 		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 		m_device->SetIndices(bucket->GetIndexBuffer());
 
-		SetGpuStateForBucket((RENDERER_BUCKETS)i);
+		setGpuStateForBucket((RENDERER_BUCKETS)i);
 
 		for (int iPass = 0; iPass < cPasses; iPass++)
 		{
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -5052,7 +4348,7 @@ void Renderer::ClearDynamicLights()
 	NumDynamics = 0;
 }
 
-void Renderer::CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos)
+void Renderer::createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos)
 {
 	D3DXVECTOR3 look = *particlePos;
 	look = look - *cameraPos;
@@ -5087,11 +4383,11 @@ void Renderer::CreateBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, 
 	out->_43 = particlePos->z;
 }
 
-bool Renderer::DrawSprites()
+bool Renderer::drawSprites()
 {
-	SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
-	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
-	SetDepthWrite(false);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+	setDepthWrite(false);
 
 	UINT cPasses = 1;
 	LPD3DXEFFECT effect = m_shaderSprites->GetEffect();
@@ -5121,7 +4417,7 @@ bool Renderer::DrawSprites()
 				float halfHeight = spr->Height / 2.0f;
 
 				D3DXMATRIX billboardMatrix;
-				CreateBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(spr->X, spr->Y, spr->Z),
+				createBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(spr->X, spr->Y, spr->Z),
 					&D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z));
 
 				D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
@@ -5293,12 +4589,7 @@ bool Renderer::DrawSprites()
 		effect->BeginPass(0);
 		effect->CommitChanges();
 
-		DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_spritesVertices.size(), 0, m_spritesIndices.size() / 3);
-
-		/*m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, m_spritesVertices.size(),
-											m_spritesIndices.size() / 3, m_spritesIndices.data(),
-											D3DFORMAT::D3DFMT_INDEX32, m_spritesVertices.data(), sizeof(RendererVertex));
-*/
+		drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_spritesVertices.size(), 0, m_spritesIndices.size() / 3);
 
 		effect->EndPass();
 	}	
@@ -5309,7 +4600,7 @@ bool Renderer::DrawSprites()
 	return true;
 }
 
-void Renderer::AddSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height)
+void Renderer::addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height)
 {
 	scale = 1.0f;
 
@@ -5333,7 +4624,7 @@ void Renderer::AddSpriteBillboard(RendererSprite* sprite, float x, float y, floa
 	m_spritesToDraw.push_back(spr);
 }
 
-void Renderer::DrawFires()
+void Renderer::drawFires()
 {
 	for (__int32 k = 0; k < 32; k++)
 	{
@@ -5345,7 +4636,7 @@ void Renderer::DrawFires()
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
 				{
-					AddSpriteBillboard(m_sprites[spark->def],
+					addSpriteBillboard(m_sprites[spark->def],
 								fire->x + spark->x, fire->y + spark->y, fire->z + spark->z, 
 								spark->r, spark->g, spark->b, 
 								TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f);
@@ -5355,14 +4646,14 @@ void Renderer::DrawFires()
 	}
 }
 
-void Renderer::DrawSmokes()
+void Renderer::drawSmokes()
 {
 	for (__int32 i = 0; i < 32; i++)
 	{
 		SMOKE_SPARKS* spark = &SmokeSparks[i];
 		if (spark->On)
 		{
-			AddSpriteBillboard(m_sprites[spark->Def],
+			addSpriteBillboard(m_sprites[spark->Def],
 				spark->x, spark->y, spark->z,
 				spark->Shade, spark->Shade, spark->Shade,
 				TR_ANGLE_TO_RAD(spark->RotAng), spark->Scalar, spark->Size * 4.0f, spark->Size * 4.0f);
@@ -5370,7 +4661,7 @@ void Renderer::DrawSmokes()
 	}
 }
 
-void Renderer::DrawSparks()
+void Renderer::drawSparks()
 {
 	for (__int32 i = 0; i < 1024; i++)
 	{
@@ -5379,7 +4670,7 @@ void Renderer::DrawSparks()
 		{
 			if (spark->flags & SP_DEF)
 			{
-				AddSpriteBillboard(m_sprites[spark->def],
+				addSpriteBillboard(m_sprites[spark->def],
 					spark->x, spark->y, spark->z,
 					spark->r, spark->g, spark->b,
 					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f);
@@ -5388,20 +4679,20 @@ void Renderer::DrawSparks()
 			{
 				D3DXVECTOR3 v = D3DXVECTOR3(spark->xVel, spark->yVel, spark->zVel);
 				D3DXVec3Normalize(&v, &v);
-				AddLine3D(spark->x, spark->y, spark->z, spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f, spark->r, spark->g, spark->b);
+				addLine3D(spark->x, spark->y, spark->z, spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f, spark->r, spark->g, spark->b);
 			}
 		}
 	}
 }
 
-void Renderer::DrawBlood()
+void Renderer::drawBlood()
 {
 	for (__int32 i = 0; i < 32; i++)
 	{
 		BLOOD_STRUCT* blood = &Blood[i];
 		if (blood->On)
 		{
-			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
+			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
 				blood->x, blood->y, blood->z,
 				blood->Shade * 244, blood->Shade * 0, blood->Shade * 0,
 				TR_ANGLE_TO_RAD(blood->RotAng), 1.0f, blood->Size * 8.0f, blood->Size * 8.0f);
@@ -5409,7 +4700,7 @@ void Renderer::DrawBlood()
 	}
 }
 
-bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+bool Renderer::drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
 	D3DXMATRIX world;
 	UINT cPasses = 1;
@@ -5453,7 +4744,7 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				if (bucket->NumVertices == 0)
 					continue;
 
-				SetGpuStateForBucket(bucketIndex);
+				setGpuStateForBucket(bucketIndex);
 
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(bucket->GetIndexBuffer());
@@ -5463,7 +4754,7 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->BeginPass(iPass);
 					effect->CommitChanges();
 
-					DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -5475,7 +4766,7 @@ bool Renderer::DrawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	return true;
 }
 
-bool Renderer::DoRain()
+bool Renderer::doRain()
 {
 	if (m_firstWeather)
 	{
@@ -5523,7 +4814,7 @@ bool Renderer::DoRain()
 		drop->Y += RAIN_DELTA_Y;
 		drop->Z += dz;
 
-		AddLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
+		addLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
 
 		// If rain drop has hit the ground, then reset it and add a little drip
 		__int16 roomNumber = Camera.pos.roomNumber;
@@ -5541,7 +4832,7 @@ bool Renderer::DoRain()
 	return true;
 }
 
-bool Renderer::DoSnow()
+bool Renderer::doSnow()
 {
 	if (m_firstWeather)
 	{
@@ -5587,7 +4878,7 @@ bool Renderer::DoSnow()
 			continue;
 		}
 
-		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
 			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE);
 
 		__int16 roomNumber = Camera.pos.roomNumber;
@@ -5602,7 +4893,7 @@ bool Renderer::DoSnow()
 	return true;
 }
 
-void Renderer::AddLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b)
+void Renderer::addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b)
 {
 	RendererLine3DToDraw* line = new RendererLine3DToDraw();
 
@@ -5619,21 +4910,11 @@ void Renderer::AddLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32
 	m_lines3DToDraw.push_back(line);
 }
 
-bool Renderer::DrawLines3D()
+bool Renderer::drawLines3D()
 {
-	SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
-	SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
-	SetDepthWrite(false);
-
-	/*m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	m_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	m_device->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ZERO);
-	m_device->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO);
-	m_device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD);
-	m_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);*/
+	setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+	setDepthWrite(false);
 
 	UINT cPasses = 1;
 	LPD3DXEFFECT effect = m_shaderRain->GetEffect();
@@ -5712,7 +4993,7 @@ bool Renderer::DrawLines3D()
 	return true;
 }
 
-void Renderer::DrawDrips()
+void Renderer::drawDrips()
 {
 	for (__int32 i = 0; i < 32; i++)
 	{
@@ -5720,12 +5001,12 @@ void Renderer::DrawDrips()
 		
 		if (drip->On)
 		{
-			AddLine3D(drip->x, drip->y, drip->z, drip->x, drip->y + 24.0f, drip->z, drip->R, drip->G, drip->B);
+			addLine3D(drip->x, drip->y, drip->z, drip->x, drip->y + 24.0f, drip->z, drip->R, drip->G, drip->B);
 		}
 	}
 }
 
-void Renderer::SetCullMode(RENDERER_CULLMODE mode)
+void Renderer::setCullMode(RENDERER_CULLMODE mode)
 {
 	if (m_cullMode == mode)
 		return;
@@ -5740,7 +5021,7 @@ void Renderer::SetCullMode(RENDERER_CULLMODE mode)
 		m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
 
-void Renderer::SetBlendState(RENDERER_BLENDSTATE state)
+void Renderer::setBlendState(RENDERER_BLENDSTATE state)
 {
 	if (m_blendState == state)
 		return;
@@ -5777,7 +5058,7 @@ void Renderer::SetBlendState(RENDERER_BLENDSTATE state)
 	}
 }
 
-void Renderer::SetDepthWrite(bool value)
+void Renderer::setDepthWrite(bool value)
 {
 	if (m_enableZwrite == value)
 		return;
@@ -5787,49 +5068,49 @@ void Renderer::SetDepthWrite(bool value)
 	m_device->SetRenderState(D3DRS_ZWRITEENABLE, value);
 }
 
-void Renderer::SetGpuStateForBucket(RENDERER_BUCKETS bucket)
+void Renderer::setGpuStateForBucket(RENDERER_BUCKETS bucket)
 {
 	switch (bucket)
 	{
 	case RENDERER_BUCKETS::RENDERER_BUCKET_SOLID:
-		SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-		SetDepthWrite(true);
+		setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		setDepthWrite(true);
 		break;
 
 	case RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS:
-		SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
-		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-		SetDepthWrite(true);
+		setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		setDepthWrite(true);
 		break;
 
 	case RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST:
-		SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-		SetDepthWrite(true);
+		setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		setDepthWrite(true);
 		break;
 
 	case RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS:
-		SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
-		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-		SetDepthWrite(true);
+		setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+		setDepthWrite(true);
 		break;
 
 	case RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT:
-		SetCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
-		SetDepthWrite(false);
+		setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+		setDepthWrite(false);
 		break;
 
 	case RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS:
-		SetCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
-		SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
-		SetDepthWrite(false);
+		setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
+		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
+		setDepthWrite(false);
 		break;
 	}
 }
 
-void Renderer::DrawBubbles()
+void Renderer::drawBubbles()
 {
 	for (__int32 i = 0; i < 40; i++)
 	{
@@ -5837,7 +5118,7 @@ void Renderer::DrawBubbles()
 
 		if (bubble->size)
 		{
-			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 13],
+			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 13],
 				bubble->pos.x, bubble->pos.y, bubble->pos.z,
 				bubble->shade * 255, bubble->shade * 255, bubble->shade * 255,
 				0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f);
@@ -5845,12 +5126,12 @@ void Renderer::DrawBubbles()
 	}
 }
 
-bool Renderer::IsRoomUnderwater(__int16 roomNumber)
+bool Renderer::isRoomUnderwater(__int16 roomNumber)
 { 
 	return (m_rooms[roomNumber]->Room->flags & 1);
 }
  
-bool Renderer::IsInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
+bool Renderer::isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	ROOM_INFO* r = room->Room;
@@ -5860,7 +5141,7 @@ bool Renderer::IsInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
 			z >= r->z && z <= r->z + r->ySize * 1024.0f);
 }
 
-void Renderer::DrawSplahes()
+void Renderer::drawSplahes()
 {
 	for (__int32 i = 0; i < 4; i++)
 	{
@@ -5870,7 +5151,7 @@ void Renderer::DrawSplahes()
 	}
 }
 
-void Renderer::AddSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height)
+void Renderer::addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height)
 {
 	scale = 1.0f;
 
@@ -5903,7 +5184,7 @@ void Renderer::AddSprite3D(RendererSprite* sprite, float x1, float y1, float z1,
 	m_spritesToDraw.push_back(spr);
 }
 
-void Renderer::DrawRipples()
+void Renderer::drawRipples()
 {
 	for (__int32 i = 0; i < 32; i++)
 	{
@@ -5919,13 +5200,13 @@ void Renderer::DrawRipples()
 
 			byte color = (ripple->init ? ripple->init << 1 : ripple->life << 1);
 
-			AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 9],
+			addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 9],
 				x1, y, z2, x2, y, z2, x2, y, z1, x1, y, z1, color, color, color, 0.0f, 1.0f, ripple->size, ripple->size);
 		}
 	}
 }
 
-void Renderer::DrawUnderwaterDust()
+void Renderer::drawUnderwaterDust()
 {
 	if (m_firstUnderwaterDustParticles)
 	{
@@ -5946,10 +5227,10 @@ void Renderer::DrawUnderwaterDust()
 			// Check if water room
 			__int16 roomNumber = Camera.pos.roomNumber;
 			FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
-			if (!IsRoomUnderwater(roomNumber))
+			if (!isRoomUnderwater(roomNumber))
 				continue;
 
-			if (!IsInRoom(dust->X, dust->Y, dust->Z, roomNumber))
+			if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber))
 			{
 				dust->Reset = true;
 				continue;
@@ -5962,7 +5243,7 @@ void Renderer::DrawUnderwaterDust()
 		dust->Life++;
 		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 		
-		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], dust->X, dust->Y, dust->Z, color, color, color,
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], dust->X, dust->Y, dust->Z, color, color, color,
 			0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE);
 
 		if (dust->Life >= 32)
@@ -5989,7 +5270,7 @@ __int32 Renderer::getAnimatedTextureInfo(__int16 textureId)
 	return -1;
 }
 
-void Renderer::UpdateAnimatedTextures()
+void Renderer::updateAnimatedTextures()
 {
 	for (__int32 i = 0; i < m_rooms.size(); i++)
 	{
