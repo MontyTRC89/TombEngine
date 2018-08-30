@@ -104,7 +104,6 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 	if (!(env_flags & ENV_FLAG_SFX_ALWAYS))
 	{
 		// Don't play effect if effect's environment isn't the same as camera position's environment
-		// @TODO: Later redo with proper EQ damping to be able to subtly hear sounds from underwater!
 		if ((env_flags & ENV_FLAG_WATER) != (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 			return 0;
 	}
@@ -154,7 +153,7 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 		break;
 
 	case SOUND_RESTART:
-		Sound_FreeSlot(Sound_EffectIsPlaying(effectID, position), 100);	// Stop existing and continue
+		Sound_FreeSlot(Sound_EffectIsPlaying(effectID, position), SOUND_XFADETIME_CUTSOUND); // Stop existing and continue
 		break;
 
 	case SOUND_LOOPED:
@@ -241,14 +240,14 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 void __cdecl StopSoundEffect(__int16 effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
-		if (SoundSlot[i].effectID == effectID && SoundSlot[i].channel != 0 && BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING)
-			Sound_FreeSlot(i, 100);
+		if (SoundSlot[i].effectID == effectID && SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING)
+			Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
 }
 
 void __cdecl SOUND_Stop()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
-		if (SoundSlot[i].channel != 0 && BASS_ChannelIsActive(SoundSlot[i].channel))
+		if (SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel))
 			BASS_ChannelStop(SoundSlot[i].channel);
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 }
@@ -269,7 +268,7 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	if (index >= SOUND_LEGACY_TRACKTABLE_SIZE || index < 0)
 		return;
 
-	mode = (mode >= NUM_SOUND_TRACK_TYPES) ? SOUND_TRACK_BACKGROUND : mode;
+	mode = (mode >= NUM_SOUND_TRACK_TYPES) ? SOUND_TRACK_BGM : mode;
 
 	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[mode].channel);
 	if (channelActive && (BASS_Soundtrack[mode].trackID == index))
@@ -278,12 +277,12 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	switch (mode)
 	{
 		case SOUND_TRACK_ONESHOT:
-			crossfadeTime = 200;
+			crossfadeTime = SOUND_XFADETIME_ONESHOT;
 			break;
 
-		case SOUND_TRACK_BACKGROUND:
+		case SOUND_TRACK_BGM:
 			crossfade = true;
-			crossfadeTime = channelActive ? 5000 : 1500;
+			crossfadeTime = channelActive ? SOUND_XFADETIME_BGM : SOUND_XFADETIME_BGM_START;
 			flags |= BASS_SAMPLE_LOOP;
 			break;
 	}
@@ -303,11 +302,16 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	if (Sound_CheckBASSError("Opening soundtrack %s", false, fullTrackName))
 		return;
 
-	BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.6f); // @TODO: Patch volume into original settings!
-	BASS_ChannelPlay(stream, false);
+	float masterVolume = (float)GlobalMusicVolume / 100.0f;
 
-	if (Sound_CheckBASSError("Playing soundtrack %s", false, fullTrackName))
-		return;
+	// Damp BGM track in case one-shot track is about to play.
+
+	if (mode == SOUND_TRACK_ONESHOT)
+	{
+		if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
+			BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, masterVolume * SOUND_BGM_DAMP_COEFFICIENT, SOUND_XFADETIME_BGM_START);
+		BASS_ChannelSetSync(stream, BASS_SYNC_FREE | BASS_SYNC_ONETIME | BASS_SYNC_MIXTIME, 0, Sound_FinishOneshotTrack, NULL);
+	}
 
 	// BGM tracks are crossfaded, and additionally shuffled a bit to make things more natural.
 	// Think everybody are fed up with same start-up sounds of Caves ambience...
@@ -316,12 +320,19 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	{		
 		// Crossfade...
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.0f);
-		BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL, 0.6f, crossfadeTime);// @TODO: Patch volume into original settings!
+		BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL, masterVolume, crossfadeTime);
 
 		// Shuffle...
 		QWORD newPos = BASS_ChannelGetLength(stream, BASS_POS_BYTE) * (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX));
 		BASS_ChannelSetPosition(stream, newPos, BASS_POS_BYTE);
 	}
+	else
+		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, masterVolume);
+
+	BASS_ChannelPlay(stream, false);
+
+	if (Sound_CheckBASSError("Playing soundtrack %s", false, fullTrackName))
+		return;
 
 	BASS_Soundtrack[mode].channel = stream;
 	BASS_Soundtrack[mode].trackID = index;
@@ -362,11 +373,22 @@ void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown)
 void __cdecl S_CDStop()
 {
 	// Do quick fadeouts.
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, 200);
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BACKGROUND].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, 200);
+	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
+	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);
 
 	BASS_Soundtrack[SOUND_TRACK_ONESHOT].trackID = -1;
-	BASS_Soundtrack[SOUND_TRACK_BACKGROUND].trackID = -1;
+	BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel = NULL;
+	BASS_Soundtrack[SOUND_TRACK_BGM].trackID = -1;
+	BASS_Soundtrack[SOUND_TRACK_BGM].channel = NULL;
+}
+
+static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData)
+{
+	if (BASS_ChannelIsActive(BASS_Soundtrack[SOUND_TRACK_BGM].channel))
+		BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_BGM].channel, BASS_ATTRIB_VOL, (float)GlobalMusicVolume / 100.0f, SOUND_XFADETIME_BGM_START);
+	
+	BASS_Soundtrack[SOUND_TRACK_ONESHOT].trackID = -1;
+	BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel = NULL;
 }
 
 void Sound_FreeSample(__int32 index)
@@ -408,7 +430,7 @@ int Sound_GetFreeSlot()
 	}
 
 	printf("Hijacking sound effect slot %d  \n", farSlot);
-	Sound_FreeSlot(farSlot, 50);
+	Sound_FreeSlot(farSlot, SOUND_XFADETIME_HIJACKSOUND);
 	return farSlot;
 }
 
@@ -466,7 +488,7 @@ float Sound_Attenuate(float gain, float distance, float radius)
 {
 	float result = gain * (1.0f - (distance / radius));
 	result = result < 0 ? 0.0f : (result > 1.0f ? 1.0f : result);
-	return result;
+	return result * ((float)GlobalFXVolume / 100.0f);
 }
 
 // Stop and free desired sound slot.
@@ -533,7 +555,7 @@ void Sound_UpdateScene()
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		if ((SoundSlot[i].channel != 0) && (BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING))
+		if ((SoundSlot[i].channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING))
 		{
 			SAMPLE_INFO *sampleInfo = &SampleInfo[SampleLUT[SoundSlot[i].effectID]];
 
@@ -543,7 +565,7 @@ void Sound_UpdateScene()
 			if (SoundSlot[i].state == SOUND_STATE_ENDING)
 			{
 				SoundSlot[i].state = SOUND_STATE_ENDED;
-				Sound_FreeSlot(i, 100);
+				Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
 				continue;
 			}
 			else if (sampleInfo->flags & 3 == SOUND_LOOPED)
@@ -670,7 +692,7 @@ bool Sound_CheckBASSError(char* message, bool verbose, ...)
 void Inject_Sound()
 {
 	INJECT(0x00479060, SOUND_Stop);
-	INJECT(0x004790A0, SOUND_Stop);			// SOUND_Init, seems no difference from SOUND_Stop
+	INJECT(0x004790A0, SOUND_Stop);			// Seems no difference from SOUND_Stop
 	INJECT(0x00478FE0, StopSoundEffect);
 	INJECT(0x00478570, SoundEffect);
 	INJECT(0x004A3510, Sound_LoadSample);	// DXCreateSampleADPCM

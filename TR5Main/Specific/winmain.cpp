@@ -1,4 +1,5 @@
 #include "game.h"
+#include "init.h"
 #include "winmain.h"
 #include <process.h>
 #include <crtdbg.h>
@@ -46,6 +47,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	_CrtSetDbgFlag(-1);
 
 	LoadGameflow();
+	LoadSettings();
 
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = NULL;
