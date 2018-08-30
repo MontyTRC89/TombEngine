@@ -112,6 +112,8 @@
 
 #define IsAtmospherePlaying			VAR_U_(0x00EEEFFC, byte)
 #define CurrentAtmosphere			VAR_U_(0x00EEEB90, byte)
+#define GlobalMusicVolume			VAR_U_(0x00517B68, unsigned int)
+#define GlobalFXVolume				VAR_U_(0x00517B6C, unsigned int)
 
 // Gameflow
 #define gfFilenameOffset			VAR_U_(0x00E5C34C, __int16*)

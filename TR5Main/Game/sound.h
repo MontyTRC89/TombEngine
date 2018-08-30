@@ -586,6 +586,14 @@ typedef enum sound_effects
 
 #define SOUND_SAMPLE_FLAGS			(BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT)
 
+#define SOUND_XFADETIME_BGM			5000
+#define SOUND_XFADETIME_BGM_START	1500
+#define SOUND_XFADETIME_ONESHOT		200
+#define SOUND_XFADETIME_CUTSOUND	100
+#define SOUND_XFADETIME_HIJACKSOUND	50
+
+#define SOUND_BGM_DAMP_COEFFICIENT	0.6f
+
 typedef struct SoundEffectSlot
 {
 	short state;
@@ -604,7 +612,7 @@ typedef struct SoundTrackSlot
 enum sound_track_types
 {
 	SOUND_TRACK_ONESHOT,
-	SOUND_TRACK_BACKGROUND,
+	SOUND_TRACK_BGM,
 
 	NUM_SOUND_TRACK_TYPES
 };
@@ -613,6 +621,7 @@ enum sound_filters
 {
 	SOUND_FILTER_REVERB,
 	SOUND_FILTER_COMPRESSOR,
+	SOUND_FILTER_LOWPASS,
 
 	NUM_SOUND_FILTERS
 };
@@ -653,6 +662,8 @@ void __cdecl SOUND_Stop();
 void __cdecl S_CDPlay(short index, unsigned int mode);
 void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown);
 void __cdecl S_CDStop();
+
+static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
 
 void  Sound_Init();
 void  Sound_DeInit();
