@@ -2367,9 +2367,9 @@ __int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool reset)
 	rect.right = ScreenWidth;
 	rect.bottom = ScreenHeight;
 
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	setDepthWrite(true);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
 
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	m_device->BeginScene();
