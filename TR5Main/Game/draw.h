@@ -12,6 +12,7 @@
 #define WeaponObject ((__int16 (__cdecl*)(__int32)) 0x00453AE0)  
 #define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
 #define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
+#define Sub_0042A050 ((void (__cdecl*)()) 0x0042A050)  
 
 extern Renderer* g_Renderer;
 

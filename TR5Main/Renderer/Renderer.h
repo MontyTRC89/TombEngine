@@ -424,6 +424,12 @@ typedef struct RendererLine3DToDraw {
 	byte B;
 };
 
+typedef struct RendererRoomNode {
+	__int16 From;
+	__int16 To;
+	D3DXVECTOR4 ClipPort;
+};
+
 class Renderer
 {
 	LPDIRECT3D9						m_d3D = NULL;

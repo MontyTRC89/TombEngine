@@ -1618,30 +1618,45 @@ void Renderer::fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
 
 void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count) 
 {
-	if (count > 8) {
-		return;
-	}
-
-	ROOM_INFO* room = &Rooms[to];
-
-	if (!m_rooms[to]->Visited) {
-		m_rooms[to]->Visited = true;
-		m_roomsToDraw.push_back(to);
-	}
-
-	D3DXVECTOR4 clipPort;
-	__int16 numDoors = *(room->door);
-	if (numDoors)
+	stack<RendererRoomNode*> stack;
+	RendererRoomNode* node = new RendererRoomNode();
+	node->To = to;
+	node->From = -1;
+	stack.push(node);
+	
+	while (!stack.empty())
 	{
-		__int16* door = room->door + 1;
-		for (int i = 0; i < numDoors; i++) {
-			__int16 adjoiningRoom = *(door);
+		node = stack.top();
+		stack.pop();
 
-			if (from != adjoiningRoom && checkPortal(to, door, viewPort, &clipPort))
-				getVisibleRooms(to, adjoiningRoom, &clipPort, water, count + 1);
+		if (m_rooms[node->To]->Visited)
+			continue;
+		m_rooms[node->To]->Visited = true;
+		m_roomsToDraw.push_back(node->To);
 
-			door += 16;
+		ROOM_INFO* room = &Rooms[node->To];
+
+		D3DXVECTOR4 clipPort;
+		__int16 numDoors = *(room->door);
+		if (numDoors)
+		{
+			__int16* door = room->door + 1;
+			for (int i = 0; i < numDoors; i++) {
+				__int16 adjoiningRoom = *(door);
+
+				if (node->From != adjoiningRoom && checkPortal(node->To, door, viewPort, &node->ClipPort))
+				{
+					RendererRoomNode* childNode = new RendererRoomNode();
+					childNode->From = node->To;
+					childNode->To = adjoiningRoom;
+					stack.push(childNode);
+				}
+
+				door += 16;
+			}
 		}
+
+		delete node;
 	}
 }
 
@@ -2958,6 +2973,47 @@ bool Renderer::drawScene(bool dump)
 	D3DXMatrixInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
 
 	// Collect scene items and update animations
+	/*CurrentRoom = Camera.pos.roomNumber;
+	ROOM_INFO* r = &Rooms[CurrentRoom];
+	r->testLeft = 0;
+	PhdLeft = 0;
+	r->testTop = 0;
+	PhdTop = 0;
+	r->testRight = ScreenWidth;
+	PhdRight = ScreenWidth;
+	r->testBottom = ScreenHeight;
+	PhdBottom = ScreenHeight;
+
+	Unknown_00E6CAE8 = 0;
+	Outside = r->flags & 8;
+	Underwater = r->flags & 1;
+
+	r->bound_active = 2;
+	BoundList[0] = Camera.pos.roomNumber;
+	BoundStart = 0;
+	BoundEnd = 1;
+	NumberDrawnRooms = 0;
+	if (Outside)
+	{
+		OutsideTop = 0;
+		OutsideLeft = 0;
+		OutsideRight = ScreenWidth;
+		OutsideBottom = ScreenHeight;
+	}
+	else
+	{
+		OutsideLeft = ScreenWidth;
+		OutsideTop = ScreenHeight;
+		OutsideBottom = 0;
+		OutsideRight = 0;
+	}
+	GetRoomBounds();
+	Sub_0042A050();
+
+	m_roomsToDraw.clear();
+	for (__int32 i = 0; i < NumberDrawnRooms; i++)
+		m_roomsToDraw.push_back(DrawnRooms[i]);*/
+	
 	collectSceneItems();
 	updateLaraAnimations();
 	updateItemsAnimations();
