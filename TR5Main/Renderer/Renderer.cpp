@@ -1616,92 +1616,6 @@ void Renderer::fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
 	}
 }
 
-void Renderer::buildAnimationPoseRecursive(RendererObject* obj, __int16** frmptr, D3DXMATRIX* parentTransform, 
-										   __int16 frac, __int16 rate, RendererBone* bone, __int32 mask)
-{
-	bool calculateMatrix = (mask >> bone->Index) & 1;
-
-	D3DXMATRIX rotation;
-	if (calculateMatrix)
-	{
-		fromTrAngle(&rotation, frmptr[0], bone->Index);
-
-		if (frac)
-		{
-			D3DXMATRIX rotation2;
-			fromTrAngle(&rotation2, frmptr[1], bone->Index);
-
-			D3DXQUATERNION q1, q2, q3;
-
-			D3DXQuaternionRotationMatrix(&q1, &rotation);
-			D3DXQuaternionRotationMatrix(&q2, &rotation2);
-
-			D3DXQuaternionSlerp(&q3, &q1, &q2, frac / ((float)rate));
-
-			D3DXMatrixRotationQuaternion(&rotation, &q3);
-		}
-
-		D3DXMATRIX extraRotation;		
-		D3DXMatrixRotationYawPitchRoll(&extraRotation, bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-	
-		D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &extraRotation, &bone->Transform);
-		D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &rotation, &obj->AnimationTransforms[bone->Index]);
-		D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &obj->AnimationTransforms[bone->Index], parentTransform);
-	}
-
-	for (int j = 0; j < bone->Children.size(); j++)
-	{
-		buildAnimationPoseRecursive(obj, frmptr, &obj->AnimationTransforms[bone->Index], frac, rate, 
-									bone->Children[j], mask);
-	}
-}
-
-void Renderer::buildAnimationPose(RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
-{
-	D3DXVECTOR3 p = D3DXVECTOR3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
-
-	bool calculateMatrix = (mask >> obj->Skeleton->Index) & 1;
-
-	D3DXMATRIX rotation;
-	if (calculateMatrix)
-	{
-		fromTrAngle(&rotation, frmptr[0], obj->Skeleton->Index);
-
-		if (frac)
-		{
-			D3DXVECTOR3 p2 = D3DXVECTOR3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
-			D3DXVec3Lerp(&p, &p, &p2, frac / ((float)rate));
-
-			D3DXMATRIX rotation2;
-			fromTrAngle(&rotation2, frmptr[1], obj->Skeleton->Index);
-
-			D3DXQUATERNION q1, q2, q3;
-
-			D3DXQuaternionRotationMatrix(&q1, &rotation);
-			D3DXQuaternionRotationMatrix(&q2, &rotation2);
-
-			D3DXQuaternionSlerp(&q3, &q1, &q2, frac / ((float)rate));
-
-			D3DXMatrixRotationQuaternion(&rotation, &q3);
-		}
-
-		D3DXMATRIX translation;
-		D3DXMatrixTranslation(&translation, p.x, p.y, p.z);
-
-		D3DXMATRIX extraRotation;
-		D3DXMatrixRotationYawPitchRoll(&extraRotation, obj->Skeleton->ExtraRotation.y, obj->Skeleton->ExtraRotation.x, obj->Skeleton->ExtraRotation.z);
-
-		D3DXMatrixMultiply(&obj->AnimationTransforms[obj->Skeleton->Index], &extraRotation, &translation);
-		D3DXMatrixMultiply(&obj->AnimationTransforms[obj->Skeleton->Index], &rotation, &obj->AnimationTransforms[obj->Skeleton->Index]);
-	}
-
-	for (int j = 0; j < obj->Skeleton->Children.size(); j++)
-	{
-		buildAnimationPoseRecursive(obj, frmptr, &obj->AnimationTransforms[obj->Skeleton->Index], frac, rate, 
-									obj->Skeleton->Children[j], mask);
-	}
-}
-
 void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count) 
 {
 	if (count > 8) {
@@ -1971,7 +1885,7 @@ void Renderer::updateLaraAnimations()
 	__int16	*framePtr[2];
 	__int32 rate;
 	__int32 frac = GetFrame_D2(LaraItem, framePtr, &rate);
-	buildAnimationPose(laraObj, framePtr, frac, rate, mask);
+	updateAnimation(laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
 	if ((Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) && Lara.gunType != WEAPON_FLARE)
@@ -1980,7 +1894,7 @@ void Renderer::updateLaraAnimations()
 		mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L) | (1 << UARM_R) |
 			   (1 << LARM_R) | (1 << HAND_R);
 		frac = GetFrame_D2(LaraItem, framePtr, &rate);
-		buildAnimationPose(laraObj, framePtr, frac, rate, mask);
+		updateAnimation(laraObj, framePtr, frac, rate, mask);
 	}
 	else
 	{
@@ -1998,24 +1912,24 @@ void Renderer::updateLaraAnimations()
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
 				__int16* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
-				buildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
+				updateAnimation(laraObj, &shotgunFramePtr, 0, 1, mask);
 				
 				// Right arm
 				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 				shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
-				buildAnimationPose(laraObj, &shotgunFramePtr, 0, 1, mask);
+				updateAnimation(laraObj, &shotgunFramePtr, 0, 1, mask);
 			}
 			else
 			{
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
 				frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-				buildAnimationPose(laraObj, framePtr, frac, rate, mask);
+				updateAnimation(laraObj, framePtr, frac, rate, mask);
 				
 				// Right arm
 				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 				frac = getFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
-				buildAnimationPose(laraObj, framePtr, frac, rate, mask);
+				updateAnimation(laraObj, framePtr, frac, rate, mask);
 			}			
 		}
 		else
@@ -2023,12 +1937,12 @@ void Renderer::updateLaraAnimations()
 			// Left arm
 			mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
 			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-			buildAnimationPose(laraObj, framePtr, frac, rate, mask);
+			updateAnimation(laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
 			mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 			frac = GetFrame_D2(LaraItem, framePtr, &rate);
-			buildAnimationPose(laraObj, framePtr, frac, rate, mask);
+			updateAnimation(laraObj, framePtr, frac, rate, mask);
 		}
 	}
 
@@ -2187,7 +2101,7 @@ void Renderer::updateItemsAnimations()
 			__int16	*framePtr[2];
 			__int32 rate;
 			__int32 frac = GetFrame_D2(item, framePtr, &rate);
-			buildAnimationPose(moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+			updateAnimation(moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 		}
 
 		// Update world matrix
@@ -2531,7 +2445,7 @@ __int32	Renderer::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum
 	
 	if (obj->animIndex != -1)
 	{
-		BuildAnimationPose(moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
+		updateAnimation(moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
 	}
 
 	D3DXVECTOR3 pos = D3DXVECTOR3(x, y, 1);
@@ -2682,10 +2596,8 @@ __int32 Renderer::drawInventoryScene()
 	m_device->BeginScene();
 
 	// Set basic render states
-	m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	m_device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_device->SetRenderState(D3DRS_ALPHATESTENABLE, false);
+	setDepthWrite(true);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
 	
 	byte colorComponent = 1.0f; // (m_fadeTimer < 15.0f ? 255.0f / (15.0f - min(m_fadeTimer, 15.0f)) : 255);
 
@@ -2802,12 +2714,12 @@ __int32 Renderer::drawInventoryScene()
 				__int16* framePtr[2];
 				__int32 rate = 0;
 				getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
-				buildAnimationPose(moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
+				updateAnimation(moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
 			}
 			else
 			{
 				if (obj->animIndex != -1)
-					buildAnimationPose(moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
+					updateAnimation(moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
 			}
 
 			for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
@@ -2826,6 +2738,8 @@ __int32 Renderer::drawInventoryScene()
 					RendererBucket* bucket = mesh->GetBucket(m);
 					if (bucket->NumVertices == 0)
 						continue;
+
+					setGpuStateForBucket((RENDERER_BUCKETS)m);
 
 					m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 					m_device->SetIndices(bucket->GetIndexBuffer());
@@ -5316,6 +5230,68 @@ void Renderer::updateAnimatedTextures()
 					bucket->Vertices[polygon->Indices[v]].v = set->Textures[textureIndex]->UV[v].y;
 				}
 			}
+		}
+	}
+}
+
+void Renderer::updateAnimation(RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
+{
+	stack<RendererBone*> bones;
+	D3DXMATRIX rotation;
+
+	bones.push(obj->Skeleton);
+	while (!bones.empty())
+	{
+		// Pop the last bone in the stack
+		RendererBone* bone = bones.top();
+		bones.pop();
+
+		bool calculateMatrix = (mask >> bone->Index) & 1;
+		if (calculateMatrix)
+		{
+			D3DXVECTOR3 p = D3DXVECTOR3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
+
+			fromTrAngle(&rotation, frmptr[0], bone->Index);
+
+			if (frac)
+			{
+				D3DXVECTOR3 p2 = D3DXVECTOR3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
+				D3DXVec3Lerp(&p, &p, &p2, frac / ((float)rate));
+
+				D3DXMATRIX rotation2;
+				fromTrAngle(&rotation2, frmptr[1], bone->Index);
+
+				D3DXQUATERNION q1, q2, q3;
+
+				D3DXQuaternionRotationMatrix(&q1, &rotation);
+				D3DXQuaternionRotationMatrix(&q2, &rotation2);
+
+				D3DXQuaternionSlerp(&q3, &q1, &q2, frac / ((float)rate));
+
+				D3DXMatrixRotationQuaternion(&rotation, &q3);
+			}
+
+			D3DXMATRIX translation;
+			if (bone == obj->Skeleton)
+				D3DXMatrixTranslation(&translation, p.x, p.y, p.z);
+
+			D3DXMATRIX extraRotation;
+			D3DXMatrixRotationYawPitchRoll(&extraRotation, bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+
+			if (bone != obj->Skeleton)
+				D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &extraRotation, &bone->Transform);
+			else
+				D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &extraRotation, &translation);
+
+			D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &rotation, &obj->AnimationTransforms[bone->Index]);
+			
+			if (bone != obj->Skeleton)
+				D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &obj->AnimationTransforms[bone->Index], &obj->AnimationTransforms[bone->Parent->Index]);
+		}
+
+		for (__int32 i = 0; i < bone->Children.size(); i++)
+		{
+			bones.push(bone->Children[i]);
 		}
 	}
 }
