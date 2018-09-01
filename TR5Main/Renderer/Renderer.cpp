@@ -699,9 +699,9 @@ RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 
 			if (numNormals > 0)
 			{
-				vertex.nx = normals[indices[v]].vx;
-				vertex.ny = normals[indices[v]].vy;
-				vertex.nz = normals[indices[v]].vz;
+				vertex.nx = normals[indices[v]].vx / 16300.0f;
+				vertex.ny = normals[indices[v]].vy / 16300.0f;
+				vertex.nz = normals[indices[v]].vz / 16300.0f;
 			}
 
 			vertex.u = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
@@ -788,10 +788,22 @@ RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 
 			if (numNormals > 0)
 			{
-				vertex.nx = normals[indices[v]].vx;
-				vertex.ny = normals[indices[v]].vy;
-				vertex.nz = normals[indices[v]].vz;
+				vertex.nx = normals[indices[v]].vx / 16300.0f;
+				vertex.ny = normals[indices[v]].vy / 16300.0f;
+				vertex.nz = normals[indices[v]].vz / 16300.0f;
 			}
+
+			D3DXMATRIX world;
+			D3DXMatrixTranslation(&world, 80000, 0, 50000);
+			D3DXVECTOR4 n;
+			D3DXVec3Transform(&n, &D3DXVECTOR3(vertex.nx, vertex.ny, vertex.nz), &world);
+			D3DXVECTOR3 n2 = D3DXVECTOR3(n.x, n.y, n.z);
+			D3DXVec3TransformNormal(&n2, &D3DXVECTOR3(vertex.nx, vertex.ny, vertex.nz), &world);
+			 
+			D3DXVec4Normalize(&n, &n);
+			D3DXVec3Normalize(&n2, &n2);
+
+			n /= n.w;
 
 			vertex.u = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 			vertex.v = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
@@ -2041,7 +2053,7 @@ void Renderer::updateLaraAnimations()
 
 						D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
 						D3DXVec3Normalize(&n, &n);
-						D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[6 * p + i]);
+						D3DXVec3TransformNormal(&n, &n, &m_hairsMatrices[6 * p + i]);
 						D3DXVec3Normalize(&n, &n);
 
 						m_hairVertices[lastVertex].nx = n.x;
@@ -2072,7 +2084,7 @@ void Renderer::updateLaraAnimations()
 
 						D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
 						D3DXVec3Normalize(&n, &n);
-						D3DXVec3TransformCoord(&n, &n, &m_hairsMatrices[6 * p + i]);
+						D3DXVec3TransformNormal(&n, &n, &m_hairsMatrices[6 * p + i]);
 						D3DXVec3Normalize(&n, &n);
 
 						m_hairVertices[lastVertex].nx = n.x;
@@ -3051,8 +3063,8 @@ bool Renderer::drawScene(bool dump)
 	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_quadIndices, D3DFORMAT::D3DFMT_INDEX32,
 		m_quadVertices, sizeof(RendererVertex));
 	effect->EndPass();
-	effect->End();
-	m_device->EndScene();
+	effect->End(); 
+	m_device->EndScene(); 
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeClearGBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -3296,7 +3308,7 @@ bool Renderer::drawScene(bool dump)
 	effect->EndPass();
 	effect->End();
 	m_device->EndScene();
-
+	 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeCombine = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
@@ -3305,7 +3317,8 @@ bool Renderer::drawScene(bool dump)
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
 
 	// We need to use alpha blending because we need to write only to the Z-Buffer
-	//SetBlendState(RENDERER_BLENDSTATE::BLENDSTATE_SPECIAL_Z_BUFFER);
+	//setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_SPECIAL_Z_BUFFER);
+	// TODO: if I use setBlendSTate probably it's overridden later and I see a black screen
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 
 	effect = m_shaderReconstructZBuffer->GetEffect();
@@ -4223,7 +4236,7 @@ bool Renderer::drawHorizonAndSky()
 	D3DXMATRIX rotation;
 	D3DXMATRIX scale;
 	UINT cPasses = 1;
-	        
+	         
 	LPD3DXEFFECT effect = m_shaderFillGBuffer->GetEffect();
 	
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_skyTexture);

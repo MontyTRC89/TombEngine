@@ -87,22 +87,25 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 	float4 worldPosition;
 	float4 normal;
+	float4x4 world;
 
 	if (UseSkinning)
 	{
-		worldPosition = mul(float4(input.Position, 1), mul(Bones[input.Bone], World));
-		normal = mul(float4(input.Normal, 1), Bones[input.Bone]);
+		world = mul(Bones[input.Bone], World);
+		worldPosition = mul(float4(input.Position, 1), world);
+		normal = mul(float4(input.Normal, 0), world);
 	}
 	else
 	{
-		worldPosition = mul(float4(input.Position, 1), World);
-		normal = float4(input.Normal, 1.0f); // mul(float4(input.Normal, 1), World);
+		world = World;
+		worldPosition = mul(float4(input.Position, 1), world);
+		normal = mul(float4(input.Normal, 0), world);
 	}
 
 	float4 viewPosition = mul(worldPosition, View);
 
 	output.Position = mul(viewPosition, Projection);
-	output.Normal = normalize(normal.xyz);
+	output.Normal = normalize(normal).xyz;
 	output.TextureCoordinate = input.TextureCoordinate;
 	output.Color = input.Color;
 	output.WorldPosition = worldPosition;

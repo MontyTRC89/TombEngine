@@ -210,7 +210,7 @@ unsigned __stdcall GameMain(void*)
 	_endthreadex(1);
 
 	return 1;   
-}
+}   
 
 void __cdecl DoTitle(__int32 index)
 {

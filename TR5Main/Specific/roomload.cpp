@@ -137,7 +137,7 @@ __int32 __cdecl LoadItems()
 void __cdecl LoadObjects()
 {
 	DB_Log(2, "LoadObjects - DLL");
-	
+	 
 	memset(Objects, 0, sizeof(OBJECT_INFO) * NUM_OBJECTS);
 	memset(StaticObjects, 0, sizeof(STATIC_INFO) * NUM_STATICS);
 
@@ -148,10 +148,6 @@ void __cdecl LoadObjects()
 	ReadBytes(MeshBase, numMeshDataBytes);
 	RawMeshData = (__int16*)malloc(numMeshDataBytes);
 	memcpy(RawMeshData, MeshBase, numMeshDataBytes);
-
-	FILE* file = fopen("E:\\meshes.bin", "wb");
-	fwrite(MeshBase, 1, numMeshDataBytes, file);
-	fclose(file);
 
 	MeshDataSize = numMeshDataBytes;
 
