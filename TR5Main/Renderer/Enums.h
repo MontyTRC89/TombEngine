@@ -85,7 +85,8 @@ typedef enum RENDERER_POLYGON_SHAPE {
 
 #define MAX_VERTICES 200000
 #define MAX_INDICES 400000
-#define MAX_LINES_2D 8192
+
+#define MAX_LINES_2D 256
 
 #define NUM_BUCKETS 6
 

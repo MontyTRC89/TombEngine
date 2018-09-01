@@ -440,9 +440,7 @@ class Renderer
 	LPDIRECT3DTEXTURE9				m_caustics[NUM_CAUSTICS_TEXTURES];
 	LPD3DXFONT						m_debugFont;
 	LPD3DXFONT						m_gameFont;
-	LPD3DXSPRITE					m_sprite;
-	MainShader*						m_mainShader;
-	DepthShader*					m_depthShader;
+	LPD3DXSPRITE					m_dxSprite;
 	char							m_message[255];
 	map<__int32, RendererRoom*>		m_rooms;
 	map<__int32, RendererObject*>	m_moveableObjects;
@@ -452,12 +450,11 @@ class Renderer
 	vector<__int32>					m_roomsToDraw;
 	__int32*						m_meshTrees;
 	LPDIRECT3DVERTEXDECLARATION9	m_vertexDeclaration;
-	LPDIRECT3DVERTEXDECLARATION9	m_spriteVertexDeclaration;
 	__int32							m_numVertices;
 	__int32							m_numTriangles;
-	RendererLine2D*					m_lines;
-	__int32							m_numLines;
-	LPD3DXLINE						m_line;
+	RendererLine2D*					m_lines2D;
+	__int32							m_numLines2D;
+	LPD3DXLINE						m_dxLine;
 	__int16							m_normalLaraSkinJointRemap[15][32];
 	__int16							m_youngLaraSkinJointRemap[15][32];
 	__int16							m_laraSkinJointRemap[15][32];
@@ -503,8 +500,6 @@ class Renderer
 	RENDERER_BLENDSTATE				m_blendState;
 	RendererUnderwaterDustParticle  m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool							m_firstUnderwaterDustParticles = true;
-
-	// New light pre-pass renderer
 	RenderTarget2D*					m_depthBuffer;
 	RenderTarget2D*					m_normalBuffer;
 	RenderTarget2D*					m_colorBuffer;
@@ -518,7 +513,7 @@ class Renderer
 	Shader*							m_shaderLight;
 	Shader*							m_shaderCombine;
 	Shader*							m_shaderBasic;
-	Shader*							m_shaderFXAA;
+	Shader*							m_shaderDepth;
 	Shader*							m_shaderReconstructZBuffer;
 	Shader*							m_shaderSprites;
 	Shader*							m_shaderRain;
@@ -650,4 +645,5 @@ public:
 	void							DrawAirBar(__int32 percentual);
 	void							ClearDynamicLights();
 	void							AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
+	void							FreeRendererData();
 };

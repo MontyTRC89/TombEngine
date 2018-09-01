@@ -252,21 +252,27 @@ Renderer::~Renderer()
 {
 	DX_RELEASE(m_d3D);
 	DX_RELEASE(m_device);
-	DX_RELEASE(m_textureAtlas);
-	DX_RELEASE(m_fontAndMiscTexture);
 	DX_RELEASE(m_debugFont);
 	DX_RELEASE(m_gameFont);
-	DX_RELEASE(m_skyTexture);
 
+	FreeRendererData();
+
+	delete m_lines2D;
 	delete m_lightBuffer;
 	delete m_normalBuffer;
 	delete m_vertexLightBuffer;
 	delete m_colorBuffer;
 	delete m_outputBuffer;
+	delete m_depthBuffer;
 	delete m_shaderClearGBuffer;
 	delete m_shaderFillGBuffer;
 	delete m_shaderLight;
 	delete m_shaderCombine;
+	delete m_shaderBasic;
+	delete m_shaderDepth;
+	delete m_shaderRain;
+	delete m_shaderSprites;
+	delete m_shaderTransparent;
 	delete m_sphereMesh;
 	delete m_shadowMap;
 	delete m_renderTarget;
@@ -309,15 +315,6 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 								D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
 								D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_titleScreen);
 
-	// Create effects
-	m_mainShader = new MainShader(m_device);
-	if (m_mainShader->GetEffect() == NULL)
- 		return false;
-
-	m_depthShader = new DepthShader(m_device);
-	if (m_depthShader->GetEffect() == NULL)
-		return false;
-
 	// Initialise the vertex declaration 
 	D3DVERTEXELEMENT9 roomVertexElements[] =
 						{
@@ -344,14 +341,15 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 		return false;
 
 	// Initialise the sprite object
-	res = D3DXCreateSprite(m_device, &m_sprite);
+	m_dxSprite = NULL;
+	res = D3DXCreateSprite(m_device, &m_dxSprite);
 	if (res != S_OK)
 		return false;
 
 	// Initialise line objects
-	m_lines = (RendererLine2D*)malloc(MAX_LINES_2D * sizeof(RendererLine2D));
-	m_line = NULL;
-	res = D3DXCreateLine(m_device, &m_line);
+	m_lines2D = (RendererLine2D*)malloc(MAX_LINES_2D * sizeof(RendererLine2D));
+	m_dxLine = NULL;
+	res = D3DXCreateLine(m_device, &m_dxLine);
 	if (res != S_OK)
 		return false;
 
@@ -427,6 +425,11 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_shaderTransparent = new Shader(m_device, (char*)"Transparent.fx");
 	m_shaderTransparent->Compile();
 	if (m_shaderTransparent->GetEffect() == NULL)
+		return false;
+
+	m_shaderDepth = new Shader(m_device, (char*)"Depth.fx");
+	m_shaderDepth->Compile();
+	if (m_shaderDepth->GetEffect() == NULL)
 		return false;
 	   
 	m_sphereMesh = new RendererSphere(m_device, 1280.0f, 6);
@@ -1820,18 +1823,19 @@ void Renderer::prepareShadowMap()
 
 	D3DXVECTOR3 lightPos = D3DXVECTOR3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
 
-	m_depthShader->GetEffect()->Begin(&cPasses, 0);
-	m_depthShader->SetTexture(m_textureAtlas);
+	LPD3DXEFFECT effect = m_shaderDepth->GetEffect();
+	effect->Begin(&cPasses, 0);
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
 
 	D3DXMatrixPerspectiveFovRH(&m_lightProjection, 90.0f * RADIAN, 1.0f, 1.0f, m_shadowLight->Out * 1.5f);
-	m_depthShader->SetProjection(&m_lightProjection);
 
 	D3DXMatrixLookAtRH(&m_lightView,
 		&lightPos,
 		&D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos),
 		&D3DXVECTOR3(0.0f, -1.0f, 0.0f));
 
-	m_depthShader->SetView(&m_lightView);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &m_lightView);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &m_lightProjection);
 
 	// Bind the shadow map
 	m_shadowMap->Bind();
@@ -1868,7 +1872,7 @@ void Renderer::prepareShadowMap()
 	m_device->EndScene();
 	m_shadowMap->Unbind();
 
-	m_depthShader->GetEffect()->End();
+	effect->End();
 }
 
 bool Renderer::drawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexIndex, UINT minVertexIndex, UINT numVertices, UINT baseIndex, UINT primitiveCount)
@@ -2151,24 +2155,22 @@ __int32 Renderer::Draw()
 
 void Renderer::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
 {
-	m_lines[m_numLines].Vertices[0] = D3DXVECTOR2(x1, y1);
-	m_lines[m_numLines].Vertices[1] = D3DXVECTOR2(x2, y2);
-	m_lines[m_numLines].Color = D3DCOLOR_XRGB(r, g, b);
-	m_numLines++;
+	m_lines2D[m_numLines2D].Vertices[0] = D3DXVECTOR2(x1, y1);
+	m_lines2D[m_numLines2D].Vertices[1] = D3DXVECTOR2(x2, y2);
+	m_lines2D[m_numLines2D].Color = D3DCOLOR_XRGB(r, g, b);
+	m_numLines2D++;
 }
 
 void Renderer::drawAllLines2D()
 {
-	m_line->SetWidth(1);
-	m_line->SetPattern(0xffffffff);
-	m_line->Begin();
+	m_dxLine->SetWidth(1);
+	m_dxLine->SetPattern(0xffffffff);
+	m_dxLine->Begin();
 
-	for (__int32 i = 0; i < m_numLines; i++)
-	{
-		m_line->Draw(m_lines[i].Vertices, 2, m_lines[i].Color);
-	}
+	for (__int32 i = 0; i < m_numLines2D; i++)
+		m_dxLine->Draw(m_lines2D[i].Vertices, 2, m_lines2D[i].Color);
 
-	m_line->End();
+	m_dxLine->End();
 }
 
 void Renderer::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2)
@@ -2350,21 +2352,21 @@ void Renderer::drawDebugInfo()
 	sprintf_s(&m_message[0], 255, "SkyPos = %d", SkyPos1);
 	printDebugMessage(10, 420 + y, 255, 255, 255, 255, m_message);
 
-	m_sprite->Begin(0);
+	m_dxSprite->Begin(0);
 
 	D3DXMATRIX scale;
 	D3DXMatrixScaling(&scale, 150.0f / 800.0f, 150.0f / 800.0f, 150.0f / 800.0f);
 	  
-	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_colorBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
-	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
-	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
-	m_sprite->SetTransform(&scale);
-	m_sprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
+	m_dxSprite->SetTransform(&scale);
+	m_dxSprite->Draw(m_colorBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
+	m_dxSprite->SetTransform(&scale);
+	m_dxSprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
+	m_dxSprite->SetTransform(&scale);
+	m_dxSprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
+	m_dxSprite->SetTransform(&scale);
+	m_dxSprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
 
-	m_sprite->End();
+	m_dxSprite->End();
 
 }
 
@@ -2386,9 +2388,9 @@ __int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool reset)
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	m_device->BeginScene();
 	
-	m_sprite->Begin(0);
-	m_sprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 128, 128, 128));
-	m_sprite->End();
+	m_dxSprite->Begin(0);
+	m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 128, 128, 128));
+	m_dxSprite->End();
 
 	PrintString(400, 200, (char*)"Paused", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
 	PrintString(400, 230, (char*)"Statistics", D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_CENTER | (selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
@@ -2414,9 +2416,9 @@ __int32	Renderer::DrawStatisticsMenu()
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	m_device->BeginScene();
 
-	m_sprite->Begin(0);
-	m_sprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
-	m_sprite->End();
+	m_dxSprite->Begin(0);
+	m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+	m_dxSprite->End();
 
 	PrintString(400, 140, (char*)"Statistics", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
 
@@ -2570,9 +2572,9 @@ __int32	Renderer::DrawLoadGameMenu(__int32 selectedIndex, bool resetBlink)
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	m_device->BeginScene();
 
-	m_sprite->Begin(0);
-	m_sprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
-	m_sprite->End();
+	m_dxSprite->Begin(0);
+	m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+	m_dxSprite->End();
 
 	PrintString(400, 20, (char*)"Load game", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
 
@@ -2634,19 +2636,19 @@ __int32 Renderer::drawInventoryScene()
 		// Scale matrix for drawing full screen background
 		D3DXMatrixScaling(&m_tempScale, ScreenWidth / 640.0f, ScreenHeight / 480.0f, 0.0f);
 
-		m_sprite->Begin(0);
-		m_sprite->SetTransform(&m_tempScale);
-		m_sprite->Draw(m_titleScreen, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, colorComponent, colorComponent, colorComponent));
-		m_sprite->End();
+		m_dxSprite->Begin(0);
+		m_dxSprite->SetTransform(&m_tempScale);
+		m_dxSprite->Draw(m_titleScreen, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, colorComponent, colorComponent, colorComponent));
+		m_dxSprite->End();
 	}
 	else
 	{
 		D3DXMatrixScaling(&m_tempScale, 1.0f, 1.0f, 1.0f);
 
-		m_sprite->Begin(0);
-		m_sprite->SetTransform(&m_tempScale);
-		m_sprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
-		m_sprite->End();
+		m_dxSprite->Begin(0);
+		m_dxSprite->SetTransform(&m_tempScale);
+		m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+		m_dxSprite->End();
 	} 
 
 	// Clear the Z-Buffer after drawing the background
@@ -3607,7 +3609,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	RendererLightInfo* light = &m_itemsLightInfo[0];
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
-		effect = m_depthShader->GetEffect();
+		effect = m_shaderDepth->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
@@ -3810,7 +3812,7 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
-		effect = m_depthShader->GetEffect();
+		effect = m_shaderDepth->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
@@ -3875,7 +3877,7 @@ bool Renderer::drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERE
 
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
-		effect = m_depthShader->GetEffect();
+		effect = m_shaderDepth->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
@@ -3961,7 +3963,7 @@ bool Renderer::drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKE
 
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
-		effect = m_depthShader->GetEffect();
+		effect = m_shaderDepth->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
 	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
@@ -4690,7 +4692,7 @@ bool Renderer::drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 	LPD3DXEFFECT effect;
 	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
-		effect = m_depthShader->GetEffect();
+		effect = m_shaderDepth->GetEffect();
 	else
 		effect = m_shaderFillGBuffer->GetEffect();
 
@@ -5363,4 +5365,11 @@ void Renderer::updateAnimation(RendererObject* obj, __int16** frmptr, __int16 fr
 			bones.push(bone->Children[i]);
 		}
 	}
+}
+
+void Renderer::FreeRendererData()
+{
+	DX_RELEASE(m_textureAtlas);
+	DX_RELEASE(m_fontAndMiscTexture);
+	DX_RELEASE(m_skyTexture);
 }
