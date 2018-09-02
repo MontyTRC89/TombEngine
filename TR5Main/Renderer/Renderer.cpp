@@ -29,9 +29,11 @@
 #include "..\Game\gameflow.h"
 #include "..\Game\lara.h"
 #include "..\Game\effect2.h"
-
+ 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
+
+extern GameScript* g_Script;
 
 Renderer::Renderer()
 {

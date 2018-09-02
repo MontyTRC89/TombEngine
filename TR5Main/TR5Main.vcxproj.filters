@@ -529,5 +529,7 @@
     <None Include="Scripting\Scripts\Settings.lua" />
     <None Include="Scripting\Scripts\Title.lua" />
     <None Include="Scripting\Scripts\English.lua" />
+    <None Include="Scripting\Scripts\Gameflow.lua" />
+    <None Include="Scripting\Scripts\Andrea2.lua" />
   </ItemGroup>
 </Project>

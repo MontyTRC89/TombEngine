@@ -15,6 +15,8 @@ unsigned int threadId;
 uintptr_t hThread;
 HACCEL hAccTable;
 
+extern GameScript* g_Script;
+
 __int32 __cdecl WinProcMsg()
 {
 	int result;
@@ -53,6 +55,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_Script = new GameScript();
 	g_Script->ExecuteScript("Scripts\\English.lua");
 	g_Script->ExecuteScript("Scripts\\Settings.lua");
+	g_Script->ExecuteScript("Scripts\\Gameflow.lua");
 
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = NULL;

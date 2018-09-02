@@ -1,14 +1,19 @@
+#pragma once
+
 #include <sol.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <map>
+#include "..\Global\global.h"
 
 using namespace std;
 
-// Define string ids
+#define NUM_STRINGS 10000
+#define NUM_LEVELS 100
 
+// Define string ids
 #define STRING_INV_PASSPORT				1
 #define STRING_INV_LARA_HOME			2
 #define STRING_INV_CONTROLS				3
@@ -73,22 +78,96 @@ typedef struct GameScriptSettings {
 	string WindowTitle;
 };
 
+typedef struct GameScriptSkyLayer {
+	byte R;
+	byte G;
+	byte B;
+	__int16 CloudSpeed;
+
+	GameScriptSkyLayer()
+	{
+
+	}
+
+	GameScriptSkyLayer(byte r, byte g, byte b, __int16 speed)
+	{
+		R = r;
+		G = g;
+		B = b;
+		CloudSpeed = speed;
+	}
+};
+
+typedef struct GameScriptFog {
+	byte R;
+	byte G;
+	byte B;
+
+	GameScriptFog()
+	{
+
+	}
+
+	GameScriptFog(byte r, byte g, byte b)
+	{
+		R = r;
+		G = g;
+		B = b;
+	}
+};
+
+typedef struct GameScriptLevel {
+	string FileName;
+	string ScriptFileName;
+	string LoadScreenFileName;
+	__int32 Name;
+	__int32 Soundtrack;
+	GameScriptSkyLayer Layer1;
+	GameScriptSkyLayer Layer2;
+	bool Horizon;
+	bool ColAddHorizon;
+	GameScriptFog Fog;
+
+	GameScriptLevel()
+	{
+
+	}
+};
+
 class GameScript
 {
 private:
-	sol::state					m_lua;
-	GameScriptSettings				m_settings;
-	vector<string>				m_strings;
+	sol::state							m_lua;
+	GameScriptSettings					m_settings;
+	vector<string>						m_strings;
+	GameScriptLevel*					m_title;
+	vector<GameScriptLevel*>			m_levels;
 
-	string						loadScriptFromFile(char* luaFilename);
+	string								loadScriptFromFile(char* luaFilename);
 
 public:
+	D3DXVECTOR3							SkyColorLayer1;
+	__int32								SkySpeedLayer1;
+	D3DXVECTOR3							SkyColorLayer2;
+	__int32								SkySpeedLayer2;
+	D3DXVECTOR3							FogColor;
+	__int32								FogInDistance;
+	__int32								FogOutDistance;
+	bool								DrawHorizon;
+	bool								ColAddHorizon;
+
 	GameScript();
 	~GameScript();
 
-	bool						LoadGameStrings(char* luaFilename);
-	bool						LoadGameSettings(char* luaFilename);
-	bool						ExecuteScript(char* luaFilename);
-	char*						GetString(__int32 id);
-	GameScriptSettings*			GetSettings();
+	bool								LoadGameStrings(char* luaFilename);
+	bool								LoadGameSettings(char* luaFilename);
+	bool								ExecuteScript(char* luaFilename);
+	char*								GetString(__int32 id);
+	GameScriptSettings*					GetSettings();
+	GameScriptLevel*					GetLevel(__int32 id);
+	GameScriptLevel*					GetTitle();
+	void								SetHorizon(bool horizon, bool colAddHorizon);
+	void								SetLayer1(byte r, byte g, byte b, __int16 speed);
+	void								SetLayer2(byte r, byte g, byte b, __int16 speed);
+	void								SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 endDistance);
 };
