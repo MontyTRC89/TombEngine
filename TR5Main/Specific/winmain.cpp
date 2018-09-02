@@ -45,9 +45,14 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	_CrtSetReportMode(0, 2);
 	_CrtSetDbgFlag(-1);
-
+	 
 	LoadGameflow();
 	LoadSettings();
+
+	// Initialise the new scripting system
+	g_Script = new GameScript();
+	g_Script->ExecuteScript("Scripts\\English.lua");
+	g_Script->ExecuteScript("Scripts\\Settings.lua");
 
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = NULL;
@@ -71,15 +76,15 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	Rect.left = 0;
 	Rect.top = 0;
-	Rect.right = 800;
-	Rect.bottom = 600;
+	Rect.right = g_Script->GetSettings()->ScreenWidth;
+	Rect.bottom = g_Script->GetSettings()->ScreenHeight;
 
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
 	App.WindowHandle = CreateWindowEx(
 		WS_THICKFRAME,
 		"TR5Main",
-		"TR5Main",
+		g_Script->GetSettings()->WindowTitle.c_str(),
 		WS_BORDER,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -102,7 +107,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	//DXInitialise(App.WindowHandle);
 	g_Renderer = new Renderer();
-	g_Renderer->Initialise(Rect.right, Rect.bottom, true, App.WindowHandle);
+	g_Renderer->Initialise(g_Script->GetSettings()->ScreenWidth, g_Script->GetSettings()->ScreenHeight, true, App.WindowHandle);
 
 	// Initialize audio
 	Sound_Init();

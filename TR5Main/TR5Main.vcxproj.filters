@@ -222,9 +222,6 @@
     <ClInclude Include="Specific\patch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\scripting.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="CustomObjects\frogman.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -292,6 +289,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\RenderTargetCube.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -503,6 +503,9 @@
     <ClCompile Include="Renderer\RenderTargetCube.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Scripting\GameScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />
@@ -522,5 +525,9 @@
     <None Include="Shaders\Sprites.fx" />
     <None Include="Shaders\Rain.fx" />
     <None Include="Shaders\Transparent.fx" />
+    <None Include="Scripting\Scripts\Levels.lua" />
+    <None Include="Scripting\Scripts\Settings.lua" />
+    <None Include="Scripting\Scripts\Title.lua" />
+    <None Include="Scripting\Scripts\English.lua" />
   </ItemGroup>
 </Project>

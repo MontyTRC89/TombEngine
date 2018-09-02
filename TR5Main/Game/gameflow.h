@@ -4,17 +4,6 @@
 
 using namespace std;
 
-#define STRING_INV_PASSPORT			67
-#define STRING_INV_LARA_HOME		68
-#define STRING_INV_CONTROLS			69
-#define STRING_INV_DISPLAY			70
-#define STRING_INV_SOUND			71
-#define STRING_INV_NEW_GAME			161
-#define STRING_INV_LOAD_GAME		160
-#define STRING_INV_SAVE_GAME		172
-#define STRING_INV_EXIT_GAME		313
-#define STRING_INV_EXIT_TO_TITLE	173
-
 typedef struct SavegameInfo {
 	bool present;
 	char levelName[75];

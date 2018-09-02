@@ -1,0 +1,39 @@
+      0: <TOMB5 Starts diagnostic log>
+      0: <MSG_TypeDef wParam=0x1 lParam=0xff>
+      0: <TOMB5 requires clearing log buffer page: reset last pointer (change log page)>
+     15: <MSG_TypeDef wParam=0x0 lParam=0x8000>
+     15: <MSG_TypeDef wParam=0x1 lParam=0x802040>
+     15: <MSG_TypeDef wParam=0x0 lParam=0x80>
+     15: <MSG_TypeDef wParam=0x1 lParam=0x800000>
+     15: <MSG_TypeDef wParam=0x0 lParam=0x800080>
+     15: <MSG_TypeDef wParam=0x0 lParam=0x8000ff>
+     15: <MSG_TypeDef wParam=0x0 lParam=0x8080>
+     15: Launching - Tomb Raider Chronicles
+     15: WinMain
+     15: WinRunCheck
+      0: <TOMB5 Starts diagnostic log>
+      0: <MSG_TypeDef wParam=0x1 lParam=0xff>
+      0: <TOMB5 requires clearing log buffer page: reset last pointer (change log page)>
+      0: <MSG_TypeDef wParam=0x0 lParam=0x8000>
+      0: <MSG_TypeDef wParam=0x1 lParam=0x802040>
+      0: <MSG_TypeDef wParam=0x0 lParam=0x80>
+      0: <MSG_TypeDef wParam=0x1 lParam=0x800000>
+      0: <MSG_TypeDef wParam=0x0 lParam=0x800080>
+      0: <MSG_TypeDef wParam=0x0 lParam=0x8000ff>
+      0: <MSG_TypeDef wParam=0x0 lParam=0x8080>
+     16: Launching - Tomb Raider Chronicles
+     16: WinMain
+     16: WinRunCheck
+      0: <TOMB5 Starts diagnostic log>
+      0: <MSG_TypeDef wParam=0x1 lParam=0xff>
+      0: <TOMB5 requires clearing log buffer page: reset last pointer (change log page)>
+      0: <MSG_TypeDef wParam=0x0 lParam=0x8000>
+      0: <MSG_TypeDef wParam=0x1 lParam=0x802040>
+     16: <MSG_TypeDef wParam=0x0 lParam=0x80>
+     16: <MSG_TypeDef wParam=0x1 lParam=0x800000>
+     16: <MSG_TypeDef wParam=0x0 lParam=0x800080>
+     16: <MSG_TypeDef wParam=0x0 lParam=0x8000ff>
+     16: <MSG_TypeDef wParam=0x0 lParam=0x8080>
+     16: Launching - Tomb Raider Chronicles
+     16: WinMain
+     31: WinRunCheck

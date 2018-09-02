@@ -14,8 +14,6 @@
 #define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 #define Sub_0042A050 ((void (__cdecl*)()) 0x0042A050)  
 
-extern Renderer* g_Renderer;
-
 __int32 __cdecl DrawPhaseGame();
 void __cdecl DoBootScreen(__int32 language);
 void __cdecl DrawPistolsMeshes(__int32 weapon);
@@ -23,5 +21,7 @@ void __cdecl DrawShotgunMeshes(__int32 weapon);
 void __cdecl UndrawPistolsMeshLeft(__int32 weapon);
 void __cdecl UndrawPistolsMeshRight(__int32 weapon);
 void __cdecl UndrawShotgunMeshes(__int32 weapon);
+
+extern Renderer* g_Renderer;
 
 void Inject_Draw();

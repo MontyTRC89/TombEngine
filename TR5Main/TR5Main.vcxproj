@@ -74,8 +74,8 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include;$(ProjectDir)Libs\bass</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(ProjectDir)Libs\bass</LibraryPath>
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include;$(ProjectDir)Libs\bass;$(ProjectDir)Libs\sol2;$(ProjectDir)Libs\lua</IncludePath>
+    <LibraryPath>$(LibraryPath);$(ProjectDir)Libs\lua;$(DXSDK_DIR)Lib\x86;$(ProjectDir)Libs\bass</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -106,10 +106,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>bass.lib;bassmix.lib;bass_fx.lib;d3d9.lib;dinput8.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;d3d9.lib;dinput8.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y "$(ProjectDir)Shaders\*.fx" "$(TargetDir)"</Command>
+      <Command>md "$(TargetDir)\Shaders" 
+xcopy /Y "$(ProjectDir)Shaders\*.fx" "$(TargetDir)\Shaders"
+md "$(TargetDir)\Scripts" 
+xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -249,7 +252,7 @@
     <ClInclude Include="Renderer\ShadowMapTarget.h" />
     <ClInclude Include="Renderer\Structs.h" />
     <ClInclude Include="Renderer\RenderTargetCube.h" />
-    <ClInclude Include="Scripting\scripting.h" />
+    <ClInclude Include="Scripting\GameScript.h" />
     <ClInclude Include="Specific\directx.h" />
     <ClInclude Include="Specific\init.h" />
     <ClInclude Include="Specific\input.h" />
@@ -320,6 +323,7 @@
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\ShadowMapTarget.cpp" />
     <ClCompile Include="Renderer\RenderTargetCube.cpp" />
+    <ClCompile Include="Scripting\GameScript.cpp" />
     <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
     <ClCompile Include="Specific\game.cpp" />
@@ -331,6 +335,22 @@
     <ClCompile Include="TR5Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Scripting\Scripts\English.lua">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Scripting\Scripts\Levels.lua">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Scripting\Scripts\Settings.lua">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Scripting\Scripts\Title.lua">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+    </None>
     <None Include="Shaders\Basic.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>

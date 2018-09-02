@@ -65,13 +65,13 @@ COMBINE WITH
 LOAD GAME
 SAVE GAME
 EXAMINE
- More
- Select Ammo
- Select Option
- Combine
- Push Keypad
- Movement
- Previous/Next                      Back
+Game
+Lara's home
+Controls
+Display
+Sound
+PSX
+PSX
  Grappling Gun
  Grappling Gun Ammo
 Chloroform soaked cloth

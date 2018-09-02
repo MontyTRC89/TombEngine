@@ -216,36 +216,36 @@ Renderer::Renderer()
 	m_youngLaraSkinJointRemap[14][4] = 7;
 	m_youngLaraSkinJointRemap[14][5] = 7;
 
-	m_quadVertices[0].x = -1;
-	m_quadVertices[0].y = 1;
-	m_quadVertices[0].z = 1;
-	m_quadVertices[0].u = 0;
-	m_quadVertices[0].v = 0;
+	m_fullscreenQuadVertices[0].x = -1;
+	m_fullscreenQuadVertices[0].y = 1;
+	m_fullscreenQuadVertices[0].z = 1;
+	m_fullscreenQuadVertices[0].u = 0;
+	m_fullscreenQuadVertices[0].v = 0;
 
-	m_quadVertices[1].x = 1;
-	m_quadVertices[1].y = 1;
-	m_quadVertices[1].z = 1;
-	m_quadVertices[1].u = 1;
-	m_quadVertices[1].v = 0;
+	m_fullscreenQuadVertices[1].x = 1;
+	m_fullscreenQuadVertices[1].y = 1;
+	m_fullscreenQuadVertices[1].z = 1;
+	m_fullscreenQuadVertices[1].u = 1;
+	m_fullscreenQuadVertices[1].v = 0;
 
-	m_quadVertices[2].x = -1;
-	m_quadVertices[2].y = -1;
-	m_quadVertices[2].z = 1;
-	m_quadVertices[2].u = 0;
-	m_quadVertices[2].v = 1;
+	m_fullscreenQuadVertices[2].x = -1;
+	m_fullscreenQuadVertices[2].y = -1;
+	m_fullscreenQuadVertices[2].z = 1;
+	m_fullscreenQuadVertices[2].u = 0;
+	m_fullscreenQuadVertices[2].v = 1;
 
-	m_quadVertices[3].x = 1;
-	m_quadVertices[3].y = -1;
-	m_quadVertices[3].z = 1;
-	m_quadVertices[3].u = 1;
-	m_quadVertices[3].v = 1;
+	m_fullscreenQuadVertices[3].x = 1;
+	m_fullscreenQuadVertices[3].y = -1;
+	m_fullscreenQuadVertices[3].z = 1;
+	m_fullscreenQuadVertices[3].u = 1;
+	m_fullscreenQuadVertices[3].v = 1;
 
-	m_quadIndices[0] = 0;
-	m_quadIndices[1] = 3;
-	m_quadIndices[2] = 2;
-	m_quadIndices[3] = 0;
-	m_quadIndices[4] = 1;
-	m_quadIndices[5] = 3;
+	m_fullscreenQuadIndices[0] = 0;
+	m_fullscreenQuadIndices[1] = 3;
+	m_fullscreenQuadIndices[2] = 2;
+	m_fullscreenQuadIndices[3] = 0;
+	m_fullscreenQuadIndices[4] = 1;
+	m_fullscreenQuadIndices[5] = 3;
 }
 
 Renderer::~Renderer()
@@ -266,16 +266,22 @@ Renderer::~Renderer()
 	delete m_depthBuffer;
 	delete m_shaderClearGBuffer;
 	delete m_shaderFillGBuffer;
+	delete m_postprocessBuffer;
+	delete m_shaderClearGBuffer;
+	delete m_shaderFillGBuffer;
 	delete m_shaderLight;
 	delete m_shaderCombine;
 	delete m_shaderBasic;
 	delete m_shaderDepth;
-	delete m_shaderRain;
+	delete m_shaderReconstructZBuffer;
 	delete m_shaderSprites;
+	delete m_shaderRain;
 	delete m_shaderTransparent;
 	delete m_sphereMesh;
 	delete m_shadowMap;
 	delete m_renderTarget;
+	delete m_quad;
+	delete m_skyQuad;
 }
 
 bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
@@ -377,57 +383,57 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_shadowBuffer = new RenderTarget2D(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
 	m_postprocessBuffer = new RenderTarget2D(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
 
-	m_shaderClearGBuffer = new Shader(m_device, (char*)"ClearGBuffer.fx");
+	m_shaderClearGBuffer = new Shader(m_device, (char*)"Shaders\\ClearGBuffer.fx");
 	m_shaderClearGBuffer->Compile();
 	if (m_shaderClearGBuffer->GetEffect() == NULL)
 		return false;
 
-	m_shaderFillGBuffer = new Shader(m_device, (char*)"FillGBuffer.fx");
+	m_shaderFillGBuffer = new Shader(m_device, (char*)"Shaders\\FillGBuffer.fx");
 	m_shaderFillGBuffer->Compile();
 	if (m_shaderFillGBuffer->GetEffect() == NULL)
 		return false;
 
-	m_shaderLight = new Shader(m_device, (char*)"Light.fx");
+	m_shaderLight = new Shader(m_device, (char*)"Shaders\\Light.fx");
 	m_shaderLight->Compile();
 	if (m_shaderLight->GetEffect() == NULL)
 		return false;
 
-	m_shaderCombine = new Shader(m_device, (char*)"CombineFinal.fx");
+	m_shaderCombine = new Shader(m_device, (char*)"Shaders\\CombineFinal.fx");
  	m_shaderCombine->Compile();
 	if (m_shaderCombine->GetEffect() == NULL)
 		return false;	
 
-	m_shaderBasic = new Shader(m_device, (char*)"Basic.fx");
+	m_shaderBasic = new Shader(m_device, (char*)"Shaders\\Basic.fx");
 	m_shaderBasic->Compile();
 	if (m_shaderBasic->GetEffect() == NULL)
 		return false;
 
-	m_shaderRain = new Shader(m_device, (char*)"Rain.fx");
+	m_shaderRain = new Shader(m_device, (char*)"Shaders\\Rain.fx");
 	m_shaderRain->Compile();
 	if (m_shaderRain->GetEffect() == NULL)
 		return false;
 
-	m_shaderReconstructZBuffer = new Shader(m_device, (char*)"ReconstructZBuffer.fx");
+	m_shaderReconstructZBuffer = new Shader(m_device, (char*)"Shaders\\ReconstructZBuffer.fx");
 	m_shaderReconstructZBuffer->Compile();
 	if (m_shaderReconstructZBuffer->GetEffect() == NULL)
 		return false;
 
-	m_shaderSprites = new Shader(m_device, (char*)"Sprites.fx");
+	m_shaderSprites = new Shader(m_device, (char*)"Shaders\\Sprites.fx");
 	m_shaderSprites->Compile();
 	if (m_shaderSprites->GetEffect() == NULL)
 		return false;
 
-	m_shaderRain = new Shader(m_device, (char*)"Rain.fx");
+	m_shaderRain = new Shader(m_device, (char*)"Shaders\\Rain.fx");
 	m_shaderRain->Compile();
 	if (m_shaderRain->GetEffect() == NULL)
 		return false;
 
-	m_shaderTransparent = new Shader(m_device, (char*)"Transparent.fx");
+	m_shaderTransparent = new Shader(m_device, (char*)"Shaders\\Transparent.fx");
 	m_shaderTransparent->Compile();
 	if (m_shaderTransparent->GetEffect() == NULL)
 		return false;
 
-	m_shaderDepth = new Shader(m_device, (char*)"Depth.fx");
+	m_shaderDepth = new Shader(m_device, (char*)"Shaders\\Depth.fx");
 	m_shaderDepth->Compile();
 	if (m_shaderDepth->GetEffect() == NULL)
 		return false;
@@ -505,12 +511,13 @@ void Renderer::resetBlink()
 	m_blinkColorDirection = -1;
 	m_blinkColorValue = 255;
 }
-
+  
 void Renderer::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color, __int32 flags)
 {
 	__int32 realX = x;
 	__int32 realY = y;
-	float factor = ScreenWidth / 800.0f;
+	float factorX = ScreenWidth / 800.0f;
+	float factorY = ScreenHeight / 600.0f;
 
 	RECT rect = { 0, 0, 0, 0 };
 
@@ -532,10 +539,10 @@ void Renderer::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color, _
 		rect.bottom += y;
 	}
 
-	rect.left *= factor;
-	rect.right *= factor;
-	rect.top *= factor;
-	rect.bottom *= factor;
+	rect.left *= factorX;
+	rect.right *= factorX;
+	rect.top *= factorY;
+	rect.bottom *= factorY;
 
 	if (flags & PRINTSTRING_BLINK)
 	{
@@ -880,19 +887,6 @@ bool Renderer::PrepareDataForTheRenderer()
 
 		m_animatedTextureSets.push_back(set);
 	}
-
-	// Step 0: free all previus resources
-	for (map<__int32, RendererRoom*>::iterator it = m_rooms.begin(); it != m_rooms.end(); ++it)
-		delete (it->second);
-	m_rooms.clear();
-
-	for (map<__int32, RendererObject*>::iterator it = m_moveableObjects.begin(); it != m_moveableObjects.end(); ++it)
-		delete (it->second);
-	m_moveableObjects.clear();
-
-	for (map<__int32, RendererObject*>::iterator it = m_staticObjects.begin(); it != m_staticObjects.end(); ++it)
-		delete (it->second);
-	m_staticObjects.clear();
 
 	// Step 1: create the texture atlas
 	byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
@@ -2627,8 +2621,9 @@ __int32 Renderer::drawInventoryScene()
 	// Set basic render states
 	setDepthWrite(true);
 	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-	
-	byte colorComponent = 1.0f; // (m_fadeTimer < 15.0f ? 255.0f / (15.0f - min(m_fadeTimer, 15.0f)) : 255);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+
+	byte colorComponent = 255; // (m_fadeTimer < 15.0f ? 255.0f / (15.0f - min(m_fadeTimer, 15.0f)) : 255);
 
 	// Draw the full screen background
 	if (g_Inventory->GetType() == INV_TYPE_TITLE)
@@ -2664,7 +2659,7 @@ __int32 Renderer::drawInventoryScene()
 	
 	// Setup a nice directional light
 	effect->SetVector(effect->GetParameterByName(NULL, "LightDirection"), &D3DXVECTOR4(-1.0f, 0.707f, -1.0f, 1.0f));
-	effect->SetVector(effect->GetParameterByName(NULL, "LightColor"), &D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "LightColor"), &D3DXVECTOR4(1.0f, 1.0f, 0.5f, 1.0f));
 	effect->SetFloat(effect->GetParameterByName(NULL, "LightIntensity"), 0.8f);
 	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &D3DXVECTOR4(0.5f, 0.5f, 0.5f, 1.0f));
 	
@@ -2821,23 +2816,23 @@ __int32 Renderer::drawInventoryScene()
 								lastY += 24;
 							}
 						}
-						char* string = (char*)g_NewStrings[0].c_str();
+						char* string = (char*)"";
 						switch (ring->passportAction)
 						{
 						case INV_WHAT_PASSPORT_NEW_GAME:
-							string = (char*)g_NewStrings[STRING_INV_NEW_GAME].c_str();
+							string = g_Script->GetString(STRING_INV_NEW_GAME);
 							break;
 						case INV_WHAT_PASSPORT_LOAD_GAME:
-							string = (char*)g_NewStrings[STRING_INV_LOAD_GAME].c_str();
+							string = g_Script->GetString(STRING_INV_LOAD_GAME);
 							break;
 						case INV_WHAT_PASSPORT_SAVE_GAME:
-							string = (char*)g_NewStrings[STRING_INV_SAVE_GAME].c_str();
+							string = g_Script->GetString(STRING_INV_SAVE_GAME);
 							break;
 						case INV_WHAT_PASSPORT_EXIT_GAME:
-							string = (char*)g_NewStrings[STRING_INV_EXIT_GAME].c_str();
+							string = g_Script->GetString(STRING_INV_EXIT_GAME);
 							break;
 						case INV_WHAT_PASSPORT_EXIT_TO_TITLE:
-							string = (char*)g_NewStrings[STRING_INV_EXIT_TO_TITLE].c_str();
+							string = g_Script->GetString(STRING_INV_EXIT_TO_TITLE);
 							break;
 						}
 
@@ -3062,8 +3057,8 @@ bool Renderer::drawScene(bool dump)
 	effect->Begin(&cPasses, 0);
 	effect->BeginPass(0);
 	effect->CommitChanges();
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_quadIndices, D3DFORMAT::D3DFMT_INDEX32,
-		m_quadVertices, sizeof(RendererVertex));
+	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFORMAT::D3DFMT_INDEX32,
+		m_fullscreenQuadVertices, sizeof(RendererVertex));
 	effect->EndPass();
 	effect->End(); 
 	m_device->EndScene(); 
@@ -3305,8 +3300,8 @@ bool Renderer::drawScene(bool dump)
 
 	effect->BeginPass(0);
 	effect->CommitChanges();
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_quadIndices, D3DFORMAT::D3DFMT_INDEX32,
-		m_quadVertices, sizeof(RendererVertex));
+	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFORMAT::D3DFMT_INDEX32,
+		m_fullscreenQuadVertices, sizeof(RendererVertex));
 	effect->EndPass();
 	effect->End();
 	m_device->EndScene();
@@ -5372,4 +5367,28 @@ void Renderer::FreeRendererData()
 	DX_RELEASE(m_textureAtlas);
 	DX_RELEASE(m_fontAndMiscTexture);
 	DX_RELEASE(m_skyTexture);
+
+	for (map<__int32, RendererRoom*>::iterator it = m_rooms.begin(); it != m_rooms.end(); ++it)
+		delete (it->second);
+	m_rooms.clear();
+
+	for (map<__int32, RendererObject*>::iterator it = m_moveableObjects.begin(); it != m_moveableObjects.end(); ++it)
+		delete (it->second);
+	m_moveableObjects.clear();
+
+	for (map<__int32, RendererObject*>::iterator it = m_staticObjects.begin(); it != m_staticObjects.end(); ++it)
+		delete (it->second);
+	m_staticObjects.clear();
+
+	for (vector<RendererAnimatedTextureSet*>::iterator it = m_animatedTextureSets.begin(); it != m_animatedTextureSets.end(); ++it)
+		delete (*it);
+	m_animatedTextureSets.clear();
+
+	for (map<__int32, RendererSprite*>::iterator it = m_sprites.begin(); it != m_sprites.end(); ++it)
+		delete (it->second);
+	m_sprites.clear();
+
+	for (map<__int32, RendererSpriteSequence*>::iterator it = m_spriteSequences.begin(); it != m_spriteSequences.end(); ++it)
+		delete (it->second);
+	m_spriteSequences.clear();
 }

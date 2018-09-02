@@ -416,7 +416,7 @@ __int32 __cdecl LoadRoomsNew()
 
 void __cdecl FreeLevel()
 {
-
+	g_Renderer->FreeRendererData();
 }
 
 unsigned __stdcall LoadLevel(void* data)

@@ -518,8 +518,8 @@ class Renderer
 	Shader*							m_shaderSprites;
 	Shader*							m_shaderRain;
 	Shader*							m_shaderTransparent;
-	RendererVertex					m_quadVertices[4];
-	__int32							m_quadIndices[6];
+	RendererVertex					m_fullscreenQuadVertices[4];
+	__int32							m_fullscreenQuadIndices[6];
 	RendererSphere*					m_sphereMesh;
 	RendererQuad*					m_quad;
 	RendererQuad*					m_skyQuad;

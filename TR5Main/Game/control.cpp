@@ -217,11 +217,10 @@ void __cdecl DoTitle(__int32 index)
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
 	//gfLevelFlags |= 1;
-	DoLevel(3, 124);
-	return;
+	//DoLevel(3, 124);
+	//return;
 
 	S_LoadLevelFile(0);
-
 	g_Inventory->DoTitleInventory();
 }
 
