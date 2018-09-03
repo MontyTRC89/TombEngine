@@ -25,9 +25,11 @@ RendererBucket::~RendererBucket()
 {
 	if (m_vertexBuffer != NULL)
 		m_vertexBuffer->Release();
+	m_vertexBuffer = NULL;
 
 	if (m_indexBuffer != NULL)
 		m_indexBuffer->Release();
+	m_indexBuffer = NULL;
 }
   
 bool RendererBucket::UpdateBuffers()

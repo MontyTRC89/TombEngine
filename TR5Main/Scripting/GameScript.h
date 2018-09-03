@@ -56,6 +56,7 @@ using namespace std;
 #define STRING_INV_COMBINE				40
 #define STRING_INV_SEPARE				41
 #define STRING_INV_CHOOSE_AMMO			42
+#define STRING_INV_SELECT_LEVEL			43
 
 /*
 #define STRING_INV_PASSPORT			67
@@ -75,7 +76,10 @@ typedef struct GameScriptSettings {
 	__int32 ScreenHeight;
 	bool EnableLoadSave;
 	bool EnableDynamicShadows;
+	bool EnableWaterCaustics;
+	bool Windowed;
 	string WindowTitle;
+	__int32 DrawingDistance;
 };
 
 typedef struct GameScriptSkyLayer {
@@ -120,6 +124,7 @@ typedef struct GameScriptLevel {
 	string FileName;
 	string ScriptFileName;
 	string LoadScreenFileName;
+	string Background;
 	__int32 Name;
 	__int32 Soundtrack;
 	GameScriptSkyLayer Layer1;
@@ -127,6 +132,7 @@ typedef struct GameScriptLevel {
 	bool Horizon;
 	bool ColAddHorizon;
 	GameScriptFog Fog;
+	bool Storm;
 
 	GameScriptLevel()
 	{
@@ -140,9 +146,8 @@ private:
 	sol::state							m_lua;
 	GameScriptSettings					m_settings;
 	vector<string>						m_strings;
-	GameScriptLevel*					m_title;
 	vector<GameScriptLevel*>			m_levels;
-
+	__int32								m_numLevels;
 	string								loadScriptFromFile(char* luaFilename);
 
 public:
@@ -155,6 +160,7 @@ public:
 	__int32								FogOutDistance;
 	bool								DrawHorizon;
 	bool								ColAddHorizon;
+	__int32								SelectedLevelForNewGame;
 
 	GameScript();
 	~GameScript();
@@ -165,9 +171,10 @@ public:
 	char*								GetString(__int32 id);
 	GameScriptSettings*					GetSettings();
 	GameScriptLevel*					GetLevel(__int32 id);
-	GameScriptLevel*					GetTitle();
 	void								SetHorizon(bool horizon, bool colAddHorizon);
 	void								SetLayer1(byte r, byte g, byte b, __int16 speed);
 	void								SetLayer2(byte r, byte g, byte b, __int16 speed);
 	void								SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 endDistance);
+	__int32								GetNumLevels();
+	void								AddLevel(GameScriptLevel* level);
 };

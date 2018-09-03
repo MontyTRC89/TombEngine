@@ -31,3 +31,5 @@ __int32 __cdecl DoSaveGameMenu();
 __int32 __cdecl LoadSavegameInfos();
 __int32 __cdecl LoadNewStrings();
 __int32 __cdecl DoPassportLoadGameMenu();
+
+bool __cdecl DoNewGameflow();

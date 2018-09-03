@@ -153,6 +153,17 @@ void Inject_Inventory();
 #define INV_RINGS_OFFSET				8192.0f
 #define INV_OBJECT_SCALE				1.5f
 
+typedef enum INVENTORY_RESULT {
+	INVENTORY_RESULT_NONE,
+	INVENTORY_RESULT_USE_ITEM,
+	INVENTORY_RESULT_NEW_GAME,
+	INVENTORY_RESULT_LOAD_GAME,
+	INVENTORY_RESULT_SAVE_GAME,
+	INVENTORY_RESULT_EXIT_GAME,
+	INVENTORY_RESULT_EXIT_TO_TILE,
+	INVENTORY_RESULT_NEW_GAME_SELECTED_LEVEL
+};
+
 typedef struct InventoryObject {
 	__int32 inventoryObject;
 	__int32 rotation;
@@ -198,13 +209,13 @@ public:
 	InventoryRing*				GetRing(__int32 index);
 	__int32						GetActiveRing();
 	void						SetActiveRing(__int32 index);
-	__int32						DoInventory();
-	__int32						DoTitleInventory();
+	INVENTORY_RESULT			DoInventory();
+	INVENTORY_RESULT			DoTitleInventory();
 	void						InsertObject(__int32 ring, __int32 objectNumber);
 	float						GetVerticalOffset();
 	void						UseCurrentItem();
 	InventoryObjectDefinition*	GetInventoryObject(__int32 index);
-	__int32						DoPassport();
+	INVENTORY_RESULT			DoPassport();
 	__int32						PopupObject();
 	__int32						PopoverObject();
 	__int32						GetType();

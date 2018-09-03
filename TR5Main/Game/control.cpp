@@ -16,6 +16,8 @@
 #include "pickup.h"
 #include "draw.h"
 #include "healt.h"
+#include "savegame.h"
+#include "sound.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -25,7 +27,7 @@
 #include <process.h>
 #include <stdio.h>
 
-__int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
+GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 {
 	RegeneratePickups();
 
@@ -45,7 +47,7 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		
 		// Poll the keyboard and update input variables
 		if (S_UpdateInput() == -1)
-			return 0;
+			return GAME_STATUS::GAME_STATUS_NONE;
 		
 		// Has Lara control been disabled?
 		if (DisableLaraControl && false)
@@ -65,9 +67,16 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		{
 			if ((DbInput & 0x200000 || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
-				//S_SoundStopAllSamples();
-				if (g_Inventory->DoInventory())
-					return 2;
+				// stop all sounds
+
+				INVENTORY_RESULT inventoryResult = g_Inventory->DoInventory();
+				switch (inventoryResult)
+				{
+				case INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME:
+					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+				case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE:
+					return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+				}
 			}
 		}
 
@@ -78,13 +87,13 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 
 		// Has level been completed?
 		if (LevelComplete)
-			return 3;
+			return GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED;
 
 		__int32 oldInput = TrInput;
 		 
 		if (ResetFlag || Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput)
 		{
-			if (GameFlow->DemoDisc && ResetFlag)
+			/*if (GameFlow->DemoDisc && ResetFlag)
 			{
 				ResetFlag = 0;
 				return 4;
@@ -93,7 +102,9 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			{
 				ResetFlag = 0;
 				return 1;
-			}
+			}*/
+			// TODO: check this
+			return GAME_STATUS::GAME_STATUS_LARA_DEAD;
 		}
 
 		if (demoMode && TrInput == -1)
@@ -161,7 +172,7 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		InItemControlLoop = false;
 		
 		j_HairControl(0, 0, 0);
-		if (gfLevelFlags & 1 || true)
+		if (gfLevelFlags & 1)
 			j_HairControl(0, 1, 0);
 
 		if (UseSpotCam)
@@ -188,6 +199,8 @@ __int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 
 		HealtBarTimer--;
 	}
+
+	return GAME_STATUS::GAME_STATUS_NONE;
 }
 
 unsigned __stdcall GameMain(void*)
@@ -203,7 +216,7 @@ unsigned __stdcall GameMain(void*)
 	//ResetSoundThings();
 	//SOUND_Init();
 	LoadNewStrings();
-	DoGameflow();
+	DoNewGameflow();
 	GameClose();
 	//ResetSoundThings();
 	PostMessageA((HWND)WindowsHandle, 0x10u, 0, 0);
@@ -212,44 +225,78 @@ unsigned __stdcall GameMain(void*)
 	return 1;   
 }   
 
-void __cdecl DoTitle(__int32 index)
+GAME_STATUS __cdecl DoTitle(__int32 index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
+
+	g_Renderer->FreeRendererData();
+
 	//gfLevelFlags |= 1;
 	//DoLevel(3, 124);
 	//return;
 
 	S_LoadLevelFile(0);
-	g_Inventory->DoTitleInventory();
+	
+	INVENTORY_RESULT inventoryResult = g_Inventory->DoTitleInventory();
+	switch (inventoryResult)
+	{
+	case INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME:
+		return GAME_STATUS::GAME_STATUS_NEW_GAME;
+	case INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME:
+		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+	case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE:
+		return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+	}
+
+	return GAME_STATUS::GAME_STATUS_NEW_GAME;
 }
 
-void __cdecl DoLevel(__int32 index, __int32 ambient)
+GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame)
 {
+	g_Renderer->FreeRendererData();
+
 	CreditsDone = false;
 	//j_DoTitleFMV();
 	CanLoad = false;
-	SkyColor1.r = 80;
-	SkyColor1.g = 96;
-	SkyColor1.b = 160;
-
-	SkyStormColor[0] = 80;
-	SkyStormColor[1] = 96;
-	SkyStormColor[2] = 160;
 
 	//InitialiseTitleOptionsMaybe(255, 0);
 
-	Savegame.Level.Timer = 0;
-	Savegame.Game.Timer = 0;
-	Savegame.Level.Distance = 0;
-	Savegame.Game.Distance = 0;
-	Savegame.Level.AmmoUsed = 0;
-	Savegame.Game.AmmoUsed = 0;
-	Savegame.Level.AmmoHits = 0;
-	Savegame.Game.AmmoHits = 0;
-	Savegame.Level.Kills = 0;
-	Savegame.Game.Kills = 0;
+	if (!loadFromSavegame)
+	{
+		Savegame.Level.Timer = 0;
+		Savegame.Game.Timer = 0;
+		Savegame.Level.Distance = 0;
+		Savegame.Game.Distance = 0;
+		Savegame.Level.AmmoUsed = 0;
+		Savegame.Game.AmmoUsed = 0;
+		Savegame.Level.AmmoHits = 0;
+		Savegame.Game.AmmoHits = 0;
+		Savegame.Level.Kills = 0;
+		Savegame.Game.Kills = 0;
+	}
 
+	if (loadFromSavegame)
+	{
+		RestoreGame();
+		gfRequiredStartPos = false;
+		gfInitialiseGame = false;
+	}
+	else
+	{
+		gfRequiredStartPos = false;
+		if (gfInitialiseGame)
+		{
+			GameTimer = 0;
+			gfRequiredStartPos = false;
+			gfInitialiseGame = false;
+		}
+
+		Savegame.Level.Timer = 0;
+		if (CurrentLevel == 1)
+			Savegame.TLCount = 0;
+	}
+		
 	//num_fmvs = 0;
 	//fmv_to_play[1] = 0;
 	//fmv_to_play[0] = 0;
@@ -294,12 +341,17 @@ void __cdecl DoLevel(__int32 index, __int32 ambient)
 	//printf("After control\n");
 	
 	__int32 nframes = 2;
-	GameStatus = ControlPhase(nframes, 0);
+	GAME_STATUS result = ControlPhase(nframes, 0);
 	//JustLoaded = 0;
-	while (!GameStatus || true)
+	while (true)
 	{
 		nframes = DrawPhaseGame();
-		GameStatus = ControlPhase(nframes, 0);
+		result = ControlPhase(nframes, 0);
+		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
+			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
+			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
+			return result;
+
 		Sound_UpdateScene();
 	}
 }

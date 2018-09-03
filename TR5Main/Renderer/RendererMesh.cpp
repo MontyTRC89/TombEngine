@@ -17,7 +17,7 @@ RendererMesh::RendererMesh(LPDIRECT3DDEVICE9 device)
 	m_buckets = (RendererBucket**)malloc(NUM_BUCKETS * sizeof(RendererBucket*));
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
 		m_buckets[i] = new RendererBucket(device);
-
+	 
 	m_animatedBuckets = (RendererBucket**)malloc(NUM_BUCKETS * sizeof(RendererBucket*));
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
 		m_animatedBuckets[i] = new RendererBucket(device);

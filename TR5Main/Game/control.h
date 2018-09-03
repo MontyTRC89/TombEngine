@@ -2,6 +2,17 @@
 
 #include "..\Global\global.h"
 
+typedef enum GAME_STATUS {
+	GAME_STATUS_NONE,
+	GAME_STATUS_NEW_GAME,
+	GAME_STATUS_LOAD_GAME,
+	GAME_STATUS_SAVE_GAME,
+	GAME_STATUS_EXIT_TO_TITLE,
+	GAME_STATUS_EXIT_GAME,
+	GAME_STATUS_LARA_DEAD,
+	GAME_STATUS_LEVEL_COMPLETED
+};
+
 #define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 #define GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
 #define TrGetHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
@@ -31,9 +42,9 @@
 #define UpdateShockwaves ((void (__cdecl*)()) 0x004849A0)
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 
-void __cdecl DoTitle(__int32 index);
-void __cdecl DoLevel(__int32 index, __int32 ambient);
-__int32 __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
+GAME_STATUS __cdecl DoTitle(__int32 index);
+GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);
+GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
 
 unsigned __stdcall GameMain(void*);
 

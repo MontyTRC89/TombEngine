@@ -483,7 +483,9 @@ unsigned __stdcall LoadLevel(void* data)
 		return false;
 	}
 
+	g_Renderer->FreeRendererData();
 	g_Renderer->PrepareDataForTheRenderer();
+
 	InitialiseLara(0);
 	//InitialiseGameStuff();
 	IsLevelLoading = false;
@@ -496,6 +498,8 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 {
 	DB_Log(2, "S_LoadLevelFile - DLL");
 	printf("S_LoadLevelFile\n");
+
+	g_Renderer->FreeRendererData();
 
 	RenderLoadBar = false;
 	

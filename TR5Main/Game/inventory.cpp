@@ -5,11 +5,13 @@
 #include "sound.h"
 #include "gameflow.h"
 #include "sound.h"
+#include "savegame.h"
 
 #include "..\Global\global.h"
 #include "..\Specific\input.h"
 
 Inventory* g_Inventory;
+extern GameScript* g_Script;
 
 void Inject_Inventory()
 {
@@ -100,7 +102,7 @@ void Inventory::Initialise()
 		//Lara.uzisTypeCarried = 1;
 		//Lara.numUziAmmo = 1000;
 
-		Lara.shotgunTypeCarried = 1;
+		/*Lara.shotgunTypeCarried = 1;
 		Lara.numShotgunAmmo1 = 1000;
 		Lara.numShotgunAmmo2 = 1000;
 
@@ -108,7 +110,7 @@ void Inventory::Initialise()
 		Lara.numShotgunAmmo2 = 1000;
 		Lara.crowbar = 1;
 
-		Lara.sixshooterTypeCarried = 1;
+		Lara.sixshooterTypeCarried = 1;*/
 		//Lara.uzisTypeCarried = 1;
 		//Lara.numUziAmmo = 10000;
 				//Lara.crossbowTypeCarried = 1;
@@ -319,7 +321,7 @@ void Inventory::Initialise()
 	InventoryItemChosen = -1;
 }
 
-__int32 Inventory::DoInventory()
+INVENTORY_RESULT Inventory::DoInventory()
 {
 	Initialise();
 
@@ -331,6 +333,8 @@ __int32 Inventory::DoInventory()
 
 	g_Renderer->DumpGameScene();
 	g_Renderer->DrawInventory();
+
+	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
 
 	while (!ResetFlag)
 	{
@@ -347,7 +351,7 @@ __int32 Inventory::DoInventory()
 
 			// Exit from inventory
 			GlobalEnterInventory = -1;
-			return 0;
+			return INVENTORY_RESULT::INVENTORY_RESULT_NONE;
 		}
 		else if (DbInput & 1 &&
 				 (m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
@@ -445,7 +449,15 @@ __int32 Inventory::DoInventory()
 			if (m_activeRing == INV_RING_OPTIONS)
 			{
 				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
-					DoPassport();
+				{
+					INVENTORY_RESULT passportResult = DoPassport();
+					if (passportResult == INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME ||
+						passportResult == INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE ||
+						passportResult == INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME)
+					{
+						return passportResult;
+					}
+				}
 
 				// DEPRECATED: all the followings will be done by passaport
 				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_TIMEX)
@@ -463,7 +475,7 @@ __int32 Inventory::DoInventory()
 
 				// Exit from inventory
 				GlobalEnterInventory = -1;
-				return 0;
+				return INVENTORY_RESULT::INVENTORY_RESULT_USE_ITEM;
 			}	
 		}
 
@@ -471,7 +483,7 @@ __int32 Inventory::DoInventory()
 		g_Renderer->SyncRenderer();
 	}
 
-	return 0;
+	return result;
 }
 
 void Inventory::UseCurrentItem()
@@ -783,7 +795,7 @@ void Inventory::InitialiseTitle()
 	InventoryItemChosen = -1;
 }
 
-__int32 Inventory::DoTitleInventory()
+INVENTORY_RESULT Inventory::DoTitleInventory()
 {
 	InitialiseTitle();
 
@@ -796,6 +808,8 @@ __int32 Inventory::DoTitleInventory()
 
 	g_Renderer->DrawInventory();
 
+	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
+
 	while (!ResetFlag)
 	{
 		SetDebounce = true;
@@ -807,6 +821,8 @@ __int32 Inventory::DoTitleInventory()
 		// Handle input
 		if (DbInput & 4)
 		{
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
 			// Change object right
 			float deltaAngle = 360.0f / ring->numObjects / 8.0f;
 			ring->movement = 0;
@@ -828,6 +844,8 @@ __int32 Inventory::DoTitleInventory()
 		}
 		else if (DbInput & 8)
 		{
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
 			// Change object left
 			float deltaAngle = 360.0f / ring->numObjects / 8.0f;
 			ring->movement = 0;
@@ -849,8 +867,18 @@ __int32 Inventory::DoTitleInventory()
 		}
 		else if (DbInput & 0x100000)
 		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
 			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
-				DoPassport();
+			{
+				INVENTORY_RESULT passportResult = DoPassport();
+				if (passportResult == INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME ||
+					passportResult == INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME ||
+					passportResult == INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME)
+				{
+					return result;
+				}
+			}
 
 			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_TIMEX)
 				DoStatisticsMenu();
@@ -866,7 +894,7 @@ __int32 Inventory::DoTitleInventory()
 		g_Renderer->SyncRenderer();
 	}
 
-	return 0;
+	return result;
 }
 
 InventoryObjectDefinition* Inventory::GetInventoryObject(__int32 index)
@@ -874,7 +902,7 @@ InventoryObjectDefinition* Inventory::GetInventoryObject(__int32 index)
 	return &m_objectsTable[index];
 }
 
-__int32	Inventory::DoPassport()
+INVENTORY_RESULT Inventory::DoPassport()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
@@ -885,6 +913,7 @@ __int32	Inventory::DoPassport()
 	if (m_type == INV_TYPE_TITLE)
 	{
 		choices.push_back(INV_WHAT_PASSPORT_NEW_GAME);
+		choices.push_back(INV_WHAT_PASSPORT_SELECT_LEVEL);
 		choices.push_back(INV_WHAT_PASSPORT_LOAD_GAME);
 		choices.push_back(INV_WHAT_PASSPORT_EXIT_GAME);
 	}
@@ -911,6 +940,8 @@ __int32	Inventory::DoPassport()
 	bool moveLeft = false;
 	bool moveRight = false;
 	bool closePassport = false;
+
+	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
 
 	// Do the passport
 	while (true)
@@ -955,8 +986,7 @@ __int32	Inventory::DoPassport()
 			moveLeft = false;
 			moveRight = false;
 			closePassport = false;
-
-
+			
 			if (choice < choices.size() - 1)
 			{
 				ring->frameIndex = 14;
@@ -1018,8 +1048,13 @@ __int32	Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					//if (choice == 0)
-					//	DoStatisticsMenu();
+					ReadSavegame(selectedSavegame);
+					result = INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME;
+					moveLeft = false;
+					moveRight = false;
+					closePassport = true;
+
+					break;
 				}
 
 				ring->selectedIndex = selectedSavegame;
@@ -1078,14 +1113,83 @@ __int32	Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					//if (choice == 0)
-					//	DoStatisticsMenu();
+					CreateSavegame();
+					WriteSavegame(selectedSavegame);
+					moveLeft = false;
+					moveRight = false;
+					closePassport = true;
+
+					break;
 				}
 
 				ring->selectedIndex = selectedSavegame;
 				ring->passportAction = INV_WHAT_PASSPORT_SAVE_GAME;
 
 				LoadSavegameInfos();
+
+				g_Renderer->DrawInventory();
+				g_Renderer->SyncRenderer();
+			}
+		}
+		else if (choices[choice] == INV_WHAT_PASSPORT_SELECT_LEVEL)
+		{
+			// Save game
+			__int32 selectedLevel = 0;
+			while (true)
+			{
+				SetDebounce = 1;
+				S_UpdateInput();
+				SetDebounce = 0;
+
+				// Process input
+				if (DbInput & 0x200000)
+				{
+					moveLeft = false;
+					moveRight = false;
+					closePassport = true;
+
+					break;
+				}
+				else if (DbInput & 1 && selectedLevel > 0)
+				{
+					selectedLevel--;
+					continue;
+				}
+				else if (DbInput & 2 && selectedLevel < g_Script->GetNumLevels() - 1)
+				{
+					selectedLevel++;
+					continue;
+				}
+				else if (DbInput & 4)
+				{
+					moveLeft = true;
+					moveRight = false;
+					closePassport = false;
+
+					break;
+				}
+				else if (DbInput & 8)
+				{
+					moveLeft = false;
+					moveRight = true;
+					closePassport = false;
+
+					break;
+				}
+				else if (DbInput & 0x100000)
+				{
+					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
+					g_Script->SelectedLevelForNewGame = selectedLevel + 1;
+
+					moveLeft = false;
+					moveRight = false;
+					closePassport = true;
+
+					break;
+				}
+
+				ring->selectedIndex = selectedLevel;
+				ring->passportAction = INV_WHAT_PASSPORT_SELECT_LEVEL;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -1127,8 +1231,12 @@ __int32	Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					//if (choice == 0)
-					//	DoStatisticsMenu();
+					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
+					moveLeft = false;
+					moveRight = false;
+					closePassport = true;
+
+					break;
 				}
 
 				ring->passportAction = INV_WHAT_PASSPORT_NEW_GAME;
@@ -1173,8 +1281,12 @@ __int32	Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					//if (choice == 0)
-					//	DoStatisticsMenu();
+					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME;
+					moveLeft = false;
+					moveRight = false;
+					closePassport = true;
+
+					break;
 				}
 
 				ring->passportAction = INV_WHAT_PASSPORT_EXIT_GAME;
@@ -1219,8 +1331,12 @@ __int32	Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					//if (choice == 0)
-					//	DoStatisticsMenu();
+					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE;
+					moveLeft = false;
+					moveRight = false;
+					closePassport = true;
+
+					break;
 				}
 
 				ring->passportAction = INV_WHAT_PASSPORT_EXIT_TO_TITLE;
@@ -1249,7 +1365,7 @@ __int32	Inventory::DoPassport()
 
 	PopoverObject();
 
-	return 0;
+	return result;
 }
 
 __int32	Inventory::PopupObject()

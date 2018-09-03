@@ -8,7 +8,10 @@ GameScript::GameScript()
 		"screenWidth", &GameScriptSettings::ScreenWidth,
 		"screenHeight", &GameScriptSettings::ScreenHeight,
 		"windowTitle", &GameScriptSettings::WindowTitle,
-		"enableDynamicShadows", &GameScriptSettings::EnableDynamicShadows
+		"enableDynamicShadows", &GameScriptSettings::EnableDynamicShadows,
+		"windowed", &GameScriptSettings::Windowed,
+		"enableWaterCaustics", &GameScriptSettings::EnableWaterCaustics,
+		"drawingDistance", &GameScriptSettings::DrawingDistance
 		);
 
 	m_lua.new_usertype<GameScriptSkyLayer>("SkyLayer",
@@ -37,16 +40,21 @@ GameScript::GameScript()
 		"layer2", &GameScriptLevel::Layer2,
 		"fog", &GameScriptLevel::Fog,
 		"horizon", &GameScriptLevel::Horizon,
-		"coladdhorizon", &GameScriptLevel::ColAddHorizon
+		"coladdhorizon", &GameScriptLevel::ColAddHorizon,
+		"storm", &GameScriptLevel::Storm,
+		"background", &GameScriptLevel::Background
 		);
 
-	m_levels.resize(NUM_LEVELS);
-	m_lua["levels"] = &m_levels;
+	m_lua.new_usertype<GameScript>("GameScript",
+		"levels", &GameScript::m_levels,
+		"settings", &GameScript::m_settings,
+		"strings", &GameScript::m_strings,
+		"addLevel", &GameScript::AddLevel
+		);
 
-	m_lua["settings"] = &m_settings;
-	
 	m_strings.resize(NUM_STRINGS);
-	m_lua["strings"] = &m_strings;
+
+	m_lua["Gameflow"] = this;
 }
 
 GameScript::~GameScript()
@@ -79,7 +87,7 @@ bool GameScript::LoadGameSettings(char* luaFilename)
 {
 	string script = loadScriptFromFile(luaFilename);
 	m_lua.script(script);
-
+	 
 	return true;
 }
  
@@ -104,11 +112,6 @@ GameScriptSettings* GameScript::GetSettings()
 GameScriptLevel* GameScript::GetLevel(__int32 id)
 {
 	return m_levels[id];
-}
-
-GameScriptLevel* GameScript::GetTitle()
-{
-	return m_title;
 }
 
 void GameScript::SetHorizon(bool horizon, bool colAddHorizon)
@@ -150,6 +153,16 @@ void GameScript::SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 e
 	FogColor.z = b / 255.0f;
 	FogInDistance = startDistance;
 	FogOutDistance = endDistance;
+}
+
+__int32	GameScript::GetNumLevels()
+{
+	return m_levels.size();
+}
+
+void GameScript::AddLevel(GameScriptLevel* level)
+{
+	m_levels.push_back(level);
 }
 
 GameScript* g_Script;

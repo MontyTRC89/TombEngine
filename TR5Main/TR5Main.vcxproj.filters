@@ -525,7 +525,6 @@
     <None Include="Shaders\Sprites.fx" />
     <None Include="Shaders\Rain.fx" />
     <None Include="Shaders\Transparent.fx" />
-    <None Include="Scripting\Scripts\Levels.lua" />
     <None Include="Scripting\Scripts\Settings.lua" />
     <None Include="Scripting\Scripts\Title.lua" />
     <None Include="Scripting\Scripts\English.lua" />

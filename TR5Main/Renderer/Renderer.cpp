@@ -2818,11 +2818,27 @@ __int32 Renderer::drawInventoryScene()
 								lastY += 24;
 							}
 						}
+						else if (ring->passportAction == INV_WHAT_PASSPORT_SELECT_LEVEL)
+						{
+							__int16 lastY = 44;
+
+							for (__int32 n = 1; n < g_Script->GetNumLevels(); n++)
+							{
+								GameScriptLevel* levelScript = g_Script->GetLevel(n);
+								PrintString(400, lastY, g_Script->GetString(levelScript->Name), D3DCOLOR_ARGB(255, 255, 255, 255),
+									PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n - 1 ? PRINTSTRING_BLINK : 0));
+								
+								lastY += 24;
+							}
+						}
 						char* string = (char*)"";
 						switch (ring->passportAction)
 						{
 						case INV_WHAT_PASSPORT_NEW_GAME:
 							string = g_Script->GetString(STRING_INV_NEW_GAME);
+							break;
+						case INV_WHAT_PASSPORT_SELECT_LEVEL:
+							string = g_Script->GetString(STRING_INV_SELECT_LEVEL);
 							break;
 						case INV_WHAT_PASSPORT_LOAD_GAME:
 							string = g_Script->GetString(STRING_INV_LOAD_GAME);

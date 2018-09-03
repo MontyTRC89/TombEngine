@@ -921,7 +921,7 @@ typedef struct savegame_info
 	unsigned __int32 CutSceneTriggered1; // size=0, offset=420
 	unsigned __int32 CutSceneTriggered2; // size=0, offset=424
 	char GameComplete; // size=0, offset=428
-	unsigned char CurrentLevel; // size=0, offset=429
+	unsigned char LevelNumber; // size=0, offset=429
 	unsigned char CampaignSecrets[4]; // size=4, offset=430
 	unsigned char TLCount; // size=0, offset=434
 } SAVEGAME_INFO;

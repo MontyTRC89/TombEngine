@@ -240,6 +240,9 @@
 #define HealtBarTimer				VAR_U_(0x0051CEA8, __int32)
 
 #define AnimatedTextureRanges		VAR_U_(0x00D9ADA0, __int16*)
+//#define Savegame					VAR_U_(0x00E52EB3, savegame_info);
+#define gfRequiredStartPos			VAR_U_(0x00E5C2B4, byte)
+#define gfInitialiseGame			VAR_U_(0x005082C1, byte)
 
 extern bool MonksAttackLara;
 
