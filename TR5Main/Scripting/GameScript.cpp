@@ -42,7 +42,9 @@ GameScript::GameScript()
 		"horizon", &GameScriptLevel::Horizon,
 		"coladdhorizon", &GameScriptLevel::ColAddHorizon,
 		"storm", &GameScriptLevel::Storm,
-		"background", &GameScriptLevel::Background
+		"background", &GameScriptLevel::Background,
+		"rain", &GameScriptLevel::Rain,
+		"snow", &GameScriptLevel::Snow
 		);
 
 	m_lua.new_usertype<GameScript>("GameScript",

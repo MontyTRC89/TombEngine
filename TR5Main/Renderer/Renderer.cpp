@@ -687,9 +687,9 @@ RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 			else
 				bucketIndex = RENDERER_BUCKET_ALPHA_TEST_DS;
 		}
-
+		 
 		// ColAddHorizon special handling
-		if (obj->GetId() == ID_HORIZON && (gfLevelFlags & 0x200))
+		if (obj->GetId() == ID_HORIZON && g_Script->GetLevel(CurrentLevel)->ColAddHorizon)
 		{
 			if (texture->attribute == 2 || (effects & 1))
 				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
@@ -2999,48 +2999,9 @@ bool Renderer::drawScene(bool dump)
 	D3DXMatrixMultiply(&m_viewProjection, &ViewMatrix, &ProjectionMatrix);
 	D3DXMatrixInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
 
-	// Collect scene items and update animations
-	/*CurrentRoom = Camera.pos.roomNumber;
-	ROOM_INFO* r = &Rooms[CurrentRoom];
-	r->testLeft = 0;
-	PhdLeft = 0;
-	r->testTop = 0;
-	PhdTop = 0;
-	r->testRight = ScreenWidth;
-	PhdRight = ScreenWidth;
-	r->testBottom = ScreenHeight;
-	PhdBottom = ScreenHeight;
+	GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
 
-	Unknown_00E6CAE8 = 0;
-	Outside = r->flags & 8;
-	Underwater = r->flags & 1;
-
-	r->bound_active = 2;
-	BoundList[0] = Camera.pos.roomNumber;
-	BoundStart = 0;
-	BoundEnd = 1;
-	NumberDrawnRooms = 0;
-	if (Outside)
-	{
-		OutsideTop = 0;
-		OutsideLeft = 0;
-		OutsideRight = ScreenWidth;
-		OutsideBottom = ScreenHeight;
-	}
-	else
-	{
-		OutsideLeft = ScreenWidth;
-		OutsideTop = ScreenHeight;
-		OutsideBottom = 0;
-		OutsideRight = 0;
-	}
-	GetRoomBounds();
-	Sub_0042A050();
-
-	m_roomsToDraw.clear();
-	for (__int32 i = 0; i < NumberDrawnRooms; i++)
-		m_roomsToDraw.push_back(DrawnRooms[i]);*/
-	
+	// Collect scene data
 	collectSceneItems();
 	updateLaraAnimations();
 	updateItemsAnimations();
@@ -3103,7 +3064,8 @@ bool Renderer::drawScene(bool dump)
 	D3DXMATRIX world;
 
 	// Draw opaque geometry
-	drawHorizonAndSky();
+	if (level->Horizon)
+		drawHorizonAndSky();
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3493,9 +3455,9 @@ bool Renderer::drawScene(bool dump)
 	drawUnderwaterDust();
 
 	// Do weather
-	if (WeatherType == WEATHER_TYPES::WEATHER_RAIN)
+	if (level->Rain)
 		doRain();
-	else if (WeatherType == WEATHER_TYPES::WEATHER_SNOW)
+	else if (level->Snow)
 		doSnow();
 
 	// Draw sprites
@@ -4223,10 +4185,11 @@ void Renderer::collectLights()
 
 bool Renderer::drawHorizonAndSky()
 {
+	GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
 	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
 	// First update the sky in the case of storm
-	if (gfLevelFlags & 0x40 || true)
+	if (level->Storm)
 	{
 		if (Unk_00E6D74C || Unk_00E6D73C)
 		{

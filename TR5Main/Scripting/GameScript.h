@@ -133,6 +133,8 @@ typedef struct GameScriptLevel {
 	bool ColAddHorizon;
 	GameScriptFog Fog;
 	bool Storm;
+	bool Rain;
+	bool Snow;
 
 	GameScriptLevel()
 	{

@@ -95,3 +95,31 @@ deepsea.coladdhorizon = true;
 deepsea.layer1 = SkyLayer.new(120, 80, 50, -4);
 
 Gameflow:addLevel(deepsea);
+
+-- Sinking submarine
+sinking = Level.new();
+
+sinking.name = 107;
+sinking.script = "joby5.lua";
+sinking.soundtrack = 121;
+sinking.filename = "Data\\joby5.trc";
+sinking.horizon = true;
+sinking.coladdhorizon = true;
+sinking.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(sinking);
+
+-- Gallows tree
+gallowstree = Level.new();
+
+gallowstree.name = 108;
+gallowstree.script = "andy1.lua";
+gallowstree.soundtrack = 124;
+gallowstree.filename = "Data\\andy1.trc";
+gallowstree.horizon = true;
+gallowstree.coladdhorizon = true;
+gallowstree.rain = true;
+gallowstree.storm = true;
+gallowstree.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(gallowstree);
