@@ -466,7 +466,7 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 		"CausticsRender_015.bmp", 
 		"CausticsRender_016.bmp" 
 	};
-	 
+	  
 	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
 	{
 		D3DXCreateTextureFromFileEx(m_device, causticsNames[i], D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
@@ -3080,7 +3080,7 @@ bool Renderer::drawScene(bool dump)
 	effect->EndPass();
 	effect->End(); 
 	m_device->EndScene(); 
-
+ 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeClearGBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;

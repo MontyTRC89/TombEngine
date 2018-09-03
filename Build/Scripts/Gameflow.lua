@@ -8,7 +8,7 @@ title = Level.new();
 
 title.script = "andrea2.lua";
 title.soundtrack = 110;
-title.filename = "Data\title.trc";
+title.filename = "Data\\title.trc";
 title.horizon = true;
 title.coladdhorizon = true;
 title.layer1 = SkyLayer.new(120, 80, 50, -4);
@@ -23,7 +23,7 @@ streets = Level.new();
 streets.name = 101;
 streets.script = "andrea1.lua";
 streets.soundtrack = 128;
-streets.filename = "Data\andrea1.trc";
+streets.filename = "Data\\andrea1.trc";
 streets.horizon = true;
 streets.coladdhorizon = true;
 streets.layer1 = SkyLayer.new(120, 80, 50, -4);
@@ -36,7 +36,7 @@ trajan = Level.new();
 trajan.name = 102;
 trajan.script = "andrea2.lua";
 trajan.soundtrack = 126;
-trajan.filename = "Data\andrea2.trc";
+trajan.filename = "Data\\andrea2.trc";
 trajan.horizon = true;
 trajan.coladdhorizon = true;
 trajan.layer1 = SkyLayer.new(120, 80, 50, -4);
@@ -50,9 +50,48 @@ colosseum = Level.new();
 colosseum.name = 103;
 colosseum.script = "andrea3.lua";
 colosseum.soundtrack = 118;
-colosseum.filename = "Data\andrea3.trc";
+colosseum.filename = "Data\\andrea3.trc";
 colosseum.horizon = true;
 colosseum.coladdhorizon = true;
 colosseum.layer1 = SkyLayer.new(120, 80, 50, -4);
 
 Gameflow:addLevel(colosseum);
+
+-- The base
+theBase = Level.new();
+
+theBase.name = 104;
+theBase.script = "joby2.lua";
+theBase.soundtrack = 130;
+theBase.filename = "Data\\joby2.trc";
+theBase.horizon = true;
+theBase.coladdhorizon = true;
+theBase.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(theBase);
+
+-- The submarine
+submarine = Level.new();
+
+submarine.name = 105;
+submarine.script = "joby3.lua";
+submarine.soundtrack = 121;
+submarine.filename = "Data\\joby3.trc";
+submarine.horizon = true;
+submarine.coladdhorizon = true;
+submarine.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(submarine);
+
+-- Deepsea dive
+deepsea = Level.new();
+
+deepsea.name = 106;
+deepsea.script = "joby4.lua";
+deepsea.soundtrack = 127;
+deepsea.filename = "Data\\joby4.trc";
+deepsea.horizon = true;
+deepsea.coladdhorizon = true;
+deepsea.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(deepsea);

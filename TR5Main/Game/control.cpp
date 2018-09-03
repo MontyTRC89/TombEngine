@@ -300,7 +300,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	//num_fmvs = 0;
 	//fmv_to_play[1] = 0;
 	//fmv_to_play[0] = 0;
-
+	 
 	//IsLevelLoading = true;
 	//S_LoadLevelFile(0);
 	//InitialiseFXArray(true);

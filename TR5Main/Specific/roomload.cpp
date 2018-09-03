@@ -482,7 +482,7 @@ unsigned __stdcall LoadLevel(void* data)
 	{
 		return false;
 	}
-
+	 
 	g_Renderer->FreeRendererData();
 	g_Renderer->PrepareDataForTheRenderer();
 
