@@ -167,4 +167,81 @@ void GameScript::AddLevel(GameScriptLevel* level)
 	m_levels.push_back(level);
 }
 
+bool GameScript::DoGameflow()
+{
+	// We start with the title level
+	CurrentLevel = 0;
+	SelectedLevelForNewGame = 0;
+
+	// We loop indefinitely, looking for return values of DoTitle or DoLevel
+	bool loadFromSavegame = false;
+	while (true)
+	{
+		// First we need to fill some legacy variables in PCTomb5.exe
+		GameScriptLevel* level = m_levels[CurrentLevel];
+
+		CurrentAtmosphere = level->Soundtrack;
+
+		if (level->Horizon)
+		{
+			SkyColor1.r = level->Layer1.R;
+			SkyColor1.g = level->Layer1.G;
+			SkyColor1.b = level->Layer1.B;
+			SkyVelocity1 = level->Layer1.CloudSpeed;
+
+			SkyColor2.r = level->Layer2.R;
+			SkyColor2.g = level->Layer2.G;
+			SkyColor2.b = level->Layer2.B;
+			SkyVelocity2 = level->Layer2.CloudSpeed;
+		}
+
+		if (level->Storm)
+		{
+			SkyStormColor[0] = level->Layer1.R;
+			SkyStormColor[1] = level->Layer1.G;
+			SkyStormColor[2] = level->Layer1.B;
+		}
+
+		GAME_STATUS status;
+
+		if (CurrentLevel == 0)
+		{
+			status = DoTitle(0);
+		}
+		else
+		{
+			status = DoLevel(CurrentLevel, CurrentAtmosphere, loadFromSavegame);
+			loadFromSavegame = false;
+		}
+
+		switch (status)
+		{
+		case GAME_STATUS::GAME_STATUS_EXIT_GAME:
+			return true;
+		case GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE:
+			CurrentLevel = 0;
+			break;
+		case GAME_STATUS::GAME_STATUS_NEW_GAME:
+			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
+			SelectedLevelForNewGame = 0;
+			gfInitialiseGame = true;
+			break;
+		case GAME_STATUS::GAME_STATUS_LOAD_GAME:
+			CurrentLevel = Savegame.LevelNumber;
+			loadFromSavegame = true;
+			break;
+		case GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED:
+			if (CurrentLevel == m_levels.size())
+			{
+				// TODO: final credits
+			}
+			else
+				CurrentLevel++;
+			break;
+		}
+	}
+
+	return true;
+}
+
 GameScript* g_Script;

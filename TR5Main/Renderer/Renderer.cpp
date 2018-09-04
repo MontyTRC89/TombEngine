@@ -2111,7 +2111,7 @@ void Renderer::updateItemsAnimations()
 		ITEM_INFO* item = itemToDraw->Item;
 
 		// Lara has her own routine
-		if (item->objectNumber == ID_LARA || item->objectNumber == 434)
+		if (item->objectNumber == ID_LARA)
 			continue;
 
 		OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -3059,7 +3059,7 @@ bool Renderer::drawScene(bool dump)
 	D3DXMATRIX world;
 
 	// Draw opaque geometry
-	if (level->Horizon)
+	if (level->Horizon && m_rooms[Camera.pos.roomNumber]->Room->flags & 8)
 		drawHorizonAndSky();
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
@@ -3769,7 +3769,7 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 	UINT cPasses = 1;
 
 	ITEM_INFO* item = itemToDraw->Item;
-	if (item->objectNumber == ID_LARA || item->objectNumber == 434)
+	if (item->objectNumber == ID_LARA)
 		return true;
 
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -5341,8 +5341,13 @@ void Renderer::updateAnimation(RendererObject* obj, __int16** frmptr, __int16 fr
 void Renderer::FreeRendererData()
 {
 	DX_RELEASE(m_textureAtlas);
+	m_textureAtlas = NULL;
+
 	DX_RELEASE(m_fontAndMiscTexture);
+	m_fontAndMiscTexture = NULL;
+
 	DX_RELEASE(m_skyTexture);
+	m_skyTexture = NULL;
 
 	for (map<__int32, RendererRoom*>::iterator it = m_rooms.begin(); it != m_rooms.end(); ++it)
 		delete (it->second);

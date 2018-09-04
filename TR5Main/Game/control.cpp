@@ -27,6 +27,8 @@
 #include <process.h>
 #include <stdio.h>
 
+extern GameScript* g_Script;
+
 GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 {
 	RegeneratePickups();
@@ -213,12 +215,13 @@ unsigned __stdcall GameMain(void*)
 
 	InitGameMalloc();
 	TIME_Init();
-	//ResetSoundThings();
-	//SOUND_Init();
+
 	LoadNewStrings();
-	DoNewGameflow();
+
+	g_Script->DoGameflow();
+
 	GameClose();
-	//ResetSoundThings();
+
 	PostMessageA((HWND)WindowsHandle, 0x10u, 0, 0);
 	_endthreadex(1);
 

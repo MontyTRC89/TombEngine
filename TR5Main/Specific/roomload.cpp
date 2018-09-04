@@ -4,6 +4,7 @@
 #include "..\Specific\setup.h"
 #include "..\Game\draw.h"
 #include "..\Game\lot.h"
+#include "..\Scripting\GameScript.h"
 
 #include <process.h>
 #include <stdio.h>
@@ -28,8 +29,9 @@ using namespace std;
 
 vector<__int32> MoveablesIds;
 vector<__int32> StaticObjectsIds;
-
 map<__int16*, RendererMesh*> MeshPointersToMesh;
+
+extern GameScript* g_Script;
 
 __int16 ReadInt16()
 {
@@ -499,15 +501,17 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	DB_Log(2, "S_LoadLevelFile - DLL");
 	printf("S_LoadLevelFile\n");
 
+	SOUND_Stop();
+	Sound_FreeSamples();
 	g_Renderer->FreeRendererData();
 
 	RenderLoadBar = false;
 	
 	char filename[80];
-	strcpy_s(filename, &gfFilenameWad[gfFilenameOffset[levelIndex]]);
-	strcat_s(filename, ".TRC");
+	strcpy_s(filename, g_Script->GetLevel(levelIndex)->FileName.c_str());
+	//strcat_s(filename, ".TRC");
 
-	printf("%s\n", filename);
+	//printf("%s\n", filename);
 
 	IsLevelLoading = true;
 	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);

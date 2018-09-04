@@ -149,7 +149,7 @@ private:
 	GameScriptSettings					m_settings;
 	vector<string>						m_strings;
 	vector<GameScriptLevel*>			m_levels;
-	__int32								m_numLevels;
+
 	string								loadScriptFromFile(char* luaFilename);
 
 public:
@@ -179,4 +179,5 @@ public:
 	void								SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 endDistance);
 	__int32								GetNumLevels();
 	void								AddLevel(GameScriptLevel* level);
+	bool								DoGameflow();
 };

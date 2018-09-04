@@ -47,7 +47,8 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	_CrtSetReportMode(0, 2);
 	_CrtSetDbgFlag(-1);
-	 
+	
+	// TODO: deprecated
 	LoadGameflow();
 	LoadSettings();
 
@@ -120,7 +121,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	SetWindowPos(App.WindowHandle, 0, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 
-	WindowsHandle = App.WindowHandle; // GetDesktopWindow();
+	WindowsHandle = App.WindowHandle;
 
 	App.bNoFocus = false;
 	App.isInScene = false;
@@ -142,9 +143,6 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	while (DoTheGame);
 	
-	//DXClose();
-	//delete g_Renderer;
-
 	WinClose();
 
 	return 0;
@@ -153,15 +151,14 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 __int32 __cdecl WinClose()
 {
 	DB_Log(2, "WinClose - DLL");
-	// sub_401BEA(); Save register keys - future
-	//CloseHandle(dxctx.cr.hObject);
-	//sub_401AFF(&dxctx);
+
 	DestroyAcceleratorTable(hAccTable);
 	
-//	Sound_DeInit();
+	//Sound_DeInit();
 
 	delete g_Renderer;
 	delete g_Inventory;
+	delete g_Script;
 
 	return 0;
 }
