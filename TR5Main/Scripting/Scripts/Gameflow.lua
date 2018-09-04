@@ -13,7 +13,7 @@ title.horizon = true;
 title.coladdhorizon = true;
 title.layer1 = SkyLayer.new(120, 80, 50, -4);
 title.storm = true;
-title.background = "title.png";
+title.background = "Title.png";
 
 Gameflow:addLevel(title);
 

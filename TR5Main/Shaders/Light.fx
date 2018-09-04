@@ -278,7 +278,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		float specularLight = specularIntensity * pow(saturate(dot(reflectionVector, directionToCamera)), specularPower);
 
 		// Take into account attenuation and lightIntensity.
-		output = attenuation * LightIntensity * float4(diffuseLight.rgb, specularLight) * 0.75f;
+		output = attenuation * LightIntensity * float4(diffuseLight.rgb, specularLight);
 	}
 	
 	//output.a = 0.5f;

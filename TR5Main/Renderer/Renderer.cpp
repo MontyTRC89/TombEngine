@@ -312,14 +312,14 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	d3dpp.EnableAutoDepthStencil = TRUE;
 	d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
 	d3dpp.MultiSampleType = D3DMULTISAMPLE_NONE;
-
+	 
 	res = m_d3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, handle, D3DCREATE_HARDWARE_VERTEXPROCESSING,
 							  &d3dpp, &m_device);
 	if (res != S_OK)
 		return false;
 
 	// Load the white sprite 
-	D3DXCreateTextureFromFileEx(m_device, "load.bmp", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
+	D3DXCreateTextureFromFileEx(m_device, g_Script->GetLevel(0)->Background.c_str(), D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
 								D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
 								D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_titleScreen);
 
@@ -528,23 +528,18 @@ void Renderer::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color, _
 	if (flags & PRINTSTRING_CENTER)
 	{
 		__int32 width = rect.right - rect.left;
-		rect.left = x - width / 2;
-		rect.right = x + width / 2;
-		rect.top += y;
-		rect.bottom += y;
+		rect.left = x * factorX - width / 2;
+		rect.right = x * factorX + width / 2;
+		rect.top += y * factorY;
+		rect.bottom += y * factorY;
 	}
 	else
 	{
-		rect.left = x;
-		rect.right += x;
-		rect.top = y;
-		rect.bottom += y;
+		rect.left = x * factorX;
+		rect.right += x * factorX;
+		rect.top = y * factorY;
+		rect.bottom += y * factorY;
 	}
-
-	rect.left *= factorX;
-	rect.right *= factorX;
-	rect.top *= factorY;
-	rect.bottom *= factorY;
 
 	if (flags & PRINTSTRING_BLINK)
 	{
@@ -2631,7 +2626,7 @@ __int32 Renderer::drawInventoryScene()
 	if (g_Inventory->GetType() == INV_TYPE_TITLE)
 	{
 		// Scale matrix for drawing full screen background
-		D3DXMatrixScaling(&m_tempScale, ScreenWidth / 640.0f, ScreenHeight / 480.0f, 0.0f);
+		D3DXMatrixScaling(&m_tempScale, ScreenWidth / 1024.0f, ScreenHeight / 768.0f, 0.0f);
 
 		m_dxSprite->Begin(0);
 		m_dxSprite->SetTransform(&m_tempScale);
