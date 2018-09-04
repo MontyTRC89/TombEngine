@@ -138,7 +138,11 @@ typedef struct GameScriptLevel {
 
 	GameScriptLevel()
 	{
-
+		Storm = false;
+		Rain = false;
+		Snow = false;
+		Horizon = false;
+		ColAddHorizon = false;
 	}
 };
 

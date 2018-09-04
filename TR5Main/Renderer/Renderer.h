@@ -256,12 +256,18 @@ typedef struct RendererItemToDraw {
 	__int32 Id;
 	ITEM_INFO* Item;
 	D3DXMATRIX World;
+	vector<D3DXMATRIX> AnimationTransforms;
 
-	RendererItemToDraw(__int32 id, ITEM_INFO* item)
+	RendererItemToDraw(__int32 id, ITEM_INFO* item, __int32 numMeshes)
 	{
 		Id = id;
 		Item = item;
 		D3DXMatrixIdentity(&World);
+		AnimationTransforms.reserve(numMeshes);
+		D3DXMATRIX matrix;
+		D3DXMatrixIdentity(&matrix);
+		for (__int32 i = 0; i < numMeshes; i++)
+			AnimationTransforms.push_back(matrix);
 	}
 };
 
@@ -552,13 +558,14 @@ class Renderer
 	bool							m_enableZtest;
 	__int32							m_currentCausticsFrame = 0;
 	vector<RendererAnimatedTextureSet*> m_animatedTextureSets;
+	map<__int16*, RendererMesh*>	m_meshPointersToMesh;
 
 	__int32							getAnimatedTextureInfo(__int16 textureId);
 	RendererMesh*					getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs);
 	void							fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index);
 	void							buildHierarchy(RendererObject* obj);
 	void							buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-	void							updateAnimation(RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask);
+	void							updateAnimation(RendererItemToDraw* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask);
 	bool							printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message);
 	bool							checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* viewPort, D3DXVECTOR4* clipPort);
 	void							getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count);
@@ -623,7 +630,7 @@ public:
 	bool							Windowed;
 	__int32							NumTexturePages;
 	float							FOV;
-	
+
 	Renderer();
 	~Renderer();
 

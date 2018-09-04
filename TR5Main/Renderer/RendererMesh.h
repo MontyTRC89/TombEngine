@@ -11,8 +11,8 @@
 class RendererMesh
 {
 private:
-	RendererBucket**			m_buckets;
-	RendererBucket**			m_animatedBuckets;
+	RendererBucket*				m_buckets[NUM_BUCKETS];
+	RendererBucket*				m_animatedBuckets[NUM_BUCKETS];
 	LPDIRECT3DDEVICE9			m_device;
 
 public:

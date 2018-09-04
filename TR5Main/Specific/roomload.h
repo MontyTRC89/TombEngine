@@ -47,7 +47,6 @@ extern vector<__int32> MoveablesIds;
 extern vector<__int32> StaticObjectsIds;
 extern __int32* RawMeshPointers;
 extern __int16* RawMeshData;
-extern map<__int16*, RendererMesh*> MeshPointersToMesh;
 extern __int32 NumObjectTextures;
 
 void __cdecl LoadTextures();

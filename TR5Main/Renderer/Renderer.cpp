@@ -841,8 +841,8 @@ RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 	free(vertices);
 	if (normals != NULL) free(normals);
 
-	if (MeshPointersToMesh.find(refMeshPtr) == MeshPointersToMesh.end())
-		MeshPointersToMesh.insert(pair<__int16*, RendererMesh*>(refMeshPtr, mesh));
+	if (m_meshPointersToMesh.find(refMeshPtr) == m_meshPointersToMesh.end())
+		m_meshPointersToMesh.insert(pair<__int16*, RendererMesh*>(refMeshPtr, mesh));
 
 	return mesh;
 }
@@ -1251,6 +1251,8 @@ bool Renderer::PrepareDataForTheRenderer()
 					light->In = oldLight->In;
 					light->Out = oldLight->Out;
 					light->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
+
+					r->Lights.push_back(light);
 				}
 				/*else if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SHADOW)
 				{
@@ -1271,14 +1273,16 @@ bool Renderer::PrepareDataForTheRenderer()
 					light->Out = oldLight->Range;  //oldLight->Out;
 					light->Range = oldLight->Range;
 					light->Type = LIGHT_TYPES::LIGHT_TYPE_POINT; // LIGHT_TYPES::LIGHT_TYPE_SPOT;
+
+					r->Lights.push_back(light);
 				}
 
-				r->Lights.push_back(light);
+				
 			}
 		}
 
-		for (__int32 i = 0; i < NUM_BUCKETS; i++)
-			mesh->GetBucket((RENDERER_BUCKETS)i)->UpdateBuffers();
+		for (__int32 b = 0; b < NUM_BUCKETS; b++)
+			mesh->GetBucket((RENDERER_BUCKETS)b)->UpdateBuffers();
 
 		roomObject->ObjectMeshes.push_back(mesh);
 	}
@@ -1303,7 +1307,8 @@ bool Renderer::PrepareDataForTheRenderer()
 				objNum == ID_AI_PATROL1 || objNum == ID_AI_PATROL2 || objNum == ID_AI_X1 ||
 				objNum == ID_AI_X2 || objNum == ID_DART_EMITTER || objNum == ID_HOMING_DART_EMITTER ||
 				objNum == ID_ROPE || objNum == ID_KILL_ALL_TRIGGERS || objNum == ID_EARTHQUAKE || 
-				objNum == ID_CAMERA_TARGET || objNum == ID_WATERFALLMIST)
+				objNum == ID_CAMERA_TARGET || objNum == ID_WATERFALLMIST || objNum == ID_SMOKE_EMITTER_BLACK || 
+				objNum == ID_SMOKE_EMITTER_WHITE)
 			{
 				moveable->DoNotDraw = true;
 			}
@@ -1333,8 +1338,13 @@ bool Renderer::PrepareDataForTheRenderer()
 
 			stack<RendererBone*> stack;
 
+			D3DXMatrixIdentity(&m_tempTransform);
 			for (int j = 0; j < obj->nmeshes; j++)
+			{
 				moveable->LinearizedBones.push_back(new RendererBone(j));
+				moveable->AnimationTransforms.push_back(m_tempTransform);
+				moveable->BindPoseTransforms.push_back(m_tempTransform);
+			}
 
 			RendererBone* currentBone = moveable->LinearizedBones[0];
 			RendererBone* stackBone = moveable->LinearizedBones[0];
@@ -1772,7 +1782,7 @@ void Renderer::collectItems()
 		delete (*it);
 	m_itemsToDraw.clear();
 
-	RendererItemToDraw* newItem = new RendererItemToDraw(Lara.itemNumber, LaraItem);
+	RendererItemToDraw* newItem = new RendererItemToDraw(Lara.itemNumber, LaraItem, 15);
 	m_itemsToDraw.push_back(newItem);
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
@@ -1790,7 +1800,7 @@ void Renderer::collectItems()
 			if (item->objectNumber == ID_LARA)
 				continue;
 
-			newItem = new RendererItemToDraw(itemNum, item);
+			newItem = new RendererItemToDraw(itemNum, item, Objects[item->objectNumber].nmeshes);
 			m_itemsToDraw.push_back(newItem);
 		}
 	}
@@ -1907,7 +1917,7 @@ void Renderer::updateLaraAnimations()
 	__int16	*framePtr[2];
 	__int32 rate;
 	__int32 frac = GetFrame_D2(LaraItem, framePtr, &rate);
-	updateAnimation(laraObj, framePtr, frac, rate, mask);
+	updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
 	if ((Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) && Lara.gunType != WEAPON_FLARE)
@@ -1916,7 +1926,7 @@ void Renderer::updateLaraAnimations()
 		mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L) | (1 << UARM_R) |
 			   (1 << LARM_R) | (1 << HAND_R);
 		frac = GetFrame_D2(LaraItem, framePtr, &rate);
-		updateAnimation(laraObj, framePtr, frac, rate, mask);
+		updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 	}
 	else
 	{
@@ -1934,24 +1944,24 @@ void Renderer::updateLaraAnimations()
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
 				__int16* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
-				updateAnimation(laraObj, &shotgunFramePtr, 0, 1, mask);
+				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
 				
 				// Right arm
 				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 				shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
-				updateAnimation(laraObj, &shotgunFramePtr, 0, 1, mask);
+				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
 			}
 			else
 			{
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
 				frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-				updateAnimation(laraObj, framePtr, frac, rate, mask);
+				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 				
 				// Right arm
 				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 				frac = getFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
-				updateAnimation(laraObj, framePtr, frac, rate, mask);
+				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 			}			
 		}
 		else
@@ -1959,12 +1969,12 @@ void Renderer::updateLaraAnimations()
 			// Left arm
 			mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
 			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-			updateAnimation(laraObj, framePtr, frac, rate, mask);
+			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
 			mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
 			frac = GetFrame_D2(LaraItem, framePtr, &rate);
-			updateAnimation(laraObj, framePtr, frac, rate, mask);
+			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 		}
 	}
 
@@ -2123,7 +2133,7 @@ void Renderer::updateItemsAnimations()
 			__int16	*framePtr[2];
 			__int32 rate;
 			__int32 frac = GetFrame_D2(item, framePtr, &rate);
-			updateAnimation(moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 		}
 
 		// Update world matrix
@@ -2735,12 +2745,12 @@ __int32 Renderer::drawInventoryScene()
 				__int16* framePtr[2];
 				__int32 rate = 0;
 				getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
-				updateAnimation(moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
+				updateAnimation(NULL, moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
 			}
 			else
 			{
 				if (obj->animIndex != -1)
-					updateAnimation(moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
+					updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
 			}
 
 			for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
@@ -3589,7 +3599,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_LARA);
-	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), laraObj->AnimationTransforms, laraObj->ObjectMeshes.size());
+	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), laraObj->AnimationTransforms.data(), laraObj->ObjectMeshes.size());
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_LaraWorldMatrix);
 	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[LaraItem->roomNumber]->AmbientLight);
 
@@ -3601,7 +3611,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	for (__int32 i = 0; i < laraObj->ObjectMeshes.size(); i++)
 	{
 		// Lara has meshes overriden by weapons, crowbar, etc
-		RendererMesh* mesh = MeshPointersToMesh[Lara.meshPtrs[i]];
+		RendererMesh* mesh = m_meshPointersToMesh[Lara.meshPtrs[i]];
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 
 		if (bucket->NumVertices != 0)
@@ -3792,7 +3802,7 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
-	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), moveableObj->AnimationTransforms, moveableObj->ObjectMeshes.size());
+	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), itemToDraw->AnimationTransforms.data(), moveableObj->ObjectMeshes.size());
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &itemToDraw->World);
 	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[item->roomNumber]->AmbientLight);
 	
@@ -5276,10 +5286,12 @@ void Renderer::updateAnimatedTextures()
 	}
 }
 
-void Renderer::updateAnimation(RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
+void Renderer::updateAnimation(RendererItemToDraw* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
 {
 	stack<RendererBone*> bones;
 	D3DXMATRIX rotation;
+
+	D3DXMATRIX* transforms = (item == NULL ? obj->AnimationTransforms.data() : item->AnimationTransforms.data());
 
 	bones.push(obj->Skeleton);
 	while (!bones.empty())
@@ -5321,14 +5333,14 @@ void Renderer::updateAnimation(RendererObject* obj, __int16** frmptr, __int16 fr
 			D3DXMatrixRotationYawPitchRoll(&extraRotation, bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
 
 			if (bone != obj->Skeleton)
-				D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &extraRotation, &bone->Transform);
+				D3DXMatrixMultiply(&transforms[bone->Index], &extraRotation, &bone->Transform);
 			else
-				D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &extraRotation, &translation);
+				D3DXMatrixMultiply(&transforms[bone->Index], &extraRotation, &translation);
 
-			D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &rotation, &obj->AnimationTransforms[bone->Index]);
+			D3DXMatrixMultiply(&transforms[bone->Index], &rotation, &transforms[bone->Index]);
 			
 			if (bone != obj->Skeleton)
-				D3DXMatrixMultiply(&obj->AnimationTransforms[bone->Index], &obj->AnimationTransforms[bone->Index], &obj->AnimationTransforms[bone->Parent->Index]);
+				D3DXMatrixMultiply(&transforms[bone->Index], &transforms[bone->Index], &transforms[bone->Parent->Index]);
 		}
 
 		for (__int32 i = 0; i < bone->Children.size(); i++)
@@ -5340,6 +5352,22 @@ void Renderer::updateAnimation(RendererObject* obj, __int16** frmptr, __int16 fr
 
 void Renderer::FreeRendererData()
 {
+	// Unbind textures from effects
+	LPD3DXEFFECT effect = m_shaderFillGBuffer->GetEffect();
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), NULL);
+
+	effect = m_shaderSprites->GetEffect();
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), NULL);
+
+	effect = m_shaderTransparent->GetEffect();
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), NULL);
+
+	effect = m_shaderBasic->GetEffect();
+	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), NULL);
+	
+	m_device->SetStreamSource(0, NULL, 0, 0);
+	m_device->SetIndices(NULL);
+
 	DX_RELEASE(m_textureAtlas);
 	m_textureAtlas = NULL;
 
@@ -5372,4 +5400,6 @@ void Renderer::FreeRendererData()
 	for (map<__int32, RendererSpriteSequence*>::iterator it = m_spriteSequences.begin(); it != m_spriteSequences.end(); ++it)
 		delete (it->second);
 	m_spriteSequences.clear();
+
+	m_meshPointersToMesh.clear();
 }

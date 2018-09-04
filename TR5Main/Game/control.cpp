@@ -129,12 +129,14 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			ITEM_INFO* item = &Items[itemNum];
 			__int16 nextItem = item->nextActive;
 
-			if (item->afterDeath > 127)
-				KillItem(itemNum);
+			if (item->afterDeath < 128)
+			{
+				if (Objects[item->objectNumber].control)
+					Objects[item->objectNumber].control(itemNum);
+			}
 			else
 			{
-				if (Objects[Items[itemNum].objectNumber].control)
-					(*Objects[Items[itemNum].objectNumber].control)(itemNum);
+				KillItem(itemNum);
 			}
 
 			itemNum = nextItem;
@@ -233,8 +235,6 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
 
-	g_Renderer->FreeRendererData();
-
 	//gfLevelFlags |= 1;
 	//DoLevel(3, 124);
 	//return;
@@ -257,8 +257,6 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame)
 {
-	g_Renderer->FreeRendererData();
-
 	CreditsDone = false;
 	//j_DoTitleFMV();
 	CanLoad = false;

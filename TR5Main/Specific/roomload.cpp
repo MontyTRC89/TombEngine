@@ -29,7 +29,6 @@ using namespace std;
 
 vector<__int32> MoveablesIds;
 vector<__int32> StaticObjectsIds;
-map<__int16*, RendererMesh*> MeshPointersToMesh;
 
 extern GameScript* g_Script;
 
@@ -418,6 +417,8 @@ __int32 __cdecl LoadRoomsNew()
 
 void __cdecl FreeLevel()
 {
+	MallocPtr = MallocBuffer;
+	MallocFree = MallocSize;
 	g_Renderer->FreeRendererData();
 }
 
@@ -485,7 +486,6 @@ unsigned __stdcall LoadLevel(void* data)
 		return false;
 	}
 	 
-	g_Renderer->FreeRendererData();
 	g_Renderer->PrepareDataForTheRenderer();
 
 	InitialiseLara(0);
@@ -503,7 +503,7 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 
 	SOUND_Stop();
 	Sound_FreeSamples();
-	g_Renderer->FreeRendererData();
+	FreeLevel();
 
 	RenderLoadBar = false;
 	

@@ -27,8 +27,8 @@ public:
 
 	vector<RendererMesh*>		ObjectMeshes;
 	RendererBone*				Skeleton;
-	D3DXMATRIX*					AnimationTransforms;
-	D3DXMATRIX*					BindPoseTransforms;
+	vector<D3DXMATRIX>			AnimationTransforms;
+	vector<D3DXMATRIX>			BindPoseTransforms;
 	vector<RendererBone*>		LinearizedBones;
 	__int32						GetId();
 	bool						HasDataInBucket[NUM_BUCKETS];

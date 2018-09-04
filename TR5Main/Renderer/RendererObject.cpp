@@ -15,8 +15,8 @@ RendererObject::RendererObject(LPDIRECT3DDEVICE9 device, __int32 id, __int32 num
 	m_id = id;
 
 	ObjectMeshes.reserve(numMeshes);
-	AnimationTransforms = (D3DXMATRIX*)malloc(numMeshes * sizeof(D3DXMATRIX));
-	BindPoseTransforms = (D3DXMATRIX*)malloc(numMeshes * sizeof(D3DXMATRIX));
+	AnimationTransforms.reserve(numMeshes);
+	BindPoseTransforms.reserve(numMeshes);
 
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
 		HasDataInBucket[i] = false;
@@ -24,9 +24,6 @@ RendererObject::RendererObject(LPDIRECT3DDEVICE9 device, __int32 id, __int32 num
 
 RendererObject::~RendererObject()
 {
-	delete AnimationTransforms;
-	delete BindPoseTransforms;
-
 	for (vector<RendererMesh*>::iterator it = ObjectMeshes.begin(); it != ObjectMeshes.end(); ++it)
 		delete (*it);
 	ObjectMeshes.clear();
