@@ -7,6 +7,7 @@
 #include <d3dx9.h>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "ShadowMapTarget.h"
 #include "MainShader.h"
@@ -33,8 +34,8 @@ typedef struct RendererBone {
 	D3DXMATRIX GlobalTransform;
 	D3DXMATRIX Transform;
 	D3DXVECTOR3 GlobalTranslation;
-	vector<RendererBone*> Children;
-	RendererBone* Parent;
+	vector<shared_ptr<RendererBone>> Children;
+	shared_ptr<RendererBone> Parent;
 	__int32 Index;
 	D3DXVECTOR3 ExtraRotation;
 
@@ -46,20 +47,20 @@ typedef struct RendererBone {
 	}
 };
 
-typedef struct RendererJointLink {
-	__int16 BoneIndex;
-	__int16 ParentBoneIndex;
-	__int16 ChildBoneIndex;
-	__int16 ParentVertices[32];
-	__int16 ChildVertices[32];
-};
-
 typedef struct RendererVertex {
-	float x, y, z;
-	float nx, ny, nz;
-	float u, v;
-	float r, g, b, a;
-	float boneAndFlags;
+	float x = 0;
+	float y = 0;
+	float z = 0;
+	float nx = 0;
+	float ny = 0;
+	float nz = 0;
+	float u = 0;
+	float v = 0;
+	float r = 0;
+	float g = 0;
+	float b = 0;
+	float a = 0;
+	float boneAndFlags = 0;
 };
 
 typedef struct RendererPolygon {
@@ -92,12 +93,6 @@ typedef struct RendererLight {
 	}
 };
 
-typedef struct RendererLightInfo {
-	bool		Active;
-	D3DXVECTOR4 AmbientLight;
-	RendererLight* Light;
-};
-
 typedef struct RendererDynamicLight {
 	D3DXVECTOR4 Position;
 	D3DXVECTOR4 Color;
@@ -110,13 +105,13 @@ typedef struct RendererAnimatedTexture {
 };
 
 typedef struct RendererAnimatedTextureSet {
-	vector<RendererAnimatedTexture*> Textures;
+	vector<shared_ptr<RendererAnimatedTexture>> Textures;
 };
 
 typedef struct RendererRoom {
 	ROOM_INFO* Room;
-	RendererObject* RoomObject;
-	vector<RendererLight*> Lights;
+	shared_ptr<RendererObject> RoomObject;
+	vector<shared_ptr<RendererLight>> Lights;
 	D3DXVECTOR4 AmbientLight;
 	bool Visited;
 
@@ -128,10 +123,7 @@ typedef struct RendererRoom {
 
 	~RendererRoom()
 	{
-		for (vector<RendererLight*>::iterator it = Lights.begin(); it != Lights.end(); ++it)
-			delete (*it);
-		Lights.clear();
-		delete RoomObject;
+		//Lights.clear();
 	}
 };
 
@@ -370,7 +362,7 @@ typedef struct RendererSprite {
 
 typedef struct RendererSpriteSequence {
 	__int32 Id;
-	vector<RendererSprite*> SpritesList;
+	vector<shared_ptr<RendererSprite>> SpritesList;
 
 	RendererSpriteSequence(__int32 id)
 	{
@@ -448,17 +440,16 @@ class Renderer
 	LPD3DXFONT						m_gameFont;
 	LPD3DXSPRITE					m_dxSprite;
 	char							m_message[255];
-	map<__int32, RendererRoom*>		m_rooms;
-	map<__int32, RendererObject*>	m_moveableObjects;
-	map<__int32, RendererObject*>	m_staticObjects;
-	map<__int32, RendererSprite*>	m_sprites;
-	map<__int32, RendererSpriteSequence*>	m_spriteSequences;
+	map<__int32, shared_ptr<RendererRoom>>		m_rooms;
+	map<__int32, shared_ptr<RendererObject>>	m_moveableObjects;
+	map<__int32, shared_ptr<RendererObject>>	m_staticObjects;
+	map<__int32, shared_ptr<RendererSprite>>	m_sprites;
+	map<__int32, shared_ptr<RendererSpriteSequence>>	m_spriteSequences;
 	vector<__int32>					m_roomsToDraw;
-	__int32*						m_meshTrees;
 	LPDIRECT3DVERTEXDECLARATION9	m_vertexDeclaration;
 	__int32							m_numVertices;
 	__int32							m_numTriangles;
-	RendererLine2D*					m_lines2D;
+	vector<RendererLine2D>			m_lines2D;
 	__int32							m_numLines2D;
 	LPD3DXLINE						m_dxLine;
 	__int16							m_normalLaraSkinJointRemap[15][32];
@@ -468,9 +459,9 @@ class Renderer
 	__int32							m_fadeMode;
 	__int16							m_numHairVertices;
 	__int16							m_numHairIndices;
-	RendererVertex*					m_hairVertices;
-	__int32*						m_hairIndices;
-	RenderTarget2D*					m_renderTarget;
+	vector<RendererVertex>			m_hairVertices;
+	vector<__int32>					m_hairIndices;
+	shared_ptr<RenderTarget2D>		m_renderTarget;
 	__int32							m_blinkColorValue;
 	__int32							m_blinkColorDirection;
 	bool							m_needToDumpScene;
@@ -484,20 +475,17 @@ class Renderer
 	D3DXMATRIX						m_tempProjection;
 	D3DXMATRIX						m_hairsMatrices[12];
 	D3DXMATRIX						m_LaraWorldMatrix;
-	RendererLightInfo*				m_itemsLightInfo;
-	RenderTarget2D*					m_shadowMap;
-	RenderTargetCube*				m_shadowMapCube;
+	shared_ptr<RenderTarget2D>		m_shadowMap;
 	D3DXMATRIX						m_lightView;
 	D3DXMATRIX						m_lightProjection;
 	bool							m_enableShadows;
 	RendererLight*					m_shadowLight;
 	vector<__int32>					m_litItems;
-	vector<RendererLight*>			m_dynamicLights;
-	vector<RendererLight*>			m_lights;
-	vector<RendererLight*>			m_testLights;
-	vector<RendererItemToDraw*>		m_itemsToDraw;
-	vector<RendererSpriteToDraw*>	m_spritesToDraw;
-	vector<RendererLine3DToDraw*>	m_lines3DToDraw;
+	vector<shared_ptr<RendererLight>>			m_dynamicLights;
+	vector<shared_ptr<RendererLight>>			m_lights;
+	vector<shared_ptr<RendererItemToDraw>>		m_itemsToDraw;
+	vector<shared_ptr<RendererSpriteToDraw>>	m_spritesToDraw;
+	vector<shared_ptr<RendererLine3DToDraw>>	m_lines3DToDraw;
 	
 	LPDIRECT3DSURFACE9				m_backBufferTarget;
 	LPDIRECT3DSURFACE9				m_backBufferDepth;
@@ -506,29 +494,29 @@ class Renderer
 	RENDERER_BLENDSTATE				m_blendState;
 	RendererUnderwaterDustParticle  m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool							m_firstUnderwaterDustParticles = true;
-	RenderTarget2D*					m_depthBuffer;
-	RenderTarget2D*					m_normalBuffer;
-	RenderTarget2D*					m_colorBuffer;
-	RenderTarget2D*					m_outputBuffer;
-	RenderTarget2D*					m_lightBuffer;
-	RenderTarget2D*					m_shadowBuffer;
-	RenderTarget2D*					m_vertexLightBuffer;
-	RenderTarget2D*					m_postprocessBuffer;
-	Shader*							m_shaderClearGBuffer;
-	Shader*							m_shaderFillGBuffer;
-	Shader*							m_shaderLight;
-	Shader*							m_shaderCombine;
-	Shader*							m_shaderBasic;
-	Shader*							m_shaderDepth;
-	Shader*							m_shaderReconstructZBuffer;
-	Shader*							m_shaderSprites;
-	Shader*							m_shaderRain;
-	Shader*							m_shaderTransparent;
+	shared_ptr<RenderTarget2D>					m_depthBuffer;
+	shared_ptr<RenderTarget2D>					m_normalBuffer;
+	shared_ptr<RenderTarget2D>					m_colorBuffer;
+	shared_ptr<RenderTarget2D>					m_outputBuffer;
+	shared_ptr<RenderTarget2D>					m_lightBuffer;
+	shared_ptr<RenderTarget2D>					m_shadowBuffer;
+	shared_ptr<RenderTarget2D>					m_vertexLightBuffer;
+	shared_ptr<RenderTarget2D>					m_postprocessBuffer;
+	shared_ptr<Shader>							m_shaderClearGBuffer;
+	shared_ptr<Shader>							m_shaderFillGBuffer;
+	shared_ptr<Shader>							m_shaderLight;
+	shared_ptr<Shader>							m_shaderCombine;
+	shared_ptr<Shader>							m_shaderBasic;
+	shared_ptr<Shader>							m_shaderDepth;
+	shared_ptr<Shader>							m_shaderReconstructZBuffer;
+	shared_ptr<Shader>							m_shaderSprites;
+	shared_ptr<Shader>							m_shaderRain;
+	shared_ptr<Shader>							m_shaderTransparent;
 	RendererVertex					m_fullscreenQuadVertices[4];
 	__int32							m_fullscreenQuadIndices[6];
-	RendererSphere*					m_sphereMesh;
-	RendererQuad*					m_quad;
-	RendererQuad*					m_skyQuad;
+	shared_ptr<RendererSphere>					m_sphereMesh;
+	shared_ptr<RendererQuad>					m_quad;
+	shared_ptr<RendererQuad>					m_skyQuad;
 	float							m_halfPixelX;
 	float							m_halfPixelY;
 	D3DXMATRIX						m_viewProjection;
@@ -557,7 +545,7 @@ class Renderer
 	bool							m_enableZwrite;
 	bool							m_enableZtest;
 	__int32							m_currentCausticsFrame = 0;
-	vector<RendererAnimatedTextureSet*> m_animatedTextureSets;
+	vector<shared_ptr<RendererAnimatedTextureSet>> m_animatedTextureSets;
 	map<__int16*, RendererMesh*>	m_meshPointersToMesh;
 
 	__int32							getAnimatedTextureInfo(__int16 textureId);

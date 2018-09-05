@@ -23,6 +23,11 @@ RendererBucket::RendererBucket(LPDIRECT3DDEVICE9 device)
 
 RendererBucket::~RendererBucket()
 {
+	
+}
+
+void RendererBucket::CleanResources()
+{
 	if (m_vertexBuffer != NULL)
 		m_vertexBuffer->Release();
 	m_vertexBuffer = NULL;

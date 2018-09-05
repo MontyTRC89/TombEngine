@@ -7,12 +7,13 @@
 #include <d3dx9.h>
 #include <DxErr.h>
 #include <vector>
+#include <memory>
 
 class RendererMesh
 {
 private:
-	RendererBucket*				m_buckets[NUM_BUCKETS];
-	RendererBucket*				m_animatedBuckets[NUM_BUCKETS];
+	shared_ptr<RendererBucket>				m_buckets[NUM_BUCKETS];
+	shared_ptr<RendererBucket>				m_animatedBuckets[NUM_BUCKETS];
 	LPDIRECT3DDEVICE9			m_device;
 
 public:

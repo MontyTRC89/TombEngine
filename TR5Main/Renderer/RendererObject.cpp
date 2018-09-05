@@ -1,4 +1,6 @@
 #include "RendererObject.h"
+#include "RendererMesh.h"
+
 #include "Enums.h"
 
 #include <stdio.h>
@@ -22,17 +24,30 @@ RendererObject::RendererObject(LPDIRECT3DDEVICE9 device, __int32 id, __int32 num
 		HasDataInBucket[i] = false;
 }
 
-RendererObject::~RendererObject()
+/*RendererObject::~RendererObject()
 {
-	for (vector<RendererMesh*>::iterator it = ObjectMeshes.begin(); it != ObjectMeshes.end(); ++it)
-		delete (*it);
-	ObjectMeshes.clear();
+	for (__int32 i = 0; i < ObjectMeshes.size(); i++)
+		delete ObjectMeshes[i];
 
-	for (vector<RendererBone*>::iterator it = LinearizedBones.begin(); it != LinearizedBones.end(); ++it)
-		delete (*it);
-	LinearizedBones.clear();
+//	for (vector<RendererMesh*>::iterator it = ObjectMeshes.begin(); it != ObjectMeshes.end(); ++it)
+//		delete (*it);
+	//ObjectMeshes.clear();
 
-	Skeleton = NULL;
+	/*for (__int32 i = 0; i < LinearizedBones.size(); i++)
+		delete LinearizedBones[i];
+
+	//for (vector<RendererBone*>::iterator it = LinearizedBones.begin(); it != LinearizedBones.end(); ++it)
+	//	delete (*it);
+	//LinearizedBones.clear();
+}*/
+
+void RendererObject::CleanResources()
+{
+	for (__int32 i = 0; i < ObjectMeshes.size(); i++)
+		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		{
+			ObjectMeshes[i]->GetBucket(j)->CleanResources();
+		}
 }
 
 __int32 RendererObject::GetId()

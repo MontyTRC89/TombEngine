@@ -6,6 +6,7 @@
 #include <d3dx9.h>
 #include <DxErr.h>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -22,18 +23,20 @@ private:
 
 public:
 	RendererObject(LPDIRECT3DDEVICE9 device, __int32 id, __int32 numMeshes);
-	~RendererObject();
+	//~RendererObject();
 	void						AverageNormals();
 
-	vector<RendererMesh*>		ObjectMeshes;
-	RendererBone*				Skeleton;
+	vector<shared_ptr<RendererMesh>>		ObjectMeshes;
+	shared_ptr<RendererBone>				Skeleton;
 	vector<D3DXMATRIX>			AnimationTransforms;
 	vector<D3DXMATRIX>			BindPoseTransforms;
-	vector<RendererBone*>		LinearizedBones;
+	vector<shared_ptr<RendererBone>>		LinearizedBones;
 	__int32						GetId();
 	bool						HasDataInBucket[NUM_BUCKETS];
 	bool						HasDataInAnimatedBucket[NUM_BUCKETS];
 	bool						DoNotDraw;
 	__int32						NumVertices;
+	void						CleanResources();
+
 	//bool(Renderer::*DrawRoutine)(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 };

@@ -15,27 +15,27 @@ RendererMesh::RendererMesh(LPDIRECT3DDEVICE9 device)
 	m_device = device;
 
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
-		m_buckets[i] = new RendererBucket(device);
+		m_buckets[i] = make_shared<RendererBucket>(device);
 	 
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
-		m_animatedBuckets[i] = new RendererBucket(device);
+		m_animatedBuckets[i] = make_shared<RendererBucket>(device);
 }
 
 RendererMesh::~RendererMesh()
 {
-	for (__int32 i = 0; i < NUM_BUCKETS; i++)
+	/*for (__int32 i = 0; i < NUM_BUCKETS; i++)
 		delete m_buckets[i];
 
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
-		delete m_animatedBuckets[i];
+		delete m_animatedBuckets[i];*/
 }
 
 RendererBucket* RendererMesh::GetBucket(__int32 bucketIndex)
 {
-	return m_buckets[bucketIndex];
+	return m_buckets[bucketIndex].get();
 }
 
 RendererBucket* RendererMesh::GetAnimatedBucket(__int32 bucketIndex)
 {
-	return m_animatedBuckets[bucketIndex];
+	return m_animatedBuckets[bucketIndex].get();
 }

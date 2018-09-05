@@ -5,6 +5,7 @@
 #include <d3dx9.h>
 #include <DxErr.h>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -33,4 +34,5 @@ public:
 	__int32						NumIndices;
 	PDIRECT3DVERTEXBUFFER9		GetVertexBuffer();
 	PDIRECT3DINDEXBUFFER9		GetIndexBuffer();
+	void						CleanResources();
 };
