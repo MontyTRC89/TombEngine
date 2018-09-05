@@ -120,6 +120,39 @@ gallowstree.horizon = true;
 gallowstree.coladdhorizon = true;
 gallowstree.rain = true;
 gallowstree.storm = true;
+gallowstree.laraType = LaraType.Young;
 gallowstree.layer1 = SkyLayer.new(120, 80, 50, -4);
 
 Gameflow:addLevel(gallowstree);
+
+-- Labyrinth
+labyrinth = Level.new();
+
+labyrinth.name = 109;
+labyrinth.script = "andy2.lua";
+labyrinth.soundtrack = 117;
+labyrinth.filename = "Data\\andy2.trc";
+labyrinth.horizon = true;
+labyrinth.coladdhorizon = true;
+labyrinth.rain = true;
+labyrinth.storm = true;
+labyrinth.laraType = LaraType.Young;
+labyrinth.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(labyrinth);
+
+-- Old mill
+oldMill = Level.new();
+
+oldMill.name = 110;
+oldMill.script = "andy3.lua";
+oldMill.soundtrack = 124;
+oldMill.filename = "Data\\andy3.trc";
+oldMill.horizon = true;
+oldMill.coladdhorizon = true;
+oldMill.rain = true;
+oldMill.storm = true;
+oldMill.laraType = LaraType.Young;
+oldMill.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(oldMill);

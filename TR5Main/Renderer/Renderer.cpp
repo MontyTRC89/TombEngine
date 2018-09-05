@@ -894,8 +894,7 @@ bool Renderer::PrepareDataForTheRenderer()
 
 	ZeroMemory(buffer.get(), TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 
-	__int32 typ = LaraDrawType;
-	if (gfLevelFlags & 1)
+	if (g_Script->GetLevel(CurrentLevel)->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
 	{
 		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
 	}
@@ -2003,12 +2002,14 @@ void Renderer::updateLaraAnimations()
 
 		__int32 lastVertex = 0;
 		__int32 lastIndex = 0;
-
-		for (__int32 p = 0; p < ((gfLevelFlags & 1) ? 2 : 1); p++)
+		
+		GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+		
+		for (__int32 p = 0; p < ((level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG) ? 2 : 1); p++)
 		{
 			// We can't use hardware skinning here, however hairs have just a few vertices so 
 			// it's not so bad doing skinning in software
-			if (gfLevelFlags & 1)
+			if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
 			{
 				if (p == 1)
 				{
@@ -3071,7 +3072,7 @@ bool Renderer::drawScene(bool dump)
 	D3DXMATRIX world;
 
 	// Draw opaque geometry
-	if (level->Horizon && m_rooms[Camera.pos.roomNumber]->Room->flags & 8)
+	if (level->Horizon)
 		drawHorizonAndSky();
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
@@ -3744,6 +3745,8 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	// Draw Lara's hairs
 	if (bucketIndex == 0)
 	{  
+		GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+
 		setGpuStateForBucket(bucketIndex); 
 
 		if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
@@ -3758,8 +3761,8 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->CommitChanges();
 
 				m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0,
-					m_numHairVertices*((gfLevelFlags & 1) ? 2 : 1),
-					m_numHairIndices*((gfLevelFlags & 1) ? 2 : 1) / 3,
+					m_numHairVertices*((level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG) ? 2 : 1),
+					m_numHairIndices*((level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG) ? 2 : 1) / 3,
 					m_hairIndices.data(), D3DFMT_INDEX32, m_hairVertices.data(), sizeof(RendererVertex));
 
 				effect->EndPass();
@@ -5409,4 +5412,5 @@ void Renderer::FreeRendererData()
 	m_spritesVertices.clear();
 	m_spritesIndices.clear();
 	m_meshPointersToMesh.clear();
+	MoveablesIds.clear();
 }

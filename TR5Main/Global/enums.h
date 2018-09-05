@@ -111,7 +111,7 @@ typedef enum camera_type
 	HEAVY_CAMERA = 5,
 } CAMERA_TYPE;
 
-typedef enum lara_draw_type
+typedef enum LARA_DRAW_TYPE
 {
 	LARA_NORMAL = 1,
 	LARA_YOUNG = 2,
@@ -119,7 +119,7 @@ typedef enum lara_draw_type
 	LARA_CATSUIT = 4,
 	LARA_DIVESUIT = 5,
 	LARA_INVISIBLE = 7
-} LARA_DRAW_TYPE;
+};
 
 enum LaraWaterStatus
 {

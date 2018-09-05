@@ -44,7 +44,8 @@ GameScript::GameScript()
 		"storm", &GameScriptLevel::Storm,
 		"background", &GameScriptLevel::Background,
 		"rain", &GameScriptLevel::Rain,
-		"snow", &GameScriptLevel::Snow
+		"snow", &GameScriptLevel::Snow,
+		"laraType", &GameScriptLevel::LaraType
 		);
 
 	m_lua.new_usertype<GameScript>("GameScript",
@@ -55,6 +56,14 @@ GameScript::GameScript()
 		);
 
 	m_strings.resize(NUM_STRINGS);
+
+	// define some constants
+	m_lua["LaraType"] = m_lua.create_table_with(
+		"Normal", LARA_DRAW_TYPE::LARA_NORMAL,
+		"Young", LARA_DRAW_TYPE::LARA_YOUNG,
+		"DiveSuit", LARA_DRAW_TYPE::LARA_DIVESUIT,
+		"CatSuit", LARA_DRAW_TYPE::LARA_CATSUIT
+	);
 
 	m_lua["Gameflow"] = this;
 }

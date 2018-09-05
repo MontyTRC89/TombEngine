@@ -31,6 +31,8 @@ extern GameScript* g_Script;
 
 GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 {
+	GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+
 	RegeneratePickups();
 
 	if (numFrames > 10)
@@ -176,7 +178,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		InItemControlLoop = false;
 		
 		j_HairControl(0, 0, 0);
-		if (gfLevelFlags & 1)
+		if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
 			j_HairControl(0, 1, 0);
 
 		if (UseSpotCam)
