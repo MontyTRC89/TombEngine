@@ -498,8 +498,7 @@ class Renderer
 	shared_ptr<RenderTarget2D>					m_normalBuffer;
 	shared_ptr<RenderTarget2D>					m_colorBuffer;
 	shared_ptr<RenderTarget2D>					m_outputBuffer;
-	shared_ptr<RenderTarget2D>					m_lightBuffer;
-	shared_ptr<RenderTarget2D>					m_shadowBuffer;
+	shared_ptr<RenderTarget2D>					m_lightBuffer; 
 	shared_ptr<RenderTarget2D>					m_vertexLightBuffer;
 	shared_ptr<RenderTarget2D>					m_postprocessBuffer;
 	shared_ptr<Shader>							m_shaderClearGBuffer;
@@ -512,6 +511,7 @@ class Renderer
 	shared_ptr<Shader>							m_shaderSprites;
 	shared_ptr<Shader>							m_shaderRain;
 	shared_ptr<Shader>							m_shaderTransparent;
+	shared_ptr<Shader>							m_shaderFinalPass;
 	RendererVertex					m_fullscreenQuadVertices[4];
 	__int32							m_fullscreenQuadIndices[6];
 	shared_ptr<RendererSphere>					m_sphereMesh;
@@ -547,7 +547,7 @@ class Renderer
 	__int32							m_currentCausticsFrame = 0;
 	vector<shared_ptr<RendererAnimatedTextureSet>> m_animatedTextureSets;
 	map<__int16*, RendererMesh*>	m_meshPointersToMesh;
-
+	
 	__int32							getAnimatedTextureInfo(__int16 textureId);
 	RendererMesh*					getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs);
 	void							fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index);
@@ -601,6 +601,7 @@ class Renderer
 	bool							doSnow();
 	bool							drawSprites();
 	bool							drawLines3D();
+	__int32							drawFinalPass();
 	void							setCullMode(RENDERER_CULLMODE mode);
 	void							setBlendState(RENDERER_BLENDSTATE state);
 	void							setDepthWrite(bool value);
@@ -608,7 +609,10 @@ class Renderer
 	bool							isRoomUnderwater(__int16 roomNumber);
 	bool							isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
 	void							updateAnimatedTextures();
-	
+	RENDERER_FADE_STATUS			m_fadeStatus;
+	float							m_fadeFactor;
+	bool							m_cinematicBars;
+
 public:
 	D3DXMATRIX						ViewMatrix;
 	D3DXMATRIX						ProjectionMatrix;
@@ -641,4 +645,7 @@ public:
 	void							ClearDynamicLights();
 	void							AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
 	void							FreeRendererData();
+	void							EnableCinematicBars(bool value);
+	void							FadeIn();
+	void							FadeOut();
 };

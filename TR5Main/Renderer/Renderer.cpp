@@ -384,7 +384,6 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_outputBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
 	m_lightBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
 	m_vertexLightBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
-	m_shadowBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
 	m_postprocessBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
 
 	m_shaderClearGBuffer = make_shared<Shader>(m_device, (char*)"Shaders\\ClearGBuffer.fx");
@@ -440,6 +439,11 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_shaderDepth = make_shared<Shader>(m_device, (char*)"Shaders\\Depth.fx");
 	m_shaderDepth->Compile();
 	if (m_shaderDepth->GetEffect() == NULL)
+		return false;
+
+	m_shaderFinalPass = make_shared<Shader>(m_device, (char*)"Shaders\\FinalPass.fx");
+	m_shaderFinalPass->Compile();
+	if (m_shaderFinalPass->GetEffect() == NULL)
 		return false;
 	   
 	m_sphereMesh = make_shared<RendererSphere>(m_device, 1280.0f, 6);
@@ -504,7 +508,9 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_lines3DToDraw.reserve(NUM_LINES_PER_BUCKET * 4);
 	m_lines3DVertices.reserve(NUM_LINES_PER_BUCKET * 2);
 	m_firstWeather = true;
-	
+	m_cinematicBars = false;
+	m_fadeFactor = 1.0f;
+
 	resetBlink();
 
 	return true;
@@ -590,7 +596,7 @@ bool Renderer::printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, by
 	rct.right = 700;
 	rct.top = y;
 	rct.bottom = rct.top + 16;
-//	m_debugFont->DrawTextA(NULL, Message, -1, &rct, 0, fontColor);
+	m_debugFont->DrawTextA(NULL, Message, -1, &rct, 0, fontColor);
 
 	return true;
 }
@@ -1293,7 +1299,7 @@ bool Renderer::PrepareDataForTheRenderer()
 	{
 		__int32 objNum = MoveablesIds[i];
 		OBJECT_INFO* obj = &Objects[objNum];
-		
+		 
 		if (obj->nmeshes > 0)
 		{
 			RendererObject* moveable = new RendererObject(m_device, MoveablesIds[i], obj->nmeshes);
@@ -2154,7 +2160,10 @@ __int32 Renderer::DumpGameScene()
 
 __int32 Renderer::Draw()
 {
-	return drawScene(false);
+	drawScene(false);
+	drawFinalPass();
+
+	return 0;
 }
 
 void Renderer::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
@@ -2456,7 +2465,10 @@ __int32 Renderer::DrawSettingsMenu(__int32 selectedIndex, bool resetBlink)
 
 __int32 Renderer::DrawInventory()
 {
-	return drawInventoryScene();
+	drawInventoryScene();
+	drawFinalPass();
+
+	return 0;
 }
 
 __int32	Renderer::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ)
@@ -2625,6 +2637,7 @@ __int32 Renderer::drawInventoryScene()
 	rect.bottom = ScreenHeight;
 
 	// Clear screen
+	bindRenderTargets(m_outputBuffer.get(), NULL, NULL, NULL);
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	m_device->BeginScene();
 
@@ -2960,7 +2973,8 @@ __int32 Renderer::drawInventoryScene()
 	effect->End();
 
 	m_device->EndScene();
-	m_device->Present(NULL, NULL, NULL, NULL);
+	//m_device->Present(NULL, NULL, NULL, NULL);
+	restoreBackBuffer();
 
 	return 0;
 }
@@ -3170,12 +3184,6 @@ bool Renderer::drawScene(bool dump)
 	   
 	// Bind the light target
 	restoreBackBuffer();
-	bindRenderTargets(m_shadowBuffer.get(), NULL, NULL, NULL);
-	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_COLORVALUE(1.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
-	m_device->BeginScene();
-	m_device->EndScene();
-
-	restoreBackBuffer();
 	bindRenderTargets(m_lightBuffer.get(), NULL, NULL, NULL);
 	
 	effect = m_shaderLight->GetEffect();
@@ -3252,6 +3260,8 @@ bool Renderer::drawScene(bool dump)
 	         
 	if (dump)
 		bindRenderTargets(m_renderTarget.get(), NULL, NULL, NULL);
+	else
+		bindRenderTargets(m_outputBuffer.get(), NULL, NULL, NULL);
 
 	// Combine stage
 	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
@@ -3479,10 +3489,11 @@ bool Renderer::drawScene(bool dump)
 	if (!dump)
 	{
 		drawDebugInfo();
-		m_device->Present(NULL, NULL, NULL, NULL);
+		//m_device->Present(NULL, NULL, NULL, NULL);
 	}
-	else
-		restoreBackBuffer();
+	/*else*/
+		
+	restoreBackBuffer();
 
 	return true;
 }
@@ -5413,4 +5424,65 @@ void Renderer::FreeRendererData()
 	m_spritesIndices.clear();
 	m_meshPointersToMesh.clear();
 	MoveablesIds.clear();
+}
+
+void Renderer::EnableCinematicBars(bool value)
+{
+	m_cinematicBars = value;
+}
+
+void Renderer::FadeIn()
+{
+	m_fadeStatus = RENDERER_FADE_STATUS::FADE_IN;
+	m_fadeFactor = 0.0f;
+}
+
+void Renderer::FadeOut()
+{
+	m_fadeStatus = RENDERER_FADE_STATUS::FADE_OUT;
+	m_fadeFactor = 1.0f;
+}
+  
+__int32 Renderer::drawFinalPass()
+{
+	// Update fade status
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor > 0.99f)
+		m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
+
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor <= 0.01f)
+		m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
+
+	UINT cPasses = 1;
+
+	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	setDepthWrite(true);
+
+	LPD3DXEFFECT effect = m_shaderFinalPass->GetEffect();
+	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+	m_device->BeginScene();
+	effect->Begin(&cPasses, 0);
+
+	effect->SetTexture(effect->GetParameterByName(NULL, "Texture"), m_outputBuffer->GetTexture());
+	effect->SetFloat(effect->GetParameterByName(NULL, "FadeFactor"), m_fadeFactor);
+	effect->SetBool(effect->GetParameterByName(NULL, "CinematicBars"), m_cinematicBars);
+	
+	effect->BeginPass(0);
+	effect->CommitChanges();
+	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFORMAT::D3DFMT_INDEX32,
+		m_fullscreenQuadVertices, sizeof(RendererVertex));
+	effect->EndPass();
+	effect->End();
+	m_device->EndScene();
+
+	m_device->Present(NULL, NULL, NULL, NULL);
+
+	// Update fade status
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN)
+		m_fadeFactor += FADE_FACTOR;
+	
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT)
+		m_fadeFactor -= FADE_FACTOR;
+
+	return 0;
 }

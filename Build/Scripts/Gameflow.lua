@@ -9,10 +9,6 @@ title = Level.new();
 title.script = "andrea2.lua";
 title.soundtrack = 110;
 title.filename = "Data\\title.trc";
-title.horizon = true;
-title.coladdhorizon = true;
-title.layer1 = SkyLayer.new(120, 80, 50, -4);
-title.storm = true;
 title.background = "Title.png";
 
 Gameflow:addLevel(title);
@@ -156,3 +152,55 @@ oldMill.laraType = LaraType.Young;
 oldMill.layer1 = SkyLayer.new(120, 80, 50, -4);
 
 Gameflow:addLevel(oldMill);
+
+-- 13th floor
+rich1 = Level.new();
+
+rich1.name = 111;
+rich1.script = "rich1.lua";
+rich1.soundtrack = 124;
+rich1.filename = "Data\\rich1.trc";
+rich1.horizon = true;
+rich1.coladdhorizon = true;
+rich1.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(rich1);
+
+-- Escape with the Iris
+iris = Level.new();
+
+iris.name = 112;
+iris.script = "rich2.lua";
+iris.soundtrack = 129;
+iris.filename = "Data\\rich2.trc";
+iris.horizon = true;
+iris.coladdhorizon = true;
+iris.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(iris);
+
+-- Security breach
+sec = Level.new();
+
+sec.name = 113;
+sec.script = "rich3.lua";
+sec.soundtrack = 129;
+sec.filename = "Data\\rich3.trc";
+sec.horizon = true;
+sec.coladdhorizon = true;
+sec.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(sec);
+
+-- Red alert!
+redAlert = Level.new();
+
+redAlert.name = 114;
+redAlert.script = "rich4.lua";
+redAlert.soundtrack = 129;
+redAlert.filename = "Data\\rich4.trc";
+redAlert.horizon = true;
+redAlert.coladdhorizon = true;
+redAlert.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(redAlert);

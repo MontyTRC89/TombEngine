@@ -22,6 +22,29 @@ __int32 __cdecl DrawPhaseGame()
 	return nFrames;
 }
 
+__int32 DrawGame()
+{
+	// Control routines uses joints calculated here for getting Lara joint positions
+	CalcLaraMatrices(0);
+	phd_PushUnitMatrix();
+	CalcLaraMatrices(1);
+
+	// Calls my new rock & roll renderer :)
+	g_Renderer->Draw();
+	nFrames = g_Renderer->SyncRenderer();
+
+	// We need to pop the matrix stack or the game will crash
+	MatrixPtr -= 12;
+	DxMatrixPtr -= 48;
+
+	return nFrames;
+}
+
+__int32 DrawInventory()
+{
+	return g_Renderer->DrawInventory();
+}
+
 void __cdecl DoBootScreen(__int32 language)
 {
 	//printf("DoBootScreen\n");
@@ -144,6 +167,6 @@ void Inject_Draw()
 	INJECT(0x0044FF40, UndrawPistolsMeshRight);
 	INJECT(0x0044DBB0, DrawShotgunMeshes);
 	INJECT(0x0044FE60, DrawPistolsMeshes);*/
-	INJECT(0x0042A400, DrawPhaseGame);
+	//INJECT(0x0042A400, DrawPhaseGame);
 	INJECT(0x004B8A80, DoBootScreen);
 }

@@ -28,7 +28,7 @@ GameScript::GameScript()
 		"g", &GameScriptFog::G,
 		"b", &GameScriptFog::B
 		);
-	 
+	  
 	m_lua.new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
 		"name", &GameScriptLevel::Name,

@@ -71,8 +71,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		{
 			if ((DbInput & 0x200000 || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
-				// stop all sounds
-
+				// Stop all sounds
 				INVENTORY_RESULT inventoryResult = g_Inventory->DoInventory();
 				switch (inventoryResult)
 				{
@@ -82,11 +81,6 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 					return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 				}
 			}
-		}
-
-		if (DbInput & 0x2000)
-		{
-			DoPauseMenu();
 		}
 
 		// Has level been completed?
@@ -177,14 +171,20 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		LaraControl();
 		InItemControlLoop = false;
 		
-		j_HairControl(0, 0, 0);
+		HairControl(0, 0, 0);
 		if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
-			j_HairControl(0, 1, 0);
+			HairControl(0, 1, 0);
 
 		if (UseSpotCam)
+		{
+			g_Renderer->EnableCinematicBars(true);
 			CalculateSpotCameras();
+		}
 		else
+		{
+			g_Renderer->EnableCinematicBars(false);
 			CalculateCamera();
+		}
 		    
 		Wibble = (Wibble + 4) & 0xFC;
 		
@@ -345,6 +345,8 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	
 	__int32 nframes = 2;
 	GAME_STATUS result = ControlPhase(nframes, 0);
+	g_Renderer->FadeIn();
+
 	//JustLoaded = 0;
 	while (true)
 	{

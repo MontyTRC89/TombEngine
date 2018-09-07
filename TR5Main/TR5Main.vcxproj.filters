@@ -520,7 +520,6 @@
     <None Include="Shaders\CombineFinal.fx" />
     <None Include="Shaders\Fxaa3_11.fxh" />
     <None Include="Shaders\FXAA.fx" />
-    <None Include="Shaders\FullScreenQuad.fx" />
     <None Include="Shaders\ReconstructZBuffer.fx" />
     <None Include="Shaders\Sprites.fx" />
     <None Include="Shaders\Rain.fx" />
@@ -530,5 +529,6 @@
     <None Include="Scripting\Scripts\English.lua" />
     <None Include="Scripting\Scripts\Gameflow.lua" />
     <None Include="Scripting\Scripts\Andrea2.lua" />
+    <None Include="Shaders\FinalPass.fx" />
   </ItemGroup>
 </Project>

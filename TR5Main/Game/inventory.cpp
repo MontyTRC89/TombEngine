@@ -307,7 +307,7 @@ void Inventory::Initialise()
 		ring->objects[j].rotation = 0;
 		ring->objects[j].scale = 2.0f;
 	}
-
+	  
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_PASSAPORT);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_SUNGLASSES);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_HEADPHONES);
@@ -455,19 +455,23 @@ INVENTORY_RESULT Inventory::DoInventory()
 						passportResult == INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE ||
 						passportResult == INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME)
 					{
+						// Fade out
+						g_Renderer->FadeOut();
+						for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+							g_Renderer->DrawInventory();
+
 						return passportResult;
 					}
 				}
 
-				// DEPRECATED: all the followings will be done by passaport
-				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_TIMEX)
-					DoStatisticsMenu();
+				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_KEYS)
+					DoControlsSettings();
 
-				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_LOAD_FLOPPY)
-					DoLoadGameMenu();
+				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_SUNGLASSES)
+					DoGraphicsSettings();
 
-				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_SAVE_FLOPPY)
-					DoSaveGameMenu();
+				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_HEADPHONES)
+					DoSoundSettings();
 			}
 			else if (m_activeRing == INV_RING_WEAPONS || m_activeRing == INV_RING_PUZZLES)
 			{
@@ -806,7 +810,10 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
 	m_activeRing = INV_RING_OPTIONS;
 
-	g_Renderer->DrawInventory();
+	// Fade in
+	g_Renderer->FadeIn();
+	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+		g_Renderer->DrawInventory();
 
 	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
 
@@ -876,23 +883,33 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 					passportResult == INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME ||
 					passportResult == INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME)
 				{
+					// Fade out
+					g_Renderer->FadeOut();
+					for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+						g_Renderer->DrawInventory();
+
 					return result;
 				}
 			}
 
-			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_TIMEX)
-				DoStatisticsMenu();
+			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_KEYS)
+				DoControlsSettings();
 
-			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_LOAD_FLOPPY)
-				DoLoadGameMenu();
+			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_SUNGLASSES)
+				DoGraphicsSettings();
 
-			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_SAVE_FLOPPY)
-				DoSaveGameMenu();
+			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_HEADPHONES)
+				DoSoundSettings();
 		}
 
 		g_Renderer->DrawInventory();
 		g_Renderer->SyncRenderer();
 	}
+
+	// Fade out
+	g_Renderer->FadeOut();
+	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+		g_Renderer->DrawInventory();
 
 	return result;
 }
@@ -1415,4 +1432,19 @@ __int32	Inventory::PopoverObject()
 __int32 Inventory::GetType()
 {
 	return m_type;
+}
+
+void Inventory::DoControlsSettings()
+{
+
+}
+
+void Inventory::DoGraphicsSettings()
+{
+
+}
+
+void Inventory::DoSoundSettings()
+{
+
 }

@@ -216,6 +216,9 @@ public:
 	void						UseCurrentItem();
 	InventoryObjectDefinition*	GetInventoryObject(__int32 index);
 	INVENTORY_RESULT			DoPassport();
+	void						DoControlsSettings();
+	void						DoGraphicsSettings();
+	void						DoSoundSettings();
 	__int32						PopupObject();
 	__int32						PopoverObject();
 	__int32						GetType();

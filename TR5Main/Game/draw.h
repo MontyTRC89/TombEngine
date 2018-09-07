@@ -15,6 +15,8 @@
 #define Sub_0042A050 ((void (__cdecl*)()) 0x0042A050)  
 
 __int32 __cdecl DrawPhaseGame();
+__int32 DrawGame();
+__int32 DrawInventory();
 void __cdecl DoBootScreen(__int32 language);
 void __cdecl DrawPistolsMeshes(__int32 weapon);
 void __cdecl DrawShotgunMeshes(__int32 weapon);
