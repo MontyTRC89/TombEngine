@@ -64,6 +64,7 @@ Gameflow.strings[111] = "The 13th Floor";
 Gameflow.strings[112] = "Escape with the Iris";
 Gameflow.strings[113] = "Security breach";
 Gameflow.strings[114] = "Red alert!";
+Gameflow.strings[115] = "Test level";
 
 -- Puzzle names (from 200 to 499)
 Gameflow.strings[200] = "Bronze key";

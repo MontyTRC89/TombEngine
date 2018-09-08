@@ -41,7 +41,7 @@ void ControlMissile(__int16 fxNumber)
 	fx = &Effects[fxNumber];
 	printf("ControlMissile\n", fx->objectNumber);
 
-	if (fx->objectNumber == ID_FROGMAN_HARPOON && !(Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
+	if (fx->objectNumber == ID_SCUBA_HARPOON && !(Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
 		fx->pos.xRot -= ONE_DEGREE;
 
 	fx->pos.yPos += (fx->speed * SIN(-fx->pos.xRot) >> W2V_SHIFT);
@@ -55,14 +55,14 @@ void ControlMissile(__int16 fxNumber)
 	if (fx->pos.yPos >= TrGetHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) ||
 		fx->pos.yPos <= GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
 	{
-		if (/*fx->objectNumber == KNIFE ||*/ fx->objectNumber == ID_FROGMAN_HARPOON)
+		if (/*fx->objectNumber == KNIFE ||*/ fx->objectNumber == ID_SCUBA_HARPOON)
 		{
 			/* Change shard into ricochet */
 			//			fx->speed = 0;
 			//			fx->frameNumber = -GetRandomControl()/11000;
 			//			fx->counter = 6;
 			//			fx->objectNumber = RICOCHET1;
-			SoundEffect((fx->objectNumber == ID_FROGMAN_HARPOON) ? 10 : 258, &fx->pos, 0);
+			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? 10 : 258, &fx->pos, 0);
 		}
 		/*else if (fx->objectNumber == DRAGON_FIRE)
 		{
@@ -94,7 +94,7 @@ void ControlMissile(__int16 fxNumber)
 			SoundEffect(317, &fx->pos, 0);
 			KillEffect(fx_number);
 		}
-		else*/ if (fx->objectNumber == ID_FROGMAN_HARPOON)
+		else*/ if (fx->objectNumber == ID_SCUBA_HARPOON)
 		{
 			LaraItem->hitPoints -= DIVER_HARPOON_DAMAGE;
 			SoundEffect(317, &fx->pos, 0);
@@ -111,7 +111,7 @@ void ControlMissile(__int16 fxNumber)
 	printf("Num: %d\n", fx->objectNumber);
 
 	/* Create bubbles in wake of harpoon bolt */
-	if (fx->objectNumber == ID_FROGMAN_HARPOON && Rooms[fx->roomNumber].flags & 1)
+	if (fx->objectNumber == ID_SCUBA_HARPOON && Rooms[fx->roomNumber].flags & 1)
 		CreateBubble(&fx->pos, fx->roomNumber);
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
 	{

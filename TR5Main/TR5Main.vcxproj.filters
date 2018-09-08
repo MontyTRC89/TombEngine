@@ -294,6 +294,9 @@
     <ClInclude Include="Scripting\GameScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\objects.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
@@ -504,6 +507,15 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\GameScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\traps.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\baddy.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\animals.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

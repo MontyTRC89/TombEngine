@@ -13,6 +13,19 @@ title.background = "Title.png";
 
 Gameflow:addLevel(title);
 
+-- Test
+test = Level.new();
+
+test.name = 115;
+test.script = "test.lua";
+test.soundtrack = 128;
+test.filename = "Data\\test.trc";
+test.horizon = true;
+test.coladdhorizon = true;
+test.layer1 = SkyLayer.new(120, 80, 50, -4);
+
+Gameflow:addLevel(test);
+
 -- Streets of rome
 streets = Level.new();
 

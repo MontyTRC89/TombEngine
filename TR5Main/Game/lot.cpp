@@ -86,16 +86,16 @@ void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
 
 	switch (item->objectNumber)
 	{
-	case ID_FROGMAN:
-	case ID_SHARK:
-	case ID_BARACUDDA:
+	case ID_SCUBA_DIVER:
+	case ID_HAMMERHEAD:
+	case ID_BARRACUDA:
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 32;
 		creature->LOT.zone = 4;
 		break;
 
-	case ID_TRIBESMAN_AX:
+	case ID_TRIBESMAN_WITH_AX:
 		creature->LOT.step = 256;
 		creature->LOT.drop = -256;
 		creature->LOT.isAmphibious = false;
@@ -136,7 +136,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	creature->LOT.blockMask = 0x4000;
 	creature->LOT.fly = 0;
 	creature->LOT.zone = 1;
-
+	  
 	switch (item->objectNumber)
 	{
 	case ID_SAS:

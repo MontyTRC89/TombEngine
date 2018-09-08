@@ -52,7 +52,7 @@ float HalfPixelY;
 float4 Color;
 
 // Bones used for Lara skinning
-float4x4 Bones[24];
+float4x4 Bones[48];
 
 // Customize the behaviour of the shader
 int ModelType;

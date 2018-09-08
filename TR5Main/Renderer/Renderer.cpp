@@ -1810,6 +1810,9 @@ void Renderer::collectItems()
 			if (item->objectNumber == ID_LARA)
 				continue;
 
+			if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
+				continue;
+
 			newItem = make_shared<RendererItemToDraw>(itemNum, item, Objects[item->objectNumber].nmeshes);
 			m_itemsToDraw.push_back(newItem);
 		}

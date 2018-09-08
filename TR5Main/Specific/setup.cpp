@@ -6,6 +6,7 @@
 #include "..\Game\Box.h"
 #include "..\Game\missile.h"
 #include "..\Game\control.h"
+#include "..\Objects\objects.h"
 
 /*#include "..\CustomObjects\tiger.h"
 #include "..\CustomObjects\customtraps.h"
@@ -23,6 +24,48 @@
 
 void __cdecl NewObjects()
 {
+	OBJECT_INFO* obj;
+
+	obj = &Objects[ID_SMALL_SCORPION];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmallScorpion;
+		obj->control = SmallScorpionControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 8;
+		obj->pivotLength = 20;
+		obj->radius = 128;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->hitEffect = true;
+	}
+	 
+	obj = &Objects[ID_WILD_BOAR];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWildBoar;
+		obj->control = WildBoarControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 40;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 192] |= 0x10;
+		Bones[obj->boneIndex + 192] |= 0x08;
+		Bones[obj->boneIndex + 208] |= 0x10;
+		Bones[obj->boneIndex + 208] |= 0x08;
+	}
+
 	/*OBJECT_INFO* obj;
 
 	obj = &Objects[ID_SPIKEY_WALL];

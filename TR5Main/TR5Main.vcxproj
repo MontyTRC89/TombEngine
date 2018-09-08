@@ -241,6 +241,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Global\malloc.h" />
     <ClInclude Include="Global\math.h" />
     <ClInclude Include="Global\vodoo.h" />
+    <ClInclude Include="Objects\objects.h" />
     <ClInclude Include="Renderer\DepthShader.h" />
     <ClInclude Include="Renderer\Enums.h" />
     <ClInclude Include="Renderer\MainShader.h" />
@@ -314,6 +315,9 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\traps.cpp" />
     <ClCompile Include="Game\twogun.cpp" />
     <ClCompile Include="Global\malloc.cpp" />
+    <ClCompile Include="Objects\animals.cpp" />
+    <ClCompile Include="Objects\baddy.cpp" />
+    <ClCompile Include="Objects\traps.cpp" />
     <ClCompile Include="Renderer\DepthShader.cpp" />
     <ClCompile Include="Renderer\MainShader.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />

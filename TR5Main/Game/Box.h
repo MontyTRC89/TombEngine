@@ -11,6 +11,7 @@
 #define CreatureMood ((void (__cdecl*)(ITEM_INFO*, AI_INFO*, __int32)) 0x00409370)
 #define GetCreatureMood ((void (__cdecl*)(ITEM_INFO*, AI_INFO*, __int32)) 0x004090A0)
 #define CreatureEffect ((__int16 (__cdecl*)(ITEM_INFO*, BITE_INFO*, __int16(*)(__int32, __int32, __int32, __int16, __int16, __int16))) 0x0040B4D0)
+#define CreatureEffect2 ((__int16 (__cdecl*)(ITEM_INFO*, BITE_INFO*, __int16, __int16, __int16(*)(__int32, __int32, __int32, __int16, __int16, __int16))) 0x0040B550)
 #define CreatureTilt ((void (__cdecl*)(ITEM_INFO*, __int16)) 0x0040B1B0)
 #define CreatureJoint ((void (__cdecl*)(ITEM_INFO*, __int16, __int16)) 0x0040B240)
 #define CreatureAnimation ((void (__cdecl*)(__int16, __int16, __int16)) 0x0040A1D0)
