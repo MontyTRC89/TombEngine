@@ -3001,7 +3001,7 @@ void Renderer::collectSceneItems()
 bool Renderer::drawScene(bool dump)
 {
 	// HACK:
-	LaraItem->hitPoints = 1000;
+	//LaraItem->hitPoints = 1000;
 
 	m_timeClearGBuffer = 0;
 	m_timePrepareShadowMap = 0;

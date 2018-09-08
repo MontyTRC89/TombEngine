@@ -70,7 +70,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		if (CurrentLevel != 0 || true)
 		{
 			if ((DbInput & 0x200000 || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
-			{
+			{ 
 				// Stop all sounds
 				INVENTORY_RESULT inventoryResult = g_Inventory->DoInventory();
 				switch (inventoryResult)
@@ -90,9 +90,18 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		__int32 oldInput = TrInput;
 		 
 		// Is Lara dead?
-		if (ResetFlag || Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput)
+		if (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput)
 		{
-			return GAME_STATUS::GAME_STATUS_LARA_DEAD;
+			INVENTORY_RESULT inventoryResult = g_Inventory->DoInventory();
+			switch (inventoryResult)
+			{
+			case INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME:
+				return GAME_STATUS::GAME_STATUS_NEW_GAME;
+			case INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME:
+				return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+			case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE:
+				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+			}
 		}
 
 		if (demoMode && TrInput == -1)

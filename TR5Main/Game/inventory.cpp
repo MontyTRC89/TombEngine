@@ -325,16 +325,36 @@ INVENTORY_RESULT Inventory::DoInventory()
 {
 	Initialise();
 
+	// If Lara is dead, then we can use only the passport
+	if (LaraItem->hitPoints <= 0 && CurrentLevel > 0)
+	{
+		m_rings[INV_RING_PUZZLES].draw = false;
+		m_rings[INV_RING_WEAPONS].draw = false;
+		m_rings[INV_RING_OPTIONS].draw = true;
+
+		m_activeRing = INV_RING_OPTIONS;
+		m_rings[m_activeRing].currentObject = 0;
+
+		INVENTORY_RESULT passportResult = DoPassport();
+
+		// Fade out
+		g_Renderer->FadeOut();
+		for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+			g_Renderer->DrawInventory();
+
+		return passportResult;
+	}
+
 	m_rings[INV_RING_PUZZLES].draw = true;
 	m_rings[INV_RING_WEAPONS].draw = true;
 	m_rings[INV_RING_OPTIONS].draw = true;
 
 	m_activeRing = INV_RING_WEAPONS;
 
+	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
+
 	g_Renderer->DumpGameScene();
 	g_Renderer->DrawInventory();
-
-	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
 
 	while (!ResetFlag)
 	{
@@ -354,8 +374,8 @@ INVENTORY_RESULT Inventory::DoInventory()
 			return INVENTORY_RESULT::INVENTORY_RESULT_NONE;
 		}
 		else if (DbInput & 1 &&
-				 (m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
-				  m_activeRing == INV_RING_OPTIONS))
+			(m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
+				m_activeRing == INV_RING_OPTIONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -480,7 +500,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 				// Exit from inventory
 				GlobalEnterInventory = -1;
 				return INVENTORY_RESULT::INVENTORY_RESULT_USE_ITEM;
-			}	
+			}
 		}
 
 		g_Renderer->DrawInventory();
@@ -938,7 +958,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 	{
 		choices.push_back(INV_WHAT_PASSPORT_NEW_GAME);
 		choices.push_back(INV_WHAT_PASSPORT_LOAD_GAME);
-		choices.push_back(INV_WHAT_PASSPORT_SAVE_GAME);
+		if (LaraItem->hitPoints > 0 || CurrentLevel == 0)
+			choices.push_back(INV_WHAT_PASSPORT_SAVE_GAME);
 		choices.push_back(INV_WHAT_PASSPORT_EXIT_TO_TITLE);
 	}
 
@@ -1031,9 +1052,12 @@ INVENTORY_RESULT Inventory::DoPassport()
 				// Process input
 				if (DbInput & 0x200000)
 				{
-					moveLeft = false;
-					moveRight = false;
-					closePassport = true;
+					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
+					{
+						moveLeft = false;
+						moveRight = false;
+						closePassport = true;
+					}
 
 					break;
 				}
@@ -1096,9 +1120,12 @@ INVENTORY_RESULT Inventory::DoPassport()
 				// Process input
 				if (DbInput & 0x200000)
 				{
-					moveLeft = false;
-					moveRight = false;
-					closePassport = true;
+					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
+					{
+						moveLeft = false;
+						moveRight = false;
+						closePassport = true;
+					}
 
 					break;
 				}
@@ -1161,9 +1188,12 @@ INVENTORY_RESULT Inventory::DoPassport()
 				// Process input
 				if (DbInput & 0x200000)
 				{
-					moveLeft = false;
-					moveRight = false;
-					closePassport = true;
+					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
+					{
+						moveLeft = false;
+						moveRight = false;
+						closePassport = true;
+					}
 
 					break;
 				}
@@ -1224,9 +1254,12 @@ INVENTORY_RESULT Inventory::DoPassport()
 				// Process input
 				if (DbInput & 0x200000)
 				{
-					moveLeft = false;
-					moveRight = false;
-					closePassport = true;
+					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
+					{
+						moveLeft = false;
+						moveRight = false;
+						closePassport = true;
+					}
 
 					break;
 				}
@@ -1274,9 +1307,12 @@ INVENTORY_RESULT Inventory::DoPassport()
 				// Process input
 				if (DbInput & 0x200000)
 				{
-					moveLeft = false;
-					moveRight = false;
-					closePassport = true;
+					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
+					{
+						moveLeft = false;
+						moveRight = false;
+						closePassport = true;
+					}
 
 					break;
 				}
@@ -1324,9 +1360,12 @@ INVENTORY_RESULT Inventory::DoPassport()
 				// Process input
 				if (DbInput & 0x200000)
 				{
-					moveLeft = false;
-					moveRight = false;
-					closePassport = true;
+					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
+					{
+						moveLeft = false;
+						moveRight = false;
+						closePassport = true;
+					}
 
 					break;
 				}
