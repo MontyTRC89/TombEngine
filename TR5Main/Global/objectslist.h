@@ -47,7 +47,7 @@ typedef enum object_types {
 	ID_CROW,
 	ID_MUMMY, // TR4
 	ID_LARSON,
-	ID_SMALL_SCORPION, // TR4
+	ID_SMALL_SCORPION, // TR4 - Ok
 	ID_PIERRE,
 	ID_BAT, // TR4
 	ID_MAFIA,

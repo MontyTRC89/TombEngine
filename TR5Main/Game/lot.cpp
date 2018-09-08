@@ -162,6 +162,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	case ID_REAPER:
 	case ID_GREEN_TEETH:
 	case ID_ATTACK_SUB:
+	case ID_BAT:
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 16;

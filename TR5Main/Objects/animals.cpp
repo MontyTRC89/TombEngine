@@ -11,6 +11,7 @@
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
+BITE_INFO batBiteInfo = { 0, 16, 45, 4 };
 
 void __cdecl InitialiseWildBoar(__int16 itemNum)
 {
@@ -73,7 +74,7 @@ void __cdecl WildBoarControl(__int16 itemNum)
 
 					if (distance < minDistance && distance < laraDistance)
 					{
-						creature->enemy = item;
+						creature->enemy = target;
 						minDistance = distance;
 					}
 				}
@@ -333,6 +334,165 @@ void __cdecl SmallScorpionControl(__int16 itemNum)
 			item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->currentAnimState = 6;
+		}
+	}
+
+	CreatureAnimation(itemNum, angle, 0);
+}
+
+void __cdecl InitialiseBat(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	ClearItem(itemNum);
+
+	item->animNumber = Objects[ID_BAT].animIndex + 5;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->goalAnimState = 6;
+	item->currentAnimState = 6;
+}
+
+void __cdecl BatControl(__int16 itemNum)
+{
+	__int16 angle = 0;
+	__int16 head = 0;
+	__int16 neck = 0;
+	__int16 tilt = 0;
+	__int16 joint0 = 0;
+	__int16 joint1 = 0;
+	__int16 joint2 = 0;
+	__int16 joint3 = 0;
+
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+	if (item->hitPoints > 0)
+	{
+		__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
+		__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
+		__int32 laraDistance = dx * dx + dz * dz;
+
+		if (item->aiBits & GUARD)
+		{
+			GetAITarget(creature);
+		}
+		else
+		{
+			creature->enemy = LaraItem;
+
+			CREATURE_INFO* baddie = &BaddieSlots[0];
+			CREATURE_INFO* found = &BaddieSlots[0];
+			__int32 minDistance = 0x7FFFFFFF;
+
+			for (__int32 i = 0; i < NUM_SLOTS; i++, baddie++)
+			{
+				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
+					continue;
+
+				ITEM_INFO* target = &Items[baddie->itemNum];
+				if (target->objectNumber != ID_WILD_BOAR)
+				{
+					__int32 dx2 = target->pos.xPos - item->pos.xPos;
+					__int32 dz2 = target->pos.zPos - item->pos.zPos;
+					__int32 distance = dx2 * dx2 + dz2 * dz2;
+
+					if (distance < minDistance && distance < laraDistance)
+					{
+						creature->enemy = target;
+						minDistance = distance;
+					}
+				}
+			}
+		}
+
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+
+		GetCreatureMood(item, &info, VIOLENT);
+		if (item->flags)
+			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, 3640);
+
+		switch (item->currentAnimState)
+		{
+		case 2:
+			if (info.distance < 0x10000 || !(GetRandomControl() & 0x3F))
+			{
+				creature->flags = 0;
+			}
+			if (!creature->flags)
+			{
+				if (item->touchBits
+					|| creature->enemy != LaraItem
+					&& info.distance < 0x10000
+					&& info.ahead
+					&& abs(item->pos.yPos - creature->enemy->pos.yPos) < 896)
+				{
+					item->goalAnimState = 3;
+				}
+			}
+			break;
+
+		case 3:
+			if (!creature->flags
+				&& (item->touchBits
+					|| creature->enemy != LaraItem
+					&& info.distance < 0x10000
+					&& info.ahead/*
+					&& (item->pos.yPos - v19->pos.yPos, (signed int)((HIDWORD(v20) ^ v20) - HIDWORD(v20)) < 896)*/))
+			{
+				CreatureEffect(item, &batBiteInfo, DoBloodSplat);
+				if (creature->enemy == LaraItem)
+				{
+					LaraItem->hitPoints -= 2;
+					LaraItem->hitStatus = true;
+				}
+				creature->flags = 1;
+			}
+			else
+			{
+				item->goalAnimState = 2;
+				creature->mood = MOOD_TYPE::BORED_MOOD;
+			}
+			break;
+
+		case 6:
+			if (info.distance < 26214400 || item->hitStatus || creature->flags & 0x10)
+			{
+				item->goalAnimState = 1;
+			}
+			break;
+
+		}
+	}
+	else if (item->currentAnimState == 3)
+	{
+		item->animNumber = Objects[ID_BAT].animIndex + 1;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->goalAnimState = 2;
+		item->currentAnimState = 2;
+	}
+	else
+	{
+		if (item->pos.yPos >= item->floor)
+		{
+			item->goalAnimState = 5;
+			item->pos.yPos = item->floor;
+			item->gravityStatus = false;
+		}
+		else
+		{
+			item->gravityStatus = true;
+			item->animNumber = Objects[ID_BAT].animIndex + 3;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = 4;
+			item->currentAnimState = 4;
+			item->speed = 0;
 		}
 	}
 
