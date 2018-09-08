@@ -89,19 +89,9 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 
 		__int32 oldInput = TrInput;
 		 
+		// Is Lara dead?
 		if (ResetFlag || Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput)
 		{
-			/*if (GameFlow->DemoDisc && ResetFlag)
-			{
-				ResetFlag = 0;
-				return 4;
-			}
-			else
-			{
-				ResetFlag = 0;
-				return 1;
-			}*/
-			// TODO: check this
 			return GAME_STATUS::GAME_STATUS_LARA_DEAD;
 		}
 
@@ -111,12 +101,14 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			TrInput = 0;
 		}
 
+		// CLear dynamic lights
 		ClearDynamics();
 		ClearFires();
 		g_Renderer->ClearDynamicLights();
 
 		GotLaraSpheres = false;
 
+		// Update all items
 		InItemControlLoop = true;
 
 		__int16 itemNum = NextItemActive;
@@ -139,9 +131,9 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		}
 
 		InItemControlLoop = false;
-
 		KillMoveItems();
 
+		// Update all effects
 		InItemControlLoop = true;
 
 		__int16 fxNum = NextFxActive;
@@ -154,9 +146,9 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		}
 
 		InItemControlLoop = false;
-
 		KillMoveEffects();
 
+		// Update some effect timers
 		if (SmokeCountL)
 			SmokeCountL--;
 		if (SmokeCountR)
@@ -166,28 +158,34 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		if (WeaponDelay)
 			WeaponDelay--;
 
+		// Control Lara
 		InItemControlLoop = true;
 		Lara.skelebob = NULL;
 		LaraControl();
 		InItemControlLoop = false;
 		
+		// Update Lara's ponytails
 		HairControl(0, 0, 0);
 		if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
 			HairControl(0, 1, 0);
 
 		if (UseSpotCam)
 		{
+			// Draw flyby cameras
 			g_Renderer->EnableCinematicBars(true);
 			CalculateSpotCameras();
 		}
 		else
 		{
+			// Do the standard camera
 			g_Renderer->EnableCinematicBars(false);
 			CalculateCamera();
 		}
 		    
+		//WTF: what is this? It's used everywhere so it has to stay
 		Wibble = (Wibble + 4) & 0xFC;
 		
+		// Update special effects
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -214,18 +212,24 @@ unsigned __stdcall GameMain(void*)
 	DB_Log(2, "GameMain - DLL");
 	printf("GameMain\n");
 
+	// We still need legacy matrices because control routines use them
 	MatrixPtr = MatrixStack;
 	DxMatrixPtr = (byte*)malloc(48 * 40);
 
+	// Initialise legacy memory buffer and game timer
 	InitGameMalloc();
 	TIME_Init();
 
+	// TODO: deprecated, to remove because now we have LUA
 	LoadNewStrings();
-
+	
+	// Execute the LUA gameflow and play the game
 	g_Script->DoGameflow();
 
+	// End the game and release some resources
 	GameClose();
 
+	// Finish the thread
 	PostMessageA((HWND)WindowsHandle, 0x10u, 0, 0);
 	_endthreadex(1);
 
@@ -237,10 +241,7 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
 
-	//gfLevelFlags |= 1;
-	//DoLevel(3, 124);
-	//return;
-
+	// Load the title level
 	S_LoadLevelFile(0);
 	
 	INVENTORY_RESULT inventoryResult = g_Inventory->DoTitleInventory();
@@ -250,8 +251,8 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 		return GAME_STATUS::GAME_STATUS_NEW_GAME;
 	case INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME:
 		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
-	case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE:
-		return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+	case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME:
+		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 
 	return GAME_STATUS::GAME_STATUS_NEW_GAME;
@@ -260,11 +261,9 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame)
 {
 	CreditsDone = false;
-	//j_DoTitleFMV();
 	CanLoad = false;
 
-	//InitialiseTitleOptionsMaybe(255, 0);
-
+	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
 	{
 		Savegame.Level.Timer = 0;
@@ -279,6 +278,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 		Savegame.Game.Kills = 0;
 	}
 
+	// If load from savegame, then restore the game
 	if (loadFromSavegame)
 	{
 		RestoreGame();
@@ -299,82 +299,58 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
 	}
-		
-	//num_fmvs = 0;
-	//fmv_to_play[1] = 0;
-	//fmv_to_play[0] = 0;
-	 
-	//IsLevelLoading = true;
-	//S_LoadLevelFile(0);
-	//InitialiseFXArray(true);
-	//InitialiseLOTarray(true);
-
+	
+	// Load the level
 	S_LoadLevelFile(index);
-	//while (IsLevelLoading);
 
-	printf("Starting rendering\n");
-
-	//while(true)
-	//	TestRenderer();
-
+	// TODO: deprecated?
 	GlobalLastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
-
-	InitSpotCamSequences();
-
 	TitleControlsLockedOut = false;
 
+	// Initialise flyby cameras
+	InitSpotCamSequences();
+		
+	// Play background music
 	CurrentAtmosphere = ambient;
 	S_CDPlay(CurrentAtmosphere, 1);
 	IsAtmospherePlaying = true;
 
+	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
 	InitialiseLOTarray(true);
 	InitialisePickUpDisplay();
 	InitialiseCamera();
-	printf("InitialiseCamera OK\n");
 
-	printf("Initialised\n");
-	//while (true)
-	//TriggerTitleSpotcam(1);
-
+	// Initialise ponytails
 	InitialiseHair();
 
-	//ControlPhase(2, 0);
-	//printf("After control\n");
-	
 	__int32 nframes = 2;
 	GAME_STATUS result = ControlPhase(nframes, 0);
 	g_Renderer->FadeIn();
 
-	//JustLoaded = 0;
+	// The game loop, finally!
 	while (true)
 	{
 		nframes = DrawPhaseGame();
 		result = ControlPhase(nframes, 0);
+
 		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
 			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
+		{
+			// Here is the only way for exiting from the loop
+			SOUND_Stop();
+			S_CDStop();
+
 			return result;
+		}
 
 		Sound_UpdateScene();
 	}
 }
 
-/*void __cdecl DoTitleFMV()
-{
-
-}
-
-void __cdecl LoadScreen(__int32 index, __int32 num)
-{
-
-}*/
-
 void Inject_Control()
 {
-	//INJECT(0x004B2090, DoTitleFMV);
-	//INJECT(0x004AC810, LoadScreen);
-	INJECT(0x00435C70, DoTitle);
-	INJECT(0x004147C0, ControlPhase);
+
 }
