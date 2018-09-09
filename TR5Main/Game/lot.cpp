@@ -87,7 +87,7 @@ void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
 	switch (item->objectNumber)
 	{
 	case ID_SCUBA_DIVER:
-	case ID_HAMMERHEAD:
+	case ID_SHARK:
 	case ID_BARRACUDA:
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;

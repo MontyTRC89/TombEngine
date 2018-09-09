@@ -83,6 +83,60 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_CHAIN];
+	if (obj->loaded)
+	{
+		obj->control = ChainControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_PLOUGH];
+	if (obj->loaded)
+	{
+		obj->control = PloughControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_FLOOR_4BLADES];
+	if (obj->loaded)
+	{
+		obj->control = FourBladesControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_CEILING_4BLADES];
+	if (obj->loaded)
+	{
+		obj->control = FourBladesControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SPIKEBALL];
+	if (obj->loaded)
+	{
+		obj->control = SpikeballControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_COG];
+	if (obj->loaded)
+	{
+		obj->control = CogControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
 	/*OBJECT_INFO* obj;
 
 	obj = &Objects[ID_SPIKEY_WALL];
