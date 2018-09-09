@@ -111,55 +111,6 @@ void __cdecl UndrawShotgunMeshes(__int32 weapon)
 	g_LaraExtra.drawWeapon = false;
 }
 
-/*__int16 __cdecl GetFrames2(__int16 animNumber, __int16 frameNumber, __int16* framePtr[], __int16* rate)
-{
-	int v3; // ebp@1
-	ANIM_STRUCT *v4; // edi@1
-	__int16 *v5; // eax@1
-	signed int v6; // esi@1
-	signed int v7; // ebp@1
-	signed int v8; // ebx@1
-	int result; // eax@2
-	int v10; // ecx@3
-	int v11; // ebx@3
-
-	ANIM_STRUCT* anim = &Anims[animNumber];
-	framePtr[0] = framePtr[1] = anim->framePtr;
-	__int16 rate2 = *rate = anim->interpolation & 0x00FF;
-
-	
-	frame_size = anim->interpolation >> 8;
-	frm -= anim->frame_base;
-	first = frm / rat;
-	interp = frm % rat;
-	frmptr[0] += first * frame_size;				  // Get Frame pointers
-	frmptr[1] = frmptr[0] + frame_size;               // and store away
-	if (interp == 0)
-		return(0);
-	second = first * rat + rat;
-	if (second>anim->frame_end)                       // Clamp KeyFrame to End if need be
-		*rate = anim->frame_end - (second - rat);
-	return(interp);
-
-	v7 = v3 - v4->frame_base;
-	v8 = v4->interpolation >> 8;
-	*(_DWORD *)a2 += 2 * v8 * (v7 / v6);
-	*(_DWORD *)(a2 + 4) = *(_DWORD *)a2 + 2 * v8;
-	if (v7 % v6)
-	{
-		v10 = v4->frame_end;
-		v11 = v6 * (v7 / v6 + 1);
-		if (v11 > v10)
-			*a3 = v6 + v10 - v11;
-		result = v7 % v6;
-	}
-	else
-	{
-		result = 0;
-	}
-	return result;
-}*/
-
 void Inject_Draw()
 {
 	/*INJECT(0x0044DBF0, UndrawShotgunMeshes);

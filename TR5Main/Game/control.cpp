@@ -126,6 +126,8 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			ITEM_INFO* item = &Items[itemNum];
 			__int16 nextItem = item->nextActive;
 
+			//printf("%d %d %d %d\n", itemNum, item->afterDeath, item->hitPoints, item->status);
+
 			if (item->afterDeath < 128)
 			{
 				if (Objects[item->objectNumber].control)
@@ -172,7 +174,8 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		Lara.skelebob = NULL;
 		LaraControl();
 		InItemControlLoop = false;
-		
+		KillMoveItems();
+
 		// Update Lara's ponytails
 		HairControl(0, 0, 0);
 		if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)

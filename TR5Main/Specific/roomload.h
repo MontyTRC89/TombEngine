@@ -27,8 +27,13 @@
 #define LoadSamples ((void (__cdecl*)()) 0x004A6880)
 #define InitialiseLaraLoad ((void (__cdecl*)(__int16)) 0x004568C0)
 #define LoadRooms ((void (__cdecl*)()) 0x004A4DA0)
-#define InitialiseLara ((void (__cdecl*)(__int16)) 0x00473210)
+#define InitialiseLara ((void (__cdecl*)(__int32)) 0x00473210)
 #define InitialiseGameStuff ((void (__cdecl*)()) 0x004778F0)
+#define InitialiseGameFlags ((void (__cdecl*)()) 0x00477880)
+#define SeedRandomDraw ((void (__cdecl*)(__int32)) 0x004A7C90)  
+#define SeedRandomControl ((void (__cdecl*)(__int32)) 0x004A7C70)  
+#define GetAIPickups ((void (__cdecl*)()) 0x00477370)  
+#define GetCarriedItems ((void (__cdecl*)()) 0x004771E0)  
 
 using namespace std;
 

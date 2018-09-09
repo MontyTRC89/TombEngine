@@ -488,8 +488,17 @@ unsigned __stdcall LoadLevel(void* data)
 	 
 	g_Renderer->PrepareDataForTheRenderer();
 
-	InitialiseLara(0);
-	//InitialiseGameStuff();
+	// Initialise the game
+	SeedRandomDraw(0xD371F947);
+	SeedRandomControl(0xD371F947);
+	InitialiseGameFlags();
+	InitialiseLara(1);
+	GetCarriedItems();
+	GetAIPickups();
+	SeedRandomDraw(0xD371F947);
+	SeedRandomControl(0xD371F947);
+
+	// Level loaded
 	IsLevelLoading = false;
 	_endthreadex(1);
 
