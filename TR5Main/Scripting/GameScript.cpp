@@ -45,7 +45,8 @@ GameScript::GameScript()
 		"background", &GameScriptLevel::Background,
 		"rain", &GameScriptLevel::Rain,
 		"snow", &GameScriptLevel::Snow,
-		"laraType", &GameScriptLevel::LaraType
+		"laratype", &GameScriptLevel::LaraType,
+		"resethub", &GameScriptLevel::ResetHub
 		);
 
 	m_lua.new_usertype<GameScript>("GameScript",

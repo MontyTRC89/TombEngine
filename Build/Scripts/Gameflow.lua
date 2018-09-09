@@ -36,6 +36,7 @@ streets.filename = "Data\\andrea1.trc";
 streets.horizon = true;
 streets.coladdhorizon = true;
 streets.layer1 = SkyLayer.new(120, 80, 50, -4);
+streets.resethub = true;
 
 Gameflow:addLevel(streets);
 
@@ -76,6 +77,7 @@ theBase.filename = "Data\\joby2.trc";
 theBase.horizon = true;
 theBase.coladdhorizon = true;
 theBase.layer1 = SkyLayer.new(120, 80, 50, -4);
+theBase.resethub = true;
 
 Gameflow:addLevel(theBase);
 
@@ -129,8 +131,9 @@ gallowstree.horizon = true;
 gallowstree.coladdhorizon = true;
 gallowstree.rain = true;
 gallowstree.storm = true;
-gallowstree.laraType = LaraType.Young;
+gallowstree.laratype = LaraType.Young;
 gallowstree.layer1 = SkyLayer.new(120, 80, 50, -4);
+gallowstree.resethub = true;
 
 Gameflow:addLevel(gallowstree);
 
@@ -145,7 +148,7 @@ labyrinth.horizon = true;
 labyrinth.coladdhorizon = true;
 labyrinth.rain = true;
 labyrinth.storm = true;
-labyrinth.laraType = LaraType.Young;
+labyrinth.laratype = LaraType.Young;
 labyrinth.layer1 = SkyLayer.new(120, 80, 50, -4);
 
 Gameflow:addLevel(labyrinth);
@@ -161,7 +164,7 @@ oldMill.horizon = true;
 oldMill.coladdhorizon = true;
 oldMill.rain = true;
 oldMill.storm = true;
-oldMill.laraType = LaraType.Young;
+oldMill.laratype = LaraType.Young;
 oldMill.layer1 = SkyLayer.new(120, 80, 50, -4);
 
 Gameflow:addLevel(oldMill);
@@ -176,6 +179,7 @@ rich1.filename = "Data\\rich1.trc";
 rich1.horizon = true;
 rich1.coladdhorizon = true;
 rich1.layer1 = SkyLayer.new(120, 80, 50, -4);
+rich1.resethub = true;
 
 Gameflow:addLevel(rich1);
 
