@@ -1909,6 +1909,10 @@ void Renderer::updateLaraAnimations()
 	D3DXMATRIX world;
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA].get();
+	
+	// Clear extra rotations
+	for (__int32 i = 0; i < laraObj->LinearizedBones.size(); i++)
+		laraObj->LinearizedBones[i]->ExtraRotation = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	// Lara world matrix
 	D3DXMatrixTranslation(&translation, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
