@@ -15,6 +15,5 @@
 #define TranslateItem ((void (__cdecl*)(ITEM_INFO*, __int32, __int32, __int32)) 0x00415960)
 
 void __cdecl ClearItem(__int16 itemNum);
-void __cdecl ItemNewRoom(__int16 itemNum, __int16 room);
 
 void Inject_Items();

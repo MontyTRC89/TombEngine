@@ -491,8 +491,10 @@ unsigned __stdcall LoadLevel(void* data)
 	// Initialise the game
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
+	Wibble = 0;
+	TorchRoom = -1;
 	InitialiseGameFlags();
-	InitialiseLara(1);
+	InitialiseLara(!(gfInitialiseGame || CurrentLevel == 1));
 	GetCarriedItems();
 	GetAIPickups();
 	SeedRandomDraw(0xD371F947);

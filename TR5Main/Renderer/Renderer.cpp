@@ -1807,6 +1807,10 @@ void Renderer::collectItems()
 		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
 		{
 			ITEM_INFO* item = &Items[itemNum];
+
+			if (item->objectNumber == ID_LARA && itemNum == Items[itemNum].nextItem)
+				break;
+
 			if (item->objectNumber == ID_LARA)
 				continue;
 

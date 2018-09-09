@@ -16,7 +16,7 @@ uintptr_t hThread;
 HACCEL hAccTable;
 
 extern GameScript* g_Script;
-
+ 
 __int32 __cdecl WinProcMsg()
 {
 	int result;

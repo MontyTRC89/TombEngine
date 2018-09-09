@@ -9,11 +9,11 @@ void __cdecl SmallScorpionControl(__int16 itemNum);
 void __cdecl InitialiseBat(__int16 itemNum);
 void __cdecl BatControl(__int16 itemNum);
 
-void __cdecl InitialiseMummy(__int16 itemNum);
-void __cdecl MummyControl(__int16 itemNum);
+//void __cdecl InitialiseMummy(__int16 itemNum);
+//void __cdecl MummyControl(__int16 itemNum);
 
-void __cdecl InitialiseSkeleton(__int16 itemNum);
-void __cdecl SkeletonControl(__int16 itemNum);
+//void __cdecl InitialiseSkeleton(__int16 itemNum);
+//void __cdecl SkeletonControl(__int16 itemNum);
 
 void __cdecl FourBladesControl(__int16 itemNum);
 

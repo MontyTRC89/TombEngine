@@ -244,6 +244,8 @@
 #define gfRequiredStartPos			VAR_U_(0x00E5C2B4, byte)
 #define gfInitialiseGame			VAR_U_(0x005082C1, byte)
 
+#define TorchRoom					VAR_U_(0x00507AB0, __int16)
+
 extern bool MonksAttackLara;
 
 // Remapped variables
