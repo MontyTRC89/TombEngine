@@ -3836,6 +3836,14 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 	for (__int32 i = 0; i < moveableObj->ObjectMeshes.size(); i++)
 	{
 		RendererMesh* mesh = moveableObj->ObjectMeshes[i].get();
+		if (itemToDraw->Item->objectNumber == ID_BADDY1)
+		{
+			// Mesh swaps
+			bool doSwap = (itemToDraw->Item->meshswapMeshbits >> i) & 1;
+			if (doSwap)
+				mesh = (m_moveableObjects[ID_MESHSWAP1].get())->ObjectMeshes[i].get();
+		}
+
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 		if (bucket->NumVertices == 0)
 			continue;

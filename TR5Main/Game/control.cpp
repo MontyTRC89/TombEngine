@@ -169,6 +169,8 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			SplashCount--;
 		if (WeaponDelay)
 			WeaponDelay--;
+		if (WeaponEnemyTimer)
+			WeaponEnemyTimer--;
 
 		// Control Lara
 		InItemControlLoop = true;

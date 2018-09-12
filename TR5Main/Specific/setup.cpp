@@ -83,7 +83,7 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_CHAIN];
+	/*obj = &Objects[ID_CHAIN];
 	if (obj->loaded)
 	{
 		obj->control = ChainControl;
@@ -135,6 +135,54 @@ void __cdecl NewObjects()
 		obj->collision = GenericSphereBoxCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+	}*/
+
+	obj = &Objects[ID_BADDY1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseBaddy;
+		obj->control = BaddyControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 25;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 112] |= 0x08;
+		Bones[obj->boneIndex + 112] |= 0x04;
+		Bones[obj->boneIndex + 352] |= 0x08;
+		Bones[obj->boneIndex + 352] |= 0x04;
+
+		Meshes[obj->meshIndex + 36] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 32];
+		Meshes[obj->meshIndex + 60] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 56];
+		Meshes[obj->meshIndex + 36] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 22];
+	}
+
+	obj = &Objects[ID_BADDY2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseBaddy;
+		obj->control = BaddyControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 25;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 112] |= 0x08;
+		Bones[obj->boneIndex + 112] |= 0x04;
+		Bones[obj->boneIndex + 352] |= 0x08;
+		Bones[obj->boneIndex + 352] |= 0x04;
 	}
 
 	/*OBJECT_INFO* obj;

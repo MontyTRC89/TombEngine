@@ -245,6 +245,7 @@
 #define gfInitialiseGame			VAR_U_(0x005082C1, byte)
 
 #define TorchRoom					VAR_U_(0x00507AB0, __int16)
+#define WeaponEnemyTimer			VAR_U_(0x0080E016, byte)
 
 extern bool MonksAttackLara;
 

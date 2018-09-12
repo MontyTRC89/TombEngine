@@ -111,6 +111,57 @@ void __cdecl UndrawShotgunMeshes(__int32 weapon)
 	g_LaraExtra.drawWeapon = false;
 }
 
+__int32 __cdecl GetFrame_D2(ITEM_INFO* item, __int16* framePtr[], __int32* rate)
+{
+	/*__int32 frameNumber = item->frameNumber;
+	ANIM_STRUCT* animation = &Anims[item->animNumber];
+
+	framePtr[0] = animation->framePtr;
+	framePtr[1] = animation->framePtr;
+
+	__int16 rat = animation->interpolation & 0xFF;
+	*rate = rat;
+
+	__int32 frm = frameNumber - animation->frameBase;
+	__int32 frameSize = animation->interpolation >> 8;
+
+	framePtr[0] += rat * (frm / rat);
+	framePtr[1] = framePtr[0] + rat;
+
+	if (frm % rat)
+	{
+		__int32 second = rat * (frm / rat + 1);
+		if (second > animation->frameEnd)
+			*rate = rat + animation->frameEnd - second;
+		return (frm % rat);
+	}
+
+	return 0;*/
+
+	ANIM_STRUCT *anim;
+	int			frm;
+	int			first, second;
+	int			frame_size;
+	int			interp, rat;
+
+	frm = item->frameNumber;
+	anim = &Anims[item->animNumber];
+	framePtr[0] = framePtr[1] = anim->framePtr;
+	rat = *rate = anim->interpolation & 0x00ff;
+	frame_size = anim->interpolation >> 8;
+	frm -= anim->frameBase;
+	first = frm / rat;
+	interp = frm % rat;
+	framePtr[0] += first * frame_size;				  // Get Frame pointers
+	framePtr[1] = framePtr[0] + frame_size;               // and store away
+	if (interp == 0)
+		return(0);
+	second = first * rat + rat;
+	if (second>anim->frameEnd)                       // Clamp KeyFrame to End if need be
+		*rate = anim->frameEnd - (second - rat);
+	return(interp);
+}
+
 void Inject_Draw()
 {
 	/*INJECT(0x0044DBF0, UndrawShotgunMeshes);

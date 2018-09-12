@@ -1,5 +1,9 @@
 #pragma once
 
+#include "..\Global\global.h"
+
+void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
+
 void __cdecl InitialiseWildBoar(__int16 itemNum);
 void __cdecl WildBoarControl(__int16 itemNum);
 
@@ -8,6 +12,9 @@ void __cdecl SmallScorpionControl(__int16 itemNum);
 
 void __cdecl InitialiseBat(__int16 itemNum);
 void __cdecl BatControl(__int16 itemNum);
+
+void __cdecl InitialiseBaddy(__int16 itemNum);
+void __cdecl BaddyControl(__int16 itemNum);
 
 //void __cdecl InitialiseMummy(__int16 itemNum);
 //void __cdecl MummyControl(__int16 itemNum);

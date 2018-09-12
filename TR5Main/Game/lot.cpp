@@ -150,6 +150,8 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		break;
 
 	case ID_HITMAN:
+	case ID_BADDY1:
+	case ID_BADDY2:
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
 		creature->LOT.canJump = true;

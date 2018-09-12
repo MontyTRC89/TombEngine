@@ -226,7 +226,8 @@ typedef struct item_info_t {
 	unsigned __int32 aiBits : 5; // offset=133.1
 	unsigned __int32 reallyActive : 1; // offset=133.6
 	unsigned __int32 InDrawRoom : 1; // offset=133.7
-	char pad2[8]; // OFF=5614
+	__int32 swapMeshFlags;
+	char pad2[4]; // OFF=5614
 } ITEM_INFO;
 
 typedef struct creature_info_t 
