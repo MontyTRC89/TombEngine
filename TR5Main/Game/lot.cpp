@@ -112,7 +112,9 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	creature->itemNum = itemNum;
 	creature->mood = BORED_MOOD;
 	creature->jointRotation[0] = 0;
+	creature->jointRotation[1] = 0;
 	creature->jointRotation[2] = 0;
+	creature->jointRotation[3] = 0;
 	creature->alerted = false;
 	creature->headLeft = false;
 	creature->headRight = false;
@@ -121,7 +123,6 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	creature->patrol2 = false;
 	creature->jumpAhead = false;
 	creature->monkeyAhead = false;
-	creature->alerted = false;
 	creature->alerted = false;
 	creature->LOT.canJump = false;
 	creature->LOT.canMonkey = false;

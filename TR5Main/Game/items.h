@@ -1,7 +1,7 @@
 #pragma once
 #include "..\Global\global.h"
 
-//#define ItemNewRoom ((void (__cdecl*)(__int16, __int16)) 0x00440DA0)
+#define ItemNewRoom ((void (__cdecl*)(__int16, __int16)) 0x00440DA0)
 #define EffectNewRoom ((void (__cdecl*)(__int16, __int16)) 0x004412F0)
 #define KillEffect ((void (__cdecl*)(__int16)) 0x00441180)
 #define CreateEffectTR5 ((__int16 (__cdecl*)(__int16)) 0x00440620)

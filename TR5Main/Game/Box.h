@@ -22,7 +22,9 @@
 #define AlertAllGuards ((void (__cdecl*)(__int16)) 0x0040BA70)
 #define AIGuard ((__int16(__cdecl*)(CREATURE_INFO*)) 0x0040BBE0)
 #define GetAITarget ((void(__cdecl*)(CREATURE_INFO*)) 0x0040BCC0)
-#define CreatureVault ((__int32 (__cdecl*)(__int16, __int16, __int32, __int32)) 0x0040B5D0)
+//#define CreatureVault ((__int32 (__cdecl*)(__int16, __int16, __int32, __int32)) 0x0040B5D0)
+
+__int32 CreatureVault(__int16 itemNum, __int16 angle, __int32 vault, __int32 shift);
 
 void Inject_Box();
 

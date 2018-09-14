@@ -222,6 +222,14 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 	return GAME_STATUS::GAME_STATUS_NONE;
 }
 
+void __cdecl j_AnimateItem(ITEM_INFO* item)
+{
+	if (item != LaraItem)
+		printf("AnimateItem\n");
+	AnimateItem(item);
+
+}
+
 unsigned __stdcall GameMain(void*)
 {
 	DB_Log(2, "GameMain - DLL");
@@ -367,5 +375,5 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 
 void Inject_Control()
 {
-
+	INJECT(0x0040261C, j_AnimateItem);
 }

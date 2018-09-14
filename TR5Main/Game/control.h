@@ -47,5 +47,6 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
 
 unsigned __stdcall GameMain(void*);
+void __cdecl j_AnimateItem(ITEM_INFO* item);
 
 void Inject_Control();

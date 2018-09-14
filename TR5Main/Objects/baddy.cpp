@@ -140,8 +140,9 @@ void __cdecl BaddyControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
+	OBJECT_INFO* obj = &Objects[ID_BADDY1];
 
-	printf("Anim: %d Frame: %d\n", item->animNumber, item->frameNumber);
+	printf("Anim: %d Frame: %d State: %d Jump: %d Monkey: %d\n", item->animNumber, item->frameNumber, item->currentAnimState, creature->jumpAhead, creature->monkeyAhead);
 
 	__int16 tilt = 0;
 	__int16 angle = 0;
@@ -325,7 +326,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx);
+			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
 			laraInfo.ahead = true;
 
 			if (laraInfo.angle <= -16384 || laraInfo.angle >= 16384)
@@ -347,7 +348,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 		//currentCreature->enemy = LaraItem;
 
 		// Is baddy alerted?
-		if (item->hitStatus || laraInfo.distance < 0x100000 ||
+		if (item->hitStatus || laraInfo.distance < SQUARE(1024) ||
 			TargetVisible(item, &laraInfo) &&
 			abs(LaraItem->pos.yPos - item->pos.yPos) < 1024)
 		{
@@ -361,8 +362,8 @@ void __cdecl BaddyControl(__int16 itemNum)
 			jump = false;
 		}
 		
-			dx = 942 * SIN(item->pos.yRot + 8192) >> 14;
-			dz = 942 * COS(item->pos.yRot + 8192) >> 14;
+			dx = 942 * SIN(item->pos.yRot + ANGLE(45)) >> 14;
+			dz = 942 * COS(item->pos.yRot + ANGLE(45)) >> 14;
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -387,7 +388,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 				jump = false;
 			else
 			{
-				roll = true;
+				jump = true;
 				if (height4 + 512 >= item->pos.yPos)
 					jump = false;
 			}
@@ -443,7 +444,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					if (item->swapMeshFlags == 2176
 						&& item == Lara.target
 						&& laraInfo.ahead
-						&& laraInfo.distance > 465124)
+						&& laraInfo.distance > SQUARE(682))
 					{
 						item->goalAnimState = 4;
 						break;
@@ -547,7 +548,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 							item->goalAnimState = 12;
 							break;
 						}
-						if (currentCreature->enemy && currentCreature->enemy->hitPoints > 0 && info.distance < 465124)
+						if (currentCreature->enemy && currentCreature->enemy->hitPoints > 0 && info.distance < SQUARE(682))
 						{
 							if (item->swapMeshFlags == 0x7FC010)
 							{
@@ -574,7 +575,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 				case 1:
 					currentCreature->LOT.isMonkeying = false;
 					currentCreature->LOT.isJumping = false;
-					currentCreature->maximumTurn = 1274;
+					currentCreature->maximumTurn = ANGLE(7);
 					currentCreature->flags = 0;
 
 					if (laraInfo.ahead)
@@ -616,12 +617,12 @@ void __cdecl BaddyControl(__int16 itemNum)
 					}
 					if (info.bite)
 					{
-						if (info.distance < 465124)
+						if (info.distance < SQUARE(482))
 						{
 							item->goalAnimState = 0;
 							break;
 						}
-						if (info.distance < 0x100000)
+						if (info.distance < SQUARE(1024))
 						{
 							item->goalAnimState = 29;
 							break;
@@ -634,7 +635,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					}
 					if (currentCreature->mood == MOOD_TYPE::ATTACK_MOOD &&
 						!(currentCreature->jumpAhead) &&
-						info.distance > 0x100000)
+						info.distance > SQUARE(1024))
 					{
 						item->goalAnimState = 2;
 					}
@@ -645,32 +646,33 @@ void __cdecl BaddyControl(__int16 itemNum)
 					{
 						joint3 = info.angle;
 					}
-					currentCreature->maximumTurn = 2002;
+					currentCreature->maximumTurn = ANGLE(11);
 					tilt = abs(angle) / 2;
 					if (objectNumber == ID_BADDY2
 						&& item->frameNumber == Anims[item->animNumber].frameBase + 11
 						&& height3 == height1
 						&& abs(height1 - item->pos.yPos) < 384
 						&& (info.angle > -4096 && info.angle < 4096 &&
-							info.distance < 9437184
+							info.distance < SQUARE(3072)
 							|| height2 >= height1 + 512))
 					{
 						item->goalAnimState = 30;
 						currentCreature->maximumTurn = 0;
 						break;
 					}
-					if (Targetable(item, &info) && item->itemFlags[2] > 0
+					if (Targetable(item, &info) 
+						&& item->itemFlags[2] > 0
 						|| canJump2sectors
 						|| canJump3sectors
 						|| currentCreature->monkeyAhead
 						|| item->aiBits & FOLLOW
-						|| info.distance < 376996
+						|| info.distance < SQUARE(614)
 						|| currentCreature->jumpAhead)
 					{
 						item->goalAnimState = 0;
 						break;
 					}
-					if (info.distance < 0x100000)
+					if (info.distance < SQUARE(1024))
 					{
 						item->goalAnimState = 1;
 						break;
@@ -695,15 +697,15 @@ void __cdecl BaddyControl(__int16 itemNum)
 					if (item->currentAnimState != 15 ||
 						item->frameNumber < Anims[item->animNumber].frameBase + 12)
 					{
-						if (abs(info.angle) >= 1274)
+						if (abs(info.angle) >= ANGLE(7))
 						{
 							if (info.angle >= 0)
 							{
-								item->pos.yRot += 1274;
+								item->pos.yRot += ANGLE(7);
 							}
 							else
 							{
-								item->pos.yRot -= 1274;
+								item->pos.yRot -= ANGLE(7);
 							}
 						}
 						else
@@ -746,7 +748,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 					if (laraInfo.ahead
-						&& laraInfo.distance < 465124
+						&& laraInfo.distance < SQUARE(682)
 						&& (LaraItem->currentAnimState > 74
 							&& LaraItem->currentAnimState < 80
 							|| LaraItem->currentAnimState == 82
@@ -774,7 +776,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					currentCreature->LOT.isJumping = true;
 					currentCreature->LOT.isMonkeying = true;
 					currentCreature->flags = 0;
-					currentCreature->maximumTurn = 1274;
+					currentCreature->maximumTurn = ANGLE(7);
 					if (item->boxNumber == currentCreature->LOT.targetBox ||
 						!currentCreature->monkeyAhead)
 					{
@@ -787,7 +789,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					}
 					if (laraInfo.ahead)
 					{
-						if (laraInfo.distance < 465124)
+						if (laraInfo.distance < SQUARE(682))
 						{
 							 
 							if (LaraItem->currentAnimState > 74 &&
@@ -802,7 +804,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					break;
 
 				case 21:
-					currentCreature->maximumTurn = 1274;
+					currentCreature->maximumTurn = ANGLE(7);
 					if (currentCreature->flags == someFlag3)
 					{
 						if (item->touchBits)
@@ -848,7 +850,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					}
 					else
 					{
-						if (info.distance >= 465124)
+						if (info.distance >= SQUARE(682))
 						{
 							break;
 						}
@@ -858,7 +860,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 					break;
 
 				case 27:
-					ClampRotation(&item->pos, info.angle, 2002);
+					ClampRotation(&item->pos, info.angle, ANGLE(11));
 					if (item->frameNumber != Anims[item->animNumber].frameBase + 9)
 					{
 						break;
@@ -918,7 +920,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 						joint1 = info.angle;
 						joint2 = info.xAngle;
 					}
-					ClampRotation(&item->pos, info.angle, 1274);
+					ClampRotation(&item->pos, info.angle, ANGLE(7));
 					if (!Targetable(item, &info) ||
 						item->itemFlags[2] < 1)
 					{
@@ -934,7 +936,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 						joint1 = info.angle;
 						joint2 = info.xAngle;
 					}
-					ClampRotation(&item->pos, info.angle, 1274);
+					ClampRotation(&item->pos, info.angle, ANGLE(7));
 					if (item->frameNumber >= Anims[item->animNumber].frameBase + 13 ||
 						item->frameNumber == Anims[item->animNumber].frameBase + 1)
 					{
@@ -991,8 +993,8 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 				case 8:
 					currentCreature->maximumTurn = 0;
-					ClampRotation(&item->pos, info.angle, 2002);
-					if (laraInfo.distance < 465124 ||
+					ClampRotation(&item->pos, info.angle, ANGLE(11));
+					if (laraInfo.distance < SQUARE(682) ||
 						item != Lara.target)
 					{
 						item->goalAnimState = 9;
@@ -1012,7 +1014,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 				case 30:
 					if (item->animNumber == Objects[objectNumber].animIndex + 4)
 					{
-						ClampRotation(&item->pos, info.angle, 1274);
+						ClampRotation(&item->pos, info.angle, ANGLE(7));
 						break;
 					}
 					if (item->frameNumber != Anims[item->animNumber].frameBase + 18)
@@ -1055,38 +1057,40 @@ void __cdecl BaddyControl(__int16 itemNum)
 	}
 	else  if (WeaponEnemyTimer <= 100)
 	{
-		__int32 vault = CreatureVault(itemNum, angle, 2, 260) + 4;
+		__int32 vault = CreatureVault(itemNum, angle, 2, 260);
+		printf("Vault: %d\n", vault);
+
 		switch (vault)
 		{
-		case 6:
+		case 2:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + 64;
 			item->currentAnimState = 41;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
-		case 7:
+		case 3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + 63;
 			item->currentAnimState = 40;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
-		case 8:
+		case 4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + 62;
 			item->currentAnimState = 39;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
-		case 1:
+		case -3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + 66;
 			item->currentAnimState = 43;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
-		case 0:
+		case -4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + 65;
 			item->currentAnimState = 42;
