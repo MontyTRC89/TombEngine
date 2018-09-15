@@ -207,6 +207,26 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 112] |= 0x04;
 	}
 
+	obj = &Objects[ID_MUMMY];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMummy;
+		obj->control = MummyControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 15;
+		obj->radius = 170;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 112] |= 0x08;
+		Bones[obj->boneIndex + 112] |= 0x04;
+		Bones[obj->boneIndex + 288] |= 0x08;
+	}
+
 	/*OBJECT_INFO* obj;
 
 	obj = &Objects[ID_SPIKEY_WALL];
