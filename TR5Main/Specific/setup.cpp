@@ -185,6 +185,28 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 352] |= 0x04;
 	}
 
+	obj = &Objects[ID_CAIRO_SAS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSas;
+		obj->control = SasControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 40;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex] |= 0x08;
+		Bones[obj->boneIndex] |= 0x04;
+		Bones[obj->boneIndex + 112] |= 0x08;
+		Bones[obj->boneIndex + 112] |= 0x04;
+	}
+
 	/*OBJECT_INFO* obj;
 
 	obj = &Objects[ID_SPIKEY_WALL];

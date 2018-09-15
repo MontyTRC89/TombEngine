@@ -16,6 +16,9 @@ void __cdecl BatControl(__int16 itemNum);
 void __cdecl InitialiseBaddy(__int16 itemNum);
 void __cdecl BaddyControl(__int16 itemNum);
 
+void __cdecl InitialiseSas(__int16 itemNum);
+void __cdecl SasControl(__int16 itemNum);
+
 //void __cdecl InitialiseMummy(__int16 itemNum);
 //void __cdecl MummyControl(__int16 itemNum);
 

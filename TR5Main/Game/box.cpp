@@ -58,7 +58,7 @@ __int32 CreatureVault(__int16 itemNum, __int16 angle, __int32 vault, __int32 shi
 		vault = -4;
 	else if (item->floor > y + STEP_SIZE * 5)
 		vault = -3;
-	else if (item->floor > y + STEP_SIZE * 3 / 2 && item->objectNumber != ID_BADDY1 && item->objectNumber != ID_BADDY2) // Baddy 1&2 don't have 2 clicks climb down animations
+	else if (item->floor > y + STEP_SIZE * 3 / 2 && item->objectNumber != ID_BADDY1 && item->objectNumber != ID_BADDY2) // Baddy 1&2 don't have some climb down animations
 		vault = -2;
 	else if (item->pos.yPos > y - STEP_SIZE * 3 / 2)
 		return 0;

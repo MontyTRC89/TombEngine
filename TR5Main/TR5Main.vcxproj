@@ -317,6 +317,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Global\malloc.cpp" />
     <ClCompile Include="Objects\animals.cpp" />
     <ClCompile Include="Objects\baddy.cpp" />
+    <ClCompile Include="Objects\sas.cpp" />
     <ClCompile Include="Objects\traps.cpp" />
     <ClCompile Include="Renderer\DepthShader.cpp" />
     <ClCompile Include="Renderer\MainShader.cpp" />

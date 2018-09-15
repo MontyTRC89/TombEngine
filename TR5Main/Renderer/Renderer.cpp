@@ -3836,6 +3836,12 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 	for (__int32 i = 0; i < moveableObj->ObjectMeshes.size(); i++)
 	{
 		RendererMesh* mesh = moveableObj->ObjectMeshes[i].get();
+
+		// Is mesh visible?
+		bool isVisible = (itemToDraw->Item->meshBits >> i) & 1;
+		if (!isVisible)
+			continue;
+
 		if (itemToDraw->Item->objectNumber == ID_BADDY1)
 		{
 			// Mesh swaps
