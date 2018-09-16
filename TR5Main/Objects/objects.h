@@ -64,3 +64,13 @@ void __cdecl SpikeballControl(__int16 itemNum);
 void __cdecl BarracudaControl(__int16 itemNum);
 
 void __cdecl SharkControl(__int16 itemNum);
+
+void __cdecl ControlSpikeWall(__int16 itemNum);
+
+void __cdecl InitialiseSpinningBlade(__int16 item_number);
+void __cdecl SpinningBlade(__int16 item_number);
+
+void __cdecl InitialiseKillerStatue(__int16 item_number);
+void __cdecl KillerStatueControl(__int16 item_number);
+
+void __cdecl SpringBoardControl(__int16 item_number);
