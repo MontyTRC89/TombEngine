@@ -12,6 +12,8 @@ BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 BITE_INFO batBiteInfo = { 0, 16, 45, 4 };
+BITE_INFO barracudaBite = { 2, -60, 121, 7 };
+BITE_INFO sharkBite = { 17, -22, 344, 12 };
 
 void __cdecl InitialiseWildBoar(__int16 itemNum)
 {
@@ -497,4 +499,196 @@ void __cdecl BatControl(__int16 itemNum)
 	}
 
 	CreatureAnimation(itemNum, angle, 0);
+}
+
+void __cdecl BarracudaControl(__int16 itemNum)
+{
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
+	__int16 angle = 0;
+	__int16 head = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != 6)
+		{
+			item->animNumber = Objects[ID_BARRACUDA].animIndex + 6;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = 6;
+		}
+
+		CreatureFloat(itemNum);
+		return;
+	}
+	else
+	{
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+
+		GetCreatureMood(item, &info, TIMID);
+		CreatureMood(item, &info, TIMID);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case 1:
+			creature->flags = 0;
+
+			if (creature->mood == BORED_MOOD)
+				item->goalAnimState = 2;
+			else if (info.ahead && info.distance < 680)
+				item->goalAnimState = 4;
+			else if (creature->mood == STALK_MOOD)
+				item->goalAnimState = 2;
+			else
+				item->goalAnimState = 3;
+			break;
+
+		case 2:
+			creature->maximumTurn = ANGLE(2);
+
+			if (creature->mood == BORED_MOOD)
+				break;
+			else if (info.ahead && (item->touchBits & 0xE0))
+				item->goalAnimState = 1;
+			else if (creature->mood != STALK_MOOD)
+				item->goalAnimState = 3;
+			break;
+
+		case 3:
+			creature->maximumTurn = ANGLE(4);
+			creature->flags = 0;
+
+			if (creature->mood == BORED_MOOD)
+				item->goalAnimState = 2;
+			else if (info.ahead && info.distance < 340)
+				item->goalAnimState = 5;
+			else if (info.ahead && info.distance < 680)
+				item->goalAnimState = 1;
+			else if (creature->mood == STALK_MOOD)
+				item->goalAnimState = 2;
+			break;
+
+		case 4:
+		case 5:
+			if (info.ahead)
+				head = info.angle;
+
+			if (!creature->flags && (item->touchBits & 0xE0))
+			{
+				LaraItem->hitPoints -= 100;
+				LaraItem->hitStatus = true;
+				CreatureEffect(item, &barracudaBite, DoBloodSplat);
+
+				creature->flags = 1;
+			}
+			break;
+		}
+	}
+
+	CreatureJoint(item, head, 0);
+
+	CreatureAnimation(itemNum, angle, 0);
+	CreatureUnderwater(item, STEP_SIZE);
+}
+
+void __cdecl SharkControl(__int16 itemNum)
+{
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
+	__int16 angle = 0;
+	__int16 head = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != 5)
+		{
+			item->animNumber = Objects[ID_SHARK].animIndex + 4;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = 5;
+		}
+		CreatureFloat(itemNum);
+		return;
+	}
+	else
+	{
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case 0:
+			creature->flags = 0;
+			creature->maximumTurn = 0;
+
+			if (info.ahead && info.distance < SQUARE(768) && info.zoneNumber == info.enemyZone)
+				item->goalAnimState = 3;
+			else
+				item->goalAnimState = 1;
+			break;
+
+		case 1:
+			creature->maximumTurn = ANGLE(1) / 2;
+			if (creature->mood == BORED_MOOD)
+				break;
+			else if (info.ahead && info.distance < SQUARE(768))
+				item->goalAnimState = 0;
+			else if (creature->mood == ESCAPE_MOOD || info.distance > SQUARE(3072) || !info.ahead)
+				item->goalAnimState = 2;
+			break;
+
+		case 2:
+			creature->flags = 0;
+			creature->maximumTurn = ANGLE(2);
+
+			if (creature->mood == BORED_MOOD)
+				item->goalAnimState = 1;
+			else if (creature->mood == ESCAPE_MOOD)
+				break;
+			else if (info.ahead && info.distance < SQUARE(1365) && info.zoneNumber == info.enemyZone)
+			{
+				if (GetRandomControl() < 0x800)
+					item->goalAnimState = 0;
+				else if (info.distance < SQUARE(768))
+					item->goalAnimState = 4;
+			}
+			break;
+
+		case 3:
+		case 4:
+			if (info.ahead)
+				head = info.angle;
+
+			if (!creature->flags && (item->touchBits & 0x3400))
+			{
+				LaraItem->hitPoints -= 400;
+				LaraItem->hitStatus = true;
+				CreatureEffect(item, &sharkBite, DoBloodSplat);
+
+				creature->flags = 1;
+			}
+			break;
+		}
+	}
+
+	if (item->currentAnimState != 6)
+	{
+		CreatureJoint(item, 0, head);
+		CreatureAnimation(itemNum, angle, 0);
+		CreatureUnderwater(item, 340);
+	}
+	else
+		AnimateItem(item);
 }

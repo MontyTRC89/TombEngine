@@ -151,17 +151,15 @@ BITE_INFO quadEffectsPositions[6] = {
 	{ -90, 180, -32, 7 }	// Left front
 };
 
-__int16 LaraVehicle;
-
 bool QuadHandbrakeStarting;
 bool QuadCanHandbrakeStart;
 __int32 QuadSmokeStart;
 bool QuadNoGetOff;
 
+extern __int16 LaraVehicle;
+
 void __cdecl QuadbikeExplode(ITEM_INFO* item)
 {
-	long lp;
-
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 		TriggerUnderwaterExplosion(item);
 	else
@@ -789,9 +787,9 @@ void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead)
 		&& (!dead))
 	{
 		if (quad->velocity < 0)
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + QUADBIKE_FALLSTART_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + QUADBIKE_FALLSTART_A;
 		else
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + QUADBIKE_FALLSTART2_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + QUADBIKE_FALLSTART2_A;
 
 		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_FALL;
@@ -807,22 +805,22 @@ void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead)
 	{
 		if (collide == QUAD_HIT_FRONT)
 		{
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + Q_HITF_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + Q_HITF_A;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_HITFRONT;
 		}
 		else if (collide == QUAD_HIT_BACK)
 		{
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + Q_HITB_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + Q_HITB_A;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_HITBACK;
 		}
 		else if (collide == QUAD_HIT_LEFT)
 		{
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + Q_HITL_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + Q_HITL_A;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_HITLEFT;
 		}
 		else
 		{
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + Q_HITR_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + Q_HITR_A;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_HITRIGHT;
 		}
 
@@ -898,7 +896,7 @@ void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead)
 				LaraItem->goalAnimState = QUAD_STATE_STOP;
 			else if (TrInput & IN_RIGHT)
 			{
-				LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + QUADBIKE_TURNR_A;
+				LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + QUADBIKE_TURNR_A;
 				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 				LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_TURNR;
 			}
@@ -914,7 +912,7 @@ void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead)
 				LaraItem->goalAnimState = QUAD_STATE_STOP;
 			else if (TrInput & IN_LEFT)
 			{
-				LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + QUADBIKE_TURNL_A;
+				LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + QUADBIKE_TURNL_A;
 				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 				LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_TURNL;
 			}
@@ -1172,7 +1170,6 @@ void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll
 	if ((geton = GetOnQuadBike(itemNumber, coll)))
 	{
 		__int16 ang;
-		static char tunes[] = { 9, 12, 4, 12 };
 
 		LaraVehicle = itemNumber;
 
@@ -1194,12 +1191,12 @@ void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll
 
 		if ((ang > -(ONE_DEGREE * 45)) && (ang < (ONE_DEGREE * 135)))
 		{
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + QUADBIKE_GETONL_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + QUADBIKE_GETONL_A;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_GETONL;
 		}
 		else
 		{
-			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIM].animIndex + QUADBIKE_GETONR_A;
+			LaraItem->animNumber = Objects[ID_LARA_QUAD_ANIMS].animIndex + QUADBIKE_GETONR_A;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_GETONR;
 		}
 
@@ -1215,20 +1212,6 @@ void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll
 		Lara.hitDirection = -1;
 
 		AnimateItem(l);
-
-		/*if (CurrentLevel == LV_QUADBIKE)
-		{
-			int track;
-
-			track = tunes[GetRandomControl() & 3];
-
-			if ((track != cdtrack)
-				&& (IsAtmospherePlaying))
-			{
-				cdtrack = track;
-				S_CDPlay(track, 0);
-			}
-		}*/
 
 		QUAD_INFO* quad = (QUAD_INFO*)item->data;
 		quad->revs = 0;
@@ -1350,7 +1333,7 @@ __int32 __cdecl QuadBikeControl()
 		AnimateQuadBike(item, collide, dead);
 		AnimateItem(LaraItem);
 
-		item->animNumber = Objects[ID_QUAD].animIndex + (LaraItem->animNumber - Objects[ID_LARA_QUAD_ANIM].animIndex);
+		item->animNumber = Objects[ID_QUAD].animIndex + (LaraItem->animNumber - Objects[ID_LARA_QUAD_ANIMS].animIndex);
 		item->frameNumber = Anims[item->animNumber].frameBase + (LaraItem->frameNumber - Anims[LaraItem->animNumber].frameBase);
 
 		Camera.targetElevation = -30 * ONE_DEGREE;

@@ -278,3 +278,18 @@ void __cdecl SpikeballControl(__int16 itemNum)
 	}
 }
 
+void __cdecl StargateControl(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+	item->itemFlags[3] = 50;
+
+	if (TriggerActive(item))
+	{
+		SoundEffect(23, &item->pos, 0);
+		item->itemFlags[0] = 57521664;
+		AnimateItem(item);
+	}
+	else
+		item->itemFlags[0] = 0;
+}
+

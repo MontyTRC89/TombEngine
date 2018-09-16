@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 LaraExtraInfo g_LaraExtra;
-extern __int16 LaraVehicle;
+__int16 LaraVehicle;
 
 void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {

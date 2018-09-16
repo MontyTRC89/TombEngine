@@ -22,6 +22,9 @@ void __cdecl SasControl(__int16 itemNum);
 void __cdecl InitialiseMummy(__int16 itemNum);
 void __cdecl MummyControl(__int16 itemNum);
 
+void __cdecl InitialiseSkeleton(__int16 itemNum);
+void __cdecl SkeletonControl(__int16 itemNum);
+
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);
 __int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
@@ -58,3 +61,6 @@ void __cdecl CogControl(__int16 itemNum);
 
 void __cdecl SpikeballControl(__int16 itemNum);
 
+void __cdecl BarracudaControl(__int16 itemNum);
+
+void __cdecl SharkControl(__int16 itemNum);

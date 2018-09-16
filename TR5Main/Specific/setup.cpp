@@ -8,17 +8,6 @@
 #include "..\Game\control.h"
 #include "..\Objects\objects.h"
 
-/*#include "..\CustomObjects\tiger.h"
-#include "..\CustomObjects\customtraps.h"
-#include "..\CustomObjects\cobra.h"
-#include "..\CustomObjects\dino.h"
-#include "..\CustomObjects\eagle.h"
-#include "..\CustomObjects\bear.h"
-#include "..\CustomObjects\frogman.h"
-#include "..\CustomObjects\tribesman.h"
-#include "..\CustomObjects\raptor.h"
-#include "..\CustomObjects\shark.h"*/
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -185,7 +174,7 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 352] |= 0x04;
 	}
 
-	obj = &Objects[ID_CAIRO_SAS];
+	obj = &Objects[ID_SAS_CAIRO];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSas;
@@ -237,8 +226,45 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
-	/*OBJECT_INFO* obj;
+	obj = &Objects[ID_SHARK];
+	if (obj->loaded)
+	{
+		obj->control = SharkControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 200;
+		obj->radius = 340;
+		obj->intelligent = true;
+		obj->waterCreature = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 
+		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_BARRACUDA];
+	if (obj->loaded)
+	{
+		obj->control = BarracudaControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 12;
+		obj->pivotLength = 200;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->waterCreature = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+	}
+
+	/*
 	obj = &Objects[ID_SPIKEY_WALL];
 	if (obj->loaded)
 	{
@@ -409,36 +435,7 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 25 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_SHARK];
-	if (obj->loaded)
-	{
-		obj->control = SharkControl;
-		//obj->draw_routine = DrawUnclippedItem;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = SHARK_HIT_POINTS;
-		obj->pivotLength = 200;
-		obj->radius = SHARK_RADIUS;
-		obj->intelligent = 1;
-		obj->waterCreature = 1;
-		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_BARACUDDA];
-	if (obj->loaded)
-	{	
-		obj->control = BaracuddaControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = BARACUDDA_HIT_POINTS;
-		obj->pivotLength = 200;
-		obj->radius = BARACUDDA_RADIUS;
-		obj->intelligent = 1;
-		obj->waterCreature = 1;
-		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-	}
+	
 
 	obj = &Objects[ID_BELL_SWITCH];
 	obj->control = BellControl;

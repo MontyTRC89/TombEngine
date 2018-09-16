@@ -18,7 +18,7 @@ void __cdecl InitialiseSas(__int16 itemNum)
 
 	ClearItem(itemNum);
 
-	item->animNumber = Objects[ID_CAIRO_SAS].animIndex + 12;
+	item->animNumber = Objects[item->objectNumber].animIndex + 12;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
