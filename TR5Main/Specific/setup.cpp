@@ -72,7 +72,7 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
-	/*obj = &Objects[ID_CHAIN];
+	obj = &Objects[ID_CHAIN];
 	if (obj->loaded)
 	{
 		obj->control = ChainControl;
@@ -124,7 +124,7 @@ void __cdecl NewObjects()
 		obj->collision = GenericSphereBoxCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-	}*/
+	}
 
 	obj = &Objects[ID_BADDY1];
 	if (obj->loaded)
@@ -262,6 +262,25 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_ROLLING_SPINDLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSpinningBlade;
+		obj->control = SpinningBlade;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SPRINGBOARD];
+	if (obj->loaded)
+	{
+		obj->control = SpringBoardControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;;
 	}
 
 	/*
