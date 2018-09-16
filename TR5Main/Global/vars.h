@@ -151,6 +151,8 @@
 
 #define EffectRoutines				ARRAY_(0x00507964, EFFECT_ROUTINE, [100])
 #define DashTimer					VAR_U_(0x00E5BF04, __int16)
+#define LaraCollisionRoutines		ARRAY_(0x005089A8, LARA_COLLISION_ROUTINE, [500])
+#define LaraControlRoutines			ARRAY_(0x0050877C, LARA_CONTROL_ROUTINE, [500])
 
 #define ShockWaves					ARRAY_(0x00E4C1A0, SHOCKWAVE_STRUCT, [16])
 //#define Drips						ARRAY_(0x00E4D740, DRIP_STRUCT, [32])
@@ -246,6 +248,8 @@
 
 #define TorchRoom					VAR_U_(0x00507AB0, __int16)
 #define WeaponEnemyTimer			VAR_U_(0x0080E016, byte)
+
+#define HeightType					VAR_U_(0x00EEEFF4, __int32)
 
 extern bool MonksAttackLara;
 

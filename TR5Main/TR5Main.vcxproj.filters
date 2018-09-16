@@ -524,6 +524,12 @@
     <ClCompile Include="Objects\mummy.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\motorbike.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\quad.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />

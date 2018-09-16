@@ -2,10 +2,13 @@
 #include "..\Global\global.h"
 #include "control.h"
 #include "items.h"
+#include "collide.h"
+#include "..\Objects\objects.h"
 
 #include <stdio.h>
 
 LaraExtraInfo g_LaraExtra;
+extern __int16 LaraVehicle;
 
 void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -163,8 +166,87 @@ void __cdecl j_AnimateLara(ITEM_INFO* item)
 	printf("AFTER: %d %d %d\n", item->pos.xPos, item->pos.yPos, item->pos.zPos);
 }
 
+void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->old.x = item->pos.xPos;
+	coll->old.y = item->pos.yPos;
+	coll->old.z = item->pos.zPos;
+	coll->oldAnimState = item->currentAnimState;
+	coll->enableBaddiePush = true;
+	coll->enableSpaz = true;
+	coll->slopesAreWalls = false;
+	coll->slopesArePits = false;
+	coll->lavaIsPit = false;
+	coll->oldAnimNumber = item->animNumber;
+	coll->oldFrameNumber = item->frameNumber;
+	coll->radius = 100;
+	coll->trigger = 0;
+
+	if ((TrInput & IN_LOOK)
+		/*&& (!lara.extra_anim)*/
+		&& (Lara.look))
+			LookLeftRight();
+	else
+		ResetLook();
+
+	Lara.look = true;
+
+	// Process vehicles
+	if (LaraVehicle != NO_ITEM)
+	{
+		if (Items[LaraVehicle].objectNumber == ID_QUAD)  
+		{
+			if (QuadBikeControl())
+				return;
+		}
+	}
+
+	// Handle current Lara status
+	(*LaraControlRoutines[item->currentAnimState])(item, coll);
+
+	if (item->pos.zRot >= -ANGLE(1) && item->pos.zRot <= ANGLE(1)) 
+		item->pos.zRot = 0;   
+	else if (item->pos.zRot < -ANGLE(1))
+		item->pos.zRot += ANGLE(1);
+	else
+		item->pos.zRot -= ANGLE(1);
+
+	if (Lara.turnRate >= -ANGLE(2) && Lara.turnRate <= ANGLE(2)) 
+		Lara.turnRate = 0; 
+	else if (Lara.turnRate < -ANGLE(2))  
+		Lara.turnRate += ANGLE(2); 
+	else
+		Lara.turnRate -= ANGLE(2);
+	item->pos.yRot += Lara.turnRate;
+
+	// Animate Lara
+	AnimateLara(item);
+
+	// Check for collision with items
+	LaraBaddieCollision(item, coll);
+
+	// Handle Lara collision
+	(*LaraCollisionRoutines[item->currentAnimState])(item, coll);
+
+	UpdateLaraRoom(item, -381);
+
+	/*if (lara.gun_type == 6 && !LaserSight && gfLevelFlags & 0x80)
+	{
+		v7 = input;
+		LOBYTE(v7) = input & 0xBF;
+		input = v7;
+	}*/
+
+	// Handle weapons
+	LaraGun();
+
+	// Test if there's a trigger
+	TestTriggers(coll->trigger, 0, 0);
+}
+
 void Inject_Lara()
 {
+	INJECT(0x00442E70, LaraAboveWater);
 	//INJECT(0x00449260, lara_as_walk);
 	//INJECT(0x00402AC2, j_AnimateLara);
 	//INJECT(0x004563F0, AnimateLaraNew);

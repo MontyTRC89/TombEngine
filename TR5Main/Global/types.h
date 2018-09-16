@@ -1264,5 +1264,7 @@ typedef struct SPRITE
 };
 
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
+typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
+typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 
 #pragma pack(pop)

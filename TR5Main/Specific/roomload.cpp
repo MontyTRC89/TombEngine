@@ -31,6 +31,7 @@ vector<__int32> MoveablesIds;
 vector<__int32> StaticObjectsIds;
 
 extern GameScript* g_Script;
+extern __int16 LaraVehicle;
 
 __int16 ReadInt16()
 {
@@ -501,6 +502,7 @@ unsigned __stdcall LoadLevel(void* data)
 	GetAIPickups();
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
+	LaraVehicle = -1;
 
 	// Level loaded
 	IsLevelLoading = false;

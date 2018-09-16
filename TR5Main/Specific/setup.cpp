@@ -227,6 +227,16 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 288] |= 0x08;
 	}
 
+	obj = &Objects[ID_QUAD];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseQuadBike;
+		obj->collision = QuadBikeCollision;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
 	/*OBJECT_INFO* obj;
 
 	obj = &Objects[ID_SPIKEY_WALL];
