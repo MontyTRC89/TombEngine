@@ -88,4 +88,7 @@ void __cdecl HarpoonControl(__int16 itemNum);
 void __cdecl ScubaControl(__int16 itemNumber);
 
 void InitialiseEagle(__int16 itemNum);
+
 void EagleControl(__int16 itemNum);
+
+void __cdecl TribemanAxeControl(__int16 itemNum);

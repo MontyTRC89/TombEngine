@@ -509,9 +509,6 @@
     <ClCompile Include="Scripting\GameScript.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\traps.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\baddy.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -537,6 +534,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\trap.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\tribesman.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

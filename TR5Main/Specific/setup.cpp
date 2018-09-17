@@ -404,6 +404,25 @@ void __cdecl NewObjects()
 		obj->pivotLength = 0;
 	}
 
+	obj = &Objects[ID_TRIBESMAN_WITH_AX];
+	if (obj->loaded)
+	{
+		obj->control = TribemanAxeControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 28;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->pivotLength = 0;
+
+		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+	}
+
 	/*
 	obj = &Objects[ID_SPIKEY_WALL];
 	if (obj->loaded)
@@ -437,21 +456,7 @@ void __cdecl NewObjects()
 
 
 
-	obj = &Objects[ID_TRIBESMAN_AX];
-	if (obj->loaded)
-	{
-		obj->control = TribeAxeControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = TRIBEAXE_hitPoints;
-		obj->radius = TRIBEAXE_RADIUS;
-		obj->intelligent = 1;
-		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
-		obj->pivotLength = 0;
-
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-	}
+	
 
 */
 }

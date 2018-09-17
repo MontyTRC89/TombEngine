@@ -994,7 +994,7 @@ void __cdecl RaptorControl(__int16 itemNum)
 				currentCreature++;
 			}
 			
-			if (nearestItem->objectNumber != ID_RAPTOR || (GetRandomControl() < 0x400 && minDistance < SQUARE(2048)))
+			if (nearestItem != NULL && (nearestItem->objectNumber != ID_RAPTOR || (GetRandomControl() < 0x400 && minDistance < SQUARE(2048))))
 				creature->enemy = nearestItem;
 			
 			__int32 x = (LaraItem->pos.xPos - item->pos.xPos) >> 6;
