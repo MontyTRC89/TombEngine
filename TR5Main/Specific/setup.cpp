@@ -72,7 +72,7 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
-	/*obj = &Objects[ID_CHAIN];
+	obj = &Objects[ID_CHAIN];
 	if (obj->loaded)
 	{
 		obj->control = ChainControl;
@@ -124,7 +124,7 @@ void __cdecl NewObjects()
 		obj->collision = GenericSphereBoxCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-	}*/
+	}
 
 	obj = &Objects[ID_BADDY1];
 	if (obj->loaded)
@@ -264,7 +264,7 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
-	/*obj = &Objects[ID_ROLLING_SPINDLE];
+	obj = &Objects[ID_ROLLING_SPINDLE];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSpinningBlade;
@@ -281,7 +281,7 @@ void __cdecl NewObjects()
 		obj->control = SpringBoardControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-	}*/ 
+	}
 
 	obj = &Objects[ID_TIGER];
 	if (obj->loaded)
@@ -370,6 +370,40 @@ void __cdecl NewObjects()
 		obj->savePosition = true;
 	}
 
+	obj = &Objects[ID_EAGLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseEagle;
+		obj->control = EagleControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 20;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->pivotLength = 0;
+	}
+
+	obj = &Objects[ID_CROW];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseEagle;
+		obj->control = EagleControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 15;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;		
+		obj->pivotLength = 0;
+	}
+
 	/*
 	obj = &Objects[ID_SPIKEY_WALL];
 	if (obj->loaded)
@@ -401,46 +435,7 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_FROGMAN];
-	if (obj->loaded)
-	{
-		obj->control = FrogManControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = DIVER_hitPoints;
-		obj->radius = DIVER_RADIUS;
-		obj->intelligent = true;
-		obj->waterCreature = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->pivotLength = 50;
 
-		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
-	}
-
-	obj = &Objects[ID_FROGMAN_HARPOON];
-	if (obj->loaded)
-	{
-		obj->control = HarpoonControl;
-		obj->collision = ObjectCollision;
-		obj->savePosition = true;
-
-		printf("nmeshes: %d\n", obj->nmeshes);
-		printf("meshIndex: %d\n", obj->meshIndex);
-		printf("boneIndex: %d\n", obj->boneIndex);
-		printf("frameBase: %d\n", obj->frameBase);
-		printf("initialise: %d\n", obj->initialise);
-		printf("control: %d\n", obj->control);
-		printf("floor: %d\n", obj->floor);
-		printf("ceiling: %d\n", obj->ceiling);
-		printf("collision: %d\n", obj->collision);
-		printf("drawRoutine: %d\n", obj->drawRoutine);
-		printf("drawRoutineExtra: %d\n", obj->drawRoutineExtra);
-		printf("objectMip: %d\n", obj->objectMip);
-	}
 
 	obj = &Objects[ID_TRIBESMAN_AX];
 	if (obj->loaded)
@@ -458,33 +453,7 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_EAGLE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseEagle;
-		obj->control = EagleControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = EAGLE_hitPoints;
-		obj->radius = EAGLE_RADIUS;
-		obj->intelligent = 1;
-		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
-		obj->pivotLength = 0;
-	}
-
-	obj = &Objects[ID_CROW];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseEagle;
-		obj->control = EagleControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = CROW_hitPoints;
-		obj->radius = CROW_RADIUS;
-		obj->intelligent = 1;
-		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
-		obj->pivotLength = 0;
-	}*/
+*/
 }
 
 void __cdecl CustomObjects()

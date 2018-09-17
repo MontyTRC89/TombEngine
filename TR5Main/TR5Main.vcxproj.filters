@@ -536,6 +536,9 @@
     <ClCompile Include="Objects\scuba.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\trap.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />
