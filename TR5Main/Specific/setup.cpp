@@ -72,7 +72,7 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_CHAIN];
+	/*obj = &Objects[ID_CHAIN];
 	if (obj->loaded)
 	{
 		obj->control = ChainControl;
@@ -124,7 +124,7 @@ void __cdecl NewObjects()
 		obj->collision = GenericSphereBoxCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-	}
+	}*/
 
 	obj = &Objects[ID_BADDY1];
 	if (obj->loaded)
@@ -264,7 +264,7 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_ROLLING_SPINDLE];
+	/*obj = &Objects[ID_ROLLING_SPINDLE];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSpinningBlade;
@@ -281,7 +281,7 @@ void __cdecl NewObjects()
 		obj->control = SpringBoardControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-	}
+	}*/ 
 
 	obj = &Objects[ID_TIGER];
 	if (obj->loaded)
@@ -319,6 +319,55 @@ void __cdecl NewObjects()
 
 		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_RAPTOR];
+	if (obj->loaded)
+	{
+		obj->control = RaptorControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 100;
+		obj->radius = 341;
+		obj->pivotLength = 600;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 23 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 25 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_SCUBA_DIVER];
+	if (obj->loaded)
+	{
+		obj->control = ScubaControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 20;
+		obj->radius = 340;
+		obj->intelligent = true;
+		obj->waterCreature = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->pivotLength = 50;
+
+		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
+	}
+
+	obj = &Objects[ID_SCUBA_HARPOON];
+	if (obj->loaded)
+	{
+		obj->control = HarpoonControl;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
 	}
 
 	/*
@@ -435,41 +484,7 @@ void __cdecl NewObjects()
 		obj->intelligent = 1;
 		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
 		obj->pivotLength = 0;
-	}
-
-	obj = &Objects[ID_RAPTOR];
-	if (obj->loaded)
-	{
-		obj->control = RaptorControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = RAPTOR_hitPoints;
-		obj->radius = RAPTOR_RADIUS;
-		obj->intelligent = 1;
-		obj->savePosition = obj->saveHitpoints = obj->saveAnim = obj->saveFlags = 1;
-		obj->pivotLength = 600;
-		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 23 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 25 * 4] |= ROT_Y;
-	}
-
-	
-
-	obj = &Objects[ID_BELL_SWITCH];
-	obj->control = BellControl;
-	obj->collision = ObjectCollision;
-	obj->saveAnim = obj->saveFlags = 1;
-
-	obj = &Objects[ID_ROLLING_SPINDLE];
-	obj->initialise = InitialiseSpinningBlade; // just conveniently needs same start state and anim type
-	obj->control = SpinningBlade;
-	obj->collision = ObjectCollision;
-	obj->savePosition = obj->saveAnim = obj->saveFlags = 1;
-
-	obj = &Objects[ID_SPRING_BOARD];
-	obj->control = SpringBoardControl;
-	obj->saveAnim = obj->saveFlags = 1;*/
+	}*/
 }
 
 void __cdecl CustomObjects()

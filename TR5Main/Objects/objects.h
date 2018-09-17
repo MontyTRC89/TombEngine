@@ -80,4 +80,10 @@ void __cdecl TigerControl(__int16 itemNum);
 void __cdecl InitialiseCobra(__int16 itemNum);
 void __cdecl CobraControl(__int16 itemNum);
 
+void __cdecl RaptorControl(__int16 itemNum);
+
+__int32 __cdecl GetWaterSurface(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
+void __cdecl ShootHarpoon(ITEM_INFO* frogman, __int32 x, __int32 y, __int32 z, __int16 speed, __int16 yRot, __int16 roomNumber);
+void __cdecl HarpoonControl(__int16 itemNum);
+void __cdecl ScubaControl(__int16 itemNumber);
 

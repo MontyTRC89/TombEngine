@@ -434,7 +434,7 @@ void __cdecl SasControl(__int16 itemNum)
 				creature->flags -= 1;
 			else
 			{
-				ShotLara(item, &info, &sasGun, joint0, 15);
+				ShotLara(item, &info, &sasGun, joint0, 15); 
 				creature->flags = 5;
 				item->firedWeapon = 3;
 			}

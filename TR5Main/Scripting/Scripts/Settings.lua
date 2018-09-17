@@ -5,7 +5,7 @@
 
 Gameflow.settings.screenwidth = 800;
 Gameflow.settings.screenheight = 600;
-Gameflow.settings.windowiitle = "TR5Main Alpha";
+Gameflow.settings.windowtitle = "TR5Main Alpha";
 Gameflow.settings.enabledynamicshadows = true;
 Gameflow.settings.enablewatercaustics = true;
 Gameflow.settings.windowed = true;
