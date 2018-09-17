@@ -14,6 +14,7 @@ BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 BITE_INFO batBiteInfo = { 0, 16, 45, 4 };
 BITE_INFO barracudaBite = { 2, -60, 121, 7 };
 BITE_INFO sharkBite = { 17, -22, 344, 12 };
+BITE_INFO tigerBite = { 19, -13, 3, 26 };
 
 void __cdecl InitialiseWildBoar(__int16 itemNum)
 {
@@ -691,4 +692,134 @@ void __cdecl SharkControl(__int16 itemNum)
 	}
 	else
 		AnimateItem(item);
+}
+
+void __cdecl TigerControl(__int16 itemNum)
+{
+	__int16 head = 0;
+	__int16 angle = 0;
+	__int16 tilt = 0;
+
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
+	
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != 9)
+		{
+			item->animNumber = Objects[item->objectNumber].animIndex + 11;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = 9;
+		}
+	}
+	else
+	{
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+
+		if (info.ahead)
+			head = info.angle;
+
+		GetCreatureMood(item, &info, 1);
+
+		if (creature->alerted && info.zoneNumber != info.enemyZone)
+			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+
+		CreatureMood(item, &info, 1);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case 1:
+			creature->maximumTurn = 0;
+			creature->flags = 0;
+
+			if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			{
+				if (Lara.target != item && info.ahead)
+					item->goalAnimState = 1;
+				else
+					item->goalAnimState = 3;
+			}
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			{
+				__int16 random = GetRandomControl();
+				if (random < 0x60)
+					item->goalAnimState = 5;
+				else if (random < 0x460);
+				item->goalAnimState = 2;
+			}
+			else if (info.bite && info.distance < SQUARE(340))
+				item->goalAnimState = 6;
+			else if (info.bite && info.distance < SQUARE(1024))
+			{
+				creature->maximumTurn = ANGLE(3);
+				item->goalAnimState = 8;
+			}
+			else if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else if (creature->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
+				item->goalAnimState = 5;
+			else
+				item->goalAnimState = 3;
+			break;
+
+		case 2:
+			creature->maximumTurn = ANGLE(3);
+
+			if (creature->mood == MOOD_TYPE::ESCAPE_MOOD || creature->mood == MOOD_TYPE::ATTACK_MOOD)
+				item->goalAnimState = 3;
+			else if (GetRandomControl() < 0x60)
+			{
+				item->goalAnimState = 1;
+				item->requiredAnimState = 5;
+			}
+			break;
+
+		case 3:
+			creature->maximumTurn = ANGLE(6);
+
+			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+				item->goalAnimState = 1;
+			else if (creature->flags && info.ahead)
+				item->goalAnimState = 1;
+			else if (info.bite && info.distance < SQUARE(1536))
+			{
+				if (LaraItem->speed == 0)
+					item->goalAnimState = 1;
+				else
+					item->goalAnimState = 7;
+			}
+			else if (creature->mood != MOOD_TYPE::ATTACK_MOOD && GetRandomControl() < 0x60)
+			{
+				item->requiredAnimState = 5;
+				item->goalAnimState = 1;
+			}
+			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD && Lara.target != item && info.ahead)
+				item->goalAnimState = 1;
+
+			creature->flags = 0;
+			break;
+
+		case 6:
+		case 7:
+		case 8:
+			if (!creature->flags && (item->touchBits & 0x7FDC000))
+			{
+				LaraItem->hitStatus = true;
+				LaraItem->hitPoints -= 90;
+				CreatureEffect(item, &tigerBite, DoBloodSplat);
+				creature->flags = 1;
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureJoint(item, 0, head);
+	CreatureAnimation(itemNum, angle, tilt);
 }

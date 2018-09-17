@@ -49,10 +49,10 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 192] |= 0x10;
-		Bones[obj->boneIndex + 192] |= 0x08;
-		Bones[obj->boneIndex + 208] |= 0x10;
-		Bones[obj->boneIndex + 208] |= 0x08;
+		Bones[obj->boneIndex + 192] |= ROT_Z;
+		Bones[obj->boneIndex + 192] |= ROT_Y;
+		Bones[obj->boneIndex + 208] |= ROT_Z;
+		Bones[obj->boneIndex + 208] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_BAT];
@@ -142,10 +142,10 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 112] |= 0x08;
-		Bones[obj->boneIndex + 112] |= 0x04;
-		Bones[obj->boneIndex + 352] |= 0x08;
-		Bones[obj->boneIndex + 352] |= 0x04;
+		Bones[obj->boneIndex + 112] |= ROT_Y;
+		Bones[obj->boneIndex + 112] |= ROT_X;
+		Bones[obj->boneIndex + 352] |= ROT_Y;
+		Bones[obj->boneIndex + 352] |= ROT_X;
 
 		Meshes[obj->meshIndex + 36] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 32];
 		Meshes[obj->meshIndex + 60] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 56];
@@ -168,10 +168,10 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 112] |= 0x08;
-		Bones[obj->boneIndex + 112] |= 0x04;
-		Bones[obj->boneIndex + 352] |= 0x08;
-		Bones[obj->boneIndex + 352] |= 0x04;
+		Bones[obj->boneIndex + 112] |= ROT_Y;
+		Bones[obj->boneIndex + 112] |= ROT_X;
+		Bones[obj->boneIndex + 352] |= ROT_Y;
+		Bones[obj->boneIndex + 352] |= ROT_X;
 	}
 
 	obj = &Objects[ID_SAS_CAIRO];
@@ -190,10 +190,10 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex] |= 0x08;
-		Bones[obj->boneIndex] |= 0x04;
-		Bones[obj->boneIndex + 112] |= 0x08;
-		Bones[obj->boneIndex + 112] |= 0x04;
+		Bones[obj->boneIndex] |= ROT_Y;
+		Bones[obj->boneIndex] |= ROT_X;
+		Bones[obj->boneIndex + 112] |= ROT_Y;
+		Bones[obj->boneIndex + 112] |= ROT_X;
 	}
 
 	obj = &Objects[ID_MUMMY];
@@ -211,9 +211,9 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 112] |= 0x08;
-		Bones[obj->boneIndex + 112] |= 0x04;
-		Bones[obj->boneIndex + 288] |= 0x08;
+		Bones[obj->boneIndex + 112] |= ROT_Y;
+		Bones[obj->boneIndex + 112] |= ROT_X;
+		Bones[obj->boneIndex + 288] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_QUAD];
@@ -280,7 +280,25 @@ void __cdecl NewObjects()
 	{
 		obj->control = SpringBoardControl;
 		obj->saveAnim = true;
-		obj->saveFlags = true;;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_TIGER];
+	if (obj->loaded)
+	{
+		obj->control = TigerControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 24;
+		obj->pivotLength = 200;
+		obj->radius = 340;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
 	}
 
 	/*
@@ -291,24 +309,6 @@ void __cdecl NewObjects()
 		obj->collision = ObjectCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_TIGER];
-	if (obj->loaded)
-	{
-		obj->control = TigerControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = TIGER_hitPoints;
-		obj->pivotLength = 200;
-		obj->radius = TIGER_RADIUS;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
-		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_COBRA];
