@@ -76,3 +76,8 @@ void __cdecl KillerStatueControl(__int16 item_number);
 void __cdecl SpringBoardControl(__int16 item_number);
 
 void __cdecl TigerControl(__int16 itemNum);
+
+void __cdecl InitialiseCobra(__int16 itemNum);
+void __cdecl CobraControl(__int16 itemNum);
+
+

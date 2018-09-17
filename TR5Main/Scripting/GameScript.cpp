@@ -5,13 +5,13 @@ GameScript::GameScript()
 	m_lua.open_libraries(sol::lib::base);
 
 	m_lua.new_usertype<GameScriptSettings>("GameScriptSettings",
-		"screenWidth", &GameScriptSettings::ScreenWidth,
-		"screenHeight", &GameScriptSettings::ScreenHeight,
-		"windowTitle", &GameScriptSettings::WindowTitle,
-		"enableDynamicShadows", &GameScriptSettings::EnableDynamicShadows,
+		"screenwidth", &GameScriptSettings::ScreenWidth,
+		"screenheight", &GameScriptSettings::ScreenHeight,
+		"windowtitle", &GameScriptSettings::WindowTitle,
+		"enabledynamicshadows", &GameScriptSettings::EnableDynamicShadows,
 		"windowed", &GameScriptSettings::Windowed,
-		"enableWaterCaustics", &GameScriptSettings::EnableWaterCaustics,
-		"drawingDistance", &GameScriptSettings::DrawingDistance
+		"enablewatercaustics", &GameScriptSettings::EnableWaterCaustics,
+		"drawingdistance", &GameScriptSettings::DrawingDistance
 		);
 
 	m_lua.new_usertype<GameScriptSkyLayer>("SkyLayer",

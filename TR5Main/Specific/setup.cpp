@@ -301,25 +301,15 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
 	}
 
-	/*
-	obj = &Objects[ID_SPIKEY_WALL];
-	if (obj->loaded)
-	{
-		obj->control = ControlSpikeWall;
-		obj->collision = ObjectCollision;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-	}
-
 	obj = &Objects[ID_COBRA];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCobra;
 		obj->control = CobraControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = COBRA_hitPoints;
-		obj->radius = COBRA_RADIUS;
+		obj->shadowSize = 128;
+		obj->hitPoints = 8;
+		obj->radius = 102;
 		obj->intelligent = true;
 		obj->nonLot = true;
 		obj->savePosition = true;
@@ -329,6 +319,16 @@ void __cdecl NewObjects()
 
 		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+	}
+
+	/*
+	obj = &Objects[ID_SPIKEY_WALL];
+	if (obj->loaded)
+	{
+		obj->control = ControlSpikeWall;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_TREX];
