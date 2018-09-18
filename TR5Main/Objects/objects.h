@@ -5,6 +5,9 @@
 void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
 
 // TR1 objects
+void __cdecl InitialiseWolf(__int16 itemNum);
+void __cdecl WolfControl(__int16 itemNum);
+void __cdecl BearControl(__int16 itemNum);
 
 // TR2 objects
 void __cdecl BarracudaControl(__int16 itemNum);
@@ -30,6 +33,8 @@ void __cdecl TribemanAxeControl(__int16 itemNum);
 void __cdecl TribesmanShotDart(ITEM_INFO* item);
 void __cdecl TribesmanDartsControl(__int16 itemNum);
 void __cdecl ControlSpikeWall(__int16 itemNum);
+void LaraTyrannosaurDeath(ITEM_INFO* item);
+void TyrannosaurControl(__int16 itemNum);
 
 __int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 __int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);

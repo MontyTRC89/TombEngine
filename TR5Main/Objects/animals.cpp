@@ -19,6 +19,8 @@ BITE_INFO cobraBite = { 0, 0, 0, 13 };
 BITE_INFO raptorBite = { 0, 66, 318, 22 };
 BITE_INFO eagleBite = { 15, 46, 21, 6 };
 BITE_INFO crowBite = { 2, 10, 60, 14 };
+BITE_INFO wolfBite = { 0, -14, 174, 6 };
+BITE_INFO bearBite = { 0, 96, 335, 14 };
 
 void __cdecl InitialiseWildBoar(__int16 itemNum)
 {
@@ -1346,4 +1348,541 @@ void EagleControl(__int16 itemNum)
 	}
 
 	CreatureAnimation(itemNum, angle, 0);
+}
+
+void __cdecl BearControl(__int16 itemNum)
+{
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+	__int16 head = 0;
+	__int16 angle;
+
+	if (item->hitPoints <= 0)
+	{
+		angle = CreatureTurn(item, ANGLE(1));
+
+		switch (item->currentAnimState)
+		{
+		case 2:
+		{
+			item->goalAnimState = 4;
+			break;
+		}
+
+		case 3:
+		case 0:
+			item->goalAnimState = 1;
+			break;
+
+		case 4:
+			creature->flags = 1;
+			item->goalAnimState = 9;
+			break;
+
+		case 1:
+			creature->flags = 0;
+			item->goalAnimState = 9;
+			break;
+
+		case 9:
+			if (creature->flags && (item->touchBits & 0x2406C))
+			{
+				LaraItem->hitPoints -= 200;
+				LaraItem->hitStatus = 1;
+				creature->flags = 0;
+			}
+
+			break;
+		}
+	}
+	else
+	{
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+
+		if (info.ahead)
+			head = info.angle;
+
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		if (item->hitStatus)
+			creature->flags = 1;
+
+		switch (item->currentAnimState)
+		{
+		case 1:
+			if (LaraItem->hitPoints <= 0)
+			{
+				if (info.bite && info.distance < SQUARE(768))
+				{
+					item->goalAnimState = 8;
+				}
+				else
+				{
+					item->goalAnimState = 0;
+				}
+			}
+			else if (item->requiredAnimState)
+			{
+				item->goalAnimState = item->requiredAnimState;
+			}
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			{
+				item->goalAnimState = 0;
+			}
+			else
+			{
+				item->goalAnimState = 3;
+			}
+			break;
+
+		case 0:
+			creature->maximumTurn = ANGLE(2);
+
+			if (LaraItem->hitPoints <= 0 && (item->touchBits & 0x2406C) && info.ahead)
+			{
+				item->goalAnimState = 1;
+			}
+			else if (creature->mood != MOOD_TYPE::BORED_MOOD)
+			{
+				item->goalAnimState = 1;
+				if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+				{
+					item->requiredAnimState = 0;
+				}
+			}
+			else if (GetRandomControl() < 0x50)
+			{
+				item->requiredAnimState = 5;
+				item->goalAnimState = 1;
+			}
+			break;
+
+		case 3:
+			creature->maximumTurn = ANGLE(5);
+
+			// if the bear slams you it hurts
+			if (item->touchBits & 0x2406C)
+			{
+				LaraItem->hitPoints -= 3;
+				LaraItem->hitStatus = true;
+			}
+
+			if (creature->mood == MOOD_TYPE::BORED_MOOD || LaraItem->hitPoints <= 0)
+			{
+				item->goalAnimState = 1;
+			}
+			else if (info.ahead && !item->requiredAnimState)
+			{
+				// bear may rear up, but not after he's taken some bullets!
+				if (!creature->flags && info.distance < SQUARE(2048) && GetRandomControl() < 0x300)
+				{
+					item->requiredAnimState = 4;
+					item->goalAnimState = 1;
+				}
+				else if (info.distance < SQUARE(1024))
+				{
+					item->goalAnimState = 6;
+				}
+			}
+			break;
+
+		case 4:
+			if (creature->flags)
+			{
+				item->requiredAnimState = 0;
+				item->goalAnimState = 1;
+			}
+			else if (item->requiredAnimState)
+			{
+				item->goalAnimState = item->requiredAnimState;
+			}
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD || creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			{
+				item->goalAnimState = 1;
+			}
+			else if (info.bite && info.distance < SQUARE(600))
+			{
+				item->goalAnimState = 7;
+			}
+			else
+			{
+				item->goalAnimState = 2;
+			}
+			break;
+
+		case 2:
+			if (creature->flags)
+			{
+				item->requiredAnimState = 0;
+				item->goalAnimState = 4;
+			}
+			else if (info.ahead && (item->touchBits & 0x2406C))
+			{
+				item->goalAnimState = 4;
+			}
+			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			{
+				item->goalAnimState = 4;
+				item->requiredAnimState = 0;
+			}
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD || GetRandomControl() < 0x50)
+			{
+				item->requiredAnimState = 5;
+				item->goalAnimState = 4;
+			}
+			else if (info.distance > SQUARE(2048) || GetRandomControl() < 0x600)
+			{
+				item->requiredAnimState = 1;
+				item->goalAnimState = 4;
+			}
+			break;
+
+		case 7:
+			if (!item->requiredAnimState && (item->touchBits & 0x2406C))
+			{
+				LaraItem->hitPoints -= 400;
+				LaraItem->hitStatus = true;
+				item->requiredAnimState = 4;
+			}
+
+			break;
+
+		case 6:
+			if (!item->requiredAnimState && (item->touchBits & 0x2406C))
+			{
+				CreatureEffect(item, &bearBite, DoBloodSplat);
+				LaraItem->hitPoints -= 200;
+				LaraItem->hitStatus = true;
+				item->requiredAnimState = 1;
+			}
+			break;
+
+		}
+
+		CreatureJoint(item, 0, head);
+		CreatureAnimation(itemNum, angle, 0);
+	}
+}
+
+
+void __cdecl InitialiseWolf(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	ClearItem(itemNum);
+
+	item->frameNumber = 96;
+}
+
+
+void __cdecl WolfControl(__int16 itemNum)
+{
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	
+	__int16 head = 0;
+	__int16 angle = 0;
+	__int16 tilt = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != 11)
+		{
+			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (__int16)(GetRandomControl() / 11000);
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = 11;
+		}
+	}
+	else
+	{
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+
+		if (info.ahead)
+			head = info.angle;
+
+		GetCreatureMood(item, &info, TIMID);
+		CreatureMood(item, &info, TIMID);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case 8:
+			head = 0;
+
+			if (creature->mood == MOOD_TYPE::ESCAPE_MOOD || info.zoneNumber == info.enemyZone)
+			{
+				item->requiredAnimState = 9;
+				item->goalAnimState = 1;
+			}
+			else if (GetRandomControl() < 0x20)
+			{
+				item->requiredAnimState = 2;
+				item->goalAnimState = 1;
+			}
+			break;
+
+		case 1:
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else
+				item->goalAnimState = 2;
+			break;
+
+		case 2:
+			creature->maximumTurn = ANGLE(2);
+
+			if (creature->mood != MOOD_TYPE::BORED_MOOD)
+			{
+				item->goalAnimState = 5;
+				item->requiredAnimState = 0;
+			}
+			else if (GetRandomControl() < 0x20)
+			{
+				item->requiredAnimState = 8;
+				item->goalAnimState = 1;
+			}
+			break;
+
+		case 9:
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+				item->goalAnimState = 3;
+			else if (info.distance < SQUARE(345) && info.bite)
+				item->goalAnimState = 12;
+			else if (creature->mood == MOOD_TYPE::STALK_MOOD)
+				item->goalAnimState = 5;
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+				item->goalAnimState = 1;
+			else
+				item->goalAnimState = 3;
+			break;
+
+		case 5:
+			creature->maximumTurn = ANGLE(2);
+
+			if (creature->mood == ESCAPE_MOOD)
+				item->goalAnimState = 3;
+			else if (info.distance < SQUARE(345) && info.bite)
+				item->goalAnimState = 12;
+			else if (info.distance > SQUARE(3072))
+				item->goalAnimState = 3;
+			else if (creature->mood == MOOD_TYPE::ATTACK_MOOD)
+			{
+				if (!info.ahead || info.distance > SQUARE(1536) ||
+					(info.enemyFacing < FRONT_ARC && info.enemyFacing > -FRONT_ARC))
+					item->goalAnimState = 3;
+			}
+			else if (GetRandomControl() < 0x180)
+			{
+				item->requiredAnimState = 7;
+				item->goalAnimState = 9;
+			}
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+				item->goalAnimState = 9;
+			break;
+
+		case 3:
+			creature->maximumTurn = ANGLE(5);
+			tilt = angle;
+
+			if (info.ahead && info.distance < SQUARE(1536))
+			{
+				if (info.distance > (SQUARE(1536) / 2) &&
+					(info.enemyFacing > FRONT_ARC || info.enemyFacing < -FRONT_ARC))
+				{
+					item->requiredAnimState = 5;
+					item->goalAnimState = 9;
+				}
+				else
+				{
+					item->goalAnimState = 6;
+					item->requiredAnimState = 0;
+				}
+			}
+			else if (creature->mood == MOOD_TYPE::STALK_MOOD && info.distance < SQUARE(3072))
+			{
+				item->requiredAnimState = 5;
+				item->goalAnimState = 9;
+			}
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+				item->goalAnimState = 9;
+			break;
+
+		case 6:
+			tilt = angle;
+			if (!item->requiredAnimState && (item->touchBits & 0x774F))
+			{
+				CreatureEffect(item, &wolfBite, DoBloodSplat);
+				LaraItem->hitPoints -= 50;
+				LaraItem->hitStatus = true;
+				item->requiredAnimState = 3;
+			}
+			item->goalAnimState = 3;
+			break;
+
+		case 12:
+			if (!item->requiredAnimState && (item->touchBits & 0x774F) && info.ahead)
+			{
+				CreatureEffect(item, &wolfBite, DoBloodSplat);
+				LaraItem->hitPoints -= 100;
+				LaraItem->hitStatus = true;
+				item->requiredAnimState = 9;
+			}
+			break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureJoint(item, 0, head);
+
+	CreatureAnimation(itemNum, angle, tilt);
+}
+
+void LaraTyrannosaurDeath(ITEM_INFO* item)
+{
+	item->goalAnimState = 8;  
+
+	if (LaraItem->roomNumber != item->roomNumber)
+		ItemNewRoom(Lara.itemNumber, item->roomNumber);
+
+	LaraItem->pos.xPos = item->pos.xPos;
+	LaraItem->pos.yPos = item->pos.yPos;
+	LaraItem->pos.zPos = item->pos.zPos;
+	LaraItem->pos.yRot = item->pos.yRot;
+	LaraItem->pos.xRot = 0;
+	LaraItem->pos.zRot = 0;
+	LaraItem->gravityStatus = false;
+
+	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
+	LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase; 
+	LaraItem->currentAnimState = STATE_LARA_DEATH;
+	LaraItem->goalAnimState = STATE_LARA_DEATH;
+	//LaraSwapMeshExtra();
+
+	LaraItem->hitPoints = -16384;
+	Lara.air = -1;
+	Lara.gunStatus = LG_HANDS_BUSY;
+	Lara.gunType = WEAPON_NONE;
+
+	Camera.flags = 1;
+	Camera.targetAngle = ANGLE(170);
+	Camera.targetElevation = -ANGLE(25);
+}
+
+void TyrannosaurControl(__int16 itemNum)
+{
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*) item->data;
+	
+	__int16 head = 0;
+	__int16 angle = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState == 1)
+			item->goalAnimState = 5;
+		else
+			item->goalAnimState = 1;
+	}
+	else
+	{
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+
+		if (info.ahead)
+			head = info.angle;
+
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		if (item->touchBits)
+			LaraItem->hitPoints -= (item->currentAnimState == 3) ? 10 : 1;
+
+		creature->flags = (creature->mood != MOOD_TYPE::ESCAPE_MOOD && !info.ahead &&
+			info.enemyFacing > -FRONT_ARC && info.enemyFacing < FRONT_ARC);
+
+		if (!creature->flags && info.distance > SQUARE(1500) && info.distance < SQUARE(4096) && info.bite)
+			creature->flags = 1;
+
+		switch (item->currentAnimState)
+		{
+		case 1:
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else if (info.distance < SQUARE(1500) && info.bite)
+				item->goalAnimState = 7;
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD || creature->flags)
+				item->goalAnimState = 2;
+			else
+				item->goalAnimState = 3;
+			break;
+
+		case 2:
+			creature->maximumTurn = ANGLE(2);
+
+			if (creature->mood != MOOD_TYPE::BORED_MOOD || !creature->flags)
+				item->goalAnimState = 1;
+			else if (info.ahead && GetRandomControl() < 0x200)
+			{
+				item->requiredAnimState = 6;
+				item->goalAnimState = 1;
+			}
+			break;
+
+		case 3:
+			creature->maximumTurn = ANGLE(4);
+
+			if (info.distance < SQUARE(5120) && info.bite)
+				item->goalAnimState = 1;
+			else if (creature->flags)
+				item->goalAnimState = 1;
+			else if (creature->mood != ESCAPE_MOOD && info.ahead && GetRandomControl() < 0x200)
+			{
+				item->requiredAnimState = 6;
+				item->goalAnimState = 1;
+			}
+			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+				item->goalAnimState = 1;
+			break;
+
+		case 7:
+			if (item->touchBits & 0x3000)
+			{
+				LaraItem->hitPoints -= 1500;
+				LaraItem->hitStatus = true;
+				item->goalAnimState = 8;
+				if (LaraItem == LaraItem)
+					LaraTyrannosaurDeath(item);
+			}
+
+			item->requiredAnimState = 2;
+			break;
+		}
+	}
+
+	CreatureJoint(item, 0, (__int16)(head * 2));
+	creature->jointRotation[1] = creature->jointRotation[0];
+
+	CreatureAnimation(itemNum, angle, 0);
+
+	item->collidable = true;
 }

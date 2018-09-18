@@ -442,27 +442,53 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
-	/*
-	obj = &Objects[ID_SPIKEY_WALL];
+	obj = &Objects[ID_WOLF];
 	if (obj->loaded)
 	{
-		obj->control = ControlSpikeWall;
-		obj->collision = ObjectCollision;
+		obj->initialise = InitialiseWolf;
+		obj->control = WolfControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 6;
+		obj->pivotLength = 375;
+		obj->radius = 340;
+		obj->intelligent = true;
 		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
 		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 2 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_TREX];
+	obj = &Objects[ID_BEAR];
 	if (obj->loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_TREX];
-
-		obj->control = DinoControl;
+		obj->initialise = InitialiseCreature;
+		obj->control = BearControl;
 		obj->collision = CreatureCollision;
-		obj->hitPoints = DINO_hitPoints;
-		obj->shadowSize = UNIT_SHADOW / 4;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 20;
+		obj->pivotLength = 500;
+		obj->radius = 340;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_TYRANNOSAUR];
+	if (obj->loaded)
+	{
+		obj->control = TyrannosaurControl;
+		obj->collision = CreatureCollision;
+		obj->hitPoints = 800;
+		obj->shadowSize = 64;
 		obj->pivotLength = 1800;
-		obj->radius = DINO_RADIUS;
+		obj->radius = 512;
 		obj->intelligent = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
@@ -472,12 +498,6 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
 	}
-
-
-
-	
-
-*/
 }
 
 void __cdecl CustomObjects()
