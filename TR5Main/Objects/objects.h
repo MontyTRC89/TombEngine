@@ -92,3 +92,5 @@ void InitialiseEagle(__int16 itemNum);
 void EagleControl(__int16 itemNum);
 
 void __cdecl TribemanAxeControl(__int16 itemNum);
+void __cdecl TribesmanShotDart(ITEM_INFO* item);
+void __cdecl TribesmanDartsControl(__int16 itemNum);
