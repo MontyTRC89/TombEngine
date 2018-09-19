@@ -8,6 +8,7 @@ void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
 void __cdecl InitialiseWolf(__int16 itemNum);
 void __cdecl WolfControl(__int16 itemNum);
 void __cdecl BearControl(__int16 itemNum);
+void __cdecl ApeControl(__int16 itemNum);
 
 // TR2 objects
 void __cdecl BarracudaControl(__int16 itemNum);
@@ -17,6 +18,7 @@ void __cdecl SpinningBlade(__int16 itemNum);
 void __cdecl InitialiseKillerStatue(__int16 itemNum);
 void __cdecl KillerStatueControl(__int16 itemNum);
 void __cdecl SpringBoardControl(__int16 itemNum);
+void __cdecl RatControl(__int16 itemNum);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);

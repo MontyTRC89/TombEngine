@@ -9,6 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
+#include "..\Game\debris.h"
 
 BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 
@@ -520,56 +521,164 @@ void __cdecl SkeletonControl(__int16 itemNum)
 			{
 				item->pos.yRot += info.angle;
 			}
-			/*if (item->frameNumber > Anims[item->animNumber].frameBase + 15)
+			if (item->frameNumber > Anims[item->animNumber].frameBase + 15)
 			{
-				v79 = Rooms + 148 * item->roomNumber;
-				v107 = 0;
-				v108 = 0;
-				v109 = 0;
 				ROOM_INFO* room = &Rooms[item->roomNumber];
 				PHD_VECTOR pos;
+				
 				GetJointAbsPosition(item, &pos, 16);
-				if ((*(*(v79 + 8) + 8 * (((v109 - *(v79 + 28)) >> 10) + *(v79 + 40) * ((v107 - *(v79 + 20)) >> 10)) + 2) & 0x8000) == 0x8000)
+
+				FLOOR_INFO* floor = &room->floor[((z - room->z) >> 10) + room->ySize * ((x - room->x) >> 10)];
+				if (floor->stopper)
 				{
-					v80 = *(v79 + 16);
-					if (*(v79 + 50) > 0)
+					MESH_INFO* staticMesh = room->mesh;
+					if (room->numMeshes > 0)
 					{
-						v105 = *(v79 + 50);
-						do
+						for (__int32 i = 0; i < room->numMeshes; i++)
 						{
-							v81 = v109 ^ *(v80 + 8);
-							if (!(v81 & 0xFFFFFC00) && !((v107 ^ *v80) & 0xFFFFFC00) && *(v80 + 18) >= 50)
+							staticMesh = &room->mesh[i];
+							if (abs(pos.x - staticMesh->x) < 1024 && abs(pos.z - staticMesh->z) < 1024 && staticMesh->staticNumber >= 50)
 							{
-								LOWORD(v81) = LaraItem->roomNumber;
-								sub_432F00(0, v80, -64, v81, 0);
-								SoundEffect(347, pos, 0);
-								*(v80 + 16) &= 0xFEu;
-								v82 = *(v79 + 8);
-								v83 = ((v109 - *(v79 + 28)) >> 10) + *(v79 + 40) * ((v107 - *(v79 + 20)) >> 10);
-								*(v82 + 8 * v83 + 3) &= 0x7Fu;
-								GetHeight(v82 + 8 * v83, v107, v108, v109);
+								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
+								SoundEffect(347, &item->pos, 0);
+								staticMesh->Flags &= ~1;
+								floor->stopper = 0;
+								TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 								TestTriggers(TriggerIndex, 1, 0);
 							}
-							v80 += 20;
-							--v105;
-						} while (v105);
+						}
 					}
 				}
-				if (!creature_1->flags)
+				if (!creature->flags)
 				{
 					if (item->touchBits & 0x18000)
 					{
 						LaraItem->hitPoints -= 80;
-						HIWORD(v84) = HIWORD(LaraItem);
-						LaraItem->MainFlags |= 0x10u;
-						LOWORD(v84) = item->pos.yRot;
-						CreatureEffect2(item, &unk_4AB2E8, 10, v84, DoBloodSplat);
-						SoundEffect(70, pos, 0);
-						creature_1->flags = 1;
+						LaraItem->hitStatus = true;
+						CreatureEffect2(item, &skeletonBite, 10, item->pos.yRot, DoBloodSplat);
+						SoundEffect(70, &item->pos, 0);
+						creature->flags = 1;
 					}
 				}
-			}*/
+			}
+			break;
+
+		case 7:
+			if (item->hitStatus)
+			{
+				if (item->meshBits == -1 && laraInfo.angle && Lara.gunType == WEAPON_SHOTGUN)
+				{
+					if (GetRandomControl() & 3)
+					{
+						item->goalAnimState = 17;
+					}
+					else
+					{
+						ExplodeItemNode(item, 11, 1, -24);
+					}
+				}
+				else
+				{
+				LABEL_153:
+					item->goalAnimState = 2;
+				}
+			}
+			else if (Lara.target != item || item->meshBits != -1 || Lara.gunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
+			{
+				item->goalAnimState = 2;
+			}
+			break;
+
+		case 21:
+			if (item->animNumber == Objects[item->objectNumber].animIndex + 43)
+			{
+				roomNumber = item->roomNumber;
+				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+				if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos + 1280)
+				{
+					creature->maximumTurn = 0;
+					item->animNumber = Objects[item->objectNumber].animIndex + 44;
+					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->currentAnimState = 23;
+					creature->LOT.isJumping = false;
+					item->gravityStatus = true;
+				}
+			}
+			break;
+
+		case 23:
+		case 24:
+			roomNumber = item->roomNumber;
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos)
+			{
+				if (item->active)
+				{
+					ExplodingDeath(itemNum, -1, 929);
+					KillItem(itemNum);
+					DisableBaddieAI(itemNum);
+					//Savegame.Kills++;
+				}
+			}
+			break;
+
+		case 25:
+		case 11:
+		case 12:
+		case 13:
+			if ((item->currentAnimState == 12 || item->currentAnimState == 13) && 
+				item->frameNumber < Anims[item->animNumber].frameBase + 20)
+			{
+				item->hitPoints = 25;
+				creature->maximumTurn = 0;
+				break;
+			}
+			if (item->currentAnimState == 11)
+			{
+				creature->maximumTurn = 0;
+				break;
+			}
+
+			item->hitPoints = 25;
+			creature->LOT.isJumping = false;
+			
+			roomNumber = item->roomNumber;
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos + 1024)
+			{
+				if (!(GetRandomControl() & 0x1F))
+				{
+					item->goalAnimState = 14;
+				}
+			}
+			else
+			{
+				creature->maximumTurn = 0;
+				item->animNumber = Objects[item->objectNumber].animIndex + 47;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->currentAnimState = 24;
+				item->gravityStatus = true;
+			}
+			break;
+
+		case 19:
+		case 20:
+			creature->alerted = false;
+			creature->maximumTurn = 0;
+			item->status = ITEM_ACTIVE;
+			break;
+
+		case 0:
+			if (item->frameNumber - Anims[item->animNumber].frameBase < 32)
+			{
+				//WakeUpSkeleton(item);
+			}
+			break;
+
+		default:
 			break;
 		}
+
+		CreatureAnimation(itemNum, angle, 0);
 	}
 }

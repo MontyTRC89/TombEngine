@@ -10,6 +10,14 @@ typedef struct vector_t
 	__int32 pad;
 } VECTOR;
 
+struct SPHERE
+{
+	long x; // size=0, offset=0
+	long y; // size=0, offset=4
+	long z; // size=0, offset=8
+	long r; // size=0, offset=12
+};
+
 typedef struct svector_t
 {
 	__int16 vx;
@@ -1261,6 +1269,16 @@ typedef struct SPRITE
 	float top;
 	float right;
 	float bottom;
+};
+
+struct SHATTER_ITEM
+{
+	SPHERE Sphere; // size=16, offset=0
+	ITEM_LIGHT* il; // size=48, offset=16
+	__int16* meshp; // size=0, offset=20
+	__int32 bit; // size=0, offset=24
+	__int16 yRot; // size=0, offset=28
+	__int16 flags; // size=0, offset=30
 };
 
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);

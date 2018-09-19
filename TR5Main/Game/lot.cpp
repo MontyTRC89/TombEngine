@@ -160,6 +160,12 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.zone = 3;
 		break;
 
+	case ID_SKELETON:
+		creature->LOT.step = 256;
+		creature->LOT.drop = -256;
+		creature->LOT.canJump = true;
+		break;
+
 	case ID_CROW:
 	case ID_EAGLE:
 	case ID_WILLOWISP:

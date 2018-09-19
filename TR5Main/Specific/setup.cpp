@@ -498,6 +498,56 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
 	}
+
+	obj = &Objects[ID_APE];
+	if (obj->loaded)
+	{
+		obj->control = ApeControl;
+		obj->collision = CreatureCollision;
+		obj->hitPoints = 22;
+		obj->shadowSize = 128;
+		obj->pivotLength = 250;
+		obj->radius = 340;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_RAT];
+	if (obj->loaded)
+	{
+		obj->control = RatControl;
+		obj->collision = CreatureCollision;
+		obj->hitPoints = 5;
+		obj->shadowSize = 128;
+		obj->pivotLength = 50;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SKELETON];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSkeleton;
+		obj->control = SkeletonControl;
+		obj->collision = CreatureCollision;
+		obj->hitPoints = 15;
+		obj->shadowSize = 128;
+		obj->pivotLength = 50;
+		obj->radius = 128;
+		obj->explodableMeshbits = 0xA00;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
 }
 
 void __cdecl CustomObjects()
