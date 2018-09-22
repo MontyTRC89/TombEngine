@@ -196,7 +196,7 @@ __int32 __cdecl CanGetOff(__int32 direction)
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height = TrGetHeight(floor, x, y, z);
+	__int32 height = GetFloorHeight(floor, x, y, z);
 
 	if ((HeightType == BIG_SLOPE) || (HeightType == DIAGONAL) || (height == NO_HEIGHT))
 		return false;
@@ -292,7 +292,7 @@ static int GetOnQuadBike(__int16 itemNumber, COLL_INFO* coll)
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < -32000)
+	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < -32000)
 		return false;
 	else
 	{
@@ -415,7 +415,7 @@ __int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* 
 	if (pos->y < ceiling || ceiling == NO_HEIGHT)
 		return NO_HEIGHT;
 	
-	return TrGetHeight(floor, pos->x, pos->y, pos->z);
+	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
 __int32 __cdecl DoShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
@@ -467,7 +467,7 @@ __int32 __cdecl DoShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 		__int16 roomNumber = quad->roomNumber;
 		FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
-		__int32 height = TrGetHeight(floor, old->x, pos->y, pos->z);
+		__int32 height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
 		{
 			if (pos->z > old->z)
@@ -478,7 +478,7 @@ __int32 __cdecl DoShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 		roomNumber = quad->roomNumber;
 		floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
-		height = TrGetHeight(floor, pos->x, pos->y, old->z);
+		height = GetFloorHeight(floor, pos->x, pos->y, old->z);
 		if (height < old->y - STEP_SIZE)
 		{
 			if (pos->x > old->x)
@@ -650,7 +650,7 @@ __int32 __cdecl QuadDynamics(ITEM_INFO* item)
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	__int32 height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	__int32 height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	__int32 speed = 0;
 	if (item->pos.yPos >= height)
 		speed = (item->speed * COS(item->pos.xRot)) >> W2V_SHIFT;
@@ -741,7 +741,7 @@ __int32 __cdecl QuadDynamics(ITEM_INFO* item)
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-	height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	if (height < item->pos.yPos - STEP_SIZE)
 		DoShift(item, (PHD_VECTOR *)&item->pos, &old);
 
@@ -1238,7 +1238,7 @@ __int32 __cdecl QuadBikeControl()
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	__int32 height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	__int32 height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	__int32 ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 	PHD_VECTOR fl;
@@ -1248,7 +1248,7 @@ __int32 __cdecl QuadBikeControl()
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 	TestTriggers(TriggerIndex, 0, 0);
 

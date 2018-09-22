@@ -1,9 +1,12 @@
 #include "game.h"
 #include "init.h"
 #include "winmain.h"
+
 #include <process.h>
 #include <crtdbg.h>
 #include <stdio.h>
+#include <sol.hpp>
+
 #include "..\Game\draw.h"
 #include "..\Game\sound.h"
 #include "..\Game\inventory.h"
@@ -15,8 +18,9 @@ unsigned int threadId;
 uintptr_t hThread;
 HACCEL hAccTable;
 
-extern GameScript* g_Script;
- 
+extern GameFlow* g_GameFlow;
+extern GameScript* g_GameScript;
+
 __int32 __cdecl WinProcMsg()
 {
 	int result;
@@ -47,16 +51,21 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	_CrtSetReportMode(0, 2);
 	_CrtSetDbgFlag(-1);
-	
+	 
 	// TODO: deprecated
 	LoadGameflow();
 	LoadSettings();
 
 	// Initialise the new scripting system
-	g_Script = new GameScript();
-	g_Script->ExecuteScript("Scripts\\English.lua");
-	g_Script->ExecuteScript("Scripts\\Settings.lua");
-	g_Script->ExecuteScript("Scripts\\Gameflow.lua");
+	sol::state luaState;
+	luaState.open_libraries(sol::lib::base);
+
+	g_GameFlow = new GameFlow(&luaState);
+	g_GameFlow->ExecuteScript("Scripts\\English.lua");
+	g_GameFlow->ExecuteScript("Scripts\\Settings.lua");
+	g_GameFlow->ExecuteScript("Scripts\\Gameflow.lua");
+
+	g_GameScript = new GameScript(&luaState);
 
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = NULL;
@@ -80,15 +89,15 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	Rect.left = 0;
 	Rect.top = 0;
-	Rect.right = g_Script->GetSettings()->ScreenWidth;
-	Rect.bottom = g_Script->GetSettings()->ScreenHeight;
+	Rect.right = g_GameFlow->GetSettings()->ScreenWidth;
+	Rect.bottom = g_GameFlow->GetSettings()->ScreenHeight;
 
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
 	App.WindowHandle = CreateWindowEx(
 		WS_THICKFRAME,
 		"TR5Main",
-		g_Script->GetSettings()->WindowTitle.c_str(),
+		g_GameFlow->GetSettings()->WindowTitle.c_str(),
 		WS_BORDER,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -111,7 +120,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	//DXInitialise(App.WindowHandle);
 	g_Renderer = new Renderer();
-	g_Renderer->Initialise(g_Script->GetSettings()->ScreenWidth, g_Script->GetSettings()->ScreenHeight, true, App.WindowHandle);
+	g_Renderer->Initialise(g_GameFlow->GetSettings()->ScreenWidth, g_GameFlow->GetSettings()->ScreenHeight, true, App.WindowHandle);
 
 	// Initialize audio
 	Sound_Init();
@@ -158,7 +167,7 @@ __int32 __cdecl WinClose()
 
 	delete g_Renderer;
 	delete g_Inventory;
-	delete g_Script;
+	delete g_GameFlow;
 
 	return 0;
 }

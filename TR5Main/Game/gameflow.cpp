@@ -12,7 +12,7 @@ using namespace std;
 SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
 vector<string> g_NewStrings;
 
-extern GameScript* g_Script;
+extern GameFlow* g_GameFlow;
 
 __int32 __cdecl DoPauseMenu()
 {

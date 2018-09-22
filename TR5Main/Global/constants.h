@@ -73,3 +73,6 @@
 #define	SP_PLASMAEXP	8192
 
 #define ONESHOT 0x100
+
+#define DATA_TYPE 0x1F
+#define END_BIT 0x8000

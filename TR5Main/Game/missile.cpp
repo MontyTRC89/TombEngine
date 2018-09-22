@@ -52,7 +52,7 @@ void ControlMissile(__int16 fxNumber)
 	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 
 	/* Check for hitting something */
-	if (fx->pos.yPos >= TrGetHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) ||
+	if (fx->pos.yPos >= GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) ||
 		fx->pos.yPos <= GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
 	{
 		if (/*fx->objectNumber == KNIFE ||*/ fx->objectNumber == ID_SCUBA_HARPOON)

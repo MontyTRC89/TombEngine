@@ -94,7 +94,7 @@ void __cdecl HarpoonControl(__int16 itemNum)
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		if (item->roomNumber != roomNumber)
 			ItemNewRoom(itemNum, roomNumber);
-		item->floor = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->pos.yPos >= item->floor)
 		{
 			//for (__int32 i = 0; i < 4; i++)

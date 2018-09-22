@@ -306,7 +306,7 @@ void __cdecl ControlSpikeWall(__int16 itemNum)
 		__int16 roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
-		if (TrGetHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
+		if (GetFloorHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
 		{
 			item->status = ITEM_DEACTIVATED;
 			StopSoundEffect(147);
@@ -357,7 +357,7 @@ void __cdecl SpinningBlade(__int16 item_number)
 
 			__int16 roomNumber = item->roomNumber;
 			FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-			__int32 height = TrGetHeight(floor, x, item->pos.yPos, z);
+			__int32 height = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 			if (height == NO_HEIGHT)
 				item->goalAnimState = 1;
@@ -386,7 +386,7 @@ void __cdecl SpinningBlade(__int16 item_number)
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO*  floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	item->floor = item->pos.yPos = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	item->floor = item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	if (roomNumber != item->roomNumber)
 		ItemNewRoom(item_number, roomNumber);
 

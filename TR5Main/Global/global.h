@@ -10,7 +10,8 @@
 #include "macros.h"
 #include "malloc.h"
 #include <windows.h>"
-#include "..\Scripting\GameScript.h"
+#include "..\Scripting\GameLogicScript.h"
+#include "..\Scripting\GameFlowScript.h"
 #include "..\Renderer\Renderer.h"
 
 #define DB_Log ((HWND (__cdecl*)(__int16, const char*)) 0x004DEB10)

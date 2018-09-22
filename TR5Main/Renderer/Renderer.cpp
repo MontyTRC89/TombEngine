@@ -33,7 +33,7 @@
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
 
-extern GameScript* g_Script;
+extern GameFlow* g_GameFlow;
 
 Renderer::Renderer()
 {
@@ -325,7 +325,7 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 		return false;
 
 	// Load the white sprite 
-	D3DXCreateTextureFromFileEx(m_device, g_Script->GetLevel(0)->Background.c_str(), D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
+	D3DXCreateTextureFromFileEx(m_device, g_GameFlow->GetLevel(0)->Background.c_str(), D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
 								D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
 								D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_titleScreen);
 
@@ -692,7 +692,7 @@ RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 		}
 		 
 		// ColAddHorizon special handling
-		if (obj->GetId() == ID_HORIZON && g_Script->GetLevel(CurrentLevel)->ColAddHorizon)
+		if (obj->GetId() == ID_HORIZON && g_GameFlow->GetLevel(CurrentLevel)->ColAddHorizon)
 		{
 			if (texture->attribute == 2 || (effects & 1))
 				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
@@ -900,7 +900,7 @@ bool Renderer::PrepareDataForTheRenderer()
 
 	ZeroMemory(buffer.get(), TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 
-	if (g_Script->GetLevel(CurrentLevel)->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
+	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
 	{
 		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
 	}
@@ -2020,7 +2020,7 @@ void Renderer::updateLaraAnimations()
 		__int32 lastVertex = 0;
 		__int32 lastIndex = 0;
 		
-		GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 		
 		for (__int32 p = 0; p < ((level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG) ? 2 : 1); p++)
 		{
@@ -2854,10 +2854,10 @@ __int32 Renderer::drawInventoryScene()
 						{
 							__int16 lastY = 44;
 
-							for (__int32 n = 1; n < g_Script->GetNumLevels(); n++)
+							for (__int32 n = 1; n < g_GameFlow->GetNumLevels(); n++)
 							{
-								GameScriptLevel* levelScript = g_Script->GetLevel(n);
-								PrintString(400, lastY, g_Script->GetString(levelScript->Name), D3DCOLOR_ARGB(255, 255, 255, 255),
+								GameScriptLevel* levelScript = g_GameFlow->GetLevel(n);
+								PrintString(400, lastY, g_GameFlow->GetString(levelScript->Name), D3DCOLOR_ARGB(255, 255, 255, 255),
 									PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n - 1 ? PRINTSTRING_BLINK : 0));
 								
 								lastY += 24;
@@ -2867,22 +2867,22 @@ __int32 Renderer::drawInventoryScene()
 						switch (ring->passportAction)
 						{
 						case INV_WHAT_PASSPORT_NEW_GAME:
-							string = g_Script->GetString(STRING_INV_NEW_GAME);
+							string = g_GameFlow->GetString(STRING_INV_NEW_GAME);
 							break;
 						case INV_WHAT_PASSPORT_SELECT_LEVEL:
-							string = g_Script->GetString(STRING_INV_SELECT_LEVEL);
+							string = g_GameFlow->GetString(STRING_INV_SELECT_LEVEL);
 							break;
 						case INV_WHAT_PASSPORT_LOAD_GAME:
-							string = g_Script->GetString(STRING_INV_LOAD_GAME);
+							string = g_GameFlow->GetString(STRING_INV_LOAD_GAME);
 							break;
 						case INV_WHAT_PASSPORT_SAVE_GAME:
-							string = g_Script->GetString(STRING_INV_SAVE_GAME);
+							string = g_GameFlow->GetString(STRING_INV_SAVE_GAME);
 							break;
 						case INV_WHAT_PASSPORT_EXIT_GAME:
-							string = g_Script->GetString(STRING_INV_EXIT_GAME);
+							string = g_GameFlow->GetString(STRING_INV_EXIT_GAME);
 							break;
 						case INV_WHAT_PASSPORT_EXIT_TO_TITLE:
-							string = g_Script->GetString(STRING_INV_EXIT_TO_TITLE);
+							string = g_GameFlow->GetString(STRING_INV_EXIT_TO_TITLE);
 							break;
 						}
 
@@ -3032,7 +3032,7 @@ bool Renderer::drawScene(bool dump)
 	D3DXMatrixMultiply(&m_viewProjection, &ViewMatrix, &ProjectionMatrix);
 	D3DXMatrixInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
 
-	GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	// Collect scene data
 	collectSceneItems();
@@ -3767,7 +3767,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	// Draw Lara's hairs
 	if (bucketIndex == 0)
 	{  
-		GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 		setGpuStateForBucket(bucketIndex); 
 
@@ -4225,7 +4225,7 @@ void Renderer::collectLights()
 
 bool Renderer::drawHorizonAndSky()
 {
-	GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
 	// First update the sky in the case of storm

@@ -11,7 +11,7 @@
 #include "..\Specific\input.h"
 
 Inventory* g_Inventory;
-extern GameScript* g_Script;
+extern GameFlow* g_GameFlow;
 
 void Inject_Inventory()
 {
@@ -1202,7 +1202,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 					selectedLevel--;
 					continue;
 				}
-				else if (DbInput & 2 && selectedLevel < g_Script->GetNumLevels() - 1)
+				else if (DbInput & 2 && selectedLevel < g_GameFlow->GetNumLevels() - 1)
 				{
 					selectedLevel++;
 					continue;
@@ -1226,7 +1226,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				else if (DbInput & 0x100000)
 				{
 					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
-					g_Script->SelectedLevelForNewGame = selectedLevel + 1;
+					g_GameFlow->SelectedLevelForNewGame = selectedLevel + 1;
 
 					moveLeft = false;
 					moveRight = false;

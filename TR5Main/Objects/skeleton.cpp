@@ -51,21 +51,21 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height1 = TrGetHeight(floor, x, y, z);
+	__int32 height1 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height2 = TrGetHeight(floor, x, y, z);
+	__int32 height2 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height3 = TrGetHeight(floor, x, y, z);
+	__int32 height3 = GetFloorHeight(floor, x, y, z);
 
 	__int32 height = 0;
 	bool canJump1sector = true;
@@ -167,7 +167,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 			roomNumber = item->roomNumber;
 			floor = GetFloor(x, y, z, &roomNumber);
-			__int32 height4 = TrGetHeight(floor, x, y, z);
+			__int32 height4 = GetFloorHeight(floor, x, y, z);
 
 			dx = 870 * SIN(item->pos.yRot + 14336) >> 14;
 			dz = 870 * COS(item->pos.yRot + 14336) >> 14;
@@ -178,7 +178,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 			roomNumber = item->roomNumber;
 			floor = GetFloor(x, y, z, &roomNumber);
-			__int32 height5 = TrGetHeight(floor, x, y, z);
+			__int32 height5 = GetFloorHeight(floor, x, y, z);
 
 			if (abs(height5 - item->pos.yPos) > 256)
 				someFlag2 = false;
@@ -198,7 +198,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 			roomNumber = item->roomNumber;
 			floor = GetFloor(x, y, z, &roomNumber);
-			__int32 height6 = TrGetHeight(floor, x, y, z);
+			__int32 height6 = GetFloorHeight(floor, x, y, z);
 
 			dx = 870 * SIN(item->pos.yRot - 14336) >> 14;
 			dz = 870 * COS(item->pos.yRot - 14336) >> 14;
@@ -209,7 +209,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 			roomNumber = item->roomNumber;
 			floor = GetFloor(x, y, z, &roomNumber);
-			__int32 height7 = TrGetHeight(floor, x, y, z);
+			__int32 height7 = GetFloorHeight(floor, x, y, z);
 
 			if (abs(height7 - item->pos.yPos) > 256 || height6 + 512 >= item->pos.yPos)
 				someFlag1 = false;
@@ -432,7 +432,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 				creature->LOT.isJumping = true;
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos + 1024)
+				if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos + 1024)
 				{
 					creature->maximumTurn = 0;
 					item->animNumber = Objects[ID_SKELETON].animIndex + 44;
@@ -543,7 +543,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 								SoundEffect(347, &item->pos, 0);
 								staticMesh->Flags &= ~1;
 								floor->stopper = 0;
-								TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+								GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 								TestTriggers(TriggerIndex, 1, 0);
 							}
 						}
@@ -594,7 +594,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 			{
 				roomNumber = item->roomNumber;
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos + 1280)
+				if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos + 1280)
 				{
 					creature->maximumTurn = 0;
 					item->animNumber = Objects[item->objectNumber].animIndex + 44;
@@ -610,7 +610,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 		case 24:
 			roomNumber = item->roomNumber;
 			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos)
+			if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos)
 			{
 				if (item->active)
 				{
@@ -644,7 +644,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 			
 			roomNumber = item->roomNumber;
 			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			if (TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos + 1024)
+			if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos + 1024)
 			{
 				if (!(GetRandomControl() & 0x1F))
 				{

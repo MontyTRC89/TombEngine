@@ -4,7 +4,6 @@
 #include "..\Specific\setup.h"
 #include "..\Game\draw.h"
 #include "..\Game\lot.h"
-#include "..\Scripting\GameScript.h"
 
 #include <process.h>
 #include <stdio.h>
@@ -30,7 +29,7 @@ using namespace std;
 vector<__int32> MoveablesIds;
 vector<__int32> StaticObjectsIds;
 
-extern GameScript* g_Script;
+extern GameFlow* g_GameFlow;
 extern __int16 LaraVehicle;
 
 __int16 ReadInt16()
@@ -490,7 +489,7 @@ unsigned __stdcall LoadLevel(void* data)
 	g_Renderer->PrepareDataForTheRenderer();
 
 	// Initialise the game
-	GameScriptLevel* level = g_Script->GetLevel(CurrentLevel);
+	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
@@ -523,7 +522,7 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	RenderLoadBar = false;
 	
 	char filename[80];
-	strcpy_s(filename, g_Script->GetLevel(levelIndex)->FileName.c_str());
+	strcpy_s(filename, g_GameFlow->GetLevel(levelIndex)->FileName.c_str());
 	//strcat_s(filename, ".TRC");
 
 	//printf("%s\n", filename);

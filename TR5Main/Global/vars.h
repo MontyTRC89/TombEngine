@@ -143,7 +143,7 @@
 
 #define LevelComplete				VAR_U_(0x00E5C2F0, byte)
 #define ResetFlag					VAR_U_(0x0051CA6C, __int32)
-#define GameFlow					VAR_U_(0x00E5C2BC, GAMEFLOW*)
+//#define GameFlow					VAR_U_(0x00E5C2BC, GAMEFLOW*)
 #define GameMode					VAR_U_(0x005082C0, byte)
 #define nFrames						VAR_U_(0x005082C4, __int32)
 #define GameStatus					VAR_U_(0x00E5C2B0, __int32)
@@ -250,6 +250,15 @@
 #define WeaponEnemyTimer			VAR_U_(0x0080E016, byte)
 
 #define HeightType					VAR_U_(0x00EEEFF4, __int32)
+#define HeavyTriggered				VAR_U_(0x00EEEA34, byte)
+#define FlipEffect					VAR_U_(0x00506C60, __int32)
+#define FlipTimer					VAR_U_(0x0051CA68, __int32)
+#define Unknown_00EEF99A			VAR_U_(0x00EEF99A, byte)
+#define SpotCamRemap				ARRAY_(0x00E4F4F0, byte, [16])
+#define CameraCnt					ARRAY_(0x00E51F10, byte, [16])
+#define LastSpotCam					VAR_U_(0x00E51F2C, __int16)
+#define FlipMap						ARRAY_(0x00EEEBA0, __int32, [255])
+#define TriggerTimer				VAR_U_(0x0051CA5A, byte)
 
 extern bool MonksAttackLara;
 

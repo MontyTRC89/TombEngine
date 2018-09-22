@@ -291,10 +291,13 @@
     <ClInclude Include="Renderer\RenderTargetCube.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Scripting\GameScript.h">
+    <ClInclude Include="Objects\objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\objects.h">
+    <ClInclude Include="Scripting\GameFlowScript.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripting\GameLogicScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -506,9 +509,6 @@
     <ClCompile Include="Renderer\RenderTargetCube.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting\GameScript.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\baddy.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -539,6 +539,12 @@
     <ClCompile Include="Objects\tribesman.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Scripting\GameFlowScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripting\GameLogicScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />
@@ -563,5 +569,6 @@
     <None Include="Scripting\Scripts\Gameflow.lua" />
     <None Include="Scripting\Scripts\Andrea2.lua" />
     <None Include="Shaders\FinalPass.fx" />
+    <None Include="Scripting\Scripts\andrea1.lua" />
   </ItemGroup>
 </Project>

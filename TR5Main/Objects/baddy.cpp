@@ -180,21 +180,21 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height1 = TrGetHeight(floor, x, y, z);
+	__int32 height1 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height2 = TrGetHeight(floor, x, y, z);
+	__int32 height2 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height3 = TrGetHeight(floor, x, y, z);
+	__int32 height3 = GetFloorHeight(floor, x, y, z);
 
 	__int32 height = 0;
 	bool canJump1sector = true;
@@ -253,7 +253,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		item->floor = height;
 
 		switch (item->currentAnimState)
@@ -375,7 +375,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height4 = TrGetHeight(floor, x, y, z);
+		__int32 height4 = GetFloorHeight(floor, x, y, z);
 
 		dx = 942 * SIN(item->pos.yRot + 14336) >> 14;
 		dz = 942 * COS(item->pos.yRot + 14336) >> 14;
@@ -386,7 +386,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height5 = TrGetHeight(floor, x, y, z);
+		__int32 height5 = GetFloorHeight(floor, x, y, z);
 
 		if (abs(height5 - item->pos.yPos) > 256)
 			jump = false;
@@ -406,7 +406,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height6 = TrGetHeight(floor, x, y, z);
+		__int32 height6 = GetFloorHeight(floor, x, y, z);
 
 		dx = 942 * SIN(item->pos.yRot - 14336) >> 14;
 		dz = 942 * COS(item->pos.yRot - 14336) >> 14;
@@ -417,7 +417,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height7 = TrGetHeight(floor, x, y, z);
+		__int32 height7 = GetFloorHeight(floor, x, y, z);
 
 		if (abs(height7 - item->pos.yPos) > 256 || height6 + 512 >= item->pos.yPos)
 		{
@@ -520,7 +520,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 			if (currentCreature->monkeyAhead)
 			{
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 				if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
 				{
 					if (item->swapMeshFlags == 0x7FC800)
@@ -755,7 +755,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 			currentCreature->flags = 0;
 
 			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 			if (laraInfo.ahead
 				&& laraInfo.distance < SQUARE(682)
@@ -791,7 +791,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 				!currentCreature->monkeyAhead)
 			{
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				height = TrGetHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 				if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
 				{
 					item->goalAnimState = 19;

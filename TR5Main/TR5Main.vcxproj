@@ -178,6 +178,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="CustomObjects\raptor.h" />
     <ClInclude Include="CustomObjects\shark.h" />
     <ClInclude Include="CustomObjects\tribesman.h" />
+    <ClInclude Include="Scripting\GameFlowScript.h" />
     <ClInclude Include="Game\Anim.h" />
     <ClInclude Include="Game\Box.h" />
     <ClInclude Include="Game\camera.h" />
@@ -254,7 +255,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Renderer\ShadowMapTarget.h" />
     <ClInclude Include="Renderer\Structs.h" />
     <ClInclude Include="Renderer\RenderTargetCube.h" />
-    <ClInclude Include="Scripting\GameScript.h" />
+    <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\directx.h" />
     <ClInclude Include="Specific\init.h" />
     <ClInclude Include="Specific\input.h" />
@@ -266,6 +267,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Scripting\GameFlowScript.cpp" />
     <ClCompile Include="Game\anim.cpp" />
     <ClCompile Include="Game\box.cpp" />
     <ClCompile Include="Game\camera.cpp" />
@@ -335,7 +337,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\ShadowMapTarget.cpp" />
     <ClCompile Include="Renderer\RenderTargetCube.cpp" />
-    <ClCompile Include="Scripting\GameScript.cpp" />
+    <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
     <ClCompile Include="Specific\game.cpp" />
@@ -347,6 +349,10 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="TR5Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Scripting\Scripts\andrea1.lua">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+    </None>
     <None Include="Scripting\Scripts\Andrea2.lua">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
