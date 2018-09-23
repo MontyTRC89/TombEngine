@@ -17,6 +17,15 @@ GameScript::GameScript(sol::state* lua)
 		);
 
 	(*m_lua)["TR"] = this;
+
+	// DEBUG: just for testing
+	LuaFunction* function = new LuaFunction();
+	function->Name = "Trigger_0";
+	function->Code = "function Trigger_0() \n TR:EnableItem(2); \n TR:PlayAudioTrack(15); \n return true; \n end";
+	m_lua->script(function->Code);
+	Triggers.push_back(function);
+	
+	m_itemsMap.insert(pair<__int16, __int16>(2, 8));
 }
 
 GameScript::~GameScript()
@@ -43,6 +52,31 @@ bool GameScript::ExecuteScript(char* luaFilename)
 	m_lua->script(script);
 	 
 	return true;
+}
+
+bool GameScript::ExecuteTrigger(__int16 index)
+{
+	// Is this a valid trigger?
+	if (index >= Triggers.size())
+		return true;
+
+	LuaFunction* trigger = Triggers[index];
+
+	// We want to execute a trigger just one time 
+	// TODO: implement in the future continoous trigger?
+	if (trigger->Executed)
+		return true;
+
+	// Get the trigger function name
+	char* name = (char*)trigger->Name.c_str();
+
+	// Execute trigger
+	bool result = (*m_lua)[name]();
+
+	// Trigger was executed, don't execute it anymore
+	Triggers[index]->Executed = result;
+
+	return result;
 }
 
 void GameScript::EnableItem(__int16 id)

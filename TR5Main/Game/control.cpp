@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 extern GameFlow* g_GameFlow;
+extern GameScript* g_GameScript;
 
 GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 {
@@ -834,10 +835,6 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 			newEffect = value;
 			break;
 
-		case TO_BODYBAG:
-			// TODO: Maybe ClearBodies?
-			break;
-
 		case TO_FINISH:
 			gfRequiredStartPos = false;
 			LevelComplete = CurrentLevel + 1;
@@ -852,8 +849,8 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 			break;
 
 		case TO_LUA_SCRIPT:
-			// TODO: execute LUA script
 			trigger = *(data++);
+			g_GameScript->ExecuteTrigger(trigger & 0x7FFF);
 
 			break;
 

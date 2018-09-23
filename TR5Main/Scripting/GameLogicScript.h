@@ -10,6 +10,12 @@
 
 using namespace std;
 
+typedef struct LuaFunction {
+	string Name;
+	string Code;
+	bool Executed;
+};
+
 class GameScript
 {
 private:
@@ -19,12 +25,15 @@ private:
 	map<__int16, __int16>				m_itemsMap;
 
 public:
+	vector<LuaFunction*>		Triggers;
+
 	GameScript(sol::state* lua);
 	~GameScript();
-
+	
 	bool								ExecuteScript(char* luaFilename);
 	void								EnableItem(__int16 id);
 	void								DisableItem(__int16 id);
 	void								PlayAudioTrack(__int16 track);
 	void								ChangeAmbientSoundTrack(__int16 track);
+	bool								ExecuteTrigger(__int16 index);
 };

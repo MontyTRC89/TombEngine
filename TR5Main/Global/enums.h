@@ -57,10 +57,9 @@ typedef enum trigobj_types {
 	TO_CD,
 	TO_FLIPEFFECT,
 	TO_SECRET,
-	TO_BODYBAG,
+	TO_LUA_SCRIPT,
 	TO_FLYBY,
-	TO_CUTSCENE,
-	TO_LUA_SCRIPT = 16
+	TO_CUTSCENE
 } TRIGOBJECTS_TYPES;
 
 typedef enum floordata_masks
