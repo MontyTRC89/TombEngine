@@ -404,7 +404,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 		if (!heavy && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
 			LavaBurn(LaraItem);
 
-		if (*(data + 1) & 0x8000)
+		if (*data & 0x8000)
 			return;
 
 		data++;
@@ -420,7 +420,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 				Lara.climbStatus = true;
 		}
 
-		if (*(data + 1) & 0x8000)
+		if (*data & 0x8000)
 			return;
 
 		data++;
@@ -432,7 +432,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 		if (!heavy)
 			Lara.canMonkeySwing = true;
 
-		if (*(data + 1) & 0x8000)
+		if (*data & 0x8000)
 			return;
 
 		data++;
@@ -492,7 +492,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 	case TRIGGER_TYPES::SWITCH:
 		value = *(data++) & 0x3FF;
 
-		if (flags & ONESHOT)
+		if (flags & 0x100)
 			Items[value].itemFlags[0] = 1;
 
 		if (!SwitchTrigger(value, timer))
@@ -556,8 +556,8 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 		value = *(data++) & 0x3FF;
 		keyResult = KeyTrigger(value);
 		if (keyResult != -1)
-			return;
-		break;
+			break;
+		return;
 
 	case TRIGGER_TYPES::PICKUP:
 		value = *(data++) & 0x3FF;
@@ -661,8 +661,8 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 				if (item->active && Objects[item->objectNumber].intelligent)
 				{
 					item->hitPoints = -16384;
-					DisableBaddieAI(flags & 0x3FF);
-					KillItem(flags & 0x3FF);
+					DisableBaddieAI(value);
+					KillItem(value);
 				}
 			}
 			else if (flags & 0x3E00)
@@ -686,15 +686,15 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 							if (item->status == ITEM_INVISIBLE)
 							{
 								item->touchBits = 0;
-								if (EnableBaddieAI(flags & 0x3FF, 0))
+								if (EnableBaddieAI(value, 0))
 								{
 									item->status = ITEM_ACTIVE;
-									AddActiveItem(flags & 0x3FF);
+									AddActiveItem(value);
 								}
 								else
 								{
 									item->status == ITEM_INVISIBLE;
-									AddActiveItem(flags & 0x3FF);
+									AddActiveItem(value);
 								}
 							}
 						}
@@ -702,14 +702,14 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 						{
 							item->touchBits = 0;
 							item->status = ITEM_ACTIVE;
-							AddActiveItem(flags & 0x3FF);
-							EnableBaddieAI(flags & 0x3FF, 1);
+							AddActiveItem(value);
+							EnableBaddieAI(value, 1);
 						}
 					}
 					else
 					{
 						item->touchBits = 0;
-						AddActiveItem(flags & 0x3FF);
+						AddActiveItem(value);
 						item->status = ITEM_ACTIVE;
 						HeavyTriggered = heavy;
 					}
@@ -818,13 +818,13 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 			break;
 
 		case TO_FLIPON:
-			flipAvailable = 1;
+			flipAvailable = true;
 			if ((FlipMap[value] & 0x3E00) == 0x3E00 && !FlipStatus)
 				flip = value;
 			break;
 
 		case TO_FLIPOFF:
-			flipAvailable = 1;
+			flipAvailable = true;
 			if ((FlipMap[value] & 0x3E00) == 0x3E00 && FlipStatus)
 				flip = value;
 			break;
@@ -853,6 +853,8 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 
 		case TO_LUA_SCRIPT:
 			// TODO: execute LUA script
+			trigger = *(data++);
+
 			break;
 
 		default: 
