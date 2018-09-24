@@ -61,6 +61,7 @@ void __cdecl LoadObjects();
 __int32 __cdecl S_LoadLevelFile(__int32 levelIndex);
 void __cdecl FreeLevel();
 void __cdecl AdjustUV(__int32 num);
+void __cdecl LoadNewData();
 
 unsigned __stdcall LoadLevel(void* data);
 

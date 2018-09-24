@@ -10,6 +10,8 @@
 #include <vector>
 #include <map>
 
+extern GameScript* g_GameScript;
+
 byte* Texture32;
 byte* Texture16;
 byte* MiscTextures;
@@ -477,6 +479,8 @@ unsigned __stdcall LoadLevel(void* data)
 		LoadAIObjects();
 		LoadDemoData();
 		LoadSamples();
+		
+		LoadNewData();
 
 		LevelDataPtr = NULL;
 		FileClose(LevelFilePtr);
@@ -539,6 +543,45 @@ void __cdecl AdjustUV(__int32 num)
 {
 	// Dummy function
 	NumObjectTextures = num;
+}
+
+void __cdecl LoadNewData()
+{
+	// Free old level scripts
+	g_GameScript->FreeLevelScripts();
+
+	// Check for magic word
+	__int32 magicWord;
+	ReadFileEx(&magicWord, 1, 4, LevelFilePtr);
+	if (magicWord != 0x5455354D)
+		return;
+
+	// Load LUA triggers
+	__int32 numTriggers;
+	ReadFileEx(&numTriggers, 1, 4, LevelFilePtr);
+	for (__int32 i = 0; i < numTriggers; i++)
+	{
+		__int32 strSize;
+		ReadFileEx(&strSize, 1, 4, LevelFilePtr);
+		char* functionName = (char*)malloc(strSize + 1);
+		ZeroMemory(functionName, strSize + 1);
+		ReadFileEx(functionName, strSize, 1, LevelFilePtr);
+
+		ReadFileEx(&strSize, 1, 4, LevelFilePtr);
+		char* functionCode = (char*)malloc(strSize + 1);
+		ZeroMemory(functionCode, strSize + 1);
+		ReadFileEx(functionCode, strSize, 1, LevelFilePtr);
+
+		LuaFunction* function = new LuaFunction();
+		function->Name = string(functionName);
+		function->Code = string(functionCode);
+		function->Executed = false;
+
+		g_GameScript->AddTrigger(function);
+
+		delete functionName;
+		delete functionCode;
+	}
 }
 
 void Inject_RoomLoad()

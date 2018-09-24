@@ -15,8 +15,6 @@ void __cdecl phd_LookAt(__int32 posX, __int32 posY, __int32 posZ,
 
 	D3DXMatrixLookAtRH(&g_Renderer->ViewMatrix, &position, &target, &up);
 	D3DXMatrixPerspectiveFovRH(&g_Renderer->ProjectionMatrix, fov, g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 32.0f, 200000.0f);
-
-	//printf("%d %d %d\n", posX, posY, posZ);
 }
 
 void __cdecl phd_AlterFOV(__int32 value)
