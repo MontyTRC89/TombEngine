@@ -169,6 +169,10 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Specific\IO\ChunkId.h" />
+    <ClInclude Include="Specific\IO\ChunkWriter.h" />
+    <ClInclude Include="Specific\IO\LEB128.h" />
+    <ClInclude Include="Specific\IO\ChunkReader.h" />
     <ClInclude Include="CustomObjects\bear.h" />
     <ClInclude Include="CustomObjects\customtraps.h" />
     <ClInclude Include="CustomObjects\dino.h" />
@@ -259,6 +263,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Specific\directx.h" />
     <ClInclude Include="Specific\init.h" />
     <ClInclude Include="Specific\input.h" />
+    <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\patch.h" />
     <ClInclude Include="Specific\roomload.h" />
     <ClInclude Include="Specific\setup.h" />

@@ -52,11 +52,14 @@
 #define FloorData					VAR_U_(0x00875168, __int16*)
 #define ObjectTextures				VAR_U_(0x008751B0, OBJECT_TEXTURE*)
 #define RoomLightsCount				VAR_U_(0x0087B0EC, __int32)
-#define LevelDataPtr				VAR_U_(0x00874964, char*)
+//#define LevelDataPtr				VAR_U_(0x00874964, char*)
 #define NumberRooms					VAR_U_(0x0087514C, __int16)
 #define nAnimUVRanges				VAR_U_(0x0087495C, __int32)
 #define LevelFilePtr				VAR_U_(0x00875164, FILE*)
 //#define StaticObjects				ARRAY_(0x00874988, STATIC_INFO, [70])
+#define NumberCameras				VAR_U_(0x00EEFAC0, __int32)
+#define Cameras						VAR_U_(0x00EEF9A2, OBJECT_VECTOR*)
+#define NumberSpotcams				VAR_U_(0x00E4F428, __int32)
 
 // Lara
 #define LaraItem					VAR_U_(0x00E5BF08, ITEM_INFO*)
@@ -122,8 +125,8 @@
 #define AllStringsOffsets			VAR_U_(0x00E5C2B8, __int16*)
 
 #define RenderLoadBar				VAR_U_(0x008FBDC0, __int32)
-#define IsLevelLoading				VAR_U_(0x00874968, __int32)
-#define ThreadId					VAR_U_(0x00874978, unsigned int)
+//#define IsLevelLoading				VAR_U_(0x00874968, __int32)
+//#define ThreadId					VAR_U_(0x00874978, unsigned int)
 #define WeatherType					VAR_U_(0x00EEF4A0, byte)
 #define CreditsDone					VAR_U_(0x00E6D838, byte)
 #define CanLoad						VAR_U_(0x0051CE54, byte)

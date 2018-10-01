@@ -224,14 +224,6 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 	return GAME_STATUS::GAME_STATUS_NONE;
 }
 
-void __cdecl j_AnimateItem(ITEM_INFO* item)
-{
-	if (item != LaraItem)
-		printf("AnimateItem\n");
-	AnimateItem(item);
-
-}
-
 unsigned __stdcall GameMain(void*)
 {
 	DB_Log(2, "GameMain - DLL");
@@ -875,5 +867,5 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 
 void Inject_Control()
 {
-	INJECT(0x0040261C, j_AnimateItem);
+	
 }

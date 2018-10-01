@@ -20,6 +20,7 @@ using namespace std;
 #define ITEM_PARAM_GRAVITY_STATUS			7
 #define ITEM_PARAM_COLLIDABLE				8
 #define ITEM_PARAM_POISONED					9
+#define ITEM_PARAM_ROOM_NUMBER				10
 
 typedef struct LuaFunction {
 	string Name;
@@ -27,40 +28,48 @@ typedef struct LuaFunction {
 	bool Executed;
 };
 
-typedef struct GameScriptItem {
-private:
-	ITEM_INFO*		m_item;
+typedef struct GameScriptItemPosition {
+	__int32 x;
+	__int32 y;
+	__int32 z;
+	__int16 xRot;
+	__int16 yRot;
+	__int16 zRot;
+	__int16 room;
+};
 
-public:
-	GameScriptItem(ITEM_INFO* item)
-	{
-		m_item = item;
-	}
+typedef struct GameScriptItem {
+	ITEM_INFO*		NativeItem;
 
 	__int16 Get(__int32 param)
 	{
+		if (NativeItem == NULL)
+			return 0;
+
 		switch (param)
 		{
 		case ITEM_PARAM_CURRENT_ANIM_STATE:
-			return m_item->currentAnimState;
+			return NativeItem->currentAnimState;
 		case ITEM_PARAM_REQUIRED_ANIM_STATE:
-			return m_item->requiredAnimState;
+			return NativeItem->requiredAnimState;
 		case ITEM_PARAM_GOAL_ANIM_STATE:
-			return m_item->goalAnimState;
+			return NativeItem->goalAnimState;
 		case ITEM_PARAM_ANIM_NUMBER:
-			return m_item->animNumber;
+			return NativeItem->animNumber;
 		case ITEM_PARAM_FRAME_NUMBER:
-			return m_item->frameNumber;
+			return NativeItem->frameNumber;
 		case ITEM_PARAM_HIT_POINTS:
-			return m_item->hitPoints;
+			return NativeItem->hitPoints;
 		case ITEM_PARAM_HIT_STATUS:
-			return m_item->hitStatus;
+			return NativeItem->hitStatus;
 		case ITEM_PARAM_GRAVITY_STATUS:
-			return m_item->gravityStatus;
+			return NativeItem->gravityStatus;
 		case ITEM_PARAM_COLLIDABLE:
-			return m_item->collidable;
+			return NativeItem->collidable;
 		case ITEM_PARAM_POISONED:
-			return m_item->poisoned;
+			return NativeItem->poisoned;
+		case ITEM_PARAM_ROOM_NUMBER:
+			return NativeItem->roomNumber;
 		default:
 			return 0;
 		}
@@ -68,33 +77,76 @@ public:
 
 	void Set(__int32 param, __int16 value)
 	{
+		if (NativeItem == NULL)
+			return;
+
 		switch (param)
 		{
 		case ITEM_PARAM_CURRENT_ANIM_STATE:
-			m_item->currentAnimState = value; break;
+			NativeItem->currentAnimState = value; break;
 		case ITEM_PARAM_REQUIRED_ANIM_STATE:
-			m_item->requiredAnimState = value; break;
+			NativeItem->requiredAnimState = value; break;
 		case ITEM_PARAM_GOAL_ANIM_STATE:
-			m_item->goalAnimState = value; break;
+			NativeItem->goalAnimState = value; break;
 		case ITEM_PARAM_ANIM_NUMBER:
-			m_item->animNumber = value; 
-			m_item->frameNumber = Anims[m_item->animNumber].frameBase;
+			NativeItem->animNumber = value;
+			NativeItem->frameNumber = Anims[NativeItem->animNumber].frameBase;
 			break;
 		case ITEM_PARAM_FRAME_NUMBER:
-			m_item->frameNumber = value; break;
+			NativeItem->frameNumber = value; break;
 		case ITEM_PARAM_HIT_POINTS:
-			m_item->hitPoints = value; break;
+			NativeItem->hitPoints = value; break;
 		case ITEM_PARAM_HIT_STATUS:
-			m_item->hitStatus = value; break;
+			NativeItem->hitStatus = value; break;
 		case ITEM_PARAM_GRAVITY_STATUS:
-			m_item->gravityStatus = value; break;
+			NativeItem->gravityStatus = value; break;
 		case ITEM_PARAM_COLLIDABLE:
-			m_item->collidable = value; break;
+			NativeItem->collidable = value; break;
 		case ITEM_PARAM_POISONED:
-			m_item->poisoned = value; break;
+			NativeItem->poisoned = value; break;
+		case ITEM_PARAM_ROOM_NUMBER:
+			NativeItem->roomNumber = value; break;
 		default:
 			break;
 		}
+	}
+
+	GameScriptItemPosition GetItemPosition()
+	{
+		GameScriptItemPosition pos;
+		
+		//if (m_item == NULL)
+		//	return pos;
+
+		pos.x = NativeItem->pos.xPos;
+		pos.y = NativeItem->pos.yPos;
+		pos.z = NativeItem->pos.zPos;
+		pos.xRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.xRot);
+		pos.yRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.yRot);
+		pos.zRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.zRot);
+		pos.room = NativeItem->roomNumber;
+
+		return pos;
+	}
+
+	void SetItemPosition(__int32 x, __int32 y, __int32 z)
+	{
+		if (NativeItem == NULL)
+			return;
+
+		NativeItem->pos.xPos = x;
+		NativeItem->pos.yPos = y;
+		NativeItem->pos.zPos = z;
+	}
+
+	void SetItemRotation(__int32 x, __int32 y, __int32 z)
+	{
+		if (NativeItem == NULL)
+			return;
+
+		NativeItem->pos.xRot = ANGLE(x);
+		NativeItem->pos.yRot = ANGLE(y);
+		NativeItem->pos.zRot = ANGLE(z);
 	}
 };
 
@@ -102,19 +154,25 @@ class GameScript
 {
 private:
 	sol::state*							m_lua;
+	sol::table							m_globals;
+	sol::table							m_locals;
+	map<__int32, __int32>				m_itemsMap;
+	vector<LuaFunction*>				m_triggers;
+	GameScriptItem						m_items[NUM_ITEMS];
 
 	string								loadScriptFromFile(char* luaFilename);
-	map<__int16, __int16>				m_itemsMap;
 
-public:
-	vector<LuaFunction*>		Triggers;
-
+public:	
 	GameScript(sol::state* lua);
 	~GameScript();
 	
 	bool								ExecuteScript(char* luaFilename);
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
+	void								AddLuaId(int luaId, int itemId);
+	void								SetItem(__int32 index, ITEM_INFO* item);
+	void								AssignVariables();
+	void								ResetVariables();
 
 	void								EnableItem(__int16 id);
 	void								DisableItem(__int16 id);
@@ -127,4 +185,6 @@ public:
 	void								AddOneSecret();
 	void								MakeItemInvisible(__int16 id);
 	GameScriptItem						GetItem(__int16 id);
+	void								PlaySoundEffectAtPosition(__int16 id, __int32 x, __int32 y, __int32 z, __int32 flags);
+	void								PlaySoundEffect(__int16 id, __int32 flags);
 };

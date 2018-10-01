@@ -5,6 +5,13 @@
 #include <vector>
 #include <map>
 
+#include "IO/ChunkId.h"
+#include "IO/ChunkReader.h"
+#include "IO/LEB128.h"
+
+struct ChunkId;
+struct LEB128;
+
 #define DoSomethingWithRooms ((void (__cdecl*)()) 0x004774D0)
 #define FreeItemsStuff ((void (__cdecl*)(__int32)) 0x00440590)
 #define InitialiseClosedDoors ((void (__cdecl*)()) 0x00473600) 
@@ -17,7 +24,7 @@
 #define FileOpen ((FILE* (__cdecl*)(char*)) 0x004A3CD0)
 #define FileClose ((void (__cdecl*)(FILE*)) 0x004A3DA0)
 #define LoadSprites ((void (__cdecl*)()) 0x004A59D0)
-#define LoadCameras ((void (__cdecl*)()) 0x004A5CA0)
+//#define LoadCameras ((void (__cdecl*)()) 0x004A5CA0)
 #define LoadSoundEffects ((void (__cdecl*)()) 0x004A5D90)
 #define LoadBoxes ((void (__cdecl*)()) 0x004A5E50)
 #define LoadAnimatedTextures ((void (__cdecl*)()) 0x004A6060)
@@ -53,6 +60,7 @@ extern vector<__int32> StaticObjectsIds;
 extern __int32* RawMeshPointers;
 extern __int16* RawMeshData;
 extern __int32 NumObjectTextures;
+extern char* LevelDataPtr;
 
 void __cdecl LoadTextures();
 __int32 __cdecl LoadRoomsNew();
@@ -61,8 +69,14 @@ void __cdecl LoadObjects();
 __int32 __cdecl S_LoadLevelFile(__int32 levelIndex);
 void __cdecl FreeLevel();
 void __cdecl AdjustUV(__int32 num);
-void __cdecl LoadNewData();
+void __cdecl LoadCameras();
 
 unsigned __stdcall LoadLevel(void* data);
+
+// New functions for loading data from TR5M footer
+bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize);
+bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize);
+bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize);
+void __cdecl LoadNewData(__int32 size);
 
 void Inject_RoomLoad();

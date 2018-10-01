@@ -4,11 +4,23 @@
 #include "..\Specific\setup.h"
 #include "..\Game\draw.h"
 #include "..\Game\lot.h"
+#include "..\Game\savegame.h"
+
+#include "IO/ChunkId.h"
+#include "IO/ChunkReader.h"
+#include "IO/ChunkWriter.h" 
+#include "IO/LEB128.h"
 
 #include <process.h>
 #include <stdio.h>
 #include <vector>
 #include <map>
+#include "IO/Streams.h"
+
+ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
+ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
+ChunkId* ChunkLuaIds = ChunkId::FromString("Tr5LuaIds");
+ChunkId* ChunkLuaId = ChunkId::FromString("Tr5LuaId");
 
 extern GameScript* g_GameScript;
 
@@ -25,6 +37,8 @@ __int32 NumMeshPointers;
 __int32 NumObjectTextures;
 
 uintptr_t hLoadLevel;
+unsigned __int32 ThreadId;
+__int32 IsLevelLoading;
 
 using namespace std;
 
@@ -33,6 +47,9 @@ vector<__int32> StaticObjectsIds;
 
 extern GameFlow* g_GameFlow;
 extern __int16 LaraVehicle;
+char* LevelDataPtr;
+
+ChunkReader* chunkIO;
 
 __int16 ReadInt16()
 {
@@ -287,6 +304,23 @@ void __cdecl LoadObjects()
 	MoveablesIds.push_back(ID_DEFAULT_SPRITES);
 }
 
+void __cdecl LoadCameras()
+{
+	NumberCameras = ReadInt32();
+	if (NumberCameras != 0)
+	{
+		Cameras = (OBJECT_VECTOR*)GameMalloc(NumberCameras * sizeof(OBJECT_VECTOR));
+		ReadBytes(Cameras, NumberCameras * sizeof(OBJECT_VECTOR));
+	}
+
+	NumberSpotcams = ReadInt32();
+
+	if (NumberSpotcams != 0)
+	{
+		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
+	}
+}
+
 void __cdecl LoadTextures()
 {
 	DB_Log(2, "LoadTextures - DLL");
@@ -422,6 +456,7 @@ void __cdecl FreeLevel()
 	MallocPtr = MallocBuffer;
 	MallocFree = MallocSize;
 	g_Renderer->FreeRendererData();
+	g_GameScript->FreeLevelScripts();
 }
 
 unsigned __stdcall LoadLevel(void* data)
@@ -479,9 +514,20 @@ unsigned __stdcall LoadLevel(void* data)
 		LoadAIObjects();
 		LoadDemoData();
 		LoadSamples();
-		
-		LoadNewData();
 
+		__int32 extraSize = 0;
+		ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
+		if (extraSize > 0)
+		{
+			ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
+			//free(LevelDataPtr);
+			LevelDataPtr = (char*)malloc(extraSize);
+			ReadFileEx(LevelDataPtr, extraSize, 1, LevelFilePtr);
+
+			LoadNewData(extraSize);
+		}
+
+		//free(LevelDataPtr);
 		LevelDataPtr = NULL;
 		FileClose(LevelFilePtr);
 	}
@@ -491,7 +537,7 @@ unsigned __stdcall LoadLevel(void* data)
 	}
 	 
 	g_Renderer->PrepareDataForTheRenderer();
-
+	
 	// Initialise the game
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -506,6 +552,7 @@ unsigned __stdcall LoadLevel(void* data)
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
 	LaraVehicle = -1;
+	g_GameScript->AssignVariables();
 
 	// Level loaded
 	IsLevelLoading = false;
@@ -545,32 +592,33 @@ void __cdecl AdjustUV(__int32 num)
 	NumObjectTextures = num;
 }
 
-void __cdecl LoadNewData()
+bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize)
 {
-	// Free old level scripts
-	g_GameScript->FreeLevelScripts();
-
-	// Check for magic word
-	__int32 magicWord;
-	ReadFileEx(&magicWord, 1, 4, LevelFilePtr);
-	if (magicWord != 0x5455354D)
-		return;
-
-	// Load LUA triggers
-	__int32 numTriggers;
-	ReadFileEx(&numTriggers, 1, 4, LevelFilePtr);
-	for (__int32 i = 0; i < numTriggers; i++)
+	if (chunkId->EqualsTo(ChunkLuaId))
 	{
-		__int32 strSize;
-		ReadFileEx(&strSize, 1, 4, LevelFilePtr);
-		char* functionName = (char*)malloc(strSize + 1);
-		ZeroMemory(functionName, strSize + 1);
-		ReadFileEx(functionName, strSize, 1, LevelFilePtr);
+		__int32 luaId = 0;
+		chunkIO->GetRawStream()->ReadInt32(&luaId);
+		
+		__int32 itemId = 0;
+		chunkIO->GetRawStream()->ReadInt32(&itemId);
 
-		ReadFileEx(&strSize, 1, 4, LevelFilePtr);
-		char* functionCode = (char*)malloc(strSize + 1);
-		ZeroMemory(functionCode, strSize + 1);
-		ReadFileEx(functionCode, strSize, 1, LevelFilePtr);
+		g_GameScript->AddLuaId(luaId, itemId);
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize)
+{
+	if (chunkId->EqualsTo(ChunkTrigger))
+	{
+		char* functionName = NULL;
+		chunkIO->GetRawStream()->ReadString(&functionName);
+		
+		char* functionCode = NULL;
+		chunkIO->GetRawStream()->ReadString(&functionCode);
 
 		LuaFunction* function = new LuaFunction();
 		function->Name = string(functionName);
@@ -581,7 +629,51 @@ void __cdecl LoadNewData()
 
 		delete functionName;
 		delete functionCode;
+
+		return true;
 	}
+	else
+		return false;
+}
+
+bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize)
+{
+	if (chunkId->EqualsTo(ChunkTriggersList))
+		return chunkIO->ReadChunks(ReadLuaTriggers);
+	else if (chunkId->EqualsTo(ChunkLuaIds))
+		return chunkIO->ReadChunks(ReadLuaIds);
+	return false;
+}
+
+//ChunkWriter* writer;
+
+void __cdecl SaveTest()
+{
+
+}
+
+void __cdecl LoadNewData(__int32 size)
+{
+	// Free old level scripts
+	//g_GameScript->FreeLevelScripts();
+	MemoryStream stream(LevelDataPtr, size);
+	chunkIO = new ChunkReader(0x4D355254, &stream);
+	if (!chunkIO->IsValid())
+		return;
+
+	chunkIO->ReadChunks(ReadNewDataChunks);
+
+	/*ChunkId* testChunkId = ChunkId::FromString("TR5MSavItems");
+	FileStream fs("H:\\test.sav");
+	writer = new ChunkWriter(0x4D355254, &fs);
+	writer->WriteChunkInt(testChunkId, 1234);
+	fs.Close();*/
+
+	SaveGame::Save((char*)"H:\\test.sav");
+
+	/*SaveGame* sg = new SaveGame();
+	sg->Save("H:\\test.sav");
+	delete sg;*/
 }
 
 void Inject_RoomLoad()
@@ -593,4 +685,5 @@ void Inject_RoomLoad()
 	INJECT(0x0040130C, S_LoadLevelFile);
 	INJECT(0x004A7130, FreeLevel);
 	INJECT(0x004A5430, AdjustUV);
+	INJECT(0x004A5CA0, LoadCameras);
 }

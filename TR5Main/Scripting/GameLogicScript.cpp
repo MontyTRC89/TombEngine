@@ -10,14 +10,37 @@ GameScript::GameScript(sol::state* lua)
 {
 	m_lua = lua;
 
+	// Add constants
 	(*m_lua)["HIT_POINTS"] = ITEM_PARAM_HIT_POINTS;
 	(*m_lua)["CURRENT_ANIM_STATE"] = ITEM_PARAM_CURRENT_ANIM_STATE;
 	(*m_lua)["ANIM_NUMBER"] = ITEM_PARAM_ANIM_NUMBER;
-	
+	(*m_lua)["GOAL_ANIM_STATE"] = ITEM_PARAM_GOAL_ANIM_STATE;
+	(*m_lua)["REQUIRED_ANIM_STATE"] = ITEM_PARAM_REQUIRED_ANIM_STATE;
+	(*m_lua)["FRAME_NUMBER"] = ITEM_PARAM_FRAME_NUMBER;
+	(*m_lua)["HIT_POINTS"] = ITEM_PARAM_HIT_POINTS;
+	(*m_lua)["HIT_STATUS"] = ITEM_PARAM_HIT_STATUS;
+	(*m_lua)["GRAVITY_STATUS"] = ITEM_PARAM_GRAVITY_STATUS;
+	(*m_lua)["COLLIDABLE"] = ITEM_PARAM_COLLIDABLE;
+	(*m_lua)["POISONED"] = ITEM_PARAM_POISONED;
+	(*m_lua)["ROOM_NUMBER"] = ITEM_PARAM_ROOM_NUMBER;
+
+	// Add the item type
+	m_lua->new_usertype<GameScriptItemPosition>("ItemPosition",
+		"x", &GameScriptItemPosition::x,
+		"y", &GameScriptItemPosition::y,
+		"z", &GameScriptItemPosition::z,
+		"xRot", &GameScriptItemPosition::xRot,
+		"yRot", &GameScriptItemPosition::yRot,
+		"zRot", &GameScriptItemPosition::zRot,
+		"room", &GameScriptItemPosition::room
+		);
+
 	m_lua->new_usertype<GameScriptItem>("Item",
-		sol::constructors<GameScriptItem(ITEM_INFO*)>(),
 		"Get", &GameScriptItem::Get,
-		"Set", &GameScriptItem::Set
+		"Set", &GameScriptItem::Set,
+		"GetPosition", &GameScriptItem::GetItemPosition,
+		"SetPosition", &GameScriptItem::SetItemPosition,
+		"SetRotation", &GameScriptItem::SetItemRotation
 		);
 	
 	// GameScript type
@@ -31,22 +54,16 @@ GameScript::GameScript(sol::state* lua)
 		"SetSecretsCount", &GameScript::SetSecretsCount,
 		"AddOneSecret", &GameScript::AddOneSecret,
 		"JumpToLevel", &GameScript::JumpToLevel,
-		"GetItem", &GameScript::GetItem
+		"GetItem", &GameScript::GetItem,
+		"PlaySoundEffect", &GameScript::PlaySoundEffect,
+		"PlaySoundEffectAtPosition", &GameScript::PlaySoundEffectAtPosition
 		);
 
+	// Add global variables and namespaces
 	(*m_lua)["TR"] = this;
 
-	// DEBUG: just for testing
-	LuaFunction* function = new LuaFunction();
-	function->Name = "Trigger_0";
-	function->Code = "function Trigger_0() \n TR:EnableItem(2); \n TR:PlayAudioTrack(15); \n item = TR:GetItem(2); \n item:Set(HIT_POINTS, -16384); \n return true; \n end";
-	m_lua->script(function->Code);
-	Triggers.push_back(function);
-	
-	m_itemsMap.insert(pair<__int16, __int16>(0, 0));
-	m_itemsMap.insert(pair<__int16, __int16>(9, 9));
-	m_itemsMap.insert(pair<__int16, __int16>(10, 10));
-	m_itemsMap.insert(pair<__int16, __int16>(2, 8));
+	m_locals = (*m_lua).create_table("Locals");
+	m_globals = (*m_lua).create_table("Globals");
 }
 
 GameScript::~GameScript()
@@ -56,22 +73,32 @@ GameScript::~GameScript()
 
 void GameScript::AddTrigger(LuaFunction* function)
 {
-	Triggers.push_back(function);
+	m_triggers.push_back(function);
 	(*m_lua).script(function->Code);
+}
+
+void GameScript::AddLuaId(int luaId, int itemId)
+{
+	m_itemsMap.insert(pair<__int32, __int32>(luaId, itemId));
 }
 
 void GameScript::FreeLevelScripts()
 {
 	// Delete all triggers
-	for (__int32 i = 0; i < Triggers.size(); i++)
+	for (__int32 i = 0; i < m_triggers.size(); i++)
 	{
-		LuaFunction* trigger = Triggers[i];
+		LuaFunction* trigger = m_triggers[i];
 		char* name = (char*)trigger->Name.c_str();
 		(*m_lua)[name] = NULL;
-		delete Triggers[i];
+		delete m_triggers[i];
 	}
+	m_triggers.clear();
 
-	Triggers.clear();
+	// Clear the items mapping
+	m_itemsMap.clear();
+
+	(*m_lua)["Lara"] = NULL;
+	//delete m_Lara;
 }
 
 string GameScript::loadScriptFromFile(char* luaFilename)
@@ -98,10 +125,10 @@ bool GameScript::ExecuteScript(char* luaFilename)
 bool GameScript::ExecuteTrigger(__int16 index)
 {
 	// Is this a valid trigger?
-	if (index >= Triggers.size())
+	if (index >= m_triggers.size())
 		return true;
 
-	LuaFunction* trigger = Triggers[index];
+	LuaFunction* trigger = m_triggers[index];
 
 	// We want to execute a trigger just one time 
 	// TODO: implement in the future continoous trigger?
@@ -115,7 +142,16 @@ bool GameScript::ExecuteTrigger(__int16 index)
 	bool result = (*m_lua)[name]();
 
 	// Trigger was executed, don't execute it anymore
-	Triggers[index]->Executed = result;
+	trigger->Executed = result;
+
+	m_locals.for_each([&](sol::object const& key, sol::object const& value) {
+		if (value.is<bool>())
+			std::cout << key.as<string>() << " " << value.as<bool>() << std::endl;
+		else if (value.is<string>())
+			std::cout << key.as<string>() << " " << value.as<string>() << std::endl;
+		else
+			std::cout << key.as<string>() << " " << value.as<int>() << std::endl;		
+	});
 
 	return result;
 }
@@ -259,13 +295,52 @@ void GameScript::MakeItemInvisible(__int16 id)
 GameScriptItem GameScript::GetItem(__int16 id)
 {
 	if (m_itemsMap.find(id) == m_itemsMap.end())
-		return NULL;
+		throw "Item not found";
 
 	__int16 itemNum = m_itemsMap[id];
-	ITEM_INFO* item = &Items[itemNum];
-	GameScriptItem scriptItem = GameScriptItem(item);
+	return m_items[itemNum];
+}
 
-	return scriptItem;
+void GameScript::PlaySoundEffectAtPosition(__int16 id, __int32 x, __int32 y, __int32 z, __int32 flags)
+{
+	PHD_3DPOS pos;
+
+	pos.xPos = x;
+	pos.yPos = y;
+	pos.zPos = z;
+	pos.xRot = 0;
+	pos.yRot = 0;
+	pos.zRot = 0;
+
+	SoundEffect(id, &pos, flags);
+}
+
+void GameScript::PlaySoundEffect(__int16 id, __int32 flags)
+{
+	SoundEffect(id, NULL, flags);
+}
+
+void GameScript::AssignVariables()
+{
+	for (__int32 i = 0; i < NUM_ITEMS; i++)
+		m_items[i].NativeItem = NULL;
+
+	for (__int32 i = 0; i < NumItems; i++)
+		m_items[i].NativeItem = &Items[i];
+
+	(*m_lua)["Lara"] = m_items[Lara.itemNumber];
+}
+
+void GameScript::ResetVariables()
+{
+	(*m_lua)["Lara"] = NULL;
+}
+
+void GameScript::SetItem(__int32 index, ITEM_INFO* item)
+{
+	if (index >= NUM_ITEMS)
+		return;
+	m_items[index].NativeItem = item;
 }
 
 GameScript* g_GameScript;

@@ -300,6 +300,21 @@
     <ClInclude Include="Scripting\GameLogicScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Specific\IO\ChunkReader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\IO\LEB128.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\IO\ChunkId.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\IO\Streams.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\IO\ChunkWriter.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">

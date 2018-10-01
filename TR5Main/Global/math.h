@@ -11,6 +11,7 @@
 
 #define ONE_DEGREE 182
 #define ANGLE(x) ((x) * 65536.0 / 360.0)
+#define TR_ANGLE_TO_DEGREES(x) ((x) / 65536.0 * 360.0)
 #define TR_ANGLE_TO_RAD(x) ((x) / 65536.0 * 360.0 * RADIAN)
 
 #define SQRT_ASM ((int (__cdecl*)(int)) 0x0048F980)
