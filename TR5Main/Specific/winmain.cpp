@@ -12,6 +12,7 @@
 #include "..\Game\inventory.h"
 #include "..\Game\control.h"
 #include "..\Game\gameflow.h"
+#include "..\Game\savegame.h"
 
 WINAPP	 App;
 unsigned int threadId;
@@ -66,6 +67,9 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_GameFlow->ExecuteScript("Scripts\\Gameflow.lua");
 
 	g_GameScript = new GameScript(&luaState);
+
+	// Initialise chunks for savegames
+	SaveGame::Start();
 
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = NULL;
@@ -163,11 +167,11 @@ __int32 __cdecl WinClose()
 
 	DestroyAcceleratorTable(hAccTable);
 	
-	//Sound_DeInit();
-
 	delete g_Renderer;
 	delete g_Inventory;
 	delete g_GameFlow;
+
+	SaveGame::End();
 
 	return 0;
 }

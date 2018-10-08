@@ -552,7 +552,7 @@ unsigned __stdcall LoadLevel(void* data)
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
 	LaraVehicle = -1;
-	g_GameScript->AssignVariables();
+	g_GameScript->AssignItemsAndLara();
 
 	// Level loaded
 	IsLevelLoading = false;

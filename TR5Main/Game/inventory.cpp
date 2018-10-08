@@ -1157,8 +1157,15 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					CreateSavegame();
-					WriteSavegame(selectedSavegame);
+					//CreateSavegame();
+					//WriteSavegame(selectedSavegame);
+
+					// Use the new savegame system
+					char fileName[255];
+					ZeroMemory(fileName, 255);
+					sprintf(fileName, "savegame.%d", selectedSavegame);
+					SaveGame::Save(fileName);
+
 					moveLeft = false;
 					moveRight = false;
 					closePassport = true;

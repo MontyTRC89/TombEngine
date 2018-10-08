@@ -7,6 +7,11 @@
 #include <fstream>
 #include <map>
 #include "..\Global\global.h"
+#include "..\Specific\IO\ChunkId.h"
+#include "..\Specific\IO\ChunkReader.h"
+#include "..\Specific\IO\ChunkWriter.h"
+#include "..\Specific\IO\LEB128.h"
+#include "..\Specific\IO\Streams.h"
 
 using namespace std;
 
@@ -21,6 +26,11 @@ using namespace std;
 #define ITEM_PARAM_COLLIDABLE				8
 #define ITEM_PARAM_POISONED					9
 #define ITEM_PARAM_ROOM_NUMBER				10
+
+#define LUA_VARIABLE_TYPE_INT				0
+#define LUA_VARIABLE_TYPE_BOOL				1
+#define LUA_VARIABLE_TYPE_FLOAT				2
+#define LUA_VARIABLE_TYPE_STRING			3
 
 typedef struct LuaFunction {
 	string Name;
@@ -150,6 +160,16 @@ typedef struct GameScriptItem {
 	}
 };
 
+typedef struct LuaVariable
+{
+	string Name;
+	__int32 Type;
+	float FloatValue;
+	__int32 IntValue;
+	string StringValue;
+	bool BoolValue;
+};
+
 class GameScript
 {
 private:
@@ -171,8 +191,12 @@ public:
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, int itemId);
 	void								SetItem(__int32 index, ITEM_INFO* item);
-	void								AssignVariables();
+	void								AssignItemsAndLara();
 	void								ResetVariables();
+	void								GetGlobalVariables(vector<LuaVariable>* list);
+	void								GetLocalVariables(vector<LuaVariable>* list);
+	void								SetGlobalVariables(vector<LuaVariable>* list);
+	void								SetLocalVariables(vector<LuaVariable>* list);
 
 	void								EnableItem(__int16 id);
 	void								DisableItem(__int16 id);

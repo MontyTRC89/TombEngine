@@ -24,6 +24,7 @@ private:
 	static FileStream* m_stream;
 	static ChunkReader* m_reader;
 	static ChunkWriter* m_writer;
+	static vector<LuaVariable> m_luaVariables;
 
 	static ChunkId* m_chunkHeader;
 	static ChunkId* m_chunkGameStatus;
@@ -39,7 +40,12 @@ private:
 	static void SaveLara(__int32 param);
 	static void SaveItem(__int32 param);
 	static void SaveItems(__int32 param);
+	static void SaveVariables(__int32 param);
+	static void SaveVariable(__int32 param);
 
 public:
-	static bool Save(char* fileName);
+	static void Start();
+	static void End();
+
+	static bool Save(char* fileName); 
 };

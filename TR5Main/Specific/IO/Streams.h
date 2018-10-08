@@ -65,12 +65,22 @@ public:
 
 	bool WriteInt16(__int16* value)
 	{
-		return Write(reinterpret_cast<char*>(value), 3);
+		return Write(reinterpret_cast<char*>(value), 2);
 	}
 
 	bool WriteInt32(__int32* value)
 	{
 		return Write(reinterpret_cast<char*>(value), 4);
+	}
+
+	bool WriteBool(bool* value)
+	{
+		return Write(reinterpret_cast<char*>(value), 1);
+	}
+
+	bool WriteFloat(float* value)
+	{
+		return Write(reinterpret_cast<char*>(value), 1);
 	}
 
 	bool WriteString(char* str)

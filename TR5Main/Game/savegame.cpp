@@ -4,6 +4,7 @@
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
 ChunkWriter* SaveGame::m_writer;
+vector<LuaVariable> SaveGame::m_luaVariables;
 
 ChunkId* SaveGame::m_chunkHeader;
 ChunkId* SaveGame::m_chunkGameStatus;
@@ -81,7 +82,41 @@ void SaveGame::SaveLara(__int32 param)
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
 }
 
-bool SaveGame::Save(char* fileName)
+void SaveGame::SaveVariables(__int32 param)
+{
+	m_luaVariables.clear();
+	g_GameScript->GetLocalVariables(&m_luaVariables);
+	for (__int32 i = 0; i < m_luaVariables.size(); i++)
+	{
+		m_writer->WriteChunk(m_chunkLuaLocal, &SaveVariable, i);
+	}
+
+	m_luaVariables.clear();
+	g_GameScript->GetGlobalVariables(&m_luaVariables);
+	for (__int32 i = 0; i < m_luaVariables.size(); i++)
+	{
+		m_writer->WriteChunk(m_chunkLuaGlobal, &SaveVariable, i);
+	}
+}
+
+void SaveGame::SaveVariable(__int32 param)
+{
+	LuaVariable variable = m_luaVariables[param];
+	
+	LEB128::Write(m_stream, LUA_VARIABLE_TYPE_BOOL);
+	m_stream->WriteString((char*)variable.Name.c_str());
+
+	if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
+		m_stream->WriteBool(&variable.BoolValue);
+	else if (variable.Type == LUA_VARIABLE_TYPE_INT)
+		m_stream->WriteInt32(&variable.IntValue);
+	else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
+		m_stream->WriteString((char*)variable.StringValue.c_str());
+	else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
+		m_stream->WriteFloat(&variable.FloatValue);
+}
+
+void SaveGame::Start()
 {
 	m_chunkHeader = ChunkId::FromString("TR5MSgHeader");
 	m_chunkGameStatus = ChunkId::FromString("TR5MSgGameStatus");
@@ -91,19 +126,10 @@ bool SaveGame::Save(char* fileName)
 	m_chunkLuaVariables = ChunkId::FromString("TR5MSgLuaVars");
 	m_chunkLuaLocal = ChunkId::FromString("TR5MSgLuaL");
 	m_chunkLuaGlobal = ChunkId::FromString("TR5MSgLuaG");
+}
 
-	m_stream = new FileStream(fileName);
-	m_writer = new ChunkWriter(0x4D355254, m_stream);
-
-	m_writer->WriteChunk(m_chunkHeader, &SaveHeader, 0);
-	m_writer->WriteChunk(m_chunkLara, &SaveLara, 0);
-	m_writer->WriteChunkWithChildren(m_chunkItems, &SaveItems, 0);
-
-	m_stream->Close();
-
-	delete m_writer;
-	delete m_stream;
-
+void SaveGame::End()
+{
 	delete m_chunkHeader;
 	delete m_chunkGameStatus;
 	delete m_chunkItems;
@@ -112,6 +138,25 @@ bool SaveGame::Save(char* fileName)
 	delete m_chunkLuaVariables;
 	delete m_chunkLuaLocal;
 	delete m_chunkLuaGlobal;
+}
+
+bool SaveGame::Save(char* fileName)
+{
+	m_stream = new FileStream(fileName);
+	m_writer = new ChunkWriter(0x4D355254, m_stream);
+
+	m_writer->WriteChunk(m_chunkHeader, &SaveHeader, 0);
+	m_writer->WriteChunk(m_chunkLara, &SaveLara, 0);
+	m_writer->WriteChunkWithChildren(m_chunkItems, &SaveItems, 0);
+	SaveVariables(0);
+
+	__int32 eof = 0;
+	m_stream->WriteInt32(&eof);
+
+	m_stream->Close();
+
+	delete m_writer;
+	delete m_stream;
 
 	return true;
 }
