@@ -32,12 +32,22 @@ public:
 		return Read(reinterpret_cast<char*>(value), 1);
 	}
 
+	bool ReadBool(bool* value)
+	{
+		return Read(reinterpret_cast<char*>(value), 1);
+	}
+
 	bool ReadInt16(__int16* value)
 	{
 		return Read(reinterpret_cast<char*>(value), 2);
 	}
 
 	bool ReadInt32(__int32* value)
+	{
+		return Read(reinterpret_cast<char*>(value), 4);
+	}
+
+	bool ReadFloat(float* value)
 	{
 		return Read(reinterpret_cast<char*>(value), 4);
 	}
@@ -58,35 +68,35 @@ public:
 		return Write(reinterpret_cast<char*>(value), length);
 	}
 
-	bool WriteByte(byte* value)
+	bool WriteByte(byte value)
 	{
-		return Write(reinterpret_cast<char*>(value), 1);
+		return Write(reinterpret_cast<char*>(&value), 1);
 	}
 
-	bool WriteInt16(__int16* value)
+	bool WriteInt16(__int16 value)
 	{
-		return Write(reinterpret_cast<char*>(value), 2);
+		return Write(reinterpret_cast<char*>(&value), 2);
 	}
 
-	bool WriteInt32(__int32* value)
+	bool WriteInt32(__int32 value)
 	{
-		return Write(reinterpret_cast<char*>(value), 4);
+		return Write(reinterpret_cast<char*>(&value), 4);
 	}
 
-	bool WriteBool(bool* value)
+	bool WriteBool(bool value)
 	{
-		return Write(reinterpret_cast<char*>(value), 1);
+		return Write(reinterpret_cast<char*>(&value), 1);
 	}
 
-	bool WriteFloat(float* value)
+	bool WriteFloat(float value)
 	{
-		return Write(reinterpret_cast<char*>(value), 1);
+		return Write(reinterpret_cast<char*>(&value), 4);
 	}
 
 	bool WriteString(char* str)
 	{
 		__int32 length = (__int32)strlen(str);
-		WriteInt32(&length);
+		WriteInt32(length);
 		Write(str, length);
 		return true;
 	}

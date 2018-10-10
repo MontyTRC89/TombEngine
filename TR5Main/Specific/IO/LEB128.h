@@ -79,7 +79,7 @@ typedef struct LEB128 {
 			byte currentByte = ((byte)(value & 0x7F));
 			if (maximumSize >> 6 == 0 || maximumSize >> 6 == -1)
 			{
-				stream->WriteByte(&currentByte);
+				stream->WriteByte(currentByte);
 
 				if (value >> 6 != 0 && value >> 6 != -1)
 					throw "Unable to write integer because the available space overflowed.";
@@ -88,7 +88,7 @@ typedef struct LEB128 {
 			}
 
 			byte b = currentByte | 0x80;
-			stream->WriteByte(&b);
+			stream->WriteByte(b);
 
 			// Move data to next byte
 			value >>= 7;

@@ -8,7 +8,7 @@ typedef struct LaraExtraInfo {
 	__int32 overrideObject;
 };
 
-extern LaraExtraInfo g_LaraExtra;
+extern __int16 LaraVehicle;
 
 #define LookUpDown ((void (__cdecl*)()) 0x0044D310)
 #define LookLeftRight ((void (__cdecl*)()) 0x0044D440)

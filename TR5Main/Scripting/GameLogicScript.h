@@ -162,6 +162,7 @@ typedef struct GameScriptItem {
 
 typedef struct LuaVariable
 {
+	bool IsGlobal;
 	string Name;
 	__int32 Type;
 	float FloatValue;
@@ -193,10 +194,8 @@ public:
 	void								SetItem(__int32 index, ITEM_INFO* item);
 	void								AssignItemsAndLara();
 	void								ResetVariables();
-	void								GetGlobalVariables(vector<LuaVariable>* list);
-	void								GetLocalVariables(vector<LuaVariable>* list);
-	void								SetGlobalVariables(vector<LuaVariable>* list);
-	void								SetLocalVariables(vector<LuaVariable>* list);
+	void								GetVariables(vector<LuaVariable>* list);
+	void								SetVariables(vector<LuaVariable>* list);
 
 	void								EnableItem(__int16 id);
 	void								DisableItem(__int16 id);

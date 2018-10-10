@@ -31,21 +31,27 @@ private:
 	static ChunkId* m_chunkItems;
 	static ChunkId* m_chunkItem;
 	static ChunkId* m_chunkLara;
-	static ChunkId* m_chunkLuaVariables;
-	static ChunkId* m_chunkLuaLocal;
-	static ChunkId* m_chunkLuaGlobal;
+	static ChunkId* m_chunkLuaVariable;
 
-	static void SaveHeader(__int32 param);
-	static void SaveGameStatus(__int32 param);
-	static void SaveLara(__int32 param);
-	static void SaveItem(__int32 param);
-	static void SaveItems(__int32 param);
-	static void SaveVariables(__int32 param);
-	static void SaveVariable(__int32 param);
+	static void saveHeader(__int32 param);
+	static void saveGameStatus(__int32 param);
+	static void saveLara(__int32 param);
+	static void saveItem(__int32 param);
+	static void saveItems(__int32 param);
+	static void saveVariables(__int32 param);
+	static void saveVariable(__int32 param);
+
+	static bool readHeader();
+	static bool readGameStatus();
+	static bool readLara();
+	static bool readItem();
+	static bool readVariable();
+	static bool readSavegameChunks(ChunkId* chunkId, __int32 maxSize);
 
 public:
 	static void Start();
 	static void End();
 
+	static bool Load(char* fileName);
 	static bool Save(char* fileName); 
 };

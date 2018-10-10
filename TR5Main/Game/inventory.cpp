@@ -127,31 +127,31 @@ void Inventory::Initialise()
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZIS);
 
 		if (Lara.numUziAmmo)
-			InsertObject(INV_RING_WEAPONS, 18);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZI_AMMO);
 		
 		if (Lara.sixshooterTypeCarried & 1)
 		{
 			if (Lara.sixshooterTypeCarried & 4)
-				InsertObject(INV_RING_WEAPONS, 4);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_LASER);
 			else
-				InsertObject(INV_RING_WEAPONS, 3);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER);
 		}
 		
 		if (Lara.numRevolverAmmo)
-			InsertObject(INV_RING_WEAPONS, 17);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_AMMO);
 		
 		if (Lara.shotgunTypeCarried & 1)
 		{
-			InsertObject(INV_RING_WEAPONS, 2);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN);
 			//if (Lara.shotgunTypeCarried & 0x10)
 			//	CurrentShotGunAmmoType = 1;
 		}
 		else
 		{
 			if (Lara.numShotgunAmmo1)
-				InsertObject(INV_RING_WEAPONS, 9);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN_AMMO1);
 			if (Lara.numShotgunAmmo2)
-				InsertObject(INV_RING_WEAPONS, 10);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
 		if (Lara.HKtypeCarried & 1)
@@ -172,7 +172,7 @@ void Inventory::Initialise()
 		}
 		
 		if (Lara.numHKammo1)
-			InsertObject(INV_RING_WEAPONS, 14);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_AMMO1);
 		
 		if (Lara.crossbowTypeCarried & 1)
 		{
@@ -201,37 +201,37 @@ void Inventory::Initialise()
 		}
 
 		if (Lara.numCrossbowAmmo1)
-			InsertObject(INV_RING_WEAPONS, 96);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO1);
 
 		if (Lara.laserSight)
-			InsertObject(INV_RING_WEAPONS, 20);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_LASERSIGHT);
 
 		if (Lara.silencer)
-			InsertObject(INV_RING_WEAPONS, 21);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SILENCER);
 
 		if (Lara.binoculars)
-			InsertObject(INV_RING_WEAPONS, 24);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_BINOCULARS);
 
 		if (Lara.numFlares)
-			InsertObject(INV_RING_WEAPONS, 25);
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_FLARES);
 	}
 
 	//InsertObject(INV_RING_OPTIONS, 26);
 
 	if (Lara.numSmallMedipack)
-		InsertObject(INV_RING_WEAPONS, 23);
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_SMALL_MEDIPACK);
 
 	if (Lara.numLargeMedipack)
-		InsertObject(INV_RING_WEAPONS, 22);
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_LARGE_MEDIPACK);
 
 	if (Lara.crowbar)
-		InsertObject(INV_RING_WEAPONS, 90);
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROWBAR);
 
 	__int32 i = 0;
 	do
 	{
 		if (Lara.puzzleItems[i])
-			InsertObject(INV_RING_PUZZLES, i + 29);
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1);
 		i++;
 	} while (i < 8);
 
@@ -239,7 +239,7 @@ void Inventory::Initialise()
 	do
 	{
 		if ((1 << i) & Lara.puzzleItemsCombo)
-			InsertObject(INV_RING_PUZZLES, i + 37);
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1_COMBO1);
 		i++;
 	} while (i < 16);
 
@@ -247,7 +247,7 @@ void Inventory::Initialise()
 	do
 	{
 		if ((1 << i) & Lara.keyItems)
-			InsertObject(INV_RING_PUZZLES, i + 53);
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1);
 		i++;
 	} while (i < 8);
 
@@ -255,7 +255,7 @@ void Inventory::Initialise()
 	do
 	{
 		if ((1 << i) & Lara.keyItemsCombo)
-			InsertObject(INV_RING_PUZZLES, i + 61);
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1_COMBO1);
 		i++;
 	} while (i < 16);
 
@@ -263,7 +263,7 @@ void Inventory::Initialise()
 	do
 	{
 		if ((1 << i) & Lara.pickupItems)
-			InsertObject(INV_RING_PUZZLES, i + 77);
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1);
 		i++;
 	} while (i < 4);
 
@@ -271,27 +271,27 @@ void Inventory::Initialise()
 	do
 	{
 		if ((1 << i) & Lara.pickupItemsCombo)
-			InsertObject(INV_RING_PUZZLES, i + 81);
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1_COMBO1);
 		i++;
 	} while (i < 8);
 
 	if (Lara.examine1)
-		InsertObject(INV_RING_PUZZLES, 91);
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_EXAMINE1);
 
 	if (Lara.examine2)
-		InsertObject(INV_RING_PUZZLES, 92);
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_EXAMINE2);
 
 	if (Lara.examine3)
-		InsertObject(INV_RING_PUZZLES, 93);
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_EXAMINE3);
 
 	if (Lara.wetcloth == 2)
-		InsertObject(INV_RING_PUZZLES, 94);
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WETCLOTH1);
 
 	if (Lara.wetcloth == 1)
-		InsertObject(INV_RING_PUZZLES, 97);
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WETCLOTH2);
 
 	if (Lara.bottle)
-		InsertObject(INV_RING_PUZZLES, 98);
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_BOTTLE);
 
 	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
 

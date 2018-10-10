@@ -48,10 +48,8 @@ public:
 	{
 		m_stream = stream;
 
-		__int32 value = 0;
-
-		m_stream->WriteInt32(&magicNumber);
-		m_stream->WriteInt32(&value);
+		m_stream->WriteInt32(magicNumber);
+		m_stream->WriteInt32(0);
 	}
 
 	BaseStream* GetRawStream()
@@ -61,8 +59,7 @@ public:
 
 	void WriteChunkEnd()
 	{
-		byte value = 0;
-		m_stream->WriteByte(&value);
+		m_stream->WriteByte(0);
 	}
 
 	void WriteChunkEmpty(ChunkId* chunkID)

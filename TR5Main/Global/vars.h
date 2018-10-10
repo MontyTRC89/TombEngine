@@ -81,6 +81,7 @@
 
 // Game
 #define FlipStatus					VAR_U_(0x00EEEAE0, int)
+#define FlipStats					ARRAY_(0x00EEF060, __int32, [255])
 #define WindowsHandle				VAR_U_(0x00D9AB3C, HWND)
 #define SoundActive					VAR_U_(0x0051D004, __int32)
 #define DoTheGame					VAR_U_(0x00876C40, __int32)
@@ -89,6 +90,7 @@
 #define CutSeqTriggered				VAR_U_(0x0051CAAC, __int32)
 #define GlobalPlayingCutscene		VAR_U_(0x0051CAB0, __int32)
 #define Wibble						VAR_U_(0x0051CDF0, __int32)
+#define CdFlags						ARRAY_(0x00EEEA40, byte, [136])
 
 // Input
 #define DbInput						VAR_U_(0x00878DAC, __int32)

@@ -662,18 +662,6 @@ void __cdecl LoadNewData(__int32 size)
 		return;
 
 	chunkIO->ReadChunks(ReadNewDataChunks);
-
-	/*ChunkId* testChunkId = ChunkId::FromString("TR5MSavItems");
-	FileStream fs("H:\\test.sav");
-	writer = new ChunkWriter(0x4D355254, &fs);
-	writer->WriteChunkInt(testChunkId, 1234);
-	fs.Close();*/
-
-	SaveGame::Save((char*)"H:\\test.sav");
-
-	/*SaveGame* sg = new SaveGame();
-	sg->Save("H:\\test.sav");
-	delete sg;*/
 }
 
 void Inject_RoomLoad()
