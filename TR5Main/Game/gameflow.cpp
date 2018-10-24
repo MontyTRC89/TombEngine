@@ -10,6 +10,7 @@
 using namespace std;
 
 SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
+SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];
 vector<string> g_NewStrings;
 
 extern GameFlow* g_GameFlow;
@@ -131,7 +132,7 @@ __int32 __cdecl LoadSavegameInfos()
 	char fileName[255];
 
 	// clean the array
-	for (__int32 i = 0; i < MAX_SAVEGAMES; i++)
+	/*for (__int32 i = 0; i < MAX_SAVEGAMES; i++)
 	{
 		g_SavegameInfos[i].present = false;
 	}
@@ -155,6 +156,28 @@ __int32 __cdecl LoadSavegameInfos()
 		fread(&g_SavegameInfos[i].hours, 2, 1, savegamePtr);
 		fread(&g_SavegameInfos[i].minutes, 2, 1, savegamePtr);
 		fread(&g_SavegameInfos[i].seconds, 2, 1, savegamePtr);
+
+		fclose(savegamePtr);
+	}*/
+
+	for (__int32 i = 0; i < MAX_SAVEGAMES; i++)
+	{
+		g_NewSavegameInfos[i].Present = false;
+	}
+
+	// try to load the savegame
+	for (__int32 i = 0; i < MAX_SAVEGAMES; i++)
+	{
+		ZeroMemory(fileName, 255);
+		sprintf(fileName, "savegame.%d", i);
+
+		FILE* savegamePtr = fopen(fileName, "rb");
+		if (savegamePtr == NULL)
+			continue;
+		fclose(savegamePtr);
+
+		g_NewSavegameInfos[i].Present = true;
+		SaveGame::LoadHeader(fileName, &g_NewSavegameInfos[i]);
 
 		fclose(savegamePtr);
 	}

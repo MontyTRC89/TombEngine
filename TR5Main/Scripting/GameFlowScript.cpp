@@ -3,6 +3,7 @@
 #include "..\Game\box.h"
 #include "..\Game\lot.h"
 #include "..\Game\sound.h"
+#include "..\Game\savegame.h"
 
 GameFlow::GameFlow(sol::state* lua)
 {
@@ -196,6 +197,8 @@ bool GameFlow::DoGameflow()
 	// We start with the title level
 	CurrentLevel = 0;
 	SelectedLevelForNewGame = 0;
+	SelectedSaveGame = 0;
+	SaveGameHeader header;
 
 	// We loop indefinitely, looking for return values of DoTitle or DoLevel
 	bool loadFromSavegame = false;
@@ -251,8 +254,16 @@ bool GameFlow::DoGameflow()
 			gfInitialiseGame = true;
 			break;
 		case GAME_STATUS::GAME_STATUS_LOAD_GAME:
-			CurrentLevel = Savegame.LevelNumber;
+			// Load the header of the savegame for getting the level to load
+			char fileName[255];
+			ZeroMemory(fileName, 255);
+			sprintf(fileName, "savegame.%d", SelectedSaveGame);
+			SaveGame::LoadHeader(fileName, &header);
+
+			// Load level
+			CurrentLevel = header.Level;
 			loadFromSavegame = true;
+
 			break;
 		case GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED:
 			if (LevelComplete == m_levels.size())

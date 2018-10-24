@@ -2830,19 +2830,19 @@ __int32 Renderer::drawInventoryScene()
 
 							for (__int32 n = 0; n < MAX_SAVEGAMES; n++)
 							{
-								if (!g_SavegameInfos[i].present)
+								if (!g_NewSavegameInfos[i].Present)
 									PrintString(400, lastY, (char*)"Not saved", D3DCOLOR_ARGB(255, 255, 255, 255),
 										PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
 								else
 								{
-									sprintf(stringBuffer, "%05d", g_SavegameInfos[n].saveNumber);
+									sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n].Count);
 									PrintString(20, lastY, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
 										(ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-									PrintString(100, lastY, g_SavegameInfos[n].levelName, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
+									PrintString(100, lastY, (char*)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
 										(ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-									sprintf(stringBuffer, "%02d days %02d:%02d:%02d", g_SavegameInfos[n].days, g_SavegameInfos[n].hours, g_SavegameInfos[n].minutes, g_SavegameInfos[n].seconds);
+									sprintf(stringBuffer, "%02d days %02d:%02d:%02d", g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
 									PrintString(600, lastY, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
 										PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
 								}

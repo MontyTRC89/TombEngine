@@ -87,18 +87,18 @@ public:
 		return new ChunkWritingState(m_stream, chunkID, maximumSize);
 	}
 
-	void WriteChunk(ChunkId* chunkID, void(*writeChunk)(__int32), __int32 arg, __int64 maximumSize = LEB128::MaximumSize4Byte)
+	void WriteChunk(ChunkId* chunkID, void(*writeChunk)(__int32, __int32), __int32 arg1, __int32 arg2, __int64 maximumSize = LEB128::MaximumSize4Byte)
 	{
 		ChunkWritingState* state = WriteChunk(chunkID, maximumSize);
-		writeChunk(arg);
+		writeChunk(arg1, arg2);
 		state->EndWrite();
 		delete state;
 	}
 
-	void WriteChunkWithChildren(ChunkId* chunkID, void(*writeChunk)(__int32), __int32 arg, __int64 maximumSize = LEB128::MaximumSize4Byte)
+	void WriteChunkWithChildren(ChunkId* chunkID, void(*writeChunk)(__int32, __int32), __int32 arg1, __int32 arg2, __int64 maximumSize = LEB128::MaximumSize4Byte)
 	{
 		ChunkWritingState* state = WriteChunk(chunkID, maximumSize);
-		writeChunk(arg);
+		writeChunk(arg1, arg2);
 		WriteChunkEnd();
 		state->EndWrite();
 		delete state;

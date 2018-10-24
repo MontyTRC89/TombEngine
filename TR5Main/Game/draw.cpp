@@ -53,62 +53,27 @@ void __cdecl DoBootScreen(__int32 language)
 
 void __cdecl DrawPistolsMeshes(__int32 weapon)
 {
-	Lara.holster = 13;
-	g_LaraExtra.overrideMeshes[HAND_R] = true;
-	if (weapon != WEAPON_REVOLVER)
-		g_LaraExtra.overrideMeshes[HAND_L] = true;
+
 }
 
 void __cdecl DrawShotgunMeshes(__int32 weapon)
 {
-	Lara.backGun = NULL;
-	g_LaraExtra.drawWeapon = true;
+
 }
 
 void __cdecl UndrawPistolsMeshLeft(__int32 weapon)
 {
-	if (weapon != WEAPON_REVOLVER)
-	{
-		WeaponObject(weapon);
-		g_LaraExtra.overrideMeshes[HAND_L] = false;
-
-		if (weapon == WEAPON_PISTOLS)
-		{
-			Lara.holster = ID_LARA_HOLSTERS_PISTOLS;
-		}
-		else if (weapon == WEAPON_UZI)
-		{
-			Lara.holster = ID_LARA_HOLSTERS_UZIS;
-		}
-	}
+	
 }
 
 void __cdecl UndrawPistolsMeshRight(__int32 weapon)
 {
-	if (weapon != WEAPON_REVOLVER)
-	{
-		WeaponObject(weapon);
-		g_LaraExtra.drawWeapon = false;
-
-		if (weapon == WEAPON_PISTOLS)
-		{
-			Lara.holster = ID_LARA_HOLSTERS_PISTOLS;
-		}
-		else if (weapon == WEAPON_UZI)
-		{
-			Lara.holster = ID_LARA_HOLSTERS_UZIS;
-		}
-		else if (weapon == WEAPON_REVOLVER)
-		{
-			Lara.holster = ID_LARA_HOLSTERS_REVOLVER;
-		}
-	}
+	
 }
 
 void __cdecl UndrawShotgunMeshes(__int32 weapon)
 {
-	Lara.backGun = WeaponObject(weapon);
-	g_LaraExtra.drawWeapon = false;
+	
 }
 
 __int32 __cdecl GetFrame_D2(ITEM_INFO* item, __int16* framePtr[], __int32* rate)

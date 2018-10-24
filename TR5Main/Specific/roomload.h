@@ -74,9 +74,9 @@ void __cdecl LoadCameras();
 unsigned __stdcall LoadLevel(void* data);
 
 // New functions for loading data from TR5M footer
-bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize);
-bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize);
-bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize);
+bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize, __int32 arg);
+bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize, __int32 arg);
+bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);
 void __cdecl LoadNewData(__int32 size);
 
 void Inject_RoomLoad();

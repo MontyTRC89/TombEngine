@@ -295,12 +295,20 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 		Savegame.Game.Kills = 0;
 	}
 
-	// If load from savegame, then restore the game
+	// Load the level
+	S_LoadLevelFile(index);
+
+	// Restore the game?
 	if (loadFromSavegame)
 	{
-		RestoreGame();
+		char fileName[255];
+		ZeroMemory(fileName, 255);
+		sprintf(fileName, "savegame.%d", g_GameFlow->SelectedSaveGame);
+		SaveGame::Load(fileName);
+
 		gfRequiredStartPos = false;
 		gfInitialiseGame = false;
+		g_GameFlow->SelectedSaveGame = 0;
 	}
 	else
 	{
@@ -316,9 +324,6 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 		if (CurrentLevel == 1)
 			Savegame.TLCount = 0;
 	}
-	
-	// Load the level
-	S_LoadLevelFile(index);
 
 	// TODO: deprecated?
 	GlobalLastInventoryItem = -1;
@@ -763,7 +768,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 					}
 				}
 
-				if (SpotCam[spotCamIndex].flags & 0x8000)
+				if (!(SpotCam[spotCamIndex].flags & 0x8000))
 				{
 					if (trigger & 0x100)
 						SpotCam[spotCamIndex].flags |= 0x8000;

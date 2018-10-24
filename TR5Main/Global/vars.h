@@ -264,6 +264,7 @@
 #define LastSpotCam					VAR_U_(0x00E51F2C, __int16)
 #define FlipMap						ARRAY_(0x00EEEBA0, __int32, [255])
 #define TriggerTimer				VAR_U_(0x0051CA5A, byte)
+#define JustLoaded					VAR_U_(0x0051D001, byte)
 
 extern bool MonksAttackLara;
 

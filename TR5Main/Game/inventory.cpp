@@ -908,7 +908,7 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 					for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 						g_Renderer->DrawInventory();
 
-					return result;
+					return passportResult;
 				}
 			}
 
@@ -1089,7 +1089,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					ReadSavegame(selectedSavegame);
+					//ReadSavegame(selectedSavegame);
+					g_GameFlow->SelectedSaveGame = selectedSavegame;
 					result = INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME;
 					moveLeft = false;
 					moveRight = false;
@@ -1157,9 +1158,6 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & 0x100000)
 				{
-					//CreateSavegame();
-					//WriteSavegame(selectedSavegame);
-
 					// Use the new savegame system
 					char fileName[255];
 					ZeroMemory(fileName, 255);

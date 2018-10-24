@@ -173,9 +173,15 @@ private:
 	fstream m_stream;
 
 public:
-	FileStream(char* fileName)
+	FileStream(char* fileName, bool read, bool write)
 	{
-		m_stream.open(fileName, fstream::in | fstream::out | fstream::trunc);
+		__int32 mode = 0;
+		if (read)
+			mode |= ifstream::binary | fstream::in;
+		if (write)
+			mode |= ofstream::binary | fstream::out | fstream::trunc;
+
+		m_stream.open(fileName, mode);
 	}
 
 	~FileStream()
@@ -185,6 +191,7 @@ public:
 
 	bool Read(char* buffer, __int32 length)
 	{
+		printf("Pos: %d\n", (__int32)(m_stream.tellg()));
 		m_stream.read(buffer, length);
 		return true;
 	}

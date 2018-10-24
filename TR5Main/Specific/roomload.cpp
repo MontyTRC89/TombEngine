@@ -592,7 +592,7 @@ void __cdecl AdjustUV(__int32 num)
 	NumObjectTextures = num;
 }
 
-bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize)
+bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 {
 	if (chunkId->EqualsTo(ChunkLuaId))
 	{
@@ -610,7 +610,7 @@ bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize)
 		return false;
 }
 
-bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize)
+bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 {
 	if (chunkId->EqualsTo(ChunkTrigger))
 	{
@@ -636,12 +636,12 @@ bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize)
 		return false;
 }
 
-bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize)
+bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 {
 	if (chunkId->EqualsTo(ChunkTriggersList))
-		return chunkIO->ReadChunks(ReadLuaTriggers);
+		return chunkIO->ReadChunks(ReadLuaTriggers, 0);
 	else if (chunkId->EqualsTo(ChunkLuaIds))
-		return chunkIO->ReadChunks(ReadLuaIds);
+		return chunkIO->ReadChunks(ReadLuaIds, 0);
 	return false;
 }
 
@@ -661,7 +661,7 @@ void __cdecl LoadNewData(__int32 size)
 	if (!chunkIO->IsValid())
 		return;
 
-	chunkIO->ReadChunks(ReadNewDataChunks);
+	chunkIO->ReadChunks(ReadNewDataChunks, 0);
 }
 
 void Inject_RoomLoad()

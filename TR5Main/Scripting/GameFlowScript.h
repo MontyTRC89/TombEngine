@@ -158,6 +158,7 @@ public:
 	bool								DrawHorizon;
 	bool								ColAddHorizon;
 	__int32								SelectedLevelForNewGame;
+	__int32								SelectedSaveGame;
 
 	GameFlow(sol::state* lua);
 	~GameFlow();

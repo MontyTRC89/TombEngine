@@ -343,11 +343,39 @@ void GameScript::SetItem(__int32 index, ITEM_INFO* item)
 	m_items[index].NativeItem = item;
 }
 
-void GameScript::GetGlobalVariables(vector<LuaVariable>* list)
+void GameScript::GetVariables(vector<LuaVariable>* list)
 {
 	LuaVariable variable;
 
 	m_globals.for_each([&](sol::object const& key, sol::object const& value) {
+		variable.IsGlobal = true;
+		variable.Name = (char*)key.as<string>().c_str();
+		if (value.is<bool>())
+		{
+			variable.Type = LUA_VARIABLE_TYPE_BOOL;
+			variable.BoolValue = value.as<bool>();
+		}
+		else if (value.is<__int32>())
+		{
+			variable.Type = LUA_VARIABLE_TYPE_INT;
+			variable.IntValue = value.as<__int32>();
+		}
+		else if (value.is<float>())
+		{
+			variable.Type = LUA_VARIABLE_TYPE_FLOAT;
+			variable.FloatValue = value.as<float>();
+		}
+		else if (value.is<string>())
+		{
+			variable.Type = LUA_VARIABLE_TYPE_STRING;
+			variable.StringValue = (char*)value.as<string>().c_str();
+		}
+
+		list->push_back(variable);
+	});
+
+	m_locals.for_each([&](sol::object const& key, sol::object const& value) {
+		variable.IsGlobal = true;
 		variable.Name = (char*)key.as<string>().c_str();
 		if (value.is<bool>())
 		{
@@ -374,66 +402,33 @@ void GameScript::GetGlobalVariables(vector<LuaVariable>* list)
 	});
 }
 
-void GameScript::GetLocalVariables(vector<LuaVariable>* list)
-{
-	LuaVariable variable;
-
-	m_locals.for_each([&](sol::object const& key, sol::object const& value) {	
-		variable.Name = key.as<string>();
-		if (value.is<bool>())
-		{
-			variable.Type = LUA_VARIABLE_TYPE_BOOL;
-			variable.BoolValue = value.as<bool>();
-		}
-		else if (value.is<__int32>())
-		{
-			variable.Type = LUA_VARIABLE_TYPE_INT;
-			variable.IntValue = value.as<__int32>();
-		}
-		else if (value.is<float>())
-		{
-			variable.Type = LUA_VARIABLE_TYPE_FLOAT;
-			variable.FloatValue = value.as<float>();
-		}
-		else if (value.is<string>())
-		{
-			variable.Type = LUA_VARIABLE_TYPE_STRING;
-			variable.StringValue = value.as<string>();
-		}
-
-		list->push_back(variable);
-	});
-}
-
-void GameScript::SetGlobalVariables(vector<LuaVariable>* list)
+void GameScript::SetVariables(vector<LuaVariable>* list)
 {
 	for (__int32 i = 0; i < list->size(); i++)
 	{
 		LuaVariable variable = (*list)[i];
-		if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
-			m_globals[variable.Name] = variable.BoolValue;
-		else if (variable.Type == LUA_VARIABLE_TYPE_INT)
-			m_globals[variable.Name] = variable.IntValue;
-		else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
-			m_globals[variable.Name] = variable.FloatValue;
-		else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
-			m_globals[variable.Name] = variable.StringValue;
-	}
-}
-
-void GameScript::SetLocalVariables(vector<LuaVariable>* list)
-{
-	for (__int32 i = 0; i < list->size(); i++)
-	{
-		LuaVariable variable = (*list)[i];
-		if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
-			m_locals[variable.Name] = variable.BoolValue;
-		else if (variable.Type == LUA_VARIABLE_TYPE_INT)
-			m_locals[variable.Name] = variable.IntValue;
-		else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
-			m_locals[variable.Name] = variable.FloatValue;
-		else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
-			m_locals[variable.Name] = variable.StringValue;
+		if (variable.IsGlobal)
+		{
+			if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
+				m_globals[variable.Name] = variable.BoolValue;
+			else if (variable.Type == LUA_VARIABLE_TYPE_INT)
+				m_globals[variable.Name] = variable.IntValue;
+			else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
+				m_globals[variable.Name] = variable.FloatValue;
+			else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
+				m_globals[variable.Name] = variable.StringValue;
+		}
+		else
+		{
+			if (variable.Type == LUA_VARIABLE_TYPE_BOOL)
+				m_locals[variable.Name] = variable.BoolValue;
+			else if (variable.Type == LUA_VARIABLE_TYPE_INT)
+				m_locals[variable.Name] = variable.IntValue;
+			else if (variable.Type == LUA_VARIABLE_TYPE_FLOAT)
+				m_locals[variable.Name] = variable.FloatValue;
+			else if (variable.Type == LUA_VARIABLE_TYPE_STRING)
+				m_locals[variable.Name] = variable.StringValue;
+		}
 	}
 }
 

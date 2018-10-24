@@ -29,7 +29,7 @@ typedef struct LEB128 {
 		do
 		{
 			stream->Read(reinterpret_cast<char *>(&currentByte), 1);
-
+			
 			result |= (__int64)(currentByte & 0x7F) << currentShift;
 			currentShift += 7;
 		} while ((currentByte & 0x80) != 0);
@@ -38,6 +38,7 @@ typedef struct LEB128 {
 		__int32 shift = 64 - currentShift;
 		if (shift > 0)
 			result = (result << shift) >> shift;
+
 		return result;
 	}
 

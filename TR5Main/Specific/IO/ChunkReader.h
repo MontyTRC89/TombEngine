@@ -61,7 +61,7 @@ public:
 		return m_isValid;
 	}
 
-	bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, __int32 maxSize))
+	bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, __int32 maxSize, __int32 arg), __int32 arg)
 	{
 		do
 		{
@@ -76,12 +76,13 @@ public:
 			bool chunkRecognized = false;
 			__int32 startPos = m_stream->GetCurrentPosition();
 
-			chunkRecognized = func(chunkId, chunkSize);
+			chunkRecognized = func(chunkId, chunkSize, arg);
 			__int32 readDataCount = m_stream->GetCurrentPosition() - startPos;
+			printf("ChunkPos: %d\n", m_stream->GetCurrentPosition());
 
 			// Adjust _stream position if necessary
 			if (readDataCount != chunkSize)
-				m_stream->Seek(chunkSize, SEEK_ORIGIN::CURRENT);
+				m_stream->Seek(chunkSize - readDataCount, SEEK_ORIGIN::CURRENT);
 		} while (true);
 
 		return true;
