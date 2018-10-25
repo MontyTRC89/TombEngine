@@ -397,10 +397,23 @@ bool SaveGame::readItem()
 	__int16 runtimeItem = LEB128::ReadByte(m_stream);
 	__int16 itemKind = LEB128::ReadInt16(m_stream);
 
+	// Runtime items must be allocated dynamically
+	if (runtimeItem)
+		itemNumber = CreateItem();
+	
 	ITEM_INFO* item = &Items[itemNumber];
+	item->objectNumber = LEB128::ReadInt16(m_stream);
+
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	item->objectNumber = LEB128::ReadInt16(m_stream);
+	// Runtime items must be initialised
+	// TODO: test test test!!!
+	if (runtimeItem)
+	{
+		InitialiseItem(itemNumber);
+		AddActiveItem(itemNumber);
+	}
+
 	item->speed = LEB128::ReadInt16(m_stream);
 	item->fallspeed = LEB128::ReadInt16(m_stream);
 
