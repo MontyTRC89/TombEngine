@@ -3,8 +3,10 @@
 #include "..\Game\lara.h"
 #include "..\Game\items.h"
 #include "..\Game\box.h"
+#include "..\Game\pickup.h"
 #include "..\Game\lot.h"
 #include "..\Game\laramisc.h"
+#include "..\Objects\objects.h"
 
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
@@ -33,6 +35,12 @@ ChunkId* SaveGame::m_chunkItemFlags;
 ChunkId* SaveGame::m_chunkItemHitPoints;
 ChunkId* SaveGame::m_chunkItemPosition;
 ChunkId* SaveGame::m_chunkItemIntelligentData;
+ChunkId* SaveGame::m_chunkSpecialItemBurningTorch;
+ChunkId* SaveGame::m_chunkSpecialItemChaff;
+ChunkId* SaveGame::m_chunkSpecialItemTorpedo;
+ChunkId* SaveGame::m_chunkSpecialItemCrossbowBolt;
+ChunkId* SaveGame::m_chunkSpecialItemFlare;
+ChunkId* SaveGame::m_chunkItemQuadInfo;
 
 void SaveGame::saveItems()
 {
@@ -42,8 +50,25 @@ void SaveGame::saveItems()
 
 	// Save items created at runtime (flares, missiles...)
 	for (__int32 i = NumItems; i < NUM_ITEMS; i++)
-		if (Items[i].active)
-			m_writer->WriteChunkWithChildren(m_chunkItem, &saveItem, i, 1);
+	{
+		ITEM_INFO* item = &Items[i];
+		if (item->active)
+		{
+			// Some items are very special and are saved in specific functions, all the others use the general function
+			if (item->objectNumber == ID_BURNING_TORCH_ITEM)
+				m_writer->WriteChunk(m_chunkSpecialItemBurningTorch, &saveBurningTorch, i, 1);
+			else if (item->objectNumber == ID_CHAFF)
+				m_writer->WriteChunk(m_chunkSpecialItemChaff, &saveChaff, i, 1);
+			else if (item->objectNumber == ID_TORPEDO)
+				m_writer->WriteChunk(m_chunkSpecialItemTorpedo, &saveTorpedo, i, 1);
+			else if (item->objectNumber == ID_CROSSBOW_BOLT)
+				m_writer->WriteChunk(m_chunkSpecialItemCrossbowBolt, &saveCrossbowBolt, i, 1);
+			else if (item->objectNumber == ID_FLARE_ITEM)
+				m_writer->WriteChunk(m_chunkSpecialItemFlare, &saveFlare, i, 1);
+			else
+				m_writer->WriteChunkWithChildren(m_chunkItem, &saveItem, i, 1);
+		}
+	}
 }
 
 void SaveGame::saveItem(__int32 itemNumber, __int32 runtimeItem)
@@ -218,6 +243,12 @@ void SaveGame::Start()
 	m_chunkItemHitPoints = ChunkId::FromString("TR5MSgItHP");
 	m_chunkItemPosition = ChunkId::FromString("TR5MSgItPos");
 	m_chunkItemIntelligentData = ChunkId::FromString("TR5MSgItIntell");
+	m_chunkSpecialItemBurningTorch = ChunkId::FromString("TR5MSgItTorch");
+	m_chunkSpecialItemChaff = ChunkId::FromString("TR5MSgItChaff");
+	m_chunkSpecialItemTorpedo = ChunkId::FromString("TR5MSgItTorpedo");
+	m_chunkSpecialItemCrossbowBolt = ChunkId::FromString("TR5MSgItBolt");
+	m_chunkSpecialItemFlare = ChunkId::FromString("TR5MSgItFlare");
+	m_chunkItemQuadInfo = ChunkId::FromString("TR5MSgQuadInfo");
 
 	LastSaveGame = 0;
 }
@@ -245,6 +276,12 @@ void SaveGame::End()
 	delete m_chunkItemHitPoints;
 	delete m_chunkItemPosition;
 	delete m_chunkItemIntelligentData;
+	delete m_chunkSpecialItemBurningTorch;
+	delete m_chunkSpecialItemChaff;
+	delete m_chunkSpecialItemTorpedo;
+	delete m_chunkSpecialItemCrossbowBolt;
+	delete m_chunkSpecialItemFlare;
+	delete m_chunkItemQuadInfo;
 }
 
 bool SaveGame::Save(char* fileName)
@@ -260,7 +297,7 @@ bool SaveGame::Save(char* fileName)
 	LEB128::Write(m_stream, (Savegame.Game.Timer / 30) % 60);
 	LEB128::Write(m_stream, CurrentLevel);
 	LEB128::Write(m_stream, GameTimer);
-	LEB128::Write(m_stream, LastSaveGame++);
+	LEB128::Write(m_stream, ++LastSaveGame);
 
 	// Now we write chunks
 	m_writer->WriteChunk(m_chunkStatistics, &saveStatistics, 0, 0);
@@ -383,6 +420,29 @@ bool SaveGame::readItem()
 		m_reader->ReadChunks(&readItemChunks, itemNumber);
 	}
 
+	// Some post-processing things
+	if (obj->collision == PuzzleHoleCollision && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
+	{
+		item->objectNumber += 8;
+		//*((_WORD *)pItem - 28) = v55 + objects[*((_WORD *)pItem - 32)].anim_index;
+	}
+
+	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8 && (item->flags & ONESHOT))
+		item->meshBits = 0x100;
+
+	if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
+	{
+		if (item->triggerFlags == -1)
+			AlterFloorHeight(item, -255);
+		else if (item->triggerFlags == -3)
+			AlterFloorHeight(item, -1023);
+		else
+			AlterFloorHeight(item, -1024);
+	}
+
+	if (item->objectNumber == ID_RAISING_BLOCK2 && item->itemFlags[1])
+		AlterFloorHeight(item, -2048);
+	   
 	return true;
 }
 
@@ -427,6 +487,16 @@ bool SaveGame::readSavegameChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg
 		return readVariable();
 	else if (chunkId->EqualsTo(m_chunkStatistics))
 		return readStatistics();
+	else if (chunkId->EqualsTo(m_chunkSpecialItemBurningTorch))
+		return readBurningTorch();
+	else if (chunkId->EqualsTo(m_chunkSpecialItemChaff))
+		return readChaff();
+	else if (chunkId->EqualsTo(m_chunkSpecialItemTorpedo))
+		return readTorpedo();
+	else if (chunkId->EqualsTo(m_chunkSpecialItemCrossbowBolt))
+		return readCrossbowBolt();
+	else if (chunkId->EqualsTo(m_chunkSpecialItemFlare))
+		return readFlare();
 
 	return false;
 }
@@ -689,7 +759,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, __int32 maxSize, __int32 itemNum
 
 		OBJECT_INFO* obj = &Objects[item->objectNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		
+
 		creature->jointRotation[0] = LEB128::ReadInt16(m_stream);
 		creature->jointRotation[1] = LEB128::ReadInt16(m_stream);
 		creature->jointRotation[2] = LEB128::ReadInt16(m_stream);
@@ -720,28 +790,20 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, __int32 maxSize, __int32 itemNum
 		creature->aiTarget.pos.yRot = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.pos.zRot = LEB128::ReadInt16(m_stream);
 
-		/*CREATURE_INFO* aiTargetCreature = (CREATURE_INFO*)creature->aiTarget.data;
-		aiTargetCreature->jointRotation[0] = LEB128::ReadInt16(m_stream);
-		aiTargetCreature->jointRotation[1] = LEB128::ReadInt16(m_stream);
-		aiTargetCreature->jointRotation[2] = LEB128::ReadInt16(m_stream);
-		aiTargetCreature->jointRotation[3] = LEB128::ReadInt16(m_stream);
-		aiTargetCreature->maximumTurn = LEB128::ReadInt16(m_stream);
-		aiTargetCreature->flags = LEB128::ReadInt16(m_stream);
-		aiTargetCreature->alerted = LEB128::ReadByte(m_stream);
-		aiTargetCreature->headLeft = LEB128::ReadByte(m_stream);
-		aiTargetCreature->headRight = LEB128::ReadByte(m_stream);
-		aiTargetCreature->reachedGoal = LEB128::ReadByte(m_stream);
-		aiTargetCreature->hurtByLara = LEB128::ReadByte(m_stream);
-		aiTargetCreature->patrol2 = LEB128::ReadByte(m_stream);
-		aiTargetCreature->jumpAhead = LEB128::ReadByte(m_stream);
-		aiTargetCreature->monkeyAhead = LEB128::ReadByte(m_stream);
-		aiTargetCreature->mood = (MOOD_TYPE)LEB128::ReadInt32(m_stream);*/
-
 		creature->LOT.canJump = LEB128::ReadByte(m_stream);
 		creature->LOT.canMonkey = LEB128::ReadByte(m_stream);
 		creature->LOT.isAmphibious = LEB128::ReadByte(m_stream);
 		creature->LOT.isJumping = LEB128::ReadByte(m_stream);
 		creature->LOT.isMonkeying = LEB128::ReadByte(m_stream);
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(m_chunkItemQuadInfo))
+	{
+		QUAD_INFO* quadInfo = (QUAD_INFO*)GameMalloc(sizeof(QUAD_INFO));
+		m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
+		if (item->objectNumber == ID_QUAD)
+			item->data = (void*)quadInfo;
 
 		return true;
 	}
@@ -849,23 +911,6 @@ void SaveGame::saveItemIntelligentData(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, creature->aiTarget.pos.yRot);
 	LEB128::Write(m_stream, creature->aiTarget.pos.zRot);
 
-	/*CREATURE_INFO* aiTargetCreature = (CREATURE_INFO*)creature->aiTarget.data;
-	LEB128::Write(m_stream, aiTargetCreature->jointRotation[0]);
-	LEB128::Write(m_stream, aiTargetCreature->jointRotation[1]);
-	LEB128::Write(m_stream, aiTargetCreature->jointRotation[2]);
-	LEB128::Write(m_stream, aiTargetCreature->jointRotation[3]);
-	LEB128::Write(m_stream, aiTargetCreature->maximumTurn);
-	LEB128::Write(m_stream, aiTargetCreature->flags);
-	LEB128::Write(m_stream, aiTargetCreature->alerted);
-	LEB128::Write(m_stream, aiTargetCreature->headLeft);
-	LEB128::Write(m_stream, aiTargetCreature->headRight);
-	LEB128::Write(m_stream, aiTargetCreature->reachedGoal);
-	LEB128::Write(m_stream, aiTargetCreature->hurtByLara);
-	LEB128::Write(m_stream, aiTargetCreature->patrol2);
-	LEB128::Write(m_stream, aiTargetCreature->jumpAhead);
-	LEB128::Write(m_stream, aiTargetCreature->monkeyAhead);
-	LEB128::Write(m_stream, aiTargetCreature->mood);*/
-
 	LEB128::Write(m_stream, creature->LOT.canJump);
 	LEB128::Write(m_stream, creature->LOT.canMonkey);
 	LEB128::Write(m_stream, creature->LOT.isAmphibious);
@@ -908,4 +953,287 @@ void SaveGame::saveItemAnims(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, item->requiredAnimState);
 	LEB128::Write(m_stream, item->animNumber);
 	LEB128::Write(m_stream, item->frameNumber);
+}
+
+void SaveGame::saveBurningTorch(__int32 itemNumber, __int32 arg2)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	LEB128::Write(m_stream, itemNumber);
+	LEB128::Write(m_stream, item->pos.xPos);
+	LEB128::Write(m_stream, item->pos.yPos);
+	LEB128::Write(m_stream, item->pos.zPos);
+	LEB128::Write(m_stream, item->pos.xRot);
+	LEB128::Write(m_stream, item->pos.yRot);
+	LEB128::Write(m_stream, item->pos.zRot);
+	LEB128::Write(m_stream, item->roomNumber);
+	LEB128::Write(m_stream, item->speed);
+	LEB128::Write(m_stream, item->fallspeed);
+
+	LEB128::Write(m_stream, item->itemFlags[2]);
+}
+
+void SaveGame::saveChaff(__int32 itemNumber, __int32 arg2)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	LEB128::Write(m_stream, itemNumber);
+	LEB128::Write(m_stream, item->pos.xPos);
+	LEB128::Write(m_stream, item->pos.yPos);
+	LEB128::Write(m_stream, item->pos.zPos);
+	LEB128::Write(m_stream, item->pos.xRot);
+	LEB128::Write(m_stream, item->pos.yRot);
+	LEB128::Write(m_stream, item->pos.zRot);
+	LEB128::Write(m_stream, item->roomNumber);
+	LEB128::Write(m_stream, item->speed);
+	LEB128::Write(m_stream, item->fallspeed);
+
+	LEB128::Write(m_stream, item->itemFlags[0]);
+	LEB128::Write(m_stream, item->itemFlags[1]);
+}
+
+void SaveGame::saveTorpedo(__int32 itemNumber, __int32 arg2)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	LEB128::Write(m_stream, itemNumber);
+	LEB128::Write(m_stream, item->pos.xPos);
+	LEB128::Write(m_stream, item->pos.yPos);
+	LEB128::Write(m_stream, item->pos.zPos);
+	LEB128::Write(m_stream, item->pos.xRot);
+	LEB128::Write(m_stream, item->pos.yRot);
+	LEB128::Write(m_stream, item->pos.zRot);
+	LEB128::Write(m_stream, item->roomNumber);
+	LEB128::Write(m_stream, item->speed);
+	LEB128::Write(m_stream, item->fallspeed);
+
+	LEB128::Write(m_stream, item->itemFlags[0]);
+	LEB128::Write(m_stream, item->itemFlags[1]);
+	LEB128::Write(m_stream, item->currentAnimState);
+	LEB128::Write(m_stream, item->goalAnimState);
+	LEB128::Write(m_stream, item->requiredAnimState);
+}
+
+void SaveGame::saveCrossbowBolt(__int32 itemNumber, __int32 arg2)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	LEB128::Write(m_stream, itemNumber);
+	LEB128::Write(m_stream, item->pos.xPos);
+	LEB128::Write(m_stream, item->pos.yPos);
+	LEB128::Write(m_stream, item->pos.zPos);
+	LEB128::Write(m_stream, item->pos.xRot);
+	LEB128::Write(m_stream, item->pos.yRot);
+	LEB128::Write(m_stream, item->pos.zRot);
+	LEB128::Write(m_stream, item->roomNumber);
+	LEB128::Write(m_stream, item->speed);
+	LEB128::Write(m_stream, item->fallspeed);
+}
+
+void SaveGame::saveFlare(__int32 itemNumber, __int32 arg2)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	LEB128::Write(m_stream, itemNumber);
+	LEB128::Write(m_stream, item->pos.xPos);
+	LEB128::Write(m_stream, item->pos.yPos);
+	LEB128::Write(m_stream, item->pos.zPos);
+	LEB128::Write(m_stream, item->pos.xRot);
+	LEB128::Write(m_stream, item->pos.yRot);
+	LEB128::Write(m_stream, item->pos.zRot);
+	LEB128::Write(m_stream, item->roomNumber);
+	LEB128::Write(m_stream, item->speed);
+	LEB128::Write(m_stream, item->fallspeed);
+
+	// Flare age
+	LEB128::Write(m_stream, (__int32)item->data);
+}
+
+bool SaveGame::readBurningTorch()
+{
+	LEB128::ReadInt16(m_stream);
+	
+	__int16 itemNumber = CreateItem();
+	ITEM_INFO* item = &Items[itemNumber];
+
+	item->objectNumber = ID_BURNING_TORCH_ITEM;
+	item->pos.xPos = LEB128::ReadInt32(m_stream);
+	item->pos.yPos = LEB128::ReadInt32(m_stream);
+	item->pos.zPos = LEB128::ReadInt32(m_stream);
+	item->pos.xRot = LEB128::ReadInt16(m_stream);
+	item->pos.yRot = LEB128::ReadInt16(m_stream);
+	item->pos.zRot = LEB128::ReadInt16(m_stream);
+	item->roomNumber = LEB128::ReadInt16(m_stream);
+
+	__int16 oldXrot = item->pos.xRot;
+	__int16 oldYrot = item->pos.yRot;
+	__int16 oldZrot = item->pos.zRot;
+
+	InitialiseItem(itemNumber);
+
+	item->pos.xRot = oldXrot;
+	item->pos.yRot = oldYrot;
+	item->pos.zRot = oldZrot;
+
+	item->speed = LEB128::ReadInt16(m_stream);
+	item->fallspeed = LEB128::ReadInt16(m_stream);
+
+	AddActiveItem(itemNumber);
+
+	item->itemFlags[2] = LEB128::ReadInt16(m_stream);
+
+	return true;
+}
+
+bool SaveGame::readChaff()
+{
+	LEB128::ReadInt16(m_stream);
+
+	__int16 itemNumber = CreateItem();
+	ITEM_INFO* item = &Items[itemNumber];
+
+	item->objectNumber = ID_CHAFF;
+	item->pos.xPos = LEB128::ReadInt32(m_stream);
+	item->pos.yPos = LEB128::ReadInt32(m_stream);
+	item->pos.zPos = LEB128::ReadInt32(m_stream);
+	item->pos.xRot = LEB128::ReadInt16(m_stream);
+	item->pos.yRot = LEB128::ReadInt16(m_stream);
+	item->pos.zRot = LEB128::ReadInt16(m_stream);
+	item->roomNumber = LEB128::ReadInt16(m_stream);
+
+	__int16 oldXrot = item->pos.xRot;
+	__int16 oldYrot = item->pos.yRot;
+	__int16 oldZrot = item->pos.zRot;
+
+	InitialiseItem(itemNumber);
+
+	item->pos.xRot = oldXrot;
+	item->pos.yRot = oldYrot;
+	item->pos.zRot = oldZrot;
+
+	item->speed = LEB128::ReadInt16(m_stream);
+	item->fallspeed = LEB128::ReadInt16(m_stream);
+
+	AddActiveItem(itemNumber);
+
+	item->itemFlags[0] = LEB128::ReadInt16(m_stream);
+	item->itemFlags[1] = LEB128::ReadInt16(m_stream);
+
+	return true;
+}
+
+bool SaveGame::readCrossbowBolt()
+{
+	LEB128::ReadInt16(m_stream);
+
+	__int16 itemNumber = CreateItem();
+	ITEM_INFO* item = &Items[itemNumber];
+
+	item->objectNumber = ID_CROSSBOW_BOLT;
+	item->pos.xPos = LEB128::ReadInt32(m_stream);
+	item->pos.yPos = LEB128::ReadInt32(m_stream);
+	item->pos.zPos = LEB128::ReadInt32(m_stream);
+	item->pos.xRot = LEB128::ReadInt16(m_stream);
+	item->pos.yRot = LEB128::ReadInt16(m_stream);
+	item->pos.zRot = LEB128::ReadInt16(m_stream);
+	item->roomNumber = LEB128::ReadInt16(m_stream);
+
+	__int16 oldXrot = item->pos.xRot;
+	__int16 oldYrot = item->pos.yRot;
+	__int16 oldZrot = item->pos.zRot;
+
+	InitialiseItem(itemNumber);
+
+	item->pos.xRot = oldXrot;
+	item->pos.yRot = oldYrot;
+	item->pos.zRot = oldZrot;
+
+	item->speed = LEB128::ReadInt16(m_stream);
+	item->fallspeed = LEB128::ReadInt16(m_stream);
+
+	AddActiveItem(itemNumber);
+
+	return true;
+}
+
+bool SaveGame::readFlare()
+{
+	LEB128::ReadInt16(m_stream);
+
+	__int16 itemNumber = CreateItem();
+	ITEM_INFO* item = &Items[itemNumber];
+
+	item->objectNumber = ID_FLARE_ITEM;
+	item->pos.xPos = LEB128::ReadInt32(m_stream);
+	item->pos.yPos = LEB128::ReadInt32(m_stream);
+	item->pos.zPos = LEB128::ReadInt32(m_stream);
+	item->pos.xRot = LEB128::ReadInt16(m_stream);
+	item->pos.yRot = LEB128::ReadInt16(m_stream);
+	item->pos.zRot = LEB128::ReadInt16(m_stream);
+	item->roomNumber = LEB128::ReadInt16(m_stream);
+
+	__int16 oldXrot = item->pos.xRot;
+	__int16 oldYrot = item->pos.yRot;
+	__int16 oldZrot = item->pos.zRot;
+
+	InitialiseItem(itemNumber);
+
+	item->pos.xRot = oldXrot;
+	item->pos.yRot = oldYrot;
+	item->pos.zRot = oldZrot;
+
+	item->speed = LEB128::ReadInt16(m_stream);
+	item->fallspeed = LEB128::ReadInt16(m_stream);
+
+	AddActiveItem(itemNumber);
+
+	// Flare age
+	item->data = (void*)LEB128::ReadInt32(m_stream);
+
+	return true;
+}
+
+bool SaveGame::readTorpedo()
+{
+	LEB128::ReadInt16(m_stream);
+
+	__int16 itemNumber = CreateItem();
+	ITEM_INFO* item = &Items[itemNumber];
+
+	item->objectNumber = ID_TORPEDO;
+	item->pos.xPos = LEB128::ReadInt32(m_stream);
+	item->pos.yPos = LEB128::ReadInt32(m_stream);
+	item->pos.zPos = LEB128::ReadInt32(m_stream);
+	item->pos.xRot = LEB128::ReadInt16(m_stream);
+	item->pos.yRot = LEB128::ReadInt16(m_stream);
+	item->pos.zRot = LEB128::ReadInt16(m_stream);
+	item->roomNumber = LEB128::ReadInt16(m_stream);
+
+	__int16 oldXrot = item->pos.xRot;
+	__int16 oldYrot = item->pos.yRot;
+	__int16 oldZrot = item->pos.zRot;
+
+	InitialiseItem(itemNumber);
+
+	item->pos.xRot = oldXrot;
+	item->pos.yRot = oldYrot;
+	item->pos.zRot = oldZrot;
+
+	item->speed = LEB128::ReadInt16(m_stream);
+	item->fallspeed = LEB128::ReadInt16(m_stream);
+
+	AddActiveItem(itemNumber);
+
+	item->itemFlags[0] = LEB128::ReadInt16(m_stream);
+	item->itemFlags[1] = LEB128::ReadInt16(m_stream);
+	item->currentAnimState = LEB128::ReadInt16(m_stream);
+	item->goalAnimState = LEB128::ReadInt16(m_stream);
+	item->requiredAnimState = LEB128::ReadInt16(m_stream);
+
+	return true;
+}
+
+void SaveGame::saveItemQuadInfo(__int32 itemNumber, __int32 arg2)
+{
+	m_stream->WriteBytes(reinterpret_cast<byte*>(Items[itemNumber].data), sizeof(QUAD_INFO));
 }

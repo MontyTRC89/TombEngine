@@ -191,7 +191,6 @@ public:
 
 	bool Read(char* buffer, __int32 length)
 	{
-		printf("Pos: %d\n", (__int32)(m_stream.tellg()));
 		m_stream.read(buffer, length);
 		return true;
 	}

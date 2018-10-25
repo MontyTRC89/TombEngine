@@ -2,6 +2,22 @@
 
 #include "..\Global\global.h"
 
+typedef struct QUAD_INFO {
+	__int32 velocity;
+	__int16 frontRot;
+	__int16 rearRot;
+	__int32 revs;
+	__int32 engineRevs;
+	__int16 trackMesh;
+	__int32 skidooTurn;
+	__int32 leftFallspeed;
+	__int32 rightFallspeed;
+	__int16 momentumAngle;
+	__int16 extraRotation;
+	__int32 pitch;
+	char flags;
+};
+
 void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
 
 // TR1 objects

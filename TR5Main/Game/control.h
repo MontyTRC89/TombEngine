@@ -37,6 +37,7 @@
 #define KeyTrigger ((__int32 (__cdecl*)(__int16)) 0x00469550)
 #define PickupTrigger ((__int32 (__cdecl*)(__int16)) 0x004695E0)
 #define PlaySoundTrack ((void (__cdecl*)(__int16, __int16)) 0x00418B90)
+#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, __int32)) 0x004159F0)
 
 GAME_STATUS __cdecl DoTitle(__int32 index);
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);

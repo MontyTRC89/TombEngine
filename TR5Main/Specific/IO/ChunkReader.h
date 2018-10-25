@@ -78,7 +78,6 @@ public:
 
 			chunkRecognized = func(chunkId, chunkSize, arg);
 			__int32 readDataCount = m_stream->GetCurrentPosition() - startPos;
-			printf("ChunkPos: %d\n", m_stream->GetCurrentPosition());
 
 			// Adjust _stream position if necessary
 			if (readDataCount != chunkSize)

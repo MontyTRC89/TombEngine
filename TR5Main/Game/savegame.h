@@ -60,10 +60,21 @@ private:
 	static ChunkId* m_chunkItemHitPoints;
 	static ChunkId* m_chunkItemPosition;
 	static ChunkId* m_chunkItemIntelligentData;
+	static ChunkId* m_chunkSpecialItemBurningTorch;
+	static ChunkId* m_chunkSpecialItemChaff;
+	static ChunkId* m_chunkSpecialItemTorpedo;
+	static ChunkId* m_chunkSpecialItemCrossbowBolt;
+	static ChunkId* m_chunkSpecialItemFlare;
+	static ChunkId* m_chunkItemQuadInfo;
 
 	static void saveGameStatus(__int32 arg1, __int32 arg2);
 	static void saveLara(__int32 arg1, __int32 arg2);
 	static void saveItem(__int32 arg1, __int32 arg2);
+	static void saveBurningTorch(__int32 arg1, __int32 arg2);
+	static void saveChaff(__int32 arg1, __int32 arg2);
+	static void saveTorpedo(__int32 arg1, __int32 arg2);
+	static void saveCrossbowBolt(__int32 arg1, __int32 arg2);
+	static void saveFlare(__int32 arg1, __int32 arg2);
 	static void saveItems();
 	static void saveVariables();
 	static void saveVariable(__int32 arg1, __int32 arg2);
@@ -81,10 +92,16 @@ private:
 	static void saveItemMesh(__int32 arg1, __int32 arg2);
 	static void saveItemAnims(__int32 arg1, __int32 arg2);
 	static void saveItemIntelligentData(__int32 arg1, __int32 arg2);
+	static void saveItemQuadInfo(__int32 arg1, __int32 arg2);
 
 	static bool readGameStatus();
 	static bool readLara();
 	static bool readItem();
+	static bool readBurningTorch();
+	static bool readChaff();
+	static bool readCrossbowBolt();
+	static bool readFlare();
+	static bool readTorpedo();
 	static bool readStatistics();
 	static bool readVariable();
 	static bool readSavegameChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);

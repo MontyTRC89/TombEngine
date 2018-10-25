@@ -17,22 +17,6 @@
 
 using namespace std;
 
-typedef struct QUAD_INFO  {
-	__int32 velocity;
-	__int16 frontRot;
-	__int16 rearRot;
-	__int32 revs;
-	__int32 engineRevs;
-	__int16 trackMesh;
-	__int32 skidooTurn;
-	__int32 leftFallspeed;
-	__int32 rightFallspeed;
-	__int16 momentumAngle;
-	__int16 extraRotation;
-	__int32 pitch;
-	char flags;
-};
-
 typedef enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
