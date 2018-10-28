@@ -450,7 +450,6 @@ class Renderer
 	__int32							m_numVertices;
 	__int32							m_numTriangles;
 	vector<RendererLine2D>			m_lines2D;
-	__int32							m_numLines2D;
 	LPD3DXLINE						m_dxLine;
 	__int16							m_normalLaraSkinJointRemap[15][32];
 	__int16							m_youngLaraSkinJointRemap[15][32];
@@ -547,7 +546,11 @@ class Renderer
 	__int32							m_currentCausticsFrame = 0;
 	vector<shared_ptr<RendererAnimatedTextureSet>> m_animatedTextureSets;
 	map<__int16*, RendererMesh*>	m_meshPointersToMesh;
-	
+	RENDERER_FADE_STATUS			m_fadeStatus;
+	float							m_fadeFactor;
+	bool							m_cinematicBars;
+	float							m_progress;
+
 	__int32							getAnimatedTextureInfo(__int16 textureId);
 	RendererMesh*					getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs);
 	void							fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index);
@@ -609,9 +612,7 @@ class Renderer
 	bool							isRoomUnderwater(__int16 roomNumber);
 	bool							isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
 	void							updateAnimatedTextures();
-	RENDERER_FADE_STATUS			m_fadeStatus;
-	float							m_fadeFactor;
-	bool							m_cinematicBars;
+	void							drawFullScreenBackground(LPDIRECT3DTEXTURE9 texture, float alpha);
 
 public:
 	D3DXMATRIX						ViewMatrix;
@@ -648,4 +649,6 @@ public:
 	void							EnableCinematicBars(bool value);
 	void							FadeIn();
 	void							FadeOut();
+	void							DrawLoadingScreen(char* fileName);
+	void							UpdateProgress(float value);
 };

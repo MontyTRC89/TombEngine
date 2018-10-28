@@ -298,6 +298,13 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	// Load the level
 	S_LoadLevelFile(index);
 
+	// Initialise items, effects, lots, camera
+	InitialiseFXArray(true);
+	//InitialiseLOTarray(true);
+	InitialisePickUpDisplay();
+	InitialiseCamera();
+	SOUND_Stop();
+
 	// Restore the game?
 	if (loadFromSavegame)
 	{
@@ -337,12 +344,6 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	CurrentAtmosphere = ambient;
 	S_CDPlay(CurrentAtmosphere, 1);
 	IsAtmospherePlaying = true;
-
-	// Initialise items, effects, lots, camera
-	InitialiseFXArray(true);
-	InitialiseLOTarray(true);
-	InitialisePickUpDisplay();
-	InitialiseCamera();
 
 	// Initialise ponytails
 	InitialiseHair();

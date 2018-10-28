@@ -976,6 +976,8 @@ bool Renderer::PrepareDataForTheRenderer()
 	memcpy(dest, MiscTextures + 256 * 512 * 4, 256 * 256 * 4);
 	m_skyTexture->UnlockRect(0);
 
+	UpdateProgress(90);
+
 	// Step 2: prepare rooms
 	for (__int32 i = 0; i < NumberRooms; i++)
 	{
@@ -2179,10 +2181,13 @@ __int32 Renderer::Draw()
 
 void Renderer::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
 {
-	m_lines2D[m_numLines2D].Vertices[0] = D3DXVECTOR2(x1, y1);
-	m_lines2D[m_numLines2D].Vertices[1] = D3DXVECTOR2(x2, y2);
-	m_lines2D[m_numLines2D].Color = D3DCOLOR_XRGB(r, g, b);
-	m_numLines2D++;
+	RendererLine2D line;
+
+	line.Vertices[0] = D3DXVECTOR2(x1, y1);
+	line.Vertices[1] = D3DXVECTOR2(x2, y2);
+	line.Color = D3DCOLOR_XRGB(r, g, b);
+
+	m_lines2D.push_back(line);
 }
 
 void Renderer::drawAllLines2D()
@@ -2191,7 +2196,7 @@ void Renderer::drawAllLines2D()
 	m_dxLine->SetPattern(0xffffffff);
 	m_dxLine->Begin();
 
-	for (__int32 i = 0; i < m_numLines2D; i++)
+	for (__int32 i = 0; i < m_lines2D.size(); i++)
 		m_dxLine->Draw(m_lines2D[i].Vertices, 2, m_lines2D[i].Color);
 
 	m_dxLine->End();
@@ -2657,18 +2662,10 @@ __int32 Renderer::drawInventoryScene()
 	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
 	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
 
-	byte colorComponent = 255; // (m_fadeTimer < 15.0f ? 255.0f / (15.0f - min(m_fadeTimer, 15.0f)) : 255);
-
 	// Draw the full screen background
 	if (g_Inventory->GetType() == INV_TYPE_TITLE)
 	{
-		// Scale matrix for drawing full screen background
-		D3DXMatrixScaling(&m_tempScale, ScreenWidth / 1024.0f, ScreenHeight / 768.0f, 0.0f);
-
-		m_dxSprite->Begin(0);
-		m_dxSprite->SetTransform(&m_tempScale);
-		m_dxSprite->Draw(m_titleScreen, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, colorComponent, colorComponent, colorComponent));
-		m_dxSprite->End();
+		drawFullScreenBackground(m_titleScreen, 1.0f);
 	}
 	else
 	{
@@ -3022,6 +3019,7 @@ bool Renderer::drawScene(bool dump)
 	m_numVertices = 0;
 	m_timeDrawScene = 0;
 	m_timeReconstructZBuffer = 0;
+	m_lines2D.clear();
 
 	LPD3DXEFFECT effect;
 	UINT cPasses = 1;
@@ -5510,4 +5508,98 @@ __int32 Renderer::drawFinalPass()
 		m_fadeFactor -= FADE_FACTOR;
 
 	return 0;
+}
+
+void Renderer::DrawLoadingScreen(char* fileName)
+{
+	UINT cPasses = 1;
+
+	// Load the texture
+	LPDIRECT3DTEXTURE9 texture;
+	D3DXCreateTextureFromFileEx(m_device, fileName, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0,
+		D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
+		D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &texture);
+	
+	// Set basic render states
+	setDepthWrite(false);
+	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
+	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+
+	m_fadeStatus = RENDERER_FADE_STATUS::FADE_IN;
+	m_fadeFactor = 0.0f;
+
+	while (true)
+	{
+		m_lines2D.clear();
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor < 1.0f)
+			m_fadeFactor += FADE_FACTOR;
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor > 0.0f)
+			m_fadeFactor -= FADE_FACTOR;
+
+		// Clear screen
+		m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+		m_device->BeginScene();
+
+		// Draw the loading screen
+		drawFullScreenBackground(texture, m_fadeFactor);
+
+		// Draw loading bar
+		drawBar(275, 564, 250, 12, m_progress, 0x0000FF, 0x0000FF);
+		drawAllLines2D();
+
+		m_device->EndScene();
+		m_device->Present(NULL, NULL, NULL, NULL);
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor >= 1.0f)
+		{
+			m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
+			m_fadeFactor = 1.0f;
+		}
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::NO_FADE && m_progress == 100)
+		{
+			m_fadeStatus = RENDERER_FADE_STATUS::FADE_OUT;
+			m_fadeFactor = 1.0f;
+		}
+		
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor <= 0.0f)
+		{
+			break;
+		}
+	}
+
+	// Release the texture
+	texture->Release();
+}
+
+void Renderer::UpdateProgress(float value)
+{
+	m_progress = value;
+}
+
+void Renderer::drawFullScreenBackground(LPDIRECT3DTEXTURE9 texture, float alpha)
+{
+	D3DSURFACE_DESC desc;
+	texture->GetLevelDesc(0, &desc);
+
+	RECT rect;
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = desc.Width;
+	rect.bottom = desc.Height;
+
+	// Scale matrix for drawing full screen background
+	D3DXMATRIX mat;
+	D3DXVECTOR2 vScaleCentre(0, 0);
+	D3DXVECTOR2 vScaleFactor(ScreenWidth / (float)desc.Width, ScreenHeight / (float)desc.Height);
+	D3DXMatrixTransformation2D(&mat, &vScaleCentre, 0.0f, &vScaleFactor, NULL, 0.0f, NULL);
+
+	byte colorComponent = 255 * alpha;
+
+	m_dxSprite->Begin(0);
+	m_dxSprite->SetTransform(&mat);
+	m_dxSprite->Draw(texture, &rect, NULL, NULL, D3DCOLOR_ARGB(255, colorComponent, colorComponent, colorComponent));
+	m_dxSprite->End();
 }

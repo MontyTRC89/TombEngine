@@ -444,7 +444,6 @@ __int32 __cdecl LoadRoomsNew()
 	DoSomethingWithRooms();
 
 	__int32 numFloorData = ReadInt32(); 
-	printf("%d\n", numFloorData);
 	FloorData = (__int16*)GameMalloc(numFloorData * 2);
 	ReadBytes(FloorData, numFloorData * 2);
 
@@ -463,12 +462,13 @@ unsigned __stdcall LoadLevel(void* data)
 {
 	DB_Log(5, "LoadLevel - DLL");
 	printf("LoadLevel\n");
-	//FreeLevel();
 
 	char* filename = (char*)data;
 
 	LevelDataPtr = NULL;
 	LevelFilePtr = 0;
+
+	g_Renderer->UpdateProgress(0);
 
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
@@ -487,6 +487,8 @@ unsigned __stdcall LoadLevel(void* data)
 
 		LoadTextures();
 
+		g_Renderer->UpdateProgress(20);
+
 		__int16 buffer[32];
 		ReadFileEx(&buffer, 2, 16, LevelFilePtr);
 		WeatherType = buffer[0];
@@ -502,32 +504,39 @@ unsigned __stdcall LoadLevel(void* data)
 		ReadFileEx(LevelDataPtr, uncompressedSize, 1, LevelFilePtr);
 
 		LoadRooms();
+		g_Renderer->UpdateProgress(40);
+
 		LoadObjects();
+		g_Renderer->UpdateProgress(50);
+
 		InitialiseLOTarray(true);
 		LoadSprites();
 		LoadCameras();
 		LoadSoundEffects();
+		g_Renderer->UpdateProgress(60);
+
 		LoadBoxes();
 		LoadAnimatedTextures();
 		LoadTextureInfos();
+		g_Renderer->UpdateProgress(70);
+
 		LoadItems();
 		LoadAIObjects();
 		LoadDemoData();
 		LoadSamples();
+		g_Renderer->UpdateProgress(80);
 
 		__int32 extraSize = 0;
 		ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
 		if (extraSize > 0)
 		{
 			ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
-			//free(LevelDataPtr);
 			LevelDataPtr = (char*)malloc(extraSize);
 			ReadFileEx(LevelDataPtr, extraSize, 1, LevelFilePtr);
 
 			LoadNewData(extraSize);
 		}
 
-		//free(LevelDataPtr);
 		LevelDataPtr = NULL;
 		FileClose(LevelFilePtr);
 	}
@@ -535,6 +544,8 @@ unsigned __stdcall LoadLevel(void* data)
 	{
 		return false;
 	}
+
+	g_Renderer->UpdateProgress(80);
 	 
 	g_Renderer->PrepareDataForTheRenderer();
 	
@@ -556,6 +567,8 @@ unsigned __stdcall LoadLevel(void* data)
 
 	// Level loaded
 	IsLevelLoading = false;
+	g_Renderer->UpdateProgress(100);
+
 	_endthreadex(1);
 
 	return true;
@@ -574,15 +587,13 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	
 	char filename[80];
 	strcpy_s(filename, g_GameFlow->GetLevel(levelIndex)->FileName.c_str());
-	//strcat_s(filename, ".TRC");
-
-	//printf("%s\n", filename);
-
+	
 	IsLevelLoading = true;
 	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
 
-	while (IsLevelLoading); 
-	
+	//while (IsLevelLoading);
+	g_Renderer->DrawLoadingScreen("Screens\\rome.jpg");
+
 	return true;
 }
 
