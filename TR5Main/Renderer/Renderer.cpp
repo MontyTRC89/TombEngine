@@ -2715,10 +2715,6 @@ __int32 Renderer::drawInventoryScene()
 		// Setup the GPU
 		m_device->SetVertexDeclaration(m_vertexDeclaration);
 	
-		// Fade timer
-		//if (m_fadeTimer < 15)
-		//	m_shader->SetFloat(m_shader->GetParameterByName(NULL, "FadeTimer"), m_fadeTimer++);
-
 		__int16 numObjects = ring->numObjects;
 		float deltaAngle = 360.0f / numObjects;
 		__int32 objectIndex = 0;
@@ -2828,7 +2824,7 @@ __int32 Renderer::drawInventoryScene()
 							for (__int32 n = 0; n < MAX_SAVEGAMES; n++)
 							{
 								if (!g_NewSavegameInfos[i].Present)
-									PrintString(400, lastY, (char*)"Not saved", D3DCOLOR_ARGB(255, 255, 255, 255),
+									PrintString(400, lastY, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
 										PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
 								else
 								{
@@ -2839,7 +2835,7 @@ __int32 Renderer::drawInventoryScene()
 									PrintString(100, lastY, (char*)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
 										(ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-									sprintf(stringBuffer, "%02d days %02d:%02d:%02d", g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
+									sprintf(stringBuffer, g_GameFlow->GetString(44), g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
 									PrintString(600, lastY, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
 										PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
 								}
@@ -2888,7 +2884,7 @@ __int32 Renderer::drawInventoryScene()
 					else
 					{
 						// Draw the description below the object
-						char* string = (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
+						char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
 						PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					}
 				}
@@ -2981,7 +2977,6 @@ __int32 Renderer::drawInventoryScene()
 	effect->End();
 
 	m_device->EndScene();
-	//m_device->Present(NULL, NULL, NULL, NULL);
 	restoreBackBuffer();
 
 	return 0;
@@ -3005,9 +3000,6 @@ void Renderer::collectSceneItems()
 
 bool Renderer::drawScene(bool dump)
 {
-	// HACK:
-	//LaraItem->hitPoints = 1000;
-
 	m_timeClearGBuffer = 0;
 	m_timePrepareShadowMap = 0;
 	m_timeFillGBuffer = 0;
@@ -4142,10 +4134,44 @@ void Renderer::collectLights()
 		for (__int32 j = 0; j < room->Lights.size(); j++)
 		{
 			D3DXVECTOR3 laraPos = D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-			D3DXVECTOR3 lightVector = D3DXVECTOR3(room->Lights[j]->Position.x, room->Lights[j]->Position.y, room->Lights[j]->Position.z);
+			D3DXVECTOR3 lightPos = D3DXVECTOR3(room->Lights[j]->Position.x, room->Lights[j]->Position.y, room->Lights[j]->Position.z);
 
-			if (D3DXVec3Length(&(laraPos-lightVector)) >= 1024.0f * 20.0f)
+			// Collect only lights nearer than 20 sectors
+			if (D3DXVec3Length(&(laraPos - lightPos)) >= 1024.0f * 20.0f)
 				continue;
+
+			// Check only lights different from sun
+			if (room->Lights[j]->Type != LIGHT_TYPES::LIGHT_TYPE_SUN)
+			{
+				// Now check if lights are touching items
+				bool isTouchingItem = false;
+				for (__int32 k = 0; k < m_itemsToDraw.size(); k++)
+				{
+					D3DXVECTOR3 itemPos = D3DXVECTOR3(m_itemsToDraw[k]->Item->pos.xPos, m_itemsToDraw[k]->Item->pos.yPos, m_itemsToDraw[k]->Item->pos.zPos);
+					float distance = D3DXVec3Length(&(itemPos - lightPos));
+					
+					if (room->Lights[j]->Type == LIGHT_TYPES::LIGHT_TYPE_SPOT)
+					{
+						if (distance < room->Lights[j]->Range)
+						{
+							isTouchingItem = true;
+							break;
+						}
+					}
+					else
+					{
+						if (distance < room->Lights[j]->Out)
+						{
+							isTouchingItem = true;
+							break;
+						}
+					}
+				}
+
+				// If the light is not touching an item, then discard it
+				if (!isTouchingItem)
+					continue;
+			}
 
 			m_lights.push_back(room->Lights[j]);
 		}

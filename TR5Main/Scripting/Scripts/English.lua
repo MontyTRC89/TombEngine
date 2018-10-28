@@ -47,6 +47,10 @@ Gameflow.strings[40] = "Combine";
 Gameflow.strings[41] = "Separe";
 Gameflow.strings[42] = "Choose ammo";
 Gameflow.strings[43] = "Select level";
+Gameflow.strings[44] = "%02d days %02d:%02d:%02d";
+Gameflow.strings[45] = "Not saved";
+Gameflow.strings[44] = "%02d days %02d:%02d:%02d";
+Gameflow.strings[44] = "%02d days %02d:%02d:%02d";
 
 -- Level names (from 100 to 199)
 Gameflow.strings[100] = "Title level";

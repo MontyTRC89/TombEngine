@@ -391,7 +391,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 	if (!heavy)
 	{
 		Lara.canMonkeySwing = false;
-		Lara.climbStatus = true;
+		Lara.climbStatus = false;
 	}
 
 	if (!data)
@@ -414,7 +414,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 	{
 		if (!heavy)
 		{
-			__int16 quad = (__int16)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
+			__int16 quad = (unsigned __int16)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
 			if ((1 << (quad + 8)) & *data)
 				Lara.climbStatus = true;
 		}
