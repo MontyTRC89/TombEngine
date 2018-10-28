@@ -2212,12 +2212,13 @@ void Renderer::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 perce
 	byte g2 = (color2 >> 8) & 0xFF;
 	byte b2 = (color2 >> 0) & 0xFF;
 
-	float factor = ScreenWidth / 800.0f;
+	float factorX = ScreenWidth / 800.0f;
+	float factorY = ScreenHeight / 600.0f;
 
-	__int32 realX = x * factor;
-	__int32 realY = y * factor;
-	__int32 realW = w * factor;
-	__int32 realH = h * factor;
+	__int32 realX = x * factorX;
+	__int32 realY = y * factorY;
+	__int32 realW = w * factorX;
+	__int32 realH = h * factorY;
 
 	__int32 realPercent = percent / 100.0f * realW;
 
