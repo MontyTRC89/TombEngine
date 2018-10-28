@@ -5515,7 +5515,7 @@ void Renderer::DrawLoadingScreen(char* fileName)
 	UINT cPasses = 1;
 
 	// Load the texture
-	LPDIRECT3DTEXTURE9 texture;
+	LPDIRECT3DTEXTURE9 texture = NULL;
 	D3DXCreateTextureFromFileEx(m_device, fileName, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, 0,
 		D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
 		D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &texture);
@@ -5543,7 +5543,8 @@ void Renderer::DrawLoadingScreen(char* fileName)
 		m_device->BeginScene();
 
 		// Draw the loading screen
-		drawFullScreenBackground(texture, m_fadeFactor);
+		if (texture != NULL)
+			drawFullScreenBackground(texture, m_fadeFactor);
 
 		// Draw loading bar
 		drawBar(275, 564, 250, 12, m_progress, 0x0000FF, 0x0000FF);

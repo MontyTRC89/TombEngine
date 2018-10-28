@@ -5,6 +5,7 @@
 #include "..\Game\draw.h"
 #include "..\Game\lot.h"
 #include "..\Game\savegame.h"
+#include "..\Scripting\GameFlowScript.h"
 
 #include "IO/ChunkId.h"
 #include "IO/ChunkReader.h"
@@ -586,13 +587,14 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	RenderLoadBar = false;
 	
 	char filename[80];
-	strcpy_s(filename, g_GameFlow->GetLevel(levelIndex)->FileName.c_str());
+	GameScriptLevel* level = g_GameFlow->GetLevel(levelIndex);
+	strcpy_s(filename, level->FileName.c_str());
 	
+	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;
 	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
 
-	//while (IsLevelLoading);
-	g_Renderer->DrawLoadingScreen("Screens\\rome.jpg");
+	g_Renderer->DrawLoadingScreen((char*)(level->LoadScreenFileName.c_str()));
 
 	return true;
 }
