@@ -3,8 +3,8 @@
 -- Place in this LUA script all the engine settings for your game
 -- WARNING: bad values could make your game unplayable, please follow with attention the reference guide
 
-Gameflow.settings.screenWidth = 800;
-Gameflow.settings.screenHeight = 600;
+Gameflow.settings.screenWidth = 1600;
+Gameflow.settings.screenHeight = 900;
 Gameflow.settings.windowTitle = "TR5Main Alpha";
 Gameflow.settings.enableDynamicShadows = true;
 Gameflow.settings.enableWaterCaustics = true;

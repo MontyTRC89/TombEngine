@@ -579,7 +579,7 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 {
 	DB_Log(2, "S_LoadLevelFile - DLL");
 	printf("S_LoadLevelFile\n");
-
+	 
 	SOUND_Stop();
 	Sound_FreeSamples();
 	FreeLevel();
@@ -594,6 +594,7 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	IsLevelLoading = true;
 	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
 
+	// This function loops until progress is 100%. Not very thread safe, but behavious should be predictable.
 	g_Renderer->DrawLoadingScreen((char*)(level->LoadScreenFileName.c_str()));
 
 	return true;
@@ -658,17 +659,9 @@ bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 	return false;
 }
 
-//ChunkWriter* writer;
-
-void __cdecl SaveTest()
-{
-
-}
-
 void __cdecl LoadNewData(__int32 size)
 {
 	// Free old level scripts
-	//g_GameScript->FreeLevelScripts();
 	MemoryStream stream(LevelDataPtr, size);
 	chunkIO = new ChunkReader(0x4D355254, &stream);
 	if (!chunkIO->IsValid())
@@ -682,7 +675,6 @@ void Inject_RoomLoad()
 	INJECT(0x004A6380, LoadItems);
 	INJECT(0x004A4E60, LoadObjects);
 	INJECT(0x004A3FC0, LoadTextures);
-	//INJECT(0x004A4DA0, LoadRoomsNew);
 	INJECT(0x0040130C, S_LoadLevelFile);
 	INJECT(0x004A7130, FreeLevel);
 	INJECT(0x004A5430, AdjustUV);

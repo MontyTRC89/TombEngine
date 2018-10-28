@@ -128,9 +128,6 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			ITEM_INFO* item = &Items[itemNum];
 			__int16 nextItem = item->nextActive;
 
-			//printf("Num: %d Next: %d Death: %d Hitpoints: %d Status: %d\n", itemNum, item->nextActive, item->afterDeath, item->hitPoints, item->status);
-			//printf("NextItemActive: %d\n", NextItemActive);
-
 			if (item->afterDeath < 128)
 			{
 				if (Objects[item->objectNumber].control)
