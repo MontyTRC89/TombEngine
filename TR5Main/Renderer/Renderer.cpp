@@ -1326,7 +1326,7 @@ bool Renderer::PrepareDataForTheRenderer()
 			for (__int32 j = 0; j < obj->nmeshes; j++)
 			{
 				// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
-				// We need to override the box index because the engine will take mesh 0 while drawing pistols anim,
+				// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 				// and vertices have bone index 0 and not 10
 				__int32 meshPtrIndex = RawMeshPointers[obj->meshIndex / 2 + j] / 2;
 				__int32 boneIndex = (meshPtrIndex == 0 ? HAND_R : j);
@@ -1816,12 +1816,59 @@ void Renderer::collectItems()
 			if (item->objectNumber == ID_LARA)
 				continue;
 
+			if (item->status == ITEM_DEACTIVATED || item->status == ITEM_INVISIBLE)
+				continue;
+
 			if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
 				continue;
 
 			newItem = make_shared<RendererItemToDraw>(itemNum, item, Objects[item->objectNumber].nmeshes);
 			m_itemsToDraw.push_back(newItem);
 		}
+	}
+}
+
+void Renderer::collectEffects()
+{
+	m_effectsToDraw.clear();
+
+	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+	{
+		RendererRoom* room = m_rooms[m_roomsToDraw[i]].get();
+		if (room == NULL)
+			continue;
+
+		ROOM_INFO* r = room->Room;
+
+		__int16 fxNum = NO_ITEM;
+		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = Effects[fxNum].nextFx)
+		{
+			FX_INFO* fx = &Effects[fxNum];
+
+			if (fx->objectNumber < 0)
+				continue;
+
+			if (fx->objectNumber != ID_BODY_PART && m_moveableObjects.find(fx->objectNumber) == m_moveableObjects.end())
+				continue;
+
+			auto newEffect = make_shared<RendererEffectToDraw>(fxNum, fx);
+			m_effectsToDraw.push_back(newEffect);
+		}
+	}
+}
+
+void Renderer::updateEffects()
+{
+	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
+	{
+		auto fx = m_effectsToDraw[i];
+
+		D3DXMatrixTranslation(&m_tempTranslation, fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
+		D3DXMatrixRotationYawPitchRoll(&m_tempRotation,
+			TR_ANGLE_TO_RAD(fx->Effect->pos.yRot), 
+			TR_ANGLE_TO_RAD(fx->Effect->pos.xRot), 
+			TR_ANGLE_TO_RAD(fx->Effect->pos.zRot));
+		D3DXMatrixMultiply(&m_effectsToDraw[i]->World, &m_tempRotation, &m_tempTranslation);
 	}
 }
 
@@ -1886,6 +1933,25 @@ void Renderer::prepareShadowMap()
 		for (__int32 k = 0; k < 4; k++)
 		{
 			drawItem(m_itemsToDraw[j].get(), (RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+		}
+	}
+
+	// Draw visible effects
+	for (__int32 j = 0; j < m_effectsToDraw.size(); j++)
+	{
+		RendererEffectToDraw* fxToDraw = m_effectsToDraw[j].get();
+		FX_INFO* fx = fxToDraw->Effect;
+
+		D3DXVECTOR3 itemPos = D3DXVECTOR3(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+		D3DXVECTOR3 lightVector = (itemPos - lightPos);
+		float distance = D3DXVec3Length(&lightVector);
+
+		if (distance > m_shadowLight->Out * 1.5f)
+			continue;
+
+		for (__int32 k = 0; k < 4; k++)
+		{
+			drawEffect(fxToDraw, (RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
 		}
 	}
 
@@ -2996,6 +3062,7 @@ void Renderer::collectSceneItems()
 {
 	collectRooms();
 	collectItems();
+	collectEffects();
 	collectLights();
 }
 
@@ -3027,8 +3094,10 @@ bool Renderer::drawScene(bool dump)
 
 	// Collect scene data
 	collectSceneItems();
+
 	updateLaraAnimations();
 	updateItemsAnimations();
+	updateEffects();
 
 	// Update animated textures every 2 frames
 	if (GnFrameCounter % 2 == 0)
@@ -3129,6 +3198,12 @@ bool Renderer::drawScene(bool dump)
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	}
 
+	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
+	{
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	}
+
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
@@ -3168,6 +3243,12 @@ bool Renderer::drawScene(bool dump)
 	{
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	}
+
+	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
+	{
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	}
 
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
@@ -3362,6 +3443,12 @@ bool Renderer::drawScene(bool dump)
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 	}
 
+	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
+	{
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	}
+
 	// Draw alpha tested geometry
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3395,6 +3482,12 @@ bool Renderer::drawScene(bool dump)
 	{
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+	}
+
+	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
+	{
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
 	}
 
 	m_device->EndScene();
@@ -3448,6 +3541,12 @@ bool Renderer::drawScene(bool dump)
 		RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber].get();
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
 		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	}
+
+	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
+	{
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
 	}
 
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
@@ -3607,7 +3706,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
 		effect = m_shaderTransparent->GetEffect();
-
+	  
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
 	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_LARA);
 	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), laraObj->AnimationTransforms.data(), laraObj->ObjectMeshes.size());
@@ -3859,6 +3958,69 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 
 			effect->EndPass();
 		}
+	}
+
+	return true;
+}
+
+bool Renderer::drawEffect(RendererEffectToDraw* fxToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+{
+	D3DXMATRIX world;
+	UINT cPasses = 1;
+
+	FX_INFO* fx = fxToDraw->Effect;
+	OBJECT_INFO* obj = &Objects[fx->objectNumber];
+
+	LPD3DXEFFECT effect;
+	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+		effect = m_shaderDepth->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+		effect = m_shaderFillGBuffer->GetEffect();
+	else
+		effect = m_shaderTransparent->GetEffect();
+
+	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &fxToDraw->World);
+	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[fx->roomNumber]->AmbientLight);
+
+	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	else
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+
+	__int16 meshIndex;
+	if (obj->nmeshes != 0)
+		meshIndex = obj->meshIndex;
+	else
+		meshIndex = fx->frameNumber;
+
+	__int32 meshPtrIndex = RawMeshPointers[meshIndex / 2] / 2;
+	__int16* meshPtr = Meshes[meshIndex];
+
+	if (m_meshPointersToMesh.find(meshPtr) == m_meshPointersToMesh.end())
+		return true;
+
+	RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+	RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+	if (bucket->NumVertices == 0)
+		return true;
+
+	setGpuStateForBucket(bucketIndex);
+
+	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+	m_device->SetIndices(bucket->GetIndexBuffer());
+
+	for (int iPass = 0; iPass < cPasses; iPass++)
+	{
+		effect->BeginPass(iPass);
+		effect->CommitChanges();
+
+		drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+		effect->EndPass();
 	}
 
 	return true;

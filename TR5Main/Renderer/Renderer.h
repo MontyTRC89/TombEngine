@@ -263,6 +263,19 @@ typedef struct RendererItemToDraw {
 	}
 };
 
+typedef struct RendererEffectToDraw {
+	__int32 Id;
+	FX_INFO* Effect;
+	D3DXMATRIX World;
+
+	RendererEffectToDraw(__int32 id, FX_INFO* effect)
+	{
+		Id = id;
+		Effect = effect;
+		D3DXMatrixIdentity(&World);
+	}
+};
+
 typedef struct RendererQuad {
 	PDIRECT3DVERTEXBUFFER9 VertexBuffer;
 	PDIRECT3DINDEXBUFFER9 IndexBuffer;
@@ -483,6 +496,7 @@ class Renderer
 	vector<shared_ptr<RendererLight>>			m_dynamicLights;
 	vector<shared_ptr<RendererLight>>			m_lights;
 	vector<shared_ptr<RendererItemToDraw>>		m_itemsToDraw;
+	vector<shared_ptr<RendererEffectToDraw>>	m_effectsToDraw;
 	vector<shared_ptr<RendererSpriteToDraw>>	m_spritesToDraw;
 	vector<shared_ptr<RendererLine3DToDraw>>	m_lines3DToDraw;
 	
@@ -562,6 +576,7 @@ class Renderer
 	void							getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count);
 	void							collectRooms();
 	void							collectItems();
+	void							collectEffects();
 	void							collectSceneItems();
 	void							prepareShadowMap();
 	bool							drawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexIndex, UINT minVertexIndex, UINT numVertices, UINT baseIndex, UINT primitiveCount);
@@ -577,6 +592,7 @@ class Renderer
 	__int32							getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate);
 	void							updateLaraAnimations();
 	void							updateItemsAnimations();
+	void							updateEffects();
 	void							addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height);
 	void							addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height);
 	void							addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);
@@ -598,6 +614,7 @@ class Renderer
 	bool							drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
+	bool							drawEffect(RendererEffectToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawHorizonAndSky();
 	void							collectLights();
 	bool							doRain();

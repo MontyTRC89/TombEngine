@@ -28,11 +28,10 @@ test.layer1 = SkyLayer.new(120, 80, 50, -4);
 
 Gameflow:AddLevel(test);
 
--- Streets of rome
+-- Streets of rome --
 streets = Level.new();
 
 streets.name = 101;
-streets.script = "andrea1.lua";
 streets.soundTrack = 128;
 streets.fileName = "Data\\andrea1.trc";
 streets.loadScreen = "Screens\\andea1.jpg";
@@ -43,7 +42,7 @@ streets.resetHub = true;
 
 Gameflow:AddLevel(streets);
 
--- Trajan markets
+-- Trajan markets --
 trajan = Level.new();
 
 trajan.name = 102;

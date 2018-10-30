@@ -1,7 +1,7 @@
 #include "control.h"
 
 #include "..\Global\global.h"
-
+ 
 #include "pickup.h"
 #include "spotcam.h"
 #include "camera.h"

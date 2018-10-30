@@ -431,7 +431,7 @@ void __cdecl ReadRooms()
 		ReadRoom(&Rooms[i], (ROOM_INFO*)roomData);
 	}
 }
-
+ 
 __int32 __cdecl LoadRoomsNew()
 {
 	DB_Log(2, "LoadRooms - DLL");
