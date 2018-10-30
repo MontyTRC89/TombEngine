@@ -17,7 +17,9 @@ GameFlow::GameFlow(sol::state* lua)
 		"enableDynamicShadows", &GameScriptSettings::EnableDynamicShadows,
 		"windowed", &GameScriptSettings::Windowed,
 		"enableWaterCaustics", &GameScriptSettings::EnableWaterCaustics,
-		"drawingDistance", &GameScriptSettings::DrawingDistance
+		"drawingDistance", &GameScriptSettings::DrawingDistance,
+		"showRendererSteps", &GameScriptSettings::ShowRendererSteps,
+		"showDebugInfo", &GameScriptSettings::ShowDebugInfo
 		);
 
 	// Layer type

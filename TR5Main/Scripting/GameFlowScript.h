@@ -67,6 +67,8 @@ typedef struct GameScriptSettings {
 	bool Windowed;
 	string WindowTitle;
 	__int32 DrawingDistance;
+	bool ShowRendererSteps;
+	bool ShowDebugInfo;
 };
 
 typedef struct GameScriptSkyLayer {

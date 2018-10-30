@@ -2312,12 +2312,12 @@ void Renderer::drawGameInfo()
 void Renderer::DrawDashBar()
 {
 	if (DashTimer < 120)
-		drawBar(460, 32, 150, 12, 100 * (unsigned __int16)DashTimer / 120, 0xA0A000, 0xA000);
+		drawBar(630, 32, 150, 12, 100 * (unsigned __int16)DashTimer / 120, 0xA0A000, 0xA000);
 }
 
 void Renderer::DrawAirBar(__int32 percentual)
 {
-	drawBar(450, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
+	drawBar(20, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
 }
 
 void Renderer::DrawHealthBar(__int32 percentual)
@@ -2325,7 +2325,7 @@ void Renderer::DrawHealthBar(__int32 percentual)
 	__int32 color2 = 0xA00000;
 	if (Lara.poisoned || Lara.gassed)
 		color2 = 0xA0A000;
-	drawBar(10, 10, 150, 12, percentual, 0xA00000, color2);
+	drawBar(20, 32, 150, 12, percentual, 0xA00000, color2);
 }
 
 void Renderer::drawDebugInfo()
@@ -2334,136 +2334,141 @@ void Renderer::drawDebugInfo()
 	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
 	setDepthWrite(true);
 
-	if (UseSpotCam)
+	if (g_GameFlow->GetSettings()->ShowDebugInfo)
 	{
-		sprintf_s(&m_message[0], 255, "Spotcam.camera = %d    Spotcam.flags = %d     Current: %d", SpotCam[CurrentSplineCamera].camera, SpotCam[CurrentSplineCamera].flags, CurrentSplineCamera);
-		printDebugMessage(10, 70, 255, 255, 255, 255, m_message);
+		if (UseSpotCam)
+		{
+			sprintf_s(&m_message[0], 255, "Spotcam.camera = %d    Spotcam.flags = %d     Current: %d", SpotCam[CurrentSplineCamera].camera, SpotCam[CurrentSplineCamera].flags, CurrentSplineCamera);
+			printDebugMessage(10, 70, 255, 255, 255, 255, m_message);
+		}
+
+		__int32 y = 100;
+
+		sprintf_s(&m_message[0], 255, "TR5Main Alpha");
+		printDebugMessage(10, 80 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "LaraItem.currentAnimState = %d", LaraItem->currentAnimState);
+		printDebugMessage(10, 90 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "LaraItem.animNumber = %d", LaraItem->animNumber);
+		printDebugMessage(10, 100 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "LaraItem.frameNumber = %d", LaraItem->frameNumber);
+		printDebugMessage(10, 110 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "LaraItem.roomNumber = %d", LaraItem->roomNumber);
+		printDebugMessage(10, 120 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "LaraItem.pos = < %d %d %d >", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		printDebugMessage(10, 130 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "NumVertices = %d", m_numVertices);
+		printDebugMessage(10, 140 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "NumTriangles = %d", m_numTriangles);
+		printDebugMessage(10, 150 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Camera.pos = < %d %d %d >", Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		printDebugMessage(10, 160 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Camera.target = < %d %d %d >", Camera.target.x, Camera.target.y, Camera.target.z);
+		printDebugMessage(10, 170 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "CurrentLevel: %d", CurrentLevel);
+		printDebugMessage(10, 180 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.backGun: %d", Lara.backGun);
+		printDebugMessage(10, 190 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.leftArm.animNumber: %d", Lara.leftArm.animNumber);
+		printDebugMessage(10, 200 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.leftArm.frameNumber: %d", Lara.leftArm.frameNumber);
+		printDebugMessage(10, 210 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.rightArm.animNumber: %d", Lara.rightArm.animNumber);
+		printDebugMessage(10, 220 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.rightArm.frameNumber: %d", Lara.rightArm.frameNumber);
+		printDebugMessage(10, 230 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.weaponItem: %d", Lara.weaponItem);
+		printDebugMessage(10, 240 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.gunType: %d", Lara.gunType);
+		printDebugMessage(10, 250 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.gunStatus: %d", Lara.gunStatus);
+		printDebugMessage(10, 260 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.crowbar: %d", Lara.crowbar);
+		printDebugMessage(10, 270 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.leftArm.rot: %d %d %d", Lara.leftArm.xRot, Lara.leftArm.yRot, Lara.leftArm.zRot);
+		printDebugMessage(10, 280 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.rightArm.rot: %d %d %d", Lara.rightArm.xRot, Lara.rightArm.yRot, Lara.rightArm.zRot);
+		printDebugMessage(10, 290 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.torsoRot: < %d %d %d >", Lara.torsoXrot, Lara.torsoYrot, Lara.torsoZrot);
+		printDebugMessage(10, 300 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.headRot: < %d %d %d >", Lara.headXrot, Lara.headYrot, Lara.headZrot);
+		printDebugMessage(10, 310 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.leftArm.lock: %d", Lara.leftArm.lock);
+		printDebugMessage(10, 320 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Lara.rightArm.lock: %d", Lara.rightArm.lock);
+		printDebugMessage(10, 330 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Autotarget: %d", OptionAutoTarget);
+		printDebugMessage(10, 340 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "NumberDrawnRooms: %d", m_roomsToDraw.size());
+		printDebugMessage(10, 350 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Camera.pos.roomNumber = %d", Camera.pos.roomNumber);
+		printDebugMessage(10, 360 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "NumberDrawnItems = %d", m_itemsToDraw.size());
+		printDebugMessage(10, 370 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "Update = %d, ShadowMap = %d, Clear = %d, Fill = %d, Light = %d, Final = %d, Z-Buffer = %d",
+			m_timeUpdate, m_timePrepareShadowMap, m_timeClearGBuffer, m_timeFillGBuffer, m_timeLight, m_timeCombine, m_timeReconstructZBuffer);
+		printDebugMessage(10, 380 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "DrawCalls = %d", m_numDrawCalls);
+		printDebugMessage(10, 390 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "NumLights = %d", m_lights.size());
+		printDebugMessage(10, 400 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "DrawSceneTime = %d", m_timeDrawScene);
+		printDebugMessage(10, 410 + y, 255, 255, 255, 255, m_message);
+
+		sprintf_s(&m_message[0], 255, "SkyPos = %d", SkyPos1);
+		printDebugMessage(10, 420 + y, 255, 255, 255, 255, m_message);
 	}
 
-	__int32 y = 100;
+	if (g_GameFlow->GetSettings()->ShowRendererSteps)
+	{
+		m_dxSprite->Begin(0);
 
-	sprintf_s(&m_message[0], 255, "TR5Main Alpha");
-	printDebugMessage(10, 80+y, 255, 255, 255, 255, m_message);
+		D3DXMATRIX scale;
+		D3DXMatrixScaling(&scale, 150.0f / 800.0f, 150.0f / 800.0f, 150.0f / 800.0f);
 
-	sprintf_s(&m_message[0], 255, "LaraItem.currentAnimState = %d", LaraItem->currentAnimState);
-	printDebugMessage(10, 90 + y, 255, 255, 255, 255, m_message);
+		m_dxSprite->SetTransform(&scale);
+		m_dxSprite->Draw(m_colorBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->SetTransform(&scale);
+		m_dxSprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->SetTransform(&scale);
+		m_dxSprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->SetTransform(&scale);
+		m_dxSprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
 
-	sprintf_s(&m_message[0], 255, "LaraItem.animNumber = %d", LaraItem->animNumber);
-	printDebugMessage(10, 100 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "LaraItem.frameNumber = %d", LaraItem->frameNumber);
-	printDebugMessage(10, 110 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "LaraItem.roomNumber = %d", LaraItem->roomNumber);
-	printDebugMessage(10, 120 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "LaraItem.pos = < %d %d %d >", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	printDebugMessage(10, 130 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "NumVertices = %d", m_numVertices);
-	printDebugMessage(10, 140 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "NumTriangles = %d", m_numTriangles);
-	printDebugMessage(10, 150 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Camera.pos = < %d %d %d >", Camera.pos.x, Camera.pos.y, Camera.pos.z);
-	printDebugMessage(10, 160 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Camera.target = < %d %d %d >", Camera.target.x, Camera.target.y, Camera.target.z);
-	printDebugMessage(10, 170 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "CurrentLevel: %d", CurrentLevel);
-	printDebugMessage(10, 180 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.backGun: %d", Lara.backGun);
-	printDebugMessage(10, 190 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.leftArm.animNumber: %d", Lara.leftArm.animNumber);
-	printDebugMessage(10, 200 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.leftArm.frameNumber: %d", Lara.leftArm.frameNumber);
-	printDebugMessage(10, 210 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.rightArm.animNumber: %d", Lara.rightArm.animNumber);
-	printDebugMessage(10, 220 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.rightArm.frameNumber: %d", Lara.rightArm.frameNumber);
-	printDebugMessage(10, 230 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.weaponItem: %d", Lara.weaponItem);
-	printDebugMessage(10, 240 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.gunType: %d", Lara.gunType);
-	printDebugMessage(10, 250 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.gunStatus: %d", Lara.gunStatus);
-	printDebugMessage(10, 260 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.crowbar: %d", Lara.crowbar);
-	printDebugMessage(10, 270 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.leftArm.rot: %d %d %d", Lara.leftArm.xRot, Lara.leftArm.yRot, Lara.leftArm.zRot);
-	printDebugMessage(10, 280 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.rightArm.rot: %d %d %d", Lara.rightArm.xRot, Lara.rightArm.yRot, Lara.rightArm.zRot);
-	printDebugMessage(10, 290 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.torsoRot: < %d %d %d >", Lara.torsoXrot, Lara.torsoYrot, Lara.torsoZrot);
-	printDebugMessage(10, 300 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.headRot: < %d %d %d >", Lara.headXrot, Lara.headYrot, Lara.headZrot);
-	printDebugMessage(10, 310 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.leftArm.lock: %d", Lara.leftArm.lock);
-	printDebugMessage(10, 320 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Lara.rightArm.lock: %d", Lara.rightArm.lock);
-	printDebugMessage(10, 330 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Autotarget: %d", OptionAutoTarget);
-	printDebugMessage(10, 340 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "NumberDrawnRooms: %d", m_roomsToDraw.size());
-	printDebugMessage(10, 350 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Camera.pos.roomNumber = %d", Camera.pos.roomNumber);
-	printDebugMessage(10, 360 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "NumberDrawnItems = %d", m_itemsToDraw.size());
-	printDebugMessage(10, 370 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "Update = %d, ShadowMap = %d, Clear = %d, Fill = %d, Light = %d, Final = %d, Z-Buffer = %d", 
-			  m_timeUpdate, m_timePrepareShadowMap, m_timeClearGBuffer, m_timeFillGBuffer, m_timeLight, m_timeCombine, m_timeReconstructZBuffer);
-	printDebugMessage(10, 380 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "DrawCalls = %d", m_numDrawCalls);
-	printDebugMessage(10, 390 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "NumLights = %d", m_lights.size());
-	printDebugMessage(10, 400 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "DrawSceneTime = %d", m_timeDrawScene);
-	printDebugMessage(10, 410 + y, 255, 255, 255, 255, m_message);
-
-	sprintf_s(&m_message[0], 255, "SkyPos = %d", SkyPos1);
-	printDebugMessage(10, 420 + y, 255, 255, 255, 255, m_message);
-
-	m_dxSprite->Begin(0);
-
-	D3DXMATRIX scale;
-	D3DXMatrixScaling(&scale, 150.0f / 800.0f, 150.0f / 800.0f, 150.0f / 800.0f);
-	  
-	m_dxSprite->SetTransform(&scale);
-	m_dxSprite->Draw(m_colorBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
-	m_dxSprite->SetTransform(&scale);
-	m_dxSprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
-	m_dxSprite->SetTransform(&scale);
-	m_dxSprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
-	m_dxSprite->SetTransform(&scale);
-	m_dxSprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
-
-	m_dxSprite->End();
-
+		m_dxSprite->End();
+	}
 }
 
 __int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool reset)
@@ -3079,7 +3084,6 @@ bool Renderer::drawScene(bool dump)
 	m_numVertices = 0;
 	m_timeDrawScene = 0;
 	m_timeReconstructZBuffer = 0;
-	m_lines2D.clear();
 
 	LPD3DXEFFECT effect;
 	UINT cPasses = 1;
@@ -3556,9 +3560,10 @@ bool Renderer::drawScene(bool dump)
 	m_device->EndScene();
 
 	// Prepare sprites
-	// TODO: preallocate big buffer and avoica memory allocations!
+	// TODO: preallocate big buffer and avoid memory allocations!
 	m_spritesToDraw.clear();
 	m_lines3DToDraw.clear();
+	m_lines2D.clear();
 
 	drawFires();
 	drawSmokes();
@@ -3568,7 +3573,7 @@ bool Renderer::drawScene(bool dump)
 	drawDrips();
 	drawRipples();
 	drawUnderwaterDust();
-
+	
 	// Do weather
 	if (level->Rain)
 		doRain();
@@ -3579,7 +3584,14 @@ bool Renderer::drawScene(bool dump)
 	drawSprites();
 	drawGunFlashes();
 	drawLines3D();
-	
+
+	// Bars
+	DrawDashBar();
+	UpdateHealtBar(0);
+	UpdateAirBar(0);
+
+	drawAllLines2D();
+
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
 	time1 = time2;
@@ -3588,11 +3600,7 @@ bool Renderer::drawScene(bool dump)
 	m_timeDrawScene = (chrono::duration_cast<ns>(timeScene2 - timeScene1)).count() / 1000;
 
 	if (!dump)
-	{
 		drawDebugInfo();
-		//m_device->Present(NULL, NULL, NULL, NULL);
-	}
-	/*else*/
 		
 	restoreBackBuffer();
 
@@ -3996,8 +4004,6 @@ bool Renderer::drawEffect(RendererEffectToDraw* fxToDraw, RENDERER_BUCKETS bucke
 		meshIndex = obj->meshIndex;
 	else
 		meshIndex = fx->frameNumber;
-
-	__int32 meshPtrIndex = RawMeshPointers[meshIndex / 2] / 2;
 	__int16* meshPtr = Meshes[meshIndex];
 
 	if (m_meshPointersToMesh.find(meshPtr) == m_meshPointersToMesh.end())

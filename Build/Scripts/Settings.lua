@@ -10,3 +10,6 @@ Gameflow.settings.enableDynamicShadows = true;
 Gameflow.settings.enableWaterCaustics = true;
 Gameflow.settings.windowed = true;
 Gameflow.settings.drawingDistance = 102400;
+Gameflow.settings.showRendererSteps = false;
+Gameflow.settings.showDebugInfo = true;
+
