@@ -3,12 +3,16 @@
 #include "..\Global\global.h"
 
 typedef struct LaraExtraInfo {
-	bool drawWeapon;
-	bool overrideMeshes[15];
-	__int32 overrideObject;
+	__int16 vehicle;
+	bool hasHarpoon;
+	__int16 harpoonAmmo;
+	bool hasGrenadeLauncher;
+	__int16 grenadeAmmo;
+	bool hasRocketLauncher;
+	__int16 rocketAmmo;
 };
 
-extern __int16 LaraVehicle;
+extern LaraExtraInfo g_LaraExtra;
 
 #define LookUpDown ((void (__cdecl*)()) 0x0044D310)
 #define LookLeftRight ((void (__cdecl*)()) 0x0044D440)
@@ -16,6 +20,7 @@ extern __int16 LaraVehicle;
 #define UpdateLaraRoom ((__int32 (__cdecl*)(ITEM_INFO*, __int32)) 0x004120F0)
 #define LaraControl ((__int32 (__cdecl*)()) 0x00455830)
 #define LaraGun ((void (__cdecl*)()) 0x00452430)
+#define GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, __int32)) 0x0041E2A0)
 
 void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll);
 void __cdecl j_AnimateLara(ITEM_INFO* item);

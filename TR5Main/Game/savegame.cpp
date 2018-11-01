@@ -20,7 +20,7 @@ ChunkId* SaveGame::m_chunkItem;
 ChunkId* SaveGame::m_chunkLara;
 ChunkId* SaveGame::m_chunkLuaVariable;
 ChunkId* SaveGame::m_chunkStaticFlags;
-ChunkId* SaveGame::m_chunkLaraVehicle;
+ChunkId* SaveGame::m_chunkVehicle;
 ChunkId* SaveGame::m_chunkFlybySequence;
 ChunkId* SaveGame::m_chunkFlybyFlags;
 ChunkId* SaveGame::m_chunkCdFlags;
@@ -191,7 +191,7 @@ void SaveGame::saveLara(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, weaponItem->requiredAnimState);
 
 	// Lara extra data
-	m_writer->WriteChunkInt(m_chunkLaraVehicle, LaraVehicle);
+	m_writer->WriteChunkInt(m_chunkVehicle, g_LaraExtra.vehicle);
 }
 
 void SaveGame::saveVariables()
@@ -228,7 +228,7 @@ void SaveGame::Start()
 	m_chunkLara = ChunkId::FromString("TR5MSgLara");
 	m_chunkLuaVariable = ChunkId::FromString("TR5MSgLuaVar");
 	m_chunkStaticFlags = ChunkId::FromString("TR5MSgStFl");
-	m_chunkLaraVehicle = ChunkId::FromString("TR5MSgLaraVeh");
+	m_chunkVehicle = ChunkId::FromString("TR5MSgLaraVeh");
 	m_chunkFlybySequence = ChunkId::FromString("TR5MSgFlybyS");
 	m_chunkFlybyFlags = ChunkId::FromString("TR5MSgFlybyF");
 	m_chunkCdFlags = ChunkId::FromString("TR5MSgCdF");
@@ -261,7 +261,7 @@ void SaveGame::End()
 	delete m_chunkLara;
 	delete m_chunkLuaVariable;
 	delete m_chunkStaticFlags;
-	delete m_chunkLaraVehicle;
+	delete m_chunkVehicle;
 	delete m_chunkFlipMap;
 	delete m_chunkFlipStats;
 	delete m_chunkFlybyFlags;
@@ -588,9 +588,9 @@ void SaveGame::saveStaticFlag(__int32 arg1, __int32 arg2)
 
 bool SaveGame::readLaraChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 {
-	if (chunkId->EqualsTo(m_chunkLaraVehicle))
+	if (chunkId->EqualsTo(m_chunkVehicle))
 	{
-		LaraVehicle = m_reader->ReadChunkInt16(maxSize);
+		g_LaraExtra.vehicle = m_reader->ReadChunkInt16(maxSize);
 		return true;
 	}
 	return false;

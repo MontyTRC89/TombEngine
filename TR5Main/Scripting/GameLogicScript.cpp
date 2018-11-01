@@ -11,18 +11,7 @@ GameScript::GameScript(sol::state* lua)
 	m_lua = lua;
 
 	// Add constants
-	(*m_lua)["HIT_POINTS"] = ITEM_PARAM_HIT_POINTS;
-	(*m_lua)["CURRENT_ANIM_STATE"] = ITEM_PARAM_CURRENT_ANIM_STATE;
-	(*m_lua)["ANIM_NUMBER"] = ITEM_PARAM_ANIM_NUMBER;
-	(*m_lua)["GOAL_ANIM_STATE"] = ITEM_PARAM_GOAL_ANIM_STATE;
-	(*m_lua)["REQUIRED_ANIM_STATE"] = ITEM_PARAM_REQUIRED_ANIM_STATE;
-	(*m_lua)["FRAME_NUMBER"] = ITEM_PARAM_FRAME_NUMBER;
-	(*m_lua)["HIT_POINTS"] = ITEM_PARAM_HIT_POINTS;
-	(*m_lua)["HIT_STATUS"] = ITEM_PARAM_HIT_STATUS;
-	(*m_lua)["GRAVITY_STATUS"] = ITEM_PARAM_GRAVITY_STATUS;
-	(*m_lua)["COLLIDABLE"] = ITEM_PARAM_COLLIDABLE;
-	(*m_lua)["POISONED"] = ITEM_PARAM_POISONED;
-	(*m_lua)["ROOM_NUMBER"] = ITEM_PARAM_ROOM_NUMBER;
+	ExecuteScript("Scripts\\Constants.lua");
 
 	// Add the item type
 	m_lua->new_usertype<GameScriptItemPosition>("ItemPosition",

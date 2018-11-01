@@ -45,7 +45,7 @@ private:
 	static ChunkId* m_chunkLara;
 	static ChunkId* m_chunkLuaVariable;
 	static ChunkId* m_chunkStaticFlags;
-	static ChunkId* m_chunkLaraVehicle;
+	static ChunkId* m_chunkVehicle;
 	static ChunkId* m_chunkFlybySequence;
 	static ChunkId* m_chunkFlybyFlags;
 	static ChunkId* m_chunkCdFlags;

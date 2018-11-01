@@ -265,6 +265,7 @@
 #define FlipMap						ARRAY_(0x00EEEBA0, __int32, [255])
 #define TriggerTimer				VAR_U_(0x0051CA5A, byte)
 #define JustLoaded					VAR_U_(0x0051D001, byte)
+//#define Weapons						ARRAY_(0x005085B0, WEAPON_INFO, [9])
 
 extern bool MonksAttackLara;
 

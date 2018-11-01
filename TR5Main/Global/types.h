@@ -1281,6 +1281,22 @@ struct SHATTER_ITEM
 	__int16 flags; // size=0, offset=30
 };
 
+struct WEAPON_INFO
+{
+	__int16 lockAngles[4]; // size=8, offset=0
+	__int16 leftAngles[4]; // size=8, offset=8
+	__int16 rightAngles[4]; // size=8, offset=16
+	__int16 aimSpeed; // size=0, offset=24
+	__int16 shotAccuracy; // size=0, offset=26
+	__int16 gunHeight; // size=0, offset=28
+	__int16 targetDist; // size=0, offset=30
+	byte damage; // size=0, offset=32
+	byte recoilFrame; // size=0, offset=33
+	byte flashTime; // size=0, offset=34
+	byte drawFrame; // size=0, offset=35
+	__int16 sampleNum; // size=0, offset=36
+};
+
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
 typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);

@@ -2,6 +2,7 @@
 #include "..\Global\global.h"
 #include <stdio.h>
 #include "roomload.h"
+#include "..\Game\larafire.h"
 
 // Remapped variables. Some variables must be moved from EXE space to DLL space for having free space for bigger arrays
 __int32 NumItems;
@@ -199,5 +200,56 @@ void PatchGameCode()
 	WriteProcessMemory(gameHandle, (LPVOID)0x004A6939, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x004A6941, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x004A694D, &newValue, 4, NULL);
+
+	// TODO: this is a temp patch for weapons
 	
+	// GetTargetOnLOS
+	newValue = (__int32)&Weapons[0] + 32;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0041A455, &newValue, 4, NULL);
+	WriteProcessMemory(gameHandle, (LPVOID)0x0041A4C7, &newValue, 4, NULL);
+	WriteProcessMemory(gameHandle, (LPVOID)0x0041A525, &newValue, 4, NULL);
+	WriteProcessMemory(gameHandle, (LPVOID)0x0041A64D, &newValue, 4, NULL);
+
+	// RifleHandler
+	newValue = (__int32)&Weapons[0] + 186;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044E2B2, &newValue, 4, NULL);
+	newValue = (__int32)&Weapons[0] + 188;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044E2D2, &newValue, 4, NULL);
+
+	// FireHK
+	newValue = (__int32)&Weapons[0] + 216;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044E3FB, &newValue, 4, NULL);
+	newValue = (__int32)&Weapons[0] + 222;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044E403, &newValue, 4, NULL);
+	newValue = (__int32)&Weapons[0] + 216;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044E40D, &newValue, 4, NULL);
+	newValue = (__int32)&Weapons[0] + 222;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044E415, &newValue, 4, NULL);
+	newValue = (__int32)&Weapons[0] + 224;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044E45B, &newValue, 4, NULL);
+
+	// draw_shotgun
+	newValue = (__int32)&Weapons[0] + 23;
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044EBBB, &newValue, 4, NULL);
+
+	// PistolsHandler
+	newValue = (__int32)&Weapons[0];
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044FFD2, &newValue, 4, NULL);
+
+	// AnimatePistols
+	newValue = (__int32)&Weapons[0];
+	WriteProcessMemory(gameHandle, (LPVOID)0x0045044A, &newValue, 4, NULL);
+
+	// LaraGun
+	newValue = (__int32)&Weapons[0] + 28;
+	WriteProcessMemory(gameHandle, (LPVOID)0x00452564, &newValue, 4, NULL);
+	WriteProcessMemory(gameHandle, (LPVOID)0x0045265C, &newValue, 4, NULL);
+
+	// FireWeapon
+	newValue = (__int32)&Weapons[0];
+	WriteProcessMemory(gameHandle, (LPVOID)0x004535E3, &newValue, 4, NULL);
+
+	// InitialiseLara
+	newValue = (__int32)&Weapons[0] + 108;
+	WriteProcessMemory(gameHandle, (LPVOID)0x00473442, &newValue, 4, NULL);
 }

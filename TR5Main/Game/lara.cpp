@@ -8,7 +8,6 @@
 #include <stdio.h>
 
 LaraExtraInfo g_LaraExtra;
-__int16 LaraVehicle;
 
 void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -192,9 +191,9 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.look = true;
 
 	// Process vehicles
-	if (LaraVehicle != NO_ITEM)
+	if (g_LaraExtra.vehicle != NO_ITEM)
 	{
-		if (Items[LaraVehicle].objectNumber == ID_QUAD)  
+		if (Items[g_LaraExtra.vehicle].objectNumber == ID_QUAD)  
 		{
 			if (QuadBikeControl())
 				return;

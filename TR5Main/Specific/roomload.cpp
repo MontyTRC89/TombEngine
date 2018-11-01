@@ -4,6 +4,7 @@
 #include "..\Specific\setup.h"
 #include "..\Game\draw.h"
 #include "..\Game\lot.h"
+#include "..\Game\lara.h"
 #include "..\Game\savegame.h"
 #include "..\Scripting\GameFlowScript.h"
 
@@ -47,7 +48,7 @@ vector<__int32> MoveablesIds;
 vector<__int32> StaticObjectsIds;
 
 extern GameFlow* g_GameFlow;
-extern __int16 LaraVehicle;
+extern LaraExtraInfo g_LaraExtra;
 char* LevelDataPtr;
 
 ChunkReader* chunkIO;
@@ -563,7 +564,7 @@ unsigned __stdcall LoadLevel(void* data)
 	GetAIPickups();
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
-	LaraVehicle = -1;
+	g_LaraExtra.vehicle = -1;
 	g_GameScript->AssignItemsAndLara();
 
 	// Level loaded

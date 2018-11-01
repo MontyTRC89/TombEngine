@@ -585,5 +585,6 @@
     <None Include="Scripting\Scripts\Andrea2.lua" />
     <None Include="Shaders\FinalPass.fx" />
     <None Include="Scripting\Scripts\andrea1.lua" />
+    <None Include="Scripting\Scripts\Constants.lua" />
   </ItemGroup>
 </Project>

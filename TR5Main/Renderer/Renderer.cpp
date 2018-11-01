@@ -1790,8 +1790,6 @@ void Renderer::collectRooms()
 
 void Renderer::collectItems()
 {
-	//for (vector<RendererItemToDraw*>::iterator it = m_itemsToDraw.begin(); it != m_itemsToDraw.end(); ++it)
-	//	delete (*it);
 	m_itemsToDraw.clear();
 
 	auto newItem = make_shared<RendererItemToDraw>(Lara.itemNumber, LaraItem, 15);
@@ -1846,9 +1844,6 @@ void Renderer::collectEffects()
 			FX_INFO* fx = &Effects[fxNum];
 
 			if (fx->objectNumber < 0)
-				continue;
-
-			if (fx->objectNumber != ID_BODY_PART && m_moveableObjects.find(fx->objectNumber) == m_moveableObjects.end())
 				continue;
 
 			auto newEffect = make_shared<RendererEffectToDraw>(fxNum, fx);
@@ -2027,8 +2022,10 @@ void Renderer::updateLaraAnimations()
 
 		if (Lara.gunType != WEAPON_FLARE)
 		{
-			// HACK: shotgun must be handled differently (and probably also crossbow)
-			if (Lara.gunType == WEAPON_SHOTGUN)
+			// HACK: backguns handles differently
+			if (Lara.gunType == WEAPON_SHOTGUN || Lara.gunType == WEAPON_GRENADE || 
+				Lara.gunType == WEAPON_CROSSBOW || Lara.gunType == WEAPON_ROCKET || 
+				Lara.gunType == WEAPON_HARPOON)
 			{
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
@@ -2052,7 +2049,7 @@ void Renderer::updateLaraAnimations()
 				frac = getFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
 				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 			}			
-		}
+		} 
 		else
 		{
 			// Left arm
@@ -5617,20 +5614,9 @@ void Renderer::FreeRendererData()
 		it->second->CleanResources();
 	m_staticObjects.clear();
 
-	//for (__int32 i = 0; i < m_animatedTextureSets.size(); i++)
-	//	delete m_animatedTextureSets[i];
-	//for (vector<RendererAnimatedTextureSet*>::iterator it = m_animatedTextureSets.begin(); it != m_animatedTextureSets.end(); ++it)
-	//	delete (*it);
 	m_animatedTextureSets.clear();
-
-	//for (map<__int32, RendererSprite*>::iterator it = m_sprites.begin(); it != m_sprites.end(); ++it)
-	//	delete (it->second);
 	m_sprites.clear();
-
-	//for (map<__int32, RendererSpriteSequence*>::iterator it = m_spriteSequences.begin(); it != m_spriteSequences.end(); ++it)
-	//	delete (it->second);
 	m_spriteSequences.clear();
-
 	m_dynamicLights.clear();
 	m_lights.clear();
 	m_lines2D.clear();
