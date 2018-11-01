@@ -668,4 +668,5 @@ public:
 	void							FadeOut();
 	void							DrawLoadingScreen(char* fileName);
 	void							UpdateProgress(float value);
+	bool							IsFading();
 };

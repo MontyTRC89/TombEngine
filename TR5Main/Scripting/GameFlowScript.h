@@ -57,6 +57,12 @@ using namespace std;
 #define STRING_INV_SEPARE				41
 #define STRING_INV_CHOOSE_AMMO			42
 #define STRING_INV_SELECT_LEVEL			43
+#define STRING_INV_GRENADE_ITEM			46
+#define STRING_INV_GRENADE_AMMO			47
+#define STRING_INV_HARPOON_ITEM			48
+#define STRING_INV_HARPOON_AMMO			49
+#define STRING_INV_ROCKET_ITEM			50
+#define STRING_INV_ROCKET_AMMO			51
 
 typedef struct GameScriptSettings {
 	__int32 ScreenWidth;

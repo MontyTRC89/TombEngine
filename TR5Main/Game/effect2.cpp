@@ -97,6 +97,112 @@ void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int3
 	}*/
 }
 
+void __cdecl TriggerRocketFlame(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 itemNumber)
+{
+	SPARKS* sptr = &Sparks[GetFreeSpark()];
+
+	sptr->on = true;
+	sptr->sR = 48 + (GetRandomControl() & 31);
+	sptr->sG = sptr->sR;
+	sptr->sB = 192 + (GetRandomControl() & 63);
+
+	sptr->dR = 192 + (GetRandomControl() & 63);
+	sptr->dG = 128 + (GetRandomControl() & 63);
+	sptr->dB = 32;
+
+	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
+	sptr->fadeToBlack = 12;
+	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 28;
+	sptr->transType = 2;
+	sptr->extras = 0;
+	sptr->dynamic = -1;
+
+	sptr->x = x + ((GetRandomControl() & 31) - 16);
+	sptr->y = y;
+	sptr->z = z + ((GetRandomControl() & 31) - 16);
+
+	sptr->xVel = xv;
+	sptr->yVel = yv;
+	sptr->zVel = zv;
+	sptr->friction = 3 | (3 << 4);
+
+	if (GetRandomControl() & 1)
+	{
+		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_ITEM | SP_EXPDEF;
+		sptr->fxObj = itemNumber;
+		sptr->rotAng = GetRandomControl() & 4095;
+		if (GetRandomControl() & 1)
+			sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+		else
+			sptr->rotAdd = (GetRandomControl() & 15) + 16;
+	}
+	else
+	{
+		sptr->flags = SP_SCALE | SP_DEF | SP_ITEM | SP_EXPDEF;
+		sptr->fxObj = itemNumber;
+	}
+	
+	sptr->gravity = 0;
+	sptr->maxYvel = 0;
+
+	// TODO: right sprite
+	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->scalar = 2;
+
+	__int32 size = (GetRandomControl() & 7) + 32;
+	sptr->size = sptr->sSize = size;
+}
+
+void __cdecl TriggerRocketSmoke(__int32 x, __int32 y, __int32 z, __int32 bodyPart)
+{
+	SPARKS* sptr = &Sparks[GetFreeSpark()];
+
+	sptr->on = true;
+	sptr->sR = 0;
+	sptr->sG = 0;
+	sptr->sB = 0;
+
+	sptr->dR = 64 + bodyPart;
+	sptr->dG = 64 + bodyPart;
+	sptr->dB = 64 + bodyPart;
+
+	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
+	sptr->fadeToBlack = 12;
+	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
+	sptr->transType = 2;
+	sptr->extras = 0;
+	sptr->dynamic = -1;
+
+	sptr->x = x + ((GetRandomControl() & 15) - 8);
+	sptr->y = y + ((GetRandomControl() & 15) - 8);
+	sptr->z = z + ((GetRandomControl() & 15) - 8);
+	sptr->xVel = ((GetRandomControl() & 255) - 128);
+	sptr->yVel = -(GetRandomControl() & 3) - 4;
+	sptr->zVel = ((GetRandomControl() & 255) - 128);
+	sptr->friction = 4;
+
+	if (GetRandomControl() & 1)
+	{
+		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		sptr->rotAng = GetRandomControl() & 4095;
+		if (GetRandomControl() & 1)
+			sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+		else
+			sptr->rotAdd = (GetRandomControl() & 15) + 16;
+	}
+	else
+		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+
+	// TODO: right sprite
+	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->scalar = 3;
+	sptr->gravity = -(GetRandomControl() & 3) - 4;
+	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
+
+	__int32 size = (GetRandomControl() & 7) + 32;
+	sptr->size = sptr->sSize = size >> 2;
+}
+
 void Inject_Effect2()
 {
 	INJECT(0x00431240, TriggerDynamics);

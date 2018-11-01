@@ -134,7 +134,8 @@ enum LaraWaterStatus
 	LW_ABOVE_WATER = 0,
 	LW_UNDERWATER = 1,
 	LW_SURFACE = 2,
-	LW_FLYCHEAT = 3
+	LW_FLYCHEAT = 3,
+	LW_WADE = 4
 };
 
 enum LaraGunStatus
@@ -143,7 +144,8 @@ enum LaraGunStatus
 	LG_HANDS_BUSY = 1,
 	LG_DRAW_GUNS = 2,
 	LG_UNDRAW_GUNS = 3,
-	LG_READY = 4
+	LG_READY = 4,
+	LG_SPECIAL = 5
 };
 
 enum input_buttons

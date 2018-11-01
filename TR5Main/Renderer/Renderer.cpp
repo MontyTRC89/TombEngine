@@ -5785,3 +5785,8 @@ void Renderer::drawFullScreenBackground(LPDIRECT3DTEXTURE9 texture, float alpha)
 	m_dxSprite->Draw(texture, &rect, NULL, NULL, D3DCOLOR_ARGB(255, colorComponent, colorComponent, colorComponent));
 	m_dxSprite->End();
 }
+
+bool Renderer::IsFading()
+{
+	return (m_fadeStatus != FADEMODE_NONE);
+}

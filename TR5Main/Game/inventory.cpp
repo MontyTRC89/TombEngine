@@ -6,12 +6,14 @@
 #include "gameflow.h"
 #include "sound.h"
 #include "savegame.h"
+#include "lara.h"
 
 #include "..\Global\global.h"
 #include "..\Specific\input.h"
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
+extern LaraExtraInfo g_LaraExtra;
 
 void Inject_Inventory()
 {
@@ -48,9 +50,13 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_POLAROID].meshBits = -1;
 	m_objectsTable[INV_OBJECT_POLAROID].rotY = 16384;
 
-	m_objectsTable[INV_OBJECT_HEADPHONES].objectNumber = ID_INVENTORY_HEADPHONES;
-	m_objectsTable[INV_OBJECT_HEADPHONES].objectName = STRING_INV_SOUND;
-	m_objectsTable[INV_OBJECT_HEADPHONES].meshBits = -1;
+	m_objectsTable[INV_OBJECT_GRENADE_ITEM].objectNumber = ID_GRENADE_ITEM;
+	m_objectsTable[INV_OBJECT_GRENADE_ITEM].objectName = STRING_INV_GRENADE_ITEM;
+	m_objectsTable[INV_OBJECT_GRENADE_ITEM].meshBits = -1;
+
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectNumber = ID_GRENADE_AMMO_ITEM;
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectName = STRING_INV_GRENADE_AMMO;
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO].meshBits = -1;
 }
 
 Inventory::~Inventory()
@@ -102,11 +108,11 @@ void Inventory::Initialise()
 		//Lara.uzisTypeCarried = 1;
 		//Lara.numUziAmmo = 1000;
 
-		/*Lara.shotgunTypeCarried = 1;
-		Lara.numShotgunAmmo1 = 1000;
-		Lara.numShotgunAmmo2 = 1000;
+		//Lara.shotgunTypeCarried = 1;
+		//Lara.numShotgunAmmo1 = 1000;
+		//Lara.numShotgunAmmo2 = 1000;
 
-		Lara.numRevolverAmmo = 1000;
+		/*Lara.numRevolverAmmo = 1000;
 		Lara.numShotgunAmmo2 = 1000;
 		Lara.crowbar = 1;
 
@@ -115,6 +121,12 @@ void Inventory::Initialise()
 		//Lara.numUziAmmo = 10000;
 				//Lara.crossbowTypeCarried = 1;
 		//Lara.numCrossbowAmmo1 = 1000;
+
+		g_LaraExtra.hasGrenadeLauncher = true;
+		g_LaraExtra.numGrenadeAmmos = 1000;
+
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_ITEM);
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO);
 	}
 	
 	// Now fill the rings
@@ -704,6 +716,42 @@ void Inventory::UseCurrentItem()
 			if (!Lara.gunStatus && Lara.gunType == WEAPON_SHOTGUN)
 				Lara.gunStatus = LG_DRAW_GUNS;
 		
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+		}
+		else
+		{
+			SayNo();
+			return;
+		}
+	}
+
+	// Grenade launcher
+	if (objectNumber == ID_GRENADE_ITEM)
+	{
+		if (canUseWeapons)
+		{
+			Lara.requestGunType = WEAPON_GRENADE;
+			if (!Lara.gunStatus && Lara.gunType == WEAPON_GRENADE)
+				Lara.gunStatus = LG_DRAW_GUNS;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+		}
+		else
+		{
+			SayNo();
+			return;
+		}
+	}
+
+	// Harpoon gun
+	if (objectNumber == ID_HARPOON_ITEM)
+	{
+		if (canUseWeapons)
+		{
+			Lara.requestGunType = WEAPON_HARPOON;
+			if (!Lara.gunStatus && Lara.gunType == WEAPON_HARPOON)
+				Lara.gunStatus = LG_DRAW_GUNS;
+
 			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 		}
 		else

@@ -6,6 +6,7 @@
 #include "..\Game\Box.h"
 #include "..\Game\missile.h"
 #include "..\Game\control.h"
+#include "..\Game\pickup.h"
 #include "..\Objects\objects.h"
 
 #include <stdlib.h>
@@ -546,6 +547,22 @@ void __cdecl NewObjects()
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_GRENADE_ITEM];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_GRENADE_AMMO_ITEM];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
 }

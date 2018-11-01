@@ -266,6 +266,10 @@
 #define TriggerTimer				VAR_U_(0x0051CA5A, byte)
 #define JustLoaded					VAR_U_(0x0051D001, byte)
 //#define Weapons						ARRAY_(0x005085B0, WEAPON_INFO, [9])
+#define SmokeWeapon					VAR_U_(0x00E6CAA0, __int32)
+#define HKTimer						VAR_U_(0x0051CEC9, __int32)
+#define HKFlag						VAR_U_(0x0051CECC, __int32)
+#define HKFlag2						VAR_U_(0x0051CEC8, byte)
 
 extern bool MonksAttackLara;
 

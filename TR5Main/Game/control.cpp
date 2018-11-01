@@ -69,7 +69,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 
 		// Does the player want to enter inventory?
 		SetDebounce = 0;
-		if (CurrentLevel != 0)
+		if (CurrentLevel != 0 && !g_Renderer->IsFading())
 		{
 			if ((DbInput & 0x200000 || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{ 
