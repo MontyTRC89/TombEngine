@@ -239,7 +239,7 @@ void __cdecl FireGrenade()
 		pos.x = 0;
 		pos.y = GRENADE_YOFF + 96;
 		pos.z = GRENADE_ZOFF;
-		GetLaraJointPosition(&pos, 1);
+		GetLaraJointPosition(&pos, HAND_R);
 		item->pos.xPos = x = pos.x;
 		item->pos.yPos = y = pos.y;
 		item->pos.zPos = z = pos.z;
@@ -250,13 +250,13 @@ void __cdecl FireGrenade()
 			item->pos.yPos = pos.y;
 			item->pos.zPos = LaraItem->pos.zPos;
 			item->roomNumber = LaraItem->roomNumber;
-		}
+		} 
 
 		pos.x = 0;
 		pos.y = GRENADE_YOFF + 1024;
 		pos.z = GRENADE_ZOFF;
-		GetLaraJointPosition(&pos, 1);
-
+		GetLaraJointPosition(&pos, HAND_R);
+		 
 		SmokeCountL = 32;
 		SmokeWeapon = WEAPON_GRENADE;
 
@@ -548,9 +548,9 @@ void __cdecl DrawShotgun(__int32 weaponType)
 		item->objectNumber = WeaponObject(weaponType);
 
 		if (weaponType == WEAPON_ROCKET)
-			item->animNumber = Objects[ID_ROCKET_LAUNCHER_ITEM].animIndex + 1;
+			item->animNumber = Objects[item->objectNumber].animIndex + 1;
 		else if (weaponType == WEAPON_GRENADE)
-			item->animNumber = Objects[ID_GRENADE_ITEM].animIndex + ROCKET_DRAW_ANIM;
+			item->animNumber = Objects[item->objectNumber].animIndex + ROCKET_DRAW_ANIM;
 		else
 			item->animNumber = Objects[item->objectNumber].animIndex + HARPOON_DRAW_ANIM; // M16 too
 		
@@ -630,7 +630,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 			pos.z = 72;
 		}
 
-		GetLaraJointPosition(&pos, 11);
+		GetLaraJointPosition(&pos, UARM_L);
 
 		if (LaraItem->meshBits)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);

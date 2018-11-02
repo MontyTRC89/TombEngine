@@ -7,6 +7,7 @@
 #include "..\Game\missile.h"
 #include "..\Game\control.h"
 #include "..\Game\pickup.h"
+#include "..\game\lara1gun.h"
 #include "..\Objects\objects.h"
 
 #include <stdlib.h>
@@ -564,6 +565,12 @@ void __cdecl NewObjects()
 		obj->collision = PickupCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_GRENADE];
+	if (obj->loaded)
+	{
+		obj->control = ControlGrenade;
 	}
 }
 
