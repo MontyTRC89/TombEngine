@@ -669,4 +669,5 @@ public:
 	void							DrawLoadingScreen(char* fileName);
 	void							UpdateProgress(float value);
 	bool							IsFading();
+	void							GetLaraBonePosition(D3DXVECTOR3* pos, __int32 bone);
 };

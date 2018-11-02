@@ -572,6 +572,28 @@ void __cdecl NewObjects()
 	{
 		obj->control = ControlGrenade;
 	}
+
+	obj = &Objects[ID_HARPOON_ITEM];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_HARPOON_AMMO_ITEM];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_HARPOON];
+	if (obj->loaded)
+	{
+		obj->control = ControlHarpoonBolt;
+	}
 }
 
 void __cdecl CustomObjects()

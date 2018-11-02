@@ -57,6 +57,14 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectNumber = ID_GRENADE_AMMO_ITEM;
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectName = STRING_INV_GRENADE_AMMO;
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO].meshBits = -1;
+
+	m_objectsTable[INV_OBJECT_HARPOON_ITEM].objectNumber = ID_HARPOON_ITEM;
+	m_objectsTable[INV_OBJECT_HARPOON_ITEM].objectName = STRING_INV_HARPOON_ITEM;
+	m_objectsTable[INV_OBJECT_HARPOON_ITEM].meshBits = -1;
+
+	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectNumber = ID_HARPOON_AMMO_ITEM;
+	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectName = STRING_INV_HARPOON_AMMO;
+	m_objectsTable[INV_OBJECT_HARPOON_AMMO].meshBits = -1;
 }
 
 Inventory::~Inventory()
@@ -127,6 +135,12 @@ void Inventory::Initialise()
 
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_ITEM);
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO);
+
+		g_LaraExtra.hasHarpoon = true;
+		g_LaraExtra.numHarpoonAmmos = 1000;
+
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_ITEM);
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);
 	}
 	
 	// Now fill the rings

@@ -2960,7 +2960,7 @@ __int32 Renderer::drawInventoryScene()
 				else
 				{
 					__int16 inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
-					char* string = &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
+					char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
 
 					__int32 quantity = -1;
 					switch (objectNumber)
@@ -5789,4 +5789,13 @@ void Renderer::drawFullScreenBackground(LPDIRECT3DTEXTURE9 texture, float alpha)
 bool Renderer::IsFading()
 {
 	return (m_fadeStatus != FADEMODE_NONE);
+}
+
+void Renderer::GetLaraBonePosition(D3DXVECTOR3* pos, __int32 joint)
+{
+	auto obj = m_moveableObjects[ID_LARA];
+	auto bone = obj->LinearizedBones[joint];
+	D3DXVECTOR3 transformed;
+	D3DXVec3TransformCoord(&transformed, pos, &obj->AnimationTransforms[joint]);
+	*pos = transformed + D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 }

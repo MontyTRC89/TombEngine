@@ -23,19 +23,22 @@ void __cdecl FireHarpoon()
 	if (itemNumber != NO_ITEM)
 	{
 		GAME_VECTOR pos;
+		D3DXVECTOR3 dxPos;
 
 		ITEM_INFO* item = &Items[itemNumber];
 
 		item->shade = 0x4210 | 0x8000;
-		item->objectNumber = ID_HARPOON_ITEM;
+		item->objectNumber = ID_HARPOON;
 		item->roomNumber = LaraItem->roomNumber;
-		pos.x = -2;
-		pos.y = 273 + 100;
-		pos.z = 77;
-		GetLaraJointPosition((PHD_VECTOR*)&pos, HAND_R);
-		item->pos.xPos = pos.x;
-		item->pos.yPos = pos.y;
-		item->pos.zPos = pos.z;
+		pos.x = dxPos.x = -2;
+		pos.y = dxPos.y = 273 + 100;
+		pos.z = dxPos.z = 77;
+
+		g_Renderer->GetLaraBonePosition(&dxPos, HAND_R);
+
+		item->pos.xPos = pos.x = dxPos.x;
+		item->pos.yPos = pos.y = dxPos.y;
+		item->pos.zPos = pos.z = dxPos.z;
 
 		InitialiseItem(itemNumber);
 
@@ -235,11 +238,12 @@ void __cdecl FireGrenade()
 		item->objectNumber = ID_GRENADE;
 		item->roomNumber = LaraItem->roomNumber;
 		
-		PHD_VECTOR pos;
+		D3DXVECTOR3 pos;
 		pos.x = 0;
-		pos.y = GRENADE_YOFF + 96;
+		pos.y = -(GRENADE_YOFF + 96);
 		pos.z = GRENADE_ZOFF;
-		GetLaraJointPosition(&pos, HAND_R);
+		g_Renderer->GetLaraBonePosition(&pos, HAND_R);
+
 		item->pos.xPos = x = pos.x;
 		item->pos.yPos = y = pos.y;
 		item->pos.zPos = z = pos.z;
@@ -253,10 +257,11 @@ void __cdecl FireGrenade()
 		} 
 
 		pos.x = 0;
-		pos.y = GRENADE_YOFF + 1024;
+		pos.y = -(GRENADE_YOFF + 1024);
 		pos.z = GRENADE_ZOFF;
-		GetLaraJointPosition(&pos, HAND_R);
-		 
+
+		g_Renderer->GetLaraBonePosition(&pos, HAND_R);
+
 		SmokeCountL = 32;
 		SmokeWeapon = WEAPON_GRENADE;
 
@@ -277,8 +282,7 @@ void __cdecl FireGrenade()
 
 		item->speed = GRENADE_SPEED;
 		item->fallspeed = (-item->speed * SIN(item->pos.xRot)) >> W2V_SHIFT;
-		item->currentAnimState = item->pos.xRot;	// Current anim state is X rotation so the object can rotate in X axis
-											// without affecting velocites.
+		item->currentAnimState = item->pos.xRot;	
 		item->goalAnimState = item->pos.yRot;	// Goal anim state is Y rotation so the object can rotate in Y axis blah blah
 		item->requiredAnimState = 0;	// Flag to say if rolling on floor.
 		item->hitPoints = 4 * 30;	// Explode after 3 seconds.
@@ -345,12 +349,12 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 
 	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
 	phd_TranslateRel(0, 0, -64);*/
-/*#
-	wx = (*(phd_mxptr + M03) >> W2V_SHIFT);
-	wy = (*(phd_mxptr + M13) >> W2V_SHIFT);
-	wz = (*(phd_mxptr + M23) >> W2V_SHIFT);
-endif
-	phd_PopMatrix();*/
+	/*#
+		wx = (*(phd_mxptr + M03) >> W2V_SHIFT);
+		wy = (*(phd_mxptr + M13) >> W2V_SHIFT);
+		wz = (*(phd_mxptr + M23) >> W2V_SHIFT);
+	endif
+		phd_PopMatrix();*/
 
 	D3DXMATRIX transform;
 	D3DXMATRIX translation;
@@ -360,7 +364,7 @@ endif
 		TR_ANGLE_TO_RAD(item->pos.zRot));
 	D3DXMatrixTranslation(&translation, 0, 0, -64);
 	D3DXMatrixMultiply(&transform, &rotation, &translation);
-	
+
 	__int32 wx = transform._14;
 	__int32 wy = transform._24;
 	__int32 wz = transform._34;
@@ -368,17 +372,23 @@ endif
 	if (item->speed && aboveWater)
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 
-	item->pos.zPos += (zv = ((item->speed * COS(item->goalAnimState)) >> W2V_SHIFT));
-	item->pos.xPos += (xv = ((item->speed * SIN(item->goalAnimState)) >> W2V_SHIFT));
-	item->pos.yPos += (yv = item->fallspeed);
+	xv = ((item->speed * SIN(item->goalAnimState)) >> W2V_SHIFT);
+	yv = item->fallspeed;
+	zv = ((item->speed * COS(item->goalAnimState)) >> W2V_SHIFT);
+
+	item->pos.xPos += xv;
+	item->pos.yPos += yv;
+	item->pos.zPos += zv;
 
 	__int16 sYrot = item->pos.yRot;
 	item->pos.yRot = item->goalAnimState;
+
 	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
+
 	item->goalAnimState = item->pos.yRot;
 	item->pos.yRot = sYrot;
 
-	/*if (Rooms[item->roomNumber].flags & 1 && abovewater) 
+	/*if (Rooms[item->roomNumber].flags & 1 && abovewater)
 	{
 		splash_setup.x = item->pos.xPos;
 		splash_setup.y = room[item->roomNumber].maxceiling;
@@ -407,7 +417,8 @@ endif
 	// Has the timer ran out ? If so, explodes with blast radius.
 
 	__int32 radius = 0;
-	bool explode = false; // no radius, so must hit bad guy
+	bool explode = false; 
+
 	if (item->hitPoints)
 	{
 		item->hitPoints--;
@@ -418,104 +429,131 @@ endif
 		}
 	}
 
-	// Has it hit a beastie? Check ones in surrounding rooms.
+	// Get all surrounding rooms inside the radius
+	ROOM_INFO* room = &Rooms[item->roomNumber];
 
-	/*GetNearByRooms(item->pos.xPos, item->pos.yPos, item->pos.zPos, radius << 2, radius << 2, item->roomNumber);
+	vector<__int32> items;
+	items.push_back(Lara.itemNumber);
 
-	for (lp = 0; lp < number_draw_rooms; lp++)
+	if (room->door)
 	{
-		for (target_number = room[draw_rooms[lp]].itemNumber; target_number != NO_ITEM; target_number = target->next_item)
+		__int32 numPortals = *(room->door);
+		__int16* portals = room->door;
+		portals++;
+
+		for (__int32 i = 0; i < numPortals; i++)
 		{
-			target = &items[target_number];
-			if (target == LaraItem || !target->collidable)
+			__int16 roomNumber = *portals;
+
+			room = &Rooms[roomNumber];
+			ITEM_INFO* target = NULL;
+
+			for (__int16 targetItemNumber = room->itemNumber; targetItemNumber != NO_ITEM; targetItemNumber = target->nextItem)
+			{
+				target = &Items[targetItemNumber];
+
+				// Ignore not collidable items
+				if (target != LaraItem && !target->collidable)
+					continue;
+
+				items.push_back(targetItemNumber);
+			}
+
+			portals += 16;
+		}
+	}
+
+	for (__int32 i = 0; i < items.size(); i++)
+	{
+		ITEM_INFO* target = &Items[items[i]];
+
+		// Destroy only smashable objects, shatters (check later), Lara and intelligent entities
+		if (target->objectNumber == ID_SMASH_OBJECT1 ||
+			target->objectNumber == ID_SMASH_OBJECT2 ||
+			target->objectNumber == ID_SMASH_OBJECT3 ||
+			target->objectNumber == ID_SMASH_OBJECT4 ||
+			target->objectNumber == ID_SMASH_OBJECT5 ||
+			target->objectNumber == ID_SMASH_OBJECT6 ||
+			target->objectNumber == ID_SMASH_OBJECT7 ||
+			target->objectNumber == ID_SMASH_OBJECT8 ||
+			target->objectNumber == ID_LARA ||
+			(Objects[target->objectNumber].intelligent &&
+				target->status != ITEM_INVISIBLE &&
+				Objects[target->objectNumber].collision)
+			)
+		{
+			__int16* bounds = GetBestFrame(target);
+			if (item->pos.yPos + radius < target->pos.yPos + bounds[2] || item->pos.yPos - radius > target->pos.yPos + bounds[3])
 				continue;
 
-			if (target->objectNumber == SMASH_WINDOW ||
-				target->objectNumber == SMASH_OBJECT1 ||
-				target->objectNumber == SMASH_OBJECT2 ||
-				target->objectNumber == SMASH_OBJECT3 ||
-				target->objectNumber == CARCASS ||
-				target->objectNumber == EXTRAFX6 ||
-				target->objectNumber == FLYING_MUTANT_EMITTER ||
-				(objects[target->objectNumber].intelligent && target->status != INVISIBLE && objects[target->objectNumber].collision))
+			// get vector from target to bolt and check against x,z bounds
+			__int32 c = COS(target->pos.yRot);
+			__int32 s = SIN(target->pos.yRot);
+
+			__int32 x = item->pos.xPos - target->pos.xPos;
+			__int32 z = item->pos.zPos - target->pos.zPos;
+			__int32 rx = (c*x - s * z) >> W2V_SHIFT;
+
+			__int32 ox = oldX - target->pos.xPos;
+			__int32 oz = oldZ - target->pos.zPos;
+			__int32 sx = (c*ox - s * oz) >> W2V_SHIFT;
+
+			if ((rx + radius < bounds[0] && sx + radius < bounds[0]) ||
+				(rx - radius > bounds[1] && sx - radius > bounds[1]))
+				continue;
+
+			__int32 rz = (c*z + s * x) >> W2V_SHIFT;
+			__int32 sz = (c*oz + s * ox) >> W2V_SHIFT;
+
+			if ((rz + radius < bounds[4] && sz + radius < bounds[4]) ||
+				(rz - radius > bounds[5] && sz - radius > bounds[5]))
+				continue;
+
+			if (target->objectNumber == ID_SMASH_OBJECT1 ||
+				target->objectNumber == ID_SMASH_OBJECT2 ||
+				target->objectNumber == ID_SMASH_OBJECT3 ||
+				target->objectNumber == ID_SMASH_OBJECT4 ||
+				target->objectNumber == ID_SMASH_OBJECT5 ||
+				target->objectNumber == ID_SMASH_OBJECT6 ||
+				target->objectNumber == ID_SMASH_OBJECT7 ||
+				target->objectNumber == ID_SMASH_OBJECT8)
 			{
-				// check against bounds of target for collision
-				__int16* bounds = GetBestFrame(target);
-				if (item->pos.yPos + radius < target->pos.yPos + bounds[2] || item->pos.yPos - radius > target->pos.yPos + bounds[3])
-					continue;
+				SmashItem(items[i]);
+			}
+			else
+			{
+				// Hit the target
+				HitTarget(target, NULL, 500, 0);
 
-				// get vector from target to bolt and check against x,z bounds
-				c = COS(target->pos.yRot);
-				s = SIN(target->pos.yRot);
+				// Update level statistics
+				Savegame.Level.AmmoHits++;
+				Savegame.Game.AmmoHits++;
 
-				x = item->pos.xPos - target->pos.xPos;
-				z = item->pos.zPos - target->pos.zPos;
-				rx = (c*x - s * z) >> W2V_SHIFT;
-
-				ox = old_x - target->pos.xPos;
-				oz = old_z - target->pos.zPos;
-				sx = (c*ox - s * oz) >> W2V_SHIFT;
-
-				if ((rx + radius < bounds[0] && sx + radius < bounds[0]) ||
-					(rx - radius > bounds[1] && sx - radius > bounds[1]))
-					continue;
-
-				rz = (c*z + s * x) >> W2V_SHIFT;
-				sz = (c*oz + s * ox) >> W2V_SHIFT;
-
-				if ((rz + radius < bounds[4] && sz + radius < bounds[4]) ||
-					(rz - radius > bounds[5] && sz - radius > bounds[5]))
-					continue;
-
-				if (target->objectNumber == SMASH_OBJECT1 && CurrentLevel != LV_CRASH)
+				// Check if entity is dead
+				if (target->hitPoints <= 0)
 				{
-					SmashWindow(target_number);
-				}
-				else if (target->objectNumber == SMASH_WINDOW ||
-					target->objectNumber == SMASH_OBJECT2 ||
-					target->objectNumber == SMASH_OBJECT3)
-				{
-					SmashWindow(target_number);
-				}
-				else if (target->objectNumber == CARCASS || target->objectNumber == EXTRAFX6)
-				{
-					if (item->status != ITEM_ACTIVE)
+					Savegame.Level.Kills++;
+					Savegame.Game.Kills++;
+
+					if (target->objectNumber != ID_LARA)
+						CreatureDie(items[i], 1);
+					else
 					{
-						item->status = ITEM_ACTIVE;
-						AddActiveItem(target_number);
+						LaraItem->hitPoints = -16384;
+						LaraItem->hitStatus = true;
 					}
 				}
-				else if (target->objectNumber != SMASH_OBJECT1)
+
+				if (!explode)
 				{
-					// Kaboom! take that evil bad guy
-					HitTarget(target, NULL, 20);
-					
-					Savegame.Level.AmmoHits++;
-					Savegame.Game.AmmoHits++;
-
-					// if dead, then blast them to bits
-					if (target->hitPoints <= 0)
-					{
-						Savegame.Level.Kills++;
-						Savegame.Game.Kills++;
-						
-						//if (target->objectNumber != TRIBEBOSS && target->objectNumber != WHALE && target->objectNumber != WILLARD_BOSS && target->objectNumber != TONY && target->objectNumber != LON_BOSS && target->objectNumber != ELECTRIC_CLEANER && target->objectNumber != FLYING_MUTANT_EMITTER)
-						//{
-							CreatureDie(target_number, 1);
-						//}
-					}
-
-					if (explode == 0)
-					{
-						explode = 1;
-						radius = GRENADE_BLAST_RADIUS;
-						lp = -1;
-						break;
-					}
+					explode = true;
+					radius = GRENADE_BLAST_RADIUS;
+					break;
 				}
 			}
 		}
-	}*/
+
+	}
 
 	if (explode)
 	{
@@ -531,7 +569,8 @@ endif
 		AlertNearbyGuards(item);
 		SoundEffect(105, &item->pos, ENV_FLAG_PITCH_SHIFT | 0x1800000);
 		SoundEffect(106, &item->pos, 0);	// Explosion ?
-		KillItem(itemNumber);
+		if (itemNumber != Lara.itemNumber)
+			KillItem(itemNumber);
 	}
 }
 
