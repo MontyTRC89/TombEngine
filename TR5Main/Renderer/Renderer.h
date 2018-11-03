@@ -607,7 +607,7 @@ class Renderer
 	void							drawRipples();
 	void							drawUnderwaterDust();
 	bool							drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
-	void							createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos);
+	void							createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos, float rotation);
 	bool							drawScene(bool dump);
 	bool							bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, RenderTarget2D* rt3, RenderTarget2D* rt4);
 	bool							restoreBackBuffer();

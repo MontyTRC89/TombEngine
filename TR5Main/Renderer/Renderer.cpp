@@ -4557,7 +4557,7 @@ void Renderer::ClearDynamicLights()
 	NumDynamics = 0;
 }
 
-void Renderer::createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos)
+void Renderer::createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos, float rotation)
 {
 	D3DXVECTOR3 look = *particlePos;
 	look = look - *cameraPos;
@@ -4568,6 +4568,12 @@ void Renderer::createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, 
 	D3DXVECTOR3 right;
 	D3DXVec3Cross(&right, &cameraUp, &look);
 	D3DXVec3Normalize(&right, &right);
+
+	// Rotate right vector
+	//rotation *= RADIAN;
+	D3DXMATRIX rightTransform;
+	D3DXMatrixRotationAxis(&rightTransform, &look, rotation);
+	D3DXVec3TransformCoord(&right, &right, &rightTransform);
 
 	D3DXVECTOR3 up;
 	D3DXVec3Cross(&up, &look, &right);
@@ -4646,7 +4652,7 @@ bool Renderer::drawSprites()
 
 					D3DXMATRIX billboardMatrix;
 					createBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(spr->X, spr->Y, spr->Z),
-						&D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z));
+						&D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
 
 					D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
 					D3DXVECTOR3 p1 = D3DXVECTOR3(halfWidth, -halfHeight, 0);
@@ -5850,20 +5856,47 @@ void Renderer::GetLaraBonePosition(D3DXVECTOR3* pos, __int32 joint)
 
 void Renderer::drawRopes()
 {
-	for (__int32 i = 0; i < 5; i++)
+	D3DVIEWPORT9 viewport;
+	m_device->GetViewport(&viewport);
+
+	for (__int32 i = 0; i < NumRopes; i++)
 	{
 		ROPE_STRUCT* rope = &Ropes[i];
 
 		if (rope->active)
 		{
-			for (__int32 i = 0; i < 24; i++)
+			D3DXMATRIX world;
+			D3DXMatrixTranslation(&world, rope->position.x, rope->position.y, rope->position.z);
+
+			for (__int32 i = 0; i < 23; i++)
 			{
-				float x = rope->segment[i].x / 65536.0f;
-				float y = rope->segment[i].y / 65536.0f;
-				float z = rope->segment[i].z / 65536.0f;
+				float x1 = rope->segment[i].x / 65536.0f;
+				float y1 = rope->segment[i].y / 65536.0f;
+				float z1 = rope->segment[i].z / 65536.0f;
+
+				float x2 = rope->segment[i + 1].x / 65536.0f;
+				float y2 = rope->segment[i + 1].y / 65536.0f;
+				float z2 = rope->segment[i + 1].z / 65536.0f;
+
+				float x = (x1 + x2) / 2.0f;
+				float y = (y1 + y2) / 2.0f;
+				float z = (z1 + z2) / 2.0f;
+
+				D3DXVECTOR3 projected1;
+				D3DXVec3Project(&projected1, &D3DXVECTOR3(x1, y1, z1), &viewport, &ProjectionMatrix, &ViewMatrix, &world);
+
+				D3DXVECTOR3 projected2;
+				D3DXVec3Project(&projected2, &D3DXVECTOR3(x2, y2, z2), &viewport, &ProjectionMatrix, &ViewMatrix, &world);
+
+				float dx = projected2.x - projected1.x;
+				float dy = projected2.y - projected1.y;
+				float hypotenuse = sqrt(dx * dx + dy * dy);
+				double angle = asin(-dx / hypotenuse);
+				if (angle > 2 * PI)
+					angle -= 2 * PI;
 
 				addSpriteBillboard(m_sprites[20].get(), rope->position.x + x, rope->position.y + y, rope->position.z + z,
-								   255, 255, 255, 0, 1, 48.0f, 192.0f, BLEND_MODES::BLENDMODE_OPAQUE);
+					255, 255, 255, angle, 1, 48.0f, 160.0f, BLEND_MODES::BLENDMODE_OPAQUE);
 			}
 		}
 	}

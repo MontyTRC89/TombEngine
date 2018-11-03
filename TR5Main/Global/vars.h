@@ -272,6 +272,7 @@
 #define HKFlag2						VAR_U_(0x0051CEC8, byte)
 
 #define Ropes						ARRAY_(0x00E54CC0, ROPE_STRUCT, [12])
+#define NumRopes					VAR_U_(0x0051CA60, __int32)
 
 extern bool MonksAttackLara;
 
