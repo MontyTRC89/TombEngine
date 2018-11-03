@@ -211,6 +211,10 @@ void PatchGameCode()
 	WriteProcessMemory(gameHandle, (LPVOID)0x0041A64D, &newValue, 4, NULL);
 
 	// RifleHandler
+	newValue = (__int32)&Weapons[0];
+	WriteProcessMemory(gameHandle, (LPVOID)0x0044DCDA, &newValue, 4, NULL);
+
+	// FireShotgun
 	newValue = (__int32)&Weapons[0] + 186;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E2B2, &newValue, 4, NULL);
 	newValue = (__int32)&Weapons[0] + 188;

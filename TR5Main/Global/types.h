@@ -1297,6 +1297,19 @@ struct WEAPON_INFO
 	__int16 sampleNum; // size=0, offset=36
 };
 
+struct ROPE_STRUCT
+{
+	PHD_VECTOR segment[24]; // size=288, offset=0
+	PHD_VECTOR velocity[24]; // size=288, offset=288
+	PHD_VECTOR normalisedSegment[24]; // size=288, offset=576
+	PHD_VECTOR meshSegment[24]; // size=288, offset=864
+	PHD_VECTOR position; // size=12, offset=1152
+	PHD_VECTOR Unknown[24];
+	__int32 segmentLength; // size=0, offset=1164
+	__int16 active; // size=0, offset=1168
+	__int16 coiled; // size=0, offset=1170
+};
+
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
 typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);

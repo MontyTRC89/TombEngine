@@ -282,6 +282,7 @@ void __cdecl LaraGun()
 		case WEAPON_ROCKET:
 		case WEAPON_HARPOON:
 		case WEAPON_REVOLVER:
+			printf("Target dist: %d\n", Weapons[Lara.gunType].targetDist);
 			RifleHandler(Lara.gunType);
 			break;
 

@@ -1,3 +1,7 @@
+#define BLENDMODE_OPAQUE			0
+#define BLENDMODE_ALPHATEST			1
+#define BLENDMODE_ALPHABLEND		2
+
 struct VertexShaderInput
 {
 	float3 Position : POSITION0;
@@ -16,6 +20,8 @@ struct VertexShaderOutput
 
 float4x4 View;
 float4x4 Projection;
+
+int BlendMode;
 
 texture TextureAtlas;
 sampler2D textureSampler = sampler_state {
@@ -41,7 +47,9 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
 	float4 textureColor = tex2D(textureSampler, input.TextureCoordinate);
-	//clip(textureColor.a - 0.6f);
+	
+	if (BlendMode == BLENDMODE_ALPHATEST)
+		clip(textureColor.a - 0.5f);
 
 	float a = textureColor.r;
 	textureColor *= input.Color;
