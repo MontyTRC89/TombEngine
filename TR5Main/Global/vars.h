@@ -274,6 +274,10 @@
 #define Ropes						ARRAY_(0x00E54CC0, ROPE_STRUCT, [12])
 #define NumRopes					VAR_U_(0x0051CA60, __int32)
 
+#define PhdWidth						VAR_U_(0x0055D29C, __int32)
+#define PhdHeight						VAR_U_(0x0055D164, __int32)
+#define PhdPerspective					VAR_U_(0x0055D208, __int32)
+
 extern bool MonksAttackLara;
 
 // Remapped variables

@@ -672,4 +672,5 @@ public:
 	void							UpdateProgress(float value);
 	bool							IsFading();
 	void							GetLaraBonePosition(D3DXVECTOR3* pos, __int32 bone);
+	void							createConstrainedBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* object, D3DXVECTOR3* cameraPosition, D3DXVECTOR3* rotateAxis, D3DXVECTOR3* cameraForward, D3DXVECTOR3* objectForward);
 };

@@ -20,6 +20,7 @@ void __cdecl phd_LookAt(__int32 posX, __int32 posY, __int32 posZ,
 void __cdecl phd_AlterFOV(__int32 value)
 {
 	CurrentFOV = value;
+	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
 }
 
 void __cdecl j_CalculateCamera()

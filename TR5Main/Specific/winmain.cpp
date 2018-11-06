@@ -122,6 +122,9 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	// TODO: load settings from Windows registry
 	OptionAutoTarget = 1;
 
+	PhdWidth = g_GameFlow->GetSettings()->ScreenWidth;
+	PhdHeight = g_GameFlow->GetSettings()->ScreenHeight;
+
 	//DXInitialise(App.WindowHandle);
 	g_Renderer = new Renderer();
 	g_Renderer->Initialise(g_GameFlow->GetSettings()->ScreenWidth, g_GameFlow->GetSettings()->ScreenHeight, true, App.WindowHandle);

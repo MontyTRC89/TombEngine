@@ -29,7 +29,8 @@
 #include "..\Game\gameflow.h"
 #include "..\Game\lara.h"
 #include "..\Game\effect2.h"
- 
+#include "..\Game\rope.h"
+
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
 
@@ -4723,7 +4724,7 @@ bool Renderer::drawSprites()
 					m_spritesIndices.push_back(baseVertex + 2);
 					m_spritesIndices.push_back(baseVertex + 3);
 				}
-				else
+				else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
 				{
 					D3DXVECTOR3 p0t = D3DXVECTOR3(spr->X1, spr->Y1, spr->Z1);
 					D3DXVECTOR3 p1t = D3DXVECTOR3(spr->X2, spr->Y2, spr->Z2);
@@ -5859,45 +5860,191 @@ void Renderer::drawRopes()
 	D3DVIEWPORT9 viewport;
 	m_device->GetViewport(&viewport);
 
-	for (__int32 i = 0; i < NumRopes; i++)
+	for (__int32 n = 0; n < NumRopes; n++)
 	{
-		ROPE_STRUCT* rope = &Ropes[i];
+		ROPE_STRUCT* rope = &Ropes[n];
 
 		if (rope->active)
 		{
-			D3DXMATRIX world;
-			D3DXMatrixTranslation(&world, rope->position.x, rope->position.y, rope->position.z);
+			// Original algorithm:
+			// 1) Transform segment coordinates from 3D to 2D + depth
+			// 2) Get dx, dy and the segment length
+			// 3) Get sine and cosine from dx / length and dy / length
+			// 4) Calculate a scale factor 
+			// 5) Get the coordinates of the 4 corners of each sprite iteratively
+			// 6) Last step only for us, unproject back to 3D coordinates
 
-			for (__int32 i = 0; i < 23; i++)
+			// Tranform rope points
+			D3DXVECTOR3 projected[24];
+
+			for (__int32 i = 0; i < 24; i++)
 			{
-				float x1 = rope->segment[i].x / 65536.0f;
-				float y1 = rope->segment[i].y / 65536.0f;
-				float z1 = rope->segment[i].z / 65536.0f;
+				D3DXVECTOR3 absolutePosition = D3DXVECTOR3(rope->position.x + rope->segment[i].x / 65536.0f,
+					rope->position.y + rope->segment[i].y / 65536.0f,
+					rope->position.z + rope->segment[i].z / 65536.0f);
 
-				float x2 = rope->segment[i + 1].x / 65536.0f;
-				float y2 = rope->segment[i + 1].y / 65536.0f;
-				float z2 = rope->segment[i + 1].z / 65536.0f;
-
-				float x = (x1 + x2) / 2.0f;
-				float y = (y1 + y2) / 2.0f;
-				float z = (z1 + z2) / 2.0f;
-
-				D3DXVECTOR3 projected1;
-				D3DXVec3Project(&projected1, &D3DXVECTOR3(x1, y1, z1), &viewport, &ProjectionMatrix, &ViewMatrix, &world);
-
-				D3DXVECTOR3 projected2;
-				D3DXVec3Project(&projected2, &D3DXVECTOR3(x2, y2, z2), &viewport, &ProjectionMatrix, &ViewMatrix, &world);
-
-				float dx = projected2.x - projected1.x;
-				float dy = projected2.y - projected1.y;
-				float hypotenuse = sqrt(dx * dx + dy * dy);
-				double angle = asin(-dx / hypotenuse);
-				if (angle > 2 * PI)
-					angle -= 2 * PI;
-
-				addSpriteBillboard(m_sprites[20].get(), rope->position.x + x, rope->position.y + y, rope->position.z + z,
-					255, 255, 255, angle, 1, 48.0f, 160.0f, BLEND_MODES::BLENDMODE_OPAQUE);
+				D3DXMatrixIdentity(&m_tempWorld);
+				D3DXVec3Project(&projected[i], &absolutePosition, &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
 			}
+
+			// Now each rope point is transformed in screen X, Y and Z depth
+			// Let's calculate dx, dy corrections and scaling
+			float dx = projected[1].x - projected[0].x;
+			float dy = projected[1].y - projected[0].y;
+			float length = sqrt(dx * dx + dy * dy);
+			float s = 0;
+			float c = 0;
+
+			if (length != 0)
+			{
+				s = -dy / length;
+				c = dx / length;
+			}
+
+			float w = 6.0f;
+			if (projected[0].z)
+			{
+				w = 6.0f * PhdPerspective / projected[0].z / 65536.0f;
+				if (w < 3)
+					w = 3;
+			}
+
+			float sdx = s * w;
+			float sdy = c * w;
+
+			float x1 = projected[0].x - sdx;
+			float y1 = projected[0].y - sdy;
+
+			float x2 = projected[0].x + sdx;
+			float y2 = projected[0].y + sdy;
+
+			float depth = projected[0].z;
+
+			for (__int32 j = 0; j < 24; j++)
+			{
+				D3DXVECTOR3 p1;
+				D3DXVec3Unproject(&p1, &D3DXVECTOR3(x1, y1, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+
+				D3DXVECTOR3 p2;
+				D3DXVec3Unproject(&p2, &D3DXVECTOR3(x2, y2, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+
+				dx = projected[j].x - projected[j - 1].x;
+				dy = projected[j].y - projected[j - 1].y;
+				length = sqrt(dx * dx + dy * dy);
+				s = 0;
+				c = 0;
+
+				if (length != 0)
+				{
+					s = -dy / length;
+					c = dx / length;
+				}
+
+				w = 6.0f;
+				if (projected[0].z)
+				{
+					w = 6.0f * PhdPerspective / projected[j + 1].z / 65536.0f;
+					if (w < 3)
+						w = 3;
+				}
+
+				float sdx = s * w;
+				float sdy = c * w;
+
+				float x3 = projected[j].x - sdx;
+				float y3 = projected[j].y - sdy;
+
+				float x4 = projected[j].x + sdx;
+				float y4 = projected[j].y + sdy;
+
+				depth = projected[j].z;
+
+				D3DXVECTOR3 p3;
+				D3DXVec3Unproject(&p3, &D3DXVECTOR3(x3, y3, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+
+				D3DXVECTOR3 p4;
+				D3DXVec3Unproject(&p4, &D3DXVECTOR3(x4, y4, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+
+				addSprite3D(m_sprites[20].get(),
+							p1.x, p1.y, p1.z,
+							p2.x, p2.y, p2.z,
+							p3.x, p3.y, p3.z,
+							p4.x, p4.y, p4.z,
+							128, 128, 128, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_OPAQUE);
+
+				x1 = x4;
+				y1 = y4;
+				x2 = x3;
+				y2 = y3;
+			}
+			
 		}
 	}
+}
+
+void Renderer::createConstrainedBillboardMatrix(D3DXMATRIX* result, D3DXVECTOR3* objectPosition, D3DXVECTOR3* cameraPosition, D3DXVECTOR3* rotateAxis,
+	D3DXVECTOR3* cameraForward, D3DXVECTOR3* objectForward)
+{
+	D3DXVECTOR3 vector;
+	D3DXVECTOR3 vector2;
+	D3DXVECTOR3 vector3;
+
+	vector2.x = objectPosition->x - cameraPosition->x;
+	vector2.y = objectPosition->y - cameraPosition->y;
+	vector2.z = objectPosition->z - cameraPosition->z;
+
+	float num2 = D3DXVec3LengthSq(&vector2);
+	if (num2 < 0.0001f)
+	{
+		vector2 = *cameraForward;
+	}
+	else
+	{
+		vector2 *= (float)(1.0f / ((float)sqrt((double)num2)));
+	}
+
+	D3DXVECTOR3 vector4 = *rotateAxis;
+	float num = D3DXVec3Dot(rotateAxis, &vector2);
+
+	if (abs(num) > 0.9982547f)
+	{
+		vector = *objectForward;
+		num = D3DXVec3Dot(rotateAxis, &vector);
+		if (abs(num) > 0.9982547f)
+		{
+			num = ((rotateAxis->x * 0.0f) + (rotateAxis->y * 0.0f)) + (rotateAxis->z * -1.0f);
+			vector = (abs(num) > 0.9982547f) ? D3DXVECTOR3(1.0f, 0.0f, 0.0f) : D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		}
+
+		D3DXVec3Cross(&vector3, rotateAxis, &vector);
+		D3DXVec3Normalize(&vector3, &vector3);
+
+		D3DXVec3Cross(&vector, &vector3, rotateAxis);
+		D3DXVec3Normalize(&vector, &vector);
+	}
+	else
+	{
+		D3DXVec3Cross(&vector3, rotateAxis, &vector2);
+		D3DXVec3Normalize(&vector3, &vector3);
+
+		D3DXVec3Cross(&vector, &vector3, &vector4);
+		D3DXVec3Normalize(&vector, &vector);
+	}
+
+	result->_11 = vector3.x;
+	result->_12 = vector3.y;
+	result->_13 = vector3.z;
+	result->_14 = 0;
+	result->_21 = vector4.x;
+	result->_22 = vector4.y;
+	result->_23 = vector4.z;
+	result->_24 = 0;
+	result->_31 = vector.x;
+	result->_32 = vector.y;
+	result->_33 = vector.z;
+	result->_34 = 0;
+	result->_41 = objectPosition->x;
+	result->_42 = objectPosition->y;
+	result->_43 = objectPosition->z;
+	result->_44 = 1;
 }
