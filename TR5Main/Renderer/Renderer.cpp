@@ -3571,7 +3571,8 @@ bool Renderer::drawScene(bool dump)
 	drawDrips();
 	drawRipples();
 	drawUnderwaterDust();
-	
+	drawSplahes();
+
 	// Do weather
 	if (level->Rain)
 		doRain();
@@ -5389,8 +5390,104 @@ void Renderer::drawSplahes()
 	for (__int32 i = 0; i < 4; i++)
 	{
 		SPLASH_STRUCT* splash = &Splashes[i];
+		
+		if (splash->flags & 1)
+		{
+			byte color = (splash->life >= 32 ? 255 : splash->life << 5);
 
-		int x = 0;
+			// Inner circle
+			float angle = PI / 16.0f;
+			float c = cos(angle);
+			float s = sin(angle);
+			float dx = splash->innerRad * c;
+			float dz = splash->innerRad * s;
+			float x1 = splash->x + dx;
+			float z1 = splash->z + dz;
+			angle -= PI / 4.0f;
+
+			for (__int32 j = 0; j < 8; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				dx = splash->innerRad * c;
+				dz = splash->innerRad * s;
+				float x2 = splash->x + dx;
+				float z2 = splash->z + dz;
+				angle -= PI / 4.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8].get(),
+					x1, splash->y - splash->innerSize, z1,
+					x2, splash->y - splash->innerSize, z2,
+					x2, splash->y, z2,
+					x1, splash->y, z1,
+					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+			}
+
+			// Medium circle
+			angle = PI / 16.0f;
+			c = cos(angle);
+			s = sin(angle);
+			dx = splash->middleRad * c;
+			dz = splash->middleRad * s;
+			x1 = splash->x + dx;
+			z1 = splash->z + dz;
+			angle -= PI / 4.0f;
+
+			for (__int32 j = 0; j < 8; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				dx = splash->middleRad * c;
+				dz = splash->middleRad * s;
+				float x2 = splash->x + dx;
+				float z2 = splash->z + dz;
+				angle -= PI / 4.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8].get(),
+					x1, splash->y - splash->middleSize, z1,
+					x2, splash->y - splash->middleSize, z2,
+					x2, splash->y, z2,
+					x1, splash->y, z1,
+					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+			}
+
+			// Large circle
+			angle = PI / 16.0f;
+			c = cos(angle);
+			s = sin(angle);
+			dx = splash->outerRad * c;
+			dz = splash->outerRad * s;
+			x1 = splash->x + dx;
+			z1 = splash->z + dz;
+			angle -= PI / 4.0f;
+
+			for (__int32 j = 0; j < 8; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				dx = splash->outerRad * c;
+				dz = splash->outerRad * s;
+				float x2 = splash->x + dx;
+				float z2 = splash->z + dz;
+				angle -= PI / 4.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8].get(),
+					x1, splash->y - splash->outerSize, z1,
+					x2, splash->y - splash->outerSize, z2,
+					x2, splash->y, z2,
+					x1, splash->y, z1,
+					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+			}
+		}	
 	}
 }
 
@@ -5941,9 +6038,9 @@ void Renderer::drawRopes()
 				}
 
 				w = 6.0f;
-				if (projected[0].z)
+				if (projected[j].z)
 				{
-					w = 6.0f * PhdPerspective / projected[j + 1].z / 65536.0f;
+					w = 6.0f * PhdPerspective / projected[j].z / 65536.0f;
 					if (w < 3)
 						w = 3;
 				}
