@@ -11,6 +11,7 @@
 #define GetFreeSmokeSpark ((__int16 (__cdecl*)()) 0x00481D40)
 #define TriggerDartSmoke ((void (__cdecl*)(__int32, __int32, __int32, __int32, __int32, __int32)) 0x00430D90)
 #define TriggerGunShell ((void (__cdecl*)(__int16, __int32, __int32)) 0x00482A60)
+#define TriggerLaraDrips ((void (__cdecl*)()) 0x00483F00)
 
 void __cdecl TriggerDynamics(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
 void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 initial, __int32 weapon, __int32 count);

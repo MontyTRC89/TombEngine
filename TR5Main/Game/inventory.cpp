@@ -130,7 +130,7 @@ void Inventory::Initialise()
 				//Lara.crossbowTypeCarried = 1;
 		//Lara.numCrossbowAmmo1 = 1000;
 
-		g_LaraExtra.hasGrenadeLauncher = true;
+		/*g_LaraExtra.hasGrenadeLauncher = true;
 		g_LaraExtra.numGrenadeAmmos = 1000;
 
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_ITEM);
@@ -140,7 +140,7 @@ void Inventory::Initialise()
 		g_LaraExtra.numHarpoonAmmos = 1000;
 
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_ITEM);
-		InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);
+		InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);*/
 	}
 	
 	// Now fill the rings
@@ -241,6 +241,8 @@ void Inventory::Initialise()
 		if (Lara.numFlares)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_FLARES);
 	}
+
+	InsertObject(INV_RING_WEAPONS, INV_OBJECT_BINOCULARS);
 
 	//InsertObject(INV_RING_OPTIONS, 26);
 

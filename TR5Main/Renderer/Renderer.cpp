@@ -1951,6 +1951,13 @@ void Renderer::prepareShadowMap()
 		}
 	}
 
+	for (__int32 k = 0; k < 4; k++)
+	{
+		drawBats((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+		drawRats((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+		drawSpiders((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+	}
+
 	m_device->EndScene();
 	m_shadowMap->Unbind();
 
@@ -3209,6 +3216,15 @@ bool Renderer::drawScene(bool dump)
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
+	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
 	// Draw alpha tested geometry
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3255,6 +3271,15 @@ bool Renderer::drawScene(bool dump)
 
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
 	effect->EndPass();
 	effect->End();
@@ -4878,7 +4903,7 @@ void Renderer::drawFires()
 								fire->x + spark->x, fire->y + spark->y, fire->z + spark->z, 
 								spark->r, spark->g, spark->b, 
 								TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
-						BLEND_MODES::BLENDMODE_ALPHABLEND);
+									BLEND_MODES::BLENDMODE_ALPHABLEND);
 				}
 			}
 		}
@@ -5416,8 +5441,8 @@ void Renderer::drawSplahes()
 				angle -= PI / 4.0f;
 
 				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8].get(),
-					x1, splash->y - splash->innerSize, z1,
-					x2, splash->y - splash->innerSize, z2,
+					x1, splash->y + splash->innerY, z1,
+					x2, splash->y + splash->innerY, z2,
 					x2, splash->y, z2,
 					x1, splash->y, z1,
 					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
@@ -5447,8 +5472,8 @@ void Renderer::drawSplahes()
 				angle -= PI / 4.0f;
 
 				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8].get(),
-					x1, splash->y - splash->middleSize, z1,
-					x2, splash->y - splash->middleSize, z2,
+					x1, splash->y + splash->middleY, z1,
+					x2, splash->y + splash->middleY, z2,
 					x2, splash->y, z2,
 					x1, splash->y, z1,
 					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
@@ -6144,4 +6169,209 @@ void Renderer::createConstrainedBillboardMatrix(D3DXMATRIX* result, D3DXVECTOR3*
 	result->_42 = objectPosition->y;
 	result->_43 = objectPosition->z;
 	result->_44 = 1;
+}
+
+bool Renderer::drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+{
+	D3DXMATRIX world;
+	UINT cPasses = 1;
+
+	if (Objects[ID_BATS].loaded)
+	{
+		OBJECT_INFO* obj = &Objects[ID_BATS];
+		RendererObject* moveableObj = m_moveableObjects[ID_BATS].get();
+		__int16* meshPtr = Meshes[Objects[ID_BATS].meshIndex + 2 * (-GlobalCounter & 3)];
+		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+
+		if (bucket->NumVertices == 0)
+			return true;
+
+		setGpuStateForBucket(bucketIndex);
+
+		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+		m_device->SetIndices(bucket->GetIndexBuffer());
+
+		LPD3DXEFFECT effect;
+		if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+			effect = m_shaderDepth->GetEffect();
+		else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+			effect = m_shaderReconstructZBuffer->GetEffect();
+		else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+			effect = m_shaderFillGBuffer->GetEffect();
+		else
+			effect = m_shaderTransparent->GetEffect();
+
+		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+
+		if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+		else
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+
+		for (__int32 i = 0; i < 64; i++)
+		{
+			BAT_STRUCT* bat = &Bats[i];
+
+			if (bat->on)
+			{
+				D3DXMatrixTranslation(&m_tempTranslation, bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
+				D3DXMatrixRotationYawPitchRoll(&m_tempRotation, bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
+				D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[bat->roomNumber]->AmbientLight);
+
+				for (int iPass = 0; iPass < cPasses; iPass++)
+				{
+					effect->BeginPass(iPass);
+					effect->CommitChanges();
+
+					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+					effect->EndPass();
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+bool Renderer::drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+{
+	D3DXMATRIX world;
+	UINT cPasses = 1;
+
+	if (Objects[ID_RATS].loaded)
+	{
+		OBJECT_INFO* obj = &Objects[ID_RATS];
+		RendererObject* moveableObj = m_moveableObjects[ID_RATS].get();
+		
+		setGpuStateForBucket(bucketIndex);
+		
+		LPD3DXEFFECT effect;
+		if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+			effect = m_shaderDepth->GetEffect();
+		else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+			effect = m_shaderReconstructZBuffer->GetEffect();
+		else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+			effect = m_shaderFillGBuffer->GetEffect();
+		else
+			effect = m_shaderTransparent->GetEffect();
+
+		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+
+		if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+		else
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+
+		for (__int32 i = 0; i < NUM_RATS; i += 4)
+		{
+			RAT_STRUCT* rat = &Rats[i];
+
+			if (rat->on)
+			{
+				__int16* meshPtr = Meshes[Objects[ID_RATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
+				RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+				RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+
+				if (bucket->NumVertices == 0)
+					return true;
+
+				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+				m_device->SetIndices(bucket->GetIndexBuffer());
+
+				D3DXMatrixTranslation(&m_tempTranslation, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
+				D3DXMatrixRotationYawPitchRoll(&m_tempRotation, rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
+				D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[rat->roomNumber]->AmbientLight);
+
+				for (int iPass = 0; iPass < cPasses; iPass++)
+				{
+					effect->BeginPass(iPass);
+					effect->CommitChanges();
+
+					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+					effect->EndPass();
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+bool Renderer::drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+{
+	D3DXMATRIX world;
+	UINT cPasses = 1;
+
+	if (Objects[ID_SPIDER].loaded)
+	{
+		OBJECT_INFO* obj = &Objects[ID_SPIDER];
+		RendererObject* moveableObj = m_moveableObjects[ID_SPIDER].get();
+		__int16* meshPtr = Meshes[Objects[ID_SPIDER].meshIndex + ((Wibble >> 2) & 2)];
+		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+
+		if (bucket->NumVertices == 0)
+			return true;
+
+		setGpuStateForBucket(bucketIndex);
+
+		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+		m_device->SetIndices(bucket->GetIndexBuffer());
+
+		LPD3DXEFFECT effect;
+		if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+			effect = m_shaderDepth->GetEffect();
+		else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+			effect = m_shaderReconstructZBuffer->GetEffect();
+		else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+			effect = m_shaderFillGBuffer->GetEffect();
+		else
+			effect = m_shaderTransparent->GetEffect();
+
+		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+
+		if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+		else
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+
+		for (__int32 i = 0; i < NUM_SPIDERS; i++)
+		{
+			SPIDER_STRUCT* spider = &Spiders[i];
+
+			if (spider->on)
+			{
+				D3DXMatrixTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
+				D3DXMatrixRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
+				D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[spider->roomNumber]->AmbientLight);
+
+				for (int iPass = 0; iPass < cPasses; iPass++)
+				{
+					effect->BeginPass(iPass);
+					effect->CommitChanges();
+
+					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+					effect->EndPass();
+				}
+			}
+		}
+	}
+
+	return true;
 }

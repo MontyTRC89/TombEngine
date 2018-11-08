@@ -131,6 +131,7 @@ typedef struct GameScriptLevel {
 	bool Rain;
 	bool Snow;
 	bool ResetHub;
+	bool Rumble;
 	LARA_DRAW_TYPE LaraType;
 
 	GameScriptLevel()

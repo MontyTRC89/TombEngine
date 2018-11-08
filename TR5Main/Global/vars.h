@@ -74,9 +74,6 @@
 #define Frames						VAR_U_(0x00875174, __int16*)
 #define gfMips						ARRAY_(0x00E5C2C0, __int8, [8])
 #define OldPickupPos				VAR_U_(0x00E59700, GAME_VECTOR)
-#define Rats						VAR_U_(0x00EEEFEC, char*)
-#define Bats						VAR_U_(0x00EEEFE8, char*)
-#define Spiders						VAR_U_(0x00EEF45C, char*)
 #define SetDebounce					VAR_U_(0x00EEEA38, __int32)
 
 // Game
@@ -274,9 +271,18 @@
 #define Ropes						ARRAY_(0x00E54CC0, ROPE_STRUCT, [12])
 #define NumRopes					VAR_U_(0x0051CA60, __int32)
 
-#define PhdWidth						VAR_U_(0x0055D29C, __int32)
-#define PhdHeight						VAR_U_(0x0055D164, __int32)
-#define PhdPerspective					VAR_U_(0x0055D208, __int32)
+#define PhdWidth					VAR_U_(0x0055D29C, __int32)
+#define PhdHeight					VAR_U_(0x0055D164, __int32)
+#define PhdPerspective				VAR_U_(0x0055D208, __int32)
+
+#define Bats						VAR_U_(0x00EEEFE8, BAT_STRUCT*)
+#define Rats						VAR_U_(0x00EEEFEC, RAT_STRUCT*)
+#define Spiders						VAR_U_(0x00EEF45C, SPIDER_STRUCT*)
+
+#define PoisonFlags					VAR_U_(0x00E5BF3E, byte)
+#define SmashedMeshCount			VAR_U_(0x0051CA5C, __int16)
+#define SmashedMesh					ARRAY_(0x00EEF8C0, MESH_INFO*, [16])
+#define SmashedMeshRoom				ARRAY_(0x00EEF480, __int16, [16])
 
 extern bool MonksAttackLara;
 

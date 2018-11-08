@@ -78,3 +78,7 @@
 
 #define DATA_TYPE 0x1F
 #define END_BIT 0x8000
+
+#define NUM_BATS	64
+#define NUM_SPIDERS	64
+#define NUM_RATS	128

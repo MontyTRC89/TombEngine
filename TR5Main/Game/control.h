@@ -29,6 +29,8 @@
 #define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
 #define UpdateShockwaves ((void (__cdecl*)()) 0x004849A0)
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
+#define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
+#define RumbleScreen ((void (__cdecl*)()) 0x00442C90)
 #define ExplodeItemNode ((__int32 (__cdecl*)(ITEM_INFO*, __int32, __int32, __int32)) 0x0041ABF0)
 #define LavaBurn ((void (__cdecl*)(ITEM_INFO*)) 0x0048ADD0)
 #define RefreshCamera ((void (__cdecl*)(__int16, __int16*)) 0x004165E0)
@@ -38,6 +40,7 @@
 #define PickupTrigger ((__int32 (__cdecl*)(__int16)) 0x004695E0)
 #define PlaySoundTrack ((void (__cdecl*)(__int16, __int16)) 0x00418B90)
 #define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, __int32)) 0x004159F0)
+#define SoundEffects ((void (__cdecl*)()) 0x00432640)
 
 GAME_STATUS __cdecl DoTitle(__int32 index);
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);

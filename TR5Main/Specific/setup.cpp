@@ -655,13 +655,13 @@ void __cdecl InitialiseObjects()
 	}
 
 	if (Objects[ID_BATS].loaded)
-		Bats = GameMalloc(1920);
+		Bats = (BAT_STRUCT*)GameMalloc(NUM_BATS * sizeof(BAT_STRUCT));
 
 	if (Objects[ID_SPIDER].loaded)
-		Spiders = GameMalloc(1664);
+		Spiders = (SPIDER_STRUCT*)GameMalloc(NUM_SPIDERS * sizeof(SPIDER_STRUCT));
 
 	if (Objects[ID_RATS].loaded)
-		Rats = GameMalloc(832);
+		Rats = (RAT_STRUCT*)GameMalloc(NUM_RATS * sizeof(RAT_STRUCT));
 }
 
 void Inject_Setup()

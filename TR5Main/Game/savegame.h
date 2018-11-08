@@ -66,6 +66,9 @@ private:
 	static ChunkId* m_chunkSpecialItemCrossbowBolt;
 	static ChunkId* m_chunkSpecialItemFlare;
 	static ChunkId* m_chunkItemQuadInfo;
+	static ChunkId* m_chunkRats;
+	static ChunkId* m_chunkSpiders;
+	static ChunkId* m_chunkBats;
 
 	static void saveGameStatus(__int32 arg1, __int32 arg2);
 	static void saveLara(__int32 arg1, __int32 arg2);

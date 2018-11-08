@@ -19,6 +19,7 @@
 #include "savegame.h"
 #include "sound.h"
 #include "spotcam.h"
+#include "Box.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -171,6 +172,39 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		if (WeaponEnemyTimer)
 			WeaponEnemyTimer--;
 
+		if (Lara.hasFired)
+		{
+			AlertNearbyGuards(LaraItem);
+			Lara.hasFired = false;
+		}
+
+		if (Lara.poisoned)
+		{
+			if (Lara.poisoned <= 4096)
+			{
+				if (Lara.dpoisoned)
+					++Lara.dpoisoned;
+			}
+			else
+			{
+				Lara.poisoned = 4096;
+			}
+			if ((gfLevelFlags & 0x80u) != 0 && !Lara.gassed)
+			{
+				if (Lara.dpoisoned)
+				{
+					Lara.dpoisoned -= 8;
+					if (Lara.dpoisoned < 0)
+						Lara.dpoisoned = 0;
+				}
+			}
+			if (Lara.dpoisoned >= 256 && !(Wibble & 0xFF))
+			{
+				LaraItem->hitPoints -= Lara.poisoned >> (8 - Lara.gassed);
+				PoisonFlags = 16;
+			}
+		}
+
 		// Control Lara
 		InItemControlLoop = true;
 		Lara.skelebob = NULL;
@@ -200,6 +234,33 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		Wibble = (Wibble + 4) & 0xFC;
 		
 		// Update special effects
+		TriggerLaraDrips();
+
+		if (SmashedMeshCount)
+		{
+			do
+			{
+				SmashedMeshCount--;
+
+				FLOOR_INFO* floor = GetFloor(
+					SmashedMesh[SmashedMeshCount]->x,
+					SmashedMesh[SmashedMeshCount]->y,
+					SmashedMesh[SmashedMeshCount]->z,
+					&SmashedMeshRoom[SmashedMeshCount]);
+
+				__int32 height = GetFloorHeight(
+					floor,
+					SmashedMesh[SmashedMeshCount]->x,
+					SmashedMesh[SmashedMeshCount]->y,
+					SmashedMesh[SmashedMeshCount]->z);
+
+				TestTriggers(TriggerIndex, 1, 0);
+
+				floor->stopper = false;
+				SmashedMesh[SmashedMeshCount] = 0;
+			} while (SmashedMeshCount != 0);
+		}
+		
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -214,6 +275,12 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		UpdateSpiders();
 		UpdateShockwaves();
 		UpdateLightning();
+		UpdatePulseColor();
+
+		if (level->Rumble)
+			RumbleScreen();
+
+		SoundEffects();
 
 		HealtBarTimer--;
 	}

@@ -57,6 +57,7 @@ GameFlow::GameFlow(sol::state* lua)
 		"rain", &GameScriptLevel::Rain,
 		"snow", &GameScriptLevel::Snow,
 		"laraType", &GameScriptLevel::LaraType,
+		"rumble", &GameScriptLevel::Rumble,
 		"resetHub", &GameScriptLevel::ResetHub
 		);
 

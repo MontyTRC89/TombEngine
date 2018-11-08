@@ -123,6 +123,7 @@ sinking.soundTrack = 121;
 sinking.fileName = "Data\\joby5.trc";
 sinking.loadScreen = "Screens\\joby5.jpg";
 sinking.horizon = true;
+sinking.rumble = true;
 sinking.colAddHorizon = true;
 sinking.layer1 = SkyLayer.new(120, 80, 50, -4);
 

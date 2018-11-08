@@ -1310,6 +1310,62 @@ struct ROPE_STRUCT
 	__int16 coiled; // size=0, offset=1170
 };
 
+struct RAT_STRUCT
+{
+	PHD_3DPOS pos; // size=20, offset=0
+	__int16 roomNumber; // size=0, offset=20
+	__int16 speed; // size=0, offset=22
+	__int16 fallspeed; // size=0, offset=24
+	byte on; // size=0, offset=26
+	byte flags; // size=0, offset=27
+};
+
+struct BAT_STRUCT
+{
+	PHD_3DPOS pos; // size=20, offset=0
+	__int16 roomNumber; // size=0, offset=20
+	__int16 speed; // size=0, offset=22
+	__int16 counter; // size=0, offset=24
+	__int16 laraTarget; // size=0, offset=26
+	char xTarget; // size=0, offset=28
+	char zTarget; // size=0, offset=29
+	byte on; // size=0, offset=30
+	byte flags; // size=0, offset=31
+};
+
+struct SPIDER_STRUCT
+{
+	PHD_3DPOS pos; // size=20, offset=0
+	__int16 roomNumber; // size=0, offset=20
+	__int16 speed; // size=0, offset=22
+	__int16 fallspeed; // size=0, offset=24
+	byte on; // size=0, offset=26
+	byte flags; // size=0, offset=27
+};
+
+struct DEBRIS_STRUCT
+{
+	void* textInfo; // size=0, offset=0
+	__int32 x; // size=0, offset=4
+	__int32 y; // size=0, offset=8
+	__int32 z; // size=0, offset=12
+	__int16 XYZOffsets1[3]; // size=6, offset=16
+	__int16 Dir; // size=0, offset=22
+	__int16 XYZOffsets2[3]; // size=6, offset=24
+	__int16 Speed; // size=0, offset=30
+	__int16 XYZOffsets3[3]; // size=6, offset=32
+	__int16 Yvel; // size=0, offset=38
+	__int16 Gravity; // size=0, offset=40
+	__int16 RoomNumber; // size=0, offset=42
+	byte On; // size=0, offset=44
+	byte XRot; // size=0, offset=45
+	byte YRot; // size=0, offset=46
+	byte r; // size=0, offset=47
+	byte g; // size=0, offset=48
+	byte b; // size=0, offset=49
+	byte Pad[2]; // size=2, offset=50
+};
+
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
 typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);

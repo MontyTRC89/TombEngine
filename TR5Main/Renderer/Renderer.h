@@ -632,6 +632,9 @@ class Renderer
 	void							updateAnimatedTextures();
 	void							drawFullScreenBackground(LPDIRECT3DTEXTURE9 texture, float alpha);
 	void							drawRopes();
+	bool							drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
+	bool							drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
+	bool							drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 
 public:
 	D3DXMATRIX						ViewMatrix;
