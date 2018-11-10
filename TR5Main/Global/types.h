@@ -1363,7 +1363,7 @@ struct DEBRIS_STRUCT
 	byte r; // size=0, offset=47
 	byte g; // size=0, offset=48
 	byte b; // size=0, offset=49
-	byte Pad[2]; // size=2, offset=50
+	byte Pad[22]; // size=22, offset=50
 };
 
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);

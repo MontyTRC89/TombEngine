@@ -116,9 +116,9 @@ void Inventory::Initialise()
 		//Lara.uzisTypeCarried = 1;
 		//Lara.numUziAmmo = 1000;
 
-		//Lara.shotgunTypeCarried = 1;
-		//Lara.numShotgunAmmo1 = 1000;
-		//Lara.numShotgunAmmo2 = 1000;
+		Lara.shotgunTypeCarried = 1;
+		Lara.numShotgunAmmo1 = 1000;
+		Lara.numShotgunAmmo2 = 1000;
 
 		/*Lara.numRevolverAmmo = 1000;
 		Lara.numShotgunAmmo2 = 1000;

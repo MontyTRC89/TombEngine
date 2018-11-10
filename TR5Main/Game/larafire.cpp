@@ -463,10 +463,10 @@ __int32 __cdecl WeaponObjectMesh(__int32 weaponType)
 
 void Inject_LaraFire()
 {
-	INJECT(0x00453AE0, WeaponObject);
-	INJECT(0x00452430, LaraGun);
-	INJECT(0x004546C0, GetAmmo);
-	INJECT(0x00452B30, InitialiseNewWeapon);
-	INJECT(0x00453B50, WeaponObjectMesh);
+	//INJECT(0x00453AE0, WeaponObject);
+	//INJECT(0x00452430, LaraGun);
+	//INJECT(0x004546C0, GetAmmo);
+	//INJECT(0x00452B30, InitialiseNewWeapon);
+	//INJECT(0x00453B50, WeaponObjectMesh);
 	//INJECT(0x00453A90, SmashItem);
 }

@@ -1956,6 +1956,7 @@ void Renderer::prepareShadowMap()
 		drawBats((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
 		drawRats((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
 		drawSpiders((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+		drawDebris((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
 	}
 
 	m_device->EndScene();
@@ -3225,6 +3226,9 @@ bool Renderer::drawScene(bool dump)
 	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
+	drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	//drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
 	// Draw alpha tested geometry
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3280,6 +3284,9 @@ bool Renderer::drawScene(bool dump)
 
 	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+
+	drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	//drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
 
 	effect->EndPass();
 	effect->End();
@@ -4167,6 +4174,10 @@ bool Renderer::drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKE
 
 	ROOM_INFO* room = &Rooms[roomIndex];
 	MESH_INFO* sobj = &room->mesh[staticIndex];
+
+	if (!(sobj->Flags & 1))
+		return true;
+
 	RendererObject* obj = m_staticObjects[sobj->staticNumber].get();
 	if (!obj->HasDataInBucket[bucketIndex])
 		return true;
@@ -6169,6 +6180,119 @@ void Renderer::createConstrainedBillboardMatrix(D3DXMATRIX* result, D3DXVECTOR3*
 	result->_42 = objectPosition->y;
 	result->_43 = objectPosition->z;
 	result->_44 = 1;
+}
+
+bool Renderer::drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
+{
+	UINT cPasses = 1;
+	
+	// First collect debrises
+	vector<RendererVertex> vertices;
+
+	for (__int32 i = 0; i < NUM_DEBRIS; i++)
+	{
+		DEBRIS_STRUCT* debris = &Debris[i];
+
+		if (debris->On)
+		{
+			D3DXMatrixTranslation(&m_tempTranslation, debris->x, debris->y, debris->z);
+			D3DXMatrixRotationYawPitchRoll(&m_tempRotation, TR_ANGLE_TO_RAD(debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
+			D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+
+			OBJECT_TEXTURE* texture = &ObjectTextures[(__int32)(debris->textInfo) & 0x7FFF];
+			__int32 tile = texture->tileAndFlag & 0x7FFF;
+
+			// Draw only debris of the current bucket
+			if (texture->attribute == 0 &&
+				bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_SOLID && bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS
+				||
+				texture->attribute == 1 &&
+				bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST && bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS
+				||
+				texture->attribute == 2 &&
+				bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT && bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS
+				)
+				continue;
+
+			RendererVertex vertex;
+
+			// Prepare the triangle
+			D3DXVECTOR3 p = D3DXVECTOR3(debris->XYZOffsets1[0], debris->XYZOffsets1[1], debris->XYZOffsets1[2]);
+			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
+			vertex.x = p.x;
+			vertex.y = p.y;
+			vertex.z = p.z;
+			vertex.u = (texture->vertices[0].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.v = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.r = debris->Pad[2] / 255.0f;
+			vertex.g = debris->Pad[3] / 255.0f;
+			vertex.b = debris->Pad[4] / 255.0f;
+			vertices.push_back(vertex);
+
+			p = D3DXVECTOR3(debris->XYZOffsets2[0], debris->XYZOffsets2[1], debris->XYZOffsets2[2]);
+			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
+			vertex.x = p.x;
+			vertex.y = p.y;
+			vertex.z = p.z;
+			vertex.u = (texture->vertices[1].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.v = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.r = debris->Pad[6] / 255.0f;
+			vertex.g = debris->Pad[7] / 255.0f;
+			vertex.b = debris->Pad[8] / 255.0f;
+			vertices.push_back(vertex);
+
+			p = D3DXVECTOR3(debris->XYZOffsets3[0], debris->XYZOffsets3[1], debris->XYZOffsets3[2]);
+			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
+			vertex.x = p.x;
+			vertex.y = p.y;
+			vertex.z = p.z;
+			vertex.u = (texture->vertices[2].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.v = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.r = debris->Pad[10] / 255.0f;
+			vertex.g = debris->Pad[11] / 255.0f;
+			vertex.b = debris->Pad[12] / 255.0f;
+			vertices.push_back(vertex);
+		}
+	}
+
+	// Check if no debris have to be drawn
+	if (vertices.size() == 0)
+		return true;
+
+	setGpuStateForBucket(bucketIndex);
+
+	LPD3DXEFFECT effect;
+	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+		effect = m_shaderDepth->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
+	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+		effect = m_shaderFillGBuffer->GetEffect();
+	else
+		effect = m_shaderTransparent->GetEffect();
+
+	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_STATIC);
+
+	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	else
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+	
+	D3DXMatrixIdentity(&m_tempWorld);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+	for (int iPass = 0; iPass < cPasses; iPass++)
+	{
+		effect->BeginPass(iPass);
+		effect->CommitChanges();
+
+		m_device->DrawPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, vertices.size() / 3, &vertices[0], sizeof(RendererVertex));
+
+		effect->EndPass();
+	}
+
+	return true;
 }
 
 bool Renderer::drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)

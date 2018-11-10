@@ -245,7 +245,7 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 void Inject_Lara()
 {
-	INJECT(0x00442E70, LaraAboveWater);
+	//INJECT(0x00442E70, LaraAboveWater);
 	//INJECT(0x00449260, lara_as_walk);
 	//INJECT(0x00402AC2, j_AnimateLara);
 	//INJECT(0x004563F0, AnimateLaraNew);

@@ -284,6 +284,8 @@
 #define SmashedMesh					ARRAY_(0x00EEF8C0, MESH_INFO*, [16])
 #define SmashedMeshRoom				ARRAY_(0x00EEF480, __int16, [16])
 
+#define Debris						ARRAY_(0x00E8CAC0, DEBRIS_STRUCT, [256])
+
 extern bool MonksAttackLara;
 
 // Remapped variables

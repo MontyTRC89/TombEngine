@@ -565,7 +565,7 @@ class Renderer
 	float							m_fadeFactor;
 	bool							m_cinematicBars;
 	float							m_progress;
-
+	
 	__int32							getAnimatedTextureInfo(__int16 textureId);
 	RendererMesh*					getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs);
 	void							fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index);
@@ -635,6 +635,7 @@ class Renderer
 	bool							drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
+	bool							drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 
 public:
 	D3DXMATRIX						ViewMatrix;

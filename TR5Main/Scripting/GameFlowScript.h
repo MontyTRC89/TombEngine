@@ -141,6 +141,8 @@ typedef struct GameScriptLevel {
 		Snow = false;
 		Horizon = false;
 		ColAddHorizon = false;
+		ResetHub = false;
+		Rumble = false;
 		LaraType = LARA_DRAW_TYPE::LARA_NORMAL;
 	}
 };
