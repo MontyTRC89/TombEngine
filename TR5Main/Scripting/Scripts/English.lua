@@ -55,6 +55,11 @@ Gameflow.strings[48] = "Harpoon gun";
 Gameflow.strings[49] = "Harpoon ammo";
 Gameflow.strings[50] = "Rocket launcher";
 Gameflow.strings[51] = "Rocket ammo";
+Gameflow.strings[52] = "Crossbow";
+Gameflow.strings[53] = "Crossbow + LaserSight";
+Gameflow.strings[54] = "Crossbow Normal Ammo";
+Gameflow.strings[55] = "Crossbow Poisoned Ammo";
+Gameflow.strings[56] = "Crossbow Explosive Ammo";
 
 -- Level names (from 100 to 199)
 Gameflow.strings[100] = "Title level";

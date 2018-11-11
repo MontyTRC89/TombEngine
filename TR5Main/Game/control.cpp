@@ -113,6 +113,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			TrInput = 0;
 		}
 
+		// Handle lasersight and binocular
 		if (!(TrInput & IN_LOOK) || SniperCameraActive || UseSpotCam || TrackCameraInit ||
 			((LaraItem->currentAnimState != STATE_LARA_STOP || LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE)
 				&& (!Lara.isDucked
@@ -262,6 +263,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			Lara.hasFired = false;
 		}
 
+		// Is Lara poisoned?
 		if (Lara.poisoned)
 		{
 			if (Lara.poisoned <= 4096)

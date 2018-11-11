@@ -28,9 +28,41 @@ Inventory::Inventory()
 	for (__int32 i = 0; i < 100; i++)
 	{
 		m_objectsTable[i].objectNumber = InventoryObjectsList[i].objectNumber;
-		m_objectsTable[i].objectName = InventoryObjectsList[i].objectNumber;
+		m_objectsTable[i].objectName = InventoryObjectsList[i].objectName;
 		m_objectsTable[i].meshBits = InventoryObjectsList[i].meshBits;
 	}
+
+	// Assign new strings
+	m_objectsTable[INV_OBJECT_UZIS].objectName = STRING_INV_UZI;
+	m_objectsTable[INV_OBJECT_PISTOLS].objectName = STRING_INV_PISTOLS;
+	m_objectsTable[INV_OBJECT_SHOTGUN].objectName = STRING_INV_SHOTGUN;
+	m_objectsTable[INV_OBJECT_REVOLVER].objectName = STRING_INV_REVOLVER;
+	m_objectsTable[INV_OBJECT_REVOLVER_LASER].objectName = STRING_INV_REVOLVER_LASER;
+	m_objectsTable[INV_OBJECT_HK].objectName = STRING_INV_HK;
+	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO1].objectName = STRING_INV_SHOTGUN_AMMO1;
+	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO2].objectName = STRING_INV_SHOTGUN_AMMO2;
+	m_objectsTable[INV_OBJECT_HK_AMMO1].objectName = STRING_INV_HK_AMMO;
+	m_objectsTable[INV_OBJECT_REVOLVER_AMMO].objectName = STRING_INV_REVOLVER_AMMO;
+	m_objectsTable[INV_OBJECT_UZI_AMMO].objectName = STRING_INV_UZI_AMMO;
+	m_objectsTable[INV_OBJECT_PISTOLS_AMMO].objectName = STRING_INV_PISTOLS_AMMO;
+	m_objectsTable[INV_OBJECT_LASERSIGHT].objectName = STRING_INV_LASERSIGHT;
+	m_objectsTable[INV_OBJECT_SILENCER].objectName = STRING_INV_SILENCER;
+	m_objectsTable[INV_OBJECT_LARGE_MEDIPACK].objectName = STRING_INV_LARGE_MEDIPACK;
+	m_objectsTable[INV_OBJECT_SMALL_MEDIPACK].objectName = STRING_INV_SMALL_MEDIPACK;
+	m_objectsTable[INV_OBJECT_BINOCULARS].objectName = STRING_INV_BINOCULARS;
+	m_objectsTable[INV_OBJECT_FLARES].objectName = STRING_INV_FLARES;
+	m_objectsTable[INV_OBJECT_TIMEX].objectName = STRING_INV_TIMEX;
+	m_objectsTable[INV_OBJECT_CROWBAR].objectName = STRING_INV_CROWBAR;
+	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].objectName = STRING_INV_GRENADE_LAUNCHER;
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectName = STRING_INV_GRENADE_AMMO;
+	m_objectsTable[INV_OBJECT_HARPOON_GUN].objectName = STRING_INV_HARPOON_GUN;
+	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectName = STRING_INV_HARPOON_AMMO;
+	m_objectsTable[INV_OBJECT_ROCKET_LAUNCHER].objectName = STRING_INV_ROCKET_LAUNCHER;
+	m_objectsTable[INV_OBJECT_ROCKET_AMMO].objectName = STRING_INV_ROCKET_AMMO;
+	m_objectsTable[INV_OBJECT_CROSSBOW].objectName = STRING_INV_CROSSBOW;
+	m_objectsTable[INV_OBJECT_CROSSBOW_LASER].objectName = STRING_INV_CROSSBOW_LASER;
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO1].objectName = STRING_INV_CROSSBOW_AMMO1;
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2].objectName = STRING_INV_CROSSBOW_AMMO2;
 
 	// Assign new objects
 	m_objectsTable[INV_OBJECT_PASSAPORT].objectNumber = ID_INVENTORY_PASSPORT;
@@ -50,17 +82,17 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_POLAROID].meshBits = -1;
 	m_objectsTable[INV_OBJECT_POLAROID].rotY = 16384;
 
-	m_objectsTable[INV_OBJECT_GRENADE_ITEM].objectNumber = ID_GRENADE_ITEM;
-	m_objectsTable[INV_OBJECT_GRENADE_ITEM].objectName = STRING_INV_GRENADE_ITEM;
-	m_objectsTable[INV_OBJECT_GRENADE_ITEM].meshBits = -1;
+	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].objectNumber = ID_GRENADE_ITEM;
+	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].objectName = STRING_INV_GRENADE_LAUNCHER;
+	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].meshBits = -1;
 
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectNumber = ID_GRENADE_AMMO_ITEM;
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectName = STRING_INV_GRENADE_AMMO;
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO].meshBits = -1;
 
-	m_objectsTable[INV_OBJECT_HARPOON_ITEM].objectNumber = ID_HARPOON_ITEM;
-	m_objectsTable[INV_OBJECT_HARPOON_ITEM].objectName = STRING_INV_HARPOON_ITEM;
-	m_objectsTable[INV_OBJECT_HARPOON_ITEM].meshBits = -1;
+	m_objectsTable[INV_OBJECT_HARPOON_GUN].objectNumber = ID_HARPOON_ITEM;
+	m_objectsTable[INV_OBJECT_HARPOON_GUN].objectName = STRING_INV_HARPOON_GUN;
+	m_objectsTable[INV_OBJECT_HARPOON_GUN].meshBits = -1;
 
 	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectNumber = ID_HARPOON_AMMO_ITEM;
 	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectName = STRING_INV_HARPOON_AMMO;
