@@ -806,7 +806,7 @@ typedef struct camera_info_t
 	GAME_VECTOR pos; // size=16, offset=0
 	GAME_VECTOR target; // size=16, offset=16
 	CAMERA_TYPE type; // size=4, offset=32
-	CAMERA_TYPE old_type; // size=4, offset=36
+	CAMERA_TYPE oldType; // size=4, offset=36
 	__int32 shift; // size=0, offset=40
 	__int32 flags; // size=0, offset=44
 	__int32 fixedCamera; // size=0, offset=48

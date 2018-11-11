@@ -113,7 +113,91 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			TrInput = 0;
 		}
 
-		// CLear dynamic lights
+		if (!(TrInput & IN_LOOK) || SniperCameraActive || UseSpotCam || TrackCameraInit ||
+			((LaraItem->currentAnimState != STATE_LARA_STOP || LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE)
+				&& (!Lara.isDucked
+					|| TrInput & IN_DUCK
+					|| LaraItem->animNumber != ANIMATION_LARA_CROUCH_IDLE
+					|| LaraItem->goalAnimState != STATE_LARA_CROUCH_IDLE)))
+		{
+			if (BinocularRange == 0)
+			{
+				if (SniperCameraActive || UseSpotCam || TrackCameraInit)
+					TrInput &= ~IN_LOOK;
+			}
+			else
+			{
+				if (LaserSight)
+				{
+					BinocularRange = 0;
+					LaserSight = false;
+					phd_AlterFOV(ANGLE(80));
+					LaraItem->meshBits = 0xFFFFFFFF;
+					Lara.isDucked = false;
+					Camera.type = BinocularOldCamera;
+
+					Lara.headYrot = 0;
+					Lara.headXrot = 0;
+					
+					Lara.torsoYrot = 0;
+					Lara.torsoXrot = 0;
+
+					Camera.bounce = 0;
+					BinocularOn = -8;
+
+					TrInput &= ~IN_LOOK;
+				}
+				else
+				{
+					TrInput |= IN_LOOK;
+				}
+			}
+
+			Infrared = false;
+		}
+		else if (BinocularRange == 0)
+		{
+			if (Lara.gunStatus == LG_READY
+				&& ((Lara.gunType == WEAPON_REVOLVER && Lara.sixshooterTypeCarried & WTYPE_LASERSIGHT)
+					|| (Lara.gunType == WEAPON_HK)
+					|| (Lara.gunType == WEAPON_CROSSBOW && Lara.crossbowTypeCarried & WTYPE_LASERSIGHT)))
+			{
+				BinocularRange = 128;
+				BinocularOldCamera = Camera.oldType;
+
+				Lara.busy = true;
+				LaserSight = true;
+
+				/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
+					InfraRed = TRUE;
+				else*
+					InfraRed = FALSE;*/
+				Infrared = true;
+			}
+			else
+				Infrared = false;
+		}
+		else
+		{
+			if (LaserSight)
+			{
+				/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
+					InfraRed = TRUE;
+				else
+					InfraRed = FALSE;*/
+				Infrared = true;
+			}
+			else
+			{
+				/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
+					InfraRed = TRUE;
+				else
+					InfraRed = FALSE;*/
+				Infrared = false;
+			}
+		}
+
+		// Clear dynamic lights
 		ClearDynamics();
 		ClearFires();
 		g_Renderer->ClearDynamicLights();

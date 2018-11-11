@@ -481,6 +481,11 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 			D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_caustics[i]);
 	}
 
+	// Load target textures
+	D3DXCreateTextureFromFileEx(m_device, "Binoculars.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
+		D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
+		D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_binocularsTexture);
+
 	// Initialise buffer for sprites and lines
 	res = m_device->CreateVertexBuffer(NUM_SPRITES_PER_BUCKET * 4 * sizeof(RendererVertex), D3DUSAGE_WRITEONLY,
 		0, D3DPOOL_MANAGED, &m_spritesVertexBuffer, NULL);
@@ -3623,23 +3628,10 @@ bool Renderer::drawScene(bool dump)
 	UpdateHealtBar(0);
 	UpdateAirBar(0);
 
-	/*ROPE_STRUCT* rope0 = &Ropes[0];
-	ROPE_STRUCT* rope1 = &Ropes[1];
-	ROPE_STRUCT* rope2 = &Ropes[2];
-	ROPE_STRUCT* rope3 = &Ropes[3];
-	ROPE_STRUCT* rope4 = &Ropes[4];
-	ROPE_STRUCT* rope5 = &Ropes[5];
-
-	if (Lara.ropePtr != -1)
-	{
-		ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
-		/*for (__int32 i = 0; i < 24; i++)
-		{
-
-		
-	}}*/
-
 	drawAllLines2D();
+
+	// Draw binoculars or lasersight
+	drawOverlays();
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeReconstructZBuffer = (chrono::duration_cast<ns>(time2 - time1)).count();
@@ -3743,6 +3735,10 @@ bool Renderer::restoreBackBuffer()
 
 bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
+	// Don't draw Lara is binoculars or lasersight is active
+	if (BinocularRange || SpotcamDontDrawLara)
+		return true;
+
 	D3DXMATRIX world;
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
@@ -6498,4 +6494,29 @@ bool Renderer::drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	}
 
 	return true;
+}
+
+bool Renderer::drawOverlays()
+{
+	if (!BinocularRange && !SpotcamOverlay)
+		return true;
+
+	D3DSURFACE_DESC desc;
+	m_binocularsTexture->GetLevelDesc(0, &desc);
+
+	RECT rect;
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = desc.Width;
+	rect.bottom = desc.Height;
+
+	D3DXMATRIX mat;
+	D3DXVECTOR2 vScaleCentre(0, 0);
+	D3DXVECTOR2 vScaleFactor(ScreenWidth / (float)desc.Width, ScreenHeight / (float)desc.Height);
+	D3DXMatrixTransformation2D(&mat, &vScaleCentre, 0.0f, &vScaleFactor, NULL, 0.0f, NULL);
+
+	m_dxSprite->Begin(D3DXSPRITE_ALPHABLEND);
+	m_dxSprite->SetTransform(&mat);
+	m_dxSprite->Draw(m_binocularsTexture, &rect, NULL, NULL, D3DCOLOR_ARGB(255, 255, 255, 255));
+	m_dxSprite->End();
 }

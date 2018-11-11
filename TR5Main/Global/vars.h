@@ -286,6 +286,22 @@
 
 #define Debris						ARRAY_(0x00E8CAC0, DEBRIS_STRUCT, [256])
 
+#define SniperCameraActive			VAR_U_(0x0051CA1D, byte)
+#define BinocularRange				VAR_U_(0x0051CA30, __int32)
+#define BinocularOn					VAR_U_(0x0051CA34, __int32)
+#define BinocularOldCamera			VAR_U_(0x0051CA38, CAMERA_TYPE)
+#define LaserSight					VAR_U_(0x0051CA3C, __int32)
+#define SniperCount					VAR_U_(0x0051CA1C, byte)
+#define ExitingBinocular			VAR_U_(00051CA20, __int32)
+#define OldLaraBusy					VAR_U_(0x00E59898, byte)
+#define Infrared					VAR_U_(0x0051CA40, __int32)
+
+#define SpotcamOverlay				VAR_U_(0x0051D020, byte)
+#define SpotcamDontDrawLara			VAR_U_(0x0051D021, byte)
+#define SniperOverlay				VAR_U_(0x0051D022, byte)
+#define TargetGraphicsMeshPointer	VAR_U_(0x00E6E460, __int16*)
+#define BinocularGraphicsMeshPointer	VAR_U_(0x00E6D744, __int16*)
+
 extern bool MonksAttackLara;
 
 // Remapped variables

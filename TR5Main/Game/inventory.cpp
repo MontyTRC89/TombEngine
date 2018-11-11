@@ -546,6 +546,10 @@ void Inventory::UseCurrentItem()
 
 	LaraItem->meshBits = -1;
 
+	__int32 binocularRange = BinocularRange;
+	BinocularRange = 0;
+	OldLaraBusy = false;
+
 	// Small medipack
 	if (objectNumber == ID_SMALLMEDI_ITEM)
 	{
@@ -599,25 +603,23 @@ void Inventory::UseCurrentItem()
 	// Binoculars
 	if (objectNumber == ID_BINOCULARS_ITEM)
 	{
-		/*
-		if ( lara_item->current_anim_state == 2 && lara_item->anim_number == 103
-        || (LOBYTE(objectNum) = *(&lara + 68), *(&lara + 69) & 8) && !(input & 0x20000000) )
-      {
-        LOBYTE(objectNum) = SniperCamActive;
-        if ( !SniperCamActive && !bUseSpotCam && !bTrackCamInit )
-        {
-          oldLaraBusy = 1;
-          BinocularRange = 128;
-          if ( lara.gun_status )
-            lara.gun_status = 3;
-        }
-      }
-      if ( v0 )
-        BinocularRange = v0;
-      else
-        BinocularOldCamera = dword_EEF964;
-      return objectNum;
-	  */
+		if (LaraItem->currentAnimState == 2 && LaraItem->animNumber == 103 || Lara.isDucked && !(TrInput & 0x20000000))
+		{
+			if (!SniperCameraActive && !UseSpotCam && !TrackCameraInit)
+			{
+				OldLaraBusy = true;
+				BinocularRange = 128;
+				if (Lara.gunStatus)
+					Lara.gunStatus = LG_UNDRAW_GUNS;
+			}
+		}
+
+		if (binocularRange)
+			BinocularRange = binocularRange;
+		else
+			BinocularOldCamera = Camera.oldType;
+
+		return;
 	}
 
 	// Crowbar and puzzles
@@ -683,8 +685,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// Uzis
@@ -701,8 +704,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// Revolver
@@ -719,8 +723,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// Shotgun
@@ -737,8 +742,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// Grenade launcher
@@ -755,8 +761,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// Harpoon gun
@@ -773,8 +780,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// Crossbow/grappling gun
@@ -791,8 +799,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// HK
@@ -809,8 +818,9 @@ void Inventory::UseCurrentItem()
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	// Flares
@@ -834,14 +844,14 @@ void Inventory::UseCurrentItem()
 
 					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 				}
-				return;
 			}
 		}
 		else
 		{
 			SayNo();
-			return;
 		}
+
+		return;
 	}
 
 	SayNo();

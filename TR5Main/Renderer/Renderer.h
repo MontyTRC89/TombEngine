@@ -450,6 +450,8 @@ class Renderer
 	LPDIRECT3DTEXTURE9				m_fontAndMiscTexture;
 	LPDIRECT3DTEXTURE9				m_titleScreen;
 	LPDIRECT3DTEXTURE9				m_caustics[NUM_CAUSTICS_TEXTURES];
+	LPDIRECT3DTEXTURE9				m_binocularsTexture;
+	LPDIRECT3DTEXTURE9				m_targetTexture;
 	LPD3DXFONT						m_debugFont;
 	LPD3DXFONT						m_gameFont;
 	LPD3DXSPRITE					m_dxSprite;
@@ -636,6 +638,7 @@ class Renderer
 	bool							drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
+	bool							drawOverlays();
 
 public:
 	D3DXMATRIX						ViewMatrix;
