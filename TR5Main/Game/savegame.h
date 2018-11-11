@@ -96,6 +96,9 @@ private:
 	static void saveItemAnims(__int32 arg1, __int32 arg2);
 	static void saveItemIntelligentData(__int32 arg1, __int32 arg2);
 	static void saveItemQuadInfo(__int32 arg1, __int32 arg2);
+	static void saveRats(__int32 arg1, __int32 arg2);
+	static void saveBats(__int32 arg1, __int32 arg2);
+	static void saveSpiders(__int32 arg1, __int32 arg2);
 
 	static bool readGameStatus();
 	static bool readLara();
@@ -105,6 +108,9 @@ private:
 	static bool readCrossbowBolt();
 	static bool readFlare();
 	static bool readTorpedo();
+	static bool readBats();
+	static bool readRats();
+	static bool readSpiders();
 	static bool readStatistics();
 	static bool readVariable();
 	static bool readSavegameChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);

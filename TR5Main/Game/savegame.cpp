@@ -41,6 +41,9 @@ ChunkId* SaveGame::m_chunkSpecialItemTorpedo;
 ChunkId* SaveGame::m_chunkSpecialItemCrossbowBolt;
 ChunkId* SaveGame::m_chunkSpecialItemFlare;
 ChunkId* SaveGame::m_chunkItemQuadInfo;
+ChunkId* SaveGame::m_chunkBats;
+ChunkId* SaveGame::m_chunkRats;
+ChunkId* SaveGame::m_chunkSpiders;
 
 void SaveGame::saveItems()
 {
@@ -69,6 +72,19 @@ void SaveGame::saveItems()
 				m_writer->WriteChunkWithChildren(m_chunkItem, &saveItem, i, 1);
 		}
 	}
+
+	// Save special items
+	for (__int32 i = 0; i < NUM_BATS; i++)
+		if (Bats[i].on)
+			m_writer->WriteChunk(m_chunkBats, &saveBats, i, 0);
+
+	for (__int32 i = 0; i < NUM_RATS; i++)
+		if (Rats[i].on)
+			m_writer->WriteChunk(m_chunkRats, &saveRats, i, 0);
+
+	for (__int32 i = 0; i < NUM_SPIDERS; i++)
+		if (Spiders[i].on)
+			m_writer->WriteChunk(m_chunkSpiders, &saveSpiders, i, 0);
 }
 
 void SaveGame::saveItem(__int32 itemNumber, __int32 runtimeItem)
@@ -249,6 +265,9 @@ void SaveGame::Start()
 	m_chunkSpecialItemCrossbowBolt = ChunkId::FromString("TR5MSgItBolt");
 	m_chunkSpecialItemFlare = ChunkId::FromString("TR5MSgItFlare");
 	m_chunkItemQuadInfo = ChunkId::FromString("TR5MSgQuadInfo");
+	m_chunkBats = ChunkId::FromString("TR5MSgBats");
+	m_chunkRats = ChunkId::FromString("TR5MSgRats");
+	m_chunkSpiders = ChunkId::FromString("TR5MSgSpiders");
 
 	LastSaveGame = 0;
 }
@@ -282,6 +301,9 @@ void SaveGame::End()
 	delete m_chunkSpecialItemCrossbowBolt;
 	delete m_chunkSpecialItemFlare;
 	delete m_chunkItemQuadInfo;
+	delete m_chunkBats;
+	delete m_chunkRats;
+	delete m_chunkSpiders;
 }
 
 bool SaveGame::Save(char* fileName)
@@ -510,6 +532,12 @@ bool SaveGame::readSavegameChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg
 		return readCrossbowBolt();
 	else if (chunkId->EqualsTo(m_chunkSpecialItemFlare))
 		return readFlare();
+	else if (chunkId->EqualsTo(m_chunkBats))
+		return readBats();
+	else if (chunkId->EqualsTo(m_chunkRats))
+		return readRats();
+	else if (chunkId->EqualsTo(m_chunkSpiders))
+		return readSpiders();
 
 	return false;
 }
@@ -1249,4 +1277,73 @@ bool SaveGame::readTorpedo()
 void SaveGame::saveItemQuadInfo(__int32 itemNumber, __int32 arg2)
 {
 	m_stream->WriteBytes(reinterpret_cast<byte*>(Items[itemNumber].data), sizeof(QUAD_INFO));
+}
+
+void SaveGame::saveRats(__int32 arg1, __int32 arg2)
+{
+	RAT_STRUCT buffer;
+	memcpy(&buffer, &Rats[arg1], sizeof(RAT_STRUCT));
+	LEB128::Write(m_stream, arg1);
+	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(RAT_STRUCT));
+}
+
+void SaveGame::saveBats(__int32 arg1, __int32 arg2)
+{
+	BAT_STRUCT buffer;
+	memcpy(&buffer, &Bats[arg1], sizeof(BAT_STRUCT));
+	LEB128::Write(m_stream, arg1);
+	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(BAT_STRUCT));
+}
+
+void SaveGame::saveSpiders(__int32 arg1, __int32 arg2)
+{
+	SPIDER_STRUCT buffer;
+	memcpy(&buffer, &Spiders[arg1], sizeof(SPIDER_STRUCT));
+	LEB128::Write(m_stream, arg1);
+	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(SPIDER_STRUCT));
+}
+
+bool SaveGame::readBats()
+{
+	__int32 index = LEB128::ReadInt16(m_stream);
+
+	BAT_STRUCT* bats = &Bats[index];
+
+	char* buffer = (char*)malloc(sizeof(BAT_STRUCT));
+	m_stream->Read(buffer, sizeof(BAT_STRUCT));
+	BAT_STRUCT* b = reinterpret_cast<BAT_STRUCT*>(buffer);
+	memcpy(&bats, b, sizeof(BAT_STRUCT));
+	free(buffer);
+
+	return true;
+}
+
+bool SaveGame::readRats()
+{
+	__int32 index = LEB128::ReadInt16(m_stream);
+
+	RAT_STRUCT* rats = &Rats[index];
+
+	char* buffer = (char*)malloc(sizeof(RAT_STRUCT));
+	m_stream->Read(buffer, sizeof(RAT_STRUCT));
+	RAT_STRUCT* r = reinterpret_cast<RAT_STRUCT*>(buffer);
+	memcpy(&rats, r, sizeof(RAT_STRUCT));
+	free(buffer);
+
+	return true;
+}
+
+bool SaveGame::readSpiders()
+{
+	__int32 index = LEB128::ReadInt16(m_stream);
+
+	SPIDER_STRUCT* spiders = &Spiders[index];
+
+	char* buffer = (char*)malloc(sizeof(SPIDER_STRUCT));
+	m_stream->Read(buffer, sizeof(SPIDER_STRUCT));
+	SPIDER_STRUCT* s = reinterpret_cast<SPIDER_STRUCT*>(buffer);
+	memcpy(&spiders, s, sizeof(SPIDER_STRUCT));
+	free(buffer);
+
+	return true;
 }
