@@ -865,6 +865,6 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 
 void __cdecl Inject_Lara1Gun()
 {
-	//INJECT(0x0044EAC0, DrawShotgun);
-	//INJECT(0x0044EE00, AnimateShotgun);
+	INJECT(0x0044EAC0, DrawShotgun);
+	INJECT(0x0044EE00, AnimateShotgun);
 }

@@ -93,7 +93,7 @@ void __cdecl LaraGun()
 	if (Lara.rightArm.flash_gun > 0)
 		--Lara.rightArm.flash_gun;
 
-	if (Lara.gunType == WEAPON_FLARE2)
+	if (Lara.gunType == WEAPON_TORCH)
 	{
 		DoFlameTorch();
 		return;
@@ -282,7 +282,6 @@ void __cdecl LaraGun()
 		case WEAPON_ROCKET:
 		case WEAPON_HARPOON:
 		case WEAPON_REVOLVER:
-			printf("Target dist: %d\n", Weapons[Lara.gunType].targetDist);
 			RifleHandler(Lara.gunType);
 			break;
 
@@ -335,42 +334,42 @@ void __cdecl LaraGun()
 	}
 }
 
-__int32 __cdecl GetAmmo(__int32 weaponType)
+__int16* __cdecl GetAmmo(__int32 weaponType)
 {
 	switch (weaponType)
 	{
 		case WEAPON_SHOTGUN:
 			if (Lara.shotgunTypeCarried & 8)
-				return Lara.numShotgunAmmo1;
+				return &Lara.numShotgunAmmo1;
 		else
-				return Lara.numShotgunAmmo2;
+				return &Lara.numShotgunAmmo2;
 
 	case WEAPON_REVOLVER:
-		return Lara.numRevolverAmmo;
+		return &Lara.numRevolverAmmo;
 
 	case WEAPON_UZI:
-		return Lara.numUziAmmo;
+		return &Lara.numUziAmmo;
 
 	case WEAPON_HK:
-		return Lara.numHKammo1;
+		return &Lara.numHKammo1;
 
 	case WEAPON_CROSSBOW:
 		if (Lara.crossbowTypeCarried & 8)
-			return Lara.numCrossbowAmmo1;
+			return &Lara.numCrossbowAmmo1;
 		else
-			return Lara.numCrossbowAmmo2;
+			return &Lara.numCrossbowAmmo2;
 
 	case WEAPON_GRENADE:
-		return g_LaraExtra.numGrenadeAmmos;
+		return &g_LaraExtra.numGrenadeAmmos;
 
 	case WEAPON_HARPOON:
-		return g_LaraExtra.numHarpoonAmmos;
+		return &g_LaraExtra.numHarpoonAmmos;
 
 	case WEAPON_ROCKET:
-		return g_LaraExtra.numRocketAmmos;
+		return &g_LaraExtra.numRocketAmmos;
 
 	default:
-		return Lara.numPistolsAmmo;
+		return &Lara.numPistolsAmmo;
 
 	}
 }
@@ -463,10 +462,10 @@ __int32 __cdecl WeaponObjectMesh(__int32 weaponType)
 
 void Inject_LaraFire()
 {
-	//INJECT(0x00453AE0, WeaponObject);
-	//INJECT(0x00452430, LaraGun);
-	//INJECT(0x004546C0, GetAmmo);
-	//INJECT(0x00452B30, InitialiseNewWeapon);
-	//INJECT(0x00453B50, WeaponObjectMesh);
+	INJECT(0x00453AE0, WeaponObject);
+	INJECT(0x00452430, LaraGun);
+	INJECT(0x004546C0, GetAmmo);
+	INJECT(0x00452B30, InitialiseNewWeapon);
+	INJECT(0x00453B50, WeaponObjectMesh);
 	//INJECT(0x00453A90, SmashItem);
 }

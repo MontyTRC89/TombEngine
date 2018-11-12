@@ -13,6 +13,7 @@ typedef struct LaraExtraInfo {
 	bool hasRocketLauncher;
 	__int16 rocketAmmo;
 	__int16 numRocketAmmos;
+	__int16 extraAnim;
 };
 
 extern LaraExtraInfo g_LaraExtra;
@@ -22,14 +23,10 @@ extern LaraExtraInfo g_LaraExtra;
 #define ResetLook ((void (__cdecl*)()) 0x0044D220)
 #define UpdateLaraRoom ((__int32 (__cdecl*)(ITEM_INFO*, __int32)) 0x004120F0)
 #define LaraControl ((__int32 (__cdecl*)()) 0x00455830)
-//#define LaraGun ((void (__cdecl*)()) 0x00452430)
 #define GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, __int32)) 0x0041E2A0)
 #define CheckForHoldingState ((__int32 (__cdecl*)(__int16)) 0x00452AF0)
+#define AnimateLara ((__int32 (__cdecl*)(ITEM_INFO*)) 0x004563F0)
 
-void lara_as_walk(ITEM_INFO* item, COLL_INFO* coll);
-void __cdecl j_AnimateLara(ITEM_INFO* item);
-void __cdecl AnimateLaraNew(ITEM_INFO* item);
 void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
-void __cdecl LaraGun();
 
 void Inject_Lara();
