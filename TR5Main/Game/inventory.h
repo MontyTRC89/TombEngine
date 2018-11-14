@@ -197,6 +197,19 @@ typedef struct InventoryObjectDefinition {
 	__int16 objectName;
 	__int32 meshBits;
 	__int16 rotY;
+
+	InventoryObjectDefinition(__int16 objNum, __int16 objName, __int32 bits, __int16 rot)
+	{
+		objectNumber = objNum;
+		objectName = objName;
+		meshBits = bits;
+		rotY = rot;
+	}
+
+	InventoryObjectDefinition()
+	{
+
+	}
 };
 
 class Inventory

@@ -338,11 +338,11 @@ __int16* __cdecl GetAmmo(__int32 weaponType)
 {
 	switch (weaponType)
 	{
-		case WEAPON_SHOTGUN:
-			if (Lara.shotgunTypeCarried & 8)
-				return &Lara.numShotgunAmmo1;
+	case WEAPON_SHOTGUN:
+		if (Lara.shotgunTypeCarried & 8)
+			return &Lara.numShotgunAmmo1;
 		else
-				return &Lara.numShotgunAmmo2;
+			return &Lara.numShotgunAmmo2;
 
 	case WEAPON_REVOLVER:
 		return &Lara.numRevolverAmmo;

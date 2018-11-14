@@ -594,6 +594,14 @@ void __cdecl NewObjects()
 	{
 		obj->control = ControlHarpoonBolt;
 	}
+
+	obj = &Objects[ID_CROSSBOW_BOLT];
+	if (obj->loaded)
+	{
+		obj->initialise = NULL;
+		obj->control = NULL;
+		obj->control = ControlCrossbowBolt;
+	}
 }
 
 void __cdecl CustomObjects()

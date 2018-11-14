@@ -112,7 +112,7 @@ void ControlMissile(__int16 fxNumber)
 
 	/* Create bubbles in wake of harpoon bolt */
 	if (fx->objectNumber == ID_SCUBA_HARPOON && Rooms[fx->roomNumber].flags & 1)
-		CreateBubble(&fx->pos, fx->roomNumber);
+		CreateBubble(&fx->pos, fx->roomNumber, 1);
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
 	{
 		AddDynamicLight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 14, 11);

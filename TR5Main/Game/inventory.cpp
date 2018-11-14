@@ -33,70 +33,41 @@ Inventory::Inventory()
 	}
 
 	// Assign new strings
-	m_objectsTable[INV_OBJECT_UZIS].objectName = STRING_INV_UZI;
-	m_objectsTable[INV_OBJECT_PISTOLS].objectName = STRING_INV_PISTOLS;
-	m_objectsTable[INV_OBJECT_SHOTGUN].objectName = STRING_INV_SHOTGUN;
-	m_objectsTable[INV_OBJECT_REVOLVER].objectName = STRING_INV_REVOLVER;
-	m_objectsTable[INV_OBJECT_REVOLVER_LASER].objectName = STRING_INV_REVOLVER_LASER;
-	m_objectsTable[INV_OBJECT_HK].objectName = STRING_INV_HK;
-	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO1].objectName = STRING_INV_SHOTGUN_AMMO1;
-	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO2].objectName = STRING_INV_SHOTGUN_AMMO2;
-	m_objectsTable[INV_OBJECT_HK_AMMO1].objectName = STRING_INV_HK_AMMO;
-	m_objectsTable[INV_OBJECT_REVOLVER_AMMO].objectName = STRING_INV_REVOLVER_AMMO;
-	m_objectsTable[INV_OBJECT_UZI_AMMO].objectName = STRING_INV_UZI_AMMO;
-	m_objectsTable[INV_OBJECT_PISTOLS_AMMO].objectName = STRING_INV_PISTOLS_AMMO;
-	m_objectsTable[INV_OBJECT_LASERSIGHT].objectName = STRING_INV_LASERSIGHT;
-	m_objectsTable[INV_OBJECT_SILENCER].objectName = STRING_INV_SILENCER;
-	m_objectsTable[INV_OBJECT_LARGE_MEDIPACK].objectName = STRING_INV_LARGE_MEDIPACK;
-	m_objectsTable[INV_OBJECT_SMALL_MEDIPACK].objectName = STRING_INV_SMALL_MEDIPACK;
-	m_objectsTable[INV_OBJECT_BINOCULARS].objectName = STRING_INV_BINOCULARS;
-	m_objectsTable[INV_OBJECT_FLARES].objectName = STRING_INV_FLARES;
-	m_objectsTable[INV_OBJECT_TIMEX].objectName = STRING_INV_TIMEX;
-	m_objectsTable[INV_OBJECT_CROWBAR].objectName = STRING_INV_CROWBAR;
-	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].objectName = STRING_INV_GRENADE_LAUNCHER;
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectName = STRING_INV_GRENADE_AMMO;
-	m_objectsTable[INV_OBJECT_HARPOON_GUN].objectName = STRING_INV_HARPOON_GUN;
-	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectName = STRING_INV_HARPOON_AMMO;
-	m_objectsTable[INV_OBJECT_ROCKET_LAUNCHER].objectName = STRING_INV_ROCKET_LAUNCHER;
-	m_objectsTable[INV_OBJECT_ROCKET_AMMO].objectName = STRING_INV_ROCKET_AMMO;
-	m_objectsTable[INV_OBJECT_CROSSBOW].objectName = STRING_INV_CROSSBOW;
-	m_objectsTable[INV_OBJECT_CROSSBOW_LASER].objectName = STRING_INV_CROSSBOW_LASER;
-	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO1].objectName = STRING_INV_CROSSBOW_AMMO1;
-	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2].objectName = STRING_INV_CROSSBOW_AMMO2;
-
-	// Assign new objects
-	m_objectsTable[INV_OBJECT_PASSAPORT].objectNumber = ID_INVENTORY_PASSPORT;
-	m_objectsTable[INV_OBJECT_PASSAPORT].objectName = STRING_INV_PASSPORT;
-	m_objectsTable[INV_OBJECT_PASSAPORT].meshBits = -1;
-
-	m_objectsTable[INV_OBJECT_KEYS].objectNumber = ID_INVENTORY_KEYS;
-	m_objectsTable[INV_OBJECT_KEYS].objectName = STRING_INV_CONTROLS;
-	m_objectsTable[INV_OBJECT_KEYS].meshBits = -1;
-
-	m_objectsTable[INV_OBJECT_SUNGLASSES].objectNumber = ID_INVENTORY_SUNGLASSES;
-	m_objectsTable[INV_OBJECT_SUNGLASSES].objectName = STRING_INV_DISPLAY;
-	m_objectsTable[INV_OBJECT_SUNGLASSES].meshBits = -1;
-
-	m_objectsTable[INV_OBJECT_POLAROID].objectNumber = ID_INVENTORY_POLAROID;
-	m_objectsTable[INV_OBJECT_POLAROID].objectName = STRING_INV_LARA_HOME;
-	m_objectsTable[INV_OBJECT_POLAROID].meshBits = -1;
-	m_objectsTable[INV_OBJECT_POLAROID].rotY = 16384;
-
-	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].objectNumber = ID_GRENADE_ITEM;
-	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].objectName = STRING_INV_GRENADE_LAUNCHER;
-	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER].meshBits = -1;
-
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectNumber = ID_GRENADE_AMMO_ITEM;
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO].objectName = STRING_INV_GRENADE_AMMO;
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO].meshBits = -1;
-
-	m_objectsTable[INV_OBJECT_HARPOON_GUN].objectNumber = ID_HARPOON_ITEM;
-	m_objectsTable[INV_OBJECT_HARPOON_GUN].objectName = STRING_INV_HARPOON_GUN;
-	m_objectsTable[INV_OBJECT_HARPOON_GUN].meshBits = -1;
-
-	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectNumber = ID_HARPOON_AMMO_ITEM;
-	m_objectsTable[INV_OBJECT_HARPOON_AMMO].objectName = STRING_INV_HARPOON_AMMO;
-	m_objectsTable[INV_OBJECT_HARPOON_AMMO].meshBits = -1;
+	m_objectsTable[INV_OBJECT_UZIS] = InventoryObjectDefinition(ID_UZI_ITEM, STRING_INV_UZI, -1, 0);
+	m_objectsTable[INV_OBJECT_PISTOLS] = InventoryObjectDefinition(ID_PISTOLS_ITEM, STRING_INV_PISTOLS, -1, 0);
+	m_objectsTable[INV_OBJECT_SHOTGUN] = InventoryObjectDefinition(ID_SHOTGUN_ITEM, STRING_INV_SHOTGUN, -1, 0);
+	m_objectsTable[INV_OBJECT_REVOLVER] = InventoryObjectDefinition(ID_REVOLVER_ITEM, STRING_INV_REVOLVER, -1, 0);
+	m_objectsTable[INV_OBJECT_REVOLVER_LASER] = InventoryObjectDefinition(ID_REVOLVER_ITEM, STRING_INV_REVOLVER_LASER, -1, 0);
+	m_objectsTable[INV_OBJECT_HK] = InventoryObjectDefinition(ID_HK_ITEM, STRING_INV_HK, -1, 0);
+	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO1] = InventoryObjectDefinition(ID_SHOTGUN_AMMO1_ITEM, STRING_INV_SHOTGUN_AMMO1, -1, 0);
+	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO2] = InventoryObjectDefinition(ID_SHOTGUN_AMMO2_ITEM, STRING_INV_SHOTGUN_AMMO2, -1, 0);
+	m_objectsTable[INV_OBJECT_HK_AMMO1] = InventoryObjectDefinition(ID_HK_AMMO_ITEM, STRING_INV_HK_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_REVOLVER_AMMO] = InventoryObjectDefinition(ID_REVOLVER_AMMO_ITEM, STRING_INV_REVOLVER_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_UZI_AMMO] = InventoryObjectDefinition(ID_UZI_AMMO_ITEM, STRING_INV_UZI_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_PISTOLS_AMMO] = InventoryObjectDefinition(ID_PISTOLS_AMMO_ITEM, STRING_INV_PISTOLS_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_LASERSIGHT] = InventoryObjectDefinition(ID_LASERSIGHT_ITEM, STRING_INV_LASERSIGHT, -1, 0);
+	m_objectsTable[INV_OBJECT_SILENCER] = InventoryObjectDefinition(ID_SILENCER_ITEM, STRING_INV_SILENCER, -1, 0);
+	m_objectsTable[INV_OBJECT_LARGE_MEDIPACK] = InventoryObjectDefinition(ID_BIGMEDI_ITEM, STRING_INV_LARGE_MEDIPACK, -1, 0);
+	m_objectsTable[INV_OBJECT_SMALL_MEDIPACK] = InventoryObjectDefinition(ID_SMALLMEDI_ITEM, STRING_INV_SMALL_MEDIPACK, -1, 0);
+	m_objectsTable[INV_OBJECT_BINOCULARS] = InventoryObjectDefinition(ID_BINOCULARS_ITEM, STRING_INV_BINOCULARS, -1, 0);
+	m_objectsTable[INV_OBJECT_FLARES] = InventoryObjectDefinition(ID_FLARE_INV_ITEM, STRING_INV_FLARES, -1, 0);
+	m_objectsTable[INV_OBJECT_TIMEX] = InventoryObjectDefinition(ID_COMPASS_ITEM, STRING_INV_TIMEX, -1, 0);
+	m_objectsTable[INV_OBJECT_CROWBAR] = InventoryObjectDefinition(ID_CROWBAR_ITEM, STRING_INV_CROWBAR, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER] = InventoryObjectDefinition(ID_GRENADE_ITEM, STRING_INV_GRENADE_LAUNCHER, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO] = InventoryObjectDefinition(ID_GRENADE_AMMO_ITEM, STRING_INV_GRENADE_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_HARPOON_GUN] = InventoryObjectDefinition(ID_HARPOON_ITEM, STRING_INV_HARPOON_GUN, -1, 0);
+	m_objectsTable[INV_OBJECT_HARPOON_AMMO] = InventoryObjectDefinition(ID_HARPOON_AMMO_ITEM, STRING_INV_HARPOON_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_ROCKET_LAUNCHER] = InventoryObjectDefinition(ID_ROCKET_LAUNCHER_ITEM, STRING_INV_ROCKET_LAUNCHER, -1, 0);
+	m_objectsTable[INV_OBJECT_ROCKET_AMMO] = InventoryObjectDefinition(ID_ROCKET_LAUNCHER_AMMO_ITEM, STRING_INV_ROCKET_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW] = InventoryObjectDefinition(ID_CROSSBOW_ITEM, STRING_INV_CROSSBOW, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_LASER] = InventoryObjectDefinition(ID_CROSSBOW_ITEM, STRING_INV_CROSSBOW_LASER, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO1] = InventoryObjectDefinition(ID_CROSSBOW_AMMO1_ITEM, STRING_INV_CROSSBOW_AMMO1, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2] = InventoryObjectDefinition(ID_CROSSBOW_AMMO2_ITEM, STRING_INV_CROSSBOW_AMMO2, -1, 0);
+	m_objectsTable[INV_OBJECT_PASSAPORT] = InventoryObjectDefinition(ID_INVENTORY_PASSPORT, STRING_INV_PASSPORT, -1, 0);
+	m_objectsTable[INV_OBJECT_KEYS] = InventoryObjectDefinition(ID_INVENTORY_KEYS, STRING_INV_CONTROLS, -1, 0);
+	m_objectsTable[INV_OBJECT_SUNGLASSES] = InventoryObjectDefinition(ID_INVENTORY_SUNGLASSES, STRING_INV_DISPLAY, -1, 0);
+	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_INV_LARA_HOME, -1, 0);
+	m_objectsTable[INV_OBJECT_HEADPHONES] = InventoryObjectDefinition(ID_INVENTORY_HEADPHONES, STRING_INV_SOUND, -1, 0);
 }
 
 Inventory::~Inventory()
@@ -148,9 +119,9 @@ void Inventory::Initialise()
 		//Lara.uzisTypeCarried = 1;
 		//Lara.numUziAmmo = 1000;
 
-		Lara.shotgunTypeCarried = 1;
-		Lara.numShotgunAmmo1 = 1000;
-		Lara.numShotgunAmmo2 = 1000;
+		//Lara.shotgunTypeCarried = 1;
+		//Lara.numShotgunAmmo1 = 1000;
+		//Lara.numShotgunAmmo2 = 1000;
 
 		/*Lara.numRevolverAmmo = 1000;
 		Lara.numShotgunAmmo2 = 1000;
@@ -162,31 +133,30 @@ void Inventory::Initialise()
 				//Lara.crossbowTypeCarried = 1;
 		//Lara.numCrossbowAmmo1 = 1000;
 
-		/*g_LaraExtra.hasGrenadeLauncher = true;
+		g_LaraExtra.hasGrenadeLauncher = true;
 		g_LaraExtra.numGrenadeAmmos = 1000;
-
-		InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_ITEM);
-		InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO);
 
 		g_LaraExtra.hasHarpoon = true;
 		g_LaraExtra.numHarpoonAmmos = 1000;
 
-		InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_ITEM);
-		InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);*/
+		Lara.crossbowTypeCarried = 1;
+		Lara.numCrossbowAmmo1 = 1000;
 	}
 	
 	// Now fill the rings
 	if (!(gfLevelFlags & 1))
 	{
+		// Pistols
 		if (Lara.pistolsTypeCarried & 1)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_PISTOLS);
 
+		// Uzi
 		if (Lara.uzisTypeCarried & 1)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZIS);
-
-		if (Lara.numUziAmmo)
+		else if (Lara.numUziAmmo)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZI_AMMO);
 		
+		// Revolver
 		if (Lara.sixshooterTypeCarried & 1)
 		{
 			if (Lara.sixshooterTypeCarried & 4)
@@ -194,10 +164,13 @@ void Inventory::Initialise()
 			else
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER);
 		}
-		
-		if (Lara.numRevolverAmmo)
-			InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_AMMO);
-		
+		else
+		{
+			if (Lara.numRevolverAmmo)
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_AMMO);
+		}
+
+		// Shotgun
 		if (Lara.shotgunTypeCarried & 1)
 		{
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN);
@@ -212,12 +185,13 @@ void Inventory::Initialise()
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
+		// HK
 		if (Lara.HKtypeCarried & 1)
 		{
 			if (Lara.HKtypeCarried & 2)
-				InsertObject(INV_RING_WEAPONS, 8);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_LASER);
 			else
-				InsertObject(INV_RING_WEAPONS, 7);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK);
 
 			if (Lara.HKtypeCarried & 0x10)
 			{
@@ -228,48 +202,59 @@ void Inventory::Initialise()
 				//CurrentGrenadeGunAmmoType = 2;
 			}
 		}
-		
-		if (Lara.numHKammo1)
-			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_AMMO1);
-		
+		else
+		{
+			if (Lara.numHKammo1 && !Lara.HKtypeCarried)
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_AMMO1);
+		}
+
+		// Crossbow
 		if (Lara.crossbowTypeCarried & 1)
 		{
-			if (CurrentLevel < 0xBu || CurrentLevel > 0xEu)
-			{
-				if (Lara.crossbowTypeCarried & 4)
-					InsertObject(INV_RING_WEAPONS, 6);
+			if (Lara.crossbowTypeCarried & 4)
+					InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_LASER);
 				else
-					InsertObject(INV_RING_WEAPONS, 5);
-				//if (Lara.crossbowTypeCarried & 0x10)
-				//	CurrentCrossBowAmmoType = 1;
-			}
-			else
-			{
-				InsertObject(INV_RING_WEAPONS, 95);
-				//CurrentCrossBowAmmoType = 0;
-			}
+					InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW);
 		}
-		
-		if (CurrentLevel < 0xBu || CurrentLevel > 0xEu)
+		else
 		{
 			if (Lara.numCrossbowAmmo1)
-				InsertObject(INV_RING_WEAPONS, 15);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO1);
 			if (Lara.numCrossbowAmmo2)
-				InsertObject(INV_RING_WEAPONS, 16);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO2);
 		}
 
-		if (Lara.numCrossbowAmmo1)
-			InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO1);
+		// Grenade launcher
+		if (g_LaraExtra.hasGrenadeLauncher)
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_LAUNCHER);
+		else if (g_LaraExtra.numGrenadeAmmos)
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO);
 
+		// Harpoon
+		if (g_LaraExtra.hasHarpoon)
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_GUN);
+		else if (g_LaraExtra.numHarpoonAmmos)
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);
+
+		// Rocket launcher
+		if (g_LaraExtra.hasRocketLauncher)
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_LAUNCHER);
+		else if (g_LaraExtra.numRocketAmmos)
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_AMMO);
+				
+		// Lasersight
 		if (Lara.laserSight)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_LASERSIGHT);
 
+		// Silencer
 		if (Lara.silencer)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SILENCER);
 
+		// Binoculars
 		if (Lara.binoculars)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_BINOCULARS);
 
+		// Flares
 		if (Lara.numFlares)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_FLARES);
 	}

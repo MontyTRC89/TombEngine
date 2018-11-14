@@ -2216,6 +2216,9 @@ void Renderer::updateItemsAnimations()
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
+		D3DXMatrixTranslation(&translation, 0, 0, 0);
+		D3DXMatrixRotationYawPitchRoll(&rotation, 0, 0, 0);
+
 		RendererItemToDraw* itemToDraw = m_itemsToDraw[i].get();
 		ITEM_INFO* item = itemToDraw->Item;
 
@@ -2227,7 +2230,7 @@ void Renderer::updateItemsAnimations()
 		RendererObject* moveableObj = m_moveableObjects[item->objectNumber].get();
 
 		// Update animation matrices
-		if (obj->animIndex != -1)
+		if (obj->animIndex != -1 && item->objectNumber != ID_HARPOON)
 		{
 			__int16	*framePtr[2];
 			__int32 rate;
@@ -5980,8 +5983,10 @@ void Renderer::GetLaraBonePosition(D3DXVECTOR3* pos, __int32 joint)
 	auto obj = m_moveableObjects[ID_LARA];
 	auto bone = obj->LinearizedBones[joint];
 	D3DXVECTOR3 transformed;
-	D3DXVec3TransformCoord(&transformed, pos, &obj->AnimationTransforms[joint]);
-	*pos = transformed + D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	D3DXMatrixTranslation(&m_tempWorld, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	D3DXMatrixMultiply(&m_tempTransform, &obj->AnimationTransforms[joint], &m_tempWorld);
+	D3DXVec3TransformCoord(pos, pos, &m_tempTransform);
+	//*pos = transformed + D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 }
 
 void Renderer::drawRopes()
