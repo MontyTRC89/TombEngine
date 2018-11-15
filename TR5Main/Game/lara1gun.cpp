@@ -11,6 +11,7 @@
 #include "lot.h"
 #include "collide.h"
 #include "debris.h"
+#include "lara2gun.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -1055,8 +1056,164 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 	return;
 }
 
+void __cdecl RifleHandler(__int32 weaponType)
+{
+	WEAPON_INFO* weapon = &Weapons[weaponType];
+
+	LaraGetNewTarget(weapon);
+
+	if (TrInput & IN_ACTION)
+		LaraTargetInfo(weapon);
+
+	AimWeapon(weapon, &Lara.leftArm);
+
+	if (Lara.leftArm.lock)
+	{
+		Lara.torsoXrot = Lara.leftArm.xRot;
+		Lara.torsoYrot = Lara.leftArm.yRot;
+		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
+		{
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+		}
+	}
+
+	if (weaponType == WEAPON_REVOLVER)
+		AnimatePistols(WEAPON_REVOLVER);
+	else
+		AnimateShotgun(weaponType);
+
+	if (Lara.rightArm.flash_gun)
+	{
+		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
+		{
+			TriggerDynamics(
+				LaraItem->pos.xPos + (SIN(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
+				LaraItem->pos.yPos + (GetRandomControl() & 0x7F) - 575,
+				LaraItem->pos.zPos + (COS(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
+				12,
+				(GetRandomControl() & 0x3F) + 192,
+				(GetRandomControl() & 0x1F) + 128,
+				GetRandomControl() & 0x3F
+			);
+		}
+		else if (weaponType == WEAPON_REVOLVER)
+		{
+			PHD_VECTOR pos;
+
+			pos.x = GetRandomControl() - 128;
+			pos.y = (GetRandomControl() & 0x7F) - 63;
+			pos.z = GetRandomControl() - 128;
+
+			GetLaraJointPosition(&pos, 11);
+
+			TriggerDynamics(pos.x, pos.y, pos.z, 12,
+				(GetRandomControl() & 0x3F) + 192,
+				(GetRandomControl() & 0x1F) + 128,
+				(GetRandomControl() & 0x3F));
+		}
+	}
+}
+
+void __cdecl FireCrossbow(PHD_3DPOS* pos)
+{
+	__int16* ammos = GetAmmo(WEAPON_CROSSBOW);
+	if (*ammos <= 0)
+		return;
+
+	Lara.hasFired = true;
+	
+	__int16 itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
+	{
+		ITEM_INFO* item = &Items[itemNumber];
+		item->objectNumber = ID_CROSSBOW_BOLT;
+		item->shade = 0xC210;
+		if (pos)
+		{
+			item->roomNumber = LaraItem->roomNumber;
+			item->pos.xPos = pos->xPos;
+			item->pos.yPos = pos->yPos;
+			item->pos.zPos = pos->zPos;
+
+			InitialiseItem(itemNumber);
+
+			item->pos.xRot = pos->xRot;
+			item->pos.yRot = pos->yRot;
+			item->pos.zRot = pos->zRot;
+		}
+		else
+		{
+			if (*ammos != -1)
+				ammos--;
+
+			PHD_VECTOR jointPos;
+			jointPos.x = 0;
+			jointPos.y = 228;
+			jointPos.z = 32;
+
+			GetLaraJointPosition(&jointPos, 11);
+
+			item->roomNumber = LaraItem->roomNumber;
+			
+			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+			__int32 height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
+
+			if (height >= jointPos.y)
+			{
+				item->pos.xPos = jointPos.x;
+				item->pos.yPos = jointPos.y;
+				item->pos.zPos = jointPos.z;
+			}
+			else
+			{
+				item->pos.xPos = LaraItem->pos.xPos;
+				item->pos.yPos = jointPos.y;
+				item->pos.zPos = LaraItem->pos.zPos;
+				item->roomNumber = LaraItem->roomNumber;
+			}
+
+			InitialiseItem(itemNumber);
+
+			item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
+			item->pos.zRot = 0;
+			item->pos.yRot = Lara.leftArm.yRot + LaraItem->pos.yRot;
+
+			if (!Lara.leftArm.lock)
+			{
+				item->pos.xRot += Lara.torsoXrot;
+				item->pos.yRot += Lara.torsoYrot;
+			}
+		}
+
+		item->speed = 512;
+
+		AddActiveItem(itemNumber);
+		
+		if (Lara.crossbowTypeCarried & 0x08)
+		{
+			item->itemFlags[0] = 1;
+		}
+		else if (Lara.crossbowTypeCarried & 0x10)
+		{
+			item->itemFlags[0] = 2;
+		}
+		else
+		{
+			item->itemFlags[0] = 3;
+		}
+
+		SoundEffect(235, 0, 0);
+
+		Savegame.Level.AmmoUsed++;
+		Savegame.Game.AmmoUsed++;
+	}
+}
+
 void __cdecl Inject_Lara1Gun()
 {
 	INJECT(0x0044EAC0, DrawShotgun);
 	INJECT(0x0044EE00, AnimateShotgun);
+	INJECT(0x0044DCC0, RifleHandler);
+	INJECT(0x00429ED0, FireCrossbow)
 }

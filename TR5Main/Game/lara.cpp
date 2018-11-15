@@ -74,8 +74,8 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	UpdateLaraRoom(item, -381);
 
-	if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
-		TrInput &= ~IN_ACTION;
+	//if (Lara.gunType == WEAPON_CROSSBOW && !LaserSight)
+	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons
 	LaraGun();

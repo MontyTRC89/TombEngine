@@ -141,6 +141,7 @@ void Inventory::Initialise()
 
 		Lara.crossbowTypeCarried = 1;
 		Lara.numCrossbowAmmo1 = 1000;
+		Lara.numCrossbowAmmo2 = 1000;
 	}
 	
 	// Now fill the rings

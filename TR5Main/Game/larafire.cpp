@@ -355,9 +355,9 @@ __int16* __cdecl GetAmmo(__int32 weaponType)
 
 	case WEAPON_CROSSBOW:
 		if (Lara.crossbowTypeCarried & 8)
-			return &Lara.numCrossbowAmmo1;
-		else
 			return &Lara.numCrossbowAmmo2;
+		else
+			return &Lara.numCrossbowAmmo1;
 
 	case WEAPON_GRENADE:
 		return &g_LaraExtra.numGrenadeAmmos;
