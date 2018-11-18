@@ -30,6 +30,7 @@
 #include "..\Game\lara.h"
 #include "..\Game\effect2.h"
 #include "..\Game\rope.h"
+#include "..\Game\items.h"
 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
@@ -3647,6 +3648,30 @@ bool Renderer::drawScene(bool dump)
 		drawDebugInfo();
 		
 	restoreBackBuffer();
+
+	// TODO: move elsewhere
+	// First to come out, kill items
+	__int16 itemNum = NO_ITEM;
+	for (__int32 i = 0; i < NumberRooms; i++)
+	{
+		ROOM_INFO* r = &Rooms[i];
+
+		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
+		{
+			ITEM_INFO* item = &Items[itemNum];
+
+			if (item->objectNumber == ID_LARA)
+				continue;
+
+			if (item->status != ITEM_ACTIVE)
+			{
+				if (item->afterDeath > 0 && item->afterDeath < 128 && !(Wibble & 3))
+					item->afterDeath++;
+				if (item->afterDeath == 128)
+					KillItem(itemNum);
+			}
+		}
+	}	
 
 	return true;
 }

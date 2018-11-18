@@ -214,7 +214,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			ITEM_INFO* item = &Items[itemNum];
 			__int16 nextItem = item->nextActive;
 
-			if (item->afterDeath < 128)
+			if (item->afterDeath <= 128)
 			{
 				if (Objects[item->objectNumber].control)
 					Objects[item->objectNumber].control(itemNum);

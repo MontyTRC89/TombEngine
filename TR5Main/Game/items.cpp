@@ -27,9 +27,6 @@ void __cdecl KillItem(__int16 itemNum)
 	{
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNum | 0x8000;
 		ItemNewRoomNo++;
-		__int32 tmp = ItemNewRoomNo;
-
-		printf("%d\n", ItemNewRoomNo);
 	}
 	else
 	{

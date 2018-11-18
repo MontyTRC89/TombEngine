@@ -160,7 +160,7 @@
 //#define Drips						ARRAY_(0x00E4D740, DRIP_STRUCT, [32])
 #define Bubbles						ARRAY_(0x00E4D160, BUBBLE_STRUCT, [40])
 #define Ripples						ARRAY_(0x00E5C600, RIPPLE_STRUCT, [32])
-#define Blood						ARRAY_(0x00E4C1A0, BLOOD_STRUCT, [32])
+#define Blood						ARRAY_(0x00E4C9C0, BLOOD_STRUCT, [32])
 
 #define CurrentFOV					VAR_U_(0x00E4F504, __int16)
 
@@ -301,6 +301,9 @@
 #define SniperOverlay				VAR_U_(0x0051D022, byte)
 #define TargetGraphicsMeshPointer	VAR_U_(0x00E6E460, __int16*)
 #define BinocularGraphicsMeshPointer	VAR_U_(0x00E6D744, __int16*)
+
+#define CollidedItems				ARRAY_(0x00E88EA0, ITEM_INFO*, [1024])
+#define CollidedMeshes				ARRAY_(0x00E89EA0, MESH_INFO*, [1024])
 
 extern bool MonksAttackLara;
 

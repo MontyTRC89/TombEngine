@@ -877,6 +877,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 
 void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 {
+
 	ITEM_INFO* item = &Items[itemNumber];
 
 	__int32 oldX = item->pos.xPos;
@@ -884,8 +885,8 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 	__int32 oldZ = item->pos.zPos;
 	__int16 roomNumber = item->roomNumber;
 
-	bool someFlag1 = false;
-	bool someFlag2 = false;
+	bool land = false;
+	bool explode = false;
 
 	if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -896,12 +897,15 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 	}
 	else
 	{
-		someFlag1 = true;
+		land = true;
 	}
 
-	item->pos.xPos += item->speed * SIN(item->pos.xRot) >> W2V_SHIFT;
+	//printf("COS XROT: %d\n", COS(item->pos.xRot) >> W2V_SHIFT);
+	//printf("SIN YROT: %d\n", SIN(item->pos.yRot) >> W2V_SHIFT);
+
+	item->pos.xPos += ((item->speed * COS(item->pos.xRot) >> W2V_SHIFT) * SIN(item->pos.yRot)) >> W2V_SHIFT;
 	item->pos.yPos += item->speed * SIN(-item->pos.xRot) >> W2V_SHIFT;
-	item->pos.zPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.zPos += ((item->speed * COS(item->pos.xRot) >> W2V_SHIFT) * COS(item->pos.yRot)) >> W2V_SHIFT;
 
 	roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -920,43 +924,42 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 			return;
 		}
 
-		someFlag2 = true;
+		explode = true;
 	}
 
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	if ((Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && someFlag1)
+	if ((Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && land)
 	{
 		SetupRipple(item->pos.xPos, Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0);
 	}
 
-	__int32 y = (someFlag2 ? 2048 : 128);
+	__int32 y = (explode ? 2048 : 128);
 
-	ITEM_INFO* tempItem;
-	MESH_INFO* tempMesh;
 	__int32 someIndex = 0;
 	bool foundCollidedObjects = false;
 
-	while (true)
+	do
 	{
-		GetCollidedObjects(item, y, 1, &tempItem, &tempMesh, 1);
-		if (!tempItem && !tempMesh)
+		GetCollidedObjects(item, y, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+		
+		if (!CollidedItems[0] && !CollidedMeshes[0])
 			break;
 
 		foundCollidedObjects = true;
 
-		if (item->itemFlags[0] != 3 || someFlag2)
+		if (item->itemFlags[0] != 3 || explode)
 		{
-			if (tempItem)
+			if (CollidedItems)
 			{
-				ITEM_INFO* currentItem = tempItem;
+				ITEM_INFO* currentItem = CollidedItems[0];
 
 				do
 				{
-					if (someFlag2)
+					if (explode)
 					{
-						if (item->objectNumber < ID_SMASH_OBJECT1 && item->objectNumber > ID_SMASH_OBJECT8)
+						if (item->objectNumber < ID_SMASH_OBJECT1 || item->objectNumber > ID_SMASH_OBJECT8)
 						{
 							if (currentItem->objectNumber == ID_SWITCH_TYPE7 || currentItem->objectNumber == ID_SWITCH_TYPE8)
 								CrossbowHitSwitchType78(item, currentItem, 0);
@@ -970,7 +973,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 							TriggerShockwave(&currentItem->pos, 19922992, 96, 411066368, 0, 0);
 							currentItem->pos.yPos += 128;
 							ExplodeItemNode(currentItem, 0, 0, 128);
-							__int16 currentItemNumber = (currentItem - tempItem) / sizeof(ITEM_INFO);
+							__int16 currentItemNumber = (currentItem - CollidedItems[0]) / sizeof(ITEM_INFO);
 							SmashObject(currentItemNumber);
 							KillItem(currentItemNumber);
 						}
@@ -989,15 +992,15 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 					currentItem++;
 				} while (currentItem);
 			}
-			if (tempMesh)
+			if (CollidedMeshes)
 			{
-				MESH_INFO* currentMesh = tempMesh;
+				MESH_INFO* currentMesh = CollidedMeshes[0];
 
 				do
 				{
 					if (currentMesh->staticNumber >= 50 && currentMesh->staticNumber < 58)
 					{
-						if (someFlag2)
+						if (explode)
 						{
 							TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
 							currentMesh->y -= 128;
@@ -1017,13 +1020,11 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		}
 
 		someIndex++;
-		someFlag2 = true;
+		explode = true;
 		y = 2048;
-		if (someIndex >= 2)
-			break;
-	}
-
-	if (!someFlag2)
+	} while (someIndex < 2);
+		
+	if (!explode)
 	{
 		if (foundCollidedObjects)
 		{
@@ -1145,7 +1146,7 @@ void __cdecl FireCrossbow(PHD_3DPOS* pos)
 		else
 		{
 			if (*ammos != -1)
-				ammos--;
+				(*ammos)--;
 
 			PHD_VECTOR jointPos;
 			jointPos.x = 0;
