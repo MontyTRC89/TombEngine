@@ -11,16 +11,19 @@
 #define 	ROCKET_SPEED 			512
 #define 	GRENADE_SPEED 			128
 #define		MAX_GRENADE_FALLSPEED	128
-#define	GRENADE_YOFF	180
-#define	GRENADE_ZOFF	80
+#define		GRENADE_YOFF			180
+#define		GRENADE_ZOFF			80
+#define		CROSSBOW_DAMAGE			5
+#define		CROSSBOW_AMMO1			1
+#define		CROSSBOW_AMMO2			2
+#define		CROSSBOW_HIT_RADIUS		128
+#define		CROSSBOW_EXPLODE_RADIUS	2048
 
 #define ReadyShotgun ((void (__cdecl*)(__int32)) 0x0044DC30)  
 #define DrawShotgunMeshes ((void (__cdecl*)(__int32)) 0x0044DBB0)  
-//#define FireCrossbow ((void (__cdecl*)(PHD_3DPOS*)) 0x0044E4B0)  
 #define FireHK ((void (__cdecl*)(__int32)) 0x0044E4B0)  
 #define FireShotgun ((void (__cdecl*)()) 0x0044E110)   
 #define UndrawShotgun ((void (__cdecl*)(__int32)) 0x0044ECA0)  
-//#define RifleHandler ((void (__cdecl*)(__int32)) 0x0044DCC0)  
 #define CrossbowHitSwitchType78 ((void (__cdecl*)(ITEM_INFO*, ITEM_INFO*, __int32)) 0x0044E5E0)  
 #define DoGrenadeDamageOnBaddie ((void (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x0044F690)  
 

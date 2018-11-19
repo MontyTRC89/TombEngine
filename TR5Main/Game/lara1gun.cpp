@@ -877,7 +877,6 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 
 void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 {
-
 	ITEM_INFO* item = &Items[itemNumber];
 
 	__int32 oldX = item->pos.xPos;
@@ -900,9 +899,6 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		land = true;
 	}
 
-	//printf("COS XROT: %d\n", COS(item->pos.xRot) >> W2V_SHIFT);
-	//printf("SIN YROT: %d\n", SIN(item->pos.yRot) >> W2V_SHIFT);
-
 	item->pos.xPos += ((item->speed * COS(item->pos.xRot) >> W2V_SHIFT) * SIN(item->pos.yRot)) >> W2V_SHIFT;
 	item->pos.yPos += item->speed * SIN(-item->pos.xRot) >> W2V_SHIFT;
 	item->pos.zPos += ((item->speed * COS(item->pos.xRot) >> W2V_SHIFT) * COS(item->pos.yRot)) >> W2V_SHIFT;
@@ -913,37 +909,44 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos ||
 		GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos)
 	{
+		// I have hit the room, this is the end for the bolt
 		item->pos.xPos = oldX;
 		item->pos.yPos = oldY;
 		item->pos.zPos = oldZ;
 
-		if (item->itemFlags[0] != 3)
+		// If ammos are normal, then just shatter the bolt and quit
+		if (item->itemFlags[0] != 2)
 		{
 			ExplodeItemNode(item, 0, 0, 256);
 			KillItem(itemNumber);
 			return;
 		}
 
+		// Otherwise, bolt must explode
 		explode = true;
 	}
 
+	// Has bolt changed room?
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
+	// If now in water and before in land, add a ripple
 	if ((Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && land)
 	{
 		SetupRipple(item->pos.xPos, Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0);
 	}
 
-	__int32 y = (explode ? 2048 : 128);
+	__int32 radius = (explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS);
 
-	__int32 someIndex = 0;
+	__int32 n = 0;
 	bool foundCollidedObjects = false;
 
 	do
 	{
-		GetCollidedObjects(item, y, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+		// Found possible collided items and statics
+		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
 		
+		// If no collided items and meshes are found, then exit the loop
 		if (!CollidedItems[0] && !CollidedMeshes[0])
 			break;
 
@@ -951,14 +954,16 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 
 		if (item->itemFlags[0] != 3 || explode)
 		{
-			if (CollidedItems)
+			if (CollidedItems[0])
 			{
 				ITEM_INFO* currentItem = CollidedItems[0];
+				__int32 k = 0;
 
 				do
 				{
 					if (explode)
 					{
+						// Item is inside the radius and must explode
 						if (item->objectNumber < ID_SMASH_OBJECT1 || item->objectNumber > ID_SMASH_OBJECT8)
 						{
 							if (currentItem->objectNumber == ID_SWITCH_TYPE7 || currentItem->objectNumber == ID_SWITCH_TYPE8)
@@ -980,21 +985,28 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 					}
 					else if (currentItem->objectNumber == ID_SWITCH_TYPE7 || currentItem->objectNumber == ID_SWITCH_TYPE8)
 					{
+						// Special case for ID_SWITCH_TYPE7 and ID_SWITCH_TYPE8
 						CrossbowHitSwitchType78(item, currentItem, 1);
 					}
 					else if (Objects[currentItem->objectNumber].hitEffect)
 					{
-						HitTarget(currentItem, (GAME_VECTOR*)&item->pos, 5, 0);
-						if (item->itemFlags[0] == 2 && !Objects[currentItem->objectNumber].explodableMeshbits) // CHECK THIS
+						HitTarget(currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_CROSSBOW].damage, 0);
+
+						// Enable item if hit but only with normal ammos
+						if (item->itemFlags[0] == 1 && !Objects[currentItem->objectNumber].explodableMeshbits)  
 							item->active = true;
 					}
 
-					currentItem++;
+					k++;
+					currentItem = CollidedItems[k];
+
 				} while (currentItem);
 			}
-			if (CollidedMeshes)
+
+			if (CollidedMeshes[0])
 			{
 				MESH_INFO* currentMesh = CollidedMeshes[0];
+				__int32 k = 0;
 
 				do
 				{
@@ -1013,16 +1025,20 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 						SmashedMeshCount++;
 						currentMesh->Flags &= ~1;
 					}
-					currentMesh++;
+
+					k++;
+					currentMesh = CollidedMeshes[k];
+
 				} while (currentMesh);
 			}
+
 			break;
 		}
 
-		someIndex++;
+		n++;
 		explode = true;
-		y = 2048;
-	} while (someIndex < 2);
+		radius = CROSSBOW_EXPLODE_RADIUS;
+	} while (n < 2);
 		
 	if (!explode)
 	{
@@ -1033,6 +1049,8 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		}
 		return;
 	}
+
+	// At this point, for sure bolt must explode
 
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 		TriggerUnderwaterExplosion(item);
@@ -1046,6 +1064,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 	}
 
 	AlertNearbyGuards(item);
+	
 	SoundEffect(105, &item->pos, 0x1800004);
 	SoundEffect(106, &item->pos, 0);
 
@@ -1054,6 +1073,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		ExplodeItemNode(item, 0, 0, 256);
 		KillItem(itemNumber);
 	}
+
 	return;
 }
 
