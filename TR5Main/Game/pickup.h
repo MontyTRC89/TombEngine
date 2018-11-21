@@ -7,6 +7,7 @@
 #define PickupCollision ((void (__cdecl*)(__int16, ITEM_INFO*, COLL_INFO*)) 0x00467C00)
 
 __int32 __cdecl DrawAllPickups();
+void __cdecl PickedUpObject(__int16 objectNumber);
 
 void Inject_Pickup();
 

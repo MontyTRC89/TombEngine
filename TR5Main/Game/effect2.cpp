@@ -69,7 +69,7 @@ void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int3
 	spark->MaxYvel = -2 - (GetRandomControl() & 1);
 
 	__int32 size = (GetRandomControl() & 15) - 
-		(weapon != WEAPON_HK && weapon != WEAPON_ROCKET && weapon != WEAPON_GRENADE ? 24 : 0) + 48;
+		(weapon != WEAPON_HK && weapon != WEAPON_ROCKET_LAUNCHER && weapon != WEAPON_GRENADE_LAUNCHER ? 24 : 0) + 48;
 	
 	if (initial)
 	{

@@ -54,7 +54,9 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_TIMEX] = InventoryObjectDefinition(ID_COMPASS_ITEM, STRING_INV_TIMEX, -1, 0);
 	m_objectsTable[INV_OBJECT_CROWBAR] = InventoryObjectDefinition(ID_CROWBAR_ITEM, STRING_INV_CROWBAR, -1, 0);
 	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER] = InventoryObjectDefinition(ID_GRENADE_ITEM, STRING_INV_GRENADE_LAUNCHER, -1, 0);
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO] = InventoryObjectDefinition(ID_GRENADE_AMMO_ITEM, STRING_INV_GRENADE_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO1] = InventoryObjectDefinition(ID_GRENADE_AMMO1_ITEM, STRING_INV_GRENADE_AMMO1, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO2] = InventoryObjectDefinition(ID_GRENADE_AMMO2_ITEM, STRING_INV_GRENADE_AMMO2, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO3] = InventoryObjectDefinition(ID_GRENADE_AMMO3_ITEM, STRING_INV_GRENADE_AMMO3, -1, 0);
 	m_objectsTable[INV_OBJECT_HARPOON_GUN] = InventoryObjectDefinition(ID_HARPOON_ITEM, STRING_INV_HARPOON_GUN, -1, 0);
 	m_objectsTable[INV_OBJECT_HARPOON_AMMO] = InventoryObjectDefinition(ID_HARPOON_AMMO_ITEM, STRING_INV_HARPOON_AMMO, -1, 0);
 	m_objectsTable[INV_OBJECT_ROCKET_LAUNCHER] = InventoryObjectDefinition(ID_ROCKET_LAUNCHER_ITEM, STRING_INV_ROCKET_LAUNCHER, -1, 0);
@@ -63,11 +65,13 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_CROSSBOW_LASER] = InventoryObjectDefinition(ID_CROSSBOW_ITEM, STRING_INV_CROSSBOW_LASER, -1, 0);
 	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO1] = InventoryObjectDefinition(ID_CROSSBOW_AMMO1_ITEM, STRING_INV_CROSSBOW_AMMO1, -1, 0);
 	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2] = InventoryObjectDefinition(ID_CROSSBOW_AMMO2_ITEM, STRING_INV_CROSSBOW_AMMO2, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO3] = InventoryObjectDefinition(ID_CROSSBOW_AMMO3_ITEM, STRING_INV_CROSSBOW_AMMO3, -1, 0);
 	m_objectsTable[INV_OBJECT_PASSAPORT] = InventoryObjectDefinition(ID_INVENTORY_PASSPORT, STRING_INV_PASSPORT, -1, 0);
 	m_objectsTable[INV_OBJECT_KEYS] = InventoryObjectDefinition(ID_INVENTORY_KEYS, STRING_INV_CONTROLS, -1, 0);
 	m_objectsTable[INV_OBJECT_SUNGLASSES] = InventoryObjectDefinition(ID_INVENTORY_SUNGLASSES, STRING_INV_DISPLAY, -1, 0);
 	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_INV_LARA_HOME, -1, 0);
 	m_objectsTable[INV_OBJECT_HEADPHONES] = InventoryObjectDefinition(ID_INVENTORY_HEADPHONES, STRING_INV_SOUND, -1, 0);
+	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY, STRING_INV_DIARY, -1, 0);
 }
 
 Inventory::~Inventory()
@@ -133,46 +137,47 @@ void Inventory::Initialise()
 				//Lara.crossbowTypeCarried = 1;
 		//Lara.numCrossbowAmmo1 = 1000;
 
-		g_LaraExtra.hasGrenadeLauncher = true;
-		g_LaraExtra.numGrenadeAmmos = 1000;
+		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present = true;
+		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] = 1000;
+		g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = 0;
 
-		g_LaraExtra.hasHarpoon = true;
-		g_LaraExtra.numHarpoonAmmos = 1000;
+		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
+		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] = 1000;
+		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = 0;
 
-		Lara.crossbowTypeCarried = 1;
-		Lara.numCrossbowAmmo1 = 1000;
-		Lara.numCrossbowAmmo2 = 1000;
+		g_LaraExtra.Weapons[WEAPON_HARPOON].Present = true;
+		g_LaraExtra.Weapons[WEAPON_HARPOON].Ammo[0] = 1000;
 	}
 	
 	// Now fill the rings
 	if (!(gfLevelFlags & 1))
 	{
 		// Pistols
-		if (Lara.pistolsTypeCarried & 1)
+		if (g_LaraExtra.Weapons[WEAPON_PISTOLS].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_PISTOLS);
 
 		// Uzi
-		if (Lara.uzisTypeCarried & 1)
+		if (g_LaraExtra.Weapons[WEAPON_UZI].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZIS);
-		else if (Lara.numUziAmmo)
+		else if (g_LaraExtra.Weapons[WEAPON_UZI].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZI_AMMO);
 		
 		// Revolver
-		if (Lara.sixshooterTypeCarried & 1)
+		if (g_LaraExtra.Weapons[WEAPON_REVOLVER].Present)
 		{
-			if (Lara.sixshooterTypeCarried & 4)
+			if (g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight)
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_LASER);
 			else
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER);
 		}
 		else
 		{
-			if (Lara.numRevolverAmmo)
+			if (g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_AMMO);
 		}
 
 		// Shotgun
-		if (Lara.shotgunTypeCarried & 1)
+		if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present)
 		{
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN);
 			//if (Lara.shotgunTypeCarried & 0x10)
@@ -180,67 +185,64 @@ void Inventory::Initialise()
 		}
 		else
 		{
-			if (Lara.numShotgunAmmo1)
+			if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN_AMMO1);
-			if (Lara.numShotgunAmmo2)
+			if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
 		// HK
-		if (Lara.HKtypeCarried & 1)
+		if (g_LaraExtra.Weapons[WEAPON_HK].Present)
 		{
-			if (Lara.HKtypeCarried & 2)
+			if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_LASER);
 			else
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK);
-
-			if (Lara.HKtypeCarried & 0x10)
-			{
-				//CurrentGrenadeGunAmmoType = 1;
-			}
-			else if (Lara.HKtypeCarried & 0x20)
-			{
-				//CurrentGrenadeGunAmmoType = 2;
-			}
 		}
-		else
-		{
-			if (Lara.numHKammo1 && !Lara.HKtypeCarried)
-				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_AMMO1);
-		}
+		else if (g_LaraExtra.Weapons[WEAPON_HK].Ammo[0])
+			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_AMMO1);
 
 		// Crossbow
-		if (Lara.crossbowTypeCarried & 1)
+		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present)
 		{
-			if (Lara.crossbowTypeCarried & 4)
+			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight)
 					InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_LASER);
 				else
 					InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW);
 		}
 		else
 		{
-			if (Lara.numCrossbowAmmo1)
+			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO1);
-			if (Lara.numCrossbowAmmo2)
+			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[1])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO2);
+			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[2])
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO3);
 		}
 
 		// Grenade launcher
-		if (g_LaraExtra.hasGrenadeLauncher)
+		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_LAUNCHER);
-		else if (g_LaraExtra.numGrenadeAmmos)
-			InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO);
+		else
+		{
+			if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0])
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO1);
+			if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1])
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO2);
+			if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2])
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO3);
+		}
 
 		// Harpoon
-		if (g_LaraExtra.hasHarpoon)
+		if (g_LaraExtra.Weapons[WEAPON_HARPOON].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_GUN);
-		else if (g_LaraExtra.numHarpoonAmmos)
+		else if (g_LaraExtra.Weapons[WEAPON_HARPOON].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);
 
 		// Rocket launcher
-		if (g_LaraExtra.hasRocketLauncher)
+		if (g_LaraExtra.Weapons[WEAPON_ROCKET].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_LAUNCHER);
-		else if (g_LaraExtra.numRocketAmmos)
+		else if (g_LaraExtra.Weapons[WEAPON_ROCKET].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_AMMO);
 				
 		// Lasersight
@@ -770,8 +772,8 @@ void Inventory::UseCurrentItem()
 	{
 		if (canUseWeapons)
 		{
-			Lara.requestGunType = WEAPON_GRENADE;
-			if (!Lara.gunStatus && Lara.gunType == WEAPON_GRENADE)
+			Lara.requestGunType = WEAPON_GRENADE_LAUNCHER;
+			if (!Lara.gunStatus && Lara.gunType == WEAPON_GRENADE_LAUNCHER)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
 			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);

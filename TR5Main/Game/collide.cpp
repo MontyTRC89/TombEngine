@@ -113,7 +113,7 @@ __int32 __cdecl CollideStaticObjects(COLL_INFO* coll, __int32 x, __int32 y, __in
 	return false;
 }
 
-__int32 GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, __int32 flag2)
+__int32 GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, __int32 ignoreLara)
 {
 	// Collect all the rooms where to check
 	__int16 roomsArray[22];
@@ -208,7 +208,7 @@ __int32 GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 fla
 				{
 					ITEM_INFO* item = &Items[itemNumber];
 
-					if (item == collidingItem || !flag2 && item == LaraItem)
+					if (item == collidingItem || !ignoreLara && item == LaraItem)
 					{
 						itemNumber = item->nextItem;
 						continue;
@@ -234,7 +234,7 @@ __int32 GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 fla
 
 					if (Objects[item->objectNumber].drawRoutine
 						&& item->meshBits
-						&& (!flag1 || item->status != ITEM_INVISIBLE)
+						&& (!onlyVisible || item->status != ITEM_INVISIBLE)
 						&& dx >= -2048
 						&& dx <= 2048
 						&& dy >= -2048

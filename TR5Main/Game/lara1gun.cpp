@@ -164,7 +164,7 @@ void __cdecl ControlHarpoonBolt(__int16 itemNumber)
 			if (Objects[target->objectNumber].intelligent)
 			{
 				DoLotsOfBlood(item->pos.xPos, item->pos.yPos, item->pos.zPos, 0, 0, item->roomNumber, 3);
-				HitTarget(target, NULL, Weapons[WEAPON_HARPOON].damage << item->itemFlags[0], 0);
+				HitTarget(target, NULL, Weapons[WEAPON_HARPOON_GUN].damage << item->itemFlags[0], 0);
 				Savegame.Level.AmmoHits++;
 				Savegame.Game.AmmoHits++;
 			}
@@ -275,10 +275,10 @@ void __cdecl FireGrenade()
 		g_Renderer->GetLaraBonePosition(&pos, HAND_R);
 
 		SmokeCountL = 32;
-		SmokeWeapon = WEAPON_GRENADE;
+		SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
 
 		for (__int32 i = 0; i < 5; i++)
-			TriggerGunSmoke(x, y, z, pos.x - x, pos.y - y, pos.z - z, 1, WEAPON_GRENADE, 32);
+			TriggerGunSmoke(x, y, z, pos.x - x, pos.y - y, pos.z - z, 1, WEAPON_GRENADE_LAUNCHER, 32);
 
 		InitialiseItem(itemNumber);
 
@@ -331,11 +331,11 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 		item->speed -= item->speed >> 2;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed >> 4) + 3)*ONE_DEGREE);
+			item->pos.zRot += (((item->speed >> 4) + 3)*ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed >> 2) + 3)*ONE_DEGREE);
+				item->pos.yRot += (((item->speed >> 2) + 3)*ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 2) + 3)*ONE_DEGREE);
+				item->pos.xRot += (((item->speed >> 2) + 3)*ANGLE(1));
 		}
 	}
 	else
@@ -344,11 +344,11 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 		item->fallspeed += GRAVITY >> 1;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed >> 2) + 7)*ONE_DEGREE);
+			item->pos.zRot += (((item->speed >> 2) + 7)*ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed >> 1) + 7)*ONE_DEGREE);
+				item->pos.yRot += (((item->speed >> 1) + 7)*ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 1) + 7)*ONE_DEGREE);
+				item->pos.xRot += (((item->speed >> 1) + 7)*ANGLE(1));
 
 		}
 	}
@@ -598,9 +598,9 @@ void __cdecl DrawShotgun(__int32 weaponType)
 
 		item->objectNumber = WeaponObject(weaponType);
 
-		if (weaponType == WEAPON_ROCKET)
+		if (weaponType == WEAPON_ROCKET_LAUNCHER)
 			item->animNumber = Objects[item->objectNumber].animIndex + 1;
-		else if (weaponType == WEAPON_GRENADE)
+		else if (weaponType == WEAPON_GRENADE_LAUNCHER)
 			item->animNumber = Objects[item->objectNumber].animIndex + ROCKET_DRAW_ANIM;
 		else
 			item->animNumber = Objects[item->objectNumber].animIndex + HARPOON_DRAW_ANIM; // M16 too
@@ -668,13 +668,13 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 			pos.y = 228;
 			pos.z = 32;
 		}
-		else if (SmokeWeapon == WEAPON_GRENADE)
+		else if (SmokeWeapon == WEAPON_GRENADE_LAUNCHER)
 		{
 			pos.x = 0;
 			pos.y = 180;
 			pos.z = 80;
 		}
-		else if (SmokeWeapon == WEAPON_ROCKET)
+		else if (SmokeWeapon == WEAPON_ROCKET_LAUNCHER)
 		{
 			pos.x = 0;
 			pos.y = 84;
@@ -732,17 +732,17 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 			{
 				if ((TrInput & IN_ACTION) && (!Lara.target || Lara.leftArm.lock))
 				{
-					if (weaponType == WEAPON_HARPOON)
+					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
 						if (!(g_LaraExtra.harpoonAmmo & 3)) 
 							harpoonFired = true;
 					}
-					else if (weaponType == WEAPON_ROCKET)
+					else if (weaponType == WEAPON_ROCKET_LAUNCHER)
 					{
 						//FireRocket();
 					}
-					else if (weaponType == WEAPON_GRENADE)
+					else if (weaponType == WEAPON_GRENADE_LAUNCHER)
 					{
 						FireGrenade();
 					}
@@ -755,7 +755,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 						FireHK(0);
 						HKFlag = 1;
 
-						if (Lara.HKtypeCarried & 2)
+						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(14, 0, 0);
 						}
@@ -774,7 +774,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 					item->goalAnimState = 0; 
 			}
 
-			if (item->goalAnimState != 2 && HKFlag && !(Lara.HKtypeCarried & 2))
+			if (item->goalAnimState != 2 && HKFlag && !(g_LaraExtra.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(68);
 				SoundEffect(69, &LaraItem->pos, 0);
@@ -783,7 +783,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 		}
 		else if (HKFlag)
 		{
-			if (Lara.HKtypeCarried & 2)
+			if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
 			{
 				SoundEffect(14, 0, 0);
 			}
@@ -811,18 +811,18 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 			{
 				if ((TrInput & IN_ACTION) && (!Lara.target || Lara.leftArm.lock))
 				{
-					if (weaponType == WEAPON_HARPOON)
+					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
 						if (!(g_LaraExtra.harpoonAmmo & 3))
 							harpoonFired = true;
 					}
-					else if (weaponType == WEAPON_HK && (!(Lara.HKtypeCarried & 0x18) || !HKTimer))
+					else if (weaponType == WEAPON_HK && (/*!(Lara.HKtypeCarried & 0x18) || */!HKTimer))
 					{
 						FireHK(1);
 						HKFlag = 1;
 						item->goalAnimState = 8;
-						if (Lara.HKtypeCarried & 2)
+						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(14, 0, 0);
 						}
@@ -842,7 +842,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 				else if (Lara.leftArm.lock)
 					item->goalAnimState = 6;
 			}
-			else if (item->goalAnimState != 8 && HKFlag && !(Lara.HKtypeCarried & 2))
+			else if (item->goalAnimState != 8 && HKFlag && !(g_LaraExtra.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(68);
 				SoundEffect(69, &LaraItem->pos, 0);
@@ -850,7 +850,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 			}
 			else if (HKFlag)
 			{
-				if (Lara.HKtypeCarried & 2)
+				if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
 				{
 					SoundEffect(14, 0, 0);
 				}
@@ -915,7 +915,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		item->pos.zPos = oldZ;
 
 		// If ammos are normal, then just shatter the bolt and quit
-		if (item->itemFlags[0] != 2)
+		if (item->itemFlags[0] != CROSSBOW_AMMO3)
 		{
 			ExplodeItemNode(item, 0, 0, 256);
 			KillItem(itemNumber);
@@ -952,7 +952,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 
 		foundCollidedObjects = true;
 
-		if (item->itemFlags[0] != 3 || explode)
+		if (item->itemFlags[0] != CROSSBOW_AMMO3 || explode)
 		{
 			if (CollidedItems[0])
 			{
@@ -993,8 +993,8 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 						HitTarget(currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_CROSSBOW].damage, 0);
 
 						// Enable item if hit but only with normal ammos
-						if (item->itemFlags[0] == 1 && !Objects[currentItem->objectNumber].explodableMeshbits)  
-							item->active = true;
+						if (item->itemFlags[0] == CROSSBOW_AMMO2 && !Objects[currentItem->objectNumber].explodableMeshbits)  
+							item->poisoned = true;
 					}
 
 					k++;
@@ -1068,7 +1068,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 	SoundEffect(105, &item->pos, 0x1800004);
 	SoundEffect(106, &item->pos, 0);
 
-	if (foundCollidedObjects)
+	if (foundCollidedObjects || explode)
 	{
 		ExplodeItemNode(item, 0, 0, 256);
 		KillItem(itemNumber);
@@ -1211,18 +1211,7 @@ void __cdecl FireCrossbow(PHD_3DPOS* pos)
 
 		AddActiveItem(itemNumber);
 		
-		if (Lara.crossbowTypeCarried & 0x08)
-		{
-			item->itemFlags[0] = 1;
-		}
-		else if (Lara.crossbowTypeCarried & 0x10)
-		{
-			item->itemFlags[0] = 2;
-		}
-		else
-		{
-			item->itemFlags[0] = 3;
-		}
+		item->itemFlags[0] = g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
 
 		SoundEffect(235, 0, 0);
 

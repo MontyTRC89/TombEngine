@@ -2,18 +2,23 @@
 
 #include "..\Global\global.h"
 
+typedef struct CarriedWeaponInfo {
+	bool Present;
+	__int16 Ammo[3];
+	byte SelectedAmmo;
+	bool HasLasersight;
+	bool HasSilencer;
+};
+
+typedef struct DiaryInfo {
+	bool Present;
+};
+
 typedef struct LaraExtraInfo {
-	__int16 vehicle;
-	bool hasHarpoon;
-	__int16 harpoonAmmo;
-	__int16 numHarpoonAmmos;
-	bool hasGrenadeLauncher;
-	__int16 grenadeAmmo;
-	__int16 numGrenadeAmmos;
-	bool hasRocketLauncher;
-	__int16 rocketAmmo;
-	__int16 numRocketAmmos;
-	__int16 extraAnim;
+	__int16 Vehicle;
+	__int16 ExtraAnim;
+	CarriedWeaponInfo Weapons[NUM_WEAPONS];
+	DiaryInfo Diary;
 };
 
 extern LaraExtraInfo g_LaraExtra;

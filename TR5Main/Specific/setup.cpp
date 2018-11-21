@@ -559,7 +559,31 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_GRENADE_AMMO_ITEM];
+	obj = &Objects[ID_GRENADE_AMMO1_ITEM];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_GRENADE_AMMO2_ITEM];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_GRENADE_AMMO3_ITEM];
+	if (obj->loaded)
+	{
+		obj->collision = PickupCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_CROSSBOW_AMMO3_ITEM];
 	if (obj->loaded)
 	{
 		obj->collision = PickupCollision;

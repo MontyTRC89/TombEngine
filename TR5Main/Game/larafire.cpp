@@ -39,6 +39,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 };
 
 extern GameFlow* g_GameFlow;
+extern LaraExtraInfo g_LaraExtra;
 
 __int32 __cdecl WeaponObject(__int32 weaponType)
 {
@@ -56,11 +57,11 @@ __int32 __cdecl WeaponObject(__int32 weaponType)
 		return ID_HK_ANIM;
 	case WEAPON_FLARE:
 		return ID_FLARE_ANIM;
-	case WEAPON_GRENADE:
+	case WEAPON_GRENADE_LAUNCHER:
 		return ID_GRENADE_ANIM;
-	case WEAPON_ROCKET:
+	case WEAPON_ROCKET_LAUNCHER:
 		return ID_ROCKET_ANIM;
-	case WEAPON_HARPOON:
+	case WEAPON_HARPOON_GUN:
 		return ID_HARPOON_ANIM;
 	default:
 		return ID_PISTOLS_ANIM;
@@ -166,7 +167,7 @@ void __cdecl LaraGun()
 	{
 		if ((TrInput & IN_DRAW) || Lara.requestGunType != Lara.gunType)  
 			Lara.gunStatus = LG_UNDRAW_GUNS;
-		else if (Lara.gunType != WEAPON_HARPOON && Lara.waterStatus != LW_ABOVE_WATER &&
+		else if (Lara.gunType != WEAPON_HARPOON_GUN && Lara.waterStatus != LW_ABOVE_WATER &&
 			(Lara.waterStatus != LW_WADE || Lara.waterSurfaceDist < -Weapons[Lara.gunType].gunHeight)) 
 			Lara.gunStatus = LG_UNDRAW_GUNS;
 	}
@@ -195,9 +196,9 @@ void __cdecl LaraGun()
 			case WEAPON_SHOTGUN:
 			case WEAPON_CROSSBOW:
 			case WEAPON_HK:
-			case WEAPON_GRENADE:
-			case WEAPON_ROCKET:
-			case WEAPON_HARPOON:
+			case WEAPON_GRENADE_LAUNCHER:
+			case WEAPON_ROCKET_LAUNCHER:
+			case WEAPON_HARPOON_GUN:
 
 			if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA && Camera.type != CAMERA_TYPE::LOOK_CAMERA &&
 				Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
@@ -234,9 +235,9 @@ void __cdecl LaraGun()
 		case WEAPON_SHOTGUN:
 		case WEAPON_CROSSBOW:
 		case WEAPON_HK:
-		case WEAPON_GRENADE:
-		case WEAPON_ROCKET:
-		case WEAPON_HARPOON:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_ROCKET_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
 			UndrawShotgun(Lara.gunType);
 			break;
 
@@ -278,9 +279,9 @@ void __cdecl LaraGun()
 		case WEAPON_SHOTGUN:
 		case WEAPON_CROSSBOW:
 		case WEAPON_HK:
-		case WEAPON_GRENADE:
-		case WEAPON_ROCKET:
-		case WEAPON_HARPOON:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_ROCKET_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
 		case WEAPON_REVOLVER:
 			RifleHandler(Lara.gunType);
 			break;
@@ -293,7 +294,7 @@ void __cdecl LaraGun()
 	case LG_NO_ARMS:
 		if (Lara.gunType == WEAPON_FLARE)
 		{
-			if (g_LaraExtra.vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
+			if (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
 			{
 				if (Lara.flareControlLeft)
 				{
@@ -324,7 +325,7 @@ void __cdecl LaraGun()
 		{
 			if (Lara.meshPtrs[HAND_L] == Meshes[Objects[ID_FLARE_ANIM].meshIndex + 26])
 			{
-				Lara.flareControlLeft = (g_LaraExtra.vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
+				Lara.flareControlLeft = (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
 				DoFlareInHand(Lara.flareAge);
 				SetFlareArm(Lara.leftArm.frameNumber);
 			}
@@ -336,42 +337,7 @@ void __cdecl LaraGun()
 
 __int16* __cdecl GetAmmo(__int32 weaponType)
 {
-	switch (weaponType)
-	{
-	case WEAPON_SHOTGUN:
-		if (Lara.shotgunTypeCarried & 8)
-			return &Lara.numShotgunAmmo1;
-		else
-			return &Lara.numShotgunAmmo2;
-
-	case WEAPON_REVOLVER:
-		return &Lara.numRevolverAmmo;
-
-	case WEAPON_UZI:
-		return &Lara.numUziAmmo;
-
-	case WEAPON_HK:
-		return &Lara.numHKammo1;
-
-	case WEAPON_CROSSBOW:
-		if (Lara.crossbowTypeCarried & 8)
-			return &Lara.numCrossbowAmmo2;
-		else
-			return &Lara.numCrossbowAmmo1;
-
-	case WEAPON_GRENADE:
-		return &g_LaraExtra.numGrenadeAmmos;
-
-	case WEAPON_HARPOON:
-		return &g_LaraExtra.numHarpoonAmmos;
-
-	case WEAPON_ROCKET:
-		return &g_LaraExtra.numRocketAmmos;
-
-	default:
-		return &Lara.numPistolsAmmo;
-
-	}
+	return &g_LaraExtra.Weapons[weaponType].Ammo[g_LaraExtra.Weapons[weaponType].SelectedAmmo];
 }
 
 void __cdecl InitialiseNewWeapon()
@@ -403,9 +369,9 @@ void __cdecl InitialiseNewWeapon()
 	case WEAPON_SHOTGUN:
 	case WEAPON_REVOLVER:
 	case WEAPON_HK:
-	case WEAPON_GRENADE:
-	case WEAPON_HARPOON:
-	case WEAPON_ROCKET:
+	case WEAPON_GRENADE_LAUNCHER:
+	case WEAPON_HARPOON_GUN:
+	case WEAPON_ROCKET_LAUNCHER:
 		Lara.rightArm.frameBase = Objects[WeaponObject(Lara.gunType)].frameBase;
 		Lara.leftArm.frameBase = Lara.rightArm.frameBase;
 		if (Lara.gunStatus)
@@ -431,7 +397,7 @@ __int32 __cdecl WeaponObjectMesh(__int32 weaponType)
 	switch (weaponType)
 	{
 	case WEAPON_REVOLVER:
-		return ((Lara.sixshooterTypeCarried & 4) != 0 ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
+		return ((g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight) != 0 ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
 
 	case WEAPON_UZI:
 		return ID_UZI_ANIM;
@@ -443,15 +409,15 @@ __int32 __cdecl WeaponObjectMesh(__int32 weaponType)
 		return ID_HK_ANIM;
 
 	case WEAPON_CROSSBOW:
-		return ((Lara.crossbowTypeCarried & 4) != 0 ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
+		return ((g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight) != 0 ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
 		
-	case WEAPON_GRENADE:
+	case WEAPON_GRENADE_LAUNCHER:
 		return ID_GRENADE_ANIM;
 
-	case WEAPON_HARPOON:
+	case WEAPON_HARPOON_GUN:
 		return ID_HARPOON_ANIM;
 
-	case WEAPON_ROCKET:
+	case WEAPON_ROCKET_LAUNCHER:
 		return ID_ROCKET_ANIM;
 
 	default:

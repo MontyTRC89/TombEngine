@@ -2038,9 +2038,9 @@ void Renderer::updateLaraAnimations()
 		if (Lara.gunType != WEAPON_FLARE)
 		{
 			// HACK: backguns handles differently
-			if (Lara.gunType == WEAPON_SHOTGUN || Lara.gunType == WEAPON_GRENADE || 
-				Lara.gunType == WEAPON_CROSSBOW || Lara.gunType == WEAPON_ROCKET || 
-				Lara.gunType == WEAPON_HARPOON)
+			if (Lara.gunType == WEAPON_SHOTGUN || Lara.gunType == WEAPON_GRENADE_LAUNCHER || 
+				Lara.gunType == WEAPON_CROSSBOW || Lara.gunType == WEAPON_ROCKET_LAUNCHER || 
+				Lara.gunType == WEAPON_HARPOON_GUN)
 			{
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);

@@ -159,9 +159,9 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		else if (BinocularRange == 0)
 		{
 			if (Lara.gunStatus == LG_READY
-				&& ((Lara.gunType == WEAPON_REVOLVER && Lara.sixshooterTypeCarried & WTYPE_LASERSIGHT)
+				&& ((Lara.gunType == WEAPON_REVOLVER && g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight)
 					|| (Lara.gunType == WEAPON_HK)
-					|| (Lara.gunType == WEAPON_CROSSBOW && Lara.crossbowTypeCarried & WTYPE_LASERSIGHT)))
+					|| (Lara.gunType == WEAPON_CROSSBOW && g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight)))
 			{
 				BinocularRange = 128;
 				BinocularOldCamera = Camera.oldType;
