@@ -656,6 +656,24 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}
+
+	obj = &Objects[ID_LARA_DIRT_MESH];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLaraDouble;
+		obj->control = LaraDoubleControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 1000;
+		obj->pivotLength = 50;
+		obj->radius = 128;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->hitEffect = 3;
+	}
 }
 
 void __cdecl CustomObjects()

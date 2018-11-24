@@ -351,6 +351,97 @@ void __cdecl SmallScorpionControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
+void __cdecl InitialiseScorpion(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	ClearItem(itemNum);
+
+	if (item->triggerFlags == 1)
+	{
+		item->goalAnimState = 8;
+		item->currentAnimState = 8;
+		item->animNumber = Objects[ID_SCORPION].animIndex + 7;
+	}
+	else
+	{
+		item->goalAnimState = 1;
+		item->currentAnimState = 1;
+		item->animNumber = Objects[ID_SCORPION].animIndex + 2;
+	}
+
+	item->frameNumber = Anims[item->animNumber].frameBase;
+}
+
+void __cdecl ScorpionControl(__int16 itemNum)
+{
+	__int16 angle = 0;
+	__int16 head = 0;
+	__int16 neck = 0;
+	__int16 tilt = 0;
+	__int16 joint0 = 0;
+	__int16 joint1 = 0;
+	__int16 joint2 = 0;
+	__int16 joint3 = 0;
+
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+	__int16 roomNumber = item->roomNumber;
+
+	__int32 x = item->pos.xPos + 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	__int32 z = item->pos.zPos + 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	__int32 height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	if (abs(item->pos.yPos - height1) > 512)
+		height1 = item->pos.yPos;
+
+	x = item->pos.xPos - 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos - 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	__int32 height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	if (abs(item->pos.yPos - height2) > 512)
+		height2 = item->pos.yPos;
+
+	__int16 angle1 = ATAN(1344, height2 - height1);
+
+	x = item->pos.xPos - 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos + 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	__int32 height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	if (abs(item->pos.yPos - height3) > 512)
+		height3 = item->pos.yPos;
+
+	x = item->pos.xPos + 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos - 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	__int32 height4 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	if (abs(item->pos.yPos - height4) > 512)
+		height4 = item->pos.yPos;
+
+	__int16 angle2 = ATAN(1344, height4 - height3);
+
+	if (item->hitPoints <= 0)
+	{
+		item->hitPoints = 0;
+
+		if (item->currentAnimState != 6)
+		{
+			if (item->triggerFlags > 0 && item->triggerFlags < 7)
+			{
+
+			}
+		}
+	}
+}
+
 void __cdecl InitialiseBat(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
