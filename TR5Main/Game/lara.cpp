@@ -5,7 +5,7 @@
 #include "collide.h"
 #include "larafire.h"
 
-#include "..\Objects\objects.h"
+#include "..\Objects\newobjects.h"
 #include "..\Global\global.h"
 
 #include <stdio.h>

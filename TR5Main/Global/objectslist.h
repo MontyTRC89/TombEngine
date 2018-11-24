@@ -485,7 +485,7 @@ typedef enum object_types {
 	ID_SCORPION, // TR4
 	ID_WRAITH, // TR4
 	ID_AHMET, // TR4
-	ID_LARA_DOUBLE, // TR4
+	ID_LARA_DOUBLE, // TR4 - OK - Needs testing
 	ID_PLANET_EFFECT, // TR4
 	ID_BUTTERFLY, // TR4
 	ID_BIG_BEETLE, // TR4

@@ -6,7 +6,7 @@
 #include "..\Game\pickup.h"
 #include "..\Game\lot.h"
 #include "..\Game\laramisc.h"
-#include "..\Objects\objects.h"
+#include "..\Objects\newobjects.h"
 
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
