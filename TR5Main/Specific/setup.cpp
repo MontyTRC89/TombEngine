@@ -8,7 +8,8 @@
 #include "..\Game\control.h"
 #include "..\Game\pickup.h"
 #include "..\game\lara1gun.h"
-#include "..\Objects\objects.h"
+#include "..\game\objects.h"
+#include "..\Objects\newobjects.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -645,6 +646,15 @@ void __cdecl NewObjects()
 		obj->control = SlicerDicerControl;
 		obj->collision = BladeCollision;
 		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SARCOPHAGUS];
+	if (obj->loaded)
+	{
+		obj->control = AnimatingControl;
+		obj->collision = SarcophagusCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 }
 

@@ -1,4 +1,4 @@
-#include "objects.h"
+#include "newobjects.h"
 #include "..\Global\global.h"
 #include "..\Game\Box.h"
 #include "..\Game\items.h"

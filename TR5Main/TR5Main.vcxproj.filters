@@ -291,9 +291,6 @@
     <ClInclude Include="Renderer\RenderTargetCube.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\objects.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Scripting\GameFlowScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -313,6 +310,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\IO\ChunkWriter.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\newobjects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -564,6 +564,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\puzzles.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\misc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
