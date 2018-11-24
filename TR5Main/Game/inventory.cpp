@@ -137,16 +137,20 @@ void Inventory::Initialise()
 				//Lara.crossbowTypeCarried = 1;
 		//Lara.numCrossbowAmmo1 = 1000;
 
+		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = true;
+		g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[0] = -1;
+		g_LaraExtra.Weapons[WEAPON_PISTOLS].SelectedAmmo = WEAPON_AMMO1;
+
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present = true;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] = 1000;
-		g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = 0;
+		g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
 
 		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
 		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] = 1000;
-		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = 0;
+		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
 
-		g_LaraExtra.Weapons[WEAPON_HARPOON].Present = true;
-		g_LaraExtra.Weapons[WEAPON_HARPOON].Ammo[0] = 1000;
+		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Present = true;
+		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;
 	}
 	
 	// Now fill the rings
@@ -234,15 +238,15 @@ void Inventory::Initialise()
 		}
 
 		// Harpoon
-		if (g_LaraExtra.Weapons[WEAPON_HARPOON].Present)
+		if (g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_GUN);
-		else if (g_LaraExtra.Weapons[WEAPON_HARPOON].Ammo[0])
+		else if (g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);
 
 		// Rocket launcher
-		if (g_LaraExtra.Weapons[WEAPON_ROCKET].Present)
+		if (g_LaraExtra.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_LAUNCHER);
-		else if (g_LaraExtra.Weapons[WEAPON_ROCKET].Ammo[0])
+		else if (g_LaraExtra.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_AMMO);
 				
 		// Lasersight
@@ -791,8 +795,8 @@ void Inventory::UseCurrentItem()
 	{
 		if (canUseWeapons)
 		{
-			Lara.requestGunType = WEAPON_HARPOON;
-			if (!Lara.gunStatus && Lara.gunType == WEAPON_HARPOON)
+			Lara.requestGunType = WEAPON_HARPOON_GUN;
+			if (!Lara.gunStatus && Lara.gunType == WEAPON_HARPOON_GUN)
 				Lara.gunStatus = LG_DRAW_GUNS;
 
 			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);

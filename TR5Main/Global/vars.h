@@ -97,6 +97,7 @@
 #define MatrixStack					ARRAY_(0x0055D66C, __int32, [480])
 #define MatrixPtr					VAR_U_(0x00E4B0F8, __int32*)
 #define DxMatrixPtr					VAR_U_(0x0055DA2C, byte*)
+//#define phd_MatrixPtr				VAR_U_(0x007E70C8, __int32*)
 
 // Unknown
 #define Unk_876C48					VAR_U_(0x00876C48, __int32)
@@ -304,6 +305,14 @@
 
 #define CollidedItems				ARRAY_(0x00E88EA0, ITEM_INFO*, [1024])
 #define CollidedMeshes				ARRAY_(0x00E89EA0, MESH_INFO*, [1024])
+
+#define FlashFadeR					VAR_U_(0x0051D07A, __int16)
+#define FlashFadeG					VAR_U_(0x0051D07C, __int16)
+#define FlashFadeB					VAR_U_(0x0051D07E, __int16)
+#define FlashFader					VAR_U_(0x0051D080, __int16)
+
+#define GlobalCollisionBounds		VAR_U_(0x007FE6D0, BOUNDING_BOX)
+#define SphereList					ARRAY_(0x00E51FE0, SPHERE, [34])
 
 extern bool MonksAttackLara;
 

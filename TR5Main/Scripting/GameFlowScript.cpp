@@ -31,6 +31,16 @@ GameFlow::GameFlow(sol::state* lua)
 		"speed", &GameScriptSkyLayer::CloudSpeed
 		);
 
+	// Mirror type
+	m_lua->new_usertype<GameScriptMirror>("Mirror",
+		sol::constructors<GameScriptMirror(__int16, __int32, __int32, __int32, __int32)>(),
+		"room", &GameScriptMirror::Room,
+		"startX", &GameScriptMirror::StartX,
+		"endX", &GameScriptMirror::EndX,
+		"startZ", &GameScriptMirror::StartZ,
+		"endZ", &GameScriptMirror::EndZ
+		);
+
 	// Fog type
 	m_lua->new_usertype<GameScriptFog>("Fog",
 		sol::constructors<GameScriptFog(byte, byte, byte)>(),
@@ -58,7 +68,8 @@ GameFlow::GameFlow(sol::state* lua)
 		"snow", &GameScriptLevel::Snow,
 		"laraType", &GameScriptLevel::LaraType,
 		"rumble", &GameScriptLevel::Rumble,
-		"resetHub", &GameScriptLevel::ResetHub
+		"resetHub", &GameScriptLevel::ResetHub,
+		"mirror", &GameScriptLevel::Mirror
 		);
 
 	// Item type

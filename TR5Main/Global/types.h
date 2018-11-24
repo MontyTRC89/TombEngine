@@ -1366,6 +1366,15 @@ struct DEBRIS_STRUCT
 	byte Pad[22]; // size=22, offset=50
 };
 
+typedef struct BOUNDING_BOX {
+	__int16 X1;
+	__int16 X2;
+	__int16 Y1;
+	__int16 Y2;
+	__int16 Z1;
+	__int16 Z2;
+};
+
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
 typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);

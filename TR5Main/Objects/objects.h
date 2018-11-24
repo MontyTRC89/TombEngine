@@ -91,6 +91,13 @@ void __cdecl ChainControl(__int16 itemNum);
 void __cdecl PloughControl(__int16 itemNum);
 void __cdecl CogControl(__int16 itemNum);
 void __cdecl SpikeballControl(__int16 itemNum);
+void __cdecl InitialiseKnightTemplar(__int16 itemNum);
+void __cdecl KnightTemplarControl(__int16 itemNum);
+void __cdecl StargateControl(__int16 itemNum);
+void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* item, COLL_INFO* coll);
+void __cdecl InitialiseSlicerDicer(__int16 itemNum);
+void __cdecl SlicerDicerControl(__int16 itemNum);
+void __cdecl BladeCollision(__int16 itemNum, ITEM_INFO* item, COLL_INFO* coll);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);

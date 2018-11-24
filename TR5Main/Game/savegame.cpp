@@ -207,7 +207,7 @@ void SaveGame::saveLara(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, weaponItem->requiredAnimState);
 
 	// Lara extra data
-	m_writer->WriteChunkInt(m_chunkVehicle, g_LaraExtra.vehicle);
+	m_writer->WriteChunkInt(m_chunkVehicle, g_LaraExtra.Vehicle);
 }
 
 void SaveGame::saveVariables()
@@ -618,7 +618,7 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 {
 	if (chunkId->EqualsTo(m_chunkVehicle))
 	{
-		g_LaraExtra.vehicle = m_reader->ReadChunkInt16(maxSize);
+		g_LaraExtra.Vehicle = m_reader->ReadChunkInt16(maxSize);
 		return true;
 	}
 	return false;

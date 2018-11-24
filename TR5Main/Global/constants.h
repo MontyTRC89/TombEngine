@@ -84,3 +84,8 @@
 #define NUM_RATS	128
 
 #define NUM_DEBRIS 256
+
+#define WEAPON_AMMO1 0
+#define WEAPON_AMMO2 1
+#define WEAPON_AMMO3 2
+#define WEAPON_AMMO4 3

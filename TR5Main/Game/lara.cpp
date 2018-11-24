@@ -28,17 +28,17 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = 100;
 	coll->trigger = 0;
 
-	if ((TrInput & IN_LOOK) && !g_LaraExtra.extraAnim && Lara.look)
+	if ((TrInput & IN_LOOK) && !g_LaraExtra.ExtraAnim && Lara.look)
 		LookLeftRight();
 	else
 		ResetLook();
 
 	Lara.look = true;
 
-	// Process vehicles
-	if (g_LaraExtra.vehicle != NO_ITEM)
+	// Process Vehicles
+	if (g_LaraExtra.Vehicle != NO_ITEM)
 	{
-		if (Items[g_LaraExtra.vehicle].objectNumber == ID_QUAD)  
+		if (Items[g_LaraExtra.Vehicle].objectNumber == ID_QUAD)  
 		{
 			if (QuadBikeControl())
 				return;

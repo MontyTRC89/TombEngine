@@ -283,6 +283,34 @@ __int32 GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 onl
 	return (numItems | numMeshes);
 }
 
+__int32 TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
+{
+	__int16* framePtr = GetBestFrame(lara);
+
+	if (item->pos.yPos + GlobalCollisionBounds.Y2 <= lara->pos.yPos + framePtr[3])
+		return false;
+
+	if (item->pos.yPos + GlobalCollisionBounds.Y1 >= framePtr[4])
+		return false;
+
+	__int32 s = SIN(item->pos.yRot);
+	__int32 c = COS(item->pos.yRot);
+
+	__int32 dx = lara->pos.xPos - item->pos.xPos;
+	__int32 dz = lara->pos.zPos - item->pos.zPos;
+
+	__int32 x = (c * dx - s * dz) >> W2V_SHIFT;
+	__int32 z = (c * dz + s * dx) >> W2V_SHIFT;
+
+	if (x < GlobalCollisionBounds.X1 - coll->radius ||
+		x > GlobalCollisionBounds.X2 + coll->radius ||
+		z < GlobalCollisionBounds.Z1 - coll->radius ||
+		z > GlobalCollisionBounds.Z2 + coll->radius)
+		return false;
+
+	return true;
+}
+
 void Inject_Collide()
 {
 	INJECT(0x00411DB0, CollideStaticObjects);

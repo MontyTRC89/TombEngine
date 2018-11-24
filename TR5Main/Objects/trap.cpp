@@ -7,6 +7,14 @@
 #include "..\Game\effects.h"
 #include "..\Game\draw.h"
 #include "..\Game\sphere.h"
+#include "..\Game\collide.h"
+
+__int16 StargateBounds[24] = 
+{
+	0xFE00, 0x0200, 0xFC00, 0xFC80, 0xFFA0, 0x0060, 0xFE00, 0x0200, 
+	0xFF80, 0x0000, 0xFFA0, 0x0060, 0xFE00, 0xFE80, 0xFC00, 0x0000,
+	0xFFA0, 0x0060, 0x0180, 0x0200, 0xFC00, 0x0000, 0xFFA0, 0x0060
+};
 
 void __cdecl FourBladesControl(__int16 itemNum)
 {
@@ -293,6 +301,76 @@ void __cdecl StargateControl(__int16 itemNum)
 		item->itemFlags[0] = 0;
 }
 
+void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c)
+{
+	ITEM_INFO* item = &Items[itemNum];
+	
+	if (item->status == ITEM_INVISIBLE)
+		return;
+
+	if (TestBoundsCollide(item, l, c->radius))
+	{
+		for (__int32 i = 0; i < 8; i++)
+		{
+			GlobalCollisionBounds.X1 = StargateBounds[3 * i + 0];
+			GlobalCollisionBounds.Y1 = StargateBounds[3 * i + 1];
+			GlobalCollisionBounds.Z1 = StargateBounds[3 * i + 2];
+
+			if (TestWithGlobalCollisionBounds(item, l, c))
+				ItemPushLara(item, l, c, 0, 2);
+		}
+
+		__int32 result = TestCollision(item, l);
+		if (result)
+		{
+			result &= item->itemFlags[0];
+			__int32 flags = item->itemFlags[0];
+
+			if (result)
+			{
+				__int32 j = 0;
+				do
+				{
+					if (result & 1)
+					{
+						GlobalCollisionBounds.X1 = SphereList[j].x - SphereList[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y1 = SphereList[j].y - SphereList[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z1 = SphereList[j].z - SphereList[j].r - item->pos.zPos;
+						GlobalCollisionBounds.X2 = SphereList[j].x + SphereList[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y2 = SphereList[j].y + SphereList[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z2 = SphereList[j].z + SphereList[j].r - item->pos.zPos;
+
+						__int32 oldX = LaraItem->pos.xPos;
+						__int32 oldY = LaraItem->pos.yPos;
+						__int32 oldZ = LaraItem->pos.zPos;
+
+						if (ItemPushLara(item, l, c, flags & 1, 2))
+						{
+							if ((flags & 1) &&
+								(oldX != LaraItem->pos.xPos || oldY != LaraItem->pos.yPos || oldZ != LaraItem->pos.zPos) &&
+								TriggerActive(item))
+							{
+								DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32, 
+											 (GetRandomControl() & 0x1F) + SphereList[j].y - 16, 
+											 (GetRandomControl() & 0x3F) + l->pos.zPos - 32, 
+											 (GetRandomControl() & 3) + 2, 
+											 2 * GetRandomControl(), 
+											 l->roomNumber);
+								LaraItem->hitPoints -= 100;
+							}
+						}
+					}
+
+					result >>= 1;
+					j++;
+					flags >>= 1;
+
+				} while (result);
+			}
+		}
+	}
+}
+
 void __cdecl ControlSpikeWall(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
@@ -456,4 +534,91 @@ void __cdecl SpringBoardControl(__int16 item_number)
 	}
 
 	AnimateItem(item);
+}
+
+void __cdecl InitialiseSlicerDicer(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	__int32 dx = SIN(item->pos.yRot + ANGLE(90)) >> 5;
+	__int32 dz = COS(item->pos.yRot + ANGLE(90)) >> 5;
+
+	item->pos.xPos += dx;
+	item->pos.zPos += dz;
+
+	item->itemFlags[0] = item->pos.xPos >> 8;
+	item->itemFlags[1] = (item->pos.yPos - 4608) >> 8;
+	item->itemFlags[2] = item->pos.zPos >> 8;
+	item->itemFlags[3] = 50;
+}
+
+void __cdecl SlicerDicerControl(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	SoundEffect(20, &item->pos, 0);
+	SoundEffect(12, &item->pos, 0);
+	
+	__int32 factor = (9 * COS(item->triggerFlags) << 9 >> W2V_SHIFT) * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	item->pos.xPos = (item->itemFlags[0] << 8) + factor;
+	item->pos.yPos = (item->itemFlags[1] << 8) - 4608 * SIN(item->triggerFlags);
+	item->pos.zPos = (item->itemFlags[2] << 8) + factor;
+
+	item->triggerFlags += 170;
+
+	__int16 roomNumber = item->roomNumber;
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(itemNum, roomNumber);
+
+	AnimateItem(item);
+}
+
+void __cdecl BladeCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	if (item->status == ITEM_INVISIBLE)
+		return;
+
+	if (item->itemFlags[3]) // Check this
+	{
+		if (TestBoundsCollide(item, l, coll->radius))
+		{
+			__int32 oldX = LaraItem->pos.xPos;
+			__int32 oldY = LaraItem->pos.yPos;
+			__int32 oldZ = LaraItem->pos.zPos;
+
+			__int32 dx = 0;
+			__int32 dy = 0;
+			__int32 dz = 0;
+
+			if (ItemPushLara(item, l, coll, 1, 1))
+			{
+				LaraItem->hitPoints -= item->itemFlags[3];
+
+				dx = oldX - LaraItem->pos.xPos;
+				dy = oldY - LaraItem->pos.yPos;
+				dz = oldZ - LaraItem->pos.zPos;
+
+				if ((dx || dy || dz) && TriggerActive(item))
+				{
+					DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32,
+						l->pos.yPos - (GetRandomControl() & 0x1FF) - 256,
+						(GetRandomControl() & 0x3F) + l->pos.zPos - 32,
+						(GetRandomControl() & 3) + (item->itemFlags[3] >> 5) + 2,
+						2 * GetRandomControl(),
+						l->roomNumber);
+				}
+
+				if (!coll->enableBaddiePush)
+				{
+					LaraItem->pos.xPos += dx;
+					LaraItem->pos.yPos += dy;
+					LaraItem->pos.zPos += dz;
+				}
+			}
+		}
+	}
 }

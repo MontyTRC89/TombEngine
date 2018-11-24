@@ -1,5 +1,4 @@
 #include "lara1gun.h"
-#include "..\Global\global.h"
 #include "items.h"
 #include "lara.h"
 #include "larafire.h"
@@ -12,14 +11,19 @@
 #include "collide.h"
 #include "debris.h"
 #include "lara2gun.h"
+#include "switch.h"
+
+#include "..\Global\global.h"
+#include "..\Scripting\GameFlowScript.h"
 
 extern LaraExtraInfo g_LaraExtra;
+extern GameFlow* g_GameFlow;
 
 void __cdecl FireHarpoon()
 {
 	// If no ammo then exit
-	if (g_LaraExtra.numHarpoonAmmos <= 0)
-		return;
+	//if (g_LaraExtra.numHarpoonAmmos <= 0)
+	//	return;
 
 	// Create a new item for harpoon
 	__int16 itemNumber = CreateItem();
@@ -232,86 +236,176 @@ long	tbx, tby, tbz;
 
 void __cdecl FireGrenade()
 {
-	__int32 x, y, z;
-
-	if (g_LaraExtra.numGrenadeAmmos <= 0)
-		return;
-
-	Lara.hasFired = true;
-
-	/* Create a grenade object and launch it on its way */
-	__int16 itemNumber = CreateItem();
-	if (itemNumber != NO_ITEM)
+	__int32 x = 0;
+	__int32 y = 0;
+	__int32 z = 0;
+	
+	__int16* ammo = GetAmmo(WEAPON_GRENADE_LAUNCHER);
+	if (*ammo)
 	{
-		ITEM_INFO* item = &Items[itemNumber];
+		Lara.hasFired = true;
 
-		item->shade = 0x4210 | 0x8000;
-
-		item->objectNumber = ID_GRENADE;
-		item->roomNumber = LaraItem->roomNumber;
-		
-		D3DXVECTOR3 pos;
-		pos.x = 0;
-		pos.y = -(GRENADE_YOFF + 96);
-		pos.z = GRENADE_ZOFF;
-		g_Renderer->GetLaraBonePosition(&pos, HAND_R);
-
-		item->pos.xPos = x = pos.x;
-		item->pos.yPos = y = pos.y;
-		item->pos.zPos = z = pos.z;
-		FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &item->roomNumber);
-		if (GetFloorHeight(floor, pos.x, pos.y, pos.z) < pos.y)
+		__int16 itemNumber = CreateItem();
+		if (itemNumber != NO_ITEM)
 		{
-			item->pos.xPos = LaraItem->pos.xPos;
-			item->pos.yPos = pos.y;
-			item->pos.zPos = LaraItem->pos.zPos;
+			ITEM_INFO* item = &Items[itemNumber];
+			
+			item->shade = 0xC210;
+			item->objectNumber = ID_GRENADE;
 			item->roomNumber = LaraItem->roomNumber;
-		} 
 
-		pos.x = 0;
-		pos.y = -(GRENADE_YOFF + 1024);
-		pos.z = GRENADE_ZOFF;
+			PHD_VECTOR jointPos;
+			jointPos.x = 0;
+			jointPos.y = 276;
+			jointPos.z = 80;
 
-		g_Renderer->GetLaraBonePosition(&pos, HAND_R);
+			GetLaraJointPosition(&jointPos, 11);
 
-		SmokeCountL = 32;
-		SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
+			item->pos.xPos = x = jointPos.x;
+			item->pos.yPos = y = jointPos.y;
+			item->pos.zPos = z = jointPos.z;
 
-		for (__int32 i = 0; i < 5; i++)
-			TriggerGunSmoke(x, y, z, pos.x - x, pos.y - y, pos.z - z, 1, WEAPON_GRENADE_LAUNCHER, 32);
+			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+			__int32 height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
+			if (height < jointPos.y)
+			{
+				item->pos.xPos = LaraItem->pos.xPos;
+				item->pos.yPos = jointPos.y;
+				item->pos.zPos = LaraItem->pos.zPos;
+				item->roomNumber = LaraItem->roomNumber;
+			}
 
-		InitialiseItem(itemNumber);
+			jointPos.x = 0;
+			jointPos.y = 1204;
+			jointPos.z = 5;
 
-		item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
-		item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
-		item->pos.zRot = 0;
+			GetLaraJointPosition(&jointPos, 11);
 
-		if (!Lara.leftArm.lock)
-		{
-			item->pos.xRot += Lara.torsoXrot;
-			item->pos.yRot += Lara.torsoYrot;
+			SmokeCountL = 32;
+			SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
+
+			if (LaraItem->meshBits)
+			{
+				for (__int32 i = 0; i < 5; i++)
+					TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_GRENADE_LAUNCHER, 32);
+
+			}
+
+			InitialiseItem(itemNumber);
+
+			item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
+			item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
+			item->pos.zRot = 0;
+
+			if (!Lara.leftArm.lock)
+			{
+				item->pos.xRot += Lara.torsoXrot;
+				item->pos.yRot += Lara.torsoYrot;
+			}
+
+			item->speed = GRENADE_SPEED;
+			item->fallspeed = (-512 * SIN(item->pos.xRot)) >> W2V_SHIFT;
+			item->currentAnimState = item->pos.xRot;
+			item->goalAnimState = item->pos.yRot;
+			item->requiredAnimState = 0;
+			item->hitPoints = 120;	
+			item->itemFlags[0] = WEAPON_AMMO2;
+
+			AddActiveItem(itemNumber);
+
+			if (*ammo != -1)
+				(*ammo)--;
+
+			item->itemFlags[0] = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
+
+			Savegame.Level.AmmoUsed++;
+			Savegame.Game.AmmoUsed++;
 		}
-
-		item->speed = GRENADE_SPEED;
-		item->fallspeed = (-item->speed * SIN(item->pos.xRot)) >> W2V_SHIFT;
-		item->currentAnimState = item->pos.xRot;	
-		item->goalAnimState = item->pos.yRot;	// Goal anim state is Y rotation so the object can rotate in Y axis blah blah
-		item->requiredAnimState = 0;	// Flag to say if rolling on floor.
-		item->hitPoints = 4 * 30;	// Explode after 3 seconds.
-
-		AddActiveItem(itemNumber);
-
-		Savegame.Level.AmmoUsed++;
-		Savegame.Game.AmmoUsed++;
 	}
 }
-
-#define GRENADE_BLAST_RADIUS (WALL_SIZE)
 
 void __cdecl ControlGrenade(__int16 itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
+	if (item->itemFlags[1])
+	{
+		item->itemFlags[1]--;
+
+		if (item->itemFlags[1])
+		{
+			if (item->itemFlags[0] == WEAPON_AMMO3)
+			{
+				// Flash grenades
+
+				if (item->itemFlags[1] == 1)
+				{
+					WeaponEnemyTimer = 120;
+					FlashFadeR = 255;
+					FlashFadeG = 255;
+					FlashFadeB = 255;
+				}
+				else
+				{
+					FlashFadeR = (GetRandomControl() & 0x1F) + 224;
+					FlashFadeG = FlashFadeB = FlashFadeR - GetRandomControl() & 0x1F;
+				}
+
+				FlashFader = 32;
+
+				// if Volumetric then FlashFader = 0?
+				/*if (sub_47F960())
+				{
+					FlashFader = 0;
+				}*/
+
+				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+			}
+			else
+			{
+				__int16 newGrenadeItemNumber = CreateItem();
+
+				if (newGrenadeItemNumber != NO_ITEM)
+				{
+					ITEM_INFO* newGrenade = &Items[newGrenadeItemNumber];
+
+					newGrenade->shade = 0xC210;
+					newGrenade->objectNumber = ID_GRENADE;
+					newGrenade->roomNumber = item->roomNumber;
+					newGrenade->pos.xPos = (GetRandomControl() & 0x1FF) + item->pos.xPos - 256;
+					newGrenade->pos.yPos = item->pos.yPos - 256;
+					newGrenade->pos.zPos = (GetRandomControl() & 0x1FF) + item->pos.zPos - 256;
+					
+					InitialiseItem(newGrenadeItemNumber);
+					
+					newGrenade->pos.xRot = (GetRandomControl() & 0x3FFF) + 0x2000;
+					newGrenade->pos.yRot = GetRandomControl() * 2;
+					newGrenade->pos.zRot = 0;
+					newGrenade->speed = 64;
+					newGrenade->fallspeed = -64 * SIN(newGrenade->pos.xRot) >> W2V_SHIFT;
+					newGrenade->currentAnimState = newGrenade->pos.xRot;
+					newGrenade->goalAnimState = newGrenade->pos.yRot;
+					newGrenade->requiredAnimState = 0;
+					
+					AddActiveItem(newGrenadeItemNumber);
+					
+					newGrenade->status = ITEM_INVISIBLE;
+					newGrenade->itemFlags[2] = item->itemFlags[2];
+					newGrenade->hitPoints = 3000;
+	
+					if (Rooms[newGrenade->roomNumber].flags & ENV_FLAG_WATER)
+						newGrenade->hitPoints = 1;
+				}
+			}
+
+			return;
+		}
+
+		KillItem(itemNumber);
+		return;
+	}
+	   
 	__int32 oldX = item->pos.xPos;
 	__int32 oldY = item->pos.yPos;
 	__int32 oldZ = item->pos.zPos;
@@ -320,8 +414,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 	__int32 yv;
 	__int32 zv;
 
-	item->shade = 0x4210 | 0x8000;
-	// Fall more slowly in water.
+	item->shade = 0xC210;
 
 	bool aboveWater = false;
 	if (Rooms[item->roomNumber].flags & 1)
@@ -331,44 +424,51 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 		item->speed -= item->speed >> 2;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed >> 4) + 3)*ANGLE(1));
+			item->pos.zRot += (((item->speed >> 4) + 3) * ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed >> 2) + 3)*ANGLE(1));
+				item->pos.yRot += (((item->speed >> 2) + 3) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 2) + 3)*ANGLE(1));
+				item->pos.xRot += (((item->speed >> 2) + 3) * ANGLE(1));
 		}
 	}
 	else
 	{
 		aboveWater = true;
-		item->fallspeed += GRAVITY >> 1;
+		item->fallspeed += 3;
 		if (item->speed)
 		{
-			item->pos.zRot += (((item->speed >> 2) + 7)*ANGLE(1));
+			item->pos.zRot += (((item->speed >> 2) + 7) * ANGLE(1));
 			if (item->requiredAnimState)
-				item->pos.yRot += (((item->speed >> 1) + 7)*ANGLE(1));
+				item->pos.yRot += (((item->speed >> 1) + 7) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 1) + 7)*ANGLE(1));
+				item->pos.xRot += (((item->speed >> 1) + 7) * ANGLE(1));
 
 		}
 	}
 
-	/*phd_PushUnitMatrix();
+	if (item->speed && aboveWater)
+	{
+		// For now keep this legacy math
+		phd_PushUnitMatrix();
 
-	*(phd_mxptr + M03) = 0;
-	*(phd_mxptr + M13) = 0;
-	*(phd_mxptr + M23) = 0;
+		*(MatrixPtr + M03) = 0;
+		*(MatrixPtr + M13) = 0;
+		*(MatrixPtr + M23) = 0;
 
-	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-	phd_TranslateRel(0, 0, -64);*/
-	/*#
-		wx = (*(phd_mxptr + M03) >> W2V_SHIFT);
-		wy = (*(phd_mxptr + M13) >> W2V_SHIFT);
-		wz = (*(phd_mxptr + M23) >> W2V_SHIFT);
-	endif
-		phd_PopMatrix();*/
+		phd_RotYXZ(item->pos.yRot - ANGLE(180), item->pos.xRot, item->pos.zRot);
+		phd_TranslateRel(0, 0, -64);
 
-	D3DXMATRIX transform;
+		__int32 wx = (*(MatrixPtr + M03) >> W2V_SHIFT);
+		__int32 wy = (*(MatrixPtr + M13) >> W2V_SHIFT);
+		__int32 wz = (*(MatrixPtr + M23) >> W2V_SHIFT);
+
+		MatrixPtr -= 12;
+		DxMatrixPtr -= 48;
+
+		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
+	}
+
+	/*D3DXMATRIX transform;
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
 
@@ -383,6 +483,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 
 	if (item->speed && aboveWater)
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
+*/
 
 	xv = ((item->speed * SIN(item->goalAnimState)) >> W2V_SHIFT);
 	yv = item->fallspeed;
@@ -392,197 +493,258 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 	item->pos.yPos += yv;
 	item->pos.zPos += zv;
 
-	__int16 sYrot = item->pos.yRot;
-	item->pos.yRot = item->goalAnimState;
+	FLOOR_INFO* floor;
+	__int32 height;
+	__int32 ceiling;
+	__int16 roomNumber;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
-
-	item->goalAnimState = item->pos.yRot;
-	item->pos.yRot = sYrot;
-
-	/*if (Rooms[item->roomNumber].flags & 1 && abovewater)
+	if (item->itemFlags[0] == WEAPON_AMMO4)
 	{
-		splash_setup.x = item->pos.xPos;
-		splash_setup.y = room[item->roomNumber].maxceiling;
-		splash_setup.z = item->pos.zPos;
-		splash_setup.InnerXZoff = 16;
-		splash_setup.InnerXZsize = 12;
-		splash_setup.InnerYsize = -96;
-		splash_setup.InnerXZvel = 0xa0;
-		splash_setup.InnerYvel = -(item->fallspeed << 5) - (64 << 5);
-		splash_setup.InnerGravity = 0x80;
-		splash_setup.InnerFriction = 7;
-		splash_setup.MiddleXZoff = 24;
-		splash_setup.MiddleXZsize = 24;
-		splash_setup.MiddleYsize = -64;
-		splash_setup.MiddleXZvel = 0xe0;
-		splash_setup.MiddleYvel = -(item->fallspeed << 4) - (64 << 4);
-		splash_setup.MiddleGravity = 0x48;
-		splash_setup.MiddleFriction = 8;
-		splash_setup.OuterXZoff = 32;
-		splash_setup.OuterXZsize = 32;
-		splash_setup.OuterXZvel = 0x110;
-		splash_setup.OuterFriction = 9;
-		SetupSplash(&splash_setup);
-	}*/
+		roomNumber = item->roomNumber;
+		
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	// Has the timer ran out ? If so, explodes with blast radius.
+		if (height < item->pos.yPos || ceiling > item->pos.yPos)
+			item->hitPoints = 1;
+	}
+	else
+	{
+		__int16 sYrot = item->pos.yRot;
+		item->pos.yRot = item->goalAnimState;
 
+		DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv);
+
+		item->goalAnimState = item->pos.yRot;
+		item->pos.yRot = sYrot;
+	}
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+
+	if ((Rooms[roomNumber].flags & ENV_FLAG_WATER) && aboveWater)
+	{
+		// Setup splash
+		/*dword_804E20 = item->pos.xPos;
+    dword_804E24 = *(Rooms + 148 * v78 + 36);
+    dword_804E28 = item->pos.zPos;
+    word_804E2C = 32;
+    word_804E2E = 8;
+    word_804E30 = 320;
+    v45 = item->fallSpeed;
+    word_804E34 = 48;
+    word_804E32 = -40 * v45;
+    word_804E36 = 32;
+    word_804E38 = 480;
+    word_804E3A = -20 * item->fallSpeed;
+    word_804E3C = 32;
+    word_804E3E = 128;
+    word_804E40 = 544;
+    sub_435380(&dword_804E20);
+    if ( item->itemFlags[0] != 4 )
+    {
+      goto LABEL_35;
+    }
+    item->hitPoints = 1;*/
+	}
+
+	if (item->itemFlags[0] == WEAPON_AMMO4)
+		GrenadeLauncherSpecialEffect1(item->pos.xPos, item->pos.yPos, item->pos.zPos, -1, 1);
+
+	// Time to explode?
 	__int32 radius = 0;
 	bool explode = false; 
 
 	if (item->hitPoints)
 	{
 		item->hitPoints--;
-		if (!item->hitPoints)
+
+		if (item->hitPoints)
 		{
-			radius = GRENADE_BLAST_RADIUS;
+			if (item->hitPoints > 118)
+			{
+				return;
+			}
+		}
+		else
+		{
+			radius = 2048;
 			explode = 1;
 		}
 	}
 
-	// Get all surrounding rooms inside the radius
-	ROOM_INFO* room = &Rooms[item->roomNumber];
-
-	vector<__int32> items;
-	items.push_back(Lara.itemNumber);
-
-	if (room->door)
+	if (!(item->itemFlags[0] == WEAPON_AMMO3 && explode))
 	{
-		__int32 numPortals = *(room->door);
-		__int16* portals = room->door;
-		portals++;
+		__int32 n = 0;
+		bool foundCollidedObjects = false;
 
-		for (__int32 i = 0; i < numPortals; i++)
+		do
 		{
-			__int16 roomNumber = *portals;
+			// Found possible collided items and statics
+			GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
 
-			room = &Rooms[roomNumber];
-			ITEM_INFO* target = NULL;
+			// If no collided items and meshes are found, then exit the loop
+			if (!CollidedItems[0] && !CollidedMeshes[0])
+				break;
 
-			for (__int16 targetItemNumber = room->itemNumber; targetItemNumber != NO_ITEM; targetItemNumber = target->nextItem)
+			foundCollidedObjects = true;
+
+			if (item->itemFlags[0] != WEAPON_AMMO3 || explode)
 			{
-				target = &Items[targetItemNumber];
-
-				// Ignore not collidable items
-				if (target != LaraItem && !target->collidable)
-					continue;
-
-				items.push_back(targetItemNumber);
-			}
-
-			portals += 16;
-		}
-	}
-
-	for (__int32 i = 0; i < items.size(); i++)
-	{
-		ITEM_INFO* target = &Items[items[i]];
-
-		// Destroy only smashable objects, shatters (check later), Lara and intelligent entities
-		if (target->objectNumber == ID_SMASH_OBJECT1 ||
-			target->objectNumber == ID_SMASH_OBJECT2 ||
-			target->objectNumber == ID_SMASH_OBJECT3 ||
-			target->objectNumber == ID_SMASH_OBJECT4 ||
-			target->objectNumber == ID_SMASH_OBJECT5 ||
-			target->objectNumber == ID_SMASH_OBJECT6 ||
-			target->objectNumber == ID_SMASH_OBJECT7 ||
-			target->objectNumber == ID_SMASH_OBJECT8 ||
-			target->objectNumber == ID_LARA ||
-			(Objects[target->objectNumber].intelligent &&
-				target->status != ITEM_INVISIBLE &&
-				Objects[target->objectNumber].collision)
-			)
-		{
-			__int16* bounds = GetBestFrame(target);
-			if (item->pos.yPos + radius < target->pos.yPos + bounds[2] || item->pos.yPos - radius > target->pos.yPos + bounds[3])
-				continue;
-
-			// get vector from target to bolt and check against x,z bounds
-			__int32 c = COS(target->pos.yRot);
-			__int32 s = SIN(target->pos.yRot);
-
-			__int32 x = item->pos.xPos - target->pos.xPos;
-			__int32 z = item->pos.zPos - target->pos.zPos;
-			__int32 rx = (c*x - s * z) >> W2V_SHIFT;
-
-			__int32 ox = oldX - target->pos.xPos;
-			__int32 oz = oldZ - target->pos.zPos;
-			__int32 sx = (c*ox - s * oz) >> W2V_SHIFT;
-
-			if ((rx + radius < bounds[0] && sx + radius < bounds[0]) ||
-				(rx - radius > bounds[1] && sx - radius > bounds[1]))
-				continue;
-
-			__int32 rz = (c*z + s * x) >> W2V_SHIFT;
-			__int32 sz = (c*oz + s * ox) >> W2V_SHIFT;
-
-			if ((rz + radius < bounds[4] && sz + radius < bounds[4]) ||
-				(rz - radius > bounds[5] && sz - radius > bounds[5]))
-				continue;
-
-			if (target->objectNumber == ID_SMASH_OBJECT1 ||
-				target->objectNumber == ID_SMASH_OBJECT2 ||
-				target->objectNumber == ID_SMASH_OBJECT3 ||
-				target->objectNumber == ID_SMASH_OBJECT4 ||
-				target->objectNumber == ID_SMASH_OBJECT5 ||
-				target->objectNumber == ID_SMASH_OBJECT6 ||
-				target->objectNumber == ID_SMASH_OBJECT7 ||
-				target->objectNumber == ID_SMASH_OBJECT8)
-			{
-				SmashItem(items[i]);
-			}
-			else
-			{
-				// Hit the target
-				HitTarget(target, NULL, 500, 0);
-
-				// Update level statistics
-				Savegame.Level.AmmoHits++;
-				Savegame.Game.AmmoHits++;
-
-				// Check if entity is dead
-				if (target->hitPoints <= 0)
+				if (CollidedItems[0])
 				{
-					Savegame.Level.Kills++;
-					Savegame.Game.Kills++;
-
-					if (target->objectNumber != ID_LARA)
-						CreatureDie(items[i], 1);
-					else
+					if (explode)
 					{
-						LaraItem->hitPoints = -16384;
-						LaraItem->hitStatus = true;
+						ITEM_INFO* currentItem = CollidedItems[0];
+						__int32 k = 0;
+
+						do
+						{
+							// Item is inside the radius and must explode
+							if (item->objectNumber < ID_SMASH_OBJECT1 || item->objectNumber > ID_SMASH_OBJECT8 || (currentItem->flags & 0x40))
+							{
+								if (currentItem->objectNumber != ID_SWITCH_TYPE7 &&
+									currentItem->objectNumber != ID_SWITCH_TYPE8 ||
+									currentItem->flags & 0x40 &&
+									(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem))
+								{
+									DoGrenadeDamageOnBaddie(currentItem, item);
+								}
+								else
+								{
+									if (currentItem->flags & 0x3E00 && (currentItem->flags & 0x3E00) != 0x3E00)
+									{
+										roomNumber = item->roomNumber;
+										floor = GetFloor(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, &roomNumber);
+										GetFloorHeight(floor, currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos);
+										TestTriggers(TriggerIndex, 1, currentItem->flags & 0x3E00);
+									}
+									else
+									{
+										__int16 itemNos[8];
+										__int32 sw = GetSwitchTrigger(currentItem, itemNos, 1);
+
+										if (sw > 0)
+										{
+											for (__int32 i = 0; i < sw; i++)
+											{
+												AddActiveItem(itemNos[i]);
+												Items[itemNos[i]].status = ITEM_ACTIVE;
+												Items[itemNos[i]].triggerFlags |= 0x3E00;
+											}
+										}
+									}
+								}
+
+								if (currentItem->objectNumber == ID_SWITCH_TYPE7)
+								{
+									ExplodeItemNode(currentItem, Objects[ID_SWITCH_TYPE7].nmeshes - 1, 0, 64);
+								}
+
+								AddActiveItem((currentItem - Items) / sizeof(ITEM_INFO));
+								currentItem->status = ITEM_ACTIVE;
+								currentItem->triggerFlags |= 0x3E40;
+							}
+							else
+							{
+								TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
+								currentItem->pos.yPos -= 128;
+								TriggerShockwave(&currentItem->pos, 0x1300030, 96, 0x18806000, 0, 0);
+								currentItem->pos.yPos += 128;
+								ExplodeItemNode(currentItem, 0, 0, 128);
+								__int16 currentItemNumber = (currentItem - Items) / sizeof(ITEM_INFO);
+								SmashObject(currentItemNumber);
+								KillItem(currentItemNumber);
+							}
+
+							k++;
+							currentItem = CollidedItems[k];
+
+						} while (currentItem);
+					}
+
+					if (CollidedMeshes[0])
+					{
+						MESH_INFO* currentMesh = CollidedMeshes[0];
+						__int32 k = 0;
+
+						do
+						{
+							if (currentMesh->staticNumber >= 50 && currentMesh->staticNumber < 58)
+							{
+								TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
+								currentMesh->y -= 128;
+								TriggerShockwave((PHD_3DPOS*)&currentMesh, 0xB00028, 64, 0x10806000, 0, 0);
+								currentMesh->y += 128;
+								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
+								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
+								SmashedMesh[SmashedMeshCount] = currentMesh;
+								SmashedMeshCount++;
+								currentMesh->Flags &= ~1;
+							}
+
+							k++;
+							currentMesh = CollidedMeshes[k];
+
+						} while (currentMesh);
 					}
 				}
-
-				if (!explode)
-				{
-					explode = true;
-					radius = GRENADE_BLAST_RADIUS;
-					break;
-				}
 			}
-		}
 
+			n++;
+			explode = true;
+			radius = GRENADE_EXPLODE_RADIUS;
+		} while (n < 2);
 	}
 
-	if (explode)
+	if (explode || (item->itemFlags[0] == WEAPON_AMMO3 && explode))
 	{
-		if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)	// Just broken water surface ?
+		if (item->itemFlags[0] == WEAPON_AMMO3)
+		{
+			FlashFader = 32;
+			FlashFadeR = 255;
+			FlashFadeG = 255;
+			FlashFadeB = 255;
+
+			/*
+			if ( sub_47F960() )
+      {
+        FlashFader = 0;
+        sub_47F880(item->pos.xPos, item->pos.yPos, item->pos.zPos, 4096, 255, 255, 255, 255, item->roomNumber);
+      }
+			*/
+
+			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+		}
+		else if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		{
 			TriggerUnderwaterExplosion(item);
+		}
 		else
 		{
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);	// -2 = Set off a dynamic light controller.
+			item->pos.yPos -= 128;
+			TriggerShockwave(&item->pos, 0x1300030, 96, 0x18806000, 0, 0);
+
+			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
 			for (__int32 x = 0; x < 2; x++)
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->roomNumber);
 		}
 
 		AlertNearbyGuards(item);
 		SoundEffect(105, &item->pos, ENV_FLAG_PITCH_SHIFT | 0x1800000);
-		SoundEffect(106, &item->pos, 0);	// Explosion ?
-		if (itemNumber != Lara.itemNumber)
-			KillItem(itemNumber);
+		SoundEffect(106, &item->pos, 0);
+
+		if (item->itemFlags[0] != WEAPON_AMMO1 && item->itemFlags[0] != 4)
+		{
+			item->meshBits = 0;
+			item->itemFlags[1] = (item->itemFlags[0] != WEAPON_AMMO2 ? 16 : 4);
+			return;
+		}
+
+		KillItem(itemNumber);
+		return;
 	}
 }
 
@@ -735,7 +897,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(g_LaraExtra.harpoonAmmo & 3)) 
+						if (!(g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3)) 
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_ROCKET_LAUNCHER)
@@ -814,7 +976,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(g_LaraExtra.harpoonAmmo & 3))
+						if (!(g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3))
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_HK && (/*!(Lara.HKtypeCarried & 0x18) || */!HKTimer))
@@ -915,7 +1077,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		item->pos.zPos = oldZ;
 
 		// If ammos are normal, then just shatter the bolt and quit
-		if (item->itemFlags[0] != CROSSBOW_AMMO3)
+		if (item->itemFlags[0] != WEAPON_AMMO3)
 		{
 			ExplodeItemNode(item, 0, 0, 256);
 			KillItem(itemNumber);
@@ -952,7 +1114,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 
 		foundCollidedObjects = true;
 
-		if (item->itemFlags[0] != CROSSBOW_AMMO3 || explode)
+		if (item->itemFlags[0] != WEAPON_AMMO3 || explode)
 		{
 			if (CollidedItems[0])
 			{
@@ -992,8 +1154,8 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 					{
 						HitTarget(currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_CROSSBOW].damage, 0);
 
-						// Enable item if hit but only with normal ammos
-						if (item->itemFlags[0] == CROSSBOW_AMMO2 && !Objects[currentItem->objectNumber].explodableMeshbits)  
+						// Poisoned ammos
+						if (item->itemFlags[0] == WEAPON_AMMO2 && !Objects[currentItem->objectNumber].explodableMeshbits)
 							item->poisoned = true;
 					}
 

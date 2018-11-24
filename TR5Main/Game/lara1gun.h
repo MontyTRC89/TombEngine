@@ -13,12 +13,14 @@
 #define		MAX_GRENADE_FALLSPEED	128
 #define		GRENADE_YOFF			180
 #define		GRENADE_ZOFF			80
+#define		GRENADE_BLAST_RADIUS (WALL_SIZE * 2)
 #define		CROSSBOW_DAMAGE			5
 #define		CROSSBOW_AMMO1			1
 #define		CROSSBOW_AMMO2			2
 #define		CROSSBOW_AMMO3			2
 #define		CROSSBOW_HIT_RADIUS		128
 #define		CROSSBOW_EXPLODE_RADIUS	2048
+#define		GRENADE_EXPLODE_RADIUS	2048
 
 #define ReadyShotgun ((void (__cdecl*)(__int32)) 0x0044DC30)  
 #define DrawShotgunMeshes ((void (__cdecl*)(__int32)) 0x0044DBB0)  
@@ -30,6 +32,7 @@
 
 void __cdecl FireGrenade();
 void __cdecl ControlGrenade(__int16 itemNumber);
+void __cdecl GrenadeExplosionEffects(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
 
 void __cdecl FireHarpoon();
 void __cdecl ControlHarpoonBolt(__int16 itemNumber);

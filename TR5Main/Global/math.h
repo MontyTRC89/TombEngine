@@ -20,7 +20,8 @@
 #define COS(x) (4 * rcossin_tbl[(((int)(x) >> 3) & 0x1FFE) + 1])
 
 #define phd_GetVectorAngles ((void(__cdecl*)(__int32, __int32, __int32, __int16*)) 0x004904B0)
-#define phd_GetVectorAngles ((void(__cdecl*)(__int32, __int32, __int32, __int16*)) 0x004904B0)
+#define phd_RotYXZ ((void(__cdecl*)(__int32, __int32, __int32)) 0x00490150)
+#define phd_TranslateRel ((void(__cdecl*)(__int32, __int32, __int32)) 0x0048FB20)
 
 #define PI 3.14159265358979323846f
 #define RADIAN 0.01745329252f

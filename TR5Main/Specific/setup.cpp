@@ -594,6 +594,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_GRENADE];
 	if (obj->loaded)
 	{
+		obj->collision = NULL;
 		obj->control = ControlGrenade;
 	}
 
@@ -616,6 +617,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_HARPOON];
 	if (obj->loaded)
 	{
+		obj->collision = NULL;
 		obj->control = ControlHarpoonBolt;
 	}
 
@@ -625,6 +627,24 @@ void __cdecl NewObjects()
 		obj->initialise = NULL;
 		obj->control = NULL;
 		obj->control = ControlCrossbowBolt;
+	}
+
+	obj = &Objects[ID_STARGATE];
+	if (obj->loaded)
+	{
+		obj->control = StargateControl;
+		obj->collision = StargateCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SLICER_DICER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSlicerDicer;
+		obj->control = SlicerDicerControl;
+		obj->collision = BladeCollision;
+		obj->saveFlags = true;
 	}
 }
 

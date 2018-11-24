@@ -3017,9 +3017,6 @@ __int32 Renderer::drawInventoryScene()
 					case ID_UZI_AMMO_ITEM:
 						quantity = Lara.numUziAmmo;
 						break;
-					case ID_BOTTLE:
-						quantity = Lara.bottle;
-						break;
 					case ID_PICKUP_ITEM4:
 						quantity = Savegame.Level.Secrets;
 						break;

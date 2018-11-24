@@ -564,7 +564,7 @@ unsigned __stdcall LoadLevel(void* data)
 	GetAIPickups();
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
-	g_LaraExtra.vehicle = -1;
+	g_LaraExtra.Vehicle = -1;
 	g_GameScript->AssignItemsAndLara();
 
 	// Level loaded

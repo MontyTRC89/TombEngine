@@ -62,6 +62,7 @@ Gameflow.strings[55] = "Crossbow + LaserSight";
 Gameflow.strings[56] = "Crossbow Normal Ammo";
 Gameflow.strings[57] = "Crossbow Poisoned Ammo";
 Gameflow.strings[58] = "Crossbow Explosive Ammo";
+Gameflow.strings[59] = "Diary";
 
 -- Level names (from 100 to 199)
 Gameflow.strings[100] = "Title level";

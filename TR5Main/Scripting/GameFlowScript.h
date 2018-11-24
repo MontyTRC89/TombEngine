@@ -123,6 +123,29 @@ typedef struct GameScriptFog {
 	}
 };
 
+typedef struct GameScriptMirror {
+	__int16 Room;
+	__int32 StartX;
+	__int32 EndX;
+	__int32 StartZ;
+	__int32 EndZ;
+
+	GameScriptMirror()
+	{
+		Room = -1;
+		StartX = EndX = StartZ = EndZ = 0;
+	}
+
+	GameScriptMirror(__int16 room, __int32 startX, __int32 endX, __int32 startZ, __int32 endZ)
+	{
+		Room = room;
+		StartX = startX;
+		EndX = endX;
+		StartZ = startZ;
+		EndZ = endZ;
+	}
+};
+
 typedef struct GameScriptLevel {
 	string FileName;
 	string ScriptFileName;
@@ -141,6 +164,7 @@ typedef struct GameScriptLevel {
 	bool ResetHub;
 	bool Rumble;
 	LARA_DRAW_TYPE LaraType;
+	GameScriptMirror Mirror;
 
 	GameScriptLevel()
 	{
