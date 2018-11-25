@@ -618,6 +618,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_HARPOON];
 	if (obj->loaded)
 	{
+		obj->initialise = NULL;
 		obj->collision = NULL;
 		obj->control = ControlHarpoonBolt;
 	}
@@ -657,7 +658,7 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 	}
 
-	obj = &Objects[ID_LARA_DIRT_MESH];
+	obj = &Objects[ID_LARA_DOUBLE];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseLaraDouble;

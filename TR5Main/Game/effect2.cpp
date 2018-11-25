@@ -499,6 +499,94 @@ void __cdecl GrenadeLauncherSpecialEffect1(__int32 x, __int32 y, __int32 z, __in
 	}
 }
 
+void __cdecl TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
+{
+	__int32 dx = LaraItem->pos.xPos - x;
+	__int32 dz = LaraItem->pos.zPos - z;
+
+	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	{
+		__int32 r = rand();
+
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+
+		spark->dG = (r & 0x7F) + 64;
+		spark->dB = -64 - (r & 0x7F) + 64;
+		spark->life = 10;
+		spark->sLife = 10;
+		spark->sR = -1;
+		spark->sG = -1;
+		spark->sB = -1;
+		spark->dR = -1;
+		spark->x = (r & 7) + x - 3;
+		spark->on = 1;
+		spark->colFadeSpeed = 3;
+		spark->fadeToBlack = 5;
+		spark->y = ((r >> 3) & 7) + y - 3;
+		spark->transType = 2;
+		spark->friction = 34;
+		spark->scalar = 1;
+		spark->z = ((r >> 6) & 7) + z - 3;
+		spark->flags = 2;
+		spark->xVel = (byte)(r >> 2) + xv - 128;
+		spark->yVel = (byte)(r >> 4) + yv - 128;
+		spark->zVel = (byte)(r >> 6) + zv - 128;
+		spark->sSize = ((r >> 9) & 3) + 4;
+		spark->size = ((r >> 9) & 3) + 4;
+		spark->dSize = ((r >> 12) & 1) + 1;
+		spark->maxYvel = 0;
+		spark->gravity = 0;
+
+		if (additional)
+		{
+			r = rand();
+			spark = &Sparks[GetFreeSpark()];
+			spark->on = 1;
+			spark->sR = spark->dR >> 1;
+			spark->sG = spark->dG >> 1;
+			spark->fadeToBlack = 4;
+			spark->transType = 2;
+			spark->colFadeSpeed = (r & 3) + 8;
+			spark->sB = spark->dB >> 1;
+			spark->dR = 32;
+			spark->dG = 32;
+			spark->dB = 32;
+			spark->yVel = yv;
+			spark->life = ((r >> 3) & 7) + 13;
+			spark->sLife = ((r >> 3) & 7) + 13;
+			spark->friction = 4;
+			spark->x = x + (xv >> 5);
+			spark->y = y + (yv >> 5);
+			spark->z = z + (zv >> 5);
+			spark->xVel = (r & 0x3F) + xv - 32;
+			spark->zVel = ((r >> 6) & 0x3F) + zv - 32;
+			if (r & 1)
+			{
+				spark->flags = 538;
+				spark->rotAng = r >> 3;
+				if (r & 2)
+				{
+					spark->rotAdd = -16 - (r & 0xF);
+				}
+				else
+				{
+					spark->rotAdd = (r & 0xF) + 16;
+				}
+			}
+			else
+			{
+				spark->flags = 522;
+			}
+			spark->gravity = -8 - (r >> 3 & 3);
+			spark->scalar = 2;
+			spark->maxYvel = -4 - (r >> 6 & 3);
+			spark->sSize = ((r >> 8) & 0xF) + 24 >> 3;
+			spark->size = ((r >> 8) & 0xF) + 24 >> 3;
+			spark->dSize = ((r >> 8) & 0xF) + 24;
+		}
+	}
+}
+
 void Inject_Effect2()
 {
 	INJECT(0x00431240, TriggerDynamics);

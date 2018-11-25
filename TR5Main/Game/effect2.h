@@ -22,5 +22,6 @@ void __cdecl TriggerRocketFlame(__int32 x, __int32 y, __int32 z, __int32 xv, __i
 void __cdecl TriggerRocketSmoke(__int32 x, __int32 y, __int32 z, __int32 bodyPart);
 void __cdecl GrenadeLauncherSpecialEffect1(__int32 x, __int32 y, __int32 z, __int32 flag1, __int32 flag2);
 void __cdecl GrenadeExplosionEffects(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
+void __cdecl TriggerMetalSparks(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 additional);
 
 void Inject_Effect2();

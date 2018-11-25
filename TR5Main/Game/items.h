@@ -4,7 +4,7 @@
 #define ItemNewRoom ((void (__cdecl*)(__int16, __int16)) 0x00440DA0)
 #define EffectNewRoom ((void (__cdecl*)(__int16, __int16)) 0x004412F0)
 #define KillEffect ((void (__cdecl*)(__int16)) 0x00441180)
-#define CreateEffectTR5 ((__int16 (__cdecl*)(__int16)) 0x00440620)
+#define CreateNewEffect ((__int16 (__cdecl*)(__int16)) 0x00440620)
 #define InitialiseFXArray ((void (__cdecl*)(__int32)) 0x00441080)
 #define AddActiveItem ((void (__cdecl*)(__int16)) 0x00440D10)
 #define RemoveActiveItem ((void (__cdecl*)(__int16)) 0x00440D10)

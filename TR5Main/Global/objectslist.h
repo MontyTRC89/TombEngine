@@ -63,11 +63,11 @@ typedef enum object_types {
 	ID_GLADIATOR,
 	ID_HARPY, // TR4
 	ID_ROMAN_GOD,
-	ID_DEMIGOD1, // TR4
+	ID_DEMIGOD1, // TR4 - OK - Needs testing
 	ID_HYDRA,
-	ID_DEMIGOD2, // TR4
+	ID_DEMIGOD2, // TR4 - OK - Needs testing
 	ID_GUARDIAN,
-	ID_DEMIGOD3, // TR4
+	ID_DEMIGOD3, // TR4 - OK - Needs testing
 	ID_HITMAN,
 	ID_LITTLE_BEETLE, // TR4
 	ID_SCIENTIST,
