@@ -499,7 +499,7 @@ void __cdecl GrenadeLauncherSpecialEffect1(__int32 x, __int32 y, __int32 z, __in
 	}
 }
 
-void __cdecl TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
+void __cdecl TriggerMetalSparks(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 additional)
 {
 	__int32 dx = LaraItem->pos.xPos - x;
 	__int32 dz = LaraItem->pos.zPos - z;

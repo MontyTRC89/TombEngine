@@ -675,6 +675,88 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->hitEffect = 3;
 	}
+
+	obj = &Objects[ID_KNIGHT_TEMPLAR];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseKnightTemplar;
+		obj->control = KnightTemplarControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 15;
+		obj->pivotLength = 50;
+		obj->radius = 128;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+
+		Bones[obj->boneIndex + 24 * 4] |= ROT_X | ROT_Y;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_DEMIGOD1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDemigod;
+		obj->control = DemigodControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 200;
+		obj->pivotLength = 50;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->hitEffect = 3;
+		obj->undead = true;
+
+		Bones[obj->boneIndex + 16 * 4] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_DEMIGOD2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDemigod;
+		obj->control = DemigodControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 200;
+		obj->pivotLength = 50;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+
+		Bones[obj->boneIndex + 16 * 4] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_DEMIGOD3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDemigod;
+		obj->control = DemigodControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 200;
+		obj->pivotLength = 50;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+
+		Bones[obj->boneIndex + 16 * 4] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+	}
 }
 
 void __cdecl CustomObjects()

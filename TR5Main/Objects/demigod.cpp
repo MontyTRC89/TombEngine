@@ -69,7 +69,7 @@ void __cdecl DemigodControl(__int16 itemNum)
 
 		__int16* zone = GroundZones[FlipStatus * 2 + creature->LOT.zone];
 		
-		LaraItem->boxNumber= room->floor[((LaraItem->pos.zPos - room->z) >> WALL_SHIFT) +
+		LaraItem->boxNumber = room->floor[((LaraItem->pos.zPos - room->z) >> WALL_SHIFT) +
 			((LaraItem->pos.xPos - room->x) >> WALL_SHIFT) * room->xSize].box;
 
 		if (zone[item->boxNumber] == zone[LaraItem->boxNumber])
@@ -103,298 +103,322 @@ void __cdecl DemigodControl(__int16 itemNum)
 				item->frameNumber = Anims[item->animNumber].frameBase;
 			}
 		}
-		
-		CreatureTilt(item, 0);
-
-		CreatureJoint(item, 0, joint0);
-		CreatureJoint(item, 1, joint1);
-		CreatureJoint(item, 2, joint2);
-		CreatureJoint(item, 3, joint3);
-
-		CreatureAnimation(itemNum, angle, 0);
-
-		return;
-	}
-
-	if (item->aiBits)
-		GetAITarget(creature);
-
-	AI_INFO info;
-	AI_INFO laraInfo;
-	
-	__int32 dx = 0;
-	__int32 dy = 0;
-	__int32 dz = 0;
-
-	CreatureAIInfo(item, &info);
-
-	if (creature->enemy == LaraItem)
-	{
-		laraInfo.ahead = info.ahead;
-		laraInfo.angle = info.angle;
 	}
 	else
 	{
-		dx = LaraItem->pos.xPos - item->pos.xPos;
-		dz = LaraItem->pos.zPos - item->pos.zPos;
-		laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+		if (item->aiBits)
+			GetAITarget(creature);
 
-		laraInfo.ahead = true;
-		if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
-			laraInfo.ahead = false;
+		AI_INFO info;
+		AI_INFO laraInfo;
 
-		dx = abs(dx);
-		dy = item->pos.yPos - LaraItem->pos.yPos;
-		dz = abs(dz);
+		__int32 dx = 0;
+		__int32 dy = 0;
+		__int32 dz = 0;
 
-		if (dx <= dz)
-			laraInfo.xAngle = ATAN(dz + (dx >> 1), dy);
-		else
-			laraInfo.xAngle = ATAN(dx + (dz >> 1), dy);
-	}
+		CreatureAIInfo(item, &info);
 
-	GetCreatureMood(item, &info, VIOLENT);
-	CreatureMood(item, &info, VIOLENT);
-
-	angle = CreatureTurn(item, creature->maximumTurn);
-
-	if (laraInfo.ahead)
-	{
-		joint0 = laraInfo.angle >> 1;
-		joint1 = -laraInfo.xAngle;
-		joint2 = laraInfo.angle >> 1;
-		joint3 = laraInfo.angle >> 1;
-	}
-	else if (info.ahead)
-	{
-		joint0 = info.angle >> 1;
-		joint1 = -info.xAngle;
-		joint2 = info.angle >> 1;
-		joint3 = info.angle >> 1;
-	}
-
-	switch (item->currentAnimState)
-	{
-	case 0:
-		creature->maximumTurn = 0;
-		if (info.ahead)
-			joint1 = -info.xAngle;
-
-		if (item->objectNumber == ID_DEMIGOD1)
+		if (creature->enemy == LaraItem)
 		{
-			if (info.distance >= SQUARE(3072))
-			{
-				item->goalAnimState = 1;
-				break;
-			}
-			if (info.bite
-				|| LaraItem->currentAnimState >= 56
-				&& LaraItem->currentAnimState <= 61
-				&& !Lara.location)
-			{
-				item->goalAnimState = 13;
-				break;
-			}
+			laraInfo.ahead = info.ahead;
+			laraInfo.angle = info.angle;
 		}
 		else
 		{
-			if (Targetable(item, &info))
-			{
-				creature->flags = 1;
-				if (item->objectNumber == ID_DEMIGOD2)
-					item->goalAnimState = 3;
-				else
-					item->goalAnimState = 11;
-				break;
-			}
+			dx = LaraItem->pos.xPos - item->pos.xPos;
+			dz = LaraItem->pos.zPos - item->pos.zPos;
+			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
 
-			if (item->objectNumber == ID_DEMIGOD3)
+			laraInfo.ahead = true;
+			if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
+				laraInfo.ahead = false;
+
+			dx = abs(dx);
+			dy = item->pos.yPos - LaraItem->pos.yPos;
+			dz = abs(dz);
+
+			if (dx <= dz)
+				laraInfo.xAngle = ATAN(dz + (dx >> 1), dy);
+			else
+				laraInfo.xAngle = ATAN(dx + (dz >> 1), dy);
+		}
+
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		if (laraInfo.ahead)
+		{
+			joint0 = laraInfo.angle >> 1;
+			joint1 = -laraInfo.xAngle;
+			joint2 = laraInfo.angle >> 1;
+			joint3 = laraInfo.angle >> 1;
+		}
+		else if (info.ahead)
+		{
+			joint0 = info.angle >> 1;
+			joint1 = -info.xAngle;
+			joint2 = info.angle >> 1;
+			joint3 = info.angle >> 1;
+		}
+
+		switch (item->currentAnimState)
+		{
+		case 0:
+			creature->maximumTurn = 0;
+			if (info.ahead)
+				joint1 = -info.xAngle;
+
+			if (item->objectNumber == ID_DEMIGOD1)
 			{
-				if (info.distance <= SQUARE(2048) || info.distance >= SQUARE(5120))
+				if (info.distance >= SQUARE(3072))
 				{
 					item->goalAnimState = 1;
 					break;
 				}
-				if (!(GetRandomControl() & 3))
+				if (info.bite
+					|| LaraItem->currentAnimState >= 56
+					&& LaraItem->currentAnimState <= 61
+					&& !Lara.location)
 				{
-					item->goalAnimState = 9;
+					item->goalAnimState = 13;
 					break;
 				}
 			}
-		}
-
-		if (info.distance <= SQUARE(3072) || item->objectNumber != ID_DEMIGOD2)
-		{
-			item->goalAnimState = 1;
-			break;
-		}
-
-		item->goalAnimState = 5;
-		
-		break;
-
-	case 1:
-		creature->maximumTurn = 1274;
-
-		if (info.distance < SQUARE(2048))
-		{
-			item->goalAnimState = 0;
-			break;
-		}
-		
-		if (item->objectNumber == ID_DEMIGOD1)
-		{
-			if (info.distance < SQUARE(3072))
-			{
-				item->goalAnimState = 0;
-				break;
-			}
-		}
-		else
-		{
-			if (Targetable(item, &info))
-			{
-				item->goalAnimState = 0;
-				break;
-			}
-			
-		}
-
-		if (info.distance > SQUARE(3072))
-		{
-			if (item->objectNumber == ID_DEMIGOD2)
-			{
-				item->goalAnimState = 5;
-			}
 			else
 			{
-				item->goalAnimState = 2;
-			}
-		}
+				if (Targetable(item, &info))
+				{
+					creature->flags = 1;
+					if (item->objectNumber == ID_DEMIGOD2)
+						item->goalAnimState = 3;
+					else
+						item->goalAnimState = 11;
+					break;
+				}
 
-		break;
-
-	case 2:
-		creature->maximumTurn = 1274;
-
-		if (info.distance < SQUARE(2048))
-		{
-			item->goalAnimState = 0;
-			break;
-		}
-		if (item->objectNumber == ID_DEMIGOD1)
-		{
-			if (info.distance < SQUARE(3072))
-			{
-				item->goalAnimState = 0;
-				break;
-			}
-		}
-		else
-		{
-			if (Targetable(item, &info) || item->objectNumber == ID_DEMIGOD3 && info.distance > SQUARE(2048))
-			{
-				item->goalAnimState = 0;
-				break;
+				if (item->objectNumber == ID_DEMIGOD3)
+				{
+					if (info.distance <= SQUARE(2048) || info.distance >= SQUARE(5120))
+					{
+						item->goalAnimState = 1;
+						break;
+					}
+					if (!(GetRandomControl() & 3))
+					{
+						item->goalAnimState = 9;
+						break;
+					}
+				}
 			}
 
-			if (info.distance < SQUARE(3072))
+			if (info.distance <= SQUARE(3072) || item->objectNumber != ID_DEMIGOD2)
 			{
 				item->goalAnimState = 1;
+				break;
 			}
-		}
 
-		break;
+			item->goalAnimState = 5;
 
-	case 3:
-		if (info.ahead)
-		{
-			joint1 = -info.xAngle;
-		}
-
-		creature->maximumTurn = 0;
-
-		if (item->animNumber == Objects[item->objectNumber].animIndex + 6)
-		{
-			if (abs(info.angle) >= ANGLE(7))
-			{
-				if (info.angle >= 0)
-				{
-					item->pos.yRot += ANGLE(7);
-				}
-				else
-				{
-					item->pos.yRot -= ANGLE(7);
-				}
-			}
-			else
-			{
-				item->pos.yRot += info.angle;
-			}
-		}
-
-		if (Targetable(item, &info) || creature->flags)
-		{
-			item->goalAnimState = 4;
-			creature->flags = 0;
-		}
-		else
-		{
-			item->goalAnimState = 0;
-			creature->flags = 0;
-		}
-
-		break;
-
-	case 4:
-	case 12:
-		DemigodEnergyAttack(itemNum);		
-		break;
-
-	case 6:
-		creature->maximumTurn = ANGLE(7);
-		if (Targetable(item, &info))
-		{
-			item->goalAnimState = 7;
-		}
-		
-		break;
-
-	case 9:
-		creature->maximumTurn = ANGLE(7);
-		if (!Targetable(item, &info) && info.distance < SQUARE(5120))
-		{
-			item->goalAnimState = 10;
-		}
-		
-		break;
-
-	case 10:
-		creature->maximumTurn = ANGLE(7);
-
-		DemigodEnergyAttack(itemNum);
-
-		if (!Targetable(item, &info) || info.distance < SQUARE(5120) || !GetRandomControl())
-		{
-			item->goalAnimState = 0;
 			break;
-		}
 
-		break;
+		case 1:
+			creature->maximumTurn = 1274;
 
-	case 11:
-		joint2 = joint0;
-		joint0 = 0;
+			if (info.distance < SQUARE(2048))
+			{
+				item->goalAnimState = 0;
+				break;
+			}
 
-		if (info.ahead)
-		{
-			joint1 = -info.xAngle;
-		}
+			if (item->objectNumber == ID_DEMIGOD1)
+			{
+				if (info.distance < SQUARE(3072))
+				{
+					item->goalAnimState = 0;
+					break;
+				}
+			}
+			else
+			{
+				if (Targetable(item, &info))
+				{
+					item->goalAnimState = 0;
+					break;
+				}
 
-		creature->maximumTurn = 0;
+			}
 
-		if (item->animNumber == Objects[(signed __int16)item->objectNumber].animIndex + 6)
-		{
+			if (info.distance > SQUARE(3072))
+			{
+				if (item->objectNumber == ID_DEMIGOD2)
+				{
+					item->goalAnimState = 5;
+				}
+				else
+				{
+					item->goalAnimState = 2;
+				}
+			}
+
+			break;
+
+		case 2:
+			creature->maximumTurn = 1274;
+
+			if (info.distance < SQUARE(2048))
+			{
+				item->goalAnimState = 0;
+				break;
+			}
+			if (item->objectNumber == ID_DEMIGOD1)
+			{
+				if (info.distance < SQUARE(3072))
+				{
+					item->goalAnimState = 0;
+					break;
+				}
+			}
+			else
+			{
+				if (Targetable(item, &info) || item->objectNumber == ID_DEMIGOD3 && info.distance > SQUARE(2048))
+				{
+					item->goalAnimState = 0;
+					break;
+				}
+
+				if (info.distance < SQUARE(3072))
+				{
+					item->goalAnimState = 1;
+				}
+			}
+
+			break;
+
+		case 3:
+			if (info.ahead)
+			{
+				joint1 = -info.xAngle;
+			}
+
+			creature->maximumTurn = 0;
+
+			if (item->animNumber == Objects[item->objectNumber].animIndex + 6)
+			{
+				if (abs(info.angle) >= ANGLE(7))
+				{
+					if (info.angle >= 0)
+					{
+						item->pos.yRot += ANGLE(7);
+					}
+					else
+					{
+						item->pos.yRot -= ANGLE(7);
+					}
+				}
+				else
+				{
+					item->pos.yRot += info.angle;
+				}
+			}
+
+			if (Targetable(item, &info) || creature->flags)
+			{
+				item->goalAnimState = 4;
+				creature->flags = 0;
+			}
+			else
+			{
+				item->goalAnimState = 0;
+				creature->flags = 0;
+			}
+
+			break;
+
+		case 4:
+		case 12:
+			DemigodEnergyAttack(itemNum);
+			break;
+
+		case 6:
+			creature->maximumTurn = ANGLE(7);
+			if (Targetable(item, &info))
+			{
+				item->goalAnimState = 7;
+			}
+
+			break;
+
+		case 9:
+			creature->maximumTurn = ANGLE(7);
+			if (!Targetable(item, &info) && info.distance < SQUARE(5120))
+			{
+				item->goalAnimState = 10;
+			}
+
+			break;
+
+		case 10:
+			creature->maximumTurn = ANGLE(7);
+
+			DemigodEnergyAttack(itemNum);
+
+			if (!Targetable(item, &info) || info.distance < SQUARE(5120) || !GetRandomControl())
+			{
+				item->goalAnimState = 0;
+				break;
+			}
+
+			break;
+
+		case 11:
+			joint2 = joint0;
+			joint0 = 0;
+
+			if (info.ahead)
+			{
+				joint1 = -info.xAngle;
+			}
+
+			creature->maximumTurn = 0;
+
+			if (item->animNumber == Objects[(signed __int16)item->objectNumber].animIndex + 6)
+			{
+				if (abs(info.angle) >= ANGLE(7))
+				{
+					if (info.angle >= 0)
+					{
+						item->pos.yRot += ANGLE(7);
+					}
+					else
+					{
+						item->pos.yRot -= ANGLE(7);
+					}
+				}
+				else
+				{
+					item->pos.yRot += info.angle;
+				}
+			}
+			if (Targetable(item, &info) || creature->flags)
+			{
+				item->goalAnimState = 12;
+				creature->flags = 0;
+			}
+			else
+			{
+				item->goalAnimState = 0;
+				creature->flags = 0;
+			}
+
+			break;
+
+		case 13:
+			// Aiming
+			creature->maximumTurn = 0;
+			joint2 = joint0;
+			joint0 = 0;
 			if (abs(info.angle) >= ANGLE(7))
 			{
 				if (info.angle >= 0)
@@ -410,100 +434,79 @@ void __cdecl DemigodControl(__int16 itemNum)
 			{
 				item->pos.yRot += info.angle;
 			}
-		}
-		if (Targetable(item, &info) || creature->flags)
-		{
-			item->goalAnimState = 12;
-			creature->flags = 0;
-		}
-		else
-		{
-			item->goalAnimState = 0;
-			creature->flags = 0;
-		}
-		
-		break;
-
-	case 13:
-		// Aiming
-		creature->maximumTurn = 0;
-		joint2 = joint0;
-		joint0 = 0;
-		if (abs(info.angle) >= ANGLE(7))
-		{
-			if (info.angle >= 0)
+			if (info.distance >= SQUARE(3072)
+				|| !info.bite
+				&& (LaraItem->currentAnimState < 56 || LaraItem->currentAnimState > 61 || Lara.location))
 			{
-				item->pos.yRot += ANGLE(7);
+				item->goalAnimState = 0;
 			}
 			else
 			{
-				item->pos.yRot -= ANGLE(7);
+				item->goalAnimState = 14;
 			}
-		}
-		else
-		{
-			item->pos.yRot += info.angle;
-		}
-		if (info.distance >= SQUARE(3072)
-			|| !info.bite
-			&& (LaraItem->currentAnimState < 56 || LaraItem->currentAnimState > 61 || Lara.location))
-		{
-			item->goalAnimState = 0;
-		}
-		else
-		{
-			item->goalAnimState = 14;
-		}
 
-		break;
+			break;
 
-	case 14:
-		// Hammer attack
-		if (item->frameNumber - Anims[item->animNumber].frameBase == 26)
-		{
-			PHD_VECTOR pos;
-
-			pos.x = 80;
-			pos.y = -8;
-			pos.z = -40;
-
-			GetJointAbsPosition(item, &pos, 17);
-
-			__int16 roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-			__int32 height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
-			if (height == -32512)
+		case 14:
+			// Hammer attack
+			if (item->frameNumber - Anims[item->animNumber].frameBase == 26)
 			{
-				pos.y = pos.y - 128;
-			}
-			else
-			{
-				pos.y = height - 128;
-			}
-			
-			TriggerShockwave((PHD_3DPOS *)&pos, 0x00580018, 256, 545292416, 0x20000, 0);	
-			DemigodHammerAttack(pos.x, pos.y + 128, pos.z, 8);
+				PHD_VECTOR pos;
 
-			Camera.bounce = -128;
+				pos.x = 80;
+				pos.y = -8;
+				pos.z = -40;
 
-			if (LaraItem->currentAnimState >= 56 && LaraItem->currentAnimState <= 61 && !Lara.location)
-			{
-				Lara.torsoXrot = 0; // dword_80DF6C 
-				Lara.torsoYrot = 0; // dword_80DF6C 
-				Lara.headXrot = 0;
-				Lara.headYrot = 0;
-				LaraItem->goalAnimState = 3;
-				LaraItem->currentAnimState = 3;
-				LaraItem->animNumber = 34;
-				LaraItem->frameNumber = Anims[item->animNumber].frameBase;
-				LaraItem->hitStatus = true;
-				LaraItem->speed = 2;
-				LaraItem->fallspeed = 1;
-				Lara.gunStatus = LG_NO_ARMS;
+				GetJointAbsPosition(item, &pos, 17);
+
+				__int16 roomNumber = item->roomNumber;
+				FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+				__int32 height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+				if (height == -32512)
+				{
+					pos.y = pos.y - 128;
+				}
+				else
+				{
+					pos.y = height - 128;
+				}
+
+				TriggerShockwave((PHD_3DPOS *)&pos, 0x00580018, 256, 545292416, 0x20000, 0);
+				DemigodHammerAttack(pos.x, pos.y + 128, pos.z, 8);
+
+				Camera.bounce = -128;
+
+				if (LaraItem->currentAnimState >= 56 && LaraItem->currentAnimState <= 61 && !Lara.location)
+				{
+					Lara.torsoXrot = 0; // dword_80DF6C 
+					Lara.torsoYrot = 0; // dword_80DF6C 
+					Lara.headXrot = 0;
+					Lara.headYrot = 0;
+					LaraItem->goalAnimState = 3;
+					LaraItem->currentAnimState = 3;
+					LaraItem->animNumber = 34;
+					LaraItem->frameNumber = Anims[item->animNumber].frameBase;
+					LaraItem->hitStatus = true;
+					LaraItem->speed = 2;
+					LaraItem->fallspeed = 1;
+					Lara.gunStatus = LG_NO_ARMS;
+				}
 			}
+
+		default:
+			break;
+
 		}
-
 	}
+
+	CreatureTilt(item, 0);
+
+	CreatureJoint(item, 0, joint0);
+	CreatureJoint(item, 1, joint1);
+	CreatureJoint(item, 2, joint2);
+	CreatureJoint(item, 3, joint3);
+
+	CreatureAnimation(itemNum, angle, 0);
 }
 
 void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int32 something)
