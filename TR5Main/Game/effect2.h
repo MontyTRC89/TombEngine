@@ -15,6 +15,7 @@
 #define SetupRipple ((void (__cdecl*)(__int32, __int32, __int32, __int32, __int32)) 0x00430910)
 #define TriggerShockwave ((void (__cdecl*)(PHD_3DPOS*, __int32, __int32, __int32, __int32, __int32)) 0x00484670)
 #define TriggerExplosionBubbles ((void (__cdecl*)(__int32, __int32, __int32, __int16)) 0x00431070)
+#define AddFire ((void (__cdecl*)(__int32, __int32, __int32, byte, __int16, __int32)) 0x00481B40)
 
 void __cdecl TriggerDynamics(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
 void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 initial, __int32 weapon, __int32 count);

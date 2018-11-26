@@ -4,10 +4,14 @@
 #include "..\Game\items.h"
 #include "..\Game\lot.h"
 #include "..\Game\control.h"
+#include "..\Game\people.h"
 #include "..\Game\effects.h"
+#include "..\Game\effect2.h"
 #include "..\Game\draw.h"
 #include "..\Game\sphere.h"
+#include "..\Game\inventory.h"
 #include "..\Game\collide.h"
+#include "..\Game\draw.h"
 
 __int16 StargateBounds[24] = 
 {
@@ -15,6 +19,8 @@ __int16 StargateBounds[24] =
 	0xFF80, 0x0000, 0xFFA0, 0x0060, 0xFE00, 0xFE80, 0xFC00, 0x0000,
 	0xFFA0, 0x0060, 0x0180, 0x0200, 0xFC00, 0x0000, 0xFFA0, 0x0060
 };
+
+BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
 
 void __cdecl FourBladesControl(__int16 itemNum)
 {
@@ -620,5 +626,250 @@ void __cdecl BladeCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 			}
 		}
+	}
+}
+
+void __cdecl InitialiseMine(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	if (item->triggerFlags)
+		item->meshBits = 0;
+}
+
+void __cdecl MineControl(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	__int32 num = GetSpheres(item, SphereList, true);
+	if (item->itemFlags[0] >= 150)
+	{
+		SoundEffect(105, &item->pos, 0);
+		SoundEffect(106, &item->pos, 0);
+		SoundEffect(105, &item->pos, 0x1800004);
+
+		if (num > 0)
+		{
+			SPHERE* sphere = &SphereList[0];
+
+			for (__int32 i = 0; i < num; i++)
+			{
+				if (i >= 7 && i != 9)
+				{
+					TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -2, 0, -item->roomNumber);
+					TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -1, 0, -item->roomNumber);
+					TriggerShockwave((PHD_3DPOS*)sphere, 19922992, (GetRandomControl() & 0x1F) + 112, 545284096, 2048, 0);
+				}
+
+				sphere++;
+			}
+
+			for (__int32 i = 0; i < num; i++)
+				ExplodeItemNode(item, i, 0, -128);
+		}
+
+		FlashFadeR = 255;
+		FlashFadeG = 192;
+		FlashFadeB = 64;
+		FlashFader = 32;
+
+		__int16 currentItemNumber = Rooms[item->roomNumber].itemNumber;
+
+		// Make the sentry gun explode?
+		while (currentItemNumber != NO_ITEM)
+		{
+			ITEM_INFO* currentItem = &Items[currentItemNumber];
+			
+			if (currentItem->objectNumber == ID_SENTRY_GUN)
+				currentItem->meshBits &= ~0x40;
+
+			currentItemNumber = currentItem->nextItem;
+		}
+		
+		KillItem(itemNum);
+	}
+	else
+	{
+		item->itemFlags[0]++;
+
+		__int32 something = 4 * item->itemFlags[0];
+		if (something > 255)
+			something = 0;
+
+		for (__int32 i = 0; i < num; i++)
+		{
+			SPHERE* sphere = &SphereList[i];
+
+			if (i == 0 || i > 5)
+				AddFire(sphere->x, sphere->y, sphere->z, 2, item->roomNumber, something);
+
+			sphere++;
+		}
+		
+		SoundEffect(150, &item->pos, 0);
+	}
+}
+
+void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	if (item->triggerFlags && !item->itemFlags[3])
+	{
+		if (l->animNumber != 432 || l->frameNumber < Anims[item->animNumber].frameBase + 57)
+		{
+			if (TestBoundsCollide(item, l, 512))
+			{
+				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 0, item->roomNumber);
+				for (__int32 i = 0; i < 2; i++)
+					TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
+
+				item->meshBits = 1;
+
+				ExplodeItemNode(item, 0, 0, 128);
+				KillItem(itemNum);
+
+				l->animNumber = 438;
+				l->frameNumber = Anims[item->animNumber].frameBase;
+				l->currentAnimState = 8;
+				l->speed = 0;
+
+				SoundEffect(103, &item->pos, 0);
+			}
+		}
+		else
+		{
+			for (__int32 i = 0; i < LevelItems; i++)
+			{
+				ITEM_INFO* currentItem = &Items[i];
+
+				// Explode other mines
+				if (currentItem->objectNumber == ID_MINE && currentItem->status != ITEM_INVISIBLE && !currentItem->triggerFlags)
+				{
+					TriggerExplosionSparks(
+						currentItem->pos.xPos,
+						currentItem->pos.yPos,
+						currentItem->pos.zPos,
+						3,
+						-2,
+						0,
+						currentItem->roomNumber);
+
+					for (__int32 j = 0; j < 2; j++)
+						TriggerExplosionSparks(
+							currentItem->pos.xPos,
+							currentItem->pos.yPos,
+							currentItem->pos.zPos,
+							3,
+							-1,
+							0,
+							currentItem->roomNumber);
+
+					currentItem->meshBits = 1;
+
+					ExplodeItemNode(currentItem, 0, 0, -32);
+					KillItem(i);
+
+					if (!(GetRandomControl() & 3))
+						SoundEffect(103, &currentItem->pos, 0);
+
+					currentItem->status = ITEM_INVISIBLE;
+				}
+			}
+		}
+	}
+}
+
+void __cdecl InitialiseSentryGun(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	ClearItem(itemNum);
+
+	item->itemFlags[0] = 0;
+	item->itemFlags[1] = 768;
+	item->itemFlags[2] = 0;
+}
+
+void __cdecl SentryGunControl(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	if (!CreatureActive(itemNum))
+		return;
+
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	
+	AI_INFO info;
+
+	if (creature)
+	{
+		// Flags set by the ID_MINE object?
+		if (item->meshBits & 0x40)
+		{
+			if (item->itemFlags[0])
+			{
+				PHD_VECTOR pos;
+
+				pos.x = sentryGunBite.x;
+				pos.y = sentryGunBite.y;
+				pos.z = sentryGunBite.z;
+
+				GetJointAbsPosition(item, &pos, sentryGunBite.meshNum);
+
+				TriggerDynamics(pos.x, pos.y, pos.z, 4 * item->itemFlags[0] + 12, 24, 16, 4);
+
+				item->itemFlags[0]--;
+			}
+
+			if (item->itemFlags[0] & 1)
+				item->meshBits |= 0x100;
+			else
+				item->meshBits &= ~0x100;
+
+			if (item->triggerFlags == 0)
+			{
+				item->pos.yPos -= 512;
+				CreatureAIInfo(item, &info);
+				item->pos.yPos += 512;
+
+				__int32 deltaAgle = info.angle - creature->jointRotation[0];
+
+				info.ahead = true;
+				if (deltaAgle <= -ANGLE(90) || deltaAgle >= ANGLE(90))
+					info.ahead = false;
+
+				if (Targetable(item, &info))
+				{
+					if (info.distance < SQUARE(9 * WALL_SIZE))
+					{
+						if (!HaveIGotItemInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+						{
+							/*if (info.distance <= SQUARE(2048))
+							{
+								sub_43EDC0((int)item);
+								v1 = 4 * phd_SinCosTable[(GlobalCounter & 0x1F) << 11 >> 3] >> 2;
+							}
+							else
+							{
+								item->itemFlags[0] = 2;
+								LOWORD(v13) = creature->jointRotations[0];
+								ShotLara(item, (int)&info, (int)&dword_4ACBB0, v13, 5);
+								SoundEffect(358, &item->pos, 0);
+								item->itemFlags[2] += 256;
+								if (item->itemFlags[2] > 6144)
+								{
+									item->itemFlags[2] = 6144;
+								}
+							}*/
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+
 	}
 }

@@ -757,6 +757,27 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 16 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
 	}
+
+	obj = &Objects[ID_MINE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMine;
+		obj->control = MineControl;
+		obj->collision = MineCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_JEAN_YVES];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseJeanYves;
+		obj->control = JeanYvesControl;
+		obj->collision = ObjectCollision;
+		obj->nonLot = true;
+		obj->savePosition = true;
+	}
 }
 
 void __cdecl CustomObjects()

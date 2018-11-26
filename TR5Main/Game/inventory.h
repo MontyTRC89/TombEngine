@@ -2,6 +2,7 @@
 
 // Legacy stuff
 #define InitialiseInventory ((void (__cdecl*)()) 0x0045FEF0)
+#define HaveIGotItemInInventory ((__int32 (__cdecl*)(__int16)) 0x0043E760)
 
 void Inject_Inventory();
 

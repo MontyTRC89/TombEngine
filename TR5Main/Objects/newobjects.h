@@ -108,6 +108,13 @@ void __cdecl DemigodControl(__int16 itemNum);
 void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int32 something);
 void __cdecl DemigodEnergyAttack(__int16 itemNum);
 void __cdecl DemigodHammerAttack(__int32 x, __int32 y, __int32 z, __int32 something);
+void __cdecl InitialiseMine(__int16 itemNum);
+void __cdecl MineControl(__int16 itemNum);
+void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* item, COLL_INFO* coll);
+void __cdecl InitialiseSentryGun(__int16 itemNum);
+void __cdecl SentryGunControl(__int16 itemNum);
+void __cdecl InitialiseJeanYves(__int16 itemNum);
+void __cdecl JeanYvesControl(__int16 itemNum);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);

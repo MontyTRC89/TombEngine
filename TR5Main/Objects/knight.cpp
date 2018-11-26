@@ -58,7 +58,6 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 	}
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[ID_KNIGHT_TEMPLAR];
 
 	__int16 tilt = 0;
 	__int16 angle = 0;
@@ -95,6 +94,9 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 		joint1 = info.angle >> 1;
 		joint2 = info.xAngle;
 	}
+
+	__int16 frameBase = 0;
+	__int16 frameNumber = 0;
 
 	switch (item->currentAnimState)
 	{
@@ -154,8 +156,8 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 			item->pos.yRot += info.angle;
 		}
 
-		__int16 frameNumber = item->frameNumber;
-		__int16 frameBase = Anims[item->animNumber].frameBase;
+		frameNumber = item->frameNumber;
+		frameBase = Anims[item->animNumber].frameBase;
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{
@@ -169,7 +171,7 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 			ROOM_INFO* room = &Rooms[item->roomNumber];
 
 			FLOOR_INFO* currentFloor = &room->floor[((pos.z - room->z) >> WALL_SHIFT) +
-													((pos.z - room->x) >> WALL_SHIFT) * room->xSize];
+				((pos.z - room->x) >> WALL_SHIFT) * room->xSize];
 
 			if (currentFloor->stopper)
 			{
@@ -210,6 +212,7 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 
 					creature->flags = 1;
 				}
+			}
 		}
 
 	case 6:
@@ -254,6 +257,7 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 
 	default:
 		break;
+
 	}
 
 	CreatureTilt(item, 0);

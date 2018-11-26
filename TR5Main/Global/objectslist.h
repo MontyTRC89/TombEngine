@@ -491,8 +491,8 @@ typedef enum object_types {
 	ID_BIG_BEETLE, // TR4
 	ID_VEHICLE_SMASHABLE_FLOOR, // TR4
 	ID_VEHICLE_SMASHABLE_WALL, // TR4
-	ID_SENTRY_GUN, // TR4
-	ID_MINE,  // TR4
+	ID_SENTRY_GUN, // TR4 - In progress
+	ID_MINE,  // TR4 - OK - Needs testing
 	ID_MAPPER, // TR4
 	ID_WHEEL_OF_FORTUNE, // TR4
 	ID_LIGHTING_CONDUCTOR, // TR4
@@ -511,7 +511,7 @@ typedef enum object_types {
 	ID_LARA_WATER_MESH, // TR4
 	ID_LARA_PETROL_MESH, // TR4
 	ID_LARA_DIRT_MESH, // TR4
-	ID_JEAN_YVES, // TR4
+	ID_JEAN_YVES, // TR4 - OK - Needs testing
 	ID_TROOPS, // TR4
 	ID_WRAITH1, // TR4
 	ID_WRAITH2, // TR4
