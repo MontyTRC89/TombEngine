@@ -17,5 +17,6 @@
 void __cdecl ClearItem(__int16 itemNum);
 __int16 __cdecl CreateItem();
 void __cdecl KillItem(__int16 itemNum);
+void __cdecl RemoveAllItemsInRoom(__int16 roomNumber, __int16 objectNumber);
 
 void Inject_Items();

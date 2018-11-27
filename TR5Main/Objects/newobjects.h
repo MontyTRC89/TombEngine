@@ -113,6 +113,7 @@ void __cdecl MineControl(__int16 itemNum);
 void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* item, COLL_INFO* coll);
 void __cdecl InitialiseSentryGun(__int16 itemNum);
 void __cdecl SentryGunControl(__int16 itemNum);
+void __cdecl SentryGunEffect(ITEM_INFO* item);
 void __cdecl InitialiseJeanYves(__int16 itemNum);
 void __cdecl JeanYvesControl(__int16 itemNum);
 

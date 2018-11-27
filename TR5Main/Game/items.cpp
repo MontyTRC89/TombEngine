@@ -89,6 +89,26 @@ void __cdecl KillItem(__int16 itemNum)
 	}
 }
 
+void __cdecl RemoveAllItemsInRoom(__int16 roomNumber, __int16 objectNumber)
+{
+	ROOM_INFO* room = &Rooms[roomNumber];
+	__int16 currentItemNum = room->itemNumber;
+
+	while (currentItemNum != NO_ITEM)
+	{
+		ITEM_INFO* item = &Items[currentItemNum];
+
+		if (item->objectNumber == objectNumber)
+		{
+			RemoveActiveItem(currentItemNum);
+			item->status = ITEM_INACTIVE;
+			item->flags &= 0xC1;
+		}
+
+		currentItemNum = item->nextItem;
+	}
+}
+
 void Inject_Items()
 {
 	INJECT(0x00440840, CreateItem);

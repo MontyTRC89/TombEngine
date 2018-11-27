@@ -799,8 +799,9 @@ void __cdecl SentryGunControl(__int16 itemNum)
 		return;
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	
+
 	AI_INFO info;
+	__int32 c;
 
 	if (creature)
 	{
@@ -833,43 +834,162 @@ void __cdecl SentryGunControl(__int16 itemNum)
 				CreatureAIInfo(item, &info);
 				item->pos.yPos += 512;
 
-				__int32 deltaAgle = info.angle - creature->jointRotation[0];
+				__int32 deltaAngle = info.angle - creature->jointRotation[0];
 
 				info.ahead = true;
-				if (deltaAgle <= -ANGLE(90) || deltaAgle >= ANGLE(90))
+				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))
 					info.ahead = false;
 
 				if (Targetable(item, &info))
 				{
 					if (info.distance < SQUARE(9 * WALL_SIZE))
 					{
-						if (!HaveIGotItemInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+						bool gotPuzzle = HaveIGotItemInInventory(ID_PUZZLE_ITEM5);
+
+						if (!gotPuzzle && !item->itemFlags[0])
 						{
-							/*if (info.distance <= SQUARE(2048))
+							if (info.distance <= SQUARE(2048))
 							{
-								sub_43EDC0((int)item);
-								v1 = 4 * phd_SinCosTable[(GlobalCounter & 0x1F) << 11 >> 3] >> 2;
+								SentryGunEffect(item);
+								c = SIN((GlobalCounter & 0x1F) << 11) >> 2;
 							}
 							else
 							{
+								c = 0;
 								item->itemFlags[0] = 2;
-								LOWORD(v13) = creature->jointRotations[0];
-								ShotLara(item, (int)&info, (int)&dword_4ACBB0, v13, 5);
+
+								ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
 								SoundEffect(358, &item->pos, 0);
+
 								item->itemFlags[2] += 256;
 								if (item->itemFlags[2] > 6144)
 								{
 									item->itemFlags[2] = 6144;
 								}
-							}*/
+							}
 						}
+
+						deltaAngle = c + info.angle - creature->jointRotation[0];
+						if (deltaAngle <= ANGLE(10))
+						{
+							if (deltaAngle < -ANGLE(10))
+							{
+								deltaAngle = -ANGLE(10);
+							}
+						}
+						else
+						{
+							deltaAngle = ANGLE(10);
+						}
+
+						creature->jointRotation[0] = deltaAngle - info.xAngle;
+
+						CreatureJoint(item, 1, -info.xAngle);
 					}
 				}
+
+				item->itemFlags[2] -= 32;
+
+				if ((item->itemFlags[2] & 0x8000u) != 0)
+				{
+					item->itemFlags[2] = 0;
+				}
+
+				creature->jointRotation[3] += item->itemFlags[2];
+				creature->jointRotation[2] += item->itemFlags[1];
+
+				if (creature->jointRotation[2] > ANGLE(90) ||
+					creature->jointRotation[2] < -ANGLE(90))
+				{
+					item->itemFlags[1] = -item->itemFlags[1];
+				}
+			}
+			else
+			{
+				CreatureJoint(item, 0, (GetRandomControl() & 0x7FF) - 1024);
+				CreatureJoint(item, 1, ANGLE(45));
+				CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45));
 			}
 		}
-	}
-	else
-	{
+		else
+		{
+			ExplodingDeath(itemNum, -1, 257);
+			DisableBaddieAI(itemNum);
+			KillItem(itemNum);
 
+			item->flags |= 1u;
+			item->status = ITEM_DEACTIVATED;
+
+			RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
+
+			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -2, 0, item->roomNumber);
+			for (__int32 i = 0; i < 2; i++)
+				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
+
+			SoundEffect(105, &item->pos, 25165828);
+			SoundEffect(106, &item->pos, 0);
+		}
+	}
+}
+
+
+
+void __cdecl SentryGunEffect(ITEM_INFO* item)
+{
+	for (__int32 i = 0; i < 3; i++)
+	{
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+
+		spark->on = 1;
+		spark->sR = (GetRandomControl() & 0x1F) + 48;
+		spark->sG = 48;
+		spark->sB = 255;
+		spark->dR = (GetRandomControl() & 0x3F) - 64;
+		spark->dG = (GetRandomControl() & 0x3F) + -128;
+		spark->dB = 32;
+		spark->colFadeSpeed = 12;
+		spark->fadeToBlack = 8;
+		spark->transType = 2;
+		spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 16;
+
+		PHD_VECTOR pos1;
+		pos1.x = -140;
+		pos1.y = -30;
+		pos1.z = -4;
+
+		GetJointAbsPosition(item, &pos1, 7);
+
+		spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
+		spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
+		spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
+
+		PHD_VECTOR pos2;
+		pos2.x = -280;
+		pos2.y = -30;
+		pos2.z = -4;
+
+		GetJointAbsPosition(item, &pos2, 7);
+
+		__int32 v = (GetRandomControl() & 0x3F) + 192;
+
+		spark->xVel = v * (pos2.x - pos1.x) / 10;
+		spark->yVel = v * (pos2.y - pos1.y) / 10;
+		spark->zVel = v * (pos2.z - pos1.z) / 10;
+
+		spark->friction = 85;
+		spark->gravity = -16 - (GetRandomControl() & 0x1F);
+		spark->maxYvel = 0;
+		spark->flags = 538;
+
+		if ((GlobalCounter & 1) != 0)
+		{
+			v = 255;
+			spark->flags = 539;
+		}
+
+		spark->scalar = 3;
+		spark->dSize = v * ((GetRandomControl() & 7) + 60) >> 8;
+		spark->sSize = spark->dSize >> 4;
+		spark->size = spark->dSize >> 4;
 	}
 }
