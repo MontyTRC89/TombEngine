@@ -778,6 +778,26 @@ void __cdecl NewObjects()
 		obj->nonLot = true;
 		obj->savePosition = true;
 	}
+
+	obj = &Objects[ID_WATERSKIN1_EMPTY];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePickup;
+		obj->control = PickupControl;
+		obj->collision = PickupCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_WATERSKIN2_EMPTY];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePickup;
+		obj->control = PickupControl;
+		obj->collision = PickupCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
 }
 
 void __cdecl CustomObjects()

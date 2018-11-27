@@ -314,6 +314,8 @@
 #define GlobalCollisionBounds		VAR_U_(0x007FE6D0, BOUNDING_BOX)
 #define SphereList					ARRAY_(0x00E51FE0, SPHERE, [34])
 
+#define IsRoomOutsideNo				VAR_U_(0x007FE6C2, __int16)
+
 extern bool MonksAttackLara;
 
 // Remapped variables

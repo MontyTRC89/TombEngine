@@ -12,6 +12,7 @@
 #define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
 #define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 #define Sub_0042A050 ((void (__cdecl*)()) 0x0042A050)  
+#define IsRoomOutside ((__int32 (__cdecl*)(__int32, __int32, __int32)) 0x0044C050)  
 
 __int32 __cdecl DrawPhaseGame();
 __int32 DrawGame();

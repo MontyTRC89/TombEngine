@@ -8,6 +8,7 @@
 #define TriggerExplosionSparks ((void (__cdecl*)(__int32, __int32, __int32, __int32, __int32, __int32, __int16)) 0x0042F610)
 #define ExplodingDeath ((void (__cdecl*)(__int16, __int32, __int32)) 0x00484080)
 #define GetFreeSpark ((__int16 (__cdecl*)()) 0x0042E790)
+#define GetFreeDrip ((__int16 (__cdecl*)()) 0x00483D00)
 #define GetFreeSmokeSpark ((__int16 (__cdecl*)()) 0x00481D40)
 #define TriggerDartSmoke ((void (__cdecl*)(__int32, __int32, __int32, __int32, __int32, __int32)) 0x00430D90)
 #define TriggerGunShell ((void (__cdecl*)(__int16, __int32, __int32)) 0x00482A60)
