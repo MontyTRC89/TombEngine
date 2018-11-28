@@ -185,7 +185,7 @@ void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-__int32 __cdecl RespawnAhmet(__int32 itemNum)
+__int32 __cdecl RespawnAhmet(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

@@ -591,7 +591,7 @@ void __cdecl ScorpionControl(__int16 itemNum)
 
 				CreatureEffect2(
 					item,
-					&scorpionBite,
+					&scorpionBite1,
 					10,
 					item->pos.yRot - ANGLE(180),
 					DoBloodSplat);
