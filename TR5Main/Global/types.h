@@ -10,12 +10,12 @@ typedef struct vector_t
 	__int32 pad;
 } VECTOR;
 
-struct SPHERE
+typedef struct SPHERE
 {
-	long x; // size=0, offset=0
-	long y; // size=0, offset=4
-	long z; // size=0, offset=8
-	long r; // size=0, offset=12
+	__int32 x; // size=0, offset=0
+	__int32 y; // size=0, offset=4
+	__int32 z; // size=0, offset=8
+	__int32 r; // size=0, offset=12
 };
 
 typedef struct svector_t

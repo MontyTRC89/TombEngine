@@ -816,6 +816,27 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->hitEffect = 2;
 	}
+
+	obj = &Objects[ID_TROOPS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTroops;
+		obj->control = TroopsControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 40;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex] |= ROT_Y;
+		Bones[obj->boneIndex] |= ROT_X;
+		Bones[obj->boneIndex + 112] |= ROT_Y;
+		Bones[obj->boneIndex + 112] |= ROT_X;
+	}
 }
 
 void __cdecl CustomObjects()
