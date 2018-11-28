@@ -279,6 +279,16 @@ void __cdecl PickedUpObject(__int16 objectNumber)
 		Lara.binoculars = 1;
 		break;
 
+	case ID_WATERSKIN1_EMPTY:
+		g_LaraExtra.Waterskin1.Present = true;
+		g_LaraExtra.Waterskin1.Quantity = 0;
+		break;
+
+	case ID_WATERSKIN2_EMPTY:
+		g_LaraExtra.Waterskin2.Present = true;
+		g_LaraExtra.Waterskin2.Quantity = 0;
+		break;
+
 	default:
 		if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
 			Lara.puzzleItems[objectNumber - ID_PUZZLE_ITEM1]++;

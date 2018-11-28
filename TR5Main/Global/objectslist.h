@@ -499,15 +499,15 @@ typedef enum object_types {
 	ID_LOCUST_EMITTER, // TR4
 	ID_SCALES, // TR4 - OK - Needs testing
 	ID_WATERSKIN1_EMPTY, // TR4 - OK
-	ID_WATERSKIN1_1, // TR4
-	ID_WATERSKIN1_2, // TR4
-	ID_WATERSKIN1_3, // TR4
+	ID_WATERSKIN1_1, // TR4 - OK - Needs testing and inventory handling
+	ID_WATERSKIN1_2, // TR4 - OK - Needs testing and inventory handling
+	ID_WATERSKIN1_3, // TR4 - OK - Needs testing and inventory handling
 	ID_WATERSKIN2_EMPTY, // TR4 - OK
-	ID_WATERSKIN2_1, // TR4
-	ID_WATERSKIN2_2, // TR4
-	ID_WATERSKIN2_3, // TR4
-	ID_WATERSKIN2_4, // TR4
-	ID_WATERSKIN2_5, // TR4
+	ID_WATERSKIN2_1, // TR4 - OK - Needs testing and inventory handling
+	ID_WATERSKIN2_2, // TR4 - OK - Needs testing and inventory handling
+	ID_WATERSKIN2_3, // TR4 - OK - Needs testing and inventory handling
+	ID_WATERSKIN2_4, // TR4 - OK - Needs testing and inventory handling
+	ID_WATERSKIN2_5, // TR4 - OK - Needs testing and inventory handling
 	ID_LARA_WATER_MESH, // TR4
 	ID_LARA_PETROL_MESH, // TR4
 	ID_LARA_DIRT_MESH, // TR4
@@ -517,7 +517,7 @@ typedef enum object_types {
 	ID_WRAITH2, // TR4
 	ID_WRAITH3, // TR4
 	ID_WRAITH4, // TR4
-	ID_NEW_SLOT_516,
-	ID_NEW_SLOT_517,
-	ID_NEW_SLOT_518
+	ID_CLOCKWORK_BEETLE,
+	ID_CLOCKWORK_BEETLE_COMBO1,
+	ID_CLOCKWORK_BEETLE_COMBO2
 } GAME_OBJECT_ID;

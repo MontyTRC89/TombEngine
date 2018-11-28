@@ -39,7 +39,7 @@ void __cdecl ScalesControl(__int16 itemNum)
 			return;
 		}
 
-		if (RespawnAhmet((__int32)Lara.generalPtr))
+		if (RespawnAhmet((__int16)Lara.generalPtr))
 		{
 			__int16 itemNos[8];
 			__int32 sw = GetSwitchTrigger(item, itemNos, 0);
@@ -185,7 +185,7 @@ void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-__int32 __cdecl __cdecl RespawnAhmet(int itemNum)
+__int32 __cdecl RespawnAhmet(__int32 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

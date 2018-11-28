@@ -71,6 +71,8 @@ using namespace std;
 #define STRING_INV_CROSSBOW_AMMO2		57
 #define STRING_INV_CROSSBOW_AMMO3		58
 #define STRING_INV_DIARY				59
+#define STRING_INV_WATERSKIN1_EMPTY		60
+#define STRING_INV_WATERSKIN2_EMPTY		61
 
 typedef struct GameScriptSettings {
 	__int32 ScreenWidth;

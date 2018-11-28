@@ -798,6 +798,24 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
+
+	obj = &Objects[ID_SCORPION];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseScorpion;
+		obj->control = ScorpionControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 80;
+		obj->pivotLength = 50;
+		obj->radius = 512;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->hitEffect = 2;
+	}
 }
 
 void __cdecl CustomObjects()

@@ -23,6 +23,8 @@ BITE_INFO wolfBite = { 0, -14, 174, 6 };
 BITE_INFO bearBite = { 0, 96, 335, 14 };
 BITE_INFO apeBite = { 0, -19, 75, 15 };
 BITE_INFO mouseBite = { 0, 0, 57, 2 };
+BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };
+BITE_INFO scorpionBite2 = { 0, 0, 0, 23 };
 
 void __cdecl InitialiseWildBoar(__int16 itemNum)
 {
@@ -432,14 +434,245 @@ void __cdecl ScorpionControl(__int16 itemNum)
 	{
 		item->hitPoints = 0;
 
-		if (item->currentAnimState != 6)
+		if (item->currentAnimState != 6 && item->currentAnimState != 7)
 		{
-			if (item->triggerFlags > 0 && item->triggerFlags < 7)
-			{
-
-			}
+			item->animNumber = Objects[item->objectNumber].animIndex + 5;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = 6;
 		}
 	}
+	else
+	{
+		if (item->aiBits)
+			GetAITarget(creature);
+		else
+		{
+			if (creature->hurtByLara && item->currentAnimState != 8)
+				creature->enemy = LaraItem;
+			{
+				// Search for active troops
+				creature->enemy = NULL;
+				CREATURE_INFO* baddy = &BaddieSlots[0];
+				__int32 minDistance = 0x7FFFFFFF;
+
+				for (__int32 i = 0; i < NUM_SLOTS; i++)
+				{
+					baddy = &BaddieSlots[i];
+
+					if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNum)
+					{
+						ITEM_INFO* currentItem = &Items[baddy->itemNum];
+
+						if (currentItem->objectNumber != ID_SCORPION &&
+							(currentItem != LaraItem || creature->hurtByLara))
+						{
+							__int32 dx = currentItem->pos.xPos - item->pos.xPos;
+							__int32 dy = currentItem->pos.yPos - item->pos.yPos;
+							__int32 dz = currentItem->pos.zPos - item->pos.zPos;
+							__int32 distance = dx * dx + dy * dy + dz * dz;
+
+							if (distance < minDistance)
+							{
+								minDistance = distance;
+								creature->enemy = currentItem;
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+		AI_INFO info;
+
+		CreatureAIInfo(item, &info);
+
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, creature->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+		case 1:
+			creature->maximumTurn = 0;
+			creature->flags = 0;
+
+			if (info.distance > SQUARE(1365))
+			{
+				item->goalAnimState = 2;
+				break;
+			}
+
+			if (info.bite)
+			{
+				creature->maximumTurn = ANGLE(2);
+
+				if (GetRandomControl() & 1 || creature->enemy->objectNumber == ID_TROOPS &&
+					creature->enemy->hitPoints <= 15)
+				{
+					item->goalAnimState = 4;
+				}
+				else
+				{
+					item->goalAnimState = 5;
+				}
+			}
+			else if (!info.ahead)
+			{
+				item->goalAnimState = 2;
+			}
+
+			break;
+
+		case 2:
+			creature->maximumTurn = ANGLE(2);
+
+			if (info.distance < SQUARE(1365))
+			{
+				item->goalAnimState = 1;
+				break;
+			}
+
+			if (info.distance > SQUARE(853))
+			{
+				item->goalAnimState = 3;
+			}
+
+			break;
+
+		case 3:
+			creature->maximumTurn = ANGLE(3);
+
+			if (info.distance >= SQUARE(1365))
+			{
+				break;
+			}
+
+			item->goalAnimState = 1;
+
+			break;
+
+		case 4:
+		case 5:
+			creature->maximumTurn = 0;
+
+			if (abs(info.angle) >= ANGLE(2))
+			{
+				if (info.angle >= 0)
+				{
+					item->pos.yRot += ANGLE(2);
+				}
+				else
+				{
+					item->pos.yRot -= ANGLE(2);
+				}
+			}
+			else
+			{
+				item->pos.yRot += info.angle;
+			}
+			if (creature->flags)
+			{
+				break;
+			}
+
+			if (creature->enemy && creature->enemy != LaraItem && info.distance < SQUARE(1365))
+			{
+				creature->enemy->hitPoints -= 15;
+				if (creature->enemy->hitPoints <= 0)
+				{
+					item->goalAnimState = 7;
+					creature->maximumTurn = 0;
+				}
+
+				creature->enemy->hitStatus = true;
+				creature->flags = 1;
+
+				CreatureEffect2(
+					item,
+					&scorpionBite,
+					10,
+					item->pos.yRot - ANGLE(180),
+					DoBloodSplat);
+			}
+			else if (item->touchBits & 0x1B00100)
+			{
+				LaraItem->hitPoints -= 120;
+				LaraItem->hitStatus = true;
+
+				if (item->currentAnimState == 5)
+				{
+					Lara.dpoisoned += 2048;
+
+					CreatureEffect2(
+						item,
+						&scorpionBite1,
+						10,
+						item->pos.yRot - ANGLE(180),
+						DoBloodSplat);
+				}
+				else
+				{
+					CreatureEffect2(
+						item,
+						&scorpionBite2,
+						10,
+						item->pos.yRot - ANGLE(180),
+						DoBloodSplat);
+				}
+
+				creature->flags = 1;
+				if (LaraItem->hitPoints <= 0)
+				{
+					CreatureKill(item, 6, 7, 442);
+					creature->maximumTurn = 0;
+					return;
+				}
+			}
+
+			break;
+
+		case 8:
+			creature->maximumTurn = 0;
+			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			{
+				item->triggerFlags++;
+			}
+			if (creature->enemy && creature->enemy->hitPoints <= 0 || item->triggerFlags > 6)
+			{
+				item->goalAnimState = 7;
+				creature->enemy->hitPoints = 0;
+			}
+			
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	if ((angle1 - item->pos.xRot) < 256)
+		item->pos.xRot = 256;
+	else
+	{
+		if (angle1 <= item->pos.xRot)
+			item->pos.xRot -= 256;
+		else
+			item->pos.xRot += 256;
+	}
+
+	if ((angle2 - item->pos.zRot) < 256)
+		item->pos.zRot = 256;
+	else
+	{
+		if (angle2 <= item->pos.zRot)
+			item->pos.zRot -= 256;
+		else
+			item->pos.zRot += 256;
+	}
+
+	CreatureAnimation(itemNum, angle, 0);
 }
 
 void __cdecl InitialiseBat(__int16 itemNum)

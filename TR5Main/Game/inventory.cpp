@@ -72,6 +72,8 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_INV_LARA_HOME, -1, 0);
 	m_objectsTable[INV_OBJECT_HEADPHONES] = InventoryObjectDefinition(ID_INVENTORY_HEADPHONES, STRING_INV_SOUND, -1, 0);
 	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY, STRING_INV_DIARY, -1, 0);
+	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_INV_WATERSKIN1_EMPTY, -1, 0);
+	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_INV_WATERSKIN2_EMPTY, -1, 0);
 }
 
 Inventory::~Inventory()
@@ -344,6 +346,12 @@ void Inventory::Initialise()
 
 	if (Lara.bottle)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_BOTTLE);
+
+	if (g_LaraExtra.Waterskin1.Present)
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WATERSKIN1);
+
+	if (g_LaraExtra.Waterskin2.Present)
+		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WATERSKIN2);
 
 	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
 

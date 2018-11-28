@@ -118,7 +118,7 @@ void __cdecl InitialiseJeanYves(__int16 itemNum);
 void __cdecl JeanYvesControl(__int16 itemNum);
 void __cdecl ScalesControl(__int16 itemNum);
 void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* item, COLL_INFO* coll);
-__int32 __cdecl __cdecl ScalesEffect(int itemNum);
+__int32 __cdecl RespawnAhmet(__int16 itemNum);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);
