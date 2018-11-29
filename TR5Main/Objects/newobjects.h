@@ -123,6 +123,12 @@ void __cdecl InitialiseLittleBeetle(__int16 itemNum);
 void __cdecl LittleBeetleControl(__int16 itemNum);
 void __cdecl InitialiseTroops(__int16 itemNum);
 void __cdecl TroopsControl(__int16 itemNum);
+void __cdecl InitialiseHarpy(__int16 itemNum);
+void __cdecl HarpyControl(__int16 itemNum);
+void __cdecl HarpyBubbles(PHD_3DPOS* pos, __int16 roomNumber, __int32 count);
+void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum);
+void __cdecl HarpySparks1(__int16 itemNum, byte num, __int32 size);
+void __cdecl HarpySparks2(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);

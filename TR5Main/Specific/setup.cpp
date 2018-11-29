@@ -837,6 +837,22 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 112] |= ROT_Y;
 		Bones[obj->boneIndex + 112] |= ROT_X;
 	}
+
+	obj = &Objects[ID_HARPY];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseHarpy;
+		obj->control = HarpyControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 60;
+		obj->pivotLength = 50;
+		obj->radius = 409;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
 }
 
 void __cdecl CustomObjects()
