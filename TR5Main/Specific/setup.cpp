@@ -853,6 +853,52 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
+	obj = &Objects[ID_GUIDE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseGuide;
+		obj->control = GuideControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = -16384;
+		obj->pivotLength = 0;
+		obj->radius = 128;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+
+		Bones[obj->boneIndex + 24] |= ROT_X | ROT_Y;
+		Bones[obj->boneIndex + 80] |= ROT_X | ROT_Y;
+
+		// TODO: check if constants are byte, __int16 or __int32
+		Meshes[obj->meshIndex + 124] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 120];
+		Meshes[obj->meshIndex + 148] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 144];
+		Meshes[obj->meshIndex + 172] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 168];
+	}
+
+	obj = &Objects[ID_CROCODILE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCrocodile;
+		obj->control = CrocodileControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 36;
+		obj->pivotLength = 300;
+		obj->radius = 409;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->waterCreature = true;
+
+		Bones[obj->boneIndex] |= ROT_Y;
+		Bones[obj->boneIndex + 28] |= ROT_Y;
+		Bones[obj->boneIndex + 36] |= ROT_Y;
+		Bones[obj->boneIndex + 40] |= ROT_Y;
+	}
 }
 
 void __cdecl CustomObjects()
