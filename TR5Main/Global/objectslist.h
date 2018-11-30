@@ -51,7 +51,7 @@ typedef enum object_types {
 	ID_PIERRE,
 	ID_BAT, // TR4 - OK (bugs in zones)
 	ID_MAFIA,
-	ID_GUIDE, // TR4
+	ID_GUIDE, // TR4 - OK - Needs testing
 	ID_MAFIA2,
 	ID_SPHINX, // TR4
 	ID_SAILOR,
@@ -61,7 +61,7 @@ typedef enum object_types {
 	ID_LION,
 	ID_WILD_BOAR, // TR4 - OK
 	ID_GLADIATOR,
-	ID_HARPY, // TR4
+	ID_HARPY, // TR4 - OK - Needs testing
 	ID_ROMAN_GOD,
 	ID_DEMIGOD1, // TR4 - OK - Needs testing
 	ID_HYDRA,

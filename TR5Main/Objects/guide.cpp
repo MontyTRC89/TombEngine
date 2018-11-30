@@ -1,0 +1,726 @@
+#include "newobjects.h"
+#include "..\Global\global.h"
+#include "..\Game\Box.h"
+#include "..\Game\items.h"
+#include "..\Game\lot.h"
+#include "..\Game\control.h"
+#include "..\Game\effects.h"
+#include "..\Game\draw.h"
+#include "..\Game\sphere.h"
+#include "..\Game\effect2.h"
+#include "..\Game\people.h"
+
+BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
+BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };
+
+void __cdecl InitialiseGuide(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	ClearItem(itemNum);
+
+	item->animNumber = Objects[item->objectNumber].animIndex + 4;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->goalAnimState = 1;
+	item->currentAnimState = 1;
+	item->swapMeshFlags = 0x40000;
+}
+
+void __cdecl GuideControl(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	if (!CreatureActive(itemNum))
+		return;
+
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
+
+	__int16 angle = 0;
+	__int16 tilt = 0;
+	__int16 joint2 = 0;
+	__int16 joint1 = 0;
+	__int16 joint0 = 0;
+
+	if (item->itemFlags[1] == 2)
+	{
+		PHD_VECTOR pos;
+
+		pos.x = guideBiteInfo1.x;
+		pos.y = guideBiteInfo1.y;
+		pos.z = guideBiteInfo1.z;
+
+		GetJointAbsPosition(item, &pos, guideBiteInfo1.meshNum);
+
+		AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
+		SoundEffect(150, &item->pos, 0);
+		GrenadeLauncherSpecialEffect1(pos.x, pos.y - 40, pos.z, -1, 7);
+
+		__int16 random = GetRandomControl();
+		TriggerDynamics(pos.x, pos.y, pos.z, 15, 255 - ((random >> 4) & 0x1F), 192 - ((random >> 6) & 0x1F), random & 0x3F);
+
+		if (item->animNumber == obj->animIndex + 61)
+		{
+			if (item->frameNumber > Anims[item->animNumber].frameBase + 32 &&
+				item->frameNumber < Anims[item->animNumber].frameBase + 42)
+			{
+				GrenadeLauncherSpecialEffect1(
+					(random & 0x3F) + pos.x - 32,
+					((random >> 3) & 0x3F) + pos.y - 128,
+					pos.z + ((random >> 6) & 0x3F) - 32,
+					-1,
+					1);
+			}
+		}
+	}
+
+	item->aiBits = FOLLOW;
+
+	GetAITarget(creature);
+
+	AI_INFO info;
+	AI_INFO laraInfo;
+
+	__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
+	__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
+
+	laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+	laraInfo.ahead = true;
+
+	if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
+	{
+		laraInfo.ahead = false;
+	}
+
+	__int32 distance = 0;
+	if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
+	{
+		laraInfo.distance = 0x7FFFFFFF;
+	}
+	else
+	{
+		laraInfo.distance = dx * dx + dz * dz;
+	}
+
+	dx = abs(dx);
+	dz = abs(dz);
+
+	__int32 dy = item->pos.yPos - LaraItem->pos.yPos;
+	__int16 rot2 = 0;
+
+	if (dx <= dz)
+	{
+		laraInfo.xAngle = ATAN(dz + (dx >> 1), dy);
+	}
+	else
+	{
+		laraInfo.xAngle = ATAN(dx + (dz >> 1), dy);
+	}
+
+	ITEM_INFO* enemy = NULL;
+
+	if (item->currentAnimState < 4 || item->currentAnimState == 31)
+	{
+		__int32 minDistance = 0x7FFFFFFF;
+		CREATURE_INFO* baddie = &BaddieSlots[0];
+
+		for (__int32 i = 0; i < NUM_SLOTS; i++)
+		{
+			baddie = &BaddieSlots[i];
+
+			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
+				continue;
+
+			ITEM_INFO* currentItem = &Items[baddie->itemNum];
+
+			dx = currentItem->pos.xPos - item->pos.xPos;
+			dy = currentItem->pos.yPos - item->pos.yPos;
+			dz = currentItem->pos.zPos - item->pos.zPos;
+
+			if (dx > 32000 || dx < -32000 || dz>32000 || dz < -32000)
+				distance = 0x7FFFFFFF;
+			else
+				distance = dx * dx + dz * dz;
+
+			if (distance < minDistance && distance < SQUARE(2048) &&
+				(dy < 256 || laraInfo.distance < SQUARE(2048) ||
+					currentItem->objectNumber == ID_DOG))
+			{
+				enemy = currentItem;
+				minDistance = distance;
+			}
+		}
+	}
+
+	CreatureAIInfo(item, &info);
+
+	GetCreatureMood(item, &info, VIOLENT);
+	CreatureMood(item, &info, VIOLENT);
+
+	angle = CreatureTurn(item, creature->maximumTurn);
+
+	if (enemy)
+		creature->enemy = enemy;
+
+	bool someFlag = false;
+	FLOOR_INFO* floor;
+	PHD_VECTOR pos1;
+	__int16 frameNumber;
+	__int16 random;
+
+	switch (item->currentAnimState)
+	{
+	case 0:
+		creature->LOT.isJumping = false;
+		creature->flags = 0;
+		creature->maximumTurn = 0;
+		joint2 = info.angle >> 1;
+
+		if (laraInfo.ahead)
+		{
+			joint1 = laraInfo.xAngle;
+			joint0 = laraInfo.angle >> 1;
+			joint2 = laraInfo.angle >> 1;
+		}
+		else if (info.ahead)
+		{
+			joint0 = info.angle >> 1;
+			joint2 = info.angle >> 1;
+			joint1 = info.xAngle;
+		}
+
+		if (item->requiredAnimState)
+		{
+			item->goalAnimState = item->requiredAnimState;
+		}
+		else if (Lara.location >= item->itemFlags[3] || item->itemFlags[1] != 2)
+		{
+			if (!creature->reachedGoal || enemy)
+			{
+				if (item->swapMeshFlags == 0x40000)
+				{
+					item->goalAnimState = 40;
+				}
+				else if (enemy && info.distance < SQUARE(1024))
+				{
+					if (info.bite)
+					{
+						item->goalAnimState = 31;
+					}
+				}
+				else if (enemy != LaraItem || info.distance > SQUARE(2048))
+				{
+					item->goalAnimState = 2;
+				}
+			}
+			else
+			{
+				if (!enemy->flags)
+				{
+					creature->reachedGoal = true;
+					creature->enemy = NULL;
+					item->aiBits = FOLLOW;
+					item->itemFlags[3]++;
+
+					break;
+				}
+
+				if (info.distance <= SQUARE(128))
+				{
+					switch (enemy->flags)
+					{
+					case 0x02:
+						item->goalAnimState = 38;
+						item->requiredAnimState = 38;
+
+						break;
+
+					case 0x20:
+						item->goalAnimState = 37;
+						item->requiredAnimState = 37;
+
+						break;
+
+					case 0x28:
+						if (laraInfo.distance < SQUARE(2048))
+						{
+							item->goalAnimState = 39;
+							item->requiredAnimState = 39;
+						}
+
+						break;
+
+					case 0x10:
+						if (laraInfo.distance < SQUARE(2048))
+						{
+							item->goalAnimState = 36;
+							item->requiredAnimState = 36;
+						}
+
+						break;
+
+					case 0x04:
+						if (laraInfo.distance < SQUARE(2048))
+						{
+							item->goalAnimState = 36;
+							item->requiredAnimState = 43;
+						}
+
+						break;
+
+					case 0x3Eu:
+						item->status = ITEM_INVISIBLE;
+						RemoveActiveItem(itemNum);
+						DisableBaddieAI(itemNum);
+
+						break;
+
+					}
+				}
+				else
+				{
+					creature->maximumTurn = 0;
+					item->requiredAnimState = 42 - (info.ahead != 0);
+				}
+			}
+		}
+		else
+		{
+			item->goalAnimState = 1;
+		}
+
+		break;
+
+	case 2:
+		if (info.ahead)
+		{
+			joint2 = info.angle;
+		}
+
+		creature->maximumTurn = ANGLE(11);
+		tilt = angle / 2;
+
+		if (info.distance < SQUARE(2048) || Lara.location < item->itemFlags[3])
+		{
+			item->goalAnimState = 1;
+			break;
+		}
+		if (creature->reachedGoal)
+		{
+			if (!enemy->flags)
+			{
+				creature->reachedGoal = true;
+				creature->enemy = NULL;
+				item->aiBits = FOLLOW;
+				item->itemFlags[3]++;
+
+				break;
+			}
+			item->goalAnimState = 1;
+		}
+		else if (enemy && (info.distance < 0x200000 || !(item->swapMeshFlags & 0x40000) && info.distance < SQUARE(3072)))
+		{
+			item->goalAnimState = 1;
+			break;
+		}
+
+		break;
+
+	case 10:
+		pos1.x = guideBiteInfo2.x;
+		pos1.y = guideBiteInfo2.y;
+		pos1.z = guideBiteInfo2.z;
+
+		GetJointAbsPosition(item, &pos1, guideBiteInfo2.meshNum);
+
+		frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		random = GetRandomControl();
+
+		if (frameNumber == 32)
+		{
+			item->swapMeshFlags |= 0x8000;
+		}
+		else if (frameNumber == 216)
+		{
+			item->swapMeshFlags &= 0x7FFF;
+		}
+		else if (frameNumber <= 79 || frameNumber >= 84)
+		{
+			if (frameNumber <= 83 || frameNumber >= 94)
+			{
+				if (frameNumber <= 159 || frameNumber >= 164)
+				{
+					if (frameNumber > 163 && frameNumber < 181)
+					{
+						GrenadeLauncherSpecialEffect1(
+							(random & 0x3F) + pos1.x - 64,
+							((random >> 5) & 0x3F) + pos1.y - 96,
+							((random >> 10) & 0x3F) + pos1.z - 64,
+							-1,
+							7);
+
+						TriggerDynamics(
+							pos1.x - 32,
+							pos1.y - 64,
+							pos1.z - 32,
+							10,
+							192 - ((random >> 4) & 0x1F),
+							128 - ((random >> 6) & 0x1F),
+							random & 0x1F);
+
+						item->itemFlags[1] = 2;
+					}
+				}
+				else
+				{
+					TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
+					TriggerDynamics(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
+				}
+			}
+			else
+			{
+				TriggerDynamics(pos1.x - 32, pos1.y - 64, pos1.z - 32, 10, 192 - ((random >> 4) & 0x1F), 128 - ((random >> 6) & 0x1F), random & 0x1F);
+
+				GrenadeLauncherSpecialEffect1(
+					(random & 0x3F) + pos1.x - 64,
+					((random >> 5) & 0x3F) + pos1.y - 96,
+					((random >> 10) & 0x3F) + pos1.z - 64,
+					-1,
+					7);
+			}
+		}
+		else
+		{
+			TriggerDynamics(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
+			TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
+		}
+
+		break;
+
+	case 21:
+		creature->maximumTurn = 0;
+
+		if (laraInfo.angle < -256)
+		{
+			item->pos.yRot -= 399;
+		}
+
+		break;
+
+	case 30:
+		if (info.ahead)
+		{
+			joint0 = info.angle >> 1;
+			joint2 = info.angle >> 1;
+			joint1 = info.xAngle >> 1;
+		}
+
+		creature->maximumTurn = 0;
+
+		if (abs(info.angle) >= ANGLE(7))
+		{
+			if (info.angle < 0)
+			{
+				item->pos.yRot += ANGLE(7);
+			}
+			else
+			{
+				item->pos.yRot -= ANGLE(7);
+			}
+		}
+		else
+		{
+			item->pos.yRot += info.angle;
+		}
+
+		if (!creature->flags)
+		{
+			if (enemy)
+			{
+				if (item->frameNumber > Anims[item->animNumber].frameBase + 15 &&
+					item->frameNumber < Anims[item->animNumber].frameBase + 26)
+				{
+					dx = abs(enemy->pos.xPos - item->pos.xPos);
+					dy = abs(enemy->pos.yPos - item->pos.yPos);
+					dz = abs(enemy->pos.zPos - item->pos.zPos);
+
+					if (dx <= 512 && dy <= 512 && dz >= 512)
+					{
+						enemy->hitPoints -= 20;
+
+						if (enemy->hitPoints <= 0)
+						{
+							item->aiBits = FOLLOW;
+						}
+
+						enemy->hitStatus = true;
+						creature->flags = 1;
+
+						CreatureEffect2(
+							item,
+							&guideBiteInfo1,
+							8,
+							-1,
+							DoBloodSplat);
+					}
+				}
+			}
+		}
+
+		break;
+
+	case 34:
+		creature->maximumTurn = 0;
+
+		if (laraInfo.angle > 256)
+		{
+			item->pos.yRot += 399;
+		}
+
+		break;
+
+	case 35:
+	case 42:
+		if (enemy)
+		{
+			__int16 deltaAngle = enemy->pos.yRot - item->pos.yRot;
+			if (deltaAngle <= 364)
+			{
+				if (deltaAngle < -364)
+					item->pos.yRot -= 364;
+			}
+			else
+			{
+				item->pos.yRot += 364;
+			}
+		}
+
+		if (item->requiredAnimState == 43)
+		{
+			item->goalAnimState = 43;
+		}
+		else
+		{
+			if (item->animNumber != obj->animIndex + 57
+				&& item->frameNumber == Anims[item->animNumber].frameEnd - 20)
+			{
+				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+				GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				TestTriggers(TriggerIndex, 1, 0);
+
+				creature->reachedGoal = true;
+				creature->enemy = NULL;
+				item->aiBits = FOLLOW;
+				item->itemFlags[3]++;
+
+				break;
+			}
+		}
+
+		break;
+
+	case 36:
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		{
+			someFlag = true;
+
+			item->pos.xPos = enemy->pos.xPos;
+			item->pos.yPos = enemy->pos.yPos;
+			item->pos.zPos = enemy->pos.zPos;
+			item->pos.xRot = enemy->pos.xRot;
+			item->pos.yRot = enemy->pos.yRot;
+			item->pos.zRot = enemy->pos.zRot;
+		}
+		else if (item->frameNumber == Anims[item->animNumber].frameBase + 35)
+		{
+			item->swapMeshFlags &= 0xFFFBFFFF;
+
+			ROOM_INFO* room = &Rooms[item->roomNumber];
+			ITEM_INFO* currentItem = NULL;
+
+			__int16 currentItemNumber = room->itemNumber;
+			while (currentItemNumber != NO_ITEM)
+			{
+				currentItem = &Items[currentItemNumber];
+
+				if (currentItem->objectNumber >= ID_ANIMATING1
+					&& currentItem->objectNumber <= ID_ANIMATING15
+					&& trunc(item->pos.xPos) == trunc(currentItem->pos.xPos)
+					&& trunc(item->pos.zPos) == trunc(currentItem->pos.zPos))
+				{
+					break;
+				}
+			}
+
+			if (currentItem != NULL)
+				currentItem->meshBits = -3;
+		}
+
+		item->itemFlags[1] = 1;
+		if (someFlag)
+		{
+			creature->reachedGoal = true;
+			creature->enemy = NULL;
+			item->aiBits = FOLLOW;
+			item->itemFlags[3]++;
+		}
+
+		break;
+
+	case 37:
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		{
+			item->pos.xPos = enemy->pos.xPos;
+			item->pos.yPos = enemy->pos.yPos;
+			item->pos.zPos = enemy->pos.zPos;
+		}
+		else
+		{
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 42)
+			{
+
+				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+				GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				TestTriggers(TriggerIndex, 1, 0);
+
+				item->pos.yRot = enemy->pos.yRot;
+				//goto LABEL_222;
+
+				creature->reachedGoal = true;
+				creature->enemy = NULL;
+				item->aiBits = FOLLOW;
+				item->itemFlags[3]++;
+
+				break;
+			}
+			if (item->frameNumber < Anims[item->animNumber].frameBase + 42)
+			{
+				if (enemy->pos.yRot - item->pos.yRot <= ANGLE(2))
+				{
+					if (enemy->pos.yRot - item->pos.yRot < -ANGLE(2))
+					{
+						item->pos.yRot -= ANGLE(2);
+					}
+				}
+				else
+				{
+					item->pos.yRot += ANGLE(2);
+				}
+			}
+		}
+
+		break;
+
+	case 38:
+		if (item->frameNumber >= Anims[item->animNumber].frameBase + 20)
+		{
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 20)
+			{
+				item->goalAnimState = 1;
+
+				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+				GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				TestTriggers(TriggerIndex, 1, 0);
+
+				// LABEL_222
+				creature->reachedGoal = true;
+				creature->enemy = NULL;
+				item->aiBits = FOLLOW;
+				item->itemFlags[3]++;
+
+				break;
+			}
+
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 70 && item->roomNumber == 70)
+			{
+				item->requiredAnimState = 3;
+				item->swapMeshFlags |= 0x200000;
+				SoundEffect(194, &item->pos, 0);
+			}
+		}
+		else if (enemy->pos.yRot - item->pos.yRot <= ANGLE(2))
+		{
+			if (enemy->pos.yRot - item->pos.yRot < -ANGLE(2))
+			{
+				item->pos.yRot -= ANGLE(2);
+			}
+		}
+		else
+		{
+			item->pos.yRot += ANGLE(2);
+		}
+
+		break;
+
+	case 39:
+		creature->LOT.isJumping;
+		creature->maximumTurn = ANGLE(7);
+
+		if (laraInfo.ahead)
+		{
+			if (info.ahead)
+			{
+				joint2 = info.angle;
+			}
+		}
+		else
+		{
+			joint2 = laraInfo.angle;
+		}
+		if (!(creature->reachedGoal))
+		{
+			break;
+		}
+
+		if (!enemy->flags)
+		{
+			creature->reachedGoal = true;
+			creature->enemy = NULL;
+			item->aiBits = FOLLOW;
+			item->itemFlags[3]++;
+
+			break;
+		}
+		if (enemy->flags == 42)
+		{
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			TestTriggers(TriggerIndex, 1, 0);
+
+			//LABEL_222:
+			creature->reachedGoal = true;
+			creature->enemy = NULL;
+			item->aiBits = FOLLOW;
+			item->itemFlags[3]++;
+		}
+		else if (item->triggerFlags <= 999)
+		{
+			item->goalAnimState = 1;
+		}
+		else
+		{
+			KillItem(itemNum);
+			DisableBaddieAI(itemNum);
+			item->flags |= 1;
+		}
+
+		break;
+
+	case 40:
+	case 41:
+		creature->maximumTurn = 0;
+		MoveCreature3DPos(&item->pos, &enemy->pos, 15, enemy->pos.yRot - item->pos.yRot, ANGLE(10));
+
+	default:
+		break;
+	}
+
+	CreatureTilt(item, tilt);
+
+	CreatureJoint(item, 0, joint0);
+	CreatureJoint(item, 1, joint1);
+	CreatureJoint(item, 2, joint2);
+	CreatureJoint(item, 3, joint1);
+
+	CreatureAnimation(itemNum, angle, 0);
+}

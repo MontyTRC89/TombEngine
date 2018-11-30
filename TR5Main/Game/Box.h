@@ -24,7 +24,7 @@
 #define AlertNearbyGuards ((void (__cdecl*)(ITEM_INFO*)) 0x0040BB10)
 #define AIGuard ((__int16(__cdecl*)(CREATURE_INFO*)) 0x0040BBE0)
 #define GetAITarget ((void(__cdecl*)(CREATURE_INFO*)) 0x0040BCC0)
-//#define CreatureVault ((__int32 (__cdecl*)(__int16, __int16, __int32, __int32)) 0x0040B5D0)
+#define MoveCreature3DPos ((__int32(__cdecl*)(PHD_3DPOS*, PHD_3DPOS*, __int32, __int16, __int16)) 0x0040C460)
 
 __int32 CreatureVault(__int16 itemNum, __int16 angle, __int32 vault, __int32 shift);
 
