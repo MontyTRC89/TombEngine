@@ -22,7 +22,7 @@ void __cdecl InitialiseDemigod(__int16 itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->currentAnimState = 0;
 
-	if (LevelItems > 0)
+	/*if (LevelItems > 0)
 	{
 		ITEM_INFO* currentItem = &Items[0];
 		__int32 k = 0;
@@ -36,7 +36,7 @@ void __cdecl InitialiseDemigod(__int16 itemNum)
 		}
 
 		item->itemFlags[0] = k;
-	}
+	}*/
 }
 
 void __cdecl DemigodControl(__int16 itemNum)
@@ -63,7 +63,7 @@ void __cdecl DemigodControl(__int16 itemNum)
 	__int16 joint2 = 0;
 	__int16 joint3 = 0;
 
-	if (CurrentLevel == 24)
+	/*if (CurrentLevel == 24)
 	{
 		ROOM_INFO* room = &Rooms[item->roomNumber];
 
@@ -83,7 +83,7 @@ void __cdecl DemigodControl(__int16 itemNum)
 			item->itemFlags[3] = Lara.location;
 			creature->enemy = NULL;
 		}
-	}
+	}*/
 
 	if (item->hitPoints <= 0)
 	{
@@ -122,12 +122,14 @@ void __cdecl DemigodControl(__int16 itemNum)
 		{
 			laraInfo.ahead = info.ahead;
 			laraInfo.angle = info.angle;
+			laraInfo.xAngle = 0;
 		}
 		else
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
 			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.xAngle = 0;
 
 			laraInfo.ahead = true;
 			if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
