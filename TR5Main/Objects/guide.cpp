@@ -53,7 +53,7 @@ void __cdecl GuideControl(__int16 itemNum)
 		GetJointAbsPosition(item, &pos, guideBiteInfo1.meshNum);
 
 		AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
-		SoundEffect(150, &item->pos, 0);
+		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 		GrenadeLauncherSpecialEffect1(pos.x, pos.y - 40, pos.z, -1, 7);
 
 		__int16 random = GetRandomControl();
@@ -635,7 +635,7 @@ void __cdecl GuideControl(__int16 itemNum)
 			{
 				item->requiredAnimState = 3;
 				item->swapMeshFlags |= 0x200000;
-				SoundEffect(194, &item->pos, 0);
+				SoundEffect(SFX_TR4_GUIDE_SCARED_ID194, &item->pos, 0);
 			}
 		}
 		else if (enemy->pos.yRot - item->pos.yRot <= ANGLE(2))

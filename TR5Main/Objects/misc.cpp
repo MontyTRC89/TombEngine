@@ -98,7 +98,7 @@ void __cdecl LaraDoubleControl(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	SoundEffect(12, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_1_ID12, &item->pos, 0);
 
 	if (CreatureActive(itemNum))
 	{

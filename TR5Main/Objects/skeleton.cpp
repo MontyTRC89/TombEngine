@@ -492,7 +492,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 					LaraItem->hitPoints -= 80;
 					LaraItem->hitStatus = true;
 					CreatureEffect2(item, &skeletonBite, 15, -1, DoBloodSplat);
-					SoundEffect(70, &item->pos, 0);
+					SoundEffect(SFX_LARA_THUD, &item->pos, 0);
 					creature->flags = 1;
 				}
 			}
@@ -540,7 +540,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 							if (abs(pos.x - staticMesh->x) < 1024 && abs(pos.z - staticMesh->z) < 1024 && staticMesh->staticNumber >= 50)
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
-								SoundEffect(347, &item->pos, 0);
+								SoundEffect(SFX_TR4_HIT_ROCK_ID347, &item->pos, 0);
 								staticMesh->Flags &= ~1;
 								floor->stopper = 0;
 								GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -556,7 +556,9 @@ void __cdecl SkeletonControl(__int16 itemNum)
 						LaraItem->hitPoints -= 80;
 						LaraItem->hitStatus = true;
 						CreatureEffect2(item, &skeletonBite, 10, item->pos.yRot, DoBloodSplat);
-						SoundEffect(70, &item->pos, 0);
+						
+						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
+						
 						creature->flags = 1;
 					}
 				}

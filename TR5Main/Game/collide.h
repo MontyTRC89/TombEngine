@@ -8,8 +8,8 @@
 #define LaraBaddieCollision ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00412170)
 #define TestBoundsCollide ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*, __int32)) 0x00412CC0)
 //#define GetCollidedObjects ((__int32 (__cdecl*)(ITEM_INFO*, __int32, __int32, ITEM_INFO**, MESH_INFO**, __int32)) 0x00413CF0)
-#define ItemPushLara ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, __int32, __int32)) 0x00446EC0)
-#define TestCollision ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x0045ED00)
+#define ItemPushLara ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, __int32, __int32)) 0x00412860)
+#define TestCollision ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x00479170)
 #define TestLaraPosition ((__int32 (__cdecl*)(__int16*, ITEM_INFO*, ITEM_INFO*)) 0x00413210)
 #define MoveLaraPosition ((__int32 (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x00413840)
 

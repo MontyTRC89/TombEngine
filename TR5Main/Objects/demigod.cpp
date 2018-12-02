@@ -513,6 +513,7 @@ void __cdecl DemigodControl(__int16 itemNum)
 
 void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int32 something)
 {
+	return;
 	__int16 fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != -1)
 	{
@@ -546,7 +547,7 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	__int16 animIndex = item->animNumber - Objects[item->animNumber].animIndex;
+	__int16 animIndex = item->animNumber - Objects[item->objectNumber].animIndex;
 
 	if (animIndex != 8 && animIndex != 16 && animIndex != 19)
 		return;

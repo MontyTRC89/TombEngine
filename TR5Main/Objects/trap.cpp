@@ -299,7 +299,7 @@ void __cdecl StargateControl(__int16 itemNum)
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(23, &item->pos, 0);
+		SoundEffect(SFX_TR4_STARGATE_SWIRL_ID23, &item->pos, 0);
 		item->itemFlags[0] = 57521664;
 		AnimateItem(item);
 	}
@@ -393,7 +393,7 @@ void __cdecl ControlSpikeWall(__int16 itemNum)
 		if (GetFloorHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
 		{
 			item->status = ITEM_DEACTIVATED;
-			StopSoundEffect(147);
+			StopSoundEffect(SFX_ROLLING_BALL);
 		}
 		else
 		{
@@ -401,7 +401,7 @@ void __cdecl ControlSpikeWall(__int16 itemNum)
 			item->pos.zPos = z;
 			if (roomNumber != item->roomNumber)
 				ItemNewRoom(itemNum, roomNumber);
-			SoundEffect(147, &item->pos, 0);
+			SoundEffect(SFX_ROLLING_BALL, &item->pos, 0);
 		}
 	}
 
@@ -562,8 +562,8 @@ void __cdecl SlicerDicerControl(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	SoundEffect(20, &item->pos, 0);
-	SoundEffect(12, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_2_ID20, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_1_ID12, &item->pos, 0);
 	
 	__int32 factor = (9 * COS(item->triggerFlags) << 9 >> W2V_SHIFT) * COS(item->pos.yRot) >> W2V_SHIFT;
 
@@ -644,9 +644,9 @@ void __cdecl MineControl(__int16 itemNum)
 	__int32 num = GetSpheres(item, SphereList, true);
 	if (item->itemFlags[0] >= 150)
 	{
-		SoundEffect(105, &item->pos, 0);
-		SoundEffect(106, &item->pos, 0);
-		SoundEffect(105, &item->pos, 0x1800004);
+		SoundEffect(SFX_EXPLOSION1, &item->pos, 0);
+		SoundEffect(SFX_EXPLOSION2, &item->pos, 0);
+		SoundEffect(SFX_EXPLOSION1, &item->pos, 0x1800004);
 
 		if (num > 0)
 		{
@@ -706,7 +706,7 @@ void __cdecl MineControl(__int16 itemNum)
 			sphere++;
 		}
 		
-		SoundEffect(150, &item->pos, 0);
+		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 	}
 }
 
@@ -734,7 +734,7 @@ void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->currentAnimState = 8;
 				l->speed = 0;
 
-				SoundEffect(103, &item->pos, 0);
+				SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY_ID103, &item->pos, 0);
 			}
 		}
 		else
@@ -771,7 +771,7 @@ void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					KillItem(i);
 
 					if (!(GetRandomControl() & 3))
-						SoundEffect(103, &currentItem->pos, 0);
+						SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY_ID103, &currentItem->pos, 0);
 
 					currentItem->status = ITEM_INVISIBLE;
 				}
@@ -859,7 +859,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 								item->itemFlags[0] = 2;
 
 								ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
-								SoundEffect(358, &item->pos, 0);
+								SoundEffect(SFX_TR4_AUTOGUNS_ID358, &item->pos, 0);
 
 								item->itemFlags[2] += 256;
 								if (item->itemFlags[2] > 6144)
@@ -926,8 +926,8 @@ void __cdecl SentryGunControl(__int16 itemNum)
 			for (__int32 i = 0; i < 2; i++)
 				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
 
-			SoundEffect(105, &item->pos, 25165828);
-			SoundEffect(106, &item->pos, 0);
+			SoundEffect(SFX_EXPLOSION1, &item->pos, 25165828);
+			SoundEffect(SFX_EXPLOSION2, &item->pos, 0);
 		}
 	}
 }

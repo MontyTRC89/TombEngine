@@ -128,7 +128,7 @@ void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else if (l->frameNumber == Anims[402].frameBase + 51)
 			{
-				SoundEffect(97, &l->pos, 0);
+				SoundEffect(SFX_TR4_POUR_ID97, &l->pos, 0);
 				item->pos.yRot = rotY;
 			}
 			else if (l->frameNumber == Anims[402].frameBase + 74)

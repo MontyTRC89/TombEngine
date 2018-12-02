@@ -157,8 +157,8 @@ void __cdecl QuadbikeExplode(ITEM_INFO* item)
 	KillItem(g_LaraExtra.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 
-	SoundEffect(105, NULL, 0);
-	SoundEffect(106, NULL, 0);
+	SoundEffect(SFX_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_EXPLOSION2, NULL, 0);
 
 	g_LaraExtra.Vehicle = NO_ITEM;
 }
