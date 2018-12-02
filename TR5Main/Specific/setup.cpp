@@ -692,8 +692,8 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 
-		Bones[obj->boneIndex + 24 * 4] |= ROT_X | ROT_Y;
-		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 24] |= ROT_X | ROT_Y;
+		Bones[obj->boneIndex + 28] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_DEMIGOD1];
@@ -714,8 +714,8 @@ void __cdecl NewObjects()
 		obj->hitEffect = 3;
 		obj->undead = true;
 
-		Bones[obj->boneIndex + 16 * 4] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 16] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 20] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_DEMIGOD2];
@@ -734,8 +734,8 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 
-		Bones[obj->boneIndex + 16 * 4] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 16] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 20] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_DEMIGOD3];
@@ -754,8 +754,8 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 
-		Bones[obj->boneIndex + 16 * 4] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 16] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 20] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_MINE];
@@ -834,8 +834,8 @@ void __cdecl NewObjects()
 
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex] |= ROT_X;
-		Bones[obj->boneIndex + 112] |= ROT_Y;
-		Bones[obj->boneIndex + 112] |= ROT_X;
+		Bones[obj->boneIndex + 28] |= ROT_Y;
+		Bones[obj->boneIndex + 28] |= ROT_X;
 	}
 
 	obj = &Objects[ID_HARPY];
@@ -898,6 +898,22 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 28] |= ROT_Y;
 		Bones[obj->boneIndex + 36] |= ROT_Y;
 		Bones[obj->boneIndex + 40] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_SPHINX];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSphinx;
+		obj->control = SphinxControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 1000;
+		obj->pivotLength = 500;
+		obj->radius = 512;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 	}
 }
 

@@ -9,6 +9,7 @@
 #include "..\Game\draw.h"
 #include "..\Game\sphere.h"
 #include "..\Game\people.h"
+#include "..\Game\debris.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };
@@ -33,6 +34,7 @@ BITE_INFO harpyBite3 = { 0, 0, 0, 21 };
 BITE_INFO harpyAttack1 = { 0, 128, 0, 2 };
 BITE_INFO harpyAttack2 = { 0, 128, 0, 4 };
 BITE_INFO crocodileBiteInfo = { 0, -156, 500, 9 };
+BITE_INFO sphinxBiteInfo = { 0, 0, 0, 6 };
 
 void __cdecl InitialiseWildBoar(__int16 itemNum)
 {
@@ -3487,4 +3489,228 @@ void __cdecl CrocodileControl(__int16 itemNum)
 		
 		return;
 	}
+}
+
+void __cdecl InitialiseSphinx(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	ClearItem(itemNum);
+
+	item->animNumber = Objects[item->animNumber].animIndex + 1;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->goalAnimState = 1;
+	item->currentAnimState = 1;
+}
+
+void __cdecl SphinxControl(__int16 itemNum)
+{
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item = &Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
+
+	__int32 x = item->pos.yPos + 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	__int32 y = item->pos.yPos;
+	__int32 z = item->pos.yPos + 614 * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	__int16 roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	__int32 height1 = GetFloorHeight(floor, x, y, z);
+
+	if (item->currentAnimState == 5 && floor->stopper)
+	{
+		ROOM_INFO* room = &Rooms[item->roomNumber];
+
+		for (__int32 i = 0; i < room->numMeshes; i++)
+		{
+			MESH_INFO* mesh = &room->mesh[i];
+
+			if (mesh->z >> 10 == z >> 10 && mesh->x >> 10 == x >> 10 && mesh->staticNumber >= 50)
+			{
+				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
+				SoundEffect(347, &item->pos, 0);
+
+				mesh->Flags &= ~0x100;
+				floor->stopper = false;
+
+				TestTriggers(TriggerIndex, 1, 0);
+			}
+		}
+	}
+
+	x = item->pos.xPos - 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	y = item->pos.yPos;
+	z = item->pos.zPos - 614 * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	roomNumber = item->roomNumber;
+
+	floor = GetFloor(x, y, z, &roomNumber);
+	__int32 height2= GetFloorHeight(floor, x, y, z);
+
+	ATAN(1228, height2 - height1);
+
+	if (item->aiBits)
+		GetAITarget(creature);
+	else
+		creature->enemy = LaraItem;
+
+	AI_INFO info;
+
+	CreatureAIInfo(item, &info);
+
+	if (creature->enemy != LaraItem)
+		ATAN(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos);
+
+	GetCreatureMood(item, &info, VIOLENT);
+	CreatureMood(item, &info, VIOLENT);
+
+	__int16 angle = CreatureTurn(item, creature->maximumTurn);
+
+	__int32 dx = abs(item->itemFlags[2] - item->pos.xPos);
+	__int32 dz = abs(item->itemFlags[3] - item->pos.zPos);
+
+	switch (item->currentAnimState)
+	{
+	case 1:
+		creature->maximumTurn = 0;
+
+		if (info.distance < SQUARE(1024) || item->triggerFlags)
+		{
+			item->goalAnimState = 3;
+		}
+		else if (GetRandomControl() == 0)
+		{
+			item->goalAnimState = 2;
+		}
+
+		break;
+
+	case 2:
+		creature->maximumTurn = 0;
+
+		if (info.distance < SQUARE(1024) || item->triggerFlags)
+		{
+			item->goalAnimState = 3;
+		}
+		else if (GetRandomControl() == 0)
+		{
+			item->goalAnimState = 1;
+		}
+
+		break;
+
+	case 4:
+		creature->maximumTurn = ANGLE(3);
+		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->requiredAnimState == 5)
+		{
+			item->goalAnimState = 5;
+		}
+		else if (info.distance < SQUARE(2048) && item->goalAnimState != 5)
+		{
+			if (height2 <= item->pos.yPos + 256 && height2 >= item->pos.yPos - 256)
+			{
+				item->goalAnimState = 9;
+				item->requiredAnimState = 6;
+			}
+		}
+
+		break;
+
+	case 5:
+		creature->maximumTurn = 60;
+
+		if (!creature->flags)
+		{
+			if (item->touchBits & 0x40)
+			{
+				CreatureEffect2(
+					item,
+					&sphinxBiteInfo,
+					20,
+					-1,
+					DoBloodSplat);
+
+				LaraItem->hitPoints -= 200;
+				creature->flags = 1;
+			}
+		}
+		if (dx >= 50 || dz >= 50 || item->animNumber != Objects[item->objectNumber].animIndex)
+		{
+			if (info.distance > SQUARE(2048) && abs(info.angle) > 512)
+			{
+				item->goalAnimState = 9;
+			}
+		}
+		else
+		{
+			item->goalAnimState = 7;
+			item->requiredAnimState = 6;
+			creature->maximumTurn = 0;
+		}
+
+		break;
+
+	case 6:
+		creature->maximumTurn = ANGLE(3);
+		if (info.distance > SQUARE(2048) || height2 > item->pos.yPos + 256 || height2 < item->pos.yPos - 256)
+		{
+			item->goalAnimState = 9;
+			item->requiredAnimState = 5;
+		}
+
+		break;
+
+	case 7:
+		//v32 = item->roomNumber;
+		//v36 = (signed __int16)item->currentAnimState - 1;
+		
+		roomNumber = item->roomNumber;
+		
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		{
+			TestTriggers(TriggerIndex, 1, 0);
+
+			if (item->touchBits & 0x40)
+			{
+				CreatureEffect2(
+					item,
+					&sphinxBiteInfo,
+					50,
+					-1,
+					DoBloodSplat);
+
+				LaraItem->hitPoints = 0;
+			}
+		}
+
+		break;
+
+	case 9:
+		creature->flags = 0;
+
+		if (item->requiredAnimState == 6)
+		{
+			item->goalAnimState = 6;
+		}
+		else
+		{
+			item->goalAnimState = 4;
+		}
+
+		break;
+
+	default:
+		break;
+	}
+
+	item->itemFlags[2] = item->pos.xPos;
+	item->itemFlags[3] = item->pos.zPos;
+
+	CreatureAnimation(itemNum, angle, 0);
 }

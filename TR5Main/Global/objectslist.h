@@ -43,7 +43,7 @@ typedef enum object_types {
 	ID_TWOGUN,
 	ID_SKELETON, // TR4 - Working on
 	ID_DOG,
-	ID_CROCODILE, // TR4
+	ID_CROCODILE, // TR4 - OK - Needs testing
 	ID_LARA_EXTRA_ANIMS, // TR1-2-3 - OK
 	ID_MUMMY, // TR4 - OK
 	ID_LARSON,
@@ -53,7 +53,7 @@ typedef enum object_types {
 	ID_MAFIA,
 	ID_GUIDE, // TR4 - OK - Needs testing
 	ID_MAFIA2,
-	ID_SPHINX, // TR4
+	ID_SPHINX, // TR4 - OK - Needs testing
 	ID_SAILOR,
 	ID_HORSEMAN, // TR4
 	ID_CRANE_GUY,
@@ -482,7 +482,7 @@ typedef enum object_types {
 	ID_VON_CROY,  // TR4
 	ID_SETHA, // TR4
 	ID_KNIGHT_TEMPLAR, // TR4 - OK - Needs testing
-	ID_SCORPION, // TR4 - OK - Needs testing
+	ID_SCORPION, // TR4 - OK
 	ID_NEW_SLOT_482, 
 	ID_AHMET, // TR4
 	ID_LARA_DOUBLE, // TR4 - OK - Needs testing
@@ -512,7 +512,7 @@ typedef enum object_types {
 	ID_LARA_PETROL_MESH, // TR4
 	ID_LARA_DIRT_MESH, // TR4
 	ID_JEAN_YVES, // TR4 - OK - Needs testing
-	ID_TROOPS, // TR4
+	ID_TROOPS, // TR4 - OK - Needs testing
 	ID_WRAITH1, // TR4
 	ID_WRAITH2, // TR4
 	ID_WRAITH3, // TR4

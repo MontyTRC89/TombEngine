@@ -173,6 +173,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	case ID_GREEN_TEETH:
 	case ID_ATTACK_SUB:
 	case ID_BAT:
+	case ID_HARPY:
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 16;
@@ -182,6 +183,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	case ID_SCUBA_DIVER:
 	case ID_SHARK:
 	case ID_BARRACUDA:
+	case ID_CROCODILE:
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 32;

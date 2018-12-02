@@ -993,3 +993,13 @@ void __cdecl SentryGunEffect(ITEM_INFO* item)
 		spark->size = spark->dSize >> 4;
 	}
 }
+
+void __cdecl InitialiseBurningFloor(__int16 itemNum)
+{
+	Items[itemNum].requiredAnimState = 127;
+}
+
+void __cdecl BurningFloorControl(__int16 itemNum)
+{
+
+}

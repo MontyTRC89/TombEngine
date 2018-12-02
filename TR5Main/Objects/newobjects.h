@@ -133,6 +133,10 @@ void __cdecl InitialiseGuide(__int16 itemNum);
 void __cdecl GuideControl(__int16 itemNum);
 void __cdecl InitialiseCrocodile(__int16 itemNum);
 void __cdecl CrocodileControl(__int16 itemNum);
+void __cdecl InitialiseSphinx(__int16 itemNum);
+void __cdecl SphinxControl(__int16 itemNum);
+void __cdecl InitialiseBurningFloor(__int16 itemNum);
+void __cdecl BurningFloorControl(__int16 itemNum);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);
