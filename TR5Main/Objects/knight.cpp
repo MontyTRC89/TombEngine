@@ -91,8 +91,8 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 	if (info.ahead)
 	{
 		joint0 = info.angle >> 1;
-		joint1 = info.angle >> 1;
-		joint2 = info.xAngle;
+		joint2 = info.angle >> 1;
+		joint1 = info.xAngle;
 	}
 
 	__int16 frameBase = 0;
@@ -106,9 +106,10 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 
 		item->goalAnimState = 2;
 
-		if (info.distance > SQUARE(682) && Lara.target == item)
+		if (info.distance > SQUARE(682))
 		{
-			item->goalAnimState = 6;
+			if (Lara.target == item)
+				item->goalAnimState = 6;
 		}
 		else if (GetRandomControl() & 1)
 		{
