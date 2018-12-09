@@ -1347,7 +1347,7 @@ bool Renderer::PrepareDataForTheRenderer()
 				moveable->ObjectMeshes.push_back(mesh);
 			}
 
-			__int32* bone = &MeshTrees[obj->boneIndex];
+			__int32* bone = &Bones[obj->boneIndex];
 
 			stack<shared_ptr<RendererBone>> stack;
 
@@ -1371,7 +1371,11 @@ bool Renderer::PrepareDataForTheRenderer()
 				int linkY = *(bone++);
 				int linkZ = *(bone++);
 
-				switch (opcode)
+				byte flags = opcode & 0x1C;
+
+				moveable->LinearizedBones[j]->ExtraRotationFlags = flags;
+
+				switch (opcode & 0x03)
 				{
 				case 0:
 					moveable->LinearizedBones[j]->Parent = currentBone;
@@ -2222,6 +2226,7 @@ void Renderer::updateItemsAnimations()
 
 		RendererItemToDraw* itemToDraw = m_itemsToDraw[i].get();
 		ITEM_INFO* item = itemToDraw->Item;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 		// Lara has her own routine
 		if (item->objectNumber == ID_LARA)
@@ -2233,9 +2238,39 @@ void Renderer::updateItemsAnimations()
 		// Update animation matrices
 		if (obj->animIndex != -1 && item->objectNumber != ID_HARPOON)
 		{
+			// Apply extra rotations
+			__int32 lastJoint = 0;
+			for (__int32 j = 0; j < moveableObj->LinearizedBones.size(); j++)
+			{
+				auto currentBone = moveableObj->LinearizedBones[j];
+				currentBone->ExtraRotation = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+				if (creature)
+				{
+					if (currentBone->ExtraRotationFlags & ROT_Y)
+					{
+						currentBone->ExtraRotation.y = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+						lastJoint++;
+					}
+
+					if (currentBone->ExtraRotationFlags & ROT_X)
+					{
+						currentBone->ExtraRotation.x = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+						lastJoint++;
+					}
+
+					if (currentBone->ExtraRotationFlags & ROT_Z)
+					{
+						currentBone->ExtraRotation.z = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+						lastJoint++;
+					}
+				}
+			}
+
 			__int16	*framePtr[2];
 			__int32 rate;
 			__int32 frac = GetFrame_D2(item, framePtr, &rate);
+
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 		}
 
@@ -5766,13 +5801,13 @@ void Renderer::updateAnimation(RendererItemToDraw* item, RendererObject* obj, __
 			D3DXMATRIX extraRotation;
 			D3DXMatrixRotationYawPitchRoll(&extraRotation, bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
 
-			if (bone != obj->Skeleton.get())
-				D3DXMatrixMultiply(&transforms[bone->Index], &extraRotation, &bone->Transform);
-			else
-				D3DXMatrixMultiply(&transforms[bone->Index], &extraRotation, &translation);
+			D3DXMatrixMultiply(&rotation, &extraRotation, &rotation);
 
-			D3DXMatrixMultiply(&transforms[bone->Index], &rotation, &transforms[bone->Index]);
-			
+			if (bone != obj->Skeleton.get())
+				D3DXMatrixMultiply(&transforms[bone->Index], &rotation, &bone->Transform);
+			else
+				D3DXMatrixMultiply(&transforms[bone->Index], &rotation, &translation);
+
 			if (bone != obj->Skeleton.get())
 				D3DXMatrixMultiply(&transforms[bone->Index], &transforms[bone->Index], &transforms[bone->Parent->Index]);
 		}

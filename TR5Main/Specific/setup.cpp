@@ -838,6 +838,28 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 28] |= ROT_X;
 	}
 
+	obj = &Objects[ID_SENTRY_GUN];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSentryGun;
+		obj->control = SentryGunControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 50;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->explodableMeshbits = 64;
+
+		Bones[obj->boneIndex + 0] |= ROT_Y;
+		Bones[obj->boneIndex + 1 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 2 * 4] |= ROT_Z;
+		Bones[obj->boneIndex + 3 * 4] |= ROT_Z;
+	}
+
 	obj = &Objects[ID_HARPY];
 	if (obj->loaded)
 	{

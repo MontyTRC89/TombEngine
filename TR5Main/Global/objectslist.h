@@ -481,7 +481,7 @@ typedef enum object_types {
 	ID_DIARY,
 	ID_VON_CROY,  // TR4
 	ID_SETHA, // TR4
-	ID_KNIGHT_TEMPLAR, // TR4 - OK - Needs testing
+	ID_KNIGHT_TEMPLAR, // TR4 - OK
 	ID_SCORPION, // TR4 - OK
 	ID_NEW_SLOT_482, 
 	ID_AHMET, // TR4

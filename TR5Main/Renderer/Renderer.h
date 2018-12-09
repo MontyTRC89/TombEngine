@@ -38,10 +38,12 @@ typedef struct RendererBone {
 	shared_ptr<RendererBone> Parent;
 	__int32 Index;
 	D3DXVECTOR3 ExtraRotation;
+	byte ExtraRotationFlags;
 
 	RendererBone(__int32 index)
 	{
 		Index = index;
+		ExtraRotationFlags = 0;
 		Translation = D3DXVECTOR3(0, 0, 0);
 		ExtraRotation = D3DXVECTOR3(0, 0, 0);
 	}

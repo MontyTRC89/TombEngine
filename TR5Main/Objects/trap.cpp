@@ -801,7 +801,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	AI_INFO info;
-	__int32 c;
+	__int32 c = 0;
 
 	if (creature)
 	{
@@ -835,6 +835,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 				item->pos.yPos += 512;
 
 				__int32 deltaAngle = info.angle - creature->jointRotation[0];
+				//printf("Angle: %d\n", (int)TR_ANGLE_TO_DEGREES(info.angle));
 
 				info.ahead = true;
 				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))
@@ -844,17 +845,18 @@ void __cdecl SentryGunControl(__int16 itemNum)
 				{
 					if (info.distance < SQUARE(9 * WALL_SIZE))
 					{
-						bool gotPuzzle = HaveIGotItemInInventory(ID_PUZZLE_ITEM5);
-
-						if (!gotPuzzle && !item->itemFlags[0])
+						if (!ObjectInInventory(ID_PUZZLE_ITEM5) && 
+							!item->itemFlags[0])
 						{
 							if (info.distance <= SQUARE(2048))
 							{
-								SentryGunEffect(item);
-								c = SIN((GlobalCounter & 0x1F) << 11) >> 2;
+								// Throw fire
+								SentryGunThrowFire(item);
+								c = 4 * rcossin_tbl[(GlobalCounter & 0x1F) << 11 >> 3] >> 2;
 							}
 							else
 							{
+								// Shot to Lara with bullets
 								c = 0;
 								item->itemFlags[0] = 2;
 
@@ -882,7 +884,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 							deltaAngle = ANGLE(10);
 						}
 
-						creature->jointRotation[0] = deltaAngle - info.xAngle;
+						creature->jointRotation[0] += deltaAngle;
 
 						CreatureJoint(item, 1, -info.xAngle);
 					}
@@ -890,7 +892,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 
 				item->itemFlags[2] -= 32;
 
-				if ((item->itemFlags[2] & 0x8000u) != 0)
+				if (item->itemFlags[2] < 0)
 				{
 					item->itemFlags[2] = 0;
 				}
@@ -906,6 +908,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 			}
 			else
 			{
+				// Stuck sentry gun 
 				CreatureJoint(item, 0, (GetRandomControl() & 0x7FF) - 1024);
 				CreatureJoint(item, 1, ANGLE(45));
 				CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45));
@@ -932,9 +935,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 	}
 }
 
-
-
-void __cdecl SentryGunEffect(ITEM_INFO* item)
+void __cdecl SentryGunThrowFire(ITEM_INFO* item)
 {
 	for (__int32 i = 0; i < 3; i++)
 	{

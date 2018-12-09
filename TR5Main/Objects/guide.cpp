@@ -117,7 +117,7 @@ void __cdecl GuideControl(__int16 itemNum)
 		laraInfo.xAngle = ATAN(dx + (dz >> 1), dy);
 	}
 
-	ITEM_INFO* enemy = NULL;
+	ITEM_INFO* foundEnemy = NULL;
 
 	if (item->currentAnimState < 4 || item->currentAnimState == 31)
 	{
@@ -132,25 +132,32 @@ void __cdecl GuideControl(__int16 itemNum)
 				continue;
 
 			ITEM_INFO* currentItem = &Items[baddie->itemNum];
-
-			dx = currentItem->pos.xPos - item->pos.xPos;
-			dy = currentItem->pos.yPos - item->pos.yPos;
-			dz = currentItem->pos.zPos - item->pos.zPos;
-
-			if (dx > 32000 || dx < -32000 || dz>32000 || dz < -32000)
-				distance = 0x7FFFFFFF;
-			else
-				distance = dx * dx + dz * dz;
-
-			if (distance < minDistance && distance < SQUARE(2048) &&
-				(dy < 256 || laraInfo.distance < SQUARE(2048) ||
-					currentItem->objectNumber == ID_DOG))
+			if (currentItem->objectNumber != ID_GUIDE &&
+				abs(currentItem->pos.yPos - item->pos.yPos) <= 512)
 			{
-				enemy = currentItem;
-				minDistance = distance;
+				dx = currentItem->pos.xPos - item->pos.xPos;
+				dy = currentItem->pos.yPos - item->pos.yPos;
+				dz = currentItem->pos.zPos - item->pos.zPos;
+
+				if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
+					distance = 0x7FFFFFFF;
+				else
+					distance = dx * dx + dz * dz;
+
+				if (distance < minDistance && distance < SQUARE(2048) &&
+					(dy < 256 || laraInfo.distance < SQUARE(2048) ||
+						currentItem->objectNumber == ID_DOG))
+				{
+					foundEnemy = currentItem;
+					minDistance = distance;
+				}
 			}
 		}
 	}
+
+	ITEM_INFO* enemy = creature->enemy;
+	if (foundEnemy)
+		creature->enemy = foundEnemy;
 
 	CreatureAIInfo(item, &info);
 
@@ -159,8 +166,11 @@ void __cdecl GuideControl(__int16 itemNum)
 
 	angle = CreatureTurn(item, creature->maximumTurn);
 
-	if (enemy)
+	if (foundEnemy)
+	{
 		creature->enemy = enemy;
+		enemy = foundEnemy;
+	}
 
 	bool someFlag = false;
 	FLOOR_INFO* floor;
@@ -168,9 +178,11 @@ void __cdecl GuideControl(__int16 itemNum)
 	__int16 frameNumber;
 	__int16 random;
 
+	printf("Guide state: %d\n", item->currentAnimState);
+
 	switch (item->currentAnimState)
 	{
-	case 0:
+	case 1:
 		creature->LOT.isJumping = false;
 		creature->flags = 0;
 		creature->maximumTurn = 0;
@@ -195,20 +207,20 @@ void __cdecl GuideControl(__int16 itemNum)
 		}
 		else if (Lara.location >= item->itemFlags[3] || item->itemFlags[1] != 2)
 		{
-			if (!creature->reachedGoal || enemy)
+			if (!creature->reachedGoal || foundEnemy)
 			{
 				if (item->swapMeshFlags == 0x40000)
 				{
 					item->goalAnimState = 40;
 				}
-				else if (enemy && info.distance < SQUARE(1024))
+				else if (foundEnemy && info.distance < SQUARE(1024))
 				{
 					if (info.bite)
 					{
 						item->goalAnimState = 31;
 					}
 				}
-				else if (enemy != LaraItem || info.distance > SQUARE(2048))
+				else if (true || enemy != LaraItem || info.distance > SQUARE(2048))
 				{
 					item->goalAnimState = 2;
 				}
@@ -217,7 +229,7 @@ void __cdecl GuideControl(__int16 itemNum)
 			{
 				if (!enemy->flags)
 				{
-					creature->reachedGoal = true;
+					creature->reachedGoal = false;
 					creature->enemy = NULL;
 					item->aiBits = FOLLOW;
 					item->itemFlags[3]++;
@@ -253,6 +265,7 @@ void __cdecl GuideControl(__int16 itemNum)
 					case 0x10:
 						if (laraInfo.distance < SQUARE(2048))
 						{
+							// Ignite torch
 							item->goalAnimState = 36;
 							item->requiredAnimState = 36;
 						}
@@ -292,6 +305,79 @@ void __cdecl GuideControl(__int16 itemNum)
 		break;
 
 	case 2:
+		creature->LOT.isJumping = false;
+
+		creature->maximumTurn = ANGLE(7);
+
+		if (laraInfo.ahead)
+		{
+			if (info.ahead)
+			{
+				joint2 = info.angle;
+			}
+		}
+		else
+		{
+			joint2 = laraInfo.angle;
+		}
+
+		if (item->itemFlags[1] == 1)
+		{
+			item->goalAnimState = 1;
+			item->requiredAnimState = 11; // Ignite torch
+		}
+		else if (creature->reachedGoal)
+		{
+			if (!creature->enemy->flags)
+			{
+				creature->reachedGoal = false;
+				creature->enemy = NULL;
+				item->aiBits = FOLLOW;
+				item->itemFlags[3]++;
+
+				break;
+			}
+			item->goalAnimState = 1;
+		}
+		else
+		{
+			if (Lara.location >= item->itemFlags[3])
+			{
+				if (!foundEnemy || info.distance >= 0x200000 && (item->swapMeshFlags & 0x40000 || info.distance >= 9437184))
+				{
+					if (creature->enemy == LaraItem)
+					{
+						if (info.distance >= 0x400000)
+						{
+							if (info.distance > 0x1000000)
+							{
+								item->goalAnimState = 3;
+							}
+						}
+						else
+						{
+							item->goalAnimState = 1;
+						}
+					}
+					else if (Lara.location > item->itemFlags[3] && laraInfo.distance > 0x400000)
+					{
+						item->goalAnimState = 3;
+					}
+				}
+				else
+				{
+					item->goalAnimState = 1;
+				}
+			}
+			else
+			{
+				item->goalAnimState = 1;
+			}
+		}
+
+		break;
+
+	case 3:
 		if (info.ahead)
 		{
 			joint2 = info.angle;
@@ -309,7 +395,7 @@ void __cdecl GuideControl(__int16 itemNum)
 		{
 			if (!enemy->flags)
 			{
-				creature->reachedGoal = true;
+				creature->reachedGoal = false;
 				creature->enemy = NULL;
 				item->aiBits = FOLLOW;
 				item->itemFlags[3]++;
@@ -318,7 +404,7 @@ void __cdecl GuideControl(__int16 itemNum)
 			}
 			item->goalAnimState = 1;
 		}
-		else if (enemy && (info.distance < 0x200000 || !(item->swapMeshFlags & 0x40000) && info.distance < SQUARE(3072)))
+		else if (foundEnemy && (info.distance < 0x200000 || !(item->swapMeshFlags & 0x40000) && info.distance < SQUARE(3072)))
 		{
 			item->goalAnimState = 1;
 			break;
@@ -326,7 +412,8 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 10:
+	case 11:
+		// Ignite torchjì
 		pos1.x = guideBiteInfo2.x;
 		pos1.y = guideBiteInfo2.y;
 		pos1.z = guideBiteInfo2.z;
@@ -397,7 +484,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 21:
+	case 22:
 		creature->maximumTurn = 0;
 
 		if (laraInfo.angle < -256)
@@ -407,7 +494,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 30:
+	case 31:
 		if (info.ahead)
 		{
 			joint0 = info.angle >> 1;
@@ -469,7 +556,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 34:
+	case 35:
 		creature->maximumTurn = 0;
 
 		if (laraInfo.angle > 256)
@@ -479,8 +566,8 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 35:
-	case 42:
+	case 36:
+	case 43:
 		if (enemy)
 		{
 			__int16 deltaAngle = enemy->pos.yRot - item->pos.yRot;
@@ -508,7 +595,7 @@ void __cdecl GuideControl(__int16 itemNum)
 				GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 				TestTriggers(TriggerIndex, 1, 0);
 
-				creature->reachedGoal = true;
+				creature->reachedGoal = false;
 				creature->enemy = NULL;
 				item->aiBits = FOLLOW;
 				item->itemFlags[3]++;
@@ -519,7 +606,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 36:
+	case 37:
 		if (item->frameNumber == Anims[item->animNumber].frameBase)
 		{
 			someFlag = true;
@@ -550,16 +637,18 @@ void __cdecl GuideControl(__int16 itemNum)
 				{
 					break;
 				}
+
+				currentItemNumber = currentItem->nextItem;
 			}
 
 			if (currentItem != NULL)
-				currentItem->meshBits = -3;
+				currentItem->meshBits = 0xFFFFFFFD;
 		}
 
 		item->itemFlags[1] = 1;
 		if (someFlag)
 		{
-			creature->reachedGoal = true;
+			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
 			item->itemFlags[3]++;
@@ -567,7 +656,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 37:
+	case 38:
 		if (item->frameNumber == Anims[item->animNumber].frameBase)
 		{
 			item->pos.xPos = enemy->pos.xPos;
@@ -586,7 +675,7 @@ void __cdecl GuideControl(__int16 itemNum)
 				item->pos.yRot = enemy->pos.yRot;
 				//goto LABEL_222;
 
-				creature->reachedGoal = true;
+				creature->reachedGoal = false;
 				creature->enemy = NULL;
 				item->aiBits = FOLLOW;
 				item->itemFlags[3]++;
@@ -611,7 +700,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 38:
+	case 39:
 		if (item->frameNumber >= Anims[item->animNumber].frameBase + 20)
 		{
 			if (item->frameNumber == Anims[item->animNumber].frameBase + 20)
@@ -623,7 +712,7 @@ void __cdecl GuideControl(__int16 itemNum)
 				TestTriggers(TriggerIndex, 1, 0);
 
 				// LABEL_222
-				creature->reachedGoal = true;
+				creature->reachedGoal = false;
 				creature->enemy = NULL;
 				item->aiBits = FOLLOW;
 				item->itemFlags[3]++;
@@ -652,7 +741,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 39:
+	case 40:
 		creature->LOT.isJumping;
 		creature->maximumTurn = ANGLE(7);
 
@@ -674,7 +763,7 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		if (!enemy->flags)
 		{
-			creature->reachedGoal = true;
+			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
 			item->itemFlags[3]++;
@@ -688,7 +777,7 @@ void __cdecl GuideControl(__int16 itemNum)
 			TestTriggers(TriggerIndex, 1, 0);
 
 			//LABEL_222:
-			creature->reachedGoal = true;
+			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
 			item->itemFlags[3]++;
@@ -706,8 +795,8 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		break;
 
-	case 40:
 	case 41:
+	case 42:
 		creature->maximumTurn = 0;
 		MoveCreature3DPos(&item->pos, &enemy->pos, 15, enemy->pos.yRot - item->pos.yRot, ANGLE(10));
 

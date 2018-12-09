@@ -1,8 +1,7 @@
 #pragma once
 
 // Legacy stuff
-#define InitialiseInventory ((void (__cdecl*)()) 0x0045FEF0)
-#define HaveIGotItemInInventory ((__int32 (__cdecl*)(__int16)) 0x0043E760)
+#define ObjectInInventory ((__int32 (__cdecl*)(__int16)) 0x00464360)
 
 void Inject_Inventory();
 
