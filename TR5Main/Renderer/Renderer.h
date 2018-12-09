@@ -608,6 +608,7 @@ class Renderer
 	void							drawDrips();
 	void							drawBubbles();
 	void							drawSplahes();
+	void							drawShockwaves();
 	void							drawRipples();
 	void							drawUnderwaterDust();
 	bool							drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);

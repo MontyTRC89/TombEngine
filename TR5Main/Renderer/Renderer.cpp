@@ -3645,6 +3645,7 @@ bool Renderer::drawScene(bool dump)
 	drawRipples();
 	drawUnderwaterDust();
 	drawSplahes();
+	drawShockwaves();
 
 	// Do weather
 	if (level->Rain)
@@ -5478,6 +5479,52 @@ bool Renderer::isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
 	return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
 			y >= r->maxceiling && y <= r->minfloor &&
 			z >= r->z && z <= r->z + r->ySize * 1024.0f);
+}
+
+void Renderer::drawShockwaves()
+{
+	for (__int32 i = 0; i < 16; i++)
+	{
+		SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
+
+		if (shockwave->life)
+		{
+			byte color = shockwave->life * 8;
+
+			// Inner circle
+			float angle = PI / 16.0f;
+			float c = cos(angle);
+			float s = sin(angle);
+			float x1 = shockwave->x + (shockwave->innerRad * c);
+			float z1 = shockwave->z + (shockwave->innerRad * s);
+			float x4 = shockwave->x + (shockwave->outerRad * c);
+			float z4 = shockwave->z + (shockwave->outerRad * s);
+			angle -= PI / 4.0f;
+
+			for (__int32 j = 0; j < 8; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				float x2 = shockwave->x + (shockwave->innerRad * c);
+				float z2 = shockwave->z + (shockwave->innerRad * s);
+				float x3 = shockwave->x + (shockwave->outerRad * c);
+				float z3 = shockwave->z + (shockwave->outerRad * s);
+				angle -= PI / 4.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8].get(),
+					x1, shockwave->y, z1,
+					x2, shockwave->y, z2,
+					x3, shockwave->y, z3,
+					x4, shockwave->y, z4,
+					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+				x4 = x3;
+				z4 = z3;
+			}
+		}
+	}
 }
 
 void Renderer::drawSplahes()
