@@ -4036,14 +4036,17 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 	else
 		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
 	 
+	__int32 bits = 1;
+
 	for (__int32 i = 0; i < moveableObj->ObjectMeshes.size(); i++)
 	{
 		RendererMesh* mesh = moveableObj->ObjectMeshes[i].get();
 
 		// Is mesh visible?
-		//bool isVisible = (itemToDraw->Item->meshBits >> i) & 1;
-		//if (!isVisible)
-		//	continue;
+		bool isVisible = itemToDraw->Item->meshBits & bits;
+		bits <<= 1;
+		if (!isVisible)
+			continue;
 
 		if (itemToDraw->Item->objectNumber == ID_BADDY1)
 		{

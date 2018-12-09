@@ -23,7 +23,7 @@ void __cdecl InitialiseKnightTemplar(__int16 itemNum)
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->meshBits &= 0xF700;
+	item->meshBits &= 0xF7FF;
 }
 
 void __cdecl KnightTemplarControl(__int16 itemNum)

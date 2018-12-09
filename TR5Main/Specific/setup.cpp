@@ -692,8 +692,8 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 
-		Bones[obj->boneIndex + 24] |= ROT_X | ROT_Y;
-		Bones[obj->boneIndex + 28] |= ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_DEMIGOD1];
@@ -714,8 +714,8 @@ void __cdecl NewObjects()
 		obj->hitEffect = 3;
 		obj->undead = true;
 
-		Bones[obj->boneIndex + 16] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 20] |= ROT_Y;
+		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_DEMIGOD2];
@@ -734,8 +734,8 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 
-		Bones[obj->boneIndex + 16] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 20] |= ROT_Y;
+		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_DEMIGOD3];
@@ -754,8 +754,8 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 
-		Bones[obj->boneIndex + 16] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 20] |= ROT_Y;
+		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
+		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_MINE];
@@ -832,10 +832,8 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex] |= ROT_X;
-		Bones[obj->boneIndex + 28] |= ROT_Y;
-		Bones[obj->boneIndex + 28] |= ROT_X;
+		Bones[obj->boneIndex] |= ROT_X | ROT_Y;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_X | ROT_Y;
 	}
 
 	obj = &Objects[ID_SENTRY_GUN];
@@ -891,8 +889,8 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 24] |= ROT_X | ROT_Y;
-		Bones[obj->boneIndex + 80] |= ROT_X | ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
+		Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
 
 		// TODO: check if constants are byte, __int16 or __int32
 		Meshes[obj->meshIndex + 124] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 120];
@@ -917,9 +915,9 @@ void __cdecl NewObjects()
 		obj->waterCreature = true;
 
 		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 28] |= ROT_Y;
-		Bones[obj->boneIndex + 36] |= ROT_Y;
-		Bones[obj->boneIndex + 40] |= ROT_Y;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_SPHINX];
