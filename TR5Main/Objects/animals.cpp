@@ -2720,7 +2720,7 @@ void __cdecl HarpyControl(__int16 itemNum)
 			break;
 
 		case 2:
-			creature->maximumTurn = 1274;
+			creature->maximumTurn = ANGLE(7);
 			creature->flags = 0;
 
 			if (item->requiredAnimState)
@@ -2735,6 +2735,28 @@ void __cdecl HarpyControl(__int16 itemNum)
 			if (item->hitStatus)
 			{
 				item->goalAnimState = 7;
+				break;
+			}
+			if (info.ahead)
+			{
+				if (info.distance >= SQUARE(341))
+				{
+					if (info.ahead && info.distance >= SQUARE(2048) &&
+						info.distance > SQUARE(3584) && GetRandomControl() & 1)
+					{
+						item->goalAnimState = 8;
+						item->itemFlags[0] = 0;
+					}
+					else
+					{
+						item->goalAnimState = 4;
+					}
+				}
+				else
+				{
+					item->goalAnimState = 6;
+				}
+
 				break;
 			}
 			if (GetRandomControl() & 1)
@@ -2768,8 +2790,7 @@ void __cdecl HarpyControl(__int16 itemNum)
 			break;
 
 		case 3:
-			if (!creature->enemy || creature->enemy->pos.yPos < item->pos.yPos + 2048 
-				|| item->floor < item->pos.yPos + 2048)
+			if (!creature->enemy || creature->enemy->pos.yPos < item->pos.yPos + 2048)
 			{
 				item->goalAnimState = 1;
 			}
@@ -2855,7 +2876,7 @@ void __cdecl HarpyControl(__int16 itemNum)
 
 		case 8:
 			// Flame attack
-
+			HarpyAttack(item, itemNum);
 			break;
 
 		case 12:
@@ -3060,6 +3081,7 @@ void __cdecl HarpyBubbles(PHD_3DPOS* pos, __int16 roomNumber, __int32 count)
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
 		fx->flag1 = count;
 		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 2 * count;
+		int hh = 0;
 	}
 }
 
@@ -3558,7 +3580,6 @@ void __cdecl SphinxControl(__int16 itemNum)
 		creature->enemy = LaraItem;
 
 	AI_INFO info;
-
 	CreatureAIInfo(item, &info);
 
 	if (creature->enemy != LaraItem)
@@ -3581,7 +3602,8 @@ void __cdecl SphinxControl(__int16 itemNum)
 		{
 			item->goalAnimState = 3;
 		}
-		else if (GetRandomControl() == 0)
+		
+		if (GetRandomControl() == 0)
 		{
 			item->goalAnimState = 2;
 		}
@@ -3595,7 +3617,8 @@ void __cdecl SphinxControl(__int16 itemNum)
 		{
 			item->goalAnimState = 3;
 		}
-		else if (GetRandomControl() == 0)
+		
+		if (GetRandomControl() == 0)
 		{
 			item->goalAnimState = 1;
 		}

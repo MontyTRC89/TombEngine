@@ -370,23 +370,72 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 		return false;
 
 	// Initialise the main render target for scene dump
-	m_renderTarget = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
-	if (m_renderTarget->GetTexture() == NULL)
+	m_renderTarget = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_renderTarget, NULL);
+	if (res != S_OK)
 		return false;
 
 	// Initialise the shadow map
-	m_shadowMap = make_shared<RenderTarget2D>(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFORMAT::D3DFMT_R32F);
-	if (m_shadowMap->GetTexture() == NULL)
+	m_shadowMap = NULL;
+	res = m_device->CreateTexture(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_shadowMap, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_shadowMapZBuffer = NULL;
+	res = m_device->CreateDepthStencilSurface(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, true, &m_shadowMapZBuffer, NULL);
+	if (res != S_OK)
 		return false;
 
 	// Initialise stuff for the new light pre-pass renderer
-	m_depthBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_R32F);
-	m_normalBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
-	m_colorBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
-	m_outputBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
-	m_lightBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
-	m_vertexLightBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
-	m_postprocessBuffer = make_shared<RenderTarget2D>(m_device, ScreenWidth, ScreenHeight, D3DFORMAT::D3DFMT_A8R8G8B8);
+	m_backBufferTarget = NULL;
+	res = m_device->GetRenderTarget(0, &m_backBufferTarget);
+	if (res != S_OK)
+		return false;
+
+	m_backBufferDepth = NULL;
+	res = m_device->GetDepthStencilSurface(&m_backBufferDepth);
+	if (res != S_OK)
+		return false;
+
+	m_zBuffer = NULL;
+	res = m_device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, true, &m_zBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_depthBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_depthBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_normalBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_normalBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_colorBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_colorBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_outputBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_outputBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_lightBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_lightBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_vertexLightBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_vertexLightBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_postprocessBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_postprocessBuffer, NULL);
+	if (res != S_OK)
+		return false;
 
 	m_shaderClearGBuffer = make_shared<Shader>(m_device, (char*)"Shaders\\ClearGBuffer.fx");
 	m_shaderClearGBuffer->Compile();
@@ -1796,7 +1845,10 @@ void Renderer::collectRooms()
 			m_rooms[i]->Visited = false;
 
 	m_roomsToDraw.clear();
-	getVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
+	for (__int32 i = 0; i < NumberRooms; i++)
+		m_roomsToDraw.push_back(i);
+
+	//getVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
 }
 
 void Renderer::collectItems()
@@ -1911,7 +1963,7 @@ void Renderer::prepareShadowMap()
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &m_lightProjection);
 
 	// Bind the shadow map
-	m_shadowMap->Bind();
+	bindRenderTargets(m_shadowMap, NULL, NULL, NULL, m_shadowMapZBuffer);
 
 	// Begin the scene 
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
@@ -1970,8 +2022,6 @@ void Renderer::prepareShadowMap()
 	}
 
 	m_device->EndScene();
-	m_shadowMap->Unbind();
-
 	effect->End();
 }
 
@@ -2485,7 +2535,8 @@ void Renderer::drawDebugInfo()
 		printDebugMessage(10, 370 + y, 255, 255, 255, 255, m_message);
 
 		sprintf_s(&m_message[0], 255, "Update = %d, ShadowMap = %d, Clear = %d, Fill = %d, Light = %d, Final = %d, Z-Buffer = %d",
-			m_timeUpdate, m_timePrepareShadowMap, m_timeClearGBuffer, m_timeFillGBuffer, m_timeLight, m_timeCombine, m_timeReconstructZBuffer);
+			m_timeUpdate / 1000, m_timePrepareShadowMap / 1000, m_timeClearGBuffer / 1000, m_timeFillGBuffer / 1000, m_timeLight / 1000, m_timeCombine / 1000, 
+			m_timeReconstructZBuffer / 1000);
 		printDebugMessage(10, 380 + y, 255, 255, 255, 255, m_message);
 
 		sprintf_s(&m_message[0], 255, "DrawCalls = %d", m_numDrawCalls);
@@ -2509,13 +2560,13 @@ void Renderer::drawDebugInfo()
 		D3DXMatrixScaling(&scale, 150.0f / 800.0f, 150.0f / 800.0f, 150.0f / 800.0f);
 
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_colorBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_colorBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_normalBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_normalBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_vertexLightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_vertexLightBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_lightBuffer->GetTexture(), NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_lightBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
 
 		m_dxSprite->End();
 	}
@@ -2540,7 +2591,7 @@ __int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool reset)
 	m_device->BeginScene();
 	
 	m_dxSprite->Begin(0);
-	m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 128, 128, 128));
+	m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 128, 128, 128));
 	m_dxSprite->End();
 
 	PrintString(400, 200, (char*)"Paused", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
@@ -2568,7 +2619,7 @@ __int32	Renderer::DrawStatisticsMenu()
 	m_device->BeginScene();
 
 	m_dxSprite->Begin(0);
-	m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+	m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
 	m_dxSprite->End();
 
 	PrintString(400, 140, (char*)"Statistics", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
@@ -2727,7 +2778,7 @@ __int32	Renderer::DrawLoadGameMenu(__int32 selectedIndex, bool resetBlink)
 	m_device->BeginScene();
 
 	m_dxSprite->Begin(0);
-	m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+	m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
 	m_dxSprite->End();
 
 	PrintString(400, 20, (char*)"Load game", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
@@ -2775,7 +2826,7 @@ __int32 Renderer::drawInventoryScene()
 	rect.bottom = ScreenHeight;
 
 	// Clear screen
-	bindRenderTargets(m_outputBuffer.get(), NULL, NULL, NULL);
+	bindRenderTargets(m_outputBuffer, NULL, NULL, NULL, m_backBufferDepth);
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 	m_device->BeginScene();
 
@@ -2795,7 +2846,7 @@ __int32 Renderer::drawInventoryScene()
 
 		m_dxSprite->Begin(0);
 		m_dxSprite->SetTransform(&m_tempScale);
-		m_dxSprite->Draw(m_renderTarget->GetTexture(), &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+		m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
 		m_dxSprite->End();
 	} 
 
@@ -3172,7 +3223,7 @@ bool Renderer::drawScene(bool dump)
 	m_device->SetVertexDeclaration(m_vertexDeclaration);
 
 	// Clear the G-Buffer
-	bindRenderTargets(m_colorBuffer.get(), m_normalBuffer.get(), m_depthBuffer.get(), m_vertexLightBuffer.get());
+	bindRenderTargets(m_colorBuffer, m_normalBuffer, m_depthBuffer, m_vertexLightBuffer, m_zBuffer);
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_COLORVALUE(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
 	effect = m_shaderClearGBuffer->GetEffect();
@@ -3210,6 +3261,9 @@ bool Renderer::drawScene(bool dump)
 	// Draw opaque geometry
 	if (level->Horizon)
 		drawHorizonAndSky();
+
+	// Bind Z-Buffer
+	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3342,7 +3396,7 @@ bool Renderer::drawScene(bool dump)
 	   
 	// Bind the light target
 	restoreBackBuffer();
-	bindRenderTargets(m_lightBuffer.get(), NULL, NULL, NULL);
+	bindRenderTargets(m_lightBuffer, NULL, NULL, NULL, m_backBufferDepth);
 	
 	effect = m_shaderLight->GetEffect();
 
@@ -3361,9 +3415,9 @@ bool Renderer::drawScene(bool dump)
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "ViewProjectionInverse"), &m_inverseViewProjection);
 	          
-	effect->SetTexture(effect->GetParameterByName(NULL, "ColorMap"), m_colorBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "NormalMap"), m_normalBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "DepthMap"), m_depthBuffer->GetTexture());
+	effect->SetTexture(effect->GetParameterByName(NULL, "ColorMap"), m_colorBuffer);
+	effect->SetTexture(effect->GetParameterByName(NULL, "NormalMap"), m_normalBuffer);
+	effect->SetTexture(effect->GetParameterByName(NULL, "DepthMap"), m_depthBuffer);
 	
 	effect->SetBool(effect->GetParameterByName(NULL, "AmbientPass"), false);
 	effect->SetVector(effect->GetParameterByName(NULL, "CameraPosition"), &D3DXVECTOR4(Camera.pos.x, Camera.pos.y, Camera.pos.z, 1.0f));
@@ -3417,9 +3471,9 @@ bool Renderer::drawScene(bool dump)
 	restoreBackBuffer();
 	         
 	if (dump)
-		bindRenderTargets(m_renderTarget.get(), NULL, NULL, NULL);
+		bindRenderTargets(m_renderTarget, NULL, NULL, NULL, m_backBufferDepth);
 	else
-		bindRenderTargets(m_outputBuffer.get(), NULL, NULL, NULL);
+		bindRenderTargets(m_outputBuffer, NULL, NULL, NULL, m_backBufferDepth);
 
 	// Combine stage
 	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
@@ -3431,10 +3485,10 @@ bool Renderer::drawScene(bool dump)
 	m_device->BeginScene();
 	effect->Begin(&cPasses, 0);
 
-	effect->SetTexture(effect->GetParameterByName(NULL, "ColorMap"), m_colorBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "LightMap"), m_lightBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "VertexColorMap"), m_vertexLightBuffer->GetTexture());
-	effect->SetTexture(effect->GetParameterByName(NULL, "NormalMap"), m_normalBuffer->GetTexture());
+	effect->SetTexture(effect->GetParameterByName(NULL, "ColorMap"), m_colorBuffer);
+	effect->SetTexture(effect->GetParameterByName(NULL, "LightMap"), m_lightBuffer);
+	effect->SetTexture(effect->GetParameterByName(NULL, "VertexColorMap"), m_vertexLightBuffer);
+	effect->SetTexture(effect->GetParameterByName(NULL, "NormalMap"), m_normalBuffer);
 	effect->SetFloat(effect->GetParameterByName(NULL, "HalfPixelX"), m_halfPixelX);
 	effect->SetFloat(effect->GetParameterByName(NULL, "HalfPixelY"), m_halfPixelY);
 	     
@@ -3446,8 +3500,8 @@ bool Renderer::drawScene(bool dump)
 		effect->SetMatrix(effect->GetParameterByName(NULL, "LightProjection"), &m_lightProjection);
 		effect->SetVector(effect->GetParameterByName(NULL, "LightPosition"), &m_shadowLight->Position);
 		effect->SetFloat(effect->GetParameterByName(NULL, "LightOut"), m_shadowLight->Out);
-		effect->SetTexture(effect->GetParameterByName(NULL, "ShadowMap"), m_shadowMap->GetTexture());
-		effect->SetTexture(effect->GetParameterByName(NULL, "DepthMap"), m_depthBuffer->GetTexture());
+		effect->SetTexture(effect->GetParameterByName(NULL, "ShadowMap"), m_shadowMap);
+		effect->SetTexture(effect->GetParameterByName(NULL, "DepthMap"), m_depthBuffer);
 	}
 	else
 	{
@@ -3467,106 +3521,7 @@ bool Renderer::drawScene(bool dump)
 	time1 = time2;
 
 	// Clear depth and start reconstructing Z-Buffer
-	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0);
-
-	// We need to use alpha blending because we need to write only to the Z-Buffer
-	//setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_SPECIAL_Z_BUFFER);
-	// TODO: if I use setBlendSTate probably it's overridden later and I see a black screen
-	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-
-	effect = m_shaderReconstructZBuffer->GetEffect();
-	m_device->BeginScene();
-	effect->Begin(&cPasses, 0);
-
-	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
-	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
-
-	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
-	{
-		RendererRoom* room = m_rooms[m_roomsToDraw[i]].get();
-		if (room == NULL)
-			continue;
-
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
-		
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, true);
-
-		// Draw static objects
-		ROOM_INFO* r = room->Room;
-		if (r->numMeshes != 0)
-		{
-			for (__int32 j = 0; j < r->numMeshes; j++)
-			{
-				MESH_INFO* sobj = &r->mesh[j];
-				RendererObject* staticObj = m_staticObjects[sobj->staticNumber].get();
-				RendererMesh* staticMesh = staticObj->ObjectMeshes[0].get();
-
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-			}
-		}
-	}
-
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-
-	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
-	{
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	}
-
-	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
-	{
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	}
-
-	// Draw alpha tested geometry
-	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
-	{
-		RendererRoom* room = m_rooms[m_roomsToDraw[i]].get();
-		if (room == NULL)
-			continue;
-
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH, false);
-
-		// Draw static objects
-		ROOM_INFO* r = room->Room;
-		if (r->numMeshes != 0)
-		{
-			for (__int32 j = 0; j < r->numMeshes; j++)
-			{
-				MESH_INFO* sobj = &r->mesh[j];
-				RendererObject* staticObj = m_staticObjects[sobj->staticNumber].get();
-				RendererMesh* staticMesh = staticObj->ObjectMeshes[0].get();
-
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-			}
-		}
-	}
-
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-
-	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
-	{
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	}
-
-	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
-	{
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH);
-	}
-
-	m_device->EndScene();
-	effect->End();
+	m_device->SetDepthStencilSurface(m_zBuffer);
 
 	// Transparent pass:
 	effect = m_shaderTransparent->GetEffect();
@@ -3709,24 +3664,14 @@ bool Renderer::drawScene(bool dump)
 	return true;
 }
 
-bool Renderer::bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, RenderTarget2D* rt3, RenderTarget2D* rt4)
+bool Renderer::bindRenderTargets(LPDIRECT3DTEXTURE9 rt1, LPDIRECT3DTEXTURE9 rt2, LPDIRECT3DTEXTURE9 rt3, LPDIRECT3DTEXTURE9 rt4, LPDIRECT3DSURFACE9 zBuffer)
 {
 	HRESULT res;
-
-	m_backBufferTarget = NULL;
-	res = m_device->GetRenderTarget(0, &m_backBufferTarget);
-	if (res != S_OK)
-		return false;
-
-	m_backBufferDepth = NULL;
-	res = m_device->GetDepthStencilSurface(&m_backBufferDepth);
-	if (res != S_OK)
-		return false;
 
 	if (rt1 != NULL)
 	{
 		LPDIRECT3DSURFACE9 surface;
-		res = rt1->GetTexture()->GetSurfaceLevel(0, &surface);
+		res = rt1->GetSurfaceLevel(0, &surface);
 		if (res != S_OK)
 			return false;
 
@@ -3740,7 +3685,7 @@ bool Renderer::bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, Rende
 	if (rt2 != NULL)
 	{
 		LPDIRECT3DSURFACE9 surface;
-		res = rt2->GetTexture()->GetSurfaceLevel(0, &surface);
+		res = rt2->GetSurfaceLevel(0, &surface);
 		if (res != S_OK)
 			return false;
 
@@ -3754,7 +3699,7 @@ bool Renderer::bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, Rende
 	if (rt3 != NULL)
 	{
 		LPDIRECT3DSURFACE9 surface;
-		res = rt3->GetTexture()->GetSurfaceLevel(0, &surface);
+		res = rt3->GetSurfaceLevel(0, &surface);
 		if (res != S_OK)
 			return false;
 
@@ -3768,7 +3713,7 @@ bool Renderer::bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, Rende
 	if (rt4 != NULL)
 	{
 		LPDIRECT3DSURFACE9 surface;
-		res = rt4->GetTexture()->GetSurfaceLevel(0, &surface);
+		res = rt4->GetSurfaceLevel(0, &surface);
 		if (res != S_OK)
 			return false;
 
@@ -3777,6 +3722,13 @@ bool Renderer::bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, Rende
 			return false;
 
 		surface->Release();
+	}
+
+	if (zBuffer != NULL)
+	{
+		res = m_device->SetDepthStencilSurface(zBuffer);
+		if (res != S_OK)
+			return false;
 	}
 
 	return true;
@@ -4423,7 +4375,7 @@ void Renderer::collectLights()
 				continue;
 
 			// Check only lights different from sun
-			if (room->Lights[j]->Type != LIGHT_TYPES::LIGHT_TYPE_SUN)
+			/*if (room->Lights[j]->Type != LIGHT_TYPES::LIGHT_TYPE_SUN)
 			{
 				// Now check if lights are touching items
 				bool isTouchingItem = false;
@@ -4453,7 +4405,7 @@ void Renderer::collectLights()
 				// If the light is not touching an item, then discard it
 				if (!isTouchingItem)
 					continue;
-			}
+			}*/
 
 			m_lights.push_back(room->Lights[j]);
 		}
@@ -5492,16 +5444,16 @@ void Renderer::drawShockwaves()
 			byte color = shockwave->life * 8;
 
 			// Inner circle
-			float angle = PI / 16.0f;
+			float angle = PI / 32.0f;
 			float c = cos(angle);
 			float s = sin(angle);
 			float x1 = shockwave->x + (shockwave->innerRad * c);
 			float z1 = shockwave->z + (shockwave->innerRad * s);
 			float x4 = shockwave->x + (shockwave->outerRad * c);
 			float z4 = shockwave->z + (shockwave->outerRad * s);
-			angle -= PI / 4.0f;
+			angle -= PI / 8.0f;
 
-			for (__int32 j = 0; j < 8; j++)
+			for (__int32 j = 0; j < 16; j++)
 			{
 				c = cos(angle);
 				s = sin(angle);
@@ -5509,7 +5461,7 @@ void Renderer::drawShockwaves()
 				float z2 = shockwave->z + (shockwave->innerRad * s);
 				float x3 = shockwave->x + (shockwave->outerRad * c);
 				float z3 = shockwave->z + (shockwave->outerRad * s);
-				angle -= PI / 4.0f;
+				angle -= PI / 8.0f;
 
 				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8].get(),
 					x1, shockwave->y, z1,
@@ -5961,7 +5913,7 @@ __int32 Renderer::drawFinalPass()
 	m_device->BeginScene();
 	effect->Begin(&cPasses, 0);
 
-	effect->SetTexture(effect->GetParameterByName(NULL, "Texture"), m_outputBuffer->GetTexture());
+	effect->SetTexture(effect->GetParameterByName(NULL, "Texture"), m_outputBuffer);
 	effect->SetFloat(effect->GetParameterByName(NULL, "FadeFactor"), m_fadeFactor);
 	effect->SetBool(effect->GetParameterByName(NULL, "CinematicBars"), m_cinematicBars);
 	

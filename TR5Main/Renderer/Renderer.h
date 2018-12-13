@@ -9,16 +9,13 @@
 #include <map>
 #include <memory>
 
-#include "ShadowMapTarget.h"
-#include "MainShader.h"
-#include "DepthShader.h"
-#include "RenderTarget2D.h"
 #include "RenderTargetCube.h"
 #include "Enums.h"
 #include "Structs.h"
 #include "RendererBucket.h"
 #include "RendererMesh.h"
 #include "RendererObject.h"
+#include "Shader.h"
 
 #define PI 3.14159265358979323846f
 #define RADIAN 0.01745329252f
@@ -478,7 +475,6 @@ class Renderer
 	__int16							m_numHairIndices;
 	vector<RendererVertex>			m_hairVertices;
 	vector<__int32>					m_hairIndices;
-	shared_ptr<RenderTarget2D>		m_renderTarget;
 	__int32							m_blinkColorValue;
 	__int32							m_blinkColorDirection;
 	bool							m_needToDumpScene;
@@ -492,7 +488,6 @@ class Renderer
 	D3DXMATRIX						m_tempProjection;
 	D3DXMATRIX						m_hairsMatrices[12];
 	D3DXMATRIX						m_LaraWorldMatrix;
-	shared_ptr<RenderTarget2D>		m_shadowMap;
 	D3DXMATRIX						m_lightView;
 	D3DXMATRIX						m_lightProjection;
 	bool							m_enableShadows;
@@ -507,18 +502,22 @@ class Renderer
 	
 	LPDIRECT3DSURFACE9				m_backBufferTarget;
 	LPDIRECT3DSURFACE9				m_backBufferDepth;
+	LPDIRECT3DSURFACE9				m_zBuffer;
+	LPDIRECT3DSURFACE9				m_shadowMapZBuffer;
 
 	RENDERER_CULLMODE				m_cullMode;
 	RENDERER_BLENDSTATE				m_blendState;
 	RendererUnderwaterDustParticle  m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool							m_firstUnderwaterDustParticles = true;
-	shared_ptr<RenderTarget2D>					m_depthBuffer;
-	shared_ptr<RenderTarget2D>					m_normalBuffer;
-	shared_ptr<RenderTarget2D>					m_colorBuffer;
-	shared_ptr<RenderTarget2D>					m_outputBuffer;
-	shared_ptr<RenderTarget2D>					m_lightBuffer; 
-	shared_ptr<RenderTarget2D>					m_vertexLightBuffer;
-	shared_ptr<RenderTarget2D>					m_postprocessBuffer;
+	LPDIRECT3DTEXTURE9					m_depthBuffer;
+	LPDIRECT3DTEXTURE9					m_normalBuffer;
+	LPDIRECT3DTEXTURE9					m_colorBuffer;
+	LPDIRECT3DTEXTURE9					m_outputBuffer;
+	LPDIRECT3DTEXTURE9					m_lightBuffer;
+	LPDIRECT3DTEXTURE9					m_vertexLightBuffer;
+	LPDIRECT3DTEXTURE9					m_postprocessBuffer;
+	LPDIRECT3DTEXTURE9				m_renderTarget;
+	LPDIRECT3DTEXTURE9				m_shadowMap;
 	shared_ptr<Shader>							m_shaderClearGBuffer;
 	shared_ptr<Shader>							m_shaderFillGBuffer;
 	shared_ptr<Shader>							m_shaderLight;
@@ -614,7 +613,7 @@ class Renderer
 	bool							drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	void							createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos, float rotation);
 	bool							drawScene(bool dump);
-	bool							bindRenderTargets(RenderTarget2D* rt1, RenderTarget2D* rt2, RenderTarget2D* rt3, RenderTarget2D* rt4);
+	bool							bindRenderTargets(LPDIRECT3DTEXTURE9 rt1, LPDIRECT3DTEXTURE9 rt2, LPDIRECT3DTEXTURE9 rt3, LPDIRECT3DTEXTURE9 rt4, LPDIRECT3DSURFACE9 zBuffer);
 	bool							restoreBackBuffer();
 	bool							drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass, bool animated);
 	bool							drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);

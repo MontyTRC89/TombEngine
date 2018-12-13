@@ -913,7 +913,7 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->waterCreature = true;
-
+		 
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
