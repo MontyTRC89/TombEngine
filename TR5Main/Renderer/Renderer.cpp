@@ -295,16 +295,73 @@ Renderer::~Renderer()
 	delete m_skyQuad;*/
 }
 
+bool Renderer::Create()
+{
+	HRESULT res;
+
+	m_d3D = Direct3DCreate9(D3D_SDK_VERSION);
+	if (m_d3D == NULL)
+		return false;
+
+	return true;
+}
+
+bool Renderer::EnumerateVideoModes()
+{
+	__int32 adaptercount = m_d3D->GetAdapterCount();
+	D3DADAPTER_IDENTIFIER9* adapters = (D3DADAPTER_IDENTIFIER9*)malloc(sizeof(D3DADAPTER_IDENTIFIER9) * adaptercount);
+	
+	for (int i = 0; i < adaptercount; i++)
+	{
+		m_d3D->GetAdapterIdentifier(i, 0, &(adapters[i]));
+
+		printf("Adapter %d\n", i);
+		printf("\t Vendor ID: %d\n", adapters[i].VendorId);
+		printf("\t Device ID: %d\n", adapters[i].DeviceId);
+		printf("\t Device Identifier: %d\n", adapters[i].DeviceIdentifier);
+		printf("\t Device Name: %s\n", adapters[i].DeviceName);
+		printf("\t Description: %s\n", adapters[i].Description);
+
+		auto adapter = make_shared<RendererVideoAdapter>();
+
+		adapter->Index = i;
+		adapter->Name = adapters[i].Description;
+
+		__int32 numDisplayModes = m_d3D->GetAdapterModeCount(i, D3DFMT_X8R8G8B8);
+		for (__int32 j = 0; j < numDisplayModes; j++)
+		{
+			D3DDISPLAYMODE mode;
+
+			m_d3D->EnumAdapterModes(i, D3DFMT_X8R8G8B8, j, &mode);
+
+			auto newMode = make_shared<RendererDisplayMode>();
+
+			newMode->Width = mode.Width;
+			newMode->Height = mode.Height;
+			newMode->RefreshRate = mode.RefreshRate;
+
+			adapter->DisplayModes.push_back(newMode);
+
+			printf("\t\t %d x %d %d Hz %d\n", mode.Width, mode.Height, mode.RefreshRate, mode.Format);
+		}
+		
+		m_adapters.push_back(adapter);
+	}
+
+	return true;
+}
+
+vector<shared_ptr<RendererVideoAdapter>>* Renderer::GetAdapters()
+{
+	return &m_adapters;
+}
+
 bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 {
 	HRESULT res;
 
 	DB_Log(2, "Renderer::Initialise - DLL");
 	printf("Initialising DX\n");
-
-	m_d3D = Direct3DCreate9(D3D_SDK_VERSION);
-	if (m_d3D == NULL) 
-		return false;
 	 
 	ScreenWidth = w;
 	ScreenHeight = h;

@@ -107,7 +107,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;d3d9.lib;dinput8.lib;d3dx9.lib;dxerr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;Comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;d3d9.lib;dinput8.lib;d3dx9.lib;dxerr.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>md "$(TargetDir)\Shaders" 

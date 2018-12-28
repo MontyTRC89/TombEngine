@@ -1,6 +1,8 @@
 #include "game.h"
 #include "init.h"
 #include "winmain.h"
+#include <CommCtrl.h>
+#include "..\resource.h"
 
 #include <process.h>
 #include <crtdbg.h>
@@ -167,6 +169,86 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void LoadResolutionsInCombobox(HWND handle, __int32 index)
+{
+	HWND cbHandle = GetDlgItem(handle, IDC_CB_MODES);
+
+	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
+
+	auto adapters = g_Renderer->GetAdapters();
+	auto adapter = (*adapters)[index];
+
+	for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
+	{
+		auto mode = (adapter->DisplayModes)[i];
+
+		char* str = (char*)malloc(255);
+		ZeroMemory(str, 255);
+		sprintf(str, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+
+		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)(str));
+		
+		free(str);
+	}
+
+	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
+}
+
+void LoadAdaptersInCombobox(HWND handle)
+{
+	HWND cbHandle = GetDlgItem(handle, IDC_CB_ADAPTERS);
+
+	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
+
+	auto adapters = g_Renderer->GetAdapters();
+	for (__int32 i = 0; i < adapters->size(); i++)
+	{
+		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)(*adapters)[i]->Name.c_str());
+	}
+
+	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
+	LoadResolutionsInCombobox(handle, 0);
+}
+
+BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	HWND ctlHandle;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		DB_Log(6, "WM_INITDIALOG");
+
+		LoadAdaptersInCombobox(handle);
+
+		break;
+
+	case WM_COMMAND:
+		DB_Log(6, "WM_COMMAND");
+
+		break;
+
+	default:
+		return 0;
+	}
+}
+
+__int32 SetupDialog()
+{
+	InitCommonControls();
+	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP_WINDOW), RT_DIALOG);
+
+	ShowCursor(true);
+	__int32 result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP_WINDOW), 0, (DLGPROC)DialogProc, 0);
+	ShowCursor(false);
+	
+	//printf("%d\n", GetLastError());
+
+	//ShowWindow(result, SW_SHOW);
+
+	return true;
+}
+
 __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, __int32 nShowCmd)
 {
 	int RetVal;
@@ -247,11 +329,18 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	// TODO: load settings from Windows registry
 	OptionAutoTarget = 1;
 
+	// Create the renderer and enumerate adapters and video modes
+	g_Renderer = new Renderer();
+	g_Renderer->Create();
+	g_Renderer->EnumerateVideoModes();
+
+	// Now show the setup dialog
+	SetupDialog();
+
 	PhdWidth = g_GameFlow->GetSettings()->ScreenWidth;
 	PhdHeight = g_GameFlow->GetSettings()->ScreenHeight;
 
-	//DXInitialise(App.WindowHandle);
-	g_Renderer = new Renderer();
+	// Initialise the renderer
 	g_Renderer->Initialise(g_GameFlow->GetSettings()->ScreenWidth, g_GameFlow->GetSettings()->ScreenHeight, true, App.WindowHandle);
 
 	// Initialize audio

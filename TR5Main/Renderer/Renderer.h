@@ -28,6 +28,18 @@ using namespace std;
 
 class RendererObject;
 
+typedef struct RendererDisplayMode {
+	__int32 Width;
+	__int32 Height;
+	__int32 RefreshRate;
+};
+
+typedef struct RendererVideoAdapter {
+	string Name;
+	__int32 Index;
+	vector<shared_ptr<RendererDisplayMode>> DisplayModes;
+};
+
 typedef struct RendererBone {
 	D3DXVECTOR3 Translation;
 	D3DXMATRIX GlobalTransform;
@@ -571,6 +583,7 @@ class Renderer
 	float							m_fadeFactor;
 	bool							m_cinematicBars;
 	float							m_progress;
+	vector<shared_ptr<RendererVideoAdapter>>	m_adapters;
 
 	// Legacy room clipper
 	__int32							m_boundList[256];
@@ -679,6 +692,8 @@ public:
 	Renderer();
 	~Renderer();
 
+	bool							Create();
+	bool							EnumerateVideoModes();
 	bool							Initialise(__int32 w, __int32 h, bool windowed, HWND handle);
 	__int32							Draw();
 	bool							PrepareDataForTheRenderer();
@@ -708,4 +723,5 @@ public:
 	bool							ToggleFullScreen();
 	bool							IsFullsScreen();
 	bool							ChangeScreenResolution();
+	vector<shared_ptr<RendererVideoAdapter>>*	GetAdapters();
 };

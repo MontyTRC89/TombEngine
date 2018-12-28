@@ -2,8 +2,11 @@
 // File di inclusione generato con Microsoft Visual C++.
 // Utilizzato da Resources.rc
 //
-#define ID_SETUP_WINDOW                 9
-#define IDD_DIALOG1                     101
+#define IDD_SETUP_WINDOW                9
+#define IDC_LBL_ADAPTERS                1001
+#define IDC_CB_ADAPTERS                 1002
+#define IDC_CB_MODES                    1003
+#define IDC_LBL_MODES                   1004
 
 // Next default values for new objects
 // 
@@ -11,7 +14,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
