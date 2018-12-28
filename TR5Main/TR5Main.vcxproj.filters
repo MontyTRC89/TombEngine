@@ -303,6 +303,9 @@
     <ClInclude Include="Objects\newobjects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
@@ -586,5 +589,10 @@
     <None Include="Shaders\FinalPass.fx" />
     <None Include="Scripting\Scripts\andrea1.lua" />
     <None Include="Scripting\Scripts\Constants.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources.rc">
+      <Filter>File di risorse</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
