@@ -31,6 +31,7 @@
 #include "..\Game\effect2.h"
 #include "..\Game\rope.h"
 #include "..\Game\items.h"
+#include "..\Game\camera.h"
 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
@@ -304,31 +305,30 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_d3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (m_d3D == NULL) 
 		return false;
-
-	D3DPRESENT_PARAMETERS d3dpp;
 	 
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
 
-	ZeroMemory(&d3dpp, sizeof(d3dpp));
-	d3dpp.Windowed = windowed;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	d3dpp.hDeviceWindow = handle;
-	d3dpp.BackBufferWidth = w;
-	d3dpp.BackBufferHeight = h;
-	d3dpp.EnableAutoDepthStencil = TRUE;
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
-	d3dpp.MultiSampleType = D3DMULTISAMPLE_NONE;
-	 
+	ZeroMemory(&m_pp, sizeof(m_pp));
+	m_pp.Windowed = windowed;
+	m_pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	m_pp.hDeviceWindow = handle;
+	m_pp.BackBufferWidth = w;
+	m_pp.BackBufferHeight = h;
+	m_pp.EnableAutoDepthStencil = TRUE;
+	m_pp.AutoDepthStencilFormat = D3DFMT_D24S8;
+	m_pp.MultiSampleType = D3DMULTISAMPLE_NONE;
+	m_pp.BackBufferFormat = D3DFMT_X8R8G8B8;
+
 	res = m_d3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, handle, D3DCREATE_HARDWARE_VERTEXPROCESSING,
-							  &d3dpp, &m_device);
+							  &m_pp, &m_device);
 	if (res != S_OK)
 		return false;
 
 	// Load the white sprite 
 	D3DXCreateTextureFromFileEx(m_device, g_GameFlow->GetLevel(0)->Background.c_str(), D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
-								D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
+								D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT,
 								D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_titleScreen);
 
 	// Initialise the vertex declaration 
@@ -371,70 +371,20 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 
 	// Initialise the main render target for scene dump
 	m_renderTarget = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_renderTarget, NULL);
-	if (res != S_OK)
-		return false;
-
-	// Initialise the shadow map
 	m_shadowMap = NULL;
-	res = m_device->CreateTexture(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_shadowMap, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_shadowMapZBuffer = NULL;
-	res = m_device->CreateDepthStencilSurface(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, true, &m_shadowMapZBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
-	// Initialise stuff for the new light pre-pass renderer
 	m_backBufferTarget = NULL;
-	res = m_device->GetRenderTarget(0, &m_backBufferTarget);
-	if (res != S_OK)
-		return false;
-
 	m_backBufferDepth = NULL;
-	res = m_device->GetDepthStencilSurface(&m_backBufferDepth);
-	if (res != S_OK)
-		return false;
-
 	m_zBuffer = NULL;
-	res = m_device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, true, &m_zBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_depthBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_depthBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_normalBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_normalBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_colorBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_colorBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_outputBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_outputBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_lightBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_lightBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_vertexLightBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_vertexLightBuffer, NULL);
-	if (res != S_OK)
-		return false;
-
 	m_postprocessBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_postprocessBuffer, NULL);
-	if (res != S_OK)
+	
+	if (!initialiseRenderTargets())
 		return false;
 
 	m_shaderClearGBuffer = make_shared<Shader>(m_device, (char*)"Shaders\\ClearGBuffer.fx");
@@ -527,13 +477,13 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
 	{
 		D3DXCreateTextureFromFileEx(m_device, causticsNames[i], D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
-			D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
+			D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT,
 			D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_caustics[i]);
 	}
 
 	// Load target textures
 	D3DXCreateTextureFromFileEx(m_device, "Binoculars.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
-		D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT,
+		D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT,
 		D3DCOLOR_XRGB(255, 255, 255), NULL, NULL, &m_binocularsTexture);
 
 	// Initialise buffer for sprites and lines
@@ -568,6 +518,97 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_fadeFactor = 1.0f;
 
 	resetBlink();
+
+	PhdWindowXmax = ScreenWidth - 1;
+	PhdWindowYmax = ScreenHeight - 1;	
+
+	return true;
+}
+
+bool Renderer::initialiseRenderTargets()
+{
+	HRESULT res;
+
+	/*DX_RELEASE(m_renderTarget);
+	DX_RELEASE(m_shadowMap);
+	DX_RELEASE(m_shadowMapZBuffer);
+	DX_RELEASE(m_backBufferTarget);
+	DX_RELEASE(m_backBufferDepth);
+	DX_RELEASE(m_zBuffer);
+	DX_RELEASE(m_depthBuffer);
+	DX_RELEASE(m_normalBuffer);
+	DX_RELEASE(m_colorBuffer);
+	DX_RELEASE(m_outputBuffer);
+	DX_RELEASE(m_lightBuffer);
+	DX_RELEASE(m_vertexLightBuffer);
+	DX_RELEASE(m_postprocessBuffer);*/
+
+	m_renderTarget = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_renderTarget, NULL);
+	if (res != S_OK)
+		return false;
+
+	// Initialise the shadow map
+	m_shadowMap = NULL;
+	res = m_device->CreateTexture(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_shadowMap, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_shadowMapZBuffer = NULL;
+	res = m_device->CreateDepthStencilSurface(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, true, &m_shadowMapZBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	// Initialise stuff for the new light pre-pass renderer
+	m_backBufferTarget = NULL;
+	res = m_device->GetRenderTarget(0, &m_backBufferTarget);
+	if (res != S_OK)
+		return false;
+
+	m_backBufferDepth = NULL;
+	res = m_device->GetDepthStencilSurface(&m_backBufferDepth);
+	if (res != S_OK)
+		return false;
+
+	m_zBuffer = NULL;
+	res = m_device->CreateDepthStencilSurface(ScreenWidth, ScreenHeight, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, true, &m_zBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_depthBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_depthBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_normalBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_normalBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_colorBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_colorBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_outputBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_outputBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_lightBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_lightBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_vertexLightBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_vertexLightBuffer, NULL);
+	if (res != S_OK)
+		return false;
+
+	m_postprocessBuffer = NULL;
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_postprocessBuffer, NULL);
+	if (res != S_OK)
+		return false;
 
 	return true;
 }
@@ -1708,6 +1749,8 @@ void Renderer::fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
 
 void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count) 
 {
+	D3DXMatrixMultiply(&ViewProjectionMatrix, &ViewMatrix, &ProjectionMatrix);
+
 	stack<shared_ptr<RendererRoomNode>> stack;
 	auto node = make_shared<RendererRoomNode>();
 	node->To = to;
@@ -1721,6 +1764,7 @@ void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool wat
 
 		if (m_rooms[node->To]->Visited)
 			continue;
+
 		m_rooms[node->To]->Visited = true;
 		m_roomsToDraw.push_back(node->To);
 
@@ -1768,14 +1812,11 @@ bool Renderer::checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* view
 	clipPort->z = FLT_MIN;
 	clipPort->w = FLT_MIN;
 
-	D3DXMATRIX viewProj;
-	D3DXMatrixMultiply(&viewProj, &ViewMatrix, &ProjectionMatrix);
-
 	for (int i = 0; i < 4; i++) {
 
 		D3DXVECTOR4 tmp = D3DXVECTOR4(*(portal + 4 + 3 * i) + room->x, *(portal + 4 + 3 * i+1) + room->y,
 			*(portal + 4 + 3 * i+2) + room->z, 1.0f);
-		D3DXVec4Transform(&p[i], &tmp, &viewProj);
+		D3DXVec4Transform(&p[i], &tmp, &ViewProjectionMatrix);
 
 		if (p[i].w > 0.0f) {
 			p[i].x *= (1.0f / p[i].w);
@@ -1845,10 +1886,48 @@ void Renderer::collectRooms()
 			m_rooms[i]->Visited = false;
 
 	m_roomsToDraw.clear();
-	for (__int32 i = 0; i < NumberRooms; i++)
-		m_roomsToDraw.push_back(i);
+	/*for (__int32 i = 0; i < NumberRooms; i++)
+		m_roomsToDraw.push_back(i);*/
 
-	//getVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
+	ROOM_INFO* room = &Rooms[baseRoomIndex];
+
+	CurrentRoom = baseRoomIndex;
+
+	PhdLeft = room->testLeft = 0;
+	PhdTop = room->testTop = 0;
+	PhdRight = room->testRight = ScreenWidth - 1;
+	PhdBottom = room->testBottom = ScreenHeight - 1;
+	
+	Unknown_00E6CAE8 = 0;
+	Outside = room->flags & ENV_FLAG_OUTSIDE;
+	Underwater = room->flags & ENV_FLAG_WATER;
+
+	room->bound_active = 2;
+	NumberDrawnRooms = 0;
+	BoundList[0] = baseRoomIndex;
+	BoundStart = 0;
+	BoundEnd = 1;
+
+	if (Outside)
+	{
+		OutsideTop = 0;
+		OutsideLeft = 0;
+		OutsideRight = ScreenWidth - 1;
+		OutsideBottom = ScreenHeight - 1;
+	}
+	else
+	{
+		OutsideBottom = 0;
+		OutsideRight = 0;
+		OutsideLeft = ScreenWidth - 1;
+		OutsideTop = ScreenHeight - 1;
+	}
+
+	GetRoomBounds();
+
+	printf("Number rooms: %d\n", NumberDrawnRooms);
+
+	getVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
 }
 
 void Renderer::collectItems()
@@ -2535,8 +2614,13 @@ void Renderer::drawDebugInfo()
 		printDebugMessage(10, 370 + y, 255, 255, 255, 255, m_message);
 
 		sprintf_s(&m_message[0], 255, "Update = %d, ShadowMap = %d, Clear = %d, Fill = %d, Light = %d, Final = %d, Z-Buffer = %d",
-			m_timeUpdate / 1000, m_timePrepareShadowMap / 1000, m_timeClearGBuffer / 1000, m_timeFillGBuffer / 1000, m_timeLight / 1000, m_timeCombine / 1000, 
-			m_timeReconstructZBuffer / 1000);
+			m_timeUpdate / 1000000, 
+			m_timePrepareShadowMap / 1000000, 
+			m_timeClearGBuffer / 1000000, 
+			m_timeFillGBuffer / 1000000, 
+			m_timeLight / 1000000, 
+			m_timeCombine / 1000000,
+			m_timeReconstructZBuffer / 1000000);
 		printDebugMessage(10, 380 + y, 255, 255, 255, 255, m_message);
 
 		sprintf_s(&m_message[0], 255, "DrawCalls = %d", m_numDrawCalls);
@@ -2600,7 +2684,9 @@ __int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool reset)
 	PrintString(400, 290, (char*)"Exit to Title", D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_CENTER | (selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 	
 	m_device->EndScene();
-	m_device->Present(NULL, NULL, NULL, NULL);
+
+	if (m_device->Present(NULL, NULL, NULL, NULL) == D3DERR_DEVICELOST)
+		handleDeviceLost();
 
 	return 1;
 }
@@ -2642,7 +2728,9 @@ __int32	Renderer::DrawStatisticsMenu()
 	PrintString(500, 290, buffer, D3DCOLOR_ARGB(255, 255, 255, 255), 0);
 
 	m_device->EndScene();
-	m_device->Present(NULL, NULL, NULL, NULL);
+
+	if (m_device->Present(NULL, NULL, NULL, NULL) == D3DERR_DEVICELOST)
+		handleDeviceLost();
 
 	return 1;
 }
@@ -2805,7 +2893,9 @@ __int32	Renderer::DrawLoadGameMenu(__int32 selectedIndex, bool resetBlink)
 	}
 
 	m_device->EndScene();
-	m_device->Present(NULL, NULL, NULL, NULL);
+
+	if (m_device->Present(NULL, NULL, NULL, NULL) == D3DERR_DEVICELOST)
+		handleDeviceLost();
 
 	return 0;
 }
@@ -4486,6 +4576,9 @@ bool Renderer::drawHorizonAndSky()
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
+	if (BinocularRange)
+		phd_AlterFOV(14560 - BinocularRange);
+
 	// First update the sky in the case of storm
 	if (level->Storm)
 	{
@@ -4504,9 +4597,9 @@ bool Renderer::drawHorizonAndSky()
 			StormTimer = (rand() & 3) + 12;
 		}
 
-		color = D3DXVECTOR4((SkyStormColor[0] + 44) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
+		color = D3DXVECTOR4((SkyStormColor[0]) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
 	}
-	    
+
 	D3DXMATRIX world;
 	D3DXMATRIX translation;
 	D3DXMATRIX rotation;
@@ -5925,7 +6018,8 @@ __int32 Renderer::drawFinalPass()
 	effect->End();
 	m_device->EndScene();
 
-	m_device->Present(NULL, NULL, NULL, NULL);
+	if (m_device->Present(NULL, NULL, NULL, NULL) == D3DERR_DEVICELOST)
+		handleDeviceLost();
 
 	// Update fade status
 	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN)
@@ -5978,7 +6072,9 @@ void Renderer::DrawLoadingScreen(char* fileName)
 		drawAllLines2D();
 
 		m_device->EndScene();
-		m_device->Present(NULL, NULL, NULL, NULL);
+		
+		if (m_device->Present(NULL, NULL, NULL, NULL) == D3DERR_DEVICELOST)
+			handleDeviceLost();
 
 		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor >= 1.0f)
 		{
@@ -6583,4 +6679,278 @@ bool Renderer::drawOverlays()
 	m_dxSprite->SetTransform(&mat);
 	m_dxSprite->Draw(m_binocularsTexture, &rect, NULL, NULL, D3DCOLOR_ARGB(255, 255, 255, 255));
 	m_dxSprite->End();
+}
+
+void Renderer::legacyCollectRoomsToDraw(__int16 roomNumber)
+{
+	ROOM_INFO* room = &Rooms[roomNumber];
+	
+	room->bound_active = 2;
+	
+	BoundList[0] = roomNumber;
+	BoundStart = 0;
+	BoundEnd = 1;
+
+	PhdLeft = room->testLeft = 0;
+	PhdTop = room->testTop = 0;
+	PhdRight = room->testRight = ScreenWidth - 1;
+	PhdBottom = room->testBottom = ScreenHeight - 1;
+
+	m_outside = room->flags & ENV_FLAG_OUTSIDE;
+	m_underwater = room->flags & ENV_FLAG_WATER;
+
+	if (m_outside)
+	{
+		OutsideLeft = OutsideTop = 0;
+		OutsideRight = ScreenWidth - 1;
+		OutsideBottom = ScreenHeight - 1;
+	}
+	else
+	{
+		OutsideLeft = ScreenWidth - 1;
+		OutsideTop = ScreenHeight - 1;
+		OutsideRight = OutsideBottom = 0;
+	}
+
+
+}
+
+void Renderer::legacyGetVisibleRooms()
+{
+	while (BoundStart != BoundEnd)
+	{
+		__int16 roomNumber = BoundList[(BoundStart++) % 128];
+		ROOM_INFO* r = &Rooms[roomNumber];
+
+		r->bound_active -= 2;
+
+		m_midSort = (r->bound_active >> 8) + 1;
+
+		/* Enlarge room bounds to incorporate test bounds */
+		if (r->testLeft < r->left)
+			r->left = r->testLeft;
+		if (r->testTop < r->top)
+			r->top = r->testTop;
+		if (r->testRight > r->right)
+			r->right = r->testRight;
+		if (r->testBottom > r->bottom)
+			r->bottom = r->testBottom;
+
+		/* Add to draw list if not already on it */
+		if (!(r->bound_active & 1))
+		{
+			m_roomsToDraw.push_back(roomNumber);
+			r->bound_active |= 1;
+
+			/* Set outside flag if this room can see it */
+			if (r->flags & ENV_FLAG_OUTSIDE)
+				m_outside = ENV_FLAG_OUTSIDE;
+		}
+
+		/* Enlarge outside polygon draw area using room bounds */
+		if (r->flags & ENV_FLAG_OUTSIDE)
+		{
+			if (r->left < OutsideLeft)
+				OutsideLeft = r->left;
+			if (r->right > OutsideRight)
+				OutsideRight = r->right;
+			if (r->top < OutsideTop)
+				OutsideTop = r->top;
+			if (r->bottom > OutsideBottom)
+				OutsideBottom = r->bottom;
+		}
+
+		__int16* door = r->door;
+		if (door)
+		{
+			for (__int32 i = *(door++); i > 0; i--, door += 15)
+			{
+				roomNumber = *(door++);
+
+				D3DXVECTOR3 n = D3DXVECTOR3(*(door), *(door + 1), *(door + 2));
+				D3DXMATRIX m;
+				D3DXMatrixTranslation(&m, r->x, r->y, r->z);
+				D3DXMatrixMultiply(&m, &m, &ViewMatrix);
+
+				if (n.x*(r->x + *(door + 3)) - m._14 +
+					n.y*(r->y + *(door + 4)) - m._24 +
+					n.z*(r->z + *(door + 5)) - m._34 >= 0)
+					continue;
+
+				legacySetRoomBounds(door, roomNumber, r);
+			}
+		}
+	}
+}
+
+bool Renderer::handleDeviceLost()
+{
+	HRESULT hr;
+
+	// Is it ok to render again yet?
+	if (FAILED(hr = m_device->TestCooperativeLevel()))
+	{
+		// The device has been lost but cannot be reset at this time
+		if (hr == D3DERR_DEVICELOST)
+		{
+			// Request repaint and exit
+			InvalidateRect(m_pp.hDeviceWindow, NULL, true);
+			return true;
+		}
+
+		// the device has been lost and can be reset
+		if (hr == D3DERR_DEVICENOTRESET)
+		{
+			// do lost/reset/restore cycle
+			beforeDeviceReset();
+
+			hr = m_device->Reset(&m_pp);
+			if (FAILED(hr))
+			{
+				// Reset failed, try again later
+				InvalidateRect(m_pp.hDeviceWindow, NULL, true);
+				return true;
+			}
+
+			afterDeviceReset();
+		}
+	}
+
+	return true;
+}
+
+void Renderer::legacySetRoomBounds(__int16* door, __int32 roomNumber, ROOM_INFO* parent)
+{
+	
+}
+
+bool Renderer::ToggleFullScreen()
+{
+	// Switch windowed/fullscreen
+	m_pp.Windowed = !m_pp.Windowed;
+
+	// Resize the backbuffer
+	if (m_pp.Windowed)
+	{
+		m_pp.BackBufferWidth = ScreenWidth;
+		m_pp.BackBufferHeight = ScreenHeight;
+	}
+	else
+	{
+		m_pp.BackBufferWidth = 1920;
+		m_pp.BackBufferHeight = 1080;
+	}
+
+	// Change window's parameters
+	if (m_pp.Windowed)
+	{
+		SetWindowLong(m_pp.hDeviceWindow, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		SetWindowPos(m_pp.hDeviceWindow, HWND_TOP, 0, 0, ScreenWidth, ScreenHeight,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	}
+	else
+	{
+		SetWindowLong(m_pp.hDeviceWindow, GWL_STYLE, WS_POPUPWINDOW);
+		SetWindowPos(m_pp.hDeviceWindow, HWND_TOP, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	}
+		
+	// Set the new DX viewport
+	D3DVIEWPORT9 vp;
+	vp.X = 0;
+	vp.Y = 0;
+	vp.Width = m_pp.BackBufferWidth;
+	vp.Height = m_pp.BackBufferHeight;
+	vp.MinZ = 0.0f;
+	vp.MaxZ = 1.0f;
+	m_device->SetViewport(&vp);
+
+	// Reset the device		
+	beforeDeviceReset();
+
+	HRESULT result = m_device->Reset(&m_pp);
+	if (FAILED(result)) {
+		fprintf(stderr, "Error: %s error description: %s\n",
+			DXGetErrorString(result), DXGetErrorDescription(result));
+	}
+
+	afterDeviceReset();
+
+	return true;
+}
+
+bool Renderer::ChangeScreenResolution()
+{
+	return true;
+}
+
+bool Renderer::IsFullsScreen()
+{
+	return m_pp.Windowed;
+}
+
+bool Renderer::resetDeviceResources()
+{
+	initialiseRenderTargets();
+	return true;
+}
+
+bool Renderer::beforeDeviceReset()
+{
+	D3DX_DEVICE_LOST(m_dxSprite);
+	D3DX_DEVICE_LOST(m_dxLine);
+	D3DX_DEVICE_LOST(m_debugFont);
+	D3DX_DEVICE_LOST(m_gameFont);
+
+	D3DX_DEVICE_LOST(m_shaderBasic->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderClearGBuffer->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderCombine->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderDepth->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderFillGBuffer->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderFinalPass->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderLight->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderRain->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderReconstructZBuffer->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderSprites->GetEffect());
+	D3DX_DEVICE_LOST(m_shaderTransparent->GetEffect());
+
+	DX_RELEASE(m_renderTarget);
+	DX_RELEASE(m_shadowMap);
+	DX_RELEASE(m_shadowMapZBuffer);
+	DX_RELEASE(m_backBufferTarget);
+	DX_RELEASE(m_backBufferDepth);
+	DX_RELEASE(m_zBuffer);
+	DX_RELEASE(m_depthBuffer);
+	DX_RELEASE(m_normalBuffer);
+	DX_RELEASE(m_colorBuffer);
+	DX_RELEASE(m_outputBuffer);
+	DX_RELEASE(m_lightBuffer);
+	DX_RELEASE(m_vertexLightBuffer);
+	DX_RELEASE(m_postprocessBuffer);
+
+	return true;
+}
+
+bool Renderer::afterDeviceReset()
+{
+	initialiseRenderTargets();
+
+	D3DX_DEVICE_RESET(m_dxSprite);
+	D3DX_DEVICE_RESET(m_dxLine);
+	D3DX_DEVICE_RESET(m_debugFont);
+	D3DX_DEVICE_RESET(m_gameFont);
+
+	D3DX_DEVICE_RESET(m_shaderBasic->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderClearGBuffer->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderCombine->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderDepth->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderFillGBuffer->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderFinalPass->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderLight->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderRain->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderReconstructZBuffer->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderSprites->GetEffect());
+	D3DX_DEVICE_RESET(m_shaderTransparent->GetEffect());
+
+	return true;
 }

@@ -37,7 +37,7 @@ streets.fileName = "Data\\andrea1.trc";
 streets.loadScreen = "Screens\\andea1.jpg";
 streets.horizon = true;
 streets.colAddHorizon = true;
-streets.layer1 = SkyLayer.new(120, 80, 50, -4);
+streets.layer1 = SkyLayer.new(16, 16, 96, 3);
 streets.resetHub = true;
 
 Gameflow:AddLevel(streets);
@@ -52,7 +52,7 @@ trajan.fileName = "Data\\andrea2.trc";
 trajan.loadScreen = "Screens\\andrea2.jpg";
 trajan.horizon = true;
 trajan.colAddHorizon = true;
-trajan.layer1 = SkyLayer.new(120, 80, 50, -4);
+trajan.layer1 = SkyLayer.new(128, 128, 128, 3);
 trajan.storm = true;
 
 Gameflow:AddLevel(trajan);
@@ -142,7 +142,7 @@ gallowstree.colAddHorizon = true;
 gallowstree.rain = true;
 gallowstree.storm = true;
 gallowstree.laraType = LaraType.Young;
-gallowstree.layer1 = SkyLayer.new(120, 80, 50, -4);
+gallowstree.layer1 = SkyLayer.new(80, 96, 160, -8);
 gallowstree.resetHub = true;
 
 Gameflow:AddLevel(gallowstree);
@@ -160,7 +160,7 @@ labyrinth.colAddHorizon = true;
 labyrinth.rain = true;
 labyrinth.storm = true;
 labyrinth.laraType = LaraType.Young;
-labyrinth.layer1 = SkyLayer.new(120, 80, 50, -4);
+labyrinth.layer1 = SkyLayer.new(80, 96, 160, -8);
 
 Gameflow:AddLevel(labyrinth);
 
@@ -177,7 +177,7 @@ oldMill.colAddHorizon = true;
 oldMill.rain = true;
 oldMill.storm = true;
 oldMill.laraType = LaraType.Young;
-oldMill.layer1 = SkyLayer.new(120, 80, 50, -4);
+oldMill.layer1 = SkyLayer.new(80, 96, 160, -8);
 
 Gameflow:AddLevel(oldMill);
 

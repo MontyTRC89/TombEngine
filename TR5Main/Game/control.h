@@ -23,7 +23,7 @@
 #define UpdateDebris ((void (__cdecl*)()) 0x0041D500)
 #define UpdateDrips ((void (__cdecl*)()) 0x00483D90)
 #define UpdateGunShells ((void (__cdecl*)()) 0x00482D80)
-#define UpdateSky ((void (__cdecl*)()) 0x00414720)
+//#define UpdateSky ((void (__cdecl*)()) 0x00414720)
 #define UpdateBats ((void (__cdecl*)()) 0x00407FD0)
 #define UpdateRats ((void (__cdecl*)()) 0x0046AC70)
 #define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
@@ -45,6 +45,7 @@
 GAME_STATUS __cdecl DoTitle(__int32 index);
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);
 GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
+void __cdecl UpdateSky();
 
 unsigned __stdcall GameMain(void*);
 void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags);

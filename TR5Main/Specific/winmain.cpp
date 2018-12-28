@@ -13,12 +13,15 @@
 #include "..\Game\control.h"
 #include "..\Game\gameflow.h"
 #include "..\Game\savegame.h"
+#include "..\Specific\roomload.h"
 
 WINAPP	 App;
 unsigned int threadId;
 uintptr_t hThread;
 HACCEL hAccTable;
+byte receivedWmClose = false;
 
+extern __int32 IsLevelLoading;
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 
@@ -40,6 +43,128 @@ __int32 __cdecl WinProcMsg()
 	} while (!Unk_876C48 && Msg.message != WM_QUIT);
 
 	return result;
+}
+
+void __stdcall HandleWmCommand(unsigned __int16 wParam)
+{
+	if (wParam == 8)
+	{
+		DB_Log(5, "Pressed ALT + ENTER");
+
+		if (!IsLevelLoading)
+		{
+			SuspendThread((HANDLE)hThread);
+			DB_Log(5, "Game thread suspended");
+			
+			g_Renderer->ToggleFullScreen();
+
+			ResumeThread((HANDLE)hThread);
+			DB_Log(5, "Game thread resumed");
+
+			if (g_Renderer->IsFullsScreen())
+			{
+				SetCursor(0);
+				ShowCursor(false);
+			}
+			else
+			{
+				SetCursor(LoadCursorA(App.hInstance, (LPCSTR)0x68));
+				ShowCursor(true);
+			}
+		}
+	}
+}
+
+LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (msg > 0x10)
+	{
+		if (msg == WM_COMMAND)
+		{
+			DB_Log(6, "WM_COMMAND");
+			HandleWmCommand((unsigned __int16)wParam);
+		}
+
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
+	}
+
+	if (msg == WM_CLOSE)
+	{
+		DB_Log(6, "WM_CLOSE");
+		receivedWmClose = true;
+		PostQuitMessage(0);
+		return DefWindowProcA(hWnd, 0x10u, wParam, (LPARAM)lParam);
+	}
+
+	if (msg == WM_CREATE)
+	{
+		DB_Log(6, "WM_CREATE");
+		// Old renderer setted a counter, not used anymore
+		return DefWindowProcA(hWnd, 1u, wParam, (LPARAM)lParam);
+	}
+
+	if (msg == WM_MOVE)
+	{
+		DB_Log(6, "WM_MOVE");
+		// With DX6 it was needed to handle DirectDraw surface move, not needed with DX9
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
+	}
+
+	if (msg != WM_ACTIVATE)
+	{
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
+	}
+
+	DB_Log(6, "WM_ACTIVATE");
+
+	if (receivedWmClose)
+	{
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
+	}
+
+	if (App_Unk00D9AC2B)
+		return 0;
+
+	if ((__int16)wParam)
+	{
+		if ((signed __int32)(unsigned __int16)wParam > 0 && (signed __int32)(unsigned __int16)wParam <= 2)
+		{
+			DB_Log(6, "WM_ACTIVE");
+
+			if (App_Unk00D9AC19)
+			{
+				//AcquireDirectInput(true);
+				ResumeThread((HANDLE)hThread);
+				App_Unk00D9ABFD = 0;
+
+				DB_Log(5, "Game Thread Resumed");
+
+				return 0;
+			}
+		}
+	}
+	else
+	{
+		DB_Log(6, "WM_INACTIVE");
+
+		if (App_Unk00D9AC19)
+		{
+			//AcquireDirectInput(false);
+
+			DB_Log(5, "HangGameThread");
+
+			//if (ptr_ctx->isInScene)
+			//	WaitForInSceneMaybe();
+			App_Unk00D9ABFD = 1;
+			//if (!ptr_ctx->isInScene)
+			//	WaitForInSceneMaybe();
+
+			SuspendThread((HANDLE)hThread);
+
+			DB_Log(5, "Game Thread Suspended");
+		}
+	}
+	return 0;
 }
 
 __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, __int32 nShowCmd)
@@ -115,7 +240,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	if (!App.WindowHandle)
 	{
-		printf("Unable To Create Window");
+		printf("Unable To Create Window: %d\n", GetLastError());
 		return FALSE;
 	}
 

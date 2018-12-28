@@ -241,6 +241,10 @@ bool GameFlow::DoGameflow()
 			SkyStormColor[0] = level->Layer1.R;
 			SkyStormColor[1] = level->Layer1.G;
 			SkyStormColor[2] = level->Layer1.B;
+
+			SkyStormColor2[0] = level->Layer1.R;
+			SkyStormColor2[1] = level->Layer1.G;
+			SkyStormColor2[2] = level->Layer1.B;
 		}
 
 		GAME_STATUS status;

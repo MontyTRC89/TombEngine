@@ -21,6 +21,8 @@
 #define RADIAN 0.01745329252f
 
 #define DX_RELEASE(x) if (x != NULL) x->Release()
+#define D3DX_DEVICE_RESET(x) if (x != NULL) x->OnResetDevice()
+#define D3DX_DEVICE_LOST(x) if (x != NULL) x->OnLostDevice()
 
 using namespace std;
 
@@ -445,6 +447,7 @@ class Renderer
 {
 	LPDIRECT3D9						m_d3D = NULL;
 	LPDIRECT3DDEVICE9				m_device = NULL;
+	D3DPRESENT_PARAMETERS			m_pp;
 	LPDIRECT3DTEXTURE9				m_textureAtlas;
 	LPDIRECT3DTEXTURE9				m_fontAndMiscTexture;
 	LPDIRECT3DTEXTURE9				m_titleScreen;
@@ -568,7 +571,19 @@ class Renderer
 	float							m_fadeFactor;
 	bool							m_cinematicBars;
 	float							m_progress;
-	
+
+	// Legacy room clipper
+	__int32							m_boundList[256];
+	__int32							m_boundStart;
+	__int32							m_boundEnd;
+	bool							m_underwater;
+	bool							m_outside;
+	__int32							m_outsideTop;
+	__int32							m_outsideBottom;
+	__int32							m_outsideLeft;
+	__int32							m_outsideRight;
+	__int32							m_midSort;
+
 	__int32							getAnimatedTextureInfo(__int16 textureId);
 	RendererMesh*					getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs);
 	void							fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index);
@@ -641,6 +656,15 @@ class Renderer
 	bool							drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 	bool							drawOverlays();
+	bool							handleDeviceLost();
+	bool							resetDeviceResources();
+	void							createConstrainedBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* object, D3DXVECTOR3* cameraPosition, D3DXVECTOR3* rotateAxis, D3DXVECTOR3* cameraForward, D3DXVECTOR3* objectForward);
+	bool							initialiseRenderTargets();
+	void							legacyCollectRoomsToDraw(__int16 roomNumber);
+	void							legacyGetVisibleRooms();
+	void							legacySetRoomBounds(__int16* door, __int32 roomNumber, ROOM_INFO* parent);
+	bool							beforeDeviceReset();
+	bool							afterDeviceReset();
 
 public:
 	D3DXMATRIX						ViewMatrix;
@@ -681,5 +705,7 @@ public:
 	void							UpdateProgress(float value);
 	bool							IsFading();
 	void							GetLaraBonePosition(D3DXVECTOR3* pos, __int32 bone);
-	void							createConstrainedBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* object, D3DXVECTOR3* cameraPosition, D3DXVECTOR3* rotateAxis, D3DXVECTOR3* cameraForward, D3DXVECTOR3* objectForward);
+	bool							ToggleFullScreen();
+	bool							IsFullsScreen();
+	bool							ChangeScreenResolution();
 };

@@ -203,6 +203,8 @@
 #define OutsideRight				VAR_U_(0x00E6E4C0, __int32)
 #define Underwater					VAR_U_(0x00E6E4B4, __int32)
 #define Unknown_00E6CAE8			VAR_U_(0x00E6CAE8, __int32)
+#define PhdWindowXmax				VAR_U_(0x0055D218, __int16)
+#define PhdWindowYmax				VAR_U_(0x0055D240, __int16)
 
 #define Fires						ARRAY_(0x00E4C7A0, FIRE_LIST, [32])
 #define Dynamics					ARRAY_(0x00E6C3E0, DYNAMIC, [64])
@@ -228,6 +230,7 @@
 #define SkyColor1					VAR_U_(0x00E5C2A4, CVECTOR)
 #define SkyColor2					VAR_U_(0x00E5C280, CVECTOR)
 #define SkyStormColor				ARRAY_(0x00E6CAF0, __int16, [3])
+#define SkyStormColor2				ARRAY_(0x00E6E4B8, __int16, [3])
 #define StormTimer					VAR_U_(0x0051CD5C, __int16)
 #define Unk_00E6D74C				VAR_U_(0x00E6D74C, __int16)
 #define Unk_00E6D73C				VAR_U_(0x00E6D73C, __int16)
@@ -315,6 +318,10 @@
 #define SphereList					ARRAY_(0x00E51FE0, SPHERE, [34])
 
 #define IsRoomOutsideNo				VAR_U_(0x007FE6C2, __int16)
+
+#define App_Unk00D9AC2B				VAR_U_(0x00D9AC2B, byte)
+#define App_Unk00D9AC19				VAR_U_(0x00D9AC19, byte)
+#define App_Unk00D9ABFD				VAR_U_(0x00D9ABFD, __int32)
 
 extern bool MonksAttackLara;
 

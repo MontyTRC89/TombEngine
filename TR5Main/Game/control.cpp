@@ -1021,6 +1021,39 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 	}
 }
 
+void __cdecl UpdateSky()
+{
+	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+
+	if (level->Layer1.Enabled)
+	{
+		SkyPos1 += level->Layer1.CloudSpeed;
+		if (SkyPos1 <= 9728)
+		{
+			if (SkyPos1 < 0)
+				SkyPos1 += 9728;
+		}
+		else
+		{
+			SkyPos1 -= 9728;
+		}
+	}
+
+	if (level->Layer1.Enabled)
+	{
+		SkyPos2 += level->Layer2.CloudSpeed;
+		if (SkyPos2 <= 9728)
+		{
+			if (SkyPos2 < 0)
+				SkyPos2 += 9728;
+		}
+		else
+		{
+			SkyPos2 -= 9728;
+		}
+	}
+}
+
 void Inject_Control()
 {
 	

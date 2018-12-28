@@ -88,6 +88,7 @@ typedef struct GameScriptSettings {
 };
 
 typedef struct GameScriptSkyLayer {
+	bool Enabled;
 	byte R;
 	byte G;
 	byte B;
@@ -95,7 +96,8 @@ typedef struct GameScriptSkyLayer {
 
 	GameScriptSkyLayer()
 	{
-
+		Enabled = false;
+		R = G = B = CloudSpeed = 0;
 	}
 
 	GameScriptSkyLayer(byte r, byte g, byte b, __int16 speed)
@@ -104,6 +106,7 @@ typedef struct GameScriptSkyLayer {
 		G = g;
 		B = b;
 		CloudSpeed = speed;
+		Enabled = true;
 	}
 };
 
