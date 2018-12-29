@@ -122,28 +122,11 @@ void Inventory::Initialise()
 
 	// DEBUG
 	{
-		//Lara.uzisTypeCarried = 1;
-		//Lara.numUziAmmo = 1000;
-
-		//Lara.shotgunTypeCarried = 1;
-		//Lara.numShotgunAmmo1 = 1000;
-		//Lara.numShotgunAmmo2 = 1000;
-
-		/*Lara.numRevolverAmmo = 1000;
-		Lara.numShotgunAmmo2 = 1000;
-		Lara.crowbar = 1;
-
-		Lara.sixshooterTypeCarried = 1;*/
-		//Lara.uzisTypeCarried = 1;
-		//Lara.numUziAmmo = 10000;
-				//Lara.crossbowTypeCarried = 1;
-		//Lara.numCrossbowAmmo1 = 1000;
-
 		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = true;
 		g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[0] = -1;
 		g_LaraExtra.Weapons[WEAPON_PISTOLS].SelectedAmmo = WEAPON_AMMO1;
 
-		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present = true;
+		/*g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present = true;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] = 1000;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
 
@@ -152,11 +135,11 @@ void Inventory::Initialise()
 		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
 
 		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Present = true;
-		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;
+		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;*/
 	}
 	
 	// Now fill the rings
-	if (!(gfLevelFlags & 1))
+	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_DRAW_TYPE::LARA_YOUNG)
 	{
 		// Pistols
 		if (g_LaraExtra.Weapons[WEAPON_PISTOLS].Present)
@@ -267,10 +250,6 @@ void Inventory::Initialise()
 		if (Lara.numFlares)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_FLARES);
 	}
-
-	InsertObject(INV_RING_WEAPONS, INV_OBJECT_BINOCULARS);
-
-	//InsertObject(INV_RING_OPTIONS, 26);
 
 	if (Lara.numSmallMedipack)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_SMALL_MEDIPACK);

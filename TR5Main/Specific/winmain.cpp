@@ -97,23 +97,11 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (msg == WM_CLOSE)
 	{
 		DB_Log(6, "WM_CLOSE");
+
 		receivedWmClose = true;
 		PostQuitMessage(0);
+
 		return DefWindowProcA(hWnd, 0x10u, wParam, (LPARAM)lParam);
-	}
-
-	if (msg == WM_CREATE)
-	{
-		DB_Log(6, "WM_CREATE");
-		// Old renderer setted a counter, not used anymore
-		return DefWindowProcA(hWnd, 1u, wParam, (LPARAM)lParam);
-	}
-
-	if (msg == WM_MOVE)
-	{
-		DB_Log(6, "WM_MOVE");
-		// With DX6 it was needed to handle DirectDraw surface move, not needed with DX9
-		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
 	if (msg != WM_ACTIVATE)
