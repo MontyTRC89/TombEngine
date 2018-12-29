@@ -104,6 +104,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			
 			case IDOK:
 				// Save the configuration
+				SaveConfiguration();
 				EndDialog(handle, wParam);
 				return 1;
 
@@ -140,16 +141,6 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 
-		switch (LOWORD(wParam))
-		{
-		case IDOK:
-			// Save the configuration
-
-		case IDCANCEL:
-			EndDialog(handle, wParam);
-			return 1;
-		}
-
 		break;
 
 	default:
@@ -166,10 +157,6 @@ __int32 __cdecl SetupDialog()
 	__int32 result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP_WINDOW), 0, (DLGPROC)DialogProc, 0);
 	ShowCursor(false);
 
-	//printf("%d\n", GetLastError());
-
-	//ShowWindow(result, SW_SHOW);
-
 	return true;
 }
 
@@ -184,6 +171,74 @@ bool FileExists(char* fileName)
 	{
 		return false;
 	}
+}
+
+bool __cdecl SaveConfiguration()
+{
+	// Try to open the root key
+	HKEY rootKey = NULL;
+	if (RegOpenKeyA(HKEY_CURRENT_USER, REGKEY_ROOT, &rootKey) != ERROR_SUCCESS)
+	{
+		// Create the new key
+		if (RegCreateKeyA(HKEY_CURRENT_USER, REGKEY_ROOT, &rootKey) != ERROR_SUCCESS)
+			return false;
+	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_ADAPTER, g_Configuration.Adapter) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_SCREEN_WIDTH, g_Configuration.Width) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_SCREEN_HEIGHT, g_Configuration.Height) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_WINDOWED, g_Configuration.Windowed) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_SHADOWS, g_Configuration.EnableShadows) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_VOLUMETRIC_FOG, g_Configuration.EnableVolumetricFog) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_AUTOTARGET, g_Configuration.AutoTarget) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_DISABLE_SOUND, g_Configuration.DisableSound) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+	
+	return true;
 }
 
 bool __cdecl LoadConfiguration()
@@ -273,6 +328,21 @@ bool __cdecl LoadConfiguration()
 	RegCloseKey(rootKey);
 
 	return true;
+}
+
+LONG SetDWORDRegKey(HKEY hKey, char* strValueName, DWORD nValue)
+{
+	return RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
+}
+
+LONG SetBoolRegKey(HKEY hKey, char* strValueName, bool bValue)
+{
+	return SetDWORDRegKey(hKey, strValueName, (bValue ? 1 : 0));
+}
+
+LONG SetStringRegKey(HKEY hKey, char* strValueName, char* strValue)
+{
+	return 1; // RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
 }
 
 LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD* nValue, DWORD nDefaultValue)

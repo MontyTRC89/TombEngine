@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-#define REGKEY_ROOT				"Software\TR5Main\TR5Main"
+#define REGKEY_ROOT				"Software\\TR5Main\\TR5Main"
 
 #define REGKEY_ADAPTER			"Adapter"
 #define REGKEY_SCREEN_WIDTH		"ScreenWidth"
@@ -31,9 +31,13 @@ void __cdecl LoadAdaptersInCombobox(HWND handle);
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 __int32 __cdecl SetupDialog();
 bool __cdecl LoadConfiguration();
+bool __cdecl SaveConfiguration();
 bool __cdecl FileExists(char* fileName);
 LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD* nValue, DWORD nDefaultValue);
 LONG GetBoolRegKey(HKEY hKey, char* strValueName, bool* bValue, bool bDefaultValue);
 LONG GetStringRegKey(HKEY hKey, char* strValueName, char** strValue, char* strDefaultValue);
+LONG SetDWORDRegKey(HKEY hKey, char* strValueName, DWORD nValue);
+LONG SetBoolRegKey(HKEY hKey, char* strValueName, bool bValue);
+LONG SetStringRegKey(HKEY hKey, char* strValueName, char* strValue);
 
 extern GameConfiguration g_Configuration;
