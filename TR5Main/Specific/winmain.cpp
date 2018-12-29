@@ -178,6 +178,24 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	int RetVal;
 	int n;
 
+	// Process the command line
+	bool setup = false;
+	bool debug = false;
+
+	LPWSTR* argv;
+	__int32 argc;
+	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+	for (__int32 i = 1; i < argc; i++)
+	{
+		if (wcscmp(argv[i], L"/setup") == 0)
+			setup = true;
+		if (wcscmp(argv[i], L"/debug") == 0)
+			debug = true;
+	}
+
+	LocalFree(argv);
+
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
 
@@ -226,7 +244,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_Renderer->EnumerateVideoModes();
 
 	// Load configuration and optionally show the setup dialog
-	if (!LoadConfiguration())
+	if (setup || !LoadConfiguration())
 	{
 		if (!SetupDialog())
 		{

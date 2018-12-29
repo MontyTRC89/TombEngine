@@ -7,5 +7,6 @@
     <LocalDebuggerCommand>PCTomb5.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)..\Build\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>/debug /setup</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
