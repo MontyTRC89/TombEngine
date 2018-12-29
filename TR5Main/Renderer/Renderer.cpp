@@ -322,10 +322,10 @@ bool Renderer::EnumerateVideoModes()
 		printf("\t Device Name: %s\n", adapters[i].DeviceName);
 		printf("\t Description: %s\n", adapters[i].Description);
 
-		auto adapter = make_shared<RendererVideoAdapter>();
+		RendererVideoAdapter adapter;
 
-		adapter->Index = i;
-		adapter->Name = adapters[i].Description;
+		adapter.Index = i;
+		adapter.Name = adapters[i].Description;
 
 		__int32 numDisplayModes = m_d3D->GetAdapterModeCount(i, D3DFMT_X8R8G8B8);
 		for (__int32 j = 0; j < numDisplayModes; j++)
@@ -334,13 +334,13 @@ bool Renderer::EnumerateVideoModes()
 
 			m_d3D->EnumAdapterModes(i, D3DFMT_X8R8G8B8, j, &mode);
 
-			auto newMode = make_shared<RendererDisplayMode>();
+			RendererDisplayMode newMode;
 
-			newMode->Width = mode.Width;
-			newMode->Height = mode.Height;
-			newMode->RefreshRate = mode.RefreshRate;
+			newMode.Width = mode.Width;
+			newMode.Height = mode.Height;
+			newMode.RefreshRate = mode.RefreshRate;
 
-			adapter->DisplayModes.push_back(newMode);
+			adapter.DisplayModes.push_back(newMode);
 
 			printf("\t\t %d x %d %d Hz %d\n", mode.Width, mode.Height, mode.RefreshRate, mode.Format);
 		}
@@ -351,7 +351,7 @@ bool Renderer::EnumerateVideoModes()
 	return true;
 }
 
-vector<shared_ptr<RendererVideoAdapter>>* Renderer::GetAdapters()
+vector<RendererVideoAdapter>* Renderer::GetAdapters()
 {
 	return &m_adapters;
 }

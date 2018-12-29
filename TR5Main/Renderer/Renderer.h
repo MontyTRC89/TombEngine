@@ -37,7 +37,7 @@ typedef struct RendererDisplayMode {
 typedef struct RendererVideoAdapter {
 	string Name;
 	__int32 Index;
-	vector<shared_ptr<RendererDisplayMode>> DisplayModes;
+	vector<RendererDisplayMode> DisplayModes;
 };
 
 typedef struct RendererBone {
@@ -583,7 +583,7 @@ class Renderer
 	float							m_fadeFactor;
 	bool							m_cinematicBars;
 	float							m_progress;
-	vector<shared_ptr<RendererVideoAdapter>>	m_adapters;
+	vector<RendererVideoAdapter>	m_adapters;
 
 	// Legacy room clipper
 	__int32							m_boundList[256];
@@ -723,5 +723,5 @@ public:
 	bool							ToggleFullScreen();
 	bool							IsFullsScreen();
 	bool							ChangeScreenResolution();
-	vector<shared_ptr<RendererVideoAdapter>>*	GetAdapters();
+	vector<RendererVideoAdapter>*	GetAdapters();
 };

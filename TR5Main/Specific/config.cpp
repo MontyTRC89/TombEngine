@@ -1,0 +1,322 @@
+#include "config.h"
+
+#include "winmain.h"
+#include "..\resource.h"
+#include "..\Renderer\Renderer.h"
+
+#include <CommCtrl.h>
+
+extern Renderer* g_Renderer;
+
+GameConfiguration g_Configuration;
+
+void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index)
+{
+	HWND cbHandle = GetDlgItem(handle, IDC_CB_MODES);
+
+	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
+
+	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	RendererVideoAdapter* adapter = &(*adapters)[index];
+
+	for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
+	{
+		RendererDisplayMode* mode = &(adapter->DisplayModes)[i];
+
+		char* str = (char*)malloc(255);
+		ZeroMemory(str, 255);
+		sprintf(str, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+
+		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)(str));
+
+		free(str);
+	}
+
+	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
+	SendMessageA(cbHandle, CB_SETMINVISIBLE, 20, 0);
+}
+
+void __cdecl LoadAdaptersInCombobox(HWND handle)
+{
+	HWND cbHandle = GetDlgItem(handle, IDC_CB_ADAPTERS);
+
+	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
+
+	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	for (__int32 i = 0; i < adapters->size(); i++)
+	{
+		RendererVideoAdapter* adapter = &(*adapters)[i];
+		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)adapter->Name.c_str());
+	}
+
+	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
+	LoadResolutionsInCombobox(handle, 0);
+}
+
+BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	HWND ctlHandle;
+
+	__int32 selectedIndex;
+	RendererVideoAdapter* adapter;
+	RendererDisplayMode* mode;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		DB_Log(6, "WM_INITDIALOG");
+
+		LoadAdaptersInCombobox(handle);
+
+		break;
+
+	case WM_COMMAND:
+		DB_Log(6, "WM_COMMAND");
+
+		// Checkboxes
+		if (HIWORD(wParam) == BN_CLICKED)
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDC_CHK_WINDOWED:
+				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_CHK_WINDOWED, BM_GETCHECK, 0, 0));
+				break;
+
+			case IDC_CHK_SHADOWS:
+				g_Configuration.EnableShadows = (SendDlgItemMessage(handle, IDC_CHK_SHADOWS, BM_GETCHECK, 0, 0));
+				break;
+
+			case IDC_CHK_CAUSTICS:
+				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CHK_CAUSTICS, BM_GETCHECK, 0, 0));
+				break;
+
+			case IDC_CHK_VOLUMETRIC_FOG:
+				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_CHK_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
+				break;
+
+			case IDC_CHK_AUTOTARGET:
+				g_Configuration.AutoTarget = (SendDlgItemMessage(handle, IDC_CHK_AUTOTARGET, BM_GETCHECK, 0, 0));
+				break;
+
+			case IDC_CHK_DISABLE_SOUND:
+				g_Configuration.DisableSound = (SendDlgItemMessage(handle, IDC_CHK_DISABLE_SOUND, BM_GETCHECK, 0, 0));
+				break;
+			
+			case IDOK:
+				// Save the configuration
+				EndDialog(handle, wParam);
+				return 1;
+
+			case IDCANCEL:
+				EndDialog(handle, wParam);
+				return 1;
+			
+			}
+
+			return 0;
+		}
+
+		// Comboboxes
+		if (HIWORD(wParam) == CBN_SELCHANGE)
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDC_CB_ADAPTERS:
+				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_CB_ADAPTERS, CB_GETCURSEL, 0, 0));
+				LoadResolutionsInCombobox(handle, g_Configuration.Adapter);
+				break;
+
+			case IDC_CB_MODES:
+				selectedIndex = (SendDlgItemMessage(handle, IDC_CB_MODES, CB_GETCURSEL, 0, 0));
+				adapter = &(*g_Renderer->GetAdapters())[g_Configuration.Adapter];
+				mode = &(adapter->DisplayModes[selectedIndex]);
+				
+				g_Configuration.Width = mode->Width;
+				g_Configuration.Height = mode->Height;
+
+				break;
+			}
+
+			return 0;
+		}
+
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+			// Save the configuration
+
+		case IDCANCEL:
+			EndDialog(handle, wParam);
+			return 1;
+		}
+
+		break;
+
+	default:
+		return 0;
+	}
+}
+
+__int32 __cdecl SetupDialog()
+{
+	InitCommonControls();
+	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP_WINDOW), RT_DIALOG);
+
+	ShowCursor(true);
+	__int32 result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP_WINDOW), 0, (DLGPROC)DialogProc, 0);
+	ShowCursor(false);
+
+	//printf("%d\n", GetLastError());
+
+	//ShowWindow(result, SW_SHOW);
+
+	return true;
+}
+
+bool FileExists(char* fileName)
+{
+	if (FILE* file = fopen(fileName, "r")) 
+	{
+		fclose(file);
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+}
+
+bool __cdecl LoadConfiguration()
+{
+	// Try to open the root key
+	HKEY rootKey = NULL;
+	if (RegOpenKeyA(HKEY_CURRENT_USER, REGKEY_ROOT, &rootKey) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	// Load configuration keys
+	DWORD adapter = 0;
+	if (GetDWORDRegKey(rootKey, REGKEY_ADAPTER, &adapter, 0) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	DWORD screenWidth = 0;
+	if (GetDWORDRegKey(rootKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	DWORD screenHeight = 0;
+	if (GetDWORDRegKey(rootKey, REGKEY_SCREEN_HEIGHT, &screenHeight, 0) != ERROR_SUCCESS)
+		return false;
+
+	bool windowed = false;
+	if (GetBoolRegKey(rootKey, REGKEY_WINDOWED, &windowed, false) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool caustics = false;
+	if (GetBoolRegKey(rootKey, REGKEY_CAUSTICS, &caustics, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool volumetricFog = false;
+	if (GetBoolRegKey(rootKey, REGKEY_VOLUMETRIC_FOG, &volumetricFog, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool shadows = false;
+	if (GetBoolRegKey(rootKey, REGKEY_SHADOWS, &shadows, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool autoTarget = false;
+	if (GetBoolRegKey(rootKey, REGKEY_AUTOTARGET, &autoTarget, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool disableSound = false;
+	if (GetBoolRegKey(rootKey, REGKEY_DISABLE_SOUND, &disableSound, false) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	// All configuration values were found, so I can apply configuration to the engine
+	OptionAutoTarget = autoTarget;
+	
+	g_Configuration.AutoTarget = autoTarget;
+	g_Configuration.Width = screenWidth;
+	g_Configuration.Height = screenHeight;
+	g_Configuration.Windowed = windowed;
+	g_Configuration.Adapter = adapter;
+	g_Configuration.EnableShadows = shadows;
+	g_Configuration.EnableCaustics = caustics;
+	g_Configuration.EnableVolumetricFog = volumetricFog;
+	g_Configuration.DisableSound = disableSound;
+
+	RegCloseKey(rootKey);
+
+	return true;
+}
+
+LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD* nValue, DWORD nDefaultValue)
+{
+	*nValue = nDefaultValue;
+	DWORD dwBufferSize(sizeof(DWORD));
+	DWORD nResult(0);
+	LONG nError = ::RegQueryValueEx(hKey,
+		strValueName,
+		0,
+		NULL,
+		reinterpret_cast<LPBYTE>(&nResult),
+		&dwBufferSize);
+	if (ERROR_SUCCESS == nError)
+	{
+		*nValue = nResult;
+	}
+	return nError;
+}
+
+
+LONG GetBoolRegKey(HKEY hKey, char* strValueName, bool* bValue, bool bDefaultValue)
+{
+	DWORD nDefValue((bDefaultValue) ? 1 : 0);
+	DWORD nResult(nDefValue);
+	LONG nError = GetDWORDRegKey(hKey, strValueName, &nResult, nDefValue);
+	if (ERROR_SUCCESS == nError)
+	{
+		*bValue = (nResult != 0) ? true : false;
+	}
+	return nError;
+}
+
+
+LONG GetStringRegKey(HKEY hKey, char* strValueName, char** strValue, char* strDefaultValue)
+{
+	*strValue = strDefaultValue;
+	char szBuffer[512];
+	DWORD dwBufferSize = sizeof(szBuffer);
+	ULONG nError;
+	nError = RegQueryValueEx(hKey, strValueName, 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+	if (ERROR_SUCCESS == nError)
+	{
+		*strValue = szBuffer;
+	}
+	return nError;
+}
