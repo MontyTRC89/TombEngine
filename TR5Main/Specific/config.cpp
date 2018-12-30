@@ -68,6 +68,31 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		LoadAdaptersInCombobox(handle);
 
+		// Set some default values
+		SendDlgItemMessage(handle, IDC_CHK_AUTOTARGET, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_CHK_VOLUMETRIC_FOG, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_CHK_SHADOWS, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_CHK_CAUSTICS, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_CHK_WINDOWED, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_SL_MUSIC_VOLUME, TBM_SETPOS, true, 100);
+		SendDlgItemMessage(handle, IDC_SL_SFX_VOLUME, TBM_SETPOS, true, 100);
+
+		break;
+
+	case WM_HSCROLL:
+		DB_Log(6, "WM_HSCROLL");
+
+		if (lParam == (LPARAM)GetDlgItem(handle, IDC_SL_MUSIC_VOLUME))
+		{
+			g_Configuration.MusicVolume = (SendMessage((HWND)lParam, TBM_GETPOS, 0, 0));
+			break;
+		}
+		else if (lParam == (LPARAM)GetDlgItem(handle, IDC_SL_SFX_VOLUME))
+		{
+			g_Configuration.SfxVolume = (SendMessage((HWND)lParam, TBM_GETPOS, 0, 0));
+			break;
+		}
+
 		break;
 
 	case WM_COMMAND:
@@ -160,19 +185,6 @@ __int32 __cdecl SetupDialog()
 	return true;
 }
 
-bool FileExists(char* fileName)
-{
-	if (FILE* file = fopen(fileName, "r")) 
-	{
-		fclose(file);
-		return true;
-	}
-	else 
-	{
-		return false;
-	}
-}
-
 bool __cdecl SaveConfiguration()
 {
 	// Try to open the root key
@@ -237,6 +249,22 @@ bool __cdecl SaveConfiguration()
 		RegCloseKey(rootKey);
 		return false;
 	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_MUSIC_VOLUME, g_Configuration.MusicVolume) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_SFX_VOLUME, g_Configuration.SfxVolume) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	OptionAutoTarget = g_Configuration.AutoTarget;
+	GlobalMusicVolume = g_Configuration.MusicVolume;
+	GlobalFXVolume = g_Configuration.SfxVolume;
 	
 	return true;
 }
@@ -312,9 +340,21 @@ bool __cdecl LoadConfiguration()
 		return false;
 	}
 
+	DWORD musicVolume = 100;
+	if (GetDWORDRegKey(rootKey, REGKEY_MUSIC_VOLUME, &musicVolume, 100) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	DWORD sfxVolume = 100;
+	if (GetDWORDRegKey(rootKey, REGKEY_SFX_VOLUME, &sfxVolume, 100) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
 	// All configuration values were found, so I can apply configuration to the engine
-	OptionAutoTarget = autoTarget;
-	
 	g_Configuration.AutoTarget = autoTarget;
 	g_Configuration.Width = screenWidth;
 	g_Configuration.Height = screenHeight;
@@ -324,6 +364,13 @@ bool __cdecl LoadConfiguration()
 	g_Configuration.EnableCaustics = caustics;
 	g_Configuration.EnableVolumetricFog = volumetricFog;
 	g_Configuration.DisableSound = disableSound;
+	g_Configuration.MusicVolume = musicVolume;
+	g_Configuration.SfxVolume = sfxVolume;
+
+	// Set legacy variables
+	OptionAutoTarget = autoTarget;
+	GlobalMusicVolume = musicVolume;
+	GlobalFXVolume = sfxVolume;
 
 	RegCloseKey(rootKey);
 

@@ -47,7 +47,6 @@ int keyMapping[] = {
 void __cdecl InitialiseDirectInput(HWND handle, HINSTANCE instance)
 {
 	// Dummy function, we don't need DirectInput anymore
-	//TestRenderer();
 }
 
 void __cdecl DI_ReadKeyboard(byte* keys)

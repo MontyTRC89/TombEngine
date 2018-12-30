@@ -63,6 +63,16 @@ Gameflow.strings[56] = "Crossbow Normal Ammo";
 Gameflow.strings[57] = "Crossbow Poisoned Ammo";
 Gameflow.strings[58] = "Crossbow Explosive Ammo";
 Gameflow.strings[59] = "Diary";
+Gameflow.strings[60] = "Enabled";
+Gameflow.strings[61] = "Disabled";
+Gameflow.strings[62] = "Music volume";
+Gameflow.strings[63] = "SFX volume";
+Gameflow.strings[64] = "Screen resolution";
+Gameflow.strings[65] = "Dynamic shadows";
+Gameflow.strings[66] = "Underwater caustics";
+Gameflow.strings[67] = "Volumetric fog";
+Gameflow.strings[68] = "Apply";
+Gameflow.strings[69] = "Cancel";
 
 -- Level names (from 100 to 199)
 Gameflow.strings[100] = "Title level";

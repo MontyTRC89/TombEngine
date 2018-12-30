@@ -1077,7 +1077,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 		GameTimer++;
 
 		// Handle input
-		if (DbInput & 0x200000 || closePassport)
+		if (DbInput & IN_DESELECT || closePassport)
 		{
 			moveLeft = false;
 			moveRight = false;
@@ -1085,7 +1085,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 			break;
 		}
-		else if (DbInput & 4 || moveLeft)
+		else if (DbInput & IN_LEFT || moveLeft)
 		{
 			moveLeft = false;
 			moveRight = false;
@@ -1104,7 +1104,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				choice--;
 			}
 		}
-		else if (DbInput & 8 || moveRight)
+		else if (DbInput & IN_RIGHT || moveRight)
 		{
 			moveLeft = false;
 			moveRight = false;
@@ -1135,7 +1135,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				SetDebounce = 0;
 
 				// Process input
-				if (DbInput & 0x200000)
+				if (DbInput & IN_DESELECT)
 				{
 					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
 					{
@@ -1146,17 +1146,17 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 1 && selectedSavegame > 0)
+				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
 					selectedSavegame--;
 					continue;
 				}
-				else if (DbInput & 2 && selectedSavegame < MAX_SAVEGAMES - 1)
+				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
 					selectedSavegame++;
 					continue;
 				}
-				else if (DbInput & 4)
+				else if (DbInput & IN_LEFT)
 				{
 					moveLeft = true;
 					moveRight = false;
@@ -1164,7 +1164,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 8)
+				else if (DbInput & IN_RIGHT)
 				{
 					moveLeft = false;
 					moveRight = true;
@@ -1172,7 +1172,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 0x100000)
+				else if (DbInput & IN_SELECT)
 				{
 					//ReadSavegame(selectedSavegame);
 					g_GameFlow->SelectedSaveGame = selectedSavegame;
@@ -1204,7 +1204,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				SetDebounce = 0;
 
 				// Process input
-				if (DbInput & 0x200000)
+				if (DbInput & IN_DESELECT)
 				{
 					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
 					{
@@ -1215,17 +1215,17 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 1 && selectedSavegame > 0)
+				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
 					selectedSavegame--;
 					continue;
 				}
-				else if (DbInput & 2 && selectedSavegame < MAX_SAVEGAMES - 1)
+				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
 					selectedSavegame++;
 					continue;
 				}
-				else if (DbInput & 4)
+				else if (DbInput & IN_LEFT)
 				{
 					moveLeft = true;
 					moveRight = false;
@@ -1233,7 +1233,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 8)
+				else if (DbInput & IN_RIGHT)
 				{
 					moveLeft = false;
 					moveRight = true;
@@ -1241,7 +1241,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 0x100000)
+				else if (DbInput & IN_SELECT)
 				{
 					// Use the new savegame system
 					char fileName[255];
@@ -1276,7 +1276,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				SetDebounce = 0;
 
 				// Process input
-				if (DbInput & 0x200000)
+				if (DbInput & IN_DESELECT)
 				{
 					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
 					{
@@ -1287,17 +1287,17 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 1 && selectedLevel > 0)
+				else if (DbInput & IN_FORWARD && selectedLevel > 0)
 				{
 					selectedLevel--;
 					continue;
 				}
-				else if (DbInput & 2 && selectedLevel < g_GameFlow->GetNumLevels() - 1)
+				else if (DbInput & IN_BACK && selectedLevel < g_GameFlow->GetNumLevels() - 1)
 				{
 					selectedLevel++;
 					continue;
 				}
-				else if (DbInput & 4)
+				else if (DbInput & IN_LEFT)
 				{
 					moveLeft = true;
 					moveRight = false;
@@ -1305,7 +1305,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 8)
+				else if (DbInput & IN_RIGHT)
 				{
 					moveLeft = false;
 					moveRight = true;
@@ -1313,7 +1313,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 0x100000)
+				else if (DbInput & IN_SELECT)
 				{
 					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
 					g_GameFlow->SelectedLevelForNewGame = selectedLevel + 1;
@@ -1342,7 +1342,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				SetDebounce = 0;
 
 				// Process input
-				if (DbInput & 0x200000)
+				if (DbInput & IN_DESELECT)
 				{
 					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
 					{
@@ -1353,7 +1353,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 4)
+				else if (DbInput & IN_LEFT)
 				{
 					moveLeft = true;
 					moveRight = false;
@@ -1361,7 +1361,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 8)
+				else if (DbInput & IN_RIGHT)
 				{
 					moveLeft = false;
 					moveRight = true;
@@ -1369,7 +1369,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 0x100000)
+				else if (DbInput & IN_SELECT)
 				{
 					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
 					moveLeft = false;
@@ -1395,7 +1395,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				SetDebounce = 0;
 
 				// Process input
-				if (DbInput & 0x200000)
+				if (DbInput & IN_DESELECT)
 				{
 					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
 					{
@@ -1406,7 +1406,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 4)
+				else if (DbInput & IN_LEFT)
 				{
 					moveLeft = true;
 					moveRight = false;
@@ -1414,7 +1414,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 8)
+				else if (DbInput & IN_RIGHT)
 				{
 					moveLeft = false;
 					moveRight = true;
@@ -1422,7 +1422,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 0x100000)
+				else if (DbInput & IN_SELECT)
 				{
 					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME;
 					moveLeft = false;
@@ -1448,7 +1448,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				SetDebounce = 0;
 
 				// Process input
-				if (DbInput & 0x200000)
+				if (DbInput & IN_DESELECT)
 				{
 					if (CurrentLevel == 0 || LaraItem->hitPoints > 0)
 					{
@@ -1459,7 +1459,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 4)
+				else if (DbInput & IN_LEFT)
 				{
 					moveLeft = true;
 					moveRight = false;
@@ -1467,7 +1467,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 8)
+				else if (DbInput & IN_RIGHT)
 				{
 					moveLeft = false;
 					moveRight = true;
@@ -1475,7 +1475,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					break;
 				}
-				else if (DbInput & 0x100000)
+				else if (DbInput & IN_SELECT)
 				{
 					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE;
 					moveLeft = false;
@@ -1570,7 +1570,86 @@ void Inventory::DoControlsSettings()
 
 void Inventory::DoGraphicsSettings()
 {
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+	ring->selectedIndex = 0;
 
+	PopupObject();
+
+	// Open the passport
+	for (__int32 i = 0; i < 14; i++)
+	{
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	bool moveLeft = false;
+	bool moveRight = false;
+	bool closeObject = false;
+
+	// Do the passport
+	while (true)
+	{
+		// Handle input
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		GameTimer++;
+
+		// Handle input
+		if (DbInput & IN_DESELECT || closeObject)
+		{
+			moveLeft = false;
+			moveRight = false;
+			closeObject = false;
+
+			break;
+		}
+		else if (DbInput & IN_LEFT || moveLeft)
+		{
+			moveLeft = false;
+			moveRight = false;
+			closeObject = false;
+		}
+		else if (DbInput & IN_RIGHT || moveRight)
+		{
+			moveLeft = false;
+			moveRight = false;
+			closeObject = false;
+		}
+		else if (DbInput & IN_FORWARD)
+		{
+			moveLeft = false;
+			moveRight = false;
+			closeObject = false;
+
+			if (ring->selectedIndex > 0)
+				ring->selectedIndex--;
+		}
+		else if (DbInput & IN_BACK)
+		{
+			moveLeft = false;
+			moveRight = false;
+			closeObject = false;
+
+			if (ring->selectedIndex < 3)
+				ring->selectedIndex++;
+		}
+		else if (DbInput & IN_SELECT)
+		{
+			moveLeft = false;
+			moveRight = false;
+			closeObject = true;
+
+			break;
+		}
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	PopoverObject();
 }
 
 void Inventory::DoSoundSettings()

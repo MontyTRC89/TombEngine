@@ -192,7 +192,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	 
 	// TODO: deprecated
 	LoadGameflow();
-	LoadSettings();
+	//LoadSettings();
 
 	// Initialise the new scripting system
 	sol::state luaState;

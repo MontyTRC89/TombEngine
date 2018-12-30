@@ -21,6 +21,7 @@
 #include "..\Specific\winmain.h"
 #include "..\Specific\roomload.h"
 #include "..\Specific\game.h"
+#include "..\Specific\config.h"
 
 #include "..\Game\draw.h"
 #include "..\Game\healt.h"
@@ -37,6 +38,7 @@ using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
 
 extern GameFlow* g_GameFlow;
+extern GameConfiguration g_Configuration;
 
 Renderer::Renderer()
 {
@@ -3200,6 +3202,40 @@ __int32 Renderer::drawInventoryScene()
 						}
 
 						PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					}
+					else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					{
+						// Draw settings menu
+						RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
+
+						// Screen resolution
+						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+						for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
+						{
+							RendererDisplayMode* mode = &adapter->DisplayModes[i];
+							if (mode->Width == ScreenWidth && mode->Height == ScreenHeight)
+							{
+								char buffer[255];
+								ZeroMemory(buffer, 255);
+								sprintf(buffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+
+								PrintString(400, 200, buffer, D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+
+								break;
+							}
+						}
+
+						// Enable dynamic shadows
+						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SHADOWS), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 230, g_GameFlow->GetString(g_Configuration.EnableShadows ? STRING_INV_ENABLED : STRING_INV_DISABLED), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+
+						// Enable caustics
+						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_CAUSTICS), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 260, g_GameFlow->GetString(g_Configuration.EnableCaustics ? STRING_INV_ENABLED : STRING_INV_DISABLED), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+
+						// Enable dynamic shadows
+						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 290, g_GameFlow->GetString(g_Configuration.EnableVolumetricFog ? STRING_INV_ENABLED : STRING_INV_DISABLED), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 					}
 					else
 					{

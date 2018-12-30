@@ -12,8 +12,10 @@
 #define IDC_CHK_VOLUMETRIC_FOG          1007
 #define IDC_CHK_WINDOWED                1008
 #define IDC_CHK_DISABLE_SOUND           1009
-#define IDC_CHECK6                      1010
 #define IDC_CHK_AUTOTARGET              1010
+#define IDC_SL_MUSIC_VOLUME             1011
+#define IDC_SLIDER2                     1013
+#define IDC_SL_SFX_VOLUME               1013
 
 // Next default values for new objects
 // 
@@ -21,7 +23,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
