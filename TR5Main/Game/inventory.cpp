@@ -405,7 +405,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 		GameTimer++;
 
 		// Handle input
-		if (DbInput & 0x200000)
+		if (DbInput & IN_DESELECT)
 		{
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
@@ -413,7 +413,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 			GlobalEnterInventory = -1;
 			return INVENTORY_RESULT::INVENTORY_RESULT_NONE;
 		}
-		else if (DbInput & 1 &&
+		else if (DbInput & IN_FORWARD &&
 			(m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
 				m_activeRing == INV_RING_OPTIONS))
 		{
@@ -436,7 +436,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 
 			continue;
 		}
-		else if (DbInput & 2 && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
+		else if (DbInput & IN_BACK && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -457,7 +457,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 
 			continue;
 		}
-		else if (DbInput & 4)
+		else if (DbInput & IN_LEFT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -480,7 +480,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 
 			m_rings[m_activeRing].movement = 0;
 		}
-		else if (DbInput & 8)
+		else if (DbInput & IN_RIGHT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -503,7 +503,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 
 			m_rings[m_activeRing].movement = 0;
 		}
-		else if (DbInput & 0x100000)
+		else if (DbInput & IN_SELECT)
 		{
 			// Handle action 
 			if (m_activeRing == INV_RING_OPTIONS)
@@ -932,7 +932,7 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 		GameTimer++;
 
 		// Handle input
-		if (DbInput & 4)
+		if (DbInput & IN_LEFT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -955,7 +955,7 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 
 			ring->movement = 0;
 		}
-		else if (DbInput & 8)
+		else if (DbInput & IN_RIGHT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -978,7 +978,7 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 
 			ring->movement = 0;
 		}
-		else if (DbInput & 0x100000)
+		else if (DbInput & IN_SELECT)
 		{
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
@@ -1149,13 +1149,13 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 					selectedSavegame--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 					selectedSavegame++;
 					continue;
 				}
@@ -1177,7 +1177,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
 					//ReadSavegame(selectedSavegame);
 					g_GameFlow->SelectedSaveGame = selectedSavegame;
@@ -1222,13 +1222,13 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 					selectedSavegame--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 					selectedSavegame++;
 					continue;
 				}
@@ -1250,7 +1250,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
 					// Use the new savegame system
 					char fileName[255];
@@ -1298,13 +1298,13 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedLevel > 0)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 					selectedLevel--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedLevel < g_GameFlow->GetNumLevels() - 1)
 				{
-					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 					selectedLevel++;
 					continue;
 				}
@@ -1326,7 +1326,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
 					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
 					g_GameFlow->SelectedLevelForNewGame = selectedLevel + 1;
@@ -1384,6 +1384,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
 					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
 					moveLeft = false;
 					moveRight = false;
@@ -1437,6 +1439,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
 					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME;
 					moveLeft = false;
 					moveRight = false;
@@ -1490,6 +1494,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
 					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE;
 					moveLeft = false;
 					moveRight = false;
