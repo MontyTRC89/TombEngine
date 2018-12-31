@@ -358,7 +358,7 @@ vector<RendererVideoAdapter>* Renderer::GetAdapters()
 	return &m_adapters;
 }
 
-bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
+bool Renderer::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle)
 {
 	HRESULT res;
 
@@ -379,6 +379,7 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 	m_pp.AutoDepthStencilFormat = D3DFMT_D24S8;
 	m_pp.MultiSampleType = D3DMULTISAMPLE_NONE;
 	m_pp.BackBufferFormat = D3DFMT_X8R8G8B8;
+	m_pp.FullScreen_RefreshRateInHz = (windowed ? 0 : refreshRate);
 
 	res = m_d3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, handle, D3DCREATE_HARDWARE_VERTEXPROCESSING,
 							  &m_pp, &m_device);
@@ -587,20 +588,6 @@ bool Renderer::Initialise(__int32 w, __int32 h, bool windowed, HWND handle)
 bool Renderer::initialiseRenderTargets()
 {
 	HRESULT res;
-
-	/*DX_RELEASE(m_renderTarget);
-	DX_RELEASE(m_shadowMap);
-	DX_RELEASE(m_shadowMapZBuffer);
-	DX_RELEASE(m_backBufferTarget);
-	DX_RELEASE(m_backBufferDepth);
-	DX_RELEASE(m_zBuffer);
-	DX_RELEASE(m_depthBuffer);
-	DX_RELEASE(m_normalBuffer);
-	DX_RELEASE(m_colorBuffer);
-	DX_RELEASE(m_outputBuffer);
-	DX_RELEASE(m_lightBuffer);
-	DX_RELEASE(m_vertexLightBuffer);
-	DX_RELEASE(m_postprocessBuffer);*/
 
 	m_renderTarget = NULL;
 	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_renderTarget, NULL);
@@ -2974,6 +2961,8 @@ __int32 Renderer::drawInventoryScene()
 	rect.right = ScreenWidth;
 	rect.bottom = ScreenHeight;
 
+	m_lines2D.clear();
+
 	// Clear screen
 	bindRenderTargets(m_outputBuffer, NULL, NULL, NULL, m_backBufferDepth);
 	m_device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
@@ -3209,33 +3198,91 @@ __int32 Renderer::drawInventoryScene()
 						RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
 
 						// Screen resolution
-						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-						for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
-						{
-							RendererDisplayMode* mode = &adapter->DisplayModes[i];
-							if (mode->Width == ScreenWidth && mode->Height == ScreenHeight)
-							{
-								char buffer[255];
+						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION), 
+									PRINTSTRING_COLOR_ORANGE, 
+									PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+
+						RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
+							char buffer[255];
 								ZeroMemory(buffer, 255);
 								sprintf(buffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
 
-								PrintString(400, 200, buffer, D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-
-								break;
-							}
-						}
+								PrintString(400, 200, buffer, PRINTSTRING_COLOR_WHITE, 
+											PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
 						// Enable dynamic shadows
-						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SHADOWS), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 230, g_GameFlow->GetString(g_Configuration.EnableShadows ? STRING_INV_ENABLED : STRING_INV_DISABLED), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SHADOWS), 
+									PRINTSTRING_COLOR_ORANGE, 
+									PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 230, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_INV_ENABLED : STRING_INV_DISABLED), 
+									PRINTSTRING_COLOR_WHITE, 
+									PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
 						// Enable caustics
-						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_CAUSTICS), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 260, g_GameFlow->GetString(g_Configuration.EnableCaustics ? STRING_INV_ENABLED : STRING_INV_DISABLED), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_CAUSTICS), 
+									PRINTSTRING_COLOR_ORANGE, 
+									PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 260, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+									PRINTSTRING_COLOR_WHITE, 
+									PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 
-						// Enable dynamic shadows
-						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 290, g_GameFlow->GetString(g_Configuration.EnableVolumetricFog ? STRING_INV_ENABLED : STRING_INV_DISABLED), D3DCOLOR_ARGB(255, 255, 255, 255), (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+						// Enable volumetric fog
+						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG), 
+									PRINTSTRING_COLOR_ORANGE,
+									PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 290, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+									PRINTSTRING_COLOR_WHITE, 
+									PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+
+						// Apply and cancel
+						PrintString(400, 320, g_GameFlow->GetString(STRING_INV_APPLY),
+									PRINTSTRING_COLOR_ORANGE,
+									PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 350, g_GameFlow->GetString(STRING_INV_CANCEL),
+									PRINTSTRING_COLOR_ORANGE,
+									PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
+
+					}
+					else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					{
+						// Draw sound menu
+						RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
+
+						// Enable sound
+						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 200, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+
+						// Enable sound special effects
+						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SPECIAL_SOUND_FX),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 230, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+
+						// Music volume
+						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_MUSIC_VOLUME),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+						drawBar(400, 260, 150, 12, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+						
+						// Sound FX volume
+						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_SFX_VOLUME),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+						drawBar(400, 290, 150, 12, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
+						
+						// Apply and cancel
+						PrintString(400, 320, g_GameFlow->GetString(STRING_INV_APPLY),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 350, g_GameFlow->GetString(STRING_INV_CANCEL),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 					}
 					else
 					{
@@ -3328,6 +3375,8 @@ __int32 Renderer::drawInventoryScene()
 	}
 
 	effect->End();
+
+	drawAllLines2D();
 
 	m_device->EndScene();
 	restoreBackBuffer();
@@ -6947,6 +6996,8 @@ bool Renderer::ToggleFullScreen()
 		SetWindowPos(m_pp.hDeviceWindow, HWND_TOP, 0, 0, 0, 0,
 			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 	}
+
+	UpdateWindow(m_pp.hDeviceWindow);
 		
 	// Set the new DX viewport
 	D3DVIEWPORT9 vp;
@@ -6972,8 +7023,54 @@ bool Renderer::ToggleFullScreen()
 	return true;
 }
 
-bool Renderer::ChangeScreenResolution()
+bool Renderer::ChangeScreenResolution(__int32 width, __int32 height, __int32 frequency, bool windowed)
 {
+	// Switch windowed/fullscreen
+	ScreenWidth = width;
+	ScreenHeight = height;
+
+	m_pp.BackBufferWidth = ScreenWidth;
+	m_pp.BackBufferHeight = ScreenHeight;
+	m_pp.Windowed = windowed;
+	m_pp.FullScreen_RefreshRateInHz = (windowed ? 0 : frequency);
+
+	// Change window's parameters
+	if (m_pp.Windowed)
+	{
+		SetWindowLong(m_pp.hDeviceWindow, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		SetWindowPos(m_pp.hDeviceWindow, HWND_TOP, 0, 0, ScreenWidth, ScreenHeight,
+			SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+	}
+	else
+	{
+		SetWindowLong(m_pp.hDeviceWindow, GWL_STYLE, WS_POPUPWINDOW);
+		SetWindowPos(m_pp.hDeviceWindow, HWND_TOP, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	}
+
+	UpdateWindow(m_pp.hDeviceWindow);
+
+	// Set the new DX viewport
+	D3DVIEWPORT9 vp;
+	vp.X = 0;
+	vp.Y = 0;
+	vp.Width = m_pp.BackBufferWidth;
+	vp.Height = m_pp.BackBufferHeight;
+	vp.MinZ = 0.0f;
+	vp.MaxZ = 1.0f;
+	m_device->SetViewport(&vp);
+
+	// Reset the device		
+	beforeDeviceReset();
+
+	HRESULT result = m_device->Reset(&m_pp);
+	if (FAILED(result)) {
+		fprintf(stderr, "Error: %s error description: %s\n",
+			DXGetErrorString(result), DXGetErrorDescription(result));
+	}
+
+	afterDeviceReset();
+
 	return true;
 }
 
@@ -7026,8 +7123,6 @@ bool Renderer::beforeDeviceReset()
 
 bool Renderer::afterDeviceReset()
 {
-	initialiseRenderTargets();
-
 	D3DX_DEVICE_RESET(m_dxSprite);
 	D3DX_DEVICE_RESET(m_dxLine);
 	D3DX_DEVICE_RESET(m_debugFont);
@@ -7044,6 +7139,8 @@ bool Renderer::afterDeviceReset()
 	D3DX_DEVICE_RESET(m_shaderReconstructZBuffer->GetEffect());
 	D3DX_DEVICE_RESET(m_shaderSprites->GetEffect());
 	D3DX_DEVICE_RESET(m_shaderTransparent->GetEffect());
+
+	initialiseRenderTargets();
 
 	return true;
 }

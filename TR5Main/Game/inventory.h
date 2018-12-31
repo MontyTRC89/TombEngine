@@ -1,5 +1,7 @@
 #pragma once
 
+#include "..\Specific\config.h"
+
 // Legacy stuff
 #define ObjectInInventory ((__int32 (__cdecl*)(__int16)) 0x00464360)
 
@@ -161,6 +163,20 @@ void Inject_Inventory();
 #define INV_WHAT_AUDIO_SETTINGS			8
 #define INV_WHAT_CONTROLS_SETTINGS		9
 
+#define INV_DISPLAY_RESOLUTION			0
+#define INV_DISPLAY_SHADOWS				1
+#define INV_DISPLAY_CAUSTICS			2
+#define INV_DISPLAY_VOLUMETRIC_FOG		3
+#define INV_DISPLAY_APPLY				4
+#define INV_DISPLAY_CANCEL				5
+#define INV_DISPLAY_COUNT				6
+
+#define INV_SOUND_ENABLED				0
+#define INV_SOUND_SPECIAL_EFFECTS		1
+#define INV_SOUND_MUSIC_VOLUME			2
+#define INV_SOUND_SFX_VOLUME			3
+#define INV_SOUND_COUNT					4
+
 #define INV_TYPE_TITLE					0
 #define INV_TYPE_GAME					1
 
@@ -196,6 +212,8 @@ typedef struct InventoryRing {
 	// Special fields for settings and passport
 	__int32 selectedIndex;
 	__int32 passportAction;
+	__int32 SelectedVideoMode;
+	GameConfiguration Configuration;
 };
 
 typedef struct InventoryObjectDefinition {

@@ -73,6 +73,8 @@ Gameflow.strings[66] = "Underwater caustics";
 Gameflow.strings[67] = "Volumetric fog";
 Gameflow.strings[68] = "Apply";
 Gameflow.strings[69] = "Cancel";
+Gameflow.strings[70] = "Enable sound";
+Gameflow.strings[71] = "Special effects";
 
 -- Level names (from 100 to 199)
 Gameflow.strings[100] = "Title level";

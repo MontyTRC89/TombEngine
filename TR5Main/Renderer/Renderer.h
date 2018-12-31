@@ -694,7 +694,7 @@ public:
 
 	bool							Create();
 	bool							EnumerateVideoModes();
-	bool							Initialise(__int32 w, __int32 h, bool windowed, HWND handle);
+	bool							Initialise(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle);
 	__int32							Draw();
 	bool							PrepareDataForTheRenderer();
 	__int32							DumpGameScene();
@@ -722,6 +722,6 @@ public:
 	void							GetLaraBonePosition(D3DXVECTOR3* pos, __int32 bone);
 	bool							ToggleFullScreen();
 	bool							IsFullsScreen();
-	bool							ChangeScreenResolution();
+	bool							ChangeScreenResolution(__int32 width, __int32 height, __int32 frequency, bool windowed);
 	vector<RendererVideoAdapter>*	GetAdapters();
 };

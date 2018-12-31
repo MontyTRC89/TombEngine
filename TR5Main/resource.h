@@ -11,10 +11,11 @@
 #define IDC_CHK_CAUSTICS                1006
 #define IDC_CHK_VOLUMETRIC_FOG          1007
 #define IDC_CHK_WINDOWED                1008
-#define IDC_CHK_DISABLE_SOUND           1009
+#define IDC_CHK_ENABLE_SOUND            1009
 #define IDC_CHK_AUTOTARGET              1010
 #define IDC_SL_MUSIC_VOLUME             1011
-#define IDC_SLIDER2                     1013
+#define IDC_CHK_ENABLE_SOUND2           1012
+#define IDC_CHK_ENABLE_SOUND_SPECIAL_FX 1012
 #define IDC_SL_SFX_VOLUME               1013
 
 // Next default values for new objects

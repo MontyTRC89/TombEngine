@@ -81,8 +81,10 @@ using namespace std;
 #define STRING_INV_VOLUMETRIC_FOG		67
 #define STRING_INV_APPLY				68
 #define STRING_INV_CANCEL				69
-#define STRING_INV_WATERSKIN1_EMPTY		70
-#define STRING_INV_WATERSKIN2_EMPTY		71
+#define STRING_INV_ENABLE_SOUND			70
+#define STRING_INV_SPECIAL_SOUND_FX		71
+#define STRING_INV_WATERSKIN1_EMPTY		75
+#define STRING_INV_WATERSKIN2_EMPTY		76
 
 typedef struct GameScriptSettings {
 	__int32 ScreenWidth;

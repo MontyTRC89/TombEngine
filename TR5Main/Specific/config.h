@@ -8,7 +8,8 @@
 #define REGKEY_SCREEN_WIDTH		"ScreenWidth"
 #define REGKEY_SCREEN_HEIGHT	"ScreenHeight"
 #define REGKEY_WINDOWED			"Windowed"
-#define REGKEY_DISABLE_SOUND	"DisableSound"
+#define REGKEY_ENABLE_SOUND		"EnableSound"
+#define REGKEY_SOUND_SPECIAL_FX	"EnableSoundSpecialEffects"
 #define REGKEY_SHADOWS			"Shadows"
 #define REGKEY_CAUSTICS			"Caustics"
 #define REGKEY_VOLUMETRIC_FOG	"VolumetricFog"
@@ -44,17 +45,20 @@
 #define REGKEY_JLOK				"JLok"
 #define REGKEY_JROL				"JRol"
 #define REGKEY_JWLK				"JWlk"
+#define REGKEY_REFRESH_RATE		"RefreshRate"
 
 typedef struct GameConfiguration {
 	__int32 Width;
 	__int32 Height;
+	__int32 RefreshRate;
 	__int32 Adapter;
 	bool Windowed;
-	bool DisableSound;
+	bool EnableSound;
 	bool AutoTarget;
 	bool EnableShadows;
 	bool EnableCaustics;
 	bool EnableVolumetricFog;
+	bool EnableAudioSpecialEffects;
 	__int32 MusicVolume;
 	__int32 SfxVolume;
 	__int32 Key0;

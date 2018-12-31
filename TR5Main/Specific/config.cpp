@@ -69,12 +69,31 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		LoadAdaptersInCombobox(handle);
 
 		// Set some default values
+		g_Configuration.AutoTarget = true;
 		SendDlgItemMessage(handle, IDC_CHK_AUTOTARGET, BM_SETCHECK, 1, 0);
+
+		g_Configuration.EnableVolumetricFog = true;
 		SendDlgItemMessage(handle, IDC_CHK_VOLUMETRIC_FOG, BM_SETCHECK, 1, 0);
+
+		g_Configuration.EnableShadows = true;
 		SendDlgItemMessage(handle, IDC_CHK_SHADOWS, BM_SETCHECK, 1, 0);
+
+		g_Configuration.EnableCaustics = true;
 		SendDlgItemMessage(handle, IDC_CHK_CAUSTICS, BM_SETCHECK, 1, 0);
+
+		g_Configuration.Windowed = true;
 		SendDlgItemMessage(handle, IDC_CHK_WINDOWED, BM_SETCHECK, 1, 0);
+
+		g_Configuration.EnableSound = true;
+		SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND, BM_SETCHECK, 1, 0);
+
+		g_Configuration.EnableAudioSpecialEffects = true;
+		SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND_SPECIAL_FX, BM_SETCHECK, 1, 0);
+
+		g_Configuration.MusicVolume = 100;
 		SendDlgItemMessage(handle, IDC_SL_MUSIC_VOLUME, TBM_SETPOS, true, 100);
+
+		g_Configuration.SfxVolume = 100;
 		SendDlgItemMessage(handle, IDC_SL_SFX_VOLUME, TBM_SETPOS, true, 100);
 
 		break;
@@ -123,8 +142,12 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				g_Configuration.AutoTarget = (SendDlgItemMessage(handle, IDC_CHK_AUTOTARGET, BM_GETCHECK, 0, 0));
 				break;
 
-			case IDC_CHK_DISABLE_SOUND:
-				g_Configuration.DisableSound = (SendDlgItemMessage(handle, IDC_CHK_DISABLE_SOUND, BM_GETCHECK, 0, 0));
+			case IDC_CHK_ENABLE_SOUND:
+				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND, BM_GETCHECK, 0, 0));
+				break;
+
+			case IDC_CHK_ENABLE_SOUND_SPECIAL_FX:
+				g_Configuration.EnableAudioSpecialEffects = (SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND_SPECIAL_FX, BM_GETCHECK, 0, 0));
 				break;
 			
 			case IDOK:
@@ -159,6 +182,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				
 				g_Configuration.Width = mode->Width;
 				g_Configuration.Height = mode->Height;
+				g_Configuration.RefreshRate = mode->RefreshRate;
 
 				break;
 			}
@@ -244,7 +268,13 @@ bool __cdecl SaveConfiguration()
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_DISABLE_SOUND, g_Configuration.DisableSound) != ERROR_SUCCESS)
+	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_SOUND, g_Configuration.EnableSound) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, g_Configuration.EnableAudioSpecialEffects) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -257,6 +287,12 @@ bool __cdecl SaveConfiguration()
 	}
 
 	if (SetDWORDRegKey(rootKey, REGKEY_SFX_VOLUME, g_Configuration.SfxVolume) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, g_Configuration.RefreshRate) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -298,6 +334,10 @@ bool __cdecl LoadConfiguration()
 	if (GetDWORDRegKey(rootKey, REGKEY_SCREEN_HEIGHT, &screenHeight, 0) != ERROR_SUCCESS)
 		return false;
 
+	DWORD refreshRate = 0;
+	if (GetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, &refreshRate, 0) != ERROR_SUCCESS)
+		return false;
+
 	bool windowed = false;
 	if (GetBoolRegKey(rootKey, REGKEY_WINDOWED, &windowed, false) != ERROR_SUCCESS)
 	{
@@ -333,8 +373,15 @@ bool __cdecl LoadConfiguration()
 		return false;
 	}
 
-	bool disableSound = false;
-	if (GetBoolRegKey(rootKey, REGKEY_DISABLE_SOUND, &disableSound, false) != ERROR_SUCCESS)
+	bool enableSound = false;
+	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_SOUND, &enableSound, false) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool enableSoundSpecialEffects = false;
+	if (GetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, &enableSoundSpecialEffects, false) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -363,9 +410,11 @@ bool __cdecl LoadConfiguration()
 	g_Configuration.EnableShadows = shadows;
 	g_Configuration.EnableCaustics = caustics;
 	g_Configuration.EnableVolumetricFog = volumetricFog;
-	g_Configuration.DisableSound = disableSound;
+	g_Configuration.EnableSound = enableSound;
+	g_Configuration.EnableAudioSpecialEffects = enableSoundSpecialEffects;
 	g_Configuration.MusicVolume = musicVolume;
 	g_Configuration.SfxVolume = sfxVolume;
+	g_Configuration.RefreshRate = refreshRate;
 
 	// Set legacy variables
 	OptionAutoTarget = autoTarget;

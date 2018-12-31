@@ -277,10 +277,11 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	PhdHeight = g_Configuration.Height;
 
 	// Initialise the renderer
-	g_Renderer->Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
+	g_Renderer->Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, 
+						   g_Configuration.Windowed, App.WindowHandle);
 
 	// Initialize audio
-	if (!g_Configuration.DisableSound)	
+	if (g_Configuration.EnableSound)	
 		Sound_Init();
 
 	// Initialise the new inventory
@@ -321,7 +322,7 @@ __int32 __cdecl WinClose()
 
 	DestroyAcceleratorTable(hAccTable);
 
-	if (!g_Configuration.DisableSound)
+	if (g_Configuration.EnableSound)
 		Sound_DeInit();
 	
 	delete g_Renderer;

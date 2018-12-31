@@ -10,6 +10,7 @@
 
 #include "..\Global\global.h"
 #include "..\Specific\input.h"
+#include "..\Specific\config.h"
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
@@ -1148,11 +1149,13 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 					selectedSavegame--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 					selectedSavegame++;
 					continue;
 				}
@@ -1174,6 +1177,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+
 					//ReadSavegame(selectedSavegame);
 					g_GameFlow->SelectedSaveGame = selectedSavegame;
 					result = INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME;
@@ -1217,11 +1222,13 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedSavegame > 0)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 					selectedSavegame--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedSavegame < MAX_SAVEGAMES - 1)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 					selectedSavegame++;
 					continue;
 				}
@@ -1243,6 +1250,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+
 					// Use the new savegame system
 					char fileName[255];
 					ZeroMemory(fileName, 255);
@@ -1289,11 +1298,13 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_FORWARD && selectedLevel > 0)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 					selectedLevel--;
 					continue;
 				}
 				else if (DbInput & IN_BACK && selectedLevel < g_GameFlow->GetNumLevels() - 1)
 				{
+					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 					selectedLevel++;
 					continue;
 				}
@@ -1315,6 +1326,8 @@ INVENTORY_RESULT Inventory::DoPassport()
 				}
 				else if (DbInput & IN_SELECT)
 				{
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+
 					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
 					g_GameFlow->SelectedLevelForNewGame = selectedLevel + 1;
 
@@ -1576,6 +1589,24 @@ void Inventory::DoGraphicsSettings()
 
 	PopupObject();
 
+	// Copy configuration to a temporary object
+	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
+
+	// Get current display mode
+	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	RendererVideoAdapter* adapter = &(*adapters)[ring->Configuration.Adapter];
+	ring->SelectedVideoMode = 0;
+	for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
+	{
+		RendererDisplayMode* mode = &adapter->DisplayModes[i];
+		if (mode->Width == ring->Configuration.Width && mode->Height == ring->Configuration.Height && 
+			mode->RefreshRate == ring->Configuration.RefreshRate)
+		{
+			ring->SelectedVideoMode = i;
+			break;
+		}
+	}
+
 	// Open the passport
 	for (__int32 i = 0; i < 14; i++)
 	{
@@ -1583,8 +1614,6 @@ void Inventory::DoGraphicsSettings()
 		g_Renderer->SyncRenderer();
 	}
 
-	bool moveLeft = false;
-	bool moveRight = false;
 	bool closeObject = false;
 
 	// Do the passport
@@ -1600,49 +1629,114 @@ void Inventory::DoGraphicsSettings()
 		// Handle input
 		if (DbInput & IN_DESELECT || closeObject)
 		{
-			moveLeft = false;
-			moveRight = false;
-			closeObject = false;
-
+			closeObject = true;
 			break;
 		}
-		else if (DbInput & IN_LEFT || moveLeft)
+		else if (DbInput & IN_LEFT)
 		{
-			moveLeft = false;
-			moveRight = false;
 			closeObject = false;
+
+			switch (ring->selectedIndex)
+			{
+			case INV_DISPLAY_RESOLUTION:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				if (ring->SelectedVideoMode > 0)
+					ring->SelectedVideoMode--;
+
+				break;
+
+			case INV_DISPLAY_SHADOWS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableShadows = !ring->Configuration.EnableShadows;
+				break;
+
+			case INV_DISPLAY_CAUSTICS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableCaustics = !ring->Configuration.EnableCaustics;
+				break;
+
+			case INV_DISPLAY_VOLUMETRIC_FOG:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableVolumetricFog = !ring->Configuration.EnableVolumetricFog;
+				break;
+			}
 		}
-		else if (DbInput & IN_RIGHT || moveRight)
+		else if (DbInput & IN_RIGHT)
 		{
-			moveLeft = false;
-			moveRight = false;
 			closeObject = false;
+
+			switch (ring->selectedIndex)
+			{
+			case INV_DISPLAY_RESOLUTION:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				if (ring->SelectedVideoMode < adapter->DisplayModes.size() - 1)
+					ring->SelectedVideoMode++;
+				break;
+
+			case INV_DISPLAY_SHADOWS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableShadows = !ring->Configuration.EnableShadows;
+				break;
+
+			case INV_DISPLAY_CAUSTICS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableCaustics = !ring->Configuration.EnableCaustics;
+				break;
+
+			case INV_DISPLAY_VOLUMETRIC_FOG:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableVolumetricFog = !ring->Configuration.EnableVolumetricFog;
+				break;
+			}
 		}
 		else if (DbInput & IN_FORWARD)
 		{
-			moveLeft = false;
-			moveRight = false;
 			closeObject = false;
 
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 			if (ring->selectedIndex > 0)
 				ring->selectedIndex--;
 		}
 		else if (DbInput & IN_BACK)
 		{
-			moveLeft = false;
-			moveRight = false;
 			closeObject = false;
 
-			if (ring->selectedIndex < 3)
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex < INV_DISPLAY_COUNT)
 				ring->selectedIndex++;
 		}
 		else if (DbInput & IN_SELECT)
 		{
-			moveLeft = false;
-			moveRight = false;
-			closeObject = true;
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
-			break;
+			if (ring->selectedIndex == INV_DISPLAY_APPLY)
+			{
+				// Save the configuration
+				RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
+				ring->Configuration.Width = mode->Width;
+				ring->Configuration.Height = mode->Height;
+				ring->Configuration.RefreshRate = mode->RefreshRate;
+				memcpy(&g_Configuration, &ring->Configuration, sizeof(GameConfiguration));
+				SaveConfiguration();
+
+				// Reset screen and go back
+				g_Renderer->ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 
+												   ring->Configuration.RefreshRate, ring->Configuration.Windowed);
+				closeObject = true;
+
+				break;
+			}
+			else if (ring->selectedIndex == INV_DISPLAY_CANCEL)
+			{
+				SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+				closeObject = true;
+				break;
+			}
+			else
+			{
+
+			}
 		}
 
 		g_Renderer->DrawInventory();
@@ -1654,5 +1748,177 @@ void Inventory::DoGraphicsSettings()
 
 void Inventory::DoSoundSettings()
 {
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+	ring->selectedIndex = 0;
 
+	PopupObject();
+
+	// Copy configuration to a temporary object
+	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
+
+	// Open the passport
+	for (__int32 i = 0; i < 14; i++)
+	{
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	bool closeObject = false;
+	__int32 oldVolume = ring->Configuration.MusicVolume;
+	__int32 oldSfxVolume = ring->Configuration.SfxVolume;
+	bool wasSoundEnabled = ring->Configuration.EnableSound;
+
+	// Do the passport
+	while (true)
+	{
+		// Handle input
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		GameTimer++;
+
+		// Handle input
+		if (DbInput & IN_DESELECT || closeObject)
+		{
+			closeObject = true;
+			GlobalMusicVolume = oldVolume;
+			GlobalFXVolume = oldSfxVolume;
+
+			break;
+		}
+		else if (DbInput & IN_LEFT)
+		{
+			closeObject = false;
+
+			switch (ring->selectedIndex)
+			{
+			case INV_SOUND_ENABLED:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
+
+				break;
+
+			case INV_SOUND_SPECIAL_EFFECTS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
+				break;
+
+			case INV_SOUND_MUSIC_VOLUME:
+				if (ring->Configuration.MusicVolume > 0)
+				{
+					ring->Configuration.MusicVolume--;
+					GlobalMusicVolume = ring->Configuration.MusicVolume;
+				}
+
+				break;
+
+			case INV_SOUND_SFX_VOLUME:
+				if (ring->Configuration.SfxVolume > 0)
+				{
+					ring->Configuration.SfxVolume--;
+					GlobalFXVolume = ring->Configuration.SfxVolume;
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				}
+
+				break;
+			}
+		}
+		else if (DbInput & IN_RIGHT)
+		{
+			closeObject = false;
+
+			switch (ring->selectedIndex)
+			{
+			case INV_SOUND_ENABLED:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
+
+				break;
+
+			case INV_SOUND_SPECIAL_EFFECTS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
+				break;
+
+			case INV_SOUND_MUSIC_VOLUME:
+				if (ring->Configuration.MusicVolume < 100)
+				{
+					ring->Configuration.MusicVolume++;
+					GlobalMusicVolume = ring->Configuration.MusicVolume;
+				}
+
+				break;
+
+			case INV_SOUND_SFX_VOLUME:
+				if (ring->Configuration.SfxVolume < 100)
+				{
+					ring->Configuration.SfxVolume++;
+					GlobalFXVolume = ring->Configuration.SfxVolume;
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				}
+
+				break;
+			}
+		}
+		else if (DbInput & IN_FORWARD)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex > 0)
+				ring->selectedIndex--;
+		}
+		else if (DbInput & IN_BACK)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex < INV_DISPLAY_COUNT)
+				ring->selectedIndex++;
+		}
+		else if (DbInput & IN_SELECT)
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+			if (ring->selectedIndex == INV_DISPLAY_APPLY)
+			{
+				// Save the configuration
+				GlobalMusicVolume = ring->Configuration.MusicVolume;
+				GlobalFXVolume = ring->Configuration.SfxVolume;
+				memcpy(&g_Configuration, &ring->Configuration, sizeof(GameConfiguration));
+				SaveConfiguration();
+
+				// Init or deinit the sound system
+				if (wasSoundEnabled && !g_Configuration.EnableSound)
+					Sound_DeInit();
+				else if (!wasSoundEnabled && g_Configuration.EnableSound)
+					Sound_Init();
+
+				closeObject = true;
+
+				break;
+			}
+			else if (ring->selectedIndex == INV_DISPLAY_CANCEL)
+			{
+				SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+				closeObject = true;
+				GlobalMusicVolume = oldVolume;
+				GlobalFXVolume = oldSfxVolume;
+
+				break;
+			}
+			else
+			{
+
+			}
+		}
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	PopoverObject();
 }
