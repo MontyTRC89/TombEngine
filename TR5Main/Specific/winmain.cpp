@@ -125,39 +125,25 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			DB_Log(6, "WM_ACTIVE");
 
-			if (App_Unk00D9AC19)
-			{
-				//AcquireDirectInput(true);
-				ResumeThread((HANDLE)hThread);
-				App_Unk00D9ABFD = 0;
+			ResumeThread((HANDLE)hThread);
+			App_Unk00D9ABFD = 0;
 
-				DB_Log(5, "Game Thread Resumed");
+			DB_Log(5, "Game Thread Resumed");
 
-				return 0;
-			}
+			return 0;
 		}
 	}
 	else
 	{
 		DB_Log(6, "WM_INACTIVE");
+		DB_Log(5, "HangGameThread");
 
-		if (App_Unk00D9AC19)
-		{
-			//AcquireDirectInput(false);
+		App_Unk00D9ABFD = 1;
+		SuspendThread((HANDLE)hThread);
 
-			DB_Log(5, "HangGameThread");
-
-			//if (ptr_ctx->isInScene)
-			//	WaitForInSceneMaybe();
-			App_Unk00D9ABFD = 1;
-			//if (!ptr_ctx->isInScene)
-			//	WaitForInSceneMaybe();
-
-			SuspendThread((HANDLE)hThread);
-
-			DB_Log(5, "Game Thread Suspended");
-		}
+		DB_Log(5, "Game Thread Suspended");
 	}
+
 	return 0;
 }
 
