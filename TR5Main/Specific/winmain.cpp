@@ -25,6 +25,7 @@ unsigned int threadId;
 uintptr_t hThread;
 HACCEL hAccTable;
 byte receivedWmClose = false;
+bool Debug = false;
 
 extern __int32 IsLevelLoading;
 extern GameFlow* g_GameFlow;
@@ -125,7 +126,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			DB_Log(6, "WM_ACTIVE");
 
-			ResumeThread((HANDLE)hThread);
+			if (!Debug)
+				ResumeThread((HANDLE)hThread);
+
 			App_Unk00D9ABFD = 0;
 
 			DB_Log(5, "Game Thread Resumed");
@@ -139,7 +142,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		DB_Log(5, "HangGameThread");
 
 		App_Unk00D9ABFD = 1;
-		SuspendThread((HANDLE)hThread);
+
+		if (!Debug)
+			SuspendThread((HANDLE)hThread);
 
 		DB_Log(5, "Game Thread Suspended");
 	}
@@ -154,8 +159,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	// Process the command line
 	bool setup = false;
-	bool debug = false;
-
+	
 	LPWSTR* argv;
 	__int32 argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -165,7 +169,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 		if (wcscmp(argv[i], L"/setup") == 0)
 			setup = true;
 		if (wcscmp(argv[i], L"/debug") == 0)
-			debug = true;
+			Debug = true;
 	}
 
 	LocalFree(argv);

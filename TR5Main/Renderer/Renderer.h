@@ -607,8 +607,8 @@ class Renderer
 	bool							checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* viewPort, D3DXVECTOR4* clipPort);
 	void							getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count);
 	void							collectRooms();
-	void							collectItems();
-	void							collectEffects();
+	void							collectItems(__int16 roomNumber);
+	void							collectEffects(__int16 roomNumber);
 	void							collectSceneItems();
 	void							prepareShadowMap();
 	bool							drawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexIndex, UINT minVertexIndex, UINT numVertices, UINT baseIndex, UINT primitiveCount);

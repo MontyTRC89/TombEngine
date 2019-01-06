@@ -1814,6 +1814,9 @@ void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool wat
 		m_rooms[node->To]->Visited = true;
 		m_roomsToDraw.push_back(node->To);
 
+		collectItems(node->To);
+		collectEffects(node->To);
+
 		ROOM_INFO* room = &Rooms[node->To];
 
 		D3DXVECTOR4 clipPort;
@@ -1931,112 +1934,57 @@ void Renderer::collectRooms()
 		if (m_rooms[i] != NULL)
 			m_rooms[i]->Visited = false;
 
-	m_roomsToDraw.clear();
-	/*for (__int32 i = 0; i < NumberRooms; i++)
-		m_roomsToDraw.push_back(i);*/
-
-	ROOM_INFO* room = &Rooms[baseRoomIndex];
-
-	CurrentRoom = baseRoomIndex;
-
-	PhdLeft = room->testLeft = 0;
-	PhdTop = room->testTop = 0;
-	PhdRight = room->testRight = ScreenWidth - 1;
-	PhdBottom = room->testBottom = ScreenHeight - 1;
-	
-	Unknown_00E6CAE8 = 0;
-	Outside = room->flags & ENV_FLAG_OUTSIDE;
-	Underwater = room->flags & ENV_FLAG_WATER;
-
-	room->bound_active = 2;
-	NumberDrawnRooms = 0;
-	BoundList[0] = baseRoomIndex;
-	BoundStart = 0;
-	BoundEnd = 1;
-
-	if (Outside)
-	{
-		OutsideTop = 0;
-		OutsideLeft = 0;
-		OutsideRight = ScreenWidth - 1;
-		OutsideBottom = ScreenHeight - 1;
-	}
-	else
-	{
-		OutsideBottom = 0;
-		OutsideRight = 0;
-		OutsideLeft = ScreenWidth - 1;
-		OutsideTop = ScreenHeight - 1;
-	}
-
-	GetRoomBounds();
-
-	printf("Number rooms: %d\n", NumberDrawnRooms);
-
 	getVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
 }
 
-void Renderer::collectItems()
+void Renderer::collectItems(__int16 roomNumber)
 {
-	m_itemsToDraw.clear();
+	RendererRoom* room = m_rooms[roomNumber].get();
+	if (room == NULL)
+		return;
 
-	auto newItem = make_shared<RendererItemToDraw>(Lara.itemNumber, LaraItem, 15);
-	m_itemsToDraw.push_back(newItem);
+	ROOM_INFO* r = room->Room;
 
-	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+	__int16 itemNum = NO_ITEM;
+	for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
 	{
-		RendererRoom* room = m_rooms[m_roomsToDraw[i]].get();
-		if (room == NULL)
+		ITEM_INFO* item = &Items[itemNum];
+
+		if (item->objectNumber == ID_LARA && itemNum == Items[itemNum].nextItem)
+			break;
+
+		if (item->objectNumber == ID_LARA)
 			continue;
 
-		ROOM_INFO* r = room->Room;
-		
-		__int16 itemNum = NO_ITEM;
-		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
-		{
-			ITEM_INFO* item = &Items[itemNum];
+		if (item->status == ITEM_DEACTIVATED || item->status == ITEM_INVISIBLE)
+			continue;
 
-			if (item->objectNumber == ID_LARA && itemNum == Items[itemNum].nextItem)
-				break;
+		if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
+			continue;
 
-			if (item->objectNumber == ID_LARA)
-				continue;
-
-			if (item->status == ITEM_DEACTIVATED || item->status == ITEM_INVISIBLE)
-				continue;
-
-			if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
-				continue;
-
-			newItem = make_shared<RendererItemToDraw>(itemNum, item, Objects[item->objectNumber].nmeshes);
-			m_itemsToDraw.push_back(newItem);
-		}
+		auto newItem = make_shared<RendererItemToDraw>(itemNum, item, Objects[item->objectNumber].nmeshes);
+		m_itemsToDraw.push_back(newItem);
 	}
 }
 
-void Renderer::collectEffects()
+void Renderer::collectEffects(__int16 roomNumber)
 {
-	m_effectsToDraw.clear();
+	RendererRoom* room = m_rooms[roomNumber].get();
+	if (room == NULL)
+		return;
 
-	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+	ROOM_INFO* r = room->Room;
+
+	__int16 fxNum = NO_ITEM;
+	for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = Effects[fxNum].nextFx)
 	{
-		RendererRoom* room = m_rooms[m_roomsToDraw[i]].get();
-		if (room == NULL)
+		FX_INFO* fx = &Effects[fxNum];
+
+		if (fx->objectNumber < 0)
 			continue;
 
-		ROOM_INFO* r = room->Room;
-
-		__int16 fxNum = NO_ITEM;
-		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = Effects[fxNum].nextFx)
-		{
-			FX_INFO* fx = &Effects[fxNum];
-
-			if (fx->objectNumber < 0)
-				continue;
-
-			auto newEffect = make_shared<RendererEffectToDraw>(fxNum, fx);
-			m_effectsToDraw.push_back(newEffect);
-		}
+		auto newEffect = make_shared<RendererEffectToDraw>(fxNum, fx);
+		m_effectsToDraw.push_back(newEffect);
 	}
 }
 
@@ -3395,9 +3343,15 @@ __int32 Renderer::getFrame(__int16 animation, __int16 frame, __int16** framePtr,
 
 void Renderer::collectSceneItems()
 {
+	m_roomsToDraw.clear();
+	m_itemsToDraw.clear();
+	m_effectsToDraw.clear();
+	m_lights.clear();
+
+	auto newItem = make_shared<RendererItemToDraw>(Lara.itemNumber, LaraItem, 15);
+	m_itemsToDraw.push_back(newItem);
+
 	collectRooms();
-	collectItems();
-	collectEffects();
 	collectLights();
 }
 
@@ -6007,6 +5961,7 @@ void Renderer::updateAnimation(RendererItemToDraw* item, RendererObject* obj, __
 		bones.pop();
 
 		bool calculateMatrix = (mask >> bone->Index) & 1;
+
 		if (calculateMatrix)
 		{
 			D3DXVECTOR3 p = D3DXVECTOR3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
