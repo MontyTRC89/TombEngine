@@ -37,6 +37,7 @@ __int32 NumObjects;
 __int32 NumStaticObjects;
 __int32 NumMeshPointers;
 __int32 NumObjectTextures;
+__int32 NumTextureTiles;
 
 uintptr_t hLoadLevel;
 unsigned __int32 ThreadId;
@@ -597,6 +598,8 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 
 	// This function loops until progress is 100%. Not very thread safe, but behavious should be predictable.
 	g_Renderer->DrawLoadingScreen((char*)(level->LoadScreenFileName.c_str()));
+
+	while (IsLevelLoading);
 
 	return true;
 }

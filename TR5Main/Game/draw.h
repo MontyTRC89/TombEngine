@@ -20,6 +20,6 @@ __int32 DrawInventory();
 void __cdecl DoBootScreen(__int32 language);
 __int32 __cdecl GetFrame_D2(ITEM_INFO* item, __int16* framePtr[], __int32* rate);
 
-extern Renderer* g_Renderer;
+extern Renderer11* g_Renderer;
 
 void Inject_Draw();

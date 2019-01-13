@@ -208,11 +208,11 @@ private:
 	map<__int16, __int16>				m_itemsMap;
 
 public:
-	D3DXVECTOR3							SkyColorLayer1;
+	Vector3								SkyColorLayer1;
 	__int32								SkySpeedLayer1;
-	D3DXVECTOR3							SkyColorLayer2;
+	Vector3								SkyColorLayer2;
 	__int32								SkySpeedLayer2;
-	D3DXVECTOR3							FogColor;
+	Vector3								FogColor;
 	__int32								FogInDistance;
 	__int32								FogOutDistance;
 	bool								DrawHorizon;

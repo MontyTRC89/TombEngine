@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "..\Game\sound.h"
-#include "..\Renderer\Renderer.h"
 
 // Camera
 #define Camera						VAR_U_(0x00EEF940, CAMERA_INFO)
@@ -196,7 +195,7 @@
 #define NumberDrawnRooms			VAR_U_(0x00E6CAFC, __int32)
 #define DrawnRooms					ARRAY_(0x00E6D760, __int16, [256])
 #define CurrentRoom					VAR_U_(0x00E6D754, __int16)
-#define Outside						VAR_U_(0x00E6CAF8, __int32)
+#define Outside2					VAR_U_(0x00E6CAF8, __int32)
 #define OutsideTop					VAR_U_(0x00E6E4E0, __int32)
 #define OutsideLeft					VAR_U_(0x00E6D83C, __int32)
 #define OutsideBottom				VAR_U_(0x00E6D738, __int32)

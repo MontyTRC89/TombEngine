@@ -1,8 +1,9 @@
 #pragma once
 
+#ifdef OLDCODE
+
 #include <stdio.h>
-#include <d3d9.h>
-#include <d3dx9.h>
+#include <D3D11.h>
 #include <DxErr.h>
 #include <vector>
 #include <memory>
@@ -15,12 +16,12 @@ struct RendererPolygon;
 class RendererBucket
 {
 private:
-	LPDIRECT3DDEVICE9			m_device;
-	PDIRECT3DVERTEXBUFFER9		m_vertexBuffer;
-	PDIRECT3DINDEXBUFFER9		m_indexBuffer;
+	ID3D11Device*				m_device;
+	ID3D11Buffer*				m_vertexBuffer;
+	ID3D11Buffer*				m_indexBuffer;
 
 public:
-	RendererBucket(LPDIRECT3DDEVICE9 device);
+	RendererBucket(ID3D11Device* device);
 	~RendererBucket();
 	bool						UpdateBuffers();
 
@@ -32,7 +33,9 @@ public:
 	__int32						NumTriangles;
 	__int32						NumVertices;
 	__int32						NumIndices;
-	PDIRECT3DVERTEXBUFFER9		GetVertexBuffer();
-	PDIRECT3DINDEXBUFFER9		GetIndexBuffer();
+	ID3D11Buffer*				GetVertexBuffer();
+	ID3D11Buffer*				GetIndexBuffer();
 	void						CleanResources();
 };
+
+#endif

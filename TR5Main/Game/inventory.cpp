@@ -1599,7 +1599,7 @@ void Inventory::DoGraphicsSettings()
 	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
 
 	// Get current display mode
-	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	/*vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[ring->Configuration.Adapter];
 	ring->SelectedVideoMode = 0;
 	for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
@@ -1611,7 +1611,7 @@ void Inventory::DoGraphicsSettings()
 			ring->SelectedVideoMode = i;
 			break;
 		}
-	}
+	}*/
 
 	// Open the passport
 	for (__int32 i = 0; i < 14; i++)
@@ -1675,7 +1675,7 @@ void Inventory::DoGraphicsSettings()
 			{
 			case INV_DISPLAY_RESOLUTION:
 				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				if (ring->SelectedVideoMode < adapter->DisplayModes.size() - 1)
+				//if (ring->SelectedVideoMode < adapter->DisplayModes.size() - 1)
 					ring->SelectedVideoMode++;
 				break;
 
@@ -1718,12 +1718,12 @@ void Inventory::DoGraphicsSettings()
 			if (ring->selectedIndex == INV_DISPLAY_APPLY)
 			{
 				// Save the configuration
-				RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
+				/*RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
 				ring->Configuration.Width = mode->Width;
 				ring->Configuration.Height = mode->Height;
 				ring->Configuration.RefreshRate = mode->RefreshRate;
 				memcpy(&g_Configuration, &ring->Configuration, sizeof(GameConfiguration));
-				SaveConfiguration();
+				SaveConfiguration();*/
 
 				// Reset screen and go back
 				g_Renderer->ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 

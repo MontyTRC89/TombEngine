@@ -1,8 +1,8 @@
 #include "draw.h"
 #include "lara.h"
-#include "..\Renderer\Renderer.h"
+#include "..\Renderer\Renderer11.h"
 
-Renderer* g_Renderer;
+Renderer11* g_Renderer;
 
 __int32 __cdecl DrawPhaseGame()
 {

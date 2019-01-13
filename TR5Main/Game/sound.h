@@ -7,6 +7,9 @@
 #include "..\Game\control.h"
 #include "..\Global\global.h"
 
+#include <SimpleMath.h>
+using namespace DirectX::SimpleMath;
+
 typedef enum audio_tracks
 {
 	CDA_XA1_TL_10B, // TO CLIMB OUT, SWIM TO THE EDGE AND PRESS 'ACTION'.
@@ -575,7 +578,7 @@ typedef enum sound_effects
 
 #define SOUND_BASS_UNITS			1.0f / 1024.0f	// TR->BASS distance unit coefficient
 #define SOUND_MAXVOL_RADIUS			1024.0f			// Max. volume hearing distance
-#define SOUND_OMNIPRESENT_ORIGIN    D3DXVECTOR3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)
+#define SOUND_OMNIPRESENT_ORIGIN    Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)
 
 #define SOUND_MAX_SAMPLES 3072 // Original was 1024, reallocate original 3-byte DX handle struct to just 1-byte memory pointer
 #define SOUND_MAX_CHANNELS  32 // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
@@ -608,7 +611,7 @@ typedef struct SoundEffectSlot
 	short effectID;
 	float gain;
 	HCHANNEL channel;
-	D3DXVECTOR3 origin;
+	Vector3 origin;
 };
 
 typedef struct SoundTrackSlot
@@ -682,7 +685,7 @@ int   Sound_GetFreeSlot();
 void  Sound_FreeSlot(int index, unsigned int fadeout = 0);
 int   Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position);
 float Sound_DistanceToListener(PHD_3DPOS *position);
-float Sound_DistanceToListener(D3DXVECTOR3 position);
+float Sound_DistanceToListener(Vector3 position);
 float Sound_Attenuate(float gain, float distance, float radius);
 bool  Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force = false);
 

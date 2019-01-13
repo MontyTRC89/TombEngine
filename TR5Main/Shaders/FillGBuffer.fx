@@ -136,10 +136,6 @@ PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
 
 	output.Normal.xyz = 0.5f * (input.Normal.xyz + 1.0f);
 	output.Normal.w = ModelType / 16.0f;
-	//float pixelFlags = ModelType;
-	//if (Underwater) pixelFlags += 32.0f;
-	//output.Normal.w = pixelFlags / 64.0f;
-	//output.Normal.w = 1.0f;
 
 	output.Depth = input.PositionCopy.z / input.PositionCopy.w;  
 

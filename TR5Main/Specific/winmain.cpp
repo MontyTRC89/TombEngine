@@ -217,7 +217,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	}
 
 	// Create the renderer and enumerate adapters and video modes
-	g_Renderer = new Renderer();
+	g_Renderer = new Renderer11();
 	g_Renderer->Create();
 	g_Renderer->EnumerateVideoModes();
 
@@ -232,6 +232,9 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 		LoadConfiguration();
 	}
+
+	g_Configuration.Width = 800;
+	g_Configuration.Height = 600;
 
 	tagRECT Rect;
 
@@ -290,6 +293,8 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	SetCursor(0);
 	ShowCursor(0);
 	hAccTable = LoadAcceleratorsA(hInstance, (LPCSTR)0x65);
+
+	//g_Renderer->Test();
 
 	SoundActive = false;
 	DoTheGame = true;

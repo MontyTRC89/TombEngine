@@ -270,13 +270,7 @@
     <ClInclude Include="Renderer\RendererObject.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\Shader.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer\Structs.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\RenderTargetCube.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\GameFlowScript.h">
@@ -307,6 +301,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\config.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Renderer11.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -497,13 +494,7 @@
     <ClCompile Include="Renderer\RendererObject.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Shader.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Specific\Init.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\RenderTargetCube.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\baddy.cpp">
@@ -569,6 +560,9 @@
     <ClCompile Include="Specific\config.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Renderer11.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />
@@ -595,6 +589,9 @@
     <None Include="Shaders\FinalPass.fx" />
     <None Include="Scripting\Scripts\andrea1.lua" />
     <None Include="Scripting\Scripts\Constants.lua" />
+    <None Include="packages.config" />
+    <None Include="Shaders\DX11\Test.fx" />
+    <None Include="Shaders\DX11_Test.fx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

@@ -1,14 +1,13 @@
+#ifdef OLDCODE
+
 #include "RendererBucket.h"
 #include "Structs.h"
       
 #include <stdio.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <DxErr.h>
 
 struct RendererVertex;
  
-RendererBucket::RendererBucket(LPDIRECT3DDEVICE9 device)
+RendererBucket::RendererBucket(ID3D11Device* device)
 {
 	m_device = device;
 
@@ -41,7 +40,7 @@ bool RendererBucket::UpdateBuffers()
 {
 	HRESULT res;
 	 
-	if (m_vertexBuffer != NULL)
+	/*if (m_vertexBuffer != NULL)
 		m_vertexBuffer->Release();
 
 	if (NumVertices == 0)
@@ -85,17 +84,19 @@ bool RendererBucket::UpdateBuffers()
 
 	m_indexBuffer->Unlock();
 	if (res != S_OK)
-		return false;
+		return false;*/
 
 	return true;
 }
 
-PDIRECT3DVERTEXBUFFER9 RendererBucket::GetVertexBuffer()
+ID3D11Buffer* RendererBucket::GetVertexBuffer()
 {
 	return m_vertexBuffer;
 }
 
-PDIRECT3DINDEXBUFFER9 RendererBucket::GetIndexBuffer()
+ID3D11Buffer* RendererBucket::GetIndexBuffer()
 {
 	return m_indexBuffer;
 }
+
+#endif

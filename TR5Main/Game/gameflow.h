@@ -25,11 +25,5 @@ extern SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];
 //#define DoGameflow ((__int32 (__cdecl*)(void)) 0x004A8570)
 #define LoadGameflow ((__int32 (__cdecl*)(void)) 0x00434800)
 
-__int32 __cdecl DoPauseMenu();
-__int32 __cdecl DoStatisticsMenu();
-__int32 __cdecl DoSettingsMenu();
-__int32 __cdecl DoLoadGameMenu();
-__int32 __cdecl DoSaveGameMenu();
 __int32 __cdecl LoadSavegameInfos();
 __int32 __cdecl LoadNewStrings();
-__int32 __cdecl DoPassportLoadGameMenu();

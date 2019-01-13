@@ -62,6 +62,7 @@ extern __int16* RawMeshData;
 extern __int32 NumObjectTextures;
 extern char* LevelDataPtr;
 extern __int32 IsLevelLoading;
+extern __int32 NumTextureTiles;
 
 void __cdecl LoadTextures();
 __int32 __cdecl LoadRoomsNew();

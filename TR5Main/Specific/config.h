@@ -59,6 +59,7 @@ typedef struct GameConfiguration {
 	bool EnableCaustics;
 	bool EnableVolumetricFog;
 	bool EnableAudioSpecialEffects;
+	__int32 MaxDrawDistance;
 	__int32 MusicVolume;
 	__int32 SfxVolume;
 	__int32 Key0;

@@ -5,20 +5,19 @@
 #include "draw.h"
  
 void __cdecl phd_LookAt(__int32 posX, __int32 posY, __int32 posZ,
-						__int32 targetX, __int32 targetY, __int32 targetZ,
-						__int16 roll)
+	__int32 targetX, __int32 targetY, __int32 targetZ,
+	__int16 roll)
 {
-	D3DXVECTOR3 position = D3DXVECTOR3(posX, posY, posZ);
-	D3DXVECTOR3 target = D3DXVECTOR3(targetX, targetY, targetZ);
-	D3DXVECTOR3 up = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+	Vector3 position = Vector3(posX, posY, posZ);
+	Vector3 target = Vector3(targetX, targetY, targetZ);
+	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
 	float fov = TR_ANGLE_TO_RAD(CurrentFOV);
 
-	D3DXMatrixLookAtRH(&g_Renderer->ViewMatrix, &position, &target, &up);
-	D3DXMatrixPerspectiveFovRH(&g_Renderer->ProjectionMatrix, fov, g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 32.0f, 200000.0f);
+	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, roll, fov);
 }
 
 void __cdecl phd_AlterFOV(__int32 value)
-{
+{ 
 	CurrentFOV = value;
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
 }

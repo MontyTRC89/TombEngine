@@ -30,7 +30,7 @@ void __cdecl FireHarpoon()
 	if (itemNumber != NO_ITEM)
 	{
 		GAME_VECTOR pos;
-		D3DXVECTOR3 dxPos;
+		Vector3 dxPos;
 
 		ITEM_INFO* item = &Items[itemNumber];
 
@@ -468,14 +468,14 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 	}
 
-	/*D3DXMATRIX transform;
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
+	/*XMMATRIX transform;
+	XMMATRIX translation;
+	XMMATRIX rotation;
 
-	D3DXMatrixRotationYawPitchRoll(&rotation, TR_ANGLE_TO_RAD(item->pos.yRot), TR_ANGLE_TO_RAD(item->pos.xRot),
+	XMMATRIXRotationYawPitchRoll(&rotation, TR_ANGLE_TO_RAD(item->pos.yRot), TR_ANGLE_TO_RAD(item->pos.xRot),
 		TR_ANGLE_TO_RAD(item->pos.zRot));
-	D3DXMatrixTranslation(&translation, 0, 0, -64);
-	D3DXMatrixMultiply(&transform, &rotation, &translation);
+	XMMATRIXTranslation(&translation, 0, 0, -64);
+	XMMATRIXMultiply(&transform, &rotation, &translation);
 
 	__int32 wx = transform._14;
 	__int32 wy = transform._24;

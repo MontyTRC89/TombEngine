@@ -1,14 +1,17 @@
 #pragma once
+#ifdef OLDCODE
+
 #include "Enums.h"
 
 #include <stdio.h>
-#include <d3d9.h>
-#include <d3dx9.h>
+#include <D3D11.h>
 #include <DxErr.h>
 #include <vector>
 #include <memory>
+#include <SimpleMath.h>
 
 using namespace std;
+using namespace DirectX::SimpleMath;
 
 struct RendererBone;
 struct RendererMesh;
@@ -18,18 +21,18 @@ struct RendererVertex;
 class RendererObject
 {
 private:
-	LPDIRECT3DDEVICE9			m_device;
+	ID3D11Device*				m_device;
 	__int32						m_id;
 
 public:
-	RendererObject(LPDIRECT3DDEVICE9 device, __int32 id, __int32 numMeshes);
+	RendererObject(ID3D11Device* device, __int32 id, __int32 numMeshes);
 	//~RendererObject();
 	void						AverageNormals();
 
 	vector<shared_ptr<RendererMesh>>		ObjectMeshes;
 	shared_ptr<RendererBone>				Skeleton;
-	vector<D3DXMATRIX>			AnimationTransforms;
-	vector<D3DXMATRIX>			BindPoseTransforms;
+	vector<Matrix>							AnimationTransforms;
+	vector<Matrix>							BindPoseTransforms;
 	vector<shared_ptr<RendererBone>>		LinearizedBones;
 	__int32						GetId();
 	bool						HasDataInBucket[NUM_BUCKETS];
@@ -40,3 +43,5 @@ public:
 
 	//bool(Renderer::*DrawRoutine)(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
 };
+
+#endif

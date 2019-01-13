@@ -1,13 +1,16 @@
 #pragma once
 
+#ifdef OLDCODE
+
 #include "..\Global\global.h"
 
-#include <d3d9.h>
-#include <d3d9types.h>
-#include <d3dx9.h>
 #include <vector>
 #include <map>
 #include <memory>
+
+#include <xnamath.h>
+#include <D3D11.h>
+#include <D3DX11.h>
 
 #include "RenderTargetCube.h"
 #include "Enums.h"
@@ -20,9 +23,9 @@
 #define PI 3.14159265358979323846f
 #define RADIAN 0.01745329252f
 
-#define DX_RELEASE(x) if (x != NULL) x->Release()
+/*#define DX_RELEASE(x) if (x != NULL) x->Release()
 #define D3DX_DEVICE_RESET(x) if (x != NULL) x->OnResetDevice()
-#define D3DX_DEVICE_LOST(x) if (x != NULL) x->OnLostDevice()
+#define D3DX_DEVICE_LOST(x) if (x != NULL) x->OnLostDevice()*/
 
 using namespace std;
 
@@ -41,22 +44,22 @@ typedef struct RendererVideoAdapter {
 };
 
 typedef struct RendererBone {
-	D3DXVECTOR3 Translation;
-	D3DXMATRIX GlobalTransform;
-	D3DXMATRIX Transform;
-	D3DXVECTOR3 GlobalTranslation;
+	Vector3 Translation;
+	XMMATRIX GlobalTransform;
+	XMMATRIX Transform;
+	Vector3 GlobalTranslation;
 	vector<shared_ptr<RendererBone>> Children;
 	shared_ptr<RendererBone> Parent;
 	__int32 Index;
-	D3DXVECTOR3 ExtraRotation;
+	Vector3 ExtraRotation;
 	byte ExtraRotationFlags;
 
 	RendererBone(__int32 index)
 	{
 		Index = index;
 		ExtraRotationFlags = 0;
-		Translation = D3DXVECTOR3(0, 0, 0);
-		ExtraRotation = D3DXVECTOR3(0, 0, 0);
+		Translation = Vector3(0, 0, 0);
+		ExtraRotation = Vector3(0, 0, 0);
 	}
 };
 
@@ -85,14 +88,14 @@ typedef struct RendererPolygon {
 };
 
 typedef struct RendererLine2D {
-	D3DXVECTOR2 Vertices[2];
+	Vector2 Vertices[2];
 	D3DCOLOR Color;
 };
 
 typedef struct RendererLight {
-	D3DXVECTOR4 Position;
-	D3DXVECTOR4 Color;
-	D3DXVECTOR4 Direction;
+	XMFLOAT4 Position;
+	XMFLOAT4 Color;
+	XMFLOAT4 Direction;
 	float Intensity;
 	float In;
 	float Out;
@@ -107,14 +110,14 @@ typedef struct RendererLight {
 };
 
 typedef struct RendererDynamicLight {
-	D3DXVECTOR4 Position;
-	D3DXVECTOR4 Color;
+	XMFLOAT4 Position;
+	XMFLOAT4 Color;
 	float Out;
 };
 
 typedef struct RendererAnimatedTexture {
 	__int32 Id;
-	D3DXVECTOR2 UV[4];
+	Vector2 UV[4];
 };
 
 typedef struct RendererAnimatedTextureSet {
@@ -125,7 +128,7 @@ typedef struct RendererRoom {
 	ROOM_INFO* Room;
 	shared_ptr<RendererObject> RoomObject;
 	vector<shared_ptr<RendererLight>> Lights;
-	D3DXVECTOR4 AmbientLight;
+	XMFLOAT4 AmbientLight;
 	bool Visited;
 
 	RendererRoom()
@@ -177,7 +180,7 @@ typedef struct RendererSphere {
 				dx *= dxz;
 				dz *= dxz;
 
-				D3DXVECTOR3 normal = D3DXVECTOR3(dx, dy, dz);
+				Vector3 normal = Vector3(dx, dy, dz);
 
 				vertices[vertexCount].x = normal.x * radius;
 				vertices[vertexCount].y = normal.y * radius;
@@ -260,17 +263,16 @@ typedef struct RendererSphere {
 typedef struct RendererItemToDraw {
 	__int32 Id;
 	ITEM_INFO* Item;
-	D3DXMATRIX World;
-	vector<D3DXMATRIX> AnimationTransforms;
+	XMMATRIX World;
+	vector<XMMATRIX> AnimationTransforms;
 
 	RendererItemToDraw(__int32 id, ITEM_INFO* item, __int32 numMeshes)
 	{
 		Id = id;
 		Item = item;
-		D3DXMatrixIdentity(&World);
+		World = XMMatrixIdentity();
 		AnimationTransforms.reserve(numMeshes);
-		D3DXMATRIX matrix;
-		D3DXMatrixIdentity(&matrix);
+		XMMATRIX matrix = XMMatrixIdentity();
 		for (__int32 i = 0; i < numMeshes; i++)
 			AnimationTransforms.push_back(matrix);
 	}
@@ -279,13 +281,13 @@ typedef struct RendererItemToDraw {
 typedef struct RendererEffectToDraw {
 	__int32 Id;
 	FX_INFO* Effect;
-	D3DXMATRIX World;
+	XMMATRIX World;
 
 	RendererEffectToDraw(__int32 id, FX_INFO* effect)
 	{
 		Id = id;
 		Effect = effect;
-		D3DXMatrixIdentity(&World);
+		World = XMMatrixIdentity();
 	}
 };
 
@@ -383,7 +385,7 @@ typedef struct RendererQuad {
 typedef struct RendererSprite {
 	__int32 Width;
 	__int32 Height;
-	D3DXVECTOR2 UV[4];
+	Vector2 UV[4];
 };
 
 typedef struct RendererSpriteSequence {
@@ -416,9 +418,9 @@ typedef struct RendererSpriteToDraw {
 };
 
 typedef struct RendererTempVertex {
-	D3DXVECTOR3 Position;
-	vector<D3DXVECTOR3> Normals;
-	D3DXVECTOR3 AveragedNormal;
+	Vector3 Position;
+	vector<Vector3> Normals;
+	Vector3 AveragedNormal;
 };
 
 typedef struct RendererWeatherParticle {
@@ -452,13 +454,25 @@ typedef struct RendererLine3DToDraw {
 typedef struct RendererRoomNode {
 	__int16 From;
 	__int16 To;
-	D3DXVECTOR4 ClipPort;
+	XMFLOAT4 ClipPort;
 };
 
 class Renderer
 {
-	LPDIRECT3D9						m_d3D = NULL;
-	LPDIRECT3DDEVICE9				m_device = NULL;
+	// Core DX11 objects
+	ID3D11Device*					m_device = NULL;
+	ID3D11DeviceContext*			m_context = NULL;
+	IDXGISwapChain*					m_swapChain = NULL;
+	IDXGIDevice*					m_dxgiDevice = NULL;
+
+	// Main back buffer
+	ID3D11RenderTargetView*			m_backBufferRTV;
+	ID3D11Texture2D*				m_backBufferTexture;
+
+	ID3D11DepthStencilState*		m_depthStencilState;
+	ID3D11DepthStencilView*			m_depthStencilView;
+	ID3D11Texture2D*				m_depthStencilTexture;
+
 	D3DPRESENT_PARAMETERS			m_pp;
 	LPDIRECT3DTEXTURE9				m_textureAtlas;
 	LPDIRECT3DTEXTURE9				m_fontAndMiscTexture;
@@ -494,17 +508,17 @@ class Renderer
 	__int32							m_blinkColorDirection;
 	bool							m_needToDumpScene;
 	__int16							m_pickupRotation;
-	D3DXMATRIX						m_tempTranslation;
-	D3DXMATRIX						m_tempScale;
-	D3DXMATRIX						m_tempTransform;
-	D3DXMATRIX						m_tempRotation;
-	D3DXMATRIX						m_tempWorld;
-	D3DXMATRIX						m_tempView;
-	D3DXMATRIX						m_tempProjection;
-	D3DXMATRIX						m_hairsMatrices[12];
-	D3DXMATRIX						m_LaraWorldMatrix;
-	D3DXMATRIX						m_lightView;
-	D3DXMATRIX						m_lightProjection;
+	XMMATRIX						m_tempTranslation;
+	XMMATRIX						m_tempScale;
+	XMMATRIX						m_tempTransform;
+	XMMATRIX						m_tempRotation;
+	XMMATRIX						m_tempWorld;
+	XMMATRIX						m_tempView;
+	XMMATRIX						m_tempProjection;
+	XMMATRIX						m_hairsMatrices[12];
+	XMMATRIX						m_LaraWorldMatrix;
+	XMMATRIX						m_lightView;
+	XMMATRIX						m_lightProjection;
 	bool							m_enableShadows;
 	RendererLight*					m_shadowLight;
 	vector<__int32>					m_litItems;
@@ -551,8 +565,8 @@ class Renderer
 	shared_ptr<RendererQuad>					m_skyQuad;
 	float							m_halfPixelX;
 	float							m_halfPixelY;
-	D3DXMATRIX						m_viewProjection;
-	D3DXMATRIX						m_inverseViewProjection;
+	XMMATRIX						m_viewProjection;
+	XMMATRIX						m_inverseViewProjection;
 	__int32							m_timeClearGBuffer;
 	__int32							m_timePrepareShadowMap;
 	__int32							m_timeFillGBuffer;
@@ -599,13 +613,13 @@ class Renderer
 
 	__int32							getAnimatedTextureInfo(__int16 textureId);
 	RendererMesh*					getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs);
-	void							fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index);
+	void							fromTrAngle(XMMATRIX* matrix, __int16* frameptr, __int32 index);
 	void							buildHierarchy(RendererObject* obj);
 	void							buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 	void							updateAnimation(RendererItemToDraw* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask);
 	bool							printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message);
-	bool							checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* viewPort, D3DXVECTOR4* clipPort);
-	void							getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count);
+	bool							checkPortal(__int16 roomIndex, __int16* portal, XMFLOAT4* viewPort, XMFLOAT4* clipPort);
+	void							getVisibleRooms(int from, int to, XMFLOAT4* viewPort, bool water, int count);
 	void							collectRooms();
 	void							collectItems(__int16 roomNumber);
 	void							collectEffects(__int16 roomNumber);
@@ -639,7 +653,7 @@ class Renderer
 	void							drawRipples();
 	void							drawUnderwaterDust();
 	bool							drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass);
-	void							createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos, float rotation);
+	void							createBillboardMatrix(XMMATRIX* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
 	bool							drawScene(bool dump);
 	bool							bindRenderTargets(LPDIRECT3DTEXTURE9 rt1, LPDIRECT3DTEXTURE9 rt2, LPDIRECT3DTEXTURE9 rt3, LPDIRECT3DTEXTURE9 rt4, LPDIRECT3DSURFACE9 zBuffer);
 	bool							restoreBackBuffer();
@@ -671,7 +685,7 @@ class Renderer
 	bool							drawOverlays();
 	bool							handleDeviceLost();
 	bool							resetDeviceResources();
-	void							createConstrainedBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* object, D3DXVECTOR3* cameraPosition, D3DXVECTOR3* rotateAxis, D3DXVECTOR3* cameraForward, D3DXVECTOR3* objectForward);
+	void							createConstrainedBillboardMatrix(XMMATRIX* out, Vector3* object, Vector3* cameraPosition, Vector3* rotateAxis, Vector3* cameraForward, Vector3* objectForward);
 	bool							initialiseRenderTargets();
 	void							legacyCollectRoomsToDraw(__int16 roomNumber);
 	void							legacyGetVisibleRooms();
@@ -680,9 +694,9 @@ class Renderer
 	bool							afterDeviceReset();
 
 public:
-	D3DXMATRIX						ViewMatrix;
-	D3DXMATRIX						ProjectionMatrix;
-	D3DXMATRIX						ViewProjectionMatrix;
+	XMMATRIX						ViewMatrix;
+	XMMATRIX						ProjectionMatrix;
+	XMMATRIX						ViewProjectionMatrix;
 	__int32							ScreenWidth;
 	__int32							ScreenHeight;
 	bool							Windowed;
@@ -719,9 +733,11 @@ public:
 	void							DrawLoadingScreen(char* fileName);
 	void							UpdateProgress(float value);
 	bool							IsFading();
-	void							GetLaraBonePosition(D3DXVECTOR3* pos, __int32 bone);
+	void							GetLaraBonePosition(Vector3* pos, __int32 bone);
 	bool							ToggleFullScreen();
 	bool							IsFullsScreen();
 	bool							ChangeScreenResolution(__int32 width, __int32 height, __int32 frequency, bool windowed);
 	vector<RendererVideoAdapter>*	GetAdapters();
 };
+
+#endif

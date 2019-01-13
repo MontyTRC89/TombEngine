@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#ifdef OLDCODE
+
 #include "Structs.h"
 #include "Enums.h"
 #include "RendererBucket.h"
@@ -363,28 +365,95 @@ bool Renderer::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool window
 	HRESULT res;
 
 	DB_Log(2, "Renderer::Initialise - DLL");
-	printf("Initialising DX\n");
+	printf("Initialising DX11\n");
 	 
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
 
-	ZeroMemory(&m_pp, sizeof(m_pp));
-	m_pp.Windowed = windowed;
-	m_pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	m_pp.hDeviceWindow = handle;
-	m_pp.BackBufferWidth = w;
-	m_pp.BackBufferHeight = h;
-	m_pp.EnableAutoDepthStencil = TRUE;
-	m_pp.AutoDepthStencilFormat = D3DFMT_D24S8;
-	m_pp.MultiSampleType = D3DMULTISAMPLE_NONE;
-	m_pp.BackBufferFormat = D3DFMT_X8R8G8B8;
-	m_pp.FullScreen_RefreshRateInHz = (windowed ? 0 : refreshRate);
+	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_0 };
+	D3D_FEATURE_LEVEL featureLevel;
 
-	res = m_d3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, handle, D3DCREATE_HARDWARE_VERTEXPROCESSING,
-							  &m_pp, &m_device);
-	if (res != S_OK)
+	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION,
+							&m_device, &featureLevel, &m_context);
+	if (FAILED(res))
 		return false;
+
+	DXGI_SWAP_CHAIN_DESC sd;
+	sd.BufferDesc.Width = g_Configuration.Width;
+	sd.BufferDesc.Height = g_Configuration.Height;
+	sd.BufferDesc.RefreshRate.Numerator = g_Configuration.RefreshRate;
+	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UINT;
+	sd.Windowed = g_Configuration.Windowed;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	sd.OutputWindow = handle;
+	sd.SampleDesc.Count = 4;
+	sd.SampleDesc.Quality = 1;
+	sd.BufferCount = 1;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+
+	IDXGIDevice* dxgiDevice = NULL;
+	res = m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
+	if (FAILED(res))
+		return false;
+
+	IDXGIAdapter* dxgiAdapter = NULL;
+	res = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter);
+	if (FAILED(res))
+		return false;
+
+	IDXGIFactory* dxgiFactory = NULL;
+	dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
+	if (FAILED(res))
+		return false;
+
+	m_swapChain = NULL;
+	res = dxgiFactory->CreateSwapChain(m_device, &sd, &m_swapChain);
+	if (FAILED(res))
+		return false;
+
+	dxgiDevice->Release();
+	dxgiAdapter->Release();
+	dxgiFactory->Release();
+
+	// Initialise the back buffer
+	m_backBufferTexture = NULL;
+	res = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast <void**>(&m_backBufferTexture));
+	if (FAILED(res))
+		return false;
+
+	m_backBufferRTV = NULL;
+	res = m_device->CreateRenderTargetView(m_backBufferTexture, NULL, &m_backBufferRTV);
+	if (FAILED(res))
+		return false;
+
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+	depthStencilDesc.Width = ScreenWidth;
+	depthStencilDesc.Height = ScreenHeight;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.SampleDesc.Count = 4;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+
+	m_depthStencilTexture = NULL;
+	res = m_device->CreateTexture2D(&depthStencilDesc, NULL, &m_depthStencilTexture);
+	if (FAILED(res))
+		return false;
+
+	m_depthStencilView = NULL;
+	res = m_device->CreateDepthStencilView(m_depthStencilTexture, NULL, &m_depthStencilView);
+	if (FAILED(res))
+		return false;
+
+	// Bind the back buffer and the depth stencil
+	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 
 	// Load the white sprite 
 	D3DXCreateTextureFromFileEx(m_device, g_GameFlow->GetLevel(0)->Background.c_str(), D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
@@ -590,13 +659,13 @@ bool Renderer::initialiseRenderTargets()
 	HRESULT res;
 
 	m_renderTarget = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_renderTarget, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_renderTarget, NULL);
 	if (res != S_OK)
 		return false;
 
 	// Initialise the shadow map
 	m_shadowMap = NULL;
-	res = m_device->CreateTexture(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_shadowMap, NULL);
+	res = m_device->CreateTexture(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, D3DUSAGE_RENDERTARGET, D3DFMT_R32F, D3DPOOL_DEFAULT, &m_shadowMap, NULL);
 	if (res != S_OK)
 		return false;
 
@@ -622,37 +691,37 @@ bool Renderer::initialiseRenderTargets()
 		return false;
 
 	m_depthBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_R32F, D3DPOOL_DEFAULT, &m_depthBuffer, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_R32F, D3DPOOL_DEFAULT, &m_depthBuffer, NULL);
 	if (res != S_OK)
 		return false;
 
 	m_normalBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_normalBuffer, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_normalBuffer, NULL);
 	if (res != S_OK)
 		return false;
 
 	m_colorBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_colorBuffer, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_colorBuffer, NULL);
 	if (res != S_OK)
 		return false;
 
 	m_outputBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_outputBuffer, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_outputBuffer, NULL);
 	if (res != S_OK)
 		return false;
 
 	m_lightBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_lightBuffer, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_lightBuffer, NULL);
 	if (res != S_OK)
 		return false;
 
 	m_vertexLightBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_vertexLightBuffer, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_vertexLightBuffer, NULL);
 	if (res != S_OK)
 		return false;
 
 	m_postprocessBuffer = NULL;
-	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFORMAT::D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_postprocessBuffer, NULL);
+	res = m_device->CreateTexture(ScreenWidth, ScreenHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_postprocessBuffer, NULL);
 	if (res != S_OK)
 		return false;
 
@@ -770,7 +839,7 @@ RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 		vertices[v].vy = y;
 		vertices[v].vz = z;
 
-		mesh->Positions.push_back(D3DXVECTOR3(x, y, z));
+		mesh->Positions.push_back(Vector3(x, y, z));
 	}
 
 	__int16 numNormals = *meshPtr++;
@@ -951,12 +1020,12 @@ RendererMesh* Renderer::getRendererMeshFromTrMesh(RendererObject* obj, __int16* 
 				vertex.nz = normals[indices[v]].vz / 16300.0f;
 			}
 
-			D3DXMATRIX world;
-			D3DXMatrixTranslation(&world, 80000, 0, 50000);
-			D3DXVECTOR4 n;
-			D3DXVec3Transform(&n, &D3DXVECTOR3(vertex.nx, vertex.ny, vertex.nz), &world);
-			D3DXVECTOR3 n2 = D3DXVECTOR3(n.x, n.y, n.z);
-			D3DXVec3TransformNormal(&n2, &D3DXVECTOR3(vertex.nx, vertex.ny, vertex.nz), &world);
+			XMMATRIX world;
+			XMMATRIXTranslation(&world, 80000, 0, 50000);
+			XMFLOAT4 n;
+			D3DXVec3Transform(&n, &Vector3(vertex.nx, vertex.ny, vertex.nz), &world);
+			Vector3 n2 = Vector3(n.x, n.y, n.z);
+			D3DXVec3TransformNormal(&n2, &Vector3(vertex.nx, vertex.ny, vertex.nz), &world);
 			 
 			D3DXVec4Normalize(&n, &n);
 			D3DXVec3Normalize(&n2, &n2);
@@ -1027,7 +1096,7 @@ bool Renderer::PrepareDataForTheRenderer()
 				float x = (texture->vertices[k].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 				float y = (texture->vertices[k].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 				
-				newTexture->UV[k] = D3DXVECTOR2(x, y);
+				newTexture->UV[k] = Vector2(x, y);
 			}
 
 			set->Textures.push_back(newTexture);
@@ -1130,7 +1199,7 @@ bool Renderer::PrepareDataForTheRenderer()
 		auto r = make_shared<RendererRoom>();
 		r->Room = room;
 		r->RoomObject = make_shared<RendererObject>(m_device, -1, 1);
-		r->AmbientLight = D3DXVECTOR4(room->ambient.r / 255.0f, room->ambient.g / 255.0f, room->ambient.b / 255.0f, 1.0f);
+		r->AmbientLight = XMFLOAT4(room->ambient.r / 255.0f, room->ambient.g / 255.0f, room->ambient.b / 255.0f, 1.0f);
 
 		m_rooms.insert(pair<__int32, shared_ptr<RendererRoom>>(i, r));
 
@@ -1202,18 +1271,18 @@ bool Renderer::PrepareDataForTheRenderer()
 					}
 
 					// Calculate face normal
-					D3DXVECTOR3 p0 = D3DXVECTOR3(vertices[poly->Vertices[0]].Vertex.x,
+					Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
 						vertices[poly->Vertices[0]].Vertex.y,
 						vertices[poly->Vertices[0]].Vertex.z);
-					D3DXVECTOR3 p1 = D3DXVECTOR3(vertices[poly->Vertices[1]].Vertex.x,
+					Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
 						vertices[poly->Vertices[1]].Vertex.y,
 						vertices[poly->Vertices[1]].Vertex.z);
-					D3DXVECTOR3 p2 = D3DXVECTOR3(vertices[poly->Vertices[2]].Vertex.x,
+					Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
 						vertices[poly->Vertices[2]].Vertex.y,
 						vertices[poly->Vertices[2]].Vertex.z);
-					D3DXVECTOR3 e1 = p1 - p0;
-					D3DXVECTOR3 e2 = p1 - p2;
-					D3DXVECTOR3 normal;
+					Vector3 e1 = p1 - p0;
+					Vector3 e2 = p1 - p2;
+					Vector3 normal;
 					D3DXVec3Cross(&normal, &e1, &e2);
 					D3DXVec3Normalize(&normal, &normal);
 
@@ -1316,18 +1385,18 @@ bool Renderer::PrepareDataForTheRenderer()
 					}
 
 					// Calculate face normal
-					D3DXVECTOR3 p0 = D3DXVECTOR3(vertices[poly->Vertices[0]].Vertex.x,
+					Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
 						vertices[poly->Vertices[0]].Vertex.y,
 						vertices[poly->Vertices[0]].Vertex.z);
-					D3DXVECTOR3 p1 = D3DXVECTOR3(vertices[poly->Vertices[1]].Vertex.x,
+					Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
 						vertices[poly->Vertices[1]].Vertex.y,
 						vertices[poly->Vertices[1]].Vertex.z);
-					D3DXVECTOR3 p2 = D3DXVECTOR3(vertices[poly->Vertices[2]].Vertex.x,
+					Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
 						vertices[poly->Vertices[2]].Vertex.y,
 						vertices[poly->Vertices[2]].Vertex.z);
-					D3DXVECTOR3 e1 = p1 - p0;
-					D3DXVECTOR3 e2 = p1 - p2;
-					D3DXVECTOR3 normal;
+					Vector3 e1 = p1 - p0;
+					Vector3 e2 = p1 - p2;
+					Vector3 normal;
 					D3DXVec3Cross(&normal, &e1, &e2);
 					D3DXVec3Normalize(&normal, &normal);
 
@@ -1387,15 +1456,15 @@ bool Renderer::PrepareDataForTheRenderer()
 				auto light = make_shared<RendererLight>();
 				/*if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SUN)
 				{
-					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->Color = XMFLOAT4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = XMFLOAT4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
 				}
 				else*/ if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_POINT)
 				{
-					light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->Position = XMFLOAT4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light->Color = XMFLOAT4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = XMFLOAT4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light->Intensity = 1.0f;
 					light->In = oldLight->In;
 					light->Out = oldLight->Out;
@@ -1405,18 +1474,18 @@ bool Renderer::PrepareDataForTheRenderer()
 				}
 				/*else if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SHADOW)
 				{
-					light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->Position = XMFLOAT4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light->Color = XMFLOAT4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = XMFLOAT4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light->In = oldLight->In;
 					light->Out = oldLight->Out;
 					light->Type = LIGHT_TYPES::LIGHT_TYPE_SHADOW;
 				}*/
 				else if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SPOT)
 				{
-					light->Position = D3DXVECTOR4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-					light->Color = D3DXVECTOR4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-					light->Direction = D3DXVECTOR4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light->Position = XMFLOAT4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light->Color = XMFLOAT4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light->Direction = XMFLOAT4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light->Intensity = 1.0f;
 					light->In = oldLight->In;
 					light->Out = oldLight->Range;  //oldLight->Out;
@@ -1487,7 +1556,7 @@ bool Renderer::PrepareDataForTheRenderer()
 
 			stack<shared_ptr<RendererBone>> stack;
 
-			D3DXMatrixIdentity(&m_tempTransform);
+			XMMATRIXIdentity(&m_tempTransform);
 			for (int j = 0; j < obj->nmeshes; j++)
 			{
 				moveable->LinearizedBones.push_back(make_shared<RendererBone>(j));
@@ -1515,7 +1584,7 @@ bool Renderer::PrepareDataForTheRenderer()
 				{
 				case 0:
 					moveable->LinearizedBones[j]->Parent = currentBone;
-					moveable->LinearizedBones[j]->Translation = D3DXVECTOR3(linkX, linkY, linkZ);
+					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
 					currentBone->Children.push_back(moveable->LinearizedBones[j]);
 					currentBone = moveable->LinearizedBones[j];
 
@@ -1527,7 +1596,7 @@ bool Renderer::PrepareDataForTheRenderer()
 					stack.pop();
 
 					moveable->LinearizedBones[j]->Parent = currentBone;
-					moveable->LinearizedBones[j]->Translation = D3DXVECTOR3(linkX, linkY, linkZ);
+					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
 					currentBone->Children.push_back(moveable->LinearizedBones[j]);
 					currentBone = moveable->LinearizedBones[j];
 
@@ -1535,7 +1604,7 @@ bool Renderer::PrepareDataForTheRenderer()
 				case 2:
 					stack.push(currentBone);
 
-					moveable->LinearizedBones[j]->Translation = D3DXVECTOR3(linkX, linkY, linkZ);
+					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
 					moveable->LinearizedBones[j]->Parent = currentBone;
 					currentBone->Children.push_back(moveable->LinearizedBones[j]);
 					currentBone = moveable->LinearizedBones[j];
@@ -1547,7 +1616,7 @@ bool Renderer::PrepareDataForTheRenderer()
 					shared_ptr<RendererBone> theBone = stack.top();
 					stack.pop();
 
-					moveable->LinearizedBones[j]->Translation = D3DXVECTOR3(linkX, linkY, linkZ);
+					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
 					moveable->LinearizedBones[j]->Parent = theBone;
 					theBone->Children.push_back(moveable->LinearizedBones[j]);
 					currentBone = moveable->LinearizedBones[j];
@@ -1558,7 +1627,7 @@ bool Renderer::PrepareDataForTheRenderer()
 			}
 
 			for (int n = 0; n < obj->nmeshes; n++)
-				D3DXMatrixTranslation(&moveable->LinearizedBones[n]->Transform,
+				XMMATRIXTranslation(&moveable->LinearizedBones[n]->Transform,
 					moveable->LinearizedBones[n]->Translation.x,
 					moveable->LinearizedBones[n]->Translation.y,
 					moveable->LinearizedBones[n]->Translation.z);
@@ -1692,10 +1761,10 @@ bool Renderer::PrepareDataForTheRenderer()
 		float right = (oldSprite->right * 256.0f + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
 		float bottom = (oldSprite->bottom * 256.0f + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
 
-		sprite->UV[0] = D3DXVECTOR2(left / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
-		sprite->UV[1] = D3DXVECTOR2(right / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
-		sprite->UV[2] = D3DXVECTOR2(right / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
-		sprite->UV[3] = D3DXVECTOR2(left / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[0] = Vector2(left / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[1] = Vector2(right / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[2] = Vector2(right / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[3] = Vector2(left / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
 
 		m_sprites.insert(pair<__int32, shared_ptr<RendererSprite>>(i, sprite));
 	}
@@ -1725,9 +1794,9 @@ bool Renderer::PrepareDataForTheRenderer()
 
 void Renderer::buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode)
 {
-	D3DXMatrixMultiply(&node->GlobalTransform, &node->Transform, &parentNode->GlobalTransform);
+	XMMATRIXMultiply(&node->GlobalTransform, &node->Transform, &parentNode->GlobalTransform);
 	obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
-	obj->Skeleton->GlobalTranslation = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 	node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
 	for (int j = 0; j < node->Children.size(); j++)
@@ -1740,7 +1809,7 @@ void Renderer::buildHierarchy(RendererObject* obj)
 {
 	obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 	obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
-	obj->Skeleton->GlobalTranslation = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 
 	for (int j = 0; j < obj->Skeleton->Children.size(); j++)
 	{
@@ -1748,7 +1817,7 @@ void Renderer::buildHierarchy(RendererObject* obj)
 	}
 }
 
-void Renderer::fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
+void Renderer::fromTrAngle(XMMATRIX* matrix, __int16* frameptr, __int32 index)
 {
 	__int16* ptr = &frameptr[0];
 
@@ -1774,28 +1843,28 @@ void Renderer::fromTrAngle(D3DXMATRIX* matrix, __int16* frameptr, __int32 index)
 		rotY = (((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff);
 		rotZ = ((rot1) & 0x3ff);
 
-		D3DXMatrixRotationYawPitchRoll(matrix, rotY* (360.0f / 1024.0f) * RADIAN,
+		XMMATRIXRotationYawPitchRoll(matrix, rotY* (360.0f / 1024.0f) * RADIAN,
 			rotX* (360.0f / 1024.0f) * RADIAN,
 			rotZ* (360.0f / 1024.0f) * RADIAN);
 		break;
 
 	case 0x4000:
-		D3DXMatrixRotationX(matrix, (rot0 & 0xfff)* (360.0f / 4096.0f) * RADIAN);
+		XMMATRIXRotationX(matrix, (rot0 & 0xfff)* (360.0f / 4096.0f) * RADIAN);
 		break;
 
 	case 0x8000:
-		D3DXMatrixRotationY(matrix, (rot0 & 0xfff)* (360.0f / 4096.0f) * RADIAN);
+		XMMATRIXRotationY(matrix, (rot0 & 0xfff)* (360.0f / 4096.0f) * RADIAN);
 		break;
 
 	case 0xc000:
-		D3DXMatrixRotationZ(matrix, (rot0 & 0xfff)* (360.0f / 4096.0f) * RADIAN);
+		XMMATRIXRotationZ(matrix, (rot0 & 0xfff)* (360.0f / 4096.0f) * RADIAN);
 		break;
 	}
 }
 
-void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool water, int count) 
+void Renderer::getVisibleRooms(int from, int to, XMFLOAT4* viewPort, bool water, int count) 
 {
-	D3DXMatrixMultiply(&ViewProjectionMatrix, &ViewMatrix, &ProjectionMatrix);
+	XMMATRIXMultiply(&ViewProjectionMatrix, &ViewMatrix, &ProjectionMatrix);
 
 	stack<shared_ptr<RendererRoomNode>> stack;
 	auto node = make_shared<RendererRoomNode>();
@@ -1819,7 +1888,7 @@ void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool wat
 
 		ROOM_INFO* room = &Rooms[node->To];
 
-		D3DXVECTOR4 clipPort;
+		XMFLOAT4 clipPort;
 		__int16 numDoors = *(room->door);
 		if (numDoors)
 		{
@@ -1841,12 +1910,12 @@ void Renderer::getVisibleRooms(int from, int to, D3DXVECTOR4* viewPort, bool wat
 	}
 }
 
-bool Renderer::checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* viewPort, D3DXVECTOR4* clipPort) 
+bool Renderer::checkPortal(__int16 roomIndex, __int16* portal, XMFLOAT4* viewPort, XMFLOAT4* clipPort) 
 {
 	ROOM_INFO* room = &Rooms[roomIndex];
 
-	D3DXVECTOR3 n = D3DXVECTOR3(*(portal + 1), *(portal + 2), *(portal + 3));
-	D3DXVECTOR3 v = D3DXVECTOR3(Camera.pos.x - (room->x + *(portal + 4)),
+	Vector3 n = Vector3(*(portal + 1), *(portal + 2), *(portal + 3));
+	Vector3 v = Vector3(Camera.pos.x - (room->x + *(portal + 4)),
 		Camera.pos.y - (room->y + *(portal + 5)),
 		Camera.pos.z - (room->z + *(portal + 6)));
 
@@ -1854,7 +1923,7 @@ bool Renderer::checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* view
 		return false;
 
 	int  zClip = 0;
-	D3DXVECTOR4 p[4];
+	XMFLOAT4 p[4];
 
 	clipPort->x = FLT_MAX;
 	clipPort->y = FLT_MAX;
@@ -1863,7 +1932,7 @@ bool Renderer::checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* view
 
 	for (int i = 0; i < 4; i++) {
 
-		D3DXVECTOR4 tmp = D3DXVECTOR4(*(portal + 4 + 3 * i) + room->x, *(portal + 4 + 3 * i+1) + room->y,
+		XMFLOAT4 tmp = XMFLOAT4(*(portal + 4 + 3 * i) + room->x, *(portal + 4 + 3 * i+1) + room->y,
 			*(portal + 4 + 3 * i+2) + room->z, 1.0f);
 		D3DXVec4Transform(&p[i], &tmp, &ViewProjectionMatrix);
 
@@ -1886,8 +1955,8 @@ bool Renderer::checkPortal(__int16 roomIndex, __int16* portal, D3DXVECTOR4* view
 
 	if (zClip > 0) {
 		for (int i = 0; i < 4; i++) {
-			D3DXVECTOR4 a = p[i];
-			D3DXVECTOR4 b = p[(i + 1) % 4];
+			XMFLOAT4 a = p[i];
+			XMFLOAT4 b = p[(i + 1) % 4];
 
 			if ((a.w > 0.0f) ^ (b.w > 0.0f)) {
 
@@ -1934,7 +2003,7 @@ void Renderer::collectRooms()
 		if (m_rooms[i] != NULL)
 			m_rooms[i]->Visited = false;
 
-	getVisibleRooms(-1, baseRoomIndex, &D3DXVECTOR4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
+	getVisibleRooms(-1, baseRoomIndex, &XMFLOAT4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0);
 }
 
 void Renderer::collectItems(__int16 roomNumber)
@@ -1994,43 +2063,43 @@ void Renderer::updateEffects()
 	{
 		auto fx = m_effectsToDraw[i];
 
-		D3DXMatrixTranslation(&m_tempTranslation, fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
-		D3DXMatrixRotationYawPitchRoll(&m_tempRotation,
+		XMMATRIXTranslation(&m_tempTranslation, fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
+		XMMATRIXRotationYawPitchRoll(&m_tempRotation,
 			TR_ANGLE_TO_RAD(fx->Effect->pos.yRot), 
 			TR_ANGLE_TO_RAD(fx->Effect->pos.xRot), 
 			TR_ANGLE_TO_RAD(fx->Effect->pos.zRot));
-		D3DXMatrixMultiply(&m_effectsToDraw[i]->World, &m_tempRotation, &m_tempTranslation);
+		XMMATRIXMultiply(&m_effectsToDraw[i]->World, &m_tempRotation, &m_tempTranslation);
 	}
 }
 
 void Renderer::prepareShadowMap()
 {
 	UINT cPasses = 1;
-	D3DXMATRIX world;
+	XMMATRIX world;
 
 	// We don't need 
 	RENDERER_BUCKETS buckets[4] = {
-		RENDERER_BUCKETS::RENDERER_BUCKET_SOLID,
-		RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS,
-		RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST,
-		RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS
+		RENDERER_BUCKET_SOLID,
+		RENDERER_BUCKET_SOLID_DS,
+		RENDERER_BUCKET_ALPHA_TEST,
+		RENDERER_BUCKET_ALPHA_TEST_DS
 	};
 
 	if (m_shadowLight == NULL)
 		return;
 
-	D3DXVECTOR3 lightPos = D3DXVECTOR3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
+	Vector3 lightPos = Vector3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
 
 	LPD3DXEFFECT effect = m_shaderDepth->GetEffect();
 	effect->Begin(&cPasses, 0);
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
 
-	D3DXMatrixPerspectiveFovRH(&m_lightProjection, 90.0f * RADIAN, 1.0f, 1.0f, m_shadowLight->Out * 1.5f);
+	XMMATRIXPerspectiveFovRH(&m_lightProjection, 90.0f * RADIAN, 1.0f, 1.0f, m_shadowLight->Out * 1.5f);
 
-	D3DXMatrixLookAtRH(&m_lightView,
+	XMMATRIXLookAtRH(&m_lightView,
 		&lightPos,
-		&D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos),
-		&D3DXVECTOR3(0.0f, -1.0f, 0.0f));
+		&Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos),
+		&Vector3(0.0f, -1.0f, 0.0f));
 
 	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &m_lightView);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &m_lightProjection);
@@ -2045,7 +2114,7 @@ void Renderer::prepareShadowMap()
 	//Draw Lara
 	for (__int32 k = 0; k < 4; k++)
 	{
-		drawLara((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+		drawLara((RENDERER_BUCKETS)k, RENDERER_PASS_SHADOW_MAP);
 	}
 
 	// Draw visible items
@@ -2054,8 +2123,8 @@ void Renderer::prepareShadowMap()
 		RendererItemToDraw* itemToDraw = m_itemsToDraw[j].get();
 		ITEM_INFO* item = itemToDraw->Item;
 
-		D3DXVECTOR3 itemPos = D3DXVECTOR3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		D3DXVECTOR3 lightVector = (itemPos - lightPos);
+		Vector3 itemPos = Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		Vector3 lightVector = (itemPos - lightPos);
 		float distance = D3DXVec3Length(&lightVector);
 
 		if (distance > m_shadowLight->Out*1.5f)
@@ -2063,7 +2132,7 @@ void Renderer::prepareShadowMap()
 
 		for (__int32 k = 0; k < 4; k++)
 		{
-			drawItem(m_itemsToDraw[j].get(), (RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+			drawItem(m_itemsToDraw[j].get(), (RENDERER_BUCKETS)k, RENDERER_PASS_SHADOW_MAP);
 		}
 	}
 
@@ -2073,8 +2142,8 @@ void Renderer::prepareShadowMap()
 		RendererEffectToDraw* fxToDraw = m_effectsToDraw[j].get();
 		FX_INFO* fx = fxToDraw->Effect;
 
-		D3DXVECTOR3 itemPos = D3DXVECTOR3(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-		D3DXVECTOR3 lightVector = (itemPos - lightPos);
+		Vector3 itemPos = Vector3(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+		Vector3 lightVector = (itemPos - lightPos);
 		float distance = D3DXVec3Length(&lightVector);
 
 		if (distance > m_shadowLight->Out * 1.5f)
@@ -2082,16 +2151,16 @@ void Renderer::prepareShadowMap()
 
 		for (__int32 k = 0; k < 4; k++)
 		{
-			drawEffect(fxToDraw, (RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+			drawEffect(fxToDraw, (RENDERER_BUCKETS)k, RENDERER_PASS_SHADOW_MAP);
 		}
 	}
 
 	for (__int32 k = 0; k < 4; k++)
 	{
-		drawBats((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
-		drawRats((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
-		drawSpiders((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
-		drawDebris((RENDERER_BUCKETS)k, RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP);
+		drawBats((RENDERER_BUCKETS)k, RENDERER_PASS_SHADOW_MAP);
+		drawRats((RENDERER_BUCKETS)k, RENDERER_PASS_SHADOW_MAP);
+		drawSpiders((RENDERER_BUCKETS)k, RENDERER_PASS_SHADOW_MAP);
+		drawDebris((RENDERER_BUCKETS)k, RENDERER_PASS_SHADOW_MAP);
 	}
 
 	m_device->EndScene();
@@ -2110,31 +2179,31 @@ bool Renderer::drawPrimitives(D3DPRIMITIVETYPE primitiveType, UINT baseVertexInd
 
 void Renderer::updateLaraAnimations()
 {
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
-	D3DXMATRIX lastMatrix;
-	D3DXMATRIX hairMatrix;
-	D3DXMATRIX identity;
-	D3DXMATRIX world;
+	XMMATRIX translation;
+	XMMATRIX rotation;
+	XMMATRIX lastMatrix;
+	XMMATRIX hairMatrix;
+	XMMATRIX identity;
+	XMMATRIX world;
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA].get();
 	
 	// Clear extra rotations
 	for (__int32 i = 0; i < laraObj->LinearizedBones.size(); i++)
-		laraObj->LinearizedBones[i]->ExtraRotation = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		laraObj->LinearizedBones[i]->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
 	// Lara world matrix
-	D3DXMatrixTranslation(&translation, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	D3DXMatrixRotationYawPitchRoll(&rotation, 
+	XMMATRIXTranslation(&translation, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	XMMATRIXRotationYawPitchRoll(&rotation, 
 								   TR_ANGLE_TO_RAD(LaraItem->pos.yRot),
 							       TR_ANGLE_TO_RAD(LaraItem->pos.xRot), 
 								   TR_ANGLE_TO_RAD(LaraItem->pos.zRot));
-	D3DXMatrixMultiply(&m_LaraWorldMatrix, &rotation, &translation);
+	XMMATRIXMultiply(&m_LaraWorldMatrix, &rotation, &translation);
 
 	// Update first Lara's animations
-	laraObj->LinearizedBones[TORSO]->ExtraRotation = D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.torsoXrot),
+	laraObj->LinearizedBones[TORSO]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.torsoXrot),
 		TR_ANGLE_TO_RAD(Lara.torsoYrot), TR_ANGLE_TO_RAD(Lara.torsoZrot));
-	laraObj->LinearizedBones[HEAD]->ExtraRotation = D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.headXrot),
+	laraObj->LinearizedBones[HEAD]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.headXrot),
 		TR_ANGLE_TO_RAD(Lara.headYrot), TR_ANGLE_TO_RAD(Lara.headZrot));
 	
 	// First calculate matrices for legs, hips, head and torso
@@ -2157,9 +2226,9 @@ void Renderer::updateLaraAnimations()
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[UARM_L]->ExtraRotation += D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),
+		laraObj->LinearizedBones[UARM_L]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),
 			TR_ANGLE_TO_RAD(Lara.leftArm.yRot), TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
-		laraObj->LinearizedBones[UARM_R]->ExtraRotation += D3DXVECTOR3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot),
+		laraObj->LinearizedBones[UARM_R]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot),
 			TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
 
 		if (Lara.gunType != WEAPON_FLARE)
@@ -2211,18 +2280,18 @@ void Renderer::updateLaraAnimations()
 	{
 		RendererObject* hairsObj = m_moveableObjects[ID_HAIR].get();
 
-		D3DXMatrixIdentity(&lastMatrix);
-		D3DXMatrixIdentity(&identity);
+		XMMATRIXIdentity(&lastMatrix);
+		XMMATRIXIdentity(&identity);
 
-		D3DXVECTOR3 parentVertices[6][4];
-		D3DXMATRIX headMatrix;
+		Vector3 parentVertices[6][4];
+		XMMATRIX headMatrix;
 
 		RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN].get();
 		RendererObject* objLara = m_moveableObjects[ID_LARA].get();
 		RendererMesh* parentMesh = objSkin->ObjectMeshes[HEAD].get();
 		RendererBone* parentBone = objSkin->LinearizedBones[HEAD].get();
 
-		D3DXMatrixMultiply(&world, &objLara->AnimationTransforms[HEAD], &m_LaraWorldMatrix);
+		XMMATRIXMultiply(&world, &objLara->AnimationTransforms[HEAD], &m_LaraWorldMatrix);
 
 		__int32 lastVertex = 0;
 		__int32 lastIndex = 0;
@@ -2261,14 +2330,14 @@ void Renderer::updateLaraAnimations()
 			for (__int32 i = 0; i < 6; i++)
 			{
 				RendererMesh* mesh = hairsObj->ObjectMeshes[i].get();
-				RendererBucket* bucket = mesh->GetBucket(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID);
+				RendererBucket* bucket = mesh->GetBucket(RENDERER_BUCKET_SOLID);
 
-				D3DXMatrixTranslation(&translation, Hairs[7 * p + i].pos.xPos, Hairs[7 * p + i].pos.yPos, Hairs[7 * p + i].pos.zPos);
-				D3DXMatrixRotationYawPitchRoll(&rotation,
+				XMMATRIXTranslation(&translation, Hairs[7 * p + i].pos.xPos, Hairs[7 * p + i].pos.yPos, Hairs[7 * p + i].pos.zPos);
+				XMMATRIXRotationYawPitchRoll(&rotation,
 					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.yRot),
 					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.xRot),
 					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
-				D3DXMatrixMultiply(&m_hairsMatrices[6 * p + i], &rotation, &translation);
+				XMMATRIXMultiply(&m_hairsMatrices[6 * p + i], &rotation, &translation);
 
 				__int32 baseVertex = lastVertex;
 
@@ -2283,7 +2352,7 @@ void Renderer::updateLaraAnimations()
 						m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
 						m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
 
-						D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
+						Vector3 n = Vector3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
 						D3DXVec3Normalize(&n, &n);
 						D3DXVec3TransformNormal(&n, &n, &m_hairsMatrices[6 * p + i]);
 						D3DXVec3Normalize(&n, &n);
@@ -2296,8 +2365,8 @@ void Renderer::updateLaraAnimations()
 					}
 					else
 					{
-						D3DXVECTOR3 in = D3DXVECTOR3(bucket->Vertices[j].x, bucket->Vertices[j].y, bucket->Vertices[j].z);
-						D3DXVECTOR4 out;
+						Vector3 in = Vector3(bucket->Vertices[j].x, bucket->Vertices[j].y, bucket->Vertices[j].z);
+						XMFLOAT4 out;
 
 						D3DXVec3Transform(&out, &in, &m_hairsMatrices[6 * p + i]);
 
@@ -2314,7 +2383,7 @@ void Renderer::updateLaraAnimations()
 						m_hairVertices[lastVertex].u = bucket->Vertices[j].u;
 						m_hairVertices[lastVertex].v = bucket->Vertices[j].v;
 
-						D3DXVECTOR3 n = D3DXVECTOR3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
+						Vector3 n = Vector3(bucket->Vertices[j].nx, bucket->Vertices[j].ny, bucket->Vertices[j].nz);
 						D3DXVec3Normalize(&n, &n);
 						D3DXVec3TransformNormal(&n, &n, &m_hairsMatrices[6 * p + i]);
 						D3DXVec3Normalize(&n, &n);
@@ -2339,13 +2408,13 @@ void Renderer::updateLaraAnimations()
 
 void Renderer::updateItemsAnimations()
 {
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
+	XMMATRIX translation;
+	XMMATRIX rotation;
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		D3DXMatrixTranslation(&translation, 0, 0, 0);
-		D3DXMatrixRotationYawPitchRoll(&rotation, 0, 0, 0);
+		XMMATRIXTranslation(&translation, 0, 0, 0);
+		XMMATRIXRotationYawPitchRoll(&rotation, 0, 0, 0);
 
 		RendererItemToDraw* itemToDraw = m_itemsToDraw[i].get();
 		ITEM_INFO* item = itemToDraw->Item;
@@ -2366,7 +2435,7 @@ void Renderer::updateItemsAnimations()
 			for (__int32 j = 0; j < moveableObj->LinearizedBones.size(); j++)
 			{
 				auto currentBone = moveableObj->LinearizedBones[j];
-				currentBone->ExtraRotation = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
 				if (creature)
 				{
@@ -2398,10 +2467,10 @@ void Renderer::updateItemsAnimations()
 		}
 
 		// Update world matrix
-		D3DXMatrixTranslation(&translation, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		D3DXMatrixRotationYawPitchRoll(&rotation, TR_ANGLE_TO_RAD(item->pos.yRot),
+		XMMATRIXTranslation(&translation, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		XMMATRIXRotationYawPitchRoll(&rotation, TR_ANGLE_TO_RAD(item->pos.yRot),
 			TR_ANGLE_TO_RAD(item->pos.xRot), TR_ANGLE_TO_RAD(item->pos.zRot));
-		D3DXMatrixMultiply(&itemToDraw->World, &rotation, &translation);
+		XMMATRIXMultiply(&itemToDraw->World, &rotation, &translation);
 	}
 }
 
@@ -2422,8 +2491,8 @@ void Renderer::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte
 {
 	RendererLine2D line;
 
-	line.Vertices[0] = D3DXVECTOR2(x1, y1);
-	line.Vertices[1] = D3DXVECTOR2(x2, y2);
+	line.Vertices[0] = Vector2(x1, y1);
+	line.Vertices[1] = Vector2(x2, y2);
 	line.Color = D3DCOLOR_XRGB(r, g, b);
 
 	m_lines2D.push_back(line);
@@ -2634,17 +2703,17 @@ void Renderer::drawDebugInfo()
 	{
 		m_dxSprite->Begin(0);
 
-		D3DXMATRIX scale;
-		D3DXMatrixScaling(&scale, 150.0f / 800.0f, 150.0f / 800.0f, 150.0f / 800.0f);
+		XMMATRIX scale;
+		XMMATRIXScaling(&scale, 150.0f / 800.0f, 150.0f / 800.0f, 150.0f / 800.0f);
 
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_colorBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(0, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_colorBuffer, NULL, &Vector3(0, 0, 0), &Vector3(0, 0, 0), 0xFFFFFFFF);
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_normalBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(1200, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_normalBuffer, NULL, &Vector3(0, 0, 0), &Vector3(1200, 0, 0), 0xFFFFFFFF);
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_vertexLightBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(2400, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_vertexLightBuffer, NULL, &Vector3(0, 0, 0), &Vector3(2400, 0, 0), 0xFFFFFFFF);
 		m_dxSprite->SetTransform(&scale);
-		m_dxSprite->Draw(m_lightBuffer, NULL, &D3DXVECTOR3(0, 0, 0), &D3DXVECTOR3(3600, 0, 0), 0xFFFFFFFF);
+		m_dxSprite->Draw(m_lightBuffer, NULL, &Vector3(0, 0, 0), &Vector3(3600, 0, 0), 0xFFFFFFFF);
 
 		m_dxSprite->End();
 	}
@@ -2669,7 +2738,7 @@ __int32	Renderer::DrawPauseMenu(__int32 selectedIndex, bool reset)
 	m_device->BeginScene();
 	
 	m_dxSprite->Begin(0);
-	m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 128, 128, 128));
+	m_dxSprite->Draw(m_renderTarget, &rect, &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 128, 128, 128));
 	m_dxSprite->End();
 
 	PrintString(400, 200, (char*)"Paused", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
@@ -2699,7 +2768,7 @@ __int32	Renderer::DrawStatisticsMenu()
 	m_device->BeginScene();
 
 	m_dxSprite->Begin(0);
-	m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+	m_dxSprite->Draw(m_renderTarget, &rect, &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
 	m_dxSprite->End();
 
 	PrintString(400, 140, (char*)"Statistics", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
@@ -2744,17 +2813,17 @@ __int32 Renderer::DrawInventory()
 
 __int32	Renderer::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ)
 {
-	/*D3DXMATRIX translation;
-	D3DXMATRIX rotation;
-	D3DXMATRIX world;
-	D3DXMATRIX view;
-	D3DXMATRIX projection;
-	D3DXMATRIX scale;
+	/*XMMATRIX translation;
+	XMMATRIX rotation;
+	XMMATRIX world;
+	XMMATRIX view;
+	XMMATRIX projection;
+	XMMATRIX scale;
 
 	UINT cPasses = 1;
 
-	D3DXMatrixLookAtRH(&view, &D3DXVECTOR3(0.0f, 0.0f, 2048.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, -1.0f, 0.0f));
-	D3DXMatrixOrthoRH(&projection, ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
+	XMMATRIXLookAtRH(&view, &Vector3(0.0f, 0.0f, 2048.0f), &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, -1.0f, 0.0f));
+	XMMATRIXOrthoRH(&projection, ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
 	OBJECT_INFO* obj = &Objects[objectNum];
 	RendererObject* moveableObj = m_moveableObjects[objectNum];
@@ -2764,8 +2833,8 @@ __int32	Renderer::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum
 		updateAnimation(moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
 	}
 
-	D3DXVECTOR3 pos = D3DXVECTOR3(x, y, 1);
-	D3DXMatrixIdentity(&world);
+	Vector3 pos = Vector3(x, y, 1);
+	XMMATRIXIdentity(&world);
 
 	D3DVIEWPORT9 viewport;
 	m_device->GetViewport(&viewport);
@@ -2787,15 +2856,15 @@ __int32	Renderer::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum
 			if (bucket->NumVertices == 0)
 				continue;
 
-			D3DXMatrixTranslation(&translation, pos.x, pos.y, pos.z + 1024);
-			D3DXMatrixRotationYawPitchRoll(&rotation, TR_ANGLE_TO_RAD(rotY), TR_ANGLE_TO_RAD(rotX), TR_ANGLE_TO_RAD(rotZ));
-			D3DXMatrixScaling(&scale, 0.5f, 0.5f, 0.5f);
-			D3DXMatrixMultiply(&world, &scale, &rotation);
-			D3DXMatrixMultiply(&world, &world, &translation);
+			XMMATRIXTranslation(&translation, pos.x, pos.y, pos.z + 1024);
+			XMMATRIXRotationYawPitchRoll(&rotation, TR_ANGLE_TO_RAD(rotY), TR_ANGLE_TO_RAD(rotX), TR_ANGLE_TO_RAD(rotZ));
+			XMMATRIXScaling(&scale, 0.5f, 0.5f, 0.5f);
+			XMMATRIXMultiply(&world, &scale, &rotation);
+			XMMATRIXMultiply(&world, &world, &translation);
 			if (obj->animIndex != -1)
-				D3DXMatrixMultiply(&world, &moveableObj->AnimationTransforms[i], &world);
+				XMMATRIXMultiply(&world, &moveableObj->AnimationTransforms[i], &world);
 			else
-				D3DXMatrixMultiply(&world, &moveableObj->BindPoseTransforms[i], &world);
+				XMMATRIXMultiply(&world, &moveableObj->BindPoseTransforms[i], &world);
 
 			m_device->SetStreamSource(0, bucket->VertexBuffer, 0, sizeof(RendererVertex));
 			m_device->SetIndices(bucket->IndexBuffer);
@@ -2806,7 +2875,7 @@ __int32	Renderer::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum
 				m_shader->SetMatrix(m_shader->GetParameterByName(NULL, "World"), &world);
 				m_shader->CommitChanges();
 
-				DrawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0,
+				DrawPrimitives(D3DPT_TRIANGLELIST, 0, 0,
 					bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 				m_shader->EndPass();
@@ -2860,7 +2929,7 @@ __int32	Renderer::DrawLoadGameMenu(__int32 selectedIndex, bool resetBlink)
 	m_device->BeginScene();
 
 	m_dxSprite->Begin(0);
-	m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+	m_dxSprite->Draw(m_renderTarget, &rect, &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
 	m_dxSprite->End();
 
 	PrintString(400, 20, (char*)"Load game", D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
@@ -2928,11 +2997,11 @@ __int32 Renderer::drawInventoryScene()
 	}
 	else
 	{
-		D3DXMatrixScaling(&m_tempScale, 1.0f, 1.0f, 1.0f);
+		XMMATRIXScaling(&m_tempScale, 1.0f, 1.0f, 1.0f);
 
 		m_dxSprite->Begin(0);
 		m_dxSprite->SetTransform(&m_tempScale);
-		m_dxSprite->Draw(m_renderTarget, &rect, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+		m_dxSprite->Draw(m_renderTarget, &rect, &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
 		m_dxSprite->End();
 	} 
 
@@ -2948,10 +3017,10 @@ __int32 Renderer::drawInventoryScene()
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &m_tempProjection);
 	
 	// Setup a nice directional light
-	effect->SetVector(effect->GetParameterByName(NULL, "LightDirection"), &D3DXVECTOR4(-1.0f, 0.707f, -1.0f, 1.0f));
-	effect->SetVector(effect->GetParameterByName(NULL, "LightColor"), &D3DXVECTOR4(1.0f, 1.0f, 0.5f, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "LightDirection"), &XMFLOAT4(-1.0f, 0.707f, -1.0f, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "LightColor"), &XMFLOAT4(1.0f, 1.0f, 0.5f, 1.0f));
 	effect->SetFloat(effect->GetParameterByName(NULL, "LightIntensity"), 0.8f);
-	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &D3DXVECTOR4(0.5f, 0.5f, 0.5f, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f));
 	
 	__int32 activeRing = g_Inventory->GetActiveRing();
 	__int32 lastRing = 0;
@@ -2967,8 +3036,8 @@ __int32 Renderer::drawInventoryScene()
 			float cameraY = -384.0f + g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET;
 			float targetY = g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET;
 
-			D3DXMatrixLookAtRH(&m_tempView, &D3DXVECTOR3(3072.0f, cameraY, 0.0f), &D3DXVECTOR3(0.0f, targetY, 0.0f), &D3DXVECTOR3(0.0f, -1.0f, 0.0f));
-			D3DXMatrixPerspectiveFovRH(&m_tempProjection, 80.0f * RADIAN, g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f);
+			XMMATRIXLookAtRH(&m_tempView, &Vector3(3072.0f, cameraY, 0.0f), &Vector3(0.0f, targetY, 0.0f), &Vector3(0.0f, -1.0f, 0.0f));
+			XMMATRIXPerspectiveFovRH(&m_tempProjection, 80.0f * RADIAN, g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f);
 		}
 
 		// Setup the GPU
@@ -3008,11 +3077,11 @@ __int32 Renderer::drawInventoryScene()
 			__int32 y = lastRing * INV_RINGS_OFFSET;
 
 			// Prepare the object transform
-			D3DXMatrixScaling(&m_tempScale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
-			D3DXMatrixTranslation(&m_tempTranslation, x, y, z);
-			D3DXMatrixRotationY(&m_tempRotation, TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384));
-			D3DXMatrixMultiply(&m_tempTransform, &m_tempScale, &m_tempRotation);
-			D3DXMatrixMultiply(&m_tempTransform, &m_tempTransform, &m_tempTranslation);
+			XMMATRIXScaling(&m_tempScale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
+			XMMATRIXTranslation(&m_tempTranslation, x, y, z);
+			XMMATRIXRotationY(&m_tempRotation, TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384));
+			XMMATRIXMultiply(&m_tempTransform, &m_tempScale, &m_tempRotation);
+			XMMATRIXMultiply(&m_tempTransform, &m_tempTransform, &m_tempTranslation);
 
 			OBJECT_INFO* obj = &Objects[objectNumber];
 			RendererObject* moveableObj = m_moveableObjects[objectNumber].get();
@@ -3038,9 +3107,9 @@ __int32 Renderer::drawInventoryScene()
 
 				// Finish the world matrix
 				if (obj->animIndex != -1)
-					D3DXMatrixMultiply(&m_tempWorld, &moveableObj->AnimationTransforms[n], &m_tempTransform);
+					XMMATRIXMultiply(&m_tempWorld, &moveableObj->AnimationTransforms[n], &m_tempTransform);
 				else
-					D3DXMatrixMultiply(&m_tempWorld, &moveableObj->BindPoseTransforms[n], &m_tempTransform);
+					XMMATRIXMultiply(&m_tempWorld, &moveableObj->BindPoseTransforms[n], &m_tempTransform);
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
 
 				for (__int32 m = 0; m < NUM_BUCKETS; m++)
@@ -3059,7 +3128,7 @@ __int32 Renderer::drawInventoryScene()
 						effect->BeginPass(iPass);
 						effect->CommitChanges();
 
-						drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+						drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 						effect->EndPass();
 					}
@@ -3375,8 +3444,8 @@ bool Renderer::drawScene(bool dump)
 	auto time1 = chrono::high_resolution_clock::now();
 	auto timeScene1 = chrono::high_resolution_clock::now();
 
-	D3DXMatrixMultiply(&m_viewProjection, &ViewMatrix, &ProjectionMatrix);
-	D3DXMatrixInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
+	XMMATRIXMultiply(&m_viewProjection, &ViewMatrix, &ProjectionMatrix);
+	XMMATRIXInverse(&m_inverseViewProjection, NULL, &m_viewProjection);
 
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -3403,8 +3472,8 @@ bool Renderer::drawScene(bool dump)
 	time1 = time2;
 
 	// Set basic GPU state
-	setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
-	setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
+	setCullMode(CULLMODE_CCW);
+	setBlendState(BLENDSTATE_OPAQUE);
 	setDepthWrite(true);
 	m_device->SetVertexDeclaration(m_vertexDeclaration);
 
@@ -3417,8 +3486,8 @@ bool Renderer::drawScene(bool dump)
 	effect->Begin(&cPasses, 0);
 	effect->BeginPass(0);
 	effect->CommitChanges();
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFORMAT::D3DFMT_INDEX32,
-		m_fullscreenQuadVertices, sizeof(RendererVertex));
+	m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFMT_INDEX32,
+									 m_fullscreenQuadVertices, sizeof(RendererVertex));
 	effect->EndPass();
 	effect->End(); 
 	m_device->EndScene(); 
@@ -3436,19 +3505,19 @@ bool Renderer::drawScene(bool dump)
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	effect->SetTexture(effect->GetParameterByName(NULL, "CausticsMap"), m_caustics[m_currentCausticsFrame / 2]);
 
 	m_currentCausticsFrame++;
 	m_currentCausticsFrame %= 32;
 
-	D3DXMATRIX world;
+	XMMATRIX world;
 
 	// Draw opaque geometry
 	if (level->Horizon)
 		drawHorizonAndSky();
 
-	// Bind Z-Buffer
+	// Clear Z-Buffer
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
@@ -3457,11 +3526,11 @@ bool Renderer::drawScene(bool dump)
 		if (room == NULL)
 			continue;
 
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER, true);
 
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -3473,43 +3542,41 @@ bool Renderer::drawScene(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber].get();
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0].get();
 
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 			}
 		}
 	}
 
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 	
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber].get();
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 	}
 
 	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
 	{
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 	}
 
-	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 
-	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawBats(RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+	drawBats(RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 
-	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawRats(RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+	drawRats(RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 
-	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawSpiders(RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+	drawSpiders(RENDERER_BUCKET_SOLID_DS, RENDERER_PASS_GBUFFER);
 
-	drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	//drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-
+	drawDebris(RENDERER_BUCKET_SOLID, RENDERER_PASS_GBUFFER);
+	
 	// Draw alpha tested geometry
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3517,11 +3584,11 @@ bool Renderer::drawScene(bool dump)
 		if (room == NULL)
 			continue;
 
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER, true);
 		
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -3533,41 +3600,40 @@ bool Renderer::drawScene(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber].get();
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0].get();
 
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 			}
 		}
 	}
 
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+	drawLara(RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 	 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 	}
 
 	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
 	{
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 	}
 
-	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+	drawGunshells(RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 
-	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawBats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawBats(RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+	drawBats(RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 
-	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawRats(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawRats(RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+	drawRats(RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 
-	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	drawSpiders(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawSpiders(RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
+	drawSpiders(RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASS_GBUFFER);
 
-	drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
-	//drawDebris(RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS, RENDERER_PASSES::RENDERER_PASS_GBUFFER);
+	drawDebris(RENDERER_BUCKET_ALPHA_TEST, RENDERER_PASS_GBUFFER);
 
 	effect->EndPass();
 	effect->End();
@@ -3606,7 +3672,7 @@ bool Renderer::drawScene(bool dump)
 	effect->SetTexture(effect->GetParameterByName(NULL, "DepthMap"), m_depthBuffer);
 	
 	effect->SetBool(effect->GetParameterByName(NULL, "AmbientPass"), false);
-	effect->SetVector(effect->GetParameterByName(NULL, "CameraPosition"), &D3DXVECTOR4(Camera.pos.x, Camera.pos.y, Camera.pos.z, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "CameraPosition"), &XMFLOAT4(Camera.pos.x, Camera.pos.y, Camera.pos.z, 1.0f));
 	effect->SetFloat(effect->GetParameterByName(NULL, "HalfPixelX"), m_halfPixelX);
 	effect->SetFloat(effect->GetParameterByName(NULL, "HalfPixelY"), m_halfPixelY);
 	  
@@ -3623,8 +3689,8 @@ bool Renderer::drawScene(bool dump)
 		{
 			effect->BeginPass(iPass);
 			  
-			D3DXMATRIX translation;
-			D3DXMATRIX scale;
+			XMMATRIX translation;
+			XMMATRIX scale;
 
 			effect->SetBool(effect->GetParameterByName(NULL, "CastShadows"), false);
 			effect->SetBool(effect->GetParameterByName(NULL, "AmbientPass"), false);
@@ -3634,14 +3700,14 @@ bool Renderer::drawScene(bool dump)
 			effect->SetFloat(effect->GetParameterByName(NULL, "LightIn"), light->In);
 			effect->SetVector(effect->GetParameterByName(NULL, "LightColor"), &light->Color);
 			effect->SetFloat(effect->GetParameterByName(NULL, "LightOut"), light->Out);
-			D3DXMatrixTranslation(&translation, light->Position.x, light->Position.y, light->Position.z);
-			D3DXMatrixScaling(&scale, light->Out / 1024.0f, light->Out / 1024.0f, light->Out / 1024.0f);
-			D3DXMatrixMultiply(&world, &scale, &translation);
+			XMMATRIXTranslation(&translation, light->Position.x, light->Position.y, light->Position.z);
+			XMMATRIXScaling(&scale, light->Out / 1024.0f, light->Out / 1024.0f, light->Out / 1024.0f);
+			XMMATRIXMultiply(&world, &scale, &translation);
 
 			effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 			effect->CommitChanges();
 
-			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_sphereMesh->NumVertices, 0, m_sphereMesh->NumIndices / 3);
+			drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, m_sphereMesh->NumVertices, 0, m_sphereMesh->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -3696,7 +3762,7 @@ bool Renderer::drawScene(bool dump)
 
 	effect->BeginPass(0);
 	effect->CommitChanges();
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFORMAT::D3DFMT_INDEX32,
+	m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFMT_INDEX32,
 		m_fullscreenQuadVertices, sizeof(RendererVertex));
 	effect->EndPass();
 	effect->End();
@@ -3716,10 +3782,10 @@ bool Renderer::drawScene(bool dump)
 
 	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_ROOM);
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
+	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
@@ -3727,11 +3793,11 @@ bool Renderer::drawScene(bool dump)
 		if (room == NULL)
 			continue;
 
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_TRANSPARENT, RENDERER_PASS_TRANSPARENT, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_TRANSPARENT, RENDERER_PASS_TRANSPARENT, true);
 		
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, false);
-		drawRoom(m_roomsToDraw[i], RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT, true);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASS_TRANSPARENT, false);
+		drawRoom(m_roomsToDraw[i], RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASS_TRANSPARENT, true);
 
 		// Draw static objects
 		ROOM_INFO* r = room->Room;
@@ -3743,30 +3809,30 @@ bool Renderer::drawScene(bool dump)
 				RendererObject* staticObj = m_staticObjects[sobj->staticNumber].get();
 				RendererMesh* staticMesh = staticObj->ObjectMeshes[0].get();
 
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKET_TRANSPARENT, RENDERER_PASS_TRANSPARENT);
+				drawStatic(m_roomsToDraw[i], j, RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASS_TRANSPARENT);
 			}
 		}
 	}
 
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-	drawLara(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	drawLara(RENDERER_BUCKET_TRANSPARENT, RENDERER_PASS_TRANSPARENT);
+	drawLara(RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASS_TRANSPARENT);
 
 	for (__int32 i = 0; i < m_itemsToDraw.size(); i++)
 	{
 		RendererObject* obj = m_moveableObjects[Items[m_itemsToDraw[i]->Id].objectNumber].get();
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKET_TRANSPARENT, RENDERER_PASS_TRANSPARENT);
+		drawItem(m_itemsToDraw[i].get(), RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASS_TRANSPARENT);
 	}
 
 	for (__int32 i = 0; i < m_effectsToDraw.size(); i++)
 	{
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKET_TRANSPARENT, RENDERER_PASS_TRANSPARENT);
+		drawEffect(m_effectsToDraw[i].get(), RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASS_TRANSPARENT);
 	}
 
-	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
-	drawGunshells(RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASSES::RENDERER_PASS_TRANSPARENT);
+	drawGunshells(RENDERER_BUCKET_TRANSPARENT, RENDERER_PASS_TRANSPARENT);
+	drawGunshells(RENDERER_BUCKET_TRANSPARENT_DS, RENDERER_PASS_TRANSPARENT);
 
 	effect->End();
 	m_device->EndScene();
@@ -3938,9 +4004,9 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	if (BinocularRange || SpotcamDontDrawLara)
 		return true;
 
-	D3DXMATRIX world;
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
+	XMMATRIX world;
+	XMMATRIX translation;
+	XMMATRIX rotation;
 	UINT cPasses = 1;
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA].get();
@@ -3950,25 +4016,25 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	OBJECT_INFO* obj = &Objects[0];
 
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	if (pass == RENDERER_PASS_SHADOW_MAP)
 		effect = m_shaderDepth->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	else if (pass == RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
 		effect = m_shaderTransparent->GetEffect();
 	  
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_LARA);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_LARA);
 	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), laraObj->AnimationTransforms.data(), laraObj->ObjectMeshes.size());
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_LaraWorldMatrix);
 	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[LaraItem->roomNumber]->AmbientLight);
 
-	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 	else
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 	for (__int32 i = 0; i < laraObj->ObjectMeshes.size(); i++)
 	{
@@ -3989,7 +4055,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->BeginPass(iPass);
 				effect->CommitChanges();
 
-				drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+				drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 				effect->EndPass();
 			}
@@ -4015,7 +4081,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->BeginPass(iPass);
 					effect->CommitChanges();
 
-					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -4043,7 +4109,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 			m_device->SetIndices(bucket->GetIndexBuffer());
 
-			D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[THIGH_L], &m_LaraWorldMatrix);
+			XMMATRIXMultiply(&world, &laraObj->AnimationTransforms[THIGH_L], &m_LaraWorldMatrix);
 
 			for (int iPass = 0; iPass < cPasses; iPass++)
 			{
@@ -4051,7 +4117,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 				effect->CommitChanges();
 
-				drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+				drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 				effect->EndPass();
 			}
@@ -4061,7 +4127,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 			m_device->SetIndices(bucket->GetIndexBuffer());
 
-			D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[THIGH_R], &m_LaraWorldMatrix);
+			XMMATRIXMultiply(&world, &laraObj->AnimationTransforms[THIGH_R], &m_LaraWorldMatrix);
 
 			for (int iPass = 0; iPass < cPasses; iPass++)
 			{
@@ -4069,7 +4135,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 				effect->CommitChanges();
 
-				drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+				drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 				effect->EndPass();
 			}
@@ -4090,7 +4156,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(bucket->GetIndexBuffer());
 
-				D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HEAD], &m_LaraWorldMatrix);
+				XMMATRIXMultiply(&world, &laraObj->AnimationTransforms[HEAD], &m_LaraWorldMatrix);
 
 				for (int iPass = 0; iPass < cPasses; iPass++)
 				{
@@ -4098,7 +4164,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 					effect->CommitChanges();
 
-					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -4116,7 +4182,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		if (m_moveableObjects.find(ID_HAIR) != m_moveableObjects.end())
 		{
 			RendererObject* hairsObj = m_moveableObjects[ID_HAIR].get();
-			D3DXMatrixIdentity(&world);
+			XMMATRIXIdentity(&world);
 
 			for (int iPass = 0; iPass < cPasses; iPass++)
 			{
@@ -4139,7 +4205,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 { 
-	D3DXMATRIX world;
+	XMMATRIX world;
 	UINT cPasses = 1;
 
 	ITEM_INFO* item = itemToDraw->Item;
@@ -4155,25 +4221,25 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 		return true;
 
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	if (pass == RENDERER_PASS_SHADOW_MAP)
 		effect = m_shaderDepth->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	else if (pass == RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
 		effect = m_shaderTransparent->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), true);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
 	effect->SetMatrixArray(effect->GetParameterByName(NULL, "Bones"), itemToDraw->AnimationTransforms.data(), moveableObj->ObjectMeshes.size());
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &itemToDraw->World);
 	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[item->roomNumber]->AmbientLight);
 	
-	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 	else
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 	 
 	__int32 bits = 1;
 
@@ -4209,7 +4275,7 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+			drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -4220,31 +4286,31 @@ bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketI
 
 bool Renderer::drawEffect(RendererEffectToDraw* fxToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
-	D3DXMATRIX world;
+	XMMATRIX world;
 	UINT cPasses = 1;
 
 	FX_INFO* fx = fxToDraw->Effect;
 	OBJECT_INFO* obj = &Objects[fx->objectNumber];
 
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	if (pass == RENDERER_PASS_SHADOW_MAP)
 		effect = m_shaderDepth->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	else if (pass == RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
 		effect = m_shaderTransparent->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &fxToDraw->World);
 	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[fx->roomNumber]->AmbientLight);
 
-	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 	else
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 	__int16 meshIndex;
 	if (obj->nmeshes != 0)
@@ -4271,7 +4337,7 @@ bool Renderer::drawEffect(RendererEffectToDraw* fxToDraw, RENDERER_BUCKETS bucke
 		effect->BeginPass(iPass);
 		effect->CommitChanges();
 
-		drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+		drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 		effect->EndPass();
 	}
@@ -4281,7 +4347,7 @@ bool Renderer::drawEffect(RendererEffectToDraw* fxToDraw, RENDERER_BUCKETS bucke
          
 bool Renderer::drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass, bool animated)
 {
-	D3DXMATRIX world;
+	XMMATRIX world;
 	UINT cPasses = 1;
 
 	RendererRoom* room = m_rooms[roomIndex].get();
@@ -4298,31 +4364,31 @@ bool Renderer::drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERE
 	RendererMesh* mesh = roomObj->ObjectMeshes[0].get();
 
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	if (pass == RENDERER_PASS_SHADOW_MAP)
 		effect = m_shaderDepth->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	else if (pass == RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
 		effect = m_shaderTransparent->GetEffect();  
 	       
-	D3DXMatrixTranslation(&world, r->x, r->y, r->z);
+	XMMATRIXTranslation(&world, r->x, r->y, r->z);
 	   
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 	      
-	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 	else
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
-	if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	if (pass == RENDERER_PASS_GBUFFER)
 	{
 		if (isRoomUnderwater(roomIndex))
-			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM_UNDERWATER);
+			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_ROOM_UNDERWATER);
 		else
-			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_ROOM);
+			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_ROOM);
 	}
 
 	if (!animated)
@@ -4339,7 +4405,7 @@ bool Renderer::drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERE
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+			drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -4354,8 +4420,8 @@ bool Renderer::drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERE
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, bucket->NumVertices, bucket->NumIndices / 3,
-				bucket->Indices.data(), D3DFORMAT::D3DFMT_INDEX32, bucket->Vertices.data(), sizeof(RendererVertex));
+			m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, bucket->NumVertices, bucket->NumIndices / 3,
+				bucket->Indices.data(), D3DFMT_INDEX32, bucket->Vertices.data(), sizeof(RendererVertex));
 
 			effect->EndPass();
 		}
@@ -4366,8 +4432,8 @@ bool Renderer::drawRoom(__int32 roomIndex, RENDERER_BUCKETS bucketIndex, RENDERE
 
 bool Renderer::drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
-	D3DXMATRIX world;
-	D3DXMATRIX rotation;
+	XMMATRIX world;
+	XMMATRIX rotation;
 	UINT cPasses = 1;
 
 	ROOM_INFO* room = &Rooms[roomIndex];
@@ -4388,28 +4454,28 @@ bool Renderer::drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKE
 	setGpuStateForBucket(bucketIndex);
 
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	if (pass == RENDERER_PASS_SHADOW_MAP)
 		effect = m_shaderDepth->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	else if (pass == RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
 		effect = m_shaderTransparent->GetEffect();
 
-	D3DXMatrixTranslation(&world, sobj->x, sobj->y, sobj->z);
-	D3DXMatrixRotationY(&rotation, TR_ANGLE_TO_RAD(sobj->yRot));
-	D3DXMatrixMultiply(&world, &rotation, &world);
+	XMMATRIXTranslation(&world, sobj->x, sobj->y, sobj->z);
+	XMMATRIXRotationY(&rotation, TR_ANGLE_TO_RAD(sobj->yRot));
+	XMMATRIXMultiply(&world, &rotation, &world);
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_STATIC);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_STATIC);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 	effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[roomIndex]->AmbientLight);
 
-	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 	else
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 	m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 	m_device->SetIndices(bucket->GetIndexBuffer());
@@ -4419,7 +4485,7 @@ bool Renderer::drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKE
 		effect->BeginPass(iPass);
 		effect->CommitChanges();
 
-		drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+		drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 		effect->EndPass();
 	}
@@ -4429,9 +4495,9 @@ bool Renderer::drawStatic(__int32 roomIndex, __int32 staticIndex, RENDERER_BUCKE
 
 bool Renderer::drawGunFlashes()
 {
-	D3DXMATRIX world;
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
+	XMMATRIX world;
+	XMMATRIX translation;
+	XMMATRIX rotation;
 	UINT cPasses = 1;
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA].get();
@@ -4444,7 +4510,7 @@ bool Renderer::drawGunFlashes()
 	effect = m_shaderBasic->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
 	effect->SetTexture(effect->GetParameterByName(NULL, "ModelTexture"), m_textureAtlas);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
@@ -4492,17 +4558,17 @@ bool Renderer::drawGunFlashes()
 				m_device->SetStreamSource(0, flashBucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(flashBucket->GetIndexBuffer());
 
-				D3DXMATRIX offset;
-				D3DXMatrixTranslation(&offset, 0, length, zOffset);
+				XMMATRIX offset;
+				XMMATRIXTranslation(&offset, 0, length, zOffset);
 
-				D3DXMATRIX rotation2;
-				D3DXMatrixRotationX(&rotation2, TR_ANGLE_TO_RAD(rotationX));
+				XMMATRIX rotation2;
+				XMMATRIXRotationX(&rotation2, TR_ANGLE_TO_RAD(rotationX));
 
 				if (Lara.leftArm.flash_gun)
 				{
-					D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_L], &m_LaraWorldMatrix);
-					D3DXMatrixMultiply(&world, &offset, &world);
-					D3DXMatrixMultiply(&world, &rotation2, &world);
+					XMMATRIXMultiply(&world, &laraObj->AnimationTransforms[HAND_L], &m_LaraWorldMatrix);
+					XMMATRIXMultiply(&world, &offset, &world);
+					XMMATRIXMultiply(&world, &rotation2, &world);
 
 					for (int iPass = 0; iPass < cPasses; iPass++)
 					{
@@ -4510,7 +4576,7 @@ bool Renderer::drawGunFlashes()
 						effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 						effect->CommitChanges();
 
-						drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
+						drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
 
 						effect->EndPass();
 					}
@@ -4518,9 +4584,9 @@ bool Renderer::drawGunFlashes()
 
 				if (Lara.rightArm.flash_gun)
 				{
-					D3DXMatrixMultiply(&world, &laraObj->AnimationTransforms[HAND_R], &m_LaraWorldMatrix);
-					D3DXMatrixMultiply(&world, &offset, &world);
-					D3DXMatrixMultiply(&world, &rotation2, &world);
+					XMMATRIXMultiply(&world, &laraObj->AnimationTransforms[HAND_R], &m_LaraWorldMatrix);
+					XMMATRIXMultiply(&world, &offset, &world);
+					XMMATRIXMultiply(&world, &rotation2, &world);
 
 					for (int iPass = 0; iPass < cPasses; iPass++)
 					{
@@ -4528,7 +4594,7 @@ bool Renderer::drawGunFlashes()
 						effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 						effect->CommitChanges();
 
-						drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
+						drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, flashBucket->NumVertices, 0, flashBucket->NumIndices / 3);
 
 						effect->EndPass();
 					}
@@ -4553,8 +4619,8 @@ void Renderer::collectLights()
 
 		for (__int32 j = 0; j < room->Lights.size(); j++)
 		{
-			D3DXVECTOR3 laraPos = D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-			D3DXVECTOR3 lightPos = D3DXVECTOR3(room->Lights[j]->Position.x, room->Lights[j]->Position.y, room->Lights[j]->Position.z);
+			Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+			Vector3 lightPos = Vector3(room->Lights[j]->Position.x, room->Lights[j]->Position.y, room->Lights[j]->Position.z);
 
 			// Collect only lights nearer than 20 sectors
 			if (D3DXVec3Length(&(laraPos - lightPos)) >= 1024.0f * 20.0f)
@@ -4567,7 +4633,7 @@ void Renderer::collectLights()
 				bool isTouchingItem = false;
 				for (__int32 k = 0; k < m_itemsToDraw.size(); k++)
 				{
-					D3DXVECTOR3 itemPos = D3DXVECTOR3(m_itemsToDraw[k]->Item->pos.xPos, m_itemsToDraw[k]->Item->pos.yPos, m_itemsToDraw[k]->Item->pos.zPos);
+					Vector3 itemPos = Vector3(m_itemsToDraw[k]->Item->pos.xPos, m_itemsToDraw[k]->Item->pos.yPos, m_itemsToDraw[k]->Item->pos.zPos);
 					float distance = D3DXVec3Length(&(itemPos - lightPos));
 					
 					if (room->Lights[j]->Type == LIGHT_TYPES::LIGHT_TYPE_SPOT)
@@ -4615,8 +4681,8 @@ void Renderer::collectLights()
 		{
 			RendererLight* light = room->Lights[j].get();
 
-			D3DXVECTOR4 itemPos = D3DXVECTOR4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
-			D3DXVECTOR4 lightVector = itemPos - light->Position;
+			XMFLOAT4 itemPos = XMFLOAT4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
+			XMFLOAT4 lightVector = itemPos - light->Position;
 
 			float distance = D3DXVec4Length(&lightVector);
 			D3DXVec4Normalize(&lightVector, &lightVector);
@@ -4670,7 +4736,7 @@ void Renderer::collectLights()
 bool Renderer::drawHorizonAndSky()
 {
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
-	D3DXVECTOR4 color = D3DXVECTOR4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
+	XMFLOAT4 color = XMFLOAT4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
 	if (BinocularRange)
 		phd_AlterFOV(14560 - BinocularRange);
@@ -4693,32 +4759,32 @@ bool Renderer::drawHorizonAndSky()
 			StormTimer = (rand() & 3) + 12;
 		}
 
-		color = D3DXVECTOR4((SkyStormColor[0]) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
+		color = XMFLOAT4((SkyStormColor[0]) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
 	}
 
-	D3DXMATRIX world;
-	D3DXMATRIX translation;
-	D3DXMATRIX rotation;
-	D3DXMATRIX scale;
+	XMMATRIX world;
+	XMMATRIX translation;
+	XMMATRIX rotation;
+	XMMATRIX scale;
 	UINT cPasses = 1;
 	         
 	LPD3DXEFFECT effect = m_shaderFillGBuffer->GetEffect();
 	
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_skyTexture);
 	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &color);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_SKY);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_SKY);
 
 	m_device->SetStreamSource(0, m_skyQuad->VertexBuffer, 0, sizeof(RendererVertex));
 	m_device->SetIndices(m_skyQuad->IndexBuffer);
 
 	// Quads have normal up, so I must rotate the plane by X (or Z)
-	D3DXMatrixRotationX(&m_tempRotation, PI);
+	XMMATRIXRotationX(&m_tempRotation, PI);
 
 	// Hardcoded kingdom :)
 	for (__int32 i = 0; i < 2; i++)
 	{
-		D3DXMatrixTranslation(&m_tempTranslation, Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
-		D3DXMatrixMultiply(&world, &m_tempRotation, &m_tempTranslation);
+		XMMATRIXTranslation(&m_tempTranslation, Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
+		XMMATRIXMultiply(&world, &m_tempRotation, &m_tempTranslation);
 		effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 
 		for (int iPass = 0; iPass < cPasses; iPass++)
@@ -4726,7 +4792,7 @@ bool Renderer::drawHorizonAndSky()
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_quad->NumVertices, 0, m_quad->NumIndices / 3);
+			drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, m_quad->NumVertices, 0, m_quad->NumIndices / 3);
 
 			effect->EndPass();
 		}
@@ -4735,13 +4801,13 @@ bool Renderer::drawHorizonAndSky()
 	// Draw the horizon
 	RendererObject* horizonObj = m_moveableObjects[ID_HORIZON].get();
 	RendererMesh* mesh = horizonObj->ObjectMeshes[0].get();
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_HORIZON);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_HORIZON);
 
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
-	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f));
-	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	effect->SetVector(effect->GetParameterByName(NULL, "Color"), &XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 
-	D3DXMatrixTranslation(&world, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	XMMATRIXTranslation(&world, Camera.pos.x, Camera.pos.y, Camera.pos.z);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 	
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
@@ -4759,13 +4825,13 @@ bool Renderer::drawHorizonAndSky()
 			effect->BeginPass(iPass);
 			effect->CommitChanges();
 
-			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+			drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 			effect->EndPass();
 		}
 	}
 
-	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 
 	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
 	m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
@@ -4777,8 +4843,8 @@ void Renderer::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff,
 {
 	auto dynamicLight = make_shared<RendererLight>();
 
-	dynamicLight->Position = D3DXVECTOR4(x, y, z, 1.0f);
-	dynamicLight->Color = D3DXVECTOR4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+	dynamicLight->Position = XMFLOAT4(x, y, z, 1.0f);
+	dynamicLight->Color = XMFLOAT4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
 	dynamicLight->Dynamic = true;
@@ -4796,29 +4862,29 @@ void Renderer::ClearDynamicLights()
 	NumDynamics = 0;
 }
 
-void Renderer::createBillboardMatrix(D3DXMATRIX* out, D3DXVECTOR3* particlePos, D3DXVECTOR3* cameraPos, float rotation)
+void Renderer::createBillboardMatrix(XMMATRIX* out, Vector3* particlePos, Vector3* cameraPos, float rotation)
 {
-	D3DXVECTOR3 look = *particlePos;
+	Vector3 look = *particlePos;
 	look = look - *cameraPos;
 	D3DXVec3Normalize(&look, &look);
 
-	D3DXVECTOR3 cameraUp = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+	Vector3 cameraUp = Vector3(0.0f, -1.0f, 0.0f);
 
-	D3DXVECTOR3 right;
+	Vector3 right;
 	D3DXVec3Cross(&right, &cameraUp, &look);
 	D3DXVec3Normalize(&right, &right);
 
 	// Rotate right vector
 	//rotation *= RADIAN;
-	D3DXMATRIX rightTransform;
-	D3DXMatrixRotationAxis(&rightTransform, &look, rotation);
+	XMMATRIX rightTransform;
+	XMMATRIXRotationAxis(&rightTransform, &look, rotation);
 	D3DXVec3TransformCoord(&right, &right, &rightTransform);
 
-	D3DXVECTOR3 up;
+	Vector3 up;
 	D3DXVec3Cross(&up, &look, &right);
 	D3DXVec3Normalize(&up, &up);
 
-	D3DXMatrixIdentity(out);
+	XMMATRIXIdentity(out);
 	
 	out->_11 = right.x;
 	out->_12 = right.y;
@@ -4851,7 +4917,7 @@ bool Renderer::drawSprites()
 	effect->SetMatrix(effect->GetParameterByName(NULL, "View"), &ViewMatrix);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "Projection"), &ProjectionMatrix);
 	effect->SetTexture(effect->GetParameterByName(NULL, "TextureAtlas"), m_textureAtlas);
-	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+	effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 	for (__int32 b = 0; b < 3; b++)
 	{
@@ -4873,15 +4939,15 @@ bool Renderer::drawSprites()
 				if (spr->BlendMode != currentBlendMode)
 					continue;
 
-				if (currentBlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+				if (currentBlendMode == BLENDMODE_OPAQUE)
 				{
 					setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
-					//effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+					//effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 				}
 				else
 				{
 					setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
-					//effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHABLEND);
+					//effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHABLEND);
 				}
 
 				if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
@@ -4889,19 +4955,19 @@ bool Renderer::drawSprites()
 					float halfWidth = spr->Width / 2.0f;
 					float halfHeight = spr->Height / 2.0f;
 
-					D3DXMATRIX billboardMatrix;
-					createBillboardMatrix(&billboardMatrix, &D3DXVECTOR3(spr->X, spr->Y, spr->Z),
-						&D3DXVECTOR3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
+					XMMATRIX billboardMatrix;
+					createBillboardMatrix(&billboardMatrix, &Vector3(spr->X, spr->Y, spr->Z),
+						&Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
 
-					D3DXVECTOR3 p0 = D3DXVECTOR3(-halfWidth, -halfHeight, 0);
-					D3DXVECTOR3 p1 = D3DXVECTOR3(halfWidth, -halfHeight, 0);
-					D3DXVECTOR3 p2 = D3DXVECTOR3(halfWidth, halfHeight, 0);
-					D3DXVECTOR3 p3 = D3DXVECTOR3(-halfWidth, halfHeight, 0);
+					Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
+					Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
+					Vector3 p2 = Vector3(halfWidth, halfHeight, 0);
+					Vector3 p3 = Vector3(-halfWidth, halfHeight, 0);
 
-					D3DXVECTOR4 p0t;
-					D3DXVECTOR4 p1t;
-					D3DXVECTOR4 p2t;
-					D3DXVECTOR4 p3t;
+					XMFLOAT4 p0t;
+					XMFLOAT4 p1t;
+					XMFLOAT4 p2t;
+					XMFLOAT4 p3t;
 
 					D3DXVec3Transform(&p0t, &p0, &billboardMatrix);
 					D3DXVec3Transform(&p1t, &p1, &billboardMatrix);
@@ -4964,10 +5030,10 @@ bool Renderer::drawSprites()
 				}
 				else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
 				{
-					D3DXVECTOR3 p0t = D3DXVECTOR3(spr->X1, spr->Y1, spr->Z1);
-					D3DXVECTOR3 p1t = D3DXVECTOR3(spr->X2, spr->Y2, spr->Z2);
-					D3DXVECTOR3 p2t = D3DXVECTOR3(spr->X3, spr->Y3, spr->Z3);
-					D3DXVECTOR3 p3t = D3DXVECTOR3(spr->X4, spr->Y4, spr->Z4);
+					Vector3 p0t = Vector3(spr->X1, spr->Y1, spr->Z1);
+					Vector3 p1t = Vector3(spr->X2, spr->Y2, spr->Z2);
+					Vector3 p2t = Vector3(spr->X3, spr->Y3, spr->Z3);
+					Vector3 p3t = Vector3(spr->X4, spr->Y4, spr->Z4);
 
 					RendererVertex v;
 					__int32 baseVertex = m_spritesVertices.size();
@@ -5062,7 +5128,7 @@ bool Renderer::drawSprites()
 			effect->BeginPass(0);
 			effect->CommitChanges();
 
-			drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, m_spritesVertices.size(), 0, m_spritesIndices.size() / 3);
+			drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, m_spritesVertices.size(), 0, m_spritesIndices.size() / 3);
 
 			effect->EndPass();
 		}
@@ -5115,7 +5181,7 @@ void Renderer::drawFires()
 								fire->x + spark->x, fire->y + spark->y, fire->z + spark->z, 
 								spark->r, spark->g, spark->b, 
 								TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
-									BLEND_MODES::BLENDMODE_ALPHABLEND);
+									BLENDMODE_ALPHABLEND);
 				}
 			}
 		}
@@ -5133,7 +5199,7 @@ void Renderer::drawSmokes()
 				spark->x, spark->y, spark->z,
 				spark->Shade, spark->Shade, spark->Shade,
 				TR_ANGLE_TO_RAD(spark->RotAng), spark->Scalar, spark->Size * 4.0f, spark->Size * 4.0f,
-				BLEND_MODES::BLENDMODE_ALPHABLEND);
+				BLENDMODE_ALPHABLEND);
 		}
 	}
 }
@@ -5151,11 +5217,11 @@ void Renderer::drawSparks()
 					spark->x, spark->y, spark->z,
 					spark->r, spark->g, spark->b,
 					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f,
-					BLEND_MODES::BLENDMODE_ALPHABLEND);
+					BLENDMODE_ALPHABLEND);
 			}
 			else
 			{
-				D3DXVECTOR3 v = D3DXVECTOR3(spark->xVel, spark->yVel, spark->zVel);
+				Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
 				D3DXVec3Normalize(&v, &v);
 				addLine3D(spark->x, spark->y, spark->z, spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f, spark->r, spark->g, spark->b);
 			}
@@ -5174,18 +5240,18 @@ void Renderer::drawBlood()
 				blood->x, blood->y, blood->z,
 				blood->Shade * 244, blood->Shade * 0, blood->Shade * 0,
 				TR_ANGLE_TO_RAD(blood->RotAng), 1.0f, blood->Size * 8.0f, blood->Size * 8.0f,
-				BLEND_MODES::BLENDMODE_ALPHABLEND);
+				BLENDMODE_ALPHABLEND);
 		}
 	}
 }
 
 bool Renderer::drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
-	D3DXMATRIX world;
+	XMMATRIX world;
 	UINT cPasses = 1;
 
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	if (pass == RENDERER_PASS_SHADOW_MAP)
 		effect = m_shaderDepth->GetEffect();
 	else
 		effect = m_shaderFillGBuffer->GetEffect();
@@ -5202,19 +5268,19 @@ bool Renderer::drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				return true;
 			
 			effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+			effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
 			
-			D3DXMatrixTranslation(&m_tempTranslation, gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
-			D3DXMatrixRotationYawPitchRoll(&m_tempRotation, TR_ANGLE_TO_RAD(gunshell->pos.yRot),
+			XMMATRIXTranslation(&m_tempTranslation, gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
+			XMMATRIXRotationYawPitchRoll(&m_tempRotation, TR_ANGLE_TO_RAD(gunshell->pos.yRot),
 				TR_ANGLE_TO_RAD(gunshell->pos.xRot),
 				TR_ANGLE_TO_RAD(gunshell->pos.zRot));
-			D3DXMatrixMultiply(&world, &m_tempRotation, &m_tempTranslation);
+			XMMATRIXMultiply(&world, &m_tempRotation, &m_tempTranslation);
 			effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &world);
 
-			if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-				effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+			if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+				effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 			else
-				effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+				effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 			for (__int32 i = 0; i < moveableObj->ObjectMeshes.size(); i++)
 			{
@@ -5233,7 +5299,7 @@ bool Renderer::drawGunshells(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->BeginPass(iPass);
 					effect->CommitChanges();
 
-					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -5359,7 +5425,7 @@ bool Renderer::doSnow()
 
 		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14].get(), snow->X, snow->Y, snow->Z, 255, 255, 255,
 			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
-			BLEND_MODES::BLENDMODE_ALPHABLEND);
+			BLENDMODE_ALPHABLEND);
 
 		__int16 roomNumber = Camera.pos.roomNumber;
 		FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
@@ -5462,7 +5528,7 @@ bool Renderer::drawLines3D()
 		effect->BeginPass(0);
 		effect->CommitChanges();
 
-		m_device->DrawPrimitive(D3DPRIMITIVETYPE::D3DPT_LINELIST, 0, m_lines3DVertices.size() / 2);
+		m_device->DrawPrimitive(D3DPT_LINELIST, 0, m_lines3DVertices.size() / 2);
 
 		effect->EndPass();
 	}
@@ -5552,37 +5618,37 @@ void Renderer::setGpuStateForBucket(RENDERER_BUCKETS bucket)
 {
 	switch (bucket)
 	{
-	case RENDERER_BUCKETS::RENDERER_BUCKET_SOLID:
+	case RENDERER_BUCKET_SOLID:
 		setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
 		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
 		setDepthWrite(true);
 		break;
 
-	case RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS:
+	case RENDERER_BUCKET_SOLID_DS:
 		setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
 		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
 		setDepthWrite(true);
 		break;
 
-	case RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST:
+	case RENDERER_BUCKET_ALPHA_TEST:
 		setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
 		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
 		setDepthWrite(true);
 		break;
 
-	case RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS:
+	case RENDERER_BUCKET_ALPHA_TEST_DS:
 		setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
 		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_OPAQUE);
 		setDepthWrite(true);
 		break;
 
-	case RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT:
+	case RENDERER_BUCKET_TRANSPARENT:
 		setCullMode(RENDERER_CULLMODE::CULLMODE_CCW);
 		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
 		setDepthWrite(false);
 		break;
 
-	case RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS:
+	case RENDERER_BUCKET_TRANSPARENT_DS:
 		setCullMode(RENDERER_CULLMODE::CULLMODE_NONE);
 		setBlendState(RENDERER_BLENDSTATE::BLENDSTATE_ADDITIVE);
 		setDepthWrite(false);
@@ -5602,7 +5668,7 @@ void Renderer::drawBubbles()
 				bubble->pos.x, bubble->pos.y, bubble->pos.z,
 				bubble->shade * 255, bubble->shade * 255, bubble->shade * 255,
 				0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f,
-				BLEND_MODES::BLENDMODE_ALPHABLEND);
+				BLENDMODE_ALPHABLEND);
 		}
 	}
 }
@@ -5657,7 +5723,7 @@ void Renderer::drawShockwaves()
 					x2, shockwave->y, z2,
 					x3, shockwave->y, z3,
 					x4, shockwave->y, z4,
-					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
 				x1 = x2;
 				z1 = z2;
@@ -5703,7 +5769,7 @@ void Renderer::drawSplahes()
 					x2, splash->y + splash->innerY, z2,
 					x2, splash->y, z2,
 					x1, splash->y, z1,
-					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
 				x1 = x2;
 				z1 = z2;
@@ -5734,7 +5800,7 @@ void Renderer::drawSplahes()
 					x2, splash->y + splash->middleY, z2,
 					x2, splash->y, z2,
 					x1, splash->y, z1,
-					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
 				x1 = x2;
 				z1 = z2;
@@ -5765,7 +5831,7 @@ void Renderer::drawSplahes()
 					x2, splash->y - splash->outerSize, z2,
 					x2, splash->y, z2,
 					x1, splash->y, z1,
-					color, color, color, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
 				x1 = x2;
 				z1 = z2;
@@ -5826,7 +5892,7 @@ void Renderer::drawRipples()
 
 			addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 9].get(),
 				x1, y, z2, x2, y, z2, x2, y, z1, x1, y, z1, color, color, color, 0.0f, 1.0f, ripple->size, ripple->size,
-				BLEND_MODES::BLENDMODE_ALPHABLEND);
+				BLENDMODE_ALPHABLEND);
 		}
 	}
 }
@@ -5870,7 +5936,7 @@ void Renderer::drawUnderwaterDust()
 		
 		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14].get(), dust->X, dust->Y, dust->Z, color, color, color,
 			0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE,
-			BLEND_MODES::BLENDMODE_ALPHABLEND);
+			BLENDMODE_ALPHABLEND);
 
 		if (dust->Life >= 32)
 			dust->Reset = true;
@@ -5949,9 +6015,9 @@ void Renderer::updateAnimatedTextures()
 void Renderer::updateAnimation(RendererItemToDraw* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
 {
 	stack<RendererBone*> bones;
-	D3DXMATRIX rotation;
+	XMMATRIX rotation;
 
-	D3DXMATRIX* transforms = (item == NULL ? obj->AnimationTransforms.data() : item->AnimationTransforms.data());
+	XMMATRIX* transforms = (item == NULL ? obj->AnimationTransforms.data() : item->AnimationTransforms.data());
 
 	bones.push(obj->Skeleton.get());
 	while (!bones.empty())
@@ -5964,16 +6030,16 @@ void Renderer::updateAnimation(RendererItemToDraw* item, RendererObject* obj, __
 
 		if (calculateMatrix)
 		{
-			D3DXVECTOR3 p = D3DXVECTOR3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
+			Vector3 p = Vector3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
 
 			fromTrAngle(&rotation, frmptr[0], bone->Index);
 
 			if (frac)
 			{
-				D3DXVECTOR3 p2 = D3DXVECTOR3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
+				Vector3 p2 = Vector3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
 				D3DXVec3Lerp(&p, &p, &p2, frac / ((float)rate));
 
-				D3DXMATRIX rotation2;
+				XMMATRIX rotation2;
 				fromTrAngle(&rotation2, frmptr[1], bone->Index);
 
 				D3DXQUATERNION q1, q2, q3;
@@ -5983,25 +6049,25 @@ void Renderer::updateAnimation(RendererItemToDraw* item, RendererObject* obj, __
 
 				D3DXQuaternionSlerp(&q3, &q1, &q2, frac / ((float)rate));
 
-				D3DXMatrixRotationQuaternion(&rotation, &q3);
+				XMMATRIXRotationQuaternion(&rotation, &q3);
 			}
 
-			D3DXMATRIX translation;
+			XMMATRIX translation;
 			if (bone == obj->Skeleton.get())
-				D3DXMatrixTranslation(&translation, p.x, p.y, p.z);
+				XMMATRIXTranslation(&translation, p.x, p.y, p.z);
 
-			D3DXMATRIX extraRotation;
-			D3DXMatrixRotationYawPitchRoll(&extraRotation, bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+			XMMATRIX extraRotation;
+			XMMATRIXRotationYawPitchRoll(&extraRotation, bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
 
-			D3DXMatrixMultiply(&rotation, &extraRotation, &rotation);
+			XMMATRIXMultiply(&rotation, &extraRotation, &rotation);
 
 			if (bone != obj->Skeleton.get())
-				D3DXMatrixMultiply(&transforms[bone->Index], &rotation, &bone->Transform);
+				XMMATRIXMultiply(&transforms[bone->Index], &rotation, &bone->Transform);
 			else
-				D3DXMatrixMultiply(&transforms[bone->Index], &rotation, &translation);
+				XMMATRIXMultiply(&transforms[bone->Index], &rotation, &translation);
 
 			if (bone != obj->Skeleton.get())
-				D3DXMatrixMultiply(&transforms[bone->Index], &transforms[bone->Index], &transforms[bone->Parent->Index]);
+				XMMATRIXMultiply(&transforms[bone->Index], &transforms[bone->Index], &transforms[bone->Parent->Index]);
 		}
 
 		for (__int32 i = 0; i < bone->Children.size(); i++)
@@ -6109,7 +6175,7 @@ __int32 Renderer::drawFinalPass()
 	
 	effect->BeginPass(0);
 	effect->CommitChanges();
-	m_device->DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFORMAT::D3DFMT_INDEX32,
+	m_device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 6, 2, m_fullscreenQuadIndices, D3DFMT_INDEX32,
 		m_fullscreenQuadVertices, sizeof(RendererVertex));
 	effect->EndPass();
 	effect->End();
@@ -6212,10 +6278,10 @@ void Renderer::drawFullScreenBackground(LPDIRECT3DTEXTURE9 texture, float alpha)
 	rect.bottom = desc.Height;
 
 	// Scale matrix for drawing full screen background
-	D3DXMATRIX mat;
-	D3DXVECTOR2 vScaleCentre(0, 0);
-	D3DXVECTOR2 vScaleFactor(ScreenWidth / (float)desc.Width, ScreenHeight / (float)desc.Height);
-	D3DXMatrixTransformation2D(&mat, &vScaleCentre, 0.0f, &vScaleFactor, NULL, 0.0f, NULL);
+	XMMATRIX mat;
+	Vector2 vScaleCentre(0, 0);
+	Vector2 vScaleFactor(ScreenWidth / (float)desc.Width, ScreenHeight / (float)desc.Height);
+	XMMATRIXTransformation2D(&mat, &vScaleCentre, 0.0f, &vScaleFactor, NULL, 0.0f, NULL);
 
 	byte colorComponent = 255 * alpha;
 
@@ -6230,15 +6296,15 @@ bool Renderer::IsFading()
 	return (m_fadeStatus != FADEMODE_NONE);
 }
 
-void Renderer::GetLaraBonePosition(D3DXVECTOR3* pos, __int32 joint)
+void Renderer::GetLaraBonePosition(Vector3* pos, __int32 joint)
 {
 	auto obj = m_moveableObjects[ID_LARA];
 	auto bone = obj->LinearizedBones[joint];
-	D3DXVECTOR3 transformed;
-	D3DXMatrixTranslation(&m_tempWorld, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	D3DXMatrixMultiply(&m_tempTransform, &obj->AnimationTransforms[joint], &m_tempWorld);
+	Vector3 transformed;
+	XMMATRIXTranslation(&m_tempWorld, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	XMMATRIXMultiply(&m_tempTransform, &obj->AnimationTransforms[joint], &m_tempWorld);
 	D3DXVec3TransformCoord(pos, pos, &m_tempTransform);
-	//*pos = transformed + D3DXVECTOR3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	//*pos = transformed + Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 }
 
 void Renderer::drawRopes()
@@ -6261,15 +6327,15 @@ void Renderer::drawRopes()
 			// 6) Last step only for us, unproject back to 3D coordinates
 
 			// Tranform rope points
-			D3DXVECTOR3 projected[24];
+			Vector3 projected[24];
 
 			for (__int32 i = 0; i < 24; i++)
 			{
-				D3DXVECTOR3 absolutePosition = D3DXVECTOR3(rope->position.x + rope->segment[i].x / 65536.0f,
+				Vector3 absolutePosition = Vector3(rope->position.x + rope->segment[i].x / 65536.0f,
 					rope->position.y + rope->segment[i].y / 65536.0f,
 					rope->position.z + rope->segment[i].z / 65536.0f);
 
-				D3DXMatrixIdentity(&m_tempWorld);
+				XMMATRIXIdentity(&m_tempWorld);
 				D3DXVec3Project(&projected[i], &absolutePosition, &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
 			}
 
@@ -6308,11 +6374,11 @@ void Renderer::drawRopes()
 
 			for (__int32 j = 0; j < 24; j++)
 			{
-				D3DXVECTOR3 p1;
-				D3DXVec3Unproject(&p1, &D3DXVECTOR3(x1, y1, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+				Vector3 p1;
+				D3DXVec3Unproject(&p1, &Vector3(x1, y1, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
 
-				D3DXVECTOR3 p2;
-				D3DXVec3Unproject(&p2, &D3DXVECTOR3(x2, y2, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+				Vector3 p2;
+				D3DXVec3Unproject(&p2, &Vector3(x2, y2, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
 
 				dx = projected[j].x - projected[j - 1].x;
 				dy = projected[j].y - projected[j - 1].y;
@@ -6345,18 +6411,18 @@ void Renderer::drawRopes()
 
 				depth = projected[j].z;
 
-				D3DXVECTOR3 p3;
-				D3DXVec3Unproject(&p3, &D3DXVECTOR3(x3, y3, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+				Vector3 p3;
+				D3DXVec3Unproject(&p3, &Vector3(x3, y3, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
 
-				D3DXVECTOR3 p4;
-				D3DXVec3Unproject(&p4, &D3DXVECTOR3(x4, y4, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
+				Vector3 p4;
+				D3DXVec3Unproject(&p4, &Vector3(x4, y4, depth), &viewport, &ProjectionMatrix, &ViewMatrix, &m_tempWorld);
 
 				addSprite3D(m_sprites[20].get(),
 							p1.x, p1.y, p1.z,
 							p2.x, p2.y, p2.z,
 							p3.x, p3.y, p3.z,
 							p4.x, p4.y, p4.z,
-							128, 128, 128, 0, 1, 0, 0, BLEND_MODES::BLENDMODE_OPAQUE);
+							128, 128, 128, 0, 1, 0, 0, BLENDMODE_OPAQUE);
 
 				x1 = x4;
 				y1 = y4;
@@ -6368,12 +6434,12 @@ void Renderer::drawRopes()
 	}
 }
 
-void Renderer::createConstrainedBillboardMatrix(D3DXMATRIX* result, D3DXVECTOR3* objectPosition, D3DXVECTOR3* cameraPosition, D3DXVECTOR3* rotateAxis,
-	D3DXVECTOR3* cameraForward, D3DXVECTOR3* objectForward)
+void Renderer::createConstrainedBillboardMatrix(XMMATRIX* result, Vector3* objectPosition, Vector3* cameraPosition, Vector3* rotateAxis,
+	Vector3* cameraForward, Vector3* objectForward)
 {
-	D3DXVECTOR3 vector;
-	D3DXVECTOR3 vector2;
-	D3DXVECTOR3 vector3;
+	Vector3 vector;
+	Vector3 vector2;
+	Vector3 vector3;
 
 	vector2.x = objectPosition->x - cameraPosition->x;
 	vector2.y = objectPosition->y - cameraPosition->y;
@@ -6389,7 +6455,7 @@ void Renderer::createConstrainedBillboardMatrix(D3DXMATRIX* result, D3DXVECTOR3*
 		vector2 *= (float)(1.0f / ((float)sqrt((double)num2)));
 	}
 
-	D3DXVECTOR3 vector4 = *rotateAxis;
+	Vector3 vector4 = *rotateAxis;
 	float num = D3DXVec3Dot(rotateAxis, &vector2);
 
 	if (abs(num) > 0.9982547f)
@@ -6399,7 +6465,7 @@ void Renderer::createConstrainedBillboardMatrix(D3DXMATRIX* result, D3DXVECTOR3*
 		if (abs(num) > 0.9982547f)
 		{
 			num = ((rotateAxis->x * 0.0f) + (rotateAxis->y * 0.0f)) + (rotateAxis->z * -1.0f);
-			vector = (abs(num) > 0.9982547f) ? D3DXVECTOR3(1.0f, 0.0f, 0.0f) : D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+			vector = (abs(num) > 0.9982547f) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 0.0f, -1.0f);
 		}
 
 		D3DXVec3Cross(&vector3, rotateAxis, &vector);
@@ -6448,29 +6514,29 @@ bool Renderer::drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 		if (debris->On)
 		{
-			D3DXMatrixTranslation(&m_tempTranslation, debris->x, debris->y, debris->z);
-			D3DXMatrixRotationYawPitchRoll(&m_tempRotation, TR_ANGLE_TO_RAD(debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
-			D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+			XMMATRIXTranslation(&m_tempTranslation, debris->x, debris->y, debris->z);
+			XMMATRIXRotationYawPitchRoll(&m_tempRotation, TR_ANGLE_TO_RAD(debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
+			XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
 
 			OBJECT_TEXTURE* texture = &ObjectTextures[(__int32)(debris->textInfo) & 0x7FFF];
 			__int32 tile = texture->tileAndFlag & 0x7FFF;
 
 			// Draw only debris of the current bucket
 			if (texture->attribute == 0 &&
-				bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_SOLID && bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS
+				bucketIndex != RENDERER_BUCKET_SOLID && bucketIndex != RENDERER_BUCKET_SOLID_DS
 				||
 				texture->attribute == 1 &&
-				bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST && bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_ALPHA_TEST_DS
+				bucketIndex != RENDERER_BUCKET_ALPHA_TEST && bucketIndex != RENDERER_BUCKET_ALPHA_TEST_DS
 				||
 				texture->attribute == 2 &&
-				bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT && bucketIndex != RENDERER_BUCKETS::RENDERER_BUCKET_TRANSPARENT_DS
+				bucketIndex != RENDERER_BUCKET_TRANSPARENT && bucketIndex != RENDERER_BUCKET_TRANSPARENT_DS
 				)
 				continue;
 
 			RendererVertex vertex;
 
 			// Prepare the triangle
-			D3DXVECTOR3 p = D3DXVECTOR3(debris->XYZOffsets1[0], debris->XYZOffsets1[1], debris->XYZOffsets1[2]);
+			Vector3 p = Vector3(debris->XYZOffsets1[0], debris->XYZOffsets1[1], debris->XYZOffsets1[2]);
 			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
 			vertex.x = p.x;
 			vertex.y = p.y;
@@ -6482,7 +6548,7 @@ bool Renderer::drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 			vertex.b = debris->Pad[4] / 255.0f;
 			vertices.push_back(vertex);
 
-			p = D3DXVECTOR3(debris->XYZOffsets2[0], debris->XYZOffsets2[1], debris->XYZOffsets2[2]);
+			p = Vector3(debris->XYZOffsets2[0], debris->XYZOffsets2[1], debris->XYZOffsets2[2]);
 			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
 			vertex.x = p.x;
 			vertex.y = p.y;
@@ -6494,7 +6560,7 @@ bool Renderer::drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 			vertex.b = debris->Pad[8] / 255.0f;
 			vertices.push_back(vertex);
 
-			p = D3DXVECTOR3(debris->XYZOffsets3[0], debris->XYZOffsets3[1], debris->XYZOffsets3[2]);
+			p = Vector3(debris->XYZOffsets3[0], debris->XYZOffsets3[1], debris->XYZOffsets3[2]);
 			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
 			vertex.x = p.x;
 			vertex.y = p.y;
@@ -6515,24 +6581,24 @@ bool Renderer::drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	setGpuStateForBucket(bucketIndex);
 
 	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+	if (pass == RENDERER_PASS_SHADOW_MAP)
 		effect = m_shaderDepth->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 		effect = m_shaderReconstructZBuffer->GetEffect();
-	else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+	else if (pass == RENDERER_PASS_GBUFFER)
 		effect = m_shaderFillGBuffer->GetEffect();
 	else
 		effect = m_shaderTransparent->GetEffect();
 
 	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_STATIC);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_STATIC);
 
-	if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 	else
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 	
-	D3DXMatrixIdentity(&m_tempWorld);
+	XMMATRIXIdentity(&m_tempWorld);
 	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
 
 	for (int iPass = 0; iPass < cPasses; iPass++)
@@ -6540,7 +6606,7 @@ bool Renderer::drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		effect->BeginPass(iPass);
 		effect->CommitChanges();
 
-		m_device->DrawPrimitiveUP(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, vertices.size() / 3, &vertices[0], sizeof(RendererVertex));
+		m_device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, vertices.size() / 3, &vertices[0], sizeof(RendererVertex));
 
 		effect->EndPass();
 	}
@@ -6550,7 +6616,7 @@ bool Renderer::drawDebris(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 bool Renderer::drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
-	D3DXMATRIX world;
+	XMMATRIX world;
 	UINT cPasses = 1;
 
 	if (Objects[ID_BATS].loaded)
@@ -6570,22 +6636,22 @@ bool Renderer::drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		m_device->SetIndices(bucket->GetIndexBuffer());
 
 		LPD3DXEFFECT effect;
-		if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+		if (pass == RENDERER_PASS_SHADOW_MAP)
 			effect = m_shaderDepth->GetEffect();
-		else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 			effect = m_shaderReconstructZBuffer->GetEffect();
-		else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+		else if (pass == RENDERER_PASS_GBUFFER)
 			effect = m_shaderFillGBuffer->GetEffect();
 		else
 			effect = m_shaderTransparent->GetEffect();
 
 		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
 
-		if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 		else
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 		for (__int32 i = 0; i < 64; i++)
 		{
@@ -6593,9 +6659,9 @@ bool Renderer::drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 			if (bat->on)
 			{
-				D3DXMatrixTranslation(&m_tempTranslation, bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
-				D3DXMatrixRotationYawPitchRoll(&m_tempRotation, bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
-				D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				XMMATRIXTranslation(&m_tempTranslation, bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
+				XMMATRIXRotationYawPitchRoll(&m_tempRotation, bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
+				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
 
 				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[bat->roomNumber]->AmbientLight);
@@ -6605,7 +6671,7 @@ bool Renderer::drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->BeginPass(iPass);
 					effect->CommitChanges();
 
-					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -6618,7 +6684,7 @@ bool Renderer::drawBats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 bool Renderer::drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
-	D3DXMATRIX world;
+	XMMATRIX world;
 	UINT cPasses = 1;
 
 	if (Objects[ID_RATS].loaded)
@@ -6629,22 +6695,22 @@ bool Renderer::drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		setGpuStateForBucket(bucketIndex);
 		
 		LPD3DXEFFECT effect;
-		if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+		if (pass == RENDERER_PASS_SHADOW_MAP)
 			effect = m_shaderDepth->GetEffect();
-		else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 			effect = m_shaderReconstructZBuffer->GetEffect();
-		else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+		else if (pass == RENDERER_PASS_GBUFFER)
 			effect = m_shaderFillGBuffer->GetEffect();
 		else
 			effect = m_shaderTransparent->GetEffect();
 
 		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
 
-		if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 		else
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 		for (__int32 i = 0; i < NUM_RATS; i += 4)
 		{
@@ -6662,9 +6728,9 @@ bool Renderer::drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
 				m_device->SetIndices(bucket->GetIndexBuffer());
 
-				D3DXMatrixTranslation(&m_tempTranslation, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-				D3DXMatrixRotationYawPitchRoll(&m_tempRotation, rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
-				D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				XMMATRIXTranslation(&m_tempTranslation, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
+				XMMATRIXRotationYawPitchRoll(&m_tempRotation, rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
+				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
 
 				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[rat->roomNumber]->AmbientLight);
@@ -6674,7 +6740,7 @@ bool Renderer::drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->BeginPass(iPass);
 					effect->CommitChanges();
 
-					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -6687,7 +6753,7 @@ bool Renderer::drawRats(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 bool Renderer::drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 {
-	D3DXMATRIX world;
+	XMMATRIX world;
 	UINT cPasses = 1;
 
 	if (Objects[ID_SPIDER].loaded)
@@ -6707,22 +6773,22 @@ bool Renderer::drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		m_device->SetIndices(bucket->GetIndexBuffer());
 
 		LPD3DXEFFECT effect;
-		if (pass == RENDERER_PASSES::RENDERER_PASS_SHADOW_MAP)
+		if (pass == RENDERER_PASS_SHADOW_MAP)
 			effect = m_shaderDepth->GetEffect();
-		else if (pass == RENDERER_PASSES::RENDERER_PASS_RECONSTRUCT_DEPTH)
+		else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
 			effect = m_shaderReconstructZBuffer->GetEffect();
-		else if (pass == RENDERER_PASSES::RENDERER_PASS_GBUFFER)
+		else if (pass == RENDERER_PASS_GBUFFER)
 			effect = m_shaderFillGBuffer->GetEffect();
 		else
 			effect = m_shaderTransparent->GetEffect();
 
 		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPES::MODEL_TYPE_MOVEABLE);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
 
-		if (bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKETS::RENDERER_BUCKET_SOLID_DS)
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_OPAQUE);
+		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
 		else
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLEND_MODES::BLENDMODE_ALPHATEST);
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
 		for (__int32 i = 0; i < NUM_SPIDERS; i++)
 		{
@@ -6730,9 +6796,9 @@ bool Renderer::drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 
 			if (spider->on)
 			{
-				D3DXMatrixTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
-				D3DXMatrixRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
-				D3DXMatrixMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				XMMATRIXTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
+				XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
+				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
 				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
 
 				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[spider->roomNumber]->AmbientLight);
@@ -6742,7 +6808,7 @@ bool Renderer::drawSpiders(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 					effect->BeginPass(iPass);
 					effect->CommitChanges();
 
-					drawPrimitives(D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
 
 					effect->EndPass();
 				}
@@ -6767,10 +6833,10 @@ bool Renderer::drawOverlays()
 	rect.right = desc.Width;
 	rect.bottom = desc.Height;
 
-	D3DXMATRIX mat;
-	D3DXVECTOR2 vScaleCentre(0, 0);
-	D3DXVECTOR2 vScaleFactor(ScreenWidth / (float)desc.Width, ScreenHeight / (float)desc.Height);
-	D3DXMatrixTransformation2D(&mat, &vScaleCentre, 0.0f, &vScaleFactor, NULL, 0.0f, NULL);
+	XMMATRIX mat;
+	Vector2 vScaleCentre(0, 0);
+	Vector2 vScaleFactor(ScreenWidth / (float)desc.Width, ScreenHeight / (float)desc.Height);
+	XMMATRIXTransformation2D(&mat, &vScaleCentre, 0.0f, &vScaleFactor, NULL, 0.0f, NULL);
 
 	m_dxSprite->Begin(D3DXSPRITE_ALPHABLEND);
 	m_dxSprite->SetTransform(&mat);
@@ -6864,10 +6930,10 @@ void Renderer::legacyGetVisibleRooms()
 			{
 				roomNumber = *(door++);
 
-				D3DXVECTOR3 n = D3DXVECTOR3(*(door), *(door + 1), *(door + 2));
-				D3DXMATRIX m;
-				D3DXMatrixTranslation(&m, r->x, r->y, r->z);
-				D3DXMatrixMultiply(&m, &m, &ViewMatrix);
+				Vector3 n = Vector3(*(door), *(door + 1), *(door + 2));
+				XMMATRIX m;
+				XMMATRIXTranslation(&m, r->x, r->y, r->z);
+				XMMATRIXMultiply(&m, &m, &ViewMatrix);
 
 				if (n.x*(r->x + *(door + 3)) - m._14 +
 					n.y*(r->y + *(door + 4)) - m._24 +
@@ -7099,3 +7165,5 @@ bool Renderer::afterDeviceReset()
 
 	return true;
 }
+
+#endif

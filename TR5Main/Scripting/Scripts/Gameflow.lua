@@ -53,7 +53,7 @@ trajan.loadScreen = "Screens\\andrea2.jpg";
 trajan.horizon = true;
 trajan.colAddHorizon = true;
 trajan.layer1 = SkyLayer.new(128, 128, 128, 3);
-trajan.storm = true;
+trajan.storm = false;
 
 Gameflow:AddLevel(trajan);
 

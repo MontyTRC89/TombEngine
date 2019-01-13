@@ -214,7 +214,7 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 	SoundSlot[freeSlot].effectID = effectID;
 	SoundSlot[freeSlot].channel = channel;
 	SoundSlot[freeSlot].gain = gain;
-	SoundSlot[freeSlot].origin = position ? D3DXVECTOR3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
+	SoundSlot[freeSlot].origin = position ? Vector3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
 	
 	// Set 3D attributes
 	
@@ -419,9 +419,7 @@ int Sound_GetFreeSlot()
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		float distance = D3DXVec3Length(&D3DXVECTOR3(SoundSlot[i].origin - D3DXVECTOR3(Camera.mikePos.x,
-																					   Camera.mikePos.y,
-																					   Camera.mikePos.z)));
+		float distance = Vector3(SoundSlot[i].origin - Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z)).Length();
 		if (distance > minDistance)
 		{
 			minDistance = distance;
@@ -458,9 +456,9 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 				// Check if effect origin is equal OR in nearest possible hearing range.
 
-				D3DXVECTOR3 origin = D3DXVECTOR3(position->xPos, position->yPos, position->zPos);
+				Vector3 origin = Vector3(position->xPos, position->yPos, position->zPos);
 				if (SoundSlot[i].origin == origin ||
-					D3DXVec3Length(&D3DXVECTOR3(SoundSlot[i].origin - origin)) < SOUND_MAXVOL_RADIUS)
+					Vector3(SoundSlot[i].origin - origin).Length() < SOUND_MAXVOL_RADIUS)
 					return i;
 			}
 			else
@@ -475,11 +473,11 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 float Sound_DistanceToListener(PHD_3DPOS *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
-	return Sound_DistanceToListener(D3DXVECTOR3(position->xPos, position->yPos, position->zPos));
+	return Sound_DistanceToListener(Vector3(position->xPos, position->yPos, position->zPos));
 }
-float Sound_DistanceToListener(D3DXVECTOR3 position)
+float Sound_DistanceToListener(Vector3 position)
 {
-	return D3DXVec3Length(&D3DXVECTOR3(D3DXVECTOR3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z) - position));
+	return Vector3(Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z) - position).Length();
 }
 
 // Calculate attenuated volume.
@@ -591,9 +589,9 @@ void Sound_UpdateScene()
 
 	// Apply current listener position.
 
-	D3DXVECTOR3 at;
-	D3DXVec3Normalize(&at, &(D3DXVECTOR3(Camera.target.x, Camera.target.y, Camera.target.z) -
-							 D3DXVECTOR3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z)));
+	Vector3 at = Vector3(Camera.target.x, Camera.target.y, Camera.target.z) -
+		Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z);
+	at.Normalize();
 
 	BASS_Set3DPosition(&BASS_3DVECTOR(Camera.mikePos.x,		// Pos
 									  Camera.mikePos.y,

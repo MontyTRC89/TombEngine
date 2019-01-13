@@ -1,24 +1,26 @@
+#ifdef OLDCODE
+
+
 #include "RendererMesh.h"
 #include "Enums.h"
 
 #include <stdio.h>
-#include <d3d9.h>
-#include <d3dx9.h>
+#include <D3D11.h>
 #include <DxErr.h>
 #include <vector>
 
 struct RendererVertex;
 struct RendererPolygon;
 
-RendererMesh::RendererMesh(LPDIRECT3DDEVICE9 device)
+RendererMesh::RendererMesh(ID3D11Device* device)
 {
 	m_device = device;
 
-	for (__int32 i = 0; i < NUM_BUCKETS; i++)
+	/*for (__int32 i = 0; i < NUM_BUCKETS; i++)
 		m_buckets[i] = make_shared<RendererBucket>(device);
 	 
 	for (__int32 i = 0; i < NUM_BUCKETS; i++)
-		m_animatedBuckets[i] = make_shared<RendererBucket>(device);
+		m_animatedBuckets[i] = make_shared<RendererBucket>(device);*/
 }
 
 RendererMesh::~RendererMesh()
@@ -32,10 +34,14 @@ RendererMesh::~RendererMesh()
 
 RendererBucket* RendererMesh::GetBucket(__int32 bucketIndex)
 {
-	return m_buckets[bucketIndex].get();
+	return NULL;
+	//return m_buckets[bucketIndex].get();
 }
 
 RendererBucket* RendererMesh::GetAnimatedBucket(__int32 bucketIndex)
 {
-	return m_animatedBuckets[bucketIndex].get();
+	return NULL;
+	//return m_animatedBuckets[bucketIndex].get();
 }
+
+#endif

@@ -1,5 +1,12 @@
 #pragma once
 
+#include <windows.h>
+#include <D3D11.h>
+#include <D3DX11.h>
+#include <SimpleMath.h>
+
+using namespace DirectX::SimpleMath;
+
 #include "vodoo.h"
 #include "constants.h"
 #include "enums.h"
@@ -9,10 +16,11 @@
 #include "math.h"
 #include "macros.h"
 #include "malloc.h"
-#include <windows.h>"
+
 #include "..\Scripting\GameLogicScript.h"
 #include "..\Scripting\GameFlowScript.h"
-#include "..\Renderer\Renderer.h"
+
+#include "..\Renderer\Renderer11.h"
 
 #define DB_Log ((HWND (__cdecl*)(__int16, const char*)) 0x004DEB10)
 
