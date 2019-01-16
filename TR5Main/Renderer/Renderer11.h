@@ -590,11 +590,17 @@ private:
 	vector<RendererLight*>							m_lightsToDraw;
 	vector<RendererLight*>							m_dynamicLights;
 	RendererLight*									m_shadowLight;
-	RendererItem									m_items[NUM_ITEMS];
-	RendererEffect									m_effects[NUM_ITEMS];
 	map<__int32, RendererObject*>					m_moveableObjects;
 	map<__int32, RendererObject*>					m_staticObjects;
 	map<__int16*, RendererMesh*>					m_meshPointersToMesh;
+
+	// Preallocated pools of objects for avoiding new/delete
+	// Items and effects are safe (can't be more than 1024 items in TR), 
+	// lights should be oversized (eventually ignore lights more than MAX_LIGHTS)
+	RendererItem									m_items[NUM_ITEMS];
+	RendererEffect									m_effects[NUM_ITEMS];
+	RendererLight									m_lights[MAX_LIGHTS];
+	__int32											m_nextLight;
 
 	// Private functions
 	bool									drawScene(bool dump);

@@ -1331,7 +1331,20 @@ void Renderer11::ClearDynamicLights()
 
 void Renderer11::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b)
 {
+	if (m_nextLight >= MAX_LIGHTS)
+		return;
 
+	RendererLight* dynamicLight = &m_lights[m_nextLight++];
+
+	dynamicLight->Position = Vector4(x, y, z, 1.0f);
+	dynamicLight->Color = Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+	dynamicLight->Out = falloff * 256.0f;
+	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
+	dynamicLight->Dynamic = true;
+	dynamicLight->Intensity = 2.0f;
+
+	m_dynamicLights.push_back(dynamicLight);
+	NumDynamics++;
 }
 
 void Renderer11::EnableCinematicBars(bool value)
