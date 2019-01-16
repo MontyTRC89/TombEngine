@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <array>
 #include "Enums.h"
 
 #include <D3D11.h>
@@ -30,6 +31,94 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace std;
+
+template <class T>
+class PreallocatedVector 
+{
+private:
+	T*			m_objects;
+	__int32		m_maxItems;
+	__int32		m_numItems;
+	__int32		m_startSize;
+
+public:
+	PreallocatedVector()
+	{
+		m_objects = NULL;
+		m_size = 0;
+		m_startSize = 0;
+		m_numItems = 0;
+	}
+
+	~PreallocatedVector()
+	{
+		delete m_objects;
+	}
+
+	void Reserve(__int32 numItems)
+	{
+		m_objects = (T*)malloc(sizeof(T) * numItems);
+		ZeroMemory(m_objects, sizeof(T) * m_maxItems);
+		m_maxItems = numItems;
+		m_numItems = 0;
+		m_startSize = numItems;
+	}
+
+	void Clear()
+	{
+		m_numItems = 0;
+		ZeroMemory(m_objects, sizeof(T) * m_maxItems);
+	}
+
+	T* Allocate()
+	{
+		return Allocate(NULL);
+	}
+
+	T* Allocate(T* from)
+	{
+		if (m_numItems >= m_maxItems)
+		{
+			// Try to reallocate
+			__int32 newSize = m_maxItems + m_startSize;
+			T* temp = (T*)malloc(sizeof(T) * newSize);
+			ZeroMemory(temp, sizeof(T) * newSize);
+			memcpy(temp, m_objects, sizeof(T) * m_maxItems);
+			delete m_objects;
+			m_objects = temp;
+			m_maxItems = newSize;
+		}
+
+		T* obj = Get(m_numItems);
+		if (obj == NULL)
+			return NULL;
+
+		m_numItems++;
+
+		if (from != NULL)
+			memcpy(obj, from, sizeof(T));
+
+		return obj;
+	}
+
+	T* Get(__int32 index)
+	{
+		if (index >= m_numItems)
+			return NULL;
+
+		return &m_objects[index];
+	}
+
+	__int32 Size()
+	{
+		return m_numItems;
+	}
+
+	void Sort(__int32(*compareFunc)(const void*, const void*))
+	{
+		qsort(m_objects, m_numItems, sizeof(T), compareFunc);
+	}
+};
 
 struct RendererVertex {
 	Vector3 Position;
@@ -173,13 +262,7 @@ public:
 		ID3D11DeviceContext* context = NULL;
 		device->GetImmediateContext(&context);
 
-		HRESULT res = CreateWICTextureFromFile(device, context,
-			&buffer[0], &resource, &texture->ShaderResourceView, (size_t)0);
-			
-			
-			/*CreateWICTextureFromFileEx(device, buffer, (size_t)0, 
-			D3D11_USAGE_DYNAMIC, D3D11_BIND_SHADER_RESOURCE, 0, 0, WIC_LOADER_DEFAULT, &resource, &texture->ShaderResourceView);
-	*/
+		HRESULT res = CreateWICTextureFromFile(device, context, &buffer[0], &resource, &texture->ShaderResourceView, (size_t)0);
 		if (FAILED(res))
 			return NULL;
 
@@ -365,6 +448,30 @@ struct RendererBucket
 	__int32						NumIndices;
 };
 
+struct RendererLight {
+	Vector4 Position;
+	Vector4 Color;
+	Vector4 Direction;
+	float Intensity;
+	float In;
+	float Out;
+	float Range;
+	LIGHT_TYPES Type;
+	bool Dynamic;
+
+	RendererLight()
+	{
+		Dynamic = false;
+	}
+};
+
+struct RendererStatic {
+	__int32 Id;
+	__int16 RoomIndex;
+	MESH_INFO* Mesh;
+	Matrix World;
+};
+
 struct RendererRoom 
 {
 	ROOM_INFO* Room;
@@ -373,7 +480,11 @@ struct RendererRoom
 	Vector4 AmbientLight;
 	RendererBucket Buckets[NUM_BUCKETS];
 	RendererBucket AnimatedBuckets[NUM_BUCKETS];
+	vector<RendererLight> Lights;
+	vector<RendererStatic> Statics;
 	bool Visited;
+	float Distance;
+	__int32 RoomNumber;
 };
 
 struct RendererRoomNode {
@@ -382,34 +493,17 @@ struct RendererRoomNode {
 	Vector4 ClipPort;
 };
 
-struct RendererItemToDraw {
+struct RendererItem {
 	__int32 Id;
 	ITEM_INFO* Item;
 	Matrix World;
 	vector<Matrix> AnimationTransforms;
-
-	RendererItemToDraw(__int32 id, ITEM_INFO* item, __int32 numMeshes)
-	{
-		Id = id;
-		Item = item;
-		World = Matrix::Identity;
-		AnimationTransforms.reserve(numMeshes);
-		for (__int32 i = 0; i < numMeshes; i++)
-			AnimationTransforms.push_back(Matrix::Identity);
-	}
 };
 
-struct RendererEffectToDraw {
+struct RendererEffect {
 	__int32 Id;
 	FX_INFO* Effect;
 	Matrix World;
-
-	RendererEffectToDraw(__int32 id, FX_INFO* effect)
-	{
-		Id = id;
-		Effect = effect;
-		World = Matrix::Identity;
-	}
 };
 
 struct RendererMesh
@@ -472,29 +566,35 @@ private:
 	Texture2D*								m_binocularsTexture;
 
 	// Level data
-	Texture2D*								m_textureAtlas;
-	vector<RendererAnimatedTextureSet*>		m_animatedTextureSets;
-	VertexBuffer*							m_roomsVertexBuffer;
-	IndexBuffer*							m_roomsIndexBuffer;
-	VertexBuffer*							m_moveablesVertexBuffer;
-	IndexBuffer*							m_moveablesIndexBuffer;
-	VertexBuffer*							m_staticsVertexBuffer;
-	IndexBuffer*							m_staticsIndexBuffer;
-	map<__int32, RendererRoom*>				m_rooms;
-	Matrix									m_hairsMatrices[12];
-	__int16									m_normalLaraSkinJointRemap[15][32];
-	__int16									m_youngLaraSkinJointRemap[15][32];
-	__int16									m_laraSkinJointRemap[15][32];
-	__int16									m_numHairVertices;
-	__int16									m_numHairIndices;
-	vector<RendererVertex>					m_hairVertices;
-	vector<__int32>							m_hairIndices;
-	vector<__int16>							m_roomsToDraw;
-	vector<RendererItemToDraw*>				m_itemsToDraw;
-	vector<RendererEffectToDraw*>			m_effectsToDraw;
-	map<__int32, RendererObject*>			m_moveableObjects;
-	map<__int32, RendererObject*>			m_staticObjects;
-	map<__int16*, RendererMesh*>			m_meshPointersToMesh;
+	Texture2D*										m_textureAtlas;
+	vector<RendererAnimatedTextureSet*>				m_animatedTextureSets;
+	VertexBuffer*									m_roomsVertexBuffer;
+	IndexBuffer*									m_roomsIndexBuffer;
+	VertexBuffer*									m_moveablesVertexBuffer;
+	IndexBuffer*									m_moveablesIndexBuffer;
+	VertexBuffer*									m_staticsVertexBuffer;
+	IndexBuffer*									m_staticsIndexBuffer;
+	map<__int32, RendererRoom*>						m_rooms;
+	Matrix											m_hairsMatrices[12];
+	__int16											m_normalLaraSkinJointRemap[15][32];
+	__int16											m_youngLaraSkinJointRemap[15][32];
+	__int16											m_laraSkinJointRemap[15][32];
+	__int16											m_numHairVertices;
+	__int16											m_numHairIndices;
+	vector<RendererVertex>							m_hairVertices;
+	vector<__int32>									m_hairIndices;
+	vector<RendererRoom*>							m_roomsToDraw;
+	vector<RendererItem*>							m_itemsToDraw;
+	vector<RendererEffect*>							m_effectsToDraw;
+	vector<RendererStatic*>							m_staticsToDraw;
+	vector<RendererLight*>							m_lightsToDraw;
+	vector<RendererLight*>							m_dynamicLights;
+	RendererLight*									m_shadowLight;
+	RendererItem									m_items[NUM_ITEMS];
+	RendererEffect									m_effects[NUM_ITEMS];
+	map<__int32, RendererObject*>					m_moveableObjects;
+	map<__int32, RendererObject*>					m_staticObjects;
+	map<__int16*, RendererMesh*>					m_meshPointersToMesh;
 
 	// Private functions
 	bool									drawScene(bool dump);
@@ -510,14 +610,19 @@ private:
 	void									fromTrAngle(Matrix* matrix, __int16* frameptr, __int32 index);
 	void									buildHierarchy(RendererObject* obj);
 	void									buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-	void									updateAnimation(RendererItemToDraw* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask);
+	void									updateAnimation(RendererItem* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask);
 	bool									printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message);
 	bool									checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPort, Vector4* clipPort);
 	void									getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count);
 	void									collectRooms();
 	void									collectItems(__int16 roomNumber);
+	void									collectStatics(__int16 roomNumber);
+	void									collectLights(__int16 roomNumber);
 	void									collectEffects(__int16 roomNumber);
+	void									prepareLights();
 	void									collectSceneItems();
+	void									clearSceneItems();
+	bool									updateConstantBuffer(ID3D11Buffer* buffer, void* data, __int32 size);
 
 public:
 	Matrix									View;

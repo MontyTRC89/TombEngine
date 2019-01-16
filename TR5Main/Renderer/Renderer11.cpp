@@ -13,6 +13,18 @@ extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 extern __int32 NumTextureTiles;
 
+__int32 SortLightsFunction(RendererLight* a, RendererLight* b)
+{
+	if (a->Dynamic > b->Dynamic)
+		return -1;
+	return 0;
+}
+
+bool SortRoomsFunction(RendererRoom* a, RendererRoom* b)
+{
+	return (a->Distance < b->Distance);
+}
+
 Renderer11::Renderer11()
 {
 	initialiseHairRemaps();
@@ -260,8 +272,28 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 	m_stMatrices.Projection = Projection;
 }
 
+void Renderer11::clearSceneItems()
+{
+	m_roomsToDraw.clear();
+	m_itemsToDraw.clear();
+	m_effectsToDraw.clear();
+	m_lightsToDraw.clear();
+	m_dynamicLights.clear();
+	m_staticsToDraw.clear();
+}
+
 bool Renderer11::drawScene(bool dump)
 {
+	ViewProjection = View * Projection;
+
+	// Prepare the scene to draw
+	clearSceneItems();
+	collectRooms();
+	prepareLights();
+
+	// Sort rooms for early Z-test
+	std::sort(m_roomsToDraw.begin(), m_roomsToDraw.end(), SortRoomsFunction);
+	
 	// Clear screen
 	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::CornflowerBlue);
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -278,18 +310,7 @@ bool Renderer11::drawScene(bool dump)
 	m_stMatrices.View = View.Transpose();
 	m_stMatrices.Projection = Projection.Transpose();
 
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-	// Lock the constant buffer so it can be written to.
-	m_context->Map(m_cbMatrices, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-	// Get a pointer to the data in the constant buffer.
-	CMatrixBuffer* dataPtr = (CMatrixBuffer*)mappedResource.pData;
-	memcpy(dataPtr, &m_stMatrices, sizeof(CMatrixBuffer));
-
-	// Unlock the constant buffer.
-	m_context->Unmap(m_cbMatrices, 0);
-
+	updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
 
 	// Set texture
@@ -305,43 +326,11 @@ bool Renderer11::drawScene(bool dump)
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	// Prepare index buffers
-	/*vector<__int32> indices[NUM_BUCKETS];
-
-	for (__int32 i = 0; i < m_rooms.size(); i++)
-	{
-		RendererRoom* room = m_rooms[i];
-
-		//if (room->VertexBuffer == NULL)
-		//	continue;
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
-		{
-			RendererBucket* bucket = &room->Buckets[j];
-			if (bucket->Vertices.size() == 0)
-				continue;
-			memcpy(indices[j].data() + sizeof(__int32))
-			for (__int32 k = 0; k < bucket->Indices.size(); k++)
-				indices[j].push_back(bucket->StartVertex + bucket->Indices[k]);
-		}
-	}
-
-	for (__int32 j = 0; j < NUM_BUCKETS; j++)
-	{
-		if (m_roomsIndexBuffers[j] == NULL)
-			continue;
-
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		HRESULT res = m_context->Map(m_roomsIndexBuffers[j]->Buffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
-		memcpy(ms.pData, indices[j].data(), sizeof(__int32) * indices[j].size());
-		m_context->Unmap(m_roomsIndexBuffers[j]->Buffer, NULL);
-	}*/
-
 	__int32 numDrawCalls = 0;
 
-	for (__int32 i = 0; i < m_rooms.size(); i++)
+	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
 	{
-		RendererRoom* room = m_rooms[i];
+		RendererRoom* room = m_roomsToDraw[i];
 
 		for (__int32 j = 0; j < NUM_BUCKETS; j++)
 		{
@@ -361,49 +350,28 @@ bool Renderer11::drawScene(bool dump)
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_staticsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 		
-	for (__int32 i = 0; i < m_rooms.size(); i++)
+	for (__int32 i = 0; i < m_staticsToDraw.size(); i++)
 	{
-		RendererRoom* room = m_rooms[i];
+		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
 
-		if (room->Room->numMeshes > 0)
+		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
+		RendererMesh* mesh = staticObj->ObjectMeshes[0];
+
+		m_stMatrices.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z)).Transpose();
+
+		updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
+		m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
+
+		for (__int32 j = 0; j < NUM_BUCKETS; j++)
 		{
-			MESH_INFO* msh = room->Room->mesh;
+			RendererBucket* bucket = &mesh->Buckets[j];
 
-			for (__int32 k = 0; k < room->Room->numMeshes; k++)
-			{
-				RendererObject* staticObj = m_staticObjects[msh->staticNumber];
-				RendererMesh* mesh = staticObj->ObjectMeshes[0];
+			if (bucket->Vertices.size() == 0)
+				continue;
 
-				m_stMatrices.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z)).Transpose();
-
-				D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-				// Lock the constant buffer so it can be written to.
-				m_context->Map(m_cbMatrices, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-				// Get a pointer to the data in the constant buffer.
-				CMatrixBuffer* dataPtr = (CMatrixBuffer*)mappedResource.pData;
-				memcpy(dataPtr, &m_stMatrices, sizeof(CMatrixBuffer));
-
-				// Unlock the constant buffer.
-				m_context->Unmap(m_cbMatrices, 0);
-
-				m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
-
-				for (__int32 j = 0; j < NUM_BUCKETS; j++)
-				{
-					RendererBucket* bucket = &mesh->Buckets[j];
-
-					if (bucket->Vertices.size() == 0)
-						continue;
-
-					// Draw vertices
-					m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-					numDrawCalls++;
-				}
-
-				msh++;
-			}
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			numDrawCalls++;
 		}
 	}
 
@@ -640,6 +608,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 		RendererRoom* r = new RendererRoom();
 		
+		r->RoomNumber = i;
 		r->Room = room;
 		r->AmbientLight = Vector4(room->ambient.r / 255.0f, room->ambient.g / 255.0f, room->ambient.b / 255.0f, 1.0f);
 		
@@ -873,7 +842,71 @@ bool Renderer11::PrepareDataForTheRenderer()
 					polygons += sizeof(tr4_mesh_face3);
 				}
 			}
-		}  
+		} 
+
+		if (room->numLights != 0)
+		{
+			tr5_room_light* oldLight = room->light;
+
+			for (__int32 l = 0; l < room->numLights; l++)
+			{
+				RendererLight light;
+
+				if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SUN)
+				{
+					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light.Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
+
+					r->Lights.push_back(light);
+				}
+				else if (oldLight->LightType == LIGHT_TYPE_POINT)
+				{
+					light.Position = Vector4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light.Intensity = 1.0f;
+					light.In = oldLight->In;
+					light.Out = oldLight->Out;
+					light.Type = LIGHT_TYPE_POINT;
+
+					r->Lights.push_back(light);
+				}
+				else if (oldLight->LightType == LIGHT_TYPE_SHADOW)
+				{
+					light.Position = Vector4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light.In = oldLight->In;
+					light.Out = oldLight->Out;
+					light.Type = LIGHT_TYPE_SHADOW;
+
+					r->Lights.push_back(light);
+				}
+				else if (oldLight->LightType == LIGHT_TYPE_SPOT)
+				{
+					light.Position = XMFLOAT4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light.Color = XMFLOAT4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Direction = XMFLOAT4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light.Intensity = 1.0f;
+					light.In = oldLight->In;
+					light.Out = oldLight->Range;   
+					light.Range = oldLight->Range;
+					light.Type = LIGHT_TYPE_SPOT;
+
+					r->Lights.push_back(light);
+				}
+			}
+		}
+
+		MESH_INFO* mesh = room->mesh;
+		for (__int32 j = 0; j < room->numMeshes; j++)
+		{
+			RendererStatic obj;
+			obj.Mesh = mesh;
+			obj.RoomIndex = i;
+			r->Statics.push_back(obj);
+		}
 
 		// Merge vertices and indices in a single list
 		for (__int32 j = 0; j < NUM_BUCKETS; j++)
@@ -1188,6 +1221,14 @@ bool Renderer11::PrepareDataForTheRenderer()
 	// Create a single vertex buffer and a single index buffer for all statics
 	m_staticsVertexBuffer = VertexBuffer::Create(m_device, staticsVertices.size(), staticsVertices.data());
 	m_staticsIndexBuffer = IndexBuffer::Create(m_device, staticsIndices.size(), staticsIndices.data());
+
+	// Preallocate lists
+	/*m_roomsToDraw.reserve(NumberRooms);
+	m_itemsToDraw.Reserve(NUM_ITEMS);
+	m_effectsToDraw.Reserve(NUM_ITEMS);
+	m_lightsToDraw.Reserve(MAX_LIGHTS);
+	m_dynamicLights.Reserve(MAX_LIGHTS);
+	m_staticsToDraw.Reserve(MAX_STATICS);*/
 
 	return true;
 }
@@ -1678,30 +1719,45 @@ void Renderer11::initialiseHairRemaps()
 
 void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count)
 {
-	Matrix viewProj = View * Projection;
+	// Avoid allocations, 1024 should be fine
+	RendererRoomNode nodes[1024];
+	__int32 nextNode = 0;
+	
+	// Avoid reallocations, 1024 should be fine
+	RendererRoomNode* stack[1024];
+	__int32 stackDepth = 0;
 
-	stack<RendererRoomNode*> stack;
-	RendererRoomNode* node = new RendererRoomNode();
+	RendererRoomNode* node = &nodes[nextNode++];
 	node->To = to;
 	node->From = -1;
-	stack.push(node);
 
-	while (!stack.empty())
+	// Push
+	stack[stackDepth++] = node;
+
+	while (stackDepth > 0)
 	{
-		node = stack.top();
-		stack.pop();
-
+		// Pop
+		node = stack[--stackDepth]; 
+	
 		if (m_rooms[node->To]->Visited)
 			continue;
 
-		m_rooms[node->To]->Visited = true;
-		m_roomsToDraw.push_back(node->To);
-
-		collectItems(node->To);
-		collectEffects(node->To);
-
 		ROOM_INFO* room = &Rooms[node->To];
 
+		Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f, 
+									 (room->RoomYTop + room->RoomYBottom) / 2.0f,
+									 room->z + room->ySize * WALL_SIZE / 2.0f);
+		Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+
+		m_rooms[node->To]->Distance = (roomCentre - laraPosition).Length();
+		m_rooms[node->To]->Visited = true;
+		m_roomsToDraw.push_back(m_rooms[node->To]);
+
+		collectItems(node->To);
+		collectStatics(node->To);
+		collectEffects(node->To);
+		collectLights(node->To);
+				
 		Vector4 clipPort;
 		__int16 numDoors = *(room->door);
 		if (numDoors)
@@ -1715,7 +1771,9 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 					RendererRoomNode* childNode = new RendererRoomNode();
 					childNode->From = node->To;
 					childNode->To = adjoiningRoom;
-					stack.push(childNode);
+
+					// Push
+					stack[stackDepth++] = childNode;
 				}
 
 				door += 16;
@@ -1746,7 +1804,7 @@ bool Renderer11::checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPo
 
 	for (int i = 0; i < 4; i++) {
 
-		XMFLOAT4 tmp = XMFLOAT4(*(portal + 4 + 3 * i) + room->x, *(portal + 4 + 3 * i + 1) + room->y,
+		Vector4 tmp = Vector4(*(portal + 4 + 3 * i) + room->x, *(portal + 4 + 3 * i + 1) + room->y,
 			*(portal + 4 + 3 * i + 2) + room->z, 1.0f);
 		Vector4::Transform(tmp, ViewProjection, p[i]);
 
@@ -1769,8 +1827,8 @@ bool Renderer11::checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPo
 
 	if (zClip > 0) {
 		for (int i = 0; i < 4; i++) {
-			XMFLOAT4 a = p[i];
-			XMFLOAT4 b = p[(i + 1) % 4];
+			Vector4 a = p[i];
+			Vector4 b = p[(i + 1) % 4];
 
 			if ((a.w > 0.0f) ^ (b.w > 0.0f)) {
 
@@ -1844,12 +1902,186 @@ void Renderer11::collectItems(__int16 roomNumber)
 		if (item->status == ITEM_DEACTIVATED || item->status == ITEM_INVISIBLE)
 			continue;
 
-		//if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
-		//	continue;
+		if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
+			continue;
 
-		RendererItemToDraw* newItem = new RendererItemToDraw(itemNum, item, Objects[item->objectNumber].nmeshes);
+		RendererItem* newItem = &m_items[itemNum];
+
+		newItem->Item = item;
+		newItem->Id = itemNum;
+		newItem->AnimationTransforms.clear();
+		for (__int32 j = 0; j < Objects[item->objectNumber].nmeshes; j++)
+			newItem->AnimationTransforms.push_back(Matrix::Identity);
+		newItem->World = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yPos),
+														TR_ANGLE_TO_RAD(item->pos.xPos),
+														TR_ANGLE_TO_RAD(item->pos.zPos)) *
+						 Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
 		m_itemsToDraw.push_back(newItem);
 	}
+}
+
+void Renderer11::collectStatics(__int16 roomNumber)
+{
+	RendererRoom* room = m_rooms[roomNumber];
+	if (room == NULL)
+		return;
+
+	ROOM_INFO* r = room->Room;
+	
+	if (r->numMeshes <= 0)
+		return;
+
+	MESH_INFO* mesh = r->mesh;
+
+	for (__int32 i = 0; i < room->Statics.size(); i++)
+	{
+		RendererStatic* newStatic = &room->Statics[i];
+
+		newStatic->Mesh = mesh;
+		newStatic->RoomIndex = roomNumber;
+		newStatic->World = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot)) * Matrix::CreateTranslation(mesh->x, mesh->y, mesh->z);
+
+		m_staticsToDraw.push_back(newStatic);
+
+		mesh++;
+	}
+}
+
+void Renderer11::collectLights(__int16 roomNumber)
+{
+	RendererRoom* room = m_rooms[roomNumber];
+	if (room == NULL)
+		return;
+
+	ROOM_INFO* r = room->Room;
+
+	if (r->numLights <= 0)
+		return;
+
+	for (__int32 j = 0; j < room->Lights.size(); j++)
+	{
+		Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		Vector3 lightPos = Vector3(room->Lights[j].Position.x, room->Lights[j].Position.y, room->Lights[j].Position.z);
+
+		// Collect only lights nearer than 20 sectors
+		if ((laraPos - lightPos).Length() >= 20 * WALL_SIZE)
+			continue;
+
+		// Check only lights different from sun
+		/*if (room->Lights[j]->Type != LIGHT_TYPES::LIGHT_TYPE_SUN)
+		{
+			// Now check if lights are touching items
+			bool isTouchingItem = false;
+			for (__int32 k = 0; k < m_itemsToDraw.size(); k++)
+			{
+				Vector3 itemPos = Vector3(m_itemsToDraw[k]->Item->pos.xPos, m_itemsToDraw[k]->Item->pos.yPos, m_itemsToDraw[k]->Item->pos.zPos);
+				float distance = D3DXVec3Length(&(itemPos - lightPos));
+
+				if (room->Lights[j]->Type == LIGHT_TYPES::LIGHT_TYPE_SPOT)
+				{
+					if (distance < room->Lights[j]->Range)
+					{
+						isTouchingItem = true;
+						break;
+					}
+				}
+				else
+				{
+					if (distance < room->Lights[j]->Out)
+					{
+						isTouchingItem = true;
+						break;
+					}
+				}
+			}
+
+			// If the light is not touching an item, then discard it
+			if (!isTouchingItem)
+				continue;
+		}*/
+
+		m_lightsToDraw.push_back(&room->Lights[j]);
+	}
+}
+
+void Renderer11::prepareLights()
+{
+	// Add dynamic lights
+	for (__int32 i = 0; i < m_dynamicLights.size(); i++)
+		m_lightsToDraw.push_back(m_dynamicLights[i]);
+
+	// Now I have a list full of draw. Let's sort them.
+	std::sort(m_lightsToDraw.begin(), m_lightsToDraw.end(), SortLightsFunction);
+
+	// Let's draw first 32 lights
+	if (m_lightsToDraw.size() > 32)
+		m_lightsToDraw.resize(32);
+
+	// Now try to search for a shadow caster, using Lara as reference
+	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+
+	// Search for the brightest light. We do a simple version of the classic calculation done in pixel shader.
+	RendererLight* brightestLight = NULL;
+	float brightest = 0.0f;
+
+	// Try room lights
+	if (room->Lights.size() != 0)
+	{
+		for (__int32 j = 0; j < room->Lights.size(); j++)
+		{
+			RendererLight* light = &room->Lights[j];
+
+			Vector4 itemPos = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
+			Vector4 lightVector = itemPos - light->Position;
+
+			float distance = lightVector.Length();
+			lightVector.Normalize();
+
+			float intensity;
+			float attenuation;
+			float angle;
+			float d;
+			float attenuationRange;
+			float attenuationAngle;
+
+			switch (light->Type)
+			{
+			case LIGHT_TYPES::LIGHT_TYPE_POINT:
+				if (distance > light->Out || light->Out < 2048.0f)
+					continue;
+
+				attenuation = 1.0f - distance / light->Out;
+				intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				if (intensity >= brightest)
+				{
+					brightest = intensity;
+					brightestLight = light;
+				}
+
+				break;
+
+			case  LIGHT_TYPES::LIGHT_TYPE_SPOT:
+				if (distance > light->Range)
+					continue;
+
+				attenuation = 1.0f - distance / light->Range;
+				intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				if (intensity >= brightest)
+				{
+					brightest = intensity;
+					brightestLight = light;
+				}
+
+				break;
+			}
+		}
+	}
+
+	// If the brightest light is found, then fill the data structure. We ignore for now dynamic lights for shadows.
+	m_shadowLight = brightestLight;
 }
 
 void Renderer11::collectEffects(__int16 roomNumber)
@@ -1868,7 +2100,12 @@ void Renderer11::collectEffects(__int16 roomNumber)
 		if (fx->objectNumber < 0)
 			continue;
 
-		RendererEffectToDraw* newEffect = new RendererEffectToDraw(fxNum, fx);
+		RendererEffect* newEffect = &m_effects[fxNum];
+		
+		newEffect->Effect = fx;
+		newEffect->Id = fxNum;
+		newEffect->World = Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+
 		m_effectsToDraw.push_back(newEffect);
 	}
 }
@@ -2177,4 +2414,24 @@ void Renderer11::fromTrAngle(Matrix* matrix, __int16* frameptr, __int32 index)
 		*matrix = Matrix::CreateRotationZ((rot0 & 0xfff)* (360.0f / 4096.0f) * RADIAN);
 		break;
 	}
+}
+
+bool Renderer11::updateConstantBuffer(ID3D11Buffer* buffer, void* data, __int32 size)
+{
+	HRESULT res;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+	// Lock the constant buffer so it can be written to.
+	res = m_context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(res))
+		return false;
+
+	// Get a pointer to the data in the constant buffer.
+	char* dataPtr = reinterpret_cast<char*>(mappedResource.pData);
+	memcpy(dataPtr, data, size);
+
+	// Unlock the constant buffer.
+	m_context->Unmap(buffer, 0);
+
+	return true;
 }
