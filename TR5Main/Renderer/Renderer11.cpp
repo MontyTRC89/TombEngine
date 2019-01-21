@@ -7,7 +7,11 @@
 #include "..\Specific\roomload.h"
 
 #include <D3Dcompiler.h>
+#include <chrono> 
 #include <stack>
+
+using ns = chrono::nanoseconds;
+using get_time = chrono::steady_clock;
 
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
@@ -23,6 +27,11 @@ __int32 SortLightsFunction(RendererLight* a, RendererLight* b)
 bool SortRoomsFunction(RendererRoom* a, RendererRoom* b)
 {
 	return (a->Distance < b->Distance);
+}
+
+__int32 SortRoomsFunctionNonStd(RendererRoom* a, RendererRoom* b)
+{
+	return (a->Distance - b->Distance);
 }
 
 Renderer11::Renderer11()
@@ -274,26 +283,54 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 
 void Renderer11::clearSceneItems()
 {
-	m_roomsToDraw.clear();
-	m_itemsToDraw.clear();
-	m_effectsToDraw.clear();
-	m_lightsToDraw.clear();
-	m_dynamicLights.clear();
-	m_staticsToDraw.clear();
+	m_roomsToDraw.Clear();
+	m_itemsToDraw.Clear();
+	m_effectsToDraw.Clear();
+	m_lightsToDraw.Clear();
+	m_dynamicLights.Clear();
+	m_staticsToDraw.Clear();
 }
 
 bool Renderer11::drawScene(bool dump)
 {
+	m_timeUpdate = 0;
+	m_timeDraw = 0;
+	m_timeFrame = 0;
+
+	m_strings.clear();
+
 	ViewProjection = View * Projection;
 
 	// Prepare the scene to draw
+	auto time1 = chrono::high_resolution_clock::now();
+
 	clearSceneItems();
 	collectRooms();
 	prepareLights();
+	updateLaraAnimations();
+	updateItemsAnimations();
+	updateEffects();
+
+	auto time2 = chrono::high_resolution_clock::now();
+	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	time1 = time2;
+
+	char buffer[255];
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Update time: %d", m_timeUpdate);
+	PrintString(10, 10, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	//printf("Time: %d, NumRooms: %d, NumItems: %d, NumStatics: %d, NumLights: %d\n",
+	//	m_timeUpdate, m_roomsToDraw.Size(), m_itemsToDraw.Size(), m_staticsToDraw.Size(), m_lightsToDraw.Size());
 
 	// Sort rooms for early Z-test
-	std::sort(m_roomsToDraw.begin(), m_roomsToDraw.end(), SortRoomsFunction);
-	
+	//std::sort(m_roomsToDraw.begin(), m_roomsToDraw.end(), SortRoomsFunction);
+	//m_roomsToDraw.Sort(SortRoomsFunctionNonStd);
+
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
 	// Clear screen
 	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::CornflowerBlue);
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -328,7 +365,7 @@ bool Renderer11::drawScene(bool dump)
 
 	__int32 numDrawCalls = 0;
 
-	for (__int32 i = 0; i < m_roomsToDraw.size(); i++)
+	for (__int32 i = 0; i < m_roomsToDraw.Size(); i++)
 	{
 		RendererRoom* room = m_roomsToDraw[i];
 
@@ -350,7 +387,7 @@ bool Renderer11::drawScene(bool dump)
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_staticsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 		
-	for (__int32 i = 0; i < m_staticsToDraw.size(); i++)
+	for (__int32 i = 0; i < m_staticsToDraw.Size(); i++)
 	{
 		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
 
@@ -374,6 +411,16 @@ bool Renderer11::drawScene(bool dump)
 			numDrawCalls++;
 		}
 	}
+
+	time2 = chrono::high_resolution_clock::now();
+	m_timeFrame = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	time1 = time2;
+
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Frame time: %d", m_timeFrame);
+	PrintString(10, 30, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	drawAllStrings();
 
 	m_swapChain->Present(0, 0);
 
@@ -456,6 +503,9 @@ bool Renderer11::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color,
 		rect.bottom += y * factorY;
 	}
 
+	str.X = rect.left;
+	str.Y = rect.top;
+
 	if (flags & PRINTSTRING_BLINK)
 	{
 		str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
@@ -509,6 +559,15 @@ bool Renderer11::PrepareDataForTheRenderer()
 	__int16* animatedPtr = AnimatedTextureRanges;
 	animatedPtr++;
 
+	m_moveableObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_OBJECTS);
+	ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * NUM_OBJECTS);
+
+	m_staticObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_STATICS);
+	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);
+
+	m_rooms = (RendererRoom**)malloc(sizeof(RendererRoom*) * 1024);
+	ZeroMemory(m_rooms, sizeof(RendererRoom*) * 1024);
+	
 	for (__int32 i = 0; i < numSets; i++)
 	{
 		RendererAnimatedTextureSet* set = new RendererAnimatedTextureSet();
@@ -612,7 +671,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		r->Room = room;
 		r->AmbientLight = Vector4(room->ambient.r / 255.0f, room->ambient.g / 255.0f, room->ambient.b / 255.0f, 1.0f);
 		
-		m_rooms.insert(pair<__int32, RendererRoom*>(i, r));
+		m_rooms[i] = r;
 
 		if (room->NumVertices == 0)
 			continue;
@@ -1147,7 +1206,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					m_hairIndices.push_back(0);
 			}
 
-			m_moveableObjects.insert(pair<__int32, RendererObject*>(MoveablesIds[i], moveable));
+			m_moveableObjects[MoveablesIds[i]] = moveable;
 
 			// Merge vertices and indices in a single list
 			for (__int32 m = 0; m < moveable->ObjectMeshes.size(); m++)
@@ -1195,7 +1254,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 		staticObject->ObjectMeshes.push_back(mesh);
 
-		m_staticObjects.insert(pair<__int32, RendererObject*>(StaticObjectsIds[i], staticObject));
+		m_staticObjects[StaticObjectsIds[i]] = staticObject;
 
 		// Merge vertices and indices in a single list
 		RendererMesh* msh = staticObject->ObjectMeshes[0];
@@ -1223,12 +1282,12 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_staticsIndexBuffer = IndexBuffer::Create(m_device, staticsIndices.size(), staticsIndices.data());
 
 	// Preallocate lists
-	/*m_roomsToDraw.reserve(NumberRooms);
+	m_roomsToDraw.Reserve(NumberRooms);
 	m_itemsToDraw.Reserve(NUM_ITEMS);
 	m_effectsToDraw.Reserve(NUM_ITEMS);
-	m_lightsToDraw.Reserve(MAX_LIGHTS);
-	m_dynamicLights.Reserve(MAX_LIGHTS);
-	m_staticsToDraw.Reserve(MAX_STATICS);*/
+	m_lightsToDraw.Reserve(16384);
+	m_dynamicLights.Reserve(16384);
+	m_staticsToDraw.Reserve(16384);
 
 	return true;
 }
@@ -1343,7 +1402,7 @@ void Renderer11::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 fallof
 	dynamicLight->Dynamic = true;
 	dynamicLight->Intensity = 2.0f;
 
-	m_dynamicLights.push_back(dynamicLight);
+	m_dynamicLights.Add(dynamicLight);
 	NumDynamics++;
 }
 
@@ -1764,7 +1823,7 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 
 		m_rooms[node->To]->Distance = (roomCentre - laraPosition).Length();
 		m_rooms[node->To]->Visited = true;
-		m_roomsToDraw.push_back(m_rooms[node->To]);
+		m_roomsToDraw.Add(m_rooms[node->To]);
 
 		collectItems(node->To);
 		collectStatics(node->To);
@@ -1781,7 +1840,7 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 
 				if (node->From != adjoiningRoom && checkPortal(node->To, door, viewPort, &node->ClipPort))
 				{
-					RendererRoomNode* childNode = new RendererRoomNode();
+					RendererRoomNode* childNode = &nodes[nextNode++];
 					childNode->From = node->To;
 					childNode->To = adjoiningRoom;
 
@@ -1885,15 +1944,14 @@ void Renderer11::collectRooms()
 	__int16 baseRoomIndex = Camera.pos.roomNumber;
 
 	for (__int32 i = 0; i < NumberRooms; i++)
-		if (m_rooms[i] != NULL)
-			m_rooms[i]->Visited = false;
+		m_rooms[i]->Visited = false;
 
 	Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 
 	getVisibleRooms(-1, baseRoomIndex, &vp, false, 0);
 }
 
-void Renderer11::collectItems(__int16 roomNumber)
+inline void Renderer11::collectItems(__int16 roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -1915,26 +1973,25 @@ void Renderer11::collectItems(__int16 roomNumber)
 		if (item->status == ITEM_DEACTIVATED || item->status == ITEM_INVISIBLE)
 			continue;
 
-		if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
+		//if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
+		if (m_moveableObjects[item->objectNumber] == NULL)
 			continue;
 
 		RendererItem* newItem = &m_items[itemNum];
 
 		newItem->Item = item;
 		newItem->Id = itemNum;
-		newItem->AnimationTransforms.clear();
-		for (__int32 j = 0; j < Objects[item->objectNumber].nmeshes; j++)
-			newItem->AnimationTransforms.push_back(Matrix::Identity);
+		newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
 		newItem->World = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yPos),
 														TR_ANGLE_TO_RAD(item->pos.xPos),
 														TR_ANGLE_TO_RAD(item->pos.zPos)) *
 						 Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		m_itemsToDraw.push_back(newItem);
+		m_itemsToDraw.Add(newItem);
 	}
 }
 
-void Renderer11::collectStatics(__int16 roomNumber)
+inline void Renderer11::collectStatics(__int16 roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -1947,7 +2004,9 @@ void Renderer11::collectStatics(__int16 roomNumber)
 
 	MESH_INFO* mesh = r->mesh;
 
-	for (__int32 i = 0; i < room->Statics.size(); i++)
+	__int32 numStatics = room->Statics.size();
+
+	for (__int32 i = 0; i < numStatics; i++)
 	{
 		RendererStatic* newStatic = &room->Statics[i];
 
@@ -1955,13 +2014,13 @@ void Renderer11::collectStatics(__int16 roomNumber)
 		newStatic->RoomIndex = roomNumber;
 		newStatic->World = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot)) * Matrix::CreateTranslation(mesh->x, mesh->y, mesh->z);
 
-		m_staticsToDraw.push_back(newStatic);
+		m_staticsToDraw.Add(newStatic);
 
 		mesh++;
 	}
 }
 
-void Renderer11::collectLights(__int16 roomNumber)
+inline void Renderer11::collectLights(__int16 roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -1972,7 +2031,9 @@ void Renderer11::collectLights(__int16 roomNumber)
 	if (r->numLights <= 0)
 		return;
 
-	for (__int32 j = 0; j < room->Lights.size(); j++)
+	__int32 numLights = room->Lights.size();
+
+	for (__int32 j = 0; j < numLights; j++)
 	{
 		Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 		Vector3 lightPos = Vector3(room->Lights[j].Position.x, room->Lights[j].Position.y, room->Lights[j].Position.z);
@@ -2014,22 +2075,24 @@ void Renderer11::collectLights(__int16 roomNumber)
 				continue;
 		}*/
 
-		m_lightsToDraw.push_back(&room->Lights[j]);
+		RendererLight* light = &room->Lights[j];
+		m_lightsToDraw.Add(light);
 	}
 }
 
 void Renderer11::prepareLights()
 {
 	// Add dynamic lights
-	for (__int32 i = 0; i < m_dynamicLights.size(); i++)
-		m_lightsToDraw.push_back(m_dynamicLights[i]);
+	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+		m_lightsToDraw.Add(m_dynamicLights[i]);
 
 	// Now I have a list full of draw. Let's sort them.
-	std::sort(m_lightsToDraw.begin(), m_lightsToDraw.end(), SortLightsFunction);
+	//std::sort(m_lightsToDraw.begin(), m_lightsToDraw.end(), SortLightsFunction);
+	//m_lightsToDraw.Sort(SortLightsFunction);
 
 	// Let's draw first 32 lights
-	if (m_lightsToDraw.size() > 32)
-		m_lightsToDraw.resize(32);
+	//if (m_lightsToDraw.size() > 32)
+	//	m_lightsToDraw.resize(32);
 
 	// Now try to search for a shadow caster, using Lara as reference
 	RendererRoom* room = m_rooms[LaraItem->roomNumber];
@@ -2097,7 +2160,7 @@ void Renderer11::prepareLights()
 	m_shadowLight = brightestLight;
 }
 
-void Renderer11::collectEffects(__int16 roomNumber)
+inline void Renderer11::collectEffects(__int16 roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -2119,7 +2182,7 @@ void Renderer11::collectEffects(__int16 roomNumber)
 		newEffect->Id = fxNum;
 		newEffect->World = Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 
-		m_effectsToDraw.push_back(newEffect);
+		m_effectsToDraw.Add(newEffect);
 	}
 }
 
@@ -2445,6 +2508,397 @@ bool Renderer11::updateConstantBuffer(ID3D11Buffer* buffer, void* data, __int32 
 
 	// Unlock the constant buffer.
 	m_context->Unmap(buffer, 0);
+
+	return true;
+}
+
+void Renderer11::updateItemsAnimations()
+{
+	Matrix translation;
+	Matrix rotation;
+
+	__int32 numItems = m_itemsToDraw.Size();
+
+	for (__int32 i = 0; i < numItems; i++)
+	{
+		RendererItem* itemToDraw = m_itemsToDraw[i];
+		ITEM_INFO* item = itemToDraw->Item;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+		// Lara has her own routine
+		if (item->objectNumber == ID_LARA)
+			continue;
+
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		RendererObject* moveableObj = m_moveableObjects[item->objectNumber];
+
+		// Update animation matrices
+		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
+		{
+			// Apply extra rotations
+			__int32 lastJoint = 0;
+			for (__int32 j = 0; j < moveableObj->LinearizedBones.size(); j++)
+			{
+				RendererBone* currentBone = moveableObj->LinearizedBones[j];
+				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+
+				if (creature)
+				{
+					if (currentBone->ExtraRotationFlags & ROT_Y)
+					{
+						currentBone->ExtraRotation.y = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+						lastJoint++;
+					}
+
+					if (currentBone->ExtraRotationFlags & ROT_X)
+					{
+						currentBone->ExtraRotation.x = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+						lastJoint++;
+					}
+
+					if (currentBone->ExtraRotationFlags & ROT_Z)
+					{
+						currentBone->ExtraRotation.z = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+						lastJoint++;
+					}
+				}
+			}
+
+			__int16	*framePtr[2];
+			__int32 rate;
+			__int32 frac = GetFrame_D2(item, framePtr, &rate);
+
+			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+		}
+
+		// Update world matrix
+		translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot), TR_ANGLE_TO_RAD(item->pos.xRot), TR_ANGLE_TO_RAD(item->pos.zRot));
+		itemToDraw->World = rotation * translation;
+	}
+}
+
+void Renderer11::updateLaraAnimations()
+{
+	Matrix translation;
+	Matrix rotation;
+	Matrix lastMatrix;
+	Matrix hairMatrix;
+	Matrix identity;
+	Matrix world;
+
+	RendererObject* laraObj = m_moveableObjects[ID_LARA];
+
+	// Clear extra rotations
+	for (__int32 i = 0; i < laraObj->LinearizedBones.size(); i++)
+		laraObj->LinearizedBones[i]->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+
+	// Lara world matrix
+	translation = Matrix::CreateTranslation(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	rotation = Matrix::CreateFromYawPitchRoll(
+		TR_ANGLE_TO_RAD(LaraItem->pos.yRot),
+		TR_ANGLE_TO_RAD(LaraItem->pos.xRot),
+		TR_ANGLE_TO_RAD(LaraItem->pos.zRot));
+	
+	// Update first Lara's animations
+	laraObj->LinearizedBones[TORSO]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.torsoXrot),
+		TR_ANGLE_TO_RAD(Lara.torsoYrot), TR_ANGLE_TO_RAD(Lara.torsoZrot));
+	laraObj->LinearizedBones[HEAD]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.headXrot),
+		TR_ANGLE_TO_RAD(Lara.headYrot), TR_ANGLE_TO_RAD(Lara.headZrot));
+
+	// First calculate matrices for legs, hips, head and torso
+	__int32 mask = (1 << HIPS) | (1 << THIGH_L) | (1 << CALF_L) | (1 << FOOT_L) |
+		(1 << THIGH_R) | (1 << CALF_R) | (1 << FOOT_R) | (1 << TORSO) | (1 << HEAD);
+	__int16	*framePtr[2];
+	__int32 rate;
+	__int32 frac = GetFrame_D2(LaraItem, framePtr, &rate);
+	updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+
+	// Then the arms, based on current weapon status
+	if ((Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) && Lara.gunType != WEAPON_FLARE)
+	{
+		// Both arms
+		mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L) | (1 << UARM_R) |
+			(1 << LARM_R) | (1 << HAND_R);
+		frac = GetFrame_D2(LaraItem, framePtr, &rate);
+		updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+	}
+	else
+	{ 
+		// While handling weapon some extra rotation could be applied to arms
+		laraObj->LinearizedBones[UARM_L]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),
+			TR_ANGLE_TO_RAD(Lara.leftArm.yRot), TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
+		laraObj->LinearizedBones[UARM_R]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot),
+			TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
+
+		if (Lara.gunType != WEAPON_FLARE)
+		{
+			// HACK: backguns handles differently
+			if (Lara.gunType == WEAPON_SHOTGUN || Lara.gunType == WEAPON_GRENADE_LAUNCHER ||
+				Lara.gunType == WEAPON_CROSSBOW || Lara.gunType == WEAPON_ROCKET_LAUNCHER ||
+				Lara.gunType == WEAPON_HARPOON_GUN)
+			{
+				// Left arm
+				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
+				__int16* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+
+				// Right arm
+				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
+				shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+			}
+			else
+			{
+				// Left arm
+				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
+				frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
+				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+
+				// Right arm
+				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
+				frac = getFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
+				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+			}
+		}
+		else
+		{
+			// Left arm
+			mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
+			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
+			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+
+			// Right arm
+			mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
+			frac = GetFrame_D2(LaraItem, framePtr, &rate);
+			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+		}
+	}
+
+	// At this point, Lara's matrices are ready. Now let's do ponytails...
+	if (m_moveableObjects[ID_HAIR] != NULL)
+	{
+		RendererObject* hairsObj = m_moveableObjects[ID_HAIR];
+
+		lastMatrix = Matrix::Identity; 
+		identity = Matrix::Identity;
+
+		Vector3 parentVertices[6][4];
+		Matrix headMatrix;
+
+		RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
+		RendererObject* objLara = m_moveableObjects[ID_LARA];
+		RendererMesh* parentMesh = objSkin->ObjectMeshes[HEAD];
+		RendererBone* parentBone = objSkin->LinearizedBones[HEAD];
+
+		world = objLara->AnimationTransforms[HEAD] * m_LaraWorldMatrix;
+
+		__int32 lastVertex = 0;
+		__int32 lastIndex = 0;
+
+		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+
+		for (__int32 p = 0; p < ((level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG) ? 2 : 1); p++)
+		{
+			// We can't use hardware skinning here, however hairs have just a few vertices so 
+			// it's not so bad doing skinning in software
+			if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
+			{
+				if (p == 1)
+				{
+					parentVertices[0][0] = Vector3::Transform(parentMesh->Positions[68], world);
+					parentVertices[0][1] = Vector3::Transform(parentMesh->Positions[69], world);
+					parentVertices[0][2] = Vector3::Transform(parentMesh->Positions[70], world);
+					parentVertices[0][3] = Vector3::Transform(parentMesh->Positions[71], world);
+				}
+				else
+				{
+					parentVertices[0][0] = Vector3::Transform(parentMesh->Positions[78], world);
+					parentVertices[0][1] = Vector3::Transform(parentMesh->Positions[78], world);
+					parentVertices[0][2] = Vector3::Transform(parentMesh->Positions[77], world);
+					parentVertices[0][3] = Vector3::Transform(parentMesh->Positions[76], world);
+				}
+			}
+			else
+			{
+				parentVertices[0][0] = Vector3::Transform(parentMesh->Positions[37], world);
+				parentVertices[0][1] = Vector3::Transform(parentMesh->Positions[39], world);
+				parentVertices[0][2] = Vector3::Transform(parentMesh->Positions[40], world);
+				parentVertices[0][3] = Vector3::Transform(parentMesh->Positions[38], world);
+			}
+
+			for (__int32 i = 0; i < 6; i++)
+			{
+				RendererMesh* mesh = hairsObj->ObjectMeshes[i];
+				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_SOLID];
+
+				translation = Matrix::CreateTranslation(Hairs[7 * p + i].pos.xPos, Hairs[7 * p + i].pos.yPos, Hairs[7 * p + i].pos.zPos);
+				rotation = Matrix::CreateFromYawPitchRoll(
+					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.yRot),
+					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.xRot),
+					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
+				m_hairsMatrices[6 * p + i] = rotation * translation;
+
+				__int32 baseVertex = lastVertex;
+
+				for (__int32 j = 0; j < bucket->Vertices.size(); j++)
+				{
+					__int32 oldVertexIndex = (__int32)bucket->Vertices[j].Bone;
+					if (oldVertexIndex < 4)
+					{
+						m_hairVertices[lastVertex].Position.x = parentVertices[i][oldVertexIndex].x;
+						m_hairVertices[lastVertex].Position.y = parentVertices[i][oldVertexIndex].y;
+						m_hairVertices[lastVertex].Position.z = parentVertices[i][oldVertexIndex].z;
+						m_hairVertices[lastVertex].UV.x = bucket->Vertices[j].UV.x;
+						m_hairVertices[lastVertex].UV.y = bucket->Vertices[j].UV.y;
+
+						Vector3 n = Vector3(bucket->Vertices[j].Normal.x, bucket->Vertices[j].Normal.y, bucket->Vertices[j].Normal.z);
+						n.Normalize();
+						n = Vector3::TransformNormal(n, m_hairsMatrices[6 * p + i]);
+						n.Normalize();
+
+						m_hairVertices[lastVertex].Normal.x = n.x;
+						m_hairVertices[lastVertex].Normal.y = n.y;
+						m_hairVertices[lastVertex].Normal.z = n.z;
+
+						lastVertex++;
+					}
+					else
+					{
+						Vector3 in = Vector3(bucket->Vertices[j].Position.x, bucket->Vertices[j].Position.y, bucket->Vertices[j].Position.z);
+						Vector3 out = Vector3::Transform(in, m_hairsMatrices[6 * p + i]);
+
+						if (i < 5)
+						{
+							parentVertices[i + 1][oldVertexIndex - 4].x = out.x;
+							parentVertices[i + 1][oldVertexIndex - 4].y = out.y;
+							parentVertices[i + 1][oldVertexIndex - 4].z = out.z;
+						}
+
+						m_hairVertices[lastVertex].Position.x = out.x;
+						m_hairVertices[lastVertex].Position.y = out.y;
+						m_hairVertices[lastVertex].Position.z = out.z;
+						m_hairVertices[lastVertex].UV.x = bucket->Vertices[j].UV.x;
+						m_hairVertices[lastVertex].UV.y = bucket->Vertices[j].UV.y;
+
+						Vector3 n = Vector3(bucket->Vertices[j].Normal.x, bucket->Vertices[j].Normal.y, bucket->Vertices[j].Normal.z);
+						n.Normalize();
+						n = Vector3::TransformNormal(n, m_hairsMatrices[6 * p + i]);
+						n.Normalize();
+
+						m_hairVertices[lastVertex].Normal.x = n.x;
+						m_hairVertices[lastVertex].Normal.y = n.y;
+						m_hairVertices[lastVertex].Normal.z = n.z;
+
+						lastVertex++;
+					}
+				}
+
+				for (__int32 j = 0; j < bucket->Indices.size(); j++)
+				{
+					m_hairIndices[lastIndex] = baseVertex + bucket->Indices[j];
+					lastIndex++;
+				}
+			}
+		}
+	}
+}
+
+__int32 Renderer11::getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate)
+{
+	ITEM_INFO item;
+	item.animNumber = animation;
+	item.frameNumber = frame;
+
+	return GetFrame_D2(&item, framePtr, rate);
+}
+
+void Renderer11::updateEffects()
+{
+	for (__int32 i = 0; i < m_effectsToDraw.Size(); i++)
+	{
+		RendererEffect* fx = m_effectsToDraw[i];
+
+		Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
+		Matrix rotation = Matrix::CreateFromYawPitchRoll(
+			TR_ANGLE_TO_RAD(fx->Effect->pos.yRot),
+			TR_ANGLE_TO_RAD(fx->Effect->pos.xRot),
+			TR_ANGLE_TO_RAD(fx->Effect->pos.zRot));
+		m_effectsToDraw[i]->World = rotation * translation;
+	}
+}
+
+void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
+{
+	RendererBone* bones[32];
+	__int32 nextBone = 0;
+
+	//stack<RendererBone*> bones;
+	Matrix rotation;
+
+	Matrix* transforms = (item == NULL ? obj->AnimationTransforms.data() : item->AnimationTransforms);
+
+	// Push
+	bones[nextBone++] = obj->Skeleton;
+
+	while (nextBone != 0)
+	{
+		// Pop the last bone in the stack
+		RendererBone* bone = bones[--nextBone];
+
+		bool calculateMatrix = (mask >> bone->Index) & 1;
+
+		if (calculateMatrix)
+		{
+			Vector3 p = Vector3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
+
+			fromTrAngle(&rotation, frmptr[0], bone->Index);
+
+			if (frac)
+			{
+				Vector3 p2 = Vector3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
+				p = Vector3::Lerp(p, p2, frac / ((float)rate));
+
+				Matrix rotation2;
+				fromTrAngle(&rotation2, frmptr[1], bone->Index);
+
+				Quaternion q1, q2, q3;
+
+				q1 = Quaternion::CreateFromRotationMatrix(rotation);
+				q2 = Quaternion::CreateFromRotationMatrix(rotation2);
+				q3 = Quaternion::Slerp(q1, q2, frac / ((float)rate));
+
+				rotation = Matrix::CreateFromQuaternion(q3);
+			}
+
+			Matrix translation;
+			if (bone == obj->Skeleton)
+				translation = Matrix::CreateTranslation(p.x, p.y, p.z);
+
+			Matrix extraRotation;
+			extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+
+			rotation = extraRotation * rotation;
+
+			if (bone != obj->Skeleton)
+				transforms[bone->Index] = rotation * bone->Transform;
+			else
+				transforms[bone->Index] = rotation * translation;
+
+			if (bone != obj->Skeleton)
+				transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
+		}
+
+		for (__int32 i = 0; i < bone->Children.size(); i++)
+		{
+			// Push
+			bones[nextBone++] = bone->Children[i];
+		}
+	}
+}
+
+bool Renderer11::printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message)
+{
 
 	return true;
 }

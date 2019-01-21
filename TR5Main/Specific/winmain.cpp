@@ -233,8 +233,9 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 		LoadConfiguration();
 	}
 
-	g_Configuration.Width = 800;
-	g_Configuration.Height = 600;
+	g_Configuration.Width = 1366;
+	g_Configuration.Height = 768;
+	g_Configuration.Windowed = false;
 
 	tagRECT Rect;
 

@@ -36,7 +36,7 @@ template <class T>
 class PreallocatedVector 
 {
 private:
-	T*			m_objects;
+	T**			m_objects;
 	__int32		m_maxItems;
 	__int32		m_numItems;
 	__int32		m_startSize;
@@ -45,7 +45,7 @@ public:
 	PreallocatedVector()
 	{
 		m_objects = NULL;
-		m_size = 0;
+		m_maxItems = 0;
 		m_startSize = 0;
 		m_numItems = 0;
 	}
@@ -55,68 +55,38 @@ public:
 		delete m_objects;
 	}
 
-	void Reserve(__int32 numItems)
+	inline void Reserve(__int32 numItems)
 	{
-		m_objects = (T*)malloc(sizeof(T) * numItems);
-		ZeroMemory(m_objects, sizeof(T) * m_maxItems);
+		m_objects = (T**)malloc(sizeof(T*) * numItems);
+		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
 		m_maxItems = numItems;
 		m_numItems = 0;
 		m_startSize = numItems;
 	}
 
-	void Clear()
+	inline void Clear()
 	{
 		m_numItems = 0;
-		ZeroMemory(m_objects, sizeof(T) * m_maxItems);
+		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
 	}
 
-	T* Allocate()
-	{
-		return Allocate(NULL);
-	}
-
-	T* Allocate(T* from)
-	{
-		if (m_numItems >= m_maxItems)
-		{
-			// Try to reallocate
-			__int32 newSize = m_maxItems + m_startSize;
-			T* temp = (T*)malloc(sizeof(T) * newSize);
-			ZeroMemory(temp, sizeof(T) * newSize);
-			memcpy(temp, m_objects, sizeof(T) * m_maxItems);
-			delete m_objects;
-			m_objects = temp;
-			m_maxItems = newSize;
-		}
-
-		T* obj = Get(m_numItems);
-		if (obj == NULL)
-			return NULL;
-
-		m_numItems++;
-
-		if (from != NULL)
-			memcpy(obj, from, sizeof(T));
-
-		return obj;
-	}
-
-	T* Get(__int32 index)
-	{
-		if (index >= m_numItems)
-			return NULL;
-
-		return &m_objects[index];
-	}
-
-	__int32 Size()
+	inline __int32 Size()
 	{
 		return m_numItems;
 	}
 
-	void Sort(__int32(*compareFunc)(const void*, const void*))
+	inline void Sort(__int32(*compareFunc)(T*, T*))
 	{
 		qsort(m_objects, m_numItems, sizeof(T), compareFunc);
+	}
+
+	inline T*& operator[] (__int32 x) {
+		return m_objects[x];
+	}
+
+	inline void Add(T* value)
+	{
+		m_objects[m_numItems++] = value;
 	}
 };
 
@@ -497,7 +467,8 @@ struct RendererItem {
 	__int32 Id;
 	ITEM_INFO* Item;
 	Matrix World;
-	vector<Matrix> AnimationTransforms;
+	Matrix AnimationTransforms[32];
+	__int32 NumMeshes;
 };
 
 struct RendererEffect {
@@ -574,7 +545,7 @@ private:
 	IndexBuffer*									m_moveablesIndexBuffer;
 	VertexBuffer*									m_staticsVertexBuffer;
 	IndexBuffer*									m_staticsIndexBuffer;
-	map<__int32, RendererRoom*>						m_rooms;
+	RendererRoom**									m_rooms;
 	Matrix											m_hairsMatrices[12];
 	__int16											m_normalLaraSkinJointRemap[15][32];
 	__int16											m_youngLaraSkinJointRemap[15][32];
@@ -583,16 +554,17 @@ private:
 	__int16											m_numHairIndices;
 	vector<RendererVertex>							m_hairVertices;
 	vector<__int32>									m_hairIndices;
-	vector<RendererRoom*>							m_roomsToDraw;
-	vector<RendererItem*>							m_itemsToDraw;
-	vector<RendererEffect*>							m_effectsToDraw;
-	vector<RendererStatic*>							m_staticsToDraw;
-	vector<RendererLight*>							m_lightsToDraw;
-	vector<RendererLight*>							m_dynamicLights;
+	PreallocatedVector<RendererRoom>				m_roomsToDraw;
+	PreallocatedVector<RendererItem>				m_itemsToDraw;
+	PreallocatedVector<RendererEffect>			    m_effectsToDraw;
+	PreallocatedVector<RendererStatic>				m_staticsToDraw;
+	PreallocatedVector<RendererLight>				m_lightsToDraw;
+	PreallocatedVector<RendererLight>				m_dynamicLights;
 	RendererLight*									m_shadowLight;
-	map<__int32, RendererObject*>					m_moveableObjects;
-	map<__int32, RendererObject*>					m_staticObjects;
-	map<__int16*, RendererMesh*>					m_meshPointersToMesh;
+	RendererObject**								m_moveableObjects;
+	RendererObject**								m_staticObjects;
+	unordered_map<__int16*, RendererMesh*>			m_meshPointersToMesh;
+	Matrix											m_LaraWorldMatrix;
 
 	// Preallocated pools of objects for avoiding new/delete
 	// Items and effects are safe (can't be more than 1024 items in TR), 
@@ -601,6 +573,11 @@ private:
 	RendererEffect									m_effects[NUM_ITEMS];
 	RendererLight									m_lights[MAX_LIGHTS];
 	__int32											m_nextLight;
+
+	// Times for debug
+	__int32											m_timeUpdate;
+	__int32											m_timeDraw;
+	__int32											m_timeFrame;
 
 	// Private functions
 	bool									drawScene(bool dump);
@@ -621,14 +598,17 @@ private:
 	bool									checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPort, Vector4* clipPort);
 	void									getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count);
 	void									collectRooms();
-	void									collectItems(__int16 roomNumber);
-	void									collectStatics(__int16 roomNumber);
-	void									collectLights(__int16 roomNumber);
-	void									collectEffects(__int16 roomNumber);
+	inline void									collectItems(__int16 roomNumber);
+	inline void									collectStatics(__int16 roomNumber);
+	inline void									collectLights(__int16 roomNumber);
+	inline void									collectEffects(__int16 roomNumber);
 	void									prepareLights();
-	void									collectSceneItems();
 	void									clearSceneItems();
 	bool									updateConstantBuffer(ID3D11Buffer* buffer, void* data, __int32 size);
+	void									updateLaraAnimations();
+	void									updateItemsAnimations();
+	void									updateEffects();
+	__int32									getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate);
 
 public:
 	Matrix									View;
