@@ -392,6 +392,7 @@ struct CMatrixBuffer
 	Matrix World;
 	Matrix View;
 	Matrix Projection;
+	Matrix BonesMatrices[32];
 };
 
 struct RendererAnimatedTexture 
@@ -519,6 +520,7 @@ private:
 
 	// Shaders
 	ID3D11VertexShader*						m_vs;
+	ID3D11VertexShader*						m_vs2;
 	ID3D11PixelShader*						m_ps;
 
 	// Constant buffers
@@ -531,6 +533,7 @@ private:
 	vector<RendererStringToDraw>			m_strings;
 	__int32									m_blinkColorValue;
 	__int32									m_blinkColorDirection;
+	PrimitiveBatch<RendererVertex>*			m_primitiveBatch;
 
 	// System resources
 	Texture2D*								m_caustics[NUM_CAUSTICS_TEXTURES];
@@ -553,7 +556,7 @@ private:
 	__int16											m_numHairVertices;
 	__int16											m_numHairIndices;
 	vector<RendererVertex>							m_hairVertices;
-	vector<__int32>									m_hairIndices;
+	vector<__int16>									m_hairIndices;
 	PreallocatedVector<RendererRoom>				m_roomsToDraw;
 	PreallocatedVector<RendererItem>				m_itemsToDraw;
 	PreallocatedVector<RendererEffect>			    m_effectsToDraw;

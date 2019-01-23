@@ -175,6 +175,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	// Initialise sprites and font
 	m_spriteBatch = new SpriteBatch(m_context);
 	m_gameFont = new SpriteFont(m_device, L"Font.spritefont");
+	m_primitiveBatch = new PrimitiveBatch<RendererVertex>(m_context);
 
 	// Initialise render states
 	m_states = new CommonStates(m_device);
@@ -230,6 +231,16 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 		return false;	
 	m_vs = NULL;
 	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vs);
+	if (FAILED(res))
+		return false;
+
+	vsBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Test.fx", 0, 0, "VS_Skinned", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
+	//char* errs = (char*)errors->GetBufferPointer();
+	if (FAILED(res))
+		return false;
+	m_vs2 = NULL;
+	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vs2);
 	if (FAILED(res))
 		return false;
 
@@ -412,6 +423,121 @@ bool Renderer11::drawScene(bool dump)
 		}
 	}
 
+	m_context->VSSetShader(m_vs2, NULL, 0);
+
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	RendererObject* laraObj = m_moveableObjects[ID_LARA];
+	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
+
+	m_stMatrices.World = m_LaraWorldMatrix.Transpose();
+	memcpy(m_stMatrices.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
+	updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
+
+	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	{
+		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
+
+		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			numDrawCalls++;
+		}
+	}
+
+	if (m_moveableObjects[ID_LARA_SKIN_JOINTS] != NULL)
+	{
+		RendererObject* laraSkinJoints = m_moveableObjects[ID_LARA_SKIN_JOINTS];
+		
+		for (__int32 k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++)
+		{
+			RendererMesh* mesh = laraSkinJoints->ObjectMeshes[k];
+
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket* bucket = &mesh->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				numDrawCalls++;
+			}
+		}
+	}
+
+	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	{
+		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
+
+		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			numDrawCalls++;
+		}
+	}
+
+	if (m_moveableObjects[ID_HAIR] != NULL)
+	{
+		m_stMatrices.World = Matrix::Identity;
+		for (__int32 i = 0; i < 6; i++)
+			m_stMatrices.BonesMatrices[i] = Matrix::Identity;
+		updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
+		m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+			(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
+			m_hairVertices.data(), m_numHairVertices);
+		m_primitiveBatch->End();
+	}
+
+	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
+	{
+		RendererItem* item = m_itemsToDraw[i];
+
+		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+
+		m_stMatrices.World = item->World.Transpose();
+		memcpy(m_stMatrices.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
+		updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
+		m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
+
+		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+		{
+			RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket* bucket = &mesh->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				numDrawCalls++;
+			}
+		}
+	}
+
 	time2 = chrono::high_resolution_clock::now();
 	m_timeFrame = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
@@ -419,6 +545,26 @@ bool Renderer11::drawScene(bool dump)
 	ZeroMemory(buffer, 255);
 	sprintf(buffer, "Frame time: %d", m_timeFrame);
 	PrintString(10, 30, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Draw calls: %d", numDrawCalls);
+	PrintString(10, 50, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Rooms: %d", m_roomsToDraw.Size());
+	PrintString(10, 70, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Items: %d", m_itemsToDraw.Size());
+	PrintString(10, 90, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Statics: %d", m_staticsToDraw.Size());
+	PrintString(10, 110, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Lights: %d", m_lightsToDraw.Size());
+	PrintString(10, 130, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
 
 	drawAllStrings();
 
@@ -609,11 +755,11 @@ bool Renderer11::PrepareDataForTheRenderer()
 	
 	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
 	{
-		//memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
+		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
 	}
 	else
 	{
-		//memcpy(m_laraSkinJointRemap, m_normalLaraSkinJointRemap, 15 * 32 * 2);
+		memcpy(m_laraSkinJointRemap, m_normalLaraSkinJointRemap, 15 * 32 * 2);
 	}
 
 	for (int p = 0; p < NumTexturePages; p++)
@@ -860,7 +1006,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					__int32 baseVertices = bucket->NumVertices;
 					for (__int32 v = 0; v < 3; v++)
 					{
-						RendererVertex vertex; 
+						RendererVertex vertex;
 
 						vertex.Position.x = room->x + vertices[poly->Vertices[v]].Vertex.x;
 						vertex.Position.y = room->y + vertices[poly->Vertices[v]].Vertex.y;
@@ -2309,7 +2455,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 			if (isHairs)
 				vertex.Bone = indices[v];
 
-			vertex.Color = Vector4::One;
+			vertex.Color = Vector4::One * 0.5f;
 
 			bucket->NumVertices++;
 			bucket->Vertices.push_back(vertex);
@@ -2395,6 +2541,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 				vertex.Bone = m_laraSkinJointRemap[boneIndex][indices[v]];
 			if (isHairs)
 				vertex.Bone = indices[v];
+
+			vertex.Color = Vector4::One * 0.5f;
 
 			bucket->NumVertices++;
 			bucket->Vertices.push_back(vertex);
@@ -2569,6 +2717,9 @@ void Renderer11::updateItemsAnimations()
 			__int32 frac = GetFrame_D2(item, framePtr, &rate);
 
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+
+			for (__int32 m = 0; m < itemToDraw->NumMeshes; m++)
+				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m].Transpose();
 		}
 
 		// Update world matrix
@@ -2599,6 +2750,8 @@ void Renderer11::updateLaraAnimations()
 		TR_ANGLE_TO_RAD(LaraItem->pos.yRot),
 		TR_ANGLE_TO_RAD(LaraItem->pos.xRot),
 		TR_ANGLE_TO_RAD(LaraItem->pos.zRot));
+
+	m_LaraWorldMatrix = rotation * translation;
 	
 	// Update first Lara's animations
 	laraObj->LinearizedBones[TORSO]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.torsoXrot),
@@ -2673,7 +2826,8 @@ void Renderer11::updateLaraAnimations()
 			frac = GetFrame_D2(LaraItem, framePtr, &rate);
 			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 		}
-	}
+
+	}		 
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
 	if (m_moveableObjects[ID_HAIR] != NULL)
@@ -2761,6 +2915,8 @@ void Renderer11::updateLaraAnimations()
 						m_hairVertices[lastVertex].Normal.y = n.y;
 						m_hairVertices[lastVertex].Normal.z = n.z;
 
+						m_hairVertices[lastVertex].Color = Vector4::One * 0.5f;
+
 						lastVertex++;
 					}
 					else
@@ -2790,6 +2946,8 @@ void Renderer11::updateLaraAnimations()
 						m_hairVertices[lastVertex].Normal.y = n.y;
 						m_hairVertices[lastVertex].Normal.z = n.z;
 
+						m_hairVertices[lastVertex].Color = Vector4::One * 0.5f;
+
 						lastVertex++;
 					}
 				}
@@ -2802,6 +2960,10 @@ void Renderer11::updateLaraAnimations()
 			}
 		}
 	}
+
+	// Transpose matrices for shaders
+	for (__int32 m = 0; m < 15; m++)
+		laraObj->AnimationTransforms[m] = laraObj->AnimationTransforms[m].Transpose();
 }
 
 __int32 Renderer11::getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate)
@@ -2833,10 +2995,9 @@ void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, __int1
 	RendererBone* bones[32];
 	__int32 nextBone = 0;
 
-	//stack<RendererBone*> bones;
 	Matrix rotation;
 
-	Matrix* transforms = (item == NULL ? obj->AnimationTransforms.data() : item->AnimationTransforms);
+	Matrix* transforms = (item == NULL ? obj->AnimationTransforms.data() : &item->AnimationTransforms[0]);
 
 	// Push
 	bones[nextBone++] = obj->Skeleton;
