@@ -104,6 +104,8 @@ public:
 	ID3D11RenderTargetView*	RenderTargetView;
 	ID3D11ShaderResourceView* ShaderResourceView;
 	ID3D11Texture2D* Texture;
+	ID3D11DepthStencilView*	DepthStencilView;
+	ID3D11Texture2D* DepthStencilTexture;
 	bool IsValid = false;
 
 	RenderTarget2D()
@@ -121,8 +123,8 @@ public:
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
 		desc.Format = format;
-		desc.SampleDesc.Count = 4;
 		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
 		desc.Usage = D3D11_USAGE_DEFAULT;
 		desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		desc.CPUAccessFlags = 0;
@@ -153,6 +155,37 @@ public:
 		if (FAILED(res))
 			return NULL;
 
+		D3D11_TEXTURE2D_DESC depthTexDesc;
+		ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
+		depthTexDesc.Width = w;
+		depthTexDesc.Height = h;
+		depthTexDesc.MipLevels = 1;
+		depthTexDesc.ArraySize = 1;
+		depthTexDesc.SampleDesc.Count = 1;
+		depthTexDesc.SampleDesc.Quality = 0;
+		depthTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+		depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthTexDesc.CPUAccessFlags = 0;
+		depthTexDesc.MiscFlags = 0;
+
+		rt->DepthStencilTexture = NULL;
+		res = device->CreateTexture2D(&depthTexDesc, NULL, &rt->DepthStencilTexture);
+		if (FAILED(res))
+			return false;
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+		ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+		dsvDesc.Format = depthTexDesc.Format;
+		dsvDesc.Flags = 0;
+		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		dsvDesc.Texture2D.MipSlice = 0;
+
+		rt->DepthStencilView = NULL;
+		res = device->CreateDepthStencilView(rt->DepthStencilTexture, &dsvDesc, &rt->DepthStencilView);
+		if (FAILED(res))
+			return false;
+
 		return rt;
 	}
 
@@ -161,6 +194,8 @@ public:
 		DX11_RELEASE(RenderTargetView);
 		DX11_RELEASE(ShaderResourceView);
 		DX11_RELEASE(Texture);
+		DX11_RELEASE(DepthStencilView);
+		DX11_RELEASE(DepthStencilTexture);
 	}
 };
 
@@ -387,12 +422,25 @@ struct RendererBone
 	}
 };
 
-struct CMatrixBuffer
+struct CCameraMatrixBuffer
 {
-	Matrix World;
 	Matrix View;
 	Matrix Projection;
+};
+
+struct CItemBuffer
+{
+	Matrix World;
 	Matrix BonesMatrices[32];
+	Vector4 Position;
+	Vector4 AmbientLight;
+};
+
+struct CStaticBuffer
+{
+	Matrix World;
+	Vector4 Position;
+	Vector4 AmbientLight;
 };
 
 struct RendererAnimatedTexture 
@@ -518,14 +566,36 @@ private:
 	ID3D11DepthStencilView*					m_depthStencilView;
 	ID3D11Texture2D*						m_depthStencilTexture;
 
+	// Ambient light cubemap
+	ID3D11Texture2D*						m_ambientCubeMapTexture;
+	ID3D11RenderTargetView*					m_ambientCubeMapRTV[6];
+	ID3D11ShaderResourceView*				m_ambientCubeMapSRV;
+	ID3D11Texture2D*						m_ambientCubeMapDepthTexture;
+	ID3D11DepthStencilView*					m_ambientCubeMapDSV;
+	RenderTarget2D*							m_testRT;
+
 	// Shaders
 	ID3D11VertexShader*						m_vs;
 	ID3D11VertexShader*						m_vs2;
 	ID3D11PixelShader*						m_ps;
+	ID3D11VertexShader*						m_vsAmbientCubeMap;
+	ID3D11PixelShader*						m_psAmbientCubeMap;
+	ID3D11VertexShader*						m_vsRooms;
+	ID3D11PixelShader*						m_psRooms;
+	ID3D11VertexShader*						m_vsItems;
+	ID3D11PixelShader*						m_psItems;
+	ID3D11VertexShader*						m_vsHairs;
+	ID3D11PixelShader*						m_psHairs;
+	ID3D11VertexShader*						m_vsStatics;
+	ID3D11PixelShader*						m_psStatics;
 
 	// Constant buffers
-	CMatrixBuffer							m_stMatrices;
-	ID3D11Buffer*							m_cbMatrices;
+	CCameraMatrixBuffer						m_stCameraMatrices;
+	ID3D11Buffer*							m_cbCameraMatrices;
+	CItemBuffer								m_stItem;
+	ID3D11Buffer*							m_cbItem;
+	CStaticBuffer							m_stStatic;
+	ID3D11Buffer*							m_cbStatic;
 
 	// Text and sprites
 	SpriteFont*								m_gameFont;
@@ -568,6 +638,9 @@ private:
 	RendererObject**								m_staticObjects;
 	unordered_map<__int16*, RendererMesh*>			m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
+
+	// Debug variables
+	__int32											m_numDrawCalls = 0;
 
 	// Preallocated pools of objects for avoiding new/delete
 	// Items and effects are safe (can't be more than 1024 items in TR), 
@@ -612,6 +685,7 @@ private:
 	void									updateItemsAnimations();
 	void									updateEffects();
 	__int32									getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate);
+	bool									drawAmbientCubeMap(__int16 roomNumber);
 
 public:
 	Matrix									View;

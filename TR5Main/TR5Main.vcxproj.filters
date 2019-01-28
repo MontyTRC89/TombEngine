@@ -592,6 +592,11 @@
     <None Include="packages.config" />
     <None Include="Shaders\DX11\Test.fx" />
     <None Include="Shaders\DX11_Test.fx" />
+    <None Include="Shaders\DX11_AmbientCubeMap.fx" />
+    <None Include="Shaders\DX11_Rooms.fx" />
+    <None Include="Shaders\DX11_Items.fx" />
+    <None Include="Shaders\DX11_Hairs.fx" />
+    <None Include="Shaders\DX11_Statics.fx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

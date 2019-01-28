@@ -1,9 +1,7 @@
-cbuffer MatrixBuffer
+cbuffer CameraMatrixBuffer
 {
-	float4x4 World;
 	float4x4 View;
 	float4x4 Projection;
-	float4x4 Bones[32];
 };
 
 struct VertexShaderInput
@@ -30,21 +28,7 @@ PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
-	output.Position = mul(mul(mul(float4(input.Position, 1.0f), World), View), Projection); // mul(float4(input.Position, 1.0f), mul(mul(World, View), Projection));
-	output.Normal = input.Normal;
-	output.Color = input.Color;
-	output.UV = input.UV;
-
-	return output;
-}
-
-PixelShaderInput VS_Skinned(VertexShaderInput input)
-{
-	PixelShaderInput output;
-
-	float4x4 world = mul(Bones[input.Bone], World);
-
-	output.Position = mul(mul(mul(float4(input.Position, 1.0f), world), View), Projection); // mul(float4(input.Position, 1.0f), mul(mul(World, View), Projection));
+	output.Position = mul(mul(float4(input.Position, 1.0f), View), Projection);
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;

@@ -88,7 +88,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	ScreenHeight = h;
 	Windowed = windowed;
 
-	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_0 };
+	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_11_0 };
 	D3D_FEATURE_LEVEL featureLevel;
 
 	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION,
@@ -253,6 +253,104 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	if (FAILED(res))
 		return false;
 
+	// Ambient cube map effect
+	vsBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_AmbientCubeMap.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
+	//char* errs = (char*)errors->GetBufferPointer();
+	if (FAILED(res))
+		return false;
+	m_vsAmbientCubeMap = NULL;
+	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsAmbientCubeMap);
+	if (FAILED(res))
+		return false;
+
+	psBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_AmbientCubeMap.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
+	if (FAILED(res))
+		return false;
+	m_psAmbientCubeMap = NULL;
+	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psAmbientCubeMap);
+	if (FAILED(res))
+		return false;
+
+	// Rooms effect
+	vsBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Rooms.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
+	//char* errs = (char*)errors->GetBufferPointer();
+	if (FAILED(res))
+		return false;
+	m_vsRooms = NULL;
+	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsRooms);
+	if (FAILED(res))
+		return false;
+
+	psBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Rooms.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
+	if (FAILED(res))
+		return false;
+	m_psRooms = NULL;
+	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psRooms);
+	if (FAILED(res))
+		return false;
+
+	// Items effect
+	vsBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Items.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
+	//char* errs = (char*)errors->GetBufferPointer();
+	if (FAILED(res))
+		return false;
+	m_vsItems = NULL;
+	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsItems);
+	if (FAILED(res))
+		return false;
+
+	psBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Items.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
+	if (FAILED(res))
+		return false;
+	m_psItems = NULL;
+	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psItems);
+	if (FAILED(res))
+		return false;
+
+	// Statics effect
+	vsBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Statics.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
+	if (FAILED(res))
+		return false;
+	m_vsStatics = NULL;
+	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsStatics);
+	if (FAILED(res))
+		return false;
+
+	psBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Statics.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
+	if (FAILED(res))
+		return false;
+	m_psStatics = NULL;
+	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psStatics);
+	if (FAILED(res))
+		return false;
+
+	// Hairs effect
+	vsBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Hairs.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
+	if (FAILED(res))
+		return false;
+	m_vsHairs = NULL;
+	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsHairs);
+	if (FAILED(res))
+		return false;
+
+	psBlob = NULL;
+	res = D3DX11CompileFromFile("Shaders\\DX11_Hairs.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
+	if (FAILED(res))
+		return false;
+	m_psHairs = NULL;
+	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psHairs);
+	if (FAILED(res))
+		return false;
+
 	// Initialise input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
 	{
@@ -269,7 +367,90 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 		return false;
 
 	// Initialise constant buffers
-	m_cbMatrices = createConstantBuffer(sizeof(CMatrixBuffer));
+	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
+	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
+	m_cbStatic = createConstantBuffer(sizeof(CStaticBuffer));
+
+	// Initialise the ambient cube map
+	D3D11_TEXTURE2D_DESC texDesc; 
+	ZeroMemory(&texDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	texDesc.Width = AMBIENT_CUBE_MAP_SIZE; 
+	texDesc.Height = AMBIENT_CUBE_MAP_SIZE; 
+	texDesc.MipLevels = 0; 
+	texDesc.ArraySize = 6;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0; 
+	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; 
+	texDesc.Usage = D3D11_USAGE_DEFAULT; 
+	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE; 
+	texDesc.CPUAccessFlags = 0; 
+	texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS | D3D11_RESOURCE_MISC_TEXTURECUBE; 
+	
+	m_ambientCubeMapTexture = NULL;
+	res = m_device->CreateTexture2D(&texDesc, NULL, &m_ambientCubeMapTexture);
+	if (FAILED(res))
+		return false;
+
+	D3D11_RENDER_TARGET_VIEW_DESC descRT;
+	ZeroMemory(&descRT, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
+	descRT.Format = DXGI_FORMAT_R8G8B8A8_UNORM; 
+	descRT.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY; 
+	descRT.Texture2DArray.ArraySize = 1; 
+	descRT.Texture2DArray.MipSlice = 0; 
+
+	for (__int32 i = 0; i < 6; i++)
+	{
+		descRT.Texture2DArray.FirstArraySlice = i;
+		m_ambientCubeMapRTV[i] = NULL;
+		res = m_device->CreateRenderTargetView(m_ambientCubeMapTexture, &descRT, &m_ambientCubeMapRTV[i]);
+		if (FAILED(res))
+			return false;
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	srvDesc.Format = texDesc.Format; 
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE; 
+	srvDesc.TextureCube.MostDetailedMip = 0; 
+	srvDesc.TextureCube.MipLevels = -1; 
+	
+	m_ambientCubeMapSRV = NULL;
+	res = m_device->CreateShaderResourceView(m_ambientCubeMapTexture, &srvDesc, &m_ambientCubeMapSRV);
+	if (FAILED(res))
+		return false;
+
+	D3D11_TEXTURE2D_DESC depthTexDesc;
+	ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	depthTexDesc.Width = AMBIENT_CUBE_MAP_SIZE; 
+	depthTexDesc.Height = AMBIENT_CUBE_MAP_SIZE; 
+	depthTexDesc.MipLevels = 1; 
+	depthTexDesc.ArraySize = 1; 
+	depthTexDesc.SampleDesc.Count = 1; 
+	depthTexDesc.SampleDesc.Quality = 0; 
+	depthTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; 
+	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL; 
+	depthTexDesc.CPUAccessFlags = 0; 
+	depthTexDesc.MiscFlags = 0; 
+	
+	ID3D11Texture2D* m_ambientCubeMapDepthTexture = NULL;
+	res = m_device->CreateTexture2D(&depthTexDesc, NULL, &m_ambientCubeMapDepthTexture);
+	if (FAILED(res))
+		return false;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+	dsvDesc.Format = depthTexDesc.Format; 
+	dsvDesc.Flags = 0; 
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D; 
+	dsvDesc.Texture2D.MipSlice = 0; 
+	
+	m_ambientCubeMapDSV = NULL;
+	res = m_device->CreateDepthStencilView(m_ambientCubeMapDepthTexture, &dsvDesc, &m_ambientCubeMapDSV);
+	if (FAILED(res))
+		return false;
+
+	m_testRT = RenderTarget2D::Create(m_device, AMBIENT_CUBE_MAP_SIZE, AMBIENT_CUBE_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	return true;
 }
@@ -288,8 +469,172 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 	View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), -Vector3::UnitY);
 	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, 20.0f, g_Configuration.MaxDrawDistance * 1024.0f);
 
-	m_stMatrices.View = View;
-	m_stMatrices.Projection = Projection;
+	m_stCameraMatrices.View = View; 
+	m_stCameraMatrices.Projection = Projection;
+}
+
+bool Renderer11::drawAmbientCubeMap(__int16 roomNumber)
+{
+	ROOM_INFO* r = &Rooms[roomNumber];
+
+	Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 384, LaraItem->pos.zPos); //Vector3(r->x+r->xSize*1024/2, (r->RoomYBottom+r->RoomYTop)/2, r->z + r->ySize * 1024 / 2);
+	Vector3 targets[6] = { laraPos + Vector3::UnitX * WALL_SIZE,
+						laraPos - Vector3::UnitX * WALL_SIZE,
+						laraPos + Vector3::UnitY * WALL_SIZE,
+						laraPos - Vector3::UnitY * WALL_SIZE,
+						laraPos + Vector3::UnitZ * WALL_SIZE,
+						laraPos - Vector3::UnitZ * WALL_SIZE };
+	Vector3 ups[6] = { -Vector3::UnitY, -Vector3::UnitY, Vector3::UnitX, -Vector3::UnitX, -Vector3::UnitY, -Vector3::UnitY };
+
+
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	for (__int32 i = 0; i < 6; i++)
+	{
+		// Clear screen
+		m_context->ClearRenderTargetView(m_ambientCubeMapRTV[i], Colors::CornflowerBlue);
+		m_context->ClearDepthStencilView(m_ambientCubeMapDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		// Bind the back buffer
+		m_context->OMSetRenderTargets(1, &m_ambientCubeMapRTV[i], m_ambientCubeMapDSV);
+		m_context->RSSetViewports(1, &m_viewport);
+		 
+		// Set vertex buffer
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
+		m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+		// Reset viewport
+		D3D11_VIEWPORT viewPort;
+		viewPort.TopLeftX = 0.0f;
+		viewPort.TopLeftY = 0.0f;
+		viewPort.Width = AMBIENT_CUBE_MAP_SIZE;
+		viewPort.Height = AMBIENT_CUBE_MAP_SIZE;
+		viewPort.MinDepth = 0.0f;
+		viewPort.MaxDepth = 1.0f;
+		m_context->RSSetViewports(1, &viewPort);
+		    
+		// Set shaders
+		m_context->VSSetShader(m_vsAmbientCubeMap, NULL, 0);
+		m_context->PSSetShader(m_psAmbientCubeMap, NULL, 0);
+		  
+		// Set texture
+		/*m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);*/
+
+		// Set camera matrices
+		Matrix projection = Matrix::CreatePerspectiveFieldOfView(PI / 2.0f, 1.0f, 20.0f, 200.0f * WALL_SIZE);
+		m_stCameraMatrices.View = Matrix::CreateLookAt(laraPos, targets[i], ups[i]).Transpose();
+		m_stCameraMatrices.Projection = projection.Transpose();
+
+		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+		for (__int32 i = 0; i < NumberRooms; i++)
+		{
+			RendererRoom* room = m_rooms[i];
+			if (room == NULL)
+				continue;
+
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket* bucket = &room->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+		}
+	}
+
+	D3DX11SaveTextureToFile(m_context, m_ambientCubeMapTexture, D3DX11_IMAGE_FILE_FORMAT::D3DX11_IFF_DDS, "H:\\cubetest.dds");
+	//D3DX11SaveTextureToFile(m_context, m_testRT->Texture, D3DX11_IFF_PNG, "H:\\provart.png");
+
+	/*
+	D3D11_VIEWPORT viewPort; 
+	viewPort.TopLeftX = 0.0f;
+	viewPort.TopLeftY = 0.0f;
+	viewPort.Width = AMBIENT_CUBE_MAP_SIZE;
+	viewPort.Height = AMBIENT_CUBE_MAP_SIZE;
+	viewPort.MinDepth = 0.0f;
+	viewPort.MaxDepth = 1.0f;
+	
+	Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	Vector3 targets[6] = { laraPos + Vector3::UnitX * WALL_SIZE,
+						laraPos - Vector3::UnitX * WALL_SIZE,
+						laraPos + Vector3::UnitY * WALL_SIZE,
+						laraPos - Vector3::UnitY * WALL_SIZE,
+						laraPos + Vector3::UnitZ * WALL_SIZE,
+						laraPos - Vector3::UnitZ * WALL_SIZE };
+	Vector3 ups[6] = { -Vector3::UnitY, -Vector3::UnitY, Vector3::UnitX, -Vector3::UnitX, -Vector3::UnitY, -Vector3::UnitY };
+
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	// Set shaders
+	m_context->VSSetShader(m_vsAmbientCubeMap, NULL, 0);
+	m_context->PSSetShader(m_psAmbientCubeMap, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	Matrix projection = Matrix::CreatePerspectiveFieldOfView(PI / 2.0f, 1.0f, 20.0f, 200.0f * WALL_SIZE);
+	
+	// Set vertex buffer
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+	m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	for (__int32 i = 0; i < 6; i++)
+	{
+		m_stCameraMatrices.View = Matrix::CreateLookAt(laraPos, targets[i], ups[i]).Transpose();
+		m_stCameraMatrices.Projection = projection.Transpose();
+		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+		m_context->ClearRenderTargetView(m_ambientCubeMapRTV[i], Colors::CornflowerBlue);
+		m_context->ClearDepthStencilView(m_ambientCubeMapDSV, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 1.0f, 0);
+		
+		m_context->OMSetRenderTargets(1, &m_ambientCubeMapRTV[i], m_ambientCubeMapDSV);
+		m_context->RSSetViewports(1, &viewPort);
+
+		for (__int32 n = 0; n < m_roomsToDraw.Size(); n++)
+		{
+			RendererRoom* room = m_roomsToDraw[n];
+			 
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket* bucket = &room->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+		}
+	}
+
+	//D3DX11SaveTextureToFile(m_context, m_ambientCubeMapTexture, D3DX11_IMAGE_FILE_FORMAT::D3DX11_IFF_JPG, "H:\\cubemap.png");
+	D3DX11SaveTextureToFile(m_context, m_ambientCubeMapTexture, D3DX11_IFF_DDS, "H:\\cubemap.dds");*/
+
+	return true;
 }
 
 void Renderer11::clearSceneItems()
@@ -307,6 +652,7 @@ bool Renderer11::drawScene(bool dump)
 	m_timeUpdate = 0;
 	m_timeDraw = 0;
 	m_timeFrame = 0;
+	m_numDrawCalls = 0;
 
 	m_strings.clear();
 
@@ -331,12 +677,8 @@ bool Renderer11::drawScene(bool dump)
 	sprintf(buffer, "Update time: %d", m_timeUpdate);
 	PrintString(10, 10, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
 
-	//printf("Time: %d, NumRooms: %d, NumItems: %d, NumStatics: %d, NumLights: %d\n",
-	//	m_timeUpdate, m_roomsToDraw.Size(), m_itemsToDraw.Size(), m_staticsToDraw.Size(), m_lightsToDraw.Size());
-
-	// Sort rooms for early Z-test
-	//std::sort(m_roomsToDraw.begin(), m_roomsToDraw.end(), SortRoomsFunction);
-	//m_roomsToDraw.Sort(SortRoomsFunctionNonStd);
+	// Prepare thr ambient cube map
+	//drawAmbientCubeMap(LaraItem->roomNumber);
 
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	m_context->RSSetState(m_states->CullCounterClockwise());
@@ -350,31 +692,94 @@ bool Renderer11::drawScene(bool dump)
 	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 	m_context->RSSetViewports(1, &m_viewport);
 
-	// Set shaders
-	m_context->VSSetShader(m_vs, NULL, 0);
-	m_context->PSSetShader(m_ps, NULL, 0);
-
-	m_stMatrices.World = Matrix::Identity;
-	m_stMatrices.View = View.Transpose();
-	m_stMatrices.Projection = Projection.Transpose();
-
-	updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
-	m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
-
-	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
-	m_context->PSSetSamplers(0, 1, &sampler);
-
-	// Set vertex buffer
+	ID3D11SamplerState* sampler;
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
+
+	// Draw horizon
+	if (m_moveableObjects[ID_HORIZON] != NULL)
+	{
+		m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+		// Set shaders
+		m_context->VSSetShader(m_vsItems, NULL, 0);
+		m_context->PSSetShader(m_psItems, NULL, 0);
+
+		// Set texture
+		m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+		sampler = m_states->AnisotropicClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);
+
+		// Set camera matrices
+		m_stCameraMatrices.View = View.Transpose();
+		m_stCameraMatrices.Projection = Projection.Transpose();
+
+		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+		RendererObject* moveableObj = m_moveableObjects[ID_HORIZON];
+
+		m_stItem.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z).Transpose();
+		m_stItem.Position = Vector4::Zero;
+		m_stItem.AmbientLight = Vector4::One;
+		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix) * 1);
+		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+		{
+			RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket* bucket = &mesh->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+		}
+	}
+
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Set vertex buffer
 	m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	__int32 numDrawCalls = 0;
+	// Reset viewport
+	D3D11_VIEWPORT viewPort;
+	viewPort.TopLeftX = 0.0f;
+	viewPort.TopLeftY = 0.0f;
+	viewPort.Width = ScreenWidth;
+	viewPort.Height = ScreenHeight;
+	viewPort.MinDepth = 0.0f;
+	viewPort.MaxDepth = 1.0f;
+	m_context->RSSetViewports(1, &viewPort);
+
+	// Set shaders
+	m_context->VSSetShader(m_vsRooms, NULL, 0);
+	m_context->PSSetShader(m_psRooms, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+	
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
 	for (__int32 i = 0; i < m_roomsToDraw.Size(); i++)
 	{
@@ -389,7 +794,7 @@ bool Renderer11::drawScene(bool dump)
 
 			// Draw vertices
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			numDrawCalls++;
+			m_numDrawCalls++;
 		}
 	}
 
@@ -397,18 +802,35 @@ bool Renderer11::drawScene(bool dump)
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_staticsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	 
+	// Set shaders
+	m_context->VSSetShader(m_vsStatics, NULL, 0);
+	m_context->PSSetShader(m_psStatics, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 		
 	for (__int32 i = 0; i < m_staticsToDraw.Size(); i++)
 	{
 		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
+		RendererRoom* room = m_rooms[m_staticsToDraw[i]->RoomIndex];
 
 		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
 		RendererMesh* mesh = staticObj->ObjectMeshes[0];
 
-		m_stMatrices.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z)).Transpose();
-
-		updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
+		m_stStatic.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z)).Transpose();
+		m_stStatic.AmbientLight = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
+		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
 		for (__int32 j = 0; j < NUM_BUCKETS; j++)
 		{
@@ -419,27 +841,45 @@ bool Renderer11::drawScene(bool dump)
 
 			// Draw vertices
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			numDrawCalls++;
+			m_numDrawCalls++;
 		}
 	}
-
-	m_context->VSSetShader(m_vs2, NULL, 0);
 
 	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
+	// Set shaders
+	m_context->VSSetShader(m_vsItems, NULL, 0);
+	m_context->PSSetShader(m_psItems, NULL, 0);
+	 
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+	  
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+	 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
+	RendererRoom* room = m_rooms[LaraItem->roomNumber];
 
-	m_stMatrices.World = m_LaraWorldMatrix.Transpose();
-	memcpy(m_stMatrices.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
-	updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
-	m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
+	m_stItem.World = m_LaraWorldMatrix.Transpose();
+	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
+	m_stItem.AmbientLight = room->AmbientLight;
+	memcpy(m_stItem.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
+	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
-	{
+	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++) 
+	{ 
 		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
 
 		for (__int32 j = 0; j < NUM_BUCKETS; j++)
@@ -451,7 +891,7 @@ bool Renderer11::drawScene(bool dump)
 
 			// Draw vertices
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			numDrawCalls++;
+			m_numDrawCalls++;
 		}
 	}
 
@@ -472,7 +912,7 @@ bool Renderer11::drawScene(bool dump)
 
 				// Draw vertices
 				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-				numDrawCalls++;
+				m_numDrawCalls++;
 			}
 		}
 	}
@@ -490,35 +930,22 @@ bool Renderer11::drawScene(bool dump)
 
 			// Draw vertices
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			numDrawCalls++;
+			m_numDrawCalls++;
 		}
-	}
-
-	if (m_moveableObjects[ID_HAIR] != NULL)
-	{
-		m_stMatrices.World = Matrix::Identity;
-		for (__int32 i = 0; i < 6; i++)
-			m_stMatrices.BonesMatrices[i] = Matrix::Identity;
-		updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
-
-		m_primitiveBatch->Begin();
-		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-			(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
-			m_hairVertices.data(), m_numHairVertices);
-		m_primitiveBatch->End();
 	}
 
 	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
-
+		RendererRoom* room = m_rooms[item->Item->roomNumber];
 		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
-		m_stMatrices.World = item->World.Transpose();
-		memcpy(m_stMatrices.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-		updateConstantBuffer(m_cbMatrices, &m_stMatrices, sizeof(CMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbMatrices);
+		m_stItem.World = item->World.Transpose();
+		m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
+		m_stItem.AmbientLight = room->AmbientLight;
+		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
+		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 		{
@@ -533,9 +960,34 @@ bool Renderer11::drawScene(bool dump)
 
 				// Draw vertices
 				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-				numDrawCalls++;
+				m_numDrawCalls++;
 			}
 		}
+	}
+
+	// Set shaders
+	m_context->VSSetShader(m_vsHairs, NULL, 0);
+	m_context->PSSetShader(m_psHairs, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	if (m_moveableObjects[ID_HAIR] != NULL)
+	{
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+			(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
+			m_hairVertices.data(), m_numHairVertices);
+		m_primitiveBatch->End();
 	}
 
 	time2 = chrono::high_resolution_clock::now();
@@ -547,7 +999,7 @@ bool Renderer11::drawScene(bool dump)
 	PrintString(10, 30, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
 
 	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Draw calls: %d", numDrawCalls);
+	sprintf(buffer, "Draw calls: %d", m_numDrawCalls);
 	PrintString(10, 50, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
 
 	ZeroMemory(buffer, 255);
@@ -567,6 +1019,10 @@ bool Renderer11::drawScene(bool dump)
 	PrintString(10, 130, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
 
 	drawAllStrings();
+
+	//m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->Opaque());
+	//m_spriteBatch->Draw(m_ambientCubeMapSRV, Vector2::Zero, Colors::White);
+	//m_spriteBatch->End();
 
 	m_swapChain->Present(0, 0);
 
@@ -1604,117 +2060,7 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 
 void Renderer11::Test()
 {
-	Texture2D* texture = Texture2D::LoadFromFile(m_device, "load.bmp");
-	RECT rect;
-	rect.top = 0;
-	rect.left = 0;
-	rect.right = 640;
-	rect.bottom = 480;
-	float color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
-
-	D3D11_VIEWPORT vp;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
-	vp.Width = ScreenWidth;
-	vp.Height = ScreenHeight;
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-
-	m_context->RSSetViewports(1, &vp);
-
-	RendererVertex vertices[] =
-	{
-		{ Vector3(0.0f, 0.5f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), Vector2(1.0f, 0.0f),Vector4(1.0f, 0.0f, 0.0f, 1.0f), 0 },
-		{ Vector3(0.45f, -0.5, 0.0f), Vector3(0.0f, 0.0f, 0.0f), Vector2(0.0f, 0.5f),Vector4(0.0f, 1.0f, 0.0f, 1.0f), 0 },
-		{ Vector3(-0.45f, -0.5f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), Vector2(1.0f, 1.0f),Vector4(0.0f, 0.0f, 1.0f, 1.0f), 0 }
-	};
-
-	VertexBuffer* vb = VertexBuffer::Create(m_device, 3, vertices);
-
-	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
-
-	ID3D10Blob* VS;
-	ID3D10Blob* PS;
-	ID3D10Blob* errors;
-
-	D3DX11CompileFromFile("Shaders\\DX11_Test.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &VS, &errors, 0);
-	D3DX11CompileFromFile("Shaders\\DX11_Test.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &PS, 0, 0);
-
-	ID3D11VertexShader* pVS;
-	ID3D11PixelShader* pPS;
-
-	m_device->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
-	m_device->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
 	
-	Texture2D* texture2 = Texture2D::LoadFromFile(m_device, "texture.jpg");
-
-	ID3D11InputLayout* pLayout = NULL;
-	m_device->CreateInputLayout(inputLayout, 5, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
-	
-	CMatrixBuffer matrices;
-	matrices.World = Matrix::Identity;
-	matrices.View = Matrix::Identity;
-	matrices.Projection = Matrix::Identity;
-	
-	ID3D11Buffer* cbuffer = createConstantBuffer(sizeof(CMatrixBuffer));
-	//m_context->VSSetConstantBuffers(0, 1, &cbuffer);
-
-	while (true)
-	{
-		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::CornflowerBlue);
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
-		 
-		m_spriteBatch->Begin(SpriteSortMode_Deferred);
-		m_spriteBatch->Draw(texture->ShaderResourceView, rect, Colors::White);
-		m_spriteBatch->End();
-
-		PrintString(400, 200, "Hello World DX11 :)", 0xFFFFFFFF, PRINTSTRING_CENTER);
-		drawAllStrings();
-
-		m_context->VSSetShader(pVS, NULL, 0);
-		m_context->PSSetShader(pPS, NULL, 0);
-
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-		// Lock the constant buffer so it can be written to.
-		m_context->Map(cbuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-		// Get a pointer to the data in the constant buffer.
-		CMatrixBuffer* dataPtr = (CMatrixBuffer*)mappedResource.pData;
-		memcpy(dataPtr, &matrices, sizeof(CMatrixBuffer));
-
-		// Unlock the constant buffer.
-		m_context->Unmap(cbuffer, 0);
-
-		//m_context->UpdateSubresource(cbuffer, 0, NULL, &matrices, 0, 0);
-		m_context->VSSetConstantBuffers(0, 1, &cbuffer);
-
-		m_context->PSSetShaderResources(0, 1, &texture2->ShaderResourceView);
-
-		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
-		m_context->PSSetSamplers(0, 1, &sampler);
-
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-		m_context->IASetVertexBuffers(0, 1, &vb->Buffer, &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(pLayout);
-
-		m_context->Draw(3, 0);
-
-		m_swapChain->Present(0, 0);
-	}
-
-	delete texture;
 }
 
 ID3D11Buffer* Renderer11::createConstantBuffer(__int32 size)
@@ -2363,6 +2709,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 
 	__int16 numNormals = *meshPtr++;
 	VECTOR* normals = NULL;
+	__int16* colors = NULL;
 	if (numNormals > 0)
 	{
 		normals = (VECTOR*)malloc(sizeof(VECTOR) * numNormals);
@@ -2378,7 +2725,14 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		}
 	}
 	else
-		meshPtr += (-numNormals);
+	{
+		__int16 numLights = -numNormals;
+		colors = (__int16*)malloc(sizeof(__int16) * numLights);
+		for (__int32 v = 0; v < numLights; v++)
+		{
+			colors[v] = *meshPtr++;
+		}
+	}
 
 	__int16 numRectangles = *meshPtr++;
 
@@ -2455,7 +2809,16 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 			if (isHairs)
 				vertex.Bone = indices[v];
 
-			vertex.Color = Vector4::One * 0.5f;
+			if (colors == NULL)
+			{
+				vertex.Color = Vector4::One * 0.5f;
+			}
+			else
+			{
+				__int16 shade = colors[indices[v]];
+				shade = (255 - shade * 255 / 8191) & 0xFF;
+				vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
+			}
 
 			bucket->NumVertices++;
 			bucket->Vertices.push_back(vertex);
@@ -2542,7 +2905,16 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 			if (isHairs)
 				vertex.Bone = indices[v];
 
-			vertex.Color = Vector4::One * 0.5f;
+			if (colors == NULL)
+			{
+				vertex.Color = Vector4::One * 0.5f;
+			}
+			else
+			{
+				__int16 shade = colors[indices[v]];
+				shade = (255 - shade * 255 / 8191) & 0xFF;
+				vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
+			}
 
 			bucket->NumVertices++;
 			bucket->Vertices.push_back(vertex);
@@ -2563,6 +2935,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 
 	free(vertices);
 	if (normals != NULL) free(normals);
+	if (colors != NULL) free(colors);
 
 	if (m_meshPointersToMesh.find(refMeshPtr) == m_meshPointersToMesh.end())
 		m_meshPointersToMesh.insert(pair<__int16*, RendererMesh*>(refMeshPtr, mesh));

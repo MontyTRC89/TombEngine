@@ -4173,7 +4173,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 	}
 
 	// Draw Lara's hairs
-	if (bucketIndex == 0)
+	if (bucketIndex == 0) 
 	{  
 		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
