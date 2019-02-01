@@ -1,5 +1,6 @@
 #include "Renderer11.h"
 
+#include "..\Game\camera.h"
 #include "..\Game\draw.h"
 #include "..\Global\global.h"
 #include "..\Specific\config.h"
@@ -88,7 +89,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	ScreenHeight = h;
 	Windowed = windowed;
 
-	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_11_0 };
+	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_1 };
 	D3D_FEATURE_LEVEL featureLevel;
 
 	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION,
@@ -220,135 +221,10 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_viewport.MaxDepth = 1.0f;
 
 	// Load shaders
-	ID3D10Blob* vsBlob;
-	ID3D10Blob* psBlob;
-	ID3D10Blob* errors;
+	ID3D10Blob* blob;
 
-	vsBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Test.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
-	//char* errs = (char*)errors->GetBufferPointer();
-	if (FAILED(res))
-		return false;	
-	m_vs = NULL;
-	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vs);
-	if (FAILED(res))
-		return false;
-
-	vsBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Test.fx", 0, 0, "VS_Skinned", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
-	//char* errs = (char*)errors->GetBufferPointer();
-	if (FAILED(res))
-		return false;
-	m_vs2 = NULL;
-	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vs2);
-	if (FAILED(res))
-		return false;
-
-	psBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Test.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
-	if (FAILED(res))
-		return false;	
-	m_ps = NULL;
-	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_ps);
-	if (FAILED(res))
-		return false;
-
-	// Ambient cube map effect
-	vsBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_AmbientCubeMap.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
-	//char* errs = (char*)errors->GetBufferPointer();
-	if (FAILED(res))
-		return false;
-	m_vsAmbientCubeMap = NULL;
-	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsAmbientCubeMap);
-	if (FAILED(res))
-		return false;
-
-	psBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_AmbientCubeMap.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
-	if (FAILED(res))
-		return false;
-	m_psAmbientCubeMap = NULL;
-	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psAmbientCubeMap);
-	if (FAILED(res))
-		return false;
-
-	// Rooms effect
-	vsBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Rooms.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
-	//char* errs = (char*)errors->GetBufferPointer();
-	if (FAILED(res))
-		return false;
-	m_vsRooms = NULL;
-	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsRooms);
-	if (FAILED(res))
-		return false;
-
-	psBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Rooms.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
-	if (FAILED(res))
-		return false;
-	m_psRooms = NULL;
-	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psRooms);
-	if (FAILED(res))
-		return false;
-
-	// Items effect
-	vsBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Items.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
-	//char* errs = (char*)errors->GetBufferPointer();
-	if (FAILED(res))
-		return false;
-	m_vsItems = NULL;
-	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsItems);
-	if (FAILED(res))
-		return false;
-
-	psBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Items.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
-	if (FAILED(res))
-		return false;
-	m_psItems = NULL;
-	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psItems);
-	if (FAILED(res))
-		return false;
-
-	// Statics effect
-	vsBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Statics.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
-	if (FAILED(res))
-		return false;
-	m_vsStatics = NULL;
-	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsStatics);
-	if (FAILED(res))
-		return false;
-
-	psBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Statics.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
-	if (FAILED(res))
-		return false;
-	m_psStatics = NULL;
-	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psStatics);
-	if (FAILED(res))
-		return false;
-
-	// Hairs effect
-	vsBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Hairs.fx", 0, 0, "VS", "vs_4_0", 0, 0, 0, &vsBlob, &errors, 0);
-	if (FAILED(res))
-		return false;
-	m_vsHairs = NULL;
-	res = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &m_vsHairs);
-	if (FAILED(res))
-		return false;
-
-	psBlob = NULL;
-	res = D3DX11CompileFromFile("Shaders\\DX11_Hairs.fx", 0, 0, "PS", "ps_4_0", 0, 0, 0, &psBlob, 0, 0);
-	if (FAILED(res))
-		return false;
-	m_psHairs = NULL;
-	res = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &m_psHairs);
-	if (FAILED(res))
+	m_vsRooms = compileVertexShader("Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &blob);
+	if (m_vsRooms == NULL)
 		return false;
 
 	// Initialise input layout using the first vertex shader
@@ -362,14 +238,59 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	};
 
 	m_inputLayout = NULL;
-	res = m_device->CreateInputLayout(inputLayout, 5, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &m_inputLayout);
+	res = m_device->CreateInputLayout(inputLayout, 5, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout);
 	if (FAILED(res))
+		return false;
+
+	m_psRooms = compilePixelShader("Shaders\\DX11_Rooms.fx", "PS", "ps_4_0", &blob);
+	if (m_psRooms == NULL)
+		return false;
+
+	m_vsItems = compileVertexShader("Shaders\\DX11_Items.fx", "VS", "vs_4_0", &blob);
+	if (m_vsItems == NULL)
+		return false;
+
+	m_psItems = compilePixelShader("Shaders\\DX11_Items.fx", "PS", "ps_4_0", &blob);
+	if (m_psItems == NULL)
+		return false;
+
+	m_vsStatics = compileVertexShader("Shaders\\DX11_Statics.fx", "VS", "vs_4_0", &blob);
+	if (m_vsStatics == NULL)
+		return false;
+
+	m_psStatics = compilePixelShader("Shaders\\DX11_Statics.fx", "PS", "ps_4_0", &blob);
+	if (m_psStatics == NULL)
+		return false;
+
+	m_vsHairs = compileVertexShader("Shaders\\DX11_Hairs.fx", "VS", "vs_4_0", &blob);
+	if (m_vsHairs == NULL)
+		return false;
+
+	m_psHairs = compilePixelShader("Shaders\\DX11_Hairs.fx", "PS", "ps_4_0", &blob);
+	if (m_psHairs == NULL)
+		return false;
+
+	m_vsSky = compileVertexShader("Shaders\\DX11_Sky.fx", "VS", "vs_4_0", &blob);
+	if (m_vsSky == NULL)
+		return false;
+
+	m_psSky = compilePixelShader("Shaders\\DX11_Sky.fx", "PS", "ps_4_0", &blob);
+	if (m_psSky == NULL)
+		return false;
+
+	m_vsSprites = compileVertexShader("Shaders\\DX11_Sprites.fx", "VS", "vs_4_0", &blob);
+	if (m_vsSprites == NULL)
+		return false;
+
+	m_psSprites = compilePixelShader("Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", &blob);
+	if (m_psSprites == NULL)
 		return false;
 
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
 	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
 	m_cbStatic = createConstantBuffer(sizeof(CStaticBuffer));
+	m_cbRoomLights = createConstantBuffer(sizeof(CLightBuffer));
 
 	// Initialise the ambient cube map
 	D3D11_TEXTURE2D_DESC texDesc; 
@@ -643,58 +564,108 @@ void Renderer11::clearSceneItems()
 	m_itemsToDraw.Clear();
 	m_effectsToDraw.Clear();
 	m_lightsToDraw.Clear();
-	m_dynamicLights.Clear();
 	m_staticsToDraw.Clear();
+	m_spritesToDraw.Clear();
+	m_lines3DToDraw.Clear();
 }
 
-bool Renderer11::drawScene(bool dump)
+bool Renderer11::drawHorizonAndSky()
 {
-	m_timeUpdate = 0;
-	m_timeDraw = 0;
-	m_timeFrame = 0;
-	m_numDrawCalls = 0;
+	// Update the sky
+	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+	Vector4 color = Vector4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
-	m_strings.clear();
+	if (!level->Horizon)
+		return true;
 
-	ViewProjection = View * Projection;
+	if (BinocularRange)
+		phd_AlterFOV(14560 - BinocularRange);
 
-	// Prepare the scene to draw
-	auto time1 = chrono::high_resolution_clock::now();
+	// Storm
+	if (level->Storm)
+	{
+		if (Unk_00E6D74C || Unk_00E6D73C)
+		{
+			UpdateStorm();
+			if (StormTimer > -1)
+				StormTimer--;
+			if (!StormTimer)
+				SoundEffect(SFX_THUNDER_RUMBLE, NULL, 0);
+		}
+		else if (!(rand() & 0x7F))
+		{
+			Unk_00E6D74C = (rand() & 0x1F) + 16;
+			Unk_00E6E4DC = rand() + 256;
+			StormTimer = (rand() & 3) + 12;
+		}
 
-	clearSceneItems();
-	collectRooms();
-	prepareLights();
-	updateLaraAnimations();
-	updateItemsAnimations();
-	updateEffects();
-
-	auto time2 = chrono::high_resolution_clock::now();
-	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
-	time1 = time2;
-
-	char buffer[255];
-	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Update time: %d", m_timeUpdate);
-	PrintString(10, 10, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
-
-	// Prepare thr ambient cube map
-	//drawAmbientCubeMap(LaraItem->roomNumber);
-
-	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-	m_context->RSSetState(m_states->CullCounterClockwise());
-	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
-	// Clear screen
-	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::CornflowerBlue);
-	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// Bind the back buffer
-	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
-	m_context->RSSetViewports(1, &m_viewport);
+		color = Vector4((SkyStormColor[0]) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
+	}
 
 	ID3D11SamplerState* sampler;
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
+
+	// Draw the sky
+	Matrix rotation = Matrix::CreateRotationX(PI);
+
+	RendererVertex vertices[4];
+	float size = 9728.0f;
+
+	vertices[0].Position.x = -size / 2.0f;
+	vertices[0].Position.y = 0.0f;
+	vertices[0].Position.z = size / 2.0f;
+	vertices[0].UV.x = 0.0f;
+	vertices[0].UV.y = 0.0f;
+
+	vertices[1].Position.x = size / 2.0f;
+	vertices[1].Position.y = 0.0f;
+	vertices[1].Position.z = size / 2.0f;
+	vertices[1].UV.x = 1.0f;
+	vertices[1].UV.y = 0.0f;
+
+	vertices[2].Position.x = size / 2.0f;
+	vertices[2].Position.y = 0.0f;
+	vertices[2].Position.z = -size / 2.0f;
+	vertices[2].UV.x = 1.0f;
+	vertices[2].UV.y = 1.0f;
+
+	vertices[3].Position.x = -size / 2.0f;
+	vertices[3].Position.y = 0.0f;
+	vertices[3].Position.z = -size / 2.0f;
+	vertices[3].UV.x = 0.0f;
+	vertices[3].UV.y = 1.0f;
+
+	m_context->VSSetShader(m_vsSky, NULL, 0);
+	m_context->PSSetShader(m_psSky, NULL, 0);
+
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	m_context->PSSetShaderResources(0, 1, &m_skyTexture->ShaderResourceView);
+	sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	
+	for (__int32 i = 0; i < 2; i++)
+	{
+		Matrix translation = Matrix::CreateTranslation(Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
+		Matrix world = rotation * translation;
+
+		m_stStatic.World = (rotation * translation).Transpose();
+		m_stStatic.Color = color;
+		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
+		m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		m_primitiveBatch->End();
+	}
 
 	// Draw horizon
 	if (m_moveableObjects[ID_HORIZON] != NULL)
@@ -704,28 +675,163 @@ bool Renderer11::drawScene(bool dump)
 		m_context->IASetInputLayout(m_inputLayout);
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders
-		m_context->VSSetShader(m_vsItems, NULL, 0);
-		m_context->PSSetShader(m_psItems, NULL, 0);
-
-		// Set texture
 		m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 		sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
-		// Set camera matrices
-		m_stCameraMatrices.View = View.Transpose();
-		m_stCameraMatrices.Projection = Projection.Transpose();
-
-		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
 		RendererObject* moveableObj = m_moveableObjects[ID_HORIZON];
 
-		m_stItem.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z).Transpose();
-		m_stItem.Position = Vector4::Zero;
-		m_stItem.AmbientLight = Vector4::One;
-		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix) * 1);
+		m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z).Transpose();
+		m_stStatic.Position = Vector4::Zero;
+		m_stStatic.Color = Vector4::One;
+		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CItemBuffer));
+		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
+		m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
+
+		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+		{
+			RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket* bucket = &mesh->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+		}
+	}
+
+	// Clear just the Z-buffer so we can start drawing on top of the horizon
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	return true;
+}
+
+bool Renderer11::drawRooms()
+{
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	// Set vertex buffer
+	m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Set shaders
+	m_context->VSSetShader(m_vsRooms, NULL, 0);
+	m_context->PSSetShader(m_psRooms, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+	 
+	for (__int32 i = 0; i < m_roomsToDraw.Size(); i++)
+	{ 
+		RendererRoom* room = m_roomsToDraw[i];
+
+		m_stRoomLights.NumLights = room->LightsToDraw.Size();
+		for (__int32 j = 0; j < room->LightsToDraw.Size(); j++)
+			memcpy(&m_stRoomLights.Lights[j], room->LightsToDraw[j], 64);
+		updateConstantBuffer(m_cbRoomLights, &m_stRoomLights, sizeof(CLightBuffer));
+		m_context->PSSetConstantBuffers(1, 1, &m_cbRoomLights);
+
+		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		{
+			RendererBucket* bucket = &room->Buckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
+
+	return true;
+}
+
+bool Renderer11::drawStatics()
+{
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	m_context->IASetVertexBuffers(0, 1, &m_staticsVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_staticsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Set shaders
+	m_context->VSSetShader(m_vsStatics, NULL, 0);
+	m_context->PSSetShader(m_psStatics, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	for (__int32 i = 0; i < m_staticsToDraw.Size(); i++)
+	{
+		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
+		RendererRoom* room = m_rooms[m_staticsToDraw[i]->RoomIndex];
+
+		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
+		RendererMesh* mesh = staticObj->ObjectMeshes[0];
+
+		m_stStatic.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z)).Transpose();
+		m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
+		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
+
+		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
+
+	return true;
+}
+
+bool Renderer11::drawItems()
+{
+	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
+	{
+		RendererItem* item = m_itemsToDraw[i];
+		RendererRoom* room = m_rooms[item->Item->roomNumber];
+		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+
+		m_stItem.World = item->World.Transpose();
+		m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
+		m_stItem.AmbientLight = room->AmbientLight;
+		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -747,103 +853,13 @@ bool Renderer11::drawScene(bool dump)
 		}
 	}
 
-	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	return true;
+}
 
-	// Set vertex buffer
-	m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
-	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
-
-	// Reset viewport
-	D3D11_VIEWPORT viewPort;
-	viewPort.TopLeftX = 0.0f;
-	viewPort.TopLeftY = 0.0f;
-	viewPort.Width = ScreenWidth;
-	viewPort.Height = ScreenHeight;
-	viewPort.MinDepth = 0.0f;
-	viewPort.MaxDepth = 1.0f;
-	m_context->RSSetViewports(1, &viewPort);
-
-	// Set shaders
-	m_context->VSSetShader(m_vsRooms, NULL, 0);
-	m_context->PSSetShader(m_psRooms, NULL, 0);
-
-	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	sampler = m_states->AnisotropicClamp();
-	m_context->PSSetSamplers(0, 1, &sampler);
-	
-	// Set camera matrices
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
-
-	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
-	for (__int32 i = 0; i < m_roomsToDraw.Size(); i++)
-	{
-		RendererRoom* room = m_roomsToDraw[i];
-
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
-		{
-			RendererBucket* bucket = &room->Buckets[j];
-
-			if (bucket->Vertices.size() == 0)
-				continue;
-
-			// Draw vertices
-			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			m_numDrawCalls++;
-		}
-	}
-
-	m_context->IASetVertexBuffers(0, 1, &m_staticsVertexBuffer->Buffer, &stride, &offset);
-	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_staticsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
-	 
-	// Set shaders
-	m_context->VSSetShader(m_vsStatics, NULL, 0);
-	m_context->PSSetShader(m_psStatics, NULL, 0);
-
-	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	sampler = m_states->AnisotropicClamp();
-	m_context->PSSetSamplers(0, 1, &sampler);
-
-	// Set camera matrices
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
-
-	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-		
-	for (__int32 i = 0; i < m_staticsToDraw.Size(); i++)
-	{
-		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
-		RendererRoom* room = m_rooms[m_staticsToDraw[i]->RoomIndex];
-
-		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
-		RendererMesh* mesh = staticObj->ObjectMeshes[0];
-
-		m_stStatic.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z)).Transpose();
-		m_stStatic.AmbientLight = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
-		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
-		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
-
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
-		{
-			RendererBucket* bucket = &mesh->Buckets[j];
-
-			if (bucket->Vertices.size() == 0)
-				continue;
-
-			// Draw vertices
-			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			m_numDrawCalls++;
-		}
-	}
+bool Renderer11::drawLara()
+{
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
 
 	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -853,19 +869,19 @@ bool Renderer11::drawScene(bool dump)
 	// Set shaders
 	m_context->VSSetShader(m_vsItems, NULL, 0);
 	m_context->PSSetShader(m_psItems, NULL, 0);
-	 
+
 	// Set texture
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	sampler = m_states->AnisotropicClamp();
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
-	  
+
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-	 
+
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
 	RendererRoom* room = m_rooms[LaraItem->roomNumber];
@@ -878,8 +894,8 @@ bool Renderer11::drawScene(bool dump)
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++) 
-	{ 
+	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	{
 		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
 
 		for (__int32 j = 0; j < NUM_BUCKETS; j++)
@@ -898,7 +914,7 @@ bool Renderer11::drawScene(bool dump)
 	if (m_moveableObjects[ID_LARA_SKIN_JOINTS] != NULL)
 	{
 		RendererObject* laraSkinJoints = m_moveableObjects[ID_LARA_SKIN_JOINTS];
-		
+
 		for (__int32 k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = laraSkinJoints->ObjectMeshes[k];
@@ -934,36 +950,79 @@ bool Renderer11::drawScene(bool dump)
 		}
 	}
 
-	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
-	{
-		RendererItem* item = m_itemsToDraw[i];
-		RendererRoom* room = m_rooms[item->Item->roomNumber];
-		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+	return true;
+}
 
-		m_stItem.World = item->World.Transpose();
-		m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
-		m_stItem.AmbientLight = room->AmbientLight;
-		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
-		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+bool Renderer11::drawScene(bool dump)
+{
+	m_timeUpdate = 0;
+	m_timeDraw = 0;
+	m_timeFrame = 0;
+	m_numDrawCalls = 0;
+	m_nextLight = 0;
+	m_nextSprite = 0;
+	m_nextLine3D = 0;
 
-		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+	m_strings.clear();
 
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
-			{
-				RendererBucket* bucket = &mesh->Buckets[j];
+	ViewProjection = View * Projection;
 
-				if (bucket->Vertices.size() == 0)
-					continue;
+	// Prepare the scene to draw
+	auto time1 = chrono::high_resolution_clock::now();
 
-				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-				m_numDrawCalls++;
-			}
-		}
-	}
+	clearSceneItems();
+	collectRooms();
+	prepareLights();
+	updateLaraAnimations();
+	updateItemsAnimations();
+	updateEffects();
+
+	auto time2 = chrono::high_resolution_clock::now();
+	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	time1 = time2;
+
+	// Prepare thr ambient cube map
+	//drawAmbientCubeMap(LaraItem->roomNumber);
+
+	// Reset GPU state
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	// Clear screen
+	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::CornflowerBlue);
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Bind the back buffer
+	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+	m_context->RSSetViewports(1, &m_viewport);
+
+	// Draw stuff
+	drawHorizonAndSky();
+	drawRooms();
+	drawStatics();
+	drawLara();
+	drawItems();
+
+	// Draw sprites
+	drawFires();
+	drawSmokes();
+	drawBlood();
+	drawSparks();
+	drawBubbles();
+	drawDrips();
+	drawRipples();
+	drawUnderwaterDust();
+	drawSplahes();
+	drawShockwaves();
+
+	drawSprites();
+
+	/*
+
+	
+
+	
 
 	// Set shaders
 	m_context->VSSetShader(m_vsHairs, NULL, 0);
@@ -988,41 +1047,25 @@ bool Renderer11::drawScene(bool dump)
 			(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
 			m_hairVertices.data(), m_numHairVertices);
 		m_primitiveBatch->End();
-	}
+	}*/
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeFrame = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
 
-	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Frame time: %d", m_timeFrame);
-	PrintString(10, 30, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+	m_currentY = 10;
 
-	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Draw calls: %d", m_numDrawCalls);
-	PrintString(10, 50, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
-
-	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Rooms: %d", m_roomsToDraw.Size());
-	PrintString(10, 70, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
-
-	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Items: %d", m_itemsToDraw.Size());
-	PrintString(10, 90, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
-
-	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Statics: %d", m_staticsToDraw.Size());
-	PrintString(10, 110, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
-
-	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Lights: %d", m_lightsToDraw.Size());
-	PrintString(10, 130, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
-
+	printDebugMessage("Update time: %d", m_timeUpdate);
+	printDebugMessage("Frame time: %d", m_timeFrame);
+	printDebugMessage("Draw calls: %d", m_numDrawCalls);
+	printDebugMessage("Rooms: %d", m_roomsToDraw.Size());
+	printDebugMessage("Items: %d", m_itemsToDraw.Size());
+	printDebugMessage("Statics: %d", m_staticsToDraw.Size());
+	printDebugMessage("Lights: %d", m_lightsToDraw.Size());
+	printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
+	printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	
 	drawAllStrings();
-
-	//m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->Opaque());
-	//m_spriteBatch->Draw(m_ambientCubeMapSRV, Vector2::Zero, Colors::White);
-	//m_spriteBatch->End();
 
 	m_swapChain->Present(0, 0);
 
@@ -1164,6 +1207,9 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_moveableObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_OBJECTS);
 	ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * NUM_OBJECTS);
 
+	m_spriteSequences = (RendererSpriteSequence**)malloc(sizeof(RendererSpriteSequence*) * NUM_OBJECTS);
+	ZeroMemory(m_spriteSequences, sizeof(RendererSpriteSequence*) * NUM_OBJECTS);
+
 	m_staticObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_STATICS);
 	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);
 
@@ -1253,6 +1299,17 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_textureAtlas = Texture2D::LoadFromByteArray(m_device, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, &buffer[0]);
 	if (m_textureAtlas == NULL)
 		return false;
+	 
+	free(buffer);
+
+	buffer = (byte*)malloc(256 * 256 * 4);
+	memcpy(buffer, MiscTextures + 256 * 512 * 4, 256 * 256 * 4);
+	
+	m_skyTexture = Texture2D::LoadFromByteArray(m_device, 256, 256, &buffer[0]);
+	if (m_skyTexture == NULL)
+		return false;
+
+	D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
 
 	free(buffer);
 
@@ -1272,7 +1329,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 		r->RoomNumber = i;
 		r->Room = room;
 		r->AmbientLight = Vector4(room->ambient.r / 255.0f, room->ambient.g / 255.0f, room->ambient.b / 255.0f, 1.0f);
-		
+		r->LightsToDraw.Reserve(32);
+
 		m_rooms[i] = r;
 
 		if (room->NumVertices == 0)
@@ -1546,9 +1604,9 @@ bool Renderer11::PrepareDataForTheRenderer()
 				}
 				else if (oldLight->LightType == LIGHT_TYPE_SPOT)
 				{
-					light.Position = XMFLOAT4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-					light.Color = XMFLOAT4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
-					light.Direction = XMFLOAT4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
+					light.Position = Vector4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
+					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Intensity = 1.0f;
 					light.In = oldLight->In;
 					light.Out = oldLight->Range;   
@@ -1776,14 +1834,6 @@ bool Renderer11::PrepareDataForTheRenderer()
 						}
 					}
 				}
-
-				// Rebuild the LARA_SKIN object
-				/*for (__int32 j = 0; j < objSkin->ObjectMeshes.size(); j++)
-				{
-					RendererMesh* mesh = objSkin->ObjectMeshes[j].get();
-					for (__int32 n = 0; n < NUM_BUCKETS; n++)
-						mesh->GetBucket((RENDERER_BUCKETS)n)->UpdateBuffers();
-				}*/
 			}
 
 			if (MoveablesIds[i] == ID_HAIR)
@@ -1883,6 +1933,52 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_staticsVertexBuffer = VertexBuffer::Create(m_device, staticsVertices.size(), staticsVertices.data());
 	m_staticsIndexBuffer = IndexBuffer::Create(m_device, staticsIndices.size(), staticsIndices.data());
 
+	// Step 5: prepare sprites
+	m_sprites = (RendererSprite**)malloc(sizeof(RendererSprite*) * 4);
+	ZeroMemory(m_sprites, sizeof(RendererSprite*) * 4);
+
+	for (__int32 i = 0; i < 41; i++)
+	{
+		SPRITE* oldSprite = &Sprites[i];
+
+		RendererSprite* sprite = new RendererSprite();
+
+		sprite->Width = (oldSprite->right - oldSprite->left)*256.0f;
+		sprite->Height = (oldSprite->bottom - oldSprite->top)*256.0f;
+
+		float left = (oldSprite->left * 256.0f + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
+		float top = (oldSprite->top * 256.0f + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
+		float right = (oldSprite->right * 256.0f + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
+		float bottom = (oldSprite->bottom * 256.0f + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
+
+		sprite->UV[0] = Vector2(left / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[1] = Vector2(right / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[2] = Vector2(right / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[3] = Vector2(left / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
+
+		m_sprites[i] = sprite;
+	}
+
+	for (__int32 i = 0; i < MoveablesIds.size(); i++)
+	{
+		OBJECT_INFO* obj = &Objects[MoveablesIds[i]];
+
+		if (obj->nmeshes < 0)
+		{
+			__int16 numSprites = abs(obj->nmeshes);
+			__int16 baseSprite = obj->meshIndex;
+
+			RendererSpriteSequence* sequence = new RendererSpriteSequence(MoveablesIds[i], numSprites);
+
+			for (__int32 j = baseSprite; j < baseSprite + numSprites; j++)
+			{
+				sequence->SpritesList[j - baseSprite] = m_sprites[j];
+			}
+
+			m_spriteSequences[MoveablesIds[i]] = sequence;
+		}
+	}
+
 	// Preallocate lists
 	m_roomsToDraw.Reserve(NumberRooms);
 	m_itemsToDraw.Reserve(NUM_ITEMS);
@@ -1890,42 +1986,56 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_lightsToDraw.Reserve(16384);
 	m_dynamicLights.Reserve(16384);
 	m_staticsToDraw.Reserve(16384);
+	m_spritesToDraw.Reserve(MAX_SPRITES);
+	m_lines3DToDraw.Reserve(MAX_LINES_3D);
+	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
+	m_lines3DBuffer = (RendererLine3DToDraw*)malloc(sizeof(RendererLine3DToDraw) * MAX_LINES_3D);
 
 	return true;
 }
 
-ID3D11VertexShader* Renderer11::compileVertexShader(char* fileName)
+ID3D11VertexShader* Renderer11::compileVertexShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode)
 {
 	HRESULT res;
 
-	ID3DBlob* bytecode = NULL;
+	*bytecode = NULL;
 	ID3DBlob* errors = NULL;
 
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, NULL, "vs_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, &bytecode, &errors, NULL);
+	printf("Compiling vertex shader: %s\n", fileName);
+
+	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, bytecode, &errors, NULL);
 	if (FAILED(res))
+	{
+		printf("Compilation failed: %s\n", errors->GetBufferPointer());
 		return NULL;
+	}
 
 	ID3D11VertexShader* shader = NULL;
-	res = m_device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), NULL, &shader);
+	res = m_device->CreateVertexShader((*bytecode)->GetBufferPointer(), (*bytecode)->GetBufferSize(), NULL, &shader);
 	if (FAILED(res))
 		return NULL;
 
 	return shader;
 }
 
-ID3D11PixelShader* Renderer11::compilePixelShader(char* fileName)
+ID3D11PixelShader* Renderer11::compilePixelShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode)
 {
 	HRESULT res;
 
-	ID3DBlob* bytecode = NULL;
+	*bytecode = NULL;
 	ID3DBlob* errors = NULL;
 
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, NULL, "ps_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, &bytecode, &errors, NULL);
+	printf("Compiling pixel shader: %s\n", fileName);
+
+	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, bytecode, &errors, NULL);
 	if (FAILED(res))
+	{
+		printf("Compilation failed: %s\n", errors->GetBufferPointer());
 		return NULL;
+	}
 
 	ID3D11PixelShader* shader = NULL;
-	res = m_device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), NULL, &shader);
+	res = m_device->CreatePixelShader((*bytecode)->GetBufferPointer(), (*bytecode)->GetBufferSize(), NULL, &shader);
 	if (FAILED(res))
 		return NULL;
 
@@ -1987,7 +2097,7 @@ void Renderer11::DrawAirBar(__int32 percentual)
 
 void Renderer11::ClearDynamicLights()
 {
-
+	m_dynamicLights.Clear();
 }
 
 void Renderer11::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b)
@@ -2436,7 +2546,10 @@ void Renderer11::collectRooms()
 	__int16 baseRoomIndex = Camera.pos.roomNumber;
 
 	for (__int32 i = 0; i < NumberRooms; i++)
+	{
 		m_rooms[i]->Visited = false;
+		m_rooms[i]->LightsToDraw.Clear();
+	}
 
 	Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 
@@ -2570,6 +2683,25 @@ inline void Renderer11::collectLights(__int16 roomNumber)
 		RendererLight* light = &room->Lights[j];
 		m_lightsToDraw.Add(light);
 	}
+
+	// Collect dynamic lights
+	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+	{
+		RendererLight* light = m_dynamicLights[i];
+		if (sphereBoxIntersection(Vector3(r->x, r->RoomYBottom, r->z),
+			Vector3(r->x + r->xSize * WALL_SIZE, r->RoomYTop, r->z + r->ySize*WALL_SIZE),
+			Vector3(light->Position.x, light->Position.y, light->Position.z), light->Out))
+		{
+			room->LightsToDraw.Add(light);
+		}
+	}
+}
+
+bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
+{
+	Vector3 closestPointInAabb = Vector3::Min(Vector3::Max(sphereCentre, boxMin), boxMax);
+	double distanceSquared = (closestPointInAabb - sphereCentre).LengthSquared();
+	return (distanceSquared < (sphereRadius * sphereRadius));
 }
 
 void Renderer11::prepareLights()
@@ -3435,4 +3567,655 @@ bool Renderer11::printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, 
 {
 
 	return true;
+}
+
+void Renderer11::printDebugMessage(char* message, ...)
+{
+	char buffer[255];
+	ZeroMemory(buffer, 255);
+	sprintf(buffer, "Update time: %d", m_timeUpdate);
+
+	va_list args;
+	va_start(args, message);
+	sprintf(buffer, message, args);
+	va_end(args);
+
+	PrintString(10, m_currentY, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+
+	m_currentY += 20;
+}
+
+void Renderer11::drawBlood()
+{
+	for (__int32 i = 0; i < 32; i++)
+	{
+		BLOOD_STRUCT* blood = &Blood[i];
+		if (blood->On)
+		{
+			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
+				blood->x, blood->y, blood->z,
+				blood->Shade * 244, blood->Shade * 0, blood->Shade * 0,
+				TR_ANGLE_TO_RAD(blood->RotAng), 1.0f, blood->Size * 8.0f, blood->Size * 8.0f,
+				BLENDMODE_ALPHABLEND);
+		}
+	}
+}
+
+void Renderer11::drawSparks()
+{
+	for (__int32 i = 0; i < 1024; i++)
+	{
+		SPARKS* spark = &Sparks[i];
+		if (spark->on)
+		{
+			if (spark->flags & SP_DEF)
+			{
+				addSpriteBillboard(m_sprites[spark->def],
+					spark->x, spark->y, spark->z,
+					spark->r, spark->g, spark->b,
+					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f,
+					BLENDMODE_ALPHABLEND);
+			}
+			else
+			{
+				Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
+				v.Normalize();
+				addLine3D(spark->x, spark->y, spark->z, spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f, spark->r, spark->g, spark->b);
+			}
+		}
+	}
+}
+
+void Renderer11::drawFires()
+{
+	for (__int32 k = 0; k < 32; k++)
+	{
+		FIRE_LIST* fire = &Fires[k];
+		if (fire->on)
+		{
+			for (__int32 i = 0; i < 20; i++)
+			{
+				FIRE_SPARKS* spark = &FireSparks[i];
+				if (spark->on)
+				{
+					addSpriteBillboard(m_sprites[spark->def],
+						fire->x + spark->x, fire->y + spark->y, fire->z + spark->z,
+						spark->r, spark->g, spark->b,
+						TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
+						BLENDMODE_ALPHABLEND);
+				}
+			}
+		}
+	}
+}
+
+void Renderer11::addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
+{
+	if (m_nextSprite >= MAX_SPRITES)
+		return;
+
+	scale = 1.0f;
+
+	width *= scale;
+	height *= scale;
+
+	RendererSpriteToDraw* spr = &m_spritesBuffer[m_nextSprite++];
+
+	spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD;
+	spr->Sprite = sprite;
+	spr->X = x;
+	spr->Y = y;
+	spr->Z = z;
+	spr->R = r;
+	spr->G = g;
+	spr->B = b;
+	spr->Rotation = rotation;
+	spr->Scale = scale;
+	spr->Width = width;
+	spr->Height = height;
+	spr->BlendMode = blendMode;
+
+	m_spritesToDraw.Add(spr);
+}
+
+void Renderer11::drawSmokes()
+{
+	for (__int32 i = 0; i < 32; i++)
+	{
+		SMOKE_SPARKS* spark = &SmokeSparks[i];
+		if (spark->On)
+		{
+			addSpriteBillboard(m_sprites[spark->Def],
+				spark->x, spark->y, spark->z,
+				spark->Shade, spark->Shade, spark->Shade,
+				TR_ANGLE_TO_RAD(spark->RotAng), spark->Scalar, spark->Size * 4.0f, spark->Size * 4.0f,
+				BLENDMODE_ALPHABLEND);
+		}
+	}
+}
+
+void Renderer11::addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b)
+{
+	if (m_nextLine3D >= MAX_LINES_3D)
+		return;
+
+	RendererLine3DToDraw* line = &m_lines3DBuffer[m_nextLine3D++];
+
+	line->X1 = x1;
+	line->Y1 = y1;
+	line->Z1 = z1;
+	line->X2 = x2;
+	line->Y2 = y2;
+	line->Z2 = z2;
+	line->R = r;
+	line->G = g;
+	line->B = b;
+
+	m_lines3DToDraw.Add(line);
+}
+
+void Renderer11::addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
+{
+	if (m_nextSprite >= MAX_SPRITES)
+		return;
+
+	scale = 1.0f;
+
+	width *= scale;
+	height *= scale;
+
+	RendererSpriteToDraw* spr = &m_spritesBuffer[m_nextSprite++];
+
+	spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+	spr->Sprite = sprite;
+	spr->X1 = x1;
+	spr->Y1 = y1;
+	spr->Z1 = z1;
+	spr->X2 = x2;
+	spr->Y2 = y2;
+	spr->Z2 = z2;
+	spr->X3 = x3;
+	spr->Y3 = y3;
+	spr->Z3 = z3;
+	spr->X4 = x4;
+	spr->Y4 = y4;
+	spr->Z4 = z4;
+	spr->R = r;
+	spr->G = g;
+	spr->B = b;
+	spr->Rotation = rotation;
+	spr->Scale = scale;
+	spr->Width = width;
+	spr->Height = height;
+	spr->BlendMode = blendMode;
+
+	m_spritesToDraw.Add(spr);
+}
+
+void Renderer11::drawShockwaves()
+{
+	for (__int32 i = 0; i < 16; i++)
+	{
+		SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
+
+		if (shockwave->life)
+		{
+			byte color = shockwave->life * 8;
+
+			// Inner circle
+			float angle = PI / 32.0f;
+			float c = cos(angle);
+			float s = sin(angle);
+			float x1 = shockwave->x + (shockwave->innerRad * c);
+			float z1 = shockwave->z + (shockwave->innerRad * s);
+			float x4 = shockwave->x + (shockwave->outerRad * c);
+			float z4 = shockwave->z + (shockwave->outerRad * s);
+			angle -= PI / 8.0f;
+
+			for (__int32 j = 0; j < 16; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				float x2 = shockwave->x + (shockwave->innerRad * c);
+				float z2 = shockwave->z + (shockwave->innerRad * s);
+				float x3 = shockwave->x + (shockwave->outerRad * c);
+				float z3 = shockwave->z + (shockwave->outerRad * s);
+				angle -= PI / 8.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+					x1, shockwave->y, z1,
+					x2, shockwave->y, z2,
+					x3, shockwave->y, z3,
+					x4, shockwave->y, z4,
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+				x4 = x3;
+				z4 = z3;
+			}
+		}
+	}
+}
+
+void Renderer11::drawRipples()
+{
+	for (__int32 i = 0; i < 32; i++)
+	{
+		RIPPLE_STRUCT* ripple = &Ripples[i];
+
+		if (ripple->flags & 1)
+		{
+			float x1 = ripple->x - ripple->size;
+			float z1 = ripple->z - ripple->size;
+			float x2 = ripple->x + ripple->size;
+			float z2 = ripple->z + ripple->size;
+			float y = ripple->y;
+
+			byte color = (ripple->init ? ripple->init << 1 : ripple->life << 1);
+
+			addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 9],
+				x1, y, z2, x2, y, z2, x2, y, z1, x1, y, z1, color, color, color, 0.0f, 1.0f, ripple->size, ripple->size,
+				BLENDMODE_ALPHABLEND);
+		}
+	}
+}
+
+void Renderer11::drawUnderwaterDust()
+{
+	/*if (m_firstUnderwaterDustParticles)
+	{
+		for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+			m_underwaterDustParticles[i].Reset = true;
+	}
+
+	for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+	{
+		RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
+
+		if (dust->Reset)
+		{
+			dust->X = LaraItem->pos.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+			dust->Y = LaraItem->pos.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+			dust->Z = LaraItem->pos.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+
+			// Check if water room
+			__int16 roomNumber = Camera.pos.roomNumber;
+			FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
+			if (!isRoomUnderwater(roomNumber))
+				continue;
+
+			if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber))
+			{
+				dust->Reset = true;
+				continue;
+			}
+
+			dust->Life = 0;
+			dust->Reset = false;
+		}
+
+		dust->Life++;
+		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
+
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], dust->X, dust->Y, dust->Z, color, color, color,
+			0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE,
+			BLENDMODE_ALPHABLEND);
+
+		if (dust->Life >= 32)
+			dust->Reset = true;
+	}
+
+	m_firstUnderwaterDustParticles = false;
+	*/
+	return;
+}
+
+void Renderer11::drawDrips()
+{
+	for (__int32 i = 0; i < 32; i++)
+	{
+		DRIP_STRUCT* drip = &Drips[i];
+
+		if (drip->On)
+		{
+			addLine3D(drip->x, drip->y, drip->z, drip->x, drip->y + 24.0f, drip->z, drip->R, drip->G, drip->B);
+		}
+	}
+}
+
+void Renderer11::drawBubbles()
+{
+	for (__int32 i = 0; i < 40; i++)
+	{
+		BUBBLE_STRUCT* bubble = &Bubbles[i];
+
+		if (bubble->size)
+		{
+			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 13],
+				bubble->pos.x, bubble->pos.y, bubble->pos.z,
+				bubble->shade * 255, bubble->shade * 255, bubble->shade * 255,
+				0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f,
+				BLENDMODE_ALPHABLEND);
+		}
+	}
+}
+
+void Renderer11::drawSplahes()
+{
+	for (__int32 i = 0; i < 4; i++)
+	{
+		SPLASH_STRUCT* splash = &Splashes[i];
+
+		if (splash->flags & 1)
+		{
+			byte color = (splash->life >= 32 ? 255 : splash->life << 5);
+
+			// Inner circle
+			float angle = PI / 16.0f;
+			float c = cos(angle);
+			float s = sin(angle);
+			float dx = splash->innerRad * c;
+			float dz = splash->innerRad * s;
+			float x1 = splash->x + dx;
+			float z1 = splash->z + dz;
+			angle -= PI / 4.0f;
+
+			for (__int32 j = 0; j < 8; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				dx = splash->innerRad * c;
+				dz = splash->innerRad * s;
+				float x2 = splash->x + dx;
+				float z2 = splash->z + dz;
+				angle -= PI / 4.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+					x1, splash->y + splash->innerY, z1,
+					x2, splash->y + splash->innerY, z2,
+					x2, splash->y, z2,
+					x1, splash->y, z1,
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+			}
+
+			// Medium circle
+			angle = PI / 16.0f;
+			c = cos(angle);
+			s = sin(angle);
+			dx = splash->middleRad * c;
+			dz = splash->middleRad * s;
+			x1 = splash->x + dx;
+			z1 = splash->z + dz;
+			angle -= PI / 4.0f;
+
+			for (__int32 j = 0; j < 8; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				dx = splash->middleRad * c;
+				dz = splash->middleRad * s;
+				float x2 = splash->x + dx;
+				float z2 = splash->z + dz;
+				angle -= PI / 4.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+					x1, splash->y + splash->middleY, z1,
+					x2, splash->y + splash->middleY, z2,
+					x2, splash->y, z2,
+					x1, splash->y, z1,
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+			}
+
+			// Large circle
+			angle = PI / 16.0f;
+			c = cos(angle);
+			s = sin(angle);
+			dx = splash->outerRad * c;
+			dz = splash->outerRad * s;
+			x1 = splash->x + dx;
+			z1 = splash->z + dz;
+			angle -= PI / 4.0f;
+
+			for (__int32 j = 0; j < 8; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+				dx = splash->outerRad * c;
+				dz = splash->outerRad * s;
+				float x2 = splash->x + dx;
+				float z2 = splash->z + dz;
+				angle -= PI / 4.0f;
+
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+					x1, splash->y - splash->outerSize, z1,
+					x2, splash->y - splash->outerSize, z2,
+					x2, splash->y, z2,
+					x1, splash->y, z1,
+					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+
+				x1 = x2;
+				z1 = z2;
+			}
+		}
+	}
+}
+
+bool Renderer11::drawSprites()
+{
+	m_context->RSSetState(m_states->CullNone());
+	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+	m_context->VSSetShader(m_vsSprites, NULL, 0);
+	m_context->PSSetShader(m_psSprites, NULL, 0);
+
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+
+	for (__int32 b = 0; b < 3; b++)
+	{
+		BLEND_MODES currentBlendMode = (BLEND_MODES)b;
+
+		__int32 numSpritesToDraw = m_spritesToDraw.Size();
+		__int32 lastSprite = 0;
+
+		m_primitiveBatch->Begin();
+
+		for (__int32 i = 0; i < numSpritesToDraw; i++)
+		{
+			RendererSpriteToDraw* spr = m_spritesToDraw[i];
+
+			if (spr->BlendMode != currentBlendMode)
+				continue;
+
+			if (currentBlendMode == BLENDMODE_OPAQUE)
+			{
+				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			}
+			else
+			{
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+			}
+
+			if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+			{
+				float halfWidth = spr->Width / 2.0f;
+				float halfHeight = spr->Height / 2.0f;
+
+				Matrix billboardMatrix;
+				createBillboardMatrix(&billboardMatrix, &Vector3(spr->X, spr->Y, spr->Z),
+					&Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
+
+				Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
+				Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
+				Vector3 p2 = Vector3(halfWidth, halfHeight, 0);
+				Vector3 p3 = Vector3(-halfWidth, halfHeight, 0);
+
+				Vector3 p0t = Vector3::Transform(p0, billboardMatrix);
+				Vector3 p1t = Vector3::Transform(p1, billboardMatrix);
+				Vector3 p2t = Vector3::Transform(p2, billboardMatrix);
+				Vector3 p3t = Vector3::Transform(p3, billboardMatrix);
+
+				RendererVertex v0;				
+				v0.Position.x = p0t.x;
+				v0.Position.y = p0t.y;
+				v0.Position.z = p0t.z;
+				v0.UV.x = spr->Sprite->UV[0].x;
+				v0.UV.y = spr->Sprite->UV[0].y;
+				v0.Color.x = spr->R / 255.0f;
+				v0.Color.y = spr->G / 255.0f;
+				v0.Color.z = spr->B / 255.0f;
+				v0.Color.w = 1.0f;
+
+				RendererVertex v1;
+				v1.Position.x = p1t.x;
+				v1.Position.y = p1t.y;
+				v1.Position.z = p1t.z;
+				v1.UV.x = spr->Sprite->UV[1].x;
+				v1.UV.y = spr->Sprite->UV[1].y;
+				v1.Color.x = spr->R / 255.0f;
+				v1.Color.y = spr->G / 255.0f;
+				v1.Color.z = spr->B / 255.0f;
+				v1.Color.w = 1.0f;
+
+				RendererVertex v2;
+				v2.Position.x = p2t.x;
+				v2.Position.y = p2t.y;
+				v2.Position.z = p2t.z;
+				v2.UV.x = spr->Sprite->UV[2].x;
+				v2.UV.y = spr->Sprite->UV[2].y;
+				v2.Color.x = spr->R / 255.0f;
+				v2.Color.y = spr->G / 255.0f;
+				v2.Color.z = spr->B / 255.0f;
+				v2.Color.w = 1.0f;
+
+				RendererVertex v3;
+				v3.Position.x = p3t.x;
+				v3.Position.y = p3t.y;
+				v3.Position.z = p3t.z;
+				v3.UV.x = spr->Sprite->UV[3].x;
+				v3.UV.y = spr->Sprite->UV[3].y;
+				v3.Color.x = spr->R / 255.0f;
+				v3.Color.y = spr->G / 255.0f;
+				v3.Color.z = spr->B / 255.0f;
+				v3.Color.w = 1.0f;
+
+				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
+			}
+			else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
+			{
+				Vector3 p0t = Vector3(spr->X1, spr->Y1, spr->Z1);
+				Vector3 p1t = Vector3(spr->X2, spr->Y2, spr->Z2);
+				Vector3 p2t = Vector3(spr->X3, spr->Y3, spr->Z3);
+				Vector3 p3t = Vector3(spr->X4, spr->Y4, spr->Z4);
+
+				RendererVertex v0;
+				v0.Position.x = p0t.x;
+				v0.Position.y = p0t.y;
+				v0.Position.z = p0t.z;
+				v0.UV.x = spr->Sprite->UV[0].x;
+				v0.UV.y = spr->Sprite->UV[0].y;
+				v0.Color.x = spr->R / 255.0f;
+				v0.Color.y = spr->G / 255.0f;
+				v0.Color.z = spr->B / 255.0f;
+				v0.Color.w = 1.0f;
+
+				RendererVertex v1;
+				v1.Position.x = p1t.x;
+				v1.Position.y = p1t.y;
+				v1.Position.z = p1t.z;
+				v1.UV.x = spr->Sprite->UV[1].x;
+				v1.UV.y = spr->Sprite->UV[1].y;
+				v1.Color.x = spr->R / 255.0f;
+				v1.Color.y = spr->G / 255.0f;
+				v1.Color.z = spr->B / 255.0f;
+				v1.Color.w = 1.0f;
+
+				RendererVertex v2;
+				v2.Position.x = p2t.x;
+				v2.Position.y = p2t.y;
+				v2.Position.z = p2t.z;
+				v2.UV.x = spr->Sprite->UV[2].x;
+				v2.UV.y = spr->Sprite->UV[2].y;
+				v2.Color.x = spr->R / 255.0f;
+				v2.Color.y = spr->G / 255.0f;
+				v2.Color.z = spr->B / 255.0f;
+				v2.Color.w = 1.0f;
+
+				RendererVertex v3;
+				v3.Position.x = p3t.x;
+				v3.Position.y = p3t.y;
+				v3.Position.z = p3t.z;
+				v3.UV.x = spr->Sprite->UV[3].x;
+				v3.UV.y = spr->Sprite->UV[3].y;
+				v3.Color.x = spr->R / 255.0f;
+				v3.Color.y = spr->G / 255.0f;
+				v3.Color.z = spr->B / 255.0f;
+				v3.Color.w = 1.0f;
+
+				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
+			}			
+		}
+
+		m_primitiveBatch->End();
+	}
+
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	return true;
+}
+
+void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation)
+{
+	Vector3 look = *particlePos;
+	look = look - *cameraPos;
+	look.Normalize();
+
+	Vector3 cameraUp = Vector3(0.0f, -1.0f, 0.0f);
+
+	Vector3 right;
+	right = cameraUp.Cross(look);
+	right.Normalize();
+	
+	// Rotate right vector
+	Matrix rightTransform = Matrix::CreateFromAxisAngle(look, rotation);
+	right = Vector3::Transform(right, rightTransform);
+
+	Vector3 up;
+	up = look.Cross(right);
+	up.Normalize();
+
+	*out = Matrix::Identity;
+
+	out->_11 = right.x;
+	out->_12 = right.y;
+	out->_13 = right.z;
+
+	out->_21 = up.x;
+	out->_22 = up.y;
+	out->_23 = up.z;
+
+	out->_31 = look.x;
+	out->_32 = look.y;
+	out->_33 = look.z;
+
+	out->_41 = particlePos->x;
+	out->_42 = particlePos->y;
+	out->_43 = particlePos->z;
 }

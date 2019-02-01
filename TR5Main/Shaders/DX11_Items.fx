@@ -48,6 +48,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+[earlydepthstencil]
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);

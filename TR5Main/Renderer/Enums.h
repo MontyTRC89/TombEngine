@@ -90,6 +90,7 @@ typedef enum RENDERER_FADE_STATUS {
 #define MAX_INDICES 400000
 
 #define MAX_LINES_2D 256
+#define MAX_LINES_3D 16384
 
 #define NUM_BUCKETS 4
 
@@ -133,3 +134,5 @@ typedef enum RENDERER_FADE_STATUS {
 
 #define FADE_FRAMES_COUNT	16
 #define FADE_FACTOR 0.0625f
+
+#define NUM_LIGHTS_PER_BUFFER	48

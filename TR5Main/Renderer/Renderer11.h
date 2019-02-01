@@ -422,6 +422,35 @@ struct RendererBone
 	}
 };
 
+struct RendererLight {
+	Vector4 Position;
+	Vector4 Color;
+	Vector4 Direction;
+	float Intensity;
+	float In;
+	float Out;
+	float Range;
+	__int32 Type;
+	__int32 Dynamic;
+	__int32 Padding1;
+	__int32 Padding2;
+
+	RendererLight()
+	{
+		Dynamic = false;
+	}
+};
+
+struct ShaderLight {
+	Vector4 Position;
+	Vector4 Color;
+	Vector4 Direction;
+	float Intensity;
+	float In;
+	float Out;
+	float Range;
+};
+
 struct CCameraMatrixBuffer
 {
 	Matrix View;
@@ -440,7 +469,13 @@ struct CStaticBuffer
 {
 	Matrix World;
 	Vector4 Position;
-	Vector4 AmbientLight;
+	Vector4 Color;
+};
+
+struct CLightBuffer {
+	ShaderLight Lights[NUM_LIGHTS_PER_BUFFER];
+	__int32 NumLights;
+	Vector3 Padding;
 };
 
 struct RendererAnimatedTexture 
@@ -467,23 +502,6 @@ struct RendererBucket
 	__int32						NumIndices;
 };
 
-struct RendererLight {
-	Vector4 Position;
-	Vector4 Color;
-	Vector4 Direction;
-	float Intensity;
-	float In;
-	float Out;
-	float Range;
-	LIGHT_TYPES Type;
-	bool Dynamic;
-
-	RendererLight()
-	{
-		Dynamic = false;
-	}
-};
-
 struct RendererStatic {
 	__int32 Id;
 	__int16 RoomIndex;
@@ -504,6 +522,7 @@ struct RendererRoom
 	bool Visited;
 	float Distance;
 	__int32 RoomNumber;
+	PreallocatedVector<RendererLight> LightsToDraw;
 };
 
 struct RendererRoomNode {
@@ -544,6 +563,54 @@ struct RendererObject
 	bool						DoNotDraw;
 	bool						HasDataInBucket[NUM_BUCKETS];
 	bool						HasDataInAnimatedBucket[NUM_BUCKETS];
+};
+
+struct RendererSprite {
+	__int32 Width;
+	__int32 Height;
+	Vector2 UV[4];
+};
+
+struct RendererSpriteSequence {
+	__int32 Id;
+	RendererSprite** SpritesList;
+
+	RendererSpriteSequence(__int32 id, __int32 num)
+	{
+		Id = id;
+		SpritesList = (RendererSprite**)malloc(sizeof(RendererSprite*) * num);
+	}
+};
+
+struct RendererSpriteToDraw {
+	RENDERER_SPRITE_TYPE Type;
+	RendererSprite* Sprite;
+	float Distance;
+	float Scale;
+	float X, Y, Z;
+	float X1, Y1, Z1;
+	float X2, Y2, Z2;
+	float X3, Y3, Z3;
+	float X4, Y4, Z4;
+	byte R;
+	byte G;
+	byte B;
+	float Rotation;
+	float Width;
+	float Height;
+	BLEND_MODES BlendMode;
+};
+
+struct RendererLine3DToDraw {
+	float X1;
+	float Y1;
+	float Z1;
+	float X2;
+	float Y2;
+	float Z2;
+	byte R;
+	byte G;
+	byte B;
 };
 
 class Renderer11
@@ -588,6 +655,10 @@ private:
 	ID3D11PixelShader*						m_psHairs;
 	ID3D11VertexShader*						m_vsStatics;
 	ID3D11PixelShader*						m_psStatics;
+	ID3D11VertexShader*						m_vsSky;
+	ID3D11PixelShader*						m_psSky;
+	ID3D11VertexShader*						m_vsSprites;
+	ID3D11PixelShader*						m_psSprites;
 
 	// Constant buffers
 	CCameraMatrixBuffer						m_stCameraMatrices;
@@ -596,6 +667,8 @@ private:
 	ID3D11Buffer*							m_cbItem;
 	CStaticBuffer							m_stStatic;
 	ID3D11Buffer*							m_cbStatic;
+	CLightBuffer							m_stRoomLights;
+	ID3D11Buffer*							m_cbRoomLights;
 
 	// Text and sprites
 	SpriteFont*								m_gameFont;
@@ -611,6 +684,7 @@ private:
 
 	// Level data
 	Texture2D*										m_textureAtlas;
+	Texture2D*										m_skyTexture;
 	vector<RendererAnimatedTextureSet*>				m_animatedTextureSets;
 	VertexBuffer*									m_roomsVertexBuffer;
 	IndexBuffer*									m_roomsIndexBuffer;
@@ -633,9 +707,17 @@ private:
 	PreallocatedVector<RendererStatic>				m_staticsToDraw;
 	PreallocatedVector<RendererLight>				m_lightsToDraw;
 	PreallocatedVector<RendererLight>				m_dynamicLights;
+	PreallocatedVector<RendererSpriteToDraw>		m_spritesToDraw;
+	PreallocatedVector<RendererLine3DToDraw>		m_lines3DToDraw;
+	RendererSpriteToDraw*							m_spritesBuffer;
+	__int32											m_nextSprite;
+	RendererLine3DToDraw*							m_lines3DBuffer;
+	__int32											m_nextLine3D;
 	RendererLight*									m_shadowLight;
 	RendererObject**								m_moveableObjects;
 	RendererObject**								m_staticObjects;
+	RendererSprite**								m_sprites;
+	RendererSpriteSequence**						m_spriteSequences;
 	unordered_map<__int16*, RendererMesh*>			m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
 
@@ -649,6 +731,7 @@ private:
 	RendererEffect									m_effects[NUM_ITEMS];
 	RendererLight									m_lights[MAX_LIGHTS];
 	__int32											m_nextLight;
+	__int32											m_currentY;
 
 	// Times for debug
 	__int32											m_timeUpdate;
@@ -658,9 +741,9 @@ private:
 	// Private functions
 	bool									drawScene(bool dump);
 	bool									drawAllStrings();
-	ID3D11VertexShader*						compileVertexShader(char* fileName);
+	ID3D11VertexShader*						compileVertexShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode);
 	ID3D11GeometryShader*					compileGeometryShader(char* fileName);
-	ID3D11PixelShader*						compilePixelShader(char* fileName);
+	ID3D11PixelShader*						compilePixelShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode);
 	ID3D11ComputeShader*					compileComputeShader(char* fileName);
 	ID3D11Buffer*							createConstantBuffer(__int32 size);
 	__int32									getAnimatedTextureInfo(__int16 textureId);
@@ -674,10 +757,10 @@ private:
 	bool									checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPort, Vector4* clipPort);
 	void									getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count);
 	void									collectRooms();
-	inline void									collectItems(__int16 roomNumber);
-	inline void									collectStatics(__int16 roomNumber);
-	inline void									collectLights(__int16 roomNumber);
-	inline void									collectEffects(__int16 roomNumber);
+	inline void								collectItems(__int16 roomNumber);
+	inline void								collectStatics(__int16 roomNumber);
+	inline void								collectLights(__int16 roomNumber);
+	inline void								collectEffects(__int16 roomNumber);
 	void									prepareLights();
 	void									clearSceneItems();
 	bool									updateConstantBuffer(ID3D11Buffer* buffer, void* data, __int32 size);
@@ -686,6 +769,29 @@ private:
 	void									updateEffects();
 	__int32									getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate);
 	bool									drawAmbientCubeMap(__int16 roomNumber);
+	bool									sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius);
+	bool									drawHorizonAndSky();
+	bool									drawRooms();
+	bool									drawStatics();
+	bool									drawItems();
+	bool									drawLara();
+	void									printDebugMessage(char* message, ...);
+	void									drawFires();
+	void									drawSparks();
+	void									drawSmokes();
+	void									drawBlood();
+	void									drawDrips();
+	void									drawBubbles();
+	void									drawSplahes();
+	bool									drawSprites();
+	bool									drawLines3D();
+	void									createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
+	void									drawShockwaves();
+	void									drawRipples();
+	void									drawUnderwaterDust();
+	void									addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
+	void									addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
+	void									addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);
 
 public:
 	Matrix									View;

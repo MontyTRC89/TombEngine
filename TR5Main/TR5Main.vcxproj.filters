@@ -597,6 +597,8 @@
     <None Include="Shaders\DX11_Items.fx" />
     <None Include="Shaders\DX11_Hairs.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
+    <None Include="Shaders\DX11_Sky.fx" />
+    <None Include="Shaders\DX11_Sprites.fx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

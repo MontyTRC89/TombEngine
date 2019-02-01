@@ -4,12 +4,11 @@ cbuffer CameraMatrixBuffer : register(b0)
 	float4x4 Projection;
 };
 
-cbuffer ItemBuffer : register(b1) 
+cbuffer StaticMatrixBuffer : register(b1)
 {
 	float4x4 World;
-	float4x4 Bones[32];
-	float4 ItemPosition;
-	float4 AmbientLight;
+	float4 StaticPosition;
+	float4 Color;
 };
 
 struct VertexShaderInput
@@ -25,36 +24,31 @@ struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
 	float3 Normal: NORMAL;
-	float3 WorldPosition : POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
 };
 
-Texture2D Texture : register(t0);
-SamplerState Sampler : register(s0);
+Texture2D Texture;
+SamplerState Sampler;
 
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
-	float4x4 world = mul(Bones[input.Bone], World);
-
-	output.Position = mul(mul(mul(float4(input.Position, 1.0f), world), View), Projection);
-	output.Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
+	output.Position = mul(mul(mul(float4(input.Position, 1.0f), World), View), Projection);
+	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
-	output.WorldPosition = (mul(float4(input.Position, 1.0f), world));
 
 	return output;
 }
 
-[earlydepthstencil]
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
 	clip(output.w - 0.5f);
+	output.xyz = output.xyz * Color;
+	output.w = 1.0f;
 
-	output.xyz *= AmbientLight.xyz * 1.0f;
-	
 	return output;
 }

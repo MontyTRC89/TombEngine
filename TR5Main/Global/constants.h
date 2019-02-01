@@ -38,6 +38,7 @@
 #define MAX_LIGHTS			100
 #define MAX_STATICS			1000
 #define MAX_BONES			32
+#define MAX_SPRITES			16384
 
 #define NO_ROOM				0xFF
 #define NO_HEIGHT			(-0x7F00)
