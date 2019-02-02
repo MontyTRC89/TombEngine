@@ -712,16 +712,22 @@ bool Renderer11::drawHorizonAndSky()
 	return true;
 }
 
-bool Renderer11::drawRooms()
+bool Renderer11::drawRooms(bool transparent, bool animated)
 {
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	// Set vertex buffer
-	m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
-	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	__int32 firstBucket = (transparent ? 2 : 0);
+	__int32 lastBucket = (transparent ? 4 : 2);
+
+	if (!animated)
+	{
+		// Set vertex buffer
+		m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	}
 
 	// Set shaders
 	m_context->VSSetShader(m_vsRooms, NULL, 0);
@@ -739,6 +745,9 @@ bool Renderer11::drawRooms()
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	 
+	if (animated)
+		m_primitiveBatch->Begin();
+
 	for (__int32 i = 0; i < m_roomsToDraw.Size(); i++)
 	{ 
 		RendererRoom* room = m_roomsToDraw[i];
@@ -749,26 +758,56 @@ bool Renderer11::drawRooms()
 		updateConstantBuffer(m_cbRoomLights, &m_stRoomLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(1, 1, &m_cbRoomLights);
 
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		for (__int32 j = firstBucket; j < lastBucket; j++)
 		{
-			RendererBucket* bucket = &room->Buckets[j];
+			if (!animated)
+			{
+				RendererBucket* bucket = &room->Buckets[j];
 
-			if (bucket->Vertices.size() == 0)
-				continue;
+				if (bucket->Vertices.size() == 0)
+					continue;
 
-			// Draw vertices
-			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			m_numDrawCalls++;
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+			else
+			{
+				RendererBucket* bucket = &room->AnimatedBuckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+				
+				for (__int32 k = 0; k < bucket->Polygons.size(); k++)
+				{
+					RendererPolygon* poly = &bucket->Polygons[k];
+					if (poly->Shape == SHAPE_RECTANGLE)
+					{
+						m_primitiveBatch->DrawQuad(bucket->Vertices[poly->Indices[0]], bucket->Vertices[poly->Indices[1]],
+							bucket->Vertices[poly->Indices[2]], bucket->Vertices[poly->Indices[3]]);
+					}
+					else
+					{
+						m_primitiveBatch->DrawTriangle(bucket->Vertices[poly->Indices[0]], bucket->Vertices[poly->Indices[1]],
+							bucket->Vertices[poly->Indices[2]]);
+					}
+				}
+			}
 		}
 	}
+
+	if (animated)
+		m_primitiveBatch->End();
 
 	return true;
 }
 
-bool Renderer11::drawStatics()
+bool Renderer11::drawStatics(bool transparent)
 {
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
+
+	__int32 firstBucket = (transparent ? 2 : 0);
+	__int32 lastBucket = (transparent ? 4 : 2);
 
 	m_context->IASetVertexBuffers(0, 1, &m_staticsVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -804,7 +843,7 @@ bool Renderer11::drawStatics()
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		for (__int32 j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -820,13 +859,19 @@ bool Renderer11::drawStatics()
 	return true;
 }
 
-bool Renderer11::drawItems()
+bool Renderer11::drawItems(bool transparent, bool animated)
 {
+	__int32 firstBucket = (transparent ? 2 : 0);
+	__int32 lastBucket = (transparent ? 4 : 2);
+
 	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
 		RendererRoom* room = m_rooms[item->Item->roomNumber];
 		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+
+		if (moveableObj->DoNotDraw)
+			continue;
 
 		m_stItem.World = item->World.Transpose();
 		m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
@@ -839,7 +884,7 @@ bool Renderer11::drawItems()
 		{
 			RendererMesh* mesh = moveableObj->ObjectMeshes[k];
 
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			for (__int32 j = firstBucket; j < lastBucket; j++)
 			{
 				RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -856,10 +901,13 @@ bool Renderer11::drawItems()
 	return true;
 }
 
-bool Renderer11::drawLara()
+bool Renderer11::drawLara(bool transparent)
 {
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
+
+	__int32 firstBucket = (transparent ? 2 : 0);
+	__int32 lastBucket = (transparent ? 4 : 2);
 
 	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -896,9 +944,9 @@ bool Renderer11::drawLara()
 
 	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
-		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
+		RendererMesh* mesh = m_meshPointersToMesh[Lara.meshPtrs[k]];
 
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		for (__int32 j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -919,7 +967,7 @@ bool Renderer11::drawLara()
 		{
 			RendererMesh* mesh = laraSkinJoints->ObjectMeshes[k];
 
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			for (__int32 j = firstBucket; j < lastBucket; j++)
 			{
 				RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -933,20 +981,23 @@ bool Renderer11::drawLara()
 		}
 	}
 
-	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	if (!transparent)
 	{
-		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
-
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 		{
-			RendererBucket* bucket = &mesh->Buckets[j];
+			RendererMesh* mesh = laraSkin->ObjectMeshes[k];
 
-			if (bucket->Vertices.size() == 0)
-				continue;
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket* bucket = &mesh->Buckets[j];
 
-			// Draw vertices
-			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-			m_numDrawCalls++;
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
 		}
 	}
 
@@ -977,6 +1028,10 @@ bool Renderer11::drawScene(bool dump)
 	updateItemsAnimations();
 	updateEffects();
 
+	// Update animated textures every 2 frames
+	if (GnFrameCounter % 2 == 0)
+		updateAnimatedTextures();
+
 	auto time2 = chrono::high_resolution_clock::now();
 	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
@@ -999,10 +1054,28 @@ bool Renderer11::drawScene(bool dump)
 
 	// Draw stuff
 	drawHorizonAndSky();
-	drawRooms();
-	drawStatics();
-	drawLara();
-	drawItems();
+
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	
+	drawRooms(false, false);
+	drawRooms(false, true);
+	drawStatics(false);
+	drawLara(false);
+	drawItems(false, false);
+	drawItems(false, true);
+
+	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+	drawRooms(true, false);
+	drawRooms(true, true);
+	drawStatics(true);
+	drawLara(true);
+	drawItems(true, false);
+	drawItems(true, true);
+
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	// Draw sprites
 	drawFires();
@@ -1055,6 +1128,8 @@ bool Renderer11::drawScene(bool dump)
 
 	m_currentY = 10;
 
+	ROOM_INFO* r = &Rooms[LaraItem->roomNumber];
+
 	printDebugMessage("Update time: %d", m_timeUpdate);
 	printDebugMessage("Frame time: %d", m_timeFrame);
 	printDebugMessage("Draw calls: %d", m_numDrawCalls);
@@ -1064,7 +1139,8 @@ bool Renderer11::drawScene(bool dump)
 	printDebugMessage("Lights: %d", m_lightsToDraw.Size());
 	printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
 	printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	
+	printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
+
 	drawAllStrings();
 
 	m_swapChain->Present(0, 0);
@@ -1199,11 +1275,6 @@ bool Renderer11::drawAllStrings()
 
 bool Renderer11::PrepareDataForTheRenderer()
 {
-	// Step 0: prepare animated textures
-	__int16 numSets = *AnimatedTextureRanges;
-	__int16* animatedPtr = AnimatedTextureRanges;
-	animatedPtr++;
-
 	m_moveableObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_OBJECTS);
 	ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * NUM_OBJECTS);
 
@@ -1215,12 +1286,23 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	m_rooms = (RendererRoom**)malloc(sizeof(RendererRoom*) * 1024);
 	ZeroMemory(m_rooms, sizeof(RendererRoom*) * 1024);
+
+	// Step 0: prepare animated textures
+	__int16 numSets = *AnimatedTextureRanges;
+	__int16* animatedPtr = AnimatedTextureRanges;
+	animatedPtr++;
 	
+	m_animatedTextureSets = (RendererAnimatedTextureSet**)malloc(sizeof(RendererAnimatedTextureSet*) * numSets);
+	m_numAnimatedTextureSets = numSets;
+
 	for (__int32 i = 0; i < numSets; i++)
 	{
 		RendererAnimatedTextureSet* set = new RendererAnimatedTextureSet();
 		__int16 numTextures = *animatedPtr + 1;
 		animatedPtr++;
+
+		set->Textures = (RendererAnimatedTexture**)malloc(sizeof(RendererAnimatedTexture) * numTextures);
+		set->NumTextures = numTextures;
 
 		for (__int32 j = 0; j < numTextures; j++)
 		{
@@ -1241,10 +1323,10 @@ bool Renderer11::PrepareDataForTheRenderer()
 				newTexture->UV[k] = Vector2(x, y);
 			}
 
-			set->Textures.push_back(newTexture);
+			set->Textures[j] = newTexture;
 		}
 
-		m_animatedTextureSets.push_back(set);
+		m_animatedTextureSets[i] = set;
 	}
 
 	// Step 1: create the texture atlas
@@ -2194,10 +2276,10 @@ ID3D11Buffer* Renderer11::createConstantBuffer(__int32 size)
 
 __int32 Renderer11::getAnimatedTextureInfo(__int16 textureId)
 {
-	for (__int32 i = 0; i < m_animatedTextureSets.size(); i++)
+	for (__int32 i = 0; i < m_numAnimatedTextureSets; i++)
 	{
 		RendererAnimatedTextureSet* set = m_animatedTextureSets[i];
-		for (__int32 j = 0; j < set->Textures.size(); j++)
+		for (__int32 j = 0; j < set->NumTextures; j++)
 		{
 			if (set->Textures[j]->Id == textureId)
 				return i;
@@ -2688,20 +2770,51 @@ inline void Renderer11::collectLights(__int16 roomNumber)
 	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
-		if (sphereBoxIntersection(Vector3(r->x, r->RoomYBottom, r->z),
-			Vector3(r->x + r->xSize * WALL_SIZE, r->RoomYTop, r->z + r->ySize*WALL_SIZE),
-			Vector3(light->Position.x, light->Position.y, light->Position.z), light->Out))
-		{
+
+		float left = r->x + WALL_SIZE;
+		float bottom = r->z + WALL_SIZE;
+		float right = r->x + (r->xSize - 1) * WALL_SIZE;
+		float top = r->z + (r->ySize - 1) * WALL_SIZE;
+
+		float closestX = light->Position.x;
+		if (closestX < left)
+			closestX = left;
+		else if (closestX > right)
+			closestX = right;
+
+		float closestZ = light->Position.z;
+		if (closestZ < bottom)
+			closestZ = bottom;
+		else if (closestZ > top)
+			closestZ = top;
+
+		// Calculate the distance between the circle's center and this closest point
+		float distanceX = light->Position.x - closestX;
+		float distanceY = light->Position.z - closestZ;
+
+		// If the distance is less than the circle's radius, an intersection occurs
+		float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+		if (distanceSquared < SQUARE(light->Out))
 			room->LightsToDraw.Add(light);
-		}
 	}
 }
 
 bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
 {
-	Vector3 closestPointInAabb = Vector3::Min(Vector3::Max(sphereCentre, boxMin), boxMax);
-	double distanceSquared = (closestPointInAabb - sphereCentre).LengthSquared();
-	return (distanceSquared < (sphereRadius * sphereRadius));
+	//Vector3 closestPointInAabb = Vector3::Min(Vector3::Max(sphereCentre, boxMin), boxMax);
+	//double distanceSquared = (closestPointInAabb - sphereCentre).LengthSquared();
+	//return (distanceSquared < (sphereRadius * sphereRadius));
+
+	/*float x = max(boxMin.x, min(sphereCentre.x, boxMax.x));
+	float y = max(boxMin.y, min(sphereCentre.y, boxMax.y));
+	float z = max(boxMin.z, min(sphereCentre.z, boxMax.z));
+
+	float distance = sqrt((x - sphereCentre.x) * (x - sphereCentre.x) +
+		(y - sphereCentre.y) * (y - sphereCentre.y) +
+		(z - sphereCentre.z) * (z - sphereCentre.z));
+
+	return (distance < sphereRadius);*/
+	return 0;
 }
 
 void Renderer11::prepareLights()
@@ -3573,11 +3686,10 @@ void Renderer11::printDebugMessage(char* message, ...)
 {
 	char buffer[255];
 	ZeroMemory(buffer, 255);
-	sprintf(buffer, "Update time: %d", m_timeUpdate);
 
 	va_list args;
 	va_start(args, message);
-	sprintf(buffer, message, args);
+	_vsprintf_l(buffer, message, NULL, args);
 	va_end(args);
 
 	PrintString(10, m_currentY, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
@@ -4218,4 +4330,52 @@ void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector
 	out->_41 = particlePos->x;
 	out->_42 = particlePos->y;
 	out->_43 = particlePos->z;
+}
+
+void Renderer11::updateAnimatedTextures()
+{
+	for (__int32 i = 0; i < NumberRooms; i++)
+	{
+		RendererRoom* room = m_rooms[i];
+		if (room == NULL)
+			continue;
+
+		for (__int32 bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++)
+		{
+			RendererBucket* bucket = &room->AnimatedBuckets[bucketIndex];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			for (__int32 p = 0; p < bucket->Polygons.size(); p++)
+			{
+				RendererPolygon* polygon = &bucket->Polygons[p];
+				RendererAnimatedTextureSet* set = m_animatedTextureSets[polygon->AnimatedSet];
+				__int32 textureIndex = -1;
+				for (__int32 j = 0; j < set->NumTextures; j++)
+				{
+					if (set->Textures[j]->Id == polygon->TextureId)
+					{
+						textureIndex = j;
+						break;
+					}
+				}
+				if (textureIndex == -1)
+					continue;
+
+				if (textureIndex == set->NumTextures - 1)
+					textureIndex = 0;
+				else
+					textureIndex++;
+
+				polygon->TextureId = set->Textures[textureIndex]->Id;
+
+				for (__int32 v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
+				{
+					bucket->Vertices[polygon->Indices[v]].UV.x = set->Textures[textureIndex]->UV[v].x;
+					bucket->Vertices[polygon->Indices[v]].UV.y = set->Textures[textureIndex]->UV[v].y;
+				}
+			}
+		}
+	}
 }

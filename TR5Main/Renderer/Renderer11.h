@@ -486,7 +486,8 @@ struct RendererAnimatedTexture
 
 struct RendererAnimatedTextureSet 
 {
-	vector<RendererAnimatedTexture*> Textures;
+	__int32 NumTextures;
+	RendererAnimatedTexture** Textures;
 };
 
 struct RendererBucket
@@ -685,7 +686,6 @@ private:
 	// Level data
 	Texture2D*										m_textureAtlas;
 	Texture2D*										m_skyTexture;
-	vector<RendererAnimatedTextureSet*>				m_animatedTextureSets;
 	VertexBuffer*									m_roomsVertexBuffer;
 	IndexBuffer*									m_roomsIndexBuffer;
 	VertexBuffer*									m_moveablesVertexBuffer;
@@ -720,6 +720,8 @@ private:
 	RendererSpriteSequence**						m_spriteSequences;
 	unordered_map<__int16*, RendererMesh*>			m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
+	RendererAnimatedTextureSet**					m_animatedTextureSets;
+	__int32											m_numAnimatedTextureSets;
 
 	// Debug variables
 	__int32											m_numDrawCalls = 0;
@@ -771,10 +773,10 @@ private:
 	bool									drawAmbientCubeMap(__int16 roomNumber);
 	bool									sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius);
 	bool									drawHorizonAndSky();
-	bool									drawRooms();
-	bool									drawStatics();
-	bool									drawItems();
-	bool									drawLara();
+	bool									drawRooms(bool transparent, bool animated);
+	bool									drawStatics(bool transparent);
+	bool									drawItems(bool transparent, bool animated);
+	bool									drawLara(bool transparent);
 	void									printDebugMessage(char* message, ...);
 	void									drawFires();
 	void									drawSparks();
@@ -785,6 +787,7 @@ private:
 	void									drawSplahes();
 	bool									drawSprites();
 	bool									drawLines3D();
+	void									updateAnimatedTextures();
 	void									createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
 	void									drawShockwaves();
 	void									drawRipples();
