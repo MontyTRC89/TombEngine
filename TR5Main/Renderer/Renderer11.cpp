@@ -2,6 +2,8 @@
 
 #include "..\Game\camera.h"
 #include "..\Game\draw.h"
+#include "..\Game\effects.h"
+#include "..\Game\effect2.h"
 #include "..\Global\global.h"
 #include "..\Specific\config.h"
 #include "..\Scripting\GameFlowScript.h"
@@ -284,6 +286,14 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 
 	m_psSprites = compilePixelShader("Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", &blob);
 	if (m_psSprites == NULL)
+		return false;
+
+	m_vsSolid = compileVertexShader("Shaders\\DX11_Solid.fx", "VS", "vs_4_0", &blob);
+	if (m_vsSolid == NULL)
+		return false;
+
+	m_psSolid = compilePixelShader("Shaders\\DX11_Solid.fx", "PS", "ps_4_0", &blob);
+	if (m_psSolid == NULL)
 		return false;
 
 	// Initialise constant buffers
@@ -1089,7 +1099,10 @@ bool Renderer11::drawScene(bool dump)
 	drawSplahes();
 	drawShockwaves();
 
+	doRain();
+
 	drawSprites();
+	drawLines3D();
 
 	/*
 
@@ -4378,4 +4391,123 @@ void Renderer11::updateAnimatedTextures()
 			}
 		}
 	}
+}
+
+bool Renderer11::drawLines3D()
+{
+	m_context->RSSetState(m_states->CullNone());
+	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+	
+	m_context->VSSetShader(m_vsSolid, NULL, 0);
+	m_context->PSSetShader(m_psSolid, NULL, 0);
+
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+
+	m_primitiveBatch->Begin();
+
+	for (__int32 i = 0; i < m_lines3DToDraw.Size(); i++)
+	{
+		RendererLine3DToDraw* line = m_lines3DToDraw[i];
+
+		RendererVertex v1;
+		v1.Position.x = line->X1;
+		v1.Position.y = line->Y1;
+		v1.Position.z = line->Z1;
+		v1.Color.x = line->R / 255.0f;
+		v1.Color.y = line->G / 255.0f;
+		v1.Color.z = line->B / 255.0f;
+		v1.Color.w = 1.0f;
+
+		RendererVertex v2;
+		v2.Position.x = line->X2;
+		v2.Position.y = line->Y2;
+		v2.Position.z = line->Z2;
+		v2.Color.x = line->R / 255.0f;
+		v2.Color.y = line->G / 255.0f;
+		v2.Color.z = line->B / 255.0f;
+		v2.Color.w = 1.0f;
+
+		m_primitiveBatch->DrawLine(v1, v2);
+	}
+
+	m_primitiveBatch->End();
+
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	return true;
+}
+
+bool Renderer11::doRain()
+{
+	if (m_firstWeather)
+	{
+		for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+			m_rain[i].Reset = true;
+	}
+
+	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+	{
+		RendererWeatherParticle* drop = &m_rain[i];
+
+		if (drop->Reset)
+		{
+			drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT);
+			drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+
+			// Check if in inside room
+			__int16 roomNumber = Camera.pos.roomNumber;
+			FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+			ROOM_INFO* room = &Rooms[roomNumber];
+			if (!(room->flags & ENV_FLAG_OUTSIDE))
+			{
+				drop->Reset = true;
+				continue;
+			}
+
+			drop->Size = RAIN_SIZE + (rand() % 64);
+			drop->AngleH = (rand() % RAIN_MAX_ANGLE_H) * RADIAN;
+			drop->AngleV = (rand() % RAIN_MAX_ANGLE_V) * RADIAN;
+			drop->Reset = false;
+		}
+
+		float x1 = drop->X;
+		float y1 = drop->Y;
+		float z1 = drop->Z;
+
+		float radius = drop->Size * sin(drop->AngleV);
+
+		float dx = sin(drop->AngleH) * radius;
+		float dy = drop->Size * cos(drop->AngleV);
+		float dz = cos(drop->AngleH) * radius;
+
+		drop->X += dx;
+		drop->Y += RAIN_DELTA_Y;
+		drop->Z += dz;
+
+		addLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
+
+		// If rain drop has hit the ground, then reset it and add a little drip
+		__int16 roomNumber = Camera.pos.roomNumber;
+		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+		ROOM_INFO* room = &Rooms[roomNumber];
+		if (drop->Y >= room->y + room->minfloor)
+		{
+			drop->Reset = true;
+			AddWaterSparks(drop->X, room->y + room->minfloor, drop->Z, 1);
+		}
+	}
+
+	m_firstWeather = false;
+
+	return true;
 }

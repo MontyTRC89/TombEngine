@@ -215,7 +215,7 @@ bool GameFlow::DoGameflow()
 	SaveGameHeader header;
 
 	// DEBUG: test
-	CurrentLevel = 4;
+	CurrentLevel = 3;
 	SelectedLevelForNewGame = 0;
 	gfInitialiseGame = true;
 	DoLevel(CurrentLevel, 126, false);

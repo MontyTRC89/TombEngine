@@ -614,6 +614,22 @@ struct RendererLine3DToDraw {
 	byte B;
 };
 
+struct RendererWeatherParticle {
+	float X, Y, Z;
+	float AngleH;
+	float AngleV;
+	float Size;
+	__int16 Room;
+	bool Reset;
+};
+
+struct RendererUnderwaterDustParticle {
+	float X, Y, Z;
+	__int16 Life;
+	__int16 Room;
+	bool Reset;
+};
+
 class Renderer11
 {
 private:
@@ -660,6 +676,8 @@ private:
 	ID3D11PixelShader*						m_psSky;
 	ID3D11VertexShader*						m_vsSprites;
 	ID3D11PixelShader*						m_psSprites;
+	ID3D11VertexShader*						m_vsSolid;
+	ID3D11PixelShader*						m_psSolid;
 
 	// Constant buffers
 	CCameraMatrixBuffer						m_stCameraMatrices;
@@ -740,6 +758,11 @@ private:
 	__int32											m_timeDraw;
 	__int32											m_timeFrame;
 
+	// Others
+	bool											m_firstWeather;
+	RendererWeatherParticle							m_rain[NUM_RAIN_DROPS];
+	RendererWeatherParticle							m_snow[NUM_SNOW_PARTICLES];
+
 	// Private functions
 	bool									drawScene(bool dump);
 	bool									drawAllStrings();
@@ -791,7 +814,9 @@ private:
 	void									createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
 	void									drawShockwaves();
 	void									drawRipples();
-	void									drawUnderwaterDust();
+	void									drawUnderwaterDust();	
+	bool									doRain();
+	bool									doSnow();
 	void									addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void									addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void									addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);
