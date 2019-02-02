@@ -600,6 +600,7 @@
     <None Include="Shaders\DX11_Sky.fx" />
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Solid.fx" />
+    <None Include="Shaders\DX11_Inventory.fx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

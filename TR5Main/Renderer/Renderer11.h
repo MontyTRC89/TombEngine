@@ -602,7 +602,7 @@ struct RendererSpriteToDraw {
 	BLEND_MODES BlendMode;
 };
 
-struct RendererLine3DToDraw {
+struct RendererLine3D {
 	float X1;
 	float Y1;
 	float Z1;
@@ -628,6 +628,11 @@ struct RendererUnderwaterDustParticle {
 	__int16 Life;
 	__int16 Room;
 	bool Reset;
+};
+
+struct RendererLine2D {
+	Vector2 Vertices[2];
+	Vector4 Color;
 };
 
 class Renderer11
@@ -678,6 +683,8 @@ private:
 	ID3D11PixelShader*						m_psSprites;
 	ID3D11VertexShader*						m_vsSolid;
 	ID3D11PixelShader*						m_psSolid;
+	ID3D11VertexShader*						m_vsInventory;
+	ID3D11PixelShader*						m_psInventory;
 
 	// Constant buffers
 	CCameraMatrixBuffer						m_stCameraMatrices;
@@ -726,11 +733,14 @@ private:
 	PreallocatedVector<RendererLight>				m_lightsToDraw;
 	PreallocatedVector<RendererLight>				m_dynamicLights;
 	PreallocatedVector<RendererSpriteToDraw>		m_spritesToDraw;
-	PreallocatedVector<RendererLine3DToDraw>		m_lines3DToDraw;
+	PreallocatedVector<RendererLine3D>				m_lines3DToDraw;
+	PreallocatedVector<RendererLine2D>				m_lines2DToDraw;
 	RendererSpriteToDraw*							m_spritesBuffer;
 	__int32											m_nextSprite;
-	RendererLine3DToDraw*							m_lines3DBuffer;
+	RendererLine3D*									m_lines3DBuffer;
 	__int32											m_nextLine3D;
+	RendererLine2D*									m_lines2DBuffer;
+	__int32											m_nextLine2D;
 	RendererLight*									m_shadowLight;
 	RendererObject**								m_moveableObjects;
 	RendererObject**								m_staticObjects;
@@ -810,6 +820,12 @@ private:
 	void									drawSplahes();
 	bool									drawSprites();
 	bool									drawLines3D();
+	void									drawRopes();
+	bool									drawBats();
+	bool									drawRats();
+	bool									drawSpiders();
+	bool									drawDebris();
+	__int32									drawInventoryScene();
 	void									updateAnimatedTextures();
 	void									createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
 	void									drawShockwaves();
@@ -817,6 +833,7 @@ private:
 	void									drawUnderwaterDust();	
 	bool									doRain();
 	bool									doSnow();
+
 	void									addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void									addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void									addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);

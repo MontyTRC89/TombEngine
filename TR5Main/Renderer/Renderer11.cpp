@@ -1,13 +1,21 @@
 #include "Renderer11.h"
 
-#include "..\Game\camera.h"
-#include "..\Game\draw.h"
-#include "..\Game\effects.h"
-#include "..\Game\effect2.h"
-#include "..\Global\global.h"
-#include "..\Specific\config.h"
-#include "..\Scripting\GameFlowScript.h"
+#include "..\Specific\input.h"
+#include "..\Specific\winmain.h"
 #include "..\Specific\roomload.h"
+#include "..\Specific\game.h"
+#include "..\Specific\config.h"
+
+#include "..\Game\draw.h"
+#include "..\Game\healt.h"
+#include "..\Game\pickup.h"
+#include "..\Game\inventory.h"
+#include "..\Game\gameflow.h"
+#include "..\Game\lara.h"
+#include "..\Game\effect2.h"
+#include "..\Game\rope.h"
+#include "..\Game\items.h"
+#include "..\Game\camera.h"
 
 #include <D3Dcompiler.h>
 #include <chrono> 
@@ -19,6 +27,7 @@ using get_time = chrono::steady_clock;
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 extern __int32 NumTextureTiles;
+extern Inventory* g_Inventory;
 
 __int32 SortLightsFunction(RendererLight* a, RendererLight* b)
 {
@@ -294,6 +303,14 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 
 	m_psSolid = compilePixelShader("Shaders\\DX11_Solid.fx", "PS", "ps_4_0", &blob);
 	if (m_psSolid == NULL)
+		return false;
+
+	m_vsInventory = compileVertexShader("Shaders\\DX11_Inventory.fx", "VS", "vs_4_0", &blob);
+	if (m_vsInventory == NULL)
+		return false;
+
+	m_psInventory = compilePixelShader("Shaders\\DX11_Inventory.fx", "PS", "ps_4_0", &blob);
+	if (m_psInventory == NULL)
 		return false;
 
 	// Initialise constant buffers
@@ -1026,6 +1043,8 @@ bool Renderer11::drawScene(bool dump)
 
 	m_strings.clear();
 
+	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+
 	ViewProjection = View * Projection;
 
 	// Prepare the scene to draw
@@ -1099,7 +1118,11 @@ bool Renderer11::drawScene(bool dump)
 	drawSplahes();
 	drawShockwaves();
 
-	doRain();
+	// Do weather
+	if (level->Rain)
+		doRain();
+	else if (level->Snow)
+		doSnow();
 
 	drawSprites();
 	drawLines3D();
@@ -1164,12 +1187,12 @@ bool Renderer11::drawScene(bool dump)
 __int32 Renderer11::DumpGameScene()
 {
 	drawScene(true);
-	return 0;
+	return 0; 
 }
 
 __int32 Renderer11::DrawInventory()
 {
-	return 0;
+	return drawInventoryScene();
 }
 
 __int32 Renderer11::DrawPickup(__int16 objectNum)
@@ -2083,8 +2106,10 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_staticsToDraw.Reserve(16384);
 	m_spritesToDraw.Reserve(MAX_SPRITES);
 	m_lines3DToDraw.Reserve(MAX_LINES_3D);
+	m_lines2DToDraw.Reserve(MAX_LINES_2D);
 	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
-	m_lines3DBuffer = (RendererLine3DToDraw*)malloc(sizeof(RendererLine3DToDraw) * MAX_LINES_3D);
+	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
+	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
 
 	return true;
 }
@@ -3824,7 +3849,7 @@ void Renderer11::addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int
 	if (m_nextLine3D >= MAX_LINES_3D)
 		return;
 
-	RendererLine3DToDraw* line = &m_lines3DBuffer[m_nextLine3D++];
+	RendererLine3D* line = &m_lines3DBuffer[m_nextLine3D++];
 
 	line->X1 = x1;
 	line->Y1 = y1;
@@ -4414,7 +4439,7 @@ bool Renderer11::drawLines3D()
 
 	for (__int32 i = 0; i < m_lines3DToDraw.Size(); i++)
 	{
-		RendererLine3DToDraw* line = m_lines3DToDraw[i];
+		RendererLine3D* line = m_lines3DToDraw[i];
 
 		RendererVertex v1;
 		v1.Position.x = line->X1;
@@ -4510,4 +4535,840 @@ bool Renderer11::doRain()
 	m_firstWeather = false;
 
 	return true;
+}
+
+bool Renderer11::doSnow()
+{
+	if (m_firstWeather)
+	{
+		for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
+			m_snow[i].Reset = true;
+	}
+
+	for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
+	{
+		RendererWeatherParticle* snow = &m_snow[i];
+
+		if (snow->Reset)
+		{
+			snow->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+			snow->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
+			snow->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
+
+			// Check if in inside room
+			__int16 roomNumber = Camera.pos.roomNumber;
+			FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
+			ROOM_INFO* room = &Rooms[roomNumber];
+			if (!(room->flags & ENV_FLAG_OUTSIDE))
+				continue;
+
+			snow->Size = SNOW_DELTA_Y + (rand() % 64);
+			snow->AngleH = (rand() % SNOW_MAX_ANGLE_H) * RADIAN;
+			snow->AngleV = (rand() % SNOW_MAX_ANGLE_V) * RADIAN;
+			snow->Reset = false;
+		}
+
+		float radius = snow->Size * sin(snow->AngleV);
+
+		float dx = sin(snow->AngleH) * radius;
+		float dz = cos(snow->AngleH) * radius;
+
+		snow->X += dx;
+		snow->Y += SNOW_DELTA_Y;
+		snow->Z += dz;
+
+		if (snow->X <= 0 || snow->Z <= 0 || snow->X >= 100 * 1024.0f || snow->Z >= 100 * 1024.0f)
+		{
+			snow->Reset = true;
+			continue;
+		}
+
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
+			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
+			BLENDMODE_ALPHABLEND);
+
+		__int16 roomNumber = Camera.pos.roomNumber;
+		FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
+		ROOM_INFO* room = &Rooms[roomNumber];
+		if (snow->Y >= room->y + room->minfloor)
+			snow->Reset = true;
+	}
+
+	m_firstWeather = false;
+
+	return true;
+}
+
+bool Renderer11::drawDebris()
+{
+	UINT cPasses = 1;
+
+	// First collect debrises
+	vector<RendererVertex> vertices;
+
+	for (__int32 i = 0; i < NUM_DEBRIS; i++)
+	{
+		DEBRIS_STRUCT* debris = &Debris[i];
+
+		if (debris->On)
+		{
+			Matrix translation = Matrix::CreateTranslation(debris->x, debris->y, debris->z);
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD (debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
+			Matrix world = rotation * translation;
+
+			OBJECT_TEXTURE* texture = &ObjectTextures[(__int32)(debris->textInfo) & 0x7FFF];
+			__int32 tile = texture->tileAndFlag & 0x7FFF;
+
+			/*// Draw only debris of the current bucket
+			if (texture->attribute == 0 &&
+				bucketIndex != RENDERER_BUCKET_SOLID && bucketIndex != RENDERER_BUCKET_SOLID_DS
+				||
+				texture->attribute == 1 &&
+				bucketIndex != RENDERER_BUCKET_ALPHA_TEST && bucketIndex != RENDERER_BUCKET_ALPHA_TEST_DS
+				||
+				texture->attribute == 2 &&
+				bucketIndex != RENDERER_BUCKET_TRANSPARENT && bucketIndex != RENDERER_BUCKET_TRANSPARENT_DS
+				)
+				continue;
+
+			RendererVertex vertex;
+
+			// Prepare the triangle
+			Vector3 p = Vector3(debris->XYZOffsets1[0], debris->XYZOffsets1[1], debris->XYZOffsets1[2]);
+			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
+			vertex.x = p.x;
+			vertex.y = p.y;
+			vertex.z = p.z;
+			vertex.u = (texture->vertices[0].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.v = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.r = debris->Pad[2] / 255.0f;
+			vertex.g = debris->Pad[3] / 255.0f;
+			vertex.b = debris->Pad[4] / 255.0f;
+			vertices.push_back(vertex);
+
+			p = Vector3(debris->XYZOffsets2[0], debris->XYZOffsets2[1], debris->XYZOffsets2[2]);
+			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
+			vertex.x = p.x;
+			vertex.y = p.y;
+			vertex.z = p.z;
+			vertex.u = (texture->vertices[1].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.v = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.r = debris->Pad[6] / 255.0f;
+			vertex.g = debris->Pad[7] / 255.0f;
+			vertex.b = debris->Pad[8] / 255.0f;
+			vertices.push_back(vertex);
+
+			p = Vector3(debris->XYZOffsets3[0], debris->XYZOffsets3[1], debris->XYZOffsets3[2]);
+			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
+			vertex.x = p.x;
+			vertex.y = p.y;
+			vertex.z = p.z;
+			vertex.u = (texture->vertices[2].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.v = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.r = debris->Pad[10] / 255.0f;
+			vertex.g = debris->Pad[11] / 255.0f;
+			vertex.b = debris->Pad[12] / 255.0f;
+			vertices.push_back(vertex);*/
+		}
+	}
+
+	// Check if no debris have to be drawn
+	/*if (vertices.size() == 0)
+		return true;
+
+	setGpuStateForBucket(bucketIndex);
+
+	LPD3DXEFFECT effect;
+	if (pass == RENDERER_PASS_SHADOW_MAP)
+		effect = m_shaderDepth->GetEffect();
+	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
+		effect = m_shaderReconstructZBuffer->GetEffect();
+	else if (pass == RENDERER_PASS_GBUFFER)
+		effect = m_shaderFillGBuffer->GetEffect();
+	else
+		effect = m_shaderTransparent->GetEffect();
+
+	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_STATIC);
+
+	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
+	else
+		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
+
+	XMMATRIXIdentity(&m_tempWorld);
+	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+	for (int iPass = 0; iPass < cPasses; iPass++)
+	{
+		effect->BeginPass(iPass);
+		effect->CommitChanges();
+
+		m_device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, vertices.size() / 3, &vertices[0], sizeof(RendererVertex));
+
+		effect->EndPass();
+	}*/
+
+	return true;
+}
+
+bool Renderer11::drawBats()
+{
+	/*UINT cPasses = 1;
+
+	if (Objects[ID_BATS].loaded)
+	{
+		OBJECT_INFO* obj = &Objects[ID_BATS];
+		RendererObject* moveableObj = m_moveableObjects[ID_BATS];
+		__int16* meshPtr = Meshes[Objects[ID_BATS].meshIndex + 2 * (-GlobalCounter & 3)];
+		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+
+		for (__int32 m = 0; m < 32; m++)
+			memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+
+		for (__int32 b = 0; b < 2; b++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[b];
+
+			if (bucket->NumVertices == 0)
+				continue;
+
+			for (__int32 i = 0; i < 64; i++)
+			{
+				BAT_STRUCT* bat = &Bats[i];
+
+				if (bat->on)
+				{
+					Matrix translation = Matrix::CreateTranslation(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
+					Matrix world = rotation * translation;
+
+					m_stItem.World = world;
+					m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
+					m_stItem.AmbientLight = m_rooms[bat->roomNumber]->AmbientLight;
+					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+
+					for (int iPass = 0; iPass < cPasses; iPass++)
+					{
+						effect->BeginPass(iPass);
+						effect->CommitChanges();
+
+						drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+						effect->EndPass();
+					}
+				}
+			}
+		}
+		
+
+
+		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
+
+		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
+		else
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
+
+		for (__int32 i = 0; i < 64; i++)
+		{
+			BAT_STRUCT* bat = &Bats[i];
+
+			if (bat->on)
+			{
+				XMMATRIXTranslation(&m_tempTranslation, bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
+				XMMATRIXRotationYawPitchRoll(&m_tempRotation, bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
+				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[bat->roomNumber]->AmbientLight);
+
+				for (int iPass = 0; iPass < cPasses; iPass++)
+				{
+					effect->BeginPass(iPass);
+					effect->CommitChanges();
+
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+					effect->EndPass();
+				}
+			}
+		}
+	}*/
+
+	return true;
+}
+
+bool Renderer11::drawRats()
+{
+	/*XMMATRIX world;
+	UINT cPasses = 1;
+
+	if (Objects[ID_RATS].loaded)
+	{
+		OBJECT_INFO* obj = &Objects[ID_RATS];
+		RendererObject* moveableObj = m_moveableObjects[ID_RATS].get();
+
+		setGpuStateForBucket(bucketIndex);
+
+		LPD3DXEFFECT effect;
+		if (pass == RENDERER_PASS_SHADOW_MAP)
+			effect = m_shaderDepth->GetEffect();
+		else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
+			effect = m_shaderReconstructZBuffer->GetEffect();
+		else if (pass == RENDERER_PASS_GBUFFER)
+			effect = m_shaderFillGBuffer->GetEffect();
+		else
+			effect = m_shaderTransparent->GetEffect();
+
+		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
+
+		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
+		else
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
+
+		for (__int32 i = 0; i < NUM_RATS; i += 4)
+		{
+			RAT_STRUCT* rat = &Rats[i];
+
+			if (rat->on)
+			{
+				__int16* meshPtr = Meshes[Objects[ID_RATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
+				RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+				RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+
+				if (bucket->NumVertices == 0)
+					return true;
+
+				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+				m_device->SetIndices(bucket->GetIndexBuffer());
+
+				XMMATRIXTranslation(&m_tempTranslation, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
+				XMMATRIXRotationYawPitchRoll(&m_tempRotation, rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
+				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[rat->roomNumber]->AmbientLight);
+
+				for (int iPass = 0; iPass < cPasses; iPass++)
+				{
+					effect->BeginPass(iPass);
+					effect->CommitChanges();
+
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+					effect->EndPass();
+				}
+			}
+		}
+	}*/
+
+	return true;
+}
+
+bool Renderer11::drawSpiders()
+{
+	/*XMMATRIX world;
+	UINT cPasses = 1;
+
+	if (Objects[ID_SPIDER].loaded)
+	{
+		OBJECT_INFO* obj = &Objects[ID_SPIDER];
+		RendererObject* moveableObj = m_moveableObjects[ID_SPIDER].get();
+		__int16* meshPtr = Meshes[Objects[ID_SPIDER].meshIndex + ((Wibble >> 2) & 2)];
+		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+
+		if (bucket->NumVertices == 0)
+			return true;
+
+		setGpuStateForBucket(bucketIndex);
+
+		m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+		m_device->SetIndices(bucket->GetIndexBuffer());
+
+		LPD3DXEFFECT effect;
+		if (pass == RENDERER_PASS_SHADOW_MAP)
+			effect = m_shaderDepth->GetEffect();
+		else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
+			effect = m_shaderReconstructZBuffer->GetEffect();
+		else if (pass == RENDERER_PASS_GBUFFER)
+			effect = m_shaderFillGBuffer->GetEffect();
+		else
+			effect = m_shaderTransparent->GetEffect();
+
+		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
+		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
+
+		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
+		else
+			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
+
+		for (__int32 i = 0; i < NUM_SPIDERS; i++)
+		{
+			SPIDER_STRUCT* spider = &Spiders[i];
+
+			if (spider->on)
+			{
+				XMMATRIXTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
+				XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
+				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+
+				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[spider->roomNumber]->AmbientLight);
+
+				for (int iPass = 0; iPass < cPasses; iPass++)
+				{
+					effect->BeginPass(iPass);
+					effect->CommitChanges();
+
+					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+
+					effect->EndPass();
+				}
+			}
+		}
+	}*/
+
+	return true;
+}
+
+__int32 Renderer11::drawInventoryScene()
+{
+	char stringBuffer[255];
+
+	RECT rect;
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = ScreenWidth;
+	rect.bottom = ScreenHeight;
+
+	m_lines2DToDraw.Clear();
+	m_nextLine2D = 0;
+
+	// Set basic render states
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	
+	// Clear screen
+	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Bind the back buffer
+	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+	m_context->RSSetViewports(1, &m_viewport);
+
+	// Draw the full screen background
+	/*if (g_Inventory->GetType() == INV_TYPE_TITLE)
+	{
+		drawFullScreenBackground(m_titleScreen, 1.0f);
+	}
+	else
+	{
+		XMMATRIXScaling(&m_tempScale, 1.0f, 1.0f, 1.0f);
+
+		m_dxSprite->Begin(0);
+		m_dxSprite->SetTransform(&m_tempScale);
+		m_dxSprite->Draw(m_renderTarget, &rect, &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
+		m_dxSprite->End();
+	}
+
+	// Clear the Z-Buffer after drawing the background
+	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);*/
+
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	// Set vertex buffer
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	
+	// Set shaders
+	m_context->VSSetShader(m_vsInventory, NULL, 0);
+	m_context->PSSetShader(m_psInventory, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	//effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f));
+
+	__int32 activeRing = g_Inventory->GetActiveRing();
+	__int32 lastRing = 0;
+	for (__int32 k = 0; k < 3; k++)
+	{
+		InventoryRing* ring = g_Inventory->GetRing(k);
+		if (!ring->draw || ring->numObjects == 0)
+			continue;
+
+		// Inventory camera
+		if (k == g_Inventory->GetActiveRing())
+		{
+			float cameraY = -384.0f + g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET;
+			float targetY = g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET;
+
+			m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(3072.0f, cameraY, 0.0f),
+				Vector3(0.0f, targetY, 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
+			m_stCameraMatrices.Projection = Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
+				g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f).Transpose();
+
+			updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+			m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+		}
+
+		__int16 numObjects = ring->numObjects;
+		float deltaAngle = 360.0f / numObjects;
+		__int32 objectIndex = 0;
+		objectIndex = ring->currentObject;
+
+		for (__int32 i = 0; i < numObjects; i++)
+		{
+			__int16 objectNumber = g_Inventory->GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
+
+			// Calculate the inventory object position and rotation
+			float currentAngle = 0.0f;
+			__int16 steps = -objectIndex + ring->currentObject;
+			if (steps < 0) steps += numObjects;
+			currentAngle = steps * deltaAngle;
+			currentAngle += ring->movement;
+
+			if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory->GetActiveRing())
+			{
+				if (objectIndex == ring->currentObject)
+					ring->objects[objectIndex].rotation += 45 * 360 / 30;
+				else if (ring->objects[objectIndex].rotation != 0)
+					ring->objects[objectIndex].rotation += 45 * 360 / 30;
+			}
+			else if (ring->focusState != INV_FOCUS_STATE_POPUP && ring->focusState != INV_FOCUS_STATE_POPOVER)
+				g_Inventory->GetRing(k)->objects[objectIndex].rotation = 0;
+
+			if (ring->objects[objectIndex].rotation > 65536.0f)
+				ring->objects[objectIndex].rotation = 0;
+
+			__int32 x = 2048.0f * cos(currentAngle * RADIAN);
+			__int32 z = 2048.0f * sin(currentAngle * RADIAN);
+			__int32 y = lastRing * INV_RINGS_OFFSET;
+
+			// Prepare the object transform
+			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
+			Matrix translation = Matrix::CreateTranslation(x, y, z);
+			Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384));
+			Matrix transform = (scale * rotation) * translation;
+			 
+			OBJECT_INFO* obj = &Objects[objectNumber];
+			RendererObject* moveableObj = m_moveableObjects[objectNumber];
+
+			// Build the object animation matrices
+			if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
+				objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
+			{
+				__int16* framePtr[2];
+				__int32 rate = 0;
+				getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
+				updateAnimation(NULL, moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
+			}
+			else
+			{
+				if (obj->animIndex != -1)
+					updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
+			}
+
+			for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
+			{
+				RendererMesh* mesh = moveableObj->ObjectMeshes[n];
+
+				// Finish the world matrix
+				if (obj->animIndex != -1)
+					m_stItem.World = (moveableObj->AnimationTransforms[n] * transform.Transpose());
+				else
+					m_stItem.World = (transform.Transpose() * moveableObj->BindPoseTransforms[n]);
+				m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+				m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+				m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+
+				for (__int32 m = 0; m < NUM_BUCKETS; m++)
+				{
+					RendererBucket* bucket = &mesh->Buckets[m];
+					if (bucket->NumVertices == 0)
+						continue;
+
+					if (m < 2)
+						m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+					else
+						m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+
+					m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				}
+			}
+
+			__int16 inventoryItem = ring->objects[objectIndex].inventoryObject;
+
+			// Draw special stuff if needed
+			if (objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
+			{
+				if (g_Inventory->GetActiveRing() == INV_RING_OPTIONS)
+				{
+					if (inventoryItem == INV_OBJECT_PASSAPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					{
+						// Draw savegames menu
+						if (ring->passportAction == INV_WHAT_PASSPORT_LOAD_GAME || ring->passportAction == INV_WHAT_PASSPORT_SAVE_GAME)
+						{
+							__int16 lastY = 44;
+
+							for (__int32 n = 0; n < MAX_SAVEGAMES; n++)
+							{
+								if (!g_NewSavegameInfos[i].Present)
+									PrintString(400, lastY, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
+										PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
+								else
+								{
+									sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n].Count);
+									PrintString(20, lastY, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
+										(ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+
+									PrintString(100, lastY, (char*)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
+										(ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+
+									sprintf(stringBuffer, g_GameFlow->GetString(44), g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
+									PrintString(600, lastY, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+										PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
+								}
+
+								lastY += 24;
+							}
+						}
+						else if (ring->passportAction == INV_WHAT_PASSPORT_SELECT_LEVEL)
+						{
+							__int16 lastY = 44;
+
+							for (__int32 n = 1; n < g_GameFlow->GetNumLevels(); n++)
+							{
+								GameScriptLevel* levelScript = g_GameFlow->GetLevel(n);
+								PrintString(400, lastY, g_GameFlow->GetString(levelScript->Name), D3DCOLOR_ARGB(255, 255, 255, 255),
+									PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n - 1 ? PRINTSTRING_BLINK : 0));
+
+								lastY += 24;
+							}
+						}
+						char* string = (char*)"";
+						switch (ring->passportAction)
+						{
+						case INV_WHAT_PASSPORT_NEW_GAME:
+							string = g_GameFlow->GetString(STRING_INV_NEW_GAME);
+							break;
+						case INV_WHAT_PASSPORT_SELECT_LEVEL:
+							string = g_GameFlow->GetString(STRING_INV_SELECT_LEVEL);
+							break;
+						case INV_WHAT_PASSPORT_LOAD_GAME:
+							string = g_GameFlow->GetString(STRING_INV_LOAD_GAME);
+							break;
+						case INV_WHAT_PASSPORT_SAVE_GAME:
+							string = g_GameFlow->GetString(STRING_INV_SAVE_GAME);
+							break;
+						case INV_WHAT_PASSPORT_EXIT_GAME:
+							string = g_GameFlow->GetString(STRING_INV_EXIT_GAME);
+							break;
+						case INV_WHAT_PASSPORT_EXIT_TO_TITLE:
+							string = g_GameFlow->GetString(STRING_INV_EXIT_TO_TITLE);
+							break;
+						}
+
+						PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					}
+					else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					{
+						// Draw settings menu
+						/*RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
+
+						// Screen resolution
+						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+
+						RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
+						char buffer[255];
+						ZeroMemory(buffer, 255);
+						sprintf(buffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+
+						PrintString(400, 200, buffer, PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+
+						// Enable dynamic shadows
+						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SHADOWS),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 230, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+
+						// Enable caustics
+						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_CAUSTICS),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 260, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+
+						// Enable volumetric fog
+						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 290, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+
+						// Apply and cancel
+						PrintString(400, 320, g_GameFlow->GetString(STRING_INV_APPLY),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 350, g_GameFlow->GetString(STRING_INV_CANCEL),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
+*/
+					}
+					else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					{
+						// Draw sound menu
+						
+						// Enable sound
+						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 200, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+
+						// Enable sound special effects
+						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SPECIAL_SOUND_FX),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 230, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+
+						// Music volume
+						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_MUSIC_VOLUME),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+						//drawBar(400, 260, 150, 12, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+
+						// Sound FX volume
+						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_SFX_VOLUME),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+						//drawBar(400, 290, 150, 12, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
+
+						// Apply and cancel
+						PrintString(400, 320, g_GameFlow->GetString(STRING_INV_APPLY),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, 350, g_GameFlow->GetString(STRING_INV_CANCEL),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
+					}
+					else
+					{
+						// Draw the description below the object
+						char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
+						PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					}
+				}
+				else
+				{
+					__int16 inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
+					char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
+
+					__int32 quantity = -1;
+					switch (objectNumber)
+					{
+					case ID_BIGMEDI_ITEM:
+						quantity = Lara.numLargeMedipack;
+						break;
+					case ID_SMALLMEDI_ITEM:
+						quantity = Lara.numSmallMedipack;
+						break;
+					case ID_FLARE_INV_ITEM:
+						quantity = Lara.numFlares;
+						break;
+					case ID_SHOTGUN_AMMO1_ITEM:
+						quantity = Lara.numShotgunAmmo1;
+						if (quantity != -1)
+							quantity /= 6;
+						break;
+					case ID_SHOTGUN_AMMO2_ITEM:
+						quantity = Lara.numShotgunAmmo2;
+						if (quantity != -1)
+							quantity /= 6;
+						break;
+					case ID_HK_AMMO_ITEM:
+						quantity = Lara.numHKammo1;
+						break;
+					case ID_CROSSBOW_AMMO1_ITEM:
+						quantity = Lara.numCrossbowAmmo1;
+						break;
+					case ID_CROSSBOW_AMMO2_ITEM:
+						quantity = Lara.numCrossbowAmmo2;
+						break;
+					case ID_REVOLVER_AMMO_ITEM:
+						quantity = Lara.numRevolverAmmo;
+						break;
+					case ID_UZI_AMMO_ITEM:
+						quantity = Lara.numUziAmmo;
+						break;
+					case ID_PICKUP_ITEM4:
+						quantity = Savegame.Level.Secrets;
+						break;
+					default:
+						if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
+							quantity = Lara.puzzleItems[objectNumber - ID_PUZZLE_ITEM1];
+						else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
+							quantity = (Lara.puzzleItemsCombo >> (objectNumber - ID_PUZZLE_ITEM1_COMBO1)) & 1;
+						else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
+							quantity = (Lara.keyItems >> (objectNumber - ID_KEY_ITEM1)) & 1;
+						else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
+							quantity = (Lara.keyItemsCombo >> (objectNumber - ID_KEY_ITEM1_COMBO1)) & 1;
+						else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM3)
+							quantity = (Lara.pickupItems >> (objectNumber - ID_PICKUP_ITEM1)) & 1;
+						else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM3_COMBO2)
+							quantity = (Lara.pickupItemsCombo >> (objectNumber - ID_PICKUP_ITEM1_COMBO1)) & 1;
+						else if (objectNumber == ID_EXAMINE1)
+							quantity = Lara.examine1;
+						else if (objectNumber == ID_EXAMINE2)
+							quantity = Lara.examine2;
+						else if (objectNumber == ID_EXAMINE3)
+							quantity = Lara.examine3;
+					}
+
+					if (quantity < 1)
+						PrintString(400, 550, string, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
+					else
+					{
+						sprintf(stringBuffer, "%d x %s", quantity, string);
+						PrintString(400, 550, stringBuffer, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
+					}
+				}
+			}
+
+			objectIndex++;
+			if (objectIndex == numObjects) objectIndex = 0;
+		}
+
+		lastRing++;
+	}
+
+	//drawAllLines2D();
+	drawAllStrings();
+
+	m_swapChain->Present(0, 0);
+
+	return 0;
 }
