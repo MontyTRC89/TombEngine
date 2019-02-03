@@ -423,17 +423,15 @@ struct RendererBone
 };
 
 struct RendererLight {
-	Vector4 Position;
-	Vector4 Color;
+	Vector3 Position;
+	float Type;
+	Vector3 Color;
+	float Dynamic;
 	Vector4 Direction;
 	float Intensity;
 	float In;
 	float Out;
 	float Range;
-	__int32 Type;
-	__int32 Dynamic;
-	__int32 Padding1;
-	__int32 Padding2;
 
 	RendererLight()
 	{
@@ -538,6 +536,7 @@ struct RendererItem {
 	Matrix World;
 	Matrix AnimationTransforms[32];
 	__int32 NumMeshes;
+	PreallocatedVector<RendererLight> Lights;
 };
 
 struct RendererEffect {
@@ -655,6 +654,8 @@ private:
 	ID3D11DepthStencilView*					m_depthStencilView;
 	ID3D11Texture2D*						m_depthStencilTexture;
 
+	RenderTarget2D*							m_dumpScreenRenderTarget;
+
 	// Ambient light cubemap
 	ID3D11Texture2D*						m_ambientCubeMapTexture;
 	ID3D11RenderTargetView*					m_ambientCubeMapRTV[6];
@@ -685,6 +686,8 @@ private:
 	ID3D11PixelShader*						m_psSolid;
 	ID3D11VertexShader*						m_vsInventory;
 	ID3D11PixelShader*						m_psInventory;
+	ID3D11VertexShader*						m_vsFullScreenQuad;
+	ID3D11PixelShader*						m_psFullScreenQuad;
 
 	// Constant buffers
 	CCameraMatrixBuffer						m_stCameraMatrices;
@@ -735,6 +738,7 @@ private:
 	PreallocatedVector<RendererSpriteToDraw>		m_spritesToDraw;
 	PreallocatedVector<RendererLine3D>				m_lines3DToDraw;
 	PreallocatedVector<RendererLine2D>				m_lines2DToDraw;
+	PreallocatedVector<RendererLight>				m_tempItemLights;
 	RendererSpriteToDraw*							m_spritesBuffer;
 	__int32											m_nextSprite;
 	RendererLine3D*									m_lines3DBuffer;
@@ -794,7 +798,8 @@ private:
 	void									collectRooms();
 	inline void								collectItems(__int16 roomNumber);
 	inline void								collectStatics(__int16 roomNumber);
-	inline void								collectLights(__int16 roomNumber);
+	inline void								collectLightsForRoom(__int16 roomNumber);
+	inline void								collectLightsForItem(__int16 roomNumber, RendererItem* item);
 	inline void								collectEffects(__int16 roomNumber);
 	void									prepareLights();
 	void									clearSceneItems();
@@ -833,6 +838,7 @@ private:
 	void									drawUnderwaterDust();	
 	bool									doRain();
 	bool									doSnow();
+	bool									drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color);
 
 	void									addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void									addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);

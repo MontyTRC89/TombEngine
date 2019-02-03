@@ -601,6 +601,7 @@
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Solid.fx" />
     <None Include="Shaders\DX11_Inventory.fx" />
+    <None Include="Shaders\DX11_FullscreenQuad.fx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

@@ -315,6 +315,14 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	if (m_psInventory == NULL)
 		return false;
 
+	m_vsFullScreenQuad = compileVertexShader("Shaders\\DX11_FullScreenQuad.fx", "VS", "vs_4_0", &blob);
+	if (m_vsFullScreenQuad == NULL)
+		return false;
+
+	m_psFullScreenQuad = compilePixelShader("Shaders\\DX11_FullScreenQuad.fx", "PS", "ps_4_0", &blob);
+	if (m_psFullScreenQuad == NULL)
+		return false;
+
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
 	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
@@ -401,6 +409,8 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 		return false;
 
 	m_testRT = RenderTarget2D::Create(m_device, AMBIENT_CUBE_MAP_SIZE, AMBIENT_CUBE_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	return true;
 }
@@ -890,8 +900,16 @@ bool Renderer11::drawStatics(bool transparent)
 
 bool Renderer11::drawItems(bool transparent, bool animated)
 {
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
 	__int32 firstBucket = (transparent ? 2 : 0);
 	__int32 lastBucket = (transparent ? 4 : 2);
+
+	/*m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);*/
 
 	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
 	{
@@ -908,6 +926,12 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+		 
+		m_stRoomLights.NumLights = item->Lights.Size();
+		for (__int32 j = 0; j < item->Lights.Size(); j++)
+			memcpy(&m_stRoomLights.Lights[j], item->Lights[j], 64);
+		updateConstantBuffer(m_cbRoomLights, &m_stRoomLights, sizeof(CLightBuffer));
+		m_context->PSSetConstantBuffers(2, 1, &m_cbRoomLights);
 
 		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 		{
@@ -1028,6 +1052,30 @@ bool Renderer11::drawLara(bool transparent)
 				m_numDrawCalls++;
 			}
 		}
+
+		/*m_context->VSSetShader(m_vsHairs, NULL, 0);
+		m_context->PSSetShader(m_psHairs, NULL, 0);
+
+		// Set texture
+		m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+		sampler = m_states->AnisotropicClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);
+
+		// Set camera matrices
+		m_stCameraMatrices.View = View.Transpose();
+		m_stCameraMatrices.Projection = Projection.Transpose();
+
+		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+		if (m_moveableObjects[ID_HAIR] != NULL)
+		{
+			m_primitiveBatch->Begin();
+			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+				(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
+				m_hairVertices.data(), m_numHairVertices);
+			m_primitiveBatch->End();
+		}*/
 	}
 
 	return true;
@@ -1075,12 +1123,19 @@ bool Renderer11::drawScene(bool dump)
 	m_context->RSSetState(m_states->CullCounterClockwise());
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-	// Clear screen
-	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::CornflowerBlue);
-	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	if (!dump)
+	{
+		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+	}
+	else
+	{
+		m_context->ClearRenderTargetView(m_dumpScreenRenderTarget->RenderTargetView, Colors::Black);
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->OMSetRenderTargets(1, &m_dumpScreenRenderTarget->RenderTargetView, m_depthStencilView);
+	}
 
-	// Bind the back buffer
-	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 	m_context->RSSetViewports(1, &m_viewport);
 
 	// Draw stuff
@@ -1108,7 +1163,7 @@ bool Renderer11::drawScene(bool dump)
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-	// Draw sprites
+	// Do special effects and weather
 	drawFires();
 	drawSmokes();
 	drawBlood();
@@ -1120,7 +1175,6 @@ bool Renderer11::drawScene(bool dump)
 	drawSplahes();
 	drawShockwaves();
 
-	// Do weather
 	if (level->Rain)
 		doRain();
 	else if (level->Snow)
@@ -1128,37 +1182,6 @@ bool Renderer11::drawScene(bool dump)
 
 	drawSprites();
 	drawLines3D();
-
-	/*
-
-	
-
-	
-
-	// Set shaders
-	m_context->VSSetShader(m_vsHairs, NULL, 0);
-	m_context->PSSetShader(m_psHairs, NULL, 0);
-
-	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	sampler = m_states->AnisotropicClamp();
-	m_context->PSSetSamplers(0, 1, &sampler);
-
-	// Set camera matrices
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
-
-	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
-	if (m_moveableObjects[ID_HAIR] != NULL)
-	{
-		m_primitiveBatch->Begin();
-		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-			(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
-			m_hairVertices.data(), m_numHairVertices);
-		m_primitiveBatch->End();
-	}*/
 
 	time2 = chrono::high_resolution_clock::now();
 	m_timeFrame = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -1181,7 +1204,8 @@ bool Renderer11::drawScene(bool dump)
 
 	drawAllStrings();
 
-	m_swapChain->Present(0, 0);
+	if (!dump)
+		m_swapChain->Present(0, 0);
 
 	return true;
 }
@@ -1682,7 +1706,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 				}
 			}
 		} 
-
+		    
 		if (room->numLights != 0)
 		{
 			tr5_room_light* oldLight = room->light;
@@ -1693,7 +1717,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 				if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SUN)
 				{
-					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
 
@@ -1701,8 +1725,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 				}
 				else if (oldLight->LightType == LIGHT_TYPE_POINT)
 				{
-					light.Position = Vector4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Intensity = 1.0f;
 					light.In = oldLight->In;
@@ -1713,8 +1737,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 				}
 				else if (oldLight->LightType == LIGHT_TYPE_SHADOW)
 				{
-					light.Position = Vector4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.In = oldLight->In;
 					light.Out = oldLight->Out;
@@ -1724,8 +1748,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 				}
 				else if (oldLight->LightType == LIGHT_TYPE_SPOT)
 				{
-					light.Position = Vector4(oldLight->x, oldLight->y, oldLight->z, 1.0f);
-					light.Color = Vector4(oldLight->r, oldLight->g, oldLight->b, 1.0f);
+					light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Intensity = 1.0f;
 					light.In = oldLight->In;
@@ -2109,9 +2133,15 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_spritesToDraw.Reserve(MAX_SPRITES);
 	m_lines3DToDraw.Reserve(MAX_LINES_3D);
 	m_lines2DToDraw.Reserve(MAX_LINES_2D);
+	m_tempItemLights.Reserve(MAX_LIGHTS);
 	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
+
+	for (__int32 i = 0; i < NUM_ITEMS; i++)
+	{
+		m_items[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
+	}
 
 	return true;
 }
@@ -2229,11 +2259,11 @@ void Renderer11::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 fallof
 
 	RendererLight* dynamicLight = &m_lights[m_nextLight++];
 
-	dynamicLight->Position = Vector4(x, y, z, 1.0f);
-	dynamicLight->Color = Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+	dynamicLight->Position = Vector3(x, y, z);
+	dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-	dynamicLight->Dynamic = true;
+	dynamicLight->Dynamic = 1;
 	dynamicLight->Intensity = 2.0f;
 
 	m_dynamicLights.Add(dynamicLight);
@@ -2549,10 +2579,10 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 		m_rooms[node->To]->Visited = true;
 		m_roomsToDraw.Add(m_rooms[node->To]);
 
+		collectLightsForRoom(node->To);
 		collectItems(node->To);
 		collectStatics(node->To);
 		collectEffects(node->To);
-		collectLights(node->To);
 				
 		Vector4 clipPort;
 		__int16 numDoors = *(room->door);
@@ -2714,6 +2744,8 @@ inline void Renderer11::collectItems(__int16 roomNumber)
 														TR_ANGLE_TO_RAD(item->pos.zPos)) *
 						 Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
+		collectLightsForItem(item->roomNumber, newItem);
+
 		m_itemsToDraw.Add(newItem);
 	}
 }
@@ -2747,7 +2779,92 @@ inline void Renderer11::collectStatics(__int16 roomNumber)
 	}
 }
 
-inline void Renderer11::collectLights(__int16 roomNumber)
+inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* item)
+{
+	item->Lights.Clear();
+
+	RendererRoom* room = m_rooms[roomNumber];
+	if (room == NULL)
+		return;
+
+	ROOM_INFO* r = room->Room;
+
+	if (r->numLights <= 0)
+		return;
+
+	m_tempItemLights.Clear();
+
+	Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
+
+	// Dynamic lights have the priority
+	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+	{
+		RendererLight* light = m_dynamicLights[i];
+
+		Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+		
+		float distance = (itemPosition - lightPosition).Length();
+		if (distance > light->Out)
+			continue;
+
+		m_tempItemLights.Add(light);
+	}
+
+	__int32 numLights = room->Lights.size();
+
+	for (__int32 j = 0; j < numLights; j++)
+	{
+		RendererLight* light = &room->Lights[j];
+
+		// Check only lights different from sun
+		if (light->Type == LIGHT_TYPE_SUN)
+		{
+			// Sun is added without checks
+		}
+		else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+		{
+			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+			float distance = (itemPosition - lightPosition).Length();
+
+			// Collect only lights nearer than 20 sectors
+			if (distance >= 20 * WALL_SIZE)
+				continue;
+
+			// Check the out radius
+			if (distance > light->Out)
+				continue;
+		}    
+		else if (light->Type == LIGHT_TYPE_SPOT)
+		{
+			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+			float distance = (itemPosition - lightPosition).Length();
+
+			// Collect only lights nearer than 20 sectors
+			if (distance >= 20 * WALL_SIZE)
+				continue;
+
+			// Check the range
+			if (distance > light->Range)
+				continue;
+		}
+		else
+		{
+			// Invalid light type
+			continue;
+		}
+		
+		m_tempItemLights.Add(light);
+	}
+	 
+	for (__int32 i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
+	{
+		item->Lights.Add(m_tempItemLights[i]);
+	}
+}
+
+inline void Renderer11::collectLightsForRoom(__int16 roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -2760,53 +2877,7 @@ inline void Renderer11::collectLights(__int16 roomNumber)
 
 	__int32 numLights = room->Lights.size();
 
-	for (__int32 j = 0; j < numLights; j++)
-	{
-		Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-		Vector3 lightPos = Vector3(room->Lights[j].Position.x, room->Lights[j].Position.y, room->Lights[j].Position.z);
-
-		// Collect only lights nearer than 20 sectors
-		if ((laraPos - lightPos).Length() >= 20 * WALL_SIZE)
-			continue;
-
-		// Check only lights different from sun
-		/*if (room->Lights[j]->Type != LIGHT_TYPES::LIGHT_TYPE_SUN)
-		{
-			// Now check if lights are touching items
-			bool isTouchingItem = false;
-			for (__int32 k = 0; k < m_itemsToDraw.size(); k++)
-			{
-				Vector3 itemPos = Vector3(m_itemsToDraw[k]->Item->pos.xPos, m_itemsToDraw[k]->Item->pos.yPos, m_itemsToDraw[k]->Item->pos.zPos);
-				float distance = D3DXVec3Length(&(itemPos - lightPos));
-
-				if (room->Lights[j]->Type == LIGHT_TYPES::LIGHT_TYPE_SPOT)
-				{
-					if (distance < room->Lights[j]->Range)
-					{
-						isTouchingItem = true;
-						break;
-					}
-				}
-				else
-				{
-					if (distance < room->Lights[j]->Out)
-					{
-						isTouchingItem = true;
-						break;
-					}
-				}
-			}
-
-			// If the light is not touching an item, then discard it
-			if (!isTouchingItem)
-				continue;
-		}*/
-
-		RendererLight* light = &room->Lights[j];
-		m_lightsToDraw.Add(light);
-	}
-
-	// Collect dynamic lights
+	// Collect dynamic lights for rooms
 	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
@@ -2898,7 +2969,7 @@ void Renderer11::prepareLights()
 			float attenuationRange;
 			float attenuationAngle;
 
-			switch (light->Type)
+			switch ((int)light->Type)
 			{
 			case LIGHT_TYPES::LIGHT_TYPE_POINT:
 				if (distance > light->Out || light->Out < 2048.0f)
@@ -4980,10 +5051,12 @@ __int32 Renderer11::drawInventoryScene()
 		m_dxSprite->SetTransform(&m_tempScale);
 		m_dxSprite->Draw(m_renderTarget, &rect, &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
 		m_dxSprite->End();
-	}
+	}*/
 
 	// Clear the Z-Buffer after drawing the background
-	m_device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);*/
+	
+	drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.3f, 0.3f, 0.3f));
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
@@ -5375,4 +5448,53 @@ __int32 Renderer11::drawInventoryScene()
 	m_swapChain->Present(0, 0);
 
 	return 0;
+}
+
+bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color)
+{
+	RendererVertex vertices[4];
+
+	vertices[0].Position.x = -1.0f;
+	vertices[0].Position.y = 1.0f;
+	vertices[0].Position.z = 0.0f;
+	vertices[0].UV.x = 0.0f;
+	vertices[0].UV.y = 0.0f;
+	vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+	vertices[1].Position.x = 1.0f;
+	vertices[1].Position.y = 1.0f;
+	vertices[1].Position.z = 0.0f;
+	vertices[1].UV.x = 1.0f;
+	vertices[1].UV.y = 0.0f;
+	vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+	vertices[2].Position.x = 1.0f;
+	vertices[2].Position.y = -1.0f;
+	vertices[2].Position.z = 0.0f;
+	vertices[2].UV.x = 1.0f;
+	vertices[2].UV.y = 1.0f;
+	vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
+	 
+	vertices[3].Position.x = -1.0f;
+	vertices[3].Position.y = -1.0f;
+	vertices[3].Position.z = 0.0f;
+	vertices[3].UV.x = 0.0f;
+	vertices[3].UV.y = 1.0f;
+	vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+	m_context->VSSetShader(m_vsFullScreenQuad, NULL, 0);
+	m_context->PSSetShader(m_psFullScreenQuad, NULL, 0);
+
+	m_context->PSSetShaderResources(0, 1, &texture);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+
+	m_primitiveBatch->Begin();
+	m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+	m_primitiveBatch->End();
+
+	return true;
 }
