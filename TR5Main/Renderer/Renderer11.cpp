@@ -49,6 +49,8 @@ __int32 SortRoomsFunctionNonStd(RendererRoom* a, RendererRoom* b)
 Renderer11::Renderer11()
 {
 	initialiseHairRemaps();
+
+	m_blinkColorDirection = 1;
 }
 
 Renderer11::~Renderer11()
@@ -1246,7 +1248,7 @@ bool Renderer11::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color,
 
 	if (flags & PRINTSTRING_CENTER)
 	{
-		__int32 width = rect.right - rect.left;
+		__int32 width = size.x;
 		rect.left = x * factorX - width / 2;
 		rect.right = x * factorX + width / 2;
 		rect.top += y * factorY;
@@ -1301,7 +1303,7 @@ bool Renderer11::drawAllStrings()
 			m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X + 1, str->Y + 1), Vector3(0, 0, 0));
 		
 		// Draw string
-		m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X, str->Y), str->Color);
+		m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X, str->Y), str->Color / 255.0f);
 	}
 
 	m_spriteBatch->End();
@@ -4948,6 +4950,8 @@ __int32 Renderer11::drawInventoryScene()
 	rect.bottom = ScreenHeight;
 
 	m_lines2DToDraw.Clear();
+	m_strings.clear();
+
 	m_nextLine2D = 0;
 
 	// Set basic render states
@@ -5087,9 +5091,9 @@ __int32 Renderer11::drawInventoryScene()
 
 				// Finish the world matrix
 				if (obj->animIndex != -1)
-					m_stItem.World = (moveableObj->AnimationTransforms[n] * transform.Transpose());
+					m_stItem.World = (moveableObj->AnimationTransforms[n] * transform).Transpose();
 				else
-					m_stItem.World = (transform.Transpose() * moveableObj->BindPoseTransforms[n]);
+					m_stItem.World = (moveableObj->BindPoseTransforms[n].Transpose() * transform).Transpose();
 				m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 				m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
