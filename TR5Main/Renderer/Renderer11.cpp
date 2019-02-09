@@ -992,14 +992,14 @@ bool Renderer11::drawWaterfall(RendererItem* item)
 	 
 	m_stItem.World = item->World.Transpose();
 	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
-	m_stItem.AmbientLight = Vector4::One * 0.5f; // room->AmbientLight;
+	m_stItem.AmbientLight = Vector4::One * 0.1f; // room->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-	m_stLights.NumLights = 0; // item->Lights.Size();
-	/*for (__int32 j = 0; j < item->Lights.Size(); j++)
-		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));*/
+	m_stLights.NumLights = item->Lights.Size();
+	for (__int32 j = 0; j < item->Lights.Size(); j++)
+		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
@@ -1096,7 +1096,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 
 	// Draw waterfalls
 	m_context->RSSetState(m_states->CullCounterClockwise());
-	m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
+	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 
