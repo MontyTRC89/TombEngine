@@ -1,3 +1,8 @@
+#define LT_SUN		0
+#define LT_POINT	1
+#define LT_SPOT		2
+#define LT_SHADOW	3
+
 struct RendererLight {
 	float4 Position;
 	float4 Color;
@@ -26,7 +31,12 @@ cbuffer LightsBuffer : register(b2)
 {
 	RendererLight Lights[48];
 	int NumLights;
-	float3 Padding;
+	float3 CameraPosition;
+};
+
+cbuffer MiscBuffer : register(b3)
+{
+	int AlphaTest;
 };
 
 struct VertexShaderInput
@@ -69,15 +79,16 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	clip(output.w - 0.5f);
+	if (AlphaTest)
+		clip(output.w - 0.5f);
 
-	float3 lighting = AmbientLight.xyz;
+	float3 lighting = AmbientLight.xyz * 2.0f;
 
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Position.w;
 
-		if (lightType == 1)
+		if (lightType == LT_POINT || lightType == LT_SHADOW)
 		{
 			float3 lightPos = Lights[i].Position.xyz;
 			float3 color = Lights[i].Color.xyz;
@@ -93,13 +104,16 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			lightVec = normalize(lightVec);
 			float attenuation = (radius - distance) / radius;
 
-			float d = dot(input.Normal, lightVec);
+			float d = dot(input.Normal, -lightVec);
 			if (d < 0)
 				continue;
 
-			lighting += color * d * intensity * attenuation;
+			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + lightVec);
+			float s = pow(saturate(dot(h, input.Normal)), 0.5f);
+
+			lighting += color * d * intensity * attenuation; // *0.6f + s * 0.5f;
 		}
-		else if (lightType == 0)
+		else if (lightType == LT_SUN)
 		{
 			float3 color = Lights[i].Color.xyz;
 			float3 direction = Lights[i].Direction.xyz;
@@ -107,15 +121,50 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			
 			direction = normalize(direction);
 
-			float d = dot(input.Normal, direction);
+			float d = dot(input.Normal, -direction);
 			if (d < 0)
 				continue;
 
-			lighting += color * d * intensity;
+			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + direction);
+			float s = pow(saturate(dot(h, input.Normal)), 0.5f);
+			
+			lighting += color * d * intensity; // *0.6f + s * 0.5f;
+		}
+		else if (lightType == LT_SPOT)
+		{
+			float3 lightPos = Lights[i].Position.xyz;
+			float3 color = Lights[i].Color.xyz;
+			float3 direction = Lights[i].Direction.xyz;
+			float range = Lights[i].Range;
+			float intensity = Lights[i].Intensity;
+			float inAngle = Lights[i].In;
+			float outAngle = Lights[i].Out;
+			
+			float3 lightVec = (lightPos - input.WorldPosition);
+			float distance = length(lightVec);
+
+			if (distance > range)
+				continue;
+
+			lightVec = normalize(lightVec);
+			float inCone = dot(-lightVec, direction); 
+			if (inCone < outAngle)
+				continue;			
+
+			float attenuation = (range - distance) / range * (inCone - outAngle) / (1.0f - outAngle);
+
+			float d = dot(input.Normal, lightVec);
+			if (d < 0)
+				continue;
+
+			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + lightVec);
+			float s = pow(saturate(dot(h, input.Normal)), 0.5f);
+
+			lighting += color * d * intensity * attenuation; // *0.6f + s * 0.5f;
 		}
 	}
 
 	output.xyz *= lighting.xyz;
-	
+
 	return output;
 }

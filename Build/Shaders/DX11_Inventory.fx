@@ -12,6 +12,11 @@ cbuffer ItemBuffer : register(b1)
 	float4 AmbientLight;
 };
 
+cbuffer MiscBuffer : register(b3)
+{
+	int AlphaTest;
+};
+
 struct VertexShaderInput
 {
 	float3 Position: POSITION;
@@ -51,7 +56,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
 
-	clip(output.w - 0.5f);
+	if (AlphaTest)
+		clip(output.w - 0.5f);
 
 	float4 lightDirection = float4(-1.0f, 0.707f, -1.0f, 1.0f);
 	float4 lightColor = float4(1.0f, 1.0f, 0.5f, 1.0f);

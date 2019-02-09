@@ -362,6 +362,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		UpdateShockwaves();
 		UpdateLightning();
 		UpdatePulseColor();
+		AnimateWaterfalls();
 
 		if (level->Rumble)
 			RumbleScreen();
@@ -1050,6 +1051,38 @@ void __cdecl UpdateSky()
 		else
 		{
 			SkyPos2 -= 9728;
+		}
+	}
+}
+
+__int32 lastWaterfallY = 0;
+
+void __cdecl AnimateWaterfalls()
+{
+	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
+	float y = lastWaterfallY * 0.00390625f;
+	float theY;
+
+	for (__int32 i = 0; i < 6; i++)
+	{
+		if (Objects[ID_WATERFALL1 + i].loaded)
+		{
+			OBJECT_TEXTURE* texture = WaterfallTextures[i];
+			
+			texture->vertices[0].y = y + WaterfallY[i];
+			texture->vertices[1].y = y + WaterfallY[i];
+			texture->vertices[2].y = y + WaterfallY[i] + 0.24609375;
+			texture->vertices[3].y = y + WaterfallY[i] + 0.24609375;
+
+			if (i < 5)
+			{
+				texture++;
+
+				texture->vertices[0].y = y + WaterfallY[i];
+				texture->vertices[1].y = y + WaterfallY[i];
+				texture->vertices[2].y = y + WaterfallY[i] + 0.24609375;
+				texture->vertices[3].y = y + WaterfallY[i] + 0.24609375;
+			}
 		}
 	}
 }

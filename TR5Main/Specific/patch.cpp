@@ -37,7 +37,7 @@ void PatchGameCode()
 	WriteProcessMemory(gameHandle, (LPVOID)0x4B844E, &newAddress, 4, NULL);
 
 	// Bigger game buffer
-	__int32 newValue = GAME_BUFFER_SIZE;
+	__int32 newValue = GAME_BUFFER_SIZE * 2;
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A7CB1, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A7CC8, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A7CD7, &newValue, 4, NULL);

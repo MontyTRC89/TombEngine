@@ -41,11 +41,13 @@
 #define PlaySoundTrack ((void (__cdecl*)(__int16, __int16)) 0x00418B90)
 #define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, __int32)) 0x004159F0)
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)
+//#define AnimateWaterfalls ((void (__cdecl*)()) 0x00465DF0)
 
 GAME_STATUS __cdecl DoTitle(__int32 index);
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);
 GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
 void __cdecl UpdateSky();
+void __cdecl AnimateWaterfalls();
 
 unsigned __stdcall GameMain(void*);
 void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags);

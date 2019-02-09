@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include "..\Global\global.h"
 
+char* __cdecl GameMalloc(__int32 size)
+{
+	//printf("Size: %d, MallocFree: %d\n", size, MallocFree);
+	return GameMallocReal(size);
+}
+
 /*
 void __cdecl InitGameMalloc()
 {
@@ -52,6 +58,7 @@ void __cdecl Free(void* ptr)
 
 void Inject_Malloc()
 {
+	INJECT(0x0040101E, GameMalloc);
 	/*INJECT(0x004A7CB0, InitGameMalloc);
 	INJECT(0x0040101E, GameMalloc);
 	INJECT(0x00403116, GameFree);

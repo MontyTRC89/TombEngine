@@ -4200,7 +4200,7 @@ bool Renderer::drawLara(RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)
 		}
 	}
 
-	return true;
+	return true;  
 }
 
 bool Renderer::drawItem(RendererItemToDraw* itemToDraw, RENDERER_BUCKETS bucketIndex, RENDERER_PASSES pass)

@@ -322,6 +322,9 @@
 #define App_Unk00D9AC19				VAR_U_(0x00D9AC19, byte)
 #define App_Unk00D9ABFD				VAR_U_(0x00D9ABFD, __int32)
 
+#define WaterfallTextures			ARRAY_(0x00E59720, OBJECT_TEXTURE*, [6])
+#define WaterfallY					ARRAY_(0x00E59760, float, [6])
+
 extern bool MonksAttackLara;
 
 // Remapped variables

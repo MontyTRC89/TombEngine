@@ -327,7 +327,8 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
 	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
 	m_cbStatic = createConstantBuffer(sizeof(CStaticBuffer));
-	m_cbRoomLights = createConstantBuffer(sizeof(CLightBuffer));
+	m_cbLights = createConstantBuffer(sizeof(CLightBuffer));
+	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
 
 	// Initialise the ambient cube map
 	D3D11_TEXTURE2D_DESC texDesc; 
@@ -683,6 +684,10 @@ bool Renderer11::drawHorizonAndSky()
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
+	m_stMisc.AlphaTest = true;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
 	m_context->PSSetShaderResources(0, 1, &m_skyTexture->ShaderResourceView);
 	sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
@@ -726,6 +731,10 @@ bool Renderer11::drawHorizonAndSky()
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CItemBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 		m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
+
+		m_stMisc.AlphaTest = true;
+		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 		{
@@ -774,16 +783,19 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 
 	// Set texture
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
-
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-	 
+	
+	m_stMisc.AlphaTest = !transparent;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
 	if (animated)
 		m_primitiveBatch->Begin();
 
@@ -791,34 +803,41 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	{ 
 		RendererRoom* room = m_roomsToDraw[i];
 
-		m_stRoomLights.NumLights = room->LightsToDraw.Size();
+		m_stLights.NumLights = room->LightsToDraw.Size();
 		for (__int32 j = 0; j < room->LightsToDraw.Size(); j++)
-			memcpy(&m_stRoomLights.Lights[j], room->LightsToDraw[j], 64);
-		updateConstantBuffer(m_cbRoomLights, &m_stRoomLights, sizeof(CLightBuffer));
-		m_context->PSSetConstantBuffers(1, 1, &m_cbRoomLights);
+			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));
+		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+		m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
 
 		for (__int32 j = firstBucket; j < lastBucket; j++)
 		{
+			RendererBucket* bucket;
+			if (!animated)
+				bucket = &room->Buckets[j];
+			else
+				bucket = &room->AnimatedBuckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			if (!animated)
+				
+			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
+				m_context->RSSetState(m_states->CullNone());
+			else
+				m_context->RSSetState(m_states->CullCounterClockwise());
+
 			if (!animated)
 			{
-				RendererBucket* bucket = &room->Buckets[j];
-
-				if (bucket->Vertices.size() == 0)
-					continue;
-
 				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
 				m_numDrawCalls++;
 			}
 			else
 			{
-				RendererBucket* bucket = &room->AnimatedBuckets[j];
-
-				if (bucket->Vertices.size() == 0)
-					continue;
-				
 				for (__int32 k = 0; k < bucket->Polygons.size(); k++)
 				{
 					RendererPolygon* poly = &bucket->Polygons[k];
+
 					if (poly->Shape == SHAPE_RECTANGLE)
 					{
 						m_primitiveBatch->DrawQuad(bucket->Vertices[poly->Indices[0]], bucket->Vertices[poly->Indices[1]],
@@ -841,10 +860,11 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 }
 
 bool Renderer11::drawStatics(bool transparent)
-{
+{  
+	//return true;
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
-
+	   
 	__int32 firstBucket = (transparent ? 2 : 0);
 	__int32 lastBucket = (transparent ? 4 : 2);
 
@@ -856,7 +876,7 @@ bool Renderer11::drawStatics(bool transparent)
 	// Set shaders
 	m_context->VSSetShader(m_vsStatics, NULL, 0);
 	m_context->PSSetShader(m_psStatics, NULL, 0);
-
+	 
 	// Set texture
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
@@ -865,9 +885,12 @@ bool Renderer11::drawStatics(bool transparent)
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
-
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	m_stMisc.AlphaTest = !transparent;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 	for (__int32 i = 0; i < m_staticsToDraw.Size(); i++)
 	{
@@ -884,6 +907,11 @@ bool Renderer11::drawStatics(bool transparent)
 
 		for (__int32 j = firstBucket; j < lastBucket; j++)
 		{
+			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
+				m_context->RSSetState(m_states->CullNone());
+			else
+				m_context->RSSetState(m_states->CullCounterClockwise());
+
 			RendererBucket* bucket = &mesh->Buckets[j];
 
 			if (bucket->Vertices.size() == 0)
@@ -898,6 +926,138 @@ bool Renderer11::drawStatics(bool transparent)
 	return true;
 }
 
+bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool animated)
+{
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	__int32 firstBucket = (transparent ? 2 : 0);
+	__int32 lastBucket = (transparent ? 4 : 2);
+
+	RendererRoom* room = m_rooms[item->Item->roomNumber];
+	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+
+	m_stItem.World = item->World.Transpose();
+	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
+	m_stItem.AmbientLight = room->AmbientLight;
+	memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
+	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+	m_stLights.NumLights = item->Lights.Size();
+	for (__int32 j = 0; j < item->Lights.Size(); j++)
+		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+
+	m_stMisc.AlphaTest = !transparent;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+	for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+	{
+		RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+
+		for (__int32 j = firstBucket; j < lastBucket; j++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
+				m_context->RSSetState(m_states->CullNone());
+			else
+				m_context->RSSetState(m_states->CullCounterClockwise());
+
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
+
+	return true;
+}
+
+bool Renderer11::drawWaterfall(RendererItem* item)
+{
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	RendererRoom* room = m_rooms[item->Item->roomNumber];
+	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	 
+	m_stItem.World = item->World.Transpose();
+	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
+	m_stItem.AmbientLight = Vector4::One * 0.5f; // room->AmbientLight;
+	memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
+	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+	m_stLights.NumLights = 0; // item->Lights.Size();
+	/*for (__int32 j = 0; j < item->Lights.Size(); j++)
+		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));*/
+	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+
+	m_stMisc.AlphaTest = false;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+	m_primitiveBatch->Begin();
+
+	for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+	{
+		RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+
+		for (__int32 b = 0; b < NUM_BUCKETS; b++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[b];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			for (__int32 p = 0; p < bucket->Polygons.size(); p++)
+			{
+				RendererPolygon* poly = &bucket->Polygons[p];
+
+				OBJECT_TEXTURE* texture = &ObjectTextures[poly->TextureId];
+				__int32 tile = texture->tileAndFlag & 0x7FFF;
+
+				if (poly->Shape == SHAPE_RECTANGLE)
+				{
+					bucket->Vertices[poly->Indices[0]].UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+					bucket->Vertices[poly->Indices[1]].UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+					bucket->Vertices[poly->Indices[2]].UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+					bucket->Vertices[poly->Indices[3]].UV.y = (texture->vertices[3].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+
+					m_primitiveBatch->DrawQuad(bucket->Vertices[poly->Indices[0]],
+						bucket->Vertices[poly->Indices[1]],
+						bucket->Vertices[poly->Indices[2]],
+						bucket->Vertices[poly->Indices[3]]);
+				}
+				else
+				{
+					bucket->Vertices[poly->Indices[0]].UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+					bucket->Vertices[poly->Indices[1]].UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+					bucket->Vertices[poly->Indices[2]].UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+
+					m_primitiveBatch->DrawTriangle(bucket->Vertices[poly->Indices[0]],
+						bucket->Vertices[poly->Indices[1]],
+						bucket->Vertices[poly->Indices[2]]);
+				}
+			}
+		}
+	}
+
+	m_primitiveBatch->End();
+
+	return true;
+}
+
 bool Renderer11::drawItems(bool transparent, bool animated)
 {
 	UINT stride = sizeof(RendererVertex);
@@ -906,10 +1066,10 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	__int32 firstBucket = (transparent ? 2 : 0);
 	__int32 lastBucket = (transparent ? 4 : 2);
 
-	/*m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);*/
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
 	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
 	{
@@ -917,37 +1077,43 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 		RendererRoom* room = m_rooms[item->Item->roomNumber];
 		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
+		__int16 objectNumber = item->Item->objectNumber;
 		if (moveableObj->DoNotDraw)
-			continue;
-
-		m_stItem.World = item->World.Transpose();
-		m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
-		m_stItem.AmbientLight = room->AmbientLight;
-		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
-		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-		 
-		m_stRoomLights.NumLights = item->Lights.Size();
-		for (__int32 j = 0; j < item->Lights.Size(); j++)
-			memcpy(&m_stRoomLights.Lights[j], item->Lights[j], 64);
-		updateConstantBuffer(m_cbRoomLights, &m_stRoomLights, sizeof(CLightBuffer));
-		m_context->PSSetConstantBuffers(2, 1, &m_cbRoomLights);
-
-		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 		{
-			RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+			continue;
+		}
+		else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
+		{
+			//drawAnimatingItem(item, transparent, animated);
+			// We'll draw waterfalls later
+			continue;
+		}
+		else
+		{
+			drawAnimatingItem(item, transparent, animated);
+		}
+	}
 
-			for (__int32 j = firstBucket; j < lastBucket; j++)
-			{
-				RendererBucket* bucket = &mesh->Buckets[j];
+	// Draw waterfalls
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
 
-				if (bucket->Vertices.size() == 0)
-					continue;
+	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
+	{
+		RendererItem* item = m_itemsToDraw[i];
+		RendererRoom* room = m_rooms[item->Item->roomNumber];
+		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
-				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-				m_numDrawCalls++;
-			}
+		__int16 objectNumber = item->Item->objectNumber;
+		if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
+		{
+			drawWaterfall(item);
+		}
+		else
+		{
+			continue;
 		}
 	}
 
@@ -967,6 +1133,8 @@ bool Renderer11::drawLara(bool transparent)
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
+	RendererItem* item = &m_items[Lara.itemNumber];
+
 	// Set shaders
 	m_context->VSSetShader(m_vsItems, NULL, 0);
 	m_context->PSSetShader(m_psItems, NULL, 0);
@@ -979,9 +1147,12 @@ bool Renderer11::drawLara(bool transparent)
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
-
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	m_stMisc.AlphaTest = !transparent;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
@@ -994,6 +1165,12 @@ bool Renderer11::drawLara(bool transparent)
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+
+	m_stLights.NumLights = item->Lights.Size();
+	for (__int32 j = 0; j < item->Lights.Size(); j++)
+		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
 	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
@@ -1090,39 +1267,41 @@ bool Renderer11::drawScene(bool dump)
 	m_nextLight = 0;
 	m_nextSprite = 0;
 	m_nextLine3D = 0;
-
+	   
 	m_strings.clear();
 
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	ViewProjection = View * Projection;
+	m_stLights.CameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 	// Prepare the scene to draw
 	auto time1 = chrono::high_resolution_clock::now();
 
 	clearSceneItems();
 	collectRooms();
-	prepareLights();
+	//prepareLights();
 	updateLaraAnimations();
 	updateItemsAnimations();
 	updateEffects();
-
-	// Update animated textures every 2 frames
-	if (GnFrameCounter % 2 == 0)
+	  
+	m_items[Lara.itemNumber].Item = LaraItem;
+ 	collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber]);
+	     
+	// Update animated textures every 2 frames  
+	if (GnFrameCounter % 2 == 0)  
 		updateAnimatedTextures();
-
+	 
 	auto time2 = chrono::high_resolution_clock::now();
 	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
-	time1 = time2;
-
-	// Prepare thr ambient cube map
-	//drawAmbientCubeMap(LaraItem->roomNumber);
+	time1 = time2;  
 
 	// Reset GPU state
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	m_context->RSSetState(m_states->CullCounterClockwise());
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
+	// Bind and clear render target
 	if (!dump)
 	{
 		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
@@ -1138,9 +1317,9 @@ bool Renderer11::drawScene(bool dump)
 
 	m_context->RSSetViewports(1, &m_viewport);
 
-	// Draw stuff
 	drawHorizonAndSky();
 
+	// Opaque geometry
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	
 	drawRooms(false, false);
@@ -1149,7 +1328,8 @@ bool Renderer11::drawScene(bool dump)
 	drawLara(false);
 	drawItems(false, false);
 	drawItems(false, true);
-
+	 
+	// Transparent geometry
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
@@ -1472,7 +1652,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		
 		r->RoomNumber = i;
 		r->Room = room;
-		r->AmbientLight = Vector4(room->ambient.r / 255.0f, room->ambient.g / 255.0f, room->ambient.b / 255.0f, 1.0f);
+		r->AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
 		r->LightsToDraw.Reserve(32);
 
 		m_rooms[i] = r;
@@ -1720,6 +1900,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
+					light.Intensity = 1.0f;
 
 					r->Lights.push_back(light);
 				}
@@ -1734,15 +1915,15 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Type = LIGHT_TYPE_POINT;
 
 					r->Lights.push_back(light);
-				}
+				} 
 				else if (oldLight->LightType == LIGHT_TYPE_SHADOW)
 				{
 					light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
-					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.In = oldLight->In;
 					light.Out = oldLight->Out;
 					light.Type = LIGHT_TYPE_SHADOW;
+					light.Intensity = 1.0f;
 
 					r->Lights.push_back(light);
 				}
@@ -1753,12 +1934,12 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Intensity = 1.0f;
 					light.In = oldLight->In;
-					light.Out = oldLight->Range;   
+					light.Out = oldLight->Out;   
 					light.Range = oldLight->Range;
 					light.Type = LIGHT_TYPE_SPOT;
 
 					r->Lights.push_back(light);
-				}
+				} 
 			}
 		}
 
@@ -2120,6 +2301,16 @@ bool Renderer11::PrepareDataForTheRenderer()
 			}
 
 			m_spriteSequences[MoveablesIds[i]] = sequence;
+		}
+	}
+
+	for (__int32 i = 0; i < 6; i++)
+	{
+		if (Objects[ID_WATERFALL1 + i].loaded)
+		{
+			OBJECT_TEXTURE* texture = &ObjectTextures[m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[RENDERER_BUCKET_TRANSPARENT].Polygons[0].TextureId];
+			WaterfallTextures[i] = texture;
+			WaterfallY[i] = texture->vertices[0].y;
 		}
 	}
 
@@ -2727,10 +2918,9 @@ inline void Renderer11::collectItems(__int16 roomNumber)
 		if (item->objectNumber == ID_LARA)
 			continue;
 
-		if (item->status == ITEM_DEACTIVATED || item->status == ITEM_INVISIBLE)
+		if (item->status == ITEM_INVISIBLE)
 			continue;
 
-		//if (m_moveableObjects.find(item->objectNumber) == m_moveableObjects.end())
 		if (m_moveableObjects[item->objectNumber] == NULL)
 			continue;
 
@@ -2834,7 +3024,7 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 			// Check the out radius
 			if (distance > light->Out)
 				continue;
-		}    
+		}     
 		else if (light->Type == LIGHT_TYPE_SPOT)
 		{
 			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
@@ -2850,17 +3040,17 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 				continue;
 		}
 		else
-		{
+		{ 
 			// Invalid light type
 			continue;
 		}
-		
+		       
 		m_tempItemLights.Add(light);
 	}
-	 
+	  
 	for (__int32 i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
 	{
-		item->Lights.Add(m_tempItemLights[i]);
+		item->Lights.Add(m_tempItemLights[i]); 
 	}
 }
 
@@ -3117,7 +3307,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		{
 			if (texture->attribute == 2 || (effects & 1))
 				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-			else 
+			else
 				bucketIndex = RENDERER_BUCKET_SOLID;
 		}
 		else
@@ -3190,6 +3380,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 
 		RendererPolygon newPolygon;
 		newPolygon.Shape = SHAPE_RECTANGLE;
+		newPolygon.TextureId = textureId;
 		newPolygon.Indices[0] = baseVertices;
 		newPolygon.Indices[1] = baseVertices + 1;
 		newPolygon.Indices[2] = baseVertices + 2;
@@ -3283,6 +3474,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 
 		RendererPolygon newPolygon;
 		newPolygon.Shape = SHAPE_TRIANGLE;
+		newPolygon.TextureId = textureId;
 		newPolygon.Indices[0] = baseVertices;
 		newPolygon.Indices[1] = baseVertices + 1;
 		newPolygon.Indices[2] = baseVertices + 2;
@@ -4243,6 +4435,10 @@ bool Renderer11::drawSprites()
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
+	m_stMisc.AlphaTest = true;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
@@ -4445,6 +4641,7 @@ void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector
 
 void Renderer11::updateAnimatedTextures()
 {
+	// Update room's animated textures
 	for (__int32 i = 0; i < NumberRooms; i++)
 	{
 		RendererRoom* room = m_rooms[i];
@@ -4485,6 +4682,31 @@ void Renderer11::updateAnimatedTextures()
 				{
 					bucket->Vertices[polygon->Indices[v]].UV.x = set->Textures[textureIndex]->UV[v].x;
 					bucket->Vertices[polygon->Indices[v]].UV.y = set->Textures[textureIndex]->UV[v].y;
+				}
+			}
+		}
+	}
+
+	// Update waterfalls textures
+	for (__int32 i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++)
+	{
+		OBJECT_INFO* obj = &Objects[i];
+
+		if (obj->loaded)
+		{
+			RendererObject* waterfall = m_moveableObjects[i];
+
+			for (__int32 m = 0; m < waterfall->ObjectMeshes.size(); m++)
+			{
+				RendererMesh* mesh = waterfall->ObjectMeshes[m];
+				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_TRANSPARENT_DS];
+
+				for (__int32 v = 0; v < bucket->Vertices.size(); v++)
+				{
+					RendererVertex* vertex = &bucket->Vertices[v];
+					int y = vertex->UV.y * TEXTURE_ATLAS_SIZE + 64;
+					y %= 128;
+					vertex->UV.y = (float)y / TEXTURE_ATLAS_SIZE;
 				}
 			}
 		}
@@ -4672,7 +4894,7 @@ bool Renderer11::doSnow()
 	return true;
 }
 
-bool Renderer11::drawDebris()
+bool Renderer11::drawDebris(bool transparent)
 {
 	UINT cPasses = 1;
 
@@ -5182,6 +5404,10 @@ __int32 Renderer11::drawInventoryScene()
 						m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 					else
 						m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+
+					m_stMisc.AlphaTest = (m < 2);
+					updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+					m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 					m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
 				}

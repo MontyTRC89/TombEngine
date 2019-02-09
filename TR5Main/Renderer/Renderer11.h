@@ -473,7 +473,12 @@ struct CStaticBuffer
 struct CLightBuffer {
 	ShaderLight Lights[NUM_LIGHTS_PER_BUFFER];
 	__int32 NumLights;
-	Vector3 Padding;
+	Vector3 CameraPosition;
+};
+
+struct CMiscBuffer {
+	__int32 AlphaTest;
+	float Padding[15];
 };
 
 struct RendererAnimatedTexture 
@@ -696,8 +701,10 @@ private:
 	ID3D11Buffer*							m_cbItem;
 	CStaticBuffer							m_stStatic;
 	ID3D11Buffer*							m_cbStatic;
-	CLightBuffer							m_stRoomLights;
-	ID3D11Buffer*							m_cbRoomLights;
+	CLightBuffer							m_stLights;
+	ID3D11Buffer*							m_cbLights;
+	CMiscBuffer								m_stMisc;
+	ID3D11Buffer*							m_cbMisc;
 
 	// Text and sprites
 	SpriteFont*								m_gameFont;
@@ -814,6 +821,8 @@ private:
 	bool									drawRooms(bool transparent, bool animated);
 	bool									drawStatics(bool transparent);
 	bool									drawItems(bool transparent, bool animated);
+	bool									drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
+	bool									drawWaterfall(RendererItem* item);
 	bool									drawLara(bool transparent);
 	void									printDebugMessage(char* message, ...);
 	void									drawFires();
@@ -829,7 +838,7 @@ private:
 	bool									drawBats();
 	bool									drawRats();
 	bool									drawSpiders();
-	bool									drawDebris();
+	bool									drawDebris(bool transparent);
 	__int32									drawInventoryScene();
 	void									updateAnimatedTextures();
 	void									createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);

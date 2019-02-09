@@ -4,6 +4,11 @@ cbuffer CameraMatrixBuffer : register(b0)
 	float4x4 Projection;
 };
 
+cbuffer MiscBuffer : register(b3)
+{
+	int AlphaTest;
+};
+
 struct VertexShaderInput
 {
 	float3 Position: POSITION;
@@ -39,7 +44,8 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	clip(output.w - 0.5f);
+	if (AlphaTest)
+		clip(output.w - 0.5f);
 	output.xyz = output.xyz * input.Color.xyz;
 	output.w = 1.0f;
 

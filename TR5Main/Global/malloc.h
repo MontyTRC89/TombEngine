@@ -7,6 +7,8 @@
 #define MallocUsed					VAR_U_(0x00E4B0F0, __int32)
 
 #define InitGameMalloc ((void (__cdecl*)()) 0x004A7CB0)
-#define GameMalloc ((char* (__cdecl*)(int)) 0x004A7D00)
+#define GameMallocReal ((char* (__cdecl*)(int)) 0x004A7D00)
+
+char* __cdecl GameMalloc(__int32 size);
 
 void Inject_Malloc();
