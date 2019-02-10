@@ -90,6 +90,18 @@ public:
 	}
 };
 
+struct RendererDisplayMode {
+	__int32 Width;
+	__int32 Height;
+	__int32 RefreshRate;
+};
+
+struct RendererVideoAdapter {
+	string Name;
+	__int32 Index;
+	vector<RendererDisplayMode> DisplayModes;
+};
+
 struct RendererVertex {
 	Vector3 Position;
 	Vector3 Normal;
@@ -650,6 +662,7 @@ private:
 	CommonStates*							m_states = NULL;
 	ID3D11InputLayout*						m_inputLayout = NULL;
 	D3D11_VIEWPORT							m_viewport;
+	vector<RendererVideoAdapter>			m_adapters;
 
 	// Main back buffer
 	ID3D11RenderTargetView*					m_backBufferRTV;
@@ -822,7 +835,7 @@ private:
 	bool									drawStatics(bool transparent);
 	bool									drawItems(bool transparent, bool animated);
 	bool									drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
-	bool									drawWaterfall(RendererItem* item);
+	bool									drawWaterfalls();
 	bool									drawLara(bool transparent);
 	void									printDebugMessage(char* message, ...);
 	void									drawFires();

@@ -104,7 +104,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			lightVec = normalize(lightVec);
 			float attenuation = (radius - distance) / radius;
 
-			float d = dot(input.Normal, -lightVec);
+			float d = dot(input.Normal, lightVec);
 			if (d < 0)
 				continue;
 
@@ -121,7 +121,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			
 			direction = normalize(direction);
 
-			float d = dot(input.Normal, -direction);
+			float d = dot(input.Normal, direction);
 			if (d < 0)
 				continue;
 
@@ -147,7 +147,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 				continue;
 
 			lightVec = normalize(lightVec);
-			float inCone = dot(-lightVec, direction); 
+			float inCone = dot(lightVec, direction); 
 			if (inCone < outAngle)
 				continue;			
 

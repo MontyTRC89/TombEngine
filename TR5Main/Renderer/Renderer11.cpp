@@ -81,11 +81,85 @@ void Renderer11::FreeRendererData()
 
 bool Renderer11::Create()
 {
+	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_1 };
+	D3D_FEATURE_LEVEL featureLevel;
+
+	HRESULT res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION,
+		&m_device, &featureLevel, &m_context);
+	if (FAILED(res))
+		return false;
+
 	return true;
 }
 
 bool Renderer11::EnumerateVideoModes()
 {
+	HRESULT res;
+
+	IDXGIFactory* dxgiFactory = NULL;
+	res = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
+	if (FAILED(res))
+		return false;
+
+	IDXGIAdapter* dxgiAdapter = NULL;
+
+	for (int i = 0; dxgiFactory->EnumAdapters(i, &dxgiAdapter) != DXGI_ERROR_NOT_FOUND; i++)
+	{
+		DXGI_ADAPTER_DESC adapterDesc;
+		UINT stringLength;
+		char videoCardDescription[128];
+
+		dxgiAdapter->GetDesc(&adapterDesc);
+		__int32 error = wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
+
+		RendererVideoAdapter adapter;
+
+		adapter.Index = i;
+		adapter.Name = videoCardDescription;
+
+		printf("Adapter %d\n", i);
+		printf("\t Device Name: %s\n", videoCardDescription);
+
+		IDXGIOutput* output = NULL;
+		res = dxgiAdapter->EnumOutputs(0, &output);
+		if (FAILED(res))
+			return false;
+
+		UINT numModes = 0;
+		DXGI_MODE_DESC* displayModes = NULL;
+		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		// Get the number of elements
+		res = output->GetDisplayModeList(format, 0, &numModes, NULL);
+		if (FAILED(res))
+			return false;
+
+		// Get the list
+		displayModes = new DXGI_MODE_DESC[numModes];
+		res = output->GetDisplayModeList(format, 0, &numModes, displayModes);
+		if (FAILED(res))
+			return false;
+
+		for (__int32 j = 0; j < numModes; j++)
+		{
+			DXGI_MODE_DESC* mode = &displayModes[j];
+
+			RendererDisplayMode newMode;
+
+			newMode.Width = mode->Width;
+			newMode.Height = mode->Height;
+			newMode.RefreshRate = mode->RefreshRate.Numerator / mode->RefreshRate.Denominator;
+
+			adapter.DisplayModes.push_back(newMode);
+
+			printf("\t\t %d x %d %d Hz\n", newMode.Width, newMode.Height, newMode.RefreshRate);
+		}
+
+		m_adapters.push_back(adapter);		
+	}
+
+	dxgiFactory->Release();
+
 	return true;
 }
 
@@ -101,14 +175,6 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
-
-	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_1 };
-	D3D_FEATURE_LEVEL featureLevel;
-
-	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION,
-		&m_device, &featureLevel, &m_context);
-	if (FAILED(res))
-		return false;
 
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = ScreenWidth;
@@ -979,81 +1045,96 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	return true;
 }
 
-bool Renderer11::drawWaterfall(RendererItem* item)
+bool Renderer11::drawWaterfalls()
 {
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	RendererRoom* room = m_rooms[item->Item->roomNumber];
-	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
-
-	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_inputLayout);
-	 
-	m_stItem.World = item->World.Transpose();
-	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
-	m_stItem.AmbientLight = Vector4::One * 0.1f; // room->AmbientLight;
-	memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
-	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-
-	m_stLights.NumLights = item->Lights.Size();
-	for (__int32 j = 0; j < item->Lights.Size(); j++)
-		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
-	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
-
-	m_stMisc.AlphaTest = false;
-	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
-	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
-
-	m_primitiveBatch->Begin();
-
-	for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+	// Draw waterfalls
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	
+	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
 	{
-		RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+		RendererItem* item = m_itemsToDraw[i];
+		RendererRoom* room = m_rooms[item->Item->roomNumber];
+		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
-		for (__int32 b = 0; b < NUM_BUCKETS; b++)
+		__int16 objectNumber = item->Item->objectNumber;
+		if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
 		{
-			RendererBucket* bucket = &mesh->Buckets[b];
+			RendererRoom* room = m_rooms[item->Item->roomNumber];
+			RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
-			if (bucket->Vertices.size() == 0)
-				continue;
+			m_stItem.World = item->World.Transpose();
+			m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
+			m_stItem.AmbientLight = room->AmbientLight; //Vector4::One * 0.1f; // room->AmbientLight;
+			memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
+			updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+			m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-			for (__int32 p = 0; p < bucket->Polygons.size(); p++)
+			m_stLights.NumLights = item->Lights.Size();
+			for (__int32 j = 0; j < item->Lights.Size(); j++)
+				memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+			updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+			m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+
+			m_stMisc.AlphaTest = false;
+			updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+			m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+			m_primitiveBatch->Begin();
+
+			for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 			{
-				RendererPolygon* poly = &bucket->Polygons[p];
+				RendererMesh* mesh = moveableObj->ObjectMeshes[k];
 
-				OBJECT_TEXTURE* texture = &ObjectTextures[poly->TextureId];
-				__int32 tile = texture->tileAndFlag & 0x7FFF;
-
-				if (poly->Shape == SHAPE_RECTANGLE)
+				for (__int32 b = 0; b < NUM_BUCKETS; b++)
 				{
-					bucket->Vertices[poly->Indices[0]].UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-					bucket->Vertices[poly->Indices[1]].UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-					bucket->Vertices[poly->Indices[2]].UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-					bucket->Vertices[poly->Indices[3]].UV.y = (texture->vertices[3].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+					RendererBucket* bucket = &mesh->Buckets[b];
 
-					m_primitiveBatch->DrawQuad(bucket->Vertices[poly->Indices[0]],
-						bucket->Vertices[poly->Indices[1]],
-						bucket->Vertices[poly->Indices[2]],
-						bucket->Vertices[poly->Indices[3]]);
-				}
-				else
-				{
-					bucket->Vertices[poly->Indices[0]].UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-					bucket->Vertices[poly->Indices[1]].UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-					bucket->Vertices[poly->Indices[2]].UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+					if (bucket->Vertices.size() == 0)
+						continue;
 
-					m_primitiveBatch->DrawTriangle(bucket->Vertices[poly->Indices[0]],
-						bucket->Vertices[poly->Indices[1]],
-						bucket->Vertices[poly->Indices[2]]);
+					for (__int32 p = 0; p < bucket->Polygons.size(); p++)
+					{
+						RendererPolygon* poly = &bucket->Polygons[p];
+
+						OBJECT_TEXTURE* texture = &ObjectTextures[poly->TextureId];
+						__int32 tile = texture->tileAndFlag & 0x7FFF;
+
+						if (poly->Shape == SHAPE_RECTANGLE)
+						{
+							bucket->Vertices[poly->Indices[0]].UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+							bucket->Vertices[poly->Indices[1]].UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+							bucket->Vertices[poly->Indices[2]].UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+							bucket->Vertices[poly->Indices[3]].UV.y = (texture->vertices[3].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+
+							m_primitiveBatch->DrawQuad(bucket->Vertices[poly->Indices[0]],
+								bucket->Vertices[poly->Indices[1]],
+								bucket->Vertices[poly->Indices[2]],
+								bucket->Vertices[poly->Indices[3]]);
+						}
+						else
+						{
+							bucket->Vertices[poly->Indices[0]].UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+							bucket->Vertices[poly->Indices[1]].UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+							bucket->Vertices[poly->Indices[2]].UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+
+							m_primitiveBatch->DrawTriangle(bucket->Vertices[poly->Indices[0]],
+								bucket->Vertices[poly->Indices[1]],
+								bucket->Vertices[poly->Indices[2]]);
+						}
+					}
 				}
 			}
+
+			m_primitiveBatch->End();
+		}
+		else
+		{
+			continue;
 		}
 	}
-
-	m_primitiveBatch->End();
 
 	return true;
 }
@@ -1084,36 +1165,12 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 		}
 		else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
 		{
-			//drawAnimatingItem(item, transparent, animated);
 			// We'll draw waterfalls later
 			continue;
 		}
 		else
 		{
 			drawAnimatingItem(item, transparent, animated);
-		}
-	}
-
-	// Draw waterfalls
-	m_context->RSSetState(m_states->CullCounterClockwise());
-	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_inputLayout);
-
-	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
-	{
-		RendererItem* item = m_itemsToDraw[i];
-		RendererRoom* room = m_rooms[item->Item->roomNumber];
-		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
-
-		__int16 objectNumber = item->Item->objectNumber;
-		if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
-		{
-			drawWaterfall(item);
-		}
-		else
-		{
-			continue;
 		}
 	}
 
@@ -1339,6 +1396,7 @@ bool Renderer11::drawScene(bool dump)
 	drawLara(true);
 	drawItems(true, false);
 	drawItems(true, true);
+	drawWaterfalls();
 
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
@@ -1934,12 +1992,14 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Intensity = 1.0f;
 					light.In = oldLight->In;
-					light.Out = oldLight->Out;   
+					light.Out = oldLight->Out;    
 					light.Range = oldLight->Range;
 					light.Type = LIGHT_TYPE_SPOT;
 
 					r->Lights.push_back(light);
 				} 
+
+				oldLight++;
 			}
 		}
 
@@ -2305,10 +2365,19 @@ bool Renderer11::PrepareDataForTheRenderer()
 	}
 
 	for (__int32 i = 0; i < 6; i++)
-	{
+	{ 
 		if (Objects[ID_WATERFALL1 + i].loaded)
 		{
-			OBJECT_TEXTURE* texture = &ObjectTextures[m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[RENDERER_BUCKET_TRANSPARENT].Polygons[0].TextureId];
+			// Get the first textured bucket
+			RendererBucket* bucket = NULL;
+			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+				if (m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j].Polygons.size() > 0)
+					bucket = &m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j];
+			 
+			if (bucket == NULL)
+				continue;
+
+			OBJECT_TEXTURE* texture = &ObjectTextures[bucket->Polygons[0].TextureId];
 			WaterfallTextures[i] = texture;
 			WaterfallY[i] = texture->vertices[0].y;
 		}
