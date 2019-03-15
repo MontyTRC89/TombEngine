@@ -26,7 +26,7 @@
 #define RADIAN 0.01745329252f
 
 #define DX11_RELEASE(x) if (x != NULL) x->Release()
-#define DX11_DELETE(x) if (x != NULL) delete x
+#define DX11_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -673,21 +673,9 @@ private:
 	ID3D11Texture2D*						m_depthStencilTexture;
 
 	RenderTarget2D*							m_dumpScreenRenderTarget;
-
-	// Ambient light cubemap
-	ID3D11Texture2D*						m_ambientCubeMapTexture;
-	ID3D11RenderTargetView*					m_ambientCubeMapRTV[6];
-	ID3D11ShaderResourceView*				m_ambientCubeMapSRV;
-	ID3D11Texture2D*						m_ambientCubeMapDepthTexture;
-	ID3D11DepthStencilView*					m_ambientCubeMapDSV;
-	RenderTarget2D*							m_testRT;
+	RenderTarget2D*							m_renderTarget;
 
 	// Shaders
-	ID3D11VertexShader*						m_vs;
-	ID3D11VertexShader*						m_vs2;
-	ID3D11PixelShader*						m_ps;
-	ID3D11VertexShader*						m_vsAmbientCubeMap;
-	ID3D11PixelShader*						m_psAmbientCubeMap;
 	ID3D11VertexShader*						m_vsRooms;
 	ID3D11PixelShader*						m_psRooms;
 	ID3D11VertexShader*						m_vsItems;
@@ -732,6 +720,8 @@ private:
 	Texture2D*								m_binocularsTexture;
 
 	// Level data
+	Texture2D*										m_titleScreen;
+	Texture2D*										m_loadScreen;
 	Texture2D*										m_textureAtlas;
 	Texture2D*										m_skyTexture;
 	VertexBuffer*									m_roomsVertexBuffer;
@@ -769,6 +759,10 @@ private:
 	RendererObject**								m_moveableObjects;
 	RendererObject**								m_staticObjects;
 	RendererSprite**								m_sprites;
+	__int32											m_numMoveables;
+	__int32											m_numStatics;
+	__int32											m_numSprites;
+	__int32											m_numSpritesSequences;
 	RendererSpriteSequence**						m_spriteSequences;
 	unordered_map<__int16*, RendererMesh*>			m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
@@ -796,6 +790,9 @@ private:
 	bool											m_firstWeather;
 	RendererWeatherParticle							m_rain[NUM_RAIN_DROPS];
 	RendererWeatherParticle							m_snow[NUM_SNOW_PARTICLES];
+	RENDERER_FADE_STATUS							m_fadeStatus;
+	float											m_fadeFactor;
+	__int32											m_progress;
 
 	// Private functions
 	bool									drawScene(bool dump);
@@ -853,6 +850,7 @@ private:
 	bool									drawSpiders();
 	bool									drawDebris(bool transparent);
 	__int32									drawInventoryScene();
+	__int32									drawFinalPass();
 	void									updateAnimatedTextures();
 	void									createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
 	void									drawShockwaves();

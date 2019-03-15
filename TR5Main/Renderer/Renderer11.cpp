@@ -64,19 +64,83 @@ Renderer11::~Renderer11()
 	DX11_RELEASE(m_depthStencilTexture);
 	DX11_RELEASE(m_depthStencilView);
 
+	DX11_DELETE(m_primitiveBatch);
 	DX11_DELETE(m_spriteBatch);
 	DX11_DELETE(m_gameFont);
 	DX11_DELETE(m_states);
+
+	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
+		DX11_DELETE(m_caustics[i]);
+
+	DX11_DELETE(m_titleScreen);
+	DX11_DELETE(m_binocularsTexture);
+
+	DX11_RELEASE(m_vsRooms);
+	DX11_RELEASE(m_psRooms);
+	DX11_RELEASE(m_vsItems);
+	DX11_RELEASE(m_psItems);
+	DX11_RELEASE(m_vsStatics);
+	DX11_RELEASE(m_psStatics);
+	DX11_RELEASE(m_vsHairs);
+	DX11_RELEASE(m_psHairs);
+	DX11_RELEASE(m_vsSky);
+	DX11_RELEASE(m_psSky);
+	DX11_RELEASE(m_vsSprites);
+	DX11_RELEASE(m_psSprites);
+	DX11_RELEASE(m_vsSolid);
+	DX11_RELEASE(m_psSolid);
+	DX11_RELEASE(m_vsInventory);
+	DX11_RELEASE(m_psInventory);
+	DX11_RELEASE(m_vsFullScreenQuad);
+	DX11_RELEASE(m_psFullScreenQuad);
+
+	DX11_DELETE(m_cbCameraMatrices);
+	DX11_DELETE(m_cbItem);
+	DX11_DELETE(m_cbStatic);
+	DX11_DELETE(m_cbLights);
+	DX11_DELETE(m_cbMisc);
+
+	DX11_DELETE(m_renderTarget);
+	DX11_DELETE(m_dumpScreenRenderTarget);
 
 	FreeRendererData();
 }
 
 void Renderer11::FreeRendererData()
 {
+	for (__int32 i = 0; i < NUM_OBJECTS; i++)
+		DX11_DELETE(m_moveableObjects[i]);
+	free(m_moveableObjects);
+
+	for (__int32 i = 0; i < NUM_OBJECTS; i++)
+		DX11_DELETE(m_spriteSequences[i]);
+	free(m_spriteSequences);
+
+	for (__int32 i = 0; i < NUM_STATICS; i++)
+		DX11_DELETE(m_staticObjects[i]);
+	free(m_staticObjects);
+
+	for (__int32 i = 0; i < NUM_ROOMS; i++)
+		DX11_DELETE(m_rooms[i]);
+	free(m_rooms);
+
+	for (__int32 i = 0; i < m_numAnimatedTextureSets; i++)
+		DX11_DELETE(m_animatedTextureSets[i]);
+	free(m_animatedTextureSets);
+
 	DX11_DELETE(m_textureAtlas);
-	DX11_DELETE(m_binocularsTexture);
-	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
-		DX11_DELETE(m_caustics[i]);
+	DX11_DELETE(m_skyTexture);
+
+	DX11_DELETE(m_roomsVertexBuffer);
+	DX11_DELETE(m_roomsIndexBuffer);
+
+	DX11_DELETE(m_moveablesVertexBuffer);
+	DX11_DELETE(m_moveablesIndexBuffer);
+
+	DX11_DELETE(m_staticsVertexBuffer);
+	DX11_DELETE(m_staticsIndexBuffer);
+	
+	m_meshPointersToMesh.clear();
 }
 
 bool Renderer11::Create()
@@ -287,6 +351,10 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 			return false;
 	}
 
+	m_titleScreen = Texture2D::LoadFromFile(m_device, "Screens\\Title.jpg");
+	if (m_titleScreen == NULL)
+		return false;
+
 	m_binocularsTexture = Texture2D::LoadFromFile(m_device, "Binoculars.png");
 	if (m_binocularsTexture == NULL)
 		return false;
@@ -396,87 +464,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_cbLights = createConstantBuffer(sizeof(CLightBuffer));
 	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
 
-	// Initialise the ambient cube map
-	D3D11_TEXTURE2D_DESC texDesc; 
-	ZeroMemory(&texDesc, sizeof(D3D11_TEXTURE2D_DESC));
-	texDesc.Width = AMBIENT_CUBE_MAP_SIZE; 
-	texDesc.Height = AMBIENT_CUBE_MAP_SIZE; 
-	texDesc.MipLevels = 0; 
-	texDesc.ArraySize = 6;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0; 
-	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; 
-	texDesc.Usage = D3D11_USAGE_DEFAULT; 
-	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE; 
-	texDesc.CPUAccessFlags = 0; 
-	texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS | D3D11_RESOURCE_MISC_TEXTURECUBE; 
-	
-	m_ambientCubeMapTexture = NULL;
-	res = m_device->CreateTexture2D(&texDesc, NULL, &m_ambientCubeMapTexture);
-	if (FAILED(res))
-		return false;
-
-	D3D11_RENDER_TARGET_VIEW_DESC descRT;
-	ZeroMemory(&descRT, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
-	descRT.Format = DXGI_FORMAT_R8G8B8A8_UNORM; 
-	descRT.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY; 
-	descRT.Texture2DArray.ArraySize = 1; 
-	descRT.Texture2DArray.MipSlice = 0; 
-
-	for (__int32 i = 0; i < 6; i++)
-	{
-		descRT.Texture2DArray.FirstArraySlice = i;
-		m_ambientCubeMapRTV[i] = NULL;
-		res = m_device->CreateRenderTargetView(m_ambientCubeMapTexture, &descRT, &m_ambientCubeMapRTV[i]);
-		if (FAILED(res))
-			return false;
-	}
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-	srvDesc.Format = texDesc.Format; 
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE; 
-	srvDesc.TextureCube.MostDetailedMip = 0; 
-	srvDesc.TextureCube.MipLevels = -1; 
-	
-	m_ambientCubeMapSRV = NULL;
-	res = m_device->CreateShaderResourceView(m_ambientCubeMapTexture, &srvDesc, &m_ambientCubeMapSRV);
-	if (FAILED(res))
-		return false;
-
-	D3D11_TEXTURE2D_DESC depthTexDesc;
-	ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
-	depthTexDesc.Width = AMBIENT_CUBE_MAP_SIZE; 
-	depthTexDesc.Height = AMBIENT_CUBE_MAP_SIZE; 
-	depthTexDesc.MipLevels = 1; 
-	depthTexDesc.ArraySize = 1; 
-	depthTexDesc.SampleDesc.Count = 1; 
-	depthTexDesc.SampleDesc.Quality = 0; 
-	depthTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; 
-	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL; 
-	depthTexDesc.CPUAccessFlags = 0; 
-	depthTexDesc.MiscFlags = 0; 
-	
-	ID3D11Texture2D* m_ambientCubeMapDepthTexture = NULL;
-	res = m_device->CreateTexture2D(&depthTexDesc, NULL, &m_ambientCubeMapDepthTexture);
-	if (FAILED(res))
-		return false;
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-	ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
-	dsvDesc.Format = depthTexDesc.Format; 
-	dsvDesc.Flags = 0; 
-	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D; 
-	dsvDesc.Texture2D.MipSlice = 0; 
-	
-	m_ambientCubeMapDSV = NULL;
-	res = m_device->CreateDepthStencilView(m_ambientCubeMapDepthTexture, &dsvDesc, &m_ambientCubeMapDSV);
-	if (FAILED(res))
-		return false;
-
-	m_testRT = RenderTarget2D::Create(m_device, AMBIENT_CUBE_MAP_SIZE, AMBIENT_CUBE_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM);
-
+	m_renderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	return true;
@@ -485,6 +473,8 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 __int32	Renderer11::Draw()
 {
 	drawScene(false);
+	drawFinalPass();
+
 	return 0;
 }
 
@@ -502,165 +492,6 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 
 bool Renderer11::drawAmbientCubeMap(__int16 roomNumber)
 {
-	ROOM_INFO* r = &Rooms[roomNumber];
-
-	Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 384, LaraItem->pos.zPos); //Vector3(r->x+r->xSize*1024/2, (r->RoomYBottom+r->RoomYTop)/2, r->z + r->ySize * 1024 / 2);
-	Vector3 targets[6] = { laraPos + Vector3::UnitX * WALL_SIZE,
-						laraPos - Vector3::UnitX * WALL_SIZE,
-						laraPos + Vector3::UnitY * WALL_SIZE,
-						laraPos - Vector3::UnitY * WALL_SIZE,
-						laraPos + Vector3::UnitZ * WALL_SIZE,
-						laraPos - Vector3::UnitZ * WALL_SIZE };
-	Vector3 ups[6] = { -Vector3::UnitY, -Vector3::UnitY, Vector3::UnitX, -Vector3::UnitX, -Vector3::UnitY, -Vector3::UnitY };
-
-
-	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-	m_context->RSSetState(m_states->CullCounterClockwise());
-	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
-	for (__int32 i = 0; i < 6; i++)
-	{
-		// Clear screen
-		m_context->ClearRenderTargetView(m_ambientCubeMapRTV[i], Colors::CornflowerBlue);
-		m_context->ClearDepthStencilView(m_ambientCubeMapDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		// Bind the back buffer
-		m_context->OMSetRenderTargets(1, &m_ambientCubeMapRTV[i], m_ambientCubeMapDSV);
-		m_context->RSSetViewports(1, &m_viewport);
-		 
-		// Set vertex buffer
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-		m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout);
-		m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
-
-		// Reset viewport
-		D3D11_VIEWPORT viewPort;
-		viewPort.TopLeftX = 0.0f;
-		viewPort.TopLeftY = 0.0f;
-		viewPort.Width = AMBIENT_CUBE_MAP_SIZE;
-		viewPort.Height = AMBIENT_CUBE_MAP_SIZE;
-		viewPort.MinDepth = 0.0f;
-		viewPort.MaxDepth = 1.0f;
-		m_context->RSSetViewports(1, &viewPort);
-		    
-		// Set shaders
-		m_context->VSSetShader(m_vsAmbientCubeMap, NULL, 0);
-		m_context->PSSetShader(m_psAmbientCubeMap, NULL, 0);
-		  
-		// Set texture
-		/*m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
-		m_context->PSSetSamplers(0, 1, &sampler);*/
-
-		// Set camera matrices
-		Matrix projection = Matrix::CreatePerspectiveFieldOfView(PI / 2.0f, 1.0f, 20.0f, 200.0f * WALL_SIZE);
-		m_stCameraMatrices.View = Matrix::CreateLookAt(laraPos, targets[i], ups[i]).Transpose();
-		m_stCameraMatrices.Projection = projection.Transpose();
-
-		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
-		for (__int32 i = 0; i < NumberRooms; i++)
-		{
-			RendererRoom* room = m_rooms[i];
-			if (room == NULL)
-				continue;
-
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
-			{
-				RendererBucket* bucket = &room->Buckets[j];
-
-				if (bucket->Vertices.size() == 0)
-					continue;
-
-				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-				m_numDrawCalls++;
-			}
-		}
-	}
-
-	D3DX11SaveTextureToFile(m_context, m_ambientCubeMapTexture, D3DX11_IMAGE_FILE_FORMAT::D3DX11_IFF_DDS, "H:\\cubetest.dds");
-	//D3DX11SaveTextureToFile(m_context, m_testRT->Texture, D3DX11_IFF_PNG, "H:\\provart.png");
-
-	/*
-	D3D11_VIEWPORT viewPort; 
-	viewPort.TopLeftX = 0.0f;
-	viewPort.TopLeftY = 0.0f;
-	viewPort.Width = AMBIENT_CUBE_MAP_SIZE;
-	viewPort.Height = AMBIENT_CUBE_MAP_SIZE;
-	viewPort.MinDepth = 0.0f;
-	viewPort.MaxDepth = 1.0f;
-	
-	Vector3 laraPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	Vector3 targets[6] = { laraPos + Vector3::UnitX * WALL_SIZE,
-						laraPos - Vector3::UnitX * WALL_SIZE,
-						laraPos + Vector3::UnitY * WALL_SIZE,
-						laraPos - Vector3::UnitY * WALL_SIZE,
-						laraPos + Vector3::UnitZ * WALL_SIZE,
-						laraPos - Vector3::UnitZ * WALL_SIZE };
-	Vector3 ups[6] = { -Vector3::UnitY, -Vector3::UnitY, Vector3::UnitX, -Vector3::UnitX, -Vector3::UnitY, -Vector3::UnitY };
-
-	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-	m_context->RSSetState(m_states->CullCounterClockwise());
-	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
-	// Set shaders
-	m_context->VSSetShader(m_vsAmbientCubeMap, NULL, 0);
-	m_context->PSSetShader(m_psAmbientCubeMap, NULL, 0);
-
-	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
-	m_context->PSSetSamplers(0, 1, &sampler);
-
-	Matrix projection = Matrix::CreatePerspectiveFieldOfView(PI / 2.0f, 1.0f, 20.0f, 200.0f * WALL_SIZE);
-	
-	// Set vertex buffer
-	UINT stride = sizeof(RendererVertex);
-	UINT offset = 0;
-	m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
-	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
-
-	for (__int32 i = 0; i < 6; i++)
-	{
-		m_stCameraMatrices.View = Matrix::CreateLookAt(laraPos, targets[i], ups[i]).Transpose();
-		m_stCameraMatrices.Projection = projection.Transpose();
-		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
-		m_context->ClearRenderTargetView(m_ambientCubeMapRTV[i], Colors::CornflowerBlue);
-		m_context->ClearDepthStencilView(m_ambientCubeMapDSV, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 1.0f, 0);
-		
-		m_context->OMSetRenderTargets(1, &m_ambientCubeMapRTV[i], m_ambientCubeMapDSV);
-		m_context->RSSetViewports(1, &viewPort);
-
-		for (__int32 n = 0; n < m_roomsToDraw.Size(); n++)
-		{
-			RendererRoom* room = m_roomsToDraw[n];
-			 
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
-			{
-				RendererBucket* bucket = &room->Buckets[j];
-
-				if (bucket->Vertices.size() == 0)
-					continue;
-
-				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
-				m_numDrawCalls++;
-			}
-		}
-	}
-
-	//D3DX11SaveTextureToFile(m_context, m_ambientCubeMapTexture, D3DX11_IMAGE_FILE_FORMAT::D3DX11_IFF_JPG, "H:\\cubemap.png");
-	D3DX11SaveTextureToFile(m_context, m_ambientCubeMapTexture, D3DX11_IFF_DDS, "H:\\cubemap.dds");*/
-
 	return true;
 }
 
@@ -1361,9 +1192,9 @@ bool Renderer11::drawScene(bool dump)
 	// Bind and clear render target
 	if (!dump)
 	{
-		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+		m_context->ClearRenderTargetView(m_renderTarget->RenderTargetView, Colors::Black);
+		m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->OMSetRenderTargets(1, &m_renderTarget->RenderTargetView, m_renderTarget->DepthStencilView);
 	}
 	else
 	{
@@ -1456,7 +1287,10 @@ __int32 Renderer11::DumpGameScene()
 
 __int32 Renderer11::DrawInventory()
 {
-	return drawInventoryScene();
+	drawInventoryScene();
+	drawFinalPass();
+
+	return 0;
 }
 
 __int32 Renderer11::DrawPickup(__int16 objectNum)
@@ -1552,6 +1386,38 @@ bool Renderer11::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color,
 	return true;
 }
 
+__int32 Renderer11::drawFinalPass()
+{
+	// Update fade status
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor > 0.99f)
+		m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
+
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor <= 0.01f)
+		m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
+
+	// Reset GPU state
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+
+	drawFullScreenQuad(m_renderTarget->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor));
+
+	m_swapChain->Present(0, 0);
+
+	// Update fade status
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN)
+		m_fadeFactor += FADE_FACTOR;
+
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT)
+		m_fadeFactor -= FADE_FACTOR;
+
+	return 0;
+}
+
 bool Renderer11::drawAllStrings()
 {
 	m_spriteBatch->Begin();
@@ -1584,15 +1450,15 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_staticObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_STATICS);
 	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);
 
-	m_rooms = (RendererRoom**)malloc(sizeof(RendererRoom*) * 1024);
-	ZeroMemory(m_rooms, sizeof(RendererRoom*) * 1024);
+	m_rooms = (RendererRoom**)malloc(sizeof(RendererRoom*) * NUM_ROOMS);
+	ZeroMemory(m_rooms, sizeof(RendererRoom*) * NUM_ROOMS);
 
 	// Step 0: prepare animated textures
 	__int16 numSets = *AnimatedTextureRanges;
 	__int16* animatedPtr = AnimatedTextureRanges;
 	animatedPtr++;
 	
-	m_animatedTextureSets = (RendererAnimatedTextureSet**)malloc(sizeof(RendererAnimatedTextureSet*) * numSets);
+	m_animatedTextureSets = (RendererAnimatedTextureSet**)malloc(sizeof(RendererAnimatedTextureSet*) * NUM_ANIMATED_SETS);
 	m_numAnimatedTextureSets = numSets;
 
 	for (__int32 i = 0; i < numSets; i++)
@@ -1636,7 +1502,6 @@ bool Renderer11::PrepareDataForTheRenderer()
 	__int32 blockX = 0;
 	__int32 blockY = 0;
 
-	
 	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
 	{
 		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
@@ -1675,8 +1540,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 		}
 	}
 
-	if (m_textureAtlas != NULL)
-		delete m_textureAtlas;
+	//if (m_textureAtlas != NULL)
+	//	delete m_textureAtlas;
 
 	m_textureAtlas = Texture2D::LoadFromByteArray(m_device, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, &buffer[0]);
 	if (m_textureAtlas == NULL)
@@ -1691,7 +1556,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	if (m_skyTexture == NULL)
 		return false;
 
-	D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
+	//D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
 
 	free(buffer);
 
@@ -2537,27 +2402,81 @@ void Renderer11::EnableCinematicBars(bool value)
 
 void Renderer11::FadeIn()
 {
-
+	m_fadeStatus = RENDERER_FADE_STATUS::FADE_IN;
+	m_fadeFactor = 0.0f;
 }
 
 void Renderer11::FadeOut()
 {
-
+	m_fadeStatus = RENDERER_FADE_STATUS::FADE_OUT;
+	m_fadeFactor = 1.0f;
 }
 
 void Renderer11::DrawLoadingScreen(char* fileName)
 {
-	
+	Texture2D* texture = Texture2D::LoadFromFile(m_device, fileName);
+	if (texture == NULL)
+		return;
+
+	m_fadeStatus = RENDERER_FADE_STATUS::FADE_IN;
+	m_fadeFactor = 0.0f;
+
+	while (true)
+	{
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor < 1.0f)
+			m_fadeFactor += FADE_FACTOR;
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor > 0.0f)
+			m_fadeFactor -= FADE_FACTOR;
+
+		// Set basic render states
+		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		m_context->RSSetState(m_states->CullCounterClockwise());
+		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+
+		// Clear screen
+		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		// Bind the back buffer
+		m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+		m_context->RSSetViewports(1, &m_viewport);
+
+		// Draw the full screen background
+		drawFullScreenQuad(texture->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor));
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		m_swapChain->Present(0, 0);
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor >= 1.0f)
+		{
+			m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
+			m_fadeFactor = 1.0f;
+		}
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::NO_FADE && m_progress == 100)
+		{
+			m_fadeStatus = RENDERER_FADE_STATUS::FADE_OUT;
+			m_fadeFactor = 1.0f;
+		}
+
+		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor <= 0.0f)
+		{
+			break;
+		}
+	}
+
+	delete texture;
 }
 
 void Renderer11::UpdateProgress(float value)
 {
-
+	m_progress = value;
 }
 
 bool Renderer11::IsFading()
 {
-	return false;
+	return (m_fadeStatus != FADEMODE_NONE);
 }
 
 void Renderer11::GetLaraBonePosition(Vector3* pos, __int32 bone)
@@ -5320,34 +5239,23 @@ __int32 Renderer11::drawInventoryScene()
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 	m_context->RSSetState(m_states->CullCounterClockwise());
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-	
-	// Clear screen
-	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	// Bind the back buffer
-	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+	// Bind and clear render target
+	m_context->ClearRenderTargetView(m_renderTarget->RenderTargetView, Colors::Black);
+	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, &m_renderTarget->RenderTargetView, m_renderTarget->DepthStencilView);
 	m_context->RSSetViewports(1, &m_viewport);
 
-	// Draw the full screen background
-	/*if (g_Inventory->GetType() == INV_TYPE_TITLE)
+	// Clear the Z-Buffer after drawing the background	
+	if (g_Inventory->GetType() == INV_TYPE_TITLE)
 	{
-		drawFullScreenBackground(m_titleScreen, 1.0f);
+		drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor));
 	}
 	else
 	{
-		XMMATRIXScaling(&m_tempScale, 1.0f, 1.0f, 1.0f);
-
-		m_dxSprite->Begin(0);
-		m_dxSprite->SetTransform(&m_tempScale);
-		m_dxSprite->Draw(m_renderTarget, &rect, &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 0.0f, 0.0f), D3DCOLOR_ARGB(255, 64, 64, 64));
-		m_dxSprite->End();
-	}*/
-
-	// Clear the Z-Buffer after drawing the background
-	
-	drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.3f, 0.3f, 0.3f));
-	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.3f, 0.3f, 0.3f));
+	}
+	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
@@ -5357,7 +5265,7 @@ __int32 Renderer11::drawInventoryScene()
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
-	
+
 	// Set shaders
 	m_context->VSSetShader(m_vsInventory, NULL, 0);
 	m_context->PSSetShader(m_psInventory, NULL, 0);
@@ -5366,8 +5274,6 @@ __int32 Renderer11::drawInventoryScene()
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
-
-	//effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f));
 
 	__int32 activeRing = g_Inventory->GetActiveRing();
 	__int32 lastRing = 0;
@@ -5430,7 +5336,7 @@ __int32 Renderer11::drawInventoryScene()
 			Matrix translation = Matrix::CreateTranslation(x, y, z);
 			Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384));
 			Matrix transform = (scale * rotation) * translation;
-			 
+
 			OBJECT_INFO* obj = &Objects[objectNumber];
 			RendererObject* moveableObj = m_moveableObjects[objectNumber];
 
@@ -5610,7 +5516,7 @@ __int32 Renderer11::drawInventoryScene()
 					else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						// Draw sound menu
-						
+
 						// Enable sound
 						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
 							PRINTSTRING_COLOR_ORANGE,
@@ -5739,8 +5645,6 @@ __int32 Renderer11::drawInventoryScene()
 
 	//drawAllLines2D();
 	drawAllStrings();
-
-	m_swapChain->Present(0, 0);
 
 	return 0;
 }

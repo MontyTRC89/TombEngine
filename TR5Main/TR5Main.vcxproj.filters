@@ -306,6 +306,9 @@
     <ClInclude Include="Renderer\Renderer11.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Scripting\LanguageScript.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
@@ -563,6 +566,9 @@
     <ClCompile Include="Renderer\Renderer11.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Scripting\LanguageScript.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />
@@ -607,5 +613,8 @@
     <ResourceCompile Include="Resources.rc">
       <Filter>File di risorse</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Shaders\DX11_FinalPass.fx" />
   </ItemGroup>
 </Project>

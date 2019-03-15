@@ -1,0 +1,364 @@
+[Strings]
+Kambodscha, 1984
+Das Jahr 2000, irgendwo in ƒgypten ...
+Titelladebildschirm  
+Spielbarer Tutorial-Level
+Das Grabmal des Seth
+Die Grabkammer
+Im Tal der Kînige
+Das 5. Grabmal im Tal der Kînige
+Der Tempel von Karnak
+Die grosse Hypostyle Halle
+Der heilige See
+Der zweite See
+Das Grabmal des Semerkhet
+Der WÑchter des Semerkhet
+Ein Zug in der WÅste
+Alexandria
+Die KÅstenruinen
+Der Isistempel von Pharos
+Der Palast der Kleopatra
+Die Katakomben
+Der Poseidontempel
+Die verschwundene Bibliothek
+Die Hallen des Demetrius
+Die Stadt der Toten
+Die GrÑben
+Die Tulun-Moschee
+Das Tor zur Zitadelle
+Der Strassenbasar
+Die Zitadelle
+Der Sphinx Komplex
+Im Zeichen der Sphinx
+Der Tempel im Tal
+Die Pyramide des Menkaure
+In der Pyramide des Menkaure
+Die Mastaba
+Die grosse Pyramide
+Die Kînigspyramiden von Khufu
+In der grossen Pyramide
+Der Tempel des Horus
+Unbegrenzt %s
+BENUTZEN
+AMMO WéHLEN
+KOMBINIEREN
+TRENNEN
+AUSRöSTEN
+KOMBINIEREN MIT
+SPIEL LADEN
+SPIEL SPEICHERN
+UNTERSUCHEN
+\x14 Mehr
+\x14 Ammo wÑhlen
+\x14 Option wÑhlen
+\x14 Kombinieren
+Uzi
+Pistolen
+Gewehr
+Revolver
+Revolver + Laser
+Armbrust
+Armbrust + Laser
+Granatwerfer
+Gewehr Normale Ammo
+Gewehr Schrot Ammo
+Granatwerfer leichte Ammo
+Granatwerfer schwere Ammo
+Granatwerfer Leuchtspurammo
+Armbrust leichte Ammo
+Armbrust Giftammo
+Armbrust Explosivammo
+Revolver Ammo
+Uzi Ammo
+Pistolenammo
+Laser
+Grosses Medipack
+Kleines Medipack
+Fernglas
+Fackeln
+Kompass
+Laden
+Speichern
+Kleine Feldflasche (leer)
+Kleine Feldflasche mit 1 Liter
+Kleine Feldflasche mit 2 Litern
+Kleine Feldflasche mit 3 Litern
+Grosse Feldflasche (leer)
+Grosse Feldflasche mit 1 Liter
+Grosse Feldflasche mit 2 Litern
+Grosse Feldflasche mit 3 Litern
+Grosse Feldflasche mit 4 Litern
+Grosse Feldflasche mit 5 Litern
+Brechstange
+QuestItem1:Das Amulet des Horus
+QuestItem2:Brustpanzerung
+QuestItem3:Linke Beinpanzerung
+QuestItem4:Rechte Beinpanzerung
+QuestItem5:Linker Metallhandschuh
+QuestItem6:Rechter Metallhandschuh
+Mechanischer SkarabÑus
+Mechanischer SkarabÑus mit SchlÅssel
+AufziehschlÅssel
+WaffenkammerschlÅssel
+SchlÅssel der Wachen
+Papierfetzen
+Stein des Maat
+Stein des Khepri
+Stein des Atum
+Stein des Re
+SchlÅssel zum Nordschaft
+SchlÅssel zum SÅdschaft
+SchlÅssel zum Ostschaft
+Schwarzer KÑfer
+Zerbrochener KÑfer
+Zerbrochene Brille
+Feuerzirkelrolle
+ZÅndschlÅssel
+Musikrolle
+MÅnzstÅck
+Das Auge des Horus
+Okular
+Der zeitlose Sand
+Die Hand des Orion
+Die Hand des Sirius
+SkarabÑus Talisman
+Die goldene Schlange
+Der goldene TotenschÑdel
+Metallklinge
+Holzgriff
+SilberschlÅssel
+SchlÅssel zum Westschaft
+Schaufel
+Heilige Skulptur
+Vase 1
+Vase 2
+Sonnenkînigin
+Sonnenscheibe
+Sonnentalisman
+Kartusche StÅck 1
+Kartusche StÅck 2
+Ba Kartusche
+Ra Kartusche
+Goldener Vraeus
+SchlÅssel des WÑchters
+HypostelschlÅssel
+TempelschlÅssel
+Verteiler Spezialbenzin
+Druckventil
+Spezialbenzin Kanister
+Wagenheber
+Defekter Wagenheber
+Kurbel
+DachbodenschlÅssel
+WaffencodeschlÅssel
+Minendetonator
+GehÑuse Minendetonator
+Minenpositionsdaten
+Dreizack
+Goldener Stern
+Haken und Stab
+Wandhaken
+Defekter Griff
+Hathorbildnis
+Ornate Handle
+PortalwÑchter
+Reiter Juwel
+Pharos' Knoten
+Pharos' SÑule
+MÅnze
+TorschlÅssel
+Die Gesetze des Senet
+Sandsack
+Kanister
+Ja
+Nein
+Spiel laden
+Neues Spiel
+Pause
+WÑhlen Sie das zu ladende Spiel
+WÑhlen Sie das zu speichernde Spiel
+GAME OVER
+Spiel speichern
+ZurÅck zum Startbildschirm
+DEMO MODUS
+Momentaner Ort
+Statistiken
+ZurÅckgelegte Entfernung
+Verbrauchte Ammo
+Gefundene Secrets
+Ort
+Benutzte Medipacks
+Gesamtzeit
+Tage
+von
+Aktion
+Waffe ziehen
+Springen
+Rolle
+Gehen
+Umsehen
+Ducken
+Sprinten
+Inventar
+RULES1:Sie gewinnen das Spiel, wenn Sie jeden Ihrer\nBrettsteine auf dem letzten Ankhfeld\npositionieren. Drehen Sie die Sticks, wenn\nSie an der Reihe sind. Die Anzahl der\nweissen FlÑchen zeigt Ihre Wurfanzahl.
+RULES2:Werden keine weissen FlÑchen gezeigt, haben\nSie eine Sechs geworfen. Wenn Sie eine Sechs\nwerfen, oder auf einem Ankhfeld landen, sind\nSie nochmals am Zug. Landen Sie auf einem\ngegnerischen Stein, wird Ihrer an den\nAnfang zurÅckgesetzt.
+PETEPOO:Damit die Schlangen leben\nkînnen, muss ihr Hunger\nzuerst gestillt werden.\nReize sie nacheinander, und\nder Kreis wird gÑnzlich\nbrennen.
+[PSXStrings]
+BSELECT:\x14 AuswÑhlen
+BCANCEL:\x17 Abbrechen
+BGOBACK:ZurÅck \x17
+BOK:\x14 Ok
+BCANCEL:Abbrechen \x17
+MEMCARD:BESLES-02240
+INSERT:Stecken Sie die Memory Card\nin den Memory Card Steckplatz 1
+CHECKING:öberprÅfe Memory Card
+FORMAT: Die Memory Card ist unformatiert\nMemory Card formatieren?
+LOADING:Lade Daten\nMemory Card nicht entfernen
+SAVING:Speichere Daten\nMemory Card nicht entfernen
+FORMATTING:Formatiere Memory Card\nMemory Card nicht entfernen
+OVERWRITE:Spielstand auf Memory Card Åberschreiben ?
+UNFORMATTED:Die Memory Card ist unformatiert\nStecken Sie eine formatierte Memory Card ein
+NOSPACE:Die Memory Card hat zu wenig freie Blîcke\n\nStecken Sie eine Memory Card mit\nmind. zwei freien Blîcken ein
+NOGAMES:Keine SpielstÑnde aus Tomb Raider IV\nauf der Memory Card\nin Memory Card Steckplatz 1 vorhanden
+LADE...
+Laden OK
+Speichern OK
+Formatierung OK
+Ladefehler
+Speicherfehler
+Formatierungsfehler
+Leer
+Kein Controller angeschlossen
+Fortsetzen
+Beenden
+Spieleinstellungen
+Steuerungsoptionen
+Wollen Sie das Spiel wirklich beenden ?
+Bildschirm Anpassung
+FXVOL:SFX Lautst.\t\t\t
+MUSICVOL:Musik Lautst.\t\t\t
+Richtungstasten\nfÅr Bildschirmanpassung
+Steuerung konfigurieren
+Configuration n
+Vibration ein
+Vibration aus
+Manuelles Zielen
+Automatisches Zielen
+PAD:\t\t\t\t\t\t\t\t\n\n\n\n\n
+PAD2:\t\t\t\t\t\t\t\t\t\n\n\n\n\n\n\n\n\n
+Programmers
+Additional Programmers
+AI Programming
+Animators
+Level Designers
+FMV Sequences
+Additional Artwork
+Music & Sound FX
+Original Story
+Script
+Producer
+QA
+Executive Producers
+Additional Sound FX
+TEAM1:Chris Coupe
+TEAM2:Martin Gibbins
+TEAM3:Derek Leigh-Gilchrist
+TEAM4:Tom Scutt
+TEAM5:Richard Flower
+TEAM6:Martin Jensen
+TEAM8:Phil Chapman
+TEAM7:Jerr O'Carroll
+TEAM9:Joby Wood
+TEAM10:Andrea Cordella
+TEAM11:Pete Duncan
+TEAM12:Jamie Morton
+TEAM13:Richard Morton
+TEAM14:Andy Sandham
+TEAM15:Peter Barnard
+TEAM16:David Reading
+TEAM17:Matt Furniss
+TEAM18:Simeon Furniss
+TEAM19:John Lilley
+TEAM20:Damon Godley
+TEAM21:Mark Hazelton
+TEAM22:Steve Huckle
+TEAM23:Steve Hawkes
+TEAM24:Darren Wakeman
+TEAM25:Peter Connelly
+TEAM26:Martin Iveson
+TEAM27:Hope Canton
+TEAM28:Dr Kieron O'Hara
+TEAM29:Troy Horton
+TEAM30:Tiziano Cirillo
+TEAM31:Nick Connolly
+TEAM32:Hayos Fatunmbi
+TEAM33:Paul Field
+TEAM34:Steve Wakeman
+TEAM35:Dave Ward
+TEAM36:Jason Churchman
+TEAM37:Jeremy H. Smith
+TEAM38:Adrian Smith
+TEAM39:Clint Nembhard
+TEAM40:Benjamin Twose
+[PCStrings]
+PC Programmer
+Programmers
+Additional Programming
+Fortsetzten
+Optionen
+Freier Slot
+Musik LautstÑrke
+SFX LautstÑrke
+Sound QualitÑt
+Niedrig
+Mittel
+Hoch
+Zielen
+Manuell
+Automatisch
+Grafikkarte
+Einstellungen
+Auflîsung
+Texturentiefe
+OK
+Abbrechen
+Hardwarebeschleuniger
+Software Modus
+Volumetrische Effekte
+Bilinearer Filter
+Bump Mapping
+Niedrige Auflîsung Texturen
+Niedrige Auflîsung Bump Maps
+Soundkarte
+Ausschalten
+Bit\t\t\t; As In 16 Bit
+Vollbild
+Im Fenster
+Render Optionen
+Keine Soundkarte installiert
+DirectX Setup fehlgeschlagen
+Verlassen
+Steuerung konfigurieren
+Fackel benutzen
+Art der Steuerung
+Maus
+Keyboard
+Joystick
+Warte...
+ZurÅcksetzen
+Einstellungen speichern
+Speichern OK
+Schritt links
+Schritt rechts
+Spielstart
+Setup
+Installieren
+Deinstallieren
+ReadMe
+Demo Modus - Esc zum Beenden
+Level auswÑhlen
+Keine FMV
+OEM1:\n\n\nCongratulations on reaching the end\nof this special version of the game.\nIf you want to continue Lara's adventure,\nyou need to purchase the full version.\nRemember to keep your save game files,\nto continue from where you are now.\nFor details of transferring your save game\nfiles refer to the readme file,\nthis is accessed via the task bar.
+THE LAST STRING ENTRY
+[ExtraNG]
+0: Prova

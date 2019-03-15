@@ -5,6 +5,24 @@
 #include "..\Game\sound.h"
 #include "..\Game\savegame.h"
 
+ChunkId* ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
+ChunkId* ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");
+ChunkId* ChunkGameFlowLevelFlags = ChunkId::FromString("Tr5MainLevelFlags");
+ChunkId* ChunkGameFlowLevelInfo = ChunkId::FromString("Tr5MainLevelInfo");
+ChunkId* ChunkGameFlowLevelPuzzle = ChunkId::FromString("Tr5MainLevelPuzzle");
+ChunkId* ChunkGameFlowLevelKey = ChunkId::FromString("Tr5MainLevelKey");
+ChunkId* ChunkGameFlowLevelPuzzleCombo = ChunkId::FromString("Tr5MainLevelPuzzleCombo");
+ChunkId* ChunkGameFlowLevelKeyCombo = ChunkId::FromString("Tr5MainLevelKeyCombo");
+ChunkId* ChunkGameFlowLevelPickup = ChunkId::FromString("Tr5MainLevelPickup");
+ChunkId* ChunkGameFlowLevelPickupCombo = ChunkId::FromString("Tr5MainLevelPickupCombo");
+ChunkId* ChunkGameFlowLevelExamine = ChunkId::FromString("Tr5MainLevelExamine");
+ChunkId* ChunkGameFlowLevelLayer = ChunkId::FromString("Tr5MainLevelLayer");
+ChunkId* ChunkGameFlowLevelLuaEvent = ChunkId::FromString("Tr5MainLevelLuaEvent");
+ChunkId* ChunkGameFlowLevelLegend = ChunkId::FromString("Tr5MainLevelLegend");
+ChunkId* ChunkGameFlowStrings = ChunkId::FromString("Tr5MainStrings");
+
+ChunkReader* g_ScriptChunkIO;
+
 GameFlow::GameFlow(sol::state* lua)
 {
 	m_lua = lua;
@@ -72,35 +90,217 @@ GameFlow::GameFlow(sol::state* lua)
 		"mirror", &GameScriptLevel::Mirror
 		);
 
-	// Item type
-	m_lua->new_usertype<ITEM_INFO>("ItemInfo",
-		"hitPoints", &ITEM_INFO::hitPoints
-		);
-
-	// Gameflow type
-	m_lua->new_usertype<GameFlow>("GameFlow",
-		"levels", &GameFlow::m_levels,
-		"settings", &GameFlow::m_settings,
-		"strings", &GameFlow::m_strings,
-		"AddLevel", &GameFlow::AddLevel
-		);
-
-	m_strings.resize(NUM_STRINGS);
-
-	// define some constants
-	(*m_lua)["LaraType"] = m_lua->create_table_with(
-		"Normal", LARA_DRAW_TYPE::LARA_NORMAL,
-		"Young", LARA_DRAW_TYPE::LARA_YOUNG,
-		"DiveSuit", LARA_DRAW_TYPE::LARA_DIVESUIT,
-		"CatSuit", LARA_DRAW_TYPE::LARA_CATSUIT
-	);
-
 	(*m_lua)["Gameflow"] = this;
 }
 
 GameFlow::~GameFlow()
 {
 
+}
+
+bool __cdecl readGameFlowFlags()
+{
+	g_GameFlow->EnableLoadSave = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+	g_GameFlow->PlayAnyLevel = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+	g_GameFlow->FlyCheat = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+	g_GameFlow->DebugMode = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+	g_GameFlow->LevelFarView = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
+
+	return true;
+}
+
+bool __cdecl readGameFlowStrings()
+{
+	char* name;
+	g_ScriptChunkIO->GetRawStream()->ReadString(&name);
+	LanguageScript* lang = new LanguageScript(name);
+	free(name);
+
+	int numStrings = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+	for (int i = 0; i < numStrings; i++)
+	{
+		char* str;
+		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+		lang->Strings.push_back(string(str));
+		free(str);
+	}
+
+	g_GameFlow->Strings.push_back(lang);
+
+	return true;
+}
+
+bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+{
+	GameScriptLevel* level = g_GameFlow->Levels[arg];
+
+	if (chunkId->EqualsTo(ChunkGameFlowLevelInfo))
+	{
+		char* str;
+
+		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+		level->FileName = string(str);
+		free(str);
+
+		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+		level->LoadScreenFileName = string(str);
+		free(str);
+
+		level->NameStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		level->Soundtrack = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelFlags))
+	{
+		level->Horizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->Sky = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->ColAddHorizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->Storm = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->ResetHub = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->LaraType = (LARA_DRAW_TYPE)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->UVRotate = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->LevelFarView = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelFlags))
+	{
+		level->Horizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->Sky = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->ColAddHorizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->Storm = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->ResetHub = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->LaraType = (LARA_DRAW_TYPE)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->UVRotate = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->LevelFarView = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzle))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (__int32 i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelKey))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (__int32 i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickup))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (__int32 i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelExamine))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (__int32 i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzleCombo))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (__int32 i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelKeyCombo))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (__int32 i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickupCombo))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (__int32 i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelLayer))
+	{
+		int layerIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+
+		if (layerIndex == 1)
+		{
+			level->Layer1.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer1.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer1.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer1.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+		}
+		else
+		{
+			level->Layer2.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer2.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer2.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer2.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool __cdecl readGameFlowLevel()
+{
+	g_GameFlow->Levels.push_back(new GameScriptLevel());
+	return g_ScriptChunkIO->ReadChunks(readGameFlowLevelChunks, g_GameFlow->Levels.size() - 1);
+}
+
+bool __cdecl readGameFlowChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+{
+	if (chunkId->EqualsTo(ChunkGameFlowFlags))
+		return readGameFlowFlags();
+	else if (chunkId->EqualsTo(ChunkGameFlowStrings))
+		return readGameFlowStrings();
+	else if (chunkId->EqualsTo(ChunkGameFlowLevel))
+		return readGameFlowLevel();
+	return false;
+}
+
+bool __cdecl LoadScript()
+{
+	// Initialise an empty legacy GAMEFLOW object for avoiding exceptions in the few functions left that use it
+	LegacyGameFlow = (GAMEFLOW*)malloc(sizeof(GAMEFLOW));
+
+	// Load the new script file
+	FileStream stream("Script.dat", true, false);
+	g_ScriptChunkIO = new ChunkReader(0x4D355254, &stream);
+	if (!g_ScriptChunkIO->IsValid())
+		return false;
+
+	g_ScriptChunkIO->ReadChunks(readGameFlowChunks, 0);
+
+	g_GameFlow->CurrentStrings = g_GameFlow->Strings[0];
+
+	return true;
 }
 
 string GameFlow::loadScriptFromFile(char* luaFilename)
@@ -142,7 +342,7 @@ bool GameFlow::ExecuteScript(char* luaFilename)
 
 char* GameFlow::GetString(__int32 id)
 {
-	return ((char*)m_strings[id - 1].c_str());
+	return (char*)(CurrentStrings->Strings[id].c_str()); 
 }
 
 GameScriptSettings* GameFlow::GetSettings()
@@ -152,7 +352,7 @@ GameScriptSettings* GameFlow::GetSettings()
 
 GameScriptLevel* GameFlow::GetLevel(__int32 id)
 {
-	return m_levels[id];
+	return Levels[id];
 }
 
 void GameFlow::SetHorizon(bool horizon, bool colAddHorizon)
@@ -198,12 +398,7 @@ void GameFlow::SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 end
 
 __int32	GameFlow::GetNumLevels()
 {
-	return m_levels.size();
-}
-
-void GameFlow::AddLevel(GameScriptLevel* level)
-{
-	m_levels.push_back(level);
+	return Levels.size();
 }
 
 bool GameFlow::DoGameflow()
@@ -215,19 +410,19 @@ bool GameFlow::DoGameflow()
 	SaveGameHeader header;
 
 	// DEBUG: test   
-	CurrentLevel = 3; 
+	/*CurrentLevel = 1; 
 	SelectedLevelForNewGame = 0;
 	gfInitialiseGame = true;
 	DoLevel(CurrentLevel, 126, false);
 	 
-	return true;
+	return true;*/
 
 	// We loop indefinitely, looking for return values of DoTitle or DoLevel
 	bool loadFromSavegame = false;
 	while (true)
 	{
 		// First we need to fill some legacy variables in PCTomb5.exe
-		GameScriptLevel* level = m_levels[CurrentLevel];
+		GameScriptLevel* level = Levels[CurrentLevel];
 
 		CurrentAtmosphere = level->Soundtrack;
 
@@ -292,7 +487,7 @@ bool GameFlow::DoGameflow()
 
 			break;
 		case GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED:
-			if (LevelComplete == m_levels.size())
+			if (LevelComplete == Levels.size())
 			{
 				// TODO: final credits
 			}

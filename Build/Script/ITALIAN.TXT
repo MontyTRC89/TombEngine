@@ -1,0 +1,364 @@
+[Strings]
+Cambogia, 1984
+Anno 2000, da qualche parte in Egitto...
+Caricamento
+Livello giocabile di pratica
+Il Sepolcro di Seth
+Camere di sepoltura
+La Valle dei Re
+KV5
+Tempio di Karnak
+Camera della Grande Ipostele
+Il Lago Sacro
+Il Lago 2
+Tomba di Semerkhet
+Il Guardiano di Semerkhet
+Ferrovia abbandonata
+Alessandria
+Rovine costiere
+Faro, Tempio di Iside
+Palazzo di Cleopatra
+Catacombe
+Tempio di Poseidone
+Libreria Perduta
+Sala di Demetrio
+La CittÖ dei morti
+Fossati
+Moschea di Tulun
+Ingresso alla Cittadella
+Bazar
+Cittadella
+Complesso della Sfinge
+La Valle dei Templi
+Sotterranei della Sfinge
+Piramide di Menkaure
+Dentro la Piramide di Menkaure
+Mastaba
+La Grande Piramide
+Piramidi della Regina Kefi
+Dentro la Grande Piramide
+Tempio di Horus
+Illimitate %s
+USA
+SCEGLI MUNIZIONI
+COMBINA
+SEPARA
+EQUIPAGGIA
+COMBINA CON
+CARICA PARTITA
+SALVA PARTITA
+ESAMINA
+\x14 Altro
+\x14 Scegli munizioni
+\x14 Scegli opzione
+\x14 Combina
+Uzi
+Pistole
+Fucile a pompa
+Revolver
+Revolver + mirino laser
+Balestra
+Balestra + mirino laser
+Lanciagranate
+Munizioni fucile a pompa normali
+Munizioni fucile a pompa potenziate
+Munizioni lanciagranate normali
+Munizioni lanciagranate potenziate
+Munizioni lanciagranate luminose
+Munizioni balestra normali
+Munizioni balestra velenose
+Munizioni balestra esplosive
+Munizioni revolver
+Munizioni Uzi
+Munizioni pistole
+Mirino laser
+Medipack grande
+Medipack piccolo
+Binocolo
+Razzi segnalatori
+Bussola
+Carica
+Salva
+Piccola borraccia (vuota)
+Piccola borraccia contenente 1 litro
+Piccola borraccia contenente 2 litri
+Piccola borraccia contenente 3 litri
+Grande borraccia (vuota)
+Grande borraccia contenente 1 litro
+Grande borraccia contenente 2 litri
+Grande borraccia contenente 3 litri
+Grande borraccia contenente 4 litri
+Grande borraccia contenente 5 litri
+Piede di porco
+Oggetto1:Amuleto di Horus
+Oggetto2:Corazza
+Oggetto3:Ginocchiera sinistra
+Oggetto4:Ginocchiera destra
+Oggetto5:Maglio sinistro
+Oggetto6:Maglio destro
+Scarabeo meccanico
+Scarabeo meccanico con chiave
+Chiave attorcigliata
+Chiave dell'armeria
+Chiave delle guardie
+Stele di Paper
+Stele di Maat
+Stele di Khepri
+Stele di Atum
+Stele di Re
+Chiave pozzo del Nord
+Chiave pozzo del Sud
+Chiave pozzo dell'Est
+Scarabeo nero
+Scarabeo infranto
+Vetri infranti
+Pergamena del cerchio solare
+Chiave di accensione
+Pergamena musicale
+Frammento di moneta
+Occhio di Horus
+Frammento di occhio
+Sabbie senza tempo
+Mano di Orione
+Mano di Sirio
+Scarabeo talismano
+Serpente dorato
+Teschio dorato
+Lama metallica
+Maniglia di legno
+Chiave d'argento
+Chiave pozzo dell'Ovest
+Badile
+Scrittura sacra
+Vaso di Canopo 1
+Vaso di Canopo 2
+Dea del Sole
+Disco del Sole
+Talismano del Sole
+Pezzo di Cartouche 1
+Pezzo di Cartouche 2
+Cartouche di Ba
+Cartouche di Ra
+Vraeus d'oro
+Chiave del Guardiano
+Chiave dell'Ipostele
+Chiave del Tempio
+Iniettore di nitrossido
+Valvola
+Contenitore di nitrossido
+Crick
+Corpo del crick
+Maniglia
+Chiave del tetto
+Codic chiave arma
+Detonatore
+Mine Detonator Body
+Dati
+Tridente
+Stella dorata
+Rampino
+Gancio nel muro
+Maniglia spezzata
+Effige di Hathor
+Maniglia adornata
+Guardiano del Portale
+Gemma del cavaliere
+Nodo di Faro
+Pilastro di Faro
+Gettone
+Chiave del cancello
+Leggi di Senet
+Borsa di sabbia
+Tanica
+Sç
+No
+Carica partita
+Nuova partita
+Pausa
+Scegli partita da caricare
+Scegli partita da salvare
+FINE DEL GIOLO
+Salva partita
+Torna ai titoli
+DEMO
+Locazione attuale
+Statistiche
+Distanza percorsa
+Munizioni usate
+Segreti trovati
+Locazione
+Medipack utilizzati
+Tempo raccolto
+giorni
+di
+Azione
+Estrai arma
+Salto
+Capriola
+Cammina
+Guarda
+Abbassati
+Scatto
+Inventario
+RULES1:Per vincere il gioco, togli tutti i tuoi pezzi\ndalla scacchiera, facendoli arrivare sul\nriquadro finale dell'ankh. Quando ä il tuo\nturno, fai ruotare i bastoncini. Il tuo tiro\nä dato dal numero di facce bianche visibili.
+RULES2:Se non vedi alcuna faccia bianca, hai tirato\nun sei. In questo caso, o se capiti sulla casella\ndi un ankh, ottieni un turno extra.\nSe arrivi sopra un avversario, lo rimandi\nall'inizio.
+PETEPOO:PerchÇ i serpenti vivano,\ndevi prima immobilizzarli.\nProvocali uno dopo l'altro e\nil cerchio sarÖ completo.
+[PSXStrings]
+BSELECT:\x14 Scegli
+BCANCEL:\x17 Annulla
+BGOBACK:Indietro \x17
+BOK:\x14 Ok
+CANCELB:Annulla \x17
+MEMCARD:BESLES-02241
+INSERT:Inserisci una Memory Card\nnell'ingresso Memory Card 1
+CHECKING:Verifica Memory Card
+FORMAT:La Memory Card non ä formattata.\nVuoi formattare la Memory Card?
+LOADING:Caricamento dati.\nNon rimuovere la Memory Card
+SAVING:Salvataggio dati.\nNon rimuovere la Memory Card
+FORMATTING:Formattazione della Memory Card.\nNon rimuovere la Memory Card
+OVERWRITE:Sovrascrivi i dati sulla Memory Card ?
+UNFORMATTED:La Memory Card non ä formattata.\nInseriscine una formattata
+NOSPACE:Spazio su Memory Card insufficiente\n\nInserisci una Memory Card con almeno\ndue blocchi liberi
+NOGAMES:Non ci sono partite salvate di\nTomb Raider IV sulla Memory Card\nnell'ingresso Memory Card 1
+CARICAMENTO
+Caricamento OK
+Salvataggio OK
+Formattazione OK
+Caricamento fallito
+Salvataggio fallito
+Formattazione fallita
+Vuoto
+Controller rimosso
+Riprendi
+Esci
+Impostazioni di gioco
+Comandi
+Sei sicuro di voler uscire?
+Posiziona schermo
+FXVOL:Volume FX\t\t\t
+MUSICVOL:Volume musica\t\t\t
+Usa i tasti direzionali\nper posizionare lo schermo
+Configura comandi
+Configurazione
+Vibrazione On
+Vibrazione Off
+Puntamento manuale
+Puntamento automatico
+PAD:\t\t\t\t\t\t\t\t\n\n\n\n\n
+PAD2:\t\t\t\t\t\t\t\t\t\n\n\n\n\n\n\n\n\n
+Programmatori
+Programmatori addizionali
+Programmazione IA
+Animatori
+Design dei livelli
+Sequenze FMV
+Grafica addizionale
+Musica & effetti sonori
+Storia originale
+Sceneggiatura
+Produttore
+CQ
+Produttori esecutivi
+Effetti sonori addizionali
+TEAM1:Chris Coupe
+TEAM2:Martin Gibbins
+TEAM3:Derek Leigh-Gilchrist
+TEAM4:Tom Scutt
+TEAM5:Richard Flower
+TEAM6:Martin Jensen
+TEAM8:Phil Chapman
+TEAM7:Jerr O'Carroll
+TEAM9:Joby Wood
+TEAM10:Andrea Cordella
+TEAM11:Pete Duncan
+TEAM12:Jamie Morton
+TEAM13:Richard Morton
+TEAM14:Andy Sandham
+TEAM15:Peter Barnard
+TEAM16:David Reading
+TEAM17:Matt Furniss
+TEAM18:Simeon Furniss
+TEAM19:John Lilley
+TEAM20:Damon Godley
+TEAM21:Mark Hazelton
+TEAM22:Steve Huckle
+TEAM23:Steve Hawkes
+TEAM24:Darren Wakeman
+TEAM25:Peter Connelly
+TEAM26:Martin Iveson
+TEAM27:Hope Canton
+TEAM28:Dr Kieron O'Hara
+TEAM29:Troy Horton
+TEAM30:Tiziano Cirillo
+TEAM31:Nick Connolly
+TEAM32:Hayos Fatunmbi
+TEAM33:Paul Field
+TEAM34:Steve Wakeman
+TEAM35:Dave Ward
+TEAM36:Jason Churchman
+TEAM37:Jeremy H. Smith
+TEAM38:Adrian Smith
+TEAM39:Clint Nembhard
+TEAM40:Benjamin Twose
+[PCStrings]
+Programmatore PC
+Programmatori
+Programmazione addizionale
+Riprendi
+Opzioni
+Posizione vuota
+Volume musica
+Volume SFX
+QualitÖ sonora
+Bassa
+Media
+Alta
+Puntamento
+Manuale
+Automatico
+Adattatore grafico
+Impostazioni in uscita
+Risoluzione in uscita
+ProfonditÖ bit texture
+OK
+Annulla
+Accelerazione hardware
+ModalitÖ software
+Effetti volumetrici
+Filtering bilineare
+Bump Mapping
+Texture a bassa risoluzione
+Bump mapping a bassa risoluzione
+Dispositivo audio
+Disabilita
+Bit\t\t\t; As In 16 Bit
+Schermo pieno
+In finestra
+Opzioni di rendering
+Nessuna scheda sonora installata
+Installazione DirectX fallita
+Esci
+Configurazione comandi
+Usa torcia
+Metodo di controllo
+Mouse
+Tastiera
+Joystick
+In attesa
+Ripristina
+Salva impostazioni
+Salvataggio OK
+Cammina a sinistra
+Cammina a destra
+Gioca
+Setup
+Installa
+Disinstalla
+ReadMe
+Demo - Esc per uscire
+Scegli livello
+No sequenze animate
+OEM1:\n\n\nCongratulations on reaching the end\nof this special version of the game.\nIf you want to continue Lara's adventure,\nyou need to purchase the full version.\nRemember to keep your save game files,\nto continue from where you are now.\nFor details of transferring your save game\nfiles refer to the readme file,\nthis is accessed via the task bar.
+THE LAST STRING ENTRY
+[ExtraNG]
+0: Update

@@ -145,7 +145,7 @@
 
 #define LevelComplete				VAR_U_(0x00E5C2F0, byte)
 #define ResetFlag					VAR_U_(0x0051CA6C, __int32)
-//#define GameFlow					VAR_U_(0x00E5C2BC, GAMEFLOW*)
+#define LegacyGameFlow				VAR_U_(0x00E5C2BC, GAMEFLOW*)
 #define GameMode					VAR_U_(0x005082C0, byte)
 #define nFrames						VAR_U_(0x005082C4, __int32)
 #define GameStatus					VAR_U_(0x00E5C2B0, __int32)

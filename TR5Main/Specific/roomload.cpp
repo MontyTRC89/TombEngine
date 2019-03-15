@@ -42,6 +42,7 @@ __int32 NumTextureTiles;
 uintptr_t hLoadLevel;
 unsigned __int32 ThreadId;
 __int32 IsLevelLoading;
+bool g_FirstLevel = true;
 
 using namespace std;
 
@@ -584,19 +585,20 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	 
 	SOUND_Stop();
 	Sound_FreeSamples();
-	FreeLevel();
-
+	if (!g_FirstLevel)
+		FreeLevel();
+	g_FirstLevel = false;
 	RenderLoadBar = false;
 	
 	char filename[80];
-	GameScriptLevel* level = g_GameFlow->GetLevel(levelIndex);
+	GameScriptLevel* level = g_GameFlow->Levels[levelIndex];
 	strcpy_s(filename, level->FileName.c_str());
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;
 	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
 
-	// This function loops until progress is 100%. Not very thread safe, but behavious should be predictable.
+	// This function loops until progress is 100%. Not very thread safe, but behaviour should be predictable.
 	g_Renderer->DrawLoadingScreen((char*)(level->LoadScreenFileName.c_str()));
 
 	while (IsLevelLoading);

@@ -33,13 +33,14 @@
 #define GAME_BUFFER_SIZE	128 * 1000000
 #define NUM_SLOTS			32
 #define NUM_ITEMS			1023
+#define NUM_ROOMS			1024
+#define NUM_ANIMATED_SETS	1024
 #define DRAW_DISTANCE		200 * 1024.0f
 #define NUM_STATICS			1000
 #define MAX_LIGHTS			100
 #define MAX_STATICS			1000
 #define MAX_BONES			32
 #define MAX_SPRITES			16384
-
 #define NO_ROOM				0xFF
 #define NO_HEIGHT			(-0x7F00)
 

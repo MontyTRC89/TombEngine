@@ -1,0 +1,104 @@
+; ============================
+; TR5Main English strings file
+; ============================
+; WARNING: while editing [Engine] section, pay attention to don't delete some strings because the engine internally refers to system strings by ID.
+; The others sections, instead, like [Levels], [Puzzles], [Examines], can be edited without problems but paying attention to have them in the same order in all 
+; languages files.
+; Please use Script Editor, inside the Tomb Editor kit, for correctly edit strings files.
+; ============================
+
+[Engine]
+Empty string
+Game 
+Lara's home 
+Controls 
+Display
+Sound
+New game
+Load game
+Save game
+Exit game
+Exit to title
+Uzi
+Pistols
+Shotgun
+Revolver
+Revolver + LaserSight
+Desert Eagle
+Desert Eagle + LaserSight
+Desert Eagle Ammo
+HK Gun
+HK Gun (Silenced)
+Shotgun Normal Ammo
+Shotgun Wideshot Ammo
+HK Sniper Mode
+HK Burst Mode
+HK Rapid Mode
+HK Ammo
+Revolver Ammo
+Uzi Ammo
+Pistol Ammo
+LaserSight
+Silencer
+Large Medipack
+Small Medipack
+Binoculars
+Headset
+Flares
+Timex-TMX
+Crowbar
+Use
+Combine
+Separe
+Choose ammo
+Select level
+%02d days %02d%02d%02d
+Not saved
+Grenade launcher
+Grenade Normal Ammo
+Grenade Poisoned Ammo
+Grenade Explosive Ammo
+Harpoon gun
+Harpoon ammo
+Rocket launcher
+Rocket ammo
+Crossbow
+Crossbow + LaserSight
+Crossbow Normal Ammo
+Crossbow Poisoned Ammo
+Crossbow Explosive Ammo
+Diary
+Enabled
+Disabled
+Music volume
+SFX volume
+Screen resolution
+Dynamic shadows
+Underwater caustics
+Volumetric fog
+Apply
+Cancel
+Enable sound
+Special effects
+
+[Levels]
+Title level
+Streets of Rome
+Trajan Markets
+The Colosseum
+The base
+The submarine
+Deepsea Dive
+Sinking Submarine
+Gallows Tree
+Labyrinth
+Old Mill
+The 13th Floor
+Escape with the Iris
+Security breach
+Red alert!
+Test level
+
+[Puzzles]
+
+[Examines]

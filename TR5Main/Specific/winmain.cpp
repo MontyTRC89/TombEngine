@@ -181,7 +181,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	_CrtSetDbgFlag(-1);
 	 
 	// TODO: deprecated
-	LoadGameflow();
+	//LoadGameflow();
 	//LoadSettings();
 
 	// Initialise the new scripting system
@@ -189,9 +189,11 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	luaState.open_libraries(sol::lib::base);
 
 	g_GameFlow = new GameFlow(&luaState);
-	g_GameFlow->ExecuteScript("Scripts\\English.lua");
-	g_GameFlow->ExecuteScript("Scripts\\Settings.lua");
-	g_GameFlow->ExecuteScript("Scripts\\Gameflow.lua");
+	LoadScript();
+
+	//g_GameFlow->ExecuteScript("Scripts\\English.lua");
+	//g_GameFlow->ExecuteScript("Scripts\\Settings.lua");
+	//g_GameFlow->ExecuteScript("Scripts\\Gameflow.lua");
 
 	g_GameScript = new GameScript(&luaState);
 
@@ -237,6 +239,11 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_Configuration.Height = 768;
 	g_Configuration.Windowed = false;
 
+	g_Configuration.Width = 1920;
+	g_Configuration.Height = 1080;
+	g_Configuration.Windowed = false;
+
+
 	tagRECT Rect;
 
 	Rect.left = 0;
@@ -281,9 +288,22 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	// Initialise the new inventory
 	g_Inventory = new Inventory();
 
-	SetWindowPos(App.WindowHandle, 0, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+	//SetWindowPos(App.WindowHandle, 0, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 
 	WindowsHandle = App.WindowHandle;
+
+	if (g_Configuration.Windowed)
+	{
+		SetWindowLong(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, g_Configuration.Width, g_Configuration.Height,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	}
+	else
+	{
+		SetWindowLong(WindowsHandle, GWL_STYLE, WS_POPUPWINDOW);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	}
 
 	App.bNoFocus = false;
 	App.isInScene = false;
