@@ -503,6 +503,13 @@ struct RendererAnimatedTextureSet
 {
 	__int32 NumTextures;
 	RendererAnimatedTexture** Textures;
+
+	~RendererAnimatedTextureSet()
+	{
+		/*for (__int32 i = 0; i < NumTextures; i++)
+			delete Textures[i];
+		free(Textures);*/
+	}
 };
 
 struct RendererBucket
@@ -528,8 +535,6 @@ struct RendererStatic {
 struct RendererRoom 
 {
 	ROOM_INFO* Room;
-	VertexBuffer* VertexBuffer;
-	IndexBuffer* IndexBuffer;
 	Vector4 AmbientLight;
 	RendererBucket Buckets[NUM_BUCKETS];
 	RendererBucket AnimatedBuckets[NUM_BUCKETS];
@@ -580,6 +585,14 @@ struct RendererObject
 	bool						DoNotDraw;
 	bool						HasDataInBucket[NUM_BUCKETS];
 	bool						HasDataInAnimatedBucket[NUM_BUCKETS];
+
+	~RendererObject()
+	{
+		/*for (__int32 i = 0; i < ObjectMeshes.size(); i++)
+			delete ObjectMeshes[i];
+		for (__int32 i = 0; i < LinearizedBones.size(); i++)
+			delete LinearizedBones[i];*/
+	}
 };
 
 struct RendererSprite {
@@ -591,11 +604,20 @@ struct RendererSprite {
 struct RendererSpriteSequence {
 	__int32 Id;
 	RendererSprite** SpritesList;
+	__int32 NumSprites;
 
 	RendererSpriteSequence(__int32 id, __int32 num)
 	{
 		Id = id;
+		NumSprites = num;
 		SpritesList = (RendererSprite**)malloc(sizeof(RendererSprite*) * num);
+	}
+
+	~RendererSpriteSequence()
+	{
+		/*for (__int32 i = 0; i < NumSprites; i++)
+			delete SpritesList[i];
+		free(SpritesList);*/
 	}
 };
 
@@ -844,10 +866,14 @@ private:
 	void									drawSplahes();
 	bool									drawSprites();
 	bool									drawLines3D();
-	void									drawRopes();
+	bool									drawLines2D();
+	bool									drawOverlays();
+	bool									drawRopes();
 	bool									drawBats();
 	bool									drawRats();
 	bool									drawSpiders();
+	bool									drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2);
+	void									insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b);
 	bool									drawDebris(bool transparent);
 	__int32									drawInventoryScene();
 	__int32									drawFinalPass();

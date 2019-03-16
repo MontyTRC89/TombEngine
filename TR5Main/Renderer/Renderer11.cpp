@@ -504,6 +504,7 @@ void Renderer11::clearSceneItems()
 	m_staticsToDraw.Clear();
 	m_spritesToDraw.Clear();
 	m_lines3DToDraw.Clear();
+	m_lines2DToDraw.Clear();
 }
 
 bool Renderer11::drawHorizonAndSky()
@@ -1155,7 +1156,8 @@ bool Renderer11::drawScene(bool dump)
 	m_nextLight = 0;
 	m_nextSprite = 0;
 	m_nextLine3D = 0;
-	   
+	m_nextLine2D = 0;
+
 	m_strings.clear();
 
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
@@ -1249,6 +1251,8 @@ bool Renderer11::drawScene(bool dump)
 	else if (level->Snow)
 		doSnow();
 
+	drawRopes();
+
 	drawSprites();
 	drawLines3D();
 
@@ -1256,9 +1260,18 @@ bool Renderer11::drawScene(bool dump)
 	m_timeFrame = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
 
-	m_currentY = 10;
+	// Bars
+	DrawDashBar();
+	UpdateHealtBar(0);
+	UpdateAirBar(0);
+
+	drawLines2D();
+
+	// Draw binoculars or lasersight
+	drawOverlays();
 
 	ROOM_INFO* r = &Rooms[LaraItem->roomNumber];
+	m_currentY = 60;
 
 	printDebugMessage("Update time: %d", m_timeUpdate);
 	printDebugMessage("Frame time: %d", m_timeFrame);
@@ -2359,17 +2372,21 @@ ID3D11ComputeShader* Renderer11::compileComputeShader(char* fileName)
 
 void Renderer11::DrawDashBar()
 {
-
+	if (DashTimer < 120)
+		drawBar(630, 32, 150, 12, 100 * (unsigned __int16)DashTimer / 120, 0xA0A000, 0xA000);
 }
 
 void Renderer11::DrawHealthBar(__int32 percentual)
 {
-
+	__int32 color2 = 0xA00000;
+	if (Lara.poisoned || Lara.gassed)
+		color2 = 0xA0A000;
+	drawBar(20, 32, 150, 12, percentual, 0xA00000, color2);
 }
 
 void Renderer11::DrawAirBar(__int32 percentual)
 {
-
+	drawBar(20, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
 }
 
 void Renderer11::ClearDynamicLights()
@@ -5696,4 +5713,240 @@ bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 c
 	m_primitiveBatch->End();
 
 	return true;
+}
+
+bool Renderer11::drawRopes()
+{
+	Viewport* vp = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
+		m_viewport.MinDepth, m_viewport.MaxDepth);
+
+	for (__int32 n = 0; n < NumRopes; n++)
+	{
+		ROPE_STRUCT* rope = &Ropes[n];
+
+		if (rope->active)
+		{
+			// Original algorithm:
+			// 1) Transform segment coordinates from 3D to 2D + depth
+			// 2) Get dx, dy and the segment length
+			// 3) Get sine and cosine from dx / length and dy / length
+			// 4) Calculate a scale factor 
+			// 5) Get the coordinates of the 4 corners of each sprite iteratively
+			// 6) Last step only for us, unproject back to 3D coordinates
+
+			// Tranform rope points
+			Vector3 projected[24];
+			Matrix world = Matrix::Identity;
+
+			for (__int32 i = 0; i < 24; i++)
+			{
+				Vector3 absolutePosition = Vector3(rope->position.x + rope->segment[i].x / 65536.0f,
+					rope->position.y + rope->segment[i].y / 65536.0f,
+					rope->position.z + rope->segment[i].z / 65536.0f);
+
+				projected[i] = vp->Project(absolutePosition, Projection, View, world);
+			}
+
+			// Now each rope point is transformed in screen X, Y and Z depth
+			// Let's calculate dx, dy corrections and scaling
+			float dx = projected[1].x - projected[0].x;
+			float dy = projected[1].y - projected[0].y;
+			float length = sqrt(dx * dx + dy * dy);
+			float s = 0;
+			float c = 0;
+
+			if (length != 0)
+			{
+				s = -dy / length;
+				c = dx / length;
+			}
+
+			float w = 6.0f;
+			if (projected[0].z)
+			{
+				w = 6.0f * PhdPerspective / projected[0].z / 65536.0f;
+				if (w < 3)
+					w = 3;
+			}
+
+			float sdx = s * w;
+			float sdy = c * w;
+
+			float x1 = projected[0].x - sdx;
+			float y1 = projected[0].y - sdy;
+
+			float x2 = projected[0].x + sdx;
+			float y2 = projected[0].y + sdy;
+
+			float depth = projected[0].z;
+
+			for (__int32 j = 0; j < 24; j++)
+			{
+				Vector3 p1 = vp->Unproject(Vector3(x1, y1, depth), Projection, View, world);
+				Vector3 p2 = vp->Unproject(Vector3(x2, y2, depth), Projection, View, world);
+				
+				dx = projected[j].x - projected[j - 1].x;
+				dy = projected[j].y - projected[j - 1].y;
+				length = sqrt(dx * dx + dy * dy);
+				s = 0;
+				c = 0;
+
+				if (length != 0)
+				{
+					s = -dy / length;
+					c = dx / length;
+				}
+
+				w = 6.0f;
+				if (projected[j].z)
+				{
+					w = 6.0f * PhdPerspective / projected[j].z / 65536.0f;
+					if (w < 3)
+						w = 3;
+				}
+
+				float sdx = s * w;
+				float sdy = c * w;
+
+				float x3 = projected[j].x - sdx;
+				float y3 = projected[j].y - sdy;
+
+				float x4 = projected[j].x + sdx;
+				float y4 = projected[j].y + sdy;
+
+				depth = projected[j].z;
+
+				Vector3 p3 = vp->Unproject(Vector3(x3, y3, depth), Projection, View, world);
+				Vector3 p4 = vp->Unproject(Vector3(x4, y4, depth), Projection, View, world);
+
+				addSprite3D(m_sprites[20],
+					p1.x, p1.y, p1.z,
+					p2.x, p2.y, p2.z,
+					p3.x, p3.y, p3.z,
+					p4.x, p4.y, p4.z,
+					128, 128, 128, 0, 1, 0, 0, BLENDMODE_OPAQUE);
+
+				x1 = x4;
+				y1 = y4;
+				x2 = x3;
+				y2 = y3;
+			}
+
+		}
+	}
+
+	delete vp;
+
+	return true;
+}
+
+bool Renderer11::drawLines2D()
+{
+	m_context->RSSetState(m_states->CullNone());
+	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+	m_context->VSSetShader(m_vsSolid, NULL, 0);
+	m_context->PSSetShader(m_psSolid, NULL, 0);
+
+	Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth, m_viewport.MaxDepth);
+
+	m_stCameraMatrices.View = Matrix::Identity;
+	m_stCameraMatrices.Projection = Matrix::Identity;
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+
+	m_primitiveBatch->Begin();
+
+	for (__int32 i = 0; i < m_lines2DToDraw.Size(); i++)
+	{
+		RendererLine2D* line = m_lines2DToDraw[i];
+
+		RendererVertex v1;
+		v1.Position.x = line->Vertices[0].x;
+		v1.Position.y = line->Vertices[0].y;
+		v1.Position.z = 1.0f;
+		v1.Color.x = line->Color.x / 255.0f;
+		v1.Color.y = line->Color.y / 255.0f;
+		v1.Color.z = line->Color.z / 255.0f;
+		v1.Color.w = 1.0f;
+
+		RendererVertex v2;
+		v2.Position.x = line->Vertices[1].x;
+		v2.Position.y = line->Vertices[1].y;
+		v2.Position.z = 1.0f;
+		v2.Color.x = line->Color.x / 255.0f;
+		v2.Color.y = line->Color.y / 255.0f;
+		v2.Color.z = line->Color.z / 255.0f;
+		v2.Color.w = 1.0f;
+
+		v1.Position = Vector3::Transform(v1.Position, world);
+		v2.Position = Vector3::Transform(v2.Position, world);
+
+		v1.Position.z = 0.5f;
+		v2.Position.z = 0.5f;
+
+		m_primitiveBatch->DrawLine(v1, v2);
+	}
+
+	m_primitiveBatch->End();
+
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	return true;
+}
+
+bool Renderer11::drawOverlays()
+{
+	return true;
+}
+
+bool Renderer11::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2)
+{
+	byte r1 = (color1 >> 16) & 0xFF;
+	byte g1 = (color1 >> 8) & 0xFF;
+	byte b1 = (color1 >> 0) & 0xFF;
+
+	byte r2 = (color2 >> 16) & 0xFF;
+	byte g2 = (color2 >> 8) & 0xFF;
+	byte b2 = (color2 >> 0) & 0xFF;
+
+	float factorX = ScreenWidth / 800.0f;
+	float factorY = ScreenHeight / 600.0f;
+
+	__int32 realX = x * factorX;
+	__int32 realY = y * factorY;
+	__int32 realW = w * factorX;
+	__int32 realH = h * factorY;
+
+	__int32 realPercent = percent / 100.0f * realW;
+
+	for (__int32 i = 0; i < realH; i++)
+		insertLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0);
+
+	for (__int32 i = 0; i < realH; i++)
+		insertLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1);
+
+	insertLine2D(realX, realY, realX + realW, realY, 255, 255, 255);
+	insertLine2D(realX, realY + realH, realX + realW, realY + realH, 255, 255, 255);
+	insertLine2D(realX, realY, realX, realY + realH, 255, 255, 255);
+	insertLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255);
+
+	return true;
+}
+
+void Renderer11::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
+{
+	RendererLine2D* line = &m_lines2DBuffer[m_nextLine2D++];
+
+	line->Vertices[0] = Vector2(x1, y1);
+	line->Vertices[1] = Vector2(x2, y2);
+	line->Color = Vector4(r, g, b, 255.0f);
+
+	m_lines2DToDraw.Add(line);
 }

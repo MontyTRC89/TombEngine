@@ -410,12 +410,12 @@ bool GameFlow::DoGameflow()
 	SaveGameHeader header;
 
 	// DEBUG: test   
-	/*CurrentLevel = 1; 
+	CurrentLevel = 1; 
 	SelectedLevelForNewGame = 0;
 	gfInitialiseGame = true;
 	DoLevel(CurrentLevel, 126, false);
 	 
-	return true;*/
+	return true;
 
 	// We loop indefinitely, looking for return values of DoTitle or DoLevel
 	bool loadFromSavegame = false;
