@@ -1011,6 +1011,10 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 
 bool Renderer11::drawLara(bool transparent)
 {
+	// Don't draw Lara if binoculars or sniper
+	if (BinocularRange || SpotcamOverlay)
+		return true;
+
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
@@ -1071,6 +1075,11 @@ bool Renderer11::drawLara(bool transparent)
 
 			if (bucket->Vertices.size() == 0)
 				continue;
+
+			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
+				m_context->RSSetState(m_states->CullNone());
+			else
+				m_context->RSSetState(m_states->CullCounterClockwise());
 
 			// Draw vertices
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
@@ -5669,7 +5678,7 @@ __int32 Renderer11::drawInventoryScene()
 bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color)
 {
 	RendererVertex vertices[4];
-
+	 
 	vertices[0].Position.x = -1.0f;
 	vertices[0].Position.y = 1.0f;
 	vertices[0].Position.z = 0.0f;
@@ -5903,6 +5912,13 @@ bool Renderer11::drawLines2D()
 
 bool Renderer11::drawOverlays()
 {
+	if (!BinocularRange && !SpotcamOverlay)
+		return true;
+
+	m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
+	drawFullScreenQuad(m_binocularsTexture->ShaderResourceView, Vector3::One);
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+
 	return true;
 }
 
