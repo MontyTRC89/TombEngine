@@ -84,6 +84,11 @@ void __stdcall HandleWmCommand(unsigned __int16 wParam)
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	// Disables ALT + SPACE
+	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU) {
+		return 0;
+	}
+
 	if (msg > 0x10)
 	{
 		if (msg == WM_COMMAND)
@@ -254,18 +259,18 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
 	App.WindowHandle = CreateWindowEx(
-		WS_THICKFRAME,
+		0,
 		"TR5Main",
 		g_GameFlow->GetSettings()->WindowTitle.c_str(),
-		WS_BORDER,
+		WS_POPUP,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		Rect.right - Rect.left,
 		Rect.bottom - Rect.top,
-		nullptr,
-		nullptr,
+		NULL,
+		NULL,
 		App.hInstance,
-		nullptr
+		NULL
 	);
 
 	if (!App.WindowHandle)
