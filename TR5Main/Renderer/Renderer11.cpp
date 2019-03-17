@@ -5843,7 +5843,7 @@ bool Renderer11::drawRopes()
 bool Renderer11::drawLines2D()
 {
 	m_context->RSSetState(m_states->CullNone());
-	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
 	m_context->VSSetShader(m_vsSolid, NULL, 0);

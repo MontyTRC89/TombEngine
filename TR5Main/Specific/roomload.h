@@ -34,13 +34,15 @@ struct LEB128;
 #define LoadSamples ((void (__cdecl*)()) 0x004A6880)
 #define InitialiseLaraLoad ((void (__cdecl*)(__int16)) 0x004568C0)
 #define LoadRooms ((void (__cdecl*)()) 0x004A4DA0)
-#define InitialiseLara ((void (__cdecl*)(__int32)) 0x00473210)
+//#define InitialiseLara ((void (__cdecl*)(__int32)) 0x00473210)
 #define InitialiseGameStuff ((void (__cdecl*)()) 0x004778F0)
 #define InitialiseGameFlags ((void (__cdecl*)()) 0x00477880)
 #define SeedRandomDraw ((void (__cdecl*)(__int32)) 0x004A7C90)  
 #define SeedRandomControl ((void (__cdecl*)(__int32)) 0x004A7C70)  
 #define GetAIPickups ((void (__cdecl*)()) 0x00477370)  
 #define GetCarriedItems ((void (__cdecl*)()) 0x004771E0)  
+#define InitialiseLaraMeshes ((void (__cdecl*)()) 0x00455680)
+#define InitialiseLaraAnims ((void (__cdecl*)(ITEM_INFO*)) 0x00456900)
 
 using namespace std;
 
@@ -72,6 +74,7 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex);
 void __cdecl FreeLevel();
 void __cdecl AdjustUV(__int32 num);
 void __cdecl LoadCameras();
+void __cdecl InitialiseLara(__int32 restore);
 
 unsigned __stdcall LoadLevel(void* data);
 

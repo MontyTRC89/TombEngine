@@ -123,10 +123,6 @@ void Inventory::Initialise()
 
 	// DEBUG
 	{
-		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = true;
-		g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[0] = -1;
-		g_LaraExtra.Weapons[WEAPON_PISTOLS].SelectedAmmo = WEAPON_AMMO1;
-
 		/*g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present = true;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] = 1000;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
