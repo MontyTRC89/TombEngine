@@ -1219,6 +1219,10 @@ bool Renderer11::drawScene(bool dump)
 	drawLara(false);
 	drawItems(false, false);
 	drawItems(false, true);
+
+	// Gun shells and Gun flashes
+	drawGunFlashes();
+	drawGunShells();
 	 
 	// Transparent geometry
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -5957,4 +5961,171 @@ void Renderer11::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, by
 	line->Color = Vector4(r, g, b, 255.0f);
 
 	m_lines2DToDraw.Add(line);
+}
+
+bool Renderer11::drawGunFlashes()
+{
+	if (!Lara.rightArm.flash_gun && !Lara.leftArm.flash_gun)
+		return true;
+
+	Matrix world;
+	Matrix translation;
+	Matrix rotation;
+	
+	RendererObject* laraObj = m_moveableObjects[ID_LARA];
+	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
+
+	OBJECT_INFO* obj = &Objects[0];
+	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+	RendererItem* item = &m_items[Lara.itemNumber];
+
+	m_stItem.AmbientLight = room->AmbientLight;
+	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+
+	m_stLights.NumLights = item->Lights.Size();
+	for (__int32 j = 0; j < item->Lights.Size(); j++)
+		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+
+	m_stMisc.AlphaTest = true;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+	__int16 length = 0;
+	__int16 zOffset = 0;
+	__int16 rotationX = 0;
+
+	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthNone(), 0);
+
+	if (Lara.weaponItem != WEAPON_FLARE && Lara.weaponItem != WEAPON_SHOTGUN && Lara.weaponItem != WEAPON_CROSSBOW)
+	{
+		if (Lara.weaponItem == WEAPON_REVOLVER)
+		{
+			length = 192;
+			zOffset = 68;
+			rotationX = -14560;
+		}
+		else if (Lara.weaponItem == WEAPON_UZI)
+		{
+			length = 190;
+			zOffset = 50;
+		}
+		else if (Lara.weaponItem == WEAPON_HK)
+		{
+			length = 300;
+			zOffset = 92;
+			rotationX = -14560;
+		}
+		else
+		{
+			length = 180;
+			zOffset = 40;
+			rotationX = -16830;
+		}
+
+		OBJECT_INFO* flashObj = &Objects[ID_GUN_FLASH];
+		RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
+		RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
+
+		for (__int32 b = 0; b < NUM_BUCKETS; b++)
+		{
+			RendererBucket* flashBucket = &flashMesh->Buckets[b];
+
+			if (flashBucket->NumVertices != 0)
+			{
+				Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
+				Matrix rotation2 = Matrix::CreateRotationX(TR_ANGLE_TO_RAD(rotationX));
+
+				if (Lara.leftArm.flash_gun)
+				{
+					world = laraObj->AnimationTransforms[HAND_L].Transpose() * m_LaraWorldMatrix;
+					world = offset * world;
+					world = rotation2 * world;
+
+					m_stItem.World = world.Transpose();
+					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+					m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+					m_context->DrawIndexed(flashBucket->NumIndices, flashBucket->StartIndex, 0);
+					m_numDrawCalls++;
+				}
+
+				if (Lara.rightArm.flash_gun)
+				{
+					world = laraObj->AnimationTransforms[HAND_R].Transpose() * m_LaraWorldMatrix;
+					world = offset * world;
+					world = rotation2 * world;
+
+					m_stItem.World = world.Transpose();
+					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+					m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+					m_context->DrawIndexed(flashBucket->NumIndices, flashBucket->StartIndex, 0);
+					m_numDrawCalls++;
+				}
+			}
+		}
+	}
+
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	return true;
+}
+
+bool Renderer11::drawGunShells()
+{
+	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+	RendererItem* item = &m_items[Lara.itemNumber];
+
+	m_stItem.AmbientLight = room->AmbientLight;
+	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+
+	m_stLights.NumLights = item->Lights.Size();
+	for (__int32 j = 0; j < item->Lights.Size(); j++)
+		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+
+	m_stMisc.AlphaTest = true;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+	for (__int32 i = 0; i < 24; i++)
+	{
+		GUNSHELL_STRUCT* gunshell = &GunShells[i];
+
+		if (gunshell->counter > 0)
+		{
+			OBJECT_INFO* obj = &Objects[gunshell->objectNumber];
+			RendererObject* moveableObj = m_moveableObjects[gunshell->objectNumber];
+
+			Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(gunshell->pos.yRot),
+				TR_ANGLE_TO_RAD(gunshell->pos.xRot),
+				TR_ANGLE_TO_RAD(gunshell->pos.zRot));
+			Matrix world = rotation * translation;
+
+			m_stItem.World = world.Transpose();
+			updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+			m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+			RendererMesh* mesh = moveableObj->ObjectMeshes[0];
+
+			for (__int32 b = 0; b < NUM_BUCKETS; b++)
+			{
+				RendererBucket* bucket = &mesh->Buckets[b];
+
+				if (bucket->NumVertices == 0)
+					continue;
+
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+		}
+	}
+
+	return true;
 }

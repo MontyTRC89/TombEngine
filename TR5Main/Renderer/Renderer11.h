@@ -872,6 +872,8 @@ private:
 	bool									drawBats();
 	bool									drawRats();
 	bool									drawSpiders();
+	bool									drawGunFlashes();
+	bool									drawGunShells();
 	bool									drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2);
 	void									insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b);
 	bool									drawDebris(bool transparent);
