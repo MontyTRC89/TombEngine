@@ -1128,20 +1128,12 @@ bool Renderer11::drawLara(bool transparent)
 			}
 		}
 
-		/*m_context->VSSetShader(m_vsHairs, NULL, 0);
-		m_context->PSSetShader(m_psHairs, NULL, 0);
-
-		// Set texture
-		m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-		sampler = m_states->AnisotropicClamp();
-		m_context->PSSetSamplers(0, 1, &sampler);
-
-		// Set camera matrices
-		m_stCameraMatrices.View = View.Transpose();
-		m_stCameraMatrices.Projection = Projection.Transpose();
-
-		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+		// Hairs are pre-transformed
+		Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity, 
+							   Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
+		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
+		m_stItem.World = Matrix::Identity;
+		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
 		if (m_moveableObjects[ID_HAIR] != NULL)
 		{
@@ -1150,7 +1142,7 @@ bool Renderer11::drawLara(bool transparent)
 				(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
 				m_hairVertices.data(), m_numHairVertices);
 			m_primitiveBatch->End();
-		}*/
+		}
 	}
 
 	return true;
