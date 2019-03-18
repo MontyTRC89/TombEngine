@@ -793,6 +793,10 @@ bool Renderer11::drawStatics(bool transparent)
 	for (__int32 i = 0; i < m_staticsToDraw.Size(); i++)
 	{
 		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
+
+		if (!(msh->Flags & 1))
+			continue;
+
 		RendererRoom* room = m_rooms[m_staticsToDraw[i]->RoomIndex];
 
 		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
@@ -1219,6 +1223,7 @@ bool Renderer11::drawScene(bool dump)
 	drawLara(false);
 	drawItems(false, false);
 	drawItems(false, true);
+	drawDebris(false);
 
 	// Gun shells and Gun flashes
 	drawGunFlashes();
@@ -1235,6 +1240,7 @@ bool Renderer11::drawScene(bool dump)
 	drawItems(true, false);
 	drawItems(true, true);
 	drawWaterfalls();
+	drawDebris(true);
 
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
@@ -4918,21 +4924,18 @@ bool Renderer11::drawDebris(bool transparent)
 		if (debris->On)
 		{
 			Matrix translation = Matrix::CreateTranslation(debris->x, debris->y, debris->z);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD (debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
 			Matrix world = rotation * translation;
 
 			OBJECT_TEXTURE* texture = &ObjectTextures[(__int32)(debris->textInfo) & 0x7FFF];
 			__int32 tile = texture->tileAndFlag & 0x7FFF;
 
-			/*// Draw only debris of the current bucket
-			if (texture->attribute == 0 &&
-				bucketIndex != RENDERER_BUCKET_SOLID && bucketIndex != RENDERER_BUCKET_SOLID_DS
+			// Draw only debris of the current bucket
+			if (texture->attribute == 0 && transparent
 				||
-				texture->attribute == 1 &&
-				bucketIndex != RENDERER_BUCKET_ALPHA_TEST && bucketIndex != RENDERER_BUCKET_ALPHA_TEST_DS
+				texture->attribute == 1 && transparent
 				||
-				texture->attribute == 2 &&
-				bucketIndex != RENDERER_BUCKET_TRANSPARENT && bucketIndex != RENDERER_BUCKET_TRANSPARENT_DS
+				texture->attribute == 2 && !transparent
 				)
 				continue;
 
@@ -4940,79 +4943,78 @@ bool Renderer11::drawDebris(bool transparent)
 
 			// Prepare the triangle
 			Vector3 p = Vector3(debris->XYZOffsets1[0], debris->XYZOffsets1[1], debris->XYZOffsets1[2]);
-			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
-			vertex.x = p.x;
-			vertex.y = p.y;
-			vertex.z = p.z;
-			vertex.u = (texture->vertices[0].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.v = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.r = debris->Pad[2] / 255.0f;
-			vertex.g = debris->Pad[3] / 255.0f;
-			vertex.b = debris->Pad[4] / 255.0f;
+			p = Vector3::Transform(p, world);
+			vertex.Position.x = p.x;
+			vertex.Position.y = p.y;
+			vertex.Position.z = p.z;
+			vertex.UV.x = (texture->vertices[0].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.Color.x = debris->Pad[2] / 255.0f;
+			vertex.Color.y = debris->Pad[3] / 255.0f;
+			vertex.Color.z = debris->Pad[4] / 255.0f;
 			vertices.push_back(vertex);
 
 			p = Vector3(debris->XYZOffsets2[0], debris->XYZOffsets2[1], debris->XYZOffsets2[2]);
-			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
-			vertex.x = p.x;
-			vertex.y = p.y;
-			vertex.z = p.z;
-			vertex.u = (texture->vertices[1].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.v = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.r = debris->Pad[6] / 255.0f;
-			vertex.g = debris->Pad[7] / 255.0f;
-			vertex.b = debris->Pad[8] / 255.0f;
+			p = Vector3::Transform(p, world);
+			vertex.Position.x = p.x;
+			vertex.Position.y = p.y;
+			vertex.Position.z = p.z;
+			vertex.UV.x = (texture->vertices[1].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.Color.x = debris->Pad[6] / 255.0f;
+			vertex.Color.y = debris->Pad[7] / 255.0f;
+			vertex.Color.z = debris->Pad[8] / 255.0f;
 			vertices.push_back(vertex);
 
 			p = Vector3(debris->XYZOffsets3[0], debris->XYZOffsets3[1], debris->XYZOffsets3[2]);
-			D3DXVec3TransformCoord(&p, &p, &m_tempWorld);
-			vertex.x = p.x;
-			vertex.y = p.y;
-			vertex.z = p.z;
-			vertex.u = (texture->vertices[2].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.v = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.r = debris->Pad[10] / 255.0f;
-			vertex.g = debris->Pad[11] / 255.0f;
-			vertex.b = debris->Pad[12] / 255.0f;
-			vertices.push_back(vertex);*/
+			p = Vector3::Transform(p, world); 
+			vertex.Position.x = p.x;
+			vertex.Position.y = p.y;
+			vertex.Position.z = p.z;
+			vertex.UV.x = (texture->vertices[2].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.Color.x = debris->Pad[10] / 255.0f;
+			vertex.Color.y = debris->Pad[11] / 255.0f;
+			vertex.Color.z = debris->Pad[12] / 255.0f;
+			vertices.push_back(vertex);
 		}
 	}
 
 	// Check if no debris have to be drawn
-	/*if (vertices.size() == 0)
+	if (vertices.size() == 0)
 		return true;
 
-	setGpuStateForBucket(bucketIndex);
+	m_primitiveBatch->Begin();
 
-	LPD3DXEFFECT effect;
-	if (pass == RENDERER_PASS_SHADOW_MAP)
-		effect = m_shaderDepth->GetEffect();
-	else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
-		effect = m_shaderReconstructZBuffer->GetEffect();
-	else if (pass == RENDERER_PASS_GBUFFER)
-		effect = m_shaderFillGBuffer->GetEffect();
-	else
-		effect = m_shaderTransparent->GetEffect();
+	// Set shaders
+	m_context->VSSetShader(m_vsStatics, NULL, 0);
+	m_context->PSSetShader(m_psStatics, NULL, 0);
 
-	effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-	effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_STATIC);
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
 
-	if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
-	else
-		effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-	XMMATRIXIdentity(&m_tempWorld);
-	effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+	m_stMisc.AlphaTest = !transparent;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	for (int iPass = 0; iPass < cPasses; iPass++)
-	{
-		effect->BeginPass(iPass);
-		effect->CommitChanges();
+	m_stStatic.World = Matrix::Identity;
+	m_stStatic.Color = Vector4::One;
+	updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+	m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
-		m_device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, vertices.size() / 3, &vertices[0], sizeof(RendererVertex));
+	// Draw vertices
+	m_primitiveBatch->Draw(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST, vertices.data(), vertices.size());
+	m_numDrawCalls++;
 
-		effect->EndPass();
-	}*/
+	m_primitiveBatch->End();
 
 	return true;
 }

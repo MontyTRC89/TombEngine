@@ -106,6 +106,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		receivedWmClose = true;
 		PostQuitMessage(0);
+		//DoTheGame = false;
 
 		return DefWindowProcA(hWnd, 0x10u, wParam, (LPARAM)lParam);
 	}
@@ -326,7 +327,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	DoTheGame = true;
 
 	Unk_876C48 = false;
-	hThread = _beginthreadex(0, 0, &GameMain, 0, 0, &threadId);
+	hThread = _beginthreadex(0, 0, &GameMain, 0, 0, &threadId); 
 	WinProcMsg();
 	Unk_876C48 = true;
 
