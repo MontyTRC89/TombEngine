@@ -252,11 +252,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Global\vodoo.h" />
     <ClInclude Include="Objects\newobjects.h" />
     <ClInclude Include="Renderer\Enums.h" />
-    <ClInclude Include="Renderer\Renderer.h" />
-    <ClInclude Include="Renderer\RendererBucket.h" />
-    <ClInclude Include="Renderer\RendererMesh.h" />
-    <ClInclude Include="Renderer\RendererObject.h" />
-    <ClInclude Include="Renderer\Structs.h" />
     <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\directx.h" />
     <ClInclude Include="Specific\init.h" />
@@ -340,10 +335,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\skeleton.cpp" />
     <ClCompile Include="Objects\trap.cpp" />
     <ClCompile Include="Objects\tribesman.cpp" />
-    <ClCompile Include="Renderer\Renderer.cpp" />
-    <ClCompile Include="Renderer\RendererBucket.cpp" />
-    <ClCompile Include="Renderer\RendererMesh.cpp" />
-    <ClCompile Include="Renderer\RendererObject.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Specific\config.cpp" />
     <ClCompile Include="Specific\Init.cpp" />

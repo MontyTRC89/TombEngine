@@ -28,7 +28,7 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = 100;
 	coll->trigger = 0;
 
-	if ((TrInput & IN_LOOK) && !g_LaraExtra.ExtraAnim && Lara.look)
+	if ((TrInput & IN_LOOK) && g_LaraExtra.ExtraAnim == -1 && Lara.look)
 		LookLeftRight();
 	else
 		ResetLook();
