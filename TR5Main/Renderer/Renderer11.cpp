@@ -1016,7 +1016,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 bool Renderer11::drawLara(bool transparent)
 {
 	// Don't draw Lara if binoculars or sniper
-	if (BinocularRange || SpotcamOverlay)
+	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara)
 		return true;
 
 	UINT stride = sizeof(RendererVertex);
@@ -1223,12 +1223,10 @@ bool Renderer11::drawScene(bool dump)
 	drawLara(false);
 	drawItems(false, false);
 	drawItems(false, true);
-	drawDebris(false);
-
-	// Gun shells and Gun flashes
 	drawGunFlashes();
 	drawGunShells();
-	 
+	drawDebris(false);
+
 	// Transparent geometry
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
