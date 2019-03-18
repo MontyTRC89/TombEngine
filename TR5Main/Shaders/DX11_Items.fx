@@ -37,6 +37,7 @@ cbuffer LightsBuffer : register(b2)
 cbuffer MiscBuffer : register(b3)
 {
 	int AlphaTest;
+	int Caustics;
 };
 
 struct VertexShaderInput

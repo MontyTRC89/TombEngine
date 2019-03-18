@@ -464,6 +464,8 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_cbLights = createConstantBuffer(sizeof(CLightBuffer));
 	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
 
+	m_currentCausticsFrame = 0;
+
 	m_renderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
@@ -683,29 +685,31 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
 	m_context->PSSetSamplers(0, 1, &sampler);
-
+	m_context->PSSetShaderResources(1, 1, &m_caustics[m_currentCausticsFrame / 2]->ShaderResourceView);
+	
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	
-	m_stMisc.AlphaTest = !transparent;
-	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
-	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
-
 	if (animated)
 		m_primitiveBatch->Begin();
 
 	for (__int32 i = 0; i < m_roomsToDraw.Size(); i++)
 	{ 
 		RendererRoom* room = m_roomsToDraw[i];
-
+		
 		m_stLights.NumLights = room->LightsToDraw.Size();
 		for (__int32 j = 0; j < room->LightsToDraw.Size(); j++)
 			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));
 		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
+
+		m_stMisc.Caustics = (room->Room->flags & ENV_FLAG_WATER);
+		m_stMisc.AlphaTest = !transparent;
+		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 		for (__int32 j = firstBucket; j < lastBucket; j++)
 		{
@@ -1163,6 +1167,9 @@ bool Renderer11::drawScene(bool dump)
 	m_nextLine3D = 0;
 	m_nextLine2D = 0;
 
+	m_currentCausticsFrame++;
+	m_currentCausticsFrame %= 32;
+
 	m_strings.clear();
 
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
@@ -1198,7 +1205,7 @@ bool Renderer11::drawScene(bool dump)
 
 	// Bind and clear render target
 	if (!dump)
-	{
+	{  
 		m_context->ClearRenderTargetView(m_renderTarget->RenderTargetView, Colors::Black);
 		m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &m_renderTarget->RenderTargetView, m_renderTarget->DepthStencilView);
@@ -4250,56 +4257,6 @@ void Renderer11::drawRipples()
 	}
 }
 
-void Renderer11::drawUnderwaterDust()
-{
-	/*if (m_firstUnderwaterDustParticles)
-	{
-		for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
-			m_underwaterDustParticles[i].Reset = true;
-	}
-
-	for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
-	{
-		RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
-
-		if (dust->Reset)
-		{
-			dust->X = LaraItem->pos.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-			dust->Y = LaraItem->pos.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-			dust->Z = LaraItem->pos.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-
-			// Check if water room
-			__int16 roomNumber = Camera.pos.roomNumber;
-			FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
-			if (!isRoomUnderwater(roomNumber))
-				continue;
-
-			if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber))
-			{
-				dust->Reset = true;
-				continue;
-			}
-
-			dust->Life = 0;
-			dust->Reset = false;
-		}
-
-		dust->Life++;
-		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
-
-		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], dust->X, dust->Y, dust->Z, color, color, color,
-			0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE,
-			BLENDMODE_ALPHABLEND);
-
-		if (dust->Life >= 32)
-			dust->Reset = true;
-	}
-
-	m_firstUnderwaterDustParticles = false;
-	*/
-	return;
-}
-
 void Renderer11::drawDrips()
 {
 	for (__int32 i = 0; i < 32; i++)
@@ -6128,4 +6085,69 @@ bool Renderer11::drawGunShells()
 	}
 
 	return true;
+}
+
+void Renderer11::drawUnderwaterDust()
+{
+	if (m_firstUnderwaterDustParticles)
+	{
+		for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+			m_underwaterDustParticles[i].Reset = true;
+	}
+
+	for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+	{
+		RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
+
+		if (dust->Reset)
+		{
+			dust->X = LaraItem->pos.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+			dust->Y = LaraItem->pos.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+			dust->Z = LaraItem->pos.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+
+			// Check if water room
+			__int16 roomNumber = Camera.pos.roomNumber;
+			FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
+			if (!isRoomUnderwater(roomNumber))
+				continue;
+
+			if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber))
+			{
+				dust->Reset = true;
+				continue;
+			}
+
+			dust->Life = 0;
+			dust->Reset = false;
+		}
+
+		dust->Life++;
+		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
+
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], dust->X, dust->Y, dust->Z, color, color, color,
+			0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE,
+			BLENDMODE_ALPHABLEND);
+
+		if (dust->Life >= 32)
+			dust->Reset = true;
+	}
+
+	m_firstUnderwaterDustParticles = false;
+
+	return;
+}
+
+bool Renderer11::isRoomUnderwater(__int16 roomNumber)
+{
+	return (m_rooms[roomNumber]->Room->flags & 1);
+}
+
+bool Renderer11::isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
+{
+	RendererRoom* room = m_rooms[roomNumber];
+	ROOM_INFO* r = room->Room;
+
+	return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
+		y >= r->maxceiling && y <= r->minfloor &&
+		z >= r->z && z <= r->z + r->ySize * 1024.0f);
 }

@@ -24,6 +24,7 @@ cbuffer LightsBuffer : register(b1)
 cbuffer MiscBuffer : register(b3)
 {
 	int AlphaTest;
+	int Caustics;
 };
 
 struct VertexShaderInput
@@ -46,6 +47,9 @@ struct PixelShaderInput
 
 Texture2D Texture;
 SamplerState Sampler;
+
+Texture2D CausticsTexture;
+//SamplerState Sampler;
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -87,6 +91,30 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		float attenuation = (radius - distance) / radius;
 
 		lighting += color * intensity * attenuation;
+	}
+
+	if (Caustics)
+	{
+		float3 position = input.WorldPosition.xyz;
+		float3 normal = input.Normal.xyz;
+
+		float fracX = position.x - floor(position.x / 2048.0f) * 2048.0f;
+		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
+		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
+
+		float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
+
+		float3 blending = abs(normal);
+		blending = normalize(max(blending, 0.00001f));
+		float b = (blending.x + blending.y + blending.z);
+		blending /= float3(b, b, b);
+
+		float3 p = float3(fracX, fracY, fracZ) / 2048.0f;
+		float3 xaxis = CausticsTexture.Sample(Sampler, p.yz).xyz; 
+		float3 yaxis = CausticsTexture.Sample(Sampler, p.xz).xyz;  
+		float3 zaxis = CausticsTexture.Sample(Sampler, p.xy).xyz;  
+
+		lighting += float4((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz, 0.0f) * attenuation * 2.0f;
 	}
 	
 	output.xyz = output.xyz * lighting;
