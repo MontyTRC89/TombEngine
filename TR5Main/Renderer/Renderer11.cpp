@@ -1433,7 +1433,7 @@ __int32 Renderer11::drawFinalPass()
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 
-	drawFullScreenQuad(m_renderTarget->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor));
+	drawFullScreenQuad(m_renderTarget->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
 
 	m_swapChain->Present(0, 0);
 
@@ -2430,7 +2430,7 @@ void Renderer11::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 fallof
 
 void Renderer11::EnableCinematicBars(bool value)
 {
-
+	m_enableCinematicBars = value;
 }
 
 void Renderer11::FadeIn()
@@ -2476,7 +2476,7 @@ void Renderer11::DrawLoadingScreen(char* fileName)
 		m_context->RSSetViewports(1, &m_viewport);
 
 		// Draw the full screen background
-		drawFullScreenQuad(texture->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor));
+		drawFullScreenQuad(texture->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		m_swapChain->Present(0, 0);
@@ -5228,11 +5228,11 @@ __int32 Renderer11::drawInventoryScene()
 	// Clear the Z-Buffer after drawing the background	
 	if (g_Inventory->GetType() == INV_TYPE_TITLE)
 	{
-		drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor));
+		drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
 	}
 	else
 	{
-		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.3f, 0.3f, 0.3f));
+		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.3f, 0.3f, 0.3f), false);
 	}
 	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -5628,37 +5628,72 @@ __int32 Renderer11::drawInventoryScene()
 	return 0;
 }
 
-bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color)
+bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool cinematicBars)
 {
 	RendererVertex vertices[4];
 	 
-	vertices[0].Position.x = -1.0f;
-	vertices[0].Position.y = 1.0f;
-	vertices[0].Position.z = 0.0f;
-	vertices[0].UV.x = 0.0f;
-	vertices[0].UV.y = 0.0f;
-	vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
+	if (!cinematicBars)
+	{
+		vertices[0].Position.x = -1.0f;
+		vertices[0].Position.y = 1.0f;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = 0.0f;
+		vertices[0].UV.y = 0.0f;
+		vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
 
-	vertices[1].Position.x = 1.0f;
-	vertices[1].Position.y = 1.0f;
-	vertices[1].Position.z = 0.0f;
-	vertices[1].UV.x = 1.0f;
-	vertices[1].UV.y = 0.0f;
-	vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
+		vertices[1].Position.x = 1.0f;
+		vertices[1].Position.y = 1.0f;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = 1.0f;
+		vertices[1].UV.y = 0.0f;
+		vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
 
-	vertices[2].Position.x = 1.0f;
-	vertices[2].Position.y = -1.0f;
-	vertices[2].Position.z = 0.0f;
-	vertices[2].UV.x = 1.0f;
-	vertices[2].UV.y = 1.0f;
-	vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
-	 
-	vertices[3].Position.x = -1.0f;
-	vertices[3].Position.y = -1.0f;
-	vertices[3].Position.z = 0.0f;
-	vertices[3].UV.x = 0.0f;
-	vertices[3].UV.y = 1.0f;
-	vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
+		vertices[2].Position.x = 1.0f;
+		vertices[2].Position.y = -1.0f;
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = 1.0f;
+		vertices[2].UV.y = 1.0f;
+		vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[3].Position.x = -1.0f;
+		vertices[3].Position.y = -1.0f;
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = 0.0f;
+		vertices[3].UV.y = 1.0f;
+		vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
+	}
+	else
+	{
+		float cinematicFactor = 0.12f;
+
+		vertices[0].Position.x = -1.0f;
+		vertices[0].Position.y = 1.0f - cinematicFactor * 2;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = 0.0f;
+		vertices[0].UV.y = cinematicFactor;
+		vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[1].Position.x = 1.0f;
+		vertices[1].Position.y = 1.0f - cinematicFactor * 2;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = 1.0f;
+		vertices[1].UV.y = cinematicFactor;
+		vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[2].Position.x = 1.0f;
+		vertices[2].Position.y = -(1.0f - cinematicFactor * 2);
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = 1.0f;
+		vertices[2].UV.y = 1.0f - cinematicFactor;
+		vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[3].Position.x = -1.0f;
+		vertices[3].Position.y = -(1.0f - cinematicFactor * 2);
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = 0.0f;
+		vertices[3].UV.y = 1.0f - cinematicFactor;
+		vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
+	}
 
 	m_context->VSSetShader(m_vsFullScreenQuad, NULL, 0);
 	m_context->PSSetShader(m_psFullScreenQuad, NULL, 0);
@@ -5869,7 +5904,7 @@ bool Renderer11::drawOverlays()
 		return true;
 
 	m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
-	drawFullScreenQuad(m_binocularsTexture->ShaderResourceView, Vector3::One);
+	drawFullScreenQuad(m_binocularsTexture->ShaderResourceView, Vector3::One, false);
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 	return true;

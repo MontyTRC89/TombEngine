@@ -819,6 +819,7 @@ private:
 	RENDERER_FADE_STATUS							m_fadeStatus;
 	float											m_fadeFactor;
 	__int32											m_progress;
+	bool											m_enableCinematicBars = false;
 
 	// Private functions
 	bool									drawScene(bool dump);
@@ -890,7 +891,7 @@ private:
 	void									drawUnderwaterDust();	
 	bool									doRain();
 	bool									doSnow();
-	bool									drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color);
+	bool									drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool cinematicBars);
 	bool									isRoomUnderwater(__int16 roomNumber);
 	bool									isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
 	void									addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
