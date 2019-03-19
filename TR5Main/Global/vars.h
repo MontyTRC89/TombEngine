@@ -139,7 +139,7 @@
 #define TrackCameraInit				VAR_U_(0x0051D010, __int32)
 #define CheckTrigger				VAR_U_(0x0051D014, __int32)
 #define UseSpotCam					VAR_U_(0x0051D018, __int32)
-#define DisableLaraControl			VAR_U_(0x0051D01C, __int32)
+#define DisableLaraControl			VAR_U_(0x0051D01C, byte)
 #define FramesCount					VAR_U_(0x0051CA78, __int32)
 #define GlobalCounter				VAR_U_(0x0051CA58, __int16)
 

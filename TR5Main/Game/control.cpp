@@ -57,7 +57,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			return GAME_STATUS::GAME_STATUS_NONE;
 		
 		// Has Lara control been disabled?
-		if (DisableLaraControl && false)
+		if (DisableLaraControl)
 		{
 			if (CurrentLevel != 0)
 				DbInput = 0;
@@ -72,7 +72,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		SetDebounce = 0;
 		if (CurrentLevel != 0 && !g_Renderer->IsFading())
 		{
-			if ((DbInput & 0x200000 || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			if ((DbInput & IN_DESELECT || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{ 
 				// Stop all sounds
 				INVENTORY_RESULT inventoryResult = g_Inventory->DoInventory();
