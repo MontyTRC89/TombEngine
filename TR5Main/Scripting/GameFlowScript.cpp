@@ -161,19 +161,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 		level->LaraType = (LARA_DRAW_TYPE)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		level->UVRotate = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		level->LevelFarView = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelFlags))
-	{
-		level->Horizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->Sky = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->ColAddHorizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->Storm = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->ResetHub = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->LaraType = (LARA_DRAW_TYPE)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->UVRotate = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		level->LevelFarView = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		level->Rumble = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 
 		return true;
 	}
@@ -249,16 +237,16 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 
 		if (layerIndex == 1)
 		{
-			level->Layer1.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer1.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer1.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer1.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
+			level->Layer1.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
+			level->Layer1.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
 			level->Layer1.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 		}
 		else
 		{
-			level->Layer2.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer2.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-			level->Layer2.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer2.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
+			level->Layer2.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
+			level->Layer2.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
 			level->Layer2.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 		}
 
@@ -289,6 +277,7 @@ bool __cdecl LoadScript()
 {
 	// Initialise an empty legacy GAMEFLOW object for avoiding exceptions in the few functions left that use it
 	LegacyGameFlow = (GAMEFLOW*)malloc(sizeof(GAMEFLOW));
+	ZeroMemory(LegacyGameFlow, sizeof(GAMEFLOW));
 
 	// Load the new script file
 	FileStream stream("Script.dat", true, false);
