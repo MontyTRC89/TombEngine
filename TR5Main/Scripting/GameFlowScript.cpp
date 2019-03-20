@@ -68,7 +68,7 @@ GameFlow::GameFlow(sol::state* lua)
 		);
 
 	// Level type
-	m_lua->new_usertype<GameScriptLevel>("Level",
+	/*m_lua->new_usertype<GameScriptLevel>("Level",
 		sol::constructors<GameScriptLevel()>(),
 		"name", &GameScriptLevel::Name,
 		"script", &GameScriptLevel::ScriptFileName,
@@ -88,7 +88,7 @@ GameFlow::GameFlow(sol::state* lua)
 		"rumble", &GameScriptLevel::Rumble,
 		"resetHub", &GameScriptLevel::ResetHub,
 		"mirror", &GameScriptLevel::Mirror
-		);
+		);*/
 
 	(*m_lua)["Gameflow"] = this;
 }
@@ -162,6 +162,8 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 		level->UVRotate = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		level->LevelFarView = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
 		level->Rumble = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->Weather = (WEATHER_TYPES)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		level->UnlimitedAir = (WEATHER_TYPES)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 
 		return true;
 	}

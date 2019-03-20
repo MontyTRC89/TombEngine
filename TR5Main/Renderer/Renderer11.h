@@ -697,6 +697,7 @@ private:
 
 	RenderTarget2D*							m_dumpScreenRenderTarget;
 	RenderTarget2D*							m_renderTarget;
+	RenderTarget2D*							m_currentRenderTarget;
 
 	// Shaders
 	ID3D11VertexShader*						m_vsRooms;
@@ -938,5 +939,6 @@ public:
 	void									GetLaraBonePosition(Vector3* pos, __int32 bone);
 	bool									ToggleFullScreen();
 	bool									IsFullsScreen();
+	vector<RendererVideoAdapter>*			GetAdapters();
 	bool									ChangeScreenResolution(__int32 width, __int32 height, __int32 frequency, bool windowed);
 };

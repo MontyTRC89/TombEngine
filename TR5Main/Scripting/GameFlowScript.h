@@ -110,25 +110,25 @@ typedef struct GameScriptLevel {
 	bool ColAddHorizon;
 	GameScriptFog Fog;
 	bool Storm;
-	bool Rain;
-	bool Snow;
+	WEATHER_TYPES Weather;
 	bool ResetHub;
 	bool Rumble;
 	LARA_DRAW_TYPE LaraType;
 	GameScriptMirror Mirror;
 	byte UVRotate;
 	int LevelFarView;
+	bool UnlimitedAir;
 
 	GameScriptLevel()
 	{
 		Storm = false;
-		Rain = false;
-		Snow = false;
 		Horizon = false;
 		ColAddHorizon = false;
 		ResetHub = false;
 		Rumble = false;
+		Weather = WEATHER_NORMAL;
 		LaraType = LARA_DRAW_TYPE::LARA_NORMAL;
+		UnlimitedAir = false;
 	}
 };
 

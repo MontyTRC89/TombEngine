@@ -465,6 +465,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
 
 	m_currentCausticsFrame = 0;
+	m_firstWeather = true;
 
 	m_renderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
@@ -628,7 +629,7 @@ bool Renderer11::drawHorizonAndSky()
 		m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z).Transpose();
 		m_stStatic.Position = Vector4::Zero;
 		m_stStatic.Color = Vector4::One;
-		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CItemBuffer));
+		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 		m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
 
@@ -655,7 +656,7 @@ bool Renderer11::drawHorizonAndSky()
 	}
 
 	// Clear just the Z-buffer so we can start drawing on top of the horizon
-	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	return true;
 }
@@ -1204,18 +1205,11 @@ bool Renderer11::drawScene(bool dump)
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	// Bind and clear render target
-	if (!dump)
-	{  
-		m_context->ClearRenderTargetView(m_renderTarget->RenderTargetView, Colors::Black);
-		m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		m_context->OMSetRenderTargets(1, &m_renderTarget->RenderTargetView, m_renderTarget->DepthStencilView);
-	}
-	else
-	{
-		m_context->ClearRenderTargetView(m_dumpScreenRenderTarget->RenderTargetView, Colors::Black);
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		m_context->OMSetRenderTargets(1, &m_dumpScreenRenderTarget->RenderTargetView, m_depthStencilView);
-	}
+	m_currentRenderTarget = (dump ? m_dumpScreenRenderTarget : m_renderTarget);
+
+	m_context->ClearRenderTargetView(m_currentRenderTarget->RenderTargetView, Colors::Black);
+	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, &m_currentRenderTarget->RenderTargetView, m_currentRenderTarget->DepthStencilView);
 
 	m_context->RSSetViewports(1, &m_viewport);
 
@@ -1233,6 +1227,9 @@ bool Renderer11::drawScene(bool dump)
 	drawGunFlashes();
 	drawGunShells();
 	drawDebris(false);
+	drawBats();
+	drawRats();
+	drawSpiders();
 
 	// Transparent geometry
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -1262,9 +1259,9 @@ bool Renderer11::drawScene(bool dump)
 	drawSplahes();
 	drawShockwaves();
 
-	if (level->Rain)
+	if (level->Weather == WEATHER_RAIN)
 		doRain();
-	else if (level->Snow)
+	else if (level->Weather == WEATHER_SNOW)
 		doSnow();
 
 	drawRopes();
@@ -4976,7 +4973,13 @@ bool Renderer11::drawDebris(bool transparent)
 
 bool Renderer11::drawBats()
 {
-	/*UINT cPasses = 1;
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
 	if (Objects[ID_BATS].loaded)
 	{
@@ -5005,92 +5008,38 @@ bool Renderer11::drawBats()
 					Matrix rotation = Matrix::CreateFromYawPitchRoll(bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
 					Matrix world = rotation * translation;
 
-					m_stItem.World = world;
+					m_stItem.World = world.Transpose();
 					m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
 					m_stItem.AmbientLight = m_rooms[bat->roomNumber]->AmbientLight;
 					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
-					for (int iPass = 0; iPass < cPasses; iPass++)
-					{
-						effect->BeginPass(iPass);
-						effect->CommitChanges();
-
-						drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-						effect->EndPass();
-					}
+					m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+					m_numDrawCalls++;
 				}
 			}
 		}
-		
-
-
-		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
-
-		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
-		else
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
-
-		for (__int32 i = 0; i < 64; i++)
-		{
-			BAT_STRUCT* bat = &Bats[i];
-
-			if (bat->on)
-			{
-				XMMATRIXTranslation(&m_tempTranslation, bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
-				XMMATRIXRotationYawPitchRoll(&m_tempRotation, bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
-				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
-				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
-
-				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[bat->roomNumber]->AmbientLight);
-
-				for (int iPass = 0; iPass < cPasses; iPass++)
-				{
-					effect->BeginPass(iPass);
-					effect->CommitChanges();
-
-					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
-
-					effect->EndPass();
-				}
-			}
-		}
-	}*/
+	}
 
 	return true;
 }
 
 bool Renderer11::drawRats()
 {
-	/*XMMATRIX world;
-	UINT cPasses = 1;
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
 	if (Objects[ID_RATS].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_RATS];
-		RendererObject* moveableObj = m_moveableObjects[ID_RATS].get();
+		OBJECT_INFO* obj = &Objects[ID_BATS];
+		RendererObject* moveableObj = m_moveableObjects[ID_BATS];
 
-		setGpuStateForBucket(bucketIndex);
-
-		LPD3DXEFFECT effect;
-		if (pass == RENDERER_PASS_SHADOW_MAP)
-			effect = m_shaderDepth->GetEffect();
-		else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
-			effect = m_shaderReconstructZBuffer->GetEffect();
-		else if (pass == RENDERER_PASS_GBUFFER)
-			effect = m_shaderFillGBuffer->GetEffect();
-		else
-			effect = m_shaderTransparent->GetEffect();
-
-		effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-		effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
-
-		if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
-		else
-			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
+		for (__int32 m = 0; m < 32; m++)
+			memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
 		for (__int32 i = 0; i < NUM_RATS; i += 4)
 		{
@@ -5098,35 +5047,31 @@ bool Renderer11::drawRats()
 
 			if (rat->on)
 			{
-				__int16* meshPtr = Meshes[Objects[ID_RATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
+				__int16* meshPtr = Meshes[Objects[ID_BATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
 				RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
-				RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 
-				if (bucket->NumVertices == 0)
-					return true;
+				Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
+				Matrix world = rotation * translation;
 
-				m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-				m_device->SetIndices(bucket->GetIndexBuffer());
+				m_stItem.World = world.Transpose();
+				m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
+				m_stItem.AmbientLight = m_rooms[rat->roomNumber]->AmbientLight;
+				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
-				XMMATRIXTranslation(&m_tempTranslation, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-				XMMATRIXRotationYawPitchRoll(&m_tempRotation, rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
-				XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
-				effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
-
-				effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[rat->roomNumber]->AmbientLight);
-
-				for (int iPass = 0; iPass < cPasses; iPass++)
+				for (__int32 b = 0; b < 2; b++)
 				{
-					effect->BeginPass(iPass);
-					effect->CommitChanges();
+					RendererBucket* bucket = &mesh->Buckets[b];
 
-					drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+					if (bucket->NumVertices == 0)
+						continue;
 
-					effect->EndPass();
+					m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+					m_numDrawCalls++;
 				}
 			}
 		}
-	}*/
+	}
 
 	return true;
 }
@@ -5444,10 +5389,12 @@ __int32 Renderer11::drawInventoryScene()
 					else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						// Draw settings menu
-						/*RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
+						RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
+
+						__int32 y = 200;
 
 						// Screen resolution
-						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
@@ -5456,41 +5403,52 @@ __int32 Renderer11::drawInventoryScene()
 						ZeroMemory(buffer, 255);
 						sprintf(buffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
 
-						PrintString(400, 200, buffer, PRINTSTRING_COLOR_WHITE,
+						PrintString(400, y, buffer, PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
+						y += 30;
+
 						// Enable dynamic shadows
-						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SHADOWS),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SHADOWS),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 230, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
+						y += 30;
+
 						// Enable caustics
-						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_CAUSTICS),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_CAUSTICS),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 260, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 
+						y += 30;
+
 						// Enable volumetric fog
-						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 290, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 
+						y += 30;
+
 						// Apply and cancel
-						PrintString(400, 320, g_GameFlow->GetString(STRING_INV_APPLY),
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_APPLY),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 350, g_GameFlow->GetString(STRING_INV_CANCEL),
+						
+						y += 30;
+						
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CANCEL),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
-*/
+
 					}
 					else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
@@ -6185,4 +6143,9 @@ bool Renderer11::isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
 	return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
 		y >= r->maxceiling && y <= r->minfloor &&
 		z >= r->z && z <= r->z + r->ySize * 1024.0f);
+}
+
+vector<RendererVideoAdapter>* Renderer11::GetAdapters()
+{
+	return &m_adapters;
 }

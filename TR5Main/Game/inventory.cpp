@@ -411,7 +411,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 		}
 		else if (DbInput & IN_FORWARD &&
 			(m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
-				m_activeRing == INV_RING_OPTIONS))
+			 m_activeRing == INV_RING_OPTIONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -673,11 +673,16 @@ void Inventory::UseCurrentItem()
 		}
 	}
 
-	bool canUseWeapons = !(LaraItem->currentAnimState == 80 || LaraItem->currentAnimState == 81 || 
-						   LaraItem->currentAnimState == 84 || LaraItem->currentAnimState == 85 || 
-						   LaraItem->currentAnimState == 86 || LaraItem->currentAnimState == 88 || 
-						   LaraItem->currentAnimState == 71 || LaraItem->currentAnimState == 105 || 
-						   LaraItem->currentAnimState == 106 || Lara.waterStatus != LW_ABOVE_WATER);
+	bool canUseWeapons = !(LaraItem->currentAnimState == STATE_LARA_CRAWL_IDLE || 
+						   LaraItem->currentAnimState == STATE_LARA_CRAWL_FORWARD ||
+						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TURN_LEFT || 
+						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TURN_RIGHT ||
+						   LaraItem->currentAnimState == STATE_LARA_CRAWL_BACK || 
+						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TO_CLIMB ||
+						   LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE || 
+						   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT ||
+						   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT || 
+						   Lara.waterStatus != LW_ABOVE_WATER);
 
 	// Pistols
 	if (objectNumber == ID_PISTOLS_ITEM)
@@ -836,13 +841,13 @@ void Inventory::UseCurrentItem()
 	{
 		if (!Lara.gunStatus)
 		{
-			if (LaraItem->currentAnimState != 80
-				&& LaraItem->currentAnimState != 81
-				&& LaraItem->currentAnimState != 84
-				&& LaraItem->currentAnimState != 85
-				&& LaraItem->currentAnimState != 86
-				&& LaraItem->currentAnimState != 88
-				&& Lara.waterStatus == LW_ABOVE_WATER)
+			if (LaraItem->currentAnimState != STATE_LARA_CRAWL_IDLE &&
+				LaraItem->currentAnimState != STATE_LARA_CRAWL_FORWARD &&
+				LaraItem->currentAnimState != STATE_LARA_CRAWL_TURN_LEFT &&
+				LaraItem->currentAnimState != STATE_LARA_CRAWL_TURN_RIGHT &&
+				LaraItem->currentAnimState != STATE_LARA_CRAWL_BACK &&
+				LaraItem->currentAnimState != STATE_LARA_CRAWL_TO_CLIMB && 
+				Lara.waterStatus == LW_ABOVE_WATER)
 			{
 				if (Lara.gunType != WEAPON_FLARE)
 				{
@@ -1595,7 +1600,7 @@ void Inventory::DoGraphicsSettings()
 	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
 
 	// Get current display mode
-	/*vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[ring->Configuration.Adapter];
 	ring->SelectedVideoMode = 0;
 	for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
@@ -1607,7 +1612,7 @@ void Inventory::DoGraphicsSettings()
 			ring->SelectedVideoMode = i;
 			break;
 		}
-	}*/
+	}
 
 	// Open the passport
 	for (__int32 i = 0; i < 14; i++)
@@ -1714,12 +1719,12 @@ void Inventory::DoGraphicsSettings()
 			if (ring->selectedIndex == INV_DISPLAY_APPLY)
 			{
 				// Save the configuration
-				/*RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
+				RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
 				ring->Configuration.Width = mode->Width;
 				ring->Configuration.Height = mode->Height;
 				ring->Configuration.RefreshRate = mode->RefreshRate;
 				memcpy(&g_Configuration, &ring->Configuration, sizeof(GameConfiguration));
-				SaveConfiguration();*/
+				SaveConfiguration();
 
 				// Reset screen and go back
 				g_Renderer->ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 

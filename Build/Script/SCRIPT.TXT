@@ -79,6 +79,7 @@ OnLaraDeath=        Andrea1Finish
 OnLevelControl=     Andrea1Finish
 OnBeginFrame=       Andrea1BeginFrame
 OnEndFrame=         Andrea1EndFrame
+Weather=            RAIN
 
 [Level]
 Puzzle= 1,Valve wheel, $0002,$0600,$0000,$fc00,$0000,$000a
