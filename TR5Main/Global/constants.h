@@ -20,7 +20,7 @@
 
 #define NUM_OBJECTS		518
 #define NUM_WEAPONS		16
-
+#define NUM_SPRITES		256
 #define UNIT_SHADOW		256
 #define DEFAULT_RADIUS	10
 #define ROT_X 4

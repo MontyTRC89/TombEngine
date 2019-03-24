@@ -108,9 +108,15 @@ Renderer11::~Renderer11()
 
 void Renderer11::FreeRendererData()
 {
+	m_meshPointersToMesh.clear();
+
 	for (__int32 i = 0; i < NUM_OBJECTS; i++)
 		DX11_DELETE(m_moveableObjects[i]);
 	free(m_moveableObjects);
+
+	for (__int32 i = 0; i < g_NumSprites; i++)
+		DX11_DELETE(m_sprites[i]);
+	free(m_sprites);
 
 	for (__int32 i = 0; i < NUM_OBJECTS; i++)
 		DX11_DELETE(m_spriteSequences[i]);
@@ -139,8 +145,6 @@ void Renderer11::FreeRendererData()
 
 	DX11_DELETE(m_staticsVertexBuffer);
 	DX11_DELETE(m_staticsIndexBuffer);
-	
-	m_meshPointersToMesh.clear();
 }
 
 bool Renderer11::Create()
@@ -202,7 +206,10 @@ bool Renderer11::EnumerateVideoModes()
 		displayModes = new DXGI_MODE_DESC[numModes];
 		res = output->GetDisplayModeList(format, 0, &numModes, displayModes);
 		if (FAILED(res))
+		{
+			delete displayModes;
 			return false;
+		}
 
 		for (__int32 j = 0; j < numModes; j++)
 		{
@@ -219,7 +226,9 @@ bool Renderer11::EnumerateVideoModes()
 			printf("\t\t %d x %d %d Hz\n", newMode.Width, newMode.Height, newMode.RefreshRate);
 		}
 
-		m_adapters.push_back(adapter);		
+		m_adapters.push_back(adapter);	
+
+		delete displayModes;
 	}
 
 	dxgiFactory->Release();
@@ -469,6 +478,29 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 
 	m_renderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+	// Preallocate lists
+	m_roomsToDraw.Reserve(NumberRooms);
+	m_itemsToDraw.Reserve(NUM_ITEMS);
+	m_effectsToDraw.Reserve(NUM_ITEMS);
+	m_lightsToDraw.Reserve(16384);
+	m_dynamicLights.Reserve(16384);
+	m_staticsToDraw.Reserve(16384);
+	m_spritesToDraw.Reserve(MAX_SPRITES);
+	m_lines3DToDraw.Reserve(MAX_LINES_3D);
+	m_lines2DToDraw.Reserve(MAX_LINES_2D);
+	m_tempItemLights.Reserve(MAX_LIGHTS);
+	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
+	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
+	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
+
+	for (__int32 i = 0; i < NUM_ITEMS; i++)
+	{
+		m_items[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
+	}
+
+	m_textureAtlas = NULL;
+	m_skyTexture = NULL;
 
 	return true;
 }
@@ -1076,8 +1108,8 @@ bool Renderer11::drawLara(bool transparent)
 
 	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
-		RendererMesh* mesh = m_meshPointersToMesh[Lara.meshPtrs[k]];
-
+		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
+		
 		for (__int32 j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
@@ -1479,6 +1511,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_rooms = (RendererRoom**)malloc(sizeof(RendererRoom*) * NUM_ROOMS);
 	ZeroMemory(m_rooms, sizeof(RendererRoom*) * NUM_ROOMS);
 
+	m_meshes.clear();
+
 	// Step 0: prepare animated textures
 	__int16 numSets = *AnimatedTextureRanges;
 	__int16* animatedPtr = AnimatedTextureRanges;
@@ -1566,8 +1600,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 		}
 	}
 
-	//if (m_textureAtlas != NULL)
-	//	delete m_textureAtlas;
+	if (m_textureAtlas != NULL)
+		delete m_textureAtlas;
 
 	m_textureAtlas = Texture2D::LoadFromByteArray(m_device, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, &buffer[0]);
 	if (m_textureAtlas == NULL)
@@ -2210,10 +2244,10 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_staticsIndexBuffer = IndexBuffer::Create(m_device, staticsIndices.size(), staticsIndices.data());
 
 	// Step 5: prepare sprites
-	m_sprites = (RendererSprite**)malloc(sizeof(RendererSprite*) * 4);
-	ZeroMemory(m_sprites, sizeof(RendererSprite*) * 4);
+	m_sprites = (RendererSprite**)malloc(sizeof(RendererSprite*) * g_NumSprites);
+	ZeroMemory(m_sprites, sizeof(RendererSprite*) * g_NumSprites);
 
-	for (__int32 i = 0; i < 41; i++)
+	for (__int32 i = 0; i < g_NumSprites; i++)
 	{
 		SPRITE* oldSprite = &Sprites[i];
 
@@ -2272,26 +2306,6 @@ bool Renderer11::PrepareDataForTheRenderer()
 			WaterfallTextures[i] = texture;
 			WaterfallY[i] = texture->vertices[0].y;
 		}
-	}
-
-	// Preallocate lists
-	m_roomsToDraw.Reserve(NumberRooms);
-	m_itemsToDraw.Reserve(NUM_ITEMS);
-	m_effectsToDraw.Reserve(NUM_ITEMS);
-	m_lightsToDraw.Reserve(16384);
-	m_dynamicLights.Reserve(16384);
-	m_staticsToDraw.Reserve(16384);
-	m_spritesToDraw.Reserve(MAX_SPRITES);
-	m_lines3DToDraw.Reserve(MAX_LINES_3D);
-	m_lines2DToDraw.Reserve(MAX_LINES_2D);
-	m_tempItemLights.Reserve(MAX_LIGHTS);
-	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
-	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
-	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
-
-	for (__int32 i = 0; i < NUM_ITEMS; i++)
-	{
-		m_items[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
 	}
 
 	return true;
@@ -3503,8 +3517,12 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 	if (normals != NULL) free(normals);
 	if (colors != NULL) free(colors);
 
-	if (m_meshPointersToMesh.find(refMeshPtr) == m_meshPointersToMesh.end())
-		m_meshPointersToMesh.insert(pair<__int16*, RendererMesh*>(refMeshPtr, mesh));
+	unsigned int castedMeshPtr = reinterpret_cast<unsigned int>(refMeshPtr);
+		
+	if (m_meshPointersToMesh.find(castedMeshPtr) == m_meshPointersToMesh.end())
+		m_meshPointersToMesh.insert(pair<unsigned int, RendererMesh*>(castedMeshPtr, mesh));
+	
+	m_meshes.push_back(mesh);
 
 	return mesh;
 }
@@ -4986,8 +5004,8 @@ bool Renderer11::drawBats()
 		OBJECT_INFO* obj = &Objects[ID_BATS];
 		RendererObject* moveableObj = m_moveableObjects[ID_BATS];
 		__int16* meshPtr = Meshes[Objects[ID_BATS].meshIndex + 2 * (-GlobalCounter & 3)];
-		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
-
+		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
+		
 		for (__int32 m = 0; m < 32; m++)
 			memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
@@ -5048,8 +5066,8 @@ bool Renderer11::drawRats()
 			if (rat->on)
 			{
 				__int16* meshPtr = Meshes[Objects[ID_BATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
-				RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
-
+				RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
+				
 				Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
 				Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
 				Matrix world = rotation * translation;

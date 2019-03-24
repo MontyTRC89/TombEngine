@@ -53,7 +53,17 @@ extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 char* LevelDataPtr;
 
-ChunkReader* chunkIO;
+__int32 g_NumSprites;
+__int32 g_NumSpritesSequences;
+
+ChunkReader* g_levelChunkIO;
+
+__int16 ReadInt8()
+{
+	byte value = *(byte*)LevelDataPtr;
+	LevelDataPtr += 1;
+	return value;
+}
 
 __int16 ReadInt16()
 {
@@ -711,10 +721,10 @@ bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 	if (chunkId->EqualsTo(ChunkLuaId))
 	{
 		__int32 luaId = 0;
-		chunkIO->GetRawStream()->ReadInt32(&luaId);
+		g_levelChunkIO->GetRawStream()->ReadInt32(&luaId);
 		
 		__int32 itemId = 0;
-		chunkIO->GetRawStream()->ReadInt32(&itemId);
+		g_levelChunkIO->GetRawStream()->ReadInt32(&itemId);
 
 		g_GameScript->AddLuaId(luaId, itemId);
 
@@ -729,10 +739,10 @@ bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 	if (chunkId->EqualsTo(ChunkTrigger))
 	{
 		char* functionName = NULL;
-		chunkIO->GetRawStream()->ReadString(&functionName);
+		g_levelChunkIO->GetRawStream()->ReadString(&functionName);
 		
 		char* functionCode = NULL;
-		chunkIO->GetRawStream()->ReadString(&functionCode);
+		g_levelChunkIO->GetRawStream()->ReadString(&functionCode);
 
 		LuaFunction* function = new LuaFunction();
 		function->Name = string(functionName);
@@ -753,9 +763,9 @@ bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 {
 	if (chunkId->EqualsTo(ChunkTriggersList))
-		return chunkIO->ReadChunks(ReadLuaTriggers, 0);
+		return g_levelChunkIO->ReadChunks(ReadLuaTriggers, 0);
 	else if (chunkId->EqualsTo(ChunkLuaIds))
-		return chunkIO->ReadChunks(ReadLuaIds, 0);
+		return g_levelChunkIO->ReadChunks(ReadLuaIds, 0);
 	return false;
 }
 
@@ -763,11 +773,54 @@ void __cdecl LoadNewData(__int32 size)
 {
 	// Free old level scripts
 	MemoryStream stream(LevelDataPtr, size);
-	chunkIO = new ChunkReader(0x4D355254, &stream);
-	if (!chunkIO->IsValid())
+	g_levelChunkIO = new ChunkReader(0x4D355254, &stream);
+	if (!g_levelChunkIO->IsValid())
 		return;
 
-	chunkIO->ReadChunks(ReadNewDataChunks, 0);
+	g_levelChunkIO->ReadChunks(ReadNewDataChunks, 0);
+}
+
+void LoadSprites()
+{
+	DB_Log(2, "LoadSprites");
+
+	ReadInt32(); // SPR\0
+
+	g_NumSprites = ReadInt32();
+
+	Sprites = (SPRITE*)GameMalloc(g_NumSprites * sizeof(SPRITE));
+
+	for (__int32 i = 0; i < g_NumSprites; i++)
+	{
+		Sprites[i].tile = ReadInt16() + 1;
+		Sprites[i].x = ReadInt8();
+		Sprites[i].y = ReadInt8();
+		Sprites[i].width = ReadInt16();
+		Sprites[i].height = ReadInt16();
+		Sprites[i].left = (ReadInt16() + 1) / 256.0;
+		Sprites[i].top = (ReadInt16() + 1) / 256.0;
+		Sprites[i].right = (ReadInt16() - 1) / 256.0;
+		Sprites[i].bottom = (ReadInt16() - 1) / 256.0;
+	}
+
+	g_NumSpritesSequences = ReadInt32();
+
+	for (__int32 i = 0; i < g_NumSpritesSequences; i++)
+	{
+		__int32 spriteID = ReadInt32();
+		__int16 negLength = ReadInt16();
+		__int16 offset = ReadInt16();
+		if (spriteID >= NUM_OBJECTS)
+		{
+			StaticObjects[spriteID - NUM_OBJECTS].meshNumber = offset;
+		}
+		else
+		{
+			Objects[spriteID].nmeshes = negLength;
+			Objects[spriteID].meshIndex = offset;
+			Objects[spriteID].loaded = true;
+		}
+	}
 }
 
 void Inject_RoomLoad()

@@ -52,7 +52,7 @@ public:
 
 	~PreallocatedVector()
 	{
-		delete m_objects;
+		free(m_objects);
 	}
 
 	inline void Reserve(__int32 numItems)
@@ -86,6 +86,82 @@ public:
 
 	inline void Add(T* value)
 	{
+		m_objects[m_numItems++] = value;
+	}
+};
+
+template <class T, class U>
+class PreallocatedDictionary
+{
+private:
+	T**			m_keys;
+	U**			m_objects;
+	__int32		m_maxItems;
+	__int32		m_numItems;
+	__int32		m_startSize;
+
+public:
+	PreallocatedDictionary()
+	{
+		m_keys = NULL;
+		m_objects = NULL;
+		m_maxItems = 0;
+		m_startSize = 0;
+		m_numItems = 0;
+	}
+
+	~PreallocatedDictionary()
+	{
+		free(m_keys);
+		free(m_objects);
+	}
+
+	inline void Reserve(__int32 numItems)
+	{
+		m_keys = (T**)malloc(sizeof(T*) * numItems);
+		m_objects = (U**)malloc(sizeof(U*) * numItems);
+		ZeroMemory(m_keys, sizeof(T*) * m_maxItems);
+		ZeroMemory(m_objects, sizeof(U*) * m_maxItems);
+		m_maxItems = numItems;
+		m_numItems = 0;
+		m_startSize = numItems;
+	}
+
+	inline void Clear()
+	{
+		m_numItems = 0;
+		ZeroMemory(m_keys, sizeof(T*) * m_maxItems);
+		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
+	}
+
+	inline __int32 Size()
+	{
+		return m_numItems;
+	}
+
+	inline T*& operator[] (__int32 x) {
+		return m_objects[x];
+	}
+
+	inline bool KeyExists(T* key)
+	{
+		for (__int32 i = 0; i < m_numItems; i++)
+			if (m_keys[i] == key)
+				return true;
+		return false;
+	}
+
+	inline U* Get(T* key)
+	{
+		for (__int32 i = 0; i < m_numItems; i++)
+			if (m_keys[i] == key)
+				return m_objects[i];
+		return NULL;
+	}
+
+	inline void Add(T* key, U* value)
+	{
+		m_keys[m_numItems] = key;
 		m_objects[m_numItems++] = value;
 	}
 };
@@ -507,9 +583,9 @@ struct RendererAnimatedTextureSet
 
 	~RendererAnimatedTextureSet()
 	{
-		/*for (__int32 i = 0; i < NumTextures; i++)
+		for (__int32 i = 0; i < NumTextures; i++)
 			delete Textures[i];
-		free(Textures);*/
+		free(Textures);
 	}
 };
 
@@ -590,9 +666,9 @@ struct RendererObject
 	~RendererObject()
 	{
 		/*for (__int32 i = 0; i < ObjectMeshes.size(); i++)
-			delete ObjectMeshes[i];
+			delete ObjectMeshes[i];*/
 		for (__int32 i = 0; i < LinearizedBones.size(); i++)
-			delete LinearizedBones[i];*/
+			delete LinearizedBones[i];
 	}
 };
 
@@ -788,13 +864,14 @@ private:
 	__int32											m_numSprites;
 	__int32											m_numSpritesSequences;
 	RendererSpriteSequence**						m_spriteSequences;
-	unordered_map<__int16*, RendererMesh*>			m_meshPointersToMesh;
+	unordered_map<unsigned int, RendererMesh*>		m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
 	RendererAnimatedTextureSet**					m_animatedTextureSets;
 	__int32											m_numAnimatedTextureSets;
 	__int32											m_currentCausticsFrame;
 	RendererUnderwaterDustParticle					m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool											m_firstUnderwaterDustParticles = true;
+	vector<RendererMesh*>							m_meshes;
 
 	// Debug variables
 	__int32											m_numDrawCalls = 0;

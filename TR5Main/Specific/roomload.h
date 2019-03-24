@@ -23,7 +23,7 @@ struct LEB128;
 #define ReadRoomsOriginal ((__int32 (__cdecl*)()) 0x004916C0)
 #define FileOpen ((FILE* (__cdecl*)(char*)) 0x004A3CD0)
 #define FileClose ((void (__cdecl*)(FILE*)) 0x004A3DA0)
-#define LoadSprites ((void (__cdecl*)()) 0x004A59D0)
+//#define LoadSprites ((void (__cdecl*)()) 0x004A59D0)
 //#define LoadCameras ((void (__cdecl*)()) 0x004A5CA0)
 #define LoadSoundEffects ((void (__cdecl*)()) 0x004A5D90)
 #define LoadBoxes ((void (__cdecl*)()) 0x004A5E50)
@@ -65,6 +65,8 @@ extern __int32 NumObjectTextures;
 extern char* LevelDataPtr;
 extern __int32 IsLevelLoading;
 extern __int32 NumTextureTiles;
+extern __int32 g_NumSprites;
+extern __int32 g_NumSpritesSequences;
 
 void __cdecl LoadTextures();
 __int32 __cdecl LoadRoomsNew();
@@ -75,6 +77,7 @@ void __cdecl FreeLevel();
 void __cdecl AdjustUV(__int32 num);
 void __cdecl LoadCameras();
 void __cdecl InitialiseLara(__int32 restore);
+void __cdecl LoadSprites();
 
 unsigned __stdcall LoadLevel(void* data);
 
