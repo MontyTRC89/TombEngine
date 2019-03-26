@@ -61,7 +61,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	float4 lightDirection = float4(-1.0f, 0.707f, -1.0f, 1.0f);
 	float4 lightColor = float4(1.0f, 1.0f, 0.5f, 1.0f);
-	float lightIntensity = 0.8f;
+	float lightIntensity = 0.5f;
 	float d = max(dot(-lightDirection, input.Normal), 0.0f);
 	float4 light = AmbientLight + d * lightColor * lightIntensity;
 

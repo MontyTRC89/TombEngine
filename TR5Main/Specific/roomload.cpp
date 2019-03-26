@@ -696,7 +696,7 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	
 	char filename[80];
 	GameScriptLevel* level = g_GameFlow->Levels[levelIndex];
-	strcpy_s(filename, /*level->FileName.c_str()*/ "DATA\\ANDY3.TRC");
+	strcpy_s(filename, level->FileName.c_str());
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;

@@ -493,6 +493,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
+	m_pickupRotation = 0;
 
 	for (__int32 i = 0; i < NUM_ITEMS; i++)
 	{
@@ -1309,6 +1310,7 @@ bool Renderer11::drawScene(bool dump)
 	DrawDashBar();
 	UpdateHealtBar(0);
 	UpdateAirBar(0);
+	DrawAllPickups();
 
 	drawLines2D();
 
@@ -1348,11 +1350,6 @@ __int32 Renderer11::DrawInventory()
 	drawInventoryScene();
 	drawFinalPass();
 
-	return 0;
-}
-
-__int32 Renderer11::DrawPickup(__int16 objectNum)
-{
 	return 0;
 }
 
@@ -1486,7 +1483,7 @@ bool Renderer11::drawAllStrings()
 
 		// Draw shadow if needed
 		if (str->Flags & PRINTSTRING_OUTLINE)
-			m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X + 1, str->Y + 1), Vector3(0, 0, 0));
+			m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X + 2, str->Y + 2), Vector3(0, 0, 0));
 		
 		// Draw string
 		m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X, str->Y), str->Color / 255.0f);
@@ -5346,7 +5343,7 @@ __int32 Renderer11::drawInventoryScene()
 
 							for (__int32 n = 0; n < MAX_SAVEGAMES; n++)
 							{
-								if (!g_NewSavegameInfos[i].Present)
+								if (!g_NewSavegameInfos[n].Present)
 									PrintString(400, lastY, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
 										PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
 								else
@@ -5373,7 +5370,7 @@ __int32 Renderer11::drawInventoryScene()
 							for (__int32 n = 1; n < g_GameFlow->GetNumLevels(); n++)
 							{
 								GameScriptLevel* levelScript = g_GameFlow->GetLevel(n);
-								PrintString(400, lastY, g_GameFlow->GetString(levelScript->Name), D3DCOLOR_ARGB(255, 255, 255, 255),
+								PrintString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
 									PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n - 1 ? PRINTSTRING_BLINK : 0));
 
 								lastY += 24;
@@ -5598,7 +5595,8 @@ __int32 Renderer11::drawInventoryScene()
 		lastRing++;
 	}
 
-	//drawAllLines2D();
+
+	drawLines2D();   
 	drawAllStrings();
 
 	return 0;
@@ -6166,4 +6164,111 @@ bool Renderer11::isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
 vector<RendererVideoAdapter>* Renderer11::GetAdapters()
 {
 	return &m_adapters;
+}
+
+__int32 Renderer11::DrawPickup(__int16 objectNum)
+{
+	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0);
+	m_pickupRotation += 45 * 360 / 30;
+	return 0;
+}
+
+bool Renderer11::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ)
+{
+	Matrix translation;
+	Matrix rotation;
+	Matrix world;
+	Matrix view;
+	Matrix projection;
+	Matrix scale;
+
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	x *= (ScreenWidth / 800.0f);
+	y *= (ScreenHeight / 600.0f);
+	
+	view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
+	projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
+
+	OBJECT_INFO* obj = &Objects[objectNum];
+	RendererObject* moveableObj = m_moveableObjects[objectNum];
+
+	if (obj->animIndex != -1)
+	{
+		updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
+	}
+
+	Viewport* vp = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
+		m_viewport.MinDepth, m_viewport.MaxDepth);
+
+	Vector3 pos = vp->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
+
+	// Clear just the Z-buffer so we can start drawing on top of the scene
+	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Set vertex buffer
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Set shaders
+	m_context->VSSetShader(m_vsInventory, NULL, 0);
+	m_context->PSSetShader(m_psInventory, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	// Set matrices
+	m_stCameraMatrices.View = view.Transpose();
+	m_stCameraMatrices.Projection = projection.Transpose();
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
+	{
+		RendererMesh* mesh = moveableObj->ObjectMeshes[n];
+
+		// Finish the world matrix
+		translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
+		rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(rotY), TR_ANGLE_TO_RAD(rotX), TR_ANGLE_TO_RAD(rotZ));
+		scale = Matrix::CreateScale(0.5f);
+
+		world = scale * rotation;
+		world = world * translation;
+
+		if (obj->animIndex != -1)
+			m_stItem.World = (moveableObj->AnimationTransforms[n] * world).Transpose();
+		else
+			m_stItem.World = (moveableObj->BindPoseTransforms[n].Transpose() * world).Transpose();
+		m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+		m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+
+		for (__int32 m = 0; m < NUM_BUCKETS; m++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[m];
+			if (bucket->NumVertices == 0)
+				continue;
+
+			if (m < 2)
+				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			else
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+
+			m_stMisc.AlphaTest = (m < 2);
+			updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+			m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+		}
+	}
+
+	delete vp;
+
+	return true;
 }

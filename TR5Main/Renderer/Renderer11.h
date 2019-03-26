@@ -898,6 +898,7 @@ private:
 	float											m_fadeFactor;
 	__int32											m_progress;
 	bool											m_enableCinematicBars = false;
+	__int32											m_pickupRotation;
 
 	// Private functions
 	bool									drawScene(bool dump);
@@ -938,6 +939,7 @@ private:
 	bool									drawItems(bool transparent, bool animated);
 	bool									drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
 	bool									drawWaterfalls();
+	bool									drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ);
 	bool									drawLara(bool transparent);
 	void									printDebugMessage(char* message, ...);
 	void									drawFires();

@@ -245,9 +245,9 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_Configuration.Height = 768;
 	g_Configuration.Windowed = false;
 
-	g_Configuration.Width = 1920;
+	/*g_Configuration.Width = 1920;
 	g_Configuration.Height = 1080;
-	g_Configuration.Windowed = false;
+	g_Configuration.Windowed = false;*/
 
 
 	tagRECT Rect;
