@@ -74,17 +74,20 @@ void SaveGame::saveItems()
 	}
 
 	// Save special items
-	for (__int32 i = 0; i < NUM_BATS; i++)
-		if (Bats[i].on)
-			m_writer->WriteChunk(m_chunkBats, &saveBats, i, 0);
+	if (Objects[ID_BATS].loaded)
+		for (__int32 i = 0; i < NUM_BATS; i++)
+			if (Bats[i].on)
+				m_writer->WriteChunk(m_chunkBats, &saveBats, i, 0);
 
-	for (__int32 i = 0; i < NUM_RATS; i++)
-		if (Rats[i].on)
-			m_writer->WriteChunk(m_chunkRats, &saveRats, i, 0);
+	if (Objects[ID_RATS].loaded)
+		for (__int32 i = 0; i < NUM_RATS; i++)
+			if (Rats[i].on)
+				m_writer->WriteChunk(m_chunkRats, &saveRats, i, 0);
 
-	for (__int32 i = 0; i < NUM_SPIDERS; i++)
-		if (Spiders[i].on)
-			m_writer->WriteChunk(m_chunkSpiders, &saveSpiders, i, 0);
+	if (Objects[ID_SPIDER].loaded)
+		for (__int32 i = 0; i < NUM_SPIDERS; i++)
+			if (Spiders[i].on)
+				m_writer->WriteChunk(m_chunkSpiders, &saveSpiders, i, 0);
 }
 
 void SaveGame::saveItem(__int32 itemNumber, __int32 runtimeItem)
@@ -312,7 +315,7 @@ bool SaveGame::Save(char* fileName)
 	m_writer = new ChunkWriter(0x4D355254, m_stream);
 
 	// The header must be here, so no chunks
-	m_stream->WriteString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->Name));
+	m_stream->WriteString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringIndex));
 	LEB128::Write(m_stream, (Savegame.Game.Timer / 30) / 86400);
 	LEB128::Write(m_stream, ((Savegame.Game.Timer / 30) % 86400) / 3600);
 	LEB128::Write(m_stream, ((Savegame.Game.Timer / 30) / 60) % 60);

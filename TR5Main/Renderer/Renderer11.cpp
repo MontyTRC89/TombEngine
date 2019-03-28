@@ -376,6 +376,9 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_viewport.MinDepth = 0.0f;
 	m_viewport.MaxDepth = 1.0f;
 
+	m_viewportToolkit = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
+		m_viewport.MinDepth, m_viewport.MaxDepth);
+
 	// Load shaders
 	ID3D10Blob* blob;
 
@@ -591,24 +594,40 @@ bool Renderer11::drawHorizonAndSky()
 	vertices[0].Position.z = size / 2.0f;
 	vertices[0].UV.x = 0.0f;
 	vertices[0].UV.y = 0.0f;
+	vertices[0].Color.x = 1.0f;
+	vertices[0].Color.y = 1.0f;
+	vertices[0].Color.z = 1.0f;
+	vertices[0].Color.w = 1.0f;
 
 	vertices[1].Position.x = size / 2.0f;
 	vertices[1].Position.y = 0.0f;
 	vertices[1].Position.z = size / 2.0f;
 	vertices[1].UV.x = 1.0f;
 	vertices[1].UV.y = 0.0f;
+	vertices[1].Color.x = 1.0f;
+	vertices[1].Color.y = 1.0f;
+	vertices[1].Color.z = 1.0f;
+	vertices[1].Color.w = 1.0f;
 
 	vertices[2].Position.x = size / 2.0f;
 	vertices[2].Position.y = 0.0f;
 	vertices[2].Position.z = -size / 2.0f;
 	vertices[2].UV.x = 1.0f;
 	vertices[2].UV.y = 1.0f;
+	vertices[2].Color.x = 1.0f;
+	vertices[2].Color.y = 1.0f;
+	vertices[2].Color.z = 1.0f;
+	vertices[2].Color.w = 1.0f;
 
 	vertices[3].Position.x = -size / 2.0f;
 	vertices[3].Position.y = 0.0f;
 	vertices[3].Position.z = -size / 2.0f;
 	vertices[3].UV.x = 0.0f;
 	vertices[3].UV.y = 1.0f;
+	vertices[3].Color.x = 1.0f;
+	vertices[3].Color.y = 1.0f;
+	vertices[3].Color.z = 1.0f;
+	vertices[3].Color.w = 1.0f;
 
 	m_context->VSSetShader(m_vsSky, NULL, 0);
 	m_context->PSSetShader(m_psSky, NULL, 0);
@@ -680,6 +699,16 @@ bool Renderer11::drawHorizonAndSky()
 
 				if (bucket->Vertices.size() == 0)
 					continue;
+
+				if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
+					m_context->RSSetState(m_states->CullNone());
+				else
+					m_context->RSSetState(m_states->CullCounterClockwise());
+
+				if (j == RENDERER_BUCKET_TRANSPARENT || j == RENDERER_BUCKET_TRANSPARENT_DS)
+					m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				else
+					m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 				// Draw vertices
 				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
@@ -1483,10 +1512,12 @@ bool Renderer11::drawAllStrings()
 
 		// Draw shadow if needed
 		if (str->Flags & PRINTSTRING_OUTLINE)
-			m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X + 2, str->Y + 2), Vector3(0, 0, 0));
-		
+			m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X + 1, str->Y + 1),
+				Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+	
 		// Draw string
-		m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X, str->Y), str->Color / 255.0f);
+		m_gameFont->DrawString(m_spriteBatch, str->String.c_str(), Vector2(str->X, str->Y), 
+			Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f));
 	}
 
 	m_spriteBatch->End();
@@ -2455,6 +2486,8 @@ void Renderer11::FadeOut()
 
 void Renderer11::DrawLoadingScreen(char* fileName)
 {
+	return; 
+
 	Texture2D* texture = Texture2D::LoadFromFile(m_device, fileName);
 	if (texture == NULL)
 		return;
@@ -4754,7 +4787,10 @@ bool Renderer11::doRain()
 	if (m_firstWeather)
 	{
 		for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+		{
 			m_rain[i].Reset = true;
+			m_rain[i].Draw = true;
+		}
 	}
 
 	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
@@ -4763,6 +4799,8 @@ bool Renderer11::doRain()
 
 		if (drop->Reset)
 		{
+			drop->Draw = true;
+
 			drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 			drop->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT);
 			drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
@@ -4797,7 +4835,8 @@ bool Renderer11::doRain()
 		drop->Y += RAIN_DELTA_Y;
 		drop->Z += dz;
 
-		addLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
+		if (drop->Draw)
+			addLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
 
 		// If rain drop has hit the ground, then reset it and add a little drip
 		__int16 roomNumber = Camera.pos.roomNumber;
@@ -5688,9 +5727,6 @@ bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 c
 
 bool Renderer11::drawRopes()
 {
-	Viewport* vp = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
-		m_viewport.MinDepth, m_viewport.MaxDepth);
-
 	for (__int32 n = 0; n < NumRopes; n++)
 	{
 		ROPE_STRUCT* rope = &Ropes[n];
@@ -5715,7 +5751,7 @@ bool Renderer11::drawRopes()
 					rope->position.y + rope->segment[i].y / 65536.0f,
 					rope->position.z + rope->segment[i].z / 65536.0f);
 
-				projected[i] = vp->Project(absolutePosition, Projection, View, world);
+				projected[i] = m_viewportToolkit->Project(absolutePosition, Projection, View, world);
 			}
 
 			// Now each rope point is transformed in screen X, Y and Z depth
@@ -5753,8 +5789,8 @@ bool Renderer11::drawRopes()
 
 			for (__int32 j = 0; j < 24; j++)
 			{
-				Vector3 p1 = vp->Unproject(Vector3(x1, y1, depth), Projection, View, world);
-				Vector3 p2 = vp->Unproject(Vector3(x2, y2, depth), Projection, View, world);
+				Vector3 p1 = m_viewportToolkit->Unproject(Vector3(x1, y1, depth), Projection, View, world);
+				Vector3 p2 = m_viewportToolkit->Unproject(Vector3(x2, y2, depth), Projection, View, world);
 				
 				dx = projected[j].x - projected[j - 1].x;
 				dy = projected[j].y - projected[j - 1].y;
@@ -5787,8 +5823,8 @@ bool Renderer11::drawRopes()
 
 				depth = projected[j].z;
 
-				Vector3 p3 = vp->Unproject(Vector3(x3, y3, depth), Projection, View, world);
-				Vector3 p4 = vp->Unproject(Vector3(x4, y4, depth), Projection, View, world);
+				Vector3 p3 = m_viewportToolkit->Unproject(Vector3(x3, y3, depth), Projection, View, world);
+				Vector3 p4 = m_viewportToolkit->Unproject(Vector3(x4, y4, depth), Projection, View, world);
 
 				addSprite3D(m_sprites[20],
 					p1.x, p1.y, p1.z,
@@ -5805,8 +5841,6 @@ bool Renderer11::drawRopes()
 
 		}
 	}
-
-	delete vp;
 
 	return true;
 }
@@ -6199,10 +6233,7 @@ bool Renderer11::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum,
 		updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
 	}
 
-	Viewport* vp = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
-		m_viewport.MinDepth, m_viewport.MaxDepth);
-
-	Vector3 pos = vp->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
+	Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
 	// Clear just the Z-buffer so we can start drawing on top of the scene
 	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -6267,8 +6298,6 @@ bool Renderer11::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum,
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
 		}
 	}
-
-	delete vp;
 
 	return true;
 }

@@ -736,6 +736,7 @@ struct RendererWeatherParticle {
 	float Size;
 	__int16 Room;
 	bool Reset;
+	bool Draw;
 };
 
 struct RendererUnderwaterDustParticle {
@@ -761,6 +762,7 @@ private:
 	CommonStates*							m_states = NULL;
 	ID3D11InputLayout*						m_inputLayout = NULL;
 	D3D11_VIEWPORT							m_viewport;
+	Viewport*								m_viewportToolkit;
 	vector<RendererVideoAdapter>			m_adapters;
 
 	// Main back buffer

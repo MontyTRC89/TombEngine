@@ -239,16 +239,18 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 
 		if (layerIndex == 1)
 		{
-			level->Layer1.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
-			level->Layer1.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
-			level->Layer1.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
+			level->Layer1.Enabled = true;
+			level->Layer1.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer1.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer1.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 			level->Layer1.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 		}
 		else
 		{
-			level->Layer2.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
-			level->Layer2.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
-			level->Layer2.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream()) / 255.0f;
+			level->Layer2.Enabled = true;
+			level->Layer2.R = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer2.G = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+			level->Layer2.B = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 			level->Layer2.CloudSpeed = LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 		}
 
@@ -417,7 +419,7 @@ bool GameFlow::DoGameflow()
 
 		CurrentAtmosphere = level->Soundtrack;
 
-		if (level->Horizon)
+		if (level->Sky)
 		{
 			SkyColor1.r = level->Layer1.R;
 			SkyColor1.g = level->Layer1.G;
