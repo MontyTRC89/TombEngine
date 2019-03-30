@@ -74,6 +74,7 @@ Renderer11::~Renderer11()
 
 	DX11_DELETE(m_titleScreen);
 	DX11_DELETE(m_binocularsTexture);
+	DX11_DELETE(m_whiteTexture);
 
 	DX11_RELEASE(m_vsRooms);
 	DX11_RELEASE(m_psRooms);
@@ -366,6 +367,10 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 
 	m_binocularsTexture = Texture2D::LoadFromFile(m_device, "Binoculars.png");
 	if (m_binocularsTexture == NULL)
+		return false;
+
+	m_whiteTexture = Texture2D::LoadFromFile(m_device, "WhiteSprite.png");
+	if (m_whiteTexture == NULL)
 		return false;
 
 	// Initialise viewport
@@ -5233,6 +5238,7 @@ __int32 Renderer11::drawInventoryScene()
 	{
 		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.3f, 0.3f, 0.3f), false);
 	}
+
 	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	UINT stride = sizeof(RendererVertex);
@@ -5373,38 +5379,44 @@ __int32 Renderer11::drawInventoryScene()
 			{
 				if (g_Inventory->GetActiveRing() == INV_RING_OPTIONS)
 				{
+					/* **************** PASSAPORT ************* */
 					if (inventoryItem == INV_OBJECT_PASSAPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
-						// Draw savegames menu
+						/* **************** LOAD AND SAVE MENU ************* */
 						if (ring->passportAction == INV_WHAT_PASSPORT_LOAD_GAME || ring->passportAction == INV_WHAT_PASSPORT_SAVE_GAME)
 						{
-							__int16 lastY = 44;
+							y = 44;
 
 							for (__int32 n = 0; n < MAX_SAVEGAMES; n++)
 							{
 								if (!g_NewSavegameInfos[n].Present)
-									PrintString(400, lastY, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
+									PrintString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
 										PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
 								else
 								{
 									sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n].Count);
-									PrintString(20, lastY, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
+									PrintString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
 										(ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-									PrintString(100, lastY, (char*)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
+									PrintString(250, y, (char*)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE |
 										(ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
 									sprintf(stringBuffer, g_GameFlow->GetString(44), g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
-									PrintString(600, lastY, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+									PrintString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
 										PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
 								}
 
-								lastY += 24;
+								y += 24;
 							}
+
+							drawColoredQuad(180, 24, 440, y + 20 - 24, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 						}
+						/* **************** SELECT LEVEL ************* */
 						else if (ring->passportAction == INV_WHAT_PASSPORT_SELECT_LEVEL)
 						{
-							__int16 lastY = 44;
+							drawColoredQuad(200, 24, 400, 24 * (g_GameFlow->GetNumLevels() - 1) + 40, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+
+							__int16 lastY = 50;
 
 							for (__int32 n = 1; n < g_GameFlow->GetNumLevels(); n++)
 							{
@@ -5440,12 +5452,18 @@ __int32 Renderer11::drawInventoryScene()
 
 						PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					}
+					/* **************** GRAPHICS SETTINGS ************* */
 					else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						// Draw settings menu
 						RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
 
 						__int32 y = 200;
+
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_DISPLAY),
+							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
+						
+						y += 30;
 
 						// Screen resolution
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION),
@@ -5503,46 +5521,72 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 
+						y += 30;
+
+						drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
+					/* **************** AUDIO SETTINGS ************* */
 					else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						// Draw sound menu
 
+						y = 200;
+
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_SOUND),
+							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
+
+						y += 30;
+
 						// Enable sound
-						PrintString(200, 200, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 200, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
+						y += 30;
+						
 						// Enable sound special effects
-						PrintString(200, 230, g_GameFlow->GetString(STRING_INV_SPECIAL_SOUND_FX),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SPECIAL_SOUND_FX),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 230, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
+						y += 30;
+
 						// Music volume
-						PrintString(200, 260, g_GameFlow->GetString(STRING_INV_MUSIC_VOLUME),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_MUSIC_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
-						//drawBar(400, 260, 150, 12, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+						drawBar(400, y, 150, 12, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+
+						y += 30;
 
 						// Sound FX volume
-						PrintString(200, 290, g_GameFlow->GetString(STRING_INV_SFX_VOLUME),
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SFX_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
-						//drawBar(400, 290, 150, 12, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
+						drawBar(400, y, 150, 12, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
+
+						y += 30;
 
 						// Apply and cancel
-						PrintString(400, 320, g_GameFlow->GetString(STRING_INV_APPLY),
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_APPLY),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, 350, g_GameFlow->GetString(STRING_INV_CANCEL),
+						
+						y += 30;
+
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CANCEL),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
+					
+						y += 30;
+
+						drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
 					else
 					{
@@ -5637,8 +5681,36 @@ __int32 Renderer11::drawInventoryScene()
 
 	drawLines2D();   
 	drawAllStrings();
-
+	
 	return 0;
+}
+
+bool Renderer11::drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vector4 color)
+{
+	float factorW = ScreenWidth / 800.0f;
+	float factorH = ScreenHeight / 600.0f;
+
+	RECT rect;
+	rect.top = y * factorH;
+	rect.left = x * factorW;
+	rect.bottom = (y + h) * factorH;
+	rect.right = (x + w) * factorW;
+
+	m_spriteBatch->Begin(SpriteSortMode_Immediate);
+	m_spriteBatch->Draw(m_whiteTexture->ShaderResourceView, rect, color);
+	m_spriteBatch->End();
+
+	int shiftW = 4 * factorW;
+	int shiftH = 4 * factorH;
+
+	insertLine2D(rect.left + shiftW, rect.top + shiftH, rect.right - shiftW, rect.top + shiftH, 128, 128, 128, 128);
+	insertLine2D(rect.right - shiftW, rect.top + shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
+	insertLine2D(rect.left + shiftW, rect.bottom - shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
+	insertLine2D(rect.left + shiftW, rect.top + shiftH, rect.left + shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
+
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	return true;
 }
 
 bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool cinematicBars)
@@ -5877,7 +5949,7 @@ bool Renderer11::drawLines2D()
 		v1.Color.x = line->Color.x / 255.0f;
 		v1.Color.y = line->Color.y / 255.0f;
 		v1.Color.z = line->Color.z / 255.0f;
-		v1.Color.w = 1.0f;
+		v1.Color.w = line->Color.w / 255.0f;
 
 		RendererVertex v2;
 		v2.Position.x = line->Vertices[1].x;
@@ -5886,7 +5958,7 @@ bool Renderer11::drawLines2D()
 		v2.Color.x = line->Color.x / 255.0f;
 		v2.Color.y = line->Color.y / 255.0f;
 		v2.Color.z = line->Color.z / 255.0f;
-		v2.Color.w = 1.0f;
+		v2.Color.w = line->Color.w / 255.0f;
 
 		v1.Position = Vector3::Transform(v1.Position, world);
 		v2.Position = Vector3::Transform(v2.Position, world);
@@ -5939,26 +6011,26 @@ bool Renderer11::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 per
 	__int32 realPercent = percent / 100.0f * realW;
 
 	for (__int32 i = 0; i < realH; i++)
-		insertLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0);
+		insertLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0, 255);
 
 	for (__int32 i = 0; i < realH; i++)
-		insertLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1);
+		insertLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1, 255);
 
-	insertLine2D(realX, realY, realX + realW, realY, 255, 255, 255);
-	insertLine2D(realX, realY + realH, realX + realW, realY + realH, 255, 255, 255);
-	insertLine2D(realX, realY, realX, realY + realH, 255, 255, 255);
-	insertLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255);
+	insertLine2D(realX, realY, realX + realW, realY, 255, 255, 255, 255);
+	insertLine2D(realX, realY + realH, realX + realW, realY + realH, 255, 255, 255, 255);
+	insertLine2D(realX, realY, realX, realY + realH, 255, 255, 255, 255);
+	insertLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255, 255);
 
 	return true;
 }
 
-void Renderer11::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b)
+void Renderer11::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b, byte a)
 {
 	RendererLine2D* line = &m_lines2DBuffer[m_nextLine2D++];
 
 	line->Vertices[0] = Vector2(x1, y1);
 	line->Vertices[1] = Vector2(x2, y2);
-	line->Color = Vector4(r, g, b, 255.0f);
+	line->Color = Vector4(r, g, b, a);
 
 	m_lines2DToDraw.Add(line);
 }

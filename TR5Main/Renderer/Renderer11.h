@@ -820,6 +820,7 @@ private:
 	// System resources
 	Texture2D*								m_caustics[NUM_CAUSTICS_TEXTURES];
 	Texture2D*								m_binocularsTexture;
+	Texture2D*								m_whiteTexture;
 
 	// Level data
 	Texture2D*										m_titleScreen;
@@ -962,7 +963,7 @@ private:
 	bool									drawGunFlashes();
 	bool									drawGunShells();
 	bool									drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2);
-	void									insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b);
+	void									insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b, byte a);
 	bool									drawDebris(bool transparent);
 	__int32									drawInventoryScene();
 	__int32									drawFinalPass();
@@ -979,6 +980,7 @@ private:
 	void									addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void									addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void									addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);
+	bool									drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vector4 color);
 
 public:
 	Matrix									View;
