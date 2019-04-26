@@ -190,7 +190,7 @@ void Inject_Inventory();
 // Some rendering parameters
 #define INV_RINGS_OFFSET				8192.0f
 #define INV_OBJECT_SCALE				1.5f
-#define INV_SECONDARY_MOVEMENT				200.0f
+#define INV_SECONDARY_MOVEMENT			200.0f
 
 // Action for each object
 #define INV_ACTION_USE					0
@@ -343,8 +343,8 @@ public:
 	__int32						PopupObject();
 	__int32						PopoverObject();
 	__int32						GetType();
-	void						DoCombine();
-	void						DoSepare();
+	bool						DoCombine();
+	bool						DoSepare();
 	void						DoSelectAmmo();
 	__int32						DoPuzzle();
 	__int32						DoWeapon();
@@ -361,7 +361,8 @@ public:
 	void						AddCombination(__int16 piece1, __int16 piece2, __int16 combinedObject, void (*f) (__int32));
 	__int32						GetActiveGui();
 	InventorySecondaryRing*		GetSecondaryRing();
-	void						LoadObjects();
+	void						LoadObjects(bool isReload);
+	void						SelectObject(__int32 ring, __int32 object, float scale);
 
 	// Combine routines
 	/*void						CombinePuzzle1(__int32 action);

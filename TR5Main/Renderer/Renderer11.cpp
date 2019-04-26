@@ -5439,6 +5439,13 @@ __int32 Renderer11::drawInventoryScene()
 			{
 				RendererMesh* mesh = moveableObj->ObjectMeshes[n];
 
+				// HACK: revolver and crossbow + lasersight
+				if (moveableObj->Id == ID_REVOLVER_ITEM && !g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight && n > 0)
+					break;
+
+				if (moveableObj->Id == ID_CROSSBOW_ITEM && !g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight && n > 0)
+					break;
+
 				// Finish the world matrix
 				if (obj->animIndex != -1)
 					m_stItem.World = (moveableObj->AnimationTransforms[n] * transform).Transpose();

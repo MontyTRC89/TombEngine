@@ -302,12 +302,12 @@ void CombineRevolverLasersight(__int32 action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.laserSight = true;
+		Lara.laserSight = false;
 		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = true;
 	}
 	else
 	{
-		Lara.laserSight = false;
+		Lara.laserSight = true;
 		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = false;
 	}
 
@@ -322,12 +322,12 @@ void CombineCrossbowLasersight(__int32 action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.laserSight = true;
+		Lara.laserSight = false;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = true;
 	}
 	else
 	{
-		Lara.laserSight = false;
+		Lara.laserSight = true;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = false;
 	}
 
@@ -441,7 +441,7 @@ void Inventory::InsertObject(__int32 ring, __int32 objectNumber)
 	m_rings[ring].numObjects++;
 }
 
-void Inventory::LoadObjects()
+void Inventory::LoadObjects(bool isReload)
 {
 	// Reset the objects in inventory
 	for (__int32 i = 0; i < NUM_INVENTORY_RINGS; i++)
@@ -449,7 +449,11 @@ void Inventory::LoadObjects()
 		m_rings[i].numObjects = 0;
 		m_rings[i].movement = 0;
 		m_rings[i].currentObject = 0;
-		m_rings[i].focusState = INV_FOCUS_STATE_NONE;
+		
+		if (!isReload)
+		{
+			m_rings[i].focusState = INV_FOCUS_STATE_NONE;
+		}
 
 		for (__int32 j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
 		{
@@ -699,9 +703,27 @@ void Inventory::LoadObjects()
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_KEYS);
 }
 
+void Inventory::SelectObject(__int32 r, __int32 object, float scale)
+{
+	if (object != -1)
+	{
+		InventoryRing* ring = &m_rings[r];
+
+		for (__int32 i = 0; i < ring->numObjects; i++)
+		{
+			if (ring->objects[i].inventoryObject == object)
+			{
+				ring->currentObject = i;
+				ring->objects[i].scale = scale;
+				break;
+			}
+		}
+	}
+}
+
 void Inventory::Initialise()
 {
-	LoadObjects();
+	LoadObjects(false);
 
 	m_activeRing = INV_RING_WEAPONS;
 	m_type = INV_TYPE_GAME;
@@ -1033,11 +1055,17 @@ __int32 Inventory::DoWeapon()
 			}
 			else if (ring->actions[ring->selectedIndex] == INV_ACTION_COMBINE)
 			{
-				DoCombine();
+				if (DoCombine())
+				{
+					ring->actions[1] = INV_ACTION_SEPARE;
+				}				
 			}
 			else if (ring->actions[ring->selectedIndex] == INV_ACTION_SEPARE)
 			{
-				DoSepare();
+				if (DoSepare())
+				{
+					ring->actions[1] = INV_ACTION_COMBINE;
+				}
 			}
 			else if (ring->actions[ring->selectedIndex] == INV_ACTION_SELECT_AMMO)
 			{
@@ -1103,9 +1131,10 @@ void Inventory::DoExamine()
 
 }
 
-void Inventory::DoCombine()
+bool Inventory::DoCombine()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
+	__int32 oldRing = m_activeRing;
 
 	// Enable the secondary GUI
 	m_activeRing = INV_RING_COMBINE;
@@ -1138,10 +1167,11 @@ void Inventory::DoCombine()
 
 	// If no objects then exit 
 	if (combineRing->numObjects == 0)
-		return;
+		return false;
 
 	combineRing->selectedIndex = 0;
 	bool closeObject = false;
+	bool combined = false;
 
 	// Do the menu
 	while (true)
@@ -1223,8 +1253,10 @@ void Inventory::DoCombine()
 					// I can do the combination
 					SoundEffect(SFX_MENU_COMBINE, NULL, 0);
 					combination->combineRoutine(INV_COMBINE_COMBINE);
-					LoadObjects();
+					LoadObjects(true);
+					SelectObject(oldRing, combination->combinedObject, 2 * INV_OBJECT_SCALE);
 					closeObject = true;
+					combined = true;
 					break;
 				}
 			}
@@ -1238,13 +1270,15 @@ void Inventory::DoCombine()
 	}
 
 	// Reset secondary GUI
-	m_activeRing = INV_RING_WEAPONS;
+	m_activeRing = oldRing;
 	combineRing->draw = false;
+
+	return combined;
 }
 
-void Inventory::DoSepare()
+bool Inventory::DoSepare()
 {
-	__int16 currentObject = m_secondaryRing.currentObject;
+	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
 	for (__int32 i = 0; i < m_combinations.size(); i++)
 	{
 		InventoryObjectCombination* combination = &m_combinations[i];
@@ -1253,10 +1287,13 @@ void Inventory::DoSepare()
 			// I can do the separation
 			SoundEffect(SFX_MENU_COMBINE, NULL, 0);
 			combination->combineRoutine(INV_COMBINE_SEPARE);
-			LoadObjects();
-			return;
+			LoadObjects(true);
+			SelectObject(m_activeRing, combination->piece1, 2 * INV_OBJECT_SCALE);
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void Inventory::DoSelectAmmo()
@@ -2794,13 +2831,10 @@ __int32 Inventory::GetActiveGui()
 	return m_activeGui;
 }
 
-/*InventoryRing* Inventory::GetSecondaryRing()
-{
-	return m_secondaryRing;
-}
-**/
-
 bool Inventory::IsObjectSeparable(__int16 object)
 {
+	for (__int32 i = 0; i < m_combinations.size(); i++)
+		if (m_combinations[i].combinedObject == object)
+			return true;
 	return false;
 }
