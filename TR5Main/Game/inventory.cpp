@@ -11,10 +11,332 @@
 #include "..\Global\global.h"
 #include "..\Specific\input.h"
 #include "..\Specific\config.h"
+#include "lara1gun.h"
+#include "lara2gun.h"
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
+
+void CombinePuzzle1(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[0] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 0));
+	}
+	else
+	{
+		Lara.puzzleItems[0] = false;
+		Lara.puzzleItemsCombo |= (3 << 0);
+	}
+}
+
+void CombinePuzzle2(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[1] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 2));
+	}
+	else
+	{
+		Lara.puzzleItems[1] = false;
+		Lara.puzzleItemsCombo |= (3 << 2);
+	}
+}
+
+void CombinePuzzle3(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[2] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 4));
+	}
+	else
+	{
+		Lara.puzzleItems[2] = false;
+		Lara.puzzleItemsCombo |= (3 << 4);
+	}
+}
+
+void CombinePuzzle4(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[3] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 6));
+	}
+	else
+	{
+		Lara.puzzleItems[3] = false;
+		Lara.puzzleItemsCombo |= (3 << 6);
+	}
+}
+
+void CombinePuzzle5(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[4] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 8));
+	}
+	else
+	{
+		Lara.puzzleItems[4] = false;
+		Lara.puzzleItemsCombo |= (3 << 8);
+	}
+}
+
+void CombinePuzzle6(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[5] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 10));
+	}
+	else
+	{
+		Lara.puzzleItems[5] = false;
+		Lara.puzzleItemsCombo |= (3 << 10);
+	}
+}
+
+void CombinePuzzle7(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[6] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 12));
+	}
+	else
+	{
+		Lara.puzzleItems[6] = false;
+		Lara.puzzleItemsCombo |= (3 << 12);
+	}
+}
+
+void CombinePuzzle8(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.puzzleItems[7] = true;
+		Lara.puzzleItemsCombo &= (~(3 << 14));
+	}
+	else
+	{
+		Lara.puzzleItems[7] = false;
+		Lara.puzzleItemsCombo |= (3 << 14);
+	}
+}
+
+void CombineKey1(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1<<0);
+		Lara.puzzleItemsCombo &= (~(3 << 0));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 0);
+		Lara.puzzleItemsCombo |= (3 << 0);
+	}
+}
+
+void CombineKey2(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1 << 1);
+		Lara.puzzleItemsCombo &= (~(3 << 2));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 1);
+		Lara.puzzleItemsCombo |= (3 << 2);
+	}
+}
+
+void CombineKey3(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1 << 2);
+		Lara.puzzleItemsCombo &= (~(3 << 4));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 2);
+		Lara.puzzleItemsCombo |= (3 << 4);
+	}
+}
+
+void CombineKey4(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1 << 3);
+		Lara.puzzleItemsCombo &= (~(3 << 6));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 3);
+		Lara.puzzleItemsCombo |= (3 << 6);
+	}
+}
+
+void CombineKey5(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1 << 4);
+		Lara.puzzleItemsCombo &= (~(3 << 8));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 4);
+		Lara.puzzleItemsCombo |= (3 << 8);
+	}
+}
+
+void CombineKey6(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1 << 5);
+		Lara.puzzleItemsCombo &= (~(3 << 10));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 5);
+		Lara.puzzleItemsCombo |= (3 << 10);
+	}
+}
+
+void CombineKey7(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1 << 6);
+		Lara.puzzleItemsCombo &= (~(3 << 12));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 6);
+		Lara.puzzleItemsCombo |= (3 << 12);
+	}
+}
+
+void CombineKey8(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.keyItems |= (1 << 7);
+		Lara.puzzleItemsCombo &= (~(3 << 14));
+	}
+	else
+	{
+		Lara.keyItems &= ~(1 << 7);
+		Lara.puzzleItemsCombo |= (3 << 14);
+	}
+}
+
+void CombinePickup1(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.pickupItems |= (1 << 0);
+		Lara.pickupItemsCombo &= (~(3 << 0));
+	}
+	else
+	{
+		Lara.pickupItems &= ~(1 << 0);
+		Lara.pickupItemsCombo |= (3 << 0);
+	}
+}
+
+void CombinePickup2(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.pickupItems |= (1 << 1);
+		Lara.pickupItemsCombo &= (~(3 << 2));
+	}
+	else
+	{
+		Lara.pickupItems &= ~(1 << 1);
+		Lara.pickupItemsCombo |= (3 << 2);
+	}
+}
+
+void CombinePickup3(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.pickupItems |= (1 << 2);
+		Lara.pickupItemsCombo &= (~(3 << 4));
+	}
+	else
+	{
+		Lara.pickupItems &= ~(1 << 2);
+		Lara.pickupItemsCombo |= (3 << 4);
+	}
+}
+
+void CombinePickup4(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.pickupItems |= (1 << 3);
+		Lara.pickupItemsCombo &= (~(3 << 6));
+	}
+	else
+	{
+		Lara.pickupItems &= ~(1 << 3);
+		Lara.pickupItemsCombo |= (3 << 6);
+	}
+}
+
+void CombineRevolverLasersight(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.laserSight = true;
+		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = true;
+	}
+	else
+	{
+		Lara.laserSight = false;
+		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = false;
+	}
+
+	if (Lara.gunStatus && Lara.gunType == WEAPON_REVOLVER)
+	{
+		UndrawPistolMeshRight(WEAPON_REVOLVER);
+		DrawPistolMeshes(WEAPON_REVOLVER);
+	}
+}
+
+void CombineCrossbowLasersight(__int32 action)
+{
+	if (action == INV_COMBINE_COMBINE)
+	{
+		Lara.laserSight = true;
+		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = true;
+	}
+	else
+	{
+		Lara.laserSight = false;
+		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = false;
+	}
+
+	if (Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
+	{
+		UndrawShotgunMeshes(WEAPON_CROSSBOW);
+		DrawShotgunMeshes(WEAPON_CROSSBOW);
+	}
+}
 
 void Inject_Inventory()
 {
@@ -25,15 +347,7 @@ Inventory::Inventory()
 {
 	ZeroMemory(&m_objectsTable[0], sizeof(InventoryObjectDefinition) * INVENTORY_TABLE_SIZE);
 
-	// Copy the old table
-	for (__int32 i = 0; i < 100; i++)
-	{
-		m_objectsTable[i].objectNumber = InventoryObjectsList[i].objectNumber;
-		m_objectsTable[i].objectName = InventoryObjectsList[i].objectName;
-		m_objectsTable[i].meshBits = InventoryObjectsList[i].meshBits;
-	}
-
-	// Assign new strings
+	// Create objects table
 	m_objectsTable[INV_OBJECT_UZIS] = InventoryObjectDefinition(ID_UZI_ITEM, STRING_INV_UZI, -1, 0);
 	m_objectsTable[INV_OBJECT_PISTOLS] = InventoryObjectDefinition(ID_PISTOLS_ITEM, STRING_INV_PISTOLS, -1, 0);
 	m_objectsTable[INV_OBJECT_SHOTGUN] = InventoryObjectDefinition(ID_SHOTGUN_ITEM, STRING_INV_SHOTGUN, -1, 0);
@@ -75,6 +389,30 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY, STRING_INV_DIARY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_INV_WATERSKIN1_EMPTY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_INV_WATERSKIN2_EMPTY, -1, 0);
+
+	// Add combinations
+	AddCombination(INV_OBJECT_PUZZLE1_COMBO1, INV_OBJECT_PUZZLE1_COMBO2, INV_OBJECT_PUZZLE1, CombinePuzzle1);
+	AddCombination(INV_OBJECT_PUZZLE2_COMBO1, INV_OBJECT_PUZZLE2_COMBO2, INV_OBJECT_PUZZLE2, CombinePuzzle2);
+	AddCombination(INV_OBJECT_PUZZLE3_COMBO1, INV_OBJECT_PUZZLE3_COMBO2, INV_OBJECT_PUZZLE3, CombinePuzzle3);
+	AddCombination(INV_OBJECT_PUZZLE4_COMBO1, INV_OBJECT_PUZZLE4_COMBO2, INV_OBJECT_PUZZLE4, CombinePuzzle4);
+	AddCombination(INV_OBJECT_PUZZLE5_COMBO1, INV_OBJECT_PUZZLE5_COMBO2, INV_OBJECT_PUZZLE5, CombinePuzzle5);
+	AddCombination(INV_OBJECT_PUZZLE6_COMBO1, INV_OBJECT_PUZZLE6_COMBO2, INV_OBJECT_PUZZLE6, CombinePuzzle6);
+	AddCombination(INV_OBJECT_PUZZLE7_COMBO1, INV_OBJECT_PUZZLE7_COMBO2, INV_OBJECT_PUZZLE7, CombinePuzzle7);
+	AddCombination(INV_OBJECT_PUZZLE8_COMBO1, INV_OBJECT_PUZZLE8_COMBO2, INV_OBJECT_PUZZLE8, CombinePuzzle8);
+	AddCombination(INV_OBJECT_KEY1_COMBO1, INV_OBJECT_KEY1_COMBO2, INV_OBJECT_KEY1, CombineKey1);
+	AddCombination(INV_OBJECT_KEY2_COMBO1, INV_OBJECT_KEY2_COMBO2, INV_OBJECT_KEY2, CombineKey2);
+	AddCombination(INV_OBJECT_KEY3_COMBO1, INV_OBJECT_KEY3_COMBO2, INV_OBJECT_KEY3, CombineKey3);
+	AddCombination(INV_OBJECT_KEY4_COMBO1, INV_OBJECT_KEY4_COMBO2, INV_OBJECT_KEY4, CombineKey4);
+	AddCombination(INV_OBJECT_KEY5_COMBO1, INV_OBJECT_KEY5_COMBO2, INV_OBJECT_KEY5, CombineKey5);
+	AddCombination(INV_OBJECT_KEY6_COMBO1, INV_OBJECT_KEY6_COMBO2, INV_OBJECT_KEY6, CombineKey6);
+	AddCombination(INV_OBJECT_KEY7_COMBO1, INV_OBJECT_KEY7_COMBO2, INV_OBJECT_KEY7, CombineKey7);
+	AddCombination(INV_OBJECT_KEY8_COMBO1, INV_OBJECT_KEY8_COMBO2, INV_OBJECT_KEY8, CombineKey8);
+	AddCombination(INV_OBJECT_PICKUP1_COMBO1, INV_OBJECT_PICKUP1_COMBO2, INV_OBJECT_PICKUP1, CombinePickup1);
+	AddCombination(INV_OBJECT_PICKUP2_COMBO1, INV_OBJECT_PICKUP2_COMBO2, INV_OBJECT_PICKUP2, CombinePickup2);
+	AddCombination(INV_OBJECT_PICKUP3_COMBO1, INV_OBJECT_PICKUP3_COMBO2, INV_OBJECT_PICKUP3, CombinePickup3);
+	AddCombination(INV_OBJECT_PICKUP4_COMBO1, INV_OBJECT_PICKUP4_COMBO2, INV_OBJECT_PICKUP4, CombinePickup4);
+	AddCombination(INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER, CombineRevolverLasersight);
+	AddCombination(INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER, CombineCrossbowLasersight);
 }
 
 Inventory::~Inventory()
@@ -103,7 +441,7 @@ void Inventory::InsertObject(__int32 ring, __int32 objectNumber)
 	m_rings[ring].numObjects++;
 }
 
-void Inventory::Initialise()
+void Inventory::LoadObjects()
 {
 	// Reset the objects in inventory
 	for (__int32 i = 0; i < NUM_INVENTORY_RINGS; i++)
@@ -123,6 +461,17 @@ void Inventory::Initialise()
 
 	// DEBUG
 	{
+		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
+		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0] = 1000;
+		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1] = 1000;
+		g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
+
+		g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
+		g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0] = 1000;
+		g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+
+		Lara.laserSight = true;
+
 		/*g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present = true;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] = 1000;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
@@ -134,7 +483,7 @@ void Inventory::Initialise()
 		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Present = true;
 		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;*/
 	}
-	
+
 	// Now fill the rings
 	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_DRAW_TYPE::LARA_YOUNG)
 	{
@@ -147,7 +496,7 @@ void Inventory::Initialise()
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZIS);
 		else if (g_LaraExtra.Weapons[WEAPON_UZI].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZI_AMMO);
-		
+
 		// Revolver
 		if (g_LaraExtra.Weapons[WEAPON_REVOLVER].Present)
 		{
@@ -192,9 +541,9 @@ void Inventory::Initialise()
 		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present)
 		{
 			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight)
-					InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_LASER);
-				else
-					InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW);
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_LASER);
+			else
+				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW);
 		}
 		else
 		{
@@ -230,7 +579,7 @@ void Inventory::Initialise()
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_LAUNCHER);
 		else if (g_LaraExtra.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_AMMO);
-				
+
 		// Lasersight
 		if (Lara.laserSight)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_LASERSIGHT);
@@ -329,7 +678,7 @@ void Inventory::Initialise()
 	if (g_LaraExtra.Waterskin2.Present)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WATERSKIN2);
 
-	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
+	InventoryRing * ring = &m_rings[INV_RING_OPTIONS];
 
 	// Reset the objects in inventory
 	ring->numObjects = 0;
@@ -343,11 +692,16 @@ void Inventory::Initialise()
 		ring->objects[j].rotation = 0;
 		ring->objects[j].scale = 2.0f;
 	}
-	  
+
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_PASSAPORT);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_SUNGLASSES);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_HEADPHONES);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_KEYS);
+}
+
+void Inventory::Initialise()
+{
+	LoadObjects();
 
 	m_activeRing = INV_RING_WEAPONS;
 	m_type = INV_TYPE_GAME;
@@ -357,7 +711,7 @@ void Inventory::Initialise()
 	InventoryItemChosen = -1;
 }
 
-INVENTORY_RESULT Inventory::DoInventory()
+__int32 Inventory::DoInventory()
 {
 	Initialise();
 
@@ -367,16 +721,20 @@ INVENTORY_RESULT Inventory::DoInventory()
 		m_rings[INV_RING_PUZZLES].draw = false;
 		m_rings[INV_RING_WEAPONS].draw = false;
 		m_rings[INV_RING_OPTIONS].draw = true;
+		m_rings[INV_RING_COMBINE].draw = false;
+		m_rings[INV_RING_CHOOSE_AMMO].draw = false;
 
 		m_activeRing = INV_RING_OPTIONS;
 		m_rings[m_activeRing].currentObject = 0;
 
-		INVENTORY_RESULT passportResult = DoPassport();
+		__int32 passportResult = DoPassport();
 
 		// Fade out
 		g_Renderer->FadeOut();
 		for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+		{
 			g_Renderer->DrawInventory();
+		}
 
 		return passportResult;
 	}
@@ -384,10 +742,12 @@ INVENTORY_RESULT Inventory::DoInventory()
 	m_rings[INV_RING_PUZZLES].draw = true;
 	m_rings[INV_RING_WEAPONS].draw = true;
 	m_rings[INV_RING_OPTIONS].draw = true;
+	m_rings[INV_RING_COMBINE].draw = false;
+	m_rings[INV_RING_CHOOSE_AMMO].draw = false;
 
 	m_activeRing = INV_RING_WEAPONS;
 
-	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
+	__int32 result = INV_RESULT_NONE;
 
 	g_Renderer->DumpGameScene();
 	g_Renderer->DrawInventory();
@@ -407,7 +767,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 
 			// Exit from inventory
 			GlobalEnterInventory = -1;
-			return INVENTORY_RESULT::INVENTORY_RESULT_NONE;
+			return INV_RESULT_NONE;
 		}
 		else if (DbInput & IN_FORWARD &&
 			(m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
@@ -474,6 +834,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 			else
 				m_rings[m_activeRing].currentObject++;
 
+			m_rings[m_activeRing].selectedIndex = INV_ACTION_USE;
 			m_rings[m_activeRing].movement = 0;
 		}
 		else if (DbInput & IN_RIGHT)
@@ -497,6 +858,7 @@ INVENTORY_RESULT Inventory::DoInventory()
 			else
 				m_rings[m_activeRing].currentObject--;
 
+			m_rings[m_activeRing].selectedIndex = INV_ACTION_USE;
 			m_rings[m_activeRing].movement = 0;
 		}
 		else if (DbInput & IN_SELECT)
@@ -506,10 +868,10 @@ INVENTORY_RESULT Inventory::DoInventory()
 			{
 				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
 				{
-					INVENTORY_RESULT passportResult = DoPassport();
-					if (passportResult == INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME ||
-						passportResult == INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE ||
-						passportResult == INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME)
+					__int32 passportResult = DoPassport();
+					if (passportResult == INV_RESULT_NEW_GAME ||
+						passportResult == INV_RESULT_EXIT_TO_TILE ||
+						passportResult == INV_RESULT_LOAD_GAME)
 					{
 						// Fade out
 						g_Renderer->FadeOut();
@@ -520,22 +882,47 @@ INVENTORY_RESULT Inventory::DoInventory()
 					}
 				}
 
-				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_KEYS)
+				__int16 currentObject = m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject;
+
+				if (currentObject == INV_OBJECT_KEYS)
 					DoControlsSettings();
 
-				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_SUNGLASSES)
+				if (currentObject == INV_OBJECT_SUNGLASSES)
 					DoGraphicsSettings();
 
-				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_HEADPHONES)
+				if (currentObject == INV_OBJECT_HEADPHONES)
 					DoSoundSettings();
 			}
 			else if (m_activeRing == INV_RING_WEAPONS || m_activeRing == INV_RING_PUZZLES)
 			{
-				UseCurrentItem();
+				__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+				__int32 result = INV_RESULT_NONE;
 
-				// Exit from inventory
-				GlobalEnterInventory = -1;
-				return INVENTORY_RESULT::INVENTORY_RESULT_USE_ITEM;
+				if (IsCurrentObjectPuzzle())
+					// Puzzles have Use, Combine, Separe
+					result = DoPuzzle();
+				else if (IsCurrentObjectWeapon())
+					// Weapons have Use, Select Ammo
+					result = DoWeapon();
+				else if (IsCurrentObjectExamine())
+					// Examines have just Examine
+					DoExamine();
+				else if (currentObject == INV_OBJECT_TIMEX)
+					// Do statistics
+					DoStatistics();
+				else
+					// All other objects have just Use
+					result = DoGenericObject();
+
+				// If an item is set to be used, then use it and close inventory
+				if (result == INV_RESULT_USE_ITEM)
+				{
+					UseCurrentItem();
+
+					// Exit from inventory
+					GlobalEnterInventory = -1;
+					return INV_RESULT_USE_ITEM;
+				}
 			}
 		}
 
@@ -544,6 +931,485 @@ INVENTORY_RESULT Inventory::DoInventory()
 	}
 
 	return result;
+}
+
+bool Inventory::IsCurrentObjectWeapon()
+{
+	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	return (currentObject == INV_OBJECT_PISTOLS || currentObject == INV_OBJECT_UZIS ||
+		currentObject == INV_OBJECT_REVOLVER_LASER || currentObject == INV_OBJECT_CROSSBOW_LASER ||
+		currentObject == INV_OBJECT_REVOLVER || currentObject == INV_OBJECT_SHOTGUN ||
+		currentObject == INV_OBJECT_HK || currentObject == INV_OBJECT_CROSSBOW ||
+		currentObject == INV_OBJECT_ROCKET_LAUNCHER || currentObject == INV_OBJECT_GRENADE_LAUNCHER ||
+		currentObject == INV_OBJECT_HARPOON_GUN);
+}
+
+bool Inventory::IsCurrentObjectPuzzle()
+{
+	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	return (currentObject >= INV_OBJECT_PUZZLE1 && currentObject <= INV_OBJECT_PICKUP4_COMBO2);
+}
+
+bool Inventory::IsCurrentObjectGeneric()
+{
+	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	return (!IsCurrentObjectPuzzle() && !IsCurrentObjectExamine() && !IsCurrentObjectWeapon() &&
+		currentObject != INV_OBJECT_TIMEX);
+}
+
+bool Inventory::IsCurrentObjectExamine()
+{
+	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	return (currentObject >= INV_OBJECT_EXAMINE1 && currentObject <= INV_OBJECT_EXAMINE1);
+}
+
+__int32 Inventory::DoPuzzle()
+{
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+
+	return INV_RESULT_NONE;
+}
+
+__int32 Inventory::DoWeapon()
+{
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+	ring->selectedIndex = 0;
+	ring->numActions = 0;
+
+	PopupObject();
+
+	__int32 result = INV_RESULT_NONE;
+	bool closeObject = false;
+	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
+
+	ring->actions[ring->numActions++] = INV_ACTION_USE;
+	if (IsObjectCombinable(currentObject)) ring->actions[ring->numActions++] = INV_ACTION_COMBINE;
+	if (IsObjectSeparable(currentObject)) ring->actions[ring->numActions++] = INV_ACTION_SEPARE;
+	ring->actions[ring->numActions++] = INV_ACTION_SELECT_AMMO;
+
+	// Do the menu
+	while (true)
+	{
+		// Handle input
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		GameTimer++;
+
+		// Handle input
+		if (DbInput & IN_DESELECT || closeObject)
+		{
+			closeObject = true;
+			break;
+		}
+		else if (DbInput & IN_FORWARD)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex > 0)
+				ring->selectedIndex--;
+		}
+		else if (DbInput & IN_BACK)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex < ring->numActions)
+				ring->selectedIndex++;
+		}
+		else if (DbInput & IN_SELECT)
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+			if (ring->actions[ring->selectedIndex] == INV_ACTION_USE)
+			{
+				result = INV_RESULT_USE_ITEM;
+				closeObject = true;
+				break;
+			}
+			else if (ring->actions[ring->selectedIndex] == INV_ACTION_COMBINE)
+			{
+				DoCombine();
+			}
+			else if (ring->actions[ring->selectedIndex] == INV_ACTION_SEPARE)
+			{
+				DoSepare();
+			}
+			else if (ring->actions[ring->selectedIndex] == INV_ACTION_SELECT_AMMO)
+			{
+				DoSelectAmmo();
+			}
+		}
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	PopoverObject();
+
+	return result;
+}
+
+bool Inventory::IsObjectPresentInInventory(__int16 object)
+{
+	for (__int32 r = 0; r < 3; r++)
+		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+			if (m_rings[r].objects[o].inventoryObject == object)
+				return true;
+	return false;
+}
+
+bool Inventory::IsObjectCombinable(__int16 object)
+{
+	for (__int32 i = 0; i < m_combinations.size(); i++)
+		if (m_combinations[i].piece1 == object || m_combinations[i].piece2 == object)
+			return true;
+	return false;
+}
+
+void Inventory::AddCombination(__int16 piece1, __int16 piece2, __int16 combinedObject, void (*f) (__int32))
+{
+	InventoryObjectCombination combination;
+	combination.piece1 = piece1;
+	combination.piece2 = piece2;
+	combination.combinedObject = combinedObject;
+	combination.combineRoutine = f;
+	m_combinations.push_back(combination);
+}
+
+__int32 Inventory::DoGenericObject()
+{
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+
+	return INV_RESULT_USE_ITEM;
+}
+
+void Inventory::DoStatistics()
+{
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+
+}
+
+void Inventory::DoExamine()
+{
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+
+}
+
+void Inventory::DoCombine()
+{
+	InventoryRing* ring = &m_rings[m_activeRing];
+
+	// Enable the secondary GUI
+	m_activeRing = INV_RING_COMBINE;
+
+	// Fill the secondary ring
+	InventoryRing* combineRing = &m_rings[INV_RING_COMBINE];
+	combineRing->draw = true;
+	combineRing->numObjects = 0;
+	
+	// Fill the objects ring
+	combineRing->numObjects = 0;
+	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
+
+	for (__int32 i = 0; i < m_combinations.size(); i++)
+	{
+		InventoryObjectCombination* combination = &m_combinations[i];
+		
+		// Add piece 1
+		if (currentObject != combination->piece1 && IsObjectPresentInInventory(combination->piece1))
+		{
+			combineRing->objects[combineRing->numObjects++].inventoryObject = combination->piece1;
+		}
+
+		// Add piece 2
+		if (currentObject != combination->piece2 && IsObjectPresentInInventory(combination->piece2))
+		{
+			combineRing->objects[combineRing->numObjects++].inventoryObject = combination->piece2;
+		}
+	}
+
+	// If no objects then exit 
+	if (combineRing->numObjects == 0)
+		return;
+
+	combineRing->selectedIndex = 0;
+	bool closeObject = false;
+
+	// Do the menu
+	while (true)
+	{
+		// Handle input
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		GameTimer++;
+
+		// Handle input
+		if (DbInput & IN_DESELECT || closeObject)
+		{
+			closeObject = true;
+			break;
+		}
+		else if (DbInput & IN_LEFT)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
+			// Change object left
+			float deltaAngle = 360.0f / combineRing->numObjects / 8.0f;
+			combineRing->movement = 0;
+
+			for (__int32 i = 0; i < 8; i++)
+			{
+				combineRing->movement += deltaAngle;
+
+				g_Renderer->DrawInventory();
+				g_Renderer->SyncRenderer();
+			}
+
+			if (combineRing->currentObject > 0)
+				combineRing->currentObject--;
+			else
+				combineRing->currentObject = combineRing->numObjects - 1;
+
+			combineRing->movement = 0;
+		}
+		else if (DbInput & IN_RIGHT)
+		{
+			closeObject = false;
+
+			// Change object right
+			float deltaAngle = 360.0f / combineRing->numObjects / 8.0f;
+			combineRing->movement = 0;
+
+			for (__int32 i = 0; i < 8; i++)
+			{
+				combineRing->movement -= deltaAngle;
+
+				g_Renderer->DrawInventory();
+				g_Renderer->SyncRenderer();
+			}
+
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			if (combineRing->currentObject < combineRing->numObjects - 1)
+				combineRing->currentObject++;
+			else
+				combineRing->currentObject = 0;
+
+			combineRing->movement = 0;
+		}
+		else if (DbInput & IN_SELECT)
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+			// Check if can be combined
+			__int16 currentObject = combineRing->objects[combineRing->currentObject].inventoryObject;
+			for (__int32 i = 0; i < m_combinations.size(); i++)
+			{
+				InventoryObjectCombination* combination = &m_combinations[i];
+				if (combination->piece1 == currentObject && combination->piece2 == ring->objects[ring->currentObject].inventoryObject || 
+					combination->piece2 == currentObject && combination->piece1 == ring->objects[ring->currentObject].inventoryObject)
+				{
+					// I can do the combination
+					SoundEffect(SFX_MENU_COMBINE, NULL, 0);
+					combination->combineRoutine(INV_COMBINE_COMBINE);
+					LoadObjects();
+					closeObject = true;
+					break;
+				}
+			}
+
+			if (!closeObject)
+				SayNo();
+		}
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	// Reset secondary GUI
+	m_activeRing = INV_RING_WEAPONS;
+	combineRing->draw = false;
+}
+
+void Inventory::DoSepare()
+{
+	__int16 currentObject = m_secondaryRing.currentObject;
+	for (__int32 i = 0; i < m_combinations.size(); i++)
+	{
+		InventoryObjectCombination* combination = &m_combinations[i];
+		if (combination->combinedObject == currentObject)
+		{
+			// I can do the separation
+			SoundEffect(SFX_MENU_COMBINE, NULL, 0);
+			combination->combineRoutine(INV_COMBINE_SEPARE);
+			LoadObjects();
+			return;
+		}
+	}
+}
+
+void Inventory::DoSelectAmmo()
+{
+	InventoryRing* ring = &m_rings[m_activeRing];
+
+	// Enable the secondary GUI
+	m_activeRing = INV_RING_CHOOSE_AMMO;
+
+	// Fill the secondary ring
+	InventoryRing* ammoRing = &m_rings[INV_RING_CHOOSE_AMMO];
+	ammoRing->draw = true;
+	ammoRing->numObjects = 0;
+
+	switch (ring->objects[ring->currentObject].inventoryObject)
+	{
+	case INV_OBJECT_SHOTGUN:
+		if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_SHOTGUN_AMMO1;
+		if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_SHOTGUN_AMMO2;
+		ammoRing->selectedIndex = g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo;
+
+		break;
+
+	case INV_OBJECT_GRENADE_LAUNCHER:
+		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_GRENADE_AMMO1;
+		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_GRENADE_AMMO2;
+		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_GRENADE_AMMO3;
+		ammoRing->selectedIndex = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
+		
+		break;
+
+	case INV_OBJECT_CROSSBOW:
+	case INV_OBJECT_CROSSBOW_LASER:
+		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_CROSSBOW_AMMO1;
+		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[1] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_CROSSBOW_AMMO2;
+		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[2] != 0)
+			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_CROSSBOW_AMMO3;
+		ammoRing->selectedIndex = g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
+		
+		break;
+	}
+
+	// If no objects then exit 
+	if (ammoRing->numObjects == 0)
+		return;
+
+	bool closeObject = false;
+
+	// Do the menu
+	while (true)
+	{
+		// Handle input
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		GameTimer++;
+
+		// Handle input
+		if (DbInput & IN_DESELECT || closeObject)
+		{
+			closeObject = true;
+			break;
+		}
+		else if (DbInput & IN_LEFT)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+
+			// Change object left
+			float deltaAngle = 360.0f / ammoRing->numObjects / 8.0f;
+			ammoRing->movement = 0;
+
+			for (__int32 i = 0; i < 8; i++)
+			{
+				ammoRing->movement += deltaAngle;
+
+				g_Renderer->DrawInventory();
+				g_Renderer->SyncRenderer();
+			}
+
+			if (ammoRing->currentObject > 0)
+				ammoRing->currentObject--;
+			else
+				ammoRing->currentObject = ammoRing->numObjects - 1;
+
+			ammoRing->movement = 0;
+		}
+		else if (DbInput & IN_RIGHT)
+		{
+			closeObject = false;
+
+			// Change object right
+			float deltaAngle = 360.0f / ammoRing->numObjects / 8.0f;
+			ammoRing->movement = 0;
+
+			for (__int32 i = 0; i < 8; i++)
+			{
+				ammoRing->movement -= deltaAngle;
+
+				g_Renderer->DrawInventory();
+				g_Renderer->SyncRenderer();
+			}
+
+			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
+			if (ammoRing->currentObject < ammoRing->numObjects - 1)
+				ammoRing->currentObject++;
+			else
+				ammoRing->currentObject = 0;
+
+			ammoRing->movement = 0;
+		}
+		else if (DbInput & IN_SELECT)
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+			// Choose ammo
+			switch (ring->objects[ring->currentObject].inventoryObject)
+			{
+			case INV_OBJECT_SHOTGUN:
+				g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = ring->selectedIndex;
+				break;
+
+			case INV_OBJECT_GRENADE_LAUNCHER:
+				g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = ring->selectedIndex;
+				break;
+
+			case INV_OBJECT_CROSSBOW:
+			case INV_OBJECT_CROSSBOW_LASER:
+				g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = ring->selectedIndex;
+				break;
+
+			}
+
+			closeObject = true;
+			break;
+		}
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	// Reset secondary GUI
+	m_activeRing = INV_RING_WEAPONS;
+	ammoRing->draw = false;
 }
 
 void Inventory::UseCurrentItem()
@@ -906,7 +1772,7 @@ void Inventory::InitialiseTitle()
 	InventoryItemChosen = -1;
 }
 
-INVENTORY_RESULT Inventory::DoTitleInventory()
+__int32 Inventory::DoTitleInventory()
 {
 	InitialiseTitle();
 
@@ -922,7 +1788,7 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 		g_Renderer->DrawInventory();
 
-	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
+	__int32 result = INV_RESULT_NONE;
 
 	while (!ResetFlag)
 	{
@@ -985,10 +1851,10 @@ INVENTORY_RESULT Inventory::DoTitleInventory()
 
 			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
 			{
-				INVENTORY_RESULT passportResult = DoPassport();
-				if (passportResult == INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME ||
-					passportResult == INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME ||
-					passportResult == INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME)
+				__int32 passportResult = DoPassport();
+				if (passportResult == INV_RESULT_NEW_GAME ||
+					passportResult == INV_RESULT_EXIT_GAME ||
+					passportResult == INV_RESULT_LOAD_GAME)
 				{
 					// Fade out
 					g_Renderer->FadeOut();
@@ -1026,7 +1892,7 @@ InventoryObjectDefinition* Inventory::GetInventoryObject(__int32 index)
 	return &m_objectsTable[index];
 }
 
-INVENTORY_RESULT Inventory::DoPassport()
+__int32 Inventory::DoPassport()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
@@ -1066,7 +1932,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 	bool moveRight = false;
 	bool closePassport = false;
 
-	INVENTORY_RESULT result = INVENTORY_RESULT::INVENTORY_RESULT_NONE;
+	__int32 result = INV_RESULT_NONE;
 
 	// Do the passport
 	while (true)
@@ -1182,7 +2048,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 
 					//ReadSavegame(selectedSavegame);
 					g_GameFlow->SelectedSaveGame = selectedSavegame;
-					result = INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME;
+					result = INV_RESULT_LOAD_GAME;
 					moveLeft = false;
 					moveRight = false;
 					closePassport = true;
@@ -1329,7 +2195,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				{
 					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
-					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
+					result = INV_RESULT_NEW_GAME;
 					g_GameFlow->SelectedLevelForNewGame = selectedLevel + 1;
 
 					moveLeft = false;
@@ -1387,7 +2253,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				{
 					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
-					result = INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME;
+					result = INV_RESULT_NEW_GAME;
 					moveLeft = false;
 					moveRight = false;
 					closePassport = true;
@@ -1442,7 +2308,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				{
 					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
-					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME;
+					result = INV_RESULT_EXIT_GAME;
 					moveLeft = false;
 					moveRight = false;
 					closePassport = true;
@@ -1497,7 +2363,7 @@ INVENTORY_RESULT Inventory::DoPassport()
 				{
 					SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
-					result = INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE;
+					result = INV_RESULT_EXIT_TO_TILE;
 					moveLeft = false;
 					moveRight = false;
 					closePassport = true;
@@ -1614,16 +2480,9 @@ void Inventory::DoGraphicsSettings()
 		}
 	}
 
-	// Open the passport
-	for (__int32 i = 0; i < 14; i++)
-	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
-	}
-
 	bool closeObject = false;
 
-	// Do the passport
+	// Do the menu
 	while (true)
 	{
 		// Handle input
@@ -1928,4 +2787,20 @@ void Inventory::DoSoundSettings()
 	}
 
 	PopoverObject();
+}
+
+__int32 Inventory::GetActiveGui()
+{
+	return m_activeGui;
+}
+
+/*InventoryRing* Inventory::GetSecondaryRing()
+{
+	return m_secondaryRing;
+}
+**/
+
+bool Inventory::IsObjectSeparable(__int16 object)
+{
+	return false;
 }

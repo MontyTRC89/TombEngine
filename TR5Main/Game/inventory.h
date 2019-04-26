@@ -1,6 +1,9 @@
 #pragma once
 
 #include "..\Specific\config.h"
+#include <vector>
+
+using namespace std;
 
 // Legacy stuff
 #define ObjectInInventory ((__int32 (__cdecl*)(__int16)) 0x00464360)
@@ -9,21 +12,26 @@ void Inject_Inventory();
 
 // New inventory
 #define NUM_INVENTORY_OBJECTS_PER_RING	120
-#define NUM_INVENTORY_RINGS				3
+#define NUM_INVENTORY_RINGS				5
 #define NUM_LEVEL_INVENTORY_RINGS		3
 
 #define INVENTORY_TABLE_SIZE		120
 
+// Movement directions
 #define INV_MOVE_STOPPED			0
 #define INV_MOVE_RIGHT				1
 #define INV_MOVE_LEFT				2
 #define INV_MOVE_UP					3
 #define INV_MOVE_DOWN				4
 
+// Rings
 #define INV_RING_WEAPONS			1
 #define INV_RING_PUZZLES			0
 #define INV_RING_OPTIONS			2
+#define INV_RING_COMBINE			3
+#define INV_RING_CHOOSE_AMMO		4
 
+// Classic objects
 #define INV_OBJECT_UZIS				0	
 #define INV_OBJECT_PISTOLS			1
 #define INV_OBJECT_SHOTGUN			2
@@ -138,20 +146,19 @@ void Inject_Inventory();
 #define INV_OBJECT_ROCKET_LAUNCHER	111
 #define INV_OBJECT_ROCKET_AMMO		112
 #define INV_OBJECT_CROSSBOW_AMMO3	113
+
+// New misc objects
 #define INV_OBJECT_DIARY			114
 #define INV_OBJECT_WATERSKIN1		115
 #define INV_OBJECT_WATERSKIN2		116
 
-#define INV_RESULT_NEW_GAME			0
-#define INV_RESULT_LOAD_GAME		1
-#define INV_RESULT_LARA_HOME		2
-#define INV_RESULT_EXIT				4
-
+// Focus state
 #define INV_FOCUS_STATE_NONE		0
 #define INV_FOCUS_STATE_POPUP		1
 #define INV_FOCUS_STATE_FOCUSED		2	
 #define INV_FOCUS_STATE_POPOVER		3
 
+// Passport actions
 #define INV_WHAT_NONE					0
 #define INV_WHAT_PASSPORT_NEW_GAME		1
 #define INV_WHAT_PASSPORT_LOAD_GAME		2
@@ -159,10 +166,8 @@ void Inject_Inventory();
 #define INV_WHAT_PASSPORT_SELECT_LEVEL	4
 #define INV_WHAT_PASSPORT_EXIT_GAME		5
 #define INV_WHAT_PASSPORT_EXIT_TO_TITLE	6
-#define INV_WHAT_DISPLAY_SETTINGS		7
-#define INV_WHAT_AUDIO_SETTINGS			8
-#define INV_WHAT_CONTROLS_SETTINGS		9
 
+// Graphics settings
 #define INV_DISPLAY_RESOLUTION			0
 #define INV_DISPLAY_SHADOWS				1
 #define INV_DISPLAY_CAUSTICS			2
@@ -171,40 +176,65 @@ void Inject_Inventory();
 #define INV_DISPLAY_CANCEL				5
 #define INV_DISPLAY_COUNT				6
 
+// Sound settings
 #define INV_SOUND_ENABLED				0
 #define INV_SOUND_SPECIAL_EFFECTS		1
 #define INV_SOUND_MUSIC_VOLUME			2
 #define INV_SOUND_SFX_VOLUME			3
 #define INV_SOUND_COUNT					4
 
+// Inventory type
 #define INV_TYPE_TITLE					0
 #define INV_TYPE_GAME					1
 
+// Some rendering parameters
 #define INV_RINGS_OFFSET				8192.0f
 #define INV_OBJECT_SCALE				1.5f
+#define INV_SECONDARY_MOVEMENT				200.0f
 
-typedef enum INVENTORY_RESULT {
-	INVENTORY_RESULT_NONE,
-	INVENTORY_RESULT_USE_ITEM,
-	INVENTORY_RESULT_NEW_GAME,
-	INVENTORY_RESULT_LOAD_GAME,
-	INVENTORY_RESULT_SAVE_GAME,
-	INVENTORY_RESULT_EXIT_GAME,
-	INVENTORY_RESULT_EXIT_TO_TILE,
-	INVENTORY_RESULT_NEW_GAME_SELECTED_LEVEL
-};
+// Action for each object
+#define INV_ACTION_USE					0
+#define INV_ACTION_SELECT_AMMO			1
+#define INV_ACTION_COMBINE				2
+#define INV_ACTION_SEPARE				3
 
-typedef struct InventoryObject {
+#define INV_COMBINE_COMBINE				0
+#define INV_COMBINE_SEPARE				1
+
+// GUI types
+#define INV_GUI_NONE					0
+#define INV_GUI_STATISTICS				1
+#define INV_GUI_PASSPORT				2
+#define INV_GUI_DISPLAY_SETTINGS		3
+#define INV_GUI_SOUND_SETTINGS			4
+#define INV_GUI_CONTROL_SETTINGS		5
+#define INV_GUI_COMBINE					6
+#define INV_GUI_SEPARE					7
+#define INV_GUI_CHOOSE_AMMO				8
+
+// Inventory results
+#define INV_RESULT_NONE						0
+#define INV_RESULT_USE_ITEM					1
+#define INV_RESULT_NEW_GAME					2
+#define INV_RESULT_LOAD_GAME				3
+#define INV_RESULT_SAVE_GAME				4
+#define INV_RESULT_EXIT_GAME				5
+#define INV_RESULT_EXIT_TO_TILE				6
+#define INV_RESULT_NEW_GAME_SELECTED_LEVEL	7
+
+#define INV_NUM_COMBINATIONS				22
+
+struct InventoryObject {
 	__int32 inventoryObject;
 	__int32 rotation;
 	float scale;
 };
 
-typedef struct InventoryRing {
+struct InventoryRing {
 	InventoryObject objects[NUM_INVENTORY_OBJECTS_PER_RING];
 	__int32 numObjects;
 	__int32 currentObject;
-	__int32 movement;
+	int movement;
 	__int32 focusState;
 	__int32 frameIndex;
 	bool draw;
@@ -214,9 +244,21 @@ typedef struct InventoryRing {
 	__int32 passportAction;
 	__int32 SelectedVideoMode;
 	GameConfiguration Configuration;
+
+	// Special fields for objects
+	__int32 actions[3];
+	__int32 numActions = 3;
 };
 
-typedef struct InventoryObjectDefinition {
+struct InventorySecondaryRing {
+	InventoryObject objects[NUM_INVENTORY_OBJECTS_PER_RING];
+	__int32 numObjects;
+	__int32 currentObject;
+	__int32 movement;
+	__int32 selectedIndex;
+};
+
+struct InventoryObjectDefinition {
 	__int16 objectNumber;
 	__int16 objectName;
 	__int32 meshBits;
@@ -236,37 +278,114 @@ typedef struct InventoryObjectDefinition {
 	}
 };
 
+struct InventoryObjectCombination {
+	__int16 piece1;
+	__int16 piece2;
+	__int16 combinedObject;
+	void(*combineRoutine)(__int32 action);
+};
+
+void CombinePuzzle1(__int32 action);
+void CombinePuzzle2(__int32 action);
+void CombinePuzzle3(__int32 action);
+void CombinePuzzle4(__int32 action);
+void CombinePuzzle5(__int32 action);
+void CombinePuzzle6(__int32 action);
+void CombinePuzzle7(__int32 action);
+void CombinePuzzle8(__int32 action);
+void CombineKey1(__int32 action);
+void CombineKey2(__int32 action);
+void CombineKey3(__int32 action);
+void CombineKey4(__int32 action);
+void CombineKey5(__int32 action);
+void CombineKey6(__int32 action);
+void CombineKey7(__int32 action);
+void CombineKey8(__int32 action);
+void CombinePickup1(__int32 action);
+void CombinePickup2(__int32 action);
+void CombinePickup3(__int32 action);
+void CombinePickup4(__int32 action);
+void CombineRevolverLasersight(__int32 action);
+void CombineCrossbowLasersight(__int32 action);
+
 class Inventory
 {
 private:
-	InventoryRing				m_rings[NUM_INVENTORY_RINGS];
-	__int32						m_activeRing;
-	__int32						m_movement;
-	float						m_deltaMovement;
-	InventoryObjectDefinition	m_objectsTable[INVENTORY_TABLE_SIZE];
-	__int32						m_type;
+	InventoryRing						m_rings[NUM_INVENTORY_RINGS];
+	InventorySecondaryRing				m_secondaryRing;
+	__int32								m_activeRing;
+	__int32								m_movement;
+	float								m_deltaMovement;
+	InventoryObjectDefinition			m_objectsTable[INVENTORY_TABLE_SIZE];
+	__int32								m_type;
+	vector<InventoryObjectCombination>	m_combinations;
+	__int32								m_activeGui;
 
 public:
 	Inventory();
 	~Inventory();
+
 	void						Initialise();
 	void						InitialiseTitle();
 	InventoryRing*				GetRing(__int32 index);
 	__int32						GetActiveRing();
 	void						SetActiveRing(__int32 index);
-	INVENTORY_RESULT			DoInventory();
-	INVENTORY_RESULT			DoTitleInventory();
+	__int32						DoInventory();
+	__int32						DoTitleInventory();
 	void						InsertObject(__int32 ring, __int32 objectNumber);
 	float						GetVerticalOffset();
 	void						UseCurrentItem();
 	InventoryObjectDefinition*	GetInventoryObject(__int32 index);
-	INVENTORY_RESULT			DoPassport();
+	__int32						DoPassport();
 	void						DoControlsSettings();
 	void						DoGraphicsSettings();
 	void						DoSoundSettings();
 	__int32						PopupObject();
 	__int32						PopoverObject();
 	__int32						GetType();
+	void						DoCombine();
+	void						DoSepare();
+	void						DoSelectAmmo();
+	__int32						DoPuzzle();
+	__int32						DoWeapon();
+	__int32						DoGenericObject();
+	void						DoStatistics();
+	void						DoExamine();
+	bool						IsCurrentObjectWeapon();
+	bool						IsCurrentObjectPuzzle();
+	bool						IsCurrentObjectGeneric();
+	bool						IsCurrentObjectExamine();
+	bool						IsObjectPresentInInventory(__int16 object);
+	bool						IsObjectCombinable(__int16 object);
+	bool						IsObjectSeparable(__int16 object);
+	void						AddCombination(__int16 piece1, __int16 piece2, __int16 combinedObject, void (*f) (__int32));
+	__int32						GetActiveGui();
+	InventorySecondaryRing*		GetSecondaryRing();
+	void						LoadObjects();
+
+	// Combine routines
+	/*void						CombinePuzzle1(__int32 action);
+	void						CombinePuzzle2(__int32 action);
+	void						CombinePuzzle3(__int32 action);
+	void						CombinePuzzle4(__int32 action);
+	void						CombinePuzzle5(__int32 action);
+	void						CombinePuzzle6(__int32 action);
+	void						CombinePuzzle7(__int32 action);
+	void						CombinePuzzle8(__int32 action);
+	void						CombineKey1(__int32 action);
+	void						CombineKey2(__int32 action);
+	void						CombineKey3(__int32 action);
+	void						CombineKey4(__int32 action);
+	void						CombineKey5(__int32 action);
+	void						CombineKey6(__int32 action);
+	void						CombineKey7(__int32 action);
+	void						CombineKey8(__int32 action);
+	void						CombinePickup1(__int32 action);
+	void						CombinePickup2(__int32 action);
+	void						CombinePickup3(__int32 action);
+	void						CombinePickup4(__int32 action);
+	void						CombineCrossbow(__int32 action);
+	void						CombineRevolver(__int32 action);*/
 };
 
 extern Inventory* g_Inventory;

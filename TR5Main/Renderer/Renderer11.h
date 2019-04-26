@@ -558,6 +558,13 @@ struct CStaticBuffer
 	Vector4 Color;
 };
 
+struct CShadowLightBuffer {
+	ShaderLight Light;
+	Matrix LightViewProjection;
+	__int32 CastShadows;
+	float Padding[15];
+};
+
 struct CLightBuffer {
 	ShaderLight Lights[NUM_LIGHTS_PER_BUFFER];
 	__int32 NumLights;
@@ -762,6 +769,7 @@ private:
 	CommonStates*							m_states = NULL;
 	ID3D11InputLayout*						m_inputLayout = NULL;
 	D3D11_VIEWPORT							m_viewport;
+	D3D11_VIEWPORT							m_shadowMapViewport;
 	Viewport*								m_viewportToolkit;
 	vector<RendererVideoAdapter>			m_adapters;
 
@@ -776,6 +784,7 @@ private:
 	RenderTarget2D*							m_dumpScreenRenderTarget;
 	RenderTarget2D*							m_renderTarget;
 	RenderTarget2D*							m_currentRenderTarget;
+	RenderTarget2D*							m_shadowMap;
 
 	// Shaders
 	ID3D11VertexShader*						m_vsRooms;
@@ -796,6 +805,8 @@ private:
 	ID3D11PixelShader*						m_psInventory;
 	ID3D11VertexShader*						m_vsFullScreenQuad;
 	ID3D11PixelShader*						m_psFullScreenQuad;
+	ID3D11VertexShader*						m_vsShadowMap;
+	ID3D11PixelShader*						m_psShadowMap;
 
 	// Constant buffers
 	CCameraMatrixBuffer						m_stCameraMatrices;
@@ -808,6 +819,8 @@ private:
 	ID3D11Buffer*							m_cbLights;
 	CMiscBuffer								m_stMisc;
 	ID3D11Buffer*							m_cbMisc;
+	CShadowLightBuffer   					m_stShadowMap;
+	ID3D11Buffer*							m_cbShadowMap;
 
 	// Text and sprites
 	SpriteFont*								m_gameFont;
@@ -942,8 +955,9 @@ private:
 	bool									drawItems(bool transparent, bool animated);
 	bool									drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
 	bool									drawWaterfalls();
+	bool									drawShadowMap();
 	bool									drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ);
-	bool									drawLara(bool transparent);
+	bool									drawLara(bool transparent, bool shadowMap);
 	void									printDebugMessage(char* message, ...);
 	void									drawFires();
 	void									drawSparks();

@@ -24,6 +24,7 @@
 
 #define ReadyShotgun ((void (__cdecl*)(__int32)) 0x0044DC30)  
 #define DrawShotgunMeshes ((void (__cdecl*)(__int32)) 0x0044DBB0)  
+#define UndrawShotgunMeshes ((void (__cdecl*)(__int32)) 0x0044DBF0)  
 #define FireHK ((void (__cdecl*)(__int32)) 0x0044E4B0)  
 #define FireShotgun ((void (__cdecl*)()) 0x0044E110)   
 #define UndrawShotgun ((void (__cdecl*)(__int32)) 0x0044ECA0)  

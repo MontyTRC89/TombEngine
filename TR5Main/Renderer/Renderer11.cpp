@@ -381,6 +381,13 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_viewport.MinDepth = 0.0f;
 	m_viewport.MaxDepth = 1.0f;
 
+	m_shadowMapViewport.TopLeftX = 0;
+	m_shadowMapViewport.TopLeftY = 0;
+	m_shadowMapViewport.Width = SHADOW_MAP_SIZE;
+	m_shadowMapViewport.Height = SHADOW_MAP_SIZE;
+	m_shadowMapViewport.MinDepth = 0.0f;
+	m_shadowMapViewport.MaxDepth = 1.0f;
+
 	m_viewportToolkit = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
 		m_viewport.MinDepth, m_viewport.MaxDepth);
 
@@ -474,18 +481,28 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	if (m_psFullScreenQuad == NULL)
 		return false;
 
+	m_vsShadowMap = compileVertexShader("Shaders\\DX11_ShadowMap.fx", "VS", "vs_4_0", &blob);
+	if (m_vsShadowMap == NULL)
+		return false;
+
+	m_psShadowMap = compilePixelShader("Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", &blob);
+	if (m_psShadowMap == NULL)
+		return false;
+
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
 	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
 	m_cbStatic = createConstantBuffer(sizeof(CStaticBuffer));
 	m_cbLights = createConstantBuffer(sizeof(CLightBuffer));
 	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
+	m_cbShadowMap = createConstantBuffer(sizeof(CShadowLightBuffer));
 
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
 	m_renderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_shadowMap = RenderTarget2D::Create(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
 
 	// Preallocate lists
 	m_roomsToDraw.Reserve(NumberRooms);
@@ -752,15 +769,34 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	// Set texture
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
+	ID3D11SamplerState* shadowSampler = m_states->PointClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 	m_context->PSSetShaderResources(1, 1, &m_caustics[m_currentCausticsFrame / 2]->ShaderResourceView);
-	
+	m_context->PSSetSamplers(1, 1, &shadowSampler);
+	m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
+	 
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-	
+	 
+	// Set shadow map data
+	if (m_shadowLight != NULL)
+	{    
+		memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
+		m_stShadowMap.CastShadows = true;
+		//m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert().Transpose();
+	}
+	else
+	{
+		m_stShadowMap.CastShadows = false;
+	}
+
+	updateConstantBuffer(m_cbShadowMap, &m_stShadowMap, sizeof(CShadowLightBuffer));
+	m_context->VSSetConstantBuffers(4, 1, &m_cbShadowMap);
+	m_context->PSSetConstantBuffers(4, 1, &m_cbShadowMap);
+
 	if (animated)
 		m_primitiveBatch->Begin();
 
@@ -1085,7 +1121,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	return true;
 }
 
-bool Renderer11::drawLara(bool transparent)
+bool Renderer11::drawLara(bool transparent, bool shadowMap)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara)
@@ -1105,8 +1141,16 @@ bool Renderer11::drawLara(bool transparent)
 	RendererItem* item = &m_items[Lara.itemNumber];
 
 	// Set shaders
-	m_context->VSSetShader(m_vsItems, NULL, 0);
-	m_context->PSSetShader(m_psItems, NULL, 0);
+	if (shadowMap)
+	{
+		m_context->VSSetShader(m_vsShadowMap, NULL, 0);
+		m_context->PSSetShader(m_psShadowMap, NULL, 0);
+	}
+	else
+	{
+		m_context->VSSetShader(m_vsItems, NULL, 0);
+		m_context->PSSetShader(m_psItems, NULL, 0);
+	}
 
 	// Set texture
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
@@ -1135,11 +1179,14 @@ bool Renderer11::drawLara(bool transparent)
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-	m_stLights.NumLights = item->Lights.Size();
-	for (__int32 j = 0; j < item->Lights.Size(); j++)
-		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
-	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+	if (!shadowMap)
+	{
+		m_stLights.NumLights = item->Lights.Size();
+		for (__int32 j = 0; j < item->Lights.Size(); j++)
+			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+	}
 
 	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
@@ -1250,7 +1297,6 @@ bool Renderer11::drawScene(bool dump)
 
 	clearSceneItems();
 	collectRooms();
-	//prepareLights();
 	updateLaraAnimations();
 	updateItemsAnimations();
 	updateEffects();
@@ -1266,6 +1312,10 @@ bool Renderer11::drawScene(bool dump)
 	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;  
 
+	// Draw shadow map
+	if (g_Configuration.EnableShadows)
+		drawShadowMap();
+	
 	// Reset GPU state
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 	m_context->RSSetState(m_states->CullCounterClockwise());
@@ -1288,7 +1338,7 @@ bool Renderer11::drawScene(bool dump)
 	drawRooms(false, false);
 	drawRooms(false, true);
 	drawStatics(false);
-	drawLara(false);
+	drawLara(false, false);
 	drawItems(false, false);
 	drawItems(false, true);
 	drawGunFlashes();
@@ -1305,7 +1355,7 @@ bool Renderer11::drawScene(bool dump)
 	drawRooms(true, false);
 	drawRooms(true, true);
 	drawStatics(true);
-	drawLara(true);
+	drawLara(true, false);
 	drawItems(true, false);
 	drawItems(true, true);
 	drawWaterfalls();
@@ -1366,6 +1416,11 @@ bool Renderer11::drawScene(bool dump)
 	printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
 
 	drawAllStrings();
+
+	m_spriteBatch->Begin();
+	RECT rect; rect.top = rect.left = 0; rect.right = rect.bottom = 300;
+	m_spriteBatch->Draw(m_shadowMap->ShaderResourceView, rect, Colors::White);
+	m_spriteBatch->End();
 
 	if (!dump)
 		m_swapChain->Present(0, 0);
@@ -3069,6 +3124,10 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 
 	__int32 numLights = room->Lights.size();
 
+	m_shadowLight = NULL;
+	RendererLight* brightestLight = NULL;
+	float brightest = 0.0f;
+
 	for (__int32 j = 0; j < numLights; j++)
 	{
 		RendererLight* light = &room->Lights[j];
@@ -3091,6 +3150,19 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 			// Check the out radius
 			if (distance > light->Out)
 				continue;
+
+			// If Lara, try to collect shadow casting light
+			if (item->Item->objectNumber == ID_LARA)
+			{
+				float attenuation = 1.0f - distance / light->Out;
+				float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				if (intensity >= brightest)
+				{
+					brightest = intensity;
+					brightestLight = light;
+				}
+			}
 		}     
 		else if (light->Type == LIGHT_TYPE_SPOT)
 		{
@@ -3105,6 +3177,19 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 			// Check the range
 			if (distance > light->Range)
 				continue;
+
+			// If Lara, try to collect shadow casting light
+			if (item->Item->objectNumber == ID_LARA)
+			{
+				float attenuation = 1.0f - distance / light->Range;
+				float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				if (intensity >= brightest)
+				{
+					brightest = intensity;
+					brightestLight = light;
+				}
+			}
 		}
 		else
 		{ 
@@ -3118,6 +3203,11 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 	for (__int32 i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
 	{
 		item->Lights.Add(m_tempItemLights[i]); 
+	}
+
+	if (item->Item->objectNumber == ID_LARA)
+	{
+		m_shadowLight = brightestLight;
 	}
 }
 
@@ -5213,11 +5303,11 @@ __int32 Renderer11::drawInventoryScene()
 	rect.right = ScreenWidth;
 	rect.bottom = ScreenHeight;
 
-	m_lines2DToDraw.Clear();
+	m_lines2DToDraw.Clear(); 
 	m_strings.clear();
 
-	m_nextLine2D = 0;
-
+	m_nextLine2D = 0; 
+	 
 	// Set basic render states
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 	m_context->RSSetState(m_states->CullCounterClockwise());
@@ -5236,7 +5326,7 @@ __int32 Renderer11::drawInventoryScene()
 	}
 	else
 	{
-		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.3f, 0.3f, 0.3f), false);
+		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.2f, 0.2f, 0.2f), false);
 	}
 
 	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -5261,17 +5351,17 @@ __int32 Renderer11::drawInventoryScene()
 
 	__int32 activeRing = g_Inventory->GetActiveRing();
 	__int32 lastRing = 0;
-	for (__int32 k = 0; k < 3; k++)
+	for (__int32 k = 0; k < NUM_INVENTORY_RINGS; k++)
 	{
 		InventoryRing* ring = g_Inventory->GetRing(k);
-		if (!ring->draw || ring->numObjects == 0)
+		if (ring->draw == false || ring->numObjects == 0)
 			continue;
 
 		// Inventory camera
 		if (k == g_Inventory->GetActiveRing())
 		{
-			float cameraY = -384.0f + g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET;
-			float targetY = g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET;
+			float cameraY = -384.0f + (k < 3 ? g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET : 0.0f);
+			float targetY = (k < 3 ? g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET : 0.0f);
 
 			m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(3072.0f, cameraY, 0.0f),
 				Vector3(0.0f, targetY, 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
@@ -5286,6 +5376,12 @@ __int32 Renderer11::drawInventoryScene()
 		float deltaAngle = 360.0f / numObjects;
 		__int32 objectIndex = 0;
 		objectIndex = ring->currentObject;
+
+		// Draw the title of section if needed
+		if (k == INV_RING_CHOOSE_AMMO)
+			PrintString(400, 20, g_GameFlow->GetString(STRING_INV_CHOOSE_AMMO), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+		else if (k == INV_RING_COMBINE)
+			PrintString(400, 20, g_GameFlow->GetString(STRING_INV_COMBINE), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
 		for (__int32 i = 0; i < numObjects; i++)
 		{
@@ -5313,7 +5409,7 @@ __int32 Renderer11::drawInventoryScene()
 
 			__int32 x = 2048.0f * cos(currentAngle * RADIAN);
 			__int32 z = 2048.0f * sin(currentAngle * RADIAN);
-			__int32 y = lastRing * INV_RINGS_OFFSET;
+			__int32 y = (k < 3 ? lastRing * INV_RINGS_OFFSET : 0.0f);
 
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
@@ -5600,6 +5696,29 @@ __int32 Renderer11::drawInventoryScene()
 					__int16 inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
 					char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
 
+					if (g_Inventory->IsCurrentObjectWeapon() && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					{
+						y = 100;
+
+						for (__int32 a = 0; a < ring->numActions; a++)
+						{
+							__int32 stringIndex = 0;
+							if (ring->actions[a] == INV_ACTION_USE) stringIndex = STRING_INV_USE;
+							if (ring->actions[a] == INV_ACTION_COMBINE) stringIndex = STRING_INV_COMBINE;
+							if (ring->actions[a] == INV_ACTION_SEPARE) stringIndex = STRING_INV_SEPARE;
+							if (ring->actions[a] == INV_ACTION_SELECT_AMMO) stringIndex = STRING_INV_CHOOSE_AMMO;
+
+							// Apply and cancel
+							PrintString(400, y, g_GameFlow->GetString(stringIndex),
+								PRINTSTRING_COLOR_WHITE,
+								PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == a ? PRINTSTRING_BLINK : 0));
+
+							y += 30;
+						}
+						
+						drawColoredQuad(300, 80, 200, y + 20 - 80, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+					}
+
 					__int32 quantity = -1;
 					switch (objectNumber)
 					{
@@ -5613,29 +5732,50 @@ __int32 Renderer11::drawInventoryScene()
 						quantity = Lara.numFlares;
 						break;
 					case ID_SHOTGUN_AMMO1_ITEM:
-						quantity = Lara.numShotgunAmmo1;
+						quantity = g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0];
 						if (quantity != -1)
 							quantity /= 6;
 						break;
 					case ID_SHOTGUN_AMMO2_ITEM:
-						quantity = Lara.numShotgunAmmo2;
+						quantity = g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1];
 						if (quantity != -1)
 							quantity /= 6;
 						break;
 					case ID_HK_AMMO_ITEM:
-						quantity = Lara.numHKammo1;
+						quantity = g_LaraExtra.Weapons[WEAPON_HK].Ammo[0];
 						break;
 					case ID_CROSSBOW_AMMO1_ITEM:
-						quantity = Lara.numCrossbowAmmo1;
+						quantity = g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0];
 						break;
 					case ID_CROSSBOW_AMMO2_ITEM:
-						quantity = Lara.numCrossbowAmmo2;
+						quantity = g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[1];
+						break;
+					case ID_CROSSBOW_AMMO3_ITEM:
+						quantity = g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[2];
 						break;
 					case ID_REVOLVER_AMMO_ITEM:
-						quantity = Lara.numRevolverAmmo;
+						quantity = g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0];
 						break;
 					case ID_UZI_AMMO_ITEM:
-						quantity = Lara.numUziAmmo;
+						quantity = g_LaraExtra.Weapons[WEAPON_UZI].Ammo[0];
+						break;
+					case ID_PISTOLS_AMMO_ITEM:
+						quantity = g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[0];
+						break;
+					case ID_GRENADE_AMMO1_ITEM:
+						quantity = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0];
+						break;
+					case ID_GRENADE_AMMO2_ITEM:
+						quantity = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1];
+						break;
+					case ID_GRENADE_AMMO3_ITEM:
+						quantity = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2];
+						break;
+					case ID_HARPOON_AMMO_ITEM:
+						quantity = g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0];
+						break;
+					case ID_ROCKET_LAUNCHER_AMMO_ITEM:
+						quantity = g_LaraExtra.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0];
 						break;
 					case ID_PICKUP_ITEM4:
 						quantity = Savegame.Level.Secrets;
@@ -5687,6 +5827,8 @@ __int32 Renderer11::drawInventoryScene()
 
 bool Renderer11::drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vector4 color)
 {
+	return true;
+
 	float factorW = ScreenWidth / 800.0f;
 	float factorH = ScreenHeight / 600.0f;
 
@@ -6369,6 +6511,233 @@ bool Renderer11::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum,
 
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
 		}
+	}
+
+	return true;
+}
+
+bool Renderer11::drawShadowMap()
+{
+	m_shadowLight = NULL;
+	RendererLight* brightestLight = NULL;
+	float brightest = 0.0f;
+	Vector3 itemPosition = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+
+	for (__int32 k = 0; k < m_roomsToDraw.Size(); k++)
+	{
+		RendererRoom* room = m_roomsToDraw[k];
+		__int32 numLights = room->Lights.size();
+
+		for (__int32 j = 0; j < numLights; j++)
+		{
+			RendererLight* light = &room->Lights[j];
+
+			// Check only lights different from sun
+			if (light->Type == LIGHT_TYPE_SUN)
+			{
+				// Sun is added without checks
+			}
+			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+			{
+				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+				float distance = (itemPosition - lightPosition).Length();
+
+				// Collect only lights nearer than 20 sectors
+				if (distance >= 20 * WALL_SIZE)
+					continue;
+
+				// Check the out radius
+				if (distance > light->Out)
+					continue;
+
+				float attenuation = 1.0f - distance / light->Out;
+				float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				if (intensity >= brightest)
+				{
+					brightest = intensity;
+					brightestLight = light;
+				}
+			}
+			else if (light->Type == LIGHT_TYPE_SPOT)
+			{
+				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+				float distance = (itemPosition - lightPosition).Length();
+
+				// Collect only lights nearer than 20 sectors
+				if (distance >= 20 * WALL_SIZE)
+					continue;
+
+				// Check the range
+				if (distance > light->Range)
+					continue;
+
+				// If Lara, try to collect shadow casting light
+				float attenuation = 1.0f - distance / light->Range;
+				float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				if (intensity >= brightest)
+				{
+					brightest = intensity;
+					brightestLight = light;
+				}
+			}
+			else
+			{
+				// Invalid light type
+				continue;
+			}
+		}
+	}
+
+	m_shadowLight = brightestLight;
+	  
+	if (m_shadowLight == NULL)
+		return true;
+
+	// Reset GPU state
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	// Bind and clear render target
+	m_context->ClearRenderTargetView(m_shadowMap->RenderTargetView, Colors::White);
+	m_context->ClearDepthStencilView(m_shadowMap->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, &m_shadowMap->RenderTargetView, m_shadowMap->DepthStencilView);
+
+	m_context->RSSetViewports(1, &m_shadowMapViewport);
+
+	//drawLara(false, true);
+
+	Vector3 lightPos = Vector3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
+	Vector3 itemPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+	if (lightPos == itemPos)
+		return true;
+
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	// Set shaders
+	m_context->VSSetShader(m_vsShadowMap, NULL, 0);
+	m_context->PSSetShader(m_psShadowMap, NULL, 0);
+	  
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+	  
+	// Set camera matrices
+	Matrix view = Matrix::CreateLookAt(lightPos,
+		itemPos,
+		Vector3(0.0f, -1.0f, 0.0f));
+	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f* RADIAN, 1.0f, 1.0f,
+		m_shadowLight->Out * 1.5f);
+
+	m_stCameraMatrices.View = view.Transpose();
+	m_stCameraMatrices.Projection = projection.Transpose();
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+	  
+	m_stShadowMap.LightViewProjection = (view*projection).Transpose();
+
+	m_stMisc.AlphaTest = true;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+	RendererObject* laraObj = m_moveableObjects[ID_LARA];
+	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
+	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+
+	m_stItem.World = m_LaraWorldMatrix.Transpose();
+	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
+	m_stItem.AmbientLight = room->AmbientLight;
+	memcpy(m_stItem.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
+	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+
+	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	{
+		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
+
+		for (__int32 j = 0; j < 2; j++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
+				m_context->RSSetState(m_states->CullNone());
+			else
+				m_context->RSSetState(m_states->CullCounterClockwise());
+
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
+
+	if (m_moveableObjects[ID_LARA_SKIN_JOINTS] != NULL)
+	{
+		RendererObject* laraSkinJoints = m_moveableObjects[ID_LARA_SKIN_JOINTS];
+
+		for (__int32 k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++)
+		{
+			RendererMesh* mesh = laraSkinJoints->ObjectMeshes[k];
+
+			for (__int32 j = 0; j < 2; j++)
+			{
+				RendererBucket* bucket = &mesh->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+		}
+	}
+
+	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	{
+		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
+
+		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		{
+			RendererBucket* bucket = &mesh->Buckets[j];
+
+			if (bucket->Vertices.size() == 0)
+				continue;
+
+			// Draw vertices
+			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
+
+	// Hairs are pre-transformed
+	Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
+						   Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
+	memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
+	m_stItem.World = Matrix::Identity;
+	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+
+	if (m_moveableObjects[ID_HAIR] != NULL)
+	{
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+			(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
+			m_hairVertices.data(), m_numHairVertices);
+		m_primitiveBatch->End();
 	}
 
 	return true;

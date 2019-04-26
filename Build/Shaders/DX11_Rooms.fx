@@ -27,6 +27,14 @@ cbuffer MiscBuffer : register(b3)
 	int Caustics;
 };
 
+cbuffer CShadowLightBuffer : register(b4)
+{
+	RendererLight Light;
+	float4x4 LightViewProjection;
+	int CastShadows;
+	float3 Padding2;
+};
+
 struct VertexShaderInput
 {
 	float3 Position: POSITION;
@@ -39,17 +47,20 @@ struct VertexShaderInput
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
-	float3 WorldPosition: POSITION;
+	float3 WorldPosition: POSITION0;
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
+	float4 LightPosition: POSITION1;
 };
 
-Texture2D Texture;
-SamplerState Sampler;
+Texture2D Texture : register(t0);
+SamplerState Sampler : register(s0);
 
-Texture2D CausticsTexture;
-//SamplerState Sampler;
+Texture2D CausticsTexture : register(t1);
+
+Texture2D ShadowMap : register(t2);
+SamplerState ShadowMapSampler : register(s1);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -60,6 +71,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = input.Color;
 	output.UV = input.UV;
 	output.WorldPosition = input.Position.xyz;
+	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 
 	return output;
 }
@@ -73,24 +85,45 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float3 colorMul = min(input.Color.xyz, 1.0f) * 2.0f;
 
 	float3 lighting = colorMul.xyz;
+	bool doLights = true;
 
-	for (int i = 0; i < NumLights; i++)
+	/*if (CastShadows)
 	{
-		float3 lightPos = Lights[i].Position.xyz;
-		float3 color = Lights[i].Color.xyz;
-		float radius = Lights[i].Out;
-		float intensity = Lights[i].Intensity;
+		// Transform clip space coords to texture space coords (-1:1 to 0:1)
+		input.LightPosition.x = input.LightPosition.x / 2.0f + 0.5f;
+		input.LightPosition.y = input.LightPosition.y / -2.0f + 0.5f;
 
-		float3 lightVec = (lightPos - input.WorldPosition);
-		float distance = length(lightVec);
-
-		if (distance > radius)
-			continue;
+		// Sample shadow map - point sampler
+		float shadowMapDepth = ShadowMap.Sample(ShadowMapSampler, input.LightPosition.xy).r;
+		return float4(shadowMapDepth, 0, 0, 1);
 		
-		lightVec = normalize(lightVec);
-		float attenuation = (radius - distance) / radius;
+		float realDepth = input.LightPosition.z / input.LightPosition.w;
 
-		lighting += color * intensity * attenuation;
+		// If clip space z value greater than shadow map value then pixel is in shadow
+		if (shadowMapDepth > realDepth)
+			return float4(1, 0, 0, 1);	//doLights = false;
+	}*/
+
+	if (doLights)
+	{
+		for (int i = 0; i < NumLights; i++)
+		{
+			float3 lightPos = Lights[i].Position.xyz;
+			float3 color = Lights[i].Color.xyz;
+			float radius = Lights[i].Out;
+			float intensity = Lights[i].Intensity;
+
+			float3 lightVec = (lightPos - input.WorldPosition);
+			float distance = length(lightVec);
+
+			if (distance > radius)
+				continue;
+
+			lightVec = normalize(lightVec);
+			float attenuation = (radius - distance) / radius;
+
+			lighting += color * intensity * attenuation;
+		}
 	}
 
 	if (Caustics)

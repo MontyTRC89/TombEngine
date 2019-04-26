@@ -75,12 +75,12 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			if ((DbInput & IN_DESELECT || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{ 
 				// Stop all sounds
-				INVENTORY_RESULT inventoryResult = g_Inventory->DoInventory();
+				__int32 inventoryResult = g_Inventory->DoInventory();
 				switch (inventoryResult)
 				{
-				case INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME:
+				case INV_RESULT_LOAD_GAME:
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
-				case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE:
+				case INV_RESULT_EXIT_TO_TILE:
 					return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 				}
 			}
@@ -95,14 +95,14 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		// Is Lara dead?
 		if (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput)
 		{
-			INVENTORY_RESULT inventoryResult = g_Inventory->DoInventory();
+			__int32 inventoryResult = g_Inventory->DoInventory();
 			switch (inventoryResult)
 			{
-			case INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME:
+			case INV_RESULT_NEW_GAME:
 				return GAME_STATUS::GAME_STATUS_NEW_GAME;
-			case INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME:
+			case INV_RESULT_LOAD_GAME:
 				return GAME_STATUS::GAME_STATUS_LOAD_GAME;
-			case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_TO_TILE:
+			case INV_RESULT_EXIT_TO_TILE:
 				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
 			}
 		}
@@ -412,14 +412,14 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	// Load the title level
 	S_LoadLevelFile(0);
 	
-	INVENTORY_RESULT inventoryResult = g_Inventory->DoTitleInventory();
+	__int32 inventoryResult = g_Inventory->DoTitleInventory();
 	switch (inventoryResult)
 	{
-	case INVENTORY_RESULT::INVENTORY_RESULT_NEW_GAME:
+	case INV_RESULT_NEW_GAME:
 		return GAME_STATUS::GAME_STATUS_NEW_GAME;
-	case INVENTORY_RESULT::INVENTORY_RESULT_LOAD_GAME:
+	case INV_RESULT_LOAD_GAME:
 		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
-	case INVENTORY_RESULT::INVENTORY_RESULT_EXIT_GAME:
+	case INV_RESULT_EXIT_GAME:
 		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
 	}
 
