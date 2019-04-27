@@ -1172,6 +1172,7 @@ bool Inventory::DoCombine()
 	// Fill the secondary ring
 	InventoryRing* combineRing = &m_rings[INV_RING_COMBINE];
 	combineRing->draw = true;
+	ring->draw = false;
 	combineRing->numObjects = 0;
 	
 	// Fill the objects ring
@@ -1201,7 +1202,7 @@ bool Inventory::DoCombine()
 
 	combineRing->selectedIndex = 0;
 
-	OpenRing(INV_RING_COMBINE, true);
+	OpenRing(INV_RING_COMBINE, false);
 
 	bool closeObject = false;
 	bool combined = false;
@@ -1302,11 +1303,12 @@ bool Inventory::DoCombine()
 		g_Renderer->SyncRenderer();
 	}
 
-	CloseRing(INV_RING_COMBINE, true);
+	CloseRing(INV_RING_COMBINE, false);
 
 	// Reset secondary GUI
 	m_activeRing = oldRing;
 	combineRing->draw = false;
+	ring->draw = true;
 
 	return combined;
 }
@@ -1340,6 +1342,7 @@ void Inventory::DoSelectAmmo()
 
 	// Fill the secondary ring
 	InventoryRing* ammoRing = &m_rings[INV_RING_CHOOSE_AMMO];
+	ring->draw = false;
 	ammoRing->draw = true;
 	ammoRing->numObjects = 0;
 
@@ -1381,6 +1384,8 @@ void Inventory::DoSelectAmmo()
 	// If no objects then exit 
 	if (ammoRing->numObjects == 0)
 		return;
+	
+	OpenRing(INV_RING_CHOOSE_AMMO, false);
 
 	bool closeObject = false;
 
@@ -1479,9 +1484,12 @@ void Inventory::DoSelectAmmo()
 		g_Renderer->SyncRenderer();
 	}
 
+	CloseRing(INV_RING_CHOOSE_AMMO, false);
+
 	// Reset secondary GUI
 	m_activeRing = INV_RING_WEAPONS;
 	ammoRing->draw = false;
+	ring->draw = true;
 }
 
 void Inventory::UseCurrentItem()
@@ -1930,12 +1938,8 @@ __int32 Inventory::DoTitleInventory()
 					passportResult == INV_RESULT_EXIT_GAME ||
 					passportResult == INV_RESULT_LOAD_GAME)
 				{
-					// Fade out
-					g_Renderer->FadeOut();
-					for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
-						g_Renderer->DrawInventory();
-
-					return passportResult;
+					result = passportResult;
+					break;
 				}
 			}
 
@@ -2892,7 +2896,7 @@ void Inventory::OpenRing(__int32 r, bool animateCamera)
 	float deltaShift = INV_OBJECTS_DISTANCE / numFrames;
 
 	float deltaTilt = 0;
-	m_cameraTilt = 0;
+	m_cameraTilt = INV_CAMERA_TILT;
 	if (animateCamera)
 	{
 		deltaTilt = (INV_CAMERA_ANIMATION_TILT - INV_CAMERA_TILT) / numFrames;
@@ -2927,7 +2931,7 @@ void Inventory::CloseRing(__int32 r, bool animateCamera)
 	float deltaShift = INV_OBJECTS_DISTANCE / numFrames;
 
 	float deltaTilt = 0;
-	m_cameraTilt = 0;
+	m_cameraTilt = INV_CAMERA_TILT;
 	if (animateCamera)
 	{
 		deltaTilt = (INV_CAMERA_ANIMATION_TILT - INV_CAMERA_TILT) / numFrames;
@@ -2945,7 +2949,7 @@ void Inventory::CloseRing(__int32 r, bool animateCamera)
 		g_Renderer->SyncRenderer();
 	}
 
-	m_cameraTilt = INV_CAMERA_ANIMATION_TILT;
+	m_cameraTilt = (animateCamera ? INV_CAMERA_ANIMATION_TILT : INV_CAMERA_TILT);
 
 	ring->distance = 0;
 	ring->rotation = 90;
