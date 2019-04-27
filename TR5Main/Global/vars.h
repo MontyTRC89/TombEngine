@@ -324,6 +324,8 @@
 
 #define WaterfallTextures			ARRAY_(0x00E59720, OBJECT_TEXTURE*, [6])
 #define WaterfallY					ARRAY_(0x00E59760, float, [6])
+#define KeyboardLayout0				ARRAY_(0x00516C3C, __int16, [18])
+#define KeyboardLayout1				ARRAY_(0x00516C60, __int16, [18])
 
 extern bool MonksAttackLara;
 

@@ -248,7 +248,7 @@ struct InventoryRing {
 	__int32 frameIndex;
 	bool draw;
 	__int32 y;
-	char* tempTitle;
+	__int32 titleStringIndex;
 
 	// Special fields for settings and passport
 	__int32 selectedIndex;

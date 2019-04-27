@@ -3,6 +3,7 @@
 #include "winmain.h"
 #include "..\resource.h"
 #include "..\Renderer\Renderer11.h"
+#include "..\Specific\input.h"
 
 #include <CommCtrl.h>
 
@@ -300,6 +301,18 @@ bool __cdecl SaveConfiguration()
 		return false;
 	}
 
+	for (int i = 0; i < 18; i++)
+	{
+		char buffer[6];
+		sprintf(buffer, "Key%d", i);
+
+		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout0[i]) != ERROR_SUCCESS)
+		{
+			RegCloseKey(rootKey);
+			return false;
+		}
+	}
+
 	OptionAutoTarget = g_Configuration.AutoTarget;
 	GlobalMusicVolume = g_Configuration.MusicVolume;
 	GlobalFXVolume = g_Configuration.SfxVolume;
@@ -403,6 +416,21 @@ bool __cdecl LoadConfiguration()
 		return false;
 	}
 
+	for (int i = 0; i < 18; i++)
+	{
+		DWORD tempKey;
+		char buffer[6];
+		sprintf(buffer, "Key%d", i);
+
+		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout0[i]) != ERROR_SUCCESS)
+		{
+			RegCloseKey(rootKey);
+			return false;
+		}
+
+		KeyboardLayout1[i] = (__int16)tempKey;
+	}
+
 	// All configuration values were found, so I can apply configuration to the engine
 	g_Configuration.AutoTarget = autoTarget;
 	g_Configuration.Width = screenWidth;
@@ -424,6 +452,8 @@ bool __cdecl LoadConfiguration()
 	GlobalFXVolume = sfxVolume;
 
 	RegCloseKey(rootKey);
+
+	CheckKeyConflicts();
 
 	return true;
 }

@@ -420,11 +420,11 @@ Inventory::Inventory()
 	m_rings[INV_RING_CHOOSE_AMMO].y = 0;
 	m_rings[INV_RING_COMBINE].y = 0;
 
-	m_rings[INV_RING_PUZZLES].tempTitle = "Puzzles";
-	m_rings[INV_RING_WEAPONS].tempTitle = "Items";
-	m_rings[INV_RING_OPTIONS].tempTitle = "Options";
-	m_rings[INV_RING_CHOOSE_AMMO].tempTitle = "Choose ammo";
-	m_rings[INV_RING_COMBINE].tempTitle = "Combine";
+	m_rings[INV_RING_PUZZLES].titleStringIndex = STRING_INV_TITLE_PUZZLES;
+	m_rings[INV_RING_WEAPONS].titleStringIndex = STRING_INV_TITLE_ITEMS;
+	m_rings[INV_RING_OPTIONS].titleStringIndex = STRING_INV_TITLE_SETTINGS;
+	m_rings[INV_RING_CHOOSE_AMMO].titleStringIndex = STRING_INV_TITLE_CHOOSE_AMMO;
+	m_rings[INV_RING_COMBINE].titleStringIndex = STRING_INV_TITLE_COMBINE;
 }
 
 Inventory::~Inventory()
@@ -1171,8 +1171,6 @@ bool Inventory::DoCombine()
 
 	// Fill the secondary ring
 	InventoryRing* combineRing = &m_rings[INV_RING_COMBINE];
-	combineRing->draw = true;
-	ring->draw = false;
 	combineRing->numObjects = 0;
 	
 	// Fill the objects ring
@@ -1186,20 +1184,44 @@ bool Inventory::DoCombine()
 		// Add piece 1
 		if (currentObject != combination->piece1 && IsObjectPresentInInventory(combination->piece1))
 		{
-			combineRing->objects[combineRing->numObjects++].inventoryObject = combination->piece1;
+			bool found = false;
+			for (__int32 j = 0; j < combineRing->numObjects; j++)
+			{
+				if (combineRing->objects[j].inventoryObject == combination->piece1)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				combineRing->objects[combineRing->numObjects++].inventoryObject = combination->piece1;
 		}
 
 		// Add piece 2
 		if (currentObject != combination->piece2 && IsObjectPresentInInventory(combination->piece2))
 		{
-			combineRing->objects[combineRing->numObjects++].inventoryObject = combination->piece2;
+			bool found = false;
+			for (__int32 j = 0; j < combineRing->numObjects; j++)
+			{
+				if (combineRing->objects[j].inventoryObject == combination->piece2)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				combineRing->objects[combineRing->numObjects++].inventoryObject = combination->piece2;
 		}
 	}
 
 	// If no objects then exit 
 	if (combineRing->numObjects == 0)
+	{
 		return false;
+	}
 
+	ring->draw = false;
+	combineRing->draw = true;
 	combineRing->selectedIndex = 0;
 
 	OpenRing(INV_RING_COMBINE, false);
@@ -2531,7 +2553,163 @@ __int32 Inventory::GetType()
 
 void Inventory::DoControlsSettings()
 {
+	InventoryRing* ring = &m_rings[m_activeRing];
+	ring->frameIndex = 0;
+	ring->selectedIndex = 0;
 
+	PopupObject();
+
+	bool closeObject = false;
+
+	// Do the passport
+	while (true)
+	{
+		// Handle input
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		GameTimer++;
+
+		// Handle input
+		if (DbInput & IN_DESELECT || closeObject)
+		{
+			closeObject = true;
+			break;
+		}
+		/*else if (DbInput & IN_LEFT)
+		{
+			closeObject = false;
+
+			switch (ring->selectedIndex)
+			{
+			case INV_SOUND_ENABLED:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
+
+				break;
+
+			case INV_SOUND_SPECIAL_EFFECTS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
+				break;
+
+			case INV_SOUND_MUSIC_VOLUME:
+				if (ring->Configuration.MusicVolume > 0)
+				{
+					ring->Configuration.MusicVolume--;
+					GlobalMusicVolume = ring->Configuration.MusicVolume;
+				}
+
+				break;
+
+			case INV_SOUND_SFX_VOLUME:
+				if (ring->Configuration.SfxVolume > 0)
+				{
+					ring->Configuration.SfxVolume--;
+					GlobalFXVolume = ring->Configuration.SfxVolume;
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				}
+
+				break;
+			}
+		}
+		else if (DbInput & IN_RIGHT)
+		{
+			closeObject = false;
+
+			switch (ring->selectedIndex)
+			{
+			case INV_SOUND_ENABLED:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
+
+				break;
+
+			case INV_SOUND_SPECIAL_EFFECTS:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
+				break;
+
+			case INV_SOUND_MUSIC_VOLUME:
+				if (ring->Configuration.MusicVolume < 100)
+				{
+					ring->Configuration.MusicVolume++;
+					GlobalMusicVolume = ring->Configuration.MusicVolume;
+				}
+
+				break;
+
+			case INV_SOUND_SFX_VOLUME:
+				if (ring->Configuration.SfxVolume < 100)
+				{
+					ring->Configuration.SfxVolume++;
+					GlobalFXVolume = ring->Configuration.SfxVolume;
+					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				}
+
+				break;
+			}
+		}
+		else if (DbInput & IN_FORWARD)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex > 0)
+				ring->selectedIndex--;
+		}
+		else if (DbInput & IN_BACK)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex < INV_DISPLAY_COUNT)
+				ring->selectedIndex++;
+		}
+		else if (DbInput & IN_SELECT)
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+			if (ring->selectedIndex == INV_DISPLAY_APPLY)
+			{
+				// Save the configuration
+				GlobalMusicVolume = ring->Configuration.MusicVolume;
+				GlobalFXVolume = ring->Configuration.SfxVolume;
+				memcpy(&g_Configuration, &ring->Configuration, sizeof(GameConfiguration));
+				SaveConfiguration();
+
+				// Init or deinit the sound system
+				if (wasSoundEnabled && !g_Configuration.EnableSound)
+					Sound_DeInit();
+				else if (!wasSoundEnabled && g_Configuration.EnableSound)
+					Sound_Init();
+
+				closeObject = true;
+
+				break;
+			}
+			else if (ring->selectedIndex == INV_DISPLAY_CANCEL)
+			{
+				SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+				closeObject = true;
+				GlobalMusicVolume = oldVolume;
+				GlobalFXVolume = oldSfxVolume;
+
+				break;
+			}
+			else
+			{
+
+			}
+		}*/
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	PopoverObject();
 }
 
 void Inventory::DoGraphicsSettings()

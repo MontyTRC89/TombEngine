@@ -146,7 +146,10 @@
 #define TR_KEY_MAIL            0xEC    /* Mail */
 #define TR_KEY_MEDIASELECT     0xED    /* Media Select */
 
+extern char* g_KeyNames[];
+
 #define S_UpdateInput ((__int32 (__cdecl*)()) 0x004A92D0)
+#define CheckKeyConflicts ((__int32 (__cdecl*)()) 0x004ADF40)
 
 void __cdecl InitialiseDirectInput(HWND handle, HINSTANCE instance);
 void __cdecl DI_ReadKeyboard(byte* keys);

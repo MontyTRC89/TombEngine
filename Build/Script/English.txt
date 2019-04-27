@@ -49,7 +49,7 @@ Timex-TMX
 Crowbar
 Use
 Combine
-Separe
+Separate
 Choose ammo
 Select level
 %02d days %02d%02d%02d
@@ -80,6 +80,34 @@ Apply
 Cancel
 Enable sound
 Special effects
+-- Empty 72 --
+-- Empty 73 --
+-- Empty 74 --
+Waterskin 1 (empty)
+Waterskin 2 (empty)
+-- Empty 77 --
+Move forward
+Move backward
+Move left
+Move right
+Duck
+Dash
+Walk
+Jump
+Action
+Draw weapon
+Use flare
+Look
+Roll
+Inventory
+Step left
+Step right
+Items
+Puzzles
+Settings
+Choose ammo
+Combine
+Waiting for key
 
 [Levels]
 Title level

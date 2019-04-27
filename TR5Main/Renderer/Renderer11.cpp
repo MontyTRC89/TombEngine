@@ -5396,7 +5396,8 @@ __int32 Renderer11::drawInventoryScene()
 		else if (k == INV_RING_COMBINE)
 			PrintString(400, 20, g_GameFlow->GetString(STRING_INV_COMBINE), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 **/
-		PrintString(400, 20, activeRing->tempTitle, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+		if (ring->focusState == INV_FOCUS_STATE_NONE)
+			PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
 		for (__int32 i = 0; i < numObjects; i++)
 		{
@@ -5705,6 +5706,40 @@ __int32 Renderer11::drawInventoryScene()
 						y += 30;
 
 						drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+					}
+					/* **************** AUDIO SETTINGS ************* */
+					else if (inventoryItem == INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					{
+						// Draw sound menu
+
+						y = 50;
+
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CONTROLS),
+							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
+
+						y += 25;
+
+						// Enable sound
+						/*PrintString(200, y, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));*/
+
+						for (__int32 k = 0; k < 18; k++)
+						{
+							PrintString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
+									PRINTSTRING_COLOR_WHITE,
+									PRINTSTRING_OUTLINE);
+							PrintString(400, y, g_KeyNames[KeyboardLayout0[k]],
+								PRINTSTRING_COLOR_ORANGE,
+								PRINTSTRING_OUTLINE);
+
+							y += 25;
+						}
+
+						//y += 30;
 					}
 					else
 					{
