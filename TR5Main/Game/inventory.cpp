@@ -413,6 +413,18 @@ Inventory::Inventory()
 	AddCombination(INV_OBJECT_PICKUP4_COMBO1, INV_OBJECT_PICKUP4_COMBO2, INV_OBJECT_PICKUP4, CombinePickup4);
 	AddCombination(INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER, CombineRevolverLasersight);
 	AddCombination(INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER, CombineCrossbowLasersight);
+
+	m_rings[INV_RING_PUZZLES].y = -INV_RINGS_OFFSET;
+	m_rings[INV_RING_WEAPONS].y = 0;
+	m_rings[INV_RING_OPTIONS].y = INV_RINGS_OFFSET;
+	m_rings[INV_RING_CHOOSE_AMMO].y = 0;
+	m_rings[INV_RING_COMBINE].y = 0;
+
+	m_rings[INV_RING_PUZZLES].tempTitle = "Puzzles";
+	m_rings[INV_RING_WEAPONS].tempTitle = "Items";
+	m_rings[INV_RING_OPTIONS].tempTitle = "Options";
+	m_rings[INV_RING_CHOOSE_AMMO].tempTitle = "Choose ammo";
+	m_rings[INV_RING_COMBINE].tempTitle = "Combine";
 }
 
 Inventory::~Inventory()
@@ -447,7 +459,7 @@ void Inventory::LoadObjects(bool isReload)
 	for (__int32 i = 0; i < NUM_INVENTORY_RINGS; i++)
 	{
 		m_rings[i].numObjects = 0;
-		m_rings[i].movement = 0;
+		m_rings[i].rotation = 0;
 		m_rings[i].currentObject = 0;
 		
 		if (!isReload)
@@ -459,7 +471,7 @@ void Inventory::LoadObjects(bool isReload)
 		{
 			m_rings[i].objects[j].inventoryObject = -1;
 			m_rings[i].objects[j].rotation = 0;
-			m_rings[i].objects[j].scale = INV_OBJECT_SCALE;
+			m_rings[i].objects[j].scale = INV_OBJECTS_SCALE;
 		}
 	}
 
@@ -686,7 +698,7 @@ void Inventory::LoadObjects(bool isReload)
 
 	// Reset the objects in inventory
 	ring->numObjects = 0;
-	ring->movement = 0;
+	ring->rotation = 0;
 	ring->currentObject = 0;
 	ring->focusState = INV_FOCUS_STATE_NONE;
 
@@ -761,9 +773,9 @@ __int32 Inventory::DoInventory()
 		return passportResult;
 	}
 
-	m_rings[INV_RING_PUZZLES].draw = true;
+	m_rings[INV_RING_PUZZLES].draw = false;
 	m_rings[INV_RING_WEAPONS].draw = true;
-	m_rings[INV_RING_OPTIONS].draw = true;
+	m_rings[INV_RING_OPTIONS].draw = false;
 	m_rings[INV_RING_COMBINE].draw = false;
 	m_rings[INV_RING_CHOOSE_AMMO].draw = false;
 
@@ -772,7 +784,8 @@ __int32 Inventory::DoInventory()
 	__int32 result = INV_RESULT_NONE;
 
 	g_Renderer->DumpGameScene();
-	g_Renderer->DrawInventory();
+
+	OpenRing(m_activeRing, true);
 
 	while (!ResetFlag)
 	{
@@ -789,26 +802,31 @@ __int32 Inventory::DoInventory()
 
 			// Exit from inventory
 			GlobalEnterInventory = -1;
-			return INV_RESULT_NONE;
+			result = INV_RESULT_NONE;
+			break;
 		}
 		else if (DbInput & IN_FORWARD &&
 			(m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
-			 m_activeRing == INV_RING_OPTIONS))
+				m_activeRing == INV_RING_OPTIONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Go to the upper ring
-			for (__int32 i = 0; i < 8; i++)
+			/*for (__int32 i = 0; i < 8; i++)
 			{
 				m_movement -= 1024.0f;
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
-			}
+			}*/
 
+			__int32 newRing = INV_RING_WEAPONS;
 			if (m_activeRing == INV_RING_WEAPONS)
-				m_activeRing = INV_RING_PUZZLES;
+				newRing = INV_RING_PUZZLES;
 			else
-				m_activeRing = INV_RING_WEAPONS;
+				newRing = INV_RING_WEAPONS;
+
+			SwitchRing(m_activeRing, newRing, -1);
+			m_activeRing = newRing;
 
 			m_movement = 0;
 
@@ -819,17 +837,26 @@ __int32 Inventory::DoInventory()
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Go to the lower ring
-			for (__int32 i = 0; i < 8; i++)
+			/*for (__int32 i = 0; i < 8; i++)
 			{
 				m_movement += 1024.0f;
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
-			}
+			}*/
 
-			if (m_activeRing == INV_RING_WEAPONS)
+			/*if (m_activeRing == INV_RING_WEAPONS)
 				m_activeRing = INV_RING_OPTIONS;
 			else
-				m_activeRing = INV_RING_WEAPONS;
+				m_activeRing = INV_RING_WEAPONS;*/
+
+			__int32 newRing = INV_RING_WEAPONS;
+			if (m_activeRing == INV_RING_WEAPONS)
+				newRing = INV_RING_OPTIONS;
+			else
+				newRing = INV_RING_WEAPONS;
+
+			SwitchRing(m_activeRing, newRing, 1);
+			m_activeRing = newRing;
 
 			m_movement = 0;
 
@@ -840,12 +867,12 @@ __int32 Inventory::DoInventory()
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Change object right
-			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / 8.0f;
-			m_rings[m_activeRing].movement = 0;
+			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
+			m_rings[m_activeRing].rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				m_rings[m_activeRing].movement += deltaAngle;
+				m_rings[m_activeRing].rotation += deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -857,19 +884,19 @@ __int32 Inventory::DoInventory()
 				m_rings[m_activeRing].currentObject++;
 
 			m_rings[m_activeRing].selectedIndex = INV_ACTION_USE;
-			m_rings[m_activeRing].movement = 0;
+			m_rings[m_activeRing].rotation = 0;
 		}
 		else if (DbInput & IN_RIGHT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Change object left
-			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / 8.0f;
-			m_rings[m_activeRing].movement = 0;
+			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
+			m_rings[m_activeRing].rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				m_rings[m_activeRing].movement -= deltaAngle;
+				m_rings[m_activeRing].rotation -= deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -881,7 +908,7 @@ __int32 Inventory::DoInventory()
 				m_rings[m_activeRing].currentObject--;
 
 			m_rings[m_activeRing].selectedIndex = INV_ACTION_USE;
-			m_rings[m_activeRing].movement = 0;
+			m_rings[m_activeRing].rotation = 0;
 		}
 		else if (DbInput & IN_SELECT)
 		{
@@ -943,7 +970,8 @@ __int32 Inventory::DoInventory()
 
 					// Exit from inventory
 					GlobalEnterInventory = -1;
-					return INV_RESULT_USE_ITEM;
+					result = INV_RESULT_USE_ITEM;
+					break;
 				}
 			}
 		}
@@ -951,6 +979,8 @@ __int32 Inventory::DoInventory()
 		g_Renderer->DrawInventory();
 		g_Renderer->SyncRenderer();
 	}
+
+	CloseRing(m_activeRing, true);
 
 	return result;
 }
@@ -1137,7 +1167,7 @@ bool Inventory::DoCombine()
 	__int32 oldRing = m_activeRing;
 
 	// Enable the secondary GUI
-	m_activeRing = INV_RING_COMBINE;
+	//m_activeRing = INV_RING_COMBINE;
 
 	// Fill the secondary ring
 	InventoryRing* combineRing = &m_rings[INV_RING_COMBINE];
@@ -1170,6 +1200,9 @@ bool Inventory::DoCombine()
 		return false;
 
 	combineRing->selectedIndex = 0;
+
+	OpenRing(INV_RING_COMBINE, true);
+
 	bool closeObject = false;
 	bool combined = false;
 
@@ -1196,12 +1229,12 @@ bool Inventory::DoCombine()
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Change object left
-			float deltaAngle = 360.0f / combineRing->numObjects / 8.0f;
-			combineRing->movement = 0;
+			float deltaAngle = 360.0f / combineRing->numObjects / INV_NUM_FRAMES_ROTATE;
+			combineRing->rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				combineRing->movement += deltaAngle;
+				combineRing->rotation += deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -1212,19 +1245,19 @@ bool Inventory::DoCombine()
 			else
 				combineRing->currentObject = combineRing->numObjects - 1;
 
-			combineRing->movement = 0;
+			combineRing->rotation = 0;
 		}
 		else if (DbInput & IN_RIGHT)
 		{
 			closeObject = false;
 
 			// Change object right
-			float deltaAngle = 360.0f / combineRing->numObjects / 8.0f;
-			combineRing->movement = 0;
+			float deltaAngle = 360.0f / combineRing->numObjects / INV_NUM_FRAMES_ROTATE;
+			combineRing->rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				combineRing->movement -= deltaAngle;
+				combineRing->rotation -= deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -1236,7 +1269,7 @@ bool Inventory::DoCombine()
 			else
 				combineRing->currentObject = 0;
 
-			combineRing->movement = 0;
+			combineRing->rotation = 0;
 		}
 		else if (DbInput & IN_SELECT)
 		{
@@ -1254,7 +1287,7 @@ bool Inventory::DoCombine()
 					SoundEffect(SFX_MENU_COMBINE, NULL, 0);
 					combination->combineRoutine(INV_COMBINE_COMBINE);
 					LoadObjects(true);
-					SelectObject(oldRing, combination->combinedObject, 2 * INV_OBJECT_SCALE);
+					SelectObject(oldRing, combination->combinedObject, 2 * INV_OBJECTS_SCALE);
 					closeObject = true;
 					combined = true;
 					break;
@@ -1268,6 +1301,8 @@ bool Inventory::DoCombine()
 		g_Renderer->DrawInventory();
 		g_Renderer->SyncRenderer();
 	}
+
+	CloseRing(INV_RING_COMBINE, true);
 
 	// Reset secondary GUI
 	m_activeRing = oldRing;
@@ -1288,7 +1323,7 @@ bool Inventory::DoSepare()
 			SoundEffect(SFX_MENU_COMBINE, NULL, 0);
 			combination->combineRoutine(INV_COMBINE_SEPARE);
 			LoadObjects(true);
-			SelectObject(m_activeRing, combination->piece1, 2 * INV_OBJECT_SCALE);
+			SelectObject(m_activeRing, combination->piece1, 2 * INV_OBJECTS_SCALE);
 			return true;
 		}
 	}
@@ -1372,12 +1407,12 @@ void Inventory::DoSelectAmmo()
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Change object left
-			float deltaAngle = 360.0f / ammoRing->numObjects / 8.0f;
-			ammoRing->movement = 0;
+			float deltaAngle = 360.0f / ammoRing->numObjects / INV_NUM_FRAMES_ROTATE;
+			ammoRing->rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				ammoRing->movement += deltaAngle;
+				ammoRing->rotation += deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -1388,19 +1423,19 @@ void Inventory::DoSelectAmmo()
 			else
 				ammoRing->currentObject = ammoRing->numObjects - 1;
 
-			ammoRing->movement = 0;
+			ammoRing->rotation = 0;
 		}
 		else if (DbInput & IN_RIGHT)
 		{
 			closeObject = false;
 
 			// Change object right
-			float deltaAngle = 360.0f / ammoRing->numObjects / 8.0f;
-			ammoRing->movement = 0;
+			float deltaAngle = 360.0f / ammoRing->numObjects / INV_NUM_FRAMES_ROTATE;
+			ammoRing->rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				ammoRing->movement -= deltaAngle;
+				ammoRing->rotation -= deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -1412,7 +1447,7 @@ void Inventory::DoSelectAmmo()
 			else
 				ammoRing->currentObject = 0;
 
-			ammoRing->movement = 0;
+			ammoRing->rotation = 0;
 		}
 		else if (DbInput & IN_SELECT)
 		{
@@ -1785,7 +1820,7 @@ void Inventory::InitialiseTitle()
 
 	// Reset the objects in inventory
 	ring->numObjects = 0;
-	ring->movement = 0;
+	ring->rotation = 0;
 	ring->currentObject = 0;
 	ring->focusState = INV_FOCUS_STATE_NONE;
 
@@ -1793,7 +1828,7 @@ void Inventory::InitialiseTitle()
 	{
 		ring->objects[j].inventoryObject = -1;
 		ring->objects[j].rotation = 0;
-		ring->objects[j].scale = INV_OBJECT_SCALE;
+		ring->objects[j].scale = INV_OBJECTS_SCALE;
 	}
 
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_PASSAPORT);
@@ -1825,6 +1860,8 @@ __int32 Inventory::DoTitleInventory()
 	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 		g_Renderer->DrawInventory();
 
+	OpenRing(INV_RING_OPTIONS, true);
+
 	__int32 result = INV_RESULT_NONE;
 
 	while (!ResetFlag)
@@ -1841,12 +1878,12 @@ __int32 Inventory::DoTitleInventory()
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Change object right
-			float deltaAngle = 360.0f / ring->numObjects / 8.0f;
-			ring->movement = 0;
+			float deltaAngle = 360.0f / ring->numObjects / INV_NUM_FRAMES_ROTATE;
+			ring->rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				ring->movement += deltaAngle;
+				ring->rotation += deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -1857,19 +1894,19 @@ __int32 Inventory::DoTitleInventory()
 			else
 				ring->currentObject++;
 
-			ring->movement = 0;
+			ring->rotation = 0;
 		}
 		else if (DbInput & IN_RIGHT)
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
 			// Change object left
-			float deltaAngle = 360.0f / ring->numObjects / 8.0f;
-			ring->movement = 0;
+			float deltaAngle = 360.0f / ring->numObjects / INV_NUM_FRAMES_ROTATE;
+			ring->rotation = 0;
 
-			for (__int32 i = 0; i < 8; i++)
+			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
-				ring->movement -= deltaAngle;
+				ring->rotation -= deltaAngle;
 
 				g_Renderer->DrawInventory();
 				g_Renderer->SyncRenderer();
@@ -1880,7 +1917,7 @@ __int32 Inventory::DoTitleInventory()
 			else
 				ring->currentObject--;
 
-			ring->movement = 0;
+			ring->rotation = 0;
 		}
 		else if (DbInput & IN_SELECT)
 		{
@@ -1915,6 +1952,8 @@ __int32 Inventory::DoTitleInventory()
 		g_Renderer->DrawInventory();
 		g_Renderer->SyncRenderer();
 	}
+
+	CloseRing(INV_RING_OPTIONS, true);
 
 	// Fade out
 	g_Renderer->FadeOut();
@@ -2441,9 +2480,9 @@ __int32	Inventory::PopupObject()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 
-	__int32 steps = 8;
+	__int32 steps = INV_NUM_FRAMES_POPUP;
 	__int32 deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
-	float deltaScale = INV_OBJECT_SCALE / (float)steps;
+	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
 
 	ring->focusState = INV_FOCUS_STATE_POPUP;
 	for (__int32 i = 0; i < steps; i++)
@@ -2463,9 +2502,9 @@ __int32	Inventory::PopoverObject()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 
-	__int32 steps = 8;
+	__int32 steps = INV_NUM_FRAMES_POPUP;
 	__int32 deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
-	float deltaScale = INV_OBJECT_SCALE / (float)steps;
+	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
 
 	ring->focusState = INV_FOCUS_STATE_POPOVER;
 	for (__int32 i = 0; i < steps; i++)
@@ -2837,4 +2876,137 @@ bool Inventory::IsObjectSeparable(__int16 object)
 		if (m_combinations[i].combinedObject == object)
 			return true;
 	return false;
+}
+
+void Inventory::OpenRing(__int32 r, bool animateCamera)
+{
+	InventoryRing* ring = &m_rings[r];
+
+	m_activeRing = r;
+	m_cameraY = ring->y;
+
+	__int32 numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
+	ring->rotation = 90;
+	ring->distance = 0;
+	float deltaAngle = ring->rotation / numFrames;
+	float deltaShift = INV_OBJECTS_DISTANCE / numFrames;
+
+	float deltaTilt = 0;
+	m_cameraTilt = 0;
+	if (animateCamera)
+	{
+		deltaTilt = (INV_CAMERA_ANIMATION_TILT - INV_CAMERA_TILT) / numFrames;
+		m_cameraTilt = INV_CAMERA_ANIMATION_TILT;
+	}	
+
+	for (__int32 i = 0; i < numFrames; i++)
+	{
+		ring->distance += deltaShift;
+		ring->rotation -= deltaAngle;
+
+		m_cameraTilt -= deltaTilt;
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	m_cameraTilt = INV_CAMERA_TILT;
+	m_cameraY = m_rings[r].y;
+	ring->distance = INV_OBJECTS_DISTANCE;
+	ring->rotation = 0;
+}
+
+void Inventory::CloseRing(__int32 r, bool animateCamera)
+{
+	InventoryRing* ring = &m_rings[r];
+
+	__int32 numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
+	ring->rotation = 0;
+	ring->distance = INV_OBJECTS_DISTANCE;
+	float deltaAngle = 90.0f / numFrames;
+	float deltaShift = INV_OBJECTS_DISTANCE / numFrames;
+
+	float deltaTilt = 0;
+	m_cameraTilt = 0;
+	if (animateCamera)
+	{
+		deltaTilt = (INV_CAMERA_ANIMATION_TILT - INV_CAMERA_TILT) / numFrames;
+		m_cameraTilt = INV_CAMERA_TILT;
+	}
+
+	for (__int32 i = 0; i < numFrames; i++)
+	{
+		ring->distance -= deltaShift;
+		ring->rotation += deltaAngle;
+
+		m_cameraTilt += deltaTilt;
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	m_cameraTilt = INV_CAMERA_ANIMATION_TILT;
+
+	ring->distance = 0;
+	ring->rotation = 90;
+}
+
+void Inventory::SwitchRing(__int32 from, __int32 to, float verticalShift)
+{
+	InventoryRing* ring1 = &m_rings[from];
+	InventoryRing* ring2 = &m_rings[to];
+
+	__int32 numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
+
+	ring1->rotation = 0;
+	ring1->distance = INV_OBJECTS_DISTANCE;
+	ring2->rotation = 90;
+	ring2->distance = 0;
+
+	float deltaAngle = 90.0f / numFrames;
+	float deltaShift = INV_OBJECTS_DISTANCE / numFrames;
+	float deltaY = INV_RINGS_OFFSET * verticalShift / numFrames;
+
+	m_cameraTilt = INV_CAMERA_TILT;
+	
+	ring1->draw = true;
+	ring2->draw = false;
+
+	for (__int32 i = 0; i < numFrames; i++)
+	{
+		ring1->distance -= deltaShift;
+		ring1->rotation += deltaAngle;
+
+		ring2->distance += deltaShift;
+		ring2->rotation -= deltaAngle;
+
+		m_cameraY += deltaY;
+
+		if (i >= 2)
+		{
+			ring1->draw = false;
+			ring2->draw = true;
+		}
+
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	ring1->distance = 0;
+	ring1->rotation = 90;
+
+	ring2->distance = INV_OBJECTS_DISTANCE;
+	ring2->rotation = 0;
+
+	m_cameraY = ring2->y;
+}
+
+float Inventory::GetCameraY()
+{
+	return m_cameraY;
+}
+
+float Inventory::GetCameraTilt()
+{
+	return m_cameraTilt;
 }

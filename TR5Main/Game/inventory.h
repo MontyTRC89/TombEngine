@@ -189,8 +189,15 @@ void Inject_Inventory();
 
 // Some rendering parameters
 #define INV_RINGS_OFFSET				8192.0f
-#define INV_OBJECT_SCALE				1.5f
+#define INV_OBJECTS_SCALE				1.5f
 #define INV_SECONDARY_MOVEMENT			200.0f
+#define INV_OBJECTS_DISTANCE			2048.0f
+#define INV_CAMERA_TILT					5.0f
+#define INV_CAMERA_ANIMATION_TILT		60.0f
+#define INV_CAMERA_DISTANCE				3072.0f
+#define INV_NUM_FRAMES_OPEN_CLOSE		12
+#define INV_NUM_FRAMES_ROTATE			8
+#define INV_NUM_FRAMES_POPUP			8
 
 // Action for each object
 #define INV_ACTION_USE					0
@@ -228,16 +235,20 @@ struct InventoryObject {
 	__int32 inventoryObject;
 	__int32 rotation;
 	float scale;
+	__int32 distance;
 };
 
 struct InventoryRing {
 	InventoryObject objects[NUM_INVENTORY_OBJECTS_PER_RING];
 	__int32 numObjects;
 	__int32 currentObject;
-	int movement;
+	__int32 rotation;
+	__int32 distance;
 	__int32 focusState;
 	__int32 frameIndex;
 	bool draw;
+	__int32 y;
+	char* tempTitle;
 
 	// Special fields for settings and passport
 	__int32 selectedIndex;
@@ -320,6 +331,8 @@ private:
 	__int32								m_type;
 	vector<InventoryObjectCombination>	m_combinations;
 	__int32								m_activeGui;
+	float								m_cameraY;
+	float								m_cameraTilt;
 
 public:
 	Inventory();
@@ -360,33 +373,13 @@ public:
 	bool						IsObjectSeparable(__int16 object);
 	void						AddCombination(__int16 piece1, __int16 piece2, __int16 combinedObject, void (*f) (__int32));
 	__int32						GetActiveGui();
-	InventorySecondaryRing*		GetSecondaryRing();
 	void						LoadObjects(bool isReload);
 	void						SelectObject(__int32 ring, __int32 object, float scale);
-
-	// Combine routines
-	/*void						CombinePuzzle1(__int32 action);
-	void						CombinePuzzle2(__int32 action);
-	void						CombinePuzzle3(__int32 action);
-	void						CombinePuzzle4(__int32 action);
-	void						CombinePuzzle5(__int32 action);
-	void						CombinePuzzle6(__int32 action);
-	void						CombinePuzzle7(__int32 action);
-	void						CombinePuzzle8(__int32 action);
-	void						CombineKey1(__int32 action);
-	void						CombineKey2(__int32 action);
-	void						CombineKey3(__int32 action);
-	void						CombineKey4(__int32 action);
-	void						CombineKey5(__int32 action);
-	void						CombineKey6(__int32 action);
-	void						CombineKey7(__int32 action);
-	void						CombineKey8(__int32 action);
-	void						CombinePickup1(__int32 action);
-	void						CombinePickup2(__int32 action);
-	void						CombinePickup3(__int32 action);
-	void						CombinePickup4(__int32 action);
-	void						CombineCrossbow(__int32 action);
-	void						CombineRevolver(__int32 action);*/
+	void						OpenRing(__int32 r, bool animateCamera);
+	void						CloseRing(__int32 r, bool animateCamera);
+	void						SwitchRing(__int32 from, __int32 to, float verticalShift);
+	float						GetCameraY();
+	float						GetCameraTilt();
 };
 
 extern Inventory* g_Inventory;

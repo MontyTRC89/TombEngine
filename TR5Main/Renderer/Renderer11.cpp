@@ -5349,8 +5349,21 @@ __int32 Renderer11::drawInventoryScene()
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
-	__int32 activeRing = g_Inventory->GetActiveRing();
+	InventoryRing* activeRing = g_Inventory->GetRing(g_Inventory->GetActiveRing());
 	__int32 lastRing = 0;
+
+	float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory->GetCameraTilt() * RADIAN);
+	float cameraY = g_Inventory->GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory->GetCameraTilt() * RADIAN);
+	float cameraZ = 0.0f;
+
+	m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
+		Vector3(0.0f, g_Inventory->GetCameraY(), 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
+	m_stCameraMatrices.Projection = Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
+		g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f).Transpose();
+
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
 	for (__int32 k = 0; k < NUM_INVENTORY_RINGS; k++)
 	{
 		InventoryRing* ring = g_Inventory->GetRing(k);
@@ -5358,19 +5371,19 @@ __int32 Renderer11::drawInventoryScene()
 			continue;
 
 		// Inventory camera
-		if (k == g_Inventory->GetActiveRing())
+		/*if (k == g_Inventory->GetActiveRing())
 		{
 			float cameraY = -384.0f + (k < 3 ? g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET : 0.0f);
 			float targetY = (k < 3 ? g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET : 0.0f);
 
-			m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(3072.0f, cameraY, 0.0f),
+			m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(INV_CAMERA_DISTANCE, cameraY, 0.0f),
 				Vector3(0.0f, targetY, 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
 			m_stCameraMatrices.Projection = Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
 				g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f).Transpose();
 
 			updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 			m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-		}
+		}*/
 
 		__int16 numObjects = ring->numObjects;
 		float deltaAngle = 360.0f / numObjects;
@@ -5378,10 +5391,12 @@ __int32 Renderer11::drawInventoryScene()
 		objectIndex = ring->currentObject;
 
 		// Draw the title of section if needed
-		if (k == INV_RING_CHOOSE_AMMO)
+		/*f (k == INV_RING_CHOOSE_AMMO)
 			PrintString(400, 20, g_GameFlow->GetString(STRING_INV_CHOOSE_AMMO), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 		else if (k == INV_RING_COMBINE)
 			PrintString(400, 20, g_GameFlow->GetString(STRING_INV_COMBINE), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+**/
+		PrintString(400, 20, activeRing->tempTitle, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
 		for (__int32 i = 0; i < numObjects; i++)
 		{
@@ -5392,7 +5407,7 @@ __int32 Renderer11::drawInventoryScene()
 			__int16 steps = -objectIndex + ring->currentObject;
 			if (steps < 0) steps += numObjects;
 			currentAngle = steps * deltaAngle;
-			currentAngle += ring->movement;
+			currentAngle += ring->rotation;
 
 			if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory->GetActiveRing())
 			{
@@ -5407,10 +5422,10 @@ __int32 Renderer11::drawInventoryScene()
 			if (ring->objects[objectIndex].rotation > 65536.0f)
 				ring->objects[objectIndex].rotation = 0;
 
-			__int32 x = 2048.0f * cos(currentAngle * RADIAN);
-			__int32 z = 2048.0f * sin(currentAngle * RADIAN);
-			__int32 y = (k < 3 ? lastRing * INV_RINGS_OFFSET : 0.0f);
-
+			__int32 x = ring->distance * cos(currentAngle * RADIAN);
+			__int32 y = g_Inventory->GetRing(k)->y; // (k < 3 ? lastRing * INV_RINGS_OFFSET : 0.0f);
+			__int32 z = ring->distance * sin(currentAngle * RADIAN);
+			
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
 			Matrix translation = Matrix::CreateTranslation(x, y, z);
