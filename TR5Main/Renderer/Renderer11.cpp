@@ -5713,7 +5713,7 @@ __int32 Renderer11::drawInventoryScene()
 							}
 							else
 							{
-								PrintString(400, y, g_KeyNames[KeyboardLayout0[k]],
+								PrintString(400, y, g_KeyNames[KeyboardLayout1[k]],
 									PRINTSTRING_COLOR_ORANGE,
 									PRINTSTRING_OUTLINE);
 							}

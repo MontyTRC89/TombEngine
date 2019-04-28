@@ -95,6 +95,20 @@ void __cdecl DI_ReadKeyboard(byte* keys)
 	for (int i = 0; i < 256; i++)
 		keys[i] = GetAsyncKeyState(MapVirtualKey(i, MAPVK_VSC_TO_VK)) >> 8;
 
+	// Empty the numeric pad keys
+	keys[TR_KEY_DECIMAL] = 0;
+	keys[TR_KEY_NUMPAD0] = 0;
+	keys[TR_KEY_NUMPAD1] = 0;
+	keys[TR_KEY_NUMPAD2] = 0;
+	keys[TR_KEY_NUMPAD3] = 0;
+	keys[TR_KEY_NUMPAD4] = 0;
+	keys[TR_KEY_NUMPAD5] = 0;
+	keys[TR_KEY_NUMPAD6] = 0;
+	keys[TR_KEY_NUMPAD7] = 0;
+	keys[TR_KEY_NUMPAD8] = 0;
+	keys[TR_KEY_NUMPAD9] = 0;
+	
+	// Some keys are not mapped by MapVirtualKey()
 	keys[TR_KEY_LEFT] = GetAsyncKeyState(VK_LEFT) >> 8;
 	keys[TR_KEY_RIGHT] = GetAsyncKeyState(VK_RIGHT) >> 8;
 	keys[TR_KEY_UP] = GetAsyncKeyState(VK_UP) >> 8;
@@ -102,7 +116,9 @@ void __cdecl DI_ReadKeyboard(byte* keys)
 	keys[TR_KEY_PRIOR] = GetAsyncKeyState(VK_PRIOR) >> 8;
 	keys[TR_KEY_NEXT] = GetAsyncKeyState(VK_NEXT) >> 8;
 	keys[TR_KEY_END] = GetAsyncKeyState(VK_END) >> 8;
-	keys[TR_KEY_NUMPAD0] = GetAsyncKeyState(VK_NUMPAD0) >> 8;
+	keys[TR_KEY_HOME] = GetAsyncKeyState(VK_HOME) >> 8;
+	keys[TR_KEY_INSERT] = GetAsyncKeyState(VK_INSERT) >> 8;
+	keys[TR_KEY_DELETE] = GetAsyncKeyState(VK_DELETE) >> 8;
 }
 
 __int32 __cdecl DD_SpinMessageLoopMaybe()

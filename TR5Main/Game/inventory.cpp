@@ -2650,8 +2650,9 @@ void Inventory::DoControlsSettings()
 					g_Renderer->DrawInventory();
 					g_Renderer->SyncRenderer();
 
-					ZeroMemory(KeyMap, 256);
-					DI_ReadKeyboard(KeyMap);
+					SetDebounce = true;
+					S_UpdateInput();
+					SetDebounce = false;
 				}
 			}
 		}
