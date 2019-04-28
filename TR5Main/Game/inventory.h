@@ -380,6 +380,7 @@ public:
 	void						SwitchRing(__int32 from, __int32 to, float verticalShift);
 	float						GetCameraY();
 	float						GetCameraTilt();
+	bool						HasWeaponMultipleAmmos(__int16 object);
 };
 
 extern Inventory* g_Inventory;

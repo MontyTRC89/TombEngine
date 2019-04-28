@@ -811,14 +811,6 @@ __int32 Inventory::DoInventory()
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
-			// Go to the upper ring
-			/*for (__int32 i = 0; i < 8; i++)
-			{
-				m_movement -= 1024.0f;
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
-			}*/
-
 			__int32 newRing = INV_RING_WEAPONS;
 			if (m_activeRing == INV_RING_WEAPONS)
 				newRing = INV_RING_PUZZLES;
@@ -835,19 +827,6 @@ __int32 Inventory::DoInventory()
 		else if (DbInput & IN_BACK && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
-
-			// Go to the lower ring
-			/*for (__int32 i = 0; i < 8; i++)
-			{
-				m_movement += 1024.0f;
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
-			}*/
-
-			/*if (m_activeRing == INV_RING_WEAPONS)
-				m_activeRing = INV_RING_OPTIONS;
-			else
-				m_activeRing = INV_RING_WEAPONS;*/
 
 			__int32 newRing = INV_RING_WEAPONS;
 			if (m_activeRing == INV_RING_WEAPONS)
@@ -866,7 +845,7 @@ __int32 Inventory::DoInventory()
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
-			// Change object right
+			// Change object left
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
 			m_rings[m_activeRing].rotation = 0;
 
@@ -890,7 +869,7 @@ __int32 Inventory::DoInventory()
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
-			// Change object left
+			// Change object right
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
 			m_rings[m_activeRing].rotation = 0;
 
@@ -1030,8 +1009,6 @@ __int32 Inventory::DoWeapon()
 	ring->selectedIndex = 0;
 	ring->numActions = 0;
 
-	PopupObject();
-
 	__int32 result = INV_RESULT_NONE;
 	bool closeObject = false;
 	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
@@ -1039,7 +1016,13 @@ __int32 Inventory::DoWeapon()
 	ring->actions[ring->numActions++] = INV_ACTION_USE;
 	if (IsObjectCombinable(currentObject)) ring->actions[ring->numActions++] = INV_ACTION_COMBINE;
 	if (IsObjectSeparable(currentObject)) ring->actions[ring->numActions++] = INV_ACTION_SEPARE;
-	ring->actions[ring->numActions++] = INV_ACTION_SELECT_AMMO;
+	if (HasWeaponMultipleAmmos(currentObject)) ring->actions[ring->numActions++] = INV_ACTION_SELECT_AMMO;
+
+	// If only use action then select the weapon directly
+	if (ring->numActions == 1)
+		return INV_RESULT_USE_ITEM;
+
+	PopupObject();
 
 	// Do the menu
 	while (true)
@@ -1166,15 +1149,10 @@ bool Inventory::DoCombine()
 	InventoryRing* ring = &m_rings[m_activeRing];
 	__int32 oldRing = m_activeRing;
 
-	// Enable the secondary GUI
-	//m_activeRing = INV_RING_COMBINE;
-
-	// Fill the secondary ring
+	// Fill the objects ring
 	InventoryRing* combineRing = &m_rings[INV_RING_COMBINE];
 	combineRing->numObjects = 0;
-	
-	// Fill the objects ring
-	combineRing->numObjects = 0;
+
 	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
 
 	for (__int32 i = 0; i < m_combinations.size(); i++)
@@ -1245,7 +1223,7 @@ bool Inventory::DoCombine()
 			closeObject = true;
 			break;
 		}
-		else if (DbInput & IN_LEFT)
+		else if (DbInput & IN_LEFT && combineRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1270,7 +1248,7 @@ bool Inventory::DoCombine()
 
 			combineRing->rotation = 0;
 		}
-		else if (DbInput & IN_RIGHT)
+		else if (DbInput & IN_RIGHT && combineRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1327,7 +1305,6 @@ bool Inventory::DoCombine()
 
 	CloseRing(INV_RING_COMBINE, false);
 
-	// Reset secondary GUI
 	m_activeRing = oldRing;
 	combineRing->draw = false;
 	ring->draw = true;
@@ -1338,12 +1315,13 @@ bool Inventory::DoCombine()
 bool Inventory::DoSepare()
 {
 	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+
 	for (__int32 i = 0; i < m_combinations.size(); i++)
 	{
 		InventoryObjectCombination* combination = &m_combinations[i];
 		if (combination->combinedObject == currentObject)
 		{
-			// I can do the separation
+			// Separation can be done
 			SoundEffect(SFX_MENU_COMBINE, NULL, 0);
 			combination->combineRoutine(INV_COMBINE_SEPARE);
 			LoadObjects(true);
@@ -1427,7 +1405,7 @@ void Inventory::DoSelectAmmo()
 			closeObject = true;
 			break;
 		}
-		else if (DbInput & IN_LEFT)
+		else if (DbInput & IN_LEFT && ammoRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -1452,7 +1430,7 @@ void Inventory::DoSelectAmmo()
 
 			ammoRing->rotation = 0;
 		}
-		else if (DbInput & IN_RIGHT)
+		else if (DbInput & IN_RIGHT && ammoRing->numObjects > 1)
 		{
 			closeObject = false;
 
@@ -3191,4 +3169,9 @@ float Inventory::GetCameraY()
 float Inventory::GetCameraTilt()
 {
 	return m_cameraTilt;
+}
+
+bool Inventory::HasWeaponMultipleAmmos(__int16 object)
+{
+	return (object == INV_OBJECT_SHOTGUN || object == INV_OBJECT_CROSSBOW || object == INV_OBJECT_GRENADE_LAUNCHER);
 }
