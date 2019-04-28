@@ -255,6 +255,7 @@ struct InventoryRing {
 	__int32 passportAction;
 	__int32 SelectedVideoMode;
 	GameConfiguration Configuration;
+	bool waitingForKey;
 
 	// Special fields for objects
 	__int32 actions[3];

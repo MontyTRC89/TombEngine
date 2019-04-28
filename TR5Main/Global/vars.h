@@ -326,6 +326,8 @@
 #define WaterfallY					ARRAY_(0x00E59760, float, [6])
 #define KeyboardLayout0				ARRAY_(0x00516C3C, __int16, [18])
 #define KeyboardLayout1				ARRAY_(0x00516C60, __int16, [18])
+#define KeyMap						ARRAY_(0x0086BB8C, byte, [256])
+#define ConflictingKeys				ARRAY_(0x00878C4C, byte, [256])
 
 extern bool MonksAttackLara;
 

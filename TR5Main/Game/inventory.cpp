@@ -2534,6 +2534,7 @@ void Inventory::DoControlsSettings()
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
 	ring->selectedIndex = 0;
+	ring->waitingForKey = false;
 
 	PopupObject();
 
@@ -2552,82 +2553,12 @@ void Inventory::DoControlsSettings()
 		// Handle input
 		if (DbInput & IN_DESELECT || closeObject)
 		{
-			closeObject = true;
+			if (!ring->waitingForKey)
+				closeObject = true;
+			else
+				ring->waitingForKey = false;
+
 			break;
-		}
-		/*else if (DbInput & IN_LEFT)
-		{
-			closeObject = false;
-
-			switch (ring->selectedIndex)
-			{
-			case INV_SOUND_ENABLED:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
-
-				break;
-
-			case INV_SOUND_SPECIAL_EFFECTS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
-				break;
-
-			case INV_SOUND_MUSIC_VOLUME:
-				if (ring->Configuration.MusicVolume > 0)
-				{
-					ring->Configuration.MusicVolume--;
-					GlobalMusicVolume = ring->Configuration.MusicVolume;
-				}
-
-				break;
-
-			case INV_SOUND_SFX_VOLUME:
-				if (ring->Configuration.SfxVolume > 0)
-				{
-					ring->Configuration.SfxVolume--;
-					GlobalFXVolume = ring->Configuration.SfxVolume;
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				}
-
-				break;
-			}
-		}
-		else if (DbInput & IN_RIGHT)
-		{
-			closeObject = false;
-
-			switch (ring->selectedIndex)
-			{
-			case INV_SOUND_ENABLED:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				ring->Configuration.EnableSound = !ring->Configuration.EnableSound;
-
-				break;
-
-			case INV_SOUND_SPECIAL_EFFECTS:
-				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				ring->Configuration.EnableAudioSpecialEffects = !ring->Configuration.EnableAudioSpecialEffects;
-				break;
-
-			case INV_SOUND_MUSIC_VOLUME:
-				if (ring->Configuration.MusicVolume < 100)
-				{
-					ring->Configuration.MusicVolume++;
-					GlobalMusicVolume = ring->Configuration.MusicVolume;
-				}
-
-				break;
-
-			case INV_SOUND_SFX_VOLUME:
-				if (ring->Configuration.SfxVolume < 100)
-				{
-					ring->Configuration.SfxVolume++;
-					GlobalFXVolume = ring->Configuration.SfxVolume;
-					SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				}
-
-				break;
-			}
 		}
 		else if (DbInput & IN_FORWARD)
 		{
@@ -2642,46 +2573,88 @@ void Inventory::DoControlsSettings()
 			closeObject = false;
 
 			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-			if (ring->selectedIndex < INV_DISPLAY_COUNT)
+			if (ring->selectedIndex < NUM_CONTROLS + 2 - 1)
 				ring->selectedIndex++;
-		}
+		}	
 		else if (DbInput & IN_SELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 
-			if (ring->selectedIndex == INV_DISPLAY_APPLY)
+			if (ring->selectedIndex == NUM_CONTROLS)
 			{
-				// Save the configuration
-				GlobalMusicVolume = ring->Configuration.MusicVolume;
-				GlobalFXVolume = ring->Configuration.SfxVolume;
-				memcpy(&g_Configuration, &ring->Configuration, sizeof(GameConfiguration));
 				SaveConfiguration();
-
-				// Init or deinit the sound system
-				if (wasSoundEnabled && !g_Configuration.EnableSound)
-					Sound_DeInit();
-				else if (!wasSoundEnabled && g_Configuration.EnableSound)
-					Sound_Init();
-
 				closeObject = true;
-
 				break;
 			}
-			else if (ring->selectedIndex == INV_DISPLAY_CANCEL)
+			else if (ring->selectedIndex == NUM_CONTROLS + 1)
 			{
-				SoundEffect(SFX_MENU_SELECT, NULL, 0);
-
 				closeObject = true;
-				GlobalMusicVolume = oldVolume;
-				GlobalFXVolume = oldSfxVolume;
-
 				break;
 			}
 			else
 			{
-
+				g_Renderer->DrawInventory();
+				g_Renderer->SyncRenderer();
+				continue;
 			}
-		}*/
+
+		}
+
+		// If RETURN is pressed, then wait for a new key
+		if (KeyMap[TR_KEY_RETURN] & 0x80)
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+			if (!ring->waitingForKey)
+			{
+				ring->waitingForKey = true;
+				
+				TrInput = 0;
+				DbInput = 0;
+				ZeroMemory(KeyMap, 256);
+
+				while (true)
+				{
+					if (DbInput & IN_DESELECT)
+					{
+						ring->waitingForKey = false;
+						break;
+					}
+
+					__int32 selectedKey = 0;
+					for (selectedKey = 0; selectedKey < 256; selectedKey++)
+					{
+						if (KeyMap[selectedKey] & 0x80)
+							break;
+					}
+
+					if (selectedKey == 256)
+						selectedKey = 0;
+
+					if (selectedKey && g_KeyNames[selectedKey])
+					{
+						// Can't rededefine special keys or the inventory will be not usable
+						if (!(selectedKey == TR_KEY_RETURN || selectedKey == TR_KEY_LEFT || selectedKey == TR_KEY_RIGHT ||
+							selectedKey == TR_KEY_UP || selectedKey == TR_KEY_DOWN))
+						{
+							if (selectedKey != TR_KEY_ESCAPE)
+							{
+								KeyboardLayout1[ring->selectedIndex] = selectedKey;
+								CheckKeyConflicts();
+								ring->waitingForKey = false;
+								break;
+							}
+						}
+					}
+
+					g_Renderer->DrawInventory();
+					g_Renderer->SyncRenderer();
+
+					ZeroMemory(KeyMap, 256);
+					DI_ReadKeyboard(KeyMap);
+				}
+			}
+		}
 
 		g_Renderer->DrawInventory();
 		g_Renderer->SyncRenderer();

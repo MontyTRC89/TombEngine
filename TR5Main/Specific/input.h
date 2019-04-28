@@ -146,6 +146,8 @@
 #define TR_KEY_MAIL            0xEC    /* Mail */
 #define TR_KEY_MEDIASELECT     0xED    /* Media Select */
 
+#define NUM_CONTROLS			18
+
 extern char* g_KeyNames[];
 
 #define S_UpdateInput ((__int32 (__cdecl*)()) 0x004A92D0)

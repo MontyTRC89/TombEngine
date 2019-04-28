@@ -5370,32 +5370,12 @@ __int32 Renderer11::drawInventoryScene()
 		if (ring->draw == false || ring->numObjects == 0)
 			continue;
 
-		// Inventory camera
-		/*if (k == g_Inventory->GetActiveRing())
-		{
-			float cameraY = -384.0f + (k < 3 ? g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET : 0.0f);
-			float targetY = (k < 3 ? g_Inventory->GetVerticalOffset() + lastRing * INV_RINGS_OFFSET : 0.0f);
-
-			m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(INV_CAMERA_DISTANCE, cameraY, 0.0f),
-				Vector3(0.0f, targetY, 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
-			m_stCameraMatrices.Projection = Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
-				g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f).Transpose();
-
-			updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-			m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-		}*/
-
 		__int16 numObjects = ring->numObjects;
 		float deltaAngle = 360.0f / numObjects;
 		__int32 objectIndex = 0;
 		objectIndex = ring->currentObject;
 
-		// Draw the title of section if needed
-		/*f (k == INV_RING_CHOOSE_AMMO)
-			PrintString(400, 20, g_GameFlow->GetString(STRING_INV_CHOOSE_AMMO), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
-		else if (k == INV_RING_COMBINE)
-			PrintString(400, 20, g_GameFlow->GetString(STRING_INV_COMBINE), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
-**/
+		// Yellow title
 		if (ring->focusState == INV_FOCUS_STATE_NONE)
 			PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
@@ -5582,7 +5562,7 @@ __int32 Renderer11::drawInventoryScene()
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_DISPLAY),
 							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 						
-						y += 30;
+						y += 25;
 
 						// Screen resolution
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SCREEN_RESOLUTION),
@@ -5597,7 +5577,7 @@ __int32 Renderer11::drawInventoryScene()
 						PrintString(400, y, buffer, PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
-						y += 30;
+						y += 25;
 
 						// Enable dynamic shadows
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SHADOWS),
@@ -5607,7 +5587,7 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
-						y += 30;
+						y += 25;
 
 						// Enable caustics
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_CAUSTICS),
@@ -5617,7 +5597,7 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 
-						y += 30;
+						y += 25;
 
 						// Enable volumetric fog
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG),
@@ -5627,20 +5607,20 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 
-						y += 30;
+						y += 25;
 
 						// Apply and cancel
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_APPLY),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
 						
-						y += 30;
+						y += 25;
 						
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CANCEL),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 
-						y += 30;
+						y += 25;
 
 						drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
@@ -5654,7 +5634,7 @@ __int32 Renderer11::drawInventoryScene()
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_SOUND),
 							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
-						y += 30;
+						y += 25;
 
 						// Enable sound
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
@@ -5664,7 +5644,7 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
-						y += 30;
+						y += 25;
 						
 						// Enable sound special effects
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SPECIAL_SOUND_FX),
@@ -5674,7 +5654,7 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_COLOR_WHITE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
-						y += 30;
+						y += 25;
 
 						// Music volume
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_MUSIC_VOLUME),
@@ -5682,7 +5662,7 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 						drawBar(400, y, 150, 12, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
 
-						y += 30;
+						y += 25;
 
 						// Sound FX volume
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SFX_VOLUME),
@@ -5690,56 +5670,69 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 						drawBar(400, y, 150, 12, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
 
-						y += 30;
+						y += 25;
 
 						// Apply and cancel
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_APPLY),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
-						
-						y += 30;
+
+						y += 25;
 
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CANCEL),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
-					
-						y += 30;
+
+						y += 25;
 
 						drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
-					/* **************** AUDIO SETTINGS ************* */
+					/* **************** CONTROLS SETTINGS ************* */
 					else if (inventoryItem == INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						// Draw sound menu
-
-						y = 50;
+						y = 20;
 
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CONTROLS),
 							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
 						y += 25;
 
-						// Enable sound
-						/*PrintString(200, y, g_GameFlow->GetString(STRING_INV_ENABLE_SOUND),
-							PRINTSTRING_COLOR_ORANGE,
-							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_INV_ENABLED : STRING_INV_DISABLED),
-							PRINTSTRING_COLOR_WHITE,
-							PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));*/
-
 						for (__int32 k = 0; k < 18; k++)
 						{
 							PrintString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
-									PRINTSTRING_COLOR_WHITE,
+								PRINTSTRING_COLOR_WHITE,
+								PRINTSTRING_OUTLINE | (ring->selectedIndex == k ? PRINTSTRING_BLINK : 0) |
+								(ring->waitingForKey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
+
+							if (ring->waitingForKey && k == ring->selectedIndex)
+							{
+								PrintString(400, y, g_GameFlow->GetString(STRING_INV_WAITING_FOR_KEY),
+									PRINTSTRING_COLOR_YELLOW,
+									PRINTSTRING_OUTLINE | PRINTSTRING_BLINK);
+							}
+							else
+							{
+								PrintString(400, y, g_KeyNames[KeyboardLayout0[k]],
+									PRINTSTRING_COLOR_ORANGE,
 									PRINTSTRING_OUTLINE);
-							PrintString(400, y, g_KeyNames[KeyboardLayout0[k]],
-								PRINTSTRING_COLOR_ORANGE,
-								PRINTSTRING_OUTLINE);
+							}
 
 							y += 25;
 						}
 
-						//y += 30;
+						// Apply and cancel
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_APPLY),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == NUM_CONTROLS + 0 ? PRINTSTRING_BLINK : 0));
+
+						y += 25;
+
+						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CANCEL),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == NUM_CONTROLS + 1 ? PRINTSTRING_BLINK : 0));
+
+						y += 25;
 					}
 					else
 					{
@@ -5770,7 +5763,7 @@ __int32 Renderer11::drawInventoryScene()
 								PRINTSTRING_COLOR_WHITE,
 								PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == a ? PRINTSTRING_BLINK : 0));
 
-							y += 30;
+							y += 25;
 						}
 						
 						drawColoredQuad(300, 80, 200, y + 20 - 80, Vector4(0.0f, 0.0f, 0.25f, 0.5f));

@@ -301,12 +301,12 @@ bool __cdecl SaveConfiguration()
 		return false;
 	}
 
-	for (int i = 0; i < 18; i++)
+	for (int i = 0; i < NUM_CONTROLS; i++)
 	{
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout0[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout1[i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
@@ -416,7 +416,7 @@ bool __cdecl LoadConfiguration()
 		return false;
 	}
 
-	for (int i = 0; i < 18; i++)
+	for (int i = 0; i < NUM_CONTROLS; i++)
 	{
 		DWORD tempKey;
 		char buffer[6];
