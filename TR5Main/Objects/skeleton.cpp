@@ -141,7 +141,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 		GetCreatureMood(item, &info, 1);
 
 		if (!(item->meshBits & 0x200))
-			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+			creature->mood = ESCAPE_MOOD;
 		else
 			CreatureMood(item, &info, 1);
 
@@ -230,9 +230,9 @@ void __cdecl SkeletonControl(__int16 itemNum)
 		case 2:
 			creature->flags = 0;
 			creature->LOT.isJumping = false;
-			creature->maximumTurn = creature->mood != MOOD_TYPE::ESCAPE_MOOD ? ANGLE(2) : 0;
+			creature->maximumTurn = creature->mood != ESCAPE_MOOD ? ANGLE(2) : 0;
 			if (item->aiBits & GUARD
-				|| !(GetRandomControl() & 0x1F) && (info.distance > SQUARE(1024) || creature->mood != MOOD_TYPE::ATTACK_MOOD))
+				|| !(GetRandomControl() & 0x1F) && (info.distance > SQUARE(1024) || creature->mood != ATTACK_MOOD))
 			{
 				if (!(GetRandomControl() & 0x3F))
 				{
@@ -285,7 +285,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 				}
 				else
 				{
-					if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+					if (creature->mood == ESCAPE_MOOD)
 					{
 						if (Lara.target == item || !info.ahead || item->hitStatus || !(item->meshBits & 0x200))
 						{
@@ -294,7 +294,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 						}
 						item->goalAnimState = 2;
 					}
-					else if (creature->mood != MOOD_TYPE::BORED_MOOD ||
+					else if (creature->mood != BORED_MOOD ||
 						item->aiBits & FOLLOW &&
 						(creature->reachedGoal ||
 							laraInfo.distance > SQUARE(2048)))
@@ -359,7 +359,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 		case 15:
 			creature->flags = 0;
 			creature->LOT.isJumping = false;
-			creature->maximumTurn = creature->mood != MOOD_TYPE::BORED_MOOD ? 1092 : 364;
+			creature->maximumTurn = creature->mood != BORED_MOOD ? 1092 : 364;
 			if (item->aiBits & PATROL1)
 			{
 				item->goalAnimState = 15;
@@ -383,11 +383,11 @@ void __cdecl SkeletonControl(__int16 itemNum)
 					item->goalAnimState = 2;
 					break;
 				}
-				if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+				if (creature->mood == ESCAPE_MOOD)
 				{
 					item->goalAnimState = 16;
 				}
-				else if (creature->mood != MOOD_TYPE::BORED_MOOD)
+				else if (creature->mood != BORED_MOOD)
 				{
 					if (info.distance >= SQUARE(682))
 					{
@@ -444,7 +444,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 			}
 			else
 			{
-				if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+				if (creature->mood == ESCAPE_MOOD)
 				{
 					if (Lara.target != item && info.ahead && (item->meshBits & 0x200))
 						item->goalAnimState = 2;
@@ -453,7 +453,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 				{
 					item->goalAnimState = 2;
 				}
-				else if (creature->mood != MOOD_TYPE::BORED_MOOD)
+				else if (creature->mood != BORED_MOOD)
 				{
 					if (info.ahead && info.distance < SQUARE(2048))
 					{

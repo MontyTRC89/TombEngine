@@ -2633,11 +2633,6 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 	return true;
 }
 
-void Renderer11::Test()
-{
-	
-}
-
 ID3D11Buffer* Renderer11::createConstantBuffer(__int32 size)
 {
 	ID3D11Buffer* buffer;

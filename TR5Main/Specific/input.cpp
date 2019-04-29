@@ -43,48 +43,6 @@ char* g_KeyNames[] = {
 		"JOY9",		"JOY10",	"JOY11",	"JOY12",	"JOY13",	"JOY14",	"JOY15",	"JOY16"
 };
 
-/*
-int keyMapping[] = {
-	-1,		VK_ESCAPE,	VK_,		"2",		"3",		"4",		"5",		"6",
-	"7",		"8",		"9",		"0",		"-",		"+",		"BKSP",	"TAB",
-	"Q",		"W",		"E",		"R",		"T",		"Y",		"U",		"I",
-	"O",		"P",		"<",		">",		"RET",	"CTRL",	"A",		"S",
-	"D",		"F",		"G",		"H",		"J",		"K",		"L",		";",
-	"'",		"`",		"SHIFT",	"#",		"Z",		"X",		"C",		"V",
-	"B",		"N",		"M",		",",		".",		"/",		"SHIFT",	"PADx",
-	"ALT",	"SPACE",	"CAPS",	-1,		-1,		-1,		-1,		-1,
-
-	-1,		-1,		-1,		-1,		-1,		"NMLK",	-1,		"PAD7",
-	"PAD8",	"PAD9",	"PAD-",	"PAD4",	"PAD5",	"PAD6",	"PAD+",	"PAD1",
-	"PAD2",	"PAD3",	"PAD0",	"PAD.",	-1,		-1,		"\\",		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		"ENTER",	"CTRL",	-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		"SHIFT",	-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		"PAD/",	-1,		-1,
-	"ALT",	-1,		-1,		-1,		-1,		-1,		-1,		-1,
-
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		"HOME",
-	"UP",		"PGUP",	-1,		"LEFT",	-1,		"RIGHT",	-1,		"END",
-	"DOWN",	"PGDN",	"INS",	"DEL",	-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-	-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,
-
-	"JOY1", 	"JOY2",		"JOY3",		"JOY4", 	"JOY5",		"JOY6", 	"JOY7",		"JOY8",
-	"JOY9",		"JOY10",	"JOY11",	"JOY12",	"JOY13",	"JOY14",	"JOY15",	"JOY16"
-};*/
-
 void __cdecl InitialiseDirectInput(HWND handle, HINSTANCE instance)
 {
 	// Dummy function, we don't need DirectInput anymore
@@ -119,6 +77,7 @@ void __cdecl DI_ReadKeyboard(byte* keys)
 	keys[TR_KEY_HOME] = GetAsyncKeyState(VK_HOME) >> 8;
 	keys[TR_KEY_INSERT] = GetAsyncKeyState(VK_INSERT) >> 8;
 	keys[TR_KEY_DELETE] = GetAsyncKeyState(VK_DELETE) >> 8;
+	keys[TR_KEY_NUMPAD0] = GetAsyncKeyState(VK_NUMPAD0) >> 8;
 }
 
 __int32 __cdecl DD_SpinMessageLoopMaybe()

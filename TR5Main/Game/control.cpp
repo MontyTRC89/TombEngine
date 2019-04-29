@@ -54,7 +54,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		
 		// Poll the keyboard and update input variables
 		if (S_UpdateInput() == -1)
-			return GAME_STATUS::GAME_STATUS_NONE;
+			return GAME_STATUS_NONE;
 		
 		// Has Lara control been disabled?
 		if (DisableLaraControl)
@@ -79,16 +79,16 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 				switch (inventoryResult)
 				{
 				case INV_RESULT_LOAD_GAME:
-					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+					return GAME_STATUS_LOAD_GAME;
 				case INV_RESULT_EXIT_TO_TILE:
-					return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+					return GAME_STATUS_EXIT_TO_TITLE;
 				}
 			}
 		}
 
 		// Has level been completed?
 		if (LevelComplete)
-			return GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED;
+			return GAME_STATUS_LEVEL_COMPLETED;
 
 		__int32 oldInput = TrInput;
 		 
@@ -99,11 +99,11 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			switch (inventoryResult)
 			{
 			case INV_RESULT_NEW_GAME:
-				return GAME_STATUS::GAME_STATUS_NEW_GAME;
+				return GAME_STATUS_NEW_GAME;
 			case INV_RESULT_LOAD_GAME:
-				return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+				return GAME_STATUS_LOAD_GAME;
 			case INV_RESULT_EXIT_TO_TILE:
-				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+				return GAME_STATUS_EXIT_TO_TITLE;
 			}
 		}
 
@@ -372,7 +372,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		HealtBarTimer--;
 	}
 
-	return GAME_STATUS::GAME_STATUS_NONE;
+	return GAME_STATUS_NONE;
 }
 
 unsigned __stdcall GameMain(void*)
@@ -416,14 +416,14 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:
-		return GAME_STATUS::GAME_STATUS_NEW_GAME;
+		return GAME_STATUS_NEW_GAME;
 	case INV_RESULT_LOAD_GAME:
-		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+		return GAME_STATUS_LOAD_GAME;
 	case INV_RESULT_EXIT_GAME:
-		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
+		return GAME_STATUS_EXIT_GAME;
 	}
 
-	return GAME_STATUS::GAME_STATUS_NEW_GAME;
+	return GAME_STATUS_NEW_GAME;
 }
 
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame)
@@ -509,9 +509,9 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 		nframes = DrawPhaseGame();
 		result = ControlPhase(nframes, 0);
 
-		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
-			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
-			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
+		if (result == GAME_STATUS_EXIT_TO_TITLE ||
+			result == GAME_STATUS_LOAD_GAME ||
+			result == GAME_STATUS_LEVEL_COMPLETED)
 		{
 			// Here is the only way for exiting from the loop
 			SOUND_Stop();

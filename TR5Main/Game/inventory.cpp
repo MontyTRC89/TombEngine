@@ -2535,10 +2535,13 @@ void Inventory::DoControlsSettings()
 	ring->frameIndex = 0;
 	ring->selectedIndex = 0;
 	ring->waitingForKey = false;
-
+	
 	PopupObject();
 
 	bool closeObject = false;
+
+	// Copy configuration to a temporary object
+	memcpy(&ring->Configuration.KeyboardLayout, &KeyboardLayout1, NUM_CONTROLS);
 
 	// Do the passport
 	while (true)
@@ -2582,7 +2585,9 @@ void Inventory::DoControlsSettings()
 
 			if (ring->selectedIndex == NUM_CONTROLS)
 			{
+				memcpy(KeyboardLayout1, ring->Configuration.KeyboardLayout, NUM_CONTROLS);
 				SaveConfiguration();
+
 				closeObject = true;
 				break;
 			}
@@ -2745,7 +2750,7 @@ void Inventory::DoGraphicsSettings()
 			{
 			case INV_DISPLAY_RESOLUTION:
 				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
-				//if (ring->SelectedVideoMode < adapter->DisplayModes.size() - 1)
+				if (ring->SelectedVideoMode < adapter->DisplayModes.size() - 1)
 					ring->SelectedVideoMode++;
 				break;
 

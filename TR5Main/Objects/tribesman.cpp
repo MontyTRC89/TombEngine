@@ -62,7 +62,7 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 
 		GetCreatureMood(item, &info, VIOLENT);
 		if (creature->enemy == LaraItem && creature->hurtByLara && info.distance > SQUARE(3072) && info.enemyFacing < ANGLE(67) && info.enemyFacing > -ANGLE(67))
-			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+			creature->mood = ESCAPE_MOOD;
 		CreatureMood(item, &info, VIOLENT);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
@@ -75,13 +75,13 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 			creature->maximumTurn = ANGLE(4);
 			creature->flags = 0;
 
-			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 			{
 				creature->maximumTurn = 0;
 				if (GetRandomControl() < 0x100)
 					item->goalAnimState = 2;
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead && !item->hitStatus)
 					item->goalAnimState = 1;
@@ -116,13 +116,13 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 			creature->maximumTurn = ANGLE(4);
 			creature->flags = 0;
 
-			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 			{
 				creature->maximumTurn = 0;
 				if (GetRandomControl() < 0x100)
 					item->goalAnimState = 2;
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead && !item->hitStatus)
 					item->goalAnimState = 1;
@@ -147,7 +147,7 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 			creature->maximumTurn = ANGLE(9);
 			tilt = angle >> 3;
 
-			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 			{
 				creature->maximumTurn >>= 2;
 				if (GetRandomControl() < 0x100)
@@ -158,7 +158,7 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 						item->goalAnimState = 11;
 				}
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 				item->goalAnimState = 3;
 			else if (info.ahead && info.distance < SQUARE(682))
 			{
@@ -176,7 +176,7 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 			creature->maximumTurn = ANGLE(6);
 			tilt = angle >> 2;
 
-			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 			{
 				creature->maximumTurn >>= 2;
 				if (GetRandomControl() < 0x100)
@@ -187,7 +187,7 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 						item->goalAnimState = 11;
 				}
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD && Lara.target != item && info.ahead)
+			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead)
 				item->goalAnimState = 11;
 			else if (info.bite || info.distance < SQUARE(2048))
 			{
@@ -350,12 +350,12 @@ void __cdecl TribesmanDartsControl(__int16 itemNum)
 
 		GetCreatureMood(item, &info, (info.zoneNumber == info.enemyZone ? VIOLENT : TIMID));
 
-		if (item->hitStatus && Lara.poisoned >= 0x100 && creature->mood == MOOD_TYPE::BORED_MOOD)
-			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+		if (item->hitStatus && Lara.poisoned >= 0x100 && creature->mood == BORED_MOOD)
+			creature->mood = ESCAPE_MOOD;
 
 		CreatureMood(item, &info, TIMID);
 
-		angle = CreatureTurn(item, creature->mood == MOOD_TYPE::BORED_MOOD ? ANGLE(2) : creature->maximumTurn);
+		angle = CreatureTurn(item, creature->mood == BORED_MOOD ? ANGLE(2) : creature->maximumTurn);
 		if (info.ahead)
 		{
 			headY = info.angle >> 1;
@@ -387,7 +387,7 @@ void __cdecl TribesmanDartsControl(__int16 itemNum)
 					item->goalAnimState = 11;
 				break;
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead && !item->hitStatus)
 					item->goalAnimState = 1;
@@ -400,7 +400,7 @@ void __cdecl TribesmanDartsControl(__int16 itemNum)
 				item->goalAnimState = 2;
 			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
 				item->goalAnimState = 4;
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x200)
 					item->goalAnimState = 2;
@@ -437,7 +437,7 @@ void __cdecl TribesmanDartsControl(__int16 itemNum)
 				item->goalAnimState = 2;
 			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
 				item->goalAnimState = 1;
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD && GetRandomControl() < 0x200)
+			else if (creature->mood == BORED_MOOD && GetRandomControl() < 0x200)
 				item->goalAnimState = 2;
 			else
 				item->goalAnimState = 3;
@@ -452,9 +452,9 @@ void __cdecl TribesmanDartsControl(__int16 itemNum)
 				item->goalAnimState = 2;
 			else if (Targetable(item, &info) && info.distance < SQUARE(8192))
 				item->goalAnimState = 1;
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 				item->goalAnimState = 3;
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() > 0x200)
 					item->goalAnimState = 2;
@@ -478,9 +478,9 @@ void __cdecl TribesmanDartsControl(__int16 itemNum)
 				item->goalAnimState = 1;
 			if (item->aiBits & GUARD)
 				item->goalAnimState = 11;
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD && Lara.target != item && info.ahead)
+			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead)
 				item->goalAnimState = 11;
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 1;
 			break;
 

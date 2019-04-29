@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include "input.h"
 
 #define REGKEY_ROOT				"Software\\TR5Main\\TR5Main"
 
@@ -62,24 +63,7 @@ typedef struct GameConfiguration {
 	__int32 MaxDrawDistance;
 	__int32 MusicVolume;
 	__int32 SfxVolume;
-	__int32 Key0;
-	__int32 Key1;
-	__int32 Key2;
-	__int32 Key3;
-	__int32 Key4;
-	__int32 Key5;
-	__int32 Key6;
-	__int32 Key7;
-	__int32 Key8;
-	__int32 Key9;
-	__int32 Key10;
-	__int32 Key11;
-	__int32 Key12;
-	__int32 Key13;
-	__int32 Key14;
-	__int32 Key15;
-	__int32 Key16;
-	__int32 Key17;
+	byte KeyboardLayout[NUM_CONTROLS];
 	bool ControlMethod;
 	__int32 JoyDuck;
 	__int32 JoyAction;

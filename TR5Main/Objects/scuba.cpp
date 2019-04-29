@@ -195,7 +195,7 @@ void __cdecl ScubaControl(__int16 itemNumber)
 
 			if (creature->target.y < waterHeight && item->pos.yPos < waterHeight + creature->LOT.fly)
 				item->goalAnimState = 2;
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 				break;
 			else if (shoot)
 				item->goalAnimState = 4;
@@ -207,7 +207,7 @@ void __cdecl ScubaControl(__int16 itemNumber)
 			if (shoot)
 				neck = -info.angle;
 
-			if (!shoot || creature->mood == MOOD_TYPE::ESCAPE_MOOD || (creature->target.y < waterHeight && item->pos.yPos < waterHeight + creature->LOT.fly))
+			if (!shoot || creature->mood == ESCAPE_MOOD || (creature->target.y < waterHeight && item->pos.yPos < waterHeight + creature->LOT.fly))
 				item->goalAnimState = 1;
 			else
 				item->goalAnimState = 3;
@@ -233,7 +233,7 @@ void __cdecl ScubaControl(__int16 itemNumber)
 
 			if (creature->target.y > waterHeight)
 				item->goalAnimState = 1;
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 				break;
 			else if (shoot)
 				item->goalAnimState = 6;
@@ -245,7 +245,7 @@ void __cdecl ScubaControl(__int16 itemNumber)
 			if (shoot)
 				head = info.angle;
 
-			if (!shoot || creature->mood == MOOD_TYPE::ESCAPE_MOOD || creature->target.y > waterHeight)
+			if (!shoot || creature->mood == ESCAPE_MOOD || creature->target.y > waterHeight)
 				item->goalAnimState = 2;
 			else
 				item->goalAnimState = 7;

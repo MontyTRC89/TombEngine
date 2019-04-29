@@ -109,7 +109,7 @@ void __cdecl WildBoarControl(__int16 itemNum)
 
 		GetCreatureMood(item, &info, VIOLENT);
 		if (item->flags)
-			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+			creature->mood = ESCAPE_MOOD;
 		CreatureMood(item, &info, VIOLENT);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
@@ -758,7 +758,7 @@ void __cdecl BatControl(__int16 itemNum)
 
 		GetCreatureMood(item, &info, VIOLENT);
 		if (item->flags)
-			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+			creature->mood = ESCAPE_MOOD;
 		CreatureMood(item, &info, VIOLENT);
 
 		angle = CreatureTurn(item, 3640);
@@ -802,7 +802,7 @@ void __cdecl BatControl(__int16 itemNum)
 			else
 			{
 				item->goalAnimState = 2;
-				creature->mood = MOOD_TYPE::BORED_MOOD;
+				creature->mood = BORED_MOOD;
 			}
 			break;
 
@@ -1068,7 +1068,7 @@ void __cdecl TigerControl(__int16 itemNum)
 		GetCreatureMood(item, &info, 1);
 
 		if (creature->alerted && info.zoneNumber != info.enemyZone)
-			creature->mood = MOOD_TYPE::ESCAPE_MOOD;
+			creature->mood = ESCAPE_MOOD;
 
 		CreatureMood(item, &info, 1);
 
@@ -1080,14 +1080,14 @@ void __cdecl TigerControl(__int16 itemNum)
 			creature->maximumTurn = 0;
 			creature->flags = 0;
 
-			if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead)
 					item->goalAnimState = 1;
 				else
 					item->goalAnimState = 3;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 			{
 				__int16 random = GetRandomControl();
 				if (random < 0x60)
@@ -1113,7 +1113,7 @@ void __cdecl TigerControl(__int16 itemNum)
 		case 2:
 			creature->maximumTurn = ANGLE(3);
 
-			if (creature->mood == MOOD_TYPE::ESCAPE_MOOD || creature->mood == MOOD_TYPE::ATTACK_MOOD)
+			if (creature->mood == ESCAPE_MOOD || creature->mood == ATTACK_MOOD)
 				item->goalAnimState = 3;
 			else if (GetRandomControl() < 0x60)
 			{
@@ -1125,7 +1125,7 @@ void __cdecl TigerControl(__int16 itemNum)
 		case 3:
 			creature->maximumTurn = ANGLE(6);
 
-			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 1;
 			else if (creature->flags && info.ahead)
 				item->goalAnimState = 1;
@@ -1136,12 +1136,12 @@ void __cdecl TigerControl(__int16 itemNum)
 				else
 					item->goalAnimState = 7;
 			}
-			else if (creature->mood != MOOD_TYPE::ATTACK_MOOD && GetRandomControl() < 0x60)
+			else if (creature->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
 			{
 				item->requiredAnimState = 5;
 				item->goalAnimState = 1;
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD && Lara.target != item && info.ahead)
+			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead)
 				item->goalAnimState = 1;
 
 			creature->flags = 0;
@@ -1355,7 +1355,7 @@ void __cdecl RaptorControl(__int16 itemNum)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		if (creature->mood == MOOD_TYPE::BORED_MOOD)
+		if (creature->mood == BORED_MOOD)
 			creature->maximumTurn >>= 1;
 
 		angle = CreatureTurn(item, creature->maximumTurn);
@@ -1378,9 +1378,9 @@ void __cdecl RaptorControl(__int16 itemNum)
 				item->goalAnimState = 8;
 			else if (info.bite && info.distance < SQUARE(1536))
 				item->goalAnimState = 4;
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD && Lara.target != item && info.ahead && !item->hitStatus)
+			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead && !item->hitStatus)
 				item->goalAnimState = 1;
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 2;
 			else
 				item->goalAnimState = 3;
@@ -1390,7 +1390,7 @@ void __cdecl RaptorControl(__int16 itemNum)
 			creature->maximumTurn = ANGLE(2);
 			creature->flags &= ~1;
 
-			if (creature->mood != MOOD_TYPE::BORED_MOOD)
+			if (creature->mood != BORED_MOOD)
 				item->goalAnimState = 1;
 			else if (info.ahead && GetRandomControl() < 0x80)
 			{
@@ -1424,12 +1424,12 @@ void __cdecl RaptorControl(__int16 itemNum)
 						item->goalAnimState = 7;
 				}
 			}
-			else if (info.ahead && creature->mood != MOOD_TYPE::ESCAPE_MOOD && GetRandomControl() < 0x80)
+			else if (info.ahead && creature->mood != ESCAPE_MOOD && GetRandomControl() < 0x80)
 			{
 				item->requiredAnimState = 6;
 				item->goalAnimState = 1;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD || (creature->mood == MOOD_TYPE::ESCAPE_MOOD && Lara.target != item && info.ahead))
+			else if (creature->mood == BORED_MOOD || (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead))
 				item->goalAnimState = 1;
 			break;
 
@@ -1631,13 +1631,13 @@ void EagleControl(__int16 itemNum)
 		{
 		case 7:
 			item->pos.yPos = item->floor;
-			if (creature->mood != MOOD_TYPE::BORED_MOOD)
+			if (creature->mood != BORED_MOOD)
 				item->goalAnimState = 1;
 			break;
 
 		case 2:
 			item->pos.yPos = item->floor;
-			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				break;
 			else
 				item->goalAnimState = 1;
@@ -1648,7 +1648,7 @@ void EagleControl(__int16 itemNum)
 
 			if (item->requiredAnimState)
 				item->goalAnimState = item->requiredAnimState;
-			if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 2;
 			else if (info.ahead && info.distance < SQUARE(512))
 				item->goalAnimState = 6;
@@ -1769,7 +1769,7 @@ void __cdecl BearControl(__int16 itemNum)
 			{
 				item->goalAnimState = item->requiredAnimState;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 			{
 				item->goalAnimState = 0;
 			}
@@ -1786,10 +1786,10 @@ void __cdecl BearControl(__int16 itemNum)
 			{
 				item->goalAnimState = 1;
 			}
-			else if (creature->mood != MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood != BORED_MOOD)
 			{
 				item->goalAnimState = 1;
-				if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+				if (creature->mood == ESCAPE_MOOD)
 				{
 					item->requiredAnimState = 0;
 				}
@@ -1811,7 +1811,7 @@ void __cdecl BearControl(__int16 itemNum)
 				LaraItem->hitStatus = true;
 			}
 
-			if (creature->mood == MOOD_TYPE::BORED_MOOD || LaraItem->hitPoints <= 0)
+			if (creature->mood == BORED_MOOD || LaraItem->hitPoints <= 0)
 			{
 				item->goalAnimState = 1;
 			}
@@ -1840,7 +1840,7 @@ void __cdecl BearControl(__int16 itemNum)
 			{
 				item->goalAnimState = item->requiredAnimState;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD || creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == BORED_MOOD || creature->mood == ESCAPE_MOOD)
 			{
 				item->goalAnimState = 1;
 			}
@@ -1864,12 +1864,12 @@ void __cdecl BearControl(__int16 itemNum)
 			{
 				item->goalAnimState = 4;
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 			{
 				item->goalAnimState = 4;
 				item->requiredAnimState = 0;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD || GetRandomControl() < 0x50)
+			else if (creature->mood == BORED_MOOD || GetRandomControl() < 0x50)
 			{
 				item->requiredAnimState = 5;
 				item->goalAnimState = 4;
@@ -1958,7 +1958,7 @@ void __cdecl WolfControl(__int16 itemNum)
 		case 8:
 			head = 0;
 
-			if (creature->mood == MOOD_TYPE::ESCAPE_MOOD || info.zoneNumber == info.enemyZone)
+			if (creature->mood == ESCAPE_MOOD || info.zoneNumber == info.enemyZone)
 			{
 				item->requiredAnimState = 9;
 				item->goalAnimState = 1;
@@ -1980,7 +1980,7 @@ void __cdecl WolfControl(__int16 itemNum)
 		case 2:
 			creature->maximumTurn = ANGLE(2);
 
-			if (creature->mood != MOOD_TYPE::BORED_MOOD)
+			if (creature->mood != BORED_MOOD)
 			{
 				item->goalAnimState = 5;
 				item->requiredAnimState = 0;
@@ -1995,13 +1995,13 @@ void __cdecl WolfControl(__int16 itemNum)
 		case 9:
 			if (item->requiredAnimState)
 				item->goalAnimState = item->requiredAnimState;
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 				item->goalAnimState = 3;
 			else if (info.distance < SQUARE(345) && info.bite)
 				item->goalAnimState = 12;
-			else if (creature->mood == MOOD_TYPE::STALK_MOOD)
+			else if (creature->mood == STALK_MOOD)
 				item->goalAnimState = 5;
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 1;
 			else
 				item->goalAnimState = 3;
@@ -2016,7 +2016,7 @@ void __cdecl WolfControl(__int16 itemNum)
 				item->goalAnimState = 12;
 			else if (info.distance > SQUARE(3072))
 				item->goalAnimState = 3;
-			else if (creature->mood == MOOD_TYPE::ATTACK_MOOD)
+			else if (creature->mood == ATTACK_MOOD)
 			{
 				if (!info.ahead || info.distance > SQUARE(1536) ||
 					(info.enemyFacing < FRONT_ARC && info.enemyFacing > -FRONT_ARC))
@@ -2027,7 +2027,7 @@ void __cdecl WolfControl(__int16 itemNum)
 				item->requiredAnimState = 7;
 				item->goalAnimState = 9;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 9;
 			break;
 
@@ -2049,12 +2049,12 @@ void __cdecl WolfControl(__int16 itemNum)
 					item->requiredAnimState = 0;
 				}
 			}
-			else if (creature->mood == MOOD_TYPE::STALK_MOOD && info.distance < SQUARE(3072))
+			else if (creature->mood == STALK_MOOD && info.distance < SQUARE(3072))
 			{
 				item->requiredAnimState = 5;
 				item->goalAnimState = 9;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 9;
 			break;
 
@@ -2153,7 +2153,7 @@ void TyrannosaurControl(__int16 itemNum)
 		if (item->touchBits)
 			LaraItem->hitPoints -= (item->currentAnimState == 3) ? 10 : 1;
 
-		creature->flags = (creature->mood != MOOD_TYPE::ESCAPE_MOOD && !info.ahead &&
+		creature->flags = (creature->mood != ESCAPE_MOOD && !info.ahead &&
 			info.enemyFacing > -FRONT_ARC && info.enemyFacing < FRONT_ARC);
 
 		if (!creature->flags && info.distance > SQUARE(1500) && info.distance < SQUARE(4096) && info.bite)
@@ -2166,7 +2166,7 @@ void TyrannosaurControl(__int16 itemNum)
 				item->goalAnimState = item->requiredAnimState;
 			else if (info.distance < SQUARE(1500) && info.bite)
 				item->goalAnimState = 7;
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD || creature->flags)
+			else if (creature->mood == BORED_MOOD || creature->flags)
 				item->goalAnimState = 2;
 			else
 				item->goalAnimState = 3;
@@ -2175,7 +2175,7 @@ void TyrannosaurControl(__int16 itemNum)
 		case 2:
 			creature->maximumTurn = ANGLE(2);
 
-			if (creature->mood != MOOD_TYPE::BORED_MOOD || !creature->flags)
+			if (creature->mood != BORED_MOOD || !creature->flags)
 				item->goalAnimState = 1;
 			else if (info.ahead && GetRandomControl() < 0x200)
 			{
@@ -2196,7 +2196,7 @@ void TyrannosaurControl(__int16 itemNum)
 				item->requiredAnimState = 6;
 				item->goalAnimState = 1;
 			}
-			else if (creature->mood == MOOD_TYPE::BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 				item->goalAnimState = 1;
 			break;
 
@@ -2313,7 +2313,7 @@ void __cdecl ApeControl(__int16 itemNum)
 				item->requiredAnimState = 4;
 				item->goalAnimState = 1;
 			}
-			else if (creature->mood != MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood != ESCAPE_MOOD)
 			{
 				random = (__int16)GetRandomControl();
 				if (random < 0xA0)
@@ -2439,7 +2439,7 @@ void __cdecl RatControl(__int16 itemNum)
 		switch (item->currentAnimState)
 		{
 		case 4:
-			if (creature->mood == MOOD_TYPE::BORED_MOOD || creature->mood == MOOD_TYPE::STALK_MOOD)
+			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
 				__int16 random = (__int16)GetRandomControl();
 				if (random < 0x500)
@@ -2466,7 +2466,7 @@ void __cdecl RatControl(__int16 itemNum)
 		case 1:
 			creature->maximumTurn = ANGLE(6);
 
-			if (creature->mood == MOOD_TYPE::BORED_MOOD || creature->mood == MOOD_TYPE::STALK_MOOD)
+			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
 				random = (__int16)GetRandomControl();
 				if (random < 0x500)

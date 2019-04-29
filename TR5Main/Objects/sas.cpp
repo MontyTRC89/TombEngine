@@ -9,6 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
+#include "..\Game\lara.h"
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
 
@@ -84,13 +85,9 @@ void __cdecl SasControl(__int16 itemNum)
 
 		GetCreatureMood(item, &info, creature->enemy != LaraItem);
 
-		/*if (Lara.bike != -1)
-		{
-			if (v44)
-			{
-				*(_DWORD *)&creature->gapD[1] = 2;
-			}
-		}*/
+		// Vehicle handling
+		if (g_LaraExtra.Vehicle != NO_ITEM && info.bite)
+			creature->mood == ESCAPE_MOOD;
 
 		CreatureMood(item, &info, creature->enemy != LaraItem);
 		angle = CreatureTurn(item, creature->maximumTurn);
@@ -181,16 +178,16 @@ void __cdecl SasControl(__int16 itemNum)
 					}
 					else
 					{
-						if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+						if (creature->mood == ESCAPE_MOOD)
 						{
 							item->goalAnimState = 3;
 						}
 						else
 						{
-							if ((creature->alerted || creature->mood != MOOD_TYPE::BORED_MOOD) && 
+							if ((creature->alerted || creature->mood != BORED_MOOD) && 
 								(!item->hitStatus || !creature->reachedGoal && distance <= 0x400000))
 							{
-								if (creature->mood == MOOD_TYPE::BORED_MOOD || info.distance <= 0x400000)
+								if (creature->mood == BORED_MOOD || info.distance <= 0x400000)
 								{
 									item->goalAnimState = 2;
 									break;
@@ -226,7 +223,7 @@ void __cdecl SasControl(__int16 itemNum)
 				}
 			}
 			else if (Targetable(item, &info)
-				|| creature->mood != MOOD_TYPE::BORED_MOOD
+				|| creature->mood != BORED_MOOD
 				|| !info.ahead
 				|| item->hitStatus
 				/*|| Lara_Bike*/)
@@ -246,7 +243,7 @@ void __cdecl SasControl(__int16 itemNum)
 			}
 			else if (/*!Lara_Bike ||*/ !(item->aiBits & GUARD) && item->aiBits)
 			{
-				if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+				if (creature->mood == ESCAPE_MOOD)
 				{
 					item->goalAnimState = 3;
 				}
@@ -306,7 +303,7 @@ void __cdecl SasControl(__int16 itemNum)
 				item->goalAnimState = 2;
 				break;
 			}
-			if (creature->mood != MOOD_TYPE::ESCAPE_MOOD)
+			if (creature->mood != ESCAPE_MOOD)
 			{
 				if (Targetable(item, &info))
 				{
@@ -314,7 +311,7 @@ void __cdecl SasControl(__int16 itemNum)
 				}
 				else
 				{
-					if (creature->mood != MOOD_TYPE::BORED_MOOD || creature->mood == MOOD_TYPE::STALK_MOOD && 
+					if (creature->mood != BORED_MOOD || creature->mood == STALK_MOOD && 
 						item->aiBits & FOLLOW && info.distance < 0x400000)
 					{
 						item->goalAnimState = 2;
@@ -418,7 +415,7 @@ void __cdecl SasControl(__int16 itemNum)
 		case 6:
 			if (item->currentAnimState == 11 || item->currentAnimState == 13)
 			{
-				if (item->goalAnimState != 1 && item->goalAnimState != 14 && (creature->mood == MOOD_TYPE::ESCAPE_MOOD || !Targetable(item, &info)))
+				if (item->goalAnimState != 1 && item->goalAnimState != 14 && (creature->mood == ESCAPE_MOOD || !Targetable(item, &info)))
 				{
 					item->goalAnimState = item->currentAnimState != 11 ? 14 : 1;
 				}

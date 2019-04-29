@@ -9,6 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
+#include "..\Game\lara.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
@@ -172,6 +173,11 @@ void __cdecl TroopsControl(__int16 itemNum)
 		}
 
 		GetCreatureMood(item, &info, TIMID);
+
+		// Vehicle handling
+		if (g_LaraExtra.Vehicle != NO_ITEM && info.bite)
+			creature->mood == ESCAPE_MOOD;
+
 		CreatureMood(item, &info, TIMID);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
@@ -223,7 +229,7 @@ void __cdecl TroopsControl(__int16 itemNum)
 				item->goalAnimState = 2;
 				joint2 = 0;
 			}
-			else if (creature->mood == MOOD_TYPE::ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 			{
 				item->goalAnimState = 3;
 			}
@@ -325,14 +331,14 @@ void __cdecl TroopsControl(__int16 itemNum)
 				item->goalAnimState = 2;
 				break;
 			}
-			if (creature->mood != MOOD_TYPE::ESCAPE_MOOD)
+			if (creature->mood != ESCAPE_MOOD)
 			{
 				if (Targetable(item, &info))
 				{
 					item->goalAnimState = 2;
 					break;
 				}
-				if (!creature->mood || creature->mood == MOOD_TYPE::STALK_MOOD && 
+				if (!creature->mood || creature->mood == STALK_MOOD && 
 					!(item->aiBits & FOLLOW) && info.distance < SQUARE(2048))
 				{
 					item->goalAnimState = 2;
@@ -428,7 +434,7 @@ void __cdecl TroopsControl(__int16 itemNum)
 
 		case 11:
 			if (item->goalAnimState != 1
-				&& (creature->mood == MOOD_TYPE::ESCAPE_MOOD || 
+				&& (creature->mood == ESCAPE_MOOD || 
 					info.distance > SQUARE(3072) || 
 					!Targetable(item, &info)))
 			{

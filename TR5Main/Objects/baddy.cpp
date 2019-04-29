@@ -9,6 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
+#include "..\Game\lara.h"
 
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
@@ -341,9 +342,9 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		GetCreatureMood(item, &info, VIOLENT);
 
-		// Bike handling
-		//if (Lara.bike != -1 && info.bite)
-		//	currentCreature->mood == MOOD_TYPE::ESCAPE_MOOD;
+		// Vehicle handling
+		if (g_LaraExtra.Vehicle != NO_ITEM && info.bite)
+			currentCreature->mood == ESCAPE_MOOD;
 
 		CreatureMood(item, &info, VIOLENT);
 
@@ -643,7 +644,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 				item->currentAnimState = 0;
 				break;
 			}
-			if (currentCreature->mood == MOOD_TYPE::ATTACK_MOOD &&
+			if (currentCreature->mood == ATTACK_MOOD &&
 				!(currentCreature->jumpAhead) &&
 				info.distance > SQUARE(1024))
 			{
