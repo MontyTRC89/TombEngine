@@ -1650,7 +1650,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	__int32 blockX = 0;
 	__int32 blockY = 0;
 
-	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
+	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG)
 	{
 		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
 	}
@@ -3929,11 +3929,11 @@ void Renderer11::updateLaraAnimations()
 
 		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-		for (__int32 p = 0; p < ((level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG) ? 2 : 1); p++)
+		for (__int32 p = 0; p < ((level->LaraType == LARA_YOUNG) ? 2 : 1); p++)
 		{
 			// We can't use hardware skinning here, however hairs have just a few vertices so 
 			// it's not so bad doing skinning in software
-			if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
+			if (level->LaraType == LARA_YOUNG)
 			{
 				if (p == 1)
 				{
@@ -5376,8 +5376,9 @@ __int32 Renderer11::drawInventoryScene()
 
 		for (__int32 i = 0; i < numObjects; i++)
 		{
+			__int16 inventoryObject = ring->objects[objectIndex].inventoryObject;
 			__int16 objectNumber = g_Inventory->GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
-
+			
 			// Calculate the inventory object position and rotation
 			float currentAngle = 0.0f;
 			__int16 steps = -objectIndex + ring->currentObject;
@@ -5405,7 +5406,7 @@ __int32 Renderer11::drawInventoryScene()
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
 			Matrix translation = Matrix::CreateTranslation(x, y, z);
-			Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384));
+			Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
 			Matrix transform = (scale * rotation) * translation;
 
 			OBJECT_INFO* obj = &Objects[objectNumber];

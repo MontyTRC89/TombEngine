@@ -42,9 +42,9 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		numFrames = 10;
 
 	if (TrackCameraInit)
-		UseSpotCam = 0;
+		UseSpotCam = false;
 
-	SetDebounce = 1;
+	SetDebounce = true;
 
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
 	{
@@ -69,7 +69,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			TrInput = 0;
 
 		// Does the player want to enter inventory?
-		SetDebounce = 0;
+		SetDebounce = false;
 		if (CurrentLevel != 0 && !g_Renderer->IsFading())
 		{
 			if ((DbInput & IN_DESELECT || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
@@ -300,7 +300,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 
 		// Update Lara's ponytails
 		HairControl(0, 0, 0);
-		if (level->LaraType == LARA_DRAW_TYPE::LARA_YOUNG)
+		if (level->LaraType == LARA_YOUNG)
 			HairControl(0, 1, 0);
 
 		if (UseSpotCam)
@@ -388,9 +388,6 @@ unsigned __stdcall GameMain(void*)
 	InitGameMalloc();
 	TIME_Init();
 
-	// TODO: deprecated, to remove because now we have LUA
-	LoadNewStrings();
-	
 	// Execute the LUA gameflow and play the game
 	g_GameFlow->DoGameflow();
 
@@ -1071,8 +1068,8 @@ void __cdecl AnimateWaterfalls()
 			
 			texture->vertices[0].y = y + WaterfallY[i];
 			texture->vertices[1].y = y + WaterfallY[i];
-			texture->vertices[2].y = y + WaterfallY[i] + 0.24609375;
-			texture->vertices[3].y = y + WaterfallY[i] + 0.24609375;
+			texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
+			texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
 
 			if (i < 5)
 			{
@@ -1080,8 +1077,8 @@ void __cdecl AnimateWaterfalls()
 
 				texture->vertices[0].y = y + WaterfallY[i];
 				texture->vertices[1].y = y + WaterfallY[i];
-				texture->vertices[2].y = y + WaterfallY[i] + 0.24609375;
-				texture->vertices[3].y = y + WaterfallY[i] + 0.24609375;
+				texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
+				texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
 			}
 		}
 	}

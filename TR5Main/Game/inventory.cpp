@@ -362,7 +362,7 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_PISTOLS_AMMO] = InventoryObjectDefinition(ID_PISTOLS_AMMO_ITEM, STRING_INV_PISTOLS_AMMO, -1, 0);
 	m_objectsTable[INV_OBJECT_LASERSIGHT] = InventoryObjectDefinition(ID_LASERSIGHT_ITEM, STRING_INV_LASERSIGHT, -1, 0);
 	m_objectsTable[INV_OBJECT_SILENCER] = InventoryObjectDefinition(ID_SILENCER_ITEM, STRING_INV_SILENCER, -1, 0);
-	m_objectsTable[INV_OBJECT_LARGE_MEDIPACK] = InventoryObjectDefinition(ID_BIGMEDI_ITEM, STRING_INV_LARGE_MEDIPACK, -1, 0);
+	m_objectsTable[INV_OBJECT_LARGE_MEDIPACK] = InventoryObjectDefinition(ID_BIGMEDI_ITEM, STRING_INV_LARGE_MEDIPACK, -1, 0x8000);
 	m_objectsTable[INV_OBJECT_SMALL_MEDIPACK] = InventoryObjectDefinition(ID_SMALLMEDI_ITEM, STRING_INV_SMALL_MEDIPACK, -1, 0);
 	m_objectsTable[INV_OBJECT_BINOCULARS] = InventoryObjectDefinition(ID_BINOCULARS_ITEM, STRING_INV_BINOCULARS, -1, 0);
 	m_objectsTable[INV_OBJECT_FLARES] = InventoryObjectDefinition(ID_FLARE_INV_ITEM, STRING_INV_FLARES, -1, 0);
@@ -382,7 +382,7 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2] = InventoryObjectDefinition(ID_CROSSBOW_AMMO2_ITEM, STRING_INV_CROSSBOW_AMMO2, -1, 0);
 	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO3] = InventoryObjectDefinition(ID_CROSSBOW_AMMO3_ITEM, STRING_INV_CROSSBOW_AMMO3, -1, 0);
 	m_objectsTable[INV_OBJECT_PASSAPORT] = InventoryObjectDefinition(ID_INVENTORY_PASSPORT, STRING_INV_PASSPORT, -1, 0);
-	m_objectsTable[INV_OBJECT_KEYS] = InventoryObjectDefinition(ID_INVENTORY_KEYS, STRING_INV_CONTROLS, -1, 0);
+	m_objectsTable[INV_OBJECT_KEYS] = InventoryObjectDefinition(ID_INVENTORY_KEYS, STRING_INV_CONTROLS, -1, 0x4000);
 	m_objectsTable[INV_OBJECT_SUNGLASSES] = InventoryObjectDefinition(ID_INVENTORY_SUNGLASSES, STRING_INV_DISPLAY, -1, 0);
 	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_INV_LARA_HOME, -1, 0);
 	m_objectsTable[INV_OBJECT_HEADPHONES] = InventoryObjectDefinition(ID_INVENTORY_HEADPHONES, STRING_INV_SOUND, -1, 0);
@@ -501,7 +501,7 @@ void Inventory::LoadObjects(bool isReload)
 	}
 
 	// Now fill the rings
-	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_DRAW_TYPE::LARA_YOUNG)
+	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_YOUNG)
 	{
 		// Pistols
 		if (g_LaraExtra.Weapons[WEAPON_PISTOLS].Present)

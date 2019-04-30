@@ -262,19 +262,11 @@ struct InventoryRing {
 	__int32 numActions = 3;
 };
 
-struct InventorySecondaryRing {
-	InventoryObject objects[NUM_INVENTORY_OBJECTS_PER_RING];
-	__int32 numObjects;
-	__int32 currentObject;
-	__int32 movement;
-	__int32 selectedIndex;
-};
-
 struct InventoryObjectDefinition {
 	__int16 objectNumber;
 	__int16 objectName;
 	__int32 meshBits;
-	__int16 rotY;
+	__int32 rotY;
 
 	InventoryObjectDefinition(__int16 objNum, __int16 objName, __int32 bits, __int16 rot)
 	{
@@ -324,7 +316,6 @@ class Inventory
 {
 private:
 	InventoryRing						m_rings[NUM_INVENTORY_RINGS];
-	InventorySecondaryRing				m_secondaryRing;
 	__int32								m_activeRing;
 	__int32								m_movement;
 	float								m_deltaMovement;

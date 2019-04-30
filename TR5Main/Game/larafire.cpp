@@ -111,7 +111,7 @@ void __cdecl LaraGun()
 	{
 		if (TrInput & IN_DRAW)
 			Lara.requestGunType = Lara.lastGunType;
-		else if ((TrInput & IN_FLARE) && (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_DRAW_TYPE::LARA_YOUNG))
+		else if ((TrInput & IN_FLARE) && (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_YOUNG))
 		{
 			if (LaraItem->currentAnimState == 71 && LaraItem->animNumber != 222)
 				return;

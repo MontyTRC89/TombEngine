@@ -127,7 +127,7 @@ typedef struct GameScriptLevel {
 		ResetHub = false;
 		Rumble = false;
 		Weather = WEATHER_NORMAL;
-		LaraType = LARA_DRAW_TYPE::LARA_NORMAL;
+		LaraType = LARA_NORMAL;
 		UnlimitedAir = false;
 	}
 };
