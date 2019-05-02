@@ -99,6 +99,7 @@ using namespace std;
 #define STRING_INV_TITLE_CHOOSE_AMMO	97
 #define STRING_INV_TITLE_COMBINE		98
 #define STRING_INV_WAITING_FOR_KEY		99
+#define STRING_INV_WINDOWED				100
 
 class LanguageScript
 {

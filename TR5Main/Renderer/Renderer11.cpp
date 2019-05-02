@@ -237,26 +237,17 @@ bool Renderer11::EnumerateVideoModes()
 	return true;
 }
 
-bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle)
+bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
 
-	DB_Log(2, "Renderer::Initialise - DLL");
-	printf("Initialising DX11\n");
-
-	CoInitialize(NULL);
-	 
-	ScreenWidth = w;
-	ScreenHeight = h;
-	Windowed = windowed;
-
 	DXGI_SWAP_CHAIN_DESC sd;
-	sd.BufferDesc.Width = ScreenWidth;
-	sd.BufferDesc.Height = ScreenHeight;
+	sd.BufferDesc.Width = w;
+	sd.BufferDesc.Height = h;
 	sd.BufferDesc.RefreshRate.Numerator = refreshRate;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.Windowed = g_Configuration.Windowed;
+	sd.Windowed = windowed;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	sd.OutputWindow = handle;
@@ -266,24 +257,30 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
 	IDXGIDevice* dxgiDevice = NULL;
-	res = m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
+	res = m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)& dxgiDevice);
 	if (FAILED(res))
 		return false;
 
 	IDXGIAdapter* dxgiAdapter = NULL;
-	res = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter);
+	res = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)& dxgiAdapter);
 	if (FAILED(res))
 		return false;
 
 	IDXGIFactory* dxgiFactory = NULL;
-	res = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
+	res = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)& dxgiFactory);
 	if (FAILED(res))
 		return false;
+
+	if (reset)
+		m_swapChain->Release();
 
 	m_swapChain = NULL;
 	res = dxgiFactory->CreateSwapChain(m_device, &sd, &m_swapChain);
 	if (FAILED(res))
 		return false;
+
+	dxgiFactory->MakeWindowAssociation(handle, 0);
+	m_swapChain->SetFullscreenState(!windowed, NULL);
 
 	dxgiDevice->Release();
 	dxgiAdapter->Release();
@@ -301,8 +298,8 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 		return false;
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
-	depthStencilDesc.Width = ScreenWidth;
-	depthStencilDesc.Height = ScreenHeight;
+	depthStencilDesc.Width = w;
+	depthStencilDesc.Height = h;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -330,6 +327,48 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_spriteBatch = new SpriteBatch(m_context);
 	m_gameFont = new SpriteFont(m_device, L"Font.spritefont");
 	m_primitiveBatch = new PrimitiveBatch<RendererVertex>(m_context);
+
+	// Initialise buffers
+	m_renderTarget = RenderTarget2D::Create(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_shadowMap = RenderTarget2D::Create(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
+	
+	// Initialise viewport
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.Width = w;
+	m_viewport.Height = h;
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+
+	m_shadowMapViewport.TopLeftX = 0;
+	m_shadowMapViewport.TopLeftY = 0;
+	m_shadowMapViewport.Width = SHADOW_MAP_SIZE;
+	m_shadowMapViewport.Height = SHADOW_MAP_SIZE;
+	m_shadowMapViewport.MinDepth = 0.0f;
+	m_shadowMapViewport.MaxDepth = 1.0f;
+
+	m_viewportToolkit = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
+		m_viewport.MinDepth, m_viewport.MaxDepth);
+
+	return true;
+}
+
+bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle)
+{
+	HRESULT res;
+
+	DB_Log(2, "Renderer::Initialise - DLL");
+	printf("Initialising DX11\n");
+
+	CoInitialize(NULL);
+	 
+	ScreenWidth = w;
+	ScreenHeight = h;
+	Windowed = windowed;
+
+	if (!initialiseScreen(w, h, refreshRate, windowed, handle, false))
+		return false;
 
 	// Initialise render states
 	m_states = new CommonStates(m_device);
@@ -372,24 +411,6 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_whiteTexture = Texture2D::LoadFromFile(m_device, "WhiteSprite.png");
 	if (m_whiteTexture == NULL)
 		return false;
-
-	// Initialise viewport
-	m_viewport.TopLeftX = 0;
-	m_viewport.TopLeftY = 0;
-	m_viewport.Width = ScreenWidth;
-	m_viewport.Height = ScreenHeight;
-	m_viewport.MinDepth = 0.0f;
-	m_viewport.MaxDepth = 1.0f;
-
-	m_shadowMapViewport.TopLeftX = 0;
-	m_shadowMapViewport.TopLeftY = 0;
-	m_shadowMapViewport.Width = SHADOW_MAP_SIZE;
-	m_shadowMapViewport.Height = SHADOW_MAP_SIZE;
-	m_shadowMapViewport.MinDepth = 0.0f;
-	m_shadowMapViewport.MaxDepth = 1.0f;
-
-	m_viewportToolkit = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
-		m_viewport.MinDepth, m_viewport.MaxDepth);
 
 	// Load shaders
 	ID3D10Blob* blob;
@@ -499,10 +520,6 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
-
-	m_renderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, ScreenWidth, ScreenHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	m_shadowMap = RenderTarget2D::Create(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
 
 	// Preallocate lists
 	m_roomsToDraw.Reserve(NumberRooms);
@@ -2632,7 +2649,7 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 {
 	HRESULT res;
 
-	if (windowed && !Windowed)
+	/*if (windowed && !Windowed)
 	{
 		res = m_swapChain->SetFullscreenState(false, NULL);
 		if (FAILED(res))
@@ -2668,6 +2685,18 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 		if (mode->Width == width && mode->Height == height)
 			break;
 	}
+
+
+	ID3D11RenderTargetView* nullViews[] = { nullptr };
+	m_context->OMSetRenderTargets(ARRAYSIZE(nullViews), nullViews, nullptr);
+	m_backBufferRTV->Release(); // Microsoft::WRL::ComPtr here does a Release();
+	m_depthStencilView->Release();
+	m_context->Flush();
+
+	res = m_swapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+
+
 
 	res = m_swapChain->ResizeTarget(mode);
 	if (FAILED(res))
@@ -2736,6 +2765,63 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 	m_spriteBatch = new SpriteBatch(m_context);
 	m_gameFont = new SpriteFont(m_device, L"Font.spritefont");
 	m_primitiveBatch = new PrimitiveBatch<RendererVertex>(m_context);
+
+	ScreenWidth = width;
+	ScreenHeight = height;
+	Windowed = windowed;*/
+
+	ID3D11RenderTargetView* nullViews[] = { nullptr };
+	m_context->OMSetRenderTargets(0, nullViews, NULL);
+
+	DX11_DELETE(m_renderTarget);
+	DX11_DELETE(m_dumpScreenRenderTarget);
+	DX11_DELETE(m_shadowMap);
+	DX11_DELETE(m_gameFont);
+	DX11_DELETE(m_spriteBatch);
+	DX11_DELETE(m_primitiveBatch);
+
+	m_backBufferTexture->Release();
+	m_backBufferRTV->Release();
+	m_depthStencilView->Release();
+	m_depthStencilTexture->Release();
+	m_context->Flush();
+	m_context->ClearState();
+
+	//res = m_swapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	/*res = m_swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+	if (FAILED(res))
+		return false;*/
+
+	IDXGIOutput* output;
+	res = m_swapChain->GetContainingOutput(&output);
+	if (FAILED(res))
+		return false;
+
+	DXGI_SWAP_CHAIN_DESC scd;
+	res = m_swapChain->GetDesc(&scd);
+	if (FAILED(res))
+		return false;
+
+	UINT numModes = 1024;
+	DXGI_MODE_DESC modes[1024];
+	res = output->GetDisplayModeList(scd.BufferDesc.Format, 0, &numModes, modes);
+	if (FAILED(res))
+		return false;
+
+	DXGI_MODE_DESC* mode = &modes[0];
+	for (__int32 i = 0; i < numModes; i++)
+	{
+		mode = &modes[i];
+		if (mode->Width == width && mode->Height == height)
+			break;
+	}
+
+	res = m_swapChain->ResizeTarget(mode);
+	if (FAILED(res))
+		return false;
+
+	if (!initialiseScreen(width, height, frequency, windowed, WindowsHandle, true))
+		return false;
 
 	ScreenWidth = width;
 	ScreenHeight = height;
@@ -5686,46 +5772,56 @@ __int32 Renderer11::drawInventoryScene()
 
 						y += 25;
 
+						// Windowed mode
+						PrintString(200, y, g_GameFlow->GetString(STRING_INV_WINDOWED),
+							PRINTSTRING_COLOR_ORANGE,
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.Windowed ? STRING_INV_ENABLED : STRING_INV_DISABLED),
+							PRINTSTRING_COLOR_WHITE,
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+
+						y += 25;
+
 						// Enable dynamic shadows
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_SHADOWS),
 							PRINTSTRING_COLOR_ORANGE,
-							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
-							PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 
 						y += 25;
 
 						// Enable caustics
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_CAUSTICS),
 							PRINTSTRING_COLOR_ORANGE,
-							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
-							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 
 						y += 25;
 
 						// Enable volumetric fog
 						PrintString(200, y, g_GameFlow->GetString(STRING_INV_VOLUMETRIC_FOG),
 							PRINTSTRING_COLOR_ORANGE,
-							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
 						PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_INV_ENABLED : STRING_INV_DISABLED),
 							PRINTSTRING_COLOR_WHITE,
-							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
 
 						y += 25;
 
 						// Apply and cancel
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_APPLY),
 							PRINTSTRING_COLOR_ORANGE,
-							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 						
 						y += 25;
 						
 						PrintString(400, y, g_GameFlow->GetString(STRING_INV_CANCEL),
 							PRINTSTRING_COLOR_ORANGE,
-							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
+							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 6 ? PRINTSTRING_BLINK : 0));
 
 						y += 25;
 

@@ -108,6 +108,7 @@ Settings
 Choose ammo
 Combine
 Waiting for key
+Windowed
 
 [Levels]
 Title level

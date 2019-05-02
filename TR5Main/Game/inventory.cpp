@@ -2726,6 +2726,11 @@ void Inventory::DoGraphicsSettings()
 
 				break;
 
+			case INV_DISPLAY_WINDOWED:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.Windowed = !ring->Configuration.Windowed;
+				break;
+
 			case INV_DISPLAY_SHADOWS:
 				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 				ring->Configuration.EnableShadows = !ring->Configuration.EnableShadows;
@@ -2752,6 +2757,11 @@ void Inventory::DoGraphicsSettings()
 				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 				if (ring->SelectedVideoMode < adapter->DisplayModes.size() - 1)
 					ring->SelectedVideoMode++;
+				break;
+
+			case INV_DISPLAY_WINDOWED:
+				SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+				ring->Configuration.Windowed = !ring->Configuration.Windowed;
 				break;
 
 			case INV_DISPLAY_SHADOWS:
@@ -2797,6 +2807,7 @@ void Inventory::DoGraphicsSettings()
 				ring->Configuration.Width = mode->Width;
 				ring->Configuration.Height = mode->Height;
 				ring->Configuration.RefreshRate = mode->RefreshRate;
+
 				memcpy(&g_Configuration, &ring->Configuration, sizeof(GameConfiguration));
 				SaveConfiguration();
 

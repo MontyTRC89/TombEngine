@@ -169,12 +169,13 @@ void Inject_Inventory();
 
 // Graphics settings
 #define INV_DISPLAY_RESOLUTION			0
-#define INV_DISPLAY_SHADOWS				1
-#define INV_DISPLAY_CAUSTICS			2
-#define INV_DISPLAY_VOLUMETRIC_FOG		3
-#define INV_DISPLAY_APPLY				4
-#define INV_DISPLAY_CANCEL				5
-#define INV_DISPLAY_COUNT				6
+#define INV_DISPLAY_WINDOWED			1
+#define INV_DISPLAY_SHADOWS				2
+#define INV_DISPLAY_CAUSTICS			3
+#define INV_DISPLAY_VOLUMETRIC_FOG		4
+#define INV_DISPLAY_APPLY				5
+#define INV_DISPLAY_CANCEL				6
+#define INV_DISPLAY_COUNT				7
 
 // Sound settings
 #define INV_SOUND_ENABLED				0
