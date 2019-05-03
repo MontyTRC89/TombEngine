@@ -247,6 +247,8 @@ bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, boo
 	sd.BufferDesc.RefreshRate.Numerator = refreshRate;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
 	sd.Windowed = windowed;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -255,7 +257,7 @@ bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, boo
 	sd.SampleDesc.Quality = 0;
 	sd.BufferCount = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-
+	
 	IDXGIDevice* dxgiDevice = NULL;
 	res = m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)& dxgiDevice);
 	if (FAILED(res))
@@ -272,7 +274,11 @@ bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, boo
 		return false;
 
 	if (reset)
+	{
+		// Always return to windowed mode otherwise crash will happen
+		m_swapChain->SetFullscreenState(false, NULL);
 		m_swapChain->Release();
+	}
 
 	m_swapChain = NULL;
 	res = dxgiFactory->CreateSwapChain(m_device, &sd, &m_swapChain);
@@ -280,7 +286,7 @@ bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, boo
 		return false;
 
 	dxgiFactory->MakeWindowAssociation(handle, 0);
-	m_swapChain->SetFullscreenState(!windowed, NULL);
+	res = m_swapChain->SetFullscreenState(!windowed, NULL);
 
 	dxgiDevice->Release();
 	dxgiAdapter->Release();
@@ -349,7 +355,22 @@ bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, boo
 	m_shadowMapViewport.MaxDepth = 1.0f;
 
 	m_viewportToolkit = new Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
-		m_viewport.MinDepth, m_viewport.MaxDepth);
+									 m_viewport.MinDepth, m_viewport.MaxDepth);
+
+	if (windowed)
+	{
+		SetWindowLong(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, g_Configuration.Width, g_Configuration.Height,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	}
+	else
+	{
+		SetWindowLong(WindowsHandle, GWL_STYLE, WS_POPUPWINDOW);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	}
+
+	UpdateWindow(handle);
 
 	return true;
 }

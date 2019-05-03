@@ -197,15 +197,12 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_GameFlow = new GameFlow(&luaState);
 	LoadScript();
 
-	//g_GameFlow->ExecuteScript("Scripts\\English.lua");
-	//g_GameFlow->ExecuteScript("Scripts\\Settings.lua");
-	//g_GameFlow->ExecuteScript("Scripts\\Gameflow.lua");
-
 	g_GameScript = new GameScript(&luaState);
 
 	// Initialise chunks for savegames
 	SaveGame::Start();
 
+	// Initialise main window
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = NULL;
 	App.WindowClass.lpszMenuName = NULL;
@@ -241,15 +238,6 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 		LoadConfiguration();
 	}
 
-	/*g_Configuration.Width = 1366;
-	g_Configuration.Height = 768;
-	g_Configuration.Windowed = false;
-
-	g_Configuration.Width = 1920;
-	g_Configuration.Height = 1080;
-	g_Configuration.Windowed = false;*/
-
-
 	tagRECT Rect;
 
 	Rect.left = 0;
@@ -282,6 +270,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	PhdWidth = g_Configuration.Width;
 	PhdHeight = g_Configuration.Height;
+	WindowsHandle = App.WindowHandle;
 
 	// Initialise the renderer
 	g_Renderer->Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, 
@@ -294,23 +283,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	// Initialise the new inventory
 	g_Inventory = new Inventory();
 
-	//SetWindowPos(App.WindowHandle, 0, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-
-	WindowsHandle = App.WindowHandle;
-
-	if (g_Configuration.Windowed)
-	{
-		SetWindowLong(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, g_Configuration.Width, g_Configuration.Height,
-			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-	}
-	else
-	{
-		SetWindowLong(WindowsHandle, GWL_STYLE, WS_POPUPWINDOW);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, 0, 0,
-			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-	}
-
+	
 	App.bNoFocus = false;
 	App.isInScene = false;
 
