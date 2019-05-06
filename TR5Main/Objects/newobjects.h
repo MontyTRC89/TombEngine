@@ -45,14 +45,18 @@ __int32 __cdecl GetWaterSurface(__int32 x, __int32 y, __int32 z, __int16 roomNum
 void __cdecl ShootHarpoon(ITEM_INFO* frogman, __int32 x, __int32 y, __int32 z, __int16 speed, __int16 yRot, __int16 roomNumber);
 void __cdecl HarpoonControl(__int16 itemNum);
 void __cdecl ScubaControl(__int16 itemNumber);
-void InitialiseEagle(__int16 itemNum);
-void EagleControl(__int16 itemNum);
+void __cdecl InitialiseEagle(__int16 itemNum);
+void __cdecl EagleControl(__int16 itemNum);
 void __cdecl TribemanAxeControl(__int16 itemNum);
 void __cdecl TribesmanShotDart(ITEM_INFO* item);
 void __cdecl TribesmanDartsControl(__int16 itemNum);
-void __cdecl ControlSpikeWall(__int16 itemNum);
-void LaraTyrannosaurDeath(ITEM_INFO* item);
-void TyrannosaurControl(__int16 itemNum);
+void __cdecl ControlSpikyWall(__int16 itemNum);
+void __cdecl LaraTyrannosaurDeath(ITEM_INFO* item);
+void __cdecl TyrannosaurControl(__int16 itemNum);
+void __cdecl TriggerFlamethrowerFlame(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 fxnum);
+__int16 __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, __int16 speed);
+void __cdecl FlamerControl(__int16 itemNumber);
+void __cdecl ControlSpikyCeiling(__int16 itemNumber);
 
 __int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 __int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);
@@ -137,6 +141,9 @@ void __cdecl InitialiseSphinx(__int16 itemNum);
 void __cdecl SphinxControl(__int16 itemNum);
 void __cdecl InitialiseBurningFloor(__int16 itemNum);
 void __cdecl BurningFloorControl(__int16 itemNum);
+void __cdecl InitialiseHorse(__int16 itemNum);
+void __cdecl InitialiseHorseman(__int16 itemNum);
+void __cdecl HorsemanControl(__int16 itemNum);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);

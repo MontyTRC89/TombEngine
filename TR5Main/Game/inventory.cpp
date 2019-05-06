@@ -477,7 +477,7 @@ void Inventory::LoadObjects(bool isReload)
 
 	// DEBUG
 	{
-		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
+		/*g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
 		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0] = 1000;
 		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1] = 1000;
 		g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
@@ -2487,8 +2487,11 @@ __int32	Inventory::PopupObject()
 	__int32 steps = INV_NUM_FRAMES_POPUP;
 	__int32 deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
 	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
+	float deltaTilt = 90.0f / steps;
+	float deltaDistance = INV_OBJECT_DISTANCE / steps;
 
 	ring->focusState = INV_FOCUS_STATE_POPUP;
+
 	for (__int32 i = 0; i < steps; i++)
 	{
 		g_Renderer->DrawInventory();
@@ -2497,6 +2500,7 @@ __int32	Inventory::PopupObject()
 		ring->objects[ring->currentObject].rotation += deltaAngle;
 		ring->objects[ring->currentObject].scale += deltaScale;
 	}
+
 	ring->focusState = INV_FOCUS_STATE_FOCUSED;
 
 	return 0;
@@ -2509,8 +2513,11 @@ __int32	Inventory::PopoverObject()
 	__int32 steps = INV_NUM_FRAMES_POPUP;
 	__int32 deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
 	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
+	float deltaTilt = INV_OBJECT_TILT / steps;
+	float deltaDistance = INV_OBJECT_DISTANCE / steps;
 
 	ring->focusState = INV_FOCUS_STATE_POPOVER;
+
 	for (__int32 i = 0; i < steps; i++)
 	{
 		g_Renderer->DrawInventory();
@@ -2519,6 +2526,7 @@ __int32	Inventory::PopoverObject()
 		ring->objects[ring->currentObject].rotation -= deltaAngle;
 		ring->objects[ring->currentObject].scale -= deltaScale;
 	}
+	
 	ring->focusState = INV_FOCUS_STATE_NONE;
 
 	return 0;

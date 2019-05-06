@@ -377,7 +377,7 @@ void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c)
 	}
 }
 
-void __cdecl ControlSpikeWall(__int16 itemNum)
+void __cdecl ControlSpikyWall(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -1003,4 +1003,47 @@ void __cdecl InitialiseBurningFloor(__int16 itemNum)
 void __cdecl BurningFloorControl(__int16 itemNum)
 {
 
+}
+
+void __cdecl ControlSpikyCeiling(__int16 itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
+	{
+		__int32 y = item->pos.yPos + ((item->itemFlags[0] == 1) ? 10 : 5);
+		
+		__int16 roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+
+		if (GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos) < y + 1024)
+		{
+			item->status = ITEM_DEACTIVATED;
+			StopSoundEffect(147);
+		}
+		else
+		{
+			item->pos.yPos = y;
+
+			if (roomNumber != item->roomNumber)
+				ItemNewRoom(itemNumber, roomNumber);
+
+			SoundEffect(147, &item->pos, 0);
+		}
+	}
+
+	if (item->touchBits)
+	{
+		LaraItem->hitPoints -= 20;
+		LaraItem->hitStatus = true;
+
+		DoLotsOfBlood(LaraItem->pos.xPos, item->pos.yPos + 768, LaraItem->pos.zPos,
+					  4, item->pos.yRot, LaraItem->roomNumber, 3);
+		item->touchBits = 0;
+
+		SoundEffect(56, &item->pos, 0);
+	}
+
+	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED && item->itemFlags[0] == 1)
+		AnimateItem(item);
 }

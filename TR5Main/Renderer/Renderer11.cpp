@@ -5618,9 +5618,9 @@ __int32 Renderer11::drawInventoryScene()
 				ring->objects[objectIndex].rotation = 0;
 
 			__int32 x = ring->distance * cos(currentAngle * RADIAN);
-			__int32 y = g_Inventory->GetRing(k)->y; // (k < 3 ? lastRing * INV_RINGS_OFFSET : 0.0f);
+			__int32 y = g_Inventory->GetRing(k)->y;
 			__int32 z = ring->distance * sin(currentAngle * RADIAN);
-			
+
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
 			Matrix translation = Matrix::CreateTranslation(x, y, z);

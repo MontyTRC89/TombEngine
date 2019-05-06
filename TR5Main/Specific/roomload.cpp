@@ -570,7 +570,7 @@ unsigned __stdcall LoadLevel(void* data)
 	Wibble = 0;
 	TorchRoom = -1;
 	InitialiseGameFlags();
-	InitialiseLara(!(gfInitialiseGame || CurrentLevel == 1 || level->ResetHub));
+	InitialiseLara(!(InitialiseGame || CurrentLevel == 1 || level->ResetHub));
 	GetCarriedItems();
 	GetAIPickups();
 	SeedRandomDraw(0xD371F947);

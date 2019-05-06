@@ -13,12 +13,15 @@
 #include "..\Specific\IO\LEB128.h"
 #include "LanguageScript.h"
 
+#define TITLE_FLYBY			0
+#define TITLE_BACKGROUND	1
+
 struct ChunkId;
 struct LEB128;
 
 using namespace std;
 
-typedef struct GameScriptSettings {
+struct GameScriptSettings {
 	__int32 ScreenWidth;
 	__int32 ScreenHeight;
 	bool EnableLoadSave;
@@ -31,7 +34,7 @@ typedef struct GameScriptSettings {
 	bool ShowDebugInfo;
 };
 
-typedef struct GameScriptSkyLayer {
+struct GameScriptSkyLayer {
 	bool Enabled;
 	byte R;
 	byte G;
@@ -54,7 +57,7 @@ typedef struct GameScriptSkyLayer {
 	}
 };
 
-typedef struct GameScriptFog {
+struct GameScriptFog {
 	byte R;
 	byte G;
 	byte B;
@@ -72,7 +75,7 @@ typedef struct GameScriptFog {
 	}
 };
 
-typedef struct GameScriptMirror {
+struct GameScriptMirror {
 	__int16 Room;
 	__int32 StartX;
 	__int32 EndX;
@@ -95,7 +98,7 @@ typedef struct GameScriptMirror {
 	}
 };
 
-typedef struct GameScriptLevel {
+struct GameScriptLevel {
 	__int32 NameStringIndex;
 	string FileName;
 	string ScriptFileName;
@@ -168,6 +171,7 @@ public:
 	bool								FlyCheat;
 	bool								DebugMode;
 	__int32								LevelFarView;
+	__int32								TitleType;
 
 	// Selected language set
 	LanguageScript*						CurrentStrings;

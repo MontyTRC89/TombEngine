@@ -195,6 +195,8 @@ void Inject_Inventory();
 #define INV_OBJECTS_DISTANCE			2048.0f
 #define INV_CAMERA_TILT					5.0f
 #define INV_CAMERA_ANIMATION_TILT		60.0f
+#define INV_OBJECT_TILT					5.0f
+#define INV_OBJECT_DISTANCE				512.0f
 #define INV_CAMERA_DISTANCE				3072.0f
 #define INV_NUM_FRAMES_OPEN_CLOSE		12
 #define INV_NUM_FRAMES_ROTATE			8
@@ -236,7 +238,6 @@ struct InventoryObject {
 	__int32 inventoryObject;
 	__int32 rotation;
 	float scale;
-	__int32 distance;
 };
 
 struct InventoryRing {

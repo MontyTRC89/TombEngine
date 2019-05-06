@@ -93,7 +93,7 @@ void __cdecl LoadScreen(__int32 index, __int32 num)
 	//while(true)
 	//	TestRenderer();
 
-	GlobalLastInventoryItem = -1;
+	LastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
 
 	InitSpotCamSequences();

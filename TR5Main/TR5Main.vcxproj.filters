@@ -542,6 +542,12 @@
     <ClCompile Include="Scripting\LanguageScript.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\horseman.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\flamethrower.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />

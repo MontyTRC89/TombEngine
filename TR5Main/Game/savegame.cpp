@@ -151,7 +151,7 @@ void SaveGame::saveItem(__int32 itemNumber, __int32 runtimeItem)
 void SaveGame::saveGameStatus(__int32 arg1, __int32 arg2)
 {
 	LEB128::Write(m_stream, FlipStatus);
-	LEB128::Write(m_stream, GlobalLastInventoryItem);
+	LEB128::Write(m_stream, LastInventoryItem);
 	LEB128::Write(m_stream, FlipEffect);
 	LEB128::Write(m_stream, FlipTimer);
 	LEB128::Write(m_stream, CurrentAtmosphere);
@@ -314,12 +314,14 @@ bool SaveGame::Save(char* fileName)
 	m_stream = new FileStream(fileName, true, true);
 	m_writer = new ChunkWriter(0x4D355254, m_stream);
 
+	printf("Timer: %d\n", Savegame.Game.Timer);
+
 	// The header must be here, so no chunks
 	m_stream->WriteString(g_GameFlow->GetString(g_GameFlow->GetLevel(CurrentLevel)->NameStringIndex));
-	LEB128::Write(m_stream, (Savegame.Game.Timer / 30) / 86400);
-	LEB128::Write(m_stream, ((Savegame.Game.Timer / 30) % 86400) / 3600);
-	LEB128::Write(m_stream, ((Savegame.Game.Timer / 30) / 60) % 60);
-	LEB128::Write(m_stream, (Savegame.Game.Timer / 30) % 60);
+	LEB128::Write(m_stream, (GameTimer / 30) / 86400);
+	LEB128::Write(m_stream, ((GameTimer / 30) % 86400) / 3600);
+	LEB128::Write(m_stream, ((GameTimer / 30) / 60) % 60);
+	LEB128::Write(m_stream, (GameTimer / 30) % 60);
 	LEB128::Write(m_stream, CurrentLevel);
 	LEB128::Write(m_stream, GameTimer);
 	LEB128::Write(m_stream, ++LastSaveGame);
@@ -345,7 +347,7 @@ bool SaveGame::Save(char* fileName)
 bool SaveGame::readGameStatus()
 {
 	FlipStatus = LEB128::ReadInt32(m_stream);
-	GlobalLastInventoryItem = LEB128::ReadInt32(m_stream);
+	LastInventoryItem = LEB128::ReadInt32(m_stream);
 	FlipEffect = LEB128::ReadInt32(m_stream);
 	FlipTimer = LEB128::ReadInt32(m_stream);
 	CurrentAtmosphere = LEB128::ReadByte(m_stream);

@@ -105,6 +105,7 @@ bool __cdecl readGameFlowFlags()
 	g_GameFlow->FlyCheat = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 	g_GameFlow->DebugMode = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 	g_GameFlow->LevelFarView = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
+	g_GameFlow->TitleType = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
 
 	return true;
 }
@@ -458,7 +459,7 @@ bool GameFlow::DoGameflow()
 		case GAME_STATUS_NEW_GAME:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
-			gfInitialiseGame = true;
+			InitialiseGame = true;
 			break;
 		case GAME_STATUS_LOAD_GAME:
 			// Load the header of the savegame for getting the level to load

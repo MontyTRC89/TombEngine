@@ -23,7 +23,7 @@
     <ProjectGuid>{15AB0220-541C-4DA1-94EB-ED3C47E4582E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TR5Main</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -265,6 +265,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Objects\flamethrower.cpp" />
+    <ClCompile Include="Objects\horseman.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\demigod.cpp" />
     <ClCompile Include="Objects\guide.cpp" />

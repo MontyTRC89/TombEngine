@@ -935,6 +935,45 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
+	obj = &Objects[ID_FLAMETHROWER_BADDY];
+	if (obj->loaded)
+	{
+		obj->control = FlamerControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 36;
+		obj->radius = 102;
+		obj->intelligent = 1;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->pivotLength = 0;
+
+		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 0 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_SPIKY_WALL];
+	if (obj->loaded)
+	{
+		obj->control = ControlSpikyWall;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SPIKY_CEILING];
+	if (obj->loaded)
+	{
+		obj->control = ControlSpikyCeiling;
+		obj->collision = TrapCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
 }
 
 void __cdecl CustomObjects()

@@ -370,6 +370,8 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		SoundEffects();
 
 		HealtBarTimer--;
+
+		GameTimer++;
 	}
 
 	return GAME_STATUS_NONE;
@@ -432,15 +434,10 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	if (!loadFromSavegame)
 	{
 		Savegame.Level.Timer = 0;
-		Savegame.Game.Timer = 0;
 		Savegame.Level.Distance = 0;
-		Savegame.Game.Distance = 0;
 		Savegame.Level.AmmoUsed = 0;
-		Savegame.Game.AmmoUsed = 0;
 		Savegame.Level.AmmoHits = 0;
-		Savegame.Game.AmmoHits = 0;
 		Savegame.Level.Kills = 0;
-		Savegame.Game.Kills = 0;
 	}
 
 	// Load the level
@@ -448,7 +445,6 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
-	//InitialiseLOTarray(true);
 	InitialisePickUpDisplay();
 	InitialiseCamera();
 	SOUND_Stop();
@@ -461,18 +457,18 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 		sprintf(fileName, "savegame.%d", g_GameFlow->SelectedSaveGame);
 		SaveGame::Load(fileName);
 
-		gfRequiredStartPos = false;
-		gfInitialiseGame = false;
+		RequiredStartPos = false;
+		InitialiseGame = false;
 		g_GameFlow->SelectedSaveGame = 0;
 	}
 	else
 	{
-		gfRequiredStartPos = false;
-		if (gfInitialiseGame)
+		RequiredStartPos = false;
+		if (InitialiseGame)
 		{
 			GameTimer = 0;
-			gfRequiredStartPos = false;
-			gfInitialiseGame = false;
+			RequiredStartPos = false;
+			InitialiseGame = false;
 		}
 
 		Savegame.Level.Timer = 0;
@@ -480,8 +476,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 			Savegame.TLCount = 0;
 	}
 
-	// TODO: deprecated?
-	GlobalLastInventoryItem = -1;
+	LastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
 	TitleControlsLockedOut = false;
 
@@ -982,7 +977,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 			break;
 
 		case TO_FINISH:
-			gfRequiredStartPos = false;
+			RequiredStartPos = false;
 			LevelComplete = CurrentLevel + 1;
 			break;
 

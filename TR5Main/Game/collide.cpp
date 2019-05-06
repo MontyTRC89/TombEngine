@@ -113,7 +113,7 @@ __int32 __cdecl CollideStaticObjects(COLL_INFO* coll, __int32 x, __int32 y, __in
 	return false;
 }
 
-__int32 GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, __int32 ignoreLara)
+__int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, __int32 ignoreLara)
 {
 	// Collect all the rooms where to check
 	__int16 roomsArray[22];
@@ -283,7 +283,7 @@ __int32 GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 onl
 	return (numItems | numMeshes);
 }
 
-__int32 TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
+__int32 __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
 {
 	__int16* framePtr = GetBestFrame(lara);
 
@@ -309,6 +309,24 @@ __int32 TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INF
 		return false;
 
 	return true;
+}
+
+void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (item->status == ITEM_ACTIVE)
+	{
+		if (!TestBoundsCollide(item, l, c->radius))
+			return;
+
+		TestCollision(item, LaraItem);    
+
+		/*if (item->object_number == FAN && item->current_anim_state == 1)	// Is the fan moving slow ?
+			ObjectCollision(item_num, laraitem, coll);*/
+	}
+	else if (item->status != ITEM_INVISIBLE)
+		ObjectCollision(itemNumber, l, c);
 }
 
 void Inject_Collide()
