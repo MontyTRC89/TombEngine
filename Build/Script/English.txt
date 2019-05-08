@@ -77,7 +77,7 @@ Dynamic shadows
 Underwater caustics
 Volumetric fog
 Apply
-Cancel
+Back
 Enable sound
 Special effects
 -- Empty 72 --
@@ -109,6 +109,11 @@ Choose ammo
 Combine
 Waiting for key
 Windowed
+OK
+Cancel
+Render options
+Display adapter
+Output settings
 
 [Levels]
 Title level

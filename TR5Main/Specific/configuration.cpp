@@ -1,19 +1,22 @@
-#include "config.h"
+#include "configuration.h"
 
 #include "winmain.h"
 #include "..\resource.h"
 #include "..\Renderer\Renderer11.h"
 #include "..\Specific\input.h"
+#include "..\Scripting\GameFlowScript.h"
 
 #include <CommCtrl.h>
+#include "configuration.h"
 
 extern Renderer11* g_Renderer;
+extern GameFlow* g_GameFlow;
 
 GameConfiguration g_Configuration;
 
 void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index)
 {
-	HWND cbHandle = GetDlgItem(handle, IDC_CB_MODES);
+	HWND cbHandle = GetDlgItem(handle, IDC_RESOLUTION);
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
@@ -39,7 +42,7 @@ void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index)
 
 void __cdecl LoadAdaptersInCombobox(HWND handle)
 {
-	HWND cbHandle = GetDlgItem(handle, IDC_CB_ADAPTERS);
+	HWND cbHandle = GetDlgItem(handle, IDC_GFXADAPTER);
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
@@ -67,51 +70,38 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_INITDIALOG:
 		DB_Log(6, "WM_INITDIALOG");
 
+		SendMessageA(GetDlgItem(handle, IDC_GROUP_GFXADAPTER), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_DISPLAY_ADAPTER));
+		SendMessageA(GetDlgItem(handle, IDC_GROUP_OUTPUT_SETTINGS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_OUTPUT_SETTINGS));
+		SendMessageA(GetDlgItem(handle, IDOK), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_OK));
+		SendMessageA(GetDlgItem(handle, IDCANCEL), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_CANCEL));
+		SendMessageA(GetDlgItem(handle, IDC_GROUP_RESOLUTION), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_SCREEN_RESOLUTION));
+		SendMessageA(GetDlgItem(handle, IDC_GROUP_SOUND), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_SOUND));
+		SendMessageA(GetDlgItem(handle, IDC_ENABLE_SOUNDS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_ENABLE_SOUND));
+		SendMessageA(GetDlgItem(handle, IDC_WINDOWED), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_WINDOWED));
+		SendMessageA(GetDlgItem(handle, IDC_GROUP_RENDER_OPTIONS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_RENDER_OPTIONS));
+		SendMessageA(GetDlgItem(handle, IDC_SHADOWS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_SHADOWS));
+		SendMessageA(GetDlgItem(handle, IDC_CAUSTICS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_CAUSTICS));
+		SendMessageA(GetDlgItem(handle, IDC_VOLUMETRIC_FOG), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_VOLUMETRIC_FOG));
+
 		LoadAdaptersInCombobox(handle);
 
 		// Set some default values
 		g_Configuration.AutoTarget = true;
-		SendDlgItemMessage(handle, IDC_CHK_AUTOTARGET, BM_SETCHECK, 1, 0);
 
 		g_Configuration.EnableVolumetricFog = true;
-		SendDlgItemMessage(handle, IDC_CHK_VOLUMETRIC_FOG, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_SETCHECK, 1, 0);
 
 		g_Configuration.EnableShadows = true;
-		SendDlgItemMessage(handle, IDC_CHK_SHADOWS, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_SHADOWS, BM_SETCHECK, 1, 0);
 
 		g_Configuration.EnableCaustics = true;
-		SendDlgItemMessage(handle, IDC_CHK_CAUSTICS, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_CAUSTICS, BM_SETCHECK, 1, 0);
 
 		g_Configuration.Windowed = true;
-		SendDlgItemMessage(handle, IDC_CHK_WINDOWED, BM_SETCHECK, 1, 0);
+		SendDlgItemMessage(handle, IDC_WINDOWED, BM_SETCHECK, 1, 0);
 
 		g_Configuration.EnableSound = true;
-		SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND, BM_SETCHECK, 1, 0);
-
-		g_Configuration.EnableAudioSpecialEffects = true;
-		SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND_SPECIAL_FX, BM_SETCHECK, 1, 0);
-
-		g_Configuration.MusicVolume = 100;
-		SendDlgItemMessage(handle, IDC_SL_MUSIC_VOLUME, TBM_SETPOS, true, 100);
-
-		g_Configuration.SfxVolume = 100;
-		SendDlgItemMessage(handle, IDC_SL_SFX_VOLUME, TBM_SETPOS, true, 100);
-
-		break;
-
-	case WM_HSCROLL:
-		DB_Log(6, "WM_HSCROLL");
-
-		if (lParam == (LPARAM)GetDlgItem(handle, IDC_SL_MUSIC_VOLUME))
-		{
-			g_Configuration.MusicVolume = (SendMessage((HWND)lParam, TBM_GETPOS, 0, 0));
-			break;
-		}
-		else if (lParam == (LPARAM)GetDlgItem(handle, IDC_SL_SFX_VOLUME))
-		{
-			g_Configuration.SfxVolume = (SendMessage((HWND)lParam, TBM_GETPOS, 0, 0));
-			break;
-		}
+		SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_SETCHECK, 1, 0);
 
 		break;
 
@@ -123,34 +113,26 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
-			case IDC_CHK_WINDOWED:
-				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_CHK_WINDOWED, BM_GETCHECK, 0, 0));
+			case IDC_WINDOWED:
+				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
 				break;
 
-			case IDC_CHK_SHADOWS:
-				g_Configuration.EnableShadows = (SendDlgItemMessage(handle, IDC_CHK_SHADOWS, BM_GETCHECK, 0, 0));
+			case IDC_SHADOWS:
+				g_Configuration.EnableShadows = (SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
 				break;
 
-			case IDC_CHK_CAUSTICS:
-				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CHK_CAUSTICS, BM_GETCHECK, 0, 0));
+			case IDC_CAUSTICS:
+				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
 				break;
 
-			case IDC_CHK_VOLUMETRIC_FOG:
-				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_CHK_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
+			case IDC_VOLUMETRIC_FOG:
+				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
 				break;
 
-			case IDC_CHK_AUTOTARGET:
-				g_Configuration.AutoTarget = (SendDlgItemMessage(handle, IDC_CHK_AUTOTARGET, BM_GETCHECK, 0, 0));
+			case IDC_ENABLE_SOUNDS:
+				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
 				break;
 
-			case IDC_CHK_ENABLE_SOUND:
-				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND, BM_GETCHECK, 0, 0));
-				break;
-
-			case IDC_CHK_ENABLE_SOUND_SPECIAL_FX:
-				g_Configuration.EnableAudioSpecialEffects = (SendDlgItemMessage(handle, IDC_CHK_ENABLE_SOUND_SPECIAL_FX, BM_GETCHECK, 0, 0));
-				break;
-			
 			case IDOK:
 				// Save the configuration
 				SaveConfiguration();
@@ -160,7 +142,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			case IDCANCEL:
 				EndDialog(handle, wParam);
 				return 1;
-			
+
 			}
 
 			return 0;
@@ -171,16 +153,16 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
-			case IDC_CB_ADAPTERS:
-				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_CB_ADAPTERS, CB_GETCURSEL, 0, 0));
+			case IDC_GFXADAPTER:
+				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
 				LoadResolutionsInCombobox(handle, g_Configuration.Adapter);
 				break;
 
-			case IDC_CB_MODES:
-				selectedIndex = (SendDlgItemMessage(handle, IDC_CB_MODES, CB_GETCURSEL, 0, 0));
+			case IDC_RESOLUTION:
+				selectedIndex = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
 				adapter = &(*g_Renderer->GetAdapters())[g_Configuration.Adapter];
 				mode = &(adapter->DisplayModes[selectedIndex]);
-				
+
 				g_Configuration.Width = mode->Width;
 				g_Configuration.Height = mode->Height;
 				g_Configuration.RefreshRate = mode->RefreshRate;
@@ -197,16 +179,16 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-return 0;
+	return 0;
 }
 
 __int32 __cdecl SetupDialog()
 {
 	InitCommonControls();
-	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP_WINDOW), RT_DIALOG);
+	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
 	ShowCursor(true);
-	__int32 result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP_WINDOW), 0, (DLGPROC)DialogProc, 0);
+	__int32 result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
 	ShowCursor(false);
 
 	return true;
@@ -316,7 +298,7 @@ bool __cdecl SaveConfiguration()
 	OptionAutoTarget = g_Configuration.AutoTarget;
 	GlobalMusicVolume = g_Configuration.MusicVolume;
 	GlobalFXVolume = g_Configuration.SfxVolume;
-	
+
 	return true;
 }
 
@@ -473,7 +455,7 @@ LONG SetStringRegKey(HKEY hKey, char* strValueName, char* strValue)
 	return 1; // RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
 }
 
-LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD* nValue, DWORD nDefaultValue)
+LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD * nValue, DWORD nDefaultValue)
 {
 	*nValue = nDefaultValue;
 	DWORD dwBufferSize(sizeof(DWORD));

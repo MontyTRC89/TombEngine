@@ -18,7 +18,7 @@
 #include "..\Game\savegame.h"
 #include "..\Specific\roomload.h"
 
-#include "config.h"
+#include "configuration.h"
 
 WINAPP	 App;
 unsigned int threadId;
@@ -185,11 +185,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	_CrtSetReportMode(0, 2);
 	_CrtSetDbgFlag(-1);
-	 
-	// TODO: deprecated
-	//LoadGameflow();
-	//LoadSettings();
-
+	
 	// Initialise the new scripting system
 	sol::state luaState;
 	luaState.open_libraries(sol::lib::base);
@@ -227,6 +223,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_Renderer->EnumerateVideoModes();
 
 	// Load configuration and optionally show the setup dialog
+	SetupDialog();
 	if (setup || !LoadConfiguration())
 	{
 		if (!SetupDialog())

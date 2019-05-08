@@ -10,7 +10,7 @@
 
 #include "..\Global\global.h"
 #include "..\Specific\input.h"
-#include "..\Specific\config.h"
+#include "..\Specific\configuration.h"
 #include "lara1gun.h"
 #include "lara2gun.h"
 
@@ -348,47 +348,47 @@ Inventory::Inventory()
 	ZeroMemory(&m_objectsTable[0], sizeof(InventoryObjectDefinition) * INVENTORY_TABLE_SIZE);
 
 	// Create objects table
-	m_objectsTable[INV_OBJECT_UZIS] = InventoryObjectDefinition(ID_UZI_ITEM, STRING_INV_UZI, -1, 0);
-	m_objectsTable[INV_OBJECT_PISTOLS] = InventoryObjectDefinition(ID_PISTOLS_ITEM, STRING_INV_PISTOLS, -1, 0);
-	m_objectsTable[INV_OBJECT_SHOTGUN] = InventoryObjectDefinition(ID_SHOTGUN_ITEM, STRING_INV_SHOTGUN, -1, 0);
-	m_objectsTable[INV_OBJECT_REVOLVER] = InventoryObjectDefinition(ID_REVOLVER_ITEM, STRING_INV_REVOLVER, -1, 0);
-	m_objectsTable[INV_OBJECT_REVOLVER_LASER] = InventoryObjectDefinition(ID_REVOLVER_ITEM, STRING_INV_REVOLVER_LASER, -1, 0);
-	m_objectsTable[INV_OBJECT_HK] = InventoryObjectDefinition(ID_HK_ITEM, STRING_INV_HK, -1, 0);
-	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO1] = InventoryObjectDefinition(ID_SHOTGUN_AMMO1_ITEM, STRING_INV_SHOTGUN_AMMO1, -1, 0);
-	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO2] = InventoryObjectDefinition(ID_SHOTGUN_AMMO2_ITEM, STRING_INV_SHOTGUN_AMMO2, -1, 0);
-	m_objectsTable[INV_OBJECT_HK_AMMO1] = InventoryObjectDefinition(ID_HK_AMMO_ITEM, STRING_INV_HK_AMMO, -1, 0);
-	m_objectsTable[INV_OBJECT_REVOLVER_AMMO] = InventoryObjectDefinition(ID_REVOLVER_AMMO_ITEM, STRING_INV_REVOLVER_AMMO, -1, 0);
-	m_objectsTable[INV_OBJECT_UZI_AMMO] = InventoryObjectDefinition(ID_UZI_AMMO_ITEM, STRING_INV_UZI_AMMO, -1, 0);
-	m_objectsTable[INV_OBJECT_PISTOLS_AMMO] = InventoryObjectDefinition(ID_PISTOLS_AMMO_ITEM, STRING_INV_PISTOLS_AMMO, -1, 0);
-	m_objectsTable[INV_OBJECT_LASERSIGHT] = InventoryObjectDefinition(ID_LASERSIGHT_ITEM, STRING_INV_LASERSIGHT, -1, 0);
-	m_objectsTable[INV_OBJECT_SILENCER] = InventoryObjectDefinition(ID_SILENCER_ITEM, STRING_INV_SILENCER, -1, 0);
-	m_objectsTable[INV_OBJECT_LARGE_MEDIPACK] = InventoryObjectDefinition(ID_BIGMEDI_ITEM, STRING_INV_LARGE_MEDIPACK, -1, 0x8000);
-	m_objectsTable[INV_OBJECT_SMALL_MEDIPACK] = InventoryObjectDefinition(ID_SMALLMEDI_ITEM, STRING_INV_SMALL_MEDIPACK, -1, 0);
-	m_objectsTable[INV_OBJECT_BINOCULARS] = InventoryObjectDefinition(ID_BINOCULARS_ITEM, STRING_INV_BINOCULARS, -1, 0);
-	m_objectsTable[INV_OBJECT_FLARES] = InventoryObjectDefinition(ID_FLARE_INV_ITEM, STRING_INV_FLARES, -1, 0);
-	m_objectsTable[INV_OBJECT_TIMEX] = InventoryObjectDefinition(ID_COMPASS_ITEM, STRING_INV_TIMEX, -1, 0);
-	m_objectsTable[INV_OBJECT_CROWBAR] = InventoryObjectDefinition(ID_CROWBAR_ITEM, STRING_INV_CROWBAR, -1, 0);
-	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER] = InventoryObjectDefinition(ID_GRENADE_ITEM, STRING_INV_GRENADE_LAUNCHER, -1, 0);
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO1] = InventoryObjectDefinition(ID_GRENADE_AMMO1_ITEM, STRING_INV_GRENADE_AMMO1, -1, 0);
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO2] = InventoryObjectDefinition(ID_GRENADE_AMMO2_ITEM, STRING_INV_GRENADE_AMMO2, -1, 0);
-	m_objectsTable[INV_OBJECT_GRENADE_AMMO3] = InventoryObjectDefinition(ID_GRENADE_AMMO3_ITEM, STRING_INV_GRENADE_AMMO3, -1, 0);
-	m_objectsTable[INV_OBJECT_HARPOON_GUN] = InventoryObjectDefinition(ID_HARPOON_ITEM, STRING_INV_HARPOON_GUN, -1, 0);
-	m_objectsTable[INV_OBJECT_HARPOON_AMMO] = InventoryObjectDefinition(ID_HARPOON_AMMO_ITEM, STRING_INV_HARPOON_AMMO, -1, 0);
-	m_objectsTable[INV_OBJECT_ROCKET_LAUNCHER] = InventoryObjectDefinition(ID_ROCKET_LAUNCHER_ITEM, STRING_INV_ROCKET_LAUNCHER, -1, 0);
-	m_objectsTable[INV_OBJECT_ROCKET_AMMO] = InventoryObjectDefinition(ID_ROCKET_LAUNCHER_AMMO_ITEM, STRING_INV_ROCKET_AMMO, -1, 0);
-	m_objectsTable[INV_OBJECT_CROSSBOW] = InventoryObjectDefinition(ID_CROSSBOW_ITEM, STRING_INV_CROSSBOW, -1, 0);
-	m_objectsTable[INV_OBJECT_CROSSBOW_LASER] = InventoryObjectDefinition(ID_CROSSBOW_ITEM, STRING_INV_CROSSBOW_LASER, -1, 0);
-	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO1] = InventoryObjectDefinition(ID_CROSSBOW_AMMO1_ITEM, STRING_INV_CROSSBOW_AMMO1, -1, 0);
-	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2] = InventoryObjectDefinition(ID_CROSSBOW_AMMO2_ITEM, STRING_INV_CROSSBOW_AMMO2, -1, 0);
-	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO3] = InventoryObjectDefinition(ID_CROSSBOW_AMMO3_ITEM, STRING_INV_CROSSBOW_AMMO3, -1, 0);
-	m_objectsTable[INV_OBJECT_PASSAPORT] = InventoryObjectDefinition(ID_INVENTORY_PASSPORT, STRING_INV_PASSPORT, -1, 0);
-	m_objectsTable[INV_OBJECT_KEYS] = InventoryObjectDefinition(ID_INVENTORY_KEYS, STRING_INV_CONTROLS, -1, 0x4000);
-	m_objectsTable[INV_OBJECT_SUNGLASSES] = InventoryObjectDefinition(ID_INVENTORY_SUNGLASSES, STRING_INV_DISPLAY, -1, 0);
-	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_INV_LARA_HOME, -1, 0);
-	m_objectsTable[INV_OBJECT_HEADPHONES] = InventoryObjectDefinition(ID_INVENTORY_HEADPHONES, STRING_INV_SOUND, -1, 0);
-	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY, STRING_INV_DIARY, -1, 0);
-	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_INV_WATERSKIN1_EMPTY, -1, 0);
-	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_INV_WATERSKIN2_EMPTY, -1, 0);
+	m_objectsTable[INV_OBJECT_UZIS] = InventoryObjectDefinition(ID_UZI_ITEM, STRING_UZI, -1, 0);
+	m_objectsTable[INV_OBJECT_PISTOLS] = InventoryObjectDefinition(ID_PISTOLS_ITEM, STRING_PISTOLS, -1, 0);
+	m_objectsTable[INV_OBJECT_SHOTGUN] = InventoryObjectDefinition(ID_SHOTGUN_ITEM, STRING_SHOTGUN, -1, 0);
+	m_objectsTable[INV_OBJECT_REVOLVER] = InventoryObjectDefinition(ID_REVOLVER_ITEM, STRING_REVOLVER, -1, 0);
+	m_objectsTable[INV_OBJECT_REVOLVER_LASER] = InventoryObjectDefinition(ID_REVOLVER_ITEM, STRING_REVOLVER_LASER, -1, 0);
+	m_objectsTable[INV_OBJECT_HK] = InventoryObjectDefinition(ID_HK_ITEM, STRING_HK, -1, 0);
+	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO1] = InventoryObjectDefinition(ID_SHOTGUN_AMMO1_ITEM, STRING_SHOTGUN_AMMO1, -1, 0);
+	m_objectsTable[INV_OBJECT_SHOTGUN_AMMO2] = InventoryObjectDefinition(ID_SHOTGUN_AMMO2_ITEM, STRING_SHOTGUN_AMMO2, -1, 0);
+	m_objectsTable[INV_OBJECT_HK_AMMO1] = InventoryObjectDefinition(ID_HK_AMMO_ITEM, STRING_HK_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_REVOLVER_AMMO] = InventoryObjectDefinition(ID_REVOLVER_AMMO_ITEM, STRING_REVOLVER_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_UZI_AMMO] = InventoryObjectDefinition(ID_UZI_AMMO_ITEM, STRING_UZI_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_PISTOLS_AMMO] = InventoryObjectDefinition(ID_PISTOLS_AMMO_ITEM, STRING_PISTOLS_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_LASERSIGHT] = InventoryObjectDefinition(ID_LASERSIGHT_ITEM, STRING_LASERSIGHT, -1, 0);
+	m_objectsTable[INV_OBJECT_SILENCER] = InventoryObjectDefinition(ID_SILENCER_ITEM, STRING_SILENCER, -1, 0);
+	m_objectsTable[INV_OBJECT_LARGE_MEDIPACK] = InventoryObjectDefinition(ID_BIGMEDI_ITEM, STRING_LARGE_MEDIPACK, -1, 0x8000);
+	m_objectsTable[INV_OBJECT_SMALL_MEDIPACK] = InventoryObjectDefinition(ID_SMALLMEDI_ITEM, STRING_SMALL_MEDIPACK, -1, 0);
+	m_objectsTable[INV_OBJECT_BINOCULARS] = InventoryObjectDefinition(ID_BINOCULARS_ITEM, STRING_BINOCULARS, -1, 0);
+	m_objectsTable[INV_OBJECT_FLARES] = InventoryObjectDefinition(ID_FLARE_INV_ITEM, STRING_FLARES, -1, 0);
+	m_objectsTable[INV_OBJECT_TIMEX] = InventoryObjectDefinition(ID_COMPASS_ITEM, STRING_TIMEX, -1, 0);
+	m_objectsTable[INV_OBJECT_CROWBAR] = InventoryObjectDefinition(ID_CROWBAR_ITEM, STRING_CROWBAR, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER] = InventoryObjectDefinition(ID_GRENADE_ITEM, STRING_GRENADE_LAUNCHER, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO1] = InventoryObjectDefinition(ID_GRENADE_AMMO1_ITEM, STRING_GRENADE_AMMO1, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO2] = InventoryObjectDefinition(ID_GRENADE_AMMO2_ITEM, STRING_GRENADE_AMMO2, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_AMMO3] = InventoryObjectDefinition(ID_GRENADE_AMMO3_ITEM, STRING_GRENADE_AMMO3, -1, 0);
+	m_objectsTable[INV_OBJECT_HARPOON_GUN] = InventoryObjectDefinition(ID_HARPOON_ITEM, STRING_HARPOON_GUN, -1, 0);
+	m_objectsTable[INV_OBJECT_HARPOON_AMMO] = InventoryObjectDefinition(ID_HARPOON_AMMO_ITEM, STRING_HARPOON_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_ROCKET_LAUNCHER] = InventoryObjectDefinition(ID_ROCKET_LAUNCHER_ITEM, STRING_ROCKET_LAUNCHER, -1, 0);
+	m_objectsTable[INV_OBJECT_ROCKET_AMMO] = InventoryObjectDefinition(ID_ROCKET_LAUNCHER_AMMO_ITEM, STRING_ROCKET_AMMO, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW] = InventoryObjectDefinition(ID_CROSSBOW_ITEM, STRING_CROSSBOW, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_LASER] = InventoryObjectDefinition(ID_CROSSBOW_ITEM, STRING_CROSSBOW_LASER, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO1] = InventoryObjectDefinition(ID_CROSSBOW_AMMO1_ITEM, STRING_CROSSBOW_AMMO1, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2] = InventoryObjectDefinition(ID_CROSSBOW_AMMO2_ITEM, STRING_CROSSBOW_AMMO2, -1, 0);
+	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO3] = InventoryObjectDefinition(ID_CROSSBOW_AMMO3_ITEM, STRING_CROSSBOW_AMMO3, -1, 0);
+	m_objectsTable[INV_OBJECT_PASSAPORT] = InventoryObjectDefinition(ID_INVENTORY_PASSPORT, STRING_PASSPORT, -1, 0);
+	m_objectsTable[INV_OBJECT_KEYS] = InventoryObjectDefinition(ID_INVENTORY_KEYS, STRING_CONTROLS, -1, 0x4000);
+	m_objectsTable[INV_OBJECT_SUNGLASSES] = InventoryObjectDefinition(ID_INVENTORY_SUNGLASSES, STRING_DISPLAY, -1, 0);
+	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_LARA_HOME, -1, 0);
+	m_objectsTable[INV_OBJECT_HEADPHONES] = InventoryObjectDefinition(ID_INVENTORY_HEADPHONES, STRING_SOUND, -1, 0);
+	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY, STRING_DIARY, -1, 0);
+	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_WATERSKIN1_EMPTY, -1, 0);
+	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_WATERSKIN2_EMPTY, -1, 0);
 
 	// Add combinations
 	AddCombination(INV_OBJECT_PUZZLE1_COMBO1, INV_OBJECT_PUZZLE1_COMBO2, INV_OBJECT_PUZZLE1, CombinePuzzle1);
@@ -420,11 +420,11 @@ Inventory::Inventory()
 	m_rings[INV_RING_CHOOSE_AMMO].y = 0;
 	m_rings[INV_RING_COMBINE].y = 0;
 
-	m_rings[INV_RING_PUZZLES].titleStringIndex = STRING_INV_TITLE_PUZZLES;
-	m_rings[INV_RING_WEAPONS].titleStringIndex = STRING_INV_TITLE_ITEMS;
-	m_rings[INV_RING_OPTIONS].titleStringIndex = STRING_INV_TITLE_SETTINGS;
-	m_rings[INV_RING_CHOOSE_AMMO].titleStringIndex = STRING_INV_TITLE_CHOOSE_AMMO;
-	m_rings[INV_RING_COMBINE].titleStringIndex = STRING_INV_TITLE_COMBINE;
+	m_rings[INV_RING_PUZZLES].titleStringIndex = STRING_TITLE_PUZZLES;
+	m_rings[INV_RING_WEAPONS].titleStringIndex = STRING_TITLE_ITEMS;
+	m_rings[INV_RING_OPTIONS].titleStringIndex = STRING_TITLE_SETTINGS;
+	m_rings[INV_RING_CHOOSE_AMMO].titleStringIndex = STRING_TITLE_CHOOSE_AMMO;
+	m_rings[INV_RING_COMBINE].titleStringIndex = STRING_TITLE_COMBINE;
 }
 
 Inventory::~Inventory()

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Specific\config.h"
+#include "..\Specific\configuration.h"
 #include <vector>
 
 using namespace std;

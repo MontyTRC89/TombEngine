@@ -172,7 +172,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Specific\config.h" />
+    <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
     <ClInclude Include="Specific\IO\ChunkWriter.h" />
     <ClInclude Include="Specific\IO\LEB128.h" />
@@ -338,7 +338,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\trap.cpp" />
     <ClCompile Include="Objects\tribesman.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
-    <ClCompile Include="Specific\config.cpp" />
+    <ClCompile Include="Specific\configuration.cpp" />
     <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
     <ClCompile Include="Specific\game.cpp" />
@@ -579,6 +579,10 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Banner.bmp" />
+    <Image Include="C:\Users\Monty\Desktop\Banner.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

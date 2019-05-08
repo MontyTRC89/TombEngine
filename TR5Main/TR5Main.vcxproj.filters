@@ -285,13 +285,13 @@
     <ClInclude Include="resource.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Specific\config.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer\Renderer11.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Scripting\LanguageScript.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\configuration.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -533,9 +533,6 @@
     <ClCompile Include="Objects\guide.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Specific\config.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer\Renderer11.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -546,6 +543,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\flamethrower.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\configuration.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -596,5 +596,13 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shaders\DX11_FinalPass.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\Monty\Desktop\Banner.bmp">
+      <Filter>File di risorse</Filter>
+    </Image>
+    <Image Include="Banner.bmp">
+      <Filter>File di risorse</Filter>
+    </Image>
   </ItemGroup>
 </Project>
