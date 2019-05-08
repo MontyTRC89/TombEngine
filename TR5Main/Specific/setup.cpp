@@ -939,12 +939,11 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_FLAMETHROWER_BADDY];
 	if (obj->loaded)
 	{
-		obj->control = FlamerControl;
+		obj->control = FlameThrowerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 36;
 		obj->radius = 102;
-		obj->intelligent = 1;
 		obj->intelligent = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
@@ -973,6 +972,31 @@ void __cdecl NewObjects()
 		obj->collision = TrapCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_MONKEY];
+	if (obj->loaded)
+	{
+		//if (!objects[MESHSWAP2].loaded)
+		//	S_ExitSystem("FATAL: Monkey requires MESHSWAP2 (Monkey + Pickups)");
+
+		//obj->draw_routine = (void*)DrawMonkey;
+		obj->initialise = InitialiseMonkey;
+		obj->control = MonkeyControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 8;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->pivotLength = 0;
+
+		Bones[obj->boneIndex + 0 * 4] |= ROT_Z;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 	}
 }
 

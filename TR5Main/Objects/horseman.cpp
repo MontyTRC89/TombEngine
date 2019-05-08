@@ -47,6 +47,7 @@ void __cdecl InitialiseHorseman(__int16 itemNum)
 
 void __cdecl HorsemanControl(__int16 itemNum)
 {
+#ifdef TEMP_DISABLE
 	if (!CreatureActive(itemNum))
 		return;
 
@@ -744,4 +745,5 @@ void __cdecl HorsemanControl(__int16 itemNum)
 	default:
 		break;
 	}
+#endif
 }

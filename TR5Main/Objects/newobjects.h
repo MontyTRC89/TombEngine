@@ -54,9 +54,12 @@ void __cdecl ControlSpikyWall(__int16 itemNum);
 void __cdecl LaraTyrannosaurDeath(ITEM_INFO* item);
 void __cdecl TyrannosaurControl(__int16 itemNum);
 void __cdecl TriggerFlamethrowerFlame(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 fxnum);
+void __cdecl TriggerPilotFlame(__int32 itemnum);
 __int16 __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, __int16 speed);
-void __cdecl FlamerControl(__int16 itemNumber);
+void __cdecl FlameThrowerControl(__int16 itemNumber);
 void __cdecl ControlSpikyCeiling(__int16 itemNumber);
+void __cdecl InitialiseMonkey(__int16 itemNumber);
+void __cdecl MonkeyControl(__int16 itemNumber);
 
 __int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 __int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);

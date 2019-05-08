@@ -13,7 +13,7 @@ GameConfiguration g_Configuration;
 
 void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index)
 {
-	/*HWND cbHandle = GetDlgItem(handle, IDC_CB_MODES);
+	HWND cbHandle = GetDlgItem(handle, IDC_CB_MODES);
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
@@ -34,12 +34,12 @@ void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index)
 	}
 
 	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
-	SendMessageA(cbHandle, CB_SETMINVISIBLE, 20, 0);*/
+	SendMessageA(cbHandle, CB_SETMINVISIBLE, 20, 0);
 }
 
 void __cdecl LoadAdaptersInCombobox(HWND handle)
 {
-	/*HWND cbHandle = GetDlgItem(handle, IDC_CB_ADAPTERS);
+	HWND cbHandle = GetDlgItem(handle, IDC_CB_ADAPTERS);
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
@@ -51,12 +51,12 @@ void __cdecl LoadAdaptersInCombobox(HWND handle)
 	}
 
 	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
-	LoadResolutionsInCombobox(handle, 0);*/
+	LoadResolutionsInCombobox(handle, 0);
 }
 
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	/*HWND ctlHandle;
+	HWND ctlHandle;
 
 	__int32 selectedIndex;
 	RendererVideoAdapter* adapter;
@@ -195,7 +195,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	default:
 		return 0;
-	}*/
+	}
 
 return 0;
 }

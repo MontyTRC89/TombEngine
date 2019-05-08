@@ -8,6 +8,7 @@
 #define InitialiseFXArray ((void (__cdecl*)(__int32)) 0x00441080)
 #define AddActiveItem ((void (__cdecl*)(__int16)) 0x00440D10)
 #define RemoveActiveItem ((void (__cdecl*)(__int16)) 0x00440D10)
+#define RemoveDrawnItem ((void (__cdecl*)(__int16)) 0x00440C40)
 #define InitialiseItem ((void (__cdecl*)(__int16)) 0x004408B0)
 //#define CreateItem ((__int16 (__cdecl*)()) 0x00440840)
 //#define KillItem ((void (__cdecl*)(__int16)) 0x00440620)

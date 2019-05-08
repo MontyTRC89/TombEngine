@@ -14,7 +14,7 @@
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
-void __cdecl FlamerControl(__int16 itemNumber)
+void __cdecl FlameThrowerControl(__int16 itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -37,11 +37,11 @@ void __cdecl FlamerControl(__int16 itemNumber)
 	__int32 random = GetRandomControl();
 	if (item->currentAnimState != 6 && item->currentAnimState != 11)
 	{
-		TriggerDynamics(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random >> 4) & 3), 16 - ((random >> 6) & 3), random & 3); 	// Pilot light.
+		TriggerDynamics(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random >> 4) & 3), 16 - ((random >> 6) & 3), random & 3); 
 		TriggerPilotFlame(itemNumber);
 	}
 	else
-		TriggerDynamics(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random >> 4) & 3), 24 - ((random >> 6) & 3), random & 7); 	// Full monty.
+		TriggerDynamics(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random >> 4) & 3), 24 - ((random >> 6) & 3), random & 7);  
 
 	if (item->hitPoints <= 0)
 	{
@@ -61,10 +61,9 @@ void __cdecl FlamerControl(__int16 itemNumber)
 		else
 		{
 			// Find another enemy different from Lara
-
 			creature->enemy = NULL;
 
-			__int32 minDistance = 0x7fffffff;
+			__int32 minDistance = 0x7FFFFFFF;
 			CREATURE_INFO* currentCreature = BaddieSlots;
 			ITEM_INFO* target = NULL;
 
@@ -77,10 +76,11 @@ void __cdecl FlamerControl(__int16 itemNumber)
 				if (target->objectNumber == ID_LARA /*|| target->objectNumber == WHITE_SOLDIER || target->objectNumber == FLAMETHROWER_BLOKE*/ || target->hitPoints <= 0)
 					continue;
 
-				/* Is this target closest? */
 				__int32 x = target->pos.xPos - item->pos.xPos;
 				__int32 z = target->pos.zPos - item->pos.zPos;
+
 				__int32 distance = SQUARE(x) + SQUARE(z);
+
 				if (distance < minDistance)
 				{
 					creature->enemy = target;
@@ -98,7 +98,7 @@ void __cdecl FlamerControl(__int16 itemNumber)
 		{
 			laraInfo.angle = info.angle;
 			laraInfo.distance = info.distance;
-			if (!creature->hurtByLara /*&& CurrentLevel != LV_CHAMBER*/)
+			if (!creature->hurtByLara)
 				creature->enemy = NULL;
 		}
 		else
@@ -106,25 +106,20 @@ void __cdecl FlamerControl(__int16 itemNumber)
 			__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
 			__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
 			
-			laraInfo.angle = ATAN(dz, dz) - item->pos.yRot; //only need to fill out the bits of laraInfo that will be needed by TargetVisible
+			laraInfo.angle = ATAN(dz, dz) - item->pos.yRot; 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			
 			info.xAngle -= 0x800;
 		}
 
-		//		if (creature->enemy != LaraItem) //Should eventually change this to be any person
-		//			meta_mood = VIOLENT;	//Shooters run up to their target if it's not a person
-		//		else
-		//meta_mood = TIMID;		//Else they stay their distance
-
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		ITEM_INFO* realEnemy = creature->enemy; //TargetVisible uses enemy, so need to fill this in as lara if we're doing other things
+		ITEM_INFO* realEnemy = creature->enemy; 
 
-		if (item->hitStatus || laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo)) //Only change flamer's AI bits if hurt (by Lara or Sealmute)
+		if (item->hitStatus || laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo)) 
 		{
 			if (!creature->alerted)
 				SoundEffect(300, &item->pos, 0);
@@ -190,7 +185,7 @@ void __cdecl FlamerControl(__int16 itemNumber)
 			creature->flags = 0;
 			creature->maximumTurn = ANGLE(5);
 
-			if (item->aiBits & GUARD)	//Complete frig so I don't have to write InitialiseFlamer - only ever happens immediately on being triggered
+			if (item->aiBits & GUARD)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 12;
 				item->frameNumber = Anims[item->animNumber].frameBase;
@@ -252,9 +247,8 @@ void __cdecl FlamerControl(__int16 itemNumber)
 			break;
 
 		case 11:
-
 			if (creature->flags < 40)
-				creature->flags += (creature->flags >> 2) + 1;	// Length of flame.
+				creature->flags += (creature->flags >> 2) + 1;
 
 			if (info.ahead)
 			{
@@ -285,10 +279,8 @@ void __cdecl FlamerControl(__int16 itemNumber)
 			SoundEffect(204, &item->pos, 0);
 
 			break;
-
-
+			
 		case 6:
-
 			if (creature->flags < 40)
 				creature->flags += (creature->flags >> 2) + 1;	// Length of flame.
 
@@ -334,12 +326,9 @@ void __cdecl FlamerControl(__int16 itemNumber)
 
 __int16 __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, __int16 speed)
 {
-	__int32			xv, yv, zv, vel, speed, lp;
-
 	PHD_VECTOR pos1;
 	PHD_VECTOR pos2;
 	__int16 angles[2];
-	__int32 speed;
 	__int32 velocity;
 	__int32 xv;
 	__int32 yv;
@@ -484,7 +473,7 @@ void __cdecl TriggerFlamethrowerFlame(__int32 x, __int32 y, __int32 z, __int32 x
 	spark->dSize = size >> 1;
 }
 
-void TriggerPilotFlame(__int32 itemnum)
+void __cdecl TriggerPilotFlame(__int32 itemnum)
 {
 	__int32 dx = LaraItem->pos.xPos - Items[itemnum].pos.xPos;
 	__int32 dz = LaraItem->pos.zPos - Items[itemnum].pos.zPos;
@@ -492,7 +481,7 @@ void TriggerPilotFlame(__int32 itemnum)
 	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 		return;
 
-	SPARKS* spark = &spark[GetFreeSpark()];
+	SPARKS* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = 1;
 	spark->sR = 48 + (GetRandomControl() & 31);
