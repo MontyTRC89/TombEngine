@@ -63,6 +63,10 @@ void __cdecl LoadSoundDevicesInCombobox(HWND handle)
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
+	// Include default device into the list
+	BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, true);
+
+	// Get all audio devices, including the default one
 	BASS_DEVICEINFO info;
 	__int32 i = 1;
 	while (BASS_GetDeviceInfo(i, &info))
