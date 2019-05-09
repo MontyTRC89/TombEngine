@@ -198,6 +198,11 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	// Initialise chunks for savegames
 	SaveGame::Start();
 
+	INITCOMMONCONTROLSEX commCtrlInit;
+	commCtrlInit.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	commCtrlInit.dwICC = ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES;
+	InitCommonControlsEx(&commCtrlInit);
+
 	// Initialise main window
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = NULL;

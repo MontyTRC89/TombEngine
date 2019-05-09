@@ -390,6 +390,9 @@ unsigned __stdcall GameMain(void*)
 	InitGameMalloc();
 	TIME_Init();
 
+	// Do a fixed time title image
+	g_Renderer->DoTitleImage();
+
 	// Execute the LUA gameflow and play the game
 	g_GameFlow->DoGameflow();
 

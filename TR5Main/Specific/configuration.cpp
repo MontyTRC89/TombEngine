@@ -71,7 +71,7 @@ void __cdecl LoadSoundDevicesInCombobox(HWND handle)
 	__int32 i = 1;
 	while (BASS_GetDeviceInfo(i, &info))
 	{
-		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)info.name);
+		SendMessageA(cbHandle, CB_ADDSTRING, 0, (LPARAM)info.name);
 		i++;
 	}
 
@@ -210,7 +210,6 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 __int32 __cdecl SetupDialog()
 {
-	InitCommonControls();
 	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
 	ShowCursor(true);

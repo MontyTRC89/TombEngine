@@ -1600,6 +1600,25 @@ __int32 Renderer11::drawFinalPass()
 	return 0;
 }
 
+bool Renderer11::drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade)
+{
+	// Reset GPU state
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->RSSetState(m_states->CullCounterClockwise());
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	m_context->ClearRenderTargetView(m_backBufferRTV, Colors::White);
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+	m_context->RSSetViewports(1, &m_viewport);
+
+	drawFullScreenQuad(texture, Vector3(fade, fade, fade), false);
+
+	m_swapChain->Present(0, 0);
+
+	return true;
+}
+
 bool Renderer11::drawAllStrings()
 {
 	m_spriteBatch->Begin();
@@ -7013,6 +7032,39 @@ bool Renderer11::drawShadowMap()
 			m_hairVertices.data(), m_numHairVertices);
 		m_primitiveBatch->End();
 	}
+
+	return true;
+}
+
+bool Renderer11::DoTitleImage()
+{
+	Texture2D* texture = Texture2D::LoadFromFile(m_device, (char*)"Title.png");
+	if (!texture)
+		return false;
+
+	float currentFade = 0;
+	while (currentFade <= 1.0f)
+	{
+		drawFullScreenImage(texture->ShaderResourceView, currentFade);
+		SyncRenderer();
+		currentFade += FADE_FACTOR;
+	}
+
+	for (__int32 i = 0; i < 30 * 1.5f; i++)
+	{
+		drawFullScreenImage(texture->ShaderResourceView, 1.0f);
+		SyncRenderer();
+	}
+
+	currentFade = 1.0f;
+	while (currentFade >= 0.0f)
+	{
+		drawFullScreenImage(texture->ShaderResourceView, currentFade);
+		SyncRenderer();
+		currentFade -= FADE_FACTOR;
+	}
+
+	delete texture;
 
 	return true;
 }

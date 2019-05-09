@@ -989,6 +989,7 @@ private:
 	bool											doRain();
 	bool											doSnow();
 	bool											drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool cinematicBars);
+	bool											drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade);
 	bool											isRoomUnderwater(__int16 roomNumber);
 	bool											isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
 	void											addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
@@ -1037,5 +1038,6 @@ public:
 	bool											ToggleFullScreen();
 	bool											IsFullsScreen();
 	vector<RendererVideoAdapter>*					GetAdapters();
+	bool											DoTitleImage();
 	bool											ChangeScreenResolution(__int32 width, __int32 height, __int32 frequency, bool windowed);
 };
