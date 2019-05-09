@@ -223,6 +223,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	g_Renderer->EnumerateVideoModes();
 
 	// Load configuration and optionally show the setup dialog
+	InitDefaultConfiguration();
 	SetupDialog();
 	if (setup || !LoadConfiguration())
 	{

@@ -1,4 +1,5 @@
 #include "sound.h"
+#include "..\Specific\configuration.h"
 
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];
@@ -609,7 +610,7 @@ void Sound_UpdateScene()
 
 void Sound_Init()
 {
-	BASS_Init(-1, 44100, BASS_DEVICE_3D, WindowsHandle, NULL);
+	BASS_Init(g_Configuration.SoundDevice, 44100, BASS_DEVICE_3D, WindowsHandle, NULL);
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 

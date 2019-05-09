@@ -47,6 +47,7 @@
 #define REGKEY_JROL				"JRol"
 #define REGKEY_JWLK				"JWlk"
 #define REGKEY_REFRESH_RATE		"RefreshRate"
+#define REGKEY_SOUND_DEVICE		"SoundDevice"
 
 typedef struct GameConfiguration {
 	__int32 Width;
@@ -63,6 +64,7 @@ typedef struct GameConfiguration {
 	__int32 MaxDrawDistance;
 	__int32 MusicVolume;
 	__int32 SfxVolume;
+	__int32 SoundDevice;
 	byte KeyboardLayout[NUM_CONTROLS];
 	bool ControlMethod;
 	__int32 JoyDuck;
@@ -79,8 +81,10 @@ typedef struct GameConfiguration {
 
 void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index);
 void __cdecl LoadAdaptersInCombobox(HWND handle);
+void __cdecl LoadSoundDevicesInCombobox(HWND handle);
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 __int32 __cdecl SetupDialog();
+void __cdecl InitDefaultConfiguration();
 bool __cdecl LoadConfiguration();
 bool __cdecl SaveConfiguration();
 LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD* nValue, DWORD nDefaultValue);
