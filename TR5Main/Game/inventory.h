@@ -190,7 +190,7 @@ void Inject_Inventory();
 
 // Some rendering parameters
 #define INV_RINGS_OFFSET				8192.0f
-#define INV_OBJECTS_SCALE				1.5f
+#define INV_OBJECTS_SCALE				2.0f
 #define INV_SECONDARY_MOVEMENT			200.0f
 #define INV_OBJECTS_DISTANCE			2048.0f
 #define INV_CAMERA_TILT					5.0f
