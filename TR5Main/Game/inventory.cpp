@@ -768,6 +768,7 @@ __int32 Inventory::DoInventory()
 		for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 		{
 			g_Renderer->DrawInventory();
+			g_Renderer->SyncRenderer();
 		}
 
 		return passportResult;
@@ -904,7 +905,10 @@ __int32 Inventory::DoInventory()
 						// Fade out
 						g_Renderer->FadeOut();
 						for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+						{
 							g_Renderer->DrawInventory();
+							g_Renderer->SyncRenderer();
+						}
 
 						return passportResult;
 					}
@@ -1866,8 +1870,15 @@ __int32 Inventory::DoTitleInventory()
 	// Fade in
 	g_Renderer->FadeIn();
 	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+	{
 		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
 
+	CurrentAtmosphere = CDA_XA11_FLYBY1;
+	IsAtmospherePlaying = true;
+	S_CDPlay(CurrentAtmosphere, 1);
+	
 	OpenRing(INV_RING_OPTIONS, true);
 
 	__int32 result = INV_RESULT_NONE;
@@ -1962,7 +1973,10 @@ __int32 Inventory::DoTitleInventory()
 	// Fade out
 	g_Renderer->FadeOut();
 	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+	{
 		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
 
 	return result;
 }

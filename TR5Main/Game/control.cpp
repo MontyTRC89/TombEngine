@@ -415,6 +415,9 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	S_LoadLevelFile(0);
 	
 	__int32 inventoryResult = g_Inventory->DoTitleInventory();
+
+	S_CDStop();
+
 	switch (inventoryResult)
 	{
 	case INV_RESULT_NEW_GAME:

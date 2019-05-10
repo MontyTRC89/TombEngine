@@ -148,6 +148,7 @@ typedef enum audio_tracks
 	CDA_XA17_ANDREA4,
 	CDA_XA17_ANDY9,
 	CDA_XA17_ANDY11,
+	CDA_XA18_TITLE_MENU
 };
 
 typedef enum sound_effects

@@ -63,9 +63,6 @@ void __cdecl LoadSoundDevicesInCombobox(HWND handle)
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
-	// Include default device into the list
-	BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, true);
-
 	// Get all audio devices, including the default one
 	BASS_DEVICEINFO info;
 	__int32 i = 1;
@@ -82,9 +79,10 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	HWND ctlHandle;
 
-	__int32 selectedIndex;
 	RendererVideoAdapter* adapter;
 	RendererDisplayMode* mode;
+	__int32 selectedAdapter;
+	__int32 selectedMode;
 
 	switch (msg)
 	{
@@ -135,27 +133,22 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (LOWORD(wParam))
 			{
-			case IDC_WINDOWED:
-				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
-				break;
-
-			case IDC_SHADOWS:
-				g_Configuration.EnableShadows = (SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
-				break;
-
-			case IDC_CAUSTICS:
-				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
-				break;
-
-			case IDC_VOLUMETRIC_FOG:
-				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
-				break;
-
-			case IDC_ENABLE_SOUNDS:
-				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
-				break;
-
 			case IDOK:
+				// Get values from dialog components
+				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
+				g_Configuration.EnableShadows = (SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
+				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
+				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
+				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
+				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
+				selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
+				adapter = &(*g_Renderer->GetAdapters())[g_Configuration.Adapter];
+				mode = &(adapter->DisplayModes[selectedMode]);
+				g_Configuration.Width = mode->Width;
+				g_Configuration.Height = mode->Height;
+				g_Configuration.RefreshRate = mode->RefreshRate;
+				g_Configuration.SoundDevice = (SendDlgItemMessage(handle, IDC_SNDADAPTER, CB_GETCURSEL, 0, 0)) + 1;
+
 				// Save the configuration
 				SaveConfiguration();
 				EndDialog(handle, wParam);
@@ -176,23 +169,8 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam))
 			{
 			case IDC_GFXADAPTER:
-				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
-				LoadResolutionsInCombobox(handle, g_Configuration.Adapter);
-				break;
-
-			case IDC_RESOLUTION:
-				selectedIndex = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
-				adapter = &(*g_Renderer->GetAdapters())[g_Configuration.Adapter];
-				mode = &(adapter->DisplayModes[selectedIndex]);
-
-				g_Configuration.Width = mode->Width;
-				g_Configuration.Height = mode->Height;
-				g_Configuration.RefreshRate = mode->RefreshRate;
-
-				break;
-
-			case IDC_SNDADAPTER:
-				g_Configuration.SoundDevice = (SendDlgItemMessage(handle, IDC_SNDADAPTER, CB_GETCURSEL, 0, 0)) + 1;
+				selectedAdapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
+				LoadResolutionsInCombobox(handle, selectedAdapter);
 				break;
 			}
 
@@ -335,6 +313,9 @@ bool __cdecl SaveConfiguration()
 
 void __cdecl InitDefaultConfiguration()
 {
+	// Include default device into the list
+	BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, true);
+
 	g_Configuration.AutoTarget = true;
 	g_Configuration.SoundDevice = 1;
 	g_Configuration.Adapter = 0;
@@ -345,6 +326,8 @@ void __cdecl InitDefaultConfiguration()
 	g_Configuration.EnableVolumetricFog = true;
 	g_Configuration.MusicVolume = 100;
 	g_Configuration.SfxVolume = 100;
+	g_Configuration.Width = 1366;
+	g_Configuration.Height = 768;
 }
 
 bool __cdecl LoadConfiguration()

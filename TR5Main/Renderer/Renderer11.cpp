@@ -94,15 +94,15 @@ Renderer11::~Renderer11()
 	DX11_RELEASE(m_psInventory);
 	DX11_RELEASE(m_vsFullScreenQuad);
 	DX11_RELEASE(m_psFullScreenQuad);
-
-	DX11_DELETE(m_cbCameraMatrices);
-	DX11_DELETE(m_cbItem);
-	DX11_DELETE(m_cbStatic);
-	DX11_DELETE(m_cbLights);
-	DX11_DELETE(m_cbMisc);
+	DX11_RELEASE(m_cbCameraMatrices);
+	DX11_RELEASE(m_cbItem);
+	DX11_RELEASE(m_cbStatic);
+	DX11_RELEASE(m_cbLights);
+	DX11_RELEASE(m_cbMisc);
 
 	DX11_DELETE(m_renderTarget);
 	DX11_DELETE(m_dumpScreenRenderTarget);
+	DX11_DELETE(m_shadowMap);
 
 	FreeRendererData();
 }
@@ -135,6 +135,7 @@ void Renderer11::FreeRendererData()
 		DX11_DELETE(m_animatedTextureSets[i]);
 	free(m_animatedTextureSets);
 
+	DX11_DELETE(m_textureAtlas);
 	DX11_DELETE(m_textureAtlas);
 	DX11_DELETE(m_skyTexture);
 
@@ -218,9 +219,27 @@ bool Renderer11::EnumerateVideoModes()
 
 			RendererDisplayMode newMode;
 
+			// discard lower resolutions
+			if (mode->Width < 1024 || mode->Height < 768)
+				continue;
+
 			newMode.Width = mode->Width;
 			newMode.Height = mode->Height;
 			newMode.RefreshRate = mode->RefreshRate.Numerator / mode->RefreshRate.Denominator;
+
+			bool found = false;
+			for (__int32 k = 0; k < adapter.DisplayModes.size(); k++)
+			{
+				RendererDisplayMode* currentMode = &adapter.DisplayModes[k];
+				if (currentMode->Width == newMode.Width && currentMode->Height == newMode.Height &&
+					currentMode->RefreshRate == newMode.RefreshRate)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (found)
+				continue;
 
 			adapter.DisplayModes.push_back(newMode);
 

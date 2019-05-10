@@ -229,7 +229,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 
 	// Load configuration and optionally show the setup dialog
 	InitDefaultConfiguration();
-	SetupDialog();
+	//SetupDialog();
 	if (setup || !LoadConfiguration())
 	{
 		if (!SetupDialog())
