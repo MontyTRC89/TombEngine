@@ -5953,7 +5953,7 @@ __int32 Renderer11::drawInventoryScene()
 					else if (inventoryItem == INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						// Draw sound menu
-						y = 20;
+						y = 40;
 
 						PrintString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
 							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
@@ -5995,6 +5995,8 @@ __int32 Renderer11::drawInventoryScene()
 							PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == NUM_CONTROLS + 1 ? PRINTSTRING_BLINK : 0));
 
 						y += 25;
+
+						drawColoredQuad(180, 20, 440, y + 20 - 20, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
 					else
 					{
@@ -6139,7 +6141,7 @@ __int32 Renderer11::drawInventoryScene()
 
 bool Renderer11::drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vector4 color)
 {
-	return true;
+	//return true;
 
 	float factorW = ScreenWidth / 800.0f;
 	float factorH = ScreenHeight / 600.0f;
