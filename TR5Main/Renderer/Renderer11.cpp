@@ -440,7 +440,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 			return false;
 	}
 
-	m_titleScreen = Texture2D::LoadFromFile(m_device, "Screens\\Title.jpg");
+	m_titleScreen = Texture2D::LoadFromFile(m_device, (char*)g_GameFlow->GetLevel(0)->Background.c_str());
 	if (m_titleScreen == NULL)
 		return false;
 
@@ -600,8 +600,12 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 {
 	g_Configuration.MaxDrawDistance = 200;
 
+	Vector3 up = -Vector3::UnitY;
+	Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
+	up = Vector3::Transform(up, upRotation);
+
 	FieldOfView = fov;
-	View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), -Vector3::UnitY);
+	View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), up);
 	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, 20.0f, g_Configuration.MaxDrawDistance * 1024.0f);
 
 	m_stCameraMatrices.View = View; 
@@ -635,7 +639,7 @@ bool Renderer11::drawHorizonAndSky()
 		return true;
 
 	if (BinocularRange)
-		phd_AlterFOV(14560 - BinocularRange);
+		AlterFOV(14560 - BinocularRange);
 
 	// Storm
 	if (level->Storm)
@@ -1181,7 +1185,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 bool Renderer11::drawLara(bool transparent, bool shadowMap)
 {
 	// Don't draw Lara if binoculars or sniper
-	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara)
+	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
 		return true;
 
 	UINT stride = sizeof(RendererVertex);
@@ -1493,6 +1497,8 @@ __int32 Renderer11::DumpGameScene()
 
 __int32 Renderer11::DrawInventory()
 {
+	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
+		drawScene(true);
 	drawInventoryScene();
 	drawFinalPass();
 
@@ -5573,7 +5579,10 @@ __int32 Renderer11::drawInventoryScene()
 	// Clear the Z-Buffer after drawing the background	
 	if (g_Inventory->GetType() == INV_TYPE_TITLE)
 	{
-		drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
+		if (g_GameFlow->TitleType == TITLE_BACKGROUND)
+			drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
+		else
+			drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(1.0f, 1.0f, 1.0f), false);
 	}
 	else
 	{
@@ -5627,16 +5636,19 @@ __int32 Renderer11::drawInventoryScene()
 		objectIndex = ring->currentObject;
 
 		// Yellow title
-		if (ring->focusState == INV_FOCUS_STATE_NONE)
+		if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory->GetType() != INV_TYPE_TITLE)
 			PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
 		for (__int32 i = 0; i < numObjects; i++)
 		{
 			__int16 inventoryObject = ring->objects[objectIndex].inventoryObject;
 			__int16 objectNumber = g_Inventory->GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
-			
+		
+			//if (ring->focusState != INV_FOCUS_STATE_NONE && (k != g_Inventory->GetActiveRing() || inventoryObject != ring->objects[i].inventoryObject))
+			//	continue;
+
 			// Calculate the inventory object position and rotation
-			float currentAngle = 0.0f;
+ 			float currentAngle = 0.0f;
 			__int16 steps = -objectIndex + ring->currentObject;
 			if (steps < 0) steps += numObjects;
 			currentAngle = steps * deltaAngle;
@@ -7059,7 +7071,7 @@ bool Renderer11::drawShadowMap()
 
 bool Renderer11::DoTitleImage()
 {
-	Texture2D* texture = Texture2D::LoadFromFile(m_device, (char*)"Title.png");
+	Texture2D* texture = Texture2D::LoadFromFile(m_device, (char*)g_GameFlow->Intro);
 	if (!texture)
 		return false;
 

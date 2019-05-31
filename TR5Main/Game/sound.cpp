@@ -15,6 +15,8 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 }; 
 
+vector<AudioTrack> g_AudioTracks;
+
 bool __cdecl Sound_LoadSample(char *pointer, __int32 compSize, __int32 uncompSize, __int32 index)	// Replaces DXCreateSampleADPCM()
 {
 	if (index >= SOUND_MAX_SAMPLES)
@@ -266,7 +268,7 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	DWORD crossfadeTime;
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
 
-	if (index >= SOUND_LEGACY_TRACKTABLE_SIZE || index < 0)
+	if (index >= g_AudioTracks.size() || index < 0)
 		return;
 
 	mode = (mode >= NUM_SOUND_TRACK_TYPES) ? SOUND_TRACK_BGM : mode;
@@ -294,9 +296,9 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	static char fullTrackName[1024];
 
 	char* mask = &TrackNamePrefix;
-	char* name = TrackNameTable[index];
+	char* name = g_AudioTracks[index].Name;
 
-	snprintf(fullTrackName, sizeof(fullTrackName), &TrackNamePrefix, TrackNameTable[index]);
+	snprintf(fullTrackName, sizeof(fullTrackName), &TrackNamePrefix, name);
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName, 0, 0, flags);
 
@@ -344,7 +346,7 @@ void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown)
 	static short loopedTracks[] = { 117, 118, 121, 123, 124, 125, 126, 127, 128, 129, 130 };
 	bool looped = false;
 
-	if (index >= SOUND_LEGACY_TRACKTABLE_SIZE || index < 0)
+	if (index >= g_AudioTracks.size() || index < 0)
 		return;
 
 	// Assign looping based on hardcoded track IDs.
@@ -362,10 +364,10 @@ void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown)
 	if (!looped)
 	{
 		byte filteredMask = (mask >> 8) & 0x3F;
-		if ((TrackMap[index] & filteredMask) == filteredMask)
+		if ((g_AudioTracks[index].Mask & filteredMask) == filteredMask)
 			return;	// Mask is the same, don't play it.
 
-		TrackMap[index] |= filteredMask;
+		g_AudioTracks[index].Mask |= filteredMask;
 	}
 
 	S_CDPlay(index, looped);

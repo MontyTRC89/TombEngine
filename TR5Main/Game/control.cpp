@@ -53,11 +53,14 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		UpdateSky();
 		
 		// Poll the keyboard and update input variables
-		if (S_UpdateInput() == -1)
-			return GAME_STATUS_NONE;
-		
+		if (CurrentLevel != 0)
+		{
+			if (S_UpdateInput() == -1)
+				return GAME_STATUS_NONE;
+		}
+
 		// Has Lara control been disabled?
-		if (DisableLaraControl)
+		if (DisableLaraControl || CurrentLevel == 0)
 		{
 			if (CurrentLevel != 0)
 				DbInput = 0;
@@ -87,13 +90,13 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		}
 
 		// Has level been completed?
-		if (LevelComplete)
+		if (CurrentLevel != 0 && LevelComplete)
 			return GAME_STATUS_LEVEL_COMPLETED;
 
 		__int32 oldInput = TrInput;
 		 
 		// Is Lara dead?
-		if (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput)
+		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
 			__int32 inventoryResult = g_Inventory->DoInventory();
 			switch (inventoryResult)
@@ -113,88 +116,94 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			TrInput = 0;
 		}
 
+		if (CurrentLevel == 0)
+			TrInput = 0;
+
 		// Handle lasersight and binocular
-		if (!(TrInput & IN_LOOK) || SniperCameraActive || UseSpotCam || TrackCameraInit ||
-			((LaraItem->currentAnimState != STATE_LARA_STOP || LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE)
-				&& (!Lara.isDucked
-					|| TrInput & IN_DUCK
-					|| LaraItem->animNumber != ANIMATION_LARA_CROUCH_IDLE
-					|| LaraItem->goalAnimState != STATE_LARA_CROUCH_IDLE)))
+		if (CurrentLevel != 0)
 		{
-			if (BinocularRange == 0)
+			if (!(TrInput & IN_LOOK) || SniperCameraActive || UseSpotCam || TrackCameraInit ||
+				((LaraItem->currentAnimState != STATE_LARA_STOP || LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE)
+					&& (!Lara.isDucked
+						|| TrInput & IN_DUCK
+						|| LaraItem->animNumber != ANIMATION_LARA_CROUCH_IDLE
+						|| LaraItem->goalAnimState != STATE_LARA_CROUCH_IDLE)))
 			{
-				if (SniperCameraActive || UseSpotCam || TrackCameraInit)
-					TrInput &= ~IN_LOOK;
+				if (BinocularRange == 0)
+				{
+					if (SniperCameraActive || UseSpotCam || TrackCameraInit)
+						TrInput &= ~IN_LOOK;
+				}
+				else
+				{
+					if (LaserSight)
+					{
+						BinocularRange = 0;
+						LaserSight = false;
+						AlterFOV(ANGLE(80));
+						LaraItem->meshBits = 0xFFFFFFFF;
+						Lara.isDucked = false;
+						Camera.type = BinocularOldCamera;
+
+						Lara.headYrot = 0;
+						Lara.headXrot = 0;
+
+						Lara.torsoYrot = 0;
+						Lara.torsoXrot = 0;
+
+						Camera.bounce = 0;
+						BinocularOn = -8;
+
+						TrInput &= ~IN_LOOK;
+					}
+					else
+					{
+						TrInput |= IN_LOOK;
+					}
+				}
+
+				Infrared = false;
+			}
+			else if (BinocularRange == 0)
+			{
+				if (Lara.gunStatus == LG_READY
+					&& ((Lara.gunType == WEAPON_REVOLVER && g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight)
+						|| (Lara.gunType == WEAPON_HK)
+						|| (Lara.gunType == WEAPON_CROSSBOW && g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight)))
+				{
+					BinocularRange = 128;
+					BinocularOldCamera = Camera.oldType;
+
+					Lara.busy = true;
+					LaserSight = true;
+
+					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
+						InfraRed = TRUE;
+					else*
+						InfraRed = FALSE;*/
+					Infrared = true;
+				}
+				else
+					Infrared = false;
 			}
 			else
 			{
 				if (LaserSight)
 				{
-					BinocularRange = 0;
-					LaserSight = false;
-					phd_AlterFOV(ANGLE(80));
-					LaraItem->meshBits = 0xFFFFFFFF;
-					Lara.isDucked = false;
-					Camera.type = BinocularOldCamera;
-
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
-
-					Camera.bounce = 0;
-					BinocularOn = -8;
-
-					TrInput &= ~IN_LOOK;
+					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
+						InfraRed = TRUE;
+					else
+						InfraRed = FALSE;*/
+					Infrared = true;
 				}
 				else
 				{
-					TrInput |= IN_LOOK;
+					/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
+						InfraRed = TRUE;
+					else
+						InfraRed = FALSE;*/
+					Infrared = false;
 				}
-			}
-
-			Infrared = false;
-		}
-		else if (BinocularRange == 0)
-		{
-			if (Lara.gunStatus == LG_READY
-				&& ((Lara.gunType == WEAPON_REVOLVER && g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight)
-					|| (Lara.gunType == WEAPON_HK)
-					|| (Lara.gunType == WEAPON_CROSSBOW && g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight)))
-			{
-				BinocularRange = 128;
-				BinocularOldCamera = Camera.oldType;
-
-				Lara.busy = true;
-				LaserSight = true;
-
-				/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-					InfraRed = TRUE;
-				else*
-					InfraRed = FALSE;*/
-				Infrared = true;
-			}
-			else
-				Infrared = false;
-		}
-		else
-		{
-			if (LaserSight)
-			{
-				/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-					InfraRed = TRUE;
-				else
-					InfraRed = FALSE;*/
-				Infrared = true;
-			}
-			else
-			{
-				/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
-					InfraRed = TRUE;
-				else
-					InfraRed = FALSE;*/
-				Infrared = false;
 			}
 		}
 
@@ -257,62 +266,67 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		if (WeaponEnemyTimer)
 			WeaponEnemyTimer--;
 
-		if (Lara.hasFired)
+		if (CurrentLevel != 0)
 		{
-			AlertNearbyGuards(LaraItem);
-			Lara.hasFired = false;
-		}
+			if (Lara.hasFired)
+			{
+				AlertNearbyGuards(LaraItem);
+				Lara.hasFired = false;
+			}
 
-		// Is Lara poisoned?
-		if (Lara.poisoned)
-		{
-			if (Lara.poisoned <= 4096)
+			// Is Lara poisoned?
+			if (Lara.poisoned)
 			{
-				if (Lara.dpoisoned)
-					++Lara.dpoisoned;
-			}
-			else
-			{
-				Lara.poisoned = 4096;
-			}
-			if ((gfLevelFlags & 0x80u) != 0 && !Lara.gassed)
-			{
-				if (Lara.dpoisoned)
+				if (Lara.poisoned <= 4096)
 				{
-					Lara.dpoisoned -= 8;
-					if (Lara.dpoisoned < 0)
-						Lara.dpoisoned = 0;
+					if (Lara.dpoisoned)
+						++Lara.dpoisoned;
+				}
+				else
+				{
+					Lara.poisoned = 4096;
+				}
+				if ((gfLevelFlags & 0x80u) != 0 && !Lara.gassed)
+				{
+					if (Lara.dpoisoned)
+					{
+						Lara.dpoisoned -= 8;
+						if (Lara.dpoisoned < 0)
+							Lara.dpoisoned = 0;
+					}
+				}
+				if (Lara.dpoisoned >= 256 && !(Wibble & 0xFF))
+				{
+					LaraItem->hitPoints -= Lara.poisoned >> (8 - Lara.gassed);
+					PoisonFlags = 16;
 				}
 			}
-			if (Lara.dpoisoned >= 256 && !(Wibble & 0xFF))
-			{
-				LaraItem->hitPoints -= Lara.poisoned >> (8 - Lara.gassed);
-				PoisonFlags = 16;
-			}
+
+			// Control Lara
+			InItemControlLoop = true;
+			Lara.skelebob = NULL;
+			LaraControl();
+			InItemControlLoop = false;
+			KillMoveItems();
+
+			// Update Lara's ponytails
+			HairControl(0, 0, 0);
+			if (level->LaraType == LARA_YOUNG)
+				HairControl(0, 1, 0);
 		}
-
-		// Control Lara
-		InItemControlLoop = true;
-		Lara.skelebob = NULL;
-		LaraControl();
-		InItemControlLoop = false;
-		KillMoveItems();
-
-		// Update Lara's ponytails
-		HairControl(0, 0, 0);
-		if (level->LaraType == LARA_YOUNG)
-			HairControl(0, 1, 0);
 
 		if (UseSpotCam)
 		{
 			// Draw flyby cameras
-			g_Renderer->EnableCinematicBars(true);
+			if (CurrentLevel != 0)
+				g_Renderer->EnableCinematicBars(true);
 			CalculateSpotCameras();
 		}
 		else
 		{
 			// Do the standard camera
 			g_Renderer->EnableCinematicBars(false);
+			TrackCameraInit = false;
 			CalculateCamera();
 		}
 		    
@@ -411,11 +425,63 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
 
-	// Load the title level
-	S_LoadLevelFile(0);
-	
-	__int32 inventoryResult = g_Inventory->DoTitleInventory();
+	CreditsDone = false;
+	CanLoad = false;
 
+	// Load the level
+	S_LoadLevelFile(index);
+
+	__int32 inventoryResult;
+
+	if (g_GameFlow->TitleType == TITLE_FLYBY)
+	{
+		// Initialise items, effects, lots, camera
+		InitialiseFXArray(true);
+		InitialisePickUpDisplay();
+		InitialiseCamera();
+		SOUND_Stop();
+
+		RequiredStartPos = false;
+		if (InitialiseGame)
+		{
+			GameTimer = 0;
+			RequiredStartPos = false;
+			InitialiseGame = false;
+		}
+
+		Savegame.Level.Timer = 0;
+		if (CurrentLevel == 1)
+			Savegame.TLCount = 0;
+
+		LastInventoryItem = -1;
+		DelCutSeqPlayer = 0;
+		TitleControlsLockedOut = false;
+		GameMode = 1;
+
+		// Initialise flyby cameras
+		InitSpotCamSequences();
+
+		InitialiseSpotCam(2);
+		CurrentAtmosphere = 83;
+		UseSpotCam = true;
+
+		// Play background music
+		//CurrentAtmosphere = ambient;
+		S_CDPlay(CurrentAtmosphere, 1);
+		IsAtmospherePlaying = true;
+
+		// Initialise ponytails
+		InitialiseHair();
+
+		ControlPhase(2, 0);
+		inventoryResult = g_Inventory->DoTitleInventory();
+	}
+	else
+	{
+		inventoryResult = g_Inventory->DoTitleInventory();
+	}
+
+	UseSpotCam = false;
 	S_CDStop();
 
 	switch (inventoryResult)
@@ -488,7 +554,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();
-		
+
 	// Play background music
 	CurrentAtmosphere = ambient;
 	S_CDPlay(CurrentAtmosphere, 1);
@@ -505,7 +571,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	while (true)
 	{
 		nframes = DrawPhaseGame();
-		result = ControlPhase(nframes, 0);
+		result = ControlPhase(nframes, 0); printf("LastSpotCam: %d\n", LastSpotCam);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||
@@ -910,7 +976,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 			else
 			{
 				spotCamIndex = 0;
-				if (SpotCamRemap[value] > 0)
+				if (SpotCamRemap[value] != 0)
 				{
 					for (__int32 i = 0; i < SpotCamRemap[value]; i++)
 					{
@@ -918,17 +984,17 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 					}
 				}
 
-				if (!(SpotCam[spotCamIndex].flags & 0x8000))
+				if (!(SpotCam[spotCamIndex].flags & SCF_CAMERA_ONE_SHOT))
 				{
 					if (trigger & 0x100)
-						SpotCam[spotCamIndex].flags |= 0x8000;
+						SpotCam[spotCamIndex].flags |= SCF_CAMERA_ONE_SHOT;
 
-					if (!UseSpotCam)
+					if (!UseSpotCam || CurrentLevel == 0)
 					{
 						UseSpotCam = true;
 						if (LastSpotCam != value)
 							TrackCameraInit = false;
-						InitialiseSpotCameras(value);
+						InitialiseSpotCam(value);
 					}
 				}
 			}
@@ -1085,7 +1151,16 @@ void __cdecl AnimateWaterfalls()
 	}
 }
 
+void __cdecl TestTriggersAtXYZ(__int32 x, __int32 y, __int32 z, __int16 roomNumber, __int16 heavy, __int16 heavyFlags)
+{
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	GetFloorHeight(floor, x, y, z);
+	TestTriggers(TriggerIndex, heavy, heavyFlags);
+}
+
 void Inject_Control()
 {
-	
+	INJECT(0x00416760, TestTriggers);
+	INJECT(0x004167B0, TestTriggers);
+	INJECT(0x0047D9D0, TestTriggersAtXYZ);
 }

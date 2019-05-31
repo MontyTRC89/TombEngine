@@ -1375,6 +1375,11 @@ typedef struct BOUNDING_BOX {
 	__int16 Z2;
 };
 
+struct QUAKE_CAMERA {
+	GAME_VECTOR spos;
+	GAME_VECTOR epos;
+};
+
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
 typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);

@@ -3,6 +3,7 @@
 #include <bass.h>
 #include <bass_fx.h>
 #include <d3dx9math.h>
+#include <vector>
 
 #include "..\Game\control.h"
 #include "..\Global\global.h"
@@ -663,6 +664,16 @@ enum reverb_type
 
 	NUM_REVERB_TYPES
 };
+
+struct AudioTrack
+{
+	char* Name;
+	byte Mask;
+};
+
+using namespace std;
+
+extern vector<AudioTrack> g_AudioTracks;
 
 #define SayNo ((void (__cdecl*)()) 0x004790E0)
 

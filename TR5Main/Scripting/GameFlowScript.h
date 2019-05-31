@@ -141,6 +141,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 bool __cdecl readGameFlowChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);
 bool __cdecl readGameFlowLevel();
 bool __cdecl readGameFlowStrings();
+bool __cdecl readGameFlowTracks();
 bool __cdecl readGameFlowFlags();
 
 bool __cdecl LoadScript();
@@ -172,6 +173,7 @@ public:
 	bool								DebugMode;
 	__int32								LevelFarView;
 	__int32								TitleType;
+	char*								Intro;
 
 	// Selected language set
 	LanguageScript*						CurrentStrings;

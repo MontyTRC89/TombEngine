@@ -7,6 +7,7 @@
 #include "..\Game\lot.h"
 #include "..\Game\laramisc.h"
 #include "..\Objects\newobjects.h"
+#include "..\Game\sound.h"
 
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
@@ -44,6 +45,8 @@ ChunkId* SaveGame::m_chunkItemQuadInfo;
 ChunkId* SaveGame::m_chunkBats;
 ChunkId* SaveGame::m_chunkRats;
 ChunkId* SaveGame::m_chunkSpiders;
+
+extern vector<AudioTrack> g_AudioTracks;
 
 void SaveGame::saveItems()
 {
@@ -171,8 +174,8 @@ void SaveGame::saveGameStatus(__int32 arg1, __int32 arg2)
 	for (__int32 i = 0; i < NumberSpotcams; i++)
 		m_writer->WriteChunk(m_chunkFlybyFlags, &saveFlybyFlags, i, SpotCam[i].flags);
 
-	for (__int32 i = 0; i < 136; i++)
-		m_writer->WriteChunk(m_chunkCdFlags, &saveCdFlags, i, CdFlags[i]);
+	for (__int32 i = 0; i < g_AudioTracks.size(); i++)
+		m_writer->WriteChunk(m_chunkCdFlags, &saveCdFlags, i, g_AudioTracks[i].Mask);
 
 	for (__int32 i = 0; i < NumberCameras; i++)
 		m_writer->WriteChunk(m_chunkCamera, &saveCamera, i, Camera.fixed[i].flags);
@@ -674,7 +677,8 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, __int32 maxSize, __int32 a
 		__int16 index = LEB128::ReadInt16(m_stream);
 		printf("Index: %d\n", index);
 		__int16 value = LEB128::ReadInt16(m_stream);
-		CdFlags[index] = value;
+		if (index < g_AudioTracks.size())
+			g_AudioTracks[index].Mask = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkCamera))

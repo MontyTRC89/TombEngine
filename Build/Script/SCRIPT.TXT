@@ -30,15 +30,16 @@ PlayAnyLevel=   ENABLED
 FlyCheat=       ENABLED
 Diagnostic=     ENABLED
 WorldFarView=   200
+Intro=          SCREENS\MAIN.PNG
 
 ;--------------------------------------
 ; Title
 ;--------------------------------------
 
 [Title]
-LoadScreen=     SCREENS\TITLE.PNG
+Background=     SCREENS\TITLE.PNG
 LevelFile=      DATA\TITLE.TRC
-AmbientTrack=   104
+AmbientTrack=   83
 
 ;--------------------------------------
 ; Levels

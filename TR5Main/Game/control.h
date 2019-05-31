@@ -42,6 +42,7 @@
 #define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, __int32)) 0x004159F0)
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)
 //#define AnimateWaterfalls ((void (__cdecl*)()) 0x00465DF0)
+//#define TestTriggersAtXYZ ((void (__cdecl*)(__int32, __int32, __int32, __int16, __int32, __int32)) 0x0047D9D0)
 
 GAME_STATUS __cdecl DoTitle(__int32 index);
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);
@@ -51,5 +52,5 @@ void __cdecl AnimateWaterfalls();
 
 unsigned __stdcall GameMain(void*);
 void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags);
-
+void __cdecl TestTriggersAtXYZ(__int32 x, __int32 y, __int32 z, __int16 roomNumber, __int16 heavy, __int16 heavyFlags);
 void Inject_Control();

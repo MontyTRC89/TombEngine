@@ -375,6 +375,7 @@ public:
 	float						GetCameraY();
 	float						GetCameraTilt();
 	bool						HasWeaponMultipleAmmos(__int16 object);
+	bool						UpdateSceneAndDrawInventory();
 };
 
 extern Inventory* g_Inventory;

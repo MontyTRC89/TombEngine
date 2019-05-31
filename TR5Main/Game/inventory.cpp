@@ -854,8 +854,7 @@ __int32 Inventory::DoInventory()
 			{
 				m_rings[m_activeRing].rotation += deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			if (m_rings[m_activeRing].currentObject == m_rings[m_activeRing].numObjects - 1)
@@ -878,8 +877,7 @@ __int32 Inventory::DoInventory()
 			{
 				m_rings[m_activeRing].rotation -= deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			if (m_rings[m_activeRing].currentObject == 0)
@@ -906,8 +904,7 @@ __int32 Inventory::DoInventory()
 						g_Renderer->FadeOut();
 						for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 						{
-							g_Renderer->DrawInventory();
-							g_Renderer->SyncRenderer();
+							UpdateSceneAndDrawInventory();
 						}
 
 						return passportResult;
@@ -959,8 +956,7 @@ __int32 Inventory::DoInventory()
 			}
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	CloseRing(m_activeRing, true);
@@ -1090,8 +1086,7 @@ __int32 Inventory::DoWeapon()
 			}
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	PopoverObject();
@@ -1241,8 +1236,7 @@ bool Inventory::DoCombine()
 			{
 				combineRing->rotation += deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			if (combineRing->currentObject > 0)
@@ -1264,8 +1258,7 @@ bool Inventory::DoCombine()
 			{
 				combineRing->rotation -= deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
@@ -1303,8 +1296,7 @@ bool Inventory::DoCombine()
 				SayNo();
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	CloseRing(INV_RING_COMBINE, false);
@@ -1423,8 +1415,7 @@ void Inventory::DoSelectAmmo()
 			{
 				ammoRing->rotation += deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			if (ammoRing->currentObject > 0)
@@ -1446,8 +1437,7 @@ void Inventory::DoSelectAmmo()
 			{
 				ammoRing->rotation -= deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
@@ -1484,8 +1474,7 @@ void Inventory::DoSelectAmmo()
 			break;
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	CloseRing(INV_RING_CHOOSE_AMMO, false);
@@ -1856,6 +1845,38 @@ void Inventory::InitialiseTitle()
 	InventoryItemChosen = -1;
 }
 
+bool Inventory::UpdateSceneAndDrawInventory()
+{
+	__int32 nframes;
+
+	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
+	{
+		// Control routines uses joints calculated here for getting Lara joint positions
+		CalcLaraMatrices(0);
+		phd_PushUnitMatrix();
+		CalcLaraMatrices(1);
+
+		// Calls my new rock & roll renderer :)
+		g_Renderer->DumpGameScene();
+		g_Renderer->DrawInventory();
+		Camera.numberFrames = g_Renderer->SyncRenderer();
+
+		// We need to pop the matrix stack or the game will crash
+		MatrixPtr -= 12;
+		DxMatrixPtr -= 48;
+
+		nframes = Camera.numberFrames;
+		ControlPhase(nframes, 0);
+	}
+	else
+	{
+		g_Renderer->DrawInventory();
+		g_Renderer->SyncRenderer();
+	}
+
+	return true;
+}
+
 __int32 Inventory::DoTitleInventory()
 {
 	InitialiseTitle();
@@ -1871,8 +1892,7 @@ __int32 Inventory::DoTitleInventory()
 	g_Renderer->FadeIn();
 	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	CurrentAtmosphere = CDA_XA11_FLYBY1;
@@ -1904,8 +1924,7 @@ __int32 Inventory::DoTitleInventory()
 			{
 				ring->rotation += deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			if (ring->currentObject == ring->numObjects - 1)
@@ -1927,8 +1946,7 @@ __int32 Inventory::DoTitleInventory()
 			{
 				ring->rotation -= deltaAngle;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 
 			if (ring->currentObject == 0)
@@ -1964,8 +1982,7 @@ __int32 Inventory::DoTitleInventory()
 				DoSoundSettings();
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	CloseRing(INV_RING_OPTIONS, true);
@@ -1974,8 +1991,7 @@ __int32 Inventory::DoTitleInventory()
 	g_Renderer->FadeOut();
 	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	return result;
@@ -2017,8 +2033,7 @@ __int32 Inventory::DoPassport()
 	// Open the passport
 	for (__int32 i = 0; i < 14; i++)
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 		ring->frameIndex++;
 	}
 
@@ -2058,8 +2073,7 @@ __int32 Inventory::DoPassport()
 				ring->frameIndex = 19;
 				for (__int32 i = 0; i < 5; i++)
 				{
-					g_Renderer->DrawInventory();
-					g_Renderer->SyncRenderer();
+					UpdateSceneAndDrawInventory();
 					ring->frameIndex--;
 				}
 
@@ -2077,8 +2091,7 @@ __int32 Inventory::DoPassport()
 				ring->frameIndex = 14;
 				for (__int32 i = 0; i < 5; i++)
 				{
-					g_Renderer->DrawInventory();
-					g_Renderer->SyncRenderer();
+					UpdateSceneAndDrawInventory();
 					ring->frameIndex++;
 				}
 
@@ -2155,8 +2168,7 @@ __int32 Inventory::DoPassport()
 
 				LoadSavegameInfos();
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 		}
 		else if (choices[choice] == INV_WHAT_PASSPORT_SAVE_GAME)
@@ -2231,8 +2243,7 @@ __int32 Inventory::DoPassport()
 
 				LoadSavegameInfos();
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 		}
 		else if (choices[choice] == INV_WHAT_PASSPORT_SELECT_LEVEL)
@@ -2302,8 +2313,7 @@ __int32 Inventory::DoPassport()
 				ring->selectedIndex = selectedLevel;
 				ring->passportAction = INV_WHAT_PASSPORT_SELECT_LEVEL;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 		}
 		else if (choices[choice] == INV_WHAT_PASSPORT_NEW_GAME)
@@ -2357,8 +2367,7 @@ __int32 Inventory::DoPassport()
 
 				ring->passportAction = INV_WHAT_PASSPORT_NEW_GAME;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 		}
 		else if (choices[choice] == INV_WHAT_PASSPORT_EXIT_GAME)
@@ -2412,8 +2421,7 @@ __int32 Inventory::DoPassport()
 
 				ring->passportAction = INV_WHAT_PASSPORT_EXIT_GAME;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 		}
 		else if (choices[choice] == INV_WHAT_PASSPORT_EXIT_TO_TITLE)
@@ -2467,14 +2475,12 @@ __int32 Inventory::DoPassport()
 
 				ring->passportAction = INV_WHAT_PASSPORT_EXIT_TO_TITLE;
 
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 			}
 		}
 		else
 		{
-			g_Renderer->DrawInventory();
-			g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 		}
 	}
 
@@ -2482,8 +2488,7 @@ __int32 Inventory::DoPassport()
 	ring->frameIndex = 24;
 	for (__int32 i = 24; i < 30; i++)
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 		ring->frameIndex++;
 	}
 
@@ -2508,8 +2513,7 @@ __int32	Inventory::PopupObject()
 
 	for (__int32 i = 0; i < steps; i++)
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 
 		ring->objects[ring->currentObject].rotation += deltaAngle;
 		ring->objects[ring->currentObject].scale += deltaScale;
@@ -2534,8 +2538,7 @@ __int32	Inventory::PopoverObject()
 
 	for (__int32 i = 0; i < steps; i++)
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 
 		ring->objects[ring->currentObject].rotation -= deltaAngle;
 		ring->objects[ring->currentObject].scale -= deltaScale;
@@ -2620,8 +2623,7 @@ void Inventory::DoControlsSettings()
 			}
 			else
 			{
-				g_Renderer->DrawInventory();
-				g_Renderer->SyncRenderer();
+				UpdateSceneAndDrawInventory();
 				continue;
 			}
 
@@ -2674,8 +2676,7 @@ void Inventory::DoControlsSettings()
 						}
 					}
 
-					g_Renderer->DrawInventory();
-					g_Renderer->SyncRenderer();
+					UpdateSceneAndDrawInventory();
 
 					SetDebounce = true;
 					S_UpdateInput();
@@ -2684,8 +2685,7 @@ void Inventory::DoControlsSettings()
 			}
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	PopoverObject();
@@ -2853,8 +2853,7 @@ void Inventory::DoGraphicsSettings()
 			}
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	PopoverObject();
@@ -2870,13 +2869,6 @@ void Inventory::DoSoundSettings()
 
 	// Copy configuration to a temporary object
 	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
-
-	// Open the passport
-	for (__int32 i = 0; i < 14; i++)
-	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
-	}
 
 	bool closeObject = false;
 	__int32 oldVolume = ring->Configuration.MusicVolume;
@@ -3030,8 +3022,7 @@ void Inventory::DoSoundSettings()
 			}
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	PopoverObject();
@@ -3078,8 +3069,7 @@ void Inventory::OpenRing(__int32 r, bool animateCamera)
 
 		m_cameraTilt -= deltaTilt;
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	m_cameraTilt = INV_CAMERA_TILT;
@@ -3113,8 +3103,7 @@ void Inventory::CloseRing(__int32 r, bool animateCamera)
 
 		m_cameraTilt += deltaTilt;
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	m_cameraTilt = (animateCamera ? INV_CAMERA_ANIMATION_TILT : INV_CAMERA_TILT);
@@ -3160,8 +3149,7 @@ void Inventory::SwitchRing(__int32 from, __int32 to, float verticalShift)
 			ring2->draw = true;
 		}
 
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		UpdateSceneAndDrawInventory();
 	}
 
 	ring1->distance = 0;

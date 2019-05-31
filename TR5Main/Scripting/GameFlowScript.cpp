@@ -20,8 +20,12 @@ ChunkId* ChunkGameFlowLevelLayer = ChunkId::FromString("Tr5MainLevelLayer");
 ChunkId* ChunkGameFlowLevelLuaEvent = ChunkId::FromString("Tr5MainLevelLuaEvent");
 ChunkId* ChunkGameFlowLevelLegend = ChunkId::FromString("Tr5MainLevelLegend");
 ChunkId* ChunkGameFlowStrings = ChunkId::FromString("Tr5MainStrings");
+ChunkId* ChunkGameFlowAudioTracks = ChunkId::FromString("Tr5MainAudioTracks");
+ChunkId* ChunkGameFlowTitleBackground = ChunkId::FromString("Tr5MainTitleBackground");
 
 ChunkReader* g_ScriptChunkIO;
+
+extern vector<AudioTrack> g_AudioTracks;
 
 GameFlow::GameFlow(sol::state* lua)
 {
@@ -105,7 +109,11 @@ bool __cdecl readGameFlowFlags()
 	g_GameFlow->FlyCheat = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 	g_GameFlow->DebugMode = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 	g_GameFlow->LevelFarView = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
-	g_GameFlow->TitleType = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
+	//g_GameFlow->TitleType = LEB128::ReadInt32(g_ScriptChunkIO->GetRawStream());
+
+	char* str;
+	g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+	g_GameFlow->Intro = str;
 
 	return true;
 }
@@ -117,8 +125,8 @@ bool __cdecl readGameFlowStrings()
 	LanguageScript* lang = new LanguageScript(name);
 	free(name);
 
-	int numStrings = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-	for (int i = 0; i < numStrings; i++)
+	__int32 numStrings = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+	for (__int32 i = 0; i < numStrings; i++)
 	{
 		char* str;
 		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
@@ -127,6 +135,23 @@ bool __cdecl readGameFlowStrings()
 	}
 
 	g_GameFlow->Strings.push_back(lang);
+
+	return true;
+}
+
+bool __cdecl readGameFlowTracks()
+{
+	__int32 numTracks = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+	for (__int32 i = 0; i < numTracks; i++)
+	{
+		char* str;
+		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+
+		AudioTrack track;
+		track.Name = str;
+		track.Mask = 0;
+		g_AudioTracks.push_back(track);
+	}
 
 	return true;
 }
@@ -147,6 +172,10 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 		level->LoadScreenFileName = string(str);
 		free(str);
 
+		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
+		level->Background = str;
+		free(str);
+
 		level->NameStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
 		level->Soundtrack = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
 
@@ -165,7 +194,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 		level->Rumble = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		level->Weather = (WEATHER_TYPES)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		level->UnlimitedAir = (WEATHER_TYPES)LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-
+		
 		return true;
 	}
 	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzle))
@@ -273,6 +302,8 @@ bool __cdecl readGameFlowChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 		return readGameFlowFlags();
 	else if (chunkId->EqualsTo(ChunkGameFlowStrings))
 		return readGameFlowStrings();
+	else if (chunkId->EqualsTo(ChunkGameFlowAudioTracks))
+		return readGameFlowTracks();
 	else if (chunkId->EqualsTo(ChunkGameFlowLevel))
 		return readGameFlowLevel();
 	return false;
@@ -405,6 +436,8 @@ bool GameFlow::DoGameflow()
 
 	// We loop indefinitely, looking for return values of DoTitle or DoLevel
 	bool loadFromSavegame = false;
+
+	//DoLevel(0, 120, false);
 
 	while (true)
 	{
