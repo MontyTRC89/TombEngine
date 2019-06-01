@@ -840,6 +840,7 @@ private:
 	Texture2D*										m_loadScreen;
 	Texture2D*										m_textureAtlas;
 	Texture2D*										m_skyTexture;
+	Texture2D*										m_logo;
 	VertexBuffer*									m_roomsVertexBuffer;
 	IndexBuffer*									m_roomsIndexBuffer;
 	VertexBuffer*									m_moveablesVertexBuffer;

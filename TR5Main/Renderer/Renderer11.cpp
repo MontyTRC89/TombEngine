@@ -452,6 +452,10 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	if (m_whiteTexture == NULL)
 		return false;
 
+	m_logo = Texture2D::LoadFromFile(m_device, "Logo.png");
+	if (m_logo == NULL)
+		return false;
+
 	// Load shaders
 	ID3D10Blob* blob;
 
@@ -1459,29 +1463,32 @@ bool Renderer11::drawScene(bool dump)
 
 	drawLines2D();
 
-	// Draw binoculars or lasersight
-	drawOverlays();
+	if (CurrentLevel != 0)
+	{
+		// Draw binoculars or lasersight
+		drawOverlays();
 
-	ROOM_INFO* r = &Rooms[LaraItem->roomNumber];
-	m_currentY = 60;
+		ROOM_INFO* r = &Rooms[LaraItem->roomNumber];
+		m_currentY = 60;
 
-	printDebugMessage("Update time: %d", m_timeUpdate);
-	printDebugMessage("Frame time: %d", m_timeFrame);
-	printDebugMessage("Draw calls: %d", m_numDrawCalls);
-	printDebugMessage("Rooms: %d", m_roomsToDraw.Size());
-	printDebugMessage("Items: %d", m_itemsToDraw.Size());
-	printDebugMessage("Statics: %d", m_staticsToDraw.Size());
-	printDebugMessage("Lights: %d", m_lightsToDraw.Size());
-	printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
-	printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
+		printDebugMessage("Update time: %d", m_timeUpdate);
+		printDebugMessage("Frame time: %d", m_timeFrame);
+		printDebugMessage("Draw calls: %d", m_numDrawCalls);
+		printDebugMessage("Rooms: %d", m_roomsToDraw.Size());
+		printDebugMessage("Items: %d", m_itemsToDraw.Size());
+		printDebugMessage("Statics: %d", m_staticsToDraw.Size());
+		printDebugMessage("Lights: %d", m_lightsToDraw.Size());
+		printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
+		printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
+	}
 
 	drawAllStrings();
 
-	m_spriteBatch->Begin();
+	/*m_spriteBatch->Begin();
 	RECT rect; rect.top = rect.left = 0; rect.right = rect.bottom = 300;
 	m_spriteBatch->Draw(m_shadowMap->ShaderResourceView, rect, Colors::White);
-	m_spriteBatch->End();
+	m_spriteBatch->End();*/
 
 	if (!dump)
 		m_swapChain->Present(0, 0);
@@ -5554,6 +5561,12 @@ __int32 Renderer11::drawInventoryScene()
 {
 	char stringBuffer[255];
 
+	bool drawLogo = true;
+
+	RECT guiRect;
+	Vector4 guiColor = Vector4(0.0f, 0.0f, 0.25f, 0.5f);
+	bool drawGuiRect = false;
+
 	RECT rect;
 	rect.left = 0;
 	rect.top = 0;
@@ -5617,7 +5630,7 @@ __int32 Renderer11::drawInventoryScene()
 	float cameraZ = 0.0f;
 
 	m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
-		Vector3(0.0f, g_Inventory->GetCameraY(), 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
+		Vector3(0.0f, g_Inventory->GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
 	m_stCameraMatrices.Projection = Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
 		g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f).Transpose();
 
@@ -5772,12 +5785,28 @@ __int32 Renderer11::drawInventoryScene()
 								y += 24;
 							}
 
-							drawColoredQuad(180, 24, 440, y + 20 - 24, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+							drawLogo = false;
+
+							drawGuiRect = true;
+							guiRect.left = 180;
+							guiRect.right = 440;
+							guiRect.top = 24;
+							guiRect.bottom = y + 20 - 24;
+
+							//drawColoredQuad(180, 24, 440, y + 20 - 24, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 						}
 						/* **************** SELECT LEVEL ************* */
 						else if (ring->passportAction == INV_WHAT_PASSPORT_SELECT_LEVEL)
 						{
-							drawColoredQuad(200, 24, 400, 24 * (g_GameFlow->GetNumLevels() - 1) + 40, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+							drawLogo = false;
+
+							drawGuiRect = true;
+							guiRect.left = 200;
+							guiRect.right = 400;
+							guiRect.top = 24;
+							guiRect.bottom = 24 * (g_GameFlow->GetNumLevels() - 1) + 40;
+
+							//drawColoredQuad(200, 24, 400, 24 * (g_GameFlow->GetNumLevels() - 1) + 40, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 
 							__int16 lastY = 50;
 
@@ -5896,7 +5925,15 @@ __int32 Renderer11::drawInventoryScene()
 
 						y += 25;
 
-						drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+						drawLogo = false;
+
+						drawGuiRect = true;
+						guiRect.left = 180;
+						guiRect.right = 440;
+						guiRect.top = 180;
+						guiRect.bottom = y + 20 - 180;
+
+						//drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
 					/* **************** AUDIO SETTINGS ************* */
 					else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
@@ -5934,7 +5971,7 @@ __int32 Renderer11::drawInventoryScene()
 						PrintString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
-						drawBar(400, y, 150, 12, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+						drawBar(400, y + 4, 150, 18, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
 
 						y += 25;
 
@@ -5942,7 +5979,7 @@ __int32 Renderer11::drawInventoryScene()
 						PrintString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
-						drawBar(400, y, 150, 12, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
+						drawBar(400, y + 4, 150, 18, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
 
 						y += 25;
 
@@ -5959,7 +5996,15 @@ __int32 Renderer11::drawInventoryScene()
 
 						y += 25;
 
-						drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+						drawLogo = false;
+
+						drawGuiRect = true;
+						guiRect.left = 180;
+						guiRect.right = 440;
+						guiRect.top = 180;
+						guiRect.bottom = y + 20 - 180;
+
+						//drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
 					/* **************** CONTROLS SETTINGS ************* */
 					else if (inventoryItem == INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED)
@@ -6008,7 +6053,15 @@ __int32 Renderer11::drawInventoryScene()
 
 						y += 25;
 
-						drawColoredQuad(180, 20, 440, y + 20 - 20, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+						drawLogo = false;
+
+						drawGuiRect = true;
+						guiRect.left = 180;
+						guiRect.right = 440;
+						guiRect.top = 20;
+						guiRect.bottom = y + 20 - 20;
+
+						//drawColoredQuad(180, 20, 440, y + 20 - 20, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
 					else
 					{
@@ -6042,7 +6095,15 @@ __int32 Renderer11::drawInventoryScene()
 							y += 25;
 						}
 						
-						drawColoredQuad(300, 80, 200, y + 20 - 80, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
+						drawLogo = false;
+
+						drawGuiRect = true;
+						guiRect.left = 300;
+						guiRect.right = 200;
+						guiRect.top = 80;
+						guiRect.bottom = y + 20 - 80;
+
+						//drawColoredQuad(300, 80, 200, y + 20 - 80, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
 
 					__int32 quantity = -1;
@@ -6144,17 +6205,37 @@ __int32 Renderer11::drawInventoryScene()
 		lastRing++;
 	}
 
-
+	if (drawGuiRect)
+	{
+		// Draw blu box
+		drawColoredQuad(guiRect.left, guiRect.top, guiRect.right, guiRect.bottom, guiColor);
+	}
+	
 	drawLines2D();   
 	drawAllStrings();
+
+	if (g_Inventory->GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
+	{
+		// Draw main logo
+		float factorX = ScreenWidth / 800.0f;
+		float factorY = ScreenHeight / 600.0f;
+
+		RECT rect;
+		rect.left = 250 * factorX;
+		rect.right = 550 * factorX;
+		rect.top = 50 * factorY;
+		rect.bottom = 200 * factorY;
+
+		m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->Additive());
+		m_spriteBatch->Draw(m_logo->ShaderResourceView, rect, Vector4::One);
+		m_spriteBatch->End();
+	}
 	
 	return 0;
 }
 
 bool Renderer11::drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vector4 color)
 {
-	//return true;
-
 	float factorW = ScreenWidth / 800.0f;
 	float factorH = ScreenHeight / 600.0f;
 
@@ -6164,7 +6245,7 @@ bool Renderer11::drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vec
 	rect.bottom = (y + h) * factorH;
 	rect.right = (x + w) * factorW;
 
-	m_spriteBatch->Begin(SpriteSortMode_Immediate);
+	m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->AlphaBlend(), NULL, m_states->DepthRead());
 	m_spriteBatch->Draw(m_whiteTexture->ShaderResourceView, rect, color);
 	m_spriteBatch->End();
 
