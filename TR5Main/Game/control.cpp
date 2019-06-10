@@ -410,13 +410,12 @@ unsigned __stdcall GameMain(void*)
 	// Execute the LUA gameflow and play the game
 	g_GameFlow->DoGameflow();
 
-	// End the game and release some resources
-	GameClose();
+	DoTheGame = false;
 
 	// Finish the thread
 	PostMessageA((HWND)WindowsHandle, 0x10u, 0, 0);
 	_endthreadex(1);
-
+	
 	return 1;   
 }   
 

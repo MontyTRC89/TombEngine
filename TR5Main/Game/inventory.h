@@ -192,7 +192,7 @@ void Inject_Inventory();
 #define INV_RINGS_OFFSET				8192.0f
 #define INV_OBJECTS_SCALE				2.0f
 #define INV_SECONDARY_MOVEMENT			200.0f
-#define INV_OBJECTS_DISTANCE			2048.0f
+#define INV_OBJECTS_DISTANCE			1792.0f
 #define INV_CAMERA_TILT					5.0f
 #define INV_CAMERA_ANIMATION_TILT		60.0f
 #define INV_OBJECT_TILT					5.0f

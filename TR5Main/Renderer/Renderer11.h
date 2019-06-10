@@ -81,11 +81,15 @@ public:
 	}
 
 	inline T*& operator[] (__int32 x) {
+		if (x >= m_maxItems)
+			return m_objects[0];
 		return m_objects[x];
 	}
 
 	inline void Add(T* value)
 	{
+		if (m_numItems >= m_maxItems)
+			return;
 		m_objects[m_numItems++] = value;
 	}
 };

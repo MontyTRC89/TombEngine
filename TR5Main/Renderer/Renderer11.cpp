@@ -55,9 +55,8 @@ Renderer11::Renderer11()
 
 Renderer11::~Renderer11()
 {
-	DX11_RELEASE(m_device);
-	DX11_RELEASE(m_context);
-	DX11_RELEASE(m_swapChain);
+	FreeRendererData();
+
 	DX11_RELEASE(m_backBufferRTV);
 	DX11_RELEASE(m_backBufferTexture);
 	DX11_RELEASE(m_depthStencilState);
@@ -75,6 +74,7 @@ Renderer11::~Renderer11()
 	DX11_DELETE(m_titleScreen);
 	DX11_DELETE(m_binocularsTexture);
 	DX11_DELETE(m_whiteTexture);
+	DX11_DELETE(m_logo);
 
 	DX11_RELEASE(m_vsRooms);
 	DX11_RELEASE(m_psRooms);
@@ -104,7 +104,9 @@ Renderer11::~Renderer11()
 	DX11_DELETE(m_dumpScreenRenderTarget);
 	DX11_DELETE(m_shadowMap);
 
-	FreeRendererData();
+	DX11_RELEASE(m_swapChain);
+	DX11_RELEASE(m_context);
+	DX11_RELEASE(m_device);
 }
 
 void Renderer11::FreeRendererData()
@@ -566,7 +568,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_firstWeather = true;
 
 	// Preallocate lists
-	m_roomsToDraw.Reserve(NumberRooms);
+	m_roomsToDraw.Reserve(1024);
 	m_itemsToDraw.Reserve(NUM_ITEMS);
 	m_effectsToDraw.Reserve(NUM_ITEMS);
 	m_lightsToDraw.Reserve(16384);
