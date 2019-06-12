@@ -88,6 +88,7 @@ void __cdecl InitialiseMummy(__int16 itemNum);
 void __cdecl MummyControl(__int16 itemNum);
 void __cdecl InitialiseSkeleton(__int16 itemNum);
 void __cdecl SkeletonControl(__int16 itemNum);
+void __cdecl WakeUpSkeleton(ITEM_INFO* item);
 void __cdecl FourBladesControl(__int16 itemNum);
 void __cdecl BirdBladeControl(__int16 itemNum);
 void __cdecl CatwalkBlaldeControl(__int16 itemNum);

@@ -15,7 +15,43 @@ BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 
 void __cdecl InitialiseSkeleton(__int16 itemNum)
 {
+	ITEM_INFO* item = &Items[itemNum];
+	OBJECT_INFO* obj = &Objects[ID_SKELETON];
 
+	ClearItem(itemNum);
+
+	switch (item->triggerFlags)
+	{
+	case 0:
+		item->goalAnimState = 0;
+		item->currentAnimState = 0;
+		item->animNumber = obj->animIndex;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		break;
+
+	case 1:
+		item->goalAnimState = 20;
+		item->currentAnimState = 20;
+		item->animNumber = obj->animIndex + 37;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		break;
+
+	case 2:
+		item->goalAnimState = 19;
+		item->currentAnimState = 19;
+		item->animNumber = obj->animIndex + 34;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		break;
+
+	case 3:
+		item->goalAnimState = 25;
+		item->currentAnimState = 25;
+		item->animNumber = obj->animIndex;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->status = ITEM_DEACTIVATED;
+		break;
+
+	}
 }
 
 void __cdecl SkeletonControl(__int16 itemNum)
@@ -90,7 +126,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 	if (item->aiBits)
 		GetAITarget(creature);
-	else if (!creature->enemy)
+	else
 		creature->enemy = LaraItem;
 
 	AI_INFO info;
@@ -138,23 +174,25 @@ void __cdecl SkeletonControl(__int16 itemNum)
 			laraInfo.distance = dx * dx + dz * dz;
 		}
 
-		GetCreatureMood(item, &info, 1);
+		GetCreatureMood(item, &info, VIOLENT);
 
 		if (!(item->meshBits & 0x200))
 			creature->mood = ESCAPE_MOOD;
-		else
-			CreatureMood(item, &info, 1);
+		
+		CreatureMood(item, &info, VIOLENT);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
+		ITEM_INFO* tempEnemy = creature->enemy;
 		creature->enemy = LaraItem;
 		if (item->hitStatus || distance < SQUARE(1024) || TargetVisible(item, &laraInfo))
 			creature->alerted = true;
+		creature->enemy = tempEnemy;
 
 		if (item != Lara.target || laraInfo.distance <= 870 || angle <= -10240 || angle >= 10240)
 		{
-			someFlag1 = 0;
-			someFlag2 = 0;
+			someFlag1 = false;
+			someFlag2 = false;
 		}
 		else
 		{
@@ -682,5 +720,64 @@ void __cdecl SkeletonControl(__int16 itemNum)
 		}
 
 		CreatureAnimation(itemNum, angle, 0);
+	}
+}
+
+void __cdecl WakeUpSkeleton(ITEM_INFO* item)
+{
+	__int16 fxNum = CreateNewEffect();
+	if (fxNum != NO_ITEM)
+	{
+		FX_INFO* fx = &Effects[fxNum];
+
+		__int16 roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		
+		fx->pos.xPos = GetRandomControl() + item->pos.xPos - 128;
+		fx->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		fx->pos.zPos = GetRandomControl() + item->pos.zPos - 128;
+		fx->roomNumber = item->roomNumber;
+		fx->pos.yRot = 2 * GetRandomControl();
+		fx->speed = GetRandomControl() >> 11;
+		fx->fallspeed = -(GetRandomControl() >> 10);
+		fx->frameNumber = Objects[103].meshIndex;
+		fx->objectNumber = ID_BODY_PART;
+		fx->shade = 0x4210;
+		fx->flag2 = 0x601;
+
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+		spark->on = 1;
+		spark->sR = 0;
+		spark->sG = 0;
+		spark->sB = 0;
+		spark->dR = 100;
+		spark->dG = 60;
+		spark->dB = 30;
+		spark->fadeToBlack = 8;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
+		spark->x = fx->pos.xPos;
+		spark->y = fx->pos.yPos;
+		spark->z = fx->pos.zPos;
+		spark->xVel = SIN(fx->pos.yRot) >> 2;  
+		spark->yVel = 0;
+		spark->zVel = COS(fx->pos.yRot) >> 2;
+		spark->transType = 2;
+		spark->friction = 68;
+		spark->flags = 26;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		if (GetRandomControl() & 1)
+		{
+			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
+		}
+		else
+		{
+			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+		}
+		spark->gravity = -4 - (GetRandomControl() & 3);
+		spark->scalar = 3;
+		spark->maxYvel = -4 - (GetRandomControl() & 3);
+		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 8;
+		spark->dSize = spark->size * 4;
 	}
 }
