@@ -41,7 +41,7 @@ typedef enum object_types {
 	ID_BLUE_GUARD,
 	ID_LARA_MOTORBIKE_ANIMS,   // TR4 - OK
 	ID_TWOGUN,
-	ID_SKELETON, // TR4 - Working on
+	ID_SKELETON, // TR4 - OK - Needs testing
 	ID_DOG,
 	ID_CROCODILE, // TR4 - OK
 	ID_LARA_EXTRA_ANIMS, // TR1-2-3 - OK

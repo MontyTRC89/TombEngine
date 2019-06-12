@@ -748,7 +748,7 @@ void __cdecl BatControl(__int16 itemNum)
 					__int32 dz2 = target->pos.zPos - item->pos.zPos;
 					__int32 distance = dx2 * dx2 + dz2 * dz2;
 
-					if (distance < minDistance && distance < laraDistance)
+					if (distance < minDistance)
 					{
 						creature->enemy = target;
 						minDistance = distance;
@@ -760,17 +760,17 @@ void __cdecl BatControl(__int16 itemNum)
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
 
-		GetCreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &info, TIMID);
 		if (item->flags)
 			creature->mood = ESCAPE_MOOD;
-		CreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, TIMID);
 
-		angle = CreatureTurn(item, 3640);
+		angle = CreatureTurn(item, ANGLE(20));
 
 		switch (item->currentAnimState)
 		{
 		case 2:
-			if (info.distance < 0x10000 || !(GetRandomControl() & 0x3F))
+			if (info.distance < SQUARE(256) || !(GetRandomControl() & 0x3F))
 			{
 				creature->flags = 0;
 			}
@@ -778,7 +778,7 @@ void __cdecl BatControl(__int16 itemNum)
 			{
 				if (item->touchBits
 					|| creature->enemy != LaraItem
-					&& info.distance < 0x10000
+					&& info.distance < SQUARE(256)
 					&& info.ahead
 					&& abs(item->pos.yPos - creature->enemy->pos.yPos) < 896)
 				{
@@ -791,9 +791,9 @@ void __cdecl BatControl(__int16 itemNum)
 			if (!creature->flags
 				&& (item->touchBits
 					|| creature->enemy != LaraItem
-					&& info.distance < 0x10000
-					&& info.ahead/*
-					&& (item->pos.yPos - v19->pos.yPos, (signed int)((HIDWORD(v20) ^ v20) - HIDWORD(v20)) < 896)*/))
+					&& info.distance < SQUARE(256)
+					&& info.ahead
+					&& abs(item->pos.yPos - creature->enemy->pos.yPos) < 896))
 			{
 				CreatureEffect(item, &batBiteInfo, DoBloodSplat);
 				if (creature->enemy == LaraItem)
@@ -811,7 +811,9 @@ void __cdecl BatControl(__int16 itemNum)
 			break;
 
 		case 6:
-			if (info.distance < 26214400 || item->hitStatus || creature->flags & 0x10)
+			if (info.distance < SQUARE(5120) || 
+				item->hitStatus || 
+				creature->hurtByLara)
 			{
 				item->goalAnimState = 1;
 			}
