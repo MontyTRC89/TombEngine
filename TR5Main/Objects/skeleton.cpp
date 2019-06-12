@@ -725,7 +725,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 
 void __cdecl WakeUpSkeleton(ITEM_INFO* item)
 {
-	__int16 fxNum = CreateNewEffect();
+	__int16 fxNum = CreateNewEffect(item->roomNumber);
 	if (fxNum != NO_ITEM)
 	{
 		FX_INFO* fx = &Effects[fxNum];

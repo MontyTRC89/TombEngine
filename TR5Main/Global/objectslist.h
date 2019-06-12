@@ -49,7 +49,7 @@ typedef enum object_types {
 	ID_LARSON,
 	ID_SMALL_SCORPION, // TR4 - OK
 	ID_PIERRE,
-	ID_BAT, // TR4 - OK (bugs in zones)
+	ID_BAT, // TR4 - OK - Needs testing
 	ID_MAFIA,
 	ID_GUIDE, // TR4 - OK - Needs testing
 	ID_MAFIA2,

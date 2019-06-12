@@ -45,6 +45,81 @@ void __cdecl InitialiseHorseman(__int16 itemNum)
 	item->itemFlags[0] = NO_ITEM; // No horse yet
 }
 
+void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num)
+{
+	for (__int32 i = 0; i < num; i++)
+	{
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+
+		__int32 r = GetRandomControl();
+
+		spark->on = 1;
+		spark->sG = -128;
+		spark->sB = (r & 0xF) + 16;
+		spark->sR = 0;
+		spark->dG = 96;
+		spark->dB = ((r >> 4) & 0x1F) + 48;
+		spark->dR = 0;
+		spark->colFadeSpeed = 2;
+		spark->fadeToBlack = 4;
+		spark->life = 9;
+		spark->sLife = 9;
+		spark->transType = 2;
+		spark->x = pos->xPos;
+		spark->y = pos->yPos;
+		spark->z = pos->zPos;
+		spark->friction = 34;
+		spark->yVel = (r & 0xFFF) - 2048;
+		spark->flags = 0;
+		spark->gravity = (r >> 7) & 0x1F;
+		spark->maxYvel = 0;
+		spark->zVel = COS((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->xVel = -SIN((r & 0x7FF) + param1 - 1024) >> 2;
+	}
+
+	for (__int32 i = 0; i < num; i++)
+	{
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+
+		__int32 r = GetRandomControl();
+
+		spark->on = 1;
+		spark->sG = -128;
+		spark->sR = 0;
+		spark->dG = 96;
+		spark->sB = (r & 0xF) + 16;
+		spark->dR = 0;
+		spark->colFadeSpeed = 2;
+		spark->fadeToBlack = 4;
+		spark->dB = ((r >> 4) & 0x1F) + 48;
+		spark->life = 9;
+		spark->sLife = 9;
+		spark->transType = 2;
+		spark->x = pos->xPos;
+		spark->y = pos->yPos;
+		spark->z = pos->zPos;
+		spark->yVel = (r & 0xFFF) - 2048;
+		spark->gravity = (r >> 7) & 0x1F;
+		spark->rotAng = r >> 3;
+		if (r & 1)
+		{
+			spark->rotAdd = -16 - (r & 0xF);
+		}
+		else
+		{
+			spark->rotAdd = spark->sB;
+		}
+		spark->scalar = 3;
+		spark->friction = 34;
+		spark->sSize = spark->size = ((r >> 5) & 7) + 4;
+		spark->dSize = spark->sSize >> 1;
+		spark->flags = 26;
+		spark->maxYvel = 0;
+		spark->zVel = COS((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->xVel = -SIN((r & 0x7FF) + param1 - 1024) >> 2;
+	}
+}
+
 void __cdecl HorsemanControl(__int16 itemNum)
 {
 #ifdef TEMP_DISABLE

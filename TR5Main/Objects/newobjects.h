@@ -148,6 +148,7 @@ void __cdecl BurningFloorControl(__int16 itemNum);
 void __cdecl InitialiseHorse(__int16 itemNum);
 void __cdecl InitialiseHorseman(__int16 itemNum);
 void __cdecl HorsemanControl(__int16 itemNum);
+void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);
