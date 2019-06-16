@@ -18,6 +18,26 @@ typedef struct QUAD_INFO {
 	char flags;
 };
 
+typedef struct JEEP_INFO {
+	__int16 rot1;
+	__int16 rot2;
+	__int16 rot3;
+	__int16 rot4;
+	__int32 velocity;
+	__int32 revs;
+	__int16 engineRevs;
+	__int16 trackMesh;
+	__int32 jeepTurn;
+	__int32 fallSpeed;
+	__int16 momentumAngle;
+	__int16 extraRotation;
+	__int16 unknown0;
+	__int32 pitch;
+	__int16 flags;
+	__int16 unknown1;
+	__int16 unknown2;
+};
+
 void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
 
 // TR1 objects
@@ -149,6 +169,20 @@ void __cdecl InitialiseHorse(__int16 itemNum);
 void __cdecl InitialiseHorseman(__int16 itemNum);
 void __cdecl HorsemanControl(__int16 itemNum);
 void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num);
+
+void __cdecl InitialiseJeep(__int16 itemNum);
+__int32 __cdecl JeepControl();
+__int32 __cdecl JeepCheckGetOff();
+__int32 __cdecl JeepDynamics(ITEM_INFO* item);
+__int32 __cdecl JeepUserControl(ITEM_INFO* item, __int32 height, __int32* pitch);
+void __cdecl AnimateJeep(ITEM_INFO* item, __int32 collide, __int32 dead);
+void __cdecl JeepExplode(ITEM_INFO* item);
+__int32 __cdecl JeepCanGetOff();
+__int32 __cdecl DoJeepDynamics(__int32 height, __int32 speed, __int32* y, __int32 flags);
+void __cdecl TriggerJeepExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int16 speed, __int32 moving);
+__int32 __cdecl GetOnJeep(int itemNumber);
+void __cdecl JeepCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+__int32 __cdecl GetOnJeep(int itemNumber);
 
 //extern __int16 LaraMotorbike;
 //void __cdecl InitialiseMotorbike(__int16 itemNum);

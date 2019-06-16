@@ -122,7 +122,7 @@ void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num)
 
 void __cdecl HorsemanControl(__int16 itemNum)
 {
-#ifdef TEMP_DISABLE
+#ifdef OLD_CODE
 	if (!CreatureActive(itemNum))
 		return;
 
@@ -218,6 +218,30 @@ void __cdecl HorsemanControl(__int16 itemNum)
 			creature->enemy = NULL;
 
 			horseItem->goalAnimState = 1;
+		}
+
+		if (horseItem && item->itemFlags[1])
+		{
+			if (abs(xRot - item->pos.xRot) < 256)
+			{
+				item->pos.xRot = xRot;
+			LABEL_182:
+				horseItem->pos.xPos = item->pos.xPos;
+				horseItem->pos.yPos = item->pos.yPos;
+				horseItem->pos.zPos = item->pos.zPos;
+				horseItem->pos.xRot = item->pos.xRot;
+				horseItem->pos.zRot = item->pos.zRot;
+
+				if (horseItem->roomNumber != item->roomNumber)
+				{
+					ItemNewRoom(item->itemFlags[0], item->roomNumber);
+				}
+				AnimateItem(horseItem);
+			END:
+				Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
+				CreatureAnimation(itemNum, angle, 0);
+				return;
+			}
 		}
 	}
 

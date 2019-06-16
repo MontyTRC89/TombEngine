@@ -1,0 +1,1661 @@
+#include "newobjects.h"
+#include "..\Global\global.h"
+#include "..\Game\Box.h"
+#include "..\Game\items.h"
+#include "..\Game\lot.h"
+#include "..\Game\control.h"
+#include "..\Game\effects.h"
+#include "..\Game\draw.h"
+#include "..\Game\sphere.h"
+#include "..\Game\effect2.h"
+#include "..\Game\people.h"
+#include "..\Game\lara.h"
+#include "..\Game\collide.h"
+#include "..\Game\laraflar.h"
+#include "..\Game\inventory.h"
+
+#include <vector>
+
+using namespace std;
+
+#define JF_FALLING					0x40
+#define JF_DEAD						0x80
+
+#define JEEP_GETOFF_DISTANCE		512
+#define JEEP_UNDO_TURN				91
+#define JEEP_SLIP					100
+#define JEEP_SLIP_SIDE				128
+#define JEEP_MAX_SPEED				0x8000
+#define JEEP_MAX_BACK				0x4000
+
+#define JEEP_STATE_LARA_STOP		0
+
+#define JEEP_STATE_LARA_GETON		9
+#define JEEP_STATE_LARA_GETOFF		10
+#define JEEP_STATE_LARA_JEEPDEATH	16
+
+#define JEEP_IN_ACCELERATE	(IN_ACTION)
+#define JEEP_IN_BRAKE		(IN_JUMP)
+#define JEEP_IN_DISMOUNT	(IN_JUMP|IN_LEFT)
+#define JEEP_IN_HANDBRAKE	(IN_DASH|IN_DUCK)
+
+//bool QuadHandbrakeStarting;
+//bool QuadCanHandbrakeStart;
+char JeepSmokeStart;
+bool JeepNoGetOff;
+
+extern LaraExtraInfo g_LaraExtra;
+extern Inventory* g_Inventory;
+
+void __cdecl InitialiseJeep(__int16 itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+	
+	JEEP_INFO* jeep = (JEEP_INFO*)GameMalloc(sizeof(JEEP_INFO));
+	item->data = jeep;
+
+	jeep->velocity = 0;
+	jeep->revs = 0;
+	jeep->jeepTurn = 0;
+	jeep->fallSpeed = 0;
+	jeep->extraRotation = 0;
+	jeep->momentumAngle = item->pos.yPos;
+	jeep->pitch = 0;
+	jeep->flags = 0;
+	jeep->unknown2 = 0;
+	jeep->rot1 = 0;
+	jeep->rot2 = 0;
+	jeep->rot3 = 0;
+	jeep->rot4 = 0;
+
+	item->meshBits = 114687;
+}
+
+__int32 JeepControl()
+{
+	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
+	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
+
+	__int32 drive = -1;
+	bool dead = 0;
+
+	__int32 collide = JeepDynamics(item);
+
+	__int16 roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+
+	GAME_VECTOR oldPos;
+	oldPos.x = item->pos.xPos;
+	oldPos.y = item->pos.yPos;
+	oldPos.z = item->pos.zPos;
+
+	__int32 height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	__int32 ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+	PHD_VECTOR fl, fr, bc;
+	__int32 hfl = TestHeight(item, 550, -256, &fl);
+	__int32 hfr = TestHeight(item, 550, 256, &fr);
+	__int32 hbc = TestHeight(item, -600, 0, &bc);
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+	TestTriggers(TriggerIndex, 1, 0);
+	TestTriggers(TriggerIndex, 0, 0);
+
+	if (LaraItem->hitPoints <= 0)
+	{
+		dead = true;
+		TrInput &= ~(IN_LEFT|IN_RIGHT|IN_BACK|IN_FORWARD);  
+	}
+
+	__int32 pitch = 0;
+	if (jeep->flags)
+	{
+		collide = 0;
+	}
+	else if (LaraItem->currentAnimState == JEEP_STATE_LARA_GETON)
+	{
+		drive = -1;
+		collide = 0;
+	}
+	else
+	{
+		drive = JeepUserControl(item, height, &pitch);
+	}
+
+	if(jeep->velocity || jeep->revs)
+	{
+		jeep->pitch = pitch;
+		if (pitch >= -32768)
+		{
+			if (pitch > 40960)
+			{
+				jeep->pitch = 40960;
+			}
+		}
+		else
+		{
+			jeep->pitch = -32768;
+		}
+
+		SoundEffect(155, &item->pos, (jeep->pitch << 8) + 16777220);
+	}
+	else
+	{
+		if (drive != -1)
+		{
+			SoundEffect(153, &item->pos, 0);
+		}
+		jeep->pitch = 0;
+	}
+
+	item->floor = height;
+	__int16 rotAdd = jeep->velocity >> 2;
+	jeep->rot1 -= rotAdd;
+	jeep->rot2 -= rotAdd;
+	jeep->rot3 -= rotAdd;
+	jeep->rot4 -= rotAdd;
+
+	__int32 oldY = item->pos.yPos;
+	item->fallspeed = DoJeepDynamics(height, item->fallspeed, &item->pos.yPos, 0);
+
+	height = (fl.y + fr.y) >> 1;
+	__int16 xRot;
+	__int16 zRot;
+	if (bc.y >= hbc)
+	{
+		if (height >= (hfl + hfr) >> 1)
+			xRot = ATAN(1100, hbc - height);
+		else
+			xRot = ATAN(550, hbc - (hbc - item->pos.yPos));
+	}
+	else 
+	{
+		if (height >= (hfl + hfr) >> 1)
+		{
+			xRot = ATAN(550, hbc - (item->pos.yPos - height));
+		}
+		else
+		{
+			xRot = -ATAN(137, oldY - item->pos.yPos);
+			if (jeep->velocity < 0)
+				xRot = -xRot;
+		}
+	}
+
+	item->pos.xRot += (xRot - item->pos.xRot) >> 2;
+	item->pos.zRot += (ATAN(256, height - fl.y) - item->pos.xRot) >> 2;
+
+	if (!(jeep->flags & JF_DEAD))
+	{
+		if (roomNumber != item->roomNumber)
+		{
+			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.itemNumber, roomNumber);
+		}
+
+		LaraItem->pos.xPos = item->pos.xPos;
+		LaraItem->pos.yPos = item->pos.yPos;
+		LaraItem->pos.zPos = item->pos.zPos;
+		LaraItem->pos.xRot = item->pos.xRot;
+		LaraItem->pos.yRot = item->pos.yRot;
+		LaraItem->pos.zRot = item->pos.zRot;
+
+		AnimateJeep(item, collide, dead);
+		AnimateItem(LaraItem);
+
+		item->animNumber = Objects[ID_JEEP].animIndex + LaraItem->animNumber - Objects[ID_LARA_JEEP_ANIMS].animIndex;
+		item->frameNumber = LaraItem->frameNumber + Anims[item->animNumber].frameBase - Anims[LaraItem->animNumber].frameBase;
+
+		Camera.targetElevation = -ANGLE(30);
+		Camera.targetDistance = 2 * WALL_SIZE;
+
+		if (jeep->unknown2)
+		{
+			if (jeep->unknown2 == 1)
+				jeep->fallSpeed += (32578 - jeep->fallSpeed) >> 3;
+		}
+		else
+		{
+			jeep->fallSpeed -= jeep->fallSpeed >> 3;
+		}
+
+		Camera.targetAngle = jeep->fallSpeed;
+
+		if (jeep->flags & JF_FALLING && item->pos.yPos == item->floor)
+		{
+			LaraItem->meshBits = 0;
+			LaraItem->hitPoints = 0;
+			LaraItem->flags |= ONESHOT;
+			JeepExplode(item);
+			return 0;
+		}
+	}
+
+	if (LaraItem->currentAnimState == JEEP_STATE_LARA_GETON ||
+		LaraItem->currentAnimState == JEEP_STATE_LARA_GETOFF)
+	{
+		JeepSmokeStart = 0;
+	}
+	else
+	{
+		__int16 speed = 0;
+		__int16 angle = 0;
+
+		PHD_VECTOR pos;
+		pos.x = 80;
+		pos.y = 0;
+		pos.z = -500;
+
+		__int32 joint = GetJointAbsPosition(item, &pos, 11);
+
+		if (joint <= 32)
+		{
+			if (JeepSmokeStart >= 16)
+			{
+				if (GetRandomControl() & 3)
+					speed = 0;
+				else
+					speed = ((GetRandomControl() & 0xF) + GetRandomControl() & 0x10) << 6;
+			}
+			else
+			{
+				speed = ((GetRandomControl() & 7) + GetRandomControl() & 0x10 + 2 * JeepSmokeStart) << 6;
+				JeepSmokeStart++;
+			}
+			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot + -32768, speed, 0);
+		}
+		else if (joint >= 64)
+		{
+
+		}
+		else
+		{
+			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot - 32768, 64 - joint, 1);
+		}
+	}
+
+	return JeepCheckGetOff();
+}
+
+__int32 __cdecl JeepCheckGetOff()
+{
+	if (LaraItem->currentAnimState == JEEP_STATE_LARA_GETOFF)
+	{
+		if (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
+		{
+			LaraItem->pos.yRot += ANGLE(90);
+			LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->goalAnimState = STATE_LARA_STOP;
+			LaraItem->currentAnimState = STATE_LARA_STOP;
+			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * SIN(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * COS(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xRot = 0;
+			LaraItem->pos.zRot = 0;
+			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.gunStatus = LG_NO_ARMS;
+			CurrentAtmosphere = 110;
+			IsAtmospherePlaying = true;
+			S_CDPlay(110, 1);
+		}
+	}
+}
+
+__int32 __cdecl JeepDynamics(ITEM_INFO* item)
+{
+	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
+
+	PHD_VECTOR f_old, b_old, mm_old, mt_old, mb_old;
+
+	__int32 hf_old = TestHeight(item, 550, -256, &f_old);
+	__int32 hb_old = TestHeight(item, 550, 256,&b_old);
+	__int32 hmm_old = TestHeight(item, -600, -256, &mm_old);
+	__int32 hmt_old = TestHeight(item, -600, 256, &mt_old);
+	__int32 hmb_old = TestHeight(item, -600, 0, (PHD_VECTOR*)&mb_old);
+
+	PHD_VECTOR oldPos;
+	oldPos.x = item->pos.xPos;
+	oldPos.y = item->pos.yPos;
+	oldPos.z = item->pos.zPos;
+
+	if (mm_old.y > hmm_old)
+		mm_old.y = hmm_old;
+	if (mt_old.y > hmt_old)
+		mt_old.y = hmt_old;
+	if (f_old.y > hf_old)
+		f_old.y = hf_old;
+	if (b_old.y > hb_old)
+		b_old.y = hb_old;
+	if (mb_old.y > hmb_old)
+		mb_old.y = hmb_old;
+
+	__int16 rot = 0;
+
+	if (oldPos.y <= item->floor - 8)
+	{
+		if (jeep->jeepTurn < -ANGLE(1) / 2)
+			jeep->jeepTurn += ANGLE(1) / 2;
+		else if (jeep->jeepTurn > ANGLE(1) / 2)
+			jeep->jeepTurn -= ANGLE(1) / 2;
+		else
+			jeep->jeepTurn = 0;
+
+		item->pos.yRot += jeep->jeepTurn + jeep->extraRotation;
+		jeep->momentumAngle += (item->pos.yRot - jeep->momentumAngle) >> 5;
+	}
+	else
+	{
+		__int16 rot2 = 0;
+		__int16 momentum = 0;
+
+		if (jeep->jeepTurn < -ANGLE(1))
+			jeep->jeepTurn += ANGLE(1);
+		else if (jeep->jeepTurn > ANGLE(1))
+			jeep->jeepTurn -= ANGLE(1);
+		else
+			jeep->jeepTurn = 0;
+
+		item->pos.yRot += jeep->jeepTurn + jeep->extraRotation;
+
+		rot = item->pos.yRot - jeep->momentumAngle;
+		momentum = 728 - (3 * jeep->velocity >> 11);
+
+		if (!(TrInput & IN_ACTION) && jeep->velocity > 0)
+			momentum -= momentum >> 2;
+
+		if (rot >= -ANGLE(1))
+		{
+			if (rot <= 273)
+				jeep->momentumAngle = item->pos.yRot;
+			else
+			{
+				if (rot > ANGLE(75))
+				{
+					item->pos.yPos -= 41;
+					item->fallspeed = -6 - (GetRandomControl() & 3);
+					jeep->jeepTurn = 0;
+					jeep->velocity -= jeep->velocity >> 3;
+				}
+
+				if (rot <= ANGLE(90))
+					jeep->momentumAngle += momentum;
+				else
+					jeep->momentumAngle = item->pos.yRot - ANGLE(90);
+			}
+		}
+		else
+		{
+			if (rot < -ANGLE(75))
+			{
+				item->pos.yPos -= 41;
+				item->fallspeed = -6 - (GetRandomControl() & 3);
+				jeep->jeepTurn = 0;
+				jeep->velocity -= jeep->velocity >> 3;
+			}
+
+			if (rot >= -ANGLE(90))
+				jeep->momentumAngle -= momentum;
+			else
+				jeep->momentumAngle = item->pos.yRot + ANGLE(90);
+		}
+	}
+
+	__int16 roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	__int32 height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+	__int16 speed;
+	if (item->pos.yPos < height)
+		speed = item->speed;
+	else
+		speed = item->speed * COS(item->pos.xRot) >> W2V_SHIFT;
+
+	item->pos.xPos += (speed * SIN(jeep->momentumAngle)) >> W2V_SHIFT;
+	item->pos.zPos += (speed * COS(jeep->momentumAngle)) >> W2V_SHIFT;
+	
+	__int32 slip = 0;
+	if (item->pos.yPos >= height)
+	{
+		slip = JEEP_SLIP * SIN(item->pos.xRot) >> W2V_SHIFT;
+
+		if (abs(slip) > 16)
+		{
+			JeepNoGetOff = true;
+			if (slip >= 0)
+				slip = jeep->velocity - (SQUARE(slip - 16) >> 1);
+			else
+				slip = (SQUARE(slip + 16) >> 1) + jeep->velocity;
+			jeep->velocity = slip;
+		}
+
+		slip = JEEP_SLIP_SIDE * SIN(item->pos.zRot) >> W2V_SHIFT;
+		if (abs(slip) > JEEP_SLIP_SIDE / 4)
+		{
+			JeepNoGetOff = true;
+
+			if (slip >= 0)
+			{
+				item->pos.xPos += (slip - 24) * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+				item->pos.zPos += (slip - 24) * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			}
+			else
+			{
+				item->pos.xPos += (slip - 24) * SIN(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
+				item->pos.zPos += (slip - 24) * COS(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
+			}
+		}
+	}
+
+	if (jeep->velocity > JEEP_MAX_SPEED)
+		jeep->velocity = JEEP_MAX_SPEED;
+	else if (jeep->velocity < -JEEP_MAX_BACK)
+		jeep->velocity = -JEEP_MAX_BACK;
+
+	PHD_VECTOR movedPos;
+	movedPos.x = item->pos.xPos;
+	movedPos.z = item->pos.zPos;
+
+	if (!(item->flags & ONESHOT))
+	{
+		//JeepBaddieCollision(item);
+		// v37 = sub_467850(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 512);
+	}
+
+	PHD_VECTOR f, b, mm, mt, mb;
+	
+	__int32 rot = 0;
+	__int32 rot2 = 0;
+
+	__int32 hf = TestHeight(item, 550, -256, (PHD_VECTOR*)&f);
+	if (hf < f_old.y - STEP_SIZE)
+		rot = abs(4 * DoShift(item, &f, &f_old));
+
+	__int32 hmm = TestHeight(item, -600, -256, (PHD_VECTOR*)&mm);
+	if (hmm < mm_old.y - STEP_SIZE)
+	{
+		if (rot)
+			rot += abs(4 * DoShift(item, &mm, &mm_old));
+		else
+			rot = abs(4 * DoShift(item, &mm, &mm_old));
+	}
+
+	__int32 hb = TestHeight(item, 550, 256, (PHD_VECTOR*)&b_old);
+	if (hb < b_old.y - STEP_SIZE)
+		rot2 = abs(4 * DoShift(item, &b, &b_old));
+
+	__int32 hmb = TestHeight(item, -600, 0, (PHD_VECTOR*)&mb_old);
+	if (hmb < mb_old.y - STEP_SIZE)
+		DoShift(item, &mb, &mb_old);
+	
+	__int32 hmt = TestHeight(item, -600, 256, (PHD_VECTOR*)&mt);
+	if (hmt < mt_old.y - STEP_SIZE)
+	{
+		if (rot2)
+			rot2 -= abs(4 * DoShift(item, &mt, &mt_old));
+		else
+			rot2 = abs(4 * DoShift(item, &mt, &mt_old));
+	}
+
+	if (!rot)
+		rot = rot2;
+	   
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos - STEP_SIZE)
+		DoShift(item, (PHD_VECTOR*)&item->pos, &oldPos);
+
+	if (!jeep->velocity)
+		rot = 0;
+
+	jeep->unknown0 += rot >> 2;
+
+	if (abs(jeep->unknown0) < 2)
+		jeep->unknown0 = 0;
+
+	if (abs(jeep->unknown0 - jeep->extraRotation) >= 4)
+		jeep->extraRotation += ((jeep->unknown0 - jeep->extraRotation) >> 2);
+	else
+		jeep->extraRotation = jeep->unknown0;
+
+	__int32 newspeed = 0;
+	__int32 collide = GetCollisionAnim(item, &movedPos);
+	
+	if (collide)
+	{
+		newspeed = ((item->pos.zPos - oldPos.z) * COS(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * SIN(jeep->momentumAngle)) >> W2V_SHIFT;
+		newspeed <<= 8;
+
+		if ((&Items[g_LaraExtra.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
+		{
+			LaraItem->hitPoints -= (JEEP_MAX_SPEED - newspeed) >> 7;
+			LaraItem->hitStatus = true;
+		}
+
+		if (jeep->velocity > 0 && newspeed < jeep->velocity)
+			jeep->velocity = (newspeed < 0) ? 0 : newspeed;
+
+		else if (jeep->velocity < 0 && newspeed > jeep->velocity)
+			jeep->velocity = (newspeed > 0) ? 0 : newspeed;
+
+		if (jeep->velocity < JEEP_MAX_BACK)
+			jeep->velocity = JEEP_MAX_BACK;
+	}
+
+	return collide;
+}
+
+/*__int32 __cdecl JeepUserControl(ITEM_INFO* item, __int32 height, __int32* pitch)
+{
+	if (LaraItem->currentAnimState == JEEP_STATE_LARA_GETOFF || LaraItem->goalAnimState == JEEP_STATE_LARA_GETOFF)
+		TrInput = 0;
+	
+	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
+
+	if (jeep->revs <= 16)
+		jeep->revs = 0;
+	else
+	{
+		jeep->velocity += jeep->revs >> 4;
+		jeep->revs -= (jeep->revs >> 3);
+	}
+
+	__int32 rot1 = 0;
+	__int32 rot2 = 0;
+
+	if (item->pos.yPos >= height - STEP_SIZE)
+	{
+		if (!jeep->velocity)
+		{
+			if (TrInput & IN_LOOK)
+				LookUpDown();
+		}
+
+		if (abs(jeep->velocity) <= JEEP_MAX_SPEED / 2)
+		{
+			rot1 = 910 * abs(jeep->velocity) >> W2V_SHIFT;
+			rot2 = (60 * abs(jeep->velocity) >> W2V_SHIFT) + 182;
+		}
+		else
+		{
+			rot1 = 910;
+			rot2 = 242;
+		}
+
+
+
+
+
+
+
+		if (jeep->velocity < 0)
+		{
+			if (TrInput & (IN_LSTEP | IN_LEFT))
+			{
+				jeep->jeepTurn -= rot2;
+				if (jeep->jeepTurn < -rot1)
+					jeep->jeepTurn = -rot1;
+			}
+			else if (TrInput & (IN_RSTEP | IN_RIGHT))
+			{
+				jeep->jeepTurn += rot2;
+				if (jeep->jeepTurn > rot1)
+					jeep->jeepTurn = rot1;
+			}
+		}
+		else if (jeep->velocity > 0)
+		{
+			if (TrInput & (IN_LSTEP | IN_LEFT))
+			{
+				jeep->jeepTurn -= rot2;
+				if (jeep->jeepTurn < -rot1)
+					jeep->jeepTurn = -rot1;
+			}
+			else if (TrInput & (IN_RSTEP | IN_RIGHT))
+			{
+				jeep->jeepTurn += rot2;
+				if (jeep->jeepTurn > rot1)
+					jeep->jeepTurn = rot1;
+			}
+		}
+			if (v6 >= 0)
+			{
+				goto LABEL_25;
+			}
+			if (!(Input & 0x808))
+			{
+				v10 = (TrInput & IN_LSTEP|IN_LEFT) == 0;
+				goto LABEL_22;
+			}
+		}
+		else if (!(Input & IN_LSTEP | IN_LEFT))
+		{
+			v10 = (Input & IN_RSTEP | IN_RIGHT) == 0;
+		LABEL_22:
+			if (!(Input & IN_RSTEP | IN_RIGHT)  ||
+				(v12 = v9 + jeep->jeepTurn, jeep->jeepTurn = v12, v12 <= v8))
+			{
+			LABEL_25:
+				if (Input & 0x10)
+				{
+					if (v6 <= 0)
+					{
+						if (v6 < 0)
+						{
+							jeep->velocity = v6 + 768;
+							if (v6 + 768 > 0)
+							{
+								jeep->velocity = 0;
+							}
+						}
+					}
+					else
+					{
+						jeep->velocity = v6 - 768;
+						if (v6 - 768 < 0)
+						{
+							jeep->velocity = 0;
+						}
+					}
+					goto LABEL_49;
+				}
+				if (!(Input & 0x40))
+				{
+				LABEL_49:
+					if (!(Input & 0x40))
+					{
+						v17 = jeep->velocity;
+						if (v17 <= 256)
+						{
+							if (v17 >= -256)
+							{
+								jeep->velocity = 0;
+							}
+							else
+							{
+								jeep->velocity = v17 + 256;
+							}
+						}
+						else
+						{
+							jeep->velocity = v17 - 256;
+						}
+					}
+					item->speed = jeep->velocity >> 8;
+					if (*(_DWORD*)& jeep->engineRevs > 49152)
+					{
+						*(_DWORD*)& jeep->engineRevs = (GetRandomControl() & 0x1FF) + 48896;
+					}
+					v18 = jeep->velocity;
+					if (v18 < 0)
+					{
+						v18 >>= 1;
+					}
+					*(_DWORD*)& jeep->engineRevs += (abs(v18) - *(_DWORD*)& jeep->engineRevs) >> 3;
+					goto LABEL_62;
+				}
+				v13 = jeep->unknown2;
+				if (v13)
+				{
+					if (v13 != 1)
+					{
+						goto LABEL_40;
+					}
+					v14 = -16384;
+					if (v6 > -16384)
+					{
+						jeep->velocity = v6 - (abs(-16384 - v6) >> 3) - 2;
+						goto LABEL_40;
+					}
+				}
+				else
+				{
+					if (v6 >= 0x8000)
+					{
+						jeep->velocity = 0x8000;
+						goto LABEL_40;
+					}
+					if (v6 < 0x4000)
+					{
+						jeep->velocity = ((18432 - v6) >> 3) + v6 + 8;
+					LABEL_40:
+						v15 = jeep->momentumAngle;
+						if (item->pos.yRot - v15 >= 0)
+						{
+							v16 = item->pos.yRot - v15;
+						}
+						else
+						{
+							v16 = v15 - item->pos.yRot;
+						}
+						jeep->velocity -= v16 >> 6;
+						goto LABEL_49;
+					}
+					if (v6 >= 28672)
+					{
+						jeep->velocity = ((0x8000 - v6) >> 3) + v6 + 2;
+						goto LABEL_40;
+					}
+					v14 = ((30720 - v6) >> 4) + v6 + 4;
+				}
+				jeep->velocity = v14;
+				goto LABEL_40;
+			}
+		LABEL_24:
+			jeep->jeepTurn = v8;
+			goto LABEL_25;
+		}
+		v11 = jeep->jeepTurn - v9;
+		jeep->jeepTurn = v11;
+		v8 = -v8;
+		if (v11 >= v8)
+		{
+			goto LABEL_25;
+		}
+		goto LABEL_24;
+	}
+	v19 = *(_DWORD*)& jeep->engineRevs;
+	if (v19 < 0xFFFF)
+	{
+		*(_DWORD*)& jeep->engineRevs = v19 + ((0xFFFF - v19) >> 3);
+	}
+LABEL_62:
+	if (Input & 0x10)
+	{
+		v21 = 0;
+		v22 = -144;
+		v23 = -1024;
+		GetJointAbsPosition((int)item, &v21, 11);
+		TriggerDynamic(v21, v22, v23, 10, 64, 0, 0);
+		item->meshBits = 163839;
+	}
+	else
+	{
+		item->meshBits = 114687;
+	}
+	*pitch = *(_DWORD*)& jeep->engineRevs;
+	return 0;
+}*/
+
+void __cdecl AnimateJeep(ITEM_INFO* item, __int32 collide, __int32 dead)
+{
+	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
+
+	if (item->pos.yPos != item->floor)
+	{
+		if (LaraItem->currentAnimState != 11 && LaraItem->currentAnimState != 12 && !dead)
+		{
+			if (jeep->unknown2 == 1)
+				LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 20;
+			else
+				LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 6;
+
+			LaraItem->goalAnimState = 11;
+			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->currentAnimState = 11;
+		}
+		else if (collide)
+		{
+			if (LaraItem->currentAnimState != 4 && 
+				LaraItem->currentAnimState != 5 &&
+				LaraItem->currentAnimState != 2 &&
+				LaraItem->currentAnimState != 3 &&
+				LaraItem->currentAnimState != 11 &&
+				jeep->velocity > JEEP_MAX_SPEED / 3 && 
+				!dead)
+			{
+				switch (collide)
+				{
+				case 13:
+					LaraItem->goalAnimState = LaraItem->currentAnimState = 4;
+					LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 11;
+					break;
+
+				case 14:
+					LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 10;
+					LaraItem->goalAnimState = LaraItem->currentAnimState = 5;
+					break;
+
+				case 11:
+					LaraItem->goalAnimState = LaraItem->currentAnimState = 2;
+					LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 12;
+					break;
+
+				default:
+					LaraItem->goalAnimState = LaraItem->currentAnimState = 3;
+					LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 13;
+					break;
+
+				}
+
+				LaraItem->frameNumber = Anims[item->animNumber].frameBase;
+			}
+		}
+		else
+		{
+			switch (LaraItem->currentAnimState)
+			{
+			case JEEP_STATE_LARA_STOP:
+				if (dead)
+					LaraItem->goalAnimState = JEEP_STATE_LARA_JEEPDEATH;
+				else
+				{
+					if ((TrInput & JEEP_IN_DISMOUNT == JEEP_IN_DISMOUNT) &&
+						!jeep->velocity &&
+						!JeepNoGetOff)
+					{
+						if (JeepCanGetOff())
+							LaraItem->goalAnimState = 10;
+						break;
+					}
+
+					if (!(DbInput & IN_WALK))
+					{
+						if (!(DbInput & 0x40000000))
+						{
+							if (!(TrInput & JEEP_IN_ACCELERATE) && !(TrInput & JEEP_IN_BRAKE))
+							{
+								LaraItem->goalAnimState = 1;
+								break;
+							}
+							else if (TrInput & (IN_LEFT | IN_LSTEP))
+							{
+								LaraItem->goalAnimState = 7;
+							}
+							else if (TrInput & (IN_RIGHT | IN_RSTEP))
+							{
+								LaraItem->goalAnimState = 8;
+							}
+						}
+						if (jeep->unknown2 < 1)
+						{
+							jeep->unknown2++;
+							if (jeep->unknown2 == 1)
+								LaraItem->goalAnimState = 17;
+
+						}
+					}
+					else
+					{
+						if (jeep->unknown2)
+							jeep->unknown2--;
+					}
+				}
+
+				break;
+
+			case 1:
+				if (dead)
+					LaraItem->goalAnimState = 0;
+				else
+				{
+					if (jeep->velocity & 0xFFFFFF00 ||
+						TrInput & (JEEP_IN_ACCELERATE | JEEP_IN_BRAKE))
+					{
+						if (TrInput & JEEP_IN_BRAKE)
+						{
+							if (jeep->velocity <= 21844)
+								LaraItem->goalAnimState = 0;
+							else
+								LaraItem->goalAnimState = 6;
+						}
+						else
+						{
+							if (TrInput & (IN_LEFT | IN_LSTEP))
+							{
+								LaraItem->goalAnimState = 7;
+							}
+							else if (TrInput & (IN_RIGHT | IN_RSTEP))
+							{
+								LaraItem->goalAnimState = 8;
+							}
+						}
+					}
+					else
+					{
+						LaraItem->goalAnimState = 0;
+					}
+				}
+
+				break;
+
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 0;
+				}
+				else if (TrInput & (JEEP_IN_ACCELERATE | JEEP_IN_BRAKE))
+				{
+					LaraItem->goalAnimState = 1;
+				}
+
+				break;
+
+			case 6:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 0;
+				}
+				else if (jeep->velocity & 0xFFFFFF00)
+				{
+					if (TrInput & (IN_LEFT | IN_LSTEP))
+					{
+						LaraItem->goalAnimState = 7;
+					}
+					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					{
+						LaraItem->goalAnimState = 8;
+					}
+				}
+				else
+				{
+					LaraItem->goalAnimState = 0;
+				}
+
+				break;
+
+			case 7:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 0;
+				}
+				else if ((DbInput & 0x80u) == 0)
+				{
+					if (DbInput & 0x40000000)
+					{
+						if (jeep->unknown2 < 1)
+						{
+							jeep->unknown2++;
+							if (jeep->unknown2 == 1)
+							{
+								LaraItem->goalAnimState = 15;
+								LaraItem->currentAnimState = 15;
+								LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 40;
+								LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+								break;
+							}
+						}
+					}
+					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					{
+						LaraItem->goalAnimState = 1;
+					}
+					else if (TrInput & (IN_LEFT | IN_LSTEP))
+					{
+						LaraItem->goalAnimState = 7;
+					}
+					else if (jeep->velocity)
+					{
+						LaraItem->goalAnimState = 1;
+					}
+					else
+					{
+						LaraItem->goalAnimState = 0;
+					}
+				}
+				else
+				{
+					if (jeep->unknown2)
+					{
+						jeep->unknown2--;
+					}
+				}
+
+				if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 4 &&
+					!jeep->velocity)
+				{
+					LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 32;
+					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+				}
+				if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 32)
+				{
+					if (jeep->velocity)
+					{
+						LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 4;
+						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+					}
+				}
+
+				break;
+
+			case 8:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 0;
+				}
+				if ((DbInput & 0x80u) == 0)
+				{
+					if (DbInput & 0x40000000)
+					{
+						if (jeep->unknown2 < 1)
+						{
+							jeep->unknown2++;
+							if (jeep->unknown2 == 1)
+							{
+								LaraItem->goalAnimState = 14;
+								LaraItem->currentAnimState = 14;
+								LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 41;
+								LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+								break;
+							}
+						}
+					}
+					else if (TrInput & (IN_LEFT | IN_LSTEP))
+					{
+						LaraItem->goalAnimState = 1;
+					}
+					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					{
+						LaraItem->goalAnimState = 8;
+					}
+					else if (jeep->velocity)
+					{
+						LaraItem->goalAnimState = 1;
+					}
+					else
+					{
+						LaraItem->goalAnimState = 0;
+					}
+				}
+				else
+				{
+					if (jeep->unknown2)
+					{
+						jeep->unknown2--;
+					}
+				}
+
+				if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 16 && !jeep->velocity)
+				{
+					LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 33;
+					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+				}
+				if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 33)
+				{
+					if (jeep->velocity)
+					{
+						LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 16;
+						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+					}
+				}
+
+				break;
+
+			case 11:
+				if (item->pos.yPos == item->floor)
+				{
+					LaraItem->goalAnimState = 12;
+				}
+				else if (item->fallspeed > 300)
+				{
+					jeep->flags |= 0x40u;
+				}
+
+				break;
+
+			case 13:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 17;
+				}
+				else if (abs(jeep->velocity) & 0xFFFFFF00)
+				{
+					if (TrInput & (IN_LEFT | IN_LSTEP))
+					{
+						LaraItem->goalAnimState = 15;
+					}
+					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					{
+						LaraItem->goalAnimState = 14;
+					}
+				}
+				else
+				{
+					LaraItem->goalAnimState = 17;
+				}
+
+				break;
+
+			case 14:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 17;
+				}
+				else if ((DbInput & 0x80u) == 0)
+				{
+					if (DbInput & 0x40000000)
+					{
+						if (jeep->unknown2 < 1)
+						{
+							jeep->unknown2++;
+						}
+					}
+					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					{
+						LaraItem->goalAnimState = 14;
+					}
+					else
+					{
+						LaraItem->goalAnimState = 13;
+					}
+				}
+				else
+				{
+					if (jeep->unknown2)
+					{
+						jeep->unknown2--;
+						if (!jeep->unknown2)
+						{
+							LaraItem->goalAnimState = 8;
+							LaraItem->currentAnimState = 8;
+							LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 44;
+							LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+							break;
+						}
+					}
+				}
+
+				if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 30 && !jeep->velocity)
+				{
+					LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 37;
+					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+				}
+				if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 37)
+				{
+					if (jeep->velocity)
+					{
+						LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 30;
+						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+					}
+				}
+
+				break;
+
+			case 15:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 17;
+				}
+				else if ((DbInput & 0x80u) == 0)
+				{
+					if (DbInput & 0x40000000)
+					{
+						if (jeep->unknown2 < 1)
+						{
+							jeep->unknown2++;
+						}
+					}
+					else if (TrInput & (IN_LEFT | IN_LSTEP))
+					{
+						LaraItem->goalAnimState = 15;
+					}
+					else
+					{
+						LaraItem->goalAnimState = 13;
+					}
+
+					if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 27 && !jeep->velocity)
+					{
+						LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 36;
+						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+					}
+					if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 36)
+					{
+						if (jeep->velocity)
+						{
+							LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 27;
+							LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+						}
+					}
+					break;
+				}
+				else if (!jeep->unknown2 || (--jeep->unknown2 != 0))
+				{
+					if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 27 && !jeep->velocity)
+					{
+						LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 36;
+						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+					}
+					if (LaraItem->animNumber == Objects[ID_LARA_JEEP_ANIMS].animIndex + 36)
+					{
+						if (jeep->velocity)
+						{
+							LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 27;
+							LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+						}
+					}
+					break;
+				}
+
+				LaraItem->goalAnimState = 7;
+				LaraItem->currentAnimState = 7;
+				LaraItem->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 44;
+				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+
+				break;
+
+			case 17:
+				if (dead)
+				{
+					LaraItem->goalAnimState = 0;
+				}
+				if ((TrInput & JEEP_IN_DISMOUNT) != JEEP_IN_DISMOUNT || jeep->velocity || JeepNoGetOff)
+				{
+					if ((DbInput & 0x80u) == 0)
+					{
+						if (DbInput & 0x40000000)
+						{
+							if (jeep->unknown2 < 1)
+							{
+								jeep->unknown2++;
+							}
+						}
+						else if (!(TrInput & JEEP_IN_ACCELERATE) || TrInput & JEEP_IN_BRAKE)
+						{
+							if (TrInput & (IN_LEFT | IN_LSTEP))
+							{
+								LaraItem->goalAnimState = 15;
+							}
+							else if (TrInput & (IN_LEFT | IN_LSTEP))
+							{
+								LaraItem->goalAnimState = 14;
+							}
+						}
+						else
+						{
+							LaraItem->goalAnimState = 13;
+						}
+					}
+					else
+					{
+						if (jeep->unknown2)
+						{
+							jeep->unknown2--;
+							if (!jeep->unknown2)
+							{
+								LaraItem->goalAnimState = 0;
+							}
+						}
+					}
+				}
+				else
+				{
+					if (JeepCanGetOff())
+					{
+						LaraItem->goalAnimState = 10;
+					}
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	{
+		LaraItem->goalAnimState = 11;
+		LaraItem->hitPoints = 0;
+		JeepExplode(item);
+	}
+}
+
+void __cdecl JeepExplode(ITEM_INFO* item)
+{
+	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	{
+		TriggerUnderwaterExplosion(item);
+	}
+	else
+	{
+		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 0, item->roomNumber);
+		for (__int32 i = 0; i < 3; i++)
+		{
+			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
+		}
+	}
+
+	ExplodingDeath(g_LaraExtra.Vehicle, -1, 256);
+	KillItem(g_LaraExtra.Vehicle);
+	item->status = ITEM_DEACTIVATED;
+	SoundEffect(SFX_EXPLOSION1, 0, 0);
+	SoundEffect(SFX_EXPLOSION2, 0, 0);
+	g_LaraExtra.Vehicle = NO_ITEM;
+}
+
+__int32 __cdecl JeepCanGetOff()
+{
+	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
+
+	__int16 angle = item->pos.yRot + 0x4000;
+
+	__int32 x = item->pos.xPos - (JEEP_GETOFF_DISTANCE * SIN(angle) >> W2V_SHIFT);
+	__int32 y = item->pos.yPos;
+	__int32 z = item->pos.zPos - (JEEP_GETOFF_DISTANCE * COS(angle) >> W2V_SHIFT);
+
+	__int16 roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	__int32 height = GetFloorHeight(floor, x, y, z);
+
+	if ((HeightType == BIG_SLOPE)
+		|| (HeightType == DIAGONAL)
+		|| (height == NO_HEIGHT))
+		return 0;
+
+	if (abs(height - item->pos.yPos) > WALL_SIZE / 2)
+		return 0;
+
+	__int32 ceiling = GetCeiling(floor, x, y, z);
+
+	if ((ceiling - item->pos.yPos > -LARA_HITE)
+		|| (height - ceiling < LARA_HITE))
+		return 0;
+
+	return 1;
+}
+
+__int32 __cdecl DoJeepDynamics(__int32 height, __int32 speed, __int32* y, __int32 flags)
+{
+	__int32 result = 0;
+
+	if (height <= *y)
+	{
+		if (flags)
+		{
+			result = speed;
+		}
+		else
+		{
+			__int32 temp = height - *y;
+			if (height - *y < -80)
+			{
+				temp = -80;
+			}
+			result = ((temp - speed) >> 4) + speed;
+			if (*y > height)
+			{
+				*y = height;
+			}
+		}
+	}
+	else
+	{
+		*y += speed;
+		if (*y <= height - 32)
+		{
+			if (flags)
+			{
+				result = flags + (flags >> 1) + speed;
+			}
+			else
+			{
+				result = speed + GRAVITY;
+			}
+		}
+		else
+		{
+			*y = height;
+			if (speed > 150)
+			{
+				LaraItem->hitPoints += 150 - speed;
+			}
+			result = 0;
+		}
+	}
+
+	return result;
+}
+
+void __cdecl TriggerJeepExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int16 speed, __int32 moving)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->dR = 16;
+	spark->dG = 16;
+	spark->on = 1;
+	spark->sR = 0;
+	spark->sG = 0;
+	spark->sB = 0;
+	spark->dB = 32;
+
+	if (moving)
+	{
+		spark->dR = (spark->dR * speed) >> 5;
+		spark->dG = (spark->dG * speed) >> 5;
+		spark->dB = (spark->dB * speed) >> 5;
+	}
+
+	spark->colFadeSpeed = 4;
+	spark->fadeToBlack = 4;
+	spark->life = spark->sLife = (GetRandomControl() & 3) - (speed >> 12) + 20;;
+
+	if (spark->life < 9)
+	{
+		spark->life = 9;
+		spark->sLife = 9;
+	}
+
+	spark->transType = 2;
+	spark->x = (GetRandomControl() & 0xF) + x - 8;
+	spark->y = (GetRandomControl() & 0xF) + y - 8;
+	spark->z = (GetRandomControl() & 0xF) + z - 8;
+	spark->xVel = speed * SIN(angle) >> (W2V_SHIFT + 2);
+	spark->yVel = -8 - (GetRandomControl() & 7);
+	spark->zVel = speed * COS(angle) >> (W2V_SHIFT + 2);
+	spark->friction = 4;
+	
+	if (GetRandomControl() & 1)
+	{
+		spark->flags = 538;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		if (GetRandomControl() & 1)
+		{
+			spark->rotAdd = -24 - (GetRandomControl() & 7);
+		}
+		else
+		{
+			spark->rotAdd = (GetRandomControl() & 7) + 24;
+		}
+	}
+	else
+	{
+		spark->flags = 522;
+	}
+
+	spark->scalar = 1;
+	spark->gravity = -4 - (GetRandomControl() & 3);
+	spark->maxYvel = -8 - (GetRandomControl() & 7);
+	spark->dSize = (GetRandomControl() & 7) + (speed >> 7) + 32;
+	spark->sSize = spark->dSize >> 1;
+	spark->size = spark->dSize >> 1;
+}
+
+void __cdecl JeepCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	if (l->hitPoints <= 0 && g_LaraExtra.Vehicle == NO_ITEM)
+	{
+		ITEM_INFO* item = &Items[itemNumber];
+
+		if (GetOnJeep(itemNumber))
+		{
+			g_LaraExtra.Vehicle = itemNumber;
+
+			if (Lara.gunType == WEAPON_FLARE)
+			{
+				CreateFlare(ID_FLARE_ITEM, 0);
+				UndrawFlaresMeshes();
+				Lara.flareControlLeft = 0;
+				Lara.requestGunType = LG_NO_ARMS;
+				Lara.gunType = LG_NO_ARMS;
+			}
+
+			Lara.gunStatus = LG_HANDS_BUSY;
+
+			/*v4 = *(_WORD*)(Rooms + 148 * (signed __int16)v3->roomNumber + 72);
+			// Enable ENEMY_JEEP
+			if (v4 != -1)
+			{
+				while (1)
+				{
+					v5 = Items + 5622 * v4;
+					if (*(_WORD*)(Items + 5622 * v4 + 12) == 34)
+					{
+						break;
+					}
+					v4 = *(_WORD*)(v5 + 26);
+					if (v4 == -1)
+					{
+						goto LABEL_11;
+					}
+				}
+				EnableBaddieAI(v4, 1);
+				*(_DWORD*)(v5 + 5610) = *(_DWORD*)(v5 + 5610) & 0xFFFFFFFB | 2;
+				AddActiveItem(v4);
+			}*/
+
+			__int16 ang = ATAN(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
+			ang -= item->pos.yRot;
+
+			if ((ang > -(ONE_DEGREE * 45)) && (ang < (ONE_DEGREE * 135)))
+			{
+				l->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 9;
+			}
+			else
+			{
+				l->animNumber = Objects[ID_LARA_JEEP_ANIMS].animIndex + 18;
+			}
+
+			l->goalAnimState = 9;
+			l->currentAnimState = 9;
+			l->frameNumber = Anims[l->animNumber].frameBase;
+
+			item->hitPoints = 1;
+			LaraItem->pos.xPos = item->pos.xPos;
+			LaraItem->pos.yPos = item->pos.yPos;
+			LaraItem->pos.zPos = item->pos.zPos;
+			LaraItem->pos.yRot = item->pos.yRot;
+
+			Lara.headXrot = Lara.headYrot = 0;
+			Lara.torsoXrot = Lara.torsoYrot = 0;
+			Lara.hitDirection = -1;
+
+			AnimateItem(l);
+
+			JEEP_INFO* jeep = (JEEP_INFO*)item->data;
+			jeep->revs = 0;
+			jeep->unknown2 = 0;
+
+			item->flags |= 0x20u;
+
+			CurrentAtmosphere = 98;
+			IsAtmospherePlaying = 1;
+			S_CDPlay(98, 1);
+		}
+		else
+		{
+			ObjectCollision(itemNumber, l, coll);
+		}
+	}
+}
+
+__int32 __cdecl GetOnJeep(int itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!(TrInput & IN_ACTION) && InventoryItemChosen != ID_PUZZLE_ITEM1)
+	{
+		return 0;
+	}
+
+	if (item->flags & 0x100)
+	{
+		return 0;
+	}
+
+	if (Lara.gunStatus)
+	{
+		return 0;
+	}
+
+	if (LaraItem->currentAnimState != STATE_LARA_STOP)
+	{
+		return 0;
+	}
+
+	if (LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE)
+	{
+		return 0;
+	}
+
+	if (LaraItem->gravityStatus)
+	{
+		return 0;
+	}
+
+	if (abs(item->pos.yPos - LaraItem->pos.yPos) >= 256)
+	{
+		return 0;
+	}
+
+	if (!TestBoundsCollide(item, LaraItem, 100))
+	{
+		return 0;
+	}
+
+	_int16 roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < -32000)
+		return 0;
+	
+	__int16 angle = ATAN(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
+	angle -= item->pos.yRot;
+
+	if ((angle > -ANGLE(45)) && (angle < ANGLE(135)))
+	{
+		__int32 tempAngle = LaraItem->pos.yRot - item->pos.yRot;
+		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
+		{
+			if (InventoryItemChosen == ID_PUZZLE_ITEM1)
+			{
+				InventoryItemChosen = NO_ITEM;
+				return 1;
+			}
+			else
+			{
+				/*if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
+						EnterInventoryItem = ID_PUZZLE_ITEM1;
+				return 0;*/
+			}
+		}
+		else
+			return 0;
+	}
+	else
+	{
+		__int32 tempAngle = LaraItem->pos.yRot - item->pos.yRot;
+		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
+		{
+			if (InventoryItemChosen == ID_PUZZLE_ITEM1)
+			{
+				InventoryItemChosen = NO_ITEM;
+				return 1;
+			}
+			else
+			{
+				/*if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
+						EnterInventoryItem = ID_PUZZLE_ITEM1;
+				return 0;*/
+			}
+		}
+		else
+			return 0;
+	}
+
+	return 0;
+}

@@ -38,10 +38,21 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Process Vehicles
 	if (g_LaraExtra.Vehicle != NO_ITEM)
 	{
-		if (Items[g_LaraExtra.Vehicle].objectNumber == ID_QUAD)  
+		switch (Items[g_LaraExtra.Vehicle].objectNumber)
 		{
+		case ID_QUAD:
 			if (QuadBikeControl())
 				return;
+			break;
+
+		case ID_JEEP:
+			if (JeepControl())
+				return;
+			break;
+
+		default:
+			break;
+
 		}
 	}
 
@@ -86,7 +97,7 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 {
-	if (item->animNumber != 103 || Lara.gunStatus || InventoryItemChosen == -1)
+	if (item->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus || InventoryItemChosen == NO_ITEM)
 		return 0;
 
 	if (InventoryItemChosen >= ID_WATERSKIN1_EMPTY && InventoryItemChosen <= ID_WATERSKIN2_5)
@@ -100,7 +111,7 @@ __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 			else
 				g_LaraExtra.Waterskin1.Quantity = 3;
 
-			item->animNumber = 401;
+			item->animNumber = ANIMATION_LARA_WATERSKIN_FILL;
 		}
 		else
 		{
@@ -115,12 +126,12 @@ __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 				g_LaraExtra.Waterskin1.Quantity = 1;
 			}
 
-			item->animNumber = 400;
+			item->animNumber = ANIMATION_LARA_WATERSKIN_EMPTY;
 		}
 	}
 	else if (InventoryItemChosen == ID_CLOCKWORK_BEETLE)
 	{
-		item->animNumber = 444;
+		item->animNumber = ANIMATION_LARA_BEETLE_PUT;
 		//UseClockworkBeetle(1);
 	}
 	else
@@ -129,11 +140,11 @@ __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 	}
 
 	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->goalAnimState = 89;
-	item->currentAnimState = 89;
+	item->goalAnimState = STATE_LARA_MISC_CONTROL;
+	item->currentAnimState = STATE_LARA_MISC_CONTROL;
 
 	Lara.gunStatus = LG_HANDS_BUSY;
-	InventoryItemChosen = -1;
+	InventoryItemChosen = NO_ITEM;
 
 	return 1;
 }
@@ -158,7 +169,7 @@ void __cdecl lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	if (TrInput & IN_ROLL && Lara.waterStatus != 4)
+	if (TrInput & IN_ROLL && Lara.waterStatus != LW_WADE)
 	{
 		item->animNumber = ANIMATION_LARA_ROLL_BEGIN;
 		item->frameNumber = Anims[ANIMATION_LARA_ROLL_BEGIN].frameBase + 2;
@@ -170,7 +181,7 @@ void __cdecl lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_DUCK &&
-		Lara.waterStatus != 4 &&
+		Lara.waterStatus != LW_WADE &&
 		item->currentAnimState == STATE_LARA_STOP &&
 		(Lara.gunStatus == LG_NO_ARMS ||
 			Lara.gunType == WEAPON_NONE ||
@@ -243,9 +254,8 @@ void __cdecl lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 				coll->badPos = 32512;
 				coll->badNeg = -384;
 				coll->badCeiling = 0;
-
 				coll->radius = 102;
-				coll->slopesAreWalls = 1;
+				coll->slopesAreWalls = true;
 
 				GetLaraCollisionInfo(item, coll);
 				if (!TestLaraVault(item, coll))

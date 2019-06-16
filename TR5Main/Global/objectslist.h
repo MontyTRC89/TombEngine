@@ -33,7 +33,7 @@ typedef enum object_types {
 	ID_TORCH_ANIM,
 	ID_HAIR,
 	ID_SAS,
-	ID_JEEP,   // TR4
+	ID_JEEP,   // TR4 - Work in progress
 	ID_SWAT,
 	ID_MOTORBIKE,   // TR4
 	ID_SWAT_PLUS,
