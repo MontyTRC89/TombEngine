@@ -183,8 +183,4 @@ void __cdecl TriggerJeepExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 an
 __int32 __cdecl GetOnJeep(int itemNumber);
 void __cdecl JeepCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 __int32 __cdecl GetOnJeep(int itemNumber);
-
-//extern __int16 LaraMotorbike;
-//void __cdecl InitialiseMotorbike(__int16 itemNum);
-
-
+__int32 __cdecl GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);

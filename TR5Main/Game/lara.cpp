@@ -77,11 +77,15 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Animate Lara
 	AnimateLara(item);
 
-	// Check for collision with items
-	LaraBaddieCollision(item, coll);
+	if (g_LaraExtra.ExtraAnim == -1)
+	{
+		// Check for collision with items
+		LaraBaddieCollision(item, coll);
 
-	// Handle Lara collision
-	(*LaraCollisionRoutines[item->currentAnimState])(item, coll);
+		// Handle Lara collision
+		if (g_LaraExtra.Vehicle == NO_ITEM)
+			(*LaraCollisionRoutines[item->currentAnimState])(item, coll);
+	}
 
 	UpdateLaraRoom(item, -381);
 

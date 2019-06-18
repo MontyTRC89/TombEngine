@@ -1482,6 +1482,11 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Lights: %d", m_lightsToDraw.Size());
 		printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
 		printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
+		printDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
+		printDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
+		printDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
+		printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
 		printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
 	}
 

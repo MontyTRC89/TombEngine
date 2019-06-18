@@ -998,6 +998,16 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 	}
+
+	obj = &Objects[ID_JEEP];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseJeep;
+		obj->collision = JeepCollision;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
 }
 
 void __cdecl CustomObjects()
