@@ -169,13 +169,13 @@ __int32 JeepControl()
 		if (height >= (hfl + hfr) >> 1)
 			xRot = ATAN(1100, hbc - height);
 		else
-			xRot = ATAN(550, hbc - (hbc - item->pos.yPos));
+			xRot = ATAN(550, hbc - item->pos.yPos);
 	}
 	else 
 	{
 		if (height >= (hfl + hfr) >> 1)
 		{
-			xRot = ATAN(550, hbc - (item->pos.yPos - height));
+			xRot = ATAN(550, item->pos.yPos - height);
 		}
 		else
 		{
@@ -186,7 +186,7 @@ __int32 JeepControl()
 	}
 
 	item->pos.xRot += (xRot - item->pos.xRot) >> 2;
-	item->pos.zRot += (ATAN(256, height - fl.y) - item->pos.xRot) >> 2;
+	item->pos.zRot += (ATAN(256, height - fl.y) - item->pos.zRot) >> 2;
 
 	if (!(jeep->flags & JF_DEAD))
 	{
@@ -347,12 +347,12 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 
 	__int16 rot = 0;
 
-	if (oldPos.y <= item->floor - 8)
+	if (oldPos.y <= item->floor - 8 )
 	{
-		if (jeep->jeepTurn < -ANGLE(1) / 2)
-			jeep->jeepTurn += ANGLE(1) / 2;
-		else if (jeep->jeepTurn > ANGLE(1) / 2)
-			jeep->jeepTurn -= ANGLE(1) / 2;
+		if (jeep->jeepTurn < -91)
+			jeep->jeepTurn += 91;
+		else if (jeep->jeepTurn > 91)
+			jeep->jeepTurn -= 91;
 		else
 			jeep->jeepTurn = 0;
 
@@ -379,13 +379,13 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 		if (!(TrInput & IN_ACTION) && jeep->velocity > 0)
 			momentum -= momentum >> 2;
 
-		if (rot >= -ANGLE(1))
+		if (rot >= -273)
 		{
 			if (rot <= 273)
 				jeep->momentumAngle = item->pos.yRot;
 			else
 			{
-				if (rot > ANGLE(75))
+				if (rot > 13650)
 				{
 					item->pos.yPos -= 41;
 					item->fallspeed = -6 - (GetRandomControl() & 3);
@@ -393,15 +393,15 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 					jeep->velocity -= jeep->velocity >> 3;
 				}
 
-				if (rot <= ANGLE(90))
+				if (rot <= 16380)
 					jeep->momentumAngle += momentum;
 				else
-					jeep->momentumAngle = item->pos.yRot - ANGLE(90);
+					jeep->momentumAngle = item->pos.yRot - 16380;
 			}
 		}
 		else
 		{
-			if (rot < -ANGLE(75))
+			if (rot < -13650)
 			{
 				item->pos.yPos -= 41;
 				item->fallspeed = -6 - (GetRandomControl() & 3);
@@ -409,10 +409,10 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 				jeep->velocity -= jeep->velocity >> 3;
 			}
 
-			if (rot >= -ANGLE(90))
+			if (rot >= -16380)
 				jeep->momentumAngle -= momentum;
 			else
-				jeep->momentumAngle = item->pos.yRot + ANGLE(90);
+				jeep->momentumAngle = item->pos.yRot + 16380;
 		}
 	}
 
@@ -436,7 +436,7 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 
 		if (abs(slip) > 16)
 		{
-			JeepNoGetOff = true;
+			JeepNoGetOff = 1;
 			if (slip >= 0)
 				slip = jeep->velocity - (SQUARE(slip - 16) >> 1);
 			else
@@ -447,7 +447,7 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 		slip = JEEP_SLIP_SIDE * SIN(item->pos.zRot) >> W2V_SHIFT;
 		if (abs(slip) > JEEP_SLIP_SIDE / 4)
 		{
-			JeepNoGetOff = true;
+			JeepNoGetOff = 1;
 
 			if (slip >= 0)
 			{
@@ -473,33 +473,33 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 
 	if (!(item->flags & ONESHOT))
 	{
-		//JeepBaddieCollision(item);
+		JeepBaddieCollision(item);
 		// v37 = sub_467850(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 512);
 	}
 
 	PHD_VECTOR f, b, mm, mt, mb;
 	
-	rot = 0;
+	__int32 rot1 = 0;
 	__int32 rot2 = 0;
 
 	__int32 hf = TestHeight(item, 550, -256, (PHD_VECTOR*)&f);
 	if (hf < f_old.y - STEP_SIZE)
-		rot = abs(4 * DoShift(item, &f, &f_old));
+		rot1 = abs(4 * DoShift(item, &f, &f_old));
 
 	__int32 hmm = TestHeight(item, -600, -256, (PHD_VECTOR*)&mm);
 	if (hmm < mm_old.y - STEP_SIZE)
 	{
 		if (rot)
-			rot += abs(4 * DoShift(item, &mm, &mm_old));
+			rot1 += abs(4 * DoShift(item, &mm, &mm_old));
 		else
-			rot = abs(4 * DoShift(item, &mm, &mm_old));
+			rot1 = -abs(4 * DoShift(item, &mm, &mm_old));
 	}
 
-	__int32 hb = TestHeight(item, 550, 256, (PHD_VECTOR*)&b_old);
+	__int32 hb = TestHeight(item, 550, 256, (PHD_VECTOR*)&b);
 	if (hb < b_old.y - STEP_SIZE)
-		rot2 = abs(4 * DoShift(item, &b, &b_old));
+		rot2 = -abs(4 * DoShift(item, &b, &b_old));
 
-	__int32 hmb = TestHeight(item, -600, 0, (PHD_VECTOR*)&mb_old);
+	__int32 hmb = TestHeight(item, -600, 0, (PHD_VECTOR*)&mb);
 	if (hmb < mb_old.y - STEP_SIZE)
 		DoShift(item, &mb, &mb_old);
 	
@@ -512,8 +512,8 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 			rot2 = abs(4 * DoShift(item, &mt, &mt_old));
 	}
 
-	if (!rot)
-		rot = rot2;
+	if (!rot1)
+		rot1 = rot2;
 	   
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -521,9 +521,11 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 		DoShift(item, (PHD_VECTOR*)&item->pos, &oldPos);
 
 	if (!jeep->velocity)
-		rot = 0;
+		rot1 = 0;
 
-	jeep->unknown0 += rot >> 2;
+	jeep->extraRotation = rot1;
+	
+	/*jeep->unknown0 += rot1 >> 1;
 
 	if (abs(jeep->unknown0) < 2)
 		jeep->unknown0 = 0;
@@ -532,7 +534,7 @@ __int32 __cdecl JeepDynamics(ITEM_INFO* item)
 		jeep->extraRotation += ((jeep->unknown0 - jeep->extraRotation) >> 2);
 	else
 		jeep->extraRotation = jeep->unknown0;
-
+		*/
 	__int32 newspeed = 0;
 	__int32 collide = GetJeepCollisionAnim(item, &movedPos);
 	
@@ -1629,4 +1631,90 @@ __int32 __cdecl GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 	}
 
 	return 0;
+}
+
+void __cdecl JeepBaddieCollision(ITEM_INFO* jeep)
+{
+	vector<__int16> roomsList;
+
+	roomsList.push_back(jeep->roomNumber);
+
+	__int16* door = Rooms[jeep->roomNumber].door;
+	if (door)
+	{
+		__int16 numDoors = *door;
+		door++;
+		for (__int32 i = 0; i < numDoors; i++)
+		{
+			roomsList.push_back(*door);
+			door += 16;
+		}
+	}
+
+	for (__int32 i = 0; i < roomsList.size(); i++)
+	{
+		__int16 itemNum = Rooms[roomsList[i]].itemNumber;
+
+		while (itemNum != NO_ITEM)
+		{
+			ITEM_INFO* item = &Items[itemNum];
+			if (item->collidable && item->status != ITEM_INVISIBLE && item != LaraItem && item != jeep)
+			{
+				if (item->objectNumber == ID_ENEMY_JEEP)
+				{
+					Unk_0080DE1A = 0;
+					Unk_0080DDE8 = 400;
+					Unk_0080DE24 = Unk_0080DE24 & 0xFFDF | 0x10;
+
+					//ObjectCollision(item, jeep, )
+				}
+				else
+				{
+					OBJECT_INFO* object = &Objects[item->objectNumber];
+					if (object->collision && object->intelligent || 
+						item->objectNumber == ID_ROLLINGBALL)
+					{
+						__int32 x = jeep->pos.xPos - item->pos.xPos;
+						__int32 y = jeep->pos.yPos - item->pos.yPos;
+						__int32 z = jeep->pos.zPos - item->pos.zPos;
+						if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
+						{
+							if (item->objectNumber == ID_ROLLINGBALL)
+							{
+								if (TestBoundsCollide(item, LaraItem, 100))
+								{
+									if (LaraItem->hitPoints > 0)
+									{
+										DoLotsOfBlood(LaraItem->pos.xPos,
+											LaraItem->pos.yPos - 512,
+											LaraItem->pos.zPos,
+											GetRandomControl() & 3,
+											LaraItem->pos.yRot,
+											LaraItem->roomNumber,
+											5);												
+										item->hitPoints -= 8;
+									}									
+								}
+							}
+							else
+							{
+								if (TestBoundsCollide(item, jeep, 550))
+								{
+									DoLotsOfBlood(item->pos.xPos, 
+										jeep->pos.yPos - STEP_SIZE, 
+										item->pos.zPos, 
+										GetRandomControl() & 3, 
+										jeep->pos.yRot, 
+										item->roomNumber, 
+										3);
+									item->hitPoints = 0;
+								}
+							}
+						}
+					}
+				}
+			}
+			itemNum = item->nextItem;
+		}
+	}
 }
