@@ -258,9 +258,9 @@ __int32 JeepControl()
 		pos.y = 0;
 		pos.z = -500;
 
-		__int32 joint = GetJointAbsPosition(item, &pos, 11);
+		GetJointAbsPosition(item, &pos, 11);
 
-		if (joint <= 32)
+		if (item->speed <= 32)
 		{
 			if (JeepSmokeStart >= 16)
 			{
@@ -276,13 +276,9 @@ __int32 JeepControl()
 			}
 			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot + -32768, speed, 0);
 		}
-		else if (joint >= 64)
+		else if (item->speed < 64)
 		{
-
-		}
-		else
-		{
-			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot - 32768, 64 - joint, 1);
+			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot - 32768, 64 - item->speed, 1);
 		}
 	}
 
@@ -1512,7 +1508,7 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	if (!(TrInput & IN_ACTION) /*&& InventoryItemChosen != ID_PUZZLE_ITEM1*/)
+	if (!(TrInput & IN_ACTION) && InventoryItemChosen != ID_PUZZLE_ITEM1)
 	{
 		return 0;
 	}
@@ -1565,8 +1561,6 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 		__int32 tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
 		{
-			return 1;
-
 			if (InventoryItemChosen == ID_PUZZLE_ITEM1)
 			{
 				InventoryItemChosen = NO_ITEM;
@@ -1574,9 +1568,9 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 			}
 			else
 			{
-				/*if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-						EnterInventoryItem = ID_PUZZLE_ITEM1;
-				return 0;*/
+				if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
+					GlobalEnterInventory = ID_PUZZLE_ITEM1;
+				return 0;
 			}
 		}
 		else
@@ -1587,8 +1581,6 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 		__int32 tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
 		{
-			return 1;
-
 			if (InventoryItemChosen == ID_PUZZLE_ITEM1)
 			{
 				InventoryItemChosen = NO_ITEM;
@@ -1596,9 +1588,9 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 			}
 			else
 			{
-				/*if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-						EnterInventoryItem = ID_PUZZLE_ITEM1;
-				return 0;*/
+				if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
+					GlobalEnterInventory = ID_PUZZLE_ITEM1;
+				return 0;
 			}
 		}
 		else

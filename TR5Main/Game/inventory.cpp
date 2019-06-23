@@ -389,6 +389,24 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY, STRING_DIARY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_WATERSKIN1_EMPTY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_WATERSKIN2_EMPTY, -1, 0);
+	
+	for (__int32 i = 0; i < 8; i++)
+		m_objectsTable[INV_OBJECT_PUZZLE1 + i] = InventoryObjectDefinition(ID_PUZZLE_ITEM1 + i, STRING_PISTOLS, -1, 0);
+
+	for (__int32 i = 0; i < 16; i++)
+		m_objectsTable[INV_OBJECT_PUZZLE1_COMBO1 + i] = InventoryObjectDefinition(ID_PUZZLE_ITEM1_COMBO1 + i, STRING_PISTOLS, -1, 0);
+
+	for (__int32 i = 0; i < 8; i++)
+		m_objectsTable[INV_OBJECT_KEY1 + i] = InventoryObjectDefinition(ID_KEY_ITEM1 + i, STRING_PISTOLS, -1, 0);
+
+	for (__int32 i = 0; i < 16; i++)
+		m_objectsTable[INV_OBJECT_KEY1_COMBO1 + i] = InventoryObjectDefinition(ID_KEY_ITEM1_COMBO1 + i, STRING_PISTOLS, -1, 0);
+
+	for (__int32 i = 0; i < 4; i++)
+		m_objectsTable[INV_OBJECT_PICKUP1 + i] = InventoryObjectDefinition(ID_PICKUP_ITEM1 + i, STRING_PISTOLS, -1, 0);
+
+	for (__int32 i = 0; i < 3; i++)
+		m_objectsTable[INV_OBJECT_EXAMINE1 + i] = InventoryObjectDefinition(ID_EXAMINE1 + i, STRING_PISTOLS, -1, 0);
 
 	// Add combinations
 	AddCombination(INV_OBJECT_PUZZLE1_COMBO1, INV_OBJECT_PUZZLE1_COMBO2, INV_OBJECT_PUZZLE1, CombinePuzzle1);
@@ -775,12 +793,29 @@ __int32 Inventory::DoInventory()
 	}
 
 	m_rings[INV_RING_PUZZLES].draw = false;
-	m_rings[INV_RING_WEAPONS].draw = true;
+	m_rings[INV_RING_WEAPONS].draw = false;
 	m_rings[INV_RING_OPTIONS].draw = false;
 	m_rings[INV_RING_COMBINE].draw = false;
 	m_rings[INV_RING_CHOOSE_AMMO].draw = false;
 
-	m_activeRing = INV_RING_WEAPONS;
+	if (GlobalEnterInventory != NO_ITEM)
+	{
+		for (__int32 r = 0; r < 3; r++)
+			for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+				if (m_objectsTable[m_rings[r].objects[o].inventoryObject].objectNumber == GlobalEnterInventory)
+				{
+					m_activeRing = r;
+					m_rings[m_activeRing].currentObject = o;
+					m_rings[m_activeRing].draw = true;
+				}
+
+		GlobalEnterInventory = NO_ITEM;
+	}
+	else
+	{
+		m_activeRing = INV_RING_WEAPONS;
+		m_rings[m_activeRing].draw = true;
+	}
 
 	__int32 result = INV_RESULT_NONE;
 
@@ -998,8 +1033,90 @@ __int32 Inventory::DoPuzzle()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
+	ring->selectedIndex = 0;
+	ring->numActions = 0;
 
-	return INV_RESULT_NONE;
+	__int32 result = INV_RESULT_NONE;
+	bool closeObject = false;
+	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
+
+	ring->numActions = 0;
+	ring->actions[ring->numActions++] = INV_ACTION_USE;
+	if (IsObjectCombinable(currentObject)) 
+		ring->actions[ring->numActions++] = INV_ACTION_COMBINE;
+	//if (IsObjectSeparable(currentObject)) 
+	//	ring->actions[ring->numActions++] = INV_ACTION_SEPARE;
+
+	// If only use action then select the weapon directly
+	if (ring->numActions == 1)
+		return INV_RESULT_USE_ITEM;
+
+	PopupObject();
+
+	// Do the menu
+	while (true)
+	{
+		// Handle input
+		SetDebounce = true;
+		S_UpdateInput();
+		SetDebounce = false;
+
+		GameTimer++;
+
+		// Handle input
+		if (DbInput & IN_DESELECT || closeObject)
+		{
+			closeObject = true;
+			break;
+		}
+		else if (DbInput & IN_FORWARD)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex > 0)
+				ring->selectedIndex--;
+		}
+		else if (DbInput & IN_BACK)
+		{
+			closeObject = false;
+
+			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
+			if (ring->selectedIndex < ring->numActions)
+				ring->selectedIndex++;
+		}
+		else if (DbInput & IN_SELECT)
+		{
+			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+
+			if (ring->actions[ring->selectedIndex] == INV_ACTION_USE)
+			{
+				result = INV_RESULT_USE_ITEM;
+				closeObject = true;
+				break;
+			}
+			else if (ring->actions[ring->selectedIndex] == INV_ACTION_COMBINE)
+			{
+				if (DoCombine())
+				{
+					ring->actions[1] = INV_ACTION_SEPARE;
+				}
+			}
+			else if (ring->actions[ring->selectedIndex] == INV_ACTION_SEPARE)
+			{
+				if (DoSepare())
+				{
+					ring->actions[1] = INV_ACTION_COMBINE;
+				}
+			}
+		}
+
+		UpdateSceneAndDrawInventory();
+	}
+
+	PopoverObject();
+
+	return result;
 }
 
 __int32 Inventory::DoWeapon()
@@ -1013,6 +1130,7 @@ __int32 Inventory::DoWeapon()
 	bool closeObject = false;
 	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
 
+	ring->numActions = 0;
 	ring->actions[ring->numActions++] = INV_ACTION_USE;
 	if (IsObjectCombinable(currentObject)) ring->actions[ring->numActions++] = INV_ACTION_COMBINE;
 	if (IsObjectSeparable(currentObject)) ring->actions[ring->numActions++] = INV_ACTION_SEPARE;
@@ -1098,9 +1216,36 @@ bool Inventory::IsObjectPresentInInventory(__int16 object)
 {
 	for (__int32 r = 0; r < 3; r++)
 		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+			if (m_objectsTable[m_rings[r].objects[o].inventoryObject].objectNumber == object)
+				return true;
+	return false;
+}
+
+bool Inventory::IsInventoryObjectPresentInInventory(__int16 object)
+{
+	for (__int32 r = 0; r < 3; r++)
+		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
 			if (m_rings[r].objects[o].inventoryObject == object)
 				return true;
 	return false;
+}
+
+__int32 Inventory::FindObjectIndex(__int16 object)
+{
+	for (__int32 r = 0; r < 3; r++)
+		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+			if (m_rings[r].objects[o].inventoryObject == object)
+				return o;
+	return -1;
+}
+
+__int32 Inventory::FindObjectRing(__int16 object)
+{
+	for (__int32 r = 0; r < 3; r++)
+		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+			if (m_rings[r].objects[o].inventoryObject == object)
+				return r;
+	return -1;
 }
 
 bool Inventory::IsObjectCombinable(__int16 object)
@@ -1159,7 +1304,7 @@ bool Inventory::DoCombine()
 		InventoryObjectCombination* combination = &m_combinations[i];
 		
 		// Add piece 1
-		if (currentObject != combination->piece1 && IsObjectPresentInInventory(combination->piece1))
+		if (currentObject != combination->piece1 && IsInventoryObjectPresentInInventory(combination->piece1))
 		{
 			bool found = false;
 			for (__int32 j = 0; j < combineRing->numObjects; j++)
@@ -1175,7 +1320,7 @@ bool Inventory::DoCombine()
 		}
 
 		// Add piece 2
-		if (currentObject != combination->piece2 && IsObjectPresentInInventory(combination->piece2))
+		if (currentObject != combination->piece2 && IsInventoryObjectPresentInInventory(combination->piece2))
 		{
 			bool found = false;
 			for (__int32 j = 0; j < combineRing->numObjects; j++)

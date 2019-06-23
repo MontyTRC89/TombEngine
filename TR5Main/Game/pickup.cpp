@@ -1,10 +1,12 @@
 #include "pickup.h"
 #include "lara.h"
 #include "draw.h"
+#include "inventory.h"
 
 #include "..\Global\global.h"
 
 extern LaraExtraInfo g_LaraExtra;
+extern Inventory* g_Inventory;
 
 __int32 __cdecl DrawAllPickups()
 {
@@ -334,6 +336,8 @@ void __cdecl PickedUpObject(__int16 objectNumber)
 
 		break;
 	}
+
+	g_Inventory->LoadObjects(false);
 }
 
 void Inject_Pickup()

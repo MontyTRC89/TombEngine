@@ -362,7 +362,10 @@ public:
 	bool						IsCurrentObjectPuzzle();
 	bool						IsCurrentObjectGeneric();
 	bool						IsCurrentObjectExamine();
+	bool						IsInventoryObjectPresentInInventory(__int16 object);
 	bool						IsObjectPresentInInventory(__int16 object);
+	__int32						FindObjectRing(__int16 object);
+	__int32						FindObjectIndex(__int16 object);
 	bool						IsObjectCombinable(__int16 object);
 	bool						IsObjectSeparable(__int16 object);
 	void						AddCombination(__int16 piece1, __int16 piece2, __int16 combinedObject, void (*f) (__int32));

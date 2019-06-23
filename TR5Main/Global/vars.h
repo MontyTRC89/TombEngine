@@ -286,6 +286,7 @@
 #define QuakeCam					VAR_U_(0x00E4F520, QUAKE_CAMERA)
 #define SplineFromCamera			VAR_U_(0x00E4F3DC, __int32)
 #define Unk_0051D024				VAR_U_(0x0051D024, byte)
+#define EnterInventoryItem			VAR_U_(0x004AC064, __int16)
 // JeepBaddieCollision
 #define Unk_0080DE1A				VAR_U_(0x0080DE1A, __int16)
 #define Unk_0080DDE8				VAR_U_(0x0080DDE8, __int32)

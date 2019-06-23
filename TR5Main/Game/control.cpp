@@ -75,7 +75,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		SetDebounce = false;
 		if (CurrentLevel != 0 && !g_Renderer->IsFading())
 		{
-			if ((DbInput & IN_DESELECT || GlobalEnterInventory != -1) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			if ((DbInput & IN_DESELECT || GlobalEnterInventory != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{ 
 				// Stop all sounds
 				__int32 inventoryResult = g_Inventory->DoInventory();
