@@ -779,14 +779,17 @@ __int32 Inventory::DoInventory()
 		m_activeRing = INV_RING_OPTIONS;
 		m_rings[m_activeRing].currentObject = 0;
 
+		g_Renderer->DumpGameScene();
+
+		OpenRing(m_activeRing, true);
+
 		__int32 passportResult = DoPassport();
 
 		// Fade out
 		g_Renderer->FadeOut();
 		for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
 		{
-			g_Renderer->DrawInventory();
-			g_Renderer->SyncRenderer();
+			UpdateSceneAndDrawInventory();
 		}
 
 		return passportResult;
