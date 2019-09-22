@@ -33,7 +33,7 @@ typedef enum object_types {
 	ID_TORCH_ANIM,
 	ID_HAIR,
 	ID_SAS,
-	ID_JEEP,   // TR4 - Work in progress
+	ID_JEEP,   // TR4 - 95% Working
 	ID_SWAT,
 	ID_MOTORBIKE,   // TR4
 	ID_SWAT_PLUS,
@@ -41,7 +41,7 @@ typedef enum object_types {
 	ID_BLUE_GUARD,
 	ID_LARA_MOTORBIKE_ANIMS,   // TR4 - OK
 	ID_TWOGUN,
-	ID_SKELETON, // TR4 - OK - Needs testing
+	ID_SKELETON, // TR4 - OK 
 	ID_DOG,
 	ID_CROCODILE, // TR4 - OK
 	ID_LARA_EXTRA_ANIMS, // TR1-2-3 - OK
@@ -461,7 +461,7 @@ typedef enum object_types {
 	ID_TARGET_GRAPHICS,
 	ID_DEFAULT_SPRITES,
 	ID_MISC_SPRITES,
-	ID_SLOT_460,
+	ID_ENERGY_BUBBLES, // TR4 - Energy attacks of harpy, demigod...
 	ID_GRENADE_ITEM, 
 	ID_GRENADE_AMMO1_ITEM,
 	ID_GRENADE,

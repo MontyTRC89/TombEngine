@@ -291,6 +291,8 @@
 #define Unk_0080DE1A				VAR_U_(0x0080DE1A, __int16)
 #define Unk_0080DDE8				VAR_U_(0x0080DDE8, __int32)
 #define Unk_0080DE24				VAR_U_(0x0080DE24, __int16)
+// End
+#define ShatterItem					VAR_U_(0x00EEFAE0, SHATTER_ITEM)
 
 extern bool MonksAttackLara;
 

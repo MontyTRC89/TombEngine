@@ -586,6 +586,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	for (__int32 i = 0; i < NUM_ITEMS; i++)
 	{
 		m_items[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
+		m_effects[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
 	}
 
 	m_textureAtlas = NULL;
@@ -1188,6 +1189,91 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	return true;
 }
 
+bool Renderer11::drawEffects(bool transparent)
+{
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	__int32 firstBucket = (transparent ? 2 : 0);
+	__int32 lastBucket = (transparent ? 4 : 2);
+
+	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	for (__int32 i = 0; i < m_effectsToDraw.Size(); i++)
+	{
+		RendererEffect* effect = m_effectsToDraw[i];
+		RendererRoom* room = m_rooms[effect->Effect->roomNumber];
+		OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
+
+		drawEffect(effect, transparent);
+
+		if (obj->nmeshes > 0)
+		{
+			
+		}
+		else
+		{
+
+		}
+	}
+
+	return true;
+}
+
+bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
+{
+	UINT stride = sizeof(RendererVertex);
+	UINT offset = 0;
+
+	__int32 firstBucket = (transparent ? 2 : 0);
+	__int32 lastBucket = (transparent ? 4 : 2);
+
+	RendererRoom * room = m_rooms[effect->Effect->roomNumber];
+	RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
+
+	m_stItem.World = effect->World.Transpose();
+	m_stItem.Position = Vector4(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos, 1.0f);
+	m_stItem.AmbientLight = room->AmbientLight;
+	Matrix matrices[1] = { Matrix::Identity };
+	memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
+	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+	m_stLights.NumLights = effect->Lights.Size();
+	for (__int32 j = 0; j < effect->Lights.Size(); j++)
+		memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
+	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+
+	m_stMisc.AlphaTest = !transparent;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+	RendererMesh* mesh = effect->Mesh;
+
+	for (__int32 j = firstBucket; j < lastBucket; j++)
+	{
+		RendererBucket* bucket = &mesh->Buckets[j];
+
+		if (bucket->Vertices.size() == 0)
+			continue;
+
+		if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
+			m_context->RSSetState(m_states->CullNone());
+		else
+			m_context->RSSetState(m_states->CullCounterClockwise());
+
+		// Draw vertices
+		m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+		m_numDrawCalls++;
+	}
+
+	return true;
+}
+
 bool Renderer11::drawLara(bool transparent, bool shadowMap)
 {
 	// Don't draw Lara if binoculars or sniper
@@ -1408,6 +1494,7 @@ bool Renderer11::drawScene(bool dump)
 	drawLara(false, false);
 	drawItems(false, false);
 	drawItems(false, true);
+	drawEffects(false);
 	drawGunFlashes();
 	drawGunShells();
 	drawDebris(false);
@@ -1425,6 +1512,7 @@ bool Renderer11::drawScene(bool dump)
 	drawLara(true, false);
 	drawItems(true, false);
 	drawItems(true, true);
+	drawEffects(true);
 	drawWaterfalls();
 	drawDebris(true);
 
@@ -2423,6 +2511,24 @@ bool Renderer11::PrepareDataForTheRenderer()
 		}
 	}
 
+	// Create missing meshes (effect objects like ID_BODY_PART have nmeshes = 0 and they are "lost" with current procedures)
+	for (__int32 i = 0; i < NumMeshPointers; i++)
+	{
+		unsigned __int32 mp = reinterpret_cast<unsigned __int32>(Meshes[i * 2]);
+		RendererMesh* mesh = m_meshPointersToMesh[mp];
+		if (mesh == NULL)
+		{
+			__int32 meshPtrIndex = RawMeshPointers[i] / 2;
+			__int16* meshPtr = &RawMeshData[meshPtrIndex];
+			RendererMesh* mesh = getRendererMeshFromTrMesh(NULL,
+				meshPtr,
+				Meshes[i * 2],
+				0,
+				false,
+				false);
+		}
+	}
+
 	// Create a single vertex buffer and a single index buffer for all statics
 	m_staticsVertexBuffer = VertexBuffer::Create(m_device, staticsVertices.size(), staticsVertices.data());
 	m_staticsIndexBuffer = IndexBuffer::Create(m_device, staticsIndices.size(), staticsIndices.data());
@@ -3303,6 +3409,8 @@ inline void Renderer11::collectItems(__int16 roomNumber)
 	__int16 itemNum = NO_ITEM;
 	for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
 	{
+		//printf("ItemNum: %d, NextItem: %d\n", itemNum, Items[itemNum].nextItem);
+
 		ITEM_INFO* item = &Items[itemNum];
 
 		if (item->objectNumber == ID_LARA && itemNum == Items[itemNum].nextItem)
@@ -3359,6 +3467,108 @@ inline void Renderer11::collectStatics(__int16 roomNumber)
 		m_staticsToDraw.Add(newStatic);
 
 		mesh++;
+	}
+}
+
+inline void Renderer11::collectLightsForEffect(__int16 roomNumber, RendererEffect* effect)
+{
+	effect->Lights.Clear();
+
+	RendererRoom* room = m_rooms[roomNumber];
+	if (room == NULL)
+		return;
+
+	ROOM_INFO * r = room->Room;
+
+	if (r->numLights <= 0)
+		return;
+
+	m_tempItemLights.Clear();
+
+	Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
+
+	// Dynamic lights have the priority
+	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+	{
+		RendererLight* light = m_dynamicLights[i];
+
+		Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+		float distance = (itemPosition - lightPosition).Length();
+		if (distance > light->Out)
+			continue;
+
+		m_tempItemLights.Add(light);
+	}
+
+	__int32 numLights = room->Lights.size();
+
+	m_shadowLight = NULL;
+	RendererLight* brightestLight = NULL;
+	float brightest = 0.0f;
+
+	for (__int32 j = 0; j < numLights; j++)
+	{
+		RendererLight* light = &room->Lights[j];
+
+		// Check only lights different from sun
+		if (light->Type == LIGHT_TYPE_SUN)
+		{
+			// Sun is added without checks
+		}
+		else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+		{
+			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+			float distance = (itemPosition - lightPosition).Length();
+
+			// Collect only lights nearer than 20 sectors
+			if (distance >= 20 * WALL_SIZE)
+				continue;
+
+			// Check the out radius
+			if (distance > light->Out)
+				continue;
+
+			// If Lara, try to collect shadow casting light
+			if (effect->Effect->objectNumber == ID_LARA)
+			{
+				float attenuation = 1.0f - distance / light->Out;
+				float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				if (intensity >= brightest)
+				{
+					brightest = intensity;
+					brightestLight = light;
+				}
+			}
+		}
+		else if (light->Type == LIGHT_TYPE_SPOT)
+		{
+			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+			float distance = (itemPosition - lightPosition).Length();
+
+			// Collect only lights nearer than 20 sectors
+			if (distance >= 20 * WALL_SIZE)
+				continue;
+
+			// Check the range
+			if (distance > light->Range)
+				continue;
+		}
+		else
+		{
+			// Invalid light type
+			continue;
+		}
+
+		m_tempItemLights.Add(light);
+	}
+
+	for (__int32 i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
+	{
+		effect->Lights.Add(m_tempItemLights[i]);
 	}
 }
 
@@ -3638,17 +3848,25 @@ inline void Renderer11::collectEffects(__int16 roomNumber)
 	for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = Effects[fxNum].nextFx)
 	{
 		FX_INFO* fx = &Effects[fxNum];
-
+		
 		if (fx->objectNumber < 0)
 			continue;
 
+		OBJECT_INFO* obj = &Objects[fx->objectNumber];
+		
 		RendererEffect* newEffect = &m_effects[fxNum];
 		
 		newEffect->Effect = fx;
 		newEffect->Id = fxNum;
 		newEffect->World = Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+		newEffect->Mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Meshes[0 (obj->nmeshes ? obj->meshIndex : fx->frameNumber * 2)])];
+		
+		collectLightsForEffect(fx->roomNumber, newEffect);
 
 		m_effectsToDraw.Add(newEffect);
+
+		short* mp = Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)];
+		short hhh = 0;
 	}
 }
 
@@ -3747,7 +3965,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		}
 
 		// ColAddHorizon special handling
-		if (obj->Id == ID_HORIZON && g_GameFlow->GetLevel(CurrentLevel)->ColAddHorizon)
+		if (obj != NULL && obj->Id == ID_HORIZON && g_GameFlow->GetLevel(CurrentLevel)->ColAddHorizon)
 		{
 			if (texture->attribute == 2 || (effects & 1))
 				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
@@ -3756,7 +3974,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		}
 
 		bucket = &mesh->Buckets[bucketIndex];
-		obj->HasDataInBucket[bucketIndex] = true;
+		if (obj != NULL) obj->HasDataInBucket[bucketIndex] = true;
 
 		__int32 baseVertices = bucket->NumVertices;
 		for (__int32 v = 0; v < 4; v++)
@@ -3853,7 +4071,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 				bucketIndex = RENDERER_BUCKET_SOLID_DS;
 		}
 		bucket = &mesh->Buckets[bucketIndex];
-		obj->HasDataInBucket[bucketIndex] = true;
+		if (obj != NULL) obj->HasDataInBucket[bucketIndex] = true;
 
 		__int32 baseVertices = bucket->NumVertices;
 		for (__int32 v = 0; v < 3; v++)
@@ -4457,8 +4675,10 @@ void Renderer11::drawSparks()
 		{
 			if (spark->flags & SP_DEF)
 			{
+				FX_INFO* fx = &Effects[spark->fxObj];
+
 				addSpriteBillboard(m_sprites[spark->def],
-					spark->x, spark->y, spark->z,
+					fx->pos.xPos + spark->x,fx->pos.yPos + spark->y, fx->pos.zPos + spark->z,
 					spark->r, spark->g, spark->b,
 					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f,
 					BLENDMODE_ALPHABLEND);

@@ -649,17 +649,19 @@ struct RendererItem {
 	PreallocatedVector<RendererLight> Lights;
 };
 
-struct RendererEffect {
-	__int32 Id;
-	FX_INFO* Effect;
-	Matrix World;
-};
-
 struct RendererMesh
 {
 	RendererBucket				Buckets[NUM_BUCKETS];
 	RendererBucket				AnimatedBuckets[NUM_BUCKETS];
 	vector<Vector3>				Positions;
+};
+
+struct RendererEffect {
+	__int32 Id;
+	FX_INFO* Effect;
+	Matrix World;
+	RendererMesh* Mesh;
+	PreallocatedVector<RendererLight> Lights;
 };
 
 struct RendererObject
@@ -944,6 +946,7 @@ private:
 	inline void										collectStatics(__int16 roomNumber);
 	inline void										collectLightsForRoom(__int16 roomNumber);
 	inline void										collectLightsForItem(__int16 roomNumber, RendererItem* item);
+	inline void										collectLightsForEffect(__int16 roomNumber, RendererEffect* effect);
 	inline void										collectEffects(__int16 roomNumber);
 	void											prepareLights();
 	void											clearSceneItems();
@@ -970,6 +973,8 @@ private:
 	void											drawBlood();
 	void											drawDrips();
 	void											drawBubbles();
+	bool											drawEffects(bool transparent);
+	bool											drawEffect(RendererEffect* effect, bool transparent);
 	void											drawSplahes();
 	bool											drawSprites();
 	bool											drawLines3D();

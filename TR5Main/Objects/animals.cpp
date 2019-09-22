@@ -167,7 +167,7 @@ void __cdecl WildBoarControl(__int16 itemNum)
 				joint0 = -info.distance;
 				joint2 = -info.distance;
 			}
-			if (!item->flags && (/*v23 < 50 && v25 < 50 || */info.distance < 0x10000 && info.bite))
+			if (!item->flags && (info.distance < 0x10000 && info.bite))
 			{
 				item->goalAnimState = 4;
 				if (creature->enemy == LaraItem)
@@ -337,12 +337,12 @@ void __cdecl SmallScorpionControl(__int16 itemNum)
 
 						if (item->currentAnimState == 5)
 						{
-							rot = item->pos.yRot + -32768;
+							rot = item->pos.yRot + -ANGLE(180);
 							biteInfo = &smallScorpionBiteInfo1;
 						}
 						else
 						{
-							rot = item->pos.yRot + -32768;
+							rot = item->pos.yRot + -ANGLE(180);
 							biteInfo = &smallScorpionBiteInfo2;
 						}
 						CreatureEffect2(item, biteInfo, 3, rot, DoBloodSplat);
@@ -3031,8 +3031,8 @@ void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
 								pos3.z - pos1.z,
 								angles);
 
-			pos.xRot = angles[0];
-			pos.yRot = angles[1];
+			pos.xRot = angles[1];
+			pos.yRot = angles[0];
 			pos.zRot = 0;
 
 			HarpyBubbles(&pos, item->roomNumber, 2);
@@ -3059,8 +3059,8 @@ void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
 				pos3.z - pos1.z,
 				angles);
 
-			pos.xRot = angles[0];
-			pos.yRot = angles[1];
+			pos.xRot = angles[1];
+			pos.yRot = angles[0];
 			pos.zRot = 0;
 
 			HarpyBubbles(&pos, item->roomNumber, 2);
@@ -3087,7 +3087,6 @@ void __cdecl HarpyBubbles(PHD_3DPOS* pos, __int16 roomNumber, __int32 count)
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
 		fx->flag1 = count;
 		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 2 * count;
-		int hh = 0;
 	}
 }
 
@@ -3540,9 +3539,9 @@ void __cdecl SphinxControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	__int32 x = item->pos.yPos + 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	__int32 x = item->pos.xPos + 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
 	__int32 y = item->pos.yPos;
-	__int32 z = item->pos.yPos + 614 * COS(item->pos.yRot) >> W2V_SHIFT;
+	__int32 z = item->pos.zPos + 614 * COS(item->pos.yRot) >> W2V_SHIFT;
 
 	__int16 roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -3651,7 +3650,7 @@ void __cdecl SphinxControl(__int16 itemNum)
 	case 5:
 		creature->maximumTurn = 60;
 
-		if (!creature->flags)
+		if (creature->flags == 0)
 		{
 			if (item->touchBits & 0x40)
 			{
@@ -3666,7 +3665,7 @@ void __cdecl SphinxControl(__int16 itemNum)
 				creature->flags = 1;
 			}
 		}
-		if (dx >= 50 || dz >= 50 || item->animNumber != Objects[item->objectNumber].animIndex)
+		if (dx >= 50 || dz >= 50 || item->animNumber != Objects[ID_SPHINX].animIndex)
 		{
 			if (info.distance > SQUARE(2048) && abs(info.angle) > 512)
 			{

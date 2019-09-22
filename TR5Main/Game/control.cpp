@@ -570,7 +570,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	while (true)
 	{
 		nframes = DrawPhaseGame();
-		result = ControlPhase(nframes, 0); printf("LastSpotCam: %d\n", LastSpotCam);
+		result = ControlPhase(nframes, 0); //printf("LastSpotCam: %d\n", LastSpotCam);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||

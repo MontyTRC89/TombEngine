@@ -201,3 +201,10 @@ void __cdecl MotorbikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* col
 __int32 __cdecl GetOnMotorbike(int itemNumber);
 __int32 __cdecl GetMotorbikeCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 void __cdecl MotorbikeBaddieCollision(ITEM_INFO* jeep);
+
+void __cdecl BubblesControl(__int16 fxNum);
+__int32 __cdecl BubblesShatterFunction(FX_INFO* fx, __int32 param1, __int32 param2);
+void __cdecl BubblesEffect1(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
+void __cdecl BubblesEffect2(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
+void __cdecl BubblesEffect3(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
+void __cdecl BubblesEffect4(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);

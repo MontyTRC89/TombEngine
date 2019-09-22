@@ -351,6 +351,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="TR5Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Objects\tr4bubbles.cpp" />
     <None Include="packages.config" />
     <None Include="Scripting\Scripts\andrea1.lua">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

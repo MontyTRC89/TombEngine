@@ -21,7 +21,7 @@ __int16 __cdecl CreateItem()
 	return result;
 }
 
-void __cdecl KillItem(__int16 itemNum)
+/*void __cdecl KillItem(__int16 itemNum)
 {
 	if (InItemControlLoop)
 	{
@@ -87,7 +87,7 @@ void __cdecl KillItem(__int16 itemNum)
 			item->flags |= IFLAG_KILLED;
 		}
 	}
-}
+}*/
 
 void __cdecl RemoveAllItemsInRoom(__int16 roomNumber, __int16 objectNumber)
 {
@@ -112,6 +112,6 @@ void __cdecl RemoveAllItemsInRoom(__int16 roomNumber, __int16 objectNumber)
 void Inject_Items()
 {
 	INJECT(0x00440840, CreateItem);
-	INJECT(0x00440620, KillItem);
+	//INJECT(0x00440620, KillItem);
 	//INJECT(0x00440DA0, ItemNewRoom);
 }

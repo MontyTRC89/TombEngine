@@ -35,7 +35,7 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->hitEffect = true;
 	}
-	 
+
 	obj = &Objects[ID_WILD_BOAR];
 	if (obj->loaded)
 	{
@@ -403,7 +403,7 @@ void __cdecl NewObjects()
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
-		obj->saveFlags = true;		
+		obj->saveFlags = true;
 		obj->pivotLength = 0;
 	}
 
@@ -913,7 +913,7 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->waterCreature = true;
-		 
+
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
@@ -1008,6 +1008,11 @@ void __cdecl NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
+	obj = &Objects[ID_ENERGY_BUBBLES];
+	obj->loaded = true;
+	obj->control = BubblesControl;
+	obj->nmeshes = 0;
 }
 
 void __cdecl CustomObjects()

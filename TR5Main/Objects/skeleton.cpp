@@ -711,7 +711,7 @@ void __cdecl SkeletonControl(__int16 itemNum)
 		case 0:
 			if (item->frameNumber - Anims[item->animNumber].frameBase < 32)
 			{
-				//WakeUpSkeleton(item);
+				WakeUpSkeleton(item);
 			}
 			break;
 
@@ -733,9 +733,9 @@ void __cdecl WakeUpSkeleton(ITEM_INFO* item)
 		__int16 roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		
-		fx->pos.xPos = GetRandomControl() + item->pos.xPos - 128;
+		fx->pos.xPos = (byte)GetRandomControl() + item->pos.xPos - 128;
 		fx->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		fx->pos.zPos = GetRandomControl() + item->pos.zPos - 128;
+		fx->pos.zPos = (byte)GetRandomControl() + item->pos.zPos - 128;
 		fx->roomNumber = item->roomNumber;
 		fx->pos.yRot = 2 * GetRandomControl();
 		fx->speed = GetRandomControl() >> 11;

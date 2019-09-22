@@ -1273,7 +1273,7 @@ typedef struct SPRITE
 
 struct SHATTER_ITEM
 {
-	SPHERE Sphere; // size=16, offset=0
+	SPHERE sphere; // size=16, offset=0
 	ITEM_LIGHT* il; // size=48, offset=16
 	__int16* meshp; // size=0, offset=20
 	__int32 bit; // size=0, offset=24

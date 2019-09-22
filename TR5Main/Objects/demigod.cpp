@@ -511,9 +511,8 @@ void __cdecl DemigodControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int32 something)
+void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int32 flags)
 {
-	return;
 	__int16 fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != -1)
 	{
@@ -523,7 +522,7 @@ void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int3
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.zPos = pos->zPos;
 		fx->pos.xRot = pos->xRot;
-		if (something < 4)
+		if (flags < 4)
 		{
 			fx->pos.yRot = pos->yRot;
 		}
@@ -531,15 +530,20 @@ void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int3
 		{
 			fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
 		}
+
+		printf("X: %d, Y: %d\n", fx->pos.xRot, fx->pos.yRot);
+
+		OBJECT_INFO* obj = &Objects[ID_ENERGY_BUBBLES];
+
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + -ANGLE(180);
-		fx->flag1 = something;
+		fx->flag1 = flags;
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
-		fx->objectNumber = ID_BUBBLES;
-		if (something >= 4)
-			something--;
-		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 2 * something;
+		fx->objectNumber = ID_ENERGY_BUBBLES;
+		if (flags >= 4)
+			flags--;
+		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
 	}
 }
 
@@ -548,9 +552,6 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 
 	__int16 animIndex = item->animNumber - Objects[item->objectNumber].animIndex;
-
-	if (animIndex != 8 && animIndex != 16 && animIndex != 19)
-		return;
 
 	if (animIndex == 8)
 	{
@@ -578,8 +579,8 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 			pos.xPos = pos1.x;
 			pos.yPos = pos1.y;
 			pos.zPos = pos1.z;
-			pos.xRot = angles[0];
-			pos.yRot = angles[1];
+			pos.xRot = angles[1];
+			pos.yRot = angles[0];
 			pos.zRot = 0;
 
 			if (item->objectNumber == ID_DEMIGOD3)
@@ -591,34 +592,31 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 				DemigodThrowEnergyAttack(&pos, item->roomNumber, 5);
 			}
 		}
-	}
-	else
-	{
-		__int32 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
-		if (frameNumber >= 8 && frameNumber <= 64)
+		return;
+	}
+
+	if (animIndex != 16)
+	{
+		if (animIndex != 19)
+			return;
+
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
 		{
 			PHD_VECTOR pos1;
 			PHD_VECTOR pos2;
 
-			pos1.x = 0;
-			pos1.y = 0;
-			pos1.z = 192;
+			pos1.x = -544;
+			pos1.y = 96;
+			pos1.z = 0;
 
-			pos2.x = 0;
-			pos2.y = 0;
-			pos2.z = 384;
+			GetJointAbsPosition(item, &pos1, 16);
 
-			if (GlobalCounter & 1)
-			{
-				GetJointAbsPosition(item, &pos1, 18);
-				GetJointAbsPosition(item, &pos2, 18);
-			}
-			else
-			{
-				GetJointAbsPosition(item, &pos1, 17);
-				GetJointAbsPosition(item, &pos2, 17);
-			}
+			pos2.x = -900;
+			pos2.y = 96;
+			pos2.z = 0;
+
+			GetJointAbsPosition(item, &pos2, 16);
 
 			__int16 angles[2];
 			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
@@ -627,12 +625,62 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 			pos.xPos = pos1.x;
 			pos.yPos = pos1.y;
 			pos.zPos = pos1.z;
-			pos.xRot = angles[0];
-			pos.yRot = angles[1];
+			pos.xRot = angles[1];
+			pos.yRot = angles[0];
 			pos.zRot = 0;
 
-			DemigodThrowEnergyAttack(&pos, item->roomNumber, 4);
+			if (item->objectNumber == ID_DEMIGOD3)
+			{
+				DemigodThrowEnergyAttack(&pos, item->roomNumber, 3);
+			}
+			else
+			{
+				DemigodThrowEnergyAttack(&pos, item->roomNumber, 5);
+			}
 		}
+
+		return;
+	}
+
+	// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
+	__int32 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+
+	if (frameNumber >= 8 && frameNumber <= 64)
+	{
+		PHD_VECTOR pos1;
+		PHD_VECTOR pos2;
+
+		pos1.x = 0;
+		pos1.y = 0;
+		pos1.z = 192;
+
+		pos2.x = 0;
+		pos2.y = 0;
+		pos2.z = 384;
+
+		if (GlobalCounter & 1)
+		{
+			GetJointAbsPosition(item, &pos1, 18);
+			GetJointAbsPosition(item, &pos2, 18);
+		}
+		else
+		{
+			GetJointAbsPosition(item, &pos1, 17);
+			GetJointAbsPosition(item, &pos2, 17);
+		}
+
+		__int16 angles[2];
+		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+
+		PHD_3DPOS pos;
+		pos.xPos = pos1.x;
+		pos.yPos = pos1.y;
+		pos.zPos = pos1.z;
+		pos.xRot = angles[1];
+		pos.yRot = angles[0];
+		pos.zRot = 0;
+
+		DemigodThrowEnergyAttack(&pos, item->roomNumber, 4);
 	}
 }
 
