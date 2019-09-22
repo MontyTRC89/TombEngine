@@ -3083,10 +3083,10 @@ void __cdecl HarpyBubbles(PHD_3DPOS* pos, __int16 roomNumber, __int32 count)
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + -32768;
-		fx->objectNumber = ID_BUBBLES;
+		fx->objectNumber = ID_ENERGY_BUBBLES;
 		fx->speed = (GetRandomControl() & 0x1F) + 96;
 		fx->flag1 = count;
-		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 2 * count;
+		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * count;
 	}
 }
 

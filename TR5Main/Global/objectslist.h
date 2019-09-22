@@ -65,9 +65,9 @@ typedef enum object_types {
 	ID_ROMAN_GOD,
 	ID_DEMIGOD1, // TR4 - OK
 	ID_HYDRA,
-	ID_DEMIGOD2, // TR4 - OK - Needs testing
+	ID_DEMIGOD2, // TR4 - OK 
 	ID_GUARDIAN,
-	ID_DEMIGOD3, // TR4 - OK - Needs testing
+	ID_DEMIGOD3, // TR4 - OK
 	ID_HITMAN,
 	ID_LITTLE_BEETLE, // TR4
 	ID_SCIENTIST,
