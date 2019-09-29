@@ -94,3 +94,10 @@
 #define WEAPON_AMMO2 1
 #define WEAPON_AMMO3 2
 #define WEAPON_AMMO4 3
+
+#define BLOCKABLE     0x8000
+#define BLOCKED       0x4000
+#define OVERLAP_INDEX 0x3fff
+
+#define SEARCH_NUMBER  0x7fff
+#define BLOCKED_SEARCH 0x8000

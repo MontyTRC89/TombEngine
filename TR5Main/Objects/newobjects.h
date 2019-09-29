@@ -80,6 +80,7 @@ void __cdecl FlameThrowerControl(__int16 itemNumber);
 void __cdecl ControlSpikyCeiling(__int16 itemNumber);
 void __cdecl InitialiseMonkey(__int16 itemNumber);
 void __cdecl MonkeyControl(__int16 itemNumber);
+void __cdecl MPGunControl(__int16 itemNumber);
 
 __int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 __int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);

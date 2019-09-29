@@ -85,22 +85,16 @@ void __cdecl GuideControl(__int16 itemNum)
 	__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
 
 	laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
-	laraInfo.ahead = true;
 
+	laraInfo.ahead = true;
 	if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
-	{
 		laraInfo.ahead = false;
-	}
 
 	__int32 distance = 0;
 	if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
-	{
 		laraInfo.distance = 0x7FFFFFFF;
-	}
 	else
-	{
 		laraInfo.distance = dx * dx + dz * dz;
-	}
 
 	dx = abs(dx);
 	dz = abs(dz);
@@ -109,13 +103,9 @@ void __cdecl GuideControl(__int16 itemNum)
 	__int16 rot2 = 0;
 
 	if (dx <= dz)
-	{
 		laraInfo.xAngle = ATAN(dz + (dx >> 1), dy);
-	}
 	else
-	{
 		laraInfo.xAngle = ATAN(dx + (dz >> 1), dy);
-	}
 
 	ITEM_INFO* foundEnemy = NULL;
 
@@ -190,16 +180,35 @@ void __cdecl GuideControl(__int16 itemNum)
 
 		if (laraInfo.ahead)
 		{
-			joint1 = laraInfo.xAngle;
 			joint0 = laraInfo.angle >> 1;
+			joint1 = laraInfo.xAngle >> 1;
 			joint2 = laraInfo.angle >> 1;
 		}
 		else if (info.ahead)
 		{
 			joint0 = info.angle >> 1;
+			joint1 = info.xAngle >> 1;
 			joint2 = info.angle >> 1;
-			joint1 = info.xAngle;
 		}
+
+		/*if (Objects[ID_WRAITH1].loaded & 0x10000)
+		{
+			if (item->itemFlags[3] == 5)
+				item->goalAnimState = 2;
+
+			if (item->itemFlags[3] == 5 || item->itemFlags[3] == 6)
+			{
+				CreatureTilt((int)item, tilt);
+				CreatureJoint((int)item, 0, joint0);
+				CreatureJoint((int)item, 1, joint1);
+				CreatureJoint((int)item, 2, joint2);
+				CreatureJoint((int)item, 3, joint1);
+
+				CreatureAnimation(itemNum, angle, 0);
+
+				return;
+			}
+		}*/
 
 		if (item->requiredAnimState)
 		{
@@ -220,7 +229,7 @@ void __cdecl GuideControl(__int16 itemNum)
 						item->goalAnimState = 31;
 					}
 				}
-				else if (true || enemy != LaraItem || info.distance > SQUARE(2048))
+				else if (/*true ||*/ enemy != LaraItem || info.distance > SQUARE(2048))
 				{
 					item->goalAnimState = 2;
 				}
@@ -413,7 +422,7 @@ void __cdecl GuideControl(__int16 itemNum)
 		break;
 
 	case 11:
-		// Ignite torchjì
+		// Ignite torch
 		pos1.x = guideBiteInfo2.x;
 		pos1.y = guideBiteInfo2.y;
 		pos1.z = guideBiteInfo2.z;

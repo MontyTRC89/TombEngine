@@ -1009,10 +1009,32 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 	}
 
+	// TODO: fix this
 	obj = &Objects[ID_ENERGY_BUBBLES];
 	obj->loaded = true;
 	obj->control = BubblesControl;
 	obj->nmeshes = 0;
+
+	obj = &Objects[ID_MP_WITH_GUN];
+	if (obj->loaded)
+	{
+		obj->control = MPGunControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 28;
+		obj->radius = 102;
+		obj->intelligent = 1;
+		obj->savePosition = true; 
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->pivotLength = 0;
+		obj->biteOffset = 0;
+
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+	}
 }
 
 void __cdecl CustomObjects()

@@ -61,7 +61,7 @@ typedef enum object_types {
 	ID_LION,
 	ID_WILD_BOAR, // TR4 - OK
 	ID_GLADIATOR,
-	ID_HARPY, // TR4 - OK - Needs testing
+	ID_HARPY, // TR4 - OK
 	ID_ROMAN_GOD,
 	ID_DEMIGOD1, // TR4 - OK
 	ID_HYDRA,
@@ -316,7 +316,7 @@ typedef enum object_types {
 	ID_LIFT_DOORS1,
 	ID_COBRA, // TR3 - OK
 	ID_LIFT_DOORS2,
-	ID_MONKEY, // TR3 - 71
+	ID_MONKEY, // TR3 - OK - Needs testing
 	ID_PUSHPULL_DOOR1,
 	ID_MP_WITH_STICK, // TR3 - 60
 	ID_PUSHPULL_DOOR2,

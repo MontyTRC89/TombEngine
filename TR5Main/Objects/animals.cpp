@@ -724,7 +724,7 @@ void __cdecl BatControl(__int16 itemNum)
 		__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
 		__int32 laraDistance = dx * dx + dz * dz;
 
-		if (item->aiBits & GUARD)
+		if (item->aiBits)
 		{
 			GetAITarget(creature);
 		}
@@ -3575,7 +3575,7 @@ void __cdecl SphinxControl(__int16 itemNum)
 	roomNumber = item->roomNumber;
 
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height2= GetFloorHeight(floor, x, y, z);
+	__int32 height2 = GetFloorHeight(floor, x, y, z);
 
 	ATAN(1228, height2 - height1);
 
