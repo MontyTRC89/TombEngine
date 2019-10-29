@@ -79,6 +79,22 @@ __int32 __cdecl EnableBaddieAI(__int16 itemNum, __int32 always)
 	return false;
 }
 
+void __cdecl DisableBaddieAI(__int16 itemNumber)
+{
+	ITEM_INFO* result; // eax
+	CREATURE_INFO* v2; // ecx
+
+	ITEM_INFO* item = &Items[itemNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)result->data;
+	
+	item->data = NULL;
+	if (creature)
+	{
+		creature->itemNum = NO_ITEM;
+		SlotsUsed--;
+	}
+}
+
 void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
 {
 	CREATURE_INFO* creature = &BaddieSlots[slot];
@@ -140,10 +156,19 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	  
 	switch (item->objectNumber)
 	{
+	case ID_MP_WITH_STICK:
+	case ID_MONKEY:
+		// Can climb
+		creature->LOT.step = 1024;
+		creature->LOT.drop = -1024;
+		creature->LOT.zone = 3;
+		break;
+
 	case ID_SAS:
 	case ID_BLUE_GUARD:
 	case ID_MAFIA2:
 	case ID_SAILOR:
+		// Can climb and jjump
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
 		creature->LOT.canJump = true;
@@ -153,6 +178,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	case ID_HITMAN:
 	case ID_BADDY1:
 	case ID_BADDY2:
+		// Can climb, jump, monkey
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
 		creature->LOT.canJump = true;
@@ -161,6 +187,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		break;
 
 	case ID_SKELETON:
+		// Can jump
 		creature->LOT.step = 256;
 		creature->LOT.drop = -256;
 		creature->LOT.canJump = true;
@@ -174,6 +201,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	case ID_ATTACK_SUB:
 	case ID_BAT:
 	case ID_HARPY:
+		// Can fly
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 16;
@@ -184,6 +212,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	case ID_SHARK:
 	case ID_BARRACUDA:
 	case ID_CROCODILE:
+		// Can swim
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 32;
@@ -202,8 +231,74 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	SlotsUsed++;
 }
 
+void __cdecl ClearLOT(LOT_INFO* LOT)
+{
+	LOT->head = NO_BOX;
+	LOT->tail = NO_BOX;
+	LOT->searchNumber = 0;
+	LOT->targetBox = NO_BOX;
+	LOT->requiredBox = NO_BOX;
+
+	BOX_NODE* node = LOT->node;
+	for (__int32 i = 0; i < NumberBoxes; i++)
+	{
+		node->exitBox = NO_BOX;
+		node->nextExpansion = NO_BOX;
+		node->searchNumber = 0;
+		node++;
+	}
+}
+
+void __cdecl CreateZone(ITEM_INFO* item)
+{
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	ROOM_INFO* r = &Rooms[item->roomNumber];
+
+	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
+
+	if (creature->LOT.fly)
+	{
+		BOX_NODE* node = creature->LOT.node;
+		creature->LOT.zoneCount = 0;
+
+		for (__int32 i = 0; i < NumberBoxes; i++)
+		{
+			node->boxNumber = i;
+			node++;
+			creature->LOT.zoneCount++;
+		}
+	}
+	else
+	{
+		__int16* zone = GroundZones[creature->LOT.zone];
+		__int16* flippedZone = GroundZones[creature->LOT.zone + 1];
+
+		__int16 zoneNumber = zone[item->boxNumber];
+		__int16 flippedZoneNumber = flippedZone[item->boxNumber];
+
+		BOX_NODE* node = creature->LOT.node;
+		creature->LOT.zoneCount = 0;
+
+		for (__int32 i = 0; i < NumberBoxes; i++)
+		{
+			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
+			{
+				node->boxNumber = i;
+				node++;
+				creature->LOT.zoneCount++;
+			}
+
+			zone++;
+			flippedZone++;
+		}
+	}
+}
+
 void Inject_Lot()
 {
 	INJECT(0x0045B0C0, InitialiseLOTarray);
 	INJECT(0x0045B1A0, EnableBaddieAI);
+	INJECT(0x0045B150, DisableBaddieAI);
+	INJECT(0x0045B740, ClearLOT);
+	INJECT(0x0045B5E0, CreateZone);
 }

@@ -38,6 +38,29 @@ typedef struct JEEP_INFO {
 	__int16 unknown2;
 };
 
+typedef struct FISH_INFO
+{
+	__int16	x;
+	__int16	y;
+	__int16	z;
+	__int32	angle;
+	__int16	destY;
+	__int16	angAdd;
+	byte speed;
+	byte acc;
+	byte swim;
+};
+
+typedef struct FISH_LEADER_INFO
+{
+	__int16	angle;
+	byte speed;
+	byte on;
+	__int16	angleTime;
+	__int16	speedTime;
+	__int16	xRange, yRange, zRange;
+};
+
 void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
 
 // TR1 objects
@@ -81,6 +104,12 @@ void __cdecl ControlSpikyCeiling(__int16 itemNumber);
 void __cdecl InitialiseMonkey(__int16 itemNumber);
 void __cdecl MonkeyControl(__int16 itemNumber);
 void __cdecl MPGunControl(__int16 itemNumber);
+void InitialiseMPStick(__int16 itemNumber);
+void MPStickControl(__int16 itemNumber);
+void __cdecl SetupShoal(__int32 shoalNumber);
+void __cdecl SetupFish(__int32 leader, ITEM_INFO* item);
+void ControlFish(__int16 itemNumber);
+bool FishNearLara(PHD_3DPOS* pos, __int32 distance, ITEM_INFO* item);
 
 __int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 __int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);

@@ -101,3 +101,29 @@
 
 #define SEARCH_NUMBER  0x7fff
 #define BLOCKED_SEARCH 0x8000
+
+#define FOLLOW_CENTRE 	1
+#define NO_CHUNKY     	2
+#define CHASE_OBJECT  	3
+#define NO_MINY		0xffffff
+
+#define NO_BOX  0x7ff
+
+#define BOX_NUMBER  0x7ff
+#define BOX_END_BIT	0x8000
+
+#define EXPAND_LEFT   0x1
+#define EXPAND_RIGHT  0x2
+#define EXPAND_TOP    0x4
+#define EXPAND_BOTTOM 0x8
+
+#define BLOCKABLE     0x8000
+#define BLOCKED       0x4000
+#define OVERLAP_INDEX 0x3fff
+
+#define SEARCH_NUMBER  0x7fff
+#define BLOCKED_SEARCH 0x8000
+
+#define NO_FLYING 0
+
+#define FLY_ZONE 0x2000

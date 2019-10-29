@@ -1023,13 +1023,34 @@ void __cdecl NewObjects()
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 28;
 		obj->radius = 102;
-		obj->intelligent = 1;
+		obj->intelligent = true;
 		obj->savePosition = true; 
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
 		obj->biteOffset = 0;
+
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_MP_WITH_STICK];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMPStick;
+		obj->control = MPStickControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 28;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->pivotLength = 0;
 
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;

@@ -11,7 +11,7 @@
 #include "..\Game\people.h"
 #include "..\Game\lara.h"
 
-enum MPGUN_ANIMS {
+enum MPGUN_STATES {
 	MPGUN_EMPTY, 
 	MPGUN_WAIT,
 	MPGUN_WALK, 
@@ -109,8 +109,8 @@ void __cdecl MPGunControl(__int16 itemNumber)
 		{
 			creature->enemy = LaraItem;
 
-			dx = LaraItem->pos.zPos - item->pos.zPos;
-			dz = LaraItem->pos.xPos - item->pos.xPos;
+			dx = LaraItem->pos.xPos - item->pos.xPos;
+			dz = LaraItem->pos.zPos - item->pos.zPos;
 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
 			
@@ -126,11 +126,10 @@ void __cdecl MPGunControl(__int16 itemNumber)
 
 				dx = target->pos.xPos - item->pos.xPos;
 				dz = target->pos.zPos - item->pos.zPos;
-				__int32 distance = SQUARE(dx) + SQUARE(dx);
+				__int32 distance = SQUARE(dx) + SQUARE(dz);
 				if (distance < laraInfo.distance)
 					creature->enemy = target;
 			}
-
 		}
 
 		CreatureAIInfo(item, &info);
@@ -142,10 +141,10 @@ void __cdecl MPGunControl(__int16 itemNumber)
 		}
 		else
 		{
-			dx = LaraItem->pos.zPos - item->pos.zPos;
 			dx = LaraItem->pos.xPos - item->pos.xPos;
+			dz = LaraItem->pos.zPos - item->pos.zPos;
 			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot; 
-			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
+			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 
 		GetCreatureMood(item, &info, creature->enemy != LaraItem ? VIOLENT : TIMID);

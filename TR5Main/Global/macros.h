@@ -7,9 +7,11 @@
 #define WHITE555 RGB555(255, 255, 255)
 #define GRAY555  RGB555(128, 128, 128)
 #define BLACK555 RGB555(  0,   0,   0)
-#define XZ_GET_SECTOR(room, x, z) (r->floor[(int)((z) / 1024 + r->x_size * ((x) / 1024))])
+#define XZ_GET_SECTOR(room, x, z) (r->floor[(int)((z) / 1024 + r->xSize * ((x) / 1024))])
 
 #define ADD_PTR(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n)); 
 
 #define GF(a,b)	(Anims[a].frameBase+b)
 #define GF2(a,b,c)	(Anims[Objects[a].animIndex + b].frameBase+c)
+
+#define ZONE(A) (((A) >> (WALL_SIZE - 2)) - 1)
