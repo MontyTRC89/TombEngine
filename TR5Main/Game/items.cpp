@@ -457,6 +457,45 @@ void __cdecl InitialiseItemArray(__int32 numitems)
 	item->nextItem = NO_ITEM;
 }
 
+__int16 __cdecl SpawnItem(ITEM_INFO* item, __int16 objectNumber)
+{
+	__int16 itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
+	{
+		ITEM_INFO* spawn = &Items[itemNumber];
+
+		spawn->objectNumber = objectNumber;
+		spawn->roomNumber = item->roomNumber;
+		memcpy(&spawn->pos, &item->pos, sizeof(PHD_3DPOS));
+
+		InitialiseItem(itemNumber);
+
+		spawn->status = ITEM_INACTIVE;
+		spawn->shade = 0x4210;
+	}
+
+	return itemNumber;
+}
+
+__int32 __cdecl GlobalItemReplace(__int16 search, __int16 replace)
+{
+	__int32 changed = 0;
+	for (__int32 i = 0; i < NumberRooms; i++)
+	{
+		ROOM_INFO* room = &Rooms[i];
+		for (__int16 itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)
+		{
+			if (Items[itemNumber].objectNumber == search)
+			{
+				Items[itemNumber].objectNumber = replace;
+				changed++;
+			}
+		}
+	}
+
+	return changed;
+}
+
 void Inject_Items()
 {
 	INJECT(0x00440840, CreateItem);

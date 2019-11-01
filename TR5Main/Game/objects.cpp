@@ -1,0 +1,608 @@
+#include "objects.h"
+#include "..\Global\global.h"
+#include "items.h"
+#include "effects.h"
+#include "effect2.h"
+#include "collide.h"
+#include "draw.h"
+#include "lara.h"
+#include "sphere.h"
+#include "debris.h"
+#include "control.h"
+
+__int32 lastWaterfallY = 0;
+__int16 TightRopeBounds[12] = 
+{
+	0xFF00, 0x0100, 0x0000, 0x0000, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
+	0xF8E4, 0x071C
+};
+PHD_VECTOR TightRopePos = { 0, 0, 0 };
+
+__int16 ParallelBarsBounds[12] =  
+{
+	0xFD80, 0x0280, 0x02C0, 0x0340, 0xFFA0, 0x0060, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
+};
+
+PHD_VECTOR PolePos = { 0, 0, -208 }; 
+PHD_VECTOR PolePosR = { 0, 0, 0 }; 
+__int16 PoleBounds[12] = // offset 0xA1250
+{
+	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
+	0xF8E4, 0x071C
+};
+
+extern LaraExtraInfo g_LaraExtra;
+
+void __cdecl SmashObject(__int16 itemNumber) 
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	ROOM_INFO* r = &Rooms[item->roomNumber];
+	__int32 sector = ((item->pos.zPos - r->z) >> 10) + r->xSize * ((item->pos.xPos - r->x) >> 10);
+	
+	BOX_INFO* box = &Boxes[r->floor[sector].box];
+	if (box->overlapIndex & BOX_LAST)
+		box->overlapIndex &= ~BOX_BLOCKED;
+
+	SoundEffect(SFX_SMASH_GLASS, &item->pos, 0);
+
+	item->collidable = 0;
+	item->meshBits = 0xFFFE;
+
+	ExplodingDeath(itemNumber, -1, 257); //ExplodingDeath2
+
+	item->flags |= IFLAG_INVISIBLE;
+
+	if (item->status == ITEM_ACTIVE)
+		RemoveActiveItem(itemNumber);
+	item->status = ITEM_DEACTIVATED;
+}
+
+void __cdecl SmashObjectControl(__int16 itemNumber) 
+{
+	SmashObject(itemNumber << 16);
+}
+
+void __cdecl BridgeFlatFloor(ITEM_INFO* item, __int32 x, __int32 y, __int32 z, __int32* height) 
+{
+	if (item->pos.yPos >= y)
+	{
+		*height = item->pos.yPos;
+		HeightType = WALL;
+		OnObject = 1;
+	}
+}
+
+void __cdecl BridgeFlatCeiling(ITEM_INFO* item, __int32 x, __int32 y, __int32 z, __int32* height) 
+{
+	if (item->pos.yPos >= y)
+	{
+		*height = item->pos.yPos + 256;
+	}
+}
+
+__int32 __cdecl GetOffset(ITEM_INFO* item, __int32 x, __int32 z)
+{
+	if (item->pos.yRot == 0)
+	{
+		return (-x) & 0x3FF;
+	}
+	else if (item->pos.yRot == ANGLE(-180))
+	{
+		return x & 0x3FF;
+	}
+	else if (item->pos.yRot == ANGLE(90))
+	{
+		return z & 0x3FF;
+	}
+	else
+	{
+		return (-z) & 0x3FF;
+	}
+}
+
+void __cdecl BridgeTilt1Floor(ITEM_INFO* item, __int32 x, __int32 y, __int32 z, __int32* height) 
+{
+	__int32 level = item->pos.yPos + (GetOffset(item, x, z) >> 2);
+
+	if (level >= y)
+	{
+		*height = level;
+		HeightType = WALL;
+		OnObject = 1;
+	}
+}
+
+void __cdecl BridgeTilt1Ceiling(ITEM_INFO* item, __int32 x, __int32 y, __int32 z, __int32* height) 
+{
+	__int32 level = item->pos.yPos + (GetOffset(item, x, z) >> 2);
+
+	if (level >= y)
+	{
+		*height = level;
+	}
+}
+
+void __cdecl BridgeTilt2Floor(ITEM_INFO* item, __int32 x, __int32 y, __int32 z, __int32* height) 
+{
+	__int32 level = item->pos.yPos + (GetOffset(item, x, z) >> 1);
+
+	if (level >= y)
+	{
+		*height = level;
+		HeightType = WALL;
+		OnObject = 1;
+	}
+}
+
+void __cdecl BridgeTilt2Ceiling(ITEM_INFO* item, __int32 x, __int32 y, __int32 z, __int32* height) 
+{
+	__int32 level = item->pos.yPos + (GetOffset(item, x, z) >> 1);
+
+	if (level >= y)
+	{
+		*height = level;
+	}
+}
+
+void __cdecl ControlAnimatingSlots(__int16 itemNumber)
+{
+	// TODO: TR5 has here a series of hardcoded OCB codes, this function actually is just a placeholder
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (TriggerActive(item))
+		AnimateItem(item);
+}
+
+void __cdecl PoleCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if ((TrInput & IN_ACTION) && !Lara.gunStatus && l->currentAnimState == STATE_LARA_STOP && 
+		l->animNumber == ANIMATION_LARA_STAY_IDLE
+		|| Lara.isMoving && Lara.generalPtr == (void*)itemNumber)
+	{
+		__int16 rot = item->pos.yRot;
+		item->pos.yRot = l->pos.yRot;
+		if (TestLaraPosition(PoleBounds, item, l))
+		{
+			if (MoveLaraPosition(&PolePos, item, l))
+			{
+				l->animNumber = ANIMATION_LARA_STAY_TO_POLE_GRAB;
+				l->currentAnimState = STATE_LARA_POLE_IDLE;
+				l->frameNumber = Anims[l->animNumber].frameBase;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_BUSY;
+			}
+			else
+			{
+				Lara.generalPtr = (void*)itemNumber;
+			}
+			item->pos.yRot = rot;
+		}
+		else
+		{
+			if (Lara.isMoving && Lara.generalPtr == (void*)itemNumber)
+			{
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_NO_ARMS;
+			}
+			item->pos.yRot = rot;
+		}
+	}
+	else if (TrInput & IN_ACTION
+		&& !Lara.gunStatus
+		&& l->gravityStatus
+		&& l->fallspeed > Lara.gunStatus
+		&& (l->currentAnimState == STATE_LARA_REACH || l->currentAnimState == STATE_LARA_JUMP_UP))
+	{
+		if (TestBoundsCollide(item, l, 100))
+		{
+			if (TestCollision(item, l))
+			{
+				__int16 rot = item->pos.yRot;
+				if (l->currentAnimState == STATE_LARA_REACH)
+				{
+					PolePosR.y = l->pos.yPos - item->pos.yPos + 10;
+					AlignLaraPosition(&PolePosR, item, l);
+					l->animNumber = ANIMATION_LARA_JUMP_FORWARD_TO_POLE_GRAB;
+					l->frameNumber = Anims[l->animNumber].frameBase;
+				}
+				else
+				{
+					PolePosR.y = l->pos.yPos - item->pos.yPos + 66;
+					AlignLaraPosition(&PolePosR, item, l);
+					l->animNumber = ANIMATION_LARA_JUMP_UP_TO_POLE_GRAB;
+					l->frameNumber = Anims[l->animNumber].frameBase;
+				}
+				l->gravityStatus = false;
+				l->fallspeed = false;
+				l->currentAnimState = STATE_LARA_POLE_IDLE;
+				Lara.gunStatus = LG_HANDS_BUSY;
+				item->pos.yRot = rot;
+			}
+		}
+	}
+	else
+	{
+		if ((l->currentAnimState < STATE_LARA_POLE_IDLE || l->currentAnimState > STATE_LARA_POLE_TURN_RIGHT) && 
+			l->currentAnimState != STATE_LARA_JUMP_BACK)
+			ObjectCollision(itemNumber, l, coll);
+	}
+}
+
+void __cdecl ControlTriggerTriggerer(__int16 itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+	__int32 height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	
+	if (TriggerIndex)
+	{
+		__int16* trigger = TriggerIndex;
+		
+		if ((*trigger & 0x1F) == 5)
+		{
+			if ((*trigger & 0x8000) != 0)
+				return;
+			trigger++;
+		}
+		
+		if ((*trigger & 0x1F) == 6)
+		{
+			if ((*trigger & 0x8000) != 0)
+				return;
+			trigger++;
+		}
+		
+		if ((*trigger & 0x1F) == 19)
+		{
+			if ((*trigger & 0x8000) != 0)
+				return;
+			trigger++;
+		}
+		
+		if ((*trigger & 0x1F) == 20)
+		{
+			if (TriggerActive(item))
+				*trigger |= 0x20u;
+			else
+				*trigger &= 0xDFu;
+		}
+	}
+}
+
+void __cdecl AnimateWaterfalls()
+{
+	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
+	float y = lastWaterfallY * 0.00390625f;
+	float theY;
+
+	for (__int32 i = 0; i < 6; i++)
+	{
+		if (Objects[ID_WATERFALL1 + i].loaded)
+		{
+			OBJECT_TEXTURE* texture = WaterfallTextures[i];
+
+			texture->vertices[0].y = y + WaterfallY[i];
+			texture->vertices[1].y = y + WaterfallY[i];
+			texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
+			texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
+
+			if (i < 5)
+			{
+				texture++;
+
+				texture->vertices[0].y = y + WaterfallY[i];
+				texture->vertices[1].y = y + WaterfallY[i];
+				texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
+				texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
+			}
+		}
+	}
+}
+
+void __cdecl ControlWaterfall(__int16 itemNumber) 
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	TriggerActive(item);
+
+	if (itemNumber != 0)
+	{
+		item->status = ITEM_ACTIVE;
+
+		if (item->triggerFlags == 0x29C)
+		{
+			SoundEffect(SFX_D_METAL_KICKOPEN, &item->pos, 0);
+		}
+		else if (item->triggerFlags == 0x309)
+		{
+			SoundEffect(SFX_WATERFALL_LOOP, &item->pos, 0);
+		}
+	}
+	else
+	{
+		if (item->triggerFlags == 2 || item->triggerFlags == 0x29C)
+		{
+			item->status = ITEM_INVISIBLE;
+		}
+	}
+}
+
+void __cdecl TightRopeCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNum];
+	
+	if (((TrInput & IN_ACTION) == 0
+		|| l->currentAnimState != STATE_LARA_STOP
+		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
+		|| l->status = ITEM_INVISIBLE
+		|| Lara.gunStatus)
+		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+	{
+		if (l->currentAnimState == STATE_LARA_TIGHTROPE_FORWARD && 
+			l->goalAnimState != STATE_LARA_TIGHTROPE_EXIT && 
+			!Lara.tightRopeOff)
+		{
+			if (item->pos.yRot == l->pos.yRot)
+			{
+				if (abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
+					Lara.tightRopeOff = 1;
+			}
+		}
+	}
+	else
+	{
+		item->pos.yRot += -ANGLE(180);
+		if (TestLaraPosition(TightRopeBounds, item, l))
+		{
+			if (MoveLaraPosition(&TightRopePos, item, l))
+			{
+				l->currentAnimState = STATE_LARA_TIGHTROPE_ENTER;
+				l->animNumber = ANIMATION_LARA_TIGHTROPE_START;
+				l->frameNumber = Anims[l->animNumber].frameBase;
+				Lara.isMoving = false;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.tightRopeOnCount = 60;
+				Lara.tightRopeOff = 0;
+				Lara.tightRopeFall = 0;
+			}
+			else
+			{
+				Lara.generalPtr = (void*)itemNum;
+			}
+			item->pos.yRot += -ANGLE(180);
+		}
+		else
+		{
+			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
+				Lara.isMoving = false;
+			item->pos.yRot += -ANGLE(180);
+		}
+	}
+}
+
+void __cdecl ParallelBarsCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (TrInput & IN_ACTION && l->currentAnimState == STATE_LARA_REACH && l->animNumber == ANIMATION_LARA_TRY_HANG_SOLID)
+	{
+		__int32 test1 = TestLaraPosition(ParallelBarsBounds, item, l);
+		__int32 test2 = 0;
+		if (!test1)
+		{
+			item->pos.yRot += -ANGLE(180);
+			test2 = TestLaraPosition(ParallelBarsBounds, item, l);
+			item->pos.yRot += -ANGLE(180);
+		}
+
+		if (test1 || test2)
+		{
+			l->currentAnimState = STATE_LARA_MISC_CONTROL;
+			l->animNumber = ANIMATION_LARA_BARS_GRAB;
+			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->fallspeed = false;
+			l->gravityStatus = false;
+
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+
+			if (test1)
+				l->pos.yRot = item->pos.yRot;
+			else
+				l->pos.yRot = item->pos.yRot + -ANGLE(180);
+
+			PHD_VECTOR pos1;
+			pos1.x = 0;
+			pos1.y = -128;
+			pos1.z = 512;
+
+			PHD_VECTOR pos2;
+			pos2.x = 0;
+			pos2.y = -128;
+			pos2.z = 512;
+
+			GetLaraJointPosition(&pos1, 14);
+			GetLaraJointPosition(&pos2, 11);
+		
+			if (l->pos.yRot & 0x4000)
+				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) >> 1);
+			else
+				l->pos.zPos += item->pos.zPos - ((pos1.z + pos2.z) >> 1);
+			l->pos.yPos = l->pos.yPos - ((pos1.y + pos2.y) >> 1) + l->pos.yPos;
+
+			Lara.generalPtr = item;
+		}
+		else
+		{
+			ObjectCollision(itemNumber, l, coll);
+		}
+	}
+	else if (l->currentAnimState != STATE_LARA_BARS_SWING)
+	{
+		ObjectCollision(itemNumber, l, coll);
+	}
+}
+
+void __cdecl ControlXRayMachine(__int16 itemNumber) 
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!TriggerActive(item))
+		return;
+
+	/*if (item->triggerFlags == 0)
+	{
+		if (item->itemFlags[0] == 666)
+		{
+			if (item->itemFlags[1] != 0)
+			{
+				item->itemFlags[1]--;
+			}
+			else
+			{
+				item->itemFlags[1] = 30;
+				SoundEffect(SFX_ALARM, &item->pos, 0);
+			}
+		}
+
+		if (Lara.skelebob)
+		{
+			if (g_LaraExtra.Weapons[WEAPON_HK].Present)
+			{
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+				item->itemFlags[0] = 666;
+			}
+		}
+
+		return;
+	}
+
+	switch (item->triggerFlags)
+	{
+	case 111:
+		if (item->itemFlags[0] != 0)
+		{
+			item->itemFlags[0]--;
+
+			if (item->itemFlags[0] == 0)
+			{
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+				RemoveActiveItem(itemNumber);
+				item->flags |= IFLAG_INVISIBLE;
+			}
+
+			return;
+		}
+
+		if (Lara.fired)
+			item->itemFlags[0] = 15;
+		break;
+
+	case 222:
+		if (item->itemFlags[1] >= 144)
+		{
+			TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+			RemoveActiveItem(itemNumber);
+			item->flags |= IFLAG_INVISIBLE;
+			return;
+		}
+
+		if (item->itemFlags[1] < 128)
+		{
+			SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+			TriggerFontFire(&Items[item->itemFlags[0]], item->itemFlags[1], item->itemFlags[1] == 0 ? 16 : 1);
+		}
+
+		++item->itemFlags[1];
+		break;
+
+	case 333:
+	{
+		ROOM_INFO* r = &Rooms[item->roomNumber];
+		MESH_INFO* mesh = r->mesh;
+		__int32 j;
+
+		for (j = 0; j < r->numMeshes; j++, mesh++)
+		{
+			if (mesh->Flags & 1)
+			{
+				if (item->pos.xPos == mesh->x &&
+					item->pos.yPos == mesh->y &&
+					item->pos.zPos == mesh->z)
+				{
+					ShatterObject(NULL, mesh, 128, item->roomNumber, 0);
+					mesh->Flags &= ~1;
+					SoundEffect(ShatterSounds[gfCurrentLevel - 5][mesh->staticNumber], (PHD_3DPOS*) & mesh->x, 0);
+				}
+			}
+		}
+
+		RemoveActiveItem(itemNumber);
+		item->flags |= IFLAG_INVISIBLE;
+		break;
+	}
+
+	default:
+		TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+		RemoveActiveItem(itemNumber);
+		break;
+	}*/
+}
+
+void __cdecl CutsceneRopeControl(__int16 itemNumber) 
+{
+	ITEM_INFO* item;
+	PHD_VECTOR pos1;
+	PHD_VECTOR pos2;
+	__int32 dx;
+	__int32 dy;
+	__int32 dz;
+
+	item = &Items[itemNumber];
+
+	pos1.x = -128;
+	pos1.y = -72;
+	pos1.z = -16;
+	GetJointAbsPosition(&Items[item->itemFlags[2]], &pos1, 0);
+
+	pos2.x = 830;
+	pos2.z = -12;
+	pos2.y = 0;
+	GetJointAbsPosition(&Items[item->itemFlags[3]], &pos2, 0);
+
+	item->pos.xPos = pos2.x;
+	item->pos.yPos = pos2.y;
+	item->pos.zPos = pos2.z;
+
+	dx = (pos2.x - pos1.x) * (pos2.x - pos1.x);
+	dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
+	dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
+
+	item->itemFlags[1] = ((SQRT_ASM(dx + dy + dz) << 1) + SQRT_ASM(dx + dy + dz)) << 1;
+	item->pos.xRot = -4869;
+}
+
+void __cdecl HybridCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* coll) 
+{
+	ITEM_INFO* item;
+
+	item = &Items[itemNum];
+
+	/*if (gfCurrentLevel == LVL5_SINKING_SUBMARINE)
+	{
+		if (item->frame_number < anims[item->anim_number].frame_end)
+		{
+			ObjectCollision(itemNum, laraitem, coll);
+		}
+	}*/
+}
+
+void Inject_Objects()
+{
+
+}

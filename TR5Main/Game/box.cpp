@@ -426,8 +426,319 @@ __int16 __cdecl CreatureTurn(ITEM_INFO* item, __int16 maximumTurn)
 
 __int32 CreatureAnimation(__int16 itemNumber, __int16 angle, __int16 tilt)
 {
-	UNIMPLEMENTED();
-	return 0;
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->data == NULL)
+		return (0);
+
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	LOT_INFO* LOT = &creature->LOT;
+
+	__int32 boxHeight = Boxes[item->boxNumber].height;
+
+	PHD_VECTOR old;
+	old.x = item->pos.xPos;
+	old.y = item->pos.yPos;
+	old.z = item->pos.zPos;
+
+	__int16* zone = GroundZones[FlipStatus + LOT->zone];
+
+	AnimateItem(item);
+
+	if (item->status == ITEM_DEACTIVATED)
+	{
+		CreatureDie(itemNumber, 0);
+		return 0;
+	}
+
+	__int16* bounds = GetBoundsAccurate(item);
+	__int32 y = item->pos.yPos + bounds[2];
+
+	__int16 roomNumber = item->roomNumber;
+	GetFloor(old.x, y, old.z, &roomNumber);  
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+
+	__int32 boxIndex = floor->box;
+	__int32 height = Boxes[item->boxNumber].height;
+	__int32 nextHeight = 0;
+
+	if (LOT->node[boxIndex].exitBox == NO_BOX)
+		nextHeight = height;
+	else
+		nextHeight = Boxes[LOT->node[boxIndex].exitBox].height;
+
+	if (floor->box == NO_BOX
+		|| !LOT->isJumping
+		&& (zone[item->boxNumber] != zone[boxIndex]
+			|| boxHeight - height > LOT->step
+			|| boxHeight - height < LOT->drop))
+	{
+		__int32 xPos = item->pos.xPos >> WALL_SHIFT;
+		__int32 zPos = item->pos.zPos >> WALL_SHIFT;
+
+		__int32 shiftX = old.x >> WALL_SHIFT;
+		__int32 shiftZ = old.z >> WALL_SHIFT;
+
+		if (xPos < shiftX)
+			item->pos.xPos = old.x & (~(WALL_SIZE - 1));
+		else if (xPos > shiftX)
+			item->pos.xPos = old.x | (WALL_SIZE - 1);
+
+		if (zPos < shiftZ)
+			item->pos.zPos = old.z & (~(WALL_SIZE - 1));
+		else if (zPos > shiftZ)
+			item->pos.zPos = old.z | (WALL_SIZE - 1);
+
+		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+
+		height = Boxes[floor->box].height;
+		if (LOT->node[floor->box].exitBox == NO_BOX)
+			nextHeight = height;
+		else
+			nextHeight = Boxes[LOT->node[boxIndex].exitBox].height;
+	}
+
+	__int32 x = item->pos.xPos;
+	__int32 z = item->pos.zPos;
+
+	__int32 xPos = x & (WALL_SIZE - 1);
+	__int32 zPos = z & (WALL_SIZE - 1);
+	__int32 radius = Objects[item->objectNumber].radius;
+
+	__int32 shiftX = 0;
+	__int32 shiftZ = 0;
+
+	if (zPos < radius)
+	{
+		if (BadFloor(x, y, z - radius, height, nextHeight, roomNumber, LOT))
+			shiftZ = radius - zPos;
+
+		if (xPos < radius)
+		{
+			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = radius - xPos;
+			else if (!shiftZ && BadFloor(x - radius, y, z - radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->pos.yRot > -0x6000 && item->pos.yRot < 0x2000)
+					shiftZ = radius - zPos;
+				else
+					shiftX = radius - xPos;
+			}
+		}
+		else if (xPos > WALL_SIZE - radius)
+		{
+			if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = WALL_SIZE - radius - xPos;
+			else if (!shiftZ && BadFloor(x + radius, y, z - radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->pos.yRot > -0x2000 && item->pos.yRot < 0x6000)
+					shiftZ = radius - zPos;
+				else
+					shiftX = WALL_SIZE - radius - xPos;
+			}
+		}
+	}
+	else if (zPos > WALL_SIZE - radius)
+	{
+		if (BadFloor(x, y, z + radius, height, nextHeight, roomNumber, LOT))
+			shiftZ = WALL_SIZE - radius - zPos;
+
+		if (xPos < radius)
+		{
+			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = radius - xPos;
+			else if (!shiftZ && BadFloor(x - radius, y, z + radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->pos.yRot > -0x2000 && item->pos.yRot < 0x6000)
+					shiftX = radius - xPos;
+				else
+					shiftZ = WALL_SIZE - radius - zPos;
+			}
+		}
+		else if (xPos > WALL_SIZE - radius)
+		{
+			if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
+				shiftX = WALL_SIZE - radius - xPos;
+			else if (!shiftZ && BadFloor(x + radius, y, z + radius, height, nextHeight, roomNumber, LOT))
+			{
+				if (item->pos.yRot > -0x6000 && item->pos.yRot < 0x2000)
+					shiftX = WALL_SIZE - radius - xPos;
+				else
+					shiftZ = WALL_SIZE - radius - zPos;
+			}
+		}
+	}
+	else if (xPos < radius)
+	{
+		if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
+			shiftX = radius - xPos;
+	}
+	else if (xPos > WALL_SIZE - radius)
+	{
+		if (BadFloor(x + radius, y, z, height, nextHeight, roomNumber, LOT))
+			shiftX = WALL_SIZE - radius - xPos;
+	}
+
+	item->pos.xPos += shiftX;
+	item->pos.zPos += shiftZ;
+
+	if (shiftX || shiftZ)
+	{
+		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+
+		item->pos.yRot += angle;
+		if (tilt)
+			CreatureTilt(item, (tilt * 2));
+	}
+
+	__int16 biffAngle = 0;
+	if (item->speed)
+	{
+		if (item->hitPoints > 0)
+		{
+			biffAngle = CreatureCreature(itemNumber);
+			if (biffAngle)
+			{
+				if (abs(biffAngle) >= 1536)
+				{
+					if (biffAngle <= 0)
+						item->pos.yRot += 1536;
+					else
+						item->pos.yRot -= 1536;
+					return 1;
+				}
+				else
+				{
+					item->pos.yRot -= biffAngle;
+					return 1;
+				}
+			}
+		}
+	}
+
+	if (LOT->fly && item->hitPoints > 0)
+	{
+		__int32 dy = creature->target.y - item->pos.yPos;
+		if (dy > LOT->fly)
+			dy = LOT->fly;
+		else if (dy < -LOT->fly)
+			dy = -LOT->fly;
+
+		height = GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos);
+		if (item->pos.yPos + dy <= height)
+		{
+			if (Objects[item->objectNumber].waterCreature)
+			{
+				__int32 ceiling = GetCeiling(floor, item->pos.xPos, y, item->pos.zPos);
+
+				if (item->pos.yPos + bounds[2] + dy < ceiling)
+				{
+					if (item->pos.yPos + bounds[2] < ceiling)
+					{
+						item->pos.xPos = old.x;
+						item->pos.zPos = old.z;
+						dy = LOT->fly;
+					}
+					else
+						dy = 0;
+				}
+			}
+			else
+			{
+				floor = GetFloor(item->pos.xPos, y + 256, item->pos.zPos, &roomNumber);
+				if (Rooms[roomNumber].flags & ENV_FLAG_WATER)  // (UNDERWATER | SWAMP)
+				{
+					dy = -LOT->fly;
+				}
+			}
+		}
+		else if (item->pos.yPos <= height)
+		{
+			dy = 0;
+			item->pos.yPos = height;
+		}
+		else
+		{
+			item->pos.xPos = old.x;
+			item->pos.zPos = old.z;
+			dy = -LOT->fly;
+		}
+
+		item->pos.yPos += dy;
+		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+		item->floor = GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos);
+ 
+		angle = (item->speed) ? ATAN(item->speed, -dy) : 0;
+		if (angle < -ANGLE(20))
+			angle = -ANGLE(20);
+		else if (angle > ANGLE(20))
+			angle = ANGLE(20);
+
+		if (angle < item->pos.xRot - ONE_DEGREE)
+			item->pos.xRot -= ONE_DEGREE;
+		else if (angle > item->pos.xRot + ONE_DEGREE)
+			item->pos.xRot += ONE_DEGREE;
+		else
+			item->pos.xRot = angle;
+	}
+	else if (LOT->isJumping)
+	{
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		
+		if (LOT->isMonkeying)
+		{
+			item->pos.yPos = GetCeiling(floor, item->pos.xPos, y, item->pos.zPos) - bounds[2];
+		}
+		else
+		{
+			if (item->pos.yPos > height + 256)
+			{
+				item->pos.xPos = old.x;
+				item->pos.yPos = old.y;
+				item->pos.zPos = old.z;
+			}
+			else
+			{
+				item->pos.yPos = height;
+			}
+		}
+	} 
+	else
+	{
+		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+
+		// Uncomment these lines if there are baddies whose height is not represented correctly by their bounds */
+		/*if (item->object_number == TREX || item->object_number == SHIVA || item->object_number == MUTANT2)
+			top = STEP_L * 3;
+		else
+			top = bounds[2];*/
+
+		if (item->pos.yPos + bounds[2] < GetCeiling(floor, item->pos.xPos, y, item->pos.zPos))
+		{
+			item->pos.xPos = old.x;
+			item->pos.zPos = old.z;
+			item->pos.yPos = old.y;
+		}
+
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+		if (item->pos.yPos > item->floor)
+			item->pos.yPos = item->floor;
+		else if (item->floor - item->pos.yPos > 64)
+			item->pos.yPos += 64;
+		else if (item->pos.yPos < item->floor)
+			item->pos.yPos = item->floor;
+
+		item->pos.xRot = 0;
+	}
+
+	__int16 roomNumber = item->roomNumber;
+	GetFloor(item->pos.xPos, item->pos.yPos - 32, item->pos.zPos, &roomNumber);
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
+
+	return 1;
 }
 
 void __cdecl CreatureDie(__int16 itemNumber, __int32 explode)
@@ -455,9 +766,8 @@ void __cdecl CreatureDie(__int16 itemNumber, __int32 explode)
 	DropBaddyPickups(item);
 }
 
-__int32 __cdecl BadFloor(__int32 x, __int32 y, __int32 z, __int32 boxHeight, __int32 nextHeight, __int32 roomNumber, LOT_INFO* LOT)
+__int32 __cdecl BadFloor(__int32 x, __int32 y, __int32 z, __int32 boxHeight, __int32 nextHeight, __int16 roomNumber, LOT_INFO* LOT)
 {
-	__int16 roomNumber = roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	
 	if (floor->box == 0x7FF)
@@ -513,11 +823,11 @@ __int32 __cdecl CreatureCreature(__int16 itemNumber)
 	return 0;
 }
 
-enum target_type CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, lot_info* LOT)
+/*TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 {
 	UNIMPLEMENTED();
 	return NO_TARGET;
-}
+}*/
 
 __int32 __cdecl ValidBox(ITEM_INFO* item, __int16 zoneNumber, __int16 boxNumber) 
 {
@@ -728,7 +1038,8 @@ __int32 __cdecl StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, __int16 boxNumber)
 	__int32 xrange = ((box->bottom - box->top) << 10) + 3072;
 	__int32 zrange = ((box->right - box->left) << 10) + 3072;
 	
-	__int32 x = ((box->top + box->bottom) << 9) - enemy->pos.xPos;
+	__int32 x = ((box->left + box->right) << 9) - enemy->pos.xPos;
+	__int32 z = ((box->top + box->bottom) << 9) - enemy->pos.zPos;
 
 	if (xrange < x || x < -xrange || zrange < z || z < -zrange)
 		return 0;
@@ -900,7 +1211,7 @@ void __cdecl GetAITarget(CREATURE_INFO* creature)
 			{
 				FLOOR_INFO* floor = GetFloor(enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos, &(enemy->roomNumber));
 				GetFloorHeight(floor, enemy->pos.xPos, enemy->pos.yPos, enemy->pos.zPos);
-				TestTriggers(TriggerIndex, 1);
+				TestTriggers(TriggerIndex, 1, 0);
 
 				creature->reachedGoal = true; 
 				creature->enemy = LaraItem;
@@ -951,7 +1262,7 @@ void __cdecl FindAITargetObject(CREATURE_INFO* creature, __int16 objectNumber)
 		{
 			AIOBJECT* aiObject = &AIObjects[i];
 
-			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->triggerFlags[3] && aiObject->roomNumber != 255)
+			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->itemFlags[3] && aiObject->roomNumber != 255)
 			{
 				__int16* zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
 
@@ -1310,4 +1621,5 @@ void Inject_Box()
 	INJECT(0x004086C0, CreatureAIInfo);
 	INJECT(0x00409370, CreatureMood);
 	INJECT(0x004090A0, GetCreatureMood);
+	INJECT(0x0040A1D0, CreatureAnimation);
 }

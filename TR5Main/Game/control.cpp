@@ -20,6 +20,7 @@
 #include "sound.h"
 #include "spotcam.h"
 #include "Box.h"
+#include "objects.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -1114,38 +1115,6 @@ void __cdecl UpdateSky()
 		else
 		{
 			SkyPos2 -= 9728;
-		}
-	}
-}
-
-__int32 lastWaterfallY = 0;
-
-void __cdecl AnimateWaterfalls()
-{
-	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
-	float y = lastWaterfallY * 0.00390625f;
-	float theY;
-
-	for (__int32 i = 0; i < 6; i++)
-	{
-		if (Objects[ID_WATERFALL1 + i].loaded)
-		{
-			OBJECT_TEXTURE* texture = WaterfallTextures[i];
-			
-			texture->vertices[0].y = y + WaterfallY[i];
-			texture->vertices[1].y = y + WaterfallY[i];
-			texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
-			texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
-
-			if (i < 5)
-			{
-				texture++;
-
-				texture->vertices[0].y = y + WaterfallY[i];
-				texture->vertices[1].y = y + WaterfallY[i];
-				texture->vertices[2].y = y + WaterfallY[i] + 0.24609375f;
-				texture->vertices[3].y = y + WaterfallY[i] + 0.24609375f;
-			}
 		}
 	}
 }
