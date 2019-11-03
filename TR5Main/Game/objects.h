@@ -2,6 +2,7 @@
 #include "..\Global\global.h"
 
 #define AnimatingControl ((void (__cdecl*)(__int16)) 0x00465590)
+//#define SmashObject ((__int32(__cdecl*)(__int16)) 0x00465200)
 
 void __cdecl SmashObject(__int16 itemNumber);
 void __cdecl SmashObjectControl(__int16 itemNumber);

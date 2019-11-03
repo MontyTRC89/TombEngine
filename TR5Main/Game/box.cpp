@@ -31,7 +31,7 @@ void __cdecl DropBaddyPickups(ITEM_INFO* item)
 	}
 }
 
-__int32 __cdecl MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, __int32 velocity, __int16 angdif, __int32 angadd)
+__int32 __cdecl MoveCreature3DPos2(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, __int32 velocity, __int16 angdif, __int32 angadd)
 {
 	__int32 x = destpos->xPos - srcpos->xPos;
 	__int32 y = destpos->yPos - srcpos->yPos;
@@ -69,7 +69,7 @@ __int32 __cdecl MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, __int32
 		&& srcpos->yRot == destpos->yRot;
 }
 
-void __cdecl CreatureYRot(PHD_3DPOS* srcpos, __int16 angle, __int16 angadd) 
+void __cdecl CreatureYRot2(PHD_3DPOS* srcpos, __int16 angle, __int16 angadd) 
 {
 	if (angadd < angle)
 	{
@@ -90,10 +90,6 @@ void __cdecl CreatureYRot(PHD_3DPOS* srcpos, __int16 angle, __int16 angadd)
 
 __int16 __cdecl SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem) 
 {
-	ROOM_INFO* r;
-	__int16* zone;
-	ITEM_INFO* item;
-
 	ITEM_INFO* item = &Items[creature->itemNum];
 
 	__int16* zone = GroundZones[creature->LOT.zone * 2 + FlipStatus];
@@ -107,52 +103,7 @@ __int16 __cdecl SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 	return (zone[item->boxNumber] == zone[targetItem->boxNumber]);
 }
 
-void __cdecl FindAITargetObject(CREATURE_INFO* creature, __int16 objNum) 
-{
-	if (nAIObjects > 0)
-	{
-		ITEM_INFO* item = &Items[creature->itemNum];
-		AIOBJECT* targetItem = &AIObjects[0];
-		__int16 i;
-
-		for (i = 0; i < nAIObjects; i++, targetItem++)
-		{
-			if (targetItem->objectNumber == objNum
-				&& targetItem->triggerFlags == item->itemFlags[3]
-				&& targetItem->roomNumber != 255)
-			{
-				__int16* zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
-				ROOM_INFO* r = &Rooms[item->roomNumber];
-
-				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
-				targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->x - r->x, targetItem->z - r->z).box;
-
-				if (zone[item->boxNumber] == zone[targetItem->boxNumber])
-					break;
-			}
-		}
-
-		creature->enemy = &creature->aiTarget;
-
-		creature->aiTarget.objectNumber = targetItem->objectNumber;
-		creature->aiTarget.roomNumber = targetItem->roomNumber;
-		creature->aiTarget.pos.xPos = targetItem->x;
-		creature->aiTarget.pos.yPos = targetItem->y;
-		creature->aiTarget.pos.zPos = targetItem->z;
-		creature->aiTarget.pos.yRot = targetItem->yRot;
-		creature->aiTarget.flags = targetItem->flags;
-		creature->aiTarget.triggerFlags = targetItem->triggerFlags;
-		creature->aiTarget.boxNumber = targetItem->boxNumber;
-
-		if (!(creature->aiTarget.flags & 0x20))
-		{
-			creature->aiTarget.pos.xPos += 256 * (SIN(creature->aiTarget.pos.yRot)) >> W2V_SHIFT;
-			creature->aiTarget.pos.zPos += 256 * (COS(creature->aiTarget.pos.yRot)) >> W2V_SHIFT;
-		}
-	}
-}
-
-__int16 __cdecl AIGuard(CREATURE_INFO* creature) 
+__int16 __cdecl AIGuard2(CREATURE_INFO* creature) 
 {
 	__int32 random;
 
@@ -186,7 +137,7 @@ __int16 __cdecl AIGuard(CREATURE_INFO* creature)
 	return -0x4000;
 }
 
-void __cdecl AlertNearbyGuards(ITEM_INFO* item) 
+void __cdecl AlertNearbyGuards2(ITEM_INFO* item) 
 {
 	for (__int32 i = 0; i < NUM_SLOTS; i++)
 	{
@@ -213,7 +164,7 @@ void __cdecl AlertNearbyGuards(ITEM_INFO* item)
 	}
 }
 
-void __cdecl AlertAllGuards(__int16 itemNumber) 
+void __cdecl AlertAllGuards2(__int16 itemNumber) 
 {
 	__int16 objNumber = Items[itemNumber].objectNumber;
 
@@ -299,7 +250,7 @@ __int16 __cdecl CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, __int16(*genera
 	return generate(pos.x, pos.y, pos.z, item->speed, item->pos.yRot, item->roomNumber);
 }
 
-void __cdecl CreatureUnderwater(ITEM_INFO* item, __int32 depth)
+void __cdecl CreatureUnderwater2(ITEM_INFO* item, __int32 depth)
 {
 	__int32 waterLevel;
 	if (depth < 0)
@@ -337,7 +288,7 @@ void __cdecl CreatureUnderwater(ITEM_INFO* item, __int32 depth)
 	}
 }
 
-void __cdecl CreatureFloat(__int16 itemNumber) 
+void __cdecl CreatureFloat2(__int16 itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	item->hitPoints = -16384;
@@ -372,7 +323,7 @@ void __cdecl CreatureFloat(__int16 itemNumber)
 	item->afterDeath = 1;
 }
 
-void __cdecl CreatureJoint(ITEM_INFO* item, __int16 joint, __int16 required) 
+void __cdecl CreatureJoint2(ITEM_INFO* item, __int16 joint, __int16 required) 
 {
 	if (item->data == NULL)
 		return;
@@ -397,7 +348,7 @@ void __cdecl CreatureJoint(ITEM_INFO* item, __int16 joint, __int16 required)
 	}
 }
 
-void __cdecl CreatureTilt(ITEM_INFO* item, __int16 angle) 
+void __cdecl CreatureTilt2(ITEM_INFO* item, __int16 angle) 
 {
 	angle = (angle << 2) - item->pos.zRot;
 
@@ -412,7 +363,7 @@ void __cdecl CreatureTilt(ITEM_INFO* item, __int16 angle)
 	item->pos.zRot += angle;  
 }
 
-__int16 __cdecl CreatureTurn(ITEM_INFO* item, __int16 maximumTurn)
+__int16 __cdecl CreatureTurn2(ITEM_INFO* item, __int16 maximumTurn)
 {
 	if (item->data == NULL || maximumTurn == 0)
 		return 0;
@@ -424,7 +375,7 @@ __int16 __cdecl CreatureTurn(ITEM_INFO* item, __int16 maximumTurn)
 	return 0;
 }
 
-__int32 CreatureAnimation(__int16 itemNumber, __int16 angle, __int16 tilt)
+__int32 CreatureAnimation2(__int16 itemNumber, __int16 angle, __int16 tilt)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->data == NULL)
@@ -733,7 +684,7 @@ __int32 CreatureAnimation(__int16 itemNumber, __int16 angle, __int16 tilt)
 		item->pos.xRot = 0;
 	}
 
-	__int16 roomNumber = item->roomNumber;
+	roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos - 32, item->pos.zPos, &roomNumber);
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
@@ -771,32 +722,32 @@ __int32 __cdecl BadFloor(__int32 x, __int32 y, __int32 z, __int32 boxHeight, __i
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	
 	if (floor->box == 0x7FF)
-		return true;
+		return 1;
 
 	if (LOT->isJumping)
-		return false;
+		return 0;
 
 	if (Boxes[floor->box].overlapIndex & LOT->blockMask)
-		return true;
+		return 1;
 
 	__int32 height = Boxes[floor->box].height;
 
 	if (boxHeight - height > LOT->step)
-		return true;
+		return 1;
 
 	if (boxHeight - height < LOT->drop)
-		return true;
+		return 1;
 
 	if (boxHeight - height < -LOT->step && height > nextHeight)
-		return true;
+		return 1;
 
 	if (LOT->fly && y > height + LOT->fly)
-		return true;
+		return 1;
 
-	return false;
+	return 0;
 }
 
-__int32 __cdecl CreatureCreature(__int16 itemNumber)  
+__int32 __cdecl CreatureCreature2(__int16 itemNumber)  
 {
 	__int32 x = Items[itemNumber].pos.xPos;
 	__int32 z = Items[itemNumber].pos.zPos;
@@ -878,12 +829,12 @@ void __cdecl TargetBox(LOT_INFO* LOT, __int16 boxNumber)
 	if (LOT->fly == 0)
 		LOT->target.y = box->height;
 	else
-		LOT->target.y = box->height - 1152;
+		LOT->target.y = box->height - 384;
 
 	return;
 }
 
-__int32 __cdecl UpdateLOT(LOT_INFO* LOT, __int32 expansion)
+__int32 __cdecl UpdateLOT2(LOT_INFO* LOT, __int32 expansion)
 {
 	BOX_NODE* expand;
 
@@ -906,10 +857,10 @@ __int32 __cdecl UpdateLOT(LOT_INFO* LOT, __int32 expansion)
 		expand->exitBox = NO_BOX;
 	}
 
-	return (SearchLOT(LOT, expansion));
+	return (SearchLOT2(LOT, expansion));
 }
 
-__int32 __cdecl SearchLOT(LOT_INFO* LOT, __int32 expansion)
+__int32 __cdecl SearchLOT2(LOT_INFO* LOT, __int32 expansion)
 {
 	__int16 searchZone;
 	__int16* zone;
@@ -997,7 +948,7 @@ __int32 __cdecl SearchLOT(LOT_INFO* LOT, __int32 expansion)
 	return 1;
 }
 
-__int32 __cdecl CreatureActive(__int16 itemNumber) 
+__int32 __cdecl CreatureActive2(__int16 itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1016,7 +967,7 @@ __int32 __cdecl CreatureActive(__int16 itemNumber)
 	return 0;
 }
 
-void __cdecl InitialiseCreature(__int16 itemNumber) 
+void __cdecl InitialiseCreature2(__int16 itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	ROOM_INFO* room = &Rooms[item->roomNumber];
@@ -1034,62 +985,32 @@ __int32 __cdecl StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, __int16 boxNumber)
 		return 0;
 
 	BOX_INFO* box = &Boxes[boxNumber];
-	
-	__int32 xrange = ((box->bottom - box->top) << 10) + 3072;
-	__int32 zrange = ((box->right - box->left) << 10) + 3072;
-	
-	__int32 x = ((box->left + box->right) << 9) - enemy->pos.xPos;
-	__int32 z = ((box->top + box->bottom) << 9) - enemy->pos.zPos;
 
-	if (xrange < x || x < -xrange || zrange < z || z < -zrange)
+	__int32 xrange = ((box->bottom - box->top + 3) << WALL_SHIFT);
+	__int32 zrange = ((box->right - box->left + 3) << WALL_SHIFT);
+
+	__int32 x = ((box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
+	__int32 z = ((box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
+	
+	if (x > xrange || x < -xrange || z > zrange || z < -zrange)
 		return 0;
 
-	__int32 enemyQuad = (enemy->pos.yRot << 14) + 2;
-
-	__int32 boxQuad;
-
-	if (z > 0)
-	{
-		if (x > 0)
-			boxQuad = 2;
-		else
-			boxQuad = 1;
-	}
-	else
-	{
-		if (x > 0)
-			boxQuad = 3;
-		else
-			boxQuad = 0;
-	}
+	__int32 enemyQuad = (enemy->pos.yRot >> W2V_SHIFT) + 2;
+	__int32 boxQuad = (z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1);
 
 	if (enemyQuad == boxQuad)
 		return 0;
 
-	__int32 baddieQuad;
-
-	if (enemy->pos.zPos < item->pos.zPos)
-	{
-		if (enemy->pos.xPos < item->pos.xPos)
-			baddieQuad = 2;
-		else
-			baddieQuad = 1;
-	}
+	__int32 baddieQuad = 0;
+	if (item->pos.zPos > enemy->pos.zPos)
+		baddieQuad = (item->pos.xPos > enemy->pos.xPos) + 1;
 	else
-	{
-		if (enemy->pos.xPos < item->pos.xPos)
-			baddieQuad = 3;
-		else
-			baddieQuad = 0;
-	}
+		baddieQuad = item->pos.xPos <= enemy->pos.xPos ? 0 : 3;
 
-	if (enemyQuad != baddieQuad)
+	if (enemyQuad == baddieQuad && abs(enemyQuad - boxQuad) == 2)
 		return 1;
 
-	if (abs(enemyQuad - boxQuad) == 2)
-		return 0;
-
-	return 1;
+	return 0;
 }
 
 __int32 CreatureVault(__int16 itemNum, __int16 angle, __int32 vault, __int32 shift)
@@ -1158,7 +1079,7 @@ __int32 CreatureVault(__int16 itemNum, __int16 angle, __int32 vault, __int32 shi
 	return vault;
 }
 
-void __cdecl GetAITarget(CREATURE_INFO* creature)
+void __cdecl GetAITarget2(CREATURE_INFO* creature)
 {
 	ITEM_INFO* enemy = creature->enemy;
 	__int16 enemyObjectNumber;
@@ -1198,7 +1119,7 @@ void __cdecl GetAITarget(CREATURE_INFO* creature)
 		}
 		else
 		{
-			FindAITargetObject(creature, ID_AI_PATROL1);
+			FindAITargetObject2(creature, ID_AI_PATROL1);
 		}
 	}
 	else  if (item->aiBits & AMBUSH)
@@ -1225,7 +1146,7 @@ void __cdecl GetAITarget(CREATURE_INFO* creature)
 		}
 		else
 		{
-			FindAITargetObject(creature, ID_AI_AMBUSH);
+			FindAITargetObject2(creature, ID_AI_AMBUSH);
 		}
 	} 
 	else if (item->aiBits & FOLLOW)
@@ -1239,7 +1160,7 @@ void __cdecl GetAITarget(CREATURE_INFO* creature)
 		else if (item->hitStatus)
 			item->aiBits &= ~FOLLOW;
 		else if (enemyObjectNumber != ID_AI_FOLLOW)
-			FindAITargetObject(creature, ID_AI_FOLLOW);
+			FindAITargetObject2(creature, ID_AI_FOLLOW);
 		else if (abs(enemy->pos.xPos - item->pos.xPos) < 640 &&
 			abs(enemy->pos.zPos - item->pos.zPos) < 640 &&
 			abs(enemy->pos.yPos - item->pos.yPos) < 1280)
@@ -1250,7 +1171,7 @@ void __cdecl GetAITarget(CREATURE_INFO* creature)
 	}
 }
 
-void __cdecl FindAITargetObject(CREATURE_INFO* creature, __int16 objectNumber)
+void __cdecl FindAITargetObject2(CREATURE_INFO* creature, __int16 objectNumber)
 {
 	ITEM_INFO* item = &Items[creature->itemNum];
 
@@ -1305,7 +1226,7 @@ void __cdecl FindAITargetObject(CREATURE_INFO* creature, __int16 objectNumber)
 	}
 }
 
-void __cdecl CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
+void __cdecl CreatureAIInfo2(ITEM_INFO* item, AI_INFO* info)
 {
 	if (item->data == NULL)
 		return;
@@ -1383,7 +1304,7 @@ void __cdecl CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= 512);
 }
 
-void __cdecl CreatureMood(ITEM_INFO* item, AI_INFO* info, __int32 violent)
+void __cdecl CreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 {
 	__int32 boxNumber;
 	__int16* bounds;
@@ -1486,7 +1407,7 @@ void __cdecl CreatureMood(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 	}
 }
 
-void __cdecl GetCreatureMood(ITEM_INFO* item, AI_INFO* info, __int32 violent)
+void __cdecl GetCreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	if (creature)
@@ -1592,34 +1513,37 @@ void __cdecl GetCreatureMood(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 void Inject_Box()
 {
 	INJECT(0x0040B5D0, CreatureVault);
-	INJECT(0x0040C5A0, DropBaddyPickups);
-	INJECT(0x0040C460, MoveCreature3DPos);
+	INJECT(0x00408FD0, ValidBox);
+	INJECT(0x00408E20, TargetBox);
+	INJECT(0x00409770, StalkBox);
+	INJECT(0x00408EF0, EscapeBox);
 	INJECT(0x0040C2D0, SameZone);
+	INJECT(0x0040B820, CreatureKill);
+	INJECT(0x00409FB0, BadFloor);
+	INJECT(0x0040B550, CreatureEffect2);
+	INJECT(0x0040B4D0, CreatureEffect);
+	INJECT(0x0040C5A0, DropBaddyPickups);
+	INJECT(0x0040A090, CreatureDie);
+
+	/*
+	INJECT(0x0040C460, MoveCreature3DPos);
 	INJECT(0x0040C070, FindAITargetObject);
 	INJECT(0x0040BBE0, AIGuard);
 	INJECT(0x0040BB10, AlertNearbyGuards);
 	INJECT(0x0040BA70, AlertAllGuards);
-	INJECT(0x0040B820, CreatureKill);
-	INJECT(0x0040B550, CreatureEffect2);
-	INJECT(0x0040B4D0, CreatureEffect);
 	INJECT(0x0040B400, CreatureUnderwater);
 	INJECT(0x0040B2C0, CreatureFloat);
 	INJECT(0x0040B240, CreatureJoint);
 	INJECT(0x0040B1B0, CreatureTilt);
 	//INJECT(0x0040AE90, CreatureTurn);
-	INJECT(0x0040A090, CreatureDie);
-	INJECT(0x00409FB0, BadFloor);
 	INJECT(0x00409E20, CreatureCreature);
-	INJECT(0x00408FD0, ValidBox);
-	INJECT(0x00408E20, TargetBox);
 	INJECT(0x00408B00, UpdateLOT);
 	INJECT(0x00408630, CreatureActive);
 	INJECT(0x00408550, InitialiseCreature);
-	INJECT(0x00409770, StalkBox);
 	INJECT(0x0040BCC0, GetAITarget);
 	INJECT(0x0040C070, FindAITargetObject);
 	INJECT(0x004086C0, CreatureAIInfo);
 	INJECT(0x00409370, CreatureMood);
 	INJECT(0x004090A0, GetCreatureMood);
-	INJECT(0x0040A1D0, CreatureAnimation);
+	INJECT(0x0040A1D0, CreatureAnimation);*/
 }

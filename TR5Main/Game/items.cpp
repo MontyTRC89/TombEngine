@@ -10,17 +10,6 @@ void __cdecl ClearItem(__int16 itemNum)
 	item->collidable = true;
 }
 
-__int16 __cdecl CreateItem()
-{
-	__int16 result = NextItemFree;
-	if (NextItemFree != NO_ITEM)
-	{
-		Items[NextItemFree].flags = 0;
-		NextItemFree = Items[NextItemFree].nextItem;
-	}
-	return result;
-}
-
 void __cdecl KillItem(__int16 itemNum)
 {
 	if (InItemControlLoop)
@@ -427,7 +416,7 @@ void __cdecl InitialiseItem(__int16 itemNum)
 
 __int16 __cdecl CreateItem()
 {
-	short itemNum = 0;
+	__int16 itemNum = 0;
 
 	if (NextItemFree == -1) return NO_ITEM;
 
@@ -498,7 +487,7 @@ __int32 __cdecl GlobalItemReplace(__int16 search, __int16 replace)
 
 void Inject_Items()
 {
-	INJECT(0x00440840, CreateItem);
+	/*INJECT(0x00440840, CreateItem);
 	INJECT(0x00440D10, AddActiveItem);
 	INJECT(0x00440620, KillItem);
 	INJECT(0x00440DA0, ItemNewRoom);
@@ -510,5 +499,5 @@ void Inject_Items()
 	INJECT(0x00440C40, RemoveDrawnItem);
 	INJECT(0x004408B0, InitialiseItem);
 	INJECT(0x00440840, ClearItem);
-	INJECT(0x00440590, InitialiseItemArray);
+	INJECT(0x00440590, InitialiseItemArray);*/
 }
