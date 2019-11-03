@@ -323,41 +323,40 @@ void __cdecl CreatureFloat2(__int16 itemNumber)
 	item->afterDeath = 1;
 }
 
-void __cdecl CreatureJoint2(ITEM_INFO* item, __int16 joint, __int16 required) 
+void __cdecl CreatureJoint(ITEM_INFO* item, __int16 joint, __int16 required) 
 {
 	if (item->data == NULL)
 		return;
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	__int16 change = required - creature->jointRotation[joint];
 
-	if (change < ANGLE(-3))
-		change -= ANGLE(3);
-	else
-		change += ANGLE(3);
+	__int16 change = required - creature->jointRotation[joint];
+	if (change > ANGLE(3))
+		change = ANGLE(3);
+	else if (change < -ANGLE(3))
+		change = -ANGLE(3);
 
 	creature->jointRotation[joint] += change;
 
-	if (creature->jointRotation[joint] < 0x3001)
-	{
-		creature->jointRotation[joint] -= 0x3000;
-	}
-	else
-	{
-		creature->jointRotation[joint] += 0x3000;
-	}
+	if (creature->jointRotation[joint] > 12288)
+		creature->jointRotation[joint] = 12288;
+	else if (creature->jointRotation[joint] < -12288)
+		creature->jointRotation[joint] = -12288;
 }
 
-void __cdecl CreatureTilt2(ITEM_INFO* item, __int16 angle) 
+void __cdecl CreatureTilt(ITEM_INFO* item, __int16 angle) 
 {
 	angle = (angle << 2) - item->pos.zRot;
 
-	if (angle < ANGLE(-3))
-		angle = ANGLE(-3);
+	if (angle < -ANGLE(3))
+		angle = -ANGLE(3);
 	else if (angle > ANGLE(3))
 		angle = ANGLE(3);
 
-	if (abs(item->pos.zRot) - ANGLE(15) > ANGLE(15))
+	__int16 theAngle = -ANGLE(3);
+
+	__int16 absRot = abs(item->pos.zRot);
+	if (absRot < ANGLE(15) || absRot > ANGLE(30))
 		angle >>= 1;
 
 	item->pos.zRot += angle;  
@@ -1524,6 +1523,8 @@ void Inject_Box()
 	INJECT(0x0040B4D0, CreatureEffect);
 	INJECT(0x0040C5A0, DropBaddyPickups);
 	INJECT(0x0040A090, CreatureDie);
+	INJECT(0x0040B240, CreatureJoint);
+	INJECT(0x0040B1B0, CreatureTilt);
 
 	/*
 	INJECT(0x0040C460, MoveCreature3DPos);
@@ -1533,8 +1534,6 @@ void Inject_Box()
 	INJECT(0x0040BA70, AlertAllGuards);
 	INJECT(0x0040B400, CreatureUnderwater);
 	INJECT(0x0040B2C0, CreatureFloat);
-	INJECT(0x0040B240, CreatureJoint);
-	INJECT(0x0040B1B0, CreatureTilt);
 	//INJECT(0x0040AE90, CreatureTurn);
 	INJECT(0x00409E20, CreatureCreature);
 	INJECT(0x00408B00, UpdateLOT);
