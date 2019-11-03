@@ -12,8 +12,8 @@
 #define GetCreatureMood ((void (__cdecl*)(ITEM_INFO*, AI_INFO*, __int32)) 0x004090A0)
 //#define CreatureEffect ((__int16 (__cdecl*)(ITEM_INFO*, BITE_INFO*, __int16(*)(__int32, __int32, __int32, __int16, __int16, __int16))) 0x0040B4D0)
 //#define CreatureEffect2 ((__int16 (__cdecl*)(ITEM_INFO*, BITE_INFO*, __int16, __int16, __int16(*)(__int32, __int32, __int32, __int16, __int16, __int16))) 0x0040B550)
-#define CreatureTilt ((void (__cdecl*)(ITEM_INFO*, __int16)) 0x0040B1B0)
-#define CreatureJoint ((void (__cdecl*)(ITEM_INFO*, __int16, __int16)) 0x0040B240)
+//#define CreatureTilt ((void (__cdecl*)(ITEM_INFO*, __int16)) 0x0040B1B0)
+//#define CreatureJoint ((void (__cdecl*)(ITEM_INFO*, __int16, __int16)) 0x0040B240)
 #define CreatureAnimation ((void (__cdecl*)(__int16, __int16, __int16)) 0x0040A1D0)
 #define CreatureCollision ((void (__cdecl*)(__int16, ITEM_INFO*, COLL_INFO*)) 0x004124E0)
 #define InitialiseCreature ((void (__cdecl*)(__int16)) 0x00408550)
@@ -53,8 +53,8 @@ __int16 __cdecl CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, __int16 damage
 __int16 __cdecl CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, __int16(*generate)(__int32 x, __int32 y, __int32 z, __int16 speed, __int16 yrot, __int16 roomNumber));
 void __cdecl CreatureUnderwater2(ITEM_INFO* item, __int32 depth);
 void __cdecl CreatureFloat2(__int16 itemNumber);
-void __cdecl CreatureJoint2(ITEM_INFO* item, __int16 joint, __int16 required);
-void __cdecl CreatureTilt2(ITEM_INFO* item, __int16 angle);
+void __cdecl CreatureJoint(ITEM_INFO* item, __int16 joint, __int16 required);
+void __cdecl CreatureTilt(ITEM_INFO* item, __int16 angle);
 __int16 __cdecl CreatureTurn2(ITEM_INFO* item, __int16 maximumTurn);
 void __cdecl CreatureDie(__int16 itemNumber, __int32 explode);
 __int32 __cdecl BadFloor(__int32 x, __int32 y, __int32 z, __int32 boxHeight, __int32 nextHeight, __int16 roomNumber, LOT_INFO* LOT);

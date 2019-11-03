@@ -620,7 +620,6 @@ void Inject_Objects()
 	INJECT(0x00465D00, ControlTriggerTriggerer);
 	INJECT(0x00465DF0, AnimateWaterfalls);
 	INJECT(0x00465F10, ControlWaterfall);
-	INJECT(0x00465FE0, TightRopeCollision);
 	INJECT(0x004661C0, ParallelBarsCollision);
 	INJECT(0x00466420, ControlXRayMachine);
 	INJECT(0x00466720, CutsceneRopeControl);
