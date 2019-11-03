@@ -171,7 +171,7 @@ typedef struct lot_info_t
 	unsigned __int16 isAmphibious : 1; // offset=24.2
 	unsigned __int16 isJumping : 1; // offset=24.3
 	unsigned __int16 isMonkeying : 1; // offset=24.4
-	PHD_VECTOR target; // size=12, offset=28
+	PHD_VECTOR target; // size=12, offset=26
 	__int32 zone; // size=4, offset=40
 } LOT_INFO;
 

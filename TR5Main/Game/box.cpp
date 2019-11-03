@@ -95,10 +95,10 @@ __int16 __cdecl SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 	__int16* zone = GroundZones[creature->LOT.zone * 2 + FlipStatus];
 
 	ROOM_INFO* r = &Rooms[item->roomNumber];
-	item->boxNumber = r->floor[((item->pos.zPos - r->z) / 1024) + ((item->pos.xPos - r->x) / 1024) * r->xSize].box;
+	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 
 	r = &Rooms[targetItem->roomNumber];
-	targetItem->boxNumber = r->floor[(targetItem->pos.zPos - r->z) / 1024 + ((targetItem->pos.xPos - r->x) / 1024) * r->xSize].box;
+	targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->pos.xPos - r->x, targetItem->pos.zPos - r->z).box;
 
 	return (zone[item->boxNumber] == zone[targetItem->boxNumber]);
 }
@@ -137,7 +137,7 @@ __int16 __cdecl AIGuard2(CREATURE_INFO* creature)
 	return -0x4000;
 }
 
-void __cdecl AlertNearbyGuards2(ITEM_INFO* item) 
+void __cdecl AlertNearbyGuards(ITEM_INFO* item) 
 {
 	for (__int32 i = 0; i < NUM_SLOTS; i++)
 	{
@@ -164,7 +164,7 @@ void __cdecl AlertNearbyGuards2(ITEM_INFO* item)
 	}
 }
 
-void __cdecl AlertAllGuards2(__int16 itemNumber) 
+void __cdecl AlertAllGuards(__int16 itemNumber) 
 {
 	__int16 objNumber = Items[itemNumber].objectNumber;
 
@@ -1298,7 +1298,7 @@ void __cdecl CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= 512);
 }
 
-void __cdecl CreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
+void __cdecl CreatureMood(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 {
 	__int32 boxNumber;
 	__int16* bounds;
@@ -1372,8 +1372,8 @@ void __cdecl CreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 
 		}
 
-		if (creature->LOT.targetBox == NO_BOX)
-			TargetBox(&creature->LOT, item->boxNumber);
+		if (LOT->targetBox == NO_BOX)
+			TargetBox(LOT, item->boxNumber);
 
 		Unk_00EEFB6C = CalculateTarget(&creature->target, item, &creature->LOT);
 		
@@ -1381,7 +1381,7 @@ void __cdecl CreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 		creature->monkeyAhead = false;
 		
 		__int32 startBox = LOT->node[item->boxNumber].exitBox;
-		if (boxNumber != NO_BOX)
+		if (startBox != NO_BOX)
 		{
 			__int32 overlapIndex = Boxes[startBox].overlapIndex & OVERLAP_INDEX;
 			__int32 nextBox = 0;
@@ -1389,7 +1389,7 @@ void __cdecl CreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 			{
 				overlapIndex++;
 				nextBox = Overlaps[overlapIndex];
-			} while (nextBox != NO_BOX && !(nextBox & 0x8000) && (nextBox & 0x7FF) != startBox);
+			} while (nextBox != NO_BOX && ((nextBox & 0x8000) == 0) && ((nextBox & 0x7FF) != startBox));
 			if ((nextBox & 0x7FF) == startBox)
 			{
 				if (nextBox & 0x800)
@@ -1401,7 +1401,7 @@ void __cdecl CreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 	}
 }
 
-void __cdecl GetCreatureMood2(ITEM_INFO* item, AI_INFO* info, __int32 violent)
+void __cdecl GetCreatureMood(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	if (creature)
@@ -1524,23 +1524,20 @@ void Inject_Box()
 	INJECT(0x00408630, CreatureActive);
 	INJECT(0x0040C460, MoveCreature3DPos);
 	INJECT(0x004086C0, CreatureAIInfo);
-
-	/*
-	INJECT(0x0040C460, MoveCreature3DPos);
-	INJECT(0x0040C070, FindAITargetObject);
-	INJECT(0x0040BBE0, AIGuard);
+	INJECT(0x00409370, CreatureMood);
+	INJECT(0x004090A0, GetCreatureMood);
 	INJECT(0x0040BB10, AlertNearbyGuards);
 	INJECT(0x0040BA70, AlertAllGuards);
+
+	/*+
+	INJECT(0x0040C070, FindAITargetObject);
+	INJECT(0x0040BBE0, AIGuard);
 	INJECT(0x0040B400, CreatureUnderwater);
 	INJECT(0x0040B2C0, CreatureFloat);
-	//INJECT(0x0040AE90, CreatureTurn);
-	INJECT(0x00409E20, CreatureCreature);
+	//INJECT(0x0040AE90, CreatureTurn);+
 	INJECT(0x00408B00, UpdateLOT);
-	INJECT(0x00408630, CreatureActive);
 	INJECT(0x00408550, InitialiseCreature);
 	INJECT(0x0040BCC0, GetAITarget);
 	INJECT(0x0040C070, FindAITargetObject);
-	INJECT(0x00409370, CreatureMood);
-	INJECT(0x004090A0, GetCreatureMood);
 	INJECT(0x0040A1D0, CreatureAnimation);*/
 }
