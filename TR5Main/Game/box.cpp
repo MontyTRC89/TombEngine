@@ -31,7 +31,7 @@ void __cdecl DropBaddyPickups(ITEM_INFO* item)
 	}
 }
 
-__int32 __cdecl MoveCreature3DPos2(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, __int32 velocity, __int16 angdif, __int32 angadd)
+__int32 __cdecl MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, __int32 velocity, __int16 angdif, __int32 angadd)
 {
 	__int32 x = destpos->xPos - srcpos->xPos;
 	__int32 y = destpos->yPos - srcpos->yPos;
@@ -746,7 +746,7 @@ __int32 __cdecl BadFloor(__int32 x, __int32 y, __int32 z, __int32 boxHeight, __i
 	return 0;
 }
 
-__int32 __cdecl CreatureCreature2(__int16 itemNumber)  
+__int32 __cdecl CreatureCreature(__int16 itemNumber)  
 {
 	__int32 x = Items[itemNumber].pos.xPos;
 	__int32 z = Items[itemNumber].pos.zPos;
@@ -947,23 +947,18 @@ __int32 __cdecl SearchLOT2(LOT_INFO* LOT, __int32 expansion)
 	return 1;
 }
 
-__int32 __cdecl CreatureActive2(__int16 itemNumber) 
+__int32 __cdecl CreatureActive(__int16 itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	if (item->flags & IFLAG_KILLED)
+	if (!(item->flags & IFLAG_KILLED) && (item->status & ITEM_INVISIBLE) == ITEM_INVISIBLE)
 	{
-		if (item->status != ITEM_INVISIBLE)
-			return 1;
-
-		if (EnableBaddieAI(itemNumber, 0) != 0)
-		{
-			item->status = ITEM_DEACTIVATED;
-			return 1;
-		}
+		if (!EnableBaddieAI(itemNumber, 0))
+			return 0;
+		item->status = ITEM_ACTIVE;
 	}
 
-	return 0;
+	return 1;
 }
 
 void __cdecl InitialiseCreature2(__int16 itemNumber) 
@@ -1187,10 +1182,10 @@ void __cdecl FindAITargetObject2(CREATURE_INFO* creature, __int16 objectNumber)
 				__int16* zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
 
 				ROOM_INFO* r = &Rooms[item->roomNumber];
-				item->boxNumber = XZ_GET_SECTOR(r, (item->pos.xPos - r->x) >> WALL_SHIFT, (item->pos.zPos - r->z) >> WALL_SHIFT).box & 0x7FF;
+				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & 0x7FF;
 
 				r = &Rooms[aiObject->roomNumber];
-				aiObject->boxNumber = XZ_GET_SECTOR(r, (aiObject->x - r->x) >> WALL_SHIFT, (aiObject->z - r->z) >> WALL_SHIFT).box & 0x7FF;
+				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z).box & 0x7FF;
 
 				if (zone[item->boxNumber] == zone[aiObject->boxNumber])
 				{
@@ -1225,7 +1220,7 @@ void __cdecl FindAITargetObject2(CREATURE_INFO* creature, __int16 objectNumber)
 	}
 }
 
-void __cdecl CreatureAIInfo2(ITEM_INFO* item, AI_INFO* info)
+void __cdecl CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 {
 	if (item->data == NULL)
 		return;
@@ -1241,15 +1236,15 @@ void __cdecl CreatureAIInfo2(ITEM_INFO* item, AI_INFO* info)
 
 	__int16* zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
 	ROOM_INFO* r = &Rooms[item->roomNumber];
-	item->boxNumber = XZ_GET_SECTOR(r, (item->pos.xPos - r->x) >> WALL_SHIFT, (item->pos.zPos - r->z) >> WALL_SHIFT).box & 0x7FF;
+	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & 0x7FF;
 	info->zoneNumber = zone[item->boxNumber];
 	
 	r = &Rooms[enemy->roomNumber];
-	enemy->boxNumber = XZ_GET_SECTOR(r, (enemy->pos.xPos - r->x) >> WALL_SHIFT, (enemy->pos.zPos - r->z) >> WALL_SHIFT).box & 0x7FF;
+	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box & 0x7FF;
 	info->enemyZone = zone[enemy->boxNumber];
 
-	if (Boxes[enemy->boxNumber].overlapIndex & creature->LOT.blockMask ||
-		creature->LOT.node[item->boxNumber].searchNumber == creature->LOT.searchNumber | BLOCKED_SEARCH)
+	if ((Boxes[enemy->boxNumber].overlapIndex & creature->LOT.blockMask) ||
+		creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 		info->enemyZone |= BLOCKED;
 
 	OBJECT_INFO* object = &Objects[item->objectNumber];
@@ -1260,7 +1255,7 @@ void __cdecl CreatureAIInfo2(ITEM_INFO* item, AI_INFO* info)
 	{
 		x = (enemy->pos.xPos + (enemy->speed * 14 * SIN(Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.xPos + (object->pivotLength * SIN(item->pos.yRot) >> W2V_SHIFT));
 		z = (enemy->pos.zPos + (enemy->speed * 14 * COS(Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.zPos + (object->pivotLength * COS(item->pos.yRot) >> W2V_SHIFT));
-		}
+	}
 	else
 	{
 		x = (enemy->pos.xPos + (enemy->speed * 14 * SIN(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.xPos + (object->pivotLength * SIN(item->pos.yRot) >> W2V_SHIFT));
@@ -1278,7 +1273,7 @@ void __cdecl CreatureAIInfo2(ITEM_INFO* item, AI_INFO* info)
 		info->distance = 0x7FFFFFFF;
 
 	info->angle = angle - item->pos.yRot;
-	info->enemyFacing = 0x8000 + angle - enemy->pos.yRot;
+	info->enemyFacing = -ANGLE(180) + angle - enemy->pos.yRot;
 
 	x = abs(x);
 	z = abs(z);
@@ -1525,6 +1520,10 @@ void Inject_Box()
 	INJECT(0x0040A090, CreatureDie);
 	INJECT(0x0040B240, CreatureJoint);
 	INJECT(0x0040B1B0, CreatureTilt);
+	INJECT(0x00409E20, CreatureCreature);
+	INJECT(0x00408630, CreatureActive);
+	INJECT(0x0040C460, MoveCreature3DPos);
+	INJECT(0x004086C0, CreatureAIInfo);
 
 	/*
 	INJECT(0x0040C460, MoveCreature3DPos);
@@ -1541,7 +1540,6 @@ void Inject_Box()
 	INJECT(0x00408550, InitialiseCreature);
 	INJECT(0x0040BCC0, GetAITarget);
 	INJECT(0x0040C070, FindAITargetObject);
-	INJECT(0x004086C0, CreatureAIInfo);
 	INJECT(0x00409370, CreatureMood);
 	INJECT(0x004090A0, GetCreatureMood);
 	INJECT(0x0040A1D0, CreatureAnimation);*/
