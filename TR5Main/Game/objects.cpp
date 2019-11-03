@@ -335,7 +335,7 @@ void __cdecl TightRopeCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (((TrInput & IN_ACTION) == 0
 		|| l->currentAnimState != STATE_LARA_STOP
 		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
-		|| l->status = ITEM_INVISIBLE
+		|| l->status == ITEM_INVISIBLE
 		|| Lara.gunStatus)
 		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
 	{
@@ -604,5 +604,25 @@ void __cdecl HybridCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* co
 
 void Inject_Objects()
 {
+	INJECT(0x00465FE0, TightRopeCollision);
+	INJECT(0x00465200, SmashObject);
 
+	/*INJECT(0x00465200, SmashObject);
+	INJECT(0x00465330, SmashObjectControl);
+	INJECT(0x00465350, BridgeFlatFloor);
+	INJECT(0x00465390, BridgeFlatCeiling);
+	INJECT(0x00465410, BridgeTilt1Floor);
+	INJECT(0x00465480, BridgeTilt1Ceiling);
+	INJECT(0x004654D0, BridgeTilt2Floor);
+	INJECT(0x00465540, BridgeTilt2Ceiling);
+	//INJECT(0x00465590, AnimatingControl);
+	INJECT(0x00465A30, PoleCollision);
+	INJECT(0x00465D00, ControlTriggerTriggerer);
+	INJECT(0x00465DF0, AnimateWaterfalls);
+	INJECT(0x00465F10, ControlWaterfall);
+	INJECT(0x00465FE0, TightRopeCollision);
+	INJECT(0x004661C0, ParallelBarsCollision);
+	INJECT(0x00466420, ControlXRayMachine);
+	INJECT(0x00466720, CutsceneRopeControl);
+	INJECT(0x00466AA0, HybridCollision);*/
 }

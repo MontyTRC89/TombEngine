@@ -27,7 +27,6 @@ void __cdecl InitialiseFXArray(__int32 allocmem);
 __int16 __cdecl CreateNewEffect(__int16 roomNum);
 void __cdecl KillEffect(__int16 fxNumber);
 void __cdecl InitialiseItem(__int16 itemNum);
-__int16 __cdecl CreateItem();
 void __cdecl InitialiseItemArray(__int32 numitems);
 void __cdecl KillItem(__int16 itemNum);
 

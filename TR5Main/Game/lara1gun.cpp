@@ -12,6 +12,7 @@
 #include "debris.h"
 #include "lara2gun.h"
 #include "switch.h"
+#include "objects.h"
 
 #include "..\Global\global.h"
 #include "..\Scripting\GameFlowScript.h"

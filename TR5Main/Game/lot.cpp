@@ -81,11 +81,8 @@ __int32 __cdecl EnableBaddieAI(__int16 itemNum, __int32 always)
 
 void __cdecl DisableBaddieAI(__int16 itemNumber)
 {
-	ITEM_INFO* result; // eax
-	CREATURE_INFO* v2; // ecx
-
 	ITEM_INFO* item = &Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)result->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
 	item->data = NULL;
 	if (creature)

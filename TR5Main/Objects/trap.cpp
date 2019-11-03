@@ -1047,39 +1047,3 @@ void __cdecl ControlSpikyCeiling(__int16 itemNumber)
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED && item->itemFlags[0] == 1)
 		AnimateItem(item);
 }
-
-void InitialiseBlade(sint16 item_number)
-{
-	ITEM_INFO* item;
-
-	item = &items[item_number];
-
-	item->anim_number = objects[BLADE].anim_index + 2;
-	item->frame_number = anims[item->anim_number].frame_base;
-	item->current_anim_state = STATUE_STOP;
-}
-
-void BladeControl(sint16 item_number)
-{
-	ITEM_INFO* item;
-
-	item = &items[item_number];
-
-	if (TriggerActive(item) && item->current_anim_state == STATUE_STOP)
-		item->goal_anim_state = STATUE_CUT;
-	else
-		item->goal_anim_state = STATUE_STOP;
-
-	if ((item->touch_bits & 0x2) && item->current_anim_state == STATUE_CUT)
-	{
-		lara_item->hit_status = 1;
-		lara_item->hit_points -= BLADE_DAMAGE;
-
-		// more blood required
-		DoLotsOfBlood(lara_item->pos.x_pos, item->pos.y_pos - STEP_L, lara_item->pos.z_pos,
-			lara_item->speed, lara_item->pos.y_rot, lara_item->room_number, 2);
-	}
-
-	AnimateItem(item);
-}
-
