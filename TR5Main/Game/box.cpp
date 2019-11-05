@@ -250,7 +250,7 @@ __int16 __cdecl CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, __int16(*genera
 	return generate(pos.x, pos.y, pos.z, item->speed, item->pos.yRot, item->roomNumber);
 }
 
-void __cdecl CreatureUnderwater2(ITEM_INFO* item, __int32 depth)
+void __cdecl CreatureUnderwater(ITEM_INFO* item, __int32 depth)
 {
 	__int32 waterLevel;
 	if (depth < 0)
@@ -288,39 +288,43 @@ void __cdecl CreatureUnderwater2(ITEM_INFO* item, __int32 depth)
 	}
 }
 
-void __cdecl CreatureFloat2(__int16 itemNumber) 
+void __cdecl CreatureFloat(__int16 itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	item->hitPoints = -16384;
 	item->pos.xRot = 0;
-	
-	__int32 waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	if (waterLevel < item->pos.yPos)
-		item->pos.yPos -= 32;
 
+	__int32 waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	__int32 y = item->pos.yPos;
+
+	if (y > waterLevel)
+		item->pos.yPos = y - 32;
 	if (item->pos.yPos < waterLevel)
 		item->pos.yPos = waterLevel;
 
 	AnimateItem(item);
 
-	__int16 roomNumber = item->roomNumber;
-	item->floor = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber), item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	printf("Crocodile Y: %d\n", item->pos.yPos);
 
+	__int16 roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	
 	if (roomNumber != item->roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
-	
-	if (waterLevel < item->pos.yPos)
-		return;
 
-	if (item->frameNumber == Anims[item->animNumber].frameBase)
+	if (item->pos.yPos <= waterLevel)
 	{
-		item->meshswapMeshbits &= -7;
-		item->active = 1;
-		DisableBaddieAI(itemNumber);
-		RemoveActiveItem(itemNumber);
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		{
+			item->pos.yPos = waterLevel;
+			item->collidable = false;
+			item->status = ITEM_DEACTIVATED;
+			DisableBaddieAI(itemNumber);
+			RemoveActiveItem(itemNumber);
+			item->afterDeath = 1;
+		}
 	}
-
-	item->afterDeath = 1;
 }
 
 void __cdecl CreatureJoint(ITEM_INFO* item, __int16 joint, __int16 required) 
@@ -833,7 +837,7 @@ void __cdecl TargetBox(LOT_INFO* LOT, __int16 boxNumber)
 	return;
 }
 
-__int32 __cdecl UpdateLOT2(LOT_INFO* LOT, __int32 expansion)
+__int32 __cdecl UpdateLOT(LOT_INFO* LOT, __int32 expansion)
 {
 	BOX_NODE* expand;
 
@@ -856,24 +860,16 @@ __int32 __cdecl UpdateLOT2(LOT_INFO* LOT, __int32 expansion)
 		expand->exitBox = NO_BOX;
 	}
 
-	return (SearchLOT2(LOT, expansion));
+	return (SearchLOT(LOT, expansion));
 }
 
-__int32 __cdecl SearchLOT2(LOT_INFO* LOT, __int32 expansion)
+__int32 __cdecl SearchLOT(LOT_INFO* LOT, __int32 expansion)
 {
 	__int16 searchZone;
 	__int16* zone;
 
-	if (LOT->fly == NO_FLYING)
-	{
-		zone = GroundZones[FlipStatus + 2 * ZONE(LOT->step)];
-		searchZone = zone[LOT->head];
-	}
-	else
-	{
-		zone = GroundZones[ZONE(1)]; 
-		searchZone = FLY_ZONE;
-	}
+	zone = GroundZones[FlipStatus + 2 * LOT->zone];
+	searchZone = zone[LOT->head];
 
 	for (__int32 i = 0; i < expansion; i++)
 	{
@@ -895,7 +891,7 @@ __int32 __cdecl SearchLOT2(LOT_INFO* LOT, __int32 expansion)
 			if (boxNumber & BOX_END_BIT)
 			{
 				done = 1;
-				boxNumber &= BOX_NUMBER;
+				boxNumber &= boxNumber;
 			}
 
 			if (LOT->fly == NO_FLYING && searchZone != zone[boxNumber])
@@ -1504,6 +1500,228 @@ void __cdecl GetCreatureMood(ITEM_INFO* item, AI_INFO* info, __int32 violent)
 	}
 }
 
+TARGET_TYPE __cdecl CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
+{
+	UpdateLOT(LOT, 5);
+
+	target->x = item->pos.xPos;
+	target->y = item->pos.yPos;
+	target->z = item->pos.zPos;
+
+	__int32 boxNumber = item->boxNumber;
+	if (boxNumber == NO_BOX)
+		return (NO_TARGET);
+
+	BOX_INFO* box = &Boxes[boxNumber];
+
+	__int32 boxLeft = (__int32)box->left << WALL_SHIFT;
+	__int32 boxRight = ((__int32)box->right << WALL_SHIFT) - 1;
+	__int32 boxTop = (__int32)box->top << WALL_SHIFT;
+	__int32 boxBottom = ((__int32)box->bottom << WALL_SHIFT) - 1;
+
+	__int32 left = boxLeft;
+	__int32 right = boxRight;
+	__int32 top = boxTop;
+	__int32 bottom = boxBottom;
+
+	__int32 direction = ALL_CLIP;
+
+	do {
+		box = &Boxes[boxNumber];
+
+		if (LOT->fly == NO_FLYING)
+		{
+			if (target->y > box->height)
+				target->y = box->height;
+		}
+		else
+		{
+			if (target->y > box->height - WALL_SIZE)
+				target->y = box->height - WALL_SIZE;
+		}
+
+		boxLeft = (__int32)box->left << WALL_SHIFT;
+		boxRight = ((__int32)box->right << WALL_SHIFT) - 1;
+		boxTop = (__int32)box->top << WALL_SHIFT;
+		boxBottom = ((__int32)box->bottom << WALL_SHIFT) - 1;
+
+		if (item->pos.zPos >= boxLeft && item->pos.zPos <= boxRight &&
+			item->pos.xPos >= boxTop && item->pos.xPos <= boxBottom)
+		{
+			left = boxLeft;
+			right = boxRight;
+			top = boxTop;
+			bottom = boxBottom;
+		}
+		else
+		{
+			if (item->pos.zPos < boxLeft)
+			{
+				if ((direction & CLIP_LEFT) && item->pos.xPos >= boxTop && item->pos.xPos <= boxBottom)
+				{
+					if (target->z < boxLeft + 512)
+						target->z = boxLeft + 512;
+
+					if (direction & SECONDARY_CLIP)
+						return (SECONDARY_TARGET);
+
+					if (boxTop > top)
+						top = boxTop;
+					if (boxBottom < bottom)
+						bottom = boxBottom;
+
+					direction = CLIP_LEFT;
+				}
+				else if (direction != CLIP_LEFT)
+				{
+					target->z = right - 512;
+					if (direction != ALL_CLIP)
+						return (SECONDARY_TARGET);
+
+					direction |= SECONDARY_CLIP;
+				}
+			}
+			else if (item->pos.zPos > boxRight)
+			{
+				if ((direction & CLIP_RIGHT) && item->pos.xPos >= boxTop && item->pos.xPos <= boxBottom)
+				{
+					if (target->z > boxRight - 512)
+						target->z = boxRight - 512;
+
+					if (direction & SECONDARY_CLIP)
+						return (SECONDARY_TARGET);
+
+					if (boxTop > top)
+						top = boxTop;
+					if (boxBottom < bottom)
+						bottom = boxBottom;
+
+					direction = CLIP_RIGHT;
+				}
+				else if (direction != CLIP_RIGHT)
+				{
+					target->z = left + 512;
+					if (direction != ALL_CLIP)
+						return (SECONDARY_TARGET);
+
+					direction |= SECONDARY_CLIP;
+				}
+			}
+
+			if (item->pos.xPos < boxTop)
+			{
+				if ((direction & CLIP_TOP) && item->pos.zPos >= boxLeft && item->pos.zPos <= boxRight)
+				{
+					if (target->x < boxTop + 512)
+						target->x = boxTop + 512;
+
+					if (direction & SECONDARY_CLIP)
+						return (SECONDARY_TARGET);
+
+					if (boxLeft > left)
+						left = boxLeft;
+					if (boxRight < right)
+						right = boxRight;
+
+					direction = CLIP_TOP;
+				}
+				else if (direction != CLIP_TOP)
+				{
+					target->x = bottom - 512;
+					if (direction != ALL_CLIP)
+						return (SECONDARY_TARGET);
+
+					direction |= SECONDARY_CLIP;
+				}
+			}
+			else if (item->pos.xPos > boxBottom)
+			{
+				if ((direction & CLIP_BOTTOM) && item->pos.zPos >= boxLeft && item->pos.zPos <= boxRight)
+				{
+					if (target->x > boxBottom - 512)
+						target->x = boxBottom - 512;
+
+					if (direction & SECONDARY_CLIP)
+						return (SECONDARY_TARGET);
+
+					if (boxLeft > left)
+						left = boxLeft;
+					if (boxRight < right)
+						right = boxRight;
+
+					direction = CLIP_BOTTOM;
+				}
+				else if (direction != CLIP_BOTTOM)
+				{
+					target->x = top + 512;
+					if (direction != ALL_CLIP)
+						return (SECONDARY_TARGET);
+
+					direction |= SECONDARY_CLIP;
+				}
+			}
+		}
+
+		if (boxNumber == LOT->targetBox)
+		{
+			if (direction & (CLIP_LEFT | CLIP_RIGHT))
+				target->z = LOT->target.z;
+			else if (!(direction & SECONDARY_CLIP))
+			{
+				if (target->z < boxLeft + 512)
+					target->z = boxLeft + 512;
+				else if (target->z > boxRight - 512)
+					target->z = boxRight - 512;
+			}
+
+			if (direction & (CLIP_TOP | CLIP_BOTTOM))
+				target->x = LOT->target.x;
+			else if (!(direction & SECONDARY_CLIP))
+			{
+				if (target->x < boxTop + 512)
+					target->x = boxTop + 512;
+				else if (target->x > boxBottom - 512)
+					target->x = boxBottom - 512;
+			}
+
+			target->y = LOT->target.y;
+
+			return (PRIME_TARGET);
+		}
+
+		boxNumber = LOT->node[boxNumber].exitBox;
+		if (boxNumber != NO_BOX && (Boxes[boxNumber].overlapIndex & LOT->blockMask))
+			break;
+	} while (boxNumber != NO_BOX);
+
+	if (direction & (CLIP_LEFT | CLIP_RIGHT))
+		target->z = boxLeft + WALL_SIZE / 2 + (GetRandomControl() * (boxRight - boxLeft - WALL_SIZE) >> 15);
+	else if (!(direction & SECONDARY_CLIP))
+	{
+		if (target->z < boxLeft + 512)
+			target->z = boxLeft + 512;
+		else if (target->z > boxRight - 512)
+			target->z = boxRight - 512;
+	}
+
+	if (direction & (CLIP_TOP | CLIP_BOTTOM))
+		target->x = boxTop + WALL_SIZE / 2 + (GetRandomControl() * (boxBottom - boxTop - WALL_SIZE) >> 15);
+	else if (!(direction & SECONDARY_CLIP))
+	{
+		if (target->x < boxTop + 512)
+			target->x = boxTop + 512;
+		else if (target->x > boxBottom - 512)
+			target->x = boxBottom - 512;
+	}
+
+	if (LOT->fly == NO_FLYING)
+		target->y = box->height;
+	else
+		target->y = box->height - 320;
+
+	return NO_TARGET;
+}
+
 void Inject_Box()
 {
 	INJECT(0x0040B5D0, CreatureVault);
@@ -1528,14 +1746,15 @@ void Inject_Box()
 	INJECT(0x004090A0, GetCreatureMood);
 	INJECT(0x0040BB10, AlertNearbyGuards);
 	INJECT(0x0040BA70, AlertAllGuards);
+	INJECT(0x00408B00, UpdateLOT);
+	INJECT(0x0040B400, CreatureUnderwater);
+	INJECT(0x0040B2C0, CreatureFloat);
+	INJECT(0x004098B0, CalculateTarget);
 
 	/*+
 	INJECT(0x0040C070, FindAITargetObject);
 	INJECT(0x0040BBE0, AIGuard);
-	INJECT(0x0040B400, CreatureUnderwater);
-	INJECT(0x0040B2C0, CreatureFloat);
 	//INJECT(0x0040AE90, CreatureTurn);+
-	INJECT(0x00408B00, UpdateLOT);
 	INJECT(0x00408550, InitialiseCreature);
 	INJECT(0x0040BCC0, GetAITarget);
 	INJECT(0x0040C070, FindAITargetObject);

@@ -7,7 +7,7 @@
 #define WHITE555 RGB555(255, 255, 255)
 #define GRAY555  RGB555(128, 128, 128)
 #define BLACK555 RGB555(  0,   0,   0)
-#define XZ_GET_SECTOR(room, x, z) (r->floor[(int)((z) / 1024 + r->xSize * ((x) / 1024))])
+#define XZ_GET_SECTOR(room, x, z) (r->floor[((z) >> WALL_SHIFT) + ((x) >> WALL_SHIFT) * r->xSize])
 
 #define ADD_PTR(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n)); 
 

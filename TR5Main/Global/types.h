@@ -661,8 +661,8 @@ typedef struct room_info_t {
 	__int32 z; // size=0, offset=28
 	__int32 minfloor; // size=0, offset=32
 	__int32 maxceiling; // size=0, offset=36
-	__int16 ySize; // size=0, offset=40
 	__int16 xSize; // size=0, offset=42
+	__int16 ySize; // size=0, offset=40
 	CVECTOR ambient; // size=4, offset=44
 	__int16 numLights; // size=0, offset=48
 	__int16 numMeshes; // size=0, offset=50
