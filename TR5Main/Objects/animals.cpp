@@ -3232,7 +3232,6 @@ void __cdecl CrocodileControl(__int16 itemNum)
 			creature->enemy = LaraItem;
 
 		AI_INFO info;
-
 		CreatureAIInfo(item, &info);
 
 		GetCreatureMood(item, &info, VIOLENT);

@@ -127,3 +127,10 @@
 #define NO_FLYING 0
 
 #define FLY_ZONE 0x2000
+
+#define CLIP_LEFT   1
+#define CLIP_RIGHT  2
+#define CLIP_TOP    4
+#define CLIP_BOTTOM 8
+#define ALL_CLIP (CLIP_LEFT|CLIP_RIGHT|CLIP_TOP|CLIP_BOTTOM)
+#define SECONDARY_CLIP 16
