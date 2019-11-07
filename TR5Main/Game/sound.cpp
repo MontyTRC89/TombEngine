@@ -319,7 +319,7 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	// BGM tracks are crossfaded, and additionally shuffled a bit to make things more natural.
 	// Think everybody are fed up with same start-up sounds of Caves ambience...
 
-	if (crossfade && false)
+	if (crossfade)
 	{		
 		// Crossfade...
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.0f);
