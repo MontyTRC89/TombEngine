@@ -850,7 +850,7 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	 
 	// Set shadow map data
-	if (m_shadowLight != NULL)
+	if (m_shadowLight != NULL && false) // TODO: finish the shadow mapping (dx11 version)
 	{    
 		memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
 		m_stShadowMap.CastShadows = true;

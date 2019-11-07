@@ -994,9 +994,9 @@ void __cdecl NewObjects()
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
 
-		Bones[obj->boneIndex + 0 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 0 * 4] |= ROT_Y; // index 0 (used in CreatureJoint "joint" argument)
+		Bones[obj->boneIndex + 0 * 4] |= ROT_X; // index 1
+		Bones[obj->boneIndex + 7 * 4] |= ROT_Y; // index 2
 	}
 
 	obj = &Objects[ID_JEEP];

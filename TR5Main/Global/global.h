@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>
+#include <Windows.h>
 #include <D3D11.h>
 #include <D3DX11.h>
 #include <SimpleMath.h>

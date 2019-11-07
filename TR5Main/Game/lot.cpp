@@ -113,6 +113,13 @@ void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
 		creature->LOT.drop = -256;
 		creature->LOT.isAmphibious = false;
 		break;
+
+	case ID_APE:
+		// can climb only 2 click and fall 2 click
+		creature->LOT.step = 512;
+		creature->LOT.drop = -512;
+		creature->LOT.zone = 3;
+		break;
 	}
 }
 
