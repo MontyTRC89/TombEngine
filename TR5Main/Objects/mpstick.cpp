@@ -80,7 +80,7 @@ void MPStickControl(__int16 itemNumber)
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 26;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->currentAnimState = BATON_DEATH;
-			creature->LOT.step = 256;
+			//creature->LOT.step = 256; // TODO: mpstick -> possibly needed, exist in original code.
 		}
 	}
 	else
@@ -505,6 +505,6 @@ void MPStickControl(__int16 itemNumber)
 	else
 	{
 		creature->maximumTurn = 0;
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

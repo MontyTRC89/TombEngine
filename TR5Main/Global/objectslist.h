@@ -49,7 +49,7 @@ typedef enum object_types {
 	ID_LARSON,
 	ID_SMALL_SCORPION, // TR4 - OK
 	ID_PIERRE,
-	ID_BAT, // TR4 - OK - Needs testing
+	ID_BAT, // TR4 - OK (problem of pathfinding)
 	ID_MAFIA,
 	ID_GUIDE, // TR4 - OK - Needs testing
 	ID_MAFIA2,
@@ -97,7 +97,7 @@ typedef enum object_types {
 	ID_BATS,
 	ID_RATS,
 	ID_SPIDER,
-	ID_FLAMETHROWER_BADDY, // TR3 - 50 - OK needs testing
+	ID_FLAMETHROWER_BADDY, // TR3 - OK (crash when shoot)
 	ID_AUTOGUN,
 	ID_ELECTRICAL_CABLES,
 	ID_DARTS,
@@ -117,7 +117,7 @@ typedef enum object_types {
 	ID_SCALING_TRAPDOOR,
 	ID_ROLLINGBALL,
 	ID_ROLLINGBARREL,
-	ID_SPIKY_CEILING, // TR3 - 116 - OK needs testing
+	ID_SPIKY_CEILING, // TR3 - OK
 	ID_TEETH_SPIKES,
 	ID_ROME_HAMMER,
 	ID_HAMMER2,
@@ -316,11 +316,11 @@ typedef enum object_types {
 	ID_LIFT_DOORS1,
 	ID_COBRA, // TR3 - OK
 	ID_LIFT_DOORS2,
-	ID_MONKEY, // TR3 - OK - Needs testing
+	ID_MONKEY, // TR3 - OK (ignore the medikit/key, can go in 1 click pool without death)
 	ID_PUSHPULL_DOOR1,
-	ID_MP_WITH_STICK, // TR3 - 60
+	ID_MP_WITH_STICK, // TR3 - OK
 	ID_PUSHPULL_DOOR2,
-	ID_MP_WITH_GUN, // TR3 - OK - Needs testing
+	ID_MP_WITH_GUN, // TR3 - OK
 	ID_KICK_DOOR1,
 	ID_WALL_MOUNTED_BLADE, // TR3 - 111
 	ID_KICK_DOOR2,
@@ -434,11 +434,11 @@ typedef enum object_types {
 	ID_ANIMATING8,
 	ID_ROLLING_SPINDLE, // TR2 - OK
 	ID_ANIMATING9,
-	ID_WOLF, // TR1 - OK NEED TEST
+	ID_WOLF, // TR1 - OK (need torso rotation fix)
 	ID_ANIMATING10,
-	ID_BEAR, // TR1 - OK NEED TEST
+	ID_BEAR, // TR1 - OK (possible mesh glitch)
 	ID_ANIMATING11,
-	ID_APE, // TR1 - OK NEED TEST
+	ID_APE, // TR1 - OK (problem of animation, too much random)
 	ID_ANIMATING12,
 	ID_WINGED_MUMMY, // TR1 - 20
 	ID_ANIMATING13,

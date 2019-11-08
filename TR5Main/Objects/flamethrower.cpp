@@ -73,7 +73,7 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 					continue;
 
 				target = &Items[currentCreature->itemNum];
-				if (target->objectNumber == ID_LARA /*|| target->objectNumber == WHITE_SOLDIER || target->objectNumber == FLAMETHROWER_BLOKE*/ || target->hitPoints <= 0)
+				if ((target->objectNumber == ID_LARA /*|| target->objectNumber == WHITE_SOLDIER || target->objectNumber == FLAMETHROWER_BLOKE*/) || target->hitPoints <= 0)
 					continue;
 
 				__int32 x = target->pos.xPos - item->pos.xPos;
@@ -88,7 +88,7 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 				}
 			}
 		}
-
+		
 		AI_INFO info;
 		AI_INFO laraInfo;
 

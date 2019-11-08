@@ -446,5 +446,5 @@ void __cdecl MPGunControl(__int16 itemNumber)
 	CreatureJoint(item, 1, torsoX);
 	CreatureJoint(item, 2, head);
 
-	CreatureAnimation(itemNumber, angle, 0);
+	CreatureAnimation(itemNumber, angle, tilt);
 }
