@@ -46,7 +46,7 @@ private:
 	static ChunkId* m_chunkLuaVariable;
 	static ChunkId* m_chunkStaticFlags;
 	static ChunkId* m_chunkVehicle;
-	static ChunkId* m_chunkFlybySequence;
+	static ChunkId* m_chunkSequenceSwitch;
 	static ChunkId* m_chunkFlybyFlags;
 	static ChunkId* m_chunkCdFlags;
 	static ChunkId* m_chunkCamera;
@@ -83,7 +83,7 @@ private:
 	static void saveVariable(__int32 arg1, __int32 arg2);
 	static void saveStaticFlag(__int32 arg1, __int32 arg2);
 	static void saveCamera(__int32 arg1, __int32 arg2);
-	static void saveFlybySequence(__int32 arg1, __int32 arg2);
+	static void saveSequenceSwitch(__int32 arg1, __int32 arg2);
 	static void saveFlybyFlags(__int32 arg1, __int32 arg2);
 	static void saveFlipMap(__int32 arg1, __int32 arg2);
 	static void saveFlipStats(__int32 arg1, __int32 arg2);

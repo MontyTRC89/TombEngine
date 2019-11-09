@@ -21,6 +21,7 @@
 #include "spotcam.h"
 #include "Box.h"
 #include "objects.h"
+#include "switch.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -1119,16 +1120,8 @@ void __cdecl UpdateSky()
 	}
 }
 
-void __cdecl TestTriggersAtXYZ(__int32 x, __int32 y, __int32 z, __int16 roomNumber, __int16 heavy, __int16 heavyFlags)
-{
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	GetFloorHeight(floor, x, y, z);
-	TestTriggers(TriggerIndex, heavy, heavyFlags);
-}
-
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
 	INJECT(0x004167B0, TestTriggers);
-	INJECT(0x0047D9D0, TestTriggersAtXYZ);
 }
