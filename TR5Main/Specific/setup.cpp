@@ -4,6 +4,7 @@
 #include "..\Game\draw.h"
 #include "..\Game\collide.h"
 #include "..\Game\Box.h"
+#include "..\Game\switch.h"
 #include "..\Game\missile.h"
 #include "..\Game\control.h"
 #include "..\Game\pickup.h"
@@ -13,6 +14,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+extern byte SequenceUsed[6];
+extern byte SequenceResults[3][3][3];
+extern byte Sequences[3];
+extern byte CurrentSequence;
 
 void __cdecl NewObjects()
 {
@@ -1103,18 +1109,21 @@ void __cdecl InitialiseObjects()
 	InitialiseHairs();
 	InitialiseSpecialEffects();
 
-	CurrentSequence = 0;
 	OldPickupPos.roomNumber = 0;
 	
-	// TODO: with the new renderer this can be safely deleted
-	for (__int32 i = 0; i < 6; i++)
-	{
-		SequenceUsed[i] = 0;
-	}
-
-	for (__int32 i = 0; i < gfNumMips; i++)
-	{
-	}
+	CurrentSequence = 0;
+	SequenceResults[0][1][2] = 0;
+	SequenceResults[0][2][1] = 1;
+	SequenceResults[1][0][2] = 2;
+	SequenceResults[1][2][0] = 3;
+	SequenceResults[2][0][1] = 4;
+	SequenceResults[2][1][0] = 5;
+	SequenceUsed[0] = 0;
+	SequenceUsed[1] = 0;
+	SequenceUsed[2] = 0;
+	SequenceUsed[3] = 0;
+	SequenceUsed[4] = 0;
+	SequenceUsed[5] = 0;
 
 	if (Objects[ID_BATS].loaded)
 		Bats = (BAT_STRUCT*)GameMalloc(NUM_BATS * sizeof(BAT_STRUCT));

@@ -5,6 +5,7 @@
 #include "..\Game\box.h"
 #include "..\Game\pickup.h"
 #include "..\Game\lot.h"
+#include "..\Game\switch.h"
 #include "..\Game\laramisc.h"
 #include "..\Objects\newobjects.h"
 #include "..\Game\sound.h"
@@ -22,7 +23,7 @@ ChunkId* SaveGame::m_chunkLara;
 ChunkId* SaveGame::m_chunkLuaVariable;
 ChunkId* SaveGame::m_chunkStaticFlags;
 ChunkId* SaveGame::m_chunkVehicle;
-ChunkId* SaveGame::m_chunkFlybySequence;
+ChunkId* SaveGame::m_chunkSequenceSwitch;
 ChunkId* SaveGame::m_chunkFlybyFlags;
 ChunkId* SaveGame::m_chunkCdFlags;
 ChunkId* SaveGame::m_chunkCamera;
@@ -47,6 +48,10 @@ ChunkId* SaveGame::m_chunkRats;
 ChunkId* SaveGame::m_chunkSpiders;
 
 extern vector<AudioTrack> g_AudioTracks;
+extern byte SequenceUsed[6];
+extern byte SequenceResults[3][3][3];
+extern byte Sequences[3];
+extern byte CurrentSequence;
 
 void SaveGame::saveItems()
 {
@@ -169,7 +174,7 @@ void SaveGame::saveGameStatus(__int32 arg1, __int32 arg2)
 	}
 
 	for (__int32 i = 0; i < 6; i++)
-		m_writer->WriteChunk(m_chunkFlybySequence, &saveFlybySequence, i, SequenceUsed[i]);
+		m_writer->WriteChunk(m_chunkSequenceSwitch, &saveSequenceSwitch, i, SequenceUsed[i]);
 
 	for (__int32 i = 0; i < NumberSpotcams; i++)
 		m_writer->WriteChunk(m_chunkFlybyFlags, &saveFlybyFlags, i, SpotCam[i].flags);
@@ -251,7 +256,7 @@ void SaveGame::Start()
 	m_chunkLuaVariable = ChunkId::FromString("TR5MSgLuaVar");
 	m_chunkStaticFlags = ChunkId::FromString("TR5MSgStFl");
 	m_chunkVehicle = ChunkId::FromString("TR5MSgLaraVeh");
-	m_chunkFlybySequence = ChunkId::FromString("TR5MSgFlybyS");
+	m_chunkSequenceSwitch = ChunkId::FromString("TR5MSgSeqSw");
 	m_chunkFlybyFlags = ChunkId::FromString("TR5MSgFlybyF");
 	m_chunkCdFlags = ChunkId::FromString("TR5MSgCdF");
 	m_chunkCamera = ChunkId::FromString("TR5MSgCam");
@@ -290,7 +295,7 @@ void SaveGame::End()
 	delete m_chunkFlipMap;
 	delete m_chunkFlipStats;
 	delete m_chunkFlybyFlags;
-	delete m_chunkFlybySequence;
+	delete m_chunkSequenceSwitch;
 	delete m_chunkCdFlags;
 	delete m_chunkCamera;
 	delete m_chunkItemDummy;
@@ -688,7 +693,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, __int32 maxSize, __int32 a
 		Camera.fixed[index].flags = value;
 		return true;
 	}
-	else if (chunkId->EqualsTo(m_chunkFlybySequence))
+	else if (chunkId->EqualsTo(m_chunkSequenceSwitch))
 	{
 		__int16 index = LEB128::ReadInt16(m_stream);
 		__int16 value = LEB128::ReadInt16(m_stream);
@@ -711,7 +716,7 @@ void SaveGame::saveCamera(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, arg2);
 }
 
-void SaveGame::saveFlybySequence(__int32 arg1, __int32 arg2)
+void SaveGame::saveSequenceSwitch(__int32 arg1, __int32 arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);

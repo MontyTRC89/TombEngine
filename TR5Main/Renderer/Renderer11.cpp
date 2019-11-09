@@ -1013,6 +1013,8 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	__int32 lastBucket = (transparent ? 4 : 2);
 
 	RendererRoom* room = m_rooms[item->Item->roomNumber];
+	if (room == NULL)
+		return true;
 	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
 	m_stItem.World = item->World.Transpose();

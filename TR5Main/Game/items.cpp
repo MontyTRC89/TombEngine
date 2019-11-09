@@ -486,7 +486,7 @@ __int32 __cdecl GlobalItemReplace(__int16 search, __int16 replace)
 
 void Inject_Items()
 {
-	/*INJECT(0x00440840, CreateItem);
+	INJECT(0x00440840, CreateItem);
 	INJECT(0x00440D10, AddActiveItem);
 	INJECT(0x00440620, KillItem);
 	INJECT(0x00440DA0, ItemNewRoom);
@@ -498,5 +498,5 @@ void Inject_Items()
 	INJECT(0x00440C40, RemoveDrawnItem);
 	INJECT(0x004408B0, InitialiseItem);
 	INJECT(0x00440840, ClearItem);
-	INJECT(0x00440590, InitialiseItemArray);*/
+	INJECT(0x00440590, InitialiseItemArray);
 }

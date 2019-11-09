@@ -50,16 +50,16 @@ typedef struct tr_vertex
 
 struct MATRIX3D
 {
-	short m00; // size=0, offset=0
-	short m01; // size=0, offset=2
-	short m02; // size=0, offset=4
-	short m10; // size=0, offset=6
-	short m11; // size=0, offset=8
-	short m12; // size=0, offset=10
-	short m20; // size=0, offset=12
-	short m21; // size=0, offset=14
-	short m22; // size=0, offset=16
-	short pad; // size=0, offset=18
+	__int16 m00; // size=0, offset=0
+	__int16 m01; // size=0, offset=2
+	__int16 m02; // size=0, offset=4
+	__int16 m10; // size=0, offset=6
+	__int16 m11; // size=0, offset=8
+	__int16 m12; // size=0, offset=10
+	__int16 m20; // size=0, offset=12
+	__int16 m21; // size=0, offset=14
+	__int16 m22; // size=0, offset=16
+	__int16 pad; // size=0, offset=18
 	__int32 tx; // size=0, offset=20
 	__int32 ty; // size=0, offset=24
 	__int32 tz; // size=0, offset=28
@@ -181,9 +181,9 @@ typedef struct floor_info_t {
 	unsigned __int16 box : 11; // offset=2.4
 	unsigned __int16 stopper : 1; // offset=3.7
 	unsigned char pitRoom; // size=0, offset=4
-	char floor; // size=0, offset=5
+	byte floor; // size=0, offset=5
 	unsigned char skyRoom; // size=0, offset=6
-	char ceiling; // size=0, offset=7
+	byte ceiling; // size=0, offset=7
 } FLOOR_INFO;
 
 typedef struct item_info_t {
@@ -214,15 +214,15 @@ typedef struct item_info_t {
 	void* data; // size=0, offset=60
 	PHD_3DPOS pos; // size=20, offset=64
 	//ITEM_LIGHT il; // size=48, offset=84
-	char padLight[48];
+	byte padLight[48];
 	unsigned __int32 meshswapMeshbits; // size=0, offset=136 OFF=132
 	__int16 drawRoom; // size=0, offset=140 OFF=136
 	__int16 TOSSPAD; // size=0, offset=142 OFF=138
-	char pad1[5464]; // OFF=140   5432?
-	char* pointer1;
-	char* pointer2;
+	byte pad1[5464]; // OFF=140   5432?
+	byte* pointer1;
+	byte* pointer2;
 	//__int16 status;
-	//char pad2[8];
+	//byte pad2[8];
 	unsigned __int32 active : 1; // offset=132.0 OFF=5610
 	unsigned __int32 status : 2; // offset=132.1
 	unsigned __int32 gravityStatus : 1; // offset=132.3
@@ -235,7 +235,7 @@ typedef struct item_info_t {
 	unsigned __int32 reallyActive : 1; // offset=133.6
 	unsigned __int32 InDrawRoom : 1; // offset=133.7
 	__int32 swapMeshFlags;
-	char pad2[4]; // OFF=5614
+	byte pad2[4]; // OFF=5614
 } ITEM_INFO;
 
 typedef struct creature_info_t 
@@ -354,8 +354,8 @@ typedef struct lara_info_t {
 	CREATURE_INFO* creature; // size=228, offset=224
 	__int32 cornerX; // size=0, offset=228
 	__int32 cornerZ; // size=0, offset=232
-	char ropeSegment; // size=0, offset=236
-	char ropeDirection; // size=0, offset=237
+	byte ropeSegment; // size=0, offset=236
+	byte ropeDirection; // size=0, offset=237
 	__int16 ropeArcFront; // size=0, offset=238
 	__int16 ropeArcBack; // size=0, offset=240
 	__int16 ropeLastX; // size=0, offset=242
@@ -369,26 +369,26 @@ typedef struct lara_info_t {
 	void* generalPtr; // size=0, offset=264
 	__int32 ropeOffset; // size=0, offset=268
 	__int32 ropeDownVel; // size=0, offset=272
-	char ropeFlag; // size=0, offset=276
-	char moveCount; // size=0, offset=277
+	byte ropeFlag; // size=0, offset=276
+	byte moveCount; // size=0, offset=277
 	__int32 ropeCount; // size=0, offset=280
-	char skelebob; // size=0, offset=284
-	char pistolsTypeCarried; // size=0, offset=285
-	char uzisTypeCarried; // size=0, offset=286
-	char shotgunTypeCarried; // size=0, offset=287
-	char crossbowTypeCarried; // size=0, offset=288
-	char HKtypeCarried; // size=0, offset=289
-	char sixshooterTypeCarried; // size=0, offset=290
-	char laserSight; // size=0, offset=291
-	char silencer; // size=0, offset=292
-	char binoculars; // size=0, offset=293
-	char crowbar; // size=0, offset=294
-	char examine1; // size=0, offset=295
-	char examine2; // size=0, offset=296
-	char examine3; // size=0, offset=297
-	char wetcloth; // size=0, offset=298
-	char bottle; // size=0, offset=299
-	char puzzleItems[12]; // size=12, offset=300
+	byte skelebob; // size=0, offset=284
+	byte pistolsTypeCarried; // size=0, offset=285
+	byte uzisTypeCarried; // size=0, offset=286
+	byte shotgunTypeCarried; // size=0, offset=287
+	byte crossbowTypeCarried; // size=0, offset=288
+	byte HKtypeCarried; // size=0, offset=289
+	byte sixshooterTypeCarried; // size=0, offset=290
+	byte laserSight; // size=0, offset=291
+	byte silencer; // size=0, offset=292
+	byte binoculars; // size=0, offset=293
+	byte crowbar; // size=0, offset=294
+	byte examine1; // size=0, offset=295
+	byte examine2; // size=0, offset=296
+	byte examine3; // size=0, offset=297
+	byte wetcloth; // size=0, offset=298
+	byte bottle; // size=0, offset=299
+	byte puzzleItems[12]; // size=12, offset=300
 	unsigned __int16 puzzleItemsCombo; // size=0, offset=312
 	unsigned __int16 keyItems; // size=0, offset=314
 	unsigned __int16 keyItemsCombo; // size=0, offset=316
@@ -405,9 +405,9 @@ typedef struct lara_info_t {
 	__int16 numHKammo1; // size=0, offset=338
 	__int16 numCrossbowAmmo1; // size=0, offset=340
 	__int16 numCrossbowAmmo2; // size=0, offset=342
-	char location; // size=0, offset=344
-	char highestLocation; // size=0, offset=345
-	char locationPad; // size=0, offset=346
+	byte location; // size=0, offset=344
+	byte highestLocation; // size=0, offset=345
+	byte locationPad; // size=0, offset=346
 	unsigned char tightRopeOnCount; // size=0, offset=347
 	unsigned char tightRopeOff; // size=0, offset=348
 	unsigned char tightRopeFall; // size=0, offset=349
@@ -447,10 +447,10 @@ typedef struct coll_info_t
 	__int16 quadrant; // size=0, offset=120
 	__int16 collType; // size=0, offset=122 USE ENUM CT_*
 	__int16* trigger; // size=0, offset=124
-	char tiltX; // size=0, offset=128
-	char tiltZ; // size=0, offset=129
-	char hitByBaddie; // size=0, offset=130
-	char hitStatic; // size=0, offset=131
+	byte tiltX; // size=0, offset=128
+	byte tiltZ; // size=0, offset=129
+	byte hitByBaddie; // size=0, offset=130
+	byte hitStatic; // size=0, offset=131
 	unsigned __int16 slopesAreWalls : 2; // offset=132.0
 	unsigned __int16 slopesArePits : 1; // offset=132.2
 	unsigned __int16 lavaIsPit : 1; // offset=132.3
@@ -602,8 +602,8 @@ struct tr_room_portal  // 32 bytes
 
 struct tr_room_sector // 8 bytes
 {
-	unsigned short FDindex;    // Index into FloorData[]
-	unsigned short BoxIndex;   // Index into Boxes[] (-1 if none)
+	unsigned __int16 FDindex;    // Index into FloorData[]
+	unsigned __int16 BoxIndex;   // Index into Boxes[] (-1 if none)
 	byte  RoomBelow;  // 255 is none
 	INT8   Floor;      // Absolute height of floor
 	byte  RoomAbove;  // 255 if none
@@ -646,8 +646,8 @@ struct GAMEFLOW
 	unsigned char nLevels; // size=0, offset=9
 	unsigned char nFileNames; // size=0, offset=10
 	unsigned char Pad; // size=0, offset=11
-	unsigned short FileNameLen; // size=0, offset=12
-	unsigned short ScriptLen; // size=0, offset=14
+	unsigned __int16 FileNameLen; // size=0, offset=12
+	unsigned __int16 ScriptLen; // size=0, offset=14
 };
 
 typedef struct room_info_t {
@@ -668,8 +668,8 @@ typedef struct room_info_t {
 	__int16 numMeshes; // size=0, offset=50
 	unsigned char reverbType; // size=0, offset=52
 	unsigned char flipNumber; // size=0, offset=53
-	char meshEffect; // size=0, offset=54
-	char bound_active; // size=0, offset=55
+	byte meshEffect; // size=0, offset=54
+	byte bound_active; // size=0, offset=55
 	__int16 left; // size=0, offset=56
 	__int16 right; // size=0, offset=58
 	__int16 top; // size=0, offset=60
@@ -777,8 +777,8 @@ typedef struct sparks_t
 	unsigned char friction; // size=0, offset=27
 	unsigned char scalar; // size=0, offset=28
 	unsigned char def; // size=0, offset=29
-	char rotAdd; // size=0, offset=30
-	char maxYvel; // size=0, offset=31
+	byte rotAdd; // size=0, offset=30
+	byte maxYvel; // size=0, offset=31
 	unsigned char on; // size=0, offset=32
 	unsigned char sR; // size=0, offset=33
 	unsigned char sG; // size=0, offset=34
@@ -795,7 +795,7 @@ typedef struct sparks_t
 	unsigned char life; // size=0, offset=45
 	unsigned char transType; // size=0, offset=46
 	unsigned char extras; // size=0, offset=47
-	char dynamic; // size=0, offset=48
+	byte dynamic; // size=0, offset=48
 	unsigned char fxObj; // size=0, offset=49
 	unsigned char roomNumber; // size=0, offset=50
 	unsigned char nodeNumber; // size=0, offset=51
@@ -852,27 +852,27 @@ typedef struct static_info_t
 
 typedef struct sample_info_t
 {
-	short number;
+	__int16 number;
 	unsigned char volume;
-	char radius;
-	char randomness;
+	byte radius;
+	byte randomness;
 	signed char pitch;
-	short flags;
+	__int16 flags;
 } SAMPLE_INFO;
 
 typedef struct change_struct_t
 {
-	short goalAnimState; // size=0, offset=0
-	short numberRanges; // size=0, offset=2
-	short rangeIndex; // size=0, offset=4
+	__int16 goalAnimState; // size=0, offset=0
+	__int16 numberRanges; // size=0, offset=2
+	__int16 rangeIndex; // size=0, offset=4
 } CHANGE_STRUCT;
 
 typedef struct range_struct_t
 {
-	short startFrame; // size=0, offset=0
-	short endFrame; // size=0, offset=2
-	short linkAnimNum; // size=0, offset=4
-	short linkFrameNum; // size=0, offset=6
+	__int16 startFrame; // size=0, offset=0
+	__int16 endFrame; // size=0, offset=2
+	__int16 linkAnimNum; // size=0, offset=4
+	__int16 linkFrameNum; // size=0, offset=6
 } RANGE_STRUCT;
 
 struct tr_object_texture_vert // 4 bytes
@@ -904,32 +904,32 @@ typedef struct stats_t {
 	unsigned __int32 Distance; // size=0, offset=4
 	unsigned __int32 AmmoUsed; // size=0, offset=8
 	unsigned __int32 AmmoHits; // size=0, offset=12
-	unsigned short Kills; // size=0, offset=16
+	unsigned __int16 Kills; // size=0, offset=16
 	unsigned char Secrets; // size=0, offset=18
 	unsigned char HealthUsed; // size=0, offset=19
 } STATS;
 
 typedef struct savegame_info
 {
-	short Checksum; // size=0, offset=0
-	unsigned short VolumeCD; // size=0, offset=2
-	unsigned short VolumeFX; // size=0, offset=4
-	short ScreenX; // size=0, offset=6
-	short ScreenY; // size=0, offset=8
+	__int16 Checksum; // size=0, offset=0
+	unsigned __int16 VolumeCD; // size=0, offset=2
+	unsigned __int16 VolumeFX; // size=0, offset=4
+	__int16 ScreenX; // size=0, offset=6
+	__int16 ScreenY; // size=0, offset=8
 	unsigned char ControlOption; // size=0, offset=10
 	unsigned char VibrateOn; // size=0, offset=11
 	unsigned char AutoTarget; // size=0, offset=12
 	LARA_INFO Lara; // size=352, offset=16
 	STATS Level; // size=20, offset=368
 	STATS Game; // size=20, offset=388
-	short WeaponObject; // size=0, offset=408
-	short WeaponAnim; // size=0, offset=410
-	short WeaponFrame; // size=0, offset=412
-	short WeaponCurrent; // size=0, offset=414
-	short WeaponGoal; // size=0, offset=416
+	__int16 WeaponObject; // size=0, offset=408
+	__int16 WeaponAnim; // size=0, offset=410
+	__int16 WeaponFrame; // size=0, offset=412
+	__int16 WeaponCurrent; // size=0, offset=414
+	__int16 WeaponGoal; // size=0, offset=416
 	unsigned __int32 CutSceneTriggered1; // size=0, offset=420
 	unsigned __int32 CutSceneTriggered2; // size=0, offset=424
-	char GameComplete; // size=0, offset=428
+	byte GameComplete; // size=0, offset=428
 	unsigned char LevelNumber; // size=0, offset=429
 	unsigned char CampaignSecrets[4]; // size=4, offset=430
 	unsigned char TLCount; // size=0, offset=434
@@ -962,7 +962,7 @@ struct WINAPP
 struct GUNFLASH_STRUCT
 {
 	MATRIX3D matrix; // size=32, offset=0
-	short on; // size=0, offset=32
+	__int16 on; // size=0, offset=32
 };
 
 struct SHOCKWAVE_STRUCT
@@ -970,44 +970,44 @@ struct SHOCKWAVE_STRUCT
 	__int32 x; // size=0, offset=0
 	__int32 y; // size=0, offset=4
 	__int32 z; // size=0, offset=8
-	short innerRad; // size=0, offset=12
-	short outerRad; // size=0, offset=14
-	short xRot; // size=0, offset=16
-	short flags; // size=0, offset=18
+	__int16 innerRad; // size=0, offset=12
+	__int16 outerRad; // size=0, offset=14
+	__int16 xRot; // size=0, offset=16
+	__int16 flags; // size=0, offset=18
 	unsigned char r; // size=0, offset=20
 	unsigned char g; // size=0, offset=21
 	unsigned char b; // size=0, offset=22
 	unsigned char life; // size=0, offset=23
-	short speed; // size=0, offset=24
-	short temp; // size=0, offset=26
+	__int16 speed; // size=0, offset=24
+	__int16 temp; // size=0, offset=26
 };
 
 struct GUNSHELL_STRUCT
 {
 	PHD_3DPOS pos; // size=20, offset=0
-	short fallspeed; // size=0, offset=20
-	short roomNumber; // size=0, offset=22
-	short speed; // size=0, offset=24
-	short counter; // size=0, offset=26
-	short dirXrot; // size=0, offset=28
-	short objectNumber; // size=0, offset=30
+	__int16 fallspeed; // size=0, offset=20
+	__int16 roomNumber; // size=0, offset=22
+	__int16 speed; // size=0, offset=24
+	__int16 counter; // size=0, offset=26
+	__int16 dirXrot; // size=0, offset=28
+	__int16 objectNumber; // size=0, offset=30
 };
 
 struct BUBBLE_STRUCT
 {
 	PHD_VECTOR pos; // size=12, offset=0
-	short roomNumber; // size=0, offset=12
-	short speed; // size=0, offset=14
-	short size; // size=0, offset=16
-	short dsize; // size=0, offset=18
+	__int16 roomNumber; // size=0, offset=12
+	__int16 speed; // size=0, offset=14
+	__int16 size; // size=0, offset=16
+	__int16 dsize; // size=0, offset=18
 	unsigned char shade; // size=0, offset=20
 	unsigned char vel; // size=0, offset=21
 	unsigned char yRot; // size=0, offset=22
-	char flags; // size=0, offset=23
-	short xVel; // size=0, offset=24
-	short yVel; // size=0, offset=26
-	short zVel; // size=0, offset=28
-	short pad; // size=0, offset=30
+	byte flags; // size=0, offset=23
+	__int16 xVel; // size=0, offset=24
+	__int16 yVel; // size=0, offset=26
+	__int16 zVel; // size=0, offset=28
+	__int16 pad; // size=0, offset=30
 };
 
 struct SPLASH_STRUCT
@@ -1015,20 +1015,20 @@ struct SPLASH_STRUCT
 	__int32 x; // size=0, offset=0
 	__int32 y; // size=0, offset=4
 	__int32 z; // size=0, offset=8
-	short innerRad; // size=0, offset=12
-	short innerSize; // size=0, offset=14
-	short innerRadVel; // size=0, offset=16
-	short innerYVel; // size=0, offset=18
-	short innerY; // size=0, offset=20
-	short middleRad; // size=0, offset=22
-	short middleSize; // size=0, offset=24
-	short middleRadVel; // size=0, offset=26
-	short middleYVel; // size=0, offset=28
-	short middleY; // size=0, offset=30
-	short outerRad; // size=0, offset=32
-	short outerSize; // size=0, offset=34
-	short outerRadVel; // size=0, offset=36
-	char flags; // size=0, offset=38
+	__int16 innerRad; // size=0, offset=12
+	__int16 innerSize; // size=0, offset=14
+	__int16 innerRadVel; // size=0, offset=16
+	__int16 innerYVel; // size=0, offset=18
+	__int16 innerY; // size=0, offset=20
+	__int16 middleRad; // size=0, offset=22
+	__int16 middleSize; // size=0, offset=24
+	__int16 middleRadVel; // size=0, offset=26
+	__int16 middleYVel; // size=0, offset=28
+	__int16 middleY; // size=0, offset=30
+	__int16 outerRad; // size=0, offset=32
+	__int16 outerSize; // size=0, offset=34
+	__int16 outerRadVel; // size=0, offset=36
+	byte flags; // size=0, offset=38
 	unsigned char life; // size=0, offset=39
 };
 
@@ -1054,7 +1054,7 @@ struct RIPPLE_STRUCT
 	__int32 x; // size=0, offset=0
 	__int32 y; // size=0, offset=4
 	__int32 z; // size=0, offset=8
-	char flags; // size=0, offset=12
+	byte flags; // size=0, offset=12
 	unsigned char life; // size=0, offset=13
 	unsigned char size; // size=0, offset=14
 	unsigned char init; // size=0, offset=15
@@ -1065,20 +1065,20 @@ struct SPLASH_SETUP
 	__int32 x; // size=0, offset=0
 	__int32 y; // size=0, offset=4
 	__int32 z; // size=0, offset=8
-	short innerRad; // size=0, offset=12
-	short innerSize; // size=0, offset=14
-	short innerRadVel; // size=0, offset=16
-	short innerYVel; // size=0, offset=18
-	short pad1; // size=0, offset=20
-	short middleRad; // size=0, offset=22
-	short middleSize; // size=0, offset=24
-	short middleRadVel; // size=0, offset=26
-	short middleYVel; // size=0, offset=28
-	short pad2; // size=0, offset=30
-	short outerRad; // size=0, offset=32
-	short outerSize; // size=0, offset=34
-	short outerRadVel; // size=0, offset=36
-	short pad3; // size=0, offset=38
+	__int16 innerRad; // size=0, offset=12
+	__int16 innerSize; // size=0, offset=14
+	__int16 innerRadVel; // size=0, offset=16
+	__int16 innerYVel; // size=0, offset=18
+	__int16 pad1; // size=0, offset=20
+	__int16 middleRad; // size=0, offset=22
+	__int16 middleSize; // size=0, offset=24
+	__int16 middleRadVel; // size=0, offset=26
+	__int16 middleYVel; // size=0, offset=28
+	__int16 pad2; // size=0, offset=30
+	__int16 outerRad; // size=0, offset=32
+	__int16 outerSize; // size=0, offset=34
+	__int16 outerRadVel; // size=0, offset=36
+	__int16 pad3; // size=0, offset=38
 };
 
 struct FIRE_LIST
@@ -1086,30 +1086,30 @@ struct FIRE_LIST
 	__int32 x; // size=0, offset=0
 	__int32 y; // size=0, offset=4
 	__int32 z; // size=0, offset=8
-	char on; // size=0, offset=12
-	char size; // size=0, offset=13
-	short room_number; // size=0, offset=14
+	byte on; // size=0, offset=12
+	byte size; // size=0, offset=13
+	__int16 room_number; // size=0, offset=14
 };
 
 struct FIRE_SPARKS
 {
-	short x; // size=0, offset=0
-	short y; // size=0, offset=2
-	short z; // size=0, offset=4
-	short xVel; // size=0, offset=6
-	short yVel; // size=0, offset=8
-	short zVel; // size=0, offset=10
-	short gravity; // size=0, offset=12
-	short rotAng; // size=0, offset=14
-	short flags; // size=0, offset=16
+	__int16 x; // size=0, offset=0
+	__int16 y; // size=0, offset=2
+	__int16 z; // size=0, offset=4
+	__int16 xVel; // size=0, offset=6
+	__int16 yVel; // size=0, offset=8
+	__int16 zVel; // size=0, offset=10
+	__int16 gravity; // size=0, offset=12
+	__int16 rotAng; // size=0, offset=14
+	__int16 flags; // size=0, offset=16
 	unsigned char sSize; // size=0, offset=18
 	unsigned char dSize; // size=0, offset=19
 	unsigned char size; // size=0, offset=20
 	unsigned char friction; // size=0, offset=21
 	unsigned char scalar; // size=0, offset=22
 	unsigned char def; // size=0, offset=23
-	char rotAdd; // size=0, offset=24
-	char maxYvel; // size=0, offset=25
+	byte rotAdd; // size=0, offset=24
+	byte maxYvel; // size=0, offset=25
 	unsigned char on; // size=0, offset=26
 	unsigned char sR; // size=0, offset=27
 	unsigned char sG; // size=0, offset=28
@@ -1131,28 +1131,28 @@ struct SMOKE_SPARKS
 	__int32 x; // size=0, offset=0
 	__int32 y; // size=0, offset=4
 	__int32 z; // size=0, offset=8
-	short Xvel; // size=0, offset=12
-	short Yvel; // size=0, offset=14
-	short Zvel; // size=0, offset=16
-	short Gravity; // size=0, offset=18
-	short RotAng; // size=0, offset=20
-	short Flags; // size=0, offset=22
+	__int16 Xvel; // size=0, offset=12
+	__int16 Yvel; // size=0, offset=14
+	__int16 Zvel; // size=0, offset=16
+	__int16 Gravity; // size=0, offset=18
+	__int16 RotAng; // size=0, offset=20
+	__int16 Flags; // size=0, offset=22
 	unsigned char sSize; // size=0, offset=24
 	unsigned char dSize; // size=0, offset=25
 	unsigned char Size; // size=0, offset=26
 	unsigned char Friction; // size=0, offset=27
 	unsigned char Scalar; // size=0, offset=28
 	unsigned char Def; // size=0, offset=29
-	char RotAdd; // size=0, offset=30
-	char MaxYvel; // size=0, offset=31
+	byte RotAdd; // size=0, offset=30
+	byte MaxYvel; // size=0, offset=31
 	unsigned char On; // size=0, offset=32
 	unsigned char sShade; // size=0, offset=33
 	unsigned char dShade; // size=0, offset=34
 	unsigned char Shade; // size=0, offset=35
 	unsigned char ColFadeSpeed; // size=0, offset=36
 	unsigned char FadeToBlack; // size=0, offset=37
-	char sLife; // size=0, offset=38
-	char Life; // size=0, offset=39
+	byte sLife; // size=0, offset=38
+	byte Life; // size=0, offset=39
 	unsigned char TransType; // size=0, offset=40
 	unsigned char FxObj; // size=0, offset=41
 	unsigned char NodeNumber; // size=0, offset=42
@@ -1164,25 +1164,25 @@ struct BLOOD_STRUCT
 	__int32 x; // size=0, offset=0
 	__int32 y; // size=0, offset=4
 	__int32 z; // size=0, offset=8
-	short Xvel; // size=0, offset=12
-	short Yvel; // size=0, offset=14
-	short Zvel; // size=0, offset=16
-	short Gravity; // size=0, offset=18
-	short RotAng; // size=0, offset=20
+	__int16 Xvel; // size=0, offset=12
+	__int16 Yvel; // size=0, offset=14
+	__int16 Zvel; // size=0, offset=16
+	__int16 Gravity; // size=0, offset=18
+	__int16 RotAng; // size=0, offset=20
 	unsigned char sSize; // size=0, offset=22
 	unsigned char dSize; // size=0, offset=23
 	unsigned char Size; // size=0, offset=24
 	unsigned char Friction; // size=0, offset=25
-	char RotAdd; // size=0, offset=26
+	byte RotAdd; // size=0, offset=26
 	unsigned char On; // size=0, offset=27
 	unsigned char sShade; // size=0, offset=28
 	unsigned char dShade; // size=0, offset=29
 	unsigned char Shade; // size=0, offset=30
 	unsigned char ColFadeSpeed; // size=0, offset=31
 	unsigned char FadeToBlack; // size=0, offset=32
-	char sLife; // size=0, offset=33
-	char Life; // size=0, offset=34
-	char Pad; // size=0, offset=35
+	byte sLife; // size=0, offset=33
+	byte Life; // size=0, offset=34
+	byte Pad; // size=0, offset=35
 };
 
 typedef struct SPOTCAM
@@ -1195,13 +1195,13 @@ typedef struct SPOTCAM
 	__int32 tz; // size=0, offset=20
 	unsigned char sequence; // size=0, offset=24
 	unsigned char camera; // size=0, offset=25
-	short fov; // size=0, offset=26
-	short roll; // size=0, offset=28
-	short timer; // size=0, offset=30
-	short speed; // size=0, offset=32
-	short flags; // size=0, offset=34
-	short roomNumber; // size=0, offset=36
-	short pad; // size=0, offset=38
+	__int16 fov; // size=0, offset=26
+	__int16 roll; // size=0, offset=28
+	__int16 timer; // size=0, offset=30
+	__int16 speed; // size=0, offset=32
+	__int16 flags; // size=0, offset=34
+	__int16 roomNumber; // size=0, offset=36
+	__int16 pad; // size=0, offset=38
 };
 
 typedef struct INVOBJ
@@ -1327,8 +1327,8 @@ struct BAT_STRUCT
 	__int16 speed; // size=0, offset=22
 	__int16 counter; // size=0, offset=24
 	__int16 laraTarget; // size=0, offset=26
-	char xTarget; // size=0, offset=28
-	char zTarget; // size=0, offset=29
+	byte xTarget; // size=0, offset=28
+	byte zTarget; // size=0, offset=29
 	byte on; // size=0, offset=30
 	byte flags; // size=0, offset=31
 };
@@ -1378,6 +1378,31 @@ typedef struct BOUNDING_BOX {
 struct QUAKE_CAMERA {
 	GAME_VECTOR spos;
 	GAME_VECTOR epos;
+};
+
+struct DOORPOS_DATA
+{
+	FLOOR_INFO* floor; // size=8, offset=0
+	FLOOR_INFO data; // size=8, offset=4
+	__int16 block; // size=0, offset=12
+};
+
+struct DOOR_DATA
+{
+	DOORPOS_DATA d1; // size=16, offset=0
+	DOORPOS_DATA d1flip; // size=16, offset=16
+	DOORPOS_DATA d2; // size=16, offset=32
+	DOORPOS_DATA d2flip; // size=16, offset=48
+	__int16 opened; // size=0, offset=64
+	__int16* dptr1; // size=0, offset=68
+	__int16* dptr2; // size=0, offset=72
+	__int16* dptr3; // size=0, offset=76
+	__int16* dptr4; // size=0, offset=80
+	byte dn1; // size=0, offset=84
+	byte dn2; // size=0, offset=85
+	byte dn3; // size=0, offset=86
+	byte dn4; // size=0, offset=87
+	ITEM_INFO* item; // size=144, offset=88
 };
 
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
