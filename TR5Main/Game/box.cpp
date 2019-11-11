@@ -103,7 +103,7 @@ __int16 __cdecl SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 	return (zone[item->boxNumber] == zone[targetItem->boxNumber]);
 }
 
-__int16 __cdecl AIGuard2(CREATURE_INFO* creature) 
+__int16 __cdecl AIGuard(CREATURE_INFO* creature) 
 {
 	__int32 random;
 
@@ -378,7 +378,7 @@ __int16 __cdecl CreatureTurn2(ITEM_INFO* item, __int16 maximumTurn)
 	return 0;
 }
 
-__int32 CreatureAnimation2(__int16 itemNumber, __int16 angle, __int16 tilt)
+__int32 __cdecl CreatureAnimation(__int16 itemNumber, __int16 angle, __int16 tilt)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->data == NULL)
@@ -837,18 +837,18 @@ void __cdecl TargetBox(LOT_INFO* LOT, __int16 boxNumber)
 	return;
 }
 
-__int32 __cdecl UpdateLOT(LOT_INFO* LOT, __int32 expansion)
+__int32 __cdecl UpdateLOT(LOT_INFO* LOT, __int32 depth)
 {
-	BOX_NODE* expand;
+	BOX_NODE* node;
 
 	if (LOT->requiredBox != NO_BOX && LOT->requiredBox != LOT->targetBox)
 	{
 		LOT->targetBox = LOT->requiredBox;
 
-		expand = &LOT->node[LOT->targetBox];
-		if (expand->nextExpansion == NO_BOX && LOT->tail != LOT->targetBox)
+		node = &LOT->node[LOT->targetBox];
+		if (node->nextExpansion == NO_BOX && LOT->tail != LOT->targetBox)
 		{
-			expand->nextExpansion = LOT->head;
+			node->nextExpansion = LOT->head;
 
 			if (LOT->head == NO_BOX)
 				LOT->tail = LOT->targetBox;
@@ -856,27 +856,24 @@ __int32 __cdecl UpdateLOT(LOT_INFO* LOT, __int32 expansion)
 			LOT->head = LOT->targetBox;
 		}
 
-		expand->searchNumber = ++LOT->searchNumber;
-		expand->exitBox = NO_BOX;
+		node->searchNumber = LOT->searchNumber++;
+		node->exitBox = NO_BOX;
 	}
 
-	return (SearchLOT(LOT, expansion));
+	return SearchLOT(LOT, depth);
 }
 
-__int32 __cdecl SearchLOT(LOT_INFO* LOT, __int32 expansion)
+__int32 __cdecl SearchLOT(LOT_INFO* LOT, __int32 depth)
 {
-	__int16 searchZone;
-	__int16* zone;
+	__int16* zone = GroundZones[FlipStatus + 2 * LOT->zone];
+	__int16 searchZone = zone[LOT->head];
 
-	zone = GroundZones[FlipStatus + 2 * LOT->zone];
-	searchZone = zone[LOT->head];
-
-	for (__int32 i = 0; i < expansion; i++)
+	for (__int32 i = 0; i < depth; i++)
 	{
 		if (LOT->head == NO_BOX)
 		{
 			LOT->tail = NO_BOX; 
-			return 0;
+			return false;
 		}
 
 		BOX_NODE* node = &LOT->node[LOT->head];
@@ -884,21 +881,20 @@ __int32 __cdecl SearchLOT(LOT_INFO* LOT, __int32 expansion)
 
 		__int32 index = box->overlapIndex & OVERLAP_INDEX;
 		bool done = false;
-
 		do
 		{
 			__int16 boxNumber = Overlaps[index++];
 			if (boxNumber & BOX_END_BIT)
 			{
-				done = 1;
+				done = true;
 				boxNumber &= boxNumber;
 			}
 
 			if (LOT->fly == NO_FLYING && searchZone != zone[boxNumber])
 				continue;
 
-			__int32 change = Boxes[boxNumber].height - box->height;
-			if (change > LOT->step || change < LOT->drop)
+			__int32 delta = Boxes[boxNumber].height - box->height;
+			if (delta > LOT->step || delta < LOT->drop)
 				continue;
 
 			BOX_NODE* expand = &LOT->node[boxNumber];
@@ -940,7 +936,7 @@ __int32 __cdecl SearchLOT(LOT_INFO* LOT, __int32 expansion)
 		node->nextExpansion = NO_BOX;
 	}
 
-	return 1;
+	return true;
 }
 
 __int32 __cdecl CreatureActive(__int16 itemNumber) 
@@ -950,14 +946,14 @@ __int32 __cdecl CreatureActive(__int16 itemNumber)
 	if (!(item->flags & IFLAG_KILLED) && (item->status & ITEM_INVISIBLE) == ITEM_INVISIBLE)
 	{
 		if (!EnableBaddieAI(itemNumber, 0))
-			return 0;
+			return false;
 		item->status = ITEM_ACTIVE;
 	}
 
-	return 1;
+	return true;
 }
 
-void __cdecl InitialiseCreature2(__int16 itemNumber) 
+void __cdecl InitialiseCreature(__int16 itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	ROOM_INFO* room = &Rooms[item->roomNumber];
@@ -1069,7 +1065,7 @@ __int32 CreatureVault(__int16 itemNum, __int16 angle, __int32 vault, __int32 shi
 	return vault;
 }
 
-void __cdecl GetAITarget2(CREATURE_INFO* creature)
+void __cdecl GetAITarget(CREATURE_INFO* creature)
 {
 	ITEM_INFO* enemy = creature->enemy;
 	__int16 enemyObjectNumber;
@@ -1109,7 +1105,7 @@ void __cdecl GetAITarget2(CREATURE_INFO* creature)
 		}
 		else
 		{
-			FindAITargetObject2(creature, ID_AI_PATROL1);
+			FindAITargetObject(creature, ID_AI_PATROL1);
 		}
 	}
 	else  if (item->aiBits & AMBUSH)
@@ -1136,7 +1132,7 @@ void __cdecl GetAITarget2(CREATURE_INFO* creature)
 		}
 		else
 		{
-			FindAITargetObject2(creature, ID_AI_AMBUSH);
+			FindAITargetObject(creature, ID_AI_AMBUSH);
 		}
 	} 
 	else if (item->aiBits & FOLLOW)
@@ -1150,7 +1146,7 @@ void __cdecl GetAITarget2(CREATURE_INFO* creature)
 		else if (item->hitStatus)
 			item->aiBits &= ~FOLLOW;
 		else if (enemyObjectNumber != ID_AI_FOLLOW)
-			FindAITargetObject2(creature, ID_AI_FOLLOW);
+			FindAITargetObject(creature, ID_AI_FOLLOW);
 		else if (abs(enemy->pos.xPos - item->pos.xPos) < 640 &&
 			abs(enemy->pos.zPos - item->pos.zPos) < 640 &&
 			abs(enemy->pos.yPos - item->pos.yPos) < 1280)
@@ -1161,7 +1157,7 @@ void __cdecl GetAITarget2(CREATURE_INFO* creature)
 	}
 }
 
-void __cdecl FindAITargetObject2(CREATURE_INFO* creature, __int16 objectNumber)
+void __cdecl FindAITargetObject(CREATURE_INFO* creature, __int16 objectNumber)
 {
 	ITEM_INFO* item = &Items[creature->itemNum];
 
@@ -1750,13 +1746,12 @@ void Inject_Box()
 	INJECT(0x0040B400, CreatureUnderwater);
 	INJECT(0x0040B2C0, CreatureFloat);
 	INJECT(0x004098B0, CalculateTarget);
-
-	/*+
+	INJECT(0x0040A1D0, CreatureAnimation);
+	INJECT(0x00408550, InitialiseCreature);
 	INJECT(0x0040C070, FindAITargetObject);
 	INJECT(0x0040BBE0, AIGuard);
-	//INJECT(0x0040AE90, CreatureTurn);+
-	INJECT(0x00408550, InitialiseCreature);
 	INJECT(0x0040BCC0, GetAITarget);
-	INJECT(0x0040C070, FindAITargetObject);
-	INJECT(0x0040A1D0, CreatureAnimation);*/
+
+	/*+
+	//INJECT(0x0040AE90, CreatureTurn);+*/
 }

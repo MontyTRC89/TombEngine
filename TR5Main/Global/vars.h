@@ -54,10 +54,7 @@
 #define Lara						VAR_U_(0x00E5BD60, LARA_INFO)
 #define LaraDrawType				VAR_U_(0x00EEEAD0, __int8)
 #define Hairs						ARRAY_(0x00E5C000, HAIR_STRUCT, [14])
-#define SequenceUsed				ARRAY_(0x00E4EA78, __int8, [6])
-#define SequenceResults				ARRAY_(0x00E4EA80, __int8, [27])
 #define gfNumMips					VAR_U_(0x0051CE37, __int8)
-#define CurrentSequence				VAR_U_(0x00E4EA61, __int8)
 #define Frames						VAR_U_(0x00875174, __int16*)
 #define gfMips						ARRAY_(0x00E5C2C0, __int8, [8])
 #define OldPickupPos				VAR_U_(0x00E59700, GAME_VECTOR)
@@ -267,7 +264,6 @@
 #define LastFOV						VAR_U_(0x00E4F506, __int16)
 #define InitialCameraPosition		VAR_U_(0x00E4F3D0, PHD_VECTOR)
 #define InitialCameraTarget			VAR_U_(0x00E4F350, PHD_VECTOR)
-#define CurrentSequence				VAR_U_(0x00E4F502, __int16)
 #define CurrentSplinePosition		VAR_U_(0x00E51F28, __int32)
 #define SplineToCamera				VAR_U_(0x00E4F48C, __int32)
 #define FirstCamera					VAR_U_(0x00E51F24, __int16)
@@ -295,6 +291,8 @@
 #define ShatterItem					VAR_U_(0x00EEFAE0, SHATTER_ITEM)
 #define Unk_00EEFB6C				VAR_U_(0x00EEFB6C, __int16)
 #define OnObject					VAR_U_(0x00EEEAC8, __int32)
+#define DontUnlockBox				VAR_U_(0x0051CB40, byte)
+#define CurrentSpotcamSequence		VAR_U_(0x00E4F502, __int16)
 
 extern bool MonksAttackLara;
 

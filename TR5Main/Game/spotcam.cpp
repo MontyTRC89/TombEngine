@@ -101,7 +101,7 @@ void __cdecl InitialiseSpotCam(__int16 Sequence)
 	LaraFixedPosition.y = LaraItem->pos.yPos;
 	LaraFixedPosition.z = LaraItem->pos.zPos;
 
-	CurrentSequence = Sequence;
+	CurrentSpotcamSequence = Sequence;
 	CurrentSplineCamera = 0;
 
 	for (i = 0; i < SpotCamRemap[Sequence]; i++)

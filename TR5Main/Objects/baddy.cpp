@@ -163,7 +163,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 		if (item->triggerFlags % 1000 > 100)
 		{
 			item->itemFlags[0] = -80;
-			SameZoneAIObject(creature, ID_AI_X1);
+			FindAITargetObject(creature, ID_AI_X1);
 		}
 		item->triggerFlags = 1000 * (item->triggerFlags / 1000);
 	}

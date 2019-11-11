@@ -9,6 +9,7 @@
 #include "sphere.h"
 #include "debris.h"
 #include "control.h"
+#include "switch.h"
 
 __int32 lastWaterfallY = 0;
 __int16 TightRopeBounds[12] = 
