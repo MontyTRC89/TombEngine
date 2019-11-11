@@ -113,6 +113,12 @@ void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
 		creature->LOT.drop = -256;
 		creature->LOT.isAmphibious = false;
 		break;
+
+	case ID_APE:
+		creature->LOT.step = 512;
+		creature->LOT.drop = -512;
+		creature->LOT.zone = 3;
+		break;
 	}
 }
 
