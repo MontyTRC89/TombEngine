@@ -172,7 +172,7 @@ void __cdecl LoadObjects()
 {
 	DB_Log(2, "LoadObjects - DLL");
 	 
-	memset(Objects, 0, sizeof(OBJECT_INFO) * NUM_OBJECTS);
+	memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
 	memset(StaticObjects, 0, sizeof(STATIC_INFO) * NUM_STATICS);
 
 	__int32 numMeshDataWords = ReadInt32();
@@ -265,7 +265,7 @@ void __cdecl LoadObjects()
 	if (LaraDrawType != LARA_DIVESUIT)
 		CreateSkinningData();
 
-	for (__int32 i = 0; i < NUM_OBJECTS; i++)
+	for (__int32 i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
 		Objects[i].meshIndex *= 2;
 	}
@@ -809,9 +809,9 @@ void LoadSprites()
 		__int32 spriteID = ReadInt32();
 		__int16 negLength = ReadInt16();
 		__int16 offset = ReadInt16();
-		if (spriteID >= NUM_OBJECTS)
+		if (spriteID >= ID_NUMBER_OBJECTS)
 		{
-			StaticObjects[spriteID - NUM_OBJECTS].meshNumber = offset;
+			StaticObjects[spriteID - ID_NUMBER_OBJECTS].meshNumber = offset;
 		}
 		else
 		{

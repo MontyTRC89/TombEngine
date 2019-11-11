@@ -113,7 +113,7 @@ void Renderer11::FreeRendererData()
 {
 	m_meshPointersToMesh.clear();
 
-	for (__int32 i = 0; i < NUM_OBJECTS; i++)
+	for (__int32 i = 0; i < ID_NUMBER_OBJECTS; i++)
 		DX11_DELETE(m_moveableObjects[i]);
 	free(m_moveableObjects);
 
@@ -121,7 +121,7 @@ void Renderer11::FreeRendererData()
 		DX11_DELETE(m_sprites[i]);
 	free(m_sprites);
 
-	for (__int32 i = 0; i < NUM_OBJECTS; i++)
+	for (__int32 i = 0; i < ID_NUMBER_OBJECTS; i++)
 		DX11_DELETE(m_spriteSequences[i]);
 	free(m_spriteSequences);
 
@@ -1773,11 +1773,11 @@ bool Renderer11::drawAllStrings()
 
 bool Renderer11::PrepareDataForTheRenderer()
 {
-	m_moveableObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_OBJECTS);
-	ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * NUM_OBJECTS);
+	m_moveableObjects = (RendererObject**)malloc(sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
+	ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
 
-	m_spriteSequences = (RendererSpriteSequence**)malloc(sizeof(RendererSpriteSequence*) * NUM_OBJECTS);
-	ZeroMemory(m_spriteSequences, sizeof(RendererSpriteSequence*) * NUM_OBJECTS);
+	m_spriteSequences = (RendererSpriteSequence**)malloc(sizeof(RendererSpriteSequence*) * ID_NUMBER_OBJECTS);
+	ZeroMemory(m_spriteSequences, sizeof(RendererSpriteSequence*) * ID_NUMBER_OBJECTS);
 
 	m_staticObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_STATICS);
 	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);

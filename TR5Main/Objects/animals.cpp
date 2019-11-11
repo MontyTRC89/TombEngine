@@ -939,7 +939,7 @@ void __cdecl BarracudaControl(__int16 itemNum)
 		}
 	}
 
-	CreatureJoint(item, head, 0);
+	CreatureJoint(item, 0, head);
 
 	CreatureAnimation(itemNum, angle, 0);
 	CreatureUnderwater(item, STEP_SIZE);
@@ -1275,7 +1275,7 @@ void __cdecl CobraControl(__int16 itemNum)
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, head >> 1);
 	CreatureJoint(item, 1, head >> 1);
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNum, angle, tilt);
 }
 
 void __cdecl RaptorControl(__int16 itemNum)
@@ -1701,44 +1701,47 @@ void __cdecl BearControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	__int16 head = 0;
-	__int16 angle;
+	__int16 angle = 0;
 
 	if (item->hitPoints <= 0)
 	{
 		angle = CreatureTurn(item, ANGLE(1));
 
-		switch (item->currentAnimState)
+		if (item->currentAnimState != 9)
 		{
-		case 2:
-		{
-			item->goalAnimState = 4;
-			break;
-		}
-
-		case 3:
-		case 0:
-			item->goalAnimState = 1;
-			break;
-
-		case 4:
-			creature->flags = 1;
-			item->goalAnimState = 9;
-			break;
-
-		case 1:
-			creature->flags = 0;
-			item->goalAnimState = 9;
-			break;
-
-		case 9:
-			if (creature->flags && (item->touchBits & 0x2406C))
+			switch (item->currentAnimState)
 			{
-				LaraItem->hitPoints -= 200;
-				LaraItem->hitStatus = 1;
-				creature->flags = 0;
-			}
+				case 2:
+					item->goalAnimState = 4;
+					break;
+				case 3:
+				case 0:
+					item->goalAnimState = 1;
+					break;
 
-			break;
+				case 4:
+					creature->flags = 1;
+					item->goalAnimState = 9;
+					break;
+
+				case 1:
+					creature->flags = 0;
+					item->goalAnimState = 9;
+					break;
+
+				case 9:
+					if (creature->flags && (item->touchBits & 0x2406C))
+					{
+						LaraItem->hitPoints -= 200;
+						LaraItem->hitStatus = 1;
+						creature->flags = 0;
+					}
+
+					item->animNumber = Objects[item->objectNumber].animIndex + 20;
+					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->currentAnimState = 9;
+					break;
+			}
 		}
 	}
 	else
@@ -2090,7 +2093,6 @@ void __cdecl WolfControl(__int16 itemNum)
 
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, head);
-
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
@@ -3762,9 +3764,9 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature  = (CREATURE_INFO*)item->data;
 	
-	__int16 torsoX = 0;
+	__int16 headX = 0;
+	__int16 headY = 0;
 	__int16 torsoY = 0;
-	__int16 head = 0;
 	__int16 angle = 0;
 	__int16 tilt = 0;
 	__int32 x = 0;
@@ -3878,11 +3880,11 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 
-			head = laraInfo.angle;
+			torsoY = laraInfo.angle;
 
 			if (item->aiBits & GUARD)
 			{
-				head = AIGuard(creature);
+				torsoY = AIGuard(creature);
 				if (!(GetRandomControl() & 0xF))
 				{
 					if (GetRandomControl() & 0x1)
@@ -3934,11 +3936,11 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 
-			head = laraInfo.angle;
+			torsoY = laraInfo.angle;
 
 			if (item->aiBits & GUARD)
 			{
-				head = AIGuard(creature);
+				torsoY = AIGuard(creature);
 				if (!(GetRandomControl() & 15))
 				{
 					if (GetRandomControl() & 1)
@@ -4074,13 +4076,13 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 			break;
 
 		case 2:
-			head = laraInfo.angle;
+			torsoY = laraInfo.angle;
 			creature->maximumTurn = ANGLE(7);
 
 			if (item->aiBits & PATROL1)
 			{
 				item->goalAnimState = 2;
-				head = 0;
+				torsoY = 0;
 			}
 			else if (creature->mood == ESCAPE_MOOD)
 				item->goalAnimState = 4;
@@ -4098,7 +4100,7 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 
 		case 4:
 			if (info.ahead)
-				head = info.angle;
+				torsoY = info.angle;
 
 			creature->maximumTurn = ANGLE(11);
 			tilt = angle / 2;
@@ -4125,8 +4127,8 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 		case 12:
 			if (info.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				headY = info.angle;
+				headX = info.xAngle;
 			}
 
 			creature->maximumTurn = 0;
@@ -4169,8 +4171,8 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 		case 13:
 			if (info.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				headY = info.angle;
+				headX = info.xAngle;
 			}
 
 			creature->maximumTurn = 0;
@@ -4213,8 +4215,8 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 		case 14:
 			if (info.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				headY = info.angle;
+				headX = info.xAngle;
 			}
 
 			creature->maximumTurn = 0;
@@ -4258,9 +4260,9 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, torsoY);
-	CreatureJoint(item, 1, torsoX);
-	CreatureJoint(item, 2, head);
+	CreatureJoint(item, 0, headY);
+	CreatureJoint(item, 1, headX);
+	CreatureJoint(item, 2, torsoY);
 
 	if (item->currentAnimState < 15) 
 	{
@@ -4312,6 +4314,6 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 	else
 	{
 		creature->maximumTurn = 0;
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }
