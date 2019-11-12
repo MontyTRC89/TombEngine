@@ -3,15 +3,29 @@
 #include "setup.h"
 #include "..\Game\draw.h"
 #include "..\Game\collide.h"
+#include "..\Game\effect2.h"
+#include "..\Game\effects.h"
 #include "..\Game\Box.h"
 #include "..\Game\switch.h"
 #include "..\Game\missile.h"
 #include "..\Game\control.h"
 #include "..\Game\pickup.h"
 #include "..\Game\lara1gun.h"
+#include "..\Game\laraflar.h"
+#include "..\Game\larafire.h"
+#include "..\Game\laramisc.h"
 #include "..\Game\objects.h"
 #include "..\Game\door.h"
+#include "..\Game\rope.h"
+#include "..\Game\traps.h"
+#include "..\Objects\oldobjects.h"
 #include "..\Objects\newobjects.h"
+
+#include "..\Game\lion.h"
+#include "..\Game\mafia.h"
+#include "..\Game\rat.h"
+#include "..\Game\hydra.h"
+#include "..\Game\guardian.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1408,7 +1422,7 @@ void __cdecl BaddyObjects()
 		obj->biteOffset = 7;
 		obj->initialise = InitialiseArmedBaddy2;
 		obj->collision = CreatureCollision;
-		obj->control = ControlArmedBaddy2;
+		obj->control = ArmedBaddy2Control;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 26;
@@ -2374,10 +2388,9 @@ void __cdecl ObjectObjects()
 	obj = &Objects[ID_FLARE_ITEM];
 	if (obj->loaded)
 	{
-		obj->initialise = NULL;
 		obj->collision = PickupCollision;
 		obj->control = FlareControl;
-		obj->drawRoutine = DrawFlare;
+		obj->drawRoutine = DrawFlareItem;
 		obj->pivotLength = 256;
 		obj->hitPoints = 256;
 	}
@@ -2385,29 +2398,13 @@ void __cdecl ObjectObjects()
 	obj = &Objects[ID_BURNING_TORCH_ITEM];
 	if (obj->loaded)
 	{
-		obj->initialise = NULL;
 		obj->control = TorchControl;
-	}
-
-	obj = &Objects[ID_CHAFF];
-	if (obj->loaded)
-	{
-		obj->control = ChaffControl;
 	}
 
 	obj = &Objects[ID_TORPEDO];
 	if (obj->loaded)
 	{
 		obj->control = TorpedoControl;
-	}
-
-	obj = &Objects[ID_CROSSBOW_BOLT];
-	if (obj->loaded)
-	{
-		obj->initialise = NULL;
-		obj->collision = NULL;
-		obj->control = ControlCrossbowOrGrapplingBolt;
-		obj->drawRoutine = DrawCrossbowOrGrapplingBolt;
 	}
 
 	{
@@ -2528,13 +2525,6 @@ void __cdecl ObjectObjects()
 		obj->control = SteelDoorControl;
 	}
 
-	obj = &Objects[ID_HEADSET_TALKING_POINT];
-	if (obj->loaded)
-	{
-		obj->drawRoutine = NULL;
-		obj->control = HeadSetTalkingPointControl;
-	}
-
 	/*
 	v25 = 0;
 	do
@@ -2553,22 +2543,6 @@ void __cdecl ObjectObjects()
 		obj->initialise = InitialiseXRayMachine;
 		obj->control = ControlXRayMachine;
 		obj->drawRoutine = NULL;
-	}
-
-	obj = &Objects[ID_SHOOT_SWITCH1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseGrapplingGunSwitch;
-		obj->collision = GrapplingGunTargetCollision;
-		obj->control = AnimatingControl;
-	}
-
-	obj = &Objects[ID_SHOOT_SWITCH2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseGrapplingGunSwitch;
-		obj->collision = GrapplingGunTargetCollision;
-		obj->control = AnimatingControl;
 	}
 
 	// by default loaded, explosion time :D
@@ -2928,14 +2902,14 @@ void __cdecl PickupObjects()
 	INIT_PICKUP(ID_PUZZLE_ITEM7_COMBO2);
 	INIT_PICKUP(ID_PUZZLE_ITEM8_COMBO1);
 	INIT_PICKUP(ID_PUZZLE_ITEM8_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM1);
-	INIT_PICKUP(ID_PUZZLE_ITEM2);
-	INIT_PICKUP(ID_PUZZLE_ITEM3);
-	INIT_PICKUP(ID_PUZZLE_ITEM4);
-	INIT_PICKUP(ID_PUZZLE_ITEM5);
-	INIT_PICKUP(ID_PUZZLE_ITEM6);
-	INIT_PICKUP(ID_PUZZLE_ITEM7);
-	INIT_PICKUP(ID_PUZZLE_ITEM8);
+	INIT_PICKUP(ID_KEY_ITEM1);
+	INIT_PICKUP(ID_KEY_ITEM2);
+	INIT_PICKUP(ID_KEY_ITEM3);
+	INIT_PICKUP(ID_KEY_ITEM4);
+	INIT_PICKUP(ID_KEY_ITEM5);
+	INIT_PICKUP(ID_KEY_ITEM6);
+	INIT_PICKUP(ID_KEY_ITEM7);
+	INIT_PICKUP(ID_KEY_ITEM8);
 	INIT_PICKUP(ID_KEY_ITEM1_COMBO1);
 	INIT_PICKUP(ID_KEY_ITEM1_COMBO2);
 	INIT_PICKUP(ID_KEY_ITEM2_COMBO1);

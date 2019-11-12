@@ -11,7 +11,8 @@
 #define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
 #define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 #define Sub_0042A050 ((void (__cdecl*)()) 0x0042A050)  
-#define IsRoomOutside ((__int32 (__cdecl*)(__int32, __int32, __int32)) 0x00418E90)  
+#define IsRoomOutside ((__int32 (__cdecl*)(__int32, __int32, __int32)) 0x00418E90) 
+#define DrawBaddieGunFlash ((void (__cdecl*)(ITEM_INFO*)) 0x00466880)
 
 __int32 __cdecl DrawPhaseGame();
 __int32 __cdecl GetFrame_D2(ITEM_INFO* item, __int16* framePtr[], __int32* rate);
