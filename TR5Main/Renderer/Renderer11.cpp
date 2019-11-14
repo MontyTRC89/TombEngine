@@ -16,6 +16,7 @@
 #include "..\Game\rope.h"
 #include "..\Game\items.h"
 #include "..\Game\camera.h"
+#include "..\Game\healt.h"
 
 #include <D3Dcompiler.h>
 #include <chrono> 
@@ -23,11 +24,6 @@
 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
-
-extern GameConfiguration g_Configuration;
-extern GameFlow* g_GameFlow;
-extern __int32 NumTextureTiles;
-extern Inventory* g_Inventory;
 
 __int32 SortLightsFunction(RendererLight* a, RendererLight* b)
 {

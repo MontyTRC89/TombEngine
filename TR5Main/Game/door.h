@@ -1,4 +1,5 @@
 #pragma once
+
 #include "..\Global\global.h"
 
 void __cdecl SequenceDoorControl(__int16 itemNumber);

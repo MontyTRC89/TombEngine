@@ -36,11 +36,12 @@
 #define RefreshCamera ((void (__cdecl*)(__int16, __int16*)) 0x004165E0)
 #define DoFlipMap ((void (__cdecl*)(__int16)) 0x00418910)
 //#define SwitchTrigger ((__int32 (__cdecl*)(__int16, __int16)) 0x0047D670)
-#define KeyTrigger ((__int32 (__cdecl*)(__int16)) 0x00469550)
-#define PickupTrigger ((__int32 (__cdecl*)(__int16)) 0x004695E0)
+//#define KeyTrigger ((__int32 (__cdecl*)(__int16)) 0x00469550)
+//#define PickupTrigger ((__int32 (__cdecl*)(__int16)) 0x004695E0)
 #define PlaySoundTrack ((void (__cdecl*)(__int16, __int16)) 0x00418B90)
 #define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, __int32)) 0x004159F0)
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)
+#define ObjectOnLOS2 ((__int32 (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
 //#define AnimateWaterfalls ((void (__cdecl*)()) 0x00465DF0)
 
 GAME_STATUS __cdecl DoTitle(__int32 index);
