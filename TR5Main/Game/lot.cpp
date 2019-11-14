@@ -161,6 +161,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	{
 	case ID_MP_WITH_STICK:
 	case ID_MONKEY:
+	case ID_YETI:
 		// Can climb
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;

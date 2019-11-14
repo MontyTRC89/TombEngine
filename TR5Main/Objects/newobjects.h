@@ -78,6 +78,9 @@ void __cdecl InitialiseKillerStatue(__int16 itemNum);
 void __cdecl KillerStatueControl(__int16 itemNum);
 void __cdecl SpringBoardControl(__int16 itemNum);
 void __cdecl RatControl(__int16 itemNum);
+void __cdecl SilencerControl(__int16 itemNum);
+void __cdecl InitialiseYeti(short itemNum);
+void __cdecl YetiControl(short itemNum);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
