@@ -44,9 +44,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Revolver */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(60), ANGLE(60) },
-		{ -ANGLE(10), ANGLE(10), -ANGLE(80), ANGLE(80) },
-		{  ANGLE(0),  ANGLE(0),   ANGLE(0),  ANGLE(0) },
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(60), +ANGLE(60) },
+		{ -ANGLE(10), +ANGLE(10), -ANGLE(80), +ANGLE(80) },
+		{  ANGLE(0),   ANGLE(0),   ANGLE(0),   ANGLE(0) },
 		ANGLE(10),
 		ANGLE(4),
 		650,
@@ -179,9 +179,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Rocket launcher */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -243,24 +243,25 @@ void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 
 	/* move y axis */
 	rotY = arm->yRot;
-	if ((rotY >= y - speed) && (rotY <= y + speed))
+	if ((rotY >= (y - speed)) && (rotY <= (y + speed)))
 		rotY = y;
 	else if (rotY < speed)
 		rotY += speed;
 	else
 		rotY -= speed;
+	arm->yRot = rotY;
 
 	/* move x axis */
 	rotX = arm->xRot;
-	if ((rotX >= x - speed) && (rotX <= x + speed))
+	if ((rotX >= (x - speed)) && (rotX <= (x + speed)))
 		rotX = x;
 	else if (rotX < x)
 		rotX += speed;
 	else
 		rotX -= speed;
-
 	arm->xRot = rotX;
-	arm->yRot = rotY;
+
+	/* move z axis */
 	arm->zRot = 0;
 }
 
@@ -418,7 +419,7 @@ void __cdecl LaraGun()
 		break;
 
 	case LG_UNDRAW_GUNS:
-		Lara.meshPtrs[HEAD] = Meshes[Objects[ID_LARA].meshIndex + 28];
+		Lara.meshPtrs[HEAD] = Meshes[Objects[ID_LARA].meshIndex + 14 * 2];
 
 		switch (Lara.gunType)
 		{
@@ -447,10 +448,11 @@ void __cdecl LaraGun()
 		break;
 
 	case LG_READY:
-		meshIndex = Objects[ID_LARA_SCREAM].meshIndex;
 		if (!(TrInput & IN_ACTION))
 			meshIndex = Objects[ID_LARA].meshIndex;
-		Lara.meshPtrs[HEAD] = Meshes[meshIndex + 28];
+		else
+			meshIndex = Objects[ID_LARA_SCREAM].meshIndex;
+		Lara.meshPtrs[HEAD] = Meshes[meshIndex + 14 * 2];
 		
 		if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA && Camera.type != CAMERA_TYPE::LOOK_CAMERA &&
 			Camera.type != CAMERA_TYPE::HEAVY_CAMERA)

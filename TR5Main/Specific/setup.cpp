@@ -1077,6 +1077,25 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
+
+	obj = &Objects[ID_YETI];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseYeti;
+		obj->collision = CreatureCollision;
+		obj->control = YetiControl;
+		obj->hitPoints = 30;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->radius = 128;
+		obj->pivotLength = 100;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
+		Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
+	}
 }
 
 // TODO: check for all the flags, some is surely missing.
@@ -1096,6 +1115,8 @@ void __cdecl BaddyObjects()
 	obj->savePosition = true;
 	obj->usingDrawanimatingItem = false;
 
+	// TODO: dummy slot test for other entity, need to be uncommented later, when the Objects[] is augmented !
+	/*
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
@@ -1117,6 +1138,7 @@ void __cdecl BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
+	*/
 
 	obj = &Objects[ID_BLUE_GUARD];
 	if (obj->loaded)
@@ -2972,7 +2994,87 @@ void __cdecl PickupObjects()
 
 void __cdecl CustomObjects()
 {
+	/*
+	obj = &Objects[ID_GOON_SILENCER1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = SilencerControl;
+		obj->hitPoints = 25;
+		obj->biteOffset = 0;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->radius = 102;
+		obj->pivotLength = 50;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+	}
 
+	obj = &Objects[ID_GOON_SILENCER2];
+	if (obj->loaded)
+	{
+		if (Objects[ID_GOON_SILENCER1].loaded)
+		{
+			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
+			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
+		}
+		else
+		{
+			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
+		}
+
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = SilencerControl;
+		obj->hitPoints = 25;
+		obj->biteOffset = 0;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->radius = 102;
+		obj->pivotLength = 50;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_GOON_SILENCER3];
+	if (obj->loaded)
+	{
+		if (Objects[ID_GOON_SILENCER1].loaded)
+		{
+			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
+			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
+		}
+		else
+		{
+			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
+		}
+
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = SilencerControl;
+		obj->hitPoints = 25;
+		obj->biteOffset = 0;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->radius = 102;
+		obj->pivotLength = 50;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+	}
+	*/
 }
 
 void __cdecl InitialiseObjects()

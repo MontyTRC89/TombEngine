@@ -49,9 +49,9 @@ typedef enum object_types {
 	ID_LARSON,
 	ID_SMALL_SCORPION, // TR4 - OK
 	ID_PIERRE,
-	ID_BAT, // TR4 - OK - Needs testing
+	ID_BAT, // TR4 - OK - (Problem of pathfinding)
 	ID_MAFIA,
-	ID_GUIDE, // TR4 - OK - Needs testing
+	ID_GUIDE, // TR4 - OK - Needs testing (need custom level)
 	ID_MAFIA2,
 	ID_SPHINX, // TR4 - OK - Needs testing
 	ID_SAILOR,
@@ -117,7 +117,7 @@ typedef enum object_types {
 	ID_SCALING_TRAPDOOR,
 	ID_ROLLINGBALL,
 	ID_ROLLINGBARREL,
-	ID_SPIKY_CEILING, // TR3 - 116 - OK needs testing
+	ID_SPIKY_CEILING, // TR3 - OK
 	ID_TEETH_SPIKES,
 	ID_ROME_HAMMER,
 	ID_HAMMER2,
@@ -520,5 +520,6 @@ typedef enum object_types {
 	ID_CLOCKWORK_BEETLE, // TR4
 	ID_CLOCKWORK_BEETLE_COMBO1, // TR4
 	ID_CLOCKWORK_BEETLE_COMBO2, // TR4
+	//ID_GOON_SILENCER, // TR2 - ON
 	ID_NUMBER_OBJECTS, // ALWAYS IN THE END
 } GAME_OBJECT_ID;
