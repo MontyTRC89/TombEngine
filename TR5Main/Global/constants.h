@@ -43,6 +43,7 @@
 #define MAX_SPRITES			16384
 #define NO_ROOM				0xFF
 #define NO_HEIGHT			(-0x7F00)
+#define NUM_PICKUPS			64
 
 #define	TIMID				0
 #define VIOLENT				1

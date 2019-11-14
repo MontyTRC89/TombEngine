@@ -382,7 +382,7 @@ void __cdecl InitialiseNewWeapon()
 		Lara.rightArm.frameBase = Objects[ID_FLARE_ANIM].frameBase;
 		Lara.leftArm.frameBase = Objects[ID_FLARE_ANIM].frameBase;
 		if (Lara.gunStatus)
-			DrawFlaresMeshes();
+			DrawFlareMeshes();
 		break;
 
 	default:

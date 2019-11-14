@@ -561,7 +561,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_GRENADE_ITEM];
 	if (obj->loaded)
 	{
-		obj->collision = PickupCollision;
+		obj->collision = PickUpCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -569,7 +569,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_GRENADE_AMMO1_ITEM];
 	if (obj->loaded)
 	{
-		obj->collision = PickupCollision;
+		obj->collision = PickUpCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -577,7 +577,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_GRENADE_AMMO2_ITEM];
 	if (obj->loaded)
 	{
-		obj->collision = PickupCollision;
+		obj->collision = PickUpCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -585,7 +585,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_GRENADE_AMMO3_ITEM];
 	if (obj->loaded)
 	{
-		obj->collision = PickupCollision;
+		obj->collision = PickUpCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -593,7 +593,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_CROSSBOW_AMMO3_ITEM];
 	if (obj->loaded)
 	{
-		obj->collision = PickupCollision;
+		obj->collision = PickUpCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -608,7 +608,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_HARPOON_ITEM];
 	if (obj->loaded)
 	{
-		obj->collision = PickupCollision;
+		obj->collision = PickUpCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -616,7 +616,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_HARPOON_AMMO_ITEM];
 	if (obj->loaded)
 	{
-		obj->collision = PickupCollision;
+		obj->collision = PickUpCollision;
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
@@ -789,8 +789,8 @@ void __cdecl NewObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialisePickup;
-		obj->control = PickupControl;
-		obj->collision = PickupCollision;
+		obj->control = PickUpControl;
+		obj->collision = PickUpCollision;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
@@ -799,8 +799,8 @@ void __cdecl NewObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialisePickup;
-		obj->control = PickupControl;
-		obj->collision = PickupCollision;
+		obj->control = PickUpControl;
+		obj->collision = PickUpCollision;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
