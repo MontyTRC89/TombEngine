@@ -605,8 +605,8 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 							// Item is inside the radius and must explode
 							if (item->objectNumber < ID_SMASH_OBJECT1 || item->objectNumber > ID_SMASH_OBJECT8 || (currentItem->flags & 0x40))
 							{
-								if (currentItem->objectNumber != ID_SWITCH_TYPE7 &&
-									currentItem->objectNumber != ID_SWITCH_TYPE8 ||
+								if (currentItem->objectNumber != ID_SHOOT_SWITCH1 &&
+									currentItem->objectNumber != ID_SHOOT_SWITCH2 ||
 									currentItem->flags & 0x40 &&
 									(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem))
 								{
@@ -638,9 +638,9 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 									}
 								}
 
-								if (currentItem->objectNumber == ID_SWITCH_TYPE7)
+								if (currentItem->objectNumber == ID_SHOOT_SWITCH1)
 								{
-									ExplodeItemNode(currentItem, Objects[ID_SWITCH_TYPE7].nmeshes - 1, 0, 64);
+									ExplodeItemNode(currentItem, Objects[ID_SHOOT_SWITCH1].nmeshes - 1, 0, 64);
 								}
 
 								AddActiveItem((currentItem - Items) / sizeof(ITEM_INFO));
@@ -1129,7 +1129,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 						// Item is inside the radius and must explode
 						if (item->objectNumber < ID_SMASH_OBJECT1 || item->objectNumber > ID_SMASH_OBJECT8)
 						{
-							if (currentItem->objectNumber == ID_SWITCH_TYPE7 || currentItem->objectNumber == ID_SWITCH_TYPE8)
+							if (currentItem->objectNumber == ID_SHOOT_SWITCH1 || currentItem->objectNumber == ID_SHOOT_SWITCH2)
 								CrossbowHitSwitchType78(item, currentItem, 0);
 							else if (Objects[item->objectNumber].hitEffect)
 								DoGrenadeDamageOnBaddie(currentItem, item);
@@ -1146,7 +1146,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 							KillItem(currentItemNumber);
 						}
 					}
-					else if (currentItem->objectNumber == ID_SWITCH_TYPE7 || currentItem->objectNumber == ID_SWITCH_TYPE8)
+					else if (currentItem->objectNumber == ID_SHOOT_SWITCH1 || currentItem->objectNumber == ID_SHOOT_SWITCH2)
 					{
 						// Special case for ID_SWITCH_TYPE7 and ID_SWITCH_TYPE8
 						CrossbowHitSwitchType78(item, currentItem, 1);

@@ -31,6 +31,8 @@
 #include <process.h>
 #include <stdio.h>
 
+__int32 KeyTriggerActive;
+
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 
@@ -438,7 +440,7 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	{
 		// Initialise items, effects, lots, camera
 		InitialiseFXArray(true);
-		InitialisePickUpDisplay();
+		InitialisePickupDisplay();
 		InitialiseCamera();
 		SOUND_Stop();
 
@@ -518,7 +520,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
-	InitialisePickUpDisplay();
+	InitialisePickupDisplay();
 	InitialiseCamera();
 	SOUND_Stop();
 
@@ -1118,6 +1120,16 @@ void __cdecl UpdateSky()
 			SkyPos2 -= 9728;
 		}
 	}
+}
+
+void __cdecl ActivateKey()
+{
+	KeyTriggerActive = 1;
+}
+
+void __cdecl ActivateCamera()
+{
+	KeyTriggerActive = 2;
 }
 
 void Inject_Control()

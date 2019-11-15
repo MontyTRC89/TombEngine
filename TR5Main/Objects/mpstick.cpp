@@ -505,6 +505,6 @@ void MPStickControl(__int16 itemNumber)
 	else
 	{
 		creature->maximumTurn = 0;
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

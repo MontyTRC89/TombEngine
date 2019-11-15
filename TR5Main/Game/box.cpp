@@ -958,7 +958,7 @@ void __cdecl InitialiseCreature(__int16 itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	ROOM_INFO* room = &Rooms[item->roomNumber];
 
-	item->hitStatus = true;
+	item->collidable = true;
 	item->data = NULL;
 	item->drawRoom = (((item->pos.zPos - room->z) / 1024) & 0xFF) | (((item->pos.xPos - room->mesh->x) / 4) & 0xFF00);
 	item->TOSSPAD = item->pos.yRot & 0xE000;

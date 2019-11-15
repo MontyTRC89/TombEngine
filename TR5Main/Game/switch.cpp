@@ -13,6 +13,7 @@ byte SequenceUsed[6];
 byte SequenceResults[3][3][3];
 byte Sequences[3];
 byte CurrentSequence;
+extern PHD_VECTOR OldPickupPos;
 
 __int16 Switch2Bounds[12] =  
 {
@@ -1366,5 +1367,4 @@ void Inject_Switch()
 	INJECT(0x0047D8C0, GetKeyTrigger);
 	INJECT(0x0047D7B0, GetSwitchTrigger);
 	INJECT(0x0047D670, SwitchTrigger);
-
 }
