@@ -49,6 +49,8 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
 void __cdecl UpdateSky();
 void __cdecl AnimateWaterfalls();
+void __cdecl ActivateKey();
+void __cdecl ActivateCamera();
 
 unsigned __stdcall GameMain(void*);
 void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags);

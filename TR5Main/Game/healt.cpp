@@ -88,7 +88,7 @@ void __cdecl AddDisplayPickup(__int16 objectNumber)
 	PickedUpObject(objectNumber);
 }
 
-void __cdecl InitialisePickUpDisplay()
+void __cdecl InitialisePickupDisplay()
 {
 	for (__int32 i = 0; i < 8; i++)
 	{

@@ -103,7 +103,7 @@ void __cdecl LoadScreen(__int32 index, __int32 num)
 
 	InitialiseFXArray(true);
 	InitialiseLOTarray(true);
-	InitialisePickUpDisplay();
+	InitialisePickupDisplay();
 	InitialiseCamera();
 	printf("InitialiseCamera OK\n");
 

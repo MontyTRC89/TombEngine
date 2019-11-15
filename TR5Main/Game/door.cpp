@@ -38,7 +38,7 @@ extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
 extern byte Sequences[3];
 extern byte CurrentSequence;
-
+extern PHD_VECTOR OldPickupPos;
 extern Inventory* g_Inventory;
 
 void __cdecl SequenceDoorControl(__int16 itemNumber) 

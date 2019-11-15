@@ -91,10 +91,11 @@ static __int16 MSBounds[12] = // offset 0xA1488
 	0xF8E4, 0x071C
 };
 
-__int32 KeyTriggerActive;
 __int32 NumRPickups;
 __int16 RPickups[16];
+PHD_VECTOR OldPickupPos;
 
+extern __int32 KeyTriggerActive;
 extern LaraExtraInfo g_LaraExtra;
 extern Inventory* g_Inventory;
 
@@ -443,16 +444,6 @@ __int32 __cdecl PickupTrigger(__int16 itemNum)
 	return 1;
 }
 
-void __cdecl ActivateKey()
-{
-	KeyTriggerActive = 1;
-}
-
-void __cdecl ActivateCamera()
-{
-	KeyTriggerActive = 2;
-}
-
 __int32 __cdecl KeyTrigger(__int16 itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
@@ -761,7 +752,7 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	return;
 }
 
-void __cdecl PickUpCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -1256,7 +1247,7 @@ void __cdecl RegeneratePickups()
 	}
 }
 
-void __cdecl PickUpControl(__int16 itemNum)
+void __cdecl PickupControl(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	__int16 roomNumber;
@@ -1333,7 +1324,7 @@ __int16* __cdecl FindPlinth(ITEM_INFO* item)
 	{
 		ITEM_INFO* current = &Items[itemNumber];
 
-		if (Objects[current->objectNumber].collision != PickUpCollision
+		if (Objects[current->objectNumber].collision != PickupCollision
 			&& item->pos.xPos == current->pos.xPos
 			&& item->pos.yPos <= current->pos.yPos
 			&& item->pos.zPos == current->pos.zPos
@@ -1381,8 +1372,45 @@ void __cdecl PuzzleDone(ITEM_INFO* item, __int16 itemNum)
 	}*/
 }
 
+void __cdecl InitialisePickup(__int16 itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	__int16* bounds = GetBoundsAccurate(item);
+	__int16 triggerFlags = item->triggerFlags & 0x3F;
+	if (triggerFlags == 5)
+	{
+		item->itemFlags[0] = item->pos.yPos - bounds[3];
+		item->status = ITEM_INVISIBLE;
+	}
+	else
+	{
+		if (!triggerFlags || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
+			item->pos.yPos -= bounds[3];
+		if ((item->triggerFlags & 0x80u) != 0)
+		{
+			RPickups[NumRPickups] = itemNumber;
+			NumRPickups++;
+		}
+		if (item->triggerFlags & 0x100)
+			item->meshBits = 0;
+		if (item->status == ITEM_INVISIBLE)
+			item->flags |= 0x20u;
+	}
+}
+
 void Inject_Pickup()
 {
 	INJECT(0x0043A130, DrawAllPickups);
 	INJECT(0x00463B60, PickedUpObject);
+	INJECT(0x0043E260, InitialisePickup);
+	INJECT(0x004679D0, PickupControl);
+	INJECT(0x00467AF0, RegeneratePickups);
+	INJECT(0x00467C00, PickupCollision);
+	INJECT(0x00468770, FindPlinth);
+	INJECT(0x00468930, KeyHoleCollision);
+	INJECT(0x00468C00, PuzzleDoneCollision);
+	INJECT(0x00468C70, PuzzleHoleCollision);
+	INJECT(0x004693A0, PuzzleDone);
+	INJECT(0x00469550, KeyTrigger);
+	INJECT(0x004695E0, PickupTrigger);
 }

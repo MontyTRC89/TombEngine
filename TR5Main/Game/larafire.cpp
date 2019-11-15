@@ -13,29 +13,185 @@
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
 	/* No weapons */
-	{ { ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) }, 0x0000, 0x0000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x0000 },
+	{
+		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	},
 	/* Pistols */
-	{ { 54616, ANGLE(60), 54616, ANGLE(60) },{ 34596, ANGLE(60), 50976, ANGLE(80) },{ 54616, ANGLE(170), 50976, ANGLE(80) }, 0x071C, 0x05B0, 0x028A, 0x2000, 100, 0x09, 0x03, 0x00, 0x0008 },
+	{
+		{ -ANGLE(60),  +ANGLE(60),  -ANGLE(60), +ANGLE(60) },
+		{ -ANGLE(170), +ANGLE(60),  -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60),  +ANGLE(170), -ANGLE(80), +ANGLE(80) },
+		ANGLE(10),
+		ANGLE(8),
+		650,
+		8 * WALL_SIZE,
+		1,
+		9,
+		3,
+		0,
+		8
+	},
 	/* Revolver */
-	{ { 54616, ANGLE(60), 54616, ANGLE(60) },{ 63716, ANGLE(10), 50976, ANGLE(80) },{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) }, 0x071C, 0x02D8, 0x028A, 0x2000, 0x15, 0x10, 0x03, 0x00, 0x0079 },
+	{
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(60), +ANGLE(60) },
+		{ -ANGLE(10), +ANGLE(10), -ANGLE(80), +ANGLE(80) },
+		{  ANGLE(0),   ANGLE(0),   ANGLE(0),   ANGLE(0) },
+		ANGLE(10),
+		ANGLE(4),
+		650,
+		8 * WALL_SIZE,
+		21,
+		16,
+		3,
+		0,
+		121
+	},
 	/* Uzis */
-	{ { 54616, ANGLE(60), 54616, ANGLE(60) },{ 34596, ANGLE(60), 50976, ANGLE(80) },{ 54616, ANGLE(170), 50976, ANGLE(80) }, 0x071C, 0x05B0, 0x028A, 0x2000, 0x01, 0x03, 0x03, 0x00, 0x002B },
+	{
+		{ -ANGLE(60),  +ANGLE(60),  -ANGLE(60), +ANGLE(60) },
+		{ -ANGLE(170), +ANGLE(60),  -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60),  +ANGLE(170), -ANGLE(80), +ANGLE(80) },
+		ANGLE(10),
+		ANGLE(8),
+		650,
+		8 * WALL_SIZE,
+		1,
+		3,
+		3,
+		0,
+		43
+	},
 	/* Shotgun */
-	{ { 54616, ANGLE(60), 55526, ANGLE(55) },{ 50976, ANGLE(80), 53706, ANGLE(65) },{ 50976, ANGLE(80), 53706, ANGLE(65) }, 0x071C, 0x0000, 0x01F4, 0x2000, 0x03, 0x09, 0x03, 0x0A, 0x002D },
+	{
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		ANGLE(10),
+		0,
+		500,
+		8 * WALL_SIZE,
+		3,
+		9,
+		3,
+		10,
+		45
+	},
 	/* HK */
-	{ { 54616, ANGLE(60), 55526, ANGLE(55) },{ 50976, ANGLE(80), 53706, ANGLE(65) },{ 50976, ANGLE(80), 53706, ANGLE(65) }, 0x071C, 0x02D8, 0x01F4, 0x3000, 0x04, 0x00, 0x03, 0x10, 0x0000 },
+	{
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		ANGLE(10),
+		ANGLE(4),
+		500,
+		12 * WALL_SIZE,
+		4,
+		0,
+		3,
+		10,
+		0
+	},
 	/* Crossbow */
-	{ { 54616, ANGLE(60), 55526, ANGLE(55) },{ 50976, ANGLE(80), 53706, ANGLE(65) },{ 50976, ANGLE(80), 53706, ANGLE(65) }, 0x071C, 0x05B0, 0x01F4, 0x2000, 0x05, 0x00, 0x02, 0x0A, 0x0000 },
+	{
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		ANGLE(10),
+		ANGLE(8),
+		500,
+		8 * WALL_SIZE,
+		5,
+		0,
+		2,
+		10,
+		0
+	},
 	/* Flare */
-	{ { ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) }, 0x0000, 0x0000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x0000 },
+	{
+		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	},
 	/* Flare 2 */
-	{ { 60076, ANGLE(30), 55526, ANGLE(55) },{ 60076, ANGLE(30), 55526, ANGLE(55) },{ 60076, ANGLE(30), 55526, ANGLE(55) }, 0x071C, 0x05B0, 0x0190, 0x2000, 0x03, 0x00, 0x02, 0x00, 0x002B },
+	{
+		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
+		ANGLE(10),
+		ANGLE(8),
+		400,
+		8 * WALL_SIZE,
+		3,
+		0,
+		2,
+		0,
+		43
+	},
 	/* Grenade launcher */
-	{ { -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) }, ANGLE(10), ANGLE(8), 500, 8 * WALL_SIZE, 20, 0, 2, 10, 0 }, 
+	{
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		ANGLE(10),
+		ANGLE(8),
+		500,
+		8 * WALL_SIZE,
+		20,
+		0, 
+		2,
+		10,
+		0
+	}, 
 	/* Harpoon gun */
-	{ { -ANGLE(60), ANGLE(60), -ANGLE(65), ANGLE(65) },{ -ANGLE(20), ANGLE(20), -ANGLE(75), ANGLE(75) },{ -ANGLE(80), ANGLE(80), -ANGLE(75), ANGLE(75) }, ANGLE(10), ANGLE(8), 500, 8 * WALL_SIZE, 6, 0, 2, 10, 0 },
+	{
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(20), +ANGLE(20), -ANGLE(75), +ANGLE(75) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(75), +ANGLE(75) },
+		ANGLE(10),
+		ANGLE(8),
+		500,
+		8 * WALL_SIZE,
+		6,
+		0,
+		2,
+		10,
+		0
+	},
 	/* Rocket launcher */
-	{ { -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) }, ANGLE(10), ANGLE(8), 500, 8 * WALL_SIZE, 30, 0, 2, 12, 77 }
+	{
+		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		ANGLE(10),
+		ANGLE(8),
+		500,
+		8 * WALL_SIZE,
+		30,
+		0,
+		2,
+		12,
+		77
+	}
 };
 
 extern GameFlow* g_GameFlow;
@@ -66,6 +222,47 @@ __int32 __cdecl WeaponObject(__int32 weaponType)
 	default:
 		return ID_PISTOLS_ANIM;
 	}
+}
+
+void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
+{
+	__int16 rotY, rotX, speed = 0, x = 0, y = 0;
+
+	speed = winfo->aimSpeed;
+
+	if (arm->lock)
+	{
+		y = Lara.targetAngles[0];
+		x = Lara.targetAngles[1];
+	}
+	else
+	{
+		y = 0;
+		x = 0;
+	}
+
+	/* move y axis */
+	rotY = arm->yRot;
+	if ((rotY >= (y - speed)) && (rotY <= (y + speed)))
+		rotY = y;
+	else if (rotY < speed)
+		rotY += speed;
+	else
+		rotY -= speed;
+	arm->yRot = rotY;
+
+	/* move x axis */
+	rotX = arm->xRot;
+	if ((rotX >= (x - speed)) && (rotX <= (x + speed)))
+		rotX = x;
+	else if (rotX < x)
+		rotX += speed;
+	else
+		rotX -= speed;
+	arm->xRot = rotX;
+
+	/* move z axis */
+	arm->zRot = 0;
 }
 
 void __cdecl SmashItem(__int16 itemNum)
@@ -222,7 +419,7 @@ void __cdecl LaraGun()
 		break;
 
 	case LG_UNDRAW_GUNS:
-		Lara.meshPtrs[HEAD] = Meshes[Objects[ID_LARA].meshIndex + 28];
+		Lara.meshPtrs[HEAD] = Meshes[Objects[ID_LARA].meshIndex + 14 * 2];
 
 		switch (Lara.gunType)
 		{
@@ -251,10 +448,11 @@ void __cdecl LaraGun()
 		break;
 
 	case LG_READY:
-		meshIndex = Objects[ID_LARA_SCREAM].meshIndex;
 		if (!(TrInput & IN_ACTION))
 			meshIndex = Objects[ID_LARA].meshIndex;
-		Lara.meshPtrs[HEAD] = Meshes[meshIndex + 28];
+		else
+			meshIndex = Objects[ID_LARA_SCREAM].meshIndex;
+		Lara.meshPtrs[HEAD] = Meshes[meshIndex + 14 * 2];
 		
 		if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA && Camera.type != CAMERA_TYPE::LOOK_CAMERA &&
 			Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
@@ -428,6 +626,7 @@ __int32 __cdecl WeaponObjectMesh(__int32 weaponType)
 
 void Inject_LaraFire()
 {
+	INJECT(0x00453490, AimWeapon);
 	INJECT(0x00453AE0, WeaponObject);
 	INJECT(0x00452430, LaraGun);
 	INJECT(0x004546C0, GetAmmo);

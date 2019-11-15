@@ -78,7 +78,7 @@ void __cdecl SarcophagusCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll
 
 			if (linknum != itemNum && currentItem->pos.xPos == item->pos.xPos && currentItem->pos.zPos == item->pos.zPos)
 			{
-				if (Objects[currentItem->objectNumber].collision == PickUpCollision)
+				if (Objects[currentItem->objectNumber].collision == PickupCollision)
 				{
 					PickedUpObject(currentItem->objectNumber);
 					currentItem->status = ITEM_ACTIVE;

@@ -57,7 +57,6 @@
 #define gfNumMips					VAR_U_(0x0051CE37, __int8)
 #define Frames						VAR_U_(0x00875174, __int16*)
 #define gfMips						ARRAY_(0x00E5C2C0, __int8, [8])
-#define OldPickupPos				VAR_U_(0x00E59700, GAME_VECTOR)
 #define SetDebounce					VAR_U_(0x00EEEA38, __int32)
 #define FlipStatus					VAR_U_(0x00EEEAE0, int)
 #define FlipStats					ARRAY_(0x00EEF060, __int32, [255])

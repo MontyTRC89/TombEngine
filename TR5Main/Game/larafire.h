@@ -10,7 +10,8 @@
 //#define GetAmmo ((__int32  (__cdecl*)(__int32)) 0x004546C0)
 #define LaraGetNewTarget ((void (__cdecl*)(WEAPON_INFO*)) 0x00452ED0)
 #define LaraTargetInfo ((void (__cdecl*)(WEAPON_INFO*)) 0x00452CC0)
-#define AimWeapon ((void (__cdecl*)(WEAPON_INFO*, LARA_ARM*)) 0x00453490)
+void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm);
+#define TorchControl ((void (__cdecl*)(__int16)) 0x00434390)
 
 extern WEAPON_INFO Weapons[NUM_WEAPONS];
 
