@@ -480,12 +480,12 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 		flag = 1;
 
-	if (!(TrInput & IN_ACTION && InventoryItemChosen == NO_ITEM)
-		|| BinocularRange
-		|| Lara.gunStatus
-		|| l->currentAnimState != STATE_LARA_STOP
-		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
-		|| !GetKeyTrigger(&Items[itemNum]))
+	if (!((TrInput & IN_ACTION || InventoryItemChosen != NO_ITEM)
+		&& !BinocularRange
+		&& !Lara.gunStatus
+		&& l->currentAnimState == STATE_LARA_STOP
+		&& l->animNumber == ANIMATION_LARA_STAY_IDLE
+		&& GetKeyTrigger(&Items[itemNum])))
 	{
 		if (!Lara.isMoving && (__int16)Lara.generalPtr == itemNum || (__int16)Lara.generalPtr != itemNum)
 		{
@@ -824,7 +824,8 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				item->pos.zRot = oldZrot;
 				return;
 			}
-			else if ((__int16)Lara.generalPtr != itemNum
+			
+			if ((__int16)Lara.generalPtr != itemNum
 				|| l->currentAnimState != STATE_LARA_PICKUP
 				|| l->frameNumber != Anims[ANIMATION_LARA_UNDERWATER_PICKUP].frameBase + 18)
 			{
@@ -854,7 +855,6 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else
 			{
-			LABEL_124:
 				item->itemFlags[3] = 1;
 				item->flags |= 0x20;
 				item->status = ITEM_ACTIVE;
@@ -866,7 +866,8 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		item->pos.zRot = oldZrot;
 		return;
 	}
-	else if (!(TrInput & IN_ACTION) && (InventoryItemChosen == NO_ITEM || triggerFlags != 2)
+	
+	if (!(TrInput & IN_ACTION) && (InventoryItemChosen == NO_ITEM || triggerFlags != 2)
 		|| BinocularRange
 		|| (l->currentAnimState != STATE_LARA_STOP || l->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus)
 		&& (l->currentAnimState != STATE_LARA_CROUCH_IDLE || l->animNumber != ANIMATION_LARA_CROUCH_IDLE || Lara.gunStatus)
@@ -890,9 +891,17 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						Lara.gunStatus = LG_SPECIAL;
 						Lara.flareAge = (__int16)(item->data) & 0x7FFF;
 					}
+					else
+					{
+						item->pos.xRot = oldXrot;
+						item->pos.yRot = oldYrot;
+						item->pos.zRot = oldZrot;
+						return;
+					}
 				}
 				else
 				{
+					printf("Frame: %d\n", Anims[ANIMATION_LARA_PICKUP].frameBase);
 					if (l->frameNumber == Anims[ANIMATION_LARA_PICKUP].frameBase + 15
 						|| l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 22
 						|| l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 20
@@ -907,6 +916,12 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 							AddDisplayPickup(ID_BURNING_TORCH_ITEM);
 							//sub_402FC7();
 							Lara.litTorch = (item->itemFlags[3] & 1);
+							
+							KillItem(itemNum);
+							item->pos.xRot = oldXrot;
+							item->pos.yRot = oldYrot;
+							item->pos.zRot = oldZrot;
+							return;
 						}
 						else
 						{
@@ -930,8 +945,21 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 							}
 						}
 					}
-					KillItem(itemNum);
+					else
+					{
+						item->pos.xRot = oldXrot;
+						item->pos.yRot = oldYrot;
+						item->pos.zRot = oldZrot;
+						return;
+					}
 				}
+
+				KillItem(itemNum);
+
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
+				return;
 			}
 		}
 
