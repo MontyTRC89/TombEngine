@@ -227,7 +227,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 		}
 		if (applyRot)
 		{
-			if (!MoveLaraPosition(&PushDoorPos, item, l))
+			if (!MoveLaraPosition(&PullDoorPos, item, l))
 			{
 				Lara.generalPtr = (void*)itemNum;
 				item->pos.yRot ^= (__int16)ANGLE(180);
