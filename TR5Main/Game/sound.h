@@ -584,7 +584,7 @@ typedef enum sound_effects
 #define SOUND_MAXVOL_RADIUS			1024.0f			// Max. volume hearing distance
 #define SOUND_OMNIPRESENT_ORIGIN    Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)
 
-#define SOUND_MAX_SAMPLES 3072 // Original was 1024, reallocate original 3-byte DX handle struct to just 1-byte memory pointer
+#define SOUND_MAX_SAMPLES 3072 // Original was 1024, reallocate original 3-dword DX handle struct to just 1-dword memory pointer
 #define SOUND_MAX_CHANNELS  32 // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
 
 #define SOUND_LEGACY_SOUNDMAP_SIZE	 450
