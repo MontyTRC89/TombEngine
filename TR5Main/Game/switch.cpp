@@ -119,7 +119,11 @@ void __cdecl CrowDoveSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c
 
 	if (item->flags & 0x100
 		|| !(item->meshBits & 4)
-		|| (!(TrInput & IN_ACTION) || Lara.gunStatus || l->currentAnimState != STATE_LARA_STOP || l->animNumber != ANIMATION_LARA_STAY_IDLE || l->gravityStatus)
+		|| (!(TrInput & IN_ACTION) 
+			|| Lara.gunStatus 
+			|| l->currentAnimState != STATE_LARA_STOP 
+			|| l->animNumber != ANIMATION_LARA_STAY_IDLE 
+			|| l->gravityStatus)
 		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
 	{
 		if (l->currentAnimState != STATE_LARA_DOVESWITCH)
@@ -193,28 +197,28 @@ void __cdecl CrowDoveSwitchControl(__int16 itemNumber)
 void __cdecl CogSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
-	DOOR_DATA* door = (DOOR_DATA*)item->data;
-
+	
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	__int16* trigger = TriggerIndex;
-	for (__int32 i = *TriggerIndex; (i & 0x1F) != 4; trigger += 2)
+	for (__int32 i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
 	{
 		if (i < 0)
 			break;
-		i = *(trigger + 2);
+		i = trigger[1];
 	}
 
-	ITEM_INFO* target = &Items[*(trigger + 6) & 0x3FF];
+	ITEM_INFO* target = &Items[trigger[3] & 0x3FF];
+	DOOR_DATA* door = (DOOR_DATA*)target->data;
 
 	if (item->status == ITEM_INACTIVE)
 	{
 		if (!(item->flags & 0x100)
-			&& (TrInput & IN_ACTION && 
-				!Lara.gunStatus && 
-				!(item->status && item->gravityStatus) &&
-				l->currentAnimState == STATE_LARA_STOP &&
-				l->animNumber == ANIMATION_LARA_STAY_IDLE  
+			&& (TrInput & IN_ACTION 
+				&& !Lara.gunStatus 
+				&& !(item->status && item->gravityStatus) 
+				&& l->currentAnimState == STATE_LARA_STOP 
+				&& l->animNumber == ANIMATION_LARA_STAY_IDLE  
 				|| Lara.isMoving && Lara.generalPtr == (void*)itemNum))
 		{
 			if (TestLaraPosition(CogSwitchBounds, item, l))
@@ -239,7 +243,7 @@ void __cdecl CogSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					item->status = ITEM_ACTIVE;
 					if (!door->opened)
 					{
-						AddActiveItem(target - Items);
+						AddActiveItem((target - Items) / sizeof(ITEM_INFO));
 						target->itemFlags[2] = target->pos.yPos;
 						target->status = ITEM_ACTIVE;
 					}
@@ -271,7 +275,7 @@ void __cdecl CogSwitchControl(__int16 itemNum)
 	{
 		if (item->goalAnimState == 1 && !(TrInput & IN_ACTION))
 		{
-			LaraItem->goalAnimState = 2;
+			LaraItem->goalAnimState = STATE_LARA_STOP;
 			item->goalAnimState = 0;
 		}
 
@@ -1034,7 +1038,7 @@ void __cdecl SwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (item->triggerFlags == 3 && item->currentAnimState == 1 || item->triggerFlags >= 5 && item->triggerFlags <= 7 && !item->currentAnimState)
 			return;
 
-		SwitchBounds[0] = *bounds - 256;
+		SwitchBounds[0] = bounds[0] - 256;
 		SwitchBounds[1] = bounds[1] + 256;
 		if (item->triggerFlags)
 		{
@@ -1192,9 +1196,9 @@ void __cdecl SwitchControl(__int16 itemNumber)
 			item->timer = 0;
 		}
 	}
-	/*else
+	else
 	{
-		if (item->animNumber == Objects[ID_AIRLOCK_SWITCH].animIndex + 1 && item->frameNumber == Anims[item->animNumber].frameEnd - 1)
+		/*if (item->animNumber == Objects[ID_AIRLOCK_SWITCH].animIndex + 1 && item->frameNumber == Anims[item->animNumber].frameEnd - 1)
 		{
 			if (GetSwitchTrigger(&item, &ItemNos, 1) > 0)
 			{
@@ -1217,23 +1221,26 @@ void __cdecl SwitchControl(__int16 itemNumber)
 					--v11;
 				} while (v11);
 			}
-		}
+		}*/
+		
 		if (item->triggerFlags == 8)
 		{
-			v15 = 0;
-			v14 = 0;
-			v13 = 0;
-			GetJointAbsPosition(item, & v13, 0);
-			LOWORD(v9) = item->roomNumber;
-			v12 = v9;
-			GetFloor(v13, v14, v15, (__int16*)& v12);
-			if ((_WORD)v12 != item->roomNumber)
+			PHD_VECTOR pos;
+			pos.x = 0;
+			pos.y = 0;
+			pos.z = 0;
+
+			GetJointAbsPosition(item, &pos, 0);
+			
+			__int16 roomNumber = item->roomNumber;
+			GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+			if (roomNumber != item->roomNumber)
 			{
-				ItemNewRoom(itemNum, v12);
-				return AnimateItem(item);
+				ItemNewRoom(itemNumber, roomNumber);
+				AnimateItem(item);
 			}
 		}
-	}*/
+	}
 	
 	AnimateItem(item);
 }
