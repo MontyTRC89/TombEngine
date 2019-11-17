@@ -203,7 +203,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 	if (TrInput & IN_ACTION
 		&& l->currentAnimState == STATE_LARA_STOP
 		&& l->animNumber == ANIMATION_LARA_STAY_IDLE
-		&& !(item->status && item->gravityStatus) 
+		&& item->status != ITEM_ACTIVE
 		&& !(l->hitStatus)
 		&& !Lara.gunStatus
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
