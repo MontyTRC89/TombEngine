@@ -2135,7 +2135,7 @@ void __cdecl ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->collision = CogSwitchCollision;
-		obj->control = CogControl;
+		obj->control = CogSwitchControl;
 	}
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];

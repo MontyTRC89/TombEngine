@@ -112,7 +112,7 @@ void __cdecl AddActiveItem(__int16 itemNumber)
 
 	if (!item->active)
 	{
-		item->active = TRUE;
+		item->active = true;
 		item->nextActive = NextItemActive;
 		NextItemActive = itemNumber;
 	}
