@@ -434,7 +434,10 @@ __int32 __cdecl PickupTrigger(__int16 itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	if (item->flags & IFLAG_KILLED && item->status != ITEM_INVISIBLE && item->itemFlags[3] != 1 && item->triggerFlags & 0x80)
+	if (item->flags & IFLAG_KILLED 
+		|| ( item->status != ITEM_INVISIBLE 
+			|| item->itemFlags[3] != 1 
+			|| item->triggerFlags & 0x80))
 	{
 		return 0;
 	}
@@ -480,7 +483,12 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 		flag = 1;
 
-	if (!((TrInput & IN_ACTION || InventoryItemChosen != NO_ITEM)
+	printf("BinocularRange: %d\n", BinocularRange);
+	printf("Lara.gunStatus: %d\n", Lara.gunStatus);
+	printf("GetKeyTrigger(): %d\n", GetKeyTrigger(&Items[itemNum]));
+
+
+	if (!((TrInput & IN_ACTION || g_Inventory->GetSelectedObject() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
 		&& l->currentAnimState == STATE_LARA_STOP
@@ -590,14 +598,14 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (!Lara.isMoving)
 		{
-			if (InventoryItemChosen == NO_ITEM)
+			if (g_Inventory->GetSelectedObject() == NO_ITEM)
 			{
 				if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - 70))
-					EnterInventoryItem = item->objectNumber - 70;
+					g_Inventory->SetEnterObject(item->objectNumber - 70);
 				item->pos.yRot = oldYrot;
 				return;
 			}
-			if (InventoryItemChosen != item->objectNumber - 70)
+			if (g_Inventory->GetSelectedObject() != item->objectNumber - 70)
 			{
 				item->pos.yRot = oldYrot;
 				return;
@@ -610,7 +618,7 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (!MoveLaraPosition(&pos, item, l))
 			{
 				Lara.generalPtr = (void*)itemNum;
-				InventoryItemChosen = NO_ITEM;
+				g_Inventory->SetSelectedObject(NO_ITEM);
 				item->pos.yRot = oldYrot;
 				return;
 			}
@@ -641,7 +649,7 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		Lara.gunStatus = 1;
 		item->flags |= 0x20;
 		Lara.generalPtr = (void*)itemNum;
-		InventoryItemChosen = NO_ITEM;
+		g_Inventory->SetSelectedObject(NO_ITEM);
 		item->pos.yRot = oldYrot;
 		return;
 	}
@@ -679,7 +687,7 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 
-	if ((!(TrInput & IN_ACTION) && InventoryItemChosen == NO_ITEM
+	if ((!(TrInput & IN_ACTION) && g_Inventory->GetSelectedObject() == NO_ITEM
 		|| BinocularRange
 		|| Lara.gunStatus
 		|| l->currentAnimState != STATE_LARA_STOP
@@ -697,13 +705,13 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (item->status != ITEM_INACTIVE)
 					return;
-				if (InventoryItemChosen == NO_ITEM)
+				if (g_Inventory->GetSelectedObject() == NO_ITEM)
 				{
 					if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - 62))
-						EnterInventoryItem = item->objectNumber - 62;
+						g_Inventory->SetEnterObject(item->objectNumber - 62);
 					return;
 				}
-				if (InventoryItemChosen != item->objectNumber - 62)
+				if (g_Inventory->GetSelectedObject() != item->objectNumber - 62)
 					return;
 			}
 			
@@ -729,7 +737,7 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (item->triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
 				{
 					item->itemFlags[3] = 92;
-					InventoryItemChosen = NO_ITEM;
+					g_Inventory->SetSelectedObject(NO_ITEM);
 					return;
 				}
 			}
@@ -738,7 +746,7 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.generalPtr = (void*)itemNum;
 			}
 
-			InventoryItemChosen = NO_ITEM;
+			g_Inventory->SetSelectedObject(NO_ITEM);
 			return;
 		}
 
@@ -867,7 +875,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && (InventoryItemChosen == NO_ITEM || triggerFlags != 2)
+	if (!(TrInput & IN_ACTION) && (g_Inventory->GetSelectedObject() == NO_ITEM || triggerFlags != 2)
 		|| BinocularRange
 		|| (l->currentAnimState != STATE_LARA_STOP || l->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus)
 		&& (l->currentAnimState != STATE_LARA_CROUCH_IDLE || l->animNumber != ANIMATION_LARA_CROUCH_IDLE || Lara.gunStatus)
@@ -1028,23 +1036,23 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		if (!Lara.isMoving)
 		{
-			if (InventoryItemChosen == NO_ITEM)
+			if (g_Inventory->GetSelectedObject() == NO_ITEM)
 			{
 				if (g_Inventory->IsObjectPresentInInventory(ID_CROWBAR_ITEM))
-					EnterInventoryItem = ID_CROWBAR_ITEM;
+					g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
 				item->pos.zRot = oldZrot;
 				return;
 			}
-			if (InventoryItemChosen != ID_CROWBAR_ITEM)
+			if (g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM)
 			{
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
 				item->pos.zRot = oldZrot;
 				return;
 			}
-			InventoryItemChosen = NO_ITEM;
+			g_Inventory->SetSelectedObject(NO_ITEM);
 		}
 		if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
 		{
@@ -1414,7 +1422,7 @@ void __cdecl InitialisePickup(__int16 itemNumber)
 	{
 		if (!triggerFlags || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
 			item->pos.yPos -= bounds[3];
-		if ((item->triggerFlags & 0x80u) != 0)
+		if ((item->triggerFlags & 0x80) != 0)
 		{
 			RPickups[NumRPickups] = itemNumber;
 			NumRPickups++;
@@ -1422,7 +1430,7 @@ void __cdecl InitialisePickup(__int16 itemNumber)
 		if (item->triggerFlags & 0x100)
 			item->meshBits = 0;
 		if (item->status == ITEM_INVISIBLE)
-			item->flags |= 0x20u;
+			item->flags |= 0x20;
 	}
 }
 

@@ -1508,7 +1508,7 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	if (!(TrInput & IN_ACTION) && InventoryItemChosen != ID_PUZZLE_ITEM1)
+	if (!(TrInput & IN_ACTION) && g_Inventory->GetSelectedObject() != ID_PUZZLE_ITEM1)
 	{
 		return 0;
 	}
@@ -1561,15 +1561,15 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 		__int32 tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
 		{
-			if (InventoryItemChosen == ID_PUZZLE_ITEM1)
+			if (g_Inventory->GetSelectedObject() == ID_PUZZLE_ITEM1)
 			{
-				InventoryItemChosen = NO_ITEM;
+				g_Inventory->SetSelectedObject(NO_ITEM);
 				return 1;
 			}
 			else
 			{
 				if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-					GlobalEnterInventory = ID_PUZZLE_ITEM1;
+					g_Inventory->SetEnterObject(ID_PUZZLE_ITEM1);
 				return 0;
 			}
 		}
@@ -1581,15 +1581,15 @@ __int32 __cdecl GetOnJeep(int itemNumber)
 		__int32 tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
 		{
-			if (InventoryItemChosen == ID_PUZZLE_ITEM1)
+			if (g_Inventory->GetSelectedObject() == ID_PUZZLE_ITEM1)
 			{
-				InventoryItemChosen = NO_ITEM;
+				g_Inventory->SetSelectedObject(NO_ITEM);
 				return 1;
 			}
 			else
 			{
 				if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-					GlobalEnterInventory = ID_PUZZLE_ITEM1;
+					g_Inventory->SetEnterObject(ID_PUZZLE_ITEM1);
 				return 0;
 			}
 		}

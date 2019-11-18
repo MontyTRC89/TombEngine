@@ -322,7 +322,7 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (item->triggerFlags == 2
 		&& !(item->status && item->gravityStatus) // CHECK
-		&& ((TrInput & IN_ACTION || InventoryItemChosen == ID_CROWBAR_ITEM)
+		&& ((TrInput & IN_ACTION || g_Inventory->GetSelectedObject() == ID_CROWBAR_ITEM)
 			&& l->currentAnimState == STATE_LARA_STOP
 			&& l->animNumber == ANIMATION_LARA_STAY_IDLE
 			&& !l->hitStatus
@@ -334,11 +334,11 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (!Lara.isMoving)
 			{
-				if (InventoryItemChosen == NO_ITEM)
+				if (g_Inventory->GetSelectedObject() == NO_ITEM)
 				{
 					if (g_Inventory->IsObjectPresentInInventory(ID_CROWBAR_ITEM))
 					{
-						InventoryItemChosen = ID_CROWBAR_ITEM;
+						g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
 						item->pos.yRot ^= (__int16)ANGLE(180);
 					}
 					else
@@ -354,14 +354,14 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					}
 					return;
 				}
-				if (InventoryItemChosen != ID_CROWBAR_ITEM)
+				if (g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM)
 				{
 					item->pos.yRot ^= (__int16)ANGLE(180);
 					return;
 				}
 			}
 
-			InventoryItemChosen = NO_ITEM;
+			g_Inventory->SetSelectedObject(NO_ITEM);
 			if (MoveLaraPosition(&CrowbarDoorPos, item, l))
 			{
 				l->animNumber = ANIMATION_LARA_DOOR_OPEN_CROWBAR;

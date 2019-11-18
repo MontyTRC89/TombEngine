@@ -3,12 +3,15 @@
 #include "control.h"
 #include "items.h"
 #include "collide.h"
+#include "inventory.h"
 #include "larafire.h"
 
 #include "..\Objects\newobjects.h"
 #include "..\Global\global.h"
 
 #include <stdio.h>
+
+extern Inventory* g_Inventory;
 
 LaraExtraInfo g_LaraExtra;
 
@@ -101,16 +104,18 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 {
-	if (item->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus || InventoryItemChosen == NO_ITEM)
+	__int16 selectedObject = g_Inventory->GetSelectedObject();
+
+	if (item->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus || selectedObject == NO_ITEM)
 		return 0;
 
-	if (InventoryItemChosen >= ID_WATERSKIN1_EMPTY && InventoryItemChosen <= ID_WATERSKIN2_5)
+	if (selectedObject >= ID_WATERSKIN1_EMPTY && selectedObject <= ID_WATERSKIN2_5)
 	{
 		item->itemFlags[2] = 25;
 
-		if (InventoryItemChosen != ID_WATERSKIN1_3 && InventoryItemChosen != ID_WATERSKIN2_5)
+		if (selectedObject != ID_WATERSKIN1_3 && selectedObject != ID_WATERSKIN2_5)
 		{
-			if (InventoryItemChosen >= ID_WATERSKIN2_EMPTY)
+			if (selectedObject >= ID_WATERSKIN2_EMPTY)
 				g_LaraExtra.Waterskin2.Quantity = 5;
 			else
 				g_LaraExtra.Waterskin1.Quantity = 3;
@@ -119,7 +124,7 @@ __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 		}
 		else
 		{
-			if (InventoryItemChosen >= ID_WATERSKIN2_EMPTY)
+			if (selectedObject >= ID_WATERSKIN2_EMPTY)
 			{
 				item->itemFlags[3] = g_LaraExtra.Waterskin2.Quantity;
 				g_LaraExtra.Waterskin2.Quantity = 1;
@@ -133,7 +138,7 @@ __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 			item->animNumber = ANIMATION_LARA_WATERSKIN_EMPTY;
 		}
 	}
-	else if (InventoryItemChosen == ID_CLOCKWORK_BEETLE)
+	else if (selectedObject == ID_CLOCKWORK_BEETLE)
 	{
 		item->animNumber = ANIMATION_LARA_BEETLE_PUT;
 		//UseClockworkBeetle(1);
@@ -148,7 +153,7 @@ __int32 __cdecl UseSpecialItem(ITEM_INFO* item)
 	item->currentAnimState = STATE_LARA_MISC_CONTROL;
 
 	Lara.gunStatus = LG_HANDS_BUSY;
-	InventoryItemChosen = NO_ITEM;
+	g_Inventory->SetSelectedObject(NO_ITEM);
 
 	return 1;
 }

@@ -4,9 +4,9 @@
 
 //#define _RegeneratePickups ((void (__cdecl*)()) 0x00467AF0)
 //#define _PuzzleHoleCollision ((void (__cdecl*)(__int16, ITEM_INFO*, COLL_INFO*)) 0x00468C70)
-//#define _PickupCollision ((void (__cdecl*)(__int16, ITEM_INFO*, COLL_INFO*)) 0x00467C00)
-//#define _InitialisePickup ((void (__cdecl*)(__int16)) 0x0043E260)
-//#define _PickupControl ((void (__cdecl*)(__int16)) 0x004679D0)
+#define _PickupCollision ((void (__cdecl*)(__int16, ITEM_INFO*, COLL_INFO*)) 0x00467C00)
+#define _InitialisePickup ((void (__cdecl*)(__int16)) 0x0043E260)
+#define _PickupControl ((void (__cdecl*)(__int16)) 0x004679D0)
 
 void __cdecl InitialisePickup(__int16 itemNumber);
 void __cdecl PickedUpObject(__int16 objectNumber);

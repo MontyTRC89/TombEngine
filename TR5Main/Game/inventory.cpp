@@ -760,7 +760,28 @@ void Inventory::Initialise()
 	m_deltaMovement = 0;
 	m_movement = INV_MOVE_STOPPED;
 	m_type = INV_TYPE_GAME;
-	InventoryItemChosen = -1;
+	m_selectedObject = NO_ITEM;
+}
+
+
+__int16 Inventory::GetEnterObject()
+{
+	return m_enterObject;
+}
+
+__int16 Inventory::GetSelectedObject()
+{
+	return m_selectedObject;
+}
+
+void Inventory::SetEnterObject(__int16 objNum) 
+{
+	m_enterObject = objNum;
+}
+
+void Inventory::SetSelectedObject(__int16 objNum)
+{
+	m_selectedObject = objNum;
 }
 
 __int32 Inventory::DoInventory()
@@ -801,18 +822,18 @@ __int32 Inventory::DoInventory()
 	m_rings[INV_RING_COMBINE].draw = false;
 	m_rings[INV_RING_CHOOSE_AMMO].draw = false;
 
-	if (GlobalEnterInventory != NO_ITEM)
+	if (m_enterObject != NO_ITEM)
 	{
 		for (__int32 r = 0; r < 3; r++)
 			for (__int32 o = 0; o < m_rings[r].numObjects; o++)
-				if (m_objectsTable[m_rings[r].objects[o].inventoryObject].objectNumber == GlobalEnterInventory)
+				if (m_objectsTable[m_rings[r].objects[o].inventoryObject].objectNumber == m_enterObject)
 				{
 					m_activeRing = r;
 					m_rings[m_activeRing].currentObject = o;
 					m_rings[m_activeRing].draw = true;
 				}
 
-		GlobalEnterInventory = NO_ITEM;
+		m_enterObject = NO_ITEM;
 	}
 	else
 	{
@@ -840,7 +861,7 @@ __int32 Inventory::DoInventory()
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
 			// Exit from inventory
-			GlobalEnterInventory = -1;
+			m_enterObject = NO_ITEM;
 			result = INV_RESULT_NONE;
 			break;
 		}
@@ -987,7 +1008,7 @@ __int32 Inventory::DoInventory()
 					UseCurrentItem();
 
 					// Exit from inventory
-					GlobalEnterInventory = -1;
+					m_enterObject = NO_ITEM;
 					result = INV_RESULT_USE_ITEM;
 					break;
 				}
@@ -1729,7 +1750,7 @@ void Inventory::UseCurrentItem()
 		// Only if above water
 		if (Lara.waterStatus == LW_ABOVE_WATER)
 		{
-			InventoryItemChosen = objectNumber;
+			m_selectedObject = objectNumber;
 			
 			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 			
@@ -1747,7 +1768,7 @@ void Inventory::UseCurrentItem()
 	{
 		if (Lara.waterStatus == LW_ABOVE_WATER)
 		{
-			InventoryItemChosen = objectNumber;
+			m_selectedObject = objectNumber;
 			
 			SoundEffect(SFX_MENU_CHOOSE, NULL, 0);
 			
@@ -1990,7 +2011,7 @@ void Inventory::InitialiseTitle()
 	m_deltaMovement = 0;
 	m_movement = INV_MOVE_STOPPED;
 	m_type = INV_TYPE_TITLE;
-	InventoryItemChosen = -1;
+	m_selectedObject = NO_ITEM;
 }
 
 bool Inventory::UpdateSceneAndDrawInventory()

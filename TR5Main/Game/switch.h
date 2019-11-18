@@ -1,12 +1,12 @@
 #pragma once
 #include "..\Global\global.h"
 
-#define InitialiseSwitch ((void (__cdecl*)(__int16)) 0x00440070)
-#define SequenceControl ((void (__cdecl*)(__int16)) 0x0047F520)
-#define SequenceCollision ((void (__cdecl*)(__int16,ITEM_INFO*,COLL_INFO*)) 0x0047F610)
-#define LeverSwitchCollision ((void (__cdecl*)(__int16,ITEM_INFO*,COLL_INFO*)) 0x0047EE00)
-#define InitialisePulleySwitch ((void (__cdecl*)(__int16)) 0x0043E1F0)
-#define InitialiseCrowDoveSwitch ((void (__cdecl*)(__int16)) 0x0043ECF0)
+//#define InitialiseSwitch ((void (__cdecl*)(__int16)) 0x00440070)
+//#define SequenceControl ((void (__cdecl*)(__int16)) 0x0047F520)
+//#define SequenceCollision ((void (__cdecl*)(__int16,ITEM_INFO*,COLL_INFO*)) 0x0047F610)
+//#define LeverSwitchCollision ((void (__cdecl*)(__int16,ITEM_INFO*,COLL_INFO*)) 0x0047EE00)
+//#define InitialisePulleySwitch ((void (__cdecl*)(__int16)) 0x0043E1F0)
+//#define InitialiseCrowDoveSwitch ((void (__cdecl*)(__int16)) 0x0043ECF0)
 void __cdecl CrowDoveSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void __cdecl CrowDoveSwitchControl(__int16 itemNumber);
 void __cdecl CogSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
@@ -27,5 +27,8 @@ void __cdecl TestTriggersAtXYZ(__int32 x, __int32 y, __int32 z, __int16 roomNumb
 __int32 __cdecl GetKeyTrigger(ITEM_INFO* item);
 __int32 __cdecl GetSwitchTrigger(ITEM_INFO* item, __int16* itemNos, __int32 AttatchedToSwitch);
 __int32 __cdecl SwitchTrigger(__int16 itemNum, __int16 timer);
+void __cdecl InitialiseSwitch(__int16 itemNum);
+void __cdecl InitialisePulleySwitch(__int16 itemNumber);
+void __cdecl InitialiseCrowDoveSwitch(__int16 itemNumber);
 
 void Inject_Switch();

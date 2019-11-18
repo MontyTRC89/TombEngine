@@ -94,8 +94,6 @@
 #define CanLoad						VAR_U_(0x0051CE54, byte)
 #define Savegame					VAR_U_(0x00E52EB3, SAVEGAME_INFO)
 #define LastInventoryItem			VAR_U_(0x00508E14, __int32)
-#define GlobalEnterInventory		VAR_U_(0x00508E18, __int32)
-#define InventoryItemChosen			VAR_U_(0x00508E1C, __int32)
 #define DelCutSeqPlayer				VAR_U_(0x0051CE2C, __int16)
 #define TitleControlsLockedOut		VAR_U_(0x00E5C2A8, byte)
 #define TrackCameraInit				VAR_U_(0x0051D010, __int32)
@@ -277,7 +275,7 @@
 #define QuakeCam					VAR_U_(0x00E4F520, QUAKE_CAMERA)
 #define SplineFromCamera			VAR_U_(0x00E4F3DC, __int32)
 #define Unk_0051D024				VAR_U_(0x0051D024, byte)
-#define EnterInventoryItem			VAR_U_(0x004AC064, __int16)
+
 // JeepBaddieCollision
 #define Unk_0080DE1A				VAR_U_(0x0080DE1A, __int16)
 #define Unk_0080DDE8				VAR_U_(0x0080DDE8, __int32)

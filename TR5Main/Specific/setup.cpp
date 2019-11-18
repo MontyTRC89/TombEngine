@@ -2071,20 +2071,20 @@ void __cdecl ObjectObjects()
 		obj = &Objects[ID_SEQUENCE_SWITCH1];
 		if (obj->loaded)
 		{
-			obj->collision = SequenceCollision;
-			obj->control = SequenceControl;
+			obj->collision = FullBlockSwitchCollision;
+			obj->control = FullBlockSwitchControl;
 		}
 		obj = &Objects[ID_SEQUENCE_SWITCH2];
 		if (obj->loaded)
 		{
-			obj->collision = SequenceCollision;
-			obj->control = SequenceControl;
+			obj->collision = FullBlockSwitchCollision;
+			obj->control = FullBlockSwitchControl;
 		}
 		obj = &Objects[ID_SEQUENCE_SWITCH3];
 		if (obj->loaded)
 		{
-			obj->collision = SequenceCollision;
-			obj->control = SequenceControl;
+			obj->collision = FullBlockSwitchCollision;
+			obj->control = FullBlockSwitchControl;
 		}
 	}
 
@@ -2105,7 +2105,7 @@ void __cdecl ObjectObjects()
 	obj = &Objects[ID_LEVER_SWITCH];
 	if (obj->loaded)
 	{
-		obj->collision = LeverSwitchCollision;
+		obj->collision = RailSwitchCollision;
 		obj->control = SwitchControl;
 	}
 
