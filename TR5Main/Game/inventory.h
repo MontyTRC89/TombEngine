@@ -327,6 +327,8 @@ private:
 	__int32								m_activeGui;
 	float								m_cameraY;
 	float								m_cameraTilt;
+	__int16								m_enterObject;
+	__int16								m_selectedObject;
 
 public:
 	Inventory();
@@ -379,6 +381,10 @@ public:
 	float						GetCameraTilt();
 	bool						HasWeaponMultipleAmmos(__int16 object);
 	bool						UpdateSceneAndDrawInventory();
+	__int16						GetEnterObject();
+	__int16						GetSelectedObject();
+	void						SetEnterObject(__int16 objNum);
+	void						SetSelectedObject(__int16 objNum);
 };
 
 extern Inventory* g_Inventory;

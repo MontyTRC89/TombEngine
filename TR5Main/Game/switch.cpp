@@ -13,7 +13,9 @@ byte SequenceUsed[6];
 byte SequenceResults[3][3][3];
 byte Sequences[3];
 byte CurrentSequence;
+
 extern PHD_VECTOR OldPickupPos;
+extern Inventory* g_Inventory;
 
 __int16 Switch2Bounds[12] =  
 {
@@ -390,7 +392,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 	__int32 doSwitch = 0;
 	ITEM_INFO* item = &Items[itemNum];
 
-	if ((!(TrInput & IN_ACTION) && InventoryItemChosen != ID_CROWBAR_ITEM
+	if ((!(TrInput & IN_ACTION) && g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM
 		|| l->currentAnimState != STATE_LARA_STOP
 		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
 		|| Lara.gunStatus
@@ -412,7 +414,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 		l->pos.yRot ^= (__int16)ANGLE(180);
 		if (TestLaraPosition(CrowbarBounds2, item, l))
 		{
-			if (Lara.isMoving || InventoryItemChosen == ID_CROWBAR_ITEM)
+			if (Lara.isMoving || g_Inventory->GetSelectedObject() == ID_CROWBAR_ITEM)
 			{
 				if (MoveLaraPosition(&CrowbarPos2, item, l))
 				{
@@ -425,7 +427,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 				{
 					Lara.generalPtr = (void*)itemNum;
 				}
-				InventoryItemChosen = NO_ITEM;
+				g_Inventory->SetSelectedObject(NO_ITEM);
 			}
 			else
 			{
@@ -452,10 +454,10 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 			return;
 		}
 
-		if (!(Lara.isMoving && InventoryItemChosen != ID_CROWBAR_ITEM))
+		if (!(Lara.isMoving && g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM))
 		{
 			if (Lara.crowbar)
-				EnterInventoryItem = ID_CROWBAR_ITEM;
+				g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
 			else
 			{
 				if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
@@ -481,7 +483,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 			Lara.generalPtr = (void*)itemNum;
 		}
 
-		InventoryItemChosen = NO_ITEM;
+		g_Inventory->SetSelectedObject(NO_ITEM);
 	}
 
 	if (!doSwitch)
@@ -509,7 +511,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 	}
 
 	if (Lara.crowbar)
-		EnterInventoryItem = ID_CROWBAR_ITEM;
+		g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
 	else
 	{
 		if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
@@ -1076,7 +1078,7 @@ void __cdecl SwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&SwitchPos, item, l))
 			{
-				if (item->currentAnimState == 1)
+				if (item->currentAnimState == 1) /* Switch down */
 				{
 					if (item->triggerFlags)
 					{
@@ -1114,9 +1116,9 @@ void __cdecl SwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						item->goalAnimState = 0;
 					}
 				}
-				else
+				else /* Switch up */
 				{
-					if (item->triggerFlags)
+					if (item->triggerFlags) 
 					{
 						if (item->triggerFlags == 3)
 						{
@@ -1259,15 +1261,15 @@ __int32 __cdecl GetKeyTrigger(ITEM_INFO* item)
 	if (TriggerIndex)
 	{
 		__int16* trigger = TriggerIndex;
-		for (__int32 i = *TriggerIndex; (i & 0x1F) != 4; trigger += 2)
+		for (__int16 i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
 		{
 			if (i < 0)
 				break;
-			i = *(trigger + 2);
+			i = trigger[1];
 		}
 		if (*trigger & 4)
 		{
-			for (__int16* j = (trigger + 4); (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++)
+			for (__int16* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++)
 			{
 				if (*j & 0x8000)
 					return 0;
@@ -1287,17 +1289,17 @@ __int32 __cdecl GetSwitchTrigger(ITEM_INFO* item, __int16* itemNos, __int32 Atta
 	if (TriggerIndex)
 	{
 		__int16* trigger = TriggerIndex;
-		for (__int32 i = *TriggerIndex; (i & 0x1F) != 4; trigger += 2)
+		for (__int32 i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
 		{
 			if (i < 0)
 				break;
-			i = *(trigger + 2);
+			i = trigger[1];
 		}
 
 		if (*trigger & 4)
 		{
 			__int16* current = itemNos;
-			for (__int16* j = (trigger + 4); (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++, current++)
+			for (__int16* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++, current++)
 			{
 				*current = *j & 0x3FF;
 				if (*j & 0x8000)
@@ -1351,6 +1353,30 @@ __int32 __cdecl SwitchTrigger(__int16 itemNum, __int16 timer)
 	}
 
 	return 0;
+}
+
+void __cdecl InitialiseSwitch(__int16 itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->triggerFlags >= 1000)
+	{
+		item->itemFlags[3] = ((item->triggerFlags - 1000) % 10) | 16 * ((item->triggerFlags - 1000) / 10);
+		item->triggerFlags = 6;
+	}
+}
+
+void __cdecl InitialisePulleySwitch(__int16 itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->itemFlags[3] = item->triggerFlags;
+	item->triggerFlags = abs(item->triggerFlags);
+	//if (itemNumber == word_E5BF24)
+	//	item->itemFlags[1] = 1;
+}
+
+void __cdecl InitialiseCrowDoveSwitch(__int16 itemNumber)
+{
+	Items[itemNumber].meshBits = 3;
 }
 
 void Inject_Switch()
