@@ -1112,10 +1112,22 @@ void __cdecl NewObjects()
 	{
 		obj->initialise = InitialiseKayak;
 		obj->collision = KayakCollision;
-		obj->drawRoutine = DrawKayak;
+		//obj->drawRoutine = DrawKayak;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_BOAT];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseBoat;
+		obj->collision = BoatCollision;
+		obj->control = BoatControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 1 * 4] |= ROT_Z;
 	}
 }
 

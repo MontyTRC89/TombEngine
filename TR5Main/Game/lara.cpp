@@ -43,19 +43,28 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		switch (Items[g_LaraExtra.Vehicle].objectNumber)
 		{
-		case ID_QUAD:
-			if (QuadBikeControl())
-				return;
-			break;
+			case ID_QUAD:
+				if (QuadBikeControl())
+					return;
+				break;
 
-		case ID_JEEP:
-			if (JeepControl())
-				return;
-			break;
+			case ID_JEEP:
+				if (JeepControl())
+					return;
+				break;
 
-		default:
-			break;
+			case ID_KAYAK:
+				if (KayakControl())
+					return;
+				break;
 
+			case ID_SNOWMOBILE:
+				if (SkidooControl())
+					return;
+				break;
+
+			default:
+				break;
 		}
 	}
 
