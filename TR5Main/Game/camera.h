@@ -10,6 +10,7 @@
 
 #define InitialiseCamera ((void (__cdecl*)()) 0x0040C690)
 #define CalculateCamera ((void (__cdecl*)()) 0x0040ED30)
+#define CameraCollisionBounds ((int (__cdecl*)(GAME_VECTOR*,int,int)) 0x0040F5C0)
 
 void __cdecl LookAt(__int32 posX, __int32 posY, __int32 posZ,
 						__int32 targetX, __int32 targetY, __int32 targetZ,

@@ -1,4 +1,4 @@
-#include "Box.h"
+#include "box.h"
 #include "..\Global\global.h"
 #include "items.h"
 #include "tomb4fx.h"

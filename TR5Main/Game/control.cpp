@@ -19,7 +19,7 @@
 #include "savegame.h"
 #include "sound.h"
 #include "spotcam.h"
-#include "Box.h"
+#include "box.h"
 #include "objects.h"
 #include "switch.h"
 

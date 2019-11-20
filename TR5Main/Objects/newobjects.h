@@ -1,5 +1,4 @@
 #pragma once
-
 #include "..\Global\global.h"
 
 typedef struct QUAD_INFO {
@@ -61,6 +60,44 @@ typedef struct FISH_LEADER_INFO
 	__int16	xRange, yRange, zRange;
 };
 
+typedef struct BOAT_INFO
+{
+	int boat_turn;
+	int left_fallspeed;
+	int right_fallspeed;
+	int water;
+	int pitch;
+	__int16 tilt_angle;
+	__int16 extra_rotation;
+	__int16 prop_rot;
+};
+
+typedef struct SKIDOO_INFO
+{
+	__int16 track_mesh;
+	int skidoo_turn;
+	int left_fallspeed, right_fallspeed;
+	__int16 momentum_angle, extra_rotation;
+	int pitch;
+	bool already_cd_played;
+	bool armed;
+	int flash_timer;
+};
+
+typedef struct KAYAK_INFO {
+	int Vel;
+	int Rot;
+	int FallSpeedF;
+	int FallSpeedL;
+	int FallSpeedR;
+	int Water;
+	PHD_3DPOS OldPos;
+	char Turn;
+	char Forward;
+	char TrueWater;
+	char Flags;
+};
+
 void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
 
 // TR1 objects
@@ -81,6 +118,13 @@ void __cdecl RatControl(__int16 itemNum);
 void __cdecl SilencerControl(__int16 itemNum);
 void __cdecl InitialiseYeti(short itemNum);
 void __cdecl YetiControl(short itemNum);
+void __cdecl InitialiseBoat(__int16 itemNum);
+void __cdecl BoatCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
+void __cdecl BoatControl(__int16 itemNum);
+void __cdecl InitialiseSkidoo(__int16 itemNum);
+void __cdecl SkidooCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
+int __cdecl SkidooControl();
+void __cdecl DrawSkidoo(ITEM_INFO* item);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
@@ -114,17 +158,27 @@ void __cdecl SetupFish(__int32 leader, ITEM_INFO* item);
 void ControlFish(__int16 itemNumber);
 bool FishNearLara(PHD_3DPOS* pos, __int32 distance, ITEM_INFO* item);
 
-__int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
-__int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);
-__int32 __cdecl DoShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old);
-__int32 __cdecl DoDynamics(__int32 height, __int32 fallspeed, __int32 *y);
+void __cdecl QuadbikeExplode(ITEM_INFO* item);
+__int32 __cdecl CanQuadbikeGetOff(__int32 direction);
+__int32 __cdecl QuadCheckGetOff();
+int GetOnQuadBike(__int16 itemNumber, COLL_INFO* coll);
+void __cdecl QuadBaddieCollision(ITEM_INFO* quad);
+__int32 __cdecl GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
+__int32 __cdecl TestQuadHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);
+__int32 __cdecl DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old);
+__int32 __cdecl DoQuadDynamics(__int32 height, __int32 fallspeed, __int32* y);
 __int32 __cdecl QuadDynamics(ITEM_INFO* item);
 void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead);
 __int32 __cdecl QuadUserControl(ITEM_INFO* item, __int32 height, int* pitch);
+void __cdecl TriggerQuadExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int32 speed, __int32 moving);
 void __cdecl InitialiseQuadBike(__int16 itemNumber);
 void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 __int32 __cdecl QuadBikeControl();
-void __cdecl TriggerExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int32 speed, __int32 moving);
+
+void __cdecl InitialiseKayak(__int16 item_number);
+void __cdecl DrawKayak(ITEM_INFO* kayak);
+void __cdecl KayakCollision(__int16 item_number, ITEM_INFO* l, COLL_INFO* coll);
+int __cdecl KayakControl();
 
 // TR4 object
 void __cdecl InitialiseWildBoar(__int16 itemNum);
@@ -203,21 +257,22 @@ void __cdecl InitialiseHorseman(__int16 itemNum);
 void __cdecl HorsemanControl(__int16 itemNum);
 void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num);
 
-void __cdecl InitialiseJeep(__int16 itemNum);
-__int32 __cdecl JeepControl();
-__int32 __cdecl JeepCheckGetOff();
-__int32 __cdecl JeepDynamics(ITEM_INFO* item);
-__int32 __cdecl JeepUserControl(ITEM_INFO* item, __int32 height, __int32* pitch);
-void __cdecl AnimateJeep(ITEM_INFO* item, __int32 collide, __int32 dead);
-void __cdecl JeepExplode(ITEM_INFO* item);
-__int32 __cdecl JeepCanGetOff();
+__int32 __cdecl TestJeepHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);
+__int32 __cdecl DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old);
 __int32 __cdecl DoJeepDynamics(__int32 height, __int32 speed, __int32* y, __int32 flags);
+__int32 __cdecl JeepCanGetOff();
 void __cdecl TriggerJeepExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int16 speed, __int32 moving);
-__int32 __cdecl GetOnJeep(int itemNumber);
-void __cdecl JeepCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+__int32 __cdecl JeepCheckGetOff();
 __int32 __cdecl GetOnJeep(int itemNumber);
 __int32 __cdecl GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 void __cdecl JeepBaddieCollision(ITEM_INFO* jeep);
+void __cdecl JeepExplode(ITEM_INFO* item);
+__int32 __cdecl JeepDynamics(ITEM_INFO* item);
+__int32 __cdecl JeepUserControl(ITEM_INFO* item, __int32 height, __int32* pitch);
+void __cdecl AnimateJeep(ITEM_INFO* item, __int32 collide, __int32 dead);
+void __cdecl InitialiseJeep(__int16 itemNum);
+__int32 __cdecl JeepControl();
+void __cdecl JeepCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 
 void __cdecl InitialiseMotorbike(__int16 itemNum);
 __int32 __cdecl MotorbikeControl();

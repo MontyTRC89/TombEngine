@@ -197,8 +197,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="CustomObjects\shark.h" />
     <ClInclude Include="CustomObjects\tribesman.h" />
     <ClInclude Include="Scripting\GameFlowScript.h" />
-    <ClInclude Include="Game\Anim.h" />
-    <ClInclude Include="Game\Box.h" />
+    <ClInclude Include="Game\anim.h" />
+    <ClInclude Include="Game\box.h" />
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
     <ClInclude Include="Game\collide.h" />
@@ -277,12 +277,15 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Game\lion.cpp" />
     <ClCompile Include="Game\swat.cpp" />
+    <ClCompile Include="Objects\boat.cpp" />
     <ClCompile Include="Objects\fish.cpp" />
     <ClCompile Include="Objects\flamethrower.cpp" />
     <ClCompile Include="Objects\horseman.cpp" />
     <ClCompile Include="Objects\jeep.cpp" />
+    <ClCompile Include="Objects\kayak.cpp" />
     <ClCompile Include="Objects\mpgun.cpp" />
     <ClCompile Include="Objects\mpstick.cpp" />
+    <ClCompile Include="Objects\snowmobile.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\demigod.cpp" />
     <ClCompile Include="Objects\guide.cpp" />
