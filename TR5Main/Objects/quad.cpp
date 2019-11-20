@@ -1,17 +1,17 @@
 #include "newobjects.h"
-#include "..\Global\global.h"
-#include "..\Game\Box.h"
-#include "..\Game\items.h"
-#include "..\Game\lot.h"
-#include "..\Game\control.h"
-#include "..\Game\effects.h"
-#include "..\Game\draw.h"
-#include "..\Game\sphere.h"
-#include "..\Game\effect2.h"
-#include "..\Game\people.h"
-#include "..\Game\lara.h"
-#include "..\Game\collide.h"
-#include "..\Game\laraflar.h"
+#include "../Global/global.h"
+#include "../Game/Box.h"
+#include "../Game/items.h"
+#include "../Game/lot.h"
+#include "../Game/control.h"
+#include "../Game/effects.h"
+#include "../Game/draw.h"
+#include "../Game/sphere.h"
+#include "../Game/effect2.h"
+#include "../Game/people.h"
+#include "../Game/lara.h"
+#include "../Game/collide.h"
+#include "../Game/laraflar.h"
 
 #include <vector>
 
@@ -163,7 +163,7 @@ void __cdecl QuadbikeExplode(ITEM_INFO* item)
 	g_LaraExtra.Vehicle = NO_ITEM;
 }
 
-__int32 __cdecl CanGetOff(__int32 direction)
+__int32 __cdecl CanQuadbikeGetOff(__int32 direction)
 {
 	__int16 angle;
 
@@ -258,7 +258,7 @@ __int32 __cdecl QuadCheckGetOff()
 	return true;
 }
 
-static int GetOnQuadBike(__int16 itemNumber, COLL_INFO* coll)
+int GetOnQuadBike(__int16 itemNumber, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -352,7 +352,7 @@ void __cdecl QuadBaddieCollision(ITEM_INFO* quad)
 	}
 }
 
-__int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
+__int32 __cdecl GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 {
 	p->x = item->pos.xPos - p->x;
 	p->z = item->pos.zPos - p->z;
@@ -383,7 +383,7 @@ __int32 __cdecl GetCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 	return 0;
 }
 
-__int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos)
+__int32 __cdecl TestQuadHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos)
 {
 	pos->y = item->pos.yPos - (dz * SIN(item->pos.xRot) >> W2V_SHIFT) + (dx * SIN(item->pos.zRot) >> W2V_SHIFT);
 
@@ -402,7 +402,7 @@ __int32 __cdecl TestHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* 
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-__int32 __cdecl DoShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
+__int32 __cdecl DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	__int32 x = pos->x >> WALL_SHIFT;
 	__int32 z = pos->z >> WALL_SHIFT;
@@ -502,7 +502,7 @@ __int32 __cdecl DoShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-__int32 __cdecl DoDynamics(__int32 height, __int32 fallspeed, __int32 *y)
+__int32 __cdecl DoQuadDynamics(__int32 height, __int32 fallspeed, __int32 *y)
 {
 	if (height > *y)
 	{
@@ -547,16 +547,16 @@ __int32 __cdecl QuadDynamics(ITEM_INFO* item)
 	QUAD_INFO* quad = (QUAD_INFO*)item->data;
 
 	/* First get positions and heights of skidoo's corners + centre */
-	holdFrontLeft = TestHeight(item, QUAD_FRONT, -QUAD_SIDE, &oldFrontLeft);
-	holdFrontRight = TestHeight(item, QUAD_FRONT, QUAD_SIDE, &oldFrontRight);
-	holdBottomLeft = TestHeight(item, -QUAD_FRONT, -QUAD_SIDE, &oldBottomLeft);
-	holdBottomRight = TestHeight(item, -QUAD_FRONT, QUAD_SIDE, &oldBottomRight);
-	hmml_old = TestHeight(item, 0, -QUAD_SIDE, &mml_old);
-	hmmr_old = TestHeight(item, 0, QUAD_SIDE, &mmr_old);
-	hmtl_old = TestHeight(item, QUAD_FRONT >> 1, -QUAD_SIDE, &mtl_old);
-	hmtr_old = TestHeight(item, QUAD_FRONT >> 1, QUAD_SIDE, &mtr_old);
-	hmoldBottomLeft = TestHeight(item, -QUAD_FRONT >> 1, -QUAD_SIDE, &moldBottomLeft);
-	hmoldBottomRight = TestHeight(item, -QUAD_FRONT >> 1, QUAD_SIDE, &moldBottomRight);
+	holdFrontLeft = TestQuadHeight(item, QUAD_FRONT, -QUAD_SIDE, &oldFrontLeft);
+	holdFrontRight = TestQuadHeight(item, QUAD_FRONT, QUAD_SIDE, &oldFrontRight);
+	holdBottomLeft = TestQuadHeight(item, -QUAD_FRONT, -QUAD_SIDE, &oldBottomLeft);
+	holdBottomRight = TestQuadHeight(item, -QUAD_FRONT, QUAD_SIDE, &oldBottomRight);
+	hmml_old = TestQuadHeight(item, 0, -QUAD_SIDE, &mml_old);
+	hmmr_old = TestQuadHeight(item, 0, QUAD_SIDE, &mmr_old);
+	hmtl_old = TestQuadHeight(item, QUAD_FRONT >> 1, -QUAD_SIDE, &mtl_old);
+	hmtr_old = TestQuadHeight(item, QUAD_FRONT >> 1, QUAD_SIDE, &mtr_old);
+	hmoldBottomLeft = TestQuadHeight(item, -QUAD_FRONT >> 1, -QUAD_SIDE, &moldBottomLeft);
+	hmoldBottomRight = TestQuadHeight(item, -QUAD_FRONT >> 1, QUAD_SIDE, &moldBottomRight);
 
 	old.x = item->pos.xPos;
 	old.y = item->pos.yPos;
@@ -670,54 +670,54 @@ __int32 __cdecl QuadDynamics(ITEM_INFO* item)
 
 	rot = 0;
 
-	hfl = TestHeight(item, QUAD_FRONT, -QUAD_SIDE, &fl);
+	hfl = TestQuadHeight(item, QUAD_FRONT, -QUAD_SIDE, &fl);
 	if (hfl < oldFrontLeft.y - STEP_SIZE)
-		rot = DoShift(item, &fl, &oldFrontLeft);
+		rot = DoQuadShift(item, &fl, &oldFrontLeft);
 
-	hmtl = TestHeight(item, QUAD_FRONT >> 1, -QUAD_SIDE, &mtl);
+	hmtl = TestQuadHeight(item, QUAD_FRONT >> 1, -QUAD_SIDE, &mtl);
 	if (hmtl < mtl_old.y - STEP_SIZE)
-		DoShift(item, &mtl, &mtl_old);
+		DoQuadShift(item, &mtl, &mtl_old);
 
-	hmml = TestHeight(item, 0, -QUAD_SIDE, &mml);
+	hmml = TestQuadHeight(item, 0, -QUAD_SIDE, &mml);
 	if (hmml < mml_old.y - STEP_SIZE)
-		DoShift(item, &mml, &mml_old);
+		DoQuadShift(item, &mml, &mml_old);
 
-	hmbl = TestHeight(item, -QUAD_FRONT >> 1, -QUAD_SIDE, &mbl);
+	hmbl = TestQuadHeight(item, -QUAD_FRONT >> 1, -QUAD_SIDE, &mbl);
 	if (hmbl < moldBottomLeft.y - STEP_SIZE)
-		DoShift(item, &mbl, &moldBottomLeft);
+		DoQuadShift(item, &mbl, &moldBottomLeft);
 
-	hbl = TestHeight(item, -QUAD_FRONT, -QUAD_SIDE, &bl);
+	hbl = TestQuadHeight(item, -QUAD_FRONT, -QUAD_SIDE, &bl);
 	if (hbl < oldBottomLeft.y - STEP_SIZE)
 	{
-		rotadd = DoShift(item, &bl, &oldBottomLeft);
+		rotadd = DoQuadShift(item, &bl, &oldBottomLeft);
 		if ((rotadd > 0 && rot >= 0) || (rotadd < 0 && rot <= 0))
 			rot += rotadd;
 	}
 
-	hfr = TestHeight(item, QUAD_FRONT, QUAD_SIDE, &fr);
+	hfr = TestQuadHeight(item, QUAD_FRONT, QUAD_SIDE, &fr);
 	if (hfr < oldFrontRight.y - STEP_SIZE)
 	{
-		rotadd = DoShift(item, &fr, &oldFrontRight);
+		rotadd = DoQuadShift(item, &fr, &oldFrontRight);
 		if ((rotadd > 0 && rot >= 0) || (rotadd < 0 && rot <= 0))
 			rot += rotadd;
 	}
 
-	hmtr = TestHeight(item, QUAD_FRONT >> 1, QUAD_SIDE, &mtr);
+	hmtr = TestQuadHeight(item, QUAD_FRONT >> 1, QUAD_SIDE, &mtr);
 	if (hmtr < mtr_old.y - STEP_SIZE)
-		DoShift(item, &mtr, &mtr_old);
+		DoQuadShift(item, &mtr, &mtr_old);
 
-	hmmr = TestHeight(item, 0, QUAD_SIDE, &mmr);
+	hmmr = TestQuadHeight(item, 0, QUAD_SIDE, &mmr);
 	if (hmmr < mmr_old.y - STEP_SIZE)
-		DoShift(item, &mmr, &mmr_old);
+		DoQuadShift(item, &mmr, &mmr_old);
 
-	hmbr = TestHeight(item, -QUAD_FRONT >> 1, QUAD_SIDE, &mbr);
+	hmbr = TestQuadHeight(item, -QUAD_FRONT >> 1, QUAD_SIDE, &mbr);
 	if (hmbr < moldBottomRight.y - STEP_SIZE)
-		DoShift(item, &mbr, &moldBottomRight);
+		DoQuadShift(item, &mbr, &moldBottomRight);
 
-	hbr = TestHeight(item, -QUAD_FRONT, QUAD_SIDE, &br);
+	hbr = TestQuadHeight(item, -QUAD_FRONT, QUAD_SIDE, &br);
 	if (hbr < oldBottomRight.y - STEP_SIZE)
 	{
-		rotadd = DoShift(item, &br, &oldBottomRight);
+		rotadd = DoQuadShift(item, &br, &oldBottomRight);
 		if ((rotadd > 0 && rot >= 0) || (rotadd < 0 && rot <= 0))
 			rot += rotadd;
 	}
@@ -727,11 +727,11 @@ __int32 __cdecl QuadDynamics(ITEM_INFO* item)
 
 	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	if (height < item->pos.yPos - STEP_SIZE)
-		DoShift(item, (PHD_VECTOR *)&item->pos, &old);
+		DoQuadShift(item, (PHD_VECTOR *)&item->pos, &old);
 
 	quad->extraRotation = rot;
 
-	collide = GetCollisionAnim(item, &moved);
+	collide = GetQuadCollisionAnim(item, &moved);
 
 	if (collide)
 	{
@@ -821,9 +821,9 @@ void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead)
 
 			else if (TrInput & IN_ROLL && quad->velocity == 0 && !QuadNoGetOff)
 			{
-				if ((TrInput & IN_RIGHT) && CanGetOff(1))
+				if ((TrInput & IN_RIGHT) && CanQuadbikeGetOff(1))
 					LaraItem->goalAnimState = QUAD_STATE_GETOFFR;
-				else if ((TrInput & IN_LEFT) && CanGetOff(-1))
+				else if ((TrInput & IN_LEFT) && CanQuadbikeGetOff(-1))
 					LaraItem->goalAnimState = QUAD_STATE_GETOFFL;
 			}
 
@@ -1204,6 +1204,66 @@ void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll
 		ObjectCollision(itemNumber, l, coll);
 }
 
+void __cdecl TriggerQuadExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int32 speed, __int32 moving)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = true;
+	spark->sR = 0;
+	spark->sG = 0;
+	spark->sB = 0;
+
+	spark->dR = 96;
+	spark->dG = 96;
+	spark->dB = 128;
+
+	if (moving)
+	{
+		spark->dR = (spark->dR * speed) >> 5;
+		spark->dG = (spark->dG * speed) >> 5;
+		spark->dB = (spark->dB * speed) >> 5;
+	}
+
+	spark->colFadeSpeed = 4;
+	spark->fadeToBlack = 4;
+	spark->sLife = spark->life = (GetRandomControl() & 3) + 20 - (speed >> 12);
+	if (spark->sLife < 9)
+		spark->sLife = spark->life = 9;
+
+	spark->extras = 0;
+	spark->dynamic = -1;
+
+	spark->x = x + ((GetRandomControl() & 15) - 8);
+	spark->y = y + ((GetRandomControl() & 15) - 8);
+	spark->z = z + ((GetRandomControl() & 15) - 8);
+	__int32 zv = (speed * COS(angle)) >> (W2V_SHIFT + 2);
+	__int32 xv = (speed * SIN(angle)) >> (W2V_SHIFT + 2);
+	spark->xVel = xv + ((GetRandomControl() & 255) - 128);
+	spark->yVel = -(GetRandomControl() & 7) - 8;
+	spark->zVel = zv + ((GetRandomControl() & 255) - 128);
+	spark->friction = 4;
+
+	if (GetRandomControl() & 1)
+	{
+		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		spark->rotAng = GetRandomControl() & 4095;
+		if (GetRandomControl() & 1)
+			spark->rotAdd = -(GetRandomControl() & 7) - 24;
+		else
+			spark->rotAdd = (GetRandomControl() & 7) + 24;
+	}
+	else
+		spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+
+	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	spark->scalar = 2;
+	spark->gravity = -(GetRandomControl() & 3) - 4;
+	spark->maxYvel = -(GetRandomControl() & 7) - 8;
+	__int32 size = (GetRandomControl() & 7) + 16 + (speed >> 7);
+	spark->dSize = size;
+	spark->size = size >> 1;
+}
+
 __int32 __cdecl QuadBikeControl()
 {
 	__int16 xRot, zRot, rotadd;
@@ -1227,8 +1287,8 @@ __int32 __cdecl QuadBikeControl()
 
 	PHD_VECTOR fl;
 	PHD_VECTOR fr;
-	__int32 hfl = TestHeight(item, QUAD_FRONT, -QUAD_SIDE, &fl);
-	__int32 hfr = TestHeight(item, QUAD_FRONT, QUAD_SIDE, &fr);
+	__int32 hfl = TestQuadHeight(item, QUAD_FRONT, -QUAD_SIDE, &fl);
+	__int32 hfr = TestQuadHeight(item, QUAD_FRONT, QUAD_SIDE, &fr);
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -1288,9 +1348,9 @@ __int32 __cdecl QuadBikeControl()
 	quad->rearRot -= (quad->revs >> 3);
 	quad->frontRot -= rotadd;
 
-	quad->leftFallspeed = DoDynamics(hfl, quad->leftFallspeed, (int *)&fl.y);
-	quad->rightFallspeed = DoDynamics(hfr, quad->rightFallspeed, (int *)&fr.y);
-	item->fallspeed = DoDynamics(height, item->fallspeed, (int *)&item->pos.yPos);
+	quad->leftFallspeed = DoQuadDynamics(hfl, quad->leftFallspeed, (int *)&fl.y);
+	quad->rightFallspeed = DoQuadDynamics(hfr, quad->rightFallspeed, (int *)&fr.y);
+	item->fallspeed = DoQuadDynamics(height, item->fallspeed, (int *)&item->pos.yPos);
 
 	height = (fl.y + fr.y) >> 1;
 	xRot = ATAN(QUAD_FRONT, item->pos.yPos - height);
@@ -1355,7 +1415,7 @@ __int32 __cdecl QuadBikeControl()
 				if (item->speed < 64)
 				{
 					speed = 64 - item->speed;
-					TriggerExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 1);
+					TriggerQuadExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 1);
 				}
 			}
 			else
@@ -1371,7 +1431,7 @@ __int32 __cdecl QuadBikeControl()
 					speed = ((GetRandomControl() & 15) + (GetRandomControl() & 16)) << 7;
 				else
 					speed = 0;
-				TriggerExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 0);
+				TriggerQuadExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 0);
 			}
 		}
 	}
@@ -1379,64 +1439,4 @@ __int32 __cdecl QuadBikeControl()
 		QuadSmokeStart = 0;
 
 	return QuadCheckGetOff();
-}
-
-void __cdecl TriggerExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int32 speed, __int32 moving)
-{
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-
-	spark->on = true;
-	spark->sR = 0;
-	spark->sG = 0;
-	spark->sB = 0;
-
-	spark->dR = 96;
-	spark->dG = 96;
-	spark->dB = 128;
-
-	if (moving)
-	{
-		spark->dR = (spark->dR * speed) >> 5;
-		spark->dG = (spark->dG * speed) >> 5;
-		spark->dB = (spark->dB * speed) >> 5;
-	}
-
-	spark->colFadeSpeed = 4;
-	spark->fadeToBlack = 4;
-	spark->sLife = spark->life = (GetRandomControl() & 3) + 20 - (speed >> 12);
-	if (spark->sLife < 9)
-		spark->sLife = spark->life = 9;
-
-	spark->extras = 0;
-	spark->dynamic = -1;
-
-	spark->x = x + ((GetRandomControl() & 15) - 8);
-	spark->y = y + ((GetRandomControl() & 15) - 8);
-	spark->z = z + ((GetRandomControl() & 15) - 8);
-	__int32 zv = (speed * COS(angle)) >> (W2V_SHIFT + 2);
-	__int32 xv = (speed * SIN(angle)) >> (W2V_SHIFT + 2);
-	spark->xVel = xv + ((GetRandomControl() & 255) - 128);
-	spark->yVel = -(GetRandomControl() & 7) - 8;
-	spark->zVel = zv + ((GetRandomControl() & 255) - 128);
-	spark->friction = 4;
-
-	if (GetRandomControl() & 1)
-	{
-		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		spark->rotAng = GetRandomControl() & 4095;
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -(GetRandomControl() & 7) - 24;
-		else
-			spark->rotAdd = (GetRandomControl() & 7) + 24;
-	}
-	else
-		spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	spark->scalar = 2;
-	spark->gravity = -(GetRandomControl() & 3) - 4;
-	spark->maxYvel = -(GetRandomControl() & 7) - 8;
-	__int32 size = (GetRandomControl() & 7) + 16 + (speed >> 7);
-	spark->dSize = size;
-	spark->size = size >> 1;
 }

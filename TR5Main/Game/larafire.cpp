@@ -29,9 +29,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Pistols */
 	{
-		{ -ANGLE(60),  +ANGLE(60),  -ANGLE(60), +ANGLE(60) },
-		{ -ANGLE(170), +ANGLE(60),  -ANGLE(80), +ANGLE(80) },
-		{ -ANGLE(60),  +ANGLE(170), -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(60),  -ANGLE(60), ANGLE(60) },
+		{ -ANGLE(170), ANGLE(60),  -ANGLE(80), ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(170), -ANGLE(80), ANGLE(80) },
 		ANGLE(10),
 		ANGLE(8),
 		650,
@@ -40,12 +40,12 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		0,
-		8
+		SFX_LARA_FIRE
 	},
 	/* Revolver */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(60), +ANGLE(60) },
-		{ -ANGLE(10), +ANGLE(10), -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(60), ANGLE(60) },
+		{ -ANGLE(10), ANGLE(10), -ANGLE(80), ANGLE(80) },
 		{  ANGLE(0),   ANGLE(0),   ANGLE(0),   ANGLE(0) },
 		ANGLE(10),
 		ANGLE(4),
@@ -55,13 +55,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		16,
 		3,
 		0,
-		121
+		SFX_REVOLVER
 	},
 	/* Uzis */
 	{
-		{ -ANGLE(60),  +ANGLE(60),  -ANGLE(60), +ANGLE(60) },
-		{ -ANGLE(170), +ANGLE(60),  -ANGLE(80), +ANGLE(80) },
-		{ -ANGLE(60),  +ANGLE(170), -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(60),  -ANGLE(60), ANGLE(60) },
+		{ -ANGLE(170), ANGLE(60),  -ANGLE(80), ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(170), -ANGLE(80), ANGLE(80) },
 		ANGLE(10),
 		ANGLE(8),
 		650,
@@ -70,13 +70,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		3,
 		3,
 		0,
-		43
+		SFX_LARA_UZI_FIRE
 	},
 	/* Shotgun */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		0,
 		500,
@@ -85,13 +85,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		10,
-		45
+		SFX_LARA_SHOTGUN
 	},
 	/* HK */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(4),
 		500,
@@ -100,13 +100,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		3,
 		10,
-		0
+		0     // FIRE/SILENCER_FIRE
 	},
 	/* Crossbow */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -115,7 +115,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		10,
-		0
+		SFX_LARA_CROSSBOW
 	},
 	/* Flare */
 	{
@@ -134,9 +134,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Flare 2 */
 	{
-		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
 		ANGLE(10),
 		ANGLE(8),
 		400,
@@ -145,13 +145,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		0,
-		43
+		SFX_LARA_UZI_FIRE
 	},
 	/* Grenade launcher */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -164,9 +164,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	}, 
 	/* Harpoon gun */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(20), +ANGLE(20), -ANGLE(75), +ANGLE(75) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(75), +ANGLE(75) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(20), ANGLE(20), -ANGLE(75), ANGLE(75) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(75), ANGLE(75) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -179,9 +179,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Rocket launcher */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -191,6 +191,21 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		2,
 		12,
 		77
+	},
+	/* Snowmobile */
+	{
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		ANGLE(10),
+		ANGLE(8),
+		400,
+		8 * WALL_SIZE,
+		3,
+		0,
+		0,
+		0,
+		SFX_LARA_UZI_FIRE
 	}
 };
 

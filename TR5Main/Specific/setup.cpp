@@ -1,5 +1,3 @@
-#pragma once
-
 #include "setup.h"
 #include "..\Game\draw.h"
 #include "..\Game\collide.h"
@@ -1097,6 +1095,28 @@ void __cdecl NewObjects()
 		Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
 		Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
 	}
+
+	obj = &Objects[ID_SNOWMOBILE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSkidoo;
+		obj->collision = SkidooCollision;
+		//obj->drawRoutine = DrawSkidoo; // TODO: create a new render for the skidoo. (with track animated)
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_KAYAK];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseKayak;
+		obj->collision = KayakCollision;
+		obj->drawRoutine = DrawKayak;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
 }
 
 // TODO: check for all the flags, some is surely missing.
@@ -1422,7 +1442,6 @@ void __cdecl BaddyObjects()
 	}
 
 	obj = &Objects[ID_REAPER];
-
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseReaper;
