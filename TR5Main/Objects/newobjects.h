@@ -120,7 +120,7 @@ void __cdecl InitialiseYeti(short itemNum);
 void __cdecl YetiControl(short itemNum);
 void __cdecl InitialiseBoat(__int16 itemNum);
 void __cdecl BoatCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
-void __cdecl BoatControl(__int16 itemNum);
+void __cdecl BoatControl(__int16 itemNumber);
 void __cdecl InitialiseSkidoo(__int16 itemNum);
 void __cdecl SkidooCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
 int __cdecl SkidooControl();
