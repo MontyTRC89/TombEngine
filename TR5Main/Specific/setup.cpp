@@ -1173,6 +1173,25 @@ void __cdecl BaddyObjects()
 	}
 	*/
 
+	obj = &Objects[ID_SAS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWorkerMachineGun;
+		obj->collision = CreatureCollision;
+		obj->control = WorkerMachineGunControl;
+		obj->hitPoints = 20;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
+		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
+		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+	}
+
 	obj = &Objects[ID_BLUE_GUARD];
 	if (obj->loaded)
 	{
@@ -3105,6 +3124,45 @@ void __cdecl CustomObjects()
 		obj->savePosition = true;
 		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
 		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_WORKER_SHOTGUN];
+	if (obj->loaded)
+	{
+		obj->biteOffset = 0;
+		obj->initialise = InitialiseWorkerShotgun;
+		obj->collision = CreatureCollision;
+		obj->control = WorkerShotgunControl;
+		obj->hitPoints = 25;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
+		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
+		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+	}
+
+	obj = &Objects[ID_WORKER_MACHINEGUN];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWorkerMachineGun;
+		obj->collision = CreatureCollision;
+		obj->control = WorkerMachineGunControl;
+		obj->hitPoints = 20;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
+		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
+		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
 	}
 	*/
 }

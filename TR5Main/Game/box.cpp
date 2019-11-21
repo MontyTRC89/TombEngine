@@ -375,6 +375,7 @@ void __cdecl CreatureTilt(ITEM_INFO* item, __int16 angle)
 	item->pos.zRot += angle;  
 }
 
+// TODO: probably wrong value somewhere, since the xRot is modified.
 __int16 __cdecl _CreatureTurn(ITEM_INFO* item, __int16 maximumTurn)
 {
 	if (item->data == NULL || maximumTurn == 0)
