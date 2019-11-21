@@ -396,21 +396,21 @@ __int16 __cdecl _CreatureTurn(ITEM_INFO* item, __int16 maximumTurn)
 #define RSINN (((rcossin_tbl[((item->pos.yRot - 0x1FFE) >> 3) & 0x1FFE] + 1) << 11) >> W2V_SHIFT)
 #define RCOSA (((rcossin_tbl[(item->pos.yRot >> 3) & 0x1FFE]) << 11) >> W2V_SHIFT)
 #define RSINA (((rcossin_tbl[(item->pos.yRot >> 3) & 0x1FFE] + 1) << 11) >> W2V_SHIFT)
-#define ROOM (unsigned __int16)(&room->floor[((zAngle1 - room->z) >> WALL_SHIFT) + room->xSize * ((xAngle1 - room->x) >> WALL_SHIFT)] + 1) >> 15
+#define ROOM(xAngle, zAngle) (unsigned __int16)(&room->floor[((zAngle - room->z) >> WALL_SHIFT) + room->xSize * ((xAngle - room->x) >> WALL_SHIFT)] + 1) >> 15
 
 	room = &Rooms[item->roomNumber];
 
 	xAngle1 = item->pos.xPos + RCOSP;
 	zAngle1 = item->pos.zPos + RSINP;
-	roomIndex1 = ROOM;
+	roomIndex1 = ROOM(xAngle1, zAngle1);
 
 	xAngle2 = item->pos.xPos + RCOSN;
 	zAngle2 = item->pos.zPos + RSINN;
-	roomIndex2 = ROOM;
+	roomIndex2 = ROOM(xAngle2, zAngle2);
 
 	xAngle3 = item->pos.xPos + RCOSA;
 	zAngle3 = item->pos.zPos + RSINA;
-	roomIndex3 = ROOM;
+	roomIndex3 = ROOM(xAngle3, zAngle3);
 
 	if (roomIndex1 && !roomIndex2 && !roomIndex3)
 	{
@@ -449,6 +449,15 @@ __int16 __cdecl _CreatureTurn(ITEM_INFO* item, __int16 maximumTurn)
 		angle = -maximumTurn;
 
 	item->pos.yRot += (angle + maximumTurn);
+
+#undef RCOSP
+#undef RSINP
+#undef RCOSN
+#undef RSINN
+#undef RCOSA
+#undef RSINA
+#undef ROOM
+
 	return angle;
 }
 
