@@ -127,6 +127,9 @@ int __cdecl SkidooControl();
 void __cdecl DrawSkidoo(ITEM_INFO* item);
 void __cdecl WorkerShotgunControl(__int16 itemNum);
 void __cdecl InitialiseWorkerShotgun(__int16 itemNum);
+void __cdecl WorkerMachineGunControl(__int16 itemNum);
+void __cdecl InitialiseWorkerMachineGun(__int16 itemNum);
+
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
