@@ -222,6 +222,15 @@ void __cdecl CreatureKill(ITEM_INFO* item, __int32 killAnim, __int32 killState, 
 	Camera.flags = FOLLOW_CENTRE;
 	Camera.targetAngle = ANGLE(170);
 	Camera.targetElevation = -ANGLE(25);
+
+	// TODO: exist in TR5 but just commented in case.
+	/*
+	ForcedFixedCamera.x = item->pos.xPos + (rcossin_tbl[(item->pos.yRot >> 3) & 0x1FFE] << 13 >> W2V_SHIFT);
+	ForcedFixedCamera.y = item->pos.yPos - 1024;
+	ForcedFixedCamera.z = item->pos.zPos + (rcossin_tbl[((item->pos.yRot >> 3) & 0x1FFE) + 1] << 13 >> W2V_SHIFT);
+	ForcedFixedCamera.roomNumber = item->roomNumber;
+	UseForcedFixedCamera = true;
+	*/
 }
 
 __int16 __cdecl CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, __int16 damage, __int16 angle, __int16 (*generate)(__int32 x, __int32 y, __int32 z, __int16 speed, __int16 yrot, __int16 roomNumber))
@@ -366,16 +375,81 @@ void __cdecl CreatureTilt(ITEM_INFO* item, __int16 angle)
 	item->pos.zRot += angle;  
 }
 
-__int16 __cdecl CreatureTurn2(ITEM_INFO* item, __int16 maximumTurn)
+__int16 __cdecl _CreatureTurn(ITEM_INFO* item, __int16 maximumTurn)
 {
 	if (item->data == NULL || maximumTurn == 0)
 		return 0;
 
+	ROOM_INFO* room;
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	int range, distance;
+	__int16 angle;
+	__int16 xAngle1, zAngle1;
+	__int16 xAngle2, zAngle2;
+	__int16 xAngle3, zAngle3;
+	int xDist, zDist;
+	unsigned __int16 roomIndex1, roomIndex2, roomIndex3;
 
+#define RCOSP (((rcossin_tbl[((item->pos.yRot + 0x1FFE) >> 3) & 0x1FFE]) << 11) >> W2V_SHIFT)
+#define RSINP (((rcossin_tbl[((item->pos.yRot + 0x1FFE) >> 3) & 0x1FFE] + 1) << 11) >> W2V_SHIFT)
+#define RCOSN (((rcossin_tbl[((item->pos.yRot - 0x1FFE) >> 3) & 0x1FFE]) << 11) >> W2V_SHIFT)
+#define RSINN (((rcossin_tbl[((item->pos.yRot - 0x1FFE) >> 3) & 0x1FFE] + 1) << 11) >> W2V_SHIFT)
+#define RCOSA (((rcossin_tbl[(item->pos.yRot >> 3) & 0x1FFE]) << 11) >> W2V_SHIFT)
+#define RSINA (((rcossin_tbl[(item->pos.yRot >> 3) & 0x1FFE] + 1) << 11) >> W2V_SHIFT)
+#define ROOM (unsigned __int16)(&room->floor[((zAngle1 - room->z) >> WALL_SHIFT) + room->xSize * ((xAngle1 - room->x) >> WALL_SHIFT)] + 1) >> 15
 
+	room = &Rooms[item->roomNumber];
 
-	return 0;
+	xAngle1 = item->pos.xPos + RCOSP;
+	zAngle1 = item->pos.zPos + RSINP;
+	roomIndex1 = ROOM;
+
+	xAngle2 = item->pos.xPos + RCOSN;
+	zAngle2 = item->pos.zPos + RSINN;
+	roomIndex2 = ROOM;
+
+	xAngle3 = item->pos.xPos + RCOSA;
+	zAngle3 = item->pos.zPos + RSINA;
+	roomIndex3 = ROOM;
+
+	if (roomIndex1 && !roomIndex2 && !roomIndex3)
+	{
+		creature = (CREATURE_INFO*)item->data;
+		creature->target.x = xAngle1;
+		creature->target.z = zAngle1;
+	}
+	else if (roomIndex2 && !roomIndex1 && !roomIndex3)
+	{
+		creature = (CREATURE_INFO*)item->data;
+		creature->target.x = xAngle2;
+		creature->target.z = zAngle2;
+	}
+	else if (roomIndex3 && !roomIndex1 && !roomIndex2)
+	{
+		creature = (CREATURE_INFO*)item->data;
+		creature->target.x = xAngle3;
+		creature->target.z = zAngle3;
+	}
+
+	xDist = creature->target.x - item->pos.xPos;
+	zDist = creature->target.z - item->pos.zPos;
+	angle = ATAN(zDist, xDist) - item->pos.yRot;
+
+	if (angle > FRONT_ARC || angle < -FRONT_ARC)
+	{
+		range = (item->speed << W2V_SHIFT) / maximumTurn;
+		distance = SQUARE(zDist) + SQUARE(xDist);
+		if (distance < SQUARE(range))
+			maximumTurn >>= 1;
+	}
+
+	if (angle > maximumTurn)
+		angle = maximumTurn;
+	else if (angle < -maximumTurn)
+		angle = -maximumTurn;
+
+	item->pos.yRot += (angle + maximumTurn);
+	return angle;
 }
 
 __int32 __cdecl CreatureAnimation(__int16 itemNumber, __int16 angle, __int16 tilt)
@@ -1736,6 +1810,7 @@ void Inject_Box()
 	INJECT(0x0040B1B0, CreatureTilt);
 	INJECT(0x00409E20, CreatureCreature);
 	INJECT(0x00408630, CreatureActive);
+	//INJECT(0x0040AE90, CreatureTurn);
 	INJECT(0x0040C460, MoveCreature3DPos);
 	INJECT(0x004086C0, CreatureAIInfo);
 	INJECT(0x00409370, CreatureMood);
@@ -1751,7 +1826,4 @@ void Inject_Box()
 	INJECT(0x0040C070, FindAITargetObject);
 	INJECT(0x0040BBE0, AIGuard);
 	INJECT(0x0040BCC0, GetAITarget);
-
-	/*+
-	//INJECT(0x0040AE90, CreatureTurn);+*/
 }
