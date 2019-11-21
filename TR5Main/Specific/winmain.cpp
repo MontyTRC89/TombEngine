@@ -219,7 +219,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	if (!RegisterClass(&App.WindowClass))
 	{
 		printf("Unable To Register Window Class\n");
-		return FALSE;
+		return false;
 	}
 
 	// Create the renderer and enumerate adapters and video modes
@@ -268,7 +268,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	if (!App.WindowHandle)
 	{
 		printf("Unable To Create Window: %d\n", GetLastError());
-		return FALSE;
+		return false;
 	}
 
 	PhdWidth = g_Configuration.Width;

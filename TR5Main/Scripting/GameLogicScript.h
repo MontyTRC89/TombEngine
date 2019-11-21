@@ -15,12 +15,12 @@
 
 using namespace std;
 
-#define ITEM_PARAM_CURRENT_ANIM_STATE		0
-#define ITEM_PARAM_GOAL_ANIM_STATE			1
+#define ITEM_PARAM_currentAnimState		0
+#define ITEM_PARAM_goalAnimState			1
 #define ITEM_PARAM_REQUIRED_ANIM_STATE		2
-#define ITEM_PARAM_FRAME_NUMBER				3
-#define ITEM_PARAM_ANIM_NUMBER				4
-#define ITEM_PARAM_HIT_POINTS				5
+#define ITEM_PARAM_frameNumber				3
+#define ITEM_PARAM_animNumber				4
+#define ITEM_PARAM_hitPoints				5
 #define ITEM_PARAM_HIT_STATUS				6
 #define ITEM_PARAM_GRAVITY_STATUS			7
 #define ITEM_PARAM_COLLIDABLE				8
@@ -58,17 +58,17 @@ typedef struct GameScriptItem {
 
 		switch (param)
 		{
-		case ITEM_PARAM_CURRENT_ANIM_STATE:
+		case ITEM_PARAM_currentAnimState:
 			return NativeItem->currentAnimState;
 		case ITEM_PARAM_REQUIRED_ANIM_STATE:
 			return NativeItem->requiredAnimState;
-		case ITEM_PARAM_GOAL_ANIM_STATE:
+		case ITEM_PARAM_goalAnimState:
 			return NativeItem->goalAnimState;
-		case ITEM_PARAM_ANIM_NUMBER:
+		case ITEM_PARAM_animNumber:
 			return NativeItem->animNumber;
-		case ITEM_PARAM_FRAME_NUMBER:
+		case ITEM_PARAM_frameNumber:
 			return NativeItem->frameNumber;
-		case ITEM_PARAM_HIT_POINTS:
+		case ITEM_PARAM_hitPoints:
 			return NativeItem->hitPoints;
 		case ITEM_PARAM_HIT_STATUS:
 			return NativeItem->hitStatus;
@@ -92,19 +92,19 @@ typedef struct GameScriptItem {
 
 		switch (param)
 		{
-		case ITEM_PARAM_CURRENT_ANIM_STATE:
+		case ITEM_PARAM_currentAnimState:
 			NativeItem->currentAnimState = value; break;
 		case ITEM_PARAM_REQUIRED_ANIM_STATE:
 			NativeItem->requiredAnimState = value; break;
-		case ITEM_PARAM_GOAL_ANIM_STATE:
+		case ITEM_PARAM_goalAnimState:
 			NativeItem->goalAnimState = value; break;
-		case ITEM_PARAM_ANIM_NUMBER:
+		case ITEM_PARAM_animNumber:
 			NativeItem->animNumber = value;
 			NativeItem->frameNumber = Anims[NativeItem->animNumber].frameBase;
 			break;
-		case ITEM_PARAM_FRAME_NUMBER:
+		case ITEM_PARAM_frameNumber:
 			NativeItem->frameNumber = value; break;
-		case ITEM_PARAM_HIT_POINTS:
+		case ITEM_PARAM_hitPoints:
 			NativeItem->hitPoints = value; break;
 		case ITEM_PARAM_HIT_STATUS:
 			NativeItem->hitStatus = value; break;

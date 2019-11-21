@@ -1,6 +1,6 @@
 #include "lara1gun.h"
 #include "items.h"
-#include "lara.h"
+#include "Lara.h"
 #include "larafire.h"
 #include "draw.h"
 #include "Box.h"

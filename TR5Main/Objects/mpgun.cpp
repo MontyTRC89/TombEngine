@@ -9,7 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 
 enum MPGUN_STATES {
 	MPGUN_EMPTY, 

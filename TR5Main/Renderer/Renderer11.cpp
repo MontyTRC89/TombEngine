@@ -11,11 +11,11 @@
 #include "..\Game\pickup.h"
 #include "..\Game\inventory.h"
 #include "..\Game\gameflow.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 #include "..\Game\effect2.h"
 #include "..\Game\rope.h"
 #include "..\Game\items.h"
-#include "..\Game\camera.h"
+#include "..\Game\Camera.h"
 #include "..\Game\healt.h"
 
 #include <D3Dcompiler.h>

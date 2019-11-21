@@ -1,7 +1,7 @@
 #include "spotcam.h"
 
 #include "..\Global\global.h"
-#include "..\Game\camera.h"
+#include "..\Game\Camera.h"
 #include "..\Game\control.h"
 #include "..\Game\draw.h"
 
@@ -835,7 +835,7 @@ void __cdecl CalculateSpotCameras()
 	}//loc_38650
 
 #if PSXENGINE
-	LookAt(camera.pos.x, camera.pos.y, camera.pos.z, camera.target.x, camera.target.y, camera.target.z, croll);
+	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, croll);
 #endif
 
 	///sp = s0
@@ -846,7 +846,7 @@ void __cdecl CalculateSpotCameras()
 
 		/*if (gfCurrentLevel != LVL5_TITLE)
 		{
-			TestTriggersAtXYZ(camera.pos.x, camera.pos.y, camera.pos.z, camera.pos.roomNumber, 1, 0);
+			TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
 		}
 		else
 		{*/
@@ -1142,7 +1142,7 @@ void __cdecl CalculateSpotCameras()
 
 			memcpy((char*)&Camera, (char*)&Backup, sizeof(CAMERA_INFO));
 #if PSXENGINE
-			LookAt(camera.pos.x, camera.pos.y, camera.pos.z, camera.target.x, camera.target.y, camera.target.z, 0);
+			LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
 #endif
 			SplineToCamera = 1;
 			return;
@@ -1156,7 +1156,7 @@ void __cdecl CalculateSpotCameras()
 
 		/*if (gfCurrentLevel != LVL5_TITLE)
 		{
-			TestTriggersAtXYZ(camera.pos.x, camera.pos.y, camera.pos.z, camera.pos.roomNumber, 1, 0);
+			TestTriggersAtXYZ(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, 1, 0);
 		}//loc_39044
 		else
 		{*/

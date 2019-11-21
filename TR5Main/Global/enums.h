@@ -920,3 +920,37 @@ enum msoff {
 	M10, M11, M12, M13,
 	M20, M21, M22, M23
 };
+
+enum collision_types
+{
+	CT_NONE = 0,			   // 0x00
+	CT_FRONT = (1 << 0),  // 0x01
+	CT_LEFT = (1 << 1),  // 0x02
+	CT_RIGHT = (1 << 2),  // 0x04
+	CT_TOP = (1 << 3),  // 0x08
+	CT_TOP_FRONT = (1 << 4),  // 0x10
+	CT_CLAMP = (1 << 5)   // 0x20
+};
+
+enum height_types
+{
+	WALL,
+	SMALL_SLOPE,
+	BIG_SLOPE,
+	DIAGONAL,
+	SPLIT_TRI
+};
+
+enum headings {
+	NORTH,
+	EAST,
+	SOUTH,
+	WEST
+};
+
+enum camera_flags
+{
+	CF_FOLLOW_CENTER = 1,
+	CF_UNKNOWN_2 = 2,
+	CF_CHASE_OBJECT = 3,
+};

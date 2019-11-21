@@ -1,6 +1,6 @@
 #include "collide.h"
 #include "draw.h"
-#include "lara.h"
+#include "Lara.h"
 
 #include "..\Global\global.h"
 
@@ -322,7 +322,7 @@ void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c)
 
 		TestCollision(item, LaraItem);    
 
-		/*if (item->object_number == FAN && item->current_anim_state == 1)	// Is the fan moving slow ?
+		/*if (item->object_number == FAN && item->currentAnimState == 1)	// Is the fan moving slow ?
 			ObjectCollision(item_num, laraitem, coll);*/
 	}
 	else if (item->status != ITEM_INVISIBLE)

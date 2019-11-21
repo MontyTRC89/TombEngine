@@ -9,7 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 
 BITE_INFO mpstickBite1 = { 247,10,11, 13 };
 BITE_INFO mpstickBite2 = { 0,0,100,6 };

@@ -1,5 +1,5 @@
 #include "draw.h"
-#include "lara.h"
+#include "Lara.h"
 #include "..\Renderer\Renderer11.h"
 
 Renderer11* g_Renderer;

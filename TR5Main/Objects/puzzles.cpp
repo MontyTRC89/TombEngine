@@ -5,7 +5,7 @@
 #include "..\Game\lot.h"
 #include "..\Game\control.h"
 #include "..\Game\effect2.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 #include "..\Game\effects.h"
 #include "..\Game\draw.h"
 #include "..\Game\collide.h"

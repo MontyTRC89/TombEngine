@@ -732,7 +732,7 @@ void __cdecl TurnSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 			{
-				Lara.isMoving = FALSE;
+				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
 			}
 			l->pos.yRot ^= (__int16)ANGLE(180);

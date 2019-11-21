@@ -3,7 +3,7 @@
 #include "lot.h"
 #include "objects.h"
 #include "collide.h"
-#include "lara.h"
+#include "Lara.h"
 #include "inventory.h"
 #include "draw.h"
 #include "sphere.h"

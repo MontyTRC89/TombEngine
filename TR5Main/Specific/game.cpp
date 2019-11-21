@@ -7,7 +7,7 @@
 #include "..\Game\effects.h"
 #include "..\Game\items.h"
 #include "..\Game\healt.h"
-#include "..\Game\camera.h"
+#include "..\Game\Camera.h"
 #include "..\Game\pickup.h"
 #include "..\Game\draw.h"
 #include "..\Game\hair.h"

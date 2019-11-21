@@ -10,7 +10,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

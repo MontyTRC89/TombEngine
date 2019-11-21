@@ -11,6 +11,7 @@
 
 #define ONE_DEGREE 182
 #define ANGLE(x) ((x) * 65536.0 / 360.0)
+#define SECTOR(x) ((x) * WALL_SIZE)
 #define TR_ANGLE_TO_DEGREES(x) ((x) / 65536.0 * 360.0)
 #define TR_ANGLE_TO_RAD(x) ((x) / 65536.0 * 360.0 * RADIAN)
 

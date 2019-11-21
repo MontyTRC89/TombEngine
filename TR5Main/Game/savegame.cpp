@@ -1,6 +1,6 @@
 #include "savegame.h"
 #include "..\Global\global.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 #include "..\Game\items.h"
 #include "..\Game\box.h"
 #include "..\Game\pickup.h"
@@ -199,11 +199,11 @@ void SaveGame::saveLara(__int32 arg1, __int32 arg2)
 	memcpy(&lara, &Lara, sizeof(Lara));
 
 	for (__int32 i = 0; i < 15; i++)
-		lara.meshPtrs[i] = (__int16*)((char*)lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
+		Lara.meshPtrs[i] = (__int16*)((char*)Lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
 
-	lara.leftArm.frameBase = (__int16*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
-	lara.rightArm.frameBase = (__int16*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
-	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)MallocBuffer;
+	Lara.leftArm.frameBase = (__int16*)((char *)Lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
+	Lara.rightArm.frameBase = (__int16*)((char *)Lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
+	Lara.generalPtr = (char *)Lara.generalPtr - (ptrdiff_t)MallocBuffer;
 
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
 	
