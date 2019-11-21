@@ -6,7 +6,7 @@
 #include "gameflow.h"
 #include "sound.h"
 #include "savegame.h"
-#include "lara.h"
+#include "Lara.h"
 
 #include "..\Global\global.h"
 #include "..\Specific\input.h"

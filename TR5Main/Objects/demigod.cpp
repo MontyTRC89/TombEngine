@@ -9,7 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 
 void __cdecl InitialiseDemigod(__int16 itemNum)
 {

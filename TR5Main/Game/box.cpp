@@ -5,7 +5,7 @@
 #include "lot.h"
 #include "deltapak.h"
 #include "items.h"
-#include "lara.h"
+#include "Lara.h"
 #include "draw.h"
 #include "sphere.h"
 

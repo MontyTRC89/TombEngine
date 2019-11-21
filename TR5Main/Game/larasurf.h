@@ -1,1 +1,19 @@
 #pragma once
+
+#include "..\Global\global.h"
+#include "lara.h"
+
+void _cdecl lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl LaraSurface(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll);
+__int32 _cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);
+__int32 _cdecl LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);

@@ -1396,8 +1396,8 @@ void __cdecl PuzzleDone(ITEM_INFO* item, __int16 itemNum)
 		for (i = 0; i < level_items; i++)
 		{
 			if (Items[i].objectNumber == AIRLOCK_SWITCH
-				&& Items[i].pos.x_pos == item->pos.x_pos
-				&& Items[i].pos.z_pos == item->pos.z_pos)
+				&& Items[i].pos.xPos == item->pos.xPos
+				&& Items[i].pos.zPos == item->pos.zPos)
 			{
 				FlipMap(Items[i].triggerFlags - 7);
 				flipmap[Items[i].triggerFlags - 7] ^= IFLAG_ACTIVATION_MASK;

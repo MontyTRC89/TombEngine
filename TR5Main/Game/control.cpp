@@ -4,8 +4,8 @@
  
 #include "pickup.h"
 #include "spotcam.h"
-#include "camera.h"
-#include "lara.h"
+#include "Camera.h"
+#include "Lara.h"
 #include "hair.h"
 #include "items.h"
 #include "effect2.h"
@@ -185,7 +185,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
 						InfraRed = TRUE;
 					else*
-						InfraRed = FALSE;*/
+						InfraRed = false;*/
 					Infrared = true;
 				}
 				else
@@ -198,7 +198,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
 						InfraRed = TRUE;
 					else
-						InfraRed = FALSE;*/
+						InfraRed = false;*/
 					Infrared = true;
 				}
 				else
@@ -206,7 +206,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 					/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
 						InfraRed = TRUE;
 					else
-						InfraRed = FALSE;*/
+						InfraRed = false;*/
 					Infrared = false;
 				}
 			}

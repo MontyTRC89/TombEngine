@@ -9,7 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 
 /*
 void __cdecl InitialiseGuard(__int16 itemNum)
@@ -464,7 +464,7 @@ void __cdecl ControlGuard(int itemNum)
 			}
 		}
 		v50 = v120;
-		if (v120 == 69 && item == lara.target)
+		if (v120 == 69 && item == Lara.target)
 		{
 			item->goalAnimState = 39;
 			goto LABEL_105;
@@ -998,7 +998,7 @@ void __cdecl ControlGuard(int itemNum)
 		}
 		goto LABEL_255;
 	case 38:
-		if ((v120 != 69 || item != lara.target)
+		if ((v120 != 69 || item != Lara.target)
 			&& (GetRandomControl() & 0x7F || (v90 = item->triggerFlags, v90 >= 10) || v90 == 9))
 		{
 			v91 = item->_bf15ea;
@@ -1024,7 +1024,7 @@ void __cdecl ControlGuard(int itemNum)
 		}
 		goto LABEL_255;
 	case 39:
-		if (item != lara.target && !(GetRandomControl() & 0x3F))
+		if (item != Lara.target && !(GetRandomControl() & 0x3F))
 		{
 			v94 = item->triggerFlags;
 			if (v94 == 7 || v94 == 9)

@@ -9,7 +9,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\effect2.h"
 #include "..\Game\people.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };

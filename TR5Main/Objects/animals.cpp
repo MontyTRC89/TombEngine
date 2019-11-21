@@ -10,7 +10,7 @@
 #include "..\Game\sphere.h"
 #include "..\Game\people.h"
 #include "..\Game\debris.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };

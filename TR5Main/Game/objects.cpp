@@ -5,7 +5,7 @@
 #include "effect2.h"
 #include "collide.h"
 #include "draw.h"
-#include "lara.h"
+#include "Lara.h"
 #include "sphere.h"
 #include "debris.h"
 #include "control.h"
@@ -596,7 +596,7 @@ void __cdecl HybridCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* co
 
 	/*if (gfCurrentLevel == LVL5_SINKING_SUBMARINE)
 	{
-		if (item->frame_number < anims[item->anim_number].frame_end)
+		if (item->frameNumber < Anims[item->animNumber].frame_end)
 		{
 			ObjectCollision(itemNum, laraitem, coll);
 		}

@@ -1,7 +1,7 @@
 #include "larafire.h"
 
 #include "items.h"
-#include "lara.h"
+#include "Lara.h"
 #include "laraflar.h"
 #include "lara1gun.h"
 #include "lara2gun.h"

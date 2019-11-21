@@ -4,7 +4,7 @@
 #include "..\Specific\setup.h"
 #include "..\Game\draw.h"
 #include "..\Game\lot.h"
-#include "..\Game\lara.h"
+#include "..\Game\Lara.h"
 #include "..\Game\savegame.h"
 #include "..\Scripting\GameFlowScript.h"
 
@@ -645,7 +645,7 @@ void __cdecl InitialiseLara(__int32 restore)
 	if (!(level->LaraType == LARA_YOUNG && Objects[ID_PISTOLS_ITEM].loaded))
 		gun = WEAPON_PISTOLS;
 
-	/*if ((gfLevelFlags & GF_LVOP_TRAIN) && objects[HK_ITEM].loaded && (lara.hk_type_carried & WTYPE_PRESENT))
+	/*if ((gfLevelFlags & GF_LVOP_TRAIN) && objects[HK_ITEM].loaded && (Lara.hk_type_carried & WTYPE_PRESENT))
 		gun = WEAPON_HK;*/
 
 	Lara.lastGunType = Lara.gunType = Lara.requestGunType = gun;
