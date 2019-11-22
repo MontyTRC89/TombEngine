@@ -1178,9 +1178,9 @@ void __cdecl BaddyObjects()
 	{
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->control = BigSpiderControl;
+		obj->control = WorkerDualGunControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 5;
+		obj->hitPoints = 150;
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -1188,9 +1188,8 @@ void __cdecl BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+		Bones[obj->boneIndex + 11*4] |= (ROT_X|ROT_Y);
+		Bones[obj->boneIndex + 0*4] |= (ROT_X|ROT_Y);
 	}
 
 	obj = &Objects[ID_BLUE_GUARD];
@@ -3200,6 +3199,25 @@ void __cdecl CustomObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_WORKER_DUAL_REVOLVER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = WorkerDualGunControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 150;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 11*4] |= (ROT_X|ROT_Y);
+		Bones[obj->boneIndex + 0*4] |= (ROT_X|ROT_Y);
 	}
 	*/
 }
