@@ -2,7 +2,6 @@
 #include "../Global/global.h"
 #include "../Game/box.h"
 #include "../Game/people.h"
-#include "../Game/items.h"
 
 static BITE_INFO workerShotgun = { 0, 281, 40, 9 };
 static BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
@@ -443,7 +442,7 @@ void __cdecl WorkerMachineGunControl(__int16 itemNum)
 				else
 				{
 					ShotLara(item, &info, &workerMachineGun, torso_y, 30);
-					//item->firedWeapon = 1;
+					// TODO: item->firedWeapon = 1; for MachineGun (state id 6 too)
 					machinegun->flags = 5;
 				}
 

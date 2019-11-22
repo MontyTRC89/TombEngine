@@ -118,18 +118,12 @@ void __cdecl RatControl(__int16 itemNum);
 void __cdecl SilencerControl(__int16 itemNum);
 void __cdecl InitialiseYeti(short itemNum);
 void __cdecl YetiControl(short itemNum);
-void __cdecl InitialiseBoat(__int16 itemNum);
-void __cdecl BoatCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
-void __cdecl BoatControl(__int16 itemNumber);
-void __cdecl InitialiseSkidoo(__int16 itemNum);
-void __cdecl SkidooCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
-int __cdecl SkidooControl();
-void __cdecl DrawSkidoo(ITEM_INFO* item);
 void __cdecl WorkerShotgunControl(__int16 itemNum);
 void __cdecl InitialiseWorkerShotgun(__int16 itemNum);
 void __cdecl WorkerMachineGunControl(__int16 itemNum);
 void __cdecl InitialiseWorkerMachineGun(__int16 itemNum);
-
+void __cdecl SmallSpiderControl(__int16 itemNum);
+void __cdecl BigSpiderControl(__int16 itemNum);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
@@ -162,28 +156,6 @@ void __cdecl SetupShoal(__int32 shoalNumber);
 void __cdecl SetupFish(__int32 leader, ITEM_INFO* item);
 void ControlFish(__int16 itemNumber);
 bool FishNearLara(PHD_3DPOS* pos, __int32 distance, ITEM_INFO* item);
-
-void __cdecl QuadbikeExplode(ITEM_INFO* item);
-__int32 __cdecl CanQuadbikeGetOff(__int32 direction);
-__int32 __cdecl QuadCheckGetOff();
-int GetOnQuadBike(__int16 itemNumber, COLL_INFO* coll);
-void __cdecl QuadBaddieCollision(ITEM_INFO* quad);
-__int32 __cdecl GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
-__int32 __cdecl TestQuadHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);
-__int32 __cdecl DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old);
-__int32 __cdecl DoQuadDynamics(__int32 height, __int32 fallspeed, __int32* y);
-__int32 __cdecl QuadDynamics(ITEM_INFO* item);
-void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead);
-__int32 __cdecl QuadUserControl(ITEM_INFO* item, __int32 height, int* pitch);
-void __cdecl TriggerQuadExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int32 speed, __int32 moving);
-void __cdecl InitialiseQuadBike(__int16 itemNumber);
-void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll);
-__int32 __cdecl QuadBikeControl();
-
-void __cdecl InitialiseKayak(__int16 item_number);
-void __cdecl DrawKayak(ITEM_INFO* kayak);
-void __cdecl KayakCollision(__int16 item_number, ITEM_INFO* l, COLL_INFO* coll);
-int __cdecl KayakControl();
 
 // TR4 object
 void __cdecl InitialiseWildBoar(__int16 itemNum);
@@ -261,6 +233,47 @@ void __cdecl InitialiseHorse(__int16 itemNum);
 void __cdecl InitialiseHorseman(__int16 itemNum);
 void __cdecl HorsemanControl(__int16 itemNum);
 void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num);
+void __cdecl BubblesControl(__int16 fxNum);
+__int32 __cdecl BubblesShatterFunction(FX_INFO* fx, __int32 param1, __int32 param2);
+void __cdecl BubblesEffect1(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
+void __cdecl BubblesEffect2(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
+void __cdecl BubblesEffect3(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
+void __cdecl BubblesEffect4(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
+
+/* Vehicles: */
+
+// TODO: the boat is bugged, need to be fixed !
+void __cdecl InitialiseBoat(__int16 itemNum);
+void __cdecl BoatCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
+void __cdecl BoatControl(__int16 itemNumber);
+
+void __cdecl InitialiseSkidoo(__int16 itemNum);
+void __cdecl SkidooCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll);
+int __cdecl SkidooControl();
+void __cdecl DrawSkidoo(ITEM_INFO* item);
+
+void __cdecl QuadbikeExplode(ITEM_INFO* item);
+__int32 __cdecl CanQuadbikeGetOff(__int32 direction);
+__int32 __cdecl QuadCheckGetOff();
+int GetOnQuadBike(__int16 itemNumber, COLL_INFO* coll);
+void __cdecl QuadBaddieCollision(ITEM_INFO* quad);
+__int32 __cdecl GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
+__int32 __cdecl TestQuadHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);
+__int32 __cdecl DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old);
+__int32 __cdecl DoQuadDynamics(__int32 height, __int32 fallspeed, __int32* y);
+__int32 __cdecl QuadDynamics(ITEM_INFO* item);
+void __cdecl AnimateQuadBike(ITEM_INFO* item, __int32 collide, __int32 dead);
+__int32 __cdecl QuadUserControl(ITEM_INFO* item, __int32 height, int* pitch);
+void __cdecl TriggerQuadExhaustSmoke(__int32 x, __int32 y, __int32 z, __int16 angle, __int32 speed, __int32 moving);
+void __cdecl InitialiseQuadBike(__int16 itemNumber);
+void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+__int32 __cdecl QuadBikeControl();
+
+// TODO: the kayak is bugged, need to be fixed !
+void __cdecl InitialiseKayak(__int16 item_number);
+void __cdecl DrawKayak(ITEM_INFO* kayak);
+void __cdecl KayakCollision(__int16 item_number, ITEM_INFO* l, COLL_INFO* coll);
+int __cdecl KayakControl();
 
 __int32 __cdecl TestJeepHeight(ITEM_INFO* item, __int32 dz, __int32 dx, PHD_VECTOR* pos);
 __int32 __cdecl DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old);
@@ -294,10 +307,3 @@ void __cdecl MotorbikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* col
 __int32 __cdecl GetOnMotorbike(int itemNumber);
 __int32 __cdecl GetMotorbikeCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
 void __cdecl MotorbikeBaddieCollision(ITEM_INFO* jeep);
-
-void __cdecl BubblesControl(__int16 fxNum);
-__int32 __cdecl BubblesShatterFunction(FX_INFO* fx, __int32 param1, __int32 param2);
-void __cdecl BubblesEffect1(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
-void __cdecl BubblesEffect2(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
-void __cdecl BubblesEffect3(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
-void __cdecl BubblesEffect4(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel);
