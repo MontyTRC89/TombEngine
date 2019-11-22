@@ -124,6 +124,7 @@ void __cdecl WorkerMachineGunControl(__int16 itemNum);
 void __cdecl InitialiseWorkerMachineGun(__int16 itemNum);
 void __cdecl SmallSpiderControl(__int16 itemNum);
 void __cdecl BigSpiderControl(__int16 itemNum);
+void __cdecl WorkerDualGunControl(__int16 itemNum);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
