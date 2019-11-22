@@ -1176,11 +1176,12 @@ void __cdecl BaddyObjects()
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseWorkerMachineGun;
+		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->control = WorkerMachineGunControl;
-		obj->hitPoints = 20;
-		obj->pivotLength = 50;
+		obj->control = BigSpiderControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 5;
+		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->saveAnim = true;
@@ -3052,9 +3053,9 @@ void __cdecl CustomObjects()
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 25;
 		obj->biteOffset = 0;
-		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -3082,9 +3083,9 @@ void __cdecl CustomObjects()
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 25;
 		obj->biteOffset = 0;
-		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -3112,9 +3113,9 @@ void __cdecl CustomObjects()
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = SilencerControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 25;
 		obj->biteOffset = 0;
-		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->radius = 102;
 		obj->pivotLength = 50;
 		obj->intelligent = true;
@@ -3133,6 +3134,7 @@ void __cdecl CustomObjects()
 		obj->initialise = InitialiseWorkerShotgun;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerShotgunControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 25;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -3152,6 +3154,7 @@ void __cdecl CustomObjects()
 		obj->initialise = InitialiseWorkerMachineGun;
 		obj->collision = CreatureCollision;
 		obj->control = WorkerMachineGunControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 20;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -3163,6 +3166,40 @@ void __cdecl CustomObjects()
 		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
 		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
 		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+	}
+
+	obj = &Objects[ID_SMALL_SPIDER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = SmallSpiderControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 5;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_BIG_SPIDER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = BigSpiderControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 40;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
 	}
 	*/
 }
@@ -3199,8 +3236,8 @@ void __cdecl InitialiseObjects()
 	PickupObjects();
 
 	// Reset MIP flag so we can reuse slots
-	for (__int16 i = 0; i < ID_NUMBER_OBJECTS; i++)
-		Objects[i].objectMip = NULL;
+	//for (__int16 i = 0; i < ID_NUMBER_OBJECTS; i++)
+	//	Objects[i].objectMip = NULL;
 		
 	// New objects imported from old TRs
 	NewObjects();
