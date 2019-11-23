@@ -2,11 +2,14 @@
 #include "../Global/global.h"
 #include "../Game/box.h"
 #include "../Game/people.h"
+#include "../Game/sphere.h"
+#include "../Game/effect2.h"
 
 BITE_INFO workerShotgun = { 0, 281, 40, 9 };
 BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
 BITE_INFO workerDualGunL = { -2, 275, 23, 6 };
 BITE_INFO workerDualGunR = { 2, 275, 23, 10 };
+BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 
 static void ShotLara_WithShotgun(ITEM_INFO* item, AI_INFO* info, BITE_INFO* bite, short angle_y, int damage)
 {
@@ -742,4 +745,256 @@ void __cdecl WorkerDualGunControl(__int16 itemNum)
 	CreatureJoint(item, 2, head_y);
 	CreatureJoint(item, 3, head_x);
 	CreatureAnimation(itemNum, angle, tilt);
+}
+
+/*
+void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD room_number)
+{
+	short fx_number;
+	short cam_rot;
+	FX_INFO* fx;
+
+	fx_number = CreateEffect(room_number);
+	if (fx_number != NO_ITEM)
+	{
+		fx = &Ptr_VetEffects[fx_number];
+		fx->pos.x_pos = x;
+		fx->pos.y_pos = y;
+		fx->pos.z_pos = z;
+		fx->room_number = room_number;
+		phd_GetVectorAngles(fx->pos.x_pos - Trng.pGlobTomb4->pAdr->Camera.pCameraSrc->CordX,
+			fx->pos.y_pos - Trng.pGlobTomb4->pAdr->Camera.pCameraSrc->CordY,
+			fx->pos.z_pos - Trng.pGlobTomb4->pAdr->Camera.pCameraSrc->CordZ,
+			&cam_rot);
+		fx->pos.x_rot = fx->pos.z_rot = 0;
+		fx->pos.y_rot = cam_rot;
+		fx->speed = 200;
+		fx->object_number = Utils.getObjects(TR2_DRAGON_FIRE);
+		fx->shade = 14 * 256;
+		fx->counter = 40;
+		Utils.ShootAtLara(fx);
+	}
+}
+*/
+
+// TODO: add flame effect when shooting
+void __cdecl WorkerFlamethrower(__int16 itemNum)
+{
+	if (!CreatureActive(itemNum))
+		return;
+
+	ITEM_INFO* item;
+	CREATURE_INFO* flame;
+	AI_INFO info;
+	PHD_VECTOR pos;
+	short angle, head_y, head_x, torso_y, torso_x, tilt;
+
+	item = &Items[itemNum];
+	flame = (CREATURE_INFO*)item->data;
+	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
+
+	// get the exact flame start position
+	pos.x = workerFlameThrower.x;
+	pos.y = workerFlameThrower.y;
+	pos.z = workerFlameThrower.z;
+	GetJointAbsPosition(item, &pos, workerFlameThrower.meshNum);
+
+	if (item->hitPoints <= 0)
+	{
+		if (item->currentAnimState != 7)
+		{
+			item->animNumber = Objects[item->objectNumber].animIndex + 19;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->currentAnimState = 7;
+		}
+	}
+	else
+	{
+		if (item->currentAnimState != 5 && item->currentAnimState != 6)
+		{
+			//TriggerDynamic(pos.RelX, pos.RelY, pos.RelZ, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
+			AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
+		}
+		else
+		{
+			//TriggerDynamic(pos.RelX, pos.RelY, pos.RelZ, (GetRandomControl() & 4) + 14, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
+		}
+
+		CreatureAIInfo(item, &info);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+		angle = CreatureTurn(item, flame->maximumTurn);
+
+		switch (item->currentAnimState)
+		{
+			case 1:
+				flame->flags = 0;
+				flame->maximumTurn = 0;
+
+				if (info.ahead)
+				{
+					head_y = info.angle;
+					head_x = info.xAngle;
+				}
+
+				if (flame->mood == ESCAPE_MOOD)
+				{
+					item->goalAnimState = 3;
+				}
+				else if (Targetable(item, &info))
+				{
+					if (info.distance < SQUARE(WALL_SIZE*4) || info.zoneNumber != info.enemyZone)
+						item->goalAnimState = 8;
+					else
+						item->goalAnimState = 2;
+				}
+				else if (flame->mood == ATTACK_MOOD || !info.ahead)
+				{
+					if (info.distance <= SQUARE(WALL_SIZE*2))
+						item->goalAnimState = 2;
+					else
+						item->goalAnimState = 3;
+				}
+				else
+				{
+					item->goalAnimState = 4;
+				}
+				break;
+
+			case 2:
+				flame->maximumTurn = ANGLE(5);
+
+				if (info.ahead)
+				{
+					head_y = info.angle;
+					head_x = info.xAngle;
+				}
+
+				if (flame->mood == ESCAPE_MOOD)
+				{
+					item->goalAnimState = 3;
+				}
+				else if (Targetable(item, &info))
+				{
+					if (info.distance < SQUARE(WALL_SIZE*4) || info.zoneNumber != info.enemyZone)
+						item->goalAnimState = 1;
+					else
+						item->goalAnimState = 6;
+				}
+				else if (flame->mood == ATTACK_MOOD || !info.ahead)
+				{
+					if (info.distance > SQUARE(WALL_SIZE*2))
+						item->goalAnimState = 3;
+				}
+				else
+				{
+					item->goalAnimState = 4;
+				}
+				break;
+
+			case 3:
+				flame->maximumTurn = ANGLE(10);
+
+				if (info.ahead)
+				{
+					head_y = info.angle;
+					head_x = info.xAngle;
+				}
+
+				if (flame->mood != ESCAPE_MOOD)
+				{
+					if (Targetable(item, &info))
+					{
+						item->goalAnimState = 2;
+					}
+					else if (flame->mood == BORED_MOOD || flame->mood == STALK_MOOD)
+					{
+						item->goalAnimState = 2;
+					}
+				}
+				break;
+
+			case 4:
+				if (info.ahead)
+				{
+					head_y = info.angle;
+					head_x = info.xAngle;
+				}
+
+				if (Targetable(item, &info))
+				{
+					item->goalAnimState = 5;
+				}
+				else
+				{
+					if (flame->mood == ATTACK_MOOD)
+					{
+						item->goalAnimState = 1;
+					}
+					else if (!info.ahead)
+					{
+						item->goalAnimState = 1;
+					}
+				}
+				break;
+
+			case 5:
+			case 6:
+				if (info.ahead)
+				{
+					torso_y = info.angle;
+					torso_x = info.xAngle;
+
+					//CreatureEffect(item, &workerFlameThrower, Flame);
+				}
+
+				if (item->goalAnimState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE*10) || !Targetable(item, &info)))
+				{
+					item->goalAnimState = 1;
+				}
+				break;
+
+			case 8:
+			case 9:
+				flame->flags = 0;
+
+				if (info.ahead)
+				{
+					torso_y = info.angle;
+					torso_x = info.xAngle;
+				}
+
+				if (Targetable(item, &info))
+				{
+					item->goalAnimState = (item->currentAnimState == 8) ? 5 : 11;
+				}
+				else
+				{
+					item->goalAnimState = 1;
+				}
+				break;
+		}
+	}
+
+	CreatureTilt(item, tilt);
+	CreatureJoint(item, 0, torso_y);
+	CreatureJoint(item, 1, torso_x);
+	CreatureJoint(item, 2, head_y);
+	CreatureJoint(item, 3, head_x);
+	CreatureAnimation(itemNum, angle, tilt);
+}
+
+void __cdecl InitialiseWorkerFlamethrower(__int16 itemNum)
+{
+	ANIM_STRUCT* anim;
+	ITEM_INFO* item;
+
+	item = &Items[itemNum];
+	item->animNumber = Objects[item->objectNumber].animIndex + 12;
+
+	InitialiseCreature(itemNum);
+
+	anim = &Anims[item->animNumber];
+	item->frameNumber = anim->frameBase;
+	item->currentAnimState = anim->currentAnimState;
 }

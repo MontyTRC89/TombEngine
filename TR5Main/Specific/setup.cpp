@@ -1172,26 +1172,28 @@ void __cdecl BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 	*/
-
+	
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->control = WorkerDualGunControl;
+		obj->control = KnifethrowerControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 150;
-		obj->pivotLength = 0;
+		obj->hitPoints = 60;
+		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 11*4] |= (ROT_X|ROT_Y);
-		Bones[obj->boneIndex + 0*4] |= (ROT_X|ROT_Y);
+		//Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		//Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
+		// TODO: find the correct for bones (knifethrower).
 	}
 
+	/*
 	obj = &Objects[ID_BLUE_GUARD];
 	if (obj->loaded)
 	{
@@ -1218,7 +1220,7 @@ void __cdecl BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
-	}
+	}*/
 
 	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
@@ -3218,6 +3220,90 @@ void __cdecl CustomObjects()
 		obj->savePosition = true;
 		Bones[obj->boneIndex + 11*4] |= (ROT_X|ROT_Y);
 		Bones[obj->boneIndex + 0*4] |= (ROT_X|ROT_Y);
+	}
+
+	obj = &Objects[ID_TONYBOSS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTony;
+		obj->collision = CreatureCollision;
+		obj->control = TonyControl;
+		obj->drawRoutine = DrawTony;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 100;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_BIRDMONSTER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = BirdMonsterControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 200;
+		obj->pivotLength = 0;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_WORKER_FLAMETHROWER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWorkerFlamethrower;
+		obj->collision = CreatureCollision;
+		obj->control = WorkerFlamethrower;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 20;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 4 * 4] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_KNIFETHROWER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = KnifethrowerControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 60;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		//Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		//Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
+		// TODO: find the correct for bones (knifethrower).
+	}
+
+	obj = &Objects[ID_KNIFETHROWER_KNIFE];
+	if (obj->loaded)
+	{
+		obj->control = KnifeControl;
 	}
 	*/
 }
