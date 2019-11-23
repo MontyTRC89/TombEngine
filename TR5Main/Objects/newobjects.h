@@ -98,6 +98,23 @@ typedef struct KAYAK_INFO {
 	char Flags;
 };
 
+typedef struct BOSS_STRUCT
+{
+	__int16 attack_count;
+	__int16 death_count;
+	unsigned char attack_flag;
+	unsigned char attack_type;
+	unsigned char attack_head_count;
+	unsigned char ring_count;
+	__int16 explode_count;
+	__int16 lizman_item, lizman_room;
+	__int16 hp_counter;
+	__int16 dropped_icon;
+	unsigned char charged;
+	unsigned char dead;
+	PHD_VECTOR	BeamTarget;
+};
+
 void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot);
 
 // TR1 objects
@@ -125,6 +142,11 @@ void __cdecl InitialiseWorkerMachineGun(__int16 itemNum);
 void __cdecl SmallSpiderControl(__int16 itemNum);
 void __cdecl BigSpiderControl(__int16 itemNum);
 void __cdecl WorkerDualGunControl(__int16 itemNum);
+void __cdecl BirdMonsterControl(__int16 itemNum);
+void __cdecl WorkerFlamethrower(__int16 itemNum);
+void __cdecl InitialiseWorkerFlamethrower(__int16 itemNum);
+void __cdecl KnifethrowerControl(short itemNum);
+void __cdecl KnifeControl(__int16 fxNum);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
@@ -157,6 +179,10 @@ void __cdecl SetupShoal(__int32 shoalNumber);
 void __cdecl SetupFish(__int32 leader, ITEM_INFO* item);
 void ControlFish(__int16 itemNumber);
 bool FishNearLara(PHD_3DPOS* pos, __int32 distance, ITEM_INFO* item);
+void __cdecl InitialiseTony(__int16 itemNum);
+void __cdecl TonyControl(__int16 itemNum);
+void __cdecl DrawTony(ITEM_INFO* item);
+void __cdecl TonyFireBallControl(__int16 fxNumber);
 
 // TR4 object
 void __cdecl InitialiseWildBoar(__int16 itemNum);

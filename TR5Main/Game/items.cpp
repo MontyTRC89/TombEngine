@@ -204,7 +204,7 @@ void __cdecl KillEffect(__int16 fxNumber)
 	{
 		FX_INFO* fx = &Effects[fxNumber];
 
-		DetatchSpark(fxNumber, 128);
+		DetatchSpark(fxNumber, 128); // TODO: SP_FX have the value 64 but there it's 128 !!
 
 		if (NextFxActive == fxNumber)
 		{
