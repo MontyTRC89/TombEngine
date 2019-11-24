@@ -211,6 +211,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
+bool MonksAttackLara;
 
 __int32 __cdecl WeaponObject(__int32 weaponType)
 {

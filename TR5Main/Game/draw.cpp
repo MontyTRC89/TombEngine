@@ -16,8 +16,8 @@ __int32 __cdecl DrawPhaseGame()
 	Camera.numberFrames = g_Renderer->SyncRenderer();
 
 	// We need to pop the matrix stack or the game will crash
-	MatrixPtr -= 12;
-	DxMatrixPtr -= 48;
+	phd_PopMatrix();
+	phd_PopDxMatrix();
 
 	return Camera.numberFrames;
 }

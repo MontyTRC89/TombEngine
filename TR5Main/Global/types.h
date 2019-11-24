@@ -2,6 +2,15 @@
 #include <Windows.h>
 
 #pragma pack(push, 1)
+typedef enum TYPE_ZONE
+{
+	ZONE_SKELLY,
+	ZONE_BASIC,
+	ZONE_FLYER,
+	ZONE_HUMAN,
+	ZONE_WATER  // TODO: zone water and flyer is the same ?
+};
+
 typedef struct vector_t
 {
 	__int32 vx;
