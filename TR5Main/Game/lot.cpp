@@ -117,7 +117,7 @@ void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
 	case ID_APE:
 		creature->LOT.step = 512;
 		creature->LOT.drop = -512;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 	}
 }
@@ -148,14 +148,14 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	creature->LOT.isAmphibious = true;
 	creature->LOT.isJumping = false;
 	creature->LOT.isMonkeying = false;
-	creature->maximumTurn = ONE_DEGREE;
+	creature->maximumTurn = ANGLE(1);
 	creature->flags = 0;
 	creature->enemy = NULL;
 	creature->LOT.step = 256;
 	creature->LOT.drop = -512;
 	creature->LOT.blockMask = 0x4000;
 	creature->LOT.fly = 0;
-	creature->LOT.zone = 1;
+	creature->LOT.zone = ZONE_BASIC;
 	  
 	switch (item->objectNumber)
 	{
@@ -165,7 +165,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		// Can climb
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 
 	case ID_SAS:
@@ -176,7 +176,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
 		creature->LOT.canJump = true;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 
 	case ID_HITMAN:
@@ -187,7 +187,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.drop = -1024;
 		creature->LOT.canJump = true;
 		creature->LOT.canMonkey = true;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 
 	case ID_SKELETON:
@@ -195,6 +195,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 256;
 		creature->LOT.drop = -256;
 		creature->LOT.canJump = true;
+		//creature->LOT.zone = ZONE_SKELLY;
 		break;
 
 	case ID_CROW:
@@ -209,7 +210,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 16;
-		creature->LOT.zone = 4;
+		creature->LOT.zone = ZONE_FLYER;
 		break;
 
 	case ID_SCUBA_DIVER:
@@ -220,7 +221,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 32;
-		creature->LOT.zone = 4;
+		creature->LOT.zone = ZONE_WATER;
 		break;
 	}
 

@@ -1172,41 +1172,39 @@ void __cdecl BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 	*/
-	
+
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
+		obj->initialise = InitialiseSwordGuardian;
 		obj->collision = CreatureCollision;
-		obj->control = KnifethrowerControl;
+		obj->control = SwordGuardianControl;
+		obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 60;
-		obj->pivotLength = 50;
-		obj->radius = 102;
+		obj->hitPoints = 80;
+		obj->pivotLength = 0;
+		obj->radius = 204;
 		obj->intelligent = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
-		// TODO: find the correct for bones (knifethrower).
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	/*
-	obj = &Objects[ID_BLUE_GUARD];
+	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
 	{
-		if (Objects[ID_SWAT].loaded) // object required
-			obj->animIndex = Objects[ID_SWAT].animIndex;
-		obj->biteOffset = 4;
+		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = ControlGuard;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
-		obj->pivotLength = 50;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
+		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
@@ -1220,19 +1218,22 @@ void __cdecl BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
-	}*/
+	}
+	*/
 
-	obj = &Objects[ID_SWAT];
+	obj = &Objects[ID_BLUE_GUARD];
 	if (obj->loaded)
 	{
-		obj->biteOffset = 0;
+		if (Objects[ID_SWAT].loaded) // object required
+			obj->animIndex = Objects[ID_SWAT].animIndex;
+		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = ControlGuard;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
+		obj->pivotLength = 50;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
-		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
@@ -3304,6 +3305,80 @@ void __cdecl CustomObjects()
 	if (obj->loaded)
 	{
 		obj->control = KnifeControl;
+	}
+
+	obj = &Objects[ID_MERCENARY_UZI];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = MercenaryUziControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 45;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_MERCENARY_AUTOPISTOLS];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = MercenaryAutoPistolControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 50;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_MONK_1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = MonkControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 50;
+		obj->pivotLength = 0;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_MONK_2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = MonkControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 50;
+		obj->pivotLength = 0;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 	}
 	*/
 }

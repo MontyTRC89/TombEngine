@@ -284,9 +284,12 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\jeep.cpp" />
     <ClCompile Include="Objects\kayak.cpp" />
     <ClCompile Include="Objects\knifethrower.cpp" />
+    <ClCompile Include="Objects\mercenary.cpp" />
+    <ClCompile Include="Objects\monk.cpp" />
     <ClCompile Include="Objects\mpgun.cpp" />
     <ClCompile Include="Objects\mpstick.cpp" />
     <ClCompile Include="Objects\snowmobile.cpp" />
+    <ClCompile Include="Objects\statue.cpp" />
     <ClCompile Include="Objects\tony.cpp" />
     <ClCompile Include="Objects\worker.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />

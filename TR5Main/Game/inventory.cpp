@@ -2031,8 +2031,8 @@ bool Inventory::UpdateSceneAndDrawInventory()
 		Camera.numberFrames = g_Renderer->SyncRenderer();
 
 		// We need to pop the matrix stack or the game will crash
-		MatrixPtr -= 12;
-		DxMatrixPtr -= 48;
+		phd_PopMatrix();
+		phd_PopDxMatrix();
 
 		nframes = Camera.numberFrames;
 		ControlPhase(nframes, 0);

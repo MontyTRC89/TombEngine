@@ -147,6 +147,15 @@ void __cdecl WorkerFlamethrower(__int16 itemNum);
 void __cdecl InitialiseWorkerFlamethrower(__int16 itemNum);
 void __cdecl KnifethrowerControl(short itemNum);
 void __cdecl KnifeControl(__int16 fxNum);
+void __cdecl MercenaryUziControl(__int16 itemNum);
+void __cdecl MercenaryAutoPistolControl(__int16 itemNum);
+void __cdecl MonkControl(__int16 itemNum);
+void __cdecl DrawStatue(ITEM_INFO* item); // compatible with all statue :)
+void __cdecl InitialiseSwordGuardian(__int16 itemNum);
+void __cdecl SwordGuardianFly(ITEM_INFO* item); // only effect to fly
+void __cdecl SwordGuardianControl(__int16 itemNum);
+void __cdecl InitialiseSpearGuardian(__int16 itemNum);
+void __cdecl SpearGuardianControl(__int16 itemNum);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
@@ -183,6 +192,8 @@ void __cdecl InitialiseTony(__int16 itemNum);
 void __cdecl TonyControl(__int16 itemNum);
 void __cdecl DrawTony(ITEM_INFO* item);
 void __cdecl TonyFireBallControl(__int16 fxNumber);
+void __cdecl InitialiseShivaGuardian(__int16 itemNum);
+void __cdecl ShivaGuardianControl(__int16 itemNum);
 
 // TR4 object
 void __cdecl InitialiseWildBoar(__int16 itemNum);
