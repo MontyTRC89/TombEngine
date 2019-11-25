@@ -1176,21 +1176,19 @@ void __cdecl BaddyObjects()
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSwordGuardian;
+		obj->initialise = NULL;
 		obj->collision = CreatureCollision;
-		obj->control = SwordGuardianControl;
-		obj->drawRoutine = DrawStatue;
+		obj->control = NULL;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 80;
+		obj->hitPoints = 1;
 		obj->pivotLength = 0;
-		obj->radius = 204;
+		obj->radius = DEFAULT_RADIUS;
 		obj->intelligent = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
+		//Bones[obj->boneIndex] |= (ROT_X | ROT_Y);
 	}
 
 	/*
@@ -3380,6 +3378,69 @@ void __cdecl CustomObjects()
 		obj->savePosition = true;
 		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 	}
+
+	obj = &Objects[ID_SWORD_GUARDIAN];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSwordGuardian;
+		obj->collision = CreatureCollision;
+		obj->control = SwordGuardianControl;
+		//obj->drawRoutine = DrawStatue;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 80;
+		obj->pivotLength = 0;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
+		// TODO: bones value is not correct (shiva) !
+		// need the correct one.
+	}
+
+	obj = &Objects[ID_SHIVA];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseShiva;
+		obj->collision = CreatureCollision;
+		obj->control = ShivaControl;
+		//obj->drawRoutine = DrawStatue;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 100;
+		obj->pivotLength = 0;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 25 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_SPEAR_GUARDIAN];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSpearGuardian;
+		obj->collision = CreatureCollision;
+		obj->control = SpearGuardianControl;
+		//obj->drawRoutine = DrawStatue;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 100;
+		obj->pivotLength = 0;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		//Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		//Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
+		// TODO: get the correct id for bones ! (spear)
+	}
 	*/
 }
 
@@ -3394,7 +3455,7 @@ void __cdecl InitialiseObjects()
 		obj->floor = NULL;
 		obj->ceiling = NULL;
 		obj->pivotLength = 0;
-		obj->radius = 10;
+		obj->radius = DEFAULT_RADIUS;
 		obj->shadowSize = 0;
 		obj->hitPoints = -16384;
 		obj->explodableMeshbits = 0;
@@ -3405,7 +3466,7 @@ void __cdecl InitialiseObjects()
 		obj->saveFlags = false;
 		obj->saveHitpoints = false;
 		obj->savePosition = false;
-		obj->frameBase += (ptrdiff_t)Frames;
+		obj->frameBase += (__int16)Frames;
 	}
 
 	// Standard TR5 objects

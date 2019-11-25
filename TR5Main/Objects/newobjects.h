@@ -192,8 +192,8 @@ void __cdecl InitialiseTony(__int16 itemNum);
 void __cdecl TonyControl(__int16 itemNum);
 void __cdecl DrawTony(ITEM_INFO* item);
 void __cdecl TonyFireBallControl(__int16 fxNumber);
-void __cdecl InitialiseShivaGuardian(__int16 itemNum);
-void __cdecl ShivaGuardianControl(__int16 itemNum);
+void __cdecl InitialiseShiva(__int16 itemNum);
+void __cdecl ShivaControl(__int16 itemNum);
 
 // TR4 object
 void __cdecl InitialiseWildBoar(__int16 itemNum);
