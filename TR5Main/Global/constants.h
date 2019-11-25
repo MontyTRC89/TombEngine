@@ -37,7 +37,10 @@
 #define DRAW_DISTANCE		200 * 1024.0f
 #define NUM_STATICS			1000
 #define MAX_LIGHTS			100
+#define MAX_LIGHTS_DRAW     16384
+#define MAX_DYNAMIC_LIGHTS  16384
 #define MAX_STATICS			1000
+#define MAX_DRAW_STATICS    16384
 #define MAX_BONES			32
 #define MAX_SPRITES			16384
 #define NO_ROOM				0xFF

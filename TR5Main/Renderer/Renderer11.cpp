@@ -564,12 +564,12 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_firstWeather = true;
 
 	// Preallocate lists
-	m_roomsToDraw.Reserve(1024);
+	m_roomsToDraw.Reserve(NUM_ROOMS);
 	m_itemsToDraw.Reserve(NUM_ITEMS);
 	m_effectsToDraw.Reserve(NUM_ITEMS);
-	m_lightsToDraw.Reserve(16384);
-	m_dynamicLights.Reserve(16384);
-	m_staticsToDraw.Reserve(16384);
+	m_lightsToDraw.Reserve(MAX_LIGHTS_DRAW);
+	m_dynamicLights.Reserve(MAX_DYNAMIC_LIGHTS);
+	m_staticsToDraw.Reserve(MAX_DRAW_STATICS);
 	m_spritesToDraw.Reserve(MAX_SPRITES);
 	m_lines3DToDraw.Reserve(MAX_LINES_3D);
 	m_lines2DToDraw.Reserve(MAX_LINES_2D);
