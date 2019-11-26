@@ -1173,25 +1173,18 @@ void __cdecl BaddyObjects()
 	}
 	*/
 
+	// ID_SNOWMOBILE_DRIVER
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = NULL;
-		obj->collision = CreatureCollision;
-		obj->control = NULL;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->initialise = InitialiseSkidman;
+		obj->control = SkidManControl;
 		obj->hitPoints = 1;
-		obj->pivotLength = 0;
-		obj->radius = DEFAULT_RADIUS;
-		obj->intelligent = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//Bones[obj->boneIndex] |= (ROT_X | ROT_Y);
 	}
 
-	/*
 	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
 	{
@@ -1217,7 +1210,6 @@ void __cdecl BaddyObjects()
 		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
 	}
-	*/
 
 	obj = &Objects[ID_BLUE_GUARD];
 	if (obj->loaded)
@@ -3440,6 +3432,75 @@ void __cdecl CustomObjects()
 		//Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		//Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
 		// TODO: get the correct id for bones ! (spear)
+	}
+
+	// ID: 22
+	obj = &Objects[ID_DRAGON_FRONT];
+	if (obj->loaded)
+	{
+		if (!Objects[ID_DRAGON_BACK].loaded)
+			printf("FATAL: dragon front need back !");
+
+		obj->collision = DragonCollision;
+		obj->control = DragonControl;
+		obj->hitPoints = 300;
+		obj->pivotLength = 300;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 10 * 4] |= ROT_Z;
+	}
+
+	// ID: 23
+	obj = &Objects[ID_DRAGON_BACK];
+	if (obj->loaded)
+	{
+		obj->collision = DragonCollision;
+		obj->control = DragonControl;
+		obj->radius = 256;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+
+	// ID: 40
+	obj = &Objects[ID_MARCO_BARTOLI];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseBartoli;
+		obj->control = BartoliControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SNOWMOBILE_GUN];
+	if (obj->loaded)
+	{
+		obj->collision = SkidManCollision;
+		obj->drawRoutine = DrawSkidoo;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 100;
+		obj->pivotLength = 0;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_SNOWMOBILE_DRIVER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSkidman;
+		obj->control = SkidManControl;
+		obj->hitPoints = 1;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 	*/
 }

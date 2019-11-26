@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "../Global/global.h"
 
 #define InitialiseGuard ((void (__cdecl*)(__int16)) 0x0043F420)
 #define ControlGuard ((void (__cdecl*)(__int16)) 0x0046F5E0)

@@ -1,14 +1,13 @@
 #include "newobjects.h"
-#include "..\Global\global.h"
-#include "..\Game\Box.h"
-#include "..\Game\items.h"
-#include "..\Game\lot.h"
-#include "..\Game\control.h"
-#include "..\Game\effects.h"
-#include "..\Game\draw.h"
-#include "..\Game\sphere.h"
-#include "..\Game\collide.h"
-#include "..\Game\pickup.h"
+#include "../Game/Box.h"
+#include "../Game/items.h"
+#include "../Game/lot.h"
+#include "../Game/control.h"
+#include "../Game/effects.h"
+#include "../Game/draw.h"
+#include "../Game/sphere.h"
+#include "../Game/collide.h"
+#include "../Game/pickup.h"
 
 __int16 SarcophagusBounds[12] = {
 	0xFE00, 0x0200, 0xFF9C, 0x0064, 0xFE00, 0x0000,

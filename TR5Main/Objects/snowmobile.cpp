@@ -1,5 +1,4 @@
 #include "newobjects.h"
-#include "../Global/global.h"
 #include "../Game/items.h"
 #include "../Game/lara.h"
 #include "../Game/collide.h"
@@ -7,8 +6,20 @@
 #include "../Game/effect2.h"
 #include "../Game/larafire.h"
 #include "../Game/effects.h"
+#include "../Game/lot.h"
+#include "../Game/box.h"
+#include "../Game/people.h"
 
-#define HP_SKIDMAN 100
+// TODO: recreate the DrawSkidoo for the snowmobile.
+// TODO: delete these 2 define when the GAME_OBJECT_ID is updated !
+
+#define ID_SNOWMOBILE_GUN 0
+#define ID_SKIDMAN 0
+
+extern LaraExtraInfo g_LaraExtra;
+
+enum SKIDOO_STATE { SKID_SIT, SKID_GETON, SKID_LEFT, SKID_RIGHT, SKID_FALL, SKID_HIT, SKID_GETONL, SKID_GETOFFL, SKID_STILL, SKID_GETOFF, SKID_LETGO, SKID_DEATH, SKID_FALLOFF };
+
 #define SWIM_DEPTH 730
 #define WADE_DEPTH STEP_SIZE
 #define DAMAGE_START 140   // DAMAGE_START 140
@@ -31,7 +42,7 @@
 #define SKIDOO_MAX_SPEED 100
 #define SKIDOO_SLOW_SPEED 50
 #define SKIDOO_MIN_SPEED 15
-#define SKIDOO_ACCELERATION    10
+#define SKIDOO_ACCELERATION 10
 #define SKIDOO_BRAKE 5
 #define SKIDOO_SLOWDOWN 2
 #define SKIDOO_REVERSE -5
@@ -46,22 +57,15 @@
 #define SKIDOO_MAX_HEIGHT STEP_SIZE
 #define SKIDOO_MIN_BOUNCE ((SKIDOO_MAX_SPEED/2)>>8)
 
-enum SKIDOO_STATE
-{
-	SKID_SIT,
-	SKID_GETON,
-	SKID_LEFT,
-	SKID_RIGHT,
-	SKID_FALL,
-	SKID_HIT,
-	SKID_GETONL,
-	SKID_GETOFFL,
-	SKID_STILL,
-	SKID_GETOFF,
-	SKID_LETGO,
-	SKID_DEATH,
-	SKID_FALLOFF
-};
+enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
+
+#define SMAN_MIN_TURN (SKIDOO_MAX_TURN/3)
+#define SMAN_TARGET_ANGLE ANGLE(15)
+#define SMAN_WAIT_RANGE SQUARE(WALL_SIZE*4)
+#define SMAN_DEATH_ANIM 10
+
+BITE_INFO skidooLeft = { 240, -190, 540, 0 };
+BITE_INFO skidooRight = { -240, -190, 540, 0 };
 
 void __cdecl InitialiseSkidoo(__int16 itemNum)
 {
@@ -72,7 +76,13 @@ void __cdecl InitialiseSkidoo(__int16 itemNum)
 	skinfo = (SKIDOO_INFO*)GameMalloc(sizeof(SKIDOO_INFO));
 	skidoo->data = (void*)skinfo;
 	skinfo->already_cd_played = false;
-	skinfo->armed = false; // change to true for armed skidoo
+
+	// change to true for armed skidoo
+	//if (skidoo->objectNumber == ID_SNOWMOBILE_GUN)
+	//	skinfo->armed = true;
+	//else
+		skinfo->armed = false;
+
 	skinfo->extra_rotation = 0;
 	skinfo->flash_timer = 0;
 	skinfo->left_fallspeed = 0;
@@ -1134,4 +1144,231 @@ int __cdecl SkidooControl()
 void __cdecl DrawSkidoo(ITEM_INFO* item)
 {
 	
+}
+
+void __cdecl InitialiseSkidman(__int16 itemNum)
+{
+	__int16 skidoo_item;
+	ITEM_INFO* item, *skidoo;
+
+	skidoo_item = CreateItem();
+	if (skidoo_item != NO_ITEM)
+	{
+		item = &Items[itemNum];
+		skidoo = &Items[skidoo_item];
+		skidoo->objectNumber = ID_SNOWMOBILE_GUN;
+		skidoo->pos.xPos = item->pos.xPos;
+		skidoo->pos.yPos = item->pos.yPos;
+		skidoo->pos.zPos = item->pos.zPos;
+		skidoo->pos.yRot = item->pos.yRot;
+		skidoo->roomNumber = item->roomNumber;
+		skidoo->flags = ITEM_INVISIBLE;
+		skidoo->shade = -1;
+
+		InitialiseItem(skidoo_item);
+
+		// The skidman remembers his skidoo
+		item->data = (void*)skidoo_item;
+
+		LevelItems++;
+	}
+	else
+	{
+		printf("FATAL: cannot create skidoo for SKIDMAN !");
+	}
+}
+
+void __cdecl SkidManCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+{
+	ITEM_INFO* item;
+
+	item = &Items[itemNum];
+	if (!TestBoundsCollide(item, laraitem, coll->radius))
+		return;
+	if (!TestCollision(item, laraitem))
+		return;
+
+	if (coll->enableBaddiePush)
+	{
+		if (item->speed > 0)
+			ItemPushLara(item, laraitem, coll, coll->enableSpaz, 0);
+		else
+			ItemPushLara(item, laraitem, coll, 0, 0);
+	}
+
+	/* If Lara is walking and hit by skidoo, gets hurt a lot */
+	if (g_LaraExtra.Vehicle == NO_ITEM && item->speed > 0)
+	{
+		laraitem->hitStatus = true;
+		laraitem->hitPoints -= 100;
+	}
+}
+
+void __cdecl SkidManControl(__int16 riderNum)
+{
+	ITEM_INFO* item, * rider;
+	CREATURE_INFO* skidman;
+	AI_INFO info;
+	__int16 angle, item_number;
+	int damage;
+
+	rider = &Items[riderNum];
+	if (rider->data == NULL)
+	{
+		printf("FATAL: rider data not contains the skidoo itemNumber !");
+		return;
+	}
+
+	item_number = (__int16)rider->data;
+	item = &Items[item_number];
+
+	/* Need to activate AI for skidoo (it's the skidoo that holds the brain) if not done yet */
+	if (!item->data)
+	{
+		EnableBaddieAI(item_number, 1);
+		item->status = ITEM_ACTIVE;
+	}
+	skidman = (CREATURE_INFO*)item->data;
+
+	angle = 0;
+
+	if (item->hitPoints <= 0)
+	{
+		if (rider->currentAnimState != SMAN_DEATH)
+		{
+			/* Separate skidoo from rider */
+			rider->pos.xPos = item->pos.xPos;
+			rider->pos.yPos = item->pos.yPos;
+			rider->pos.zPos = item->pos.zPos;
+			rider->pos.yRot = item->pos.yRot;
+			rider->roomNumber = item->roomNumber;
+
+			rider->animNumber = Objects[ID_SKIDMAN].animIndex + SMAN_DEATH_ANIM;
+			rider->frameNumber = Anims[rider->animNumber].frameBase;
+			rider->currentAnimState = SMAN_DEATH;
+
+			/* Break Lara's lock */
+			if (Lara.target == item)
+				Lara.target = NULL;
+		}
+		else
+			AnimateItem(rider);
+
+		/* Make skidoo stop */
+		if (item->currentAnimState == SMAN_MOVING || item->currentAnimState == SMAN_WAIT)
+			item->goalAnimState = SMAN_WAIT;
+		else
+			item->goalAnimState = SMAN_MOVING;
+	}
+	else
+	{
+		/* As skidoo has the brain, it needs to know if the rider was hurt */
+		CreatureAIInfo(item, &info);
+
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+
+		angle = CreatureTurn(item, SKIDOO_MAX_TURN / 2);
+
+		switch (item->currentAnimState)
+		{
+		case SMAN_WAIT:
+			if (skidman->mood == BORED_MOOD)
+				break;
+			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
+				break;
+			item->goalAnimState = SMAN_MOVING;
+			break;
+
+		case SMAN_MOVING:
+			if (skidman->mood == BORED_MOOD)
+				item->goalAnimState = SMAN_WAIT;
+			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
+				item->goalAnimState = SMAN_WAIT;
+			else if (angle < -SMAN_MIN_TURN)
+				item->goalAnimState = SMAN_STARTLEFT;
+			else if (angle > SMAN_MIN_TURN)
+				item->goalAnimState = SMAN_STARTRIGHT;
+			break;
+
+		case SMAN_STARTLEFT:
+		case SMAN_LEFT:
+			if (angle < -SMAN_MIN_TURN)
+				item->goalAnimState = SMAN_LEFT;
+			else
+				item->goalAnimState = SMAN_MOVING;
+			break;
+
+		case SMAN_STARTRIGHT:
+		case SMAN_RIGHT:
+			if (angle < -SMAN_MIN_TURN)
+				item->goalAnimState = SMAN_LEFT;
+			else
+				item->goalAnimState = SMAN_MOVING;
+			break;
+		}
+	}
+
+
+	/* Shoot them guns */
+	if (rider->currentAnimState != SMAN_DEATH)
+	{
+		if (!skidman->flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->hitPoints > 0)
+		{
+			damage = (g_LaraExtra.Vehicle != NO_ITEM) ? 10 : 50; // more damage if Lara on foot
+
+			if (ShotLara(item, &info, &skidooLeft, 0, damage) + ShotLara(item, &info, &skidooRight, 0, damage))
+				skidman->flags = 5;
+		}
+
+		if (skidman->flags)
+		{
+			SoundEffect(43, &item->pos, 0);
+			skidman->flags--;
+		}
+	}
+
+	/* Use 'head_rotation' to store which track is required */
+	if (item->currentAnimState == SMAN_WAIT)
+	{
+		SoundEffect(153, &item->pos, 0);
+		skidman->jointRotation[0] = 0;
+	}
+	else
+	{
+		skidman->jointRotation[0] = (skidman->jointRotation[0] == 1) ? 2 : 1;
+		DoSnowEffect(item);
+		SoundEffect(155, &item->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - item->speed) * 100) << 8));
+	}
+
+	CreatureAnimation(item_number, angle, 0);
+
+	/* Move rider to save position and animation as skidoo */
+	if (rider->currentAnimState != SMAN_DEATH)
+	{
+		rider->pos.xPos = item->pos.xPos;
+		rider->pos.yPos = item->pos.yPos;
+		rider->pos.zPos = item->pos.zPos;
+		rider->pos.yRot = item->pos.yRot;
+		if (item->roomNumber != rider->roomNumber)
+			ItemNewRoom(riderNum, item->roomNumber);
+
+		rider->animNumber = item->animNumber + (Objects[ID_SKIDMAN].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
+		rider->frameNumber = item->frameNumber + (Anims[rider->animNumber].frameBase - Anims[item->animNumber].frameBase);
+	}
+	else if (rider->status == ITEM_DEACTIVATED && item->speed == 0 && item->fallspeed == 0)
+	{
+		/* If rider has reached end of his death animation, turn his skidoo into one that Lara can ride */
+		RemoveActiveItem(riderNum);
+		rider->collidable = false;
+		rider->hitPoints = -16384;
+		rider->flags |= ONESHOT;
+
+		DisableBaddieAI(item_number);
+		item->objectNumber = ID_SNOWMOBILE;
+		item->status = ITEM_DEACTIVATED;
+		InitialiseSkidoo(item_number);
+
+		((SKIDOO_INFO*)item->data)->armed = true;
+	}
 }
