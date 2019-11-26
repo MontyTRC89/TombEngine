@@ -8,10 +8,6 @@
 #include "../Game/effect2.h"
 #include "../Game/draw.h"
 
-/*---------------------------------------------------------------------------
- *	Constants
-\*--------------------------------------------------------------------------*/
-
 extern LaraExtraInfo g_LaraExtra;
 
 enum boat_Anims {

@@ -1,5 +1,4 @@
 #include "newobjects.h"
-#include "../Global/global.h"
 #include "../Game/lara.h"
 #include "../Game/effect2.h"
 #include "../Game/draw.h"

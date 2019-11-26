@@ -1,5 +1,4 @@
 #include "newobjects.h"
-#include "../Global/global.h"
 #include "../Game/items.h"
 #include "../Game/missile.h"
 #include "../Game/box.h"

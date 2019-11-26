@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "../Global/global.h"
 
 typedef struct QUAD_INFO {
 	__int32 velocity;
@@ -156,6 +156,13 @@ void __cdecl SwordGuardianFly(ITEM_INFO* item); // only effect to fly
 void __cdecl SwordGuardianControl(__int16 itemNum);
 void __cdecl InitialiseSpearGuardian(__int16 itemNum);
 void __cdecl SpearGuardianControl(__int16 itemNum);
+void __cdecl DragonCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
+void __cdecl DragonControl(__int16 backNum);
+void __cdecl InitialiseBartoli(__int16 itemNum);
+void __cdecl BartoliControl(__int16 itemNum);
+void __cdecl InitialiseSkidman(__int16 itemNum);
+void __cdecl SkidManCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
+void __cdecl SkidManControl(__int16 riderNum);
 
 // TR3 objects
 void __cdecl TigerControl(__int16 itemNum);
