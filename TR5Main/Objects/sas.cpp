@@ -12,7 +12,7 @@
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
 
-void __cdecl InitialiseSas(__int16 itemNum)
+void __cdecl InitialiseSas(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -24,7 +24,7 @@ void __cdecl InitialiseSas(__int16 itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SasControl(__int16 itemNum)
+void __cdecl SasControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -33,11 +33,11 @@ void __cdecl SasControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
 
-	__int16 tilt = 0;
-	__int16 angle = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
+	short tilt = 0;
+	short angle = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
 
 	// Handle SAS firing
 	if (item->firedWeapon)
@@ -62,10 +62,10 @@ void __cdecl SasControl(__int16 itemNum)
 
 		AI_INFO info;
 
-		__int32 distance = 0;
-		__int32 ang = 0;
-		__int32 dx = 0;
-		__int32 dz = 0;
+		int distance = 0;
+		int ang = 0;
+		int dx = 0;
+		int dz = 0;
 
 		CreatureAIInfo(item, &info);
 
@@ -94,8 +94,8 @@ void __cdecl SasControl(__int16 itemNum)
 		if (item->hitStatus)
 			AlertAllGuards(itemNum);
 
-		__int32 angle1 = 0;
-		__int32 angle2 = 0;
+		int angle1 = 0;
+		int angle2 = 0;
 
 		switch (item->currentAnimState)
 		{

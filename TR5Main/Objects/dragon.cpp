@@ -80,9 +80,9 @@ void createBartoliLight(short ItemIndex, int type)
 	*/
 }
 
-__int16 __cdecl dragonFire(int x, int y, int z, __int16 speed, __int16 yrot, __int16 room_number)
+short __cdecl dragonFire(int x, int y, int z, short speed, short yrot, short room_number)
 {
-	__int16 fx_number = NO_ITEM;
+	short fx_number = NO_ITEM;
 	/*
 	FX_INFO* fx;
 
@@ -180,7 +180,7 @@ void createDragonBone(short front_number)
 	}
 }
 
-void __cdecl DragonCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void __cdecl DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 	int c, s, rx, rz, shift, side_shift, angle;
@@ -256,7 +256,7 @@ void __cdecl DragonCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* co
 				//memcpy(&CinematicPos, &laraitem->pos, sizeof(PHD_3DPOS));
 
 				/* Flag dragon is dead forever */
-				((CREATURE_INFO*)Items[(__int16)item->data].data)->flags = -1;
+				((CREATURE_INFO*)Items[(short)item->data].data)->flags = -1;
 
 				return;
 			}
@@ -277,20 +277,20 @@ void __cdecl DragonCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* co
 	ItemPushLara(item, laraitem, coll, 1, 0);
 }
 
-void __cdecl DragonControl(__int16 backNum)
+void __cdecl DragonControl(short backNum)
 {
 	ITEM_INFO* item, *back;
 	CREATURE_INFO* dragon;
 	AI_INFO info;
 	bool ahead;
-	__int16 head, angle;
-	__int16 itemNum;
+	short head, angle;
+	short itemNum;
 
 	back = &Items[backNum];
 	if (back->data != NULL && back->objectNumber == ID_DRAGON_FRONT) // check if data is not null and back is front
 		return;
 
-	itemNum = (__int16)back->data;
+	itemNum = (short)back->data;
 	if (!CreatureActive(itemNum))
 		return;
 
@@ -501,10 +501,10 @@ void __cdecl DragonControl(__int16 backNum)
 		ItemNewRoom(backNum, item->roomNumber);
 }
 
-void __cdecl InitialiseBartoli(__int16 itemNum)
+void __cdecl InitialiseBartoli(short itemNum)
 {
 	ITEM_INFO* item, *back, *front;
-	__int16 back_item, front_item;
+	short back_item, front_item;
 
 	item = &Items[itemNum];
 	item->pos.xPos -= STEP_SIZE * 2;
@@ -548,10 +548,10 @@ void __cdecl InitialiseBartoli(__int16 itemNum)
 	}
 }
 
-void __cdecl BartoliControl(__int16 itemNum)
+void __cdecl BartoliControl(short itemNum)
 {
 	ITEM_INFO* item, *back, *front;
-	__int16 front_item, back_item;
+	short front_item, back_item;
 
 	item = &Items[itemNum];
 
@@ -590,10 +590,10 @@ void __cdecl BartoliControl(__int16 itemNum)
 		else if (item->timer >= 30 * 5)
 		{
 			/* Convert Bartoli into a dragon */
-			back_item = (__int16)item->data;
+			back_item = (short)item->data;
 			back = &Items[back_item];
 
-			front_item = (__int16)back->data;
+			front_item = (short)back->data;
 			front = &Items[front_item];
 
 			front->touchBits = back->touchBits = 0;

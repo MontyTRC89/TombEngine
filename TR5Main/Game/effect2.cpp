@@ -5,12 +5,12 @@
 
 extern GameFlow* g_GameFlow;
 
-void __cdecl TriggerDynamics(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b)
+void __cdecl TriggerDynamics(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
 	g_Renderer->AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 initial, __int32 weapon, __int32 count)
+void __cdecl TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int initial, int weapon, int count)
 {
 	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
@@ -72,7 +72,7 @@ void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int3
 	spark->Gravity = -2 - (GetRandomControl() & 1);
 	spark->MaxYvel = -2 - (GetRandomControl() & 1);
 
-	__int32 size = (GetRandomControl() & 15) - 
+	int size = (GetRandomControl() & 15) - 
 		(weapon != WEAPON_HK && weapon != WEAPON_ROCKET_LAUNCHER && weapon != WEAPON_GRENADE_LAUNCHER ? 24 : 0) + 48;
 	
 	if (initial)
@@ -101,7 +101,7 @@ void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int3
 	}*/
 }
 
-void __cdecl TriggerRocketFlame(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 itemNumber)
+void __cdecl TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
 {
 	SPARKS* sptr = &Sparks[GetFreeSpark()];
 
@@ -153,11 +153,11 @@ void __cdecl TriggerRocketFlame(__int32 x, __int32 y, __int32 z, __int32 xv, __i
 	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	sptr->scalar = 2;
 
-	__int32 size = (GetRandomControl() & 7) + 32;
+	int size = (GetRandomControl() & 7) + 32;
 	sptr->size = sptr->sSize = size;
 }
 
-void __cdecl TriggerRocketSmoke(__int32 x, __int32 y, __int32 z, __int32 bodyPart)
+void __cdecl TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 {
 	SPARKS* sptr = &Sparks[GetFreeSpark()];
 
@@ -203,11 +203,11 @@ void __cdecl TriggerRocketSmoke(__int32 x, __int32 y, __int32 z, __int32 bodyPar
 	sptr->gravity = -(GetRandomControl() & 3) - 4;
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 
-	__int32 size = (GetRandomControl() & 7) + 32;
+	int size = (GetRandomControl() & 7) + 32;
 	sptr->size = sptr->sSize = size >> 2;
 }
 
-void __cdecl GrenadeExplosionEffects(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
+void __cdecl GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO* room = &Rooms[roomNumber];
 
@@ -267,10 +267,10 @@ void __cdecl GrenadeExplosionEffects(__int32 x, __int32 y, __int32 z, __int16 ro
 	spark->mirror = mirror;
 }
 
-void __cdecl GrenadeLauncherSpecialEffect1(__int32 x, __int32 y, __int32 z, __int32 flag1, __int32 flag2)
+void __cdecl GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
 {
-	__int32 dx = LaraItem->pos.xPos - x;
-	__int32 dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->pos.xPos - x;
+	int dz = LaraItem->pos.zPos - z;
 
 	if (dx >= -ANGLE(90) && dx <= ANGLE(90) && dz >= -ANGLE(90) && dz <= ANGLE(90))
 	{
@@ -499,14 +499,14 @@ void __cdecl GrenadeLauncherSpecialEffect1(__int32 x, __int32 y, __int32 z, __in
 	}
 }
 
-void __cdecl TriggerMetalSparks(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 additional)
+void __cdecl TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
 {
-	__int32 dx = LaraItem->pos.xPos - x;
-	__int32 dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->pos.xPos - x;
+	int dz = LaraItem->pos.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		__int32 r = rand();
+		int r = rand();
 
 		SPARKS* spark = &Sparks[GetFreeSpark()];
 

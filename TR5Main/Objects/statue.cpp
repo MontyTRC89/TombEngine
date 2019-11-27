@@ -26,10 +26,10 @@ void __cdecl DrawStatue(ITEM_INFO* item)
 	CREATURE_INFO* creature;
 	int* bones;
 	int clip, i, poppush, frac, rate, bit;
-	__int16* frames[2];
-	__int16* extra_rotation;
-	__int16* rotation1, *rotation2;
-	__int16** normal, **statue;
+	short* frames[2];
+	short* extra_rotation;
+	short* rotation1, *rotation2;
+	short** normal, **statue;
 
 	creature = (CREATURE_INFO*)item->data;
 	frac = GetFrame_D2(item, frames, &rate);
@@ -52,7 +52,7 @@ void __cdecl DrawStatue(ITEM_INFO* item)
 		if (item->data == NULL)
 			extra_rotation = NullRotations;
 		else
-			extra_rotation = (__int16*)item->data;
+			extra_rotation = (short*)item->data;
 
 		// all entity have the statue slot after it, (ex: ID_SWORD_GUARDIAN: 256, ID_SWORD_GUARDIAN_STATUE: 257)
 		normal = &Meshes[Objects[obj->objectNumber].meshIndex];
@@ -63,7 +63,7 @@ void __cdecl DrawStatue(ITEM_INFO* item)
 		if (!frac)
 		{
 			phd_TranslateRel((int)*(frames[0] + 6), (int)*(frames[0] + 7), (int)*(frames[0] + 8)); // can be [0][6] etc.. ?
-			rotation1 = (__int16*)(frames[0] + 9);
+			rotation1 = (short*)(frames[0] + 9);
 			gar_RotYXZsuperpack(&rotation1, 0);
 			
 			if (item->meshBits & bit)
@@ -162,7 +162,7 @@ void __cdecl DrawStatue(ITEM_INFO* item)
 	*/
 }
 
-void __cdecl InitialiseSwordGuardian(__int16 itemNum)
+void __cdecl InitialiseSwordGuardian(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -187,7 +187,7 @@ void __cdecl SwordGuardianFly(ITEM_INFO* item)
 	SoundEffect(SFX_SWORD_GUARDIAN_FLYING_ID312, &item->pos, 0);
 }
 
-void __cdecl SwordGuardianControl(__int16 itemNum)
+void __cdecl SwordGuardianControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -425,7 +425,7 @@ void __cdecl XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 	}
 }
 
-void __cdecl InitialiseSpearGuardian(__int16 itemNum)
+void __cdecl InitialiseSpearGuardian(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -444,14 +444,14 @@ void __cdecl InitialiseSpearGuardian(__int16 itemNum)
 	//item->meshBits = 0;
 }
 
-void __cdecl SpearGuardianControl(__int16 itemNum)
+void __cdecl SpearGuardianControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
 
 	ITEM_INFO* item;
 	CREATURE_INFO* xian;
-	__int16 angle, head, neck, tilt;
+	short angle, head, neck, tilt;
 	int random, lara_alive;
 	AI_INFO info;
 
@@ -840,7 +840,7 @@ void __cdecl ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 	}
 }
 
-void __cdecl InitialiseShiva(__int16 itemNum)
+void __cdecl InitialiseShiva(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -858,14 +858,14 @@ void __cdecl InitialiseShiva(__int16 itemNum)
 	//item->meshBits = 0;
 }
 
-void __cdecl ShivaControl(__int16 itemNum)
+void __cdecl ShivaControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
 
 	ITEM_INFO* item;
 	CREATURE_INFO* shiva;
-	__int16 angle, head_x, head_y, torso_x, torso_y, tilt, room_number;
+	short angle, head_x, head_y, torso_x, torso_y, tilt, room_number;
 	int x, z;
 	int random, lara_alive;
 	AI_INFO info;

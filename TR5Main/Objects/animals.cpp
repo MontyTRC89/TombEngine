@@ -44,7 +44,7 @@ BITE_INFO birdyBiteR = { 0, 224, 0, 22 };
 
 extern LaraExtraInfo g_LaraExtra;
 
-void __cdecl InitialiseWildBoar(__int16 itemNum)
+void __cdecl InitialiseWildBoar(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -56,16 +56,16 @@ void __cdecl InitialiseWildBoar(__int16 itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl WildBoarControl(__int16 itemNum)
+void __cdecl WildBoarControl(short itemNum)
 {
-	__int16 angle = 0;
-	__int16 head = 0;
-	__int16 neck = 0;
-	__int16 tilt = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
-	__int16 joint3 = 0;
+	short angle = 0;
+	short head = 0;
+	short neck = 0;
+	short tilt = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short joint3 = 0;
 
 	if (!CreatureActive(itemNum))
 		return;
@@ -75,9 +75,9 @@ void __cdecl WildBoarControl(__int16 itemNum)
 
 	if (item->hitPoints > 0)
 	{
-		__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
-		__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
-		__int32 laraDistance = dx * dx + dz * dz;
+		int dx = LaraItem->pos.xPos - item->pos.xPos;
+		int dz = LaraItem->pos.zPos - item->pos.zPos;
+		int laraDistance = dx * dx + dz * dz;
 
 		if (item->aiBits & GUARD)
 		{
@@ -89,9 +89,9 @@ void __cdecl WildBoarControl(__int16 itemNum)
 			
 			CREATURE_INFO* baddie = &BaddieSlots[0];
 			CREATURE_INFO* found = &BaddieSlots[0];
-			__int32 minDistance = 0x7FFFFFFF;
+			int minDistance = 0x7FFFFFFF;
 
-			for (__int32 i = 0; i < NUM_SLOTS; i++, baddie++)
+			for (int i = 0; i < NUM_SLOTS; i++, baddie++)
 			{
 				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
 					continue;
@@ -99,9 +99,9 @@ void __cdecl WildBoarControl(__int16 itemNum)
 				ITEM_INFO* target = &Items[baddie->itemNum];
 				if (target->objectNumber != ID_WILD_BOAR)
 				{
-					__int32 dx2 = target->pos.xPos - item->pos.xPos;
-					__int32 dz2 = target->pos.zPos - item->pos.zPos;
-					__int32 distance = dx2 * dx2 + dz2 * dz2;
+					int dx2 = target->pos.xPos - item->pos.xPos;
+					int dz2 = target->pos.zPos - item->pos.zPos;
+					int distance = dx2 * dx2 + dz2 * dz2;
 
 					if (distance < minDistance && distance < laraDistance)
 					{
@@ -210,7 +210,7 @@ void __cdecl WildBoarControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseSmallScorpion(__int16 itemNum)
+void __cdecl InitialiseSmallScorpion(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -222,16 +222,16 @@ void __cdecl InitialiseSmallScorpion(__int16 itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SmallScorpionControl(__int16 itemNum)
+void __cdecl SmallScorpionControl(short itemNum)
 {
-	__int16 angle = 0;
-	__int16 head = 0;
-	__int16 neck = 0;
-	__int16 tilt = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
-	__int16 joint3 = 0;
+	short angle = 0;
+	short head = 0;
+	short neck = 0;
+	short tilt = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short joint3 = 0;
 
 	if (!CreatureActive(itemNum))
 		return;
@@ -241,9 +241,9 @@ void __cdecl SmallScorpionControl(__int16 itemNum)
 
 	if (item->hitPoints > 0)
 	{
-		__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
-		__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
-		__int32 laraDistance = dx * dx + dz * dz;
+		int dx = LaraItem->pos.xPos - item->pos.xPos;
+		int dz = LaraItem->pos.zPos - item->pos.zPos;
+		int laraDistance = dx * dx + dz * dz;
 
 		if (item->aiBits & GUARD)
 			GetAITarget(creature);
@@ -337,7 +337,7 @@ void __cdecl SmallScorpionControl(__int16 itemNum)
 						LaraItem->hitStatus = true;
 
 						BITE_INFO* biteInfo;
-						__int16 rot;
+						short rot;
 
 						if (item->currentAnimState == 5)
 						{
@@ -371,7 +371,7 @@ void __cdecl SmallScorpionControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseScorpion(__int16 itemNum)
+void __cdecl InitialiseScorpion(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -393,16 +393,16 @@ void __cdecl InitialiseScorpion(__int16 itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void __cdecl ScorpionControl(__int16 itemNum)
+void __cdecl ScorpionControl(short itemNum)
 {
-	__int16 angle = 0;
-	__int16 head = 0;
-	__int16 neck = 0;
-	__int16 tilt = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
-	__int16 joint3 = 0;
+	short angle = 0;
+	short head = 0;
+	short neck = 0;
+	short tilt = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short joint3 = 0;
 
 	if (!CreatureActive(itemNum))
 		return;
@@ -410,13 +410,13 @@ void __cdecl ScorpionControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 
-	__int32 x = item->pos.xPos + 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	__int32 z = item->pos.zPos + 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+	int x = item->pos.xPos + 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	int z = item->pos.zPos + 682 * COS(item->pos.yRot) >> W2V_SHIFT;
 
 	FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	__int32 height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height1) > 512)
 		height1 = item->pos.yPos;
 
@@ -424,17 +424,17 @@ void __cdecl ScorpionControl(__int16 itemNum)
 	z = item->pos.zPos - 682 * COS(item->pos.yRot) >> W2V_SHIFT;
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	__int32 height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height2) > 512)
 		height2 = item->pos.yPos;
 
-	__int16 angle1 = ATAN(1344, height2 - height1);
+	short angle1 = ATAN(1344, height2 - height1);
 
 	x = item->pos.xPos - 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
 	z = item->pos.zPos + 682 * COS(item->pos.yRot) >> W2V_SHIFT;
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	__int32 height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height3) > 512)
 		height3 = item->pos.yPos;
 
@@ -442,11 +442,11 @@ void __cdecl ScorpionControl(__int16 itemNum)
 	z = item->pos.zPos - 682 * COS(item->pos.yRot) >> W2V_SHIFT;
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	__int32 height4 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	int height4 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height4) > 512)
 		height4 = item->pos.yPos;
 
-	__int16 angle2 = ATAN(1344, height4 - height3);
+	short angle2 = ATAN(1344, height4 - height3);
 
 	if (item->hitPoints <= 0)
 	{
@@ -471,9 +471,9 @@ void __cdecl ScorpionControl(__int16 itemNum)
 				// Search for active troops
 				creature->enemy = NULL;
 				CREATURE_INFO* baddy = &BaddieSlots[0];
-				__int32 minDistance = 0x7FFFFFFF;
+				int minDistance = 0x7FFFFFFF;
 
-				for (__int32 i = 0; i < NUM_SLOTS; i++)
+				for (int i = 0; i < NUM_SLOTS; i++)
 				{
 					baddy = &BaddieSlots[i];
 
@@ -484,10 +484,10 @@ void __cdecl ScorpionControl(__int16 itemNum)
 						if (currentItem->objectNumber != ID_SCORPION &&
 							(currentItem != LaraItem || creature->hurtByLara))
 						{
-							__int32 dx = currentItem->pos.xPos - item->pos.xPos;
-							__int32 dy = currentItem->pos.yPos - item->pos.yPos;
-							__int32 dz = currentItem->pos.zPos - item->pos.zPos;
-							__int32 distance = dx * dx + dy * dy + dz * dz;
+							int dx = currentItem->pos.xPos - item->pos.xPos;
+							int dy = currentItem->pos.yPos - item->pos.yPos;
+							int dz = currentItem->pos.zPos - item->pos.zPos;
+							int distance = dx * dx + dy * dy + dz * dz;
 
 							if (distance < minDistance)
 							{
@@ -693,7 +693,7 @@ void __cdecl ScorpionControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseBat(__int16 itemNum)
+void __cdecl InitialiseBat(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -705,16 +705,16 @@ void __cdecl InitialiseBat(__int16 itemNum)
 	item->currentAnimState = 6;
 }
 
-void __cdecl BatControl(__int16 itemNum)
+void __cdecl BatControl(short itemNum)
 {
-	__int16 angle = 0;
-	__int16 head = 0;
-	__int16 neck = 0;
-	__int16 tilt = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
-	__int16 joint3 = 0;
+	short angle = 0;
+	short head = 0;
+	short neck = 0;
+	short tilt = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short joint3 = 0;
 
 	if (!CreatureActive(itemNum))
 		return;
@@ -724,9 +724,9 @@ void __cdecl BatControl(__int16 itemNum)
 
 	if (item->hitPoints > 0)
 	{
-		__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
-		__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
-		__int32 laraDistance = dx * dx + dz * dz;
+		int dx = LaraItem->pos.xPos - item->pos.xPos;
+		int dz = LaraItem->pos.zPos - item->pos.zPos;
+		int laraDistance = dx * dx + dz * dz;
 
 		if (item->aiBits)
 		{
@@ -738,9 +738,9 @@ void __cdecl BatControl(__int16 itemNum)
 
 			CREATURE_INFO* baddie = &BaddieSlots[0];
 			CREATURE_INFO* found = &BaddieSlots[0];
-			__int32 minDistance = 0x7FFFFFFF;
+			int minDistance = 0x7FFFFFFF;
 
-			for (__int32 i = 0; i < NUM_SLOTS; i++, baddie++)
+			for (int i = 0; i < NUM_SLOTS; i++, baddie++)
 			{
 				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
 					continue;
@@ -748,9 +748,9 @@ void __cdecl BatControl(__int16 itemNum)
 				ITEM_INFO* target = &Items[baddie->itemNum];
 				if (target->objectNumber != ID_WILD_BOAR)
 				{
-					__int32 dx2 = target->pos.xPos - item->pos.xPos;
-					__int32 dz2 = target->pos.zPos - item->pos.zPos;
-					__int32 distance = dx2 * dx2 + dz2 * dz2;
+					int dx2 = target->pos.xPos - item->pos.xPos;
+					int dz2 = target->pos.zPos - item->pos.zPos;
+					int distance = dx2 * dx2 + dz2 * dz2;
 
 					if (distance < minDistance)
 					{
@@ -854,15 +854,15 @@ void __cdecl BatControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl BarracudaControl(__int16 itemNum)
+void __cdecl BarracudaControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
-	__int16 angle = 0;
-	__int16 head = 0;
+	short angle = 0;
+	short head = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -949,15 +949,15 @@ void __cdecl BarracudaControl(__int16 itemNum)
 	CreatureUnderwater(item, STEP_SIZE);
 }
 
-void __cdecl SharkControl(__int16 itemNum)
+void __cdecl SharkControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
-	__int16 angle = 0;
-	__int16 head = 0;
+	short angle = 0;
+	short head = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -1046,11 +1046,11 @@ void __cdecl SharkControl(__int16 itemNum)
 		AnimateItem(item);
 }
 
-void __cdecl TigerControl(__int16 itemNum)
+void __cdecl TigerControl(short itemNum)
 {
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short head = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (!CreatureActive(itemNum))
 		return;
@@ -1099,7 +1099,7 @@ void __cdecl TigerControl(__int16 itemNum)
 			}
 			else if (creature->mood == BORED_MOOD)
 			{
-				__int16 random = GetRandomControl();
+				short random = GetRandomControl();
 				if (random < 0x60)
 					item->goalAnimState = 5;
 				else if (random < 0x460);
@@ -1176,7 +1176,7 @@ void __cdecl TigerControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl InitialiseCobra(__int16 itemNum)
+void __cdecl InitialiseCobra(short itemNum)
 {
 	InitialiseCreature(itemNum);
 
@@ -1188,14 +1188,14 @@ void __cdecl InitialiseCobra(__int16 itemNum)
 	item->hitPoints = Objects[item->objectNumber].hitPoints;
 }
 
-void __cdecl CobraControl(__int16 itemNum)
+void __cdecl CobraControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
 
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short head = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
@@ -1282,7 +1282,7 @@ void __cdecl CobraControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl RaptorControl(__int16 itemNum)
+void __cdecl RaptorControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (item->status == ITEM_INVISIBLE)
@@ -1293,13 +1293,13 @@ void __cdecl RaptorControl(__int16 itemNum)
 	}
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
 	
-	__int16 head = 0;
-	__int16 neck = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short head = 0;
+	short neck = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	ITEM_INFO* nearestItem = NULL;
-	__int32 minDistance = 0x7FFFFFFF;
+	int minDistance = 0x7FFFFFFF;
 	
 	if (item->hitPoints <= 0)
 	{
@@ -1319,7 +1319,7 @@ void __cdecl RaptorControl(__int16 itemNum)
 		{
 			CREATURE_INFO* currentCreature = BaddieSlots;
 			ITEM_INFO* target = NULL;
-			for (__int32 i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < NUM_SLOTS; i++)
 			{
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNum)
 				{
@@ -1329,10 +1329,10 @@ void __cdecl RaptorControl(__int16 itemNum)
 
 				target = &Items[currentCreature->itemNum];
 
-				__int32 x = (target->pos.xPos - item->pos.xPos) >> 6;
-				__int32 y = (target->pos.yPos - item->pos.yPos) >> 6;
-				__int32 z = (target->pos.zPos - item->pos.zPos) >> 6;
-				__int32 distance = x * x + y * y + z * z;
+				int x = (target->pos.xPos - item->pos.xPos) >> 6;
+				int y = (target->pos.yPos - item->pos.yPos) >> 6;
+				int z = (target->pos.zPos - item->pos.zPos) >> 6;
+				int distance = x * x + y * y + z * z;
 				if (distance < minDistance && item->hitPoints > 0)
 				{
 					nearestItem = target;
@@ -1345,10 +1345,10 @@ void __cdecl RaptorControl(__int16 itemNum)
 			if (nearestItem != NULL && (nearestItem->objectNumber != ID_RAPTOR || (GetRandomControl() < 0x400 && minDistance < SQUARE(2048))))
 				creature->enemy = nearestItem;
 			
-			__int32 x = (LaraItem->pos.xPos - item->pos.xPos) >> 6;
-			__int32 y = (LaraItem->pos.yPos - item->pos.yPos) >> 6;
-			__int32 z = (LaraItem->pos.zPos - item->pos.zPos) >> 6;
-			__int32 distance = x * x + y * y + z * z;
+			int x = (LaraItem->pos.xPos - item->pos.xPos) >> 6;
+			int y = (LaraItem->pos.yPos - item->pos.yPos) >> 6;
+			int z = (LaraItem->pos.zPos - item->pos.zPos) >> 6;
+			int distance = x * x + y * y + z * z;
 			if (distance <= minDistance)
 				creature->enemy = LaraItem;
 		}
@@ -1566,7 +1566,7 @@ void __cdecl RaptorControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void InitialiseEagle(__int16 itemNum)
+void InitialiseEagle(short itemNum)
 {
 	InitialiseCreature(itemNum);
 
@@ -1585,7 +1585,7 @@ void InitialiseEagle(__int16 itemNum)
 	}
 }
 
-void EagleControl(__int16 itemNum)
+void EagleControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -1593,7 +1593,7 @@ void EagleControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
 
-	__int16 angle = 0;
+	short angle = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -1696,7 +1696,7 @@ void EagleControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl BearControl(__int16 itemNum)
+void __cdecl BearControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -1704,8 +1704,8 @@ void __cdecl BearControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	__int16 head = 0;
-	__int16 angle = 0;
+	short head = 0;
+	short angle = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -1922,7 +1922,7 @@ void __cdecl BearControl(__int16 itemNum)
 }
 
 
-void __cdecl InitialiseWolf(__int16 itemNum)
+void __cdecl InitialiseWolf(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	ClearItem(itemNum);
@@ -1930,7 +1930,7 @@ void __cdecl InitialiseWolf(__int16 itemNum)
 }
 
 
-void __cdecl WolfControl(__int16 itemNum)
+void __cdecl WolfControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -1938,15 +1938,15 @@ void __cdecl WolfControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short head = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (item->hitPoints <= 0)
 	{
 		if (item->currentAnimState != 11)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (__int16)(GetRandomControl() / 11000);
+			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (short)(GetRandomControl() / 11000);
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->currentAnimState = 11;
 		}
@@ -2129,7 +2129,7 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 	Camera.targetElevation = -ANGLE(25);
 }
 
-void TyrannosaurControl(__int16 itemNum)
+void TyrannosaurControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -2137,8 +2137,8 @@ void TyrannosaurControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*) item->data;
 	
-	__int16 head = 0;
-	__int16 angle = 0;
+	short head = 0;
+	short angle = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -2225,7 +2225,7 @@ void TyrannosaurControl(__int16 itemNum)
 		}
 	}
 
-	CreatureJoint(item, 0, (__int16)(head * 2));
+	CreatureJoint(item, 0, (short)(head * 2));
 	creature->jointRotation[1] = creature->jointRotation[0];
 
 	CreatureAnimation(itemNum, angle, 0);
@@ -2233,7 +2233,7 @@ void TyrannosaurControl(__int16 itemNum)
 	item->collidable = true;
 }
 
-void __cdecl ApeControl(__int16 itemNum)
+void __cdecl ApeControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -2241,15 +2241,15 @@ void __cdecl ApeControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*) item->data;
 	
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 random = 0;
+	short head = 0;
+	short angle = 0;
+	short random = 0;
 
 	if (item->hitPoints <= 0)
 	{
 		if (item->currentAnimState != 5)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 7 + (__int16)(GetRandomControl() / 0x4000);
+			item->animNumber = Objects[item->objectNumber].animIndex + 7 + (short)(GetRandomControl() / 0x4000);
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->currentAnimState = 5;
 		}
@@ -2291,7 +2291,7 @@ void __cdecl ApeControl(__int16 itemNum)
 			else if (!(creature->flags & 1) &&
 				info.zoneNumber == info.enemyZone && info.ahead)
 			{
-				random = (__int16)(GetRandomControl() >> 5);
+				random = (short)(GetRandomControl() >> 5);
 				if (random < 0xA0)
 					item->goalAnimState = 10;
 				else if (random < 0x140)
@@ -2325,7 +2325,7 @@ void __cdecl ApeControl(__int16 itemNum)
 			}
 			else if (creature->mood != ESCAPE_MOOD)
 			{
-				random = (__int16)GetRandomControl();
+				random = (short)GetRandomControl();
 				if (random < 0xA0)
 				{
 					item->requiredAnimState = 10;
@@ -2393,7 +2393,7 @@ void __cdecl ApeControl(__int16 itemNum)
 			creature->flags -= 4;
 		}
 
-		__int32 vault = CreatureVault(itemNum, angle, 2, 75);
+		int vault = CreatureVault(itemNum, angle, 2, 75);
 
 		switch (vault)
 		{
@@ -2412,7 +2412,7 @@ void __cdecl ApeControl(__int16 itemNum)
 		CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl RatControl(__int16 itemNum)
+void __cdecl RatControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -2420,9 +2420,9 @@ void __cdecl RatControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*) item->data;
 	
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 random = 0;
+	short head = 0;
+	short angle = 0;
+	short random = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -2451,7 +2451,7 @@ void __cdecl RatControl(__int16 itemNum)
 		case 4:
 			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
-				__int16 random = (__int16)GetRandomControl();
+				short random = (short)GetRandomControl();
 				if (random < 0x500)
 					item->requiredAnimState = 3;
 				else if (random > 0xA00)
@@ -2478,7 +2478,7 @@ void __cdecl RatControl(__int16 itemNum)
 
 			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
-				random = (__int16)GetRandomControl();
+				random = (short)GetRandomControl();
 				if (random < 0x500)
 				{
 					item->requiredAnimState = 3;
@@ -2512,7 +2512,7 @@ void __cdecl RatControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseLittleBeetle(__int16 itemNum)
+void __cdecl InitialiseLittleBeetle(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -2548,12 +2548,12 @@ void __cdecl InitialiseLittleBeetle(__int16 itemNum)
 	}
 }
 
-void __cdecl LittleBeetleControl(__int16 itemNum)
+void __cdecl LittleBeetleControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 }
 
-void __cdecl InitialiseHarpy(__int16 itemNum)
+void __cdecl InitialiseHarpy(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -2565,7 +2565,7 @@ void __cdecl InitialiseHarpy(__int16 itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl HarpyControl(__int16 itemNum)
+void __cdecl HarpyControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -2575,14 +2575,14 @@ void __cdecl HarpyControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	__int16 angle = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
+	short angle = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
 
 	if (item->hitPoints <= 0)
 	{
-		__int16 state = item->currentAnimState - 9;
+		short state = item->currentAnimState - 9;
 		item->hitPoints = 0;
 
 		if (state)
@@ -2636,11 +2636,11 @@ void __cdecl HarpyControl(__int16 itemNum)
 		creature->enemy = LaraItem;
 
 		CREATURE_INFO* baddie = &BaddieSlots[0];
-		__int32 minDistance = 0x7FFFFFFF;
+		int minDistance = 0x7FFFFFFF;
 
 		creature->enemy = NULL;
 
-		for (__int32 i = 0; i < NUM_SLOTS; i++, baddie++)
+		for (int i = 0; i < NUM_SLOTS; i++, baddie++)
 		{
 			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
 				continue;
@@ -2649,9 +2649,9 @@ void __cdecl HarpyControl(__int16 itemNum)
 
 			if (target->objectNumber == ID_LARA_DOUBLE)
 			{
-				__int32 dx = target->pos.xPos - item->pos.xPos;
-				__int32 dz = target->pos.zPos - item->pos.zPos;
-				__int32 distance = dx * dx + dz * dz;
+				int dx = target->pos.xPos - item->pos.xPos;
+				int dz = target->pos.zPos - item->pos.zPos;
+				int distance = dx * dx + dz * dz;
 
 				if (distance < minDistance)
 				{
@@ -2682,8 +2682,8 @@ void __cdecl HarpyControl(__int16 itemNum)
 			joint0 = info.xAngle;
 		}
 
-		__int32 height = 0;
-		__int32 dy = 0;
+		int height = 0;
+		int dy = 0;
 
 		switch (item->currentAnimState)
 		{
@@ -2920,10 +2920,10 @@ void __cdecl HarpyControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl HarpySparks2(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv)
+void __cdecl HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 {
-	__int32 dx = LaraItem->pos.xPos - x;
-	__int32 dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->pos.xPos - x;
+	int dz = LaraItem->pos.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -2956,7 +2956,7 @@ void __cdecl HarpySparks2(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 y
 	}
 }
 
-void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
+void __cdecl HarpyAttack(ITEM_INFO* item, short itemNum)
 {
 	item->itemFlags[0]++;
 
@@ -2978,11 +2978,11 @@ void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
 
 	if (item->itemFlags[0] >= 24 && item->itemFlags[0] <= 47 && (GetRandomControl() & 0x1F) < item->itemFlags[0])
 	{
-		for (__int32 i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++)
 		{
-			__int32 dx = (GetRandomControl() & 0x7FF) + pos1.x - 1024;
-			__int32 dy = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
-			__int32 dz = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
+			int dx = (GetRandomControl() & 0x7FF) + pos1.x - 1024;
+			int dy = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
+			int dz = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
 
 			HarpySparks2(dx, dy, dz, 8 * (pos1.x - dx), 8 * (pos1.y - dy), 8 * (pos1.z - dz));
 		
@@ -2994,7 +2994,7 @@ void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
 		}
 	}
 
-	__int32 something = 2 * item->itemFlags[0];
+	int something = 2 * item->itemFlags[0];
 	if (something > 64)
 	{
 		something = 64;
@@ -3029,7 +3029,7 @@ void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
 			pos.yPos = pos1.y;
 			pos.zPos = pos1.z;
 			
-			__int16 angles[2];
+			short angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x, 
 								pos3.y - pos1.y,
 								pos3.z - pos1.z,
@@ -3057,7 +3057,7 @@ void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
 			pos.yPos = pos1.y;
 			pos.zPos = pos1.z;
 
-			__int16 angles[2];
+			short angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
 				pos3.y - pos1.y,
 				pos3.z - pos1.z,
@@ -3072,9 +3072,9 @@ void __cdecl HarpyAttack(ITEM_INFO* item, __int16 itemNum)
 	}
 }
 
-void __cdecl HarpyBubbles(PHD_3DPOS* pos, __int16 roomNumber, __int32 count)
+void __cdecl HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 {
-	__int16 fxNumber = CreateNewEffect(roomNumber);
+	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
 	{
 		FX_INFO* fx = &Effects[fxNumber];
@@ -3094,12 +3094,12 @@ void __cdecl HarpyBubbles(PHD_3DPOS* pos, __int16 roomNumber, __int32 count)
 	}
 }
 
-void __cdecl HarpySparks1(__int16 itemNum, byte num, __int32 size)
+void __cdecl HarpySparks1(short itemNum, byte num, int size)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
-	__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
+	int dx = LaraItem->pos.xPos - item->pos.xPos;
+	int dz = LaraItem->pos.zPos - item->pos.zPos;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -3142,7 +3142,7 @@ void __cdecl HarpySparks1(__int16 itemNum, byte num, __int32 size)
 	}
 }
 
-void __cdecl InitialiseCrocodile(__int16 itemNum)
+void __cdecl InitialiseCrocodile(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -3166,7 +3166,7 @@ void __cdecl InitialiseCrocodile(__int16 itemNum)
 	}
 }
 
-void __cdecl CrocodileControl(__int16 itemNum)
+void __cdecl CrocodileControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -3175,13 +3175,13 @@ void __cdecl CrocodileControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	__int32 x = item->pos.xPos + SIN(item->pos.yRot) << 10 >> W2V_SHIFT;
-	__int32 y = item->pos.yPos;
-	__int32 z = item->pos.zPos + COS(item->pos.yRot) << 10 >> W2V_SHIFT;
+	int x = item->pos.xPos + SIN(item->pos.yRot) << 10 >> W2V_SHIFT;
+	int y = item->pos.yPos;
+	int z = item->pos.zPos + COS(item->pos.yRot) << 10 >> W2V_SHIFT;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height1 = GetFloorHeight(floor, x, y, z);
+	int height1 = GetFloorHeight(floor, x, y, z);
 
 	if (abs(y - height1) > 512)
 		height1 = y;
@@ -3192,15 +3192,15 @@ void __cdecl CrocodileControl(__int16 itemNum)
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height2 = GetFloorHeight(floor, x, y, z);
+	int height2 = GetFloorHeight(floor, x, y, z);
 
 	if (abs(y - height2) > 512)
 		height2 = y;
 
-	__int16 at = ATAN(2048, height2 - height1);
-	__int16 angle = 0;
-	__int16 joint0 = 0;
-	__int16 joint2 = 0;
+	short at = ATAN(2048, height2 - height1);
+	short angle = 0;
+	short joint0 = 0;
+	short joint2 = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -3438,7 +3438,7 @@ void __cdecl CrocodileControl(__int16 itemNum)
 	CreatureJoint(item, 2, -joint0);
 	CreatureJoint(item, 3, -joint0);
 
-	__int16 xRot = item->pos.xRot;
+	short xRot = item->pos.xRot;
 
 	if (!(abs(angle - item->pos.xRot) < 256 || item->currentAnimState >= 8))
 	{
@@ -3521,7 +3521,7 @@ void __cdecl CrocodileControl(__int16 itemNum)
 	}
 }
 
-void __cdecl InitialiseSphinx(__int16 itemNum)
+void __cdecl InitialiseSphinx(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -3533,7 +3533,7 @@ void __cdecl InitialiseSphinx(__int16 itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SphinxControl(__int16 itemNum)
+void __cdecl SphinxControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -3542,19 +3542,19 @@ void __cdecl SphinxControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	__int32 x = item->pos.xPos + 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	__int32 y = item->pos.yPos;
-	__int32 z = item->pos.zPos + 614 * COS(item->pos.yRot) >> W2V_SHIFT;
+	int x = item->pos.xPos + 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	int y = item->pos.yPos;
+	int z = item->pos.zPos + 614 * COS(item->pos.yRot) >> W2V_SHIFT;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height1 = GetFloorHeight(floor, x, y, z);
+	int height1 = GetFloorHeight(floor, x, y, z);
 
 	if (item->currentAnimState == 5 && floor->stopper)
 	{
 		ROOM_INFO* room = &Rooms[item->roomNumber];
 
-		for (__int32 i = 0; i < room->numMeshes; i++)
+		for (int i = 0; i < room->numMeshes; i++)
 		{
 			MESH_INFO* mesh = &room->mesh[i];
 
@@ -3578,7 +3578,7 @@ void __cdecl SphinxControl(__int16 itemNum)
 	roomNumber = item->roomNumber;
 
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height2 = GetFloorHeight(floor, x, y, z);
+	int height2 = GetFloorHeight(floor, x, y, z);
 
 	ATAN(1228, height2 - height1);
 
@@ -3596,10 +3596,10 @@ void __cdecl SphinxControl(__int16 itemNum)
 	GetCreatureMood(item, &info, VIOLENT);
 	CreatureMood(item, &info, VIOLENT);
 
-	__int16 angle = CreatureTurn(item, creature->maximumTurn);
+	short angle = CreatureTurn(item, creature->maximumTurn);
 
-	__int32 dx = abs(item->itemFlags[2] - item->pos.xPos);
-	__int32 dz = abs(item->itemFlags[3] - item->pos.zPos);
+	int dx = abs(item->itemFlags[2] - item->pos.xPos);
+	int dz = abs(item->itemFlags[3] - item->pos.zPos);
 
 	switch (item->currentAnimState)
 	{
@@ -3696,7 +3696,7 @@ void __cdecl SphinxControl(__int16 itemNum)
 
 	case 7:
 		//v32 = item->roomNumber;
-		//v36 = (signed __int16)item->currentAnimState - 1;
+		//v36 = (signed short)item->currentAnimState - 1;
 		
 		roomNumber = item->roomNumber;
 		
@@ -3746,7 +3746,7 @@ void __cdecl SphinxControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseMonkey(__int16 itemNumber)
+void __cdecl InitialiseMonkey(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -3758,7 +3758,7 @@ void __cdecl InitialiseMonkey(__int16 itemNumber)
 	item->goalAnimState = 6;
 }
 
-void __cdecl MonkeyControl(__int16 itemNumber)
+void __cdecl MonkeyControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -3766,16 +3766,16 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature  = (CREATURE_INFO*)item->data;
 	
-	__int16 headX = 0;
-	__int16 headY = 0;
-	__int16 torsoY = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
-	__int32 x = 0;
-	__int32 z = 0;
-	__int32 distance = 0;
-	__int32 dx = 0;
-	__int32 dz = 0;
+	short headX = 0;
+	short headY = 0;
+	short torsoY = 0;
+	short angle = 0;
+	short tilt = 0;
+	int x = 0;
+	int z = 0;
+	int distance = 0;
+	int dx = 0;
+	int dz = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -3795,11 +3795,11 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 			creature->enemy = LaraItem;
 		else
 		{
-			__int32 minDistance = 0x7FFFFFFF;
+			int minDistance = 0x7FFFFFFF;
 			creature->enemy = NULL;
 			CREATURE_INFO* currentCreature = BaddieSlots;
 
-			for (__int32 i = 0; i < NUM_SLOTS; i++, currentCreature++)
+			for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
 			{
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
@@ -4029,7 +4029,7 @@ void __cdecl MonkeyControl(__int16 itemNumber)
 
 					// Stop other entities to interest to this item
 					CREATURE_INFO * currentCreature = BaddieSlots;
-					for (__int32 i = 0; i < NUM_SLOTS; i++, currentCreature++)
+					for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
 					{
 						if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 							continue;
@@ -4339,7 +4339,7 @@ void __cdecl YetiControl(short itemNum)
 		return;
 	CREATURE_INFO* yeti = (CREATURE_INFO*)item->data;
 	AI_INFO info;
-	__int16 angle = 0, torso = 0, head = 0, tilt = 0;
+	short angle = 0, torso = 0, head = 0, tilt = 0;
 	bool lara_alive;
 
 	lara_alive = (LaraItem->hitPoints > 0);
@@ -4642,7 +4642,7 @@ void S_SpiderBite(ITEM_INFO* item)
 	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->pos.yPos, item->roomNumber);
 }
 
-void SpiderLeap(__int16 itemNum, ITEM_INFO* item, short angle)
+void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
 {
 	GAME_VECTOR vec;
 
@@ -4671,7 +4671,7 @@ void SpiderLeap(__int16 itemNum, ITEM_INFO* item, short angle)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl SmallSpiderControl(__int16 itemNum)
+void __cdecl SmallSpiderControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -4776,7 +4776,7 @@ void __cdecl SmallSpiderControl(__int16 itemNum)
 		SpiderLeap(itemNum, item, angle);
 }
 
-void __cdecl BigSpiderControl(__int16 itemNum)
+void __cdecl BigSpiderControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -4872,7 +4872,7 @@ void __cdecl BigSpiderControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl BirdMonsterControl(__int16 itemNum)
+void __cdecl BirdMonsterControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

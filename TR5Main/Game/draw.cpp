@@ -4,7 +4,7 @@
 
 Renderer11* g_Renderer;
 
-__int32 __cdecl DrawPhaseGame()
+int __cdecl DrawPhaseGame()
 {
 	// Control routines uses joints calculated here for getting Lara joint positions
 	CalcLaraMatrices(0);
@@ -28,10 +28,10 @@ void __cdecl DrawAnimatingItem(ITEM_INFO* item)
 	CREATURE_INFO* creature;
 	int* bones;
 	int clip, i, poppush, frac, rate, bit;
-	__int16* frames[2];
-	__int16* extra_rotation;
-	__int16* rotation1, *rotation2;
-	__int16** mesh;
+	short* frames[2];
+	short* extra_rotation;
+	short* rotation1, *rotation2;
+	short** mesh;
 
 	creature = (CREATURE_INFO*)item->data;
 	frac = GetFrame_D2(item, frames, &rate);
@@ -54,7 +54,7 @@ void __cdecl DrawAnimatingItem(ITEM_INFO* item)
 		if (item->data == NULL)
 			extra_rotation = NullRotations;
 		else
-			extra_rotation = (__int16*)item->data;
+			extra_rotation = (short*)item->data;
 
 		mesh = &Meshes[Objects[item->objectNumber].meshIndex];
 		bones = &Bones[obj->boneIndex];
@@ -63,7 +63,7 @@ void __cdecl DrawAnimatingItem(ITEM_INFO* item)
 		if (!frac)
 		{
 			phd_TranslateRel((int)*(frames[0] + 6), (int)*(frames[0] + 7), (int)*(frames[0] + 8)); // can be [0][6] etc.. ?
-			rotation1 = (__int16*)(frames[0] + 9);
+			rotation1 = (short*)(frames[0] + 9);
 			gar_RotYXZsuperpack(&rotation1, 0);
 
 			if (item->meshBits & bit)
@@ -148,7 +148,7 @@ void __cdecl DrawAnimatingItem(ITEM_INFO* item)
 	phd_PopDxMatrix();
 }
 
-__int32 __cdecl GetFrame_D2(ITEM_INFO* item, __int16* framePtr[], __int32* rate)
+int __cdecl GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
 {
 	ANIM_STRUCT *anim;
 	int frm;
@@ -172,6 +172,136 @@ __int32 __cdecl GetFrame_D2(ITEM_INFO* item, __int16* framePtr[], __int32* rate)
 	if (second>anim->frameEnd)                       // Clamp KeyFrame to End if need be
 		*rate = anim->frameEnd - (second - rat);
 	return(interp);
+}
+
+void _InitInterpolate(void)
+{
+}
+
+void _phd_PushMatrix(void)
+{
+}
+
+void _phd_PushMatrix_I(void)
+{
+}
+
+void _phd_PushUnitMatrix(void)
+{
+}
+
+void _phd_RotYXZ(short ry, short rx, short rz)
+{
+}
+
+void _phd_RotY(short ry)
+{
+}
+
+void _phd_RotY_I(short ry)
+{
+}
+
+void _phd_RotX(short rx)
+{
+}
+
+void _phd_RotX_I(short rx)
+{
+}
+
+void _phd_RotZ(short rz)
+{
+}
+
+void _phd_RotZ_I(short rz)
+{
+}
+
+void _phd_PutPolygons(void)
+{
+}
+
+void _phd_PutPolygons_I(void)
+{
+}
+
+void _phd_TranslateRel(int x, int y, int z)
+{
+}
+
+void _phd_TranslateRel_I(int x, int y, int z)
+{
+}
+
+void _phd_TranslateRel_ID(int x1, int y1, int z1, int x2, int y2, int z2)
+{
+}
+
+void _phd_TranslateAbs(int x, int y, int z)
+{
+}
+
+void _phd_RotYXZpack(short ry, short rx, short rz)
+{
+}
+
+void _gar_RotYXZsuperpack(short** pproc, int skip)
+{
+}
+
+void _gar_RotYXZsuperpack_I(short** pproc1, short** pproc2, int skip)
+{
+}
+
+void _phd_ClipBoundingBox(short* frames)
+{
+}
+
+void _phd_DxTranslateRel(int x, int y, int z)
+{
+}
+
+void _phd_DxTranslateAbs(int x, int y, int z)
+{
+}
+
+void _phd_DxRotY(short ry)
+{
+}
+
+void _phd_DxRotX(short rx)
+{
+}
+
+void _phd_DxRotZ(short rz)
+{
+}
+
+void _phd_DxRotYXZ(short ry, short rx, short rz)
+{
+}
+
+void _phd_DxRotYXZpack(int rangle)
+{
+}
+
+void phd_PopMatrix(void)
+{
+	MatrixPtr -= 12;
+}
+
+void _phd_PopMatrix_I(void)
+{
+	MatrixPtr -= 12;
+	DxMatrixPtr -= 48;
+	//dword_E6E468 -= 48;
+	//dword_E6D834 -= 48;
+}
+
+void phd_PopDxMatrix(void)
+{
+	DxMatrixPtr -= 48;
 }
 
 void Inject_Draw()

@@ -11,12 +11,12 @@
 #include "../Game/sphere.h"
 #include "../Game/switch.h"
 
-__int16 ScalesBounds[12] = {
+short ScalesBounds[12] = {
 	0xFA80, 0xFA80, 0x0000, 0x0000, 0xFE00, 0x0200,
 	0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
 
-void __cdecl ScalesControl(__int16 itemNum)
+void __cdecl ScalesControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -38,10 +38,10 @@ void __cdecl ScalesControl(__int16 itemNum)
 			return;
 		}
 
-		if (RespawnAhmet((__int16)Lara.generalPtr))
+		if (RespawnAhmet((short)Lara.generalPtr))
 		{
-			__int16 itemNos[8];
-			__int32 sw = GetSwitchTrigger(item, itemNos, 0);
+			short itemNos[8];
+			int sw = GetSwitchTrigger(item, itemNos, 0);
 
 			if (sw > 0)
 			{
@@ -59,7 +59,7 @@ void __cdecl ScalesControl(__int16 itemNum)
 		AnimateItem(item);
 	}
 
-	__int32 flags = 0;
+	int flags = 0;
 
 	if (item->currentAnimState == 2)
 	{
@@ -73,16 +73,16 @@ void __cdecl ScalesControl(__int16 itemNum)
 		item->itemFlags[1] = 1;
 	}
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	__int32 height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 	TestTriggers(TriggerIndex, 1, flags);
 
 	AnimateItem(item);
 }
 
-void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -111,8 +111,8 @@ void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			__int16 rotY = item->pos.yRot;
-			item->pos.yRot = (__int16)(l->pos.yRot + ANGLE(45)) & 0xC000;
+			short rotY = item->pos.yRot;
+			item->pos.yRot = (short)(l->pos.yRot + ANGLE(45)) & 0xC000;
 
 			ScalesBounds[0] = -1408;
 			ScalesBounds[1] = -640;
@@ -184,7 +184,7 @@ void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-__int32 __cdecl RespawnAhmet(__int16 itemNum)
+int __cdecl RespawnAhmet(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

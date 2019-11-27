@@ -1,7 +1,7 @@
 #include "hair.h"
 #include "..\Global\global.h"
 
-void __cdecl j_HairControl(__int16 a, __int16 b, __int16 c)
+void __cdecl j_HairControl(short a, short b, short c)
 {
 	HairControl(a, b, c);
 }

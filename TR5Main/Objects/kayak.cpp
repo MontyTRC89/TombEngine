@@ -56,12 +56,12 @@ enum KAYAK_STATE {
 	KS_CLIMBOUTR,
 };
 
-void __cdecl DoKayakRipple(ITEM_INFO* v, __int16 xoff, __int16 zoff)
+void __cdecl DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 {
 	RIPPLE_STRUCT* r;
 	int s, c, x, z;
 	FLOOR_INFO* floor;
-	__int16 room_number;
+	short room_number;
 
 	c = COS(v->pos.yRot);
 	s = SIN(v->pos.yRot);
@@ -157,13 +157,13 @@ void __cdecl TriggerRapidsMist(long x, long y, long z)
 	*/
 }
 
-int __cdecl GetInKayak(__int16 item_number, COLL_INFO* coll)
+int __cdecl GetInKayak(short item_number, COLL_INFO* coll)
 {
 	int dist;
 	int x, z;
 	ITEM_INFO* kayak;
 	FLOOR_INFO* floor;
-	__int16 room_number;
+	short room_number;
 
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
 		return 0;
@@ -188,8 +188,8 @@ int __cdecl GetInKayak(__int16 item_number, COLL_INFO* coll)
 	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &room_number);
 	if (GetFloorHeight(floor, kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos) > -32000)
 	{
-		__int16 ang;
-		unsigned __int16 tempang;
+		short ang;
+		unsigned short tempang;
 
 		ang = ATAN(kayak->pos.zPos - LaraItem->pos.zPos, kayak->pos.xPos - LaraItem->pos.xPos);
 		ang -= kayak->pos.yRot;
@@ -351,7 +351,7 @@ int __cdecl TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 {
 	int h;
 	FLOOR_INFO* floor;
-	__int16 room_number;
+	short room_number;
 
 	phd_PushUnitMatrix();
 	MatrixPtr[M03] = item->pos.xPos;
@@ -397,7 +397,7 @@ int __cdecl DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 	int shift_x, shift_z;
 	int height;
 	FLOOR_INFO* floor;
-	__int16 room_number;
+	short room_number;
 
 	x = pos->x >> WALL_SHIFT;
 	z = pos->z >> WALL_SHIFT;
@@ -518,7 +518,7 @@ void __cdecl KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	PHD_VECTOR pos;
 	int collide, oldx, oldz;
 	FLOOR_INFO* floor;
-	__int16 room_number;
+	short room_number;
 	int height[8];
 	PHD_VECTOR oldpos[9];
 	int x, z;
@@ -673,7 +673,7 @@ void __cdecl KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 
 void __cdecl KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 {
-	__int16 frame;
+	short frame;
 	char lr;
 
 	/* -------- kill Lara in boat */
@@ -952,7 +952,7 @@ void __cdecl KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo
 		/* --------------------- */
 		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 4) && (frame == 24) && (!(kinfo->Flags & 0x80)))
 		{
-			__int16* tmp;
+			short* tmp;
 			tmp = Lara.meshPtrs[HAND_R];
 
 			Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + HAND_R];
@@ -966,7 +966,7 @@ void __cdecl KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo
 	case KS_JUMPOUT:
 		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 14) && (frame == 27) && (kinfo->Flags & 0x80))
 		{
-			__int16* tmp;
+			short* tmp;
 			tmp = Lara.meshPtrs[HAND_R];
 
 			Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + HAND_R];
@@ -1066,8 +1066,8 @@ void __cdecl KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo
 void __cdecl KayakToBaddieCollision(ITEM_INFO* kayak)
 {
 #define TARGET_DIST (WALL_SIZE*2)              // Up to this Distance more Complicated checks are made
-	vector<__int16> roomsList;
-	__int16 numDoors, *door;
+	vector<short> roomsList;
+	short numDoors, *door;
 
 	roomsList.push_back(kayak->roomNumber);
 
@@ -1077,7 +1077,7 @@ void __cdecl KayakToBaddieCollision(ITEM_INFO* kayak)
 	{
 		numDoors = *door;
 		door++;
-		for (__int32 i = 0; i < numDoors; i++)
+		for (int i = 0; i < numDoors; i++)
 		{
 			roomsList.push_back(*door);
 			door += 16;
@@ -1086,15 +1086,15 @@ void __cdecl KayakToBaddieCollision(ITEM_INFO* kayak)
 
 	/* -------- collide with all baddies in these rooms */
 
-	for (__int32 i = 0; i < roomsList.size(); i++)
+	for (int i = 0; i < roomsList.size(); i++)
 	{
-		__int16 item_num;
+		short item_num;
 
 		item_num = Rooms[roomsList[i]].itemNumber;	// Only do collision with Items on Draw list
 
 		while (item_num != NO_ITEM)
 		{
-			__int16 nex;
+			short nex;
 			ITEM_INFO* item;
 
 			item = &Items[item_num];
@@ -1164,7 +1164,7 @@ void __cdecl LaraRapidsDrown()
 	Lara.hitDirection = -1;
 }
 
-void __cdecl InitialiseKayak(__int16 item_number)
+void __cdecl InitialiseKayak(short item_number)
 {
 	int i;
 	ITEM_INFO* v;
@@ -1189,7 +1189,7 @@ void __cdecl DrawKayak(ITEM_INFO* kayak)
 	kayak->pos.yPos -= KAYAK_DRAW_SHIFT;
 }
 
-void __cdecl KayakCollision(__int16 item_number, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
 
@@ -1254,7 +1254,7 @@ int __cdecl KayakControl()
 	ITEM_INFO* v, * l;
 	FLOOR_INFO* floor;
 	int ofs, water, lp;
-	__int16 room_number;
+	short room_number;
 
 	l = LaraItem;
 	v = &Items[g_LaraExtra.Vehicle];
@@ -1336,9 +1336,9 @@ int __cdecl KayakControl()
 		{
 			PHD_VECTOR dest;
 			static char cnt = 0;
-			static __int16 MistZPos[10] = { 900, 750, 600, 450, 300, 150, 0,  -150, -300, -450 };
+			static short MistZPos[10] = { 900, 750, 600, 450, 300, 150, 0,  -150, -300, -450 };
 			//			static sint16 MistXPos[10] = { 32,  64,  128, 192, 256, 480, 480, 350,  256,  64};
-			static __int16 MistXPos[10] = { 32,  96,  170, 220, 300, 400, 400, 300,  200,  64 };
+			static short MistXPos[10] = { 32,  96,  170, 220, 300, 400, 400, 300,  200,  64 };
 
 			cnt ^= 1;
 

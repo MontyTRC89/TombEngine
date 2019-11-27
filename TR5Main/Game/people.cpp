@@ -8,21 +8,21 @@
 #include "debris.h"
 #include "box.h"
 
-__int32 __cdecl ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, __int16 extra_rotation, __int32 damage) 
+int __cdecl ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
 
-	__int32 hit = 0;
-	__int32 targetable = 0;
+	int hit = 0;
+	int targetable = 0;
 
 	if (info->distance <= SQUARE(8192) && Targetable(item, info))
 	{
-		__int32 distance = SIN(info->enemyFacing) * enemy->speed >> W2V_SHIFT * SQUARE(8192) / 300;
+		int distance = SIN(info->enemyFacing) * enemy->speed >> W2V_SHIFT * SQUARE(8192) / 300;
 		distance = info->distance + SQUARE(distance);
 		if (distance <= SQUARE(8192))
 		{
-			__int32 random = (SQUARE(8192) - info->distance) / (SQUARE(8192) / 0x5000) + 8192;
+			int random = (SQUARE(8192) - info->distance) / (SQUARE(8192) / 0x5000) + 8192;
 			hit = (GetRandomControl() < random);
 		}
 		else
@@ -60,7 +60,7 @@ __int32 __cdecl ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, __int16
 				enemy->hitStatus = true;
 				enemy->hitPoints += damage / -10;
 
-				__int32 random = GetRandomControl() & 0xF;
+				int random = GetRandomControl() & 0xF;
 				if (random > 14)
 					random = 0;
 
@@ -80,7 +80,7 @@ __int32 __cdecl ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, __int16
 	return targetable;
 }
 
-__int16 __cdecl GunMiss(__int32 x, __int32 y, __int32 z, __int16 speed, __int16 yrot, __int16 roomNumber)
+short __cdecl GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	GAME_VECTOR pos;
 
@@ -94,7 +94,7 @@ __int16 __cdecl GunMiss(__int32 x, __int32 y, __int32 z, __int16 speed, __int16 
 	return GunShot(x, y, z, speed, yrot, roomNumber);
 }
 
-__int16 __cdecl GunHit(__int32 x, __int32 y, __int32 z, __int16 speed, __int16 yrot, __int16 roomNumber)
+short __cdecl GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	PHD_VECTOR pos;
 
@@ -110,12 +110,12 @@ __int16 __cdecl GunHit(__int32 x, __int32 y, __int32 z, __int16 speed, __int16 y
 	return GunShot(x, y, z, speed, yrot, roomNumber);
 }
 
-__int16 __cdecl GunShot(__int32 x, __int32 y, __int32 z, __int16 speed, __int16 yrot, __int16 roomNumber)
+short __cdecl GunShot(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	return -1;
 }
 
-__int32 __cdecl Targetable(ITEM_INFO* item, AI_INFO* info) 
+int __cdecl Targetable(ITEM_INFO* item, AI_INFO* info) 
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
@@ -124,7 +124,7 @@ __int32 __cdecl Targetable(ITEM_INFO* item, AI_INFO* info)
 	{
 		GAME_VECTOR start, target;
 
-		__int16* bounds = GetBestFrame(item);
+		short* bounds = GetBestFrame(item);
 
 		start.x = item->pos.xPos;
 		if (item->objectNumber == ID_SNIPER)
@@ -146,14 +146,14 @@ __int32 __cdecl Targetable(ITEM_INFO* item, AI_INFO* info)
 	return 0;
 }
 
-__int32 __cdecl TargetVisible(ITEM_INFO* item, AI_INFO* info) 
+int __cdecl TargetVisible(ITEM_INFO* item, AI_INFO* info) 
 {
 	CREATURE_INFO*  creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
 
 	if (enemy != NULL)
 	{
-		__int16 angle = info->angle - creature->jointRotation[2];
+		short angle = info->angle - creature->jointRotation[2];
 		if (enemy->hitPoints != 0 && angle > -ANGLE(45) && angle < ANGLE(45) && info->distance < SQUARE(8192))
 		{
 			GAME_VECTOR start;
@@ -164,7 +164,7 @@ __int32 __cdecl TargetVisible(ITEM_INFO* item, AI_INFO* info)
 
 			GAME_VECTOR target;
 			target.x = enemy->pos.xPos;
-			__int16* bounds = GetBestFrame(enemy);
+			short* bounds = GetBestFrame(enemy);
 			target.y = enemy->pos.yPos + ((((bounds[2] << 1) + bounds[2]) + bounds[3]) >> 2);
 			target.z = enemy->pos.zPos;
 

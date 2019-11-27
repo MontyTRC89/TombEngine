@@ -12,7 +12,7 @@
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
-void __cdecl FlameThrowerControl(__int16 itemNumber)
+void __cdecl FlameThrowerControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -20,11 +20,11 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	__int16 angle = 0;
-	__int16 tilt = 0;
-	__int16 torsoX = 0;
-	__int16 torsoY = 0;
-	__int16 head = 0;
+	short angle = 0;
+	short tilt = 0;
+	short torsoX = 0;
+	short torsoY = 0;
+	short head = 0;
 
 	PHD_VECTOR pos;
 	pos.x = flamerBite.x;
@@ -32,7 +32,7 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 	pos.z = flamerBite.z;
 	GetJointAbsPosition(item, &pos, flamerBite.meshNum);
 
-	__int32 random = GetRandomControl();
+	int random = GetRandomControl();
 	if (item->currentAnimState != 6 && item->currentAnimState != 11)
 	{
 		TriggerDynamics(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random >> 4) & 3), 16 - ((random >> 6) & 3), random & 3); 
@@ -61,11 +61,11 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 			// Find another enemy different from Lara
 			creature->enemy = NULL;
 
-			__int32 minDistance = 0x7FFFFFFF;
+			int minDistance = 0x7FFFFFFF;
 			CREATURE_INFO* currentCreature = BaddieSlots;
 			ITEM_INFO* target = NULL;
 
-			for (__int32 i = 0; i < NUM_SLOTS; i++, currentCreature++)
+			for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
 			{
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
@@ -74,10 +74,10 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 				if (target->objectNumber == ID_LARA /*|| target->objectNumber == WHITE_SOLDIER || target->objectNumber == FLAMETHROWER_BLOKE*/ || target->hitPoints <= 0)
 					continue;
 
-				__int32 x = target->pos.xPos - item->pos.xPos;
-				__int32 z = target->pos.zPos - item->pos.zPos;
+				int x = target->pos.xPos - item->pos.xPos;
+				int z = target->pos.zPos - item->pos.zPos;
 
-				__int32 distance = SQUARE(x) + SQUARE(z);
+				int distance = SQUARE(x) + SQUARE(z);
 
 				if (distance < minDistance)
 				{
@@ -101,8 +101,8 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 		}
 		else
 		{
-			__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
-			__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
+			int dx = LaraItem->pos.xPos - item->pos.xPos;
+			int dz = LaraItem->pos.zPos - item->pos.zPos;
 			
 			laraInfo.angle = ATAN(dz, dz) - item->pos.yRot; 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
@@ -322,17 +322,17 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
-__int16 __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, __int16 speed)
+short __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 {
 	PHD_VECTOR pos1;
 	PHD_VECTOR pos2;
-	__int16 angles[2];
-	__int32 velocity;
-	__int32 xv;
-	__int32 yv;
-	__int32 zv;
+	short angles[2];
+	int velocity;
+	int xv;
+	int yv;
+	int zv;
 
-	__int16 effectNumber = CreateNewEffect(item->roomNumber);
+	short effectNumber = CreateNewEffect(item->roomNumber);
 	if (effectNumber != NO_ITEM)
 	{
 		FX_INFO* fx = &Effects[effectNumber];
@@ -365,7 +365,7 @@ __int16 __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, __int16 sp
 
 		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
 
-		for (__int32 i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			speed = (GetRandomControl() % (speed << 2)) + 32;
 			velocity = (speed * COS(fx->pos.xRot)) >> W2V_SHIFT;
@@ -388,7 +388,7 @@ __int16 __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, __int16 sp
 	return effectNumber;
 }
 
-void __cdecl TriggerFlamethrowerFlame(__int32 x, __int32 y, __int32 z, __int32 xv, __int32 yv, __int32 zv, __int32 fxnum)
+void __cdecl TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxnum)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -452,7 +452,7 @@ void __cdecl TriggerFlamethrowerFlame(__int32 x, __int32 y, __int32 z, __int32 x
 	spark->gravity = 0;
 	spark->maxYvel = 0;
 	//spark->def = Objects[EXPLOSION1].mesh_index;
-	__int32 size = (GetRandomControl() & 31) + 64;
+	int size = (GetRandomControl() & 31) + 64;
 	
 	if (xv || yv || zv)
 	{
@@ -471,10 +471,10 @@ void __cdecl TriggerFlamethrowerFlame(__int32 x, __int32 y, __int32 z, __int32 x
 	spark->dSize = size >> 1;
 }
 
-void __cdecl TriggerPilotFlame(__int32 itemnum)
+void __cdecl TriggerPilotFlame(int itemnum)
 {
-	__int32 dx = LaraItem->pos.xPos - Items[itemnum].pos.xPos;
-	__int32 dz = LaraItem->pos.zPos - Items[itemnum].pos.zPos;
+	int dx = LaraItem->pos.xPos - Items[itemnum].pos.xPos;
+	int dz = LaraItem->pos.zPos - Items[itemnum].pos.zPos;
 
 	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 		return;
@@ -512,7 +512,7 @@ void __cdecl TriggerPilotFlame(__int32 itemnum)
 	spark->maxYvel = -(GetRandomControl() & 3) - 4;
 	//spark->def = objects[EXPLOSION1].mesh_index;
 	spark->scalar = 0;
-	__int32 size = (GetRandomControl() & 7) + 32;
+	int size = (GetRandomControl() & 7) + 32;
 	spark->size = size >> 1;
 	spark->dSize = size;
 }

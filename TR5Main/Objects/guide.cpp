@@ -12,7 +12,7 @@
 BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
 BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };
 
-void __cdecl InitialiseGuide(__int16 itemNum)
+void __cdecl InitialiseGuide(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -25,7 +25,7 @@ void __cdecl InitialiseGuide(__int16 itemNum)
 	item->swapMeshFlags = 0x40000;
 }
 
-void __cdecl GuideControl(__int16 itemNum)
+void __cdecl GuideControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -35,11 +35,11 @@ void __cdecl GuideControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	__int16 angle = 0;
-	__int16 tilt = 0;
-	__int16 joint2 = 0;
-	__int16 joint1 = 0;
-	__int16 joint0 = 0;
+	short angle = 0;
+	short tilt = 0;
+	short joint2 = 0;
+	short joint1 = 0;
+	short joint0 = 0;
 
 	if (item->itemFlags[1] == 2)
 	{
@@ -55,7 +55,7 @@ void __cdecl GuideControl(__int16 itemNum)
 		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
 		GrenadeLauncherSpecialEffect1(pos.x, pos.y - 40, pos.z, -1, 7);
 
-		__int16 random = GetRandomControl();
+		short random = GetRandomControl();
 		TriggerDynamics(pos.x, pos.y, pos.z, 15, 255 - ((random >> 4) & 0x1F), 192 - ((random >> 6) & 0x1F), random & 0x3F);
 
 		if (item->animNumber == obj->animIndex + 61)
@@ -80,8 +80,8 @@ void __cdecl GuideControl(__int16 itemNum)
 	AI_INFO info;
 	AI_INFO laraInfo;
 
-	__int32 dx = LaraItem->pos.xPos - item->pos.xPos;
-	__int32 dz = LaraItem->pos.zPos - item->pos.zPos;
+	int dx = LaraItem->pos.xPos - item->pos.xPos;
+	int dz = LaraItem->pos.zPos - item->pos.zPos;
 
 	laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
 
@@ -89,7 +89,7 @@ void __cdecl GuideControl(__int16 itemNum)
 	if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
 		laraInfo.ahead = false;
 
-	__int32 distance = 0;
+	int distance = 0;
 	if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
 		laraInfo.distance = 0x7FFFFFFF;
 	else
@@ -98,8 +98,8 @@ void __cdecl GuideControl(__int16 itemNum)
 	dx = abs(dx);
 	dz = abs(dz);
 
-	__int32 dy = item->pos.yPos - LaraItem->pos.yPos;
-	__int16 rot2 = 0;
+	int dy = item->pos.yPos - LaraItem->pos.yPos;
+	short rot2 = 0;
 
 	if (dx <= dz)
 		laraInfo.xAngle = ATAN(dz + (dx >> 1), dy);
@@ -110,10 +110,10 @@ void __cdecl GuideControl(__int16 itemNum)
 
 	if (item->currentAnimState < 4 || item->currentAnimState == 31)
 	{
-		__int32 minDistance = 0x7FFFFFFF;
+		int minDistance = 0x7FFFFFFF;
 		CREATURE_INFO* baddie = &BaddieSlots[0];
 
-		for (__int32 i = 0; i < NUM_SLOTS; i++)
+		for (int i = 0; i < NUM_SLOTS; i++)
 		{
 			baddie = &BaddieSlots[i];
 
@@ -164,8 +164,8 @@ void __cdecl GuideControl(__int16 itemNum)
 	bool someFlag = false;
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos1;
-	__int16 frameNumber;
-	__int16 random;
+	short frameNumber;
+	short random;
 
 	printf("Guide state: %d\n", item->currentAnimState);
 
@@ -578,7 +578,7 @@ void __cdecl GuideControl(__int16 itemNum)
 	case 43:
 		if (enemy)
 		{
-			__int16 deltaAngle = enemy->pos.yRot - item->pos.yRot;
+			short deltaAngle = enemy->pos.yRot - item->pos.yRot;
 			if (deltaAngle <= 364)
 			{
 				if (deltaAngle < -364)
@@ -633,7 +633,7 @@ void __cdecl GuideControl(__int16 itemNum)
 			ROOM_INFO* room = &Rooms[item->roomNumber];
 			ITEM_INFO* currentItem = NULL;
 
-			__int16 currentItemNumber = room->itemNumber;
+			short currentItemNumber = room->itemNumber;
 			while (currentItemNumber != NO_ITEM)
 			{
 				currentItem = &Items[currentItemNumber];

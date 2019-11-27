@@ -1,34 +1,34 @@
 #pragma once
 #include "..\Global\global.h"
 
-//#define InitialiseSwitch ((void (__cdecl*)(__int16)) 0x00440070)
-//#define SequenceControl ((void (__cdecl*)(__int16)) 0x0047F520)
-//#define SequenceCollision ((void (__cdecl*)(__int16,ITEM_INFO*,COLL_INFO*)) 0x0047F610)
-//#define LeverSwitchCollision ((void (__cdecl*)(__int16,ITEM_INFO*,COLL_INFO*)) 0x0047EE00)
-//#define InitialisePulleySwitch ((void (__cdecl*)(__int16)) 0x0043E1F0)
-//#define InitialiseCrowDoveSwitch ((void (__cdecl*)(__int16)) 0x0043ECF0)
-void __cdecl CrowDoveSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl CrowDoveSwitchControl(__int16 itemNumber);
-void __cdecl CogSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl CogSwitchControl(__int16 itemNum);
-void __cdecl FullBlockSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl FullBlockSwitchControl(__int16 itemNumber);
-void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl JumpSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl RailSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl TurnSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl TurnSwitchControl(__int16 itemNum);
-void __cdecl PulleyCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl UnderwaterSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl SwitchCollision2(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl SwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl SwitchControl(__int16 itemNumber);
-void __cdecl TestTriggersAtXYZ(__int32 x, __int32 y, __int32 z, __int16 roomNumber, __int32 heavy, __int32 flags);
-__int32 __cdecl GetKeyTrigger(ITEM_INFO* item);
-__int32 __cdecl GetSwitchTrigger(ITEM_INFO* item, __int16* itemNos, __int32 AttatchedToSwitch);
-__int32 __cdecl SwitchTrigger(__int16 itemNum, __int16 timer);
-void __cdecl InitialiseSwitch(__int16 itemNum);
-void __cdecl InitialisePulleySwitch(__int16 itemNumber);
-void __cdecl InitialiseCrowDoveSwitch(__int16 itemNumber);
+//#define InitialiseSwitch ((void (__cdecl*)(short)) 0x00440070)
+//#define SequenceControl ((void (__cdecl*)(short)) 0x0047F520)
+//#define SequenceCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0047F610)
+//#define LeverSwitchCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0047EE00)
+//#define InitialisePulleySwitch ((void (__cdecl*)(short)) 0x0043E1F0)
+//#define InitialiseCrowDoveSwitch ((void (__cdecl*)(short)) 0x0043ECF0)
+void __cdecl CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl CrowDoveSwitchControl(short itemNumber);
+void __cdecl CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl CogSwitchControl(short itemNum);
+void __cdecl FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl FullBlockSwitchControl(short itemNumber);
+void __cdecl CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl TurnSwitchControl(short itemNum);
+void __cdecl PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl SwitchCollision2(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void __cdecl SwitchControl(short itemNumber);
+void __cdecl TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags);
+int __cdecl GetKeyTrigger(ITEM_INFO* item);
+int __cdecl GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch);
+int __cdecl SwitchTrigger(short itemNum, short timer);
+void __cdecl InitialiseSwitch(short itemNum);
+void __cdecl InitialisePulleySwitch(short itemNumber);
+void __cdecl InitialiseCrowDoveSwitch(short itemNumber);
 
 void Inject_Switch();

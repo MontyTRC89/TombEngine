@@ -6,11 +6,11 @@ BITE_INFO monk_hit = { -23,16,265, 14 };
 
 extern bool MonksAttackLara;
 
-void __cdecl MonkControl(__int16 itemNum)
+void __cdecl MonkControl(short itemNum)
 {
 	ITEM_INFO* item, * enemy;
 	CREATURE_INFO* monk;
-	__int16 angle, torso, tilt;
+	short angle, torso, tilt;
 	AI_INFO info;
 	int random;
 

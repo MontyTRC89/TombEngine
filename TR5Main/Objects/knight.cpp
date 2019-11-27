@@ -12,7 +12,7 @@
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
-void __cdecl InitialiseKnightTemplar(__int16 itemNum)
+void __cdecl InitialiseKnightTemplar(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -25,7 +25,7 @@ void __cdecl InitialiseKnightTemplar(__int16 itemNum)
 	item->meshBits &= 0xF7FF;
 }
 
-void __cdecl KnightTemplarControl(__int16 itemNum)
+void __cdecl KnightTemplarControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -58,11 +58,11 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	__int16 tilt = 0;
-	__int16 angle = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
+	short tilt = 0;
+	short angle = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
 
 	// Knight is immortal
 	if (item->hitPoints < obj->hitPoints)
@@ -78,7 +78,7 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 
 	CreatureAIInfo(item, &info);
 
-	__int32 a = 0;
+	int a = 0;
 	if (creature->enemy != LaraItem)
 		a = ATAN(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
 
@@ -94,8 +94,8 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 		joint1 = info.xAngle;
 	}
 
-	__int16 frameBase = 0;
-	__int16 frameNumber = 0;
+	short frameBase = 0;
+	short frameNumber = 0;
 
 	switch (item->currentAnimState)
 	{
@@ -177,7 +177,7 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 			{
 				MESH_INFO* mesh = room->mesh;
 
-				for (__int32 i = 0; i < room->numMeshes; i++)
+				for (int i = 0; i < room->numMeshes; i++)
 				{
 					if (floor(pos.x) == floor(mesh->x) &&
 						floor(pos.z) == floor(mesh->z) &&
@@ -188,7 +188,7 @@ void __cdecl KnightTemplarControl(__int16 itemNum)
 
 						mesh->Flags &= ~1;
 						currentFloor->stopper = false;
-						__int32 height = GetFloorHeight(currentFloor, pos.x, pos.y, pos.z);
+						int height = GetFloorHeight(currentFloor, pos.x, pos.y, pos.z);
 						TestTriggers(TriggerIndex, 1, 0);
 					}
 

@@ -3,14 +3,14 @@
 #include "effect2.h"
 #include <stdio.h>
 
-void __cdecl ClearItem(__int16 itemNum)
+void __cdecl ClearItem(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	item->data = NULL;
 	item->collidable = true;
 }
 
-void __cdecl KillItem(__int16 itemNum)
+void __cdecl KillItem(short itemNum)
 {
 	if (InItemControlLoop)
 	{
@@ -32,7 +32,7 @@ void __cdecl KillItem(__int16 itemNum)
 		}
 		else if (NextItemActive != NO_ITEM)
 		{
-			__int16 linknum;
+			short linknum;
 			for (linknum = Items[NextItemActive].nextActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
 			{
 				if (linknum == itemNum)
@@ -51,7 +51,7 @@ void __cdecl KillItem(__int16 itemNum)
 			}
 			else if (Rooms[item->roomNumber].itemNumber != -1)
 			{
-				__int16 linknum;
+				short linknum;
 				for (linknum = Items[Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
 				{
 					if (linknum == itemNum)
@@ -78,10 +78,10 @@ void __cdecl KillItem(__int16 itemNum)
 	}
 }
 
-void __cdecl RemoveAllItemsInRoom(__int16 roomNumber, __int16 objectNumber)
+void __cdecl RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 {
 	ROOM_INFO* room = &Rooms[roomNumber];
-	__int16 currentItemNum = room->itemNumber;
+	short currentItemNum = room->itemNumber;
 
 	while (currentItemNum != NO_ITEM)
 	{
@@ -98,7 +98,7 @@ void __cdecl RemoveAllItemsInRoom(__int16 roomNumber, __int16 objectNumber)
 	}
 }
 
-void __cdecl AddActiveItem(__int16 itemNumber)
+void __cdecl AddActiveItem(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -118,7 +118,7 @@ void __cdecl AddActiveItem(__int16 itemNumber)
 	}
 }
 
-void __cdecl ItemNewRoom(__int16 itemNumber, __int16 roomNumber)
+void __cdecl ItemNewRoom(short itemNumber, short roomNumber)
 {
 	if (InItemControlLoop)
 	{
@@ -140,7 +140,7 @@ void __cdecl ItemNewRoom(__int16 itemNumber, __int16 roomNumber)
 			}
 			else if (r->itemNumber != NO_ITEM)
 			{
-				for (__int16 linknum = Items[r->itemNumber].nextItem; linknum != -1; linknum = Items[linknum].nextItem)
+				for (short linknum = Items[r->itemNumber].nextItem; linknum != -1; linknum = Items[linknum].nextItem)
 				{
 					if (linknum == itemNumber)
 					{
@@ -157,7 +157,7 @@ void __cdecl ItemNewRoom(__int16 itemNumber, __int16 roomNumber)
 	}
 }
 
-void __cdecl EffectNewRoom(__int16 fxNumber, __int16 roomNumber)
+void __cdecl EffectNewRoom(short fxNumber, short roomNumber)
 {
 	if (InItemControlLoop)
 	{
@@ -176,7 +176,7 @@ void __cdecl EffectNewRoom(__int16 fxNumber, __int16 roomNumber)
 		}
 		else if (r->fxNumber != NO_ITEM)
 		{
-			__int16 linknum;
+			short linknum;
 			for (linknum = Effects[r->fxNumber].nextFx; linknum != -1; linknum = Effects[linknum].nextFx)
 			{
 				if (linknum == fxNumber)
@@ -193,7 +193,7 @@ void __cdecl EffectNewRoom(__int16 fxNumber, __int16 roomNumber)
 	}
 }
 
-void __cdecl KillEffect(__int16 fxNumber)
+void __cdecl KillEffect(short fxNumber)
 {
 	if (InItemControlLoop)
 	{
@@ -212,7 +212,7 @@ void __cdecl KillEffect(__int16 fxNumber)
 		}
 		else if (NextFxActive != NO_ITEM)
 		{
-			for (__int16 linknum = Effects[NextFxActive].nextActive; linknum != NO_ITEM; linknum = Effects[linknum].nextActive)
+			for (short linknum = Effects[NextFxActive].nextActive; linknum != NO_ITEM; linknum = Effects[linknum].nextActive)
 			{
 				if (linknum == fxNumber)
 				{
@@ -228,7 +228,7 @@ void __cdecl KillEffect(__int16 fxNumber)
 		}
 		else if (Rooms[fx->roomNumber].fxNumber != NO_ITEM)
 		{
-			for (__int16 linknum = Effects[Rooms[fx->roomNumber].fxNumber].nextFx; linknum != NO_ITEM; linknum = Effects[linknum].nextFx)
+			for (short linknum = Effects[Rooms[fx->roomNumber].fxNumber].nextFx; linknum != NO_ITEM; linknum = Effects[linknum].nextFx)
 			{
 				if (linknum == fxNumber)
 				{
@@ -243,9 +243,9 @@ void __cdecl KillEffect(__int16 fxNumber)
 	}
 }
 
-__int16 __cdecl CreateNewEffect(__int16 roomNum) 
+short __cdecl CreateNewEffect(short roomNum) 
 {
-	__int16 fxNumber = NextFxFree;
+	short fxNumber = NextFxFree;
 
 	if (NextFxFree != NO_ITEM)
 	{
@@ -263,7 +263,7 @@ __int16 __cdecl CreateNewEffect(__int16 roomNum)
 	return fxNumber;
 }
 
-void __cdecl InitialiseFXArray(__int32 allocmem)
+void __cdecl InitialiseFXArray(int allocmem)
 {
 	if (allocmem)
 		Effects = (FX_INFO*)GameMalloc(24 * sizeof(FX_INFO));
@@ -271,7 +271,7 @@ void __cdecl InitialiseFXArray(__int32 allocmem)
 	FX_INFO* fx = Effects;
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
-	for (__int32 i = 1; i <= 24; i++)
+	for (int i = 1; i <= 24; i++)
 	{
 		fx->nextFx = i++;
 		++fx;
@@ -279,7 +279,7 @@ void __cdecl InitialiseFXArray(__int32 allocmem)
 	fx->nextFx = -1;
 }
 
-void __cdecl RemoveDrawnItem(__int16 itemNum) 
+void __cdecl RemoveDrawnItem(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -289,7 +289,7 @@ void __cdecl RemoveDrawnItem(__int16 itemNum)
 	}
 	else if (Rooms[item->roomNumber].itemNumber != NO_ITEM)
 	{
-		for (__int16 linknum = Items[Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+		for (short linknum = Items[Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
 		{
 			if (linknum == itemNum)
 			{
@@ -300,7 +300,7 @@ void __cdecl RemoveDrawnItem(__int16 itemNum)
 	}
 }
 
-void __cdecl RemoveActiveItem(__int16 itemNum) 
+void __cdecl RemoveActiveItem(short itemNum) 
 {
 	if (Items[itemNum].active)
 	{
@@ -312,7 +312,7 @@ void __cdecl RemoveActiveItem(__int16 itemNum)
 		}
 		else if (NextItemActive != NO_ITEM)
 		{
-			for (__int16 linknum = Items[NextItemActive].nextActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
+			for (short linknum = Items[NextItemActive].nextActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
 			{
 				if (linknum == itemNum)
 				{
@@ -324,7 +324,7 @@ void __cdecl RemoveActiveItem(__int16 itemNum)
 	}
 }
 
-void __cdecl InitialiseItem(__int16 itemNum) 
+void __cdecl InitialiseItem(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -413,9 +413,9 @@ void __cdecl InitialiseItem(__int16 itemNum)
 	//item->unk_thing = 0;
 }
 
-__int16 __cdecl CreateItem()
+short __cdecl CreateItem()
 {
-	__int16 itemNum = 0;
+	short itemNum = 0;
 
 	if (NextItemFree == -1) return NO_ITEM;
 
@@ -426,7 +426,7 @@ __int16 __cdecl CreateItem()
 	return itemNum;
 }
 
-void __cdecl InitialiseItemArray(__int32 numitems) 
+void __cdecl InitialiseItemArray(int numitems) 
 {
 	ITEM_INFO* item = &Items[LevelItems];
 
@@ -435,7 +435,7 @@ void __cdecl InitialiseItemArray(__int32 numitems)
 
 	if (LevelItems + 1 < numitems)
 	{
-		for (__int32 i = LevelItems + 1; i < numitems; i++, item++)
+		for (int i = LevelItems + 1; i < numitems; i++, item++)
 		{
 			item->nextItem = i;
 			item->active = false;
@@ -445,9 +445,9 @@ void __cdecl InitialiseItemArray(__int32 numitems)
 	item->nextItem = NO_ITEM;
 }
 
-__int16 __cdecl SpawnItem(ITEM_INFO* item, __int16 objectNumber)
+short __cdecl SpawnItem(ITEM_INFO* item, short objectNumber)
 {
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
 		ITEM_INFO* spawn = &Items[itemNumber];
@@ -465,13 +465,13 @@ __int16 __cdecl SpawnItem(ITEM_INFO* item, __int16 objectNumber)
 	return itemNumber;
 }
 
-__int32 __cdecl GlobalItemReplace(__int16 search, __int16 replace)
+int __cdecl GlobalItemReplace(short search, short replace)
 {
-	__int32 changed = 0;
-	for (__int32 i = 0; i < NumberRooms; i++)
+	int changed = 0;
+	for (int i = 0; i < NumberRooms; i++)
 	{
 		ROOM_INFO* room = &Rooms[i];
-		for (__int16 itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)
+		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)
 		{
 			if (Items[itemNumber].objectNumber == search)
 			{

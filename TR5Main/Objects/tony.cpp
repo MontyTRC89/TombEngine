@@ -82,7 +82,7 @@ static BOSS_STRUCT bossdata;             // exclusive for tony unlike TR3
 #define SPN_TONYHANDLFLAME		4  // {0, 64, 0, 10}
 #define SPN_TONYHANDRFLAME		5  // {0, 64, 0, 13}
 
-void __cdecl TriggerTonyFlame(__int16 itemNum, long hand)
+void __cdecl TriggerTonyFlame(short itemNum, long hand)
 {
 	ITEM_INFO* item;
 	long size;
@@ -150,7 +150,7 @@ void __cdecl TriggerTonyFlame(__int16 itemNum, long hand)
 	sptr->dSize = size >> 2;
 }
 
-void __cdecl TriggerFireBallFlame(__int16 fxNumber, long type, long xv, long yv, long zv)
+void __cdecl TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
 {
 	SPARKS* sptr;
 	long		size;
@@ -238,11 +238,11 @@ void __cdecl TriggerFireBallFlame(__int16 fxNumber, long type, long xv, long yv,
 	}
 }
 
-void __cdecl TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, __int16 room_number, __int16 angle, long zdspeed)
+void __cdecl TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short room_number, short angle, long zdspeed)
 {
 	FX_INFO* fx;
 	PHD_VECTOR pos;
-	__int16 fxNumber;
+	short fxNumber;
 	long speed, fallspeed;
 
 	if (type == ROCKZAPPL)
@@ -324,14 +324,14 @@ void __cdecl TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, __int
 	}
 }
 
-void __cdecl TonyFireBallControl(__int16 fxNumber)
+void __cdecl TonyFireBallControl(short fxNumber)
 {
 	FX_INFO* fx;
 	FLOOR_INFO* floor;
 	long old_x, old_y, old_z, x;
 	long rnd, r, g, b;
 	unsigned char radtab[7] = { 16,0,14,9,7,7,7 };
-	__int16 room_number;
+	short room_number;
 
 	fx = &Effects[fxNumber];
 
@@ -447,7 +447,7 @@ void __cdecl TonyFireBallControl(__int16 fxNumber)
 	}
 }
 
-void __cdecl TonyDie(__int16 itemNum)
+void __cdecl TonyDie(short itemNum)
 {
 	ITEM_INFO* item;
 
@@ -461,12 +461,12 @@ void __cdecl TonyDie(__int16 itemNum)
 	item->flags |= ONESHOT;
 }
 
-void __cdecl InitialiseTony(__int16 itemNum)
+void __cdecl InitialiseTony(short itemNum)
 {
 	SHIELD_POINTS* shptr;
 	ITEM_INFO* item;
 	int lp, lp1, y;
-	__int16 angle;
+	short angle;
 
 	item = &Items[itemNum];
 	item->itemFlags[3] = 0;
@@ -493,13 +493,13 @@ void __cdecl InitialiseTony(__int16 itemNum)
 	}
 }
 
-void __cdecl TonyControl(__int16 itemNum)
+void __cdecl TonyControl(short itemNum)
 {
 	ITEM_INFO* item;
 	CREATURE_INFO* tonyboss;
 	AI_INFO info;
 	PHD_VECTOR pos1;
-	__int16 angle, head, torso_x, torso_y, tilt, lp;
+	short angle, head, torso_x, torso_y, tilt, lp;
 	int rnd;
 
 	if (!CreatureActive(itemNum))

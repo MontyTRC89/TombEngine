@@ -5,7 +5,7 @@
 BITE_INFO mercUziBite = { 0, 150, 19, 17 };
 BITE_INFO mercAutoPistolBite = { 0, 230, 9, 17 };
 
-void __cdecl MercenaryUziControl(__int16 itemNum)
+void __cdecl MercenaryUziControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -194,7 +194,7 @@ void __cdecl MercenaryUziControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl MercenaryAutoPistolControl(__int16 itemNum)
+void __cdecl MercenaryAutoPistolControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

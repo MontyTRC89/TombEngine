@@ -67,7 +67,7 @@ enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_ST
 BITE_INFO skidooLeft = { 240, -190, 540, 0 };
 BITE_INFO skidooRight = { -240, -190, 540, 0 };
 
-void __cdecl InitialiseSkidoo(__int16 itemNum)
+void __cdecl InitialiseSkidoo(short itemNum)
 {
 	ITEM_INFO* skidoo;
 	SKIDOO_INFO* skinfo;
@@ -98,26 +98,26 @@ void __cdecl InitialiseSkidoo(__int16 itemNum)
 	}
 }
 
-void __cdecl SkidooBaddieCollision(__int16 itemNum, ITEM_INFO* skidoo)
+void __cdecl SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 {
-	vector<__int16> roomsList;
+	vector<short> roomsList;
 	roomsList.push_back(skidoo->roomNumber);
 
-	__int16* door = Rooms[skidoo->roomNumber].door;
+	short* door = Rooms[skidoo->roomNumber].door;
 	if (door)
 	{
-		__int16 numDoors = *door;
+		short numDoors = *door;
 		door++;
-		for (__int32 i = 0; i < numDoors; i++)
+		for (int i = 0; i < numDoors; i++)
 		{
 			roomsList.push_back(*door);
 			door += 16;
 		}
 	}
 
-	for (__int32 i = 0; i < roomsList.size(); i++)
+	for (int i = 0; i < roomsList.size(); i++)
 	{
-		__int16 itemNum = Rooms[roomsList[i]].itemNumber;
+		short itemNum = Rooms[roomsList[i]].itemNumber;
 
 		while (itemNum != NO_ITEM)
 		{
@@ -127,9 +127,9 @@ void __cdecl SkidooBaddieCollision(__int16 itemNum, ITEM_INFO* skidoo)
 				OBJECT_INFO* object = &Objects[target->objectNumber];
 				if (object->collision && (object->intelligent || target->objectNumber == ID_ROLLINGBALL))
 				{
-					__int32 x = skidoo->pos.xPos - target->pos.xPos;
-					__int32 y = skidoo->pos.yPos - target->pos.yPos;
-					__int32 z = skidoo->pos.zPos - target->pos.zPos;
+					int x = skidoo->pos.xPos - target->pos.xPos;
+					int y = skidoo->pos.yPos - target->pos.yPos;
+					int z = skidoo->pos.zPos - target->pos.zPos;
 					if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
 					{
 						if (target->objectNumber == ID_ROLLINGBALL)
@@ -200,7 +200,7 @@ void __cdecl SkidooExplode(ITEM_INFO* skidoo)
 	else
 	{
 		TriggerExplosionSparks(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, 3, -2, 0, skidoo->roomNumber);
-		for (__int32 i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, 3, -1, 0, skidoo->roomNumber);
 	}
 
@@ -216,7 +216,7 @@ int __cdecl SkidooCheckGetOffOK(int direction)
 {
 	/* Check if getting off skidoo here is possible in the direction required by player */
 	int x, y, z, height, ceiling;
-	__int16 room_number, angle;
+	short room_number, angle;
 	ITEM_INFO* skidoo;
 	FLOOR_INFO* floor;
 
@@ -315,7 +315,7 @@ void __cdecl DoSnowEffect(ITEM_INFO* skidoo)
 {
 	/*
 	int c, s, x, random;
-	__int16 fx_number;
+	short fx_number;
 	FX_INFO* fx;
 
 	fx_number = CreateNewEffect(skidoo->roomNumber);
@@ -352,7 +352,7 @@ void __cdecl DoSnowEffect(ITEM_INFO* skidoo)
 
 void __cdecl SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 {
-	__int16 cd;
+	short cd;
 	SKIDOO_INFO* skinfo;
 	skinfo = (SKIDOO_INFO*)skidoo->data;
 
@@ -371,7 +371,7 @@ void __cdecl SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 				SoundEffect(SFX_TR2_SNOWMOBILE_HITF_ID201, &skidoo->pos, 0);
 			else
 				SoundEffect(SFX_TR2_SNOWMOBILE_HITB_ID202, &skidoo->pos, 0);
-			LaraItem->animNumber = (__int16)(Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + collide);
+			LaraItem->animNumber = (short)(Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + collide);
 			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = SKID_HIT;
 		}
@@ -595,10 +595,10 @@ int __cdecl DoSkidooDynamics(int height, int fallspeed, int* y)
 }
 
 /* Returns 0 if no get on, 1 if right get on and 2 if left get on */
-int __cdecl SkidooCheckGetOn(__int16 itemNum, COLL_INFO* coll)
+int __cdecl SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 {
 	int geton;
-	__int16 rot, room_number;
+	short rot, room_number;
 	ITEM_INFO* skidoo;
 	FLOOR_INFO* floor;
 
@@ -630,7 +630,7 @@ int __cdecl SkidooCheckGetOn(__int16 itemNum, COLL_INFO* coll)
 	return geton;
 }
 
-void __cdecl SkidooCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll)
+void __cdecl SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
 	/* This routine is only for when Lara is not on the skidoo and she would like to be */
 	int geton;
@@ -685,22 +685,22 @@ int __cdecl TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* 
 	pos->y = item->pos.yPos - (z_off * SIN(item->pos.xRot) >> W2V_SHIFT) +
 		                      (x_off * SIN(item->pos.zRot) >> W2V_SHIFT);
 
-	__int32 c = COS(item->pos.yRot);
-	__int32 s = SIN(item->pos.yRot);
+	int c = COS(item->pos.yRot);
+	int s = SIN(item->pos.yRot);
 
 	pos->z = item->pos.zPos + ((z_off * c - x_off * s) >> W2V_SHIFT);
 	pos->x = item->pos.xPos + ((z_off * s + x_off * c) >> W2V_SHIFT);
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
-	__int32 ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
+	int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
 	if (pos->y < ceiling || ceiling == NO_HEIGHT)
 		return NO_HEIGHT;
 
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-__int16 __cdecl DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
+short __cdecl DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
@@ -752,7 +752,7 @@ __int16 __cdecl DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* ol
 	else
 	{
 		/* A diagonal hit; means a barrage of tests needed to determine best shift */
-		__int16 room_number;
+		short room_number;
 		FLOOR_INFO* floor;
 		int height;
 
@@ -827,7 +827,7 @@ int __cdecl SkidooDynamics(ITEM_INFO* skidoo)
 	int hfr_old, hfl_old, hbr_old, hbl_old;
 	FLOOR_INFO* floor;
 	int height, slip, collide;
-	__int16 room_number, rot;
+	short room_number, rot;
 	int newspeed;
 
 	skinfo = (SKIDOO_INFO*)skidoo->data;
@@ -977,7 +977,7 @@ int __cdecl SkidooControl()
 	int hfl, hfr;
 	FLOOR_INFO* floor;
 	int height, collide, drive;
-	__int16 room_number, x_rot, z_rot, bandit_skidoo;
+	short room_number, x_rot, z_rot, bandit_skidoo;
 	int pitch, dead = 0;
 
 	skidoo = &Items[g_LaraExtra.Vehicle];
@@ -1146,9 +1146,9 @@ void __cdecl DrawSkidoo(ITEM_INFO* item)
 	
 }
 
-void __cdecl InitialiseSkidman(__int16 itemNum)
+void __cdecl InitialiseSkidman(short itemNum)
 {
-	__int16 skidoo_item;
+	short skidoo_item;
 	ITEM_INFO* item, *skidoo;
 
 	skidoo_item = CreateItem();
@@ -1178,7 +1178,7 @@ void __cdecl InitialiseSkidman(__int16 itemNum)
 	}
 }
 
-void __cdecl SkidManCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void __cdecl SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 
@@ -1204,12 +1204,12 @@ void __cdecl SkidManCollision(__int16 itemNum, ITEM_INFO* laraitem, COLL_INFO* c
 	}
 }
 
-void __cdecl SkidManControl(__int16 riderNum)
+void __cdecl SkidManControl(short riderNum)
 {
 	ITEM_INFO* item, * rider;
 	CREATURE_INFO* skidman;
 	AI_INFO info;
-	__int16 angle, item_number;
+	short angle, item_number;
 	int damage;
 
 	rider = &Items[riderNum];
@@ -1219,7 +1219,7 @@ void __cdecl SkidManControl(__int16 riderNum)
 		return;
 	}
 
-	item_number = (__int16)rider->data;
+	item_number = (short)rider->data;
 	item = &Items[item_number];
 
 	/* Need to activate AI for skidoo (it's the skidoo that holds the brain) if not done yet */

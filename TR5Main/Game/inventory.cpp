@@ -18,7 +18,7 @@ Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 
-void CombinePuzzle1(__int32 action)
+void CombinePuzzle1(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -32,7 +32,7 @@ void CombinePuzzle1(__int32 action)
 	}
 }
 
-void CombinePuzzle2(__int32 action)
+void CombinePuzzle2(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -46,7 +46,7 @@ void CombinePuzzle2(__int32 action)
 	}
 }
 
-void CombinePuzzle3(__int32 action)
+void CombinePuzzle3(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -60,7 +60,7 @@ void CombinePuzzle3(__int32 action)
 	}
 }
 
-void CombinePuzzle4(__int32 action)
+void CombinePuzzle4(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -74,7 +74,7 @@ void CombinePuzzle4(__int32 action)
 	}
 }
 
-void CombinePuzzle5(__int32 action)
+void CombinePuzzle5(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -88,7 +88,7 @@ void CombinePuzzle5(__int32 action)
 	}
 }
 
-void CombinePuzzle6(__int32 action)
+void CombinePuzzle6(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -102,7 +102,7 @@ void CombinePuzzle6(__int32 action)
 	}
 }
 
-void CombinePuzzle7(__int32 action)
+void CombinePuzzle7(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -116,7 +116,7 @@ void CombinePuzzle7(__int32 action)
 	}
 }
 
-void CombinePuzzle8(__int32 action)
+void CombinePuzzle8(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -130,7 +130,7 @@ void CombinePuzzle8(__int32 action)
 	}
 }
 
-void CombineKey1(__int32 action)
+void CombineKey1(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -144,7 +144,7 @@ void CombineKey1(__int32 action)
 	}
 }
 
-void CombineKey2(__int32 action)
+void CombineKey2(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -158,7 +158,7 @@ void CombineKey2(__int32 action)
 	}
 }
 
-void CombineKey3(__int32 action)
+void CombineKey3(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -172,7 +172,7 @@ void CombineKey3(__int32 action)
 	}
 }
 
-void CombineKey4(__int32 action)
+void CombineKey4(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -186,7 +186,7 @@ void CombineKey4(__int32 action)
 	}
 }
 
-void CombineKey5(__int32 action)
+void CombineKey5(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -200,7 +200,7 @@ void CombineKey5(__int32 action)
 	}
 }
 
-void CombineKey6(__int32 action)
+void CombineKey6(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -214,7 +214,7 @@ void CombineKey6(__int32 action)
 	}
 }
 
-void CombineKey7(__int32 action)
+void CombineKey7(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -228,7 +228,7 @@ void CombineKey7(__int32 action)
 	}
 }
 
-void CombineKey8(__int32 action)
+void CombineKey8(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -242,7 +242,7 @@ void CombineKey8(__int32 action)
 	}
 }
 
-void CombinePickup1(__int32 action)
+void CombinePickup1(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -256,7 +256,7 @@ void CombinePickup1(__int32 action)
 	}
 }
 
-void CombinePickup2(__int32 action)
+void CombinePickup2(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -270,7 +270,7 @@ void CombinePickup2(__int32 action)
 	}
 }
 
-void CombinePickup3(__int32 action)
+void CombinePickup3(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -284,7 +284,7 @@ void CombinePickup3(__int32 action)
 	}
 }
 
-void CombinePickup4(__int32 action)
+void CombinePickup4(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -298,7 +298,7 @@ void CombinePickup4(__int32 action)
 	}
 }
 
-void CombineRevolverLasersight(__int32 action)
+void CombineRevolverLasersight(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -318,7 +318,7 @@ void CombineRevolverLasersight(__int32 action)
 	}
 }
 
-void CombineCrossbowLasersight(__int32 action)
+void CombineCrossbowLasersight(int action)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
@@ -390,22 +390,22 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_WATERSKIN1_EMPTY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_WATERSKIN2_EMPTY, -1, 0);
 	
-	for (__int32 i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_objectsTable[INV_OBJECT_PUZZLE1 + i] = InventoryObjectDefinition(ID_PUZZLE_ITEM1 + i, STRING_PISTOLS, -1, 0);
 
-	for (__int32 i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_objectsTable[INV_OBJECT_PUZZLE1_COMBO1 + i] = InventoryObjectDefinition(ID_PUZZLE_ITEM1_COMBO1 + i, STRING_PISTOLS, -1, 0);
 
-	for (__int32 i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_objectsTable[INV_OBJECT_KEY1 + i] = InventoryObjectDefinition(ID_KEY_ITEM1 + i, STRING_PISTOLS, -1, 0);
 
-	for (__int32 i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_objectsTable[INV_OBJECT_KEY1_COMBO1 + i] = InventoryObjectDefinition(ID_KEY_ITEM1_COMBO1 + i, STRING_PISTOLS, -1, 0);
 
-	for (__int32 i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_objectsTable[INV_OBJECT_PICKUP1 + i] = InventoryObjectDefinition(ID_PICKUP_ITEM1 + i, STRING_PISTOLS, -1, 0);
 
-	for (__int32 i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		m_objectsTable[INV_OBJECT_EXAMINE1 + i] = InventoryObjectDefinition(ID_EXAMINE1 + i, STRING_PISTOLS, -1, 0);
 
 	// Add combinations
@@ -450,22 +450,22 @@ Inventory::~Inventory()
 
 }
 
-InventoryRing* Inventory::GetRing(__int32 index)
+InventoryRing* Inventory::GetRing(int index)
 {
 	return &m_rings[index];
 }
 
-__int32 Inventory::GetActiveRing()
+int Inventory::GetActiveRing()
 {
 	return m_activeRing;
 }
 
-void Inventory::SetActiveRing(__int32 index)
+void Inventory::SetActiveRing(int index)
 {
 	m_activeRing = index;
 }
 
-void Inventory::InsertObject(__int32 ring, __int32 objectNumber)
+void Inventory::InsertObject(int ring, int objectNumber)
 {
 	m_rings[ring].objects[m_rings[ring].numObjects].inventoryObject = objectNumber;
 	m_rings[ring].numObjects++;
@@ -474,7 +474,7 @@ void Inventory::InsertObject(__int32 ring, __int32 objectNumber)
 void Inventory::LoadObjects(bool isReload)
 {
 	// Reset the objects in inventory
-	for (__int32 i = 0; i < NUM_INVENTORY_RINGS; i++)
+	for (int i = 0; i < NUM_INVENTORY_RINGS; i++)
 	{
 		m_rings[i].numObjects = 0;
 		m_rings[i].rotation = 0;
@@ -485,7 +485,7 @@ void Inventory::LoadObjects(bool isReload)
 			m_rings[i].focusState = INV_FOCUS_STATE_NONE;
 		}
 
-		for (__int32 j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
+		for (int j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
 		{
 			m_rings[i].objects[j].inventoryObject = -1;
 			m_rings[i].objects[j].rotation = 0;
@@ -640,7 +640,7 @@ void Inventory::LoadObjects(bool isReload)
 	if (Lara.crowbar)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROWBAR);
 
-	__int32 i = 0;
+	int i = 0;
 	do
 	{
 		if (Lara.puzzleItems[i])
@@ -720,7 +720,7 @@ void Inventory::LoadObjects(bool isReload)
 	ring->currentObject = 0;
 	ring->focusState = INV_FOCUS_STATE_NONE;
 
-	for (__int32 j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
+	for (int j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
 	{
 		ring->objects[j].inventoryObject = -1;
 		ring->objects[j].rotation = 0;
@@ -733,13 +733,13 @@ void Inventory::LoadObjects(bool isReload)
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_KEYS);
 }
 
-void Inventory::SelectObject(__int32 r, __int32 object, float scale)
+void Inventory::SelectObject(int r, int object, float scale)
 {
 	if (object != -1)
 	{
 		InventoryRing* ring = &m_rings[r];
 
-		for (__int32 i = 0; i < ring->numObjects; i++)
+		for (int i = 0; i < ring->numObjects; i++)
 		{
 			if (ring->objects[i].inventoryObject == object)
 			{
@@ -764,27 +764,27 @@ void Inventory::Initialise()
 }
 
 
-__int16 Inventory::GetEnterObject()
+short Inventory::GetEnterObject()
 {
 	return m_enterObject;
 }
 
-__int16 Inventory::GetSelectedObject()
+short Inventory::GetSelectedObject()
 {
 	return m_selectedObject;
 }
 
-void Inventory::SetEnterObject(__int16 objNum) 
+void Inventory::SetEnterObject(short objNum) 
 {
 	m_enterObject = objNum;
 }
 
-void Inventory::SetSelectedObject(__int16 objNum)
+void Inventory::SetSelectedObject(short objNum)
 {
 	m_selectedObject = objNum;
 }
 
-__int32 Inventory::DoInventory()
+int Inventory::DoInventory()
 {
 	Initialise();
 
@@ -804,11 +804,11 @@ __int32 Inventory::DoInventory()
 
 		OpenRing(m_activeRing, true);
 
-		__int32 passportResult = DoPassport();
+		int passportResult = DoPassport();
 
 		// Fade out
 		g_Renderer->FadeOut();
-		for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+		for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 		{
 			UpdateSceneAndDrawInventory();
 		}
@@ -824,8 +824,8 @@ __int32 Inventory::DoInventory()
 
 	if (m_enterObject != NO_ITEM)
 	{
-		for (__int32 r = 0; r < 3; r++)
-			for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+		for (int r = 0; r < 3; r++)
+			for (int o = 0; o < m_rings[r].numObjects; o++)
 				if (m_objectsTable[m_rings[r].objects[o].inventoryObject].objectNumber == m_enterObject)
 				{
 					m_activeRing = r;
@@ -841,7 +841,7 @@ __int32 Inventory::DoInventory()
 		m_rings[m_activeRing].draw = true;
 	}
 
-	__int32 result = INV_RESULT_NONE;
+	int result = INV_RESULT_NONE;
 
 	g_Renderer->DumpGameScene();
 
@@ -871,7 +871,7 @@ __int32 Inventory::DoInventory()
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
-			__int32 newRing = INV_RING_WEAPONS;
+			int newRing = INV_RING_WEAPONS;
 			if (m_activeRing == INV_RING_WEAPONS)
 				newRing = INV_RING_PUZZLES;
 			else
@@ -888,7 +888,7 @@ __int32 Inventory::DoInventory()
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
-			__int32 newRing = INV_RING_WEAPONS;
+			int newRing = INV_RING_WEAPONS;
 			if (m_activeRing == INV_RING_WEAPONS)
 				newRing = INV_RING_OPTIONS;
 			else
@@ -909,7 +909,7 @@ __int32 Inventory::DoInventory()
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
 			m_rings[m_activeRing].rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				m_rings[m_activeRing].rotation += deltaAngle;
 
@@ -932,7 +932,7 @@ __int32 Inventory::DoInventory()
 			float deltaAngle = 360.0f / m_rings[m_activeRing].numObjects / INV_NUM_FRAMES_ROTATE;
 			m_rings[m_activeRing].rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				m_rings[m_activeRing].rotation -= deltaAngle;
 
@@ -954,14 +954,14 @@ __int32 Inventory::DoInventory()
 			{
 				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
 				{
-					__int32 passportResult = DoPassport();
+					int passportResult = DoPassport();
 					if (passportResult == INV_RESULT_NEW_GAME ||
 						passportResult == INV_RESULT_EXIT_TO_TILE ||
 						passportResult == INV_RESULT_LOAD_GAME)
 					{
 						// Fade out
 						g_Renderer->FadeOut();
-						for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+						for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 						{
 							UpdateSceneAndDrawInventory();
 						}
@@ -970,7 +970,7 @@ __int32 Inventory::DoInventory()
 					}
 				}
 
-				__int16 currentObject = m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject;
+				short currentObject = m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject;
 
 				if (currentObject == INV_OBJECT_KEYS)
 					DoControlsSettings();
@@ -983,8 +983,8 @@ __int32 Inventory::DoInventory()
 			}
 			else if (m_activeRing == INV_RING_WEAPONS || m_activeRing == INV_RING_PUZZLES)
 			{
-				__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
-				__int32 result = INV_RESULT_NONE;
+				short currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+				int result = INV_RESULT_NONE;
 
 				if (IsCurrentObjectPuzzle())
 					// Puzzles have Use, Combine, Separe
@@ -1025,7 +1025,7 @@ __int32 Inventory::DoInventory()
 
 bool Inventory::IsCurrentObjectWeapon()
 {
-	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	short currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
 	return (currentObject == INV_OBJECT_PISTOLS || currentObject == INV_OBJECT_UZIS ||
 		currentObject == INV_OBJECT_REVOLVER_LASER || currentObject == INV_OBJECT_CROSSBOW_LASER ||
 		currentObject == INV_OBJECT_REVOLVER || currentObject == INV_OBJECT_SHOTGUN ||
@@ -1036,33 +1036,33 @@ bool Inventory::IsCurrentObjectWeapon()
 
 bool Inventory::IsCurrentObjectPuzzle()
 {
-	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	short currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
 	return (currentObject >= INV_OBJECT_PUZZLE1 && currentObject <= INV_OBJECT_PICKUP4_COMBO2);
 }
 
 bool Inventory::IsCurrentObjectGeneric()
 {
-	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	short currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
 	return (!IsCurrentObjectPuzzle() && !IsCurrentObjectExamine() && !IsCurrentObjectWeapon() &&
 		currentObject != INV_OBJECT_TIMEX);
 }
 
 bool Inventory::IsCurrentObjectExamine()
 {
-	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	short currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
 	return (currentObject >= INV_OBJECT_EXAMINE1 && currentObject <= INV_OBJECT_EXAMINE1);
 }
 
-__int32 Inventory::DoPuzzle()
+int Inventory::DoPuzzle()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
 	ring->selectedIndex = 0;
 	ring->numActions = 0;
 
-	__int32 result = INV_RESULT_NONE;
+	int result = INV_RESULT_NONE;
 	bool closeObject = false;
-	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
+	short currentObject = ring->objects[ring->currentObject].inventoryObject;
 
 	ring->numActions = 0;
 	ring->actions[ring->numActions++] = INV_ACTION_USE;
@@ -1143,16 +1143,16 @@ __int32 Inventory::DoPuzzle()
 	return result;
 }
 
-__int32 Inventory::DoWeapon()
+int Inventory::DoWeapon()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
 	ring->selectedIndex = 0;
 	ring->numActions = 0;
 
-	__int32 result = INV_RESULT_NONE;
+	int result = INV_RESULT_NONE;
 	bool closeObject = false;
-	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
+	short currentObject = ring->objects[ring->currentObject].inventoryObject;
 
 	ring->numActions = 0;
 	ring->actions[ring->numActions++] = INV_ACTION_USE;
@@ -1236,51 +1236,51 @@ __int32 Inventory::DoWeapon()
 	return result;
 }
 
-bool Inventory::IsObjectPresentInInventory(__int16 object)
+bool Inventory::IsObjectPresentInInventory(short object)
 {
-	for (__int32 r = 0; r < 3; r++)
-		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+	for (int r = 0; r < 3; r++)
+		for (int o = 0; o < m_rings[r].numObjects; o++)
 			if (m_objectsTable[m_rings[r].objects[o].inventoryObject].objectNumber == object)
 				return true;
 	return false;
 }
 
-bool Inventory::IsInventoryObjectPresentInInventory(__int16 object)
+bool Inventory::IsInventoryObjectPresentInInventory(short object)
 {
-	for (__int32 r = 0; r < 3; r++)
-		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+	for (int r = 0; r < 3; r++)
+		for (int o = 0; o < m_rings[r].numObjects; o++)
 			if (m_rings[r].objects[o].inventoryObject == object)
 				return true;
 	return false;
 }
 
-__int32 Inventory::FindObjectIndex(__int16 object)
+int Inventory::FindObjectIndex(short object)
 {
-	for (__int32 r = 0; r < 3; r++)
-		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+	for (int r = 0; r < 3; r++)
+		for (int o = 0; o < m_rings[r].numObjects; o++)
 			if (m_rings[r].objects[o].inventoryObject == object)
 				return o;
 	return -1;
 }
 
-__int32 Inventory::FindObjectRing(__int16 object)
+int Inventory::FindObjectRing(short object)
 {
-	for (__int32 r = 0; r < 3; r++)
-		for (__int32 o = 0; o < m_rings[r].numObjects; o++)
+	for (int r = 0; r < 3; r++)
+		for (int o = 0; o < m_rings[r].numObjects; o++)
 			if (m_rings[r].objects[o].inventoryObject == object)
 				return r;
 	return -1;
 }
 
-bool Inventory::IsObjectCombinable(__int16 object)
+bool Inventory::IsObjectCombinable(short object)
 {
-	for (__int32 i = 0; i < m_combinations.size(); i++)
+	for (int i = 0; i < m_combinations.size(); i++)
 		if (m_combinations[i].piece1 == object || m_combinations[i].piece2 == object)
 			return true;
 	return false;
 }
 
-void Inventory::AddCombination(__int16 piece1, __int16 piece2, __int16 combinedObject, void (*f) (__int32))
+void Inventory::AddCombination(short piece1, short piece2, short combinedObject, void (*f) (int))
 {
 	InventoryObjectCombination combination;
 	combination.piece1 = piece1;
@@ -1290,7 +1290,7 @@ void Inventory::AddCombination(__int16 piece1, __int16 piece2, __int16 combinedO
 	m_combinations.push_back(combination);
 }
 
-__int32 Inventory::DoGenericObject()
+int Inventory::DoGenericObject()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
@@ -1315,15 +1315,15 @@ void Inventory::DoExamine()
 bool Inventory::DoCombine()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	__int32 oldRing = m_activeRing;
+	int oldRing = m_activeRing;
 
 	// Fill the objects ring
 	InventoryRing* combineRing = &m_rings[INV_RING_COMBINE];
 	combineRing->numObjects = 0;
 
-	__int16 currentObject = ring->objects[ring->currentObject].inventoryObject;
+	short currentObject = ring->objects[ring->currentObject].inventoryObject;
 
-	for (__int32 i = 0; i < m_combinations.size(); i++)
+	for (int i = 0; i < m_combinations.size(); i++)
 	{
 		InventoryObjectCombination* combination = &m_combinations[i];
 		
@@ -1331,7 +1331,7 @@ bool Inventory::DoCombine()
 		if (currentObject != combination->piece1 && IsInventoryObjectPresentInInventory(combination->piece1))
 		{
 			bool found = false;
-			for (__int32 j = 0; j < combineRing->numObjects; j++)
+			for (int j = 0; j < combineRing->numObjects; j++)
 			{
 				if (combineRing->objects[j].inventoryObject == combination->piece1)
 				{
@@ -1347,7 +1347,7 @@ bool Inventory::DoCombine()
 		if (currentObject != combination->piece2 && IsInventoryObjectPresentInInventory(combination->piece2))
 		{
 			bool found = false;
-			for (__int32 j = 0; j < combineRing->numObjects; j++)
+			for (int j = 0; j < combineRing->numObjects; j++)
 			{
 				if (combineRing->objects[j].inventoryObject == combination->piece2)
 				{
@@ -1401,7 +1401,7 @@ bool Inventory::DoCombine()
 			float deltaAngle = 360.0f / combineRing->numObjects / INV_NUM_FRAMES_ROTATE;
 			combineRing->rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				combineRing->rotation += deltaAngle;
 
@@ -1423,7 +1423,7 @@ bool Inventory::DoCombine()
 			float deltaAngle = 360.0f / combineRing->numObjects / INV_NUM_FRAMES_ROTATE;
 			combineRing->rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				combineRing->rotation -= deltaAngle;
 
@@ -1443,8 +1443,8 @@ bool Inventory::DoCombine()
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
 			// Check if can be combined
-			__int16 currentObject = combineRing->objects[combineRing->currentObject].inventoryObject;
-			for (__int32 i = 0; i < m_combinations.size(); i++)
+			short currentObject = combineRing->objects[combineRing->currentObject].inventoryObject;
+			for (int i = 0; i < m_combinations.size(); i++)
 			{
 				InventoryObjectCombination* combination = &m_combinations[i];
 				if (combination->piece1 == currentObject && combination->piece2 == ring->objects[ring->currentObject].inventoryObject || 
@@ -1479,9 +1479,9 @@ bool Inventory::DoCombine()
 
 bool Inventory::DoSepare()
 {
-	__int16 currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
+	short currentObject = m_rings[m_activeRing].objects[m_rings[m_activeRing].currentObject].inventoryObject;
 
-	for (__int32 i = 0; i < m_combinations.size(); i++)
+	for (int i = 0; i < m_combinations.size(); i++)
 	{
 		InventoryObjectCombination* combination = &m_combinations[i];
 		if (combination->combinedObject == currentObject)
@@ -1580,7 +1580,7 @@ void Inventory::DoSelectAmmo()
 			float deltaAngle = 360.0f / ammoRing->numObjects / INV_NUM_FRAMES_ROTATE;
 			ammoRing->rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				ammoRing->rotation += deltaAngle;
 
@@ -1602,7 +1602,7 @@ void Inventory::DoSelectAmmo()
 			float deltaAngle = 360.0f / ammoRing->numObjects / INV_NUM_FRAMES_ROTATE;
 			ammoRing->rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				ammoRing->rotation -= deltaAngle;
 
@@ -1658,11 +1658,11 @@ void Inventory::UseCurrentItem()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	InventoryObject* inventoryObject = &ring->objects[ring->currentObject];
-	__int16 objectNumber = m_objectsTable[inventoryObject->inventoryObject].objectNumber;
+	short objectNumber = m_objectsTable[inventoryObject->inventoryObject].objectNumber;
 
 	LaraItem->meshBits = -1;
 
-	__int32 binocularRange = BinocularRange;
+	int binocularRange = BinocularRange;
 	BinocularRange = 0;
 	OldLaraBusy = false;
 
@@ -1994,7 +1994,7 @@ void Inventory::InitialiseTitle()
 	ring->currentObject = 0;
 	ring->focusState = INV_FOCUS_STATE_NONE;
 
-	for (__int32 j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
+	for (int j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
 	{
 		ring->objects[j].inventoryObject = -1;
 		ring->objects[j].rotation = 0;
@@ -2016,7 +2016,7 @@ void Inventory::InitialiseTitle()
 
 bool Inventory::UpdateSceneAndDrawInventory()
 {
-	__int32 nframes;
+	int nframes;
 
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 	{
@@ -2046,7 +2046,7 @@ bool Inventory::UpdateSceneAndDrawInventory()
 	return true;
 }
 
-__int32 Inventory::DoTitleInventory()
+int Inventory::DoTitleInventory()
 {
 	InitialiseTitle();
 
@@ -2059,7 +2059,7 @@ __int32 Inventory::DoTitleInventory()
 
 	// Fade in
 	g_Renderer->FadeIn();
-	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
 	}
@@ -2070,7 +2070,7 @@ __int32 Inventory::DoTitleInventory()
 	
 	OpenRing(INV_RING_OPTIONS, true);
 
-	__int32 result = INV_RESULT_NONE;
+	int result = INV_RESULT_NONE;
 
 	while (!ResetFlag)
 	{
@@ -2089,7 +2089,7 @@ __int32 Inventory::DoTitleInventory()
 			float deltaAngle = 360.0f / ring->numObjects / INV_NUM_FRAMES_ROTATE;
 			ring->rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				ring->rotation += deltaAngle;
 
@@ -2111,7 +2111,7 @@ __int32 Inventory::DoTitleInventory()
 			float deltaAngle = 360.0f / ring->numObjects / INV_NUM_FRAMES_ROTATE;
 			ring->rotation = 0;
 
-			for (__int32 i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
+			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				ring->rotation -= deltaAngle;
 
@@ -2131,7 +2131,7 @@ __int32 Inventory::DoTitleInventory()
 
 			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
 			{
-				__int32 passportResult = DoPassport();
+				int passportResult = DoPassport();
 				if (passportResult == INV_RESULT_NEW_GAME ||
 					passportResult == INV_RESULT_EXIT_GAME ||
 					passportResult == INV_RESULT_LOAD_GAME)
@@ -2158,7 +2158,7 @@ __int32 Inventory::DoTitleInventory()
 
 	// Fade out
 	g_Renderer->FadeOut();
-	for (__int32 i = 0; i < FADE_FRAMES_COUNT; i++)
+	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
 	}
@@ -2166,19 +2166,19 @@ __int32 Inventory::DoTitleInventory()
 	return result;
 }
 
-InventoryObjectDefinition* Inventory::GetInventoryObject(__int32 index)
+InventoryObjectDefinition* Inventory::GetInventoryObject(int index)
 {
 	return &m_objectsTable[index];
 }
 
-__int32 Inventory::DoPassport()
+int Inventory::DoPassport()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 	ring->frameIndex = 0;
 
-	__int16 choice = 0;
+	short choice = 0;
 	
-	vector<__int32> choices;
+	vector<int> choices;
 	if (m_type == INV_TYPE_TITLE)
 	{
 		choices.push_back(INV_WHAT_PASSPORT_NEW_GAME);
@@ -2200,7 +2200,7 @@ __int32 Inventory::DoPassport()
 	PopupObject();
 
 	// Open the passport
-	for (__int32 i = 0; i < 14; i++)
+	for (int i = 0; i < 14; i++)
 	{
 		UpdateSceneAndDrawInventory();
 		ring->frameIndex++;
@@ -2210,7 +2210,7 @@ __int32 Inventory::DoPassport()
 	bool moveRight = false;
 	bool closePassport = false;
 
-	__int32 result = INV_RESULT_NONE;
+	int result = INV_RESULT_NONE;
 
 	// Do the passport
 	while (true)
@@ -2240,7 +2240,7 @@ __int32 Inventory::DoPassport()
 			if (choice > 0)
 			{
 				ring->frameIndex = 19;
-				for (__int32 i = 0; i < 5; i++)
+				for (int i = 0; i < 5; i++)
 				{
 					UpdateSceneAndDrawInventory();
 					ring->frameIndex--;
@@ -2258,7 +2258,7 @@ __int32 Inventory::DoPassport()
 			if (choice < choices.size() - 1)
 			{
 				ring->frameIndex = 14;
-				for (__int32 i = 0; i < 5; i++)
+				for (int i = 0; i < 5; i++)
 				{
 					UpdateSceneAndDrawInventory();
 					ring->frameIndex++;
@@ -2271,7 +2271,7 @@ __int32 Inventory::DoPassport()
 		if (choices[choice] == INV_WHAT_PASSPORT_LOAD_GAME)
 		{
 			// Load game
-			__int32 selectedSavegame = 0;
+			int selectedSavegame = 0;
 			while (true)
 			{
 				SetDebounce = 1;
@@ -2343,7 +2343,7 @@ __int32 Inventory::DoPassport()
 		else if (choices[choice] == INV_WHAT_PASSPORT_SAVE_GAME)
 		{
 			// Save game
-			__int32 selectedSavegame = 0;
+			int selectedSavegame = 0;
 			while (true)
 			{
 				SetDebounce = 1;
@@ -2418,7 +2418,7 @@ __int32 Inventory::DoPassport()
 		else if (choices[choice] == INV_WHAT_PASSPORT_SELECT_LEVEL)
 		{
 			// Save game
-			__int32 selectedLevel = 0;
+			int selectedLevel = 0;
 			while (true)
 			{
 				SetDebounce = 1;
@@ -2655,7 +2655,7 @@ __int32 Inventory::DoPassport()
 
 	// Close the passport
 	ring->frameIndex = 24;
-	for (__int32 i = 24; i < 30; i++)
+	for (int i = 24; i < 30; i++)
 	{
 		UpdateSceneAndDrawInventory();
 		ring->frameIndex++;
@@ -2668,19 +2668,19 @@ __int32 Inventory::DoPassport()
 	return result;
 }
 
-__int32	Inventory::PopupObject()
+int	Inventory::PopupObject()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 
-	__int32 steps = INV_NUM_FRAMES_POPUP;
-	__int32 deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
+	int steps = INV_NUM_FRAMES_POPUP;
+	int deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
 	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
 	float deltaTilt = 90.0f / steps;
 	float deltaDistance = INV_OBJECT_DISTANCE / steps;
 
 	ring->focusState = INV_FOCUS_STATE_POPUP;
 
-	for (__int32 i = 0; i < steps; i++)
+	for (int i = 0; i < steps; i++)
 	{
 		UpdateSceneAndDrawInventory();
 
@@ -2693,19 +2693,19 @@ __int32	Inventory::PopupObject()
 	return 0;
 }
 
-__int32	Inventory::PopoverObject()
+int	Inventory::PopoverObject()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
 
-	__int32 steps = INV_NUM_FRAMES_POPUP;
-	__int32 deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
+	int steps = INV_NUM_FRAMES_POPUP;
+	int deltaAngle = (0 - ring->objects[ring->currentObject].rotation) / steps;
 	float deltaScale = INV_OBJECTS_SCALE / (float)steps;
 	float deltaTilt = INV_OBJECT_TILT / steps;
 	float deltaDistance = INV_OBJECT_DISTANCE / steps;
 
 	ring->focusState = INV_FOCUS_STATE_POPOVER;
 
-	for (__int32 i = 0; i < steps; i++)
+	for (int i = 0; i < steps; i++)
 	{
 		UpdateSceneAndDrawInventory();
 
@@ -2718,7 +2718,7 @@ __int32	Inventory::PopoverObject()
 	return 0;
 }
 
-__int32 Inventory::GetType()
+int Inventory::GetType()
 {
 	return m_type;
 }
@@ -2819,7 +2819,7 @@ void Inventory::DoControlsSettings()
 						break;
 					}
 
-					__int32 selectedKey = 0;
+					int selectedKey = 0;
 					for (selectedKey = 0; selectedKey < 256; selectedKey++)
 					{
 						if (KeyMap[selectedKey] & 0x80)
@@ -2875,7 +2875,7 @@ void Inventory::DoGraphicsSettings()
 	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[ring->Configuration.Adapter];
 	ring->SelectedVideoMode = 0;
-	for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
+	for (int i = 0; i < adapter->DisplayModes.size(); i++)
 	{
 		RendererDisplayMode* mode = &adapter->DisplayModes[i];
 		if (mode->Width == ring->Configuration.Width && mode->Height == ring->Configuration.Height && 
@@ -3040,8 +3040,8 @@ void Inventory::DoSoundSettings()
 	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
 
 	bool closeObject = false;
-	__int32 oldVolume = ring->Configuration.MusicVolume;
-	__int32 oldSfxVolume = ring->Configuration.SfxVolume;
+	int oldVolume = ring->Configuration.MusicVolume;
+	int oldSfxVolume = ring->Configuration.SfxVolume;
 	bool wasSoundEnabled = ring->Configuration.EnableSound;
 
 	// Do the passport
@@ -3197,27 +3197,27 @@ void Inventory::DoSoundSettings()
 	PopoverObject();
 }
 
-__int32 Inventory::GetActiveGui()
+int Inventory::GetActiveGui()
 {
 	return m_activeGui;
 }
 
-bool Inventory::IsObjectSeparable(__int16 object)
+bool Inventory::IsObjectSeparable(short object)
 {
-	for (__int32 i = 0; i < m_combinations.size(); i++)
+	for (int i = 0; i < m_combinations.size(); i++)
 		if (m_combinations[i].combinedObject == object)
 			return true;
 	return false;
 }
 
-void Inventory::OpenRing(__int32 r, bool animateCamera)
+void Inventory::OpenRing(int r, bool animateCamera)
 {
 	InventoryRing* ring = &m_rings[r];
 
 	m_activeRing = r;
 	m_cameraY = ring->y;
 
-	__int32 numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
+	int numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
 	ring->rotation = 90;
 	ring->distance = 0;
 	float deltaAngle = ring->rotation / numFrames;
@@ -3231,7 +3231,7 @@ void Inventory::OpenRing(__int32 r, bool animateCamera)
 		m_cameraTilt = INV_CAMERA_ANIMATION_TILT;
 	}	
 
-	for (__int32 i = 0; i < numFrames; i++)
+	for (int i = 0; i < numFrames; i++)
 	{
 		ring->distance += deltaShift;
 		ring->rotation -= deltaAngle;
@@ -3247,11 +3247,11 @@ void Inventory::OpenRing(__int32 r, bool animateCamera)
 	ring->rotation = 0;
 }
 
-void Inventory::CloseRing(__int32 r, bool animateCamera)
+void Inventory::CloseRing(int r, bool animateCamera)
 {
 	InventoryRing* ring = &m_rings[r];
 
-	__int32 numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
+	int numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
 	ring->rotation = 0;
 	ring->distance = INV_OBJECTS_DISTANCE;
 	float deltaAngle = 90.0f / numFrames;
@@ -3265,7 +3265,7 @@ void Inventory::CloseRing(__int32 r, bool animateCamera)
 		m_cameraTilt = INV_CAMERA_TILT;
 	}
 
-	for (__int32 i = 0; i < numFrames; i++)
+	for (int i = 0; i < numFrames; i++)
 	{
 		ring->distance -= deltaShift;
 		ring->rotation += deltaAngle;
@@ -3281,12 +3281,12 @@ void Inventory::CloseRing(__int32 r, bool animateCamera)
 	ring->rotation = 90;
 }
 
-void Inventory::SwitchRing(__int32 from, __int32 to, float verticalShift)
+void Inventory::SwitchRing(int from, int to, float verticalShift)
 {
 	InventoryRing* ring1 = &m_rings[from];
 	InventoryRing* ring2 = &m_rings[to];
 
-	__int32 numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
+	int numFrames = INV_NUM_FRAMES_OPEN_CLOSE;
 
 	ring1->rotation = 0;
 	ring1->distance = INV_OBJECTS_DISTANCE;
@@ -3302,7 +3302,7 @@ void Inventory::SwitchRing(__int32 from, __int32 to, float verticalShift)
 	ring1->draw = true;
 	ring2->draw = false;
 
-	for (__int32 i = 0; i < numFrames; i++)
+	for (int i = 0; i < numFrames; i++)
 	{
 		ring1->distance -= deltaShift;
 		ring1->rotation += deltaAngle;
@@ -3340,7 +3340,7 @@ float Inventory::GetCameraTilt()
 	return m_cameraTilt;
 }
 
-bool Inventory::HasWeaponMultipleAmmos(__int16 object)
+bool Inventory::HasWeaponMultipleAmmos(short object)
 {
 	return (object == INV_OBJECT_SHOTGUN || object == INV_OBJECT_CROSSBOW || object == INV_OBJECT_GRENADE_LAUNCHER);
 }

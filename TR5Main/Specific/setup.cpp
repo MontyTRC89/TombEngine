@@ -1173,18 +1173,19 @@ void __cdecl BaddyObjects()
 	}
 	*/
 
-	// ID_SNOWMOBILE_DRIVER
+	// Add the Dragon Bone Front/Back Objects Initialise
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSkidman;
-		obj->control = SkidManControl;
-		obj->hitPoints = 1;
+		obj->initialise = SubInitialise;
+		obj->collision = SubCollision;
+		//obj->drawRoutine = SubDraw;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
 
+	/*
 	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
 	{
@@ -1209,7 +1210,7 @@ void __cdecl BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
-	}
+	}*/
 
 	obj = &Objects[ID_BLUE_GUARD];
 	if (obj->loaded)
