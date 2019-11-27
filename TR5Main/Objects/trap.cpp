@@ -12,7 +12,7 @@
 #include "../Game/collide.h"
 #include "../Game/draw.h"
 
-__int16 StargateBounds[24] = 
+short StargateBounds[24] = 
 {
 	0xFE00, 0x0200, 0xFC00, 0xFC80, 0xFFA0, 0x0060, 0xFE00, 0x0200, 
 	0xFF80, 0x0000, 0xFFA0, 0x0060, 0xFE00, 0xFE80, 0xFC00, 0x0000,
@@ -21,7 +21,7 @@ __int16 StargateBounds[24] =
 
 BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
 
-void __cdecl FourBladesControl(__int16 itemNum)
+void __cdecl FourBladesControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -32,7 +32,7 @@ void __cdecl FourBladesControl(__int16 itemNum)
 	}
 	else
 	{
-		__int16 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
 		if (frameNumber <= 5 || frameNumber >= 58 || frameNumber >= 8 && frameNumber <= 54)
 			item->itemFlags[0] = 0;
@@ -57,7 +57,7 @@ void __cdecl FourBladesControl(__int16 itemNum)
 	}
 }
 
-void __cdecl BirdBladeControl(__int16 itemNum)
+void __cdecl BirdBladeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -69,7 +69,7 @@ void __cdecl BirdBladeControl(__int16 itemNum)
 	}
 	else
 	{
-		__int16 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
 		if (frameNumber <= 14 || frameNumber >= 31)
 			item->itemFlags[0] = 0;
@@ -80,7 +80,7 @@ void __cdecl BirdBladeControl(__int16 itemNum)
 	}
 }
 
-void __cdecl CatwalkBlaldeControl(__int16 itemNum)
+void __cdecl CatwalkBlaldeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -91,7 +91,7 @@ void __cdecl CatwalkBlaldeControl(__int16 itemNum)
 	}
 	else
 	{
-		__int16 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
 		if (item->frameNumber == Anims[item->animNumber].frameEnd || frameNumber < 38)
 			item->itemFlags[3] = 0;
@@ -102,7 +102,7 @@ void __cdecl CatwalkBlaldeControl(__int16 itemNum)
 	}
 }
 
-void __cdecl PlinthBladeControl(__int16 itemNum)
+void __cdecl PlinthBladeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -112,7 +112,7 @@ void __cdecl PlinthBladeControl(__int16 itemNum)
 	}
 	else
 	{
-		__int16 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
 		if (item->frameNumber == Anims[item->animNumber].frameEnd)
 			item->itemFlags[3] = 0;
@@ -123,7 +123,7 @@ void __cdecl PlinthBladeControl(__int16 itemNum)
 	}
 }
 
-void __cdecl InitialiseSethBlade(__int16 itemNum)
+void __cdecl InitialiseSethBlade(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -134,7 +134,7 @@ void __cdecl InitialiseSethBlade(__int16 itemNum)
 	item->itemFlags[2] = abs(item->triggerFlags);
 }
 
-void __cdecl SethBladeControl(__int16 itemNum)
+void __cdecl SethBladeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -162,7 +162,7 @@ void __cdecl SethBladeControl(__int16 itemNum)
 		}
 		else
 		{
-			__int16 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+			short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
 			if (item->frameNumber != Anims[item->animNumber].frameBase && frameNumber <= 6)
 			{
@@ -185,7 +185,7 @@ void __cdecl SethBladeControl(__int16 itemNum)
 	}
 }
 
-void __cdecl ChainControl(__int16 itemNum)
+void __cdecl ChainControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -216,7 +216,7 @@ void __cdecl ChainControl(__int16 itemNum)
 	item->itemFlags[0] = 0;
 }
 
-void __cdecl PloughControl(__int16 itemNum)
+void __cdecl PloughControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -232,7 +232,7 @@ void __cdecl PloughControl(__int16 itemNum)
 	}
 }
 
-void __cdecl CogControl(__int16 itemNum)
+void __cdecl CogControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -258,13 +258,13 @@ void __cdecl CogControl(__int16 itemNum)
 	}
 }
 
-void __cdecl SpikeballControl(__int16 itemNum)
+void __cdecl SpikeballControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
 	if (TriggerActive(item))
 	{
-		__int16 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
 		if ((frameNumber <= 14 || frameNumber >= 24) && (frameNumber < 138 || frameNumber > 140))
 		{
@@ -291,7 +291,7 @@ void __cdecl SpikeballControl(__int16 itemNum)
 	}
 }
 
-void __cdecl StargateControl(__int16 itemNum)
+void __cdecl StargateControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	item->itemFlags[3] = 50;
@@ -306,7 +306,7 @@ void __cdecl StargateControl(__int16 itemNum)
 		item->itemFlags[0] = 0;
 }
 
-void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c)
+void __cdecl StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -315,7 +315,7 @@ void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c)
 
 	if (TestBoundsCollide(item, l, c->radius))
 	{
-		for (__int32 i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			GlobalCollisionBounds.X1 = StargateBounds[3 * i + 0];
 			GlobalCollisionBounds.Y1 = StargateBounds[3 * i + 1];
@@ -325,15 +325,15 @@ void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c)
 				ItemPushLara(item, l, c, 0, 2);
 		}
 
-		__int32 result = TestCollision(item, l);
+		int result = TestCollision(item, l);
 		if (result)
 		{
 			result &= item->itemFlags[0];
-			__int32 flags = item->itemFlags[0];
+			int flags = item->itemFlags[0];
 
 			if (result)
 			{
-				__int32 j = 0;
+				int j = 0;
 				do
 				{
 					if (result & 1)
@@ -345,9 +345,9 @@ void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c)
 						GlobalCollisionBounds.Y2 = SphereList[j].y + SphereList[j].r - item->pos.yPos;
 						GlobalCollisionBounds.Z2 = SphereList[j].z + SphereList[j].r - item->pos.zPos;
 
-						__int32 oldX = LaraItem->pos.xPos;
-						__int32 oldY = LaraItem->pos.yPos;
-						__int32 oldZ = LaraItem->pos.zPos;
+						int oldX = LaraItem->pos.xPos;
+						int oldY = LaraItem->pos.yPos;
+						int oldZ = LaraItem->pos.zPos;
 
 						if (ItemPushLara(item, l, c, flags & 1, 2))
 						{
@@ -376,17 +376,17 @@ void __cdecl StargateCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c)
 	}
 }
 
-void __cdecl ControlSpikyWall(__int16 itemNum)
+void __cdecl ControlSpikyWall(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
 	/* Move wall */
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
-		__int32 x = item->pos.xPos + SIN(item->pos.yRot) >> WALL_SHIFT;
-		__int32 z = item->pos.zPos + COS(item->pos.yRot) >> WALL_SHIFT;
+		int x = item->pos.xPos + SIN(item->pos.yRot) >> WALL_SHIFT;
+		int z = item->pos.zPos + COS(item->pos.yRot) >> WALL_SHIFT;
 
-		__int16 roomNumber = item->roomNumber;
+		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
 		if (GetFloorHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
@@ -416,7 +416,7 @@ void __cdecl ControlSpikyWall(__int16 itemNum)
 	}
 }
 
-void __cdecl InitialiseSpinningBlade(__int16 item_number)
+void __cdecl InitialiseSpinningBlade(short item_number)
 {
 	ITEM_INFO* item = &Items[item_number];
 
@@ -425,7 +425,7 @@ void __cdecl InitialiseSpinningBlade(__int16 item_number)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SpinningBlade(__int16 item_number)
+void __cdecl SpinningBlade(short item_number)
 {
 	bool spinning = false;
 
@@ -435,12 +435,12 @@ void __cdecl SpinningBlade(__int16 item_number)
 	{
 		if (item->goalAnimState != 1)
 		{
-			__int32 x = item->pos.xPos + (WALL_SIZE * 3 / 2 * SIN(item->pos.yRot) >> W2V_SHIFT);
-			__int32 z = item->pos.zPos + (WALL_SIZE * 3 / 2 * COS(item->pos.yRot) >> W2V_SHIFT);
+			int x = item->pos.xPos + (WALL_SIZE * 3 / 2 * SIN(item->pos.yRot) >> W2V_SHIFT);
+			int z = item->pos.zPos + (WALL_SIZE * 3 / 2 * COS(item->pos.yRot) >> W2V_SHIFT);
 
-			__int16 roomNumber = item->roomNumber;
+			short roomNumber = item->roomNumber;
 			FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-			__int32 height = GetFloorHeight(floor, x, item->pos.yPos, z);
+			int height = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 			if (height == NO_HEIGHT)
 				item->goalAnimState = 1;
@@ -453,7 +453,7 @@ void __cdecl SpinningBlade(__int16 item_number)
 			LaraItem->hitStatus = true;
 			LaraItem->hitPoints -= 100;
 
-			DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - STEP_SIZE * 2, LaraItem->pos.zPos, (__int16)(item->speed * 2), LaraItem->pos.yRot, LaraItem->roomNumber, 2);
+			DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - STEP_SIZE * 2, LaraItem->pos.zPos, (short)(item->speed * 2), LaraItem->pos.yRot, LaraItem->roomNumber, 2);
 		}
 
 		SoundEffect(231, &item->pos, 0);
@@ -467,7 +467,7 @@ void __cdecl SpinningBlade(__int16 item_number)
 
 	AnimateItem(item);
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO*  floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	item->floor = item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	if (roomNumber != item->roomNumber)
@@ -477,7 +477,7 @@ void __cdecl SpinningBlade(__int16 item_number)
 		item->pos.yRot += -ANGLE(180);
 }
 
-void __cdecl InitialiseKillerStatue(__int16 item_number)
+void __cdecl InitialiseKillerStatue(short item_number)
 {
 	ITEM_INFO* item = &Items[item_number];
 
@@ -486,11 +486,11 @@ void __cdecl InitialiseKillerStatue(__int16 item_number)
 	item->currentAnimState = 1;
 }
 
-void __cdecl KillerStatueControl(__int16 item_number)
+void __cdecl KillerStatueControl(short item_number)
 {
 	ITEM_INFO *item;
-	__int32 x, y, z;
-	__int16 d;
+	int x, y, z;
+	short d;
 
 	item = &Items[item_number];
 
@@ -504,17 +504,17 @@ void __cdecl KillerStatueControl(__int16 item_number)
 		LaraItem->hitStatus = 1;
 		LaraItem->hitPoints -= 20;
 
-		__int32 x = LaraItem->pos.xPos + (GetRandomControl() - 16384) / 256;
-		__int32 z = LaraItem->pos.zPos + (GetRandomControl() - 16384) / 256;
-		__int32 y = LaraItem->pos.yPos - GetRandomControl() / 44;
-		__int32 d = (GetRandomControl() - 16384) / 8 + LaraItem->pos.yRot;
+		int x = LaraItem->pos.xPos + (GetRandomControl() - 16384) / 256;
+		int z = LaraItem->pos.zPos + (GetRandomControl() - 16384) / 256;
+		int y = LaraItem->pos.yPos - GetRandomControl() / 44;
+		int d = (GetRandomControl() - 16384) / 8 + LaraItem->pos.yRot;
 		DoBloodSplat(x, y, z, LaraItem->speed, d, LaraItem->roomNumber);
 	}
 
 	AnimateItem(item);
 }
 
-void __cdecl SpringBoardControl(__int16 item_number)
+void __cdecl SpringBoardControl(short item_number)
 {
 	ITEM_INFO* item = &Items[item_number];
 
@@ -541,12 +541,12 @@ void __cdecl SpringBoardControl(__int16 item_number)
 	AnimateItem(item);
 }
 
-void __cdecl InitialiseSlicerDicer(__int16 itemNum)
+void __cdecl InitialiseSlicerDicer(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	__int32 dx = SIN(item->pos.yRot + ANGLE(90)) >> 5;
-	__int32 dz = COS(item->pos.yRot + ANGLE(90)) >> 5;
+	int dx = SIN(item->pos.yRot + ANGLE(90)) >> 5;
+	int dz = COS(item->pos.yRot + ANGLE(90)) >> 5;
 
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;
@@ -557,14 +557,14 @@ void __cdecl InitialiseSlicerDicer(__int16 itemNum)
 	item->itemFlags[3] = 50;
 }
 
-void __cdecl SlicerDicerControl(__int16 itemNum)
+void __cdecl SlicerDicerControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_2_ID20, &item->pos, 0);
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_1_ID12, &item->pos, 0);
 	
-	__int32 factor = (9 * COS(item->triggerFlags) << 9 >> W2V_SHIFT) * COS(item->pos.yRot) >> W2V_SHIFT;
+	int factor = (9 * COS(item->triggerFlags) << 9 >> W2V_SHIFT) * COS(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos = (item->itemFlags[0] << 8) + factor;
 	item->pos.yPos = (item->itemFlags[1] << 8) - 4608 * SIN(item->triggerFlags);
@@ -572,7 +572,7 @@ void __cdecl SlicerDicerControl(__int16 itemNum)
 
 	item->triggerFlags += 170;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNum, roomNumber);
@@ -580,7 +580,7 @@ void __cdecl SlicerDicerControl(__int16 itemNum)
 	AnimateItem(item);
 }
 
-void __cdecl BladeCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -591,13 +591,13 @@ void __cdecl BladeCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (TestBoundsCollide(item, l, coll->radius))
 		{
-			__int32 oldX = LaraItem->pos.xPos;
-			__int32 oldY = LaraItem->pos.yPos;
-			__int32 oldZ = LaraItem->pos.zPos;
+			int oldX = LaraItem->pos.xPos;
+			int oldY = LaraItem->pos.yPos;
+			int oldZ = LaraItem->pos.zPos;
 
-			__int32 dx = 0;
-			__int32 dy = 0;
-			__int32 dz = 0;
+			int dx = 0;
+			int dy = 0;
+			int dz = 0;
 
 			if (ItemPushLara(item, l, coll, 1, 1))
 			{
@@ -628,7 +628,7 @@ void __cdecl BladeCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl InitialiseMine(__int16 itemNum)
+void __cdecl InitialiseMine(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -636,11 +636,11 @@ void __cdecl InitialiseMine(__int16 itemNum)
 		item->meshBits = 0;
 }
 
-void __cdecl MineControl(__int16 itemNum)
+void __cdecl MineControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	__int32 num = GetSpheres(item, SphereList, true);
+	int num = GetSpheres(item, SphereList, true);
 	if (item->itemFlags[0] >= 150)
 	{
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0);
@@ -651,7 +651,7 @@ void __cdecl MineControl(__int16 itemNum)
 		{
 			SPHERE* sphere = &SphereList[0];
 
-			for (__int32 i = 0; i < num; i++)
+			for (int i = 0; i < num; i++)
 			{
 				if (i >= 7 && i != 9)
 				{
@@ -663,7 +663,7 @@ void __cdecl MineControl(__int16 itemNum)
 				sphere++;
 			}
 
-			for (__int32 i = 0; i < num; i++)
+			for (int i = 0; i < num; i++)
 				ExplodeItemNode(item, i, 0, -128);
 		}
 
@@ -672,7 +672,7 @@ void __cdecl MineControl(__int16 itemNum)
 		FlashFadeB = 64;
 		FlashFader = 32;
 
-		__int16 currentItemNumber = Rooms[item->roomNumber].itemNumber;
+		short currentItemNumber = Rooms[item->roomNumber].itemNumber;
 
 		// Make the sentry gun explode?
 		while (currentItemNumber != NO_ITEM)
@@ -691,11 +691,11 @@ void __cdecl MineControl(__int16 itemNum)
 	{
 		item->itemFlags[0]++;
 
-		__int32 something = 4 * item->itemFlags[0];
+		int something = 4 * item->itemFlags[0];
 		if (something > 255)
 			something = 0;
 
-		for (__int32 i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			SPHERE* sphere = &SphereList[i];
 
@@ -709,7 +709,7 @@ void __cdecl MineControl(__int16 itemNum)
 	}
 }
 
-void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -720,7 +720,7 @@ void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (TestBoundsCollide(item, l, 512))
 			{
 				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 0, item->roomNumber);
-				for (__int32 i = 0; i < 2; i++)
+				for (int i = 0; i < 2; i++)
 					TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 
 				item->meshBits = 1;
@@ -738,7 +738,7 @@ void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			for (__int32 i = 0; i < LevelItems; i++)
+			for (int i = 0; i < LevelItems; i++)
 			{
 				ITEM_INFO* currentItem = &Items[i];
 
@@ -754,7 +754,7 @@ void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						0,
 						currentItem->roomNumber);
 
-					for (__int32 j = 0; j < 2; j++)
+					for (int j = 0; j < 2; j++)
 						TriggerExplosionSparks(
 							currentItem->pos.xPos,
 							currentItem->pos.yPos,
@@ -779,7 +779,7 @@ void __cdecl MineCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl InitialiseSentryGun(__int16 itemNum)
+void __cdecl InitialiseSentryGun(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -790,7 +790,7 @@ void __cdecl InitialiseSentryGun(__int16 itemNum)
 	item->itemFlags[2] = 0;
 }
 
-void __cdecl SentryGunControl(__int16 itemNum)
+void __cdecl SentryGunControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -800,7 +800,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	AI_INFO info;
-	__int32 c = 0;
+	int c = 0;
 
 	if (creature)
 	{
@@ -833,7 +833,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 				CreatureAIInfo(item, &info);
 				item->pos.yPos += 512;
 
-				__int32 deltaAngle = info.angle - creature->jointRotation[0];
+				int deltaAngle = info.angle - creature->jointRotation[0];
 				//printf("Angle: %d\n", (int)TR_ANGLE_TO_DEGREES(info.angle));
 
 				info.ahead = true;
@@ -925,7 +925,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 			RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
 
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -2, 0, item->roomNumber);
-			for (__int32 i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
 
 			SoundEffect(SFX_EXPLOSION1, &item->pos, 25165828);
@@ -936,7 +936,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 
 void __cdecl SentryGunThrowFire(ITEM_INFO* item)
 {
-	for (__int32 i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -970,7 +970,7 @@ void __cdecl SentryGunThrowFire(ITEM_INFO* item)
 
 		GetJointAbsPosition(item, &pos2, 7);
 
-		__int32 v = (GetRandomControl() & 0x3F) + 192;
+		int v = (GetRandomControl() & 0x3F) + 192;
 
 		spark->xVel = v * (pos2.x - pos1.x) / 10;
 		spark->yVel = v * (pos2.y - pos1.y) / 10;
@@ -994,25 +994,25 @@ void __cdecl SentryGunThrowFire(ITEM_INFO* item)
 	}
 }
 
-void __cdecl InitialiseBurningFloor(__int16 itemNum)
+void __cdecl InitialiseBurningFloor(short itemNum)
 {
 	Items[itemNum].requiredAnimState = 127;
 }
 
-void __cdecl BurningFloorControl(__int16 itemNum)
+void __cdecl BurningFloorControl(short itemNum)
 {
 
 }
 
-void __cdecl ControlSpikyCeiling(__int16 itemNumber)
+void __cdecl ControlSpikyCeiling(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
-		__int32 y = item->pos.yPos + ((item->itemFlags[0] == 1) ? 10 : 5);
+		int y = item->pos.yPos + ((item->itemFlags[0] == 1) ? 10 : 5);
 		
-		__int16 roomNumber = item->roomNumber;
+		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
 
 		if (GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos) < y + 1024)

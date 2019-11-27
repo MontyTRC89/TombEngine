@@ -14,7 +14,7 @@ BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
 BITE_INFO silencerGun = { 3, 331, 56, 10 };
 
-void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot)
+void __cdecl ClampRotation(PHD_3DPOS *pos, short angle, short rot)
 {
 	if (angle <= rot)
 	{
@@ -33,13 +33,13 @@ void __cdecl ClampRotation(PHD_3DPOS *pos, __int16 angle, __int16 rot)
 	}
 }
 
-void __cdecl InitialiseBaddy(__int16 itemNum)
+void __cdecl InitialiseBaddy(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
 	ClearItem(itemNum);
 
-	__int16 objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
+	short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 	if (item->objectNumber == ID_BADDY1)
 	{
 		item->swapMeshFlags = 0x7FC010;
@@ -55,7 +55,7 @@ void __cdecl InitialiseBaddy(__int16 itemNum)
 	
 	item->itemFlags[1] = -1;
 
-	__int16 ocb = item->triggerFlags;
+	short ocb = item->triggerFlags;
 
 	if (ocb > 9 && ocb < 20)
 	{
@@ -132,7 +132,7 @@ void __cdecl InitialiseBaddy(__int16 itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void __cdecl BaddyControl(__int16 itemNum)
+void __cdecl BaddyControl(short itemNum)
 {
 
 	if (!CreatureActive(itemNum))
@@ -143,18 +143,18 @@ void __cdecl BaddyControl(__int16 itemNum)
 	ITEM_INFO* enemyItem = creature->enemy;
 	OBJECT_INFO* obj = &Objects[ID_BADDY1];
 
-	__int16 tilt = 0;
-	__int16 angle = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
-	__int16 joint3 = 0;
+	short tilt = 0;
+	short angle = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short joint3 = 0;
 
 	// TODO: better add a second control routine for baddy 2 instead of mixing them?
-	__int16 objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
+	short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 
-	__int32 roll = false;
-	__int32 jump = false;
-	__int32 someFlag3 = false;
+	int roll = false;
+	int jump = false;
+	int someFlag3 = false;
 
 	if (item->triggerFlags % 1000)
 	{
@@ -169,35 +169,35 @@ void __cdecl BaddyControl(__int16 itemNum)
 	}
 
 	// Can baddy jump? Check for a distance of 1 and 2 sectors
-	__int32 x = item->pos.xPos;
-	__int32 y = item->pos.yPos;
-	__int32 z = item->pos.zPos;
+	int x = item->pos.xPos;
+	int y = item->pos.yPos;
+	int z = item->pos.zPos;
 
-	__int32 dx = 942 * SIN(item->pos.yRot) >> 14;
-	__int32 dz = 942 * COS(item->pos.yRot) >> 14;
+	int dx = 942 * SIN(item->pos.yRot) >> 14;
+	int dz = 942 * COS(item->pos.yRot) >> 14;
 
 	x += dx;
 	z += dz;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height1 = GetFloorHeight(floor, x, y, z);
+	int height1 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height2 = GetFloorHeight(floor, x, y, z);
+	int height2 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height3 = GetFloorHeight(floor, x, y, z);
+	int height3 = GetFloorHeight(floor, x, y, z);
 
-	__int32 height = 0;
+	int height = 0;
 	bool canJump1sector = true;
 	if (enemyItem && item->boxNumber == enemyItem->boxNumber
 		|| y >= height1 - 384
@@ -376,7 +376,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height4 = GetFloorHeight(floor, x, y, z);
+		int height4 = GetFloorHeight(floor, x, y, z);
 
 		dx = 942 * SIN(item->pos.yRot + 14336) >> 14;
 		dz = 942 * COS(item->pos.yRot + 14336) >> 14;
@@ -387,7 +387,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height5 = GetFloorHeight(floor, x, y, z);
+		int height5 = GetFloorHeight(floor, x, y, z);
 
 		if (abs(height5 - item->pos.yPos) > 256)
 			jump = false;
@@ -407,7 +407,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height6 = GetFloorHeight(floor, x, y, z);
+		int height6 = GetFloorHeight(floor, x, y, z);
 
 		dx = 942 * SIN(item->pos.yRot - 14336) >> 14;
 		dz = 942 * COS(item->pos.yRot - 14336) >> 14;
@@ -418,7 +418,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height7 = GetFloorHeight(floor, x, y, z);
+		int height7 = GetFloorHeight(floor, x, y, z);
 
 		if (abs(height7 - item->pos.yPos) > 256 || height6 + 512 >= item->pos.yPos)
 		{
@@ -503,7 +503,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 
 			if (currentCreature->enemy)
 			{
-				__int16 objNum = currentCreature->enemy->objectNumber;
+				short objNum = currentCreature->enemy->objectNumber;
 				if ((objNum == ID_SMALLMEDI_ITEM || objNum == ID_UZI_AMMO_ITEM) && info.distance < 0x40000)
 				{
 					item->goalAnimState = 25;
@@ -1065,7 +1065,7 @@ void __cdecl BaddyControl(__int16 itemNum)
 	}
 	else  if (WeaponEnemyTimer <= 100)
 	{
-		__int32 vault = CreatureVault(itemNum, angle, 2, 260);
+		int vault = CreatureVault(itemNum, angle, 2, 260);
 
 		switch (vault)
 		{
@@ -1119,14 +1119,14 @@ void __cdecl BaddyControl(__int16 itemNum)
 	return;
 }
 
-void __cdecl SilencerControl(__int16 itemNum)
+void __cdecl SilencerControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* silencer = (CREATURE_INFO*)item->data;
-	__int16 angle = 0, torso_y = 0, torso_x = 0, head_y = 0, tilt = 0;
+	short angle = 0, torso_y = 0, torso_x = 0, head_y = 0, tilt = 0;
 
 	if (item->hitPoints <= 0)
 	{

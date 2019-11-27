@@ -71,7 +71,7 @@ void __cdecl GetBoatGetOff(ITEM_INFO* boat)
 	/* Wait for last frame of getoff anims before returning to normal Lara control */
 	if ((LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
 	{
-		__int16 room_number;
+		short room_number;
 		int x, y, z;
 		FLOOR_INFO* floor;
 
@@ -113,7 +113,7 @@ int __cdecl CanGetOff(int direction)
 {
 	ITEM_INFO* v;
 	FLOOR_INFO* floor;
-	__int16 room_number, angle;
+	short room_number, angle;
 	int x, y, z, height, ceiling;
 
 	v = &Items[g_LaraExtra.Vehicle];
@@ -144,7 +144,7 @@ int __cdecl CanGetOff(int direction)
 	return 1;
 }
 
-int __cdecl BoatCheckGetOn(__int16 itemNum, COLL_INFO* coll)
+int __cdecl BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 {
 	/* Returns 0 if no get on, 1 if right get on and 2 if left get on and 3 if jump geton */
 	int geton = 0, dist;
@@ -325,7 +325,7 @@ short __cdecl DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	else
 	{
 		/* A diagonal hit; means a barrage of tests needed to determine best shift */
-		__int16 room_number;
+		short room_number;
 		FLOOR_INFO* floor;
 		int height;
 
@@ -447,7 +447,7 @@ int __cdecl DoBoatDynamics(int height, int fallspeed, int* y)
 	return fallspeed;
 }
 
-int __cdecl BoatDynamics(__int16 itemNum)
+int __cdecl BoatDynamics(short itemNum)
 {
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;
@@ -457,7 +457,7 @@ int __cdecl BoatDynamics(__int16 itemNum)
 	int hfr_old, hfl_old, hbr_old, hbl_old, hf_old;
 	FLOOR_INFO* floor;
 	int height, slip, collide;
-	__int16 room_number, rot;
+	short room_number, rot;
 	int newspeed;
 
 	boat = &Items[itemNum];
@@ -711,7 +711,7 @@ void __cdecl BoatAnimation(ITEM_INFO* boat, int collide)
 	{
 		if (LaraItem->currentAnimState != BOAT_HIT)
 		{
-			LaraItem->animNumber = (__int16)(Objects[ID_BOAT_ANIMS].animIndex + collide);
+			LaraItem->animNumber = (short)(Objects[ID_BOAT_ANIMS].animIndex + collide);
 			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = BOAT_HIT;
 		}
@@ -790,7 +790,7 @@ void __cdecl BoatSplash(ITEM_INFO* item, long fallspeed, long water)
 	*/
 }
 
-void __cdecl InitialiseBoat(__int16 itemNum)
+void __cdecl InitialiseBoat(short itemNum)
 {
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;
@@ -807,7 +807,7 @@ void __cdecl InitialiseBoat(__int16 itemNum)
 	binfo->pitch = 0;
 }
 
-void __cdecl BoatCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll)
+void __cdecl BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
 	/* This routine is only for when Lara is not on the boat and she would like to be */
 	int geton;
@@ -868,7 +868,7 @@ void __cdecl BoatCollision(__int16 itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	g_LaraExtra.Vehicle = itemNum;
 }
 
-void __cdecl BoatControl(__int16 itemNumber)
+void __cdecl BoatControl(short itemNumber)
 {
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;
@@ -876,7 +876,7 @@ void __cdecl BoatControl(__int16 itemNumber)
 	int hfl, hfr, no_turn = 1, drive = 0;
 	FLOOR_INFO* floor;
 	int height, collide, water, ceiling, pitch, h, ofs, nowake;
-	__int16 roomNumber, x_rot, z_rot;
+	short roomNumber, x_rot, z_rot;
 
 	boat = &Items[itemNumber];
 	binfo = (BOAT_INFO*)boat->data;

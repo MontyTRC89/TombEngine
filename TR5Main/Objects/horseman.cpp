@@ -19,7 +19,7 @@ BITE_INFO horsemanBite1 = { 0, 0, 0, 0x06 };
 BITE_INFO horsemanBite2 = { 0, 0, 0, 0x0E };
 BITE_INFO horsemanBite3 = { 0, 0, 0, 0x0A };
 
-void __cdecl InitialiseHorse(__int16 itemNum)
+void __cdecl InitialiseHorse(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[ID_HORSE];
@@ -30,7 +30,7 @@ void __cdecl InitialiseHorse(__int16 itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl InitialiseHorseman(__int16 itemNum)
+void __cdecl InitialiseHorseman(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[ID_HORSEMAN];
@@ -44,13 +44,13 @@ void __cdecl InitialiseHorseman(__int16 itemNum)
 	item->itemFlags[0] = NO_ITEM; // No horse yet
 }
 
-void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num)
+void __cdecl HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 {
-	for (__int32 i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		SPARKS* spark = &Sparks[GetFreeSpark()];
 
-		__int32 r = GetRandomControl();
+		int r = GetRandomControl();
 
 		spark->on = 1;
 		spark->sG = -128;
@@ -76,11 +76,11 @@ void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num)
 		spark->xVel = -SIN((r & 0x7FF) + param1 - 1024) >> 2;
 	}
 
-	for (__int32 i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		SPARKS* spark = &Sparks[GetFreeSpark()];
 
-		__int32 r = GetRandomControl();
+		int r = GetRandomControl();
 
 		spark->on = 1;
 		spark->sG = -128;
@@ -119,7 +119,7 @@ void __cdecl HorsemanSparks(PHD_3DPOS* pos, __int32 param1, __int32 num)
 	}
 }
 
-void __cdecl HorsemanControl(__int16 itemNum)
+void __cdecl HorsemanControl(short itemNum)
 {
 #ifdef OLD_CODE
 	if (!CreatureActive(itemNum))
@@ -131,7 +131,7 @@ void __cdecl HorsemanControl(__int16 itemNum)
 	// Try to find the horse
 	if (item->itemFlags[0] == NO_ITEM)
 	{
-		for (__int32 i = 0; i < LevelItems; i++)
+		for (int i = 0; i < LevelItems; i++)
 		{
 			ITEM_INFO* currentItem = &Items[i];
 			if (item->objectNumber == ID_HORSE && item->triggerFlags == currentItem->triggerFlags)
@@ -151,17 +151,17 @@ void __cdecl HorsemanControl(__int16 itemNum)
 	if (item->itemFlags[0] != 0)
 		horseItem = &Items[item->itemFlags[0]];
 
-	__int32 x;
-	__int32 y;
-	__int32 z;
-	__int16 roomNumber;
-	__int32 deltaX;
-	__int32 deltaZ;
+	int x;
+	int y;
+	int z;
+	short roomNumber;
+	int deltaX;
+	int deltaZ;
 	FLOOR_INFO * floor;
-	__int16 height;
-	__int16 height1;
-	__int16 height2;
-	__int32 xRot = 0;
+	short height;
+	short height1;
+	short height2;
+	int xRot = 0;
 
 	if (horseItem != NULL)
 	{
@@ -272,8 +272,8 @@ void __cdecl HorsemanControl(__int16 itemNum)
 		laraInfo.distance = SQUARE(deltaX) + SQUARE(deltaZ);
 	}
 
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (item->hitStatus
 		&& laraInfo.angle < 12288
@@ -383,7 +383,7 @@ void __cdecl HorsemanControl(__int16 itemNum)
 				v69 = -128;
 				v70 = 80;
 				GetJointAbsPosition((int)item, &v68, 1);
-				sub_408D90(&v68, (signed __int16)item->pos.yRot, 7);
+				sub_408D90(&v68, (signed short)item->pos.yRot, 7);
 				goto LABEL_47;
 			}
 		}

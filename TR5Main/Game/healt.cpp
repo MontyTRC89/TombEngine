@@ -2,23 +2,23 @@
 #include "draw.h"
 #include "pickup.h"
 
-__int16 PickupX;
-__int16 PickupY;
-__int16 CurrentPickup;
+short PickupX;
+short PickupY;
+short CurrentPickup;
 DISPLAY_PICKUP Pickups[NUM_PICKUPS];
-__int16 PickupVel;
+short PickupVel;
 
-void __cdecl DrawHealtBar(__int32 percentual)
+void __cdecl DrawHealtBar(int percentual)
 {
 	g_Renderer->DrawHealthBar(percentual);
 }
 
-void __cdecl DrawAirBar(__int32 percentual)
+void __cdecl DrawAirBar(int percentual)
 {
 	g_Renderer->DrawAirBar(percentual);
 }
 
-__int32 __cdecl DrawAllPickups()
+int __cdecl DrawAllPickups()
 {
 	if (Pickups[CurrentPickup].life > 0)
 	{
@@ -50,8 +50,8 @@ __int32 __cdecl DrawAllPickups()
 		}
 	}
 
-	__int32 pickupIndex = CurrentPickup;
-	__int32 i = 0;
+	int pickupIndex = CurrentPickup;
+	int i = 0;
 	do
 	{
 		if (Pickups[pickupIndex].life > 0)
@@ -70,9 +70,9 @@ __int32 __cdecl DrawAllPickups()
 }
 
 
-void __cdecl AddDisplayPickup(__int16 objectNumber)
+void __cdecl AddDisplayPickup(short objectNumber)
 {
-	for (__int32 i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		DISPLAY_PICKUP* pickup = &Pickups[i];
 		if (pickup->life < 0)
@@ -90,7 +90,7 @@ void __cdecl AddDisplayPickup(__int16 objectNumber)
 
 void __cdecl InitialisePickupDisplay()
 {
-	for (__int32 i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		DISPLAY_PICKUP* pickup = &Pickups[i];
 		pickup->life = -1;

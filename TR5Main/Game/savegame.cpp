@@ -14,7 +14,7 @@ FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
 ChunkWriter* SaveGame::m_writer;
 vector<LuaVariable> SaveGame::m_luaVariables;
-__int32 SaveGame::LastSaveGame;
+int SaveGame::LastSaveGame;
 
 ChunkId* SaveGame::m_chunkGameStatus;
 ChunkId* SaveGame::m_chunkItems;
@@ -56,11 +56,11 @@ extern byte CurrentSequence;
 void SaveGame::saveItems()
 {
 	// Save level items
-	for (__int32 i = 0; i < NumItems; i++)
+	for (int i = 0; i < NumItems; i++)
 		m_writer->WriteChunkWithChildren(m_chunkItem, &saveItem, i, 0);
 
 	// Save items created at runtime (flares, missiles...)
-	for (__int32 i = NumItems; i < NUM_ITEMS; i++)
+	for (int i = NumItems; i < NUM_ITEMS; i++)
 	{
 		ITEM_INFO* item = &Items[i];
 		if (item->active)
@@ -83,22 +83,22 @@ void SaveGame::saveItems()
 
 	// Save special items
 	if (Objects[ID_BATS].loaded)
-		for (__int32 i = 0; i < NUM_BATS; i++)
+		for (int i = 0; i < NUM_BATS; i++)
 			if (Bats[i].on)
 				m_writer->WriteChunk(m_chunkBats, &saveBats, i, 0);
 
 	if (Objects[ID_RATS].loaded)
-		for (__int32 i = 0; i < NUM_RATS; i++)
+		for (int i = 0; i < NUM_RATS; i++)
 			if (Rats[i].on)
 				m_writer->WriteChunk(m_chunkRats, &saveRats, i, 0);
 
 	if (Objects[ID_SPIDER].loaded)
-		for (__int32 i = 0; i < NUM_SPIDERS; i++)
+		for (int i = 0; i < NUM_SPIDERS; i++)
 			if (Spiders[i].on)
 				m_writer->WriteChunk(m_chunkSpiders, &saveSpiders, i, 0);
 }
 
-void SaveGame::saveItem(__int32 itemNumber, __int32 runtimeItem)
+void SaveGame::saveItem(int itemNumber, int runtimeItem)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -156,7 +156,7 @@ void SaveGame::saveItem(__int32 itemNumber, __int32 runtimeItem)
 	}
 }
 
-void SaveGame::saveGameStatus(__int32 arg1, __int32 arg2)
+void SaveGame::saveGameStatus(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, FlipStatus);
 	LEB128::Write(m_stream, LastInventoryItem);
@@ -168,41 +168,41 @@ void SaveGame::saveGameStatus(__int32 arg1, __int32 arg2)
 	// Now the sub-chunks
 	if (NumberRooms > 0)
 	{
-		for (__int32 i = 0; i < NumberRooms; i++)
-			for (__int32 j = 0; j < Rooms[i].numMeshes; j++)
+		for (int i = 0; i < NumberRooms; i++)
+			for (int j = 0; j < Rooms[i].numMeshes; j++)
 				m_writer->WriteChunk(m_chunkStaticFlags, &saveStaticFlag, i, j);
 	}
 
-	for (__int32 i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_writer->WriteChunk(m_chunkSequenceSwitch, &saveSequenceSwitch, i, SequenceUsed[i]);
 
-	for (__int32 i = 0; i < NumberSpotcams; i++)
+	for (int i = 0; i < NumberSpotcams; i++)
 		m_writer->WriteChunk(m_chunkFlybyFlags, &saveFlybyFlags, i, SpotCam[i].flags);
 
-	for (__int32 i = 0; i < g_AudioTracks.size(); i++)
+	for (int i = 0; i < g_AudioTracks.size(); i++)
 		m_writer->WriteChunk(m_chunkCdFlags, &saveCdFlags, i, g_AudioTracks[i].Mask);
 
-	for (__int32 i = 0; i < NumberCameras; i++)
+	for (int i = 0; i < NumberCameras; i++)
 		m_writer->WriteChunk(m_chunkCamera, &saveCamera, i, Camera.fixed[i].flags);
 
-	for (__int32 i = 0; i < 255; i++)
+	for (int i = 0; i < 255; i++)
 		m_writer->WriteChunk(m_chunkFlipStats, &saveFlipStats, i, FlipStats[i]);
 
-	for (__int32 i = 0; i < 255; i++)
+	for (int i = 0; i < 255; i++)
 		m_writer->WriteChunk(m_chunkFlipMap, &saveFlipMap, i, FlipMap[i]);
 }
 
-void SaveGame::saveLara(__int32 arg1, __int32 arg2)
+void SaveGame::saveLara(int arg1, int arg2)
 {
 	// LARA_INFO struct dumped to savegame
 	LARA_INFO lara;
 	memcpy(&lara, &Lara, sizeof(Lara));
 
-	for (__int32 i = 0; i < 15; i++)
-		lara.meshPtrs[i] = (__int16*)((char*)lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
+	for (int i = 0; i < 15; i++)
+		lara.meshPtrs[i] = (short*)((char*)lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
 
-	lara.leftArm.frameBase = (__int16*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
-	lara.rightArm.frameBase = (__int16*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
+	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
+	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
 	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)MallocBuffer;
 
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
@@ -225,11 +225,11 @@ void SaveGame::saveVariables()
 {
 	m_luaVariables.clear();
 	g_GameScript->GetVariables(&m_luaVariables);
-	for (__int32 i = 0; i < m_luaVariables.size(); i++)
+	for (int i = 0; i < m_luaVariables.size(); i++)
 		m_writer->WriteChunk(m_chunkLuaVariable, &saveVariable, i, 0);
 }
 
-void SaveGame::saveVariable(__int32 arg1, __int32 arg2)
+void SaveGame::saveVariable(int arg1, int arg2)
 {
 	LuaVariable variable = m_luaVariables[arg1];
 	
@@ -375,14 +375,14 @@ bool SaveGame::readLara()
 	memcpy(&Lara, lara, sizeof(LARA_INFO));
 	free(buffer);
 
-	for (__int32 i = 0; i < 15; i++)
+	for (int i = 0; i < 15; i++)
 	{
-		Lara.meshPtrs[i] = ADD_PTR(Lara.meshPtrs[i], __int16, MeshBase);
+		Lara.meshPtrs[i] = ADD_PTR(Lara.meshPtrs[i], short, MeshBase);
 		printf("MeshPtr: %d\n", Lara.meshPtrs[i]);
 	}
 
-	Lara.leftArm.frameBase = ADD_PTR(Lara.leftArm.frameBase, __int16, Objects[ID_PISTOLS_ANIM].frameBase);
-	Lara.rightArm.frameBase = ADD_PTR(Lara.rightArm.frameBase, __int16, Objects[ID_PISTOLS_ANIM].frameBase);
+	Lara.leftArm.frameBase = ADD_PTR(Lara.leftArm.frameBase, short, Objects[ID_PISTOLS_ANIM].frameBase);
+	Lara.rightArm.frameBase = ADD_PTR(Lara.rightArm.frameBase, short, Objects[ID_PISTOLS_ANIM].frameBase);
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;
@@ -407,7 +407,7 @@ bool SaveGame::readLara()
 	// Lara weapon data
 	if (Lara.weaponItem)
 	{
-		__int16 weaponItemNum = CreateItem();
+		short weaponItemNum = CreateItem();
 		Lara.weaponItem = weaponItemNum;
 
 		ITEM_INFO* weaponItem = &Items[Lara.weaponItem];
@@ -428,9 +428,9 @@ bool SaveGame::readLara()
 
 bool SaveGame::readItem()
 {
-	__int16 itemNumber = LEB128::ReadInt16(m_stream);
-	__int16 runtimeItem = LEB128::ReadByte(m_stream);
-	__int16 itemKind = LEB128::ReadInt16(m_stream);
+	short itemNumber = LEB128::ReadInt16(m_stream);
+	short runtimeItem = LEB128::ReadByte(m_stream);
+	short itemKind = LEB128::ReadInt16(m_stream);
 
 	// Runtime items must be allocated dynamically
 	if (runtimeItem)
@@ -523,7 +523,7 @@ bool SaveGame::readVariable()
 	return true;
 }
 
-bool SaveGame::readSavegameChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool SaveGame::readSavegameChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(m_chunkGameStatus))
 		return readGameStatus();
@@ -620,14 +620,14 @@ bool SaveGame::LoadHeader(char* fileName, SaveGameHeader* header)
 	return true;
 }
 
-void SaveGame::saveStaticFlag(__int32 arg1, __int32 arg2)
+void SaveGame::saveStaticFlag(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
 	LEB128::Write(m_stream, Rooms[arg1].mesh[arg2].Flags);
 }
 
-bool SaveGame::readLaraChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(m_chunkVehicle))
 	{
@@ -637,13 +637,13 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 	return false;
 }
 
-bool SaveGame::readGameStatusChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(m_chunkStaticFlags))
 	{
-		__int16 roomIndex = LEB128::ReadInt16(m_stream);
-		__int16 staticIndex = LEB128::ReadInt16(m_stream);
-		__int16 flags = LEB128::ReadInt16(m_stream);
+		short roomIndex = LEB128::ReadInt16(m_stream);
+		short staticIndex = LEB128::ReadInt16(m_stream);
+		short flags = LEB128::ReadInt16(m_stream);
 		Rooms[roomIndex].mesh[staticIndex].Flags = flags;
 
 		if (!flags)
@@ -652,7 +652,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, __int32 maxSize, __int32 a
 				Rooms[roomIndex].mesh[staticIndex].y,
 				Rooms[roomIndex].mesh[staticIndex].z,
 				&roomIndex);
-			__int32 height = GetFloorHeight(floor, Rooms[roomIndex].mesh[staticIndex].x,
+			int height = GetFloorHeight(floor, Rooms[roomIndex].mesh[staticIndex].x,
 				Rooms[roomIndex].mesh[staticIndex].y,
 				Rooms[roomIndex].mesh[staticIndex].z);
 			TestTriggers(TriggerIndex, 1, 0);
@@ -663,15 +663,15 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, __int32 maxSize, __int32 a
 	}
 	else if (chunkId->EqualsTo(m_chunkFlipStats))
 	{
-		__int16 index = LEB128::ReadInt16(m_stream);
-		__int16 value = LEB128::ReadInt16(m_stream);
+		short index = LEB128::ReadInt16(m_stream);
+		short value = LEB128::ReadInt16(m_stream);
 		FlipStats[index] = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkFlipMap))
 	{
-		__int16 index = LEB128::ReadInt16(m_stream);
-		__int16 value = LEB128::ReadInt16(m_stream);
+		short index = LEB128::ReadInt16(m_stream);
+		short value = LEB128::ReadInt16(m_stream);
 		FlipMap[index] = value;
 		if (value)
 			DoFlipMap(value);
@@ -679,74 +679,74 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, __int32 maxSize, __int32 a
 	}
 	else if (chunkId->EqualsTo(m_chunkCdFlags))
 	{
-		__int16 index = LEB128::ReadInt16(m_stream);
+		short index = LEB128::ReadInt16(m_stream);
 		printf("Index: %d\n", index);
-		__int16 value = LEB128::ReadInt16(m_stream);
+		short value = LEB128::ReadInt16(m_stream);
 		if (index < g_AudioTracks.size())
 			g_AudioTracks[index].Mask = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkCamera))
 	{
-		__int16 index = LEB128::ReadInt16(m_stream);
-		__int16 value = LEB128::ReadInt16(m_stream);
+		short index = LEB128::ReadInt16(m_stream);
+		short value = LEB128::ReadInt16(m_stream);
 		Camera.fixed[index].flags = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkSequenceSwitch))
 	{
-		__int16 index = LEB128::ReadInt16(m_stream);
-		__int16 value = LEB128::ReadInt16(m_stream);
+		short index = LEB128::ReadInt16(m_stream);
+		short value = LEB128::ReadInt16(m_stream);
 		SequenceUsed[index] = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkFlybyFlags))
 	{
-		__int32 index = LEB128::ReadInt16(m_stream);
-		__int32 value = LEB128::ReadInt16(m_stream);
+		int index = LEB128::ReadInt16(m_stream);
+		int value = LEB128::ReadInt16(m_stream);
 		SpotCam[index].flags = value;
 		return true;
 	}
 	return false;
 }
 
-void SaveGame::saveCamera(__int32 arg1, __int32 arg2)
+void SaveGame::saveCamera(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
 }
 
-void SaveGame::saveSequenceSwitch(__int32 arg1, __int32 arg2)
+void SaveGame::saveSequenceSwitch(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
 }
 
-void SaveGame::saveFlybyFlags(__int32 arg1, __int32 arg2)
+void SaveGame::saveFlybyFlags(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
 }
 
-void SaveGame::saveFlipMap(__int32 arg1, __int32 arg2)
+void SaveGame::saveFlipMap(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
 }
 
-void SaveGame::saveFlipStats(__int32 arg1, __int32 arg2)
+void SaveGame::saveFlipStats(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
 }
 
-void SaveGame::saveCdFlags(__int32 arg1, __int32 arg2)
+void SaveGame::saveCdFlags(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
 }
 
-bool SaveGame::readItemChunks(ChunkId* chunkId, __int32 maxSize, __int32 itemNumber)
+bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -771,7 +771,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, __int32 maxSize, __int32 itemNum
 		item->pos.yRot = LEB128::ReadInt16(m_stream);
 		item->pos.zRot = LEB128::ReadInt16(m_stream);
 
-		__int16 roomNumber = LEB128::ReadInt16(m_stream);
+		short roomNumber = LEB128::ReadInt16(m_stream);
 		if (item->roomNumber != roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
@@ -866,7 +866,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, __int32 maxSize, __int32 itemNum
 	return false;
 }
 
-void SaveGame::saveStatistics(__int32 arg1, __int32 arg2)
+void SaveGame::saveStatistics(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, Savegame.Game.AmmoHits);
 	LEB128::Write(m_stream, Savegame.Game.AmmoUsed);
@@ -906,7 +906,7 @@ bool SaveGame::readStatistics()
 	return true;
 }
 
-void SaveGame::saveItemFlags(__int32 arg1, __int32 arg2)
+void SaveGame::saveItemFlags(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -930,7 +930,7 @@ void SaveGame::saveItemFlags(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, item->itemFlags[3]);
 }
 
-void SaveGame::saveItemIntelligentData(__int32 arg1, __int32 arg2)
+void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -953,7 +953,7 @@ void SaveGame::saveItemIntelligentData(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, creature->jumpAhead);
 	LEB128::Write(m_stream, creature->monkeyAhead);
 	LEB128::Write(m_stream, creature->mood);
-	LEB128::Write(m_stream, (__int32)enemy);
+	LEB128::Write(m_stream, (int)enemy);
 
 	LEB128::Write(m_stream, creature->aiTarget.objectNumber);
 	LEB128::Write(m_stream, creature->aiTarget.roomNumber);
@@ -973,14 +973,14 @@ void SaveGame::saveItemIntelligentData(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, creature->LOT.isMonkeying);
 }
 
-void SaveGame::saveItemHitPoints(__int32 arg1, __int32 arg2)
+void SaveGame::saveItemHitPoints(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
 
 	LEB128::Write(m_stream, item->hitPoints);
 }
 
-void SaveGame::saveItemPosition(__int32 arg1, __int32 arg2)
+void SaveGame::saveItemPosition(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
 
@@ -993,13 +993,13 @@ void SaveGame::saveItemPosition(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, item->roomNumber);
 }
 
-void SaveGame::saveItemMesh(__int32 arg1, __int32 arg2)
+void SaveGame::saveItemMesh(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
 
 }
 
-void SaveGame::saveItemAnims(__int32 arg1, __int32 arg2)
+void SaveGame::saveItemAnims(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
 
@@ -1010,7 +1010,7 @@ void SaveGame::saveItemAnims(__int32 arg1, __int32 arg2)
 	LEB128::Write(m_stream, item->frameNumber);
 }
 
-void SaveGame::saveBurningTorch(__int32 itemNumber, __int32 arg2)
+void SaveGame::saveBurningTorch(int itemNumber, int arg2)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1028,7 +1028,7 @@ void SaveGame::saveBurningTorch(__int32 itemNumber, __int32 arg2)
 	LEB128::Write(m_stream, item->itemFlags[2]);
 }
 
-void SaveGame::saveChaff(__int32 itemNumber, __int32 arg2)
+void SaveGame::saveChaff(int itemNumber, int arg2)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1047,7 +1047,7 @@ void SaveGame::saveChaff(__int32 itemNumber, __int32 arg2)
 	LEB128::Write(m_stream, item->itemFlags[1]);
 }
 
-void SaveGame::saveTorpedo(__int32 itemNumber, __int32 arg2)
+void SaveGame::saveTorpedo(int itemNumber, int arg2)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1069,7 +1069,7 @@ void SaveGame::saveTorpedo(__int32 itemNumber, __int32 arg2)
 	LEB128::Write(m_stream, item->requiredAnimState);
 }
 
-void SaveGame::saveCrossbowBolt(__int32 itemNumber, __int32 arg2)
+void SaveGame::saveCrossbowBolt(int itemNumber, int arg2)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1085,7 +1085,7 @@ void SaveGame::saveCrossbowBolt(__int32 itemNumber, __int32 arg2)
 	LEB128::Write(m_stream, item->fallspeed);
 }
 
-void SaveGame::saveFlare(__int32 itemNumber, __int32 arg2)
+void SaveGame::saveFlare(int itemNumber, int arg2)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1101,14 +1101,14 @@ void SaveGame::saveFlare(__int32 itemNumber, __int32 arg2)
 	LEB128::Write(m_stream, item->fallspeed);
 
 	// Flare age
-	LEB128::Write(m_stream, (__int32)item->data);
+	LEB128::Write(m_stream, (int)item->data);
 }
 
 bool SaveGame::readBurningTorch()
 {
 	LEB128::ReadInt16(m_stream);
 	
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	ITEM_INFO* item = &Items[itemNumber];
 
 	item->objectNumber = ID_BURNING_TORCH_ITEM;
@@ -1120,9 +1120,9 @@ bool SaveGame::readBurningTorch()
 	item->pos.zRot = LEB128::ReadInt16(m_stream);
 	item->roomNumber = LEB128::ReadInt16(m_stream);
 
-	__int16 oldXrot = item->pos.xRot;
-	__int16 oldYrot = item->pos.yRot;
-	__int16 oldZrot = item->pos.zRot;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
 	InitialiseItem(itemNumber);
 
@@ -1144,7 +1144,7 @@ bool SaveGame::readChaff()
 {
 	LEB128::ReadInt16(m_stream);
 
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	ITEM_INFO* item = &Items[itemNumber];
 
 	item->objectNumber = ID_CHAFF;
@@ -1156,9 +1156,9 @@ bool SaveGame::readChaff()
 	item->pos.zRot = LEB128::ReadInt16(m_stream);
 	item->roomNumber = LEB128::ReadInt16(m_stream);
 
-	__int16 oldXrot = item->pos.xRot;
-	__int16 oldYrot = item->pos.yRot;
-	__int16 oldZrot = item->pos.zRot;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
 	InitialiseItem(itemNumber);
 
@@ -1181,7 +1181,7 @@ bool SaveGame::readCrossbowBolt()
 {
 	LEB128::ReadInt16(m_stream);
 
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	ITEM_INFO* item = &Items[itemNumber];
 
 	item->objectNumber = ID_CROSSBOW_BOLT;
@@ -1193,9 +1193,9 @@ bool SaveGame::readCrossbowBolt()
 	item->pos.zRot = LEB128::ReadInt16(m_stream);
 	item->roomNumber = LEB128::ReadInt16(m_stream);
 
-	__int16 oldXrot = item->pos.xRot;
-	__int16 oldYrot = item->pos.yRot;
-	__int16 oldZrot = item->pos.zRot;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
 	InitialiseItem(itemNumber);
 
@@ -1215,7 +1215,7 @@ bool SaveGame::readFlare()
 {
 	LEB128::ReadInt16(m_stream);
 
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	ITEM_INFO* item = &Items[itemNumber];
 
 	item->objectNumber = ID_FLARE_ITEM;
@@ -1227,9 +1227,9 @@ bool SaveGame::readFlare()
 	item->pos.zRot = LEB128::ReadInt16(m_stream);
 	item->roomNumber = LEB128::ReadInt16(m_stream);
 
-	__int16 oldXrot = item->pos.xRot;
-	__int16 oldYrot = item->pos.yRot;
-	__int16 oldZrot = item->pos.zRot;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
 	InitialiseItem(itemNumber);
 
@@ -1252,7 +1252,7 @@ bool SaveGame::readTorpedo()
 {
 	LEB128::ReadInt16(m_stream);
 
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	ITEM_INFO* item = &Items[itemNumber];
 
 	item->objectNumber = ID_TORPEDO;
@@ -1264,9 +1264,9 @@ bool SaveGame::readTorpedo()
 	item->pos.zRot = LEB128::ReadInt16(m_stream);
 	item->roomNumber = LEB128::ReadInt16(m_stream);
 
-	__int16 oldXrot = item->pos.xRot;
-	__int16 oldYrot = item->pos.yRot;
-	__int16 oldZrot = item->pos.zRot;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
 	InitialiseItem(itemNumber);
 
@@ -1288,12 +1288,12 @@ bool SaveGame::readTorpedo()
 	return true;
 }
 
-void SaveGame::saveItemQuadInfo(__int32 itemNumber, __int32 arg2)
+void SaveGame::saveItemQuadInfo(int itemNumber, int arg2)
 {
 	m_stream->WriteBytes(reinterpret_cast<byte*>(Items[itemNumber].data), sizeof(QUAD_INFO));
 }
 
-void SaveGame::saveRats(__int32 arg1, __int32 arg2)
+void SaveGame::saveRats(int arg1, int arg2)
 {
 	RAT_STRUCT buffer;
 	memcpy(&buffer, &Rats[arg1], sizeof(RAT_STRUCT));
@@ -1301,7 +1301,7 @@ void SaveGame::saveRats(__int32 arg1, __int32 arg2)
 	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(RAT_STRUCT));
 }
 
-void SaveGame::saveBats(__int32 arg1, __int32 arg2)
+void SaveGame::saveBats(int arg1, int arg2)
 {
 	BAT_STRUCT buffer;
 	memcpy(&buffer, &Bats[arg1], sizeof(BAT_STRUCT));
@@ -1309,7 +1309,7 @@ void SaveGame::saveBats(__int32 arg1, __int32 arg2)
 	m_stream->Write(reinterpret_cast<char*>(&buffer), sizeof(BAT_STRUCT));
 }
 
-void SaveGame::saveSpiders(__int32 arg1, __int32 arg2)
+void SaveGame::saveSpiders(int arg1, int arg2)
 {
 	SPIDER_STRUCT buffer;
 	memcpy(&buffer, &Spiders[arg1], sizeof(SPIDER_STRUCT));
@@ -1319,7 +1319,7 @@ void SaveGame::saveSpiders(__int32 arg1, __int32 arg2)
 
 bool SaveGame::readBats()
 {
-	__int32 index = LEB128::ReadInt16(m_stream);
+	int index = LEB128::ReadInt16(m_stream);
 
 	BAT_STRUCT* bats = &Bats[index];
 
@@ -1334,7 +1334,7 @@ bool SaveGame::readBats()
 
 bool SaveGame::readRats()
 {
-	__int32 index = LEB128::ReadInt16(m_stream);
+	int index = LEB128::ReadInt16(m_stream);
 
 	RAT_STRUCT* rats = &Rats[index];
 
@@ -1349,7 +1349,7 @@ bool SaveGame::readRats()
 
 bool SaveGame::readSpiders()
 {
-	__int32 index = LEB128::ReadInt16(m_stream);
+	int index = LEB128::ReadInt16(m_stream);
 
 	SPIDER_STRUCT* spiders = &Spiders[index];
 

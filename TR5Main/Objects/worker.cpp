@@ -19,7 +19,7 @@ static void ShotLara_WithShotgun(ITEM_INFO* item, AI_INFO* info, BITE_INFO* bite
 	ShotLara(item, info, bite, angle_y, damage);
 }
 
-void __cdecl InitialiseWorkerShotgun(__int16 itemNum)
+void __cdecl InitialiseWorkerShotgun(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -33,7 +33,7 @@ void __cdecl InitialiseWorkerShotgun(__int16 itemNum)
 	item->currentAnimState = anim->currentAnimState;
 }
 
-void __cdecl WorkerShotgunControl(__int16 itemNum)
+void __cdecl WorkerShotgunControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -235,7 +235,7 @@ void __cdecl WorkerShotgunControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl InitialiseWorkerMachineGun(__int16 itemNum)
+void __cdecl InitialiseWorkerMachineGun(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -249,7 +249,7 @@ void __cdecl InitialiseWorkerMachineGun(__int16 itemNum)
 	item->currentAnimState = anim->currentAnimState;
 }
 
-void __cdecl WorkerMachineGunControl(__int16 itemNum)
+void __cdecl WorkerMachineGunControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -485,7 +485,7 @@ void __cdecl WorkerMachineGunControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl WorkerDualGunControl(__int16 itemNum)
+void __cdecl WorkerDualGunControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -777,7 +777,7 @@ void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD room_number)
 */
 
 // TODO: add flame effect when shooting
-void __cdecl WorkerFlamethrower(__int16 itemNum)
+void __cdecl WorkerFlamethrower(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -983,7 +983,7 @@ void __cdecl WorkerFlamethrower(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl InitialiseWorkerFlamethrower(__int16 itemNum)
+void __cdecl InitialiseWorkerFlamethrower(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;

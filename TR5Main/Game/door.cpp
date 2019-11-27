@@ -16,22 +16,22 @@ PHD_VECTOR KickDoorPos = { 0, 0, -917 };
 PHD_VECTOR UnderwaterDoorPos = { -251, -540, -46 };
 PHD_VECTOR CrowbarDoorPos = { -412, 0, 256 };
 
-static __int16 PushPullKickDoorBounds[12] =
+static short PushPullKickDoorBounds[12] =
 {
 	0xFE80, 0x0180, 0x0000, 0x0000, 0xFC00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
 
-static __int16 UnderwaterDoorBounds[12] =
+static short UnderwaterDoorBounds[12] =
 {
 	0xFF00, 0x0100, 0xFC00, 0x0000, 0xFC00, 0x0000, 0xC720, 0x38E0, 0xC720, 0x38E0, 0xC720, 0x38E0
 };
 
-static __int16 CrowbarDoorBounds[12] =
+static short CrowbarDoorBounds[12] =
 {
 	0xFE00, 0x0200, 0xFC00, 0x0000, 0x0000, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0, 0xC720, 0x38E0
 };
 
-__int32 ClosedDoors[32];
+int ClosedDoors[32];
 byte LiftDoor;
 
 extern byte SequenceUsed[6];
@@ -41,7 +41,7 @@ extern byte CurrentSequence;
 extern PHD_VECTOR OldPickupPos;
 extern Inventory* g_Inventory;
 
-void __cdecl SequenceDoorControl(__int16 itemNumber) 
+void __cdecl SequenceDoorControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
@@ -92,7 +92,7 @@ void __cdecl SequenceDoorControl(__int16 itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl UnderwaterDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -103,7 +103,7 @@ void __cdecl UnderwaterDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c
 		&& !Lara.gunStatus
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
-		l->pos.yRot ^= (__int16)ANGLE(180);
+		l->pos.yRot ^= (short)ANGLE(180);
 		
 		if (TestLaraPosition(UnderwaterDoorBounds, item, l))
 		{
@@ -129,7 +129,7 @@ void __cdecl UnderwaterDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c
 			{
 				Lara.generalPtr = (void*)itemNum;
 			}
-			l->pos.yRot ^= (__int16)ANGLE(180);
+			l->pos.yRot ^= (short)ANGLE(180);
 		}
 		else
 		{
@@ -138,7 +138,7 @@ void __cdecl UnderwaterDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
 			}
-			l->pos.yRot ^= (__int16)ANGLE(180);
+			l->pos.yRot ^= (short)ANGLE(180);
 		}
 	}
 	else if (item->status == ITEM_ACTIVE)
@@ -147,7 +147,7 @@ void __cdecl UnderwaterDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c
 	}
 }
 
-void __cdecl DoubleDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -159,7 +159,7 @@ void __cdecl DoubleDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& !Lara.gunStatus
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
-		item->pos.yRot ^= (__int16)ANGLE(180);
+		item->pos.yRot ^= (short)ANGLE(180);
 		if (TestLaraPosition(PushPullKickDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&DoubleDoorPos, item, l))
@@ -183,7 +183,7 @@ void __cdecl DoubleDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				Lara.generalPtr = (void*)itemNum;
 			}
-			item->pos.yRot ^= (__int16)ANGLE(180);
+			item->pos.yRot ^= (short)ANGLE(180);
 		}
 		else
 		{
@@ -192,12 +192,12 @@ void __cdecl DoubleDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
 			}
-			item->pos.yRot ^= (__int16)ANGLE(180);
+			item->pos.yRot ^= (short)ANGLE(180);
 		}
 	}
 }
 
-void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (TrInput & IN_ACTION
@@ -211,7 +211,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 		bool applyRot = false;
 		if (l->roomNumber == item->roomNumber)
 		{
-			item->pos.yRot ^= (__int16)ANGLE(180);
+			item->pos.yRot ^= (short)ANGLE(180);
 			applyRot = true;
 		}
 		if (!TestLaraPosition(PushPullKickDoorBounds, item, l))
@@ -222,7 +222,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 				Lara.gunStatus = LG_NO_ARMS;
 			}
 			if (applyRot)
-				item->pos.yRot ^= (__int16)ANGLE(180);
+				item->pos.yRot ^= (short)ANGLE(180);
 			return;
 		}
 		if (applyRot)
@@ -230,7 +230,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 			if (!MoveLaraPosition(&PullDoorPos, item, l))
 			{
 				Lara.generalPtr = (void*)itemNum;
-				item->pos.yRot ^= (__int16)ANGLE(180);
+				item->pos.yRot ^= (short)ANGLE(180);
 				return;
 			}
 
@@ -247,7 +247,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 			Lara.gunStatus = LG_HANDS_BUSY;
 
 			if (applyRot)
-				item->pos.yRot ^= (__int16)ANGLE(180);
+				item->pos.yRot ^= (short)ANGLE(180);
 			return;
 		}
 
@@ -268,7 +268,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 				if (applyRot)
-					item->pos.yRot ^= (__int16)ANGLE(180);
+					item->pos.yRot ^= (short)ANGLE(180);
 				return;
 			}
 		}
@@ -287,7 +287,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 			Lara.gunStatus = LG_HANDS_BUSY;
 
 			if (applyRot)
-				item->pos.yRot ^= (__int16)ANGLE(180);
+				item->pos.yRot ^= (short)ANGLE(180);
 			return;
 		}
 
@@ -299,7 +299,7 @@ void __cdecl PushPullKickDoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 		DoorCollision(itemNum, l, coll);
 }
 
-void __cdecl PushPullKickDoorControl(__int16 itemNumber)
+void __cdecl PushPullKickDoorControl(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
@@ -316,7 +316,7 @@ void __cdecl PushPullKickDoorControl(__int16 itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -329,7 +329,7 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			&& Lara.gunStatus == LG_NO_ARMS
 			|| Lara.isMoving && Lara.generalPtr == (void*)itemNum))
 	{
-		item->pos.yRot ^= (__int16)ANGLE(180);
+		item->pos.yRot ^= (short)ANGLE(180);
 		if (TestLaraPosition(CrowbarDoorBounds, item, l))
 		{
 			if (!Lara.isMoving)
@@ -339,7 +339,7 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					if (g_Inventory->IsObjectPresentInInventory(ID_CROWBAR_ITEM))
 					{
 						g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
-						item->pos.yRot ^= (__int16)ANGLE(180);
+						item->pos.yRot ^= (short)ANGLE(180);
 					}
 					else
 					{
@@ -350,13 +350,13 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 							OldPickupPos.z = l->pos.zPos;
 							SayNo();
 						}
-						item->pos.yRot ^= (__int16)ANGLE(180);
+						item->pos.yRot ^= (short)ANGLE(180);
 					}
 					return;
 				}
 				if (g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM)
 				{
-					item->pos.yRot ^= (__int16)ANGLE(180);
+					item->pos.yRot ^= (short)ANGLE(180);
 					return;
 				}
 			}
@@ -367,7 +367,7 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->animNumber = ANIMATION_LARA_DOOR_OPEN_CROWBAR;
 				l->currentAnimState = STATE_LARA_MISC_CONTROL;
 				l->frameNumber = Anims[l->animNumber].frameBase;
-				item->pos.yRot ^= (__int16)ANGLE(180);
+				item->pos.yRot ^= (short)ANGLE(180);
 
 				AddActiveItem(itemNum);
 
@@ -388,7 +388,7 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 
-		item->pos.yRot ^= (__int16)ANGLE(180);
+		item->pos.yRot ^= (short)ANGLE(180);
 	}
 
 	if (TestBoundsCollide(item, l, coll->radius))
@@ -406,7 +406,7 @@ void __cdecl DoorCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl DoorControl(__int16 itemNumber) 
+void __cdecl DoorControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
@@ -415,10 +415,10 @@ void __cdecl DoorControl(__int16 itemNumber)
 	{
 		if (item->itemFlags[0])
 		{
-			__int16* bounds = GetBoundsAccurate(item);
+			short* bounds = GetBoundsAccurate(item);
 			--item->itemFlags[0];
 			item->pos.yPos -= 12;
-			__int32 y = bounds[2] + item->itemFlags[2] - 256;
+			int y = bounds[2] + item->itemFlags[2] - 256;
 			if (item->pos.yPos < y)
 			{
 				item->pos.yPos = y;
@@ -565,13 +565,13 @@ void __cdecl OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
 		memcpy(doorPos->floor, &doorPos->data, sizeof(FLOOR_INFO));
 		
-		__int16 boxIndex = doorPos->block;
+		short boxIndex = doorPos->block;
 		if (boxIndex != NO_BOX)
 		{
 			if (!DontUnlockBox)
 				Boxes[boxIndex].overlapIndex &= ~BLOCKED;
 
-			for (__int32 i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < NUM_SLOTS; i++)
 			{
 				BaddieSlots[i].LOT.targetBox = NO_BOX;
 			}
@@ -580,7 +580,7 @@ void __cdecl OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 
 	if (dd->dptr1)
 	{
-		__int16 n = dd->dn1 < 0 ? -1 : 1;
+		short n = dd->dn1 < 0 ? -1 : 1;
 		if (dd->dn1 & 1)
 		{
 			dd->dptr1[0] = n;
@@ -657,11 +657,11 @@ void __cdecl ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 		floor->skyRoom = NO_ROOM;
 		floor->pitRoom = NO_ROOM;
 
-		__int16 boxIndex = doorPos->block;
+		short boxIndex = doorPos->block;
 		if (boxIndex != NO_BOX)
 		{
 			Boxes[boxIndex].overlapIndex |= BLOCKED;
-			for (__int32 i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < NUM_SLOTS; i++)
 			{
 				BaddieSlots[i].LOT.targetBox = NO_BOX;
 			}

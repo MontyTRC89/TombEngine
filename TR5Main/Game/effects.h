@@ -2,7 +2,7 @@
 
 #include "..\Global\global.h"
 
-#define DoBloodSplat ((__int16 (__cdecl*)(__int32, __int32, __int32, __int16, __int16, __int16)) 0x00432760)
-#define DoLotsOfBlood ((void (__cdecl*)(__int32, __int32, __int32, __int16, __int16, __int16, __int32)) 0x00432800)
-#define CreateBubble ((__int16 (__cdecl*)(PHD_3DPOS*, __int16, __int32)) 0x0043C6C0); // 0x00483350)
+#define DoBloodSplat ((short (__cdecl*)(int, int, int, short, short, short)) 0x00432760)
+#define DoLotsOfBlood ((void (__cdecl*)(int, int, int, short, short, short, int)) 0x00432800)
+#define CreateBubble ((short (__cdecl*)(PHD_3DPOS*, short, int)) 0x0043C6C0); // 0x00483350)
 

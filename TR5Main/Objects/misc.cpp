@@ -9,18 +9,18 @@
 #include "../Game/collide.h"
 #include "../Game/pickup.h"
 
-__int16 SarcophagusBounds[12] = {
+short SarcophagusBounds[12] = {
 	0xFE00, 0x0200, 0xFF9C, 0x0064, 0xFE00, 0x0000,
 	0xF8E4, 0x071C, 0xEAAC, 0x1554, 0x0000, 0x0000
 };
 PHD_VECTOR SarcophagusPosition = { 0x00000000, 0x00000000, 0xFFFFFED4 };
 
-void __cdecl InitialiseSarcophagus(__int16 itemNum)
+void __cdecl InitialiseSarcophagus(short itemNum)
 {
 
 }
 
-void __cdecl SarcophagusCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -29,7 +29,7 @@ void __cdecl SarcophagusCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll
 		l->currentAnimState == 2 &&
 		l->animNumber == 103 &&
 		!Lara.gunStatus ||
-		Lara.isMoving && (__int16)Lara.generalPtr == itemNum)
+		Lara.isMoving && (short)Lara.generalPtr == itemNum)
 	{
 		if (TestLaraPosition(SarcophagusBounds, item, l))
 		{
@@ -57,7 +57,7 @@ void __cdecl SarcophagusCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll
 		}
 		else if (Lara.isMoving)
 		{
-			if ((__int16)Lara.generalPtr == itemNum)
+			if ((short)Lara.generalPtr == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -70,7 +70,7 @@ void __cdecl SarcophagusCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll
 	}
 	else
 	{
-		__int16 linknum;
+		short linknum;
 		for (linknum = Items[Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
 		{
 			ITEM_INFO* currentItem = &Items[linknum];
@@ -88,12 +88,12 @@ void __cdecl SarcophagusCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll
 	}
 }
 
-void __cdecl InitialiseLaraDouble(__int16 itemNum)
+void __cdecl InitialiseLaraDouble(short itemNum)
 {
 	ClearItem(itemNum);
 }
 
-void __cdecl LaraDoubleControl(__int16 itemNum)
+void __cdecl LaraDoubleControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

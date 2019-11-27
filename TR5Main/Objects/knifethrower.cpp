@@ -8,11 +8,11 @@
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };
 
-void __cdecl KnifeControl(__int16 fxNum)
+void __cdecl KnifeControl(short fxNum)
 {
 	FX_INFO* fx;
 	int speed;
-	__int16 roomNumber;
+	short roomNumber;
 	FLOOR_INFO* floor;
 
 	fx = &Effects[fxNum];
@@ -70,7 +70,7 @@ void __cdecl KnifeControl(__int16 fxNum)
 	}
 }
 
-__int16 __cdecl ThrowKnife(int x, int y, int z, __int16 speed, __int16 yrot, __int16 room_number)
+short __cdecl ThrowKnife(int x, int y, int z, short speed, short yrot, short room_number)
 {
 	short fx_number = 0;
 	/*

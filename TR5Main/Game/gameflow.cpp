@@ -15,17 +15,17 @@ vector<string> g_NewStrings;
 
 extern GameFlow* g_GameFlow;
 
-__int32 __cdecl LoadSavegameInfos()
+int __cdecl LoadSavegameInfos()
 {
 	char fileName[255];
 
-	for (__int32 i = 0; i < MAX_SAVEGAMES; i++)
+	for (int i = 0; i < MAX_SAVEGAMES; i++)
 	{
 		g_NewSavegameInfos[i].Present = false;
 	}
 
 	// try to load the savegame
-	for (__int32 i = 0; i < MAX_SAVEGAMES; i++)
+	for (int i = 0; i < MAX_SAVEGAMES; i++)
 	{
 		ZeroMemory(fileName, 255);
 		sprintf(fileName, "savegame.%d", i);

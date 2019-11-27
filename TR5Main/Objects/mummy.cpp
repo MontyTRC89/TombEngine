@@ -12,7 +12,7 @@
 BITE_INFO mummyBite1 = { 0, 0, 0, 11 };
 BITE_INFO mummyBite2 = { 0, 0, 0, 14 };
 
-void __cdecl InitialiseMummy(__int16 itemNum)
+void __cdecl InitialiseMummy(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -35,7 +35,7 @@ void __cdecl InitialiseMummy(__int16 itemNum)
 	}
 }
 
-void __cdecl MummyControl(__int16 itemNum)
+void __cdecl MummyControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -43,11 +43,11 @@ void __cdecl MummyControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	__int16 tilt = 0;
-	__int16 angle = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
+	short tilt = 0;
+	short angle = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
 
 	if (item->aiBits)
 		GetAITarget(creature);

@@ -6,7 +6,7 @@
 using namespace std;
 
 // Legacy stuff
-#define ObjectInInventory ((__int32 (__cdecl*)(__int16)) 0x00464360)
+#define ObjectInInventory ((int (__cdecl*)(short)) 0x00464360)
 
 void Inject_Inventory();
 
@@ -235,42 +235,42 @@ void Inject_Inventory();
 #define INV_NUM_COMBINATIONS				22
 
 struct InventoryObject {
-	__int32 inventoryObject;
-	__int32 rotation;
+	int inventoryObject;
+	int rotation;
 	float scale;
 };
 
 struct InventoryRing {
 	InventoryObject objects[NUM_INVENTORY_OBJECTS_PER_RING];
-	__int32 numObjects;
-	__int32 currentObject;
-	__int32 rotation;
-	__int32 distance;
-	__int32 focusState;
-	__int32 frameIndex;
+	int numObjects;
+	int currentObject;
+	int rotation;
+	int distance;
+	int focusState;
+	int frameIndex;
 	bool draw;
-	__int32 y;
-	__int32 titleStringIndex;
+	int y;
+	int titleStringIndex;
 
 	// Special fields for settings and passport
-	__int32 selectedIndex;
-	__int32 passportAction;
-	__int32 SelectedVideoMode;
+	int selectedIndex;
+	int passportAction;
+	int SelectedVideoMode;
 	GameConfiguration Configuration;
 	bool waitingForKey;
 
 	// Special fields for objects
-	__int32 actions[3];
-	__int32 numActions = 3;
+	int actions[3];
+	int numActions = 3;
 };
 
 struct InventoryObjectDefinition {
-	__int16 objectNumber;
-	__int16 objectName;
-	__int32 meshBits;
-	__int32 rotY;
+	short objectNumber;
+	short objectName;
+	int meshBits;
+	int rotY;
 
-	InventoryObjectDefinition(__int16 objNum, __int16 objName, __int32 bits, __int16 rot)
+	InventoryObjectDefinition(short objNum, short objName, int bits, short rot)
 	{
 		objectNumber = objNum;
 		objectName = objName;
@@ -285,50 +285,50 @@ struct InventoryObjectDefinition {
 };
 
 struct InventoryObjectCombination {
-	__int16 piece1;
-	__int16 piece2;
-	__int16 combinedObject;
-	void(*combineRoutine)(__int32 action);
+	short piece1;
+	short piece2;
+	short combinedObject;
+	void(*combineRoutine)(int action);
 };
 
-void CombinePuzzle1(__int32 action);
-void CombinePuzzle2(__int32 action);
-void CombinePuzzle3(__int32 action);
-void CombinePuzzle4(__int32 action);
-void CombinePuzzle5(__int32 action);
-void CombinePuzzle6(__int32 action);
-void CombinePuzzle7(__int32 action);
-void CombinePuzzle8(__int32 action);
-void CombineKey1(__int32 action);
-void CombineKey2(__int32 action);
-void CombineKey3(__int32 action);
-void CombineKey4(__int32 action);
-void CombineKey5(__int32 action);
-void CombineKey6(__int32 action);
-void CombineKey7(__int32 action);
-void CombineKey8(__int32 action);
-void CombinePickup1(__int32 action);
-void CombinePickup2(__int32 action);
-void CombinePickup3(__int32 action);
-void CombinePickup4(__int32 action);
-void CombineRevolverLasersight(__int32 action);
-void CombineCrossbowLasersight(__int32 action);
+void CombinePuzzle1(int action);
+void CombinePuzzle2(int action);
+void CombinePuzzle3(int action);
+void CombinePuzzle4(int action);
+void CombinePuzzle5(int action);
+void CombinePuzzle6(int action);
+void CombinePuzzle7(int action);
+void CombinePuzzle8(int action);
+void CombineKey1(int action);
+void CombineKey2(int action);
+void CombineKey3(int action);
+void CombineKey4(int action);
+void CombineKey5(int action);
+void CombineKey6(int action);
+void CombineKey7(int action);
+void CombineKey8(int action);
+void CombinePickup1(int action);
+void CombinePickup2(int action);
+void CombinePickup3(int action);
+void CombinePickup4(int action);
+void CombineRevolverLasersight(int action);
+void CombineCrossbowLasersight(int action);
 
 class Inventory
 {
 private:
 	InventoryRing						m_rings[NUM_INVENTORY_RINGS];
-	__int32								m_activeRing;
-	__int32								m_movement;
+	int								m_activeRing;
+	int								m_movement;
 	float								m_deltaMovement;
 	InventoryObjectDefinition			m_objectsTable[INVENTORY_TABLE_SIZE];
-	__int32								m_type;
+	int								m_type;
 	vector<InventoryObjectCombination>	m_combinations;
-	__int32								m_activeGui;
+	int								m_activeGui;
 	float								m_cameraY;
 	float								m_cameraTilt;
-	__int16								m_enterObject;
-	__int16								m_selectedObject;
+	short								m_enterObject;
+	short								m_selectedObject;
 
 public:
 	Inventory();
@@ -336,55 +336,55 @@ public:
 
 	void						Initialise();
 	void						InitialiseTitle();
-	InventoryRing*				GetRing(__int32 index);
-	__int32						GetActiveRing();
-	void						SetActiveRing(__int32 index);
-	__int32						DoInventory();
-	__int32						DoTitleInventory();
-	void						InsertObject(__int32 ring, __int32 objectNumber);
+	InventoryRing*				GetRing(int index);
+	int						GetActiveRing();
+	void						SetActiveRing(int index);
+	int						DoInventory();
+	int						DoTitleInventory();
+	void						InsertObject(int ring, int objectNumber);
 	float						GetVerticalOffset();
 	void						UseCurrentItem();
-	InventoryObjectDefinition*	GetInventoryObject(__int32 index);
-	__int32						DoPassport();
+	InventoryObjectDefinition*	GetInventoryObject(int index);
+	int						DoPassport();
 	void						DoControlsSettings();
 	void						DoGraphicsSettings();
 	void						DoSoundSettings();
-	__int32						PopupObject();
-	__int32						PopoverObject();
-	__int32						GetType();
+	int						PopupObject();
+	int						PopoverObject();
+	int						GetType();
 	bool						DoCombine();
 	bool						DoSepare();
 	void						DoSelectAmmo();
-	__int32						DoPuzzle();
-	__int32						DoWeapon();
-	__int32						DoGenericObject();
+	int						DoPuzzle();
+	int						DoWeapon();
+	int						DoGenericObject();
 	void						DoStatistics();
 	void						DoExamine();
 	bool						IsCurrentObjectWeapon();
 	bool						IsCurrentObjectPuzzle();
 	bool						IsCurrentObjectGeneric();
 	bool						IsCurrentObjectExamine();
-	bool						IsInventoryObjectPresentInInventory(__int16 object);
-	bool						IsObjectPresentInInventory(__int16 object);
-	__int32						FindObjectRing(__int16 object);
-	__int32						FindObjectIndex(__int16 object);
-	bool						IsObjectCombinable(__int16 object);
-	bool						IsObjectSeparable(__int16 object);
-	void						AddCombination(__int16 piece1, __int16 piece2, __int16 combinedObject, void (*f) (__int32));
-	__int32						GetActiveGui();
+	bool						IsInventoryObjectPresentInInventory(short object);
+	bool						IsObjectPresentInInventory(short object);
+	int						FindObjectRing(short object);
+	int						FindObjectIndex(short object);
+	bool						IsObjectCombinable(short object);
+	bool						IsObjectSeparable(short object);
+	void						AddCombination(short piece1, short piece2, short combinedObject, void (*f) (int));
+	int						GetActiveGui();
 	void						LoadObjects(bool isReload);
-	void						SelectObject(__int32 ring, __int32 object, float scale);
-	void						OpenRing(__int32 r, bool animateCamera);
-	void						CloseRing(__int32 r, bool animateCamera);
-	void						SwitchRing(__int32 from, __int32 to, float verticalShift);
+	void						SelectObject(int ring, int object, float scale);
+	void						OpenRing(int r, bool animateCamera);
+	void						CloseRing(int r, bool animateCamera);
+	void						SwitchRing(int from, int to, float verticalShift);
 	float						GetCameraY();
 	float						GetCameraTilt();
-	bool						HasWeaponMultipleAmmos(__int16 object);
+	bool						HasWeaponMultipleAmmos(short object);
 	bool						UpdateSceneAndDrawInventory();
-	__int16						GetEnterObject();
-	__int16						GetSelectedObject();
-	void						SetEnterObject(__int16 objNum);
-	void						SetSelectedObject(__int16 objNum);
+	short						GetEnterObject();
+	short						GetSelectedObject();
+	void						SetEnterObject(short objNum);
+	void						SetSelectedObject(short objNum);
 };
 
 extern Inventory* g_Inventory;

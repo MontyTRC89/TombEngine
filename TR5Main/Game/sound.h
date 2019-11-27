@@ -586,6 +586,7 @@ typedef enum sound_effects
 	SFX_MONK_HIT_TARGET_ID245,
 	SFX_SWORD_GUARDIAN_FLYING_ID312,
 	SFX_SWORD_HITTARGET_ID318,
+	SFX_UPV_HARPOON_SHOT_ID23,
 	NUM_SFX
 };
 
@@ -688,9 +689,9 @@ extern vector<AudioTrack> g_AudioTracks;
 
 #define SayNo ((void (__cdecl*)()) 0x004790E0)
 
-long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flags);
-void __cdecl StopSoundEffect(__int16 effectID);
-bool __cdecl Sound_LoadSample(char *buffer, __int32 compSize, __int32 uncompSize, __int32 currentIndex);
+long __cdecl SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
+void __cdecl StopSoundEffect(short effectID);
+bool __cdecl Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void __cdecl Sound_FreeSamples();
 void __cdecl SOUND_Stop();
 void __cdecl S_CDPlay(short index, unsigned int mode);
@@ -703,7 +704,7 @@ void  Sound_Init();
 void  Sound_DeInit();
 bool  Sound_CheckBASSError(char* message, bool verbose, ...);
 void  Sound_UpdateScene();
-void  Sound_FreeSample(__int32 index);
+void  Sound_FreeSample(int index);
 int   Sound_GetFreeSlot();
 void  Sound_FreeSlot(int index, unsigned int fadeout = 0);
 int   Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position);

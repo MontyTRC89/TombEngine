@@ -17,86 +17,86 @@ byte CurrentSequence;
 extern PHD_VECTOR OldPickupPos;
 extern Inventory* g_Inventory;
 
-__int16 Switch2Bounds[12] =  
+short Switch2Bounds[12] =  
 {
 	0xFC00, 0x0400, 0xFC00, 0x0400, 0xFC00, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0,
 	0xC720, 0x38E0
 };
 PHD_VECTOR Switch2Position = { 0, 0, 108 };  
-__int16 TurnSwitchBoundsA[12] = // offset 0xA14D8
+short TurnSwitchBoundsA[12] = // offset 0xA14D8
 {
 	0x0200, 0x0380, 0x0000, 0x0000, 0xFE00, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR TurnSwitchPos = { 650, 0, 138 }; // offset 0xA14F0
-__int16 TurnSwitchBoundsC[12] = // offset 0xA14FC
+short TurnSwitchBoundsC[12] = // offset 0xA14FC
 {
 	0x0200, 0x0380, 0x0000, 0x0000, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR TurnSwitchPosA = { 650, 0, -138 }; // offset 0xA1514
 PHD_VECTOR CogSwitchPos = { 0, 0, -856 }; // offset 0xA1520
-__int16 CogSwitchBounds[12] = // offset 0xA152C
+short CogSwitchBounds[12] = // offset 0xA152C
 {
 	0xFE00, 0x0200, 0x0000, 0x0000, 0xFA00, 0xFE00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR RailSwitchPos = { 0, 0, -550 }; // offset 0xA1544
-__int16 RailSwitchBounds[12] = // offset 0xA1550
+short RailSwitchBounds[12] = // offset 0xA1550
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFD00, 0xFE00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR RailSwitchPos2 = { 0, 0, 550 }; // offset 0xA1568
-__int16 RailSwitchBounds2[12] = // offset 0xA1574
+short RailSwitchBounds2[12] = // offset 0xA1574
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0x0200, 0x0300, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-__int16 JumpSwitchBounds[12] = // offset 0xA158C
+short JumpSwitchBounds[12] = // offset 0xA158C
 {
 	0xFF80, 0x0080, 0xFF00, 0x0100, 0x0180, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR JumpSwitchPos = { 0, -208, 256 }; // offset 0xA15A4
 PHD_VECTOR CrowbarPos = { -89, 0, -328 }; // offset 0xA15B0
-__int16 CrowbarBounds[12] = // offset 0xA15BC
+short CrowbarBounds[12] = // offset 0xA15BC
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0xFF00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR CrowbarPos2 = { 89, 0, 328 }; // offset 0xA15D4
-__int16 CrowbarBounds2[12] = // offset 0xA15E0
+short CrowbarBounds2[12] = // offset 0xA15E0
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0x0100, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-__int16 FullBlockSwitchBounds[12] = // offset 0xA15F8
+short FullBlockSwitchBounds[12] = // offset 0xA15F8
 {
 	0xFE80, 0x0180, 0x0000, 0x0100, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR FullBlockSwitchPos = { 0, 0, 0 }; // offset 0xA1610
-__int16 PulleyBounds[12] = // offset 0xA161C
+short PulleyBounds[12] = // offset 0xA161C
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR PulleyPos = { 0, 0, -148 }; // offset 0xA1634
 PHD_VECTOR CrowDovePos = { 0, 0, -400 }; // offset 0xA1640
-__int16 UnderwaterSwitchBounds[12] = // offset 0xA164C
+short UnderwaterSwitchBounds[12] = // offset 0xA164C
 {
 	0xFF00, 0x0100, 0xFB00, 0xFE00, 0xFE00, 0x0000, 0xC720, 0x38E0, 0xC720, 0x38E0,
 	0xC720, 0x38E0
 };
-__int16 UnderwaterSwitchBounds2[12] = // offset 0xA1664
+short UnderwaterSwitchBounds2[12] = // offset 0xA1664
 {
 	0xFF00, 0x0100, 0xFB00, 0xFE00, 0x0000, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0,
 	0xC720, 0x38E0
 };
 PHD_VECTOR UnderwaterSwitchPos = { 0, -736, -416 }; // offset 0xA167C
 PHD_VECTOR UnderwaterSwitchPos2 = { 0, -736, 416 }; // offset 0xA1688
-__int16 SwitchBounds[12] = // offset 0xA1694
+short SwitchBounds[12] = // offset 0xA1694
 {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
@@ -115,7 +115,7 @@ void __cdecl ProcessExplodingSwitchType8(ITEM_INFO* item)
 	item->meshBits |= 1 << ((Objects[item->objectNumber].nmeshes & 0xFF) - 2);
 }
 
-void __cdecl CrowDoveSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -133,7 +133,7 @@ void __cdecl CrowDoveSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c
 	}
 	else
 	{
-		__int32 oldYrot = item->pos.yRot;
+		int oldYrot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
 		if (TestLaraPosition(PulleyBounds, item, l))
 		{
@@ -173,7 +173,7 @@ void __cdecl CrowDoveSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* c
 	}
 }
 
-void __cdecl CrowDoveSwitchControl(__int16 itemNumber) 
+void __cdecl CrowDoveSwitchControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -196,14 +196,14 @@ void __cdecl CrowDoveSwitchControl(__int16 itemNumber)
 	}
 }
 
-void __cdecl CogSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	__int16* trigger = TriggerIndex;
-	for (__int32 i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
+	short* trigger = TriggerIndex;
+	for (int i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
 	{
 		if (i < 0)
 			break;
@@ -267,7 +267,7 @@ void __cdecl CogSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl CogSwitchControl(__int16 itemNum) 
+void __cdecl CogSwitchControl(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -308,7 +308,7 @@ void __cdecl CogSwitchControl(__int16 itemNum)
 	}
 }
 
-void __cdecl FullBlockSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -361,7 +361,7 @@ void __cdecl FullBlockSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* 
 	}
 }
 
-void __cdecl FullBlockSwitchControl(__int16 itemNumber) 
+void __cdecl FullBlockSwitchControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	
@@ -387,9 +387,9 @@ void __cdecl FullBlockSwitchControl(__int16 itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
-	__int32 doSwitch = 0;
+	int doSwitch = 0;
 	ITEM_INFO* item = &Items[itemNum];
 
 	if ((!(TrInput & IN_ACTION) && g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM
@@ -411,7 +411,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 			return;
 		}
 
-		l->pos.yRot ^= (__int16)ANGLE(180);
+		l->pos.yRot ^= (short)ANGLE(180);
 		if (TestLaraPosition(CrowbarBounds2, item, l))
 		{
 			if (Lara.isMoving || g_Inventory->GetSelectedObject() == ID_CROWBAR_ITEM)
@@ -439,7 +439,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
-		l->pos.yRot ^= (__int16)ANGLE(180);
+		l->pos.yRot ^= (short)ANGLE(180);
 	}
 	else
 	{
@@ -524,7 +524,7 @@ void __cdecl CrowbarSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* co
 	}
 }
 
-void __cdecl JumpSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -561,9 +561,9 @@ void __cdecl JumpSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl RailSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
-	__int32 flag = 0;
+	int flag = 0;
 	ITEM_INFO* item = &Items[itemNum];
 
 	if ((!(TrInput & IN_ACTION) || l->currentAnimState != STATE_LARA_STOP || l->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus)
@@ -576,7 +576,7 @@ void __cdecl RailSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (item->currentAnimState == 1)
 		{
-			l->pos.yRot ^= (__int16)ANGLE(180);
+			l->pos.yRot ^= (short)ANGLE(180);
 			if (TestLaraPosition(RailSwitchBounds2, item, l))
 			{
 				if (MoveLaraPosition(&RailSwitchPos2, item, l))
@@ -594,7 +594,7 @@ void __cdecl RailSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
 			}
-			l->pos.yRot ^= (__int16)ANGLE(180);
+			l->pos.yRot ^= (short)ANGLE(180);
 			if (flag)
 			{
 				item->goalAnimState = 1;
@@ -657,10 +657,10 @@ void __cdecl RailSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	AnimateItem(item);
 }
 
-void __cdecl TurnSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
-	__int32 flag = 0;
+	int flag = 0;
 
 	if (item->currentAnimState
 		&& TrInput & IN_ACTION
@@ -670,7 +670,7 @@ void __cdecl TurnSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& Lara.gunStatus == LG_NO_ARMS
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
-		__int16 ItemNos[8];
+		short ItemNos[8];
 		if (TestLaraPosition(TurnSwitchBoundsA, item, l))
 		{
 			if (MoveLaraPosition(&TurnSwitchPosA, item, l))
@@ -713,7 +713,7 @@ void __cdecl TurnSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			l->pos.yRot ^= (__int16)ANGLE(180);
+			l->pos.yRot ^= (short)ANGLE(180);
 			if (TestLaraPosition(TurnSwitchBoundsC, item, l))
 			{
 				if (MoveLaraPosition(&TurnSwitchPos, item, l))
@@ -735,7 +735,7 @@ void __cdecl TurnSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.isMoving = FALSE;
 				Lara.gunStatus = LG_NO_ARMS;
 			}
-			l->pos.yRot ^= (__int16)ANGLE(180);
+			l->pos.yRot ^= (short)ANGLE(180);
 			if (flag)
 			{
 				Lara.isMoving = 0;
@@ -784,7 +784,7 @@ void __cdecl TurnSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl TurnSwitchControl(__int16 itemNum) 
+void __cdecl TurnSwitchControl(short itemNum) 
 {
 	ITEM_INFO* l = LaraItem;
 	ITEM_INFO* item = &Items[itemNum];
@@ -862,7 +862,7 @@ void __cdecl TurnSwitchControl(__int16 itemNum)
 	}
 }
 
-void __cdecl PulleyCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -876,7 +876,7 @@ void __cdecl PulleyCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		__int16 oldYrot = item->pos.yRot;
+		short oldYrot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
 		if (TestLaraPosition(PulleyBounds, item, l))
 		{
@@ -917,10 +917,10 @@ void __cdecl PulleyCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl UnderwaterSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
-	__int32 flag = 0;
+	int flag = 0;
 
 	if (TrInput & IN_ACTION
 		&& Lara.waterStatus == LW_UNDERWATER
@@ -958,7 +958,7 @@ void __cdecl UnderwaterSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 			return;
 		}
 
-		l->pos.yRot ^= (__int16)ANGLE(180);
+		l->pos.yRot ^= (short)ANGLE(180);
 		if (TestLaraPosition(UnderwaterSwitchBounds2, item, l))
 		{
 			if (MoveLaraPosition(&UnderwaterSwitchPos2, item, l))
@@ -966,7 +966,7 @@ void __cdecl UnderwaterSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 			else
 				Lara.generalPtr = (void*)itemNum;
 		}
-		l->pos.yRot ^= (__int16)ANGLE(180);
+		l->pos.yRot ^= (short)ANGLE(180);
 
 		if (flag)
 		{
@@ -989,7 +989,7 @@ void __cdecl UnderwaterSwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO*
 	}
 }
 
-void __cdecl SwitchCollision2(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl SwitchCollision2(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -1023,7 +1023,7 @@ void __cdecl SwitchCollision2(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl SwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (TrInput & IN_ACTION
@@ -1035,7 +1035,7 @@ void __cdecl SwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& item->triggerFlags >= 0
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
-		__int16* bounds = GetBoundsAccurate(item);
+		short* bounds = GetBoundsAccurate(item);
 		
 		if (item->triggerFlags == 3 && item->currentAnimState == 1 || item->triggerFlags >= 5 && item->triggerFlags <= 7 && !item->currentAnimState)
 			return;
@@ -1179,7 +1179,7 @@ void __cdecl SwitchCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		ObjectCollision(itemNum, l, coll);
 }
 
-void __cdecl SwitchControl(__int16 itemNumber) 
+void __cdecl SwitchControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->objectNumber != ID_AIRLOCK_SWITCH || item->triggerFlags < 8)
@@ -1204,7 +1204,7 @@ void __cdecl SwitchControl(__int16 itemNumber)
 		{
 			if (GetSwitchTrigger(&item, &ItemNos, 1) > 0)
 			{
-				v4 = (__int16*)((char*)& v15 + 2 * v3 + 2);
+				v4 = (short*)((char*)& v15 + 2 * v3 + 2);
 				v11 = v3;
 				do
 				{
@@ -1234,7 +1234,7 @@ void __cdecl SwitchControl(__int16 itemNumber)
 
 			GetJointAbsPosition(item, &pos, 0);
 			
-			__int16 roomNumber = item->roomNumber;
+			short roomNumber = item->roomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 			if (roomNumber != item->roomNumber)
 			{
@@ -1247,21 +1247,21 @@ void __cdecl SwitchControl(__int16 itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl TestTriggersAtXYZ(__int32 x, __int32 y, __int32 z, __int16 roomNumber, __int32 heavy, __int32 flags) 
+void __cdecl TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags) 
 {
 	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
 	TestTriggers(TriggerIndex, heavy, flags);
 }
 
-__int32 __cdecl GetKeyTrigger(ITEM_INFO* item) 
+int __cdecl GetKeyTrigger(ITEM_INFO* item) 
 {
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 	if (TriggerIndex)
 	{
-		__int16* trigger = TriggerIndex;
-		for (__int16 i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
+		short* trigger = TriggerIndex;
+		for (short i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
 		{
 			if (i < 0)
 				break;
@@ -1269,7 +1269,7 @@ __int32 __cdecl GetKeyTrigger(ITEM_INFO* item)
 		}
 		if (*trigger & 4)
 		{
-			for (__int16* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++)
+			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++)
 			{
 				if (*j & 0x8000)
 					return 0;
@@ -1281,15 +1281,15 @@ __int32 __cdecl GetKeyTrigger(ITEM_INFO* item)
 	return 0;
 }
 
-__int32 __cdecl GetSwitchTrigger(ITEM_INFO* item, __int16* itemNos, __int32 AttatchedToSwitch)
+int __cdecl GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 {
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 	if (TriggerIndex)
 	{
-		__int16* trigger = TriggerIndex;
-		for (__int32 i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
+		short* trigger = TriggerIndex;
+		for (int i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
 		{
 			if (i < 0)
 				break;
@@ -1298,8 +1298,8 @@ __int32 __cdecl GetSwitchTrigger(ITEM_INFO* item, __int16* itemNos, __int32 Atta
 
 		if (*trigger & 4)
 		{
-			__int16* current = itemNos;
-			for (__int16* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++, current++)
+			short* current = itemNos;
+			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++, current++)
 			{
 				*current = *j & 0x3FF;
 				if (*j & 0x8000)
@@ -1312,7 +1312,7 @@ __int32 __cdecl GetSwitchTrigger(ITEM_INFO* item, __int16* itemNos, __int32 Atta
 	return 0;
 }
 
-__int32 __cdecl SwitchTrigger(__int16 itemNum, __int16 timer) 
+int __cdecl SwitchTrigger(short itemNum, short timer) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (item->status == ITEM_DEACTIVATED)
@@ -1355,7 +1355,7 @@ __int32 __cdecl SwitchTrigger(__int16 itemNum, __int16 timer)
 	return 0;
 }
 
-void __cdecl InitialiseSwitch(__int16 itemNumber)
+void __cdecl InitialiseSwitch(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->triggerFlags >= 1000)
@@ -1365,7 +1365,7 @@ void __cdecl InitialiseSwitch(__int16 itemNumber)
 	}
 }
 
-void __cdecl InitialisePulleySwitch(__int16 itemNumber)
+void __cdecl InitialisePulleySwitch(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	item->itemFlags[3] = item->triggerFlags;
@@ -1374,7 +1374,7 @@ void __cdecl InitialisePulleySwitch(__int16 itemNumber)
 	//	item->itemFlags[1] = 1;
 }
 
-void __cdecl InitialiseCrowDoveSwitch(__int16 itemNumber)
+void __cdecl InitialiseCrowDoveSwitch(short itemNumber)
 {
 	Items[itemNumber].meshBits = 3;
 }

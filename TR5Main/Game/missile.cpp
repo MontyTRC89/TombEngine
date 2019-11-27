@@ -12,8 +12,8 @@
 
 void ShootAtLara(FX_INFO *fx)
 {
-	__int32 x, y, z, distance;
-	__int16* bounds;
+	int x, y, z, distance;
+	short* bounds;
 
 	x = LaraItem->pos.xPos - fx->pos.xPos;
 	y = LaraItem->pos.yPos - fx->pos.yPos;
@@ -31,12 +31,12 @@ void ShootAtLara(FX_INFO *fx)
 	fx->pos.yRot += (GetRandomControl() - 0x4000) / 0x40;
 }
 
-void ControlMissile(__int16 fxNumber)
+void ControlMissile(short fxNumber)
 {
 	FX_INFO *fx;
 	FLOOR_INFO *floor;
-	__int16 roomNumber;
-	__int32 speed;
+	short roomNumber;
+	int speed;
 
 	fx = &Effects[fxNumber];
 	printf("ControlMissile\n", fx->objectNumber);

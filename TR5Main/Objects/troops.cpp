@@ -12,7 +12,7 @@
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
-void __cdecl InitialiseTroops(__int16 itemNum)
+void __cdecl InitialiseTroops(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -32,7 +32,7 @@ void __cdecl InitialiseTroops(__int16 itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void __cdecl TroopsControl(__int16 itemNum)
+void __cdecl TroopsControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -42,17 +42,17 @@ void __cdecl TroopsControl(__int16 itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	__int16 angle = 0;
-	__int16 tilt = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
-	__int16 rot = 0;
+	short angle = 0;
+	short tilt = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short rot = 0;
 
-	__int32 dx = 0;
-	__int32 dy = 0;
-	__int32 dz = 0;
-	__int32 distance = 0;
+	int dx = 0;
+	int dy = 0;
+	int dz = 0;
+	int distance = 0;
 
 	if (item->firedWeapon)
 	{
@@ -122,9 +122,9 @@ void __cdecl TroopsControl(__int16 itemNum)
 			// Search for active troops
 			creature->enemy = NULL;
 			CREATURE_INFO* baddy = &BaddieSlots[0];
-			__int32 minDistance = 0x7FFFFFFF;
+			int minDistance = 0x7FFFFFFF;
 
-			for (__int32 i = 0; i < NUM_SLOTS; i++)
+			for (int i = 0; i < NUM_SLOTS; i++)
 			{
 				baddy = &BaddieSlots[i];
 
@@ -157,7 +157,7 @@ void __cdecl TroopsControl(__int16 itemNum)
 		
 		CreatureAIInfo(item, &info);
 
-		__int32 distance = 0;
+		int distance = 0;
 		if (creature->enemy == LaraItem)
 		{
 			distance = info.distance;

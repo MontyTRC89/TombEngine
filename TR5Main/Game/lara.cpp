@@ -63,6 +63,11 @@ void __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 					return;
 				break;
 
+			case ID_SAS:
+				if (SubControl())
+					return;
+				break;
+
 			default:
 				break;
 		}
