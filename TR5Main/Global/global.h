@@ -24,7 +24,6 @@ using namespace DirectX::SimpleMath;
 
 #define DB_Log ((HWND (__cdecl*)(short, const char*)) 0x004DEB10)
 
-#define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
 
 extern HMODULE g_DllHandle;

@@ -1,4 +1,5 @@
 #include "newobjects.h"
+#include "../Game/anim.h"
 #include "../Game/box.h"
 #include "../Game/items.h"
 #include "../Game/sphere.h"
@@ -22,24 +23,6 @@ enum UPV_FLAG
 #define ID_UPV ID_SAS
 #define ID_UPV_ANIMS ID_SWAT
 
-#define SUB_DEATH1_A		0
-#define SUB_DEATH2_A		0
-#define SUB_POSE_A			5
-#define SUB_POSE_F			GF2(ID_UPV, SUB_POSE_A, 0)
-#define SUB_GETOFFSURF_A	8
-#define SUB_GETOFFSURF_F	GF2(ID_UPV, SUB_GETOFFSURF_A, 0)
-#define SUB_GETOFFSURF1_A	9
-#define SUB_GETOFFSURF1_F	GF2(ID_UPV, SUB_GETOFFSURF1_A, 0)
-#define SUB_GETONSURF_A		10
-#define SUB_GETONSURF_F		GF2(ID_UPV, SUB_GETONSURF_A, 0)
-#define SUB_GETONSURF1_A	11
-#define SUB_GETOFF_A		12
-#define SUB_GETOFF_F  		GF2(ID_UPV, SUB_GETOFF_A, 0)
-#define SUB_GETON_A			13
-#define SUB_GETON_F			GF2(ID_UPV, SUB_GETON_A, 0)
-#define UWDEATH_A			124
-#define UWDEATH_F			GF(UWDEATH_A, 17)
-
 #define ACCELERATION		0x40000
 #define FRICTION			0x18000
 #define MAX_SPEED			0x400000
@@ -47,10 +30,10 @@ enum UPV_FLAG
 #define ROT_SLOWACCEL		0x200000
 #define ROT_FRICTION 		0x100000
 #define MAX_ROTATION		0x1c00000
-#define UPDOWN_ACCEL		((ONE_DEGREE*2) << 16)
-#define UPDOWN_SLOWACCEL	(((ONE_DEGREE*2) / 2) << 16)
-#define UPDOWN_FRICTION		((ONE_DEGREE/1) << 16)
-#define MAX_UPDOWN			((ONE_DEGREE*2) << 16)
+#define UPDOWN_ACCEL		(ANGLE(2) << 16)
+#define UPDOWN_SLOWACCEL	((ANGLE(2) / 2) << 16)
+#define UPDOWN_FRICTION		((ANGLE(1)/1) << 16)
+#define MAX_UPDOWN			(ANGLE(2) << 16)
 #define UPDOWN_LIMIT		ANGLE(80)
 #define UPDOWN_SPEED		10
 #define SURFACE_DIST		210
@@ -61,9 +44,9 @@ enum UPV_FLAG
 #define SUB_RADIUS			300
 #define SUB_HEIGHT			400
 #define SUB_LENGTH			WALL_SIZE
-#define FRONT_TOLERANCE		((ONE_DEGREE*45) << 16)
-#define TOP_TOLERANCE		((ONE_DEGREE*45) << 16)
-#define WALLDEFLECT			((ONE_DEGREE*2) << 16)
+#define FRONT_TOLERANCE		(ANGLE(45) << 16)
+#define TOP_TOLERANCE		(ANGLE(45) << 16)
+#define WALLDEFLECT			(ANGLE(2) << 16)
 #define GETOFF_DIST 		WALL_SIZE
 #define HARPOON_SPEED		256
 #define HARPOON_TIME		256
@@ -497,9 +480,7 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 	switch (l->currentAnimState)
 	{
-		/* --------------------- */
 	case SUBS_MOVE:
-		/* --------------------- */
 		if (l->hitPoints <= 0)
 		{
 			l->goalAnimState = SUBS_DIE;
@@ -539,9 +520,8 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->goalAnimState = SUBS_POSE;
 
 		break;
-		/* --------------------- */
+
 	case SUBS_POSE:
-		/* --------------------- */
 		if (l->hitPoints <= 0)
 		{
 			l->goalAnimState = SUBS_DIE;
@@ -590,10 +570,9 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		}
 
 		break;
-		/* --------------------- */
+
 	case SUBS_GETON:
-		/* --------------------- */
-		if (anim == SUB_GETONSURF1_A)
+		if (anim == 11)
 		{
 			v->pos.yPos += 4;
 			v->pos.xRot += ANGLE(1);
@@ -605,7 +584,7 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 				sub->Flags |= UPV_CONTROL;
 		}
 
-		else if (anim == SUB_GETON_A)
+		else if (anim == 13)
 		{
 			if (frame == 30)
 				SoundEffect(347, (PHD_3DPOS*)&v->pos.xPos, 2);
@@ -615,10 +594,9 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		}
 
 		break;
-		/* --------------------- */
+
 	case SUBS_GETOFF:
-		/* --------------------- */
-		if ((anim == SUB_GETOFF_A) && (frame == 42))
+		if ((anim == 12) && (frame == 42))
 		{
 			PHD_VECTOR vec = { 0, 0, 0 };
 			GAME_VECTOR VPos, LPos;
@@ -656,10 +634,9 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		}
 
 		break;
-		/* --------------------- */
+
 	case SUBS_GETOFFS:
-		/* --------------------- */
-		if ((anim == SUB_GETOFFSURF1_A) && (frame == 51))
+		if ((anim == 9) && (frame == 51))
 		{
 			int wd, wh, hfw;
 			PHD_VECTOR vec = { 0, 0, 0 };
@@ -702,7 +679,7 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		break;
 
 	case SUBS_DIE:
-		if (((anim == SUB_DEATH1_A) && (frame == 16)) || ((anim == SUB_DEATH2_A) && (frame == 17)))
+		if (((anim == 0) && (frame == 16)) || ((anim == 0) && (frame == 17)))
 		{
 			PHD_VECTOR vec = { 0, 0, 0 };
 
@@ -711,8 +688,8 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.xPos = vec.x;
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
-			l->animNumber = UWDEATH_A;
-			l->frameNumber = UWDEATH_F;
+			l->animNumber = 124;
+			l->frameNumber = GF(124, 17);
 			l->currentAnimState = l->goalAnimState = 44;
 			l->fallspeed = 0;
 			l->gravityStatus = 0;
@@ -831,14 +808,14 @@ void __cdecl SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if ((l->currentAnimState == 33) || (l->currentAnimState == 34))
 		{
-			l->animNumber = Objects[ID_UPV_ANIMS].animIndex + SUB_GETONSURF_A;
-			l->frameNumber = SUB_GETONSURF_F;
+			l->animNumber = Objects[ID_UPV_ANIMS].animIndex + 10;
+			l->frameNumber = GF2(ID_UPV_ANIMS, 10, 0);
 			l->currentAnimState = l->goalAnimState = SUBS_GETON;
 		}
 		else
 		{
-			l->animNumber = Objects[ID_UPV_ANIMS].animIndex + SUB_GETON_A;
-			l->frameNumber = SUB_GETON_F;
+			l->animNumber = Objects[ID_UPV_ANIMS].animIndex + 13;
+			l->frameNumber = GF2(ID_UPV, 13, 0);
 			l->currentAnimState = l->goalAnimState = SUBS_GETON;
 		}
 
@@ -1010,8 +987,8 @@ int __cdecl SubControl()
 
 		sub->RotX = 0;
 
-		v->animNumber = SUB_POSE_A;
-		v->frameNumber = SUB_POSE_F;
+		v->animNumber = 5;
+		v->frameNumber = GF2(ID_UPV, 5, 0);
 		v->goalAnimState = v->currentAnimState = SUBS_POSE;
 		v->fallspeed = 0;
 		v->speed = 0;

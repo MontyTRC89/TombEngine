@@ -46,6 +46,21 @@ typedef struct SUB_INFO {
 	char WeaponTimer;
 };
 
+
+typedef struct CART_INFO {
+	int Speed;
+	int MidPos;
+	int FrontPos;
+	int TurnX;
+	int TurnZ;
+	short TurnLen;
+	short TurnRot;
+	short YVel;
+	short Gradient;
+	char Flags;
+	char StopDelay;
+};
+
 typedef struct FISH_INFO
 {
 	short x;
@@ -333,7 +348,10 @@ int __cdecl KayakControl();
 void __cdecl SubInitialise(short itemNum);
 void __cdecl SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 int __cdecl SubControl();
-void __cdecl SubEffects(short item_number);
+
+void InitialiseMineCart(short itemNum);
+void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+int MineCartControl();
 
 int __cdecl TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos);
 int __cdecl DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old);

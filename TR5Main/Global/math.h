@@ -13,7 +13,7 @@
 #define CLAMPADD(x, a, b) ((x)<(a)?((x)+(a)):((x)>(b)?((x)-(b)):0))
 
 #define ONE_DEGREE 182
-#define ANGLE(x) ((x) * 65536.0 / 360.0)
+short ANGLE(short ang);
 #define TR_ANGLE_TO_DEGREES(x) ((x) / 65536.0 * 360.0)
 #define TR_ANGLE_TO_RAD(x) ((x) / 65536.0 * 360.0 * RADIAN)
 
