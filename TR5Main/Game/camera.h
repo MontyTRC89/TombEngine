@@ -14,6 +14,5 @@
 
 void __cdecl LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
 void __cdecl AlterFOV(int value);
-void __cdecl j_CalculateCamera();
 
 void Inject_Camera();

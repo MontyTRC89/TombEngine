@@ -11,7 +11,4 @@
 
 #define ADD_PTR(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n)); 
 
-#define GF(a,b)	(Anims[a].frameBase+b)
-#define GF2(a,b,c)	(Anims[Objects[a].animIndex + b].frameBase+c)
-
 #define ZONE(A) (((A) >> (WALL_SIZE - 2)) - 1)

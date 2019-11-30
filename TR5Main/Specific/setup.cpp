@@ -1173,13 +1173,11 @@ void __cdecl BaddyObjects()
 	}
 	*/
 
-	// Add the Dragon Bone Front/Back Objects Initialise
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = SubInitialise;
-		obj->collision = SubCollision;
-		//obj->drawRoutine = SubDraw;
+		obj->initialise = InitialiseMineCart;
+		obj->collision = MineCartCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;

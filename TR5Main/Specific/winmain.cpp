@@ -8,7 +8,7 @@
 #include <process.h>
 #include <crtdbg.h>
 #include <stdio.h>
-#include <sol.hpp>
+#include "sol.hpp"
 
 #include "..\Game\draw.h"
 #include "..\Game\sound.h"

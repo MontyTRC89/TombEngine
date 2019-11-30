@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bass.h>
-#include <bass_fx.h>
+#include "bass.h"
+#include "bass_fx.h"
 #include <d3dx9math.h>
 #include <vector>
 
@@ -587,6 +587,7 @@ typedef enum sound_effects
 	SFX_SWORD_GUARDIAN_FLYING_ID312,
 	SFX_SWORD_HITTARGET_ID318,
 	SFX_UPV_HARPOON_SHOT_ID23,
+	SFX_MINECART_HIT_ID202,
 	NUM_SFX
 };
 
