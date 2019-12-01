@@ -50,7 +50,7 @@ void __cdecl SasControl(__int16 itemNum)
 		pos.z = sasGun.z;
 
 		GetJointAbsPosition(item, &pos, sasGun.meshNum);
-		TriggerDynamics(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 8, 24, 16, 4);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 8, 24, 16, 4);
 		item->firedWeapon--;
 	}
 

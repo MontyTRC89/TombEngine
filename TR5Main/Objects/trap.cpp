@@ -818,7 +818,7 @@ void __cdecl SentryGunControl(__int16 itemNum)
 
 				GetJointAbsPosition(item, &pos, sentryGunBite.meshNum);
 
-				TriggerDynamics(pos.x, pos.y, pos.z, 4 * item->itemFlags[0] + 12, 24, 16, 4);
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->itemFlags[0] + 12, 24, 16, 4);
 
 				item->itemFlags[0]--;
 			}

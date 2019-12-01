@@ -427,8 +427,8 @@ void __cdecl ParallelBarsCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* 
 			pos2.y = -128;
 			pos2.z = 512;
 
-			GetLaraJointPosition(&pos1, 14);
-			GetLaraJointPosition(&pos2, 11);
+			GetLaraJointPosition(&pos1, LJ_LHAND);
+			GetLaraJointPosition(&pos2, LJ_RHAND);
 		
 			if (l->pos.yRot & 0x4000)
 				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) >> 1);

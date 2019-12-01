@@ -45,7 +45,7 @@ typedef enum trigger_types {
 	CLIMB_T,
 } TRIGGER_TYPES;
 
-typedef enum trigobj_types {
+typedef enum trigobtypes {
 	TO_OBJECT,
 	TO_CAMERA,
 	TO_SINK,
@@ -91,14 +91,6 @@ typedef enum item_status
 	ITEM_DEACTIVATED = 2,
 	ITEM_INVISIBLE = 3
 } ITEM_STATUS;
-
-enum height_types {
-	WALL,
-	SMALL_SLOPE,
-	BIG_SLOPE,
-	DIAGONAL,
-	SPLIT_TRI
-};
 
 typedef enum item_flags
 {
@@ -834,25 +826,6 @@ enum lara_mesh
 	NUM_LARA_MESHES
 };
 
-enum lara_joint
-{
-	LJ_HIPS = 0,
-	LJ_LTHIGH = 1,
-	LJ_LSHIN = 2,
-	LJ_LFOOT = 3,
-	LJ_RTHIGH = 4,
-	LJ_RSHIN = 5,
-	LJ_RFOOT = 6,
-	LJ_TORSO = 7,
-	LJ_RINARM = 9,
-	LJ_ROUTARM = 10,
-	LJ_RHAND = 11,
-	LJ_LINARM = 12,
-	LJ_LOUTARM = 13,
-	LJ_LHAND = 14,
-	LJ_HEAD = 8,
-};
-
 enum WeaponTypes {
 	WEAPON_NONE = 0,
 	WEAPON_PISTOLS = 1,
@@ -953,4 +926,23 @@ enum camera_flags
 	CF_FOLLOW_CENTER = 1,
 	CF_UNKNOWN_2 = 2,
 	CF_CHASE_OBJECT = 3,
+};
+
+enum lara_joint
+{
+	LJ_HIPS = 0, // 0
+	LJ_LTHIGH = 1, // 1
+	LJ_LSHIN = 2, // 2
+	LJ_LFOOT = 3, // 3
+	LJ_RTHIGH = 4, // 4
+	LJ_RSHIN = 5, // 5
+	LJ_RFOOT = 6, // 6
+	LJ_TORSO = 7, // 7
+	LJ_RINARM = 9, // 8
+	LJ_ROUTARM = 10, // 9
+	LJ_RHAND = 11, // 10
+	LJ_LINARM = 12, // 11
+	LJ_LOUTARM = 13, // 12
+	LJ_LHAND = 14, // 13
+	LJ_HEAD = 8, // 14
 };

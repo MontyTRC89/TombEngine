@@ -64,7 +64,7 @@ void __cdecl LoadScreen(__int32 index, __int32 num)
 /*void __cdecl DoLevel(__int32 index)
 {
 	CreditsDone = false;
-	//j_DoTitleFMV();
+	//DoTitleFMV();
 	CanLoad = false;
 
 	InitialiseTitleOptionsMaybe(255, 0);

@@ -15,6 +15,7 @@
 #include "..\Game\inventory.h"
 
 #include <vector>
+#include "../Game/lara1gun.h"
 
 using namespace std;
 
@@ -704,7 +705,7 @@ __int32 __cdecl JeepUserControl(ITEM_INFO* item, __int32 height, __int32* pitch)
 		pos.y = -144;
 		pos.z = -1024;
 		GetJointAbsPosition(item, &pos, 11);
-		TriggerDynamics(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 		item->meshBits = 163839;
 	}
 	else
@@ -1427,7 +1428,7 @@ void __cdecl JeepCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			if (Lara.gunType == WEAPON_FLARE)
 			{
 				CreateFlare(ID_FLARE_ITEM, 0);
-				UndrawFlaresMeshes();
+				undraw_flare_meshes();
 				Lara.flareControlLeft = 0;
 				Lara.requestGunType = LG_NO_ARMS;
 				Lara.gunType = LG_NO_ARMS;

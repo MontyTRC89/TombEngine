@@ -5,7 +5,7 @@
 
 extern GameFlow* g_GameFlow;
 
-void __cdecl TriggerDynamics(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b)
+void __cdecl TriggerDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b)
 {
 	g_Renderer->AddDynamicLight(x, y, z, falloff, r, g, b);
 }
@@ -89,7 +89,7 @@ void __cdecl TriggerGunSmoke(__int32 x, __int32 y, __int32 z, __int32 xv, __int3
 
 	spark->dSize = size;
 
-	/*if (BYTE1(gfLevelFlags) & 0x20 && lara_item->room_number == gfMirrorRoom)
+	/*if (BYTE1(gfLevelFlags) & 0x20 && LaraItem->room_number == gfMirrorRoom)
 	{
 		result = 1;
 		spark->mirror = 1;
@@ -589,6 +589,6 @@ void __cdecl TriggerMetalSparks(__int32 x, __int32 y, __int32 z, __int32 xv, __i
 
 void Inject_Effect2()
 {
-	INJECT(0x00431240, TriggerDynamics);
+	INJECT(0x00431240, TriggerDynamicLight);
 	INJECT(0x004820A0, TriggerGunSmoke);
 }

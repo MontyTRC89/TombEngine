@@ -22,6 +22,7 @@
 #include "Box.h"
 #include "objects.h"
 #include "switch.h"
+#include "laramisc.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -310,7 +311,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			// Control Lara
 			InItemControlLoop = true;
 			Lara.skelebob = NULL;
-			LaraControl();
+			LaraControl(Lara.itemNumber);
 			InItemControlLoop = false;
 			KillMoveItems();
 
@@ -1133,6 +1134,50 @@ void __cdecl ActivateKey()
 void __cdecl ActivateCamera()
 {
 	KeyTriggerActive = 2;
+}
+
+__int16 __cdecl GetDoor(FLOOR_INFO* floor)
+{
+	if (!floor->index)
+		return NO_ROOM;
+
+	__int16* data = &FloorData[floor->index];
+	__int16 type = *(data++);
+
+	if (((type & DATA_TYPE) == TILT_TYPE)
+		|| ((type & DATA_TYPE) == SPLIT1)
+		|| ((type & DATA_TYPE) == SPLIT2)
+		|| ((type & DATA_TYPE) == NOCOLF1B)
+		|| ((type & DATA_TYPE) == NOCOLF1T)
+		|| ((type & DATA_TYPE) == NOCOLF2B)
+		|| ((type & DATA_TYPE) == NOCOLF2T))
+	{
+		if (type & END_BIT)
+			return NO_ROOM;
+
+		data++;
+		type = *(data++);
+	}
+
+	if (((type & DATA_TYPE) == ROOF_TYPE)
+		|| ((type & DATA_TYPE) == SPLIT3)
+		|| ((type & DATA_TYPE) == SPLIT4)
+		|| ((type & DATA_TYPE) == NOCOLC1B)
+		|| ((type & DATA_TYPE) == NOCOLC1T)
+		|| ((type & DATA_TYPE) == NOCOLC2B)
+		|| ((type & DATA_TYPE) == NOCOLC2T))
+	{
+		if (type & END_BIT)
+			return NO_ROOM;
+
+		data++;
+		type = *(data++);
+	}
+
+	if ((type & DATA_TYPE) == DOOR_TYPE)
+		return (*data);
+
+	return NO_ROOM;
 }
 
 void Inject_Control()

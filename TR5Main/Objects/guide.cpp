@@ -57,7 +57,7 @@ void __cdecl GuideControl(__int16 itemNum)
 		GrenadeLauncherSpecialEffect1(pos.x, pos.y - 40, pos.z, -1, 7);
 
 		__int16 random = GetRandomControl();
-		TriggerDynamics(pos.x, pos.y, pos.z, 15, 255 - ((random >> 4) & 0x1F), 192 - ((random >> 6) & 0x1F), random & 0x3F);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 255 - ((random >> 4) & 0x1F), 192 - ((random >> 6) & 0x1F), random & 0x3F);
 
 		if (item->animNumber == obj->animIndex + 61)
 		{
@@ -455,7 +455,7 @@ void __cdecl GuideControl(__int16 itemNum)
 							-1,
 							7);
 
-						TriggerDynamics(
+						TriggerDynamicLight(
 							pos1.x - 32,
 							pos1.y - 64,
 							pos1.z - 32,
@@ -470,12 +470,12 @@ void __cdecl GuideControl(__int16 itemNum)
 				else
 				{
 					TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
-					TriggerDynamics(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
+					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
 				}
 			}
 			else
 			{
-				TriggerDynamics(pos1.x - 32, pos1.y - 64, pos1.z - 32, 10, 192 - ((random >> 4) & 0x1F), 128 - ((random >> 6) & 0x1F), random & 0x1F);
+				TriggerDynamicLight(pos1.x - 32, pos1.y - 64, pos1.z - 32, 10, 192 - ((random >> 4) & 0x1F), 128 - ((random >> 6) & 0x1F), random & 0x1F);
 
 				GrenadeLauncherSpecialEffect1(
 					(random & 0x3F) + pos1.x - 64,
@@ -487,7 +487,7 @@ void __cdecl GuideControl(__int16 itemNum)
 		}
 		else
 		{
-			TriggerDynamics(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
+			TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random >> 6) & 0x1F), 128 - ((random >> 4) & 0x1F));
 			TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
 		}
 

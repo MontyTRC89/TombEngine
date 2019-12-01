@@ -86,7 +86,7 @@ void __cdecl __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Handle current Lara status
-	(*LaraControlRoutines[item->currentAnimState])(item, coll);
+	(*lara_control_routines[item->currentAnimState])(item, coll);
 
 	if (item->pos.zRot >= -ANGLE(1) && item->pos.zRot <= ANGLE(1)) 
 		item->pos.zRot = 0;   
@@ -113,7 +113,7 @@ void __cdecl __cdecl LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 		// Handle Lara collision
 		if (g_LaraExtra.Vehicle == NO_ITEM)
-			(*LaraCollisionRoutines[item->currentAnimState])(item, coll);
+			(*lara_collision_routines[item->currentAnimState])(item, coll);
 	}
 
 	UpdateLaraRoom(item, -381);
@@ -709,7 +709,7 @@ void __cdecl lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 			pos.y = 0;
 			pos.z = 0;
 
-			GetLaraJointPos(&pos, 6);
+			GetLaraJointPosition(&pos, LJ_RFOOT);
 
 			item->pos.xPos = pos.x;
 			item->pos.yPos = pos.y + 75;
@@ -718,7 +718,7 @@ void __cdecl lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = STATE_LARA_FREEFALL;
 			item->currentAnimState = STATE_LARA_FREEFALL;
 
-			item->animNumber = ANIMATION_LARA_FREE_FALL___int32;
+			item->animNumber = ANIMATION_LARA_FREE_FALL_LONG;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 
 			item->fallspeed = 81;
@@ -2517,9 +2517,9 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, __int16 angle)//19930,
 	__int32 res;
 
 	Lara.moveAngle = angle + item->pos.yRot;
-	__int16 angle = (__int16)(Lara.moveAngle + ANGLE(45)) >> W2V_SHIFT;
+	__int16 ang = (__int16)(Lara.moveAngle + ANGLE(45)) >> W2V_SHIFT;
 
-	switch (angle)
+	switch (ang)
 	{
 	case 0:
 		z += 16;
@@ -2955,19 +2955,19 @@ void __cdecl lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 
 			switch ((char)(item->pos.yRot + ANGLE(45)) / (char)ANGLE(90))
 			{
-			case 0:
+			case NORTH:
 				item->pos.zPos = (item->pos.zPos | 0x3FF) - 100;
 				item->pos.xPos += coll->shift.x;
 				break;
-			case 2:
+			case SOUTH:
 				item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 100;
 				item->pos.xPos += coll->shift.x;
 				break;
-			case 1:
+			case EAST:
 				item->pos.xPos = (item->pos.xPos | 0x3FF) - 100;
 				item->pos.zPos += coll->shift.z;
 				break;
-			case 3:
+			case WEST:
 				item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) + 100;
 				item->pos.zPos += coll->shift.z;
 				break;
@@ -3271,7 +3271,7 @@ void __cdecl lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)//18444(<), 18578(<)
 
 void __cdecl lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)//17E64, 17F98 (F)
 {
-	LaraClimbRope(item, coll);
+	//LaraClimbRope(item, coll);
 }
 
 void __cdecl lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll)//17D9C(<), 17ED0(<) (F)
@@ -3298,7 +3298,7 @@ void __cdecl lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll)//17D9C(<), 17ED
 // CHECK
 void __cdecl lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll)//17B74, 17CA8 (F)
 {
-	Camera.targetDistance = SECTOR(2);
+	/*Camera.targetDistance = SECTOR(2);
 
 	UpdateRopeSwing(item);
 
@@ -3351,7 +3351,7 @@ void __cdecl lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll)//17B74, 17CA8 (F
 	else if (item->frameNumber == Anims[ANIMATION_LARA_ROPE_IDLE_TO_SWING].frameBase + 15)
 	{
 		ApplyVelocityToRope(Lara.ropeSegment, item->pos.yRot, 128);
-	}
+	}*/
 }
 
 void __cdecl lara_as_roper(ITEM_INFO* item, COLL_INFO* coll)//17B14(<), 17C48(<) (F)
@@ -3442,10 +3442,10 @@ void __cdecl lara_as_rope(ITEM_INFO* item, COLL_INFO* coll)//17958(<), 17A8C(<) 
 
 void __cdecl ApplyVelocityToRope(int node, __int16 angle, __int16 n)//178E4, 17A18 (F)
 {
-	SetPendulumVelocity(
+	/*SetPendulumVelocity(
 		n * SIN(angle),
 		0,
-		n * COS(angle));
+		n * COS(angle));*/
 }
 
 void __cdecl UpdateRopeSwing(ITEM_INFO* item)//17508, 1763C
@@ -3496,7 +3496,7 @@ void __cdecl JumpOffRope(ITEM_INFO* item)//17424, 17558 (F)
 
 void __cdecl FallFromRope(ITEM_INFO* item)//17394, 174C8 (F)
 {
-	item->speed = (abs(CurrentPendulum.Velocity.x >> 16) + abs(CurrentPendulum.Velocity.z >> 16)) >> 1; // todo this may explode if the values are negative but im too lazy
+	/*item->speed = (abs(CurrentPendulum.Velocity.x >> 16) + abs(CurrentPendulum.Velocity.z >> 16)) >> 1; // todo this may explode if the values are negative but im too lazy
 	item->pos.xRot = 0;
 	item->pos.yPos += 320;
 
@@ -3509,7 +3509,7 @@ void __cdecl FallFromRope(ITEM_INFO* item)//17394, 174C8 (F)
 	item->gravityStatus = true;
 
 	Lara.gunStatus = LG_NO_ARMS;
-	Lara.ropePtr = -1;
+	Lara.ropePtr = -1;*/
 }
 
 void __cdecl lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
@@ -4863,13 +4863,13 @@ void __cdecl lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 			if (LOS(&s, &d))
 			{
 				// CHECK
-				if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == 999)
+				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == 999)
 				{
 					item->animNumber = ANIMATION_LARA_CRAWL_JUMP_DOWN;
 					item->frameNumber = Anims[item->animNumber].frameBase;
 					item->goalAnimState = STATE_LARA_MISC_CONTROL;
 					item->currentAnimState = STATE_LARA_MISC_CONTROL;
-				}
+				}*/
 			}
 		}
 	}
@@ -5398,9 +5398,9 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//13738, 137E8
 		return 0;
 
 	return result;
+}
 
-
-int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)//135BC, 1366C (F)
+__int32 __cdecl IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)//135BC, 1366C (F)
 {
 	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
 		return false;
@@ -5438,7 +5438,7 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)//135BC, 1366C (F)
 	return abs(coll->frontFloor - coll->rightFloor2) < 60;
 }
 
-int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)//12F34, 12FE4
+/*int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll)//12F34, 12FE4
 {
 	__int16 v3 = 0;
 	v4 = item->pos.yRot;
@@ -5644,7 +5644,7 @@ LABEL_44:
 		break;
 	}
 	return result;
-}
+}*/
 
 void __cdecl SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, __int16 angle)//12E54, 12F04 (F)
 {
@@ -5652,16 +5652,16 @@ void __cdecl SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, __int16 ang
 	{
 		switch (angle)
 		{
-		case 0:
+		case NORTH:
 			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x390;
 			return;
-		case 1:
+		case EAST:
 			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0x70;
 			return;
-		case 2:
+		case SOUTH:
 			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0x70;
 			return;
-		case 3:
+		case WEST:
 		default:
 			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x390;
 			return;
@@ -5672,16 +5672,16 @@ void __cdecl SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, __int16 ang
 	{
 		switch (angle)
 		{
-		case 0:
+		case NORTH:
 			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0x70;
 			return;
-		case 1:
+		case EAST:
 			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x390;
 			return;
-		case 2:
+		case SOUTH:
 			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x390;
 			return;
-		case 3:
+		case WEST:
 		default:
 			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0x70;
 			return;
@@ -5689,7 +5689,7 @@ void __cdecl SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, __int16 ang
 	}
 }
 
-int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)//12C54, 12D04 (F)
+__int32 __cdecl LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)//12C54, 12D04 (F)
 {
 	__int16* bounds;
 	int shift, result;
@@ -5702,13 +5702,13 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)//12C54, 12D04 (F)
 
 	switch ((__int16)(item->pos.yRot + ANGLE(45)) / (__int16)ANGLE(90))
 	{
-	case 0:
-	case 2:
+	case NORTH:
+	case SOUTH:
 		item->pos.zPos += coll->shift.z;
 		break;
 
-	case 1:
-	case 3:
+	case EAST:
+	case WEST:
 		item->pos.xPos += coll->shift.x;
 		break;
 
@@ -5857,7 +5857,7 @@ void __cdecl lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F
 
 			item->pos.yPos += coll->midFloor;
 
-			if (abs(coll->tilt_x) <= 2 && abs(coll->tilt_z) <= 2)
+			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
 			{
 				item->goalAnimState = STATE_LARA_STOP;
 				StopSoundEffect(SFX_LARA_SLIPPING);
@@ -5892,15 +5892,15 @@ void __cdecl lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F
 
 void __cdecl LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
 {
-	switch (coll->old_anim_state)
+	switch (coll->oldAnimState)
 	{
 	case STATE_LARA_STOP:
 	case STATE_LARA_TURN_RIGHT_SLOW:
 	case STATE_LARA_TURN_LEFT_SLOW:
 	case STATE_LARA_TURN_FAST:
-		item->currentAnimState = coll->old_anim_state;
-		item->animNumber = coll->old_animNumber;
-		item->frameNumber = coll->old_frameNumber;
+		item->currentAnimState = coll->oldAnimState;
+		item->animNumber = coll->oldAnimNumber;
+		item->frameNumber = coll->oldFrameNumber;
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = STATE_LARA_TURN_LEFT_SLOW;
@@ -5922,30 +5922,30 @@ void __cdecl LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(
 	}
 }
 
-int TestWall(ITEM_INFO* item, __int32 front, __int32 right, __int32 down)//12550, 12600 (F)
+__int32 __cdecl TestWall(ITEM_INFO* item, __int32 front, __int32 right, __int32 down)//12550, 12600 (F)
 {
-	int x = item->pos.xPos;
-	int y = item->pos.yPos + down;
-	int z = item->pos.zPos;
+	__int32 x = item->pos.xPos;
+	__int32 y = item->pos.yPos + down;
+	__int32 z = item->pos.zPos;
 
 	__int16 angle = item->pos.yRot + ANGLE(45);
 	__int16 roomNum = item->roomNumber;
 
 	FLOOR_INFO* floor;
-	int h, c;
+	__int32 h, c;
 
 	switch (angle / (__int16)ANGLE(90))
 	{
-	case 0:
+	case NORTH:
 		x -= right;
 		break;
-	case 1:
+	case EAST:
 		z -= right;
 		break;
-	case 2:
+	case SOUTH:
 		x += right;
 		break;
-	case 3:
+	case WEST:
 		z += right;
 		break;
 	default:
@@ -5956,16 +5956,16 @@ int TestWall(ITEM_INFO* item, __int32 front, __int32 right, __int32 down)//12550
 
 	switch (angle / (__int16)ANGLE(90))
 	{
-	case 0:
+	case NORTH:
 		z += front;
 		break;
-	case 1:
+	case EAST:
 		x += front;
 		break;
-	case 2:
+	case SOUTH:
 		z -= front;
 		break;
-	case 3:
+	case WEST:
 		x -= front;
 		break;
 	default:
@@ -5985,15 +5985,15 @@ int TestWall(ITEM_INFO* item, __int32 front, __int32 right, __int32 down)//12550
 	return 0;
 }
 
-int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)//120C0, 12170
+/*int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)//120C0, 12170
 {
 	UNIMPLEMENTED();
 	return 0;
-}
+}*/
 
-int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
+__int32 __cdecl LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
 {
-	int shift_r, shift_l;
+	__int32 shift_r, shift_l;
 
 	if (LaraTestClimbPos(item, coll->radius, coll->radius + 120, -700, 512, &shift_r) != 1)
 		return false;
@@ -6028,7 +6028,7 @@ int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
 	return true;
 }
 
-int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, __int32* edge)//11E60, 11F10 (F)
+__int32 __cdecl LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, __int32* edge)//11E60, 11F10 (F)
 {
 	__int16* bounds = GetBoundsAccurate(item);
 	int hdif = coll->frontFloor - bounds[2];
@@ -6040,9 +6040,9 @@ int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, __int32* edge)//11E60, 1
 		if (hdif >> (WALL_SHIFT - 2) != (hdif + item->fallspeed) >> (WALL_SHIFT - 2))
 		{
 			if (item->fallspeed > 0)
-				* edge = (hdif + item->fallspeed) & ~(STEP_L - 1);
+				* edge = (hdif + item->fallspeed) & ~(256 - 1);
 			else
-				*edge = hdif & ~(STEP_L - 1);
+				*edge = hdif & ~(256 - 1);
 
 			return -1;
 		}
@@ -6056,7 +6056,7 @@ int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, __int32* edge)//11E60, 1
 	return 1;
 }
 
-int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)//11DC0, 11E70 (F)
+__int32 __cdecl LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)//11DC0, 11E70 (F)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
 	{
@@ -6081,7 +6081,7 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)//11DC0, 11E70 (F)
 	return 0;
 }
 
-int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)//11D18(<), 11DC8(<) (F)
+__int32 __cdecl LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)//11D18(<), 11DC8(<) (F)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
 	{
@@ -6110,7 +6110,7 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)//11D18(<), 11DC8(<) (F)
 	}
 }
 
-int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)//11C94, 11D44 (F)
+__int32 __cdecl LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)//11C94, 11D44 (F)
 {
 	if (coll->collType == CT_TOP || coll->collType == CT_CLAMP)
 	{
@@ -6136,7 +6136,7 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)//11C94, 11D44 (F)
 	}
 }
 
-int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)//11BD8(<), 11C88(<) (F)
+__int32 __cdecl LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)//11BD8(<), 11C88(<) (F)
 {
 	int landspeed = item->fallspeed - 140;
 
@@ -6157,7 +6157,7 @@ int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)//11BD8(<), 11C88(<) (F)
 	return false;
 }
 
-int LaraFallen(ITEM_INFO* item, COLL_INFO* coll)//11B6C, 11C1C (F)
+__int32 __cdecl LaraFallen(ITEM_INFO* item, COLL_INFO* coll)//11B6C, 11C1C (F)
 {
 	if (Lara.waterStatus == 4 || coll->midFloor <= 384)
 	{
@@ -6175,11 +6175,11 @@ int LaraFallen(ITEM_INFO* item, COLL_INFO* coll)//11B6C, 11C1C (F)
 	}
 }
 
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)//11998, 11A48
+/*int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)//11998, 11A48
 {
 	UNIMPLEMENTED();
 	return 0;
-}
+}*/
 
 __int16 LaraCeilingFront(ITEM_INFO* item, __int16 ang, __int32 dist, __int32 h)//1189C, 1194C (F)
 {
@@ -6197,7 +6197,7 @@ __int16 LaraCeilingFront(ITEM_INFO* item, __int16 ang, __int32 dist, __int32 h)/
 	return height;
 }
 
-__int16 LaraFloorFront(ITEM_INFO* item, __int16 ang, __int32 dist)//117B0, 11860 (F)
+__int16 __cdecl LaraFloorFront(ITEM_INFO* item, __int16 ang, __int32 dist)//117B0, 11860 (F)
 {
 	__int16 room = item->roomNumber;
 
@@ -6219,7 +6219,7 @@ void __cdecl GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll)//11764(<), 1
 	GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 762);
 }
 
-int GetLaraJointPos(PHD_VECTOR* vec, __int32 mat)
+/*int GetLaraJointPos(PHD_VECTOR* vec, __int32 mat)
 {
 #if !PSXPC_TEST///@FIXME excuse me but this doesn't work.
 	phd_mxptr[0] = lara_joint_matrices[mat].m00;
@@ -6248,19 +6248,12 @@ int GetLaraJointPos(PHD_VECTOR* vec, __int32 mat)
 	mPopMatrix();
 #endif
 	return 48;
-}
+}*/
 
-#if PC_VERSION || PSXPC_TEST///@TODO move for PSXPC_N
-void __cdecl AnimateLara(ITEM_INFO* item)
-{
-	UNIMPLEMENTED();
-}
-#endif
-
+/*
 void __cdecl SetLaraUnderwaterNodes()//8596C(<), 879B0(<) (F) 
 {
 	return;//not used yet
-#if 0
 	PHD_VECTOR joint;
 	__int16 roomNumber;//_18
 	room_info* r;//$a1
@@ -6304,7 +6297,6 @@ void __cdecl SetLaraUnderwaterNodes()//8596C(<), 879B0(<) (F)
 			}
 		}
 	}
-#endif
 }
 
 void __cdecl SetPendulumVelocity(int x, int y, int z)// (F)
@@ -6341,7 +6333,7 @@ void __cdecl GetLaraJointPosRot(PHD_VECTOR* a1, int a2, int a3, SVECTOR * a4)
 void __cdecl DoSubsuitStuff()
 {
 	UNIMPLEMENTED();
-}
+}*/
 
 void __cdecl Inject_Lara()
 {

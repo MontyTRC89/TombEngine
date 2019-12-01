@@ -6,6 +6,7 @@
 #include "..\Game\pickup.h"
 #include "..\Game\lot.h"
 #include "..\Game\switch.h"
+#include "traps.h"
 #include "..\Game\laramisc.h"
 #include "..\Objects\newobjects.h"
 #include "..\Game\sound.h"
@@ -472,7 +473,7 @@ bool SaveGame::readItem()
 	if (obj->collision == PuzzleHoleCollision && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
 	{
 		item->objectNumber += 8;
-		//*((_WORD *)pItem - 28) = v55 + objects[*((_WORD *)pItem - 32)].anim_index;
+		//*((_WORD *)pItem - 28) = v55 + Objects[*((_WORD *)pItem - 32)].anim_index;
 	}
 
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8 && (item->flags & ONESHOT))

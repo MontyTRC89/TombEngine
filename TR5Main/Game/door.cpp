@@ -478,14 +478,14 @@ void __cdecl DoorControl(__int16 itemNumber)
 					v9 = item->object_number;
 					if (v9 != 302 && v9 != 304)
 					{
-						LOBYTE(v5) = j_AnimateItem((int)item);
+						LOBYTE(v5) = AnimateItem((int)item);
 						return v5;
 					}
 				LABEL_40:
 					v10 = item->_bf15ea;
 					LOBYTE(v10) = v10 | 6;
 					item->_bf15ea = v10;
-					LOBYTE(v5) = j_AnimateItem((int)item);
+					LOBYTE(v5) = AnimateItem((int)item);
 					return v5;
 				}
 				if (gfCurrentLevel >= 0xCu && gfCurrentLevel <= 0xEu && item->object_number == 300)

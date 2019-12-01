@@ -313,8 +313,8 @@ void CombineRevolverLasersight(__int32 action)
 
 	if (Lara.gunStatus && Lara.gunType == WEAPON_REVOLVER)
 	{
-		UndrawPistolMeshRight(WEAPON_REVOLVER);
-		DrawPistolMeshes(WEAPON_REVOLVER);
+		undraw_pistol_mesh_right(WEAPON_REVOLVER);
+		draw_pistol_meshes(WEAPON_REVOLVER);
 	}
 }
 
@@ -333,8 +333,8 @@ void CombineCrossbowLasersight(__int32 action)
 
 	if (Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
 	{
-		UndrawShotgunMeshes(WEAPON_CROSSBOW);
-		DrawShotgunMeshes(WEAPON_CROSSBOW);
+		undraw_shotgun_meshes(WEAPON_CROSSBOW);
+		draw_shotgun_meshes(WEAPON_CROSSBOW);
 	}
 }
 

@@ -13,12 +13,16 @@
 #include "lara2gun.h"
 #include "switch.h"
 #include "objects.h"
+#include "sphere.h"
+#include "traps.h"
 
 #include "..\Global\global.h"
 #include "..\Scripting\GameFlowScript.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
+
+__int32 HKCounter = 0;
 
 void __cdecl FireHarpoon()
 {
@@ -43,7 +47,7 @@ void __cdecl FireHarpoon()
 		pos.z = dxPos.z = 77;
 
 		g_Renderer->GetLaraBonePosition(&dxPos, HAND_R);
-		GetLaraJointPosition((PHD_VECTOR*)&pos, HAND_R);
+		GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
 
 		/*item->pos.xPos = pos.x = dxPos.x;
 		item->pos.yPos = pos.y = dxPos.y;
@@ -57,7 +61,7 @@ void __cdecl FireHarpoon()
 
 		if (Lara.target)
 		{
-			FindTargetPoint(Lara.target, &pos);
+			find_target_point(Lara.target, &pos);
 
 			item->pos.yRot = ATAN(pos.z - item->pos.zPos, pos.x - item->pos.xPos);
 			__int32 distance = SQRT_ASM(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
@@ -260,7 +264,7 @@ void __cdecl FireGrenade()
 			jointPos.y = 276;
 			jointPos.z = 80;
 
-			GetLaraJointPosition(&jointPos, 11);
+			GetLaraJointPosition(&jointPos, LJ_RHAND);
 
 			item->pos.xPos = x = jointPos.x;
 			item->pos.yPos = y = jointPos.y;
@@ -280,7 +284,7 @@ void __cdecl FireGrenade()
 			jointPos.y = 1204;
 			jointPos.z = 5;
 
-			GetLaraJointPosition(&jointPos, 11);
+			GetLaraJointPosition(&jointPos, LJ_RHAND);
 
 			SmokeCountL = 32;
 			SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
@@ -788,7 +792,7 @@ void __cdecl DrawShotgun(__int32 weaponType)
 	{
 		if (item->frameNumber - Anims[item->animNumber].frameBase == Weapons[weaponType].drawFrame)
 		{
-			DrawShotgunMeshes(weaponType);
+			draw_shotgun_meshes(weaponType);
 		}
 		else if (Lara.waterStatus == 1)
 		{
@@ -797,7 +801,7 @@ void __cdecl DrawShotgun(__int32 weaponType)
 	}
 	else
 	{
-		ReadyShotgun(weaponType);
+		ready_shotgun(weaponType);
 	}
 
 	Lara.leftArm.frameBase = Lara.rightArm.frameBase = Anims[item->animNumber].framePtr;
@@ -844,7 +848,7 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 			pos.z = 72;
 		}
 
-		GetLaraJointPosition(&pos, UARM_L);
+		GetLaraJointPosition(&pos, LJ_LOUTARM);
 
 		if (LaraItem->meshBits)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
@@ -1271,7 +1275,7 @@ void __cdecl RifleHandler(__int32 weaponType)
 	{
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
-			TriggerDynamics(
+			TriggerDynamicLight(
 				LaraItem->pos.xPos + (SIN(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
 				LaraItem->pos.yPos + (GetRandomControl() & 0x7F) - 575,
 				LaraItem->pos.zPos + (COS(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
@@ -1289,9 +1293,9 @@ void __cdecl RifleHandler(__int32 weaponType)
 			pos.y = (GetRandomControl() & 0x7F) - 63;
 			pos.z = GetRandomControl() - 128;
 
-			GetLaraJointPosition(&pos, 11);
+			GetLaraJointPosition(&pos, LJ_RHAND);
 
-			TriggerDynamics(pos.x, pos.y, pos.z, 12,
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 12,
 				(GetRandomControl() & 0x3F) + 192,
 				(GetRandomControl() & 0x1F) + 128,
 				(GetRandomControl() & 0x3F));
@@ -1336,7 +1340,7 @@ void __cdecl FireCrossbow(PHD_3DPOS* pos)
 			jointPos.y = 228;
 			jointPos.z = 32;
 
-			GetLaraJointPosition(&jointPos, 11);
+			GetLaraJointPosition(&jointPos, LJ_RHAND);
 
 			item->roomNumber = LaraItem->roomNumber;
 			
@@ -1383,10 +1387,400 @@ void __cdecl FireCrossbow(PHD_3DPOS* pos)
 	}
 }
 
+void __cdecl DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
+{
+	if (!(dest->flags & 0x8000))
+	{
+		if (dest != LaraItem || LaraItem->hitPoints <= 0)
+		{
+			if (!src->itemFlags[2])
+			{
+				dest->hitStatus = true;
+
+				OBJECT_INFO* obj = &Objects[dest->objectNumber];
+				if (!obj->undead)
+				{
+					HitTarget(dest, 0, 30, 1);
+					if (dest != LaraItem)
+					{
+						++Savegame.Game.AmmoHits;
+						if (src->hitPoints <= 0)
+						{
+							++Savegame.Level.Kills;
+							CreatureDie((dest - Items) / sizeof(ITEM_INFO), 1);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			LaraItem->hitPoints -= 50;
+			if (!(Rooms[dest->roomNumber].flags & ENV_FLAG_WATER) && LaraItem->hitPoints <= 50)
+				LaraBurn();
+		}
+	}
+}
+
+void __cdecl TriggerUnderwaterExplosion(ITEM_INFO* item)
+{
+	TriggerExplosionBubbles(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
+	
+	for (__int32 i = 0; i < 3; i++)
+	{
+		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -1, 1, item->roomNumber);
+	}
+	
+	__int32 wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	if (wh != NO_HEIGHT)
+	{
+		__int32 dy = item->pos.yPos - wh;
+		if (dy < 2048)
+		{
+			SplashSetup.y = wh;
+			SplashSetup.x = item->pos.xPos;
+			SplashSetup.z = item->pos.zPos;
+			SplashSetup.innerRadVel = 160;
+			SplashSetup.middleRadVel = 224;
+			SplashSetup.outerRadVel = 272;
+			SplashSetup.innerRad = (2048 - dy) >> 6 + 16;
+			SplashSetup.innerSize = (2048 - dy) >> 6 + 12;
+			SplashSetup.innerYVel = 8 * (-512 - (2048 - dy));
+			SplashSetup.middleRad = (2048 - dy) >> 6 + 24;
+			SplashSetup.middleSize = (2048 - dy) >> 6 + 24;
+			SplashSetup.middleYVel = 4 * (-768 - (2048 - dy));
+			SplashSetup.outerRad = (2048 - dy) >> 6 + 32;
+			SplashSetup.outerSize = (2048 - dy) >> 6 + 32;
+			
+			SetupSplash(&SplashSetup);
+		}
+	}
+}
+
+void __cdecl undraw_shotgun(__int32 weapon)
+{
+	ITEM_INFO* item = &Items[Lara.weaponItem];
+	item->goalAnimState = 3;
+	
+	AnimateItem(item);
+
+	if (item->status == ITEM_DEACTIVATED)
+	{
+		Lara.gunStatus = LG_NO_ARMS;
+		Lara.target = NULL;
+		Lara.rightArm.lock = 0;
+		Lara.leftArm.lock = 0;
+		
+		KillItem(Lara.weaponItem);
+
+		Lara.weaponItem = NO_ITEM;
+		Lara.rightArm.frameNumber = 0;
+		Lara.leftArm.frameNumber = 0;
+	}
+	else if (item->currentAnimState == 3 && item->frameNumber - Anims[item->animNumber].frameBase == 21)
+	{
+		undraw_shotgun_meshes(weapon);
+	}
+	
+	Lara.rightArm.frameBase = Anims[item->animNumber].framePtr;
+	Lara.leftArm.frameBase = Anims[item->animNumber].framePtr;
+	Lara.rightArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.leftArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.rightArm.animNumber = item->animNumber;
+	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
+}
+
+void __cdecl undraw_shotgun_meshes(__int32 weapon)
+{
+	__int16 objectNumber = WeaponObject(weapon);
+	Lara.backGun = objectNumber;
+	Lara.meshPtrs[10] = Meshes[Objects[0].meshIndex + 20];
+}
+
+void __cdecl draw_shotgun(__int32 weapon)
+{
+	ITEM_INFO* item;
+
+	if (Lara.weaponItem == NO_ITEM)
+	{
+		Lara.weaponItem = CreateItem();
+		item = &Items[Lara.weaponItem];
+		item->objectNumber = WeaponObject(weapon);
+		item->animNumber = Objects[item->objectNumber].animIndex;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->goalAnimState = 1;
+		item->currentAnimState = 1;
+		item->status = ITEM_ACTIVE;
+		item->roomNumber = 255;
+		Lara.rightArm.frameBase = Objects[item->objectNumber].frameBase;
+		Lara.leftArm.frameBase = Lara.rightArm.frameBase;
+	}
+	else
+	{
+		item = &Items[Lara.weaponItem];
+	}
+
+	AnimateItem(item);
+	
+	if (item->currentAnimState && item->currentAnimState != 6)
+	{
+		if (item->frameNumber - Anims[item->animNumber].frameBase == Weapons[weapon].drawFrame)
+		{
+			draw_shotgun_meshes(weapon);
+		}
+		else if (Lara.waterStatus == LW_UNDERWATER)
+		{
+			item->goalAnimState = 6;
+		}
+	}
+	else
+	{
+		ready_shotgun(weapon);
+	}
+
+	Lara.rightArm.frameBase = Anims[item->animNumber].framePtr;
+	Lara.leftArm.frameBase = Anims[item->animNumber].framePtr;
+	Lara.rightArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.leftArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.rightArm.animNumber = item->animNumber;
+	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
+}
+
+void __cdecl draw_shotgun_meshes(__int32 weaponType)
+{
+	Lara.backGun = 0;
+	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
+}
+
+void __cdecl CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
+{
+	/*v4 = item2;
+	if (!(item2->flags & 0x40))
+	{
+		if (search)
+		{
+			__int32 numSpheres = GetSpheres(item2, SphereList, 1);
+			__int32 best = -1;
+			__int32 bestDistance = 0x7FFFFFFF;
+
+			for (__int32 i = 0; i < numSpheres; i++)
+			{
+				SPHERE* sphere = &SphereList[i];
+
+				__int32 dx = sphere->x - item1->pos.xPos;
+				__int32 dy = sphere->y - item1->pos.yPos;
+				__int32 dz = sphere->z - item1->pos.zPos;
+
+				if (SQUARE(dx) + SQUARE(dy) + SQUARE(dz) - SQUARE(sphere->r) < bestDistance)
+				{
+					bestDistance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz) - SQUARE(sphere->r);
+					best = i;
+				}
+			}
+
+			if (numSpheres > 0)
+			{
+				v7 = &Slist[0].z;
+				v8 = item1->pos.yPos;
+				v9 = item1->pos.zPos;
+				item1a = item1->pos.xPos;
+				v20 = v8;
+				v21 = v9;
+				do
+				{
+					r = v7[1];
+					a1 = *(v7 - 2) - item1a;
+					v11 = *(v7 - 1) - v20;
+					if (dx2 + dy2 + dz2 - r2 < search)
+					{
+						search = (dx2 + dy2 + dz2 - r2;
+						best = item2;
+					}
+					v5 = v22;
+					v7 += 4;
+					item2 = (item2 + 1);
+				} while (item2 < v22);
+				best = best;
+			}
+		}
+		else
+		{
+			v5 = Objects[item2->objectNumber].nmeshes;
+			v6 = v5 - 1;
+		}
+		if (v6 == v5 - 1)
+		{
+			if (v4->flags & 0x3E00 && (item2->flags & 0x3E00) != 15872)
+			{
+				__int16 roomNumber = item2->roomNumber;
+				FLOOR_INFO* floor = GetFloor(item2->pos.xPos, item2->pos.yPos - 256, item2->pos.zPos, &roomNumber);
+				GetFloorHeight(floor, item2->pos.xPos, item2->pos.yPos - 256, item2->pos.zPos);
+				TestTriggers(TriggerIndex, 1, item2->flags & 0x3E00);
+			}
+			else
+			{
+				v14 = GetSwitchTrigger(v4, &ItemNos, 1);
+				if (v14 > 0)
+				{
+					v15 = v14;
+					v16 = (&v22 + 2 * v14 + 2);
+					do
+					{
+						AddActiveItem(*v16);
+						v17 = *v16;
+						--v16;
+						Items[v17]._bf15ea = Items[v17]._bf15ea & 0xFFFFFFFB | 2;
+						HIBYTE(Items[v16[1]].flags) |= 0x3Eu;
+						--v15;
+					} while (v15);
+				}
+			}
+			
+			if (item2->objectNumber == ID_SHOOT_SWITCH1)
+				ExplodeItemNode(item2, Objects[ID_SHOOT_SWITCH1].nmeshes - 1, 0, 64);
+			
+			AddActiveItem((item2 - Items) / sizeof(ITEM_INFO));
+			item2->flags |= 0x3E40;
+			item2->status = ITEM_ACTIVE;
+		}
+	}*/
+}
+
+void __cdecl FireHK(__int32 mode)
+{
+	if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+	{
+		HKTimer = 12;
+	}
+	else if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
+	{
+		HKCounter++;
+		if (HKCounter == 5)
+		{
+			HKCounter = 0;
+			HKTimer = 12;
+		}
+	}
+
+	__int16 angles[2];
+
+	angles[1] = Lara.leftArm.xRot;
+	angles[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
+
+	if (!Lara.leftArm.lock)
+	{
+		angles[0] = Lara.torsoYrot + Lara.leftArm.yRot + LaraItem->pos.yRot;
+		angles[1] = Lara.torsoXrot + Lara.leftArm.xRot;
+	}
+
+	if (mode)
+	{
+		Weapons[WEAPON_HK].shotAccuracy = 2184;
+		Weapons[WEAPON_HK].damage = 1;
+	}
+	else
+	{
+		Weapons[WEAPON_HK].shotAccuracy = 728;
+		Weapons[WEAPON_HK].damage = 3;
+	}
+
+	if (FireWeapon(WEAPON_HK, Lara.target, LaraItem, angles))
+	{
+		SmokeCountL = 12;
+		SmokeWeapon = WEAPON_HK;
+		TriggerGunShell(1, ID_GUNSHELL, 5);
+		Lara.rightArm.flash_gun = Weapons[WEAPON_HK].flashTime;
+	}
+}
+
+void __cdecl FireShotgun()
+{
+	__int16 angles[2];
+	
+	angles[1] = Lara.leftArm.xRot;
+	angles[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
+
+	if (!Lara.leftArm.lock)
+	{
+		angles[0] = Lara.torsoYrot + Lara.leftArm.yRot + LaraItem->pos.yRot;
+		angles[1] = Lara.torsoXrot + Lara.leftArm.xRot;
+	}
+
+	__int16 loopAngles[2];
+	bool fired = false;
+	__int32 value = (g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
+
+	for (__int32 i = 0; i < 6; i++)
+	{
+		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
+		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
+
+		if (FireWeapon(WEAPON_SHOTGUN, Lara.target, LaraItem, loopAngles))
+			fired = true;
+	}
+
+	if (fired)
+	{
+		PHD_VECTOR pos;
+
+		pos.x = 0;
+		pos.y = 228;
+		pos.z = 32;
+
+		GetLaraJointPosition(&pos, LJ_RHAND);
+
+		PHD_VECTOR pos2;
+
+		pos2.x = pos.x;
+		pos2.y = pos.y;
+		pos2.z = pos.z;
+
+		pos.x = 0;
+		pos.y = 1508;
+		pos.z = 32;
+
+		GetLaraJointPosition(&pos, LJ_RHAND);
+
+		SmokeCountL = 32;
+		SmokeWeapon = WEAPON_SHOTGUN;
+
+		if (LaraItem->meshBits)
+		{
+			for (__int32 i = 0; i < 7; i++)
+			{
+				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, 32);
+			}
+		}
+
+		Lara.rightArm.flash_gun = Weapons[WEAPON_SHOTGUN].flashTime;
+		
+		SoundEffect(SFX_EXPLOSION1, &LaraItem->pos, 20971524);
+		SoundEffect(Weapons[WEAPON_SHOTGUN].sampleNum, &LaraItem->pos, 0);
+		
+		Savegame.Game.AmmoUsed++;
+	}
+}
+
+void __cdecl ready_shotgun(__int32 weaponType)
+{
+	Lara.gunStatus = LG_READY;
+	Lara.leftArm.zRot = 0;
+	Lara.leftArm.yRot = 0;
+	Lara.leftArm.xRot = 0;
+	Lara.rightArm.zRot = 0;
+	Lara.rightArm.yRot = 0;
+	Lara.rightArm.xRot = 0;
+	Lara.rightArm.frameNumber = 0;
+	Lara.leftArm.frameNumber = 0;
+	Lara.rightArm.lock = 0;
+	Lara.leftArm.lock = 0;
+	Lara.target = NULL;
+	Lara.rightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
+	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
+}
+
 void __cdecl Inject_Lara1Gun()
 {
-	INJECT(0x0044EAC0, DrawShotgun);
-	INJECT(0x0044EE00, AnimateShotgun);
-	INJECT(0x0044DCC0, RifleHandler);
-	INJECT(0x00429ED0, FireCrossbow)
+	
 }

@@ -64,7 +64,7 @@ void __cdecl TroopsControl(__int16 itemNum)
 		pos.z = TroopsBite1.z;
 
 		GetJointAbsPosition(item, &pos, TroopsBite1.meshNum);
-		TriggerDynamics(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 8, 24, 16, 4);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 8, 24, 16, 4);
 
 		item->firedWeapon--;
 	}

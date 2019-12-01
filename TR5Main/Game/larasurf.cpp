@@ -8,6 +8,7 @@
 #include "box.h"
 #include "Lara.h"
 #include "laraswim.h"
+#include "larafire.h"
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
