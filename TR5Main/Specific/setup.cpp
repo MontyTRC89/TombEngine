@@ -999,7 +999,7 @@ void __cdecl NewObjects()
 	obj = &Objects[ID_MONKEY];
 	if (obj->loaded)
 	{
-		//if (!objects[MESHSWAP2].loaded)
+		//if (!Objects[MESHSWAP2].loaded)
 		//	S_ExitSystem("FATAL: Monkey requires MESHSWAP2 (Monkey + Pickups)");
 
 		//obj->draw_routine = (void*)DrawMonkey;
@@ -2413,7 +2413,7 @@ void __cdecl ObjectObjects()
 	{
 		obj->collision = PickupCollision;
 		obj->control = FlareControl;
-		obj->drawRoutine = DrawFlareItem;
+		//obj->drawRoutine = draw_f;
 		obj->pivotLength = 256;
 		obj->hitPoints = 256;
 	}
@@ -2552,8 +2552,8 @@ void __cdecl ObjectObjects()
 	v25 = 0;
 	do
 	{
-		v26 = v25 + objects[ID_SCUBA_HARPOON].mesh_index;
-		v27 = v25 + objects[ID_BURNING_ROOTS].mesh_index;
+		v26 = v25 + Objects[ID_SCUBA_HARPOON].mesh_index;
+		v27 = v25 + Objects[ID_BURNING_ROOTS].mesh_index;
 		v25 += 2;
 		meshes[v27 + 1] = meshes[v26];
 	}

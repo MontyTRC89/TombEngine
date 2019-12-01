@@ -307,7 +307,7 @@ void __cdecl ControlGuard(int itemNum)
 	v21 = GetFloor(v19, v8, v20, &a4);
 	v22 = GetFloorHeight(v21, v19, v8, v20);
 	v23 = item->box_number;
-	v24 = lara_item->box_number;
+	v24 = LaraItem->box_number;
 	if (v23 == v24 || v8 >= v130 - 384 || (v25 = v129, v8 >= v129 + 256) || v8 <= v129 - 256)
 	{
 		v25 = v129;
@@ -325,7 +325,7 @@ void __cdecl ControlGuard(int itemNum)
 		v135 = SwatGunY;
 		v136 = SwatGunZ;
 		GetJointAbsPosition(item, &v134, SwatGunMesh);
-		TriggerDynamics(v134, v135, v136, 2 * item->firedWeapon + 10, 192, 128, 32);
+		TriggerDynamicLight(v134, v135, v136, 2 * item->firedWeapon + 10, 192, 128, 32);
 		item->firedWeapon--;
 	}
 	v26 = item->_bf15ea;
@@ -333,10 +333,10 @@ void __cdecl ControlGuard(int itemNum)
 	if (v26 & 0x3E00)
 		GetAITarget(creature);
 	else
-		creature->enemy = lara_item;
+		creature->enemy = LaraItem;
 	CreatureAIInfo(item, &a2);
-	v28 = lara_item;
-	if (*(&v27->mood + 2) == lara_item)
+	v28 = LaraItem;
+	if (*(&v27->mood + 2) == LaraItem)
 	{
 		v29 = v125;
 		LOWORD(v133) = v125;
@@ -344,11 +344,11 @@ void __cdecl ControlGuard(int itemNum)
 	}
 	else
 	{
-		v30 = lara_item->pos.zPos - item->pos.zPos;
-		v31 = lara_item->pos.xPos - item->pos.xPos;
+		v30 = LaraItem->pos.zPos - item->pos.zPos;
+		v31 = LaraItem->pos.xPos - item->pos.xPos;
 		v29 = phd_atan(v30, v31) - item->pos.yRot;
 		v132 = v30 * v30 + v31 * v31;
-		v28 = lara_item;
+		v28 = LaraItem;
 		LOWORD(v133) = v29;
 	}
 	v32 = animIndex;
@@ -381,7 +381,7 @@ void __cdecl ControlGuard(int itemNum)
 	{
 		if (item->hitPoints >= Objects[69].hitPoints)
 		{
-			if (*(&v27->mood + 2) == lara_item)
+			if (*(&v27->mood + 2) == LaraItem)
 				* (&v27->_bfc + 1) = 0;
 		}
 		else
@@ -417,13 +417,13 @@ void __cdecl ControlGuard(int itemNum)
 	LOWORD(v38) = CreatureTurn(item, v37);
 	v39 = *(&v27->mood + 2);
 	v128 = v38;
-	*(&v27->mood + 2) = lara_item;
-	v40 = lara_item;
-	if (v132 < 0x400000 && lara_item->speed > 20 || item->_bf15ea & 0x10)
+	*(&v27->mood + 2) = LaraItem;
+	v40 = LaraItem;
+	if (v132 < 0x400000 && LaraItem->speed > 20 || item->_bf15ea & 0x10)
 		goto LABEL_52;
 	if (TargetVisible(item, &v131))
 	{
-		v40 = lara_item;
+		v40 = LaraItem;
 	LABEL_52:
 		v41 = item->_bf15ea;
 		if (!(v41 & 0x2000) && item->object_number != 69 && abs(item->pos.yPos - v40->pos.yPos) < 1280)
@@ -438,10 +438,10 @@ void __cdecl ControlGuard(int itemNum)
 	v138 = item->pos.yPos - 384;
 	v139 = item->pos.zPos;
 	v140 = item->roomNumber;
-	v141 = lara_item->pos.xPos;
-	v43 = GetBestFrame(lara_item);
-	v142 = lara_item->pos.yPos + ((*(v43 + 6) + 3 * *(v43 + 4)) >> 2);
-	v143 = lara_item->pos.zPos;
+	v141 = LaraItem->pos.xPos;
+	v43 = GetBestFrame(LaraItem);
+	v142 = LaraItem->pos.yPos + ((*(v43 + 6) + 3 * *(v43 + 4)) >> 2);
+	v143 = LaraItem->pos.zPos;
 	v45 = !LOS(&v137, &v141) && item->triggerFlags != 10;
 	v27->maximumTurn = 0;
 	v46 = item->currentAnimState;
@@ -498,7 +498,7 @@ void __cdecl ControlGuard(int itemNum)
 			}
 			goto LABEL_105;
 		}
-		if (*(&v27->mood + 2) == lara_item && (v133 > 20480 || v133 < -20480) && v120 != 69)
+		if (*(&v27->mood + 2) == LaraItem && (v133 > 20480 || v133 < -20480) && v120 != 69)
 		{
 			item->goalAnimState = 2;
 			goto LABEL_105;
@@ -913,7 +913,7 @@ void __cdecl ControlGuard(int itemNum)
 	case 17:
 		v71 = item->_bf15ea;
 		v118 = 0;
-		if (!(v71 & 0x10) && lara_item->speed < 40 && !(*(&lara + 69) & 0x10))
+		if (!(v71 & 0x10) && LaraItem->speed < 40 && !(*(&lara + 69) & 0x10))
 			v27->_bfc &= 0xFFFEu;
 		if (v27->_bfc & 1)
 			item->goalAnimState = 18;

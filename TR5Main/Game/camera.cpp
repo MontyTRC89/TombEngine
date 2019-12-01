@@ -23,14 +23,8 @@ void __cdecl AlterFOV(__int32 value)
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
 }
 
-void __cdecl j_CalculateCamera()
-{
-	CalculateCamera();
-}
-
 void Inject_Camera()
 {
 	INJECT(0x0048EDC0, AlterFOV);
 	INJECT(0x0048F760, LookAt);
-	INJECT(0x00401D5C, j_CalculateCamera);
 }

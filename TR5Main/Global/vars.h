@@ -275,6 +275,8 @@
 #define QuakeCam					VAR_U_(0x00E4F520, QUAKE_CAMERA)
 #define SplineFromCamera			VAR_U_(0x00E4F3DC, __int32)
 #define Unk_0051D024				VAR_U_(0x0051D024, byte)
+#define PoisonFlag					VAR_U_(0x00E5BF3E, byte)
+#define SplashSetup					VAR_U_(0x00E6CAC0, SPLASH_SETUP)
 
 // JeepBaddieCollision
 #define Unk_0080DE1A				VAR_U_(0x0080DE1A, __int16)

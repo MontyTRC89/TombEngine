@@ -37,11 +37,11 @@ void __cdecl FlameThrowerControl(__int16 itemNumber)
 	__int32 random = GetRandomControl();
 	if (item->currentAnimState != 6 && item->currentAnimState != 11)
 	{
-		TriggerDynamics(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random >> 4) & 3), 16 - ((random >> 6) & 3), random & 3); 
+		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random >> 4) & 3), 16 - ((random >> 6) & 3), random & 3); 
 		TriggerPilotFlame(itemNumber);
 	}
 	else
-		TriggerDynamics(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random >> 4) & 3), 24 - ((random >> 6) & 3), random & 7);  
+		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random >> 4) & 3), 24 - ((random >> 6) & 3), random & 7);  
 
 	if (item->hitPoints <= 0)
 	{
@@ -512,7 +512,7 @@ void __cdecl TriggerPilotFlame(__int32 itemnum)
 	spark->friction = 4;
 	spark->gravity = -(GetRandomControl() & 3) - 2;
 	spark->maxYvel = -(GetRandomControl() & 3) - 4;
-	//spark->def = objects[EXPLOSION1].mesh_index;
+	//spark->def = Objects[EXPLOSION1].mesh_index;
 	spark->scalar = 0;
 	__int32 size = (GetRandomControl() & 7) + 32;
 	spark->size = size >> 1;

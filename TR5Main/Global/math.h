@@ -24,6 +24,7 @@
 #define phd_RotYXZ ((void(__cdecl*)(__int32, __int32, __int32)) 0x00490150)
 #define phd_TranslateRel ((void(__cdecl*)(__int32, __int32, __int32)) 0x0048FB20)
 #define mGetAngle ((__int32(__cdecl*)(__int32, __int32, __int32, __int32)) 0x0048F290)
+#define phd_GenerateW2V ((void(__cdecl*)(PHD_3DPOS*)) 0x0048F330)
 
 #define PI 3.14159265358979323846f
 #define RADIAN 0.01745329252f

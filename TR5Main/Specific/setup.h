@@ -13,8 +13,8 @@ void __cdecl InitialiseObjects();
 
 void Inject_Setup();
 
-#define INIT_PICKUP(obj_id) \
-obj = &Objects[obj_id]; \
+#define INIT_PICKUP(obid) \
+obj = &Objects[obid]; \
 if (obj->loaded) \
 { \
 	obj->initialise = InitialisePickup; \
@@ -22,23 +22,23 @@ if (obj->loaded) \
 	obj->control = PickupControl; \
 }
 
-#define INIT_KEYHOLE(obj_id) \
-obj = &Objects[obj_id]; \
+#define INIT_KEYHOLE(obid) \
+obj = &Objects[obid]; \
 if (obj->loaded) \
 { \
 	obj->collision = KeyHoleCollision; \
 }
 
-#define INIT_PUZZLEHOLE(obj_id) \
-obj = &Objects[obj_id]; \
+#define INIT_PUZZLEHOLE(obid) \
+obj = &Objects[obid]; \
 if (obj->loaded) \
 { \
 	obj->collision = PuzzleHoleCollision; \
 	obj->control = AnimatingControl; \
 }
 
-#define INIT_PUZZLEDONE(obj_id) \
-obj = &Objects[obj_id]; \
+#define INIT_PUZZLEDONE(obid) \
+obj = &Objects[obid]; \
 if (obj->loaded) \
 { \
 	obj->collision = PuzzleDoneCollision; \
@@ -49,8 +49,8 @@ if (obj->loaded) \
 //Bones[obj->boneIndex] |= ROT_Y;
 //Bones[obj->boneIndex + 4] |= ROT_X;
 
-#define INIT_ANIMATING(obj_id) \
-obj = &Objects[obj_id]; \
+#define INIT_ANIMATING(obid) \
+obj = &Objects[obid]; \
 if (obj->loaded) \
 { \
 	obj->initialise = InitialiseAnimating; \

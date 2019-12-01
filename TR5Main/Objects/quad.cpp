@@ -14,6 +14,7 @@
 #include "..\Game\laraflar.h"
 
 #include <vector>
+#include "../Game/lara1gun.h"
 
 using namespace std;
 
@@ -66,7 +67,6 @@ typedef enum QUAD_ANIM_STATES {
 #define MAX_REVS		0xa000
 
 #define TERMINAL_FALLSPEED 240
-#define PITCH_SHIFT	4
 #define QUAD_SLIP 100
 #define QUAD_SLIP_SIDE 50
 
@@ -1160,7 +1160,7 @@ void __cdecl QuadBikeCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll
 		if (Lara.gunType == WEAPON_FLARE)
 		{
 			CreateFlare(ID_FLARE_ITEM, 0);
-			UndrawFlaresMeshes();
+			undraw_flare_meshes();
 			Lara.flareControlLeft = 0;
 			Lara.requestGunType = LG_NO_ARMS;
 			Lara.gunType = LG_NO_ARMS;

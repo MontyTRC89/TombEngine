@@ -18,5 +18,6 @@ __int32 __cdecl CollideStaticObjects(COLL_INFO* coll, __int32 x, __int32 y, __in
 __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, __int32 flag2);
 __int32 __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
 void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c);
+void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 
 void Inject_Collide();

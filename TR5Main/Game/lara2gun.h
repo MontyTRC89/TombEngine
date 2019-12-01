@@ -1,9 +1,12 @@
 #pragma once
+#include "..\Global\global.h"
 
-#define DrawPistols ((void (__cdecl*)(__int32)) 0x0044F950)
-#define UndrawPistols ((void (__cdecl*)(__int32)) 0x0044FAC0) 
-#define PistolsHandler ((void (__cdecl*)(__int32)) 0x0044FFC0) 
-#define DrawPistolMeshes ((void (__cdecl*)(__int32)) 0x0044FE60) 
-#define UndrawPistolMeshLeft ((void (__cdecl*)(__int32)) 0x0044FED0) 
-#define UndrawPistolMeshRight ((void (__cdecl*)(__int32)) 0x0044FF40) 
-#define AnimatePistols ((void (__cdecl*)(__int32)) 0x004502B0) 
+void __cdecl AnimatePistols(__int32 weaponType);
+void __cdecl PistolHandler(__int32 weaponType);
+void __cdecl undraw_pistol_mesh_right(__int32 weaponType);
+void __cdecl undraw_pistol_mesh_left(__int32 weaponType);
+void __cdecl draw_pistol_meshes(__int32 weaponType);
+void __cdecl ready_pistols(__int32 weaponType);
+void __cdecl undraw_pistols(__int32 weaponType);
+void __cdecl set_arm_info(LARA_ARM* arm, __int32 frame);
+void __cdecl draw_pistols(__int32 weaponType);

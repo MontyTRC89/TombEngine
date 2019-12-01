@@ -60,7 +60,7 @@ void __cdecl MPGunControl(__int16 itemNumber)
 
 		GetJointAbsPosition(item, &pos, mpgunBite.meshNum);
 
-		TriggerDynamics(pos.x, pos.y, pos.z, (item->firedWeapon << 1) + 4, 24, 16, 4);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, (item->firedWeapon << 1) + 4, 24, 16, 4);
 	}
 
 	if (Boxes[item->boxNumber].overlapIndex & BLOCKED)

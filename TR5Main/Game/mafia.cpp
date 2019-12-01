@@ -98,7 +98,7 @@ void __cdecl ArmedBaddy2Control(__int16 itemNum)
 		pos.z = ArmedBaddy2Gun.z;
 
 		GetJointAbsPosition(item, &pos, ArmedBaddy2Gun.meshNum);
-		TriggerDynamics(pos.x, pos.y, pos.z, 4 * item->firedWeapon + 8, 24, 16, 4);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->firedWeapon + 8, 24, 16, 4);
 		item->firedWeapon--;
 	}
 

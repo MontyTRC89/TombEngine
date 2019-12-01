@@ -3,7 +3,7 @@
 #include "..\Global\global.h"
 
 void __cdecl LaraWaterCurrent(COLL_INFO* coll);
-__int32 __cdecl GetWaterDepth(long x, long y, long z, short room_number);
+__int32 __cdecl GetWaterDepth(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
 void __cdecl lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll);
 void __cdecl lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll);
 void __cdecl lara_col_dive(ITEM_INFO* item, COLL_INFO* coll);

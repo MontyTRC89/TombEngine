@@ -168,7 +168,7 @@ void __cdecl ScalesCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		pos.y = 0;
 		pos.z = 0;
 
-		GetLaraJointPosition(&pos, 14);
+		GetLaraJointPosition(&pos, LJ_LHAND);
 
 		DRIP_STRUCT* drip = &Drips[GetFreeDrip()];
 		drip->x = pos.x;

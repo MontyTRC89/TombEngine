@@ -846,7 +846,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					InitialiseNewWeapon();
 					Lara.gunStatus = LG_SPECIAL;
 					Lara.flareAge = (__int32)(item->data) & 0x7FFF;
-					DrawFlareMeshes();
+					draw_flare_meshes();
 					KillItem(itemNum);
 				}
 

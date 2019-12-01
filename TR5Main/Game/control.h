@@ -43,6 +43,8 @@
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)
 #define ObjectOnLOS2 ((__int32 (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
 //#define AnimateWaterfalls ((void (__cdecl*)()) 0x00465DF0)
+#define LOS ((__int32 (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
+#define GetTargetOnLOS ((__int32 (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, __int32, __int32)) 0x0041A170)
 
 GAME_STATUS __cdecl DoTitle(__int32 index);
 GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);
@@ -51,6 +53,7 @@ void __cdecl UpdateSky();
 void __cdecl AnimateWaterfalls();
 void __cdecl ActivateKey();
 void __cdecl ActivateCamera();
+__int16 __cdecl GetDoor(FLOOR_INFO* floor);
 
 unsigned __stdcall GameMain(void*);
 void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags);

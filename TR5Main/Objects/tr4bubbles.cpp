@@ -11,6 +11,7 @@
 #include "..\Game\people.h"
 #include "..\Game\laramisc.h"
 #include "..\Game\debris.h"
+#include "../Game/traps.h"
 
 void __cdecl BubblesEffect1(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel)
 {

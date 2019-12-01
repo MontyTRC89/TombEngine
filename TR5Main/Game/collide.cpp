@@ -329,6 +329,37 @@ void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		ObjectCollision(itemNumber, l, c);
 }
 
+void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) (F)
+{
+	for (__int32 i = 0; i < 2; i++)
+	{
+		GAME_VECTOR s;
+		s.x = (i << 8) - 0x80;
+		s.y = -256;
+		s.z = 0;
+
+		GetLaraJointPosition((PHD_VECTOR*)&s, LJ_HEAD);
+		s.roomNumber = LaraItem->roomNumber;
+
+		GAME_VECTOR d;
+		d.x = 0;
+		d.x = (s.x + ((SIN(LaraItem->pos.yRot) << 1) + SIN(LaraItem->pos.yRot))) >> 4;
+		d.y = s.y;
+		d.z = (s.z + ((COS(LaraItem->pos.yRot) << 1) + COS(LaraItem->pos.yRot))) >> 4;
+		
+		LOS(&s, &d);
+		
+		PHD_VECTOR v;
+		MESH_INFO* mesh;
+
+		// CHECK
+		/*if (ObjectOnLOS2(&s, &d, &v, &mesh) != 999)
+		{
+			coll->hitStatic = true;
+		}*/
+	}
+}
+
 void Inject_Collide()
 {
 	INJECT(0x00411DB0, CollideStaticObjects);

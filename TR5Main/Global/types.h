@@ -1405,6 +1405,23 @@ struct DOOR_DATA
 	ITEM_INFO* item; // size=144, offset=88
 };
 
+struct SUBSUIT_INFO
+{
+	short XRot; // size=0, offset=0
+	short dXRot; // size=0, offset=2
+	short XRotVel; // size=0, offset=4
+	short Vel[2]; // size=4, offset=6
+	short YVel; // size=0, offset=10
+};
+
+struct PISTOL_DEF {
+	__int16 objectNum;
+	char draw1Anim2;
+	char draw1Anim;
+	char draw2Anim;
+	char recoilAnim;
+};
+
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
 typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);
