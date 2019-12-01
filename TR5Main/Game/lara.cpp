@@ -2953,7 +2953,8 @@ void __cdecl lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 		{
 			item->pos.yPos += coll->frontFloor - bounds[2];
 
-			switch ((char)(item->pos.yRot + ANGLE(45)) / (char)ANGLE(90))
+			__int16 dir = (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+			switch (dir)
 			{
 			case NORTH:
 				item->pos.zPos = (item->pos.zPos | 0x3FF) - 100;
