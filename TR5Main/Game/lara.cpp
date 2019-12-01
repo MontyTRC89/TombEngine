@@ -6185,11 +6185,11 @@ __int16 LaraCeilingFront(ITEM_INFO* item, __int16 ang, __int32 dist, __int32 h)/
 {
 	__int16 room = item->roomNumber;
 
-	__int32 x = item->pos.xPos + ((dist * 4 * SIN(ang)) >> W2V_SHIFT);
+	__int32 x = item->pos.xPos + ((dist * SIN(ang)) >> W2V_SHIFT);
 	__int32 y = item->pos.yPos - h;
-	__int32 z = item->pos.zPos + ((dist * 4 * COS(ang)) >> W2V_SHIFT);
+	__int32 z = item->pos.zPos + ((dist * COS(ang)) >> W2V_SHIFT);
 
-	__int32 height = GetFloorHeight(GetFloor(x, y, z, &room), x, y, z);
+	__int32 height = GetCeiling(GetFloor(x, y, z, &room), x, y, z);
 
 	if (height != NO_HEIGHT)
 		height += h - item->pos.yPos;
@@ -6201,9 +6201,9 @@ __int16 __cdecl LaraFloorFront(ITEM_INFO* item, __int16 ang, __int32 dist)//117B
 {
 	__int16 room = item->roomNumber;
 
-	__int32 x = item->pos.xPos + ((dist * 4 * SIN(ang)) >> W2V_SHIFT);
+	__int32 x = item->pos.xPos + ((dist * SIN(ang)) >> W2V_SHIFT);
 	__int32 y = item->pos.yPos - 762;
-	__int32 z = item->pos.zPos + ((dist * 4 * COS(ang)) >> W2V_SHIFT);
+	__int32 z = item->pos.zPos + ((dist * COS(ang)) >> W2V_SHIFT);
 
 	__int32 height = GetFloorHeight(GetFloor(x, y, z, &room), x, y, z);
 
