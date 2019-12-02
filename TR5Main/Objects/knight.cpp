@@ -12,7 +12,7 @@
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
-void __cdecl InitialiseKnightTemplar(short itemNum)
+void InitialiseKnightTemplar(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -25,7 +25,7 @@ void __cdecl InitialiseKnightTemplar(short itemNum)
 	item->meshBits &= 0xF7FF;
 }
 
-void __cdecl KnightTemplarControl(short itemNum)
+void KnightTemplarControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

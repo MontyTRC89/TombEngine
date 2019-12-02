@@ -12,7 +12,7 @@
 #include "../Game/collide.h"
 #include "../Game/draw.h"
 
-void __cdecl InitialiseJeanYves(short itemNum)
+void InitialiseJeanYves(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -24,7 +24,7 @@ void __cdecl InitialiseJeanYves(short itemNum)
 
 }
 
-void __cdecl JeanYvesControl(short itemNum)
+void JeanYvesControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

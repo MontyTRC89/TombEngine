@@ -98,7 +98,7 @@ void draw_flare_meshes()//4A394(<), 4A7F8(<) (F)
 	Lara.meshPtrs[LM_LHAND] = Meshes[Objects[ID_FLARE_ANIM].meshIndex + 104];
 }
 
-void __cdecl undraw_flare()//4A108, 4A56C
+void undraw_flare()//4A108, 4A56C
 {
 	Lara.flareControlLeft = true;
 
@@ -200,7 +200,7 @@ void __cdecl undraw_flare()//4A108, 4A56C
 	set_flare_arm(Lara.leftArm.frameNumber);
 }
 
-void __cdecl draw_flare()//49F74, 4A3D8 (F)
+void draw_flare()//49F74, 4A3D8 (F)
 {
 	short frame;
 
@@ -249,7 +249,7 @@ void __cdecl draw_flare()//49F74, 4A3D8 (F)
 	}
 }
 
-void __cdecl set_flare_arm(int frame)//49ED4, 4A338 (F)
+void set_flare_arm(int frame)//49ED4, 4A338 (F)
 {
 	short anim = Objects[ID_FLARE_ANIM].animIndex;
 
@@ -274,7 +274,7 @@ void __cdecl set_flare_arm(int frame)//49ED4, 4A338 (F)
 	Lara.leftArm.frameBase = Anims[anim].framePtr;
 }
 
-void __cdecl CreateFlare(short objectNum, int thrown)//49BBC, 4A020
+void CreateFlare(short objectNum, int thrown)//49BBC, 4A020
 {
 	short itemNum = CreateItem();
 	if (itemNum != NO_ITEM)

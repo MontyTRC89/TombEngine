@@ -11,7 +11,7 @@
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 
-int __cdecl GetWaterSurface(int x, int y, int z, short roomNumber)
+int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO* room = &Rooms[roomNumber];
 	FLOOR_INFO* floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT) * room->xSize];
@@ -41,7 +41,7 @@ int __cdecl GetWaterSurface(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
-void __cdecl ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber)
+void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber)
 {
 	short harpoonItemNum = CreateItem();
 	if (harpoonItemNum != NO_ITEM)
@@ -68,7 +68,7 @@ void __cdecl ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, 
 	}
 }
 
-void __cdecl HarpoonControl(short itemNum)
+void HarpoonControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -104,7 +104,7 @@ void __cdecl HarpoonControl(short itemNum)
 	}
 }
 
-void __cdecl ScubaControl(short itemNumber)
+void ScubaControl(short itemNumber)
 {
 	int waterHeight;
 

@@ -218,7 +218,7 @@ extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 bool MonksAttackLara;
 
-int __cdecl WeaponObject(int weaponType)
+int WeaponObject(int weaponType)
 {
 	switch (weaponType)
 	{
@@ -245,7 +245,7 @@ int __cdecl WeaponObject(int weaponType)
 	}
 }
 
-void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
+void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 {
 	short rotY, rotX, speed = 0, x = 0, y = 0;
 
@@ -286,7 +286,7 @@ void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 	arm->zRot = 0;
 }
 
-void __cdecl SmashItem(short itemNum)
+void SmashItem(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	short objectNumber = item->objectNumber;
@@ -308,7 +308,7 @@ void __cdecl SmashItem(short itemNum)
 	}*/
 }
 
-void __cdecl LaraGun()
+void LaraGun()
 {
 	int meshIndex;
 
@@ -561,12 +561,12 @@ void __cdecl LaraGun()
 	}
 }
 
-short* __cdecl GetAmmo(int weaponType)
+short* GetAmmo(int weaponType)
 {
 	return &g_LaraExtra.Weapons[weaponType].Ammo[g_LaraExtra.Weapons[weaponType].SelectedAmmo];
 }
 
-void __cdecl InitialiseNewWeapon()
+void InitialiseNewWeapon()
 {
 	Lara.rightArm.frameNumber = 0;
 	Lara.leftArm.frameNumber = 0;
@@ -618,7 +618,7 @@ void __cdecl InitialiseNewWeapon()
 	}
 }
 
-int __cdecl WeaponObjectMesh(int weaponType)
+int WeaponObjectMesh(int weaponType)
 {
 	switch (weaponType)
 	{
@@ -652,7 +652,7 @@ int __cdecl WeaponObjectMesh(int weaponType)
 	}
 }
 
-void __cdecl HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
+void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -688,7 +688,7 @@ void __cdecl HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int fla
 	}
 }
 
-int __cdecl FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
+int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 {
 	PHD_3DPOS pos;
 	
@@ -769,14 +769,56 @@ int __cdecl FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short*
 		vDest.y = vSrc.y + ((*(MatrixPtr + M21) * bestDistance) >> W2V_SHIFT);
 		vDest.z = vSrc.z + ((*(MatrixPtr + M22) * bestDistance) >> W2V_SHIFT);
 
-		if (!GetTargetOnLOS(&vSrc, &vDest, 0, 1))
+		// TODO: enable it when the slot is created !
+		/*if (target->objectNumber != ID_SHIVA && target->objectNumber != ID_ARMY_WINSTON && target->objectNumber != ID_LONDONBOSS && (target->objectNumber != ID_TRIBEBOSS || TribeBossShieldOn == false))	// Hit TRIBEBOSS's shield if on.
+		{
 			HitTarget(target, &vDest, weapon->damage, 0);
+		}
+		else if (target->objectNumber == ID_TRIBEBOSS)
+		{
+			long dx, dy, dz;
+
+			dx = (vDest.x - vSrc.x) >> 5;
+			dy = (vDest.y - vSrc.y) >> 5;
+			dz = (vDest.z - vSrc.z) >> 5;
+			FindClosestShieldPoint(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
+		}
+		else if (target->objectNumber == ID_ARMY_WINSTON || target->objectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
+		{
+			short ricochet_angle;
+			target->hitStatus = true; //need to do this to maintain defence state
+			target->hitPoints--;
+			ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) >> 4) & 4095;
+			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
+			SoundEffect(SFX_LARA_RICOCHET, &target->pos, 0);		// play RICOCHET Sample
+		}
+		else if (target->objectNumber == ID_SHIVA) //So must be Shiva
+		{
+			z = target->pos.zPos - lara_item->pos.zPos;
+			x = target->pos.xPos - lara_item->pos.xPos;
+			angle = 0x8000 + ATAN(z, x) - target->pos.yRot;
+
+			if ((target->currentAnimState > 1 && target->currentAnimState < 5) && angle < 0x4000 && angle > -0x4000)
+			{
+				target->hitStatus = true; //need to do this to maintain defence state
+				ricochet_angle = (mGetAngle(LaraItem->pos.zPos, LaraItem->pos.xPos, target->pos.zPos, target->pos.xPos) >> 4) & 4095;
+				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
+				SoundEffect(SFX_LARA_RICOCHET, &target->pos, 0); // play RICOCHET Sample
+			}
+			else //Shiva's not in defence mode or has its back to Lara
+				HitTarget(target, &vDest, weapon->damage, 0);
+		}
+		else
+		{*/
+			if (!GetTargetOnLOS(&vSrc, &vDest, 0, 1))
+				HitTarget(target, &vDest, weapon->damage, 0);
+		//}
 		
 		return 1;
 	}
 }
 
-void __cdecl find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
+void find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
 {
 	short* bounds = GetBestFrame(item);
 
@@ -794,7 +836,7 @@ void __cdecl find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
 	target->roomNumber = item->roomNumber;
 }
 
-void __cdecl LaraTargetInfo(WEAPON_INFO* weapon)
+void LaraTargetInfo(WEAPON_INFO* weapon)
 {
 	if (!Lara.target)
 	{

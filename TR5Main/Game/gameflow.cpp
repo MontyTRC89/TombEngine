@@ -15,7 +15,7 @@ vector<string> g_NewStrings;
 
 extern GameFlow* g_GameFlow;
 
-int __cdecl LoadSavegameInfos()
+int LoadSavegameInfos()
 {
 	char fileName[255];
 

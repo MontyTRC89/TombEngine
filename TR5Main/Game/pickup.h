@@ -8,22 +8,22 @@
 #define _InitialisePickup ((void (__cdecl*)(short)) 0x0043E260)
 #define _PickupControl ((void (__cdecl*)(short)) 0x004679D0)
 
-void __cdecl InitialisePickup(short itemNumber);
-void __cdecl PickedUpObject(short objectNumber);
-void __cdecl RemoveObjectFromInventory(short objectNumber);
-void __cdecl CollectCarriedItems(ITEM_INFO* item);
-int __cdecl PickupTrigger(short itemNum);
-void __cdecl ActivateKey();
-void __cdecl ActivateCamera();
-int __cdecl KeyTrigger(short itemNum);
-void __cdecl PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl RegeneratePickups();
-short* __cdecl FindPlinth(ITEM_INFO* item);
-void __cdecl PuzzleDone(ITEM_INFO* item, short itemNum);
-void __cdecl PickupControl(short itemNum);
+void InitialisePickup(short itemNumber);
+void PickedUpObject(short objectNumber);
+void RemoveObjectFromInventory(short objectNumber);
+void CollectCarriedItems(ITEM_INFO* item);
+int PickupTrigger(short itemNum);
+void ActivateKey();
+void ActivateCamera();
+int KeyTrigger(short itemNum);
+void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void RegeneratePickups();
+short* FindPlinth(ITEM_INFO* item);
+void PuzzleDone(ITEM_INFO* item, short itemNum);
+void PickupControl(short itemNum);
 
 void Inject_Pickup();
 

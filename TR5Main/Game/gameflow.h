@@ -23,4 +23,4 @@ extern SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
 extern vector<string> g_NewStrings;
 extern SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];
 
-int __cdecl LoadSavegameInfos();
+int LoadSavegameInfos();

@@ -43,12 +43,12 @@ char* g_KeyNames[] = {
 		"JOY9",		"JOY10",	"JOY11",	"JOY12",	"JOY13",	"JOY14",	"JOY15",	"JOY16"
 };
 
-void __cdecl InitialiseDirectInput(HWND handle, HINSTANCE instance)
+void InitialiseDirectInput(HWND handle, HINSTANCE instance)
 {
 	// Dummy function, we don't need DirectInput anymore
 }
 
-void __cdecl DI_ReadKeyboard(byte* keys)
+void DI_ReadKeyboard(byte* keys)
 {
 	for (int i = 0; i < 256; i++)
 		keys[i] = GetAsyncKeyState(MapVirtualKey(i, MAPVK_VSC_TO_VK)) >> 8;
@@ -80,7 +80,7 @@ void __cdecl DI_ReadKeyboard(byte* keys)
 	keys[TR_KEY_NUMPAD0] = GetAsyncKeyState(VK_NUMPAD0) >> 8;
 }
 
-int __cdecl DD_SpinMessageLoopMaybe()
+int DD_SpinMessageLoopMaybe()
 {
 	return 0;
 }

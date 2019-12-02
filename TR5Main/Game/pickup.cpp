@@ -98,7 +98,7 @@ extern int KeyTriggerActive;
 extern LaraExtraInfo g_LaraExtra;
 extern Inventory* g_Inventory;
 
-void __cdecl PickedUpObject(short objectNumber)
+void PickedUpObject(short objectNumber)
 {
 	switch (objectNumber)
 	{
@@ -379,7 +379,7 @@ void __cdecl PickedUpObject(short objectNumber)
 	g_Inventory->LoadObjects(false);
 }
 
-void __cdecl RemoveObjectFromInventory(short objectNumber)
+void RemoveObjectFromInventory(short objectNumber)
 {
 	if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
 		Lara.puzzleItems[objectNumber - ID_PUZZLE_ITEM1]--;
@@ -402,7 +402,7 @@ void __cdecl RemoveObjectFromInventory(short objectNumber)
 	g_Inventory->LoadObjects(false);
 }
 
-void __cdecl CollectCarriedItems(ITEM_INFO* item) 
+void CollectCarriedItems(ITEM_INFO* item) 
 {
 	short pickupNumber = item->carriedItem;
 	if (pickupNumber != NO_ITEM)
@@ -419,7 +419,7 @@ void __cdecl CollectCarriedItems(ITEM_INFO* item)
 	}
 }
 
-/*void __cdecl SearchObjectCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+/*void SearchObjectCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	UNIMPLEMENTED();
 }
@@ -429,7 +429,7 @@ void SearchObjectControl(short itemNumber)//52D54, 531B8
 	UNIMPLEMENTED();
 }*/
 
-int __cdecl PickupTrigger(short itemNum) 
+int PickupTrigger(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -446,7 +446,7 @@ int __cdecl PickupTrigger(short itemNum)
 	return 1;
 }
 
-int __cdecl KeyTrigger(short itemNum) 
+int KeyTrigger(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	int oldkey;
@@ -464,7 +464,7 @@ int __cdecl KeyTrigger(short itemNum)
 	return oldkey;
 }
 
-void __cdecl PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	int flag = 0;
@@ -665,7 +665,7 @@ void __cdecl PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	item->pos.yRot = oldYrot;
 }
 
-void __cdecl PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	if (Items[itemNum].triggerFlags - 998 > 1)
 	{
@@ -673,7 +673,7 @@ void __cdecl PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (Items[itemNum].triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
@@ -759,7 +759,7 @@ void __cdecl KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	return;
 }
 
-void __cdecl PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -1230,7 +1230,7 @@ void __cdecl PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	item->pos.zRot = oldZrot;
 }
 
-void __cdecl RegeneratePickups()
+void RegeneratePickups()
 {
 	for (int i = 0; i < NumRPickups; i++)
 	{
@@ -1282,7 +1282,7 @@ void __cdecl RegeneratePickups()
 	}
 }
 
-void __cdecl PickupControl(short itemNum)
+void PickupControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	short roomNumber;
@@ -1324,7 +1324,7 @@ void __cdecl PickupControl(short itemNum)
 	}
 }
 
-short* __cdecl FindPlinth(ITEM_INFO* item)
+short* FindPlinth(ITEM_INFO* item)
 {
 	ROOM_INFO* room = &Rooms[item->roomNumber];
 	MESH_INFO* mesh = room->mesh;
@@ -1375,7 +1375,7 @@ short* __cdecl FindPlinth(ITEM_INFO* item)
 		return GetBestFrame(&Items[itemNumber]);
 }
 
-void __cdecl PuzzleDone(ITEM_INFO* item, short itemNum)
+void PuzzleDone(ITEM_INFO* item, short itemNum)
 {
 	item->objectNumber += 8; 
 	item->animNumber = Objects[item->objectNumber].animIndex;
@@ -1407,7 +1407,7 @@ void __cdecl PuzzleDone(ITEM_INFO* item, short itemNum)
 	}*/
 }
 
-void __cdecl InitialisePickup(short itemNumber)
+void InitialisePickup(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	short* bounds = GetBoundsAccurate(item);

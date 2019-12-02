@@ -29,7 +29,7 @@ byte tribesmanAxeHit[13][3] = {
 	{15,19,32}
 };
 
-void __cdecl TribemanAxeControl(short itemNum)
+void TribemanAxeControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -263,7 +263,7 @@ void __cdecl TribemanAxeControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl TribesmanShotDart(ITEM_INFO* item)
+void TribesmanShotDart(ITEM_INFO* item)
 {
 	short dartItemNumber = CreateItem();
 	if (dartItemNumber != NO_ITEM)
@@ -312,7 +312,7 @@ void __cdecl TribesmanShotDart(ITEM_INFO* item)
 	}
 }
 
-void __cdecl TribesmanDartsControl(short itemNum)
+void TribesmanDartsControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

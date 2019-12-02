@@ -68,23 +68,23 @@ extern int NumTextureTiles;
 extern int g_NumSprites;
 extern int g_NumSpritesSequences;
 
-void __cdecl LoadTextures();
-int __cdecl LoadRoomsNew();
-int __cdecl LoadItems();
-void __cdecl LoadObjects();
-int __cdecl S_LoadLevelFile(int levelIndex);
-void __cdecl FreeLevel();
-void __cdecl AdjustUV(int num);
-void __cdecl LoadCameras();
-void __cdecl InitialiseLara(int restore);
-void __cdecl LoadSprites();
+void LoadTextures();
+int LoadRoomsNew();
+int LoadItems();
+void LoadObjects();
+int S_LoadLevelFile(int levelIndex);
+void FreeLevel();
+void AdjustUV(int num);
+void LoadCameras();
+void InitialiseLara(int restore);
+void LoadSprites();
 
 unsigned __stdcall LoadLevel(void* data);
 
 // New functions for loading data from TR5M footer
-bool __cdecl ReadLuaIds(ChunkId* chunkId, int maxSize, int arg);
-bool __cdecl ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg);
-bool __cdecl ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg);
-void __cdecl LoadNewData(int size);
+bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg);
+bool ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg);
+bool ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg);
+void LoadNewData(int size);
 
 void Inject_RoomLoad();

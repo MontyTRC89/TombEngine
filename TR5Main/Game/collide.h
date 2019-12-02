@@ -19,11 +19,11 @@
 #define MoveLaraPosition ((int (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x00413840)
 #define AlignLaraPosition ((int (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x004133C0)
 
-int __cdecl CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
-int __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
-int __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
-void __cdecl TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
-void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
-void __cdecl ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
+int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
+int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
+int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
+void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
+void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
+void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 
 void Inject_Collide();

@@ -22,7 +22,7 @@ short StargateBounds[24] =
 
 BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
 
-void __cdecl FourBladesControl(short itemNum)
+void FourBladesControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -58,7 +58,7 @@ void __cdecl FourBladesControl(short itemNum)
 	}
 }
 
-void __cdecl BirdBladeControl(short itemNum)
+void BirdBladeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -81,7 +81,7 @@ void __cdecl BirdBladeControl(short itemNum)
 	}
 }
 
-void __cdecl CatwalkBlaldeControl(short itemNum)
+void CatwalkBlaldeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -103,7 +103,7 @@ void __cdecl CatwalkBlaldeControl(short itemNum)
 	}
 }
 
-void __cdecl PlinthBladeControl(short itemNum)
+void PlinthBladeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -124,7 +124,7 @@ void __cdecl PlinthBladeControl(short itemNum)
 	}
 }
 
-void __cdecl InitialiseSethBlade(short itemNum)
+void InitialiseSethBlade(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -135,7 +135,7 @@ void __cdecl InitialiseSethBlade(short itemNum)
 	item->itemFlags[2] = abs(item->triggerFlags);
 }
 
-void __cdecl SethBladeControl(short itemNum)
+void SethBladeControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -186,7 +186,7 @@ void __cdecl SethBladeControl(short itemNum)
 	}
 }
 
-void __cdecl ChainControl(short itemNum)
+void ChainControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -217,7 +217,7 @@ void __cdecl ChainControl(short itemNum)
 	item->itemFlags[0] = 0;
 }
 
-void __cdecl PloughControl(short itemNum)
+void PloughControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -233,7 +233,7 @@ void __cdecl PloughControl(short itemNum)
 	}
 }
 
-void __cdecl CogControl(short itemNum)
+void CogControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -259,7 +259,7 @@ void __cdecl CogControl(short itemNum)
 	}
 }
 
-void __cdecl SpikeballControl(short itemNum)
+void SpikeballControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -292,7 +292,7 @@ void __cdecl SpikeballControl(short itemNum)
 	}
 }
 
-void __cdecl StargateControl(short itemNum)
+void StargateControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	item->itemFlags[3] = 50;
@@ -307,7 +307,7 @@ void __cdecl StargateControl(short itemNum)
 		item->itemFlags[0] = 0;
 }
 
-void __cdecl StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
+void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -377,7 +377,7 @@ void __cdecl StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 	}
 }
 
-void __cdecl ControlSpikyWall(short itemNum)
+void ControlSpikyWall(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -417,7 +417,7 @@ void __cdecl ControlSpikyWall(short itemNum)
 	}
 }
 
-void __cdecl InitialiseSpinningBlade(short item_number)
+void InitialiseSpinningBlade(short item_number)
 {
 	ITEM_INFO* item = &Items[item_number];
 
@@ -426,7 +426,7 @@ void __cdecl InitialiseSpinningBlade(short item_number)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SpinningBlade(short item_number)
+void SpinningBlade(short item_number)
 {
 	bool spinning = false;
 
@@ -478,7 +478,7 @@ void __cdecl SpinningBlade(short item_number)
 		item->pos.yRot += -ANGLE(180);
 }
 
-void __cdecl InitialiseKillerStatue(short item_number)
+void InitialiseKillerStatue(short item_number)
 {
 	ITEM_INFO* item = &Items[item_number];
 
@@ -487,7 +487,7 @@ void __cdecl InitialiseKillerStatue(short item_number)
 	item->currentAnimState = 1;
 }
 
-void __cdecl KillerStatueControl(short item_number)
+void KillerStatueControl(short item_number)
 {
 	ITEM_INFO *item;
 	int x, y, z;
@@ -515,7 +515,7 @@ void __cdecl KillerStatueControl(short item_number)
 	AnimateItem(item);
 }
 
-void __cdecl SpringBoardControl(short item_number)
+void SpringBoardControl(short item_number)
 {
 	ITEM_INFO* item = &Items[item_number];
 
@@ -542,7 +542,7 @@ void __cdecl SpringBoardControl(short item_number)
 	AnimateItem(item);
 }
 
-void __cdecl InitialiseSlicerDicer(short itemNum)
+void InitialiseSlicerDicer(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -558,7 +558,7 @@ void __cdecl InitialiseSlicerDicer(short itemNum)
 	item->itemFlags[3] = 50;
 }
 
-void __cdecl SlicerDicerControl(short itemNum)
+void SlicerDicerControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -581,7 +581,7 @@ void __cdecl SlicerDicerControl(short itemNum)
 	AnimateItem(item);
 }
 
-void __cdecl BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -629,7 +629,7 @@ void __cdecl BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl InitialiseMine(short itemNum)
+void InitialiseMine(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -637,7 +637,7 @@ void __cdecl InitialiseMine(short itemNum)
 		item->meshBits = 0;
 }
 
-void __cdecl MineControl(short itemNum)
+void MineControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -710,7 +710,7 @@ void __cdecl MineControl(short itemNum)
 	}
 }
 
-void __cdecl MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -780,7 +780,7 @@ void __cdecl MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl InitialiseSentryGun(short itemNum)
+void InitialiseSentryGun(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -791,7 +791,7 @@ void __cdecl InitialiseSentryGun(short itemNum)
 	item->itemFlags[2] = 0;
 }
 
-void __cdecl SentryGunControl(short itemNum)
+void SentryGunControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -935,7 +935,7 @@ void __cdecl SentryGunControl(short itemNum)
 	}
 }
 
-void __cdecl SentryGunThrowFire(ITEM_INFO* item)
+void SentryGunThrowFire(ITEM_INFO* item)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -995,17 +995,17 @@ void __cdecl SentryGunThrowFire(ITEM_INFO* item)
 	}
 }
 
-void __cdecl InitialiseBurningFloor(short itemNum)
+void InitialiseBurningFloor(short itemNum)
 {
 	Items[itemNum].requiredAnimState = 127;
 }
 
-void __cdecl BurningFloorControl(short itemNum)
+void BurningFloorControl(short itemNum)
 {
 
 }
 
-void __cdecl ControlSpikyCeiling(short itemNumber)
+void ControlSpikyCeiling(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 

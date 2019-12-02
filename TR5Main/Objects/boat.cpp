@@ -66,7 +66,7 @@ enum boat_Anims {
 
 // TODO: (boat) render problem, water height problem, enter problem.
 
-void __cdecl GetBoatGetOff(ITEM_INFO* boat)
+void GetBoatGetOff(ITEM_INFO* boat)
 {
 	/* Wait for last frame of getoff anims before returning to normal Lara control */
 	if ((LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
@@ -109,7 +109,7 @@ void __cdecl GetBoatGetOff(ITEM_INFO* boat)
 	}
 }
 
-int __cdecl CanGetOff(int direction)
+int CanGetOff(int direction)
 {
 	ITEM_INFO* v;
 	FLOOR_INFO* floor;
@@ -144,7 +144,7 @@ int __cdecl CanGetOff(int direction)
 	return 1;
 }
 
-int __cdecl BoatCheckGetOn(short itemNum, COLL_INFO* coll)
+int BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 {
 	/* Returns 0 if no get on, 1 if right get on and 2 if left get on and 3 if jump geton */
 	int geton = 0, dist;
@@ -204,7 +204,7 @@ int __cdecl BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 	return geton;
 }
 
-int __cdecl TestWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
+int TestWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 {
 	/* Get water height at a position offset from the origin.
 		Moves the vector in 'pos' to the required test position too */
@@ -237,7 +237,7 @@ int __cdecl TestWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* p
 	return height - 5; // make sure boat is above water line else all sorts of weirdness results
 }
 
-void __cdecl DoBoatCollision(int itemNum)
+void DoBoatCollision(int itemNum)
 {
 	ITEM_INFO* item, * boat;
 	int item_number, distance, x, z, radius;
@@ -271,7 +271,7 @@ void __cdecl DoBoatCollision(int itemNum)
 	}
 }
 
-short __cdecl DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
+short DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
@@ -386,7 +386,7 @@ short __cdecl DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-int __cdecl GetBoatCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
+int GetBoatCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 {
 	int c, s, front, side;
 
@@ -419,7 +419,7 @@ int __cdecl GetBoatCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	return 0;
 }
 
-int __cdecl DoBoatDynamics(int height, int fallspeed, int* y)
+int DoBoatDynamics(int height, int fallspeed, int* y)
 {
 	if (height > * y)
 	{
@@ -447,7 +447,7 @@ int __cdecl DoBoatDynamics(int height, int fallspeed, int* y)
 	return fallspeed;
 }
 
-int __cdecl BoatDynamics(short itemNum)
+int BoatDynamics(short itemNum)
 {
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;
@@ -595,7 +595,7 @@ int __cdecl BoatDynamics(short itemNum)
 	return collide;
 }
 
-int __cdecl BoatUserControl(ITEM_INFO* boat)
+int BoatUserControl(ITEM_INFO* boat)
 {
 	/* Return whether to straighten up or not */
 	int no_turn = 1, max_speed;
@@ -682,7 +682,7 @@ int __cdecl BoatUserControl(ITEM_INFO* boat)
 	return no_turn;
 }
 
-void __cdecl BoatAnimation(ITEM_INFO* boat, int collide)
+void BoatAnimation(ITEM_INFO* boat, int collide)
 {
 	BOAT_INFO* binfo;
 
@@ -761,7 +761,7 @@ void __cdecl BoatAnimation(ITEM_INFO* boat, int collide)
 	}
 }
 
-void __cdecl BoatSplash(ITEM_INFO* item, long fallspeed, long water)
+void BoatSplash(ITEM_INFO* item, long fallspeed, long water)
 {
 	/*
 	splash_setup.x = item->pos.x_pos;
@@ -790,7 +790,7 @@ void __cdecl BoatSplash(ITEM_INFO* item, long fallspeed, long water)
 	*/
 }
 
-void __cdecl InitialiseBoat(short itemNum)
+void InitialiseBoat(short itemNum)
 {
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;
@@ -807,7 +807,7 @@ void __cdecl InitialiseBoat(short itemNum)
 	binfo->pitch = 0;
 }
 
-void __cdecl BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
+void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
 	/* This routine is only for when Lara is not on the boat and she would like to be */
 	int geton;
@@ -868,7 +868,7 @@ void __cdecl BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	g_LaraExtra.Vehicle = itemNum;
 }
 
-void __cdecl BoatControl(short itemNumber)
+void BoatControl(short itemNumber)
 {
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;

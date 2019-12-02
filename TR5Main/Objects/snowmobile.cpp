@@ -68,7 +68,7 @@ enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_ST
 BITE_INFO skidooLeft = { 240, -190, 540, 0 };
 BITE_INFO skidooRight = { -240, -190, 540, 0 };
 
-void __cdecl InitialiseSkidoo(short itemNum)
+void InitialiseSkidoo(short itemNum)
 {
 	ITEM_INFO* skidoo;
 	SKIDOO_INFO* skinfo;
@@ -99,7 +99,7 @@ void __cdecl InitialiseSkidoo(short itemNum)
 	}
 }
 
-void __cdecl SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
+void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 {
 	vector<short> roomsList;
 	roomsList.push_back(skidoo->roomNumber);
@@ -159,7 +159,7 @@ void __cdecl SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 	}
 }
 
-void __cdecl SkidooGuns(void)
+void SkidooGuns(void)
 {
 	ITEM_INFO* skidoo;
 	SKIDOO_INFO* skinfo;
@@ -192,7 +192,7 @@ void __cdecl SkidooGuns(void)
 		skidoo->itemFlags[0]--;
 }
 
-void __cdecl SkidooExplode(ITEM_INFO* skidoo)
+void SkidooExplode(ITEM_INFO* skidoo)
 {
 	if (Rooms[skidoo->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -213,7 +213,7 @@ void __cdecl SkidooExplode(ITEM_INFO* skidoo)
 	g_LaraExtra.Vehicle = NO_ITEM;
 }
 
-int __cdecl SkidooCheckGetOffOK(int direction)
+int SkidooCheckGetOffOK(int direction)
 {
 	/* Check if getting off skidoo here is possible in the direction required by player */
 	int x, y, z, height, ceiling;
@@ -253,7 +253,7 @@ int __cdecl SkidooCheckGetOffOK(int direction)
 
 /* Check if Lara is still under skidoo control. Return 0 if she is in that limbo state of the skidoo still needing
 		control (it is falling) and her needing normal control (so is she) */
-int __cdecl SkidooCheckGetOff()
+int SkidooCheckGetOff()
 {
 	ITEM_INFO* skidoo;
 	skidoo = &Items[g_LaraExtra.Vehicle];
@@ -312,7 +312,7 @@ int __cdecl SkidooCheckGetOff()
 	return 1;
 }
 
-void __cdecl DoSnowEffect(ITEM_INFO* skidoo)
+void DoSnowEffect(ITEM_INFO* skidoo)
 {
 	/*
 	int c, s, x, random;
@@ -351,7 +351,7 @@ void __cdecl DoSnowEffect(ITEM_INFO* skidoo)
 	*/
 }
 
-void __cdecl SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
+void SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 {
 	short cd;
 	SKIDOO_INFO* skinfo;
@@ -454,7 +454,7 @@ void __cdecl SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 	}
 }
 
-int __cdecl GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
+int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 {
 	int c, s, front, side;
 
@@ -486,7 +486,7 @@ int __cdecl GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	return 0;
 }
 
-int __cdecl SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
+int SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 {
 	int drive = 0, max_speed;
 	SKIDOO_INFO* skinfo;
@@ -565,7 +565,7 @@ int __cdecl SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 	return drive;
 }
 
-int __cdecl DoSkidooDynamics(int height, int fallspeed, int* y)
+int DoSkidooDynamics(int height, int fallspeed, int* y)
 {
 	int kick;
 
@@ -596,7 +596,7 @@ int __cdecl DoSkidooDynamics(int height, int fallspeed, int* y)
 }
 
 /* Returns 0 if no get on, 1 if right get on and 2 if left get on */
-int __cdecl SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
+int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 {
 	int geton;
 	short rot, room_number;
@@ -631,7 +631,7 @@ int __cdecl SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 	return geton;
 }
 
-void __cdecl SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
+void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
 	/* This routine is only for when Lara is not on the skidoo and she would like to be */
 	int geton;
@@ -681,7 +681,7 @@ void __cdecl SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 }
 
 /* Get height at a position offset from the origin. Moves the vector in 'pos' to the required test position too */
-int __cdecl TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
+int TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 {
 	pos->y = item->pos.yPos - (z_off * SIN(item->pos.xRot) >> W2V_SHIFT) +
 		                      (x_off * SIN(item->pos.zRot) >> W2V_SHIFT);
@@ -701,7 +701,7 @@ int __cdecl TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* 
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-short __cdecl DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
+short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
@@ -818,7 +818,7 @@ short __cdecl DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-int __cdecl SkidooDynamics(ITEM_INFO* skidoo)
+int SkidooDynamics(ITEM_INFO* skidoo)
 {
 	/* Does all skidoo movement and collision and returns if collide value */
 	SKIDOO_INFO* skinfo;
@@ -970,7 +970,7 @@ int __cdecl SkidooDynamics(ITEM_INFO* skidoo)
 }
 
 /* Returns 1 if this controls Lara too, 0 if skidoo is no longer moving with Lara (so need normal Lara control) */
-int __cdecl SkidooControl()
+int SkidooControl()
 {
 	ITEM_INFO* skidoo;
 	SKIDOO_INFO* skinfo;
@@ -1142,12 +1142,12 @@ int __cdecl SkidooControl()
 	return SkidooCheckGetOff();
 }
 
-void __cdecl DrawSkidoo(ITEM_INFO* item)
+void DrawSkidoo(ITEM_INFO* item)
 {
 	
 }
 
-void __cdecl InitialiseSkidman(short itemNum)
+void InitialiseSkidman(short itemNum)
 {
 	short skidoo_item;
 	ITEM_INFO* item, *skidoo;
@@ -1179,7 +1179,7 @@ void __cdecl InitialiseSkidman(short itemNum)
 	}
 }
 
-void __cdecl SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 
@@ -1205,7 +1205,7 @@ void __cdecl SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* col
 	}
 }
 
-void __cdecl SkidManControl(short riderNum)
+void SkidManControl(short riderNum)
 {
 	ITEM_INFO* item, * rider;
 	CREATURE_INFO* skidman;

@@ -19,7 +19,7 @@ BITE_INFO shivaRightBite = { 0, 0, 920, 22 };
 // for TR2 and TR3 statue (compatible by any statue entity)
 // the statue object need to be after the normal one:
 // ex: ID_SWORD_GUARDIAN: 256, ID_SWORD_GUARDIAN_STATUE: 257
-void __cdecl DrawStatue(ITEM_INFO* item)
+void DrawStatue(ITEM_INFO* item)
 {
 	/*
 	OBJECT_INFO* obj;
@@ -162,7 +162,7 @@ void __cdecl DrawStatue(ITEM_INFO* item)
 	*/
 }
 
-void __cdecl InitialiseSwordGuardian(short itemNum)
+void InitialiseSwordGuardian(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -175,7 +175,7 @@ void __cdecl InitialiseSwordGuardian(short itemNum)
 	//item->meshBits = 0;
 }
 
-void __cdecl SwordGuardianFly(ITEM_INFO* item)
+void SwordGuardianFly(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
 
@@ -184,10 +184,10 @@ void __cdecl SwordGuardianFly(ITEM_INFO* item)
 	pos.z = (GetRandomControl() << 8 >> 15) + item->pos.zPos - 128;
 
 	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, WEAPON_GRENADE_LAUNCHER, 32);
-	SoundEffect(SFX_SWORD_GUARDIAN_FLYING_ID312, &item->pos, 0);
+	SoundEffect(SFX_TR2_SWORD_GUARDIAN_FLYING_ID312, &item->pos, 0);
 }
 
-void __cdecl SwordGuardianControl(short itemNum)
+void SwordGuardianControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -404,7 +404,7 @@ void __cdecl SwordGuardianControl(short itemNum)
 	}
 }
 
-void __cdecl XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
+void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 {
 	if (!(xian->flags & 1) && (item->touchBits & 0x40000))
 	{
@@ -412,7 +412,7 @@ void __cdecl XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &spearRightBite, DoBloodSplat);
 		xian->flags |= 1;
-		SoundEffect(SFX_SWORD_HITTARGET_ID318, &item->pos, 0);
+		SoundEffect(SFX_TR2_SWORD_HITTARGET_ID318, &item->pos, 0);
 	}
 
 	if (!(xian->flags & 2) && (item->touchBits & 0x800))
@@ -421,11 +421,11 @@ void __cdecl XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &spearLeftBite, DoBloodSplat);
 		xian->flags |= 2;
-		SoundEffect(SFX_SWORD_HITTARGET_ID318, &item->pos, 0);
+		SoundEffect(SFX_TR2_SWORD_HITTARGET_ID318, &item->pos, 0);
 	}
 }
 
-void __cdecl InitialiseSpearGuardian(short itemNum)
+void InitialiseSpearGuardian(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -444,7 +444,7 @@ void __cdecl InitialiseSpearGuardian(short itemNum)
 	//item->meshBits = 0;
 }
 
-void __cdecl SpearGuardianControl(short itemNum)
+void SpearGuardianControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -730,7 +730,7 @@ void __cdecl SpearGuardianControl(short itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl TriggerShivaSmoke(long x, long y, long z, long uw)
+void TriggerShivaSmoke(long x, long y, long z, long uw)
 {
 	long size;
 	SPARKS* sptr;
@@ -819,7 +819,7 @@ void __cdecl TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->dSize = size;
 }
 
-void __cdecl ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
+void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 {
 	if (!(shiva->flags) && (item->touchBits & 0x2400000))
 	{
@@ -827,7 +827,7 @@ void __cdecl ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &shivaRightBite, DoBloodSplat);
 		shiva->flags = 1;
-		SoundEffect(SFX_SWORD_HITTARGET_ID318, &item->pos, 0);
+		SoundEffect(SFX_TR2_SWORD_HITTARGET_ID318, &item->pos, 0);
 	}
 
 	if (!(shiva->flags) && (item->touchBits & 0x2400))
@@ -836,11 +836,11 @@ void __cdecl ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &shivaLeftBite, DoBloodSplat);
 		shiva->flags = 1;
-		SoundEffect(SFX_SWORD_HITTARGET_ID318, &item->pos, 0);
+		SoundEffect(SFX_TR2_SWORD_HITTARGET_ID318, &item->pos, 0);
 	}
 }
 
-void __cdecl InitialiseShiva(short itemNum)
+void InitialiseShiva(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
@@ -858,7 +858,7 @@ void __cdecl InitialiseShiva(short itemNum)
 	//item->meshBits = 0;
 }
 
-void __cdecl ShivaControl(short itemNum)
+void ShivaControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

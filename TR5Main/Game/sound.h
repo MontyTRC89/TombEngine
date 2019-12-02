@@ -582,12 +582,13 @@ typedef enum sound_effects
 	SFX_TR2_SNOWMOBILE_HITF_ID201,
 	SFX_TR2_SNOWMOBILE_HITB_ID202,
 	SFX_TR2_SNOWMOBILE_FALL_ID203,
-	SFX_HIT_BY_KNIFE_ID317,
-	SFX_MONK_HIT_TARGET_ID245,
-	SFX_SWORD_GUARDIAN_FLYING_ID312,
-	SFX_SWORD_HITTARGET_ID318,
-	SFX_UPV_HARPOON_SHOT_ID23,
-	SFX_MINECART_HIT_ID202,
+	SFX_TR2_HIT_BY_KNIFE_ID317,
+	SFX_TR2_MONK_HIT_TARGET_ID245,
+	SFX_TR2_SWORD_GUARDIAN_FLYING_ID312,
+	SFX_TR2_SWORD_HITTARGET_ID318,
+	SFX_TR3_UPV_HARPOON_SHOT_ID23,
+	SFX_TR3_MINECART_HIT_ID202,
+	SFX_TR3_BOSS_EXPLODE_ID76,
 	NUM_SFX
 };
 
@@ -692,14 +693,14 @@ extern vector<AudioTrack> g_AudioTracks;
 
 #define SayNo ((void (__cdecl*)()) 0x004790E0)
 
-long __cdecl SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
-void __cdecl StopSoundEffect(short effectID);
-bool __cdecl Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
-void __cdecl Sound_FreeSamples();
-void __cdecl SOUND_Stop();
-void __cdecl S_CDPlay(short index, unsigned int mode);
-void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown);
-void __cdecl S_CDStop();
+long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
+void StopSoundEffect(short effectID);
+bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
+void Sound_FreeSamples();
+void SOUND_Stop();
+void S_CDPlay(short index, unsigned int mode);
+void S_CDPlayEx(short index, DWORD mask, DWORD unknown);
+void S_CDStop();
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
 

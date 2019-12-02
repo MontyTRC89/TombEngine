@@ -2,7 +2,7 @@
 #include "..\Global\global.h"
 #include "items.h"
 
-void __cdecl LaraBurn()
+void LaraBurn()
 {
 	if (!Lara.burn && !Lara.burnSmoke)
 	{

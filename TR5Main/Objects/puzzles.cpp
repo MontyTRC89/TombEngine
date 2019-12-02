@@ -17,7 +17,7 @@ short ScalesBounds[12] = {
 	0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
 
-void __cdecl ScalesControl(short itemNum)
+void ScalesControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -83,7 +83,7 @@ void __cdecl ScalesControl(short itemNum)
 	AnimateItem(item);
 }
 
-void __cdecl ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -185,7 +185,7 @@ void __cdecl ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-int __cdecl RespawnAhmet(short itemNum)
+int RespawnAhmet(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

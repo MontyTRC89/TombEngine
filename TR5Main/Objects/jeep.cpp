@@ -48,7 +48,7 @@ bool JeepNoGetOff;
 extern LaraExtraInfo g_LaraExtra;
 extern Inventory* g_Inventory;
 
-int __cdecl TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
+int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
 	pos->y = item->pos.yPos - (dz * SIN(item->pos.xRot) >> W2V_SHIFT) + (dx * SIN(item->pos.zRot) >> W2V_SHIFT);
 
@@ -67,7 +67,7 @@ int __cdecl TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-int __cdecl DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old)
+int DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x = pos->x >> WALL_SHIFT;
 	int z = pos->z >> WALL_SHIFT;
@@ -165,7 +165,7 @@ int __cdecl DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-int __cdecl DoJeepDynamics(int height, int speed, int* y, int flags)
+int DoJeepDynamics(int height, int speed, int* y, int flags)
 {
 	int result = 0;
 
@@ -217,7 +217,7 @@ int __cdecl DoJeepDynamics(int height, int speed, int* y, int flags)
 	return result;
 }
 
-int __cdecl JeepCanGetOff()
+int JeepCanGetOff()
 {
 	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
 
@@ -248,7 +248,7 @@ int __cdecl JeepCanGetOff()
 	return 1;
 }
 
-void __cdecl TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short speed, int moving)
+void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short speed, int moving)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -312,7 +312,7 @@ void __cdecl TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spe
 	spark->size = spark->dSize >> 1;
 }
 
-void __cdecl InitialiseJeep(short itemNum)
+void InitialiseJeep(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -336,7 +336,7 @@ void __cdecl InitialiseJeep(short itemNum)
 	item->meshBits = 114687;
 }
 
-int __cdecl JeepCheckGetOff()
+int JeepCheckGetOff()
 {
 	if (LaraItem->currentAnimState == 10)
 	{
@@ -364,7 +364,7 @@ int __cdecl JeepCheckGetOff()
 	return true;
 }
 
-int __cdecl GetOnJeep(int itemNumber)
+int GetOnJeep(int itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -460,7 +460,7 @@ int __cdecl GetOnJeep(int itemNumber)
 	return 0;
 }
 
-int __cdecl GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
+int GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 {
 	p->x = item->pos.xPos - p->x;
 	p->z = item->pos.zPos - p->z;
@@ -485,7 +485,7 @@ int __cdecl GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 	return 0;
 }
 
-void __cdecl JeepBaddieCollision(ITEM_INFO* jeep)
+void JeepBaddieCollision(ITEM_INFO* jeep)
 {
 	vector<short> roomsList;
 	short* door, numDoors;
@@ -572,7 +572,7 @@ void __cdecl JeepBaddieCollision(ITEM_INFO* jeep)
 	}
 }
 
-void __cdecl JeepExplode(ITEM_INFO* item)
+void JeepExplode(ITEM_INFO* item)
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -595,7 +595,7 @@ void __cdecl JeepExplode(ITEM_INFO* item)
 	g_LaraExtra.Vehicle = NO_ITEM;
 }
 
-int __cdecl JeepDynamics(ITEM_INFO* item)
+int JeepDynamics(ITEM_INFO* item)
 {
 	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
 
@@ -840,7 +840,7 @@ int __cdecl JeepDynamics(ITEM_INFO* item)
 	return collide;
 }
 
-int __cdecl JeepUserControl(ITEM_INFO* item, int height, int* pitch)
+int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 {
 	if (LaraItem->currentAnimState == 10 || LaraItem->goalAnimState == 10)
 		TrInput = 0;
@@ -999,7 +999,7 @@ int __cdecl JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 	return 1;
 }
 
-void __cdecl AnimateJeep(ITEM_INFO* item, int collide, int dead)
+void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 {
 	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
 
@@ -1526,7 +1526,7 @@ void __cdecl AnimateJeep(ITEM_INFO* item, int collide, int dead)
 	}
 }
 
-void __cdecl JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	if (l->hitPoints > 0 && g_LaraExtra.Vehicle == NO_ITEM)
 	{

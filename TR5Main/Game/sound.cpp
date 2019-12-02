@@ -17,7 +17,7 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
 
 vector<AudioTrack> g_AudioTracks;
 
-bool __cdecl Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	// Replaces DXCreateSampleADPCM()
+bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	// Replaces DXCreateSampleADPCM()
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
@@ -96,7 +96,7 @@ bool __cdecl Sound_LoadSample(char *pointer, int compSize, int uncompSize, int i
 	return true;
 }
 
-long __cdecl SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
+long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 {
 	if (effectID >= SOUND_LEGACY_SOUNDMAP_SIZE)
 		return 0;
@@ -240,14 +240,14 @@ long __cdecl SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	return 1;
 }
 
-void __cdecl StopSoundEffect(short effectID)
+void StopSoundEffect(short effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 		if (SoundSlot[i].effectID == effectID && SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING)
 			Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
 }
 
-void __cdecl SOUND_Stop()
+void SOUND_Stop()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 		if (SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel))
@@ -255,14 +255,14 @@ void __cdecl SOUND_Stop()
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 }
 
-void __cdecl Sound_FreeSamples()
+void Sound_FreeSamples()
 {
 	SOUND_Stop();
 	for (int i = 0; i < SOUND_MAX_SAMPLES; i++)
 		Sound_FreeSample(i);
 }
 
-void __cdecl S_CDPlay(short index, unsigned int mode)
+void S_CDPlay(short index, unsigned int mode)
 {
 	bool  crossfade = false;
 	DWORD crossfadeTime;
@@ -341,7 +341,7 @@ void __cdecl S_CDPlay(short index, unsigned int mode)
 	BASS_Soundtrack[mode].trackID = index;
 }
 
-void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown)
+void S_CDPlayEx(short index, DWORD mask, DWORD unknown)
 {
 	static short loopedTracks[] = { 117, 118, 121, 123, 124, 125, 126, 127, 128, 129, 130 };
 	bool looped = false;
@@ -373,7 +373,7 @@ void __cdecl S_CDPlayEx(short index, DWORD mask, DWORD unknown)
 	S_CDPlay(index, looped);
 }
 
-void __cdecl S_CDStop()
+void S_CDStop()
 {
 	// Do quick fadeouts.
 	BASS_ChannelSlideAttribute(BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, SOUND_XFADETIME_ONESHOT);

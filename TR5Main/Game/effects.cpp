@@ -4,7 +4,7 @@
 #include "draw.h"
 #include "sphere.h"
 
-void __cdecl SetupSplash(SPLASH_SETUP* setup)
+void SetupSplash(SPLASH_SETUP* setup)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -38,7 +38,7 @@ void __cdecl SetupSplash(SPLASH_SETUP* setup)
 	SoundEffect(SFX_LARA_SPLASH, (PHD_3DPOS*)setup, 0);
 }
 
-void __cdecl WadeSplash(ITEM_INFO* item, int wh, int wd)
+void WadeSplash(ITEM_INFO* item, int wh, int wd)
 {
 	short roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -99,7 +99,7 @@ void __cdecl WadeSplash(ITEM_INFO* item, int wh, int wd)
 	}
 }
 
-void __cdecl Splash(ITEM_INFO* item)
+void Splash(ITEM_INFO* item)
 {
 	short roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
