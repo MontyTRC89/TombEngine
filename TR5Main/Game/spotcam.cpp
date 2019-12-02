@@ -8,7 +8,7 @@
 
 void __cdecl InitSpotCamSequences() 
 {
-	__int32 s, cc, n, ce;
+	int s, cc, n, ce;
 
 	n = NumberSpotcams;
 	TrackCameraInit = 0;
@@ -47,12 +47,12 @@ void __cdecl InitSpotCamSequences()
 	return;
 }
 
-void __cdecl InitialiseSpotCam(__int16 Sequence)
+void __cdecl InitialiseSpotCam(short Sequence)
 {
 	SPOTCAM* s;
-	__int32 cn;
-	__int32 sp;
-	__int32 i;
+	int cn;
+	int sp;
+	int i;
 
 	if (TrackCameraInit != 0 && LastSequence == Sequence)
 	{
@@ -337,36 +337,36 @@ void __cdecl InitialiseSpotCam(__int16 Sequence)
 #ifdef OLD_CODE
 void __cdecl CalculateSpotCameras()
 {
-	__int32 cpx; // stack offset -96
-	__int32 cpy; // stack offset -92
-	__int32 cpz; // stack offset -88
-	__int32 ctx; // stack offset -84
-	__int32 cty; // stack offset -80
-	__int32 ctz; // stack offset -76
-	__int32 cspeed; // stack offset -72
-	__int32 cfov; // stack offset -68
-	__int32 croll; // stack offset -64
+	int cpx; // stack offset -96
+	int cpy; // stack offset -92
+	int cpz; // stack offset -88
+	int ctx; // stack offset -84
+	int cty; // stack offset -80
+	int ctz; // stack offset -76
+	int cspeed; // stack offset -72
+	int cfov; // stack offset -68
+	int croll; // stack offset -64
 	SPOTCAM* s; // stack offset -60
-	__int16 spline_cnt; // $s3
+	short spline_cnt; // $s3
 	int next_spline_camera; // $s0
 	int n; // $s5
 	static int bFirstLook; // offset 0x18 dword_A0AC4?
-	__int32 dx; // $v1
-	__int32 dy; // $s0
-	__int32 dz; // $s1
+	int dx; // $v1
+	int dy; // $s0
+	int dz; // $s1
 
 	//{ // line 76, offset 0x38114
-	__int32 cs; // $s6
-	__int32 sp; // $s2
-	__int32 cp; // $fp
-	__int32 clen; // $s4
-	__int32 tlen; // $v1
-	__int32 cx; // $s1
-	__int32 cy; // $s0
-	__int32 cz; // $v0
-	__int32 lx; // stack offset -56
-	__int32 lz; // stack offset -52
-	__int32 ly; // stack offset -48
+	int cs; // $s6
+	int sp; // $s2
+	int cp; // $fp
+	int clen; // $s4
+	int tlen; // $v1
+	int cx; // $s1
+	int cy; // $s0
+	int cz; // $v0
+	int lx; // stack offset -56
+	int lz; // stack offset -52
+	int ly; // stack offset -48
 	int i; // $v1
 	int var_2C;
 	int ctype; // $s0
@@ -382,7 +382,7 @@ void __cdecl CalculateSpotCameras()
 	}
 
 	SPOTCAM* s = &SpotCam[FirstCamera];
-	__int16 spline_cnt = 4;
+	short spline_cnt = 4;
 
 	if ((s->flags & SCF_TRACKING_CAM))
 	{
@@ -390,17 +390,17 @@ void __cdecl CalculateSpotCameras()
 	}
 
 	//loc_37F64
-	__int32 cpx = Spline(CurrentSplinePosition, &CameraXposition[0], spline_cnt);
-	__int32 cpy = Spline(CurrentSplinePosition, &CameraYposition[0], spline_cnt);
-	__int32 cpz = Spline(CurrentSplinePosition, &CameraZposition[0], spline_cnt);
+	int cpx = Spline(CurrentSplinePosition, &CameraXposition[0], spline_cnt);
+	int cpy = Spline(CurrentSplinePosition, &CameraYposition[0], spline_cnt);
+	int cpz = Spline(CurrentSplinePosition, &CameraZposition[0], spline_cnt);
 
-	__int32 ctx = Spline(CurrentSplinePosition, &CameraXtarget[0], spline_cnt);
-	__int32 cty = Spline(CurrentSplinePosition, &CameraYtarget[0], spline_cnt);
-	__int32 ctz = Spline(CurrentSplinePosition, &CameraZtarget[0], spline_cnt);
+	int ctx = Spline(CurrentSplinePosition, &CameraXtarget[0], spline_cnt);
+	int cty = Spline(CurrentSplinePosition, &CameraYtarget[0], spline_cnt);
+	int ctz = Spline(CurrentSplinePosition, &CameraZtarget[0], spline_cnt);
 
-	__int32 cspeed = Spline(CurrentSplinePosition, &CameraSpeed[0], spline_cnt);
-	__int32 croll = Spline(CurrentSplinePosition, &CameraRoll[0], spline_cnt);
-	__int32 cfov = Spline(CurrentSplinePosition, &CameraFOV[0], spline_cnt);
+	int cspeed = Spline(CurrentSplinePosition, &CameraSpeed[0], spline_cnt);
+	int croll = Spline(CurrentSplinePosition, &CameraRoll[0], spline_cnt);
+	int cfov = Spline(CurrentSplinePosition, &CameraFOV[0], spline_cnt);
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN) && CameraFade != CurrentSplineCamera)
 	{
@@ -428,11 +428,11 @@ void __cdecl CalculateSpotCameras()
 		}*/
 	}
 
-	__int32 sp = 0;
-	__int32 tlen = 0;
-	__int32 clen = 0;
-	__int32 cp = 0;
-	__int32 temp = 0;
+	int sp = 0;
+	int tlen = 0;
+	int clen = 0;
+	int cp = 0;
+	int temp = 0;
 
 	if ((s->flags & SCF_TRACKING_CAM))
 	{
@@ -440,11 +440,11 @@ void __cdecl CalculateSpotCameras()
 		ly = LaraItem->pos.yPos;
 		lz = LaraItem->pos.zPos;
 
-		for (__int32 i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			clen = 0x10000;
 
-			for (__int32 j = 0; j < 8; j++)
+			for (int j = 0; j < 8; j++)
 			{
 				cx = Spline(sp, &CameraXposition[0], spline_cnt);
 				cy = Spline(sp, &CameraYposition[0], spline_cnt);
@@ -585,13 +585,13 @@ void __cdecl CalculateSpotCameras()
 			{
 				/*v25 = current_spline_camera;
 		v13 = 40 * current_spline_camera;
-		v26 = *(__int16 *)((char *)&SpotCam[0].flags + v13);
+		v26 = *(short *)((char *)&SpotCam[0].flags + v13);
 		if ( v26 & 2 )
 		{
-		  if ( *(__int16 *)((char *)&SpotCam[0].timer + v13) >= 0 )
+		  if ( *(short *)((char *)&SpotCam[0].timer + v13) >= 0 )
 		  {
 			if ( !SlowMotion )
-			  SlowMotion = *(__int16 *)((char *)&SpotCam[0].timer + v13);
+			  SlowMotion = *(short *)((char *)&SpotCam[0].timer + v13);
 		  }
 		  else
 		  {

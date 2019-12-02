@@ -2,7 +2,7 @@
 #include "..\Global\global.h"
 #include <stdio.h>
 
-ITEM_INFO* __cdecl FindItem(__int16 objectNumber)
+ITEM_INFO* __cdecl FindItem(short objectNumber)
 {
 #ifdef DEBUG
 	printf("Called FindItem()\n");
@@ -12,7 +12,7 @@ ITEM_INFO* __cdecl FindItem(__int16 objectNumber)
 
 	if (LevelItems > 0)
 	{
-		for (__int32 i = 0; i < LevelItems; i++)
+		for (int i = 0; i < LevelItems; i++)
 		{
 			if (Items[i].objectNumber == objectNumber)
 				return &Items[i];

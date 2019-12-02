@@ -13,12 +13,12 @@
 #include "..\Game\debris.h"
 #include "../Game/traps.h"
 
-void __cdecl BubblesEffect1(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel)
+void __cdecl BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
-	__int32 dx = LaraItem->pos.xPos - fx->pos.xPos;
-	__int32 dz = LaraItem->pos.zPos - fx->pos.zPos;
+	int dx = LaraItem->pos.xPos - fx->pos.xPos;
+	int dz = LaraItem->pos.zPos - fx->pos.zPos;
 	
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -68,12 +68,12 @@ void __cdecl BubblesEffect1(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 z
 	}
 }
 
-void __cdecl BubblesEffect2(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel)
+void __cdecl BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
-	__int32 dx = LaraItem->pos.xPos - fx->pos.xPos;
-	__int32 dz = LaraItem->pos.zPos - fx->pos.zPos;
+	int dx = LaraItem->pos.xPos - fx->pos.xPos;
+	int dz = LaraItem->pos.zPos - fx->pos.zPos;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -115,12 +115,12 @@ void __cdecl BubblesEffect2(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 z
 	}
 }
 
-void __cdecl BubblesEffect3(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel)
+void __cdecl BubblesEffect3(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
-	__int32 dx = LaraItem->pos.xPos - fx->pos.xPos;
-	__int32 dz = LaraItem->pos.zPos - fx->pos.zPos;
+	int dx = LaraItem->pos.xPos - fx->pos.xPos;
+	int dz = LaraItem->pos.zPos - fx->pos.zPos;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -167,12 +167,12 @@ void __cdecl BubblesEffect3(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 z
 	}
 }
 
-void __cdecl BubblesEffect4(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 zVel)
+void __cdecl BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
-	__int32 dx = LaraItem->pos.xPos - fx->pos.xPos;
-	__int32 dz = LaraItem->pos.zPos - fx->pos.zPos;
+	int dx = LaraItem->pos.xPos - fx->pos.xPos;
+	int dz = LaraItem->pos.zPos - fx->pos.zPos;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -227,7 +227,7 @@ void __cdecl BubblesEffect4(__int16 fxNum, __int16 xVel, __int16 yVel, __int16 z
 	}
 }
 
-__int32 __cdecl BubblesShatterFunction(FX_INFO* fx, __int32 param1, __int32 param2)
+int __cdecl BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 {
 	ShatterItem.yRot = fx->pos.yRot;
 	ShatterItem.meshp = Meshes[fx->frameNumber];
@@ -241,19 +241,19 @@ __int32 __cdecl BubblesShatterFunction(FX_INFO* fx, __int32 param1, __int32 para
 	return 1;
 }
 
-void __cdecl BubblesControl(__int16 fxNum)
+void __cdecl BubblesControl(short fxNum)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
-	__int16 angles[2];
+	short angles[2];
 	phd_GetVectorAngles(
 		LaraItem->pos.xPos - fx->pos.xPos,
 		LaraItem->pos.yPos - fx->pos.yPos - 256,
 		LaraItem->pos.zPos - fx->pos.zPos,
 		angles);
 
-	__int32 unk1 = 0; // v44
-	__int32 unk2 = 0; // v3
+	int unk1 = 0; // v44
+	int unk2 = 0; // v3
 
 	if (fx->flag1 == 1)
 	{
@@ -288,13 +288,13 @@ void __cdecl BubblesControl(__int16 fxNum)
 			fx->speed += 3;
 		}
 		
-		__int32 dy = angles[0] - fx->pos.yRot;
+		int dy = angles[0] - fx->pos.yRot;
 		if (abs(dy) > ANGLE(180))
 		{
 			dy = -dy;
 		}
 
-		__int32 dx = angles[1] - fx->pos.xRot;
+		int dx = angles[1] - fx->pos.xRot;
 		if (abs(dx) > ANGLE(180))
 		{
 			dx = -dx;
@@ -326,19 +326,19 @@ void __cdecl BubblesControl(__int16 fxNum)
 		fx->pos.zRot += 16 * fx->speed;
 	}
 
-	__int32 oldX = fx->pos.xPos;
-	__int32 oldY = fx->pos.yPos;
-	__int32 oldZ = fx->pos.zPos;
+	int oldX = fx->pos.xPos;
+	int oldY = fx->pos.yPos;
+	int oldZ = fx->pos.zPos;
 
-	__int32 c = fx->speed * COS(fx->pos.xRot) >> W2V_SHIFT;  
+	int c = fx->speed * COS(fx->pos.xRot) >> W2V_SHIFT;  
 	fx->pos.xPos += c * SIN(fx->pos.yRot) >> W2V_SHIFT; 
 	fx->pos.yPos += fx->speed * SIN(-fx->pos.xRot) >> W2V_SHIFT;  
 	fx->pos.zPos += c * COS(fx->pos.yRot) >> W2V_SHIFT;
 	
-	__int16 roomNumber = fx->roomNumber;
+	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
-	__int32 floorHeight = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-	__int32 ceilingHeight = GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+	int floorHeight = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+	int ceilingHeight = GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 
 	if (fx->pos.yPos >= floorHeight || fx->pos.yPos <= ceilingHeight)
 	{
@@ -364,7 +364,7 @@ void __cdecl BubblesControl(__int16 fxNum)
 		}
 		else
 		{
-			__int32 shockwaveValue = 0;
+			int shockwaveValue = 0;
 
 			if (fx->flag1)
 			{
@@ -467,9 +467,9 @@ void __cdecl BubblesControl(__int16 fxNum)
 			EffectNewRoom(fxNum, roomNumber);
 		}
 
-		__int32 dx = oldX - fx->pos.xPos;
-		__int32 dy = oldY - fx->pos.yPos;
-		__int32 dz = oldZ - fx->pos.zPos;
+		int dx = oldX - fx->pos.xPos;
+		int dy = oldY - fx->pos.yPos;
+		int dz = oldZ - fx->pos.zPos;
 
 		if (Wibble & 4 || fx->flag1 == 1 || fx->flag1 == 5 || fx->flag1 == 2)
 		{

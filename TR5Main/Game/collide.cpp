@@ -6,33 +6,33 @@
 
 #include <stdio.h>
 
-__int32 __cdecl CollideStaticObjects(COLL_INFO* coll, __int32 x, __int32 y, __int32 z, __int16 roomNumber, __int32 hite)
+int __cdecl CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
 {
-	__int16 roomsArray[22];
+	short roomsArray[22];
 	memset(&roomsArray[0], 0, 44);
 
 	coll->hitStatic = false;
 
-	__int32 inXmin = x - coll->radius;
-	__int32 inXmax = x + coll->radius;
-	__int32 inZmin = z - coll->radius;
-	__int32 inZmax = z + coll->radius;
-	__int32 inYmin = y - hite;
+	int inXmin = x - coll->radius;
+	int inXmax = x + coll->radius;
+	int inZmin = z - coll->radius;
+	int inZmax = z + coll->radius;
+	int inYmin = y - hite;
 
 	roomsArray[0] = roomNumber;
 
-	__int16* doors = Rooms[roomNumber].door;
-	__int32 numRooms = 1;
+	short* doors = Rooms[roomNumber].door;
+	int numRooms = 1;
 
 	// Check for connected rooms
 	if (doors != NULL)
 	{
-		__int16 numDoors = *doors;
-		__int16* currentDoor = doors + 1;
+		short numDoors = *doors;
+		short* currentDoor = doors + 1;
 
-		for (__int32 i = 0; i < numDoors; i++)
+		for (int i = 0; i < numDoors; i++)
 		{
-			__int32 j = 0;
+			int j = 0;
 
 			for (j = 0; j < numRooms; j++)
 			{
@@ -50,25 +50,25 @@ __int32 __cdecl CollideStaticObjects(COLL_INFO* coll, __int32 x, __int32 y, __in
 	if (numRooms <= 0)
 		return false;
 
-	__int32 xMin = 0;
-	__int32 xMax = 0;
-	__int32 zMin = 0;
-	__int32 zMax = 0;
+	int xMin = 0;
+	int xMax = 0;
+	int zMin = 0;
+	int zMax = 0;
 
-	for (__int32 i = 0; i < numRooms; i++)
+	for (int i = 0; i < numRooms; i++)
 	{
 		ROOM_INFO* room = &Rooms[roomsArray[i]];
 		MESH_INFO* mesh = room->mesh;
 
-		for (__int32 j = room->numMeshes; j > 0; j--, mesh++)
+		for (int j = room->numMeshes; j > 0; j--, mesh++)
 		{
 			STATIC_INFO* sInfo = &StaticObjects[mesh->staticNumber];
 			if ((sInfo->flags & 1)) // No collision
 				continue;
 
-			__int32 yMin = mesh->y + sInfo->xMinc;
-			__int32 yMax = mesh->y + sInfo->yMaxc;
-			__int16 yRot = mesh->yRot;
+			int yMin = mesh->y + sInfo->xMinc;
+			int yMax = mesh->y + sInfo->yMaxc;
+			short yRot = mesh->yRot;
 
 			if (yRot == -32768)
 			{
@@ -113,24 +113,24 @@ __int32 __cdecl CollideStaticObjects(COLL_INFO* coll, __int32 x, __int32 y, __in
 	return false;
 }
 
-__int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, __int32 ignoreLara)
+int __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	// Collect all the rooms where to check
-	__int16 roomsArray[22];
-	__int32 numRooms = 1;
+	short roomsArray[22];
+	int numRooms = 1;
 	roomsArray[0] = collidingItem->roomNumber;
 
-	__int16* doors = Rooms[roomsArray[0]].door;
+	short* doors = Rooms[roomsArray[0]].door;
 	if (doors)
 	{
-		__int32 numDoors = *doors;
+		int numDoors = *doors;
 		doors++;
 
-		for (__int32 i = 0; i < numDoors; i++)
+		for (int i = 0; i < numDoors; i++)
 		{
-			__int16 adjoiningRoom = *doors;
+			short adjoiningRoom = *doors;
 			bool found = false;
-			for (__int32 j = 0; j < numRooms; j++)
+			for (int j = 0; j < numRooms; j++)
 			{
 				if (roomsArray[j] == adjoiningRoom)
 				{
@@ -148,16 +148,16 @@ __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __i
 		}
 	}
 
-	__int32 numItems = 0;
-	__int32 numMeshes = 0;
+	int numItems = 0;
+	int numMeshes = 0;
 
 	if (collidedMeshes)
 	{
-		for (__int32 i = 0; i < numRooms; i++)
+		for (int i = 0; i < numRooms; i++)
 		{
 			ROOM_INFO* room = &Rooms[roomsArray[i]];
 
-			for (__int32 j = 0; j < room->numMeshes; j++)
+			for (int j = 0; j < room->numMeshes; j++)
 			{
 				MESH_INFO* mesh = &room->mesh[j];
 				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
@@ -168,11 +168,11 @@ __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __i
 					{
 						if (collidingItem->pos.yPos <= mesh->y + staticMesh->yMaxc)
 						{
-							__int32 s = SIN(mesh->yRot);
-							__int32 c = COS(mesh->yRot);
+							int s = SIN(mesh->yRot);
+							int c = COS(mesh->yRot);
 
-							__int32 rx = ((collidingItem->pos.xPos - mesh->x) * c - s * (collidingItem->pos.zPos - mesh->z)) >> W2V_SHIFT;
-							__int32 rz = ((collidingItem->pos.zPos - mesh->z) * c + s * (collidingItem->pos.xPos - mesh->x)) >> W2V_SHIFT;
+							int rx = ((collidingItem->pos.xPos - mesh->x) * c - s * (collidingItem->pos.zPos - mesh->z)) >> W2V_SHIFT;
+							int rz = ((collidingItem->pos.zPos - mesh->z) * c + s * (collidingItem->pos.xPos - mesh->x)) >> W2V_SHIFT;
 
 							if (radius + rx + 128 >= staticMesh->xMinc && rx - radius - 128 <= staticMesh->xMaxc)
 							{
@@ -197,11 +197,11 @@ __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __i
 
 	if (collidedItems)
 	{
-		for (__int32 i = 0; i < numRooms; i++)
+		for (int i = 0; i < numRooms; i++)
 		{
 			ROOM_INFO* room = &Rooms[roomsArray[i]];
 
-			__int32 itemNumber = room->itemNumber;
+			int itemNumber = room->itemNumber;
 			if (itemNumber != NO_ITEM)
 			{
 				do
@@ -226,11 +226,11 @@ __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __i
 						continue;
 					}
 
-					__int32 dx = collidingItem->pos.xPos - item->pos.xPos;
-					__int32 dy = collidingItem->pos.yPos - item->pos.yPos;
-					__int32 dz = collidingItem->pos.zPos - item->pos.zPos;
+					int dx = collidingItem->pos.xPos - item->pos.xPos;
+					int dy = collidingItem->pos.yPos - item->pos.yPos;
+					int dz = collidingItem->pos.zPos - item->pos.zPos;
 
-					__int16* framePtr = GetBestFrame(item);
+					short* framePtr = GetBestFrame(item);
 
 					if (Objects[item->objectNumber].drawRoutine
 						&& item->meshBits
@@ -244,11 +244,11 @@ __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __i
 						&& collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr[2]
 						&& collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr[3])
 					{
-						__int32 s = SIN(item->pos.yRot);
-						__int32 c = COS(item->pos.yRot);
+						int s = SIN(item->pos.yRot);
+						int c = COS(item->pos.yRot);
 
-						__int32 rx = (dx * c - s * dz) >> W2V_SHIFT;
-						__int32 rz = (dz * c + s * dx) >> W2V_SHIFT;
+						int rx = (dx * c - s * dz) >> W2V_SHIFT;
+						int rz = (dz * c + s * dx) >> W2V_SHIFT;
 
 						if (item->objectNumber == ID_TURN_SWITCH)
 						{
@@ -283,9 +283,9 @@ __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __i
 	return (numItems | numMeshes);
 }
 
-__int32 __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
+int __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
 {
-	__int16* framePtr = GetBestFrame(lara);
+	short* framePtr = GetBestFrame(lara);
 
 	if (item->pos.yPos + GlobalCollisionBounds.Y2 <= lara->pos.yPos + framePtr[3])
 		return false;
@@ -293,14 +293,14 @@ __int32 __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, 
 	if (item->pos.yPos + GlobalCollisionBounds.Y1 >= framePtr[4])
 		return false;
 
-	__int32 s = SIN(item->pos.yRot);
-	__int32 c = COS(item->pos.yRot);
+	int s = SIN(item->pos.yRot);
+	int c = COS(item->pos.yRot);
 
-	__int32 dx = lara->pos.xPos - item->pos.xPos;
-	__int32 dz = lara->pos.zPos - item->pos.zPos;
+	int dx = lara->pos.xPos - item->pos.xPos;
+	int dz = lara->pos.zPos - item->pos.zPos;
 
-	__int32 x = (c * dx - s * dz) >> W2V_SHIFT;
-	__int32 z = (c * dz + s * dx) >> W2V_SHIFT;
+	int x = (c * dx - s * dz) >> W2V_SHIFT;
+	int z = (c * dz + s * dx) >> W2V_SHIFT;
 
 	if (x < GlobalCollisionBounds.X1 - coll->radius ||
 		x > GlobalCollisionBounds.X2 + coll->radius ||
@@ -311,7 +311,7 @@ __int32 __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, 
 	return true;
 }
 
-void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c)
+void __cdecl TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -331,7 +331,7 @@ void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c)
 
 void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) (F)
 {
-	for (__int32 i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		GAME_VECTOR s;
 		s.x = (i << 8) - 0x80;

@@ -50,10 +50,10 @@
 #define REGKEY_SOUND_DEVICE		"SoundDevice"
 
 typedef struct GameConfiguration {
-	__int32 Width;
-	__int32 Height;
-	__int32 RefreshRate;
-	__int32 Adapter;
+	int Width;
+	int Height;
+	int RefreshRate;
+	int Adapter;
 	bool Windowed;
 	bool EnableSound;
 	bool AutoTarget;
@@ -61,29 +61,29 @@ typedef struct GameConfiguration {
 	bool EnableCaustics;
 	bool EnableVolumetricFog;
 	bool EnableAudioSpecialEffects;
-	__int32 MaxDrawDistance;
-	__int32 MusicVolume;
-	__int32 SfxVolume;
-	__int32 SoundDevice;
+	int MaxDrawDistance;
+	int MusicVolume;
+	int SfxVolume;
+	int SoundDevice;
 	byte KeyboardLayout[NUM_CONTROLS];
 	bool ControlMethod;
-	__int32 JoyDuck;
-	__int32 JoyAction;
-	__int32 JoyDraw;
-	__int32 JoyFlare;
-	__int32 JoyDash;
-	__int32 JoyInventory;
-	__int32 JoyJump;
-	__int32 JoyLook;
-	__int32 JoyRoll;
-	__int32 JoyWalk;
+	int JoyDuck;
+	int JoyAction;
+	int JoyDraw;
+	int JoyFlare;
+	int JoyDash;
+	int JoyInventory;
+	int JoyJump;
+	int JoyLook;
+	int JoyRoll;
+	int JoyWalk;
 };
 
-void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index);
+void __cdecl LoadResolutionsInCombobox(HWND handle, int index);
 void __cdecl LoadAdaptersInCombobox(HWND handle);
 void __cdecl LoadSoundDevicesInCombobox(HWND handle);
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
-__int32 __cdecl SetupDialog();
+int __cdecl SetupDialog();
 void __cdecl InitDefaultConfiguration();
 bool __cdecl LoadConfiguration();
 bool __cdecl SaveConfiguration();

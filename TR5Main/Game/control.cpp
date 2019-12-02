@@ -19,7 +19,7 @@
 #include "savegame.h"
 #include "sound.h"
 #include "spotcam.h"
-#include "Box.h"
+#include "box.h"
 #include "objects.h"
 #include "switch.h"
 #include "laramisc.h"
@@ -32,13 +32,13 @@
 #include <process.h>
 #include <stdio.h>
 
-__int32 KeyTriggerActive;
+int KeyTriggerActive;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern Inventory* g_Inventory;
 
-GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
+GAME_STATUS __cdecl ControlPhase(int numFrames, int demoMode)
 {
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -84,7 +84,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 			if ((DbInput & IN_DESELECT || g_Inventory->GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{ 
 				// Stop all sounds
-				__int32 inventoryResult = g_Inventory->DoInventory();
+				int inventoryResult = g_Inventory->DoInventory();
 				switch (inventoryResult)
 				{
 				case INV_RESULT_LOAD_GAME:
@@ -99,12 +99,12 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		if (CurrentLevel != 0 && LevelComplete)
 			return GAME_STATUS_LEVEL_COMPLETED;
 
-		__int32 oldInput = TrInput;
+		int oldInput = TrInput;
 		 
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
-			__int32 inventoryResult = g_Inventory->DoInventory();
+			int inventoryResult = g_Inventory->DoInventory();
 			switch (inventoryResult)
 			{
 			case INV_RESULT_NEW_GAME:
@@ -223,11 +223,11 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		// Update all items
 		InItemControlLoop = true;
 
-		__int16 itemNum = NextItemActive;
+		short itemNum = NextItemActive;
 		while (itemNum != NO_ITEM)
 		{
 			ITEM_INFO* item = &Items[itemNum];
-			__int16 nextItem = item->nextActive;
+			short nextItem = item->nextActive;
 
 			if (item->afterDeath <= 128)
 			{
@@ -248,10 +248,10 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 		// Update all effects
 		InItemControlLoop = true;
 
-		__int16 fxNum = NextFxActive;
+		short fxNum = NextFxActive;
 		while (fxNum != NO_ITEM)
 		{
-			__int16 nextFx = Effects[fxNum].nextActive;
+			short nextFx = Effects[fxNum].nextActive;
 			if (Objects[Effects[fxNum].objectNumber].control)
 				(*Objects[Effects[fxNum].objectNumber].control)(fxNum);
 			fxNum = nextFx;
@@ -354,7 +354,7 @@ GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode)
 					SmashedMesh[SmashedMeshCount]->z,
 					&SmashedMeshRoom[SmashedMeshCount]);
 
-				__int32 height = GetFloorHeight(
+				int height = GetFloorHeight(
 					floor,
 					SmashedMesh[SmashedMeshCount]->x,
 					SmashedMesh[SmashedMeshCount]->y,
@@ -425,7 +425,7 @@ unsigned __stdcall GameMain(void*)
 	return 1;   
 }   
 
-GAME_STATUS __cdecl DoTitle(__int32 index)
+GAME_STATUS __cdecl DoTitle(int index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
@@ -436,7 +436,7 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	// Load the level
 	S_LoadLevelFile(index);
 
-	__int32 inventoryResult;
+	int inventoryResult;
 
 	if (g_GameFlow->TitleType == TITLE_FLYBY)
 	{
@@ -502,7 +502,7 @@ GAME_STATUS __cdecl DoTitle(__int32 index)
 	return GAME_STATUS_NEW_GAME;
 }
 
-GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame)
+GAME_STATUS __cdecl DoLevel(int index, int ambient, bool loadFromSavegame)
 {
 	CreditsDone = false;
 	CanLoad = false;
@@ -570,7 +570,7 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	// Initialise ponytails
 	InitialiseHair();
 
-	__int32 nframes = 2;
+	int nframes = 2;
 	GAME_STATUS result = ControlPhase(nframes, 0);
 	g_Renderer->FadeIn();
 
@@ -595,18 +595,18 @@ GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegam
 	}
 }
 
-void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
+void __cdecl TestTriggers(short* data, int heavy, int HeavyFlags)
 {
-	__int32 flip = -1;
-	__int32 flipAvailable = 0;
-	__int32 newEffect = -1;
-	__int32 switchOff = 0;
-	__int32 switchFlag = 0;
-	__int16 objectNumber = 0;
-	__int32 keyResult = 0;
-	__int16 cameraFlags = 0;
-	__int16 cameraTimer = 0;
-	__int32 spotCamIndex = 0;
+	int flip = -1;
+	int flipAvailable = 0;
+	int newEffect = -1;
+	int switchOff = 0;
+	int switchFlag = 0;
+	short objectNumber = 0;
+	int keyResult = 0;
+	short cameraFlags = 0;
+	short cameraTimer = 0;
+	int spotCamIndex = 0;
 
 	HeavyTriggered = false;
 
@@ -636,7 +636,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 	{
 		if (!heavy)
 		{
-			__int16 quad = (unsigned __int16)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
+			short quad = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
 			if ((1 << (quad + 8)) & *data)
 				Lara.climbStatus = true;
 		}
@@ -668,9 +668,9 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 		data++;
 	}
 
-	__int16 triggerType = (*(data++) >> 8) & 0x3F;
-	__int16 flags = *(data++);
-	__int16 timer = flags & 0xFF;
+	short triggerType = (*(data++) >> 8) & 0x3F;
+	short flags = *(data++);
+	short timer = flags & 0xFF;
 
 	if (Camera.type != HEAVY_CAMERA)
 		RefreshCamera(triggerType, data);
@@ -706,7 +706,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 		}
 	}
 
-	__int16 value = 0;
+	short value = 0;
 
 	switch (triggerType)
 	{
@@ -805,8 +805,8 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 		break;
 	}
 
-	__int16 targetType = 0;
-	__int16 trigger = 0;
+	short targetType = 0;
+	short trigger = 0;
 
 	ITEM_INFO* item = NULL;
 	ITEM_INFO* cameraItem = NULL;
@@ -985,7 +985,7 @@ void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags)
 				spotCamIndex = 0;
 				if (SpotCamRemap[value] != 0)
 				{
-					for (__int32 i = 0; i < SpotCamRemap[value]; i++)
+					for (int i = 0; i < SpotCamRemap[value]; i++)
 					{
 						spotCamIndex += CameraCnt[i];
 					}
@@ -1136,13 +1136,13 @@ void __cdecl ActivateCamera()
 	KeyTriggerActive = 2;
 }
 
-__int16 __cdecl GetDoor(FLOOR_INFO* floor)
+short __cdecl GetDoor(FLOOR_INFO* floor)
 {
 	if (!floor->index)
 		return NO_ROOM;
 
-	__int16* data = &FloorData[floor->index];
-	__int16 type = *(data++);
+	short* data = &FloorData[floor->index];
+	short type = *(data++);
 
 	if (((type & DATA_TYPE) == TILT_TYPE)
 		|| ((type & DATA_TYPE) == SPLIT1)

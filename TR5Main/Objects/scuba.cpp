@@ -1,18 +1,17 @@
 #include "newobjects.h"
-#include "..\Global\global.h"
-#include "..\Game\Box.h"
-#include "..\Game\items.h"
-#include "..\Game\lot.h"
-#include "..\Game\control.h"
-#include "..\Game\effects.h"
-#include "..\Game\draw.h"
-#include "..\Game\sphere.h"
-#include "..\Game\effect2.h"
-#include "..\Game\people.h"
+#include "../Game/Box.h"
+#include "../Game/items.h"
+#include "../Game/lot.h"
+#include "../Game/control.h"
+#include "../Game/effects.h"
+#include "../Game/draw.h"
+#include "../Game/sphere.h"
+#include "../Game/effect2.h"
+#include "../Game/people.h"
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 
-__int32 __cdecl GetWaterSurface(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
+int __cdecl GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO* room = &Rooms[roomNumber];
 	FLOOR_INFO* floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT) * room->xSize];
@@ -42,9 +41,9 @@ __int32 __cdecl GetWaterSurface(__int32 x, __int32 y, __int32 z, __int16 roomNum
 	return NO_HEIGHT;
 }
 
-void __cdecl ShootHarpoon(ITEM_INFO* frogman, __int32 x, __int32 y, __int32 z, __int16 speed, __int16 yRot, __int16 roomNumber)
+void __cdecl ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber)
 {
-	__int16 harpoonItemNum = CreateItem();
+	short harpoonItemNum = CreateItem();
 	if (harpoonItemNum != NO_ITEM)
 	{
 		ITEM_INFO* harpoon = &Items[harpoonItemNum];
@@ -69,7 +68,7 @@ void __cdecl ShootHarpoon(ITEM_INFO* frogman, __int32 x, __int32 y, __int32 z, _
 	}
 }
 
-void __cdecl HarpoonControl(__int16 itemNum)
+void __cdecl HarpoonControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -82,22 +81,22 @@ void __cdecl HarpoonControl(__int16 itemNum)
 	}
 	else
 	{
-		__int32 ox = item->pos.xPos;
-		__int32 oz = item->pos.zPos;
+		int ox = item->pos.xPos;
+		int oz = item->pos.zPos;
 
-		__int16 speed = (item->speed * COS(item->pos.xRot)) >> W2V_SHIFT;
+		short speed = (item->speed * COS(item->pos.xRot)) >> W2V_SHIFT;
 		item->pos.zPos += (speed * COS(item->pos.yRot)) >> W2V_SHIFT;
 		item->pos.xPos += (speed * SIN(item->pos.yRot)) >> W2V_SHIFT;
 		item->pos.yPos += -((item->speed * SIN(item->pos.xRot)) >> W2V_SHIFT);
 
-		__int16 roomNumber = item->roomNumber;
+		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		if (item->roomNumber != roomNumber)
 			ItemNewRoom(itemNum, roomNumber);
 		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->pos.yPos >= item->floor)
 		{
-			//for (__int32 i = 0; i < 4; i++)
+			//for (int i = 0; i < 4; i++)
 			//	TriggerDartSmoke(ox, item->pos.yPos, oz, 0, 0, 1);
 			KillItem(itemNum);
 			//		SoundEffect(258, &item->pos, 0);
@@ -105,9 +104,9 @@ void __cdecl HarpoonControl(__int16 itemNum)
 	}
 }
 
-void __cdecl ScubaControl(__int16 itemNumber)
+void __cdecl ScubaControl(short itemNumber)
 {
-	__int32 waterHeight;
+	int waterHeight;
 
 	if (!CreatureActive(itemNumber))
 		return;
@@ -115,9 +114,9 @@ void __cdecl ScubaControl(__int16 itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
 	
-	__int16 angle = 0;
-	__int16 head = 0;
-	__int16 neck = 0;
+	short angle = 0;
+	short head = 0;
+	short neck = 0;
 
 	if (item->hitPoints <= 0)
 	{

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "..\Global\global.h"
 
-char* __cdecl GameMalloc(__int32 size)
+char* __cdecl GameMalloc(int size)
 {
 	//printf("Size: %d, MallocFree: %d\n", size, MallocFree);
 	return GameMallocReal(size);
@@ -19,9 +19,9 @@ void __cdecl InitGameMalloc()
 	MallocUsed = 0;
 }
 
-char* __cdecl GameMalloc(__int32 size)
+char* __cdecl GameMalloc(int size)
 {
-	__int32 memSize = (size + 3) & -4;
+	int memSize = (size + 3) & -4;
 	if (memSize > MallocFree)
 	{
 		DB_Log(0, "Out of memory");
@@ -38,15 +38,15 @@ char* __cdecl GameMalloc(__int32 size)
 	}
 }
 
-void __cdecl GameFree(__int32 size)
+void __cdecl GameFree(int size)
 {
-	__int32 memSize = (size + 3) & -4;
+	int memSize = (size + 3) & -4;
 	MallocPtr -= memSize;
 	MallocFree += memSize;
 	MallocUsed -= memSize;
 }
 
-void* __cdecl Malloc(__int32 size)
+void* __cdecl Malloc(int size)
 {
 	return malloc(size);
 }

@@ -11,7 +11,7 @@
 #include "..\Game\people.h"
 #include "..\Game\Lara.h"
 
-void __cdecl InitialiseDemigod(__int16 itemNum)
+void __cdecl InitialiseDemigod(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -25,7 +25,7 @@ void __cdecl InitialiseDemigod(__int16 itemNum)
 	/*if (LevelItems > 0)
 	{
 		ITEM_INFO* currentItem = &Items[0];
-		__int32 k = 0;
+		int k = 0;
 
 		while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])
 		{
@@ -39,11 +39,11 @@ void __cdecl InitialiseDemigod(__int16 itemNum)
 	}*/
 }
 
-void __cdecl DemigodControl(__int16 itemNum)
+void __cdecl DemigodControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
-	__int32 someItemNum = item->itemFlags[0];
+	int someItemNum = item->itemFlags[0];
 	
 	if (someItemNum && Items[someItemNum].status == ITEM_ACTIVE && Items[someItemNum].active)
 	{
@@ -56,18 +56,18 @@ void __cdecl DemigodControl(__int16 itemNum)
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	__int16 tilt = 0;
-	__int16 angle = 0;
-	__int16 joint0 = 0;
-	__int16 joint1 = 0;
-	__int16 joint2 = 0;
-	__int16 joint3 = 0;
+	short tilt = 0;
+	short angle = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short joint3 = 0;
 
 	/*if (CurrentLevel == 24)
 	{
 		ROOM_INFO* room = &Rooms[item->roomNumber];
 
-		__int16* zone = GroundZones[FlipStatus * 2 + creature->LOT.zone];
+		short* zone = GroundZones[FlipStatus * 2 + creature->LOT.zone];
 		
 		LaraItem->boxNumber = room->floor[((LaraItem->pos.zPos - room->z) >> WALL_SHIFT) +
 			((LaraItem->pos.xPos - room->x) >> WALL_SHIFT) * room->xSize].box;
@@ -112,9 +112,9 @@ void __cdecl DemigodControl(__int16 itemNum)
 		AI_INFO info;
 		AI_INFO laraInfo;
 
-		__int32 dx = 0;
-		__int32 dy = 0;
-		__int32 dz = 0;
+		int dx = 0;
+		int dy = 0;
+		int dz = 0;
 
 		CreatureAIInfo(item, &info);
 
@@ -385,7 +385,7 @@ void __cdecl DemigodControl(__int16 itemNum)
 
 			creature->maximumTurn = 0;
 
-			if (item->animNumber == Objects[(signed __int16)item->objectNumber].animIndex + 6)
+			if (item->animNumber == Objects[(signed short)item->objectNumber].animIndex + 6)
 			{
 				if (abs(info.angle) >= ANGLE(7))
 				{
@@ -461,9 +461,9 @@ void __cdecl DemigodControl(__int16 itemNum)
 
 				GetJointAbsPosition(item, &pos, 17);
 
-				__int16 roomNumber = item->roomNumber;
+				short roomNumber = item->roomNumber;
 				FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-				__int32 height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+				int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 				if (height == -32512)
 				{
 					pos.y = pos.y - 128;
@@ -511,9 +511,9 @@ void __cdecl DemigodControl(__int16 itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int32 flags)
+void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
 {
-	__int16 fxNum = CreateNewEffect(roomNumber);
+	short fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != -1)
 	{
 		FX_INFO* fx = &Effects[fxNum];
@@ -547,11 +547,11 @@ void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, __int16 roomNumber, __int3
 	}
 }
 
-void __cdecl DemigodEnergyAttack(__int16 itemNum)
+void __cdecl DemigodEnergyAttack(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	__int16 animIndex = item->animNumber - Objects[item->objectNumber].animIndex;
+	short animIndex = item->animNumber - Objects[item->objectNumber].animIndex;
 
 	if (animIndex == 8)
 	{
@@ -572,7 +572,7 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 
 			GetJointAbsPosition(item, &pos2, 16);
 
-			__int16 angles[2];
+			short angles[2];
 			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 			PHD_3DPOS pos;
@@ -618,7 +618,7 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 
 			GetJointAbsPosition(item, &pos2, 16);
 
-			__int16 angles[2];
+			short angles[2];
 			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 			PHD_3DPOS pos;
@@ -643,7 +643,7 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 	}
 
 	// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
-	__int32 frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	int frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
 
 	if (frameNumber >= 8 && frameNumber <= 64)
 	{
@@ -669,7 +669,7 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 			GetJointAbsPosition(item, &pos2, 17);
 		}
 
-		__int16 angles[2];
+		short angles[2];
 		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 		PHD_3DPOS pos;
@@ -684,14 +684,14 @@ void __cdecl DemigodEnergyAttack(__int16 itemNum)
 	}
 }
 
-void __cdecl DemigodHammerAttack(__int32 x, __int32 y, __int32 z, __int32 something)
+void __cdecl DemigodHammerAttack(int x, int y, int z, int something)
 {
-	__int32 angle = 2 * GetRandomControl();
-	__int32 deltaAngle = 0x10000 / something;
+	int angle = 2 * GetRandomControl();
+	int deltaAngle = 0x10000 / something;
 
 	if (something > 0)
 	{
-		for (__int32 i = 0; i < something; i++)
+		for (int i = 0; i < something; i++)
 		{
 			SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
 

@@ -2,7 +2,7 @@
 #include "..\Global\global.h"
 #include <stdio.h>
 
-void __cdecl InitialiseLOTarray(__int32 allocMem)
+void __cdecl InitialiseLOTarray(int allocMem)
 {
 	DB_Log(0, "InitialiseLOTarray - DLL");
 
@@ -10,7 +10,7 @@ void __cdecl InitialiseLOTarray(__int32 allocMem)
 		BaddieSlots = (CREATURE_INFO*)GameMalloc(sizeof(CREATURE_INFO) * NUM_SLOTS);
 
 	CREATURE_INFO* creature = BaddieSlots;
-	for (__int32 i = 0; i < NUM_SLOTS; i++, creature++)
+	for (int i = 0; i < NUM_SLOTS; i++, creature++)
 	{
 		creature->itemNum = NO_ITEM;
 		creature->LOT.node = (BOX_NODE*)GameMalloc(sizeof(BOX_NODE) * NumberBoxes);
@@ -19,7 +19,7 @@ void __cdecl InitialiseLOTarray(__int32 allocMem)
 	SlotsUsed = 0;
 }
 
-__int32 __cdecl EnableBaddieAI(__int16 itemNum, __int32 always)
+int __cdecl EnableBaddieAI(short itemNum, int always)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -27,25 +27,25 @@ __int32 __cdecl EnableBaddieAI(__int16 itemNum, __int32 always)
 		return true;
 	else if (SlotsUsed >= NUM_SLOTS)
 	{
-		__int32 cameraDistance = 0;
+		int cameraDistance = 0;
 		if (!always)
 		{
-			__int32 deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
-			__int32 deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
-			__int32 deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
+			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
+			int deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
+			int deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
 			cameraDistance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
 		}
 
-		__int32 slotToDisable = -1;
+		int slotToDisable = -1;
 		CREATURE_INFO* creature = BaddieSlots;
-		for (__int32 slot = 0; slot < NUM_SLOTS; slot++, creature++)
+		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
 		{
 			item = &Items[creature->itemNum];
 
-			__int32 deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
-			__int32 deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
-			__int32 deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
-			__int32 distance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
+			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
+			int deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
+			int deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
+			int distance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
 
 			if (distance > cameraDistance)
 			{
@@ -66,7 +66,7 @@ __int32 __cdecl EnableBaddieAI(__int16 itemNum, __int32 always)
 	else
 	{
 		CREATURE_INFO* creature = BaddieSlots;
-		for (__int32 slot = 0; slot < NUM_SLOTS; slot++, creature++)
+		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
 		{
 			if (creature->itemNum == NO_ITEM)
 			{
@@ -79,7 +79,7 @@ __int32 __cdecl EnableBaddieAI(__int16 itemNum, __int32 always)
 	return false;
 }
 
-void __cdecl DisableBaddieAI(__int16 itemNumber)
+void __cdecl DisableBaddieAI(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
@@ -92,7 +92,7 @@ void __cdecl DisableBaddieAI(__int16 itemNumber)
 	}
 }
 
-void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
+void InitialiseCustomObjects(short itemNum, short slot)
 {
 	CREATURE_INFO* creature = &BaddieSlots[slot];
 	ITEM_INFO* item = &Items[itemNum];
@@ -117,12 +117,12 @@ void InitialiseCustomObjects(__int16 itemNum, __int16 slot)
 	case ID_APE:
 		creature->LOT.step = 512;
 		creature->LOT.drop = -512;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 	}
 }
 
-void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
+void __cdecl InitialiseSlot(short itemNum, short slot)
 {
 	CREATURE_INFO* creature = &BaddieSlots[slot];
 	ITEM_INFO* item = &Items[itemNum];
@@ -148,14 +148,14 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 	creature->LOT.isAmphibious = true;
 	creature->LOT.isJumping = false;
 	creature->LOT.isMonkeying = false;
-	creature->maximumTurn = ONE_DEGREE;
+	creature->maximumTurn = ANGLE(1);
 	creature->flags = 0;
 	creature->enemy = NULL;
 	creature->LOT.step = 256;
 	creature->LOT.drop = -512;
 	creature->LOT.blockMask = 0x4000;
 	creature->LOT.fly = 0;
-	creature->LOT.zone = 1;
+	creature->LOT.zone = ZONE_BASIC;
 	  
 	switch (item->objectNumber)
 	{
@@ -165,7 +165,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		// Can climb
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 
 	case ID_SAS:
@@ -176,7 +176,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
 		creature->LOT.canJump = true;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 
 	case ID_HITMAN:
@@ -187,7 +187,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.drop = -1024;
 		creature->LOT.canJump = true;
 		creature->LOT.canMonkey = true;
-		creature->LOT.zone = 3;
+		creature->LOT.zone = ZONE_HUMAN;
 		break;
 
 	case ID_SKELETON:
@@ -195,6 +195,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 256;
 		creature->LOT.drop = -256;
 		creature->LOT.canJump = true;
+		//creature->LOT.zone = ZONE_SKELLY;
 		break;
 
 	case ID_CROW:
@@ -209,7 +210,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 16;
-		creature->LOT.zone = 4;
+		creature->LOT.zone = ZONE_FLYER;
 		break;
 
 	case ID_SCUBA_DIVER:
@@ -220,7 +221,7 @@ void __cdecl InitialiseSlot(__int16 itemNum, __int16 slot)
 		creature->LOT.step = 20480;
 		creature->LOT.drop = -20480;
 		creature->LOT.fly = 32;
-		creature->LOT.zone = 4;
+		creature->LOT.zone = ZONE_WATER;
 		break;
 	}
 
@@ -244,7 +245,7 @@ void __cdecl ClearLOT(LOT_INFO* LOT)
 	LOT->requiredBox = NO_BOX;
 
 	BOX_NODE* node = LOT->node;
-	for (__int32 i = 0; i < NumberBoxes; i++)
+	for (int i = 0; i < NumberBoxes; i++)
 	{
 		node->exitBox = NO_BOX;
 		node->nextExpansion = NO_BOX;
@@ -265,7 +266,7 @@ void __cdecl CreateZone(ITEM_INFO* item)
 		BOX_NODE* node = creature->LOT.node;
 		creature->LOT.zoneCount = 0;
 
-		for (__int32 i = 0; i < NumberBoxes; i++)
+		for (int i = 0; i < NumberBoxes; i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -274,16 +275,16 @@ void __cdecl CreateZone(ITEM_INFO* item)
 	}
 	else
 	{
-		__int16* zone = GroundZones[creature->LOT.zone];
-		__int16* flippedZone = GroundZones[creature->LOT.zone + 1];
+		short* zone = GroundZones[creature->LOT.zone];
+		short* flippedZone = GroundZones[creature->LOT.zone + 1];
 
-		__int16 zoneNumber = zone[item->boxNumber];
-		__int16 flippedZoneNumber = flippedZone[item->boxNumber];
+		short zoneNumber = zone[item->boxNumber];
+		short flippedZoneNumber = flippedZone[item->boxNumber];
 
 		BOX_NODE* node = creature->LOT.node;
 		creature->LOT.zoneCount = 0;
 
-		for (__int32 i = 0; i < NumberBoxes; i++)
+		for (int i = 0; i < NumberBoxes; i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

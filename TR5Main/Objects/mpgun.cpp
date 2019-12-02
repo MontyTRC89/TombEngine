@@ -37,18 +37,18 @@ enum MPGUN_STATES {
 
 BITE_INFO mpgunBite = { 0, 160, 40, 13 };
 
-void __cdecl MPGunControl(__int16 itemNumber)
+void __cdecl MPGunControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
 
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	__int16 torsoY = 0;
-	__int16 torsoX = 0;
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short torsoY = 0;
+	short torsoX = 0;
+	short head = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (item->firedWeapon)
 	{
@@ -72,9 +72,9 @@ void __cdecl MPGunControl(__int16 itemNumber)
 	AI_INFO info;
 	AI_INFO laraInfo;
 	ITEM_INFO* target;
-	__int32 dx;
-	__int32 dz;
-	__int32 random;
+	int dx;
+	int dz;
+	int random;
 
 	if (item->hitPoints <= 0)
 	{
@@ -115,7 +115,7 @@ void __cdecl MPGunControl(__int16 itemNumber)
 			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
 			
 			CREATURE_INFO* currentCreature = BaddieSlots;
-			for (__int32 slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
+			for (int slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
 			{
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
@@ -126,7 +126,7 @@ void __cdecl MPGunControl(__int16 itemNumber)
 
 				dx = target->pos.xPos - item->pos.xPos;
 				dz = target->pos.zPos - item->pos.zPos;
-				__int32 distance = SQUARE(dx) + SQUARE(dz);
+				int distance = SQUARE(dx) + SQUARE(dz);
 				if (distance < laraInfo.distance)
 					creature->enemy = target;
 			}
@@ -152,13 +152,13 @@ void __cdecl MPGunControl(__int16 itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		__int32 x = item->pos.xPos + (WALL_SIZE * SIN(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
-		__int32 y = item->pos.yPos;
-		__int32 z = item->pos.zPos + (WALL_SIZE * COS(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
+		int x = item->pos.xPos + (WALL_SIZE * SIN(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
+		int y = item->pos.yPos;
+		int z = item->pos.zPos + (WALL_SIZE * COS(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
 		
-		__int16 roomNumber = item->roomNumber;
+		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-		__int32 height = GetFloorHeight(floor, x, y, z);
+		int height = GetFloorHeight(floor, x, y, z);
 
 		bool cover = (item->pos.yPos > (height + 768) && item->pos.yPos < (height + 1152) && laraInfo.distance > SQUARE(1024));
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2037
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TR5Main", "TR5Main\TR5Main.vcxproj", "{15AB0220-541C-4DA1-94EB-ED3C47E4582E}"
 EndProject
@@ -13,12 +13,10 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Debug|x64.ActiveCfg = Debug|x64
-		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Debug|x64.Build.0 = Debug|x64
+		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Debug|x64.ActiveCfg = Debug|Win32
 		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Debug|x86.ActiveCfg = Debug|Win32
 		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Debug|x86.Build.0 = Debug|Win32
-		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Release|x64.ActiveCfg = Release|x64
-		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Release|x64.Build.0 = Release|x64
+		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Release|x64.ActiveCfg = Release|Win32
 		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Release|x86.ActiveCfg = Release|Win32
 		{15AB0220-541C-4DA1-94EB-ED3C47E4582E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection

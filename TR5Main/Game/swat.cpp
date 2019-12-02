@@ -12,13 +12,13 @@
 #include "..\Game\Lara.h"
 
 /*
-void __cdecl InitialiseGuard(__int16 itemNum)
+void __cdecl InitialiseGuard(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
 	ClearItem(itemNum);
 	
-	__int16 animIndex = Objects[ID_SWAT].animIndex;
+	short animIndex = Objects[ID_SWAT].animIndex;
 	if (!Objects[ID_SWAT].loaded)
 		animIndex = Objects[ID_BLUE_GUARD].animIndex;
 
@@ -122,8 +122,8 @@ void __cdecl ControlGuard(int itemNum)
 	int v2; // ecx
 	ITEM_INFO* item; // esi
 	int v4; // eax
-	__int32 v5; // edi
-	__int32 v6; // ebp
+	int v5; // edi
+	int v6; // ebp
 	int v7; // eax
 	int v8; // ebx
 	int v9; // ecx
@@ -140,49 +140,49 @@ void __cdecl ControlGuard(int itemNum)
 	int v20; // ebp
 	struct FLOOR_INFO* v21; // eax
 	int v22; // eax
-	unsigned __int16 v23; // cx
-	unsigned __int16 v24; // dx
+	unsigned short v23; // cx
+	unsigned short v24; // dx
 	int v25; // edi
-	__int32 v26; // eax
+	int v26; // eax
 	CREATURE_INFO* v27; // ebp
 	ITEM_INFO* v28; // ecx
-	__int16 v29; // ax
+	short v29; // ax
 	int v30; // edi
 	int v31; // ebx
-	__int16 v32; // bx
-	__int16 v33; // cx
-	__int16 v34; // bx
-	__int16 v35; // bx
+	short v32; // bx
+	short v33; // cx
+	short v34; // bx
+	short v35; // bx
 	int v36; // edi
 	int v37; // eax
 	int v38; // eax
 	enum mood_type v39; // edi
 	ITEM_INFO* v40; // ecx
-	__int32 v41; // eax
+	int v41; // eax
 	int* v42; // edi
 	int v43; // eax
 	int v44; // ecx
 	_BOOL2 v45; // bx
-	__int16 v46; // cx
+	short v46; // cx
 	int v47; // eax
 	int v48; // eax
 	int v49; // eax
-	__int16 v50; // di
-	__int16 v51; // ax
-	__int32 v52; // eax
+	short v50; // di
+	short v51; // ax
+	int v52; // eax
 	int v53; // eax
-	__int32 v54; // eax
-	__int32 v55; // eax
-	__int16 v56; // dx
+	int v54; // eax
+	int v55; // eax
+	short v56; // dx
 	bool v57; // zf
-	__int16 v58; // dx
-	__int32 v59; // ecx
-	__int32 v60; // ecx
-	__int32 v61; // eax
-	__int16 v62; // dx
-	__int16 v63; // dx
-	__int16 v64; // dx
-	__int16 v65; // dx
+	short v58; // dx
+	int v59; // ecx
+	int v60; // ecx
+	int v61; // eax
+	short v62; // dx
+	short v63; // dx
+	short v64; // dx
+	short v65; // dx
 	int v66; // eax
 	int v67; // ecx
 	int v68; // ecx
@@ -191,47 +191,47 @@ void __cdecl ControlGuard(int itemNum)
 	char v71; // al
 	int v72; // eax
 	int v73; // eax
-	__int16 v74; // cx
-	__int16 v75; // ax
-	__int16 v76; // di
-	__int16 v77; // ax
+	short v74; // cx
+	short v75; // ax
+	short v76; // di
+	short v77; // ax
 	int v78; // eax
-	__int16 v79; // cx
+	short v79; // cx
 	ITEM_INFO* v80; // eax
-	__int16 v81; // cx
+	short v81; // cx
 	ITEM_INFO* v82; // eax
-	__int16 i; // cx
-	__int16 v84; // di
+	short i; // cx
+	short v84; // di
 	CREATURE_INFO_FINAL* v85; // ecx
-	__int16 v86; // cx
-	__int32 v87; // eax
+	short v86; // cx
+	int v87; // eax
 	int v88; // edx
 	struct FLOOR_INFO* v89; // eax
-	__int16 v90; // ax
-	__int32 v91; // eax
+	short v90; // ax
+	int v91; // eax
 	int v92; // eax
-	__int32 v93; // eax
-	__int16 v94; // ax
+	int v93; // eax
+	short v94; // ax
 	struct FLOOR_INFO* v95; // eax
 	int v96; // edx
 	int v97; // eax
-	__int16 v98; // cx
-	__int32 v99; // eax
-	__int32 v100; // ecx
+	short v98; // cx
+	int v99; // eax
+	int v100; // ecx
 	struct FLOOR_INFO* v101; // eax
-	__int16 v102; // ax
-	__int16 v103; // dx
-	__int16 v104; // dx
-	__int16 v105; // ax
-	__int16 v106; // ax
-	__int16 v107; // cx
-	__int16 v108; // cx
-	__int16 v109; // dx
-	__int16 v110; // dx
-	__int16 v111; // ax
-	__int16 v112; // ax
-	__int16 v113; // cx
-	__int16 v114; // cx
+	short v102; // ax
+	short v103; // dx
+	short v104; // dx
+	short v105; // ax
+	short v106; // ax
+	short v107; // cx
+	short v108; // cx
+	short v109; // dx
+	short v110; // dx
+	short v111; // ax
+	short v112; // ax
+	short v113; // cx
+	short v114; // cx
 	int a4; // [esp+Ch] [ebp-8Ch]
 	int animIndex; // [esp+10h] [ebp-88h]
 	int v117; // [esp+14h] [ebp-84h]
@@ -257,7 +257,7 @@ void __cdecl ControlGuard(int itemNum)
 	int v137; // [esp+78h] [ebp-20h]
 	int v138; // [esp+7Ch] [ebp-1Ch]
 	int v139; // [esp+80h] [ebp-18h]
-	__int16 v140; // [esp+84h] [ebp-14h]
+	short v140; // [esp+84h] [ebp-14h]
 	int v141; // [esp+88h] [ebp-10h]
 	int v142; // [esp+8Ch] [ebp-Ch]
 	int v143; // [esp+90h] [ebp-8h]

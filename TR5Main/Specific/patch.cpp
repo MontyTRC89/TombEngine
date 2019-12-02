@@ -5,9 +5,9 @@
 #include "..\Game\larafire.h"
 
 // Remapped variables. Some variables must be moved from EXE space to DLL space for having free space for bigger arrays
-__int32 NumItems;
-__int32 dword_874254;
-__int32 unk_87435C;
+int NumItems;
+int dword_874254;
+int unk_87435C;
 ITEM_INFO* Targets[NUM_SLOTS];
 STATIC_INFO StaticObjects[NUM_STATICS];
 
@@ -18,7 +18,7 @@ void PatchGameCode()
 	HANDLE gameHandle = GetCurrentProcess();
 
 	// Remap some variables for more slots
-	__int32 *newAddress = &NumItems;
+	int *newAddress = &NumItems;
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A63A5, &newAddress, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A63CA, &newAddress, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A63E3, &newAddress, 4, NULL);
@@ -37,7 +37,7 @@ void PatchGameCode()
 	WriteProcessMemory(gameHandle, (LPVOID)0x4B844E, &newAddress, 4, NULL);
 
 	// Bigger game buffer
-	__int32 newValue = GAME_BUFFER_SIZE * 2;
+	int newValue = GAME_BUFFER_SIZE * 2;
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A7CB1, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A7CC8, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A7CD7, &newValue, 4, NULL);
@@ -61,46 +61,46 @@ void PatchGameCode()
 	WriteProcessMemory(gameHandle, (LPVOID)0x511A5C, &newDrawingDistance, 4, NULL);
 
 	// Remove vertex limit in meshes
-	__int16 newValue16 = 0;
+	short newValue16 = 0;
 	//WriteProcessMemory(gameHandle, (LPVOID)0x49A4E1, &newValue16, 2, NULL);
 
 	// More statics
-	newValue = (__int32)&StaticObjects[0];
+	newValue = (int)&StaticObjects[0];
 	WriteProcessMemory(gameHandle, (LPVOID)0x41D736, &newValue, 4, NULL); // ShatterObject
 	WriteProcessMemory(gameHandle, (LPVOID)0x4A5BDA, &newValue, 4, NULL); // LoadSprites
 	WriteProcessMemory(gameHandle, (LPVOID)0x41453F, &newValue, 4, NULL); // TestObjectOnLedge
 
-	newValue = (__int32)&StaticObjects[0];
+	newValue = (int)&StaticObjects[0];
 	WriteProcessMemory(gameHandle, (LPVOID)0x42D185, &newValue, 4, NULL); // sub_42D060
-	newValue = (__int32)&StaticObjects[0] + 2;
+	newValue = (int)&StaticObjects[0] + 2;
 	WriteProcessMemory(gameHandle, (LPVOID)0x42D12E, &newValue, 4, NULL); // sub_42D060
-	newValue = (__int32)&StaticObjects[0] + 4;
+	newValue = (int)&StaticObjects[0] + 4;
 	WriteProcessMemory(gameHandle, (LPVOID)0x42D117, &newValue, 4, NULL); // sub_42D060
 
-	newValue = (__int32)&StaticObjects[0] + 16;
+	newValue = (int)&StaticObjects[0] + 16;
 	WriteProcessMemory(gameHandle, (LPVOID)0x4687D0, &newValue, 4, NULL); // sub_468770
-	newValue = (__int32)&StaticObjects[0] + 18;
+	newValue = (int)&StaticObjects[0] + 18;
 	WriteProcessMemory(gameHandle, (LPVOID)0x4687D8, &newValue, 4, NULL); // sub_468770
 
-	newValue = (__int32)&StaticObjects[0];
+	newValue = (int)&StaticObjects[0];
 	WriteProcessMemory(gameHandle, (LPVOID)0x43453F, &newValue, 4, NULL); //  sub_434390
 
-	newValue = (__int32)&StaticObjects[0] + 16;
+	newValue = (int)&StaticObjects[0] + 16;
 	WriteProcessMemory(gameHandle, (LPVOID)0x4123AB, &newValue, 4, NULL); // LaraBaddieCollision
 
-	newValue = (__int32)&StaticObjects[0] + 20;
+	newValue = (int)&StaticObjects[0] + 20;
 	WriteProcessMemory(gameHandle, (LPVOID)0x413DF0, &newValue, 4, NULL); // sub_413CF0
-	newValue = (__int32)&StaticObjects[0] + 16;
+	newValue = (int)&StaticObjects[0] + 16;
 	WriteProcessMemory(gameHandle, (LPVOID)0x413DF7, &newValue, 4, NULL); // sub_413CF0
 
-	newValue = (__int32)&StaticObjects[0] + 16;
+	newValue = (int)&StaticObjects[0] + 16;
 	WriteProcessMemory(gameHandle, (LPVOID)0x480128, &newValue, 4, NULL); // sub_47FFE0	
 
-	newValue = (__int32)&StaticObjects[0] + 16;
+	newValue = (int)&StaticObjects[0] + 16;
 	WriteProcessMemory(gameHandle, (LPVOID)0x4192B0, &newValue, 4, NULL); // ObjectOnLOS2	
 
 	// Move LevelDataPtr for having more space for Objects[]
-	newValue = (__int32)&LevelDataPtr;
+	newValue = (int)&LevelDataPtr;
 	
 	// LoadRooms
 	WriteProcessMemory(gameHandle, (LPVOID)0x004916C4, &newValue, 4, NULL);
@@ -204,56 +204,56 @@ void PatchGameCode()
 	// TODO: this is a temp patch for weapons
 	
 	// GetTargetOnLOS
-	newValue = (__int32)&Weapons[0] + 32;
+	newValue = (int)&Weapons[0] + 32;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0041A455, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x0041A4C7, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x0041A525, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x0041A64D, &newValue, 4, NULL);
 
 	// RifleHandler
-	newValue = (__int32)&Weapons[0];
+	newValue = (int)&Weapons[0];
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044DCDA, &newValue, 4, NULL);
 
 	// FireShotgun
-	newValue = (__int32)&Weapons[0] + 186;
+	newValue = (int)&Weapons[0] + 186;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E2B2, &newValue, 4, NULL);
-	newValue = (__int32)&Weapons[0] + 188;
+	newValue = (int)&Weapons[0] + 188;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E2D2, &newValue, 4, NULL);
 
 	// FireHK
-	newValue = (__int32)&Weapons[0] + 216;
+	newValue = (int)&Weapons[0] + 216;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E3FB, &newValue, 4, NULL);
-	newValue = (__int32)&Weapons[0] + 222;
+	newValue = (int)&Weapons[0] + 222;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E403, &newValue, 4, NULL);
-	newValue = (__int32)&Weapons[0] + 216;
+	newValue = (int)&Weapons[0] + 216;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E40D, &newValue, 4, NULL);
-	newValue = (__int32)&Weapons[0] + 222;
+	newValue = (int)&Weapons[0] + 222;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E415, &newValue, 4, NULL);
-	newValue = (__int32)&Weapons[0] + 224;
+	newValue = (int)&Weapons[0] + 224;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044E45B, &newValue, 4, NULL);
 
 	// draw_shotgun
-	newValue = (__int32)&Weapons[0] + 23;
+	newValue = (int)&Weapons[0] + 23;
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044EBBB, &newValue, 4, NULL);
 
 	// PistolsHandler
-	newValue = (__int32)&Weapons[0];
+	newValue = (int)&Weapons[0];
 	WriteProcessMemory(gameHandle, (LPVOID)0x0044FFD2, &newValue, 4, NULL);
 
 	// AnimatePistols
-	newValue = (__int32)&Weapons[0];
+	newValue = (int)&Weapons[0];
 	WriteProcessMemory(gameHandle, (LPVOID)0x0045044A, &newValue, 4, NULL);
 
 	// LaraGun
-	newValue = (__int32)&Weapons[0] + 28;
+	newValue = (int)&Weapons[0] + 28;
 	WriteProcessMemory(gameHandle, (LPVOID)0x00452564, &newValue, 4, NULL);
 	WriteProcessMemory(gameHandle, (LPVOID)0x0045265C, &newValue, 4, NULL);
 
 	// FireWeapon
-	newValue = (__int32)&Weapons[0];
+	newValue = (int)&Weapons[0];
 	WriteProcessMemory(gameHandle, (LPVOID)0x004535E3, &newValue, 4, NULL);
 
 	// InitialiseLara
-	newValue = (__int32)&Weapons[0] + 108;
+	newValue = (int)&Weapons[0] + 108;
 	WriteProcessMemory(gameHandle, (LPVOID)0x00473442, &newValue, 4, NULL);
 }

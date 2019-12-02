@@ -9,10 +9,10 @@
 #include "..\Scripting\GameFlowScript.h"
 #include "..\Scripting\GameLogicScript.h"
 
-#define RestoreGame ((__int32 (__cdecl*)()) 0x00472060)	
-#define ReadSavegame ((__int32 (__cdecl*)(__int32)) 0x004A8E10)	
+#define RestoreGame ((int (__cdecl*)()) 0x00472060)	
+#define ReadSavegame ((int (__cdecl*)(int)) 0x004A8E10)	
 #define CreateSavegame ((void (__cdecl*)()) 0x00470FA0)	
-#define WriteSavegame ((__int32 (__cdecl*)(__int32)) 0x004A8BC0)	
+#define WriteSavegame ((int (__cdecl*)(int)) 0x004A8BC0)	
 
 #define SAVEGAME_BUFFER_SIZE 1048576
 
@@ -22,13 +22,13 @@ extern GameScript* g_GameScript;
 typedef struct SaveGameHeader
 {
 	string LevelName;
-	__int32 Days;
-	__int32 Hours;
-	__int32 Minutes;
-	__int32 Seconds;
-	__int32 Level;
-	__int32 Timer;
-	__int32 Count;
+	int Days;
+	int Hours;
+	int Minutes;
+	int Seconds;
+	int Level;
+	int Timer;
+	int Count;
 	bool Present;
 };
 
@@ -70,35 +70,35 @@ private:
 	static ChunkId* m_chunkSpiders;
 	static ChunkId* m_chunkBats;
 
-	static void saveGameStatus(__int32 arg1, __int32 arg2);
-	static void saveLara(__int32 arg1, __int32 arg2);
-	static void saveItem(__int32 arg1, __int32 arg2);
-	static void saveBurningTorch(__int32 arg1, __int32 arg2);
-	static void saveChaff(__int32 arg1, __int32 arg2);
-	static void saveTorpedo(__int32 arg1, __int32 arg2);
-	static void saveCrossbowBolt(__int32 arg1, __int32 arg2);
-	static void saveFlare(__int32 arg1, __int32 arg2);
+	static void saveGameStatus(int arg1, int arg2);
+	static void saveLara(int arg1, int arg2);
+	static void saveItem(int arg1, int arg2);
+	static void saveBurningTorch(int arg1, int arg2);
+	static void saveChaff(int arg1, int arg2);
+	static void saveTorpedo(int arg1, int arg2);
+	static void saveCrossbowBolt(int arg1, int arg2);
+	static void saveFlare(int arg1, int arg2);
 	static void saveItems();
 	static void saveVariables();
-	static void saveVariable(__int32 arg1, __int32 arg2);
-	static void saveStaticFlag(__int32 arg1, __int32 arg2);
-	static void saveCamera(__int32 arg1, __int32 arg2);
-	static void saveSequenceSwitch(__int32 arg1, __int32 arg2);
-	static void saveFlybyFlags(__int32 arg1, __int32 arg2);
-	static void saveFlipMap(__int32 arg1, __int32 arg2);
-	static void saveFlipStats(__int32 arg1, __int32 arg2);
-	static void saveCdFlags(__int32 arg1, __int32 arg2);
-	static void saveStatistics(__int32 arg1, __int32 arg2);
-	static void saveItemFlags(__int32 arg1, __int32 arg2);
-	static void saveItemHitPoints(__int32 arg1, __int32 arg2);
-	static void saveItemPosition(__int32 arg1, __int32 arg2);
-	static void saveItemMesh(__int32 arg1, __int32 arg2);
-	static void saveItemAnims(__int32 arg1, __int32 arg2);
-	static void saveItemIntelligentData(__int32 arg1, __int32 arg2);
-	static void saveItemQuadInfo(__int32 arg1, __int32 arg2);
-	static void saveRats(__int32 arg1, __int32 arg2);
-	static void saveBats(__int32 arg1, __int32 arg2);
-	static void saveSpiders(__int32 arg1, __int32 arg2);
+	static void saveVariable(int arg1, int arg2);
+	static void saveStaticFlag(int arg1, int arg2);
+	static void saveCamera(int arg1, int arg2);
+	static void saveSequenceSwitch(int arg1, int arg2);
+	static void saveFlybyFlags(int arg1, int arg2);
+	static void saveFlipMap(int arg1, int arg2);
+	static void saveFlipStats(int arg1, int arg2);
+	static void saveCdFlags(int arg1, int arg2);
+	static void saveStatistics(int arg1, int arg2);
+	static void saveItemFlags(int arg1, int arg2);
+	static void saveItemHitPoints(int arg1, int arg2);
+	static void saveItemPosition(int arg1, int arg2);
+	static void saveItemMesh(int arg1, int arg2);
+	static void saveItemAnims(int arg1, int arg2);
+	static void saveItemIntelligentData(int arg1, int arg2);
+	static void saveItemQuadInfo(int arg1, int arg2);
+	static void saveRats(int arg1, int arg2);
+	static void saveBats(int arg1, int arg2);
+	static void saveSpiders(int arg1, int arg2);
 
 	static bool readGameStatus();
 	static bool readLara();
@@ -113,13 +113,13 @@ private:
 	static bool readSpiders();
 	static bool readStatistics();
 	static bool readVariable();
-	static bool readSavegameChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);
-	static bool readLaraChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);
-	static bool readGameStatusChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);
-	static bool readItemChunks(ChunkId* chunkId, __int32 maxSize, __int32 itemNumber);
+	static bool readSavegameChunks(ChunkId* chunkId, int maxSize, int arg);
+	static bool readLaraChunks(ChunkId* chunkId, int maxSize, int arg);
+	static bool readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg);
+	static bool readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber);
 	
 public:
-	static __int32 LastSaveGame;
+	static int LastSaveGame;
 
 	static void Start();
 	static void End();

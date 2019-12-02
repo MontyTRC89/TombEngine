@@ -1,14 +1,13 @@
 #include "newobjects.h"
-#include "..\Global\global.h"
-#include "..\Game\Box.h"
-#include "..\Game\items.h"
-#include "..\Game\lot.h"
-#include "..\Game\control.h"
-#include "..\Game\effects.h"
-#include "..\Game\draw.h"
-#include "..\Game\sphere.h"
-#include "..\Game\effect2.h"
-#include "..\Game\people.h"
+#include "../Game/Box.h"
+#include "../Game/items.h"
+#include "../Game/lot.h"
+#include "../Game/control.h"
+#include "../Game/effects.h"
+#include "../Game/draw.h"
+#include "../Game/sphere.h"
+#include "../Game/effect2.h"
+#include "../Game/people.h"
 
 BITE_INFO tribesmanAxeBite = { 0, 16, 265, 13 };
 BITE_INFO tribesmanDartsBite1 = { 0, 0, -200, 13 };
@@ -30,7 +29,7 @@ byte tribesmanAxeHit[13][3] = {
 	{15,19,32}
 };
 
-void __cdecl TribemanAxeControl(__int16 itemNum)
+void __cdecl TribemanAxeControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -38,9 +37,9 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*) item->data;
 
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short head = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -227,7 +226,7 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 					LaraItem->hitPoints -= tribesmanAxeHit[item->currentAnimState][2];
 					LaraItem->hitStatus = true;
 
-					for (__int32 i = 0; i < tribesmanAxeHit[item->currentAnimState][2]; i += 8)
+					for (int i = 0; i < tribesmanAxeHit[item->currentAnimState][2]; i += 8)
 						CreatureEffect(item, &tribesmanAxeBite, DoBloodSplat);
 
 					SoundEffect(70, &item->pos, 0);
@@ -266,7 +265,7 @@ void __cdecl TribemanAxeControl(__int16 itemNum)
 
 void __cdecl TribesmanShotDart(ITEM_INFO* item)
 {
-	__int16 dartItemNumber = CreateItem();
+	short dartItemNumber = CreateItem();
 	if (dartItemNumber != NO_ITEM)
 	{
 		ITEM_INFO* dartItem = &Items[dartItemNumber];
@@ -285,7 +284,7 @@ void __cdecl TribesmanShotDart(ITEM_INFO* item)
 		pos2.z = tribesmanDartsBite2.z << 1;
 		GetJointAbsPosition(item, &pos2, tribesmanDartsBite2.meshNum);
 
-		__int16 angles[2];
+		short angles[2];
 		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 		dartItem->pos.xPos = pos1.x;
@@ -313,7 +312,7 @@ void __cdecl TribesmanShotDart(ITEM_INFO* item)
 	}
 }
 
-void __cdecl TribesmanDartsControl(__int16 itemNum)
+void __cdecl TribesmanDartsControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -321,12 +320,12 @@ void __cdecl TribesmanDartsControl(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
 	
-	__int16 headX = 0;
-	__int16 headY = 0;
-	__int16 torsoX = 0;
-	__int16 torsoY = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short headX = 0;
+	short headY = 0;
+	short torsoX = 0;
+	short torsoY = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (item->hitPoints <= 0)
 	{

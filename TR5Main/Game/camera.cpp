@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include "draw.h"
  
-void __cdecl LookAt(__int32 posX, __int32 posY, __int32 posZ,
-	__int32 targetX, __int32 targetY, __int32 targetZ,
-	__int16 roll)
+void __cdecl LookAt(int posX, int posY, int posZ,
+	int targetX, int targetY, int targetZ,
+	short roll)
 {
 	Vector3 position = Vector3(posX, posY, posZ);
 	Vector3 target = Vector3(targetX, targetY, targetZ);
@@ -17,7 +17,7 @@ void __cdecl LookAt(__int32 posX, __int32 posY, __int32 posZ,
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }
 
-void __cdecl AlterFOV(__int32 value)
+void __cdecl AlterFOV(int value)
 { 
 	CurrentFOV = value;
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);

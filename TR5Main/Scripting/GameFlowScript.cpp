@@ -46,7 +46,7 @@ GameFlow::GameFlow(sol::state* lua)
 
 	// Layer type
 	m_lua->new_usertype<GameScriptSkyLayer>("SkyLayer",
-		sol::constructors<GameScriptSkyLayer(byte, byte, byte, __int16)>(),
+		sol::constructors<GameScriptSkyLayer(byte, byte, byte, short)>(),
 		"r", &GameScriptSkyLayer::R,
 		"g", &GameScriptSkyLayer::G,
 		"b", &GameScriptSkyLayer::B,
@@ -55,7 +55,7 @@ GameFlow::GameFlow(sol::state* lua)
 
 	// Mirror type
 	m_lua->new_usertype<GameScriptMirror>("Mirror",
-		sol::constructors<GameScriptMirror(__int16, __int32, __int32, __int32, __int32)>(),
+		sol::constructors<GameScriptMirror(short, int, int, int, int)>(),
 		"room", &GameScriptMirror::Room,
 		"startX", &GameScriptMirror::StartX,
 		"endX", &GameScriptMirror::EndX,
@@ -125,8 +125,8 @@ bool __cdecl readGameFlowStrings()
 	LanguageScript* lang = new LanguageScript(name);
 	free(name);
 
-	__int32 numStrings = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-	for (__int32 i = 0; i < numStrings; i++)
+	int numStrings = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+	for (int i = 0; i < numStrings; i++)
 	{
 		char* str;
 		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
@@ -141,8 +141,8 @@ bool __cdecl readGameFlowStrings()
 
 bool __cdecl readGameFlowTracks()
 {
-	__int32 numTracks = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-	for (__int32 i = 0; i < numTracks; i++)
+	int numTracks = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+	for (int i = 0; i < numTracks; i++)
 	{
 		char* str;
 		g_ScriptChunkIO->GetRawStream()->ReadString(&str);
@@ -156,7 +156,7 @@ bool __cdecl readGameFlowTracks()
 	return true;
 }
 
-bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	GameScriptLevel* level = g_GameFlow->Levels[arg];
 
@@ -201,7 +201,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (__int32 i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -210,7 +210,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (__int32 i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -219,7 +219,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (__int32 i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -228,7 +228,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (__int32 i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -238,7 +238,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (__int32 i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -248,7 +248,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (__int32 i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -258,7 +258,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (__int32 i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
 
 		return true;
@@ -296,7 +296,7 @@ bool __cdecl readGameFlowLevel()
 	return g_ScriptChunkIO->ReadChunks(readGameFlowLevelChunks, g_GameFlow->Levels.size() - 1);
 }
 
-bool __cdecl readGameFlowChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool __cdecl readGameFlowChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(ChunkGameFlowFlags))
 		return readGameFlowFlags();
@@ -365,7 +365,7 @@ bool GameFlow::ExecuteScript(char* luaFilename)
 	return true;
 }
 
-char* GameFlow::GetString(__int32 id)
+char* GameFlow::GetString(int id)
 {
 	return (char*)(CurrentStrings->Strings[id].c_str()); 
 }
@@ -375,7 +375,7 @@ GameScriptSettings* GameFlow::GetSettings()
 	return &m_settings;
 }
 
-GameScriptLevel* GameFlow::GetLevel(__int32 id)
+GameScriptLevel* GameFlow::GetLevel(int id)
 {
 	return Levels[id];
 }
@@ -386,7 +386,7 @@ void GameFlow::SetHorizon(bool horizon, bool colAddHorizon)
 	ColAddHorizon = colAddHorizon;
 }
 
-void GameFlow::SetLayer1(byte r, byte g, byte b, __int16 speed)
+void GameFlow::SetLayer1(byte r, byte g, byte b, short speed)
 {
 	SkyColor1.r = r;
 	SkyColor1.g = g;
@@ -399,7 +399,7 @@ void GameFlow::SetLayer1(byte r, byte g, byte b, __int16 speed)
 	SkySpeedLayer1 = speed;
 }
 
-void GameFlow::SetLayer2(byte r, byte g, byte b, __int16 speed)
+void GameFlow::SetLayer2(byte r, byte g, byte b, short speed)
 {
 	SkyColor2.r = r;
 	SkyColor2.g = g;
@@ -412,7 +412,7 @@ void GameFlow::SetLayer2(byte r, byte g, byte b, __int16 speed)
 	SkySpeedLayer2 = speed;
 }
 
-void GameFlow::SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 endDistance)
+void GameFlow::SetFog(byte r, byte g, byte b, short startDistance, short endDistance)
 {
 	FogColor.x = r / 255.0f;
 	FogColor.y = g / 255.0f;
@@ -421,7 +421,7 @@ void GameFlow::SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 end
 	FogOutDistance = endDistance;
 }
 
-__int32	GameFlow::GetNumLevels()
+int	GameFlow::GetNumLevels()
 {
 	return Levels.size();
 }

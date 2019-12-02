@@ -23,7 +23,7 @@ typedef struct LEB128 {
 	static __int64 ReadLong(BaseStream* stream)
 	{
 		__int64 result = 0;
-		__int32 currentShift = 0;
+		int currentShift = 0;
 
 		byte currentByte;
 		do
@@ -35,23 +35,23 @@ typedef struct LEB128 {
 		} while ((currentByte & 0x80) != 0);
 
 		// Sign extend
-		__int32 shift = 64 - currentShift;
+		int shift = 64 - currentShift;
 		if (shift > 0)
 			result = (result << shift) >> shift;
 
 		return result;
 	}
 
-	static __int32 ReadInt32(BaseStream* stream)
+	static int ReadInt32(BaseStream* stream)
 	{
 		__int64 value = ReadLong(stream);
-		return (__int32)min(max(value, INT32_MIN), INT32_MAX);
+		return (int)min(max(value, INT32_MIN), INT32_MAX);
 	}
 
-	static __int16 ReadInt16(BaseStream* stream)
+	static short ReadInt16(BaseStream* stream)
 	{
 		__int64 value = ReadLong(stream);
-		return (__int16)min(max(value, INT16_MIN), INT16_MAX);
+		return (short)min(max(value, INT16_MIN), INT16_MAX);
 	}
 
 	static byte ReadByte(BaseStream* stream)
@@ -60,16 +60,16 @@ typedef struct LEB128 {
 		return (byte)min(max(value, 0), UINT8_MAX);
 	}	
 
-	static unsigned __int32 ReadUInt32(BaseStream* stream)
+	static unsigned int ReadUInt32(BaseStream* stream)
 	{
 		__int64 value = ReadLong(stream);
-		return (unsigned __int32)min(max(value, 0), UINT32_MAX);
+		return (unsigned int)min(max(value, 0), UINT32_MAX);
 	}
 
-	static unsigned __int16 ReadUInt16(BaseStream* stream)
+	static unsigned short ReadUInt16(BaseStream* stream)
 	{
 		__int64 value = ReadLong(stream);
-		return (unsigned __int16)min(max(value, 0), UINT16_MAX);
+		return (unsigned short)min(max(value, 0), UINT16_MAX);
 	}
 
 	static void Write(BaseStream* stream, __int64 value, __int64 maximumSize)
@@ -102,9 +102,9 @@ typedef struct LEB128 {
 		Write(stream, value, value);
 	}
 
-	static __int32 GetLength(BaseStream* stream, __int64 value)
+	static int GetLength(BaseStream* stream, __int64 value)
 	{
-		__int32 length = 1;
+		int length = 1;
 		value >>= 6;
 		while (value > 0)
 		{

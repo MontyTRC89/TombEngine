@@ -15,14 +15,14 @@ enum SEEK_ORIGIN {
 
 class BaseStream {
 public:
-	virtual bool Read(char* buffer, __int32 length) = 0;
-	virtual bool Write(char* buffer, __int32 length) = 0;
-	virtual __int32 GetCurrentPosition() = 0;
-	virtual bool Seek(__int32 seek, SEEK_ORIGIN origin) = 0;
+	virtual bool Read(char* buffer, int length) = 0;
+	virtual bool Write(char* buffer, int length) = 0;
+	virtual int GetCurrentPosition() = 0;
+	virtual bool Seek(int seek, SEEK_ORIGIN origin) = 0;
 	virtual bool IsEOF() = 0;
 	virtual bool Close() = 0;
 	
-	bool ReadBytes(byte* value, __int32 length)
+	bool ReadBytes(byte* value, int length)
 	{
 		return Read(reinterpret_cast<char*>(value), length);
 	}
@@ -37,12 +37,12 @@ public:
 		return Read(reinterpret_cast<char*>(value), 1);
 	}
 
-	bool ReadInt16(__int16* value)
+	bool ReadInt16(short* value)
 	{
 		return Read(reinterpret_cast<char*>(value), 2);
 	}
 
-	bool ReadInt32(__int32* value)
+	bool ReadInt32(int* value)
 	{
 		return Read(reinterpret_cast<char*>(value), 4);
 	}
@@ -54,7 +54,7 @@ public:
 
 	bool ReadString(char** value)
 	{
-		__int32 length;
+		int length;
 		ReadInt32(&length);
 		*value = (char*)malloc(length + 1);
 		Read(*value, length);
@@ -63,7 +63,7 @@ public:
 		return true;
 	}
 
-	bool WriteBytes(byte* value, __int32 length)
+	bool WriteBytes(byte* value, int length)
 	{
 		return Write(reinterpret_cast<char*>(value), length);
 	}
@@ -73,12 +73,12 @@ public:
 		return Write(reinterpret_cast<char*>(&value), 1);
 	}
 
-	bool WriteInt16(__int16 value)
+	bool WriteInt16(short value)
 	{
 		return Write(reinterpret_cast<char*>(&value), 2);
 	}
 
-	bool WriteInt32(__int32 value)
+	bool WriteInt32(int value)
 	{
 		return Write(reinterpret_cast<char*>(&value), 4);
 	}
@@ -95,7 +95,7 @@ public:
 
 	bool WriteString(char* str)
 	{
-		__int32 length = (__int32)strlen(str);
+		int length = (int)strlen(str);
 		WriteInt32(length);
 		Write(str, length);
 		return true;
@@ -106,10 +106,10 @@ class MemoryStream : public BaseStream {
 private:
 	char* m_startBuffer;
 	char* m_buffer;
-	__int32 m_size;
+	int m_size;
 
 public:
-	MemoryStream(char* buffer, __int32 size)
+	MemoryStream(char* buffer, int size)
 	{
 		m_buffer = (char*)malloc(size);
 		m_startBuffer = m_buffer;
@@ -117,7 +117,7 @@ public:
 		m_size = size;
 	}
 
-	MemoryStream(__int32 size)
+	MemoryStream(int size)
 	{
 		m_buffer = (char*)malloc(size);
 		m_startBuffer = m_buffer;
@@ -129,26 +129,26 @@ public:
 		free(m_startBuffer);
 	}
 
-	bool Read(char* buffer, __int32 length)
+	bool Read(char* buffer, int length)
 	{
 		memcpy(buffer, m_buffer, length);
 		m_buffer += length;
 		return true;
 	}
 
-	bool Write(char* buffer, __int32 length)
+	bool Write(char* buffer, int length)
 	{
 		memcpy(m_buffer, buffer, length);
 		m_buffer += length;
 		return true;
 	}
 
-	__int32 GetCurrentPosition()
+	int GetCurrentPosition()
 	{
 		return (m_buffer - m_startBuffer);
 	}
 
-	bool Seek(__int32 seek, SEEK_ORIGIN origin)
+	bool Seek(int seek, SEEK_ORIGIN origin)
 	{
 		if (origin == SEEK_ORIGIN::BEGIN)
 			m_buffer = m_startBuffer + seek;
@@ -175,7 +175,7 @@ private:
 public:
 	FileStream(char* fileName, bool read, bool write)
 	{
-		__int32 mode = 0;
+		int mode = 0;
 		if (read)
 			mode |= ifstream::binary | fstream::in;
 		if (write)
@@ -189,24 +189,24 @@ public:
 		m_stream.close();
 	}
 
-	bool Read(char* buffer, __int32 length)
+	bool Read(char* buffer, int length)
 	{
 		m_stream.read(buffer, length);
 		return true;
 	}
 
-	bool Write(char* buffer, __int32 length)
+	bool Write(char* buffer, int length)
 	{
 		m_stream.write(buffer, length);
 		return true;
 	}
 
-	__int32 GetCurrentPosition()
+	int GetCurrentPosition()
 	{
-		return (__int32)(m_stream.tellg());
+		return (int)(m_stream.tellg());
 	}
 
-	bool Seek(__int32 seek, SEEK_ORIGIN origin)
+	bool Seek(int seek, SEEK_ORIGIN origin)
 	{
 		m_stream.seekg(seek, (origin == SEEK_ORIGIN::BEGIN ? m_stream.beg : m_stream.cur));
 		return true;

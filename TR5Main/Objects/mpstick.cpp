@@ -34,7 +34,7 @@ typedef enum MPSTICK_STATES {
 	BATON_FALL3
 };
 
-void InitialiseMPStick(__int16 itemNumber)
+void InitialiseMPStick(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	InitialiseCreature(itemNumber);
@@ -44,18 +44,18 @@ void InitialiseMPStick(__int16 itemNumber)
 	item->currentAnimState = item->goalAnimState = BATON_STOP;
 }
 
-void MPStickControl(__int16 itemNumber)
+void MPStickControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
 
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	__int16 torsoY = 0;
-	__int16 torsoX = 0;
-	__int16 head = 0;
-	__int16 angle = 0;
-	__int16 tilt = 0;
+	short torsoY = 0;
+	short torsoX = 0;
+	short head = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (Boxes[item->boxNumber].overlapIndex & BLOCKED)
 	{
@@ -63,11 +63,11 @@ void MPStickControl(__int16 itemNumber)
 		item->hitPoints -= 20;
 	}
 
-	__int32 dx;
-	__int32 dz;
-	__int32 x;
-	__int32 y;
-	__int32 z;
+	int dx;
+	int dz;
+	int x;
+	int y;
+	int z;
 	AI_INFO info;
 	AI_INFO laraInfo;
 	ITEM_INFO* target;
@@ -96,9 +96,9 @@ void MPStickControl(__int16 itemNumber)
 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
 
-			__int32 bestDistance = 0x7fffffff;
+			int bestDistance = 0x7fffffff;
 			CREATURE_INFO* currentCreature = BaddieSlots;
-			for (__int32 slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
+			for (int slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
 			{
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
@@ -113,7 +113,7 @@ void MPStickControl(__int16 itemNumber)
 				if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
 					continue;
 
-				__int32 distance = SQUARE(dx) + SQUARE(dz);
+				int distance = SQUARE(dx) + SQUARE(dz);
 				if (distance < bestDistance && distance < laraInfo.distance)
 				{
 					bestDistance = distance;

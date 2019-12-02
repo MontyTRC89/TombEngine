@@ -25,7 +25,7 @@
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
 
-__int32 SortLightsFunction(RendererLight* a, RendererLight* b)
+int SortLightsFunction(RendererLight* a, RendererLight* b)
 {
 	if (a->Dynamic > b->Dynamic)
 		return -1;
@@ -37,7 +37,7 @@ bool SortRoomsFunction(RendererRoom* a, RendererRoom* b)
 	return (a->Distance < b->Distance);
 }
 
-__int32 SortRoomsFunctionNonStd(RendererRoom* a, RendererRoom* b)
+int SortRoomsFunctionNonStd(RendererRoom* a, RendererRoom* b)
 {
 	return (a->Distance - b->Distance);
 }
@@ -64,7 +64,7 @@ Renderer11::~Renderer11()
 	DX11_DELETE(m_gameFont);
 	DX11_DELETE(m_states);
 
-	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
+	for (int i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
 		DX11_DELETE(m_caustics[i]);
 
 	DX11_DELETE(m_titleScreen);
@@ -109,27 +109,27 @@ void Renderer11::FreeRendererData()
 {
 	m_meshPointersToMesh.clear();
 
-	for (__int32 i = 0; i < ID_NUMBER_OBJECTS; i++)
+	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 		DX11_DELETE(m_moveableObjects[i]);
 	free(m_moveableObjects);
 
-	for (__int32 i = 0; i < g_NumSprites; i++)
+	for (int i = 0; i < g_NumSprites; i++)
 		DX11_DELETE(m_sprites[i]);
 	free(m_sprites);
 
-	for (__int32 i = 0; i < ID_NUMBER_OBJECTS; i++)
+	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 		DX11_DELETE(m_spriteSequences[i]);
 	free(m_spriteSequences);
 
-	for (__int32 i = 0; i < NUM_STATICS; i++)
+	for (int i = 0; i < NUM_STATICS; i++)
 		DX11_DELETE(m_staticObjects[i]);
 	free(m_staticObjects);
 
-	for (__int32 i = 0; i < NUM_ROOMS; i++)
+	for (int i = 0; i < NUM_ROOMS; i++)
 		DX11_DELETE(m_rooms[i]);
 	free(m_rooms);
 
-	for (__int32 i = 0; i < m_numAnimatedTextureSets; i++)
+	for (int i = 0; i < m_numAnimatedTextureSets; i++)
 		DX11_DELETE(m_animatedTextureSets[i]);
 	free(m_animatedTextureSets);
 
@@ -178,7 +178,7 @@ bool Renderer11::EnumerateVideoModes()
 		char videoCardDescription[128];
 
 		dxgiAdapter->GetDesc(&adapterDesc);
-		__int32 error = wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
+		int error = wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
 
 		RendererVideoAdapter adapter;
 
@@ -211,7 +211,7 @@ bool Renderer11::EnumerateVideoModes()
 			return false;
 		}
 
-		for (__int32 j = 0; j < numModes; j++)
+		for (int j = 0; j < numModes; j++)
 		{
 			DXGI_MODE_DESC* mode = &displayModes[j];
 
@@ -226,7 +226,7 @@ bool Renderer11::EnumerateVideoModes()
 			newMode.RefreshRate = mode->RefreshRate.Numerator / mode->RefreshRate.Denominator;
 
 			bool found = false;
-			for (__int32 k = 0; k < adapter.DisplayModes.size(); k++)
+			for (int k = 0; k < adapter.DisplayModes.size(); k++)
 			{
 				RendererDisplayMode* currentMode = &adapter.DisplayModes[k];
 				if (currentMode->Width == newMode.Width && currentMode->Height == newMode.Height &&
@@ -254,7 +254,7 @@ bool Renderer11::EnumerateVideoModes()
 	return true;
 }
 
-bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle, bool reset)
+bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
 
@@ -392,7 +392,7 @@ bool Renderer11::initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, boo
 	return true;
 }
 
-bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle)
+bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
 {
 	HRESULT res;
 
@@ -431,7 +431,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 		"CausticsRender_016.bmp"
 	};
 
-	for (__int32 i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
+	for (int i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
 	{
 		m_caustics[i] = Texture2D::LoadFromFile(m_device, causticsNames[i]);
 		if (m_caustics[i] == NULL)
@@ -564,12 +564,12 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_firstWeather = true;
 
 	// Preallocate lists
-	m_roomsToDraw.Reserve(1024);
+	m_roomsToDraw.Reserve(NUM_ROOMS);
 	m_itemsToDraw.Reserve(NUM_ITEMS);
 	m_effectsToDraw.Reserve(NUM_ITEMS);
-	m_lightsToDraw.Reserve(16384);
-	m_dynamicLights.Reserve(16384);
-	m_staticsToDraw.Reserve(16384);
+	m_lightsToDraw.Reserve(MAX_LIGHTS_DRAW);
+	m_dynamicLights.Reserve(MAX_DYNAMIC_LIGHTS);
+	m_staticsToDraw.Reserve(MAX_DRAW_STATICS);
 	m_spritesToDraw.Reserve(MAX_SPRITES);
 	m_lines3DToDraw.Reserve(MAX_LINES_3D);
 	m_lines2DToDraw.Reserve(MAX_LINES_2D);
@@ -579,7 +579,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
 	m_pickupRotation = 0;
 
-	for (__int32 i = 0; i < NUM_ITEMS; i++)
+	for (int i = 0; i < NUM_ITEMS; i++)
 	{
 		m_items[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
 		m_effects[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
@@ -591,7 +591,7 @@ bool Renderer11::Initialise(__int32 w, __int32 h, __int32 refreshRate, bool wind
 	return true;
 }
 
-__int32	Renderer11::Draw()
+int	Renderer11::Draw()
 {
 	drawScene(false);
 	drawFinalPass();
@@ -615,7 +615,7 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 	m_stCameraMatrices.Projection = Projection;
 }
 
-bool Renderer11::drawAmbientCubeMap(__int16 roomNumber)
+bool Renderer11::drawAmbientCubeMap(short roomNumber)
 {
 	return true;
 }
@@ -734,7 +734,7 @@ bool Renderer11::drawHorizonAndSky()
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	
-	for (__int32 i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		Matrix translation = Matrix::CreateTranslation(Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
 		Matrix world = rotation * translation;
@@ -775,11 +775,11 @@ bool Renderer11::drawHorizonAndSky()
 		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-		for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+		for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = moveableObj->ObjectMeshes[k];
 
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			for (int j = 0; j < NUM_BUCKETS; j++)
 			{
 				RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -814,8 +814,8 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	__int32 firstBucket = (transparent ? 2 : 0);
-	__int32 lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
 
 	if (!animated)
 	{
@@ -864,12 +864,12 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	if (animated)
 		m_primitiveBatch->Begin();
 
-	for (__int32 i = 0; i < m_roomsToDraw.Size(); i++)
+	for (int i = 0; i < m_roomsToDraw.Size(); i++)
 	{ 
 		RendererRoom* room = m_roomsToDraw[i];
 		
 		m_stLights.NumLights = room->LightsToDraw.Size();
-		for (__int32 j = 0; j < room->LightsToDraw.Size(); j++)
+		for (int j = 0; j < room->LightsToDraw.Size(); j++)
 			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));
 		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
@@ -879,7 +879,7 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-		for (__int32 j = firstBucket; j < lastBucket; j++)
+		for (int j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket;
 			if (!animated)
@@ -904,7 +904,7 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 			}
 			else
 			{
-				for (__int32 k = 0; k < bucket->Polygons.size(); k++)
+				for (int k = 0; k < bucket->Polygons.size(); k++)
 				{
 					RendererPolygon* poly = &bucket->Polygons[k];
 
@@ -935,8 +935,8 @@ bool Renderer11::drawStatics(bool transparent)
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 	   
-	__int32 firstBucket = (transparent ? 2 : 0);
-	__int32 lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
 
 	m_context->IASetVertexBuffers(0, 1, &m_staticsVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -962,7 +962,7 @@ bool Renderer11::drawStatics(bool transparent)
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	for (__int32 i = 0; i < m_staticsToDraw.Size(); i++)
+	for (int i = 0; i < m_staticsToDraw.Size(); i++)
 	{
 		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
 
@@ -979,7 +979,7 @@ bool Renderer11::drawStatics(bool transparent)
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
-		for (__int32 j = firstBucket; j < lastBucket; j++)
+		for (int j = firstBucket; j < lastBucket; j++)
 		{
 			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
 				m_context->RSSetState(m_states->CullNone());
@@ -1005,8 +1005,8 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	__int32 firstBucket = (transparent ? 2 : 0);
-	__int32 lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
 
 	RendererRoom* room = m_rooms[item->Item->roomNumber];
 	if (room == NULL)
@@ -1021,7 +1021,7 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 	m_stLights.NumLights = item->Lights.Size();
-	for (__int32 j = 0; j < item->Lights.Size(); j++)
+	for (int j = 0; j < item->Lights.Size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -1030,11 +1030,11 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+	for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 	{
 		RendererMesh* mesh = moveableObj->ObjectMeshes[k];
 
-		for (__int32 j = firstBucket; j < lastBucket; j++)
+		for (int j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -1063,13 +1063,13 @@ bool Renderer11::drawWaterfalls()
 	// Draw waterfalls
 	m_context->RSSetState(m_states->CullCounterClockwise());
 	
-	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
+	for (int i = 0; i < m_itemsToDraw.Size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
 		RendererRoom* room = m_rooms[item->Item->roomNumber];
 		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
-		__int16 objectNumber = item->Item->objectNumber;
+		short objectNumber = item->Item->objectNumber;
 		if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
 		{
 			RendererRoom* room = m_rooms[item->Item->roomNumber];
@@ -1083,7 +1083,7 @@ bool Renderer11::drawWaterfalls()
 			m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 			m_stLights.NumLights = item->Lights.Size();
-			for (__int32 j = 0; j < item->Lights.Size(); j++)
+			for (int j = 0; j < item->Lights.Size(); j++)
 				memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 			updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 			m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -1094,23 +1094,23 @@ bool Renderer11::drawWaterfalls()
 
 			m_primitiveBatch->Begin();
 
-			for (__int32 k = 0; k < moveableObj->ObjectMeshes.size(); k++)
+			for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 			{
 				RendererMesh* mesh = moveableObj->ObjectMeshes[k];
 
-				for (__int32 b = 0; b < NUM_BUCKETS; b++)
+				for (int b = 0; b < NUM_BUCKETS; b++)
 				{
 					RendererBucket* bucket = &mesh->Buckets[b];
 
 					if (bucket->Vertices.size() == 0)
 						continue;
 
-					for (__int32 p = 0; p < bucket->Polygons.size(); p++)
+					for (int p = 0; p < bucket->Polygons.size(); p++)
 					{
 						RendererPolygon* poly = &bucket->Polygons[p];
 
 						OBJECT_TEXTURE* texture = &ObjectTextures[poly->TextureId];
-						__int32 tile = texture->tileAndFlag & 0x7FFF;
+						int tile = texture->tileAndFlag & 0x7FFF;
 
 						if (poly->Shape == SHAPE_RECTANGLE)
 						{
@@ -1154,21 +1154,21 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	__int32 firstBucket = (transparent ? 2 : 0);
-	__int32 lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
 
 	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	for (__int32 i = 0; i < m_itemsToDraw.Size(); i++)
+	for (int i = 0; i < m_itemsToDraw.Size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
 		RendererRoom* room = m_rooms[item->Item->roomNumber];
 		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
-		__int16 objectNumber = item->Item->objectNumber;
+		short objectNumber = item->Item->objectNumber;
 		if (moveableObj->DoNotDraw)
 		{
 			continue;
@@ -1192,15 +1192,15 @@ bool Renderer11::drawEffects(bool transparent)
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	__int32 firstBucket = (transparent ? 2 : 0);
-	__int32 lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
 
 	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	for (__int32 i = 0; i < m_effectsToDraw.Size(); i++)
+	for (int i = 0; i < m_effectsToDraw.Size(); i++)
 	{
 		RendererEffect* effect = m_effectsToDraw[i];
 		RendererRoom* room = m_rooms[effect->Effect->roomNumber];
@@ -1226,8 +1226,8 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	__int32 firstBucket = (transparent ? 2 : 0);
-	__int32 lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
 
 	RendererRoom * room = m_rooms[effect->Effect->roomNumber];
 	RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
@@ -1241,7 +1241,7 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 	m_stLights.NumLights = effect->Lights.Size();
-	for (__int32 j = 0; j < effect->Lights.Size(); j++)
+	for (int j = 0; j < effect->Lights.Size(); j++)
 		memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -1252,7 +1252,7 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 
 	RendererMesh* mesh = effect->Mesh;
 
-	for (__int32 j = firstBucket; j < lastBucket; j++)
+	for (int j = firstBucket; j < lastBucket; j++)
 	{
 		RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -1281,8 +1281,8 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	__int32 firstBucket = (transparent ? 2 : 0);
-	__int32 lastBucket = (transparent ? 4 : 2);
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
 
 	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1333,17 +1333,17 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	if (!shadowMap)
 	{
 		m_stLights.NumLights = item->Lights.Size();
-		for (__int32 j = 0; j < item->Lights.Size(); j++)
+		for (int j = 0; j < item->Lights.Size(); j++)
 			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 	}
 
-	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
 		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
 		
-		for (__int32 j = firstBucket; j < lastBucket; j++)
+		for (int j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -1365,11 +1365,11 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	{
 		RendererObject* laraSkinJoints = m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
-		for (__int32 k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++)
+		for (int k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = laraSkinJoints->ObjectMeshes[k];
 
-			for (__int32 j = firstBucket; j < lastBucket; j++)
+			for (int j = firstBucket; j < lastBucket; j++)
 			{
 				RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -1385,11 +1385,11 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	if (!transparent)
 	{
-		for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+		for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = laraSkin->ObjectMeshes[k];
 
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			for (int j = 0; j < NUM_BUCKETS; j++)
 			{
 				RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -1413,7 +1413,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 		{
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-				(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
+				(const unsigned short*)m_hairIndices.data(), m_numHairIndices,
 				m_hairVertices.data(), m_numHairVertices);
 			m_primitiveBatch->End();
 		}
@@ -1589,13 +1589,13 @@ bool Renderer11::drawScene(bool dump)
 	return true;
 }
 
-__int32 Renderer11::DumpGameScene()
+int Renderer11::DumpGameScene()
 {
 	drawScene(true);
 	return 0; 
 }
 
-__int32 Renderer11::DrawInventory()
+int Renderer11::DrawInventory()
 {
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 		drawScene(true);
@@ -1605,13 +1605,13 @@ __int32 Renderer11::DrawInventory()
 	return 0;
 }
 
-__int32 Renderer11::SyncRenderer()
+int Renderer11::SyncRenderer()
 {
 	// Sync the renderer
-	__int32 nf = Sync();
+	int nf = Sync();
 	if (nf < 2)
 	{
-		__int32 i = 2 - nf;
+		int i = 2 - nf;
 		nf = 2;
 		do
 		{
@@ -1624,17 +1624,17 @@ __int32 Renderer11::SyncRenderer()
 	return nf;
 }
 
-bool Renderer11::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color, __int32 flags)
+bool Renderer11::PrintString(int x, int y, char* string, D3DCOLOR color, int flags)
 {
-	__int32 realX = x;
-	__int32 realY = y;
+	int realX = x;
+	int realY = y;
 	float factorX = ScreenWidth / 800.0f;
 	float factorY = ScreenHeight / 600.0f;
 
 	RECT rect = { 0, 0, 0, 0 };
 
 	// Convert the string to wstring
-	__int32 sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, string, strlen(string), NULL, 0);
+	int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, string, strlen(string), NULL, 0);
 	std::wstring wstr(sizeNeeded, 0);
 	MultiByteToWideChar(CP_UTF8, 0, string, strlen(string), &wstr[0], sizeNeeded);
 
@@ -1651,7 +1651,7 @@ bool Renderer11::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color,
 
 	if (flags & PRINTSTRING_CENTER)
 	{
-		__int32 width = size.x;
+		int width = size.x;
 		rect.left = x * factorX - width / 2;
 		rect.right = x * factorX + width / 2;
 		rect.top += y * factorY;
@@ -1693,7 +1693,7 @@ bool Renderer11::PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color,
 	return true;
 }
 
-__int32 Renderer11::drawFinalPass()
+int Renderer11::drawFinalPass()
 {
 	// Update fade status
 	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor > 0.99f)
@@ -1748,7 +1748,7 @@ bool Renderer11::drawAllStrings()
 {
 	m_spriteBatch->Begin();
 
-	for (__int32 i = 0; i < m_strings.size(); i++)
+	for (int i = 0; i < m_strings.size(); i++)
 	{
 		RendererStringToDraw* str = &m_strings[i];
 
@@ -1784,34 +1784,34 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_meshes.clear();
 
 	// Step 0: prepare animated textures
-	__int16 numSets = *AnimatedTextureRanges;
-	__int16* animatedPtr = AnimatedTextureRanges;
+	short numSets = *AnimatedTextureRanges;
+	short* animatedPtr = AnimatedTextureRanges;
 	animatedPtr++;
 	
 	m_animatedTextureSets = (RendererAnimatedTextureSet**)malloc(sizeof(RendererAnimatedTextureSet*) * NUM_ANIMATED_SETS);
 	m_numAnimatedTextureSets = numSets;
 
-	for (__int32 i = 0; i < numSets; i++)
+	for (int i = 0; i < numSets; i++)
 	{
 		RendererAnimatedTextureSet* set = new RendererAnimatedTextureSet();
-		__int16 numTextures = *animatedPtr + 1;
+		short numTextures = *animatedPtr + 1;
 		animatedPtr++;
 
 		set->Textures = (RendererAnimatedTexture**)malloc(sizeof(RendererAnimatedTexture) * numTextures);
 		set->NumTextures = numTextures;
 
-		for (__int32 j = 0; j < numTextures; j++)
+		for (int j = 0; j < numTextures; j++)
 		{
-			__int16 textureId = *animatedPtr;
+			short textureId = *animatedPtr;
 			animatedPtr++;
 
 			OBJECT_TEXTURE* texture = &ObjectTextures[textureId];
-			__int32 tile = texture->tileAndFlag & 0x7FFF;
+			int tile = texture->tileAndFlag & 0x7FFF;
 
 			RendererAnimatedTexture* newTexture = new RendererAnimatedTexture();
 			newTexture->Id = textureId;
 
-			for (__int32 k = 0; k < 4; k++)
+			for (int k = 0; k < 4; k++)
 			{
 				float x = (texture->vertices[k].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 				float y = (texture->vertices[k].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
@@ -1829,8 +1829,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 	byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 	ZeroMemory(buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 
-	__int32 blockX = 0;
-	__int32 blockY = 0;
+	int blockX = 0;
+	int blockY = 0;
 
 	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG)
 	{
@@ -1847,8 +1847,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 		{
 			for (int x = 0; x < 256; x++)
 			{
-				__int32 pixelIndex = blockY * TEXTURE_PAGE_SIZE * NUM_TEXTURE_PAGES_PER_ROW + y * 256 * NUM_TEXTURE_PAGES_PER_ROW * 4 + blockX * 256 * 4 + x * 4;
-				__int32 oldPixelIndex = p * TEXTURE_PAGE_SIZE + y * 256 * 4 + x * 4;
+				int pixelIndex = blockY * TEXTURE_PAGE_SIZE * NUM_TEXTURE_PAGES_PER_ROW + y * 256 * NUM_TEXTURE_PAGES_PER_ROW * 4 + blockX * 256 * 4 + x * 4;
+				int oldPixelIndex = p * TEXTURE_PAGE_SIZE + y * 256 * 4 + x * 4;
 
 				byte r = Texture32[oldPixelIndex];
 				byte g = Texture32[oldPixelIndex + 1];
@@ -1892,12 +1892,12 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	// Step 2: prepare rooms
 	vector<RendererVertex> roomVertices;
-	vector<__int32> roomIndices;
+	vector<int> roomIndices;
 
-	__int32 baseRoomVertex = 0;
-	__int32 baseRoomIndex = 0;
+	int baseRoomVertex = 0;
+	int baseRoomIndex = 0;
 
-	for (__int32 i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < NumberRooms; i++)
 	{
 		ROOM_INFO* room = &Rooms[i];
 
@@ -1913,12 +1913,12 @@ bool Renderer11::PrepareDataForTheRenderer()
 		if (room->NumVertices == 0)
 			continue;
 
-		__int32 lastRectangle = 0;
-		__int32 lastTriangle = 0;
+		int lastRectangle = 0;
+		int lastTriangle = 0;
 
 		tr5_room_layer* layers = (tr5_room_layer*)room->LayerOffset;
 
-		for (__int32 l = 0; l < room->NumLayers; l++)
+		for (int l = 0; l < room->NumLayers; l++)
 		{
 			tr5_room_layer* layer = &layers[l];
 			if (layer->NumLayerVertices == 0)
@@ -1934,18 +1934,18 @@ bool Renderer11::PrepareDataForTheRenderer()
 					tr4_mesh_face4* poly = (tr4_mesh_face4*)polygons;
 
 					// Get the real texture index and if double sided
-					__int16 textureIndex = poly->Texture & 0x3FFF;
+					short textureIndex = poly->Texture & 0x3FFF;
 					bool doubleSided = (poly->Texture & 0x8000) >> 15;
 
 					// Get the object texture
 					OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-					__int32 tile = texture->tileAndFlag & 0x7FFF;
+					int tile = texture->tileAndFlag & 0x7FFF;
 
 					// Create vertices
 					RendererBucket* bucket;
 
-					__int32 animatedSetIndex = getAnimatedTextureInfo(textureIndex);
-					__int32 bucketIndex = RENDERER_BUCKET_SOLID;
+					int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
+					int bucketIndex = RENDERER_BUCKET_SOLID;
 
 					if (!doubleSided)
 					{
@@ -1986,8 +1986,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 					Vector3 normal = e1.Cross(e2);
 					normal.Normalize();
 
-					__int32 baseVertices = bucket->NumVertices;
-					for (__int32 v = 0; v < 4; v++)
+					int baseVertices = bucket->NumVertices;
+					for (int v = 0; v < 4; v++)
 					{
 						RendererVertex vertex; 
 
@@ -2042,18 +2042,18 @@ bool Renderer11::PrepareDataForTheRenderer()
 					tr4_mesh_face3* poly = (tr4_mesh_face3*)polygons;
 
 					// Get the real texture index and if double sided
-					__int16 textureIndex = poly->Texture & 0x3FFF;
+					short textureIndex = poly->Texture & 0x3FFF;
 					bool doubleSided = (poly->Texture & 0x8000) >> 15;
 
 					// Get the object texture
 					OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-					__int32 tile = texture->tileAndFlag & 0x7FFF;
+					int tile = texture->tileAndFlag & 0x7FFF;
 
 					// Create vertices
 					RendererBucket* bucket;
 
-					__int32 animatedSetIndex = getAnimatedTextureInfo(textureIndex);
-					__int32 bucketIndex = RENDERER_BUCKET_SOLID;
+					int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
+					int bucketIndex = RENDERER_BUCKET_SOLID;
 
 					if (!doubleSided)
 					{
@@ -2094,8 +2094,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 					Vector3 normal = e1.Cross(e2);
 					normal.Normalize();
 
-					__int32 baseVertices = bucket->NumVertices;
-					for (__int32 v = 0; v < 3; v++)
+					int baseVertices = bucket->NumVertices;
+					for (int v = 0; v < 3; v++)
 					{
 						RendererVertex vertex;
 
@@ -2144,7 +2144,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		{
 			tr5_room_light* oldLight = room->light;
 
-			for (__int32 l = 0; l < room->numLights; l++)
+			for (int l = 0; l < room->numLights; l++)
 			{
 				RendererLight light;
 
@@ -2199,7 +2199,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		}
 
 		MESH_INFO* mesh = room->mesh;
-		for (__int32 j = 0; j < room->numMeshes; j++)
+		for (int j = 0; j < room->numMeshes; j++)
 		{
 			RendererStatic obj;
 			obj.Mesh = mesh;
@@ -2208,17 +2208,17 @@ bool Renderer11::PrepareDataForTheRenderer()
 		}
 
 		// Merge vertices and indices in a single list
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		for (int j = 0; j < NUM_BUCKETS; j++)
 		{
 			RendererBucket* bucket = &r->Buckets[j];
 			
 			bucket->StartVertex = baseRoomVertex;
 			bucket->StartIndex = baseRoomIndex;
 
-			for (__int32 k = 0; k < bucket->Vertices.size(); k++)
+			for (int k = 0; k < bucket->Vertices.size(); k++)
 				roomVertices.push_back(bucket->Vertices[k]);
 
-			for (__int32 k = 0; k < bucket->Indices.size(); k++)
+			for (int k = 0; k < bucket->Indices.size(); k++)
 				roomIndices.push_back(baseRoomVertex + bucket->Indices[k]);
 			 
 			baseRoomVertex += bucket->Vertices.size();
@@ -2235,14 +2235,14 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_numHairIndices = 0;
 
 	vector<RendererVertex> moveablesVertices;
-	vector<__int32> moveablesIndices;
-	__int32 baseMoveablesVertex = 0;
-	__int32 baseMoveablesIndex = 0;
+	vector<int> moveablesIndices;
+	int baseMoveablesVertex = 0;
+	int baseMoveablesIndex = 0;
 
 	// Step 3: prepare moveables
-	for (__int32 i = 0; i < MoveablesIds.size(); i++)
+	for (int i = 0; i < MoveablesIds.size(); i++)
 	{
-		__int32 objNum = MoveablesIds[i];
+		int objNum = MoveablesIds[i];
 		OBJECT_INFO* obj = &Objects[objNum];
 
 		if (obj->nmeshes > 0)
@@ -2267,15 +2267,15 @@ bool Renderer11::PrepareDataForTheRenderer()
 				moveable->DoNotDraw = false;
 			}
 
-			for (__int32 j = 0; j < obj->nmeshes; j++)
+			for (int j = 0; j < obj->nmeshes; j++)
 			{
 				// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 				// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 				// and vertices have bone index 0 and not 10
-				__int32 meshPtrIndex = RawMeshPointers[obj->meshIndex / 2 + j] / 2;
-				__int32 boneIndex = (meshPtrIndex == 0 ? HAND_R : j);
+				int meshPtrIndex = RawMeshPointers[obj->meshIndex / 2 + j] / 2;
+				int boneIndex = (meshPtrIndex == 0 ? HAND_R : j);
 
-				__int16* meshPtr = &RawMeshData[meshPtrIndex];
+				short* meshPtr = &RawMeshData[meshPtrIndex];
 				RendererMesh* mesh = getRendererMeshFromTrMesh(moveable,
 					meshPtr,
 					Meshes[obj->meshIndex + 2 * j],
@@ -2284,7 +2284,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 				moveable->ObjectMeshes.push_back(mesh);
 			}
 
-			__int32* bone = &Bones[obj->boneIndex];
+			int* bone = &Bones[obj->boneIndex];
 
 			stack<RendererBone*> stack;
 
@@ -2302,7 +2302,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 			{
 				int j = mi + 1;
 
-				__int32 opcode = *(bone++);
+				int opcode = *(bone++);
 				int linkX = *(bone++);
 				int linkY = *(bone++);
 				int linkZ = *(bone++);
@@ -2371,15 +2371,15 @@ bool Renderer11::PrepareDataForTheRenderer()
 			{
 				RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
 
-				for (__int32 j = 1; j < obj->nmeshes; j++)
+				for (int j = 1; j < obj->nmeshes; j++)
 				{
 					RendererMesh* jointMesh = moveable->ObjectMeshes[j];
 					RendererBone* jointBone = moveable->LinearizedBones[j];
 
-					for (__int32 b1 = 0; b1 < NUM_BUCKETS; b1++)
+					for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
 					{
 						RendererBucket* jointBucket = &jointMesh->Buckets[b1];
-						for (__int32 v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
+						for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
 						{
 							RendererVertex* jointVertex = &jointBucket->Vertices[v1];
 							if (jointVertex->Bone != j)
@@ -2387,20 +2387,20 @@ bool Renderer11::PrepareDataForTheRenderer()
 								RendererMesh* skinMesh = objSkin->ObjectMeshes[jointVertex->Bone];
 								RendererBone* skinBone = objSkin->LinearizedBones[jointVertex->Bone];
 
-								for (__int32 b2 = 0; b2 < NUM_BUCKETS; b2++)
+								for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
 								{
 									RendererBucket* skinBucket = &skinMesh->Buckets[b2];
-									for (__int32 v2 = 0; v2 < skinBucket->Vertices.size(); v2++)
+									for (int v2 = 0; v2 < skinBucket->Vertices.size(); v2++)
 									{
 										RendererVertex* skinVertex = &skinBucket->Vertices[v2];
 
-										__int32 x1 = jointBucket->Vertices[v1].Position.x + jointBone->GlobalTranslation.x;
-										__int32 y1 = jointBucket->Vertices[v1].Position.y + jointBone->GlobalTranslation.y;
-										__int32 z1 = jointBucket->Vertices[v1].Position.z + jointBone->GlobalTranslation.z;
+										int x1 = jointBucket->Vertices[v1].Position.x + jointBone->GlobalTranslation.x;
+										int y1 = jointBucket->Vertices[v1].Position.y + jointBone->GlobalTranslation.y;
+										int z1 = jointBucket->Vertices[v1].Position.z + jointBone->GlobalTranslation.z;
 
-										__int32 x2 = skinBucket->Vertices[v2].Position.x + skinBone->GlobalTranslation.x;
-										__int32 y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
-										__int32 z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
+										int x2 = skinBucket->Vertices[v2].Position.x + skinBone->GlobalTranslation.x;
+										int y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
+										int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
 
 										if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 										{
@@ -2418,10 +2418,10 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 			if (MoveablesIds[i] == ID_HAIR)
 			{
-				for (__int32 j = 0; j < moveable->ObjectMeshes.size(); j++)
+				for (int j = 0; j < moveable->ObjectMeshes.size(); j++)
 				{
 					RendererMesh* mesh = moveable->ObjectMeshes[j];
-					for (__int32 n = 0; n < NUM_BUCKETS; n++)
+					for (int n = 0; n < NUM_BUCKETS; n++)
 					{
 						m_numHairVertices += mesh->Buckets[n].NumVertices;
 						m_numHairIndices += mesh->Buckets[n].NumIndices;
@@ -2432,30 +2432,30 @@ bool Renderer11::PrepareDataForTheRenderer()
 				m_hairIndices.clear();
 
 				RendererVertex vertex;
-				for (__int32 m = 0; m < m_numHairVertices * 2; m++)
+				for (int m = 0; m < m_numHairVertices * 2; m++)
 					m_hairVertices.push_back(vertex);
-				for (__int32 m = 0; m < m_numHairIndices * 2; m++)
+				for (int m = 0; m < m_numHairIndices * 2; m++)
 					m_hairIndices.push_back(0);
 			}
 
 			m_moveableObjects[MoveablesIds[i]] = moveable;
 
 			// Merge vertices and indices in a single list
-			for (__int32 m = 0; m < moveable->ObjectMeshes.size(); m++)
+			for (int m = 0; m < moveable->ObjectMeshes.size(); m++)
 			{
 				RendererMesh* msh = moveable->ObjectMeshes[m];
 
-				for (__int32 j = 0; j < NUM_BUCKETS; j++)
+				for (int j = 0; j < NUM_BUCKETS; j++)
 				{
 					RendererBucket* bucket = &msh->Buckets[j];
 
 					bucket->StartVertex = baseMoveablesVertex;
 					bucket->StartIndex = baseMoveablesIndex;
 
-					for (__int32 k = 0; k < bucket->Vertices.size(); k++)
+					for (int k = 0; k < bucket->Vertices.size(); k++)
 						moveablesVertices.push_back(bucket->Vertices[k]);
 
-					for (__int32 k = 0; k < bucket->Indices.size(); k++)
+					for (int k = 0; k < bucket->Indices.size(); k++)
 						moveablesIndices.push_back(baseMoveablesVertex + bucket->Indices[k]);
 
 					baseMoveablesVertex += bucket->Vertices.size();
@@ -2471,17 +2471,17 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	// Step 4: prepare static meshes
 	vector<RendererVertex> staticsVertices;
-	vector<__int32> staticsIndices;
-	__int32 baseStaticsVertex = 0;
-	__int32 baseStaticsIndex = 0;
+	vector<int> staticsIndices;
+	int baseStaticsVertex = 0;
+	int baseStaticsIndex = 0;
 
-	for (__int32 i = 0; i < StaticObjectsIds.size(); i++)
+	for (int i = 0; i < StaticObjectsIds.size(); i++)
 	{
 		STATIC_INFO* obj = &StaticObjects[StaticObjectsIds[i]];
 		RendererObject* staticObject = new RendererObject();
 		staticObject->Id = StaticObjectsIds[i];
 
-		__int16* meshPtr = &RawMeshData[RawMeshPointers[obj->meshNumber / 2] / 2];
+		short* meshPtr = &RawMeshData[RawMeshPointers[obj->meshNumber / 2] / 2];
 		RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, meshPtr, Meshes[obj->meshNumber], 0, false, false);
 
 		staticObject->ObjectMeshes.push_back(mesh);
@@ -2491,17 +2491,17 @@ bool Renderer11::PrepareDataForTheRenderer()
 		// Merge vertices and indices in a single list
 		RendererMesh* msh = staticObject->ObjectMeshes[0];
 
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		for (int j = 0; j < NUM_BUCKETS; j++)
 		{
 			RendererBucket* bucket = &msh->Buckets[j];
 
 			bucket->StartVertex = baseStaticsVertex;
 			bucket->StartIndex = baseStaticsIndex;
 
-			for (__int32 k = 0; k < bucket->Vertices.size(); k++)
+			for (int k = 0; k < bucket->Vertices.size(); k++)
 				staticsVertices.push_back(bucket->Vertices[k]);
 
-			for (__int32 k = 0; k < bucket->Indices.size(); k++)
+			for (int k = 0; k < bucket->Indices.size(); k++)
 				staticsIndices.push_back(baseStaticsVertex + bucket->Indices[k]);
 
 			baseStaticsVertex += bucket->Vertices.size();
@@ -2510,14 +2510,14 @@ bool Renderer11::PrepareDataForTheRenderer()
 	}
 
 	// Create missing meshes (effect objects like ID_BODY_PART have nmeshes = 0 and they are "lost" with current procedures)
-	for (__int32 i = 0; i < NumMeshPointers; i++)
+	for (int i = 0; i < NumMeshPointers; i++)
 	{
-		unsigned __int32 mp = reinterpret_cast<unsigned __int32>(Meshes[i * 2]);
+		unsigned int mp = reinterpret_cast<unsigned int>(Meshes[i * 2]);
 		RendererMesh* mesh = m_meshPointersToMesh[mp];
 		if (mesh == NULL)
 		{
-			__int32 meshPtrIndex = RawMeshPointers[i] / 2;
-			__int16* meshPtr = &RawMeshData[meshPtrIndex];
+			int meshPtrIndex = RawMeshPointers[i] / 2;
+			short* meshPtr = &RawMeshData[meshPtrIndex];
 			RendererMesh* mesh = getRendererMeshFromTrMesh(NULL,
 				meshPtr,
 				Meshes[i * 2],
@@ -2535,7 +2535,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_sprites = (RendererSprite**)malloc(sizeof(RendererSprite*) * g_NumSprites);
 	ZeroMemory(m_sprites, sizeof(RendererSprite*) * g_NumSprites);
 
-	for (__int32 i = 0; i < g_NumSprites; i++)
+	for (int i = 0; i < g_NumSprites; i++)
 	{
 		SPRITE* oldSprite = &Sprites[i];
 
@@ -2557,18 +2557,18 @@ bool Renderer11::PrepareDataForTheRenderer()
 		m_sprites[i] = sprite;
 	}
 
-	for (__int32 i = 0; i < MoveablesIds.size(); i++)
+	for (int i = 0; i < MoveablesIds.size(); i++)
 	{
 		OBJECT_INFO* obj = &Objects[MoveablesIds[i]];
 
 		if (obj->nmeshes < 0)
 		{
-			__int16 numSprites = abs(obj->nmeshes);
-			__int16 baseSprite = obj->meshIndex;
+			short numSprites = abs(obj->nmeshes);
+			short baseSprite = obj->meshIndex;
 
 			RendererSpriteSequence* sequence = new RendererSpriteSequence(MoveablesIds[i], numSprites);
 
-			for (__int32 j = baseSprite; j < baseSprite + numSprites; j++)
+			for (int j = baseSprite; j < baseSprite + numSprites; j++)
 			{
 				sequence->SpritesList[j - baseSprite] = m_sprites[j];
 			}
@@ -2577,13 +2577,13 @@ bool Renderer11::PrepareDataForTheRenderer()
 		}
 	}
 
-	for (__int32 i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{ 
 		if (Objects[ID_WATERFALL1 + i].loaded)
 		{
 			// Get the first textured bucket
 			RendererBucket* bucket = NULL;
-			for (__int32 j = 0; j < NUM_BUCKETS; j++)
+			for (int j = 0; j < NUM_BUCKETS; j++)
 				if (m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j].Polygons.size() > 0)
 					bucket = &m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j];
 			 
@@ -2688,18 +2688,18 @@ ID3D11ComputeShader* Renderer11::compileComputeShader(char* fileName)
 void Renderer11::DrawDashBar()
 {
 	if (DashTimer < 120)
-		drawBar(630, 32, 150, 12, 100 * (unsigned __int16)DashTimer / 120, 0xA0A000, 0xA000);
+		drawBar(630, 32, 150, 12, 100 * (unsigned short)DashTimer / 120, 0xA0A000, 0xA000);
 }
 
-void Renderer11::DrawHealthBar(__int32 percentual)
+void Renderer11::DrawHealthBar(int percentual)
 {
-	__int32 color2 = 0xA00000;
+	int color2 = 0xA00000;
 	if (Lara.poisoned || Lara.gassed)
 		color2 = 0xA0A000;
 	drawBar(20, 32, 150, 12, percentual, 0xA00000, color2);
 }
 
-void Renderer11::DrawAirBar(__int32 percentual)
+void Renderer11::DrawAirBar(int percentual)
 {
 	drawBar(20, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
 }
@@ -2709,7 +2709,7 @@ void Renderer11::ClearDynamicLights()
 	m_dynamicLights.Clear();
 }
 
-void Renderer11::AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b)
+void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
 	if (m_nextLight >= MAX_LIGHTS)
 		return;
@@ -2813,7 +2813,7 @@ bool Renderer11::IsFading()
 	return (m_fadeStatus != FADEMODE_NONE);
 }
 
-void Renderer11::GetLaraBonePosition(Vector3* pos, __int32 bone)
+void Renderer11::GetLaraBonePosition(Vector3* pos, int bone)
 {
 
 }
@@ -2828,7 +2828,7 @@ bool Renderer11::IsFullsScreen()
 	return (!Windowed);
 }
 
-bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 frequency, bool windowed)
+bool Renderer11::ChangeScreenResolution(int width, int height, int frequency, bool windowed)
 {
 	HRESULT res;
 
@@ -2862,7 +2862,7 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 		return false;
 
 	DXGI_MODE_DESC* mode = &modes[0];
-	for (__int32 i = 0; i < numModes; i++)
+	for (int i = 0; i < numModes; i++)
 	{
 		mode = &modes[i];
 		if (mode->Width == width && mode->Height == height)
@@ -2992,7 +2992,7 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 		return false;
 
 	DXGI_MODE_DESC* mode = &modes[0];
-	for (__int32 i = 0; i < numModes; i++)
+	for (int i = 0; i < numModes; i++)
 	{
 		mode = &modes[i];
 		if (mode->Width == width && mode->Height == height)
@@ -3013,7 +3013,7 @@ bool Renderer11::ChangeScreenResolution(__int32 width, __int32 height, __int32 f
 	return true;
 }
 
-ID3D11Buffer* Renderer11::createConstantBuffer(__int32 size)
+ID3D11Buffer* Renderer11::createConstantBuffer(int size)
 {
 	ID3D11Buffer* buffer;
 
@@ -3032,12 +3032,12 @@ ID3D11Buffer* Renderer11::createConstantBuffer(__int32 size)
 	return buffer;
 }
 
-__int32 Renderer11::getAnimatedTextureInfo(__int16 textureId)
+int Renderer11::getAnimatedTextureInfo(short textureId)
 {
-	for (__int32 i = 0; i < m_numAnimatedTextureSets; i++)
+	for (int i = 0; i < m_numAnimatedTextureSets; i++)
 	{
 		RendererAnimatedTextureSet* set = m_animatedTextureSets[i];
-		for (__int32 j = 0; j < set->NumTextures; j++)
+		for (int j = 0; j < set->NumTextures; j++)
 		{
 			if (set->Textures[j]->Id == textureId)
 				return i;
@@ -3235,11 +3235,11 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 {
 	// Avoid allocations, 1024 should be fine
 	RendererRoomNode nodes[1024];
-	__int32 nextNode = 0;
+	int nextNode = 0;
 	
 	// Avoid reallocations, 1024 should be fine
 	RendererRoomNode* stack[1024];
-	__int32 stackDepth = 0;
+	int stackDepth = 0;
 
 	RendererRoomNode* node = &nodes[nextNode++];
 	node->To = to;
@@ -3273,12 +3273,12 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 		collectEffects(node->To);
 				
 		Vector4 clipPort;
-		__int16 numDoors = *(room->door);
+		short numDoors = *(room->door);
 		if (numDoors)
 		{
-			__int16* door = room->door + 1;
+			short* door = room->door + 1;
 			for (int i = 0; i < numDoors; i++) {
-				__int16 adjoiningRoom = *(door);
+				short adjoiningRoom = *(door);
 
 				if (node->From != adjoiningRoom && checkPortal(node->To, door, viewPort, &node->ClipPort))
 				{
@@ -3296,7 +3296,7 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 	}
 }
 
-bool Renderer11::checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPort, Vector4* clipPort)
+bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort)
 {
 	ROOM_INFO* room = &Rooms[roomIndex];
 
@@ -3383,9 +3383,9 @@ bool Renderer11::checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPo
 
 void Renderer11::collectRooms()
 {
-	__int16 baseRoomIndex = Camera.pos.roomNumber;
+	short baseRoomIndex = Camera.pos.roomNumber;
 
-	for (__int32 i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < NumberRooms; i++)
 	{
 		m_rooms[i]->Visited = false;
 		m_rooms[i]->LightsToDraw.Clear();
@@ -3396,7 +3396,7 @@ void Renderer11::collectRooms()
 	getVisibleRooms(-1, baseRoomIndex, &vp, false, 0);
 }
 
-inline void Renderer11::collectItems(__int16 roomNumber)
+inline void Renderer11::collectItems(short roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -3404,7 +3404,7 @@ inline void Renderer11::collectItems(__int16 roomNumber)
 
 	ROOM_INFO* r = room->Room;
 
-	__int16 itemNum = NO_ITEM;
+	short itemNum = NO_ITEM;
 	for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
 	{
 		//printf("ItemNum: %d, NextItem: %d\n", itemNum, Items[itemNum].nextItem);
@@ -3439,7 +3439,7 @@ inline void Renderer11::collectItems(__int16 roomNumber)
 	}
 }
 
-inline void Renderer11::collectStatics(__int16 roomNumber)
+inline void Renderer11::collectStatics(short roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -3452,9 +3452,9 @@ inline void Renderer11::collectStatics(__int16 roomNumber)
 
 	MESH_INFO* mesh = r->mesh;
 
-	__int32 numStatics = room->Statics.size();
+	int numStatics = room->Statics.size();
 
-	for (__int32 i = 0; i < numStatics; i++)
+	for (int i = 0; i < numStatics; i++)
 	{
 		RendererStatic* newStatic = &room->Statics[i];
 
@@ -3468,7 +3468,7 @@ inline void Renderer11::collectStatics(__int16 roomNumber)
 	}
 }
 
-inline void Renderer11::collectLightsForEffect(__int16 roomNumber, RendererEffect* effect)
+inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect* effect)
 {
 	effect->Lights.Clear();
 
@@ -3486,7 +3486,7 @@ inline void Renderer11::collectLightsForEffect(__int16 roomNumber, RendererEffec
 	Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
 
 	// Dynamic lights have the priority
-	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+	for (int i = 0; i < m_dynamicLights.Size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
 
@@ -3499,13 +3499,13 @@ inline void Renderer11::collectLightsForEffect(__int16 roomNumber, RendererEffec
 		m_tempItemLights.Add(light);
 	}
 
-	__int32 numLights = room->Lights.size();
+	int numLights = room->Lights.size();
 
 	m_shadowLight = NULL;
 	RendererLight* brightestLight = NULL;
 	float brightest = 0.0f;
 
-	for (__int32 j = 0; j < numLights; j++)
+	for (int j = 0; j < numLights; j++)
 	{
 		RendererLight* light = &room->Lights[j];
 
@@ -3564,13 +3564,13 @@ inline void Renderer11::collectLightsForEffect(__int16 roomNumber, RendererEffec
 		m_tempItemLights.Add(light);
 	}
 
-	for (__int32 i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
+	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
 	{
 		effect->Lights.Add(m_tempItemLights[i]);
 	}
 }
 
-inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* item)
+inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* item)
 {
 	item->Lights.Clear();
 
@@ -3588,7 +3588,7 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 	Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
 
 	// Dynamic lights have the priority
-	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+	for (int i = 0; i < m_dynamicLights.Size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
 
@@ -3601,13 +3601,13 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 		m_tempItemLights.Add(light);
 	}
 
-	__int32 numLights = room->Lights.size();
+	int numLights = room->Lights.size();
 
 	m_shadowLight = NULL;
 	RendererLight* brightestLight = NULL;
 	float brightest = 0.0f;
 
-	for (__int32 j = 0; j < numLights; j++)
+	for (int j = 0; j < numLights; j++)
 	{
 		RendererLight* light = &room->Lights[j];
 
@@ -3679,7 +3679,7 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 		m_tempItemLights.Add(light);
 	}
 	  
-	for (__int32 i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
+	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
 	{
 		item->Lights.Add(m_tempItemLights[i]); 
 	}
@@ -3690,7 +3690,7 @@ inline void Renderer11::collectLightsForItem(__int16 roomNumber, RendererItem* i
 	}
 }
 
-inline void Renderer11::collectLightsForRoom(__int16 roomNumber)
+inline void Renderer11::collectLightsForRoom(short roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -3701,10 +3701,10 @@ inline void Renderer11::collectLightsForRoom(__int16 roomNumber)
 	if (r->numLights <= 0)
 		return;
 
-	__int32 numLights = room->Lights.size();
+	int numLights = room->Lights.size();
 
 	// Collect dynamic lights for rooms
-	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+	for (int i = 0; i < m_dynamicLights.Size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
 
@@ -3757,7 +3757,7 @@ bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 s
 void Renderer11::prepareLights()
 {
 	// Add dynamic lights
-	for (__int32 i = 0; i < m_dynamicLights.Size(); i++)
+	for (int i = 0; i < m_dynamicLights.Size(); i++)
 		m_lightsToDraw.Add(m_dynamicLights[i]);
 
 	// Now I have a list full of draw. Let's sort them.
@@ -3778,7 +3778,7 @@ void Renderer11::prepareLights()
 	// Try room lights
 	if (room->Lights.size() != 0)
 	{
-		for (__int32 j = 0; j < room->Lights.size(); j++)
+		for (int j = 0; j < room->Lights.size(); j++)
 		{
 			RendererLight* light = &room->Lights[j];
 
@@ -3834,7 +3834,7 @@ void Renderer11::prepareLights()
 	m_shadowLight = brightestLight;
 }
 
-inline void Renderer11::collectEffects(__int16 roomNumber)
+inline void Renderer11::collectEffects(short roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	if (room == NULL)
@@ -3842,7 +3842,7 @@ inline void Renderer11::collectEffects(__int16 roomNumber)
 
 	ROOM_INFO* r = room->Room;
 
-	__int16 fxNum = NO_ITEM;
+	short fxNum = NO_ITEM;
 	for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = Effects[fxNum].nextFx)
 	{
 		FX_INFO* fx = &Effects[fxNum];
@@ -3868,27 +3868,27 @@ inline void Renderer11::collectEffects(__int16 roomNumber)
 	}
 }
 
-RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr,
-	__int16 boneIndex, __int32 isJoints, __int32 isHairs)
+RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short* refMeshPtr,
+	short boneIndex, int isJoints, int isHairs)
 {
 	RendererMesh* mesh = new RendererMesh();
 	
-	__int16* basePtr = meshPtr;
+	short* basePtr = meshPtr;
 
-	__int16 cx = *meshPtr++;
-	__int16 cy = *meshPtr++;
-	__int16 cz = *meshPtr++;
-	__int16 r1 = *meshPtr++;
-	__int16 r2 = *meshPtr++;
+	short cx = *meshPtr++;
+	short cy = *meshPtr++;
+	short cz = *meshPtr++;
+	short r1 = *meshPtr++;
+	short r2 = *meshPtr++;
 
-	__int16 numVertices = *meshPtr++;
+	short numVertices = *meshPtr++;
 
 	VECTOR* vertices = (VECTOR*)malloc(sizeof(VECTOR) * numVertices);
-	for (__int32 v = 0; v < numVertices; v++)
+	for (int v = 0; v < numVertices; v++)
 	{
-		__int16 x = *meshPtr++;
-		__int16 y = *meshPtr++;
-		__int16 z = *meshPtr++;
+		short x = *meshPtr++;
+		short y = *meshPtr++;
+		short z = *meshPtr++;
 
 		vertices[v].vx = x;
 		vertices[v].vy = y;
@@ -3897,17 +3897,17 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		mesh->Positions.push_back(Vector3(x, y, z));
 	}
 
-	__int16 numNormals = *meshPtr++;
+	short numNormals = *meshPtr++;
 	VECTOR* normals = NULL;
-	__int16* colors = NULL;
+	short* colors = NULL;
 	if (numNormals > 0)
 	{
 		normals = (VECTOR*)malloc(sizeof(VECTOR) * numNormals);
-		for (__int32 v = 0; v < numNormals; v++)
+		for (int v = 0; v < numNormals; v++)
 		{
-			__int16 x = *meshPtr++;
-			__int16 y = *meshPtr++;
-			__int16 z = *meshPtr++;
+			short x = *meshPtr++;
+			short y = *meshPtr++;
+			short z = *meshPtr++;
 
 			normals[v].vx = x;
 			normals[v].vy = y;
@@ -3916,37 +3916,37 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 	}
 	else
 	{
-		__int16 numLights = -numNormals;
-		colors = (__int16*)malloc(sizeof(__int16) * numLights);
-		for (__int32 v = 0; v < numLights; v++)
+		short numLights = -numNormals;
+		colors = (short*)malloc(sizeof(short) * numLights);
+		for (int v = 0; v < numLights; v++)
 		{
 			colors[v] = *meshPtr++;
 		}
 	}
 
-	__int16 numRectangles = *meshPtr++;
+	short numRectangles = *meshPtr++;
 
-	for (__int32 r = 0; r < numRectangles; r++)
+	for (int r = 0; r < numRectangles; r++)
 	{
-		__int16 v1 = *meshPtr++;
-		__int16 v2 = *meshPtr++;
-		__int16 v3 = *meshPtr++;
-		__int16 v4 = *meshPtr++;
-		__int16 textureId = *meshPtr++;
-		__int16 effects = *meshPtr++;
+		short v1 = *meshPtr++;
+		short v2 = *meshPtr++;
+		short v3 = *meshPtr++;
+		short v4 = *meshPtr++;
+		short textureId = *meshPtr++;
+		short effects = *meshPtr++;
 
-		__int16 indices[4] = { v1,v2,v3,v4 };
+		short indices[4] = { v1,v2,v3,v4 };
 
-		__int16 textureIndex = textureId & 0x7FFF;
+		short textureIndex = textureId & 0x7FFF;
 		bool doubleSided = (textureId & 0x8000) >> 15;
 
 		// Get the object texture
 		OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-		__int32 tile = texture->tileAndFlag & 0x7FFF;
+		int tile = texture->tileAndFlag & 0x7FFF;
 
 		// Create vertices
 		RendererBucket* bucket;
-		__int32 bucketIndex = RENDERER_BUCKET_SOLID;
+		int bucketIndex = RENDERER_BUCKET_SOLID;
 		if (!doubleSided)
 		{
 			if (texture->attribute == 2 || (effects & 1))
@@ -3974,8 +3974,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		bucket = &mesh->Buckets[bucketIndex];
 		if (obj != NULL) obj->HasDataInBucket[bucketIndex] = true;
 
-		__int32 baseVertices = bucket->NumVertices;
-		for (__int32 v = 0; v < 4; v++)
+		int baseVertices = bucket->NumVertices;
+		for (int v = 0; v < 4; v++)
 		{
 			RendererVertex vertex;
 
@@ -4005,7 +4005,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 			}
 			else
 			{
-				__int16 shade = colors[indices[v]];
+				short shade = colors[indices[v]];
 				shade = (255 - shade * 255 / 8191) & 0xFF;
 				vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
 			}
@@ -4032,28 +4032,28 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		bucket->Polygons.push_back(newPolygon);
 	}
 
-	__int16 numTriangles = *meshPtr++;
+	short numTriangles = *meshPtr++;
 
-	for (__int32 r = 0; r < numTriangles; r++)
+	for (int r = 0; r < numTriangles; r++)
 	{
-		__int16 v1 = *meshPtr++;
-		__int16 v2 = *meshPtr++;
-		__int16 v3 = *meshPtr++;
-		__int16 textureId = *meshPtr++;
-		__int16 effects = *meshPtr++;
+		short v1 = *meshPtr++;
+		short v2 = *meshPtr++;
+		short v3 = *meshPtr++;
+		short textureId = *meshPtr++;
+		short effects = *meshPtr++;
 
-		__int16 indices[3] = { v1,v2,v3 };
+		short indices[3] = { v1,v2,v3 };
 
-		__int16 textureIndex = textureId & 0x7FFF;
+		short textureIndex = textureId & 0x7FFF;
 		bool doubleSided = (textureId & 0x8000) >> 15;
 
 		// Get the object texture
 		OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-		__int32 tile = texture->tileAndFlag & 0x7FFF;
+		int tile = texture->tileAndFlag & 0x7FFF;
 
 		// Create vertices
 		RendererBucket* bucket;
-		__int32 bucketIndex = RENDERER_BUCKET_SOLID;
+		int bucketIndex = RENDERER_BUCKET_SOLID;
 		if (!doubleSided)
 		{
 			if (texture->attribute == 2 || (effects & 1))
@@ -4071,8 +4071,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 		bucket = &mesh->Buckets[bucketIndex];
 		if (obj != NULL) obj->HasDataInBucket[bucketIndex] = true;
 
-		__int32 baseVertices = bucket->NumVertices;
-		for (__int32 v = 0; v < 3; v++)
+		int baseVertices = bucket->NumVertices;
+		for (int v = 0; v < 3; v++)
 		{
 			RendererVertex vertex;
 
@@ -4102,7 +4102,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, __int16
 			}
 			else
 			{
-				__int16 shade = colors[indices[v]];
+				short shade = colors[indices[v]];
 				shade = (255 - shade * 255 / 8191) & 0xFF;
 				vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
 			}
@@ -4164,9 +4164,9 @@ void Renderer11::buildHierarchy(RendererObject* obj)
 	}
 }
 
-void Renderer11::fromTrAngle(Matrix* matrix, __int16* frameptr, __int32 index)
+void Renderer11::fromTrAngle(Matrix* matrix, short* frameptr, int index)
 {
-	__int16* ptr = &frameptr[0];
+	short* ptr = &frameptr[0];
 
 	ptr += 9;
 	for (int i = 0; i < index; i++)
@@ -4209,7 +4209,7 @@ void Renderer11::fromTrAngle(Matrix* matrix, __int16* frameptr, __int32 index)
 	}
 }
 
-bool Renderer11::updateConstantBuffer(ID3D11Buffer* buffer, void* data, __int32 size)
+bool Renderer11::updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size)
 {
 	HRESULT res;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -4234,9 +4234,9 @@ void Renderer11::updateItemsAnimations()
 	Matrix translation;
 	Matrix rotation;
 
-	__int32 numItems = m_itemsToDraw.Size();
+	int numItems = m_itemsToDraw.Size();
 
-	for (__int32 i = 0; i < numItems; i++)
+	for (int i = 0; i < numItems; i++)
 	{
 		RendererItem* itemToDraw = m_itemsToDraw[i];
 		ITEM_INFO* item = itemToDraw->Item;
@@ -4253,8 +4253,8 @@ void Renderer11::updateItemsAnimations()
 		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
 		{
 			// Apply extra rotations
-			__int32 lastJoint = 0;
-			for (__int32 j = 0; j < moveableObj->LinearizedBones.size(); j++)
+			int lastJoint = 0;
+			for (int j = 0; j < moveableObj->LinearizedBones.size(); j++)
 			{
 				RendererBone* currentBone = moveableObj->LinearizedBones[j];
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
@@ -4281,13 +4281,13 @@ void Renderer11::updateItemsAnimations()
 				}
 			}
 
-			__int16	*framePtr[2];
-			__int32 rate;
-			__int32 frac = GetFrame_D2(item, framePtr, &rate);
+			short	*framePtr[2];
+			int rate;
+			int frac = GetFrame_D2(item, framePtr, &rate);
 
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 
-			for (__int32 m = 0; m < itemToDraw->NumMeshes; m++)
+			for (int m = 0; m < itemToDraw->NumMeshes; m++)
 				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m].Transpose();
 		}
 
@@ -4310,7 +4310,7 @@ void Renderer11::updateLaraAnimations()
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 
 	// Clear extra rotations
-	for (__int32 i = 0; i < laraObj->LinearizedBones.size(); i++)
+	for (int i = 0; i < laraObj->LinearizedBones.size(); i++)
 		laraObj->LinearizedBones[i]->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
 	// Lara world matrix
@@ -4329,11 +4329,11 @@ void Renderer11::updateLaraAnimations()
 		TR_ANGLE_TO_RAD(Lara.headYrot), TR_ANGLE_TO_RAD(Lara.headZrot));
 
 	// First calculate matrices for legs, hips, head and torso
-	__int32 mask = (1 << HIPS) | (1 << THIGH_L) | (1 << CALF_L) | (1 << FOOT_L) |
+	int mask = (1 << HIPS) | (1 << THIGH_L) | (1 << CALF_L) | (1 << FOOT_L) |
 		(1 << THIGH_R) | (1 << CALF_R) | (1 << FOOT_R) | (1 << TORSO) | (1 << HEAD);
-	__int16	*framePtr[2];
-	__int32 rate;
-	__int32 frac = GetFrame_D2(LaraItem, framePtr, &rate);
+	short	*framePtr[2];
+	int rate;
+	int frac = GetFrame_D2(LaraItem, framePtr, &rate);
 	updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
@@ -4362,7 +4362,7 @@ void Renderer11::updateLaraAnimations()
 			{
 				// Left arm
 				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
-				__int16* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+				short* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
 				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
 
 				// Right arm
@@ -4416,12 +4416,12 @@ void Renderer11::updateLaraAnimations()
 
 		world = objLara->AnimationTransforms[HEAD] * m_LaraWorldMatrix;
 
-		__int32 lastVertex = 0;
-		__int32 lastIndex = 0;
+		int lastVertex = 0;
+		int lastIndex = 0;
 
 		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-		for (__int32 p = 0; p < ((level->LaraType == LARA_YOUNG) ? 2 : 1); p++)
+		for (int p = 0; p < ((level->LaraType == LARA_YOUNG) ? 2 : 1); p++)
 		{
 			// We can't use hardware skinning here, however hairs have just a few vertices so 
 			// it's not so bad doing skinning in software
@@ -4450,7 +4450,7 @@ void Renderer11::updateLaraAnimations()
 				parentVertices[0][3] = Vector3::Transform(parentMesh->Positions[38], world);
 			}
 
-			for (__int32 i = 0; i < 6; i++)
+			for (int i = 0; i < 6; i++)
 			{
 				RendererMesh* mesh = hairsObj->ObjectMeshes[i];
 				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_SOLID];
@@ -4462,11 +4462,11 @@ void Renderer11::updateLaraAnimations()
 					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
 				m_hairsMatrices[6 * p + i] = rotation * translation;
 
-				__int32 baseVertex = lastVertex;
+				int baseVertex = lastVertex;
 
-				for (__int32 j = 0; j < bucket->Vertices.size(); j++)
+				for (int j = 0; j < bucket->Vertices.size(); j++)
 				{
-					__int32 oldVertexIndex = (__int32)bucket->Vertices[j].Bone;
+					int oldVertexIndex = (int)bucket->Vertices[j].Bone;
 					if (oldVertexIndex < 4)
 					{
 						m_hairVertices[lastVertex].Position.x = parentVertices[i][oldVertexIndex].x;
@@ -4521,7 +4521,7 @@ void Renderer11::updateLaraAnimations()
 					}
 				}
 
-				for (__int32 j = 0; j < bucket->Indices.size(); j++)
+				for (int j = 0; j < bucket->Indices.size(); j++)
 				{
 					m_hairIndices[lastIndex] = baseVertex + bucket->Indices[j];
 					lastIndex++;
@@ -4531,11 +4531,11 @@ void Renderer11::updateLaraAnimations()
 	}
 
 	// Transpose matrices for shaders
-	for (__int32 m = 0; m < 15; m++)
+	for (int m = 0; m < 15; m++)
 		laraObj->AnimationTransforms[m] = laraObj->AnimationTransforms[m].Transpose();
 }
 
-__int32 Renderer11::getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate)
+int Renderer11::getFrame(short animation, short frame, short** framePtr, int* rate)
 {
 	ITEM_INFO item;
 	item.animNumber = animation;
@@ -4546,7 +4546,7 @@ __int32 Renderer11::getFrame(__int16 animation, __int16 frame, __int16** framePt
 
 void Renderer11::updateEffects()
 {
-	for (__int32 i = 0; i < m_effectsToDraw.Size(); i++)
+	for (int i = 0; i < m_effectsToDraw.Size(); i++)
 	{
 		RendererEffect* fx = m_effectsToDraw[i];
 
@@ -4559,10 +4559,10 @@ void Renderer11::updateEffects()
 	}
 }
 
-void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask)
+void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask)
 {
 	RendererBone* bones[32];
-	__int32 nextBone = 0;
+	int nextBone = 0;
 
 	Matrix rotation;
 
@@ -4619,7 +4619,7 @@ void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, __int1
 				transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 		}
 
-		for (__int32 i = 0; i < bone->Children.size(); i++)
+		for (int i = 0; i < bone->Children.size(); i++)
 		{
 			// Push
 			bones[nextBone++] = bone->Children[i];
@@ -4627,7 +4627,7 @@ void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, __int1
 	}
 }
 
-bool Renderer11::printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message)
+bool Renderer11::printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)
 {
 
 	return true;
@@ -4650,7 +4650,7 @@ void Renderer11::printDebugMessage(char* message, ...)
 
 void Renderer11::drawBlood()
 {
-	for (__int32 i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		BLOOD_STRUCT* blood = &Blood[i];
 		if (blood->On)
@@ -4666,7 +4666,7 @@ void Renderer11::drawBlood()
 
 void Renderer11::drawSparks()
 {
-	for (__int32 i = 0; i < 1024; i++)
+	for (int i = 0; i < 1024; i++)
 	{
 		SPARKS* spark = &Sparks[i];
 		if (spark->on)
@@ -4693,12 +4693,12 @@ void Renderer11::drawSparks()
 
 void Renderer11::drawFires()
 {
-	for (__int32 k = 0; k < 32; k++)
+	for (int k = 0; k < 32; k++)
 	{
 		FIRE_LIST* fire = &Fires[k];
 		if (fire->on)
 		{
-			for (__int32 i = 0; i < 20; i++)
+			for (int i = 0; i < 20; i++)
 			{
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
@@ -4745,7 +4745,7 @@ void Renderer11::addSpriteBillboard(RendererSprite* sprite, float x, float y, fl
 
 void Renderer11::drawSmokes()
 {
-	for (__int32 i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		SMOKE_SPARKS* spark = &SmokeSparks[i];
 		if (spark->On)
@@ -4759,7 +4759,7 @@ void Renderer11::drawSmokes()
 	}
 }
 
-void Renderer11::addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b)
+void Renderer11::addLine3D(int x1, int y1, int z1, int x2, int y2, int z2, byte r, byte g, byte b)
 {
 	if (m_nextLine3D >= MAX_LINES_3D)
 		return;
@@ -4819,7 +4819,7 @@ void Renderer11::addSprite3D(RendererSprite* sprite, float x1, float y1, float z
 
 void Renderer11::drawShockwaves()
 {
-	for (__int32 i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
 
@@ -4837,7 +4837,7 @@ void Renderer11::drawShockwaves()
 			float z4 = shockwave->z + (shockwave->outerRad * s);
 			angle -= PI / 8.0f;
 
-			for (__int32 j = 0; j < 16; j++)
+			for (int j = 0; j < 16; j++)
 			{
 				c = cos(angle);
 				s = sin(angle);
@@ -4865,7 +4865,7 @@ void Renderer11::drawShockwaves()
 
 void Renderer11::drawRipples()
 {
-	for (__int32 i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		RIPPLE_STRUCT* ripple = &Ripples[i];
 
@@ -4888,7 +4888,7 @@ void Renderer11::drawRipples()
 
 void Renderer11::drawDrips()
 {
-	for (__int32 i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		DRIP_STRUCT* drip = &Drips[i];
 
@@ -4901,7 +4901,7 @@ void Renderer11::drawDrips()
 
 void Renderer11::drawBubbles()
 {
-	for (__int32 i = 0; i < 40; i++)
+	for (int i = 0; i < 40; i++)
 	{
 		BUBBLE_STRUCT* bubble = &Bubbles[i];
 
@@ -4918,7 +4918,7 @@ void Renderer11::drawBubbles()
 
 void Renderer11::drawSplahes()
 {
-	for (__int32 i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		SPLASH_STRUCT* splash = &Splashes[i];
 
@@ -4936,7 +4936,7 @@ void Renderer11::drawSplahes()
 			float z1 = splash->z + dz;
 			angle -= PI / 4.0f;
 
-			for (__int32 j = 0; j < 8; j++)
+			for (int j = 0; j < 8; j++)
 			{
 				c = cos(angle);
 				s = sin(angle);
@@ -4967,7 +4967,7 @@ void Renderer11::drawSplahes()
 			z1 = splash->z + dz;
 			angle -= PI / 4.0f;
 
-			for (__int32 j = 0; j < 8; j++)
+			for (int j = 0; j < 8; j++)
 			{
 				c = cos(angle);
 				s = sin(angle);
@@ -4998,7 +4998,7 @@ void Renderer11::drawSplahes()
 			z1 = splash->z + dz;
 			angle -= PI / 4.0f;
 
-			for (__int32 j = 0; j < 8; j++)
+			for (int j = 0; j < 8; j++)
 			{
 				c = cos(angle);
 				s = sin(angle);
@@ -5046,16 +5046,16 @@ bool Renderer11::drawSprites()
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 
-	for (__int32 b = 0; b < 3; b++)
+	for (int b = 0; b < 3; b++)
 	{
 		BLEND_MODES currentBlendMode = (BLEND_MODES)b;
 
-		__int32 numSpritesToDraw = m_spritesToDraw.Size();
-		__int32 lastSprite = 0;
+		int numSpritesToDraw = m_spritesToDraw.Size();
+		int lastSprite = 0;
 
 		m_primitiveBatch->Begin();
 
-		for (__int32 i = 0; i < numSpritesToDraw; i++)
+		for (int i = 0; i < numSpritesToDraw; i++)
 		{
 			RendererSpriteToDraw* spr = m_spritesToDraw[i];
 
@@ -5242,25 +5242,25 @@ void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector
 void Renderer11::updateAnimatedTextures()
 {
 	// Update room's animated textures
-	for (__int32 i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < NumberRooms; i++)
 	{
 		RendererRoom* room = m_rooms[i];
 		if (room == NULL)
 			continue;
 
-		for (__int32 bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++)
+		for (int bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++)
 		{
 			RendererBucket* bucket = &room->AnimatedBuckets[bucketIndex];
 
 			if (bucket->Vertices.size() == 0)
 				continue;
 
-			for (__int32 p = 0; p < bucket->Polygons.size(); p++)
+			for (int p = 0; p < bucket->Polygons.size(); p++)
 			{
 				RendererPolygon* polygon = &bucket->Polygons[p];
 				RendererAnimatedTextureSet* set = m_animatedTextureSets[polygon->AnimatedSet];
-				__int32 textureIndex = -1;
-				for (__int32 j = 0; j < set->NumTextures; j++)
+				int textureIndex = -1;
+				for (int j = 0; j < set->NumTextures; j++)
 				{
 					if (set->Textures[j]->Id == polygon->TextureId)
 					{
@@ -5278,7 +5278,7 @@ void Renderer11::updateAnimatedTextures()
 
 				polygon->TextureId = set->Textures[textureIndex]->Id;
 
-				for (__int32 v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
+				for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
 				{
 					bucket->Vertices[polygon->Indices[v]].UV.x = set->Textures[textureIndex]->UV[v].x;
 					bucket->Vertices[polygon->Indices[v]].UV.y = set->Textures[textureIndex]->UV[v].y;
@@ -5288,7 +5288,7 @@ void Renderer11::updateAnimatedTextures()
 	}
 
 	// Update waterfalls textures
-	for (__int32 i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++)
+	for (int i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++)
 	{
 		OBJECT_INFO* obj = &Objects[i];
 
@@ -5296,12 +5296,12 @@ void Renderer11::updateAnimatedTextures()
 		{
 			RendererObject* waterfall = m_moveableObjects[i];
 
-			for (__int32 m = 0; m < waterfall->ObjectMeshes.size(); m++)
+			for (int m = 0; m < waterfall->ObjectMeshes.size(); m++)
 			{
 				RendererMesh* mesh = waterfall->ObjectMeshes[m];
 				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_TRANSPARENT_DS];
 
-				for (__int32 v = 0; v < bucket->Vertices.size(); v++)
+				for (int v = 0; v < bucket->Vertices.size(); v++)
 				{
 					RendererVertex* vertex = &bucket->Vertices[v];
 					int y = vertex->UV.y * TEXTURE_ATLAS_SIZE + 64;
@@ -5332,7 +5332,7 @@ bool Renderer11::drawLines3D()
 
 	m_primitiveBatch->Begin();
 
-	for (__int32 i = 0; i < m_lines3DToDraw.Size(); i++)
+	for (int i = 0; i < m_lines3DToDraw.Size(); i++)
 	{
 		RendererLine3D* line = m_lines3DToDraw[i];
 
@@ -5370,14 +5370,14 @@ bool Renderer11::doRain()
 {
 	if (m_firstWeather)
 	{
-		for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+		for (int i = 0; i < NUM_RAIN_DROPS; i++)
 		{
 			m_rain[i].Reset = true;
 			m_rain[i].Draw = true;
 		}
 	}
 
-	for (__int32 i = 0; i < NUM_RAIN_DROPS; i++)
+	for (int i = 0; i < NUM_RAIN_DROPS; i++)
 	{
 		RendererWeatherParticle* drop = &m_rain[i];
 
@@ -5390,7 +5390,7 @@ bool Renderer11::doRain()
 			drop->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 
 			// Check if in inside room
-			__int16 roomNumber = Camera.pos.roomNumber;
+			short roomNumber = Camera.pos.roomNumber;
 			FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
 			ROOM_INFO* room = &Rooms[roomNumber];
 			if (!(room->flags & ENV_FLAG_OUTSIDE))
@@ -5423,7 +5423,7 @@ bool Renderer11::doRain()
 			addLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
 
 		// If rain drop has hit the ground, then reset it and add a little drip
-		__int16 roomNumber = Camera.pos.roomNumber;
+		short roomNumber = Camera.pos.roomNumber;
 		FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
 		ROOM_INFO* room = &Rooms[roomNumber];
 		if (drop->Y >= room->y + room->minfloor)
@@ -5442,11 +5442,11 @@ bool Renderer11::doSnow()
 {
 	if (m_firstWeather)
 	{
-		for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
+		for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
 			m_snow[i].Reset = true;
 	}
 
-	for (__int32 i = 0; i < NUM_SNOW_PARTICLES; i++)
+	for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
 	{
 		RendererWeatherParticle* snow = &m_snow[i];
 
@@ -5457,7 +5457,7 @@ bool Renderer11::doSnow()
 			snow->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 
 			// Check if in inside room
-			__int16 roomNumber = Camera.pos.roomNumber;
+			short roomNumber = Camera.pos.roomNumber;
 			FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
 			ROOM_INFO* room = &Rooms[roomNumber];
 			if (!(room->flags & ENV_FLAG_OUTSIDE))
@@ -5488,7 +5488,7 @@ bool Renderer11::doSnow()
 			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
 			BLENDMODE_ALPHABLEND);
 
-		__int16 roomNumber = Camera.pos.roomNumber;
+		short roomNumber = Camera.pos.roomNumber;
 		FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
 		ROOM_INFO* room = &Rooms[roomNumber];
 		if (snow->Y >= room->y + room->minfloor)
@@ -5507,7 +5507,7 @@ bool Renderer11::drawDebris(bool transparent)
 	// First collect debrises
 	vector<RendererVertex> vertices;
 
-	for (__int32 i = 0; i < NUM_DEBRIS; i++)
+	for (int i = 0; i < NUM_DEBRIS; i++)
 	{
 		DEBRIS_STRUCT* debris = &Debris[i];
 
@@ -5517,8 +5517,8 @@ bool Renderer11::drawDebris(bool transparent)
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
 			Matrix world = rotation * translation;
 
-			OBJECT_TEXTURE* texture = &ObjectTextures[(__int32)(debris->textInfo) & 0x7FFF];
-			__int32 tile = texture->tileAndFlag & 0x7FFF;
+			OBJECT_TEXTURE* texture = &ObjectTextures[(int)(debris->textInfo) & 0x7FFF];
+			int tile = texture->tileAndFlag & 0x7FFF;
 
 			// Draw only debris of the current bucket
 			if (texture->attribute == 0 && transparent
@@ -5623,20 +5623,20 @@ bool Renderer11::drawBats()
 	{
 		OBJECT_INFO* obj = &Objects[ID_BATS];
 		RendererObject* moveableObj = m_moveableObjects[ID_BATS];
-		__int16* meshPtr = Meshes[Objects[ID_BATS].meshIndex + 2 * (-GlobalCounter & 3)];
+		short* meshPtr = Meshes[Objects[ID_BATS].meshIndex + 2 * (-GlobalCounter & 3)];
 		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 		
-		for (__int32 m = 0; m < 32; m++)
+		for (int m = 0; m < 32; m++)
 			memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-		for (__int32 b = 0; b < 2; b++)
+		for (int b = 0; b < 2; b++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[b];
 
 			if (bucket->NumVertices == 0)
 				continue;
 
-			for (__int32 i = 0; i < 64; i++)
+			for (int i = 0; i < 64; i++)
 			{
 				BAT_STRUCT* bat = &Bats[i];
 
@@ -5676,16 +5676,16 @@ bool Renderer11::drawRats()
 		OBJECT_INFO* obj = &Objects[ID_BATS];
 		RendererObject* moveableObj = m_moveableObjects[ID_BATS];
 
-		for (__int32 m = 0; m < 32; m++)
+		for (int m = 0; m < 32; m++)
 			memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-		for (__int32 i = 0; i < NUM_RATS; i += 4)
+		for (int i = 0; i < NUM_RATS; i += 4)
 		{
 			RAT_STRUCT* rat = &Rats[i];
 
 			if (rat->on)
 			{
-				__int16* meshPtr = Meshes[Objects[ID_BATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
+				short* meshPtr = Meshes[Objects[ID_BATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
 				RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 				
 				Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
@@ -5697,7 +5697,7 @@ bool Renderer11::drawRats()
 				m_stItem.AmbientLight = m_rooms[rat->roomNumber]->AmbientLight;
 				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
-				for (__int32 b = 0; b < 2; b++)
+				for (int b = 0; b < 2; b++)
 				{
 					RendererBucket* bucket = &mesh->Buckets[b];
 
@@ -5723,7 +5723,7 @@ bool Renderer11::drawSpiders()
 	{
 		OBJECT_INFO* obj = &Objects[ID_SPIDER];
 		RendererObject* moveableObj = m_moveableObjects[ID_SPIDER].get();
-		__int16* meshPtr = Meshes[Objects[ID_SPIDER].meshIndex + ((Wibble >> 2) & 2)];
+		short* meshPtr = Meshes[Objects[ID_SPIDER].meshIndex + ((Wibble >> 2) & 2)];
 		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 
@@ -5753,7 +5753,7 @@ bool Renderer11::drawSpiders()
 		else
 			effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
 
-		for (__int32 i = 0; i < NUM_SPIDERS; i++)
+		for (int i = 0; i < NUM_SPIDERS; i++)
 		{
 			SPIDER_STRUCT* spider = &Spiders[i];
 
@@ -5782,7 +5782,7 @@ bool Renderer11::drawSpiders()
 	return true;
 }
 
-__int32 Renderer11::drawInventoryScene()
+int Renderer11::drawInventoryScene()
 {
 	char stringBuffer[255];
 
@@ -5848,7 +5848,7 @@ __int32 Renderer11::drawInventoryScene()
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	InventoryRing* activeRing = g_Inventory->GetRing(g_Inventory->GetActiveRing());
-	__int32 lastRing = 0;
+	int lastRing = 0;
 
 	float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory->GetCameraTilt() * RADIAN);
 	float cameraY = g_Inventory->GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory->GetCameraTilt() * RADIAN);
@@ -5862,32 +5862,32 @@ __int32 Renderer11::drawInventoryScene()
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-	for (__int32 k = 0; k < NUM_INVENTORY_RINGS; k++)
+	for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
 	{
 		InventoryRing* ring = g_Inventory->GetRing(k);
 		if (ring->draw == false || ring->numObjects == 0)
 			continue;
 
-		__int16 numObjects = ring->numObjects;
+		short numObjects = ring->numObjects;
 		float deltaAngle = 360.0f / numObjects;
-		__int32 objectIndex = 0;
+		int objectIndex = 0;
 		objectIndex = ring->currentObject;
 
 		// Yellow title
 		if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory->GetType() != INV_TYPE_TITLE)
 			PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
-		for (__int32 i = 0; i < numObjects; i++)
+		for (int i = 0; i < numObjects; i++)
 		{
-			__int16 inventoryObject = ring->objects[objectIndex].inventoryObject;
-			__int16 objectNumber = g_Inventory->GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
+			short inventoryObject = ring->objects[objectIndex].inventoryObject;
+			short objectNumber = g_Inventory->GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
 		
 			//if (ring->focusState != INV_FOCUS_STATE_NONE && (k != g_Inventory->GetActiveRing() || inventoryObject != ring->objects[i].inventoryObject))
 			//	continue;
 
 			// Calculate the inventory object position and rotation
  			float currentAngle = 0.0f;
-			__int16 steps = -objectIndex + ring->currentObject;
+			short steps = -objectIndex + ring->currentObject;
 			if (steps < 0) steps += numObjects;
 			currentAngle = steps * deltaAngle;
 			currentAngle += ring->rotation;
@@ -5905,9 +5905,9 @@ __int32 Renderer11::drawInventoryScene()
 			if (ring->objects[objectIndex].rotation > 65536.0f)
 				ring->objects[objectIndex].rotation = 0;
 
-			__int32 x = ring->distance * cos(currentAngle * RADIAN);
-			__int32 y = g_Inventory->GetRing(k)->y;
-			__int32 z = ring->distance * sin(currentAngle * RADIAN);
+			int x = ring->distance * cos(currentAngle * RADIAN);
+			int y = g_Inventory->GetRing(k)->y;
+			int z = ring->distance * sin(currentAngle * RADIAN);
 
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
@@ -5922,8 +5922,8 @@ __int32 Renderer11::drawInventoryScene()
 			if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
 				objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
 			{
-				__int16* framePtr[2];
-				__int32 rate = 0;
+				short* framePtr[2];
+				int rate = 0;
 				getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
 				updateAnimation(NULL, moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
 			}
@@ -5933,7 +5933,7 @@ __int32 Renderer11::drawInventoryScene()
 					updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
 			}
 
-			for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
+			for (int n = 0; n < moveableObj->ObjectMeshes.size(); n++)
 			{
 				RendererMesh* mesh = moveableObj->ObjectMeshes[n];
 
@@ -5954,7 +5954,7 @@ __int32 Renderer11::drawInventoryScene()
 				m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 				m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-				for (__int32 m = 0; m < NUM_BUCKETS; m++)
+				for (int m = 0; m < NUM_BUCKETS; m++)
 				{
 					RendererBucket* bucket = &mesh->Buckets[m];
 					if (bucket->NumVertices == 0)
@@ -5973,7 +5973,7 @@ __int32 Renderer11::drawInventoryScene()
 				}
 			}
 
-			__int16 inventoryItem = ring->objects[objectIndex].inventoryObject;
+			short inventoryItem = ring->objects[objectIndex].inventoryObject;
 
 			// Draw special stuff if needed
 			if (objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
@@ -5988,7 +5988,7 @@ __int32 Renderer11::drawInventoryScene()
 						{
 							y = 44;
 
-							for (__int32 n = 0; n < MAX_SAVEGAMES; n++)
+							for (int n = 0; n < MAX_SAVEGAMES; n++)
 							{
 								if (!g_NewSavegameInfos[n].Present)
 									PrintString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
@@ -6033,9 +6033,9 @@ __int32 Renderer11::drawInventoryScene()
 
 							//drawColoredQuad(200, 24, 400, 24 * (g_GameFlow->GetNumLevels() - 1) + 40, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 
-							__int16 lastY = 50;
+							short lastY = 50;
 
-							for (__int32 n = 1; n < g_GameFlow->GetNumLevels(); n++)
+							for (int n = 1; n < g_GameFlow->GetNumLevels(); n++)
 							{
 								GameScriptLevel* levelScript = g_GameFlow->GetLevel(n);
 								PrintString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
@@ -6075,7 +6075,7 @@ __int32 Renderer11::drawInventoryScene()
 						// Draw settings menu
 						RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
 
-						__int32 y = 200;
+						int y = 200;
 
 						PrintString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
 							PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
@@ -6242,7 +6242,7 @@ __int32 Renderer11::drawInventoryScene()
 
 						y += 25;
 
-						for (__int32 k = 0; k < 18; k++)
+						for (int k = 0; k < 18; k++)
 						{
 							PrintString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
 								PRINTSTRING_COLOR_WHITE,
@@ -6297,16 +6297,16 @@ __int32 Renderer11::drawInventoryScene()
 				}
 				else
 				{
-					__int16 inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
+					short inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
 					char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
 
 					if (g_Inventory->IsCurrentObjectWeapon() && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						y = 100;
 
-						for (__int32 a = 0; a < ring->numActions; a++)
+						for (int a = 0; a < ring->numActions; a++)
 						{
-							__int32 stringIndex = 0;
+							int stringIndex = 0;
 							if (ring->actions[a] == INV_ACTION_USE) stringIndex = STRING_USE;
 							if (ring->actions[a] == INV_ACTION_COMBINE) stringIndex = STRING_COMBINE;
 							if (ring->actions[a] == INV_ACTION_SEPARE) stringIndex = STRING_SEPARE;
@@ -6331,7 +6331,7 @@ __int32 Renderer11::drawInventoryScene()
 						//drawColoredQuad(300, 80, 200, y + 20 - 80, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
 					}
 
-					__int32 quantity = -1;
+					int quantity = -1;
 					switch (objectNumber)
 					{
 					case ID_BIGMEDI_ITEM:
@@ -6459,7 +6459,7 @@ __int32 Renderer11::drawInventoryScene()
 	return 0;
 }
 
-bool Renderer11::drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vector4 color)
+bool Renderer11::drawColoredQuad(int x, int y, int w, int h, Vector4 color)
 {
 	float factorW = ScreenWidth / 800.0f;
 	float factorH = ScreenHeight / 600.0f;
@@ -6573,7 +6573,7 @@ bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 c
 
 bool Renderer11::drawRopes()
 {
-	for (__int32 n = 0; n < NumRopes; n++)
+	for (int n = 0; n < NumRopes; n++)
 	{
 		ROPE_STRUCT* rope = &Ropes[n];
 
@@ -6591,7 +6591,7 @@ bool Renderer11::drawRopes()
 			Vector3 projected[24];
 			Matrix world = Matrix::Identity;
 
-			for (__int32 i = 0; i < 24; i++)
+			for (int i = 0; i < 24; i++)
 			{
 				Vector3 absolutePosition = Vector3(rope->position.x + rope->segment[i].x / 65536.0f,
 					rope->position.y + rope->segment[i].y / 65536.0f,
@@ -6633,7 +6633,7 @@ bool Renderer11::drawRopes()
 
 			float depth = projected[0].z;
 
-			for (__int32 j = 0; j < 24; j++)
+			for (int j = 0; j < 24; j++)
 			{
 				Vector3 p1 = m_viewportToolkit->Unproject(Vector3(x1, y1, depth), Projection, View, world);
 				Vector3 p2 = m_viewportToolkit->Unproject(Vector3(x2, y2, depth), Projection, View, world);
@@ -6712,7 +6712,7 @@ bool Renderer11::drawLines2D()
 
 	m_primitiveBatch->Begin();
 
-	for (__int32 i = 0; i < m_lines2DToDraw.Size(); i++)
+	for (int i = 0; i < m_lines2DToDraw.Size(); i++)
 	{
 		RendererLine2D* line = m_lines2DToDraw[i];
 
@@ -6764,7 +6764,7 @@ bool Renderer11::drawOverlays()
 	return true;
 }
 
-bool Renderer11::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2)
+bool Renderer11::drawBar(int x, int y, int w, int h, int percent, int color1, int color2)
 {
 	byte r1 = (color1 >> 16) & 0xFF;
 	byte g1 = (color1 >> 8) & 0xFF;
@@ -6777,17 +6777,17 @@ bool Renderer11::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 per
 	float factorX = ScreenWidth / 800.0f;
 	float factorY = ScreenHeight / 600.0f;
 
-	__int32 realX = x * factorX;
-	__int32 realY = y * factorY;
-	__int32 realW = w * factorX;
-	__int32 realH = h * factorY;
+	int realX = x * factorX;
+	int realY = y * factorY;
+	int realW = w * factorX;
+	int realH = h * factorY;
 
-	__int32 realPercent = percent / 100.0f * realW;
+	int realPercent = percent / 100.0f * realW;
 
-	for (__int32 i = 0; i < realH; i++)
+	for (int i = 0; i < realH; i++)
 		insertLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0, 255);
 
-	for (__int32 i = 0; i < realH; i++)
+	for (int i = 0; i < realH; i++)
 		insertLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1, 255);
 
 	insertLine2D(realX, realY, realX + realW, realY, 255, 255, 255, 255);
@@ -6798,7 +6798,7 @@ bool Renderer11::drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 per
 	return true;
 }
 
-void Renderer11::insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b, byte a)
+void Renderer11::insertLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a)
 {
 	RendererLine2D* line = &m_lines2DBuffer[m_nextLine2D++];
 
@@ -6829,7 +6829,7 @@ bool Renderer11::drawGunFlashes()
 	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 	m_stLights.NumLights = item->Lights.Size();
-	for (__int32 j = 0; j < item->Lights.Size(); j++)
+	for (int j = 0; j < item->Lights.Size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -6838,9 +6838,9 @@ bool Renderer11::drawGunFlashes()
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	__int16 length = 0;
-	__int16 zOffset = 0;
-	__int16 rotationX = 0;
+	short length = 0;
+	short zOffset = 0;
+	short rotationX = 0;
 
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthNone(), 0);
@@ -6875,7 +6875,7 @@ bool Renderer11::drawGunFlashes()
 		RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
 		RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
 
-		for (__int32 b = 0; b < NUM_BUCKETS; b++)
+		for (int b = 0; b < NUM_BUCKETS; b++)
 		{
 			RendererBucket* flashBucket = &flashMesh->Buckets[b];
 
@@ -6930,7 +6930,7 @@ bool Renderer11::drawGunShells()
 	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 	m_stLights.NumLights = item->Lights.Size();
-	for (__int32 j = 0; j < item->Lights.Size(); j++)
+	for (int j = 0; j < item->Lights.Size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -6939,7 +6939,7 @@ bool Renderer11::drawGunShells()
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	for (__int32 i = 0; i < 24; i++)
+	for (int i = 0; i < 24; i++)
 	{
 		GUNSHELL_STRUCT* gunshell = &GunShells[i];
 
@@ -6960,7 +6960,7 @@ bool Renderer11::drawGunShells()
 
 			RendererMesh* mesh = moveableObj->ObjectMeshes[0];
 
-			for (__int32 b = 0; b < NUM_BUCKETS; b++)
+			for (int b = 0; b < NUM_BUCKETS; b++)
 			{
 				RendererBucket* bucket = &mesh->Buckets[b];
 
@@ -6980,11 +6980,11 @@ void Renderer11::drawUnderwaterDust()
 {
 	if (m_firstUnderwaterDustParticles)
 	{
-		for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+		for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 			m_underwaterDustParticles[i].Reset = true;
 	}
 
-	for (__int32 i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
+	for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 	{
 		RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
 
@@ -6995,7 +6995,7 @@ void Renderer11::drawUnderwaterDust()
 			dust->Z = LaraItem->pos.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
 
 			// Check if water room
-			__int16 roomNumber = Camera.pos.roomNumber;
+			short roomNumber = Camera.pos.roomNumber;
 			FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
 			if (!isRoomUnderwater(roomNumber))
 				continue;
@@ -7026,12 +7026,12 @@ void Renderer11::drawUnderwaterDust()
 	return;
 }
 
-bool Renderer11::isRoomUnderwater(__int16 roomNumber)
+bool Renderer11::isRoomUnderwater(short roomNumber)
 {
 	return (m_rooms[roomNumber]->Room->flags & 1);
 }
 
-bool Renderer11::isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber)
+bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
 {
 	RendererRoom* room = m_rooms[roomNumber];
 	ROOM_INFO* r = room->Room;
@@ -7046,14 +7046,14 @@ vector<RendererVideoAdapter>* Renderer11::GetAdapters()
 	return &m_adapters;
 }
 
-__int32 Renderer11::DrawPickup(__int16 objectNum)
+int Renderer11::DrawPickup(short objectNum)
 {
 	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0);
 	m_pickupRotation += 45 * 360 / 30;
 	return 0;
 }
 
-bool Renderer11::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ)
+bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)
 {
 	Matrix translation;
 	Matrix rotation;
@@ -7105,7 +7105,7 @@ bool Renderer11::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum,
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-	for (__int32 n = 0; n < moveableObj->ObjectMeshes.size(); n++)
+	for (int n = 0; n < moveableObj->ObjectMeshes.size(); n++)
 	{
 		RendererMesh* mesh = moveableObj->ObjectMeshes[n];
 
@@ -7126,7 +7126,7 @@ bool Renderer11::drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum,
 		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 		m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-		for (__int32 m = 0; m < NUM_BUCKETS; m++)
+		for (int m = 0; m < NUM_BUCKETS; m++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[m];
 			if (bucket->NumVertices == 0)
@@ -7155,12 +7155,12 @@ bool Renderer11::drawShadowMap()
 	float brightest = 0.0f;
 	Vector3 itemPosition = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 
-	for (__int32 k = 0; k < m_roomsToDraw.Size(); k++)
+	for (int k = 0; k < m_roomsToDraw.Size(); k++)
 	{
 		RendererRoom* room = m_roomsToDraw[k];
-		__int32 numLights = room->Lights.size();
+		int numLights = room->Lights.size();
 
-		for (__int32 j = 0; j < numLights; j++)
+		for (int j = 0; j < numLights; j++)
 		{
 			RendererLight* light = &room->Lights[j];
 
@@ -7295,11 +7295,11 @@ bool Renderer11::drawShadowMap()
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
 		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
 
-		for (__int32 j = 0; j < 2; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -7321,11 +7321,11 @@ bool Renderer11::drawShadowMap()
 	{
 		RendererObject* laraSkinJoints = m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
-		for (__int32 k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++)
+		for (int k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = laraSkinJoints->ObjectMeshes[k];
 
-			for (__int32 j = 0; j < 2; j++)
+			for (int j = 0; j < 2; j++)
 			{
 				RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -7339,11 +7339,11 @@ bool Renderer11::drawShadowMap()
 		}
 	}
 
-	for (__int32 k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+	for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
 		RendererMesh* mesh = laraSkin->ObjectMeshes[k];
 
-		for (__int32 j = 0; j < NUM_BUCKETS; j++)
+		for (int j = 0; j < NUM_BUCKETS; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
 
@@ -7367,7 +7367,7 @@ bool Renderer11::drawShadowMap()
 	{
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-			(const unsigned __int16*)m_hairIndices.data(), m_numHairIndices,
+			(const unsigned short*)m_hairIndices.data(), m_numHairIndices,
 			m_hairVertices.data(), m_numHairVertices);
 		m_primitiveBatch->End();
 	}
@@ -7389,7 +7389,7 @@ bool Renderer11::DoTitleImage()
 		currentFade += FADE_FACTOR;
 	}
 
-	for (__int32 i = 0; i < 30 * 1.5f; i++)
+	for (int i = 0; i < 30 * 1.5f; i++)
 	{
 		drawFullScreenImage(texture->ShaderResourceView, 1.0f);
 		SyncRenderer();

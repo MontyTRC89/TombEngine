@@ -14,7 +14,7 @@ extern GameFlow* g_GameFlow;
 
 GameConfiguration g_Configuration;
 
-void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index)
+void __cdecl LoadResolutionsInCombobox(HWND handle, int index)
 {
 	HWND cbHandle = GetDlgItem(handle, IDC_RESOLUTION);
 
@@ -23,7 +23,7 @@ void __cdecl LoadResolutionsInCombobox(HWND handle, __int32 index)
 	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[index];
 
-	for (__int32 i = 0; i < adapter->DisplayModes.size(); i++)
+	for (int i = 0; i < adapter->DisplayModes.size(); i++)
 	{
 		RendererDisplayMode* mode = &(adapter->DisplayModes)[i];
 
@@ -47,7 +47,7 @@ void __cdecl LoadAdaptersInCombobox(HWND handle)
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
 	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
-	for (__int32 i = 0; i < adapters->size(); i++)
+	for (int i = 0; i < adapters->size(); i++)
 	{
 		RendererVideoAdapter* adapter = &(*adapters)[i];
 		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)adapter->Name.c_str());
@@ -65,7 +65,7 @@ void __cdecl LoadSoundDevicesInCombobox(HWND handle)
 
 	// Get all audio devices, including the default one
 	BASS_DEVICEINFO info;
-	__int32 i = 1;
+	int i = 1;
 	while (BASS_GetDeviceInfo(i, &info))
 	{
 		SendMessageA(cbHandle, CB_ADDSTRING, 0, (LPARAM)info.name);
@@ -81,8 +81,8 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	RendererVideoAdapter* adapter;
 	RendererDisplayMode* mode;
-	__int32 selectedAdapter;
-	__int32 selectedMode;
+	int selectedAdapter;
+	int selectedMode;
 
 	switch (msg)
 	{
@@ -186,12 +186,12 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-__int32 __cdecl SetupDialog()
+int __cdecl SetupDialog()
 {
 	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
 	ShowCursor(true);
-	__int32 result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
+	int result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
 	ShowCursor(false);
 
 	return true;
@@ -445,7 +445,7 @@ bool __cdecl LoadConfiguration()
 			return false;
 		}
 
-		KeyboardLayout1[i] = (__int16)tempKey;
+		KeyboardLayout1[i] = (short)tempKey;
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine

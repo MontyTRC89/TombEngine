@@ -63,13 +63,13 @@ void __cdecl InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
 	}
 }
 
-void __cdecl InitialiseLaraLoad(__int16 itemNum)//4B308, 4B76C (F)
+void __cdecl InitialiseLaraLoad(short itemNum)//4B308, 4B76C (F)
 {
 	Lara.itemNumber = itemNum;
 	LaraItem = &Items[itemNum];
 }
 
-void __cdecl LaraControl(__int16 itemNumber)//4A838, 4AC9C
+void __cdecl LaraControl(short itemNumber)//4A838, 4AC9C
 {
 	ITEM_INFO* item = LaraItem;
 
@@ -85,9 +85,9 @@ void __cdecl LaraControl(__int16 itemNumber)//4A838, 4AC9C
 	if (!DisableLaraControl)
 		Lara.locationPad = -128;
 
-	__int32 oldX = LaraItem->pos.xPos; 
-	__int32 oldY = LaraItem->pos.yPos; 
-	__int32 oldZ = LaraItem->pos.zPos; 
+	int oldX = LaraItem->pos.xPos; 
+	int oldY = LaraItem->pos.yPos; 
+	int oldZ = LaraItem->pos.zPos; 
 
 	if (Lara.gunStatus == LG_HANDS_BUSY && 
 		LaraItem->currentAnimState == STATE_LARA_STOP &&
@@ -104,18 +104,18 @@ void __cdecl LaraControl(__int16 itemNumber)//4A838, 4AC9C
 	Lara.isDucked = 0;
 
 	bool isWater = Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
-	__int32 wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	__int32 wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
-	__int32 hfw = NO_HEIGHT;
+	int hfw = NO_HEIGHT;
 	if (wh != NO_HEIGHT)
 		hfw = item->pos.yPos - wh;
 
 	Lara.waterSurfaceDist = -hfw;
 	WadeSplash(item, wh, wd);
 	
-	__int16 roomNumber;
-	__int16 height = 0;
+	short roomNumber;
+	short height = 0;
 
 	switch (Lara.waterStatus)
 	{
@@ -559,7 +559,7 @@ void __cdecl LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
 
 void __cdecl LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 {
-	for (__int32 i = 0; i < 15; i++)
+	for (int i = 0; i < 15; i++)
 	{
 		Lara.meshPtrs[i] = Meshes[Objects[ID_LARA].meshIndex + 2 * i] = Meshes[Objects[ID_LARA_SKIN].meshIndex + 2 * i];
 	}
@@ -593,12 +593,12 @@ void __cdecl LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 	Lara.leftArm.lock = 0;
 }
 
-void __cdecl InitialiseLara(__int32 restore)
+void __cdecl InitialiseLara(int restore)
 {
 	if (Lara.itemNumber == NO_ITEM)
 		return;
 
-	__int16 itemNumber = Lara.itemNumber;
+	short itemNumber = Lara.itemNumber;
 
 	LaraItem->data = &Lara;
 	LaraItem->collidable = false;
@@ -644,7 +644,7 @@ void __cdecl InitialiseLara(__int32 restore)
 
 	Lara.gunStatus = LG_NO_ARMS;
 
-	__int16 gun = WEAPON_NONE;
+	short gun = WEAPON_NONE;
 
 	if (LaraDrawType != LARA_YOUNG && Objects[ID_PISTOLS_ITEM].loaded)
 		gun = WEAPON_PISTOLS;

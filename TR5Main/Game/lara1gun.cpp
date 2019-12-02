@@ -22,7 +22,7 @@
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
 
-__int32 HKCounter = 0;
+int HKCounter = 0;
 
 void __cdecl FireHarpoon()
 {
@@ -31,7 +31,7 @@ void __cdecl FireHarpoon()
 	//	return;
 
 	// Create a new item for harpoon
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
 		GAME_VECTOR pos;
@@ -64,7 +64,7 @@ void __cdecl FireHarpoon()
 			find_target_point(Lara.target, &pos);
 
 			item->pos.yRot = ATAN(pos.z - item->pos.zPos, pos.x - item->pos.xPos);
-			__int32 distance = SQRT_ASM(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
+			int distance = SQRT_ASM(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
 			item->pos.xRot = -ATAN(distance, pos.y - item->pos.yPos);
 		}
 		else
@@ -75,8 +75,8 @@ void __cdecl FireHarpoon()
 
 		item->pos.zRot = 0;
 
-		item->fallspeed = (__int16)(-HARPOON_SPEED * SIN(item->pos.xRot) >> W2V_SHIFT);
-		item->speed = (__int16)(HARPOON_SPEED * COS(item->pos.xRot) >> W2V_SHIFT);
+		item->fallspeed = (short)(-HARPOON_SPEED * SIN(item->pos.xRot) >> W2V_SHIFT);
+		item->speed = (short)(HARPOON_SPEED * COS(item->pos.xRot) >> W2V_SHIFT);
 		item->hitPoints = HARPOON_TIME;
 
 		AddActiveItem(itemNumber);
@@ -86,20 +86,20 @@ void __cdecl FireHarpoon()
 	}
 }
 
-void __cdecl ControlHarpoonBolt(__int16 itemNumber)
+void __cdecl ControlHarpoonBolt(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	__int32 oldX = item->pos.xPos;
-	__int32 oldY = item->pos.yPos;
-	__int32 oldZ = item->pos.zPos;
-	__int16 oldRoom = item->roomNumber;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
+	short oldRoom = item->roomNumber;
 
 	item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
 	item->pos.yPos += item->fallspeed;
 	item->pos.zPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
@@ -107,7 +107,7 @@ void __cdecl ControlHarpoonBolt(__int16 itemNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
 	//  First check if the harpoon has it an item
-	__int16 targetItemNumber = 0;
+	short targetItemNumber = 0;
 	ITEM_INFO* target;
 	for (targetItemNumber = Rooms[item->roomNumber].itemNumber; targetItemNumber != NO_ITEM; targetItemNumber = target->nextItem)
 	{
@@ -124,27 +124,27 @@ void __cdecl ControlHarpoonBolt(__int16 itemNumber)
 			(target->status != ITEM_INVISIBLE && Objects[target->objectNumber].collision))
 		{
 			// check against bounds of target for collision
-			__int16* bounds = GetBestFrame(target);
+			short* bounds = GetBestFrame(target);
 			if (item->pos.yPos < target->pos.yPos + bounds[2] || item->pos.yPos > target->pos.yPos + bounds[3])
 				continue;
 
 			// get vector from target to bolt and check against x,z bounds
-			__int16 c = COS(target->pos.yRot);
-			__int16 s = SIN(target->pos.yRot);
+			short c = COS(target->pos.yRot);
+			short s = SIN(target->pos.yRot);
 
-			__int32 x = item->pos.xPos - target->pos.xPos;
-			__int32 z = item->pos.zPos - target->pos.zPos;
-			__int32 rx = (c * x - s * z) >> W2V_SHIFT;
+			int x = item->pos.xPos - target->pos.xPos;
+			int z = item->pos.zPos - target->pos.zPos;
+			int rx = (c * x - s * z) >> W2V_SHIFT;
 
-			__int32 ox = oldX - target->pos.xPos;
-			__int32 oz = oldZ - target->pos.zPos;
-			__int32 sx = (c * ox - s * oz) >> W2V_SHIFT;
+			int ox = oldX - target->pos.xPos;
+			int oz = oldZ - target->pos.zPos;
+			int sx = (c * ox - s * oz) >> W2V_SHIFT;
 
 			if ((rx < bounds[0] && sx < bounds[0]) || (rx > bounds[1] && sx > bounds[1]))
 				continue;
 
-			__int32 rz = (c * z + s * x) >> W2V_SHIFT;
-			__int32 sz = (c * oz + s * ox) >> W2V_SHIFT;
+			int rz = (c * z + s * x) >> W2V_SHIFT;
+			int sz = (c * oz + s * ox) >> W2V_SHIFT;
 
 			if ((rz < bounds[4] && sz < bounds[4]) || (rz > bounds[5] && sz > bounds[5]))
 				continue;
@@ -215,8 +215,8 @@ void __cdecl ControlHarpoonBolt(__int16 itemNumber)
 			item->pos.xRot -= ANGLE(1);
 			if (item->pos.xRot < -16384)
 				item->pos.xRot = -16384;
-			item->fallspeed = (__int16)(-HARPOON_SPEED * SIN(item->pos.xRot) >> W2V_SHIFT);
-			item->speed = (__int16)(HARPOON_SPEED * COS(item->pos.xRot) >> W2V_SHIFT);
+			item->fallspeed = (short)(-HARPOON_SPEED * SIN(item->pos.xRot) >> W2V_SHIFT);
+			item->speed = (short)(HARPOON_SPEED * COS(item->pos.xRot) >> W2V_SHIFT);
 		}
 		else
 		{
@@ -224,8 +224,8 @@ void __cdecl ControlHarpoonBolt(__int16 itemNumber)
 			if ((Wibble & 15) == 0)
 				CreateBubble(&item->pos, item->roomNumber, 0);
 			//TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
-			item->fallspeed = (__int16)(-(HARPOON_SPEED >> 1) * SIN(item->pos.xRot) >> W2V_SHIFT);
-			item->speed = (__int16)((HARPOON_SPEED >> 1) * COS(item->pos.xRot) >> W2V_SHIFT);
+			item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * SIN(item->pos.xRot) >> W2V_SHIFT);
+			item->speed = (short)((HARPOON_SPEED >> 1) * COS(item->pos.xRot) >> W2V_SHIFT);
 		}
 	}
 
@@ -241,16 +241,16 @@ long	tbx, tby, tbz;
 
 void __cdecl FireGrenade()
 {
-	__int32 x = 0;
-	__int32 y = 0;
-	__int32 z = 0;
+	int x = 0;
+	int y = 0;
+	int z = 0;
 	
-	__int16* ammo = GetAmmo(WEAPON_GRENADE_LAUNCHER);
+	short* ammo = GetAmmo(WEAPON_GRENADE_LAUNCHER);
 	if (*ammo)
 	{
 		Lara.hasFired = true;
 
-		__int16 itemNumber = CreateItem();
+		short itemNumber = CreateItem();
 		if (itemNumber != NO_ITEM)
 		{
 			ITEM_INFO* item = &Items[itemNumber];
@@ -271,7 +271,7 @@ void __cdecl FireGrenade()
 			item->pos.zPos = z = jointPos.z;
 
 			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
-			__int32 height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
+			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
 			if (height < jointPos.y)
 			{
 				item->pos.xPos = LaraItem->pos.xPos;
@@ -291,7 +291,7 @@ void __cdecl FireGrenade()
 
 			if (LaraItem->meshBits)
 			{
-				for (__int32 i = 0; i < 5; i++)
+				for (int i = 0; i < 5; i++)
 					TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_GRENADE_LAUNCHER, 32);
 
 			}
@@ -329,7 +329,7 @@ void __cdecl FireGrenade()
 	}
 }
 
-void __cdecl ControlGrenade(__int16 itemNumber)
+void __cdecl ControlGrenade(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -369,7 +369,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 			}
 			else
 			{
-				__int16 newGrenadeItemNumber = CreateItem();
+				short newGrenadeItemNumber = CreateItem();
 
 				if (newGrenadeItemNumber != NO_ITEM)
 				{
@@ -411,13 +411,13 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 		return;
 	}
 	   
-	__int32 oldX = item->pos.xPos;
-	__int32 oldY = item->pos.yPos;
-	__int32 oldZ = item->pos.zPos;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
 
-	__int32 xv;
-	__int32 yv;
-	__int32 zv;
+	int xv;
+	int yv;
+	int zv;
 
 	item->shade = 0xC210;
 
@@ -463,9 +463,9 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 		phd_RotYXZ(item->pos.yRot - ANGLE(180), item->pos.xRot, item->pos.zRot);
 		phd_TranslateRel(0, 0, -64);
 
-		__int32 wx = (*(MatrixPtr + M03) >> W2V_SHIFT);
-		__int32 wy = (*(MatrixPtr + M13) >> W2V_SHIFT);
-		__int32 wz = (*(MatrixPtr + M23) >> W2V_SHIFT);
+		int wx = (*(MatrixPtr + M03) >> W2V_SHIFT);
+		int wy = (*(MatrixPtr + M13) >> W2V_SHIFT);
+		int wz = (*(MatrixPtr + M23) >> W2V_SHIFT);
 
 		MatrixPtr -= 12;
 		DxMatrixPtr -= 48;
@@ -482,9 +482,9 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 	XMMATRIXTranslation(&translation, 0, 0, -64);
 	XMMATRIXMultiply(&transform, &rotation, &translation);
 
-	__int32 wx = transform._14;
-	__int32 wy = transform._24;
-	__int32 wz = transform._34;
+	int wx = transform._14;
+	int wy = transform._24;
+	int wz = transform._34;
 
 	if (item->speed && aboveWater)
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
@@ -499,9 +499,9 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 	item->pos.zPos += zv;
 
 	FLOOR_INFO* floor;
-	__int32 height;
-	__int32 ceiling;
-	__int16 roomNumber;
+	int height;
+	int ceiling;
+	short roomNumber;
 
 	if (item->itemFlags[0] == WEAPON_AMMO4)
 	{
@@ -516,7 +516,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 	}
 	else
 	{
-		__int16 sYrot = item->pos.yRot;
+		short sYrot = item->pos.yRot;
 		item->pos.yRot = item->goalAnimState;
 
 		DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv);
@@ -558,7 +558,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 		GrenadeLauncherSpecialEffect1(item->pos.xPos, item->pos.yPos, item->pos.zPos, -1, 1);
 
 	// Time to explode?
-	__int32 radius = 0;
+	int radius = 0;
 	bool explode = false; 
 
 	if (item->hitPoints)
@@ -581,7 +581,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 
 	if (!(item->itemFlags[0] == WEAPON_AMMO3 && explode))
 	{
-		__int32 n = 0;
+		int n = 0;
 		bool foundCollidedObjects = false;
 
 		do
@@ -602,7 +602,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 					if (explode)
 					{
 						ITEM_INFO* currentItem = CollidedItems[0];
-						__int32 k = 0;
+						int k = 0;
 
 						do
 						{
@@ -627,12 +627,12 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 									}
 									else
 									{
-										__int16 itemNos[8];
-										__int32 sw = GetSwitchTrigger(currentItem, itemNos, 1);
+										short itemNos[8];
+										int sw = GetSwitchTrigger(currentItem, itemNos, 1);
 
 										if (sw > 0)
 										{
-											for (__int32 i = 0; i < sw; i++)
+											for (int i = 0; i < sw; i++)
 											{
 												AddActiveItem(itemNos[i]);
 												Items[itemNos[i]].status = ITEM_ACTIVE;
@@ -658,7 +658,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 								TriggerShockwave(&currentItem->pos, 0x1300030, 96, 0x18806000, 0, 0);
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
-								__int16 currentItemNumber = (currentItem - Items) / sizeof(ITEM_INFO);
+								short currentItemNumber = (currentItem - Items) / sizeof(ITEM_INFO);
 								SmashObject(currentItemNumber);
 								KillItem(currentItemNumber);
 							}
@@ -672,7 +672,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 					if (CollidedMeshes[0])
 					{
 						MESH_INFO* currentMesh = CollidedMeshes[0];
-						__int32 k = 0;
+						int k = 0;
 
 						do
 						{
@@ -733,7 +733,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 			TriggerShockwave(&item->pos, 0x1300030, 96, 0x18806000, 0, 0);
 
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
-			for (__int32 x = 0; x < 2; x++)
+			for (int x = 0; x < 2; x++)
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->roomNumber);
 		}
 
@@ -753,7 +753,7 @@ void __cdecl ControlGrenade(__int16 itemNumber)
 	}
 }
 
-void __cdecl DrawShotgun(__int32 weaponType)
+void __cdecl DrawShotgun(int weaponType)
 {
 	ITEM_INFO* item;
 
@@ -809,7 +809,7 @@ void __cdecl DrawShotgun(__int32 weaponType)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
 }
 
-void __cdecl AnimateShotgun(__int32 weaponType)
+void __cdecl AnimateShotgun(int weaponType)
 {
 	bool harpoonFired = false;
 
@@ -1042,14 +1042,14 @@ void __cdecl AnimateShotgun(__int32 weaponType)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
 }
 
-void __cdecl ControlCrossbowBolt(__int16 itemNumber)
+void __cdecl ControlCrossbowBolt(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	__int32 oldX = item->pos.xPos;
-	__int32 oldY = item->pos.yPos;
-	__int32 oldZ = item->pos.zPos;
-	__int16 roomNumber = item->roomNumber;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
+	short roomNumber = item->roomNumber;
 
 	bool land = false;
 	bool explode = false;
@@ -1103,9 +1103,9 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		SetupRipple(item->pos.xPos, Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0);
 	}
 
-	__int32 radius = (explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS);
+	int radius = (explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS);
 
-	__int32 n = 0;
+	int n = 0;
 	bool foundCollidedObjects = false;
 
 	do
@@ -1124,7 +1124,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 			if (CollidedItems[0])
 			{
 				ITEM_INFO* currentItem = CollidedItems[0];
-				__int32 k = 0;
+				int k = 0;
 
 				do
 				{
@@ -1145,7 +1145,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 							TriggerShockwave(&currentItem->pos, 19922992, 96, 411066368, 0, 0);
 							currentItem->pos.yPos += 128;
 							ExplodeItemNode(currentItem, 0, 0, 128);
-							__int16 currentItemNumber = (currentItem - CollidedItems[0]) / sizeof(ITEM_INFO);
+							short currentItemNumber = (currentItem - CollidedItems[0]) / sizeof(ITEM_INFO);
 							SmashObject(currentItemNumber);
 							KillItem(currentItemNumber);
 						}
@@ -1173,7 +1173,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 			if (CollidedMeshes[0])
 			{
 				MESH_INFO* currentMesh = CollidedMeshes[0];
-				__int32 k = 0;
+				int k = 0;
 
 				do
 				{
@@ -1226,7 +1226,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 		TriggerShockwave(&item->pos, 19922992, 96, 411066368, 0, 0);
 		item->pos.yPos += 128;
 		TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
-		for (__int32 j = 0; j < 2; j++)
+		for (int j = 0; j < 2; j++)
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->roomNumber);
 	}
 
@@ -1244,7 +1244,7 @@ void __cdecl ControlCrossbowBolt(__int16 itemNumber)
 	return;
 }
 
-void __cdecl RifleHandler(__int32 weaponType)
+void __cdecl RifleHandler(int weaponType)
 {
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
@@ -1305,13 +1305,13 @@ void __cdecl RifleHandler(__int32 weaponType)
 
 void __cdecl FireCrossbow(PHD_3DPOS* pos)
 {
-	__int16* ammos = GetAmmo(WEAPON_CROSSBOW);
+	short* ammos = GetAmmo(WEAPON_CROSSBOW);
 	if (*ammos <= 0)
 		return;
 
 	Lara.hasFired = true;
 	
-	__int16 itemNumber = CreateItem();
+	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
 		ITEM_INFO* item = &Items[itemNumber];
@@ -1345,7 +1345,7 @@ void __cdecl FireCrossbow(PHD_3DPOS* pos)
 			item->roomNumber = LaraItem->roomNumber;
 			
 			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
-			__int32 height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
+			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
 
 			if (height >= jointPos.y)
 			{
@@ -1427,15 +1427,15 @@ void __cdecl TriggerUnderwaterExplosion(ITEM_INFO* item)
 	TriggerExplosionBubbles(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
 	
-	for (__int32 i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -1, 1, item->roomNumber);
 	}
 	
-	__int32 wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	if (wh != NO_HEIGHT)
 	{
-		__int32 dy = item->pos.yPos - wh;
+		int dy = item->pos.yPos - wh;
 		if (dy < 2048)
 		{
 			SplashSetup.y = wh;
@@ -1458,7 +1458,7 @@ void __cdecl TriggerUnderwaterExplosion(ITEM_INFO* item)
 	}
 }
 
-void __cdecl undraw_shotgun(__int32 weapon)
+void __cdecl undraw_shotgun(int weapon)
 {
 	ITEM_INFO* item = &Items[Lara.weaponItem];
 	item->goalAnimState = 3;
@@ -1491,14 +1491,14 @@ void __cdecl undraw_shotgun(__int32 weapon)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
 }
 
-void __cdecl undraw_shotgun_meshes(__int32 weapon)
+void __cdecl undraw_shotgun_meshes(int weapon)
 {
-	__int16 objectNumber = WeaponObject(weapon);
+	short objectNumber = WeaponObject(weapon);
 	Lara.backGun = objectNumber;
 	Lara.meshPtrs[10] = Meshes[Objects[0].meshIndex + 20];
 }
 
-void __cdecl draw_shotgun(__int32 weapon)
+void __cdecl draw_shotgun(int weapon)
 {
 	ITEM_INFO* item;
 
@@ -1547,7 +1547,7 @@ void __cdecl draw_shotgun(__int32 weapon)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
 }
 
-void __cdecl draw_shotgun_meshes(__int32 weaponType)
+void __cdecl draw_shotgun_meshes(int weaponType)
 {
 	Lara.backGun = 0;
 	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
@@ -1560,17 +1560,17 @@ void __cdecl CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed 
 	{
 		if (search)
 		{
-			__int32 numSpheres = GetSpheres(item2, SphereList, 1);
-			__int32 best = -1;
-			__int32 bestDistance = 0x7FFFFFFF;
+			int numSpheres = GetSpheres(item2, SphereList, 1);
+			int best = -1;
+			int bestDistance = 0x7FFFFFFF;
 
-			for (__int32 i = 0; i < numSpheres; i++)
+			for (int i = 0; i < numSpheres; i++)
 			{
 				SPHERE* sphere = &SphereList[i];
 
-				__int32 dx = sphere->x - item1->pos.xPos;
-				__int32 dy = sphere->y - item1->pos.yPos;
-				__int32 dz = sphere->z - item1->pos.zPos;
+				int dx = sphere->x - item1->pos.xPos;
+				int dy = sphere->y - item1->pos.yPos;
+				int dz = sphere->z - item1->pos.zPos;
 
 				if (SQUARE(dx) + SQUARE(dy) + SQUARE(dz) - SQUARE(sphere->r) < bestDistance)
 				{
@@ -1613,7 +1613,7 @@ void __cdecl CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed 
 		{
 			if (v4->flags & 0x3E00 && (item2->flags & 0x3E00) != 15872)
 			{
-				__int16 roomNumber = item2->roomNumber;
+				short roomNumber = item2->roomNumber;
 				FLOOR_INFO* floor = GetFloor(item2->pos.xPos, item2->pos.yPos - 256, item2->pos.zPos, &roomNumber);
 				GetFloorHeight(floor, item2->pos.xPos, item2->pos.yPos - 256, item2->pos.zPos);
 				TestTriggers(TriggerIndex, 1, item2->flags & 0x3E00);
@@ -1647,7 +1647,7 @@ void __cdecl CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed 
 	}*/
 }
 
-void __cdecl FireHK(__int32 mode)
+void __cdecl FireHK(int mode)
 {
 	if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
 	{
@@ -1663,7 +1663,7 @@ void __cdecl FireHK(__int32 mode)
 		}
 	}
 
-	__int16 angles[2];
+	short angles[2];
 
 	angles[1] = Lara.leftArm.xRot;
 	angles[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
@@ -1696,7 +1696,7 @@ void __cdecl FireHK(__int32 mode)
 
 void __cdecl FireShotgun()
 {
-	__int16 angles[2];
+	short angles[2];
 	
 	angles[1] = Lara.leftArm.xRot;
 	angles[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
@@ -1707,11 +1707,11 @@ void __cdecl FireShotgun()
 		angles[1] = Lara.torsoXrot + Lara.leftArm.xRot;
 	}
 
-	__int16 loopAngles[2];
+	short loopAngles[2];
 	bool fired = false;
-	__int32 value = (g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
+	int value = (g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
 
-	for (__int32 i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
 		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
@@ -1747,7 +1747,7 @@ void __cdecl FireShotgun()
 
 		if (LaraItem->meshBits)
 		{
-			for (__int32 i = 0; i < 7; i++)
+			for (int i = 0; i < 7; i++)
 			{
 				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, 32);
 			}
@@ -1762,7 +1762,7 @@ void __cdecl FireShotgun()
 	}
 }
 
-void __cdecl ready_shotgun(__int32 weaponType)
+void __cdecl ready_shotgun(int weaponType)
 {
 	Lara.gunStatus = LG_READY;
 	Lara.leftArm.zRot = 0;

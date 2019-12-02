@@ -68,13 +68,13 @@ void GameScript::AddTrigger(LuaFunction* function)
 
 void GameScript::AddLuaId(int luaId, int itemId)
 {
-	m_itemsMap.insert(pair<__int32, __int32>(luaId, itemId));
+	m_itemsMap.insert(pair<int, int>(luaId, itemId));
 }
 
 void GameScript::FreeLevelScripts()
 {
 	// Delete all triggers
-	for (__int32 i = 0; i < m_triggers.size(); i++)
+	for (int i = 0; i < m_triggers.size(); i++)
 	{
 		LuaFunction* trigger = m_triggers[i];
 		char* name = (char*)trigger->Name.c_str();
@@ -111,7 +111,7 @@ bool GameScript::ExecuteScript(char* luaFilename)
 	return true;
 }
 
-bool GameScript::ExecuteTrigger(__int16 index)
+bool GameScript::ExecuteTrigger(short index)
 {
 	// Is this a valid trigger?
 	if (index >= m_triggers.size())
@@ -145,12 +145,12 @@ bool GameScript::ExecuteTrigger(__int16 index)
 	return result;
 }
 
-void GameScript::EnableItem(__int16 id)
+void GameScript::EnableItem(short id)
 {
 	if (m_itemsMap.find(id) == m_itemsMap.end())
 		return;
 
-	__int16 itemNum = m_itemsMap[id];
+	short itemNum = m_itemsMap[id];
 
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -184,12 +184,12 @@ void GameScript::EnableItem(__int16 id)
 	}
 }
 
-void GameScript::DisableItem(__int16 id)
+void GameScript::DisableItem(short id)
 {
 	if (m_itemsMap.find(id) == m_itemsMap.end())
 		return;
 
-	__int16 itemNum = m_itemsMap[id];
+	short itemNum = m_itemsMap[id];
 
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -214,31 +214,31 @@ void GameScript::DisableItem(__int16 id)
 	}
 }
 
-void GameScript::PlayAudioTrack(__int16 track)
+void GameScript::PlayAudioTrack(short track)
 {
 	S_CDPlay(track, SOUND_TRACK_ONESHOT);
 }
 
-void GameScript::ChangeAmbientSoundTrack(__int16 track)
+void GameScript::ChangeAmbientSoundTrack(short track)
 {
 	CurrentAtmosphere = track;
 	S_CDStop();
 	S_CDPlay(track, SOUND_TRACK_BGM);
 }
 
-void GameScript::JumpToLevel(__int32 levelNum)
+void GameScript::JumpToLevel(int levelNum)
 {
 	if (levelNum >= g_GameFlow->GetNumLevels())
 		return;
 	LevelComplete = levelNum;
 }
 
-__int32 GameScript::GetSecretsCount()
+int GameScript::GetSecretsCount()
 {
 	return Savegame.Level.Secrets;
 }
 
-void GameScript::SetSecretsCount(__int32 secretsNum)
+void GameScript::SetSecretsCount(int secretsNum)
 {
 	if (secretsNum > 255)
 		return;
@@ -253,12 +253,12 @@ void GameScript::AddOneSecret()
 	S_CDPlay(6, 0);
 }
 
-void GameScript::MakeItemInvisible(__int16 id)
+void GameScript::MakeItemInvisible(short id)
 {
 	if (m_itemsMap.find(id) == m_itemsMap.end())
 		return;
 
-	__int16 itemNum = m_itemsMap[id];
+	short itemNum = m_itemsMap[id];
 
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -281,16 +281,16 @@ void GameScript::MakeItemInvisible(__int16 id)
 	}
 }
 
-GameScriptItem GameScript::GetItem(__int16 id)
+GameScriptItem GameScript::GetItem(short id)
 {
 	if (m_itemsMap.find(id) == m_itemsMap.end())
 		throw "Item not found";
 
-	__int16 itemNum = m_itemsMap[id];
+	short itemNum = m_itemsMap[id];
 	return m_items[itemNum];
 }
 
-void GameScript::PlaySoundEffectAtPosition(__int16 id, __int32 x, __int32 y, __int32 z, __int32 flags)
+void GameScript::PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags)
 {
 	PHD_3DPOS pos;
 
@@ -304,17 +304,17 @@ void GameScript::PlaySoundEffectAtPosition(__int16 id, __int32 x, __int32 y, __i
 	SoundEffect(id, &pos, flags);
 }
 
-void GameScript::PlaySoundEffect(__int16 id, __int32 flags)
+void GameScript::PlaySoundEffect(short id, int flags)
 {
 	SoundEffect(id, NULL, flags);
 }
 
 void GameScript::AssignItemsAndLara()
 {
-	for (__int32 i = 0; i < NUM_ITEMS; i++)
+	for (int i = 0; i < NUM_ITEMS; i++)
 		m_items[i].NativeItem = NULL;
 
-	for (__int32 i = 0; i < NumItems; i++)
+	for (int i = 0; i < NumItems; i++)
 		m_items[i].NativeItem = &Items[i];
 
 	(*m_lua)["Lara"] = m_items[Lara.itemNumber];
@@ -325,7 +325,7 @@ void GameScript::ResetVariables()
 	(*m_lua)["Lara"] = NULL;
 }
 
-void GameScript::SetItem(__int32 index, ITEM_INFO* item)
+void GameScript::SetItem(int index, ITEM_INFO* item)
 {
 	if (index >= NUM_ITEMS)
 		return;
@@ -344,10 +344,10 @@ void GameScript::GetVariables(vector<LuaVariable>* list)
 			variable.Type = LUA_VARIABLE_TYPE_BOOL;
 			variable.BoolValue = value.as<bool>();
 		}
-		else if (value.is<__int32>())
+		else if (value.is<int>())
 		{
 			variable.Type = LUA_VARIABLE_TYPE_INT;
-			variable.IntValue = value.as<__int32>();
+			variable.IntValue = value.as<int>();
 		}
 		else if (value.is<float>())
 		{
@@ -371,10 +371,10 @@ void GameScript::GetVariables(vector<LuaVariable>* list)
 			variable.Type = LUA_VARIABLE_TYPE_BOOL;
 			variable.BoolValue = value.as<bool>();
 		}
-		else if (value.is<__int32>())
+		else if (value.is<int>())
 		{
 			variable.Type = LUA_VARIABLE_TYPE_INT;
-			variable.IntValue = value.as<__int32>();
+			variable.IntValue = value.as<int>();
 		}
 		else if (value.is<float>())
 		{
@@ -393,7 +393,7 @@ void GameScript::GetVariables(vector<LuaVariable>* list)
 
 void GameScript::SetVariables(vector<LuaVariable>* list)
 {
-	for (__int32 i = 0; i < list->size(); i++)
+	for (int i = 0; i < list->size(); i++)
 	{
 		LuaVariable variable = (*list)[i];
 		if (variable.IsGlobal)

@@ -8,7 +8,7 @@
 #include <process.h>
 #include <crtdbg.h>
 #include <stdio.h>
-#include <sol.hpp>
+#include "sol.hpp"
 
 #include "..\Game\draw.h"
 #include "..\Game\sound.h"
@@ -27,12 +27,12 @@ HACCEL hAccTable;
 byte receivedWmClose = false;
 bool Debug = false;
 
-extern __int32 IsLevelLoading;
+extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 
-__int32 __cdecl WinProcMsg()
+int __cdecl WinProcMsg()
 {
 	int result;
 	struct tagMSG Msg;
@@ -52,7 +52,7 @@ __int32 __cdecl WinProcMsg()
 	return result;
 }
 
-void __stdcall HandleWmCommand(unsigned __int16 wParam)
+void __stdcall HandleWmCommand(unsigned short wParam)
 {
 	if (wParam == 8)
 	{
@@ -94,7 +94,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (msg == WM_COMMAND)
 		{
 			DB_Log(6, "WM_COMMAND");
-			HandleWmCommand((unsigned __int16)wParam);
+			HandleWmCommand((unsigned short)wParam);
 		}
 
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
@@ -126,9 +126,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (App_Unk00D9AC2B)
 		return 0;
 
-	if ((__int16)wParam)
+	if ((short)wParam)
 	{
-		if ((signed __int32)(unsigned __int16)wParam > 0 && (signed __int32)(unsigned __int16)wParam <= 2)
+		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
 			DB_Log(6, "WM_ACTIVE");
 
@@ -158,7 +158,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-__int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, __int32 nShowCmd)
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	int RetVal;
 	int n;
@@ -167,10 +167,10 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	bool setup = false;
 	
 	LPWSTR* argv;
-	__int32 argc;
+	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 
-	for (__int32 i = 1; i < argc; i++)
+	for (int i = 1; i < argc; i++)
 	{
 		if (wcscmp(argv[i], L"/setup") == 0)
 			setup = true;
@@ -314,7 +314,7 @@ __int32 __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lp
 	return 0;
 }
 
-__int32 __cdecl WinClose()
+int __cdecl WinClose()
 {
 	DB_Log(2, "WinClose - DLL");
 
