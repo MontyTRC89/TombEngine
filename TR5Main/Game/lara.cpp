@@ -4923,7 +4923,7 @@ void __cdecl lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)//147C4, 148CC (F)
 	}
 	else if (!TestLaraSlide(item, coll))
 	{
-		Lara.keepDucked = coll->midCeiling < -362;
+		Lara.keepDucked = coll->midCeiling >= -362;
 
 		ShiftItem(item, coll);
 
@@ -4979,7 +4979,8 @@ void __cdecl lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 		&& !(Rooms[roomNum].flags & ENV_FLAG_WATER))
 	{
 
-		if ((item->animNumber == ANIMATION_LARA_CROUCH_IDLE || item->animNumber == ANIMATION_LARA_CROUCH_PREPARE)
+		if ((item->animNumber == ANIMATION_LARA_CROUCH_IDLE 
+			|| item->animNumber == ANIMATION_LARA_CROUCH_PREPARE)
 			&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)
 			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
 		{
