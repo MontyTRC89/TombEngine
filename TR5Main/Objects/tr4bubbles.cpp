@@ -13,7 +13,7 @@
 #include "..\Game\debris.h"
 #include "../Game/traps.h"
 
-void __cdecl BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
+void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
@@ -68,7 +68,7 @@ void __cdecl BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 	}
 }
 
-void __cdecl BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
+void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
@@ -115,7 +115,7 @@ void __cdecl BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 	}
 }
 
-void __cdecl BubblesEffect3(short fxNum, short xVel, short yVel, short zVel)
+void BubblesEffect3(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
@@ -167,7 +167,7 @@ void __cdecl BubblesEffect3(short fxNum, short xVel, short yVel, short zVel)
 	}
 }
 
-void __cdecl BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
+void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
@@ -227,7 +227,7 @@ void __cdecl BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 	}
 }
 
-int __cdecl BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
+int BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 {
 	ShatterItem.yRot = fx->pos.yRot;
 	ShatterItem.meshp = Meshes[fx->frameNumber];
@@ -241,7 +241,7 @@ int __cdecl BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 	return 1;
 }
 
-void __cdecl BubblesControl(short fxNum)
+void BubblesControl(short fxNum)
 {
 	FX_INFO* fx = &Effects[fxNum];
 

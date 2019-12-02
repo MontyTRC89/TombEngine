@@ -15,7 +15,7 @@ BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
 BITE_INFO silencerGun = { 3, 331, 56, 10 };
 
-void __cdecl ClampRotation(PHD_3DPOS *pos, short angle, short rot)
+void ClampRotation(PHD_3DPOS *pos, short angle, short rot)
 {
 	if (angle <= rot)
 	{
@@ -34,7 +34,7 @@ void __cdecl ClampRotation(PHD_3DPOS *pos, short angle, short rot)
 	}
 }
 
-void __cdecl InitialiseBaddy(short itemNum)
+void InitialiseBaddy(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -133,7 +133,7 @@ void __cdecl InitialiseBaddy(short itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void __cdecl BaddyControl(short itemNum)
+void BaddyControl(short itemNum)
 {
 
 	if (!CreatureActive(itemNum))
@@ -1120,7 +1120,7 @@ void __cdecl BaddyControl(short itemNum)
 	return;
 }
 
-void __cdecl SilencerControl(short itemNum)
+void SilencerControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

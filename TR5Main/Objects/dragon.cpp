@@ -80,7 +80,7 @@ void createBartoliLight(short ItemIndex, int type)
 	*/
 }
 
-short __cdecl dragonFire(int x, int y, int z, short speed, short yrot, short room_number)
+short dragonFire(int x, int y, int z, short speed, short yrot, short room_number)
 {
 	short fx_number = NO_ITEM;
 	/*
@@ -107,7 +107,7 @@ short __cdecl dragonFire(int x, int y, int z, short speed, short yrot, short roo
 	return fx_number;
 }
 
-void __cdecl createExplosion(ITEM_INFO* item)
+void createExplosion(ITEM_INFO* item)
 {
 	ITEM_INFO* itemExplo;
 	short ExplIndex;
@@ -180,7 +180,7 @@ void createDragonBone(short front_number)
 	}
 }
 
-void __cdecl DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 	int c, s, rx, rz, shift, side_shift, angle;
@@ -277,7 +277,7 @@ void __cdecl DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll
 	ItemPushLara(item, laraitem, coll, 1, 0);
 }
 
-void __cdecl DragonControl(short backNum)
+void DragonControl(short backNum)
 {
 	ITEM_INFO* item, *back;
 	CREATURE_INFO* dragon;
@@ -501,7 +501,7 @@ void __cdecl DragonControl(short backNum)
 		ItemNewRoom(backNum, item->roomNumber);
 }
 
-void __cdecl InitialiseBartoli(short itemNum)
+void InitialiseBartoli(short itemNum)
 {
 	ITEM_INFO* item, *back, *front;
 	short back_item, front_item;
@@ -548,7 +548,7 @@ void __cdecl InitialiseBartoli(short itemNum)
 	}
 }
 
-void __cdecl BartoliControl(short itemNum)
+void BartoliControl(short itemNum)
 {
 	ITEM_INFO* item, *back, *front;
 	short front_item, back_item;

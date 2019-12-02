@@ -12,7 +12,7 @@
 #define CalculateCamera ((void (__cdecl*)()) 0x0040ED30)
 #define CameraCollisionBounds ((int (__cdecl*)(GAME_VECTOR*,int,int)) 0x0040F5C0)
 
-void __cdecl LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
-void __cdecl AlterFOV(int value);
+void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
+void AlterFOV(int value);
 
 void Inject_Camera();

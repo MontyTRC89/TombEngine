@@ -83,7 +83,7 @@ enum UPV_STATE {
 	SUBS_GETOFF
 };
 
-void __cdecl FireSubHarpoon(ITEM_INFO* v)
+void FireSubHarpoon(ITEM_INFO* v)
 {
 	short itemNum;
 
@@ -121,7 +121,7 @@ void __cdecl FireSubHarpoon(ITEM_INFO* v)
 
 		AddActiveItem(itemNum);
 
-		SoundEffect(SFX_UPV_HARPOON_SHOT_ID23, &LaraItem->pos, 2);
+		SoundEffect(SFX_TR3_UPV_HARPOON_SHOT_ID23, &LaraItem->pos, 2);
 
 		// if lara have ammo, reduce it.
 		if (g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
@@ -133,7 +133,7 @@ void __cdecl FireSubHarpoon(ITEM_INFO* v)
 }
 
 
-void __cdecl TriggerSubMist(long x, long y, long z, long speed, short angle)
+void TriggerSubMist(long x, long y, long z, long speed, short angle)
 {
 	long size, xv, zv;
 	SPARKS* sptr;
@@ -185,7 +185,7 @@ void __cdecl TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->dSize = size;
 }
 
-void __cdecl SubEffects(short item_number)
+void SubEffects(short item_number)
 {
 	ITEM_INFO* v;
 	SUB_INFO* sub;
@@ -266,7 +266,7 @@ void __cdecl SubEffects(short item_number)
 	*/
 }
 
-int __cdecl CanGetOff(ITEM_INFO* v)
+int CanGetOff(ITEM_INFO* v)
 {
 	FLOOR_INFO* floor;
 	short room_number;
@@ -296,7 +296,7 @@ int __cdecl CanGetOff(ITEM_INFO* v)
 	return 1;
 }
 
-int __cdecl GetOnSub(short item_number, COLL_INFO* coll)
+int GetOnSub(short item_number, COLL_INFO* coll)
 {
 	/* Returns 0 if no get on, 1 if right get on and 2 if left get on */
 	int dist;
@@ -332,7 +332,7 @@ int __cdecl GetOnSub(short item_number, COLL_INFO* coll)
 	return 1;
 }
 
-void __cdecl DoCurrent(ITEM_INFO* item)
+void DoCurrent(ITEM_INFO* item)
 {
 	PHD_VECTOR target;
 
@@ -398,7 +398,7 @@ void __cdecl DoCurrent(ITEM_INFO* item)
 	Lara.currentActive = 0;
 }
 
-void __cdecl BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
+void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 {
 	int height;
 	COLL_INFO cinfo, *coll = &cinfo;
@@ -469,7 +469,7 @@ void __cdecl BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	}
 }
 
-void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
+void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 {
 	short anim, frame;
 
@@ -759,7 +759,7 @@ void __cdecl UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		sub->RotX = -MAX_UPDOWN;
 }
 
-void __cdecl SubInitialise(short itemNum)
+void SubInitialise(short itemNum)
 {
 	ITEM_INFO* v;
 	SUB_INFO* sub;
@@ -772,7 +772,7 @@ void __cdecl SubInitialise(short itemNum)
 	sub->WeaponTimer = 0;
 }
 
-void __cdecl SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
 	ITEM_INFO* v;
@@ -835,7 +835,7 @@ void __cdecl SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-int __cdecl SubControl()
+int SubControl()
 {
 	int h;
 	SUB_INFO* sub;

@@ -12,7 +12,7 @@
 
 BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 
-void __cdecl InitialiseSkeleton(short itemNum)
+void InitialiseSkeleton(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[ID_SKELETON];
@@ -53,7 +53,7 @@ void __cdecl InitialiseSkeleton(short itemNum)
 	}
 }
 
-void __cdecl SkeletonControl(short itemNum)
+void SkeletonControl(short itemNum)
 {
 	bool someFlag1 = false;
 	bool someFlag2 = false;
@@ -722,7 +722,7 @@ void __cdecl SkeletonControl(short itemNum)
 	}
 }
 
-void __cdecl WakeUpSkeleton(ITEM_INFO* item)
+void WakeUpSkeleton(ITEM_INFO* item)
 {
 	short fxNum = CreateNewEffect(item->roomNumber);
 	if (fxNum != NO_ITEM)

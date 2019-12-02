@@ -11,7 +11,7 @@
 
 extern LaraExtraInfo g_LaraExtra;
 
-void __cdecl DropBaddyPickups(ITEM_INFO* item)
+void DropBaddyPickups(ITEM_INFO* item)
 {
 	ITEM_INFO* pickup = NULL;
 
@@ -31,7 +31,7 @@ void __cdecl DropBaddyPickups(ITEM_INFO* item)
 	}
 }
 
-int __cdecl MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short angdif, int angadd)
+int MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short angdif, int angadd)
 {
 	int x = destpos->xPos - srcpos->xPos;
 	int y = destpos->yPos - srcpos->yPos;
@@ -69,7 +69,7 @@ int __cdecl MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocit
 		&& srcpos->yRot == destpos->yRot;
 }
 
-void __cdecl CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd) 
+void CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd) 
 {
 	if (angadd < angle)
 	{
@@ -88,7 +88,7 @@ void __cdecl CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd)
 	return;
 }
 
-short __cdecl SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem) 
+short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem) 
 {
 	ITEM_INFO* item = &Items[creature->itemNum];
 
@@ -103,7 +103,7 @@ short __cdecl SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 	return (zone[item->boxNumber] == zone[targetItem->boxNumber]);
 }
 
-short __cdecl AIGuard(CREATURE_INFO* creature) 
+short AIGuard(CREATURE_INFO* creature) 
 {
 	int random;
 
@@ -137,7 +137,7 @@ short __cdecl AIGuard(CREATURE_INFO* creature)
 	return -0x4000;
 }
 
-void __cdecl AlertNearbyGuards(ITEM_INFO* item) 
+void AlertNearbyGuards(ITEM_INFO* item) 
 {
 	for (int i = 0; i < NUM_SLOTS; i++)
 	{
@@ -164,7 +164,7 @@ void __cdecl AlertNearbyGuards(ITEM_INFO* item)
 	}
 }
 
-void __cdecl AlertAllGuards(short itemNumber) 
+void AlertAllGuards(short itemNumber) 
 {
 	short objNumber = Items[itemNumber].objectNumber;
 
@@ -185,7 +185,7 @@ void __cdecl AlertAllGuards(short itemNumber)
 	}
 }
 
-void __cdecl CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillState)
+void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillState)
 {
 	item->animNumber = Objects[item->objectNumber].animIndex + killAnim;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -233,7 +233,7 @@ void __cdecl CreatureKill(ITEM_INFO* item, int killAnim, int killState, short la
 	*/
 }
 
-short __cdecl CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, short (*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
+short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, short (*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
 {
 	PHD_VECTOR pos;
 
@@ -246,7 +246,7 @@ short __cdecl CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, sh
 	return generate(pos.x, pos.y, pos.z, damage, angle, item->roomNumber);
 }
 
-short __cdecl CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, short(*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
+short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, short(*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
 {
 	PHD_VECTOR pos;
 
@@ -259,7 +259,7 @@ short __cdecl CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, short(*generate)(
 	return generate(pos.x, pos.y, pos.z, item->speed, item->pos.yRot, item->roomNumber);
 }
 
-void __cdecl CreatureUnderwater(ITEM_INFO* item, int depth)
+void CreatureUnderwater(ITEM_INFO* item, int depth)
 {
 	int waterLevel;
 	if (depth < 0)
@@ -297,7 +297,7 @@ void __cdecl CreatureUnderwater(ITEM_INFO* item, int depth)
 	}
 }
 
-void __cdecl CreatureFloat(short itemNumber) 
+void CreatureFloat(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	item->hitPoints = -16384;
@@ -336,7 +336,7 @@ void __cdecl CreatureFloat(short itemNumber)
 	}
 }
 
-void __cdecl CreatureJoint(ITEM_INFO* item, short joint, short required) 
+void CreatureJoint(ITEM_INFO* item, short joint, short required) 
 {
 	if (item->data == NULL)
 		return;
@@ -357,7 +357,7 @@ void __cdecl CreatureJoint(ITEM_INFO* item, short joint, short required)
 		creature->jointRotation[joint] = -12288;
 }
 
-void __cdecl CreatureTilt(ITEM_INFO* item, short angle) 
+void CreatureTilt(ITEM_INFO* item, short angle) 
 {
 	angle = (angle << 2) - item->pos.zRot;
 
@@ -376,7 +376,7 @@ void __cdecl CreatureTilt(ITEM_INFO* item, short angle)
 }
 
 // TODO: probably wrong value somewhere, since the xRot is modified.
-short __cdecl _CreatureTurn(ITEM_INFO* item, short maximumTurn)
+short _CreatureTurn(ITEM_INFO* item, short maximumTurn)
 {
 	if (item->data == NULL || maximumTurn == 0)
 		return 0;
@@ -462,7 +462,7 @@ short __cdecl _CreatureTurn(ITEM_INFO* item, short maximumTurn)
 	return angle;
 }
 
-int __cdecl CreatureAnimation(short itemNumber, short angle, short tilt)
+int CreatureAnimation(short itemNumber, short angle, short tilt)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->data == NULL)
@@ -779,7 +779,7 @@ int __cdecl CreatureAnimation(short itemNumber, short angle, short tilt)
 	return 1;
 }
 
-void __cdecl CreatureDie(short itemNumber, int explode)
+void CreatureDie(short itemNumber, int explode)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	item->hitPoints = -16384;
@@ -804,7 +804,7 @@ void __cdecl CreatureDie(short itemNumber, int explode)
 	DropBaddyPickups(item);
 }
 
-int __cdecl BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT)
+int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	
@@ -834,7 +834,7 @@ int __cdecl BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short r
 	return 0;
 }
 
-int __cdecl CreatureCreature(short itemNumber)  
+int CreatureCreature(short itemNumber)  
 {
 	int x = Items[itemNumber].pos.xPos;
 	int z = Items[itemNumber].pos.zPos;
@@ -867,7 +867,7 @@ int __cdecl CreatureCreature(short itemNumber)
 	return NO_TARGET;
 }*/
 
-int __cdecl ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber) 
+int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber) 
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short* zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
@@ -887,7 +887,7 @@ int __cdecl ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	return 0;
 }
 
-int __cdecl EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
+int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
 {
 	BOX_INFO* box = &Boxes[boxNumber];
 	int x = ((box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
@@ -903,7 +903,7 @@ int __cdecl EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber)
 	return 1;
 }
 
-void __cdecl TargetBox(LOT_INFO* LOT, short boxNumber) 
+void TargetBox(LOT_INFO* LOT, short boxNumber) 
 {
 	boxNumber &= 0x7FF;
 	BOX_INFO* box = &Boxes[boxNumber];
@@ -921,7 +921,7 @@ void __cdecl TargetBox(LOT_INFO* LOT, short boxNumber)
 	return;
 }
 
-int __cdecl UpdateLOT(LOT_INFO* LOT, int depth)
+int UpdateLOT(LOT_INFO* LOT, int depth)
 {
 	BOX_NODE* node;
 
@@ -947,7 +947,7 @@ int __cdecl UpdateLOT(LOT_INFO* LOT, int depth)
 	return SearchLOT(LOT, depth);
 }
 
-int __cdecl SearchLOT(LOT_INFO* LOT, int depth)
+int SearchLOT(LOT_INFO* LOT, int depth)
 {
 	short* zone = GroundZones[FlipStatus + 2 * LOT->zone];
 	short searchZone = zone[LOT->head];
@@ -1023,7 +1023,7 @@ int __cdecl SearchLOT(LOT_INFO* LOT, int depth)
 	return true;
 }
 
-int __cdecl CreatureActive(short itemNumber) 
+int CreatureActive(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1037,7 +1037,7 @@ int __cdecl CreatureActive(short itemNumber)
 	return true;
 }
 
-void __cdecl InitialiseCreature(short itemNumber) 
+void InitialiseCreature(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	ROOM_INFO* room = &Rooms[item->roomNumber];
@@ -1049,7 +1049,7 @@ void __cdecl InitialiseCreature(short itemNumber)
 	item->itemFlags[2] = item->roomNumber | (item->pos.yPos - room->minfloor);
 }
 
-int __cdecl StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
+int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
 {
 	if (enemy == NULL)
 		return 0;
@@ -1149,7 +1149,7 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 	return vault;
 }
 
-void __cdecl GetAITarget(CREATURE_INFO* creature)
+void GetAITarget(CREATURE_INFO* creature)
 {
 	ITEM_INFO* enemy = creature->enemy;
 	short enemyObjectNumber;
@@ -1241,7 +1241,7 @@ void __cdecl GetAITarget(CREATURE_INFO* creature)
 	}
 }
 
-void __cdecl FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
+void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 {
 	ITEM_INFO* item = &Items[creature->itemNum];
 
@@ -1296,7 +1296,7 @@ void __cdecl FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 	}
 }
 
-void __cdecl CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
+void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 {
 	if (item->data == NULL)
 		return;
@@ -1374,7 +1374,7 @@ void __cdecl CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= 512);
 }
 
-void __cdecl CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
+void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 {
 	int boxNumber;
 	short* bounds;
@@ -1477,7 +1477,7 @@ void __cdecl CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	}
 }
 
-void __cdecl GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
+void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	if (creature)
@@ -1580,7 +1580,7 @@ void __cdecl GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	}
 }
 
-TARGET_TYPE __cdecl CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
+TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 {
 	UpdateLOT(LOT, 5);
 
@@ -1802,7 +1802,7 @@ TARGET_TYPE __cdecl CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INF
 	return NO_TARGET;
 }
 
-long __cdecl mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, long push)
+long mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, long push)
 {
 	FLOOR_INFO* floor;
 	long x, y, z, h, c, cdiff, hdiff;

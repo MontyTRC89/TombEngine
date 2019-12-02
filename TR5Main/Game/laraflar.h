@@ -22,6 +22,6 @@ extern void DrawFlareInAir(ITEM_INFO* item);
 extern void DoFlareInHand(int flare_age);
 extern int DoFlareLight(PHD_VECTOR* pos, int flare_age);
 
-//void __cdecl DrawFlareMeshes();
+//void DrawFlareMeshes();
 
 void Inject_LaraFlar();

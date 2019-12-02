@@ -9,6 +9,6 @@
 #define InitGameMalloc ((void (__cdecl*)()) 0x004A7CB0)
 #define GameMallocReal ((char* (__cdecl*)(int)) 0x004A7D00)
 
-char* __cdecl GameMalloc(int size);
+char* GameMalloc(int size);
 
 void Inject_Malloc();

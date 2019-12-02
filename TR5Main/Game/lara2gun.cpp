@@ -15,7 +15,7 @@ PISTOL_DEF PistolsTable[4] =
 int UziLeft;
 int UziRight;
 
-void __cdecl AnimatePistols(int weaponType)
+void AnimatePistols(int weaponType)
 {
 	int soundPlayed = false;
 
@@ -222,7 +222,7 @@ void __cdecl AnimatePistols(int weaponType)
 	set_arm_info(&Lara.leftArm, frameLeft);
 }
 
-void __cdecl PistolHandler(int weaponType)
+void PistolHandler(int weaponType)
 {
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
@@ -292,7 +292,7 @@ void __cdecl PistolHandler(int weaponType)
 	}
 }
 
-void __cdecl undraw_pistol_mesh_right(int weaponType)
+void undraw_pistol_mesh_right(int weaponType)
 {
 	short objectNumber = WeaponObject(weaponType);
 	
@@ -314,7 +314,7 @@ void __cdecl undraw_pistol_mesh_right(int weaponType)
 
 }
 
-void __cdecl undraw_pistol_mesh_left(int weaponType)
+void undraw_pistol_mesh_left(int weaponType)
 {
 	int result; // eax
 
@@ -334,7 +334,7 @@ void __cdecl undraw_pistol_mesh_left(int weaponType)
 	}
 }
 
-void __cdecl draw_pistol_meshes(int weaponType)
+void draw_pistol_meshes(int weaponType)
 {
 	Lara.holster = 13;
 	Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
@@ -345,7 +345,7 @@ void __cdecl draw_pistol_meshes(int weaponType)
 	}
 }
 
-void __cdecl ready_pistols(int weaponType)
+void ready_pistols(int weaponType)
 {
 	Lara.gunStatus = LG_READY;
 	Lara.leftArm.zRot = 0;
@@ -363,7 +363,7 @@ void __cdecl ready_pistols(int weaponType)
 	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 }
 
-void __cdecl undraw_pistols(int weaponType)
+void undraw_pistols(int weaponType)
 {
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];
 
@@ -451,7 +451,7 @@ void __cdecl undraw_pistols(int weaponType)
 	}
 }
 
-void __cdecl set_arm_info(LARA_ARM* arm, int frame)
+void set_arm_info(LARA_ARM* arm, int frame)
 {
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];
 	short animBase = Objects[p->objectNum].animIndex;
@@ -469,7 +469,7 @@ void __cdecl set_arm_info(LARA_ARM* arm, int frame)
 	arm->frameBase = Anims[animBase].framePtr;
 }
 
-void __cdecl draw_pistols(int weaponType)
+void draw_pistols(int weaponType)
 {
 	short frame = Lara.leftArm.frameNumber + 1;
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];

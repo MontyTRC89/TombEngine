@@ -13,7 +13,7 @@
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
-void __cdecl FlameThrowerControl(short itemNumber)
+void FlameThrowerControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -323,7 +323,7 @@ void __cdecl FlameThrowerControl(short itemNumber)
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
-short __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
+short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 {
 	PHD_VECTOR pos1;
 	PHD_VECTOR pos2;
@@ -389,7 +389,7 @@ short __cdecl TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 	return effectNumber;
 }
 
-void __cdecl TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxnum)
+void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxnum)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -472,7 +472,7 @@ void __cdecl TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int z
 	spark->dSize = size >> 1;
 }
 
-void __cdecl TriggerPilotFlame(int itemnum)
+void TriggerPilotFlame(int itemnum)
 {
 	int dx = LaraItem->pos.xPos - Items[itemnum].pos.xPos;
 	int dz = LaraItem->pos.zPos - Items[itemnum].pos.zPos;

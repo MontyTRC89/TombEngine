@@ -16,14 +16,14 @@
 #define InitialiseSteelDoor ((void (__cdecl*)(short)) 0x0043F180)
 #define SteelDoorControl ((void (__cdecl*)(short)) 0x00486BE0)
 #define SteelDoorCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00487AD0)
-void __cdecl SequenceDoorControl(short itemNumber);
-void __cdecl UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl PushPullKickDoorControl(short itemNumber);
-void __cdecl DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void __cdecl DoorControl(short itemNumber);
-void __cdecl OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);
-void __cdecl ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);
+void SequenceDoorControl(short itemNumber);
+void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void PushPullKickDoorControl(short itemNumber);
+void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void DoorControl(short itemNumber);
+void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);
+void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);
 
 void Inject_Door();

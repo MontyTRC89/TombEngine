@@ -13,7 +13,7 @@
 
 BITE_INFO ArmedBaddy2Gun = { 0x0FFFFFFCE, 0xDC, 0x3C, 0x0D };
 
-void __cdecl InitialiseArmedBaddy2(short itemNum)
+void InitialiseArmedBaddy2(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -26,7 +26,7 @@ void __cdecl InitialiseArmedBaddy2(short itemNum)
 	*item->pad2 = 9216;
 }
 
-void __cdecl ArmedBaddy2Control(short itemNum)
+void ArmedBaddy2Control(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

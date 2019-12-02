@@ -15,12 +15,12 @@ short SarcophagusBounds[12] = {
 };
 PHD_VECTOR SarcophagusPosition = { 0x00000000, 0x00000000, 0xFFFFFED4 };
 
-void __cdecl InitialiseSarcophagus(short itemNum)
+void InitialiseSarcophagus(short itemNum)
 {
 
 }
 
-void __cdecl SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -88,12 +88,12 @@ void __cdecl SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl InitialiseLaraDouble(short itemNum)
+void InitialiseLaraDouble(short itemNum)
 {
 	ClearItem(itemNum);
 }
 
-void __cdecl LaraDoubleControl(short itemNum)
+void LaraDoubleControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

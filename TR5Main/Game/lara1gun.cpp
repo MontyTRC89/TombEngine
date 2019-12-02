@@ -24,7 +24,7 @@ extern GameFlow* g_GameFlow;
 
 int HKCounter = 0;
 
-void __cdecl FireHarpoon()
+void FireHarpoon()
 {
 	// If no ammo then exit
 	//if (g_LaraExtra.numHarpoonAmmos <= 0)
@@ -86,7 +86,7 @@ void __cdecl FireHarpoon()
 	}
 }
 
-void __cdecl ControlHarpoonBolt(short itemNumber)
+void ControlHarpoonBolt(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -239,7 +239,7 @@ void __cdecl ControlHarpoonBolt(short itemNumber)
 
 long	tbx, tby, tbz;
 
-void __cdecl FireGrenade()
+void FireGrenade()
 {
 	int x = 0;
 	int y = 0;
@@ -329,7 +329,7 @@ void __cdecl FireGrenade()
 	}
 }
 
-void __cdecl ControlGrenade(short itemNumber)
+void ControlGrenade(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -753,7 +753,7 @@ void __cdecl ControlGrenade(short itemNumber)
 	}
 }
 
-void __cdecl DrawShotgun(int weaponType)
+void DrawShotgun(int weaponType)
 {
 	ITEM_INFO* item;
 
@@ -809,7 +809,7 @@ void __cdecl DrawShotgun(int weaponType)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
 }
 
-void __cdecl AnimateShotgun(int weaponType)
+void AnimateShotgun(int weaponType)
 {
 	bool harpoonFired = false;
 
@@ -1042,7 +1042,7 @@ void __cdecl AnimateShotgun(int weaponType)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
 }
 
-void __cdecl ControlCrossbowBolt(short itemNumber)
+void ControlCrossbowBolt(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -1244,7 +1244,7 @@ void __cdecl ControlCrossbowBolt(short itemNumber)
 	return;
 }
 
-void __cdecl RifleHandler(int weaponType)
+void RifleHandler(int weaponType)
 {
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
@@ -1303,7 +1303,7 @@ void __cdecl RifleHandler(int weaponType)
 	}
 }
 
-void __cdecl FireCrossbow(PHD_3DPOS* pos)
+void FireCrossbow(PHD_3DPOS* pos)
 {
 	short* ammos = GetAmmo(WEAPON_CROSSBOW);
 	if (*ammos <= 0)
@@ -1387,7 +1387,7 @@ void __cdecl FireCrossbow(PHD_3DPOS* pos)
 	}
 }
 
-void __cdecl DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
+void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 {
 	if (!(dest->flags & 0x8000))
 	{
@@ -1422,7 +1422,7 @@ void __cdecl DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 	}
 }
 
-void __cdecl TriggerUnderwaterExplosion(ITEM_INFO* item)
+void TriggerUnderwaterExplosion(ITEM_INFO* item)
 {
 	TriggerExplosionBubbles(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
@@ -1458,7 +1458,7 @@ void __cdecl TriggerUnderwaterExplosion(ITEM_INFO* item)
 	}
 }
 
-void __cdecl undraw_shotgun(int weapon)
+void undraw_shotgun(int weapon)
 {
 	ITEM_INFO* item = &Items[Lara.weaponItem];
 	item->goalAnimState = 3;
@@ -1491,14 +1491,14 @@ void __cdecl undraw_shotgun(int weapon)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
 }
 
-void __cdecl undraw_shotgun_meshes(int weapon)
+void undraw_shotgun_meshes(int weapon)
 {
 	short objectNumber = WeaponObject(weapon);
 	Lara.backGun = objectNumber;
 	Lara.meshPtrs[10] = Meshes[Objects[0].meshIndex + 20];
 }
 
-void __cdecl draw_shotgun(int weapon)
+void draw_shotgun(int weapon)
 {
 	ITEM_INFO* item;
 
@@ -1547,13 +1547,13 @@ void __cdecl draw_shotgun(int weapon)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
 }
 
-void __cdecl draw_shotgun_meshes(int weaponType)
+void draw_shotgun_meshes(int weaponType)
 {
 	Lara.backGun = 0;
 	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
 }
 
-void __cdecl CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
+void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
 {
 	/*v4 = item2;
 	if (!(item2->flags & 0x40))
@@ -1647,7 +1647,7 @@ void __cdecl CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed 
 	}*/
 }
 
-void __cdecl FireHK(int mode)
+void FireHK(int mode)
 {
 	if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
 	{
@@ -1694,7 +1694,7 @@ void __cdecl FireHK(int mode)
 	}
 }
 
-void __cdecl FireShotgun()
+void FireShotgun()
 {
 	short angles[2];
 	
@@ -1762,7 +1762,7 @@ void __cdecl FireShotgun()
 	}
 }
 
-void __cdecl ready_shotgun(int weaponType)
+void ready_shotgun(int weaponType)
 {
 	Lara.gunStatus = LG_READY;
 	Lara.leftArm.zRot = 0;
@@ -1780,7 +1780,7 @@ void __cdecl ready_shotgun(int weaponType)
 	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 }
 
-void __cdecl Inject_Lara1Gun()
+void Inject_Lara1Gun()
 {
 	
 }

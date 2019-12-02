@@ -15,16 +15,16 @@
 
 extern WEAPON_INFO Weapons[NUM_WEAPONS];
 
-void __cdecl SmashItem(short itemNum);
-int __cdecl WeaponObject(int weaponType);
-void __cdecl LaraGun();
-short* __cdecl GetAmmo(int weaponType);
-void __cdecl InitialiseNewWeapon();
-int __cdecl WeaponObjectMesh(int weaponType);
-void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm);
-void __cdecl HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag);
-int __cdecl FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
-void __cdecl find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
-void __cdecl LaraTargetInfo(WEAPON_INFO* weapon);
+void SmashItem(short itemNum);
+int WeaponObject(int weaponType);
+void LaraGun();
+short* GetAmmo(int weaponType);
+void InitialiseNewWeapon();
+int WeaponObjectMesh(int weaponType);
+void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm);
+void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag);
+int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
+void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
+void LaraTargetInfo(WEAPON_INFO* weapon);
 
 void Inject_LaraFire();

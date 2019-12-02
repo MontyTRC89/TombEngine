@@ -103,7 +103,7 @@ short SwitchBounds[12] = // offset 0xA1694
 };
 PHD_VECTOR SwitchPos = { 0, 0, 0 }; // offset 0xA16AC
 
-void __cdecl ProcessExplodingSwitchType8(ITEM_INFO* item) 
+void ProcessExplodingSwitchType8(ITEM_INFO* item) 
 {
 	PHD_VECTOR pos;
 	pos.x = 0;
@@ -115,7 +115,7 @@ void __cdecl ProcessExplodingSwitchType8(ITEM_INFO* item)
 	item->meshBits |= 1 << ((Objects[item->objectNumber].nmeshes & 0xFF) - 2);
 }
 
-void __cdecl CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -173,7 +173,7 @@ void __cdecl CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* col
 	}
 }
 
-void __cdecl CrowDoveSwitchControl(short itemNumber) 
+void CrowDoveSwitchControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -196,7 +196,7 @@ void __cdecl CrowDoveSwitchControl(short itemNumber)
 	}
 }
 
-void __cdecl CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -267,7 +267,7 @@ void __cdecl CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl CogSwitchControl(short itemNum) 
+void CogSwitchControl(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -308,7 +308,7 @@ void __cdecl CogSwitchControl(short itemNum)
 	}
 }
 
-void __cdecl FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -361,7 +361,7 @@ void __cdecl FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* co
 	}
 }
 
-void __cdecl FullBlockSwitchControl(short itemNumber) 
+void FullBlockSwitchControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	
@@ -387,7 +387,7 @@ void __cdecl FullBlockSwitchControl(short itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	int doSwitch = 0;
 	ITEM_INFO* item = &Items[itemNum];
@@ -524,7 +524,7 @@ void __cdecl CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll
 	}
 }
 
-void __cdecl JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -561,7 +561,7 @@ void __cdecl JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	int flag = 0;
 	ITEM_INFO* item = &Items[itemNum];
@@ -657,7 +657,7 @@ void __cdecl RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	AnimateItem(item);
 }
 
-void __cdecl TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	int flag = 0;
@@ -784,7 +784,7 @@ void __cdecl TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl TurnSwitchControl(short itemNum) 
+void TurnSwitchControl(short itemNum) 
 {
 	ITEM_INFO* l = LaraItem;
 	ITEM_INFO* item = &Items[itemNum];
@@ -862,7 +862,7 @@ void __cdecl TurnSwitchControl(short itemNum)
 	}
 }
 
-void __cdecl PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -917,7 +917,7 @@ void __cdecl PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	int flag = 0;
@@ -989,7 +989,7 @@ void __cdecl UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c
 	}
 }
 
-void __cdecl SwitchCollision2(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void SwitchCollision2(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -1023,7 +1023,7 @@ void __cdecl SwitchCollision2(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (TrInput & IN_ACTION
@@ -1179,7 +1179,7 @@ void __cdecl SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		ObjectCollision(itemNum, l, coll);
 }
 
-void __cdecl SwitchControl(short itemNumber) 
+void SwitchControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->objectNumber != ID_AIRLOCK_SWITCH || item->triggerFlags < 8)
@@ -1247,13 +1247,13 @@ void __cdecl SwitchControl(short itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags) 
+void TestTriggersAtXYZ(int x, int y, int z, short roomNumber, int heavy, int flags) 
 {
 	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
 	TestTriggers(TriggerIndex, heavy, flags);
 }
 
-int __cdecl GetKeyTrigger(ITEM_INFO* item) 
+int GetKeyTrigger(ITEM_INFO* item) 
 {
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -1281,7 +1281,7 @@ int __cdecl GetKeyTrigger(ITEM_INFO* item)
 	return 0;
 }
 
-int __cdecl GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
+int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 {
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -1312,7 +1312,7 @@ int __cdecl GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwi
 	return 0;
 }
 
-int __cdecl SwitchTrigger(short itemNum, short timer) 
+int SwitchTrigger(short itemNum, short timer) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (item->status == ITEM_DEACTIVATED)
@@ -1355,7 +1355,7 @@ int __cdecl SwitchTrigger(short itemNum, short timer)
 	return 0;
 }
 
-void __cdecl InitialiseSwitch(short itemNumber)
+void InitialiseSwitch(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->triggerFlags >= 1000)
@@ -1365,7 +1365,7 @@ void __cdecl InitialiseSwitch(short itemNumber)
 	}
 }
 
-void __cdecl InitialisePulleySwitch(short itemNumber)
+void InitialisePulleySwitch(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	item->itemFlags[3] = item->triggerFlags;
@@ -1374,7 +1374,7 @@ void __cdecl InitialisePulleySwitch(short itemNumber)
 	//	item->itemFlags[1] = 1;
 }
 
-void __cdecl InitialiseCrowDoveSwitch(short itemNumber)
+void InitialiseCrowDoveSwitch(short itemNumber)
 {
 	Items[itemNumber].meshBits = 3;
 }

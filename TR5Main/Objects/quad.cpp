@@ -143,7 +143,7 @@ bool QuadNoGetOff;
 
 extern LaraExtraInfo g_LaraExtra;
 
-void __cdecl QuadbikeExplode(ITEM_INFO* item)
+void QuadbikeExplode(ITEM_INFO* item)
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 		TriggerUnderwaterExplosion(item);
@@ -164,7 +164,7 @@ void __cdecl QuadbikeExplode(ITEM_INFO* item)
 	g_LaraExtra.Vehicle = NO_ITEM;
 }
 
-int __cdecl CanQuadbikeGetOff(int direction)
+int CanQuadbikeGetOff(int direction)
 {
 	short angle;
 
@@ -197,7 +197,7 @@ int __cdecl CanQuadbikeGetOff(int direction)
 	return true;
 }
 
-int __cdecl QuadCheckGetOff()
+int QuadCheckGetOff()
 {
 	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
 
@@ -305,7 +305,7 @@ int GetOnQuadBike(short itemNumber, COLL_INFO* coll)
 	return true;
 }
 
-void __cdecl QuadBaddieCollision(ITEM_INFO* quad)
+void QuadBaddieCollision(ITEM_INFO* quad)
 {
 	vector<short> roomsList;
 
@@ -353,7 +353,7 @@ void __cdecl QuadBaddieCollision(ITEM_INFO* quad)
 	}
 }
 
-int __cdecl GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
+int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 {
 	p->x = item->pos.xPos - p->x;
 	p->z = item->pos.zPos - p->z;
@@ -384,7 +384,7 @@ int __cdecl GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 	return 0;
 }
 
-int __cdecl TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
+int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
 	pos->y = item->pos.yPos - (dz * SIN(item->pos.xRot) >> W2V_SHIFT) + (dx * SIN(item->pos.zRot) >> W2V_SHIFT);
 
@@ -403,7 +403,7 @@ int __cdecl TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-int __cdecl DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
+int DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x = pos->x >> WALL_SHIFT;
 	int z = pos->z >> WALL_SHIFT;
@@ -503,7 +503,7 @@ int __cdecl DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-int __cdecl DoQuadDynamics(int height, int fallspeed, int *y)
+int DoQuadDynamics(int height, int fallspeed, int *y)
 {
 	if (height > *y)
 	{
@@ -532,7 +532,7 @@ int __cdecl DoQuadDynamics(int height, int fallspeed, int *y)
 	return fallspeed;
 }
 
-int __cdecl QuadDynamics(ITEM_INFO* item)
+int QuadDynamics(ITEM_INFO* item)
 {
 	/* Does all skidoo movement and collision and returns if collide value */
 	PHD_VECTOR moved, fl, fr, br, bl, mtl, mbl, mtr, mbr, mml, mmr;
@@ -761,7 +761,7 @@ int __cdecl QuadDynamics(ITEM_INFO* item)
 	return collide;
 }
 
-void __cdecl AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
+void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 {
 	QUAD_INFO* quad = (QUAD_INFO *)item->data;
 
@@ -937,7 +937,7 @@ void __cdecl AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 	}
 }
 
-int __cdecl QuadUserControl(ITEM_INFO* item, int height, int* pitch)
+int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 {
 	bool drive = false;
 	int revs = 0;
@@ -1126,7 +1126,7 @@ int __cdecl QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 	return drive;
 }
 
-void __cdecl InitialiseQuadBike(short itemNumber)
+void InitialiseQuadBike(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	
@@ -1144,7 +1144,7 @@ void __cdecl InitialiseQuadBike(short itemNumber)
 	quad->flags = 0;
 }
 
-void __cdecl QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
 
@@ -1205,7 +1205,7 @@ void __cdecl QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		ObjectCollision(itemNumber, l, coll);
 }
 
-void __cdecl TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
+void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -1265,7 +1265,7 @@ void __cdecl TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed
 	spark->size = size >> 1;
 }
 
-int __cdecl QuadBikeControl()
+int QuadBikeControl()
 {
 	short xRot, zRot, rotadd;
 	int pitch, dead = 0;

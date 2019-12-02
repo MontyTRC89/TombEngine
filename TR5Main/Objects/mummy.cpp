@@ -12,7 +12,7 @@
 BITE_INFO mummyBite1 = { 0, 0, 0, 11 };
 BITE_INFO mummyBite2 = { 0, 0, 0, 14 };
 
-void __cdecl InitialiseMummy(short itemNum)
+void InitialiseMummy(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -35,7 +35,7 @@ void __cdecl InitialiseMummy(short itemNum)
 	}
 }
 
-void __cdecl MummyControl(short itemNum)
+void MummyControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

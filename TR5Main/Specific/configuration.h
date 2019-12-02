@@ -79,14 +79,14 @@ typedef struct GameConfiguration {
 	int JoyWalk;
 };
 
-void __cdecl LoadResolutionsInCombobox(HWND handle, int index);
-void __cdecl LoadAdaptersInCombobox(HWND handle);
-void __cdecl LoadSoundDevicesInCombobox(HWND handle);
+void LoadResolutionsInCombobox(HWND handle, int index);
+void LoadAdaptersInCombobox(HWND handle);
+void LoadSoundDevicesInCombobox(HWND handle);
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
-int __cdecl SetupDialog();
-void __cdecl InitDefaultConfiguration();
-bool __cdecl LoadConfiguration();
-bool __cdecl SaveConfiguration();
+int SetupDialog();
+void InitDefaultConfiguration();
+bool LoadConfiguration();
+bool SaveConfiguration();
 LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD* nValue, DWORD nDefaultValue);
 LONG GetBoolRegKey(HKEY hKey, char* strValueName, bool* bValue, bool bDefaultValue);
 LONG GetStringRegKey(HKEY hKey, char* strValueName, char** strValue, char* strDefaultValue);

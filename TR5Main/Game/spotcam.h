@@ -26,8 +26,8 @@ enum spotcam_flags
 #define TriggerTitleSpotcam ((void (__cdecl*)(int)) 0x004284A0)
 #define Spline ((int (__cdecl*)(int, int*, int)) 0x0047A890)
 
-void __cdecl InitSpotCamSequences();
-void __cdecl InitialiseSpotCam(short sequence);
-//void __cdecl CalculateSpotCameras();
+void InitSpotCamSequences();
+void InitialiseSpotCam(short sequence);
+//void CalculateSpotCameras();
 
-void __cdecl Inject_Spotcam();
+void Inject_Spotcam();

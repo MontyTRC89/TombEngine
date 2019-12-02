@@ -153,8 +153,8 @@ extern char* g_KeyNames[];
 #define S_UpdateInput ((int (__cdecl*)()) 0x004A92D0)
 #define CheckKeyConflicts ((int (__cdecl*)()) 0x004ADF40)
 
-void __cdecl InitialiseDirectInput(HWND handle, HINSTANCE instance);
-void __cdecl DI_ReadKeyboard(byte* keys);
-int __cdecl DD_SpinMessageLoopMaybe();
+void InitialiseDirectInput(HWND handle, HINSTANCE instance);
+void DI_ReadKeyboard(byte* keys);
+int DD_SpinMessageLoopMaybe();
 
 void Inject_Input();

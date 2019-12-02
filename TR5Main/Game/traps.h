@@ -57,4 +57,4 @@
 #define TeethSpikeControl ((void (__cdecl*)(short)) 0x0043FBC0)
 #define DrawScaledSpike ((void (__cdecl*)(ITEM_INFO*)) 0x0043FBC0)
 
-void __cdecl LaraBurn();
+void LaraBurn();

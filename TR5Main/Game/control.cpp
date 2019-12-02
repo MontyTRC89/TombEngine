@@ -38,7 +38,7 @@ extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern Inventory* g_Inventory;
 
-GAME_STATUS __cdecl ControlPhase(int numFrames, int demoMode)
+GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -425,7 +425,7 @@ unsigned __stdcall GameMain(void*)
 	return 1;   
 }   
 
-GAME_STATUS __cdecl DoTitle(int index)
+GAME_STATUS DoTitle(int index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
@@ -502,7 +502,7 @@ GAME_STATUS __cdecl DoTitle(int index)
 	return GAME_STATUS_NEW_GAME;
 }
 
-GAME_STATUS __cdecl DoLevel(int index, int ambient, bool loadFromSavegame)
+GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 {
 	CreditsDone = false;
 	CanLoad = false;
@@ -595,7 +595,7 @@ GAME_STATUS __cdecl DoLevel(int index, int ambient, bool loadFromSavegame)
 	}
 }
 
-void __cdecl TestTriggers(short* data, int heavy, int HeavyFlags)
+void TestTriggers(short* data, int heavy, int HeavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -1093,7 +1093,7 @@ void __cdecl TestTriggers(short* data, int heavy, int HeavyFlags)
 	}
 }
 
-void __cdecl UpdateSky()
+void UpdateSky()
 {
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1126,17 +1126,17 @@ void __cdecl UpdateSky()
 	}
 }
 
-void __cdecl ActivateKey()
+void ActivateKey()
 {
 	KeyTriggerActive = 1;
 }
 
-void __cdecl ActivateCamera()
+void ActivateCamera()
 {
 	KeyTriggerActive = 2;
 }
 
-short __cdecl GetDoor(FLOOR_INFO* floor)
+short GetDoor(FLOOR_INFO* floor)
 {
 	if (!floor->index)
 		return NO_ROOM;

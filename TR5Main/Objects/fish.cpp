@@ -72,7 +72,7 @@ uchar	rapids_fish_ranges[2][3] = {
 								{	1 << 2,2 << 2,5	},
 };*/
 
-void __cdecl SetupShoal(int shoalNumber)
+void SetupShoal(int shoalNumber)
 {
 	//if (CurrentLevel == LV_JUNGLE)
 	//{
@@ -125,7 +125,7 @@ void __cdecl SetupShoal(int shoalNumber)
 }
 
 
-void __cdecl SetupFish(int leader, ITEM_INFO* item)
+void SetupFish(int leader, ITEM_INFO* item)
 {
 	int fishXRange = LeaderInfo[leader].xRange;
 	int fishYRange = LeaderInfo[leader].yRange;

@@ -13,7 +13,7 @@
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
-void __cdecl InitialiseTroops(short itemNum)
+void InitialiseTroops(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -33,7 +33,7 @@ void __cdecl InitialiseTroops(short itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void __cdecl TroopsControl(short itemNum)
+void TroopsControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	

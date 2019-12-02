@@ -6,7 +6,7 @@ BITE_INFO monk_hit = { -23,16,265, 14 };
 
 extern bool MonksAttackLara;
 
-void __cdecl MonkControl(short itemNum)
+void MonkControl(short itemNum)
 {
 	ITEM_INFO* item, * enemy;
 	CREATURE_INFO* monk;
@@ -208,7 +208,7 @@ void __cdecl MonkControl(short itemNum)
 					LaraItem->hitStatus = true;
 
 					monk->flags |= 0x1000;
-					SoundEffect(SFX_MONK_HIT_TARGET_ID245, &item->pos, 0);
+					SoundEffect(SFX_TR2_MONK_HIT_TARGET_ID245, &item->pos, 0);
 					CreatureEffect(item, &monk_hit, DoBloodSplat);
 				}
 			}
@@ -224,7 +224,7 @@ void __cdecl MonkControl(short itemNum)
 						enemy->hitStatus = true;
 
 						monk->flags |= 0x1000;
-						SoundEffect(SFX_MONK_HIT_TARGET_ID245, &item->pos, 0);
+						SoundEffect(SFX_TR2_MONK_HIT_TARGET_ID245, &item->pos, 0);
 					}
 				}
 			}

@@ -19,7 +19,7 @@ BITE_INFO horsemanBite1 = { 0, 0, 0, 0x06 };
 BITE_INFO horsemanBite2 = { 0, 0, 0, 0x0E };
 BITE_INFO horsemanBite3 = { 0, 0, 0, 0x0A };
 
-void __cdecl InitialiseHorse(short itemNum)
+void InitialiseHorse(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[ID_HORSE];
@@ -30,7 +30,7 @@ void __cdecl InitialiseHorse(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl InitialiseHorseman(short itemNum)
+void InitialiseHorseman(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[ID_HORSEMAN];
@@ -44,7 +44,7 @@ void __cdecl InitialiseHorseman(short itemNum)
 	item->itemFlags[0] = NO_ITEM; // No horse yet
 }
 
-void __cdecl HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
+void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
@@ -119,7 +119,7 @@ void __cdecl HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 	}
 }
 
-void __cdecl HorsemanControl(short itemNum)
+void HorsemanControl(short itemNum)
 {
 #ifdef OLD_CODE
 	if (!CreatureActive(itemNum))

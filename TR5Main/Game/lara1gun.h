@@ -31,24 +31,24 @@
 //#define CrossbowHitSwitchType78 ((void (__cdecl*)(ITEM_INFO*, ITEM_INFO*, int)) 0x0044E5E0)  
 //#define DoGrenadeDamageOnBaddie ((void (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x0044F690)  
 
-void __cdecl FireGrenade();
-void __cdecl ControlGrenade(short itemNumber);
-void __cdecl GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
-void __cdecl FireHarpoon();
-void __cdecl ControlHarpoonBolt(short itemNumber);
-void __cdecl DrawShotgun(int weaponType);
-void __cdecl AnimateShotgun(int weaponType);
-void __cdecl ControlCrossbowBolt(short itemNumber);
-void __cdecl FireCrossbow(PHD_3DPOS* pos);
-void __cdecl RifleHandler(int weaponType);
-void __cdecl DoGrenadeDamageOnBaddie(ITEM_INFO* src, ITEM_INFO* dest);
-void __cdecl TriggerUnderwaterExplosion(ITEM_INFO* item);
-void __cdecl undraw_shotgun_meshes(int weapon);
-void __cdecl undraw_shotgun(int weapon);
-void __cdecl draw_shotgun_meshes(int weaponType);
-void __cdecl FireHK(int mode);
-void __cdecl FireShotgun();
-void __cdecl CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search);
-void __cdecl ready_shotgun(int weaponType);
+void FireGrenade();
+void ControlGrenade(short itemNumber);
+void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
+void FireHarpoon();
+void ControlHarpoonBolt(short itemNumber);
+void DrawShotgun(int weaponType);
+void AnimateShotgun(int weaponType);
+void ControlCrossbowBolt(short itemNumber);
+void FireCrossbow(PHD_3DPOS* pos);
+void RifleHandler(int weaponType);
+void DoGrenadeDamageOnBaddie(ITEM_INFO* src, ITEM_INFO* dest);
+void TriggerUnderwaterExplosion(ITEM_INFO* item);
+void undraw_shotgun_meshes(int weapon);
+void undraw_shotgun(int weapon);
+void draw_shotgun_meshes(int weaponType);
+void FireHK(int mode);
+void FireShotgun();
+void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search);
+void ready_shotgun(int weaponType);
 
-void __cdecl Inject_Lara1Gun();
+void Inject_Lara1Gun();

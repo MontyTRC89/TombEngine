@@ -12,7 +12,7 @@
 #include "..\Game\Lara.h"
 
 /*
-void __cdecl InitialiseGuard(short itemNum)
+void InitialiseGuard(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -116,7 +116,7 @@ LABEL_21:
 	return result;
 }
 
-void __cdecl ControlGuard(int itemNum)
+void ControlGuard(int itemNum)
 {
 	int v1; // eax
 	int v2; // ecx

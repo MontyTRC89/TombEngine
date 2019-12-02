@@ -46,9 +46,9 @@
 #define phd_DxRotYXZ ((void(__cdecl*)(int, int, int)) 0x00490AF0)
 #define phd_DxRotYXZpack ((void(__cdecl*)(int)) 0x00490A80)
 
-int __cdecl DrawPhaseGame();
-void __cdecl DrawAnimatingItem(ITEM_INFO* item);
-int __cdecl GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate);
+int DrawPhaseGame();
+void DrawAnimatingItem(ITEM_INFO* item);
+int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate);
 
 /* phd function (DX11 version) */
 // TODO: phd_XX function after this lign is used with DX11 one, when it's finished, delete the #define one and delete this sign: "_" at the beginning of the new function. (delete the unused if needed)

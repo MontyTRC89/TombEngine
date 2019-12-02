@@ -7,11 +7,11 @@
 #define UpdateHealtBar ((void (__cdecl*)(int)) 0x00439E50)
 #define UpdateAirBar ((void (__cdecl*)(int)) 0x00439FC0)
 
-void __cdecl DrawHealtBar(int percentual);
-void __cdecl DrawAirBar(int percentual);
-void __cdecl AddDisplayPickup(short objectNumber);
-int __cdecl DrawAllPickups();
-void __cdecl InitialisePickupDisplay();
+void DrawHealtBar(int percentual);
+void DrawAirBar(int percentual);
+void AddDisplayPickup(short objectNumber);
+int DrawAllPickups();
+void InitialisePickupDisplay();
 
 extern short PickupX;
 extern short PickupY;
