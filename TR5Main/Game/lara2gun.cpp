@@ -112,7 +112,6 @@ void AnimatePistols(int weaponType)
 
 					frameRight = p->recoilAnim;
 				}
-
 				else if (UziRight)
 				{
 					SoundEffect(weapon->sampleNum + 1, &LaraItem->pos, 0);
@@ -131,7 +130,7 @@ void AnimatePistols(int weaponType)
 
 					frameRight++;
 					if (frameRight == p->recoilAnim + weapon->recoilFrame)
-						frameRight = p->recoilAnim + weapon->recoilFrame;
+						frameRight = p->draw1Anim2;
 				}
 			}
 		}
@@ -157,7 +156,7 @@ void AnimatePistols(int weaponType)
 	set_arm_info(&Lara.rightArm, frameRight);
 
 	int frameLeft = Lara.leftArm.frameNumber;
-	if (!Lara.leftArm.lock && (!(TrInput & IN_ACTION) || Lara.target))
+	if (Lara.leftArm.lock || ((TrInput & IN_ACTION) && !Lara.target))
 	{
 		if (frameLeft >= 0 && frameLeft < p->draw1Anim2)
 		{
@@ -197,6 +196,8 @@ void AnimatePistols(int weaponType)
 
 					Savegame.Game.AmmoUsed++;
 				}
+
+				frameLeft = p->recoilAnim;
 			}
 			else if (UziLeft)
 			{
@@ -204,14 +205,28 @@ void AnimatePistols(int weaponType)
 				UziLeft = false;
 			}
 		}
+		else if (frameLeft >= p->recoilAnim)
+		{
+			if (weaponType == WEAPON_UZI)
+			{
+				SoundEffect(weapon->sampleNum, &LaraItem->pos, 0);
+				UziLeft = true;
+			}
+
+			frameLeft++;
+
+			if (frameLeft == (p->recoilAnim + weapon->recoilFrame))
+				frameLeft = p->draw1Anim2;
+		}
 	}
-	else
+	else       														// Havent GOT a LOCK ON..
 	{
-		if (frameLeft >= p->recoilAnim)
-			frameLeft = p->recoilAnim;
+		if (frameLeft >= p->recoilAnim) 									// If Gun is Recoiling Stop it now...
+			frameLeft = p->draw1Anim2;
+
 		else if (frameLeft > 0 && frameLeft <= p->draw1Anim2)
-			frameLeft--;
-		
+			frameLeft--;													// UnLock ARM
+
 		if (UziLeft)
 		{
 			SoundEffect(weapon->sampleNum + 1, &LaraItem->pos, 0);
@@ -316,8 +331,6 @@ void undraw_pistol_mesh_right(int weaponType)
 
 void undraw_pistol_mesh_left(int weaponType)
 {
-	int result; // eax
-
 	if (weaponType != WEAPON_REVOLVER)
 	{
 		WeaponObject(weaponType);
@@ -336,12 +349,15 @@ void undraw_pistol_mesh_left(int weaponType)
 
 void draw_pistol_meshes(int weaponType)
 {
-	Lara.holster = 13;
-	Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
-	
+	Lara.holster = ID_LARA_HOLSTERS;
+
+	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
+	Lara.meshPtrs[THIGH_R] = Meshes[Objects[ID_LARA].meshIndex + THIGH_R];
+
 	if (weaponType != WEAPON_REVOLVER)
 	{
-		Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
+		Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_L];
+		Lara.meshPtrs[THIGH_L] = Meshes[Objects[ID_LARA].meshIndex + THIGH_L];
 	}
 }
 
@@ -370,7 +386,7 @@ void undraw_pistols(int weaponType)
 	int frameLeft = Lara.leftArm.frameNumber;
 	if (frameLeft >= p->recoilAnim)
 	{
-		frameLeft = p->recoilAnim;
+		frameLeft = p->draw1Anim2;
 	}
 	else if (frameLeft > 0 && frameLeft < p->draw1Anim)
 	{
