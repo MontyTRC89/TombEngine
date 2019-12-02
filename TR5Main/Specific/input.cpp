@@ -80,7 +80,7 @@ void __cdecl DI_ReadKeyboard(byte* keys)
 	keys[TR_KEY_NUMPAD0] = GetAsyncKeyState(VK_NUMPAD0) >> 8;
 }
 
-__int32 __cdecl DD_SpinMessageLoopMaybe()
+int __cdecl DD_SpinMessageLoopMaybe()
 {
 	return 0;
 }

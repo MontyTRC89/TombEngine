@@ -2,22 +2,27 @@
 
 #include "..\Global\global.h"
 
-#define ObjectCollision ((void (__cdecl*)(__int16, ITEM_INFO*, COLL_INFO*)) 0x004126E0)
-#define GetCollisionInfo ((void (__cdecl*)(COLL_INFO*, __int32, __int32, __int32, __int16, __int32)) 0x00411100)
-#define GenericSphereBoxCollision ((void (__cdecl*)(__int16, ITEM_INFO*, COLL_INFO*)) 0x00413A90)
-#define LaraBaddieCollision ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00412170)
-#define TestBoundsCollide ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*, __int32)) 0x00412CC0)
-//#define GetCollidedObjects ((__int32 (__cdecl*)(ITEM_INFO*, __int32, __int32, ITEM_INFO**, MESH_INFO**, __int32)) 0x00413CF0)
-#define ItemPushLara ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, __int32, __int32)) 0x00412860)
-#define TestCollision ((__int32 (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x00479170)
-#define TestLaraPosition ((__int32 (__cdecl*)(__int16*, ITEM_INFO*, ITEM_INFO*)) 0x00413210)
-#define MoveLaraPosition ((__int32 (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x00413840)
-#define AlignLaraPosition ((__int32 (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x004133C0)
+// used by coll->badPos
+#define NO_BAD_POS (-NO_HEIGHT)
+// used by coll->badNeg
+#define NO_BAD_NEG NO_HEIGHT
 
-__int32 __cdecl CollideStaticObjects(COLL_INFO* coll, __int32 x, __int32 y, __int32 z, __int16 roomNumber, __int32 hite);
-__int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __int32 flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, __int32 flag2);
-__int32 __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
-void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c);
+#define ObjectCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004126E0)
+#define GetCollisionInfo ((void (__cdecl*)(COLL_INFO*, int, int, int, short, int)) 0x00411100)
+#define GenericSphereBoxCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00413A90)
+#define LaraBaddieCollision ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00412170)
+#define TestBoundsCollide ((int (__cdecl*)(ITEM_INFO*, ITEM_INFO*, int)) 0x00412CC0)
+//#define GetCollidedObjects ((int (__cdecl*)(ITEM_INFO*, int, int, ITEM_INFO**, MESH_INFO**, int)) 0x00413CF0)
+#define ItemPushLara ((int (__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, int, int)) 0x00412860)
+#define TestCollision ((int (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x00479170)
+#define TestLaraPosition ((int (__cdecl*)(short*, ITEM_INFO*, ITEM_INFO*)) 0x00413210)
+#define MoveLaraPosition ((int (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x00413840)
+#define AlignLaraPosition ((int (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x004133C0)
+
+int __cdecl CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
+int __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
+int __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
+void __cdecl TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 void __cdecl ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 

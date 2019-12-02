@@ -1,19 +1,18 @@
 #include "newobjects.h"
-#include "..\Global\global.h"
-#include "..\Game\Box.h"
-#include "..\Game\items.h"
-#include "..\Game\lot.h"
-#include "..\Game\control.h"
-#include "..\Game\people.h"
-#include "..\Game\effects.h"
-#include "..\Game\effect2.h"
-#include "..\Game\draw.h"
-#include "..\Game\sphere.h"
-#include "..\Game\inventory.h"
-#include "..\Game\collide.h"
-#include "..\Game\draw.h"
+#include "../Game/Box.h"
+#include "../Game/items.h"
+#include "../Game/lot.h"
+#include "../Game/control.h"
+#include "../Game/people.h"
+#include "../Game/effects.h"
+#include "../Game/effect2.h"
+#include "../Game/draw.h"
+#include "../Game/sphere.h"
+#include "../Game/inventory.h"
+#include "../Game/collide.h"
+#include "../Game/draw.h"
 
-void __cdecl InitialiseJeanYves(__int16 itemNum)
+void __cdecl InitialiseJeanYves(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -25,13 +24,13 @@ void __cdecl InitialiseJeanYves(__int16 itemNum)
 
 }
 
-void __cdecl JeanYvesControl(__int16 itemNum)
+void __cdecl JeanYvesControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
 	if (item->triggerFlags >= Lara.highestLocation)
 	{
-		__int16 state = 0;
+		short state = 0;
 
 		if (GetRandomControl() & 3)
 		{
@@ -51,8 +50,8 @@ void __cdecl JeanYvesControl(__int16 itemNum)
 		if (Lara.highestLocation > 3)
 			Lara.highestLocation = 3;
 
-		__int16 state = (GetRandomControl() & 3) + 4 * Lara.highestLocation;
-		__int16 animNumber = Objects[item->objectNumber].animIndex + state;
+		short state = (GetRandomControl() & 3) + 4 * Lara.highestLocation;
+		short animNumber = Objects[item->objectNumber].animIndex + state;
 		state++;
 
 		item->goalAnimState = item->currentAnimState = state;

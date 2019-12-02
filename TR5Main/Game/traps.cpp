@@ -6,7 +6,7 @@ void __cdecl LaraBurn()
 {
 	if (!Lara.burn && !Lara.burnSmoke)
 	{
-		__int16 fxNum = CreateNewEffect(LaraItem->roomNumber);
+		short fxNum = CreateNewEffect(LaraItem->roomNumber);
 		if (fxNum != NO_ITEM)
 		{
 			Effects[fxNum].objectNumber = ID_FLAME;

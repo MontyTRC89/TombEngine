@@ -5,6 +5,7 @@
 #define W2V_SHIFT 		14					// Shift scale of View.Frame to World.Frame
 #define	W2V_SCALE 		(1 << W2V_SHIFT)	// Scale of View Frame to World Frame
 #define WALL_SHIFT		10
+#define PITCH_SHIFT     4
 #define STEP_SIZE		256
 #define	WALL_SIZE		1024
 
@@ -37,7 +38,10 @@
 #define DRAW_DISTANCE		200 * 1024.0f
 #define NUM_STATICS			1000
 #define MAX_LIGHTS			100
+#define MAX_LIGHTS_DRAW     16384
+#define MAX_DYNAMIC_LIGHTS  16384
 #define MAX_STATICS			1000
+#define MAX_DRAW_STATICS    16384
 #define MAX_BONES			32
 #define MAX_SPRITES			16384
 #define NO_ROOM				0xFF
@@ -64,15 +68,15 @@
 #define ENV_FLAG_UNKNOWN3			0x0400
 
 // From TR3, we need to check
-#define	SP_FLAT		1
+#define	SP_FLAT			1
 #define	SP_SCALE		2
 #define	SP_BLOOD		4
-#define	SP_DEF		8
+#define	SP_DEF			8
 #define	SP_ROTATE		16
 #define	SP_EXPLOSION	32
-#define	SP_FX		64
-#define	SP_ITEM		128
-#define	SP_WIND		256
+#define	SP_FX			64
+#define	SP_ITEM			128
+#define	SP_WIND			256
 #define	SP_EXPDEF		512
 #define	SP_USEFXOBJPOS	1024
 #define	SP_UNDERWEXP	2048

@@ -37,9 +37,9 @@ class PreallocatedVector
 {
 private:
 	T**			m_objects;
-	__int32		m_maxItems;
-	__int32		m_numItems;
-	__int32		m_startSize;
+	int		m_maxItems;
+	int		m_numItems;
+	int		m_startSize;
 
 public:
 	PreallocatedVector()
@@ -55,7 +55,7 @@ public:
 		free(m_objects);
 	}
 
-	inline void Reserve(__int32 numItems)
+	inline void Reserve(int numItems)
 	{
 		m_objects = (T**)malloc(sizeof(T*) * numItems);
 		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
@@ -70,17 +70,17 @@ public:
 		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
 	}
 
-	inline __int32 Size()
+	inline int Size()
 	{
 		return m_numItems;
 	}
 
-	inline void Sort(__int32(*compareFunc)(T*, T*))
+	inline void Sort(int(*compareFunc)(T*, T*))
 	{
 		qsort(m_objects, m_numItems, sizeof(T), compareFunc);
 	}
 
-	inline T*& operator[] (__int32 x) {
+	inline T*& operator[] (int x) {
 		if (x >= m_maxItems)
 			return m_objects[0];
 		return m_objects[x];
@@ -100,9 +100,9 @@ class PreallocatedDictionary
 private:
 	T**			m_keys;
 	U**			m_objects;
-	__int32		m_maxItems;
-	__int32		m_numItems;
-	__int32		m_startSize;
+	int		m_maxItems;
+	int		m_numItems;
+	int		m_startSize;
 
 public:
 	PreallocatedDictionary()
@@ -120,7 +120,7 @@ public:
 		free(m_objects);
 	}
 
-	inline void Reserve(__int32 numItems)
+	inline void Reserve(int numItems)
 	{
 		m_keys = (T**)malloc(sizeof(T*) * numItems);
 		m_objects = (U**)malloc(sizeof(U*) * numItems);
@@ -138,18 +138,18 @@ public:
 		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
 	}
 
-	inline __int32 Size()
+	inline int Size()
 	{
 		return m_numItems;
 	}
 
-	inline T*& operator[] (__int32 x) {
+	inline T*& operator[] (int x) {
 		return m_objects[x];
 	}
 
 	inline bool KeyExists(T* key)
 	{
-		for (__int32 i = 0; i < m_numItems; i++)
+		for (int i = 0; i < m_numItems; i++)
 			if (m_keys[i] == key)
 				return true;
 		return false;
@@ -157,7 +157,7 @@ public:
 
 	inline U* Get(T* key)
 	{
-		for (__int32 i = 0; i < m_numItems; i++)
+		for (int i = 0; i < m_numItems; i++)
 			if (m_keys[i] == key)
 				return m_objects[i];
 		return NULL;
@@ -171,14 +171,14 @@ public:
 };
 
 struct RendererDisplayMode {
-	__int32 Width;
-	__int32 Height;
-	__int32 RefreshRate;
+	int Width;
+	int Height;
+	int RefreshRate;
 };
 
 struct RendererVideoAdapter {
 	string Name;
-	__int32 Index;
+	int Index;
 	vector<RendererDisplayMode> DisplayModes;
 };
 
@@ -205,7 +205,7 @@ public:
 
 	}
 
-	static RenderTarget2D* Create(ID3D11Device* device, __int32 w, __int32 h, DXGI_FORMAT format)
+	static RenderTarget2D* Create(ID3D11Device* device, int w, int h, DXGI_FORMAT format)
 	{
 		RenderTarget2D* rt = new RenderTarget2D();
 
@@ -308,7 +308,7 @@ public:
 		DX11_RELEASE(Texture);
 	}
 
-	static Texture2D* LoadFromByteArray(ID3D11Device* device, __int32 w, __int32 h, byte* data)
+	static Texture2D* LoadFromByteArray(ID3D11Device* device, int w, int h, byte* data)
 	{
 		Texture2D* texture = new Texture2D();
 
@@ -384,7 +384,7 @@ public:
 		DX11_RELEASE(Buffer);
 	}
 
-	static VertexBuffer* Create(ID3D11Device* device, __int32 numVertices, RendererVertex* vertices)
+	static VertexBuffer* Create(ID3D11Device* device, int numVertices, RendererVertex* vertices)
 	{
 		HRESULT res;
 
@@ -437,7 +437,7 @@ public:
 		DX11_RELEASE(Buffer);
 	}
 
-	static IndexBuffer* Create(ID3D11Device* device, __int32 numIndices, __int32* indices)
+	static IndexBuffer* Create(ID3D11Device* device, int numIndices, int* indices)
 	{
 		HRESULT res;
 
@@ -447,7 +447,7 @@ public:
 		ZeroMemory(&desc, sizeof(desc));
 
 		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.ByteWidth = sizeof(__int32) * numIndices;
+		desc.ByteWidth = sizeof(int) * numIndices;
 		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		
@@ -466,7 +466,7 @@ public:
 			if (FAILED(res))
 				return NULL;
 
-			memcpy(ms.pData, indices, sizeof(__int32) * numIndices);
+			memcpy(ms.pData, indices, sizeof(int) * numIndices);
 
 			context->Unmap(ib->Buffer, NULL);
 		}
@@ -479,7 +479,7 @@ struct RendererStringToDraw
 {
 	float X;
 	float Y;
-	__int32 Flags;
+	int Flags;
 	wstring String;
 	Vector3 Color;
 };
@@ -487,10 +487,10 @@ struct RendererStringToDraw
 struct RendererPolygon 
 {
 	byte Shape;
-	__int32 AnimatedSet;
-	__int32 TextureId;
-	__int32 Distance;
-	__int32 Indices[4];
+	int AnimatedSet;
+	int TextureId;
+	int Distance;
+	int Indices[4];
 };
 
 struct RendererBone 
@@ -501,11 +501,11 @@ struct RendererBone
 	Vector3 GlobalTranslation;
 	vector<RendererBone*> Children;
 	RendererBone* Parent;
-	__int32 Index;
+	int Index;
 	Vector3 ExtraRotation;
 	byte ExtraRotationFlags;
 
-	RendererBone(__int32 index)
+	RendererBone(int index)
 	{
 		Index = index;
 		ExtraRotationFlags = 0;
@@ -565,36 +565,36 @@ struct CStaticBuffer
 struct CShadowLightBuffer {
 	ShaderLight Light;
 	Matrix LightViewProjection;
-	__int32 CastShadows;
+	int CastShadows;
 	float Padding[15];
 };
 
 struct CLightBuffer {
 	ShaderLight Lights[NUM_LIGHTS_PER_BUFFER];
-	__int32 NumLights;
+	int NumLights;
 	Vector3 CameraPosition;
 };
 
 struct CMiscBuffer {
-	__int32 AlphaTest;
-	__int32 Caustics;
+	int AlphaTest;
+	int Caustics;
 	float Padding[14];
 };
 
 struct RendererAnimatedTexture 
 {
-	__int32 Id;
+	int Id;
 	Vector2 UV[4];
 };
 
 struct RendererAnimatedTextureSet 
 {
-	__int32 NumTextures;
+	int NumTextures;
 	RendererAnimatedTexture** Textures;
 
 	~RendererAnimatedTextureSet()
 	{
-		for (__int32 i = 0; i < NumTextures; i++)
+		for (int i = 0; i < NumTextures; i++)
 			delete Textures[i];
 		free(Textures);
 	}
@@ -603,19 +603,19 @@ struct RendererAnimatedTextureSet
 struct RendererBucket
 {
 	vector<RendererVertex>		Vertices;
-	vector<__int32>				Indices;
+	vector<int>				Indices;
 	vector<RendererPolygon>		Polygons;
 	vector<RendererPolygon>		AnimatedPolygons;
-	__int32						StartVertex;
-	__int32						StartIndex;
-	__int32						NumTriangles;
-	__int32						NumVertices;
-	__int32						NumIndices;
+	int						StartVertex;
+	int						StartIndex;
+	int						NumTriangles;
+	int						NumVertices;
+	int						NumIndices;
 };
 
 struct RendererStatic {
-	__int32 Id;
-	__int16 RoomIndex;
+	int Id;
+	short RoomIndex;
 	MESH_INFO* Mesh;
 	Matrix World;
 };
@@ -630,22 +630,22 @@ struct RendererRoom
 	vector<RendererStatic> Statics;
 	bool Visited;
 	float Distance;
-	__int32 RoomNumber;
+	int RoomNumber;
 	PreallocatedVector<RendererLight> LightsToDraw;
 };
 
 struct RendererRoomNode {
-	__int16 From;
-	__int16 To;
+	short From;
+	short To;
 	Vector4 ClipPort;
 };
 
 struct RendererItem {
-	__int32 Id;
+	int Id;
 	ITEM_INFO* Item;
 	Matrix World;
 	Matrix AnimationTransforms[32];
-	__int32 NumMeshes;
+	int NumMeshes;
 	PreallocatedVector<RendererLight> Lights;
 };
 
@@ -657,7 +657,7 @@ struct RendererMesh
 };
 
 struct RendererEffect {
-	__int32 Id;
+	int Id;
 	FX_INFO* Effect;
 	Matrix World;
 	RendererMesh* Mesh;
@@ -666,7 +666,7 @@ struct RendererEffect {
 
 struct RendererObject
 {
-	__int32 Id;
+	int Id;
 	vector<RendererMesh*>		ObjectMeshes;
 	RendererBone*				Skeleton;
 	vector<Matrix>				AnimationTransforms;
@@ -678,25 +678,25 @@ struct RendererObject
 
 	~RendererObject()
 	{
-		/*for (__int32 i = 0; i < ObjectMeshes.size(); i++)
+		/*for (int i = 0; i < ObjectMeshes.size(); i++)
 			delete ObjectMeshes[i];*/
-		for (__int32 i = 0; i < LinearizedBones.size(); i++)
+		for (int i = 0; i < LinearizedBones.size(); i++)
 			delete LinearizedBones[i];
 	}
 };
 
 struct RendererSprite {
-	__int32 Width;
-	__int32 Height;
+	int Width;
+	int Height;
 	Vector2 UV[4];
 };
 
 struct RendererSpriteSequence {
-	__int32 Id;
+	int Id;
 	RendererSprite** SpritesList;
-	__int32 NumSprites;
+	int NumSprites;
 
-	RendererSpriteSequence(__int32 id, __int32 num)
+	RendererSpriteSequence(int id, int num)
 	{
 		Id = id;
 		NumSprites = num;
@@ -705,7 +705,7 @@ struct RendererSpriteSequence {
 
 	~RendererSpriteSequence()
 	{
-		/*for (__int32 i = 0; i < NumSprites; i++)
+		/*for (int i = 0; i < NumSprites; i++)
 			delete SpritesList[i];
 		free(SpritesList);*/
 	}
@@ -747,15 +747,15 @@ struct RendererWeatherParticle {
 	float AngleH;
 	float AngleV;
 	float Size;
-	__int16 Room;
+	short Room;
 	bool Reset;
 	bool Draw;
 };
 
 struct RendererUnderwaterDustParticle {
 	float X, Y, Z;
-	__int16 Life;
-	__int16 Room;
+	short Life;
+	short Room;
 	bool Reset;
 };
 
@@ -832,8 +832,8 @@ private:
 	SpriteFont*										m_gameFont;
 	SpriteBatch*									m_spriteBatch;
 	vector<RendererStringToDraw>					m_strings;
-	__int32											m_blinkColorValue;
-	__int32											m_blinkColorDirection;
+	int											m_blinkColorValue;
+	int											m_blinkColorDirection;
 	PrimitiveBatch<RendererVertex>*					m_primitiveBatch;
 
 	// System resources
@@ -855,13 +855,13 @@ private:
 	IndexBuffer*									m_staticsIndexBuffer;
 	RendererRoom**									m_rooms;
 	Matrix											m_hairsMatrices[12];
-	__int16											m_normalLaraSkinJointRemap[15][32];
-	__int16											m_youngLaraSkinJointRemap[15][32];
-	__int16											m_laraSkinJointRemap[15][32];
-	__int16											m_numHairVertices;
-	__int16											m_numHairIndices;
+	short											m_normalLaraSkinJointRemap[15][32];
+	short											m_youngLaraSkinJointRemap[15][32];
+	short											m_laraSkinJointRemap[15][32];
+	short											m_numHairVertices;
+	short											m_numHairIndices;
 	vector<RendererVertex>							m_hairVertices;
-	vector<__int16>									m_hairIndices;
+	vector<short>									m_hairIndices;
 	PreallocatedVector<RendererRoom>				m_roomsToDraw;
 	PreallocatedVector<RendererItem>				m_itemsToDraw;
 	PreallocatedVector<RendererEffect>			    m_effectsToDraw;
@@ -873,31 +873,31 @@ private:
 	PreallocatedVector<RendererLine2D>				m_lines2DToDraw;
 	PreallocatedVector<RendererLight>				m_tempItemLights;
 	RendererSpriteToDraw*							m_spritesBuffer;
-	__int32											m_nextSprite;
+	int											m_nextSprite;
 	RendererLine3D*									m_lines3DBuffer;
-	__int32											m_nextLine3D;
+	int											m_nextLine3D;
 	RendererLine2D*									m_lines2DBuffer;
-	__int32											m_nextLine2D;
+	int											m_nextLine2D;
 	RendererLight*									m_shadowLight;
 	RendererObject**								m_moveableObjects;
 	RendererObject**								m_staticObjects;
 	RendererSprite**								m_sprites;
-	__int32											m_numMoveables;
-	__int32											m_numStatics;
-	__int32											m_numSprites;
-	__int32											m_numSpritesSequences;
+	int											m_numMoveables;
+	int											m_numStatics;
+	int											m_numSprites;
+	int											m_numSpritesSequences;
 	RendererSpriteSequence**						m_spriteSequences;
 	unordered_map<unsigned int, RendererMesh*>		m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
 	RendererAnimatedTextureSet**					m_animatedTextureSets;
-	__int32											m_numAnimatedTextureSets;
-	__int32											m_currentCausticsFrame;
+	int											m_numAnimatedTextureSets;
+	int											m_currentCausticsFrame;
 	RendererUnderwaterDustParticle					m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool											m_firstUnderwaterDustParticles = true;
 	vector<RendererMesh*>							m_meshes;
 
 	// Debug variables
-	__int32											m_numDrawCalls = 0;
+	int											m_numDrawCalls = 0;
 
 	// Preallocated pools of objects for avoiding new/delete
 	// Items and effects are safe (can't be more than 1024 items in TR), 
@@ -905,13 +905,13 @@ private:
 	RendererItem									m_items[NUM_ITEMS];
 	RendererEffect									m_effects[NUM_ITEMS];
 	RendererLight									m_lights[MAX_LIGHTS];
-	__int32											m_nextLight;
-	__int32											m_currentY;
+	int											m_nextLight;
+	int											m_currentY;
 
 	// Times for debug
-	__int32											m_timeUpdate;
-	__int32											m_timeDraw;
-	__int32											m_timeFrame;
+	int											m_timeUpdate;
+	int											m_timeDraw;
+	int											m_timeFrame;
 
 	// Others
 	bool											m_firstWeather;
@@ -919,9 +919,9 @@ private:
 	RendererWeatherParticle							m_snow[NUM_SNOW_PARTICLES];
 	RENDERER_FADE_STATUS							m_fadeStatus;
 	float											m_fadeFactor;
-	__int32											m_progress;
+	int											m_progress;
 	bool											m_enableCinematicBars = false;
-	__int32											m_pickupRotation;
+	int											m_pickupRotation;
 
 	// Private functions
 	bool											drawScene(bool dump);
@@ -930,32 +930,32 @@ private:
 	ID3D11GeometryShader*							compileGeometryShader(char* fileName);
 	ID3D11PixelShader*								compilePixelShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode);
 	ID3D11ComputeShader*							compileComputeShader(char* fileName);
-	ID3D11Buffer*									createConstantBuffer(__int32 size);
-	__int32											getAnimatedTextureInfo(__int16 textureId);
+	ID3D11Buffer*									createConstantBuffer(int size);
+	int											getAnimatedTextureInfo(short textureId);
 	void											initialiseHairRemaps();
-	RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, __int16* meshPtr, __int16* refMeshPtr, __int16 boneIndex, __int32 isJoints, __int32 isHairs);
-	void											fromTrAngle(Matrix* matrix, __int16* frameptr, __int32 index);
+	RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short* refMeshPtr, short boneIndex, int isJoints, int isHairs);
+	void											fromTrAngle(Matrix* matrix, short* frameptr, int index);
 	void											buildHierarchy(RendererObject* obj);
 	void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-	void											updateAnimation(RendererItem* item, RendererObject* obj, __int16** frmptr, __int16 frac, __int16 rate, __int32 mask);
-	bool											printDebugMessage(__int32 x, __int32 y, __int32 alpha, byte r, byte g, byte b, LPCSTR Message);
-	bool											checkPortal(__int16 roomIndex, __int16* portal, Vector4* viewPort, Vector4* clipPort);
+	void											updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask);
+	bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
+	bool											checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort);
 	void											getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count);
 	void											collectRooms();
-	inline void										collectItems(__int16 roomNumber);
-	inline void										collectStatics(__int16 roomNumber);
-	inline void										collectLightsForRoom(__int16 roomNumber);
-	inline void										collectLightsForItem(__int16 roomNumber, RendererItem* item);
-	inline void										collectLightsForEffect(__int16 roomNumber, RendererEffect* effect);
-	inline void										collectEffects(__int16 roomNumber);
+	inline void										collectItems(short roomNumber);
+	inline void										collectStatics(short roomNumber);
+	inline void										collectLightsForRoom(short roomNumber);
+	inline void										collectLightsForItem(short roomNumber, RendererItem* item);
+	inline void										collectLightsForEffect(short roomNumber, RendererEffect* effect);
+	inline void										collectEffects(short roomNumber);
 	void											prepareLights();
 	void											clearSceneItems();
-	bool											updateConstantBuffer(ID3D11Buffer* buffer, void* data, __int32 size);
+	bool											updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size);
 	void											updateLaraAnimations();
 	void											updateItemsAnimations();
 	void											updateEffects();
-	__int32											getFrame(__int16 animation, __int16 frame, __int16** framePtr, __int32* rate);
-	bool											drawAmbientCubeMap(__int16 roomNumber);
+	int											getFrame(short animation, short frame, short** framePtr, int* rate);
+	bool											drawAmbientCubeMap(short roomNumber);
 	bool											sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius);
 	bool											drawHorizonAndSky();
 	bool											drawRooms(bool transparent, bool animated);
@@ -964,7 +964,7 @@ private:
 	bool											drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
 	bool											drawWaterfalls();
 	bool											drawShadowMap();
-	bool											drawObjectOn2DPosition(__int16 x, __int16 y, __int16 objectNum, __int16 rotX, __int16 rotY, __int16 rotZ);
+	bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
 	bool											drawLara(bool transparent, bool shadowMap);
 	void											printDebugMessage(char* message, ...);
 	void											drawFires();
@@ -986,11 +986,11 @@ private:
 	bool											drawSpiders();
 	bool											drawGunFlashes();
 	bool											drawGunShells();
-	bool											drawBar(__int32 x, __int32 y, __int32 w, __int32 h, __int32 percent, __int32 color1, __int32 color2);
-	void											insertLine2D(__int32 x1, __int32 y1, __int32 x2, __int32 y2, byte r, byte g, byte b, byte a);
+	bool											drawBar(int x, int y, int w, int h, int percent, int color1, int color2);
+	void											insertLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 	bool											drawDebris(bool transparent);
-	__int32											drawInventoryScene();
-	__int32											drawFinalPass();
+	int											drawInventoryScene();
+	int											drawFinalPass();
 	void											updateAnimatedTextures();
 	void											createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
 	void											drawShockwaves();
@@ -1000,43 +1000,43 @@ private:
 	bool											doSnow();
 	bool											drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool cinematicBars);
 	bool											drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade);
-	bool											isRoomUnderwater(__int16 roomNumber);
-	bool											isInRoom(__int32 x, __int32 y, __int32 z, __int16 roomNumber);
+	bool											isRoomUnderwater(short roomNumber);
+	bool											isInRoom(int x, int y, int z, short roomNumber);
 	void											addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void											addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
-	void											addLine3D(__int32 x1, __int32 y1, __int32 z1, __int32 x2, __int32 y2, __int32 z2, byte r, byte g, byte b);
-	bool											drawColoredQuad(__int32 x, __int32 y, __int32 w, __int32 h, Vector4 color);
-	bool											initialiseScreen(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle, bool reset);
+	void											addLine3D(int x1, int y1, int z1, int x2, int y2, int z2, byte r, byte g, byte b);
+	bool											drawColoredQuad(int x, int y, int w, int h, Vector4 color);
+	bool											initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
 
 public:
 	Matrix											View;
 	Matrix											Projection;
 	Matrix											ViewProjection;
 	float											FieldOfView;
-	__int32											ScreenWidth;
-	__int32											ScreenHeight;
+	int											ScreenWidth;
+	int											ScreenHeight;
 	bool											Windowed;
-	__int32											NumTexturePages;
+	int											NumTexturePages;
 
 	Renderer11();
 	~Renderer11();
 
 	bool											Create();
 	bool											EnumerateVideoModes();
-	bool											Initialise(__int32 w, __int32 h, __int32 refreshRate, bool windowed, HWND handle);
-	__int32											Draw();
+	bool											Initialise(int w, int h, int refreshRate, bool windowed, HWND handle);
+	int											Draw();
 	bool											PrepareDataForTheRenderer();
 	void											UpdateCameraMatrices(float posX, float posY, float posZ, float targetX, float targetY, float targetZ, float roll, float fov);
-	__int32											DumpGameScene();
-	__int32											DrawInventory();
-	__int32											DrawPickup(__int16 objectNum);
-	__int32											SyncRenderer();
-	bool											PrintString(__int32 x, __int32 y, char* string, D3DCOLOR color, __int32 flags);
+	int											DumpGameScene();
+	int											DrawInventory();
+	int											DrawPickup(short objectNum);
+	int											SyncRenderer();
+	bool											PrintString(int x, int y, char* string, D3DCOLOR color, int flags);
 	void											DrawDashBar();
-	void											DrawHealthBar(__int32 percentual);
-	void											DrawAirBar(__int32 percentual);
+	void											DrawHealthBar(int percentual);
+	void											DrawAirBar(int percentual);
 	void											ClearDynamicLights();
-	void											AddDynamicLight(__int32 x, __int32 y, __int32 z, __int16 falloff, byte r, byte g, byte b);
+	void											AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 	void											FreeRendererData();
 	void											EnableCinematicBars(bool value);
 	void											FadeIn();
@@ -1044,10 +1044,10 @@ public:
 	void											DrawLoadingScreen(char* fileName);
 	void											UpdateProgress(float value);
 	bool											IsFading();
-	void											GetLaraBonePosition(Vector3* pos, __int32 bone);
+	void											GetLaraBonePosition(Vector3* pos, int bone);
 	bool											ToggleFullScreen();
 	bool											IsFullsScreen();
 	vector<RendererVideoAdapter>*					GetAdapters();
 	bool											DoTitleImage();
-	bool											ChangeScreenResolution(__int32 width, __int32 height, __int32 frequency, bool windowed);
+	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
 };

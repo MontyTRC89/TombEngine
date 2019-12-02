@@ -5,18 +5,18 @@
 #include "draw.h"
 #include "sphere.h"
 
-__int16 LeftIntRightExtTab[4] = // offset 0xA0B7C
+short LeftIntRightExtTab[4] = // offset 0xA0B7C
 {
 	0x0800, 0x0100, 0x0200, 0x0400
 };
-__int16 LeftExtRightIntTab[4] = // offset 0xA0B84
+short LeftExtRightIntTab[4] = // offset 0xA0B84
 {
 	0x0200, 0x0400, 0x0800, 0x0100
 };
 
-__int16 __cdecl GetClimbTrigger(__int32 x, __int32 y, __int32 z, __int16 roomNumber)//46E38, 4729C (F)
+short __cdecl GetClimbTrigger(int x, int y, int z, short roomNumber)//46E38, 4729C (F)
 {
-	__int16* data = TriggerIndex;
+	short* data = TriggerIndex;
 
 	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
 
@@ -54,9 +54,9 @@ void __cdecl lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 
 		|| item->animNumber != ANIMATION_LARA_LADDER_DOWN)
 		return;
 
-	__int32 frame = item->frameNumber - Anims[ANIMATION_LARA_LADDER_DOWN].frameBase;
-	__int32 xShift;
-	__int32 yShift;
+	int frame = item->frameNumber - Anims[ANIMATION_LARA_LADDER_DOWN].frameBase;
+	int xShift;
+	int yShift;
 
 	switch (frame)
 	{
@@ -79,10 +79,10 @@ void __cdecl lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 
 
 	item->pos.yPos += yShift + 256;
 
-	__int32 shiftLeft = 0;
-	__int32 shiftRight = 0;
-	__int32 resultRight = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shiftRight);
-	__int32 resultLeft = LaraTestClimbPos(item, coll->radius, -(coll->radius + 120), -512, 512, &shiftLeft);
+	int shiftLeft = 0;
+	int shiftRight = 0;
+	int resultRight = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shiftRight);
+	int resultLeft = LaraTestClimbPos(item, coll->radius, -(coll->radius + 120), -512, 512, &shiftLeft);
 
 	item->pos.yPos -= 256;
 
@@ -142,11 +142,11 @@ void __cdecl lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (
 	if (!LaraCheckForLetGo(item, coll)
 		&& item->animNumber == ANIMATION_LARA_LADDER_UP)
 	{
-		__int32 frame = item->frameNumber - Anims[ANIMATION_LARA_LADDER_UP].frameBase;
-		__int32 yShift;
-		__int32 resultRight, resultLeft;
-		__int32 shiftRight, shiftLeft;
-		__int32 ledgeRight, ledgeLeft;
+		int frame = item->frameNumber - Anims[ANIMATION_LARA_LADDER_UP].frameBase;
+		int yShift;
+		int resultRight, resultLeft;
+		int shiftRight, shiftLeft;
+		int ledgeRight, ledgeLeft;
 
 		if (frame == 0)
 		{
@@ -220,7 +220,7 @@ void __cdecl lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)//46908(<), 46
 {
 	if (!LaraCheckForLetGo(item, coll))
 	{
-		__int32 shift = 0;
+		int shift = 0;
 		Lara.moveAngle = item->pos.yRot + ANGLE(90);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift), shift);
 	}
@@ -242,7 +242,7 @@ void __cdecl lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)//46834(<), 46C
 {
 	if (!LaraCheckForLetGo(item, coll))
 	{
-		__int32 shift = 0;
+		int shift = 0;
 		Lara.moveAngle = item->pos.yRot - ANGLE(90);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->radius, -(coll->radius + 120), -512, 512, &shift), shift);
 	}
@@ -262,10 +262,10 @@ void __cdecl lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)//467E4(<), 46C4
 
 /*void __cdecl lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//464E8, 4694C
 {
-	__int32 yShift;
-	__int32 resultRight, resultLeft;
-	__int32 shiftRight, shiftLeft;
-	__int32 ledgeRight, ledgeLeft;
+	int yShift;
+	int resultRight, resultLeft;
+	int shiftRight, shiftLeft;
+	int ledgeRight, ledgeLeft;
 
 	if (LaraCheckForLetGo(item, coll) 
 		|| item->animNumber != ANIMATION_LARA_LADDER_IDLE)
@@ -449,13 +449,13 @@ void __cdecl lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (
 	}
 }
 
-__int32 __cdecl LaraTestClimbPos(ITEM_INFO* item, __int32 front, __int32 right, __int32 origin, __int32 height, __int32* shift)//462F8, 4675C (F)
+int __cdecl LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift)//462F8, 4675C (F)
 {
-	__int16 angle = (__int16)(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
-	__int32 x = 0;
-	__int32 z = 0;
-	__int32 xfront = 0;
-	__int32 zfront = 0;
+	short angle = (short)(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
+	int x = 0;
+	int z = 0;
+	int xfront = 0;
+	int zfront = 0;
 
 	switch (angle)
 	{
@@ -488,7 +488,7 @@ __int32 __cdecl LaraTestClimbPos(ITEM_INFO* item, __int32 front, __int32 right, 
 	return LaraTestClimb(x, item->pos.yPos + origin, z, xfront, zfront, height, item->roomNumber, shift);
 }
 
-void __cdecl LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, __int32 result, __int32 shift)//46100, 46564 (F)
+void __cdecl LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shift)//46100, 46564 (F)
 {
 	if (result == 1)
 	{
@@ -540,7 +540,7 @@ void __cdecl LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, __int32 resu
 
 	if (TrInput & IN_LEFT)
 	{
-		__int32 flag = LaraClimbLeftCornerTest(item, coll);
+		int flag = LaraClimbLeftCornerTest(item, coll);
 
 		if (flag)
 		{
@@ -564,7 +564,7 @@ void __cdecl LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, __int32 resu
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		__int32 flag = LaraClimbRightCornerTest(item, coll);
+		int flag = LaraClimbRightCornerTest(item, coll);
 
 		if (flag)
 		{
@@ -593,20 +593,20 @@ void __cdecl LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, __int32 resu
 	AnimateLara(item);
 }
 
-__int32 __cdecl LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
+int __cdecl LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 {
-	__int32 result = 0;
+	int result = 0;
 
 	if (item->animNumber != ANIMATION_LARA_LADDER_RIGHT)
 		return 0;
 
-	__int32 oldYrot = item->pos.yRot;
-	__int32 oldX = item->pos.xPos;
-	__int32 oldY = item->pos.yPos;
-	__int32 oldZ = item->pos.zPos;
+	int oldYrot = item->pos.yRot;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
 
-	__int16 angle = (__int16)(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
-	__int32 x, z;
+	short angle = (short)(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
+	int x, z;
 
 	if (angle && angle != SOUTH)
 	{
@@ -619,7 +619,7 @@ __int32 __cdecl LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE
 		z = item->pos.zPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
 	}
 
-	__int32 shift = 0;
+	int shift = 0;
 
 	if (!(GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftExtRightIntTab[angle])
 		|| (item->pos.xPos = x,
@@ -635,7 +635,7 @@ __int32 __cdecl LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE
 		item->pos.yRot = oldY;
 		item->pos.zPos = oldZ;
 
-		__int32 newX, newZ;
+		int newX, newZ;
 
 		switch (angle)
 		{
@@ -686,20 +686,20 @@ __int32 __cdecl LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE
 	return result;
 }
 
-__int32 __cdecl LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
+int __cdecl LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 {
-	__int32 result = 0;
+	int result = 0;
 
 	if (item->animNumber != ANIMATION_LARA_LADDER_LEFT)
 		return 0;
 
-	__int32 oldYrot = item->pos.yRot;
-	__int32 oldX = item->pos.xPos;
-	__int32 oldY = item->pos.yPos;
-	__int32 oldZ = item->pos.zPos;
+	int oldYrot = item->pos.yRot;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
 
-	__int16 angle = (__int16)(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
-	__int32 x, z;
+	short angle = (short)(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
+	int x, z;
 
 	if (angle && angle != SOUTH)
 	{
@@ -712,7 +712,7 @@ __int32 __cdecl LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC
 		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + 1024;
 	}
 
-	__int32 shift = 0;
+	int shift = 0;
 
 	if (!(GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftIntRightExtTab[angle])
 		|| (item->pos.xPos = x,
@@ -728,7 +728,7 @@ __int32 __cdecl LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC
 		item->pos.yRot = oldY;
 		item->pos.zPos = oldZ;
 
-		__int32 newX, newZ;
+		int newX, newZ;
 
 		switch (angle)
 		{
@@ -780,17 +780,17 @@ __int32 __cdecl LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC
 	return result;
 }
 
-__int32 __cdecl LaraTestClimb(__int32 x, __int32 y, __int32 z, __int32 xFront, __int32 zFront, __int32 itemHeight, __int32 itemRoom, __int32* shift)//457F0, 45C54
+int __cdecl LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift)//457F0, 45C54
 {
 
 	*shift = 0;
-	__int32 hang = 1;
+	int hang = 1;
 	if (!Lara.climbStatus)
 		return 0;
 
-	__int16 roomNumber = itemRoom;
+	short roomNumber = itemRoom;
 	FLOOR_INFO* floor = GetFloor(x, y - 128, z, &roomNumber);
-	__int32 height = GetFloorHeight(floor, x, y, z);
+	int height = GetFloorHeight(floor, x, y, z);
 	if (height == NO_HEIGHT)
 		return 0;
 
@@ -800,7 +800,7 @@ __int32 __cdecl LaraTestClimb(__int32 x, __int32 y, __int32 z, __int32 xFront, _
 	if (height < 0)
 		*shift = height;
 
-	__int32 ceiling = GetCeiling(floor, x, y, z) - y;
+	int ceiling = GetCeiling(floor, x, y, z) - y;
 	if (ceiling > 70)
 		return 0;
 	if (ceiling > 0)
@@ -813,8 +813,8 @@ __int32 __cdecl LaraTestClimb(__int32 x, __int32 y, __int32 z, __int32 xFront, _
 	if (itemHeight + height < 900)
 		hang = 0;
 
-	__int32 dz = zFront + z;
-	__int32 dx = xFront + x;
+	int dz = zFront + z;
+	int dx = xFront + x;
 	
 	floor = GetFloor(dx, y, dz, &roomNumber);
 	height = GetFloorHeight(floor, dx, y, dz);
@@ -876,14 +876,14 @@ __int32 __cdecl LaraTestClimb(__int32 x, __int32 y, __int32 z, __int32 xFront, _
 	return -1;
 }
 
-__int32 __cdecl LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* ledge)//45530, 45994
+int __cdecl LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* ledge)//45530, 45994
 {
-	__int32 y = item->pos.yPos - 768;
-	__int16 angle = (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	int y = item->pos.yPos - 768;
+	short angle = (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 
-	__int32 x, z;
-	__int32 xFront = 0;
-	__int32 zFront = 0;
+	int x, z;
+	int xFront = 0;
+	int zFront = 0;
 
 	switch(angle)
 	{
@@ -911,9 +911,9 @@ __int32 __cdecl LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* s
 
 	*shift = 0;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 ceiling = 256 - y + GetCeiling(floor, x, y, z);
+	int ceiling = 256 - y + GetCeiling(floor, x, y, z);
 	
 	if (ceiling > 70)
 		return 0;
@@ -922,7 +922,7 @@ __int32 __cdecl LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* s
 		*shift = ceiling;
 
 	floor = GetFloor(x + xFront, y, z + zFront, &roomNumber);
-	__int32 height = GetFloorHeight(floor, x + xFront, y, z + zFront);
+	int height = GetFloorHeight(floor, x + xFront, y, z + zFront);
 	
 	if (height == NO_HEIGHT)
 	{
@@ -978,9 +978,9 @@ __int32 __cdecl LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* s
 	return -2;
 }
 
-__int32 __cdecl LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)//45434, 45898 (F)
+int __cdecl LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)//45434, 45898 (F)
 {
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 
 	item->gravityStatus = false;
 	item->fallspeed = 0;

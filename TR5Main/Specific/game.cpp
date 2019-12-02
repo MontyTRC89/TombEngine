@@ -22,7 +22,7 @@
 
 }
 
-void __cdecl LoadScreen(__int32 index, __int32 num)
+void __cdecl LoadScreen(int index, int num)
 {
 
 }*/
@@ -49,7 +49,7 @@ void __cdecl LoadScreen(__int32 index, __int32 num)
 	r*eturn 1;
 }*/
 
-/*void __cdecl DoTitle(__int32 index)
+/*void __cdecl DoTitle(int index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
@@ -61,7 +61,7 @@ void __cdecl LoadScreen(__int32 index, __int32 num)
 	g_Inventory->DoTitleInventory();
 }*/
 
-/*void __cdecl DoLevel(__int32 index)
+/*void __cdecl DoLevel(int index)
 {
 	CreditsDone = false;
 	//DoTitleFMV();

@@ -6,7 +6,7 @@
 
 void __cdecl SetupSplash(SPLASH_SETUP* setup)
 {
-	for (__int32 i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		SPLASH_STRUCT* splash = &Splashes[i];
 
@@ -38,21 +38,21 @@ void __cdecl SetupSplash(SPLASH_SETUP* setup)
 	SoundEffect(SFX_LARA_SPLASH, (PHD_3DPOS*)setup, 0);
 }
 
-void __cdecl WadeSplash(ITEM_INFO* item, __int32 wh, __int32 wd)
+void __cdecl WadeSplash(ITEM_INFO* item, int wh, int wd)
 {
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	
 	ROOM_INFO* room = &Rooms[roomNumber];
 	if (room->flags & ENV_FLAG_WATER)
 	{
-		__int16 roomNumber2 = item->roomNumber;
+		short roomNumber2 = item->roomNumber;
 		GetFloor(item->pos.xPos, room->y - 128, item->pos.zPos, &roomNumber2);
 		
 		ROOM_INFO* room2 = &Rooms[roomNumber2];
 		if (!(room2->flags & ENV_FLAG_WATER))
 		{
-			__int16* frame = GetBestFrame(item);
+			short* frame = GetBestFrame(item);
 			if (item->pos.yPos + frame[2] <= wh)
 			{
 				if (item->pos.yPos + frame[3] >= wh)
@@ -101,13 +101,13 @@ void __cdecl WadeSplash(ITEM_INFO* item, __int32 wh, __int32 wd)
 
 void __cdecl Splash(ITEM_INFO* item)
 {
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	
 	ROOM_INFO* room = &Rooms[roomNumber];
 	if (room->flags & ENV_FLAG_WATER)
 	{
-		__int32 wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
+		int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
 		SplashSetup.y = wh;
 		SplashSetup.x = item->pos.xPos;
 		SplashSetup.z = item->pos.zPos;

@@ -22,14 +22,14 @@ struct LEB128;
 using namespace std;
 
 struct GameScriptSettings {
-	__int32 ScreenWidth;
-	__int32 ScreenHeight;
+	int ScreenWidth;
+	int ScreenHeight;
 	bool EnableLoadSave;
 	bool EnableDynamicShadows;
 	bool EnableWaterCaustics;
 	bool Windowed;
 	string WindowTitle;
-	__int32 DrawingDistance;
+	int DrawingDistance;
 	bool ShowRendererSteps;
 	bool ShowDebugInfo;
 };
@@ -39,7 +39,7 @@ struct GameScriptSkyLayer {
 	byte R;
 	byte G;
 	byte B;
-	__int16 CloudSpeed;
+	short CloudSpeed;
 
 	GameScriptSkyLayer()
 	{
@@ -47,7 +47,7 @@ struct GameScriptSkyLayer {
 		R = G = B = CloudSpeed = 0;
 	}
 
-	GameScriptSkyLayer(byte r, byte g, byte b, __int16 speed)
+	GameScriptSkyLayer(byte r, byte g, byte b, short speed)
 	{
 		R = r;
 		G = g;
@@ -76,11 +76,11 @@ struct GameScriptFog {
 };
 
 struct GameScriptMirror {
-	__int16 Room;
-	__int32 StartX;
-	__int32 EndX;
-	__int32 StartZ;
-	__int32 EndZ;
+	short Room;
+	int StartX;
+	int EndX;
+	int StartZ;
+	int EndZ;
 
 	GameScriptMirror()
 	{
@@ -88,7 +88,7 @@ struct GameScriptMirror {
 		StartX = EndX = StartZ = EndZ = 0;
 	}
 
-	GameScriptMirror(__int16 room, __int32 startX, __int32 endX, __int32 startZ, __int32 endZ)
+	GameScriptMirror(short room, int startX, int endX, int startZ, int endZ)
 	{
 		Room = room;
 		StartX = startX;
@@ -99,13 +99,13 @@ struct GameScriptMirror {
 };
 
 struct GameScriptLevel {
-	__int32 NameStringIndex;
+	int NameStringIndex;
 	string FileName;
 	string ScriptFileName;
 	string LoadScreenFileName;
 	string Background;
-	__int32 Name;
-	__int32 Soundtrack;
+	int Name;
+	int Soundtrack;
 	GameScriptSkyLayer Layer1;
 	GameScriptSkyLayer Layer2;
 	bool Horizon;
@@ -137,8 +137,8 @@ struct GameScriptLevel {
 
 extern ChunkReader* g_ScriptChunkIO;
 
-bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);
-bool __cdecl readGameFlowChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg);
+bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg);
+bool __cdecl readGameFlowChunks(ChunkId* chunkId, int maxSize, int arg);
 bool __cdecl readGameFlowLevel();
 bool __cdecl readGameFlowStrings();
 bool __cdecl readGameFlowTracks();
@@ -153,26 +153,26 @@ private:
 	GameScriptSettings					m_settings;
 	
 	string								loadScriptFromFile(char* luaFilename);
-	map<__int16, __int16>				m_itemsMap;
+	map<short, short>				m_itemsMap;
 
 public:
 	Vector3								SkyColorLayer1;
-	__int32								SkySpeedLayer1;
+	int								SkySpeedLayer1;
 	Vector3								SkyColorLayer2;
-	__int32								SkySpeedLayer2;
+	int								SkySpeedLayer2;
 	Vector3								FogColor;
-	__int32								FogInDistance;
-	__int32								FogOutDistance;
+	int								FogInDistance;
+	int								FogOutDistance;
 	bool								DrawHorizon;
 	bool								ColAddHorizon;
-	__int32								SelectedLevelForNewGame;
-	__int32								SelectedSaveGame;
+	int								SelectedLevelForNewGame;
+	int								SelectedSaveGame;
 	bool								EnableLoadSave;
 	bool								PlayAnyLevel;
 	bool								FlyCheat;
 	bool								DebugMode;
-	__int32								LevelFarView;
-	__int32								TitleType;
+	int								LevelFarView;
+	int								TitleType;
 	char*								Intro;
 
 	// Selected language set
@@ -186,13 +186,13 @@ public:
 	bool								LoadGameStrings(char* luaFilename);
 	bool								LoadGameSettings(char* luaFilename);
 	bool								ExecuteScript(char* luaFilename);
-	char*								GetString(__int32 id);
+	char*								GetString(int id);
 	GameScriptSettings*					GetSettings();
-	GameScriptLevel*					GetLevel(__int32 id);
+	GameScriptLevel*					GetLevel(int id);
 	void								SetHorizon(bool horizon, bool colAddHorizon);
-	void								SetLayer1(byte r, byte g, byte b, __int16 speed);
-	void								SetLayer2(byte r, byte g, byte b, __int16 speed);
-	void								SetFog(byte r, byte g, byte b, __int16 startDistance, __int16 endDistance);
-	__int32								GetNumLevels();		
+	void								SetLayer1(byte r, byte g, byte b, short speed);
+	void								SetLayer2(byte r, byte g, byte b, short speed);
+	void								SetFog(byte r, byte g, byte b, short startDistance, short endDistance);
+	int								GetNumLevels();		
 	bool								DoGameflow();
 };

@@ -14,10 +14,10 @@ typedef struct ChunkId
 {
 private:
 	byte*		m_chunkBytes;
-	__int32		m_length;
+	int		m_length;
 
 public:
-	ChunkId(char* bytes, __int32 length)
+	ChunkId(char* bytes, int length)
 	{
 		if (length == 0)
 		{
@@ -50,7 +50,7 @@ public:
 
 	static ChunkId* FromStream(BaseStream* stream)
 	{
-		__int32 idLength = LEB128::ReadInt32(stream);
+		int idLength = LEB128::ReadInt32(stream);
 		char* buffer = (char*)malloc(idLength);
 		stream->Read(buffer, idLength);
 		ChunkId* chunk = new ChunkId(buffer, idLength);
@@ -69,7 +69,7 @@ public:
 		return m_chunkBytes;
 	}
 
-	__int32 GetLength()
+	int GetLength()
 	{
 		return m_length;
 	}

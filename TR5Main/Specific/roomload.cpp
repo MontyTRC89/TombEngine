@@ -29,63 +29,63 @@ extern GameScript* g_GameScript;
 byte* Texture32;
 byte* Texture16;
 byte* MiscTextures;
-__int16* RawMeshData;
-__int32 MeshDataSize;
-__int32* MeshTrees;
-__int32* RawMeshPointers;
-__int32 NumObjects;
-__int32 NumStaticObjects;
-__int32 NumMeshPointers;
-__int32 NumObjectTextures;
-__int32 NumTextureTiles;
+short* RawMeshData;
+int MeshDataSize;
+int* MeshTrees;
+int* RawMeshPointers;
+int NumObjects;
+int NumStaticObjects;
+int NumMeshPointers;
+int NumObjectTextures;
+int NumTextureTiles;
 
 uintptr_t hLoadLevel;
-unsigned __int32 ThreadId;
-__int32 IsLevelLoading;
+unsigned int ThreadId;
+int IsLevelLoading;
 bool g_FirstLevel = true;
 
 using namespace std;
 
-vector<__int32> MoveablesIds;
-vector<__int32> StaticObjectsIds;
+vector<int> MoveablesIds;
+vector<int> StaticObjectsIds;
 
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 char* LevelDataPtr;
 
-__int32 g_NumSprites;
-__int32 g_NumSpritesSequences;
+int g_NumSprites;
+int g_NumSpritesSequences;
 
 ChunkReader* g_levelChunkIO;
 
-__int16 ReadInt8()
+short ReadInt8()
 {
 	byte value = *(byte*)LevelDataPtr;
 	LevelDataPtr += 1;
 	return value;
 }
 
-__int16 ReadInt16()
+short ReadInt16()
 {
-	__int16 value = *(__int16*)LevelDataPtr;
+	short value = *(short*)LevelDataPtr;
 	LevelDataPtr += 2;
 	return value;
 }
 
-__int32 ReadInt32()
+int ReadInt32()
 {
-	__int32 value = *(__int32*)LevelDataPtr;
+	int value = *(int*)LevelDataPtr;
 	LevelDataPtr += 4;
 	return value;
 }
 
-void ReadBytes(void* dest, __int32 count)
+void ReadBytes(void* dest, int count)
 {
 	memcpy(dest, LevelDataPtr, count);
 	LevelDataPtr += count;
 }
 
-__int32 __cdecl LoadItems()
+int __cdecl LoadItems()
 {
 	DB_Log(2, "LoadItems - DLL");
 
@@ -101,7 +101,7 @@ __int32 __cdecl LoadItems()
 
 	if (NumItems > 0)
 	{
-		for (__int32 i = 0; i < NumItems; i++)
+		for (int i = 0; i < NumItems; i++)
 		{
 			ITEM_INFO* item = &Items[i];
 			
@@ -134,7 +134,7 @@ __int32 __cdecl LoadItems()
 			}*/
 		}
 
-		for (__int32 i = 0; i < NumItems; i++)
+		for (int i = 0; i < NumItems; i++)
 			InitialiseItem(i);
 	}
 
@@ -175,77 +175,77 @@ void __cdecl LoadObjects()
 	memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
 	memset(StaticObjects, 0, sizeof(STATIC_INFO) * NUM_STATICS);
 
-	__int32 numMeshDataWords = ReadInt32();
-	__int32 numMeshDataBytes = 2 * numMeshDataWords;
+	int numMeshDataWords = ReadInt32();
+	int numMeshDataBytes = 2 * numMeshDataWords;
 
-	MeshBase = (__int16*)GameMalloc(numMeshDataBytes);
+	MeshBase = (short*)GameMalloc(numMeshDataBytes);
 	ReadBytes(MeshBase, numMeshDataBytes);
-	RawMeshData = (__int16*)malloc(numMeshDataBytes);
+	RawMeshData = (short*)malloc(numMeshDataBytes);
 	memcpy(RawMeshData, MeshBase, numMeshDataBytes);
 
 	MeshDataSize = numMeshDataBytes;
 
 	// TR5 functions do something strange with meshes so I save just for me raw meshes and raw mesh pointers
-	__int32 numMeshPointers = ReadInt32();
-	Meshes = (__int16**)GameMalloc(8 * numMeshPointers);
-	RawMeshPointers = (__int32*)malloc(4 * numMeshPointers);
+	int numMeshPointers = ReadInt32();
+	Meshes = (short**)GameMalloc(8 * numMeshPointers);
+	RawMeshPointers = (int*)malloc(4 * numMeshPointers);
 	ReadBytes(RawMeshPointers, 4 * numMeshPointers);
 	memcpy(Meshes, RawMeshPointers, 4 * numMeshPointers);
 
-	for (__int32 i = 0; i < numMeshPointers; i++)
-		Meshes[i] = &MeshBase[(__int32)Meshes[i] / 2];
+	for (int i = 0; i < numMeshPointers; i++)
+		Meshes[i] = &MeshBase[(int)Meshes[i] / 2];
 
-	__int32 numMeshes = numMeshPointers;
+	int numMeshes = numMeshPointers;
 	NumMeshPointers = numMeshes;
 
-	__int32 numAnimations = ReadInt32();
+	int numAnimations = ReadInt32();
 	Anims = (ANIM_STRUCT*)GameMalloc(sizeof(ANIM_STRUCT) * numAnimations);
 	ReadBytes(Anims, sizeof(ANIM_STRUCT) * numAnimations);
 
-	__int32 numChanges = ReadInt32();
+	int numChanges = ReadInt32();
 	Changes = (CHANGE_STRUCT*)GameMalloc(sizeof(CHANGE_STRUCT) * numChanges);
 	ReadBytes(Changes, sizeof(CHANGE_STRUCT) * numChanges);
 
-	__int32 numRanges = ReadInt32();
+	int numRanges = ReadInt32();
 	Ranges = (RANGE_STRUCT*)GameMalloc(sizeof(RANGE_STRUCT) * numRanges);
 	ReadBytes(Ranges, sizeof(RANGE_STRUCT) * numRanges);
 
-	__int32 numCommands = ReadInt32();
-	Commands = (__int16*)GameMalloc(2 * numCommands);
+	int numCommands = ReadInt32();
+	Commands = (short*)GameMalloc(2 * numCommands);
 	ReadBytes(Commands, 2 * numCommands);
 
-	__int32 numBones = ReadInt32();
-	Bones = (__int32*)GameMalloc(4 * numBones);
+	int numBones = ReadInt32();
+	Bones = (int*)GameMalloc(4 * numBones);
 	ReadBytes(Bones, 4 * numBones);
 
-	__int32* bone = Bones;
+	int* bone = Bones;
 	for (int i = 0; i < 15; i++)
 	{
-		__int32 opcode = *(bone++);
+		int opcode = *(bone++);
 		int linkX = *(bone++);
 		int linkY = *(bone++);
 		int linkZ = *(bone++);
 	}
 	
-	MeshTrees = (__int32*)GameMalloc(4 * numBones);
+	MeshTrees = (int*)GameMalloc(4 * numBones);
 
 	memcpy(MeshTrees, Bones, 4 * numBones);
 
-	__int32 numFrames = ReadInt32();
-	Frames = (__int16*)GameMalloc(2 * numFrames);
+	int numFrames = ReadInt32();
+	Frames = (short*)GameMalloc(2 * numFrames);
 	ReadBytes(Frames, 2 * numFrames);
 
 	AnimationsCount = numAnimations;
 	if (AnimationsCount > 0)
 	{
-		__int32 i = 0;
-		for (__int32 i = 0; i < AnimationsCount; i++)
-			ADD_PTR(Anims[i].framePtr, __int16, Frames);
+		int i = 0;
+		for (int i = 0; i < AnimationsCount; i++)
+			ADD_PTR(Anims[i].framePtr, short, Frames);
 	}
 
-	__int32 numModels = ReadInt32();
+	int numModels = ReadInt32();
 	NumObjects = numModels;
-	for (__int32 i = 0; i < numModels; i++)
+	for (int i = 0; i < numModels; i++)
 	{
 		int objNum = ReadInt32();
 		MoveablesIds.push_back(objNum);
@@ -254,7 +254,7 @@ void __cdecl LoadObjects()
 		Objects[objNum].nmeshes = ReadInt16();
 		Objects[objNum].meshIndex = ReadInt16();
 		Objects[objNum].boneIndex = ReadInt32();
-		Objects[objNum].frameBase = (__int16*)(ReadInt32() + (__int32)Frames); 
+		Objects[objNum].frameBase = (short*)(ReadInt32() + (int)Frames); 
 		Objects[objNum].animIndex = ReadInt16();
 
 		ReadInt16();
@@ -265,14 +265,14 @@ void __cdecl LoadObjects()
 	if (LaraDrawType != LARA_DIVESUIT)
 		CreateSkinningData();
 
-	for (__int32 i = 0; i < ID_NUMBER_OBJECTS; i++)
+	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
 		Objects[i].meshIndex *= 2;
 	}
 
 	memcpy(&Meshes[numMeshes], &Meshes[0], sizeof(short*) * numMeshes);
 
-	for (__int32 i = 0; i < numMeshes; i++)
+	for (int i = 0; i < numMeshes; i++)
 	{
 		Meshes[2 * i] = Meshes[numMeshes + i];
 		Meshes[2 * i + 1] = Meshes[numMeshes + i];
@@ -285,7 +285,7 @@ void __cdecl LoadObjects()
 	NumStaticObjects = numStatics;
 	for (int i = 0; i < numStatics; i++)
 	{
-		__int32 meshID = ReadInt32();
+		int meshID = ReadInt32();
 		StaticObjectsIds.push_back(meshID);
 
 		StaticObjects[meshID].meshNumber = ReadInt16();
@@ -307,7 +307,7 @@ void __cdecl LoadObjects()
 		StaticObjects[meshID].flags = ReadInt16();
 	}
 
-	for (__int32 i = 0; i < NUM_STATICS; i++)
+	for (int i = 0; i < NUM_STATICS; i++)
 	{
 		StaticObjects[i].meshNumber *= 2;
 	}
@@ -340,8 +340,8 @@ void __cdecl LoadTextures()
 	DB_Log(2, "LoadTextures - DLL");
 	printf("LoadTextures\n");
 
-	__int32 uncompressedSize = 0;
-	__int32 compressedSize = 0;
+	int uncompressedSize = 0;
+	int compressedSize = 0;
 
 	// Read 32 bit textures
 	ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
@@ -381,7 +381,7 @@ void __cdecl LoadTextures()
 
 void __cdecl ReadRoom(ROOM_INFO* room, ROOM_INFO* roomData)
 {
-	/*ADD_PTR(roomData->door, __int16, roomData + 1);
+	/*ADD_PTR(roomData->door, short, roomData + 1);
 	ADD_PTR(roomData->floor, FLOOR_INFO, roomData + 1);
 	ADD_PTR(roomData->light, LIGHTINFO, roomData + 1);
 	ADD_PTR(roomData->mesh, MESH_INFO, roomData + 1);
@@ -391,7 +391,7 @@ void __cdecl ReadRoom(ROOM_INFO* room, ROOM_INFO* roomData)
 	ADD_PTR(roomData->PolyOffset2, void, roomData + 1);
 	ADD_PTR(roomData->VerticesOffset, tr5_room_vertex, roomData + 1);
 
-	roomData->LightDataSize += (__int32)(roomData + 1);
+	roomData->LightDataSize += (int)(roomData + 1);
 
 	if ((byte)roomData->door & 1)
 	{
@@ -424,19 +424,19 @@ void __cdecl ReadRooms()
 {
 	ReadInt32();
 
-	__int32 numRooms = ReadInt32();
+	int numRooms = ReadInt32();
 	NumberRooms = numRooms;
 	Rooms = (ROOM_INFO*)GameMalloc(NumberRooms * sizeof(ROOM_INFO));
 
 	printf("NumRooms: %d\n", numRooms);
 	
-	for (__int32 i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < NumberRooms; i++)
 	{
 		// Ignore XELA
-		__int32 xela = ReadInt32();
+		int xela = ReadInt32();
 
 		// Read room data
-		__int32 roomDataSize = ReadInt32();
+		int roomDataSize = ReadInt32();
 		byte* roomData = (byte*)GameMalloc(roomDataSize);
 		ReadBytes(roomData, roomDataSize);
 
@@ -445,7 +445,7 @@ void __cdecl ReadRooms()
 	}
 }
  
-__int32 __cdecl LoadRoomsNew()
+int __cdecl LoadRoomsNew()
 {
 	DB_Log(2, "LoadRooms - DLL");
 	printf("LoadRooms\n");
@@ -457,8 +457,8 @@ __int32 __cdecl LoadRoomsNew()
 	ReadRooms();
 	DoSomethingWithRooms();
 
-	__int32 numFloorData = ReadInt32(); 
-	FloorData = (__int16*)GameMalloc(numFloorData * 2);
+	int numFloorData = ReadInt32(); 
+	FloorData = (short*)GameMalloc(numFloorData * 2);
 	ReadBytes(FloorData, numFloorData * 2);
 
 	return true;
@@ -487,10 +487,10 @@ unsigned __stdcall LoadLevel(void* data)
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
 	{
-		__int32 version;
-		__int16 numRoomTextureTiles;
-		__int16 numObjectsTextureTiles;
-		__int16 numBumpTextureTiles;
+		int version;
+		short numRoomTextureTiles;
+		short numObjectsTextureTiles;
+		short numBumpTextureTiles;
 
 		ReadFileEx(&version, 1, 4, LevelFilePtr);
 		ReadFileEx(&numRoomTextureTiles, 1, 2, LevelFilePtr);
@@ -503,13 +503,13 @@ unsigned __stdcall LoadLevel(void* data)
 
 		g_Renderer->UpdateProgress(20);
 
-		__int16 buffer[32];
+		short buffer[32];
 		ReadFileEx(&buffer, 2, 16, LevelFilePtr);
 		WeatherType = buffer[0];
 		LaraDrawType = buffer[1];
 
-		__int32 uncompressedSize;
-		__int32 compressedSize;
+		int uncompressedSize;
+		int compressedSize;
 
 		ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
 		ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
@@ -540,7 +540,7 @@ unsigned __stdcall LoadLevel(void* data)
 		LoadSamples();
 		g_Renderer->UpdateProgress(80);
 
-		__int32 extraSize = 0;
+		int extraSize = 0;
 		ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
 		if (extraSize > 0)
 		{
@@ -587,7 +587,7 @@ unsigned __stdcall LoadLevel(void* data)
 	return true;
 }
 
-__int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
+int __cdecl S_LoadLevelFile(int levelIndex)
 {
 	DB_Log(2, "S_LoadLevelFile - DLL");
 	printf("S_LoadLevelFile\n");
@@ -615,20 +615,20 @@ __int32 __cdecl S_LoadLevelFile(__int32 levelIndex)
 	return true;
 }
 
-void __cdecl AdjustUV(__int32 num)
+void __cdecl AdjustUV(int num)
 {
 	// Dummy function
 	NumObjectTextures = num;
 }
 
-bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool __cdecl ReadLuaIds(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(ChunkLuaId))
 	{
-		__int32 luaId = 0;
+		int luaId = 0;
 		g_levelChunkIO->GetRawStream()->ReadInt32(&luaId);
 		
-		__int32 itemId = 0;
+		int itemId = 0;
 		g_levelChunkIO->GetRawStream()->ReadInt32(&itemId);
 
 		g_GameScript->AddLuaId(luaId, itemId);
@@ -639,7 +639,7 @@ bool __cdecl ReadLuaIds(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 		return false;
 }
 
-bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool __cdecl ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(ChunkTrigger))
 	{
@@ -665,7 +665,7 @@ bool __cdecl ReadLuaTriggers(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 		return false;
 }
 
-bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
+bool __cdecl ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(ChunkTriggersList))
 		return g_levelChunkIO->ReadChunks(ReadLuaTriggers, 0);
@@ -674,7 +674,7 @@ bool __cdecl ReadNewDataChunks(ChunkId* chunkId, __int32 maxSize, __int32 arg)
 	return false;
 }
 
-void __cdecl LoadNewData(__int32 size)
+void __cdecl LoadNewData(int size)
 {
 	// Free old level scripts
 	MemoryStream stream(LevelDataPtr, size);
@@ -695,7 +695,7 @@ void LoadSprites()
 
 	Sprites = (SPRITE*)GameMalloc(g_NumSprites * sizeof(SPRITE));
 
-	for (__int32 i = 0; i < g_NumSprites; i++)
+	for (int i = 0; i < g_NumSprites; i++)
 	{
 		Sprites[i].tile = ReadInt16() + 1;
 		Sprites[i].x = ReadInt8();
@@ -710,11 +710,11 @@ void LoadSprites()
 
 	g_NumSpritesSequences = ReadInt32();
 
-	for (__int32 i = 0; i < g_NumSpritesSequences; i++)
+	for (int i = 0; i < g_NumSpritesSequences; i++)
 	{
-		__int32 spriteID = ReadInt32();
-		__int16 negLength = ReadInt16();
-		__int16 offset = ReadInt16();
+		int spriteID = ReadInt32();
+		short negLength = ReadInt16();
+		short offset = ReadInt16();
 		if (spriteID >= ID_NUMBER_OBJECTS)
 		{
 			StaticObjects[spriteID - ID_NUMBER_OBJECTS].meshNumber = offset;

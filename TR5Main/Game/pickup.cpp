@@ -1,5 +1,5 @@
 #include "pickup.h"
-#include "Lara.h"
+#include "lara.h"
 #include "draw.h"
 #include "inventory.h"
 #include "effects.h"
@@ -11,7 +11,6 @@
 #include "healt.h"
 #include "items.h"
 #include "collide.h"
-#include "Lara.h"
 #include "switch.h"
 #include "larafire.h"
 #include "laraflar.h"
@@ -20,86 +19,86 @@
 
 #include "..\Global\global.h"
 
-static __int16 PickUpBounds[12] = // offset 0xA1338
+static short PickUpBounds[12] = // offset 0xA1338
 {
 	0xFF00, 0x0100, 0xFF38, 0x00C8, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0x0000, 0x0000,
 	0x0000, 0x0000
 };
 static PHD_VECTOR PickUpPosition = { 0, 0, 0xFFFFFF9C }; // offset 0xA1350
-static __int16 HiddenPickUpBounds[12] = // offset 0xA135C
+static short HiddenPickUpBounds[12] = // offset 0xA135C
 {
 	0xFF00, 0x0100, 0xFF9C, 0x0064, 0xFCE0, 0xFF00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
 static PHD_VECTOR HiddenPickUpPosition = { 0, 0, 0xFFFFFD4E }; // offset 0xA1374
-static __int16 CrowbarPickUpBounds[12] = // offset 0xA1380
+static short CrowbarPickUpBounds[12] = // offset 0xA1380
 {
 	0xFF00, 0x0100, 0xFF9C, 0x0064, 0x00C8, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
 static PHD_VECTOR CrowbarPickUpPosition = { 0, 0, 0xD7 }; // offset 0xA1398
-static __int16 JobyCrowPickUpBounds[12] = // offset 0xA13A4
+static short JobyCrowPickUpBounds[12] = // offset 0xA13A4
 {
 	0xFE00, 0x0000, 0xFF9C, 0x0064, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
 static PHD_VECTOR JobyCrowPickUpPosition = { 0xFFFFFF20, 0, 0xF0 }; // offset 0xA13BC
-static __int16 PlinthPickUpBounds[12] = // offset 0xA13C8
+static short PlinthPickUpBounds[12] = // offset 0xA13C8
 {
 	0xFF00, 0x0100, 0xFD80, 0x0280, 0xFE01, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
 static PHD_VECTOR PlinthPickUpPosition = { 0, 0, 0xFFFFFE34 }; // offset 0xA13E0
-static __int16 PickUpBoundsUW[12] = // offset 0xA13EC
+static short PickUpBoundsUW[12] = // offset 0xA13EC
 {
 	0xFE00, 0x0200, 0xFE00, 0x0200, 0xFE00, 0x0200, 0xE002, 0x1FFE, 0xE002, 0x1FFE,
 	0xE002, 0x1FFE
 };
 static PHD_VECTOR PickUpPositionUW = { 0, 0xFFFFFF38, 0xFFFFFEA2 }; // offset 0xA1404
-static __int16 KeyHoleBounds[12] = // offset 0xA1410
+static short KeyHoleBounds[12] = // offset 0xA1410
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0x0000, 0x019C, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 static PHD_VECTOR KeyHolePosition = { 0, 0, 0x138 }; // offset 0xA1428
-static __int16 PuzzleBounds[12] = // offset 0xA1434
+static short PuzzleBounds[12] = // offset 0xA1434
 {
 	0x0000, 0x0000, 0xFF00, 0x0100, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-static __int16 SOBounds[12] = // offset 0xA144C
+static short SOBounds[12] = // offset 0xA144C
 {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 static PHD_VECTOR SOPos = { 0, 0, 0 }; // offset 0xA1464
-__int16 SearchCollectFrames[4] =
+short SearchCollectFrames[4] =
 {
 	0x00B4, 0x0064, 0x0099, 0x0053
 };
-__int16 SearchAnims[4] =
+short SearchAnims[4] =
 {
 	0x01D0, 0x01D1, 0x01D2, 0x01D8
 };
-__int16 SearchOffsets[4] =
+short SearchOffsets[4] =
 {
 	0x00A0, 0x0060, 0x00A0, 0x0070
 };
-static __int16 MSBounds[12] = // offset 0xA1488
+static short MSBounds[12] = // offset 0xA1488
 {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 
-__int32 NumRPickups;
-__int16 RPickups[16];
+int NumRPickups;
+short RPickups[16];
 PHD_VECTOR OldPickupPos;
 
-extern __int32 KeyTriggerActive;
+extern int KeyTriggerActive;
 extern LaraExtraInfo g_LaraExtra;
 extern Inventory* g_Inventory;
 
-void __cdecl PickedUpObject(__int16 objectNumber)
+void __cdecl PickedUpObject(short objectNumber)
 {
 	switch (objectNumber)
 	{
@@ -380,7 +379,7 @@ void __cdecl PickedUpObject(__int16 objectNumber)
 	g_Inventory->LoadObjects(false);
 }
 
-void __cdecl RemoveObjectFromInventory(__int16 objectNumber)
+void __cdecl RemoveObjectFromInventory(short objectNumber)
 {
 	if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
 		Lara.puzzleItems[objectNumber - ID_PUZZLE_ITEM1]--;
@@ -405,7 +404,7 @@ void __cdecl RemoveObjectFromInventory(__int16 objectNumber)
 
 void __cdecl CollectCarriedItems(ITEM_INFO* item) 
 {
-	__int16 pickupNumber = item->carriedItem;
+	short pickupNumber = item->carriedItem;
 	if (pickupNumber != NO_ITEM)
 	{
 		while (pickupNumber != NO_ITEM)
@@ -420,17 +419,17 @@ void __cdecl CollectCarriedItems(ITEM_INFO* item)
 	}
 }
 
-/*void __cdecl SearchObjectCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+/*void __cdecl SearchObjectCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	UNIMPLEMENTED();
 }
 
-void SearchObjectControl(__int16 itemNumber)//52D54, 531B8
+void SearchObjectControl(short itemNumber)//52D54, 531B8
 {
 	UNIMPLEMENTED();
 }*/
 
-__int32 __cdecl PickupTrigger(__int16 itemNum) 
+int __cdecl PickupTrigger(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -447,10 +446,10 @@ __int32 __cdecl PickupTrigger(__int16 itemNum)
 	return 1;
 }
 
-__int32 __cdecl KeyTrigger(__int16 itemNum) 
+int __cdecl KeyTrigger(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
-	__int32 oldkey;
+	int oldkey;
 
 	if ((item->status != ITEM_ACTIVE || Lara.gunStatus == LG_HANDS_BUSY) && (!KeyTriggerActive || Lara.gunStatus != LG_HANDS_BUSY))
 		return -1;
@@ -465,10 +464,10 @@ __int32 __cdecl KeyTrigger(__int16 itemNum)
 	return oldkey;
 }
 
-void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
-	__int32 flag = 0;
+	int flag = 0;
 	
 	if (item->triggerFlags >= 0)
 	{
@@ -495,9 +494,9 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& l->animNumber == ANIMATION_LARA_STAY_IDLE
 		&& GetKeyTrigger(&Items[itemNum])))
 	{
-		if (!Lara.isMoving && (__int16)Lara.generalPtr == itemNum || (__int16)Lara.generalPtr != itemNum)
+		if (!Lara.isMoving && (short)Lara.generalPtr == itemNum || (short)Lara.generalPtr != itemNum)
 		{
-			if ((__int16)Lara.generalPtr == itemNum && l->currentAnimState == STATE_LARA_INSERT_PUZZLE)
+			if ((short)Lara.generalPtr == itemNum && l->currentAnimState == STATE_LARA_INSERT_PUZZLE)
 			{
 				if (l->frameNumber == Anims[ANIMATION_LARA_USE_PUZZLE].frameBase + 80 && item->itemFlags[0])
 				{
@@ -511,7 +510,7 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 			}
 
-			if ((__int16)Lara.generalPtr == itemNum)
+			if ((short)Lara.generalPtr == itemNum)
 			{
 				if (l->currentAnimState != STATE_LARA_MISC_CONTROL)
 				{
@@ -537,8 +536,8 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 
-	__int16 oldYrot = item->pos.yRot;
-	__int16* bounds = GetBoundsAccurate(item);
+	short oldYrot = item->pos.yRot;
+	short* bounds = GetBoundsAccurate(item);
 
 	PuzzleBounds[0] = bounds[0] - 256;
 	PuzzleBounds[1] = bounds[1] + 256;
@@ -656,7 +655,7 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (Lara.isMoving)
 	{
-		if ((__int16)Lara.generalPtr == itemNum)
+		if ((short)Lara.generalPtr == itemNum)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -666,7 +665,7 @@ void __cdecl PuzzleHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	item->pos.yRot = oldYrot;
 }
 
-void __cdecl PuzzleDoneCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	if (Items[itemNum].triggerFlags - 998 > 1)
 	{
@@ -674,7 +673,7 @@ void __cdecl PuzzleDoneCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void __cdecl KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (Items[itemNum].triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
@@ -692,7 +691,7 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| Lara.gunStatus
 		|| l->currentAnimState != STATE_LARA_STOP
 		|| l->animNumber != ANIMATION_LARA_STAY_IDLE)
-		&& (!Lara.isMoving || (__int16)Lara.generalPtr != itemNum))
+		&& (!Lara.isMoving || (short)Lara.generalPtr != itemNum))
 	{
 		if (item->objectNumber < ID_KEY_HOLE6)
 			ObjectCollision(itemNum, l, coll);
@@ -750,7 +749,7 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 
-		if (Lara.isMoving && (__int16)Lara.generalPtr == itemNum)
+		if (Lara.isMoving && (short)Lara.generalPtr == itemNum)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -760,18 +759,18 @@ void __cdecl KeyHoleCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	return;
 }
 
-void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void __cdecl PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	__int16 oldXrot = item->pos.xRot;
-	__int16 oldYrot = item->pos.yRot;
-	__int16 oldZrot = item->pos.zRot;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
 	if (item->status == ITEM_INVISIBLE)
 		return;
 
-	__int16 triggerFlags = item->triggerFlags & 0x3F;
+	short triggerFlags = item->triggerFlags & 0x3F;
 	if (triggerFlags == 5 || triggerFlags == 10)
 		return;
 
@@ -791,7 +790,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				&& l->currentAnimState == STATE_LARA_UNDERWATER_STOP
 				&& !Lara.gunStatus
 				&& TestLaraPosition(PickUpBoundsUW, item, l)
-				|| Lara.isMoving && (__int16)Lara.generalPtr == itemNum)
+				|| Lara.isMoving && (short)Lara.generalPtr == itemNum)
 			{
 				if (TestLaraPosition(PickUpBoundsUW, item, l))
 				{
@@ -819,7 +818,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				{
 					if (Lara.isMoving)
 					{
-						if ((__int16)Lara.generalPtr == itemNum)
+						if ((short)Lara.generalPtr == itemNum)
 						{
 							Lara.isMoving = false;
 							Lara.gunStatus = LG_NO_ARMS;
@@ -833,11 +832,11 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 			
-			if ((__int16)Lara.generalPtr != itemNum
+			if ((short)Lara.generalPtr != itemNum
 				|| l->currentAnimState != STATE_LARA_PICKUP
 				|| l->frameNumber != Anims[ANIMATION_LARA_UNDERWATER_PICKUP].frameBase + 18)
 			{
-				if ((__int16)Lara.generalPtr == itemNum
+				if ((short)Lara.generalPtr == itemNum
 					&& l->currentAnimState == STATE_LARA_FLARE_PICKUP
 					&& l->frameNumber == Anims[ANIMATION_LARA_UNDERWATER_FLARE_PICKUP].frameBase + 20)
 				{
@@ -845,7 +844,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					Lara.gunType = WEAPON_FLARE;
 					InitialiseNewWeapon();
 					Lara.gunStatus = LG_SPECIAL;
-					Lara.flareAge = (__int32)(item->data) & 0x7FFF;
+					Lara.flareAge = (int)(item->data) & 0x7FFF;
 					draw_flare_meshes();
 					KillItem(itemNum);
 				}
@@ -883,11 +882,11 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (!Lara.isMoving)
 		{
-			if ((__int16)Lara.generalPtr == itemNum)
+			if ((short)Lara.generalPtr == itemNum)
 			{
 				if (l->currentAnimState != STATE_LARA_PICKUP && l->currentAnimState != STATE_LARA_HOLE)
 				{
-					if ((__int16)Lara.generalPtr == itemNum
+					if ((short)Lara.generalPtr == itemNum
 						&& l->currentAnimState == STATE_LARA_FLARE_PICKUP
 						&& (l->animNumber == ANIMATION_LARA_CROUCH_PICKUP_FLARE &&
 							l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP_FLARE].frameBase + 22)
@@ -897,7 +896,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						Lara.gunType = WEAPON_FLARE;
 						InitialiseNewWeapon();
 						Lara.gunStatus = LG_SPECIAL;
-						Lara.flareAge = (__int16)(item->data) & 0x7FFF;
+						Lara.flareAge = (short)(item->data) & 0x7FFF;
 					}
 					else
 					{
@@ -938,7 +937,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 								AddDisplayPickup(item->objectNumber);
 								if (item->triggerFlags & 0x100)
 								{
-									for (__int32 i = 0; i < LevelItems; i++)
+									for (int i = 0; i < LevelItems; i++)
 									{
 										if (Items[i].objectNumber == item->objectNumber)
 											KillItem(i);
@@ -971,7 +970,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 
-		if ((__int16)Lara.generalPtr != itemNum)
+		if ((short)Lara.generalPtr != itemNum)
 		{
 			item->pos.xRot = oldXrot;
 			item->pos.yRot = oldYrot;
@@ -980,8 +979,8 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 	
-	__int32 flag = 0;
-	__int16* plinth = NULL;
+	int flag = 0;
+	short* plinth = NULL;
 	item->pos.xRot = 0;
 	switch (triggerFlags)
 	{
@@ -990,7 +989,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if(Lara.isMoving)
 			{
-				if ((__int16)Lara.generalPtr == itemNum)
+				if ((short)Lara.generalPtr == itemNum)
 				{
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_NO_ARMS;
@@ -1023,7 +1022,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			if ((__int16)Lara.generalPtr == itemNum)
+			if ((short)Lara.generalPtr == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -1118,7 +1117,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 		
-		if ((__int16)Lara.generalPtr == itemNum)
+		if ((short)Lara.generalPtr == itemNum)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -1160,7 +1159,7 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 			
-			if ((__int16)Lara.generalPtr == itemNum)
+			if ((short)Lara.generalPtr == itemNum)
 			{
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -1233,13 +1232,13 @@ void __cdecl PickupCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void __cdecl RegeneratePickups()
 {
-	for (__int32 i = 0; i < NumRPickups; i++)
+	for (int i = 0; i < NumRPickups; i++)
 	{
 		ITEM_INFO* item = &Items[RPickups[i]];
 
 		if (item->status == ITEM_INVISIBLE)
 		{
-			__int16 ammo = 0;
+			short ammo = 0;
 
 			if (item->objectNumber == ID_CROSSBOW_AMMO1_ITEM)
 				ammo = g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1];
@@ -1283,11 +1282,11 @@ void __cdecl RegeneratePickups()
 	}
 }
 
-void __cdecl PickupControl(__int16 itemNum)
+void __cdecl PickupControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	__int16 roomNumber;
-	__int16 triggerFlags = item->triggerFlags & 0x3F;
+	short roomNumber;
+	short triggerFlags = item->triggerFlags & 0x3F;
 	switch (triggerFlags)
 	{
 	case 5:
@@ -1325,20 +1324,20 @@ void __cdecl PickupControl(__int16 itemNum)
 	}
 }
 
-__int16* __cdecl FindPlinth(ITEM_INFO* item)
+short* __cdecl FindPlinth(ITEM_INFO* item)
 {
 	ROOM_INFO* room = &Rooms[item->roomNumber];
 	MESH_INFO* mesh = room->mesh;
 
-	__int32 found = -1;
-	for (__int32 i = 0; i < room->numMeshes; i++)
+	int found = -1;
+	for (int i = 0; i < room->numMeshes; i++)
 	{
 		MESH_INFO* mesh = &room->mesh[i];
 		if (mesh->Flags & 1)
 		{
 			if (item->pos.xPos == mesh->x && item->pos.yPos == mesh->y && item->pos.zPos == mesh->z)
 			{
-				__int16* frame = GetBestFrame(item);
+				short* frame = GetBestFrame(item);
 				STATIC_INFO* s = &StaticObjects[mesh->staticNumber];
 				if (frame[0] <= s->xMaxc && frame[1] >= s->xMinc && frame[4] <= s->zMaxc && frame[5] >= s->zMinc && (s->xMinc || s->xMaxc))
 				{
@@ -1355,7 +1354,7 @@ __int16* __cdecl FindPlinth(ITEM_INFO* item)
 	if (room->itemNumber == NO_ITEM)
 		return NULL;
 
-	__int16 itemNumber = room->itemNumber;
+	short itemNumber = room->itemNumber;
 	for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)
 	{
 		ITEM_INFO* current = &Items[itemNumber];
@@ -1376,7 +1375,7 @@ __int16* __cdecl FindPlinth(ITEM_INFO* item)
 		return GetBestFrame(&Items[itemNumber]);
 }
 
-void __cdecl PuzzleDone(ITEM_INFO* item, __int16 itemNum)
+void __cdecl PuzzleDone(ITEM_INFO* item, short itemNum)
 {
 	item->objectNumber += 8; 
 	item->animNumber = Objects[item->objectNumber].animIndex;
@@ -1408,11 +1407,11 @@ void __cdecl PuzzleDone(ITEM_INFO* item, __int16 itemNum)
 	}*/
 }
 
-void __cdecl InitialisePickup(__int16 itemNumber)
+void __cdecl InitialisePickup(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	__int16* bounds = GetBoundsAccurate(item);
-	__int16 triggerFlags = item->triggerFlags & 0x3F;
+	short* bounds = GetBoundsAccurate(item);
+	short triggerFlags = item->triggerFlags & 0x3F;
 	if (triggerFlags == 5)
 	{
 		item->itemFlags[0] = item->pos.yPos - bounds[3];

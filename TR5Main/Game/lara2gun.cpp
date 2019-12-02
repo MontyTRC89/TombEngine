@@ -12,12 +12,12 @@ PISTOL_DEF PistolsTable[4] =
 	{ ID_UZI_ANIM, 4, 5, 0xD, 0x18 }
 };
 
-__int32 UziLeft;
-__int32 UziRight;
+int UziLeft;
+int UziRight;
 
-void __cdecl AnimatePistols(__int32 weaponType)
+void __cdecl AnimatePistols(int weaponType)
 {
-	__int32 soundPlayed = false;
+	int soundPlayed = false;
 
 	PHD_VECTOR pos;
 
@@ -75,8 +75,8 @@ void __cdecl AnimatePistols(__int32 weaponType)
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
-	__int16 frameRight = Lara.rightArm.frameNumber;
-	__int16 angles[2];
+	short frameRight = Lara.rightArm.frameNumber;
+	short angles[2];
 
 	if (Lara.rightArm.lock || TrInput & IN_ACTION && !Lara.target)
 	{
@@ -156,7 +156,7 @@ void __cdecl AnimatePistols(__int32 weaponType)
 
 	set_arm_info(&Lara.rightArm, frameRight);
 
-	__int32 frameLeft = Lara.leftArm.frameNumber;
+	int frameLeft = Lara.leftArm.frameNumber;
 	if (!Lara.leftArm.lock && (!(TrInput & IN_ACTION) || Lara.target))
 	{
 		if (frameLeft >= 0 && frameLeft < p->draw1Anim2)
@@ -222,7 +222,7 @@ void __cdecl AnimatePistols(__int32 weaponType)
 	set_arm_info(&Lara.leftArm, frameLeft);
 }
 
-void __cdecl PistolHandler(__int32 weaponType)
+void __cdecl PistolHandler(int weaponType)
 {
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
@@ -292,9 +292,9 @@ void __cdecl PistolHandler(__int32 weaponType)
 	}
 }
 
-void __cdecl undraw_pistol_mesh_right(__int32 weaponType)
+void __cdecl undraw_pistol_mesh_right(int weaponType)
 {
-	__int16 objectNumber = WeaponObject(weaponType);
+	short objectNumber = WeaponObject(weaponType);
 	
 	//Lara.meshPtrs[THIGH_R] = Meshes[Objects[objectNumber].meshIndex + THIGH_R];
 	Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_LARA].meshIndex + HAND_R];
@@ -314,7 +314,7 @@ void __cdecl undraw_pistol_mesh_right(__int32 weaponType)
 
 }
 
-void __cdecl undraw_pistol_mesh_left(__int32 weaponType)
+void __cdecl undraw_pistol_mesh_left(int weaponType)
 {
 	int result; // eax
 
@@ -334,7 +334,7 @@ void __cdecl undraw_pistol_mesh_left(__int32 weaponType)
 	}
 }
 
-void __cdecl draw_pistol_meshes(__int32 weaponType)
+void __cdecl draw_pistol_meshes(int weaponType)
 {
 	Lara.holster = 13;
 	Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
@@ -345,7 +345,7 @@ void __cdecl draw_pistol_meshes(__int32 weaponType)
 	}
 }
 
-void __cdecl ready_pistols(__int32 weaponType)
+void __cdecl ready_pistols(int weaponType)
 {
 	Lara.gunStatus = LG_READY;
 	Lara.leftArm.zRot = 0;
@@ -363,11 +363,11 @@ void __cdecl ready_pistols(__int32 weaponType)
 	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 }
 
-void __cdecl undraw_pistols(__int32 weaponType)
+void __cdecl undraw_pistols(int weaponType)
 {
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];
 
-	__int32 frameLeft = Lara.leftArm.frameNumber;
+	int frameLeft = Lara.leftArm.frameNumber;
 	if (frameLeft >= p->recoilAnim)
 	{
 		frameLeft = p->recoilAnim;
@@ -398,7 +398,7 @@ void __cdecl undraw_pistols(__int32 weaponType)
 
 	set_arm_info(&Lara.leftArm, frameLeft);
 
-	__int32 frameRight = Lara.rightArm.frameNumber;
+	int frameRight = Lara.rightArm.frameNumber;
 	if (frameRight < p->recoilAnim)
 	{
 		if (frameRight > 0 && frameRight < p->draw1Anim)
@@ -451,10 +451,10 @@ void __cdecl undraw_pistols(__int32 weaponType)
 	}
 }
 
-void __cdecl set_arm_info(LARA_ARM* arm, __int32 frame)
+void __cdecl set_arm_info(LARA_ARM* arm, int frame)
 {
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];
-	__int16 animBase = Objects[p->objectNum].animIndex;
+	short animBase = Objects[p->objectNum].animIndex;
 	
 	if (frame < p->draw1Anim)
 		arm->animNumber = animBase;
@@ -469,9 +469,9 @@ void __cdecl set_arm_info(LARA_ARM* arm, __int32 frame)
 	arm->frameBase = Anims[animBase].framePtr;
 }
 
-void __cdecl draw_pistols(__int32 weaponType)
+void __cdecl draw_pistols(int weaponType)
 {
-	__int16 frame = Lara.leftArm.frameNumber + 1;
+	short frame = Lara.leftArm.frameNumber + 1;
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];
 
 	if (frame < p->draw1Anim|| frame > p->recoilAnim - 1)
@@ -492,5 +492,4 @@ void __cdecl draw_pistols(__int32 weaponType)
 	set_arm_info(&Lara.rightArm, frame);
 	set_arm_info(&Lara.leftArm, frame);
 }
-
 

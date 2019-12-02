@@ -27,8 +27,8 @@ byte FishRanges[1][3] = {
 	{ 2 << 2, 5 << 2, 3 }
 };
 
-__int32 PirahnaHitWait = false;
-__int32 CarcassItem = NO_ITEM;
+int PirahnaHitWait = false;
+int CarcassItem = NO_ITEM;
 
 /*uchar	temple_fish_ranges[3][3] = {
 								{	1 << 2,1 << 2,2	},
@@ -72,7 +72,7 @@ uchar	rapids_fish_ranges[2][3] = {
 								{	1 << 2,2 << 2,5	},
 };*/
 
-void __cdecl SetupShoal(__int32 shoalNumber)
+void __cdecl SetupShoal(int shoalNumber)
 {
 	//if (CurrentLevel == LV_JUNGLE)
 	//{
@@ -125,11 +125,11 @@ void __cdecl SetupShoal(__int32 shoalNumber)
 }
 
 
-void __cdecl SetupFish(__int32 leader, ITEM_INFO* item)
+void __cdecl SetupFish(int leader, ITEM_INFO* item)
 {
-	__int32 fishXRange = LeaderInfo[leader].xRange;
-	__int32 fishYRange = LeaderInfo[leader].yRange;
-	__int32 fishZRange = LeaderInfo[leader].zRange;
+	int fishXRange = LeaderInfo[leader].xRange;
+	int fishYRange = LeaderInfo[leader].yRange;
+	int fishZRange = LeaderInfo[leader].zRange;
 
 	Fishes[leader].x = 0;
 	Fishes[leader].y = 0;
@@ -138,7 +138,7 @@ void __cdecl SetupFish(__int32 leader, ITEM_INFO* item)
 	Fishes[leader].speed = (GetRandomControl() & 63) + 8;
 	Fishes[leader].swim = GetRandomControl() & 63;
 
-	for (__int32 i = 0; i < 24; i++)
+	for (int i = 0; i < 24; i++)
 	{
 		Fishes[MAX_FISH + (leader * 24) + i].x = (GetRandomControl() % (fishXRange << 1)) - fishXRange;
 		Fishes[MAX_FISH + (leader * 24) + i].y = (GetRandomControl() % fishYRange);
@@ -157,10 +157,10 @@ void __cdecl SetupFish(__int32 leader, ITEM_INFO* item)
 	LeaderInfo[leader].speedTime = 0;
 }
 
-void ControlFish(__int16 itemNumber)
+void ControlFish(short itemNumber)
 {
-	__int32 pirahnaAttack = 0;
-	__int32 angle = 0;
+	int pirahnaAttack = 0;
+	int angle = 0;
 
 	ITEM_INFO* item = &Items[itemNumber];
 	ITEM_INFO* enemy = item;
@@ -168,7 +168,7 @@ void ControlFish(__int16 itemNumber)
 	if (!TriggerActive(item))
 		return;
 
-	__int32 leader = item->hitPoints;
+	int leader = item->hitPoints;
 	if (!LeaderInfo[leader].on)
 		SetupFish(leader, item);
 
@@ -203,7 +203,7 @@ void ControlFish(__int16 itemNumber)
 		LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
 	}
 
-	__int32 diff = fish->angle - LeaderInfo[leader].angle;
+	int diff = fish->angle - LeaderInfo[leader].angle;
 
 	if (diff > 2048)
 		diff -= 4096;
@@ -256,16 +256,16 @@ void ControlFish(__int16 itemNumber)
 	fish->swim += fish->speed >> 4;
 	fish->swim &= 63;
 
-	__int32 x = fish->x;
-	__int32 z = fish->z;
+	int x = fish->x;
+	int z = fish->z;
 	
 	x += -fish->speed * SIN(fish->angle << 4) >> W2V_SHIFT;  //   -(((rcossin_tbl[(fish->angle << 1)]) * (fish->speed)) >> 13);
 	z += fish->speed * COS(fish->angle << 4) >> W2V_SHIFT;  //   (((rcossin_tbl[(fish->angle << 1) + 1]) * (fish->speed)) >> 13);
 	
 	if (pirahnaAttack == 0)
 	{
-		__int32 fishXRange = LeaderInfo[leader].xRange;
-		__int32 fishZRange = LeaderInfo[leader].zRange;
+		int fishXRange = LeaderInfo[leader].xRange;
+		int fishZRange = LeaderInfo[leader].zRange;
 		if (z < -fishZRange)
 		{
 			z = -fishZRange;
@@ -316,7 +316,7 @@ void ControlFish(__int16 itemNumber)
 		else
 		{
 			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
-			__int32 angAdd = ((GetRandomControl() & 63) + 16) - 8 - 32;
+			int angAdd = ((GetRandomControl() & 63) + 16) - 8 - 32;
 			if ((GetRandomControl() & 3) == 0)
 				LeaderInfo[leader].angle += angAdd << 5;
 			else
@@ -344,15 +344,15 @@ void ControlFish(__int16 itemNumber)
 
 	}
 
-	__int32 ftx = x;
-	__int32 ftz = z;
+	int ftx = x;
+	int ftz = z;
 
 	fish->x = x;
 	fish->z = z;
 
 	fish = (FISH_INFO*)&Fishes[MAX_FISH + (leader * 24)];
 
-	for (__int32 i = 0; i < 24; i++)
+	for (int i = 0; i < 24; i++)
 	{
 		if (item->flags & OCB_FISH_LETAL)
 		{
@@ -373,8 +373,8 @@ void ControlFish(__int16 itemNumber)
 		}
 
 		angle = (-(mGetAngle(fish->x, fish->z, ftx, ftz) + 0x4000) >> 4) & 4095;
-		__int32 dx = fish->x - ftx + ((24 - i) << 7);
-		__int32 dz = fish->z - ftz - ((24 - i) << 7);
+		int dx = fish->x - ftx + ((24 - i) << 7);
+		int dz = fish->z - ftz - ((24 - i) << 7);
 
 		dx *= dx;
 		dz *= dz;
@@ -459,7 +459,7 @@ void ControlFish(__int16 itemNumber)
 		}
 		else
 		{
-			__int32 y = enemy->pos.yPos - item->pos.yPos;
+			int y = enemy->pos.yPos - item->pos.yPos;
 			if (abs(fish->y - fish->destY) < 16)
 				fish->destY = y + (GetRandomControl() & 255); 
 		}
@@ -469,11 +469,11 @@ void ControlFish(__int16 itemNumber)
 	}
 }
 
-bool FishNearLara(PHD_3DPOS* pos, __int32 distance, ITEM_INFO* item)
+bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item)
 {
-	__int32 x = pos->xPos - item->pos.xPos;
-	__int32 y = abs(pos->yPos - item->pos.yPos);
-	__int32 z = pos->zPos - item->pos.zPos;
+	int x = pos->xPos - item->pos.xPos;
+	int y = abs(pos->yPos - item->pos.yPos);
+	int z = pos->zPos - item->pos.zPos;
 
 	if (x < -distance || x > distance || z < -distance || z > distance || y < -WALL_SIZE * 3 || y > WALL_SIZE * 3)
 		return false;

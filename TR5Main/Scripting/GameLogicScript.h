@@ -39,19 +39,19 @@ typedef struct LuaFunction {
 };
 
 typedef struct GameScriptItemPosition {
-	__int32 x;
-	__int32 y;
-	__int32 z;
-	__int16 xRot;
-	__int16 yRot;
-	__int16 zRot;
-	__int16 room;
+	int x;
+	int y;
+	int z;
+	short xRot;
+	short yRot;
+	short zRot;
+	short room;
 };
 
 typedef struct GameScriptItem {
 	ITEM_INFO*		NativeItem;
 
-	__int16 Get(__int32 param)
+	short Get(int param)
 	{
 		if (NativeItem == NULL)
 			return 0;
@@ -85,7 +85,7 @@ typedef struct GameScriptItem {
 		}
 	}
 
-	void Set(__int32 param, __int16 value)
+	void Set(int param, short value)
 	{
 		if (NativeItem == NULL)
 			return;
@@ -139,7 +139,7 @@ typedef struct GameScriptItem {
 		return pos;
 	}
 
-	void SetItemPosition(__int32 x, __int32 y, __int32 z)
+	void SetItemPosition(int x, int y, int z)
 	{
 		if (NativeItem == NULL)
 			return;
@@ -149,7 +149,7 @@ typedef struct GameScriptItem {
 		NativeItem->pos.zPos = z;
 	}
 
-	void SetItemRotation(__int32 x, __int32 y, __int32 z)
+	void SetItemRotation(int x, int y, int z)
 	{
 		if (NativeItem == NULL)
 			return;
@@ -164,9 +164,9 @@ typedef struct LuaVariable
 {
 	bool IsGlobal;
 	string Name;
-	__int32 Type;
+	int Type;
 	float FloatValue;
-	__int32 IntValue;
+	int IntValue;
 	string StringValue;
 	bool BoolValue;
 };
@@ -177,7 +177,7 @@ private:
 	sol::state*							m_lua;
 	sol::table							m_globals;
 	sol::table							m_locals;
-	map<__int32, __int32>				m_itemsMap;
+	map<int, int>				m_itemsMap;
 	vector<LuaFunction*>				m_triggers;
 	GameScriptItem						m_items[NUM_ITEMS];
 
@@ -191,23 +191,23 @@ public:
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, int itemId);
-	void								SetItem(__int32 index, ITEM_INFO* item);
+	void								SetItem(int index, ITEM_INFO* item);
 	void								AssignItemsAndLara();
 	void								ResetVariables();
 	void								GetVariables(vector<LuaVariable>* list);
 	void								SetVariables(vector<LuaVariable>* list);
 
-	void								EnableItem(__int16 id);
-	void								DisableItem(__int16 id);
-	void								PlayAudioTrack(__int16 track);
-	void								ChangeAmbientSoundTrack(__int16 track);
-	bool								ExecuteTrigger(__int16 index);
-	void								JumpToLevel(__int32 levelNum);
-	__int32								GetSecretsCount();
-	void								SetSecretsCount(__int32 secretsNum);
+	void								EnableItem(short id);
+	void								DisableItem(short id);
+	void								PlayAudioTrack(short track);
+	void								ChangeAmbientSoundTrack(short track);
+	bool								ExecuteTrigger(short index);
+	void								JumpToLevel(int levelNum);
+	int								GetSecretsCount();
+	void								SetSecretsCount(int secretsNum);
 	void								AddOneSecret();
-	void								MakeItemInvisible(__int16 id);
-	GameScriptItem						GetItem(__int16 id);
-	void								PlaySoundEffectAtPosition(__int16 id, __int32 x, __int32 y, __int32 z, __int32 flags);
-	void								PlaySoundEffect(__int16 id, __int32 flags);
+	void								MakeItemInvisible(short id);
+	GameScriptItem						GetItem(short id);
+	void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
+	void								PlaySoundEffect(short id, int flags);
 };

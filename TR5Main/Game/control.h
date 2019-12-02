@@ -7,9 +7,9 @@
 #define GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
 #define GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
 #define AnimateItem ((void (__cdecl*)(ITEM_INFO*)) 0x00415300)
-#define GetWaterHeight ((__int32 (__cdecl*)(__int32, __int32, __int32, __int16)) 0x00415DA0)
-#define TriggerActive ((__int32 (__cdecl*)(ITEM_INFO*)) 0x004175B0)
-#define GetChange ((__int32 (__cdecl*)(ITEM_INFO*, ANIM_STRUCT*)) 0x00415890)
+#define GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
+#define TriggerActive ((int (__cdecl*)(ITEM_INFO*)) 0x004175B0)
+#define GetChange ((int (__cdecl*)(ITEM_INFO*, ANIM_STRUCT*)) 0x00415890)
 #define KillMoveItems ((void (__cdecl*)()) 0x00414620)
 #define KillMoveEffects ((void (__cdecl*)()) 0x004146A0)
 #define ClearDynamics ((void (__cdecl*)()) 0x00431530)
@@ -31,30 +31,30 @@
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 #define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
 #define RumbleScreen ((void (__cdecl*)()) 0x00442C90)
-#define ExplodeItemNode ((__int32 (__cdecl*)(ITEM_INFO*, __int32, __int32, __int32)) 0x0041ABF0)
+#define ExplodeItemNode ((int (__cdecl*)(ITEM_INFO*, int, int, int)) 0x0041ABF0)
 #define LavaBurn ((void (__cdecl*)(ITEM_INFO*)) 0x0048ADD0)
-#define RefreshCamera ((void (__cdecl*)(__int16, __int16*)) 0x004165E0)
-#define DoFlipMap ((void (__cdecl*)(__int16)) 0x00418910)
-//#define SwitchTrigger ((__int32 (__cdecl*)(__int16, __int16)) 0x0047D670)
-//#define KeyTrigger ((__int32 (__cdecl*)(__int16)) 0x00469550)
-//#define PickupTrigger ((__int32 (__cdecl*)(__int16)) 0x004695E0)
-#define PlaySoundTrack ((void (__cdecl*)(__int16, __int16)) 0x00418B90)
-#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, __int32)) 0x004159F0)
+#define RefreshCamera ((void (__cdecl*)(short, short*)) 0x004165E0)
+#define DoFlipMap ((void (__cdecl*)(short)) 0x00418910)
+//#define SwitchTrigger ((int (__cdecl*)(short, short)) 0x0047D670)
+//#define KeyTrigger ((int (__cdecl*)(short)) 0x00469550)
+//#define PickupTrigger ((int (__cdecl*)(short)) 0x004695E0)
+#define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
+#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)
-#define ObjectOnLOS2 ((__int32 (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
+#define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
 //#define AnimateWaterfalls ((void (__cdecl*)()) 0x00465DF0)
-#define LOS ((__int32 (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
-#define GetTargetOnLOS ((__int32 (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, __int32, __int32)) 0x0041A170)
+#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
+#define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
 
-GAME_STATUS __cdecl DoTitle(__int32 index);
-GAME_STATUS __cdecl DoLevel(__int32 index, __int32 ambient, bool loadFromSavegame);
-GAME_STATUS __cdecl ControlPhase(__int32 numFrames, __int32 demoMode);
+GAME_STATUS __cdecl DoTitle(int index);
+GAME_STATUS __cdecl DoLevel(int index, int ambient, bool loadFromSavegame);
+GAME_STATUS __cdecl ControlPhase(int numFrames, int demoMode);
 void __cdecl UpdateSky();
 void __cdecl AnimateWaterfalls();
 void __cdecl ActivateKey();
 void __cdecl ActivateCamera();
-__int16 __cdecl GetDoor(FLOOR_INFO* floor);
+short __cdecl GetDoor(FLOOR_INFO* floor);
 
 unsigned __stdcall GameMain(void*);
-void __cdecl TestTriggers(__int16* data, __int32 heavy, __int32 HeavyFlags);
+void __cdecl TestTriggers(short* data, int heavy, int HeavyFlags);
 void Inject_Control();

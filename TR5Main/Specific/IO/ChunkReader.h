@@ -14,22 +14,22 @@ private:
 	ChunkId*			m_emptyChunk;
 	BaseStream*			m_stream;
 
-	__int32 readInt32()
+	int readInt32()
 	{
-		__int32 value = 0;
+		int value = 0;
 		m_stream->Read(reinterpret_cast<char *>(&value), 4);
 		return value;
 	}
 
-	__int16 readInt16()
+	short readInt16()
 	{
-		__int16 value = 0;
+		short value = 0;
 		m_stream->Read(reinterpret_cast<char *>(&value), 2);
 		return value;
 	}
 
 public:
-	ChunkReader(__int32 expectedMagicNumber, BaseStream* stream)
+	ChunkReader(int expectedMagicNumber, BaseStream* stream)
 	{
 		m_isValid = false;
 
@@ -39,7 +39,7 @@ public:
 		m_stream = stream;
 
 		// Check the magic number
-		__int32 magicNumber = readInt32();
+		int magicNumber = readInt32();
 		if (magicNumber != expectedMagicNumber)
 			return;
 
@@ -61,7 +61,7 @@ public:
 		return m_isValid;
 	}
 
-	bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, __int32 maxSize, __int32 arg), __int32 arg)
+	bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg)
 	{
 		do
 		{
@@ -74,10 +74,10 @@ public:
 
 			// Try loading chunk content
 			bool chunkRecognized = false;
-			__int32 startPos = m_stream->GetCurrentPosition();
+			int startPos = m_stream->GetCurrentPosition();
 
 			chunkRecognized = func(chunkId, chunkSize, arg);
-			__int32 readDataCount = m_stream->GetCurrentPosition() - startPos;
+			int readDataCount = m_stream->GetCurrentPosition() - startPos;
 
 			// Adjust _stream position if necessary
 			if (readDataCount != chunkSize)
@@ -104,22 +104,22 @@ public:
 		return LEB128::ReadLong(m_stream);
 	}
 
-	__int32 ReadChunkInt32(__int64 length)
+	int ReadChunkInt32(__int64 length)
 	{
 		return LEB128::ReadInt32(m_stream);
 	}
 
-	unsigned __int32 ReadChunkUInt32(__int64 length)
+	unsigned int ReadChunkUInt32(__int64 length)
 	{
 		return LEB128::ReadUInt32(m_stream);
 	}
 
-	__int16 ReadChunkInt16(__int64 length)
+	short ReadChunkInt16(__int64 length)
 	{
 		return LEB128::ReadInt16(m_stream);
 	}
 
-	unsigned __int16 ReadChunkUInt16(__int64 length)
+	unsigned short ReadChunkUInt16(__int64 length)
 	{
 		return LEB128::ReadUInt16(m_stream);
 	}

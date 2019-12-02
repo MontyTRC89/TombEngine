@@ -34,9 +34,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Pistols */
 	{
-		{ -ANGLE(60),  +ANGLE(60),  -ANGLE(60), +ANGLE(60) },
-		{ -ANGLE(170), +ANGLE(60),  -ANGLE(80), +ANGLE(80) },
-		{ -ANGLE(60),  +ANGLE(170), -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(60),  -ANGLE(60), ANGLE(60) },
+		{ -ANGLE(170), ANGLE(60),  -ANGLE(80), ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(170), -ANGLE(80), ANGLE(80) },
 		ANGLE(10),
 		ANGLE(8),
 		650,
@@ -45,12 +45,12 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		0,
-		8
+		SFX_LARA_FIRE
 	},
 	/* Revolver */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(60), +ANGLE(60) },
-		{ -ANGLE(10), +ANGLE(10), -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(60), ANGLE(60) },
+		{ -ANGLE(10), ANGLE(10), -ANGLE(80), ANGLE(80) },
 		{  ANGLE(0),   ANGLE(0),   ANGLE(0),   ANGLE(0) },
 		ANGLE(10),
 		ANGLE(4),
@@ -60,13 +60,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		16,
 		3,
 		0,
-		121
+		SFX_REVOLVER
 	},
 	/* Uzis */
 	{
-		{ -ANGLE(60),  +ANGLE(60),  -ANGLE(60), +ANGLE(60) },
-		{ -ANGLE(170), +ANGLE(60),  -ANGLE(80), +ANGLE(80) },
-		{ -ANGLE(60),  +ANGLE(170), -ANGLE(80), +ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(60),  -ANGLE(60), ANGLE(60) },
+		{ -ANGLE(170), ANGLE(60),  -ANGLE(80), ANGLE(80) },
+		{ -ANGLE(60),  ANGLE(170), -ANGLE(80), ANGLE(80) },
 		ANGLE(10),
 		ANGLE(8),
 		650,
@@ -75,13 +75,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		3,
 		3,
 		0,
-		43
+		SFX_LARA_UZI_FIRE
 	},
 	/* Shotgun */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		0,
 		500,
@@ -90,13 +90,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		9,
 		3,
 		10,
-		45
+		SFX_LARA_SHOTGUN
 	},
 	/* HK */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(4),
 		500,
@@ -105,13 +105,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		3,
 		10,
-		0
+		0     // FIRE/SILENCER_FIRE
 	},
 	/* Crossbow */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -120,7 +120,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		10,
-		0
+		SFX_LARA_CROSSBOW
 	},
 	/* Flare */
 	{
@@ -139,9 +139,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Flare 2 */
 	{
-		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), +ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
 		ANGLE(10),
 		ANGLE(8),
 		400,
@@ -150,13 +150,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		0,
 		2,
 		0,
-		43
+		SFX_LARA_UZI_FIRE
 	},
 	/* Grenade launcher */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -169,9 +169,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	}, 
 	/* Harpoon gun */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(20), +ANGLE(20), -ANGLE(75), +ANGLE(75) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(75), +ANGLE(75) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(20), ANGLE(20), -ANGLE(75), ANGLE(75) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(75), ANGLE(75) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -184,9 +184,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Rocket launcher */
 	{
-		{ -ANGLE(60), +ANGLE(60), -ANGLE(55), +ANGLE(55) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
-		{ -ANGLE(80), +ANGLE(80), -ANGLE(65), +ANGLE(65) },
+		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
+		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
 		ANGLE(10),
 		ANGLE(8),
 		500,
@@ -196,13 +196,29 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 		2,
 		12,
 		77
+	},
+	/* Snowmobile */
+	{
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
+		ANGLE(10),
+		ANGLE(8),
+		400,
+		8 * WALL_SIZE,
+		3,
+		0,
+		0,
+		0,
+		SFX_LARA_UZI_FIRE
 	}
 };
 
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
+bool MonksAttackLara;
 
-__int32 __cdecl WeaponObject(__int32 weaponType)
+int __cdecl WeaponObject(int weaponType)
 {
 	switch (weaponType)
 	{
@@ -231,7 +247,7 @@ __int32 __cdecl WeaponObject(__int32 weaponType)
 
 void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 {
-	__int16 rotY, rotX, speed = 0, x = 0, y = 0;
+	short rotY, rotX, speed = 0, x = 0, y = 0;
 
 	speed = winfo->aimSpeed;
 
@@ -270,15 +286,15 @@ void __cdecl AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 	arm->zRot = 0;
 }
 
-void __cdecl SmashItem(__int16 itemNum)
+void __cdecl SmashItem(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	__int16 objectNumber = item->objectNumber;
+	short objectNumber = item->objectNumber;
 	if (objectNumber >= ID_SMASH_OBJECT1 && objectNumber <= ID_SMASH_OBJECT8)
 		SmashObject(itemNum);
 
 	/*ITEM_INFO* item = &Items[itemNum];
-	__int16 objectNumber = item->objectNumber;
+	short objectNumber = item->objectNumber;
 	printf("SmashItem\n");
 	if (objectNumber >= ID_SMASH_OBJECT1 && objectNumber <= ID_SMASH_OBJECT8)
 		SmashObject(itemNum);
@@ -294,7 +310,7 @@ void __cdecl SmashItem(__int16 itemNum)
 
 void __cdecl LaraGun()
 {
-	__int32 meshIndex;
+	int meshIndex;
 
 	if (Lara.leftArm.flash_gun > 0)
 		--Lara.leftArm.flash_gun;
@@ -307,7 +323,7 @@ void __cdecl LaraGun()
 		return;
 	}
 
-	__int32 gunStatus = Lara.gunStatus;
+	int gunStatus = Lara.gunStatus;
 
 	if (LaraItem->hitPoints <= 0)
 	{
@@ -545,7 +561,7 @@ void __cdecl LaraGun()
 	}
 }
 
-__int16* __cdecl GetAmmo(__int32 weaponType)
+short* __cdecl GetAmmo(int weaponType)
 {
 	return &g_LaraExtra.Weapons[weaponType].Ammo[g_LaraExtra.Weapons[weaponType].SelectedAmmo];
 }
@@ -602,7 +618,7 @@ void __cdecl InitialiseNewWeapon()
 	}
 }
 
-__int32 __cdecl WeaponObjectMesh(__int32 weaponType)
+int __cdecl WeaponObjectMesh(int weaponType)
 {
 	switch (weaponType)
 	{
@@ -636,7 +652,7 @@ __int32 __cdecl WeaponObjectMesh(__int32 weaponType)
 	}
 }
 
-void __cdecl HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, __int32 damage, __int32 flag)
+void __cdecl HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -672,7 +688,7 @@ void __cdecl HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, __int32 damage, __i
 	}
 }
 
-__int32 __cdecl FireWeapon(__int32 weaponType, ITEM_INFO* target, ITEM_INFO* src, __int16* angles)
+int __cdecl FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 {
 	PHD_3DPOS pos;
 	
@@ -681,7 +697,7 @@ __int32 __cdecl FireWeapon(__int32 weaponType, ITEM_INFO* target, ITEM_INFO* src
 	pos.zPos = 0;
 
 	GetLaraJointPosition((PHD_VECTOR*)&pos, 11);
-	__int16* ammo = GetAmmo(weaponType);
+	short* ammo = GetAmmo(weaponType);
 	if (!*ammo)
 		return 0;
 	if (*ammo != -1)
@@ -692,19 +708,19 @@ __int32 __cdecl FireWeapon(__int32 weaponType, ITEM_INFO* target, ITEM_INFO* src
 	pos.xPos = src->pos.xPos;
 	pos.yPos = src->pos.yPos - weapon->gunHeight;
 	pos.zPos = src->pos.zPos;
-	__int32 r = (__int32)((GetRandomControl() - 16384) * weapon->shotAccuracy) / 65536;
-	pos.xRot = angles[1] + (__int16)r;
-	r = (__int32)((GetRandomControl() - 16384) * weapon->shotAccuracy) / 65536;
-	pos.yRot = angles[0] + (__int16)r;
+	int r = (int)((GetRandomControl() - 16384) * weapon->shotAccuracy) / 65536;
+	pos.xRot = angles[1] + (short)r;
+	r = (int)((GetRandomControl() - 16384) * weapon->shotAccuracy) / 65536;
+	pos.yRot = angles[0] + (short)r;
 	pos.zRot = 0;
 
 	phd_GenerateW2V(&pos);
 	
-	__int32 num = GetSpheres(target, SphereList, 0);
-	__int32 best = -1;
-	__int32 bestDistance = 0x7FFFFFFF;
+	int num = GetSpheres(target, SphereList, 0);
+	int best = -1;
+	int bestDistance = 0x7FFFFFFF;
 
-	for (__int32 i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		SPHERE* sphere = &SphereList[i];
 
@@ -727,7 +743,7 @@ __int32 __cdecl FireWeapon(__int32 weaponType, ITEM_INFO* target, ITEM_INFO* src
 	vSrc.y = pos.yPos;
 	vSrc.z = pos.zPos;
 	
-	__int16 roomNumber = src->roomNumber;
+	short roomNumber = src->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos.xPos, pos.yPos, pos.zPos, &roomNumber);
 	vSrc.roomNumber = roomNumber;
 
@@ -762,14 +778,14 @@ __int32 __cdecl FireWeapon(__int32 weaponType, ITEM_INFO* target, ITEM_INFO* src
 
 void __cdecl find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
 {
-	__int16* bounds = GetBestFrame(item);
+	short* bounds = GetBestFrame(item);
 
-	__int32 x = (__int32)((*(bounds + 0) + *(bounds + 1)) / 2);
-	__int32 y = (__int32)(*(bounds + 2) + (*(bounds + 3) - *(bounds + 2)) / 3);
-	__int32 z = (__int32)((*(bounds + 4) + *(bounds + 5)) / 2);
+	int x = (int)((*(bounds + 0) + *(bounds + 1)) / 2);
+	int y = (int)(*(bounds + 2) + (*(bounds + 3) - *(bounds + 2)) / 3);
+	int z = (int)((*(bounds + 4) + *(bounds + 5)) / 2);
 
-	__int32 c = COS(item->pos.yRot);
-	__int32 s = SIN(item->pos.yRot);
+	int c = COS(item->pos.yRot);
+	int s = SIN(item->pos.yRot);
 
 	target->x = item->pos.xPos + ((c * x + s * z) >> W2V_SHIFT);
 	target->y = item->pos.yPos + y;
@@ -804,7 +820,7 @@ void __cdecl LaraTargetInfo(WEAPON_INFO* weapon)
 	GAME_VECTOR targetPoint;
 	find_target_point(Lara.target, &targetPoint);
 
-	__int16 angles[2];
+	short angles[2];
 	phd_GetVectorAngles(targetPoint.x - pos.x, targetPoint.y - pos.y, targetPoint.z - pos.z, angles);
 
 	angles[0] -= LaraItem->pos.yRot;

@@ -13,7 +13,7 @@
 
 BITE_INFO ArmedBaddy2Gun = { 0x0FFFFFFCE, 0xDC, 0x3C, 0x0D };
 
-void __cdecl InitialiseArmedBaddy2(__int16 itemNum)
+void __cdecl InitialiseArmedBaddy2(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -26,7 +26,7 @@ void __cdecl InitialiseArmedBaddy2(__int16 itemNum)
 	*item->pad2 = 9216;
 }
 
-void __cdecl ArmedBaddy2Control(__int16 itemNum)
+void __cdecl ArmedBaddy2Control(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -34,41 +34,41 @@ void __cdecl ArmedBaddy2Control(__int16 itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
-	__int16 angle = 0;
-	__int16 joint2 = 0;
-	__int16 joint1 = 0;
-	__int16 joint0 = 0;
+	short angle = 0;
+	short joint2 = 0;
+	short joint1 = 0;
+	short joint0 = 0;
 
 	// Can baddy jump? Check for a distance of 1 and 2 sectors
-	__int32 x = item->pos.xPos;
-	__int32 y = item->pos.yPos;
-	__int32 z = item->pos.zPos;
+	int x = item->pos.xPos;
+	int y = item->pos.yPos;
+	int z = item->pos.zPos;
 
-	__int32 dx = 870 * SIN(item->pos.yRot) >> 14;
-	__int32 dz = 870 * COS(item->pos.yRot) >> 14;
+	int dx = 870 * SIN(item->pos.yRot) >> 14;
+	int dz = 870 * COS(item->pos.yRot) >> 14;
 
 	x += dx;
 	z += dz;
 
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height1 = GetFloorHeight(floor, x, y, z);
+	int height1 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height2 = GetFloorHeight(floor, x, y, z);
+	int height2 = GetFloorHeight(floor, x, y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
-	__int32 height3 = GetFloorHeight(floor, x, y, z);
+	int height3 = GetFloorHeight(floor, x, y, z);
 
-	__int32 height = 0;
+	int height = 0;
 	bool canJump1sector = true;
 	if (item->boxNumber == LaraItem->boxNumber
 		|| y >= height1 - 384

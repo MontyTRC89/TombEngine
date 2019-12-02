@@ -12,7 +12,7 @@
 
 extern LaraExtraInfo g_LaraExtra;
 
-void FlareControl(__int16 itemNumber)//4A418, 4A87C
+void FlareControl(short itemNumber)//4A418, 4A87C
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->fallspeed)
@@ -26,12 +26,12 @@ void FlareControl(__int16 itemNumber)//4A418, 4A87C
 		item->pos.zRot = 0;
 	}
 
-	__int32 oldX = item->pos.xPos;
-	__int32 oldY = item->pos.yPos;
-	__int32 oldZ = item->pos.zPos;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
 
-	__int32 xv = 0;
-	__int32 zv = 0;
+	int xv = 0;
+	int zv = 0;
 
 	item->pos.xPos += (xv = (item->speed * SIN(item->pos.yRot) >> W2V_SHIFT));
 	item->pos.zPos += (zv = (item->speed * COS(item->pos.yRot) >> W2V_SHIFT));
@@ -49,7 +49,7 @@ void FlareControl(__int16 itemNumber)//4A418, 4A87C
 
 	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, zv);
 	
-	__int16 age = (__int16)(item->data) & 0x7FFF;
+	short age = (short)(item->data) & 0x7FFF;
 	if (age >= 900)
 	{
 		if (!item->fallspeed && !item->speed)
@@ -102,8 +102,8 @@ void __cdecl undraw_flare()//4A108, 4A56C
 {
 	Lara.flareControlLeft = true;
 
-	__int16 frame1 = Lara.flareFrame;
-	__int16 frame2 = Lara.leftArm.frameNumber;
+	short frame1 = Lara.flareFrame;
+	short frame2 = Lara.leftArm.frameNumber;
 	
 	if (LaraItem->goalAnimState == STATE_LARA_STOP &&
 		g_LaraExtra.Vehicle == NO_ITEM)
@@ -202,7 +202,7 @@ void __cdecl undraw_flare()//4A108, 4A56C
 
 void __cdecl draw_flare()//49F74, 4A3D8 (F)
 {
-	__int16 frame;
+	short frame;
 
 	if (LaraItem->currentAnimState == STATE_LARA_FLARE_PICKUP ||
 		LaraItem->currentAnimState == STATE_LARA_PICKUP)
@@ -251,7 +251,7 @@ void __cdecl draw_flare()//49F74, 4A3D8 (F)
 
 void __cdecl set_flare_arm(int frame)//49ED4, 4A338 (F)
 {
-	__int16 anim = Objects[ID_FLARE_ANIM].animIndex;
+	short anim = Objects[ID_FLARE_ANIM].animIndex;
 
 	if (frame >= 95)
 	{
@@ -274,9 +274,9 @@ void __cdecl set_flare_arm(int frame)//49ED4, 4A338 (F)
 	Lara.leftArm.frameBase = Anims[anim].framePtr;
 }
 
-void __cdecl CreateFlare(__int16 objectNum, __int32 thrown)//49BBC, 4A020
+void __cdecl CreateFlare(short objectNum, int thrown)//49BBC, 4A020
 {
-	__int16 itemNum = CreateItem();
+	short itemNum = CreateItem();
 	if (itemNum != NO_ITEM)
 	{
 		bool flag = false;
@@ -298,9 +298,9 @@ void __cdecl CreateFlare(__int16 objectNum, __int32 thrown)//49BBC, 4A020
 		ITEM_INFO* tmp1[128];
 		MESH_INFO* tmp2[128];
 
-		__int16 roomNumber = LaraItem->roomNumber;
+		short roomNumber = LaraItem->roomNumber;
 		FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-		__int32 collided = GetCollidedObjects(item, 0, 1, &tmp1[0], &tmp2[0], 0);
+		int collided = GetCollidedObjects(item, 0, 1, &tmp1[0], &tmp2[0], 0);
 		if (collided || GetFloorHeight(floor, pos.x, pos.y, pos.z) < pos.y)
 		{
 			flag = true;
@@ -384,12 +384,12 @@ void DoFlareInHand(int flare_age)//49984, 49DE8
 	}
 }
 
-int DoFlareLight(PHD_VECTOR* pos, __int32 age)//49708, 49B6C (F)
+int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 {
-	__int32 x, y, z;
-	__int32 r, g, b;
-	__int32 random;
-	__int32 falloff;
+	int x, y, z;
+	int r, g, b;
+	int random;
+	int falloff;
 
 	if (age >= 900 || age == 0)
 		return 0;

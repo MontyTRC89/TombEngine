@@ -327,7 +327,7 @@ void __cdecl LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4
 	}
 }
 
-__int32 __cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
+int __cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 {
 	if (coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
@@ -341,11 +341,11 @@ __int32 __cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 
 	if (coll->midCeiling > -384)
 		return false;
 
-	__int32 frontFloor = coll->frontFloor + 700;
+	int frontFloor = coll->frontFloor + 700;
 	if (frontFloor <= -512 || frontFloor > 316)
 		return false;
 
-	__int16 rot = item->pos.yRot;
+	short rot = item->pos.yRot;
 	if (item->pos.yRot < -ANGLE(35) || item->pos.yRot > ANGLE(35))
 	{
 		if (item->pos.yRot < 10014 || item->pos.yRot > 22754)
@@ -432,7 +432,7 @@ __int32 __cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 
 	return true;
 }
 
-__int32 __cdecl LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
+int __cdecl LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
 {
 	if (coll->collType == CT_FRONT || coll->midType == BIG_SLOPE || coll->midType == DIAGONAL || coll->midFloor >= 0)
 	{

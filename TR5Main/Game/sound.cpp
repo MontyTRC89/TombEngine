@@ -17,7 +17,7 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
 
 vector<AudioTrack> g_AudioTracks;
 
-bool __cdecl Sound_LoadSample(char *pointer, __int32 compSize, __int32 uncompSize, __int32 index)	// Replaces DXCreateSampleADPCM()
+bool __cdecl Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	// Replaces DXCreateSampleADPCM()
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
@@ -96,7 +96,7 @@ bool __cdecl Sound_LoadSample(char *pointer, __int32 compSize, __int32 uncompSiz
 	return true;
 }
 
-long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flags)
+long __cdecl SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 {
 	if (effectID >= SOUND_LEGACY_SOUNDMAP_SIZE)
 		return 0;
@@ -240,7 +240,7 @@ long __cdecl SoundEffect(__int32 effectID, PHD_3DPOS* position, __int32 env_flag
 	return 1;
 }
 
-void __cdecl StopSoundEffect(__int16 effectID)
+void __cdecl StopSoundEffect(short effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 		if (SoundSlot[i].effectID == effectID && SoundSlot[i].channel != NULL && BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING)
@@ -394,7 +394,7 @@ static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD
 	BASS_Soundtrack[SOUND_TRACK_ONESHOT].channel = NULL;
 }
 
-void Sound_FreeSample(__int32 index)
+void Sound_FreeSample(int index)
 {
 	if (SamplePointer[index] != NULL)
 	{

@@ -25,7 +25,7 @@ void __cdecl LaraWaterCurrent(COLL_INFO* coll)//4CD34, 4D198
 	{
 		OBJECT_VECTOR* sink = &Cameras[Lara.currentActive - 1];
 
-		__int16 angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
+		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
 		Lara.currentXvel += ((sink->data * SIN(angle - ANGLE(90)) >> 2) - Lara.currentXvel) >> 4;
 		Lara.currentZvel += ((sink->data * COS(angle - ANGLE(90)) >> 2) - Lara.currentZvel) >> 4; // ((v12 * rcossin_tbl[2 * v13 + 1] >> 2) - Lara.currentZvel) >> 4;
 
@@ -33,7 +33,7 @@ void __cdecl LaraWaterCurrent(COLL_INFO* coll)//4CD34, 4D198
 	}
 	else
 	{
-		__int32 shift = 0;
+		int shift = 0;
 
 		if (abs(Lara.currentXvel) <= 16)
 			shift = (abs(Lara.currentXvel) > 8) + 2;
@@ -103,16 +103,16 @@ void __cdecl LaraWaterCurrent(COLL_INFO* coll)//4CD34, 4D198
 	coll->old.z = LaraItem->pos.zPos;
 }
 
-__int32 __cdecl GetWaterDepth(__int32 x, __int32 y, __int32 z, __int16 roomNumber)//4CA38, 4CE9C
+int __cdecl GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 {
 	FLOOR_INFO* floor;
 	ROOM_INFO* r = &Rooms[roomNumber];
 	
-	__int16 roomIndex = NO_ROOM;
+	short roomIndex = NO_ROOM;
 	do
 	{
-		__int32 zFloor = (z - r->z) >> WALL_SHIFT;
-		__int32 xFloor = (x - r->x) >> WALL_SHIFT;
+		int zFloor = (z - r->z) >> WALL_SHIFT;
+		int xFloor = (x - r->x) >> WALL_SHIFT;
 
 		if (zFloor <= 0)
 		{
@@ -151,7 +151,7 @@ __int32 __cdecl GetWaterDepth(__int32 x, __int32 y, __int32 z, __int16 roomNumbe
 			r = &Rooms[floor->skyRoom];
 			if (!(r->flags & ENV_FLAG_WATER))
 			{
-				__int32 wh = floor->ceiling << 8;
+				int wh = floor->ceiling << 8;
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
@@ -166,7 +166,7 @@ __int32 __cdecl GetWaterDepth(__int32 x, __int32 y, __int32 z, __int16 roomNumbe
 			r = &Rooms[floor->pitRoom];
 			if (r->flags & ENV_FLAG_WATER)
 			{
-				__int32 wh = floor->floor << 8;
+				int wh = floor->floor << 8;
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
@@ -186,7 +186,7 @@ void __cdecl lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)//4C980(<), 4CDE4
 	item->hitPoints = -1;
 	Lara.air = -1;
 	Lara.gunStatus = LG_HANDS_BUSY;
-	__int32 wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	if (wh != NO_HEIGHT)
 	{
 		if (wh < item->pos.yPos - 100)
@@ -564,7 +564,7 @@ void __cdecl UpdateSubsuitAngles()//4BD20, 4C184 (F)
 
 	if (Subsuit.dXRot != 0)
 	{
-		__int16 rot = Subsuit.dXRot >> 3;
+		short rot = Subsuit.dXRot >> 3;
 		if (rot < -ANGLE(2))
 			rot = -ANGLE(2);
 		else if (rot > ANGLE(2))
@@ -663,12 +663,12 @@ void __cdecl SwimTurn(ITEM_INFO* item)//4BAF4(<), 4BF58(<) (F)
 
 void __cdecl LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 {
-	__int32 oldX = item->pos.xPos;
-	__int32 oldY = item->pos.yPos;
-	__int32 oldZ = item->pos.zPos;
-	__int16 oldXrot = item->pos.xRot;
-	__int16 oldYrot = item->pos.yRot;
-	__int16 oldZrot = item->pos.zRot;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
 	if (item->pos.xRot < -ANGLE(90) || item->pos.xRot > ANGLE(90))
 	{
@@ -681,7 +681,7 @@ void __cdecl LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		coll->facing = item->pos.yRot;
 	}
 
-	__int16 height = 762 * SIN(item->pos.xRot) >> W2V_SHIFT;
+	short height = 762 * SIN(item->pos.xRot) >> W2V_SHIFT;
 	if (height < 0)
 		height = -height;
 	if (height < ((LaraDrawType == LARA_DIVESUIT) << 6) + 200)
@@ -704,7 +704,7 @@ void __cdecl LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	
 	ShiftItem(item, coll);
 	
-	__int32 flag = 0;
+	int flag = 0;
 
 	switch (coll->collType)
 	{
@@ -826,9 +826,9 @@ void __cdecl LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 
 void __cdecl LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)//4B4F8(<), 4B95C(<) (F)
 {
-	__int16 roomNumber = item->roomNumber;
+	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	__int32 wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
+	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
 
 	if (wd == NO_HEIGHT)
 	{
