@@ -13,7 +13,7 @@
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 
-void __cdecl lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
+void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
 	if (item->goalAnimState == STATE_LARA_UNDERWATER_FORWARD)
 	{
@@ -28,25 +28,25 @@ void __cdecl lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void __cdecl lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DD90(<), 4E1F4(<) (F)
+void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DD90(<), 4E1F4(<) (F)
 {
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
-void __cdecl lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DD64(<), 4E1C8(<) (F)
+void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DD64(<), 4E1C8(<) (F)
 {
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
-void __cdecl lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)//4DD38(<), 4E19C(<) (F)
+void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)//4DD38(<), 4E19C(<) (F)
 {
 	Lara.moveAngle = item->pos.yRot - ANGLE(180);
 	LaraSurfaceCollision(item, coll);
 }
 
-void __cdecl lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14C(<) (F)
+void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14C(<) (F)
 {
 	coll->badNeg = -384;
 	Lara.moveAngle = item->pos.yRot;
@@ -54,7 +54,7 @@ void __cdecl lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14
 	LaraTestWaterClimbOut(item, coll);
 }
 
-void __cdecl lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
+void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 {
 	item->fallspeed -= 4;
 	if (item->fallspeed < 0)
@@ -110,7 +110,7 @@ void __cdecl lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (
 	}
 }
 
-void __cdecl lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
+void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -139,7 +139,7 @@ void __cdecl lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (
 		item->fallspeed = 60;
 }
 
-void __cdecl lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
+void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -168,7 +168,7 @@ void __cdecl lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4
 		item->fallspeed = 60;
 }
 
-void __cdecl lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
+void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -197,7 +197,7 @@ void __cdecl lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C
 		item->fallspeed = 60;
 }
 
-void __cdecl lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
+void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -226,7 +226,7 @@ void __cdecl lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48
 		item->fallspeed = 60;
 }
 
-void __cdecl LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
+void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 {
 	Camera.targetElevation = ANGLE(-22);
 
@@ -287,7 +287,7 @@ void __cdecl LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 	TestTriggers(coll->trigger, 0, 0);
 }
 
-void __cdecl LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) (F)
+void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) (F)
 {
 	coll->facing = Lara.moveAngle;
 	
@@ -327,7 +327,7 @@ void __cdecl LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4
 	}
 }
 
-int __cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
+int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 {
 	if (coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
@@ -432,7 +432,7 @@ int __cdecl LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D69
 	return true;
 }
 
-int __cdecl LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
+int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
 {
 	if (coll->collType == CT_FRONT || coll->midType == BIG_SLOPE || coll->midType == DIAGONAL || coll->midFloor >= 0)
 	{

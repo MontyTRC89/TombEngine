@@ -15,19 +15,19 @@
 #define ItemNearLara ((int (__cdecl*)(PHD_3DPOS*, int)) 0x00432580)
 #define TranslateItem ((void (__cdecl*)(ITEM_INFO*, int, int, int)) 0x00415960)
 
-void __cdecl EffectNewRoom(short fxNumber, short roomNumber);
-void __cdecl ItemNewRoom(short itemNum, short roomNumber);
-void __cdecl AddActiveItem(short itemNumber);
-void __cdecl ClearItem(short itemNum);
-short __cdecl CreateItem();
-void __cdecl RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void __cdecl RemoveActiveItem(short itemNum);
-void __cdecl RemoveDrawnItem(short itemNum);
-void __cdecl InitialiseFXArray(int allocmem);
-short __cdecl CreateNewEffect(short roomNum);
-void __cdecl KillEffect(short fxNumber);
-void __cdecl InitialiseItem(short itemNum);
-void __cdecl InitialiseItemArray(int numitems);
-void __cdecl KillItem(short itemNum);
+void EffectNewRoom(short fxNumber, short roomNumber);
+void ItemNewRoom(short itemNum, short roomNumber);
+void AddActiveItem(short itemNumber);
+void ClearItem(short itemNum);
+short CreateItem();
+void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
+void RemoveActiveItem(short itemNum);
+void RemoveDrawnItem(short itemNum);
+void InitialiseFXArray(int allocmem);
+short CreateNewEffect(short roomNum);
+void KillEffect(short fxNumber);
+void InitialiseItem(short itemNum);
+void InitialiseItemArray(int numitems);
+void KillItem(short itemNum);
 
 void Inject_Items();

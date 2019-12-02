@@ -23,13 +23,13 @@
 #define ControlWaterfallMist ((void (__cdecl*)(short)) 0x00432CA0)
 #define TriggerRicochetSparks ((void (__cdecl*)(GAME_VECTOR*, short, int, int)) 0x0042F060)
 
-void __cdecl TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
-void __cdecl TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int initial, int weapon, int count);
-void __cdecl TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
-void __cdecl TriggerRocketSmoke(int x, int y, int z, int bodyPart);
-void __cdecl GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2);
-void __cdecl GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
-void __cdecl TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
+void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+void TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int initial, int weapon, int count);
+void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
+void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
+void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2);
+void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
+void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
 
 
 void Inject_Effect2();

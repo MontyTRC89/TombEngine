@@ -8,7 +8,7 @@
 #include "debris.h"
 #include "box.h"
 
-int __cdecl ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
+int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
@@ -80,7 +80,7 @@ int __cdecl ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra
 	return targetable;
 }
 
-short __cdecl GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
+short GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	GAME_VECTOR pos;
 
@@ -94,7 +94,7 @@ short __cdecl GunMiss(int x, int y, int z, short speed, short yrot, short roomNu
 	return GunShot(x, y, z, speed, yrot, roomNumber);
 }
 
-short __cdecl GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
+short GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	PHD_VECTOR pos;
 
@@ -110,12 +110,12 @@ short __cdecl GunHit(int x, int y, int z, short speed, short yrot, short roomNum
 	return GunShot(x, y, z, speed, yrot, roomNumber);
 }
 
-short __cdecl GunShot(int x, int y, int z, short speed, short yrot, short roomNumber)
+short GunShot(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	return -1;
 }
 
-int __cdecl Targetable(ITEM_INFO* item, AI_INFO* info) 
+int Targetable(ITEM_INFO* item, AI_INFO* info) 
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
@@ -146,7 +146,7 @@ int __cdecl Targetable(ITEM_INFO* item, AI_INFO* info)
 	return 0;
 }
 
-int __cdecl TargetVisible(ITEM_INFO* item, AI_INFO* info) 
+int TargetVisible(ITEM_INFO* item, AI_INFO* info) 
 {
 	CREATURE_INFO*  creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;

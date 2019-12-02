@@ -2,7 +2,7 @@
 #include "..\Global\global.h"
 #include <stdio.h>
 
-void __cdecl InitialiseLOTarray(int allocMem)
+void InitialiseLOTarray(int allocMem)
 {
 	DB_Log(0, "InitialiseLOTarray - DLL");
 
@@ -19,7 +19,7 @@ void __cdecl InitialiseLOTarray(int allocMem)
 	SlotsUsed = 0;
 }
 
-int __cdecl EnableBaddieAI(short itemNum, int always)
+int EnableBaddieAI(short itemNum, int always)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -79,7 +79,7 @@ int __cdecl EnableBaddieAI(short itemNum, int always)
 	return false;
 }
 
-void __cdecl DisableBaddieAI(short itemNumber)
+void DisableBaddieAI(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
@@ -115,6 +115,7 @@ void InitialiseCustomObjects(short itemNum, short slot)
 		break;
 
 	case ID_APE:
+	//case ID_SMALL_SPIDER:
 		creature->LOT.step = 512;
 		creature->LOT.drop = -512;
 		creature->LOT.zone = ZONE_HUMAN;
@@ -122,7 +123,7 @@ void InitialiseCustomObjects(short itemNum, short slot)
 	}
 }
 
-void __cdecl InitialiseSlot(short itemNum, short slot)
+void InitialiseSlot(short itemNum, short slot)
 {
 	CREATURE_INFO* creature = &BaddieSlots[slot];
 	ITEM_INFO* item = &Items[itemNum];
@@ -162,6 +163,7 @@ void __cdecl InitialiseSlot(short itemNum, short slot)
 	case ID_MP_WITH_STICK:
 	case ID_MONKEY:
 	case ID_YETI:
+	//case ID_SOPHIA_LEE:
 		// Can climb
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;
@@ -236,7 +238,7 @@ void __cdecl InitialiseSlot(short itemNum, short slot)
 	SlotsUsed++;
 }
 
-void __cdecl ClearLOT(LOT_INFO* LOT)
+void ClearLOT(LOT_INFO* LOT)
 {
 	LOT->head = NO_BOX;
 	LOT->tail = NO_BOX;
@@ -254,7 +256,7 @@ void __cdecl ClearLOT(LOT_INFO* LOT)
 	}
 }
 
-void __cdecl CreateZone(ITEM_INFO* item)
+void CreateZone(ITEM_INFO* item)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ROOM_INFO* r = &Rooms[item->roomNumber];

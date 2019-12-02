@@ -37,7 +37,7 @@ enum MPGUN_STATES {
 
 BITE_INFO mpgunBite = { 0, 160, 40, 13 };
 
-void __cdecl MPGunControl(short itemNumber)
+void MPGunControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;

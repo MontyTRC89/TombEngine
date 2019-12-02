@@ -56,7 +56,7 @@ enum KAYAK_STATE {
 	KS_CLIMBOUTR,
 };
 
-void __cdecl DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
+void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 {
 	RIPPLE_STRUCT* r;
 	int s, c, x, z;
@@ -78,7 +78,7 @@ void __cdecl DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 	}
 }
 
-void __cdecl KayakSplash(ITEM_INFO* item, long fallspeed, long water)
+void KayakSplash(ITEM_INFO* item, long fallspeed, long water)
 {
 	/*
 	splash_setup.x = item->pos.x_pos;
@@ -107,7 +107,7 @@ void __cdecl KayakSplash(ITEM_INFO* item, long fallspeed, long water)
 	*/
 }
 
-void __cdecl TriggerRapidsMist(long x, long y, long z)
+void TriggerRapidsMist(long x, long y, long z)
 {
 	/*
 	SPARKS* sptr;
@@ -157,7 +157,7 @@ void __cdecl TriggerRapidsMist(long x, long y, long z)
 	*/
 }
 
-int __cdecl GetInKayak(short item_number, COLL_INFO* coll)
+int GetInKayak(short item_number, COLL_INFO* coll)
 {
 	int dist;
 	int x, z;
@@ -211,7 +211,7 @@ int __cdecl GetInKayak(short item_number, COLL_INFO* coll)
 	return 0;
 }
 
-int __cdecl GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
+int GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 {
 	xdiff = v->pos.xPos - xdiff;
 	zdiff = v->pos.zPos - zdiff;
@@ -246,7 +246,7 @@ int __cdecl GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 	return 0;
 }
 
-int __cdecl DoKayakDynamics(int height, int fallspeed, int* y)
+int DoKayakDynamics(int height, int fallspeed, int* y)
 {
 	int kick;
 
@@ -280,7 +280,7 @@ int __cdecl DoKayakDynamics(int height, int fallspeed, int* y)
 	return fallspeed;
 }
 
-void __cdecl DoKayakCurrent(ITEM_INFO* item)
+void DoKayakCurrent(ITEM_INFO* item)
 {
 	ROOM_INFO* r;
 	PHD_VECTOR target;
@@ -347,7 +347,7 @@ void __cdecl DoKayakCurrent(ITEM_INFO* item)
 	Lara.currentActive = 0;
 }
 
-int __cdecl TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
+int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 {
 	int h;
 	FLOOR_INFO* floor;
@@ -377,7 +377,7 @@ int __cdecl TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 	return h - 5;
 }
 
-int __cdecl CanKayakGetOut(ITEM_INFO* kayak, int direction)
+int CanKayakGetOut(ITEM_INFO* kayak, int direction)
 {
 	int height;
 	PHD_VECTOR pos;
@@ -390,7 +390,7 @@ int __cdecl CanKayakGetOut(ITEM_INFO* kayak, int direction)
 	return 1;
 }
 
-int __cdecl DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
+int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
@@ -512,7 +512,7 @@ int __cdecl DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-void __cdecl KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
+void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 {
 	int h, slip = 0, rot = 0;
 	PHD_VECTOR pos;
@@ -671,7 +671,7 @@ void __cdecl KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	}
 }
 
-void __cdecl KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
+void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 {
 	short frame;
 	char lr;
@@ -1063,7 +1063,7 @@ void __cdecl KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo
 	}
 }
 
-void __cdecl KayakToBaddieCollision(ITEM_INFO* kayak)
+void KayakToBaddieCollision(ITEM_INFO* kayak)
 {
 #define TARGET_DIST (WALL_SIZE*2)              // Up to this Distance more Complicated checks are made
 	vector<short> roomsList;
@@ -1143,7 +1143,7 @@ void __cdecl KayakToBaddieCollision(ITEM_INFO* kayak)
 #undef TARGET_DIST
 }
 
-void __cdecl LaraRapidsDrown()
+void LaraRapidsDrown()
 {
 	ITEM_INFO* l = LaraItem;
 
@@ -1164,7 +1164,7 @@ void __cdecl LaraRapidsDrown()
 	Lara.hitDirection = -1;
 }
 
-void __cdecl InitialiseKayak(short item_number)
+void InitialiseKayak(short item_number)
 {
 	int i;
 	ITEM_INFO* v;
@@ -1182,14 +1182,14 @@ void __cdecl InitialiseKayak(short item_number)
 	Kayak->OldPos = v->pos;
 }
 
-void __cdecl DrawKayak(ITEM_INFO* kayak)
+void DrawKayak(ITEM_INFO* kayak)
 {
 	kayak->pos.yPos += KAYAK_DRAW_SHIFT;
 	DrawAnimatingItem(kayak);
 	kayak->pos.yPos -= KAYAK_DRAW_SHIFT;
 }
 
-void __cdecl KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
+void KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
 
@@ -1247,7 +1247,7 @@ void __cdecl KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-int __cdecl KayakControl()
+int KayakControl()
 {
 	int h;
 	KAYAK_INFO* Kayak;

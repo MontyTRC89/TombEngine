@@ -32,7 +32,7 @@ extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 
-int __cdecl WinProcMsg()
+int WinProcMsg()
 {
 	int result;
 	struct tagMSG Msg;
@@ -314,7 +314,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	return 0;
 }
 
-int __cdecl WinClose()
+int WinClose()
 {
 	DB_Log(2, "WinClose - DLL");
 

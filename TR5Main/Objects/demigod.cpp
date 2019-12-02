@@ -11,7 +11,7 @@
 #include "..\Game\people.h"
 #include "..\Game\Lara.h"
 
-void __cdecl InitialiseDemigod(short itemNum)
+void InitialiseDemigod(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -39,7 +39,7 @@ void __cdecl InitialiseDemigod(short itemNum)
 	}*/
 }
 
-void __cdecl DemigodControl(short itemNum)
+void DemigodControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -511,7 +511,7 @@ void __cdecl DemigodControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
+void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
 {
 	short fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != -1)
@@ -547,7 +547,7 @@ void __cdecl DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flag
 	}
 }
 
-void __cdecl DemigodEnergyAttack(short itemNum)
+void DemigodEnergyAttack(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -684,7 +684,7 @@ void __cdecl DemigodEnergyAttack(short itemNum)
 	}
 }
 
-void __cdecl DemigodHammerAttack(int x, int y, int z, int something)
+void DemigodHammerAttack(int x, int y, int z, int something)
 {
 	int angle = 2 * GetRandomControl();
 	int deltaAngle = 0x10000 / something;

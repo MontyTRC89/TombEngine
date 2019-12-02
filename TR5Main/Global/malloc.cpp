@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include "..\Global\global.h"
 
-char* __cdecl GameMalloc(int size)
+char* GameMalloc(int size)
 {
 	//printf("Size: %d, MallocFree: %d\n", size, MallocFree);
 	return GameMallocReal(size);
 }
 
 /*
-void __cdecl InitGameMalloc()
+void InitGameMalloc()
 {
 	char* buffer = (char*)malloc(GAME_BUFFER_SIZE);
 	MallocBuffer = buffer;
@@ -19,7 +19,7 @@ void __cdecl InitGameMalloc()
 	MallocUsed = 0;
 }
 
-char* __cdecl GameMalloc(int size)
+char* GameMalloc(int size)
 {
 	int memSize = (size + 3) & -4;
 	if (memSize > MallocFree)
@@ -38,7 +38,7 @@ char* __cdecl GameMalloc(int size)
 	}
 }
 
-void __cdecl GameFree(int size)
+void GameFree(int size)
 {
 	int memSize = (size + 3) & -4;
 	MallocPtr -= memSize;
@@ -46,12 +46,12 @@ void __cdecl GameFree(int size)
 	MallocUsed -= memSize;
 }
 
-void* __cdecl Malloc(int size)
+void* Malloc(int size)
 {
 	return malloc(size);
 }
 
-void __cdecl Free(void* ptr)
+void Free(void* ptr)
 {
 	free(ptr);
 }*/

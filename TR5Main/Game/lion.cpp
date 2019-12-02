@@ -9,7 +9,7 @@
 BITE_INFO LionBite1 = { 0xFFFFFFFE, 0xFFFFFFF6, 0xFA, 0x15 };
 BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };
 
-void __cdecl InitialiseLion(short itemNum)
+void InitialiseLion(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -21,7 +21,7 @@ void __cdecl InitialiseLion(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl LionControl(short itemNum)
+void LionControl(short itemNum)
 {
 	short joint0 = 0;
 	short angle = 0;

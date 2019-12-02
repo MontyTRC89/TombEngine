@@ -34,7 +34,7 @@ extern byte Sequences[3];
 extern byte CurrentSequence;
 extern int NumRPickups;
 
-void __cdecl NewObjects()
+void NewObjects()
 {
 	OBJECT_INFO* obj;
 
@@ -1132,7 +1132,7 @@ void __cdecl NewObjects()
 }
 
 // TODO: check for all the flags, some is surely missing.
-void __cdecl BaddyObjects()
+void BaddyObjects()
 {
 	OBJECT_INFO* obj;
 
@@ -1957,7 +1957,7 @@ void __cdecl BaddyObjects()
 }
 
 // TODO: add the flags
-void __cdecl ObjectObjects()
+void ObjectObjects()
 {
 	OBJECT_INFO* obj;
 
@@ -2713,7 +2713,7 @@ void __cdecl ObjectObjects()
 }
 
 // TODO: add the flags
-void __cdecl TrapObjects()
+void TrapObjects()
 {
 	OBJECT_INFO* obj;
 
@@ -2939,7 +2939,7 @@ void __cdecl TrapObjects()
 	}
 }
 
-void __cdecl PickupObjects()
+void PickupObjects()
 {
 	OBJECT_INFO* obj;
 
@@ -3035,7 +3035,7 @@ void __cdecl PickupObjects()
 	INIT_PICKUP(ID_FLARE_INV_ITEM);
 }
 
-void __cdecl CustomObjects()
+void CustomObjects()
 {
 	/*
 	obj = &Objects[ID_GOON_SILENCER1];
@@ -3501,10 +3501,41 @@ void __cdecl CustomObjects()
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
+
+	obj = &Objects[ID_MINECART];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMineCart;
+		obj->collision = MineCartCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_SOPHIA_LEE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLondonBoss;
+		obj->collision = CreatureCollision;
+		obj->control = LondonBossControl;
+		obj->drawRoutine = S_DrawLondonBoss;
+		obj->shadowSize = 0;
+		obj->pivotLength = 50;
+		obj->hitPoints = 300;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+	}
 	*/
 }
 
-void __cdecl InitialiseObjects()
+void InitialiseObjects()
 {
 	OBJECT_INFO* obj;
 

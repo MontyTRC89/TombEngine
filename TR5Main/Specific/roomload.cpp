@@ -85,7 +85,7 @@ void ReadBytes(void* dest, int count)
 	LevelDataPtr += count;
 }
 
-int __cdecl LoadItems()
+int LoadItems()
 {
 	DB_Log(2, "LoadItems - DLL");
 
@@ -168,7 +168,7 @@ int __cdecl LoadItems()
 	return true;
 }
 
-void __cdecl LoadObjects()
+void LoadObjects()
 {
 	DB_Log(2, "LoadObjects - DLL");
 	 
@@ -318,7 +318,7 @@ void __cdecl LoadObjects()
 	MoveablesIds.push_back(ID_DEFAULT_SPRITES);
 }
 
-void __cdecl LoadCameras()
+void LoadCameras()
 {
 	NumberCameras = ReadInt32();
 	if (NumberCameras != 0)
@@ -335,7 +335,7 @@ void __cdecl LoadCameras()
 	}
 }
 
-void __cdecl LoadTextures()
+void LoadTextures()
 {
 	DB_Log(2, "LoadTextures - DLL");
 	printf("LoadTextures\n");
@@ -379,7 +379,7 @@ void __cdecl LoadTextures()
 	free(buffer);
 }
 
-void __cdecl ReadRoom(ROOM_INFO* room, ROOM_INFO* roomData)
+void ReadRoom(ROOM_INFO* room, ROOM_INFO* roomData)
 {
 	/*ADD_PTR(roomData->door, short, roomData + 1);
 	ADD_PTR(roomData->floor, FLOOR_INFO, roomData + 1);
@@ -420,7 +420,7 @@ void __cdecl ReadRoom(ROOM_INFO* room, ROOM_INFO* roomData)
 	memcpy(room, roomData, sizeof(ROOM_INFO));*/
 }
 
-void __cdecl ReadRooms()
+void ReadRooms()
 {
 	ReadInt32();
 
@@ -445,7 +445,7 @@ void __cdecl ReadRooms()
 	}
 }
  
-int __cdecl LoadRoomsNew()
+int LoadRoomsNew()
 {
 	DB_Log(2, "LoadRooms - DLL");
 	printf("LoadRooms\n");
@@ -464,7 +464,7 @@ int __cdecl LoadRoomsNew()
 	return true;
 }
 
-void __cdecl FreeLevel()
+void FreeLevel()
 {
 	MallocPtr = MallocBuffer;
 	MallocFree = MallocSize;
@@ -587,7 +587,7 @@ unsigned __stdcall LoadLevel(void* data)
 	return true;
 }
 
-int __cdecl S_LoadLevelFile(int levelIndex)
+int S_LoadLevelFile(int levelIndex)
 {
 	DB_Log(2, "S_LoadLevelFile - DLL");
 	printf("S_LoadLevelFile\n");
@@ -615,13 +615,13 @@ int __cdecl S_LoadLevelFile(int levelIndex)
 	return true;
 }
 
-void __cdecl AdjustUV(int num)
+void AdjustUV(int num)
 {
 	// Dummy function
 	NumObjectTextures = num;
 }
 
-bool __cdecl ReadLuaIds(ChunkId* chunkId, int maxSize, int arg)
+bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(ChunkLuaId))
 	{
@@ -639,7 +639,7 @@ bool __cdecl ReadLuaIds(ChunkId* chunkId, int maxSize, int arg)
 		return false;
 }
 
-bool __cdecl ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg)
+bool ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(ChunkTrigger))
 	{
@@ -665,7 +665,7 @@ bool __cdecl ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg)
 		return false;
 }
 
-bool __cdecl ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg)
+bool ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	if (chunkId->EqualsTo(ChunkTriggersList))
 		return g_levelChunkIO->ReadChunks(ReadLuaTriggers, 0);
@@ -674,7 +674,7 @@ bool __cdecl ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg)
 	return false;
 }
 
-void __cdecl LoadNewData(int size)
+void LoadNewData(int size)
 {
 	// Free old level scripts
 	MemoryStream stream(LevelDataPtr, size);
