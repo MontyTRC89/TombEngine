@@ -15,10 +15,10 @@
 #define TR_ANGLE_TO_DEGREES(x) ((x) / 65536.0 * 360.0)
 #define TR_ANGLE_TO_RAD(x) ((x) / 65536.0 * 360.0 * RADIAN)
 
-#define SQRT_ASM ((int (__cdecl*)(int)) 0x0048F980)
+#define SQRT_ASM ((__int32 (__cdecl*)(__int32)) 0x0048F980)
 #define ATAN ((__int32 (__cdecl*)(__int32, __int32)) 0x0048F8A0)
-#define SIN(x) (4 * rcossin_tbl[((int)(x) >> 3) & 0x1FFE])
-#define COS(x) (4 * rcossin_tbl[(((int)(x) >> 3) & 0x1FFE) + 1])
+#define SIN(x) (4 * rcossin_tbl[((__int32)(x) >> 3) & 0x1FFE])
+#define COS(x) (4 * rcossin_tbl[(((__int32)(x) >> 3) & 0x1FFE) + 1])
 
 #define phd_GetVectorAngles ((void(__cdecl*)(__int32, __int32, __int32, __int16*)) 0x004904B0)
 #define phd_RotYXZ ((void(__cdecl*)(__int32, __int32, __int32)) 0x00490150)

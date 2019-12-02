@@ -19,5 +19,6 @@ __int32 __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, __int32 radius, __i
 __int32 __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
 void __cdecl TrapCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
+void __cdecl ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 
 void Inject_Collide();

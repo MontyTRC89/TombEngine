@@ -1,6 +1,7 @@
 #pragma once
 
 #include "..\Global\global.h"
+#include "..\Renderer\Renderer11.h"
 
 typedef struct CarriedWeaponInfo {
 	bool Present;
@@ -26,6 +27,7 @@ typedef struct LaraExtraInfo {
 	DiaryInfo Diary;
 	WaterskinInfo Waterskin1;
 	WaterskinInfo Waterskin2;
+	RendererMesh* MeshesPointers[15];
 };
 
 extern LaraExtraInfo g_LaraExtra;
@@ -42,8 +44,8 @@ extern LaraExtraInfo g_LaraExtra;
 //#define LaraFloorFront ((__int32 (__cdecl*)(ITEM_INFO*, __int16, __int32)) 0x004438F0)
 //#define LaraCeilingFront ((__int32 (__cdecl*)(ITEM_INFO*, __int16, __int32, __int32)) 0x00442DB0)
 //#define GetLaraCollisionInfo ((__int32 (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00444F80)
-#define TestLaraVault ((__int32 (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00445100)
-#define ShiftItem ((__int32 (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004120A0)
+//#define TestLaraVault ((__int32 (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00445100)
+//#define ShiftItem ((__int32 (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004120A0)
 //#define lara_as_wade ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x0044B770)
 //#define lara_as_back ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x0044AE20)
 //#define lara_as_run ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00449330)
@@ -51,9 +53,6 @@ extern LaraExtraInfo g_LaraExtra;
 
 #define LaraHangTest ((__int32 (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004460F0)
 #define TestLaraSlide ((__int32 (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004431F0)
-
-
-
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
@@ -234,6 +233,7 @@ __int32 __cdecl LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 __int16 LaraCeilingFront(ITEM_INFO* item, __int16 ang, __int32 dist, __int32 h);
 __int16 LaraFloorFront(ITEM_INFO* item, __int16 ang, __int32 dist);
 void __cdecl GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll);
+__int32 __cdecl TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 //__int32 __cdecl GetLaraJointPos(PHD_VECTOR* arg1, __int32 arg2);
 //void __cdecl AnimateLara(ITEM_INFO* item);
 /*void __cdecl SetLaraUnderwaterNodes();

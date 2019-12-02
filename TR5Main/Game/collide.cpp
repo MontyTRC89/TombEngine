@@ -360,6 +360,16 @@ void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2
 	}
 }
 
+void __cdecl ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->pos.xPos += coll->shift.x;
+	item->pos.yPos += coll->shift.y;
+	item->pos.zPos += coll->shift.z;
+	coll->shift.z = 0;
+	coll->shift.y = 0;
+	coll->shift.x = 0;
+}
+
 void Inject_Collide()
 {
 	INJECT(0x00411DB0, CollideStaticObjects);
