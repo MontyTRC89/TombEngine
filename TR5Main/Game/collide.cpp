@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-int __cdecl CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
+int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
 {
 	short roomsArray[22];
 	memset(&roomsArray[0], 0, 44);
@@ -113,7 +113,7 @@ int __cdecl CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roo
 	return false;
 }
 
-int __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	// Collect all the rooms where to check
 	short roomsArray[22];
@@ -283,7 +283,7 @@ int __cdecl GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVis
 	return (numItems | numMeshes);
 }
 
-int __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
+int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
 {
 	short* framePtr = GetBestFrame(lara);
 
@@ -311,7 +311,7 @@ int __cdecl TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL
 	return true;
 }
 
-void __cdecl TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -329,7 +329,7 @@ void __cdecl TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		ObjectCollision(itemNumber, l, c);
 }
 
-void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) (F)
+void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) (F)
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -360,7 +360,7 @@ void __cdecl TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2
 	}
 }
 
-void __cdecl ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
+void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->pos.xPos += coll->shift.x;
 	item->pos.yPos += coll->shift.y;

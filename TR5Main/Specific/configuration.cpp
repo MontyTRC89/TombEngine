@@ -14,7 +14,7 @@ extern GameFlow* g_GameFlow;
 
 GameConfiguration g_Configuration;
 
-void __cdecl LoadResolutionsInCombobox(HWND handle, int index)
+void LoadResolutionsInCombobox(HWND handle, int index)
 {
 	HWND cbHandle = GetDlgItem(handle, IDC_RESOLUTION);
 
@@ -40,7 +40,7 @@ void __cdecl LoadResolutionsInCombobox(HWND handle, int index)
 	SendMessageA(cbHandle, CB_SETMINVISIBLE, 20, 0);
 }
 
-void __cdecl LoadAdaptersInCombobox(HWND handle)
+void LoadAdaptersInCombobox(HWND handle)
 {
 	HWND cbHandle = GetDlgItem(handle, IDC_GFXADAPTER);
 
@@ -57,7 +57,7 @@ void __cdecl LoadAdaptersInCombobox(HWND handle)
 	LoadResolutionsInCombobox(handle, 0);
 }
 
-void __cdecl LoadSoundDevicesInCombobox(HWND handle)
+void LoadSoundDevicesInCombobox(HWND handle)
 {
 	HWND cbHandle = GetDlgItem(handle, IDC_SNDADAPTER);
 
@@ -186,7 +186,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-int __cdecl SetupDialog()
+int SetupDialog()
 {
 	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
@@ -197,7 +197,7 @@ int __cdecl SetupDialog()
 	return true;
 }
 
-bool __cdecl SaveConfiguration()
+bool SaveConfiguration()
 {
 	// Try to open the root key
 	HKEY rootKey = NULL;
@@ -311,7 +311,7 @@ bool __cdecl SaveConfiguration()
 	return true;
 }
 
-void __cdecl InitDefaultConfiguration()
+void InitDefaultConfiguration()
 {
 	// Include default device into the list
 	BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, true);
@@ -330,7 +330,7 @@ void __cdecl InitDefaultConfiguration()
 	g_Configuration.Height = 768;
 }
 
-bool __cdecl LoadConfiguration()
+bool LoadConfiguration()
 {
 	// Try to open the root key
 	HKEY rootKey = NULL;

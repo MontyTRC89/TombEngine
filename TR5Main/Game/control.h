@@ -46,15 +46,15 @@
 #define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 #define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
 
-GAME_STATUS __cdecl DoTitle(int index);
-GAME_STATUS __cdecl DoLevel(int index, int ambient, bool loadFromSavegame);
-GAME_STATUS __cdecl ControlPhase(int numFrames, int demoMode);
-void __cdecl UpdateSky();
-void __cdecl AnimateWaterfalls();
-void __cdecl ActivateKey();
-void __cdecl ActivateCamera();
-short __cdecl GetDoor(FLOOR_INFO* floor);
+GAME_STATUS DoTitle(int index);
+GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);
+GAME_STATUS ControlPhase(int numFrames, int demoMode);
+void UpdateSky();
+void AnimateWaterfalls();
+void ActivateKey();
+void ActivateCamera();
+short GetDoor(FLOOR_INFO* floor);
 
 unsigned __stdcall GameMain(void*);
-void __cdecl TestTriggers(short* data, int heavy, int HeavyFlags);
+void TestTriggers(short* data, int heavy, int HeavyFlags);
 void Inject_Control();

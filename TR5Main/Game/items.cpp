@@ -3,14 +3,14 @@
 #include "effect2.h"
 #include <stdio.h>
 
-void __cdecl ClearItem(short itemNum)
+void ClearItem(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	item->data = NULL;
 	item->collidable = true;
 }
 
-void __cdecl KillItem(short itemNum)
+void KillItem(short itemNum)
 {
 	if (InItemControlLoop)
 	{
@@ -78,7 +78,7 @@ void __cdecl KillItem(short itemNum)
 	}
 }
 
-void __cdecl RemoveAllItemsInRoom(short roomNumber, short objectNumber)
+void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 {
 	ROOM_INFO* room = &Rooms[roomNumber];
 	short currentItemNum = room->itemNumber;
@@ -98,7 +98,7 @@ void __cdecl RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 	}
 }
 
-void __cdecl AddActiveItem(short itemNumber)
+void AddActiveItem(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -118,7 +118,7 @@ void __cdecl AddActiveItem(short itemNumber)
 	}
 }
 
-void __cdecl ItemNewRoom(short itemNumber, short roomNumber)
+void ItemNewRoom(short itemNumber, short roomNumber)
 {
 	if (InItemControlLoop)
 	{
@@ -157,7 +157,7 @@ void __cdecl ItemNewRoom(short itemNumber, short roomNumber)
 	}
 }
 
-void __cdecl EffectNewRoom(short fxNumber, short roomNumber)
+void EffectNewRoom(short fxNumber, short roomNumber)
 {
 	if (InItemControlLoop)
 	{
@@ -193,7 +193,7 @@ void __cdecl EffectNewRoom(short fxNumber, short roomNumber)
 	}
 }
 
-void __cdecl KillEffect(short fxNumber)
+void KillEffect(short fxNumber)
 {
 	if (InItemControlLoop)
 	{
@@ -243,7 +243,7 @@ void __cdecl KillEffect(short fxNumber)
 	}
 }
 
-short __cdecl CreateNewEffect(short roomNum) 
+short CreateNewEffect(short roomNum) 
 {
 	short fxNumber = NextFxFree;
 
@@ -263,7 +263,7 @@ short __cdecl CreateNewEffect(short roomNum)
 	return fxNumber;
 }
 
-void __cdecl InitialiseFXArray(int allocmem)
+void InitialiseFXArray(int allocmem)
 {
 	if (allocmem)
 		Effects = (FX_INFO*)GameMalloc(24 * sizeof(FX_INFO));
@@ -279,7 +279,7 @@ void __cdecl InitialiseFXArray(int allocmem)
 	fx->nextFx = -1;
 }
 
-void __cdecl RemoveDrawnItem(short itemNum) 
+void RemoveDrawnItem(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -300,7 +300,7 @@ void __cdecl RemoveDrawnItem(short itemNum)
 	}
 }
 
-void __cdecl RemoveActiveItem(short itemNum) 
+void RemoveActiveItem(short itemNum) 
 {
 	if (Items[itemNum].active)
 	{
@@ -324,7 +324,7 @@ void __cdecl RemoveActiveItem(short itemNum)
 	}
 }
 
-void __cdecl InitialiseItem(short itemNum) 
+void InitialiseItem(short itemNum) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -413,7 +413,7 @@ void __cdecl InitialiseItem(short itemNum)
 	//item->unk_thing = 0;
 }
 
-short __cdecl CreateItem()
+short CreateItem()
 {
 	short itemNum = 0;
 
@@ -426,7 +426,7 @@ short __cdecl CreateItem()
 	return itemNum;
 }
 
-void __cdecl InitialiseItemArray(int numitems) 
+void InitialiseItemArray(int numitems) 
 {
 	ITEM_INFO* item = &Items[LevelItems];
 
@@ -445,7 +445,7 @@ void __cdecl InitialiseItemArray(int numitems)
 	item->nextItem = NO_ITEM;
 }
 
-short __cdecl SpawnItem(ITEM_INFO* item, short objectNumber)
+short SpawnItem(ITEM_INFO* item, short objectNumber)
 {
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -465,7 +465,7 @@ short __cdecl SpawnItem(ITEM_INFO* item, short objectNumber)
 	return itemNumber;
 }
 
-int __cdecl GlobalItemReplace(short search, short replace)
+int GlobalItemReplace(short search, short replace)
 {
 	int changed = 0;
 	for (int i = 0; i < NumberRooms; i++)

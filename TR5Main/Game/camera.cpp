@@ -1,10 +1,10 @@
-#include "Camera.h"
+#include "camera.h"
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <stdio.h>
 #include "draw.h"
  
-void __cdecl LookAt(int posX, int posY, int posZ,
+void LookAt(int posX, int posY, int posZ,
 	int targetX, int targetY, int targetZ,
 	short roll)
 {
@@ -17,7 +17,7 @@ void __cdecl LookAt(int posX, int posY, int posZ,
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }
 
-void __cdecl AlterFOV(int value)
+void AlterFOV(int value)
 { 
 	CurrentFOV = value;
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);

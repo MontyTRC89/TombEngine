@@ -13,7 +13,7 @@
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
 
-void __cdecl InitialiseSas(short itemNum)
+void InitialiseSas(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -25,7 +25,7 @@ void __cdecl InitialiseSas(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SasControl(short itemNum)
+void SasControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

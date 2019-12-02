@@ -17,12 +17,12 @@
 #include <process.h>
 #include <stdio.h>
 
-/*void __cdecl DoTitleFMV()
+/*void DoTitleFMV()
 {
 
 }
 
-void __cdecl LoadScreen(int index, int num)
+void LoadScreen(int index, int num)
 {
 
 }*/
@@ -49,7 +49,7 @@ void __cdecl LoadScreen(int index, int num)
 	r*eturn 1;
 }*/
 
-/*void __cdecl DoTitle(int index)
+/*void DoTitle(int index)
 {
 	DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
@@ -61,7 +61,7 @@ void __cdecl LoadScreen(int index, int num)
 	g_Inventory->DoTitleInventory();
 }*/
 
-/*void __cdecl DoLevel(int index)
+/*void DoLevel(int index)
 {
 	CreditsDone = false;
 	//DoTitleFMV();

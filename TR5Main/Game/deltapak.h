@@ -2,6 +2,6 @@
 
 #include "..\Global\global.h"
 
-ITEM_INFO* __cdecl FindItem(short objectNumber);
+ITEM_INFO* FindItem(short objectNumber);
 
 void Inject_DeltaPak();

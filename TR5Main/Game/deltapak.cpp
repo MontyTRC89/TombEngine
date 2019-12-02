@@ -2,7 +2,7 @@
 #include "..\Global\global.h"
 #include <stdio.h>
 
-ITEM_INFO* __cdecl FindItem(short objectNumber)
+ITEM_INFO* FindItem(short objectNumber)
 {
 #ifdef DEBUG
 	printf("Called FindItem()\n");

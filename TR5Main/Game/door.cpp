@@ -41,7 +41,7 @@ extern byte CurrentSequence;
 extern PHD_VECTOR OldPickupPos;
 extern Inventory* g_Inventory;
 
-void __cdecl SequenceDoorControl(short itemNumber) 
+void SequenceDoorControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
@@ -92,7 +92,7 @@ void __cdecl SequenceDoorControl(short itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -147,7 +147,7 @@ void __cdecl UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* col
 	}
 }
 
-void __cdecl DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -197,7 +197,7 @@ void __cdecl DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (TrInput & IN_ACTION
@@ -299,7 +299,7 @@ void __cdecl PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c
 		DoorCollision(itemNum, l, coll);
 }
 
-void __cdecl PushPullKickDoorControl(short itemNumber)
+void PushPullKickDoorControl(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
@@ -316,7 +316,7 @@ void __cdecl PushPullKickDoorControl(short itemNumber)
 	AnimateItem(item);
 }
 
-void __cdecl DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
+void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -406,7 +406,7 @@ void __cdecl DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl DoorControl(short itemNumber) 
+void DoorControl(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
@@ -557,7 +557,7 @@ void __cdecl DoorControl(short itemNumber)
 	}
 }
 
-void __cdecl OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd) 
+void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd) 
 {
 	FLOOR_INFO* floor = doorPos->floor;
 
@@ -644,7 +644,7 @@ void __cdecl OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	}
 }
 
-void __cdecl ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd) 
+void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd) 
 {
 	FLOOR_INFO* floor = doorPos->floor;
 

@@ -8,7 +8,7 @@
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };
 
-void __cdecl KnifeControl(short fxNum)
+void KnifeControl(short fxNum)
 {
 	FX_INFO* fx;
 	int speed;
@@ -64,13 +64,13 @@ void __cdecl KnifeControl(short fxNum)
 		fx->speed = LaraItem->speed;
 		fx->frameNumber = fx->counter = 0;
 
-		SoundEffect(SFX_HIT_BY_KNIFE_ID317, &fx->pos, 0); // knife hit lara sound
+		SoundEffect(SFX_TR2_HIT_BY_KNIFE_ID317, &fx->pos, 0); // knife hit lara sound
 		DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 80, fx->pos.yRot, fx->roomNumber);
 		KillEffect(fxNum);
 	}
 }
 
-short __cdecl ThrowKnife(int x, int y, int z, short speed, short yrot, short room_number)
+short ThrowKnife(int x, int y, int z, short speed, short yrot, short room_number)
 {
 	short fx_number = 0;
 	/*
@@ -96,7 +96,7 @@ short __cdecl ThrowKnife(int x, int y, int z, short speed, short yrot, short roo
 	return fx_number;
 }
 
-void __cdecl KnifethrowerControl(short itemNum)
+void KnifethrowerControl(short itemNum)
 {
 	ITEM_INFO* item;
 	CREATURE_INFO* knife;

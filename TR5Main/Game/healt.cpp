@@ -8,17 +8,17 @@ short CurrentPickup;
 DISPLAY_PICKUP Pickups[NUM_PICKUPS];
 short PickupVel;
 
-void __cdecl DrawHealtBar(int percentual)
+void DrawHealtBar(int percentual)
 {
 	g_Renderer->DrawHealthBar(percentual);
 }
 
-void __cdecl DrawAirBar(int percentual)
+void DrawAirBar(int percentual)
 {
 	g_Renderer->DrawAirBar(percentual);
 }
 
-int __cdecl DrawAllPickups()
+int DrawAllPickups()
 {
 	if (Pickups[CurrentPickup].life > 0)
 	{
@@ -70,7 +70,7 @@ int __cdecl DrawAllPickups()
 }
 
 
-void __cdecl AddDisplayPickup(short objectNumber)
+void AddDisplayPickup(short objectNumber)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -88,7 +88,7 @@ void __cdecl AddDisplayPickup(short objectNumber)
 	PickedUpObject(objectNumber);
 }
 
-void __cdecl InitialisePickupDisplay()
+void InitialisePickupDisplay()
 {
 	for (int i = 0; i < 8; i++)
 	{

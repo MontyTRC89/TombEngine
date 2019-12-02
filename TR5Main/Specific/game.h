@@ -9,11 +9,11 @@
 #define InitialiseTitleOptionsMaybe ((void (__cdecl*)(int, int)) 0x004CA720)
 #define TriggerTitleSpotcam ((void (__cdecl*)(int)) 0x004284A0)*/
 
-/*void __cdecl DoTitleFMV();
-void __cdecl LoadScreen(int index, int num);
-void __cdecl DoTitle(int index);
-void __cdecl DoLevel(int index);*/
-//int __cdecl ControlPhase(int a, int b);
+/*void DoTitleFMV();
+void LoadScreen(int index, int num);
+void DoTitle(int index);
+void DoLevel(int index);*/
+//int ControlPhase(int a, int b);
 
 //unsigned __stdcall GameMainThread(void*);
 

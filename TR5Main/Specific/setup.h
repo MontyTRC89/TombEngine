@@ -2,14 +2,14 @@
 
 #include "..\Global\global.h"
 
-void __cdecl BaddyObjects(); //#define BaddyObjects ((void (__cdecl*)()) 0x004737C0)
-void __cdecl ObjectObjects(); //#define ObjectObjects ((void (__cdecl*)()) 0x00476360)
-void __cdecl TrapObjects(); //#define TrapObjects ((void (__cdecl*)()) 0x00475D40)
+void BaddyObjects(); //#define BaddyObjects ((void (__cdecl*)()) 0x004737C0)
+void ObjectObjects(); //#define ObjectObjects ((void (__cdecl*)()) 0x00476360)
+void TrapObjects(); //#define TrapObjects ((void (__cdecl*)()) 0x00475D40)
 #define InitialiseHairs ((void (__cdecl*)()) 0x00438BE0)
 #define InitialiseSpecialEffects ((void (__cdecl*)()) 0x0043D8B0)
 
-void __cdecl CustomObjects();
-void __cdecl InitialiseObjects();
+void CustomObjects();
+void InitialiseObjects();
 
 void Inject_Setup();
 

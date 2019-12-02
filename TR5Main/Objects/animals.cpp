@@ -45,7 +45,7 @@ BITE_INFO birdyBiteR = { 0, 224, 0, 22 };
 
 extern LaraExtraInfo g_LaraExtra;
 
-void __cdecl InitialiseWildBoar(short itemNum)
+void InitialiseWildBoar(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -57,7 +57,7 @@ void __cdecl InitialiseWildBoar(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl WildBoarControl(short itemNum)
+void WildBoarControl(short itemNum)
 {
 	short angle = 0;
 	short head = 0;
@@ -211,7 +211,7 @@ void __cdecl WildBoarControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseSmallScorpion(short itemNum)
+void InitialiseSmallScorpion(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -223,7 +223,7 @@ void __cdecl InitialiseSmallScorpion(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SmallScorpionControl(short itemNum)
+void SmallScorpionControl(short itemNum)
 {
 	short angle = 0;
 	short head = 0;
@@ -372,7 +372,7 @@ void __cdecl SmallScorpionControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseScorpion(short itemNum)
+void InitialiseScorpion(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -394,7 +394,7 @@ void __cdecl InitialiseScorpion(short itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void __cdecl ScorpionControl(short itemNum)
+void ScorpionControl(short itemNum)
 {
 	short angle = 0;
 	short head = 0;
@@ -694,7 +694,7 @@ void __cdecl ScorpionControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseBat(short itemNum)
+void InitialiseBat(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -706,7 +706,7 @@ void __cdecl InitialiseBat(short itemNum)
 	item->currentAnimState = 6;
 }
 
-void __cdecl BatControl(short itemNum)
+void BatControl(short itemNum)
 {
 	short angle = 0;
 	short head = 0;
@@ -855,7 +855,7 @@ void __cdecl BatControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl BarracudaControl(short itemNum)
+void BarracudaControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -950,7 +950,7 @@ void __cdecl BarracudaControl(short itemNum)
 	CreatureUnderwater(item, STEP_SIZE);
 }
 
-void __cdecl SharkControl(short itemNum)
+void SharkControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -1047,7 +1047,7 @@ void __cdecl SharkControl(short itemNum)
 		AnimateItem(item);
 }
 
-void __cdecl TigerControl(short itemNum)
+void TigerControl(short itemNum)
 {
 	short head = 0;
 	short angle = 0;
@@ -1177,7 +1177,7 @@ void __cdecl TigerControl(short itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl InitialiseCobra(short itemNum)
+void InitialiseCobra(short itemNum)
 {
 	InitialiseCreature(itemNum);
 
@@ -1189,7 +1189,7 @@ void __cdecl InitialiseCobra(short itemNum)
 	item->hitPoints = Objects[item->objectNumber].hitPoints;
 }
 
-void __cdecl CobraControl(short itemNum)
+void CobraControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -1283,7 +1283,7 @@ void __cdecl CobraControl(short itemNum)
 	CreatureAnimation(itemNum, angle, tilt);
 }
 
-void __cdecl RaptorControl(short itemNum)
+void RaptorControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (item->status == ITEM_INVISIBLE)
@@ -1697,7 +1697,7 @@ void EagleControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl BearControl(short itemNum)
+void BearControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -1923,7 +1923,7 @@ void __cdecl BearControl(short itemNum)
 }
 
 
-void __cdecl InitialiseWolf(short itemNum)
+void InitialiseWolf(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	ClearItem(itemNum);
@@ -1931,7 +1931,7 @@ void __cdecl InitialiseWolf(short itemNum)
 }
 
 
-void __cdecl WolfControl(short itemNum)
+void WolfControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -2234,7 +2234,7 @@ void TyrannosaurControl(short itemNum)
 	item->collidable = true;
 }
 
-void __cdecl ApeControl(short itemNum)
+void ApeControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -2413,7 +2413,7 @@ void __cdecl ApeControl(short itemNum)
 		CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl RatControl(short itemNum)
+void RatControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -2513,7 +2513,7 @@ void __cdecl RatControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseLittleBeetle(short itemNum)
+void InitialiseLittleBeetle(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -2549,12 +2549,12 @@ void __cdecl InitialiseLittleBeetle(short itemNum)
 	}
 }
 
-void __cdecl LittleBeetleControl(short itemNum)
+void LittleBeetleControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 }
 
-void __cdecl InitialiseHarpy(short itemNum)
+void InitialiseHarpy(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -2566,7 +2566,7 @@ void __cdecl InitialiseHarpy(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl HarpyControl(short itemNum)
+void HarpyControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -2921,7 +2921,7 @@ void __cdecl HarpyControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
+void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -2957,7 +2957,7 @@ void __cdecl HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 	}
 }
 
-void __cdecl HarpyAttack(ITEM_INFO* item, short itemNum)
+void HarpyAttack(ITEM_INFO* item, short itemNum)
 {
 	item->itemFlags[0]++;
 
@@ -3073,7 +3073,7 @@ void __cdecl HarpyAttack(ITEM_INFO* item, short itemNum)
 	}
 }
 
-void __cdecl HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
+void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
@@ -3095,7 +3095,7 @@ void __cdecl HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 	}
 }
 
-void __cdecl HarpySparks1(short itemNum, byte num, int size)
+void HarpySparks1(short itemNum, byte num, int size)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -3143,7 +3143,7 @@ void __cdecl HarpySparks1(short itemNum, byte num, int size)
 	}
 }
 
-void __cdecl InitialiseCrocodile(short itemNum)
+void InitialiseCrocodile(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -3167,7 +3167,7 @@ void __cdecl InitialiseCrocodile(short itemNum)
 	}
 }
 
-void __cdecl CrocodileControl(short itemNum)
+void CrocodileControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -3522,7 +3522,7 @@ void __cdecl CrocodileControl(short itemNum)
 	}
 }
 
-void __cdecl InitialiseSphinx(short itemNum)
+void InitialiseSphinx(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -3534,7 +3534,7 @@ void __cdecl InitialiseSphinx(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void __cdecl SphinxControl(short itemNum)
+void SphinxControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -3747,7 +3747,7 @@ void __cdecl SphinxControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl InitialiseMonkey(short itemNumber)
+void InitialiseMonkey(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -3759,7 +3759,7 @@ void __cdecl InitialiseMonkey(short itemNumber)
 	item->goalAnimState = 6;
 }
 
-void __cdecl MonkeyControl(short itemNumber)
+void MonkeyControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -4321,7 +4321,7 @@ void __cdecl MonkeyControl(short itemNumber)
 	}
 }
 
-void __cdecl InitialiseYeti(short itemNum)
+void InitialiseYeti(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	InitialiseCreature(itemNum);
@@ -4330,7 +4330,7 @@ void __cdecl InitialiseYeti(short itemNum)
 	item->currentAnimState = Anims[item->animNumber].currentAnimState;
 }
 
-void __cdecl YetiControl(short itemNum)
+void YetiControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -4672,7 +4672,7 @@ void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl SmallSpiderControl(short itemNum)
+void SmallSpiderControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -4777,7 +4777,7 @@ void __cdecl SmallSpiderControl(short itemNum)
 		SpiderLeap(itemNum, item, angle);
 }
 
-void __cdecl BigSpiderControl(short itemNum)
+void BigSpiderControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -4873,7 +4873,7 @@ void __cdecl BigSpiderControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl BirdMonsterControl(short itemNum)
+void BirdMonsterControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

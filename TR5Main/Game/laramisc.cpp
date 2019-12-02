@@ -42,7 +42,7 @@ void DelAlignLaraToRope(ITEM_INFO* item)//4B3D8, 4B83C
 	UNIMPLEMENTED();
 }*/
 
-void __cdecl InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
+void InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -63,13 +63,13 @@ void __cdecl InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
 	}
 }
 
-void __cdecl InitialiseLaraLoad(short itemNum)//4B308, 4B76C (F)
+void InitialiseLaraLoad(short itemNum)//4B308, 4B76C (F)
 {
 	Lara.itemNumber = itemNum;
 	LaraItem = &Items[itemNum];
 }
 
-void __cdecl LaraControl(short itemNumber)//4A838, 4AC9C
+void LaraControl(short itemNumber)//4A838, 4AC9C
 {
 	ITEM_INFO* item = LaraItem;
 
@@ -533,7 +533,7 @@ void __cdecl LaraControl(short itemNumber)//4A838, 4AC9C
 		SQUARE(item->pos.zPos - oldZ));
 }
 
-void __cdecl LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
+void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
 {
 	LaraItem->hitPoints = 1000;
 	LaraUnderWater(item, coll);
@@ -557,7 +557,7 @@ void __cdecl LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
 	}
 }
 
-void __cdecl LaraInitialiseMeshes()//4A684, 4AAE8 (F)
+void LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 {
 	for (int i = 0; i < 15; i++)
 	{
@@ -593,7 +593,7 @@ void __cdecl LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 	Lara.leftArm.lock = 0;
 }
 
-void __cdecl InitialiseLara(int restore)
+void InitialiseLara(int restore)
 {
 	if (Lara.itemNumber == NO_ITEM)
 		return;

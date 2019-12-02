@@ -82,7 +82,7 @@ static BOSS_STRUCT bossdata;             // exclusive for tony unlike TR3
 #define SPN_TONYHANDLFLAME		4  // {0, 64, 0, 10}
 #define SPN_TONYHANDRFLAME		5  // {0, 64, 0, 13}
 
-void __cdecl TriggerTonyFlame(short itemNum, long hand)
+void TriggerTonyFlame(short itemNum, long hand)
 {
 	ITEM_INFO* item;
 	long size;
@@ -150,7 +150,7 @@ void __cdecl TriggerTonyFlame(short itemNum, long hand)
 	sptr->dSize = size >> 2;
 }
 
-void __cdecl TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
+void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
 {
 	SPARKS* sptr;
 	long		size;
@@ -238,7 +238,7 @@ void __cdecl TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, l
 	}
 }
 
-void __cdecl TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short room_number, short angle, long zdspeed)
+void TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short room_number, short angle, long zdspeed)
 {
 	FX_INFO* fx;
 	PHD_VECTOR pos;
@@ -324,7 +324,7 @@ void __cdecl TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short
 	}
 }
 
-void __cdecl TonyFireBallControl(short fxNumber)
+void TonyFireBallControl(short fxNumber)
 {
 	FX_INFO* fx;
 	FLOOR_INFO* floor;
@@ -447,7 +447,7 @@ void __cdecl TonyFireBallControl(short fxNumber)
 	}
 }
 
-void __cdecl TonyDie(short itemNum)
+void TonyDie(short itemNum)
 {
 	ITEM_INFO* item;
 
@@ -461,7 +461,7 @@ void __cdecl TonyDie(short itemNum)
 	item->flags |= ONESHOT;
 }
 
-void __cdecl InitialiseTony(short itemNum)
+void InitialiseTony(short itemNum)
 {
 	SHIELD_POINTS* shptr;
 	ITEM_INFO* item;
@@ -493,7 +493,7 @@ void __cdecl InitialiseTony(short itemNum)
 	}
 }
 
-void __cdecl TonyControl(short itemNum)
+void TonyControl(short itemNum)
 {
 	ITEM_INFO* item;
 	CREATURE_INFO* tonyboss;
@@ -683,7 +683,7 @@ void __cdecl TonyControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void __cdecl DrawTony(ITEM_INFO* item)
+void DrawTony(ITEM_INFO* item)
 {
 	DrawAnimatingItem(item);
 

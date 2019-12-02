@@ -34,7 +34,7 @@ short PoleBounds[12] = // offset 0xA1250
 
 extern LaraExtraInfo g_LaraExtra;
 
-void __cdecl SmashObject(short itemNumber) 
+void SmashObject(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	ROOM_INFO* r = &Rooms[item->roomNumber];
@@ -58,12 +58,12 @@ void __cdecl SmashObject(short itemNumber)
 	item->status = ITEM_DEACTIVATED;
 }
 
-void __cdecl SmashObjectControl(short itemNumber) 
+void SmashObjectControl(short itemNumber) 
 {
 	SmashObject(itemNumber << 16);
 }
 
-void __cdecl BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height) 
+void BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
 	if (item->pos.yPos >= y)
 	{
@@ -73,7 +73,7 @@ void __cdecl BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height)
 	}
 }
 
-void __cdecl BridgeFlatCeiling(ITEM_INFO* item, int x, int y, int z, int* height) 
+void BridgeFlatCeiling(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
 	if (item->pos.yPos >= y)
 	{
@@ -81,7 +81,7 @@ void __cdecl BridgeFlatCeiling(ITEM_INFO* item, int x, int y, int z, int* height
 	}
 }
 
-int __cdecl GetOffset(ITEM_INFO* item, int x, int z)
+int GetOffset(ITEM_INFO* item, int x, int z)
 {
 	if (item->pos.yRot == 0)
 	{
@@ -101,7 +101,7 @@ int __cdecl GetOffset(ITEM_INFO* item, int x, int z)
 	}
 }
 
-void __cdecl BridgeTilt1Floor(ITEM_INFO* item, int x, int y, int z, int* height) 
+void BridgeTilt1Floor(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
 	int level = item->pos.yPos + (GetOffset(item, x, z) >> 2);
 
@@ -113,7 +113,7 @@ void __cdecl BridgeTilt1Floor(ITEM_INFO* item, int x, int y, int z, int* height)
 	}
 }
 
-void __cdecl BridgeTilt1Ceiling(ITEM_INFO* item, int x, int y, int z, int* height) 
+void BridgeTilt1Ceiling(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
 	int level = item->pos.yPos + (GetOffset(item, x, z) >> 2);
 
@@ -123,7 +123,7 @@ void __cdecl BridgeTilt1Ceiling(ITEM_INFO* item, int x, int y, int z, int* heigh
 	}
 }
 
-void __cdecl BridgeTilt2Floor(ITEM_INFO* item, int x, int y, int z, int* height) 
+void BridgeTilt2Floor(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
 	int level = item->pos.yPos + (GetOffset(item, x, z) >> 1);
 
@@ -135,7 +135,7 @@ void __cdecl BridgeTilt2Floor(ITEM_INFO* item, int x, int y, int z, int* height)
 	}
 }
 
-void __cdecl BridgeTilt2Ceiling(ITEM_INFO* item, int x, int y, int z, int* height) 
+void BridgeTilt2Ceiling(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
 	int level = item->pos.yPos + (GetOffset(item, x, z) >> 1);
 
@@ -145,7 +145,7 @@ void __cdecl BridgeTilt2Ceiling(ITEM_INFO* item, int x, int y, int z, int* heigh
 	}
 }
 
-void __cdecl ControlAnimatingSlots(short itemNumber)
+void ControlAnimatingSlots(short itemNumber)
 {
 	// TODO: TR5 has here a series of hardcoded OCB codes, this function actually is just a placeholder
 	ITEM_INFO* item = &Items[itemNumber];
@@ -154,7 +154,7 @@ void __cdecl ControlAnimatingSlots(short itemNumber)
 		AnimateItem(item);
 }
 
-void __cdecl PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -231,7 +231,7 @@ void __cdecl PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl ControlTriggerTriggerer(short itemNumber)
+void ControlTriggerTriggerer(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
@@ -272,7 +272,7 @@ void __cdecl ControlTriggerTriggerer(short itemNumber)
 	}
 }
 
-void __cdecl AnimateWaterfalls()
+void AnimateWaterfalls()
 {
 	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
 	float y = lastWaterfallY * 0.00390625f;
@@ -302,7 +302,7 @@ void __cdecl AnimateWaterfalls()
 	}
 }
 
-void __cdecl ControlWaterfall(short itemNumber) 
+void ControlWaterfall(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	TriggerActive(item);
@@ -329,7 +329,7 @@ void __cdecl ControlWaterfall(short itemNumber)
 	}
 }
 
-void __cdecl TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
@@ -385,7 +385,7 @@ void __cdecl TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void __cdecl ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (TrInput & IN_ACTION && l->currentAnimState == STATE_LARA_REACH && l->animNumber == ANIMATION_LARA_TRY_HANG_SOLID)
@@ -449,7 +449,7 @@ void __cdecl ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* co
 	}
 }
 
-void __cdecl ControlXRayMachine(short itemNumber) 
+void ControlXRayMachine(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -555,7 +555,7 @@ void __cdecl ControlXRayMachine(short itemNumber)
 	}*/
 }
 
-void __cdecl CutsceneRopeControl(short itemNumber) 
+void CutsceneRopeControl(short itemNumber) 
 {
 	ITEM_INFO* item;
 	PHD_VECTOR pos1;
@@ -588,7 +588,7 @@ void __cdecl CutsceneRopeControl(short itemNumber)
 	item->pos.xRot = -4869;
 }
 
-void __cdecl HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll) 
+void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll) 
 {
 	ITEM_INFO* item;
 

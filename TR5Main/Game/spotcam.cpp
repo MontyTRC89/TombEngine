@@ -6,7 +6,7 @@
 #include "..\Game\draw.h"
 
 
-void __cdecl InitSpotCamSequences() 
+void InitSpotCamSequences() 
 {
 	int s, cc, n, ce;
 
@@ -47,7 +47,7 @@ void __cdecl InitSpotCamSequences()
 	return;
 }
 
-void __cdecl InitialiseSpotCam(short Sequence)
+void InitialiseSpotCam(short Sequence)
 {
 	SPOTCAM* s;
 	int cn;
@@ -335,7 +335,7 @@ void __cdecl InitialiseSpotCam(short Sequence)
 }
 
 #ifdef OLD_CODE
-void __cdecl CalculateSpotCameras()
+void CalculateSpotCameras()
 {
 	int cpx; // stack offset -96
 	int cpy; // stack offset -92
@@ -1201,12 +1201,12 @@ void __cdecl CalculateSpotCameras()
 }
 #endif
 
-/*void __cdecl CalculateSpotCameras()
+/*void CalculateSpotCameras()
 {
 
 }*/
 
-void __cdecl Inject_Spotcam()
+void Inject_Spotcam()
 {
 	INJECT(0x0047A800, InitSpotCamSequences);
 	//INJECT(0x0047A9D0, InitialiseSpotCam);

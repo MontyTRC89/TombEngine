@@ -12,7 +12,7 @@
 BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
 BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };
 
-void __cdecl InitialiseGuide(short itemNum)
+void InitialiseGuide(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
@@ -25,7 +25,7 @@ void __cdecl InitialiseGuide(short itemNum)
 	item->swapMeshFlags = 0x40000;
 }
 
-void __cdecl GuideControl(short itemNum)
+void GuideControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

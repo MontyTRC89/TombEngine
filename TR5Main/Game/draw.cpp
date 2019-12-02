@@ -4,7 +4,7 @@
 
 Renderer11* g_Renderer;
 
-int __cdecl DrawPhaseGame()
+int DrawPhaseGame()
 {
 	// Control routines uses joints calculated here for getting Lara joint positions
 	CalcLaraMatrices(0);
@@ -22,7 +22,7 @@ int __cdecl DrawPhaseGame()
 	return Camera.numberFrames;
 }
 
-void __cdecl DrawAnimatingItem(ITEM_INFO* item)
+void DrawAnimatingItem(ITEM_INFO* item)
 {
 	/*OBJECT_INFO* obj;
 	CREATURE_INFO* creature;
@@ -148,7 +148,7 @@ void __cdecl DrawAnimatingItem(ITEM_INFO* item)
 	phd_PopDxMatrix();*/
 }
 
-int __cdecl GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
+int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
 {
 	ANIM_STRUCT *anim;
 	int frm;

@@ -5,12 +5,12 @@
 
 extern GameFlow* g_GameFlow;
 
-void __cdecl TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
+void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
 	g_Renderer->AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void __cdecl TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int initial, int weapon, int count)
+void TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int initial, int weapon, int count)
 {
 	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
@@ -101,7 +101,7 @@ void __cdecl TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int in
 	}*/
 }
 
-void __cdecl TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
+void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
 {
 	SPARKS* sptr = &Sparks[GetFreeSpark()];
 
@@ -157,7 +157,7 @@ void __cdecl TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int
 	sptr->size = sptr->sSize = size;
 }
 
-void __cdecl TriggerRocketSmoke(int x, int y, int z, int bodyPart)
+void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 {
 	SPARKS* sptr = &Sparks[GetFreeSpark()];
 
@@ -207,7 +207,7 @@ void __cdecl TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	sptr->size = sptr->sSize = size >> 2;
 }
 
-void __cdecl GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
+void GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO* room = &Rooms[roomNumber];
 
@@ -267,7 +267,7 @@ void __cdecl GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
 	spark->mirror = mirror;
 }
 
-void __cdecl GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
+void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -499,7 +499,7 @@ void __cdecl GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int f
 	}
 }
 
-void __cdecl TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
+void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;

@@ -7,11 +7,11 @@
 //#define ClearLOT ((void (__cdecl*)(LOT_INFO*)) 0x0045B740)
 //#define SameZoneAIObject ((int (__cdecl*)(CREATURE_INFO*, short)) 0x0040C070)
 
-void __cdecl InitialiseLOTarray(int allocMem);
-int __cdecl EnableBaddieAI(short itemNum, int always);
-void __cdecl InitialiseSlot(short itemNum, short slot);
-void __cdecl DisableBaddieAI(short itemNumber);
-void __cdecl ClearLOT(LOT_INFO* LOT);
-void __cdecl CreateZone(ITEM_INFO* item);
+void InitialiseLOTarray(int allocMem);
+int EnableBaddieAI(short itemNum, int always);
+void InitialiseSlot(short itemNum, short slot);
+void DisableBaddieAI(short itemNumber);
+void ClearLOT(LOT_INFO* LOT);
+void CreateZone(ITEM_INFO* item);
 
 void Inject_Lot();
