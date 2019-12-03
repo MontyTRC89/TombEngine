@@ -24,7 +24,7 @@
 #define TriggerRicochetSparks ((void (__cdecl*)(GAME_VECTOR*, short, int, int)) 0x0042F060)
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
-void TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int initial, int weapon, int count);
+void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2);

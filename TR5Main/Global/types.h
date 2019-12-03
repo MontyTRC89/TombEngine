@@ -1146,26 +1146,26 @@ struct SMOKE_SPARKS
 	short Gravity; // size=0, offset=18
 	short RotAng; // size=0, offset=20
 	short Flags; // size=0, offset=22
-	unsigned char sSize; // size=0, offset=24
-	unsigned char dSize; // size=0, offset=25
-	unsigned char Size; // size=0, offset=26
-	unsigned char Friction; // size=0, offset=27
-	unsigned char Scalar; // size=0, offset=28
-	unsigned char Def; // size=0, offset=29
+	byte sSize; // size=0, offset=24
+	byte dSize; // size=0, offset=25
+	byte Size; // size=0, offset=26
+	byte Friction; // size=0, offset=27
+	byte Scalar; // size=0, offset=28
+	byte Def; // size=0, offset=29
 	byte RotAdd; // size=0, offset=30
 	byte MaxYvel; // size=0, offset=31
-	unsigned char On; // size=0, offset=32
-	unsigned char sShade; // size=0, offset=33
-	unsigned char dShade; // size=0, offset=34
-	unsigned char Shade; // size=0, offset=35
-	unsigned char ColFadeSpeed; // size=0, offset=36
-	unsigned char FadeToBlack; // size=0, offset=37
+	byte On; // size=0, offset=32
+	byte sShade; // size=0, offset=33
+	byte dShade; // size=0, offset=34
+	byte Shade; // size=0, offset=35
+	byte ColFadeSpeed; // size=0, offset=36
+	byte FadeToBlack; // size=0, offset=37
 	byte sLife; // size=0, offset=38
 	byte Life; // size=0, offset=39
-	unsigned char TransType; // size=0, offset=40
-	unsigned char FxObj; // size=0, offset=41
-	unsigned char NodeNumber; // size=0, offset=42
-	unsigned char mirror; // size=0, offset=43
+	byte TransType; // size=0, offset=40
+	byte FxObj; // size=0, offset=41
+	byte NodeNumber; // size=0, offset=42
+	byte mirror; // size=0, offset=43
 };
 
 struct BLOOD_STRUCT

@@ -264,9 +264,9 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 
 	/* move y axis */
 	rotY = arm->yRot;
-	if ((rotY >= (y - speed)) && (rotY <= (y + speed)))
+	if ((rotY >= y - speed) && (rotY <= y + speed))
 		rotY = y;
-	else if (rotY < speed)
+	else if (rotY < y)
 		rotY += speed;
 	else
 		rotY -= speed;
@@ -274,7 +274,7 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 
 	/* move x axis */
 	rotX = arm->xRot;
-	if ((rotX >= (x - speed)) && (rotX <= (x + speed)))
+	if ((rotX >= x - speed) && (rotX <= x + speed))
 		rotX = x;
 	else if (rotX < x)
 		rotX += speed;
