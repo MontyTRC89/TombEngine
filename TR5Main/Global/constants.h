@@ -5,7 +5,6 @@
 #define W2V_SHIFT 		14					// Shift scale of View.Frame to World.Frame
 #define	W2V_SCALE 		(1 << W2V_SHIFT)	// Scale of View Frame to World Frame
 #define WALL_SHIFT		10
-#define PITCH_SHIFT     4
 #define STEP_SIZE		256
 #define	WALL_SIZE		1024
 
@@ -19,7 +18,6 @@
 #define BOX_LAST		(1 << 15) // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
 #define GRAVITY 6
 
-#define NUM_WEAPONS		16
 #define NUM_SPRITES		256
 #define UNIT_SHADOW		256
 #define DEFAULT_RADIUS	10
