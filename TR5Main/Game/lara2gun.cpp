@@ -47,7 +47,7 @@ void AnimatePistols(int weaponType)
 				break;
 			}
 			GetLaraJointPosition(&pos, LJ_LHAND);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, (byte)0, SmokeWeapon, SmokeCountL);
 		}
 
 		if (SmokeCountR)
@@ -72,8 +72,9 @@ void AnimatePistols(int weaponType)
 				pos.z = 48;
 				break;
 			}
+
 			GetLaraJointPosition(&pos, LJ_RHAND);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountR);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, (byte)0, SmokeWeapon, SmokeCountR);
 		}
 	}
 
