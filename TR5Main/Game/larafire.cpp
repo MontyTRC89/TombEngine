@@ -480,7 +480,7 @@ void LaraGun()
 			meshIndex = Objects[ID_LARA].meshIndex;
 		else
 			meshIndex = Objects[ID_LARA_SCREAM].meshIndex;
-		Lara.meshPtrs[HEAD] = Meshes[meshIndex + 14 * 2];
+		Lara.meshPtrs[HEAD] = Meshes[meshIndex + HEAD * 2];
 		
 		if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA && Camera.type != CAMERA_TYPE::LOOK_CAMERA &&
 			Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
@@ -549,7 +549,7 @@ void LaraGun()
 	case LG_HANDS_BUSY:
 		if (Lara.gunType == WEAPON_FLARE)
 		{
-			if (Lara.meshPtrs[HAND_L] == Meshes[Objects[ID_FLARE_ANIM].meshIndex + 26])
+			if (Lara.meshPtrs[HAND_L] == Meshes[Objects[ID_FLARE_ANIM].meshIndex + HAND_L * 2])
 			{
 				Lara.flareControlLeft = (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
 				DoFlareInHand(Lara.flareAge);
@@ -588,7 +588,7 @@ void InitialiseNewWeapon()
 	case WEAPON_UZI:
 		Lara.rightArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 		Lara.leftArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-		if (Lara.gunStatus)
+		if (Lara.gunStatus != LG_NO_ARMS)
 			draw_pistol_meshes(Lara.gunType);
 		break;
 
@@ -599,15 +599,15 @@ void InitialiseNewWeapon()
 	case WEAPON_HARPOON_GUN:
 	case WEAPON_ROCKET_LAUNCHER:
 		Lara.rightArm.frameBase = Objects[WeaponObject(Lara.gunType)].frameBase;
-		Lara.leftArm.frameBase = Lara.rightArm.frameBase;
-		if (Lara.gunStatus)
-			undraw_shotgun_meshes(Lara.gunType);
+		Lara.leftArm.frameBase = Objects[WeaponObject(Lara.gunType)].frameBase;
+		if (Lara.gunStatus != LG_NO_ARMS)
+			draw_shotgun_meshes(Lara.gunType);
 		break;
 
 	case WEAPON_FLARE:
 		Lara.rightArm.frameBase = Objects[ID_FLARE_ANIM].frameBase;
 		Lara.leftArm.frameBase = Objects[ID_FLARE_ANIM].frameBase;
-		if (Lara.gunStatus)
+		if (Lara.gunStatus != LG_NO_ARMS)
 			draw_flare_meshes();
 		break;
 
