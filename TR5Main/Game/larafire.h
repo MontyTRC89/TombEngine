@@ -26,5 +26,6 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag);
 int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
 void LaraTargetInfo(WEAPON_INFO* weapon);
+int CheckForHoldingState(int state);
 
 void Inject_LaraFire();

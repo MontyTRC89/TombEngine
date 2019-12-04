@@ -456,8 +456,8 @@ typedef struct coll_info_t
 	short quadrant; // size=0, offset=120
 	short collType; // size=0, offset=122 USE ENUM CT_*
 	short* trigger; // size=0, offset=124
-	byte tiltX; // size=0, offset=128
-	byte tiltZ; // size=0, offset=129
+	signed char tiltX; // size=0, offset=128
+	signed char tiltZ; // size=0, offset=129
 	byte hitByBaddie; // size=0, offset=130
 	byte hitStatic; // size=0, offset=131
 	unsigned short slopesAreWalls : 2; // offset=132.0

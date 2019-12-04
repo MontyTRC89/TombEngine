@@ -5,6 +5,7 @@
 #include "..\Global\global.h"
 
 #include <stdio.h>
+#include "items.h"
 
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
 {
@@ -368,6 +369,18 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 	coll->shift.z = 0;
 	coll->shift.y = 0;
 	coll->shift.x = 0;
+}
+
+void UpdateLaraRoom(ITEM_INFO* item, int height)
+{
+	int x = item->pos.xPos;
+	int y = height + item->pos.yPos;
+	int z = item->pos.zPos;
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	item->floor = GetFloorHeight(floor, x, y, z);
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(Lara.itemNumber, roomNumber);
 }
 
 void Inject_Collide()

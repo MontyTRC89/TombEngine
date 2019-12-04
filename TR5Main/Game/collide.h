@@ -25,5 +25,6 @@ int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* c
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
+void UpdateLaraRoom(ITEM_INFO* item, int height);
 
 void Inject_Collide();

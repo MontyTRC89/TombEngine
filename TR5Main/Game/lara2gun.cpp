@@ -311,19 +311,19 @@ void undraw_pistol_mesh_right(int weaponType)
 {
 	short objectNumber = WeaponObject(weaponType);
 	
-	//Lara.meshPtrs[THIGH_R] = Meshes[Objects[objectNumber].meshIndex + THIGH_R];
-	Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_LARA].meshIndex + HAND_R];
+	Lara.meshPtrs[THIGH_R] = Meshes[Objects[objectNumber].meshIndex + THIGH_R * 2];
+	Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_LARA].meshIndex + HAND_R * 2];
 	
 	switch (weaponType)
 	{
 	case WEAPON_PISTOLS:
-		Lara.holster = 14;
+		Lara.holster = ID_LARA_HOLSTERS_PISTOLS;
 		break;
 	case WEAPON_UZI:
-		Lara.holster = 15;
+		Lara.holster = ID_LARA_HOLSTERS_UZIS;
 		break;
 	case WEAPON_REVOLVER:
-		Lara.holster = 16;
+		Lara.holster = ID_LARA_HOLSTERS_REVOLVER;
 		break;
 	}
 
@@ -335,14 +335,14 @@ void undraw_pistol_mesh_left(int weaponType)
 	{
 		WeaponObject(weaponType);
 
-		Lara.meshPtrs[HAND_L] = Meshes[Objects[ID_LARA].meshIndex + HAND_L];
+		Lara.meshPtrs[HAND_L] = Meshes[Objects[ID_LARA].meshIndex + HAND_L * 2];
 		if (weaponType == WEAPON_PISTOLS)
 		{
-			Lara.holster = 14;
+			Lara.holster = ID_LARA_HOLSTERS_PISTOLS;
 		}
 		else if (weaponType == WEAPON_UZI)
 		{
-			Lara.holster = 15;
+			Lara.holster = ID_LARA_HOLSTERS_UZIS;
 		}
 	}
 }
@@ -351,13 +351,13 @@ void draw_pistol_meshes(int weaponType)
 {
 	Lara.holster = ID_LARA_HOLSTERS;
 
-	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
-	Lara.meshPtrs[THIGH_R] = Meshes[Objects[ID_LARA].meshIndex + THIGH_R];
+	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R * 2];
+	Lara.meshPtrs[THIGH_R] = Meshes[Objects[ID_LARA].meshIndex + THIGH_R * 2];
 
 	if (weaponType != WEAPON_REVOLVER)
 	{
-		Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_L];
-		Lara.meshPtrs[THIGH_L] = Meshes[Objects[ID_LARA].meshIndex + THIGH_L];
+		Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_L * 2];
+		Lara.meshPtrs[THIGH_L] = Meshes[Objects[ID_LARA].meshIndex + THIGH_L * 2];
 	}
 }
 

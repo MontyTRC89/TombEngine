@@ -39,6 +39,7 @@ extern Inventory* g_Inventory;
 short angle = 0;
 short elevation = 57346;
 bool doJump = false;
+short OldAngle = 1;
 LaraExtraInfo g_LaraExtra;
 
 
@@ -6481,6 +6482,55 @@ void DoSubsuitStuff()
 {
 	UNIMPLEMENTED();
 }*/
+
+int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
+		return 0;
+
+	short angle = 0;
+	if (coll->tiltX > 2)                       		 
+		angle = -ANGLE(90);
+	else if (coll->tiltX < -2)
+		angle = ANGLE(90);
+
+	if (coll->tiltZ > 2 && coll->tiltZ > abs(coll->tiltX))
+		angle = -ANGLE(180);
+	else if (coll->tiltZ < -2 && -coll->tiltZ > abs(coll->tiltX))
+		angle = 0;
+
+	short delta = angle - item->pos.yRot;
+
+	ShiftItem(item, coll);
+
+	if (delta < -ANGLE(90) || delta > ANGLE(90))
+	{
+		if (item->currentAnimState == STATE_LARA_SLIDE_BACK && OldAngle == angle)
+			return 1;
+
+		item->animNumber = ANIMATION_LARA_START_SLIDE_BACKWARD;
+		item->goalAnimState = STATE_LARA_SLIDE_BACK;
+		item->currentAnimState = STATE_LARA_SLIDE_BACK;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->pos.yRot = angle - ANGLE(180);
+	}
+	else
+	{
+		if (item->currentAnimState == STATE_LARA_SLIDE_FORWARD && OldAngle == angle)
+			return 1;
+
+		item->animNumber = ANIMATION_LARA_SLIDE_FORWARD;
+		item->goalAnimState = STATE_LARA_SLIDE_FORWARD;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->currentAnimState = STATE_LARA_SLIDE_FORWARD;
+		item->pos.yRot = angle;
+	}
+
+	Lara.moveAngle = angle;
+	OldAngle = angle;
+
+	return 1;
+}
 
 void Inject_Lara()
 {

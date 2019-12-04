@@ -4,6 +4,7 @@
 #include "control.h"
 #include "draw.h"
 #include "sphere.h"
+#include "laramisc.h"
 
 short LeftIntRightExtTab[4] = // offset 0xA0B7C
 {

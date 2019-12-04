@@ -1495,7 +1495,7 @@ void undraw_shotgun_meshes(int weapon)
 {
 	short objectNumber = WeaponObject(weapon);
 	Lara.backGun = objectNumber;
-	Lara.meshPtrs[10] = Meshes[Objects[0].meshIndex + 20];
+	Lara.meshPtrs[HAND_R] = Meshes[Objects[0].meshIndex + HAND_R * 2];
 }
 
 void draw_shotgun(int weapon)
@@ -1550,7 +1550,7 @@ void draw_shotgun(int weapon)
 void draw_shotgun_meshes(int weaponType)
 {
 	Lara.backGun = 0;
-	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R];
+	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R * 2];
 }
 
 void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
