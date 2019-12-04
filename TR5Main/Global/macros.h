@@ -12,3 +12,8 @@
 #define ADD_PTR(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n)); 
 
 #define ZONE(A) (((A) >> (WALL_SIZE - 2)) - 1)
+
+#define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh * 2]
+#define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
+#define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
+#define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)

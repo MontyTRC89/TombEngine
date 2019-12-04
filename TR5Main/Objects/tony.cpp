@@ -39,39 +39,6 @@ static long dradii[5] = { 100 << 4,350 << 4,400 << 4,350 << 4,100 << 4 };
 static long dheights1[5] = { -1536 - (768 << 3),-1152 - (384 << 3),-768,-384 + (384 << 3),0 + (768 << 3) };
 static long dheights2[5] = { -1536,-1152,-768,-384,0 };
 
-typedef struct
-{
-	short x;
-	short y;
-	short z;
-	unsigned char rsub;
-	unsigned char gsub;
-	unsigned char bsub;
-	unsigned char pad[3];
-	long rgb;
-} SHIELD_POINTS;
-
-typedef struct
-{
-	short x;
-	short z;
-	long rgb;
-} EXPLOSION_VERTS;
-
-typedef struct
-{
-	short on;
-	short life;	// 0 - 32.
-	short speed;
-	short radius;	// Width is 1/4 of radius.
-	short xrot;
-	short zrot;
-	int x;
-	int y;
-	int z;
-	EXPLOSION_VERTS	verts[16];
-} EXPLOSION_RING;
-
 static SHIELD_POINTS TonyBossShield[40]; // x,y,z,rgb.
 static EXPLOSION_RING ExpRings[7];
 static BOSS_STRUCT bossdata;             // exclusive for tony unlike TR3

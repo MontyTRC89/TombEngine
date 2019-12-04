@@ -10,93 +10,107 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 	g_Renderer->AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void TriggerGunSmoke(int x, int y, int z, int xv, int yv, int zv, int initial, int weapon, int count)
+static byte TriggerGunSmoke_SubFunction(int weaponType)
 {
-	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
+	switch (weaponType)
+	{
+		case WEAPON_HK:
+		case WEAPON_ROCKET_LAUNCHER:
+		case WEAPON_GRENADE_LAUNCHER:
+			return 12; // Rocket and Grenade value for TriggerGunSmoke in TR3 have the value 12 ! (the HK is not included there)
 
+		// other weapon
+		default:
+			return 0;
+	}
+}
+
+void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
+{
+	SMOKE_SPARKS* spark;
+
+	spark = &SmokeSparks[GetFreeSmokeSpark()];
 	spark->On = true;
 	spark->sShade = 0;
-	spark->dShade = 4 * count;
+	spark->dShade = (count << 2);
 	spark->ColFadeSpeed = 4;
-	spark->FadeToBlack = 32 - 16 * initial;
+	spark->FadeToBlack = 32 - (initial << 4);
 	spark->Life = (GetRandomControl() & 3) + 40;
 	spark->sLife = spark->Life;
 
-	if ((weapon == WEAPON_PISTOLS || weapon == WEAPON_REVOLVER || weapon == WEAPON_UZI) && spark->dShade > 64)
-		spark->dShade = 64;
+	if (weaponType == WEAPON_PISTOLS || weaponType == WEAPON_REVOLVER || weaponType == WEAPON_UZI)
+	{
+		if (spark->dShade > 64)
+			spark->dShade = 64;
+	}
 
 	spark->TransType = 2;
-
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
+	spark->x = x + (GetRandomControl() & 31) - 16;
+	spark->y = y + (GetRandomControl() & 31) - 16;
+	spark->z = z + (GetRandomControl() & 31) - 16;
 
 	if (initial)
 	{
-		spark->Xvel = (GetRandomControl() & 0x3FF) + xv - 512;
-		spark->Yvel = (GetRandomControl() & 0x3FF) + yv - 512;
-		spark->Zvel = (GetRandomControl() & 0x3FF) + zv - 512;
+		spark->Xvel = ((GetRandomControl() & 1023) - 512) + xv;
+		spark->Yvel = ((GetRandomControl() & 1023) - 512) + yv;
+		spark->Zvel = ((GetRandomControl() & 1023) - 512) + zv;
 	}
 	else
 	{
-		spark->Xvel = ((GetRandomControl() & 0x1FF) - 256) >> 1;
-		spark->Yvel = ((GetRandomControl() & 0x1FF) - 256) >> 1;
-		spark->Zvel = ((GetRandomControl() & 0x1FF) - 256) >> 1;
+		spark->Xvel = ((GetRandomControl() & 511) - 256) >> 1;
+		spark->Yvel = ((GetRandomControl() & 511) - 256) >> 1;
+		spark->Zvel = ((GetRandomControl() & 511) - 256) >> 1;
 	}
 
 	spark->Friction = 4;
 
 	if (GetRandomControl() & 1)
 	{
-		if (Rooms[LaraItem->roomNumber].flags & 0x20)
-			spark->Flags = 272;
+		if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
+			spark->Flags = SP_ROTATE | SP_WIND;
 		else
-			spark->Flags = 16;
+			spark->Flags = SP_ROTATE;
 
 		spark->RotAng = GetRandomControl() & 255;
 
 		if (GetRandomControl() & 1)
-			spark->RotAdd = -16 - (GetRandomControl() & 15);
+			spark->RotAdd = -(GetRandomControl() & 15) - 16;
 		else
 			spark->RotAdd = (GetRandomControl() & 15) + 16;
 	}
-	else if (Rooms[LaraItem->roomNumber].flags & 0x20)
+	else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 	{
-		spark->Flags = 256;
+		spark->Flags = SP_WIND;
 	}
 	else
 	{
 		spark->Flags = 0;
 	}
 
-	spark->Gravity = -2 - (GetRandomControl() & 1);
-	spark->MaxYvel = -2 - (GetRandomControl() & 1);
+	spark->Gravity = -(GetRandomControl() & 1) - 2;
+	spark->MaxYvel = -(GetRandomControl() & 1) - 2;
 
-	int size = (GetRandomControl() & 15) - 
-		(weapon != WEAPON_HK && weapon != WEAPON_ROCKET_LAUNCHER && weapon != WEAPON_GRENADE_LAUNCHER ? 24 : 0) + 48;
+	byte size = ((GetRandomControl() & 7) + 24) - TriggerGunSmoke_SubFunction(weaponType);
 	
 	if (initial)
 	{
 		spark->sSize = size >> 1;
 		spark->Size = size >> 1;
-		size = 2 * (size + 4);
+		spark->dSize = (size << 1) + 8;
 	}
 	else
 	{
 		spark->sSize = size >> 2;
 		spark->Size = size >> 2;
+		spark->dSize = size;
 	}
 
-	spark->dSize = size;
-
-	/*if (BYTE1(gfLevelFlags) & 0x20 && LaraItem->room_number == gfMirrorRoom)
+	/*if (gfLevelFlags & 0x20 && LaraItem->room_number == gfMirrorRoom) // 0x20 = GF_MIRROR_ENABLED
 	{
-		result = 1;
 		spark->mirror = 1;
 	}
 	else
 	{
-		result = 0;
 		spark->mirror = 0;
 	}*/
 }

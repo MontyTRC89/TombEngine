@@ -139,6 +139,39 @@ typedef struct BOSS_STRUCT
 	PHD_VECTOR	BeamTarget;
 };
 
+typedef struct SHIELD_POINTS
+{
+	short x;
+	short y;
+	short z;
+	byte rsub;
+	byte gsub;
+	byte bsub;
+	byte pad[3];
+	long rgb;
+};
+
+typedef struct EXPLOSION_VERTS
+{
+	short x;
+	short z;
+	long rgb;
+};
+
+typedef struct EXPLOSION_RING
+{
+	short on;
+	short life;   // 0 - 32.
+	short speed;
+	short radius; // Width is 1/4 of radius.
+	short xrot;
+	short zrot;
+	int x;
+	int y;
+	int z;
+	EXPLOSION_VERTS	verts[16];
+};
+
 void ClampRotation(PHD_3DPOS *pos, short angle, short rot);
 
 // TR1 objects

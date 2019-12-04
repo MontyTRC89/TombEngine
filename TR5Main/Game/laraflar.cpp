@@ -91,11 +91,11 @@ void ready_flare()//4A3E4(<), 4A848(<) (F)
 
 void undraw_flare_meshes() 
 {
-	Lara.meshPtrs[LM_LHAND] = Meshes[Objects[ID_LARA].meshIndex + 104];
+	LARA_MESHES(ID_LARA, HAND_L);
 }
 void draw_flare_meshes()//4A394(<), 4A7F8(<) (F)
 {
-	Lara.meshPtrs[LM_LHAND] = Meshes[Objects[ID_FLARE_ANIM].meshIndex + 104];
+	LARA_MESHES(ID_FLARE_ANIM, HAND_L);
 }
 
 void undraw_flare()//4A108, 4A56C

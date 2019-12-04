@@ -72,10 +72,10 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 192] |= ROT_Z;
-		Bones[obj->boneIndex + 192] |= ROT_Y;
-		Bones[obj->boneIndex + 208] |= ROT_Z;
-		Bones[obj->boneIndex + 208] |= ROT_Y;
+		Bones[obj->boneIndex + 48 * 4] |= ROT_Z;
+		Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 52 * 4] |= ROT_Z;
+		Bones[obj->boneIndex + 52 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_BAT];
@@ -165,14 +165,14 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 112] |= ROT_Y;
-		Bones[obj->boneIndex + 112] |= ROT_X;
-		Bones[obj->boneIndex + 352] |= ROT_Y;
-		Bones[obj->boneIndex + 352] |= ROT_X;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 88 * 4] |= ROT_X;
 
-		Meshes[obj->meshIndex + 36] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 32];
-		Meshes[obj->meshIndex + 60] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 56];
-		Meshes[obj->meshIndex + 36] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 22];
+		Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 16 * 2];
+		Meshes[obj->meshIndex + 30 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 28 * 2];
+		Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 11 * 2];
 	}
 
 	obj = &Objects[ID_BADDY2];
@@ -191,10 +191,10 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 112] |= ROT_Y;
-		Bones[obj->boneIndex + 112] |= ROT_X;
-		Bones[obj->boneIndex + 352] |= ROT_Y;
-		Bones[obj->boneIndex + 352] |= ROT_X;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 88 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_SAS_CAIRO];
@@ -215,8 +215,8 @@ void NewObjects()
 
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex] |= ROT_X;
-		Bones[obj->boneIndex + 112] |= ROT_Y;
-		Bones[obj->boneIndex + 112] |= ROT_X;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_MUMMY];
@@ -234,9 +234,9 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 112] |= ROT_Y;
-		Bones[obj->boneIndex + 112] |= ROT_X;
-		Bones[obj->boneIndex + 288] |= ROT_Y;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 72 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_QUAD];
@@ -913,9 +913,9 @@ void NewObjects()
 		Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
 
 		// TODO: check if constants are byte, short or int
-		Meshes[obj->meshIndex + 124] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 120];
-		Meshes[obj->meshIndex + 148] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 144];
-		Meshes[obj->meshIndex + 172] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 168];
+		Meshes[obj->meshIndex + 60 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 60 * 2];
+		Meshes[obj->meshIndex + 72 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 72 * 2];
+		Meshes[obj->meshIndex + 84 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 84 * 2];
 	}
 
 	obj = &Objects[ID_CROCODILE];
@@ -1138,15 +1138,22 @@ void BaddyObjects()
 
 	/* Initialise Lara directly since lara will be used all the time. */
 	obj = &Objects[ID_LARA];
-	obj->initialise = InitialiseLaraLoad;
-	obj->shadowSize = 160;
-	obj->hitPoints = 1000;
-	obj->drawRoutine = NULL;
-	obj->saveAnim = true;
-	obj->saveFlags = true;
-	obj->saveHitpoints = true;
-	obj->savePosition = true;
-	obj->usingDrawanimatingItem = false;
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLaraLoad;
+		obj->shadowSize = 160;
+		obj->hitPoints = 1000;
+		obj->drawRoutine = NULL;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->usingDrawanimatingItem = false;
+	}
+	else
+	{
+		printf("lara not found !");
+	}
 
 	// TODO: dummy slot test for other entity, need to be uncommented later, when the Objects[] is augmented !
 	/*
@@ -2939,6 +2946,67 @@ void TrapObjects()
 	}
 }
 
+void InitialiseHair()
+{
+	int* bone;
+
+	FirstHair = 1;
+	bone = &Bones[Objects[ID_HAIR].boneIndex];
+
+	Hairs[0].pos.yRot = 0;
+	Hairs[0].pos.xRot = -0x4000;
+
+	// normal hair
+	for (int i = 1; i < HAIR_SEGMENTS; i++, bone += 4)
+	{
+		Hairs[i].pos.xPos = *(bone + 1);
+		Hairs[i].pos.yPos = *(bone + 2);
+		Hairs[i].pos.zPos = *(bone + 3);
+		Hairs[i].pos.xRot = -0x4000;
+		Hairs[i].pos.yRot = 0;
+		Hairs[i].pos.zRot = 0;
+		//Hairs[i].hvel.x = 0;
+		//Hairs[i].hvel.y = 0;
+		//Hairs[i].hvel.z = 0;
+	}
+}
+
+void InitialiseSpecialEffects()
+{
+	int i;
+	SPARKS* sptr;
+
+	memset(&Sparks, 0, MAX_SPARKS * sizeof(SPARKS));
+	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
+	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
+	memset(&GunShells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
+	memset(&GunFlashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)) - sizeof(int)); // the size is 200 on IDA (without -4 it's 204 ??)
+	memset(&Debris, 0, MAX_DEBRIS * sizeof(DEBRIS_STRUCT));
+	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
+	memset(&Splashes, 0, MAX_SPLASH * sizeof(SPLASH_STRUCT));
+	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));
+	memset(&Bubbles, 0, MAX_BUBBLES * sizeof(BUBBLE_STRUCT));
+	memset(&Drips, 0, MAX_DRIPS * sizeof(DRIP_STRUCT));
+	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
+
+	sptr = &Sparks[0];
+	for (i = 0; i < MAX_SPARKS; i++)
+	{
+		sptr->on = false;
+		sptr->dynamic = -1;
+		sptr++;
+	}
+
+	NextFireSpark = 1;
+	NextSmokeSpark = 0;
+	NextGunShell = 0;
+	NextBubble = 0;
+	NextDrip = 0;
+	NextDebris = 0;
+	NextBlood = 0;
+	NextItem = NO_ITEM;
+}
+
 void PickupObjects()
 {
 	OBJECT_INFO* obj;
@@ -3037,7 +3105,8 @@ void PickupObjects()
 
 void CustomObjects()
 {
-	/*
+	OBJECT_INFO* obj;
+
 	obj = &Objects[ID_GOON_SILENCER1];
 	if (obj->loaded)
 	{
@@ -3315,7 +3384,7 @@ void CustomObjects()
 		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
 
-	obj = &Objects[ID_MERCENARY_AUTOPISTOLS];
+	obj = &Objects[ID_MERCENARY_AUTOPISTOLS1];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCreature;
@@ -3334,7 +3403,36 @@ void CustomObjects()
 		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
 
-	obj = &Objects[ID_MONK_1];
+	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
+	if (obj->loaded)
+	{
+		if (Objects[ID_MERCENARY_AUTOPISTOLS1].loaded)
+		{
+			obj->animIndex = Objects[ID_MERCENARY_AUTOPISTOLS1].animIndex;
+			obj->frameBase = Objects[ID_MERCENARY_AUTOPISTOLS1].frameBase;
+		}
+		else
+		{
+			MessageBox(NULL, "ID_MERCENARY_AUTOPISTOLS1 not found !", NULL, MB_OK);
+		}
+
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = MercenaryAutoPistolControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 50;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+	}
+
+	obj = &Objects[ID_MONK1];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCreature;
@@ -3352,7 +3450,7 @@ void CustomObjects()
 		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 	}
 
-	obj = &Objects[ID_MONK_2];
+	obj = &Objects[ID_MONK2];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCreature;
@@ -3376,7 +3474,7 @@ void CustomObjects()
 		obj->initialise = InitialiseSwordGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SwordGuardianControl;
-		//obj->drawRoutine = DrawStatue;
+		obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 80;
 		obj->pivotLength = 0;
@@ -3398,7 +3496,7 @@ void CustomObjects()
 		obj->initialise = InitialiseShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;
-		//obj->drawRoutine = DrawStatue;
+		obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
 		obj->pivotLength = 0;
@@ -3418,7 +3516,7 @@ void CustomObjects()
 		obj->initialise = InitialiseSpearGuardian;
 		obj->collision = CreatureCollision;
 		obj->control = SpearGuardianControl;
-		//obj->drawRoutine = DrawStatue;
+		obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
 		obj->pivotLength = 0;
@@ -3433,12 +3531,11 @@ void CustomObjects()
 		// TODO: get the correct id for bones ! (spear)
 	}
 
-	// ID: 22
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded)
 	{
 		if (!Objects[ID_DRAGON_BACK].loaded)
-			printf("FATAL: dragon front need back !");
+			printf("FATAL: ID_DRAGON_BACK need ID_DRAGON_BACK !");
 
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
@@ -3453,10 +3550,12 @@ void CustomObjects()
 		Bones[obj->boneIndex + 10 * 4] |= ROT_Z;
 	}
 
-	// ID: 23
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
+		if (!Objects[ID_MARCO_BARTOLI].loaded)
+			printf("FATAL: ID_DRAGON_BACK need ID_MARCO_BARTOLI !");
+
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->radius = 256;
@@ -3465,7 +3564,6 @@ void CustomObjects()
 		obj->savePosition = true;
 	}
 
-	// ID: 40
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
@@ -3532,7 +3630,8 @@ void CustomObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
-	*/
+
+
 }
 
 void InitialiseObjects()
@@ -3565,18 +3664,14 @@ void InitialiseObjects()
 	ObjectObjects();
 	TrapObjects();
 	PickupObjects();
-
-	// Reset MIP flag so we can reuse slots
-	//for (short i = 0; i < ID_NUMBER_OBJECTS; i++)
-	//	Objects[i].objectMip = NULL;
-		
+	
 	// New objects imported from old TRs
 	NewObjects();
 
 	// User defined objects
 	CustomObjects();
 
-	InitialiseHairs();
+	InitialiseHair();
 	InitialiseSpecialEffects();
 
 	NumRPickups = 0;
