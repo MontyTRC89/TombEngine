@@ -115,7 +115,7 @@ void InitialiseCustomObjects(short itemNum, short slot)
 		break;
 
 	case ID_APE:
-	//case ID_SMALL_SPIDER:
+	case ID_SMALL_SPIDER:
 		creature->LOT.step = 512;
 		creature->LOT.drop = -512;
 		creature->LOT.zone = ZONE_HUMAN;
@@ -152,6 +152,8 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->maximumTurn = ANGLE(1);
 	creature->flags = 0;
 	creature->enemy = NULL;
+
+	// default zone for all entity with (intelligent == true)
 	creature->LOT.step = 256;
 	creature->LOT.drop = -512;
 	creature->LOT.blockMask = 0x4000;
@@ -163,7 +165,9 @@ void InitialiseSlot(short itemNum, short slot)
 	case ID_MP_WITH_STICK:
 	case ID_MONKEY:
 	case ID_YETI:
-	//case ID_SOPHIA_LEE:
+	case ID_SOPHIA_LEE:
+	case ID_LIZARD_MAN:
+	case ID_MP1:
 		// Can climb
 		creature->LOT.step = 1024;
 		creature->LOT.drop = -1024;

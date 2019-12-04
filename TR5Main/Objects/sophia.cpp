@@ -8,41 +8,6 @@
 #include "../Game/sphere.h"
 #include "../Game/people.h"
 
-#define ID_LASER_BOLT ID_ANIMATING1
-
-typedef struct
-{
-	short x;
-	short y;
-	short z;
-	byte rsub;
-	byte gsub;
-	byte bsub;
-	byte pad[3];
-	long rgb;
-} SHIELD_POINTS;
-
-typedef struct
-{
-	short x;
-	short z;
-	long rgb;
-} EXPLOSION_VERTS;
-
-typedef struct
-{
-	short on;
-	short life;   // 0 - 32.
-	short speed;
-	short radius; // Width is 1/4 of radius.
-	short xrot;
-	short zrot;
-	long x;
-	long y;
-	long z;
-	EXPLOSION_VERTS	verts[16];
-} EXPLOSION_RING;
-
 #define MAX_TRIGGER_RANGE 0x4000
 #define SMALL_FLASH 10
 #define BIG_FLASH 16

@@ -14,9 +14,6 @@
 // TODO: recreate the DrawSkidoo for the snowmobile.
 // TODO: delete these 2 define when the GAME_OBJECT_ID is updated !
 
-#define ID_SNOWMOBILE_GUN 0
-#define ID_SKIDMAN 0
-
 extern LaraExtraInfo g_LaraExtra;
 
 enum SKIDOO_STATE { SKID_SIT, SKID_GETON, SKID_LEFT, SKID_RIGHT, SKID_FALL, SKID_HIT, SKID_GETONL, SKID_GETOFFL, SKID_STILL, SKID_GETOFF, SKID_LETGO, SKID_DEATH, SKID_FALLOFF };
@@ -1226,11 +1223,11 @@ void SkidManControl(short riderNum)
 	/* Need to activate AI for skidoo (it's the skidoo that holds the brain) if not done yet */
 	if (!item->data)
 	{
-		EnableBaddieAI(item_number, 1);
+		EnableBaddieAI(item_number, TRUE);
 		item->status = ITEM_ACTIVE;
 	}
-	skidman = (CREATURE_INFO*)item->data;
 
+	skidman = (CREATURE_INFO*)item->data;
 	angle = 0;
 
 	if (item->hitPoints <= 0)
@@ -1244,7 +1241,7 @@ void SkidManControl(short riderNum)
 			rider->pos.yRot = item->pos.yRot;
 			rider->roomNumber = item->roomNumber;
 
-			rider->animNumber = Objects[ID_SKIDMAN].animIndex + SMAN_DEATH_ANIM;
+			rider->animNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_DEATH_ANIM;
 			rider->frameNumber = Anims[rider->animNumber].frameBase;
 			rider->currentAnimState = SMAN_DEATH;
 
@@ -1354,7 +1351,7 @@ void SkidManControl(short riderNum)
 		if (item->roomNumber != rider->roomNumber)
 			ItemNewRoom(riderNum, item->roomNumber);
 
-		rider->animNumber = item->animNumber + (Objects[ID_SKIDMAN].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
+		rider->animNumber = item->animNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
 		rider->frameNumber = item->frameNumber + (Anims[rider->animNumber].frameBase - Anims[item->animNumber].frameBase);
 	}
 	else if (rider->status == ITEM_DEACTIVATED && item->speed == 0 && item->fallspeed == 0)
