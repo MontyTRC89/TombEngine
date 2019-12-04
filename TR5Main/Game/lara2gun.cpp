@@ -7,13 +7,13 @@
 PISTOL_DEF PistolsTable[4] =
 {
 	{ ID_LARA, 0, 0, 0, 0 },
-	{ ID_PISTOLS_ANIM, 4, 5, 0xD, 0x18 },
-	{ ID_REVOLVER_ANIM , 7, 8, 0xF, 0x1D },
-	{ ID_UZI_ANIM, 4, 5, 0xD, 0x18 }
+	{ ID_PISTOLS_ANIM, 4, 5, 13, 24 },
+	{ ID_REVOLVER_ANIM , 7, 8, 15, 29 },
+	{ ID_UZI_ANIM, 4, 5, 13, 24 }
 };
 
-int UziLeft;
-int UziRight;
+bool UziLeft;
+bool UziRight;
 
 void AnimatePistols(int weaponType)
 {
@@ -302,7 +302,7 @@ void PistolHandler(int weaponType)
 
 void undraw_pistol_mesh_right(int weaponType)
 {
-	Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_LARA].meshIndex + HAND_R * 2];
+	LARA_MESHES(ID_LARA, HAND_R);
 	
 	switch (weaponType)
 	{
@@ -323,7 +323,7 @@ void undraw_pistol_mesh_left(int weaponType)
 {
 	if (weaponType != WEAPON_REVOLVER)
 	{
-		Lara.meshPtrs[HAND_L] = Meshes[Objects[ID_LARA].meshIndex + HAND_L * 2];
+		LARA_MESHES(ID_LARA, HAND_L);
 
 		switch (weaponType)
 		{
@@ -340,14 +340,12 @@ void undraw_pistol_mesh_left(int weaponType)
 void draw_pistol_meshes(int weaponType)
 {
 	Lara.holster = ID_LARA_HOLSTERS;
-
-	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R * 2];
-	//Lara.meshPtrs[THIGH_R] = Meshes[Objects[ID_LARA].meshIndex + THIGH_R * 2];
+	
+	LARA_MESHES(WeaponObjectMesh(weaponType), HAND_R);
 
 	if (weaponType != WEAPON_REVOLVER)
 	{
-		Lara.meshPtrs[HAND_L] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_L * 2];
-		//Lara.meshPtrs[THIGH_L] = Meshes[Objects[ID_LARA].meshIndex + THIGH_L * 2];
+		LARA_MESHES(WeaponObjectMesh(weaponType), HAND_L);
 	}
 }
 

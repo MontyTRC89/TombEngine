@@ -122,6 +122,7 @@ typedef struct item_light_t
 typedef struct hair_struct
 {
 	PHD_3DPOS pos;
+	//PHD_VECTOR hvel;
 	byte unknown[24];
 } HAIR_STRUCT;
 
@@ -156,10 +157,10 @@ typedef struct ai_info_t
 } AI_INFO;
 
 typedef struct bite_info_t {				// Offset into given Mesh
-	int			x;					// where Baddie kicks off Bite Effect
-	int			y;
-	int			z;
-	int			meshNum;
+	int	x;					// where Baddie kicks off Bite Effect
+	int	y;
+	int	z;
+	int	meshNum;
 } BITE_INFO;
 
 typedef struct lot_info_t

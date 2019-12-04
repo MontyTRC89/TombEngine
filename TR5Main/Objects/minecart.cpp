@@ -623,8 +623,8 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 				short* tmp;
 
 				tmp = Lara.meshPtrs[HAND_R];
-
-				Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_MINECART_ANIMS].meshIndex + HAND_R];
+				
+				LARA_MESHES(ID_MINECART_ANIMS, HAND_R);
 				Meshes[Objects[ID_MINECART_ANIMS].meshIndex + HAND_R] = tmp;
 
 				cart->Flags &= ~CF_MESH;

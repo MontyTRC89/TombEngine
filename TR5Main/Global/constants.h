@@ -1,5 +1,8 @@
 #pragma once
 
+#define HAIR_SEGMENTS 7 // only classic lara (young lara have more segments !)
+#define DOUBLE_HAIR_SEGMENTS 14
+
 #define TEXTURE_PAGE	(256 * 256)
 
 #define W2V_SHIFT 		14					// Shift scale of View.Frame to World.Frame
@@ -42,6 +45,22 @@
 #define MAX_DRAW_STATICS    16384
 #define MAX_BONES			32
 #define MAX_SPRITES			16384
+#define MAX_SPARKS          1024      // 128 normally
+#define MAX_SPARKS_FIRE     20
+#define MAX_FIRE_LIST       32        // FIRE_SPARKS list
+#define MAX_SPARKS_SMOKE    64
+#define MAX_SPARKS_BLOOD    64
+#define MAX_GUNSHELL        24
+#define MAX_GUNFLASH        6
+#define MAX_DRIPS           32
+#define MAX_BUBBLES         40
+#define MAX_DYNAMICS        64
+#define MAX_SPLASH          4
+#define MAX_RIPPLES         32
+#define MAX_CAMERA          18
+#define MAX_SHOCKWAVE       16
+#define MAX_EFFECTS         100
+#define MAX_DEBRIS          256
 #define NO_ROOM				0xFF
 #define NO_HEIGHT			(-0x7F00)
 #define NUM_PICKUPS			64
