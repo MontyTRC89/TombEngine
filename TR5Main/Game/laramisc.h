@@ -9,6 +9,4 @@ void InitialiseLara(int restore);
 void LaraControl(short itemNumber);
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll);
 void LaraInitialiseMeshes();
-
-//#define LaraBurn ((void (__cdecl*)()) 0x0048AD60)
-//#define InitialiseLaraLoad ((void (__cdecl*)(short)) 0x004568C0)
+void AnimateLara(ITEM_INFO* item);

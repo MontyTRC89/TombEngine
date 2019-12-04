@@ -32,27 +32,9 @@ typedef struct LaraExtraInfo {
 
 extern LaraExtraInfo g_LaraExtra;
 
-//#define LookUpDown ((void (__cdecl*)()) 0x0044D310)
-//#define LookLeftRight ((void (__cdecl*)()) 0x0044D440)
-//#define ResetLook ((void (__cdecl*)()) 0x0044D220)
-#define UpdateLaraRoom ((int (__cdecl*)(ITEM_INFO*, int)) 0x004120F0)
-//#define LaraControl ((int (__cdecl*)()) 0x00455830)
 #define GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, int)) 0x0041E2A0)
-#define CheckForHoldingState ((int (__cdecl*)(short)) 0x00452AF0)
-#define AnimateLara ((int (__cdecl*)(ITEM_INFO*)) 0x004563F0)
-
-//#define LaraFloorFront ((int (__cdecl*)(ITEM_INFO*, short, int)) 0x004438F0)
-//#define LaraCeilingFront ((int (__cdecl*)(ITEM_INFO*, short, int, int)) 0x00442DB0)
-//#define GetLaraCollisionInfo ((int (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00444F80)
-//#define TestLaraVault ((int (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00445100)
-//#define ShiftItem ((int (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004120A0)
-//#define lara_as_wade ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x0044B770)
-//#define lara_as_back ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x0044AE20)
-//#define lara_as_run ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00449330)
-//#define lara_as_walk ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00449260)
-
+//#define AnimateLara ((int (__cdecl*)(ITEM_INFO*)) 0x004563F0)
 #define LaraHangTest ((int (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004460F0)
-#define TestLaraSlide ((int (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004431F0)
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
@@ -221,7 +203,6 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll);
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll);
 int TestWall(ITEM_INFO* item, int front, int right, int down);
-//int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll);
 int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge);
 int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll);
@@ -229,11 +210,12 @@ int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll);
 int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll);
 int LaraLandedBad(ITEM_INFO* l, COLL_INFO* coll);
 int LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
-//int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
+int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 short LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 void GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
+int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 //int GetLaraJointPos(PHD_VECTOR* arg1, int arg2);
 //void AnimateLara(ITEM_INFO* item);
 /*void SetLaraUnderwaterNodes();

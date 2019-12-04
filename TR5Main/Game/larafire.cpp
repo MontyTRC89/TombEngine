@@ -214,6 +214,25 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	}
 };
 
+short HoldStates[] = {
+	STATE_LARA_STOP,
+	STATE_LARA_POSE,
+	STATE_LARA_TURN_RIGHT_SLOW,
+	STATE_LARA_TURN_LEFT_SLOW,
+	STATE_LARA_WALK_BACK,
+	STATE_LARA_TURN_FAST,
+	STATE_LARA_WALK_RIGHT,
+	STATE_LARA_WALK_LEFT,
+	STATE_LARA_PICKUP,
+	STATE_LARA_SWITCH_DOWN,
+	STATE_LARA_SWITCH_UP,
+	STATE_LARA_WADE_FORWARD,
+	STATE_LARA_CROUCH_IDLE,
+	STATE_LARA_CROUCH_TURN_LEFT,
+	STATE_LARA_CROUCH_TURN_RIGHT,
+	-1
+};
+
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 bool MonksAttackLara;
@@ -447,7 +466,7 @@ void LaraGun()
 		break;
 
 	case LG_UNDRAW_GUNS:
-		Lara.meshPtrs[HEAD] = Meshes[Objects[ID_LARA].meshIndex + 14 * 2];
+		Lara.meshPtrs[HEAD] = Meshes[Objects[ID_LARA].meshIndex + HEAD * 2];
 
 		switch (Lara.gunType)
 		{
@@ -480,7 +499,7 @@ void LaraGun()
 			meshIndex = Objects[ID_LARA].meshIndex;
 		else
 			meshIndex = Objects[ID_LARA_SCREAM].meshIndex;
-		Lara.meshPtrs[HEAD] = Meshes[meshIndex + 14 * 2];
+		Lara.meshPtrs[HEAD] = Meshes[meshIndex + HEAD * 2];
 		
 		if (Camera.type != CAMERA_TYPE::CINEMATIC_CAMERA && Camera.type != CAMERA_TYPE::LOOK_CAMERA &&
 			Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
@@ -911,6 +930,23 @@ void LaraTargetInfo(WEAPON_INFO* weapon)
 
 	Lara.targetAngles[0] = angles[0];
 	Lara.targetAngles[1] = angles[1];
+}
+
+int CheckForHoldingState(int state)
+{
+	short* holdState = HoldStates;
+
+	if (g_LaraExtra.ExtraAnim)
+		return 0;
+
+	while (*holdState >= 0)
+	{
+		if (state == *holdState)
+			return 1;
+		holdState++;
+	}
+	
+	return 0;
 }
 
 void Inject_LaraFire()

@@ -12,6 +12,7 @@ extern GameFlow* g_GameFlow;
 
 COLL_INFO coll; 
 short SubsuitAir = 0;
+short FXType;
 
 /*void GetLaraDeadlyBounds()//4B408(<), 4B86C (F)
 {
@@ -664,6 +665,12 @@ void InitialiseLara(int restore)
 		g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1] = -1;
 	}
 
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
+
+	//g_LaraExtra.Weapons[WEAPON_UZI].Present = true;
+	//g_LaraExtra.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
+
 	Lara.binoculars = WTYPE_PRESENT;
 
 	if (!restore)
@@ -726,4 +733,201 @@ void InitialiseLara(int restore)
 
 	Lara.bottle = 0;
 	Lara.wetcloth = CLOTH_MISSING;
+}
+
+void AnimateLara(ITEM_INFO* item)
+{
+	item->frameNumber++;
+
+	ANIM_STRUCT* anim = &Anims[item->animNumber];
+	if (anim->numberChanges > 0 && GetChange(item, anim))
+	{
+		anim = &Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (item->frameNumber > anim->frameEnd)
+	{
+		if (anim->numberCommands > 0)
+		{
+			short* cmd = &Commands[anim->commandIndex];
+			for (int i = anim->numberCommands; i > 0; i--)
+			{
+				switch (*(cmd++))
+				{
+				case COMMAND_MOVE_ORIGIN:
+					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					UpdateLaraRoom(item, -381);
+					cmd += 3;
+					break;
+
+				case COMMAND_JUMP_VELOCITY:
+					item->fallspeed = *(cmd++);
+					item->speed = *(cmd++);
+					item->gravityStatus = true;
+					if (Lara.calcFallSpeed)
+					{
+						item->fallspeed = Lara.calcFallSpeed;
+						Lara.calcFallSpeed = 0;
+					}
+					break;
+
+				case COMMAND_ATTACK_READY:
+					if (Lara.gunStatus != LG_SPECIAL)
+						Lara.gunStatus = LG_NO_ARMS;
+					break;
+
+				case COMMAND_SOUND_FX:
+				case COMMAND_EFFECT:
+					cmd += 2;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+
+		item->animNumber = anim->jumpAnimNum;
+		item->frameNumber = anim->jumpFrameNum;
+		
+		anim = &Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (anim->numberCommands > 0)
+	{
+		short* cmd = &Commands[anim->commandIndex];
+		int flags;
+
+		for (int i = anim->numberCommands; i > 0; i--)
+		{
+			switch (*(cmd++))
+			{
+			case COMMAND_MOVE_ORIGIN:
+				cmd += 3;
+				break;
+
+			case COMMAND_JUMP_VELOCITY:
+				cmd += 2;
+				break;
+
+			case COMMAND_SOUND_FX:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				flags = cmd[1] & 0xC000;
+				if (flags == SFX_LANDANDWATER ||
+					(flags == SFX_LANDONLY && (Lara.waterSurfaceDist >= 0 || Lara.waterSurfaceDist == NO_HEIGHT)) ||
+					(flags == SFX_WATERONLY && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT /*&& !(Rooms[lara_item->room_number].flags & SWAMP)*/))
+				{
+					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
+				}
+
+				cmd += 2;
+				break;
+
+			case COMMAND_EFFECT:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				FXType = cmd[1] & 0xC000;
+				(*EffectRoutines[(int)(cmd[1] & 0x3fff)])(item);
+
+				cmd += 2;
+				break;
+
+			default:
+				break;
+
+			}
+		}
+	}
+
+	int lateral = anim->Xvelocity;
+	if (anim->Xacceleration)
+		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
+	
+	lateral >>= 16;
+	
+	if (item->gravityStatus)
+	{
+		int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
+		item->speed -= velocity >> 16;
+		item->speed += (velocity + anim->acceleration) >> 16;
+		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6);
+		item->pos.yPos += item->fallspeed;
+	}
+	else
+	{
+		int velocity = anim->velocity;
+		if (anim->acceleration)
+			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		item->speed = velocity >> 16;
+	}
+
+	/*if (lara.RopePtr != -1)
+		result = j_SomeRopeCollisionFunc(item);*/
+
+	/*
+	if ( !item->gravity_status ) 					// Calculate absolute new velocities
+	{                                               // if on the Ground...
+		if (lara.water_status==LARA_WADE && (room[item->room_number].flags & SWAMP))
+		{
+			speed = anim->velocity>>1;
+			if ( anim->acceleration )
+				speed += (anim->acceleration * (item->frame_number - anim->frame_base))>>2;
+			item->speed = (sint16)(speed >> 16);
+		}
+		else
+		{
+			speed = anim->velocity;
+			if ( anim->acceleration )
+				speed += anim->acceleration * (item->frame_number - anim->frame_base);
+			item->speed = (sint16)(speed >> 16);
+		}
+	}
+	else                                            // If gravity ON
+	{                                               // do Up/down movement
+		if (room[item->room_number].flags & SWAMP)
+		{
+			item->speed -= item->speed>>3;
+			if (abs(item->speed)<8)
+			{
+				item->speed = 0;
+				item->gravity_status = 0;
+			}
+			if (item->fallspeed > 128)
+				item->fallspeed >>= 1;
+			item->fallspeed -= item->fallspeed>>2;
+			if (item->fallspeed < 4)
+				item->fallspeed = 4;
+			item->pos.y_pos += item->fallspeed;
+		}
+		else
+		{
+			speed = anim->velocity + anim->acceleration * (item->frame_number - anim->frame_base - 1);
+			item->speed -= (sint16)(speed>>16);
+			speed += anim->acceleration;
+			item->speed += (sint16)(speed>>16);
+			item->fallspeed += (item->fallspeed<FASTFALL_SPEED) ? GRAVITY : 1;
+			item->pos.y_pos += item->fallspeed;
+		}
+	}
+	*/
+
+	if (!Lara.isMoving)
+	{
+		item->pos.xPos += item->speed * SIN(Lara.moveAngle) >> W2V_SHIFT; 
+		item->pos.zPos += item->speed * COS(Lara.moveAngle) >> W2V_SHIFT;
+
+		item->pos.xPos += lateral * SIN(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
+		item->pos.zPos += lateral * COS(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+	}
 }

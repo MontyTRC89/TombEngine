@@ -23,7 +23,6 @@
 #define UpdateDebris ((void (__cdecl*)()) 0x0041D500)
 #define UpdateDrips ((void (__cdecl*)()) 0x00483D90)
 #define UpdateGunShells ((void (__cdecl*)()) 0x00482D80)
-//#define UpdateSky ((void (__cdecl*)()) 0x00414720)
 #define UpdateBats ((void (__cdecl*)()) 0x00407FD0)
 #define UpdateRats ((void (__cdecl*)()) 0x0046AC70)
 #define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
@@ -35,14 +34,10 @@
 #define LavaBurn ((void (__cdecl*)(ITEM_INFO*)) 0x0048ADD0)
 #define RefreshCamera ((void (__cdecl*)(short, short*)) 0x004165E0)
 #define DoFlipMap ((void (__cdecl*)(short)) 0x00418910)
-//#define SwitchTrigger ((int (__cdecl*)(short, short)) 0x0047D670)
-//#define KeyTrigger ((int (__cdecl*)(short)) 0x00469550)
-//#define PickupTrigger ((int (__cdecl*)(short)) 0x004695E0)
 #define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
 #define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)
 #define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
-//#define AnimateWaterfalls ((void (__cdecl*)()) 0x00465DF0)
 #define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 #define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
 
@@ -54,7 +49,7 @@ void AnimateWaterfalls();
 void ActivateKey();
 void ActivateCamera();
 short GetDoor(FLOOR_INFO* floor);
-
-unsigned __stdcall GameMain(void*);
+void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void TestTriggers(short* data, int heavy, int HeavyFlags);
+unsigned __stdcall GameMain(void*);
 void Inject_Control();

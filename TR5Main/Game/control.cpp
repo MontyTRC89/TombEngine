@@ -1180,8 +1180,19 @@ short GetDoor(FLOOR_INFO* floor)
 	return NO_ROOM;
 }
 
+void TranslateItem(ITEM_INFO* item, int x, int y, int z)
+{
+	int c = COS(item->pos.yRot);
+	int s = SIN(item->pos.yRot);
+
+	item->pos.xPos += (c * x + s * z) >> W2V_SHIFT;
+	item->pos.yPos += y;
+	item->pos.zPos += (-s * x + c * z) >> W2V_SHIFT;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
 	INJECT(0x004167B0, TestTriggers);
+	INJECT(0x00415960, TranslateItem);
 }

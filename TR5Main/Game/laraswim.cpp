@@ -12,6 +12,7 @@
 #include "effects.h"
 #include "effect2.h"
 #include "larafire.h"
+#include "laramisc.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
