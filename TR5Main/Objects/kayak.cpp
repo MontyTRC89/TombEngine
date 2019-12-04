@@ -955,7 +955,7 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 			short* tmp;
 			tmp = Lara.meshPtrs[HAND_R];
 
-			Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + HAND_R];
+			LARA_MESHES(ID_KAYAK_LARA_ANIMS, HAND_R);
 			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + HAND_R] = tmp;
 			
 			lara->meshBits &= ~LARA_LEG_BITS;
