@@ -38,18 +38,6 @@ extern LaraExtraInfo g_LaraExtra;
 
 BITE_INFO dragonMouthBite = { 35, 171, 1168, 12 };
 
-
-// TODO: need to be deleted (define) when the slot is created ! (dragon)
-
-#define ID_DRAGON_FRONT 0        // ID: 22
-#define ID_DRAGON_BACK 0         // ID: 23
-#define ID_DRAGON_BONE_FRONT 0   // ID: 218
-#define ID_DRAGON_BONE_BACK 0    // ID: 219
-#define ID_SPHERE_OF_DOOM 0      // ID: 209
-#define ID_SPHERE_OF_DOOM2 0     // ID: 210
-#define ID_SPHERE_OF_DOOM3 0     // ID: 211
-#define ID_MARCO_BARTOLI 0       // ID: 40
-
 enum DRAGON_STATE {
 	DRAGON_EMPTY,
 	DRAGON_WALK,

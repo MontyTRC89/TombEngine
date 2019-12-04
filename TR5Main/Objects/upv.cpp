@@ -19,10 +19,6 @@ enum UPV_FLAG
 	UPV_DEAD = 8
 };
 
-// TODO need to be deleted when the slot (UPV & UPV_ANIMS) is created !
-#define ID_UPV ID_SAS
-#define ID_UPV_ANIMS ID_SWAT
-
 #define ACCELERATION		0x40000
 #define FRICTION			0x18000
 #define MAX_SPEED			0x400000
