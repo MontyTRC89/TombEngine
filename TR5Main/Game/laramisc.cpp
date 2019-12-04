@@ -562,7 +562,7 @@ void LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 {
 	for (int i = 0; i < 15; i++)
 	{
-		Lara.meshPtrs[i] = Meshes[Objects[ID_LARA].meshIndex + 2 * i] = Meshes[Objects[ID_LARA_SKIN].meshIndex + 2 * i];
+		INIT_LARA_MESHES(i, ID_LARA, ID_LARA_SKIN);
 	}
 
 	/*if (gfCurrentLevel >= LVL5_GALLOWS_TREE && gfCurrentLevel <= LVL5_OLD_MILL)
