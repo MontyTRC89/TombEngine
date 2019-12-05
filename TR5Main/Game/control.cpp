@@ -1190,6 +1190,36 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	item->pos.zPos += (-s * x + c * z) >> W2V_SHIFT;
 }
 
+int GetWaterSurface(int x, int y, int z, short roomNumber)
+{
+	ROOM_INFO* room = &Rooms[roomNumber];
+	FLOOR_INFO* floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT)* room->xSize];
+
+	if (room->flags & ENV_FLAG_WATER)
+	{
+		while (floor->skyRoom != NO_ROOM)
+		{
+			room = &Rooms[floor->skyRoom];
+			if (!(room->flags & ENV_FLAG_WATER))
+				return (floor->ceiling << 8);
+			floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT)* room->xSize];
+		}
+		return NO_HEIGHT;
+	}
+	else
+	{
+		// Go down until hit water
+		while (floor->pitRoom != NO_ROOM)
+		{
+			room = &Rooms[floor->pitRoom];
+			if (room->flags & ENV_FLAG_WATER)
+				return (floor->floor << 8);
+			floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT)* room->xSize];
+		}
+	}
+	return NO_HEIGHT;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
