@@ -20,7 +20,7 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->goalAnimState = STATE_LARA_UNDERWATER_DIVING;
 		item->animNumber = ANIMATION_LARA_FREE_FALL_TO_UNDERWATER_ALTERNATE;
-		item->pos.xRot = ANGLE(-45);
+		item->pos.xRot = -ANGLE(45);
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->fallspeed = 80;
 		Lara.waterStatus = LW_UNDERWATER;
@@ -102,7 +102,8 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 
 	if (TrInput & IN_JUMP)
 	{
-		if (++Lara.diveCount == 10)
+		Lara.diveCount++;
+		if (Lara.diveCount == 10)
 			item->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
 	}
 	else
@@ -246,7 +247,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 	coll->enableSpaz = false;
 
 	coll->radius = 100;
-	coll->trigger = 0;
+	coll->trigger = NULL;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -257,25 +258,20 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	if (item->pos.zRot < -ANGLE(2) || item->pos.zPos >= ANGLE(2))
-	{
-		if (item->pos.zRot >= 0)
-			item->pos.zRot -= ANGLE(2);
-		else
-			item->pos.zRot += ANGLE(2);
-	}
-	else
-	{
+	if (item->pos.zRot >= -ANGLE(2) && item->pos.zRot <= ANGLE(2))
 		item->pos.zRot = 0;
-	}
+	else if (item->pos.zRot < 0)
+		item->pos.zRot += ANGLE(2);
+	else
+		item->pos.zRot -= ANGLE(2);
 
 	if (Lara.currentActive && Lara.waterStatus != LW_FLYCHEAT)
 		LaraWaterCurrent(coll);
 
 	AnimateLara(item);
 
-	item->pos.xPos += item->fallspeed * SIN(Lara.moveAngle) >> W2V_SHIFT;
-	item->pos.zPos += item->fallspeed * COS(Lara.moveAngle) >> W2V_SHIFT;
+	item->pos.xPos += item->fallspeed * SIN(Lara.moveAngle) >> (W2V_SHIFT + 2);
+	item->pos.zPos += item->fallspeed * COS(Lara.moveAngle) >> (W2V_SHIFT + 2);
 
 	LaraBaddieCollision(item, coll);
 

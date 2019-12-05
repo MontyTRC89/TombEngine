@@ -487,8 +487,6 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 		item->pos.xRot += ANGLE(85);
 	else if (item->pos.xRot > ANGLE(85))
 		item->pos.xRot -= ANGLE(85);
-	else
-		item->pos.xRot = 0;
 
 	if (LaraDrawType == LARA_DIVESUIT)
 	{
