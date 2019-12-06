@@ -4,7 +4,7 @@
 
 BITE_INFO raptorBite = { 0, 66, 318, 22 };
 
-void RaptorControl(short itemNum)
+void Tr3RaptorControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

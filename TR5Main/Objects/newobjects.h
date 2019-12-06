@@ -178,7 +178,15 @@ void ClampRotation(PHD_3DPOS *pos, short angle, short rot);
 void InitialiseWolf(short itemNum);
 void WolfControl(short itemNum);
 void BearControl(short itemNum);
+void Tr1RaptorControl(short itemNum);
+void Tr1LarsonControl(short itemNum);
+void Tr1PierreControl(short itemNum);
 void ApeControl(short itemNum);
+void InitialiseEvilLara(short itemNum);
+void LaraEvilControl(short itemNum);
+void DrawEvilLara(ITEM_INFO* item);
+void NatlaControl(short itemNum);
+void NatlaEvilControl(short itemNum);
 
 // TR2 objects
 void BarracudaControl(short itemNum);
@@ -225,7 +233,7 @@ void SkidManControl(short riderNum);
 void TigerControl(short itemNum);
 void InitialiseCobra(short itemNum);
 void CobraControl(short itemNum);
-void RaptorControl(short itemNum);
+void Tr3RaptorControl(short itemNum);
 void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber);
 void HarpoonControl(short itemNum);
 void ScubaControl(short itemNumber);
