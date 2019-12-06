@@ -5,10 +5,15 @@
 #include "..\Game\items.h"
 #include "..\Game\effects.h"
 #include "..\Game\draw.h"
-//#include "..\CustomObjects\frogman.h"
 #include <stdio.h>
 
+#define SHARD_DAMAGE 30
+#define ROCKET_DAMAGE 100
 #define DIVER_HARPOON_DAMAGE 50
+
+#define SHARD_SPEED  250
+#define ROCKET_SPEED 220
+#define NATLAGUN_SPEED 400
 
 void ShootAtLara(FX_INFO *fx)
 {
@@ -39,7 +44,7 @@ void ControlMissile(short fxNumber)
 	int speed;
 
 	fx = &Effects[fxNumber];
-	printf("ControlMissile\n", fx->objectNumber);
+	printf("ControlMissile\n");
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON && !(Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
 		fx->pos.xRot -= ONE_DEGREE;
@@ -121,4 +126,122 @@ void ControlMissile(short fxNumber)
 	}
 	else if (fx->objectNumber == KNIFE)
 		fx->pos.zRot += 30 * ONE_DEGREE;*/
+}
+
+void ControlNatlaGun(short fx_number)
+{
+	FX_INFO* fx, *newfx;
+	OBJECT_INFO* object;
+	FLOOR_INFO* floor;
+	short room_number;
+	int x, y, z;
+
+	fx = &Effects[fx_number];
+	object = &Objects[fx->objectNumber];
+	fx->frameNumber--;
+	if (fx->frameNumber <= Objects[fx->objectNumber].nmeshes)
+		KillEffect(fx_number);
+
+	/* If first frame, then start another explosion at next position */
+	if (fx->frameNumber == -1)
+	{
+		z = fx->pos.zPos + (fx->speed * COS(fx->pos.yRot) >> W2V_SHIFT);
+		x = fx->pos.xPos + (fx->speed * SIN(fx->pos.yRot) >> W2V_SHIFT);
+		y = fx->pos.yPos;
+		room_number = fx->roomNumber;
+		floor = GetFloor(x, y, z, &room_number);
+
+		/* Don't create one if hit a wall */
+		if (y >= GetFloorHeight(floor, x, y, z) || y <= GetCeiling(floor, x, y, z))
+			return;
+
+		fx_number = CreateNewEffect(room_number);
+		if (fx_number != NO_ITEM)
+		{
+			newfx = &Effects[fx_number];
+			newfx->pos.xPos = x;
+			newfx->pos.yPos = y;
+			newfx->pos.zPos = z;
+			newfx->pos.yRot = fx->pos.yRot;
+			newfx->roomNumber = room_number;
+			newfx->speed = fx->speed;
+			newfx->frameNumber = 0;
+			newfx->objectNumber = ID_PROJ_NATLA;
+		}
+	}
+}
+
+short ShardGun(int x, int y, int z, short speed, short yrot, short room_number)
+{
+	short fx_number;
+	FX_INFO* fx;
+
+	fx_number = CreateNewEffect(room_number);
+	if (fx_number != NO_ITEM)
+	{
+		fx = &Effects[fx_number];
+		fx->pos.xPos = x;
+		fx->pos.yPos = y;
+		fx->pos.zPos = z;
+		fx->roomNumber = room_number;
+		fx->pos.xRot = fx->pos.zRot = 0;
+		fx->pos.yRot = yrot;
+		fx->speed = SHARD_SPEED;
+		fx->frameNumber = 0;
+		fx->objectNumber = ID_PROJ_SHARD;
+		fx->shade = 14 * 256;
+		ShootAtLara(fx);
+	}
+
+	return (fx_number);
+}
+
+short BombGun(int x, int y, int z, short speed, short yrot, short room_number)
+{
+	short fx_number;
+	FX_INFO* fx;
+
+	fx_number = CreateNewEffect(room_number);
+	if (fx_number != NO_ITEM)
+	{
+		fx = &Effects[fx_number];
+		fx->pos.xPos = x;
+		fx->pos.yPos = y;
+		fx->pos.zPos = z;
+		fx->roomNumber = room_number;
+		fx->pos.xRot = fx->pos.zRot = 0;
+		fx->pos.yRot = yrot;
+		fx->speed = ROCKET_SPEED;
+		fx->frameNumber = 0;
+		fx->objectNumber = ID_PROJ_BOMB;
+		fx->shade = 16 * 256;
+		ShootAtLara(fx);
+	}
+
+	return (fx_number);
+}
+
+short NatlaGun(int x, int y, int z, short speed, short yrot, short room_number)
+{
+	short fx_number;
+	FX_INFO* fx;
+
+	fx_number = CreateNewEffect(room_number);
+	if (fx_number != NO_ITEM)
+	{
+		fx = &Effects[fx_number];
+		fx->pos.xPos = x;
+		fx->pos.yPos = y;
+		fx->pos.zPos = z;
+		fx->roomNumber = room_number;
+		fx->pos.xRot = fx->pos.zRot = 0;
+		fx->pos.yRot = yrot;
+		fx->speed = NATLAGUN_SPEED;
+		fx->frameNumber = 0;
+		fx->objectNumber = ID_PROJ_NATLA;
+		fx->shade = 16 * 256;
+		ShootAtLara(fx);
+	}
+
+	return (fx_number);
 }

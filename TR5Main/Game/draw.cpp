@@ -49,7 +49,7 @@ void DrawAnimatingItem(ITEM_INFO* item)
 	sub_42B4C0(item, frames[0]);
 	if (phd_ClipBoundingBox(frames[0]))
 	{
-		CalculateObjectLighting(item, frames[0]);
+		//CalculateObjectLighting(item, frames[0]);
 
 		if (item->data == NULL)
 			extra_rotation = NullRotations;
