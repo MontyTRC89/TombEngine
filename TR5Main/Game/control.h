@@ -52,6 +52,7 @@ short GetDoor(FLOOR_INFO* floor);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void TestTriggers(short* data, int heavy, int HeavyFlags);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, short x, short z);
+int GetWaterSurface(int x, int y, int z, short roomNumber);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();

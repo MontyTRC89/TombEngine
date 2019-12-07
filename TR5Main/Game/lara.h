@@ -23,6 +23,8 @@ typedef struct WaterskinInfo {
 typedef struct LaraExtraInfo {
 	short Vehicle;
 	short ExtraAnim;
+	bool mineL;
+	bool mineR;
 	CarriedWeaponInfo Weapons[NUM_WEAPONS];
 	DiaryInfo Diary;
 	WaterskinInfo Waterskin1;

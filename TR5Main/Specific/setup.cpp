@@ -347,7 +347,7 @@ void NewObjects()
 	obj = &Objects[ID_RAPTOR];
 	if (obj->loaded)
 	{
-		obj->control = RaptorControl;
+		obj->control = Tr3RaptorControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->hitPoints = 100;
@@ -1183,14 +1183,20 @@ void BaddyObjects()
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseMineCart;
-		obj->collision = MineCartCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
+		obj->initialise = InitialiseCreature;
+		obj->control = Tr1LarsonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 50;
+		obj->radius = 104;
+		obj->intelligent = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
-	/*
 	obj = &Objects[ID_SWAT];
 	if (obj->loaded)
 	{
@@ -1215,7 +1221,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
-	}*/
+	}
 
 	obj = &Objects[ID_BLUE_GUARD];
 	if (obj->loaded)
@@ -1515,7 +1521,7 @@ void BaddyObjects()
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 13 * 2];
 	}
 
-	obj = &Objects[ID_PIERRE];
+	obj = &Objects[ID_TR5_PIERRE];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 1;
@@ -1538,7 +1544,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_LARSON];
+	obj = &Objects[ID_TR5_LARSON];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 3;
@@ -3077,7 +3083,6 @@ void PickupObjects()
 	INIT_PICKUP(ID_GAME_PIECE1);
 	INIT_PICKUP(ID_GAME_PIECE2);
 	INIT_PICKUP(ID_GAME_PIECE3);
-	//INIT_PICKUP(ID_TEMPLE_STATUE);
 	INIT_PICKUP(ID_HAMMER_ITEM);
 	INIT_PICKUP(ID_CROWBAR_ITEM);
 	INIT_PICKUP(ID_BURNING_TORCH_ITEM);
@@ -3631,7 +3636,114 @@ void CustomObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 
+	obj = &Objects[ID_NATLA];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = NatlaControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 400;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		Bones[obj->boneIndex + 2 * 4] |= (ROT_Z|ROT_X);
+	}
 
+	obj = &Objects[ID_EVIL_NATLA];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->collision = CreatureCollision;
+		obj->control = NatlaEvilControl;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 500;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		Bones[obj->boneIndex + 1 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_EVIL_LARA];
+	if (obj->loaded)
+	{
+		// use lara animation.
+		if (Objects[ID_LARA].loaded)
+		{
+			obj->animIndex = Objects[ID_LARA].animIndex;
+			obj->frameBase = Objects[ID_LARA].frameBase;
+		}
+
+		obj->initialise = InitialiseEvilLara;
+		obj->collision = CreatureCollision;
+		obj->control = LaraEvilControl;
+		//obj->drawRoutine = DrawEvilLara;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 1000;
+		obj->radius = 102;
+		//obj->intelligent = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+	}
+
+	obj = &Objects[ID_TR1_RAPTOR];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->control = Tr1RaptorControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 20;
+		obj->pivotLength = 400;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_TR1_LARSON];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->control = Tr1LarsonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 50;
+		obj->radius = 104;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+	}
+
+	obj = &Objects[ID_TR1_PIERRE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCreature;
+		obj->control = Tr1LarsonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 70;
+		obj->radius = 104;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+	}
 }
 
 void InitialiseObjects()

@@ -47,9 +47,9 @@ ID_DOG,
 ID_CROCODILE, // TR4 - OK
 ID_LARA_EXTRA_ANIMS, // TR1-2-3 - OK
 ID_MUMMY, // TR4 - OK
-ID_LARSON,
+ID_TR5_LARSON,
 ID_SMALL_SCORPION, // TR4 - OK
-ID_PIERRE,
+ID_TR5_PIERRE,
 ID_BAT, // TR4 - OK - (Problem of pathfinding)
 ID_MAFIA,
 ID_GUIDE, // TR4 - OK - Needs testing (need custom level)
@@ -522,6 +522,18 @@ ID_CLOCKWORK_BEETLE, // TR4
 ID_CLOCKWORK_BEETLE_COMBO1, // TR4
 ID_CLOCKWORK_BEETLE_COMBO2, // TR4
 ID_NUMBER_OBJECTS, // TODO: move it at the end when Objects[] is augmented !
+
+ID_TR1_LARSON, // TR1 - OFF
+ID_TR1_PIERRE, // TR1 - OFF
+ID_TR1_RAPTOR, // TR1 - OFF
+
+ID_PROJ_NATLA, // TR1 - OFF
+ID_PROJ_SHARD, // TR1 - OFF
+ID_PROJ_BOMB,  // TR1 - OFF
+
+ID_EVIL_LARA,  // TR1 - OFF (Cant be targeted (if enabled, evil lara die anim is played)) (cant move for now)
+ID_NATLA,      // TR1 - OFF
+ID_EVIL_NATLA, // TR1 - OFF
 
 ID_GOON_SILENCER1, // TR2 - ON
 ID_GOON_SILENCER2, // TR2 - ON
