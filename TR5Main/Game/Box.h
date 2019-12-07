@@ -27,8 +27,7 @@
 //#define BadFloor ((int(__cdecl*)(int, int, int, int, int, short, LOT_INFO*)) 0x00409FB0)
 //#define CreatureCreature ((int(__cdecl*)(short)) 0x00409E20)
 //#define DropBaddyPickups ((int(__cdecl*)(ITEM_INFO*)) 0x0040C5A0)
-
-#define CreatureCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004124E0)
+//#define CreatureCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004124E0)
 #define CreatureTurn ((short (__cdecl*)(ITEM_INFO*, short)) 0x0040AE90)
 #define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 #define _AIGuard ((short(__cdecl*)(CREATURE_INFO*)) 0x0040BBE0)

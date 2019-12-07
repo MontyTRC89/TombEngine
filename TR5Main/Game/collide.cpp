@@ -943,6 +943,79 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	return 0;
 }
 
+int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
+{
+	short* bounds = GetBestFrame(item);
+	short* laraBounds = GetBestFrame(l);
+
+	if (item->pos.yPos + bounds[3] > l->pos.yPos + laraBounds[2])
+	{
+		if (item->pos.yPos + bounds[2] < l->pos.yPos + laraBounds[3])
+		{
+			int c = COS(item->pos.yRot);
+			int s = SIN(item->pos.yRot);
+
+			int dx = (c * (l->pos.xPos - item->pos.xPos) - s * (l->pos.zPos - item->pos.zPos)) >> W2V_SHIFT;
+			int dz = (c * (l->pos.zPos - item->pos.zPos) + s * (l->pos.xPos - item->pos.xPos)) >> W2V_SHIFT;
+
+			if (dx >= bounds[0] - radius
+				&& dx <= radius + bounds[1]
+				&& dz >= bounds[4] - radius
+				&& dz <= radius + bounds[5])
+			{
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+void CreatureCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	if (item->objectNumber != ID_HITMAN || item->currentAnimState != STATE_LARA_INSERT_PUZZLE)
+	{
+		if (TestBoundsCollide(item, l, coll->radius))
+		{
+			if (TestCollision(item, l))
+			{
+				if (coll->enableBaddiePush || Lara.waterStatus == LW_UNDERWATER || Lara.waterStatus == LW_SURFACE)
+				{
+					ItemPushLara(item, l, coll, coll->enableSpaz, 0);
+				}
+				else if (coll->enableSpaz)
+				{
+					int x = l->pos.xPos - item->pos.xPos;
+					int z = l->pos.zPos - item->pos.zPos;
+
+					int c = COS(item->pos.yRot);
+					int s = SIN(item->pos.yRot);
+
+					short* frame = GetBestFrame(item);
+	
+					int rx = (frame[0] + frame[1]) / 2;
+					int rz = (frame[4] + frame[5]) / 2;
+					
+					if (frame[3] - frame[2] > 256)
+					{
+						int angle = (l->pos.yRot
+									- ATAN(z - ((c * rx - s * rz) >> W2V_SHIFT), x - ((c * rx + s * rz) >> W2V_SHIFT))
+									- ANGLE(135)) >> W2V_SHIFT;
+						Lara.hitDirection = (short)angle;
+
+						Lara.hitFrame++;
+						Lara.hitFrame++; 
+						if (Lara.hitFrame > 30)	 
+							Lara.hitFrame = 30;
+					}
+				}
+			}
+		}
+	}
+}
+
 void Inject_Collide()
 {
 	INJECT(0x00411DB0, CollideStaticObjects);
