@@ -23,6 +23,7 @@
 #include "objects.h"
 #include "switch.h"
 #include "laramisc.h"
+#include "rope.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -33,6 +34,7 @@
 #include <stdio.h>
 
 int KeyTriggerActive;
+PENDULUM CurrentPendulum;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -1188,6 +1190,45 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	item->pos.xPos += (c * x + s * z) >> W2V_SHIFT;
 	item->pos.yPos += y;
 	item->pos.zPos += (-s * x + c * z) >> W2V_SHIFT;
+}
+
+int CheckNoColFloorTriangle(FLOOR_INFO* floor, short x, short z)
+{
+	if (!floor->index)
+		return 0;
+
+	short func = FloorData[floor->index] & 0x1F;
+	if (func != NOCOLF1T && func != NOCOLF1B && func != NOCOLF2T && func != NOCOLF2B)
+		return 0;
+
+	int dx = x & 0x3FF;
+	int dz = z & 0x3FF;
+
+	switch (func)
+	{
+	case NOCOLF1T:
+		if (dx <= 1024 - dz)
+			return -1;
+		break;
+
+	case NOCOLF1B:
+		if (dx > 1024 - dz)
+			return -1;
+		break;
+
+	case NOCOLF2T:
+		if (dx <= dz)
+			return -1;
+		break;
+
+	case NOCOLF2B:
+		if (dx > dz)
+			return -1;
+		break;
+
+	}
+
+	return 1;
 }
 
 void Inject_Control()
