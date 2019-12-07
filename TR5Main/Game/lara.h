@@ -144,7 +144,7 @@ void lara_as_roper(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll);
-void ApplyVelocityToRope(int node, unsigned short angle, unsigned short n);
+void ApplyVelocityToRope(int node, short angle, short n);
 void UpdateRopeSwing(ITEM_INFO* item);
 void JumpOffRope(ITEM_INFO* item);
 void FallFromRope(ITEM_INFO* item);
@@ -216,11 +216,10 @@ short LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 void GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
-//int GetLaraJointPos(PHD_VECTOR* arg1, int arg2);
-//void AnimateLara(ITEM_INFO* item);
-/*void SetLaraUnderwaterNodes();
 void SetPendulumVelocity(int x, int y, int z);
-void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll); // 0xC (RelocPtr + 0x28)
+void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
+//int GetLaraJointPos(PHD_VECTOR* arg1, int arg2);
+/*void SetLaraUnderwaterNodes();
 void FireChaff();
 void GetLaraJointPosRot(PHD_VECTOR* a1, int a2, int a3, SVECTOR* a4);
 void DoSubsuitStuff();*/

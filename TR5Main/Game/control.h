@@ -51,5 +51,7 @@ void ActivateCamera();
 short GetDoor(FLOOR_INFO* floor);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void TestTriggers(short* data, int heavy, int HeavyFlags);
+int CheckNoColFloorTriangle(FLOOR_INFO* floor, short x, short z);
+
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
