@@ -1378,6 +1378,87 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	}
 }
 
+void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
+{
+	l->hitStatus = false;
+	Lara.hitDirection = -1;
+
+	if (l->hitPoints > 0)
+	{
+		short roomsToCheck[255];
+		int numRoomsToCheck = 1;
+		roomsToCheck[0] = l->roomNumber;
+
+		short* door = Rooms[l->roomNumber].door;	 
+		if (door != NULL)
+		{
+			for (int i = (int) *(door++); i > 0; i--)
+			{
+				roomsToCheck[numRoomsToCheck++] = *(door);
+				door += 16;
+			}
+		}
+
+		for (int i = 0; i < numRoomsToCheck; i++)
+		{
+			short itemNumber = Rooms[roomsToCheck[i]].itemNumber; 
+			while (itemNumber != NO_ITEM)
+			{
+				ITEM_INFO* item = &Items[itemNumber];
+				if (item->collidable && item->status != ITEM_INVISIBLE)		 
+				{
+					OBJECT_INFO* obj = &Objects[item->objectNumber];
+					if (obj->collision) 
+					{
+						int x = l->pos.xPos - item->pos.xPos; 
+						int y = l->pos.yPos - item->pos.yPos;
+						int z = l->pos.zPos - item->pos.zPos;
+						
+						if (x > -3072 && x < 3072 &&  
+							z > -3072 && z < 3072 &&   
+							y > -3072 && y < 3072)  
+							(*obj->collision)(itemNumber, l, coll);
+					}
+				}
+				itemNumber = item->nextItem;
+			}
+
+			if (coll->enableSpaz)
+			{
+				MESH_INFO* mesh = Rooms[roomsToCheck[i]].mesh;
+				int numMeshes = Rooms[roomsToCheck[i]].numMeshes;
+
+				for (int j = 0; j < numMeshes; j++)
+				{
+					if (mesh->Flags & 1)
+					{
+						int x = l->pos.xPos - mesh->x;
+						int y = l->pos.yPos - mesh->y;
+						int z = l->pos.zPos - mesh->z;
+
+						if (x > -3072 && x < 3072 && y > -3072 && y < 3072 && z > -3072 && z < 3072)
+						{
+							PHD_3DPOS pos;
+							pos.xPos = mesh->x;
+							pos.yPos = mesh->y;
+							pos.zPos = mesh->z;
+							pos.yRot = mesh->yRot;
+
+							if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].xMinc, &pos, coll->radius))
+								ItemPushLaraStatic(l, &StaticObjects[mesh->staticNumber].xMinc, &pos, coll);
+						}
+					}
+
+					mesh++;
+				}
+			}
+		}
+
+		if (Lara.hitDirection == -1)
+			Lara.hitFrame = 0;
+	}
+}
+
 void Inject_Collide()
 {
 	INJECT(0x00411DB0, CollideStaticObjects);
