@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "items.h"
 #include "effects.h"
+#include "sphere.h"
 
 char LM[] =
 {
@@ -26,6 +27,8 @@ char LM[] =
 	LJ_LHAND,
 	LJ_HEAD,
 };
+
+int XFront, ZFront;
 
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
 {
@@ -1013,6 +1016,365 @@ void CreatureCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 			}
 		}
+	}
+}
+
+void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
+{
+	int resetRoom;
+	if (objectHeight >= 0)
+	{
+		resetRoom = 0;
+	}
+	else
+	{
+		objectHeight = -objectHeight;
+		resetRoom = 1;
+	}
+
+	coll->collType = 0;
+	coll->shift.x = 0;
+	coll->shift.y = 0;
+	coll->shift.z = 0;
+	coll->quadrant = (short)((coll->facing + ANGLE(45)) / ANGLE(90));
+
+	int x = xPos;
+	int y = yPos - objectHeight;
+	int yTop = y - 160;
+	int z = zPos;
+
+	short tRoomNumber = roomNumber;
+	FLOOR_INFO* floor = GetFloor(xPos, yTop, zPos, &tRoomNumber);
+	
+	int height, mheight;
+	mheight = height = GetFloorHeight(floor, xPos, yTop, zPos);
+	if (height != NO_HEIGHT)
+		height -= yPos;
+
+	int ceiling = GetCeiling(floor, xPos, yTop - LaraItem->fallspeed, zPos);
+	if (ceiling != NO_HEIGHT)
+		ceiling -= y;
+
+	coll->midCeiling = ceiling;
+	coll->midFloor = height;
+	coll->midType = HeightType;
+
+	coll->trigger = TriggerIndex;
+
+	coll->tiltX = GetTiltType(floor, xPos, LaraItem->pos.yPos, zPos);
+	coll->tiltZ = coll->tiltX >> 8;
+	
+	int xright, xleft, zright, zleft;
+
+	switch (coll->quadrant)
+	{
+	case 0:
+		XFront = (SIN(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		ZFront = coll->radius;
+		xleft = -(coll->radius);
+		zleft = coll->radius;
+		xright = coll->radius;
+		zright = coll->radius;
+		break;
+
+	case 1:
+		XFront = coll->radius;
+		ZFront = (COS(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		xleft = coll->radius;
+		zleft = coll->radius;
+		xright = coll->radius;
+		zright = -(coll->radius);
+		break;
+
+	case 2:
+		XFront = (SIN(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		ZFront = -coll->radius;
+		xleft = coll->radius;
+		zleft = -(coll->radius);
+		xright = -(coll->radius);
+		zright = -(coll->radius);
+		break;
+
+	case 3:
+		XFront = -(coll->radius);
+		ZFront = (COS(coll->facing) * coll->radius) >> (W2V_SHIFT);
+		xleft = -(coll->radius);
+		zleft = -(coll->radius);
+		xright = -(coll->radius);
+		zright = coll->radius;
+		break;
+
+	default:
+		xleft = zleft = 0;
+		xright = zright = 0;
+		XFront = ZFront = 0;
+		break;
+	}
+
+	x = XFront + xPos;
+	z = ZFront + zPos;
+
+	if (resetRoom)
+		tRoomNumber = roomNumber;
+	
+	floor = GetFloor(x, yTop, z, &tRoomNumber);
+	
+	int fheight = height = GetFloorHeight(floor, x, yTop, z);
+	if (height != NO_HEIGHT)
+		height -= yPos;
+
+	ceiling = GetCeiling(floor, x, yTop, z);
+	if (ceiling != NO_HEIGHT)
+		ceiling -= y;
+
+	coll->frontCeiling = ceiling;
+	coll->frontFloor = height;
+	coll->frontType = HeightType;
+
+	floor = GetFloor(x + XFront, yTop, z + ZFront, &tRoomNumber);
+	height = GetFloorHeight(floor, x + XFront, yTop, z + ZFront);
+	if (height != NO_HEIGHT)
+		height -= yPos;
+
+	if ((coll->slopesAreWalls)
+		&& ((coll->frontType == BIG_SLOPE) || (coll->frontType == DIAGONAL))
+		&& (coll->frontFloor < coll->midFloor)
+		&& (height < coll->frontFloor)
+		&& (coll->frontFloor < 0))
+	{
+		coll->frontFloor = -32767;
+	}
+	else if (coll->slopesArePits
+		&& ((coll->frontType == BIG_SLOPE) || (coll->frontType == DIAGONAL))
+		&& (coll->frontFloor > coll->midFloor))
+	{
+		coll->frontFloor = 512;
+	}
+	else if ((coll->lavaIsPit)
+		&& (coll->frontFloor > 0)
+		&& (TriggerIndex)
+		&& ((*(TriggerIndex) & DATA_TYPE) == LAVA_TYPE))
+	{
+		coll->frontFloor = 512;
+	}
+
+	x = xPos + xleft;
+	z = zPos + zleft;
+	short lrRoomNumber = roomNumber;
+	floor = GetFloor(x, yTop, z, &lrRoomNumber);
+
+	height = GetFloorHeight(floor, x, yTop, z);
+	if (height != NO_HEIGHT)
+		height -= yPos;
+
+	ceiling = GetCeiling(floor, x, yTop, z);
+	if (ceiling != NO_HEIGHT)
+		ceiling -= y;
+
+	coll->leftFloor = height;
+	coll->leftCeiling = ceiling;
+	coll->leftType = HeightType;
+
+	if (coll->slopesAreWalls == 1 && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor < 0)
+		coll->leftFloor = -32767;
+	else if (coll->slopesArePits && (coll->leftType == BIG_SLOPE || coll->leftType == DIAGONAL) && coll->leftFloor > 0)
+		coll->leftFloor = 512;
+	else if (coll->lavaIsPit && coll->leftFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+		coll->leftFloor = 512;
+
+	x = xPos + xleft;
+	z = zPos + zleft;
+	floor = GetFloor(x, yTop, z, &tRoomNumber);
+
+	height = GetFloorHeight(floor, x, yTop, z);
+	if (height != NO_HEIGHT)
+		height -= yPos;
+
+	ceiling = GetCeiling(floor, x, yTop, z);
+	if (ceiling != NO_HEIGHT)
+		ceiling -= y;
+
+	coll->leftFloor2 = height;
+	coll->leftCeiling2 = ceiling;
+	coll->leftType2 = HeightType;
+
+	if (coll->slopesAreWalls == 1 && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 < 0)
+		coll->leftFloor2 = -32767;
+	else if (coll->slopesArePits && (coll->leftType2 == BIG_SLOPE || coll->leftType2 == DIAGONAL) && coll->leftFloor2 > 0)
+		coll->leftFloor2 = 512;
+	else if (coll->lavaIsPit && coll->leftFloor2 > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+		coll->leftFloor2 = 512;
+
+	x = xPos + xright;
+	z = zPos + zright;
+	lrRoomNumber = roomNumber;
+	floor = GetFloor(x, yTop, z, &lrRoomNumber);
+
+	height = GetFloorHeight(floor, x, yTop, z);
+	if (height != NO_HEIGHT)
+		height -= yPos;
+
+	ceiling = GetCeiling(floor, x, yTop, z);
+	if (ceiling != NO_HEIGHT)
+		ceiling -= y;
+
+	coll->rightFloor = height;
+	coll->rightCeiling = ceiling;
+	coll->rightType = HeightType;
+
+	if (coll->slopesAreWalls == 1 && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor < 0)
+		coll->rightFloor = -32767;
+	else if (coll->slopesArePits && (coll->rightType == BIG_SLOPE || coll->rightType == DIAGONAL) && coll->rightFloor > 0)
+		coll->rightFloor = 512;
+	else if (coll->lavaIsPit && coll->rightFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+		coll->rightFloor = 512;
+
+	x = xPos + xright;
+	z = zPos + zright;
+	floor = GetFloor(x, yTop, z, &tRoomNumber);
+
+	height = GetFloorHeight(floor, x, yTop, z);
+	if (height != NO_HEIGHT)
+		height -= yPos;
+
+	ceiling = GetCeiling(floor, x, yTop, z);
+	if (ceiling != NO_HEIGHT)
+		ceiling -= y;
+
+	coll->rightFloor2 = height;
+	coll->rightCeiling2 = ceiling;
+	coll->rightType2 = HeightType;
+
+	if (coll->slopesAreWalls == 1 && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 < 0)
+		coll->rightFloor2 = -32767;
+	else if (coll->slopesArePits && (coll->rightType2 == BIG_SLOPE || coll->rightType2 == DIAGONAL) && coll->rightFloor2 > 0)
+		coll->rightFloor2 = 512;
+	else if (coll->lavaIsPit && coll->rightFloor2 > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
+		coll->rightFloor2 = 512;
+
+	CollideStaticObjects(coll, xPos, yPos, zPos, tRoomNumber, objectHeight);
+	
+	if (coll->midFloor == NO_HEIGHT)	 
+	{
+		coll->shift.x = coll->old.x - xPos;
+		coll->shift.y = coll->old.y - yPos;
+		coll->shift.z = coll->old.z - zPos;
+		coll->collType = CT_FRONT;
+		return;
+	}
+
+	if (coll->midFloor - coll->midCeiling <= 0)
+	{
+		coll->shift.x = coll->old.x - xPos;	 
+		coll->shift.y = coll->old.y - yPos;	 
+		coll->shift.z = coll->old.z - zPos;
+		coll->collType = CT_CLAMP;
+		return;
+	}
+
+	if (coll->midCeiling >= 0)
+	{
+		coll->shift.y = coll->midCeiling;	
+		coll->collType = CT_TOP;
+		coll->hitCeiling = true;
+	}
+
+	if ((coll->frontFloor > coll->badPos)
+		|| (coll->frontFloor < coll->badNeg)
+		|| (coll->frontCeiling > coll->badCeiling))
+	{
+		if ((coll->frontType == DIAGONAL)
+			|| (coll->frontType == SPLIT_TRI))
+		{
+			coll->shift.x = coll->old.x - xPos; 
+			coll->shift.z = coll->old.z - zPos; 
+		}
+		else
+		{
+			switch (coll->quadrant)
+			{
+			case 0:
+			case 2:
+				coll->shift.x = coll->old.x - xPos;  
+				coll->shift.z = FindGridShift(zPos + ZFront, zPos); 
+				break;
+
+			case 1:
+			case 3:
+				coll->shift.x = FindGridShift(xPos + XFront, xPos);	 
+				coll->shift.z = coll->old.z - zPos;  
+				break;
+
+			}
+		}
+
+		coll->collType = CT_FRONT;
+		return;
+	}
+
+	if (coll->frontCeiling >= coll->badCeiling)
+	{
+		coll->shift.x = coll->old.x - xPos; 
+		coll->shift.y = coll->old.y - yPos;
+		coll->shift.z = coll->old.z - zPos;
+		coll->collType = CT_TOP_FRONT;
+		return;
+	}
+
+	if (coll->leftFloor > coll->badPos ||
+		coll->leftFloor < coll->badNeg ||
+		coll->leftCeiling > coll->badCeiling)
+	{
+		if (coll->leftType == SPLIT_TRI)
+		{
+			coll->shift.x = coll->old.x - xPos; 
+			coll->shift.z = coll->old.z - zPos;   
+		}
+		else
+		{
+			switch (coll->quadrant)
+			{
+			case 0:
+			case 2:
+				coll->shift.x = FindGridShift(xPos + xleft, xPos + XFront);
+				break;
+
+			case 1:
+			case 3:
+				coll->shift.z = FindGridShift(zPos + zleft, zPos + ZFront);
+				break;
+			}
+		}
+		coll->collType = CT_LEFT;
+		return;
+	}
+
+	if (coll->rightFloor > coll->badPos ||
+		coll->rightFloor < coll->badNeg ||
+		coll->rightCeiling > coll->badCeiling)
+	{
+		if (coll->rightType == SPLIT_TRI)
+		{
+			coll->shift.x = coll->old.x - xPos;   
+			coll->shift.z = coll->old.z - zPos;  
+		}
+		else
+		{
+			switch (coll->quadrant)
+			{
+			case 0:
+			case 2:
+				coll->shift.x = FindGridShift(xPos + xright, xPos + XFront);
+				break;
+
+			case 1:
+			case 3:
+				coll->shift.z = FindGridShift(zPos + zright, zPos + ZFront);
+				break;
+			}
+		}
+		coll->collType = CT_RIGHT;
+		return;
 	}
 }
 

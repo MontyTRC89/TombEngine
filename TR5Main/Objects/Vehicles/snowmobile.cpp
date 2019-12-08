@@ -8,6 +8,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/lot.h"
+#include "../../Game/sphere.h"
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
 
