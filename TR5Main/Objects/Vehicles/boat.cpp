@@ -2,6 +2,7 @@
 #include "../../Game/lara.h"
 #include "../../Game/items.h"
 #include "../../Game/collide.h"
+#include "../../Game/sphere.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

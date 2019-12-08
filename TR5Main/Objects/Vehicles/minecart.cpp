@@ -5,6 +5,7 @@
 #include "../../Game/anim.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/items.h"
+#include "../../Game/sphere.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
