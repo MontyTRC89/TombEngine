@@ -1261,6 +1261,266 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
+void KillMoveItems()
+{
+	if (ItemNewRoomNo > 0)
+	{
+		for (int i = 0; i < ItemNewRoomNo; i++)
+		{
+			short itemNumber = ItemNewRooms[2 * i];
+			if (itemNumber >= 0)
+				ItemNewRoom(itemNumber, ItemNewRooms[2 * i + 1]);
+			else
+				KillItem(itemNumber & 0x7FFF);
+		}
+	}
+
+	ItemNewRoomNo = 0;
+}
+
+void KillMoveEffects()
+{
+	if (ItemNewRoomNo > 0)
+	{
+		for (int i = 0; i < ItemNewRoomNo; i++)
+		{
+			short itemNumber = ItemNewRooms[2 * i];
+			if (itemNumber >= 0)
+				EffectNewRoom(itemNumber, ItemNewRooms[2 * i + 1]);
+			else
+				KillEffect(itemNumber & 0x7FFF);
+		}
+	}
+
+	ItemNewRoomNo = 0;
+}
+
+int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
+{
+	if (item->currentAnimState == item->goalAnimState)
+		return 0;
+
+	if (anim->numberChanges <= 0)
+		return 0;
+
+	CHANGE_STRUCT* change = &Changes[anim->changeIndex];
+	for (int i = 0; i < anim->numberChanges; i++)
+	{
+		if (change->goalAnimState == item->goalAnimState)
+		{
+			RANGE_STRUCT* range = &Ranges[change->rangeIndex];
+			for (int j = 0; j < change->numberRanges; j++)
+			{
+				if (item->frameNumber >= range->startFrame && item->frameNumber <= range->endFrame)
+				{
+					item->animNumber = range->linkAnimNum;
+					item->frameNumber = range->linkFrameNum;
+					
+					return 1;
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+void AlterFloorHeight(ITEM_INFO* item, int height)
+{
+	int flag = 0;
+	if (abs(height))
+	{
+		flag = 1;
+		if (height >= 0)
+			height++;
+		else
+			height--;
+	}
+
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	FLOOR_INFO* ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - 1024, item->pos.zPos, &roomNumber);
+	
+	if (floor->floor == -127)
+	{
+		floor->floor = ceiling->ceiling + (((height >> 31) + height) >> 8);
+	}
+	else
+	{
+		floor->floor += (((height >> 31) + height) >> 8);
+		if (floor->floor == ceiling->ceiling && !flag)
+			floor->floor = -127;
+	}
+
+	BOX_INFO* box = &Boxes[floor->box];
+	if (box->overlapIndex & 0x8000)
+	{
+		if (height >= 0)
+			box->overlapIndex &= 0xBFFF;
+		else
+			box->overlapIndex |= 0x4000;
+	}
+}
+
+FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber)
+{
+	FLOOR_INFO* floor;
+
+	int xFloor = 0;
+	int yFloor = 0;
+
+	short roomDoor = 0;
+
+	ROOM_INFO* r;
+
+	for (r = &Rooms[*roomNumber]; ; r = &Rooms[roomDoor])
+	{
+		xFloor = (z - r->z) >> WALL_SHIFT;
+		yFloor = (x - r->x) >> WALL_SHIFT;
+
+		if (xFloor <= 0)
+		{
+			xFloor = 0;
+			if (yFloor < 1)
+			{
+				yFloor = 1;
+			}
+			else
+			{
+				if (yFloor > r->ySize - 2)
+					yFloor = r->ySize - 2;
+			}
+		}
+		else if (xFloor >= r->xSize - 1)
+		{
+			xFloor = r->xSize - 1;
+			if (yFloor < 1)
+			{
+				yFloor = 1;
+			}
+			else
+			{
+				if (yFloor > r->ySize - 2)
+					yFloor = r->ySize - 2;
+			}
+		}
+		else if (yFloor >= 0)
+		{
+			if (yFloor >= r->ySize)
+				yFloor = r->ySize - 1;
+		}
+		else
+		{
+			yFloor = 0;
+		}
+
+		floor = &r->floor[xFloor + yFloor * r->xSize];
+		roomDoor = GetDoor(floor);
+		if (roomDoor == 255)
+			break;
+
+		*roomNumber = roomDoor;
+	}
+
+	if (y < floor->floor * 256)
+	{
+		if (y < floor->ceiling * 256 && floor->skyRoom != NO_ROOM)
+		{
+			do
+			{
+				int noCollision = CheckNoColCeilingTriangle(floor, x, z);
+				if (noCollision == 1 || noCollision == -1 && y >= r->maxceiling)
+					break;
+
+				*roomNumber = floor->skyRoom;
+				r = &Rooms[floor->skyRoom];
+				floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+				if (y >= floor->ceiling * 256)
+					break;
+			} while (floor->skyRoom != NO_ROOM);
+		}
+	}
+	else if (floor->pitRoom != NO_ROOM)
+	{
+		do
+		{
+			int noCollision = CheckNoColFloorTriangle(floor, x, z);
+			if (noCollision == 1 || noCollision == -1 && y < r->minfloor)
+				break;
+
+			*roomNumber = floor->pitRoom;
+			r = &Rooms[floor->pitRoom];
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);   
+			if (y < floor->floor * 256)
+				break;
+		} while (floor->pitRoom != NO_ROOM);
+	}
+	return floor;
+}
+
+int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z)
+{
+	if (!floor->index)
+		return 0;
+
+	short* data = &FloorData[floor->index];
+	short type = *(data) & DATA_TYPE;
+
+	if (type == NOCOLF1T || type == NOCOLF1B || type == NOCOLF2T || type == NOCOLF2B)
+	{
+		int dx = x & 1023;
+		int dz = z & 1023;
+
+		if (type == NOCOLF1T && dx <= (1024 - dz))
+			return -1;
+		else if (type == NOCOLF1B && dx > (1024 - dz))
+			return -1;
+		else if (type == NOCOLF2T && dx <= dz)
+			return -1;
+		else if (type == NOCOLF2B && dx > dz)
+			return -1;
+		else
+			return 1;
+	}
+
+	return 0;
+}
+
+int CheckNoColCeilingTriangle(FLOOR_INFO * floor, int x, int z)
+{
+	if (!floor->index)
+		return 0;
+
+	short* data = &FloorData[floor->index];
+	short type = *(data) & DATA_TYPE;
+
+	if (type == TILT_TYPE || type == SPLIT1 || type == SPLIT2 || type == NOCOLF1T || type == NOCOLF1B || type == NOCOLF2T || type == NOCOLF2B)	// gibby
+	{
+		if (*(data) & END_BIT)
+			return 0;
+		type = *(data + 2) & DATA_TYPE;
+	}
+
+	if (type == NOCOLC1T || type == NOCOLC1B || type == NOCOLC2T || type == NOCOLC2B)
+	{
+		int dx = x & 1023;
+		int dz = z & 1023;
+
+		if (type == NOCOLC1T && dx <= (1024 - dz))
+			return -1;
+		else if (type == NOCOLC1B && dx > (1024 - dz))
+			return -1;
+		else if (type == NOCOLC2T && dx <= dz)
+			return -1;
+		else if (type == NOCOLC2B && dx > dz)
+			return -1;
+		else
+			return 1;
+	}
+	
+	return 0;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
