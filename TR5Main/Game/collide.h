@@ -10,7 +10,7 @@
 //#define ObjectCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004126E0)
 //#define GetCollisionInfo ((void (__cdecl*)(COLL_INFO*, int, int, int, short, int)) 0x00411100)
 #define GenericSphereBoxCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00413A90)
-#define LaraBaddieCollision ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00412170)
+//#define LaraBaddieCollision ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00412170)
 //#define TestBoundsCollide ((int (__cdecl*)(ITEM_INFO*, ITEM_INFO*, int)) 0x00412CC0)
 //#define GetCollidedObjects ((int (__cdecl*)(ITEM_INFO*, int, int, ITEM_INFO**, MESH_INFO**, int)) 0x00413CF0)
 //#define ItemPushLara ((int (__cdecl*)(ITEM_INFO*, ITEM_INFO*, COLL_INFO*, int, int)) 0x00412860)
@@ -40,5 +40,6 @@ int MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
 int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
+void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 
 void Inject_Collide();
