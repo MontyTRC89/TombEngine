@@ -2,16 +2,16 @@
 
 #include "..\Global\global.h"
 
-#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
+//#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 #define GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
 #define GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
 #define GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
 #define AnimateItem ((void (__cdecl*)(ITEM_INFO*)) 0x00415300)
 #define GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
 #define TriggerActive ((int (__cdecl*)(ITEM_INFO*)) 0x004175B0)
-#define GetChange ((int (__cdecl*)(ITEM_INFO*, ANIM_STRUCT*)) 0x00415890)
-#define KillMoveItems ((void (__cdecl*)()) 0x00414620)
-#define KillMoveEffects ((void (__cdecl*)()) 0x004146A0)
+//#define GetChange ((int (__cdecl*)(ITEM_INFO*, ANIM_STRUCT*)) 0x00415890)
+//#define KillMoveItems ((void (__cdecl*)()) 0x00414620)
+//#define KillMoveEffects ((void (__cdecl*)()) 0x004146A0)
 #define ClearDynamics ((void (__cdecl*)()) 0x00431530)
 #define ClearFires ((void (__cdecl*)()) 0x00481B10)
 #define UpdateSparks ((void (__cdecl*)()) 0x0042E8B0)	
@@ -35,7 +35,7 @@
 #define RefreshCamera ((void (__cdecl*)(short, short*)) 0x004165E0)
 #define DoFlipMap ((void (__cdecl*)(short)) 0x00418910)
 #define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
-#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
+//#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)
 #define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
 #define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
@@ -53,6 +53,13 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void TestTriggers(short* data, int heavy, int HeavyFlags);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, short x, short z);
 int GetWaterSurface(int x, int y, int z, short roomNumber);
+void KillMoveItems();
+void KillMoveEffects();
+int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
+void AlterFloorHeight(ITEM_INFO* item, int height);
+FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber);
+int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
+int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
