@@ -665,9 +665,9 @@ void InitialiseLara(int restore)
 		g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1] = -1;
 	}
 
-	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
-	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
-
+	// DEBUG LINES
+	//g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
+	//g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
 	//g_LaraExtra.Weapons[WEAPON_UZI].Present = true;
 	//g_LaraExtra.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
 

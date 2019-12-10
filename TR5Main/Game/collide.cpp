@@ -408,22 +408,21 @@ void UpdateLaraRoom(ITEM_INFO* item, int height)
 
 int GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 {
-	FLOOR_INFO* current = floor;
-	while (current->pitRoom != NO_ROOM)
+	while (floor->pitRoom != NO_ROOM)
 	{
 		ROOM_INFO* r = &Rooms[floor->pitRoom];
-		if (CheckNoColFloorTriangle(current, x, z) == 1)
+		if (CheckNoColFloorTriangle(floor, x, z) == 1)
 			break;
-		current = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
-	if (y + 512 < current->floor * 256)
+	if (y + 512 < floor->floor * 256)
 		return 0;
 
-	if (!current->index)
+	if (!floor->index)
 		return 0;
 
-	short* data = &FloorData[current->index];
+	short* data = &FloorData[floor->index];
 	short func = *data & DATA_TYPE;
 	
 	if (func == TILT_TYPE)
@@ -1019,7 +1018,7 @@ void CreatureCollision(__int16 itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
+void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
 {
 	int resetRoom;
 	if (objectHeight >= 0)
@@ -1463,4 +1462,6 @@ void Inject_Collide()
 {
 	INJECT(0x00411DB0, CollideStaticObjects);
 	INJECT(0x00413CF0, GetCollidedObjects);
+	INJECT(0x00410EF0, GetTiltType);
+	//INJECT(0x00411100, _GetCollisionInfo);
 }

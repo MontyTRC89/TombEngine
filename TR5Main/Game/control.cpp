@@ -1303,14 +1303,14 @@ int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 	if (anim->numberChanges <= 0)
 		return 0;
 
-	CHANGE_STRUCT* change = &Changes[anim->changeIndex];
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
+		CHANGE_STRUCT* change = &Changes[anim->changeIndex + i];
 		if (change->goalAnimState == item->goalAnimState)
 		{
-			RANGE_STRUCT* range = &Ranges[change->rangeIndex];
 			for (int j = 0; j < change->numberRanges; j++)
 			{
+				RANGE_STRUCT* range = &Ranges[change->rangeIndex + j];
 				if (item->frameNumber >= range->startFrame && item->frameNumber <= range->endFrame)
 				{
 					item->animNumber = range->linkAnimNum;
@@ -1371,9 +1371,10 @@ FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber)
 
 	short roomDoor = 0;
 
-	ROOM_INFO* r;
+	ROOM_INFO* r = &Rooms[*roomNumber];
 
-	for (r = &Rooms[*roomNumber]; ; r = &Rooms[roomDoor])
+	short data;
+	do
 	{
 		xFloor = (z - r->z) >> WALL_SHIFT;
 		yFloor = (x - r->x) >> WALL_SHIFT;
@@ -1382,27 +1383,17 @@ FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber)
 		{
 			xFloor = 0;
 			if (yFloor < 1)
-			{
 				yFloor = 1;
-			}
-			else
-			{
-				if (yFloor > r->ySize - 2)
+			else if (yFloor > r->ySize - 2)
 					yFloor = r->ySize - 2;
-			}
 		}
 		else if (xFloor >= r->xSize - 1)
 		{
 			xFloor = r->xSize - 1;
 			if (yFloor < 1)
-			{
 				yFloor = 1;
-			}
-			else
-			{
-				if (yFloor > r->ySize - 2)
+			else if (yFloor > r->ySize - 2)
 					yFloor = r->ySize - 2;
-			}
 		}
 		else if (yFloor >= 0)
 		{
@@ -1415,12 +1406,13 @@ FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber)
 		}
 
 		floor = &r->floor[xFloor + yFloor * r->xSize];
-		roomDoor = GetDoor(floor);
-		if (roomDoor == 255)
-			break;
-
-		*roomNumber = roomDoor;
-	}
+		data = GetDoor(floor);
+		if (data != NO_ROOM)
+		{
+			*roomNumber = data;
+			r = &Rooms[*roomNumber];
+		}
+	} while (data != NO_ROOM);
 
 	if (y < floor->floor * 256)
 	{
@@ -1521,9 +1513,219 @@ int CheckNoColCeilingTriangle(FLOOR_INFO * floor, int x, int z)
 	return 0;
 }
 
+int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
+{
+	TiltYOffset = 0;
+	TiltXOffset = 0;
+	OnObject = 0;
+	HeightType = 0;
+
+	ROOM_INFO* r;
+	while (floor->pitRoom != NO_ROOM)
+	{
+		if (CheckNoColFloorTriangle(floor, x, z) == 1)
+			break;
+		r = &Rooms[floor->pitRoom];
+		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	}
+
+	int height = floor->floor * 256;
+	if (height == NO_HEIGHT)
+		return height;
+
+	TriggerIndex = NULL;
+	
+	if (floor->index == 0)
+		return height;
+
+	short* data = &FloorData[floor->index];
+	short type;
+
+	int xOff, yOff, trigger;
+	ITEM_INFO* item;
+	OBJECT_INFO* obj;
+	int tilts, t0, t1, t2, t3, t4, hadj, dx, dz, h1, h2;
+
+	do
+	{
+		type = *(data++);
+
+		switch (type & DATA_TYPE)
+		{
+		case DOOR_TYPE:
+		case ROOF_TYPE:
+		case SPLIT3:
+		case SPLIT4:
+		case NOCOLC1T:
+		case NOCOLC1B:
+		case NOCOLC2T:
+		case NOCOLC2B:
+			data++;
+			break;
+
+		case TILT_TYPE:
+			TiltXOffset = xOff = *data >> 8;
+			TiltYOffset = yOff = *data & 0xFF;
+
+			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+				HeightType = BIG_SLOPE;
+			else
+				HeightType = SMALL_SLOPE;
+
+			if (xOff >= 0)
+				height += (xOff * ((-1 - z) & 0x3FF) >> 2);
+			else
+				height -= (xOff * (z & 0x3FF) >> 2);
+
+			if (yOff >= 0)
+				height += yOff * ((-1 - x) & 0x3FF) >> 2;
+			else
+				height += yOff * (x & 0x3FF) >> 2;
+
+			data++;
+			break;
+
+		case TRIGGER_TYPE:
+			if (!TriggerIndex)
+				TriggerIndex = data - 1;
+
+			data++;
+
+			do
+			{
+				trigger = *(data++);
+
+				if (TRIG_BITS(trigger) != TO_OBJECT)
+				{
+					if (TRIG_BITS(trigger) == TO_CAMERA || 
+						TRIG_BITS(trigger) == TO_FLYBY)
+					{
+						trigger = *(data++);
+					}
+				}
+				else
+				{
+					item = &Items[trigger & VALUE_BITS];
+					obj = &Objects[item->objectNumber];
+
+					if (obj->floor && !(item->flags & 0x8000))
+					{
+						(obj->floor)(item, x, y, z, &height);
+					}
+				}
+
+			} while (!(trigger& END_BIT));
+			break;
+
+		case LAVA_TYPE:
+			TriggerIndex = data - 1;
+			break;
+
+		case CLIMB_TYPE:
+		case MONKEY_TYPE:
+		case TRIGTRIGGER_TYPE:
+			if (!TriggerIndex)
+				TriggerIndex = data - 1;
+			break;
+
+		case SPLIT1:
+		case SPLIT2:
+		case NOCOLF1T:
+		case NOCOLF1B:
+		case NOCOLF2T:
+		case NOCOLF2B:
+			tilts = *data;
+			t0 = tilts & 15;
+			t1 = (tilts >> 4) & 15;
+			t2 = (tilts >> 8) & 15;
+			t3 = (tilts >> 12) & 15;
+
+			dx = x & 1023;
+			dz = z & 1023;
+
+			xOff = yOff = 0;
+
+			HeightType = SPLIT_TRI;
+
+			if ((type & DATA_TYPE) == SPLIT1 ||
+				(type & DATA_TYPE) == NOCOLF1T ||
+				(type & DATA_TYPE) == NOCOLF1B)
+			{
+				if (dx <= (1024 - dz))	 
+				{
+					hadj = (type >> 10) & 0x1f;
+					if (hadj & 0x10) 
+						hadj |= 0xfff0;
+					height += hadj << 8;
+					xOff = t2 - t1;
+					yOff = t0 - t1;
+				}
+				else
+				{
+					hadj = (type >> 5) & 0x1f;
+					if (hadj & 0x10) 
+						hadj |= 0xfff0;
+					height += hadj << 8;
+					xOff = t3 - t0;
+					yOff = t3 - t2;
+				}
+			}
+			else 
+			{
+				if (dx <= dz) 
+				{
+					hadj = (type >> 10) & 0x1f;
+					if (hadj & 0x10) 
+						hadj |= 0xfff0;
+					height += hadj << 8;
+					xOff = t2 - t1;
+					yOff = t3 - t2;
+				}
+				else
+				{
+					hadj = (type >> 5) & 0x1f;
+					if (hadj & 0x10) 
+						hadj |= 0xfff0;
+					height += hadj << 8;
+					xOff = t3 - t0;
+					yOff = t0 - t1;
+
+				}
+			}
+
+			TiltXOffset = xOff;
+			TiltYOffset = yOff;
+
+			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
+				HeightType = DIAGONAL;
+			else if (HeightType != SPLIT_TRI)
+				HeightType = SMALL_SLOPE;
+
+			if (xOff >= 0)
+				height += xOff * ((-1 - z) & 0x3FF) >> 2;
+			else
+				height -= xOff * (z & 0x3FF) >> 2;
+			
+			if (yOff >= 0)
+				height += yOff * ((-1 - x) & 0x3FF) >> 2;
+			else
+				height -= yOff * (x & 0x3FF) >> 2;
+
+			data++;
+			break;
+
+		default:
+			break;
+		}
+	} while (!(type & END_BIT));
+
+	return height;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
 	INJECT(0x004167B0, TestTriggers);
 	INJECT(0x00415960, TranslateItem);
+	INJECT(0x00415B20, GetFloor);
 }

@@ -191,9 +191,9 @@ typedef struct floor_info_t {
 	unsigned short box : 11; // offset=2.4
 	unsigned short stopper : 1; // offset=3.7
 	unsigned char pitRoom; // size=0, offset=4
-	byte floor; // size=0, offset=5
+	signed char floor; // size=0, offset=5
 	unsigned char skyRoom; // size=0, offset=6
-	byte ceiling; // size=0, offset=7
+	signed char ceiling; // size=0, offset=7
 } FLOOR_INFO;
 
 typedef struct item_info_t {

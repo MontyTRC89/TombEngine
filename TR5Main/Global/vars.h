@@ -298,6 +298,8 @@
 #define OnObject					VAR_U_(0x00EEEAC8, int)
 #define DontUnlockBox				VAR_U_(0x0051CB40, byte)
 #define CurrentSpotcamSequence		VAR_U_(0x00E4F502, short)
+#define TiltXOffset					VAR_U_(0x00EEEAD4, int)
+#define TiltYOffset					VAR_U_(0x00EEEADC, int)
 
 extern bool MonksAttackLara;
 
