@@ -104,6 +104,7 @@
 
 #define DATA_TYPE 0x1F
 #define END_BIT 0x8000
+#define VALUE_BITS  0x3ff
 
 #define NUM_BATS	64
 #define NUM_SPIDERS	64

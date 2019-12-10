@@ -2,9 +2,7 @@
 
 #include "..\Global\global.h"
 
-//#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 #define GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
-#define GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
 #define GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
 #define AnimateItem ((void (__cdecl*)(ITEM_INFO*)) 0x00415300)
 #define GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
@@ -41,6 +39,11 @@
 #define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 #define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
 
+//#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
+#define GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
+
+#define TRIG_BITS(T) ((T & 0x3fff) >> 10)
+
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);
 GAME_STATUS ControlPhase(int numFrames, int demoMode);
@@ -57,9 +60,10 @@ void KillMoveItems();
 void KillMoveEffects();
 int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 void AlterFloorHeight(ITEM_INFO* item, int height);
-FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber);
 int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
+int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
+FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
