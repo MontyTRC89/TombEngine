@@ -200,11 +200,11 @@ void SaveGame::saveLara(int arg1, int arg2)
 	memcpy(&lara, &Lara, sizeof(Lara));
 
 	for (int i = 0; i < 15; i++)
-		Lara.meshPtrs[i] = (short*)((char*)Lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
+		lara.meshPtrs[i] = (short*)((char*)lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
 
-	Lara.leftArm.frameBase = (short*)((char *)Lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
-	Lara.rightArm.frameBase = (short*)((char *)Lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
-	Lara.generalPtr = (char *)Lara.generalPtr - (ptrdiff_t)MallocBuffer;
+	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
+	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
+	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)MallocBuffer;
 
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
 	
