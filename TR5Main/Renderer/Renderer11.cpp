@@ -1290,7 +1290,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
 	RendererItem* item = &m_items[Lara.itemNumber];
-
+	
 	// Set shaders
 	if (shadowMap)
 	{
@@ -1346,7 +1346,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 		for (int j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket = &mesh->Buckets[j];
-
+			
 			if (bucket->Vertices.size() == 0)
 				continue;
 
@@ -1412,9 +1412,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 		if (m_moveableObjects[ID_HAIR] != NULL)
 		{
 			m_primitiveBatch->Begin();
-			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-				(const unsigned short*)m_hairIndices.data(), m_numHairIndices,
-				m_hairVertices.data(), m_numHairVertices);
+			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, (const uint16_t*)m_hairIndices.data(), m_numHairIndices, m_hairVertices.data(), m_numHairVertices);
 			m_primitiveBatch->End();
 		}
 	}
