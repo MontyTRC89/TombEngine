@@ -1356,7 +1356,7 @@ void AlterFloorHeight(ITEM_INFO* item, int height)
 	if (box->overlapIndex & 0x8000)
 	{
 		if (height >= 0)
-			box->overlapIndex &= 0xBFFF;
+			box->overlapIndex &= ~0x4000;
 		else
 			box->overlapIndex |= 0x4000;
 	}
