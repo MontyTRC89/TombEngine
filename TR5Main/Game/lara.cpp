@@ -2523,7 +2523,7 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	int res;
 
 	Lara.moveAngle = angle + item->pos.yRot;
-	short ang = (short)(Lara.moveAngle + ANGLE(45)) >> W2V_SHIFT;
+	short ang = (unsigned short) (Lara.moveAngle + ANGLE(45)) >> W2V_SHIFT;
 
 	switch (ang)
 	{
@@ -2963,7 +2963,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 		{
 			item->pos.yPos += coll->frontFloor - bounds[2];
 
-			short dir = (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+			short dir = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 			switch (dir)
 			{
 			case NORTH:
@@ -4941,7 +4941,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 
 										if (!tmp)
 										{
-											switch ((short)(item->pos.yRot + ANGLE(45)) / (short)ANGLE(90))
+											switch ((unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90))
 											{
 											case 0:
 												item->pos.yRot = 0;
@@ -5265,7 +5265,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//13C24, 13CD4
 	short oldYrot = item->pos.yRot;
 	int oldFrontFloor = coll->frontFloor;
 
-	short angle = (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 	if (angle && angle != 2)
 	{
 		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
@@ -5423,7 +5423,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//13738, 137E8
 	short oldYrot = item->pos.yRot;
 	int oldFrontFloor = coll->frontFloor;
 
-	short angle = (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 	if (angle && angle != 2)
 	{
 		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + SECTOR(1);
@@ -5569,7 +5569,7 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll)//135BC, 1366C (F)
 	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
 		return false;
 
-	short angle = (short)(item->pos.yRot + ANGLE(45)) / (short)ANGLE(90);
+	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 	switch (angle)
 	{
 	case NORTH:
@@ -5864,7 +5864,7 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)//12C54, 12D04 (F)
 	if (item->fallspeed < 0)
 		return false;
 
-	switch ((short)(item->pos.yRot + ANGLE(45)) / (short)ANGLE(90))
+	switch ((unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90))
 	{
 	case NORTH:
 	case SOUTH:
@@ -6092,13 +6092,13 @@ int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)
 	int y = item->pos.yPos + down;
 	int z = item->pos.zPos;
 
-	short angle = item->pos.yRot + ANGLE(45);
+	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 	short roomNum = item->roomNumber;
 
 	FLOOR_INFO* floor;
 	int h, c;
 
-	switch (angle / (short)ANGLE(90))
+	switch (angle)
 	{
 	case NORTH:
 		x -= right;
@@ -6118,7 +6118,7 @@ int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)
 
 	GetFloor(x, y, z, &roomNum);
 
-	switch (angle / (short)ANGLE(90))
+	switch (angle)
 	{
 	case NORTH:
 		z += front;
@@ -6489,7 +6489,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	short dir = (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short dir = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 	switch (dir)
 	{
 	case NORTH:
