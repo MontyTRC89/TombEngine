@@ -26,7 +26,7 @@ short GetClimbTrigger(int x, int y, int z, short roomNumber)//46E38, 4729C (F)
 
 	if ((*data & 0x1F) == 5)
 	{
-		if ((*data >> 8) & 0x80)
+		if (*data & 0x8000)
 			return 0;
 
 		data++;
