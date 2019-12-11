@@ -255,12 +255,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		{
 			short nextFx = Effects[fxNum].nextActive;
 			if (Objects[Effects[fxNum].objectNumber].control)
-				(*Objects[Effects[fxNum].objectNumber].control)(fxNum);
+				Objects[Effects[fxNum].objectNumber].control(fxNum);
 			fxNum = nextFx;
 		}
 
 		InItemControlLoop = false;
-		KillMoveEffects();
+		//KillMoveEffects();
 
 		// Update some effect timers
 		if (SmokeCountL)

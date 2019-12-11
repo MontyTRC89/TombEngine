@@ -11,7 +11,7 @@ void LookAt(int posX, int posY, int posZ,
 	Vector3 position = Vector3(posX, posY, posZ);
 	Vector3 target = Vector3(targetX, targetY, targetZ);
 	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
-	float fov = TR_ANGLE_TO_RAD(CurrentFOV);
+	float fov = TR_ANGLE_TO_RAD(CurrentFOV / 1.333333f);
 	float r = TR_ANGLE_TO_RAD(roll);
 
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
