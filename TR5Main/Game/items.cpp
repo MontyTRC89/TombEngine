@@ -12,6 +12,8 @@ void ClearItem(short itemNum)
 
 void KillItem(short itemNum)
 {
+	int _ItemNewRoomNo = ItemNewRoomNo;
+
 	if (InItemControlLoop)
 	{
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNum | 0x8000;
@@ -250,7 +252,7 @@ short CreateNewEffect(short roomNum)
 	if (NextFxFree != NO_ITEM)
 	{
 		FX_INFO* fx = &Effects[NextFxFree];
-		NextFxFree = fx->objectNumber;
+		NextFxFree = fx->nextFx;
 		ROOM_INFO* r = &Rooms[roomNum];
 		fx->roomNumber = roomNum;
 		fx->nextFx = r->fxNumber;
@@ -271,10 +273,9 @@ void InitialiseFXArray(int allocmem)
 	FX_INFO* fx = Effects;
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
-	for (int i = 1; i <= 24; i++)
+	for (int i = 1; i < 24; i++, fx++)
 	{
-		fx->nextFx = i++;
-		++fx;
+		fx->nextFx = i;
 	}
 	fx->nextFx = -1;
 }

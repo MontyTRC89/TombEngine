@@ -149,7 +149,7 @@ void Renderer11::FreeRendererData()
 
 bool Renderer11::Create()
 {
-	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_1 };
+	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_0 };
 	D3D_FEATURE_LEVEL featureLevel;
 
 	HRESULT res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION,
