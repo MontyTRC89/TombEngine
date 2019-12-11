@@ -124,8 +124,8 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 {
 	if (InItemControlLoop)
 	{
-		ItemNewRooms[ItemNewRoomNo] = itemNumber;
-		ItemNewRooms[ItemNewRoomNo + 1] = roomNumber;
+		ItemNewRooms[2 * ItemNewRoomNo] = itemNumber;
+		ItemNewRooms[2 * ItemNewRoomNo + 1] = roomNumber;
 		ItemNewRoomNo++;
 	}
 	else
@@ -163,8 +163,8 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 {
 	if (InItemControlLoop)
 	{
-		ItemNewRooms[ItemNewRoomNo] = fxNumber;
-		ItemNewRooms[ItemNewRoomNo + 1] = roomNumber;
+		ItemNewRooms[2 * ItemNewRoomNo] = fxNumber;
+		ItemNewRooms[2 * ItemNewRoomNo + 1] = roomNumber;
 		ItemNewRoomNo++;
 	}
 	else

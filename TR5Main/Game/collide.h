@@ -17,6 +17,7 @@
 //#define TestLaraPosition ((int (__cdecl*)(short*, ITEM_INFO*, ITEM_INFO*)) 0x00413210)
 //#define MoveLaraPosition ((int (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x00413840)
 //#define AlignLaraPosition ((int (__cdecl*)(PHD_VECTOR*, ITEM_INFO*, ITEM_INFO*)) 0x004133C0)
+//#define UpdateLaraRoom ((void (__cdecl*)(ITEM_INFO*, int)) 0x004120F0)
 
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
 int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);

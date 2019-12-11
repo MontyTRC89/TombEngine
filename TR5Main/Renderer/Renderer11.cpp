@@ -3259,7 +3259,7 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 		ROOM_INFO* room = &Rooms[node->To];
 
 		Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f, 
-									 (room->RoomYTop + room->RoomYBottom) / 2.0f,
+									 (room->minfloor + room->maxceiling) / 2.0f,
 									 room->z + room->ySize * WALL_SIZE / 2.0f);
 		Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -3298,6 +3298,8 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 
 bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort)
 {
+	//return true;
+
 	ROOM_INFO* room = &Rooms[roomIndex];
 
 	Vector3 n = Vector3(*(portal + 1), *(portal + 2), *(portal + 3));
