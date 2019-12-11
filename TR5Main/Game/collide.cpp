@@ -1035,7 +1035,7 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 	coll->shift.x = 0;
 	coll->shift.y = 0;
 	coll->shift.z = 0;
-	coll->quadrant = (short)((coll->facing + ANGLE(45)) / ANGLE(90));
+	coll->quadrant = (unsigned short) (coll->facing + ANGLE(45)) / ANGLE(90);
 
 	int x = xPos;
 	int y = yPos - objectHeight;
