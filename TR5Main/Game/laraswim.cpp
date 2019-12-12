@@ -432,7 +432,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 	coll->enableSpaz = false;
 
 	coll->radius = 300;
-	coll->trigger = 0;
+	coll->trigger = NULL;
 
 	if (TrInput & IN_LOOK && Lara.look)
 		LookLeftRight();
@@ -681,8 +681,8 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	}
 
 	short height = 762 * SIN(item->pos.xRot) >> W2V_SHIFT;
-	if (height < 0)
-		height = -height;
+	height = abs(height);
+
 	if (height < ((LaraDrawType == LARA_DIVESUIT) << 6) + 200)
 		height = ((LaraDrawType == LARA_DIVESUIT) << 6) + 200;
 	
@@ -691,7 +691,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 	COLL_INFO c1;
 	COLL_INFO c2;
 	memcpy(&c1, coll, sizeof(COLL_INFO));
-	memcpy(&c2, coll, sizeof(COLL_INFO));
+	memcpy(&c2, coll, sizeof(COLL_INFO) - 2);
 
 	GetCollisionInfo(coll, item->pos.xPos, height / 2 + item->pos.yPos, item->pos.zPos, item->roomNumber, height);
 	
@@ -755,25 +755,30 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 			item->pos.yRot -= ANGLE(2);
 		}
 		break;
+
 	case CT_TOP:
-		if (item->pos.xRot >= -ANGLE(45))
+		if (item->pos.xRot >= -8190)
 		{
 			flag = 1;
 			item->pos.xRot -= ANGLE(1);
 		}
 		break;
+
 	case CT_TOP_FRONT:
 		item->fallspeed = 0;
 		flag = 1;
 		break;
+
 	case CT_LEFT:
 		item->pos.yRot += ANGLE(2);
 		flag = 1;
 		break;
+
 	case CT_RIGHT:
 		item->pos.yRot -= ANGLE(2);
 		flag = 1;
 		break;
+
 	case CT_CLAMP:
 		flag = 2;
 		item->pos.xPos = coll->old.x;
@@ -790,21 +795,18 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		item->pos.yPos += coll->midFloor;
 	}
 
-	/*v21 = v28;
 	if (oldX == item->pos.xPos
 		&& oldY == item->pos.yPos
 		&& oldZ == item->pos.zPos 
-		&& (BYTE1(v21) = HIBYTE(v26), v26 == item->pos.xRot)
-		&& (LOWORD(v21) = v27, v27 == item->pos.yRot)
-		|| (LOBYTE(v21) = byte_51CEE4) != 0
-		|| v24 != 1)
+		&& oldXrot == item->pos.xRot
+		&& oldYrot == item->pos.yRot
+		/*|| (LOBYTE(v21) = byte_51CEE4) != 0*/
+		|| flag != 1)
 	{
-		if (v24 == 2)
+		if (flag == 2)
 			return;
 	}
-	else*/
-	
-	if (item->fallspeed > 100)
+	else if (item->fallspeed > 100)
 	{
 		if (LaraDrawType == 5)
 		{
