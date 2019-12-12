@@ -169,8 +169,10 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 		item->pos.yPos += yShift - 256;
 
 		resultRight = LaraTestClimbUpPos(item, coll->radius, coll->radius + 120, &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->radius, coll->radius + 120, &shiftLeft, &ledgeLeft);
+		resultLeft = LaraTestClimbUpPos(item, coll->radius, -(coll->radius + 120), &shiftLeft, &ledgeLeft);
 
+		item->pos.yPos += 256;
+		 
 		if (resultRight && resultLeft && TrInput & IN_FORWARD)
 		{
 			if (resultRight < 0 || resultLeft < 0)
@@ -196,7 +198,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 			else
 			{
 				item->goalAnimState = STATE_LARA_LADDER_UP;
-				item->pos.yPos += 256 - yShift;
+				item->pos.yPos -= yShift;
 			}
 		}
 		else
