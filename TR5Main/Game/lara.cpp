@@ -6394,11 +6394,11 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	short angle = item->pos.yRot;
 	if (angle >= -ANGLE(30) && angle <= ANGLE(30))
 		angle = 0;
-	else if (angle >= ANGLE(60) && angle <= ANGLE(120))
+	else if (angle >= 10924 && angle <= 21844)
 		angle = ANGLE(90);
 	else if (angle >= 27307 || angle <= -27307)
 		angle = -ANGLE(180);
-	else if (angle >= -ANGLE(120) && angle <= -ANGLE(60))
+	else if (angle >= -21844 && angle <= -10924)
 		angle = -ANGLE(90);
 
 	if (angle & 0x3FFF)
@@ -6406,7 +6406,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	int slope = (abs(coll->leftFloor2 - coll->rightFloor2)) >= 60;
 	
-	if (slope >= -640 && slope <= -384)
+	if (coll->frontFloor >= -640 && coll->frontFloor <= -384)
 	{
 		if (!slope && coll->frontFloor - coll->frontCeiling >= 0 && coll->leftFloor2 - coll->leftCeiling2 >= 0 && coll->rightFloor2 - coll->rightCeiling2 >= 0)
 		{
@@ -6414,7 +6414,6 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->currentAnimState = STATE_LARA_GRABBING;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->goalAnimState = STATE_LARA_STOP;
-		LABEL_27:
 			item->pos.yPos += coll->frontFloor + 512;
 			Lara.gunStatus = LG_HANDS_BUSY;
 		}

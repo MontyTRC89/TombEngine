@@ -606,13 +606,13 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
 
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
+	short angle = (short)((item->pos.yRot + ANGLE(45)) / ANGLE(90));
 	int x, z;
 
 	if (angle && angle != SOUTH)
 	{
-		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + 1024;
-		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + 1024;
+		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos % 1024) + 1024;
+		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos % 1024) + 1024;
 	}
 	else
 	{
@@ -622,18 +622,23 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 
 	int shift = 0;
 
-	if (!(GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftExtRightIntTab[angle])
-		|| (item->pos.xPos = x,
-			Lara.cornerX = x,
-			item->pos.zPos = z,
-			Lara.cornerZ = z,
-			item->pos.yRot += ANGLE(90),
-			Lara.moveAngle = item->pos.yRot,
-			(result = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift)) == 0))
+	if (GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber) & LeftExtRightIntTab[angle])
+	{
+		item->pos.xPos = x;
+		Lara.cornerX = x;
+		item->pos.zPos = z;
+		Lara.cornerZ = z;
+		item->pos.yRot += ANGLE(90);
+		Lara.moveAngle = item->pos.yRot;
+
+		result = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift);
+	}
+
+	if (!result)
 	{
 		item->pos.xPos = oldX;
 		Lara.moveAngle = oldYrot;
-		item->pos.yRot = oldY;
+		item->pos.yRot = oldYrot;
 		item->pos.zPos = oldZ;
 
 		int newX, newZ;
@@ -641,24 +646,24 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 		switch (angle)
 		{
 		case NORTH:
-			newX = ((item->pos.xPos + 1024) & 0xFFFFFC00) - (z & 0x3FF) + 1024;
-			newZ = ((z + 1024) & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + 1024;
+			newX = ((item->pos.xPos + 1024) & 0xFFFFFC00) - (z % 1024) + 1024;
+			newZ = ((z + 1024) & 0xFFFFFC00) - (item->pos.xPos % 1024) + 1024;
 			break;
 
 		case SOUTH:
-			newX = ((item->pos.xPos - 1024) & 0xFFFFFC00) - (z & 0x3FF) + 1024;
-			newZ = ((z - 1024) & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + 1024;
+			newX = ((item->pos.xPos - 1024) & 0xFFFFFC00) - (z % 1024) + 1024;
+			newZ = ((z - 1024) & 0xFFFFFC00) - (item->pos.xPos % 1024) + 1024;
 			break;
 
 		case EAST:
-			newX = ((z ^ item->pos.xPos) & 0x3FF) ^ (item->pos.xPos + 1024);
-			newZ = (z ^ ((z ^ item->pos.xPos) & 0x3FF)) - 1024;
+			newX = ((z ^ item->pos.xPos) % 1024) ^ (item->pos.xPos + 1024);
+			newZ = (z ^ ((z ^ item->pos.xPos) % 1024)) - 1024;
 			break;
 
 		case WEST:
 		default:
-			newX = (item->pos.xPos ^ (z ^ item->pos.xPos) & 0x3FF) - 1024;
-			newZ = (z ^ item->pos.xPos) & 0x3FF ^ (z + 1024);
+			newX = (item->pos.xPos ^ (z ^ item->pos.xPos) % 1024) - 1024;
+			newZ = ((z ^ item->pos.xPos) % 1024) ^ (z + 1024);
 			break;
 
 		}
