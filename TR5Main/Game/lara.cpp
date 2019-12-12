@@ -6406,7 +6406,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	int slope = (abs(coll->leftFloor2 - coll->rightFloor2)) >= 60;
 	
-	if (slope >= -640 && slope <= -384)
+	if (coll->frontFloor >= -640 && coll->frontFloor <= -384)
 	{
 		if (!slope && coll->frontFloor - coll->frontCeiling >= 0 && coll->leftFloor2 - coll->leftCeiling2 >= 0 && coll->rightFloor2 - coll->rightCeiling2 >= 0)
 		{
