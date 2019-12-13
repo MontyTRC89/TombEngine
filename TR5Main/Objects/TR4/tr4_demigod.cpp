@@ -4,6 +4,7 @@
 #include "../../Game/people.h"
 #include "../../Game/sphere.h"
 #include "../../Game/effect2.h"
+#include "../../Game/draw.h"
 
 void InitialiseDemigod(short itemNum)
 {

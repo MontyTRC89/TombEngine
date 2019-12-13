@@ -46,6 +46,9 @@
 #define phd_DxRotYXZ ((void(__cdecl*)(int, int, int)) 0x00490AF0)
 #define phd_DxRotYXZpack ((void(__cdecl*)(int)) 0x00490A80)
 
+#define mGetAngle ((int(__cdecl*)(int, int, int, int)) 0x0048F290)
+#define phd_GenerateW2V ((void(__cdecl*)(PHD_3DPOS*)) 0x0048F330)
+
 int DrawPhaseGame();
 void DrawAnimatingItem(ITEM_INFO* item);
 int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate);

@@ -5,6 +5,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/items.h"
 #include "../../Game/sphere.h"
+#include "../../Game/draw.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };

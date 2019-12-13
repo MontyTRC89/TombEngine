@@ -4,11 +4,15 @@
 #pragma pack(push, 1)
 typedef enum TYPE_ZONE
 {
-	ZONE_SKELLY,
+	ZONE_NULL = -1,
+	ZONE_SKELLY = 0,
 	ZONE_BASIC,
 	ZONE_FLYER,
-	ZONE_HUMAN,
-	ZONE_WATER  // TODO: zone water and flyer is the same ?
+	ZONE_HUMAN_CLASSIC,
+	ZONE_WATER,
+	ZONE_HUMAN_JUMP_AND_MONKEY,
+	ZONE_HUMAN_JUMP,
+	ZONE_SPIDER,
 };
 
 typedef struct vector_t

@@ -53,7 +53,6 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->hitEffect = true;
 	}
 
 	obj = &Objects[ID_WILD_BOAR];
@@ -320,7 +319,6 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-
 		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
 	}
 
@@ -693,7 +691,6 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->hitEffect = 3;
 	}
 
 	obj = &Objects[ID_KNIGHT_TEMPLAR];
@@ -731,7 +728,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->hitEffect = 3;
+		obj->hitEffect = HIT_FRAGMENT;
 		obj->undead = true;
 
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
@@ -753,7 +750,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-
+		obj->hitEffect = HIT_FRAGMENT;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 	}
@@ -773,7 +770,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-
+		obj->hitEffect = HIT_FRAGMENT;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 	}
@@ -834,7 +831,6 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->hitEffect = 2;
 	}
 
 	obj = &Objects[ID_TROOPS];
@@ -1934,7 +1930,6 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->usingDrawAnimatingItem = false;
-		obj->hitEffect = 0;
 		obj->undead = true; // ??
 	}
 
@@ -1953,7 +1948,6 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->usingDrawAnimatingItem = false;
-		obj->hitEffect = 1;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
@@ -3737,9 +3731,10 @@ void InitialiseObjects()
 		obj->drawRoutineExtra = NULL;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
-		obj->shadowSize = 0;
+		obj->shadowSize = NO_SHADOW;
 		obj->hitPoints = -16384;
-		obj->explodableMeshbits = 0;
+		obj->hitEffect = HIT_NONE;
+		obj->explodableMeshbits = NULL;
 		obj->intelligent = false;
 		obj->waterCreature = false;
 		obj->saveMesh = false;
@@ -3751,7 +3746,7 @@ void InitialiseObjects()
 		obj->usingDrawAnimatingItem = true;
 		obj->semiTransparent = false;
 		obj->undead = false;
-		obj->zoneType = ZONE_BASIC;
+		obj->zoneType = ZONE_NULL;
 		obj->frameBase += (short)Frames;
 	}
 

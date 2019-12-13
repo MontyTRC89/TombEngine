@@ -8,6 +8,7 @@
 #include "../../Game/box.h"
 #include "../../Game/anim.h"
 #include "../../Game/laraflar.h"
+#include "../../Game/draw.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
