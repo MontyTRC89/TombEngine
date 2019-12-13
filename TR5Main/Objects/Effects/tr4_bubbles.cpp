@@ -3,6 +3,7 @@
 #include "../../Game/debris.h"
 #include "../../Game/items.h"
 #include "../../Game/traps.h"
+#include "../../Game/draw.h"
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {

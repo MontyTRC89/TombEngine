@@ -11,6 +11,9 @@
 
 extern LaraExtraInfo g_LaraExtra;
 
+#define ESCAPE_DIST (WALL_SIZE*5)
+#define STALK_DIST (WALL_SIZE*3)
+
 void DropBaddyPickups(ITEM_INFO* item)
 {
 	ITEM_INFO* pickup = NULL;
@@ -236,26 +239,20 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, short (*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
 {
 	PHD_VECTOR pos;
-
 	pos.x = bite->x;
 	pos.y = bite->y;
 	pos.z = bite->z;
-
 	GetJointAbsPosition(item, &pos, bite->meshNum);
-
 	return generate(pos.x, pos.y, pos.z, damage, angle, item->roomNumber);
 }
 
 short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, short(*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
 {
 	PHD_VECTOR pos;
-
 	pos.x = bite->x;
 	pos.y = bite->y;
 	pos.z = bite->z;
-
 	GetJointAbsPosition(item, &pos, bite->meshNum);
-
 	return generate(pos.x, pos.y, pos.z, item->speed, item->pos.yRot, item->roomNumber);
 }
 
@@ -313,7 +310,7 @@ void CreatureFloat(short itemNumber)
 
 	AnimateItem(item);
 
-	printf("Crocodile Y: %d\n", item->pos.yPos);
+	//printf("Crocodile Y: %d\n", item->pos.yPos);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -351,10 +348,10 @@ void CreatureJoint(ITEM_INFO* item, short joint, short required)
 
 	creature->jointRotation[joint] += change;
 
-	if (creature->jointRotation[joint] > 12288)
-		creature->jointRotation[joint] = 12288;
-	else if (creature->jointRotation[joint] < -12288)
-		creature->jointRotation[joint] = -12288;
+	if (creature->jointRotation[joint] > ANGLE(70))
+		creature->jointRotation[joint] = ANGLE(70);
+	else if (creature->jointRotation[joint] < -ANGLE(70))
+		creature->jointRotation[joint] = -ANGLE(70);
 }
 
 void CreatureTilt(ITEM_INFO* item, short angle) 
@@ -366,13 +363,15 @@ void CreatureTilt(ITEM_INFO* item, short angle)
 	else if (angle > ANGLE(3))
 		angle = ANGLE(3);
 
+	item->pos.zRot += angle;
+
+	/*
 	short theAngle = -ANGLE(3);
 
 	short absRot = abs(item->pos.zRot);
 	if (absRot < ANGLE(15) || absRot > ANGLE(30))
 		angle >>= 1;
-
-	item->pos.zRot += angle;  
+	*/
 }
 
 // TODO: probably wrong value somewhere, since the xRot is modified.
@@ -806,57 +805,68 @@ void CreatureDie(short itemNumber, int explode)
 
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT)
 {
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	
-	if (floor->box == 0x7FF)
-		return 1;
+	FLOOR_INFO* floor;
+	int height;
+
+	floor = GetFloor(x, y, z, &roomNumber);
+	if (floor->box == NO_BOX)
+		return TRUE;
 
 	if (LOT->isJumping)
-		return 0;
+		return FALSE;
 
 	if (Boxes[floor->box].overlapIndex & LOT->blockMask)
-		return 1;
+		return TRUE;
 
-	int height = Boxes[floor->box].height;
-
-	if (boxHeight - height > LOT->step)
-		return 1;
-
-	if (boxHeight - height < LOT->drop)
-		return 1;
+	height = Boxes[floor->box].height;
+	if (boxHeight - height > LOT->step || boxHeight - height < LOT->drop)
+		return TRUE;
 
 	if (boxHeight - height < -LOT->step && height > nextHeight)
-		return 1;
+		return TRUE;
 
-	if (LOT->fly && y > height + LOT->fly)
-		return 1;
+	if ((LOT->fly != NO_FLYING) && y > height + LOT->fly)
+		return TRUE;
 
-	return 0;
+	return FALSE;
 }
 
 int CreatureCreature(short itemNumber)  
 {
-	int x = Items[itemNumber].pos.xPos;
-	int z = Items[itemNumber].pos.zPos;
+	ITEM_INFO* item, *linked;
+	OBJECT_INFO* obj;
+	ROOM_INFO* r;
+	int x, z, xDistance, zDistance, distance = 0;
+	short link, radius;
 
-	ITEM_INFO* item;
+	item = &Items[itemNumber];
+	obj = &Objects[item->objectNumber];
+	x = item->pos.xPos;
+	z = item->pos.zPos;
+	radius = obj->radius;
 
-	for (short link = Rooms[Items[itemNumber].roomNumber].itemNumber; link != NO_ITEM; link = item->nextItem)
+	r = &Rooms[item->roomNumber];
+	link = r->itemNumber;
+	do
 	{
-		item = &Items[link];
-
-		if (link != itemNumber && item != LaraItem && item->status == ITEM_ACTIVE && item->hitPoints > 0)
+		linked = &Items[link];
+		
+		if (link != itemNumber && linked != LaraItem && linked->status == ITEM_ACTIVE && linked->hitPoints > 0)
 		{
-			int xdistance = abs(item->pos.xPos - x);
-			int zdistance = abs(item->pos.zPos - z);
-			int radius = xdistance <= zdistance ? zdistance + (xdistance >> 1) : xdistance + (zdistance >> 1);
-			if (radius < Objects[Items[itemNumber].objectNumber].radius + Objects[item->objectNumber].radius)
-			{
-				int yRot = Items[itemNumber].pos.yRot;
-				return ATAN(item->pos.zPos - z, item->pos.xPos - x) - yRot;
-			}
+			xDistance = abs(linked->pos.xPos - x);
+			zDistance = abs(linked->pos.zPos - z);
+			
+			if (xDistance > zDistance)
+				distance = xDistance + (zDistance >> 1);
+			else
+				distance = zDistance + (xDistance >> 1);
+
+			if (distance < radius + Objects[linked->objectNumber].radius)
+				return ATAN(linked->pos.zPos - z, linked->pos.xPos - x) - item->pos.yRot;
 		}
-	}
+
+		link = linked->nextItem;
+	} while (link != NO_ITEM);
 
 	return 0;
 }
@@ -869,56 +879,60 @@ int CreatureCreature(short itemNumber)
 
 int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber) 
 {
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	short* zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
+	CREATURE_INFO* creature;
+	BOX_INFO* box;
+	short* zone;
 
-	if (creature->LOT.fly == 0 && zone[boxNumber] != zoneNumber)
-		return 0;
+	creature = (CREATURE_INFO*)item->data;
+	zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
+	if (creature->LOT.fly == NO_FLYING && zone[boxNumber] != zoneNumber)
+		return FALSE;
 
-	BOX_INFO* box = &Boxes[boxNumber];
-
+	box = &Boxes[boxNumber];
 	if (box->overlapIndex & creature->LOT.blockMask)
-		return 0;
+		return FALSE;
 
-	if ((item->pos.zPos > (box->left * 1024)) || ((box->right * 1024) > item->pos.zPos) ||
-		(item->pos.xPos > (box->top * 1024)) || ((box->bottom * 1024) > item->pos.xPos))
-		return 1;
+	if ((item->pos.zPos > (box->left << WALL_SHIFT)) && item->pos.zPos < ((box->right  << WALL_SHIFT)) &&
+		(item->pos.xPos > (box->top  << WALL_SHIFT)) && item->pos.xPos < ((box->bottom << WALL_SHIFT)))
+		return FALSE;
 
-	return 0;
+	return TRUE;
 }
 
 int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
 {
 	BOX_INFO* box = &Boxes[boxNumber];
-	int x = ((box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
-	int z = ((box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
+	int x, z;
+
+	x = (int(box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
+	z = (int(box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
 	
-	if (x > -5120 && x < 5120 && z > -5120 && z < 5120)
-		return 0;
+	if (x > -ESCAPE_DIST && x < ESCAPE_DIST && z > -ESCAPE_DIST && z < ESCAPE_DIST)
+		return FALSE;
 
-	if (((x > 0) ^ (item->pos.xPos > enemy->pos.xPos)) && 
-		((z > 0) ^ (item->pos.zPos > enemy->pos.zPos)))
-		return 0;
+	if (((x > 0) ^ (item->pos.xPos > enemy->pos.xPos)) && ((z > 0) ^ (item->pos.zPos > enemy->pos.zPos)))
+		return FALSE;
 
-	return 1;
+	return TRUE;
 }
 
 void TargetBox(LOT_INFO* LOT, short boxNumber) 
 {
-	boxNumber &= 0x7FF;
-	BOX_INFO* box = &Boxes[boxNumber];
+	BOX_INFO* box;
 
+	boxNumber &= NO_BOX;
+	box = &Boxes[boxNumber];
+
+	//LOT->target.x = (((((box->bottom - box->top) - 1) * GetRandomControl()) / 32) + (box->top * 1024)) + 512;
+	//LOT->target.z = (((((box->right - box->left) - 1) * GetRandomControl()) / 32) + (box->left * 1024)) + 512;
+	LOT->target.x = ((box->top << WALL_SHIFT) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + WALL_SIZE/2;
+	LOT->target.z = ((box->left << WALL_SHIFT) + GetRandomControl() * ((box->right - box->left) - 1) >> 5) + WALL_SIZE / 2;
 	LOT->requiredBox = boxNumber;
 
-	LOT->target.x = (((((box->bottom - box->top) - 1) * GetRandomControl()) / 32) + (box->top * 1024)) + 512;
-	LOT->target.z = (((((box->right - box->left) - 1) * GetRandomControl()) / 32) + (box->left * 1024)) + 512;
-	
-	if (LOT->fly == 0)
+	if (LOT->fly == NO_FLYING)
 		LOT->target.y = box->height;
 	else
-		LOT->target.y = box->height - 384;
-
-	return;
+		LOT->target.y = box->height - STEPUP_HEIGHT;
 }
 
 int UpdateLOT(LOT_INFO* LOT, int depth)
@@ -940,7 +954,7 @@ int UpdateLOT(LOT_INFO* LOT, int depth)
 			LOT->head = LOT->targetBox;
 		}
 
-		node->searchNumber = LOT->searchNumber++;
+		node->searchNumber = ++LOT->searchNumber;
 		node->exitBox = NO_BOX;
 	}
 
@@ -949,39 +963,52 @@ int UpdateLOT(LOT_INFO* LOT, int depth)
 
 int SearchLOT(LOT_INFO* LOT, int depth)
 {
-	short* zone = GroundZones[FlipStatus + 2 * LOT->zone];
-	short searchZone = zone[LOT->head];
+	BOX_NODE* node, *expand;
+	BOX_INFO* box;
+	short* zone, index, searchZone, boxNumber, delta;
+	bool done;
+	
+	if (LOT->fly == NO_FLYING)
+	{
+		zone = GroundZones[FlipStatus + 2 * LOT->zone];
+		searchZone = zone[LOT->head];
+	}
+	else
+	{
+		zone = GroundZones[FlipStatus + 2 * LOT->zone];
+		searchZone = FLY_ZONE;
+	}
 
 	for (int i = 0; i < depth; i++)
 	{
 		if (LOT->head == NO_BOX)
 		{
 			LOT->tail = NO_BOX; 
-			return false;
+			return FALSE;
 		}
 
-		BOX_NODE* node = &LOT->node[LOT->head];
-		BOX_INFO* box = &Boxes[LOT->head];
+		node = &LOT->node[LOT->head];
+		box = &Boxes[LOT->head];
 
-		int index = box->overlapIndex & OVERLAP_INDEX;
-		bool done = false;
+		index = box->overlapIndex & OVERLAP_INDEX;
+		done = FALSE;
 		do
 		{
-			short boxNumber = Overlaps[index++];
+			boxNumber = Overlaps[index++];
 			if (boxNumber & BOX_END_BIT)
 			{
-				done = true;
-				boxNumber &= boxNumber;
+				done = TRUE;
+				boxNumber &= BOX_NUMBER;
 			}
 
 			if (LOT->fly == NO_FLYING && searchZone != zone[boxNumber])
 				continue;
 
-			int delta = Boxes[boxNumber].height - box->height;
+			delta = Boxes[boxNumber].height - box->height;
 			if (delta > LOT->step || delta < LOT->drop)
 				continue;
 
-			BOX_NODE* expand = &LOT->node[boxNumber];
+			expand = &LOT->node[boxNumber];
 			if ((node->searchNumber & SEARCH_NUMBER) < (expand->searchNumber & SEARCH_NUMBER))
 				continue;
 
@@ -994,8 +1021,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 			}
 			else
 			{
-				if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER) &&
-					!(expand->searchNumber & BLOCKED_SEARCH))
+				if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER) && !(expand->searchNumber & BLOCKED_SEARCH))
 					continue;
 
 				if (Boxes[boxNumber].overlapIndex & LOT->blockMask)
@@ -1020,21 +1046,21 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 		node->nextExpansion = NO_BOX;
 	}
 
-	return true;
+	return TRUE;
 }
 
 int CreatureActive(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	if (!(item->flags & IFLAG_KILLED) && (item->status & ITEM_INVISIBLE) == ITEM_INVISIBLE)
+	if (!(item->flags & IFLAG_KILLED) && item->status & ITEM_INVISIBLE)
 	{
-		if (!EnableBaddieAI(itemNumber, 0))
-			return false;
+		if (!EnableBaddieAI(itemNumber, FALSE))
+			return FALSE;
 		item->status = ITEM_ACTIVE;
 	}
 
-	return true;
+	return TRUE;
 }
 
 void InitialiseCreature(short itemNumber) 
@@ -1044,7 +1070,7 @@ void InitialiseCreature(short itemNumber)
 
 	item->collidable = true;
 	item->data = NULL;
-	item->drawRoom = (((item->pos.zPos - room->z) / 1024) & 0xFF) | (((item->pos.xPos - room->mesh->x) / 4) & 0xFF00);
+	item->drawRoom = (((item->pos.zPos - room->z) / WALL_SIZE) & 0xFF) | (((item->pos.xPos - room->mesh->x) / 4) & 0xFF00);
 	item->TOSSPAD = item->pos.yRot & 0xE000;
 	item->itemFlags[2] = item->roomNumber | (item->pos.yPos - room->minfloor);
 }
@@ -1052,35 +1078,43 @@ void InitialiseCreature(short itemNumber)
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
 {
 	if (enemy == NULL)
-		return 0;
+		return FALSE;
 
-	BOX_INFO* box = &Boxes[boxNumber];
+	BOX_INFO* box;
+	int x, z, xrange, zrange;
+	int enemyQuad, boxQuad, baddieQuad;
 
-	int xrange = ((box->bottom - box->top + 3) << WALL_SHIFT);
-	int zrange = ((box->right - box->left + 3) << WALL_SHIFT);
+	box = &Boxes[boxNumber];
 
-	int x = ((box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
-	int z = ((box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
+	xrange	= STALK_DIST + ((box->bottom - box->top + 3) << WALL_SHIFT);
+	zrange	= STALK_DIST + ((box->right - box->left + 3) << WALL_SHIFT);
+	x		= ((box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
+	z		= ((box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
 	
 	if (x > xrange || x < -xrange || z > zrange || z < -zrange)
-		return 0;
+		return FALSE;
 
-	int enemyQuad = (enemy->pos.yRot >> W2V_SHIFT) + 2;
-	int boxQuad = (z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1);
+	enemyQuad = (enemy->pos.yRot >> W2V_SHIFT) + 2;
+	
+	// boxQuad = (z <= 0 ? (x <= 0 ? 0 : 3) : (x > 0) + 1);
+	if (z > 0)
+		boxQuad = (x > 0) ? 2 : 1;
+	else
+		boxQuad = (x > 0) ? 3 : 0;
 
 	if (enemyQuad == boxQuad)
-		return 0;
+		return FALSE;
 
-	int baddieQuad = 0;
+	baddieQuad = 0;
 	if (item->pos.zPos > enemy->pos.zPos)
-		baddieQuad = (item->pos.xPos > enemy->pos.xPos) + 1;
+		baddieQuad = (item->pos.xPos > enemy->pos.xPos) ? 2 : 1;
 	else
-		baddieQuad = item->pos.xPos <= enemy->pos.xPos ? 0 : 3;
+		baddieQuad = (item->pos.xPos > enemy->pos.xPos) ? 3 : 0;
 
 	if (enemyQuad == baddieQuad && abs(enemyQuad - boxQuad) == 2)
-		return 1;
+		return FALSE;
 
-	return 0;
+	return TRUE;
 }
 
 int CreatureVault(short itemNum, short angle, int vault, int shift)
@@ -1479,12 +1513,20 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 {
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	if (item->data == NULL)
+		return;
+
+	CREATURE_INFO* creature;
+	LOT_INFO* LOT;
+	ITEM_INFO* enemy;
+
+	creature = (CREATURE_INFO*)item->data;
+	enemy = creature->enemy;
+	LOT = &creature->LOT;
+
 	if (creature)
 	{
-		LOT_INFO* LOT = &creature->LOT;
-		ITEM_INFO* enemy = creature->enemy;
-		if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | 0x8000))
+		if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 			creature->LOT.requiredBox = NO_BOX;
 		
 		if (creature->mood != ATTACK_MOOD && creature->LOT.requiredBox != NO_BOX)

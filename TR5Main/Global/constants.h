@@ -11,6 +11,12 @@
 #define STEP_SIZE		256
 #define	WALL_SIZE		1024
 
+/// obj->hitEffect flag
+#define HIT_NONE     0
+#define HIT_BLOOD    1
+#define HIT_SMOKE    2
+#define HIT_FRAGMENT 3
+
 #define GUARD			1
 #define AMBUSH			2
 #define PATROL1			4
@@ -23,6 +29,7 @@
 
 #define NUM_SPRITES		256
 #define UNIT_SHADOW		256
+#define NO_SHADOW       0
 #define DEFAULT_RADIUS	10
 #define ROT_X 4
 #define ROT_Y 8
@@ -120,7 +127,6 @@
 #define BLOCKABLE     0x8000
 #define BLOCKED       0x4000
 #define OVERLAP_INDEX 0x3fff
-
 #define SEARCH_NUMBER  0x7fff
 #define BLOCKED_SEARCH 0x8000
 
@@ -139,15 +145,7 @@
 #define EXPAND_TOP    0x4
 #define EXPAND_BOTTOM 0x8
 
-#define BLOCKABLE     0x8000
-#define BLOCKED       0x4000
-#define OVERLAP_INDEX 0x3fff
-
-#define SEARCH_NUMBER  0x7fff
-#define BLOCKED_SEARCH 0x8000
-
 #define NO_FLYING 0
-
 #define FLY_ZONE 0x2000
 
 #define CLIP_LEFT   1
@@ -156,3 +154,16 @@
 #define CLIP_BOTTOM 8
 #define ALL_CLIP (CLIP_LEFT|CLIP_RIGHT|CLIP_TOP|CLIP_BOTTOM)
 #define SECONDARY_CLIP 16
+
+#define SLOPE_DIF 60
+#define LARA_FREEFALL_SPEED 131
+#define LARA_LEAN_RATE ((ANGLE(1)/2) + ANGLE(1))
+#define LARA_LEAN_MAX ANGLE(11)
+#define LARA_TURN_RATE ((ANGLE(1)/4) + ANGLE(2))
+#define LARA_JUMP_TURN ANGLE(3)
+#define LARA_SLOW_TURN ANGLE(4)
+#define LARA_MED_TURN ANGLE(6)
+#define LARA_FAST_TURN ANGLE(8)
+#define STEPUP_HEIGHT ((STEP_SIZE*3)/2)
+#define BAD_JUMP_CEILING ((STEP_SIZE*3)/4)
+#define LARA_RAD 100

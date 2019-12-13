@@ -23,22 +23,6 @@
 #include <stdio.h>
 #include "Anim.h"
 
-#define SLOPE_DIF 60
-#define LARA_FREEFALL_SPEED 131
-
-#define LARA_LEAN_RATE ((ANGLE(1)/2) + ANGLE(1))
-#define LARA_LEAN_MAX ANGLE(11)
-
-#define LARA_TURN_RATE ((ANGLE(1)/4) + ANGLE(2))
-#define LARA_JUMP_TURN ANGLE(3)
-#define LARA_SLOW_TURN ANGLE(4)
-#define LARA_MED_TURN ANGLE(6)
-#define LARA_FAST_TURN ANGLE(8)
-
-#define STEPUP_HEIGHT ((STEP_SIZE*3)/2)
-#define BAD_JUMP_CEILING ((STEP_SIZE*3)/4)
-#define LARA_RAD 100
-
 static short LeftClimbTab[4] = // offset 0xA0638
 {
 	0x0200, 0x0400, 0x0800, 0x0100

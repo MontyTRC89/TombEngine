@@ -2,6 +2,9 @@
 #include "..\Global\global.h"
 #include <stdio.h>
 
+#define DEFAULT_FLY_UPDOWN_SPEED 16
+#define DEFAULT_SWIM_UPDOWN_SPEED 32
+
 void InitialiseLOTarray(int allocMem)
 {
 	DB_Log(0, "InitialiseLOTarray - DLL");
@@ -92,41 +95,11 @@ void DisableBaddieAI(short itemNumber)
 	}
 }
 
-void InitialiseCustomObjects(short itemNum, short slot)
-{
-	CREATURE_INFO* creature = &BaddieSlots[slot];
-	ITEM_INFO* item = &Items[itemNum];
-
-	switch (item->objectNumber)
-	{
-	case ID_SCUBA_DIVER:
-	case ID_SHARK:
-	case ID_BARRACUDA:
-		creature->LOT.step = 20480;
-		creature->LOT.drop = -20480;
-		creature->LOT.fly = 32;
-		creature->LOT.zone = 4;
-		break;
-
-	case ID_TRIBESMAN_WITH_AX:
-		creature->LOT.step = 256;
-		creature->LOT.drop = -256;
-		creature->LOT.isAmphibious = false;
-		break;
-
-	case ID_APE:
-	case ID_SMALL_SPIDER:
-		creature->LOT.step = 512;
-		creature->LOT.drop = -512;
-		creature->LOT.zone = ZONE_HUMAN;
-		break;
-	}
-}
-
 void InitialiseSlot(short itemNum, short slot)
 {
-	CREATURE_INFO* creature = &BaddieSlots[slot];
 	ITEM_INFO* item = &Items[itemNum];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	CREATURE_INFO* creature = &BaddieSlots[slot];
 
 	item->data = creature;
 	creature->itemNum = itemNum;
@@ -146,96 +119,109 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->alerted = false;
 	creature->LOT.canJump = false;
 	creature->LOT.canMonkey = false;
-	creature->LOT.isAmphibious = true;
+	creature->LOT.isAmphibious = false; // only land (only crocodile can be amphibious)
 	creature->LOT.isJumping = false;
 	creature->LOT.isMonkeying = false;
 	creature->maximumTurn = ANGLE(1);
 	creature->flags = 0;
 	creature->enemy = NULL;
+	creature->LOT.fly = NO_FLYING;
+	creature->LOT.blockMask = BLOCKED;
 
-	// default zone for all entity with (intelligent == true)
-	creature->LOT.step = 256;
-	creature->LOT.drop = -512;
-	creature->LOT.blockMask = 0x4000;
-	creature->LOT.fly = 0;
-	creature->LOT.zone = ZONE_BASIC;
-	  
-	switch (item->objectNumber)
+	if (obj->intelligent)
 	{
-	case ID_MP_WITH_STICK:
-	case ID_MONKEY:
-	case ID_YETI:
-	case ID_SOPHIA_LEE:
-	case ID_LIZARD_MAN:
-	case ID_MP1:
-		// Can climb
-		creature->LOT.step = 1024;
-		creature->LOT.drop = -1024;
-		creature->LOT.zone = ZONE_HUMAN;
-		break;
-
-	case ID_SAS:
-	case ID_BLUE_GUARD:
-	case ID_MAFIA2:
-	case ID_SAILOR:
-		// Can climb and jjump
-		creature->LOT.step = 1024;
-		creature->LOT.drop = -1024;
-		creature->LOT.canJump = true;
-		creature->LOT.zone = ZONE_HUMAN;
-		break;
-
-	case ID_HITMAN:
-	case ID_BADDY1:
-	case ID_BADDY2:
-		// Can climb, jump, monkey
-		creature->LOT.step = 1024;
-		creature->LOT.drop = -1024;
-		creature->LOT.canJump = true;
-		creature->LOT.canMonkey = true;
-		creature->LOT.zone = ZONE_HUMAN;
-		break;
-
-	case ID_SKELETON:
-		// Can jump
-		creature->LOT.step = 256;
-		creature->LOT.drop = -256;
-		creature->LOT.canJump = true;
-		//creature->LOT.zone = ZONE_SKELLY;
-		break;
-
-	case ID_CROW:
-	case ID_EAGLE:
-	case ID_WILLOWISP:
-	case ID_REAPER:
-	case ID_GREEN_TEETH:
-	case ID_ATTACK_SUB:
-	case ID_BAT:
-	case ID_HARPY:
-		// Can fly
-		creature->LOT.step = 20480;
-		creature->LOT.drop = -20480;
-		creature->LOT.fly = 16;
-		creature->LOT.zone = ZONE_FLYER;
-		break;
-
-	case ID_SCUBA_DIVER:
-	case ID_SHARK:
-	case ID_BARRACUDA:
-	case ID_CROCODILE:
-		// Can swim
-		creature->LOT.step = 20480;
-		creature->LOT.drop = -20480;
-		creature->LOT.fly = 32;
-		creature->LOT.zone = ZONE_WATER;
-		break;
+		// simple check to set hitEffect to blood or smoke by default if intelligent enabled and no value assigned to hitEffect !
+		// undead have smoke instead of blood !
+		if (!obj->hitEffect)
+		{
+			if (obj->undead)
+				obj->hitEffect = HIT_SMOKE;
+			else if (!obj->undead && obj->hitPoints)
+				obj->hitEffect = HIT_BLOOD;
+		}
+		
+		// init the basic zone for intelligent creature.
+		// ignore if the zoneType is specified in the Objects[] already.
+		if (obj->zoneType == ZONE_NULL)
+			obj->zoneType = ZONE_BASIC;
 	}
 
-	// Hook for initialising custom objects in a separate function
-	InitialiseCustomObjects(itemNum, slot);
+	switch (obj->zoneType)
+	{
+		default:
+		case ZONE_NULL:
+			break;
+
+		case ZONE_SKELLY:
+			// Can jump
+			creature->LOT.step = SECTOR(1) - CLICK(3);
+			creature->LOT.drop = -(SECTOR(1) - CLICK(3));
+			creature->LOT.canJump = true;
+			creature->LOT.zone = ZONE_SKELLY;
+			break;
+
+		case ZONE_BASIC:
+			creature->LOT.step = SECTOR(1) - CLICK(3);
+			creature->LOT.drop = -(SECTOR(1) - CLICK(3));
+			creature->LOT.zone = ZONE_BASIC;
+			break;
+
+		case ZONE_FLYER:
+			// Can fly
+			creature->LOT.step = SECTOR(20);
+			creature->LOT.drop = -SECTOR(20);
+			creature->LOT.fly = DEFAULT_FLY_UPDOWN_SPEED;
+			creature->LOT.zone = ZONE_FLYER;
+			break;
+
+		case ZONE_WATER:
+			// Can swim
+			creature->LOT.step = SECTOR(20);
+			creature->LOT.drop = -SECTOR(20);
+			if (item->objectNumber == ID_CROCODILE)
+			{
+				creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // crocodile is more slower than the other creature when swimming.
+				creature->LOT.isAmphibious = true; // crocodile can walk and swim.
+			}
+			else
+			{
+				creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED;
+			}
+			creature->LOT.zone = ZONE_WATER;
+			break;
+
+		case ZONE_HUMAN_CLASSIC:
+			// Can climb
+			creature->LOT.step = SECTOR(1);
+			creature->LOT.drop = -SECTOR(1);
+			creature->LOT.zone = ZONE_HUMAN_CLASSIC;
+			break;
+
+		case ZONE_HUMAN_JUMP:
+			// Can climb and jump
+			creature->LOT.step = SECTOR(1);
+			creature->LOT.drop = -SECTOR(1);
+			creature->LOT.canJump = true;
+			creature->LOT.zone = ZONE_HUMAN_CLASSIC;
+			break;
+
+		case ZONE_HUMAN_JUMP_AND_MONKEY:
+			// Can climb, jump, monkey
+			creature->LOT.step = SECTOR(1);
+			creature->LOT.drop = -SECTOR(1);
+			creature->LOT.canJump = true;
+			creature->LOT.canMonkey = true;
+			creature->LOT.zone = ZONE_HUMAN_CLASSIC;
+			break;
+
+		case ZONE_SPIDER:
+			creature->LOT.step = SECTOR(1) - CLICK(2);
+			creature->LOT.drop = -(SECTOR(1) - CLICK(2));
+			creature->LOT.zone = ZONE_HUMAN_CLASSIC;
+			break;
+	}
 
 	ClearLOT(&creature->LOT);
-
 	if (itemNum != Lara.itemNumber)
 		CreateZone(item);
 

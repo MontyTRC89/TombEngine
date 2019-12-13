@@ -4,6 +4,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
 #include "../../Game/items.h"
+#include "../../Game/draw.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
