@@ -156,7 +156,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->x);  
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);  
 		}
 		return 0x7FFF;
 	}
@@ -171,7 +171,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->x);
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 		}
 		return NO_HEIGHT;
 	}
