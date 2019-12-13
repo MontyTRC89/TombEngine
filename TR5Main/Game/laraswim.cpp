@@ -156,9 +156,9 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
-			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->x);  
 		}
-		return 0x7fff;
+		return 0x7FFF;
 	}
 	else
 	{
@@ -171,7 +171,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 				floor = GetFloor(x, y, z, &roomNumber);
 				return (GetFloorHeight(floor, x, y, z) - wh);
 			}
-			floor = &r->floor[((z - r->z) >> WALL_SHIFT) + ((x - r->x) >> WALL_SHIFT) * r->xSize];
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->x);
 		}
 		return NO_HEIGHT;
 	}
@@ -484,9 +484,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 		item->pos.zRot = 0;
 
 	if (item->pos.xRot < -ANGLE(85))
-		item->pos.xRot += ANGLE(85);
+		item->pos.xRot = -ANGLE(85);
 	else if (item->pos.xRot > ANGLE(85))
-		item->pos.xRot -= ANGLE(85);
+		item->pos.xRot = ANGLE(85);
 
 	if (LaraDrawType == LARA_DIVESUIT)
 	{
@@ -509,7 +509,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 	AnimateLara(item);
 
 	item->pos.xPos += COS(item->pos.xRot) * (item->fallspeed * SIN(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
-	item->pos.yPos -= item->fallspeed * SIN(item->pos.xRot) >> W2V_SHIFT >> 2;
+	item->pos.yPos -= item->fallspeed * SIN(item->pos.xRot) >> (W2V_SHIFT + 2);
 	item->pos.zPos += COS(item->pos.xRot) * (item->fallspeed * COS(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
 
 	LaraBaddieCollision(item, coll);
