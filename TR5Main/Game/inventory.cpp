@@ -381,7 +381,7 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO1] = InventoryObjectDefinition(ID_CROSSBOW_AMMO1_ITEM, STRING_CROSSBOW_AMMO1, -1, 0);
 	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO2] = InventoryObjectDefinition(ID_CROSSBOW_AMMO2_ITEM, STRING_CROSSBOW_AMMO2, -1, 0);
 	m_objectsTable[INV_OBJECT_CROSSBOW_AMMO3] = InventoryObjectDefinition(ID_CROSSBOW_AMMO3_ITEM, STRING_CROSSBOW_AMMO3, -1, 0);
-	m_objectsTable[INV_OBJECT_PASSAPORT] = InventoryObjectDefinition(ID_INVENTORY_PASSPORT, STRING_PASSPORT, -1, 0);
+	m_objectsTable[INV_OBJECT_PASSPORT] = InventoryObjectDefinition(ID_INVENTORY_PASSPORT, STRING_PASSPORT, -1, 0);
 	m_objectsTable[INV_OBJECT_KEYS] = InventoryObjectDefinition(ID_INVENTORY_KEYS, STRING_CONTROLS, -1, 0x4000);
 	m_objectsTable[INV_OBJECT_SUNGLASSES] = InventoryObjectDefinition(ID_INVENTORY_SUNGLASSES, STRING_DISPLAY, -1, 0);
 	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_LARA_HOME, -1, 0);
@@ -640,53 +640,42 @@ void Inventory::LoadObjects(bool isReload)
 	if (Lara.crowbar)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROWBAR);
 
-	int i = 0;
-	do
+	int i;
+	for (i = 0; i < 8; i++)
 	{
 		if (Lara.puzzleItems[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1);
-		i++;
-	} while (i < 8);
+	}
 
-	i = 0;
-	do
+	for (i = 0; i < 16; i++)
 	{
 		if ((1 << i) & Lara.puzzleItemsCombo)
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1_COMBO1);
-		i++;
-	} while (i < 16);
+	}
 
-	i = 0;
-	do
+	for (i = 0; i < 8; i++)
 	{
 		if ((1 << i) & Lara.keyItems)
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1);
-		i++;
-	} while (i < 8);
+	}
 
-	i = 0;
-	do
+	for (i = 0; i < 16; i++)
 	{
 		if ((1 << i) & Lara.keyItemsCombo)
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1_COMBO1);
-		i++;
-	} while (i < 16);
+	}
 
-	i = 0;
-	do
+	for (i = 0; i < 4; i++)
 	{
 		if ((1 << i) & Lara.pickupItems)
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1);
-		i++;
-	} while (i < 4);
+	}
 
-	i = 0;
-	do
+	for (i = 0; i < 8; i++)
 	{
 		if ((1 << i) & Lara.pickupItemsCombo)
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1_COMBO1);
-		i++;
-	} while (i < 8);
+	}
 
 	if (Lara.examine1)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_EXAMINE1);
@@ -712,7 +701,7 @@ void Inventory::LoadObjects(bool isReload)
 	if (g_LaraExtra.Waterskin2.Present)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WATERSKIN2);
 
-	InventoryRing * ring = &m_rings[INV_RING_OPTIONS];
+	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
 
 	// Reset the objects in inventory
 	ring->numObjects = 0;
@@ -727,7 +716,7 @@ void Inventory::LoadObjects(bool isReload)
 		ring->objects[j].scale = 2.0f;
 	}
 
-	InsertObject(INV_RING_OPTIONS, INV_OBJECT_PASSAPORT);
+	InsertObject(INV_RING_OPTIONS, INV_OBJECT_PASSPORT);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_SUNGLASSES);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_HEADPHONES);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_KEYS);
@@ -735,7 +724,7 @@ void Inventory::LoadObjects(bool isReload)
 
 void Inventory::SelectObject(int r, int object, float scale)
 {
-	if (object != -1)
+	if (object != NO_ITEM)
 	{
 		InventoryRing* ring = &m_rings[r];
 
@@ -865,9 +854,7 @@ int Inventory::DoInventory()
 			result = INV_RESULT_NONE;
 			break;
 		}
-		else if (DbInput & IN_FORWARD &&
-			(m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 ||
-				m_activeRing == INV_RING_OPTIONS))
+		else if (DbInput & IN_FORWARD && (m_activeRing == INV_RING_WEAPONS && m_rings[INV_RING_PUZZLES].numObjects != 0 || m_activeRing == INV_RING_OPTIONS))
 		{
 			SoundEffect(SFX_MENU_ROTATE, NULL, 0);
 
@@ -879,9 +866,7 @@ int Inventory::DoInventory()
 
 			SwitchRing(m_activeRing, newRing, -1);
 			m_activeRing = newRing;
-
 			m_movement = 0;
-
 			continue;
 		}
 		else if (DbInput & IN_BACK && (m_activeRing == INV_RING_PUZZLES || m_activeRing == INV_RING_WEAPONS))
@@ -896,9 +881,7 @@ int Inventory::DoInventory()
 
 			SwitchRing(m_activeRing, newRing, 1);
 			m_activeRing = newRing;
-
 			m_movement = 0;
-
 			continue;
 		}
 		else if (DbInput & IN_LEFT)
@@ -912,7 +895,6 @@ int Inventory::DoInventory()
 			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				m_rings[m_activeRing].rotation += deltaAngle;
-
 				UpdateSceneAndDrawInventory();
 			}
 
@@ -935,7 +917,6 @@ int Inventory::DoInventory()
 			for (int i = 0; i < INV_NUM_FRAMES_ROTATE; i++)
 			{
 				m_rings[m_activeRing].rotation -= deltaAngle;
-
 				UpdateSceneAndDrawInventory();
 			}
 
@@ -952,7 +933,7 @@ int Inventory::DoInventory()
 			// Handle action 
 			if (m_activeRing == INV_RING_OPTIONS)
 			{
-				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
+				if (m_rings[INV_RING_OPTIONS].objects[m_rings[INV_RING_OPTIONS].currentObject].inventoryObject == INV_OBJECT_PASSPORT)
 				{
 					int passportResult = DoPassport();
 					if (passportResult == INV_RESULT_NEW_GAME ||
@@ -1781,6 +1762,7 @@ void Inventory::UseCurrentItem()
 		}
 	}
 
+	// TODO: can cause problem with harpoongun in underwater and wading !
 	bool canUseWeapons = !(LaraItem->currentAnimState == STATE_LARA_CRAWL_IDLE || 
 						   LaraItem->currentAnimState == STATE_LARA_CRAWL_FORWARD ||
 						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TURN_LEFT || 
@@ -2001,7 +1983,7 @@ void Inventory::InitialiseTitle()
 		ring->objects[j].scale = INV_OBJECTS_SCALE;
 	}
 
-	InsertObject(INV_RING_OPTIONS, INV_OBJECT_PASSAPORT);
+	InsertObject(INV_RING_OPTIONS, INV_OBJECT_PASSPORT);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_POLAROID);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_SUNGLASSES);
 	InsertObject(INV_RING_OPTIONS, INV_OBJECT_HEADPHONES);
@@ -2129,7 +2111,7 @@ int Inventory::DoTitleInventory()
 		{
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
-			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_PASSAPORT)
+			if (ring->objects[ring->currentObject].inventoryObject == INV_OBJECT_PASSPORT)
 			{
 				int passportResult = DoPassport();
 				if (passportResult == INV_RESULT_NEW_GAME ||

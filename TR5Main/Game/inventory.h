@@ -130,7 +130,7 @@ void Inject_Inventory();
 #define INV_OBJECT_BOTTLE			98
 
 // New objects for TR3 style inventory
-#define INV_OBJECT_PASSAPORT		100
+#define INV_OBJECT_PASSPORT		100
 #define INV_OBJECT_KEYS				101
 #define INV_OBJECT_SUNGLASSES		102
 #define INV_OBJECT_HEADPHONES		103

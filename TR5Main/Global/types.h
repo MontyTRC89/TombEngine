@@ -493,7 +493,7 @@ typedef struct object_info_t {
 	void(*ceiling)(ITEM_INFO* item, int x, int y, int z, int* height); // size=0, offset=24
 	void(*drawRoutine)(ITEM_INFO* item); // size=0, offset=28
 	void(*collision)(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll); // size=0, offset=32
-	short objectMip; // size=0, offset=36
+	short zoneType; // size=0, offset=36
 	short animIndex; // size=0, offset=38
 	short hitPoints; // size=0, offset=40
 	short pivotLength; // size=0, offset=42
@@ -509,7 +509,7 @@ typedef struct object_info_t {
 	unsigned short saveAnim : 1; // offset=50.6
 	unsigned short semiTransparent : 1; // offset=50.7
 	unsigned short waterCreature : 1; // offset=51.0
-	unsigned short usingDrawanimatingItem : 1; // offset=51.1
+	unsigned short usingDrawAnimatingItem : 1; // offset=51.1
 	unsigned short hitEffect : 2; // offset=51.2
 	unsigned short undead : 1; // offset=51.4
 	unsigned short saveMesh : 1; // offset=51.5
