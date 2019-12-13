@@ -1148,7 +1148,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		obj->usingDrawanimatingItem = false;
+		obj->usingDrawAnimatingItem = false;
 	}
 	else
 	{
@@ -1933,7 +1933,7 @@ void BaddyObjects()
 		obj->saveHitpoints = false;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->usingDrawanimatingItem = false;
+		obj->usingDrawAnimatingItem = false;
 		obj->hitEffect = 0;
 		obj->undead = true; // ??
 	}
@@ -1952,7 +1952,7 @@ void BaddyObjects()
 		obj->saveHitpoints = false;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->usingDrawanimatingItem = false;
+		obj->usingDrawAnimatingItem = false;
 		obj->hitEffect = 1;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -2952,31 +2952,6 @@ void TrapObjects()
 	}
 }
 
-void InitialiseHair()
-{
-	int* bone;
-
-	FirstHair = 1;
-	bone = &Bones[Objects[ID_HAIR].boneIndex];
-
-	Hairs[0].pos.yRot = 0;
-	Hairs[0].pos.xRot = -0x4000;
-
-	// normal hair
-	for (int i = 1; i < HAIR_SEGMENTS; i++, bone += 4)
-	{
-		Hairs[i].pos.xPos = *(bone + 1);
-		Hairs[i].pos.yPos = *(bone + 2);
-		Hairs[i].pos.zPos = *(bone + 3);
-		Hairs[i].pos.xRot = -0x4000;
-		Hairs[i].pos.yRot = 0;
-		Hairs[i].pos.zRot = 0;
-		//Hairs[i].hvel.x = 0;
-		//Hairs[i].hvel.y = 0;
-		//Hairs[i].hvel.z = 0;
-	}
-}
-
 void InitialiseSpecialEffects()
 {
 	int i;
@@ -3753,9 +3728,13 @@ void InitialiseObjects()
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
 		obj = &Objects[i];
-		obj->drawRoutine = DrawAnimatingItem;
+		obj->initialise = NULL;
+		obj->collision = NULL;
+		obj->control = NULL;
 		obj->floor = NULL;
 		obj->ceiling = NULL;
+		obj->drawRoutine = DrawAnimatingItem;
+		obj->drawRoutineExtra = NULL;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowSize = 0;
@@ -3768,6 +3747,11 @@ void InitialiseObjects()
 		obj->saveFlags = false;
 		obj->saveHitpoints = false;
 		obj->savePosition = false;
+		obj->nonLot = true;
+		obj->usingDrawAnimatingItem = true;
+		obj->semiTransparent = false;
+		obj->undead = false;
+		obj->zoneType = ZONE_BASIC;
 		obj->frameBase += (short)Frames;
 	}
 

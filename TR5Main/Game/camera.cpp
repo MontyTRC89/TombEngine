@@ -4,9 +4,7 @@
 #include <stdio.h>
 #include "draw.h"
  
-void LookAt(int posX, int posY, int posZ,
-	int targetX, int targetY, int targetZ,
-	short roll)
+void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll)
 {
 	Vector3 position = Vector3(posX, posY, posZ);
 	Vector3 target = Vector3(targetX, targetY, targetZ);

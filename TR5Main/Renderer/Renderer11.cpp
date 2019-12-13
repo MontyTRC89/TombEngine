@@ -5981,7 +5981,7 @@ int Renderer11::drawInventoryScene()
 				if (g_Inventory->GetActiveRing() == INV_RING_OPTIONS)
 				{
 					/* **************** PASSAPORT ************* */
-					if (inventoryItem == INV_OBJECT_PASSAPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					if (inventoryItem == INV_OBJECT_PASSPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						/* **************** LOAD AND SAVE MENU ************* */
 						if (ring->passportAction == INV_WHAT_PASSPORT_LOAD_GAME || ring->passportAction == INV_WHAT_PASSPORT_SAVE_GAME)
