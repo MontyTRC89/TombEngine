@@ -5299,7 +5299,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//13C24, 13CD4
 	item->pos.yRot = oldYrot;
 	Lara.moveAngle = oldYrot;
 
-	if ((LaraFloorFront(item, oldYrot - ANGLE(90), 116) & 0x8000) != 0)
+	if (LaraFloorFront(item, oldYrot - ANGLE(90), 116) < 0)
 		return 0;
 
 	switch (angle)
@@ -5423,7 +5423,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//13738, 137E8
 	Lara.cornerX = x;
 	item->pos.zPos = z;
 	Lara.cornerZ = z;
-	item->pos.yRot -= ANGLE(90);
+	item->pos.yRot += ANGLE(90);
 
 	int result = -IsValidHangPos(item, coll);
 	if (result)
@@ -5457,7 +5457,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//13738, 137E8
 	item->pos.yRot = oldYrot;
 	Lara.moveAngle = oldYrot;
 
-	if ((LaraFloorFront(item, oldYrot - ANGLE(90), 116) & 0x8000) != 0)
+	if (LaraFloorFront(item, oldYrot + ANGLE(90), 116) < 0)
 		return 0;
 
 	switch (angle)
@@ -5488,7 +5488,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//13738, 137E8
 	Lara.cornerX = x;
 	item->pos.zPos = z;
 	Lara.cornerZ = z;
-	item->pos.yRot += ANGLE(90);
+	item->pos.yRot -= ANGLE(90);
 
 	result = IsValidHangPos(item, coll);
 	if (!result)
