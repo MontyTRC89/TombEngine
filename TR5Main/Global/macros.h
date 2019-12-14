@@ -7,11 +7,13 @@
 #define WHITE555 RGB555(255, 255, 255)
 #define GRAY555  RGB555(128, 128, 128)
 #define BLACK555 RGB555(  0,   0,   0)
-#define XZ_GET_SECTOR(room, x, z) (r->floor[((z) >> WALL_SHIFT) + ((x) >> WALL_SHIFT) * r->xSize])
+#define XZ_GET_SECTOR(room, x, z) (room->floor[((z) >> WALL_SHIFT) + ((x) >> WALL_SHIFT) * room->xSize])
 
 #define ADD_PTR(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n)); 
 
-#define ZONE(A) (((A) >> (WALL_SIZE - 2)) - 1)
+///#define ZONE(A) (((A) >> (WALL_SIZE - 2)) - 1)
+#define ZONE(A) FlipStatus + 2 * A
+#define CHECK_CLICK(x) CLICK(x) / 2
 
 #define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh * 2]
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
