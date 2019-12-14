@@ -1370,14 +1370,13 @@ void AlterFloorHeight(ITEM_INFO* item, int height)
 	}
 }
 
-FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber)
+FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 {
 	FLOOR_INFO* floor;
-
 	int xFloor = 0;
 	int yFloor = 0;
-
 	short roomDoor = 0;
+	int retval;
 
 	ROOM_INFO* r = &Rooms[*roomNumber];
 
@@ -1413,15 +1412,62 @@ FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber)
 			yFloor = 0;
 		}
 
-		floor = &r->floor[xFloor + yFloor * r->xSize];
+		floor = &r->floor[xFloor + (yFloor * r->xSize)];
 		data = GetDoor(floor);
 		if (data != NO_ROOM)
 		{
 			*roomNumber = data;
-			r = &Rooms[*roomNumber];
+			r = &Rooms[data];
 		}
 	} while (data != NO_ROOM);
 
+	if (y >= (floor->floor * 256))
+	{
+		do
+		{
+			if (floor->pitRoom == NO_ROOM)
+				return floor;
+
+			retval = CheckNoColFloorTriangle(floor, x, z);
+			if (retval == 1)
+				break;
+
+			if (retval == -1)
+			{
+				if (y < r->minfloor)
+					break;
+			}
+
+			*roomNumber = floor->pitRoom;
+			r = &Rooms[floor->pitRoom];
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		}
+		while (y >= (floor->floor * 256));
+	}
+	else if (y < (floor->ceiling * 256))
+	{
+		do
+		{
+			if (floor->skyRoom == NO_ROOM)
+				return floor;
+
+			retval = CheckNoColCeilingTriangle(floor, x, z);
+			if (retval == 1)
+				break;
+
+			if (retval == -1)
+			{
+				if (y >= r->maxceiling)
+					break;
+			}
+
+			*roomNumber = floor->pitRoom;
+			r = &Rooms[floor->pitRoom];
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+		}
+		while (y < (floor->ceiling * 256));
+	}
+	/*
 	if (y < floor->floor * 256)
 	{
 		if (y < floor->ceiling * 256 && floor->skyRoom != NO_ROOM)
@@ -1455,6 +1501,7 @@ FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber)
 				break;
 		} while (floor->pitRoom != NO_ROOM);
 	}
+	*/
 	return floor;
 }
 
@@ -1471,9 +1518,9 @@ int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z)
 		int dx = x & 1023;
 		int dz = z & 1023;
 
-		if (type == NOCOLF1T && dx <= (1024 - dz))
+		if (type == NOCOLF1T && dx <= (SECTOR(1) - dz))
 			return -1;
-		else if (type == NOCOLF1B && dx > (1024 - dz))
+		else if (type == NOCOLF1B && dx > (SECTOR(1) - dz))
 			return -1;
 		else if (type == NOCOLF2T && dx <= dz)
 			return -1;
@@ -1506,9 +1553,9 @@ int CheckNoColCeilingTriangle(FLOOR_INFO * floor, int x, int z)
 		int dx = x & 1023;
 		int dz = z & 1023;
 
-		if (type == NOCOLC1T && dx <= (1024 - dz))
+		if (type == NOCOLC1T && dx <= (SECTOR(1) - dz))
 			return -1;
-		else if (type == NOCOLC1B && dx > (1024 - dz))
+		else if (type == NOCOLC1B && dx > (SECTOR(1) - dz))
 			return -1;
 		else if (type == NOCOLC2T && dx <= dz)
 			return -1;
@@ -1526,7 +1573,7 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 	TiltYOffset = 0;
 	TiltXOffset = 0;
 	OnObject = 0;
-	HeightType = 0;
+	HeightType = WALL;
 
 	ROOM_INFO* r;
 	while (floor->pitRoom != NO_ROOM)

@@ -28,7 +28,7 @@
 //#define CreatureCreature ((int(__cdecl*)(short)) 0x00409E20)
 //#define DropBaddyPickups ((int(__cdecl*)(ITEM_INFO*)) 0x0040C5A0)
 //#define CreatureCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004124E0)
-#define CreatureTurn ((short (__cdecl*)(ITEM_INFO*, short)) 0x0040AE90)
+//#define CreatureTurn ((short (__cdecl*)(ITEM_INFO*, short)) 0x0040AE90)
 #define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 #define _AIGuard ((short(__cdecl*)(CREATURE_INFO*)) 0x0040BBE0)
 #define _GetAITarget ((void(__cdecl*)(CREATURE_INFO*)) 0x0040BCC0)
@@ -55,7 +55,7 @@ void CreatureUnderwater(ITEM_INFO* item, int depth);
 void CreatureFloat(short itemNumber);
 void CreatureJoint(ITEM_INFO* item, short joint, short required);
 void CreatureTilt(ITEM_INFO* item, short angle);
-//short _CreatureTurn(ITEM_INFO* item, short maximumTurn);
+short CreatureTurn(ITEM_INFO* item, short maximumTurn);
 void CreatureDie(short itemNumber, int explode);
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT);
 int CreatureCreature(short itemNumber);

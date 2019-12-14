@@ -5,13 +5,15 @@
 
 #define TEXTURE_PAGE	(256 * 256)
 
+#define PREDICTIVE_SCALE_FACTOR 14
 #define W2V_SHIFT 		14					// Shift scale of View.Frame to World.Frame
+#define NODE_SHIFT      15
 #define	W2V_SCALE 		(1 << W2V_SHIFT)	// Scale of View Frame to World Frame
 #define WALL_SHIFT		10
 #define STEP_SIZE		256
 #define	WALL_SIZE		1024
 
-/// obj->hitEffect flag
+/// obj->hitEFFect flag
 #define HIT_NONE     0
 #define HIT_BLOOD    1
 #define HIT_SMOKE    2
@@ -35,7 +37,7 @@
 #define ROT_Y 8
 #define ROT_Z 16
 
-#define FRONT_ARC		0x4000
+#define FRONT_ARC		ANGLE(90)
 #define NO_ITEM			-1
 
 #define GAME_BUFFER_SIZE	128 * 1000000
@@ -90,6 +92,7 @@
 #define ENV_FLAG_MIST				0x0100
 #define ENV_FLAG_CAUSTICS			0x0200
 #define ENV_FLAG_UNKNOWN3			0x0400
+#define ENV_FLAG_SWAMP              0x0800
 
 // From TR3, we need to check
 #define	SP_FLAT			1
@@ -111,7 +114,7 @@
 
 #define DATA_TYPE 0x1F
 #define END_BIT 0x8000
-#define VALUE_BITS  0x3ff
+#define VALUE_BITS  0x3FF
 
 #define NUM_BATS	64
 #define NUM_SPIDERS	64
@@ -124,20 +127,22 @@
 #define WEAPON_AMMO3 2
 #define WEAPON_AMMO4 3
 
-#define BLOCKABLE     0x8000
-#define BLOCKED       0x4000
-#define OVERLAP_INDEX 0x3fff
-#define SEARCH_NUMBER  0x7fff
+#define BLOCKABLE      0x8000
+#define BLOCKED        0x4000
+#define OVERLAP_INDEX  0x3FFF
+#define SEARCH_NUMBER  0x7FFF
 #define BLOCKED_SEARCH 0x8000
 
 #define FOLLOW_CENTRE 	1
 #define NO_CHUNKY     	2
 #define CHASE_OBJECT  	3
-#define NO_MINY		0xffffff
+#define NO_MINY		0xFFFFFF
 
-#define NO_BOX  0x7ff
+#define NO_BOX  0x7FF
+#define BOX_JUMP 0x800
+#define BOX_MONKEY 0x2000
 
-#define BOX_NUMBER  0x7ff
+#define BOX_NUMBER  0x7FF
 #define BOX_END_BIT	0x8000
 
 #define EXPAND_LEFT   0x1

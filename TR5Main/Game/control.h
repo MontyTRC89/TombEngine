@@ -63,7 +63,7 @@ void AlterFloorHeight(ITEM_INFO* item, int height);
 int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
-FLOOR_INFO* GetFloor(int x, signed int y, int z, short* roomNumber);
+FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
