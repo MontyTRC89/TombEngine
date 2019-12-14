@@ -1240,9 +1240,9 @@ int CreatureVault(short itemNum, short angle, int vault, int shift)
 
 void GetAITarget(CREATURE_INFO* creature)
 {
-#define GET_REACHED_GOAL abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&\
-	                     abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&\
-					     abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS
+#define GET_REACHED_GOAL	abs(enemy->pos.xPos - item->pos.xPos) < REACHED_GOAL_RADIUS &&\
+							abs(enemy->pos.zPos - item->pos.zPos) < REACHED_GOAL_RADIUS &&\
+							abs(enemy->pos.yPos - item->pos.yPos) < REACHED_GOAL_RADIUS
 
 	ITEM_INFO* enemy;
 	ITEM_INFO* item;
