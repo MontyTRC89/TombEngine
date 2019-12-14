@@ -1521,7 +1521,7 @@ int CheckNoColCeilingTriangle(FLOOR_INFO * floor, int x, int z)
 	return 0;
 }
 
-int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
+int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 {
 	TiltYOffset = 0;
 	TiltXOffset = 0;
@@ -1572,7 +1572,7 @@ int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 			break;
 
 		case TILT_TYPE:
-			TiltXOffset = xOff = *data >> 8;
+			TiltXOffset = xOff = (*data >> 8) & 0xFF;
 			TiltYOffset = yOff = *data & 0xFF;
 
 			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
@@ -1581,14 +1581,14 @@ int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 				HeightType = SMALL_SLOPE;
 
 			if (xOff >= 0)
-				height += (xOff * ((-1 - z) & 0x3FF) >> 2);
+				height += (xOff * ((-1 - z) & 1023) >> 2);
 			else
-				height -= (xOff * (z & 0x3FF) >> 2);
+				height -= (xOff * (z & 1023) >> 2);
 
 			if (yOff >= 0)
-				height += yOff * ((-1 - x) & 0x3FF) >> 2;
+				height += yOff * ((-1 - x) & 1023) >> 2;
 			else
-				height += yOff * (x & 0x3FF) >> 2;
+				height -= yOff * (x & 1023) >> 2;
 
 			data++;
 			break;
@@ -1661,19 +1661,19 @@ int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 			{
 				if (dx <= (1024 - dz))	 
 				{
-					hadj = (type >> 10) & 0x1f;
+					hadj = (type >> 10) & 0x1F;
 					if (hadj & 0x10) 
 						hadj |= 0xfff0;
-					height += hadj << 8;
+					height += 256 * hadj;
 					xOff = t2 - t1;
 					yOff = t0 - t1;
 				}
 				else
 				{
-					hadj = (type >> 5) & 0x1f;
+					hadj = (type >> 5) & 0x1F;
 					if (hadj & 0x10) 
-						hadj |= 0xfff0;
-					height += hadj << 8;
+						hadj |= 0xFFF0;
+					height += 256 * hadj;
 					xOff = t3 - t0;
 					yOff = t3 - t2;
 				}
@@ -1685,7 +1685,7 @@ int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 					hadj = (type >> 10) & 0x1f;
 					if (hadj & 0x10) 
 						hadj |= 0xfff0;
-					height += hadj << 8;
+					height += 256 * hadj;
 					xOff = t2 - t1;
 					yOff = t3 - t2;
 				}
@@ -1694,7 +1694,7 @@ int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 					hadj = (type >> 5) & 0x1f;
 					if (hadj & 0x10) 
 						hadj |= 0xfff0;
-					height += hadj << 8;
+					height += 256 * hadj;
 					xOff = t3 - t0;
 					yOff = t0 - t1;
 
@@ -1710,14 +1710,14 @@ int _GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 				HeightType = SMALL_SLOPE;
 
 			if (xOff >= 0)
-				height += xOff * ((-1 - z) & 0x3FF) >> 2;
+				height += xOff * ((-1 - z) & 1023) >> 2;
 			else
-				height -= xOff * (z & 0x3FF) >> 2;
+				height -= xOff * (z & 1023) >> 2;
 			
 			if (yOff >= 0)
-				height += yOff * ((-1 - x) & 0x3FF) >> 2;
+				height += yOff * ((-1 - x) & 1023) >> 2;
 			else
-				height -= yOff * (x & 0x3FF) >> 2;
+				height -= yOff * (x & 1023) >> 2;
 
 			data++;
 			break;
