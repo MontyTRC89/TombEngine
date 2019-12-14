@@ -410,9 +410,9 @@ int GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 {
 	while (floor->pitRoom != NO_ROOM)
 	{
-		ROOM_INFO* r = &Rooms[floor->pitRoom];
 		if (CheckNoColFloorTriangle(floor, x, z) == 1)
 			break;
+		ROOM_INFO* r = &Rooms[floor->pitRoom];
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
@@ -444,26 +444,37 @@ int GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 	int t2 = (tilts >> 8) & 0xF;
 	int t3 = (tilts >> 12) & 0xF;
 	
-	int dx = x & 0x3FF;
-	int dz = z & 0x3FF;
+	int dx = x & 1023;
+	int dz = z & 1023;
+
+	short xOff = 0;
+	short yOff = 0;
 
 	if (func == SPLIT1 || func == NOCOLF1T || func == NOCOLF1B)
 	{
 		if (dx > 1024 - dz)
-			return ((t3 - t0) << 8) | (t3 - t2);
+		{
+			xOff = t3 - t0;
+			yOff = t3 - t2;
+		}
 		else
-			return ((t2 - t1) << 8) | (t0 - t1);
+		{
+			xOff = t2 - t1;
+			yOff = t0 - t1;
+		}
 	}
 	else if (dx > dz)
 	{
-		return ((t3 - t0) << 8) | (t0 - t1);
+		xOff = t3 - t0;
+		yOff = t0 - t1;
 	}
 	else
 	{
-		return ((t2 - t1) << 8) | (t3 - t2);
+		xOff = t2 - t1;
+		yOff = t3 - t2;
 	}
 
-	return 0;
+	return ((xOff << 8) | (yOff & 0xFF));
 }
 
 int FindGridShift(int x, int z)
