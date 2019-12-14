@@ -5009,14 +5009,14 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 
 			if (LOS(&s, &d))
 			{
-				// CHECK
+				// TODO: fix ObjectOnLOS2
 				/*if (ObjectOnLOS2(&s, &d, &v, (PHD_VECTOR*)&StaticMesh) == 999)
-				{
+				{*/
 					item->animNumber = ANIMATION_LARA_CRAWL_JUMP_DOWN;
 					item->frameNumber = Anims[item->animNumber].frameBase;
 					item->goalAnimState = STATE_LARA_MISC_CONTROL;
 					item->currentAnimState = STATE_LARA_MISC_CONTROL;
-				}*/
+				/*}*/
 			}
 		}
 	}
