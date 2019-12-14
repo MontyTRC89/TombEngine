@@ -536,6 +536,14 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 		sprintf(fileName, "savegame.%d", g_GameFlow->SelectedSaveGame);
 		SaveGame::Load(fileName);
 
+		Camera.pos.x = LaraItem->pos.xPos + 256;
+		Camera.pos.y = LaraItem->pos.yPos + 256;
+		Camera.pos.z = LaraItem->pos.zPos + 256;
+
+		Camera.target.x = LaraItem->pos.xPos;
+		Camera.target.y = LaraItem->pos.yPos;
+		Camera.target.z = LaraItem->pos.zPos;
+
 		RequiredStartPos = false;
 		InitialiseGame = false;
 		g_GameFlow->SelectedSaveGame = 0;
