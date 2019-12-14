@@ -45,9 +45,7 @@ public:
 
 		// TODO: future use for compression
 		m_stream->Seek(4, SEEK_ORIGIN::CURRENT);
-
 		m_emptyChunk = new ChunkId(NULL, 0);
-
 		m_isValid = true;
 	}
 
@@ -56,12 +54,12 @@ public:
 		delete m_emptyChunk;
 	}
 
-	bool ChunkReader::IsValid()
+	bool IsValid()
 	{
 		return m_isValid;
 	}
 
-	bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg)
+	bool ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg)
 	{
 		do
 		{

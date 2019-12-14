@@ -38,9 +38,9 @@ public:
 			delete m_chunkBytes;
 	}
 
-	static ChunkId* FromString(char* str)
+	static ChunkId* FromString(const char* str)
 	{
-		return new ChunkId(str, strlen(str));
+		return new ChunkId((char*)str, strlen(str));
 	}
 
 	static ChunkId* FromString(string* str)

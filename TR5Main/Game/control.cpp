@@ -1335,7 +1335,12 @@ int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 
 void AlterFloorHeight(ITEM_INFO* item, int height)
 {
+	FLOOR_INFO* floor;
+	FLOOR_INFO* ceiling;
+	BOX_INFO* box;
+	short roomNumber;
 	int flag = 0;
+
 	if (abs(height))
 	{
 		flag = 1;
@@ -1345,42 +1350,42 @@ void AlterFloorHeight(ITEM_INFO* item, int height)
 			height--;
 	}
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	FLOOR_INFO* ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - 1024, item->pos.zPos, &roomNumber);
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - WALL_SIZE, item->pos.zPos, &roomNumber);
 	
-	if (floor->floor == -127)
+	if (floor->floor == NO_HEIGHT/STEP_SIZE)
 	{
-		floor->floor = ceiling->ceiling + (((height >> 31) + height) >> 8);
+		floor->floor = ceiling->ceiling + height/STEP_SIZE;
 	}
 	else
 	{
-		floor->floor += (((height >> 31) + height) >> 8);
+		floor->floor += height/STEP_SIZE;
 		if (floor->floor == ceiling->ceiling && !flag)
-			floor->floor = -127;
+			floor->floor = NO_HEIGHT/STEP_SIZE;
 	}
 
-	BOX_INFO* box = &Boxes[floor->box];
-	if (box->overlapIndex & 0x8000)
+	box = &Boxes[floor->box];
+	if (box->overlapIndex & BLOCKABLE)
 	{
 		if (height >= 0)
-			box->overlapIndex &= ~0x4000;
+			box->overlapIndex &= ~BLOCKED;
 		else
-			box->overlapIndex |= 0x4000;
+			box->overlapIndex |= BLOCKED;
 	}
 }
 
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 {
+	ROOM_INFO* r;
 	FLOOR_INFO* floor;
+	short data;
 	int xFloor = 0;
 	int yFloor = 0;
 	short roomDoor = 0;
 	int retval;
 
-	ROOM_INFO* r = &Rooms[*roomNumber];
-
-	short data;
+	r = &Rooms[*roomNumber];
 	do
 	{
 		xFloor = (z - r->z) >> WALL_SHIFT;
@@ -1421,53 +1426,6 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 		}
 	} while (data != NO_ROOM);
 
-	if (y >= (floor->floor * 256))
-	{
-		do
-		{
-			if (floor->pitRoom == NO_ROOM)
-				return floor;
-
-			retval = CheckNoColFloorTriangle(floor, x, z);
-			if (retval == 1)
-				break;
-
-			if (retval == -1)
-			{
-				if (y < r->minfloor)
-					break;
-			}
-
-			*roomNumber = floor->pitRoom;
-			r = &Rooms[floor->pitRoom];
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-		}
-		while (y >= (floor->floor * 256));
-	}
-	else if (y < (floor->ceiling * 256))
-	{
-		do
-		{
-			if (floor->skyRoom == NO_ROOM)
-				return floor;
-
-			retval = CheckNoColCeilingTriangle(floor, x, z);
-			if (retval == 1)
-				break;
-
-			if (retval == -1)
-			{
-				if (y >= r->maxceiling)
-					break;
-			}
-
-			*roomNumber = floor->pitRoom;
-			r = &Rooms[floor->pitRoom];
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-		}
-		while (y < (floor->ceiling * 256));
-	}
-	/*
 	if (y < floor->floor * 256)
 	{
 		if (y < floor->ceiling * 256 && floor->skyRoom != NO_ROOM)
@@ -1496,12 +1454,12 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 
 			*roomNumber = floor->pitRoom;
 			r = &Rooms[floor->pitRoom];
-			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);   
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 			if (y < floor->floor * 256)
 				break;
 		} while (floor->pitRoom != NO_ROOM);
 	}
-	*/
+
 	return floor;
 }
 

@@ -264,7 +264,7 @@ public:
 		rt->DepthStencilTexture = NULL;
 		res = device->CreateTexture2D(&depthTexDesc, NULL, &rt->DepthStencilTexture);
 		if (FAILED(res))
-			return false;
+			return NULL;
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 		ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
@@ -276,7 +276,7 @@ public:
 		rt->DepthStencilView = NULL;
 		res = device->CreateDepthStencilView(rt->DepthStencilTexture, &dsvDesc, &rt->DepthStencilView);
 		if (FAILED(res))
-			return false;
+			return NULL;
 
 		return rt;
 	}
@@ -347,7 +347,7 @@ public:
 		return texture;
 	}
 
-	static Texture2D* LoadFromFile(ID3D11Device* device, char* fileName)
+	static Texture2D* LoadFromFile(ID3D11Device* device, const char* fileName)
 	{
 		Texture2D* texture = new Texture2D();
 
@@ -832,8 +832,8 @@ private:
 	SpriteFont*										m_gameFont;
 	SpriteBatch*									m_spriteBatch;
 	vector<RendererStringToDraw>					m_strings;
-	int											m_blinkColorValue;
-	int											m_blinkColorDirection;
+	int												m_blinkColorValue;
+	int												m_blinkColorDirection;
 	PrimitiveBatch<RendererVertex>*					m_primitiveBatch;
 
 	// System resources
@@ -873,31 +873,31 @@ private:
 	PreallocatedVector<RendererLine2D>				m_lines2DToDraw;
 	PreallocatedVector<RendererLight>				m_tempItemLights;
 	RendererSpriteToDraw*							m_spritesBuffer;
-	int											m_nextSprite;
+	int												m_nextSprite;
 	RendererLine3D*									m_lines3DBuffer;
-	int											m_nextLine3D;
+	int												m_nextLine3D;
 	RendererLine2D*									m_lines2DBuffer;
-	int											m_nextLine2D;
+	int												m_nextLine2D;
 	RendererLight*									m_shadowLight;
 	RendererObject**								m_moveableObjects;
 	RendererObject**								m_staticObjects;
 	RendererSprite**								m_sprites;
-	int											m_numMoveables;
-	int											m_numStatics;
-	int											m_numSprites;
-	int											m_numSpritesSequences;
+	int												m_numMoveables;
+	int												m_numStatics;
+	int												m_numSprites;
+	int												m_numSpritesSequences;
 	RendererSpriteSequence**						m_spriteSequences;
 	unordered_map<unsigned int, RendererMesh*>		m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
 	RendererAnimatedTextureSet**					m_animatedTextureSets;
-	int											m_numAnimatedTextureSets;
-	int											m_currentCausticsFrame;
+	int												m_numAnimatedTextureSets;
+	int												m_currentCausticsFrame;
 	RendererUnderwaterDustParticle					m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool											m_firstUnderwaterDustParticles = true;
 	vector<RendererMesh*>							m_meshes;
 
 	// Debug variables
-	int											m_numDrawCalls = 0;
+	int												m_numDrawCalls = 0;
 
 	// Preallocated pools of objects for avoiding new/delete
 	// Items and effects are safe (can't be more than 1024 items in TR), 
@@ -905,13 +905,13 @@ private:
 	RendererItem									m_items[NUM_ITEMS];
 	RendererEffect									m_effects[NUM_ITEMS];
 	RendererLight									m_lights[MAX_LIGHTS];
-	int											m_nextLight;
-	int											m_currentY;
+	int												m_nextLight;
+	int												m_currentY;
 
 	// Times for debug
-	int											m_timeUpdate;
-	int											m_timeDraw;
-	int											m_timeFrame;
+	int												m_timeUpdate;
+	int												m_timeDraw;
+	int												m_timeFrame;
 
 	// Others
 	bool											m_firstWeather;
@@ -919,19 +919,19 @@ private:
 	RendererWeatherParticle							m_snow[NUM_SNOW_PARTICLES];
 	RENDERER_FADE_STATUS							m_fadeStatus;
 	float											m_fadeFactor;
-	int											m_progress;
+	int												m_progress;
 	bool											m_enableCinematicBars = false;
-	int											m_pickupRotation;
+	int												m_pickupRotation;
 
 	// Private functions
 	bool											drawScene(bool dump);
 	bool											drawAllStrings();
-	ID3D11VertexShader*								compileVertexShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode);
-	ID3D11GeometryShader*							compileGeometryShader(char* fileName);
-	ID3D11PixelShader*								compilePixelShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode);
-	ID3D11ComputeShader*							compileComputeShader(char* fileName);
+	ID3D11VertexShader*								compileVertexShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode);
+	ID3D11GeometryShader*							compileGeometryShader(const char* fileName);
+	ID3D11PixelShader*								compilePixelShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode);
+	ID3D11ComputeShader*							compileComputeShader(const char* fileName);
 	ID3D11Buffer*									createConstantBuffer(int size);
-	int											getAnimatedTextureInfo(short textureId);
+	int												getAnimatedTextureInfo(short textureId);
 	void											initialiseHairRemaps();
 	RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short* refMeshPtr, short boneIndex, int isJoints, int isHairs);
 	void											fromTrAngle(Matrix* matrix, short* frameptr, int index);
@@ -954,7 +954,7 @@ private:
 	void											updateLaraAnimations();
 	void											updateItemsAnimations();
 	void											updateEffects();
-	int											getFrame(short animation, short frame, short** framePtr, int* rate);
+	int												getFrame(short animation, short frame, short** framePtr, int* rate);
 	bool											drawAmbientCubeMap(short roomNumber);
 	bool											sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius);
 	bool											drawHorizonAndSky();
@@ -966,7 +966,7 @@ private:
 	bool											drawShadowMap();
 	bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
 	bool											drawLara(bool transparent, bool shadowMap);
-	void											printDebugMessage(char* message, ...);
+	void											printDebugMessage(LPCSTR message, ...);
 	void											drawFires();
 	void											drawSparks();
 	void											drawSmokes();
@@ -989,8 +989,8 @@ private:
 	bool											drawBar(int x, int y, int w, int h, int percent, int color1, int color2);
 	void											insertLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 	bool											drawDebris(bool transparent);
-	int											drawInventoryScene();
-	int											drawFinalPass();
+	int												drawInventoryScene();
+	int												drawFinalPass();
 	void											updateAnimatedTextures();
 	void											createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation);
 	void											drawShockwaves();
@@ -1013,10 +1013,10 @@ public:
 	Matrix											Projection;
 	Matrix											ViewProjection;
 	float											FieldOfView;
-	int											ScreenWidth;
-	int											ScreenHeight;
+	int												ScreenWidth;
+	int												ScreenHeight;
 	bool											Windowed;
-	int											NumTexturePages;
+	int												NumTexturePages;
 
 	Renderer11();
 	~Renderer11();
@@ -1024,13 +1024,13 @@ public:
 	bool											Create();
 	bool											EnumerateVideoModes();
 	bool											Initialise(int w, int h, int refreshRate, bool windowed, HWND handle);
-	int											Draw();
+	int												Draw();
 	bool											PrepareDataForTheRenderer();
 	void											UpdateCameraMatrices(float posX, float posY, float posZ, float targetX, float targetY, float targetZ, float roll, float fov);
-	int											DumpGameScene();
-	int											DrawInventory();
-	int											DrawPickup(short objectNum);
-	int											SyncRenderer();
+	int												DumpGameScene();
+	int												DrawInventory();
+	int												DrawPickup(short objectNum);
+	int												SyncRenderer();
 	bool											PrintString(int x, int y, char* string, D3DCOLOR color, int flags);
 	void											DrawDashBar();
 	void											DrawHealthBar(int percentual);

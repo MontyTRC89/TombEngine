@@ -220,7 +220,6 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	SoundSlot[freeSlot].origin = position ? Vector3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
 	
 	// Set 3D attributes
-	
 	BASS_ChannelSet3DAttributes(channel, position ? BASS_3DMODE_NORMAL : BASS_3DMODE_OFF, SOUND_MAXVOL_RADIUS, radius, 360, 360, 0.0f);
 	Sound_UpdateEffectPosition(freeSlot, position, true);
 
@@ -264,7 +263,7 @@ void Sound_FreeSamples()
 
 void S_CDPlay(short index, unsigned int mode)
 {
-	bool  crossfade = false;
+	bool crossfade = false;
 	DWORD crossfadeTime;
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
 
@@ -274,7 +273,7 @@ void S_CDPlay(short index, unsigned int mode)
 	mode = (mode >= NUM_SOUND_TRACK_TYPES) ? SOUND_TRACK_BGM : mode;
 
 	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[mode].channel);
-	if (channelActive && (BASS_Soundtrack[mode].trackID == index))
+	if (channelActive && BASS_Soundtrack[mode].trackID == index)
 		return;
 
 	switch (mode)
@@ -410,8 +409,7 @@ int Sound_GetFreeSlot()
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		if ((SoundSlot[i].channel == NULL) ||
-			!BASS_ChannelIsActive(SoundSlot[i].channel))
+		if (SoundSlot[i].channel == NULL || !BASS_ChannelIsActive(SoundSlot[i].channel))
 			return i;
 	}
 
@@ -673,7 +671,7 @@ void Sound_DeInit()
 	BASS_Free();
 }
 
-bool Sound_CheckBASSError(char* message, bool verbose, ...)
+bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 {
 	va_list argptr;
 	static char data[4096];
@@ -682,7 +680,7 @@ bool Sound_CheckBASSError(char* message, bool verbose, ...)
 	if (verbose || bassError)
 	{
 		va_start(argptr, verbose);
-		int32_t written = vsprintf(data, message, argptr);	// @TODO: replace with debug/console/message output later...
+		int32_t written = vsprintf(data, (char*)message, argptr);	// @TODO: replace with debug/console/message output later...
 		va_end(argptr);
 		snprintf(data + written, sizeof(data) - written, bassError ? ": error #%d \n" : ": success \n", bassError);
 		printf(data);

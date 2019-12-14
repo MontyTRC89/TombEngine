@@ -134,15 +134,11 @@ void Renderer11::FreeRendererData()
 	free(m_animatedTextureSets);
 
 	DX11_DELETE(m_textureAtlas);
-	DX11_DELETE(m_textureAtlas);
 	DX11_DELETE(m_skyTexture);
-
 	DX11_DELETE(m_roomsVertexBuffer);
 	DX11_DELETE(m_roomsIndexBuffer);
-
 	DX11_DELETE(m_moveablesVertexBuffer);
 	DX11_DELETE(m_moveablesIndexBuffer);
-
 	DX11_DELETE(m_staticsVertexBuffer);
 	DX11_DELETE(m_staticsIndexBuffer);
 }
@@ -151,9 +147,14 @@ bool Renderer11::Create()
 {
 	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_0 };
 	D3D_FEATURE_LEVEL featureLevel;
+	HRESULT res;
 
-	HRESULT res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION,
-		&m_device, &featureLevel, &m_context);
+#ifdef _RELEASE
+	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context);
+#else
+	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
+#endif
+
 	if (FAILED(res))
 		return false;
 
@@ -412,7 +413,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_states = new CommonStates(m_device);
 
 	// Load caustics
-	char* causticsNames[NUM_CAUSTICS_TEXTURES] = {
+	const char* causticsNames[NUM_CAUSTICS_TEXTURES] = {
 		"CausticsRender_001.bmp",
 		"CausticsRender_002.bmp",
 		"CausticsRender_003.bmp",
@@ -1554,8 +1555,9 @@ bool Renderer11::drawScene(bool dump)
 		// Draw binoculars or lasersight
 		drawOverlays();
 
-		ROOM_INFO* r = &Rooms[LaraItem->roomNumber];
 		m_currentY = 60;
+#ifdef _DEBUG
+		ROOM_INFO* r = &Rooms[LaraItem->roomNumber];
 
 		printDebugMessage("Update time: %d", m_timeUpdate);
 		printDebugMessage("Frame time: %d", m_timeFrame);
@@ -1572,6 +1574,7 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
 		printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
 		printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
+#endif
 	}
 
 	drawAllStrings();
@@ -2597,7 +2600,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	return true;
 }
 
-ID3D11VertexShader* Renderer11::compileVertexShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode)
+ID3D11VertexShader* Renderer11::compileVertexShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode)
 {
 	HRESULT res;
 
@@ -2621,7 +2624,7 @@ ID3D11VertexShader* Renderer11::compileVertexShader(char* fileName, char* functi
 	return shader;
 }
 
-ID3D11PixelShader* Renderer11::compilePixelShader(char* fileName, char* function, char* model, ID3D10Blob** bytecode)
+ID3D11PixelShader* Renderer11::compilePixelShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode)
 {
 	HRESULT res;
 
@@ -2645,7 +2648,7 @@ ID3D11PixelShader* Renderer11::compilePixelShader(char* fileName, char* function
 	return shader;
 }
 
-ID3D11GeometryShader* Renderer11::compileGeometryShader(char* fileName)
+ID3D11GeometryShader* Renderer11::compileGeometryShader(const char* fileName)
 {
 	HRESULT res;
 
@@ -2664,7 +2667,7 @@ ID3D11GeometryShader* Renderer11::compileGeometryShader(char* fileName)
 	return shader;
 }
 
-ID3D11ComputeShader* Renderer11::compileComputeShader(char* fileName)
+ID3D11ComputeShader* Renderer11::compileComputeShader(const char* fileName)
 {
 	HRESULT res;
 
@@ -4633,7 +4636,7 @@ bool Renderer11::printDebugMessage(int x, int y, int alpha, byte r, byte g, byte
 	return true;
 }
 
-void Renderer11::printDebugMessage(char* message, ...)
+void Renderer11::printDebugMessage(LPCSTR message, ...)
 {
 	char buffer[255];
 	ZeroMemory(buffer, 255);

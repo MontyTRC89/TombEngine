@@ -593,37 +593,28 @@ typedef enum sound_effects
 };
 
 #define PITCH_SHIFT	4
-
 #define SOUND_BASS_UNITS			1.0f / 1024.0f	// TR->BASS distance unit coefficient
 #define SOUND_MAXVOL_RADIUS			1024.0f			// Max. volume hearing distance
 #define SOUND_OMNIPRESENT_ORIGIN    Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)
-
 #define SOUND_MAX_SAMPLES 3072 // Original was 1024, reallocate original 3-dword DX handle struct to just 1-dword memory pointer
 #define SOUND_MAX_CHANNELS  32 // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
-
 #define SOUND_LEGACY_SOUNDMAP_SIZE	 450
 #define SOUND_LEGACY_TRACKTABLE_SIZE 136
-
 #define SOUND_FLAG_NO_PAN			(1<<12)	// Unused flag
 #define SOUND_FLAG_RND_PITCH		(1<<13)
 #define SOUND_FLAG_RND_GAIN			(1<<14)
-
 #define SOUND_MAX_PITCH_CHANGE		0.09f
 #define SOUND_MAX_GAIN_CHANGE		0.0625f
-
 #define SOUND_32BIT_SILENCE_LEVEL	4.9e-04f
-
 #define SOUND_SAMPLE_FLAGS			(BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT)
-
 #define SOUND_XFADETIME_BGM			5000
 #define SOUND_XFADETIME_BGM_START	1500
 #define SOUND_XFADETIME_ONESHOT		200
 #define SOUND_XFADETIME_CUTSOUND	100
 #define SOUND_XFADETIME_HIJACKSOUND	50
-
 #define SOUND_BGM_DAMP_COEFFICIENT	0.6f
 
-typedef struct SoundEffectSlot
+struct SoundEffectSlot
 {
 	short state;
 	short effectID;
@@ -632,7 +623,7 @@ typedef struct SoundEffectSlot
 	Vector3 origin;
 };
 
-typedef struct SoundTrackSlot
+struct SoundTrackSlot
 {
 	HSTREAM channel;
 	short   trackID;
@@ -706,7 +697,7 @@ static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD
 
 void  Sound_Init();
 void  Sound_DeInit();
-bool  Sound_CheckBASSError(char* message, bool verbose, ...);
+bool  Sound_CheckBASSError(const char* message, bool verbose, ...);
 void  Sound_UpdateScene();
 void  Sound_FreeSample(int index);
 int   Sound_GetFreeSlot();
