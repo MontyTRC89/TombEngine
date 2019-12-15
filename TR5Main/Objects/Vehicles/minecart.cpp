@@ -2,11 +2,11 @@
 #include "../../Game/lara.h"
 #include "../../Game/collide.h"
 #include "../../Game/effects.h"
-#include "../../Game/anim.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/items.h"
 #include "../../Game/sphere.h"
 #include "../../Game/draw.h"
+#include "../../Game/misc.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

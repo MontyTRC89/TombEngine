@@ -5,6 +5,7 @@
 #include "collide.h"
 #include "inventory.h"
 #include "larafire.h"
+#include "misc.h"
 #include "draw.h"
 #include "sphere.h"
 #include "Camera.h"
@@ -21,7 +22,6 @@
 #include "..\Global\global.h"
 
 #include <stdio.h>
-#include "Anim.h"
 
 static short LeftClimbTab[4] = // offset 0xA0638
 {

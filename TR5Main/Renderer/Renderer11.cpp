@@ -21,6 +21,7 @@
 #include <D3Dcompiler.h>
 #include <chrono> 
 #include <stack>
+#include "../Game/misc.h"
 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
@@ -2724,7 +2725,7 @@ void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byt
 
 	RendererLight* dynamicLight = &m_lights[m_nextLight++];
 
-	dynamicLight->Position = Vector3(x, y, z);
+	dynamicLight->Position = Vector3(float(x), float(y), float(z));
 	dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
@@ -4325,77 +4326,87 @@ void Renderer11::updateLaraAnimations()
 
 	// Lara world matrix
 	translation = Matrix::CreateTranslation(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	rotation = Matrix::CreateFromYawPitchRoll(ANGLEF(LaraItem->pos.yRot), ANGLEF(LaraItem->pos.xRot), ANGLEF(LaraItem->pos.zRot));
+	rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(LaraItem->pos.yRot), TR_ANGLE_TO_RAD(LaraItem->pos.xRot), TR_ANGLE_TO_RAD(LaraItem->pos.zRot));
 
 	m_LaraWorldMatrix = rotation * translation;
 	
 	// Update first Lara's animations
-	laraObj->LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(ANGLEF(Lara.torsoXrot), ANGLEF(Lara.torsoYrot), ANGLEF(Lara.torsoZrot)); // TR_ANGLE_TO_RAD()
-	laraObj->LinearizedBones[LM_HEAD]->ExtraRotation  = Vector3(ANGLEF(Lara.headXrot),  ANGLEF(Lara.headYrot),  ANGLEF(Lara.headZrot)); // TR_ANGLE_TO_RAD()
+	laraObj->LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.torsoXrot), TR_ANGLE_TO_RAD(Lara.torsoYrot), TR_ANGLE_TO_RAD(Lara.torsoZrot));
+	laraObj->LinearizedBones[LM_HEAD]->ExtraRotation  = Vector3(TR_ANGLE_TO_RAD(Lara.headXrot),  TR_ANGLE_TO_RAD(Lara.headYrot),  TR_ANGLE_TO_RAD(Lara.headZrot));
 
 	// First calculate matrices for legs, hips, head and torso
-	int mask = (MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD));
+	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 	short *framePtr[2];
-	int rate;
-	int frac = GetFrame_D2(LaraItem, framePtr, &rate);
+	int rate, frac;
+
+	frac = GetFrame_D2(LaraItem, framePtr, &rate);
 	updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
-	if ((Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) && Lara.gunType != WEAPON_FLARE)
+	if (Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY && Lara.gunType != WEAPON_FLARE)
 	{
 		// Both arms
-		mask = (MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND));
+		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 		frac = GetFrame_D2(LaraItem, framePtr, &rate);
 		updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 	}
 	else
 	{ 
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(ANGLEF(Lara.leftArm.xRot),  ANGLEF(Lara.leftArm.yRot),  ANGLEF(Lara.leftArm.zRot)); // TR_ANGLE_TO_RAD()
-		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(ANGLEF(Lara.rightArm.xRot), ANGLEF(Lara.rightArm.yRot), ANGLEF(Lara.rightArm.zRot)); // TR_ANGLE_TO_RAD()
+		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),  TR_ANGLE_TO_RAD(Lara.leftArm.yRot),  TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
+		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot), TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
 
-		if (Lara.gunType != WEAPON_FLARE)
+		// HACK: backguns handles differently // TokyoSU: not really a hack since it's the original way to do that.
+		switch (Lara.gunType)
 		{
-			// HACK: backguns handles differently
-			if (Lara.gunType == WEAPON_SHOTGUN || Lara.gunType == WEAPON_GRENADE_LAUNCHER || Lara.gunType == WEAPON_CROSSBOW || Lara.gunType == WEAPON_ROCKET_LAUNCHER || Lara.gunType == WEAPON_HARPOON_GUN)
-			{
-				// Left arm
-				mask = (MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND));
-				short* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
-				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+		case WEAPON_SHOTGUN:
+		case WEAPON_HK:
+		case WEAPON_CROSSBOW:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
+			short* shotgunFramePtr;
 
-				// Right arm
-				mask = (MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND));
-				shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
-				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
-			}
-			else
-			{
-				// Left arm
-				mask = (MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND));
-				frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
-
-				// Right arm
-				mask = (MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND));
-				frac = getFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
-				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
-			}
-		}
-		else
-		{
 			// Left arm
-			mask = (MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND));
+			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
+			shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+
+			// Right arm
+			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
+			shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+			break;
+
+		case WEAPON_PISTOLS:
+		case WEAPON_UZI:
+		case WEAPON_REVOLVER:
+		default:
+			short* pistolFramePtr;
+
+			// Left arm
+			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
+			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
+
+			// Right arm
+			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
+			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
+			break;
+
+		case WEAPON_FLARE:
+			// Left arm
+			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
 			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
-			mask = (MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND));
+			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			frac = GetFrame_D2(LaraItem, framePtr, &rate);
 			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+			break;
 		}
-
-	}		 
+	}
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
 	if (m_moveableObjects[ID_HAIR] != NULL)
@@ -4455,7 +4466,7 @@ void Renderer11::updateLaraAnimations()
 				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_SOLID];
 
 				translation = Matrix::CreateTranslation(Hairs[7 * p + i].pos.xPos, Hairs[7 * p + i].pos.yPos, Hairs[7 * p + i].pos.zPos);
-				rotation = Matrix::CreateFromYawPitchRoll(ANGLEF(Hairs[7 * p + i].pos.yRot), ANGLEF(Hairs[7 * p + i].pos.xRot), ANGLEF(Hairs[7 * p + i].pos.zRot)); // TR_ANGLE_TO_RAD()
+				rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.yRot), TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.xRot), TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
 				m_hairsMatrices[6 * p + i] = rotation * translation;
 
 				int baseVertex = lastVertex;
@@ -4643,7 +4654,7 @@ void Renderer11::printDebugMessage(LPCSTR message, ...)
 
 void Renderer11::drawBlood()
 {
-	for (int i = 0; i < MAX_SPARKS_BLOOD; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		BLOOD_STRUCT* blood = &Blood[i];
 		if (blood->On)
@@ -4726,7 +4737,7 @@ void Renderer11::addSpriteBillboard(RendererSprite* sprite, float x, float y, fl
 
 void Renderer11::drawSmokes()
 {
-	for (int i = 0; i < MAX_SPARKS_SMOKE; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		SMOKE_SPARKS* spark = &SmokeSparks[i];
 		if (spark->On)
@@ -5039,8 +5050,7 @@ bool Renderer11::drawSprites()
 				float halfHeight = spr->Height / 2.0f;
 
 				Matrix billboardMatrix;
-				createBillboardMatrix(&billboardMatrix, &Vector3(spr->X, spr->Y, spr->Z),
-					&Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
+				createBillboardMatrix(&billboardMatrix, &Vector3(spr->X, spr->Y, spr->Z), &Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
 
 				Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
 				Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
@@ -5446,7 +5456,7 @@ bool Renderer11::doSnow()
 			continue;
 		}
 
-		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], snow->X, snow->Y, snow->Z, 255, 255, 255,
 			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
 			BLENDMODE_ALPHABLEND);
 
@@ -5483,12 +5493,9 @@ bool Renderer11::drawDebris(bool transparent)
 			int tile = texture->tileAndFlag & 0x7FFF;
 
 			// Draw only debris of the current bucket
-			if (texture->attribute == 0 && transparent
-				||
-				texture->attribute == 1 && transparent
-				||
-				texture->attribute == 2 && !transparent
-				)
+			if (texture->attribute == 0 && transparent ||
+				texture->attribute == 1 && transparent ||
+				texture->attribute == 2 && !transparent)
 				continue;
 
 			RendererVertex vertex;
@@ -5598,7 +5605,7 @@ bool Renderer11::drawBats()
 			if (bucket->NumVertices == 0)
 				continue;
 
-			for (int i = 0; i < 64; i++)
+			for (int i = 0; i < NUM_BATS; i++)
 			{
 				BAT_STRUCT* bat = &Bats[i];
 
@@ -6825,6 +6832,7 @@ bool Renderer11::drawGunFlashes()
 			zOffset = 92;
 			rotationX = -14560;
 			break;
+		default:
 		case WEAPON_PISTOLS:
 			length = 180;
 			zOffset = 40;
@@ -7005,9 +7013,9 @@ vector<RendererVideoAdapter>* Renderer11::GetAdapters()
 
 int Renderer11::DrawPickup(short objectNum)
 {
-	bool drawed = drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
+	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
 	m_pickupRotation += 45 * 360 / 30;
-	return drawed;
+	return 0;
 }
 
 bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)

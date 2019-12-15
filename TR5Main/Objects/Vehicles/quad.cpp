@@ -2,13 +2,13 @@
 #include "../../Game/lara.h"
 #include "../../Game/effect2.h"
 #include "../../Game/items.h"
-#include "../../Game/Anim.h"
 #include "../../Game/sphere.h"
 #include "../../Game/collide.h"
 #include "../../Game/effects.h"
 #include "../../Game/laraflar.h"
 #include <vector>
 #include "../../Game/lara1gun.h"
+#include "../../Game/misc.h"
 using namespace std;
 
 typedef enum QUAD_EFFECTS_POSITIONS {

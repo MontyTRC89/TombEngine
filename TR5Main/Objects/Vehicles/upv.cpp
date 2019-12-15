@@ -6,9 +6,9 @@
 #include "../../Game/effects.h"
 #include "../../Game/collide.h"
 #include "../../Game/box.h"
-#include "../../Game/anim.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/draw.h"
+#include "../../Game/misc.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
