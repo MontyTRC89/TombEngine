@@ -618,10 +618,10 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			{
 				short* tmp;
 
-				tmp = Lara.meshPtrs[HAND_R];
+				tmp = Lara.meshPtrs[LM_RHAND];
 				
-				LARA_MESHES(ID_MINECART_ANIMS, HAND_R);
-				Meshes[Objects[ID_MINECART_ANIMS].meshIndex + HAND_R] = tmp;
+				LARA_MESHES(ID_MINECART_ANIMS, LM_RHAND);
+				Meshes[Objects[ID_MINECART_ANIMS].meshIndex + LM_RHAND] = tmp;
 
 				cart->Flags &= ~CF_MESH;
 			}
@@ -638,7 +638,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			PHD_VECTOR vec = { 0, 640, 0 };
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 			l->pos.xPos = vec.x;
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
@@ -659,7 +659,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			PHD_VECTOR vec = { 0, 640, 0 };
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 			l->pos.xPos = vec.x;
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
@@ -680,10 +680,10 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			short* tmp;
 
-			tmp = Lara.meshPtrs[HAND_R];
+			tmp = Lara.meshPtrs[LM_RHAND];
 
-			Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_MINECART_ANIMS].meshIndex + HAND_R];
-			Meshes[Objects[ID_MINECART_ANIMS].meshIndex + HAND_R] = tmp;
+			Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_MINECART_ANIMS].meshIndex + LM_RHAND];
+			Meshes[Objects[ID_MINECART_ANIMS].meshIndex + LM_RHAND] = tmp;
 
 			cart->Flags |= CF_MESH;
 		}

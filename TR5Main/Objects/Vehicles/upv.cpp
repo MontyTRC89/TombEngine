@@ -598,7 +598,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			PHD_VECTOR vec = { 0, 0, 0 };
 			GAME_VECTOR VPos, LPos;
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			LPos.x = vec.x;
 			LPos.y = vec.y;
@@ -646,7 +646,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			else
 				hfw = NO_HEIGHT;
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			l->pos.xPos = vec.x;
 			l->pos.yPos = l->pos.yPos + 1 - hfw;
@@ -680,7 +680,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		{
 			PHD_VECTOR vec = { 0, 0, 0 };
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			l->pos.xPos = vec.x;
 			l->pos.yPos = vec.y;

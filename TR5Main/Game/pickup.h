@@ -13,8 +13,6 @@ void PickedUpObject(short objectNumber);
 void RemoveObjectFromInventory(short objectNumber);
 void CollectCarriedItems(ITEM_INFO* item);
 int PickupTrigger(short itemNum);
-void ActivateKey();
-void ActivateCamera();
 int KeyTrigger(short itemNum);
 void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);

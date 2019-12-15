@@ -148,7 +148,7 @@
 
 #define NUM_CONTROLS			18
 
-extern char* g_KeyNames[];
+extern const char* g_KeyNames[];
 
 #define S_UpdateInput ((int (__cdecl*)()) 0x004A92D0)
 #define CheckKeyConflicts ((int (__cdecl*)()) 0x004ADF40)

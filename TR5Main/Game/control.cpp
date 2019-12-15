@@ -1141,11 +1141,6 @@ void ActivateKey()
 	KeyTriggerActive = 1;
 }
 
-void ActivateCamera()
-{
-	KeyTriggerActive = 2;
-}
-
 short GetDoor(FLOOR_INFO* floor)
 {
 	if (!floor->index)

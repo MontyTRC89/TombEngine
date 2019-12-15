@@ -224,7 +224,7 @@ int QuadCheckGetOff()
 			LaraItem->frameNumber = GF(ANIMATION_LARA_FREE_FALL_LONG, 0);
 			LaraItem->currentAnimState = STATE_LARA_FREEFALL;
 
-			GetJointAbsPosition(LaraItem, &pos, HIPS);
+			GetJointAbsPosition(LaraItem, &pos, LM_HIPS);
 
 			LaraItem->pos.xPos = pos.x;
 			LaraItem->pos.yPos = pos.y;

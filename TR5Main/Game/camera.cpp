@@ -3,7 +3,14 @@
 #include <d3dx9.h>
 #include <stdio.h>
 #include "draw.h"
- 
+
+extern int KeyTriggerActive;
+
+void ActivateCamera()
+{
+	KeyTriggerActive = 2;
+}
+
 void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll)
 {
 	Vector3 position = Vector3(posX, posY, posZ);

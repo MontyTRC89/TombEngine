@@ -2,7 +2,12 @@
 
 // fix "improperly terminated macro invocation"
 // fix "expression must have integral or unscoped enum type"
-short ANGLE(short ang)
+short ANGLE(short angle)
 {
-	return short((ang * 65536.0) / 360.0);
+	return short(TR_ANGLE_TO_DEGREES(angle));
+}
+
+float ANGLEF(short angle)
+{
+	return TR_ANGLE_TO_DEGREES(angle);
 }
