@@ -1,12 +1,12 @@
 #include "../newobjects.h"
 #include "../../Game/items.h"
 #include "../../Game/effect2.h"
-#include "../../Game/Anim.h"
 #include "../../Game/lot.h"
 #include "../../Game/Box.h"
 #include "../../Game/sphere.h"
 #include "../../Game/people.h"
 #include "../../Game/draw.h"
+#include "../../Game/misc.h"
 
 #define MAX_TRIGGER_RANGE 0x4000
 #define SMALL_FLASH 10

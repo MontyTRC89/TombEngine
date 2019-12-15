@@ -1,8 +1,8 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/items.h"
-#include "../../Game/Anim.h"
 #include "../../Game/larafire.h"
+#include "../../Game/misc.h"
 
 // TODO: Evil lara is not targetable and cant move like lara.
 
