@@ -1577,8 +1577,8 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 			break;
 
 		case TILT_TYPE:
-			TiltXOffset = xOff = (*data >> 8) & 0xFF;
-			TiltYOffset = yOff = *data & 0xFF;
+			TiltXOffset = xOff = (*data >> 8);
+			TiltYOffset = yOff = *(char *) data;
 
 			if ((abs(xOff)) > 2 || (abs(yOff)) > 2)
 				HeightType = BIG_SLOPE;
