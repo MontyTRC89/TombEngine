@@ -87,11 +87,11 @@ int SetupDialog();
 void InitDefaultConfiguration();
 bool LoadConfiguration();
 bool SaveConfiguration();
-LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD* nValue, DWORD nDefaultValue);
-LONG GetBoolRegKey(HKEY hKey, char* strValueName, bool* bValue, bool bDefaultValue);
-LONG GetStringRegKey(HKEY hKey, char* strValueName, char** strValue, char* strDefaultValue);
-LONG SetDWORDRegKey(HKEY hKey, char* strValueName, DWORD nValue);
-LONG SetBoolRegKey(HKEY hKey, char* strValueName, bool bValue);
-LONG SetStringRegKey(HKEY hKey, char* strValueName, char* strValue);
+LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaultValue);
+LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultValue);
+LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue);
+LONG SetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD nValue);
+LONG SetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool bValue);
+LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue);
 
 extern GameConfiguration g_Configuration;

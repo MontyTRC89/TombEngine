@@ -12,8 +12,8 @@ extern LaraExtraInfo g_LaraExtra;
 
 #define MAX_SPEED 0x380000
 #define KAYAK_COLLIDE 64
-#define GETOFF_DIST 768		// minimum collision distance
-#define KAYAK_TO_BADDIE_RADIUS 256
+#define GETOFF_DIST CLICK(3)		// minimum collision distance
+#define KAYAK_TO_BADDIE_RADIUS CLICK(1)
 #define KAYAK_FRICTION 0x8000
 #define KAYAK_ROT_FRIC 0x50000
 #define KAYAK_DFLECT_ROT 0x80000
@@ -34,9 +34,9 @@ extern LaraExtraInfo g_LaraExtra;
 #define HIT_LEFT 3
 #define HIT_RIGHT 4
 #define KAYAK_DRAW_SHIFT 32
-#define LARA_LEG_BITS ((1<<HIPS)|(1<<THIGH_L)|(1<<CALF_L)|(1<<FOOT_L)|(1<<THIGH_R)|(1<<CALF_R)|(1<<FOOT_R))
-#define KAYAK_X	128
-#define KAYAK_Z	128
+#define LARA_LEG_BITS (MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT))
+#define KAYAK_X	STEP_SIZE/2
+#define KAYAK_Z	STEP_SIZE/2
 #define SKIDOO_MAX_KICK -80
 #define SKIDOO_MIN_BOUNCE ((MAX_SPEED/2)>>8)
 
@@ -951,10 +951,10 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 4) && (frame == 24) && (!(kinfo->Flags & 0x80)))
 		{
 			short* tmp;
-			tmp = Lara.meshPtrs[HAND_R];
+			tmp = Lara.meshPtrs[LM_RHAND];
 
-			LARA_MESHES(ID_KAYAK_LARA_ANIMS, HAND_R);
-			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + HAND_R] = tmp;
+			LARA_MESHES(ID_KAYAK_LARA_ANIMS, LM_RHAND);
+			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
 			
 			lara->meshBits &= ~LARA_LEG_BITS;
 			kinfo->Flags |= 0x80;
@@ -965,10 +965,10 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 14) && (frame == 27) && (kinfo->Flags & 0x80))
 		{
 			short* tmp;
-			tmp = Lara.meshPtrs[HAND_R];
+			tmp = Lara.meshPtrs[LM_RHAND];
 
-			Lara.meshPtrs[HAND_R] = Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + HAND_R];
-			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + HAND_R] = tmp;
+			Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND];
+			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
 
 			lara->meshBits |= LARA_LEG_BITS;
 			kinfo->Flags &= ~0x80;
@@ -982,7 +982,7 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 		{
 			PHD_VECTOR vec = { 0, 350, 500 };
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			lara->pos.xPos = vec.x;
 			lara->pos.yPos = vec.y;
@@ -1007,7 +1007,7 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 		{
 			PHD_VECTOR vec = { 0, 350, 500 };
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			lara->pos.xPos = vec.x;
 			lara->pos.yPos = vec.y;

@@ -2,7 +2,7 @@
 #include "..\Global\global.h"
 #include <stdio.h>
 
-char* g_KeyNames[] = {
+const char* g_KeyNames[] = {
 	NULL,		"ESC",	"1",		"2",		"3",		"4",		"5",		"6",
 		"7",		"8",		"9",		"0",		"-",		"+",		"BKSP",	"TAB",
 		"Q",		"W",		"E",		"R",		"T",		"Y",		"U",		"I",
