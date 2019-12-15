@@ -507,11 +507,11 @@ int TestBoundsCollideStatic(short* bounds, PHD_3DPOS* pos, int radius)
 	int dx = LaraItem->pos.xPos - pos->xPos;
 	int dz = LaraItem->pos.zPos - pos->zPos;
 	
-	dx = (c * dx - s * dz) >> W2V_SHIFT;
-	dz = (c * dz + s * dx) >> W2V_SHIFT;
+	int x = (c * dx - s * dz) >> W2V_SHIFT;
+	int z = (c * dz + s * dx) >> W2V_SHIFT;
 	
-	if (dx >= bounds[0] - radius && dx <= radius + bounds[1] 
-		&& dz >= bounds[4] - radius && dz <= radius + bounds[5])
+	if (x >= bounds[0] - radius && x <= radius + bounds[1] 
+		&& z >= bounds[4] - radius && z <= radius + bounds[5])
 		return 1;
 	else
 		return 0;
