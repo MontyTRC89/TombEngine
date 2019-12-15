@@ -5190,7 +5190,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	FLOOR_INFO* floor;
 	int h, c;
 
-	if (angle == -ANGLE(180))
+	if (angle == ANGLE(180))
 	{
 		z -= 256;
 	}
@@ -5202,7 +5202,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	{
 		x += 256;
 	}
-	else
+	else if (angle == ANGLE(0))
 	{
 		z += 256;
 	}
