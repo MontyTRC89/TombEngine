@@ -20,4 +20,5 @@ enum LARA_MESH_MASK
 
 short GF(short animIndex, short frameToStart); // for lara
 short GF2(short objectID, short animIndex, short frameToStart); // for entity
-int INVERT(int value1, int value2, bool isInvert);
+
+int getLaraMask(UINT16 meshMaskFlag);
