@@ -943,7 +943,7 @@ enum headings {
 	NORTH,
 	EAST,
 	SOUTH,
-	WEST,
+	WEST
 };
 
 enum camera_flags
