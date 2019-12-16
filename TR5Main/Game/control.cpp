@@ -260,7 +260,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		InItemControlLoop = false;
-		//KillMoveEffects();
+		KillMoveEffects();
 
 		// Update some effect timers
 		if (SmokeCountL)
