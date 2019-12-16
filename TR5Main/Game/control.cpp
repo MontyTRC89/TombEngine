@@ -630,19 +630,19 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 		return;
 
 	// Burn Lara
-	if ((*data & 0x1F) == LAVA_TYPE)
+	if ((*data & DATA_TYPE) == LAVA_TYPE)
 	{
-		if (!heavy && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
+		if (!heavy && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus != LW_ABOVE_WATER))
 			LavaBurn(LaraItem);
 
-		if (*data & 0x8000)
+		if (*data & END_BIT)
 			return;
 
 		data++;
 	}
 
 	// Lara can climb
-	if ((*data & 0x1F) == CLIMB_TYPE)
+	if ((*data & DATA_TYPE) == CLIMB_TYPE)
 	{
 		if (!heavy)
 		{
@@ -651,28 +651,28 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				Lara.climbStatus = true;
 		}
 
-		if (*data & 0x8000)
+		if (*data & END_BIT)
 			return;
 
 		data++;
 	}
 
 	// Lara can monkey
-	if ((*data & 0x1F) == MONKEY_TYPE)
+	if ((*data & DATA_TYPE) == MONKEY_TYPE)
 	{
 		if (!heavy)
 			Lara.canMonkeySwing = true;
 
-		if (*data & 0x8000)
+		if (*data & END_BIT)
 			return;
 
 		data++;
 	}
 
 	// Trigger triggerer
-	if ((*data & 0x1F) == TRIGTRIGGER_TYPE)
+	if ((*data & DATA_TYPE) == TRIGTRIGGER_TYPE)
 	{
-		if (!(*data & 0x20) || *data & 0x8000)
+		if (!(*data & 0x20) || *data & END_BIT)
 			return;
 
 		data++;
