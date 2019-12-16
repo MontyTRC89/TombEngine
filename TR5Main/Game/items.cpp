@@ -12,8 +12,6 @@ void ClearItem(short itemNum)
 
 void KillItem(short itemNum)
 {
-	int _ItemNewRoomNo = ItemNewRoomNo;
-
 	if (InItemControlLoop)
 	{
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNum | 0x8000;
@@ -32,12 +30,12 @@ void KillItem(short itemNum)
 		{
 			NextItemActive = item->nextActive;
 		}
-		else if (NextItemActive != NO_ITEM)
+		else
 		{
 			short linknum;
-			for (linknum = Items[NextItemActive].nextActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
+			for (linknum = NextItemActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
 			{
-				if (linknum == itemNum)
+				if (Items[linknum].nextActive == itemNum)
 				{
 					Items[linknum].nextActive = item->nextActive;
 					break;
@@ -51,14 +49,14 @@ void KillItem(short itemNum)
 			{
 				Rooms[item->roomNumber].itemNumber = item->nextItem;
 			}
-			else if (Rooms[item->roomNumber].itemNumber != -1)
+			else
 			{
 				short linknum;
-				for (linknum = Items[Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+				for (linknum = Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
 				{
-					if (linknum == itemNum)
+					if (Items[linknum].nextItem == itemNum)
 					{
-						Items[Rooms[item->roomNumber].itemNumber].nextItem = item->nextItem;
+						Items[linknum].nextItem = item->nextItem;
 						break;
 					}
 				}
@@ -140,13 +138,13 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 			{
 				r->itemNumber = item->nextItem;
 			}
-			else if (r->itemNumber != NO_ITEM)
+			else
 			{
-				for (short linknum = Items[r->itemNumber].nextItem; linknum != -1; linknum = Items[linknum].nextItem)
+				for (short linknum = r->itemNumber; linknum != -1; linknum = Items[linknum].nextItem)
 				{
-					if (linknum == itemNumber)
+					if (Items[linknum].nextItem == itemNumber)
 					{
-						Items[r->itemNumber].nextItem = item->nextItem;
+						Items[linknum].nextItem = item->nextItem;
 						break;
 					}
 				}
@@ -176,14 +174,14 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 		{
 			r->fxNumber = fx->nextFx;
 		}
-		else if (r->fxNumber != NO_ITEM)
+		else
 		{
 			short linknum;
-			for (linknum = Effects[r->fxNumber].nextFx; linknum != -1; linknum = Effects[linknum].nextFx)
+			for (linknum = r->fxNumber; linknum != -1; linknum = Effects[linknum].nextFx)
 			{
-				if (linknum == fxNumber)
+				if (Effects[linknum].nextFx == fxNumber)
 				{
-					Effects[r->fxNumber].nextFx = fx->nextFx;
+					Effects[linknum].nextFx = fx->nextFx;
 					break;
 				}
 			}
@@ -212,11 +210,11 @@ void KillEffect(short fxNumber)
 		{
 			NextFxActive = fx->nextActive;
 		}
-		else if (NextFxActive != NO_ITEM)
+		else
 		{
-			for (short linknum = Effects[NextFxActive].nextActive; linknum != NO_ITEM; linknum = Effects[linknum].nextActive)
+			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = Effects[linknum].nextActive)
 			{
-				if (linknum == fxNumber)
+				if (Effects[linknum].nextActive == fxNumber)
 				{
 					Effects[linknum].nextActive = fx->nextActive;
 					break;
@@ -228,13 +226,13 @@ void KillEffect(short fxNumber)
 		{
 			Rooms[fx->roomNumber].fxNumber = fx->nextFx;
 		}
-		else if (Rooms[fx->roomNumber].fxNumber != NO_ITEM)
+		else
 		{
-			for (short linknum = Effects[Rooms[fx->roomNumber].fxNumber].nextFx; linknum != NO_ITEM; linknum = Effects[linknum].nextFx)
+			for (short linknum = Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = Effects[linknum].nextFx)
 			{
-				if (linknum == fxNumber)
+				if (Effects[linknum].nextFx == fxNumber)
 				{
-					Effects[Rooms[fx->roomNumber].fxNumber].nextFx = fx->nextFx;
+					Effects[linknum].nextFx = fx->nextFx;
 					break;
 				}
 			}
@@ -288,13 +286,13 @@ void RemoveDrawnItem(short itemNum)
 	{
 		Rooms[item->roomNumber].itemNumber = item->nextItem;
 	}
-	else if (Rooms[item->roomNumber].itemNumber != NO_ITEM)
+	else
 	{
-		for (short linknum = Items[Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+		for (short linknum = Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
 		{
-			if (linknum == itemNum)
+			if (Items[linknum].nextItem == itemNum)
 			{
-				Items[linknum].nextItem = Items[itemNum].nextItem;
+				Items[linknum].nextItem = item->nextItem;
 				break;
 			}
 		}
@@ -311,11 +309,11 @@ void RemoveActiveItem(short itemNum)
 		{
 			NextItemActive = Items[itemNum].nextActive;
 		}
-		else if (NextItemActive != NO_ITEM)
+		else
 		{
-			for (short linknum = Items[NextItemActive].nextActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
+			for (short linknum = NextItemActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
 			{
-				if (linknum == itemNum)
+				if (Items[linknum].nextActive == itemNum)
 				{
 					Items[linknum].nextActive = Items[itemNum].nextActive;
 					break;
