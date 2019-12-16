@@ -6316,6 +6316,7 @@ int LaraFallen(ITEM_INFO* item, COLL_INFO* coll)//11B6C, 11C1C (F)
 		item->goalAnimState = STATE_LARA_JUMP_FORWARD;
 		item->fallspeed = 0;
 		item->gravityStatus = true;
+		return 1;
 	}
 	return 0;
 }
@@ -6448,7 +6449,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = STATE_LARA_JUMP_UP;
 			item->currentAnimState = STATE_LARA_STOP;
 			Lara.calcFallSpeed = -(short)SQRT_ASM((int)(-2 * GRAVITY * (hdif + 800))) + 3; // (-9600 - 12 * coll->frontFloor) + 3
-			//printf("sqrt: %d", -(short)SQRT_ASM((int)(-2 * GRAVITY * (hdif + 800))) + 3);
+			printf("\nsqrt: %d", -(short)SQRT_ASM((int)(-2 * GRAVITY * (hdif + 800))) + 2);
 			AnimateLara(item);
 		}
 		/* Jump up onto tall climbable wall; won't do this for tall ceiling walls lowered below platform we're on (v.rare) */
@@ -6463,8 +6464,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->frameNumber = GF(ANIMATION_LARA_STAY_SOLID, 0);
 			item->goalAnimState = STATE_LARA_JUMP_UP;
 			item->currentAnimState = STATE_LARA_STOP;
-			printf("sqrt: %d", -(short)SQRT_ASM((int)(-2 * GRAVITY * (hdif + 800))) + 3);
-			Lara.calcFallSpeed = -120;
+			Lara.calcFallSpeed = -116;
 			AnimateLara(item);
 		}
 		else if (Lara.climbStatus
