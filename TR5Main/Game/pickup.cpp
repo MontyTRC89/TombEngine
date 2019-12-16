@@ -864,7 +864,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				item->itemFlags[3] = 1;
 				item->flags |= 0x20;
-				item->status = ITEM_ACTIVE;
+				item->status = ITEM_INVISIBLE;
 			}
 		}
 
@@ -948,7 +948,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 							{
 								item->itemFlags[3] = 1;
 								item->flags |= 0x20;
-								item->status = ITEM_ACTIVE;
+								item->status = ITEM_INVISIBLE;
 							}
 						}
 					}
