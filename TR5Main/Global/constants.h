@@ -37,8 +37,13 @@
 #define ROT_Y 8
 #define ROT_Z 16
 
+// ExplodingDeath2() last argument flags
+#define EXPLODE_HIT_EFFECT 258
+#define EXPLODE_NORMAL 256
+
 #define FRONT_ARC		ANGLE(90)
 #define NO_ITEM			-1
+#define ALL_MESHBITS    -1
 
 #define GAME_BUFFER_SIZE	128 * 1000000
 #define NUM_SLOTS			32
@@ -113,8 +118,10 @@
 #define ONESHOT 0x100
 
 #define DATA_TYPE 0x1F
+#define DATA_TILT 0xF    // tile type (FLOOR_TYPE enum)
+#define DATA_STATIC 0xFF // probably add static collision
 #define END_BIT 0x8000
-#define VALUE_BITS  0x3FF
+#define VALUE_BITS 0x3FF
 
 #define NUM_BATS	64
 #define NUM_SPIDERS	64
@@ -172,3 +179,4 @@
 #define STEPUP_HEIGHT ((STEP_SIZE*3)/2)
 #define BAD_JUMP_CEILING ((STEP_SIZE*3)/4)
 #define LARA_RAD 100
+#define LARA_VELOCITY 12
