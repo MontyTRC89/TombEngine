@@ -68,7 +68,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 			int yMax = mesh->y + sInfo->yMaxc;
 			short yRot = mesh->yRot;
 
-			if (yRot == -ANGLE(180))
+			if (yRot == ANGLE(180))
 			{
 				xMin = mesh->x - sInfo->xMaxc;
 				xMax = mesh->x - sInfo->xMinc;
@@ -1386,7 +1386,7 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 		{
 			numDoors = *door;
 			door++;
-			for (int i = numDoors; i > 0; i--)
+			for (int i = 0; i < numDoors; i++)
 			{
 				roomsList.push_back(*door);
 				door += 16;
