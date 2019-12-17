@@ -13,22 +13,75 @@ short GF2(short objectID, short animIndex, short frameToStart)
 	return short(Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart);
 }
 
-int getLaraMask(UINT16 meshMaskFlag)
+void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 {
-	if (CHK_ANY(meshMaskFlag, LARA_ONLY_LEGS))
-		return (MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT));
-	else if (CHK_ANY(meshMaskFlag, LARA_ONLY_ARMS))
-		return (MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND));
-	else if (CHK_ANY(meshMaskFlag, LARA_ONLY_HEAD))
-		return MESH_BITS(LM_HEAD);
-	else if (CHK_ANY(meshMaskFlag, LARA_ONLY_TORSO))
-		return MESH_BITS(LM_TORSO);
-	else if (CHK_ANY(meshMaskFlag, LARA_ONLY_LEFT_ARM))
-		return (MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND));
-	else if (CHK_ANY(meshMaskFlag, LARA_ONLY_RIGHT_ARM))
-		return (MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND));
-	else if (CHK_ANY(meshMaskFlag, LARA_LEGS_TORSO_HEAD))
-		return (MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_HEAD) | MESH_BITS(LM_TORSO));
-	else if (CHK_ANY(meshMaskFlag, LARA_LEGS_TORSO_HEAD_ARMS))
-		return (MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_HEAD) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND));
+	short numDoors, *door, adjoiningRoom;
+	int i, j;
+	bool adjoiningRoomFound;
+
+	roomArray[0] = roomNumber;
+	door = Rooms[roomNumber].door;
+	if (door)
+	{
+		numDoors = *door;
+		door++;
+
+		for (i = 0; i < numDoors; i++)
+		{
+			adjoiningRoom = *door;
+			adjoiningRoomFound = false;
+
+			for (j = 0; j < *numRooms; j++)
+			{
+				if (roomArray[i] == adjoiningRoom)
+				{
+					adjoiningRoomFound = true;
+					break;
+				}
+			}
+
+			if (!adjoiningRoomFound)
+				roomArray[*numRooms++] = adjoiningRoom;
+
+			door += 16;
+		}
+	}
+}
+
+void GetRoomList(short roomNumber, vector<short>* destRoomList)
+{
+	vector<short> roomList;
+	short numDoors, *door, adjoiningRoom;
+	int i, j;
+	bool adjoiningRoomFound;
+
+	roomList.push_back(roomNumber);
+	door = Rooms[roomNumber].door;
+	if (door)
+	{
+		numDoors = *door;
+		door++;
+
+		for (i = 0; i < numDoors; i++)
+		{
+			adjoiningRoom = *door;
+			adjoiningRoomFound = false;
+
+			for (j = 0; j < roomList.size(); j++)
+			{
+				if (roomList[i] == adjoiningRoom)
+				{
+					adjoiningRoomFound = true;
+					break;
+				}
+			}
+
+			if (!adjoiningRoomFound)
+				roomList.push_back(adjoiningRoom);
+
+			door += 16;
+		}
+	}
+
+	*destRoomList = roomList;
 }
