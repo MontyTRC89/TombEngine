@@ -21,9 +21,9 @@ short* FindPlinth(ITEM_INFO* item);
 void PuzzleDone(ITEM_INFO* item, short itemNum);
 void PickupControl(short itemNum);
 
-//#define InitialiseCupboard ((void (__cdecl*)(short)) 0x0043EDB0)
-//#define CupboardCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004699A0)
-//#define CupboardControl ((void (__cdecl*)(short)) 0x00469660)
+#define _InitialiseCupboard ((void (__cdecl*)(short)) 0x0043EDB0)
+#define _CupboardCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004699A0)
+#define _CupboardControl ((void (__cdecl*)(short)) 0x00469660)
 void InitialiseCupboard(short itemNumber);
 void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll);
 void CupboardControl(short itemNumber);

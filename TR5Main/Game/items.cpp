@@ -373,7 +373,7 @@ void InitialiseItem(short itemNum)
 	}
 
 	item->touchBits = 0;
-	item->afterDeath = 0;
+	item->afterDeath = false;
 	item->firedWeapon = 0;
 	item->data = NULL;
 
