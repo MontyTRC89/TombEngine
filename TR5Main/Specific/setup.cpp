@@ -2426,35 +2426,33 @@ void ObjectObjects()
 		}
 	}
 
+	obj = &Objects[ID_SEARCH_OBJECT1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_SEARCH_OBJECT1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
-		obj = &Objects[ID_SEARCH_OBJECT2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
-		obj = &Objects[ID_SEARCH_OBJECT3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
-		obj = &Objects[ID_SEARCH_OBJECT4];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
+		obj->initialise = InitialiseCupboard;
+		obj->collision = CupboardCollision;
+		obj->control = CupboardControl;
+	}
+	obj = &Objects[ID_SEARCH_OBJECT2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCupboard;
+		obj->collision = CupboardCollision;
+		obj->control = CupboardControl;
+	}
+	obj = &Objects[ID_SEARCH_OBJECT3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCupboard;
+		obj->collision = CupboardCollision;
+		obj->control = CupboardControl;
+	}
+	obj = &Objects[ID_SEARCH_OBJECT4];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseCupboard;
+		obj->collision = CupboardCollision;
+		obj->control = CupboardControl;
 	}
 
 	obj = &Objects[ID_FLARE_ITEM];

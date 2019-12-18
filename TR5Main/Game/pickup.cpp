@@ -1419,32 +1419,34 @@ void InitialisePickup(short itemNumber)
 	}
 	else
 	{
-		if (!triggerFlags || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
+		if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
 			item->pos.yPos -= bounds[3];
+		
 		if ((item->triggerFlags & 0x80) != 0)
 		{
 			RPickups[NumRPickups] = itemNumber;
 			NumRPickups++;
 		}
+		
 		if (item->triggerFlags & 0x100)
 			item->meshBits = 0;
+		
 		if (item->status == ITEM_INVISIBLE)
 			item->flags |= 0x20;
 	}
 }
 
 /// related to cupboard !!!
-#define word_509C1C VAR_U_(0x00509C1C, short)
-#define word_509C1E VAR_U_(0x00509C1E, short)
-#define word_509C24 VAR_U_(0x00509C24, short)
-#define word_509C26 VAR_U_(0x00509C26, short)
-#define dword_51CF78 VAR_U_(0x0051CF78, int)
-#define word_509C3C ARRAY_(0x00509C3C, short, [])
-#define word_509C44 ARRAY_(0x00509C44, short, [])
-#define unk_51CF70 VAR_U_(0x0051CF70, PHD_VECTOR)
-#define word_509C34 ARRAY_(0x00509C34, short, [])
-
-/// Crash when lara is in range (Cupboard)
+#define CupboardBounds	VAR_U_(0x00509C1C, short)
+#define CupboardPos		VAR_U_(0x0051CF70, PHD_VECTOR)
+#define CupboardAnims	ARRAY_(0x00509C3C, short, [])
+#define word_509C1E		VAR_U_(0x00509C1E, short)
+#define word_509C24		VAR_U_(0x00509C24, short)
+#define word_509C26		VAR_U_(0x00509C26, short)
+#define unk_51CF78      VAR_U_(0x0051CF78, short)
+#define dword_51CF78	VAR_U_(0x0051CF78, int)
+#define word_509C44		ARRAY_(0x00509C44, short, [])
+#define word_509C34		ARRAY_(0x00509C34, short, [])
 
 void InitialiseCupboard(short itemNumber)
 {
@@ -1474,12 +1476,8 @@ void InitialiseCupboard(short itemNumber)
 		if (LevelItems <= 0)
 		{
 			AddActiveItem(itemNumber);
-			/*
-			v8 = item->flags2;
-			HIBYTE(item->flags) |= 62u;
-			LOBYTE(v8) = v8 & 251 | 2;
-			item->flags2 = v8;
-			*/
+			item->flags |= IFLAG_ACTIVATION_MASK;
+			item->status = ITEM_ACTIVE;
 			return;
 		}
 
@@ -1494,12 +1492,8 @@ void InitialiseCupboard(short itemNumber)
 				{
 					item->itemFlags[1] = id;
 					AddActiveItem(itemNumber);
-					/*
-					v8 = item->flags2;
-					HIBYTE(item->flags) |= 62u;
-					LOBYTE(v8) = v8 & 251 | 2;
-					item->flags2 = v8;
-					*/
+					item->flags |= IFLAG_ACTIVATION_MASK;
+					item->status = ITEM_ACTIVE;
 					return;
 				}
 			}
@@ -1510,12 +1504,8 @@ void InitialiseCupboard(short itemNumber)
 			{
 				item->itemFlags[1] = id;
 				AddActiveItem(itemNumber);
-				/*
-				v8 = item->flags2;
-				HIBYTE(item->flags) |= 62u;
-				LOBYTE(v8) = v8 & 251 | 2;
-				item->flags2 = v8;
-				*/
+				item->flags |= IFLAG_ACTIVATION_MASK;
+				item->status = ITEM_ACTIVE;
 				return;
 			}
 
@@ -1523,12 +1513,8 @@ void InitialiseCupboard(short itemNumber)
 			if (id >= LevelItems)
 			{
 				AddActiveItem(itemNumber);
-				/*
-				v8 = item->flags2;
-				HIBYTE(item->flags) |= 62u;
-				LOBYTE(v8) = v8 & 251 | 2;
-				item->flags2 = v8;
-				*/
+				item->flags |= IFLAG_ACTIVATION_MASK;
+				item->status = ITEM_ACTIVE;
 				return;
 			}
 		}
@@ -1545,7 +1531,7 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 	item = &Items[itemNumber];
 	objNumber = 3 - ((ID_SEARCH_OBJECT4 - item->objectNumber) >> 1);
 
-	if (!(TrInput & IN_ACTION) || laraitem->currentAnimState != STATE_LARA_STOP || laraitem->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus != LG_NO_ARMS && /* !(*(&lara + 68) & 0x20) */ !Lara.isMoving || Lara.generalPtr != (void*)itemNumber)
+	if (!(TrInput & IN_ACTION) || laraitem->currentAnimState != STATE_LARA_STOP || laraitem->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus != LG_NO_ARMS && !Lara.isMoving || Lara.generalPtr != (void*)itemNumber)
 	{
 		if (laraitem->currentAnimState != STATE_LARA_MISC_CONTROL)
 			ObjectCollision(itemNumber, laraitem, laracoll);
@@ -1553,30 +1539,30 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 	else
 	{
 		bounds = GetBoundsAccurate(item);
-		word_509C1C = *bounds;
+		CupboardBounds = *bounds;
 		if (objNumber)
 		{
-			word_509C1C -= 128;
+			CupboardBounds -= 128;
 			boundsResult = bounds[1] + 128;
 		}
 		else
 		{
-			word_509C1C += 64;
+			CupboardBounds += 64;
 			boundsResult = bounds[1] - 64;
 		}
 		word_509C1E = boundsResult;
 		word_509C24 = bounds[4] - 200; // unk_51CF70 ?
 		word_509C26 = bounds[5] + 200; // unk_51CF70 ?
-		unk_51CF70.z = bounds[4] - word_509C44[objNumber];
+		CupboardPos.z = bounds[4] - word_509C44[objNumber];
 
-		if (TestLaraPosition(&word_509C1C, item, laraitem))
+		if (TestLaraPosition(&CupboardBounds, item, laraitem))
 		{
-			if (MoveLaraPosition(&unk_51CF70, item, laraitem))
+			if (MoveLaraPosition(&CupboardPos, item, laraitem))
 			{
 				laraitem->currentAnimState = STATE_LARA_MISC_CONTROL;
-				laraitem->animNumber = word_509C3C[objNumber];
-				laraitem->frameNumber = Anims[word_509C3C[objNumber]].frameBase;
-				//*(&lara + 34) &= 0xFFDFu;
+				laraitem->animNumber = CupboardAnims[objNumber];
+				laraitem->frameNumber = Anims[CupboardAnims[objNumber]].frameBase;
+				Lara.isMoving = false;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
 				Lara.torsoYrot = 0;
@@ -1590,7 +1576,7 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 				else
 				{
 					AddActiveItem(itemNumber);
-					//item->flags2 = item->flags2 & 0xFFFFFFFB | 2;
+					item->status = ITEM_ACTIVE;
 				}
 
 				item->animNumber = Objects[item->objectNumber].animIndex + 1;
@@ -1604,7 +1590,7 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 		}
 		else if (Lara.isMoving && Lara.generalPtr == (void*)itemNumber) // *(&lara + 68) & 0x20
 		{
-			//*(&Lara + 34) &= 65503u;
+			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 	}
@@ -1649,14 +1635,10 @@ void CupboardControl(short itemNumber)
 				item2 = &Items[item->itemFlags[1]];
 				if (Objects[item2->objectNumber].collision == PickupCollision)
 				{
-					/*int flag, newflag;
-					flag = item2->flags2;
-					if (flipStats)
-						newflag = flag & 0xFFFFFFF9;
-					else
-						newflag = flag | 6;
-					item2->flags2 = newflag;
-					*/
+					//if (flipStats)
+					//	item2->flags2 = item2->flags2 & 0xFFFFFFF9;
+					//else
+					//	item2->flags2 = item2->flags2 | 6;
 				}
 			}
 		}
@@ -1676,12 +1658,13 @@ void CupboardControl(short itemNumber)
 	{
 		if (objNumber == 3)
 		{
-			/*
+			ITEM_INFO* item3;
 			short itemFlag1 = item->itemFlags[1];
+			item3 = &Items[itemFlag1];
 			if (itemFlag1 != -1)
 			{
-				short v11 = 2811 * itemFlag1;
-				v11 = Items[itemFlag1].objectNumber;
+				short v11;
+				v11 = Items[2811 * itemFlag1].objectNumber;
 				if (Objects[v11].collision == PickupCollision)
 				{
 					AddDisplayPickup(v11);
@@ -1690,37 +1673,33 @@ void CupboardControl(short itemNumber)
 				else
 				{
 					AddActiveItem(itemFlag1);
-					HIBYTE(Items[item->item_flags[1]].flags) |= 0x3Eu;
-					item2->flags2 = item2->flags2 & 0xFFFFFFFB | 2;
+					item3->flags |= IFLAG_ACTIVATION_MASK;
+					item3->status = ITEM_ACTIVE;
 					LaraItem->hitPoints = 640;
 				}
 				item->itemFlags[1] = -1;
 			}
-			*/
 		}
 		else
 		{
 			CollectCarriedItems(item);
 		}
 	}
-	/*
-	flag2 = item->flags2;
-	if ((item->flags2 & 6) == 4)
+
+	
+	if (item->status == ITEM_DEACTIVATED)
 	{
 		if (objNumber == 3)
 		{
 			item->itemFlags[0] = 0;
-			LOBYTE(flag2) = flag2 & 0xFB | 2;
+			item->status = ITEM_ACTIVE;
 		}
 		else
 		{
 			RemoveActiveItem(itemNumber);
-			flag2 = item->flags2;
-			LOBYTE(flag2) = flag2 & 0xF9;
+			item->status = ITEM_DEACTIVATED;
 		}
-		item->flags2 = flag2;
 	}
-	*/
 }
 
 void Inject_Pickup()
