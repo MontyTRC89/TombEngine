@@ -1433,6 +1433,296 @@ void InitialisePickup(short itemNumber)
 	}
 }
 
+/// related to cupboard !!!
+#define word_509C1C VAR_U_(0x00509C1C, short)
+#define word_509C1E VAR_U_(0x00509C1E, short)
+#define word_509C24 VAR_U_(0x00509C24, short)
+#define word_509C26 VAR_U_(0x00509C26, short)
+#define dword_51CF78 VAR_U_(0x0051CF78, int)
+#define word_509C3C ARRAY_(0x00509C3C, short, [])
+#define word_509C44 ARRAY_(0x00509C44, short, [])
+#define unk_51CF70 VAR_U_(0x0051CF70, PHD_VECTOR)
+#define word_509C34 ARRAY_(0x00509C34, short, [])
+
+/// Crash when lara is in range (Cupboard)
+
+void InitialiseCupboard(short itemNumber)
+{
+	ITEM_INFO* item, *item2;
+	int id, itemNumber2;
+	short objNumber;
+
+	item = &Items[itemNumber];
+	objNumber = 3 - ((ID_SEARCH_OBJECT4 - item->objectNumber) >> 1);
+	if (objNumber == 1)
+	{
+		item->meshBits = 1;
+		return;
+	}
+	if (objNumber == 4)
+	{
+		item->pad2[0] = -1;
+		item->meshBits = 7;
+		return;
+	}
+	if (objNumber == 3)
+	{
+		item->itemFlags[1] = -1;
+		item->meshBits = 9;
+		
+		id = 0;
+		if (LevelItems <= 0)
+		{
+			AddActiveItem(itemNumber);
+			/*
+			v8 = item->flags2;
+			HIBYTE(item->flags) |= 62u;
+			LOBYTE(v8) = v8 & 251 | 2;
+			item->flags2 = v8;
+			*/
+			return;
+		}
+
+		itemNumber2 = 0;
+		while (true)
+		{
+			item2 = &Items[itemNumber2];
+
+			if (item->objectNumber == 149) // ID_SNOWMOBILE_LARA_ANIMS !!!!!!
+			{
+				if (item->pos.xPos == item2->pos.xPos && item->pos.yPos == item2->pos.yPos && item->pos.zPos == item2->pos.zPos)
+				{
+					item->itemFlags[1] = id;
+					AddActiveItem(itemNumber);
+					/*
+					v8 = item->flags2;
+					HIBYTE(item->flags) |= 62u;
+					LOBYTE(v8) = v8 & 251 | 2;
+					item->flags2 = v8;
+					*/
+					return;
+				}
+			}
+			else if (Objects[item2->objectNumber].collision == PickupCollision
+				 &&  item->pos.xPos == item2->pos.xPos
+				 &&  item->pos.yPos == item2->pos.yPos
+				 &&  item->pos.zPos == item2->pos.zPos)
+			{
+				item->itemFlags[1] = id;
+				AddActiveItem(itemNumber);
+				/*
+				v8 = item->flags2;
+				HIBYTE(item->flags) |= 62u;
+				LOBYTE(v8) = v8 & 251 | 2;
+				item->flags2 = v8;
+				*/
+				return;
+			}
+
+			itemNumber2 = ++id;
+			if (id >= LevelItems)
+			{
+				AddActiveItem(itemNumber);
+				/*
+				v8 = item->flags2;
+				HIBYTE(item->flags) |= 62u;
+				LOBYTE(v8) = v8 & 251 | 2;
+				item->flags2 = v8;
+				*/
+				return;
+			}
+		}
+	}
+}
+
+void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll)
+{
+	ITEM_INFO* item;
+	int objNumber;
+	short* bounds;
+	short boundsResult;
+
+	item = &Items[itemNumber];
+	objNumber = 3 - ((ID_SEARCH_OBJECT4 - item->objectNumber) >> 1);
+
+	if (!(TrInput & IN_ACTION) || laraitem->currentAnimState != STATE_LARA_STOP || laraitem->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus != LG_NO_ARMS && /* !(*(&lara + 68) & 0x20) */ !Lara.isMoving || Lara.generalPtr != (void*)itemNumber)
+	{
+		if (laraitem->currentAnimState != STATE_LARA_MISC_CONTROL)
+			ObjectCollision(itemNumber, laraitem, laracoll);
+	}
+	else
+	{
+		bounds = GetBoundsAccurate(item);
+		word_509C1C = *bounds;
+		if (objNumber)
+		{
+			word_509C1C -= 128;
+			boundsResult = bounds[1] + 128;
+		}
+		else
+		{
+			word_509C1C += 64;
+			boundsResult = bounds[1] - 64;
+		}
+		word_509C1E = boundsResult;
+		word_509C24 = bounds[4] - 200; // unk_51CF70 ?
+		word_509C26 = bounds[5] + 200; // unk_51CF70 ?
+		unk_51CF70.z = bounds[4] - word_509C44[objNumber];
+
+		if (TestLaraPosition(&word_509C1C, item, laraitem))
+		{
+			if (MoveLaraPosition(&unk_51CF70, item, laraitem))
+			{
+				laraitem->currentAnimState = STATE_LARA_MISC_CONTROL;
+				laraitem->animNumber = word_509C3C[objNumber];
+				laraitem->frameNumber = Anims[word_509C3C[objNumber]].frameBase;
+				//*(&lara + 34) &= 0xFFDFu;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
+
+				if (objNumber == 3)
+				{
+					item->itemFlags[0] = LG_HANDS_BUSY;
+				}
+				else
+				{
+					AddActiveItem(itemNumber);
+					//item->flags2 = item->flags2 & 0xFFFFFFFB | 2;
+				}
+
+				item->animNumber = Objects[item->objectNumber].animIndex + 1;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				AnimateItem(item);
+			}
+			else
+			{
+				Lara.generalPtr = (void*)itemNumber;
+			}
+		}
+		else if (Lara.isMoving && Lara.generalPtr == (void*)itemNumber) // *(&lara + 68) & 0x20
+		{
+			//*(&Lara + 34) &= 65503u;
+			Lara.gunStatus = LG_NO_ARMS;
+		}
+	}
+}
+
+void CupboardControl(short itemNumber)
+{
+	ITEM_INFO* item, *item2;
+	short objNumber;
+	short frameNumber;
+	short flipStats;
+	int meshBits;
+
+	item = &Items[itemNumber];
+	objNumber = 3 - ((ID_SEARCH_OBJECT4 - item->objectNumber) >> 1);
+
+	if (objNumber != 3 || item->itemFlags[0] == LG_HANDS_BUSY)
+		AnimateItem(item);
+
+	frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	if (objNumber == 1)
+	{
+		if (frameNumber == 18)
+			item->meshBits = 1;
+		else if (frameNumber == 172)
+			item->meshBits = 2;
+	}
+	else if (objNumber)
+	{
+		if (objNumber == 3)
+		{
+			flipStats = FlipStats[0];
+			meshBits = FlipStats[0] != 0 ? 48 : 9;
+
+			item->meshBits = meshBits;
+
+			if (frameNumber >= 45 && frameNumber <= 131)
+				item->meshBits = meshBits | (flipStats != 0 ? 4 : 2);
+			
+			if (item->itemFlags[1] != -1)
+			{
+				item2 = &Items[item->itemFlags[1]];
+				if (Objects[item2->objectNumber].collision == PickupCollision)
+				{
+					/*int flag, newflag;
+					flag = item2->flags2;
+					if (flipStats)
+						newflag = flag & 0xFFFFFFF9;
+					else
+						newflag = flag | 6;
+					item2->flags2 = newflag;
+					*/
+				}
+			}
+		}
+	}
+	else if (frameNumber <= 0)
+	{
+		item->pad2[0] = -1;
+		item->meshBits = 7;
+	}
+	else
+	{
+		item->pad2[0] = 0;
+		item->meshBits = -1;
+	}
+
+	if (frameNumber == word_509C34[objNumber])
+	{
+		if (objNumber == 3)
+		{
+			/*
+			short itemFlag1 = item->itemFlags[1];
+			if (itemFlag1 != -1)
+			{
+				short v11 = 2811 * itemFlag1;
+				v11 = Items[itemFlag1].objectNumber;
+				if (Objects[v11].collision == PickupCollision)
+				{
+					AddDisplayPickup(v11);
+					KillItem(item->itemFlags[1]);
+				}
+				else
+				{
+					AddActiveItem(itemFlag1);
+					HIBYTE(Items[item->item_flags[1]].flags) |= 0x3Eu;
+					item2->flags2 = item2->flags2 & 0xFFFFFFFB | 2;
+					LaraItem->hitPoints = 640;
+				}
+				item->itemFlags[1] = -1;
+			}
+			*/
+		}
+		else
+		{
+			CollectCarriedItems(item);
+		}
+	}
+	/*
+	flag2 = item->flags2;
+	if ((item->flags2 & 6) == 4)
+	{
+		if (objNumber == 3)
+		{
+			item->itemFlags[0] = 0;
+			LOBYTE(flag2) = flag2 & 0xFB | 2;
+		}
+		else
+		{
+			RemoveActiveItem(itemNumber);
+			flag2 = item->flags2;
+			LOBYTE(flag2) = flag2 & 0xF9;
+		}
+		item->flags2 = flag2;
+	}
+	*/
+}
+
 void Inject_Pickup()
 {
 	INJECT(0x0043A130, DrawAllPickups);
