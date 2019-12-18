@@ -23,5 +23,5 @@
 #define SIN(x) (4 * rcossin_tbl[(int(x) >> 3) & 8190])
 #define COS(x) (4 * rcossin_tbl[((int(x) >> 3) & 8190) + 1])
 
-short ANGLE(short angle);
+short ANGLE(double angle);
 float ANGLEF(short angle);

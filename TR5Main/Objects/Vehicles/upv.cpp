@@ -28,8 +28,8 @@ enum UPV_FLAG
 #define ROT_FRICTION 		0x100000
 #define MAX_ROTATION		0x1c00000
 #define UPDOWN_ACCEL		(ANGLE(2) << 16)
-#define UPDOWN_SLOWACCEL	((ANGLE(2) / 2) << 16)
-#define UPDOWN_FRICTION		((ANGLE(1)/1) << 16)
+#define UPDOWN_SLOWACCEL	(ANGLE(1) << 16)
+#define UPDOWN_FRICTION		(ANGLE(1) << 16)
 #define MAX_UPDOWN			(ANGLE(2) << 16)
 #define UPDOWN_LIMIT		ANGLE(80)
 #define UPDOWN_SPEED		10

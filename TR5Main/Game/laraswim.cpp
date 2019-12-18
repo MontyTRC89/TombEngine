@@ -446,13 +446,13 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 
 	if (LaraDrawType == LARA_DIVESUIT)
 	{
-		if (Lara.turnRate < -(ANGLE(1) / 2))
+		if (Lara.turnRate < -ANGLE(0.5))
 		{
-			Lara.turnRate += (ANGLE(1) / 2);
+			Lara.turnRate += ANGLE(0.5);
 		}
-		else if (Lara.turnRate > (ANGLE(1) / 2))
+		else if (Lara.turnRate > ANGLE(0.5))
 		{
-			Lara.turnRate -= (ANGLE(1) / 2);
+			Lara.turnRate -= ANGLE(0.5);
 		}
 		else
 		{
@@ -714,9 +714,9 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 			if (item->pos.xRot >= -ANGLE(25))
 			{
 				if (item->pos.xRot > ANGLE(5))
-					item->pos.xRot += ANGLE(1) / 2;
+					item->pos.xRot += ANGLE(0.5);
 				else if (item->pos.xRot < -ANGLE(5))
-					item->pos.xRot -= ANGLE(1) / 2;
+					item->pos.xRot -= ANGLE(0.5);
 				else if (item->pos.xRot > 0)
 					item->pos.xRot += 45;
 				else if (item->pos.xRot < 0)
