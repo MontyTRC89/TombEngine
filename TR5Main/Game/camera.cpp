@@ -24,6 +24,8 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 
 void AlterFOV(int value)
 { 
+	if (SIN(value / 2) == 0) return; /* @FIXME Integer division by zero */
+
 	CurrentFOV = value;
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
 }
