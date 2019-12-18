@@ -87,7 +87,7 @@ int GetOffset(ITEM_INFO* item, int x, int z)
 	{
 		return (-x) & 0x3FF;
 	}
-	else if (item->pos.yRot == ANGLE(-180))
+	else if (item->pos.yRot == ANGLE(180))
 	{
 		return x & 0x3FF;
 	}
