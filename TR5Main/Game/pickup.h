@@ -2,11 +2,9 @@
 
 #include "..\Global\global.h"
 
-//#define _RegeneratePickups ((void (__cdecl*)()) 0x00467AF0)
-//#define _PuzzleHoleCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00468C70)
-#define _PickupCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00467C00)
-#define _InitialisePickup ((void (__cdecl*)(short)) 0x0043E260)
-#define _PickupControl ((void (__cdecl*)(short)) 0x004679D0)
+//#define PickupCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00467C00)
+//#define InitialisePickup ((void (__cdecl*)(short)) 0x0043E260)
+//#define PickupControl ((void (__cdecl*)(short)) 0x004679D0)
 
 void InitialisePickup(short itemNumber);
 void PickedUpObject(short objectNumber);
@@ -22,6 +20,13 @@ void RegeneratePickups();
 short* FindPlinth(ITEM_INFO* item);
 void PuzzleDone(ITEM_INFO* item, short itemNum);
 void PickupControl(short itemNum);
+
+//#define InitialiseCupboard ((void (__cdecl*)(short)) 0x0043EDB0)
+//#define CupboardCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004699A0)
+//#define CupboardControl ((void (__cdecl*)(short)) 0x00469660)
+void InitialiseCupboard(short itemNumber);
+void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll);
+void CupboardControl(short itemNumber);
 
 void Inject_Pickup();
 
