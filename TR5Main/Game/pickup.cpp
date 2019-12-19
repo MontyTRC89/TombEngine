@@ -1437,87 +1437,57 @@ void InitialisePickup(short itemNumber)
 }
 
 /// related to cupboard !!!
-#define CupboardBounds	VAR_U_(0x00509C1C, short)
+#define CupboardBounds	ARRAY_(0x00509C1C, short, [])
 #define CupboardPos		VAR_U_(0x0051CF70, PHD_VECTOR)
 #define CupboardAnims	ARRAY_(0x00509C3C, short, [])
-#define word_509C1E		VAR_U_(0x00509C1E, short)
-#define word_509C24		VAR_U_(0x00509C24, short)
-#define word_509C26		VAR_U_(0x00509C26, short)
-#define unk_51CF78      VAR_U_(0x0051CF78, short)
-#define dword_51CF78	VAR_U_(0x0051CF78, int)
-#define word_509C44		ARRAY_(0x00509C44, short, [])
-#define word_509C34		ARRAY_(0x00509C34, short, [])
+#define CupboardOffsets	ARRAY_(0x00509C44, short, [])
+#define CupboardFrames	ARRAY_(0x00509C34, short, [])
 
 void InitialiseCupboard(short itemNumber)
 {
 	ITEM_INFO* item, *item2;
-	int id, itemNumber2;
-	short objNumber;
+	short itemNumber2;
 
 	item = &Items[itemNumber];
-	objNumber = 3 - ((ID_SEARCH_OBJECT4 - item->objectNumber) >> 1);
-	if (objNumber == 1)
+	if (item->objectNumber == ID_SEARCH_OBJECT1)
 	{
-		item->meshBits = 1;
-		return;
-	}
-	if (objNumber == 4)
-	{
-		item->pad2[0] = -1;
+		item->swapMeshFlags = -1;
 		item->meshBits = 7;
-		return;
 	}
-	if (objNumber == 3)
+	else if (item->objectNumber == ID_SEARCH_OBJECT2)
+	{
+		item->meshBits = 2;
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT4)
 	{
 		item->itemFlags[1] = -1;
 		item->meshBits = 9;
 		
-		id = 0;
-		if (LevelItems <= 0)
-		{
-			AddActiveItem(itemNumber);
-			item->flags |= IFLAG_ACTIVATION_MASK;
-			item->status = ITEM_ACTIVE;
-			return;
-		}
-
-		itemNumber2 = 0;
-		while (true)
+		for (itemNumber2 = 0; itemNumber2 < LevelItems; ++itemNumber2)
 		{
 			item2 = &Items[itemNumber2];
 
-			if (item->objectNumber == 149) // ID_SNOWMOBILE_LARA_ANIMS !!!!!!
+			if (item2->objectNumber == 149) /* @FIXME In TRC OBJECTS.H this is the EXPLOSION slot */
 			{
 				if (item->pos.xPos == item2->pos.xPos && item->pos.yPos == item2->pos.yPos && item->pos.zPos == item2->pos.zPos)
 				{
-					item->itemFlags[1] = id;
-					AddActiveItem(itemNumber);
-					item->flags |= IFLAG_ACTIVATION_MASK;
-					item->status = ITEM_ACTIVE;
-					return;
+					item->itemFlags[1] = itemNumber2;
+					break;
 				}
 			}
 			else if (Objects[item2->objectNumber].collision == PickupCollision
-				 &&  item->pos.xPos == item2->pos.xPos
-				 &&  item->pos.yPos == item2->pos.yPos
-				 &&  item->pos.zPos == item2->pos.zPos)
+					&&  item->pos.xPos == item2->pos.xPos
+					&&  item->pos.yPos == item2->pos.yPos
+					&&  item->pos.zPos == item2->pos.zPos)
 			{
-				item->itemFlags[1] = id;
-				AddActiveItem(itemNumber);
-				item->flags |= IFLAG_ACTIVATION_MASK;
-				item->status = ITEM_ACTIVE;
-				return;
+				item->itemFlags[1] = itemNumber2;
+				break;
 			}
 
-			itemNumber2 = ++id;
-			if (id >= LevelItems)
-			{
-				AddActiveItem(itemNumber);
-				item->flags |= IFLAG_ACTIVATION_MASK;
-				item->status = ITEM_ACTIVE;
-				return;
-			}
 		}
+		AddActiveItem(itemNumber);
+		item->flags |= IFLAG_ACTIVATION_MASK;
+		item->status = ITEM_ACTIVE;
 	}
 }
 
@@ -1526,52 +1496,45 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 	ITEM_INFO* item;
 	int objNumber;
 	short* bounds;
-	short boundsResult;
 
 	item = &Items[itemNumber];
-	objNumber = 3 - ((ID_SEARCH_OBJECT4 - item->objectNumber) >> 1);
+	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
 
-	if (!(TrInput & IN_ACTION) || laraitem->currentAnimState != STATE_LARA_STOP || laraitem->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus != LG_NO_ARMS && !Lara.isMoving || Lara.generalPtr != (void*)itemNumber)
-	{
-		if (laraitem->currentAnimState != STATE_LARA_MISC_CONTROL)
-			ObjectCollision(itemNumber, laraitem, laracoll);
-	}
-	else
+	if (TrInput & IN_ACTION && laraitem->currentAnimState == STATE_LARA_STOP && laraitem->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS && (item->status == ITEM_INACTIVE && item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
+		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 	{
 		bounds = GetBoundsAccurate(item);
-		CupboardBounds = *bounds;
-		if (objNumber)
+		if (item->objectNumber != ID_SEARCH_OBJECT1)
 		{
-			CupboardBounds -= 128;
-			boundsResult = bounds[1] + 128;
+			CupboardBounds[0] = bounds[0] - 128;
+			CupboardBounds[1] = bounds[1] + 128;
 		}
 		else
 		{
-			CupboardBounds += 64;
-			boundsResult = bounds[1] - 64;
+			CupboardBounds[0] = bounds[0] + 64;
+			CupboardBounds[1] = bounds[1] - 64;
 		}
-		word_509C1E = boundsResult;
-		word_509C24 = bounds[4] - 200; // unk_51CF70 ?
-		word_509C26 = bounds[5] + 200; // unk_51CF70 ?
-		CupboardPos.z = bounds[4] - word_509C44[objNumber];
+		CupboardBounds[4] = bounds[4] - 200;
+		CupboardBounds[5] = bounds[5] + 200;
+		CupboardPos.z = bounds[4] - CupboardOffsets[objNumber];
 
-		if (TestLaraPosition(&CupboardBounds, item, laraitem))
+		if (TestLaraPosition(CupboardBounds, item, laraitem))
 		{
 			if (MoveLaraPosition(&CupboardPos, item, laraitem))
 			{
 				laraitem->currentAnimState = STATE_LARA_MISC_CONTROL;
 				laraitem->animNumber = CupboardAnims[objNumber];
-				laraitem->frameNumber = Anims[CupboardAnims[objNumber]].frameBase;
+				laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
 				Lara.isMoving = false;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
+				Lara.headZrot = 0;
 				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
-				if (objNumber == 3)
+				if (item->objectNumber == ID_SEARCH_OBJECT4)
 				{
-					item->itemFlags[0] = LG_HANDS_BUSY;
+					item->itemFlags[0] = 1;
 				}
 				else
 				{
@@ -1585,96 +1548,91 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 			}
 			else
 			{
-				Lara.generalPtr = (void*)itemNumber;
+				Lara.generalPtr = (void *) itemNumber;
 			}
 		}
-		else if (Lara.isMoving && Lara.generalPtr == (void*)itemNumber) // *(&lara + 68) & 0x20
+		else if (Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 		{
 			Lara.isMoving = false;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.generalPtr = NULL;
 		}
+	}
+	else if (laraitem->currentAnimState != STATE_LARA_MISC_CONTROL)
+	{
+		ObjectCollision(itemNumber, laraitem, laracoll);
 	}
 }
 
 void CupboardControl(short itemNumber)
 {
 	ITEM_INFO* item, *item2;
-	short objNumber;
+	int objNumber;
 	short frameNumber;
-	short flipStats;
-	int meshBits;
 
 	item = &Items[itemNumber];
-	objNumber = 3 - ((ID_SEARCH_OBJECT4 - item->objectNumber) >> 1);
+	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
 
-	if (objNumber != 3 || item->itemFlags[0] == LG_HANDS_BUSY)
+	if (item->objectNumber != ID_SEARCH_OBJECT4 || item->itemFlags[0] == 1)
 		AnimateItem(item);
 
 	frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
-	if (objNumber == 1)
+	if (item->objectNumber == ID_SEARCH_OBJECT1)
+	{
+		if (frameNumber > 0)
+		{
+			item->swapMeshFlags = 0;
+			item->meshBits = -1;
+		}
+		else
+		{
+			item->swapMeshFlags = -1;
+			item->meshBits = 7;
+		}
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT2)
 	{
 		if (frameNumber == 18)
 			item->meshBits = 1;
 		else if (frameNumber == 172)
 			item->meshBits = 2;
 	}
-	else if (objNumber)
+	else if (item->objectNumber == ID_SEARCH_OBJECT4)
 	{
-		if (objNumber == 3)
-		{
-			flipStats = FlipStats[0];
-			meshBits = FlipStats[0] != 0 ? 48 : 9;
+		item->meshBits = FlipStats[0] != 0 ? 48 : 9;
 
-			item->meshBits = meshBits;
-
-			if (frameNumber >= 45 && frameNumber <= 131)
-				item->meshBits = meshBits | (flipStats != 0 ? 4 : 2);
+		if (frameNumber >= 45 && frameNumber <= 131)
+			item->meshBits |= FlipStats[0] != 0 ? 4 : 2;
 			
+		if (item->itemFlags[1] != -1)
+		{
+			item2 = &Items[item->itemFlags[1]];
+			if (Objects[item2->objectNumber].collision == PickupCollision)
+			{
+				if (FlipStats[0])
+					item2->status = ITEM_INACTIVE;
+				else
+					item2->status = ITEM_INVISIBLE;
+			}
+		}
+	}
+
+	if (frameNumber == CupboardFrames[objNumber])
+	{
+		if (item->objectNumber == ID_SEARCH_OBJECT4)
+		{
 			if (item->itemFlags[1] != -1)
 			{
 				item2 = &Items[item->itemFlags[1]];
 				if (Objects[item2->objectNumber].collision == PickupCollision)
 				{
-					//if (flipStats)
-					//	item2->flags2 = item2->flags2 & 0xFFFFFFF9;
-					//else
-					//	item2->flags2 = item2->flags2 | 6;
-				}
-			}
-		}
-	}
-	else if (frameNumber <= 0)
-	{
-		item->pad2[0] = -1;
-		item->meshBits = 7;
-	}
-	else
-	{
-		item->pad2[0] = 0;
-		item->meshBits = -1;
-	}
-
-	if (frameNumber == word_509C34[objNumber])
-	{
-		if (objNumber == 3)
-		{
-			ITEM_INFO* item3;
-			short itemFlag1 = item->itemFlags[1];
-			item3 = &Items[itemFlag1];
-			if (itemFlag1 != -1)
-			{
-				short v11;
-				v11 = Items[2811 * itemFlag1].objectNumber;
-				if (Objects[v11].collision == PickupCollision)
-				{
-					AddDisplayPickup(v11);
+					AddDisplayPickup(item2->objectNumber);
 					KillItem(item->itemFlags[1]);
 				}
 				else
 				{
-					AddActiveItem(itemFlag1);
-					item3->flags |= IFLAG_ACTIVATION_MASK;
-					item3->status = ITEM_ACTIVE;
+					AddActiveItem(item->itemFlags[1]);
+					item2->flags |= IFLAG_ACTIVATION_MASK;
+					item2->status = ITEM_ACTIVE;
 					LaraItem->hitPoints = 640;
 				}
 				item->itemFlags[1] = -1;
@@ -1689,7 +1647,7 @@ void CupboardControl(short itemNumber)
 	
 	if (item->status == ITEM_DEACTIVATED)
 	{
-		if (objNumber == 3)
+		if (item->objectNumber == ID_SEARCH_OBJECT4)
 		{
 			item->itemFlags[0] = 0;
 			item->status = ITEM_ACTIVE;
@@ -1697,7 +1655,7 @@ void CupboardControl(short itemNumber)
 		else
 		{
 			RemoveActiveItem(itemNumber);
-			item->status = ITEM_DEACTIVATED;
+			item->status = ITEM_INACTIVE;
 		}
 	}
 }
