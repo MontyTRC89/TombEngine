@@ -797,7 +797,7 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		if (Lara.waterStatus != LW_UNDERWATER)
 		{
 			angle = mGetAngle(dest->xPos, dest->zPos, src->xPos, src->zPos);
-			direction = (((angle + ANGLE(45)) >> W2V_SHIFT) - ((dest->yRot + ANGLE(45)) >> W2V_SHIFT)) & 3;
+			direction = ((unsigned short) (angle + ANGLE(45)) / ANGLE(90) - (unsigned short) (dest->yRot + ANGLE(45)) / ANGLE(90)) & 3;
 
 			switch (direction)
 			{
@@ -841,9 +841,9 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		Lara.moveCount = 0;
 	}
 
-	if ((dest->xRot - src->xRot) <= angAdd)
+	if ((short) (dest->xRot - src->xRot) <= angAdd)
 	{
-		if ((dest->xRot - src->xRot) >= -angAdd)
+		if ((short) (dest->xRot - src->xRot) >= -angAdd)
 			src->xRot = dest->xRot;
 		else
 			src->xRot = src->xRot - angAdd;
@@ -853,9 +853,9 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		src->xRot = angAdd + src->xRot;
 	}
 
-	if ((dest->yRot - src->yRot) <= angAdd)
+	if ((short) (dest->yRot - src->yRot) <= angAdd)
 	{
-		if ((dest->yRot - src->yRot) >= -angAdd)
+		if ((short) (dest->yRot - src->yRot) >= -angAdd)
 			src->yRot = dest->yRot;
 		else
 			src->yRot = src->yRot - angAdd;
@@ -865,9 +865,9 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		src->yRot = angAdd + src->yRot;
 	}
 
-	if ((dest->zRot - src->zRot) <= angAdd)
+	if ((short) (dest->zRot - src->zRot) <= angAdd)
 	{
-		if ((dest->zRot - src->zRot) >= -angAdd)
+		if ((short) (dest->zRot - src->zRot) >= -angAdd)
 			src->zRot = dest->zRot;
 		else
 			src->zRot = src->zRot - angAdd;
