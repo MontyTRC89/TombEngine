@@ -1629,6 +1629,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
+	// TODO: the chef not exist anymore !!!
+	/*
 	obj = &Objects[ID_SAS_CAIRO];
 	if (obj->loaded)
 	{
@@ -1650,7 +1652,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
-
+	*/
 	obj = &Objects[ID_TWOGUN];
 	if (obj->loaded)
 	{
@@ -1678,9 +1680,9 @@ void BaddyObjects()
 	obj = &Objects[ID_HYDRA];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmallDragon;
+		obj->initialise = InitialiseHydra;
 		obj->collision = CreatureCollision;
-		obj->control = ControlSmallDragon;
+		obj->control = ControlHydra;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 30;
 		obj->pivotLength = 50;
@@ -1763,7 +1765,9 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
-
+	
+	// TODO: LagoonWitch is deleted !
+	/*
 	obj = &Objects[ID_GREEN_TEETH];
 	if (obj->loaded)
 	{
@@ -1790,6 +1794,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
+	*/
 
 	obj = &Objects[ID_INVISIBLE_GHOST];
 	if (obj->loaded)
@@ -1831,6 +1836,8 @@ void BaddyObjects()
 		obj->control = ControlLittleBats;
 	}
 
+	// TODO: spider is deleted !
+	/*
 	obj = &Objects[ID_SPIDER];
 	if (obj->loaded)
 	{
@@ -1839,6 +1846,7 @@ void BaddyObjects()
 		obj->initialise = InitialiseSpiders;
 		obj->control = ControlSpiders;
 	}
+	*/
 
 	obj = &Objects[ID_GLADIATOR];
 	if (obj->loaded)
