@@ -485,6 +485,24 @@ int GlobalItemReplace(short search, short replace)
 	return changed;
 }
 
+ITEM_INFO* find_a_fucking_item(short objectNum)
+{
+	int itemNumber = FindItem(objectNum);
+	return (itemNumber != NO_ITEM ? &Items[itemNumber] : NULL);
+}
+
+int FindItem(short objectNum)
+{
+	for (int i = 0; i < LevelItems; i++)
+	{
+		ITEM_INFO* item = &Items[i];
+		if (item->objectNumber == objectNum)
+			return i;
+	}
+
+	return NO_ITEM;
+}
+
 void Inject_Items()
 {
 	INJECT(0x00440840, CreateItem);

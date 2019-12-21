@@ -7,6 +7,7 @@
 #include "control.h"
 #include "effects.h"
 #include "effect2.h"
+#include "tomb4fx.h"
 #include "lot.h"
 #include "collide.h"
 #include "debris.h"
@@ -222,7 +223,7 @@ void ControlHarpoonBolt(short itemNumber)
 		{
 			// Create bubbles
 			if ((Wibble & 15) == 0)
-				CreateBubble(&item->pos, item->roomNumber, 0);
+				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 0, 0, 0, 0, 0, 0); // CHECK
 			//TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
 			item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * SIN(item->pos.xRot) >> W2V_SHIFT);
 			item->speed = (short)((HARPOON_SPEED >> 1) * COS(item->pos.xRot) >> W2V_SHIFT);
@@ -654,8 +655,8 @@ void ControlGrenade(short itemNumber)
 							else
 							{
 								TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-								currentItem->pos.yPos -= 128;
-								TriggerShockwave(&currentItem->pos, 0x1300030, 96, 0x18806000, 0, 0);
+								currentItem->pos.yPos -= 128; 
+								TriggerShockwave(&currentItem->pos, 0x3000, 0x3001, 64, 0, 96, 128, 24, 0, 0); // CHECK
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
 								short currentItemNumber = (currentItem - Items) / sizeof(ITEM_INFO);
@@ -680,7 +681,7 @@ void ControlGrenade(short itemNumber)
 							{
 								TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
 								currentMesh->y -= 128;
-								TriggerShockwave((PHD_3DPOS*)&currentMesh, 0xB00028, 64, 0x10806000, 0, 0);
+								TriggerShockwave((PHD_3DPOS*)&currentMesh, 0x2800, 0xB000, 64, 0, 96, 128, 16, 0, 0);
 								currentMesh->y += 128;
 								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
@@ -730,7 +731,7 @@ void ControlGrenade(short itemNumber)
 		else
 		{
 			item->pos.yPos -= 128;
-			TriggerShockwave(&item->pos, 0x1300030, 96, 0x18806000, 0, 0);
+			TriggerShockwave(&item->pos, 0x3000, 0x3001, 96, 0, 96, 128, 24, 0, 0);
 
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
 			for (int x = 0; x < 2; x++)
@@ -1059,7 +1060,7 @@ void ControlCrossbowBolt(short itemNumber)
 		if (item->speed > 64)
 			item->speed -= (item->speed >> 4);
 		if (GlobalCounter & 1)
-			CreateBubble(&item->pos, roomNumber, 4, 7);
+			CreateBubble((PHD_VECTOR*)&item->pos, roomNumber, 4, 7, 0, 0, 0, 0);
 	}
 	else
 	{
@@ -1142,7 +1143,7 @@ void ControlCrossbowBolt(short itemNumber)
 						{
 							TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
 							currentItem->pos.yPos -= 128;
-							TriggerShockwave(&currentItem->pos, 19922992, 96, 411066368, 0, 0);
+							TriggerShockwave(&currentItem->pos, 0x3000, 0x3001, 96, 0, 96, 128, 24, 0, 0);
 							currentItem->pos.yPos += 128;
 							ExplodeItemNode(currentItem, 0, 0, 128);
 							short currentItemNumber = (currentItem - CollidedItems[0]) / sizeof(ITEM_INFO);
@@ -1183,7 +1184,7 @@ void ControlCrossbowBolt(short itemNumber)
 						{
 							TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
 							currentMesh->y -= 128;
-							TriggerShockwave((PHD_3DPOS*)&currentMesh, 0xB00028, 64, 0x10806000, 0, 0);
+							TriggerShockwave((PHD_3DPOS*)&currentMesh, 0x2800, 0xB000, 64, 0, 96, 128, 16, 0, 0);
 							currentMesh->y += 128;
 						}
 						ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
@@ -1223,7 +1224,7 @@ void ControlCrossbowBolt(short itemNumber)
 		TriggerUnderwaterExplosion(item);
 	else
 	{
-		TriggerShockwave(&item->pos, 19922992, 96, 411066368, 0, 0);
+		TriggerShockwave(&item->pos, 0x3000, 0x3001, 96, 0, 96, 128, 24, 0, 0);
 		item->pos.yPos += 128;
 		TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
 		for (int j = 0; j < 2; j++)
@@ -1424,7 +1425,7 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 
 void TriggerUnderwaterExplosion(ITEM_INFO* item)
 {
-	TriggerExplosionBubbles(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	TriggerExplosionBubble(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
 	
 	for (int i = 0; i < 3; i++)

@@ -12,7 +12,7 @@
 //#define InitialiseItem ((void (__cdecl*)(short)) 0x004408B0)
 //#define CreateItem ((short (__cdecl*)()) 0x00440840)
 //#define KillItem ((void (__cdecl*)(short)) 0x00440620)
-#define ItemNearLara ((int (__cdecl*)(PHD_3DPOS*, int)) 0x00432580)
+//#define ItemNearLara ((int (__cdecl*)(PHD_3DPOS*, int)) 0x00432580)
 //#define TranslateItem ((void (__cdecl*)(ITEM_INFO*, int, int, int)) 0x00415960)
 
 void EffectNewRoom(short fxNumber, short roomNumber);
@@ -29,5 +29,7 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numitems);
 void KillItem(short itemNum);
+ITEM_INFO* find_a_fucking_item(short objectNum);
+int FindItem(short objectNum);
 
 void Inject_Items();

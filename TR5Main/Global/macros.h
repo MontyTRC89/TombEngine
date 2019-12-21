@@ -15,6 +15,11 @@
 #define ZONE(A) FlipStatus + 2 * A
 #define CHECK_CLICK(x) CLICK(x) / 2
 
+#define RED(rgb) (((rgb) >> 16) & 0xFF)
+#define GREEN(rgb) (((rgb) >> 8) & 0xFF)
+#define BLUE(rgb) ((rgb) & 0xFF)
+#define ALPHA(rgb) (((rgb) >> 24) & 0xFF)
+
 #define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh * 2]
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)

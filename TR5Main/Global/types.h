@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include "enums.h"
 
 #pragma pack(push, 1)
 typedef enum TYPE_ZONE
@@ -1051,16 +1052,16 @@ struct DRIP_STRUCT
 	int x; // size=0, offset=0
 	int y; // size=0, offset=4
 	int z; // size=0, offset=8
-	byte On; // size=0, offset=12
-	byte R; // size=0, offset=13
-	byte G; // size=0, offset=14
-	byte B; // size=0, offset=15
-	short Yvel; // size=0, offset=16
-	byte Gravity; // size=0, offset=18
-	byte Life; // size=0, offset=19
-	short RoomNumber; // size=0, offset=20
-	byte Outside; // size=0, offset=22
-	byte Pad; // size=0, offset=23
+	byte on; // size=0, offset=12
+	byte r; // size=0, offset=13
+	byte g; // size=0, offset=14
+	byte b; // size=0, offset=15
+	short yVel; // size=0, offset=16
+	byte gravity; // size=0, offset=18
+	byte life; // size=0, offset=19
+	short roomNumber; // size=0, offset=20
+	byte outside; // size=0, offset=22
+	byte pad; // size=0, offset=23
 };
 
 struct RIPPLE_STRUCT
@@ -1102,7 +1103,7 @@ struct FIRE_LIST
 	int z; // size=0, offset=8
 	byte on; // size=0, offset=12
 	byte size; // size=0, offset=13
-	short room_number; // size=0, offset=14
+	short roomNumber; // size=0, offset=14
 };
 
 struct FIRE_SPARKS
@@ -1145,31 +1146,31 @@ struct SMOKE_SPARKS
 	int x; // size=0, offset=0
 	int y; // size=0, offset=4
 	int z; // size=0, offset=8
-	short Xvel; // size=0, offset=12
-	short Yvel; // size=0, offset=14
-	short Zvel; // size=0, offset=16
-	short Gravity; // size=0, offset=18
-	short RotAng; // size=0, offset=20
-	short Flags; // size=0, offset=22
+	short xVel; // size=0, offset=12
+	short yVel; // size=0, offset=14
+	short zVel; // size=0, offset=16
+	short gravity; // size=0, offset=18
+	short rotAng; // size=0, offset=20
+	short flags; // size=0, offset=22
 	byte sSize; // size=0, offset=24
 	byte dSize; // size=0, offset=25
-	byte Size; // size=0, offset=26
-	byte Friction; // size=0, offset=27
-	byte Scalar; // size=0, offset=28
-	byte Def; // size=0, offset=29
-	byte RotAdd; // size=0, offset=30
-	byte MaxYvel; // size=0, offset=31
-	byte On; // size=0, offset=32
+	byte size; // size=0, offset=26
+	byte friction; // size=0, offset=27
+	byte scalar; // size=0, offset=28
+	byte def; // size=0, offset=29
+	byte rotAdd; // size=0, offset=30
+	byte maxYvel; // size=0, offset=31
+	byte on; // size=0, offset=32
 	byte sShade; // size=0, offset=33
 	byte dShade; // size=0, offset=34
-	byte Shade; // size=0, offset=35
-	byte ColFadeSpeed; // size=0, offset=36
-	byte FadeToBlack; // size=0, offset=37
+	byte shade; // size=0, offset=35
+	byte colFadeSpeed; // size=0, offset=36
+	byte fadeToBlack; // size=0, offset=37
 	byte sLife; // size=0, offset=38
-	byte Life; // size=0, offset=39
-	byte TransType; // size=0, offset=40
-	byte FxObj; // size=0, offset=41
-	byte NodeNumber; // size=0, offset=42
+	byte life; // size=0, offset=39
+	byte transType; // size=0, offset=40
+	byte fxObj; // size=0, offset=41
+	byte nodeNumber; // size=0, offset=42
 	byte mirror; // size=0, offset=43
 };
 
@@ -1178,25 +1179,25 @@ struct BLOOD_STRUCT
 	int x; // size=0, offset=0
 	int y; // size=0, offset=4
 	int z; // size=0, offset=8
-	short Xvel; // size=0, offset=12
-	short Yvel; // size=0, offset=14
-	short Zvel; // size=0, offset=16
-	short Gravity; // size=0, offset=18
-	short RotAng; // size=0, offset=20
+	short xVel; // size=0, offset=12
+	short yVel; // size=0, offset=14
+	short zVel; // size=0, offset=16
+	short gravity; // size=0, offset=18
+	short rotAng; // size=0, offset=20
 	unsigned char sSize; // size=0, offset=22
 	unsigned char dSize; // size=0, offset=23
-	unsigned char Size; // size=0, offset=24
-	unsigned char Friction; // size=0, offset=25
-	byte RotAdd; // size=0, offset=26
-	unsigned char On; // size=0, offset=27
+	unsigned char size; // size=0, offset=24
+	unsigned char friction; // size=0, offset=25
+	byte rotAdd; // size=0, offset=26
+	unsigned char on; // size=0, offset=27
 	unsigned char sShade; // size=0, offset=28
 	unsigned char dShade; // size=0, offset=29
-	unsigned char Shade; // size=0, offset=30
-	unsigned char ColFadeSpeed; // size=0, offset=31
-	unsigned char FadeToBlack; // size=0, offset=32
+	unsigned char shade; // size=0, offset=30
+	unsigned char colFadeSpeed; // size=0, offset=31
+	unsigned char fadeToBlack; // size=0, offset=32
 	byte sLife; // size=0, offset=33
-	byte Life; // size=0, offset=34
-	byte Pad; // size=0, offset=35
+	byte life; // size=0, offset=34
+	byte pad; // size=0, offset=35
 };
 
 typedef struct SPOTCAM
@@ -1352,21 +1353,21 @@ struct DEBRIS_STRUCT
 	int x; // size=0, offset=4
 	int y; // size=0, offset=8
 	int z; // size=0, offset=12
-	short XYZOffsets1[3]; // size=6, offset=16
-	short Dir; // size=0, offset=22
-	short XYZOffsets2[3]; // size=6, offset=24
-	short Speed; // size=0, offset=30
-	short XYZOffsets3[3]; // size=6, offset=32
-	short Yvel; // size=0, offset=38
-	short Gravity; // size=0, offset=40
-	short RoomNumber; // size=0, offset=42
-	byte On; // size=0, offset=44
-	byte XRot; // size=0, offset=45
-	byte YRot; // size=0, offset=46
+	short xyzOffsets1[3]; // size=6, offset=16
+	short dir; // size=0, offset=22
+	short xyzOffsets2[3]; // size=6, offset=24
+	short speed; // size=0, offset=30
+	short xyzOffsets3[3]; // size=6, offset=32
+	short yVel; // size=0, offset=38
+	short gravity; // size=0, offset=40
+	short roomNumber; // size=0, offset=42
+	byte on; // size=0, offset=44
+	byte xRot; // size=0, offset=45
+	byte yRot; // size=0, offset=46
 	byte r; // size=0, offset=47
 	byte g; // size=0, offset=48
 	byte b; // size=0, offset=49
-	byte Pad[22]; // size=22, offset=50
+	byte pad[22]; // size=22, offset=50
 };
 
 typedef struct BOUNDING_BOX {
@@ -1423,6 +1424,17 @@ struct PISTOL_DEF {
 	char draw1Anim;
 	char draw2Anim;
 	char recoilAnim;
+};
+
+struct SP_DYNAMIC
+{
+	unsigned char On; // size=0, offset=0
+	unsigned char Falloff; // size=0, offset=1
+	unsigned char R; // size=0, offset=2
+	unsigned char G; // size=0, offset=3
+	unsigned char B; // size=0, offset=4
+	unsigned char Flags; // size=0, offset=5
+	unsigned char Pad[2]; // size=2, offset=6
 };
 
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);

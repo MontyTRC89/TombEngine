@@ -5,6 +5,7 @@
 #include "..\Game\items.h"
 #include "..\Game\effects.h"
 #include "..\Game\draw.h"
+#include "..\Game\tomb4fx.h"
 #include <stdio.h>
 
 #define SHARD_DAMAGE 30
@@ -116,8 +117,8 @@ void ControlMissile(short fxNumber)
 	printf("Num: %d\n", fx->objectNumber);
 
 	/* Create bubbles in wake of harpoon bolt */
-	if (fx->objectNumber == ID_SCUBA_HARPOON && Rooms[fx->roomNumber].flags & 1)
-		CreateBubble(&fx->pos, fx->roomNumber, 1);
+	//if (fx->objectNumber == ID_SCUBA_HARPOON && Rooms[fx->roomNumber].flags & 1)
+	//	CreateBubble(&fx->pos, fx->roomNumber, 1, 0);
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
 	{
 		AddDynamicLight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 14, 11);

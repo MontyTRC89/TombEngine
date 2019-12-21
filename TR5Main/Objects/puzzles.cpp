@@ -11,6 +11,7 @@
 #include "..\Game\collide.h"
 #include "..\Game\sphere.h"
 #include "..\Game\switch.h"
+#include "../Game/tomb4fx.h"
 
 short ScalesBounds[12] = {
 	0xFA80, 0xFA80, 0x0000, 0x0000, 0xFE00, 0x0200,
@@ -174,14 +175,14 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		drip->x = pos.x;
 		drip->y = pos.y;
 		drip->z = pos.z;
-		drip->On = 1;
-		drip->R = (GetRandomControl() & 0xF) + 24;
-		drip->G = (GetRandomControl() & 0xF) + 44;
-		drip->B = (GetRandomControl() & 0xF) + 56;
-		drip->Yvel = (GetRandomControl() & 0x1F) + 32;
-		drip->Gravity = (GetRandomControl() & 0x1F) + 32;
-		drip->Life = (GetRandomControl() & 0x1F) + 16;
-		drip->RoomNumber = l->roomNumber;
+		drip->on = 1;
+		drip->r = (GetRandomControl() & 0xF) + 24;
+		drip->g = (GetRandomControl() & 0xF) + 44;
+		drip->b = (GetRandomControl() & 0xF) + 56;
+		drip->yVel = (GetRandomControl() & 0x1F) + 32;
+		drip->gravity = (GetRandomControl() & 0x1F) + 32;
+		drip->life = (GetRandomControl() & 0x1F) + 16;
+		drip->roomNumber = l->roomNumber;
 	}
 }
 

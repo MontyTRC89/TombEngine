@@ -5,6 +5,7 @@
 #include "../../Game/sphere.h"
 #include "../../Game/lot.h"
 #include "../../Game/effects.h"
+#include "../../Game/tomb4fx.h"
 
 BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
 BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };

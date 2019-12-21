@@ -3,6 +3,7 @@
 #include "..\Game\collide.h"
 #include "..\Game\effect2.h"
 #include "..\Game\effects.h"
+#include "..\Game\tomb4fx.h"
 #include "..\Game\Box.h"
 #include "..\Game\switch.h"
 #include "..\Game\missile.h"
@@ -2954,7 +2955,7 @@ void InitialiseSpecialEffects()
 	memset(&Sparks, 0, MAX_SPARKS * sizeof(SPARKS));
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
-	memset(&GunShells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
+	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&GunFlashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)) - sizeof(int)); // the size is 200 on IDA (without -4 it's 204 ??)
 	memset(&Debris, 0, MAX_DEBRIS * sizeof(DEBRIS_STRUCT));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));

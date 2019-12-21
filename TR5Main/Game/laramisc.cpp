@@ -6,6 +6,7 @@
 #include "Lara.h"
 #include "laraswim.h"
 #include "larasurf.h"
+#include "effect2.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;

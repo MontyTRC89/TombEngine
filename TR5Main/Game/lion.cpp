@@ -5,6 +5,7 @@
 #include "effects.h"
 #include "lot.h"
 #include "box.h"
+#include "tomb4fx.h"
 
 BITE_INFO LionBite1 = { 0xFFFFFFFE, 0xFFFFFFF6, 0xFA, 0x15 };
 BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };

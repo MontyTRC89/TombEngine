@@ -17,6 +17,7 @@
 #include "..\Game\items.h"
 #include "..\Game\Camera.h"
 #include "..\Game\healt.h"
+#include "../Game/tomb4fx.h"
 
 #include <D3Dcompiler.h>
 #include <chrono> 
@@ -2725,7 +2726,7 @@ void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byt
 	dynamicLight->Intensity = 2.0f;
 
 	m_dynamicLights.Add(dynamicLight);
-	NumDynamics++;
+	//NumDynamics++;
 }
 
 void Renderer11::EnableCinematicBars(bool value)
@@ -4656,12 +4657,12 @@ void Renderer11::drawBlood()
 	for (int i = 0; i < 32; i++)
 	{
 		BLOOD_STRUCT* blood = &Blood[i];
-		if (blood->On)
+		if (blood->on)
 		{
 			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
 				blood->x, blood->y, blood->z,
-				blood->Shade * 244, blood->Shade * 0, blood->Shade * 0,
-				TR_ANGLE_TO_RAD(blood->RotAng), 1.0f, blood->Size * 8.0f, blood->Size * 8.0f,
+				blood->shade * 244, blood->shade * 0, blood->shade * 0,
+				TR_ANGLE_TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
 				BLENDMODE_ALPHABLEND);
 		}
 	}
@@ -4751,12 +4752,12 @@ void Renderer11::drawSmokes()
 	for (int i = 0; i < 32; i++)
 	{
 		SMOKE_SPARKS* spark = &SmokeSparks[i];
-		if (spark->On)
+		if (spark->on)
 		{
-			addSpriteBillboard(m_sprites[spark->Def],
+			addSpriteBillboard(m_sprites[spark->def],
 				spark->x, spark->y, spark->z,
-				spark->Shade, spark->Shade, spark->Shade,
-				TR_ANGLE_TO_RAD(spark->RotAng), spark->Scalar, spark->Size * 4.0f, spark->Size * 4.0f,
+				spark->shade, spark->shade, spark->shade,
+				TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
 				BLENDMODE_ALPHABLEND);
 		}
 	}
@@ -4895,9 +4896,9 @@ void Renderer11::drawDrips()
 	{
 		DRIP_STRUCT* drip = &Drips[i];
 
-		if (drip->On)
+		if (drip->on)
 		{
-			addLine3D(drip->x, drip->y, drip->z, drip->x, drip->y + 24.0f, drip->z, drip->R, drip->G, drip->B);
+			addLine3D(drip->x, drip->y, drip->z, drip->x, drip->y + 24.0f, drip->z, drip->r, drip->g, drip->b);
 		}
 	}
 }
@@ -5514,10 +5515,10 @@ bool Renderer11::drawDebris(bool transparent)
 	{
 		DEBRIS_STRUCT* debris = &Debris[i];
 
-		if (debris->On)
+		if (debris->on)
 		{
 			Matrix translation = Matrix::CreateTranslation(debris->x, debris->y, debris->z);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(debris->YRot), TR_ANGLE_TO_RAD(debris->XRot), 0);
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(debris->yRot), TR_ANGLE_TO_RAD(debris->xRot), 0);
 			Matrix world = rotation * translation;
 
 			OBJECT_TEXTURE* texture = &ObjectTextures[(int)(debris->textInfo) & 0x7FFF];
@@ -5535,40 +5536,40 @@ bool Renderer11::drawDebris(bool transparent)
 			RendererVertex vertex;
 
 			// Prepare the triangle
-			Vector3 p = Vector3(debris->XYZOffsets1[0], debris->XYZOffsets1[1], debris->XYZOffsets1[2]);
+			Vector3 p = Vector3(debris->xyzOffsets1[0], debris->xyzOffsets1[1], debris->xyzOffsets1[2]);
 			p = Vector3::Transform(p, world);
 			vertex.Position.x = p.x;
 			vertex.Position.y = p.y;
 			vertex.Position.z = p.z;
 			vertex.UV.x = (texture->vertices[0].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 			vertex.UV.y = (texture->vertices[0].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.Color.x = debris->Pad[2] / 255.0f;
-			vertex.Color.y = debris->Pad[3] / 255.0f;
-			vertex.Color.z = debris->Pad[4] / 255.0f;
+			vertex.Color.x = debris->pad[2] / 255.0f;
+			vertex.Color.y = debris->pad[3] / 255.0f;
+			vertex.Color.z = debris->pad[4] / 255.0f;
 			vertices.push_back(vertex);
 
-			p = Vector3(debris->XYZOffsets2[0], debris->XYZOffsets2[1], debris->XYZOffsets2[2]);
+			p = Vector3(debris->xyzOffsets2[0], debris->xyzOffsets2[1], debris->xyzOffsets2[2]);
 			p = Vector3::Transform(p, world);
 			vertex.Position.x = p.x;
 			vertex.Position.y = p.y;
 			vertex.Position.z = p.z;
 			vertex.UV.x = (texture->vertices[1].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 			vertex.UV.y = (texture->vertices[1].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.Color.x = debris->Pad[6] / 255.0f;
-			vertex.Color.y = debris->Pad[7] / 255.0f;
-			vertex.Color.z = debris->Pad[8] / 255.0f;
+			vertex.Color.x = debris->pad[6] / 255.0f;
+			vertex.Color.y = debris->pad[7] / 255.0f;
+			vertex.Color.z = debris->pad[8] / 255.0f;
 			vertices.push_back(vertex);
 
-			p = Vector3(debris->XYZOffsets3[0], debris->XYZOffsets3[1], debris->XYZOffsets3[2]);
+			p = Vector3(debris->xyzOffsets3[0], debris->xyzOffsets3[1], debris->xyzOffsets3[2]);
 			p = Vector3::Transform(p, world); 
 			vertex.Position.x = p.x;
 			vertex.Position.y = p.y;
 			vertex.Position.z = p.z;
 			vertex.UV.x = (texture->vertices[2].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 			vertex.UV.y = (texture->vertices[2].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.Color.x = debris->Pad[10] / 255.0f;
-			vertex.Color.y = debris->Pad[11] / 255.0f;
-			vertex.Color.z = debris->Pad[12] / 255.0f;
+			vertex.Color.x = debris->pad[10] / 255.0f;
+			vertex.Color.y = debris->pad[11] / 255.0f;
+			vertex.Color.z = debris->pad[12] / 255.0f;
 			vertices.push_back(vertex);
 		}
 	}
@@ -6944,7 +6945,7 @@ bool Renderer11::drawGunShells()
 
 	for (int i = 0; i < 24; i++)
 	{
-		GUNSHELL_STRUCT* gunshell = &GunShells[i];
+		GUNSHELL_STRUCT* gunshell = &Gunshells[i];
 
 		if (gunshell->counter > 0)
 		{

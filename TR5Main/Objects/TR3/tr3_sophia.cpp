@@ -7,6 +7,7 @@
 #include "../../Game/sphere.h"
 #include "../../Game/people.h"
 #include "../../Game/draw.h"
+#include "../../Game/effects.h"
 
 #define MAX_TRIGGER_RANGE 0x4000
 #define SMALL_FLASH 10

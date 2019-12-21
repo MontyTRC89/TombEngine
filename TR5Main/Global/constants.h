@@ -110,6 +110,14 @@
 #define	SP_NODEATTATCH	4096
 #define	SP_PLASMAEXP	8192
 
+#define	SD_EXPLOSION	1
+#define	SD_UWEXPLOSION	2
+
+#define	SEMITRANS		1
+#define	COLADD		2
+#define	COLSUB		3
+#define	WEIRD		4
+
 #define ONESHOT 0x100
 
 #define DATA_TYPE 0x1F

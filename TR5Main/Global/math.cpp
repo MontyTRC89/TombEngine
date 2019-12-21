@@ -1,4 +1,5 @@
 #include "math.h"
+#include "vars.h"
 
 // fix "improperly terminated macro invocation"
 // fix "expression must have integral or unscoped enum type"

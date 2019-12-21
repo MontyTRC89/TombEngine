@@ -17,6 +17,10 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 
 void AlterFOV(int value)
 { 
+	// DEBUG
+	if (value == 0)
+		return;
+
 	CurrentFOV = value;
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
 }
