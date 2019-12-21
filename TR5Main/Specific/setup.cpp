@@ -2387,49 +2387,49 @@ void ObjectObjects()
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorFloorCollision;
+			obj->collision = FloorTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_FLOOR_TRAPDOOR2];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorFloorCollision;
+			obj->collision = FloorTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_CEILING_TRAPDOOR1];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCeilingCollision;
+			obj->collision = CeilingTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_CEILING_TRAPDOOR2];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCeilingCollision;
+			obj->collision = CeilingTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_TRAPDOOR1];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorNormalCollision;
+			obj->collision = TrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_TRAPDOOR2];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorNormalCollision;
+			obj->collision = TrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_TRAPDOOR3];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorNormalCollision;
+			obj->collision = TrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 	}
@@ -2437,30 +2437,30 @@ void ObjectObjects()
 	obj = &Objects[ID_SEARCH_OBJECT1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCupboard;
-		obj->collision = CupboardCollision;
-		obj->control = CupboardControl;
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
 	}
 	obj = &Objects[ID_SEARCH_OBJECT2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCupboard;
-		obj->collision = CupboardCollision;
-		obj->control = CupboardControl;
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
 	}
 	obj = &Objects[ID_SEARCH_OBJECT3];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCupboard;
-		obj->collision = CupboardCollision;
-		obj->control = CupboardControl;
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
 	}
 	obj = &Objects[ID_SEARCH_OBJECT4];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCupboard;
-		obj->collision = CupboardCollision;
-		obj->control = CupboardControl;
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
 	}
 
 	obj = &Objects[ID_FLARE_ITEM];

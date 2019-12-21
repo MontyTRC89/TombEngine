@@ -1436,14 +1436,7 @@ void InitialisePickup(short itemNumber)
 	}
 }
 
-/// related to cupboard !!!
-#define CupboardBounds	ARRAY_(0x00509C1C, short, [])
-#define CupboardPos		VAR_U_(0x0051CF70, PHD_VECTOR)
-#define CupboardAnims	ARRAY_(0x00509C3C, short, [])
-#define CupboardOffsets	ARRAY_(0x00509C44, short, [])
-#define CupboardFrames	ARRAY_(0x00509C34, short, [])
-
-void InitialiseCupboard(short itemNumber)
+void InitialiseSearchObject(short itemNumber)
 {
 	ITEM_INFO* item, *item2;
 	short itemNumber2;
@@ -1476,9 +1469,9 @@ void InitialiseCupboard(short itemNumber)
 				}
 			}
 			else if (Objects[item2->objectNumber].collision == PickupCollision
-					&&  item->pos.xPos == item2->pos.xPos
-					&&  item->pos.yPos == item2->pos.yPos
-					&&  item->pos.zPos == item2->pos.zPos)
+				&&  item->pos.xPos == item2->pos.xPos
+				&&  item->pos.yPos == item2->pos.yPos
+				&&  item->pos.zPos == item2->pos.zPos)
 			{
 				item->itemFlags[1] = itemNumber2;
 				break;
@@ -1491,7 +1484,7 @@ void InitialiseCupboard(short itemNumber)
 	}
 }
 
-void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll)
+void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll)
 {
 	ITEM_INFO* item;
 	int objNumber;
@@ -1506,30 +1499,30 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 		bounds = GetBoundsAccurate(item);
 		if (item->objectNumber != ID_SEARCH_OBJECT1)
 		{
-			CupboardBounds[0] = bounds[0] - 128;
-			CupboardBounds[1] = bounds[1] + 128;
+			SOBounds[0] = bounds[0] - 128;
+			SOBounds[1] = bounds[1] + 128;
 		}
 		else
 		{
-			CupboardBounds[0] = bounds[0] + 64;
-			CupboardBounds[1] = bounds[1] - 64;
+			SOBounds[0] = bounds[0] + 64;
+			SOBounds[1] = bounds[1] - 64;
 		}
-		CupboardBounds[4] = bounds[4] - 200;
-		CupboardBounds[5] = bounds[5] + 200;
-		CupboardPos.z = bounds[4] - CupboardOffsets[objNumber];
+		SOBounds[4] = bounds[4] - 200;
+		SOBounds[5] = bounds[5] + 200;
+		SOPos.z = bounds[4] - SearchOffsets[objNumber];
 
-		if (TestLaraPosition(CupboardBounds, item, laraitem))
+		if (TestLaraPosition(SOBounds, item, laraitem))
 		{
-			if (MoveLaraPosition(&CupboardPos, item, laraitem))
+			if (MoveLaraPosition(&SOPos, item, laraitem))
 			{
 				laraitem->currentAnimState = STATE_LARA_MISC_CONTROL;
-				laraitem->animNumber = CupboardAnims[objNumber];
+				laraitem->animNumber = SearchAnims[objNumber];
 				laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
 				Lara.isMoving = false;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
-				Lara.headZrot = 0;
 				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 				if (item->objectNumber == ID_SEARCH_OBJECT4)
@@ -1554,7 +1547,7 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 		else if (Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 		{
 			Lara.isMoving = false;
-			Lara.generalPtr = NULL;
+			Lara.gunStatus = LG_NO_ARMS;
 		}
 	}
 	else if (laraitem->currentAnimState != STATE_LARA_MISC_CONTROL)
@@ -1563,7 +1556,7 @@ void CupboardCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracol
 	}
 }
 
-void CupboardControl(short itemNumber)
+void SearchObjectControl(short itemNumber)
 {
 	ITEM_INFO* item, *item2;
 	int objNumber;
@@ -1616,7 +1609,7 @@ void CupboardControl(short itemNumber)
 		}
 	}
 
-	if (frameNumber == CupboardFrames[objNumber])
+	if (frameNumber == SearchCollectFrames[objNumber])
 	{
 		if (item->objectNumber == ID_SEARCH_OBJECT4)
 		{
