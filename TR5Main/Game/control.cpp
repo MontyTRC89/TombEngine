@@ -24,6 +24,9 @@
 #include "switch.h"
 #include "laramisc.h"
 #include "rope.h"
+#include "tomb4fx.h"
+#include "traps.h"
+#include "effects.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -39,6 +42,7 @@ PENDULUM CurrentPendulum;
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern Inventory* g_Inventory;
+extern int SplashCount;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -216,7 +220,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		// Clear dynamic lights
-		ClearDynamics();
+		ClearDynamicLights();
 		ClearFires();
 		g_Renderer->ClearDynamicLights();
 
@@ -1734,6 +1738,467 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 
 	return height;
 }
+
+void UpdateBats()
+{
+	if (!Objects[ID_BATS].loaded)
+		return;
+
+	short* bounds = GetBoundsAccurate(LaraItem);
+	
+	int x1 = LaraItem->pos.xPos + bounds[0] - (bounds[0] >> 2);
+	int x2 = LaraItem->pos.xPos + bounds[1] - (bounds[1] >> 2);
+
+	int y1 = LaraItem->pos.yPos + bounds[2] - (bounds[2] >> 2);
+	int y2 = LaraItem->pos.yPos + bounds[3] - (bounds[3] >> 2);
+
+	int z1 = LaraItem->pos.zPos + bounds[4] - (bounds[4] >> 2);
+	int z2 = LaraItem->pos.zPos + bounds[5] - (bounds[5] >> 2);
+	
+	int minDistance = 0xFFFFFFF; // v40
+	int minIndex = -1;
+
+	for (int i=0;i<64;i++)
+	{
+		BAT_STRUCT* bat = &Bats[i];
+
+		if (!bat->on)
+			continue;
+
+		if ((Lara.burn || LaraItem->hitPoints <= 0) 
+			&& bat->counter > 90 
+			&& !(GetRandomControl() & 7))
+			bat->counter = 90;
+
+		if (!(--bat->counter))
+		{
+			bat->on = 0;
+			continue;
+		}
+
+		if (!(GetRandomControl() & 7))
+		{
+			bat->laraTarget = GetRandomControl() % 640 + 128;
+			bat->xTarget = (GetRandomControl() & 0x7F) - 64;
+			bat->zTarget = (GetRandomControl() & 0x7F) - 64;
+		}
+
+		short angles[2];
+		phd_GetVectorAngles(
+			LaraItem->pos.xPos + 8 * bat->xTarget - bat->pos.xPos,
+			LaraItem->pos.yPos - bat->laraTarget - bat->pos.yPos,
+			LaraItem->pos.zPos + 8 * bat->zTarget - bat->pos.zPos,
+			angles);
+
+		int distance = SQUARE(LaraItem->pos.zPos - bat->pos.zPos) + SQUARE(LaraItem->pos.xPos - bat->pos.xPos);
+		if (distance < minDistance)
+		{
+			minDistance = distance;
+			minIndex = i;
+		}
+
+		distance = SQRT_ASM(distance) / 8;
+		if (distance <= 128)
+		{
+			if (distance < 48)
+				distance = 48;
+		}
+		else
+		{
+			distance = 128;
+		}
+
+		if (bat->speed < distance)
+			bat->speed++;
+		else if (bat->speed > distance)
+			bat->speed--;
+
+		if (bat->counter > 90)
+		{
+			int speed = bat->speed * 128;
+			
+			short xAngle = abs(angles[1] - bat->pos.yRot) >> 3;
+			short yAngle = abs(angles[0] - bat->pos.yRot) >> 3;
+
+			if (xAngle <= -speed)
+				xAngle = -speed;
+			else if (xAngle >= speed)
+				xAngle = speed;
+
+			if (yAngle <= -speed)
+				yAngle = -speed;
+			else if (yAngle >= speed)
+				yAngle = speed;
+
+			bat->pos.yRot += yAngle;
+			bat->pos.xRot += xAngle;
+		}
+
+		int sp = bat->speed * SIN(bat->pos.xRot) >> W2V_SHIFT;
+
+		bat->pos.xPos += sp * SIN(bat->pos.yRot) >> W2V_SHIFT;
+		bat->pos.yPos += bat->speed * SIN(-bat->pos.xRot) >> W2V_SHIFT;
+		bat->pos.zPos += sp * COS(bat->pos.yRot) >> W2V_SHIFT;
+		
+		if ((i % 2 == 0)
+			&& bat->pos.xPos > x1
+			&& bat->pos.xPos < x2
+			&& bat->pos.yPos > y1
+			&& bat->pos.yPos < y2
+			&& bat->pos.zPos > z1
+			&& bat->pos.zPos < z2)
+		{
+			TriggerBlood(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 2 * GetRandomControl(), 2);
+			if (LaraItem->hitPoints > 0)
+				LaraItem->hitPoints -= 2;
+		}
+	}
+
+	if (minIndex != -1)
+	{
+		BAT_STRUCT* bat = &Bats[minIndex];
+		if (!(GetRandomControl() & 4))
+			SoundEffect(SFX_BATS_1, &bat->pos, 0);
+	}
+}
+
+void UpdateDebris()
+{
+	for (int i = 0; i < 256; i++)
+	{
+		DEBRIS_STRUCT* debris = &Debris[i];
+
+		if (debris->on)
+		{
+			debris->yVel += debris->gravity;
+			if (debris->yVel > 4096)
+				debris->yVel = 4096;
+
+			debris->speed -= debris->speed >> 4;
+
+			debris->x += debris->speed * SIN(debris->dir) >> W2V_SHIFT;
+			debris->y += debris->yVel >> 4;
+			debris->z += debris->speed * COS(debris->dir) >> W2V_SHIFT;
+			
+			FLOOR_INFO* floor = GetFloor(debris->x, debris->y, debris->z, &debris->roomNumber);
+			int height = GetFloorHeight(floor, debris->x, debris->y, debris->z);
+			int ceiling = GetCeiling(floor, debris->x, debris->y, debris->z);
+
+			if (debris->y >= height || debris->y < ceiling)
+				debris->on--;
+			else
+			{
+				debris->xRot += debris->yVel >> 6;
+				
+				if (debris->yVel)
+					debris->yRot += debris->speed >> 5;
+
+				if (Rooms[debris->roomNumber].flags & ENV_FLAG_WATER)
+					debris->yVel -= debris->yVel >> 2;
+			}
+		}
+	}
+}
+
+void UpdateRats()
+{
+	if (Objects[ID_RATS].loaded)
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			RAT_STRUCT* rat = &Rats[i];
+
+			if (rat->on)
+			{
+				int oldX = rat->pos.xPos;
+				int oldY = rat->pos.yPos;
+				int oldZ = rat->pos.zPos;
+
+				rat->pos.xPos += rat->speed * SIN(rat->pos.yRot) >> W2V_SHIFT;
+				rat->pos.yPos += rat->fallspeed;
+				rat->pos.zPos += rat->speed * COS(rat->pos.yRot) >> W2V_SHIFT;
+
+				rat->fallspeed += 6;
+
+				int dx = LaraItem->pos.xPos - rat->pos.xPos;
+				int dy = LaraItem->pos.yPos - rat->pos.yPos;
+				int dz = LaraItem->pos.zPos - rat->pos.zPos;
+
+				short angle;
+				if (rat->flags >= 170)
+					angle = rat->pos.yRot - ATAN(dz, dx);
+				else
+					angle = ATAN(dz, dx) - rat->pos.yRot;
+
+				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
+				{
+					LaraItem->hitPoints--;
+					LaraItem->hitStatus = true;
+				}
+
+				if (rat->flags & 1)
+				{
+					if (abs(dz) + abs(dx) <= 1024)
+					{
+						if (rat->speed & 1)
+							rat->pos.yRot += 512;
+						else
+							rat->pos.yRot -= 512;
+						rat->speed = 48 - (abs(angle) >> 10);
+					}
+					else
+					{
+						if (rat->speed < (i & 0x1F) + 24)
+							rat->speed++;
+
+						if (abs(angle) >= 2048)
+						{
+							if (angle >= 0)
+								rat->pos.yRot += 1024;
+							else
+								rat->pos.yRot -= 1024;
+						}
+						else
+						{
+							rat->pos.yRot += 8 * (Wibble - i);
+						}
+					}
+				}
+
+				__int16 oldRoomNumber = rat->roomNumber;
+
+				FLOOR_INFO* floor = GetFloor(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, &rat->roomNumber);
+				int height = GetFloorHeight(floor, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
+				if (height < rat->pos.yPos - 1280 || height == NO_HEIGHT)
+				{
+					if (rat->flags > 170)
+					{
+						rat->on = false;
+						NextRat = 0;
+					}
+					if (angle <= 0)
+						rat->pos.yRot -= ANGLE(90);
+					else
+						rat->pos.yRot += ANGLE(90);
+					
+					rat->pos.xPos = oldX;
+					rat->pos.yPos = oldY;
+					rat->pos.zPos = oldZ;
+
+					rat->fallspeed = 0;
+				}
+				else
+				{
+					if (height >= rat->pos.yPos - 64)
+					{
+						if (rat->pos.yPos <= height)
+						{
+							if (rat->fallspeed >= 500 || rat->flags >= 200)
+							{
+								rat->on = 0;
+								NextRat = 0;
+							}
+							else
+							{
+								rat->pos.xRot = -128 * rat->fallspeed;
+							}
+						}
+						else
+						{
+							rat->pos.yPos = height;
+							rat->fallspeed = 0;
+							rat->flags |= 1;
+						}
+					}
+					else
+					{
+						rat->pos.xRot = 14336;
+						rat->pos.xPos = oldX;
+						rat->pos.yPos = oldY - 24;
+						rat->pos.zPos = oldZ;
+						rat->fallspeed = 0;
+					}
+				}
+
+				if (!(Wibble & 0x3C))
+					rat->flags += 2;
+
+				ROOM_INFO* r = &Rooms[rat->roomNumber];
+				if (r->flags & ENV_FLAG_WATER)
+				{
+					rat->fallspeed = 0;
+					rat->speed = 16;
+					rat->pos.yPos = r->maxceiling + 50;
+					
+					if (Rooms[oldRoomNumber].flags & ENV_FLAG_WATER)
+					{
+						if (!(GetRandomControl() & 0xF))
+						{
+							SetupRipple(rat->pos.xPos, r->maxceiling, rat->pos.zPos, (GetRandomControl() & 3) + 48, 2);
+						}
+					}
+					else
+					{
+						AddWaterSparks(rat->pos.xPos, r->maxceiling, rat->pos.zPos, 16);
+						SetupRipple(rat->pos.xPos, r->maxceiling, rat->pos.zPos, (GetRandomControl() & 3) + 48, 2);
+						SoundEffect(SFX_RATSPLASH, &rat->pos, 0);
+					}
+				}
+
+				if (!i && !(GetRandomControl() & 4))
+					SoundEffect(SFX_RATS_1, &rat->pos, 0);
+			}
+		}
+	}
+}
+
+/*char __usercall UpdateSpiders@<al > (signed int a1@<eax > )
+{
+	if (Objects[ID_SPIDER].loaded)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			SPIDER_STRUCT* spider = &Spiders[i];
+			if (spider->on)
+			{
+
+			}
+		}
+	}
+
+	LOBYTE(a1) = *(&objects[95] + 50);
+	if (*(&objects[95] + 50) & 1)
+	{
+		v1 = Spiders;
+		v23 = 0;
+		do
+		{
+			if (BYTE2(v1[1].yPos))
+			{
+				LOWORD(a1) = v1->yRot;
+				v2 = SHIWORD(v1[1].xPos);
+				v3 = v1->yPos;
+				v4 = (a1 >> 3) & 0x1FFE;
+				v25 = v1->xPos;
+				v5 = v1->zPos;
+				v6 = v1[1].yPos;
+				v1->xPos += v2 * 4 * rcossin_tbl[v4] >> 14;
+				v26 = v3;
+				v1->yPos = v3 + v6;
+				v27 = v5;
+				v7 = v5 + (v2 * 4 * rcossin_tbl[v4 + 1] >> 14);
+				LOWORD(v1[1].yPos) = v6 + 6;
+				v1->zPos = v7;
+				v8 = v3 + v6;
+				v9 = LaraItem->pos.zPos - v1->zPos;
+				v10 = LaraItem->pos.xPos - v1->xPos;
+				v11 = LaraItem->pos.yPos - v8;
+				v12 = phd_atan(v9, v10) - v1->yRot;
+				v24 = v12;
+				v13 = abs(v9);
+				if (v13 < 85 && abs(v11) < 85 && abs(v10) < 85)
+				{
+					LaraItem->hit_points -= 3;
+					LaraItem->_bf15ea |= 0x10u;
+					TriggerBlood(v1->xPos, v1->yPos, v1->zPos, v1->yRot, 1);
+					v12 = v24;
+				}
+				if (HIBYTE(v1[1].yPos))
+				{
+					if (v13 + abs(v10) <= 768)
+					{
+						if (v1[1].xPos & 0x10000)
+							v1->yRot += 512;
+						else
+							v1->yRot -= 512;
+						HIWORD(v1[1].xPos) = 48 - (abs(v12) >> 10);
+					}
+					else
+					{
+						v14 = HIWORD(v1[1].xPos);
+						if (v14 < (v23 & 0x1F) + 24)
+							HIWORD(v1[1].xPos) = v14 + 1;
+						if (abs(v12) >= 2048)
+						{
+							if (v12 >= 0)
+								v1->yRot += 1024;
+							else
+								v1->yRot -= 1024;
+						}
+						else
+						{
+							v1->yRot += 8 * (wibble - v23);
+						}
+					}
+				}
+				v15 = v1 + 1;
+				v16 = GetFloor(v1->xPos, v1->yPos, v1->zPos, &v1[1]);
+				v17 = GetHeight(v16, v1->xPos, v1->yPos, v1->zPos);
+				v18 = v1->yPos;
+				if (v17 >= v18 - 1280 || v17 == -32512)
+				{
+					if (v17 >= v18 - 64)
+					{
+						if (v18 <= v17)
+						{
+							if (SLOWORD(v1[1].yPos) >= 500)
+							{
+								BYTE2(v1[1].yPos) = 0;
+								NextSpider = 0;
+							}
+							else
+							{
+								v1->xRot = -128 * LOWORD(v1[1].yPos);
+							}
+						}
+						else
+						{
+							v1->yPos = v17;
+							LOWORD(v1[1].yPos) = 0;
+							HIBYTE(v1[1].yPos) = 1;
+						}
+					}
+					else
+					{
+						v1->xRot = 14336;
+						v1->xPos = v25;
+						v1->yPos = v26 - 8;
+						if (!(GetRandomControl() & 0x1F))
+							v1->yRot += -32768;
+						LOWORD(v1[1].yPos) = 0;
+						v1->zPos = v27;
+					}
+				}
+				else
+				{
+					if (v24 <= 0)
+						v1->yRot -= 0x4000;
+					else
+						v1->yRot += 0x4000;
+					v1->xPos = v25;
+					v1->yPos = v26;
+					v1->zPos = v27;
+					LOWORD(v1[1].yPos) = 0;
+				}
+				if (v1->yPos < room[SLOWORD(v15->xPos)].maxceiling + 50)
+				{
+					v19 = room[SLOWORD(v15->xPos)].maxceiling;
+					LOWORD(v1[1].yPos) = 1;
+					v1->yRot += -32768;
+					v1->yPos = v19 + 50;
+				}
+				if (!v23 && !(GetRandomControl() & 4))
+					SoundEffect(276, v1, 0);
+			}
+			v1 = (v1 + 26);
+			a1 = v23 + 1;
+			v21 = __OFSUB__(v23 + 1, 64);
+			v20 = v23++ - 63 < 0;
+		} while (v20 ^ v21);
+	}
+	return a1;
+}*/
+
 
 void Inject_Control()
 {

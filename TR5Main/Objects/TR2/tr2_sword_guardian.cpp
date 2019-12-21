@@ -4,6 +4,7 @@
 #include "../../Game/lot.h"
 #include "../../Game/effect2.h"
 #include "../../Game/items.h"
+#include "../../Game/tomb4fx.h"
 
 BITE_INFO swordBite = { 0, 37, 550, 15 };
 

@@ -29,11 +29,11 @@
 #define DartControl ((void (__cdecl*)(short)) 0x00489D60)
 #define InitialiseFlameEmitter ((void (__cdecl*)(short)) 0x0043D370)
 #define FlameEmitterCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00433B40)
-#define FlameEmitterControl ((void (__cdecl*)(short)) 0x00489F70)
+//#define FlameEmitterControl ((void (__cdecl*)(short)) 0x00489F70)
 #define InitialiseFlameEmitter2 ((void (__cdecl*)(short)) 0x0043D4E0)
-#define FlameEmitter2Control ((void (__cdecl*)(short)) 0x0048A3B0)
+//#define FlameEmitter2Control ((void (__cdecl*)(short)) 0x0048A3B0)
 #define FlameEmitter3Control ((void (__cdecl*)(short)) 0x0048A570)
-#define FlameControl ((void (__cdecl*)(short)) 0x0048AB80)
+//#define FlameControl ((void (__cdecl*)(short)) 0x0048AB80)
 #define InitialiseRopeTrap ((void (__cdecl*)()) 0x0046EE40)
 #define GenSlot1Control ((void (__cdecl*)(short)) 0x00406580)
 #define InitialiseGenSlot2 ((void (__cdecl*)(short)) 0x0043FD70)
@@ -58,3 +58,7 @@
 #define DrawScaledSpike ((void (__cdecl*)(ITEM_INFO*)) 0x0043FBC0)
 
 void LaraBurn();
+void LavaBurn(ITEM_INFO* item);
+void FlameControl(short fxNumber);
+void FlameEmitter2Control(short itemNumber);
+void FlameEmitterControl(short itemNumber);

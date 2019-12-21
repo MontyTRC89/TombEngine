@@ -9,6 +9,7 @@
 #include "../../Game/anim.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/draw.h"
+#include "../../Game/tomb4fx.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -219,7 +220,7 @@ void SubEffects(short item_number)
 				pos3d.zPos = pos.z + (GetRandomControl() & 63) - 32;
 				room_number = v->roomNumber;
 				GetFloor(pos3d.xPos, pos3d.yPos, pos3d.zPos, &room_number);
-				CreateBubble(&pos3d, room_number, 4, 8);
+				CreateBubble((PHD_VECTOR*)&pos3d, room_number, 4, 8, 0, 0, 0, 0); // CHECK
 			}
 		}
 	}

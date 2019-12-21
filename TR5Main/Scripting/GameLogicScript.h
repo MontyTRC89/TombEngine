@@ -100,7 +100,7 @@ typedef struct GameScriptItem {
 			NativeItem->goalAnimState = value; break;
 		case ITEM_PARAM_animNumber:
 			NativeItem->animNumber = value;
-			NativeItem->frameNumber = Anims[NativeItem->animNumber].frameBase;
+			//NativeItem->frameNumber = Anims[NativeItem->animNumber].frameBase;
 			break;
 		case ITEM_PARAM_frameNumber:
 			NativeItem->frameNumber = value; break;

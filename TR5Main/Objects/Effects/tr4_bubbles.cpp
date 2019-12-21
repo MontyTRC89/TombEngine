@@ -4,6 +4,8 @@
 #include "../../Game/items.h"
 #include "../../Game/traps.h"
 #include "../../Game/draw.h"
+#include "../../Game/tomb4fx.h"
+#include "../../Game/effects.h"
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {
@@ -346,10 +348,12 @@ void BubblesControl(short fxNum)
 		if (fx->flag1 == 1)
 		{
 			TriggerShockwave(
-				&fx->pos,
-				10485792,
+				(PHD_3DPOS*)&fx->pos,
+				0x2000,
+				0xA000,
 				64,
-				402686016,
+				64, 80, 00,
+				24,
 				(((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
 
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
@@ -357,16 +361,25 @@ void BubblesControl(short fxNum)
 		else
 		{
 			int shockwaveValue = 0;
+			byte r, g, b, life;
 
 			if (fx->flag1)
 			{
 				if (fx->flag1 == 3 || fx->flag1 == 4)
 				{
 					shockwaveValue = 268451968;
+					r = 128;
+					g = 64;
+					b = 0;
+					life = 16;
 				}
 				else if (fx->flag1 == 5)
 				{
 					shockwaveValue = 276848640;
+					r = 0;
+					g = 96;
+					b = 128;
+					life = 16;
 				}
 				else
 				{
@@ -375,25 +388,33 @@ void BubblesControl(short fxNum)
 						if (fx->flag1 == 6)
 						{
 							TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-							TriggerShockwave(&fx->pos, 15728688, 64, 411066368, 0x20000, 0);
+							TriggerShockwave(&fx->pos, 0x3000, 0xF000, 64, 0, 96, 128, 24, 0x20000, 0);
 							fx->pos.yPos -= 128;
-							TriggerShockwave(&fx->pos, 15728688, 48, 276852736, 0x20000, 0);
+							TriggerShockwave(&fx->pos, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0x2000);
 							fx->pos.yPos += 256;
-							TriggerShockwave(&fx->pos, 15728688, 48, 276852736, 0x20000, 0);
+							TriggerShockwave(&fx->pos, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0x2000);
 						}
 					}
 					else
 					{
 						shockwaveValue = 276856832;
+						r = 0;
+						g = 128;
+						b = 128;
+						life = 16;
 					}
 				}
 			}
 			else
 			{
 				shockwaveValue = 268468288;
+				r = 64;
+				g = 128;
+				b = 0;
+				life = 16;
 			}
 
-			TriggerShockwave(&fx->pos, 10485792, 64, shockwaveValue, 0, 0);
+			TriggerShockwave(&fx->pos, 0x2000, 0xA000, 64, r, g, b, life, 0, 0);
 		}
 
 		KillEffect(fxNum);
@@ -412,7 +433,7 @@ void BubblesControl(short fxNum)
 
 		if (fx->flag1 == 1)
 		{
-			TriggerShockwave((PHD_3DPOS*)fx, 15728688, 64, 402686016, 0, 0);
+			TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 64, 64, 128, 0, 24, 0, 0);
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 			LaraBurn();
 			//Lara.gassed = true; BYTE1(Lara_Flags) |= 2u;			
@@ -423,21 +444,21 @@ void BubblesControl(short fxNum)
 			{
 			case 3:
 			case 4:
-				TriggerShockwave((PHD_3DPOS*)fx, 10485792, 64, 268451968, 0x10000, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 0x2000, 0xA000, 64, 128, 64, 0, 16, 0, 256);
 				break;
 			case 5:
-				TriggerShockwave((PHD_3DPOS*)fx, 10485792, 64, 276848640, 0x20000, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 0x2000, 0xA000, 64, 0, 96, 128, 16, 0, 512);
 				break;
 			case 2:
-				TriggerShockwave((PHD_3DPOS*)fx, 10485792, 64, 276856832, 0x20000, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 0x2000, 0xA000, 64, 0, 128, 128, 16, 0, 512);
 				break;
 			case 6:
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-				TriggerShockwave((PHD_3DPOS*)fx, 15728688, 64, 411066368, 0, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 64, 0, 96, 128, 24, 0, 0);
 				fx->pos.yPos -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 15728688, 48, 276852736, 0, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0);
 				fx->pos.yPos += 256;
-				TriggerShockwave((PHD_3DPOS*)fx, 15728688, 48, 276852736, 0, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0);
 				LaraBurn();
 				break;
 			}
@@ -446,9 +467,10 @@ void BubblesControl(short fxNum)
 		{
 			TriggerShockwave(
 				(PHD_3DPOS*)fx,
-				0x00580018,
+				0x1800,
+				0x5800,
 				48,
-				268468288,
+				64, 128, 0, 16,
 				(((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
 		}
 	}

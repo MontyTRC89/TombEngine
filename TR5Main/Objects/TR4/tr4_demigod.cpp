@@ -5,6 +5,7 @@
 #include "../../Game/sphere.h"
 #include "../../Game/effect2.h"
 #include "../../Game/draw.h"
+#include "../../Game/tomb4fx.h"
 
 void InitialiseDemigod(short itemNum)
 {
@@ -466,7 +467,8 @@ void DemigodControl(short itemNum)
 					pos.y = height - 128;
 				}
 
-				TriggerShockwave((PHD_3DPOS *)&pos, 0x00580018, 256, 545292416, 0x20000, 0);
+				// TODO:
+				//TriggerShockwave((PHD_3DPOS *)&pos, 0x00580018, 256, 545292416, 0x20000, 0);
 				DemigodHammerAttack(pos.x, pos.y + 128, pos.z, 8);
 
 				Camera.bounce = -128;
@@ -688,47 +690,47 @@ void DemigodHammerAttack(int x, int y, int z, int something)
 		{
 			SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
-			spark->On = true;
+			spark->on = true;
 			spark->sShade = 0;
-			spark->ColFadeSpeed = 4;
+			spark->colFadeSpeed = 4;
 			spark->dShade = (GetRandomControl() & 0x1F) + 96;
-			spark->FadeToBlack = 24 - (GetRandomControl() & 7);
-			spark->TransType = 2;
-			spark->Life = spark->sLife = (GetRandomControl() & 7) + 48;
+			spark->fadeToBlack = 24 - (GetRandomControl() & 7);
+			spark->transType = 2;
+			spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 			spark->x = (GetRandomControl() & 0x1F) + x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			spark->Xvel = (byte)(GetRandomControl() + 256) * SIN(angle) >> W2V_SHIFT;
-			spark->Yvel = -32 - (GetRandomControl() & 0x3F);
-			spark->Zvel = (byte)(GetRandomControl() + 256) * COS(angle) >> W2V_SHIFT;
-			spark->Friction = 9;
+			spark->xVel = (byte)(GetRandomControl() + 256) * SIN(angle) >> W2V_SHIFT;
+			spark->yVel = -32 - (GetRandomControl() & 0x3F);
+			spark->zVel = (byte)(GetRandomControl() + 256) * COS(angle) >> W2V_SHIFT;
+			spark->friction = 9;
 
 			if (GetRandomControl() & 1)
 			{
-				spark->Flags = 16;
-				spark->RotAng = GetRandomControl() & 0xFFF;
+				spark->flags = 16;
+				spark->rotAng = GetRandomControl() & 0xFFF;
 				if (GetRandomControl() & 1)
 				{
-					spark->RotAdd = -64 - (GetRandomControl() & 0x3F);
+					spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
 				}
 				else
 				{
-					spark->RotAdd = (GetRandomControl() & 0x3F) + 64;
+					spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
 				}
 			}
 			else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 			{
-				spark->Flags = 256;
+				spark->flags = 256;
 			}
 			else
 			{
-				spark->Flags = 0;
+				spark->flags = 0;
 			}
-			spark->Gravity = -4 - (GetRandomControl() & 3);
-			spark->MaxYvel = -4 - (GetRandomControl() & 3);
+			spark->gravity = -4 - (GetRandomControl() & 3);
+			spark->maxYvel = -4 - (GetRandomControl() & 3);
 			spark->dSize = ((GetRandomControl() & 0x3F) + 64);
 			spark->sSize = spark->dSize >> 3;
-			spark->Size = spark->dSize >> 3;
+			spark->size = spark->dSize >> 3;
 			
 			angle += deltaAngle;
 		}

@@ -89,7 +89,7 @@ short GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
 	pos.z = LaraItem->pos.zPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
 	pos.roomNumber = LaraItem->roomNumber;
 
-	//Richochet(&pos);
+	Richochet((PHD_3DPOS*)&pos);
 
 	return GunShot(x, y, z, speed, yrot, roomNumber);
 }

@@ -12,6 +12,7 @@
 #include "../Game/inventory.h"
 #include "../Game/collide.h"
 #include "../Game/draw.h"
+#include "../Game/tomb4fx.h"
 
 short StargateBounds[24] = 
 {
@@ -658,7 +659,7 @@ void MineControl(short itemNum)
 				{
 					TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -2, 0, -item->roomNumber);
 					TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -1, 0, -item->roomNumber);
-					TriggerShockwave((PHD_3DPOS*)sphere, 19922992, (GetRandomControl() & 0x1F) + 112, 545284096, 2048, 0);
+					TriggerShockwave((PHD_3DPOS*)sphere, 0x3000, 0x3001, (GetRandomControl() & 0x1F) + 112, 0, 96, 128, 32, 2048, 0);
 				}
 
 				sphere++;
