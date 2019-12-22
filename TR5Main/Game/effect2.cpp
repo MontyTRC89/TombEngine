@@ -432,10 +432,10 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 			{
 				spark->colFadeSpeed >>= 1;
 				spark->fadeToBlack = 4;
-				spark->sLife >>=1;
-				spark->life >>=1;
+				spark->sLife >>= 1;
+				spark->life >>= 1;
 				spark->xVel = (random & 0x1FF) - 256;
-				spark->yVel = ((random>>2) & 0x1FF) - 256;
+				spark->yVel = ((random >> 2) & 0x1FF) - 256;
 				spark->zVel = ((random >> 4) & 0x1FF) - 256;
 			}
 			else

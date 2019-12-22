@@ -20,8 +20,8 @@
 #define InitialiseSmokeEmitter ((void (__cdecl*)(short)) 0x0043D9D0)
 #define SmokeEmitterControl ((void (__cdecl*)(short)) 0x00431560)
 #define DrawLensFlare ((void (__cdecl*)(ITEM_INFO*)) 0x00485290)
-#define ControlWaterfallMist ((void (__cdecl*)(short)) 0x00432CA0)
-#define TriggerRicochetSparks ((void (__cdecl*)(GAME_VECTOR*, short, int, int)) 0x0042F060)
+//#define ControlWaterfallMist ((void (__cdecl*)(short)) 0x00432CA0)
+//#define TriggerRicochetSparks ((void (__cdecl*)(GAME_VECTOR*, short, int, int)) 0x0042F060)
 
 extern SPLASH_STRUCT Splashes[4];
 extern RIPPLE_STRUCT Ripples[32];

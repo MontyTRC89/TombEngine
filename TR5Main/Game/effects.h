@@ -12,7 +12,7 @@ int ItemNearLara(PHD_3DPOS* pos, int radius);
 void StopSoundEffect(short sampleIndex);
 short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber);
 //void SoundEffects();
-void WaterFall(short itemNumber);
+void ControlWaterfallMist(short itemNumber);
 void void_effect(ITEM_INFO* item);
 void finish_level_effect(ITEM_INFO* item);
 void turn180_effect(ITEM_INFO* item);

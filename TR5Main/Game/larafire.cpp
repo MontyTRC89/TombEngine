@@ -14,6 +14,7 @@
 #include "sphere.h"
 #include "draw.h"
 #include "effect2.h"
+#include "flmtorch.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -680,10 +681,10 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
 					break;
 				case 3:
-					TriggerRicochetSparks(hitPos, LaraItem->pos.yRot, 3, 0);
+					TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, 0);
 					break;
 				case 2:
-					TriggerRicochetSparks(hitPos, LaraItem->pos.yRot, 3, -5);
+					TriggerRicochetSpark(hitPos, LaraItem->pos.yRot, 3, -5);
 					SoundEffect(SFX_SWORD_GOD_HITMET, &item->pos, 0);
 					break;
 			}
