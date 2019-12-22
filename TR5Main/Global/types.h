@@ -1123,8 +1123,8 @@ struct FIRE_SPARKS
 	unsigned char friction; // size=0, offset=21
 	unsigned char scalar; // size=0, offset=22
 	unsigned char def; // size=0, offset=23
-	byte rotAdd; // size=0, offset=24
-	byte maxYvel; // size=0, offset=25
+	signed char rotAdd; // size=0, offset=24
+	signed char maxYvel; // size=0, offset=25
 	unsigned char on; // size=0, offset=26
 	unsigned char sR; // size=0, offset=27
 	unsigned char sG; // size=0, offset=28

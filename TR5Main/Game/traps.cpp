@@ -132,14 +132,14 @@ void FlameEmitter2Control(short itemNumber)//5A1BC, 5A638 (F)
 				if (item->itemFlags[0] == 1)
 				{
 					DoFlipMap(-item->triggerFlags);
-					FlipMap[-item->triggerFlags] ^= 0x3E00u;
+					FlipMap[-item->triggerFlags] ^= 0x3E00;
 					item->itemFlags[0] = 2;
 				}
 			}
 			else
 			{
 				if (item->triggerFlags < -100)
-					item->triggerFlags = item->triggerFlags + 100;
+					item->triggerFlags += 100;
 
 				item->itemFlags[0] = 1;
 			}
