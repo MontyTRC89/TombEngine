@@ -476,22 +476,22 @@ bool LoadConfiguration()
 	return true;
 }
 
-LONG SetDWORDRegKey(HKEY hKey, char* strValueName, DWORD nValue)
+LONG SetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD nValue)
 {
 	return RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
 }
 
-LONG SetBoolRegKey(HKEY hKey, char* strValueName, bool bValue)
+LONG SetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool bValue)
 {
 	return SetDWORDRegKey(hKey, strValueName, (bValue ? 1 : 0));
 }
 
-LONG SetStringRegKey(HKEY hKey, char* strValueName, char* strValue)
+LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue)
 {
 	return 1; // RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
 }
 
-LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD * nValue, DWORD nDefaultValue)
+LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaultValue)
 {
 	*nValue = nDefaultValue;
 	DWORD dwBufferSize(sizeof(DWORD));
@@ -510,7 +510,7 @@ LONG GetDWORDRegKey(HKEY hKey, char* strValueName, DWORD * nValue, DWORD nDefaul
 }
 
 
-LONG GetBoolRegKey(HKEY hKey, char* strValueName, bool* bValue, bool bDefaultValue)
+LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultValue)
 {
 	DWORD nDefValue((bDefaultValue) ? 1 : 0);
 	DWORD nResult(nDefValue);
@@ -523,7 +523,7 @@ LONG GetBoolRegKey(HKEY hKey, char* strValueName, bool* bValue, bool bDefaultVal
 }
 
 
-LONG GetStringRegKey(HKEY hKey, char* strValueName, char** strValue, char* strDefaultValue)
+LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue)
 {
 	*strValue = strDefaultValue;
 	char szBuffer[512];

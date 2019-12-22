@@ -5,6 +5,7 @@
 #include "collide.h"
 #include "inventory.h"
 #include "larafire.h"
+#include "misc.h"
 #include "draw.h"
 #include "sphere.h"
 #include "Camera.h"
@@ -21,7 +22,6 @@
 #include "..\Global\global.h"
 
 #include <stdio.h>
-#include "Anim.h"
 
 static short LeftClimbTab[4] = // offset 0xA0638
 {
@@ -5190,7 +5190,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	FLOOR_INFO* floor;
 	int h, c;
 
-	if (angle == -ANGLE(180))
+	if (angle == ANGLE(180))
 	{
 		z -= 256;
 	}
@@ -5202,7 +5202,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	{
 		x += 256;
 	}
-	else
+	else if (angle == ANGLE(0))
 	{
 		z += 256;
 	}
@@ -6436,8 +6436,8 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				if (LaraTestClimbStance(item, coll))
 				{
 					item->animNumber = ANIMATION_LARA_STAY_SOLID;
+					item->frameNumber = GF(ANIMATION_LARA_STAY_SOLID, 0);
 					item->goalAnimState = STATE_LARA_LADDER_IDLE;
-					item->frameNumber = Anims[item->animNumber].frameBase;
 					item->currentAnimState = STATE_LARA_STOP;
 					AnimateLara(item);
 					item->pos.yRot = angle;
@@ -6447,9 +6447,10 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			return 0;
 		}
+
 		item->animNumber = ANIMATION_LARA_STAY_SOLID;
+		item->frameNumber = GF(ANIMATION_LARA_STAY_SOLID, 0);
 		item->goalAnimState = STATE_LARA_JUMP_UP;
-		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->currentAnimState = STATE_LARA_STOP;
 		Lara.calcFallSpeed = -116;
 		AnimateLara(item);
@@ -6457,36 +6458,37 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		item->animNumber = ANIMATION_LARA_STAY_SOLID;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = GF(ANIMATION_LARA_STAY_SOLID, 0);
 		item->goalAnimState = STATE_LARA_JUMP_UP;
 		item->currentAnimState = STATE_LARA_STOP;
-		int fallSpeed = SQRT_ASM(-9600 - 12 * coll->frontFloor);
-		Lara.calcFallSpeed = -3 - fallSpeed;
+		Lara.calcFallSpeed = -3 - SQRT_ASM(-9600 - 12 * coll->frontFloor);
 		AnimateLara(item);
 	}
 
 	item->pos.yRot = angle;
-
 	ShiftItem(item, coll);
 
 	short dir = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 	switch (dir)
 	{
-	case NORTH:
-		item->pos.zPos = (item->pos.zPos | 0x3FF) - 100;
-		return 1;
-	case EAST:
-		item->pos.xPos = (item->pos.xPos | 0x3FF) - 100;
-		return 1;
-	case SOUTH:
-		item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 100;
-		return 1;
-	case WEST:
-		item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) + 100;
-		return 1;
-	default:
-		return 1;
-		break;
+		case NORTH:
+			item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD;
+			return 1;
+
+		case EAST:
+			item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - LARA_RAD;
+			return 1;
+
+		case SOUTH:
+			item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + LARA_RAD;
+			return 1;
+
+		case WEST:
+			item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD;
+			return 1;
+
+		default: // you cant go there normally so return 0...
+			return 0;
 	}
 
 	return 0;

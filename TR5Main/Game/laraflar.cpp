@@ -91,11 +91,12 @@ void ready_flare()//4A3E4(<), 4A848(<) (F)
 
 void undraw_flare_meshes() 
 {
-	LARA_MESHES(ID_LARA, HAND_L);
+	LARA_MESHES(ID_LARA, LM_LHAND);
 }
+
 void draw_flare_meshes()//4A394(<), 4A7F8(<) (F)
 {
-	LARA_MESHES(ID_FLARE_ANIM, HAND_L);
+	LARA_MESHES(ID_FLARE_ANIM, LM_LHAND);
 }
 
 void undraw_flare()//4A108, 4A56C

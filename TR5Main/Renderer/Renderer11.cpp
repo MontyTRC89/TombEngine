@@ -22,6 +22,7 @@
 #include <D3Dcompiler.h>
 #include <chrono> 
 #include <stack>
+#include "../Game/misc.h"
 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
@@ -1529,13 +1530,20 @@ bool Renderer11::drawScene(bool dump)
 	drawSplahes();
 	drawShockwaves();
 
-	if (level->Weather == WEATHER_RAIN)
-		doRain();
-	else if (level->Weather == WEATHER_SNOW)
-		doSnow();
+	switch (level->Weather)
+	{
+		case WEATHER_NORMAL:
+			// no weather in normal
+			break;
+		case WEATHER_RAIN:
+			doRain();
+			break;
+		case WEATHER_SNOW:
+			doSnow();
+			break;
+	}
 
 	drawRopes();
-
 	drawSprites();
 	drawLines3D();
 
@@ -1569,12 +1577,15 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Lights: %d", m_lightsToDraw.Size());
 		printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
 		printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
 		printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
 		printDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
 		printDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
 		printDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
 		printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
 		printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
+		printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 #endif
 	}
 
@@ -2275,7 +2286,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 				// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 				// and vertices have bone index 0 and not 10
 				int meshPtrIndex = RawMeshPointers[obj->meshIndex / 2 + j] / 2;
-				int boneIndex = (meshPtrIndex == 0 ? HAND_R : j);
+				int boneIndex = (meshPtrIndex == 0 ? LM_RHAND : j);
 
 				short* meshPtr = &RawMeshData[meshPtrIndex];
 				RendererMesh* mesh = getRendererMeshFromTrMesh(moveable,
@@ -2718,7 +2729,7 @@ void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byt
 
 	RendererLight* dynamicLight = &m_lights[m_nextLight++];
 
-	dynamicLight->Position = Vector3(x, y, z);
+	dynamicLight->Position = Vector3(float(x), float(y), float(z));
 	dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
@@ -4319,88 +4330,87 @@ void Renderer11::updateLaraAnimations()
 
 	// Lara world matrix
 	translation = Matrix::CreateTranslation(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	rotation = Matrix::CreateFromYawPitchRoll(
-		TR_ANGLE_TO_RAD(LaraItem->pos.yRot),
-		TR_ANGLE_TO_RAD(LaraItem->pos.xRot),
-		TR_ANGLE_TO_RAD(LaraItem->pos.zRot));
+	rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(LaraItem->pos.yRot), TR_ANGLE_TO_RAD(LaraItem->pos.xRot), TR_ANGLE_TO_RAD(LaraItem->pos.zRot));
 
 	m_LaraWorldMatrix = rotation * translation;
 	
 	// Update first Lara's animations
-	laraObj->LinearizedBones[TORSO]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.torsoXrot),
-		TR_ANGLE_TO_RAD(Lara.torsoYrot), TR_ANGLE_TO_RAD(Lara.torsoZrot));
-	laraObj->LinearizedBones[HEAD]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.headXrot),
-		TR_ANGLE_TO_RAD(Lara.headYrot), TR_ANGLE_TO_RAD(Lara.headZrot));
+	laraObj->LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.torsoXrot), TR_ANGLE_TO_RAD(Lara.torsoYrot), TR_ANGLE_TO_RAD(Lara.torsoZrot));
+	laraObj->LinearizedBones[LM_HEAD]->ExtraRotation  = Vector3(TR_ANGLE_TO_RAD(Lara.headXrot),  TR_ANGLE_TO_RAD(Lara.headYrot),  TR_ANGLE_TO_RAD(Lara.headZrot));
 
 	// First calculate matrices for legs, hips, head and torso
-	int mask = (1 << HIPS) | (1 << THIGH_L) | (1 << CALF_L) | (1 << FOOT_L) |
-		(1 << THIGH_R) | (1 << CALF_R) | (1 << FOOT_R) | (1 << TORSO) | (1 << HEAD);
-	short	*framePtr[2];
-	int rate;
-	int frac = GetFrame_D2(LaraItem, framePtr, &rate);
+	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
+	short *framePtr[2];
+	int rate, frac;
+
+	frac = GetFrame_D2(LaraItem, framePtr, &rate);
 	updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
-	if ((Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) && Lara.gunType != WEAPON_FLARE)
+	if (Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY && Lara.gunType != WEAPON_FLARE)
 	{
 		// Both arms
-		mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L) | (1 << UARM_R) |
-			(1 << LARM_R) | (1 << HAND_R);
+		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 		frac = GetFrame_D2(LaraItem, framePtr, &rate);
 		updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 	}
 	else
 	{ 
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[UARM_L]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),
-			TR_ANGLE_TO_RAD(Lara.leftArm.yRot), TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
-		laraObj->LinearizedBones[UARM_R]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot),
-			TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
+		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),  TR_ANGLE_TO_RAD(Lara.leftArm.yRot),  TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
+		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot), TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
 
-		if (Lara.gunType != WEAPON_FLARE)
+		// HACK: backguns handles differently // TokyoSU: not really a hack since it's the original way to do that.
+		switch (Lara.gunType)
 		{
-			// HACK: backguns handles differently
-			if (Lara.gunType == WEAPON_SHOTGUN || Lara.gunType == WEAPON_GRENADE_LAUNCHER ||
-				Lara.gunType == WEAPON_CROSSBOW || Lara.gunType == WEAPON_ROCKET_LAUNCHER ||
-				Lara.gunType == WEAPON_HARPOON_GUN)
-			{
-				// Left arm
-				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
-				short* shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
-				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+		case WEAPON_SHOTGUN:
+		case WEAPON_HK:
+		case WEAPON_CROSSBOW:
+		case WEAPON_GRENADE_LAUNCHER:
+		case WEAPON_HARPOON_GUN:
+			short* shotgunFramePtr;
 
-				// Right arm
-				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
-				shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
-				updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
-			}
-			else
-			{
-				// Left arm
-				mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
-				frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
-
-				// Right arm
-				mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
-				frac = getFrame(Lara.rightArm.animNumber, Lara.rightArm.frameNumber, framePtr, &rate);
-				updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
-			}
-		}
-		else
-		{
 			// Left arm
-			mask = (1 << UARM_L) | (1 << LARM_L) | (1 << HAND_L);
+			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
+			shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+
+			// Right arm
+			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
+			shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+			break;
+
+		case WEAPON_PISTOLS:
+		case WEAPON_UZI:
+		case WEAPON_REVOLVER:
+		default:
+			short* pistolFramePtr;
+
+			// Left arm
+			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
+			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
+
+			// Right arm
+			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
+			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
+			break;
+
+		case WEAPON_FLARE:
+			// Left arm
+			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
 			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
-			mask = (1 << UARM_R) | (1 << LARM_R) | (1 << HAND_R);
+			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			frac = GetFrame_D2(LaraItem, framePtr, &rate);
 			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+			break;
 		}
-
-	}		 
+	}
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
 	if (m_moveableObjects[ID_HAIR] != NULL)
@@ -4415,10 +4425,10 @@ void Renderer11::updateLaraAnimations()
 
 		RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
 		RendererObject* objLara = m_moveableObjects[ID_LARA];
-		RendererMesh* parentMesh = objSkin->ObjectMeshes[HEAD];
-		RendererBone* parentBone = objSkin->LinearizedBones[HEAD];
+		RendererMesh* parentMesh = objSkin->ObjectMeshes[LM_HEAD];
+		RendererBone* parentBone = objSkin->LinearizedBones[LM_HEAD];
 
-		world = objLara->AnimationTransforms[HEAD] * m_LaraWorldMatrix;
+		world = objLara->AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
 
 		int lastVertex = 0;
 		int lastIndex = 0;
@@ -4460,10 +4470,7 @@ void Renderer11::updateLaraAnimations()
 				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_SOLID];
 
 				translation = Matrix::CreateTranslation(Hairs[7 * p + i].pos.xPos, Hairs[7 * p + i].pos.yPos, Hairs[7 * p + i].pos.zPos);
-				rotation = Matrix::CreateFromYawPitchRoll(
-					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.yRot),
-					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.xRot),
-					TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
+				rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.yRot), TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.xRot), TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
 				m_hairsMatrices[6 * p + i] = rotation * translation;
 
 				int baseVertex = lastVertex;
@@ -4555,10 +4562,7 @@ void Renderer11::updateEffects()
 		RendererEffect* fx = m_effectsToDraw[i];
 
 		Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
-		Matrix rotation = Matrix::CreateFromYawPitchRoll(
-			TR_ANGLE_TO_RAD(fx->Effect->pos.yRot),
-			TR_ANGLE_TO_RAD(fx->Effect->pos.xRot),
-			TR_ANGLE_TO_RAD(fx->Effect->pos.zRot));
+		Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(fx->Effect->pos.yRot), TR_ANGLE_TO_RAD(fx->Effect->pos.xRot), TR_ANGLE_TO_RAD(fx->Effect->pos.zRot));
 		m_effectsToDraw[i]->World = rotation * translation;
 	}
 }
@@ -4657,6 +4661,7 @@ void Renderer11::drawBlood()
 	for (int i = 0; i < 32; i++)
 	{
 		BLOOD_STRUCT* blood = &Blood[i];
+
 		if (blood->on)
 		{
 			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
@@ -4670,7 +4675,7 @@ void Renderer11::drawBlood()
 
 void Renderer11::drawSparks()
 {
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < MAX_SPARKS; i++)
 	{
 		SPARKS* spark = &Sparks[i];
 		if (spark->on)
@@ -4697,22 +4702,16 @@ void Renderer11::drawSparks()
 
 void Renderer11::drawFires()
 {
-	for (int k = 0; k < 32; k++)
+	for (int k = 0; k < MAX_FIRE_LIST; k++)
 	{
 		FIRE_LIST* fire = &Fires[k];
 		if (fire->on)
 		{
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < MAX_SPARKS_FIRE; i++)
 			{
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
-				{
-					addSpriteBillboard(m_sprites[spark->def],
-						fire->x + spark->x, fire->y + spark->y, fire->z + spark->z,
-						spark->r, spark->g, spark->b,
-						TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
-						BLENDMODE_ALPHABLEND);
-				}
+					addSpriteBillboard(m_sprites[spark->def], fire->x + spark->x, fire->y + spark->y, fire->z + spark->z, spark->r, spark->g, spark->b, TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
 			}
 		}
 	}
@@ -4752,6 +4751,7 @@ void Renderer11::drawSmokes()
 	for (int i = 0; i < 32; i++)
 	{
 		SMOKE_SPARKS* spark = &SmokeSparks[i];
+
 		if (spark->on)
 		{
 			addSpriteBillboard(m_sprites[spark->def],
@@ -4823,7 +4823,7 @@ void Renderer11::addSprite3D(RendererSprite* sprite, float x1, float y1, float z
 
 void Renderer11::drawShockwaves()
 {
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < MAX_SHOCKWAVE; i++)
 	{
 		SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
 
@@ -4851,7 +4851,7 @@ void Renderer11::drawShockwaves()
 				float z3 = shockwave->z + (shockwave->outerRad * s);
 				angle -= PI / 8.0f;
 
-				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
 					x1, shockwave->y, z1,
 					x2, shockwave->y, z2,
 					x3, shockwave->y, z3,
@@ -4869,7 +4869,7 @@ void Renderer11::drawShockwaves()
 
 void Renderer11::drawRipples()
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_RIPPLES; i++)
 	{
 		RIPPLE_STRUCT* ripple = &Ripples[i];
 
@@ -4883,16 +4883,14 @@ void Renderer11::drawRipples()
 
 			byte color = (ripple->init ? ripple->init << 1 : ripple->life << 1);
 
-			addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 9],
-				x1, y, z2, x2, y, z2, x2, y, z1, x1, y, z1, color, color, color, 0.0f, 1.0f, ripple->size, ripple->size,
-				BLENDMODE_ALPHABLEND);
+			addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES], x1, y, z2, x2, y, z2, x2, y, z1, x1, y, z1, color, color, color, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 		}
 	}
 }
 
 void Renderer11::drawDrips()
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_DRIPS; i++)
 	{
 		DRIP_STRUCT* drip = &Drips[i];
 
@@ -4905,27 +4903,19 @@ void Renderer11::drawDrips()
 
 void Renderer11::drawBubbles()
 {
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < MAX_BUBBLES; i++)
 	{
 		BUBBLE_STRUCT* bubble = &Bubbles[i];
-
 		if (bubble->size)
-		{
-			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 13],
-				bubble->pos.x, bubble->pos.y, bubble->pos.z,
-				bubble->shade * 255, bubble->shade * 255, bubble->shade * 255,
-				0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f,
-				BLENDMODE_ALPHABLEND);
-		}
+			addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES], bubble->pos.x, bubble->pos.y, bubble->pos.z, bubble->shade * 255, bubble->shade * 255, bubble->shade * 255, 0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
 	}
 }
 
 void Renderer11::drawSplahes()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < MAX_SPLASH; i++)
 	{
 		SPLASH_STRUCT* splash = &Splashes[i];
-
 		if (splash->flags & 1)
 		{
 			byte color = (splash->life >= 32 ? 255 : splash->life << 5);
@@ -4950,7 +4940,7 @@ void Renderer11::drawSplahes()
 				float z2 = splash->z + dz;
 				angle -= PI / 4.0f;
 
-				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH1],
 					x1, splash->y + splash->innerY, z1,
 					x2, splash->y + splash->innerY, z2,
 					x2, splash->y, z2,
@@ -4981,7 +4971,7 @@ void Renderer11::drawSplahes()
 				float z2 = splash->z + dz;
 				angle -= PI / 4.0f;
 
-				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
 					x1, splash->y + splash->middleY, z1,
 					x2, splash->y + splash->middleY, z2,
 					x2, splash->y, z2,
@@ -5012,7 +5002,7 @@ void Renderer11::drawSplahes()
 				float z2 = splash->z + dz;
 				angle -= PI / 4.0f;
 
-				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 8],
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
 					x1, splash->y - splash->outerSize, z1,
 					x2, splash->y - splash->outerSize, z2,
 					x2, splash->y, z2,
@@ -5081,8 +5071,7 @@ bool Renderer11::drawSprites()
 				float halfHeight = spr->Height / 2.0f;
 
 				Matrix billboardMatrix;
-				createBillboardMatrix(&billboardMatrix, &Vector3(spr->X, spr->Y, spr->Z),
-					&Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
+				createBillboardMatrix(&billboardMatrix, &Vector3(spr->X, spr->Y, spr->Z), &Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
 
 				Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
 				Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
@@ -5488,7 +5477,7 @@ bool Renderer11::doSnow()
 			continue;
 		}
 
-		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], snow->X, snow->Y, snow->Z, 255, 255, 255,
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], snow->X, snow->Y, snow->Z, 255, 255, 255,
 			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
 			BLENDMODE_ALPHABLEND);
 
@@ -5525,12 +5514,9 @@ bool Renderer11::drawDebris(bool transparent)
 			int tile = texture->tileAndFlag & 0x7FFF;
 
 			// Draw only debris of the current bucket
-			if (texture->attribute == 0 && transparent
-				||
-				texture->attribute == 1 && transparent
-				||
-				texture->attribute == 2 && !transparent
-				)
+			if (texture->attribute == 0 && transparent ||
+				texture->attribute == 1 && transparent ||
+				texture->attribute == 2 && !transparent)
 				continue;
 
 			RendererVertex vertex;
@@ -5640,7 +5626,7 @@ bool Renderer11::drawBats()
 			if (bucket->NumVertices == 0)
 				continue;
 
-			for (int i = 0; i < 64; i++)
+			for (int i = 0; i < NUM_BATS; i++)
 			{
 				BAT_STRUCT* bat = &Bats[i];
 
@@ -6261,7 +6247,7 @@ int Renderer11::drawInventoryScene()
 							}
 							else
 							{
-								PrintString(400, y, g_KeyNames[KeyboardLayout1[k]],
+								PrintString(400, y, (char*)g_KeyNames[KeyboardLayout1[k]],
 									PRINTSTRING_COLOR_ORANGE,
 									PRINTSTRING_OUTLINE);
 							}
@@ -6851,28 +6837,28 @@ bool Renderer11::drawGunFlashes()
 
 	if (Lara.weaponItem != WEAPON_FLARE && Lara.weaponItem != WEAPON_SHOTGUN && Lara.weaponItem != WEAPON_CROSSBOW)
 	{
-		if (Lara.weaponItem == WEAPON_REVOLVER)
+		switch (Lara.weaponItem)
 		{
+		case WEAPON_REVOLVER:
 			length = 192;
 			zOffset = 68;
 			rotationX = -14560;
-		}
-		else if (Lara.weaponItem == WEAPON_UZI)
-		{
+			break;
+		case WEAPON_UZI:
 			length = 190;
 			zOffset = 50;
-		}
-		else if (Lara.weaponItem == WEAPON_HK)
-		{
+			break;
+		case WEAPON_HK:
 			length = 300;
 			zOffset = 92;
 			rotationX = -14560;
-		}
-		else
-		{
+			break;
+		default:
+		case WEAPON_PISTOLS:
 			length = 180;
 			zOffset = 40;
 			rotationX = -16830;
+			break;
 		}
 
 		OBJECT_INFO* flashObj = &Objects[ID_GUN_FLASH];
@@ -6890,7 +6876,7 @@ bool Renderer11::drawGunFlashes()
 
 				if (Lara.leftArm.flash_gun)
 				{
-					world = laraObj->AnimationTransforms[HAND_L].Transpose() * m_LaraWorldMatrix;
+					world = laraObj->AnimationTransforms[LM_LHAND].Transpose() * m_LaraWorldMatrix;
 					world = offset * world;
 					world = rotation2 * world;
 
@@ -6904,7 +6890,7 @@ bool Renderer11::drawGunFlashes()
 
 				if (Lara.rightArm.flash_gun)
 				{
-					world = laraObj->AnimationTransforms[HAND_R].Transpose() * m_LaraWorldMatrix;
+					world = laraObj->AnimationTransforms[LM_RHAND].Transpose() * m_LaraWorldMatrix;
 					world = offset * world;
 					world = rotation2 * world;
 
@@ -6953,9 +6939,7 @@ bool Renderer11::drawGunShells()
 			RendererObject* moveableObj = m_moveableObjects[gunshell->objectNumber];
 
 			Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(gunshell->pos.yRot),
-				TR_ANGLE_TO_RAD(gunshell->pos.xRot),
-				TR_ANGLE_TO_RAD(gunshell->pos.zRot));
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(gunshell->pos.yRot), TR_ANGLE_TO_RAD(gunshell->pos.xRot), TR_ANGLE_TO_RAD(gunshell->pos.zRot));
 			Matrix world = rotation * translation;
 
 			m_stItem.World = world.Transpose();
@@ -7017,9 +7001,7 @@ void Renderer11::drawUnderwaterDust()
 		dust->Life++;
 		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14], dust->X, dust->Y, dust->Z, color, color, color,
-			0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE,
-			BLENDMODE_ALPHABLEND);
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], dust->X, dust->Y, dust->Z, color, color, color, 0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE, BLENDMODE_ALPHABLEND);
 
 		if (dust->Life >= 32)
 			dust->Reset = true;
@@ -7032,7 +7014,7 @@ void Renderer11::drawUnderwaterDust()
 
 bool Renderer11::isRoomUnderwater(short roomNumber)
 {
-	return (m_rooms[roomNumber]->Room->flags & 1);
+	return (m_rooms[roomNumber]->Room->flags & ENV_FLAG_WATER);
 }
 
 bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
@@ -7041,8 +7023,8 @@ bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
 	ROOM_INFO* r = room->Room;
 
 	return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
-		y >= r->maxceiling && y <= r->minfloor &&
-		z >= r->z && z <= r->z + r->ySize * 1024.0f);
+		    y >= r->maxceiling && y <= r->minfloor &&
+		    z >= r->z && z <= r->z + r->ySize * 1024.0f);
 }
 
 vector<RendererVideoAdapter>* Renderer11::GetAdapters()
@@ -7052,7 +7034,7 @@ vector<RendererVideoAdapter>* Renderer11::GetAdapters()
 
 int Renderer11::DrawPickup(short objectNum)
 {
-	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0);
+	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
 	m_pickupRotation += 45 * 360 / 30;
 	return 0;
 }
@@ -7273,7 +7255,7 @@ bool Renderer11::drawShadowMap()
 	Matrix view = Matrix::CreateLookAt(lightPos,
 		itemPos,
 		Vector3(0.0f, -1.0f, 0.0f));
-	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f* RADIAN, 1.0f, 1.0f,
+	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 1.0f,
 		m_shadowLight->Out * 1.5f);
 
 	m_stCameraMatrices.View = view.Transpose();

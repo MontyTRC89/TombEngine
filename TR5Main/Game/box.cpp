@@ -8,6 +8,7 @@
 #include "Lara.h"
 #include "draw.h"
 #include "sphere.h"
+#include "misc.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -31,8 +32,8 @@ void DropBaddyPickups(ITEM_INFO* item)
 	for (short pickupNumber = item->carriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->carriedItem)
 	{
 		pickup = &Items[pickupNumber];
-		pickup->pos.xPos = (item->pos.xPos & 0xFFFFFC00) | 512;
-		pickup->pos.zPos = (item->pos.zPos & 0xFFFFFC00) | 512;
+		pickup->pos.xPos = (item->pos.xPos & -CLICK(2)) | CLICK(2);
+		pickup->pos.zPos = (item->pos.zPos & -CLICK(2)) | CLICK(2);
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(pickup->pos.xPos, item->pos.yPos, pickup->pos.zPos, &roomNumber);
@@ -47,16 +48,18 @@ void DropBaddyPickups(ITEM_INFO* item)
 
 int MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short angdif, int angadd)
 {
-	int x = destpos->xPos - srcpos->xPos;
-	int y = destpos->yPos - srcpos->yPos;
-	int z = destpos->zPos - srcpos->zPos;
-	int dist = SQRT_ASM(SQUARE(x) + SQUARE(y) + SQUARE(z));
+	int x, y, z, distance;
 
-	if (velocity < dist)
+	x = destpos->xPos - srcpos->xPos;
+	y = destpos->yPos - srcpos->yPos;
+	z = destpos->zPos - srcpos->zPos;
+	distance = SQRT_ASM(SQUARE(x) + SQUARE(y) + SQUARE(z));
+
+	if (velocity < distance)
 	{
-		srcpos->xPos += velocity * x / dist;
-		srcpos->yPos += velocity * y / dist;
-		srcpos->zPos += velocity * z / dist;
+		srcpos->xPos += x * velocity / distance;
+		srcpos->yPos += y * velocity / distance;
+		srcpos->zPos += z * velocity / distance;
 	}
 	else
 	{
@@ -77,10 +80,10 @@ int MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short
 		srcpos->yRot += angadd;
 	}
 
-	return srcpos->xPos == destpos->xPos
-		&& srcpos->yPos == destpos->yPos
-		&& srcpos->zPos == destpos->zPos
-		&& srcpos->yRot == destpos->yRot;
+	return (srcpos->xPos == destpos->xPos
+		&&  srcpos->yPos == destpos->yPos
+		&&  srcpos->zPos == destpos->zPos
+		&&  srcpos->yRot == destpos->yRot);
 }
 
 void CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd) 
@@ -98,45 +101,46 @@ void CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd)
 	} 
 
 	srcpos->yRot += angle;
-
-	return;
 }
 
 short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem) 
 {
 	ITEM_INFO* item = &Items[creature->itemNum];
+	ROOM_INFO* r;
+	short* zone;
 
-	short* zone = GroundZones[creature->LOT.zone * 2 + FlipStatus];
-
-	ROOM_INFO* r = &Rooms[item->roomNumber];
+	r = &Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 
 	r = &Rooms[targetItem->roomNumber];
 	targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->pos.xPos - r->x, targetItem->pos.zPos - r->z).box;
 
+	zone = GroundZones[ZONE(creature->LOT.zone)];
 	return (zone[item->boxNumber] == zone[targetItem->boxNumber]);
 }
 
 short AIGuard(CREATURE_INFO* creature) 
 {
+	ITEM_INFO* item;
 	int random;
 
-	if (Items[creature->itemNum].aiBits & (GUARD | PATROL1))
+	item = &Items[creature->itemNum];
+	if (item->aiBits & (GUARD | PATROL1))
 		return 0;
 
 	random = GetRandomControl();
 
-	if (random < 0x100)
+	if (random < 256)
 	{
 		creature->headRight = true;
 		creature->headLeft = true;
 	}
-	else if (random < 0x180)
+	else if (random < 384)
 	{
 		creature->headRight = false;
 		creature->headLeft = true;
 	}
-	else if (random < 0x200)
+	else if (random < 512)
 	{
 		creature->headRight = true;
 		creature->headLeft = false;
@@ -153,48 +157,52 @@ short AIGuard(CREATURE_INFO* creature)
 
 void AlertNearbyGuards(ITEM_INFO* item) 
 {
+	ITEM_INFO* target;
+	CREATURE_INFO* creature;
+	int x, y, z;
+	int distance;
+
 	for (int i = 0; i < NUM_SLOTS; i++)
 	{
-		CREATURE_INFO* creature = &BaddieSlots[i];
-
+		creature = &BaddieSlots[i];
 		if (creature->itemNum == NO_ITEM)
 			continue;
 
-		ITEM_INFO* target = &Items[creature->itemNum + i];
+		target = &Items[creature->itemNum + i];
 		if (item->roomNumber == target->roomNumber)
 		{
 			creature->alerted = true;
 			continue;
 		}
 
-		int x = (target->pos.xPos - item->pos.xPos) / 64;
-		int y = (target->pos.yPos - item->pos.yPos) / 64;
-		int z = (target->pos.zPos - item->pos.zPos) / 64;
+		x = (target->pos.xPos - item->pos.xPos) / 64;
+		y = (target->pos.yPos - item->pos.yPos) / 64;
+		z = (target->pos.zPos - item->pos.zPos) / 64;
 
-		int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
-
-		if (distance < 8000)
+		distance = (SQUARE(x) + SQUARE(y) + SQUARE(z));
+		if (distance < SECTOR(8))
 			creature->alerted = true;
 	}
 }
 
 void AlertAllGuards(short itemNumber) 
 {
-	short objNumber = Items[itemNumber].objectNumber;
+	ITEM_INFO* target;
+	CREATURE_INFO* creature;
+	short objNumber;
 
 	for (int i = 0; i < NUM_SLOTS; i++)
 	{
-		CREATURE_INFO* creature = &BaddieSlots[i];
+		creature = &BaddieSlots[i];
 		if (creature->itemNum == NO_ITEM)
 			continue;
 
-		ITEM_INFO* target = &Items[creature->itemNum];
+		target = &Items[creature->itemNum];
+		objNumber = Items[itemNumber].objectNumber;
 		if (objNumber == target->objectNumber)
 		{
 			if (target->status == ITEM_ACTIVE)
-			{
 				creature->alerted = true;
-			}
 		}
 	}
 }
@@ -239,9 +247,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 
 	// TODO: exist in TR5 but just commented in case.
 	/*
-	ForcedFixedCamera.x = item->pos.xPos + (rcossin_tbl[(item->pos.yRot >> 3) & 0x1FFE] << 13 >> W2V_SHIFT);
-	ForcedFixedCamera.y = item->pos.yPos - 1024;
-	ForcedFixedCamera.z = item->pos.zPos + (rcossin_tbl[((item->pos.yRot >> 3) & 0x1FFE) + 1] << 13 >> W2V_SHIFT);
+	ForcedFixedCamera.x = item->pos.xPos + (SIN(item->pos.yRot) << 13) >> W2V_SHIFT;
+	ForcedFixedCamera.y = item->pos.yPos - WALL_SIZE;
+	ForcedFixedCamera.z = item->pos.zPos + (COS(item->pos.yRot) << 13) >> W2V_SHIFT;
 	ForcedFixedCamera.roomNumber = item->roomNumber;
 	UseForcedFixedCamera = true;
 	*/
@@ -282,8 +290,13 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 
 	if (item->pos.yPos < depth)
 	{
-		short roomNumber = item->roomNumber;
-		int floorHeight = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber), item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		FLOOR_INFO* floor;
+		short roomNumber;
+		int floorHeight;
+
+		roomNumber = item->roomNumber;
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		floorHeight = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 		if (floorHeight < depth)
 		{
@@ -307,13 +320,19 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 
 void CreatureFloat(short itemNumber) 
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item;
+	FLOOR_INFO* floor;
+	int waterLevel;
+	int y;
+	short roomNumber;
+
+	item = &Items[itemNumber];
 	item->hitPoints = -16384;
 	item->pos.xRot = 0;
 
-	int waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	int y = item->pos.yPos;
+	waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
+	y = item->pos.yPos;
 	if (y > waterLevel)
 		item->pos.yPos = y - 32;
 	if (item->pos.yPos < waterLevel)
@@ -321,10 +340,8 @@ void CreatureFloat(short itemNumber)
 
 	AnimateItem(item);
 
-	//printf("Crocodile Y: %d\n", item->pos.yPos);
-
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	
 	if (roomNumber != item->roomNumber)
@@ -332,7 +349,7 @@ void CreatureFloat(short itemNumber)
 
 	if (item->pos.yPos <= waterLevel)
 	{
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == GF2(item->objectNumber, item->animNumber, 0))
 		{
 			item->pos.yPos = waterLevel;
 			item->collidable = false;
@@ -495,7 +512,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	item = &Items[itemNumber];
 	if (item->data == NULL)
-		return 0;
+		return FALSE;
 
 	creature = (CREATURE_INFO*)item->data;
 	LOT = &creature->LOT;
@@ -516,8 +533,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	AnimateItem(item);
 	if (item->status == ITEM_DEACTIVATED)
 	{
-		CreatureDie(itemNumber, 0);
-		return 0;
+		CreatureDie(itemNumber, FALSE);
+		return FALSE;
 	}
 
 	bounds = GetBoundsAccurate(item);
@@ -695,7 +712,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			item->pos.yRot -= BIFF_AVOID_TURN;
 		else
 			item->pos.yRot += BIFF_AVOID_TURN;
-		return 1;
+		return TRUE;
 	}
 
 	if (LOT->fly != NO_FLYING)
@@ -834,7 +851,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	return 1;
+	return TRUE;
 }
 
 void CreatureDie(short itemNumber, int explode)
@@ -846,9 +863,9 @@ void CreatureDie(short itemNumber, int explode)
 	if (explode)
 	{
 		if (Objects[item->objectNumber].hitEffect)
-			ExplodingDeath2(itemNumber, -1, 258);
+			ExplodingDeath2(itemNumber, ALL_MESHBITS, EXPLODE_HIT_EFFECT);
 		else
-			ExplodingDeath2(itemNumber, -1, 256);
+			ExplodingDeath2(itemNumber, ALL_MESHBITS, EXPLODE_NORMAL);
 
 		KillItem(itemNumber);
 	}
@@ -1987,98 +2004,6 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 		target->y = box->height - STEPUP_HEIGHT;
 
 	return TARGET_TYPE::NO_TARGET;
-}
-
-long mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, long push)
-{
-	FLOOR_INFO* floor;
-	long x, y, z, h, c, cdiff, hdiff;
-	long dx, dy, dz, lp, clipped, nc;
-	short room_number, room_number2;
-
-	dx = (target->x - start->x) >> 3;
-	dy = (target->y - start->y) >> 3;
-	dz = (target->z - start->z) >> 3;
-
-	x = start->x;
-	y = start->y;
-	z = start->z;
-	room_number = room_number2 = start->roomNumber;
-
-	clipped = nc = 0;
-	for (lp = 0; lp < 8; lp++)
-	{
-		room_number = room_number2;
-		floor = GetFloor(x, y, z, &room_number2);
-
-		if (Rooms[room_number2].flags & ENV_FLAG_NO_LENSFLARE)
-		{
-			clipped = 1;
-			break;
-		}
-
-		h = GetFloorHeight(floor, x, y, z);
-		c = GetCeiling(floor, x, y, z);
-
-		if (h == NO_HEIGHT || c == NO_HEIGHT || c >= h)
-		{
-			if (!nc)
-			{
-				x += dx;
-				y += dy;
-				z += dz;
-				continue;
-			}
-			clipped = 1;
-			break;
-		}
-
-		if (y > h)
-		{
-			hdiff = y - h;
-			if (hdiff < push)
-				y = h;
-			else
-			{
-				clipped = 1;
-				break;
-			}
-		}
-
-		if (y < c)
-		{
-			cdiff = c - y;
-			if (cdiff < push)
-				y = c;
-			else
-			{
-				clipped = 1;
-				break;
-			}
-		}
-
-		nc = 1;
-
-		x += dx;
-		y += dy;
-		z += dz;
-	}
-
-	if (lp)
-	{
-		x -= dx;
-		y -= dy;
-		z -= dz;
-	}
-
-	target->x = x;
-	target->y = y;
-	target->z = z;
-
-	GetFloor(target->x, target->y, target->z, &room_number);
-	target->roomNumber = room_number;
-
-	return (!clipped);
 }
 
 void Inject_Box()

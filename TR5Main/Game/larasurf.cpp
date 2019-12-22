@@ -18,7 +18,7 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->goalAnimState == STATE_LARA_UNDERWATER_FORWARD)
 	{
-		item->goalAnimState = STATE_LARA_UNDERWATER_DIVING;
+		item->currentAnimState = STATE_LARA_UNDERWATER_DIVING;
 		item->animNumber = ANIMATION_LARA_FREE_FALL_TO_UNDERWATER_ALTERNATE;
 		item->pos.xRot = -8190;
 		item->frameNumber = Anims[item->animNumber].frameBase;
@@ -352,7 +352,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		{
 			if (item->pos.yRot >= 26397 || item->pos.yRot <= -26397)
 			{
-				rot = -ANGLE(180);
+				rot = ANGLE(180);
 			}
 			else if (item->pos.yRot >= -22754 && item->pos.yRot <= -10014)
 			{
@@ -385,7 +385,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	}
 	else if (rot)
 	{
-		if (rot == -ANGLE(180))
+		if (rot == ANGLE(180))
 		{
 			item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) - 100;
 		}

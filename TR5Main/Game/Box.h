@@ -29,11 +29,12 @@
 //#define DropBaddyPickups ((int(__cdecl*)(ITEM_INFO*)) 0x0040C5A0)
 //#define CreatureCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x004124E0)
 //#define CreatureTurn ((short (__cdecl*)(ITEM_INFO*, short)) 0x0040AE90)
-#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
+#define LOS ((int(__cdecl*)(GAME_VECTOR*,GAME_VECTOR*)) 0x00417CF0)
+#define mgLOS ((int(__cdecl*)(GAME_VECTOR*,GAME_VECTOR*,int)) 0x0040FA70)
 #define _AIGuard ((short(__cdecl*)(CREATURE_INFO*)) 0x0040BBE0)
 #define _GetAITarget ((void(__cdecl*)(CREATURE_INFO*)) 0x0040BCC0)
-#define _FindAIObject ((int(__cdecl*)(CREATURE_INFO*, short)) 0x0040C070)
-#define _SameZoneAIObject ((int(__cdecl*)(CREATURE_INFO*, short)) 0x0040C460)
+#define _FindAIObject ((int(__cdecl*)(CREATURE_INFO*,short)) 0x0040C070)
+#define _SameZoneAIObject ((int(__cdecl*)(CREATURE_INFO*,short)) 0x0040C460)
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
 void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
@@ -70,7 +71,6 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber);
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info);
 TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
-long mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, long push);
 
 void Inject_Box();
 

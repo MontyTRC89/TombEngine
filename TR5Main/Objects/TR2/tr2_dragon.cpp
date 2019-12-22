@@ -235,7 +235,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.hitDirection = -1;
 
-				LARA_MESHES(ID_LARA_EXTRA_ANIMS, HAND_R);
+				LARA_MESHES(ID_LARA_EXTRA_ANIMS, LM_RHAND);
 
 				/* Do cinematic camera */
 				Camera.type = CINEMATIC_CAMERA;
