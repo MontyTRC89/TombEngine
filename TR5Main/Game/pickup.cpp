@@ -864,7 +864,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				item->itemFlags[3] = 1;
 				item->flags |= 0x20;
-				item->status = ITEM_ACTIVE;
+				item->status = ITEM_INVISIBLE;
 			}
 		}
 
@@ -948,7 +948,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 							{
 								item->itemFlags[3] = 1;
 								item->flags |= 0x20;
-								item->status = ITEM_ACTIVE;
+								item->status = ITEM_INVISIBLE;
 							}
 						}
 					}
@@ -1419,17 +1419,237 @@ void InitialisePickup(short itemNumber)
 	}
 	else
 	{
-		if (!triggerFlags || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
+		if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
 			item->pos.yPos -= bounds[3];
+		
 		if ((item->triggerFlags & 0x80) != 0)
 		{
 			RPickups[NumRPickups] = itemNumber;
 			NumRPickups++;
 		}
+		
 		if (item->triggerFlags & 0x100)
 			item->meshBits = 0;
+		
 		if (item->status == ITEM_INVISIBLE)
 			item->flags |= 0x20;
+	}
+}
+
+void InitialiseSearchObject(short itemNumber)
+{
+	ITEM_INFO* item, *item2;
+	short itemNumber2;
+
+	item = &Items[itemNumber];
+	if (item->objectNumber == ID_SEARCH_OBJECT1)
+	{
+		item->swapMeshFlags = -1;
+		item->meshBits = 7;
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT2)
+	{
+		item->meshBits = 2;
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT4)
+	{
+		item->itemFlags[1] = -1;
+		item->meshBits = 9;
+		
+		for (itemNumber2 = 0; itemNumber2 < LevelItems; ++itemNumber2)
+		{
+			item2 = &Items[itemNumber2];
+
+			if (item2->objectNumber == 149) /* @FIXME In TRC OBJECTS.H this is the EXPLOSION slot */
+			{
+				if (item->pos.xPos == item2->pos.xPos && item->pos.yPos == item2->pos.yPos && item->pos.zPos == item2->pos.zPos)
+				{
+					item->itemFlags[1] = itemNumber2;
+					break;
+				}
+			}
+			else if (Objects[item2->objectNumber].collision == PickupCollision
+				&&  item->pos.xPos == item2->pos.xPos
+				&&  item->pos.yPos == item2->pos.yPos
+				&&  item->pos.zPos == item2->pos.zPos)
+			{
+				item->itemFlags[1] = itemNumber2;
+				break;
+			}
+
+		}
+		AddActiveItem(itemNumber);
+		item->flags |= IFLAG_ACTIVATION_MASK;
+		item->status = ITEM_ACTIVE;
+	}
+}
+
+void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll)
+{
+	ITEM_INFO* item;
+	int objNumber;
+	short* bounds;
+
+	item = &Items[itemNumber];
+	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
+
+	if (TrInput & IN_ACTION && laraitem->currentAnimState == STATE_LARA_STOP && laraitem->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS && (item->status == ITEM_INACTIVE && item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
+		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
+	{
+		bounds = GetBoundsAccurate(item);
+		if (item->objectNumber != ID_SEARCH_OBJECT1)
+		{
+			SOBounds[0] = bounds[0] - 128;
+			SOBounds[1] = bounds[1] + 128;
+		}
+		else
+		{
+			SOBounds[0] = bounds[0] + 64;
+			SOBounds[1] = bounds[1] - 64;
+		}
+		SOBounds[4] = bounds[4] - 200;
+		SOBounds[5] = bounds[5] + 200;
+		SOPos.z = bounds[4] - SearchOffsets[objNumber];
+
+		if (TestLaraPosition(SOBounds, item, laraitem))
+		{
+			if (MoveLaraPosition(&SOPos, item, laraitem))
+			{
+				laraitem->currentAnimState = STATE_LARA_MISC_CONTROL;
+				laraitem->animNumber = SearchAnims[objNumber];
+				laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
+				Lara.isMoving = false;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
+
+				if (item->objectNumber == ID_SEARCH_OBJECT4)
+				{
+					item->itemFlags[0] = 1;
+				}
+				else
+				{
+					AddActiveItem(itemNumber);
+					item->status = ITEM_ACTIVE;
+				}
+
+				item->animNumber = Objects[item->objectNumber].animIndex + 1;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				AnimateItem(item);
+			}
+			else
+			{
+				Lara.generalPtr = (void *) itemNumber;
+			}
+		}
+		else if (Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
+		{
+			Lara.isMoving = false;
+			Lara.gunStatus = LG_NO_ARMS;
+		}
+	}
+	else if (laraitem->currentAnimState != STATE_LARA_MISC_CONTROL)
+	{
+		ObjectCollision(itemNumber, laraitem, laracoll);
+	}
+}
+
+void SearchObjectControl(short itemNumber)
+{
+	ITEM_INFO* item, *item2;
+	int objNumber;
+	short frameNumber;
+
+	item = &Items[itemNumber];
+	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
+
+	if (item->objectNumber != ID_SEARCH_OBJECT4 || item->itemFlags[0] == 1)
+		AnimateItem(item);
+
+	frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	if (item->objectNumber == ID_SEARCH_OBJECT1)
+	{
+		if (frameNumber > 0)
+		{
+			item->swapMeshFlags = 0;
+			item->meshBits = -1;
+		}
+		else
+		{
+			item->swapMeshFlags = -1;
+			item->meshBits = 7;
+		}
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT2)
+	{
+		if (frameNumber == 18)
+			item->meshBits = 1;
+		else if (frameNumber == 172)
+			item->meshBits = 2;
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT4)
+	{
+		item->meshBits = FlipStats[0] != 0 ? 48 : 9;
+
+		if (frameNumber >= 45 && frameNumber <= 131)
+			item->meshBits |= FlipStats[0] != 0 ? 4 : 2;
+			
+		if (item->itemFlags[1] != -1)
+		{
+			item2 = &Items[item->itemFlags[1]];
+			if (Objects[item2->objectNumber].collision == PickupCollision)
+			{
+				if (FlipStats[0])
+					item2->status = ITEM_INACTIVE;
+				else
+					item2->status = ITEM_INVISIBLE;
+			}
+		}
+	}
+
+	if (frameNumber == SearchCollectFrames[objNumber])
+	{
+		if (item->objectNumber == ID_SEARCH_OBJECT4)
+		{
+			if (item->itemFlags[1] != -1)
+			{
+				item2 = &Items[item->itemFlags[1]];
+				if (Objects[item2->objectNumber].collision == PickupCollision)
+				{
+					AddDisplayPickup(item2->objectNumber);
+					KillItem(item->itemFlags[1]);
+				}
+				else
+				{
+					AddActiveItem(item->itemFlags[1]);
+					item2->flags |= IFLAG_ACTIVATION_MASK;
+					item2->status = ITEM_ACTIVE;
+					LaraItem->hitPoints = 640;
+				}
+				item->itemFlags[1] = -1;
+			}
+		}
+		else
+		{
+			CollectCarriedItems(item);
+		}
+	}
+
+	
+	if (item->status == ITEM_DEACTIVATED)
+	{
+		if (item->objectNumber == ID_SEARCH_OBJECT4)
+		{
+			item->itemFlags[0] = 0;
+			item->status = ITEM_ACTIVE;
+		}
+		else
+		{
+			RemoveActiveItem(itemNumber);
+			item->status = ITEM_INACTIVE;
+		}
 	}
 }
 

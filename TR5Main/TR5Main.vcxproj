@@ -74,7 +74,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;dxerr.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;d3dx11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;dxerr.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;d3dx11d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>md "$(TargetDir)\Shaders" 
@@ -101,7 +102,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;dxerr.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;dxerr.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;d3dx11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>md "$(TargetDir)\Shaders" 
@@ -151,7 +153,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\hair.h" />
     <ClInclude Include="Game\healt.h" />
     <ClInclude Include="Game\hydra.h" />
-    <ClInclude Include="Game\Intestazione.h" />
     <ClInclude Include="Game\inventory.h" />
     <ClInclude Include="Game\items.h" />
     <ClInclude Include="Game\lara.h" />
@@ -211,6 +212,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Game\lion.cpp" />
+    <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\swat.cpp" />
     <ClCompile Include="Global\math.cpp" />
     <ClCompile Include="Objects\TR1\tr1_lara_evil.cpp" />
@@ -221,6 +223,21 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR1\tr1_raptor.cpp" />
     <ClCompile Include="Objects\TR2\tr2_skidman.cpp" />
     <ClCompile Include="Objects\TR3\tr3_sophia.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_autoguns.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_brownbeast.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_cybord.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_doberman.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_dog.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_ghost.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_gladiator.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_guard.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_hydra.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_imp.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_larson.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_reaper.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_romanstatue.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_submarine.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_willowwisp.cpp" />
     <ClCompile Include="Objects\Vehicles\boat.cpp" />
     <ClCompile Include="Objects\TR2\tr2_dragon.cpp" />
     <ClCompile Include="Objects\TR2\tr2_spear_guardian.cpp" />
@@ -274,7 +291,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\tr4_jeanyves.cpp" />
     <ClCompile Include="Objects\TR4\tr4_knighttemplar.cpp" />
-    <ClCompile Include="Objects\misc.cpp" />
     <ClCompile Include="Objects\puzzles.cpp" />
     <ClCompile Include="Objects\TR4\tr4_troops.cpp" />
     <ClCompile Include="Objects\TR4\tr4_wraith.cpp" />

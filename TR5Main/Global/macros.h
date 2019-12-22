@@ -21,6 +21,7 @@
 #define ALPHA(rgb) (((rgb) >> 24) & 0xFF)
 
 #define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh * 2]
+#define MESH_BITS(x) (1 << x)
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
 #define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)

@@ -264,7 +264,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		InItemControlLoop = false;
-		//KillMoveEffects();
+		KillMoveEffects();
 
 		// Update some effect timers
 		if (SmokeCountL)
@@ -1145,11 +1145,6 @@ void ActivateKey()
 	KeyTriggerActive = 1;
 }
 
-void ActivateCamera()
-{
-	KeyTriggerActive = 2;
-}
-
 short GetDoor(FLOOR_INFO* floor)
 {
 	if (!floor->index)
@@ -1556,12 +1551,12 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 		return height;
 
 	short* data = &FloorData[floor->index];
-	short type;
+	short type, hadj;
 
 	int xOff, yOff, trigger;
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
-	int tilts, t0, t1, t2, t3, t4, hadj, dx, dz, h1, h2;
+	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
 
 	do
 	{

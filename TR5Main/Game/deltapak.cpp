@@ -4,7 +4,7 @@
 
 ITEM_INFO* FindItem(short objectNumber)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
 	printf("Called FindItem()\n");
 #endif
 

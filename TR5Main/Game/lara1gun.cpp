@@ -47,7 +47,7 @@ void FireHarpoon()
 		pos.y = dxPos.y = 0; // -273 - 100;
 		pos.z = dxPos.z = 77;
 
-		g_Renderer->GetLaraBonePosition(&dxPos, HAND_R);
+		g_Renderer->GetLaraBonePosition(&dxPos, LM_RHAND);
 		GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
 
 		/*item->pos.xPos = pos.x = dxPos.x;
@@ -238,7 +238,7 @@ void ControlHarpoonBolt(short itemNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 }
 
-long	tbx, tby, tbz;
+long tbx, tby, tbz;
 
 void FireGrenade()
 {
@@ -457,19 +457,19 @@ void ControlGrenade(short itemNumber)
 		// For now keep this legacy math
 		phd_PushUnitMatrix();
 
-		*(MatrixPtr + M03) = 0;
-		*(MatrixPtr + M13) = 0;
-		*(MatrixPtr + M23) = 0;
+		MatrixPtr[M03] = 0;
+		MatrixPtr[M13] = 0;
+		MatrixPtr[M23] = 0;
 
 		phd_RotYXZ(item->pos.yRot - ANGLE(180), item->pos.xRot, item->pos.zRot);
 		phd_TranslateRel(0, 0, -64);
 
-		int wx = (*(MatrixPtr + M03) >> W2V_SHIFT);
-		int wy = (*(MatrixPtr + M13) >> W2V_SHIFT);
-		int wz = (*(MatrixPtr + M23) >> W2V_SHIFT);
+		int wx = (MatrixPtr[M03] >> W2V_SHIFT);
+		int wy = (MatrixPtr[M13] >> W2V_SHIFT);
+		int wz = (MatrixPtr[M23] >> W2V_SHIFT);
 
-		MatrixPtr -= 12;
-		DxMatrixPtr -= 48;
+		phd_PopMatrix();
+		phd_PopDxMatrix();
 
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 	}
@@ -777,7 +777,7 @@ void DrawShotgun(int weaponType)
 		item->goalAnimState = 1;
 		item->currentAnimState = 1;
 		item->status = ITEM_ACTIVE;
-		item->roomNumber = 255;
+		item->roomNumber = NO_ROOM;
 		
 		Lara.rightArm.frameBase = Objects[item->objectNumber].frameBase;
 		Lara.leftArm.frameBase = Lara.rightArm.frameBase;
@@ -1233,7 +1233,7 @@ void ControlCrossbowBolt(short itemNumber)
 
 	AlertNearbyGuards(item);
 	
-	SoundEffect(105, &item->pos, 0x1800004);
+	SoundEffect(105, &item->pos, ENV_FLAG_PITCH_SHIFT | 0x1800000);
 	SoundEffect(106, &item->pos, 0);
 
 	if (foundCollidedObjects || explode)
@@ -1494,9 +1494,8 @@ void undraw_shotgun(int weapon)
 
 void undraw_shotgun_meshes(int weapon)
 {
-	short objectNumber = WeaponObject(weapon);
-	Lara.backGun = objectNumber;
-	Lara.meshPtrs[HAND_R] = Meshes[Objects[0].meshIndex + HAND_R * 2];
+	Lara.backGun = WeaponObject(weapon);
+	LARA_MESHES(ID_LARA, LM_RHAND);
 }
 
 void draw_shotgun(int weapon)
@@ -1550,8 +1549,8 @@ void draw_shotgun(int weapon)
 
 void draw_shotgun_meshes(int weaponType)
 {
-	Lara.backGun = 0;
-	Lara.meshPtrs[HAND_R] = Meshes[Objects[WeaponObjectMesh(weaponType)].meshIndex + HAND_R * 2];
+	Lara.backGun = WEAPON_NONE;
+	LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
 }
 
 void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
@@ -1690,7 +1689,7 @@ void FireHK(int mode)
 	{
 		SmokeCountL = 12;
 		SmokeWeapon = WEAPON_HK;
-		TriggerGunShell(1, ID_GUNSHELL, 5);
+		TriggerGunShell(1, ID_GUNSHELL, WEAPON_HK);
 		Lara.rightArm.flash_gun = Weapons[WEAPON_HK].flashTime;
 	}
 }
@@ -1714,8 +1713,8 @@ void FireShotgun()
 
 	for (int i = 0; i < 6; i++)
 	{
-		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
-		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
+		loopAngles[0] = angles[0] + value * (GetRandomControl() - ANGLE(90)) / 0x10000;
+		loopAngles[1] = angles[1] + value * (GetRandomControl() - ANGLE(90)) / 0x10000;
 
 		if (FireWeapon(WEAPON_SHOTGUN, Lara.target, LaraItem, loopAngles))
 			fired = true;
@@ -1774,8 +1773,8 @@ void ready_shotgun(int weaponType)
 	Lara.rightArm.xRot = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.leftArm.frameNumber = 0;
-	Lara.rightArm.lock = 0;
-	Lara.leftArm.lock = 0;
+	Lara.rightArm.lock = false;
+	Lara.leftArm.lock = false;
 	Lara.target = NULL;
 	Lara.rightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;

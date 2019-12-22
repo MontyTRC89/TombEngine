@@ -51,7 +51,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode);
 void UpdateSky();
 void AnimateWaterfalls();
 void ActivateKey();
-void ActivateCamera();
 short GetDoor(FLOOR_INFO* floor);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void TestTriggers(short* data, int heavy, int HeavyFlags);

@@ -1630,6 +1630,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
+	// TODO: the chef not exist anymore !!!
+	/*
 	obj = &Objects[ID_SAS_CAIRO];
 	if (obj->loaded)
 	{
@@ -1651,7 +1653,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
-
+	*/
 	obj = &Objects[ID_TWOGUN];
 	if (obj->loaded)
 	{
@@ -1679,9 +1681,9 @@ void BaddyObjects()
 	obj = &Objects[ID_HYDRA];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSmallDragon;
+		obj->initialise = InitialiseHydra;
 		obj->collision = CreatureCollision;
-		obj->control = ControlSmallDragon;
+		obj->control = ControlHydra;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 30;
 		obj->pivotLength = 50;
@@ -1764,7 +1766,9 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
-
+	
+	// TODO: LagoonWitch is deleted !
+	/*
 	obj = &Objects[ID_GREEN_TEETH];
 	if (obj->loaded)
 	{
@@ -1791,6 +1795,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
+	*/
 
 	obj = &Objects[ID_INVISIBLE_GHOST];
 	if (obj->loaded)
@@ -1832,6 +1837,8 @@ void BaddyObjects()
 		obj->control = ControlLittleBats;
 	}
 
+	// TODO: spider is deleted !
+	/*
 	obj = &Objects[ID_SPIDER];
 	if (obj->loaded)
 	{
@@ -1840,6 +1847,7 @@ void BaddyObjects()
 		obj->initialise = InitialiseSpiders;
 		obj->control = ControlSpiders;
 	}
+	*/
 
 	obj = &Objects[ID_GLADIATOR];
 	if (obj->loaded)
@@ -2380,82 +2388,80 @@ void ObjectObjects()
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorFloorCollision;
+			obj->collision = FloorTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_FLOOR_TRAPDOOR2];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorFloorCollision;
+			obj->collision = FloorTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_CEILING_TRAPDOOR1];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCeilingCollision;
+			obj->collision = CeilingTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_CEILING_TRAPDOOR2];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCeilingCollision;
+			obj->collision = CeilingTrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_TRAPDOOR1];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorNormalCollision;
+			obj->collision = TrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_TRAPDOOR2];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorNormalCollision;
+			obj->collision = TrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 		obj = &Objects[ID_TRAPDOOR3];
 		if (obj->loaded)
 		{
 			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorNormalCollision;
+			obj->collision = TrapDoorCollision;
 			obj->control = TrapDoorControl;
 		}
 	}
 
+	obj = &Objects[ID_SEARCH_OBJECT1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_SEARCH_OBJECT1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
-		obj = &Objects[ID_SEARCH_OBJECT2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
-		obj = &Objects[ID_SEARCH_OBJECT3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
-		obj = &Objects[ID_SEARCH_OBJECT4];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseCupboard;
-			obj->collision = CupboardCollision;
-			obj->control = CupboardControl;
-		}
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
+	}
+	obj = &Objects[ID_SEARCH_OBJECT2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
+	}
+	obj = &Objects[ID_SEARCH_OBJECT3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
+	}
+	obj = &Objects[ID_SEARCH_OBJECT4];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSearchObject;
+		obj->collision = SearchObjectCollision;
+		obj->control = SearchObjectControl;
 	}
 
 	obj = &Objects[ID_FLARE_ITEM];

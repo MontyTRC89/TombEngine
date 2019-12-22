@@ -1,5 +1,4 @@
 #include "newobjects.h"
-#include "../Game/anim.h"
 #include "../Game/Box.h"
 #include "../Game/items.h"
 #include "../Game/lot.h"
@@ -13,6 +12,7 @@
 #include "../Game/collide.h"
 #include "../Game/draw.h"
 #include "../Game/tomb4fx.h"
+#include "../Game/misc.h"
 
 short StargateBounds[24] = 
 {

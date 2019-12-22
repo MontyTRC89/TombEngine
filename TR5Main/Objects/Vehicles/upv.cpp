@@ -6,10 +6,10 @@
 #include "../../Game/effects.h"
 #include "../../Game/collide.h"
 #include "../../Game/box.h"
-#include "../../Game/anim.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/draw.h"
 #include "../../Game/tomb4fx.h"
+#include "../../Game/misc.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -29,8 +29,8 @@ enum UPV_FLAG
 #define ROT_FRICTION 		0x100000
 #define MAX_ROTATION		0x1c00000
 #define UPDOWN_ACCEL		(ANGLE(2) << 16)
-#define UPDOWN_SLOWACCEL	((ANGLE(2) / 2) << 16)
-#define UPDOWN_FRICTION		((ANGLE(1)/1) << 16)
+#define UPDOWN_SLOWACCEL	(ANGLE(1) << 16)
+#define UPDOWN_FRICTION		(ANGLE(1) << 16)
 #define MAX_UPDOWN			(ANGLE(2) << 16)
 #define UPDOWN_LIMIT		ANGLE(80)
 #define UPDOWN_SPEED		10
@@ -599,7 +599,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			PHD_VECTOR vec = { 0, 0, 0 };
 			GAME_VECTOR VPos, LPos;
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			LPos.x = vec.x;
 			LPos.y = vec.y;
@@ -647,7 +647,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			else
 				hfw = NO_HEIGHT;
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			l->pos.xPos = vec.x;
 			l->pos.yPos = l->pos.yPos + 1 - hfw;
@@ -681,7 +681,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 		{
 			PHD_VECTOR vec = { 0, 0, 0 };
 
-			GetLaraJointPosition(&vec, HIPS);
+			GetLaraJointPosition(&vec, LM_HIPS);
 
 			l->pos.xPos = vec.x;
 			l->pos.yPos = vec.y;

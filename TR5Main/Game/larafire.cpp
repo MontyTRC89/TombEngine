@@ -458,7 +458,7 @@ void LaraGun()
 			break;
 
 		case LG_UNDRAW_GUNS:
-			LARA_MESHES(ID_LARA, HEAD);
+			LARA_MESHES(ID_LARA, LM_HEAD);
 
 			switch (Lara.gunType)
 			{
@@ -488,9 +488,9 @@ void LaraGun()
 
 		case LG_READY:
 			if (!(TrInput & IN_ACTION))
-				LARA_MESHES(ID_LARA, HEAD);
+				LARA_MESHES(ID_LARA, LM_HEAD);
 			else
-				LARA_MESHES(ID_LARA_SCREAM, HEAD);
+				LARA_MESHES(ID_LARA_SCREAM, LM_HEAD);
 		
 			if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
 				Camera.type = COMBAT_CAMERA;
@@ -559,7 +559,7 @@ void LaraGun()
 		case LG_HANDS_BUSY:
 			if (Lara.gunType == WEAPON_FLARE)
 			{
-				if (CHECK_LARA_MESHES(ID_FLARE_ANIM, HAND_L))
+				if (CHECK_LARA_MESHES(ID_FLARE_ANIM, LM_LHAND))
 				{
 					Lara.flareControlLeft = (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
 					DoFlareInHand(Lara.flareAge);

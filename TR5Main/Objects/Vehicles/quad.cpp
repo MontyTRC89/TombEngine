@@ -2,13 +2,13 @@
 #include "../../Game/lara.h"
 #include "../../Game/effect2.h"
 #include "../../Game/items.h"
-#include "../../Game/Anim.h"
 #include "../../Game/sphere.h"
 #include "../../Game/collide.h"
 #include "../../Game/effects.h"
 #include "../../Game/laraflar.h"
 #include <vector>
 #include "../../Game/lara1gun.h"
+#include "../../Game/misc.h"
 using namespace std;
 
 typedef enum QUAD_EFFECTS_POSITIONS {
@@ -83,13 +83,13 @@ typedef enum QUAD_ANIM_STATES {
 #define GETOFF_DISTANCE 512	
 
 #define QUAD_UNDO_TURN ANGLE(2)
-#define QUAD_TURN ((ANGLE(1)/2) + QUAD_UNDO_TURN)
+#define QUAD_TURN (ANGLE(0.5) + QUAD_UNDO_TURN)
 #define QUAD_MAX_TURN ANGLE(5)
-#define QUAD_HTURN ((ANGLE(3)/4) + QUAD_UNDO_TURN)
+#define QUAD_HTURN (ANGLE(0.75) + QUAD_UNDO_TURN)
 #define QUAD_MAX_HTURN ANGLE(8)
 
 #define MIN_MOMENTUM_TURN ANGLE(3)
-#define MAX_MOMENTUM_TURN (ANGLE(1)+(ANGLE(1)/2))
+#define MAX_MOMENTUM_TURN ANGLE(1.5)
 #define QUAD_MAX_MOM_TURN ANGLE(150)
 
 #define QUAD_FRONT 550
@@ -224,7 +224,7 @@ int QuadCheckGetOff()
 			LaraItem->frameNumber = GF(ANIMATION_LARA_FREE_FALL_LONG, 0);
 			LaraItem->currentAnimState = STATE_LARA_FREEFALL;
 
-			GetJointAbsPosition(LaraItem, &pos, HIPS);
+			GetJointAbsPosition(LaraItem, &pos, LM_HIPS);
 
 			LaraItem->pos.xPos = pos.x;
 			LaraItem->pos.yPos = pos.y;

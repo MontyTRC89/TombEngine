@@ -2,7 +2,6 @@
 
 #include "..\Global\global.h"
 
-//#define InitialisePickupDisplay ((void (__cdecl*)()) 0x0043A0E0)
 #define FlashIt ((int (__cdecl*)()) 0x00439C10)
 #define UpdateHealtBar ((void (__cdecl*)(int)) 0x00439E50)
 #define UpdateAirBar ((void (__cdecl*)(int)) 0x00439FC0)

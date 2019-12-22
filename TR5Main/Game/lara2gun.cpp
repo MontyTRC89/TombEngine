@@ -303,7 +303,7 @@ void PistolHandler(int weaponType)
 
 void undraw_pistol_mesh_right(int weaponType)
 {
-	LARA_MESHES(ID_LARA, HAND_R);
+	LARA_MESHES(ID_LARA, LM_RHAND);
 	
 	switch (weaponType)
 	{
@@ -324,7 +324,7 @@ void undraw_pistol_mesh_left(int weaponType)
 {
 	if (weaponType != WEAPON_REVOLVER)
 	{
-		LARA_MESHES(ID_LARA, HAND_L);
+		LARA_MESHES(ID_LARA, LM_LHAND);
 		
 		switch (weaponType)
 		{
@@ -342,12 +342,9 @@ void draw_pistol_meshes(int weaponType)
 {
 	Lara.holster = ID_LARA_HOLSTERS;
 
-	LARA_MESHES(WeaponObjectMesh(weaponType), HAND_R);
-
+	LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
 	if (weaponType != WEAPON_REVOLVER)
-	{
-		LARA_MESHES(WeaponObjectMesh(weaponType), HAND_L);
-	}
+		LARA_MESHES(WeaponObjectMesh(weaponType), LM_LHAND);
 }
 
 void ready_pistols(int weaponType)
