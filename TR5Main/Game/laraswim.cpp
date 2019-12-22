@@ -28,8 +28,8 @@ void LaraWaterCurrent(COLL_INFO* coll)//4CD34, 4D198
 		OBJECT_VECTOR* sink = &Cameras[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
-		Lara.currentXvel += ((sink->data * SIN(angle - ANGLE(90)) >> 2) - Lara.currentXvel) >> 4;
-		Lara.currentZvel += ((sink->data * COS(angle - ANGLE(90)) >> 2) - Lara.currentZvel) >> 4; // ((v12 * rcossin_tbl[2 * v13 + 1] >> 2) - Lara.currentZvel) >> 4;
+		Lara.currentXvel += ((sink->data * (SIN(angle - ANGLE(90)) / 4) >> 2) - Lara.currentXvel) >> 4;
+		Lara.currentZvel += ((sink->data * (COS(angle - ANGLE(90)) / 4) >> 2) - Lara.currentZvel) >> 4;
 
 		LaraItem->pos.yPos += (sink->y - LaraItem->pos.yPos) >> 4;
 	}
@@ -73,27 +73,25 @@ void LaraWaterCurrent(COLL_INFO* coll)//4CD34, 4D198
 			LaraItem->pos.xRot += ANGLE(1);
 		else if (LaraItem->pos.xRot < -ANGLE(35))
 			LaraItem->pos.xRot -= ANGLE(1);
+		else
+			LaraItem->fallspeed = 0;
 	}
-	else
+	else if (coll->collType == CT_TOP)
 	{
-		if (coll->collType == CT_TOP)
-		{
-			LaraItem->pos.xRot -= ANGLE(1);
-		}
-		else if (coll->collType != CT_TOP_FRONT)
-		{
-			if (coll->collType == CT_LEFT)
-			{
-				LaraItem->pos.yRot += ANGLE(5);
-			}
-			else if (coll->collType == CT_RIGHT)
-			{
-				LaraItem->pos.yRot -= ANGLE(5);
-			}
-		}
+		LaraItem->pos.xRot -= ANGLE(1);
 	}
-
-	LaraItem->fallspeed = 0;
+	else if (coll->collType == CT_TOP_FRONT)
+	{
+		LaraItem->fallspeed = 0;
+	}
+	else if (coll->collType == CT_LEFT)
+	{
+		LaraItem->pos.yRot += ANGLE(5);
+	}
+	else if (coll->collType == CT_RIGHT)
+	{
+		LaraItem->pos.yRot -= ANGLE(5);
+	}
 
 	if (coll->midFloor < 0 && coll->midFloor != NO_HEIGHT)
 		LaraItem->pos.yPos += coll->midFloor;
