@@ -3667,7 +3667,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	if (((TrInput & IN_BACK) ^ (TrInput & IN_ACTION)) || item->hitPoints <= 0)
+	if ((TrInput & (IN_BACK | IN_ACTION)) != (IN_BACK | IN_ACTION) || item->hitPoints <= 0)
 		item->goalAnimState = STATE_LARA_POLE_IDLE;
 
 	coll->badPos = NO_BAD_POS;
@@ -3824,8 +3824,9 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
 		}
 		else
 		{
-			item->pos.xPos -= (SIN(item->pos.yRot)) << 8 >> W2V_SHIFT;
-			item->pos.zPos -= (COS(item->pos.yRot)) << 8 >> W2V_SHIFT;
+			item->pos.xPos -= (SIN(item->pos.yRot)) << 6 >> W2V_SHIFT;
+			item->pos.zPos -= (COS(item->pos.yRot)) << 6 >> W2V_SHIFT;
+			item->goalAnimState = STATE_LARA_FREEFALL;
 		}
 	}
 }
@@ -5168,7 +5169,7 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)//14534, 145E4 (F)
 void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)//144E0(<), 14590(<) (F)
 {
 	coll->enableSpaz = false;
-	if ((TrInput & IN_DUCK) ^ (TrInput & IN_LEFT) || item->hitPoints <= 0)
+	if ((TrInput & (IN_DUCK | IN_LEFT)) != (IN_DUCK | IN_LEFT) || item->hitPoints <= 0)
 		item->goalAnimState = STATE_LARA_CROUCH_IDLE;
 	item->pos.yRot += ANGLE(1.5);
 }
@@ -5176,7 +5177,7 @@ void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll)//144E0(<), 14590(<) (F)
 void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll)//1448C(<), 1453C(<) (F)
 {
 	coll->enableSpaz = false;
-	if ((TrInput & IN_DUCK) ^ (TrInput & IN_LEFT) || item->hitPoints <= 0)
+	if ((TrInput & (IN_DUCK | IN_LEFT)) != (IN_DUCK | IN_LEFT) || item->hitPoints <= 0)
 		item->goalAnimState = STATE_LARA_CROUCH_IDLE;
 	item->pos.yRot -= ANGLE(1.5);
 }
