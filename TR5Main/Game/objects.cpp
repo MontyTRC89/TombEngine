@@ -201,6 +201,7 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			if (TestCollision(item, l))
 			{
 				short rot = item->pos.yRot;
+				item->pos.yRot = l->pos.yRot;
 				if (l->currentAnimState == STATE_LARA_REACH)
 				{
 					PolePosR.y = l->pos.yPos - item->pos.yPos + 10;
