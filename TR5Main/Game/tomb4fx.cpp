@@ -112,27 +112,29 @@ int GetFreeFireSpark()
 
 void TriggerGlobalStaticFlame()
 {
-	FireSparks[0].on = 1;
-	FireSparks[0].dR = FireSparks[0].sR = (GetRandomControl() & 0x3F) - 64;
-	FireSparks[0].dB = 64;
-	FireSparks[0].sB = 64;
-	FireSparks[0].dG = (GetRandomControl() & 0x3F) + 96;
-	FireSparks[0].sG = (GetRandomControl() & 0x3F) + 96;
-	FireSparks[0].colFadeSpeed = 1;
-	FireSparks[0].fadeToBlack = 0;
-	FireSparks[0].life = 8;
-	FireSparks[0].sLife = 8;
-	FireSparks[0].y = 0;
-	FireSparks[0].x = (GetRandomControl() & 7) - 4;
-	FireSparks[0].maxYvel = 0;
-	FireSparks[0].gravity = 0;
-	FireSparks[0].z = (GetRandomControl() & 7) - 4;
-	FireSparks[0].friction = 0;
-	FireSparks[0].xVel = 0;
-	FireSparks[0].yVel = 0;
-	FireSparks[0].zVel = 0;
-	FireSparks[0].flags = 0;
-	FireSparks[0].dSize = FireSparks[0].sSize = FireSparks[0].size = (GetRandomControl() & 0x1F) + -128;
+	FIRE_SPARKS* spark = &FireSparks[0];
+
+	spark->on = true;
+	spark->dR = spark->sR = (GetRandomControl() & 0x3F) - 64;
+	spark->dB = 64;
+	spark->sB = 64;
+	spark->dG = (GetRandomControl() & 0x3F) + 96;
+	spark->sG = (GetRandomControl() & 0x3F) + 96;
+	spark->colFadeSpeed = 1;
+	spark->fadeToBlack = 0;
+	spark->life = 8;
+	spark->sLife = 8;
+	spark->y = 0;
+	spark->x = (GetRandomControl() & 7) - 4;
+	spark->maxYvel = 0;
+	spark->gravity = 0;
+	spark->z = (GetRandomControl() & 7) - 4;
+	spark->friction = 0;
+	spark->xVel = 0;
+	spark->yVel = 0;
+	spark->zVel = 0;
+	spark->flags = 0;
+	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 0x1F) + -128;
 }
 
 void TriggerGlobalFireSmoke()
@@ -152,9 +154,9 @@ void TriggerGlobalFireSmoke()
 	spark->x = (GetRandomControl() & 0xF) - 8;
 	spark->y = -256 - (GetRandomControl() & 0x7F);
 	spark->z = (GetRandomControl() & 0xF) - 8;
-	spark->xVel = GetRandomControl() - 128;
+	spark->xVel = (GetRandomControl() & 0xFF) - 128;
 	spark->yVel = -16 - (GetRandomControl() & 0xF);
-	spark->zVel = GetRandomControl() - 128;
+	spark->zVel = (GetRandomControl() & 0xFF) - 128;
 	spark->friction = 4;
 
 	if (GetRandomControl() & 1)
@@ -180,8 +182,8 @@ void TriggerGlobalFireFlame()
 {
 	FIRE_SPARKS* spark = &FireSparks[GetFreeFireSpark()];
 
-	spark->on = 1;
-	spark->sR = -1;
+	spark->on = true;
+	spark->sR = 255;
 	spark->sB = 48;
 	spark->sG = (GetRandomControl() & 0x1F) + 48;
 	spark->dR = (GetRandomControl() & 0x3F) - 64;
@@ -193,9 +195,9 @@ void TriggerGlobalFireFlame()
 	spark->y = 0;
 	spark->x = 4 * (GetRandomControl() & 0x1F) - 64;
 	spark->z = 4 * (GetRandomControl() & 0x1F) - 64;
-	spark->xVel = 2 * GetRandomControl() - 256;
+	spark->xVel = 2 * (GetRandomControl() & 0xFF) - 256;
 	spark->yVel = -16 - (GetRandomControl() & 0xF);
-	spark->zVel = 2 * GetRandomControl() - 256;
+	spark->zVel = 2 * (GetRandomControl() & 0xFF) - 256;
 	spark->friction = 5;
 	spark->gravity = -32 - (GetRandomControl() & 0x1F);
 	spark->maxYvel = -16 - (GetRandomControl() & 7);
@@ -298,7 +300,7 @@ void UpdateFireSparks()
 				spark->g = dl * spark->dG >> 16;
 				spark->b = dl * spark->dB >> 16;
 
-				if (spark->r < 8 && spark->g < 8 & spark->b < 8)
+				if (spark->r < 8 && spark->g < 8 && spark->b < 8)
 				{
 					spark->on = false;
 					continue;
