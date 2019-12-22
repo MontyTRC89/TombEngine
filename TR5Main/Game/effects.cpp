@@ -415,7 +415,7 @@ void void_effect(ITEM_INFO* item)//393CC(<), 398CC(<) (F)
 
 }
 
-void WaterFall(short itemNumber) // ControlWaterfallMist
+void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	int x, z;

@@ -17,6 +17,7 @@
 #include "..\Game\door.h"
 #include "..\Game\rope.h"
 #include "..\Game\traps.h"
+#include "..\Game\flmtorch.h"
 #include "..\Objects\oldobjects.h"
 #include "..\Objects\newobjects.h"
 

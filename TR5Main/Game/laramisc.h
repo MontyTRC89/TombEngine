@@ -1,6 +1,8 @@
 #pragma once
 #include "..\Global\global.h"
 
+extern COLL_INFO coll;
+
 void GetLaraDeadlyBounds();
 void DelAlignLaraToRope(ITEM_INFO* item);
 void InitialiseLaraAnims(ITEM_INFO* item);
