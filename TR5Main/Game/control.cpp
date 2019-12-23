@@ -1352,16 +1352,16 @@ void AlterFloorHeight(ITEM_INFO* item, int height)
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - WALL_SIZE, item->pos.zPos, &roomNumber);
-	
-	if (floor->floor == NO_HEIGHT/STEP_SIZE)
+
+	if (floor->floor == NO_HEIGHT / STEP_SIZE)
 	{
-		floor->floor = ceiling->ceiling + height/STEP_SIZE;
+		floor->floor = ceiling->ceiling + height / STEP_SIZE;
 	}
 	else
 	{
-		floor->floor += height/STEP_SIZE;
+		floor->floor += height / STEP_SIZE;
 		if (floor->floor == ceiling->ceiling && !flag)
-			floor->floor = NO_HEIGHT/STEP_SIZE;
+			floor->floor = NO_HEIGHT / STEP_SIZE;
 	}
 
 	box = &Boxes[floor->box];

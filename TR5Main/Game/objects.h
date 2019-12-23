@@ -19,7 +19,7 @@ void PoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void ControlTriggerTriggerer(short itemNumber);
 void AnimateWaterfalls();
 void ControlWaterfall(short itemNumber);
-#define InitialiseTightRope ((void (__cdecl*)(short)) 0x0043ED30)
+//#define InitialiseTightRope ((void (__cdecl*)(short)) 0x0043ED30)
 void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void ParallelBarsCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 #define InitialiseXRayMachine ((void (__cdecl*)(short)) 0x0043FA20)
@@ -32,5 +32,6 @@ void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
 #define RaisingCogControl ((void (__cdecl*)(short)) 0x00406040)
 #define HighObject2Control ((void (__cdecl*)(short)) 0x004070D0)
 void InitialiseSmashObject(short itemNumber);
+void InitialiseTightRope(short itemNumber);
 
 void Inject_Objects();

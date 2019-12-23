@@ -71,6 +71,7 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber);
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info);
 TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
+void AdjustStopperFlag(ITEM_INFO* item, int dir, int set);
 
 void Inject_Box();
 

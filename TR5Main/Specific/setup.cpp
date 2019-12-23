@@ -2342,7 +2342,7 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->collision = DoubleDoorCollision;
-		obj->control = DoubleDoorControl;
+		obj->control = PushPullKickDoorControl;
 	}
 
 	obj = &Objects[ID_UNDERWATER_DOOR];
@@ -2350,7 +2350,7 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->collision = UnderwaterDoorCollision;
-		obj->control = DoubleDoorControl;
+		obj->control = PushPullKickDoorControl;
 	}
 
 	{
