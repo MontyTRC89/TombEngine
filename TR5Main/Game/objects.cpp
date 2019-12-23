@@ -117,9 +117,9 @@ void BridgeTilt1Ceiling(ITEM_INFO* item, int x, int y, int z, int* height)
 {
 	int level = item->pos.yPos + (GetOffset(item, x, z) >> 2);
 
-	if (level >= y)
+	if (level < y)
 	{
-		*height = level;
+		*height = level + 256;
 	}
 }
 
@@ -139,9 +139,9 @@ void BridgeTilt2Ceiling(ITEM_INFO* item, int x, int y, int z, int* height)
 {
 	int level = item->pos.yPos + (GetOffset(item, x, z) >> 1);
 
-	if (level >= y)
+	if (level < y)
 	{
-		*height = level;
+		*height = level + 256;
 	}
 }
 
@@ -435,7 +435,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) >> 1);
 			else
 				l->pos.zPos += item->pos.zPos - ((pos1.z + pos2.z) >> 1);
-			l->pos.yPos = l->pos.yPos - ((pos1.y + pos2.y) >> 1) + l->pos.yPos;
+			l->pos.yPos += item->pos.yPos - ((pos1.y + pos2.y) >> 1);
 
 			Lara.generalPtr = item;
 		}
