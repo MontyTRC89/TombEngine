@@ -300,6 +300,7 @@
 #define NextRat						VAR_U_(0x0051CF94, int)
 //#define NextFireSpark				VAR_U_(0x0050A17C, int)
 #define LaraNodeUnderwater			ARRAY_(0x00E862FE, byte, [15])
+#define OnFloor						VAR_U_(0x00EEEAC8, int)
 
 extern bool MonksAttackLara;
 

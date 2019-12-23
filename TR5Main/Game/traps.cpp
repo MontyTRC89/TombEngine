@@ -472,3 +472,90 @@ void OpenTrapDoor(ITEM_INFO* item)
 
 	item->itemFlags[2] = 0;
 }
+
+void InitialiseFallingBlock(short itemNumber)
+{
+	Items[itemNumber].meshBits = 1;
+}
+
+void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNum];
+	if (!item->itemFlags[0] && !item->triggerFlags && item->pos.yPos == l->pos.yPos)
+	{
+		if (!((item->pos.xPos ^ l->pos.xPos) & 0xFFFFFC00) && !((l->pos.zPos ^ item->pos.zPos) & 0xFFFFFC00))
+		{
+			SoundEffect(SFX_ROCK_FALL_CRUMBLE, &item->pos, 0);
+			AddActiveItem(itemNum);
+
+			item->itemFlags[0] = 0;
+			item->status = ITEM_ACTIVE;
+			item->flags |= 0x3E00;
+		}
+	}
+}
+
+void FallingBlockControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (item->triggerFlags)
+	{
+		item->triggerFlags--;
+	}
+	else
+	{
+		if (item->itemFlags[0])
+		{
+			if (item->itemFlags[0] < 60)
+			{
+				if (item->itemFlags[0] < 52)
+				{
+					if (!(GetRandomControl() % (62 - item->itemFlags[0])))
+						item->pos.yPos += (GetRandomControl() & 3) + 1;
+					item->itemFlags[0]++;
+				}
+				else
+				{
+					item->itemFlags[1] += 2;
+					item->itemFlags[0]++;
+					item->pos.yPos += item->itemFlags[1];
+				}
+			}
+			else
+			{
+				KillItem(itemNumber);
+			}
+		}
+		else
+		{
+			item->meshBits = -2;
+			ExplodingDeath2(itemNumber, -1, 15265);
+			item->itemFlags[0]++;
+		}
+	}
+}
+
+void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height)
+{
+	if (!((x ^ item->pos.xPos) & 0xFFFFFC00) && !((z ^ item->pos.zPos) & 0xFFFFFC00))
+	{
+		if (y <= item->pos.yPos)
+		{
+			*height = item->pos.yPos;
+			HeightType = 0;
+			OnFloor = 1;
+		}
+	}
+}
+
+void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
+{
+	if (!((x ^ item->pos.xPos) & 0xFFFFFC00) && !((z ^ item->pos.zPos) & 0xFFFFFC00))
+	{
+		if (y > item->pos.yPos)
+		{
+			*height = item->pos.yPos + 256;
+		}
+	}
+}
