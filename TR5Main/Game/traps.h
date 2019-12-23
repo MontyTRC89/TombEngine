@@ -16,11 +16,11 @@
 #define KillAllTriggersControl ((void (__cdecl*)(short)) 0x00431030)
 #define FallingCeilingCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004127C0)
 #define FallingCeilingControl ((void (__cdecl*)(short)) 0x004899D0)
-#define InitialiseFallingBlock ((void (__cdecl*)(short)) 0x0043D330)
-#define FallingBlockCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00489750)
-#define FallingBlockControl ((void (__cdecl*)(short)) 0x00489820)
-#define FallingBlockFloor ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00489910)
-#define FallingBlockCeiling ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00489980)
+//#define InitialiseFallingBlock ((void (__cdecl*)(short)) 0x0043D330)
+//#define FallingBlockCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00489750)
+//#define FallingBlockControl ((void (__cdecl*)(short)) 0x00489820)
+//#define FallingBlockFloor ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00489910)
+//#define FallingBlockCeiling ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x00489980)
 #define InitialisePushableBlock ((void (__cdecl*)(short)) 0x0045E720)
 #define PushableBlockControl ((void (__cdecl*)(short)) 0x0045EA30)
 #define PushableBlockCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0045F570)
@@ -69,3 +69,8 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void TrapDoorControl(short itemNumber);
 void CloseTrapDoor(ITEM_INFO* item);
 void OpenTrapDoor(ITEM_INFO* item);
+void InitialiseFallingBlock(short itemNumber);
+void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void FallingBlockControl(short itemNumber);
+void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height);
+void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height);
