@@ -2,7 +2,7 @@
 
 #include "..\Global\global.h"
 
-#define InitialiseDoor ((void (__cdecl*)(short)) 0x0043DB60)
+//#define InitialiseDoor ((void (__cdecl*)(short)) 0x0043DB60)
 #define DrawLiftDoor ((void (__cdecl*)(ITEM_INFO*)) 0x0045AAF0)
 #define DoubleDoorControl ((void (__cdecl*)(short)) 0x00429840)
 #define InitialiseSteelDoor ((void (__cdecl*)(short)) 0x0043F180)
@@ -17,5 +17,6 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void DoorControl(short itemNumber);
 void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);
 void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);
+void InitialiseDoor(short itemNumber);
 
 void Inject_Door();

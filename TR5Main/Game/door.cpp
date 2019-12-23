@@ -698,6 +698,168 @@ void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	}
 }
 
+void InitialiseDoor(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (item->objectNumber == ID_SEQUENCE_DOOR1)
+		item->flags &= 0xBFFFu;
+
+	if (item->objectNumber == ID_LIFT_DOORS1 || item->objectNumber == ID_LIFT_DOORS2)
+		item->itemFlags[0] = 4096;
+
+	DOOR_DATA * door = (DOOR_DATA*)GameMalloc(sizeof(DOOR_DATA));
+
+	item->data = door;
+	door->opened = false;
+	door->dptr1 = NULL;
+	door->dptr2 = NULL;
+	door->dptr3 = NULL;
+	door->dptr4 = NULL;
+
+	int dz = 0;
+	int dx = 0;
+
+	if (item->pos.yRot == 0)
+		dz--;
+	else if (item->pos.yRot == -ANGLE(180))
+		dz++;
+	else if (item->pos.yRot == ANGLE(90))
+		dx--;
+	else
+		dx++;
+
+	dz *= 1024;
+	dx *= 1024;
+
+	ROOM_INFO * r = &Rooms[item->roomNumber];
+	ROOM_INFO * b;
+
+	door->d1.floor = &XZ_GET_SECTOR(r, dx + item->pos.xPos - r->x, dz + item->pos.zPos - r->z);
+	short roomNumber = GetDoor(door->d1.floor);
+	short boxNumber;
+	if (roomNumber == NO_ROOM)
+		boxNumber = door->d1.floor->box;
+	else
+	{
+		b = &Rooms[roomNumber];
+		boxNumber = XZ_GET_SECTOR(b, dx + item->pos.xPos - b->x, dz + item->pos.zPos - b->z).box;
+	}
+	door->d1.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+
+	memcpy(&door->d1.data, door->d1.floor, sizeof(FLOOR_INFO));
+
+	if (r->flippedRoom != -1)
+	{
+		r = &Rooms[r->flippedRoom];
+
+		door->d1flip.floor = &XZ_GET_SECTOR(r, dx + item->pos.xPos - r->x, dz + item->pos.zPos - r->z);
+		roomNumber = GetDoor(door->d1flip.floor);
+		if (roomNumber == NO_ROOM)
+			boxNumber = door->d1flip.floor->box;
+		else
+		{
+			b = &Rooms[roomNumber];
+			boxNumber = XZ_GET_SECTOR(b, dx + item->pos.xPos - b->x, dz + item->pos.zPos - b->z).box;
+		}
+		door->d1flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+
+		memcpy(&door->d1flip.data, door->d1flip.floor, sizeof(FLOOR_INFO));
+	}
+	else
+		door->d1flip.floor = NULL;
+
+	short twoRoom = GetDoor(door->d1.floor);
+
+	ShutThatDoor(&door->d1, door);
+	ShutThatDoor(&door->d1flip, door);
+
+	if (twoRoom == NO_ROOM)
+	{
+		door->d2.floor = NULL;
+		door->d2flip.floor = NULL;
+	}
+	else
+	{
+		r = &Rooms[twoRoom];
+
+		door->d2.floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+		roomNumber = GetDoor(door->d2.floor);
+		if (roomNumber == NO_ROOM)
+			boxNumber = door->d2.floor->box;
+		else
+		{
+			b = &Rooms[roomNumber];
+			boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x, item->pos.zPos - b->z).box;
+		}
+		door->d2.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+
+		memcpy(&door->d2.data, door->d2.floor, sizeof(FLOOR_INFO));
+
+		if (r->flippedRoom != -1)
+		{
+			r = &Rooms[r->flippedRoom];
+
+			door->d2flip.floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+			roomNumber = GetDoor(door->d2flip.floor);
+			if (roomNumber == NO_ROOM)
+				boxNumber = door->d2flip.floor->box;
+			else
+			{
+				b = &Rooms[roomNumber];
+				boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x, item->pos.zPos - b->z).box;
+			}
+			door->d2flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+
+			memcpy(&door->d2flip.data, door->d2flip.floor, sizeof(FLOOR_INFO));
+		}
+		else
+			door->d2flip.floor = NULL;
+
+		ShutThatDoor(&door->d2, door);
+		ShutThatDoor(&door->d2flip, door);
+
+		roomNumber = item->roomNumber;
+		ItemNewRoom(itemNumber, twoRoom);
+		item->roomNumber = roomNumber;
+		item->InDrawRoom = true;
+	}
+
+	// TODO: we'll rewrite this maybe
+	/*if (item->objectNumber >= ID_LIFT_DOORS1 && item->objectNumber <= ID_LIFT_DOORS2)
+	{
+		sub_401BB8(v4, item, twoRoom, v54, v53);
+		v49 = *(v4 + 58);
+		*v49 = 0;
+		v49[1] = 0;
+		v49[2] = 0;
+		v50 = *(v4 + 66);
+		*v50 = 0;
+		v50[1] = 0;
+		v50[2] = 0;
+		if (Rooms[item->roomNumber].flippedRoom != -1)
+		{
+			v51 = *(v4 + 62);
+			if (!v51)
+				MEMORY[1] = 1;
+			*v51 = 0;
+			v51[1] = 0;
+			v51[2] = 0;
+		}
+		if (Rooms[*&item->pad2[4]].flippedRoom != -1)
+		{
+			v52 = *(v4 + 70);
+			if (!v52)
+				MEMORY[1] = 1;
+			*v52 = 0;
+			v52[1] = 0;
+			v52[2] = 0;
+		}
+		*(v4 + 78) = item;
+		result = sub_401CF8(item);
+	}*/
+}
+
 void Inject_Door()
 {
 	INJECT(0x00429EC0, SequenceDoorControl);

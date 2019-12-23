@@ -4,7 +4,7 @@
 #define InitialiseAnimating ((void (__cdecl*)(short)) 0x00440100)
 #define AnimatingControl ((void (__cdecl*)(short)) 0x00465590)
 
-#define InitialiseSmashObject ((void (__cdecl*)(short)) 0x0043D7F0)
+//#define InitialiseSmashObject ((void (__cdecl*)(short)) 0x0043D7F0)
 void SmashObject(short itemNumber);
 void SmashObjectControl(short itemNumber);
 void BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height);
@@ -31,5 +31,6 @@ void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
 #define InitialiseRaisingCog ((void (__cdecl*)(short)) 0x00440320)
 #define RaisingCogControl ((void (__cdecl*)(short)) 0x00406040)
 #define HighObject2Control ((void (__cdecl*)(short)) 0x004070D0)
+void InitialiseSmashObject(short itemNumber);
 
 void Inject_Objects();
