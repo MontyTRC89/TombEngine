@@ -617,6 +617,32 @@ void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	}*/
 }
 
+void InitialiseTightRope(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (item->pos.yRot > 0)
+	{
+		if (item->pos.yRot == ANGLE(90))
+			item->pos.xPos -= 256;
+	}
+	else if (item->pos.yRot)
+	{
+		if (item->pos.yRot == -ANGLE(180))
+		{
+			item->pos.zPos += 256;
+		}
+		else if (item->pos.yRot == -ANGLE(90))
+		{
+			item->pos.xPos += 256;
+		}
+	}
+	else
+	{
+		item->pos.zPos -= 256;
+	}
+}
+
 void Inject_Objects()
 {
 	INJECT(0x00465FE0, TightRopeCollision);

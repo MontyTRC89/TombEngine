@@ -2006,6 +2006,27 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 	return TARGET_TYPE::NO_TARGET;
 }
 
+void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
+{
+	int x = item->pos.xPos;
+	int z = item->pos.zPos;
+
+	ROOM_INFO* r = &Rooms[item->roomNumber];
+
+	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	floor->stopper = set;
+
+	x = item->pos.xPos + ((1024 * SIN(dir)) >> W2V_SHIFT);
+	z = item->pos.zPos + ((1024 * COS(dir)) >> W2V_SHIFT);
+
+	short roomNumber = item->roomNumber;
+	GetFloor(x, item->pos.yPos, z, &roomNumber);
+	r = &Rooms[roomNumber];
+	
+	floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+	floor->stopper = set;
+}
+
 void Inject_Box()
 {
 	INJECT(0x0040B5D0, CreatureVault);

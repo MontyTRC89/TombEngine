@@ -47,3 +47,10 @@ void InitialiseInvisibleGhost(short itemNum);
 void InitialiseGladiator(short itemNum);
 /// void InitialiseRomanStatue(short itemNum)
 void InitialiseAutoGuns(short itemNum);
+void InitialisePushableBlock(short itemNum);
+void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
+void PushableBlockControl(short itemNumber);
+void PushableBlockCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
+int TestBlockMovable(ITEM_INFO* item, int blokhite);
+int TestBlockPush(ITEM_INFO* item, int blokhite, unsigned short quadrant);
+int TestBlockPull(ITEM_INFO* item, int blokhite, short quadrant);
