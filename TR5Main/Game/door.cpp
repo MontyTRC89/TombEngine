@@ -729,8 +729,8 @@ void InitialiseDoor(short itemNumber)
 	else
 		dz++;
 
-	dz *= 1024;
-	dx *= 1024;
+	dz *= WALL_SIZE;
+	dx *= WALL_SIZE;
 
 	ROOM_INFO * r = &Rooms[item->roomNumber];
 	ROOM_INFO * b;
