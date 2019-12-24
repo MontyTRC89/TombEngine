@@ -1,7 +1,7 @@
 #pragma once
 #include "../Global/global.h"
 
-#define ControlGuard ((void (__cdecl*)(short)) 0x0046F5E0)
+//#define ControlGuard ((void (__cdecl*)(short)) 0x0046F5E0)
 #define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
 #define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
 #define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
@@ -54,3 +54,4 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 int TestBlockMovable(ITEM_INFO* item, int blokhite);
 int TestBlockPush(ITEM_INFO* item, int blokhite, unsigned short quadrant);
 int TestBlockPull(ITEM_INFO* item, int blokhite, short quadrant);
+void ControlGuard(short itemNum);
