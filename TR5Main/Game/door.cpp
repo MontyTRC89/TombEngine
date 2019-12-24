@@ -721,13 +721,13 @@ void InitialiseDoor(short itemNumber)
 	int dx = 0;
 
 	if (item->pos.yRot == 0)
-		dz--;
-	else if (item->pos.yRot == -ANGLE(180))
-		dz++;
-	else if (item->pos.yRot == ANGLE(90))
 		dx--;
-	else
+	else if (item->pos.yRot == -ANGLE(180))
 		dx++;
+	else if (item->pos.yRot == ANGLE(90))
+		dz--;
+	else
+		dz++;
 
 	dz *= 1024;
 	dx *= 1024;
