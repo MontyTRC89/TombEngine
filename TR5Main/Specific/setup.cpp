@@ -2490,7 +2490,7 @@ void ObjectObjects()
 	{
 		obj = &Objects[ID_PUSHABLE_OBJECT1];
 		if (obj->loaded)
-		{
+		{   
 			obj->initialise = InitialisePushableBlock;
 			obj->control = PushableBlockControl;
 			obj->collision = PushableBlockCollision;
