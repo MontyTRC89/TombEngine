@@ -88,7 +88,7 @@ void BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height)
 
 void BridgeFlatCeiling(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
-	if (item->pos.yPos >= y)
+	if (item->pos.yPos < y)
 	{
 		*height = item->pos.yPos + 256;
 	}
