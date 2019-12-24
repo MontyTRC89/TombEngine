@@ -11,6 +11,7 @@ static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
 static short FloorTrapDoorBounds[12] = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR FloorTrapDoorPos = {0, 0, -655};
+static short WreckingBallData[2] = {0, 0};
 
 void LaraBurn()
 {
@@ -557,5 +558,104 @@ void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
 		{
 			*height = item->pos.yPos + 256;
 		}
+	}
+}
+
+void InitialiseWreckingBall(short itemNumber)
+{
+	ITEM_INFO* item;
+	short room;
+
+	item = &Items[itemNumber];
+	item->itemFlags[3] = find_a_fucking_item(ID_ANIMATING16) - Items;
+	room = item->roomNumber;
+	item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1644;
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
+	if (room != item->roomNumber)
+		ItemNewRoom(itemNumber, room);
+}
+
+void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item;
+	int x, y, z, test;
+	short damage;
+
+	item = &Items[itemNumber];
+	if (TestBoundsCollide(item, l, coll->radius))
+	{
+		x = l->pos.xPos;
+		y = l->pos.yPos;
+		z = l->pos.zPos;
+		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
+		damage = item->fallspeed > 0 ? 96 : 0;
+		if (ItemPushLara(item, l, coll, coll->enableSpaz, 1))
+		{
+			if (test)
+				l->hitPoints = 0;
+			else
+				l->hitPoints -= damage;
+			x -= l->pos.xPos;
+			y -= l->pos.yPos;
+			z -= l->pos.zPos;
+			if (damage)
+			{
+				for (int i = 14 + (GetRandomControl() & 3); i > 0; --i)
+				{
+					TriggerBlood(l->pos.xPos + (GetRandomControl() & 63) - 32, l->pos.yPos - (GetRandomControl() & 511) - 256,
+						l->pos.zPos + (GetRandomControl() & 63) - 32, -1, 1);
+				}
+			}
+			if (!coll->enableBaddiePush || test)
+			{
+				l->pos.xPos += x;
+				l->pos.yPos += y;
+				l->pos.zPos += z;
+			}
+		}
+	}
+}
+
+void _WreckingBallControl(short itemNumber)
+{
+	ITEM_INFO* item;
+	int x, z, test;
+
+	item = &Items[itemNumber];
+	if (LaraItem->pos.xPos >= 45056 && LaraItem->pos.xPos <= 57344 && LaraItem->pos.zPos >= 26624 && LaraItem->pos.zPos <= 43008
+		|| item->itemFlags[2] < 900)
+	{
+		if (item->itemFlags[2] < 900)
+		{
+			if (!item->itemFlags[2] || !(GlobalCounter & 0x3F))
+			{
+				WreckingBallData[0] = GetRandomControl() % 7 - 3;
+				WreckingBallData[1] = GetRandomControl() % 7 - 3;
+			}
+			x = (WreckingBallData[0] << 10) + 51712;
+			z = (WreckingBallData[1] << 10) + 34304;
+			test = 0;
+		}
+		else
+		{
+			x = LaraItem->pos.xPos;
+			z = LaraItem->pos.zPos;
+		}
+	}
+	else
+	{
+		x = 51200;
+		z = 33792;
+		test = 0;
+	}
+	if (item->itemFlags[2] < 900)
+		++item->itemFlags[2];
+	if (GlobalPlayingCutscene)
+	{
+
+	}
+	else
+	{
+
 	}
 }
