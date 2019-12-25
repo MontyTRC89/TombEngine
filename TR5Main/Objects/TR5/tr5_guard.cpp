@@ -322,6 +322,9 @@ void ControlGuard(short itemNum)
 
 		creature->maximumTurn = 0;
 
+		ITEM_INFO* currentItem;
+		short currentItemNumber;
+
 		switch (item->currentAnimState)
 		{
 		case 1:
@@ -693,8 +696,8 @@ void ControlGuard(short itemNum)
 			break;
 
 		case 37:
-			ITEM_INFO* currentItem = NULL;
-			for (short currentItemNumber = Rooms[item->roomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->nextItem)
+			currentItem = NULL;
+			for (currentItemNumber = Rooms[item->roomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->nextItem)
 			{
 				currentItem = &Items[currentItemNumber];
 				if (item->objectNumber == ID_PUZZLE_HOLE8)

@@ -721,13 +721,13 @@ void InitialiseDoor(short itemNumber)
 	int dx = 0;
 
 	if (item->pos.yRot == 0)
-		dx--;
-	else if (item->pos.yRot == -ANGLE(180))
-		dx++;
-	else if (item->pos.yRot == ANGLE(90))
 		dz--;
-	else
+	else if (item->pos.yRot == -ANGLE(180))
 		dz++;
+	else if (item->pos.yRot == ANGLE(90))
+		dx--;
+	else
+		dx++;
 
 	dz *= WALL_SIZE;
 	dx *= WALL_SIZE;
