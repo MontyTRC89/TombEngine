@@ -5,7 +5,7 @@
 #include "..\Game\control.h"
 #include "..\Game\draw.h"
 
-
+#ifdef OLD_CODE
 void InitSpotCamSequences() 
 {
 	int s, cc, n, ce;
@@ -334,7 +334,6 @@ void InitialiseSpotCam(short Sequence)
 	QuakeCam.spos.boxNumber = 0;
 }
 
-#ifdef OLD_CODE
 void CalculateSpotCameras()
 {
 	int cpx; // stack offset -96
@@ -1208,7 +1207,7 @@ void CalculateSpotCameras()
 
 void Inject_Spotcam()
 {
-	INJECT(0x0047A800, InitSpotCamSequences);
+	//INJECT(0x0047A800, InitSpotCamSequences);
 	//INJECT(0x0047A9D0, InitialiseSpotCam);
 	//INJECT(0x0047B280, CalculateSpotCameras);
 }
