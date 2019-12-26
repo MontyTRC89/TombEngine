@@ -12,3 +12,4 @@ void LaraControl(short itemNumber);
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll);
 void LaraInitialiseMeshes();
 void AnimateLara(ITEM_INFO* item);
+void LaraCheatyBits();
