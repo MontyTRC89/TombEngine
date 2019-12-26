@@ -717,33 +717,32 @@ void InitialiseDoor(short itemNumber)
 	door->dptr3 = NULL;
 	door->dptr4 = NULL;
 
-	int dz = 0;
-	int dx = 0;
+	int dz, dx;
+	ROOM_INFO* r;
+	ROOM_INFO* b;
+	short boxNumber, twoRoom, roomNumber;
+
+	dz = dx = 0;
 
 	if (item->pos.yRot == 0)
 		dz--;
-	else if (item->pos.yRot == -ANGLE(180))
+	else if (item->pos.yRot == -0x8000)
 		dz++;
-	else if (item->pos.yRot == ANGLE(90))
+	else if (item->pos.yRot == 0x4000)
 		dx--;
 	else
 		dx++;
 
-	dz *= WALL_SIZE;
-	dx *= WALL_SIZE;
+	r = &Rooms[item->roomNumber];
 
-	ROOM_INFO * r = &Rooms[item->roomNumber];
-	ROOM_INFO * b;
-
-	door->d1.floor = &XZ_GET_SECTOR(r, dx + item->pos.xPos - r->x, dz + item->pos.zPos - r->z);
-	short roomNumber = GetDoor(door->d1.floor);
-	short boxNumber;
+	door->d1.floor = &r->floor[(((item->pos.zPos - r->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - r->x) >> WALL_SHIFT) + dx) * r->xSize];
+	roomNumber = GetDoor(door->d1.floor);
 	if (roomNumber == NO_ROOM)
 		boxNumber = door->d1.floor->box;
 	else
 	{
 		b = &Rooms[roomNumber];
-		boxNumber = XZ_GET_SECTOR(b, dx + item->pos.xPos - b->x, dz + item->pos.zPos - b->z).box;
+		boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
 	}
 	door->d1.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
 
@@ -753,14 +752,14 @@ void InitialiseDoor(short itemNumber)
 	{
 		r = &Rooms[r->flippedRoom];
 
-		door->d1flip.floor = &XZ_GET_SECTOR(r, dx + item->pos.xPos - r->x, dz + item->pos.zPos - r->z);
+		door->d1flip.floor = &r->floor[(((item->pos.zPos - r->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - r->x) >> WALL_SHIFT) + dx) * r->xSize];
 		roomNumber = GetDoor(door->d1flip.floor);
 		if (roomNumber == NO_ROOM)
 			boxNumber = door->d1flip.floor->box;
 		else
 		{
 			b = &Rooms[roomNumber];
-			boxNumber = XZ_GET_SECTOR(b, dx + item->pos.xPos - b->x, dz + item->pos.zPos - b->z).box;
+			boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
 		}
 		door->d1flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
 
@@ -769,7 +768,7 @@ void InitialiseDoor(short itemNumber)
 	else
 		door->d1flip.floor = NULL;
 
-	short twoRoom = GetDoor(door->d1.floor);
+	twoRoom = GetDoor(door->d1.floor);
 
 	ShutThatDoor(&door->d1, door);
 	ShutThatDoor(&door->d1flip, door);
@@ -783,14 +782,14 @@ void InitialiseDoor(short itemNumber)
 	{
 		r = &Rooms[twoRoom];
 
-		door->d2.floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+		door->d2.floor = &r->floor[((item->pos.zPos - r->z) >> WALL_SHIFT) + ((item->pos.xPos - r->x) >> WALL_SHIFT) * r->xSize];
 		roomNumber = GetDoor(door->d2.floor);
 		if (roomNumber == NO_ROOM)
 			boxNumber = door->d2.floor->box;
 		else
 		{
 			b = &Rooms[roomNumber];
-			boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x, item->pos.zPos - b->z).box;
+			boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
 		}
 		door->d2.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
 
@@ -800,14 +799,14 @@ void InitialiseDoor(short itemNumber)
 		{
 			r = &Rooms[r->flippedRoom];
 
-			door->d2flip.floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+			door->d2flip.floor = &r->floor[((item->pos.zPos - r->z) >> WALL_SHIFT) + ((item->pos.xPos - r->x) >> WALL_SHIFT) * r->xSize];
 			roomNumber = GetDoor(door->d2flip.floor);
 			if (roomNumber == NO_ROOM)
 				boxNumber = door->d2flip.floor->box;
 			else
 			{
 				b = &Rooms[roomNumber];
-				boxNumber = XZ_GET_SECTOR(b, item->pos.xPos - b->x, item->pos.zPos - b->z).box;
+				boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
 			}
 			door->d2flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
 
