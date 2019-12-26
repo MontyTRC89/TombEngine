@@ -62,10 +62,10 @@
 #define MAX_SPARKS          1024      // 128 normally
 #define MAX_SPARKS_FIRE     20
 #define MAX_FIRE_LIST       32        // FIRE_SPARKS list
-#define MAX_SPARKS_SMOKE    64
-#define MAX_SPARKS_BLOOD    64
+#define MAX_SPARKS_SMOKE    32
+#define MAX_SPARKS_BLOOD    32
 #define MAX_GUNSHELL        24
-#define MAX_GUNFLASH        6
+#define MAX_GUNFLASH        4
 #define MAX_DRIPS           32
 #define MAX_BUBBLES         40
 #define MAX_DYNAMICS        64
