@@ -71,9 +71,41 @@ void InitialiseLaraLoad(short itemNum)//4B308, 4B76C (F)
 	LaraItem = &Items[itemNum];
 }
 
+void LaraCheatyBits()
+{
+	if (TrInput & IN_D)
+	{
+		//LaraCheatGetStuff();
+		//LaraItem->hitPoints = 1000;
+	}
+
+	if (TrInput & IN_PAUSE)
+	{
+		LaraItem->pos.yPos -= 128;
+		if (Lara.waterStatus != LW_FLYCHEAT)
+		{
+			LaraItem->hitPoints = 1000;
+			Lara.waterStatus = LW_FLYCHEAT;
+			LaraItem->animNumber = ANIMATION_LARA_UNDERWATER_SWIM_SOLID;
+			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->currentAnimState = STATE_LARA_UNDERWATER_FORWARD;
+			LaraItem->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
+			LaraItem->gravityStatus = 0;
+			LaraItem->pos.xRot = ANGLE(30);
+			LaraItem->fallspeed = 30;
+			Lara.air = 1800;
+			Lara.deathCount = 0;
+			Lara.torsoXrot = Lara.torsoYrot = 0;
+			Lara.headXrot = Lara.headYrot = 0;
+		}
+	}
+}
+
 void LaraControl(short itemNumber)//4A838, 4AC9C
 {
 	ITEM_INFO* item = LaraItem;
+
+	LaraCheatyBits();
 
 	if (Lara.isMoving)
 	{
@@ -412,6 +444,10 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 				item->goalAnimState = STATE_LARA_RUN_FORWARD;
 		}
 		break;
+
+	case LW_FLYCHEAT:
+		LaraCheat(item, &coll);
+		break;
 	}
 
 	//S_SetReverbType(room[item->roomNumber].ReverbType);
@@ -516,23 +552,20 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
 {
 	LaraItem->hitPoints = 1000;
 	LaraUnderWater(item, coll);
-	if (TrInput & IN_WALK)
+	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
 	{
-		if (!(TrInput & IN_LOOK))
-		{
-			Lara.waterStatus = LW_ABOVE_WATER;
-			item->animNumber = ANIMATION_LARA_STAY_SOLID;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->pos.zRot = 0;
-			item->pos.xRot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.gunStatus = LG_NO_ARMS;
-			LaraInitialiseMeshes();
-			Lara.meshEffects = 0;
-		}
+		Lara.waterStatus = LW_ABOVE_WATER;
+		item->animNumber = ANIMATION_LARA_STAY_SOLID;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->pos.zRot = 0;
+		item->pos.xRot = 0;
+		Lara.torsoYrot = 0;
+		Lara.torsoXrot = 0;
+		Lara.headYrot = 0;
+		Lara.headXrot = 0;
+		Lara.gunStatus = LG_NO_ARMS;
+		LaraInitialiseMeshes();
+		Lara.meshEffects = 0;
 	}
 }
 
