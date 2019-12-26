@@ -67,7 +67,6 @@ FIRE_LIST Fires[32]; // offset 0xA8D7C
 
 extern int NextSpark;
 extern SPARKS Sparks[1024];
-extern Renderer11* g_Renderer;
 
 int GetFreeFireSpark()
 {
@@ -1910,18 +1909,8 @@ void TriggerSmallSplash(int x, int y, int z, int num)// (F)
 	}
 }
 
-void SetFadeClip(short height, short speed)
-{
-	if (height > 0)
-		g_Renderer->EnableCinematicBars(true);
-	else
-		g_Renderer->EnableCinematicBars(false);
-}
-
-
 void Inject_Tomb4FX()
 {
-	INJECT(0x00483A90, SetFadeClip);
 	INJECT(0x004827E0, TriggerBlood);
 	INJECT(0x00431070, TriggerExplosionBubble);
 	INJECT(0x004812B0, GetFreeFireSpark);
