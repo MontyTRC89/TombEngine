@@ -54,19 +54,19 @@ int NextBlood = 0;
 int NextSpider = 0;
 int NextGunShell = 0;
 
-GUNFLASH_STRUCT Gunflashes[4]; // offset 0xA31D8
+GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 PHD_VECTOR NodeVectors[16]; // offset 0xA3274
-FIRE_SPARKS FireSparks[20]; // offset 0xA94FC
-SMOKE_SPARKS SmokeSparks[32]; // offset 0xA8F7C
-GUNSHELL_STRUCT Gunshells[24]; // offset 0xA7DFC
-BLOOD_STRUCT Blood[32]; // offset 0xA88FC
-BUBBLE_STRUCT Bubbles[40]; // offset 0xA80FC
-DRIP_STRUCT Drips[32]; // offset 0xA85FC
-SHOCKWAVE_STRUCT ShockWaves[16]; // offset 0xA7C3C
-FIRE_LIST Fires[32]; // offset 0xA8D7C
+FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE]; // offset 0xA94FC
+SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; // offset 0xA8F7C
+GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; // offset 0xA7DFC
+BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; // offset 0xA88FC
+BUBBLE_STRUCT Bubbles[MAX_BUBBLES]; // offset 0xA80FC
+DRIP_STRUCT Drips[MAX_DRIPS]; // offset 0xA85FC
+SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; // offset 0xA7C3C
+FIRE_LIST Fires[MAX_FIRE_LIST]; // offset 0xA8D7C
 
 extern int NextSpark;
-extern SPARKS Sparks[1024];
+extern SPARKS Sparks[MAX_SPARKS];
 extern Renderer11* g_Renderer;
 
 int GetFreeFireSpark()
@@ -95,17 +95,17 @@ int GetFreeFireSpark()
 			spark++;
 		}
 
-		if (++i >= 20)
+		if (++i >= MAX_SPARKS_FIRE)
 		{
 			NextFireSpark = minIndex + 1;
-			if (NextFireSpark >= 20)
+			if (NextFireSpark >= MAX_SPARKS_FIRE)
 				NextFireSpark = 1;
 			return minIndex;
 		}
 	}
 
 	NextFireSpark = sparkNum + 1;
-	if (sparkNum + 1 >= 20)
+	if (sparkNum + 1 >= MAX_SPARKS_FIRE)
 		NextFireSpark = 1;
 
 	return sparkNum;
@@ -239,7 +239,7 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 	while (fptr->on)
 	{
 		fptr++;
-		if (++i >= 32)
+		if (++i >= MAX_FIRE_LIST)
 			return;
 	}
 
@@ -257,7 +257,7 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 
 void ClearFires()
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_FIRE_LIST; i++)
 		Fires[i].on = false;
 }
 
@@ -265,7 +265,7 @@ void UpdateFireSparks()
 {
 	keep_those_fires_burning();
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < MAX_SPARKS_FIRE; i++)
 	{
 		FIRE_SPARKS* spark = &FireSparks[i];
 
@@ -373,21 +373,21 @@ int GetFreeSmokeSpark()// (F)
 			spark++;
 		}
 
-		if (++count >= 32)
+		if (++count >= MAX_SPARKS_SMOKE)
 		{
-			NextSmokeSpark = (minIndex + 1) % 32;
+			NextSmokeSpark = (minIndex + 1) % MAX_SPARKS_SMOKE;
 			return minIndex;
 		}
 	}
 
-	NextSmokeSpark = (sparkNum + 1) % 32;
+	NextSmokeSpark = (sparkNum + 1) % MAX_SPARKS_SMOKE;
 
 	return sparkNum;
 }
 
 void UpdateSmoke()
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_SPARKS_SMOKE; i++)
 	{
 		SMOKE_SPARKS* spark = &SmokeSparks[i];
 
@@ -648,7 +648,7 @@ int GetFreeBlood()// (F)
 			bloodNum++;
 		}
 
-		if (++count >= 32)
+		if (++count >= MAX_SPARKS_BLOOD)
 		{
 			NextBlood = (minIndex + 1) & 31;
 			return minIndex;
@@ -694,7 +694,7 @@ void TriggerBlood(int x, int y, int z, int unk, int num)// (F)
 
 void UpdateBlood()
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_SPARKS_BLOOD; i++)
 	{
 		BLOOD_STRUCT* blood = &Blood[i];
 
@@ -779,17 +779,17 @@ int GetFreeGunshell()
 			gs++;
 		}
 
-		if (++i >= 24)
+		if (++i >= MAX_GUNSHELL)
 		{
 			NextGunShell = minIndex + 1;
-			if (minIndex + 1 >= 24)
+			if (minIndex + 1 >= MAX_GUNSHELL)
 				NextGunShell = 0;
 			return minIndex;
 		}
 	}
 
 	NextGunShell = gsNum + 1;
-	if (gsNum + 1 >= 24)
+	if (gsNum + 1 >= MAX_GUNSHELL)
 		NextGunShell = 0;
 
 	return gsNum;
@@ -904,7 +904,7 @@ void TriggerGunShell(short hand, short objNum, int weaponType)
 
 void UpdateGunShells()
 {
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i < MAX_GUNSHELL; i++)
 	{
 		GUNSHELL_STRUCT* gs = &Gunshells[i];
 
@@ -1050,14 +1050,14 @@ int GetFreeBubble()//8BEAC(<), 8DEF0(<) (F)
 			bub++;
 		}
 
-		if (++bubNum >= 40)
+		if (++bubNum >= MAX_BUBBLES)
 		{
 			break;
 		}
 	}
 
 	NextBubble = bubNum + 1;
-	if (bubNum + 1 >= 40)
+	if (bubNum + 1 >= MAX_BUBBLES)
 		NextBubble = 0;
 
 	return bubNum;
@@ -1119,7 +1119,7 @@ void LaraBubbles(ITEM_INFO* item)// (F)
 
 void UpdateBubbles()
 {
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < MAX_BUBBLES; i++)
 	{
 		BUBBLE_STRUCT* bubble = &Bubbles[i];
 
@@ -1218,21 +1218,21 @@ int GetFreeDrip()
 			drip++;
 		}
 
-		if (++count >= 32)
+		if (++count >= MAX_DRIPS)
 		{
-			NextDrip = (minIndex + 1) % 32;
+			NextDrip = (minIndex + 1) % MAX_DRIPS;
 			return minIndex;
 		}
 	}
 
-	NextDrip = (dripNum + 1) % 32;
+	NextDrip = (dripNum + 1) % MAX_DRIPS;
 
 	return dripNum;
 }
 
 void UpdateDrips()
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_DRIPS; i++)
 	{
 		DRIP_STRUCT* drip = &Drips[i];
 
@@ -1492,7 +1492,7 @@ int ExplodingDeath2(short itemNumber, int meshBits, short damage)
 
 int GetFreeShockwave()// (F)
 {
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < MAX_SHOCKWAVE; i++)
 	{
 		if (!ShockWaves[i].life)
 			return i;
@@ -1585,7 +1585,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int ve
 
 void UpdateShockwaves()
 {
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < MAX_SHOCKWAVE; i++)
 	{
 		SHOCKWAVE_STRUCT* sw = &ShockWaves[i];
 
