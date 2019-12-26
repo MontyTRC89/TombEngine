@@ -330,8 +330,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (UseSpotCam)
 		{
 			// Draw flyby cameras
-			if (CurrentLevel != 0)
-				g_Renderer->EnableCinematicBars(true);
+			//if (CurrentLevel != 0)
+			//	g_Renderer->EnableCinematicBars(true);
 			CalculateSpotCameras();
 		}
 		else
