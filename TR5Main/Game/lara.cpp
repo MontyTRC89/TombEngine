@@ -693,8 +693,9 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)//1D244, 1D3D8 (F)
 
 	if (item->frameNumber == Anims[item->animNumber].frameEnd)
 	{
-		item->pos.xPos += 2800 * SIN(item->pos.yRot) >> W2V_SHIFT;
-		item->pos.xPos += 2800 * COS(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.xPos += 700 * SIN(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.yPos -= 361;
+		item->pos.zPos += 700 * COS(item->pos.yRot) >> W2V_SHIFT;
 
 		item->animNumber = ANIMATION_LARA_TRY_HANG_SOLID;
 		item->frameNumber = Anims[item->animNumber].frameBase;
