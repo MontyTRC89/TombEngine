@@ -340,7 +340,7 @@ void LaraGun()
 	{
 		Lara.gunStatus = LG_NO_ARMS;
 	}
-	else if (!Lara.gunStatus)
+	else if (Lara.gunStatus == LG_NO_ARMS)
 	{
 		if (TrInput & IN_DRAW)
 		{
@@ -351,9 +351,12 @@ void LaraGun()
 			if (LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE && LaraItem->animNumber != ANIMATION_LARA_CROUCH_IDLE)
 				return;
 
-			if (Lara.gunType == WEAPON_FLARE && !Lara.leftArm.frameNumber)
+			if (Lara.gunType == WEAPON_FLARE)
 			{
-				Lara.gunStatus = LG_UNDRAW_GUNS;
+				if (!Lara.leftArm.frameNumber)
+				{
+					Lara.gunStatus = LG_UNDRAW_GUNS;
+				}
 			}
 			else if (Lara.numFlares)
 			{
@@ -366,20 +369,22 @@ void LaraGun()
 		if ((Lara.requestGunType != Lara.gunType) || (TrInput & IN_DRAW))
 		{
 			if ((LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE
-			||   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT
-			||   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT)
-			&&  (Lara.requestGunType == WEAPON_HK
-			||   Lara.requestGunType == WEAPON_CROSSBOW
-			||   Lara.requestGunType == WEAPON_FLARE
-			||   Lara.requestGunType == WEAPON_HARPOON_GUN))
-				return;
-
-			if ((Lara.requestGunType == WEAPON_FLARE
-			|| ((g_LaraExtra.Vehicle == NO_ITEM)
-			&& ((Lara.requestGunType == WEAPON_HARPOON_GUN)
-			||  (Lara.waterStatus == LW_ABOVE_WATER)
-			|| ((Lara.waterStatus == LW_WADE)
-			&&   Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight)))))
+				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT
+				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT)
+				&& (Lara.requestGunType == WEAPON_HK
+				|| Lara.requestGunType == WEAPON_CROSSBOW
+				|| Lara.requestGunType == WEAPON_SHOTGUN
+				|| Lara.requestGunType == WEAPON_HARPOON_GUN))
+			{
+				if (Lara.gunType == WEAPON_FLARE)
+					Lara.requestGunType = WEAPON_FLARE;
+			}
+			else if (Lara.requestGunType == WEAPON_FLARE
+				|| g_LaraExtra.Vehicle == NO_ITEM
+				&& (Lara.requestGunType == WEAPON_HARPOON_GUN
+				|| Lara.waterStatus == LW_ABOVE_WATER
+				|| Lara.waterStatus == LW_WADE
+				&& Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight))
 			{
 				if (Lara.gunType == WEAPON_FLARE)
 				{
@@ -407,9 +412,7 @@ void LaraGun()
 	}
 	else if (Lara.gunStatus == LG_READY)
 	{
-		if ((TrInput & IN_DRAW) || Lara.requestGunType != Lara.gunType)  
-			Lara.gunStatus = LG_UNDRAW_GUNS;
-		else if (Lara.gunType != WEAPON_HARPOON_GUN && Lara.waterStatus != LW_ABOVE_WATER && (Lara.waterStatus != LW_WADE || Lara.waterSurfaceDist < -Weapons[Lara.gunType].gunHeight)) 
+		if ((TrInput & IN_DRAW) || Lara.requestGunType != Lara.gunType || Lara.gunType != WEAPON_HARPOON_GUN && Lara.waterStatus != LW_ABOVE_WATER && Lara.waterStatus != LW_WADE || Lara.waterSurfaceDist < -Weapons[Lara.gunType].gunHeight)
 			Lara.gunStatus = LG_UNDRAW_GUNS;
 	}
 	else if (Lara.gunStatus == LG_HANDS_BUSY && (TrInput & IN_FLARE) && LaraItem->currentAnimState == STATE_LARA_CRAWL_IDLE && LaraItem->animNumber == ANIMATION_LARA_CRAWL_IDLE)
@@ -419,9 +422,9 @@ void LaraGun()
 
 	switch (Lara.gunStatus)
 	{
-	case LG_DRAW_GUNS:
-		if (Lara.gunType != WEAPON_FLARE && Lara.gunType)
-			Lara.lastGunType = Lara.gunType;
+		case LG_DRAW_GUNS:
+			if (Lara.gunType != WEAPON_FLARE && Lara.gunType)
+				Lara.lastGunType = Lara.gunType;
 
 		switch (Lara.gunType)
 		{
@@ -927,8 +930,8 @@ int CheckForHoldingState(int state)
 {
 	short* holdState = HoldStates;
 
-	if (g_LaraExtra.ExtraAnim)
-		return 0;
+	/*if (g_LaraExtra.ExtraAnim)
+		return 0;*/
 
 	while (*holdState >= 0)
 	{
