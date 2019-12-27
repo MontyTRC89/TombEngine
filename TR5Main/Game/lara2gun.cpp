@@ -47,6 +47,7 @@ void AnimatePistols(int weaponType)
 				pos.z = 48;
 				break;
 			}
+
 			GetLaraJointPosition(&pos, LJ_LHAND);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, (byte)0, SmokeWeapon, SmokeCountL);
 		}
@@ -463,7 +464,7 @@ void set_arm_info(LARA_ARM* arm, int frame)
 		arm->animNumber = animBase + 3;
 
 	arm->frameNumber = frame;
-	arm->frameBase = Anims[animBase].framePtr;
+	arm->frameBase = Anims[arm->animNumber].framePtr;
 }
 
 void draw_pistols(int weaponType)
