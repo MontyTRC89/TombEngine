@@ -55,7 +55,7 @@
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)TR5Main\Libs\lua</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
-    <OutDir>$(ProjectDir)..\Build\Release\</OutDir>
+    <OutDir>$(ProjectDir)..\Build\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

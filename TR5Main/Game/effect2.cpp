@@ -16,9 +16,9 @@ unsigned char TES_extra_tab[] =
 };
 
 int DeadlyBounds[6];
-SPLASH_STRUCT Splashes[4];
-RIPPLE_STRUCT Ripples[32];
-DYNAMIC Dynamics[64];
+SPLASH_STRUCT Splashes[MAX_SPLASH];
+RIPPLE_STRUCT Ripples[MAX_RIPPLES];
+DYNAMIC Dynamics[MAX_DYNAMICS];
 SPLASH_SETUP SplashSetup;
 SP_DYNAMIC SparkDynamics[8];
 int SmokeWeapon;
@@ -27,7 +27,7 @@ int SmokeCountR;
 //int SmokeWindX;
 //int SmokeWindZ;
 int SplashCount = 0;
-SPARKS Sparks[1024];
+SPARKS Sparks[MAX_SPARKS];
 
 extern GameFlow* g_GameFlow;
 
@@ -37,7 +37,7 @@ void DetatchSpark(int num, int type)//32D8C, 3328C (F)
 	ITEM_INFO* item = &Items[num];
 	SPARKS* sptr = &Sparks[0];
 
-	for (int lp = 0; lp < 1024; lp++, sptr++)
+	for (int lp = 0; lp < MAX_SPARKS; lp++, sptr++)
 	{
 		if (sptr->on && sptr->flags & type && sptr->fxObj == num)
 		{
@@ -65,7 +65,7 @@ int GetFreeSpark()
 {
 	short sparkNumber = NextSpark;
 
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < MAX_SPARKS; i++)
 	{
 		SPARKS* spark = &Sparks[sparkNumber];
 		if (!spark->on)
@@ -90,7 +90,7 @@ int GetFreeSpark()
 	}
 
 	int life = 4095;
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < MAX_SPARKS; i++)
 	{
 		SPARKS* spark = &Sparks[i];
 		if (spark->life < life
@@ -123,7 +123,7 @@ void UpdateSparks()
 	DeadlyBounds[4] = LaraItem->pos.zPos + bounds[4];
 	DeadlyBounds[5] = LaraItem->pos.zPos + bounds[5];
 
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < MAX_SPARKS; i++)
 	{
 		SPARKS* spark = &Sparks[i];
 
@@ -259,7 +259,7 @@ void UpdateSparks()
 		}
 	}
 
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < MAX_SPARKS; i++)
 	{
 		SPARKS* spark = &Sparks[i];
 
@@ -362,7 +362,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
-			short ang = (((random >> 3) & 0x7FF) + angle - 1024) & 0xFFF;
+			short ang = (((random >> 3) & 0x7FF) + angle - WALL_SIZE) & 0xFFF;
 			spark->xVel = -rcossin_tbl[2 * ang] >> 2;
 			spark->yVel = (random & 0xFFF) - 2048;
 			spark->zVel = rcossin_tbl[2 * ang + 1] >> 2;
@@ -1003,7 +1003,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 
 void SetupSplash(SPLASH_SETUP* setup)
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < MAX_SPLASH; i++)
 	{
 		SPLASH_STRUCT* splash = &Splashes[i];
 
@@ -1037,7 +1037,7 @@ void SetupSplash(SPLASH_SETUP* setup)
 
 void UpdateSplashes()
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < MAX_SPLASH; i++)
 	{
 		SPLASH_STRUCT* splash = &Splashes[i];
 
@@ -1095,7 +1095,7 @@ void UpdateSplashes()
 		}
 	}
 
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_RIPPLES; i++)
 	{
 		RIPPLE_STRUCT* ripple = &Ripples[i];
 
@@ -1137,14 +1137,14 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 	RIPPLE_STRUCT* ripple;
 	int i;
 
-	for (i = 0; i < 32; i++)
+	for (i = 0; i < MAX_RIPPLES; i++)
 	{
 		ripple = &Ripples[i];
 		if (!(ripple->flags & 1))
 			break;
 	}
 
-	if (i == 32)
+	if (i == MAX_RIPPLES)
 		return;
 
 	ripple->flags = flags | 1;
@@ -1163,7 +1163,7 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < MAX_RIPPLES; i++)
 	{
 		RIPPLE_STRUCT* ripple = &Ripples[i];
 		if (!(ripple->flags & 1))

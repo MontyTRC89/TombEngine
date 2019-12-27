@@ -113,8 +113,8 @@ void undraw_flare()//4A108, 4A56C
 		{
 			LaraItem->animNumber = ANIMATION_LARA_FLARE_THROW;
 			frame1 = frame2 + Anims[LaraItem->animNumber].frameBase;
-			Lara.flareFrame = frame2 + Anims[LaraItem->animNumber].frameBase;
-			LaraItem->frameNumber = Lara.flareFrame;
+			Lara.flareFrame = frame1;
+			LaraItem->frameNumber = frame1;
 		}
 
 		if (LaraItem->animNumber == ANIMATION_LARA_FLARE_THROW)
@@ -149,7 +149,12 @@ void undraw_flare()//4A108, 4A56C
 		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 	}
 
-	if (!frame2)
+	if (frame2 >= 33 && frame2 < 72)
+	{
+		frame2 = 2;
+		DoFlareInHand(Lara.flareAge);
+	}
+	else if (!frame2)
 	{
 		frame2 = 1;
 		DoFlareInHand(Lara.flareAge);
@@ -160,9 +165,10 @@ void undraw_flare()//4A108, 4A56C
 		if (frame2 == 94)
 		{
 			frame2 = 1;
+			DoFlareInHand(Lara.flareAge);
 		}
 	}
-	else if (frame2 >= 1 || frame2 < 33)
+	else if (frame2 >= 1 && frame2 < 33)
 	{
 		frame2++;
 		if (frame2 == 21)
@@ -186,16 +192,20 @@ void undraw_flare()//4A108, 4A56C
 			Lara.leftArm.lock = 0;
 			Lara.flareFrame = 0;
 		}
+		else if (frame2 < 21)
+		{
+			DoFlareInHand(Lara.flareAge);
+		}
 	}
-	if (frame2 >= 95 && frame2 < 110)
+	else if (frame2 >= 95 && frame2 < 110)
 	{
 		frame2++;
 		if (frame2 == 110)
+		{
 			frame2 = 1;
+			DoFlareInHand(Lara.flareAge);
+		}
 	}
-
-	if (frame2 >= 1 && frame2 < 21)
-		DoFlareInHand(Lara.flareAge);
 
 	Lara.leftArm.frameNumber = frame2;
 	set_flare_arm(Lara.leftArm.frameNumber);
@@ -210,6 +220,7 @@ void draw_flare()//49F74, 4A3D8 (F)
 	{
 		DoFlareInHand(Lara.flareAge);
 		Lara.flareControlLeft = false;
+		Lara.leftArm.frameNumber = 93;
 		set_flare_arm(93);
 	}
 	else
