@@ -5907,6 +5907,8 @@ int Renderer11::drawInventoryScene()
 
 			OBJECT_INFO* obj = &Objects[objectNumber];
 			RendererObject* moveableObj = m_moveableObjects[objectNumber];
+			if (moveableObj == NULL)
+				continue;
 
 			// Build the object animation matrices
 			if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&

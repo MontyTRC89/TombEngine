@@ -1209,6 +1209,6 @@ void CalculateSpotCameras()
 void Inject_Spotcam()
 {
 	INJECT(0x0047A800, InitSpotCamSequences);
-	//INJECT(0x0047A9D0, InitialiseSpotCam);
+	INJECT(0x0047A9D0, InitialiseSpotCam);
 	//INJECT(0x0047B280, CalculateSpotCameras);
 }
