@@ -54,16 +54,16 @@ int NextBlood = 0;
 int NextSpider = 0;
 int NextGunShell = 0;
 
-GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
-PHD_VECTOR NodeVectors[16]; // offset 0xA3274
-FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE]; // offset 0xA94FC
-SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; // offset 0xA8F7C
-GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; // offset 0xA7DFC
-BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; // offset 0xA88FC
-BUBBLE_STRUCT Bubbles[MAX_BUBBLES]; // offset 0xA80FC
-DRIP_STRUCT Drips[MAX_DRIPS]; // offset 0xA85FC
-SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; // offset 0xA7C3C
-FIRE_LIST Fires[MAX_FIRE_LIST]; // offset 0xA8D7C
+GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; 
+PHD_VECTOR NodeVectors[16]; 
+FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE]; 
+SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; 
+GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; 
+BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; 
+BUBBLE_STRUCT Bubbles[MAX_BUBBLES]; 
+DRIP_STRUCT Drips[MAX_DRIPS]; 
+SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
+FIRE_LIST Fires[MAX_FIRE_LIST];  
 
 extern int NextSpark;
 extern SPARKS Sparks[MAX_SPARKS];
@@ -84,7 +84,7 @@ int GetFreeFireSpark()
 			minIndex = sparkNum;
 			minLife = spark->life;
 		}
-		if (sparkNum == 19)
+		if (sparkNum == MAX_SPARKS_FIRE - 1)
 		{
 			spark = &FireSparks[1];
 			sparkNum = 1;
@@ -347,7 +347,7 @@ void UpdateFireSparks()
 	}
 }
 
-int GetFreeSmokeSpark()// (F)
+int GetFreeSmokeSpark() 
 {
 	SMOKE_SPARKS* spark = &SmokeSparks[NextSmokeSpark];
 	int sparkNum = NextSmokeSpark;
@@ -362,7 +362,7 @@ int GetFreeSmokeSpark()// (F)
 			minLife = spark->life;
 		}
 
-		if (sparkNum == 31)
+		if (sparkNum == MAX_SPARKS_SMOKE - 1)
 		{
 			spark = &SmokeSparks[0];
 			sparkNum = 0;
@@ -393,7 +393,7 @@ void UpdateSmoke()
 
 		if (spark->on)
 		{
-			spark->life--;
+			spark->life -= 2;
 
 			if (spark->life <= 0)
 			{
@@ -490,7 +490,7 @@ byte TriggerGunSmoke_SubFunction(int weaponType)
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
 {
 	SMOKE_SPARKS* spark;
-
+	
 	spark = &SmokeSparks[GetFreeSmokeSpark()];
 	spark->on = true;
 	spark->sShade = 0;
@@ -533,12 +533,12 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 		else
 			spark->flags = SP_ROTATE;
 
-		spark->rotAng = GetRandomControl() & 255;
+		spark->rotAng = GetRandomControl() & 0xFFF;
 
 		if (GetRandomControl() & 1)
-			spark->rotAdd = -(GetRandomControl() & 15) - 16;
+			spark->rotAdd = -(GetRandomControl() & 0x0F) - 16;
 		else
-			spark->rotAdd = (GetRandomControl() & 15) + 16;
+			spark->rotAdd = (GetRandomControl() & 0x0F) + 16;
 	}
 	else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 	{
@@ -552,7 +552,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	spark->gravity = -(GetRandomControl() & 1) - 2;
 	spark->maxYvel = -(GetRandomControl() & 1) - 2;
 
-	byte size = ((GetRandomControl() & 7) + 24) - TriggerGunSmoke_SubFunction(weaponType);
+	byte size = ((GetRandomControl() & 0x0F) + 24); // -TriggerGunSmoke_SubFunction(weaponType);
 
 	if (initial)
 	{
@@ -637,7 +637,7 @@ int GetFreeBlood()// (F)
 			minLife = blood->life;
 		}
 
-		if (bloodNum == 31)
+		if (bloodNum == MAX_SPARKS_BLOOD - 1)
 		{
 			blood = &Blood[0];
 			bloodNum = 0;
@@ -768,7 +768,7 @@ int GetFreeGunshell()
 			minLife = gs->counter;
 			minIndex = gsNum;
 		}
-		if (gsNum == 23)
+		if (gsNum == MAX_GUNSHELL - 1)
 		{
 			gs = &Gunshells[0];
 			gsNum = 0;
@@ -1039,7 +1039,7 @@ int GetFreeBubble()//8BEAC(<), 8DEF0(<) (F)
 
 	while (bub->size != 0)
 	{
-		if (bubNum == 39)
+		if (bubNum == MAX_BUBBLES - 1)
 		{
 			bub = &Bubbles[0];
 			bubNum = 0;
@@ -1207,7 +1207,7 @@ int GetFreeDrip()
 			minLife = drip->life;
 		}
 
-		if (dripNum == 31)
+		if (dripNum == MAX_DRIPS - 1)
 		{
 			drip = &Drips[0];
 			dripNum = 0;

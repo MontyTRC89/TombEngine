@@ -4360,6 +4360,9 @@ void Renderer11::updateLaraAnimations()
 		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),  TR_ANGLE_TO_RAD(Lara.leftArm.yRot),  TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
 		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot), TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
 
+		LARA_ARM* leftArm = &Lara.leftArm;
+		LARA_ARM* rightArm = &Lara.rightArm;
+
 		// HACK: backguns handles differently // TokyoSU: not really a hack since it's the original way to do that.
 		switch (Lara.gunType)
 		{
@@ -4389,12 +4392,12 @@ void Renderer11::updateLaraAnimations()
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber - Anims[Lara.leftArm.animNumber].frameBase) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
 			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber- Anims[Lara.rightArm.animNumber].frameBase) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
 			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
 			break;
 
