@@ -627,7 +627,7 @@ void InitialiseLara(int restore)
 		memset(&Lara, 0, sizeof(LARA_INFO));
 		g_LaraExtra.ExtraAnim = -1;
 		g_LaraExtra.Vehicle = NO_ITEM;
-		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = true;
+		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = Objects[ID_PISTOLS_ITEM].loaded;
 	}
 
 	Lara.look = TRUE;
