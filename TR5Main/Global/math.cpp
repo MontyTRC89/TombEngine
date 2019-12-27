@@ -12,3 +12,10 @@ float ANGLEF(short angle)
 {
 	return TR_ANGLE_TO_DEGREES(angle);
 }
+
+
+float frand() {
+	int randValue = rand();
+	float result = randValue / (float)RAND_MAX;
+	return result;
+}
