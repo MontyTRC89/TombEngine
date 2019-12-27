@@ -25,3 +25,5 @@
 
 short ANGLE(double angle);
 float ANGLEF(short angle);
+// returns a float between 0-1
+float frand();
