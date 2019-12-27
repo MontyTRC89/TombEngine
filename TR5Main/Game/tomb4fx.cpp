@@ -439,27 +439,28 @@ void UpdateSmoke()
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
-			spark->yVel += spark->gravity;
-
-			if (spark->maxYvel)
+			spark->yVel -= spark->gravity.to_float();
+			
+			if (spark->maxYvel != 0)
 			{
-				if ((spark->yVel < 0 && spark->yVel < (spark->maxYvel << 5)) ||
-					(spark->yVel > 0 && spark->yVel > (spark->maxYvel << 5)))
-					spark->yVel = spark->maxYvel << 5;
-			}
-
-			if (spark->friction & 0xF)
-			{
-				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
-				spark->zVel -= spark->zVel >> (spark->friction & 0xF);
+				if (spark->yVel < 0) {
+					if (-spark->yVel.to_float() > (spark->maxYvel)) {
+						spark->yVel = -spark->maxYvel.to_float();
+					}
+				}
+				else {
+					if (spark->yVel.to_float() > (spark->maxYvel)) {
+						spark->yVel = spark->maxYvel.to_float();
+					}
+				}
 			}
 			
-			if (spark->friction & 0xF0)
-				spark->yVel -= spark->yVel >> (spark->friction >> 4);
-
-			spark->x += spark->xVel >> 5;
-			spark->y += spark->yVel >> 5;
-			spark->z += spark->zVel >> 5;
+			spark->xVel -= spark->xVel * spark->friction.to_float();
+			spark->zVel -= spark->zVel * spark->friction.to_float();
+			spark->yVel -= spark->yVel * spark->friction.to_float();
+			spark->x += spark->xVel.to_float();
+			spark->y += spark->yVel.to_float();
+			spark->z += spark->zVel.to_float();
 
 			if (spark->flags & SP_WIND)
 			{
@@ -519,9 +520,10 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	}
 	else
 	{
-		spark->xVel = ((GetRandomControl() & 511) - 256) >> 1;
-		spark->yVel = ((GetRandomControl() & 511) - 256) >> 1;
-		spark->zVel = ((GetRandomControl() & 511) - 256) >> 1;
+		float f = (frand() * 6) - 3;
+		spark->xVel = (frand() * 6) - 3;
+		spark->yVel = (frand() * 6) - 3;
+		spark->zVel = (frand() * 6) - 3;
 	}
 
 	spark->friction = 4;
@@ -548,9 +550,9 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	{
 		spark->flags = 0;
 	}
-
-	spark->gravity = -(GetRandomControl() & 1) - 2;
-	spark->maxYvel = -(GetRandomControl() & 1) - 2;
+	float gravity = frand() * 1.25f;
+	spark->gravity = gravity;
+	spark->maxYvel = frand() * 16;
 
 	byte size = ((GetRandomControl() & 0x0F) + 24); // -TriggerGunSmoke_SubFunction(weaponType);
 
