@@ -25,5 +25,6 @@
 void ActivateCamera();
 void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
 void AlterFOV(int value);
+int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push);
 
 void Inject_Camera();
