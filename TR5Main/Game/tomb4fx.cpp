@@ -464,7 +464,7 @@ void UpdateSmoke()
 			if (spark->flags & SP_WIND)
 			{
 				spark->x += SmokeWindX >> 1;
-				spark->z += SmokeWindZ>>1;
+				spark->z += SmokeWindZ >> 1;
 			}
 
 			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);
@@ -1908,6 +1908,16 @@ void TriggerSmallSplash(int x, int y, int z, int num)// (F)
 		sptr->maxYvel = 0;
 		sptr->gravity = (GetRandomControl() & 0xF) + 64;
 	}
+}
+
+void SetFadeClip(short height, short speed)
+{
+	/*__int16 result; // ax
+
+	result = a1;
+	DestFadeScreenHeight = a1;
+	FadeClipSpeed = a2;
+	return result;*/
 }
 
 void Inject_Tomb4FX()
