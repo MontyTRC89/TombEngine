@@ -944,9 +944,9 @@ void UpdateGunShells()
 			gs->pos.yRot += gs->speed * ANGLE(1);
 			gs->pos.zRot += ANGLE(23);
 
-			gs->pos.xPos += gs->speed * 2 * SIN(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.xPos += gs->speed * SIN(gs->dirXrot) >> W2V_SHIFT;
 			gs->pos.yPos += gs->fallspeed;
-			gs->pos.zPos += gs->speed * 2 * COS(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.zPos += gs->speed * COS(gs->dirXrot) >> W2V_SHIFT;
 
 			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
 			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
@@ -1074,12 +1074,12 @@ void CreateBubble(PHD_VECTOR * pos, short roomNum, int unk1, int unk2, int flags
 		BUBBLE_STRUCT* bubble = &Bubbles[GetFreeBubble()];
 		bubble->pos = *pos;
 		bubble->roomNumber = roomNum;
-		bubble->speed = GetRandomControl() + 64;
+		bubble->speed = frand();
 		bubble->shade = 0;
-		int size = 2 * (unk1 + (unk2 & GetRandomControl()));
+		int size = rand() % 4 + 6;
 		bubble->size = size;
 		bubble->dsize = 16 * size;
-		bubble->vel = (GetRandomControl() & 0x1F) + 32;
+		bubble->vel = (frand()*0.8f)+0.2f;
 		bubble->flags = flags;
 		bubble->xVel = xv;
 		bubble->yVel = yv;
@@ -1127,24 +1127,24 @@ void UpdateBubbles()
 
 		if (bubble->size)
 		{
-			bubble->speed += bubble->vel;
+			bubble->speed += bubble->vel.to_float();
 			bubble->yRot += 6;
-			bubble->pos.y -= bubble->speed >> 8;
+			bubble->pos.y -= bubble->speed.to_float();
 
 			if (bubble->flags & 1)
 			{
-				bubble->pos.x += bubble->xVel >> 4;
-				bubble->pos.y += bubble->yVel >> 4;
-				bubble->pos.z += bubble->zVel >> 4;
+				bubble->pos.x += bubble->xVel.to_float();
+				bubble->pos.y += bubble->yVel.to_float();
+				bubble->pos.z += bubble->zVel.to_float();
 
-				bubble->xVel -= (bubble->xVel >> 3);
-				bubble->yVel -= (bubble->yVel >> 3);
-				bubble->zVel -= (bubble->zVel >> 3);
+				bubble->xVel -= (bubble->xVel.to_float()/2.0f);
+				bubble->yVel -= (bubble->yVel.to_float()/2.0f);
+				bubble->zVel -= (bubble->zVel.to_float()/2.0f);
 			}
 			else
 			{
-				bubble->pos.x += SIN(bubble->yRot) >> W2V_SHIFT;
-				bubble->pos.z += COS(bubble->yRot) >> W2V_SHIFT;
+				bubble->pos.x += sin(bubble->yRot)*5;
+				bubble->pos.z += cos(bubble->yRot)*5;
 			}
 
 			short roomNumber = bubble->roomNumber;

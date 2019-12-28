@@ -1013,16 +1013,16 @@ struct BUBBLE_STRUCT
 {
 	PHD_VECTOR pos; // size=12, offset=0
 	short roomNumber; // size=0, offset=12
-	short speed; // size=0, offset=14
+	numeric::Fixed<9, 7> speed; // size=0, offset=14
 	short size; // size=0, offset=16
 	short dsize; // size=0, offset=18
 	unsigned char shade; // size=0, offset=20
-	unsigned char vel; // size=0, offset=21
+	numeric::Fixed<4, 4> vel; // size=0, offset=21
 	unsigned char yRot; // size=0, offset=22
 	byte flags; // size=0, offset=23
-	short xVel; // size=0, offset=24
-	short yVel; // size=0, offset=26
-	short zVel; // size=0, offset=28
+	numeric::Fixed<6,2> xVel; // size=0, offset=24
+	numeric::Fixed<6, 2> yVel; // size=0, offset=26
+	numeric::Fixed<6, 2> zVel; // size=0, offset=28
 	short pad; // size=0, offset=30
 };
 
