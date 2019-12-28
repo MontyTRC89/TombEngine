@@ -21,13 +21,13 @@ enum spotcam_flags
 };
 
 //#define InitSpotCamSequences ((void (__cdecl*)()) 0x0047A800)
-#define CalculateSpotCameras ((void (__cdecl*)()) 0x0047B280)
+//#define CalculateSpotCameras ((void (__cdecl*)()) 0x0047B280)
 //#define InitialiseSpotCam ((void (__cdecl*)(short)) 0x0047A9D0)
 #define TriggerTitleSpotcam ((void (__cdecl*)(int)) 0x004284A0)
 #define Spline ((int (__cdecl*)(int, int*, int)) 0x0047A890)
 
 void InitSpotCamSequences();
 void InitialiseSpotCam(short sequence);
-//void CalculateSpotCameras();
+void CalculateSpotCameras();
 
 void Inject_Spotcam();
