@@ -158,20 +158,14 @@ void InitialiseSpotCam(short Sequence)
 		CameraXposition[1] = SpotCam[FirstCamera].x;
 		CameraYposition[1] = SpotCam[FirstCamera].y;
 		CameraZposition[1] = SpotCam[FirstCamera].z;
-
 		CameraXtarget[1] = SpotCam[FirstCamera].tx;
 		CameraYtarget[1] = SpotCam[FirstCamera].ty;
 		CameraZtarget[1] = SpotCam[FirstCamera].tz;
-
-		CameraXtarget[1] = SpotCam[FirstCamera].tx;
-		CameraYtarget[1] = SpotCam[FirstCamera].ty;
-		CameraZtarget[1] = SpotCam[FirstCamera].tz;
-
 		CameraRoll[1] = SpotCam[FirstCamera].roll;
 		CameraFOV[1] = SpotCam[FirstCamera].fov;
+		CameraSpeed[1] = SpotCam[FirstCamera].speed;
 
 		SplineFromCamera = 0;
-		CameraSpeed[1] = SpotCam[FirstCamera].speed;
 
 		if (CurrentCameraCnt > 0)
 		{
@@ -182,15 +176,9 @@ void InitialiseSpotCam(short Sequence)
 				CameraXposition[i + 2] = s->x;
 				CameraYposition[i + 2] = s->y;
 				CameraZposition[i + 2] = s->z;
-
 				CameraXtarget[i + 2] = s->tx;
 				CameraYtarget[i + 2] = s->ty;
 				CameraZtarget[i + 2] = s->tz;
-
-				CameraXtarget[i + 2] = s->tx;
-				CameraYtarget[i + 2] = s->ty;
-				CameraZtarget[i + 2] = s->tz;
-
 				CameraRoll[i + 2] = s->roll;
 				CameraFOV[i + 2] = s->fov;
 				CameraSpeed[i + 2] = s->speed;
@@ -198,32 +186,28 @@ void InitialiseSpotCam(short Sequence)
 		}
 
 		//loc_379F8
-		CameraXposition[CurrentCameraCnt + 1] = SpotCam[LastCamera].x;
-		CameraYposition[CurrentCameraCnt + 1] = SpotCam[LastCamera].y;
-		CameraZposition[CurrentCameraCnt + 1] = SpotCam[LastCamera].z;
-
-		CameraXtarget[CurrentCameraCnt + 1] = SpotCam[LastCamera].tx;
-		CameraYtarget[CurrentCameraCnt + 1] = SpotCam[LastCamera].ty;
-		CameraZtarget[CurrentCameraCnt + 1] = SpotCam[LastCamera].tz;
-
-		CameraFOV[CurrentCameraCnt + 1] = SpotCam[LastCamera].fov;
-		CameraRoll[CurrentCameraCnt + 1] = SpotCam[LastCamera].roll;
-		CameraSpeed[CurrentCameraCnt + 1] = SpotCam[LastCamera].speed;
+		CameraXposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].x;
+		CameraYposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].y;
+		CameraZposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].z;
+		CameraXtarget[CurrentCameraCnt + 2] = SpotCam[LastCamera].tx;
+		CameraYtarget[CurrentCameraCnt + 2] = SpotCam[LastCamera].ty;
+		CameraZtarget[CurrentCameraCnt + 2] = SpotCam[LastCamera].tz;
+		CameraFOV[CurrentCameraCnt + 2] = SpotCam[LastCamera].fov;
+		CameraRoll[CurrentCameraCnt + 2] = SpotCam[LastCamera].roll;
+		CameraSpeed[CurrentCameraCnt + 2] = SpotCam[LastCamera].speed;
 	}
 	else
 	{
 		//loc_37AA8
-		sp = 1;
+		sp = 0;
 		if ((s->flags & SCF_CUT_PAN))
 		{
 			CameraXposition[1] = SpotCam[CurrentSplineCamera].x;
 			CameraYposition[1] = SpotCam[CurrentSplineCamera].y;
 			CameraZposition[1] = SpotCam[CurrentSplineCamera].z;
-
 			CameraXtarget[1] = SpotCam[CurrentSplineCamera].tx;
 			CameraYtarget[1] = SpotCam[CurrentSplineCamera].ty;
 			CameraZtarget[1] = SpotCam[CurrentSplineCamera].tz;
-
 			CameraRoll[1] = SpotCam[CurrentSplineCamera].roll;
 			CameraFOV[1] = SpotCam[CurrentSplineCamera].fov;
 			CameraSpeed[1] = SpotCam[CurrentSplineCamera].speed;
@@ -239,17 +223,15 @@ void InitialiseSpotCam(short Sequence)
 				}
 
 				//loc_37B74
-				CameraXposition[sp + 1] = SpotCam[cn].x;
-				CameraYposition[sp + 1] = SpotCam[cn].y;
-				CameraZposition[sp + 1] = SpotCam[cn].z;
-
-				CameraXtarget[sp + 1] = SpotCam[cn].tx;
-				CameraYtarget[sp + 1] = SpotCam[cn].ty;
-				CameraZtarget[sp + 1] = SpotCam[cn].tz;
-
-				CameraRoll[sp + 1] = SpotCam[cn].roll;
-				CameraFOV[sp + 1] = SpotCam[cn].fov;
-				CameraSpeed[sp + 1] = SpotCam[cn].speed;
+				CameraXposition[sp + 2] = SpotCam[cn].x;
+				CameraYposition[sp + 2] = SpotCam[cn].y;
+				CameraZposition[sp + 2] = SpotCam[cn].z;
+				CameraXtarget[sp + 2] = SpotCam[cn].tx;
+				CameraYtarget[sp + 2] = SpotCam[cn].ty;
+				CameraZtarget[sp + 2] = SpotCam[cn].tz;
+				CameraRoll[sp + 2] = SpotCam[cn].roll;
+				CameraFOV[sp + 2] = SpotCam[cn].fov;
+				CameraSpeed[sp + 2] = SpotCam[cn].speed;
 				cn++;
 				sp++;
 			}
@@ -392,7 +374,7 @@ void CalculateSpotCameras()
 	int cn; // $s0
 
 
-	CAMERA_INFO Backup; 
+	CAMERA_INFO Backup;
 
 	if (DisableLaraControl)
 	{
@@ -421,7 +403,7 @@ void CalculateSpotCameras()
 	croll = Spline(CurrentSplinePosition, &CameraRoll[1], spline_cnt);
 	cfov = Spline(CurrentSplinePosition, &CameraFOV[1], spline_cnt);
 
-	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN) 
+	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN)
 		&& CameraFade != CurrentSplineCamera)
 	{
 		CameraFade = CurrentSplineCamera;
@@ -435,7 +417,7 @@ void CalculateSpotCameras()
 		}*/
 	}
 
-	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT) 
+	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT)
 		&& CameraFade != CurrentSplineCamera)
 	{
 		CameraFade = CurrentSplineCamera;
@@ -468,13 +450,13 @@ void CalculateSpotCameras()
 			for (int j = 0; j < 8; j++)
 			{
 				cx = Spline(sp, &CameraXposition[1], spline_cnt);
-				cy = Spline(sp, &CameraYposition[1], spline_cnt) ;
+				cy = Spline(sp, &CameraYposition[1], spline_cnt);
 				cz = Spline(sp, &CameraZposition[1], spline_cnt);
 
 				dx = SQUARE(cx - lx);
 				dy = SQUARE(cy - ly);
 				dz = SQUARE(cz - lz);
-				
+
 				tlen = SQRT_ASM(dx + dy + dz);
 
 				if (tlen <= clen)
@@ -497,7 +479,7 @@ void CalculateSpotCameras()
 		}
 
 		CurrentSplinePosition += (cp - CurrentSplinePosition) >> 5;
-		
+
 		if ((s->flags & SCF_CUT_PAN))
 		{
 			if (abs(cp - CurrentSplinePosition) > 0x8000)
@@ -736,15 +718,15 @@ void CalculateSpotCameras()
 							}
 						}
 
-						CameraXposition[sp] = SpotCam[cn].x;
-						CameraYposition[sp] = SpotCam[cn].y;
-						CameraZposition[sp] = SpotCam[cn].z;
-						CameraXtarget[sp] = SpotCam[cn].tx;
-						CameraYtarget[sp] = SpotCam[cn].ty;
-						CameraZtarget[sp] = SpotCam[cn].tz;
-						CameraRoll[sp] = SpotCam[cn].roll;
-						CameraFOV[sp] = SpotCam[cn].fov;
-						CameraSpeed[sp] = SpotCam[cn].speed;
+						CameraXposition[sp + 1] = SpotCam[cn].x;
+						CameraYposition[sp + 1] = SpotCam[cn].y;
+						CameraZposition[sp + 1] = SpotCam[cn].z;
+						CameraXtarget[sp + 1] = SpotCam[cn].tx;
+						CameraYtarget[sp + 1] = SpotCam[cn].ty;
+						CameraZtarget[sp + 1] = SpotCam[cn].tz;
+						CameraRoll[sp + 1] = SpotCam[cn].roll;
+						CameraFOV[sp + 1] = SpotCam[cn].fov;
+						CameraSpeed[sp + 1] = SpotCam[cn].speed;
 						cn++;
 						sp++;
 					}
@@ -827,7 +809,7 @@ void CalculateSpotCameras()
 					CameraFOV[2] = SpotCam[CurrentSplineCamera].fov;
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera].speed;
 
-					memcpy((char*)&Backup, (char*)&Camera, sizeof(CAMERA_INFO));
+					memcpy((char*)& Backup, (char*)& Camera, sizeof(CAMERA_INFO));
 					Camera.oldType = FIXED_CAMERA;
 					Camera.type = CHASE_CAMERA;
 					Camera.speed = 1;
@@ -868,7 +850,7 @@ void CalculateSpotCameras()
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;
 
-					memcpy((char*)&Camera, (char*)&Backup, sizeof(CAMERA_INFO));
+					memcpy((char*)& Camera, (char*)& Backup, sizeof(CAMERA_INFO));
 
 					Camera.targetElevation = elevation;
 
