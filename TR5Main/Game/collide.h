@@ -7,7 +7,6 @@
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
 
-#define GetCollisionInfo ((void (__cdecl*)(COLL_INFO*, int, int, int, short, int)) 0x00411100)
 #define GenericSphereBoxCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00413A90)
 
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
@@ -31,7 +30,7 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 int MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
 int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
+void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 
 void Inject_Collide();
