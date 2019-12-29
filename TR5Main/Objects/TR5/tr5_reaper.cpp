@@ -1,5 +1,6 @@
 #include "../newobjects.h"
 #include "../../Game/items.h"
+#include "../../Game/Box.h"
 
 void InitialiseReaper(short itemNum)
 {
@@ -11,4 +12,47 @@ void InitialiseReaper(short itemNum)
     item->frameNumber = Anims[item->animNumber].frameBase;
     item->goalAnimState = 2;
     item->currentAnimState = 2;
+}
+
+void ControlReaper(short itemNumber)
+{
+	if (CreatureActive(itemNumber))
+	{
+		ITEM_INFO* item = &Items[itemNumber];
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+		if (item->aiBits)
+			GetAITarget(creature);
+		else
+			creature->enemy = LaraItem;
+
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
+		GetCreatureMood(item, &info, TIMID);
+		CreatureMood(item, &info, TIMID);
+
+		short angle = CreatureTurn(item, ANGLE(2));
+
+		if (item->currentAnimState == 2 
+			&& !(GetRandomControl() & 0x3F))
+			item->goalAnimState = 1;
+
+		if (creature->reachedGoal)
+		{
+			if (creature->enemy)
+			{
+				if (creature->enemy->flags & 2)
+					item->itemFlags[3] = item->pad2[6] - 1;
+
+				item->itemFlags[3]++;
+
+				creature->reachedGoal = false;
+				creature->enemy = NULL;
+			}
+		}
+
+		item->pos.xRot = -12288;
+		CreatureAnimation(itemNumber, angle, 0);
+		CreatureUnderwater(item, 1024);
+	}
 }
