@@ -2706,15 +2706,19 @@ void Renderer11::DrawDashBar()
 
 void Renderer11::DrawHealthBar(int percentual)
 {
-	int color2 = 0xA00000;
+	int color2;
 	if (Lara.poisoned || Lara.gassed)
 		color2 = 0xA0A000;
+	else
+		color2 = 0xA00000;
 	drawBar(20, 32, 150, 12, percentual, 0xA00000, color2);
 }
 
 void Renderer11::DrawAirBar(int percentual)
 {
-	drawBar(20, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
+	/* Draw the air bar only if lara is not one a swamp room */
+	if (!(Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP))
+		drawBar(20, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
 }
 
 void Renderer11::ClearDynamicLights()
@@ -4916,104 +4920,51 @@ void Renderer11::drawBubbles()
 
 void Renderer11::drawSplahes()
 {
+	constexpr size_t NUM_POINTS = 12;
 	for (int i = 0; i < MAX_SPLASH; i++)
 	{
-		SPLASH_STRUCT* splash = &Splashes[i];
-		if (splash->flags & 1)
+		SPLASH_STRUCT& splash = Splashes[i];
+		if (splash.isActive)
 		{
-			byte color = (splash->life >= 32 ? 255 : splash->life << 5);
-
-			// Inner circle
-			float angle = PI / 16.0f;
-			float c = cos(angle);
-			float s = sin(angle);
-			float dx = splash->innerRad * c;
-			float dz = splash->innerRad * s;
-			float x1 = splash->x + dx;
-			float z1 = splash->z + dz;
-			angle -= PI / 4.0f;
-
-			for (int j = 0; j < 8; j++)
-			{
-				c = cos(angle);
-				s = sin(angle);
-				dx = splash->innerRad * c;
-				dz = splash->innerRad * s;
-				float x2 = splash->x + dx;
-				float z2 = splash->z + dz;
-				angle -= PI / 4.0f;
-
-				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH1],
-					x1, splash->y + splash->innerY, z1,
-					x2, splash->y + splash->innerY, z2,
-					x2, splash->y, z2,
-					x1, splash->y, z1,
-					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
-
-				x1 = x2;
-				z1 = z2;
+			constexpr float alpha = 360 / NUM_POINTS;
+			byte color = (splash.life >= 32 ? 255 : (byte)((splash.life / 32.0f) * 255));
+			if (!splash.isRipple) {
+				if (splash.heightSpeed < 0 && splash.height < 1024) {
+					float multiplier = splash.height / 1024.0f;
+					color = (float)color*multiplier;
+				}
 			}
-
-			// Medium circle
-			angle = PI / 16.0f;
-			c = cos(angle);
-			s = sin(angle);
-			dx = splash->middleRad * c;
-			dz = splash->middleRad * s;
-			x1 = splash->x + dx;
-			z1 = splash->z + dz;
-			angle -= PI / 4.0f;
-
-			for (int j = 0; j < 8; j++)
-			{
-				c = cos(angle);
-				s = sin(angle);
-				dx = splash->middleRad * c;
-				dz = splash->middleRad * s;
-				float x2 = splash->x + dx;
-				float z2 = splash->z + dz;
-				angle -= PI / 4.0f;
-
-				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-					x1, splash->y + splash->middleY, z1,
-					x2, splash->y + splash->middleY, z2,
-					x2, splash->y, z2,
-					x1, splash->y, z1,
-					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
-
-				x1 = x2;
-				z1 = z2;
-			}
-
-			// Large circle
-			angle = PI / 16.0f;
-			c = cos(angle);
-			s = sin(angle);
-			dx = splash->outerRad * c;
-			dz = splash->outerRad * s;
-			x1 = splash->x + dx;
-			z1 = splash->z + dz;
-			angle -= PI / 4.0f;
-
-			for (int j = 0; j < 8; j++)
-			{
-				c = cos(angle);
-				s = sin(angle);
-				dx = splash->outerRad * c;
-				dz = splash->outerRad * s;
-				float x2 = splash->x + dx;
-				float z2 = splash->z + dz;
-				angle -= PI / 4.0f;
-
-				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-					x1, splash->y - splash->outerSize, z1,
-					x2, splash->y - splash->outerSize, z2,
-					x2, splash->y, z2,
-					x1, splash->y, z1,
-					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
-
-				x1 = x2;
-				z1 = z2;
+			float innerRadius = splash.innerRad;
+			float outerRadius = splash.outerRad;
+			float xInner;
+			float zInner;
+			float xOuter;
+			float zOuter;
+			float x2Inner;
+			float z2Inner;
+			float x2Outer;
+			float z2Outer;
+			float yInner = splash.y;
+			float yOuter = splash.y - splash.height;
+			for (int i = 0; i < NUM_POINTS; i++) {
+				xInner = innerRadius * sin(alpha * i * PI / 180);
+				zInner = innerRadius * cos(alpha * i * PI / 180);
+				xOuter = outerRadius * sin(alpha * i * PI / 180);
+				zOuter = outerRadius * cos(alpha * i * PI / 180);
+				xInner += splash.x;
+				zInner += splash.z;
+				xOuter += splash.x;
+				zOuter += splash.z;
+				int j = (i + 1) % NUM_POINTS;
+				x2Inner = innerRadius * sin(alpha * j * PI / 180);
+				x2Inner += splash.x;
+				z2Inner = innerRadius * cos(alpha * j * PI / 180);
+				z2Inner += splash.z;
+				x2Outer = outerRadius * sin(alpha * j * PI / 180);
+				x2Outer += splash.x;
+				z2Outer = outerRadius * cos(alpha * j * PI / 180);
+				z2Outer += splash.z;
+				addSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], xOuter, yOuter, zOuter, x2Outer, yOuter, z2Outer, x2Inner, yInner, z2Inner, xInner, yInner, zInner, color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 			}
 		}
 	}
@@ -7006,7 +6957,7 @@ void Renderer11::drawUnderwaterDust()
 		dust->Life++;
 		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], dust->X, dust->Y, dust->Z, color, color, color, 0.0f, 1.0f, UNDERWATER_DUST_PARTICLES_SIZE, UNDERWATER_DUST_PARTICLES_SIZE, BLENDMODE_ALPHABLEND);
+		addSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], dust->X, dust->Y, dust->Z, color, color, color, 0.0f, 1.0f, 12, 12, BLENDMODE_ALPHABLEND);
 
 		if (dust->Life >= 32)
 			dust->Reset = true;

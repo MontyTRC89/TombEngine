@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include "enums.h"
 
+#include <fixed_point.h>
 #pragma pack(push, 1)
 typedef enum TYPE_ZONE
 {
@@ -1012,39 +1013,38 @@ struct BUBBLE_STRUCT
 {
 	PHD_VECTOR pos; // size=12, offset=0
 	short roomNumber; // size=0, offset=12
-	short speed; // size=0, offset=14
+	numeric::Fixed<9, 7> speed; // size=0, offset=14
 	short size; // size=0, offset=16
 	short dsize; // size=0, offset=18
 	unsigned char shade; // size=0, offset=20
-	unsigned char vel; // size=0, offset=21
+	numeric::Fixed<4, 4> vel; // size=0, offset=21
 	unsigned char yRot; // size=0, offset=22
 	byte flags; // size=0, offset=23
-	short xVel; // size=0, offset=24
-	short yVel; // size=0, offset=26
-	short zVel; // size=0, offset=28
+	numeric::Fixed<6,2> xVel; // size=0, offset=24
+	numeric::Fixed<6, 2> yVel; // size=0, offset=26
+	numeric::Fixed<6, 2> zVel; // size=0, offset=28
 	short pad; // size=0, offset=30
 };
 
 struct SPLASH_STRUCT
 {
-	int x; // size=0, offset=0
-	int y; // size=0, offset=4
-	int z; // size=0, offset=8
-	short innerRad; // size=0, offset=12
-	short innerSize; // size=0, offset=14
-	short innerRadVel; // size=0, offset=16
-	short innerYVel; // size=0, offset=18
-	short innerY; // size=0, offset=20
-	short middleRad; // size=0, offset=22
-	short middleSize; // size=0, offset=24
-	short middleRadVel; // size=0, offset=26
-	short middleYVel; // size=0, offset=28
-	short middleY; // size=0, offset=30
-	short outerRad; // size=0, offset=32
-	short outerSize; // size=0, offset=34
-	short outerRadVel; // size=0, offset=36
-	byte flags; // size=0, offset=38
-	unsigned char life; // size=0, offset=39
+	float x;
+	float y;
+	float z;
+	float innerRad;
+	float innerRadVel;
+	float heightVel;
+	float heightSpeed;
+	float height;
+	float outerRad;
+	float outerRadVel;
+	float animationSpeed;
+	float animationPhase;
+	short spriteSequenceStart;
+	short spriteSequenceEnd;
+	unsigned short life;
+	bool isRipple;
+	bool isActive;
 };
 
 struct DRIP_STRUCT
@@ -1077,23 +1077,11 @@ struct RIPPLE_STRUCT
 
 struct SPLASH_SETUP
 {
-	int x; // size=0, offset=0
-	int y; // size=0, offset=4
-	int z; // size=0, offset=8
-	short innerRad; // size=0, offset=12
-	short innerSize; // size=0, offset=14
-	short innerRadVel; // size=0, offset=16
-	short innerYVel; // size=0, offset=18
-	short pad1; // size=0, offset=20
-	short middleRad; // size=0, offset=22
-	short middleSize; // size=0, offset=24
-	short middleRadVel; // size=0, offset=26
-	short middleYVel; // size=0, offset=28
-	short pad2; // size=0, offset=30
-	short outerRad; // size=0, offset=32
-	short outerSize; // size=0, offset=34
-	short outerRadVel; // size=0, offset=36
-	short pad3; // size=0, offset=38
+	float x;
+	float y;
+	float z;
+	float splashPower;
+	float innerRadius;
 };
 
 struct FIRE_LIST
@@ -1146,20 +1134,20 @@ struct SMOKE_SPARKS
 	int x; // size=0, offset=0
 	int y; // size=0, offset=4
 	int z; // size=0, offset=8
-	short xVel; // size=0, offset=12
-	short yVel; // size=0, offset=14
-	short zVel; // size=0, offset=16
-	short gravity; // size=0, offset=18
+	numeric::Fixed<12 ,4> xVel; // size=0, offset=12
+	numeric::Fixed<12, 4> yVel; // size=0, offset=14
+	numeric::Fixed<12, 4> zVel; // size=0, offset=16
+	numeric::Fixed<8, 8> gravity; // size=0, offset=18
 	short rotAng; // size=0, offset=20
 	short flags; // size=0, offset=22
 	byte sSize; // size=0, offset=24
 	byte dSize; // size=0, offset=25
 	byte size; // size=0, offset=26
-	byte friction; // size=0, offset=27
+	numeric::Fixed<2,6> friction; // size=0, offset=27
 	byte scalar; // size=0, offset=28
 	byte def; // size=0, offset=29
 	byte rotAdd; // size=0, offset=30
-	byte maxYvel; // size=0, offset=31
+	numeric::Fixed<4, 4> maxYvel; // size=0, offset=31
 	byte on; // size=0, offset=32
 	byte sShade; // size=0, offset=33
 	byte dShade; // size=0, offset=34
