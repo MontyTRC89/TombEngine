@@ -15,6 +15,13 @@ extern LaraExtraInfo g_LaraExtra;
 void FlareControl(short itemNumber)//4A418, 4A87C
 {
 	ITEM_INFO* item = &Items[itemNumber];
+
+	if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+	{
+		KillItem(itemNumber);
+		return;
+	}
+
 	if (item->fallspeed)
 	{
 		item->pos.xRot += ANGLE(3);
