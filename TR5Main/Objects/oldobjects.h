@@ -63,3 +63,5 @@ void ControlImp(short itemNumber);
 void ControlGladiator(short itemNumber);
 void ControlBrowsBeast(short itemNumber);
 void ControlInvisibleGhost(short itemNumber);
+short GetNextRat();
+void ControlLittleRats(short itemNumber);
