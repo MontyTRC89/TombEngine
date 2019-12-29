@@ -1610,30 +1610,6 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
-	// TODO: the chef not exist anymore !!!
-	/*
-	obj = &Objects[ID_SAS_CAIRO];
-	if (obj->loaded)
-	{
-		obj->biteOffset = 0;
-		obj->initialise = InitialiseChef;
-		obj->collision = CreatureCollision;
-		obj->control = ControlChef;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 35;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-	}
-	*/
 	obj = &Objects[ID_TWOGUN];
 	if (obj->loaded)
 	{
