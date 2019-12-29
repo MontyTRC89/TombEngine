@@ -7,19 +7,19 @@
 #include "tomb4fx.h"
 #include "switch.h"
 
-short LastSequence;
-short SpotcamTimer;
-short SpotcamLoopCnt;
+int LastSequence;
+int SpotcamTimer;
+int SpotcamLoopCnt;
 int CameraFade;
 PHD_VECTOR LaraFixedPosition;
-short InitialCameraRoom;
-short LastFOV;
+int InitialCameraRoom;
+int LastFOV;
 PHD_VECTOR InitialCameraPosition;
 PHD_VECTOR InitialCameraTarget;
 int CurrentSplinePosition;
 int SplineToCamera;
-short FirstCamera;
-short LastCamera;
+int FirstCamera;
+int LastCamera;
 int CurrentCameraCnt;
 int CameraXposition[MAX_CAMERA];
 int CameraYposition[MAX_CAMERA];
@@ -33,6 +33,17 @@ int CameraSpeed[MAX_CAMERA];
 QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
 int Unk_0051D024;
+short CurrentSplineCamera;
+byte SpotCamRemap[16];
+byte CameraCnt[16];
+int LastSpotCam;
+int LaraHealth;
+int LaraAir;
+int CurrentSpotcamSequence;
+SPOTCAM SpotCam[64];
+int NumberSpotcams;
+
+extern Renderer11* g_Renderer;
 
 void InitSpotCamSequences() 
 {
@@ -150,6 +161,7 @@ void InitialiseSpotCam(short Sequence)
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS) /*|| gfGameMode == 1*/)
 	{
 		DisableLaraControl = 1;
+		g_Renderer->EnableCinematicBars(true);
 		//SetFadeClip(16, 1);
 	}
 
@@ -394,11 +406,9 @@ void CalculateSpotCameras()
 	cpx = Spline(CurrentSplinePosition, &CameraXposition[1], spline_cnt);
 	cpy = Spline(CurrentSplinePosition, &CameraYposition[1], spline_cnt);
 	cpz = Spline(CurrentSplinePosition, &CameraZposition[1], spline_cnt);
-
 	ctx = Spline(CurrentSplinePosition, &CameraXtarget[1], spline_cnt);
 	cty = Spline(CurrentSplinePosition, &CameraYtarget[1], spline_cnt);
 	ctz = Spline(CurrentSplinePosition, &CameraZtarget[1], spline_cnt);
-
 	cspeed = Spline(CurrentSplinePosition, &CameraSpeed[1], spline_cnt);
 	croll = Spline(CurrentSplinePosition, &CameraRoll[1], spline_cnt);
 	cfov = Spline(CurrentSplinePosition, &CameraFOV[1], spline_cnt);
@@ -472,7 +482,7 @@ void CalculateSpotCameras()
 			}
 
 			temp >>= 1;
-			sp = cp - 2 * (temp & 0xFFFE); // << 2 ?
+			sp = cp - 2 * (temp & 0xFE); // << 2 ?
 
 			if (sp < 0)
 				sp = 0;
@@ -667,9 +677,12 @@ void CalculateSpotCameras()
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS))
 					{
 						//SetFadeClip(16, 1);
+						if (CurrentLevel)
+							g_Renderer->EnableCinematicBars(true);
 						DisableLaraControl = true;
 					}
 
+					int sp2 = 0;
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_CUT_TO_CAM))
 					{
 						cn = (SpotCam[CurrentSplineCamera].timer & 0xF) + FirstCamera;
@@ -683,9 +696,11 @@ void CalculateSpotCameras()
 						CameraRoll[1] = SpotCam[cn].roll;
 						CameraFOV[1] = SpotCam[cn].fov;
 						CameraSpeed[1] = SpotCam[cn].speed;
-						sp++;
+						sp2 = 1;
 						CurrentSplineCamera = cn;
 					}
+
+					sp = sp2 + 1;
 
 					CameraXposition[sp] = SpotCam[cn].x;
 					CameraYposition[sp] = SpotCam[cn].y;
@@ -734,7 +749,7 @@ void CalculateSpotCameras()
 
 				CurrentSplineCamera++;
 
-				if (LastCamera > CurrentSplineCamera)
+				if (LastCamera >= CurrentSplineCamera)
 				{
 					return;
 				}
@@ -764,6 +779,7 @@ void CalculateSpotCameras()
 					}
 
 					//SetFadeClip(0, 1);
+					g_Renderer->EnableCinematicBars(false);
 
 					UseSpotCam = 0;
 					DisableLaraControl = 0;
@@ -873,6 +889,7 @@ void CalculateSpotCameras()
 	}
 	else
 	{
+		g_Renderer->EnableCinematicBars(false);
 		UseSpotCam = false;
 		DisableLaraControl = false;
 		Camera.speed = 1;
