@@ -922,7 +922,7 @@ void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			break;
 		}
 
-		if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		if (Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 		{
 			LaraItem->goalAnimState = QUAD_STATE_FALLOFF;
 			LaraItem->hitPoints = 0;
