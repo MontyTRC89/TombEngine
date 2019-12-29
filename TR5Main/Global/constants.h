@@ -27,7 +27,8 @@
 
 #define BOX_BLOCKED		(1 << 14) // unpassable for other enemies, always set for movable blocks & closed doors
 #define BOX_LAST		(1 << 15) // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
-#define GRAVITY 6
+#define GRAVITY			6
+#define SWAMP_GRAVITY	2
 
 #define NUM_SPRITES		256
 #define UNIT_SHADOW		256
