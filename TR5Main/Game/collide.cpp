@@ -1007,7 +1007,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
+void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight)
 {
 	int resetRoom;
 	if (objectHeight >= 0)
@@ -1032,14 +1032,13 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 	int z = zPos;
 
 	short tRoomNumber = roomNumber;
-	FLOOR_INFO* floor = GetFloor(xPos, yTop, zPos, &tRoomNumber);
+	FLOOR_INFO* floor = GetFloor(x, yTop, z, &tRoomNumber);
 	
-	int height, mheight;
-	mheight = height = GetFloorHeight(floor, xPos, yTop, zPos);
+	int height = GetFloorHeight(floor, x, yTop, z);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	int ceiling = GetCeiling(floor, xPos, yTop - LaraItem->fallspeed, zPos);
+	int ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1049,8 +1048,9 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 
 	coll->trigger = TriggerIndex;
 
-	coll->tiltX = GetTiltType(floor, xPos, LaraItem->pos.yPos, zPos);
-	coll->tiltZ = coll->tiltX >> 8;
+	int tilt = GetTiltType(floor, x, LaraItem->pos.yPos, z);
+	coll->tiltX = tilt;
+	coll->tiltZ = tilt >> 8;
 	
 	int xright, xleft, zright, zleft;
 
@@ -1107,11 +1107,11 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 	
 	floor = GetFloor(x, yTop, z, &tRoomNumber);
 	
-	int fheight = height = GetFloorHeight(floor, x, yTop, z);
+	height = GetFloorHeight(floor, x, yTop, z);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop, z);
+	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1155,7 +1155,7 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop, z);
+	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1170,15 +1170,13 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 	else if (coll->lavaIsPit && coll->leftFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
 		coll->leftFloor = 512;
 
-	x = xPos + xleft;
-	z = zPos + zleft;
 	floor = GetFloor(x, yTop, z, &tRoomNumber);
 
 	height = GetFloorHeight(floor, x, yTop, z);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop, z);
+	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1202,7 +1200,7 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop, z);
+	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1217,15 +1215,13 @@ void _GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNu
 	else if (coll->lavaIsPit && coll->rightFloor > 0 && TriggerIndex && (*(TriggerIndex)& DATA_TYPE) == LAVA_TYPE)
 		coll->rightFloor = 512;
 
-	x = xPos + xright;
-	z = zPos + zright;
 	floor = GetFloor(x, yTop, z, &tRoomNumber);
 
 	height = GetFloorHeight(floor, x, yTop, z);
 	if (height != NO_HEIGHT)
 		height -= yPos;
 
-	ceiling = GetCeiling(floor, x, yTop, z);
+	ceiling = GetCeiling(floor, x, yTop - LaraItem->fallspeed, z);
 	if (ceiling != NO_HEIGHT)
 		ceiling -= y;
 
@@ -1456,5 +1452,5 @@ void Inject_Collide()
 	INJECT(0x00411DB0, CollideStaticObjects);
 	INJECT(0x00413CF0, GetCollidedObjects);
 	INJECT(0x00410EF0, GetTiltType);
-	//INJECT(0x00411100, _GetCollisionInfo);
+	INJECT(0x00411100, GetCollisionInfo);
 }

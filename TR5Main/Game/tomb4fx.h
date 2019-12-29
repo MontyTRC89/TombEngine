@@ -65,5 +65,6 @@ void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int ve
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int num);
 int GetFreeSpider();
+void SetFadeClip(short height, short speed);
 
 void Inject_Tomb4FX();
