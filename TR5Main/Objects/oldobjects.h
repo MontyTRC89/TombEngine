@@ -3,7 +3,7 @@
 
 //#define ControlGuard ((void (__cdecl*)(short)) 0x0046F5E0)
 #define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
-#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
+//#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
 #define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
 #define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
 #define ControlLarson ((void (__cdecl*)(short)) 0x0046A080)
@@ -55,3 +55,4 @@ int TestBlockMovable(ITEM_INFO* item, int blokhite);
 int TestBlockPush(ITEM_INFO* item, int blokhite, unsigned short quadrant);
 int TestBlockPull(ITEM_INFO* item, int blokhite, short quadrant);
 void ControlGuard(short itemNum);
+void ControlDoberman(short itemNumber);
