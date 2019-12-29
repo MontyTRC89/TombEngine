@@ -55,8 +55,78 @@ void AlterFOV(int value)
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
 }
 
+int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
+{
+	int x, y, z, dx, dy, dz, i, h, c;
+	short room, room2;
+	FLOOR_INFO* floor;
+	int flag, result;
+
+	x = start->x;
+	y = start->y;
+	z = start->z;
+	room = start->roomNumber;
+	dx = target->x - x >> 3;
+	dy = target->y - y >> 3;
+	dz = target->z - z >> 3;
+	flag = 0;
+	result = 0;
+	for (i = 0; i < 8; ++i)
+	{
+		room2 = room;
+		floor = GetFloor(x, y, z, &room);
+		h = GetFloorHeight(floor, x, y, z);
+		c = GetCeiling(floor, x, y, z);
+		if (h != NO_HEIGHT && c != NO_HEIGHT && c < h)
+		{
+			if (y > h)
+			{
+				if (y - h >= push)
+				{
+					flag = 1;
+					break;
+				}
+				y = h;
+			}
+			if (y < c) {
+				if (c - y >= push)
+				{
+					flag = 1;
+					break;
+				}
+				y = c;
+			}
+			result = 1;
+		}
+		else if (result)
+		{
+			flag = 1;
+			break;
+		}
+		x += dx;
+		y += dy;
+		z += dz;
+	}
+
+	if (i)
+	{
+		x -= dx;
+		y -= dy;
+		z -= dz;
+	}
+
+	GetFloor(x, y, z, &room2);
+	target->x = x;
+	target->y = y;
+	target->z = z;
+	target->roomNumber = room2;
+
+	return flag == 0;
+}
+
 void Inject_Camera()
 {
 	INJECT(0x0048EDC0, AlterFOV);
 	INJECT(0x0048F760, LookAt);
+	INJECT(0x0040FA70, mgLOS);
 }

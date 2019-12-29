@@ -9,7 +9,6 @@
 #define Sync ((int (__cdecl*)()) 0x004D1A40)
 #define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
 #define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
-#define Sub_0042A050 ((void (__cdecl*)()) 0x0042A050)  
 #define IsRoomOutside ((int (__cdecl*)(int, int, int)) 0x00418E90) 
 #define DrawBaddieGunFlash ((void (__cdecl*)(ITEM_INFO*)) 0x00466880)
 #define sub_42B4C0 ((void (__cdecl*)(ITEM_INFO*,short*)) 0x0042B4C0)

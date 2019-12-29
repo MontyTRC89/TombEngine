@@ -6,6 +6,7 @@
 #include "..\Game\lot.h"
 #include "..\Game\Lara.h"
 #include "..\Game\savegame.h"
+#include "..\Game\spotcam.h"
 #include "..\Scripting\GameFlowScript.h"
 
 #include "IO/ChunkId.h"
