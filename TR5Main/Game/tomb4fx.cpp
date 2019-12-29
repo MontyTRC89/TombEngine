@@ -439,32 +439,33 @@ void UpdateSmoke()
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
-			spark->yVel += spark->gravity;
-
-			if (spark->maxYvel)
+			spark->yVel -= spark->gravity.to_float();
+			
+			if (spark->maxYvel != 0)
 			{
-				if ((spark->yVel < 0 && spark->yVel < (spark->maxYvel << 5)) ||
-					(spark->yVel > 0 && spark->yVel > (spark->maxYvel << 5)))
-					spark->yVel = spark->maxYvel << 5;
-			}
-
-			if (spark->friction & 0xF)
-			{
-				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
-				spark->zVel -= spark->zVel >> (spark->friction & 0xF);
+				if (spark->yVel < 0) {
+					if (-spark->yVel.to_float() > (spark->maxYvel)) {
+						spark->yVel = -spark->maxYvel.to_float();
+					}
+				}
+				else {
+					if (spark->yVel.to_float() > (spark->maxYvel)) {
+						spark->yVel = spark->maxYvel.to_float();
+					}
+				}
 			}
 			
-			if (spark->friction & 0xF0)
-				spark->yVel -= spark->yVel >> (spark->friction >> 4);
-
-			spark->x += spark->xVel >> 5;
-			spark->y += spark->yVel >> 5;
-			spark->z += spark->zVel >> 5;
+			spark->xVel -= spark->xVel * spark->friction.to_float();
+			spark->zVel -= spark->zVel * spark->friction.to_float();
+			spark->yVel -= spark->yVel * spark->friction.to_float();
+			spark->x += spark->xVel.to_float();
+			spark->y += spark->yVel.to_float();
+			spark->z += spark->zVel.to_float();
 
 			if (spark->flags & SP_WIND)
 			{
 				spark->x += SmokeWindX >> 1;
-				spark->z += SmokeWindZ >> 1;
+				spark->z += SmokeWindZ>>1;
 			}
 
 			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);
@@ -519,9 +520,10 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	}
 	else
 	{
-		spark->xVel = ((GetRandomControl() & 511) - 256) >> 1;
-		spark->yVel = ((GetRandomControl() & 511) - 256) >> 1;
-		spark->zVel = ((GetRandomControl() & 511) - 256) >> 1;
+		float f = (frand() * 6) - 3;
+		spark->xVel = (frand() * 6) - 3;
+		spark->yVel = (frand() * 6) - 3;
+		spark->zVel = (frand() * 6) - 3;
 	}
 
 	spark->friction = 4;
@@ -548,9 +550,9 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	{
 		spark->flags = 0;
 	}
-
-	spark->gravity = -(GetRandomControl() & 1) - 2;
-	spark->maxYvel = -(GetRandomControl() & 1) - 2;
+	float gravity = frand() * 1.25f;
+	spark->gravity = gravity;
+	spark->maxYvel = frand() * 16;
 
 	byte size = ((GetRandomControl() & 0x0F) + 24); // -TriggerGunSmoke_SubFunction(weaponType);
 
@@ -942,9 +944,9 @@ void UpdateGunShells()
 			gs->pos.yRot += gs->speed * ANGLE(1);
 			gs->pos.zRot += ANGLE(23);
 
-			gs->pos.xPos += gs->speed * 2 * SIN(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.xPos += gs->speed * SIN(gs->dirXrot) >> W2V_SHIFT;
 			gs->pos.yPos += gs->fallspeed;
-			gs->pos.zPos += gs->speed * 2 * COS(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.zPos += gs->speed * COS(gs->dirXrot) >> W2V_SHIFT;
 
 			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
 			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
@@ -1072,12 +1074,12 @@ void CreateBubble(PHD_VECTOR * pos, short roomNum, int unk1, int unk2, int flags
 		BUBBLE_STRUCT* bubble = &Bubbles[GetFreeBubble()];
 		bubble->pos = *pos;
 		bubble->roomNumber = roomNum;
-		bubble->speed = GetRandomControl() + 64;
+		bubble->speed = frand();
 		bubble->shade = 0;
-		int size = 2 * (unk1 + (unk2 & GetRandomControl()));
+		int size = rand() % 4 + 6;
 		bubble->size = size;
 		bubble->dsize = 16 * size;
-		bubble->vel = (GetRandomControl() & 0x1F) + 32;
+		bubble->vel = (frand()*0.8f)+0.2f;
 		bubble->flags = flags;
 		bubble->xVel = xv;
 		bubble->yVel = yv;
@@ -1125,24 +1127,24 @@ void UpdateBubbles()
 
 		if (bubble->size)
 		{
-			bubble->speed += bubble->vel;
+			bubble->speed += bubble->vel.to_float();
 			bubble->yRot += 6;
-			bubble->pos.y -= bubble->speed >> 8;
+			bubble->pos.y -= bubble->speed.to_float();
 
 			if (bubble->flags & 1)
 			{
-				bubble->pos.x += bubble->xVel >> 4;
-				bubble->pos.y += bubble->yVel >> 4;
-				bubble->pos.z += bubble->zVel >> 4;
+				bubble->pos.x += bubble->xVel.to_float();
+				bubble->pos.y += bubble->yVel.to_float();
+				bubble->pos.z += bubble->zVel.to_float();
 
-				bubble->xVel -= (bubble->xVel >> 3);
-				bubble->yVel -= (bubble->yVel >> 3);
-				bubble->zVel -= (bubble->zVel >> 3);
+				bubble->xVel -= (bubble->xVel.to_float()/2.0f);
+				bubble->yVel -= (bubble->yVel.to_float()/2.0f);
+				bubble->zVel -= (bubble->zVel.to_float()/2.0f);
 			}
 			else
 			{
-				bubble->pos.x += SIN(bubble->yRot) >> W2V_SHIFT;
-				bubble->pos.z += COS(bubble->yRot) >> W2V_SHIFT;
+				bubble->pos.x += sin(bubble->yRot)*5;
+				bubble->pos.z += cos(bubble->yRot)*5;
 			}
 
 			short roomNumber = bubble->roomNumber;
@@ -1908,16 +1910,6 @@ void TriggerSmallSplash(int x, int y, int z, int num)// (F)
 		sptr->maxYvel = 0;
 		sptr->gravity = (GetRandomControl() & 0xF) + 64;
 	}
-}
-
-void SetFadeClip(short height, short speed)
-{
-	/*__int16 result; // ax
-
-	result = a1;
-	DestFadeScreenHeight = a1;
-	FadeClipSpeed = a2;
-	return result;*/
 }
 
 void Inject_Tomb4FX()
