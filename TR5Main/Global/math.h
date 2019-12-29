@@ -26,4 +26,8 @@
 short ANGLE(double angle);
 float ANGLEF(short angle);
 // returns a float between 0-1
-float frand();
+const float frand();
+
+const float frandMinMax(float min, float max);
+
+const float lerp(float v0, float v1, float t);

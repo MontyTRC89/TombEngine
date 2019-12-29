@@ -1028,24 +1028,23 @@ struct BUBBLE_STRUCT
 
 struct SPLASH_STRUCT
 {
-	int x; // size=0, offset=0
-	int y; // size=0, offset=4
-	int z; // size=0, offset=8
-	short innerRad; // size=0, offset=12
-	short innerSize; // size=0, offset=14
-	short innerRadVel; // size=0, offset=16
-	short innerYVel; // size=0, offset=18
-	short innerY; // size=0, offset=20
-	short middleRad; // size=0, offset=22
-	short middleSize; // size=0, offset=24
-	short middleRadVel; // size=0, offset=26
-	short middleYVel; // size=0, offset=28
-	short middleY; // size=0, offset=30
-	short outerRad; // size=0, offset=32
-	short outerSize; // size=0, offset=34
-	short outerRadVel; // size=0, offset=36
-	byte flags; // size=0, offset=38
-	unsigned char life; // size=0, offset=39
+	float x;
+	float y;
+	float z;
+	float innerRad;
+	float innerRadVel;
+	float heightVel;
+	float heightSpeed;
+	float height;
+	float outerRad;
+	float outerRadVel;
+	float animationSpeed;
+	float animationPhase;
+	short spriteSequenceStart;
+	short spriteSequenceEnd;
+	unsigned short life;
+	bool isRipple;
+	bool isActive;
 };
 
 struct DRIP_STRUCT
@@ -1078,23 +1077,12 @@ struct RIPPLE_STRUCT
 
 struct SPLASH_SETUP
 {
-	int x; // size=0, offset=0
-	int y; // size=0, offset=4
-	int z; // size=0, offset=8
-	short innerRad; // size=0, offset=12
-	short innerSize; // size=0, offset=14
-	short innerRadVel; // size=0, offset=16
-	short innerYVel; // size=0, offset=18
-	short pad1; // size=0, offset=20
-	short middleRad; // size=0, offset=22
-	short middleSize; // size=0, offset=24
-	short middleRadVel; // size=0, offset=26
-	short middleYVel; // size=0, offset=28
-	short pad2; // size=0, offset=30
-	short outerRad; // size=0, offset=32
-	short outerSize; // size=0, offset=34
-	short outerRadVel; // size=0, offset=36
-	short pad3; // size=0, offset=38
+	float x;
+	float y;
+	float z;
+	float splashPower;
+	float innerRadius;
+
 };
 
 struct FIRE_LIST
