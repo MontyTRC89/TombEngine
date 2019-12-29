@@ -7,6 +7,7 @@
 #include "../../Game/draw.h"
 
 BITE_INFO swatGun = { 0x50, 0xC8, 0x0D, 0 };
+BITE_INFO SniperGun = { 0, 0x1E0, 0x6E, 0x0D };
 
 void InitialiseGuard(short itemNum)
 {
@@ -897,5 +898,117 @@ void ControlGuard(short itemNum)
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 		}
+	}
+}
+
+void ControlGuardM16(short itemNumber)
+{
+	if (CreatureActive(itemNumber))
+	{
+		short angle = 0;
+		short joint0 = 0;
+		short joint2 = 0;
+		short joint1 = 0;
+
+		ITEM_INFO* item = &Items[itemNumber];
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+		if (item->firedWeapon)
+		{
+			PHD_VECTOR pos;
+
+			pos.x = SniperGun.x;
+			pos.y = SniperGun.y;
+			pos.z = SniperGun.z;
+
+			GetJointAbsPosition(item, &pos, SniperGun.meshNum);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 10, 192, 128, 32);
+
+			item->firedWeapon--;
+		}
+
+		if (item->hitPoints > 0)
+		{
+			if (item->aiBits)
+			{
+				GetAITarget(creature);
+			}
+			else if (creature->hurtByLara)
+			{
+				creature->enemy = LaraItem;
+			}
+
+			AI_INFO info;
+			CreatureAIInfo(item, &info);
+
+			GetCreatureMood(item, &info, VIOLENT);
+			CreatureMood(item, &info, VIOLENT);
+
+			angle = CreatureTurn(item, creature->maximumTurn);
+
+			if (info.ahead)
+			{
+				joint0 = info.angle >> 1;
+				joint2 = info.angle >> 1;
+				joint1 = info.xAngle;
+			}
+
+			creature->maximumTurn = 0;
+
+			switch (item->currentAnimState)
+			{
+			case 1:
+				item->meshBits = 0;
+				if (TargetVisible(item, &info))
+					item->goalAnimState = 2;
+				break;
+
+			case 2:
+				item->meshBits = -1;
+				break;
+
+			case 3:
+				creature->flags = 0;
+				if (!TargetVisible(item, &info)
+					|| item->hitStatus
+					&& GetRandomControl() & 1)
+				{
+					item->goalAnimState = 5;
+				}
+				else if (!(GetRandomControl() & 0x1F))
+				{
+					item->goalAnimState = 4;
+				}
+				break;
+
+			case 4:
+				if (!creature->flags)
+				{
+					ShotLara(item, &info, &SniperGun, joint0, 100);
+					creature->flags = 1;
+					item->firedWeapon = 2;
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+		else
+		{
+			item->hitPoints = 0;
+			if (item->currentAnimState != 6)
+			{
+				item->animNumber = Objects[ID_SNIPER].animIndex + 5;
+				item->currentAnimState = 6;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+			}
+		}
+
+		CreatureTilt(item, 0);
+		CreatureJoint(item, 0, joint0);
+		CreatureJoint(item, 1, joint1);
+		CreatureJoint(item, 2, joint2);
+		CreatureAnimation(itemNumber, angle, 0);
 	}
 }

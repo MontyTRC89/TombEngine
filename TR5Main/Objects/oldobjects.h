@@ -5,10 +5,10 @@
 #define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
 //#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
 #define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
-#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
+//#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
 #define ControlLarson ((void (__cdecl*)(short)) 0x0046A080)
 #define ControlCyborg ((void (__cdecl*)(short)) 0x0043A340)
-#define ControlGuardM16 ((void (__cdecl*)(short)) 0x00478250)
+//#define ControlGuardM16 ((void (__cdecl*)(short)) 0x00478250)
 #define InitialiseChef ((void (__cdecl*)(short)) 0x00410990) // not used anymore !
 #define ControlChef ((void (__cdecl*)(short)) 0x00410A60)    // not used anymore !
 #define ControlGuardLaser ((void (__cdecl*)(short)) 0x0048CDD0)
@@ -56,3 +56,5 @@ int TestBlockPush(ITEM_INFO* item, int blokhite, unsigned short quadrant);
 int TestBlockPull(ITEM_INFO* item, int blokhite, short quadrant);
 void ControlGuard(short itemNum);
 void ControlDoberman(short itemNumber);
+void ControlReaper(short itemNumber);
+void ControlGuardM16(short itemNumber);
