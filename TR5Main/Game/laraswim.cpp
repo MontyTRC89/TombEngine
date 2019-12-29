@@ -144,12 +144,12 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 		}
 	} while (roomIndex != NO_ROOM);
 
-	if (r->flags & ENV_FLAG_WATER)
+	if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 	{
 		while (floor->skyRoom != NO_ROOM)
 		{
 			r = &Rooms[floor->skyRoom];
-			if (!(r->flags & ENV_FLAG_WATER))
+			if (!(r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP)))
 			{
 				int wh = floor->ceiling << 8;
 				floor = GetFloor(x, y, z, &roomNumber);
@@ -164,7 +164,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 		while (floor->pitRoom != NO_ROOM)
 		{
 			r = &Rooms[floor->pitRoom];
-			if (r->flags & ENV_FLAG_WATER)
+			if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 			{
 				int wh = floor->floor << 8;
 				floor = GetFloor(x, y, z, &roomNumber);
