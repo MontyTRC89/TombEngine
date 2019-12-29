@@ -456,7 +456,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 			spark->gravity = -4 - ((random >> 9) & 3);
 			spark->sSize = spark->size= ((random >> 5) & 7) + 4;
 			spark->maxYvel = -4 - ((random >> 6) & 3);
-			spark->dSize = 4 * spark->size;
+			spark->dSize = spark->size;
 		}
 	}
 }

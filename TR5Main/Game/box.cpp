@@ -9,6 +9,7 @@
 #include "draw.h"
 #include "sphere.h"
 #include "misc.h"
+#include "control.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

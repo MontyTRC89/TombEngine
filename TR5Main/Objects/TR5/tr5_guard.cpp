@@ -310,6 +310,7 @@ void ControlGuard(short itemNum)
 		src.x = item->pos.xPos;
 		src.y = item->pos.yPos - 384;
 		src.z = item->pos.zPos;
+		src.roomNumber = item->roomNumber;
 
 		short* frame = GetBestFrame(LaraItem);
 
