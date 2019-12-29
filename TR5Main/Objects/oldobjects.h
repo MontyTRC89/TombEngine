@@ -13,7 +13,7 @@
 #define ControlChef ((void (__cdecl*)(short)) 0x00410A60)    // not used anymore !
 #define ControlGuardLaser ((void (__cdecl*)(short)) 0x0048CDD0)
 #define ControlHydra ((void (__cdecl*)(short)) 0x0043BF70)
-#define ControlImp ((void (__cdecl*)(short)) 0x0043BEA0)
+//#define ControlImp ((void (__cdecl*)(short)) 0x0043BEA0)
 #define ControlLightingGuide ((void (__cdecl*)(short)) 0x0048E580)
 #define ControlBrowsBeast ((void (__cdecl*)(short)) 0x0048E960)
 #define InitialiseLagoonWitch ((void (__cdecl*)(short)) 0x0047D2D0) // not used anymore !
@@ -58,3 +58,5 @@ void ControlGuard(short itemNum);
 void ControlDoberman(short itemNumber);
 void ControlReaper(short itemNumber);
 void ControlGuardM16(short itemNumber);
+void ImpThrowStones(ITEM_INFO* item);
+void ControlImp(short itemNumber);
