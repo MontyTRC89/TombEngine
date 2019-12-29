@@ -44,8 +44,8 @@ void ArmedBaddy2Control(short itemNum)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	int dx = 870 * SIN(item->pos.yRot) >> 14;
-	int dz = 870 * COS(item->pos.yRot) >> 14;
+	int dx = 870 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	int dz = 870 * COS(item->pos.yRot) >> W2V_SHIFT;
 
 	x += dx;
 	z += dz;
@@ -125,6 +125,7 @@ void ArmedBaddy2Control(short itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
+
 			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
@@ -133,7 +134,7 @@ void ArmedBaddy2Control(short itemNum)
 		CreatureMood(item, &info, creature->enemy != LaraItem);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
-		//creature->enemy = LaraItem;
+		creature->enemy = LaraItem;
 
 		if (laraInfo.distance < SQUARE(2048) && LaraItem->speed > 20 || item->hitStatus || TargetVisible(item, &laraInfo))
 		{
@@ -146,7 +147,7 @@ void ArmedBaddy2Control(short itemNum)
 		
 		switch (item->currentAnimState)
 		{
-		case 0:
+		case 1:
 			creature->LOT.isJumping = false;
 			joint2 = laraInfo.angle;
 			creature->flags = 0;
@@ -224,8 +225,8 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			break;
 
-		case 1:
-		case 31:
+		case 2:
+		case 32:
 			creature->maximumTurn = 0;
 			if (info.angle >= 0)
 				item->pos.yRot -= ANGLE(2);
@@ -243,7 +244,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			break;
 
-		case 2:
+		case 3:
 			joint0 = laraInfo.angle >> 1;
 			joint2 = laraInfo.angle >> 1;
 			if (info.ahead)
@@ -268,7 +269,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			break;
 
-		case 3:
+		case 4:
 			joint0 = laraInfo.angle >> 1;
 			joint2 = laraInfo.angle >> 1;
 			creature->flags = 0;
@@ -300,7 +301,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			break;
 
-		case 4:
+		case 5:
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(5);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
@@ -336,7 +337,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			break;
 
-		case 6:
+		case 7:
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(10);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
@@ -361,7 +362,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			break;
 
-		case 36:
+		case 37:
 			creature->maximumTurn = 0;
 			if (info.angle >= 0)
 				item->pos.yRot += ANGLE(2);
