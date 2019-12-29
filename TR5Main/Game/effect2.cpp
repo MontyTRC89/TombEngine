@@ -2,7 +2,7 @@
 #include "draw.h"
 #include "tomb4fx.h"
 #include "traps.h"
-
+#include "math.h"
 #include "..\Scripting\GameFlowScript.h"
 
 //long wibble;
@@ -1001,36 +1001,67 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 	}
 }
 
-void SetupSplash(SPLASH_SETUP* setup)
+void SetupSplash(const SPLASH_SETUP* const setup)
 {
+	constexpr size_t NUM_SPLASHES = 4;
+	int numSplashesSetup = 0;
+	float splashVelocity;
 	for (int i = 0; i < MAX_SPLASH; i++)
 	{
-		SPLASH_STRUCT* splash = &Splashes[i];
-
-		if (!(splash->flags & 1))
+		SPLASH_STRUCT& splash = Splashes[i];
+		if (!splash.isActive)
 		{
-			splash->flags = 1;
-			splash->x = setup->x;
-			splash->y = setup->y;
-			splash->z = setup->z;
-			splash->life = 62;
-			splash->innerRad = setup->innerRad;
-			splash->innerSize = setup->innerSize;
-			splash->innerRadVel = setup->innerRadVel;
-			splash->innerYVel = setup->innerYVel;
-			splash->innerY = setup->innerYVel >> 2;
-			splash->middleRad = setup->middleRad;
-			splash->middleSize = setup->middleSize;
-			splash->middleRadVel = setup->middleRadVel;
-			splash->middleYVel = setup->middleYVel;
-			splash->middleY = setup->middleYVel >> 2;
-			splash->outerRad = setup->outerRad;
-			splash->outerSize = setup->outerSize;
-			splash->outerRadVel = setup->outerRadVel;
+			if (numSplashesSetup == 0) {
+				splash.isActive = true;
+				splash.x = setup->x;
+				splash.y = setup->y;
+				splash.z = setup->z;
+				splash.life = 62;
+				splash.isRipple = false;
+				splash.innerRad = setup->innerRadius;
+				splashVelocity = setup->splashPower / 16;
+				splash.innerRadVel = splashVelocity;
+				splash.heightSpeed = setup->splashPower * 1.5f;
+				splash.height = 0;
+				splash.heightVel = -16;
+				splash.outerRad = setup->innerRadius / 6;
+				splash.outerRadVel = splashVelocity *2;
+				splash.spriteSequenceStart = 8; //Splash Texture
+				numSplashesSetup++;
+			}
+			else {
+				float thickness = frandMinMax(128,256);
+				splash.isActive = true;
+				splash.x = setup->x;
+				splash.y = setup->y;
+				splash.z = setup->z;
+				splash.isRipple = true;
+				float vel = (splashVelocity/2) + frandMinMax(3,16);
+				float innerRadius = 0;
+				splash.innerRad = innerRadius;
+				splash.innerRadVel = vel;
+				splash.outerRad = innerRadius + thickness;
+				splash.outerRadVel = vel;
+				splash.heightSpeed = 128;
+				splash.height = 0;
+				splash.heightVel = -16;
+				float t = vel / (splashVelocity / 2) + 16;
+				t = fmax(0, fmin(t, 1));
+				splash.life = lerp(48, 70, t);
+				splash.spriteSequenceStart = 4; //Splash Texture
+				splash.spriteSequenceEnd = 7; //Splash Texture
+				splash.animationSpeed = frandMinMax(0.05f, 0.15f);
 
-			break;
+				numSplashesSetup++;
+			}
+			if (numSplashesSetup == NUM_SPLASHES) {
+				break;
+			}
+			continue;
 		}
 	}
+
+
 
 	SoundEffect(SFX_LARA_SPLASH, (PHD_3DPOS*)setup, 0);
 }
@@ -1039,60 +1070,30 @@ void UpdateSplashes()
 {
 	for (int i = 0; i < MAX_SPLASH; i++)
 	{
-		SPLASH_STRUCT* splash = &Splashes[i];
-
-		if (splash->flags & 1)
-		{
-			splash->innerRad += splash->innerRadVel >> 5;
-			splash->innerSize += splash->innerRadVel >> 6;
-			splash->innerRadVel -= (splash->innerRadVel >> 6);
-
-			splash->middleRad += splash->middleRadVel >> 5;
-			splash->middleSize += splash->middleRadVel >> 6;
-			splash->middleRadVel -= splash->middleRadVel >> 6;
-
-			splash->outerRad += splash->outerRadVel >> 5;
-			splash->outerSize += splash->outerRadVel >> 6;
-			splash->outerRadVel -= splash->outerRadVel >> 6;
-
-			splash->innerY += splash->innerYVel >> 4;
-			splash->innerYVel += 1024;
-
-			if (splash->innerYVel > 16384)
-				splash->innerYVel = 16384;
-
-			if (splash->innerY < 0)
-			{
-				if (splash->innerY < -28672)
-					splash->innerY = -28672;
+		SPLASH_STRUCT& splash = Splashes[i];
+		if (splash.isActive) {
+			splash.life--;
+			if (splash.life <= 0) {
+				splash.isActive = false;
 			}
-			else
-			{
-				splash->innerY = 0;
-				splash->flags |= 4;
-				splash->life -= 2;
-
-				if (splash->life == 0)
-					splash->flags = 0;
+			splash.heightSpeed += splash.heightVel;
+			splash.height += splash.heightSpeed;
+			if (splash.height < 0) {
+				splash.height = 0;
+				if (!splash.isRipple) {
+					splash.isActive = false;
+				}
 			}
-
-			splash->middleY += splash->middleYVel >> 4;
-			splash->middleYVel += 896;
-
-			if (splash->middleYVel > 16384)
-				splash->middleYVel = 16384;
-
-			if (splash->middleY < 0)
-			{
-				if (splash->middleY < -28672)
-					splash->middleY = -28672;
-			}
-			else
-			{
-				splash->middleY = 0;
-				splash->flags |= 8;
+			splash.innerRad += splash.innerRadVel;
+			splash.outerRad += splash.outerRadVel;
+			splash.animationPhase += splash.animationSpeed;
+			short sequenceLength = splash.spriteSequenceEnd - splash.spriteSequenceStart;
+			if (splash.animationPhase > sequenceLength) {
+				splash.animationPhase = fmod(splash.animationPhase, sequenceLength);
 			}
 		}
+		
+		
 	}
 
 	for (int i = 0; i < MAX_RIPPLES; i++)
@@ -1389,17 +1390,8 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 						SplashSetup.y = wh;
 						SplashSetup.x = item->pos.xPos;
 						SplashSetup.z = item->pos.zPos;
-						SplashSetup.innerRad = 16;
-						SplashSetup.innerSize = 12;
-						SplashSetup.innerRadVel = 160;
-						SplashSetup.innerYVel = -72 * item->fallspeed;
-						SplashSetup.middleRad = 24;
-						SplashSetup.middleSize = 24;
-						SplashSetup.middleRadVel = 224;
-						SplashSetup.middleYVel = -36 * item->fallspeed;
-						SplashSetup.outerRad = 32;
-						SplashSetup.outerSize = 32;
-						SplashSetup.outerRadVel = 272;
+						SplashSetup.innerRadius = 16;
+						SplashSetup.splashPower = item->speed;
 						SetupSplash(&SplashSetup);
 						SplashCount = 16;
 					}
@@ -1421,17 +1413,8 @@ void Splash(ITEM_INFO* item)
 		SplashSetup.y = wh;
 		SplashSetup.x = item->pos.xPos;
 		SplashSetup.z = item->pos.zPos;
-		SplashSetup.innerRad = 32;
-		SplashSetup.innerSize = 8;
-		SplashSetup.innerRadVel = 320;
-		SplashSetup.innerYVel = -40 * item->fallspeed;
-		SplashSetup.middleRad = 48;
-		SplashSetup.middleSize = 32;
-		SplashSetup.middleRadVel = 480;
-		SplashSetup.middleYVel = -20 * item->fallspeed;
-		SplashSetup.outerRad = 32;
-		SplashSetup.outerSize = 128;
-		SplashSetup.outerRadVel = 544;
+		SplashSetup.splashPower = item->fallspeed;
+		SplashSetup.innerRadius = 64;
 		SetupSplash(&SplashSetup);
 	}
 }
@@ -1952,5 +1935,4 @@ void Inject_Effect2()
 	INJECT(0x00431530, ClearDynamicLights);
 	INJECT(0x00432A30, WadeSplash);
 	INJECT(0x00432900, Splash);
-	INJECT(0x00430620, SetupSplash);
 }

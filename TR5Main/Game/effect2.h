@@ -23,7 +23,7 @@
 //#define ControlWaterfallMist ((void (__cdecl*)(short)) 0x00432CA0)
 //#define TriggerRicochetSparks ((void (__cdecl*)(GAME_VECTOR*, short, int, int)) 0x0042F060)
 
-extern SPLASH_STRUCT Splashes[4];
+extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[32];
 extern int DeadlyBounds[6];
 extern SPARKS Sparks[1024];
@@ -43,7 +43,7 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
 void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly);
-void SetupSplash(SPLASH_SETUP* setup);
+void SetupSplash(const SPLASH_SETUP* const setup);
 void UpdateSplashes();
 void SetupRipple(int x, int y, int z, char size, char flags);
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
@@ -59,6 +59,4 @@ void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
 void WadeSplash(ITEM_INFO* item, int wh, int wd);
 void Splash(ITEM_INFO* item);
-void SetupSplash(SPLASH_SETUP* setup);
-
 void Inject_Effect2();
