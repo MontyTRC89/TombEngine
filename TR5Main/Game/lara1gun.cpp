@@ -1442,18 +1442,8 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item)
 			SplashSetup.y = wh;
 			SplashSetup.x = item->pos.xPos;
 			SplashSetup.z = item->pos.zPos;
-			SplashSetup.innerRadVel = 160;
-			SplashSetup.middleRadVel = 224;
-			SplashSetup.outerRadVel = 272;
-			SplashSetup.innerRad = (2048 - dy) >> 6 + 16;
-			SplashSetup.innerSize = (2048 - dy) >> 6 + 12;
-			SplashSetup.innerYVel = 8 * (-512 - (2048 - dy));
-			SplashSetup.middleRad = (2048 - dy) >> 6 + 24;
-			SplashSetup.middleSize = (2048 - dy) >> 6 + 24;
-			SplashSetup.middleYVel = 4 * (-768 - (2048 - dy));
-			SplashSetup.outerRad = (2048 - dy) >> 6 + 32;
-			SplashSetup.outerSize = (2048 - dy) >> 6 + 32;
-			
+			SplashSetup.innerRadius = 160;
+			SplashSetup.splashPower = 2048 - dy;
 			SetupSplash(&SplashSetup);
 		}
 	}
