@@ -35,7 +35,7 @@
 #define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
 //#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
 #define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
-#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
+//#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 #define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
 
 //#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
@@ -67,6 +67,10 @@ FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 void UpdateRats();
 void UpdateDebris();
 void UpdateBats();
+int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
+int xLOS(GAME_VECTOR* start, GAME_VECTOR* end);
+int zLOS(GAME_VECTOR* start, GAME_VECTOR* end);
+int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
