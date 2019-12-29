@@ -15,15 +15,15 @@
 #define ControlHydra ((void (__cdecl*)(short)) 0x0043BF70)
 //#define ControlImp ((void (__cdecl*)(short)) 0x0043BEA0)
 #define ControlLightingGuide ((void (__cdecl*)(short)) 0x0048E580)
-#define ControlBrowsBeast ((void (__cdecl*)(short)) 0x0048E960)
+//#define ControlBrowsBeast ((void (__cdecl*)(short)) 0x0048E960)
 #define InitialiseLagoonWitch ((void (__cdecl*)(short)) 0x0047D2D0) // not used anymore !
 #define ControlLagoonWitch ((void (__cdecl*)(short)) 0x0047D360)    // not used anymore !
-#define ControlInvisibleGhost ((void (__cdecl*)(short)) 0x00477AB0)
+//#define ControlInvisibleGhost ((void (__cdecl*)(short)) 0x00477AB0)
 #define InitialiseLittleBats ((void (__cdecl*)(short)) 0x00407EC0)
 #define ControlLittleBats ((void (__cdecl*)(short)) 0x00407F50)
 #define InitialiseSpiders ((void (__cdecl*)(short)) 0x0043F2B0)
 #define ControlSpiders ((void (__cdecl*)(short)) 0x0047A200)
-#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
+//#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
 #define ControlRomanStatue ((void (__cdecl*)(short)) 0x0046BC10)
 #define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
 #define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
@@ -60,3 +60,6 @@ void ControlReaper(short itemNumber);
 void ControlGuardM16(short itemNumber);
 void ImpThrowStones(ITEM_INFO* item);
 void ControlImp(short itemNumber);
+void ControlGladiator(short itemNumber);
+void ControlBrowsBeast(short itemNumber);
+void ControlInvisibleGhost(short itemNumber);
