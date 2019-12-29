@@ -1153,46 +1153,25 @@ void BaddyObjects()
 		printf("lara not found !");
 	}
 
-	// TODO: dummy slot test for other entity, need to be uncommented later, when the Objects[] is augmented !
-	/*
 	obj = &Objects[ID_SAS];
 	if (obj->loaded)
 	{
-		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
-		obj->collision = CreatureCollision;
 		obj->control = ControlGuard;
+		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 40;
-		obj->pivotLength = 50;
 		obj->radius = 102;
+		obj->pivotLength = 50;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-	}
-	*/
-
-	obj = &Objects[ID_SAS];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->control = Tr1LarsonControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 50;
-		obj->radius = 104;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_SWAT];
