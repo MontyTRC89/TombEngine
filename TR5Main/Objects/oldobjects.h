@@ -65,3 +65,5 @@ void ControlBrowsBeast(short itemNumber);
 void ControlInvisibleGhost(short itemNumber);
 short GetNextRat();
 void ControlLittleRats(short itemNumber);
+void InitialiseArmedBaddy2(short itemNum);
+void ArmedBaddy2Control(short itemNum);
