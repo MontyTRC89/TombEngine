@@ -300,6 +300,9 @@
     <ClInclude Include="Objects\oldobjects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Libs\fixedpoint\fixed_point.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
