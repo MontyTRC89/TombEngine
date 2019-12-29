@@ -6,6 +6,7 @@
 #include "..\Game\pickup.h"
 #include "..\Game\lot.h"
 #include "..\Game\switch.h"
+#include "..\Game\spotcam.h"
 #include "traps.h"
 #include "..\Game\laramisc.h"
 #include "..\Objects\newobjects.h"

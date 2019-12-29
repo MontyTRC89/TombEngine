@@ -1,5 +1,7 @@
 #pragma once
 
+#include "..\Global\global.h"
+
 enum spotcam_flags
 {
 	SCF_CUT_PAN = (1 << 0),					 // 0x0001   cut without panning smoothly
@@ -25,6 +27,12 @@ enum spotcam_flags
 //#define InitialiseSpotCam ((void (__cdecl*)(short)) 0x0047A9D0)
 #define TriggerTitleSpotcam ((void (__cdecl*)(int)) 0x004284A0)
 #define Spline ((int (__cdecl*)(int, int*, int)) 0x0047A890)
+
+extern byte SpotCamRemap[16];
+extern byte CameraCnt[16];
+extern int LastSpotCam;
+extern SPOTCAM SpotCam[64];
+extern int NumberSpotcams;
 
 void InitSpotCamSequences();
 void InitialiseSpotCam(short sequence);
