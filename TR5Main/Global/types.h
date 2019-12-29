@@ -1082,7 +1082,6 @@ struct SPLASH_SETUP
 	float z;
 	float splashPower;
 	float innerRadius;
-
 };
 
 struct FIRE_LIST
