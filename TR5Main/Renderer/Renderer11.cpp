@@ -2706,15 +2706,19 @@ void Renderer11::DrawDashBar()
 
 void Renderer11::DrawHealthBar(int percentual)
 {
-	int color2 = 0xA00000;
+	int color2;
 	if (Lara.poisoned || Lara.gassed)
 		color2 = 0xA0A000;
+	else
+		color2 = 0xA00000;
 	drawBar(20, 32, 150, 12, percentual, 0xA00000, color2);
 }
 
 void Renderer11::DrawAirBar(int percentual)
 {
-	drawBar(20, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
+	/* Draw the air bar only if lara is not one a swamp room */
+	if (!(Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP))
+		drawBar(20, 10, 150, 12, percentual, 0x0000A0, 0x0050A0);
 }
 
 void Renderer11::ClearDynamicLights()

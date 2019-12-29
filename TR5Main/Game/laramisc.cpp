@@ -7,6 +7,7 @@
 #include "laraswim.h"
 #include "larasurf.h"
 #include "effect2.h"
+#include "misc.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
@@ -137,7 +138,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 
 	Lara.isDucked = 0;
 
-	bool isWater = Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
+	bool isWater = Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP);
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
@@ -162,10 +163,22 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 				{
 					Lara.waterStatus = LW_WADE;
 					if (!(item->gravityStatus))
+					{
 						item->goalAnimState = STATE_LARA_STOP;
+					}
+					else if (isWater & ENV_FLAG_SWAMP)
+					{
+						if (item->currentAnimState == STATE_LARA_SWANDIVE_BEGIN || item->currentAnimState == STATE_LARA_SWANDIVE_END)			// Is Lara swan-diving?
+							item->pos.yPos = wh + 1000;
+
+						item->goalAnimState = STATE_LARA_WADE_FORWARD;
+						item->currentAnimState = STATE_LARA_WADE_FORWARD;
+						item->animNumber = ANIMATION_LARA_WADE;
+						item->frameNumber = GF(ANIMATION_LARA_WADE, 0);
+					}
 				}
 			}
-			else if (isWater)
+			else if (!(isWater & ENV_FLAG_SWAMP))
 			{
 				Lara.air = 1800;
 				Lara.waterStatus = LW_UNDERWATER;
@@ -388,7 +401,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		Camera.targetElevation = -ANGLE(22);
 		if (hfw >= 256)
 		{
-			if (hfw > 730)
+			if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
 			{
 				Lara.waterStatus = LW_SURFACE;
 				item->pos.yPos += 1 - hfw;
@@ -471,7 +484,20 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 	{
 	case LW_ABOVE_WATER:
 	case LW_WADE:
-		if (Lara.gassed)
+		if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -775)
+		{
+			if (item->hitPoints >= 0)
+			{
+				Lara.air -= 6;
+
+				if (Lara.air < 0)
+				{
+					Lara.air = -1;
+					item->hitPoints -= 10;
+				}
+			}
+		}
+		else if (Lara.gassed)
 		{
 			if (item->hitPoints >= 0 && --Lara.air < 0)
 			{
@@ -483,10 +509,14 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		}
 		else if (Lara.air < 1800 && item->hitPoints >= 0)
 		{
-			Lara.air += 10;
-			if (Lara.air > 1800)
-				Lara.air = 1800;
-		}		
+			/* lara is not equipped with any vehicle */
+			if (g_LaraExtra.Vehicle == NO_ITEM) // only for the upv !!
+			{
+				Lara.air += 10;
+				if (Lara.air > 1800)
+					Lara.air = 1800;
+			}
+		}
 		LaraAboveWater(item, &coll);
 		break;
 
@@ -832,8 +862,8 @@ void AnimateLara(ITEM_INFO* item)
 
 				flags = cmd[1] & 0xC000;
 				if (flags == SFX_LANDANDWATER ||
-					(flags == SFX_LANDONLY && (Lara.waterSurfaceDist >= 0 || Lara.waterSurfaceDist == NO_HEIGHT)) ||
-					(flags == SFX_WATERONLY && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT /*&& !(Rooms[lara_item->room_number].flags & SWAMP)*/))
+				   (flags == SFX_LANDONLY && (Lara.waterSurfaceDist >= 0 || Lara.waterSurfaceDist == NO_HEIGHT)) ||
+				   (flags == SFX_WATERONLY && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT && !(Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)))
 				{
 					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 				}
@@ -864,74 +894,56 @@ void AnimateLara(ITEM_INFO* item)
 	int lateral = anim->Xvelocity;
 	if (anim->Xacceleration)
 		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
-	
 	lateral >>= 16;
 	
-	if (item->gravityStatus)
+	if (item->gravityStatus)             // If gravity ON (Do Up/Down movement)
 	{
-		int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
-		item->speed -= velocity >> 16;
-		item->speed += (velocity + anim->acceleration) >> 16;
-		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6);
-		item->pos.yPos += item->fallspeed;
+		if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+		{
+			item->speed -= item->speed >> 3;
+			if (abs(item->speed) < 8)
+			{
+				item->speed = 0;
+				item->gravityStatus = false;
+			}
+			if (item->fallspeed > 128)
+				item->fallspeed >>= 1;
+			item->fallspeed -= item->fallspeed >> 2;
+			if (item->fallspeed < 4)
+				item->fallspeed = 4;
+			item->pos.yPos += item->fallspeed;
+		}
+		else
+		{
+			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
+			item->speed -= velocity >> 16;
+			item->speed += (velocity + anim->acceleration) >> 16;
+			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
+			item->pos.yPos += item->fallspeed;
+		}
 	}
-	else
+	else                                 // if on the Ground...
 	{
-		int velocity = anim->velocity;
-		if (anim->acceleration)
-			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		int velocity;
+
+		if (Lara.waterStatus == LW_WADE && Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+		{
+			velocity = anim->velocity >> 1;
+			if (anim->acceleration)
+				velocity += anim->acceleration * (item->frameNumber - anim->frameBase) >> 2;
+		}
+		else
+		{
+			velocity = anim->velocity;
+			if (anim->acceleration)
+				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		}
+		
 		item->speed = velocity >> 16;
 	}
 
 	/*if (lara.RopePtr != -1)
 		result = j_SomeRopeCollisionFunc(item);*/
-
-	/*
-	if ( !item->gravity_status ) 					// Calculate absolute new velocities
-	{                                               // if on the Ground...
-		if (lara.water_status==LARA_WADE && (room[item->room_number].flags & SWAMP))
-		{
-			speed = anim->velocity>>1;
-			if ( anim->acceleration )
-				speed += (anim->acceleration * (item->frame_number - anim->frame_base))>>2;
-			item->speed = (sint16)(speed >> 16);
-		}
-		else
-		{
-			speed = anim->velocity;
-			if ( anim->acceleration )
-				speed += anim->acceleration * (item->frame_number - anim->frame_base);
-			item->speed = (sint16)(speed >> 16);
-		}
-	}
-	else                                            // If gravity ON
-	{                                               // do Up/down movement
-		if (room[item->room_number].flags & SWAMP)
-		{
-			item->speed -= item->speed>>3;
-			if (abs(item->speed)<8)
-			{
-				item->speed = 0;
-				item->gravity_status = 0;
-			}
-			if (item->fallspeed > 128)
-				item->fallspeed >>= 1;
-			item->fallspeed -= item->fallspeed>>2;
-			if (item->fallspeed < 4)
-				item->fallspeed = 4;
-			item->pos.y_pos += item->fallspeed;
-		}
-		else
-		{
-			speed = anim->velocity + anim->acceleration * (item->frame_number - anim->frame_base - 1);
-			item->speed -= (sint16)(speed>>16);
-			speed += anim->acceleration;
-			item->speed += (sint16)(speed>>16);
-			item->fallspeed += (item->fallspeed<FASTFALL_SPEED) ? GRAVITY : 1;
-			item->pos.y_pos += item->fallspeed;
-		}
-	}
-	*/
 
 	if (!Lara.isMoving)
 	{
