@@ -6,7 +6,7 @@
 //#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
 ///#define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
 //#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
-#define ControlLarson ((void (__cdecl*)(short)) 0x0046A080)
+//#define ControlLarson ((void (__cdecl*)(short)) 0x0046A080)
 #define ControlCyborg ((void (__cdecl*)(short)) 0x0043A340)
 //#define ControlGuardM16 ((void (__cdecl*)(short)) 0x00478250)
 #define InitialiseChef ((void (__cdecl*)(short)) 0x00410990) // not used anymore !
@@ -68,3 +68,4 @@ void ControlLittleRats(short itemNumber);
 void InitialiseArmedBaddy2(short itemNum);
 void ArmedBaddy2Control(short itemNum);
 void ControlDog(short itemNumber);
+void ControlLarson(short itemNumber);
