@@ -4,7 +4,7 @@
 //#define ControlGuard ((void (__cdecl*)(short)) 0x0046F5E0)
 #define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
 //#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
-#define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
+///#define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
 //#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
 #define ControlLarson ((void (__cdecl*)(short)) 0x0046A080)
 #define ControlCyborg ((void (__cdecl*)(short)) 0x0043A340)
@@ -67,3 +67,4 @@ short GetNextRat();
 void ControlLittleRats(short itemNumber);
 void InitialiseArmedBaddy2(short itemNum);
 void ArmedBaddy2Control(short itemNum);
+void ControlDog(short itemNumber);
