@@ -1,7 +1,9 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
+#include "../../Game/effects.h"
 
-byte dogAnims[] = { 0x14, 0x15, 0x16, 0x14 };
+byte DogAnims[] = { 20, 21, 22, 20 };
+BITE_INFO DogBite = { 0, 0, 100, 3 };
 
 void InitialiseDog(short itemNum)
 {
@@ -18,7 +20,7 @@ void InitialiseDog(short itemNum)
     item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void DogControl(short itemNumber)
+void ControlDog(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -40,7 +42,7 @@ void DogControl(short itemNumber)
 		}
 		else if (item->currentAnimState != 11)
 		{
-			item->animNumber = obj->animIndex+ dogAnims[GetRandomControl() & 3];
+			item->animNumber = obj->animIndex + DogAnims[GetRandomControl() & 3];
 			item->currentAnimState = 11;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 		}
@@ -84,212 +86,223 @@ void DogControl(short itemNumber)
 		joint0 = 4 * angle;
 
 
-		if (creature->hurtByLara || distance < 0x900000 && !(item->aiBits & MODIFY)) 
+		if (creature->hurtByLara || distance < SQUARE(3072) && !(item->aiBits & MODIFY))
 		{
 			AlertAllGuards(itemNumber);
 			item->aiBits &= ~MODIFY;
 		}
 
-#if OLD_CODE
-		v14 = GetRandomControl();
-		v15 = item->frameNumber - anims[item->animNumber].frame_base;
+		short random = GetRandomControl();
+		int frame = item->frameNumber - Anims[item->animNumber].frameBase;
+
 		switch (item->currentAnimState)
 		{
 		case 0:
 		case 8:
 			joint1 = 0;
 			joint2 = 0;
-			if (creature->mood && (item->_bf15ea & 0x3E00) != 4096)
+			if (creature->mood && (item->aiBits) != MODIFY)
 			{
-				item->goal_anim_state = 1;
+				item->goalAnimState = 1;
 			}
 			else
 			{
-				v18 = __OFSUB__(++creature->flags, 300);
-				v16 = creature->flags == 300;
-				v17 = (creature->flags - 300) < 0;
+				creature->flags++;
 				creature->maximumTurn = 0;
-				if (!((v17 ^ v18) | v16) && v14 < 128)
-					item->goal_anim_state = 1;
+				if (creature->flags > 300 && random < 128)
+					item->goalAnimState = 1;
 			}
-			goto LABEL_100;
+			break;
+
 		case 1:
-			goto LABEL_30;
-		case 2:
-			creature->maximumTurn = 546;
-			v24 = item->_bf15ea;
-			if (v24 & 0x800)
-			{
-				item->goal_anim_state = 2;
-				goto LABEL_100;
-			}
-			if (!creature->mood && v14 < 256)
-				goto LABEL_63;
-			item->goal_anim_state = 5;
-			goto LABEL_100;
-		case 3:
-			creature->maximumTurn = 1092;
-			v25 = creature->mood;
-			if (v25 == 2)
-			{
-				if (lara.target != item && v33)
-					item->goal_anim_state = 9;
-			}
-			else if (v25)
-			{
-				if (v34 && v32 < 0x100000)
-				{
-					item->goal_anim_state = 6;
-				}
-				else if (v32 < 2359296)
-				{
-					item->required_anim_state = 5;
-					item->goal_anim_state = 9;
-				}
-			}
-			else
-			{
-				item->goal_anim_state = 9;
-			}
-			goto LABEL_100;
-		case 5:
-			creature->maximumTurn = 546;
-			v26 = creature->mood;
-			if (v26)
-			{
-				if (v26 == 2)
-				{
-					item->goal_anim_state = 3;
-				}
-				else if (v34 && v32 < 116281)
-				{
-					item->goal_anim_state = 12;
-					item->required_anim_state = 5;
-				}
-				else if (v32 > 2359296 || item->_bf15ea & 0x10)
-				{
-					item->goal_anim_state = 3;
-				}
-			}
-			else
-			{
-				item->goal_anim_state = 9;
-			}
-			goto LABEL_100;
-		case 6:
-			if (v34 && item->touch_bits & 0x6648 && v15 >= 4 && v15 <= 14)
-			{
-				CreatureEffectOld(item, &unk_508518, 2, -1, DoBloodSplat);
-				LaraItem->hitPoints -= 20;
-				LaraItem->_bf15ea |= 0x10u;
-			}
-			item->goal_anim_state = 3;
-			goto LABEL_100;
-		case 7:
-			joint1 = 0;
-			joint2 = 0;
-			goto LABEL_100;
 		case 9:
-			v19 = item->required_anim_state;
-			if (v19)
+			if (item->currentAnimState == 9 && item->requiredAnimState)
 			{
-				item->goal_anim_state = v19;
-				goto LABEL_100;
+				item->goalAnimState = item->requiredAnimState;
+				break;
 			}
-		LABEL_30:
+
 			creature->maximumTurn = 0;
-			v20 = item->_bf15ea;
-			if (v20 & 0x200)
+			if (item->aiBits & GUARD)
 			{
 				joint1 = AIGuard(creature);
 				if (GetRandomControl())
-					goto LABEL_100;
+					break;
 				if (item->currentAnimState == 1)
 				{
-					item->goal_anim_state = 9;
-					goto LABEL_100;
+					item->goalAnimState = 9;
+					break;
 				}
 			}
 			else
 			{
-				v21 = item->currentAnimState;
-				if (v21 == 9 && v14 < 128)
+				if (item->currentAnimState == 9 && random < 128)
 				{
-					item->goal_anim_state = 1;
-					goto LABEL_100;
+					item->goalAnimState = 1;
+					break;
 				}
-				if (v20 & 0x800)
+
+				if (item->aiBits & PATROL1)
 				{
-					if (v21 == 1)
-						item->goal_anim_state = 2;
+					if (item->currentAnimState == 1)
+						item->goalAnimState = 2;
 					else
-						LABEL_63:
-					item->goal_anim_state = 1;
-					goto LABEL_100;
+						item->goalAnimState = 1;
+					break;
 				}
-				v22 = creature->mood;
-				if (v22 == 2)
+
+				if (creature->mood == ESCAPE_MOOD)
 				{
-					if (lara.target == item || !v33 || v20 & 0x10)
+					if (Lara.target == item || !info.ahead || item->hitStatus)
 					{
-						item->required_anim_state = 3;
-						item->goal_anim_state = 9;
+						item->requiredAnimState = 3;
+						item->goalAnimState = 9;
 					}
 					else
 					{
-						item->goal_anim_state = 1;
+						item->goalAnimState = 1;
 					}
-					goto LABEL_100;
+					break;
 				}
-				if (v22)
+
+				if (creature->mood)
 				{
-					item->required_anim_state = 3;
-					if (v21 == 1)
-						item->goal_anim_state = 9;
-					goto LABEL_100;
+					item->requiredAnimState = 3;
+					if (item->currentAnimState == 1)
+						item->goalAnimState = 9;
+					break;
 				}
+
 				creature->flags = 0;
-				creature->maximumTurn = 182;
-				if (v14 < 256)
+				creature->maximumTurn = ANGLE(1);
+
+				if (random < 256)
 				{
-					v23 = item->_bf15ea;
-					if (v23 & 0x1000)
+					if (item->aiBits & MODIFY)
 					{
 						if (item->currentAnimState == 1)
 						{
-							item->goal_anim_state = 8;
+							item->goalAnimState = 8;
 							creature->flags = 0;
-							goto LABEL_100;
+							break;
 						}
 					}
 				}
-				if (v14 >= 4096)
+
+				if (random >= 4096)
 				{
-					if (!(v14 & 0x1F))
-						item->goal_anim_state = 7;
-					goto LABEL_100;
+					if (!(random & 0x1F))
+						item->goalAnimState = 7;
+					break;
 				}
+
 				if (item->currentAnimState == 1)
 				{
-					item->goal_anim_state = 2;
-					goto LABEL_100;
+					item->goalAnimState = 2;
+					break;
 				}
 			}
-			item->goal_anim_state = 1;
-			goto LABEL_100;
-		case 12:
-			if (v34 && item->touch_bits & 0x48 && (v15 >= 9 && v15 <= 12 || v15 >= 22 && v15 <= 25))
-			{
-				CreatureEffectOld(item, &unk_508518, 2, -1, DoBloodSplat);
-				LaraItem->hitPoints -= 10;
-				LaraItem->_bf15ea |= 0x10u;
-			}
-			goto LABEL_100;
-		default:
-			goto LABEL_100;
-		}
+			item->goalAnimState = 1;
+			break;
 
-#endif
+		case 2:
+			creature->maximumTurn = ANGLE(3);
+			if (item->aiBits & PATROL1)
+			{
+				item->goalAnimState = 2;
+				break;
+			}
+
+			if (!creature->mood && random < 256)
+			{
+				item->goalAnimState = 1;
+				break;
+			}
+			item->goalAnimState = 5;
+			break;
+
+		case 3:
+			creature->maximumTurn = ANGLE(6);
+			if (creature->mood == ESCAPE_MOOD)
+			{
+				if (Lara.target != item && info.ahead)
+					item->goalAnimState = 9;
+			}
+			else if (creature->mood)
+			{
+				if (info.bite && info.distance < SQUARE(1024))
+				{
+					item->goalAnimState = 6;
+				}
+				else if (info.distance < SQUARE(1536))
+				{
+					item->requiredAnimState = 5;
+					item->goalAnimState = 9;
+				}
+			}
+			else
+			{
+				item->goalAnimState = 9;
+			}
+			break;
+
+		case 5:
+			creature->maximumTurn = ANGLE(3);
+			if (creature->mood)
+			{
+				if (creature->mood == ESCAPE_MOOD)
+				{
+					item->goalAnimState = 3;
+				}
+				else if (info.bite && info.distance < SQUARE(341))
+				{
+					item->goalAnimState = 12;
+					item->requiredAnimState = 5;
+				}
+				else if (info.distance > SQUARE(1536) || item->hitStatus)
+				{
+					item->goalAnimState = 3;
+				}
+			}
+			else
+			{
+				item->goalAnimState = 9;
+			}
+			break;
+		case 6:
+			if (info.bite
+				&& item->touchBits & 0x6648
+				&& frame >= 4
+				&& frame <= 14)
+			{
+				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+				LaraItem->hitPoints -= 20;
+				LaraItem->hitStatus = true;
+			}
+			item->goalAnimState = 3;
+			break;
+
+		case 7:
+			joint1 = 0;
+			joint2 = 0;
+			break;
+
+		case 12:
+			if (info.bite
+				&& item->touchBits & 0x48
+				&& (frame >= 9
+					&& frame <= 12
+					|| frame >= 22
+					&& frame <= 25))
+			{
+				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+				LaraItem->hitPoints -= 10;
+				LaraItem->hitStatus = true;
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 	CreatureTilt(item, 0);
