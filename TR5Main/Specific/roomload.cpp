@@ -264,7 +264,7 @@ void LoadObjects()
 	}
 
 	// HACK: until we don't decompile everything, this simple hack allows us to use legacy stuff correctly
-	for (int i = 0; i <= ID_HAIR; i++)
+	for (int i = 0; i <= 518; i++)
 	{
 		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
 	}
