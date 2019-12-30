@@ -1061,9 +1061,12 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 		}
 	}
 
+	PHD_3DPOS soundPosition;
+	soundPosition.xPos = setup->x;
+	soundPosition.yPos = setup->y;
+	soundPosition.zPos = setup->z;
 
-
-	SoundEffect(SFX_LARA_SPLASH, (PHD_3DPOS*)setup, 0);
+	SoundEffect(SFX_LARA_SPLASH, &soundPosition, 0);
 }
 
 void UpdateSplashes()
