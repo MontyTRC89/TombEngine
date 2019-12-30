@@ -32,7 +32,7 @@
 #define BaddieSlots					VAR_U_(0x00E5B834, CREATURE_INFO*)
 #define AIObjects					VAR_U_(0x00E5B844, AIOBJECT*)
 #define Rooms						VAR_U_(0x00875154, ROOM_INFO*)
-#define Objects						ARRAY_(0x0086CF50, OBJECT_INFO, [460])
+//#define Objects						ARRAY_(0x0086CF50, OBJECT_INFO, [460])
 #define Anims						VAR_U_(0x00875158, ANIM_STRUCT*)
 #define Bones						VAR_U_(0x00875178, int*)
 #define Changes						VAR_U_(0x0087515C, CHANGE_STRUCT*)
@@ -314,3 +314,6 @@ extern int dword_874254;
 extern int unk_87435C;
 extern ITEM_INFO* Targets[NUM_SLOTS];
 extern STATIC_INFO StaticObjects[NUM_STATICS];
+
+#define LegacyObjects						ARRAY_(0x0086CF50, OBJECT_INFO, [460])
+extern OBJECT_INFO Objects[2048];
