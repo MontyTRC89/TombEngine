@@ -36,6 +36,8 @@ extern byte Sequences[3];
 extern byte CurrentSequence;
 extern int NumRPickups;
 
+OBJECT_INFO Objects[2048];
+
 void NewObjects()
 {
 	OBJECT_INFO* obj;
