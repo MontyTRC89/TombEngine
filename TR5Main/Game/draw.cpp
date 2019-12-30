@@ -289,6 +289,7 @@ void _phd_DxRotYXZpack(int rangle)
 void phd_PopMatrix(void)
 {
 	MatrixPtr -= 12;
+	DxMatrixPtr -= 48;
 }
 
 void _phd_PopMatrix_I(void)
