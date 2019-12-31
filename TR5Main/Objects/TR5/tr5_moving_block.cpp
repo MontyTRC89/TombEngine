@@ -84,7 +84,7 @@ void PushableBlockControl(short itemNumber)
 	pos.y = 0;
 	pos.z = 0;
 
-	unsigned short quadrant = (unsigned short)((LaraItem->pos.yRot + 0x2000) / 0x4000);
+	short quadrant = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
 
 	int x, z;
 	FLOOR_INFO* floor;
@@ -316,7 +316,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 			return;
 		}
 
-		unsigned short quadrant = (unsigned short)((l->pos.yRot + 0x2000) / 0x4000);
+		short quadrant = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
 
 		if (TrInput & IN_FORWARD)
 		{

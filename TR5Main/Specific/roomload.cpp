@@ -263,12 +263,6 @@ void LoadObjects()
 		Objects[objNum].loaded = true;
 	}
 
-	// HACK: until we don't decompile everything, this simple hack allows us to use legacy stuff correctly
-	for (int i = 0; i <= ID_HAIR; i++)
-	{
-		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
-	}
-
 	// TODO: this functions seems to not be useful anymore. Hairs and skinning works fine without it.
 	//if (LaraDrawType != LARA_DIVESUIT)
 	//	CreateSkinningData();
