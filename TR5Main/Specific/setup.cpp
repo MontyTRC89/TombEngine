@@ -1703,7 +1703,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_MAZE_MONSTER];
+	obj = &Objects[ID_BROWN_BEAST];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 256;
@@ -3220,7 +3220,7 @@ void CustomObjects()
 		Bones[obj->boneIndex + 0*4] |= (ROT_X|ROT_Y);
 	}
 
-	obj = &Objects[ID_TONYBOSS];
+	obj = &Objects[ID_TONY_BOSS];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseTony;
@@ -3549,7 +3549,7 @@ void CustomObjects()
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_SOPHIA_LEE];
+	obj = &Objects[ID_SOPHIA_LEE_BOSS];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseLondonBoss;
@@ -3587,7 +3587,7 @@ void CustomObjects()
 		Bones[obj->boneIndex + 2 * 4] |= (ROT_Z|ROT_X);
 	}
 
-	obj = &Objects[ID_EVIL_NATLA];
+	obj = &Objects[ID_WINGED_NATLA];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCreature;
@@ -3626,7 +3626,7 @@ void CustomObjects()
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
 	}
-
+	/*
 	obj = &Objects[ID_TR1_RAPTOR];
 	if (obj->loaded)
 	{
@@ -3677,7 +3677,7 @@ void CustomObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-	}
+	}*/
 }
 
 void InitialiseObjects()
@@ -3728,7 +3728,7 @@ void InitialiseObjects()
 	CustomObjects();
 
 	// HACK: until we don't decompile everything, this simple hack allows us to use legacy stuff correctly
-	for (int i = 0; i <= ID_HAIR; i++)
+	for (int i = 0; i <= ID_LARA_HAIR; i++)
 	{
 		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
 	}

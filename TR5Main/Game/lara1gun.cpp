@@ -469,7 +469,6 @@ void ControlGrenade(short itemNumber)
 		int wz = (MatrixPtr[M23] >> W2V_SHIFT);
 
 		phd_PopMatrix();
-		phd_PopDxMatrix();
 
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 	}
@@ -739,7 +738,7 @@ void ControlGrenade(short itemNumber)
 		}
 
 		AlertNearbyGuards(item);
-		SoundEffect(105, &item->pos, ENV_FLAG_PITCH_SHIFT | 0x1800000);
+		SoundEffect(105, &item->pos, PITCH_SHIFT | 0x1800000);
 		SoundEffect(106, &item->pos, 0);
 
 		if (item->itemFlags[0] != WEAPON_AMMO1 && item->itemFlags[0] != 4)
@@ -1233,7 +1232,7 @@ void ControlCrossbowBolt(short itemNumber)
 
 	AlertNearbyGuards(item);
 	
-	SoundEffect(105, &item->pos, ENV_FLAG_PITCH_SHIFT | 0x1800000);
+	SoundEffect(105, &item->pos, PITCH_SHIFT | 0x1800000);
 	SoundEffect(106, &item->pos, 0);
 
 	if (foundCollidedObjects || explode)

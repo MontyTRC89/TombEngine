@@ -88,8 +88,7 @@ constexpr auto MAX_SPLASH = 8;
 // Room flags
 
 #define ENV_FLAG_WATER				0x0001
-#define ENV_FLAG_SFX_ALWAYS			0x0002
-#define ENV_FLAG_PITCH_SHIFT		0x0004
+#define ENV_FLAG_SWAMP              0x0004
 #define ENV_FLAG_OUTSIDE			0x0008
 #define ENV_FLAG_DYNAMIC_LIT		0x0010
 #define ENV_FLAG_WIND				0x0020
@@ -98,7 +97,6 @@ constexpr auto MAX_SPLASH = 8;
 #define ENV_FLAG_MIST				0x0100
 #define ENV_FLAG_CAUSTICS			0x0200
 #define ENV_FLAG_UNKNOWN3			0x0400
-#define ENV_FLAG_SWAMP              0x0800
 
 // From TR3, we need to check
 #define	SP_FLAT			1

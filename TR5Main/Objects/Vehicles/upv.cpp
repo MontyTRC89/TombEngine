@@ -474,7 +474,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 	CanGetOff(v);
 
-	anim = l->animNumber - Objects[ID_UPV_ANIMS].animIndex;
+	anim = l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
 	frame = l->frameNumber - Anims[l->animNumber].frameBase;
 
 	switch (l->currentAnimState)
@@ -807,13 +807,13 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if ((l->currentAnimState == 33) || (l->currentAnimState == 34))
 		{
-			l->animNumber = Objects[ID_UPV_ANIMS].animIndex + 10;
-			l->frameNumber = GF2(ID_UPV_ANIMS, 10, 0);
+			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + 10;
+			l->frameNumber = GF2(ID_UPV_LARA_ANIMS, 10, 0);
 			l->currentAnimState = l->goalAnimState = SUBS_GETON;
 		}
 		else
 		{
-			l->animNumber = Objects[ID_UPV_ANIMS].animIndex + 13;
+			l->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + 13;
 			l->frameNumber = GF2(ID_UPV, 13, 0);
 			l->currentAnimState = l->goalAnimState = SUBS_GETON;
 		}
@@ -965,7 +965,7 @@ int SubControl()
 		if (sub->Flags & UPV_CONTROL)
 			SoundEffect(346, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed << 16));
 
-		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_ANIMS].animIndex);
+		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		v->frameNumber = Anims[v->animNumber].frameBase + (l->frameNumber - Anims[l->animNumber].frameBase);
 
 		if (sub->Flags & UPV_SURFACE)
