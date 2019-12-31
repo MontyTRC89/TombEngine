@@ -4361,8 +4361,8 @@ void Renderer11::updateLaraAnimations()
 	else
 	{ 
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),  TR_ANGLE_TO_RAD(Lara.leftArm.yRot),  TR_ANGLE_TO_RAD(Lara.leftArm.zRot));
-		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot), TR_ANGLE_TO_RAD(Lara.rightArm.yRot), TR_ANGLE_TO_RAD(Lara.rightArm.zRot));
+		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot),  TR_ANGLE_TO_RAD(0),  TR_ANGLE_TO_RAD(-Lara.leftArm.yRot));
+		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot), TR_ANGLE_TO_RAD(0), TR_ANGLE_TO_RAD(-Lara.rightArm.yRot));
 
 		LARA_ARM* leftArm = &Lara.leftArm;
 		LARA_ARM* rightArm = &Lara.rightArm;
@@ -4392,17 +4392,24 @@ void Renderer11::updateLaraAnimations()
 		case WEAPON_UZI:
 		case WEAPON_REVOLVER:
 		default:
+		{
 			short* pistolFramePtr;
 
 			// Left arm
-			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
+			int upperArmMask = MESH_BITS(LM_LINARM);
+			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber - Anims[Lara.leftArm.animNumber].frameBase) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
 			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
 
 			// Right arm
-			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber- Anims[Lara.rightArm.animNumber].frameBase) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			upperArmMask = MESH_BITS(LM_RINARM);
+			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
+			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber - Anims[Lara.rightArm.animNumber].frameBase) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
 			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
+		}
+			
 			break;
 
 		case WEAPON_FLARE:
@@ -4574,7 +4581,7 @@ void Renderer11::updateEffects()
 	}
 }
 
-void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask)
+void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 {
 	RendererBone* bones[32];
 	int nextBone = 0;
@@ -4622,8 +4629,15 @@ void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, short*
 
 			Matrix extraRotation;
 			extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+			if (useObjectWorldRotation) {
+				Quaternion invertedQuat;
+				transforms[bone->Parent->Index].Invert().Decompose(Vector3(), invertedQuat, Vector3());
+				rotation = extraRotation * rotation * Matrix::CreateFromQuaternion(invertedQuat);
+			}
+			else {
+				rotation = extraRotation * rotation;
 
-			rotation = extraRotation * rotation;
+			}
 
 			if (bone != obj->Skeleton)
 				transforms[bone->Index] = rotation * bone->Transform;
@@ -4631,6 +4645,7 @@ void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, short*
 				transforms[bone->Index] = rotation * translation;
 
 			if (bone != obj->Skeleton)
+				
 				transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 		}
 
