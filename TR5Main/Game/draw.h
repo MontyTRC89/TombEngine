@@ -87,7 +87,6 @@ void _phd_DxRotYXZpack(int rangle);
 
 void phd_PopMatrix(void);
 void _phd_PopMatrix_I(void);
-void phd_PopDxMatrix(void);
 
 extern Renderer11* g_Renderer;
 

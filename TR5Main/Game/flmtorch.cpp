@@ -60,7 +60,7 @@ void DoFlameTorch()
 		{
 			Lara.leftArm.lock = 2;
 			Lara.leftArm.frameNumber = 31;
-			Lara.leftArm.animNumber = Objects[ID_TORCH_ANIM].animIndex + 2;
+			Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 2;
 			break;
 		}
 		
@@ -77,7 +77,7 @@ void DoFlameTorch()
 		{
 			Lara.leftArm.lock = 1;
 			Lara.leftArm.frameNumber = 1;
-			Lara.leftArm.animNumber = Objects[ID_TORCH_ANIM].animIndex + 1;
+			Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 1;
 			if (Lara.waterStatus == LW_UNDERWATER)
 				Lara.litTorch = false;
 		}
@@ -89,7 +89,7 @@ void DoFlameTorch()
 		{
 			Lara.leftArm.lock = 0;
 			Lara.leftArm.frameNumber = 0;
-			Lara.leftArm.animNumber = Objects[ID_TORCH_ANIM].animIndex;
+			Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 		}
 		else
 		{
@@ -134,7 +134,7 @@ void DoFlameTorch()
 			Lara.leftArm.frameNumber = 0;
 			Lara.flareControlLeft = true;
 			Lara.litTorch = LaraItem->itemFlags[3] & 1;
-			Lara.leftArm.animNumber = Objects[ID_TORCH_ANIM].animIndex;
+			Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 		}
 		break;
 	default:
@@ -175,7 +175,7 @@ void GetFlameTorch()
 	Lara.requestGunType = WEAPON_TORCH;
 	Lara.gunType = WEAPON_TORCH;
 	Lara.flareControlLeft = true;
-	Lara.leftArm.animNumber = Objects[ID_TORCH_ANIM].animIndex;
+	Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 	Lara.gunStatus = LG_READY;
 	Lara.leftArm.lock = 0;
 	Lara.leftArm.frameNumber = 0;

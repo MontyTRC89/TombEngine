@@ -103,7 +103,7 @@ void undraw_flare_meshes()
 
 void draw_flare_meshes()//4A394(<), 4A7F8(<) (F)
 {
-	LARA_MESHES(ID_FLARE_ANIM, LM_LHAND);
+	LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND);
 }
 
 void undraw_flare()//4A108, 4A56C
@@ -270,7 +270,7 @@ void draw_flare()//49F74, 4A3D8 (F)
 
 void set_flare_arm(int frame)//49ED4, 4A338 (F)
 {
-	short anim = Objects[ID_FLARE_ANIM].animIndex;
+	short anim = Objects[ID_LARA_FLARE_ANIM].animIndex;
 
 	if (frame >= 95)
 	{

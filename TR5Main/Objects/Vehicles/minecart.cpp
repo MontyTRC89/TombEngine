@@ -215,7 +215,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 						{
 							if (item->objectNumber == ID_ANIMATING2)
 							{
-								if ((item->frameNumber == Anims[item->animNumber].frameBase) && (LaraItem->currentAnimState == CART_USE) && (LaraItem->animNumber == Objects[ID_MINECART_ANIMS].animIndex + 6))
+								if ((item->frameNumber == Anims[item->animNumber].frameBase) && (LaraItem->currentAnimState == CART_USE) && (LaraItem->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 6))
 								{
 									FLOOR_INFO* floor;
 									short frame, room_number;
@@ -612,7 +612,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 
 	case CART_GETOUT:
-		if (l->animNumber == Objects[ID_MINECART_ANIMS].animIndex + 7)
+		if (l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 7)
 		{
 			if ((l->frameNumber == GF2(ID_MINECART, 7, 0) + 20) && (cart->Flags & CF_MESH))
 			{
@@ -620,8 +620,8 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 				tmp = Lara.meshPtrs[LM_RHAND];
 				
-				LARA_MESHES(ID_MINECART_ANIMS, LM_RHAND);
-				Meshes[Objects[ID_MINECART_ANIMS].meshIndex + LM_RHAND] = tmp;
+				LARA_MESHES(ID_MINECART_LARA_ANIMS, LM_RHAND);
+				Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
 
 				cart->Flags &= ~CF_MESH;
 			}
@@ -634,7 +634,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 
 	case CART_GETOUTL:
-		if ((l->animNumber == Objects[ID_MINECART_ANIMS].animIndex + 1) && (l->frameNumber == Anims[l->animNumber].frameEnd))
+		if ((l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 1) && (l->frameNumber == Anims[l->animNumber].frameEnd))
 		{
 			PHD_VECTOR vec = { 0, 640, 0 };
 
@@ -655,7 +655,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 
 	case CART_GETOUTR:
-		if ((l->animNumber == Objects[ID_MINECART_ANIMS].animIndex + 47) && (l->frameNumber == Anims[l->animNumber].frameEnd))
+		if ((l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 47) && (l->frameNumber == Anims[l->animNumber].frameEnd))
 		{
 			PHD_VECTOR vec = { 0, 640, 0 };
 
@@ -676,14 +676,14 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 
 	case CART_GETIN:
-		if ((l->animNumber == Objects[ID_MINECART_ANIMS].animIndex + 5) && (l->frameNumber == GF2(ID_MINECART, 5, 0) + 20) && (!cart->Flags & CF_MESH))
+		if ((l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 5) && (l->frameNumber == GF2(ID_MINECART, 5, 0) + 20) && (!cart->Flags & CF_MESH))
 		{
 			short* tmp;
 
 			tmp = Lara.meshPtrs[LM_RHAND];
 
-			Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_MINECART_ANIMS].meshIndex + LM_RHAND];
-			Meshes[Objects[ID_MINECART_ANIMS].meshIndex + LM_RHAND] = tmp;
+			Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND];
+			Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
 
 			cart->Flags |= CF_MESH;
 		}
@@ -710,7 +710,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		}
 		else
 		{
-			if (l->animNumber == Objects[ID_MINECART_ANIMS].animIndex + 30)
+			if (l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 30)
 			{
 				cart->Flags |= CF_NOANIM;
 				l->hitPoints = -1;
@@ -733,7 +733,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	{
 		AnimateItem(l);
 
-		v->animNumber = Objects[ID_MINECART].animIndex + (l->animNumber - Objects[ID_MINECART_ANIMS].animIndex);
+		v->animNumber = Objects[ID_MINECART].animIndex + (l->animNumber - Objects[ID_MINECART_LARA_ANIMS].animIndex);
 		v->frameNumber = Anims[v->animNumber].frameBase + (l->frameNumber - Anims[l->animNumber].frameBase);
 	}
 
@@ -743,7 +743,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		/* -------- fall off corners */
 		if ((v->pos.zRot > TERMINAL_ANGLE) || (v->pos.zRot < -TERMINAL_ANGLE))
 		{
-			l->animNumber = Objects[ID_MINECART_ANIMS].animIndex + 31;
+			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 31;
 			l->frameNumber = Anims[l->animNumber].frameBase;
 			l->currentAnimState = l->goalAnimState = CART_TURNDEATH;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | CF_STOPPED | CF_DEAD;
@@ -755,7 +755,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		fh = GetCollision(v, v->pos.yRot, 512, &ch);
 		if (fh < -(STEP_SIZE * 2))
 		{
-			l->animNumber = Objects[ID_MINECART_ANIMS].animIndex + 23;
+			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 23;
 			l->frameNumber = Anims[l->animNumber].frameBase;
 			l->currentAnimState = l->goalAnimState = CART_WALLDEATH;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | (CF_STOPPED | CF_DEAD);
@@ -776,7 +776,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			{
 				int hits;
 
-				l->animNumber = Objects[ID_MINECART_ANIMS].animIndex + 34;
+				l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 34;
 				l->frameNumber = Anims[l->animNumber].frameBase;
 				l->currentAnimState = l->goalAnimState = CART_HIT;
 				DoLotsOfBlood(l->pos.xPos, l->pos.yPos - 768, l->pos.zPos, v->speed, v->pos.yRot, l->roomNumber, 3);
@@ -845,9 +845,9 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		ang = short(mGetAngle(v->pos.xPos, v->pos.zPos, l->pos.xPos, l->pos.zPos) - v->pos.yRot);
 
 		if ((ang > -ANGLE(45)) && (ang < ANGLE(135)))
-			l->animNumber = Objects[ID_MINECART_ANIMS].animIndex + 46;
+			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 46;
 		else
-			l->animNumber = Objects[ID_MINECART_ANIMS].animIndex + 0;
+			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 0;
 
 		l->frameNumber = Anims[l->animNumber].frameBase;
 		l->currentAnimState = l->goalAnimState = CART_GETIN;

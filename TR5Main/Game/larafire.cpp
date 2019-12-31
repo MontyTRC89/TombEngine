@@ -253,7 +253,7 @@ int WeaponObject(int weaponType)
 	case WEAPON_HK:
 		return ID_HK_ANIM;
 	case WEAPON_FLARE:
-		return ID_FLARE_ANIM;
+		return ID_LARA_FLARE_ANIM;
 	case WEAPON_GRENADE_LAUNCHER:
 		return ID_GRENADE_ANIM;
 	case WEAPON_ROCKET_LAUNCHER:
@@ -563,7 +563,7 @@ void LaraGun()
 		case LG_HANDS_BUSY:
 			if (Lara.gunType == WEAPON_FLARE)
 			{
-				if (CHECK_LARA_MESHES(ID_FLARE_ANIM, LM_LHAND))
+				if (CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND))
 				{
 					Lara.flareControlLeft = (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
 					DoFlareInHand(Lara.flareAge);
@@ -618,8 +618,8 @@ void InitialiseNewWeapon()
 		break;
 
 	case WEAPON_FLARE:
-		Lara.rightArm.frameBase = Objects[ID_FLARE_ANIM].frameBase;
-		Lara.leftArm.frameBase = Objects[ID_FLARE_ANIM].frameBase;
+		Lara.rightArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		Lara.leftArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 		if (Lara.gunStatus != LG_NO_ARMS)
 			draw_flare_meshes();
 		break;

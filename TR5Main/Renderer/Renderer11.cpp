@@ -1412,7 +1412,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 		m_stItem.World = Matrix::Identity;
 		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
-		if (m_moveableObjects[ID_HAIR] != NULL)
+		if (m_moveableObjects[ID_LARA_HAIR] != NULL)
 		{
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, (const uint16_t*)m_hairIndices.data(), m_numHairIndices, m_hairVertices.data(), m_numHairVertices);
@@ -2293,7 +2293,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					meshPtr,
 					Meshes[obj->meshIndex + 2 * j],
 					boneIndex, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-					MoveablesIds[i] == ID_HAIR);
+					MoveablesIds[i] == ID_LARA_HAIR);
 				moveable->ObjectMeshes.push_back(mesh);
 			}
 
@@ -2429,7 +2429,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 				}
 			}
 
-			if (MoveablesIds[i] == ID_HAIR)
+			if (MoveablesIds[i] == ID_LARA_HAIR)
 			{
 				for (int j = 0; j < moveable->ObjectMeshes.size(); j++)
 				{
@@ -4420,9 +4420,9 @@ void Renderer11::updateLaraAnimations()
 	}
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
-	if (m_moveableObjects[ID_HAIR] != NULL)
+	if (m_moveableObjects[ID_LARA_HAIR] != NULL)
 	{
-		RendererObject* hairsObj = m_moveableObjects[ID_HAIR];
+		RendererObject* hairsObj = m_moveableObjects[ID_LARA_HAIR];
 
 		lastMatrix = Matrix::Identity; 
 		identity = Matrix::Identity;
@@ -7305,7 +7305,7 @@ bool Renderer11::drawShadowMap()
 	m_stItem.World = Matrix::Identity;
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
-	if (m_moveableObjects[ID_HAIR] != NULL)
+	if (m_moveableObjects[ID_LARA_HAIR] != NULL)
 	{
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,

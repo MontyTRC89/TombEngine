@@ -1077,7 +1077,7 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor != NO_HEIGHT)
+		if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor < 0)
 			item->pos.yPos += coll->midFloor;
 		else if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->midFloor)
 			item->pos.yPos += SWAMP_GRAVITY;
@@ -1336,7 +1336,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)//1BE38, 1BF6C (F)
 			if (TestLaraSlide(item, coll))
 				return;
 
-			if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor != NO_HEIGHT)
+			if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor < 0)
 				item->pos.yPos += coll->midFloor;
 			else if ((Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) && coll->midFloor)
 				item->pos.yPos += SWAMP_GRAVITY;
@@ -1490,7 +1490,7 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll)//1B9C4, 1BAF8 (F)
 	if (TestLaraSlide(item, coll))
 		return;
 
-	if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor != NO_HEIGHT)
+	if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor < 0)
 		item->pos.yPos += coll->midFloor;
 	else if((Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) && coll->midFloor)
 		item->pos.yPos += SWAMP_GRAVITY;
@@ -3326,7 +3326,7 @@ void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll)//18444(<), 18578(<) (F)
 			{
 				ShiftItem(item, coll);
 
-				if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor != NO_HEIGHT)
+				if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor < 0)
 					item->pos.yPos += coll->midFloor;
 				else if ((Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) && coll->midFloor)
 					item->pos.yPos += SWAMP_GRAVITY;

@@ -6,7 +6,7 @@ void InitialiseHair()
 	int* bone;
 
 	FirstHair = 1;
-	bone = &Bones[Objects[ID_HAIR].boneIndex];
+	bone = &Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 	Hairs[0].pos.yRot = 0;
 	Hairs[0].pos.xRot = -0x4000;

@@ -340,7 +340,7 @@ void SwapCrowbar(ITEM_INFO* item)//39638(<), 39B38(<) (F)
 	short* tmp = Meshes[Objects[ID_LARA].meshIndex + 2 * LM_RHAND];
 
 	if (Lara.meshPtrs[LM_RHAND] == tmp)
-		Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_CROWBAR_ANIM].meshIndex + 2 * LM_RHAND];
+		Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_LARA_CROWBAR_ANIM].meshIndex + 2 * LM_RHAND];
 	else 
 		Lara.meshPtrs[LM_RHAND] = tmp;
 }

@@ -1065,6 +1065,9 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 	soundPosition.xPos = setup->x;
 	soundPosition.yPos = setup->y;
 	soundPosition.zPos = setup->z;
+	soundPosition.yRot = 0;
+	soundPosition.xRot = 0;
+	soundPosition.zRot = 0;
 
 	SoundEffect(SFX_LARA_SPLASH, &soundPosition, 0);
 }

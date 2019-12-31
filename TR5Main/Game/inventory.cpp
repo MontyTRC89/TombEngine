@@ -2014,7 +2014,6 @@ bool Inventory::UpdateSceneAndDrawInventory()
 
 		// We need to pop the matrix stack or the game will crash
 		phd_PopMatrix();
-		phd_PopDxMatrix();
 
 		nframes = Camera.numberFrames;
 		ControlPhase(nframes, 0);

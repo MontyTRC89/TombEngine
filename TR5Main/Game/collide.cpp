@@ -698,7 +698,6 @@ void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	z = item->pos.zPos + ((MatrixPtr[M20] * vec->x + MatrixPtr[M21] * vec->y + MatrixPtr[M22] * vec->z) >> W2V_SHIFT);
 
 	phd_PopMatrix();
-	phd_PopDxMatrix();
 
 	l->pos.xPos = x;
 	l->pos.yPos = y;
@@ -760,7 +759,6 @@ int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l)
 	rz = (x * MatrixPtr[M02] + y * MatrixPtr[M12] + z * MatrixPtr[M22]) >> W2V_SHIFT;
 	
 	phd_PopMatrix();
-	phd_PopDxMatrix();
 	
 	if (rx < bounds[0] || rx > bounds[1] || ry < bounds[2] || ry > bounds[3] || rz < bounds[4] || rz > bounds[5])
 		return FALSE;
@@ -904,7 +902,6 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	dest.zPos = item->pos.zPos + ((MatrixPtr[M20] * vec->x + MatrixPtr[M21] * vec->y + MatrixPtr[M22] * vec->z) >> W2V_SHIFT);
 
 	phd_PopMatrix();
-	phd_PopDxMatrix();
 
 	if (item->objectNumber != ID_FLARE_ITEM && item->objectNumber != ID_BURNING_TORCH_ITEM)
 		return Move3DPosTo3DPos(&l->pos, &dest, LARA_VELOCITY, ANGLE(2));

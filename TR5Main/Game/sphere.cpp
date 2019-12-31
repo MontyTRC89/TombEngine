@@ -1,5 +1,4 @@
 #include "sphere.h"
-#include "..\Global\global.h"
 #include "draw.h"
 
 int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
@@ -33,7 +32,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 
 	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
 
-	short *frame = GetBestFrame(item);
+	short* frame = GetBestFrame(item);
 	phd_TranslateRel(frame[6], frame[7], frame[8]);
 	short* rotation = &frame[9];
 	gar_RotYXZsuperpack(&rotation, 0);
@@ -45,10 +44,10 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 	phd_PushMatrix();
 
 	short* objPtr = *(meshPtr++);							// Get Sphere stuff Now...
-	
+
 	if (!(worldSpace & 2))
 		phd_TranslateRel(objPtr[0], objPtr[1], objPtr[2]);
-	
+
 	ptr->x = x + (MatrixPtr[M03] >> W2V_SHIFT);
 	ptr->y = y + (MatrixPtr[M13] >> W2V_SHIFT);
 	ptr->z = z + (MatrixPtr[M23] >> W2V_SHIFT);
@@ -60,8 +59,8 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 
 	for (int i = obj->nmeshes - 1; i > 0; i--, bone += 3)
 	{
-		int poppush = *(bone++);	 
-		if (poppush & 1)             
+		int poppush = *(bone++);
+		if (poppush & 1)
 			phd_PopMatrix();
 		if (poppush & 2)
 			phd_PushMatrix();
