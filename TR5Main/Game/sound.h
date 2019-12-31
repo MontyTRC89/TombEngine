@@ -592,7 +592,9 @@ typedef enum sound_effects
 	NUM_SFX
 };
 
+#define SFX_ALWAYS 2
 #define PITCH_SHIFT	4
+
 #define SOUND_BASS_UNITS			1.0f / 1024.0f	// TR->BASS distance unit coefficient
 #define SOUND_MAXVOL_RADIUS			1024.0f			// Max. volume hearing distance
 #define SOUND_OMNIPRESENT_ORIGIN    Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f)

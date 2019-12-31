@@ -17,7 +17,6 @@ int DrawPhaseGame()
 
 	// We need to pop the matrix stack or the game will crash
 	phd_PopMatrix();
-	phd_PopDxMatrix();
 
 	return Camera.numberFrames;
 }
@@ -298,11 +297,6 @@ void _phd_PopMatrix_I(void)
 	DxMatrixPtr -= 48;
 	//dword_E6E468 -= 48;
 	//dword_E6D834 -= 48;
-}
-
-void phd_PopDxMatrix(void)
-{
-	DxMatrixPtr -= 48;
 }
 
 void Inject_Draw()

@@ -34,7 +34,7 @@ void ControlBrowsBeast(short itemNumber)
 			item->hitPoints = 0;
 			if (item->currentAnimState != 7)
 			{
-				item->animNumber = Objects[ID_MAZE_MONSTER].animIndex + 10;
+				item->animNumber = Objects[ID_BROWN_BEAST].animIndex + 10;
 				item->currentAnimState = 7;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 			}
@@ -127,7 +127,7 @@ void ControlBrowsBeast(short itemNumber)
 
 				if (item->touchBits & 0x3C000)
 				{
-					if (item->animNumber == Objects[ID_MAZE_MONSTER].animIndex + 8)
+					if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
 					{
 						if (item->frameNumber > Anims[item->animNumber].frameBase + 19
 							&& item->frameNumber < Anims[item->animNumber].frameBase + 25)
@@ -140,7 +140,7 @@ void ControlBrowsBeast(short itemNumber)
 						}
 					}
 
-					if (item->animNumber == Objects[ID_MAZE_MONSTER].animIndex + 2)
+					if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
 					{
 						if (item->frameNumber > Anims[item->animNumber].frameBase + 6 
 							&& item->frameNumber < Anims[item->animNumber].frameBase + 16)
@@ -157,7 +157,7 @@ void ControlBrowsBeast(short itemNumber)
 				if (!(item->touchBits & 0xF00000))
 					break;
 
-				if (item->animNumber == Objects[ID_MAZE_MONSTER].animIndex + 8)
+				if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
 				{
 					if (item->frameNumber > Anims[item->animNumber].frameBase + 13
 						&& item->frameNumber < Anims[item->animNumber].frameBase + 20)
@@ -170,7 +170,7 @@ void ControlBrowsBeast(short itemNumber)
 					}
 				}
 
-				if (item->animNumber == Objects[ID_MAZE_MONSTER].animIndex + 2)
+				if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
 				{
 					if (item->frameNumber > Anims[item->animNumber].frameBase + 33
 						&& item->frameNumber < Anims[item->animNumber].frameBase + 43)

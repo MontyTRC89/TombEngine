@@ -96,11 +96,11 @@ void PushableBlockControl(short itemNumber)
 	{
 	case ANIMATION_LARA_OBJECT_PUSH:
 		if ((LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 30
-			|| LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 67)
-			&& (LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 78
-				|| LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 125)
-			&& (LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 140
-				|| LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 160))
+		||   LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 67)
+		&&  (LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 78
+		||   LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 125)
+		&&  (LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 140
+		||   LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 160))
 		{
 			if (DoPushPull)
 			{

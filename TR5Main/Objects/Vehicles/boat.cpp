@@ -689,7 +689,7 @@ void BoatAnimation(ITEM_INFO* boat, int collide)
 	{
 		if (LaraItem->currentAnimState != BOAT_DEATH)
 		{
-			LaraItem->animNumber = Objects[ID_BOAT_ANIMS].animIndex + BOAT_DEATH_ANIM;
+			LaraItem->animNumber = Objects[ID_BOAT_LARA_ANIMS].animIndex + BOAT_DEATH_ANIM;
 			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = BOAT_DEATH;
 		}
@@ -698,7 +698,7 @@ void BoatAnimation(ITEM_INFO* boat, int collide)
 	{
 		if (LaraItem->currentAnimState != BOAT_FALL)
 		{
-			LaraItem->animNumber = Objects[ID_BOAT_ANIMS].animIndex + BOAT_FALL_ANIM;
+			LaraItem->animNumber = Objects[ID_BOAT_LARA_ANIMS].animIndex + BOAT_FALL_ANIM;
 			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = BOAT_FALL;
 		}
@@ -707,7 +707,7 @@ void BoatAnimation(ITEM_INFO* boat, int collide)
 	{
 		if (LaraItem->currentAnimState != BOAT_HIT)
 		{
-			LaraItem->animNumber = (short)(Objects[ID_BOAT_ANIMS].animIndex + collide);
+			LaraItem->animNumber = (short)(Objects[ID_BOAT_LARA_ANIMS].animIndex + collide);
 			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = BOAT_HIT;
 		}
@@ -825,13 +825,13 @@ void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	}
 
 	if (geton == 2)
-		litem->animNumber = Objects[ID_BOAT_ANIMS].animIndex + BOAT_GETONLW_ANIM;
+		litem->animNumber = Objects[ID_BOAT_LARA_ANIMS].animIndex + BOAT_GETONLW_ANIM;
 	else if (geton == 1)
-		litem->animNumber = Objects[ID_BOAT_ANIMS].animIndex + BOAT_GETONRW_ANIM;
+		litem->animNumber = Objects[ID_BOAT_LARA_ANIMS].animIndex + BOAT_GETONRW_ANIM;
 	else if (geton == 3)
-		litem->animNumber = Objects[ID_BOAT_ANIMS].animIndex + BOAT_GETONJ_ANIM;
+		litem->animNumber = Objects[ID_BOAT_LARA_ANIMS].animIndex + BOAT_GETONJ_ANIM;
 	else
-		litem->animNumber = Objects[ID_BOAT_ANIMS].animIndex + BOAT_GETON_START;
+		litem->animNumber = Objects[ID_BOAT_LARA_ANIMS].animIndex + BOAT_GETON_START;
 
 	Lara.waterStatus = LW_ABOVE_WATER;
 	litem->pos.xPos = boat->pos.xPos;
@@ -988,7 +988,7 @@ void BoatControl(short itemNumber)
 		/* Set boat on the exact same anim frame */
 		if (LaraItem->hitPoints > 0)
 		{
-			boat->animNumber = Objects[ID_BOAT].animIndex + (LaraItem->animNumber - Objects[ID_BOAT_ANIMS].animIndex);
+			boat->animNumber = Objects[ID_BOAT].animIndex + (LaraItem->animNumber - Objects[ID_BOAT_LARA_ANIMS].animIndex);
 			boat->frameNumber = Anims[boat->animNumber].frameBase + (LaraItem->frameNumber - Anims[LaraItem->animNumber].frameBase);
 		}
 

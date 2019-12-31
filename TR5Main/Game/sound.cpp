@@ -104,7 +104,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	if (BASS_GetDevice() == -1)
 		return 0;
 
-	if (!(env_flags & ENV_FLAG_SFX_ALWAYS))
+	if (!(env_flags & SFX_ALWAYS))
 	{
 		// Don't play effect if effect's environment isn't the same as camera position's environment
 		if ((env_flags & ENV_FLAG_WATER) != (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
@@ -352,11 +352,13 @@ void S_CDPlayEx(short index, DWORD mask, DWORD unknown)
 	// @TODO: Replace with scripted ones (or trigger property) later.
 	int size = sizeof(loopedTracks) / sizeof(short);
 	for (int i = 0; i < size; i++)
+	{
 		if (index == loopedTracks[i])
 		{
 			looped = true;
 			break;
 		}
+	}
 
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.

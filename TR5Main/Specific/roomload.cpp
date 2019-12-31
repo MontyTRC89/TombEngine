@@ -561,7 +561,7 @@ unsigned __stdcall LoadLevel(void* data)
 		return false;
 	}
 
-	g_Renderer->UpdateProgress(80);
+	g_Renderer->UpdateProgress(90);
 	g_Renderer->PrepareDataForTheRenderer();
 	
 	// Initialise the game
