@@ -937,7 +937,7 @@ private:
 	void											fromTrAngle(Matrix* matrix, short* frameptr, int index);
 	void											buildHierarchy(RendererObject* obj);
 	void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-	void											updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask);
+	void											updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 	bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 	bool											checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort);
 	void											getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count);
