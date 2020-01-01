@@ -110,7 +110,7 @@
 #define GameMode					VAR_U_(0x005082C0, byte)
 #define nFrames						VAR_U_(0x005082C4, int)
 #define GameStatus					VAR_U_(0x00E5C2B0, int)
-#define GotLaraSpheres				VAR_U_(0x00E51F2E, byte)
+//#define GotLaraSpheres				VAR_U_(0x00E51F2E, byte)
 #define EffectRoutines				ARRAY_(0x00507964, EFFECT_ROUTINE, [MAX_EFFECTS])
 #define DashTimer					VAR_U_(0x00E5BF04, short)
 #define LaraCollisionRoutines		ARRAY_(0x005089A8, LARA_COLLISION_ROUTINE, [500])
