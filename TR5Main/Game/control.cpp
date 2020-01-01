@@ -27,6 +27,7 @@
 #include "tomb4fx.h"
 #include "traps.h"
 #include "effects.h"
+#include "sphere.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
