@@ -961,10 +961,6 @@ bool Renderer11::drawStatics(bool transparent)
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-	m_stMisc.AlphaTest = !transparent;
-	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
-	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
-
 	for (int i = 0; i < m_staticsToDraw.Size(); i++)
 	{
 		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
@@ -1164,6 +1160,27 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	RendererItem* item = &m_items[Lara.itemNumber];
+
+	// Set shaders
+	m_context->VSSetShader(m_vsItems, NULL, 0);
+	m_context->PSSetShader(m_psItems, NULL, 0);
+
+	// Set texture
+	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+
+	// Set camera matrices
+	m_stCameraMatrices.View = View.Transpose();
+	m_stCameraMatrices.Projection = Projection.Transpose();
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+
+	m_stMisc.AlphaTest = !transparent;
+	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 	for (int i = 0; i < m_itemsToDraw.Size(); i++)
 	{
@@ -3447,9 +3464,9 @@ inline void Renderer11::collectItems(short roomNumber)
 		newItem->Item = item;
 		newItem->Id = itemNum;
 		newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
-		newItem->World = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yPos),
-														TR_ANGLE_TO_RAD(item->pos.xPos),
-														TR_ANGLE_TO_RAD(item->pos.zPos)) *
+		newItem->World = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot),
+														TR_ANGLE_TO_RAD(item->pos.xRot),
+														TR_ANGLE_TO_RAD(item->pos.zRot)) *
 						 Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 		collectLightsForItem(item->roomNumber, newItem);
@@ -4311,9 +4328,11 @@ void Renderer11::updateItemsAnimations()
 		}
 
 		// Update world matrix
-		translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot), TR_ANGLE_TO_RAD(item->pos.xRot), TR_ANGLE_TO_RAD(item->pos.zRot));
-		itemToDraw->World = rotation * translation;
+		//translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		//rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot), TR_ANGLE_TO_RAD(item->pos.xRot), TR_ANGLE_TO_RAD(item->pos.zRot));
+		//itemToDraw->World = rotation * translation;
+
+		int test = 0;
 	}
 }
 
