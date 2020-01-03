@@ -74,7 +74,7 @@ void ControlGladiator(short itemNumber)
 
 			if (creature->enemy == LaraItem)
 			{
-				laraInfo.distance = info.distance;
+				distance = info.distance;
 				rot = info.angle;
 			}
 			else
