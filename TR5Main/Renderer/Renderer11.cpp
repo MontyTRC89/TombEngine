@@ -7285,8 +7285,8 @@ bool Renderer11::drawShadowMap()
 	Matrix view = Matrix::CreateLookAt(lightPos,
 		itemPos,
 		Vector3(0.0f, -1.0f, 0.0f));
-	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 128.0f,
-		(m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range));
+	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
+		(m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
 
 	m_stCameraMatrices.View = view.Transpose();
 	m_stCameraMatrices.Projection = projection.Transpose();
