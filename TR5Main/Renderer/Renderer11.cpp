@@ -1650,10 +1650,11 @@ bool Renderer11::drawScene(bool dump)
 	  
 	drawAllStrings();
 	
+	/*
 	m_spriteBatch->Begin();
 	RECT rect; rect.top = rect.left = 0; rect.right = rect.bottom = 300;
 	m_spriteBatch->Draw(m_shadowMap->ShaderResourceView, rect, Colors::White);
-	m_spriteBatch->End();
+	m_spriteBatch->End();*/
 
 	if (!dump)
 		m_swapChain->Present(0, 0);
