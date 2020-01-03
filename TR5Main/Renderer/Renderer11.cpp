@@ -358,6 +358,46 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	m_renderTarget = RenderTarget2D::Create(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_shadowMap = RenderTarget2D::Create(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
+
+	// Shadow map
+	/*D3D11_TEXTURE2D_DESC depthTexDesc;
+	ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	depthTexDesc.Width = SHADOW_MAP_SIZE;
+	depthTexDesc.Height = SHADOW_MAP_SIZE;
+	depthTexDesc.MipLevels = 1;
+	depthTexDesc.ArraySize = 1;
+	depthTexDesc.SampleDesc.Count = 1;
+	depthTexDesc.SampleDesc.Quality = 0;
+	depthTexDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	depthTexDesc.CPUAccessFlags = 0;
+	depthTexDesc.MiscFlags = 0;
+
+	res = m_device->CreateTexture2D(&depthTexDesc, NULL, &m_shadowMapTexture);
+	if (FAILED(res))
+		return false;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+	dsvDesc.Format = depthTexDesc.Format;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Texture2D.MipSlice = 0;
+
+	m_shadowMapDSV = NULL;
+	res = m_device->CreateDepthStencilView(m_shadowMapTexture, &dsvDesc, &m_shadowMapDSV);
+	if (FAILED(res))
+		return false;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+	shaderDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderDesc.Texture2D.MostDetailedMip = 0;
+	shaderDesc.Texture2D.MipLevels = 1;
+
+	res = m_device->CreateShaderResourceView(m_shadowMapTexture, &shaderDesc, &m_shadowMapRV);
+	if (FAILED(res))
+		return false;*/
 	
 	// Initialise viewport
 	m_viewport.TopLeftX = 0;
@@ -839,9 +879,11 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	ID3D11SamplerState* shadowSampler = m_states->PointClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 	m_context->PSSetShaderResources(1, 1, &m_caustics[m_currentCausticsFrame / 2]->ShaderResourceView);
+	//m_context->PSSetSamplers(1, 1, &shadowSampler);
+	//m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
 	m_context->PSSetSamplers(1, 1, &shadowSampler);
 	m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
-	 
+
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
@@ -1605,13 +1647,13 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 #endif
 	}
-
+	  
 	drawAllStrings();
-
-	/*m_spriteBatch->Begin();
+	
+	m_spriteBatch->Begin();
 	RECT rect; rect.top = rect.left = 0; rect.right = rect.bottom = 300;
 	m_spriteBatch->Draw(m_shadowMap->ShaderResourceView, rect, Colors::White);
-	m_spriteBatch->End();*/
+	m_spriteBatch->End();
 
 	if (!dump)
 		m_swapChain->Present(0, 0);
@@ -7145,7 +7187,7 @@ bool Renderer11::drawShadowMap()
 			{
 				// Sun is added without checks
 			}
-			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+			else if (light->Type == LIGHT_TYPE_POINT)
 			{
 				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
@@ -7246,14 +7288,14 @@ bool Renderer11::drawShadowMap()
 		itemPos,
 		Vector3(0.0f, -1.0f, 0.0f));
 	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 1.0f,
-		m_shadowLight->Out * 1.5f);
+		(m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.5f);
 
 	m_stCameraMatrices.View = view.Transpose();
 	m_stCameraMatrices.Projection = projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	  
-	m_stShadowMap.LightViewProjection = (view*projection).Transpose();
+	m_stShadowMap.LightViewProjection = (view * projection).Transpose();
 
 	m_stMisc.AlphaTest = true;
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
@@ -7340,7 +7382,7 @@ bool Renderer11::drawShadowMap()
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
 	if (m_moveableObjects[ID_LARA_HAIR] != NULL)
-	{
+	{    
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
 			(const unsigned short*)m_hairIndices.data(), m_numHairIndices,
