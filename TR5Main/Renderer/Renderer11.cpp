@@ -602,7 +602,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_cbLights = createConstantBuffer(sizeof(CLightBuffer));
 	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
 	m_cbShadowMap = createConstantBuffer(sizeof(CShadowLightBuffer));
-
+	m_cbRoom = createConstantBuffer(sizeof(CRoomBuffer));
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
@@ -921,7 +921,9 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 		m_stMisc.AlphaTest = !transparent;
 		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
-
+		m_stRoom.AmbientColor = room->AmbientLight;
+		updateConstantBuffer(m_cbRoom, &m_stRoom, sizeof(CRoomBuffer));
+		m_context->PSSetConstantBuffers(5, 1, &m_cbRoom);
 		for (int j = firstBucket; j < lastBucket; j++)
 		{
 			RendererBucket* bucket;
