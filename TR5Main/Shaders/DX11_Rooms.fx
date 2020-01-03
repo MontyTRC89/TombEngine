@@ -87,10 +87,10 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float3 lighting = colorMul.xyz;
 	bool doLights = true;
 
-	/*if (CastShadows)
+	if (CastShadows)
 	{
 		// Transform clip space coords to texture space coords (-1:1 to 0:1)
-		float2 coords = float2(input.LightPosition.x / 2.0f + 0.5f, input.LightPosition.y / -2.0f + 0.5f);
+		float2 coords = float2(input.LightPosition.x / 2.0f + 0.5f, -input.LightPosition.y / 2.0f + 0.5f);
 
 		// Sample shadow map - point sampler
 		float shadowMapDepth = ShadowMap.Sample(ShadowMapSampler, coords).r;
@@ -98,9 +98,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		float realDepth = input.LightPosition.z / input.LightPosition.w;
 
 		// If clip space z value greater than shadow map value then pixel is in shadow
-		if (shadowMapDepth >= realDepth - 0.001f)
-			return float4(1, 0, 0, 1);	//doLights = false;
-	}*/
+		if (shadowMapDepth >= realDepth)
+			doLights = false;
+	}
 
 	if (doLights)
 	{

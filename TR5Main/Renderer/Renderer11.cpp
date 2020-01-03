@@ -1650,11 +1650,10 @@ bool Renderer11::drawScene(bool dump)
 	  
 	drawAllStrings();
 	
-	/*
 	m_spriteBatch->Begin();
-	RECT rect; rect.top = rect.left = 0; rect.right = rect.bottom = 300;
+	RECT rect; rect.top = rect.left = 0; rect.right = rect.bottom = 128;
 	m_spriteBatch->Draw(m_shadowMap->ShaderResourceView, rect, Colors::White);
-	m_spriteBatch->End();*/
+	m_spriteBatch->End();
 
 	if (!dump)
 		m_swapChain->Present(0, 0);
@@ -7283,13 +7282,13 @@ bool Renderer11::drawShadowMap()
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
-	  
+	
 	// Set camera matrices
 	Matrix view = Matrix::CreateLookAt(lightPos,
 		itemPos,
 		Vector3(0.0f, -1.0f, 0.0f));
-	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 1.0f,
-		(m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.5f);
+	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 128.0f,
+		(m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range));
 
 	m_stCameraMatrices.View = view.Transpose();
 	m_stCameraMatrices.Projection = projection.Transpose();
