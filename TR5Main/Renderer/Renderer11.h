@@ -198,6 +198,7 @@ public:
 	ID3D11Texture2D* Texture;
 	ID3D11DepthStencilView*	DepthStencilView;
 	ID3D11Texture2D* DepthStencilTexture;
+	ID3D11ShaderResourceView* DepthShaderResourceView;
 	bool IsValid = false;
 
 	RenderTarget2D()
@@ -813,6 +814,12 @@ private:
 	ID3D11PixelShader*								m_psFullScreenQuad;
 	ID3D11VertexShader*								m_vsShadowMap;
 	ID3D11PixelShader*								m_psShadowMap;
+
+
+	ID3D11ShaderResourceView* m_shadowMapRV;
+	ID3D11Texture2D* m_shadowMapTexture;
+	ID3D11DepthStencilView* m_shadowMapDSV;
+
 
 	// Constant buffers
 	CCameraMatrixBuffer								m_stCameraMatrices;
