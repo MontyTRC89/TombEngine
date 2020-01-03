@@ -872,18 +872,16 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	// Set shaders
 	m_context->VSSetShader(m_vsRooms, NULL, 0);
 	m_context->PSSetShader(m_psRooms, NULL, 0);
-
+	 
 	// Set texture
 	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
 	ID3D11SamplerState* shadowSampler = m_states->PointClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 	m_context->PSSetShaderResources(1, 1, &m_caustics[m_currentCausticsFrame / 2]->ShaderResourceView);
-	//m_context->PSSetSamplers(1, 1, &shadowSampler);
-	//m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
 	m_context->PSSetSamplers(1, 1, &shadowSampler);
 	m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
-
+	  
 	// Set camera matrices
 	m_stCameraMatrices.View = View.Transpose();
 	m_stCameraMatrices.Projection = Projection.Transpose();
@@ -891,14 +889,14 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	 
 	// Set shadow map data
-	if (m_shadowLight != NULL)
+	if (m_shadowLight != NULL) 
 	{    
 		memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
-		m_stShadowMap.CastShadows = true;
+		m_stShadowMap.CastShadows = true; 
 		//m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert().Transpose();
 	}
 	else
-	{
+	{ 
 		m_stShadowMap.CastShadows = false;
 	}
 
@@ -1646,7 +1644,7 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 #endif
-	}
+	} 
 	  
 	drawAllStrings();
 	
