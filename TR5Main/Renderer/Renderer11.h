@@ -582,6 +582,10 @@ struct CMiscBuffer {
 	float Padding[14];
 };
 
+struct CRoomBuffer {
+	Vector4 AmbientColor;
+};
+
 struct RendererAnimatedTexture 
 {
 	int Id;
@@ -832,6 +836,8 @@ private:
 	ID3D11Buffer*									m_cbLights;
 	CMiscBuffer										m_stMisc;
 	ID3D11Buffer*									m_cbMisc;
+	CRoomBuffer										m_stRoom;
+	ID3D11Buffer*									m_cbRoom;
 	CShadowLightBuffer   							m_stShadowMap;
 	ID3D11Buffer*									m_cbShadowMap;
 
