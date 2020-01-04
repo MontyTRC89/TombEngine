@@ -283,9 +283,9 @@ void PistolHandler(int weaponType)
 	{
 		PHD_VECTOR pos;
 
-		pos.x = GetRandomControl() - 128;
+		pos.x = (byte)GetRandomControl() - 128;
 		pos.y = (GetRandomControl() & 0x7F) - 63;
-		pos.z = GetRandomControl() - 128;
+		pos.z = (byte)GetRandomControl() - 128;
 
 		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LJ_LHAND : LJ_RHAND);
 		/*if (gfLevelFlags & 0x2000 && LaraItem->room_number == gfMirrorRoom)
