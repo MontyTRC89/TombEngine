@@ -303,8 +303,8 @@ void InitialiseSpotCam(short Sequence)
 			CameraXtarget[2] = InitialCameraTarget.x;
 			CameraYtarget[2] = InitialCameraTarget.y;
 			CameraZtarget[2] = InitialCameraTarget.z;
+			CameraFOV[2] = CurrentFOV;
 			CameraRoll[2] = 0;
-			CameraFOV[2] = 0;
 			CameraSpeed[2] = s->speed;
 
 			CameraXposition[3] = SpotCam[CurrentSplineCamera].x;
