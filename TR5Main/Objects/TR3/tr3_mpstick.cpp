@@ -2,6 +2,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/people.h"
+#include "../../Game/items.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };
