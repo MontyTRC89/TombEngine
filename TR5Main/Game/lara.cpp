@@ -17,6 +17,7 @@
 #include "laramisc.h"
 #include "laraclmb.h"
 #include "rope.h"
+#include "healt.h"
 
 #include "..\Objects\newobjects.h"
 #include "..\Global\global.h"
