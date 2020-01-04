@@ -29,7 +29,7 @@ typedef enum MPSTICK_STATES {
 void InitialiseMPStick(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	InitialiseCreature(itemNumber);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 6;
 	item->frameNumber = Anims[item->animNumber].frameBase;

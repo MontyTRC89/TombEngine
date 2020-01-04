@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Game/items.h"
 
 BITE_INFO spearLeftBite = { 0, 0, 920, 11 };
 BITE_INFO spearRightBite = { 0, 0, 920, 18 };
@@ -31,7 +32,7 @@ void InitialiseSpearGuardian(short itemNum)
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
 
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 
 	item = &Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 48;

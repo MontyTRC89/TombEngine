@@ -3466,7 +3466,7 @@ void Renderer11::collectRooms()
 		m_rooms[i]->Visited = false;
 		m_rooms[i]->LightsToDraw.Clear();
 	}
-
+	 
 	Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 
 	getVisibleRooms(-1, baseRoomIndex, &vp, false, 0);

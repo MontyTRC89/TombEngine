@@ -12,38 +12,37 @@ BITE_INFO PierreGun2 = { -57, 200, 0, 14 };
 
 void InitialiseLarson(short itemNum)
 {
-    ITEM_INFO* item;
-    short rotY;
+	ITEM_INFO* item = &Items[itemNum];
 
-    item = &Items[itemNum];
-    ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
-    if (!item->triggerFlags)
-        return;
-    item->itemFlags[3] = 0;
-    rotY = item->pos.yRot;
+	ClearItem(itemNum);
 
-    // TODO: check if it's ok !
-    if (rotY > 4096 && rotY < 28672)
-    {
-        item->pos.xPos += STEPUP_HEIGHT;
-    }
-    else if (rotY < -4096 && rotY > -28672)
-    {
-        item->pos.xPos += STEPUP_HEIGHT;
-    }
-    else if (rotY <= -8192 || rotY >= 8192)
-    {
-        if (rotY < -20480 || rotY > 20480)
-            item->pos.zPos -= STEPUP_HEIGHT;
-    }
-    else
-    {
-        item->pos.zPos += STEPUP_HEIGHT;
-    }
+	item->animNumber = Objects[item->objectNumber].animIndex;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->goalAnimState = 1;
+	item->currentAnimState = 1;
+
+	if (!item->triggerFlags)
+		return;
+
+	item->itemFlags[3] = item->triggerFlags;
+	short rotY = item->pos.yRot;
+
+	if (rotY > 4096 && rotY < 28672)
+	{
+		item->pos.xPos += STEPUP_HEIGHT;
+	}
+	else if (rotY < -4096 && rotY > -28672)
+	{
+		item->pos.xPos -= STEPUP_HEIGHT;
+	}
+	else if (rotY < -20480 || rotY > 20480)
+	{
+		item->pos.zPos -= STEPUP_HEIGHT;
+	}
+	else if (rotY > -8192 || rotY < 8192)
+	{
+		item->pos.zPos += STEPUP_HEIGHT;
+	}
 }
 
 void ControlLarson(short itemNumber)
@@ -126,11 +125,12 @@ void ControlLarson(short itemNumber)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		if (info.distance < SQUARE(2048) && LaraItem->speed > 20
+		if (info.distance < SQUARE(2048) 
+			&& LaraItem->speed > 20
 			|| item->hitStatus
 			|| TargetVisible(item, &info) != 0)
 		{
-			item->status &= ITEM_DEACTIVATED;
+			item->status &= ~ITEM_ACTIVE;
 			creature->alerted = true;
 		}
 
@@ -305,7 +305,7 @@ void ControlLarson(short itemNumber)
 			joint0 = info.angle >> 1;
 			joint2 = info.angle >> 1;
 			if (info.ahead)
-				joint1 = HIWORD(info.angle);
+				joint1 = info.xAngle;
 			creature->maximumTurn = 0;
 			if (abs(info.angle) >= ANGLE(2))
 			{
@@ -342,14 +342,16 @@ void ControlLarson(short itemNumber)
 	}
 	else if (item->currentAnimState == 5)
 	{
-		if (item->objectNumber == ID_TR5_LARSON && item->frameNumber == Anims[item->animNumber].frameEnd)
+		if (item->objectNumber == ID_TR5_LARSON 
+			&& item->frameNumber == Anims[item->animNumber].frameEnd)
 		{
-			short roomNumber= item->itemFlags[2];
+			short roomNumber= item->itemFlags[2] & 0xFF;
+			short floorHeight = item->itemFlags[2] & 0xFF00;
 			ROOM_INFO* r = &Rooms[roomNumber];
 			
-			int x = r->x + 4 * (item->pad2[4] & 0xFF00) + 512;
-			int y = r->minfloor + (item->itemFlags[2] & 0xFFFFFF00);
-			int z = ((item->pad2[4] & 0x00FF) << 10) + r->z + 512;
+			int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
+			int y = r->minfloor + floorHeight;
+			int z = r->z + ((item->TOSSPAD & 0xFF) << WALL_SHIFT) + 512;
 
 			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 			GetFloorHeight(floor, x, y, z);

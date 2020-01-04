@@ -6,8 +6,13 @@
 void ClearItem(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	item->data = NULL;
+	ROOM_INFO* room = &Rooms[item->roomNumber];
+
 	item->collidable = true;
+	item->data = NULL;
+	item->drawRoom = (((item->pos.zPos - room->z) >> WALL_SHIFT) & 0xFF) | ((((item->pos.xPos - room->mesh->x) >> WALL_SHIFT) & 0xFF) << 8);
+	item->TOSSPAD = item->pos.yRot & 0xE000;
+	item->itemFlags[2] = item->roomNumber | ((item->pos.yPos - room->minfloor) & 0xFF00);
 }
 
 void KillItem(short itemNum)

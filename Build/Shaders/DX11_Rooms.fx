@@ -105,7 +105,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			// If clip space z value greater than shadow map value then pixel is in shadow
 			if (shadowMapDepth < realDepth)
-				return float4(output.xyz * colorMul.xyz / 2.0f, 1.0f);
+				return float4(output.xyz* colorMul.xyz / 2.0f, 1.0f);
 		}
 	}
 

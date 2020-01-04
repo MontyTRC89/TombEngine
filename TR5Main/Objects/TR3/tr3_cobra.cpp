@@ -1,13 +1,14 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Game/items.h"
 
 BITE_INFO cobraBite = { 0, 0, 0, 13 };
 
 void InitialiseCobra(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 	item->animNumber = Objects[item->objectNumber].animIndex + 2;
 	item->frameNumber = Anims[item->animNumber].frameBase + 45;
 	item->currentAnimState = item->goalAnimState = 3;
