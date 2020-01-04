@@ -1136,7 +1136,7 @@ int CreatureActive(short itemNumber)
 
 void InitialiseCreature(short itemNumber) 
 {
-	InitialiseCreature(itemNumber);
+	ClearItem(itemNumber);
 }
 
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
