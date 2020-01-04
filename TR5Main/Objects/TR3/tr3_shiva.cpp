@@ -122,7 +122,7 @@ void InitialiseShiva(short itemNum)
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
 
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 
 	item = &Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 14;

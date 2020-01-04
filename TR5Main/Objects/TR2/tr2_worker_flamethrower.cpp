@@ -44,7 +44,7 @@ void InitialiseWorkerFlamethrower(short itemNum)
 	item = &Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 12;
 
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 
 	anim = &Anims[item->animNumber];
 	item->frameNumber = anim->frameBase;

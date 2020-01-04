@@ -7,6 +7,7 @@ void InitialiseReaper(short itemNum)
     ITEM_INFO* item;
 
     ClearItem(itemNum);
+
     item = &Items[itemNum];
     item->animNumber = Objects[item->objectNumber].animIndex + 1;
     item->frameNumber = Anims[item->animNumber].frameBase;
@@ -42,7 +43,7 @@ void ControlReaper(short itemNumber)
 			if (creature->enemy)
 			{
 				if (creature->enemy->flags & 2)
-					item->itemFlags[3] = item->pad2[6] - 1;
+					item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
 
 				item->itemFlags[3]++;
 
