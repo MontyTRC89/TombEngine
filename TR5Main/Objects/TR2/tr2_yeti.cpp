@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Game/items.h"
 
 BITE_INFO yetiBiteR = { 12, 101, 19, 10 };
 BITE_INFO yetiBiteL = { 12, 101, 19, 13 };
@@ -8,7 +9,7 @@ BITE_INFO yetiBiteL = { 12, 101, 19, 13 };
 void InitialiseYeti(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 	item->animNumber = Objects[item->objectNumber].animIndex + 19;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->currentAnimState = Anims[item->animNumber].currentAnimState;
