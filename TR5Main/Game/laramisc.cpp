@@ -7,6 +7,7 @@
 #include "laraswim.h"
 #include "larasurf.h"
 #include "effect2.h"
+#include "healt.h"
 #include "misc.h"
 
 extern LaraExtraInfo g_LaraExtra;
