@@ -69,3 +69,5 @@ void InitialiseArmedBaddy2(short itemNum);
 void ArmedBaddy2Control(short itemNum);
 void ControlDog(short itemNumber);
 void ControlLarson(short itemNumber);
+void InitialiseRaisingBlock(short itemNumber);
+void ControlRaisingBlock(short itemNumber);

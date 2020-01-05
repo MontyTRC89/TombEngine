@@ -1041,6 +1041,19 @@ bool Renderer11::drawStatics(bool transparent)
 	return true;
 }
 
+bool Renderer11::drawScaledSpikes(RendererItem* item, bool transparent, bool animated)
+{
+	short objectNumber = item->Item->objectNumber;
+	if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) 
+		&& (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
+	{
+		item->Scale = Matrix::CreateScale(1.0f, item->Item->itemFlags[1] / 4096.0f, 1.0f);
+		item->World = item->Scale * item->Rotation * item->Translation;
+
+		return drawAnimatingItem(item, transparent, animated);
+	}
+}
+
 bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool animated)
 {
 	UINT stride = sizeof(RendererVertex);
@@ -1234,6 +1247,11 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 		if (moveableObj->DoNotDraw)
 		{
 			continue;
+		}
+		else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2)
+		{
+			// Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
+			drawScaledSpikes(item, transparent, animated);
 		}
 		else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
 		{
@@ -3485,10 +3503,12 @@ inline void Renderer11::collectItems(short roomNumber)
 		newItem->Item = item;
 		newItem->Id = itemNum;
 		newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
-		newItem->World = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot),
-														TR_ANGLE_TO_RAD(item->pos.xRot),
-														TR_ANGLE_TO_RAD(item->pos.zRot)) *
-						 Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		newItem->Translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		newItem->Rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot),
+			TR_ANGLE_TO_RAD(item->pos.xRot),
+			TR_ANGLE_TO_RAD(item->pos.zRot));
+		newItem->Scale = Matrix::CreateScale(1.0f);
+		newItem->World = newItem->Rotation * newItem->Translation;
 
 		collectLightsForItem(item->roomNumber, newItem);
 

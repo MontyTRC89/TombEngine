@@ -26,8 +26,8 @@ void ParallelBarsCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void ControlXRayMachine(short itemNumber);
 void CutsceneRopeControl(short itemNumber);
 void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
-#define InitialiseRaisingBlock  ((void (__cdecl*)(short)) 0x0043D730)
-#define RaisingBlockControl ((void (__cdecl*)(short)) 0x0048C3D0)
+//#define InitialiseRaisingBlock  ((void (__cdecl*)(short)) 0x0043D730)
+//#define RaisingBlockControl ((void (__cdecl*)(short)) 0x0048C3D0)
 #define InitialiseRaisingCog ((void (__cdecl*)(short)) 0x00440320)
 #define RaisingCogControl ((void (__cdecl*)(short)) 0x00406040)
 #define HighObject2Control ((void (__cdecl*)(short)) 0x004070D0)
