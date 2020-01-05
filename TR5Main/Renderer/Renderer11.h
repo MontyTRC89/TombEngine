@@ -649,6 +649,9 @@ struct RendererItem {
 	int Id;
 	ITEM_INFO* Item;
 	Matrix World;
+	Matrix Translation;
+	Matrix Rotation;
+	Matrix Scale;
 	Matrix AnimationTransforms[32];
 	int NumMeshes;
 	PreallocatedVector<RendererLight> Lights;
@@ -975,6 +978,7 @@ private:
 	bool											drawStatics(bool transparent);
 	bool											drawItems(bool transparent, bool animated);
 	bool											drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
+	bool											drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
 	bool											drawWaterfalls();
 	bool											drawShadowMap();
 	bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);

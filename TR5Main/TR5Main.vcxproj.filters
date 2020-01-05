@@ -779,6 +779,9 @@
     <ClCompile Include="Objects\TR5\tr5_rats.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\TR5\tr5_misc_objects.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />
