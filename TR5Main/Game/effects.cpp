@@ -8,8 +8,9 @@
 #include "hair.h"
 #include "draw.h"
 #include "sphere.h"
-
+#include "footprint.h"
 int wf = 256;
+extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 void(*effect_routines[59])(ITEM_INFO* item) =
 {
@@ -45,7 +46,7 @@ void(*effect_routines[59])(ITEM_INFO* item) =
 	void_effect,
 	LaraLocation,
 	ClearSpidersPatch,
-	void_effect /*AddFootprint*/,
+	AddFootprint, /*AddFootprint*/
 	void_effect /*ResetTest*/,
 	void_effect,
 	void_effect,
@@ -82,6 +83,38 @@ void TL_1(ITEM_INFO* item)
 		S_CDPlay(9, 0);
 		Savegame.TLCount = 1;
 	}
+}
+
+void AddFootprint(ITEM_INFO* item) {
+	if (item != LaraItem) {
+		return;
+	}
+	PHD_3DPOS footprintPosition;
+	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition)) {
+		if (footprints.size() >= MAX_FOOTPRINTS) {
+			footprints.pop_back();
+		}
+		FOOTPRINT_STRUCT footprint;
+		footprint.pos = footprintPosition;
+		footprint.lifeStartFading = 30 * 5;
+		footprint.startOpacity = 128;
+		footprint.life = 30 * 20;
+		footprint.active = true;
+		footprints.push_front(footprint);
+	}
+	if (CheckFootOnFloor(*item, LM_RFOOT, footprintPosition)) {
+		if (footprints.size() >= MAX_FOOTPRINTS) {
+			footprints.pop_back();
+		}
+		FOOTPRINT_STRUCT footprint;
+		footprint.pos = footprintPosition;
+		footprint.lifeStartFading = 30*5;
+		footprint.startOpacity = 128;
+		footprint.life = 30 * 20;
+		footprint.active = true;
+		footprints.push_front(footprint);
+	}
+	
 }
 
 void TL_2(ITEM_INFO* item)
