@@ -2604,8 +2604,16 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseRaisingBlock;
-		obj->control = RaisingBlockControl;
-		obj->drawRoutine = DrawScaledSpike;
+		obj->control = ControlRaisingBlock;
+		//obj->drawRoutine = DrawScaledSpike;
+	}
+
+	obj = &Objects[ID_RAISING_BLOCK2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseRaisingBlock;
+		obj->control = ControlRaisingBlock;
+		//obj->drawRoutine = DrawScaledSpike;
 	}
 
 	obj = &Objects[ID_SMOKE_EMITTER_BLACK];
