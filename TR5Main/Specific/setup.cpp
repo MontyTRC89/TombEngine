@@ -2913,9 +2913,9 @@ void TrapObjects()
 	obj = &Objects[ID_TEETH_SPIKES];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTeethSpike;
-		obj->control = TeethSpikeControl;
-		obj->drawRoutine = DrawScaledSpike;
+		obj->initialise = InitialiseTeethSpikes;
+		obj->control = ControlTeethSpikes;
+		//obj->drawRoutine = DrawScaledSpike;
 	}
 }
 

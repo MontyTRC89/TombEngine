@@ -53,9 +53,9 @@
 #define DrawWreckingBall ((void (__cdecl*)(ITEM_INFO*)) 0x00441F50)
 #define InitialiseVentilator ((void (__cdecl*)(short)) 0x0043F3D0)
 #define VentilatorControl ((void (__cdecl*)(short)) 0x00405610)
-#define InitialiseTeethSpike ((void (__cdecl*)(short)) 0x0043FBC0)
-#define TeethSpikeControl ((void (__cdecl*)(short)) 0x0043FBC0)
-#define DrawScaledSpike ((void (__cdecl*)(ITEM_INFO*)) 0x0043FBC0)
+//#define InitialiseTeethSpike ((void (__cdecl*)(short)) 0x0043FBC0)
+//#define TeethSpikeControl ((void (__cdecl*)(short)) 0x0043FBC0)
+//#define DrawScaledSpike ((void (__cdecl*)(ITEM_INFO*)) 0x0043FBC0)
 
 void LaraBurn();
 void LavaBurn(ITEM_INFO* item);
