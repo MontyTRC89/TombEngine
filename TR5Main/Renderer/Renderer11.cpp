@@ -23,9 +23,11 @@
 #include <chrono> 
 #include <stack>
 #include "../Game/misc.h"
+#include "../Game/footprint.h"
 
 using ns = chrono::nanoseconds;
 using get_time = chrono::steady_clock;
+extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 int SortLightsFunction(RendererLight* a, RendererLight* b)
 {
@@ -630,6 +632,16 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	m_textureAtlas = NULL;
 	m_skyTexture = NULL;
+	D3D11_BLEND_DESC subtractiveBlendDescription;
+	subtractiveBlendDescription.RenderTarget[0].BlendEnable = true;
+	subtractiveBlendDescription.RenderTarget[0].RenderTargetWriteMask = 0xFFFFFFFF;
+	subtractiveBlendDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_SUBTRACT;
+	subtractiveBlendDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_SUBTRACT;
+	subtractiveBlendDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	subtractiveBlendDescription.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	subtractiveBlendDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	subtractiveBlendDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	m_device->CreateBlendState(&subtractiveBlendDescription,&m_subtractiveBlendState);
 
 	return true;
 }
@@ -1559,6 +1571,7 @@ bool Renderer11::drawScene(bool dump)
 	drawBats();
 	drawRats();
 	drawSpiders();
+	drawFootprints();
 
 	// Transparent geometry
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -5049,7 +5062,7 @@ bool Renderer11::drawSprites()
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 
-	for (int b = 0; b < 3; b++)
+	for (int b = 0; b < 4; b++)
 	{
 		BLEND_MODES currentBlendMode = (BLEND_MODES)b;
 
@@ -5064,14 +5077,22 @@ bool Renderer11::drawSprites()
 
 			if (spr->BlendMode != currentBlendMode)
 				continue;
-
-			if (currentBlendMode == BLENDMODE_OPAQUE)
-			{
-				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-			}
-			else
-			{
+			switch (currentBlendMode) {
+			case BLENDMODE_ALPHABLEND:
 				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+
+				break;
+			case BLENDMODE_ALPHATEST:
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+
+				break;
+			case BLENDMODE_OPAQUE:
+				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				break;
+			case BLENDMODE_SUBTRACTIVE:
+				m_context->OMSetBlendState(m_subtractiveBlendState, NULL, 0xFFFFFFFF);
+
+				break;
 			}
 
 			if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
@@ -6797,6 +6818,32 @@ bool Renderer11::DrawBar(int x, int y, int w, int h, int percent, int color1, in
 	AddLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255, 255);
 
 	return true;
+}
+
+void Renderer11::drawFootprints()
+{
+	for (auto i = footprints.begin(); i != footprints.end();i++) {
+		FOOTPRINT_STRUCT& footprint = *i;
+		if (footprint.active) {
+			float x1 = footprint.pos.xPos - 30;
+			float y1 = footprint.pos.yPos;
+			float z1 = footprint.pos.zPos - 30;
+
+			float x2 = footprint.pos.xPos+30;
+			float y2 = footprint.pos.yPos;
+			float z2 = footprint.pos.zPos - 30;
+
+			float x3 = footprint.pos.xPos+30;
+			float y3 = footprint.pos.yPos;
+			float z3 = footprint.pos.zPos+30;
+
+			float x4 = footprint.pos.xPos -30;
+			float y4 = footprint.pos.yPos;
+			float z4 = footprint.pos.zPos+30;
+			AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex], x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, footprint.opacity, footprint.opacity, footprint.opacity,
+				0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
+		}
+	}
 }
 
 void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a)

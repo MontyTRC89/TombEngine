@@ -778,6 +778,7 @@ private:
 	IDXGISwapChain*									m_swapChain = NULL;
 	IDXGIDevice*									m_dxgiDevice = NULL;
 	CommonStates*									m_states = NULL;
+	ID3D11BlendState* m_subtractiveBlendState = nullptr;
 	ID3D11InputLayout*								m_inputLayout = NULL;
 	D3D11_VIEWPORT									m_viewport;
 	D3D11_VIEWPORT									m_shadowMapViewport;
@@ -1060,4 +1061,6 @@ public:
 	void											AddLine3D(int x1, int y1, int z1, int x2, int y2, int z2, byte r, byte g, byte b);
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
 	bool											DrawBar(int x, int y, int w, int h, int percent, int color1, int color2);
+private:
+	void drawFootprints();
 };
