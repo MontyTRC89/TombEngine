@@ -71,3 +71,6 @@ void ControlDog(short itemNumber);
 void ControlLarson(short itemNumber);
 void InitialiseRaisingBlock(short itemNumber);
 void ControlRaisingBlock(short itemNumber);
+void InitialiseTeethSpikes(short itemNumber);
+int CollidedWithTeethSpikes(ITEM_INFO* item);
+void ControlTeethSpikes(short itemNumber);

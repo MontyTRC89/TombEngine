@@ -7373,6 +7373,9 @@ bool Renderer11::drawShadowMap()
 		}
 	}
 
+	// Draw items
+
+
 	// Hairs are pre-transformed
 	Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
 						   Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
