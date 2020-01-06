@@ -157,7 +157,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 						LaserSight = false;
 						AlterFOV(ANGLE(80));
 						LaraItem->meshBits = 0xFFFFFFFF;
-						Lara.isDucked = false;
+						Lara.busy = false;
 						Camera.type = BinocularOldCamera;
 
 						Lara.headYrot = 0;
