@@ -1377,7 +1377,7 @@ void AlterFloorHeight(ITEM_INFO* item, int height)
 	}
 }
 
-FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
+FLOOR_INFO* _GetFloor(int x, int y, int z, short* roomNumber)
 {
 	ROOM_INFO* r;
 	FLOOR_INFO* floor;
@@ -2486,5 +2486,5 @@ void Inject_Control()
 	INJECT(0x00416760, TestTriggers);
 	INJECT(0x004167B0, TestTriggers);
 	INJECT(0x00415960, TranslateItem);
-	INJECT(0x00415B20, GetFloor);
+	//INJECT(0x00415B20, GetFloor);
 }

@@ -2343,7 +2343,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 			moveable->Id = MoveablesIds[i];
 
 			// Assign the draw routine
-			if (objNum == ID_FLAME || objNum == ID_FLAME_EMITTER || objNum == ID_FLAME_EMITTER2 || objNum == ID_FLAME_EMITTER3 ||
+			/*if (objNum == ID_FLAME || objNum == ID_FLAME_EMITTER || objNum == ID_FLAME_EMITTER2 || objNum == ID_FLAME_EMITTER3 ||
 				objNum == ID_TRIGGER_TRIGGERER || objNum == ID_TIGHT_ROPE || objNum == ID_AI_AMBUSH ||
 				objNum == ID_AI_FOLLOW || objNum == ID_AI_GUARD || objNum == ID_AI_MODIFY ||
 				objNum == ID_AI_PATROL1 || objNum == ID_AI_PATROL2 || objNum == ID_AI_X1 ||
@@ -2357,7 +2357,9 @@ bool Renderer11::PrepareDataForTheRenderer()
 			else
 			{
 				moveable->DoNotDraw = false;
-			}
+			}*/
+
+			moveable->DoNotDraw = (obj->drawRoutine == NULL);
 
 			for (int j = 0; j < obj->nmeshes; j++)
 			{
