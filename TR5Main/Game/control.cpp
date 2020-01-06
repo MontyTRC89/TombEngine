@@ -1377,7 +1377,7 @@ void AlterFloorHeight(ITEM_INFO* item, int height)
 	}
 }
 
-FLOOR_INFO* _GetFloor(int x, int y, int z, short* roomNumber)
+FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
 {
 	ROOM_INFO* r;
 	FLOOR_INFO* floor;
