@@ -18,7 +18,7 @@
 #include "..\Game\Camera.h"
 #include "..\Game\healt.h"
 #include "../Game/tomb4fx.h"
-
+#include "math.h"
 #include <D3Dcompiler.h>
 #include <chrono> 
 #include <stack>
@@ -632,16 +632,13 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	m_textureAtlas = NULL;
 	m_skyTexture = NULL;
-	D3D11_BLEND_DESC subtractiveBlendDescription;
-	subtractiveBlendDescription.RenderTarget[0].BlendEnable = true;
-	subtractiveBlendDescription.RenderTarget[0].RenderTargetWriteMask = 0xFFFFFFFF;
-	subtractiveBlendDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_SUBTRACT;
-	subtractiveBlendDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_SUBTRACT;
-	subtractiveBlendDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-	subtractiveBlendDescription.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
-	subtractiveBlendDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	subtractiveBlendDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-	m_device->CreateBlendState(&subtractiveBlendDescription,&m_subtractiveBlendState);
+	D3D11_BLEND_DESC desc;
+	desc.RenderTarget[0].BlendEnable = TRUE;
+	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_DEST_COLOR;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	m_device->CreateBlendState(&desc,&m_subtractiveBlendState);
 
 	return true;
 }
@@ -4740,8 +4737,8 @@ void Renderer11::drawBlood()
 		if (blood->on)
 		{
 			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
-				blood->x, blood->y, blood->z,
-				blood->shade * 244, blood->shade * 0, blood->shade * 0,
+				Vector3(blood->x, blood->y, blood->z),
+				Vector4(blood->shade * 244/255.0f, blood->shade * 0, blood->shade * 0,1.0f),
 				TR_ANGLE_TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
 				BLENDMODE_ALPHABLEND);
 		}
@@ -4760,8 +4757,8 @@ void Renderer11::drawSparks()
 				FX_INFO* fx = &Effects[spark->fxObj];
 
 				AddSpriteBillboard(m_sprites[spark->def],
-					fx->pos.xPos + spark->x,fx->pos.yPos + spark->y, fx->pos.zPos + spark->z,
-					spark->r, spark->g, spark->b,
+					Vector3(fx->pos.xPos + spark->x,fx->pos.yPos + spark->y, fx->pos.zPos + spark->z),
+					Vector4(spark->r/255.0f, spark->g / 255.0f, spark->b / 255.0f,1.0f),
 					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f,
 					BLENDMODE_ALPHABLEND);
 			}
@@ -4769,7 +4766,7 @@ void Renderer11::drawSparks()
 			{
 				Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
 				v.Normalize();
-				AddLine3D(spark->x, spark->y, spark->z, spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f, spark->r, spark->g, spark->b);
+				AddLine3D(Vector3(spark->x, spark->y, spark->z),Vector3( spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f,1.0f));
 			}
 		}
 	}
@@ -4786,13 +4783,13 @@ void Renderer11::drawFires()
 			{
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
-					AddSpriteBillboard(m_sprites[spark->def], fire->x + spark->x, fire->y + spark->y, fire->z + spark->z, spark->r, spark->g, spark->b, TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
+					AddSpriteBillboard(m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f,1.0f), TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
 			}
 		}
 	}
 }
 
-void Renderer11::AddSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
+void Renderer11::AddSpriteBillboard(RendererSprite* sprite,Vector3 pos, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
 {
 	if (m_nextSprite >= MAX_SPRITES)
 		return;
@@ -4806,12 +4803,8 @@ void Renderer11::AddSpriteBillboard(RendererSprite* sprite, float x, float y, fl
 
 	spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD;
 	spr->Sprite = sprite;
-	spr->X = x;
-	spr->Y = y;
-	spr->Z = z;
-	spr->R = r;
-	spr->G = g;
-	spr->B = b;
+	spr->pos = pos;
+	spr->color = color;
 	spr->Rotation = rotation;
 	spr->Scale = scale;
 	spr->Width = width;
@@ -4830,35 +4823,29 @@ void Renderer11::drawSmokes()
 		if (spark->on)
 		{
 			AddSpriteBillboard(m_sprites[spark->def],
-				spark->x, spark->y, spark->z,
-				spark->shade, spark->shade, spark->shade,
+				Vector3(spark->x, spark->y, spark->z),
+				Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f,1.0f),
 				TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
 				BLENDMODE_ALPHABLEND);
 		}
 	}
 }
 
-void Renderer11::AddLine3D(int x1, int y1, int z1, int x2, int y2, int z2, byte r, byte g, byte b)
+void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
 {
 	if (m_nextLine3D >= MAX_LINES_3D)
 		return;
 
 	RendererLine3D* line = &m_lines3DBuffer[m_nextLine3D++];
 
-	line->X1 = x1;
-	line->Y1 = y1;
-	line->Z1 = z1;
-	line->X2 = x2;
-	line->Y2 = y2;
-	line->Z2 = z2;
-	line->R = r;
-	line->G = g;
-	line->B = b;
+	line->start = start;
+	line->end = end;
+	line->color = color;
 
 	m_lines3DToDraw.Add(line);
 }
 
-void Renderer11::AddSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
+void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1,Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
 {
 	if (m_nextSprite >= MAX_SPRITES)
 		return;
@@ -4872,21 +4859,11 @@ void Renderer11::AddSprite3D(RendererSprite* sprite, float x1, float y1, float z
 
 	spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 	spr->Sprite = sprite;
-	spr->X1 = x1;
-	spr->Y1 = y1;
-	spr->Z1 = z1;
-	spr->X2 = x2;
-	spr->Y2 = y2;
-	spr->Z2 = z2;
-	spr->X3 = x3;
-	spr->Y3 = y3;
-	spr->Z3 = z3;
-	spr->X4 = x4;
-	spr->Y4 = y4;
-	spr->Z4 = z4;
-	spr->R = r;
-	spr->G = g;
-	spr->B = b;
+	spr->vtx1 = vtx1;
+	spr->vtx2 = vtx2;
+	spr->vtx3 = vtx3;
+	spr->vtx4 = vtx4;
+	spr->color = color;
 	spr->Rotation = rotation;
 	spr->Scale = scale;
 	spr->Width = width;
@@ -4927,11 +4904,11 @@ void Renderer11::drawShockwaves()
 				angle -= PI / 8.0f;
 
 				AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-					x1, shockwave->y, z1,
-					x2, shockwave->y, z2,
-					x3, shockwave->y, z3,
-					x4, shockwave->y, z4,
-					color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+					Vector3(x1, shockwave->y, z1),
+					Vector3(x2, shockwave->y, z2),
+					Vector3(x3, shockwave->y, z3),
+					Vector3(x4, shockwave->y, z4),
+					Vector4(color / 255.0f, color / 255.0f, color/255.0f,1.0f), 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
 				x1 = x2;
 				z1 = z2;
@@ -4958,7 +4935,7 @@ void Renderer11::drawRipples()
 
 			byte color = (ripple->init ? ripple->init << 1 : ripple->life << 1);
 
-			AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES], x1, y, z2, x2, y, z2, x2, y, z1, x1, y, z1, color, color, color, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+			AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES], Vector3(x1, y, z2),Vector3(x2, y, z2),Vector3( x2, y, z1),Vector3( x1, y, z1),Vector4( color / 255.0f, color / 255.0f, color/255.0f,1.0f), 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 		}
 	}
 }
@@ -4971,7 +4948,7 @@ void Renderer11::drawDrips()
 
 		if (drip->on)
 		{
-			AddLine3D(drip->x, drip->y, drip->z, drip->x, drip->y + 24.0f, drip->z, drip->r, drip->g, drip->b);
+			AddLine3D(Vector3(drip->x, drip->y, drip->z),Vector3( drip->x, drip->y + 24.0f, drip->z), Vector4(drip->r/255.0f, drip->g/255.0f, drip->b/255.0f,1.0f));
 		}
 	}
 }
@@ -4982,7 +4959,7 @@ void Renderer11::drawBubbles()
 	{
 		BUBBLE_STRUCT* bubble = &Bubbles[i];
 		if (bubble->size)
-			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES], bubble->pos.x, bubble->pos.y, bubble->pos.z, bubble->shade * 255, bubble->shade * 255, bubble->shade * 255, 0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
+			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES], Vector3(bubble->pos.x, bubble->pos.y, bubble->pos.z),Vector4( bubble->shade, bubble->shade, bubble->shade,1.0f), 0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
 	}
 }
 
@@ -5032,7 +5009,7 @@ void Renderer11::drawSplahes()
 				x2Outer += splash.x;
 				z2Outer = outerRadius * cos(alpha * j * PI / 180);
 				z2Outer += splash.z;
-				AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], xOuter, yOuter, zOuter, x2Outer, yOuter, z2Outer, x2Inner, yInner, z2Inner, xInner, yInner, zInner, color, color, color, 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+				AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],Vector3( xOuter, yOuter, zOuter), Vector3(x2Outer, yOuter, z2Outer),Vector3( x2Inner, yInner, z2Inner), Vector3(xInner, yInner, zInner),Vector4( color / 255.0f, color / 255.0f, color / 255.0f,1.0f), 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 			}
 		}
 	}
@@ -5101,7 +5078,7 @@ bool Renderer11::drawSprites()
 				float halfHeight = spr->Height / 2.0f;
 
 				Matrix billboardMatrix;
-				createBillboardMatrix(&billboardMatrix, &Vector3(spr->X, spr->Y, spr->Z), &Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
+				createBillboardMatrix(&billboardMatrix, &spr->pos, &Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
 
 				Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
 				Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
@@ -5119,10 +5096,7 @@ bool Renderer11::drawSprites()
 				v0.Position.z = p0t.z;
 				v0.UV.x = spr->Sprite->UV[0].x;
 				v0.UV.y = spr->Sprite->UV[0].y;
-				v0.Color.x = spr->R / 255.0f;
-				v0.Color.y = spr->G / 255.0f;
-				v0.Color.z = spr->B / 255.0f;
-				v0.Color.w = 1.0f;
+				v0.Color = spr->color;
 
 				RendererVertex v1;
 				v1.Position.x = p1t.x;
@@ -5130,10 +5104,7 @@ bool Renderer11::drawSprites()
 				v1.Position.z = p1t.z;
 				v1.UV.x = spr->Sprite->UV[1].x;
 				v1.UV.y = spr->Sprite->UV[1].y;
-				v1.Color.x = spr->R / 255.0f;
-				v1.Color.y = spr->G / 255.0f;
-				v1.Color.z = spr->B / 255.0f;
-				v1.Color.w = 1.0f;
+				v1.Color = spr->color;
 
 				RendererVertex v2;
 				v2.Position.x = p2t.x;
@@ -5141,10 +5112,7 @@ bool Renderer11::drawSprites()
 				v2.Position.z = p2t.z;
 				v2.UV.x = spr->Sprite->UV[2].x;
 				v2.UV.y = spr->Sprite->UV[2].y;
-				v2.Color.x = spr->R / 255.0f;
-				v2.Color.y = spr->G / 255.0f;
-				v2.Color.z = spr->B / 255.0f;
-				v2.Color.w = 1.0f;
+				v2.Color = spr->color;
 
 				RendererVertex v3;
 				v3.Position.x = p3t.x;
@@ -5152,19 +5120,16 @@ bool Renderer11::drawSprites()
 				v3.Position.z = p3t.z;
 				v3.UV.x = spr->Sprite->UV[3].x;
 				v3.UV.y = spr->Sprite->UV[3].y;
-				v3.Color.x = spr->R / 255.0f;
-				v3.Color.y = spr->G / 255.0f;
-				v3.Color.z = spr->B / 255.0f;
-				v3.Color.w = 1.0f;
+				v3.Color = spr->color;
 
 				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
 			}
 			else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
 			{
-				Vector3 p0t = Vector3(spr->X1, spr->Y1, spr->Z1);
-				Vector3 p1t = Vector3(spr->X2, spr->Y2, spr->Z2);
-				Vector3 p2t = Vector3(spr->X3, spr->Y3, spr->Z3);
-				Vector3 p3t = Vector3(spr->X4, spr->Y4, spr->Z4);
+				Vector3 p0t = spr->vtx1;
+				Vector3 p1t = spr->vtx2;
+				Vector3 p2t = spr->vtx3;
+				Vector3 p3t = spr->vtx4;
 
 				RendererVertex v0;
 				v0.Position.x = p0t.x;
@@ -5172,10 +5137,7 @@ bool Renderer11::drawSprites()
 				v0.Position.z = p0t.z;
 				v0.UV.x = spr->Sprite->UV[0].x;
 				v0.UV.y = spr->Sprite->UV[0].y;
-				v0.Color.x = spr->R / 255.0f;
-				v0.Color.y = spr->G / 255.0f;
-				v0.Color.z = spr->B / 255.0f;
-				v0.Color.w = 1.0f;
+				v0.Color = spr->color;
 
 				RendererVertex v1;
 				v1.Position.x = p1t.x;
@@ -5183,10 +5145,7 @@ bool Renderer11::drawSprites()
 				v1.Position.z = p1t.z;
 				v1.UV.x = spr->Sprite->UV[1].x;
 				v1.UV.y = spr->Sprite->UV[1].y;
-				v1.Color.x = spr->R / 255.0f;
-				v1.Color.y = spr->G / 255.0f;
-				v1.Color.z = spr->B / 255.0f;
-				v1.Color.w = 1.0f;
+				v1.Color = spr->color;
 
 				RendererVertex v2;
 				v2.Position.x = p2t.x;
@@ -5194,10 +5153,7 @@ bool Renderer11::drawSprites()
 				v2.Position.z = p2t.z;
 				v2.UV.x = spr->Sprite->UV[2].x;
 				v2.UV.y = spr->Sprite->UV[2].y;
-				v2.Color.x = spr->R / 255.0f;
-				v2.Color.y = spr->G / 255.0f;
-				v2.Color.z = spr->B / 255.0f;
-				v2.Color.w = 1.0f;
+				v2.Color = spr->color;
 
 				RendererVertex v3;
 				v3.Position.x = p3t.x;
@@ -5205,10 +5161,7 @@ bool Renderer11::drawSprites()
 				v3.Position.z = p3t.z;
 				v3.UV.x = spr->Sprite->UV[3].x;
 				v3.UV.y = spr->Sprite->UV[3].y;
-				v3.Color.x = spr->R / 255.0f;
-				v3.Color.y = spr->G / 255.0f;
-				v3.Color.z = spr->B / 255.0f;
-				v3.Color.w = 1.0f;
+				v3.Color = spr->color;
 
 				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
 			}			
@@ -5360,23 +5313,12 @@ bool Renderer11::drawLines3D()
 		RendererLine3D* line = m_lines3DToDraw[i];
 
 		RendererVertex v1;
-		v1.Position.x = line->X1;
-		v1.Position.y = line->Y1;
-		v1.Position.z = line->Z1;
-		v1.Color.x = line->R / 255.0f;
-		v1.Color.y = line->G / 255.0f;
-		v1.Color.z = line->B / 255.0f;
-		v1.Color.w = 1.0f;
+		v1.Position = line->start;
+		v1.Color = line->color;
 
 		RendererVertex v2;
-		v2.Position.x = line->X2;
-		v2.Position.y = line->Y2;
-		v2.Position.z = line->Z2;
-		v2.Color.x = line->R / 255.0f;
-		v2.Color.y = line->G / 255.0f;
-		v2.Color.z = line->B / 255.0f;
-		v2.Color.w = 1.0f;
-
+		v2.Position = line->end;
+		v2.Color = line->color;
 		m_primitiveBatch->DrawLine(v1, v2);
 	}
 
@@ -5443,7 +5385,7 @@ bool Renderer11::doRain()
 		drop->Z += dz;
 
 		if (drop->Draw)
-			AddLine3D(x1, y1, z1, drop->X, drop->Y, drop->Z, (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f), (byte)(RAIN_COLOR * 255.0f));
+			AddLine3D(Vector3(x1, y1, z1),Vector3( drop->X, drop->Y, drop->Z), Vector4(RAIN_COLOR, RAIN_COLOR, RAIN_COLOR,1.0f));
 
 		// If rain drop has hit the ground, then reset it and add a little drip
 		short roomNumber = Camera.pos.roomNumber;
@@ -5507,7 +5449,7 @@ bool Renderer11::doSnow()
 			continue;
 		}
 
-		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], snow->X, snow->Y, snow->Z, 255, 255, 255,
+		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1,1),
 			0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
 			BLENDMODE_ALPHABLEND);
 
@@ -6695,11 +6637,11 @@ bool Renderer11::drawRopes()
 				Vector3 p4 = m_viewportToolkit->Unproject(Vector3(x4, y4, depth), Projection, View, world);
 
 				AddSprite3D(m_sprites[20],
-					p1.x, p1.y, p1.z,
-					p2.x, p2.y, p2.z,
-					p3.x, p3.y, p3.z,
-					p4.x, p4.y, p4.z,
-					128, 128, 128, 0, 1, 0, 0, BLENDMODE_OPAQUE);
+					Vector3(p1.x, p1.y, p1.z),
+					Vector3(p2.x, p2.y, p2.z),
+					Vector3(p3.x, p3.y, p3.z),
+					Vector3(p4.x, p4.y, p4.z),
+					Vector4(0.5f, 0.5f, 0.5f,1.0f), 0, 1, 0, 0, BLENDMODE_OPAQUE);
 
 				x1 = x4;
 				y1 = y4;
@@ -6825,22 +6767,22 @@ void Renderer11::drawFootprints()
 	for (auto i = footprints.begin(); i != footprints.end();i++) {
 		FOOTPRINT_STRUCT& footprint = *i;
 		if (footprint.active) {
-			float x1 = footprint.pos.xPos - 30;
-			float y1 = footprint.pos.yPos;
-			float z1 = footprint.pos.zPos - 30;
+			float y = footprint.pos.yPos;
+			Matrix rot = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(footprint.pos.yRot) + PI);
+			Vector3 p1 = Vector3(-64, 0, -64);
+			Vector3 p2 = Vector3(64, 0, -64);
+			Vector3 p3 = Vector3(64, 0, 64);
+			Vector3 p4 = Vector3(-64, 0, 64);
+			p1 = XMVector3Transform(p1, rot);
+			p2 = XMVector3Transform(p2, rot);
+			p3 = XMVector3Transform(p3, rot);
+			p4 = XMVector3Transform(p4, rot);
+			p1 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+			p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+			p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+			p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 
-			float x2 = footprint.pos.xPos+30;
-			float y2 = footprint.pos.yPos;
-			float z2 = footprint.pos.zPos - 30;
-
-			float x3 = footprint.pos.xPos+30;
-			float y3 = footprint.pos.yPos;
-			float z3 = footprint.pos.zPos+30;
-
-			float x4 = footprint.pos.xPos -30;
-			float y4 = footprint.pos.yPos;
-			float z4 = footprint.pos.zPos+30;
-			AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex], x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, footprint.opacity, footprint.opacity, footprint.opacity,
+			AddSprite3D(m_sprites[Objects[ID_MISC_SPRITES].meshIndex+1], p1,p2,p3,p4, Vector4(1,1,1,footprint.opacity),
 				0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
 		}
 	}
@@ -7059,7 +7001,7 @@ void Renderer11::drawUnderwaterDust()
 		dust->Life++;
 		byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], dust->X, dust->Y, dust->Z, color, color, color, 0.0f, 1.0f, 12, 12, BLENDMODE_ALPHABLEND);
+		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z),Vector4( color/255.0f, color/255.0f, color/255.0f,1.0f), 0.0f, 1.0f, 12, 12, BLENDMODE_ALPHABLEND);
 
 		if (dust->Life >= 32)
 			dust->Reset = true;

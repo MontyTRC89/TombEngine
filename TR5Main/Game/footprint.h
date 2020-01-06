@@ -3,7 +3,7 @@
 #include <queue>
 #pragma once
 
-constexpr size_t MAX_FOOTPRINTS = 10;
+constexpr size_t MAX_FOOTPRINTS = 20;
 typedef struct footprint_t {
 	PHD_3DPOS pos;
 	int life;
