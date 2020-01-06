@@ -43,11 +43,13 @@ void updateFootprints()
 	if (footprints.size() == 0) {
 		return;
 	}
+	int numInvalidFootprints = 0;
 	for (auto i = footprints.begin(); i != footprints.end(); i++) {
 		FOOTPRINT_STRUCT& footprint = *i;
 		footprint.life--;
 		if (footprint.life <= 0) {
-			footprints.pop_back();
+			numInvalidFootprints++;
+			continue;
 		}
 		if (footprint.life > footprint.lifeStartFading) {
 			footprint.opacity = footprint.startOpacity;
@@ -56,5 +58,8 @@ void updateFootprints()
 			float opacity = lerp(0, footprint.startOpacity, fmax(0, fmin(1, footprint.life / (float)footprint.lifeStartFading)));
 			footprint.opacity = opacity;
 		}
+	}
+	for (int i = 0; i < numInvalidFootprints; i++) {
+		footprints.pop_back();
 	}
 }
