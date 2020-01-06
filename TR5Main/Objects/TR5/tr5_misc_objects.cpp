@@ -8,6 +8,8 @@
 #include "../../Game/effects.h"
 #include "../../Game/laramisc.h"
 #include "../../Game/Box.h"
+#include "../../Game/sphere.h"
+#include "../../Game/effect2.h"
 
 void InitialiseRaisingBlock(short itemNumber)
 {
@@ -131,5 +133,218 @@ void ControlRaisingBlock(short itemNumber)
 		}
 
 		item->itemFlags[1] -= 64;
+	}
+}
+
+void PulseLightControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (TriggerActive(item))
+	{
+		item->itemFlags[0] -= 1024;
+
+		long pulse = 256 * SIN(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF)) >> W2V_SHIFT;
+		pulse = (HIDWORD(pulse) ^ pulse) - HIDWORD(pulse);
+		if (pulse > 255)
+			pulse = 255;
+		
+		TriggerDynamicLight(
+			item->pos.xPos,
+			item->pos.yPos,
+			item->pos.zPos,
+			24,
+			pulse * 8 * (item->triggerFlags & 0x1F) >> 9,
+			pulse* ((item->triggerFlags >> 2) & 0xF8) >> 9,
+			pulse* ((item->triggerFlags >> 7) & 0xF8) >> 9);
+	}
+}
+
+void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int rot, __int16 roomNumber, __int16 falloff)
+{
+	GAME_VECTOR from;
+	from.x = x;
+	from.y = y;
+	from.z = z;
+	GetFloor(x, y, z, &roomNumber);
+	from.roomNumber = roomNumber;
+	
+	GAME_VECTOR to;
+	to.x = x + rcossin_tbl[2 * rot];
+	to.y = y;
+	to.z = z + rcossin_tbl[2 * rot + 1];
+
+	if (!LOS(&from, &to))
+		TriggerDynamicLight(to.x, to.y, to.z, falloff, r, g, b);
+}
+
+void StrobeLightControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (TriggerActive(item))
+	{
+		item->pos.yRot += ANGLE(16);
+
+		byte r = 8 * (item->triggerFlags & 0x1F);
+		byte g = (item->triggerFlags >> 2) & 0xF8;
+		byte b = (item->triggerFlags >> 7) & 0xF8;
+
+		TriggerAlertLight(
+			item->pos.xPos, 
+			item->pos.yPos - 512, 
+			item->pos.zPos, 
+			r, g, b, 
+			((item->pos.yRot + 22528) >> 4) & 0xFFF,
+			item->roomNumber, 
+			12);
+		
+		TriggerDynamicLight(
+			item->pos.xPos + 256 * SIN(item->pos.yRot + 22528) >> W2V_SHIFT,
+			item->pos.yPos - 768,
+			item->pos.zPos + 256 * COS(item->pos.yRot + 22528) >> W2V_SHIFT,
+			8,
+			r, g, b);
+	}
+}
+
+void ColorLightControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (TriggerActive(item))
+	{
+		TriggerDynamicLight(
+			item->pos.xPos,
+			item->pos.yPos,
+			item->pos.zPos,
+			24,
+			8 * (item->triggerFlags & 0x1F),
+			(item->triggerFlags >> 2) & 0xF8,
+			(item->triggerFlags >> 7) & 0xF8);
+	}
+}
+
+void ElectricalLightControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (!TriggerActive(item))
+	{
+		item->itemFlags[0] = 0;
+		return;
+	}
+
+	int intensity = 0;
+
+	if (item->triggerFlags > 0)
+	{
+		if (item->itemFlags[0] < 16)
+		{
+			intensity = 4 * (GetRandomControl() & 0x3F);
+			item->itemFlags[0]++;			
+		}
+		else if (item->itemFlags[0] >= 96)
+		{
+			if (item->itemFlags[0] >= 160)
+			{
+				intensity = 255 - (GetRandomControl() & 0x1F);
+			}
+			else
+			{
+				intensity = 96 - (GetRandomControl() & 0x1F);
+				if (!(GetRandomControl() & 0x1F) && item->itemFlags[0] > 128)
+				{
+					item->itemFlags[0] = 160;
+				}
+				else
+				{
+					item->itemFlags[0]++;
+				}
+			}
+		}
+		else
+		{
+			if (Wibble & 0x3F && GetRandomControl() & 7)
+			{
+				intensity = GetRandomControl() & 0x3F;
+				item->itemFlags[0]++;
+			}
+			else
+			{
+				intensity = 192 - (GetRandomControl() & 0x3F);
+				item->itemFlags[0]++;
+			}
+		}		
+	}
+	else
+	{
+		if (item->itemFlags[0] <= 0)
+		{
+			item->itemFlags[0] = (GetRandomControl() & 3) + 4;
+			item->itemFlags[1] = (GetRandomControl() & 0x7F) + 128;
+			item->itemFlags[2] = GetRandomControl() & 1;
+		}
+		
+		item->itemFlags[0]--;
+
+		if (!item->itemFlags[2])
+		{
+			item->itemFlags[0]--;
+
+			intensity = item->itemFlags[1] - (GetRandomControl() & 0x7F);
+			if (intensity > 64)
+				SoundEffect(SFX_ELEC_LIGHT_CRACKLES, &item->pos, 32 * (intensity & 0xFFFFFFF8) | 8);
+		}
+		else
+		{
+			return;
+		}
+	}
+
+	TriggerDynamicLight(
+		item->pos.xPos,
+		item->pos.yPos,
+		item->pos.zPos,
+		24,
+		intensity * 8 * (item->triggerFlags & 0x1F) >> 8,
+		intensity * ((item->triggerFlags >> 2) & 0xF8) >> 8,
+		intensity * ((item->triggerFlags >> 7) & 0xF8) >> 8);
+}
+
+void BlinkingLightControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (TriggerActive(item))
+	{
+		item->itemFlags[0]--;
+
+		if (item->itemFlags[0] >= 3)
+		{
+			item->meshBits = 1;
+		}
+		else
+		{
+			PHD_VECTOR pos;
+			pos.x = 0;
+			pos.y = 0;
+			pos.z = 0;
+			GetJointAbsPosition(item, &pos, 0);
+			
+			TriggerDynamicLight(
+				pos.x,
+				pos.y,
+				pos.z,
+				16,
+				8 * (item->triggerFlags & 0x1F),
+				(item->triggerFlags >> 2) & 0xF8,
+				(item->triggerFlags >> 7) & 0xF8);
+
+			item->meshBits = 2;
+
+			if (item->itemFlags[0] < 0)
+				item->itemFlags[0] = 30;
+		}
 	}
 }
