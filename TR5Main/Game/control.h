@@ -38,7 +38,7 @@
 //#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 #define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
 
-//#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
+#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 //#define GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
 
 #define TRIG_BITS(T) ((T & 0x3fff) >> 10)
@@ -63,7 +63,7 @@ void AlterFloorHeight(ITEM_INFO* item, int height);
 int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
-FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
+FLOOR_INFO* _GetFloor(int x, int y, int z, short* roomNumber);
 void UpdateRats();
 void UpdateDebris();
 void UpdateBats();

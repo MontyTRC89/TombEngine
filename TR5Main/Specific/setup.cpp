@@ -2498,6 +2498,47 @@ void ObjectObjects()
 		obj->control = RaisingCogControl;
 	}
 
+	obj = &Objects[ID_ELECTRICAL_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = ElectricalLightControl;
+		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_PULSE_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = PulseLightControl;
+		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_STROBE_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = StrobeLightControl;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_COLOR_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = ColorLightControl;
+		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_BLINKING_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = BlinkingLightControl;
+		obj->saveFlags = true;
+	}
+
 	INIT_KEYHOLE(ID_KEY_HOLE1);
 	INIT_KEYHOLE(ID_KEY_HOLE2);
 	INIT_KEYHOLE(ID_KEY_HOLE3);
