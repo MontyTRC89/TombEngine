@@ -28,7 +28,7 @@
 #include "traps.h"
 #include "effects.h"
 #include "sphere.h"
-
+#include "footprint.h"
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
 #include "..\Specific\init.h"
@@ -41,6 +41,7 @@ int KeyTriggerActive;
 PENDULUM CurrentPendulum;
 int number_los_rooms;
 short los_rooms[20];
+extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 // TODO: move to DLL after @ChocolateFan decompilation
 #define ClosestCoord VAR_U_(0x00EEF460, PHD_VECTOR)
@@ -394,6 +395,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBubbles();
 		UpdateDebris();
 		UpdateGunShells();
+		updateFootprints();
 		UpdateSplashes();
 		UpdateDrips();
 		UpdateRats();
