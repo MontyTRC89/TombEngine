@@ -21,6 +21,12 @@ extern DRIP_STRUCT Drips[32]; // offset 0xA85FC
 extern SHOCKWAVE_STRUCT ShockWaves[16]; // 0xA7C3C
 extern FIRE_LIST Fires[32]; // offset 0xA8D7C
 
+extern int LaserSightX;
+extern int LaserSightY;
+extern int LaserSightZ;
+extern char LaserSightActive;
+extern char LaserSightCol;
+
 extern int NextFireSpark;
 extern int NextSmokeSpark;
 extern int NextBubble;
