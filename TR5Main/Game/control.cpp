@@ -47,7 +47,7 @@ short los_rooms[20];
 #define ClosestItem VAR_U_(0x00EEEFF8, short)
 #define ClosestDist VAR_U_(0x00EEF4A4, int)
 
-#define _NormaliseVector ((PHD_VECTOR* (__cdecl*)(PHD_VECTOR*)) 0x0046DE10)
+#define _NormalizeVector ((PHD_VECTOR* (__cdecl*)(PHD_VECTOR*)) 0x0046DE10)
 
 //PHD_VECTOR ClosestCoord;
 //short ClosestItem = NO_ITEM;
@@ -2492,24 +2492,31 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
 	return 1;
 }
 
-PHD_VECTOR* NormaliseVector(PHD_VECTOR* vec)
+PHD_VECTOR* NormalizeVector(PHD_VECTOR* vec)
 {
 	int x = vec->x >> 16;
 	int y = vec->y >> 16;
 	int z = vec->z >> 16;
 
+	Vector3 v = Vector3(x, y, z);
+	v.Normalize();
+
+	vec->x = (int)(v.x * 16384);
+	vec->y = (int)(v.y * 16384);
+	vec->z = (int)(v.z * 16384);
+
+	/*
 	if (!x && !y && !z)
 		return vec;
 
-	int length = SQUARE(x) + SQUARE(y) + SQUARE(z);
-	if (length < 0)
-		length = -length;
+	int length = abs(SQUARE(x) + SQUARE(y) + SQUARE(z));
 
 	length = 0x1000000 / (SQRT_ASM(length) << 16 >> 8) << 8 >> 8;
 
-	vec->x = (vec->x * length >> 16);
+	vec->x = vec->x * length >> 16;
 	vec->y = vec->y * length >> 16;
 	vec->z = vec->z * length >> 16;
+	*/
 
 	return vec;
 }
@@ -2569,7 +2576,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 	vec.y = ((a2 >> W2V_SHIFT) - (b2 >> W2V_SHIFT)) << 16;
 	vec.z = ((a3 >> W2V_SHIFT) - (b3 >> W2V_SHIFT)) << 16;
 
-	_NormaliseVector(&vec);
+	NormalizeVector(&vec);
 
 	PHD_VECTOR pb;
 	pb.x = b1 >> W2V_SHIFT << 16;
