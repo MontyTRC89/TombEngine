@@ -31,4 +31,6 @@ void InitialiseSwitch(short itemNum);
 void InitialisePulleySwitch(short itemNumber);
 void InitialiseCrowDoveSwitch(short itemNumber);
 
+extern int PulleyItemNumber;
+
 void Inject_Switch();

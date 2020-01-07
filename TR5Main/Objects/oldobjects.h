@@ -80,3 +80,11 @@ void StrobeLightControl(short itemNumber);
 void ColorLightControl(short itemNumber);
 void ElectricalLightControl(short itemNumber);
 void BlinkingLightControl(short itemNumber);
+void InitialiseTwoBlocksPlatform(short itemNumber);
+void TwoBlocksPlatformControl(short itemNumber);
+void TwoBlocksPlatformFloor(ITEM_INFO* item, int x, int y, int z, int* height);
+void TwoBlocksPlatformCeiling(ITEM_INFO* item, int x, int y, int z, int* height);
+int IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z);
+void InitialiseRaisingCog(short itemNumber);
+void RaisingCogControl(short itemNumber);
+
