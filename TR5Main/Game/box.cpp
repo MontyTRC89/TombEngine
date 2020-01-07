@@ -1136,14 +1136,7 @@ int CreatureActive(short itemNumber)
 
 void InitialiseCreature(short itemNumber) 
 {
-	ITEM_INFO* item = &Items[itemNumber];
-	ROOM_INFO* room = &Rooms[item->roomNumber];
-
-	item->collidable = true;
-	item->data = NULL;
-	item->drawRoom = (((item->pos.zPos - room->z) / WALL_SIZE) & 0xFF) | (((item->pos.xPos - room->mesh->x) / 4) & 0xFF00);
-	item->TOSSPAD = item->pos.yRot & 0xE000;
-	item->itemFlags[2] = item->roomNumber | (item->pos.yPos - room->minfloor);
+	ClearItem(itemNumber);
 }
 
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
@@ -1296,7 +1289,7 @@ void GetAITarget(CREATURE_INFO* creature)
 			if (item->aiBits & AMBUSH)
 			{
 				item->aiBits |= MODIFY;
-				item->itemFlags[3] = (short)item->pad2[6]; // fix wrong size warning.
+				item->itemFlags[3] = (item->TOSSPAD & 0xFF);
 			}
 		}
 		else if (!creature->patrol2 && enemyObjectNumber != ID_AI_PATROL1)

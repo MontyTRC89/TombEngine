@@ -1276,9 +1276,9 @@ void RifleHandler(int weaponType)
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
 			TriggerDynamicLight(
-				LaraItem->pos.xPos + (SIN(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
+				LaraItem->pos.xPos + (SIN(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
 				LaraItem->pos.yPos + (GetRandomControl() & 0x7F) - 575,
-				LaraItem->pos.zPos + (COS(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
+				LaraItem->pos.zPos + (COS(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
 				12,
 				(GetRandomControl() & 0x3F) + 192,
 				(GetRandomControl() & 0x1F) + 128,

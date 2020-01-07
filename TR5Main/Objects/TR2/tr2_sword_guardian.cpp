@@ -15,7 +15,7 @@ void InitialiseSwordGuardian(short itemNum)
 
 	item = &Items[itemNum];
 
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 
 	//item->status = ITEM_INACTIVE;
 	//item->meshBits = 0;

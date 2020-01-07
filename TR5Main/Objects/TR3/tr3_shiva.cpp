@@ -3,6 +3,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/sphere.h"
+#include "../../Game/items.h"
 
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
 BITE_INFO shivaRightBite = { 0, 0, 920, 22 };
@@ -122,7 +123,7 @@ void InitialiseShiva(short itemNum)
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
 
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 
 	item = &Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 14;
