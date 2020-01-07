@@ -8,6 +8,7 @@
 #include "..\Game\savegame.h"
 #include "..\Game\spotcam.h"
 #include "..\Scripting\GameFlowScript.h"
+#include "..\Game\control.h"
 
 #include "IO/ChunkId.h"
 #include "IO/ChunkReader.h"

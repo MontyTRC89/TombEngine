@@ -305,6 +305,10 @@
 #define LaraNodeUnderwater			ARRAY_(0x00E862FE, byte, [15])
 #define OnFloor						VAR_U_(0x00EEEAC8, int)
 #define SlowMotion					VAR_U_(0x0051CA50, short)
+#define ShatterSounds				ARRAY_(0x00506BAC, unsigned char, [18][10])
+#define TargetMesh					VAR_U_(0x00EEFAF8, int)
+#define WeaponsArray				ARRAY_(0x005085B0, WEAPON_INFO, [9])
+#define GetLaraOnLOS				VAR_U_(0x0051CA64, char)
 
 extern bool MonksAttackLara;
 

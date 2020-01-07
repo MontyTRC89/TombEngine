@@ -28,6 +28,8 @@
 #include "traps.h"
 #include "effects.h"
 #include "sphere.h"
+#include "debris.h"
+#include "larafire.h"
 
 #include "..\Specific\roomload.h"
 #include "..\Specific\input.h"
@@ -41,6 +43,11 @@ int KeyTriggerActive;
 PENDULUM CurrentPendulum;
 int number_los_rooms;
 short los_rooms[20];
+int ClosestItem;
+int ClosestDist;
+PHD_VECTOR ClosestCoord;
+int rand_1 = -747505337;
+int rand_2 = -747505337;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -1200,45 +1207,6 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	item->pos.xPos += (c * x + s * z) >> W2V_SHIFT;
 	item->pos.yPos += y;
 	item->pos.zPos += (-s * x + c * z) >> W2V_SHIFT;
-}
-
-int CheckNoColFloorTriangle(FLOOR_INFO* floor, short x, short z)
-{
-	if (!floor->index)
-		return 0;
-
-	short func = FloorData[floor->index] & 0x1F;
-	if (func != NOCOLF1T && func != NOCOLF1B && func != NOCOLF2T && func != NOCOLF2B)
-		return 0;
-
-	int dx = x & 0x3FF;
-	int dz = z & 0x3FF;
-
-	switch (func)
-	{
-	case NOCOLF1T:
-		if (dx <= 1024 - dz)
-			return -1;
-		break;
-
-	case NOCOLF1B:
-		if (dx > 1024 - dz)
-			return -1;
-		break;
-
-	case NOCOLF2T:
-		if (dx <= dz)
-			return -1;
-		break;
-
-	case NOCOLF2B:
-		if (dx > dz)
-			return -1;
-		break;
-
-	}
-
-	return 1;
 }
 
 int GetWaterSurface(int x, int y, int z, short roomNumber)
@@ -2481,10 +2449,493 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
 	return 1;
 }
 
+int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing)
+{
+	GAME_VECTOR target;
+	int result, flag, itemNumber, count;
+	MESH_INFO* mesh;
+	PHD_VECTOR vector;
+	ITEM_INFO* item;
+	short angle, room, triggerItems[8];
+
+	target.x = dest->x;
+	target.y = dest->y;
+	target.z = dest->z;
+	result = LOS(src, &target);
+	GetFloor(target.x, target.y, target.z, &target.roomNumber);
+	if (firing && LaserSight)
+	{
+		Lara.hasFired = true;
+		Lara.fired = true;
+		if (Lara.gunType == WEAPON_REVOLVER)
+		{
+			SoundEffect(SFX_REVOLVER, NULL, 0);
+		}
+	}
+	flag = 0;
+	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
+	if (itemNumber != 999)
+	{
+		target.x = vector.x - (vector.x - src->x >> 5);
+		target.y = vector.y - (vector.y - src->y >> 5);
+		target.z = vector.z - (vector.z - src->z >> 5);
+		GetFloor(target.x, target.y, target.z, &target.roomNumber);
+		if (itemNumber >= 0)
+			Lara.target = &Items[itemNumber];
+		if (firing)
+		{
+			if (Lara.gunType != WEAPON_CROSSBOW)
+			{
+				if (itemNumber < 0)
+				{
+					if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
+					{
+						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
+						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
+						SmashedMesh[SmashedMeshCount] = mesh;
+						++SmashedMeshCount;
+						mesh->Flags &= ~0x1;
+						SoundEffect(ShatterSounds[CurrentLevel - 5][mesh->staticNumber], (PHD_3DPOS *) mesh, 0);
+					}
+					TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+				}
+				else
+				{
+					item = &Items[itemNumber];
+					if (item->objectNumber != ID_SHOOT_SWITCH1 && item->objectNumber != ID_SHOOT_SWITCH2)
+					{
+						if (Objects[item->objectNumber].explodableMeshbits & TargetMesh && LaserSight)
+						{
+							if (!Objects[item->objectNumber].intelligent)
+							{
+								ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
+								item->meshBits &= ~TargetMesh;
+								TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+							}
+							else
+							{
+								if (item->objectNumber != ID_TWOGUN)
+								{
+									item->hitPoints -= 30;
+									if (item->hitPoints < 0)
+										item->hitPoints = 0;
+									HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+								}
+								else
+								{
+									angle = ATAN(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
+									if (angle > -ANGLE(90) && angle < ANGLE(90))
+									{
+										item->hitPoints = 0;
+										HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+									}
+								}
+							}
+						}
+						else
+						{
+							if (DrawTarget && (Lara.gunType == WEAPON_REVOLVER || Lara.gunType == WEAPON_HK))
+							{
+								if (Objects[item->objectNumber].intelligent)
+								{
+									HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+								}
+								else
+								{
+									if (Objects[item->objectNumber].hitEffect == 3)
+										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+								}
+							}
+							else
+							{
+								if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
+								{
+									SmashObject(itemNumber);
+								}
+								else
+								{
+									if (Objects[item->objectNumber].hitEffect == 1)
+									{
+										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
+									}
+									else if (Objects[item->objectNumber].hitEffect == 2)
+									{
+										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, -5);
+									}
+									else if (Objects[item->objectNumber].hitEffect == 3)
+									{
+										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+									}
+									item->hitStatus = true;
+									if (!Objects[item->objectNumber].undead)
+									{
+										item->hitPoints -= WeaponsArray[Lara.gunType].damage;
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						if (TargetMesh == 1 << Objects[item->objectNumber].nmeshes - 1)
+						{
+							if (!(item->flags & 0x40))
+							{
+								if (item->objectNumber == ID_SHOOT_SWITCH1)
+									ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
+								if (item->triggerFlags == 444 && item->objectNumber == ID_SHOOT_SWITCH2)
+								{
+									ProcessExplodingSwitchType8(item);
+								}
+								else
+								{
+									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+									{
+										room = item->roomNumber;
+										GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
+										TestTriggers(TriggerIndex, 1, item->flags & IFLAG_ACTIVATION_MASK);
+									}
+									else
+									{
+										for (count = GetSwitchTrigger(item, triggerItems, 1); count > 0; --count)
+										{
+											AddActiveItem(triggerItems[count]);
+											Items[triggerItems[count]].status = ITEM_ACTIVE;
+											Items[triggerItems[count]].flags |= IFLAG_ACTIVATION_MASK;
+										}
+									}
+								}
+							}
+							if (item->status != ITEM_DEACTIVATED)
+							{
+								AddActiveItem(itemNumber);
+								item->status = ITEM_ACTIVE;
+								item->flags |= IFLAG_ACTIVATION_MASK | 0x40;
+							}
+						}
+						TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+					}
+				}
+			}
+			else
+			{
+				if (LaserSight && itemNumber >= 0)
+				{
+					item = &Items[itemNumber];
+					if (item->objectNumber == ID_ENEMY_JEEP && item->meshBits & 1)
+					{
+						/* @FIXME This turns the LaserSight sprite of the Grappling Gun green and calls FireGrapplingBoltFromLasersight() */
+					}
+				}
+			}
+		}
+		else
+		{
+			if (itemNumber >= 0)
+			{
+				item = &Items[itemNumber];
+				if (item->objectNumber == ID_ENEMY_JEEP && Lara.gunType == WEAPON_CROSSBOW && item->meshBits & 1)
+				{
+					/* @FIXME This turns the LaserSight sprite of the Grappling Gun green */
+				}
+			}
+		}
+		flag = 1;
+	}
+	else
+	{
+		if (Lara.gunType != WEAPON_CROSSBOW)
+		{
+			target.x -= target.x - src->x >> 5;
+			target.y -= target.y - src->y >> 5;
+			target.z -= target.z - src->z >> 5;
+			if (firing && !result)
+				TriggerRicochetSpark(&target, LaraItem->pos.yRot, 8, 0);
+		}
+		else
+		{
+			if (firing && LaserSight)
+			{
+				/* @FIXME This calls FireGrapplingBoltFromLasersight() */
+			}
+		}
+	}
+	if (DrawTarget && (flag || !result))
+	{
+		TriggerDynamicLight(target.x, target.y, target.z, 64, 255, 0, 0);
+		LaserSightActive = 1;
+		LaserSightX = target.x;
+		LaserSightY = target.y;
+		LaserSightZ = target.z;
+	}
+	return flag;
+}
+
+int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh)
+{
+	int r, m;
+	ROOM_INFO* room;
+	short linknum, *box;
+	ITEM_INFO* item;
+	PHD_3DPOS pos;
+	MESH_INFO* meshp;
+
+	ClosestItem = 999;
+	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
+	for (r = 0; r < number_los_rooms; ++r)
+	{
+		room = &Rooms[los_rooms[r]];
+		for (linknum = room->itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+		{
+			item = &Items[linknum];
+			if (item->status != ITEM_DEACTIVATED && item->status != ITEM_INVISIBLE && (item->objectNumber ? (bool) Objects[item->objectNumber].collision : (bool) GetLaraOnLOS))
+			{
+				box = GetBoundsAccurate(item);
+				pos.xPos = item->pos.xPos;
+				pos.yPos = item->pos.yPos;
+				pos.zPos = item->pos.zPos;
+				pos.yRot = item->pos.yRot;
+				if (DoRayBox(start, end, box, &pos, vec, linknum))
+				{
+					end->roomNumber = los_rooms[r];
+				}
+			}
+		}
+		for (m = room->numMeshes; m > 0; --m)
+		{
+			meshp = &room->mesh[m];
+			if (meshp->Flags & 1)
+			{
+				pos.xPos = meshp->x;
+				pos.yPos = meshp->y;
+				pos.zPos = meshp->z;
+				pos.yRot = meshp->yRot;
+				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].xMinc, &pos, vec, -1 - meshp->staticNumber))
+				{
+					*mesh = meshp;
+					end->roomNumber = los_rooms[r];
+				}
+			}
+		}
+	}
+	vec->x = ClosestCoord.x;
+	vec->y = ClosestCoord.y;
+	vec->z = ClosestCoord.z;
+	return ClosestItem;
+}
+
+int GetRandomControl()
+{
+	rand_1 = 1103515245 * rand_1 + 12345;
+	return rand_1 >> 10 & 0x7FFF;
+}
+
+void SeedRandomControl(int seed)
+{
+	rand_1 = seed;
+}
+
+int GetRandomDraw()
+{
+	rand_2 = 1103515245 * rand_2 + 12345;
+	return rand_2 >> 10 & 0x7FFF;
+}
+
+void SeedRandomDraw(int seed)
+{
+	rand_2 = seed;
+}
+
+int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
+{
+	ROOM_INFO* room;
+	FLOOR_INFO* floor2;
+	int ceiling, t0, t1, t2, t3, dx, dz, xOff, yOff;
+	short type, type2, function, cadj, trigger, *data;
+	bool end;
+	ITEM_INFO* item;
+
+	floor2 = floor;
+	while (floor2->skyRoom != NO_ROOM)
+	{
+		if (CheckNoColCeilingTriangle(floor2, x, z) == 1)
+			break;
+		room = &Rooms[floor2->skyRoom];
+		floor2 = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
+	}
+	ceiling = 256 * floor2->ceiling;
+	if (ceiling != NO_HEIGHT)
+	{
+		if (floor2->index)
+		{
+			data = &FloorData[floor2->index];
+			type = *data;
+			function = type & DATA_TYPE;
+			++data;
+			end = false;
+			if (function == TILT_TYPE || function == SPLIT1 || function == SPLIT2 || function == NOCOLF1T || function == NOCOLF1B || function == NOCOLF2T || function == NOCOLF2B)
+			{
+				++data;
+				if (type & END_BIT)
+					end = true;
+				type = *data;
+				function = type & DATA_TYPE;
+				++data;
+			}
+			if (!end)
+			{
+				xOff = 0;
+				yOff = 0;
+				if (function != ROOF_TYPE)
+				{
+					if (function == SPLIT3 || function == SPLIT4 || function == NOCOLC1T || function == NOCOLC1B || function == NOCOLC2T || function == NOCOLC2B)
+					{
+						dx = x & 0x3FF;
+						dz = z & 0x3FF;
+						t0 = -(*data & DATA_TILT);
+						t1 = -(*data >> 4 & DATA_TILT);
+						t2 = -(*data >> 8 & DATA_TILT);
+						t3 = -(*data >> 12 & DATA_TILT);
+						if (function == SPLIT3 || function == NOCOLC1T || function == NOCOLC1B)
+						{
+							if (dx <= 1024 - dz)
+							{
+								cadj = type >> 10 & DATA_TYPE;
+								if (cadj & 0x10)
+									cadj |= 0xFFF0;
+								ceiling += 256 * cadj;
+								xOff = t2 - t1;
+								yOff = t3 - t2;
+							}
+							else
+							{
+								cadj = type >> 5 & DATA_TYPE;
+								if (cadj & 0x10)
+									cadj |= 0xFFF0;
+								ceiling += 256 * cadj;
+								xOff = t3 - t0;
+								yOff = t0 - t1;
+							}
+						}
+						else
+						{
+							if (dx <= dz)
+							{
+								cadj = type >> 10 & DATA_TYPE;
+								if (cadj & 0x10)
+									cadj |= 0xFFF0;
+								ceiling += 256 * cadj;
+								xOff = t2 - t1;
+								yOff = t0 - t1;
+							}
+							else
+							{
+								cadj = type >> 5 & DATA_TYPE;
+								if (cadj & 0x10)
+									cadj |= 0xFFF0;
+								ceiling += 256 * cadj;
+								xOff = t3 - t0;
+								yOff = t3 - t2;
+							}
+						}
+					}
+				}
+				else
+				{
+					xOff = *data >> 8;
+					yOff = *(char *)data;
+				}
+				if (xOff < 0)
+				{
+					ceiling += (z & 0x3FF) * xOff >> 2;
+				}
+				else
+				{
+					ceiling -= (-1 - z & 0x3FF) * xOff >> 2;
+				}
+				if (yOff < 0)
+				{
+					ceiling += (-1 - x & 0x3FF) * yOff >> 2;
+				}
+				else
+				{
+					ceiling -= (x & 0x3FF) * yOff >> 2;
+				}
+			}
+		}
+		while (floor->pitRoom != NO_ROOM)
+		{
+			if (CheckNoColFloorTriangle(floor, x, z) == 1)
+				break;
+			room = &Rooms[floor->pitRoom];
+			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
+		}
+		if (floor->index)
+		{
+			data = &FloorData[floor->index];
+			do
+			{
+				type = *data;
+				function = type & DATA_TYPE;
+				++data;
+				switch (function)
+				{
+				case DOOR_TYPE:
+				case TILT_TYPE:
+				case ROOF_TYPE:
+				case SPLIT1:
+				case SPLIT2:
+				case SPLIT3:
+				case SPLIT4:
+				case NOCOLF1T:
+				case NOCOLF1B:
+				case NOCOLF2T:
+				case NOCOLF2B:
+				case NOCOLC1T:
+				case NOCOLC1B:
+				case NOCOLC2T:
+				case NOCOLC2B:
+					++data;
+					break;
+				case TRIGGER_TYPE:
+					++data;
+					do
+					{
+						type2 = *data;
+						trigger = TRIG_BITS(type2);
+						++data;
+						if (trigger != TO_OBJECT)
+						{
+							if (trigger == TO_CAMERA || trigger == TO_FLYBY)
+							{
+								type2 = *data;
+								++data;
+							}
+						}
+						else
+						{
+							item = &Items[type2 & VALUE_BITS];
+							if (Objects[item->objectNumber].ceiling && !(item->flags & 0x8000))
+							{
+								Objects[item->objectNumber].ceiling(item, x, y, z, &ceiling);
+							}
+						}
+					}
+					while (!(type2 & END_BIT));
+				}
+			}
+			while (!(type & END_BIT));
+		}
+	}
+	return ceiling;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
 	INJECT(0x004167B0, TestTriggers);
 	INJECT(0x00415960, TranslateItem);
 	INJECT(0x00415B20, GetFloor);
+	INJECT(0x00417640, GetCeiling);
 }
