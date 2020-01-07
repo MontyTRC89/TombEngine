@@ -42,6 +42,17 @@ PENDULUM CurrentPendulum;
 int number_los_rooms;
 short los_rooms[20];
 
+// TODO: move to DLL after @ChocolateFan decompilation
+#define ClosestCoord VAR_U_(0x00EEF460, PHD_VECTOR)
+#define ClosestItem VAR_U_(0x00EEEFF8, short)
+#define ClosestDist VAR_U_(0x00EEF4A4, int)
+
+#define _NormaliseVector ((PHD_VECTOR* (__cdecl*)(PHD_VECTOR*)) 0x0046DE10)
+
+//PHD_VECTOR ClosestCoord;
+//short ClosestItem = NO_ITEM;
+//int ClosestDist = 0x7FFFFFFF;
+
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern Inventory* g_Inventory;
@@ -2481,10 +2492,236 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
 	return 1;
 }
 
+PHD_VECTOR* NormaliseVector(PHD_VECTOR* vec)
+{
+	int x = vec->x >> 16;
+	int y = vec->y >> 16;
+	int z = vec->z >> 16;
+
+	if (!x && !y && !z)
+		return vec;
+
+	int length = SQUARE(x) + SQUARE(y) + SQUARE(z);
+	if (length < 0)
+		length = -length;
+
+	length = 0x1000000 / (SQRT_ASM(length) << 16 >> 8) << 8 >> 8;
+
+	vec->x = (vec->x * length >> 16);
+	vec->y = vec->y * length >> 16;
+	vec->z = vec->z * length >> 16;
+
+	return vec;
+}
+
+int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber)
+{
+	PHD_VECTOR p1, p2;
+
+	p1.x = box[0] << 16;
+	p2.x = box[1] << 16;
+	p1.y = box[2] << 16;
+	p2.y = box[3] << 16;
+	p1.z = box[4] << 16;
+	p2.z = box[5] << 16;
+
+	int dx2 = end->x - itemOrStaticPos->xPos;
+	int dy2 = end->y - itemOrStaticPos->yPos;
+	int dz2 = end->z - itemOrStaticPos->zPos;
+
+	phd_PushUnitMatrix();
+
+	phd_RotY(-itemOrStaticPos->yRot);
+
+	int a1 = MatrixPtr[M00] * dx2 + 
+		MatrixPtr[M01] * dy2 + 
+		MatrixPtr[M02] * dz2;
+
+	int a2 = MatrixPtr[M10] * dx2 +
+		MatrixPtr[M11] * dy2 +
+		MatrixPtr[M12] * dz2;
+
+	int a3 = MatrixPtr[M20] * dx2 +
+		MatrixPtr[M21] * dy2 +
+		MatrixPtr[M22] * dz2;
+
+	int dx1 = start->x - itemOrStaticPos->xPos;
+	int dy1 = start->y - itemOrStaticPos->yPos;
+	int dz1 = start->z - itemOrStaticPos->zPos;
+
+	int b1 = MatrixPtr[M00] * dx1 +
+		MatrixPtr[M01] * dy1 +
+		MatrixPtr[M02] * dz1;
+
+	int b2 = MatrixPtr[M10] * dx1 +
+		MatrixPtr[M11] * dy1 +
+		MatrixPtr[M12] * dz1;
+
+	int b3 = MatrixPtr[M20] * dx1 +
+		MatrixPtr[M21] * dy1 +
+		MatrixPtr[M22] * dz1;
+
+	phd_PopMatrix();
+
+	PHD_VECTOR vec;
+
+	vec.x = ((a1 >> W2V_SHIFT) - (b1 >> W2V_SHIFT)) << 16;
+	vec.y = ((a2 >> W2V_SHIFT) - (b2 >> W2V_SHIFT)) << 16;
+	vec.z = ((a3 >> W2V_SHIFT) - (b3 >> W2V_SHIFT)) << 16;
+
+	_NormaliseVector(&vec);
+
+	PHD_VECTOR pb;
+	pb.x = b1 >> W2V_SHIFT << 16;
+	pb.y = b2 >> W2V_SHIFT << 16;
+	pb.z = b3 >> W2V_SHIFT << 16;
+
+	vec.x <<= 8;
+	vec.y <<= 8;
+	vec.z <<= 8;
+
+	if (!DoRayBox_sub_401523(&p1, &p2, &pb, &vec, hitPos))
+		return 0;
+
+	if (hitPos->x < box[0] 
+		|| hitPos->y < box[2] 
+		|| hitPos->z < box[4] 
+		|| hitPos->x > box[1] 
+		|| hitPos->y > box[3]
+		|| hitPos->z > box[5])
+		return 0;
+
+	phd_PushUnitMatrix();
+
+	phd_RotY(itemOrStaticPos->yRot);
+	
+	int c1 = MatrixPtr[M00] * hitPos->x +
+		MatrixPtr[M01] * hitPos->y +
+		MatrixPtr[M02] * hitPos->z;
+
+	int c2 = MatrixPtr[M10] * hitPos->x +
+		MatrixPtr[M11] * hitPos->y +
+		MatrixPtr[M12] * hitPos->z;
+
+	int c3 = MatrixPtr[M20] * hitPos->x +
+		MatrixPtr[M21] * hitPos->y +
+		MatrixPtr[M22] * hitPos->z;
+
+	hitPos->x = (c1 >> W2V_SHIFT);
+	hitPos->y = (c2 >> W2V_SHIFT);
+	hitPos->z = (c3 >> W2V_SHIFT);
+	
+	phd_PopMatrix();
+	
+	short* meshPtr = NULL;
+	int bit = 1;
+	int sp = -2;
+	int minDistance = 0x7FFFFFFF;
+
+	if (closesItemNumber < 0)
+	{
+		sp = -1;
+	}
+	else
+	{
+		ITEM_INFO* item = &Items[closesItemNumber];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
+
+		GetSpheres(item, SphereList, 1);
+
+		if (obj->nmeshes <= 0)
+			return 0;
+
+		meshPtr = Meshes[obj->meshIndex];
+
+		for (int i = 0; i < obj->nmeshes; i++)
+		{
+			if (item->meshBits & (1 << i))
+			{
+				SPHERE* sphere = &SphereList[i];
+
+				if (item->meshBits & (1 << i))
+				{
+					SPHERE* sphere = &SphereList[i];
+
+					int dx = end->x - start->x;
+					int dy = end->y - start->y;
+					int dz = end->z - start->z;
+
+					int d1 = dx * (sphere->x - start->x) + dy * (sphere->y - start->y) + dz * (sphere->z - start->z);
+					int d2 = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
+
+					if ((d1 < 0 && d2 < 0) || (d1 > 0 && d2 > 0) || abs(d1) <= abs(d2))
+					{
+						int l;
+						if (d2 >> 16)
+							l = d1 / (d2 >> 16);
+						else
+							l = 0;
+
+						int x = start->x + (l * dx >> 16);
+						int y = start->y + (l * dy >> 16);
+						int z = start->z + (l * dz >> 16);
+
+						int d = SQUARE(x - sphere->x) + SQUARE(y - sphere->y) + SQUARE(z - sphere->z);
+
+						if (d <= SQUARE(sphere->r))
+						{
+							int newDist = SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z);
+
+							if (newDist < minDistance)
+							{
+								minDistance = newDist;
+								meshPtr = Meshes[obj->meshIndex + 2 * i];
+								bit = 1 << i;
+								sp = i;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (sp < -1)
+			return 0;
+	}
+
+	int distance = SQUARE(hitPos->x + itemOrStaticPos->xPos - start->x) 
+		+ SQUARE(hitPos->y + itemOrStaticPos->yPos - start->y)
+		+ SQUARE(hitPos->z + itemOrStaticPos->zPos - start->z);
+
+	if (distance >= ClosestDist)
+		return 0;
+	
+	ClosestCoord.x = hitPos->x + itemOrStaticPos->xPos;
+	ClosestCoord.y = hitPos->y + itemOrStaticPos->yPos;
+	ClosestCoord.z = hitPos->z + itemOrStaticPos->zPos;
+	ClosestDist = distance;
+	ClosestItem = closesItemNumber;
+
+	if (sp >= 0)
+	{
+		ITEM_INFO* item = &Items[closesItemNumber];
+
+		GetSpheres(item, SphereList, 3);
+
+		ShatterItem.yRot = item->pos.yRot;
+		ShatterItem.meshp = meshPtr;
+		ShatterItem.sphere.x = SphereList[sp].x;
+		ShatterItem.sphere.y = SphereList[sp].y;
+		ShatterItem.sphere.z = SphereList[sp].z;
+		ShatterItem.bit = bit;
+		ShatterItem.flags = 0;
+	}
+	return 1;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
 	INJECT(0x004167B0, TestTriggers);
 	INJECT(0x00415960, TranslateItem);
+	INJECT(0x004193C0, DoRayBox);
+
 	//INJECT(0x00415B20, GetFloor);
 }
