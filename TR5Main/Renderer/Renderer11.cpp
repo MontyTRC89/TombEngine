@@ -632,13 +632,18 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	m_textureAtlas = NULL;
 	m_skyTexture = NULL;
-	D3D11_BLEND_DESC desc;
-	desc.RenderTarget[0].BlendEnable = TRUE;
-	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
-	desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_DEST_COLOR;
-		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-	m_device->CreateBlendState(&desc,&m_subtractiveBlendState);
+	D3D11_BLEND_DESC blendStateDesc{};
+	blendStateDesc.AlphaToCoverageEnable = FALSE;
+	blendStateDesc.IndependentBlendEnable = FALSE;
+	blendStateDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_device->CreateBlendState(&blendStateDesc,&m_subtractiveBlendState);
 
 	return true;
 }
@@ -1568,7 +1573,6 @@ bool Renderer11::drawScene(bool dump)
 	drawBats();
 	drawRats();
 	drawSpiders();
-	drawFootprints();
 
 	// Transparent geometry
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -1590,6 +1594,7 @@ bool Renderer11::drawScene(bool dump)
 	// Do special effects and weather
 	drawFires();
 	drawSmokes();
+	drawFootprints();
 	drawBlood();
 	drawSparks();
 	drawBubbles();
@@ -1598,6 +1603,8 @@ bool Renderer11::drawScene(bool dump)
 	drawUnderwaterDust();
 	drawSplahes();
 	drawShockwaves();
+
+
 
 	switch (level->Weather)
 	{
@@ -6782,7 +6789,7 @@ void Renderer11::drawFootprints()
 			p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 			p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 
-			AddSprite3D(m_sprites[Objects[ID_MISC_SPRITES].meshIndex+1], p1,p2,p3,p4, Vector4(1,1,1,footprint.opacity),
+			AddSprite3D(m_sprites[Objects[ID_MISC_SPRITES].meshIndex+1], p1,p2,p3,p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f),
 				0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
 		}
 	}

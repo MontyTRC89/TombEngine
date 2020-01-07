@@ -96,8 +96,8 @@ void AddFootprint(ITEM_INFO* item) {
 		}
 		FOOTPRINT_STRUCT footprint;
 		footprint.pos = footprintPosition;
-		footprint.lifeStartFading = 30 * 5;
-		footprint.startOpacity = 128;
+		footprint.lifeStartFading = 30 * 10;
+		footprint.startOpacity = 32;
 		footprint.life = 30 * 20;
 		footprint.active = true;
 		footprints.push_front(footprint);
@@ -108,8 +108,8 @@ void AddFootprint(ITEM_INFO* item) {
 		}
 		FOOTPRINT_STRUCT footprint;
 		footprint.pos = footprintPosition;
-		footprint.lifeStartFading = 30*5;
-		footprint.startOpacity = 128;
+		footprint.lifeStartFading = 30*10;
+		footprint.startOpacity = 32;
 		footprint.life = 30 * 20;
 		footprint.active = true;
 		footprints.push_front(footprint);
