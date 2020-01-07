@@ -9,10 +9,10 @@
 #define DeathSlideControl ((void (__cdecl*)(short)) 0x0041CE00)
 #define RollingBallCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0048B6D0)
 #define RollingBallControl ((void (__cdecl*)(short)) 0x0048AE60)
-#define InitialiseTwoBlocksPlatform ((void (__cdecl*)(short)) 0x0043D5D0)
-#define TwoBlocksPlatformControl ((void (__cdecl*)(short)) 0x0048BBB0)
-#define TwoBlocksPlatformFloor ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x0048B9E0)
-#define TwoBlocksPlatformCeiling ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x0048BA50)
+//#define InitialiseTwoBlocksPlatform ((void (__cdecl*)(short)) 0x0043D5D0)
+//#define TwoBlocksPlatformControl ((void (__cdecl*)(short)) 0x0048BBB0)
+//#define TwoBlocksPlatformFloor ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x0048B9E0)
+//#define TwoBlocksPlatformCeiling ((void (__cdecl*)(ITEM_INFO*,int,int,int,int*)) 0x0048BA50)
 #define KillAllTriggersControl ((void (__cdecl*)(short)) 0x00431030)
 #define FallingCeilingCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x004127C0)
 #define FallingCeilingControl ((void (__cdecl*)(short)) 0x004899D0)
@@ -53,9 +53,9 @@
 #define DrawWreckingBall ((void (__cdecl*)(ITEM_INFO*)) 0x00441F50)
 #define InitialiseVentilator ((void (__cdecl*)(short)) 0x0043F3D0)
 #define VentilatorControl ((void (__cdecl*)(short)) 0x00405610)
-#define InitialiseTeethSpike ((void (__cdecl*)(short)) 0x0043FBC0)
-#define TeethSpikeControl ((void (__cdecl*)(short)) 0x0043FBC0)
-#define DrawScaledSpike ((void (__cdecl*)(ITEM_INFO*)) 0x0043FBC0)
+//#define InitialiseTeethSpike ((void (__cdecl*)(short)) 0x0043FBC0)
+//#define TeethSpikeControl ((void (__cdecl*)(short)) 0x0043FBC0)
+//#define DrawScaledSpike ((void (__cdecl*)(ITEM_INFO*)) 0x0043FBC0)
 
 void LaraBurn();
 void LavaBurn(ITEM_INFO* item);
