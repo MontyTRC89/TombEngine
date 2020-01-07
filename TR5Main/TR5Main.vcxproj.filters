@@ -303,6 +303,12 @@
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\groundfx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\footprint.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
@@ -777,6 +783,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\tr5_rats.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\footprint.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\tr5_misc_objects.cpp">
