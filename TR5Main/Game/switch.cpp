@@ -14,6 +14,7 @@ byte SequenceUsed[6];
 byte SequenceResults[3][3][3];
 byte Sequences[3];
 byte CurrentSequence;
+int PulleyItemNumber = NO_ITEM;
 
 extern PHD_VECTOR OldPickupPos;
 extern Inventory* g_Inventory;
@@ -1300,13 +1301,16 @@ int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 		if (*trigger & 4)
 		{
 			short* current = itemNos;
+			int k = 0;
 			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++, current++)
 			{
 				*current = *j & 0x3FF;
+				k++;
 				if (*j & 0x8000)
-					return 0;
+					break;
 			}
-			return 1;
+
+			return k;
 		}
 	}
 
@@ -1369,10 +1373,12 @@ void InitialiseSwitch(short itemNumber)
 void InitialisePulleySwitch(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
+
 	item->itemFlags[3] = item->triggerFlags;
 	item->triggerFlags = abs(item->triggerFlags);
-	//if (itemNumber == word_E5BF24)
-	//	item->itemFlags[1] = 1;
+
+	if (itemNumber == PulleyItemNumber)
+		item->itemFlags[1] = 1;
 }
 
 void InitialiseCrowDoveSwitch(short itemNumber)
