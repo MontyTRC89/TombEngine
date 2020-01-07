@@ -30,5 +30,6 @@ int SwitchTrigger(short itemNum, short timer);
 void InitialiseSwitch(short itemNum);
 void InitialisePulleySwitch(short itemNumber);
 void InitialiseCrowDoveSwitch(short itemNumber);
+void ProcessExplodingSwitchType8(ITEM_INFO* item);
 
 void Inject_Switch();

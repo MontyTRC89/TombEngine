@@ -2,8 +2,8 @@
 
 #include "..\Global\global.h"
 
-#define GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
-#define GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
+//#define GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
+//#define GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
 #define AnimateItem ((void (__cdecl*)(ITEM_INFO*)) 0x00415300)
 #define GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
 #define TriggerActive ((int (__cdecl*)(ITEM_INFO*)) 0x004175B0)
@@ -34,9 +34,9 @@
 #define DoFlipMap ((void (__cdecl*)(short)) 0x00418910)
 #define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
 //#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
-#define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
+//#define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
 //#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
-#define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
+//#define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
 
 //#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 //#define GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
@@ -54,7 +54,6 @@ void ActivateKey();
 short GetDoor(FLOOR_INFO* floor);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void TestTriggers(short* data, int heavy, int HeavyFlags);
-int CheckNoColFloorTriangle(FLOOR_INFO* floor, short x, short z);
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 void KillMoveItems();
 void KillMoveEffects();
@@ -71,6 +70,13 @@ int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
+int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing);
+int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh);
+int GetRandomControl();
+void SeedRandomControl(int seed);
+int GetRandomDraw();
+void SeedRandomDraw(int seed);
+int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
