@@ -493,6 +493,11 @@ void Inventory::LoadObjects(bool isReload)
 		}
 	}
 
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0] = 1000;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = true;
+
 	// DEBUG
 	{
 		/*g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
