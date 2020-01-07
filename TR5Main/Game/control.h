@@ -74,7 +74,7 @@ int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
-PHD_VECTOR* NormaliseVector(PHD_VECTOR* vec);
+PHD_VECTOR* NormalizeVector(PHD_VECTOR* vec);
 int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
 
 unsigned __stdcall GameMain(void*);
