@@ -20,7 +20,7 @@ void InitialiseGladiator(short itemNum)
     item->goalAnimState = 1;
     item->currentAnimState = 1;
     if (item->triggerFlags == 1)
-        *item->pad2 = -1;
+        item->swapMeshFlags = -1;
 }
 
 void ControlGladiator(short itemNumber)

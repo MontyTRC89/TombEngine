@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/box.h"
 #include "../../Game/effects.h"
+#include "../../Game/items.h"
 
 BITE_INFO eagleBite = { 15, 46, 21, 6 };
 BITE_INFO crowBite = { 2, 10, 60, 14 };
@@ -8,7 +9,7 @@ BITE_INFO crowBite = { 2, 10, 60, 14 };
 void InitialiseEagle(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 
 	if (item->objectNumber == ID_CROW)
 	{

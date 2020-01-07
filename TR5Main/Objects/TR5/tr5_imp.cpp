@@ -156,9 +156,9 @@ void ControlImp(short itemNumber)
 			joint2 = info.xAngle >> 1;
 
 			if (Wibble & 0x10)
-				*item->pad2 = 1024;
+				item->swapMeshFlags = 1024;
 			else
-				*item->pad2 = 0;
+				item->swapMeshFlags = 0;
 
 			switch (item->currentAnimState)
 			{

@@ -32,4 +32,6 @@ void InitialisePulleySwitch(short itemNumber);
 void InitialiseCrowDoveSwitch(short itemNumber);
 void ProcessExplodingSwitchType8(ITEM_INFO* item);
 
+extern int PulleyItemNumber;
+
 void Inject_Switch();

@@ -41,7 +41,7 @@ void InitialiseGuard(short itemNum)
         case 3:
             item->goalAnimState = 15;
             item->animNumber = anim + 28;
-            *item->pad2 = 9216;
+            item->swapMeshFlags = 9216;
             roomItemNumber = Rooms[item->roomNumber].itemNumber;
             if (roomItemNumber != NO_ITEM)
             {
@@ -63,7 +63,7 @@ void InitialiseGuard(short itemNum)
             break;
         case 4:
             item->goalAnimState = 17;
-            *item->pad2 = 8192;
+			item->swapMeshFlags = 8192;
             item->animNumber = anim + 30;
             break;
         case 5:
@@ -626,7 +626,7 @@ void ControlGuard(short itemNum)
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase + 44)
 			{
-				*item->pad2 = 0;
+				item->swapMeshFlags = 0;
 				short currentItemNumber = Rooms[item->roomNumber].itemNumber;
 				if (currentItemNumber == NO_ITEM)
 					break;
@@ -713,7 +713,7 @@ void ControlGuard(short itemNum)
 				item->pos.xPos = currentItem->pos.xPos - 256;
 				item->pos.yRot = currentItem->pos.yRot;
 				item->pos.zPos = currentItem->pos.zPos + 128;
-				*item->pad2 = 1024;
+				item->swapMeshFlags = 1024;
 			}
 			else
 			{
@@ -745,7 +745,7 @@ void ControlGuard(short itemNum)
 					GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					TestTriggers(TriggerIndex, 1, 0);
 					item->requiredAnimState = 5;
-					*item->pad2 = 0;
+					item->swapMeshFlags = 0;
 				}
 			}
 			break;
@@ -829,7 +829,7 @@ void ControlGuard(short itemNum)
 					TestTriggers(TriggerIndex, 1, 0);
 					item->requiredAnimState = 5;
 					if (creature->enemy->flags & 2)
-						item->itemFlags[3] = item->pad2[6] - 1;
+						item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
 					if (creature->enemy->flags & 8)
 					{
 						item->requiredAnimState = 1;
@@ -1025,7 +1025,7 @@ void InitialiseArmedBaddy2(short itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
-	*item->pad2 = 9216;
+	item->swapMeshFlags = 9216;
 }
 
 void ArmedBaddy2Control(short itemNum)
@@ -1169,13 +1169,13 @@ void ArmedBaddy2Control(short itemNum)
 
 			if (laraInfo.angle <= 20480 && laraInfo.angle >= -20480)
 			{
-				if (*item->pad2 == 9216)
+				if (item->swapMeshFlags == 9216)
 				{
 					item->goalAnimState = 37;
 					break;
 				}
 			}
-			else if (*item->pad2 == 9216)
+			else if (item->swapMeshFlags == 9216)
 			{
 				item->goalAnimState = 2;
 				break;
@@ -1235,14 +1235,15 @@ void ArmedBaddy2Control(short itemNum)
 			else
 				item->pos.yRot += ANGLE(2);
 
-			if (item->frameNumber != Anims[item->animNumber].frameBase + 16 || *item->pad2 != 9216)
+			if (item->frameNumber != Anims[item->animNumber].frameBase + 16 
+				|| item->swapMeshFlags != 9216)
 			{
 				if (item->frameNumber == Anims[item->animNumber].frameEnd)
 					item->pos.yRot += -ANGLE(180);
 			}
 			else
 			{
-				*item->pad2 = 128;
+				item->swapMeshFlags = 128;
 			}
 			break;
 
@@ -1370,8 +1371,9 @@ void ArmedBaddy2Control(short itemNum)
 				item->pos.yRot += ANGLE(2);
 			else
 				item->pos.yRot -= ANGLE(2);
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 16 && *item->pad2 == 9216)
-				* item->pad2 = 128;
+			if (item->frameNumber == Anims[item->animNumber].frameBase + 16 
+				&& item->swapMeshFlags == 9216)
+				item->swapMeshFlags = 128;
 			break;
 		default:
 			break;

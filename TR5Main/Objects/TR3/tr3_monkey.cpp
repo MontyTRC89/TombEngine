@@ -12,7 +12,7 @@ void InitialiseMonkey(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	InitialiseCreature(itemNumber);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_MONKEY].animIndex + 2;
 	item->frameNumber = Anims[item->animNumber].frameBase;

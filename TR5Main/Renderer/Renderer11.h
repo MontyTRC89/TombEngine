@@ -582,6 +582,10 @@ struct CMiscBuffer {
 	float Padding[14];
 };
 
+struct CRoomBuffer {
+	Vector4 AmbientColor;
+};
+
 struct RendererAnimatedTexture 
 {
 	int Id;
@@ -645,6 +649,9 @@ struct RendererItem {
 	int Id;
 	ITEM_INFO* Item;
 	Matrix World;
+	Matrix Translation;
+	Matrix Rotation;
+	Matrix Scale;
 	Matrix AnimationTransforms[32];
 	int NumMeshes;
 	PreallocatedVector<RendererLight> Lights;
@@ -717,14 +724,12 @@ struct RendererSpriteToDraw {
 	RendererSprite* Sprite;
 	float Distance;
 	float Scale;
-	float X, Y, Z;
-	float X1, Y1, Z1;
-	float X2, Y2, Z2;
-	float X3, Y3, Z3;
-	float X4, Y4, Z4;
-	byte R;
-	byte G;
-	byte B;
+	Vector3 pos;
+	Vector3 vtx1;
+	Vector3 vtx2;
+	Vector3 vtx3;
+	Vector3 vtx4;
+	Vector4 color;
 	float Rotation;
 	float Width;
 	float Height;
@@ -732,15 +737,9 @@ struct RendererSpriteToDraw {
 };
 
 struct RendererLine3D {
-	float X1;
-	float Y1;
-	float Z1;
-	float X2;
-	float Y2;
-	float Z2;
-	byte R;
-	byte G;
-	byte B;
+	Vector3 start;
+	Vector3 end;
+	Vector4 color;
 };
 
 struct RendererWeatherParticle {
@@ -774,6 +773,7 @@ private:
 	IDXGISwapChain*									m_swapChain = NULL;
 	IDXGIDevice*									m_dxgiDevice = NULL;
 	CommonStates*									m_states = NULL;
+	ID3D11BlendState* m_subtractiveBlendState = nullptr;
 	ID3D11InputLayout*								m_inputLayout = NULL;
 	D3D11_VIEWPORT									m_viewport;
 	D3D11_VIEWPORT									m_shadowMapViewport;
@@ -832,6 +832,8 @@ private:
 	ID3D11Buffer*									m_cbLights;
 	CMiscBuffer										m_stMisc;
 	ID3D11Buffer*									m_cbMisc;
+	CRoomBuffer										m_stRoom;
+	ID3D11Buffer*									m_cbRoom;
 	CShadowLightBuffer   							m_stShadowMap;
 	ID3D11Buffer*									m_cbShadowMap;
 
@@ -969,6 +971,7 @@ private:
 	bool											drawStatics(bool transparent);
 	bool											drawItems(bool transparent, bool animated);
 	bool											drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
+	bool											drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
 	bool											drawWaterfalls();
 	bool											drawShadowMap();
 	bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
@@ -993,8 +996,6 @@ private:
 	bool											drawSpiders();
 	bool											drawGunFlashes();
 	bool											drawGunShells();
-	bool											drawBar(int x, int y, int w, int h, int percent, int color1, int color2);
-	void											insertLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 	bool											drawDebris(bool transparent);
 	int												drawInventoryScene();
 	int												drawFinalPass();
@@ -1009,9 +1010,6 @@ private:
 	bool											drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade);
 	bool											isRoomUnderwater(short roomNumber);
 	bool											isInRoom(int x, int y, int z, short roomNumber);
-	void											addSpriteBillboard(RendererSprite* sprite, float x, float y, float z, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
-	void											addSprite3D(RendererSprite* sprite, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, byte r, byte g, byte b, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
-	void											addLine3D(int x1, int y1, int z1, int x2, int y2, int z2, byte r, byte g, byte b);
 	bool											drawColoredQuad(int x, int y, int w, int h, Vector4 color);
 	bool											initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
 
@@ -1039,9 +1037,6 @@ public:
 	int												DrawPickup(short objectNum);
 	int												SyncRenderer();
 	bool											PrintString(int x, int y, char* string, D3DCOLOR color, int flags);
-	void											DrawDashBar();
-	void											DrawHealthBar(int percentual);
-	void											DrawAirBar(int percentual);
 	void											ClearDynamicLights();
 	void											AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 	void											FreeRendererData();
@@ -1056,5 +1051,12 @@ public:
 	bool											IsFullsScreen();
 	vector<RendererVideoAdapter>*					GetAdapters();
 	bool											DoTitleImage();
+	void											AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
+	void											AddSpriteBillboard(RendererSprite* sprite, Vector3 pos,Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
+	void											AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
+	void											AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
+	bool											DrawBar(int x, int y, int w, int h, int percent, int color1, int color2);
+private:
+	void drawFootprints();
 };

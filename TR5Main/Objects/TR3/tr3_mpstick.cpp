@@ -2,6 +2,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/people.h"
+#include "../../Game/items.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };
@@ -29,7 +30,7 @@ typedef enum MPSTICK_STATES {
 void InitialiseMPStick(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	InitialiseCreature(itemNumber);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 6;
 	item->frameNumber = Anims[item->animNumber].frameBase;
