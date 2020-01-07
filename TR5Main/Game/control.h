@@ -37,6 +37,7 @@
 //#define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
 //#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
 //#define GetTargetOnLOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, int, int)) 0x0041A170)
+#define DoRayBox_sub_401523 ((int (__cdecl*)(PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*)) 0x00401523)
 
 //#define GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 //#define GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
@@ -77,6 +78,8 @@ void SeedRandomControl(int seed);
 int GetRandomDraw();
 void SeedRandomDraw(int seed);
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
+PHD_VECTOR* NormalizeVector(PHD_VECTOR* vec);
+int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();

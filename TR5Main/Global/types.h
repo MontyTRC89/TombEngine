@@ -229,16 +229,7 @@ typedef struct item_info_t {
 	short itemFlags[4]; // size=8, offset=52
 	void* data; // size=0, offset=60
 	PHD_3DPOS pos; // size=20, offset=64
-	//ITEM_LIGHT il; // size=48, offset=84
-	byte padLight[48];
-	unsigned int meshswapMeshbits; // size=0, offset=136 OFF=132
-	short drawRoom; // size=0, offset=140 OFF=136
-	short TOSSPAD; // size=0, offset=142 OFF=138
-	byte pad1[5464]; // OFF=140   5432?
-	byte* pointer1;
-	byte* pointer2;
-	//short status;
-	//byte pad2[8];
+	byte legacyLightData[5528];
 	unsigned int active : 1; // offset=132.0 OFF=5610
 	unsigned int status : 2; // offset=132.1
 	unsigned int gravityStatus : 1; // offset=132.3
@@ -251,7 +242,8 @@ typedef struct item_info_t {
 	unsigned int reallyActive : 1; // offset=133.6
 	unsigned int InDrawRoom : 1; // offset=133.7
 	int swapMeshFlags;
-	byte pad2[4]; // OFF=5614
+	short drawRoom;
+	short TOSSPAD; // OFF=5614
 } ITEM_INFO;
 
 typedef struct creature_info_t 
@@ -519,6 +511,7 @@ typedef struct object_info_t {
 	unsigned short hitEffect : 2; // offset=51.2
 	unsigned short undead : 1; // offset=51.4
 	unsigned short saveMesh : 1; // offset=51.5
+	unsigned short castShadows : 1; // offset=51.6
 	void(*drawRoutineExtra)(ITEM_INFO* item); // size=0, offset=52
 	unsigned int explodableMeshbits; // size=0, offset=56
 	unsigned int padfuck; // size=0, offset=60

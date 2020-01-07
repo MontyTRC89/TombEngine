@@ -7,11 +7,12 @@
 #include "laraswim.h"
 #include "larasurf.h"
 #include "effect2.h"
+#include "healt.h"
 #include "misc.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
-
+extern void(*effect_routines[59])(ITEM_INFO* item);
 COLL_INFO coll; 
 short SubsuitAir = 0;
 short FXType;
@@ -879,7 +880,7 @@ void AnimateLara(ITEM_INFO* item)
 				}
 
 				FXType = cmd[1] & 0xC000;
-				(*EffectRoutines[(int)(cmd[1] & 0x3fff)])(item);
+				(*effect_routines[(int)(cmd[1] & 0x3fff)])(item);
 
 				cmd += 2;
 				break;

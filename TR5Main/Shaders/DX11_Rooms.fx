@@ -35,6 +35,11 @@ cbuffer CShadowLightBuffer : register(b4)
 	float3 Padding2;
 };
 
+cbuffer RoomBuffer : register(b5)
+{
+	float4 AmbientColor;
+};
+
 struct VertexShaderInput
 {
 	float3 Position: POSITION;
@@ -61,7 +66,6 @@ Texture2D CausticsTexture : register(t1);
 
 Texture2D ShadowMap : register(t2);
 SamplerState ShadowMapSampler : register(s1);
-
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
@@ -74,6 +78,19 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 
 	return output;
+}
+
+float getShadowFactor(Texture2D shadowMap, SamplerState shadowMapSampler, float2 coords, float realDepth) {
+	const float texelSize = 1.0f / 1024;
+	float shadowFactor = 0.0f;
+	//doing 9 samples
+	for (float x = -1; x <= 1.0f; x++) {
+		for (float y = -1; y <= 1.0f; y++) {
+			float shadowMapDepth = ShadowMap.SampleLevel(ShadowMapSampler, coords + (float2(x, y)*texelSize),0).r;
+			shadowFactor += shadowMapDepth < realDepth ? 1.0f : 0.0f;
+		}
+	}
+	return shadowFactor / 9.0f;
 }
 
 [earlydepthstencil]
@@ -104,9 +121,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float realDepth = input.LightPosition.z;
 
 			// If clip space z value greater than shadow map value then pixel is in shadow
-			if (shadowMapDepth < realDepth)
-				return float4(0, 0, 0, 1);
-				//doLights = false;
+			float shadow = getShadowFactor(ShadowMap, ShadowMapSampler, coords, realDepth);
+			lighting = lerp(lighting,lighting*0.5f, saturate(shadow));
 		}
 	}
 
@@ -161,3 +177,4 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	return output;
 }
+

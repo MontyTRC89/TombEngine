@@ -859,6 +859,31 @@ void InitialiseDoor(short itemNumber)
 	}*/
 }
 
+void InitialiseSteelDoor(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	item->meshBits = 1;
+	item->pos.yPos -= 1024;
+}
+
+void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (item->itemFlags[0] != 3)
+	{
+		if (TestBoundsCollide(item, l, coll->radius))
+		{
+			if (TestCollision(item, l))
+			{
+				if (coll->enableBaddiePush)
+					ItemPushLara(item, l, coll, 0, 1);
+			}
+		}
+	}
+}
+
 void Inject_Door()
 {
 	INJECT(0x00429EC0, SequenceDoorControl);

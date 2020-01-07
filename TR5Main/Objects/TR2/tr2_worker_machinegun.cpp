@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/people.h"
 #include "../../Game/Box.h"
+#include "../../Game/items.h"
 
 BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
 
@@ -11,7 +12,7 @@ void InitialiseWorkerMachineGun(short itemNum)
 	item = &Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 12;
 
-	InitialiseCreature(itemNum);
+	ClearItem(itemNum);
 
 	anim = &Anims[item->animNumber];
 	item->frameNumber = anim->frameBase;
