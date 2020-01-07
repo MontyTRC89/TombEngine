@@ -22,22 +22,6 @@ bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPo
 	return	abs(pos.y - height) < 32;
 }
 
-int getFootprintIndexWithLowestLife()
-{
-	int lowestLife = footprints[0].life;
-	int index = 0;
-	for (int i = 1; i < MAX_FOOTPRINTS; i++) {
-		if (!footprints[i].active) {
-			index = i;
-			break;
-		}
-		if (footprints[i].life < lowestLife) {
-			index = i;
-		}
-	}
-	return index;
-}
-
 void updateFootprints()
 {
 	if (footprints.size() == 0) {
