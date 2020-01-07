@@ -1,6 +1,7 @@
 #include "footprint.h"
 #include "control.h"
 #include "lara.h"
+#include "groundfx.h"
 
 std::deque<FOOTPRINT_STRUCT> footprints = deque<FOOTPRINT_STRUCT>();
 bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPosition){
@@ -9,6 +10,9 @@ bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPo
 	int z = item.pos.zPos;
 	short roomNumber = item.roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	if (!(floor->fx == GroundMaterial::Ice || floor->fx == GroundMaterial::Sand || floor->fx == GroundMaterial::Mud)) {
+		return false;
+	}
 	int height = GetFloorHeight(floor, x, y, z);
 	int diff;
 	PHD_VECTOR pos;

@@ -1,5 +1,5 @@
 #pragma once
-enum class GroundMaterial : unsigned char {
+enum GroundMaterial : unsigned char {
 	Mud = 0,
 	Snow = 1,
 	Sand = 2,

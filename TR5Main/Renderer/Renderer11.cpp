@@ -6788,7 +6788,7 @@ void Renderer11::drawFootprints()
 			p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 			p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 			p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-
+			if(m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 1] != nullptr )
 			AddSprite3D(m_sprites[Objects[ID_MISC_SPRITES].meshIndex+1], p1,p2,p3,p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f),
 				0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
 		}
