@@ -49,7 +49,8 @@ int ClosestDist;
 PHD_VECTOR ClosestCoord;
 int rand_1 = -747505337;
 int rand_2 = -747505337;
-extern std::deque<FOOTPRINT_STRUCT> footprints;
+int RumbleTimer = 0;
+int InGameCnt = 0;
 
 #define _NormalizeVector ((PHD_VECTOR* (__cdecl*)(PHD_VECTOR*)) 0x0046DE10)
 
@@ -59,6 +60,8 @@ extern Inventory* g_Inventory;
 extern int SplashCount;
 extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
+extern vector<AudioTrack> g_AudioTracks;
+extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -3371,6 +3374,114 @@ void AnimateItem(ITEM_INFO* item)
 
 	item->pos.xPos += lateral * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 	item->pos.zPos += lateral * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+}
+
+void DoFlipMap(short group)
+{
+	ROOM_INFO temp ;
+	
+	for (int i = 0; i < NumberRooms; i++)
+	{
+		ROOM_INFO* r = &Rooms[i];
+
+		if (r->flippedRoom >= 0 && r->flipNumber == group)
+		{
+			RemoveRoomFlipItems(r);
+
+			ROOM_INFO* flipped = &Rooms[r->flippedRoom];
+			
+			memcpy(&temp, r, sizeof(temp));
+			memcpy(r, flipped, sizeof(ROOM_INFO));
+			memcpy(flipped, &temp, sizeof(ROOM_INFO));
+			
+			r->flippedRoom = flipped->flippedRoom;
+			flipped->flippedRoom = -1;
+
+			r->itemNumber = flipped->itemNumber;
+			r->fxNumber = flipped->fxNumber;
+			
+			AddRoomFlipItems(r);
+		}
+	}
+
+	FlipStats[group] = (FlipStats[group] == 0);
+	FlipStatus = (FlipStats[group] == 0);
+	
+	for (int i = 0; i < NUM_SLOTS; i++)
+	{
+		BaddieSlots[i].LOT.targetBox = NO_BOX;
+	}
+}
+
+void AddRoomFlipItems(ROOM_INFO* r)
+{
+	for (short linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = Items[linkNum].nextItem)
+	{
+		ITEM_INFO* item = &Items[linkNum];
+
+		if (item->objectNumber == ID_RAISING_BLOCK1 && item->itemFlags[1])
+			AlterFloorHeight(item, -1024);
+		
+		if (item->objectNumber == ID_RAISING_BLOCK2)
+		{
+			if (item->itemFlags[1])
+				AlterFloorHeight(item, -2048);
+		}
+	}
+}
+
+void RemoveRoomFlipItems(ROOM_INFO* r)
+{
+	for (short linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = Items[linkNum].nextItem)
+	{
+		ITEM_INFO* item = &Items[linkNum];
+
+		if (item->flags & 0x100
+			&& Objects[item->objectNumber].intelligent
+			&& item->hitPoints <= 0
+			&& item->hitPoints != -16384)
+		{
+			KillItem(linkNum);
+		}
+	}
+}
+
+void PlaySoundTrack(short track, short flags)
+{
+	S_CDPlayEx(track, flags, 0);
+}
+
+void RumbleScreen()
+{
+	if (!(GlobalCounter & 0x1FF))
+		SoundEffect(SFX_KLAXON, 0, 4104);
+
+	if (RumbleTimer >= 0)
+		RumbleTimer++;
+
+	if (RumbleTimer > 450)
+	{
+		if (!(GetRandomControl() & 0x1FF))
+		{
+			InGameCnt = 0;
+			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
+			return;
+		}
+	}
+
+	if (RumbleTimer < 0)
+	{
+		if (InGameCnt >= abs(RumbleTimer))
+		{
+			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
+			RumbleTimer++;
+		}
+		else
+		{
+			InGameCnt++;
+			Camera.bounce = -(GetRandomControl() % InGameCnt);
+		}
+	}
 }
 
 void Inject_Control()

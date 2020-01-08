@@ -27,12 +27,12 @@
 //#define UpdateShockwaves ((void (__cdecl*)()) 0x004849A0)
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 #define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
-#define RumbleScreen ((void (__cdecl*)()) 0x00442C90)
+//#define RumbleScreen ((void (__cdecl*)()) 0x00442C90)
 #define ExplodeItemNode ((int (__cdecl*)(ITEM_INFO*, int, int, int)) 0x0041ABF0)
 //#define LavaBurn ((void (__cdecl*)(ITEM_INFO*)) 0x0048ADD0)
 #define RefreshCamera ((void (__cdecl*)(short, short*)) 0x004165E0)
-#define DoFlipMap ((void (__cdecl*)(short)) 0x00418910)
-#define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
+//#define DoFlipMap ((void (__cdecl*)(short)) 0x00418910)
+//#define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
 //#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
 //#define ObjectOnLOS2 ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*, PHD_VECTOR*, BITE_INFO*)) 0x00419110)
 //#define LOS ((int (__cdecl*)(GAME_VECTOR*, GAME_VECTOR*)) 0x00417CF0)
@@ -81,6 +81,11 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
 PHD_VECTOR* NormalizeVector(PHD_VECTOR* vec);
 int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
 void AnimateItem(ITEM_INFO* item);
+void DoFlipMap(short group);
+void AddRoomFlipItems(ROOM_INFO* r);
+void RemoveRoomFlipItems(ROOM_INFO* r);
+void PlaySoundTrack(short track, short flags);
+void RumbleScreen();
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
