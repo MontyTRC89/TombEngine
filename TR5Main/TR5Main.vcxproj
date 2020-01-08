@@ -120,6 +120,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Game\swat.h" />
     <ClInclude Include="Game\lion.h" />
+    <ClInclude Include="Global\legacyfunctions.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
