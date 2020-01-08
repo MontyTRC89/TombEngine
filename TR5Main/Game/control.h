@@ -4,7 +4,7 @@
 
 //#define GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
 //#define GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
-#define AnimateItem ((void (__cdecl*)(ITEM_INFO*)) 0x00415300)
+//#define AnimateItem ((void (__cdecl*)(ITEM_INFO*)) 0x00415300)
 #define GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
 #define TriggerActive ((int (__cdecl*)(ITEM_INFO*)) 0x004175B0)
 //#define GetChange ((int (__cdecl*)(ITEM_INFO*, ANIM_STRUCT*)) 0x00415890)
@@ -80,6 +80,7 @@ void SeedRandomDraw(int seed);
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
 PHD_VECTOR* NormalizeVector(PHD_VECTOR* vec);
 int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
+void AnimateItem(ITEM_INFO* item);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
