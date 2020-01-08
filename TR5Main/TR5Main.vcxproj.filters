@@ -309,6 +309,9 @@
     <ClInclude Include="Game\footprint.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Global\legacyfunctions.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
