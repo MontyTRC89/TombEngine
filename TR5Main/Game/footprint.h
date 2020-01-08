@@ -11,7 +11,7 @@ typedef struct footprint_t {
 	byte startOpacity;
 	byte opacity;
 	bool active;
-}FOOTPRINT_STRUCT;
+} FOOTPRINT_STRUCT;
 
 constexpr int FOOT_HEIGHT_OFFSET = 64;
 bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPosition);
