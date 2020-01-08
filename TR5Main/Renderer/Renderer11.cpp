@@ -129,9 +129,7 @@ void Renderer11::FreeRendererData()
 		DX11_DELETE(m_staticObjects[i]);
 	free(m_staticObjects);
 
-	for (int i = 0; i < NUM_ROOMS; i++)
-		DX11_DELETE(m_rooms[i]);
-	free(m_rooms);
+	m_rooms.clear();
 
 	for (int i = 0; i < m_numAnimatedTextureSets; i++)
 		DX11_DELETE(m_animatedTextureSets[i]);
@@ -609,7 +607,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_firstWeather = true;
 
 	// Preallocate lists
-	m_roomsToDraw.Reserve(NUM_ROOMS);
+	m_roomsToDraw = vector<RendererRoom*>(NUM_ROOMS);
 	m_itemsToDraw.Reserve(NUM_ITEMS);
 	m_effectsToDraw.Reserve(NUM_ITEMS);
 	m_lightsToDraw.Reserve(MAX_LIGHTS_DRAW);
@@ -679,7 +677,7 @@ bool Renderer11::drawAmbientCubeMap(short roomNumber)
 
 void Renderer11::clearSceneItems()
 {
-	m_roomsToDraw.Clear();
+	m_roomsToDraw.clear();
 	m_itemsToDraw.Clear();
 	m_effectsToDraw.Clear();
 	m_lightsToDraw.Clear();
@@ -921,7 +919,7 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	if (animated)
 		m_primitiveBatch->Begin();
 
-	for (int i = 0; i < m_roomsToDraw.Size(); i++)
+	for (int i = 0; i < m_roomsToDraw.size(); i++)
 	{ 
 		RendererRoom* room = m_roomsToDraw[i];
 		
@@ -1024,7 +1022,7 @@ bool Renderer11::drawStatics(bool transparent)
 		if (!(msh->Flags & 1))
 			continue;
 
-		RendererRoom* room = m_rooms[m_staticsToDraw[i]->RoomIndex];
+		RendererRoom& const room = m_rooms[m_staticsToDraw[i]->RoomIndex];
 
 		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
 		RendererMesh* mesh = staticObj->ObjectMeshes[0];
@@ -1075,15 +1073,15 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
-
-	RendererRoom* room = m_rooms[item->Item->roomNumber];
-	if (room == NULL)
+	if (m_rooms.size() <= item->Item->roomNumber) {
 		return true;
+	}
+	RendererRoom& const room = m_rooms[item->Item->roomNumber];
 	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
 	m_stItem.World = item->World.Transpose();
 	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
-	m_stItem.AmbientLight = room->AmbientLight;
+	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
@@ -1134,18 +1132,18 @@ bool Renderer11::drawWaterfalls()
 	for (int i = 0; i < m_itemsToDraw.Size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
-		RendererRoom* room = m_rooms[item->Item->roomNumber];
+		RendererRoom& const room = m_rooms[item->Item->roomNumber];
 		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
 		short objectNumber = item->Item->objectNumber;
 		if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
 		{
-			RendererRoom* room = m_rooms[item->Item->roomNumber];
+			RendererRoom& const room = m_rooms[item->Item->roomNumber];
 			RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
 			m_stItem.World = item->World.Transpose();
 			m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
-			m_stItem.AmbientLight = room->AmbientLight; //Vector4::One * 0.1f; // room->AmbientLight;
+			m_stItem.AmbientLight = room.AmbientLight; //Vector4::One * 0.1f; // room->AmbientLight;
 			memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 			updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 			m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
@@ -1254,7 +1252,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	for (int i = 0; i < m_itemsToDraw.Size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
-		RendererRoom* room = m_rooms[item->Item->roomNumber];
+		RendererRoom& const room = m_rooms[item->Item->roomNumber];
 		RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
 		short objectNumber = item->Item->objectNumber;
@@ -1297,7 +1295,7 @@ bool Renderer11::drawEffects(bool transparent)
 	for (int i = 0; i < m_effectsToDraw.Size(); i++)
 	{
 		RendererEffect* effect = m_effectsToDraw[i];
-		RendererRoom* room = m_rooms[effect->Effect->roomNumber];
+		RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
 		OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
 
 		drawEffect(effect, transparent);
@@ -1323,12 +1321,12 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
 
-	RendererRoom * room = m_rooms[effect->Effect->roomNumber];
+	RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
 	RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
 	m_stItem.World = effect->World.Transpose();
 	m_stItem.Position = Vector4(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos, 1.0f);
-	m_stItem.AmbientLight = room->AmbientLight;
+	m_stItem.AmbientLight = room.AmbientLight;
 	Matrix matrices[1] = { Matrix::Identity };
 	memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
@@ -1414,11 +1412,11 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
-	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 
 	m_stItem.World = m_LaraWorldMatrix.Transpose();
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
-	m_stItem.AmbientLight = room->AmbientLight;
+	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
@@ -1667,7 +1665,7 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Update time: %d", m_timeUpdate);
 		printDebugMessage("Frame time: %d", m_timeFrame);
 		printDebugMessage("Draw calls: %d", m_numDrawCalls);
-		printDebugMessage("Rooms: %d", m_roomsToDraw.Size());
+		printDebugMessage("Rooms: %d", m_roomsToDraw.size());
 		printDebugMessage("Items: %d", m_itemsToDraw.Size());
 		printDebugMessage("Statics: %d", m_staticsToDraw.Size());
 		printDebugMessage("Lights: %d", m_lightsToDraw.Size());
@@ -1887,8 +1885,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_staticObjects = (RendererObject**)malloc(sizeof(RendererObject*) * NUM_STATICS);
 	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);
 
-	m_rooms = (RendererRoom**)malloc(sizeof(RendererRoom*) * NUM_ROOMS);
-	ZeroMemory(m_rooms, sizeof(RendererRoom*) * NUM_ROOMS);
+	m_rooms = vector<RendererRoom>(NUM_ROOMS);
 
 	m_meshes.clear();
 
@@ -2010,14 +2007,13 @@ bool Renderer11::PrepareDataForTheRenderer()
 	{
 		ROOM_INFO* room = &Rooms[i];
 
-		RendererRoom* r = new RendererRoom();
 		
-		r->RoomNumber = i;
-		r->Room = room;
-		r->AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
-		r->LightsToDraw.Reserve(32);
-
-		m_rooms[i] = r;
+		m_rooms[i] = RendererRoom();
+		RendererRoom& r = m_rooms[i];
+		r.RoomNumber = i;
+		r.Room = room;
+		r.AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
+		r.LightsToDraw.Reserve(32);
 
 		if (room->NumVertices == 0)
 			continue;
@@ -2073,11 +2069,11 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 					if (animatedSetIndex == -1)
 					{
-						bucket = &r->Buckets[bucketIndex];
+						bucket = &r.Buckets[bucketIndex];
 					}
 					else
 					{
-						bucket = &r->AnimatedBuckets[bucketIndex];
+						bucket = &r.AnimatedBuckets[bucketIndex];
 					}
 
 					// Calculate face normal
@@ -2181,11 +2177,11 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 					if (animatedSetIndex == -1)
 					{
-						bucket = &r->Buckets[bucketIndex];
+						bucket = &r.Buckets[bucketIndex];
 					}
 					else
 					{
-						bucket = &r->AnimatedBuckets[bucketIndex];
+						bucket = &r.AnimatedBuckets[bucketIndex];
 					}
 
 					// Calculate face normal
@@ -2264,7 +2260,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
 					light.Intensity = 1.0f;
 
-					r->Lights.push_back(light);
+					r.Lights.push_back(light);
 				}
 				else if (oldLight->LightType == LIGHT_TYPE_POINT)
 				{
@@ -2276,7 +2272,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Out = oldLight->Out;
 					light.Type = LIGHT_TYPE_POINT;
 
-					r->Lights.push_back(light);
+					r.Lights.push_back(light);
 				} 
 				else if (oldLight->LightType == LIGHT_TYPE_SHADOW)
 				{
@@ -2287,7 +2283,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Type = LIGHT_TYPE_SHADOW;
 					light.Intensity = 1.0f;
 
-					r->Lights.push_back(light);
+					r.Lights.push_back(light);
 				}
 				else if (oldLight->LightType == LIGHT_TYPE_SPOT)
 				{
@@ -2300,7 +2296,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 					light.Range = oldLight->Range;
 					light.Type = LIGHT_TYPE_SPOT;
 
-					r->Lights.push_back(light);
+					r.Lights.push_back(light);
 				} 
 
 				oldLight++;
@@ -2313,13 +2309,13 @@ bool Renderer11::PrepareDataForTheRenderer()
 			RendererStatic obj;
 			obj.Mesh = mesh;
 			obj.RoomIndex = i;
-			r->Statics.push_back(obj);
+			r.Statics.push_back(obj);
 		}
 
 		// Merge vertices and indices in a single list
 		for (int j = 0; j < NUM_BUCKETS; j++)
 		{
-			RendererBucket* bucket = &r->Buckets[j];
+			RendererBucket* bucket = &r.Buckets[j];
 			
 			bucket->StartVertex = baseRoomVertex;
 			bucket->StartIndex = baseRoomIndex;
@@ -3345,7 +3341,7 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 		// Pop
 		node = stack[--stackDepth]; 
 	
-		if (m_rooms[node->To]->Visited)
+		if (m_rooms[node->To].Visited)
 			continue;
 
 		ROOM_INFO* room = &Rooms[node->To];
@@ -3355,9 +3351,9 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 									 room->z + room->ySize * WALL_SIZE / 2.0f);
 		Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-		m_rooms[node->To]->Distance = (roomCentre - laraPosition).Length();
-		m_rooms[node->To]->Visited = true;
-		m_roomsToDraw.Add(m_rooms[node->To]);
+		m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
+		m_rooms[node->To].Visited = true;
+		m_roomsToDraw.push_back(&m_rooms[node->To]);
 
 		collectLightsForRoom(node->To);
 		collectItems(node->To);
@@ -3481,8 +3477,8 @@ void Renderer11::collectRooms()
 
 	for (int i = 0; i < NumberRooms; i++)
 	{
-		m_rooms[i]->Visited = false;
-		m_rooms[i]->LightsToDraw.Clear();
+		m_rooms[i].Visited = false;
+		m_rooms[i].LightsToDraw.Clear();
 	}
 	 
 	Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
@@ -3492,11 +3488,12 @@ void Renderer11::collectRooms()
 
 inline void Renderer11::collectItems(short roomNumber)
 {
-	RendererRoom* room = m_rooms[roomNumber];
-	if (room == NULL)
+	if (m_rooms.size() <= roomNumber) {
 		return;
+	}
+	RendererRoom& const room = m_rooms[roomNumber];
 
-	ROOM_INFO* r = room->Room;
+	ROOM_INFO* r = room.Room;
 
 	short itemNum = NO_ITEM;
 	for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
@@ -3537,22 +3534,23 @@ inline void Renderer11::collectItems(short roomNumber)
 
 inline void Renderer11::collectStatics(short roomNumber)
 {
-	RendererRoom* room = m_rooms[roomNumber];
-	if (room == NULL)
+	if (m_rooms.size() <= roomNumber) {
 		return;
+	}
+	RendererRoom& const room = m_rooms[roomNumber];
 
-	ROOM_INFO* r = room->Room;
+	ROOM_INFO* r = room.Room;
 	
 	if (r->numMeshes <= 0)
 		return;
 
 	MESH_INFO* mesh = r->mesh;
 
-	int numStatics = room->Statics.size();
+	int numStatics = room.Statics.size();
 
 	for (int i = 0; i < numStatics; i++)
 	{
-		RendererStatic* newStatic = &room->Statics[i];
+		RendererStatic* newStatic = &room.Statics[i];
 
 		newStatic->Mesh = mesh;
 		newStatic->RoomIndex = roomNumber;
@@ -3567,12 +3565,12 @@ inline void Renderer11::collectStatics(short roomNumber)
 inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect* effect)
 {
 	effect->Lights.Clear();
-
-	RendererRoom* room = m_rooms[roomNumber];
-	if (room == NULL)
+	if (m_rooms.size() <= roomNumber) {
 		return;
+	}
+	RendererRoom& const room = m_rooms[roomNumber];
 
-	ROOM_INFO * r = room->Room;
+	ROOM_INFO * r = room.Room;
 
 	if (r->numLights <= 0)
 		return;
@@ -3595,7 +3593,7 @@ inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect*
 		m_tempItemLights.Add(light);
 	}
 
-	int numLights = room->Lights.size();
+	int numLights = room.Lights.size();
 
 	m_shadowLight = NULL;
 	RendererLight* brightestLight = NULL;
@@ -3603,7 +3601,7 @@ inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect*
 
 	for (int j = 0; j < numLights; j++)
 	{
-		RendererLight* light = &room->Lights[j];
+		RendererLight* light = &room.Lights[j];
 
 		// Check only lights different from sun
 		if (light->Type == LIGHT_TYPE_SUN)
@@ -3669,12 +3667,12 @@ inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect*
 inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* item)
 {
 	item->Lights.Clear();
-
-	RendererRoom* room = m_rooms[roomNumber];
-	if (room == NULL)
+	if (m_rooms.size() <= roomNumber) {
 		return;
+	}
+	RendererRoom& const room = m_rooms[roomNumber];
 
-	ROOM_INFO* r = room->Room;
+	ROOM_INFO* r = room.Room;
 
 	if (r->numLights <= 0)
 		return;
@@ -3697,7 +3695,7 @@ inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* ite
 		m_tempItemLights.Add(light);
 	}
 
-	int numLights = room->Lights.size();
+	int numLights = room.Lights.size();
 
 	m_shadowLight = NULL;
 	RendererLight* brightestLight = NULL;
@@ -3705,7 +3703,7 @@ inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* ite
 
 	for (int j = 0; j < numLights; j++)
 	{
-		RendererLight* light = &room->Lights[j];
+		RendererLight* light = &room.Lights[j];
 
 		// Check only lights different from sun
 		if (light->Type == LIGHT_TYPE_SUN)
@@ -3788,16 +3786,17 @@ inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* ite
 
 inline void Renderer11::collectLightsForRoom(short roomNumber)
 {
-	RendererRoom* room = m_rooms[roomNumber];
-	if (room == NULL)
+	if (m_rooms.size() <= roomNumber) {
 		return;
+	}
+	RendererRoom& const room = m_rooms[roomNumber];
 
-	ROOM_INFO* r = room->Room;
+	ROOM_INFO* r = room.Room;
 
 	if (r->numLights <= 0)
 		return;
 
-	int numLights = room->Lights.size();
+	int numLights = room.Lights.size();
 
 	// Collect dynamic lights for rooms
 	for (int i = 0; i < m_dynamicLights.Size(); i++)
@@ -3828,7 +3827,7 @@ inline void Renderer11::collectLightsForRoom(short roomNumber)
 		// If the distance is less than the circle's radius, an intersection occurs
 		float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
 		if (distanceSquared < SQUARE(light->Out))
-			room->LightsToDraw.Add(light);
+			room.LightsToDraw.Add(light);
 	}
 }
 
@@ -3865,18 +3864,18 @@ void Renderer11::prepareLights()
 	//	m_lightsToDraw.resize(32);
 
 	// Now try to search for a shadow caster, using Lara as reference
-	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 
 	// Search for the brightest light. We do a simple version of the classic calculation done in pixel shader.
 	RendererLight* brightestLight = NULL;
 	float brightest = 0.0f;
 
 	// Try room lights
-	if (room->Lights.size() != 0)
+	if (room.Lights.size() != 0)
 	{
-		for (int j = 0; j < room->Lights.size(); j++)
+		for (int j = 0; j < room.Lights.size(); j++)
 		{
-			RendererLight* light = &room->Lights[j];
+			RendererLight* light = &room.Lights[j];
 
 			Vector4 itemPos = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 			Vector4 lightVector = itemPos - light->Position;
@@ -3932,11 +3931,10 @@ void Renderer11::prepareLights()
 
 inline void Renderer11::collectEffects(short roomNumber)
 {
-	RendererRoom* room = m_rooms[roomNumber];
-	if (room == NULL)
-		return;
+	if (m_rooms.size() <= roomNumber) return;
+	RendererRoom& const room = m_rooms[roomNumber];
 
-	ROOM_INFO* r = room->Room;
+	ROOM_INFO* r = room.Room;
 
 	short fxNum = NO_ITEM;
 	for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = Effects[fxNum].nextFx)
@@ -5249,13 +5247,12 @@ void Renderer11::updateAnimatedTextures()
 	// Update room's animated textures
 	for (int i = 0; i < NumberRooms; i++)
 	{
-		RendererRoom* room = m_rooms[i];
-		if (room == NULL)
-			continue;
+		if (m_rooms.size() <= i) continue;
+		RendererRoom& const room = m_rooms[i];
 
 		for (int bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++)
 		{
-			RendererBucket* bucket = &room->AnimatedBuckets[bucketIndex];
+			RendererBucket* bucket = &room.AnimatedBuckets[bucketIndex];
 
 			if (bucket->Vertices.size() == 0)
 				continue;
@@ -5639,7 +5636,7 @@ bool Renderer11::drawBats()
 
 					m_stItem.World = world.Transpose();
 					m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
-					m_stItem.AmbientLight = m_rooms[bat->roomNumber]->AmbientLight;
+					m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
 					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
 					m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
@@ -5685,7 +5682,7 @@ bool Renderer11::drawRats()
 
 				m_stItem.World = world.Transpose();
 				m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
-				m_stItem.AmbientLight = m_rooms[rat->roomNumber]->AmbientLight;
+				m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
 				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
 				for (int b = 0; b < 2; b++)
@@ -6841,10 +6838,10 @@ bool Renderer11::drawGunFlashes()
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
 
 	OBJECT_INFO* obj = &Objects[0];
-	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 	RendererItem* item = &m_items[Lara.itemNumber];
 
-	m_stItem.AmbientLight = room->AmbientLight;
+	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 	m_stLights.NumLights = item->Lights.Size();
@@ -6942,10 +6939,10 @@ bool Renderer11::drawGunFlashes()
 
 bool Renderer11::drawGunShells()
 {
-	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 	RendererItem* item = &m_items[Lara.itemNumber];
 
-	m_stItem.AmbientLight = room->AmbientLight;
+	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 	m_stLights.NumLights = item->Lights.Size();
@@ -7043,13 +7040,13 @@ void Renderer11::drawUnderwaterDust()
 
 bool Renderer11::isRoomUnderwater(short roomNumber)
 {
-	return (m_rooms[roomNumber]->Room->flags & ENV_FLAG_WATER);
+	return (m_rooms[roomNumber].Room->flags & ENV_FLAG_WATER);
 }
 
 bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
 {
-	RendererRoom* room = m_rooms[roomNumber];
-	ROOM_INFO* r = room->Room;
+	RendererRoom& const room = m_rooms[roomNumber];
+	ROOM_INFO* r = room.Room;
 
 	return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
 		    y >= r->maxceiling && y <= r->minfloor &&
@@ -7170,7 +7167,7 @@ bool Renderer11::drawShadowMap()
 	float brightest = 0.0f;
 	Vector3 itemPosition = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 
-	for (int k = 0; k < m_roomsToDraw.Size(); k++)
+	for (int k = 0; k < m_roomsToDraw.size(); k++)
 	{
 		RendererRoom* room = m_roomsToDraw[k];
 		int numLights = room->Lights.size();
@@ -7300,11 +7297,11 @@ bool Renderer11::drawShadowMap()
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
-	RendererRoom* room = m_rooms[LaraItem->roomNumber];
+	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 
 	m_stItem.World = m_LaraWorldMatrix.Transpose();
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
-	m_stItem.AmbientLight = room->AmbientLight;
+	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
