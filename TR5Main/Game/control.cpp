@@ -2466,27 +2466,36 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 	target.x = dest->x;
 	target.y = dest->y;
 	target.z = dest->z;
+
 	result = LOS(src, &target);
+
 	GetFloor(target.x, target.y, target.z, &target.roomNumber);
+
 	if (firing && LaserSight)
 	{
 		Lara.hasFired = true;
 		Lara.fired = true;
+
 		if (Lara.gunType == WEAPON_REVOLVER)
 		{
 			SoundEffect(SFX_REVOLVER, NULL, 0);
 		}
 	}
+
 	flag = 0;
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
+
 	if (itemNumber != 999)
 	{
 		target.x = vector.x - (vector.x - src->x >> 5);
 		target.y = vector.y - (vector.y - src->y >> 5);
 		target.z = vector.z - (vector.z - src->z >> 5);
+		
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
+		
 		if (itemNumber >= 0)
 			Lara.target = &Items[itemNumber];
+		
 		if (firing)
 		{
 			if (Lara.gunType != WEAPON_CROSSBOW)
@@ -2666,6 +2675,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 			}
 		}
 	}
+
 	if (DrawTarget && (flag || !result))
 	{
 		TriggerDynamicLight(target.x, target.y, target.z, 64, 255, 0, 0);
@@ -2674,6 +2684,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 		LaserSightY = target.y;
 		LaserSightZ = target.z;
 	}
+
 	return flag;
 }
 
@@ -2687,35 +2698,25 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 	MESH_INFO* meshp;
 
 	ClosestItem = 999;
-	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
+	ClosestDist = SQUARE(end->x - start->x) 
+		+ SQUARE(end->y - start->y) 
+		+ SQUARE(end->z - start->z);
+
 	for (r = 0; r < number_los_rooms; ++r)
 	{
 		room = &Rooms[los_rooms[r]];
-		for (linknum = room->itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
-		{
-			item = &Items[linknum];
-			if (item->status != ITEM_DEACTIVATED && item->status != ITEM_INVISIBLE && (item->objectNumber ? (bool) Objects[item->objectNumber].collision : (bool) GetLaraOnLOS))
-			{
-				box = GetBoundsAccurate(item);
-				pos.xPos = item->pos.xPos;
-				pos.yPos = item->pos.yPos;
-				pos.zPos = item->pos.zPos;
-				pos.yRot = item->pos.yRot;
-				if (DoRayBox(start, end, box, &pos, vec, linknum))
-				{
-					end->roomNumber = los_rooms[r];
-				}
-			}
-		}
-		for (m = room->numMeshes; m > 0; --m)
+
+		for (m = 0; m < room->numMeshes; m++)
 		{
 			meshp = &room->mesh[m];
+
 			if (meshp->Flags & 1)
 			{
 				pos.xPos = meshp->x;
 				pos.yPos = meshp->y;
 				pos.zPos = meshp->z;
 				pos.yRot = meshp->yRot;
+
 				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].xMinc, &pos, vec, -1 - meshp->staticNumber))
 				{
 					*mesh = meshp;
@@ -2723,10 +2724,36 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 				}
 			}
 		}
+
+		for (linknum = room->itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+		{
+			item = &Items[linknum];
+
+			if (item->status != ITEM_DEACTIVATED 
+				&& item->status != ITEM_INVISIBLE 
+				&& ((item->objectNumber != ID_LARA 
+				&& Objects[item->objectNumber].collision != NULL)
+					|| GetLaraOnLOS))
+			{
+				box = GetBoundsAccurate(item);
+
+				pos.xPos = item->pos.xPos;
+				pos.yPos = item->pos.yPos;
+				pos.zPos = item->pos.zPos;
+				pos.yRot = item->pos.yRot;
+
+				if (DoRayBox(start, end, box, &pos, vec, linknum))
+				{
+					end->roomNumber = los_rooms[r];
+				}
+			}
+		}
 	}
+
 	vec->x = ClosestCoord.x;
 	vec->y = ClosestCoord.y;
 	vec->z = ClosestCoord.z;
+
 	return ClosestItem;
 }
 
