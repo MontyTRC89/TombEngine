@@ -2275,7 +2275,7 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
-		obj->drawRoutine = DrawLiftDoor;
+		obj->drawRoutine = Legacy_DrawLiftDoor;
 	}
 
 	obj = &Objects[ID_LIFT_DOORS2];
@@ -2283,7 +2283,7 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
-		obj->drawRoutine = DrawLiftDoor;
+		obj->drawRoutine = Legacy_DrawLiftDoor;
 	}
 
 	obj = &Objects[ID_SEQUENCE_DOOR1];
@@ -2600,7 +2600,7 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseSteelDoor;
 		obj->collision = SteelDoorCollision;
-		obj->control = SteelDoorControl;
+		obj->control = Legacy_SteelDoorControl;
 	}
 
 	/*
