@@ -608,15 +608,15 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	// Preallocate lists
 	m_roomsToDraw = vector<RendererRoom*>(NUM_ROOMS);
-	m_itemsToDraw.Reserve(NUM_ITEMS);
-	m_effectsToDraw.Reserve(NUM_ITEMS);
-	m_lightsToDraw.Reserve(MAX_LIGHTS_DRAW);
-	m_dynamicLights.Reserve(MAX_DYNAMIC_LIGHTS);
-	m_staticsToDraw.Reserve(MAX_DRAW_STATICS);
-	m_spritesToDraw.Reserve(MAX_SPRITES);
-	m_lines3DToDraw.Reserve(MAX_LINES_3D);
-	m_lines2DToDraw.Reserve(MAX_LINES_2D);
-	m_tempItemLights.Reserve(MAX_LIGHTS);
+	m_itemsToDraw = vector<RendererItem*>(NUM_ITEMS);
+	m_effectsToDraw = vector<RendererEffect*>(NUM_ITEMS);
+	m_lightsToDraw = vector<RendererLight*>(MAX_LIGHTS_DRAW);
+	m_dynamicLights = vector<RendererLight*>(MAX_DYNAMIC_LIGHTS);
+	m_staticsToDraw = vector<RendererStatic*>(MAX_DRAW_STATICS);
+	m_spritesToDraw = vector<RendererSpriteToDraw*>(MAX_SPRITES);
+	m_lines3DToDraw = vector<RendererLine3D*>(MAX_LINES_3D);
+	m_lines2DToDraw = vector<RendererLine2D*>(MAX_LINES_2D);
+	m_tempItemLights = vector<RendererLight*>(MAX_LIGHTS);
 	m_spritesBuffer = (RendererSpriteToDraw*)malloc(sizeof(RendererSpriteToDraw) * MAX_SPRITES);
 	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
 	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
@@ -678,13 +678,13 @@ bool Renderer11::drawAmbientCubeMap(short roomNumber)
 void Renderer11::clearSceneItems()
 {
 	m_roomsToDraw.clear();
-	m_itemsToDraw.Clear();
-	m_effectsToDraw.Clear();
-	m_lightsToDraw.Clear();
-	m_staticsToDraw.Clear();
-	m_spritesToDraw.Clear();
-	m_lines3DToDraw.Clear();
-	m_lines2DToDraw.Clear();
+	m_itemsToDraw.clear();
+	m_effectsToDraw.clear();
+	m_lightsToDraw.clear();
+	m_staticsToDraw.clear();
+	m_spritesToDraw.clear();
+	m_lines3DToDraw.clear();
+	m_lines2DToDraw.clear();
 }
 
 bool Renderer11::drawHorizonAndSky()
@@ -1015,7 +1015,7 @@ bool Renderer11::drawStatics(bool transparent)
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-	for (int i = 0; i < m_staticsToDraw.Size(); i++)
+	for (int i = 0; i < m_staticsToDraw.size(); i++)
 	{
 		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
 
@@ -1129,7 +1129,7 @@ bool Renderer11::drawWaterfalls()
 	// Draw waterfalls
 	m_context->RSSetState(m_states->CullCounterClockwise());
 	
-	for (int i = 0; i < m_itemsToDraw.Size(); i++)
+	for (int i = 0; i < m_itemsToDraw.size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
 		RendererRoom& const room = m_rooms[item->Item->roomNumber];
@@ -1249,7 +1249,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	for (int i = 0; i < m_itemsToDraw.Size(); i++)
+	for (int i = 0; i < m_itemsToDraw.size(); i++)
 	{
 		RendererItem* item = m_itemsToDraw[i];
 		RendererRoom& const room = m_rooms[item->Item->roomNumber];
@@ -1292,7 +1292,7 @@ bool Renderer11::drawEffects(bool transparent)
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	for (int i = 0; i < m_effectsToDraw.Size(); i++)
+	for (int i = 0; i < m_effectsToDraw.size(); i++)
 	{
 		RendererEffect* effect = m_effectsToDraw[i];
 		RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
@@ -1666,9 +1666,9 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Frame time: %d", m_timeFrame);
 		printDebugMessage("Draw calls: %d", m_numDrawCalls);
 		printDebugMessage("Rooms: %d", m_roomsToDraw.size());
-		printDebugMessage("Items: %d", m_itemsToDraw.Size());
-		printDebugMessage("Statics: %d", m_staticsToDraw.Size());
-		printDebugMessage("Lights: %d", m_lightsToDraw.Size());
+		printDebugMessage("Items: %d", m_itemsToDraw.size());
+		printDebugMessage("Statics: %d", m_staticsToDraw.size());
+		printDebugMessage("Lights: %d", m_lightsToDraw.size());
 		printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
 		printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 		printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
@@ -2794,7 +2794,7 @@ ID3D11ComputeShader* Renderer11::compileComputeShader(const char* fileName)
 
 void Renderer11::ClearDynamicLights()
 {
-	m_dynamicLights.Clear();
+	m_dynamicLights.clear();
 }
 
 void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -2811,7 +2811,7 @@ void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byt
 	dynamicLight->Dynamic = 1;
 	dynamicLight->Intensity = 2.0f;
 
-	m_dynamicLights.Add(dynamicLight);
+	m_dynamicLights.push_back(dynamicLight);
 	//NumDynamics++;
 }
 
@@ -3528,7 +3528,7 @@ inline void Renderer11::collectItems(short roomNumber)
 
 		collectLightsForItem(item->roomNumber, newItem);
 
-		m_itemsToDraw.Add(newItem);
+		m_itemsToDraw.push_back(newItem);
 	}
 }
 
@@ -3556,7 +3556,7 @@ inline void Renderer11::collectStatics(short roomNumber)
 		newStatic->RoomIndex = roomNumber;
 		newStatic->World = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot)) * Matrix::CreateTranslation(mesh->x, mesh->y, mesh->z);
 
-		m_staticsToDraw.Add(newStatic);
+		m_staticsToDraw.push_back(newStatic);
 
 		mesh++;
 	}
@@ -3575,12 +3575,12 @@ inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect*
 	if (r->numLights <= 0)
 		return;
 
-	m_tempItemLights.Clear();
+	m_tempItemLights.clear();
 
 	Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
 
 	// Dynamic lights have the priority
-	for (int i = 0; i < m_dynamicLights.Size(); i++)
+	for (int i = 0; i < m_dynamicLights.size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
 
@@ -3590,7 +3590,7 @@ inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect*
 		if (distance > light->Out)
 			continue;
 
-		m_tempItemLights.Add(light);
+		m_tempItemLights.push_back(light);
 	}
 
 	int numLights = room.Lights.size();
@@ -3655,10 +3655,10 @@ inline void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect*
 			continue;
 		}
 
-		m_tempItemLights.Add(light);
+		m_tempItemLights.push_back(light);
 	}
 
-	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
+	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
 	{
 		effect->Lights.Add(m_tempItemLights[i]);
 	}
@@ -3677,12 +3677,12 @@ inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* ite
 	if (r->numLights <= 0)
 		return;
 
-	m_tempItemLights.Clear();
+	m_tempItemLights.clear();
 
 	Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
 
 	// Dynamic lights have the priority
-	for (int i = 0; i < m_dynamicLights.Size(); i++)
+	for (int i = 0; i < m_dynamicLights.size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
 
@@ -3692,7 +3692,7 @@ inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* ite
 		if (distance > light->Out)
 			continue;
 
-		m_tempItemLights.Add(light);
+		m_tempItemLights.push_back(light);
 	}
 
 	int numLights = room.Lights.size();
@@ -3770,10 +3770,10 @@ inline void Renderer11::collectLightsForItem(short roomNumber, RendererItem* ite
 			continue;
 		}
 		       
-		m_tempItemLights.Add(light);
+		m_tempItemLights.push_back(light);
 	}
 	  
-	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.Size()); i++)
+	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
 	{
 		item->Lights.Add(m_tempItemLights[i]); 
 	}
@@ -3799,7 +3799,7 @@ inline void Renderer11::collectLightsForRoom(short roomNumber)
 	int numLights = room.Lights.size();
 
 	// Collect dynamic lights for rooms
-	for (int i = 0; i < m_dynamicLights.Size(); i++)
+	for (int i = 0; i < m_dynamicLights.size(); i++)
 	{
 		RendererLight* light = m_dynamicLights[i];
 
@@ -3852,8 +3852,8 @@ bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 s
 void Renderer11::prepareLights()
 {
 	// Add dynamic lights
-	for (int i = 0; i < m_dynamicLights.Size(); i++)
-		m_lightsToDraw.Add(m_dynamicLights[i]);
+	for (int i = 0; i < m_dynamicLights.size(); i++)
+		m_lightsToDraw.push_back(m_dynamicLights[i]);
 
 	// Now I have a list full of draw. Let's sort them.
 	//std::sort(m_lightsToDraw.begin(), m_lightsToDraw.end(), SortLightsFunction);
@@ -3955,7 +3955,7 @@ inline void Renderer11::collectEffects(short roomNumber)
 		
 		collectLightsForEffect(fx->roomNumber, newEffect);
 
-		m_effectsToDraw.Add(newEffect);
+		m_effectsToDraw.push_back(newEffect);
 
 		short* mp = Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)];
 		short hhh = 0;
@@ -4328,7 +4328,7 @@ void Renderer11::updateItemsAnimations()
 	Matrix translation;
 	Matrix rotation;
 
-	int numItems = m_itemsToDraw.Size();
+	int numItems = m_itemsToDraw.size();
 
 	for (int i = 0; i < numItems; i++)
 	{
@@ -4648,7 +4648,7 @@ int Renderer11::getFrame(short animation, short frame, short** framePtr, int* ra
 
 void Renderer11::updateEffects()
 {
-	for (int i = 0; i < m_effectsToDraw.Size(); i++)
+	for (int i = 0; i < m_effectsToDraw.size(); i++)
 	{
 		RendererEffect* fx = m_effectsToDraw[i];
 
@@ -4838,7 +4838,7 @@ void Renderer11::AddSpriteBillboard(RendererSprite* sprite,Vector3 pos, Vector4 
 	spr->Height = height;
 	spr->BlendMode = blendMode;
 
-	m_spritesToDraw.Add(spr);
+	m_spritesToDraw.push_back(spr);
 }
 
 void Renderer11::drawSmokes()
@@ -4869,7 +4869,7 @@ void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
 	line->end = end;
 	line->color = color;
 
-	m_lines3DToDraw.Add(line);
+	m_lines3DToDraw.push_back(line);
 }
 
 void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1,Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
@@ -4897,7 +4897,7 @@ void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1,Vector3 vtx2, 
 	spr->Height = height;
 	spr->BlendMode = blendMode;
 
-	m_spritesToDraw.Add(spr);
+	m_spritesToDraw.push_back(spr);
 }
 
 void Renderer11::drawShockwaves()
@@ -5070,7 +5070,7 @@ bool Renderer11::drawSprites()
 	{
 		BLEND_MODES currentBlendMode = (BLEND_MODES)b;
 
-		int numSpritesToDraw = m_spritesToDraw.Size();
+		int numSpritesToDraw = m_spritesToDraw.size();
 		int lastSprite = 0;
 
 		m_primitiveBatch->Begin();
@@ -5334,7 +5334,7 @@ bool Renderer11::drawLines3D()
 
 	m_primitiveBatch->Begin();
 
-	for (int i = 0; i < m_lines3DToDraw.Size(); i++)
+	for (int i = 0; i < m_lines3DToDraw.size(); i++)
 	{
 		RendererLine3D* line = m_lines3DToDraw[i];
 
@@ -5786,7 +5786,7 @@ int Renderer11::drawInventoryScene()
 	rect.right = ScreenWidth;
 	rect.bottom = ScreenHeight;
 
-	m_lines2DToDraw.Clear(); 
+	m_lines2DToDraw.clear(); 
 	m_strings.clear();
 
 	m_nextLine2D = 0; 
@@ -6702,7 +6702,7 @@ bool Renderer11::drawLines2D()
 
 	m_primitiveBatch->Begin();
 
-	for (int i = 0; i < m_lines2DToDraw.Size(); i++)
+	for (int i = 0; i < m_lines2DToDraw.size(); i++)
 	{
 		RendererLine2D* line = m_lines2DToDraw[i];
 
@@ -6822,7 +6822,7 @@ void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte 
 	line->Vertices[1] = Vector2(x2, y2);
 	line->Color = Vector4(r, g, b, a);
 
-	m_lines2DToDraw.Add(line);
+	m_lines2DToDraw.push_back(line);
 }
 
 bool Renderer11::drawGunFlashes()
