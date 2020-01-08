@@ -950,12 +950,12 @@ private:
 	bool											checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort);
 	void											getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count);
 	void											collectRooms();
-	inline void										collectItems(short roomNumber);
-	inline void										collectStatics(short roomNumber);
-	inline void										collectLightsForRoom(short roomNumber);
-	inline void										collectLightsForItem(short roomNumber, RendererItem* item);
-	inline void										collectLightsForEffect(short roomNumber, RendererEffect* effect);
-	inline void										collectEffects(short roomNumber);
+	void										collectItems(short roomNumber);
+	void										collectStatics(short roomNumber);
+	void										collectLightsForRoom(short roomNumber);
+	void										collectLightsForItem(short roomNumber, RendererItem* item);
+	void										collectLightsForEffect(short roomNumber, RendererEffect* effect);
+	void										collectEffects(short roomNumber);
 	void											prepareLights();
 	void											clearSceneItems();
 	bool											updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size);
