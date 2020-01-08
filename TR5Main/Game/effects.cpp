@@ -12,6 +12,8 @@
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
+short FXType;
+
 void(*effect_routines[59])(ITEM_INFO* item) =
 {
 	turn180_effect,

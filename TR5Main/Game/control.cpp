@@ -57,6 +57,8 @@ extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern Inventory* g_Inventory;
 extern int SplashCount;
+extern void(*effect_routines[59])(ITEM_INFO* item);
+extern short FXType;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -3194,6 +3196,183 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 	return 1;
 }
 
+void AnimateItem(ITEM_INFO* item)
+{
+	item->touchBits = 0;
+	item->hitStatus = false;
+
+	item->frameNumber++;
+
+	ANIM_STRUCT* anim = &Anims[item->animNumber];
+	if (anim->numberChanges > 0 && GetChange(item, anim))
+	{
+		anim = &Anims[item->animNumber];
+
+		item->currentAnimState = anim->currentAnimState;
+
+		if (item->requiredAnimState == item->currentAnimState)
+			item->requiredAnimState = 0;
+	}
+
+	if (item->frameNumber > anim->frameEnd)
+	{
+		if (anim->numberCommands > 0)
+		{
+			short* cmd = &Commands[anim->commandIndex];
+			for (int i = anim->numberCommands; i > 0; i--)
+			{
+				switch (*(cmd++))
+				{
+				case COMMAND_MOVE_ORIGIN:
+					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					cmd += 3;
+					break;
+
+				case COMMAND_JUMP_VELOCITY:
+					item->fallspeed = *(cmd++);
+					item->speed = *(cmd++);
+					item->gravityStatus = true;
+					break;
+
+				case COMMAND_DEACTIVATE:
+					if (Objects[item->objectNumber].intelligent && !item->afterDeath)
+						item->afterDeath = 1;
+					item->status = ITEM_DEACTIVATED;
+					break;
+
+				case COMMAND_SOUND_FX:
+				case COMMAND_EFFECT:
+					cmd += 2;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+
+		item->animNumber = anim->jumpAnimNum;
+		item->frameNumber = anim->jumpFrameNum;
+
+		anim = &Anims[item->animNumber];
+		
+		if (item->currentAnimState != anim->currentAnimState)
+		{
+			item->currentAnimState = anim->currentAnimState;
+			item->goalAnimState = anim->currentAnimState;
+		}
+
+		if (item->requiredAnimState == item->currentAnimState)
+			item->requiredAnimState = 0;
+	}
+
+	if (anim->numberCommands > 0)
+	{
+		short* cmd = &Commands[anim->commandIndex];
+		int flags;
+
+		for (int i = anim->numberCommands; i > 0; i--)
+		{
+			switch (*(cmd++))
+			{
+			case COMMAND_MOVE_ORIGIN:
+				cmd += 3;
+				break;
+
+			case COMMAND_JUMP_VELOCITY:
+				cmd += 2;
+				break;
+
+			case COMMAND_SOUND_FX:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				flags = cmd[1] & 0xC000;
+
+				if (!Objects[item->objectNumber].waterCreature)
+				{
+					if (item->roomNumber == NO_ROOM)
+					{
+						item->pos.xPos = LaraItem->pos.xPos;
+						item->pos.yPos = LaraItem->pos.yPos - 762;
+						item->pos.zPos = LaraItem->pos.zPos;
+						
+						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
+					}
+					else if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+					{
+						if (!flags 
+							|| flags == SFX_WATERONLY 
+							&& (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER 
+								|| Objects[item->objectNumber].intelligent))
+						{
+							SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
+						}
+					}
+					else if (!flags || flags == SFX_LANDONLY && !(Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+					{
+						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
+					}
+				}
+				else
+				{
+					if (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER)
+						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 1);
+					else
+						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 0);
+				}
+				break;
+
+			case COMMAND_EFFECT:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				FXType = cmd[1] & 0xC000;
+				(*effect_routines[(int)(cmd[1] & 0x3fff)])(item);
+
+				cmd += 2;
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	int lateral = 0;
+
+	if (item->gravityStatus)
+	{
+		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6);
+		item->pos.yPos += item->fallspeed;
+	}
+	else
+	{
+		int velocity = anim->velocity;
+		if (anim->acceleration)
+			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		item->speed = velocity >> 16;
+
+		lateral = anim->Xvelocity;
+		if (anim->Xacceleration)
+			lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
+
+		lateral >>= 16;
+	}
+
+	item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.zPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	item->pos.xPos += lateral * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.zPos += lateral * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
@@ -3201,5 +3380,9 @@ void Inject_Control()
 	INJECT(0x00415960, TranslateItem);
 	INJECT(0x00415B20, GetFloor);
 	INJECT(0x00417640, GetCeiling);
-	INJECT(0x004193C0, DoRayBox);
+	INJECT(0x004A7C10, GetRandomControl);
+	INJECT(0x004A7C40, GetRandomDraw);
+	INJECT(0x004A7C70, SeedRandomControl);
+	INJECT(0x004A7C90, SeedRandomDraw);
+	INJECT(0x00415300, AnimateItem);
 }

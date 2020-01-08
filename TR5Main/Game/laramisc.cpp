@@ -13,9 +13,10 @@
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
 extern void(*effect_routines[59])(ITEM_INFO* item);
-COLL_INFO coll; 
+extern short FXType;
+
+COLL_INFO coll;
 short SubsuitAir = 0;
-short FXType;
 
 /*void GetLaraDeadlyBounds()//4B408(<), 4B86C (F)
 {
