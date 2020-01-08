@@ -13,6 +13,7 @@
 #include "..\Game\switch.h"
 #include "../Game/tomb4fx.h"
 #include "../Game/pickup.h"
+extern DRIP_STRUCT Drips[MAX_DRIPS];
 
 short ScalesBounds[12] = {
 	0xFA80, 0xFA80, 0x0000, 0x0000, 0xFE00, 0x0200,

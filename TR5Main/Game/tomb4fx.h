@@ -10,16 +10,8 @@ struct NODEOFFSET_INFO
 	unsigned char gotIt; // size=0, offset=7
 };
 
-extern GUNFLASH_STRUCT Gunflashes[4]; // offset 0xA31D8
 extern PHD_VECTOR NodeVectors[16]; // offset 0xA3274
-extern FIRE_SPARKS FireSparks[20]; // offset 0xA94FC
-extern SMOKE_SPARKS SmokeSparks[32]; // offset 0xA8F7C
-extern GUNSHELL_STRUCT Gunshells[24]; // offset 0xA7DFC
-extern BLOOD_STRUCT Blood[32]; // offset 0xA88FC
-extern BUBBLE_STRUCT Bubbles[40]; // offset 0xA80FC
-extern DRIP_STRUCT Drips[32]; // offset 0xA85FC
-extern SHOCKWAVE_STRUCT ShockWaves[16]; // 0xA7C3C
-extern FIRE_LIST Fires[32]; // offset 0xA8D7C
+
 
 extern int LaserSightX;
 extern int LaserSightY;
