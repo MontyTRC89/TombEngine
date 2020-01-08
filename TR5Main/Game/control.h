@@ -30,7 +30,7 @@
 //#define RumbleScreen ((void (__cdecl*)()) 0x00442C90)
 #define ExplodeItemNode ((int (__cdecl*)(ITEM_INFO*, int, int, int)) 0x0041ABF0)
 //#define LavaBurn ((void (__cdecl*)(ITEM_INFO*)) 0x0048ADD0)
-#define RefreshCamera ((void (__cdecl*)(short, short*)) 0x004165E0)
+//#define RefreshCamera ((void (__cdecl*)(short, short*)) 0x004165E0)
 //#define DoFlipMap ((void (__cdecl*)(short)) 0x00418910)
 //#define PlaySoundTrack ((void (__cdecl*)(short, short)) 0x00418B90)
 //#define AlterFloorHeight ((void (__cdecl*)(ITEM_INFO*, int)) 0x004159F0)
@@ -86,6 +86,7 @@ void AddRoomFlipItems(ROOM_INFO* r);
 void RemoveRoomFlipItems(ROOM_INFO* r);
 void PlaySoundTrack(short track, short flags);
 void RumbleScreen();
+void RefreshCamera(short type, short* data);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
