@@ -16,6 +16,7 @@ using namespace DirectX::SimpleMath;
 #include "math.h"
 #include "macros.h"
 #include "malloc.h"
+#include "legacyfunctions.h"
 
 #include "..\Scripting\GameLogicScript.h"
 #include "..\Scripting\GameFlowScript.h"
