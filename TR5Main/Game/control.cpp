@@ -3484,6 +3484,58 @@ void RumbleScreen()
 	}
 }
 
+void RefreshCamera(short type, short* data)
+{
+	short trigger, value, targetOk;
+
+	targetOk = 2;
+	
+	do
+	{
+		trigger = *(data++);
+		value = trigger & VALUE_BITS;
+
+		switch (TRIG_BITS(trigger))
+		{
+		case TO_CAMERA:
+			data++;
+
+			if (value == Camera.last)
+			{
+				Camera.number = value;
+
+				if ((Camera.timer < 0)
+					|| (Camera.type == LOOK_CAMERA)
+					|| (Camera.type == COMBAT_CAMERA))
+				{
+					Camera.timer = -1;
+					targetOk = 0;
+					break;
+				}
+				Camera.type = FIXED_CAMERA;
+				targetOk = 1;
+			}
+			else
+				targetOk = 0;
+			break;
+
+		case TO_TARGET:
+			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA)
+				break;
+
+			Camera.item = &Items[value];
+			break;
+		}
+	} while (!(trigger & END_BIT));
+
+	if (Camera.item)
+		if (!targetOk || (targetOk == 2 && Camera.item->lookedAt && Camera.item != Camera.lastItem))
+			Camera.item = NULL;
+
+	if (Camera.number == -1 && Camera.timer > 0)
+		Camera.timer = -1;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
