@@ -4767,7 +4767,7 @@ void Renderer11::drawBlood()
 		{
 			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
 				Vector3(blood->x, blood->y, blood->z),
-				Vector4(blood->shade * 244/255.0f, blood->shade * 0, blood->shade * 0,1.0f),
+				Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0,1.0f),
 				TR_ANGLE_TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
 				BLENDMODE_ALPHABLEND);
 		}
@@ -4988,7 +4988,7 @@ void Renderer11::drawBubbles()
 	{
 		BUBBLE_STRUCT* bubble = &Bubbles[i];
 		if (bubble->size)
-			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES], Vector3(bubble->pos.x, bubble->pos.y, bubble->pos.z),Vector4( bubble->shade, bubble->shade, bubble->shade,1.0f), 0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
+			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES], Vector3(bubble->pos.x, bubble->pos.y, bubble->pos.z),Vector4( bubble->shade/255.0f, bubble->shade/255.0f, bubble->shade/255.0f,1.0f), 0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
 	}
 }
 
