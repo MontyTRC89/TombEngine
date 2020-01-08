@@ -52,7 +52,6 @@ public:
 
 	~PreallocatedVector()
 	{
-		free(m_objects);
 	}
 
 	inline void Reserve(int numItems)
@@ -862,7 +861,7 @@ private:
 	IndexBuffer*									m_moveablesIndexBuffer;
 	VertexBuffer*									m_staticsVertexBuffer;
 	IndexBuffer*									m_staticsIndexBuffer;
-	RendererRoom**									m_rooms;
+	vector<RendererRoom>							m_rooms;
 	Matrix											m_hairsMatrices[12];
 	short											m_normalLaraSkinJointRemap[15][32];
 	short											m_youngLaraSkinJointRemap[15][32];
@@ -871,7 +870,7 @@ private:
 	short											m_numHairIndices;
 	vector<RendererVertex>							m_hairVertices;
 	vector<short>									m_hairIndices;
-	PreallocatedVector<RendererRoom>				m_roomsToDraw;
+	vector<RendererRoom*>							m_roomsToDraw;
 	PreallocatedVector<RendererItem>				m_itemsToDraw;
 	PreallocatedVector<RendererEffect>			    m_effectsToDraw;
 	PreallocatedVector<RendererStatic>				m_staticsToDraw;
