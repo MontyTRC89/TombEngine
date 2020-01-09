@@ -1734,7 +1734,7 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
 			case STALK_MOOD:
 				if (creature->alerted && info->zoneNumber != info->enemyZone)
 				{
-					if (info->distance > (WALL_SIZE*3))
+					if (info->distance > 3072)
 						creature->mood = STALK_MOOD;
 					else
 						creature->mood = BORED_MOOD;

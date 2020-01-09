@@ -3403,8 +3403,9 @@ void DoFlipMap(short group)
 		}
 	}
 
-	FlipStats[group] = (FlipStats[group] == 0);
-	FlipStatus = (FlipStats[group] == 0);
+	int status = FlipStats[group] == 0;
+	FlipStats[group] = status;
+	FlipStatus = status;
 	
 	for (int i = 0; i < NUM_SLOTS; i++)
 	{
