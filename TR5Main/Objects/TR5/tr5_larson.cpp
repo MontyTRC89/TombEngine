@@ -285,7 +285,7 @@ void ControlLarson(short itemNumber)
 			joint0 = info.angle >> 1;
 			joint2 = info.angle >> 1;
 			if (info.ahead)
-				joint1 =info.xAngle;
+				joint1 = info.xAngle;
 
 			if (creature->mood)
 			{
@@ -331,7 +331,7 @@ void ControlLarson(short itemNumber)
 				}
 				item->firedWeapon = 2;
 			}
-			if (creature->mood == 2 && GetRandomControl() > 0x2000)
+			if (creature->mood == ESCAPE_MOOD && GetRandomControl() > 0x2000)
 				item->requiredAnimState = 1;
 			break;
 
