@@ -6,6 +6,19 @@
 #include "../../Game/people.h"
 #include "../../Game/lot.h"
 
+#define STATE_TR5_LARSON_STOP		1
+#define STATE_TR5_LARSON_WALK		2
+#define STATE_TR5_LARSON_RUN		3
+#define STATE_TR5_LARSON_AIM		4
+#define STATE_TR5_LARSON_DIE		5
+#define STATE_TR5_LARSON_IDLE		6
+#define STATE_TR5_LARSON_ATTACK		7
+
+#define ANIMATION_TR5_PIERRE_DIE	12
+#define ANIMATION_TR5_LARSON_DIE	15
+
+#define TR5_LARSON_MIN_HP			40
+
 BITE_INFO LarsonGun = { -55, 200, 5, 14 };
 BITE_INFO PierreGun1 = { 60, 200, 0, 11 };
 BITE_INFO PierreGun2 = { -57, 200, 0, 14 };
@@ -18,8 +31,8 @@ void InitialiseLarson(short itemNum)
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->goalAnimState = STATE_TR5_LARSON_STOP;
+	item->currentAnimState = STATE_TR5_LARSON_STOP;
 
 	if (!item->triggerFlags)
 		return;
@@ -59,12 +72,14 @@ void ControlLarson(short itemNumber)
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
-	if (item->hitPoints <= 40 && !(item->flags & 0x100))
+	// In Streets of Rome when Larson HP are below 40 he runs way
+	if (item->hitPoints <= TR5_LARSON_MIN_HP && !(item->flags & ONESHOT))
 	{
-		item->hitPoints = 40;
+		item->hitPoints = TR5_LARSON_MIN_HP;
 		creature->flags++;
 	}
 
+	// Fire weapon effects
 	if (item->firedWeapon)
 	{
 		PHD_VECTOR pos;
@@ -112,6 +127,7 @@ void ControlLarson(short itemNumber)
 		if (info.ahead)
 			joint2 = info.angle;
 
+		// FIXME: this should make Larson running away, but it's broken
 		if (creature->flags)
 		{
 			item->hitPoints = 60;
@@ -138,7 +154,7 @@ void ControlLarson(short itemNumber)
 		
 		switch (item->currentAnimState)
 		{
-		case 1:
+		case STATE_TR5_LARSON_STOP:
 			joint0 = info.angle >> 1;
 			joint2 = info.angle >> 1;
 			if (info.ahead)
@@ -150,18 +166,18 @@ void ControlLarson(short itemNumber)
 			}
 			else if (item->aiBits & AMBUSH)
 			{
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_TR5_LARSON_RUN;
 			}
 			else if (Targetable(item, &info))
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_TR5_LARSON_AIM;
 			}
 			else
 			{
 				if (item->aiBits & GUARD || CurrentLevel == 2 || item->itemFlags[3])
 				{
 					creature->maximumTurn = 0;
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_TR5_LARSON_STOP;
 					if (abs(info.angle) >= ANGLE(2))
 					{
 						if (info.angle > 0)
@@ -179,9 +195,9 @@ void ControlLarson(short itemNumber)
 					if (creature->mood)
 					{
 						if (creature->mood == ESCAPE_MOOD)
-							item->goalAnimState = 3;
+							item->goalAnimState = STATE_TR5_LARSON_RUN;
 						else
-							item->goalAnimState = 2;
+							item->goalAnimState = STATE_TR5_LARSON_WALK;
 					}
 					else
 					{
@@ -191,36 +207,36 @@ void ControlLarson(short itemNumber)
 			}
 			break;
 
-		case 2:
+		case STATE_TR5_LARSON_WALK:
 			if (info.ahead)
 				joint2 = info.angle;
 			
 			creature->maximumTurn = ANGLE(7);
 			if (!creature->mood && GetRandomControl() < 96)
 			{
-				item->requiredAnimState = 6;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_TR5_LARSON_IDLE;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 				break;
 			}
 
 			if (creature->mood == ESCAPE_MOOD || item->aiBits & AMBUSH)
 			{
-				item->requiredAnimState = 3;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_TR5_LARSON_RUN;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			}
 			else if (Targetable(item, &info))
 			{
-				item->requiredAnimState = 4;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_TR5_LARSON_AIM;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			}
 			else if (!info.ahead || info.distance > SQUARE(3072))
 			{
-				item->requiredAnimState = 3;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_TR5_LARSON_RUN;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			}
 			break;
 
-		case 3:
+		case STATE_TR5_LARSON_RUN:
 			if (info.ahead)
 				joint2 = info.angle;
 			creature->maximumTurn = ANGLE(11);
@@ -228,36 +244,36 @@ void ControlLarson(short itemNumber)
 
 			if (creature->reachedGoal)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			}
 			else if (item->aiBits & AMBUSH)
 			{
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_TR5_LARSON_RUN;
 			}
 			else if (creature->mood || GetRandomControl() >= 96)
 			{
 				if (Targetable(item, &info))
 				{
-					item->requiredAnimState = 4;
-					item->goalAnimState = 1;
+					item->requiredAnimState = STATE_TR5_LARSON_AIM;
+					item->goalAnimState = STATE_TR5_LARSON_STOP;
 				}
 				else if (info.ahead)
 				{
 					if (info.distance <= SQUARE(3072))
 					{
-						item->requiredAnimState = 2;
-						item->goalAnimState = 1;
+						item->requiredAnimState = STATE_TR5_LARSON_WALK;
+						item->goalAnimState = STATE_TR5_LARSON_STOP;
 					}
 				}
 			}
 			else
 			{
-				item->requiredAnimState = 6;
-				item->goalAnimState = 1;
+				item->requiredAnimState = STATE_TR5_LARSON_IDLE;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			}
 			break;
 
-		case 4:
+		case STATE_TR5_LARSON_AIM:
 			joint0 = info.angle >> 1;
 			joint2 = info.angle >> 1;
 			if (info.ahead)
@@ -276,12 +292,12 @@ void ControlLarson(short itemNumber)
 			}
 
 			if (Targetable(item, &info))
-				item->goalAnimState = 7;
+				item->goalAnimState = STATE_TR5_LARSON_ATTACK;
 			else
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			break;
 
-		case 6:
+		case STATE_TR5_LARSON_IDLE:
 			joint0 = info.angle >> 1;
 			joint2 = info.angle >> 1;
 			if (info.ahead)
@@ -289,19 +305,19 @@ void ControlLarson(short itemNumber)
 
 			if (creature->mood)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			}
 			else
 			{
 				if (GetRandomControl() <= 96)
 				{
-					item->requiredAnimState = 2;
-					item->goalAnimState = 1;
+					item->requiredAnimState = STATE_TR5_LARSON_WALK;
+					item->goalAnimState = STATE_TR5_LARSON_STOP;
 				}
 			}
 			break;
 
-		case 7:
+		case STATE_TR5_LARSON_ATTACK:
 			joint0 = info.angle >> 1;
 			joint2 = info.angle >> 1;
 			if (info.ahead)
@@ -332,7 +348,7 @@ void ControlLarson(short itemNumber)
 				item->firedWeapon = 2;
 			}
 			if (creature->mood == ESCAPE_MOOD && GetRandomControl() > 0x2000)
-				item->requiredAnimState = 1;
+				item->requiredAnimState = STATE_TR5_LARSON_STOP;
 			break;
 
 		default:
@@ -340,8 +356,9 @@ void ControlLarson(short itemNumber)
 
 		}
 	}
-	else if (item->currentAnimState == 5)
+	else if (item->currentAnimState == STATE_TR5_LARSON_DIE)
 	{
+		// When Larson dies, it activates trigger at start position
 		if (item->objectNumber == ID_TR5_LARSON 
 			&& item->frameNumber == Anims[item->animNumber].frameEnd)
 		{
@@ -362,11 +379,12 @@ void ControlLarson(short itemNumber)
 	}
 	else
 	{
+		// Die
 		if (item->objectNumber == ID_TR5_PIERRE)
-			item->animNumber = Objects[ID_TR5_PIERRE].animIndex + 12;
+			item->animNumber = Objects[ID_TR5_PIERRE].animIndex + ANIMATION_TR5_PIERRE_DIE;
 		else
-			item->animNumber = Objects[ID_TR5_LARSON].animIndex + 15;
-		item->currentAnimState = 5;
+			item->animNumber = Objects[ID_TR5_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
+		item->currentAnimState = STATE_TR5_LARSON_DIE;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 	}
 
@@ -380,8 +398,8 @@ void ControlLarson(short itemNumber)
 	{
 		if (CurrentLevel == 2)
 		{
-			item->goalAnimState = 1;
-			item->requiredAnimState = 1;
+			item->goalAnimState = STATE_TR5_LARSON_STOP;
+			item->requiredAnimState = STATE_TR5_LARSON_STOP;
 			creature->reachedGoal = false;
 			item->gravityStatus = false;
 			item->hitStatus = false;
