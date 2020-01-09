@@ -36,6 +36,19 @@ extern byte Sequences[3];
 extern byte CurrentSequence;
 extern int NumRPickups;
 
+extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
+extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
+extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+extern BUBBLE_STRUCT Bubbles[MAX_BUBBLES];
+extern DRIP_STRUCT Drips[MAX_DRIPS];
+extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
+extern FIRE_LIST Fires[MAX_FIRE_LIST];
+extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
+extern SPARKS Sparks[MAX_SPARKS];
+extern SPLASH_STRUCT Splashes[MAX_SPLASH];
+extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
+
 OBJECT_INFO Objects[2048];
 
 void NewObjects()

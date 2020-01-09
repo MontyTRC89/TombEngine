@@ -14,7 +14,7 @@ unsigned char TES_extra_tab[] =
 {
 	0x00, 0x04, 0x07, 0x0A, 0x00, 0x00
 };
-
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 int DeadlyBounds[6];
 SPLASH_STRUCT Splashes[MAX_SPLASH];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];

@@ -6,6 +6,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/draw.h"
 #include "../../Game/tomb4fx.h"
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void InitialiseDemigod(short itemNum)
 {
