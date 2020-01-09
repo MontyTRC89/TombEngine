@@ -52,7 +52,6 @@ public:
 
 	~PreallocatedVector()
 	{
-		free(m_objects);
 	}
 
 	inline void Reserve(int numItems)
@@ -862,7 +861,7 @@ private:
 	IndexBuffer*									m_moveablesIndexBuffer;
 	VertexBuffer*									m_staticsVertexBuffer;
 	IndexBuffer*									m_staticsIndexBuffer;
-	RendererRoom**									m_rooms;
+	vector<RendererRoom>							m_rooms;
 	Matrix											m_hairsMatrices[12];
 	short											m_normalLaraSkinJointRemap[15][32];
 	short											m_youngLaraSkinJointRemap[15][32];
@@ -871,16 +870,16 @@ private:
 	short											m_numHairIndices;
 	vector<RendererVertex>							m_hairVertices;
 	vector<short>									m_hairIndices;
-	PreallocatedVector<RendererRoom>				m_roomsToDraw;
-	PreallocatedVector<RendererItem>				m_itemsToDraw;
-	PreallocatedVector<RendererEffect>			    m_effectsToDraw;
-	PreallocatedVector<RendererStatic>				m_staticsToDraw;
-	PreallocatedVector<RendererLight>				m_lightsToDraw;
-	PreallocatedVector<RendererLight>				m_dynamicLights;
-	PreallocatedVector<RendererSpriteToDraw>		m_spritesToDraw;
-	PreallocatedVector<RendererLine3D>				m_lines3DToDraw;
-	PreallocatedVector<RendererLine2D>				m_lines2DToDraw;
-	PreallocatedVector<RendererLight>				m_tempItemLights;
+	vector<RendererRoom*>							m_roomsToDraw;
+	vector<RendererItem*>							m_itemsToDraw;
+	vector<RendererEffect*>							m_effectsToDraw;
+	vector<RendererStatic*>							m_staticsToDraw;
+	vector<RendererLight*>							m_lightsToDraw;
+	vector<RendererLight*>							m_dynamicLights;
+	vector<RendererSpriteToDraw*>					m_spritesToDraw;
+	vector<RendererLine3D*>							m_lines3DToDraw;
+	vector<RendererLine2D*>							m_lines2DToDraw;
+	vector<RendererLight*>							m_tempItemLights;
 	RendererSpriteToDraw*							m_spritesBuffer;
 	int												m_nextSprite;
 	RendererLine3D*									m_lines3DBuffer;
@@ -951,12 +950,12 @@ private:
 	bool											checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort);
 	void											getVisibleRooms(int from, int to, Vector4* viewPort, bool water, int count);
 	void											collectRooms();
-	inline void										collectItems(short roomNumber);
-	inline void										collectStatics(short roomNumber);
-	inline void										collectLightsForRoom(short roomNumber);
-	inline void										collectLightsForItem(short roomNumber, RendererItem* item);
-	inline void										collectLightsForEffect(short roomNumber, RendererEffect* effect);
-	inline void										collectEffects(short roomNumber);
+	void										collectItems(short roomNumber);
+	void										collectStatics(short roomNumber);
+	void										collectLightsForRoom(short roomNumber);
+	void										collectLightsForItem(short roomNumber, RendererItem* item);
+	void										collectLightsForEffect(short roomNumber, RendererEffect* effect);
+	void										collectEffects(short roomNumber);
 	void											prepareLights();
 	void											clearSceneItems();
 	bool											updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size);
