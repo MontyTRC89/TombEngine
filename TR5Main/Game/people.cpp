@@ -120,7 +120,7 @@ int Targetable(ITEM_INFO* item, AI_INFO* info)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemy = creature->enemy;
 
-	if (enemy != NULL && enemy->hitPoints > 0 && enemy->data != NULL && info->ahead && info->distance < SQUARE(2048))
+	if (enemy != NULL && enemy->hitPoints > 0 && enemy->data != NULL && info->ahead && info->distance < SQUARE(8192))
 	{
 		GAME_VECTOR start, target;
 
