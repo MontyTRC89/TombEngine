@@ -725,14 +725,9 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.yPos = 0;
 	pos.zPos = 0;
 	GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
-	pos.xPos = src->pos.xPos;
-	pos.yPos = src->pos.yPos - DetectCrouchWhenFiring(src, weapon);
-	pos.zPos = src->pos.zPos;
 
-	r = int(((GetRandomControl() - 0x4000) * weapon->shotAccuracy) / 0x10000);
-	pos.xRot = angles[1] + short(r);
-	r = int(((GetRandomControl() - 0x4000) * weapon->shotAccuracy) / 0x10000);
-	pos.yRot = angles[0] + short(r);
+	pos.xRot = angles[1] + (short) ((GetRandomControl() - 16384) * weapon->shotAccuracy / 65536);
+	pos.yRot = angles[0] + (short) ((GetRandomControl() - 16384) * weapon->shotAccuracy / 65536);
 	pos.zRot = 0;
 
 	phd_GenerateW2V(&pos);
