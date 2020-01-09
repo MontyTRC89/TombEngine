@@ -1290,25 +1290,30 @@ int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 
 	if (TriggerIndex)
 	{
-		short* trigger = TriggerIndex;
-		for (int i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
+		short* trigger;
+		for (trigger = TriggerIndex; (*trigger & DATA_TYPE) != TRIGGER_TYPE; trigger++)
 		{
-			if (i < 0)
+			if (*trigger & END_BIT)
 				break;
-			i = trigger[1];
 		}
 
 		if (*trigger & 4)
 		{
+			trigger += 2;
 			short* current = itemNos;
 			int k = 0;
-			for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &Items[*j & 0x3FF]; j++, current++)
+			do
 			{
-				*current = *j & 0x3FF;
-				k++;
-				if (*j & 0x8000)
+				if (TRIG_BITS(*trigger) == TO_OBJECT && item != &Items[*trigger & VALUE_BITS])
+				{
+					current[k] = *trigger & VALUE_BITS;
+					++k;
+				}
+				if (*trigger & END_BIT)
 					break;
+				++trigger;
 			}
+			while (true);
 
 			return k;
 		}
