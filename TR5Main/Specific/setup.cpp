@@ -2744,6 +2744,18 @@ void ObjectObjects()
 	{
 		obj->control = ControlWaterfall;
 	}
+
+	obj = &Objects[ID_SHOOT_SWITCH1]; /* @FIXME This setup can be wrong */
+	if (obj->loaded)
+	{
+		obj->collision = ObjectCollision;
+	}
+
+	obj = &Objects[ID_SHOOT_SWITCH2]; /* @FIXME This setup can be wrong */
+	if (obj->loaded)
+	{
+		obj->collision = ObjectCollision;
+	}
 }
 
 // TODO: add the flags
