@@ -3536,6 +3536,69 @@ void RefreshCamera(short type, short* data)
 		Camera.timer = -1;
 }
 
+int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
+{
+	short Num;
+
+	if (1 << Node & item->meshBits)
+	{
+		Num = bits;
+		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7))
+		{
+			SoundEffect(SFX_SMASH_METAL, &item->pos, 0);
+		}
+		else if (Num == 256)
+		{
+			Num = -64;
+		}
+		GetSpheres(item, SphereList, 3);
+		ShatterItem.yRot = item->pos.yRot;
+		ShatterItem.bit = 1 << Node;
+		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + 2 * Node];
+		ShatterItem.sphere.x = SphereList[Node].x;
+		ShatterItem.sphere.y = SphereList[Node].y;
+		ShatterItem.sphere.z = SphereList[Node].z;
+		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData;
+		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
+		ShatterObject(&ShatterItem, 0, Num, item->roomNumber, NoXZVel);
+		item->meshBits &= ~ShatterItem.bit;
+		return 1;
+	}
+	return 0;
+}
+
+int TriggerActive(ITEM_INFO* item)
+{
+	int flag;
+
+	flag = item->flags & IFLAG_REVERSE ? 0 : 1;
+	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+	{
+		flag = !flag;
+	}
+	else
+	{
+		if (item->timer)
+		{
+			if (item->timer > 0)
+			{
+				--item->timer;
+				if (!item->timer)
+					item->timer = -1;
+			}
+			else if (item->timer < -1)
+			{
+				++item->timer;
+				if (item->timer == -1)
+					item->timer = 0;
+			}
+			if (item->timer <= -1)
+				flag = !flag;
+		}
+	}
+	return flag;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
