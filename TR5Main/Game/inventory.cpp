@@ -18,296 +18,80 @@ Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 
-void CombinePuzzle1(int action)
+void CombinePuzzle(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.puzzleItems[0] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 0));
+		g_LaraExtra.Puzzles[object] = true;
+		g_LaraExtra.PuzzlesCombo[object] = false;
+		g_LaraExtra.PuzzlesCombo[object + 1] = false;
 	}
 	else
 	{
-		Lara.puzzleItems[0] = false;
-		Lara.puzzleItemsCombo |= (3 << 0);
+		g_LaraExtra.Puzzles[object] = false;
+		g_LaraExtra.PuzzlesCombo[object] = true;
+		g_LaraExtra.PuzzlesCombo[object + 1] = true;
 	}
 }
 
-void CombinePuzzle2(int action)
+void CombineKey(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.puzzleItems[1] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 2));
+		g_LaraExtra.Keys[object] = true;
+		g_LaraExtra.KeysCombo[object] = false;
+		g_LaraExtra.KeysCombo[object + 1] = false;
 	}
 	else
 	{
-		Lara.puzzleItems[1] = false;
-		Lara.puzzleItemsCombo |= (3 << 2);
+		g_LaraExtra.Keys[object] = false;
+		g_LaraExtra.KeysCombo[object] = true;
+		g_LaraExtra.KeysCombo[object + 1] = true;
 	}
 }
 
-void CombinePuzzle3(int action)
+void CombinePickup(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.puzzleItems[2] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 4));
+		g_LaraExtra.Pickups[object] = true;
+		g_LaraExtra.PickupsCombo[object] = false;
+		g_LaraExtra.PickupsCombo[object + 1] = false;
 	}
 	else
 	{
-		Lara.puzzleItems[2] = false;
-		Lara.puzzleItemsCombo |= (3 << 4);
+		g_LaraExtra.Pickups[object] = false;
+		g_LaraExtra.PickupsCombo[object] = true;
+		g_LaraExtra.PickupsCombo[object + 1] = true;
 	}
 }
 
-void CombinePuzzle4(int action)
+void CombineExamine(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.puzzleItems[3] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 6));
+		g_LaraExtra.Examines[object] = true;
+		g_LaraExtra.ExaminesCombo[object] = false;
+		g_LaraExtra.ExaminesCombo[object + 1] = false;
 	}
 	else
 	{
-		Lara.puzzleItems[3] = false;
-		Lara.puzzleItemsCombo |= (3 << 6);
+		g_LaraExtra.Examines[object] = false;
+		g_LaraExtra.ExaminesCombo[object] = true;
+		g_LaraExtra.ExaminesCombo[object + 1] = true;
 	}
 }
 
-void CombinePuzzle5(int action)
+void CombineRevolverLasersight(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.puzzleItems[4] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 8));
-	}
-	else
-	{
-		Lara.puzzleItems[4] = false;
-		Lara.puzzleItemsCombo |= (3 << 8);
-	}
-}
-
-void CombinePuzzle6(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.puzzleItems[5] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 10));
-	}
-	else
-	{
-		Lara.puzzleItems[5] = false;
-		Lara.puzzleItemsCombo |= (3 << 10);
-	}
-}
-
-void CombinePuzzle7(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.puzzleItems[6] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 12));
-	}
-	else
-	{
-		Lara.puzzleItems[6] = false;
-		Lara.puzzleItemsCombo |= (3 << 12);
-	}
-}
-
-void CombinePuzzle8(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.puzzleItems[7] = true;
-		Lara.puzzleItemsCombo &= (~(3 << 14));
-	}
-	else
-	{
-		Lara.puzzleItems[7] = false;
-		Lara.puzzleItemsCombo |= (3 << 14);
-	}
-}
-
-void CombineKey1(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1<<0);
-		Lara.puzzleItemsCombo &= (~(3 << 0));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 0);
-		Lara.puzzleItemsCombo |= (3 << 0);
-	}
-}
-
-void CombineKey2(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1 << 1);
-		Lara.puzzleItemsCombo &= (~(3 << 2));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 1);
-		Lara.puzzleItemsCombo |= (3 << 2);
-	}
-}
-
-void CombineKey3(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1 << 2);
-		Lara.puzzleItemsCombo &= (~(3 << 4));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 2);
-		Lara.puzzleItemsCombo |= (3 << 4);
-	}
-}
-
-void CombineKey4(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1 << 3);
-		Lara.puzzleItemsCombo &= (~(3 << 6));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 3);
-		Lara.puzzleItemsCombo |= (3 << 6);
-	}
-}
-
-void CombineKey5(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1 << 4);
-		Lara.puzzleItemsCombo &= (~(3 << 8));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 4);
-		Lara.puzzleItemsCombo |= (3 << 8);
-	}
-}
-
-void CombineKey6(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1 << 5);
-		Lara.puzzleItemsCombo &= (~(3 << 10));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 5);
-		Lara.puzzleItemsCombo |= (3 << 10);
-	}
-}
-
-void CombineKey7(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1 << 6);
-		Lara.puzzleItemsCombo &= (~(3 << 12));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 6);
-		Lara.puzzleItemsCombo |= (3 << 12);
-	}
-}
-
-void CombineKey8(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.keyItems |= (1 << 7);
-		Lara.puzzleItemsCombo &= (~(3 << 14));
-	}
-	else
-	{
-		Lara.keyItems &= ~(1 << 7);
-		Lara.puzzleItemsCombo |= (3 << 14);
-	}
-}
-
-void CombinePickup1(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.pickupItems |= (1 << 0);
-		Lara.pickupItemsCombo &= (~(3 << 0));
-	}
-	else
-	{
-		Lara.pickupItems &= ~(1 << 0);
-		Lara.pickupItemsCombo |= (3 << 0);
-	}
-}
-
-void CombinePickup2(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.pickupItems |= (1 << 1);
-		Lara.pickupItemsCombo &= (~(3 << 2));
-	}
-	else
-	{
-		Lara.pickupItems &= ~(1 << 1);
-		Lara.pickupItemsCombo |= (3 << 2);
-	}
-}
-
-void CombinePickup3(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.pickupItems |= (1 << 2);
-		Lara.pickupItemsCombo &= (~(3 << 4));
-	}
-	else
-	{
-		Lara.pickupItems &= ~(1 << 2);
-		Lara.pickupItemsCombo |= (3 << 4);
-	}
-}
-
-void CombinePickup4(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.pickupItems |= (1 << 3);
-		Lara.pickupItemsCombo &= (~(3 << 6));
-	}
-	else
-	{
-		Lara.pickupItems &= ~(1 << 3);
-		Lara.pickupItemsCombo |= (3 << 6);
-	}
-}
-
-void CombineRevolverLasersight(int action)
-{
-	if (action == INV_COMBINE_COMBINE)
-	{
-		Lara.laserSight = false;
+		g_LaraExtra.Lasersight = false;
 		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = true;
 	}
 	else
 	{
-		Lara.laserSight = true;
+		g_LaraExtra.Lasersight = true;
 		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = false;
 	}
 
@@ -318,16 +102,16 @@ void CombineRevolverLasersight(int action)
 	}
 }
 
-void CombineCrossbowLasersight(int action)
+void CombineCrossbowLasersight(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		Lara.laserSight = false;
+		g_LaraExtra.Lasersight = false;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = true;
 	}
 	else
 	{
-		Lara.laserSight = true;
+		g_LaraExtra.Lasersight = true;
 		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = false;
 	}
 
@@ -390,45 +174,37 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_WATERSKIN1_EMPTY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_WATERSKIN2_EMPTY, -1, 0);
 	
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUM_PUZZLES; i++)
 		m_objectsTable[INV_OBJECT_PUZZLE1 + i] = InventoryObjectDefinition(ID_PUZZLE_ITEM1 + i, STRING_PISTOLS, -1, 0);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NUM_PUZZLES * 2; i++)
 		m_objectsTable[INV_OBJECT_PUZZLE1_COMBO1 + i] = InventoryObjectDefinition(ID_PUZZLE_ITEM1_COMBO1 + i, STRING_PISTOLS, -1, 0);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUM_KEYS; i++)
 		m_objectsTable[INV_OBJECT_KEY1 + i] = InventoryObjectDefinition(ID_KEY_ITEM1 + i, STRING_PISTOLS, -1, 0);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < NUM_KEYS * 2; i++)
 		m_objectsTable[INV_OBJECT_KEY1_COMBO1 + i] = InventoryObjectDefinition(ID_KEY_ITEM1_COMBO1 + i, STRING_PISTOLS, -1, 0);
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < NUM_PICKUPS; i++)
 		m_objectsTable[INV_OBJECT_PICKUP1 + i] = InventoryObjectDefinition(ID_PICKUP_ITEM1 + i, STRING_PISTOLS, -1, 0);
 
 	for (int i = 0; i < 3; i++)
 		m_objectsTable[INV_OBJECT_EXAMINE1 + i] = InventoryObjectDefinition(ID_EXAMINE1 + i, STRING_PISTOLS, -1, 0);
 
 	// Add combinations
-	AddCombination(INV_OBJECT_PUZZLE1_COMBO1, INV_OBJECT_PUZZLE1_COMBO2, INV_OBJECT_PUZZLE1, CombinePuzzle1);
-	AddCombination(INV_OBJECT_PUZZLE2_COMBO1, INV_OBJECT_PUZZLE2_COMBO2, INV_OBJECT_PUZZLE2, CombinePuzzle2);
-	AddCombination(INV_OBJECT_PUZZLE3_COMBO1, INV_OBJECT_PUZZLE3_COMBO2, INV_OBJECT_PUZZLE3, CombinePuzzle3);
-	AddCombination(INV_OBJECT_PUZZLE4_COMBO1, INV_OBJECT_PUZZLE4_COMBO2, INV_OBJECT_PUZZLE4, CombinePuzzle4);
-	AddCombination(INV_OBJECT_PUZZLE5_COMBO1, INV_OBJECT_PUZZLE5_COMBO2, INV_OBJECT_PUZZLE5, CombinePuzzle5);
-	AddCombination(INV_OBJECT_PUZZLE6_COMBO1, INV_OBJECT_PUZZLE6_COMBO2, INV_OBJECT_PUZZLE6, CombinePuzzle6);
-	AddCombination(INV_OBJECT_PUZZLE7_COMBO1, INV_OBJECT_PUZZLE7_COMBO2, INV_OBJECT_PUZZLE7, CombinePuzzle7);
-	AddCombination(INV_OBJECT_PUZZLE8_COMBO1, INV_OBJECT_PUZZLE8_COMBO2, INV_OBJECT_PUZZLE8, CombinePuzzle8);
-	AddCombination(INV_OBJECT_KEY1_COMBO1, INV_OBJECT_KEY1_COMBO2, INV_OBJECT_KEY1, CombineKey1);
-	AddCombination(INV_OBJECT_KEY2_COMBO1, INV_OBJECT_KEY2_COMBO2, INV_OBJECT_KEY2, CombineKey2);
-	AddCombination(INV_OBJECT_KEY3_COMBO1, INV_OBJECT_KEY3_COMBO2, INV_OBJECT_KEY3, CombineKey3);
-	AddCombination(INV_OBJECT_KEY4_COMBO1, INV_OBJECT_KEY4_COMBO2, INV_OBJECT_KEY4, CombineKey4);
-	AddCombination(INV_OBJECT_KEY5_COMBO1, INV_OBJECT_KEY5_COMBO2, INV_OBJECT_KEY5, CombineKey5);
-	AddCombination(INV_OBJECT_KEY6_COMBO1, INV_OBJECT_KEY6_COMBO2, INV_OBJECT_KEY6, CombineKey6);
-	AddCombination(INV_OBJECT_KEY7_COMBO1, INV_OBJECT_KEY7_COMBO2, INV_OBJECT_KEY7, CombineKey7);
-	AddCombination(INV_OBJECT_KEY8_COMBO1, INV_OBJECT_KEY8_COMBO2, INV_OBJECT_KEY8, CombineKey8);
-	AddCombination(INV_OBJECT_PICKUP1_COMBO1, INV_OBJECT_PICKUP1_COMBO2, INV_OBJECT_PICKUP1, CombinePickup1);
-	AddCombination(INV_OBJECT_PICKUP2_COMBO1, INV_OBJECT_PICKUP2_COMBO2, INV_OBJECT_PICKUP2, CombinePickup2);
-	AddCombination(INV_OBJECT_PICKUP3_COMBO1, INV_OBJECT_PICKUP3_COMBO2, INV_OBJECT_PICKUP3, CombinePickup3);
-	AddCombination(INV_OBJECT_PICKUP4_COMBO1, INV_OBJECT_PICKUP4_COMBO2, INV_OBJECT_PICKUP4, CombinePickup4);
+	for (int i = 0; i < NUM_PUZZLES; i++)
+		AddCombination(INV_OBJECT_PUZZLE1_COMBO1 + 2 * i, INV_OBJECT_PUZZLE1_COMBO2 + 2 * i, INV_OBJECT_PUZZLE1 + i, CombinePuzzle);
+
+	for (int i = 0; i < NUM_KEYS; i++)
+		AddCombination(INV_OBJECT_KEY1_COMBO1 + 2 * i, INV_OBJECT_KEY1_COMBO2 + 2 * i, INV_OBJECT_KEY1 + i, CombineKey);
+
+	for (int i = 0; i < NUM_PICKUPS; i++)
+		AddCombination(INV_OBJECT_PICKUP1_COMBO1 + 2 * i, INV_OBJECT_PICKUP1_COMBO2 + 2 * i, INV_OBJECT_PICKUP1 + i, CombinePickup);
+
+	for (int i = 0; i < NUM_EXAMINES; i++)
+		AddCombination(INV_OBJECT_EXAMINE1_COMBO1 + 2 * i, INV_OBJECT_EXAMINE1_COMBO2 + 2 * i, INV_OBJECT_EXAMINE1 + i, CombineExamine);
+
 	AddCombination(INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER, CombineRevolverLasersight);
 	AddCombination(INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER, CombineCrossbowLasersight);
 
@@ -620,76 +396,79 @@ void Inventory::LoadObjects(bool isReload)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_AMMO);
 
 		// Lasersight
-		if (Lara.laserSight)
+		if (g_LaraExtra.Lasersight)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_LASERSIGHT);
 
 		// Silencer
-		if (Lara.silencer)
+		if (g_LaraExtra.Silencer)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SILENCER);
 
 		// Binoculars
-		if (Lara.binoculars)
+		if (g_LaraExtra.Binoculars)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_BINOCULARS);
 
 		// Flares
-		if (Lara.numFlares)
+		if (g_LaraExtra.NumFlares)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_FLARES);
 	}
 
-	if (Lara.numSmallMedipack)
+	if (g_LaraExtra.NumSmallMedipacks)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_SMALL_MEDIPACK);
 
-	if (Lara.numLargeMedipack)
+	if (g_LaraExtra.NumLargeMedipacks)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_LARGE_MEDIPACK);
 
-	if (Lara.crowbar)
+	if (g_LaraExtra.Crowbar)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROWBAR);
 
 	int i;
 	for (i = 0; i < 8; i++)
 	{
-		if (Lara.puzzleItems[i])
+		if (g_LaraExtra.Puzzles[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1);
 	}
 
 	for (i = 0; i < 16; i++)
 	{
-		if ((1 << i) & Lara.puzzleItemsCombo)
+		if (g_LaraExtra.PuzzlesCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1_COMBO1);
 	}
 
 	for (i = 0; i < 8; i++)
 	{
-		if ((1 << i) & Lara.keyItems)
+		if (g_LaraExtra.Keys[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1);
 	}
 
 	for (i = 0; i < 16; i++)
 	{
-		if ((1 << i) & Lara.keyItemsCombo)
+		if (g_LaraExtra.KeysCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1_COMBO1);
 	}
 
 	for (i = 0; i < 4; i++)
 	{
-		if ((1 << i) & Lara.pickupItems)
+		if (g_LaraExtra.Pickups[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1);
 	}
 
 	for (i = 0; i < 8; i++)
 	{
-		if ((1 << i) & Lara.pickupItemsCombo)
+		if (g_LaraExtra.PickupsCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1_COMBO1);
 	}
 
-	if (Lara.examine1)
-		InsertObject(INV_RING_PUZZLES, INV_OBJECT_EXAMINE1);
+	for (i = 0; i < 3; i++)
+	{
+		if (g_LaraExtra.Examines[i])
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_EXAMINE1);
+	}
 
-	if (Lara.examine2)
-		InsertObject(INV_RING_PUZZLES, INV_OBJECT_EXAMINE2);
-
-	if (Lara.examine3)
-		InsertObject(INV_RING_PUZZLES, INV_OBJECT_EXAMINE3);
+	for (i = 0; i < 6; i++)
+	{
+		if (g_LaraExtra.ExaminesCombo[i])
+			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_EXAMINE1_COMBO1);
+	}
 
 	if (Lara.wetcloth == 2)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WETCLOTH1);
@@ -1266,7 +1045,7 @@ bool Inventory::IsObjectCombinable(short object)
 	return false;
 }
 
-void Inventory::AddCombination(short piece1, short piece2, short combinedObject, void (*f) (int))
+void Inventory::AddCombination(short piece1, short piece2, short combinedObject, void (*f) (int, short))
 {
 	InventoryObjectCombination combination;
 	combination.piece1 = piece1;
@@ -1438,7 +1217,7 @@ bool Inventory::DoCombine()
 				{
 					// I can do the combination
 					SoundEffect(SFX_MENU_COMBINE, NULL, 0);
-					combination->combineRoutine(INV_COMBINE_COMBINE);
+					combination->combineRoutine(INV_COMBINE_COMBINE, combination->combinedObject);
 					LoadObjects(true);
 					SelectObject(oldRing, combination->combinedObject, 2 * INV_OBJECTS_SCALE);
 					closeObject = true;
@@ -1474,7 +1253,7 @@ bool Inventory::DoSepare()
 		{
 			// Separation can be done
 			SoundEffect(SFX_MENU_COMBINE, NULL, 0);
-			combination->combineRoutine(INV_COMBINE_SEPARE);
+			combination->combineRoutine(INV_COMBINE_SEPARE, combination->combinedObject);
 			LoadObjects(true);
 			SelectObject(m_activeRing, combination->piece1, 2 * INV_OBJECTS_SCALE);
 			return true;
@@ -1661,8 +1440,8 @@ void Inventory::UseCurrentItem()
 			return;
 		}
 
-		if (Lara.numSmallMedipack != -1)
-			Lara.numSmallMedipack--;
+		if (g_LaraExtra.NumSmallMedipacks != -1)
+			g_LaraExtra.NumSmallMedipacks--;
 
 		Lara.dpoisoned = 0;
 		LaraItem->hitPoints += 500;
@@ -1686,8 +1465,8 @@ void Inventory::UseCurrentItem()
 			return;
 		}
 
-		if (Lara.numLargeMedipack != -1)
-			Lara.numLargeMedipack--;
+		if (g_LaraExtra.NumLargeMedipacks != -1)
+			g_LaraExtra.NumLargeMedipacks--;
 
 		Lara.dpoisoned = 0;
 		LaraItem->hitPoints += 1000;
@@ -1705,7 +1484,7 @@ void Inventory::UseCurrentItem()
 	// Binoculars
 	if (objectNumber == ID_BINOCULARS_ITEM)
 	{
-		if (LaraItem->currentAnimState == 2 && LaraItem->animNumber == 103 || Lara.isDucked && !(TrInput & 0x20000000))
+		if (LaraItem->currentAnimState == STATE_LARA_STOP && LaraItem->animNumber == ANIMATION_LARA_STAY_IDLE || Lara.isDucked && !(TrInput & 0x20000000))
 		{
 			if (!SniperCameraActive && !UseSpotCam && !TrackCameraInit)
 			{

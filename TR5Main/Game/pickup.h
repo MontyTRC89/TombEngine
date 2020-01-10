@@ -8,7 +8,7 @@
 
 void InitialisePickup(short itemNumber);
 void PickedUpObject(short objectNumber);
-void RemoveObjectFromInventory(short objectNumber);
+void RemoveObjectFromInventory(short objectNumber, int count);
 void CollectCarriedItems(ITEM_INFO* item);
 int PickupTrigger(short itemNum);
 int KeyTrigger(short itemNum);

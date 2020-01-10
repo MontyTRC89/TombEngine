@@ -652,7 +652,7 @@ void InitialiseLara(int restore)
 		LARA_INFO backup;
 		memcpy(&backup, &Lara, sizeof(LARA_INFO));
 		memset(&Lara, 0, sizeof(LARA_INFO));
-		memcpy(&Lara.pistolsTypeCarried, &backup.pistolsTypeCarried, 59);
+		memcpy(&Lara.Legacy_pistolsTypeCarried, &backup.Legacy_pistolsTypeCarried, 59);
 	}
 	else
 	{
@@ -714,15 +714,15 @@ void InitialiseLara(int restore)
 	//g_LaraExtra.Weapons[WEAPON_UZI].Present = true;
 	//g_LaraExtra.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
 
-	Lara.binoculars = WTYPE_PRESENT;
+	g_LaraExtra.Binoculars = true;
 
 	if (!restore)
 	{
 		if (Objects[ID_FLARE_INV_ITEM].loaded)
-			Lara.numFlares = 3;
+			g_LaraExtra.NumFlares = 3;
 
-		Lara.numSmallMedipack = 3;
-		Lara.numLargeMedipack = 1;
+		g_LaraExtra.NumSmallMedipacks = 3;
+		g_LaraExtra.NumLargeMedipacks = 1;
 	}
 
 	InitialiseLaraAnims(LaraItem);
