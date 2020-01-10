@@ -358,10 +358,10 @@ void LaraGun()
 					Lara.gunStatus = LG_UNDRAW_GUNS;
 				}
 			}
-			else if (Lara.numFlares)
+			else if (g_LaraExtra.NumFlares)
 			{
-				if (Lara.numFlares != -1)
-					Lara.numFlares--;
+				if (g_LaraExtra.NumFlares != -1)
+					g_LaraExtra.NumFlares--;
 				Lara.requestGunType = WEAPON_FLARE;
 			}
 		}

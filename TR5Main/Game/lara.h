@@ -30,6 +30,23 @@ typedef struct LaraExtraInfo {
 	WaterskinInfo Waterskin1;
 	WaterskinInfo Waterskin2;
 	RendererMesh* MeshesPointers[15];
+	int Puzzles[NUM_PUZZLES];
+	int Keys[NUM_KEYS];
+	int Pickups[NUM_PICKUPS];
+	int Examines[NUM_EXAMINES];
+	int PuzzlesCombo[NUM_PUZZLES * 2];
+	int KeysCombo[NUM_KEYS * 2];
+	int PickupsCombo[NUM_PICKUPS * 2];
+	int ExaminesCombo[NUM_EXAMINES * 2];
+	int Secrets;
+	bool Lasersight;
+	bool Crowbar;
+	bool Torch;
+	bool Silencer;
+	bool Binoculars;
+	int NumSmallMedipacks;
+	int NumLargeMedipacks;
+	int NumFlares;
 };
 
 extern LaraExtraInfo g_LaraExtra;

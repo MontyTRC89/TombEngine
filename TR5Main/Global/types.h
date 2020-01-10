@@ -381,38 +381,38 @@ typedef struct lara_info_t {
 	byte moveCount; // size=0, offset=277
 	int ropeCount; // size=0, offset=280
 	byte skelebob; // size=0, offset=284
-	byte pistolsTypeCarried; // size=0, offset=285
-	byte uzisTypeCarried; // size=0, offset=286
-	byte shotgunTypeCarried; // size=0, offset=287
-	byte crossbowTypeCarried; // size=0, offset=288
-	byte HKtypeCarried; // size=0, offset=289
-	byte sixshooterTypeCarried; // size=0, offset=290
-	byte laserSight; // size=0, offset=291
-	byte silencer; // size=0, offset=292
-	byte binoculars; // size=0, offset=293
-	byte crowbar; // size=0, offset=294
-	byte examine1; // size=0, offset=295
-	byte examine2; // size=0, offset=296
-	byte examine3; // size=0, offset=297
+	byte Legacy_pistolsTypeCarried; // size=0, offset=285
+	byte Legacy_uzisTypeCarried; // size=0, offset=286
+	byte Legacy_shotgunTypeCarried; // size=0, offset=287
+	byte Legacy_crossbowTypeCarried; // size=0, offset=288
+	byte Legacy_HKtypeCarried; // size=0, offset=289
+	byte Legacy_sixshooterTypeCarried; // size=0, offset=290
+	byte Legacy_laserSight; // size=0, offset=291
+	byte Legacy_silencer; // size=0, offset=292
+	byte Legacy_binoculars; // size=0, offset=293
+	byte Legacy_crowbar; // size=0, offset=294
+	byte Legacy_examine1; // size=0, offset=295
+	byte Legacy_examine2; // size=0, offset=296
+	byte Legacy_examine3; // size=0, offset=297
 	byte wetcloth; // size=0, offset=298
 	byte bottle; // size=0, offset=299
-	byte puzzleItems[12]; // size=12, offset=300
-	unsigned short puzzleItemsCombo; // size=0, offset=312
-	unsigned short keyItems; // size=0, offset=314
-	unsigned short keyItemsCombo; // size=0, offset=316
-	unsigned short pickupItems; // size=0, offset=318
-	unsigned short pickupItemsCombo; // size=0, offset=320
-	short numSmallMedipack; // size=0, offset=322
-	short numLargeMedipack; // size=0, offset=324
-	short numFlares; // size=0, offset=326
-	short numPistolsAmmo; // size=0, offset=328
-	short numUziAmmo; // size=0, offset=330
-	short numRevolverAmmo; // size=0, offset=332
-	short numShotgunAmmo1; // size=0, offset=334
-	short numShotgunAmmo2; // size=0, offset=336
-	short numHKammo1; // size=0, offset=338
-	short numCrossbowAmmo1; // size=0, offset=340
-	short numCrossbowAmmo2; // size=0, offset=342
+	byte Legacy_puzzleItems[12]; // size=12, offset=300
+	unsigned short Legacy_puzzleItemsCombo; // size=0, offset=312
+	unsigned short Legacy_keyItems; // size=0, offset=314
+	unsigned short Legacy_keyItemsCombo; // size=0, offset=316
+	unsigned short Legacy_pickupItems; // size=0, offset=318
+	unsigned short Legacy_pickupItemsCombo; // size=0, offset=320
+	short Legacy_numSmallMedipack; // size=0, offset=322
+	short Legacy_numLargeMedipack; // size=0, offset=324
+	short Legacy_numFlares; // size=0, offset=326
+	short Legacy_numPistolsAmmo; // size=0, offset=328
+	short Legacy_numUziAmmo; // size=0, offset=330
+	short Legacy_numRevolverAmmo; // size=0, offset=332
+	short Legacy_numShotgunAmmo1; // size=0, offset=334
+	short Legacy_numShotgunAmmo2; // size=0, offset=336
+	short Legacy_numHKammo1; // size=0, offset=338
+	short Legacy_numCrossbowAmmo1; // size=0, offset=340
+	short Legacy_numCrossbowAmmo2; // size=0, offset=342
 	byte location; // size=0, offset=344
 	byte highestLocation; // size=0, offset=345
 	byte locationPad; // size=0, offset=346

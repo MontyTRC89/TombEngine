@@ -15,8 +15,6 @@ void Inject_Inventory();
 #define NUM_INVENTORY_RINGS				5
 #define NUM_LEVEL_INVENTORY_RINGS		3
 
-#define INVENTORY_TABLE_SIZE		120
-
 // Movement directions
 #define INV_MOVE_STOPPED			0
 #define INV_MOVE_RIGHT				1
@@ -31,126 +29,146 @@ void Inject_Inventory();
 #define INV_RING_COMBINE			3
 #define INV_RING_CHOOSE_AMMO		4
 
-// Classic objects
-#define INV_OBJECT_UZIS				0	
-#define INV_OBJECT_PISTOLS			1
-#define INV_OBJECT_SHOTGUN			2
-#define INV_OBJECT_REVOLVER			3
-#define INV_OBJECT_REVOLVER_LASER	4
-#define INV_OBJECT_CROSSBOW			5
-#define INV_OBJECT_CROSSBOW_LASER	6
-#define INV_OBJECT_HK				7
-#define INV_OBJECT_HK_LASER			8
-#define INV_OBJECT_SHOTGUN_AMMO1	9
-#define INV_OBJECT_SHOTGUN_AMMO2	10
-#define INV_OBJECT_HK_AMMO1			13
-#define INV_OBJECT_CROSSBOW_AMMO1	15
-#define INV_OBJECT_CROSSBOW_AMMO2	16
-#define INV_OBJECT_REVOLVER_AMMO	17
-#define INV_OBJECT_UZI_AMMO			18
-#define INV_OBJECT_PISTOLS_AMMO		19
-#define INV_OBJECT_LASERSIGHT		20
-#define INV_OBJECT_SILENCER			21
-#define INV_OBJECT_LARGE_MEDIPACK	22
-#define INV_OBJECT_SMALL_MEDIPACK	23
-#define INV_OBJECT_BINOCULARS		24
-#define INV_OBJECT_FLARES			25
-#define INV_OBJECT_TIMEX			26
-#define INV_OBJECT_LOAD_FLOPPY		27
-#define INV_OBJECT_SAVE_FLOPPY		28
-#define INV_OBJECT_PUZZLE1			29
-#define INV_OBJECT_PUZZLE2			30
-#define INV_OBJECT_PUZZLE3			31
-#define INV_OBJECT_PUZZLE4			32
-#define INV_OBJECT_PUZZLE5			33
-#define INV_OBJECT_PUZZLE6			34
-#define INV_OBJECT_PUZZLE7			35
-#define INV_OBJECT_PUZZLE8			36
-#define INV_OBJECT_PUZZLE1_COMBO1	37
-#define INV_OBJECT_PUZZLE1_COMBO2	38
-#define INV_OBJECT_PUZZLE2_COMBO1	39
-#define INV_OBJECT_PUZZLE2_COMBO2	40
-#define INV_OBJECT_PUZZLE3_COMBO1	41
-#define INV_OBJECT_PUZZLE3_COMBO2	42
-#define INV_OBJECT_PUZZLE4_COMBO1	43
-#define INV_OBJECT_PUZZLE4_COMBO2	44
-#define INV_OBJECT_PUZZLE5_COMBO1	45
-#define INV_OBJECT_PUZZLE5_COMBO2	46
-#define INV_OBJECT_PUZZLE6_COMBO1	47
-#define INV_OBJECT_PUZZLE6_COMBO2	48
-#define INV_OBJECT_PUZZLE7_COMBO1	49
-#define INV_OBJECT_PUZZLE7_COMBO2	50
-#define INV_OBJECT_PUZZLE8_COMBO1	51
-#define INV_OBJECT_PUZZLE8_COMBO2	52
-#define INV_OBJECT_KEY1				53
-#define INV_OBJECT_KEY2				54
-#define INV_OBJECT_KEY3				55
-#define INV_OBJECT_KEY4				56
-#define INV_OBJECT_KEY5				57
-#define INV_OBJECT_KEY6				58
-#define INV_OBJECT_KEY7				59
-#define INV_OBJECT_KEY8				60
-#define INV_OBJECT_KEY1_COMBO1		61
-#define INV_OBJECT_KEY1_COMBO2		62
-#define INV_OBJECT_KEY2_COMBO1		63
-#define INV_OBJECT_KEY2_COMBO2		64
-#define INV_OBJECT_KEY3_COMBO1		65
-#define INV_OBJECT_KEY3_COMBO2		66
-#define INV_OBJECT_KEY4_COMBO1		67
-#define INV_OBJECT_KEY4_COMBO2		68
-#define INV_OBJECT_KEY5_COMBO1		69
-#define INV_OBJECT_KEY5_COMBO2		70
-#define INV_OBJECT_KEY6_COMBO1		71
-#define INV_OBJECT_KEY6_COMBO2		72
-#define INV_OBJECT_KEY7_COMBO1		73
-#define INV_OBJECT_KEY7_COMBO2		74
-#define INV_OBJECT_KEY8_COMBO1		75
-#define INV_OBJECT_KEY8_COMBO2		76
-#define INV_OBJECT_PICKUP1			77
-#define INV_OBJECT_PICKUP2			78
-#define INV_OBJECT_PICKUP3			79
-#define INV_OBJECT_PICKUP4			80
-#define INV_OBJECT_PICKUP1_COMBO1	81
-#define INV_OBJECT_PICKUP1_COMBO2	82
-#define INV_OBJECT_PICKUP2_COMBO1	83
-#define INV_OBJECT_PICKUP2_COMBO2	84
-#define INV_OBJECT_PICKUP3_COMBO1	85
-#define INV_OBJECT_PICKUP3_COMBO2	86
-#define INV_OBJECT_PICKUP4_COMBO1	87
-#define INV_OBJECT_PICKUP4_COMBO2	88
-#define INV_OBJECT_BRUNING_TORCH	89
-#define INV_OBJECT_CROWBAR			90
-#define INV_OBJECT_EXAMINE1			91
-#define INV_OBJECT_EXAMINE2			92
-#define INV_OBJECT_EXAMINE3			93
-#define INV_OBJECT_WETCLOTH1		93
-#define INV_OBJECT_GRAPPLING_GUN	95
-#define INV_OBJECT_GRAPPLING_AMMO	96
-#define INV_OBJECT_WETCLOTH2		97
-#define INV_OBJECT_BOTTLE			98
+enum INVENTORY_OBJECTS {
+	// Weapons and ammos
+	INV_OBJECT_PISTOLS,
+	INV_OBJECT_PISTOLS_AMMO,
+	INV_OBJECT_UZIS,
+	INV_OBJECT_UZI_AMMO,
+	INV_OBJECT_SHOTGUN,
+	INV_OBJECT_SHOTGUN_AMMO1,
+	INV_OBJECT_SHOTGUN_AMMO2,
+	INV_OBJECT_REVOLVER,
+	INV_OBJECT_REVOLVER_AMMO,
+	INV_OBJECT_REVOLVER_LASER,
+	INV_OBJECT_CROSSBOW,
+	INV_OBJECT_CROSSBOW_LASER,
+	INV_OBJECT_CROSSBOW_AMMO1,
+	INV_OBJECT_CROSSBOW_AMMO2,
+	INV_OBJECT_CROSSBOW_AMMO3,
+	INV_OBJECT_HK,
+	INV_OBJECT_HK_LASER,
+	INV_OBJECT_HK_AMMO1,
+	INV_OBJECT_HK_AMMO2,
+	INV_OBJECT_GRAPPLING_GUN,
+	INV_OBJECT_GRAPPLING_AMMO,
+	INV_OBJECT_GRENADE_LAUNCHER,
+	INV_OBJECT_GRENADE_AMMO1,
+	INV_OBJECT_GRENADE_AMMO2,
+	INV_OBJECT_GRENADE_AMMO3,
+	INV_OBJECT_HARPOON_GUN,
+	INV_OBJECT_HARPOON_AMMO,
+	INV_OBJECT_ROCKET_LAUNCHER,
+	INV_OBJECT_ROCKET_AMMO,
+	INV_OBJECT_MAGNUMS,
+	INV_OBJECT_MAGNUMS_AMMO,
 
-// New objects for TR3 style inventory
-#define INV_OBJECT_PASSPORT		100
-#define INV_OBJECT_KEYS				101
-#define INV_OBJECT_SUNGLASSES		102
-#define INV_OBJECT_HEADPHONES		103
-#define INV_OBJECT_POLAROID			104
+	// Misc objects
+	INV_OBJECT_LASERSIGHT,
+	INV_OBJECT_SILENCER,
+	INV_OBJECT_LARGE_MEDIPACK,
+	INV_OBJECT_SMALL_MEDIPACK,
+	INV_OBJECT_BINOCULARS,
+	INV_OBJECT_FLARES,
+	INV_OBJECT_TIMEX,
+	INV_OBJECT_LOAD_FLOPPY,
+	INV_OBJECT_SAVE_FLOPPY,
+	INV_OBJECT_BRUNING_TORCH,
+	INV_OBJECT_WETCLOTH1,
+	INV_OBJECT_WETCLOTH2,
+	INV_OBJECT_BOTTLE,
+	INV_OBJECT_CROWBAR,
+	INV_OBJECT_DIARY,
+	INV_OBJECT_WATERSKIN1,
+	INV_OBJECT_WATERSKIN2,
 
-// New weapons
-#define INV_OBJECT_GRENADE_LAUNCHER	105
-#define INV_OBJECT_GRENADE_AMMO1	106
-#define INV_OBJECT_GRENADE_AMMO2	107
-#define INV_OBJECT_GRENADE_AMMO3	108
-#define INV_OBJECT_HARPOON_GUN		109
-#define INV_OBJECT_HARPOON_AMMO		110
-#define INV_OBJECT_ROCKET_LAUNCHER	111
-#define INV_OBJECT_ROCKET_AMMO		112
-#define INV_OBJECT_CROSSBOW_AMMO3	113
+	// Ring inventoory objects
+	INV_OBJECT_PASSPORT,
+	INV_OBJECT_KEYS,
+	INV_OBJECT_SUNGLASSES,
+	INV_OBJECT_HEADPHONES,
+	INV_OBJECT_POLAROID,
 
-// New misc objects
-#define INV_OBJECT_DIARY			114
-#define INV_OBJECT_WATERSKIN1		115
-#define INV_OBJECT_WATERSKIN2		116
+	// Puzzle, keys, pickups, examines
+	INV_OBJECT_PUZZLE1,  
+	INV_OBJECT_PUZZLE2,
+	INV_OBJECT_PUZZLE3,
+	INV_OBJECT_PUZZLE4,
+	INV_OBJECT_PUZZLE5,
+	INV_OBJECT_PUZZLE6,
+	INV_OBJECT_PUZZLE7,
+	INV_OBJECT_PUZZLE8,
+
+	INV_OBJECT_PUZZLE1_COMBO1,
+	INV_OBJECT_PUZZLE1_COMBO2,
+	INV_OBJECT_PUZZLE2_COMBO1,
+	INV_OBJECT_PUZZLE2_COMBO2,
+	INV_OBJECT_PUZZLE3_COMBO1,
+	INV_OBJECT_PUZZLE3_COMBO2,
+	INV_OBJECT_PUZZLE4_COMBO1,
+	INV_OBJECT_PUZZLE4_COMBO2,
+	INV_OBJECT_PUZZLE5_COMBO1,
+	INV_OBJECT_PUZZLE5_COMBO2,
+	INV_OBJECT_PUZZLE6_COMBO1,
+	INV_OBJECT_PUZZLE6_COMBO2,
+	INV_OBJECT_PUZZLE7_COMBO1,
+	INV_OBJECT_PUZZLE7_COMBO2,
+	INV_OBJECT_PUZZLE8_COMBO1,
+	INV_OBJECT_PUZZLE8_COMBO2,
+
+	INV_OBJECT_KEY1,
+	INV_OBJECT_KEY2,
+	INV_OBJECT_KEY3,
+	INV_OBJECT_KEY4,
+	INV_OBJECT_KEY5,
+	INV_OBJECT_KEY6,
+	INV_OBJECT_KEY7,
+	INV_OBJECT_KEY8,
+
+	INV_OBJECT_KEY1_COMBO1,
+	INV_OBJECT_KEY1_COMBO2,
+	INV_OBJECT_KEY2_COMBO1,
+	INV_OBJECT_KEY2_COMBO2,
+	INV_OBJECT_KEY3_COMBO1,
+	INV_OBJECT_KEY3_COMBO2,
+	INV_OBJECT_KEY4_COMBO1,
+	INV_OBJECT_KEY4_COMBO2,
+	INV_OBJECT_KEY5_COMBO1,
+	INV_OBJECT_KEY5_COMBO2,
+	INV_OBJECT_KEY6_COMBO1,
+	INV_OBJECT_KEY6_COMBO2,
+	INV_OBJECT_KEY7_COMBO1,
+	INV_OBJECT_KEY7_COMBO2,
+	INV_OBJECT_KEY8_COMBO1,
+	INV_OBJECT_KEY8_COMBO2,
+
+	INV_OBJECT_PICKUP1,
+	INV_OBJECT_PICKUP2,
+	INV_OBJECT_PICKUP3,
+	INV_OBJECT_PICKUP4,
+
+	INV_OBJECT_PICKUP1_COMBO1,
+	INV_OBJECT_PICKUP1_COMBO2,
+	INV_OBJECT_PICKUP2_COMBO1,
+	INV_OBJECT_PICKUP2_COMBO2,
+	INV_OBJECT_PICKUP3_COMBO1,
+	INV_OBJECT_PICKUP3_COMBO2,
+	INV_OBJECT_PICKUP4_COMBO1,
+	INV_OBJECT_PICKUP4_COMBO2,
+
+	INV_OBJECT_EXAMINE1,
+	INV_OBJECT_EXAMINE2,
+	INV_OBJECT_EXAMINE3,
+
+	INV_OBJECT_EXAMINE1_COMBO1,
+	INV_OBJECT_EXAMINE1_COMBO2,
+	INV_OBJECT_EXAMINE2_COMBO1,
+	INV_OBJECT_EXAMINE2_COMBO2,
+	INV_OBJECT_EXAMINE3_COMBO1,
+	INV_OBJECT_EXAMINE3_COMBO2,
+
+	INVENTORY_TABLE_SIZE
+};
 
 // Focus state
 #define INV_FOCUS_STATE_NONE		0
@@ -288,43 +306,27 @@ struct InventoryObjectCombination {
 	short piece1;
 	short piece2;
 	short combinedObject;
-	void(*combineRoutine)(int action);
+	void(*combineRoutine)(int action, short index);
 };
 
-void CombinePuzzle1(int action);
-void CombinePuzzle2(int action);
-void CombinePuzzle3(int action);
-void CombinePuzzle4(int action);
-void CombinePuzzle5(int action);
-void CombinePuzzle6(int action);
-void CombinePuzzle7(int action);
-void CombinePuzzle8(int action);
-void CombineKey1(int action);
-void CombineKey2(int action);
-void CombineKey3(int action);
-void CombineKey4(int action);
-void CombineKey5(int action);
-void CombineKey6(int action);
-void CombineKey7(int action);
-void CombineKey8(int action);
-void CombinePickup1(int action);
-void CombinePickup2(int action);
-void CombinePickup3(int action);
-void CombinePickup4(int action);
-void CombineRevolverLasersight(int action);
-void CombineCrossbowLasersight(int action);
+void CombinePuzzle(int action, short index);
+void CombineKey(int action, short index);
+void CombinePickup(int action, short index);
+void CombineExamine(int action, short index);
+void CombineRevolverLasersight(int action, short index);
+void CombineCrossbowLasersight(int action, short index);
 
 class Inventory
 {
 private:
 	InventoryRing						m_rings[NUM_INVENTORY_RINGS];
-	int								m_activeRing;
-	int								m_movement;
+	int									m_activeRing;
+	int									m_movement;
 	float								m_deltaMovement;
 	InventoryObjectDefinition			m_objectsTable[INVENTORY_TABLE_SIZE];
-	int								m_type;
+	int									m_type;
 	vector<InventoryObjectCombination>	m_combinations;
-	int								m_activeGui;
+	int									m_activeGui;
 	float								m_cameraY;
 	float								m_cameraTilt;
 	short								m_enterObject;
@@ -337,27 +339,27 @@ public:
 	void						Initialise();
 	void						InitialiseTitle();
 	InventoryRing*				GetRing(int index);
-	int						GetActiveRing();
+	int							GetActiveRing();
 	void						SetActiveRing(int index);
-	int						DoInventory();
-	int						DoTitleInventory();
+	int							DoInventory();
+	int							DoTitleInventory();
 	void						InsertObject(int ring, int objectNumber);
 	float						GetVerticalOffset();
 	void						UseCurrentItem();
 	InventoryObjectDefinition*	GetInventoryObject(int index);
-	int						DoPassport();
+	int							DoPassport();
 	void						DoControlsSettings();
 	void						DoGraphicsSettings();
 	void						DoSoundSettings();
-	int						PopupObject();
-	int						PopoverObject();
-	int						GetType();
+	int							PopupObject();
+	int							PopoverObject();
+	int							GetType();
 	bool						DoCombine();
 	bool						DoSepare();
 	void						DoSelectAmmo();
-	int						DoPuzzle();
-	int						DoWeapon();
-	int						DoGenericObject();
+	int							DoPuzzle();
+	int							DoWeapon();
+	int							DoGenericObject();
 	void						DoStatistics();
 	void						DoExamine();
 	bool						IsCurrentObjectWeapon();
@@ -366,12 +368,12 @@ public:
 	bool						IsCurrentObjectExamine();
 	bool						IsInventoryObjectPresentInInventory(short object);
 	bool						IsObjectPresentInInventory(short object);
-	int						FindObjectRing(short object);
-	int						FindObjectIndex(short object);
+	int							FindObjectRing(short object);
+	int							FindObjectIndex(short object);
 	bool						IsObjectCombinable(short object);
 	bool						IsObjectSeparable(short object);
-	void						AddCombination(short piece1, short piece2, short combinedObject, void (*f) (int));
-	int						GetActiveGui();
+	void						AddCombination(short piece1, short piece2, short combinedObject, void (*f) (int, short));
+	int							GetActiveGui();
 	void						LoadObjects(bool isReload);
 	void						SelectObject(int ring, int object, float scale);
 	void						OpenRing(int r, bool animateCamera);
