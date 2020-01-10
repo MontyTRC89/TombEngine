@@ -288,36 +288,36 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_FLARE_INV_ITEM:
-		if (Lara.numFlares != -1)
-			Lara.numFlares += 12;
+		if (g_LaraExtra.NumFlares != -1)
+			g_LaraExtra.NumFlares += 12;
 		break;
 
 	case ID_SILENCER_ITEM:
 		if (!(g_LaraExtra.Weapons[WEAPON_UZI].HasSilencer || g_LaraExtra.Weapons[WEAPON_PISTOLS].HasSilencer || 
 			  g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasSilencer || g_LaraExtra.Weapons[WEAPON_REVOLVER].HasSilencer || 
 			  g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasSilencer || g_LaraExtra.Weapons[WEAPON_HK].HasSilencer))
-			Lara.silencer = true;
+			g_LaraExtra.Silencer = true;
 		break;
 
 	case ID_LASERSIGHT_ITEM:
 		if (!(g_LaraExtra.Weapons[WEAPON_UZI].HasSilencer || g_LaraExtra.Weapons[WEAPON_PISTOLS].HasSilencer ||
 			  g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasSilencer || g_LaraExtra.Weapons[WEAPON_REVOLVER].HasSilencer ||
 			  g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasSilencer || g_LaraExtra.Weapons[WEAPON_HK].HasSilencer))
-			Lara.laserSight = true;
+			g_LaraExtra.Lasersight = true;
 		break;
 
 	case ID_BIGMEDI_ITEM:
-		if (Lara.numLargeMedipack != -1)
-			Lara.numLargeMedipack++;
+		if (g_LaraExtra.NumLargeMedipacks != -1)
+			g_LaraExtra.NumLargeMedipacks++;
 		break;
 
 	case ID_SMALLMEDI_ITEM:
-		if (Lara.numSmallMedipack != -1)
-			Lara.numSmallMedipack++;
+		if (g_LaraExtra.NumSmallMedipacks != -1)
+			g_LaraExtra.NumSmallMedipacks++;
 		break;
 
 	case ID_BINOCULARS_ITEM:
-		Lara.binoculars = 1;
+		g_LaraExtra.Binoculars = true;
 		break;
 
 	case ID_WATERSKIN1_EMPTY:
@@ -329,75 +329,77 @@ void PickedUpObject(short objectNumber)
 		g_LaraExtra.Waterskin2.Present = true;
 		g_LaraExtra.Waterskin2.Quantity = 0;
 		break;
+		
+	case ID_GOLDROSE_ITEM:
+		IsAtmospherePlaying = 0;
+		S_CDPlay(6, 0);
+		g_LaraExtra.Secrets++;
+		Savegame.Level.Secrets++;
+		Savegame.Game.Secrets++;
+		break;
+
+	case ID_CROWBAR_ITEM:
+		g_LaraExtra.Crowbar = true;
+		break;
+
+	case ID_DIARY:
+		g_LaraExtra.Diary.Present = true;
+		break;
 
 	default:
 		if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
-			Lara.puzzleItems[objectNumber - ID_PUZZLE_ITEM1]++;
+			g_LaraExtra.Puzzles[objectNumber - ID_PUZZLE_ITEM1]++;
 
 		else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
-			Lara.puzzleItemsCombo |= 1 << (objectNumber - ID_PUZZLE_ITEM1_COMBO1);
+			g_LaraExtra.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]++;
 
 		else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
-			Lara.keyItems |= 1 << (objectNumber - ID_KEY_ITEM1);
+			g_LaraExtra.Keys[objectNumber - ID_KEY_ITEM1]++;
 
 		else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
-			Lara.keyItemsCombo |= 1 << (objectNumber - ID_KEY_ITEM1_COMBO1);
+			g_LaraExtra.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]++;
 
 		else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM4)
-			Lara.pickupItems |= 1 << (objectNumber - ID_PICKUP_ITEM1);
+			g_LaraExtra.Pickups[objectNumber - ID_PICKUP_ITEM1]++;
 
 		else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM4_COMBO2)
-			Lara.pickupItemsCombo |= 1 << (objectNumber - ID_PICKUP_ITEM1_COMBO1);
+			g_LaraExtra.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]++;
 
-		else if (objectNumber == ID_GOLDROSE_ITEM)
-		{
-			IsAtmospherePlaying = 0;
-			S_CDPlay(6, 0);
-			Lara.pickupItems |= 8;
-			Savegame.Level.Secrets++;
-			Savegame.Game.Secrets++;
-		}
+		else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
+			g_LaraExtra.Examines[objectNumber - ID_EXAMINE1] = 1;
 
-		else if (objectNumber == ID_CROWBAR_ITEM)
-			Lara.crowbar = true;
-
-		else if (objectNumber == ID_EXAMINE1)
-			Lara.examine1 = true;
-
-		else if (objectNumber == ID_EXAMINE2)
-			Lara.examine2 = true;
-
-		else if (objectNumber == ID_EXAMINE3)
-			Lara.examine3 = true;
-
-		else if (objectNumber == ID_DIARY)
-			g_LaraExtra.Diary.Present = true;
-
-		break;
+		else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
+			g_LaraExtra.ExaminesCombo[objectNumber - ID_EXAMINE1_COMBO1] = 1;
 	}
 
 	g_Inventory->LoadObjects(false);
 }
 
-void RemoveObjectFromInventory(short objectNumber)
+void RemoveObjectFromInventory(short objectNumber, int count)
 {
 	if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
-		Lara.puzzleItems[objectNumber - ID_PUZZLE_ITEM1]--;
+		g_LaraExtra.Puzzles[objectNumber - ID_PUZZLE_ITEM1] -= min(count, g_LaraExtra.Puzzles[objectNumber - ID_PUZZLE_ITEM1]);
 
 	else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
-		Lara.puzzleItemsCombo &= ~(1 << (objectNumber - ID_PUZZLE_ITEM1_COMBO1));
+		g_LaraExtra.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1] -= min(count, g_LaraExtra.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]);
 
 	else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
-		Lara.keyItems &= ~(1 << (objectNumber - ID_KEY_ITEM1));
+		g_LaraExtra.Keys[objectNumber - ID_KEY_ITEM1] -= min(count, g_LaraExtra.Keys[objectNumber - ID_KEY_ITEM1]);
 
 	else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
-		Lara.keyItemsCombo &= ~(1 << (objectNumber - ID_KEY_ITEM1_COMBO1));
+		g_LaraExtra.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1] -= min(count, g_LaraExtra.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]);
 
 	else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM4)
-		Lara.pickupItems &= ~(1 << (objectNumber - ID_PICKUP_ITEM1));
+		g_LaraExtra.Pickups[objectNumber - ID_PICKUP_ITEM1] -= min(count, g_LaraExtra.Pickups[objectNumber - ID_PICKUP_ITEM1]);
 
 	else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM4_COMBO2)
-		Lara.pickupItemsCombo &= ~(1 << (objectNumber - ID_PICKUP_ITEM1_COMBO1));
+		g_LaraExtra.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1] -= min(count, g_LaraExtra.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]);
+
+	else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
+		g_LaraExtra.Examines[objectNumber - ID_EXAMINE1] = 0;
+
+	else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
+		g_LaraExtra.PickupsCombo[objectNumber - ID_EXAMINE1_COMBO1] = 0;
 
 	g_Inventory->LoadObjects(false);
 }
@@ -623,7 +625,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 
-		RemoveObjectFromInventory(item->objectNumber - 70);
+		RemoveObjectFromInventory(item->objectNumber - 70, 1);
 
 		if (flag == 1)
 		{
@@ -720,7 +722,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->animNumber = ANIMATION_LARA_USE_KEYCARD;
 				else
 				{
-					RemoveObjectFromInventory(item->objectNumber - 62);
+					RemoveObjectFromInventory(item->objectNumber - 62, 1);
 					l->animNumber = ANIMATION_LARA_USE_KEY;
 				}
 				l->currentAnimState = STATE_LARA_INSERT_KEY;

@@ -986,13 +986,13 @@ int Renderer11::drawInventoryScene()
 					switch (objectNumber)
 					{
 					case ID_BIGMEDI_ITEM:
-						quantity = Lara.numLargeMedipack;
+						quantity = g_LaraExtra.NumLargeMedipacks;
 						break;
 					case ID_SMALLMEDI_ITEM:
-						quantity = Lara.numSmallMedipack;
+						quantity = g_LaraExtra.NumSmallMedipacks;
 						break;
 					case ID_FLARE_INV_ITEM:
-						quantity = Lara.numFlares;
+						quantity = g_LaraExtra.NumFlares;
 						break;
 					case ID_SHOTGUN_AMMO1_ITEM:
 						quantity = g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0];
@@ -1045,23 +1045,29 @@ int Renderer11::drawInventoryScene()
 						break;
 					default:
 						if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
-							quantity = Lara.puzzleItems[objectNumber - ID_PUZZLE_ITEM1];
+							quantity = g_LaraExtra.Puzzles[objectNumber - ID_PUZZLE_ITEM1];
+
 						else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
-							quantity = (Lara.puzzleItemsCombo >> (objectNumber - ID_PUZZLE_ITEM1_COMBO1)) & 1;
+							quantity = g_LaraExtra.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1];
+
 						else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
-							quantity = (Lara.keyItems >> (objectNumber - ID_KEY_ITEM1)) & 1;
+							quantity = g_LaraExtra.Keys[objectNumber - ID_KEY_ITEM1];
+
 						else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
-							quantity = (Lara.keyItemsCombo >> (objectNumber - ID_KEY_ITEM1_COMBO1)) & 1;
+							quantity = g_LaraExtra.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1];
+
 						else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM3)
-							quantity = (Lara.pickupItems >> (objectNumber - ID_PICKUP_ITEM1)) & 1;
+							quantity = g_LaraExtra.Pickups[objectNumber - ID_PICKUP_ITEM1];
+
 						else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM3_COMBO2)
-							quantity = (Lara.pickupItemsCombo >> (objectNumber - ID_PICKUP_ITEM1_COMBO1)) & 1;
-						else if (objectNumber == ID_EXAMINE1)
-							quantity = Lara.examine1;
-						else if (objectNumber == ID_EXAMINE2)
-							quantity = Lara.examine2;
-						else if (objectNumber == ID_EXAMINE3)
-							quantity = Lara.examine3;
+							quantity = g_LaraExtra.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1];
+
+						else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
+							quantity = g_LaraExtra.Pickups[objectNumber - ID_EXAMINE1];
+
+						else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
+							quantity = g_LaraExtra.PickupsCombo[objectNumber - ID_EXAMINE1_COMBO1];
+
 					}
 
 					if (quantity < 1)

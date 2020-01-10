@@ -458,7 +458,7 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (!(Lara.isMoving && g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM))
 		{
-			if (Lara.crowbar)
+			if (g_LaraExtra.Crowbar)
 				g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
 			else
 			{
@@ -512,7 +512,7 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		return;
 	}
 
-	if (Lara.crowbar)
+	if (g_LaraExtra.Crowbar)
 		g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
 	else
 	{
