@@ -31,6 +31,8 @@ void InitialiseSwitch(short itemNum);
 void InitialisePulleySwitch(short itemNumber);
 void InitialiseCrowDoveSwitch(short itemNumber);
 void ProcessExplodingSwitchType8(ITEM_INFO* item);
+void InitialiseShootSwitch(short itemNumber);
+void ShootSwitchCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 
 extern int PulleyItemNumber;
 
