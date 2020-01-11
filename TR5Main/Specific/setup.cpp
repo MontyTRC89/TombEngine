@@ -2755,16 +2755,20 @@ void ObjectObjects()
 		obj->control = ControlWaterfall;
 	}
 
-	obj = &Objects[ID_SHOOT_SWITCH1]; /* @FIXME This setup can be wrong */
+	obj = &Objects[ID_SHOOT_SWITCH1];
 	if (obj->loaded)
 	{
-		obj->collision = ObjectCollision;
+		obj->initialise = InitialiseShootSwitch;
+		obj->control = AnimatingControl;
+		obj->collision = ShootSwitchCollision;
 	}
 
-	obj = &Objects[ID_SHOOT_SWITCH2]; /* @FIXME This setup can be wrong */
+	obj = &Objects[ID_SHOOT_SWITCH2];
 	if (obj->loaded)
 	{
-		obj->collision = ObjectCollision;
+		obj->initialise = InitialiseShootSwitch;
+		obj->control = AnimatingControl;
+		obj->collision = ShootSwitchCollision;
 	}
 }
 
