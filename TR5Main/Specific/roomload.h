@@ -23,8 +23,6 @@ struct LEB128;
 #define ReadRoomsOriginal ((int (__cdecl*)()) 0x004916C0)
 #define FileOpen ((FILE* (__cdecl*)(char*)) 0x004A3CD0)
 #define FileClose ((void (__cdecl*)(FILE*)) 0x004A3DA0)
-//#define LoadSprites ((void (__cdecl*)()) 0x004A59D0)
-//#define LoadCameras ((void (__cdecl*)()) 0x004A5CA0)
 #define LoadSoundEffects ((void (__cdecl*)()) 0x004A5D90)
 #define LoadBoxes ((void (__cdecl*)()) 0x004A5E50)
 #define LoadAnimatedTextures ((void (__cdecl*)()) 0x004A6060)
@@ -34,13 +32,8 @@ struct LEB128;
 #define LoadSamples ((void (__cdecl*)()) 0x004A6880)
 #define InitialiseLaraLoad ((void (__cdecl*)(short)) 0x004568C0)
 #define LoadRooms ((void (__cdecl*)()) 0x004A4DA0)
-//#define InitialiseLara ((void (__cdecl*)(int)) 0x00473210)
 #define InitialiseGameStuff ((void (__cdecl*)()) 0x004778F0)
 #define InitialiseGameFlags ((void (__cdecl*)()) 0x00477880)
-//#define SeedRandomDraw ((void (__cdecl*)(int)) 0x004A7C90)  
-//#define SeedRandomControl ((void (__cdecl*)(int)) 0x004A7C70)  
-#define GetAIPickups ((void (__cdecl*)()) 0x00477370)  
-#define GetCarriedItems ((void (__cdecl*)()) 0x004771E0)  
 #define InitialiseLaraMeshes ((void (__cdecl*)()) 0x00455680)
 #define InitialiseLaraAnims ((void (__cdecl*)(ITEM_INFO*)) 0x00456900)
 
@@ -78,6 +71,8 @@ void AdjustUV(int num);
 void LoadCameras();
 void InitialiseLara(int restore);
 void LoadSprites();
+void GetCarriedItems();
+void GetAIPickups();
 
 unsigned __stdcall LoadLevel(void* data);
 
