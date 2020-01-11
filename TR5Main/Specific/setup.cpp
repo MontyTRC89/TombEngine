@@ -1183,6 +1183,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1235,6 +1236,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1388,6 +1390,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1410,6 +1413,7 @@ void BaddyObjects()
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
+		obj->zoneType = ZONE_FLYER;
 		Bones[obj->boneIndex] |= ROT_X;
 		Bones[obj->boneIndex + 4] |= ROT_X;
 	}
@@ -1484,6 +1488,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_FLYER;
 	}
 
 	obj = &Objects[ID_MAFIA2];
@@ -1504,6 +1509,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1581,6 +1587,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
+
 		/*
 		v44 = 20;(short)
 		v24 = 0;(short)
@@ -1710,6 +1718,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_FLYER;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -1761,6 +1770,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_FLYER;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -3678,6 +3688,7 @@ void CustomObjects()
 		Bones[obj->boneIndex + 1 * 4] |= ROT_Y;
 	}
 
+	// FIXME: evil lara not work correctly.
 	obj = &Objects[ID_EVIL_LARA];
 	if (obj->loaded)
 	{
@@ -3700,58 +3711,26 @@ void CustomObjects()
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
 	}
-	/*
-	obj = &Objects[ID_TR1_RAPTOR];
+	
+	obj = &Objects[ID_CIVVIE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseCreature;
-		obj->control = Tr1RaptorControl;
+		obj->initialise = InitialiseCivvy;
+		obj->control = CivvyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 20;
-		obj->pivotLength = 400;
-		obj->radius = 341;
+		obj->hitPoints = 15;
+		obj->radius = 102;
 		obj->intelligent = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_TR1_LARSON];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->control = Tr1LarsonControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 50;
-		obj->radius = 104;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
+		obj->pivotLength = 0;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
-
-	obj = &Objects[ID_TR1_PIERRE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->control = Tr1LarsonControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 70;
-		obj->radius = 104;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-	}*/
 }
 
 void InitialiseObjects()
@@ -3803,15 +3782,12 @@ void InitialiseObjects()
 
 	// HACK: until we don't decompile everything, this simple hack allows us to use legacy stuff correctly
 	for (int i = 0; i <= ID_LARA_HAIR; i++)
-	{
 		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
-	}
 
 	InitialiseHair();
 	InitialiseSpecialEffects();
 
 	NumRPickups = 0;
-	
 	CurrentSequence = 0;
 	SequenceResults[0][1][2] = 0;
 	SequenceResults[0][2][1] = 1;
