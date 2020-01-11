@@ -2,6 +2,8 @@
 
 #include "..\Global\global.h"
 
+extern int SlotsUsed;
+
 //#define DisableBaddieAI ((void (__cdecl*)(short)) 0x0045B150)
 //#define CreateZone ((void (__cdecl*)(ITEM_INFO*)) 0x0045B5E0)
 //#define ClearLOT ((void (__cdecl*)(LOT_INFO*)) 0x0045B740)

@@ -5,6 +5,8 @@
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 
+int SlotsUsed;
+
 void InitialiseLOTarray(int allocMem)
 {
 	DB_Log(0, "InitialiseLOTarray - DLL");
@@ -28,7 +30,8 @@ int EnableBaddieAI(short itemNum, int always)
 
 	if (item->data != NULL)
 		return true;
-	else if (SlotsUsed >= NUM_SLOTS)
+
+	if (SlotsUsed >= NUM_SLOTS)
 	{
 		int cameraDistance = 0;
 		if (!always)
@@ -57,13 +60,15 @@ int EnableBaddieAI(short itemNum, int always)
 			}
 		}
 
-		if (slotToDisable < 0)
+		if (slotToDisable < 0 || slotToDisable > NUM_SLOTS)
 			return false;
 
-		Items[BaddieSlots[slotToDisable].itemNum].status = ITEM_INVISIBLE;
-		DisableBaddieAI(BaddieSlots[slotToDisable].itemNum);
-		InitialiseSlot(itemNum, slotToDisable);
+		ITEM_INFO* itemToDisable = &Items[BaddieSlots[slotToDisable].itemNum];
+		CREATURE_INFO* creatureToDisable = &BaddieSlots[slotToDisable];
 
+		itemToDisable->status = ITEM_INVISIBLE;
+		DisableBaddieAI(creatureToDisable->itemNum);
+		InitialiseSlot(itemNum, slotToDisable);
 		return true;
 	}
 	else
@@ -119,7 +124,7 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->alerted = false;
 	creature->LOT.canJump = false;
 	creature->LOT.canMonkey = false;
-	creature->LOT.isAmphibious = false; // only land (only crocodile can be amphibious)
+	creature->LOT.isAmphibious = false; // only the crocodile can go water and land. (default: true)
 	creature->LOT.isJumping = false;
 	creature->LOT.isMonkeying = false;
 	creature->maximumTurn = ANGLE(1);
@@ -132,19 +137,19 @@ void InitialiseSlot(short itemNum, short slot)
 	{
 		// simple check to set hitEffect to blood or smoke by default if intelligent enabled and no value assigned to hitEffect !
 		// undead have smoke instead of blood !
-		if (!obj->hitEffect)
+		if (obj->hitEffect == HIT_NONE)
 		{
 			if (obj->undead)
 				obj->hitEffect = HIT_SMOKE;
 			else if (!obj->undead && obj->hitPoints)
 				obj->hitEffect = HIT_BLOOD;
 		}
-		
-		// init the basic zone for intelligent creature.
-		// ignore if the zoneType is specified in the Objects[] already.
-		if (obj->zoneType == ZONE_NULL)
-			obj->zoneType = ZONE_BASIC;
 	}
+
+	// init the basic zone for creature.
+	// ignore if the zoneType is specified in the Objects[] already with other than ZONE_NULL.
+	if (obj->zoneType == ZONE_NULL)
+		obj->zoneType = ZONE_BASIC;
 
 	switch (obj->zoneType)
 	{
@@ -180,7 +185,7 @@ void InitialiseSlot(short itemNum, short slot)
 			creature->LOT.drop = -SECTOR(20);
 			if (item->objectNumber == ID_CROCODILE)
 			{
-				creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // crocodile is more slower than the other creature when swimming.
+				creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // crocodile is more slower (up/down) than the other creature when swimming.
 				creature->LOT.isAmphibious = true; // crocodile can walk and swim.
 			}
 			else
