@@ -144,6 +144,8 @@ void InitialiseSlot(short itemNum, short slot)
 			else if (!obj->undead && obj->hitPoints)
 				obj->hitEffect = HIT_BLOOD;
 		}
+
+		obj->nonLot = false; // change to use pathfinding
 	}
 
 	// init the basic zone for creature.
