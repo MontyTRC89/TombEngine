@@ -1391,6 +1391,22 @@ void InitialiseCrowDoveSwitch(short itemNumber)
 	Items[itemNumber].meshBits = 3;
 }
 
+void InitialiseShootSwitch(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (item->triggerFlags == 444)
+		item->meshBits &= ~(1 << Objects[item->objectNumber].nmeshes - 2);
+}
+
+void ShootSwitchCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (item->objectNumber == ID_SHOOT_SWITCH1 && !(item->meshBits & 1))
+		item->status = ITEM_INVISIBLE;
+}
+
 void Inject_Switch()
 {
 	INJECT(0x0047FD20, CrowDoveSwitchCollision);
