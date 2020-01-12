@@ -877,7 +877,7 @@
     <None Include="Shaders\DX11_ShadowMap.fx" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\DX11_Sprites.fx" />
-    <None Include="Shaders\DX11_HUD.fx" />
+    <None Include="Shaders\HUD\DX11_PS_HUD.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">
@@ -894,5 +894,8 @@
     <Image Include="Banner.bmp">
       <Filter>File di risorse</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\HUD\DX11_VS_HUD.hlsl" />
   </ItemGroup>
 </Project>

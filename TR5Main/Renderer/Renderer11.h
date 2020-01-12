@@ -28,9 +28,10 @@
 #define DX11_RELEASE(x) if (x != NULL) x->Release()
 #define DX11_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 constexpr int REFERENCE_RES_WIDTH = 800;
-constexpr int REFERENCE_RES_HEIGHT = 600;
+constexpr int REFERENCE_RES_HEIGHT = 450;
 constexpr float HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
 constexpr float HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
+constexpr float HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace std;
@@ -341,8 +342,19 @@ public:
 };
 
 typedef struct RendererHUDBar {
+	VertexBuffer* vertexBufferBorder;
+	IndexBuffer* indexBufferBorder;
 	VertexBuffer* vertexBuffer;
 	IndexBuffer* indexBuffer;
+	/*
+		Initialises a new Bar for rendering. the Coordinates are set in the Reference Resolution (default 800x600).
+		The colors are setup like this
+		0-----------1-----------2
+		|           |           |
+		3-----------4-----------5
+		|           |           |
+		6-----------7-----------8
+	*/
 	RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4,9> colors);
 };
 struct RendererStringToDraw
@@ -412,7 +424,8 @@ struct ShaderLight {
 };
 
 struct CHUDBuffer {
-	Matrix ViewProjection;
+	Matrix View;
+	Matrix Projection;
 };
 struct CCameraMatrixBuffer
 {
@@ -692,7 +705,8 @@ private:
 	ID3D11VertexShader*								m_vsShadowMap;
 	ID3D11PixelShader*								m_psShadowMap;
 	ID3D11VertexShader*								m_vsHUD;
-	ID3D11PixelShader*								m_psHUD;
+	ID3D11PixelShader*								m_psHUDColor;
+	ID3D11PixelShader*								m_psHUDTexture;
 
 	ID3D11ShaderResourceView* m_shadowMapRV;
 	ID3D11Texture2D* m_shadowMapTexture;
@@ -725,6 +739,7 @@ private:
 	PrimitiveBatch<RendererVertex>*					m_primitiveBatch;
 
 	// System resources
+	Texture2D*										m_HUDBarBorderTexture;
 	Texture2D*										m_caustics[NUM_CAUSTICS_TEXTURES];
 	Texture2D*										m_binocularsTexture;
 	Texture2D*										m_whiteTexture;

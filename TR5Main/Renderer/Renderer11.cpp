@@ -157,8 +157,8 @@ ID3D11VertexShader* Renderer11::compileVertexShader(const char* fileName, const 
 	ID3DBlob* errors = NULL;
 
 	printf("Compiling vertex shader: %s\n", fileName);
-
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, bytecode, &errors, NULL);
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG;
+	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, flags, 0, NULL, bytecode, &errors, NULL);
 	if (FAILED(res))
 	{
 		printf("Compilation failed: %s\n", errors->GetBufferPointer());
@@ -181,8 +181,8 @@ ID3D11PixelShader* Renderer11::compilePixelShader(const char* fileName, const ch
 	ID3DBlob* errors = NULL;
 
 	printf("Compiling pixel shader: %s\n", fileName);
-
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, bytecode, &errors, NULL);
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG;
+	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, flags, 0, NULL, bytecode, &errors, NULL);
 	if (FAILED(res))
 	{
 		printf("Compilation failed: %s\n", errors->GetBufferPointer());
@@ -265,40 +265,41 @@ ID3D11Buffer* Renderer11::createConstantBuffer(int size)
 
 RendererHUDBar::RendererHUDBar(ID3D11Device* m_device,int x, int y, int w, int h, int borderSize, array<Vector4,9> colors)
 {
-
 	array<Vector3, 9> barVertices = {
-		Vector3(x, y, 0),
-		Vector3(x + (w / 2.0f), y, 0),
-		Vector3(x + w, y, 0),
-		Vector3(x, (y + h / 2.0f), 0),
-		Vector3(x + (w / 2.0f), (y + h / 2.0f), 0),
-		Vector3(x + w, (y + h / 2.0f), 0),
-		Vector3(x, y + h, 0),
-		Vector3(x + (w / 2.0f), y + h, 0),
-		Vector3(x + w, y + h, 0),
+		Vector3(x, HUD_ZERO_Y +y, 0.5),
+		Vector3(x + (w / 2.0f), HUD_ZERO_Y + y, 0.5),
+		Vector3(x + w, HUD_ZERO_Y + y, 0.5),
+		Vector3(x, HUD_ZERO_Y + (y + h / 2.0f), 0.5),
+		Vector3(x + (w / 2.0f), HUD_ZERO_Y + (y + h / 2.0f), 0.5),
+		Vector3(x + w, HUD_ZERO_Y + (y + h / 2.0f), 0.5),
+		Vector3(x, HUD_ZERO_Y + y + h, 0.5),
+		Vector3(x + (w / 2.0f), HUD_ZERO_Y + y + h, 0.5),
+		Vector3(x + w, HUD_ZERO_Y + y + h, 0.5),
 
 	};
+	const float HUD_BORDER_WIDTH = borderSize * (REFERENCE_RES_WIDTH/ REFERENCE_RES_HEIGHT);
+	const float HUD_BORDER_HEIGT = borderSize;
 	array<Vector3, 16> barBorderVertices = {
 		//top left
-		Vector3(x - HUD_UNIT_X,y - HUD_UNIT_Y,0),
-		Vector3(x,y - HUD_UNIT_Y,0),
-		Vector3(x,y,0),
-		Vector3(x - HUD_UNIT_X,y,0),
+		Vector3(x - HUD_BORDER_WIDTH	,HUD_ZERO_Y+y - HUD_BORDER_HEIGT,0),
+		Vector3(x						,HUD_ZERO_Y+y - HUD_BORDER_HEIGT,0),
+		Vector3(x						,HUD_ZERO_Y+y,0),
+		Vector3(x - HUD_BORDER_WIDTH	,HUD_ZERO_Y+y,0),
 		//top right
-		Vector3(x + w,y - HUD_UNIT_Y,0),
-		Vector3(x + w + HUD_UNIT_X,y - HUD_UNIT_Y,0),
-		Vector3(x + w + HUD_UNIT_X,y,0),
-		Vector3(x + w,y,0),
+		Vector3(x + w					,HUD_ZERO_Y+y - HUD_BORDER_HEIGT,0),
+		Vector3(x + w + HUD_BORDER_WIDTH,HUD_ZERO_Y+y - HUD_BORDER_HEIGT,0),
+		Vector3(x + w + HUD_BORDER_WIDTH,HUD_ZERO_Y+y,0),
+		Vector3(x + w					,HUD_ZERO_Y+y,0),
 		//bottom right
-		Vector3(x + w,1,0),
-		Vector3(x + w + HUD_UNIT_X,y + h,0),
-		Vector3(x + w + HUD_UNIT_X,y + h + HUD_UNIT_Y,0),
-		Vector3(x + w,y + h + HUD_UNIT_Y,0),
+		Vector3(x + w					,HUD_ZERO_Y+y + h,0),
+		Vector3(x + w + HUD_BORDER_WIDTH,HUD_ZERO_Y+y + h,0),
+		Vector3(x + w + HUD_BORDER_WIDTH,HUD_ZERO_Y+y + h + HUD_BORDER_HEIGT,0),
+		Vector3(x + w					,HUD_ZERO_Y+y + h + HUD_BORDER_HEIGT,0),
 		//bottom left
-		Vector3(x - HUD_UNIT_X,y + h,0),
-		Vector3(x,y + h,0),
-		Vector3(x,y + h + HUD_UNIT_Y,0),
-		Vector3(x - HUD_UNIT_X,y + h + HUD_UNIT_Y,0)
+		Vector3(x - HUD_BORDER_WIDTH	,HUD_ZERO_Y+y + h,0),
+		Vector3(x						,HUD_ZERO_Y+y + h,0),
+		Vector3(x						,HUD_ZERO_Y+y + h + HUD_BORDER_HEIGT,0),
+		Vector3(x - HUD_BORDER_WIDTH	,HUD_ZERO_Y+y + h + HUD_BORDER_HEIGT,0)
 	};
 
 	array<Vector2, 9> barUVs = {
@@ -364,15 +365,27 @@ RendererHUDBar::RendererHUDBar(ID3D11Device* m_device,int x, int y, int w, int h
 		//center
 		2,7,13,7,8,13
 	};
-	Matrix hudMatrix = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0))* Matrix::CreateOrthographic(REFERENCE_RES_WIDTH, REFERENCE_RES_HEIGHT, -10, 10);
-	Vector4 vec = XMVector4Transform(Vector4(x + (w / 2.0f), y, 0, 1), hudMatrix);
 	array<RendererVertex, 9> vertices;
 	for (int i = 0; i < 9; i++) {
 
 		vertices[i].Position = barVertices[i];
 		vertices[i].Color = colors[i];
 		vertices[i].UV = barUVs[i];
+		vertices[i].Normal = Vector3(0, 0, 0);
+		vertices[i].Bone = 0.0f;
 	}
-	vertexBuffer = VertexBuffer::Create(m_device, vertices.size(), vertices._Elems);
-	indexBuffer = IndexBuffer::Create(m_device, barIndices.size(), barIndices._Elems);
+	vertexBuffer = VertexBuffer::Create(m_device, vertices.size(), vertices.data());
+	indexBuffer = IndexBuffer::Create(m_device, barIndices.size(), barIndices.data());
+
+	array<RendererVertex, barBorderVertices.size()> verticesBorder;
+	for (int i = 0; i < barBorderVertices.size(); i++) {
+		verticesBorder[i].Position = barBorderVertices[i];
+		verticesBorder[i].Color = Vector4(1, 1, 1, 1);
+		verticesBorder[i].UV = barBorderUVs[i];
+		verticesBorder[i].Normal = Vector3(0, 0, 0);
+		verticesBorder[i].Bone = 0.0f;
+	}
+	vertexBufferBorder = VertexBuffer::Create(m_device, verticesBorder.size(), verticesBorder.data());
+	indexBufferBorder = IndexBuffer::Create(m_device, barBorderIndices.size(), barBorderIndices.data());
+	
 }
