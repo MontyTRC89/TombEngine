@@ -2850,7 +2850,7 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseShootSwitch;
-		obj->control = AnimatingControl;
+		obj->control = ControlAnimatingSlots;
 		obj->collision = ShootSwitchCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -2861,7 +2861,7 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseShootSwitch;
-		obj->control = AnimatingControl;
+		obj->control = ControlAnimatingSlots;
 		obj->collision = ShootSwitchCollision;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
