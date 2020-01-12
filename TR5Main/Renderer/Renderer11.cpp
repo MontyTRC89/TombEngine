@@ -112,10 +112,6 @@ void Renderer11::FreeRendererData()
 
 	m_rooms.clear();
 
-	for (int i = 0; i < m_numAnimatedTextureSets; i++)
-		DX11_DELETE(m_animatedTextureSets[i]);
-	free(m_animatedTextureSets);
-
 	DX11_DELETE(m_textureAtlas);
 	DX11_DELETE(m_skyTexture);
 	DX11_DELETE(m_roomsVertexBuffer);
