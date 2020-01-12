@@ -556,21 +556,33 @@ struct RendererSprite {
 
 struct RendererSpriteSequence {
 	int Id;
-	RendererSprite** SpritesList;
+	vector<RendererSprite*> SpritesList;
 	int NumSprites;
 
+	RendererSpriteSequence()
+	{
+	}
 	RendererSpriteSequence(int id, int num)
 	{
 		Id = id;
 		NumSprites = num;
-		SpritesList = (RendererSprite**)malloc(sizeof(RendererSprite*) * num);
+		SpritesList = vector<RendererSprite*>(NumSprites);
 	}
 
-	~RendererSpriteSequence()
-	{
-		/*for (int i = 0; i < NumSprites; i++)
-			delete SpritesList[i];
-		free(SpritesList);*/
+	RendererSpriteSequence(const RendererSpriteSequence& rhs) {
+		Id = rhs.Id;
+		NumSprites = rhs.NumSprites;
+		SpritesList = rhs.SpritesList;
+	}
+
+	RendererSpriteSequence& operator=(const RendererSpriteSequence& other) {
+		if (this != &other) {
+			Id = other.Id;
+			NumSprites = other.NumSprites;
+			SpritesList = vector<RendererSprite*>(NumSprites);
+			std::copy(other.SpritesList.begin(), other.SpritesList.end(),back_inserter(SpritesList));
+		}
+		return *this;
 	}
 };
 
@@ -750,7 +762,7 @@ private:
 	int												m_numStatics;
 	int												m_numSprites;
 	int												m_numSpritesSequences;
-	RendererSpriteSequence**						m_spriteSequences;
+	vector<RendererSpriteSequence>					m_spriteSequences;
 	unordered_map<unsigned int, RendererMesh*>		m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
 	vector<RendererAnimatedTextureSet>				m_animatedTextureSets;

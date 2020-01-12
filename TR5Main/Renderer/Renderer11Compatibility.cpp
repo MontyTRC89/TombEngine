@@ -8,8 +8,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_moveableObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
 	ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
 
-	m_spriteSequences = (RendererSpriteSequence * *)malloc(sizeof(RendererSpriteSequence*) * ID_NUMBER_OBJECTS);
-	ZeroMemory(m_spriteSequences, sizeof(RendererSpriteSequence*) * ID_NUMBER_OBJECTS);
+	m_spriteSequences = vector<RendererSpriteSequence>(ID_NUMBER_OBJECTS);
 
 	m_staticObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * NUM_STATICS);
 	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);
@@ -799,12 +798,12 @@ bool Renderer11::PrepareDataForTheRenderer()
 		{
 			short numSprites = abs(obj->nmeshes);
 			short baseSprite = obj->meshIndex;
-
-			RendererSpriteSequence* sequence = new RendererSpriteSequence(MoveablesIds[i], numSprites);
+			m_spriteSequences[MoveablesIds[i]] = RendererSpriteSequence(MoveablesIds[i], numSprites);
+			RendererSpriteSequence& sequence = m_spriteSequences[MoveablesIds[i]];
 
 			for (int j = baseSprite; j < baseSprite + numSprites; j++)
 			{
-				sequence->SpritesList[j - baseSprite] = m_sprites[j];
+				sequence.SpritesList[j - baseSprite] = m_sprites[j];
 			}
 
 			m_spriteSequences[MoveablesIds[i]] = sequence;
