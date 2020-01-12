@@ -175,6 +175,9 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_psHUDTexture = compilePixelShader("Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", &blob);
 	if (m_psHUDTexture == NULL)
 		return false;
+	m_psHUDBarColor = compilePixelShader("Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", &blob);
+	if (m_psHUDBarColor == NULL)
+		return false;
 
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
@@ -185,9 +188,10 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_cbShadowMap = createConstantBuffer(sizeof(CShadowLightBuffer));
 	m_cbRoom = createConstantBuffer(sizeof(CRoomBuffer));
 	//Prepare HUD Constant buffer
+	m_cbHUDBar = createConstantBuffer(sizeof(CHUDBarBuffer));
 	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
-	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1),Vector3(0,-1,0)).Transpose();
-	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f).Transpose();
+	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0)).Transpose();
+	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f).Transpose();
 	updateConstantBuffer(m_cbHUD, &m_stHUD, sizeof(CHUDBuffer));
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;

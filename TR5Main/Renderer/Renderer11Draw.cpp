@@ -12,6 +12,7 @@
 #include "../Game/rope.h"
 #include "../Game/tomb4fx.h"
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
+extern RendererHUDBar* g_DashBar;
 int Renderer11::DrawPickup(short objectNum)
 {
 	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
@@ -2023,7 +2024,7 @@ bool Renderer11::drawScene(bool dump)
 	// Bars
 	int flash = FlashIt();
 	if (DashTimer < 120)
-		//DrawBar(630, 32, 150, 12, 100 * (unsigned short)DashTimer / 120, 0xA0A000, 0xA000);
+		DrawBar(DashTimer / 120.0f, g_DashBar);
 	UpdateHealtBar(flash);
 	UpdateAirBar(flash);
 	DrawAllPickups();

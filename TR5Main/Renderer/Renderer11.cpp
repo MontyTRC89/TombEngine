@@ -248,7 +248,7 @@ ID3D11Buffer* Renderer11::createConstantBuffer(int size)
 	D3D11_BUFFER_DESC desc;	
 	ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
 		
-	desc.ByteWidth = ceil(size / 16) * 16; // Constant buffer must have a size multiple of 16 bytes
+	desc.ByteWidth = ceil(size / 16.0f) * 16; // Constant buffer must have a size multiple of 16 bytes
 	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
