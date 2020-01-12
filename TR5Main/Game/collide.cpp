@@ -661,7 +661,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	return TRUE;
 }
 
-void AIPickupCollision(short itemNumber)
+void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	if (item->objectNumber == ID_SHOOT_SWITCH1 && !(item->meshBits & 1))

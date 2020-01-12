@@ -856,24 +856,28 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 		collectEffects(node->To);
 
 		Vector4 clipPort;
-		short numDoors = *(room->door);
-		if (numDoors)
+
+		if (room->door != NULL)
 		{
-			short* door = room->door + 1;
-			for (int i = 0; i < numDoors; i++) {
-				short adjoiningRoom = *(door);
+			short numDoors = *(room->door);
+			if (numDoors)
+			{
+				short* door = room->door + 1;
+				for (int i = 0; i < numDoors; i++) {
+					short adjoiningRoom = *(door);
 
-				if (node->From != adjoiningRoom && checkPortal(node->To, door, viewPort, &node->ClipPort))
-				{
-					RendererRoomNode* childNode = &nodes[nextNode++];
-					childNode->From = node->To;
-					childNode->To = adjoiningRoom;
+					if (node->From != adjoiningRoom && checkPortal(node->To, door, viewPort, &node->ClipPort))
+					{
+						RendererRoomNode* childNode = &nodes[nextNode++];
+						childNode->From = node->To;
+						childNode->To = adjoiningRoom;
 
-					// Push
-					stack[stackDepth++] = childNode;
+						// Push
+						stack[stackDepth++] = childNode;
+					}
+
+					door += 16;
 				}
-
-				door += 16;
 			}
 		}
 	}

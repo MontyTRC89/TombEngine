@@ -568,6 +568,8 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 		Camera.target.y = LaraItem->pos.yPos;
 		Camera.target.z = LaraItem->pos.zPos;
 
+		int x = Lara.weaponItem;
+
 		RequiredStartPos = false;
 		InitialiseGame = false;
 		g_GameFlow->SelectedSaveGame = 0;

@@ -69,6 +69,17 @@ private:
 	static ChunkId* m_chunkRats;
 	static ChunkId* m_chunkSpiders;
 	static ChunkId* m_chunkBats;
+	static ChunkId* m_chunkLaraExtraInfo;
+	static ChunkId* m_chunkWeaponInfo;
+	static ChunkId* m_chunkPuzzle;
+	static ChunkId* m_chunkKey;
+	static ChunkId* m_chunkPickup;
+	static ChunkId* m_chunkExamine;
+	static ChunkId* m_chunkPuzzleCombo;
+	static ChunkId* m_chunkKeyCombo;
+	static ChunkId* m_chunkPickupCombo;
+	static ChunkId* m_chunkExamineCombo;
+	static ChunkId* m_chunkWeaponItem;
 
 	static void saveGameStatus(int arg1, int arg2);
 	static void saveLara(int arg1, int arg2);
@@ -99,6 +110,10 @@ private:
 	static void saveRats(int arg1, int arg2);
 	static void saveBats(int arg1, int arg2);
 	static void saveSpiders(int arg1, int arg2);
+	static void saveLaraExtraInfo(int arg1, int arg2);
+	static void savePuzzle(int arg1, int arg2);
+	static void saveWeaponInfo(int arg1, int arg2);
+	static void saveWeaponItem(int arg1, int arg2);
 
 	static bool readGameStatus();
 	static bool readLara();
