@@ -48,6 +48,17 @@ ChunkId* SaveGame::m_chunkItemQuadInfo;
 ChunkId* SaveGame::m_chunkBats;
 ChunkId* SaveGame::m_chunkRats;
 ChunkId* SaveGame::m_chunkSpiders;
+ChunkId* SaveGame::m_chunkLaraExtraInfo;
+ChunkId* SaveGame::m_chunkWeaponInfo;
+ChunkId* SaveGame::m_chunkPuzzle;
+ChunkId* SaveGame::m_chunkKey;
+ChunkId* SaveGame::m_chunkPickup;
+ChunkId* SaveGame::m_chunkExamine;
+ChunkId* SaveGame::m_chunkPuzzleCombo;
+ChunkId* SaveGame::m_chunkKeyCombo;
+ChunkId* SaveGame::m_chunkPickupCombo;
+ChunkId* SaveGame::m_chunkExamineCombo;
+ChunkId* SaveGame::m_chunkWeaponItem;
 
 extern vector<AudioTrack> g_AudioTracks;
 extern byte SequenceUsed[6];
@@ -127,8 +138,6 @@ void SaveGame::saveItem(int itemNumber, int runtimeItem)
 	}
 
 	LEB128::Write(m_stream, item->objectNumber);
-	LEB128::Write(m_stream, item->speed);
-	LEB128::Write(m_stream, item->fallspeed);
 
 	if (hasData)
 	{
@@ -146,8 +155,8 @@ void SaveGame::saveItem(int itemNumber, int runtimeItem)
 		if (obj->saveFlags)
 			m_writer->WriteChunkWithChildren(m_chunkItemFlags, &saveItemFlags, itemNumber, 0);
 
-		/*if (obj->saveMesh)
-			m_writer->WriteChunk(m_chunkItemMeshes, &saveItemMesh, itemNumber, 0);*/
+		if (obj->saveMesh)
+			m_writer->WriteChunk(m_chunkItemMeshes, &saveItemMesh, itemNumber, 0);
 
 		if (obj->intelligent && item->data != NULL)
 			m_writer->WriteChunk(m_chunkItemIntelligentData, &saveItemIntelligentData, itemNumber, 0);
@@ -203,24 +212,122 @@ void SaveGame::saveLara(int arg1, int arg2)
 	for (int i = 0; i < 15; i++)
 		lara.meshPtrs[i] = (short*)((char*)lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
 
-	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
-	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_PISTOLS_ANIM].frameBase);
+	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
+	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
 	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)MallocBuffer;
 
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
 	
 	// Lara weapon data
-	ITEM_INFO* weaponItem = &Items[Lara.weaponItem];
+	if (Lara.weaponItem != NO_ITEM)
+		m_writer->WriteChunk(m_chunkWeaponItem, &saveWeaponItem, Lara.weaponItem, 0);
+	
+	// Save Lara extra info
+	m_writer->WriteChunk(m_chunkLaraExtraInfo, &saveLaraExtraInfo, 0, 0);
+	
+	// Save carried weapons
+	for (int i = 0; i < NUM_WEAPONS; i++)
+	{
+		m_writer->WriteChunk(m_chunkWeaponInfo, &saveWeaponInfo, i, 0);
+	}
 
+	// Save carried puzzles, keys, pickups and examines
+	for (int i = 0; i < NUM_PUZZLES; i++)
+	{
+		if (g_LaraExtra.Puzzles[i] > 0)
+			m_writer->WriteChunk(m_chunkPuzzle, &savePuzzle, i, g_LaraExtra.Puzzles[i]);
+	}
+
+	for (int i = 0; i < NUM_PUZZLES * 2; i++)
+	{
+		if (g_LaraExtra.PuzzlesCombo[i] > 0)
+			m_writer->WriteChunk(m_chunkPuzzleCombo, &savePuzzle, i, g_LaraExtra.PuzzlesCombo[i]);
+	}
+
+	for (int i = 0; i < NUM_KEYS; i++)
+	{
+		if (g_LaraExtra.Keys[i] > 0)
+			m_writer->WriteChunk(m_chunkKey, &savePuzzle, i, g_LaraExtra.Keys[i]);
+	}
+
+	for (int i = 0; i < NUM_KEYS * 2; i++)
+	{
+		if (g_LaraExtra.KeysCombo[i] > 0)
+			m_writer->WriteChunk(m_chunkKeyCombo, &savePuzzle, i, g_LaraExtra.KeysCombo[i]);
+	}
+
+	for (int i = 0; i < NUM_PICKUPS; i++)
+	{
+		if (g_LaraExtra.Pickups[i] > 0)
+			m_writer->WriteChunk(m_chunkPickup, &savePuzzle, i, g_LaraExtra.Pickups[i]);
+	}
+
+	for (int i = 0; i < NUM_PICKUPS * 2; i++)
+	{
+		if (g_LaraExtra.PickupsCombo[i] > 0)
+			m_writer->WriteChunk(m_chunkPickupCombo, &savePuzzle, i, g_LaraExtra.PickupsCombo[i]);
+	}
+
+	for (int i = 0; i < NUM_EXAMINES; i++)
+	{
+		if (g_LaraExtra.Examines[i] > 0)
+			m_writer->WriteChunk(m_chunkExamine, &savePuzzle, i, g_LaraExtra.Examines[i]);
+	}
+
+	for (int i = 0; i < NUM_EXAMINES * 2; i++)
+	{
+		if (g_LaraExtra.ExaminesCombo[i] > 0)
+			m_writer->WriteChunk(m_chunkExamineCombo, &savePuzzle, i, g_LaraExtra.ExaminesCombo[i]);
+	}
+}
+
+void SaveGame::saveWeaponItem(int arg1, int arg2)
+{
+	ITEM_INFO* weaponItem = &Items[arg1];
+	
 	LEB128::Write(m_stream, weaponItem->objectNumber);
 	LEB128::Write(m_stream, weaponItem->animNumber);
 	LEB128::Write(m_stream, weaponItem->frameNumber);
 	LEB128::Write(m_stream, weaponItem->currentAnimState);
 	LEB128::Write(m_stream, weaponItem->goalAnimState);
 	LEB128::Write(m_stream, weaponItem->requiredAnimState);
+}
 
-	// Lara extra data
-	m_writer->WriteChunkInt(m_chunkVehicle, g_LaraExtra.Vehicle);
+void SaveGame::saveLaraExtraInfo(int arg1, int arg2)
+{
+	LEB128::Write(m_stream, (g_LaraExtra.Binoculars ? 1 : 0));
+	LEB128::Write(m_stream, (g_LaraExtra.Lasersight ? 1 : 0));
+	LEB128::Write(m_stream, (g_LaraExtra.Crowbar ? 1 : 0));
+	LEB128::Write(m_stream, (g_LaraExtra.Silencer ? 1 : 0));
+	LEB128::Write(m_stream, (g_LaraExtra.Torch ? 1 : 0));
+	LEB128::Write(m_stream, g_LaraExtra.Secrets);
+	LEB128::Write(m_stream, g_LaraExtra.ExtraAnim);
+	LEB128::Write(m_stream, g_LaraExtra.Vehicle);
+	LEB128::Write(m_stream, g_LaraExtra.mineL);
+	LEB128::Write(m_stream, g_LaraExtra.mineR);
+	LEB128::Write(m_stream, g_LaraExtra.NumFlares);
+	LEB128::Write(m_stream, g_LaraExtra.NumLargeMedipacks);
+	LEB128::Write(m_stream, g_LaraExtra.NumSmallMedipacks);
+}
+
+void SaveGame::savePuzzle(int arg1, int arg2)
+{
+	LEB128::Write(m_stream, arg1); // ID
+	LEB128::Write(m_stream, arg2); // Quantity
+}
+
+void SaveGame::saveWeaponInfo(int arg1, int arg2)
+{
+	CarriedWeaponInfo* weapon = &g_LaraExtra.Weapons[arg1];
+
+	LEB128::Write(m_stream, arg1);
+	LEB128::Write(m_stream, weapon->Present);
+	LEB128::Write(m_stream, weapon->SelectedAmmo);
+	LEB128::Write(m_stream, weapon->Ammo[WEAPON_AMMO1]);
+	LEB128::Write(m_stream, weapon->Ammo[WEAPON_AMMO2]);
+	LEB128::Write(m_stream, weapon->Ammo[WEAPON_AMMO3]);
+	LEB128::Write(m_stream, weapon->HasSilencer);
+	LEB128::Write(m_stream, weapon->HasLasersight);
 }
 
 void SaveGame::saveVariables()
@@ -281,6 +388,17 @@ void SaveGame::Start()
 	m_chunkBats = ChunkId::FromString("TR5MSgBats");
 	m_chunkRats = ChunkId::FromString("TR5MSgRats");
 	m_chunkSpiders = ChunkId::FromString("TR5MSgSpiders");
+	m_chunkLaraExtraInfo = ChunkId::FromString("TR5MSgLaraExtraInfo");
+	m_chunkWeaponInfo = ChunkId::FromString("TR5MSgWeapon");
+	m_chunkPuzzle = ChunkId::FromString("TR5MSgPuzzle");
+	m_chunkPuzzleCombo = ChunkId::FromString("TR5MSgPuzzleC");
+	m_chunkKey = ChunkId::FromString("TR5MSgKey");
+	m_chunkKeyCombo = ChunkId::FromString("TR5MSgKeyC");
+	m_chunkPickup = ChunkId::FromString("TR5MSgPickup");
+	m_chunkPickupCombo = ChunkId::FromString("TR5MSgPickupC");
+	m_chunkExamine = ChunkId::FromString("TR5MSgExamine");
+	m_chunkExamineCombo = ChunkId::FromString("TR5MSgExamineC");
+	m_chunkWeaponItem = ChunkId::FromString("TR5MSgWeaponItem");
 
 	LastSaveGame = 0;
 }
@@ -317,6 +435,8 @@ void SaveGame::End()
 	delete m_chunkBats;
 	delete m_chunkRats;
 	delete m_chunkSpiders;
+	delete m_chunkLaraExtraInfo;
+	delete m_chunkWeaponInfo;
 }
 
 bool SaveGame::Save(char* fileName)
@@ -380,15 +500,16 @@ bool SaveGame::readLara()
 	for (int i = 0; i < 15; i++)
 	{
 		Lara.meshPtrs[i] = ADD_PTR(Lara.meshPtrs[i], short, MeshBase);
-		printf("MeshPtr: %d\n", Lara.meshPtrs[i]);
+		//printf("MeshPtr: %d\n", Lara.meshPtrs[i]);
 	}
 
-	Lara.leftArm.frameBase = ADD_PTR(Lara.leftArm.frameBase, short, Objects[ID_PISTOLS_ANIM].frameBase);
-	Lara.rightArm.frameBase = ADD_PTR(Lara.rightArm.frameBase, short, Objects[ID_PISTOLS_ANIM].frameBase);
+	Lara.leftArm.frameBase = ADD_PTR(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
+	Lara.rightArm.frameBase = ADD_PTR(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;
 	Lara.generalPtr = ADD_PTR(Lara.generalPtr, char, MallocBuffer);
+	Lara.weaponItem = NO_ITEM;
 
 	// Is Lara burning?
 	if (Lara.burn)
@@ -404,23 +525,6 @@ bool SaveGame::readLara()
 		LaraBurn();
 		if (smokeFlag)
 			Lara.burnSmoke = true;
-	}
-
-	// Lara weapon data
-	if (Lara.weaponItem)
-	{
-		short weaponItemNum = CreateItem();
-		Lara.weaponItem = weaponItemNum;
-
-		ITEM_INFO* weaponItem = &Items[Lara.weaponItem];
-
-		weaponItem->objectNumber = LEB128::ReadInt16(m_stream);
-		weaponItem->animNumber = LEB128::ReadInt16(m_stream);
-		weaponItem->frameNumber = LEB128::ReadInt16(m_stream);
-		weaponItem->currentAnimState = LEB128::ReadInt16(m_stream);
-		weaponItem->goalAnimState = LEB128::ReadInt16(m_stream);
-		weaponItem->requiredAnimState = LEB128::ReadInt16(m_stream);
-		weaponItem->roomNumber = 255;
 	}
 	
 	m_reader->ReadChunks(&readLaraChunks, 0);
@@ -450,9 +554,6 @@ bool SaveGame::readItem()
 		InitialiseItem(itemNumber);
 		AddActiveItem(itemNumber);
 	}
-
-	item->speed = LEB128::ReadInt16(m_stream);
-	item->fallspeed = LEB128::ReadInt16(m_stream);
 
 	if (itemKind == 0x2000)
 	{
@@ -631,11 +732,102 @@ void SaveGame::saveStaticFlag(int arg1, int arg2)
 
 bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 {
-	if (chunkId->EqualsTo(m_chunkVehicle))
+	if (chunkId->EqualsTo(m_chunkLaraExtraInfo))
 	{
-		g_LaraExtra.Vehicle = m_reader->ReadChunkInt16(maxSize);
+		g_LaraExtra.Binoculars = LEB128::ReadByte(m_stream);
+		g_LaraExtra.Lasersight = LEB128::ReadByte(m_stream);
+		g_LaraExtra.Crowbar = LEB128::ReadByte(m_stream);
+		g_LaraExtra.Silencer = LEB128::ReadByte(m_stream);
+		g_LaraExtra.Torch = LEB128::ReadByte(m_stream);
+		g_LaraExtra.Secrets = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.ExtraAnim = LEB128::ReadInt16(m_stream);
+		g_LaraExtra.Vehicle = LEB128::ReadInt16(m_stream);
+		g_LaraExtra.mineL = LEB128::ReadByte(m_stream);
+		g_LaraExtra.mineR = LEB128::ReadByte(m_stream);
+		g_LaraExtra.NumFlares = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.NumLargeMedipacks = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.NumSmallMedipacks = LEB128::ReadInt32(m_stream);
+
 		return true;
 	}
+	else if (chunkId->EqualsTo(m_chunkWeaponInfo))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+
+		CarriedWeaponInfo* weapon = &g_LaraExtra.Weapons[id];
+
+		weapon->Present = LEB128::ReadByte(m_stream);
+		weapon->SelectedAmmo = LEB128::ReadByte(m_stream);
+		weapon->Ammo[WEAPON_AMMO1] = LEB128::ReadInt16(m_stream);
+		weapon->Ammo[WEAPON_AMMO2] = LEB128::ReadInt16(m_stream);
+		weapon->Ammo[WEAPON_AMMO3] = LEB128::ReadInt16(m_stream);
+		weapon->HasSilencer = LEB128::ReadByte(m_stream);
+		weapon->HasLasersight = LEB128::ReadByte(m_stream);
+	}
+	else if (chunkId->EqualsTo(m_chunkPuzzle))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.Puzzles[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkPuzzleCombo))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.PuzzlesCombo[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkKey))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.Keys[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkKeyCombo))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.KeysCombo[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkPickup))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.Pickups[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkPickupCombo))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.PickupsCombo[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkExamine))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.Examines[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkExamineCombo))
+	{
+		int id = LEB128::ReadInt32(m_stream);
+		int quantity = LEB128::ReadInt32(m_stream);
+		g_LaraExtra.ExaminesCombo[id] = quantity;
+	}
+	else if (chunkId->EqualsTo(m_chunkWeaponItem))
+	{
+		short weaponItemNum = CreateItem();
+		Lara.weaponItem = weaponItemNum;
+
+		ITEM_INFO* weaponItem = &Items[Lara.weaponItem];
+
+		weaponItem->objectNumber = LEB128::ReadInt16(m_stream);
+		weaponItem->animNumber = LEB128::ReadInt16(m_stream);
+		weaponItem->frameNumber = LEB128::ReadInt16(m_stream);
+		weaponItem->currentAnimState = LEB128::ReadInt16(m_stream);
+		weaponItem->goalAnimState = LEB128::ReadInt16(m_stream);
+		weaponItem->requiredAnimState = LEB128::ReadInt16(m_stream);
+		weaponItem->roomNumber = 255;
+	}
+
 	return false;
 }
 
@@ -777,6 +969,9 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		if (item->roomNumber != roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
+		item->speed = LEB128::ReadInt16(m_stream);
+		item->fallspeed = LEB128::ReadInt16(m_stream);
+
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkItemHitPoints))
@@ -861,6 +1056,13 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
 		if (item->objectNumber == ID_QUAD)
 			item->data = (void*)quadInfo;
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(m_chunkItemMeshes))
+	{
+		item->meshBits = LEB128::ReadInt32(m_stream);
+		item->swapMeshFlags = LEB128::ReadInt32(m_stream);
 
 		return true;
 	}
@@ -993,12 +1195,16 @@ void SaveGame::saveItemPosition(int arg1, int arg2)
 	LEB128::Write(m_stream, item->pos.yRot);
 	LEB128::Write(m_stream, item->pos.zRot);
 	LEB128::Write(m_stream, item->roomNumber);
+	LEB128::Write(m_stream, item->speed);
+	LEB128::Write(m_stream, item->fallspeed);
 }
 
 void SaveGame::saveItemMesh(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
 
+	LEB128::Write(m_stream, item->meshBits);
+	LEB128::Write(m_stream, item->swapMeshFlags);
 }
 
 void SaveGame::saveItemAnims(int arg1, int arg2)
@@ -1327,8 +1533,7 @@ bool SaveGame::readBats()
 
 	char* buffer = (char*)malloc(sizeof(BAT_STRUCT));
 	m_stream->Read(buffer, sizeof(BAT_STRUCT));
-	BAT_STRUCT* b = reinterpret_cast<BAT_STRUCT*>(buffer);
-	memcpy(&bats, b, sizeof(BAT_STRUCT));
+	memcpy(bats, buffer, sizeof(BAT_STRUCT));
 	free(buffer);
 
 	return true;
@@ -1342,8 +1547,7 @@ bool SaveGame::readRats()
 
 	char* buffer = (char*)malloc(sizeof(RAT_STRUCT));
 	m_stream->Read(buffer, sizeof(RAT_STRUCT));
-	RAT_STRUCT* r = reinterpret_cast<RAT_STRUCT*>(buffer);
-	memcpy(&rats, r, sizeof(RAT_STRUCT));
+	memcpy(rats, buffer, sizeof(RAT_STRUCT));
 	free(buffer);
 
 	return true;
@@ -1357,8 +1561,7 @@ bool SaveGame::readSpiders()
 
 	char* buffer = (char*)malloc(sizeof(SPIDER_STRUCT));
 	m_stream->Read(buffer, sizeof(SPIDER_STRUCT));
-	SPIDER_STRUCT* s = reinterpret_cast<SPIDER_STRUCT*>(buffer);
-	memcpy(&spiders, s, sizeof(SPIDER_STRUCT));
+	memcpy(spiders, buffer, sizeof(SPIDER_STRUCT));
 	free(buffer);
 
 	return true;

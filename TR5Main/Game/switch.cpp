@@ -1375,6 +1375,13 @@ void InitialiseSwitch(short itemNumber)
 	}
 }
 
+void InitialiseShootSwitch(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->triggerFlags == 444)
+		item->meshBits &= ~(1 << (Objects[item->objectNumber].nmeshes - 2));
+}
+
 void InitialisePulleySwitch(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];

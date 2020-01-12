@@ -187,8 +187,3 @@ constexpr auto MAX_SPLASH = 8;
 #define BAD_JUMP_CEILING ((STEP_SIZE*3)/4)
 #define LARA_RAD 100
 #define LARA_VELOCITY 12
-
-#define NUM_PUZZLES 8
-#define NUM_KEYS 8
-#define NUM_PICKUPS 4
-#define NUM_EXAMINES 3

@@ -20,7 +20,7 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z);
 int FindGridShift(int x, int z);
 int TestBoundsCollideStatic(short* bounds, PHD_3DPOS* pos, int radius);
 int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO* coll);
-void AIPickupCollision(short itemNumber);
+void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l);
 void TriggerLaraBlood();

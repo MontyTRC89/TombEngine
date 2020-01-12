@@ -2055,6 +2055,7 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
 		printDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
 		printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
+		printDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
 		printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
 		printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
