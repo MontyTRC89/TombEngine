@@ -681,13 +681,11 @@ void InitialiseLara(int restore)
 	Lara.skelebob = 0;
 
 	short gun = WEAPON_NONE;
-	if (LaraDrawType != LARA_YOUNG)
-	{
-		if (Objects[ID_PISTOLS_ITEM].loaded)
-			gun = WEAPON_PISTOLS;
-		else if (Objects[ID_HK_ITEM].loaded)
-			gun = WEAPON_HK;
-	}
+
+	if (Objects[ID_PISTOLS_ITEM].loaded)
+		gun = WEAPON_PISTOLS;
+	else if (Objects[ID_HK_ITEM].loaded)
+		gun = WEAPON_HK;
 
 	Lara.lastGunType = Lara.gunType = Lara.requestGunType = gun;
 
