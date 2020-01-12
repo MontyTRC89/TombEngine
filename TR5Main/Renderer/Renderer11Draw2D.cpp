@@ -1,36 +1,45 @@
 #include "Renderer11.h"
 
-bool Renderer11::DrawBar(int x, int y, int w, int h, int percent, int color1, int color2)
+RendererHUDBar* g_HealthBar;
+RendererHUDBar* g_AirBar;
+RendererHUDBar* g_DashBar;
+
+bool Renderer11::initialiseBars()
 {
-	byte r1 = (color1 >> 16) & 0xFF;
-	byte g1 = (color1 >> 8) & 0xFF;
-	byte b1 = (color1 >> 0) & 0xFF;
-
-	byte r2 = (color2 >> 16) & 0xFF;
-	byte g2 = (color2 >> 8) & 0xFF;
-	byte b2 = (color2 >> 0) & 0xFF;
-
-	float factorX = ScreenWidth / 800.0f;
-	float factorY = ScreenHeight / 600.0f;
-
-	int realX = x * factorX;
-	int realY = y * factorY;
-	int realW = w * factorX;
-	int realH = h * factorY;
-
-	int realPercent = percent / 100.0f * realW;
-
-	for (int i = 0; i < realH; i++)
-		AddLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0, 255);
-
-	for (int i = 0; i < realH; i++)
-		AddLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1, 255);
-
-	AddLine2D(realX, realY, realX + realW, realY, 255, 255, 255, 255);
-	AddLine2D(realX, realY + realH, realX + realW, realY + realH, 255, 255, 255, 255);
-	AddLine2D(realX, realY, realX, realY + realH, 255, 255, 255, 255);
-	AddLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255, 255);
-
+	array<Vector4, 9> healthColors = {
+		//top
+		Vector4(82 / 255.0f,0,0,1),
+		Vector4(36 / 255.0f,46 / 255.0f,0,1),
+		Vector4(0,82 / 255.0f,0,1),
+		//center
+		Vector4(159 / 255.0f,0,0,1),
+		Vector4(78 / 255.0f,81 / 255.0f,0,1),
+		Vector4(0,158 / 255.0f,0,1),
+		//bottom
+		Vector4(82 / 255.0f,0,0,1),
+		Vector4(36 / 255.0f,46 / 255.0f,0,1),
+		Vector4(0,82 / 255.0f,0,1),
+	};
+	g_HealthBar = new RendererHUDBar(m_device, 0, 0, 800, 600, 3, healthColors);
+	return true;
+}
+bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
+{
+	UINT strides = 0;
+	UINT offset = 0;
+	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);	
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetVertexBuffers(0, 1, &bar->vertexBuffer->Buffer, &strides, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetIndexBuffer(bar->indexBuffer->Buffer, DXGI_FORMAT_R32_SINT, 0);
+	m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
+	m_context->VSSetShader(m_vsHUD,NULL,0);
+	m_context->PSSetShader(m_psHUD, NULL,0);
+	m_context->OMSetBlendState(m_states->Opaque(), NULL,0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthNone(),0);
+	m_context->RSSetState(m_states->CullNone());
+	m_context->DrawIndexed(24, 0, 0);
+	
 	return true;
 }
 

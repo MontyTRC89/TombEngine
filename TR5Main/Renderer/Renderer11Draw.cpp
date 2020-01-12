@@ -847,7 +847,7 @@ int Renderer11::drawInventoryScene()
 						PrintString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
-						DrawBar(400, y + 4, 150, 18, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+						//DrawBar(400, y + 4, 150, 18, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
 
 						y += 25;
 
@@ -855,7 +855,7 @@ int Renderer11::drawInventoryScene()
 						PrintString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
-						DrawBar(400, y + 4, 150, 18, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
+						//DrawBar(400, y + 4, 150, 18, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
 
 						y += 25;
 
@@ -2024,7 +2024,7 @@ bool Renderer11::drawScene(bool dump)
 	// Bars
 	int flash = FlashIt();
 	if (DashTimer < 120)
-		DrawBar(630, 32, 150, 12, 100 * (unsigned short)DashTimer / 120, 0xA0A000, 0xA000);
+		//DrawBar(630, 32, 150, 12, 100 * (unsigned short)DashTimer / 120, 0xA0A000, 0xA000);
 	UpdateHealtBar(flash);
 	UpdateAirBar(flash);
 	DrawAllPickups();
