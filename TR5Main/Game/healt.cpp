@@ -15,6 +15,8 @@ int FlashCount = 0;
 int PoisonFlag = 0;
 int DashTimer = 0;
 extern RendererHUDBar* g_HealthBar;
+extern RendererHUDBar* g_DashBar;
+extern RendererHUDBar* g_AirBar;
 extern LaraExtraInfo g_LaraExtra;
 
 void DrawHealthBarOverlay(int value)
@@ -101,7 +103,7 @@ void DrawAirBar(int value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer->DrawBar(value, g_HealthBar);
+		g_Renderer->DrawBar(value, g_AirBar);
 	}
 }
 
@@ -147,7 +149,7 @@ void DrawDashBar(int value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer->DrawBar(value, g_HealthBar);
+		g_Renderer->DrawBar(value, g_DashBar);
 	}
 }
 

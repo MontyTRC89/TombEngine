@@ -82,6 +82,7 @@
     <PostBuildEvent>
       <Command>md "$(TargetDir)\Shaders" 
 xcopy /Y "$(ProjectDir)Shaders\*.fx" "$(TargetDir)\Shaders"
+xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"
 md "$(TargetDir)\Scripts" 
 xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     </PostBuildEvent>
@@ -629,11 +630,21 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <Image Include="C:\Users\Monty\Desktop\Banner.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\DX11_HUD.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    <None Include="Shaders\HUD\DX11_PS_HUD.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
+    <FxCompile Include="Shaders\HUD\DX11_VS_HUD.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <CompileD2DCustomEffect Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileD2DCustomEffect>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
