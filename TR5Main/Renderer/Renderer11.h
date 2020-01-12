@@ -427,6 +427,9 @@ struct CHUDBuffer {
 	Matrix View;
 	Matrix Projection;
 };
+struct CHUDBarBuffer {
+	float Percent;
+};
 struct CCameraMatrixBuffer
 {
 	Matrix View;
@@ -707,6 +710,7 @@ private:
 	ID3D11VertexShader*								m_vsHUD;
 	ID3D11PixelShader*								m_psHUDColor;
 	ID3D11PixelShader*								m_psHUDTexture;
+	ID3D11PixelShader*								m_psHUDBarColor;
 
 	ID3D11ShaderResourceView* m_shadowMapRV;
 	ID3D11Texture2D* m_shadowMapTexture;
@@ -730,6 +734,8 @@ private:
 	ID3D11Buffer*									m_cbShadowMap;
 	CHUDBuffer										m_stHUD;
 	ID3D11Buffer*									m_cbHUD;
+	CHUDBarBuffer									m_stHUDBar;
+	ID3D11Buffer*									m_cbHUDBar;
 	// Text and sprites
 	SpriteFont*										m_gameFont;
 	SpriteBatch*									m_spriteBatch;

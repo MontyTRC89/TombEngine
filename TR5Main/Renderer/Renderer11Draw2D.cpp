@@ -51,9 +51,9 @@ bool Renderer11::initialiseBars()
 		Vector4(0,82 / 255.0f,0,1),
 	};
 
-	g_HealthBar = new RendererHUDBar(m_device, 20, 32, 150, 8, 2, healthColors);
-	g_AirBar = new RendererHUDBar(m_device, 630, 32, 150, 8, 2, airColors);
-	g_DashBar = new RendererHUDBar(m_device, 630, 32+8+4, 150, 8, 2, dashColors);
+	g_HealthBar = new RendererHUDBar(m_device, 20, 32, 150, 8, 1, healthColors);
+	g_AirBar = new RendererHUDBar(m_device, 630, 32, 150, 8, 1, airColors);
+	g_DashBar = new RendererHUDBar(m_device, 630, 32+8+4, 150, 8, 1, dashColors);
 	return true;
 }
 bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
@@ -76,15 +76,19 @@ bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
 	m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
 	m_context->RSSetState(m_states->CullNone());
 	m_context->DrawIndexed(56, 0, 0);
+
 	
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetVertexBuffers(0, 1, &bar->vertexBuffer->Buffer, &strides, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetIndexBuffer(bar->indexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_stHUDBar.Percent = percent;
+	updateConstantBuffer(m_cbHUDBar, &m_stHUDBar, sizeof(CHUDBarBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
+	m_context->PSSetConstantBuffers(0, 1, &m_cbHUDBar);
 	m_context->VSSetShader(m_vsHUD,NULL,0);
-	m_context->PSSetShader(m_psHUDColor, NULL,0);
+	m_context->PSSetShader(m_psHUDBarColor, NULL,0);
 	m_context->OMSetBlendState(m_states->Opaque(), NULL,0xFFFFFFFF);
 	m_context->OMSetDepthStencilState(m_states->DepthNone(),NULL);
 	m_context->RSSetState(m_states->CullNone());
