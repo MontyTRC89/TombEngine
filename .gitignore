@@ -1,11 +1,4 @@
-Build/audio
-Build/data
-Build/movie
-Build/screens
-Build/TR5Main.pdb
-Build/TR5Main.lib
-Build/TR5Main.ilk
-Build/TR5Main.exp
+Build/
 TR5Main/CustomObjects/
 TR5Main/x64/
 TR5Main/Debug/
