@@ -3,11 +3,9 @@
 #include "..\Global\global.h"
 
 #define GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
-#define TriggerActive ((int (__cdecl*)(ITEM_INFO*)) 0x004175B0)
 #define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 #define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
-#define ExplodeItemNode ((int (__cdecl*)(ITEM_INFO*, int, int, int)) 0x0041ABF0)
 #define DoRayBox_sub_401523 ((int (__cdecl*)(PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*)) 0x00401523)
 
 #define TRIG_BITS(T) ((T & 0x3fff) >> 10)
@@ -55,6 +53,8 @@ void RemoveRoomFlipItems(ROOM_INFO* r);
 void PlaySoundTrack(short track, short flags);
 void RumbleScreen();
 void RefreshCamera(short type, short* data);
+int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
+int TriggerActive(ITEM_INFO* item);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();

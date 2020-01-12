@@ -38,7 +38,7 @@ void InitialiseCivvy(short item_number)
 	item = &Items[item_number];
 	InitialiseCreature(item_number);
 
-	/* Start Civvy in stop pose*/
+	/* Start Civvy in stop pose */
 	item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_STOP_ANIM;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->currentAnimState = item->goalAnimState = CIVVY_STOP;
@@ -115,7 +115,7 @@ void CivvyControl(short item_number)
 		if ((lara_info.distance < CIVVY_AWARE_DISTANCE || item->hitStatus || TargetVisible(item, &lara_info)) && !(item->aiBits & FOLLOW)) //Maybe move this into LONDSEC_WAIT case?
 		{
 			if (!civvy->alerted)
-				SoundEffect(SFX_AL, &item->pos, 0);
+				SoundEffect(300, &item->pos, 0);
 			AlertAllGuards(item_number);
 		}
 		civvy->enemy = real_enemy;
@@ -339,7 +339,6 @@ void CivvyControl(short item_number)
 	CreatureJoint(item, 1, torso_x);
 	CreatureJoint(item, 2, head);
 
-	/* Actually do animation allowing for collisions */
 	if (item->currentAnimState < CIVVY_DEATH) // Know CLIMB3 marks the start of the CLIMB states
 	{
 		switch (CreatureVault(item_number, angle, 2, CIVVY_VAULT_SHIFT))

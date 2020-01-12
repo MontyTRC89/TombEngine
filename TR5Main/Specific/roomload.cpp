@@ -9,6 +9,7 @@
 #include "..\Game\spotcam.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "..\Game\control.h"
+#include "..\Game\pickup.h"
 
 #include "IO/ChunkId.h"
 #include "IO/ChunkReader.h"
@@ -727,6 +728,68 @@ void LoadSprites()
 			Objects[spriteID].nmeshes = negLength;
 			Objects[spriteID].meshIndex = offset;
 			Objects[spriteID].loaded = true;
+		}
+	}
+}
+
+void GetCarriedItems()
+{
+	int i;
+	ITEM_INFO* item, *item2;
+	short linknum;
+
+	for (i = 0; i < LevelItems; ++i)
+		Items[i].carriedItem = NO_ITEM;
+	for (i = 0; i < LevelItems; ++i)
+	{
+		item = &Items[i];
+		if (Objects[item->objectNumber].intelligent || item->objectNumber >= ID_SEARCH_OBJECT1 && item->objectNumber <= ID_SEARCH_OBJECT3)
+		{
+			for (linknum = Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+			{
+				item2 = &Items[linknum];
+				if (abs(item2->pos.xPos - item->pos.xPos) < 512
+					&& abs(item2->pos.zPos - item->pos.zPos) < 512
+					&& abs(item2->pos.yPos - item->pos.yPos) < 256
+					&& Objects[item2->objectNumber].collision == PickupCollision)
+				{
+					item2->carriedItem = item->carriedItem;
+					item->carriedItem = linknum;
+					RemoveDrawnItem(linknum);
+					item2->roomNumber = NO_ROOM;
+				}
+			}
+		}
+	}
+}
+
+void GetAIPickups()
+{
+	int i, num;
+	ITEM_INFO* item;
+	AIOBJECT* object;
+
+	for (i = 0; i < LevelItems; ++i)
+	{
+		item = &Items[i];
+		if (Objects[item->objectNumber].intelligent)
+		{
+			item->aiBits = 0;
+			for (num = 0; num < nAIObjects; ++num)
+			{
+				object = &AIObjects[num];
+				if (abs(object->x - item->pos.xPos) < 512
+					&& abs(object->z - item->pos.zPos) < 512
+					&& object->roomNumber == item->roomNumber
+					&& object->objectNumber < ID_AI_PATROL2)
+				{
+					item->aiBits = (1 << object->objectNumber - ID_AI_GUARD) & 0x1F;
+					item->itemFlags[3] = object->triggerFlags;
+					if (object->objectNumber != ID_AI_GUARD)
+						object->roomNumber = NO_ROOM;
+				}
+			}
+			item->TOSSPAD |= item->aiBits << 8 | (char) item->itemFlags[3];
 		}
 	}
 }

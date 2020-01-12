@@ -407,18 +407,16 @@ void RemoveObjectFromInventory(short objectNumber, int count)
 void CollectCarriedItems(ITEM_INFO* item) 
 {
 	short pickupNumber = item->carriedItem;
-	if (pickupNumber != NO_ITEM)
+	while (pickupNumber != NO_ITEM)
 	{
-		while (pickupNumber != NO_ITEM)
-		{
-			ITEM_INFO* pickup = &Items[pickupNumber];
+		ITEM_INFO* pickup = &Items[pickupNumber];
 
-			AddDisplayPickup(pickup->objectNumber);
-			KillItem(pickupNumber);
+		AddDisplayPickup(pickup->objectNumber);
+		KillItem(pickupNumber);
 
-			pickupNumber = pickup->carriedItem;
-		}
+		pickupNumber = pickup->carriedItem;
 	}
+	item->carriedItem = NO_ITEM;
 }
 
 /*void SearchObjectCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
