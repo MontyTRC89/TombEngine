@@ -457,14 +457,7 @@ struct RendererAnimatedTexture
 struct RendererAnimatedTextureSet 
 {
 	int NumTextures;
-	RendererAnimatedTexture** Textures;
-
-	~RendererAnimatedTextureSet()
-	{
-		for (int i = 0; i < NumTextures; i++)
-			delete Textures[i];
-		free(Textures);
-	}
+	vector<RendererAnimatedTexture> Textures;
 };
 
 struct RendererBucket
@@ -760,7 +753,7 @@ private:
 	RendererSpriteSequence**						m_spriteSequences;
 	unordered_map<unsigned int, RendererMesh*>		m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
-	RendererAnimatedTextureSet**					m_animatedTextureSets;
+	vector<RendererAnimatedTextureSet>				m_animatedTextureSets;
 	int												m_numAnimatedTextureSets;
 	int												m_currentCausticsFrame;
 	RendererUnderwaterDustParticle					m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];

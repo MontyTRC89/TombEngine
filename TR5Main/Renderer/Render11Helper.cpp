@@ -81,11 +81,11 @@ void Renderer11::updateAnimatedTextures()
 			for (int p = 0; p < bucket->Polygons.size(); p++)
 			{
 				RendererPolygon* polygon = &bucket->Polygons[p];
-				RendererAnimatedTextureSet* set = m_animatedTextureSets[polygon->AnimatedSet];
+				RendererAnimatedTextureSet& const set = m_animatedTextureSets[polygon->AnimatedSet];
 				int textureIndex = -1;
-				for (int j = 0; j < set->NumTextures; j++)
+				for (int j = 0; j < set.NumTextures; j++)
 				{
-					if (set->Textures[j]->Id == polygon->TextureId)
+					if (set.Textures[j].Id == polygon->TextureId)
 					{
 						textureIndex = j;
 						break;
@@ -94,17 +94,17 @@ void Renderer11::updateAnimatedTextures()
 				if (textureIndex == -1)
 					continue;
 
-				if (textureIndex == set->NumTextures - 1)
+				if (textureIndex == set.NumTextures - 1)
 					textureIndex = 0;
 				else
 					textureIndex++;
 
-				polygon->TextureId = set->Textures[textureIndex]->Id;
+				polygon->TextureId = set.Textures[textureIndex].Id;
 
 				for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
 				{
-					bucket->Vertices[polygon->Indices[v]].UV.x = set->Textures[textureIndex]->UV[v].x;
-					bucket->Vertices[polygon->Indices[v]].UV.y = set->Textures[textureIndex]->UV[v].y;
+					bucket->Vertices[polygon->Indices[v]].UV.x = set.Textures[textureIndex].UV[v].x;
+					bucket->Vertices[polygon->Indices[v]].UV.y = set.Textures[textureIndex].UV[v].y;
 				}
 			}
 		}
@@ -668,10 +668,10 @@ int Renderer11::getAnimatedTextureInfo(short textureId)
 {
 	for (int i = 0; i < m_numAnimatedTextureSets; i++)
 	{
-		RendererAnimatedTextureSet* set = m_animatedTextureSets[i];
-		for (int j = 0; j < set->NumTextures; j++)
+		RendererAnimatedTextureSet& const set = m_animatedTextureSets[i];
+		for (int j = 0; j < set.NumTextures; j++)
 		{
-			if (set->Textures[j]->Id == textureId)
+			if (set.Textures[j].Id == textureId)
 				return i;
 		}
 	}
