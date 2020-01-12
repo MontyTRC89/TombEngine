@@ -27,7 +27,10 @@
 
 #define DX11_RELEASE(x) if (x != NULL) x->Release()
 #define DX11_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-
+constexpr int REFERENCE_RES_WIDTH = 800;
+constexpr int REFERENCE_RES_HEIGHT = 600;
+constexpr float HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
+constexpr float HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace std;
@@ -37,7 +40,6 @@ struct RendererDisplayMode {
 	int Height;
 	int RefreshRate;
 };
-
 struct RendererVideoAdapter {
 	string Name;
 	int Index;
@@ -338,6 +340,11 @@ public:
 	}
 };
 
+typedef struct RendererHUDBar {
+	VertexBuffer* vertexBuffer;
+	IndexBuffer* indexBuffer;
+	RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4,9> colors);
+};
 struct RendererStringToDraw
 {
 	float X;
@@ -404,6 +411,9 @@ struct ShaderLight {
 	float Range;
 };
 
+struct CHUDBuffer {
+	Matrix ViewProjection;
+};
 struct CCameraMatrixBuffer
 {
 	Matrix View;
@@ -681,7 +691,8 @@ private:
 	ID3D11PixelShader*								m_psFullScreenQuad;
 	ID3D11VertexShader*								m_vsShadowMap;
 	ID3D11PixelShader*								m_psShadowMap;
-
+	ID3D11VertexShader*								m_vsHUD;
+	ID3D11PixelShader*								m_psHUD;
 
 	ID3D11ShaderResourceView* m_shadowMapRV;
 	ID3D11Texture2D* m_shadowMapTexture;
@@ -703,7 +714,8 @@ private:
 	ID3D11Buffer*									m_cbRoom;
 	CShadowLightBuffer   							m_stShadowMap;
 	ID3D11Buffer*									m_cbShadowMap;
-
+	CHUDBuffer										m_stHUD;
+	ID3D11Buffer*									m_cbHUD;
 	// Text and sprites
 	SpriteFont*										m_gameFont;
 	SpriteBatch*									m_spriteBatch;
@@ -879,7 +891,7 @@ private:
 	bool											isInRoom(int x, int y, int z, short roomNumber);
 	bool											drawColoredQuad(int x, int y, int w, int h, Vector4 color);
 	bool											initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
-
+	bool											initialiseBars();
 public:
 	Matrix											View;
 	Matrix											Projection;
@@ -923,7 +935,7 @@ public:
 	void											AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void											AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
-	bool											DrawBar(int x, int y, int w, int h, int percent, int color1, int color2);
+	bool DrawBar(float percent, const RendererHUDBar* const bar);
 private:
 	void drawFootprints();
 };

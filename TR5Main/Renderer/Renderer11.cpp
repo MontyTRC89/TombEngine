@@ -263,3 +263,116 @@ ID3D11Buffer* Renderer11::createConstantBuffer(int size)
 
 
 
+RendererHUDBar::RendererHUDBar(ID3D11Device* m_device,int x, int y, int w, int h, int borderSize, array<Vector4,9> colors)
+{
+
+	array<Vector3, 9> barVertices = {
+		Vector3(x, y, 0),
+		Vector3(x + (w / 2.0f), y, 0),
+		Vector3(x + w, y, 0),
+		Vector3(x, (y + h / 2.0f), 0),
+		Vector3(x + (w / 2.0f), (y + h / 2.0f), 0),
+		Vector3(x + w, (y + h / 2.0f), 0),
+		Vector3(x, y + h, 0),
+		Vector3(x + (w / 2.0f), y + h, 0),
+		Vector3(x + w, y + h, 0),
+
+	};
+	array<Vector3, 16> barBorderVertices = {
+		//top left
+		Vector3(x - HUD_UNIT_X,y - HUD_UNIT_Y,0),
+		Vector3(x,y - HUD_UNIT_Y,0),
+		Vector3(x,y,0),
+		Vector3(x - HUD_UNIT_X,y,0),
+		//top right
+		Vector3(x + w,y - HUD_UNIT_Y,0),
+		Vector3(x + w + HUD_UNIT_X,y - HUD_UNIT_Y,0),
+		Vector3(x + w + HUD_UNIT_X,y,0),
+		Vector3(x + w,y,0),
+		//bottom right
+		Vector3(x + w,1,0),
+		Vector3(x + w + HUD_UNIT_X,y + h,0),
+		Vector3(x + w + HUD_UNIT_X,y + h + HUD_UNIT_Y,0),
+		Vector3(x + w,y + h + HUD_UNIT_Y,0),
+		//bottom left
+		Vector3(x - HUD_UNIT_X,y + h,0),
+		Vector3(x,y + h,0),
+		Vector3(x,y + h + HUD_UNIT_Y,0),
+		Vector3(x - HUD_UNIT_X,y + h + HUD_UNIT_Y,0)
+	};
+
+	array<Vector2, 9> barUVs = {
+		Vector2(0,0),
+		Vector2(0.5,0),
+		Vector2(1,0),
+		Vector2(0,0.5),
+		Vector2(0.5,0.5),
+		Vector2(1,0.5),
+		Vector2(0,1),
+		Vector2(0.5,1),
+		Vector2(1,1),
+	};
+	array<Vector2, 16> barBorderUVs = {
+		//top left
+		Vector2(0,0),
+		Vector2(0.25,0),
+		Vector2(0.25,0.25),
+		Vector2(0,0.25),
+		//top right
+		Vector2(0.75,0),
+		Vector2(1,0),
+		Vector2(1,0.25),
+		Vector2(0.75,0.25),
+		//bottom right
+		Vector2(0.75,0.75),
+		Vector2(1,0.75),
+		Vector2(1,1),
+		Vector2(0.75,1),
+		//bottom left
+		Vector2(0,0.75),
+		Vector2(0.25,0.75),
+		Vector2(0.25,1),
+		Vector2(0,1),
+	};
+
+	array<int, 24> barIndices = {
+		0,1,3,1,4,3,
+		//
+		1,2,4,2,5,4,
+		//
+		3,4,6,4,7,6,
+		//
+		4,5,7,5,8,7
+	};
+	array<int, 56> barBorderIndices = {
+		//top left
+		0,1,3,1,2,3,
+		//top center
+		1,4,2,4,7,2,
+		//top right
+		4,5,7,5,6,7,
+		//right
+		7,6,8,6,9,8,
+		//bottom right
+		8,9,11,9,10,11,
+		//bottom
+		13,8,14,8,11,14,
+		//bottom left
+		12,13,15,13,14,15,
+		//left
+		3,2,12,2,13,12,
+		//center
+		2,7,13,7,8,13
+	};
+	Matrix hudMatrix = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0))* Matrix::CreateOrthographic(REFERENCE_RES_WIDTH, REFERENCE_RES_HEIGHT, -10, 10);
+	Vector4 vec = XMVector4Transform(Vector4(x + (w / 2.0f), y, 0, 1), hudMatrix);
+	array<RendererVertex, 9> vertices;
+	for (int i = 0; i < 9; i++) {
+
+		vertices[i].Position = barVertices[i];
+		vertices[i].Color = colors[i];
+		vertices[i].UV = barUVs[i];
+	}
+	vertexBuffer = VertexBuffer::Create(m_device, vertices.size(), vertices._Elems);
+	indexBuffer = IndexBuffer::Create(m_device, barIndices.size(), barIndices._Elems);
+}

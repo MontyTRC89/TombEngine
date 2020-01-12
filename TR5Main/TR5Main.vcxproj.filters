@@ -871,12 +871,13 @@
     <None Include="Shaders\DX11_Hairs.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
     <None Include="Shaders\DX11_Sky.fx" />
-    <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Solid.fx" />
     <None Include="Shaders\DX11_Inventory.fx" />
     <None Include="Shaders\DX11_FullscreenQuad.fx" />
     <None Include="Shaders\DX11_ShadowMap.fx" />
     <None Include="RuleSet.ruleset" />
+    <None Include="Shaders\DX11_Sprites.fx" />
+    <None Include="Shaders\DX11_HUD.fx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">
