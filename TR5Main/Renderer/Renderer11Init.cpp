@@ -164,6 +164,13 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	if (m_psShadowMap == NULL)
 		return false;
 
+	m_vsHUD = compileVertexShader("Shaders\\DX11_HUD.fx", "VS", "vs_4_0", &blob);
+	if (m_vsHUD == NULL)
+		return false;
+	m_psHUD = compilePixelShader("Shaders\\DX11_HUD.fx", "PS", "ps_4_0", &blob);
+	if (m_psHUD == NULL)
+		return false;
+
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
 	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
@@ -172,6 +179,10 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
 	m_cbShadowMap = createConstantBuffer(sizeof(CShadowLightBuffer));
 	m_cbRoom = createConstantBuffer(sizeof(CRoomBuffer));
+	//Prepare HUD Constant buffer
+	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
+	m_stHUD.ViewProjection = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, -1), Vector3(0, -1, 0))* Matrix::CreateOrthographic(REFERENCE_RES_WIDTH, REFERENCE_RES_HEIGHT, -10, 10);
+	updateConstantBuffer(m_cbHUD, &m_stHUD, sizeof(CHUDBuffer));
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
@@ -211,7 +222,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_device->CreateBlendState(&blendStateDesc, &m_subtractiveBlendState);
-
+	initialiseBars();
 	return true;
 }
 
