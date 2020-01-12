@@ -657,12 +657,13 @@ void InitialiseLara(int restore)
 	else
 	{
 		memset(&Lara, 0, sizeof(LARA_INFO));
+		ZeroMemory(&g_LaraExtra, sizeof(LaraExtraInfo));
+
 		g_LaraExtra.ExtraAnim = -1;
 		g_LaraExtra.Vehicle = NO_ITEM;
-		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = Objects[ID_PISTOLS_ITEM].loaded;
 	}
 
-	Lara.look = TRUE;
+	Lara.look = true;
 	Lara.itemNumber = itemNumber;
 	Lara.hitDirection = -1;
 	Lara.air = 1800;
@@ -676,43 +677,32 @@ void InitialiseLara(int restore)
 	Lara.highestLocation = -1;
 	Lara.ropePtr = -1;
 	LaraItem->hitPoints = 1000;
-
-	/*
-	TODO: scripting
-	for (i = 0; i < gfNumPickups; i++)
-	{
-		DEL_picked_up_object(convert_invobto_obj(gfPickups[i]));
-	}
-
-	gfNumPickups = 0;*/
-
 	Lara.gunStatus = LG_NO_ARMS;
+	Lara.skelebob = 0;
 
 	short gun = WEAPON_NONE;
-
-	if (LaraDrawType != LARA_YOUNG && Objects[ID_PISTOLS_ITEM].loaded)
-		gun = WEAPON_PISTOLS;
-
-	//if ((gfLevelFlags & GF_LVOP_TRAIN) && Objects[HK_ITEM].loaded && (Lara.hk_type_carried & WTYPE_PRESENT))
-	//	gun = WEAPON_HK;
+	if (LaraDrawType != LARA_YOUNG)
+	{
+		if (Objects[ID_PISTOLS_ITEM].loaded)
+			gun = WEAPON_PISTOLS;
+		else if (Objects[ID_HK_ITEM].loaded)
+			gun = WEAPON_HK;
+	}
 
 	Lara.lastGunType = Lara.gunType = Lara.requestGunType = gun;
 
 	LaraInitialiseMeshes();
 
-	Lara.skelebob = 0;
-
-	if (Objects[ID_PISTOLS_ITEM].loaded)
+	if (gun == WEAPON_PISTOLS)
 	{
 		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = true;
 		g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1] = -1;
 	}
-
-	// DEBUG LINES
-	//g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
-	//g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
-	//g_LaraExtra.Weapons[WEAPON_UZI].Present = true;
-	//g_LaraExtra.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
+	else if (gun == WEAPON_HK)
+	{
+		g_LaraExtra.Weapons[WEAPON_HK].Present = true;
+		g_LaraExtra.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] = 100;
+	}
 
 	g_LaraExtra.Binoculars = true;
 
@@ -729,50 +719,7 @@ void InitialiseLara(int restore)
 
 	DashTimer = 120;
 
-	/*for (i = 0; i < gfNumTakeaways; i++)
-	{
-		NailInvItem(convert_invobto_obj(gfTakeaways[i]));
-	}
-
-	gfNumTakeaways = 0;*/
-
 	//weapons[WEAPON_REVOLVER].damage = gfCurrentLevel >= LVL5_BASE ? 15 : 6;
-
-	/*switch (gfCurrentLevel)
-	{
-	case 6u:
-		Lara.pickupitems &= 0xFFF7u;
-
-		Lara.puzzleitems[0] = 10;
-		return;
-	case 5u:
-		Lara.pickupitems = 0;
-		Lara.pickupitemscombo = 0;
-		Lara.keyitems = 0;
-		Lara.keyitemscombo = 0;
-		Lara.puzzleitemscombo = 0;
-
-		memset(Lara.puzzleitems, 0, 12);
-		return;
-	case 7u:
-		Lara.pickupitems = 0;
-
-		Lara.puzzleitems[0] = 0;
-		return;
-	case 0xCu:
-		Lara.pickupitems &= 0xFFFEu;
-
-		Lara.puzzleitems[2] = 0;
-		Lara.puzzleitems[3] = 0;
-		break;
-	case 0xEu:
-		Lara.pickupitems &= 0xFFFDu;
-		break;
-	default:
-		if (gfCurrentLevel < LVL5_THIRTEENTH_FLOOR || gfCurrentLevel > LVL5_RED_ALERT)
-			Lara.pickupitems &= 0xFFF7u;
-		return;
-	}*/
 
 	Lara.bottle = 0;
 	Lara.wetcloth = CLOTH_MISSING;

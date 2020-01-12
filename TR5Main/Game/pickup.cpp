@@ -625,7 +625,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 
-		RemoveObjectFromInventory(item->objectNumber - 70, 1);
+		RemoveObjectFromInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1), 1);
 
 		if (flag == 1)
 		{
@@ -722,7 +722,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->animNumber = ANIMATION_LARA_USE_KEYCARD;
 				else
 				{
-					RemoveObjectFromInventory(item->objectNumber - 62, 1);
+					RemoveObjectFromInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1), 1);
 					l->animNumber = ANIMATION_LARA_USE_KEY;
 				}
 				l->currentAnimState = STATE_LARA_INSERT_KEY;

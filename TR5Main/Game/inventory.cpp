@@ -269,7 +269,7 @@ void Inventory::LoadObjects(bool isReload)
 		}
 	}
 
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
+	/*g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
 	g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0] = 1000;
 	g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
 	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = true;
@@ -296,8 +296,8 @@ void Inventory::LoadObjects(bool isReload)
 		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
 
 		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Present = true;
-		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;*/
-	}
+		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;
+	}*/
 
 	// Now fill the rings
 	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_YOUNG)
@@ -422,49 +422,49 @@ void Inventory::LoadObjects(bool isReload)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROWBAR);
 
 	int i;
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < NUM_PUZZLES; i++)
 	{
 		if (g_LaraExtra.Puzzles[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1);
 	}
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < NUM_PUZZLES * 2; i++)
 	{
 		if (g_LaraExtra.PuzzlesCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1_COMBO1);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < NUM_KEYS; i++)
 	{
 		if (g_LaraExtra.Keys[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1);
 	}
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < NUM_KEYS * 2; i++)
 	{
 		if (g_LaraExtra.KeysCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1_COMBO1);
 	}
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < NUM_PICKUPS; i++)
 	{
 		if (g_LaraExtra.Pickups[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < NUM_PICKUPS * 2; i++)
 	{
 		if (g_LaraExtra.PickupsCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1_COMBO1);
 	}
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < NUM_EXAMINES; i++)
 	{
 		if (g_LaraExtra.Examines[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_EXAMINE1);
 	}
 
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < NUM_EXAMINES * 2; i++)
 	{
 		if (g_LaraExtra.ExaminesCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_EXAMINE1_COMBO1);
