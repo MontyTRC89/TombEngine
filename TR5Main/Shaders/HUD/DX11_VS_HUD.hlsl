@@ -28,8 +28,3 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.UV = input.UV;
 	return output;
 }
-
-half4 PS(PixelShaderInput input) : SV_TARGET
-{
-	return input.Color;
-}
