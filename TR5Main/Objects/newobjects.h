@@ -270,6 +270,8 @@ void ControlLondBossPlasmaBall(short fx_number);
 void InitialiseLondonBoss(short item_number);
 void LondonBossControl(short item_number);
 void S_DrawLondonBoss(ITEM_INFO* item);
+void InitialiseCivvy(short item_number);
+void CivvyControl(short item_number);
 
 // TR4 object
 void InitialiseWildBoar(short itemNum);
