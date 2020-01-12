@@ -193,8 +193,8 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{
-		m_items[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
-		m_effects[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
+		m_items[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+		m_effects[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
 	m_textureAtlas = NULL;
