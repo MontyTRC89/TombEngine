@@ -32,143 +32,6 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace std;
 
-template <class T>
-class PreallocatedVector 
-{
-private:
-	T**			m_objects;
-	int		m_maxItems;
-	int		m_numItems;
-	int		m_startSize;
-
-public:
-	PreallocatedVector()
-	{
-		m_objects = NULL;
-		m_maxItems = 0;
-		m_startSize = 0;
-		m_numItems = 0;
-	}
-
-	~PreallocatedVector()
-	{
-	}
-
-	inline void Reserve(int numItems)
-	{
-		m_objects = (T**)malloc(sizeof(T*) * numItems);
-		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
-		m_maxItems = numItems;
-		m_numItems = 0;
-		m_startSize = numItems;
-	}
-
-	inline void Clear()
-	{
-		m_numItems = 0;
-		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
-	}
-
-	inline int Size()
-	{
-		return m_numItems;
-	}
-
-	inline void Sort(int(*compareFunc)(T*, T*))
-	{
-		qsort(m_objects, m_numItems, sizeof(T), compareFunc);
-	}
-
-	inline T*& operator[] (int x) {
-		if (x >= m_maxItems)
-			return m_objects[0];
-		return m_objects[x];
-	}
-
-	inline void Add(T* value)
-	{
-		if (m_numItems >= m_maxItems)
-			return;
-		m_objects[m_numItems++] = value;
-	}
-};
-
-template <class T, class U>
-class PreallocatedDictionary
-{
-private:
-	T**			m_keys;
-	U**			m_objects;
-	int		m_maxItems;
-	int		m_numItems;
-	int		m_startSize;
-
-public:
-	PreallocatedDictionary()
-	{
-		m_keys = NULL;
-		m_objects = NULL;
-		m_maxItems = 0;
-		m_startSize = 0;
-		m_numItems = 0;
-	}
-
-	~PreallocatedDictionary()
-	{
-		free(m_keys);
-		free(m_objects);
-	}
-
-	inline void Reserve(int numItems)
-	{
-		m_keys = (T**)malloc(sizeof(T*) * numItems);
-		m_objects = (U**)malloc(sizeof(U*) * numItems);
-		ZeroMemory(m_keys, sizeof(T*) * m_maxItems);
-		ZeroMemory(m_objects, sizeof(U*) * m_maxItems);
-		m_maxItems = numItems;
-		m_numItems = 0;
-		m_startSize = numItems;
-	}
-
-	inline void Clear()
-	{
-		m_numItems = 0;
-		ZeroMemory(m_keys, sizeof(T*) * m_maxItems);
-		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
-	}
-
-	inline int Size()
-	{
-		return m_numItems;
-	}
-
-	inline T*& operator[] (int x) {
-		return m_objects[x];
-	}
-
-	inline bool KeyExists(T* key)
-	{
-		for (int i = 0; i < m_numItems; i++)
-			if (m_keys[i] == key)
-				return true;
-		return false;
-	}
-
-	inline U* Get(T* key)
-	{
-		for (int i = 0; i < m_numItems; i++)
-			if (m_keys[i] == key)
-				return m_objects[i];
-		return NULL;
-	}
-
-	inline void Add(T* key, U* value)
-	{
-		m_keys[m_numItems] = key;
-		m_objects[m_numItems++] = value;
-	}
-};
-
 struct RendererDisplayMode {
 	int Width;
 	int Height;
@@ -635,7 +498,7 @@ struct RendererRoom
 	bool Visited;
 	float Distance;
 	int RoomNumber;
-	PreallocatedVector<RendererLight> LightsToDraw;
+	vector<RendererLight*> LightsToDraw;
 };
 
 struct RendererRoomNode {
@@ -653,7 +516,7 @@ struct RendererItem {
 	Matrix Scale;
 	Matrix AnimationTransforms[32];
 	int NumMeshes;
-	PreallocatedVector<RendererLight> Lights;
+	vector<RendererLight*> Lights;
 };
 
 struct RendererMesh
@@ -668,7 +531,7 @@ struct RendererEffect {
 	FX_INFO* Effect;
 	Matrix World;
 	RendererMesh* Mesh;
-	PreallocatedVector<RendererLight> Lights;
+	vector<RendererLight*> Lights;
 };
 
 struct RendererObject

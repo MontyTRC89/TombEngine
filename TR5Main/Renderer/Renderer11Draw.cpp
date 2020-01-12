@@ -385,8 +385,8 @@ bool Renderer11::drawGunShells()
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-	m_stLights.NumLights = item->Lights.Size();
-	for (int j = 0; j < item->Lights.Size(); j++)
+	m_stLights.NumLights = item->Lights.size();
+	for (int j = 0; j < item->Lights.size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -2165,8 +2165,8 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-	m_stLights.NumLights = item->Lights.Size();
-	for (int j = 0; j < item->Lights.Size(); j++)
+	m_stLights.NumLights = item->Lights.size();
+	for (int j = 0; j < item->Lights.size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -2339,8 +2339,8 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	{
 		RendererRoom* room = m_roomsToDraw[i];
 
-		m_stLights.NumLights = room->LightsToDraw.Size();
-		for (int j = 0; j < room->LightsToDraw.Size(); j++)
+		m_stLights.NumLights = room->LightsToDraw.size();
+		for (int j = 0; j < room->LightsToDraw.size(); j++)
 			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));
 		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
