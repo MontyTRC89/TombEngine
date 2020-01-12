@@ -102,10 +102,6 @@ void Renderer11::FreeRendererData()
 		DX11_DELETE(m_sprites[i]);
 	free(m_sprites);
 
-	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
-		DX11_DELETE(m_spriteSequences[i]);
-	free(m_spriteSequences);
-
 	for (int i = 0; i < NUM_STATICS; i++)
 		DX11_DELETE(m_staticObjects[i]);
 	free(m_staticObjects);
