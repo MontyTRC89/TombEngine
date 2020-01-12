@@ -23,17 +23,18 @@ bool Renderer11::PrepareDataForTheRenderer()
 	short* animatedPtr = AnimatedTextureRanges;
 	animatedPtr++;
 
-	m_animatedTextureSets = (RendererAnimatedTextureSet * *)malloc(sizeof(RendererAnimatedTextureSet*) * NUM_ANIMATED_SETS);
+	m_animatedTextureSets = vector<RendererAnimatedTextureSet>(NUM_ANIMATED_SETS);
 	m_numAnimatedTextureSets = numSets;
 
 	for (int i = 0; i < numSets; i++)
 	{
-		RendererAnimatedTextureSet* set = new RendererAnimatedTextureSet();
+		m_animatedTextureSets[i] = RendererAnimatedTextureSet();
+		RendererAnimatedTextureSet& const set = m_animatedTextureSets[i];
 		short numTextures = *animatedPtr + 1;
 		animatedPtr++;
 
-		set->Textures = (RendererAnimatedTexture * *)malloc(sizeof(RendererAnimatedTexture) * numTextures);
-		set->NumTextures = numTextures;
+		set.Textures = vector<RendererAnimatedTexture>(numTextures);
+		set.NumTextures = numTextures;
 
 		for (int j = 0; j < numTextures; j++)
 		{
@@ -42,22 +43,19 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 			OBJECT_TEXTURE* texture = &ObjectTextures[textureId];
 			int tile = texture->tileAndFlag & 0x7FFF;
-
-			RendererAnimatedTexture* newTexture = new RendererAnimatedTexture();
-			newTexture->Id = textureId;
+			set.Textures[j] = RendererAnimatedTexture();
+			RendererAnimatedTexture& const newTexture = set.Textures[j];
+			newTexture.Id = textureId;
 
 			for (int k = 0; k < 4; k++)
 			{
 				float x = (texture->vertices[k].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 				float y = (texture->vertices[k].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 
-				newTexture->UV[k] = Vector2(x, y);
+				newTexture.UV[k] = Vector2(x, y);
 			}
 
-			set->Textures[j] = newTexture;
 		}
-
-		m_animatedTextureSets[i] = set;
 	}
 
 	// Step 1: create the texture atlas
