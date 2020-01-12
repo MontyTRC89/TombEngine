@@ -142,7 +142,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		r.RoomNumber = i;
 		r.Room = room;
 		r.AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
-		r.LightsToDraw.Reserve(32);
+		r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
 
 		if (room->NumVertices == 0)
 			continue;
