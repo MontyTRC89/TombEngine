@@ -32,7 +32,7 @@ void DrawHealthBarOverlay(int value)
 	}
 }
 
-void DrawHealthBar(int value)
+void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
@@ -87,11 +87,11 @@ void UpdateHealtBar(int flash)
 	{
 		if (!BinocularRange && !SniperOverlay)
 		{
-			DrawHealthBar(hitPoints / 10);
+			DrawHealthBar(hitPoints / 1000.0f);
 		}
 		else
 		{
-			DrawHealthBarOverlay(hitPoints / 10);
+			DrawHealthBarOverlay(hitPoints / 1000.0f);
 		}
 	}
 
@@ -99,7 +99,7 @@ void UpdateHealtBar(int flash)
 		PoisonFlag--;
 }
 
-void DrawAirBar(int value)
+void DrawAirBar(float value)
 {
 	if (CurrentLevel)
 	{
