@@ -184,17 +184,16 @@ int DrawAllPickups()
 	}
 
 	int pickupIndex = CurrentPickup;
-	int i = 0;
-	do
+	int i;
+	for (i = 0; i < NUM_PICKUPS; ++i)
 	{
 		if (Pickups[pickupIndex].life > 0)
 			break;
-		pickupIndex = (pickupIndex + 1) & 7;
-		i++;
-	} while (i < 8);
+		pickupIndex = pickupIndex + 1 & NUM_PICKUPS - 1;
+	}
 
 	CurrentPickup = pickupIndex;
-	if (i != 8)
+	if (i != NUM_PICKUPS)
 		return g_Renderer->DrawPickup(Pickups[CurrentPickup].objectNumber);
 
 	CurrentPickup = 0;
@@ -223,7 +222,7 @@ void AddDisplayPickup(short objectNumber)
 
 void InitialisePickupDisplay()
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUM_PICKUPS; i++)
 	{
 		DISPLAY_PICKUP* pickup = &Pickups[i];
 		pickup->life = -1;
