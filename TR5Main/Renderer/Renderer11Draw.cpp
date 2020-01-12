@@ -1328,7 +1328,6 @@ bool Renderer11::drawLines2D()
 
 	m_context->VSSetShader(m_vsSolid, NULL, 0);
 	m_context->PSSetShader(m_psSolid, NULL, 0);
-
 	Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth, m_viewport.MaxDepth);
 
 	m_stCameraMatrices.View = Matrix::Identity;
@@ -1782,7 +1781,7 @@ void Renderer11::DrawLoadingScreen(char* fileName)
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		m_swapChain->Present(0, 0);
-
+		m_context->ClearState();
 		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor >= 1.0f)
 		{
 			m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
