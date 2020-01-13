@@ -1962,65 +1962,95 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
 	}
 
+	obj = &Objects[ID_SMASH_OBJECT1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_SMASH_OBJECT1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
-		obj = &Objects[ID_SMASH_OBJECT2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
-		obj = &Objects[ID_SMASH_OBJECT3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
-		obj = &Objects[ID_SMASH_OBJECT4];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
-		obj = &Objects[ID_SMASH_OBJECT5];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
-		obj = &Objects[ID_SMASH_OBJECT6];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
-		obj = &Objects[ID_SMASH_OBJECT7];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
-		obj = &Objects[ID_SMASH_OBJECT8];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSmashObject;
-			obj->collision = ObjectCollision;
-			obj->control = SmashObjectControl;
-		}
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SMASH_OBJECT2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SMASH_OBJECT3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SMASH_OBJECT4];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SMASH_OBJECT5];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SMASH_OBJECT6];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SMASH_OBJECT7];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SMASH_OBJECT8];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmashObject;
+		obj->collision = ObjectCollision;
+		obj->control = SmashObjectControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_BRIDGE_FLAT];
@@ -2052,51 +2082,75 @@ void ObjectObjects()
 		obj->control = FallingBlockControl;
 		obj->floor = FallingBlockFloor;
 		obj->ceiling = FallingBlockCeiling;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveMesh = true;
 	}
 
+	obj = &Objects[ID_SWITCH_TYPE1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_SWITCH_TYPE1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-		}
-		obj = &Objects[ID_SWITCH_TYPE2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-		}
-		obj = &Objects[ID_SWITCH_TYPE3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-		}
-		obj = &Objects[ID_SWITCH_TYPE4];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-		}
-		obj = &Objects[ID_SWITCH_TYPE5];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-		}
-		obj = &Objects[ID_SWITCH_TYPE6];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseSwitch;
-			obj->collision = SwitchCollision;
-			obj->control = SwitchControl;
-		}
+		obj->initialise = InitialiseSwitch;
+		obj->collision = SwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SWITCH_TYPE2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSwitch;
+		obj->collision = SwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SWITCH_TYPE3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSwitch;
+		obj->collision = SwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SWITCH_TYPE4];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSwitch;
+		obj->collision = SwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SWITCH_TYPE5];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSwitch;
+		obj->collision = SwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+	}
+
+	obj = &Objects[ID_SWITCH_TYPE6];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSwitch;
+		obj->collision = SwitchCollision;
+		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_AIRLOCK_SWITCH];
@@ -2104,27 +2158,35 @@ void ObjectObjects()
 	{
 		obj->collision = SwitchCollision;
 		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
+	obj = &Objects[ID_SEQUENCE_SWITCH1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_SEQUENCE_SWITCH1];
-		if (obj->loaded)
-		{
-			obj->collision = FullBlockSwitchCollision;
-			obj->control = FullBlockSwitchControl;
-		}
-		obj = &Objects[ID_SEQUENCE_SWITCH2];
-		if (obj->loaded)
-		{
-			obj->collision = FullBlockSwitchCollision;
-			obj->control = FullBlockSwitchControl;
-		}
-		obj = &Objects[ID_SEQUENCE_SWITCH3];
-		if (obj->loaded)
-		{
-			obj->collision = FullBlockSwitchCollision;
-			obj->control = FullBlockSwitchControl;
-		}
+		obj->collision = FullBlockSwitchCollision;
+		obj->control = FullBlockSwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_SEQUENCE_SWITCH2];
+	if (obj->loaded)
+	{
+		obj->collision = FullBlockSwitchCollision;
+		obj->control = FullBlockSwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_SEQUENCE_SWITCH3];
+	if (obj->loaded)
+	{
+		obj->collision = FullBlockSwitchCollision;
+		obj->control = FullBlockSwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_UNDERWATER_SWITCH1];
@@ -2132,6 +2194,8 @@ void ObjectObjects()
 	{
 		obj->control = SwitchControl;
 		obj->collision = UnderwaterSwitchCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_UNDERWATER_SWITCH2];
@@ -2139,6 +2203,8 @@ void ObjectObjects()
 	{
 		obj->control = SwitchControl;
 		obj->collision = UnderwaterSwitchCollision; // UnderwaterSwitchCollision2 ?
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_LEVER_SWITCH];
@@ -2146,6 +2212,8 @@ void ObjectObjects()
 	{
 		obj->collision = RailSwitchCollision;
 		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_JUMP_SWITCH];
@@ -2153,6 +2221,8 @@ void ObjectObjects()
 	{
 		obj->collision = JumpSwitchCollision;
 		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_CROWBAR_SWITCH];
@@ -2160,6 +2230,8 @@ void ObjectObjects()
 	{
 		obj->collision = CrowbarSwitchCollision;
 		obj->control = SwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_PULLEY];
@@ -2168,6 +2240,8 @@ void ObjectObjects()
 		obj->initialise = InitialisePulleySwitch;
 		obj->control = SwitchControl;
 		obj->collision = PulleyCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_COG_SWITCH];
@@ -2175,6 +2249,8 @@ void ObjectObjects()
 	{
 		obj->collision = CogSwitchCollision;
 		obj->control = CogSwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];
@@ -2183,159 +2259,160 @@ void ObjectObjects()
 		obj->initialise = InitialiseCrowDoveSwitch;
 		obj->collision = CrowDoveSwitchCollision;
 		obj->control = CrowDoveSwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
 	}
 
+	obj = &Objects[ID_DOOR_TYPE1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_DOOR_TYPE1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_DOOR_TYPE2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_DOOR_TYPE3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_DOOR_TYPE4];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_DOOR_TYPE5];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_DOOR_TYPE6];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_DOOR_TYPE7];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_DOOR_TYPE8];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_CLOSED_DOOR1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_CLOSED_DOOR1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_CLOSED_DOOR2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_CLOSED_DOOR3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_CLOSED_DOOR4];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_CLOSED_DOOR5];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
-		obj = &Objects[ID_CLOSED_DOOR6];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->control = DoorControl;
-			obj->collision = DoorCollision;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-			obj->saveMesh = true;
-		}
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_DOOR_TYPE2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_DOOR_TYPE3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_DOOR_TYPE4];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_DOOR_TYPE5];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_DOOR_TYPE6];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_DOOR_TYPE7];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_DOOR_TYPE8];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_CLOSED_DOOR1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_CLOSED_DOOR1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_CLOSED_DOOR2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_CLOSED_DOOR3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_CLOSED_DOOR4];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_CLOSED_DOOR5];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+	}
+	obj = &Objects[ID_CLOSED_DOOR6];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->control = DoorControl;
+		obj->collision = DoorCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_LIFT_DOORS1];
@@ -2386,109 +2463,105 @@ void ObjectObjects()
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_PUSHPULL_DOOR1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_PUSHPULL_DOOR1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = PushPullKickDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_PUSHPULL_DOOR2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = PushPullKickDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_KICK_DOOR1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = PushPullKickDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_KICK_DOOR2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseDoor;
-			obj->collision = PushPullKickDoorCollision;
-			obj->control = PushPullKickDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
+		obj->initialise = InitialiseDoor;
+		obj->collision = PushPullKickDoorCollision;
+		obj->control = PushPullKickDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_PUSHPULL_DOOR2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->collision = PushPullKickDoorCollision;
+		obj->control = PushPullKickDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_KICK_DOOR1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->collision = PushPullKickDoorCollision;
+		obj->control = PushPullKickDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_KICK_DOOR2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDoor;
+		obj->collision = PushPullKickDoorCollision;
+		obj->control = PushPullKickDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_FLOOR_TRAPDOOR1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_FLOOR_TRAPDOOR1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = FloorTrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_FLOOR_TRAPDOOR2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = FloorTrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_CEILING_TRAPDOOR1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = CeilingTrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_CEILING_TRAPDOOR2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = CeilingTrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_TRAPDOOR1];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_TRAPDOOR2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
-		obj = &Objects[ID_TRAPDOOR3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseTrapDoor;
-			obj->collision = TrapDoorCollision;
-			obj->control = TrapDoorControl;
-			obj->saveAnim = true;
-			obj->saveFlags = true;
-		}
+		obj->initialise = InitialiseTrapDoor;
+		obj->collision = FloorTrapDoorCollision;
+		obj->control = TrapDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_FLOOR_TRAPDOOR2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTrapDoor;
+		obj->collision = FloorTrapDoorCollision;
+		obj->control = TrapDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_CEILING_TRAPDOOR1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTrapDoor;
+		obj->collision = CeilingTrapDoorCollision;
+		obj->control = TrapDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_CEILING_TRAPDOOR2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTrapDoor;
+		obj->collision = CeilingTrapDoorCollision;
+		obj->control = TrapDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_TRAPDOOR1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTrapDoor;
+		obj->collision = TrapDoorCollision;
+		obj->control = TrapDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_TRAPDOOR2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTrapDoor;
+		obj->collision = TrapDoorCollision;
+		obj->control = TrapDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+	obj = &Objects[ID_TRAPDOOR3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTrapDoor;
+		obj->collision = TrapDoorCollision;
+		obj->control = TrapDoorControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_SEARCH_OBJECT1];
@@ -2528,56 +2601,77 @@ void ObjectObjects()
 		//obj->drawRoutine = draw_f;
 		obj->pivotLength = 256;
 		obj->hitPoints = 256;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_BURNING_TORCH_ITEM];
 	if (obj->loaded)
 	{
 		obj->control = TorchControl;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_TORPEDO];
 	if (obj->loaded)
 	{
 		obj->control = TorpedoControl;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
 	}
 
+	obj = &Objects[ID_PUSHABLE_OBJECT1];
+	if (obj->loaded)
 	{
-		obj = &Objects[ID_PUSHABLE_OBJECT1];
-		if (obj->loaded)
-		{   
-			obj->initialise = InitialisePushableBlock;
-			obj->control = PushableBlockControl;
-			obj->collision = PushableBlockCollision;
-		}
-		obj = &Objects[ID_PUSHABLE_OBJECT2];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialisePushableBlock;
-			obj->control = PushableBlockControl;
-			obj->collision = PushableBlockCollision;
-		}
-		obj = &Objects[ID_PUSHABLE_OBJECT3];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialisePushableBlock;
-			obj->control = PushableBlockControl;
-			obj->collision = PushableBlockCollision;
-		}
-		obj = &Objects[ID_PUSHABLE_OBJECT4];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialisePushableBlock;
-			obj->control = PushableBlockControl;
-			obj->collision = PushableBlockCollision;
-		}
-		obj = &Objects[ID_PUSHABLE_OBJECT5];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialisePushableBlock;
-			obj->control = PushableBlockControl;
-			obj->collision = PushableBlockCollision;
-		}
+		obj->initialise = InitialisePushableBlock;
+		obj->control = PushableBlockControl;
+		obj->collision = PushableBlockCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
+	obj = &Objects[ID_PUSHABLE_OBJECT2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePushableBlock;
+		obj->control = PushableBlockControl;
+		obj->collision = PushableBlockCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
+	obj = &Objects[ID_PUSHABLE_OBJECT3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePushableBlock;
+		obj->control = PushableBlockControl;
+		obj->collision = PushableBlockCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
+	obj = &Objects[ID_PUSHABLE_OBJECT4];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePushableBlock;
+		obj->control = PushableBlockControl;
+		obj->collision = PushableBlockCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
+	obj = &Objects[ID_PUSHABLE_OBJECT5];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialisePushableBlock;
+		obj->control = PushableBlockControl;
+		obj->collision = PushableBlockCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
@@ -2587,6 +2681,9 @@ void ObjectObjects()
 		obj->control = TwoBlocksPlatformControl;
 		obj->floor = TwoBlocksPlatformFloor;
 		obj->ceiling = TwoBlocksPlatformCeiling;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_RAISING_COG];
@@ -2594,6 +2691,9 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseRaisingCog;
 		obj->control = RaisingCogControl;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_ELECTRICAL_LIGHT];
@@ -2686,6 +2786,7 @@ void ObjectObjects()
 		obj->collision = TightRopeCollision;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_PARALLEL_BARS];
@@ -2869,7 +2970,6 @@ void ObjectObjects()
 	}
 }
 
-// TODO: add the flags
 void TrapObjects()
 {
 	OBJECT_INFO* obj;
