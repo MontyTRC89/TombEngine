@@ -2,9 +2,7 @@
 
 #include "..\Global\global.h"
 
-//#define FlashIt ((int (__cdecl*)()) 0x00439C10)
-//#define UpdateHealtBar ((void (__cdecl*)(int)) 0x00439E50)
-//#define UpdateAirBar ((void (__cdecl*)(int)) 0x00439FC0)
+#define MAX_COLLECTED_PICKUPS 32
 
 void DrawHealthBarOverlay(int value);
 void DrawHealthBar(int value);
@@ -20,7 +18,7 @@ int FlashIt();
 extern short PickupX;
 extern short PickupY;
 extern short CurrentPickup;
-extern DISPLAY_PICKUP Pickups[NUM_PICKUPS];
+extern DISPLAY_PICKUP Pickups[MAX_COLLECTED_PICKUPS];
 extern short PickupVel;
 extern int OldHitPoints;
 extern int HealtBarTimer;

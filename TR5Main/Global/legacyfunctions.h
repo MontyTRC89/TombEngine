@@ -99,3 +99,7 @@
 #define Legacy_CreateBubble ((short (__cdecl*)(PHD_3DPOS*, short, int)) 0x0043C6C0); 
 #define Legacy_SetupRipple ((void (__cdecl*)(int, int, int, byte, byte)) 0x00430910); 
 
+// HEALT.CPP
+#define Legacy_FlashIt ((int (__cdecl*)()) 0x00439C10)
+#define Legacy_UpdateHealtBar ((void (__cdecl*)(int)) 0x00439E50)
+#define Legacy_UpdateAirBar ((void (__cdecl*)(int)) 0x00439FC0)
