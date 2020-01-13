@@ -1952,8 +1952,7 @@ int Inventory::DoPassport()
 		choices.push_back(INV_WHAT_PASSPORT_EXIT_GAME);
 	}
 	else
-	{
-		choices.push_back(INV_WHAT_PASSPORT_NEW_GAME);
+	{ 
 		choices.push_back(INV_WHAT_PASSPORT_LOAD_GAME);
 		if (LaraItem->hitPoints > 0 || CurrentLevel == 0)
 			choices.push_back(INV_WHAT_PASSPORT_SAVE_GAME);
