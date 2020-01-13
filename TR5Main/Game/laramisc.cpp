@@ -717,8 +717,6 @@ void InitialiseLara(int restore)
 
 	DashTimer = 120;
 
-	//weapons[WEAPON_REVOLVER].damage = gfCurrentLevel >= LVL5_BASE ? 15 : 6;
-
 	Lara.bottle = 0;
 	Lara.wetcloth = CLOTH_MISSING;
 }
