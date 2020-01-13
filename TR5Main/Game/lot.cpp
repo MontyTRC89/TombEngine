@@ -135,7 +135,7 @@ void InitialiseSlot(short itemNum, short slot)
 
 	if (obj->intelligent)
 	{
-		// simple check to set hitEffect to blood or smoke by default if intelligent enabled and no value assigned to hitEffect !
+		// simple check to set hitEffect to blood or smoke by default if intelligent enabled and no value assigned to hitEffect and the entity have HP !
 		// undead have smoke instead of blood !
 		if (obj->hitEffect == HIT_NONE)
 		{
@@ -145,13 +145,13 @@ void InitialiseSlot(short itemNum, short slot)
 				obj->hitEffect = HIT_BLOOD;
 		}
 
+		// init the basic zone for creature.
+		// ignore if the zoneType is specified in the Objects[] already with other than ZONE_NULL.
+		if (obj->zoneType == ZONE_NULL)
+			obj->zoneType = ZONE_BASIC; // only entity that use CreatureActive() will reach InitialiseSlot() !
+
 		obj->nonLot = false; // change to use pathfinding
 	}
-
-	// init the basic zone for creature.
-	// ignore if the zoneType is specified in the Objects[] already with other than ZONE_NULL.
-	if (obj->zoneType == ZONE_NULL)
-		obj->zoneType = ZONE_BASIC;
 
 	switch (obj->zoneType)
 	{
@@ -225,6 +225,15 @@ void InitialiseSlot(short itemNum, short slot)
 			creature->LOT.step = SECTOR(1) - CLICK(2);
 			creature->LOT.drop = -(SECTOR(1) - CLICK(2));
 			creature->LOT.zone = ZONE_HUMAN_CLASSIC;
+			break;
+
+		case ZONE_BLOCKABLE:
+			creature->LOT.blockMask = BLOCKABLE;
+			break;
+
+		case ZONE_SOPHIALEE:
+			creature->LOT.step = CLICK(4);
+			creature->LOT.drop = -CLICK(3);
 			break;
 	}
 

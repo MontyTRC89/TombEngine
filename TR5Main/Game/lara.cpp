@@ -346,7 +346,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = 100;
 	coll->trigger = 0;
 
-	if ((TrInput & IN_LOOK) && g_LaraExtra.ExtraAnim == -1 && Lara.look)
+	if ((TrInput & IN_LOOK) && g_LaraExtra.ExtraAnim == 0 && Lara.look)
 		LookLeftRight();
 	else
 		ResetLook();
@@ -414,7 +414,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Animate Lara
 	AnimateLara(item);
 
-	if (g_LaraExtra.ExtraAnim == NO_ITEM)
+	if (g_LaraExtra.ExtraAnim == 0)
 	{
 		// Check for collision with items
 		LaraBaddieCollision(item, coll);
