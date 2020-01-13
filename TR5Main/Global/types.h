@@ -1,22 +1,9 @@
 #pragma once
 #include <Windows.h>
 #include "enums.h"
-
 #include <fixed_point.h>
-#pragma pack(push, 1)
-typedef enum TYPE_ZONE
-{
-	ZONE_NULL = -1,
-	ZONE_SKELLY = 0,
-	ZONE_BASIC,
-	ZONE_FLYER,
-	ZONE_HUMAN_CLASSIC,
-	ZONE_WATER,
-	ZONE_HUMAN_JUMP_AND_MONKEY,
-	ZONE_HUMAN_JUMP,
-	ZONE_SPIDER,
-};
 
+#pragma pack(push, 1)
 typedef struct vector_t
 {
 	int vx;

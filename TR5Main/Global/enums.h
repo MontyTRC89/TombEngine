@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-typedef enum SpriteTypes
+enum SPRITE_TYPES
 {
 	SPR_FIRE0,
 	SPR_FIRE1,
@@ -33,7 +33,24 @@ typedef enum SpriteTypes
 	SPR_LIGHTHING
 };
 
-typedef enum floor_types {
+enum TYPE_ZONE
+{
+	ZONE_NULL = -1,  // default zone
+	ZONE_SKELLY = 0,
+	ZONE_BASIC,
+	ZONE_FLYER,
+	ZONE_HUMAN_CLASSIC,
+	ZONE_WATER,
+	ZONE_HUMAN_JUMP_AND_MONKEY,
+	ZONE_HUMAN_JUMP,
+	ZONE_SPIDER,
+	ZONE_BLOCKABLE, // for trex, shiva, etc..
+	ZONE_SOPHIALEE, // dont want sophia to go down again !
+	ZONE_APE,       // only 2 click climb
+};
+
+enum FLOOR_TYPES
+{
 	FLOOR_TYPE,
 	DOOR_TYPE,
 	TILT_TYPE,
@@ -56,9 +73,10 @@ typedef enum floor_types {
 	MONKEY_TYPE,
 	TRIGTRIGGER_TYPE,
 	MINER_TYPE
-} FLOOR_TYPES;
+};
 
-typedef enum trigger_types {
+enum TRIGGER_TYPES
+{
 	TRIGGER,
 	PAD,
 	SWITCH,
@@ -76,9 +94,10 @@ typedef enum trigger_types {
 	TIGHTROPE_T,
 	CRAWLDUCK_T,
 	CLIMB_T,
-} TRIGGER_TYPES;
+};
 
-typedef enum trigobtypes {
+enum TRIGOBJECTS_TYPES
+{
 	TO_OBJECT,
 	TO_CAMERA,
 	TO_SINK,
@@ -93,58 +112,58 @@ typedef enum trigobtypes {
 	TO_LUA_SCRIPT,
 	TO_FLYBY,
 	TO_CUTSCENE
-} TRIGOBJECTS_TYPES;
+};
 
-typedef enum floordata_masks
+enum FLOORDATA_MASKS
 {
 	FD_MASK_FUNCTION = 0x1F,
 	FD_MASK_SUBFUNCTION = 0x7F00,
 	FD_MASK_END_DATA = 0x8000
-} FLOORDATA_MASKS;
+};
 
-typedef enum mood_type
+enum MOOD_TYPE
 {
-	BORED_MOOD = 0,
-	ATTACK_MOOD = 1,
-	ESCAPE_MOOD = 2,
-	STALK_MOOD = 3,
-} MOOD_TYPE;
+	BORED_MOOD,
+	ATTACK_MOOD,
+	ESCAPE_MOOD,
+	STALK_MOOD
+};
 
-typedef enum target_type
+enum TARGET_TYPE
 {
-	NO_TARGET = 0,
-	PRIME_TARGET = 1,
-	SECONDARY_TARGET = 2,
-} TARGET_TYPE;
+	NO_TARGET,
+	PRIME_TARGET,
+	SECONDARY_TARGET
+};
 
-typedef enum item_status
+enum ITEM_STATUS
 {
-	ITEM_INACTIVE = 0,
-	ITEM_ACTIVE = 1,
-	ITEM_DEACTIVATED = 2,
-	ITEM_INVISIBLE = 3
-} ITEM_STATUS;
+	ITEM_INACTIVE,
+	ITEM_ACTIVE,
+	ITEM_DEACTIVATED,
+	ITEM_INVISIBLE
+};
 
-typedef enum item_flags
+enum ITEM_FLAGS
 {
 	IFLAG_CLEAR_BODY = (1 << 7), // 0x0080
 	IFLAG_INVISIBLE = (1 << 8),  // 0x0100
 	IFLAG_REVERSE = (1 << 14),	 // 0x4000
 	IFLAG_KILLED = (1 << 15),    // 0x8000
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
-} ITEM_FLAGS;
+};
 
-typedef enum camera_type
+enum CAMERA_TYPE
 {
-	CHASE_CAMERA = 0,
-	FIXED_CAMERA = 1,
-	LOOK_CAMERA = 2,
-	COMBAT_CAMERA = 3,
-	CINEMATIC_CAMERA = 4,
-	HEAVY_CAMERA = 5,
-} CAMERA_TYPE;
+	CHASE_CAMERA,
+	FIXED_CAMERA,
+	LOOK_CAMERA,
+	COMBAT_CAMERA,
+	CINEMATIC_CAMERA,
+	HEAVY_CAMERA
+};
 
-typedef enum LARA_DRAW_TYPE
+enum LARA_DRAW_TYPE
 {
 	LARA_NORMAL = 1,
 	LARA_YOUNG = 2,
@@ -154,26 +173,26 @@ typedef enum LARA_DRAW_TYPE
 	LARA_INVISIBLE = 7
 };
 
-enum LaraWaterStatus
+enum LARA_WATER_STATUS
 {
-	LW_ABOVE_WATER = 0,
-	LW_UNDERWATER = 1,
-	LW_SURFACE = 2,
-	LW_FLYCHEAT = 3,
-	LW_WADE = 4
+	LW_ABOVE_WATER,
+	LW_UNDERWATER,
+	LW_SURFACE,
+	LW_FLYCHEAT,
+	LW_WADE
 };
 
-enum LaraGunStatus
+enum LARA_GUN_STATUS
 {
-	LG_NO_ARMS = 0,
-	LG_HANDS_BUSY = 1,
-	LG_DRAW_GUNS = 2,
-	LG_UNDRAW_GUNS = 3,
-	LG_READY = 4,
-	LG_SPECIAL = 5
+	LG_NO_ARMS,
+	LG_HANDS_BUSY,
+	LG_DRAW_GUNS,
+	LG_UNDRAW_GUNS,
+	LG_READY,
+	LG_SPECIAL
 };
 
-enum input_buttons
+enum INPUT_BUTTONS
 {
 	IN_NONE = 0,								// 0x00000000
 	IN_FORWARD = (1 << 0),						// 0x00000001
@@ -208,12 +227,11 @@ enum input_buttons
 	IN_DUCK = (1 << 29),						// 0x20000000
 	IN_SPRINT = (1 << 30),						// 0x40000000
 	IN_UNK31 = (1 << 31),						// 0x80000000
-
 	IN_ALL = ~0,								// 0xFFFFFFFF (-1)
 };
 
 
-enum lara_anim_state
+enum LARA_STATE
 {
 	STATE_LARA_WALK_FORWARD = 0,
 	STATE_LARA_RUN_FORWARD = 1,
@@ -358,7 +376,7 @@ enum lara_anim_state
 	NUM_LARA_STATES
 };
 
-enum lara_anim
+enum LARA_ANIM
 {
 	ANIMATION_LARA_RUN = 0,                                     // Run 
 	ANIMATION_LARA_WALK_FORWARD = 1,                            // Walk 
@@ -838,28 +856,29 @@ enum lara_anim
 	NUM_LARA_ANIMS
 };
 
-enum lara_mesh
+enum LARA_MESHES
 {
-	LM_HIPS = 0,
-	LM_LTHIGH = 1,
-	LM_LSHIN = 2,
-	LM_LFOOT = 3,
-	LM_RTHIGH = 4,
-	LM_RSHIN = 5,
-	LM_RFOOT = 6,
-	LM_TORSO = 7,
-	LM_RINARM = 8,
-	LM_ROUTARM = 9,
-	LM_RHAND = 10,
-	LM_LINARM = 11,
-	LM_LOUTARM = 12,
-	LM_LHAND = 13,
-	LM_HEAD = 14,
+	LM_HIPS,
+	LM_LTHIGH,
+	LM_LSHIN,
+	LM_LFOOT,
+	LM_RTHIGH,
+	LM_RSHIN,
+	LM_RFOOT,
+	LM_TORSO,
+	LM_RINARM,
+	LM_ROUTARM,
+	LM_RHAND,
+	LM_LINARM,
+	LM_LOUTARM,
+	LM_LHAND,
+	LM_HEAD,
 
 	NUM_LARA_MESHES
 };
 
-enum WeaponTypes {
+enum LARA_WEAPON_TYPE
+{
 	WEAPON_NONE,
 	WEAPON_PISTOLS,
 	WEAPON_REVOLVER,
@@ -876,33 +895,34 @@ enum WeaponTypes {
 	NUM_WEAPONS
 };
 
-enum WeaponTypeCarried {
-	WTYPE_MISSING = 0,
-	WTYPE_PRESENT = 1,
-	WTYPE_SILENCER = 2,
-	WTYPE_LASERSIGHT = 4,
-	WTYPE_AMMO_1 = 8,
-	WTYPE_AMMO_2 = 16,
-	WTYPE_AMMO_3 = 32,
-
-	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3
+enum LARA_WEAPON_TYPE_CARRIED
+{
+	WTYPE_MISSING = 0x0,
+	WTYPE_PRESENT = 0x1,
+	WTYPE_SILENCER = 0x2,
+	WTYPE_LASERSIGHT = 0x4,
+	WTYPE_AMMO_1 = 0x8,
+	WTYPE_AMMO_2 = 0x10,
+	WTYPE_AMMO_3 = 0x20,
+	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
 };
 
-enum ClothType
+enum LARA_CLOTH_TYPES
 {
-	CLOTH_MISSING = 0,
-	CLOTH_DRY = 1,
-	CLOTH_WET = 2
+	CLOTH_MISSING,
+	CLOTH_DRY,
+	CLOTH_WET
 };
 
 enum WEATHER_TYPES
 {
-	WEATHER_NORMAL = 0,
-	WEATHER_RAIN = 1,
-	WEATHER_SNOW = 2
+	WEATHER_NORMAL,
+	WEATHER_RAIN,
+	WEATHER_SNOW
 };
 
-enum GAME_STATUS {
+enum GAME_STATUS
+{
 	GAME_STATUS_NONE,
 	GAME_STATUS_NEW_GAME,
 	GAME_STATUS_LOAD_GAME,
@@ -913,13 +933,14 @@ enum GAME_STATUS {
 	GAME_STATUS_LEVEL_COMPLETED
 };
 
-enum msoff {
+enum MATRIX_ARRAY_VALUE
+{
 	M00, M01, M02, M03,
 	M10, M11, M12, M13,
 	M20, M21, M22, M23
 };
 
-enum collision_types
+enum COLL_TYPE
 {
 	CT_NONE = 0,			   // 0x00
 	CT_FRONT = (1 << 0),  // 0x01
@@ -930,7 +951,7 @@ enum collision_types
 	CT_CLAMP = (1 << 5)   // 0x20
 };
 
-enum height_types
+enum HEIGHT_TYPES
 {
 	WALL,
 	SMALL_SLOPE,
@@ -939,21 +960,22 @@ enum height_types
 	SPLIT_TRI
 };
 
-enum headings {
+enum HEADINGS
+{
 	NORTH,
 	EAST,
 	SOUTH,
 	WEST
 };
 
-enum camera_flags
+enum CAMERA_FLAGS
 {
 	CF_FOLLOW_CENTER = 1,
 	CF_UNKNOWN_2 = 2,
 	CF_CHASE_OBJECT = 3,
 };
 
-enum lara_joint
+enum LARA_JOINT
 {
 	LJ_HIPS = 0, // 0
 	LJ_LTHIGH = 1, // 1
@@ -972,7 +994,8 @@ enum lara_joint
 	LJ_HEAD = 8, // 14
 };
 
-enum command_types {
+enum COMMAND_TYPES
+{
 	COMMAND_NULL = 0,
 	COMMAND_MOVE_ORIGIN,
 	COMMAND_JUMP_VELOCITY,
@@ -982,8 +1005,9 @@ enum command_types {
 	COMMAND_EFFECT
 };
 
-enum sfx_types {
-	SFX_LANDANDWATER = 0 << 14,
-	SFX_LANDONLY = 1 << 14,
-	SFX_WATERONLY = 2 << 14
+enum SFX_TYPES
+{
+	SFX_LANDANDWATER = 0,
+	SFX_LANDONLY	 = (1 << 14),
+	SFX_WATERONLY	 = (2 << 14)
 };

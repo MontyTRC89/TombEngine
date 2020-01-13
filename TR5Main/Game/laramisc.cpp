@@ -130,7 +130,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		LaraItem->currentAnimState == STATE_LARA_STOP &&
 		LaraItem->goalAnimState == STATE_LARA_STOP && 
 		LaraItem->animNumber == ANIMATION_LARA_STAY_IDLE &&
-		!LaraItem->gravityStatus)
+	   !LaraItem->gravityStatus)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
 	}
@@ -138,8 +138,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 	if (item->currentAnimState != STATE_LARA_SPRINT && DashTimer < 120)
 		DashTimer++;
 
-	Lara.isDucked = 0;
-
+	Lara.isDucked = false;
 	bool isWater = Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP);
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -157,7 +156,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 	switch (Lara.waterStatus)
 	{
 	case LW_ABOVE_WATER:
-		if (hfw != NO_HEIGHT && hfw >= 256)
+		if (hfw != NO_HEIGHT && hfw >= STEP_SIZE)
 		{
 			if (wd <= 474)
 			{
@@ -603,7 +602,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
 
 void LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 {
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
 		INIT_LARA_MESHES(i, ID_LARA, ID_LARA_SKIN);
 	}
@@ -614,20 +613,12 @@ void LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 	}*/
 
 	if (Lara.gunType == WEAPON_HK)
-	{
 		Lara.backGun = WEAPON_HK;
-	}
 	else if (!g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present)
-	{
 		if (g_LaraExtra.Weapons[WEAPON_HK].Present)
-		{
 			Lara.backGun = WEAPON_HK;
-		}
-	}
 	else
-	{
 		Lara.backGun = WEAPON_UZI;
-	}
 
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.leftArm.frameNumber = 0;
@@ -651,7 +642,7 @@ void InitialiseLara(int restore)
 	{
 		LARA_INFO backup;
 		memcpy(&backup, &Lara, sizeof(LARA_INFO));
-		memset(&Lara, 0, sizeof(LARA_INFO));
+		ZeroMemory(&Lara, sizeof(LARA_INFO));
 		memcpy(&Lara.Legacy_pistolsTypeCarried, &backup.Legacy_pistolsTypeCarried, 59);
 	}
 	else
@@ -659,7 +650,7 @@ void InitialiseLara(int restore)
 		ZeroMemory(&Lara, sizeof(LARA_INFO));
 		ZeroMemory(&g_LaraExtra, sizeof(LaraExtraInfo));
 
-		g_LaraExtra.ExtraAnim = -1;
+		g_LaraExtra.ExtraAnim = 0;
 		g_LaraExtra.Vehicle = NO_ITEM;
 	}
 
@@ -667,12 +658,12 @@ void InitialiseLara(int restore)
 	Lara.itemNumber = itemNumber;
 	Lara.hitDirection = -1;
 	Lara.air = 1800;
-	Lara.weaponItem = -1;
+	Lara.weaponItem = NO_ITEM;
 	PoisonFlag = 0;
 	Lara.dpoisoned = 0;
 	Lara.poisoned = 0;
 	Lara.waterSurfaceDist = 100;
-	Lara.holster = 14;
+	Lara.holster = ID_LARA_HOLSTERS_PISTOLS;
 	Lara.location = -1;
 	Lara.highestLocation = -1;
 	Lara.ropePtr = -1;
@@ -680,13 +671,15 @@ void InitialiseLara(int restore)
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.skelebob = 0;
 
-	short gun = WEAPON_NONE;
+	short gun;
 
-	// TODO: e should script this behaviour
+	// TODO: we should script this behaviour
 	if (Objects[ID_HK_ITEM].loaded)
 		gun = WEAPON_HK;
 	else if (Objects[ID_PISTOLS_ITEM].loaded)
 		gun = WEAPON_PISTOLS;
+	else
+		gun = WEAPON_NONE; // avoid problem with empty gun level
 
 	Lara.lastGunType = Lara.gunType = Lara.requestGunType = gun;
 
@@ -744,7 +737,7 @@ void AnimateLara(ITEM_INFO* item)
 				{
 				case COMMAND_MOVE_ORIGIN:
 					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-					UpdateLaraRoom(item, -381);
+					UpdateLaraRoom(item, -LARA_HITE/2);
 					cmd += 3;
 					break;
 
@@ -825,7 +818,7 @@ void AnimateLara(ITEM_INFO* item)
 				}
 
 				FXType = cmd[1] & 0xC000;
-				(*effect_routines[(int)(cmd[1] & 0x3fff)])(item);
+				(*effect_routines[(int)(cmd[1] & 0x3FFF)])(item);
 
 				cmd += 2;
 				break;
@@ -874,9 +867,9 @@ void AnimateLara(ITEM_INFO* item)
 
 		if (Lara.waterStatus == LW_WADE && Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			velocity = anim->velocity >> 1;
+			velocity = (anim->velocity >> 1);
 			if (anim->acceleration)
-				velocity += anim->acceleration * (item->frameNumber - anim->frameBase) >> 2;
+				velocity += (anim->acceleration * (item->frameNumber - anim->frameBase)) >> 2;
 		}
 		else
 		{
@@ -891,7 +884,7 @@ void AnimateLara(ITEM_INFO* item)
 	/*if (lara.RopePtr != -1)
 		result = j_SomeRopeCollisionFunc(item);*/
 
-	if (!Lara.isMoving)
+	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
 		item->pos.xPos += item->speed * SIN(Lara.moveAngle) >> W2V_SHIFT; 
 		item->pos.zPos += item->speed * COS(Lara.moveAngle) >> W2V_SHIFT;
