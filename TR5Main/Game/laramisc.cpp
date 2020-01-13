@@ -682,10 +682,10 @@ void InitialiseLara(int restore)
 
 	short gun = WEAPON_NONE;
 
-	if (Objects[ID_PISTOLS_ITEM].loaded)
-		gun = WEAPON_PISTOLS;
-	else if (Objects[ID_HK_ITEM].loaded)
+	if (Objects[ID_HK_ITEM].loaded)
 		gun = WEAPON_HK;
+	else if (Objects[ID_PISTOLS_ITEM].loaded)
+		gun = WEAPON_PISTOLS;
 
 	Lara.lastGunType = Lara.gunType = Lara.requestGunType = gun;
 
