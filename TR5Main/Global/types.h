@@ -511,7 +511,7 @@ typedef struct object_info_t {
 	unsigned short hitEffect : 2; // offset=51.2
 	unsigned short undead : 1; // offset=51.4
 	unsigned short saveMesh : 1; // offset=51.5
-	unsigned short castShadows : 1; // offset=51.6
+	unsigned short unknown : 2; // offset=51.6
 	void(*drawRoutineExtra)(ITEM_INFO* item); // size=0, offset=52
 	unsigned int explodableMeshbits; // size=0, offset=56
 	unsigned int padfuck; // size=0, offset=60

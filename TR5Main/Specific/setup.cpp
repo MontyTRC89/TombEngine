@@ -1144,7 +1144,6 @@ void NewObjects()
 	}
 }
 
-// TODO: check for all the flags, some is surely missing.
 void BaddyObjects()
 {
 	OBJECT_INFO* obj;
@@ -1183,6 +1182,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -1204,10 +1204,11 @@ void BaddyObjects()
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1232,10 +1233,11 @@ void BaddyObjects()
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -1264,10 +1266,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1296,10 +1299,11 @@ void BaddyObjects()
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1325,10 +1329,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
 		Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
 		Bones[Objects[69].boneIndex + 13 * 4] |= ROT_Y;
@@ -1357,10 +1362,11 @@ void BaddyObjects()
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1386,10 +1392,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -1413,7 +1420,9 @@ void BaddyObjects()
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
+		obj->hitEffect = HIT_FRAGMENT;
 		obj->zoneType = ZONE_FLYER;
+		obj->undead = true;
 		Bones[obj->boneIndex] |= ROT_X;
 		Bones[obj->boneIndex + 4] |= ROT_X;
 	}
@@ -1429,10 +1438,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 341;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
@@ -1448,10 +1458,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -1466,10 +1477,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -1488,6 +1500,8 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
+		obj->waterCreature = true;
 		obj->zoneType = ZONE_FLYER;
 	}
 
@@ -1505,10 +1519,11 @@ void BaddyObjects()
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -1532,10 +1547,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -1555,10 +1571,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -1578,11 +1595,12 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//HIBYTE(v23) = *(&Objects[ID_HITMAN] + 51) | 0x1C;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_FRAGMENT;
+		obj->undead = true;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1623,10 +1641,11 @@ void BaddyObjects()
 		obj->radius = 102;
 		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1646,10 +1665,12 @@ void BaddyObjects()
 		obj->radius = 128;
 		obj->explodableMeshbits = 4;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_FRAGMENT;
+		obj->undead = true;
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex] |= ROT_X;
 		Bones[obj->boneIndex + 4] |= ROT_Y;
@@ -1669,10 +1690,12 @@ void BaddyObjects()
 		obj->radius = 102;
 		obj->biteOffset = 1024;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_FRAGMENT;
+		obj->undead = true;
 		Bones[obj->boneIndex + 0] |= ROT_Y;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_X;
@@ -1691,10 +1714,11 @@ void BaddyObjects()
 		obj->pivotLength = 20;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->meshIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->meshIndex + 4 * 4] |= ROT_X;
 		Bones[obj->meshIndex + 9 * 4] |= ROT_Z;
@@ -1741,6 +1765,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -1790,10 +1815,11 @@ void BaddyObjects()
 		obj->pivotLength = 20;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
@@ -1803,19 +1829,19 @@ void BaddyObjects()
 	obj = &Objects[ID_RATS];
 	if (obj->loaded)
 	{
-		//*(&Objects[94] + 25) &= 0xFDFFu;
 		obj->drawRoutine = NULL;
 		obj->initialise = InitialiseLittleRats;
 		obj->control = ControlLittleRats;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_BATS];
 	if (obj->loaded)
 	{
-		//*(&Objects[93] + 25) &= 0xFDFFu;
 		obj->drawRoutine = NULL;
 		obj->initialise = InitialiseLittleBats;
 		obj->control = ControlLittleBats;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	// TODO: spider is deleted !
@@ -1842,10 +1868,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1878,10 +1905,11 @@ void BaddyObjects()
 		obj->pivotLength = 50;
 		obj->radius = 256;
 		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_SMOKE;
 		Bones[obj->boneIndex + 24] |= ROT_Y;
 		Bones[obj->boneIndex + 24] |= ROT_X;
 		Bones[obj->boneIndex + 52] |= ROT_Y;
@@ -1906,38 +1934,31 @@ void BaddyObjects()
 	obj = &Objects[ID_GUARDIAN];
 	if (obj->loaded)
 	{
-		//HIBYTE(v39) = ((*(&Objects[65] + 25) | 0xC08) >> 8) | 0x20;
-		//LOBYTE(v39) = *(&Objects[65] + 50) | 0x78;
-		//*(&Objects[65] + 25) = v39;
 		obj->initialise = InitialiseLaserHead;
 		obj->collision = CreatureCollision;
 		obj->control = ControlLaserHead;
 		obj->explodableMeshbits = 6;
-		obj->intelligent = false;
 		obj->nonLot = true;
-		obj->savePosition = false;
-		obj->saveHitpoints = false;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->usingDrawAnimatingItem = false;
-		obj->undead = true; // ??
+		obj->undead = true; 
+		obj->unknown = 3;
+		obj->hitEffect = HIT_SMOKE;
+		obj->saveMesh = true;
 	}
 
 	obj = &Objects[ID_AUTOGUN];
 	if (obj->loaded)
 	{
-		//HIBYTE(v40) = *(&Objects[97] + 51) | 0xC;
-		//LOBYTE(v40) = *(&Objects[97] + 50) | 0x70;
-		//*(&Objects[97] + 25) = v40;
 		obj->initialise = InitialiseAutoGuns;
 		obj->control = ControlAutoGuns;
-		obj->intelligent = true;
-		obj->nonLot = false;
-		obj->savePosition = false;
-		obj->saveHitpoints = false;
+		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		obj->usingDrawAnimatingItem = false;
+		obj->hitEffect = HIT_BLOOD;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
@@ -1946,8 +1967,9 @@ void BaddyObjects()
 	obj = &Objects[ID_GUNSHIP];
 	if (obj->loaded)
 	{
-		// *(&Objects[91] + 25) |= 0x60u;
 		obj->control = ControlGunShip;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
 		Bones[obj->boneIndex + 0] |= ROT_Y;
 		Bones[obj->boneIndex + 4] |= ROT_X;
 	}
