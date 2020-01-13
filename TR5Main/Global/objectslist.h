@@ -545,7 +545,7 @@ typedef enum GAME_OBJECT_ID
 	ID_MERCENARY_UZI, // TR2 - ON (Need to detect the monk first)
 	ID_MERCENARY_AUTOPISTOLS1, // TR2 - ON (Need to detect the monk first)
 	ID_MERCENARY_AUTOPISTOLS2, // TR2 - ON (Need to detect the monk first)
-	ID_SWORD_GUARDIAN, // TR2 - ON (blocked if the floor are 2+ click) (need a custom render)
+	ID_SWORD_GUARDIAN, // TR2 - ON (blocked if the floor are 2+ click and currently flying) (need a custom render)
 	ID_SWORD_GUARDIAN_STATUE, // TR2 - ON
 	ID_SPEAR_GUARDIAN, // TR2 - ON (need a custom render)
 	ID_SPEAR_GUARDIAN_STATUE, // TR2 - ON

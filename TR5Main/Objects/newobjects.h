@@ -397,7 +397,7 @@ void SubInitialise(short itemNum);
 void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 int SubControl();
 
-void InitialiseMineCart(short itemNum);
+void InitialiseMineCart(short itemNum); // minecart not tested !
 void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 int MineCartControl();
 
@@ -418,6 +418,7 @@ void InitialiseJeep(short itemNum);
 int JeepControl();
 void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 
+// TODO: motorbike missing
 void InitialiseMotorbike(short itemNum);
 int MotorbikeControl();
 int MotorbikeCheckGetOff();
