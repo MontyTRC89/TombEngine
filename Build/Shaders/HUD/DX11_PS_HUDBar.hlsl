@@ -12,12 +12,23 @@ struct PixelShaderInput
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
+half4 glassOverlay(float2 UVs, half4 originalColor) {
+	float y = UVs.y;
+	y -= 0.15f;
+	y = distance(0.1f, y);
+	y = 1 - y;
+	y = pow(y, 7);
+	y = saturate(y);
+	half4 color = originalColor;
+	return lerp(color, (color * 1.2f)+half4(0.4f, 0.4f, 0.4f, 0.0f), y);
+}
+
 half4 PSColored(PixelShaderInput input) : SV_TARGET
 {
 	if (input.UV.x > Percent) {
 		discard;
 	}
-	return input.Color;
+	return glassOverlay(input.UV,input.Color);
 }
 
 half4 PSTextured(PixelShaderInput input) : SV_TARGET
@@ -25,6 +36,6 @@ half4 PSTextured(PixelShaderInput input) : SV_TARGET
 	if (input.UV.x > Percent) {
 		discard;
 	}
-	float4 output = Texture.Sample(Sampler, input.UV);
-	return output;
+	float4 color = Texture.Sample(Sampler, input.UV);
+	return glassOverlay(input.UV, color);
 }
