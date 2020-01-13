@@ -13,7 +13,7 @@
 #define STEP_SIZE		256
 #define	WALL_SIZE		1024
 
-/// obj->hitEFFect flag
+/// obj->hitEffect flag
 #define HIT_NONE     0
 #define HIT_BLOOD    1
 #define HIT_SMOKE    2
