@@ -4054,8 +4054,8 @@ void InitialiseObjects()
 	CustomObjects();
 
 	// HACK: until we don't decompile everything, this simple hack allows us to use legacy stuff correctly
-	for (int i = 0; i <= ID_LARA_HAIR; i++)
-		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
+	for (int i = 0; i < 460; i++)
+		memcpy(&LegacyObjects[i], &Objects[i], 64);
 
 	InitialiseHair();
 	InitialiseSpecialEffects();
