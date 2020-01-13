@@ -68,14 +68,14 @@ void UpdateHealtBar(int flash)
 		if (!BinocularRange)
 		{
 			if (flash)
-				DrawHealthBar(hitPoints / 10);
+				DrawHealthBar(hitPoints / 1000.0f);
 			else
 				DrawHealthBar(0);
 		}
 		else 
 		{
 			if (flash)
-				DrawHealthBarOverlay(hitPoints / 10);
+				DrawHealthBarOverlay(hitPoints / 1000.0f);
 			else
 				DrawHealthBarOverlay(0);
 		}
