@@ -6,7 +6,7 @@
 short PickupX;
 short PickupY;
 short CurrentPickup;
-DISPLAY_PICKUP Pickups[NUM_PICKUPS];
+DISPLAY_PICKUP Pickups[MAX_COLLECTED_PICKUPS];
 short PickupVel;
 int OldHitPoints = 1000;
 int HealtBarTimer = 40;
@@ -185,15 +185,15 @@ int DrawAllPickups()
 
 	int pickupIndex = CurrentPickup;
 	int i;
-	for (i = 0; i < NUM_PICKUPS; ++i)
+	for (i = 0; i < MAX_COLLECTED_PICKUPS; ++i)
 	{
 		if (Pickups[pickupIndex].life > 0)
 			break;
-		pickupIndex = pickupIndex + 1 & NUM_PICKUPS - 1;
+		pickupIndex = pickupIndex + 1 & MAX_COLLECTED_PICKUPS - 1;
 	}
 
 	CurrentPickup = pickupIndex;
-	if (i != NUM_PICKUPS)
+	if (i != MAX_COLLECTED_PICKUPS)
 		return g_Renderer->DrawPickup(Pickups[CurrentPickup].objectNumber);
 
 	CurrentPickup = 0;
@@ -204,7 +204,7 @@ int DrawAllPickups()
 
 void AddDisplayPickup(short objectNumber)
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
 	{
 		DISPLAY_PICKUP* pickup = &Pickups[i];
 		if (pickup->life < 0)
@@ -222,7 +222,7 @@ void AddDisplayPickup(short objectNumber)
 
 void InitialisePickupDisplay()
 {
-	for (int i = 0; i < NUM_PICKUPS; i++)
+	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
 	{
 		DISPLAY_PICKUP* pickup = &Pickups[i];
 		pickup->life = -1;
