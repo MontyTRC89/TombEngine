@@ -2878,6 +2878,8 @@ void TrapObjects()
 	if (obj->loaded)
 	{
 		obj->control = ElectricityWiresControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_ROME_HAMMER];
@@ -2886,6 +2888,8 @@ void TrapObjects()
 		obj->initialise = InitialiseRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
 		obj->control = AnimatingControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_ZIPLINE_HANDLE];
@@ -2894,6 +2898,9 @@ void TrapObjects()
 		obj->initialise = InitialiseDeathSlide;
 		obj->collision = DeathSlideCollision;
 		obj->control = DeathSlideControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_ROLLINGBALL];
@@ -2901,6 +2908,8 @@ void TrapObjects()
 	{
 		obj->collision = RollingBallCollision;
 		obj->control = RollingBallControl;
+		obj->savePosition = true;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
@@ -2909,6 +2918,8 @@ void TrapObjects()
 		obj->control = KillAllTriggersControl;
 		obj->drawRoutine = NULL;
 		obj->hitPoints = 0;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_FALLING_CEILING];
@@ -2916,6 +2927,9 @@ void TrapObjects()
 	{
 		obj->collision = FallingCeilingCollision;
 		obj->control = FallingCeilingControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_FALLING_BLOCK];
@@ -2926,6 +2940,8 @@ void TrapObjects()
 		obj->control = FallingBlockControl;
 		obj->floor = FallingBlockFloor;
 		obj->ceiling = FallingBlockCeiling;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_FALLING_BLOCK2];
@@ -2936,6 +2952,8 @@ void TrapObjects()
 		obj->control = FallingBlockControl;
 		obj->floor = FallingBlockFloor;
 		obj->ceiling = FallingBlockCeiling;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_DARTS];
@@ -2945,6 +2963,7 @@ void TrapObjects()
 		obj->drawRoutine = DrawDart;
 		obj->collision = ObjectCollision;
 		obj->control = DartControl;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_DART_EMITTER];
@@ -2952,6 +2971,8 @@ void TrapObjects()
 	{
 		obj->control = DartEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_HOMING_DART_EMITTER];
@@ -2959,6 +2980,8 @@ void TrapObjects()
 	{
 		obj->control = DartEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_FLAME];
@@ -2966,6 +2989,8 @@ void TrapObjects()
 	{
 		obj->control = FlameControl;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_FLAME_EMITTER];
@@ -2975,6 +3000,8 @@ void TrapObjects()
 		obj->collision = FlameEmitterCollision;
 		obj->control = FlameEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_FLAME_EMITTER2];
@@ -2984,6 +3011,8 @@ void TrapObjects()
 		obj->collision = FlameEmitterCollision;
 		obj->control = FlameEmitter2Control;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_FLAME_EMITTER3];
@@ -2991,12 +3020,16 @@ void TrapObjects()
 	{
 		obj->control = FlameEmitter3Control;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];
 	if (obj->loaded)
 	{
 		obj->control = GenSlot1Control;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_GEN_SLOT2];
@@ -3005,6 +3038,8 @@ void TrapObjects()
 		obj->initialise = InitialiseGenSlot2;
 		obj->control = GenSlot2Control;
 		obj->drawRoutine = DrawGenSlot2;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_GEN_SLOT3];
@@ -3013,6 +3048,8 @@ void TrapObjects()
 		obj->initialise = InitialiseGenSlot3;
 		obj->collision = HybridCollision;
 		obj->control = AnimatingControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_GEN_SLOT4];
@@ -3020,6 +3057,9 @@ void TrapObjects()
 	{
 		obj->initialise = InitialiseGenSlot4;
 		obj->control = GenSlot4Control;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_HIGH_OBJECT1];
@@ -3028,6 +3068,8 @@ void TrapObjects()
 		obj->initialise = InitialiseHighObject1;
 		obj->control = HighObject1Control;
 		obj->collision = ObjectCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_PORTAL];
@@ -3036,16 +3078,18 @@ void TrapObjects()
 		obj->initialise = InitialisePortal;
 		//obj->control = PortalControl;        // TODO: found the control procedure !
 		obj->drawRoutine = NULL;             // go to nullsub_44() !
+		obj->saveFlags = true; 
+		obj->usingDrawAnimatingItem = false;
 	}
-
-	/*
+	
 	obj = &Objects[ID_TRIGGER_TRIGGERER];
 	if (obj->loaded)
 	{
 		obj->control = ControlTriggerTriggerer;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
-	*/
 
 	InitialiseRopeTrap();
 
@@ -3056,12 +3100,15 @@ void TrapObjects()
 		obj->control = RopeControl;
 		obj->collision = RopeCollision;
 		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_POLEROPE];
 	if (obj->loaded)
 	{
 		obj->collision = PoleCollision;
+		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_WRECKING_BALL];
@@ -3071,6 +3118,9 @@ void TrapObjects()
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
 		obj->drawRoutineExtra = DrawWreckingBall;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_PROPELLER_H];

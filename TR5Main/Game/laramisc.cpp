@@ -656,7 +656,7 @@ void InitialiseLara(int restore)
 	}
 	else
 	{
-		memset(&Lara, 0, sizeof(LARA_INFO));
+		ZeroMemory(&Lara, sizeof(LARA_INFO));
 		ZeroMemory(&g_LaraExtra, sizeof(LaraExtraInfo));
 
 		g_LaraExtra.ExtraAnim = -1;
@@ -682,6 +682,7 @@ void InitialiseLara(int restore)
 
 	short gun = WEAPON_NONE;
 
+	// TODO: e should script this behaviour
 	if (Objects[ID_HK_ITEM].loaded)
 		gun = WEAPON_HK;
 	else if (Objects[ID_PISTOLS_ITEM].loaded)
