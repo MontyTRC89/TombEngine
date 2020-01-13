@@ -17,10 +17,10 @@ half4 glassOverlay(float2 UVs, half4 originalColor) {
 	y -= 0.15f;
 	y = distance(0.1f, y);
 	y = 1 - y;
-	y = pow(y, 7);
+	y = pow(y, 4);
 	y = saturate(y);
 	half4 color = originalColor;
-	return lerp(color, (color * 1.2f)+half4(0.4f, 0.4f, 0.4f, 0.0f), y);
+	return saturate(lerp(color, (color * 1.6f)+half4(0.4f, 0.4f, 0.4f, 0.0f), y));
 }
 
 half4 PSColored(PixelShaderInput input) : SV_TARGET
