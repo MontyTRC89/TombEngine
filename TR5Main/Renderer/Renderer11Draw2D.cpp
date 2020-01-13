@@ -38,17 +38,17 @@ bool Renderer11::initialiseBars()
 
 	array<Vector4, 9> dashColors = {
 		//top
-		Vector4(0,0,84/255.0f,1),
-		Vector4(0,25 / 255.0f,84 / 255.0f,1),
-		Vector4(0,82 / 255.0f,0,1),
+		Vector4(78/255.0f,4/255.0f,0,1),
+		Vector4(161/255.0f,25 / 255.0f,84 / 255.0f,1),
+		Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 		//center
-		Vector4(159 / 255.0f,159/255.0f,0,1),
-		Vector4(0,84 / 255,159/255.0f,1),
-		Vector4(13,134 / 255.0f,1,1),
+		Vector4(211 / 255.0f,29/255.0f,23/255.0f,1),
+		Vector4(245/255.0f,119 / 255,24/255.0f,1),
+		Vector4(207/255.0f,183 / 255.0f,27/255.0f,1),
 		//bottom
-		Vector4(0,0,84 / 255.0f,1),
-		Vector4(0,25/255.0f,84 / 255.0f,1),
-		Vector4(0,82 / 255.0f,0,1),
+		Vector4(78 / 255.0f,4 / 255.0f,0,1),
+		Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
+		Vector4(136/255.0f,117 / 255.0f,5/255.0f,1),
 	};
 
 	g_HealthBar = new RendererHUDBar(m_device, 20, 32, 150, 8, 1, healthColors);
