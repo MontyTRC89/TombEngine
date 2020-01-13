@@ -820,7 +820,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		}
 	}
 
-	if (Lara.waterStatus != LW_FLYCHEAT && g_LaraExtra.ExtraAnim == -1)
+	if (Lara.waterStatus != LW_FLYCHEAT && g_LaraExtra.ExtraAnim == 0)
 		LaraTestWaterDepth(item, coll);
 }
 
