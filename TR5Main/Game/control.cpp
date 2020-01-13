@@ -109,6 +109,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			if ((DbInput & IN_DESELECT || g_Inventory->GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{ 
 				// Stop all sounds
+				SOUND_Stop();
 				int inventoryResult = g_Inventory->DoInventory();
 				switch (inventoryResult)
 				{
