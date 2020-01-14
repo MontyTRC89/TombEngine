@@ -109,6 +109,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			if ((DbInput & IN_DESELECT || g_Inventory->GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{ 
 				// Stop all sounds
+				SOUND_Stop();
 				int inventoryResult = g_Inventory->DoInventory();
 				switch (inventoryResult)
 				{
@@ -1067,22 +1068,24 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 
 				if (flags & 0x100)
 					FlipMap[value] |= 0x100;
-				if (!FlipStatus)
+				if (!FlipStats[value])
 					flip = value;
 			}
-			else if (FlipStatus)
+			else if (FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPON:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && !FlipStatus)
+			FlipMap[value] |= 0x3E00;
+			if (!FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPOFF:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && FlipStatus)
+			FlipMap[value] &= ~0x3E00;
+			if (FlipStats[value])
 				flip = value;
 			break;
 
