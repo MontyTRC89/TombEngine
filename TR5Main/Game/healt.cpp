@@ -14,7 +14,9 @@ int FlashState = 0;
 int FlashCount = 0;
 int PoisonFlag = 0;
 int DashTimer = 0;
-
+extern RendererHUDBar* g_HealthBar;
+extern RendererHUDBar* g_DashBar;
+extern RendererHUDBar* g_AirBar;
 extern LaraExtraInfo g_LaraExtra;
 
 void DrawHealthBarOverlay(int value)
@@ -26,20 +28,20 @@ void DrawHealthBarOverlay(int value)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
-		g_Renderer->DrawBar(245, 32, 150, 12, value, 0xA00000, color2);
+		g_Renderer->DrawBar(value, g_HealthBar);
 	}
 }
 
-void DrawHealthBar(int value)
+void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
-		int color2;
-		if (Lara.poisoned || Lara.gassed)
-			color2 = 0xA0A000;
-		else
-			color2 = 0xA00000;
-		g_Renderer->DrawBar(20, 32, 150, 12, value, 0xA00000, color2);
+		//int color2;
+		//if (Lara.poisoned || Lara.gassed)
+		//	color2 = 0xA0A000;
+		//else
+		//	color2 = 0xA00000;
+		g_Renderer->DrawBar(value,g_HealthBar);
 	}
 }
 
@@ -66,14 +68,14 @@ void UpdateHealtBar(int flash)
 		if (!BinocularRange)
 		{
 			if (flash)
-				DrawHealthBar(hitPoints / 10);
+				DrawHealthBar(hitPoints / 1000.0f);
 			else
 				DrawHealthBar(0);
 		}
 		else 
 		{
 			if (flash)
-				DrawHealthBarOverlay(hitPoints / 10);
+				DrawHealthBarOverlay(hitPoints / 1000.0f);
 			else
 				DrawHealthBarOverlay(0);
 		}
@@ -85,11 +87,11 @@ void UpdateHealtBar(int flash)
 	{
 		if (!BinocularRange && !SniperOverlay)
 		{
-			DrawHealthBar(hitPoints / 10);
+			DrawHealthBar(hitPoints / 1000.0f);
 		}
 		else
 		{
-			DrawHealthBarOverlay(hitPoints / 10);
+			DrawHealthBarOverlay(hitPoints / 1000.0f);
 		}
 	}
 
@@ -97,11 +99,11 @@ void UpdateHealtBar(int flash)
 		PoisonFlag--;
 }
 
-void DrawAirBar(int value)
+void DrawAirBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer->DrawBar(20, 10, 150, 12, value, 0x0000A0, 0x0050A0);
+		g_Renderer->DrawBar(value, g_AirBar);
 	}
 }
 
@@ -128,12 +130,12 @@ void UpdateAirBar(int flash)
 	if (air <= 450)
 	{
 		if (flash)
-			DrawAirBar((air * 100) / 1800);
+			DrawAirBar(air/ 1800.0f);
 		else
 			DrawAirBar(0);
 	}
 	else
-		DrawAirBar((air * 100) / 1800);
+		DrawAirBar(air / 1800.0f);
 
 	if (Lara.gassed)
 	{
@@ -147,7 +149,7 @@ void DrawDashBar(int value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer->DrawBar(630, 32, 150, 12, value, 0xA0A000, 0x00A000);
+		g_Renderer->DrawBar(value, g_DashBar);
 	}
 }
 
