@@ -13,7 +13,7 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern std::deque<FOOTPRINT_STRUCT> footprints;
-
+extern int g_NumSprites;
 void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
 {
 	if (m_nextSprite >= MAX_SPRITES)
@@ -418,28 +418,32 @@ bool Renderer11::drawGunFlashes()
 
 void Renderer11::drawFootprints()
 {
-	for (auto i = footprints.begin(); i != footprints.end(); i++) {
-		FOOTPRINT_STRUCT& footprint = *i;
-		if (footprint.active) {
-			float y = footprint.pos.yPos;
-			Matrix rot = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(footprint.pos.yRot) + PI);
-			Vector3 p1 = Vector3(-64, 0, -64);
-			Vector3 p2 = Vector3(64, 0, -64);
-			Vector3 p3 = Vector3(64, 0, 64);
-			Vector3 p4 = Vector3(-64, 0, 64);
-			p1 = XMVector3Transform(p1, rot);
-			p2 = XMVector3Transform(p2, rot);
-			p3 = XMVector3Transform(p3, rot);
-			p4 = XMVector3Transform(p4, rot);
-			p1 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-			p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-			p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-			p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-			if (m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 1] != nullptr)
-				AddSprite3D(m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 1], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f),
-					0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
+	const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
+	if (g_NumSprites > spriteIndex) {
+		for (auto i = footprints.begin(); i != footprints.end(); i++) {
+			FOOTPRINT_STRUCT& footprint = *i;
+			if (footprint.active) {
+				float y = footprint.pos.yPos;
+				Matrix rot = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(footprint.pos.yRot) + PI);
+				Vector3 p1 = Vector3(-64, 0, -64);
+				Vector3 p2 = Vector3(64, 0, -64);
+				Vector3 p3 = Vector3(64, 0, 64);
+				Vector3 p4 = Vector3(-64, 0, 64);
+				p1 = XMVector3Transform(p1, rot);
+				p2 = XMVector3Transform(p2, rot);
+				p3 = XMVector3Transform(p3, rot);
+				p4 = XMVector3Transform(p4, rot);
+				p1 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
+				if (m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 1] != nullptr)
+					AddSprite3D(m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 1], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f),
+						0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
+			}
 		}
 	}
+	
 }
 
 void Renderer11::drawUnderwaterDust()
