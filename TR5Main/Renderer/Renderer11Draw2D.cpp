@@ -3,6 +3,8 @@
 RendererHUDBar* g_HealthBar;
 RendererHUDBar* g_AirBar;
 RendererHUDBar* g_DashBar;
+RendererHUDBar* g_MusicVolumeBar;
+RendererHUDBar* g_SFXVolumeBar;
 
 bool Renderer11::initialiseBars()
 {
@@ -38,22 +40,37 @@ bool Renderer11::initialiseBars()
 
 	array<Vector4, 9> dashColors = {
 		//top
-		Vector4(78/255.0f,4/255.0f,0,1),
-		Vector4(161/255.0f,25 / 255.0f,84 / 255.0f,1),
+		Vector4(78 / 255.0f,4 / 255.0f,0,1),
+		Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
 		Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 		//center
-		Vector4(211 / 255.0f,29/255.0f,23/255.0f,1),
-		Vector4(245/255.0f,119 / 255,24/255.0f,1),
-		Vector4(207/255.0f,183 / 255.0f,27/255.0f,1),
+		Vector4(211 / 255.0f,29 / 255.0f,23 / 255.0f,1),
+		Vector4(245 / 255.0f,119 / 255,24 / 255.0f,1),
+		Vector4(207 / 255.0f,183 / 255.0f,27 / 255.0f,1),
 		//bottom
 		Vector4(78 / 255.0f,4 / 255.0f,0,1),
 		Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
-		Vector4(136/255.0f,117 / 255.0f,5/255.0f,1),
+		Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 	};
-
+	array<Vector4, 9> soundSettingColors = {
+		//top
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		//center
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		//bottom
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+	};
 	g_HealthBar = new RendererHUDBar(m_device, 20, 32, 150, 8, 1, healthColors);
 	g_AirBar = new RendererHUDBar(m_device, 630, 32, 150, 8, 1, airColors);
-	g_DashBar = new RendererHUDBar(m_device, 630, 32+8+4, 150, 8, 1, dashColors);
+	g_DashBar = new RendererHUDBar(m_device, 630, 32 + 8 + 4, 150, 8, 1, dashColors);
+	g_MusicVolumeBar = new RendererHUDBar(m_device, 400, 212, 150, 8, 1, soundSettingColors);
+	g_SFXVolumeBar = new RendererHUDBar(m_device, 400, 230, 150, 8, 1, soundSettingColors);
 	return true;
 }
 bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
