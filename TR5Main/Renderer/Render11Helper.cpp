@@ -992,3 +992,14 @@ void Renderer11::GetLaraBonePosition(Vector3* pos, int bone)
 {
 
 }
+
+void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
+{
+	RendererRoom temporary;
+
+	temporary = m_rooms[roomNumber1];
+	m_rooms[roomNumber1] = m_rooms[roomNumber2];
+	m_rooms[roomNumber2] = temporary;
+	m_rooms[roomNumber1].Room = &Rooms[roomNumber1];
+	m_rooms[roomNumber2].Room = &Rooms[roomNumber2];
+}

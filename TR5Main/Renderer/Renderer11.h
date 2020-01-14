@@ -957,6 +957,7 @@ public:
 	void											AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
 	bool DrawBar(float percent, const RendererHUDBar* const bar);
+	void											FlipRooms(short roomNumber1, short roomNumber2);
 private:
 	void drawFootprints();
 };
