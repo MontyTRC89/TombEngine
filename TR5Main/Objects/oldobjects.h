@@ -87,4 +87,8 @@ void TwoBlocksPlatformCeiling(ITEM_INFO* item, int x, int y, int z, int* height)
 int IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z);
 void InitialiseRaisingCog(short itemNumber);
 void RaisingCogControl(short itemNumber);
-
+void TriggerElectricityWiresSparks(int x, int z, char objNum, char node, int flags);
+void TriggerLaraElectricitySparks(int flame);
+int ElectricityWireCheckDeadlyBounds(PHD_VECTOR* pos, short delta);
+void ElectricityWiresControl(short itemNumber);
+void InitialiseRomeHammer(short itemNumber);
