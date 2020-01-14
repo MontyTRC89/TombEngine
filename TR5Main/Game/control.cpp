@@ -1068,22 +1068,24 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 
 				if (flags & 0x100)
 					FlipMap[value] |= 0x100;
-				if (!FlipStatus)
+				if (!FlipStats[value])
 					flip = value;
 			}
-			else if (FlipStatus)
+			else if (FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPON:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && !FlipStatus)
+			FlipMap[value] |= 0x3E00;
+			if (!FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPOFF:
 			flipAvailable = true;
-			if ((FlipMap[value] & 0x3E00) == 0x3E00 && FlipStatus)
+			FlipMap[value] &= ~0x3E00;
+			if (FlipStats[value])
 				flip = value;
 			break;
 

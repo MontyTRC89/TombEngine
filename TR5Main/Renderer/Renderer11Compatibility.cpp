@@ -140,6 +140,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		r.Room = room;
 		r.AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
 		r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
+		r.Statics.resize(128);
 
 		if (room->NumVertices == 0)
 			continue;
@@ -427,15 +428,6 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 				oldLight++;
 			}
-		}
-
-		MESH_INFO* mesh = room->mesh;
-		for (int j = 0; j < room->numMeshes; j++)
-		{
-			RendererStatic obj;
-			obj.Mesh = mesh;
-			obj.RoomIndex = i;
-			r.Statics.push_back(obj);
 		}
 
 		// Merge vertices and indices in a single list
