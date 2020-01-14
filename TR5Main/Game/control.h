@@ -2,7 +2,6 @@
 
 #include "..\Global\global.h"
 
-#define GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
 #define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 #define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
@@ -55,6 +54,7 @@ void RumbleScreen();
 void RefreshCamera(short type, short* data);
 int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
 int TriggerActive(ITEM_INFO* item);
+int GetWaterHeight(int x, int y, int z, short roomNumber);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();
