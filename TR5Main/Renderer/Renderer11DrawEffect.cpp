@@ -321,7 +321,7 @@ bool Renderer11::drawGunFlashes()
 	short rotationX = 0;
 
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-	m_context->OMSetDepthStencilState(m_states->DepthNone(), 0);
+	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
 	if (Lara.weaponItem != WEAPON_FLARE && Lara.weaponItem != WEAPON_SHOTGUN && Lara.weaponItem != WEAPON_CROSSBOW)
 	{
