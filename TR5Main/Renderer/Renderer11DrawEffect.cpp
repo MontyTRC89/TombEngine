@@ -110,10 +110,27 @@ void Renderer11::drawSparks()
 		{
 			if (spark->flags & SP_DEF)
 			{
-				FX_INFO* fx = &Effects[spark->fxObj];
+				Vector3 pos = Vector3(spark->x, spark->y, spark->z);
+				
+				if (spark->flags & SP_FX)
+				{
+					FX_INFO* fx = &Effects[spark->fxObj];
+					
+					pos.x += fx->pos.xPos;
+					pos.y += fx->pos.yPos;
+					pos.z += fx->pos.zPos;
+				}
+				else if (spark->flags & SP_ITEM)
+				{
+					ITEM_INFO* item = &Items[spark->fxObj];
+
+					pos.x += item->pos.xPos;
+					pos.y += item->pos.yPos;
+					pos.z += item->pos.zPos;
+				}
 
 				AddSpriteBillboard(m_sprites[spark->def],
-					Vector3(fx->pos.xPos + spark->x, fx->pos.yPos + spark->y, fx->pos.zPos + spark->z),
+					pos,
 					Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
 					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f,
 					BLENDMODE_ALPHABLEND);

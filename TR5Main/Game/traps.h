@@ -2,8 +2,8 @@
 
 #include "..\Global\global.h"
 
-#define ElectricityWiresControl ((void (__cdecl*)(short)) 0x00442610)
-#define InitialiseRomeHammer ((void (__cdecl*)(short)) 0x0043ECB0)
+//#define ElectricityWiresControl ((void (__cdecl*)(short)) 0x00442610)
+//#define InitialiseRomeHammer ((void (__cdecl*)(short)) 0x0043ECB0)
 #define InitialiseDeathSlide ((void (__cdecl*)(short)) 0x0041CC70)
 #define DeathSlideCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0041CCE0)
 #define DeathSlideControl ((void (__cdecl*)(short)) 0x0041CE00)
