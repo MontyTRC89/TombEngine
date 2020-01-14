@@ -140,7 +140,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		r.Room = room;
 		r.AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
 		r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
-		r.Statics.resize(128);
+		r.Statics.resize(room->numMeshes);
 
 		if (room->NumVertices == 0)
 			continue;
