@@ -44,7 +44,7 @@ extern BUBBLE_STRUCT Bubbles[MAX_BUBBLES];
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
+extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
