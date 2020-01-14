@@ -323,8 +323,8 @@ bool Renderer11::drawGunFlashes()
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-	m_stLights.NumLights = item->Lights.Size();
-	for (int j = 0; j < item->Lights.Size(); j++)
+	m_stLights.NumLights = item->Lights.size();
+	for (int j = 0; j < item->Lights.size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -338,7 +338,7 @@ bool Renderer11::drawGunFlashes()
 	short rotationX = 0;
 
 	m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-	m_context->OMSetDepthStencilState(m_states->DepthNone(), 0);
+	m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
 	if (Lara.weaponItem != WEAPON_FLARE && Lara.weaponItem != WEAPON_SHOTGUN && Lara.weaponItem != WEAPON_CROSSBOW)
 	{
@@ -670,8 +670,8 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-	m_stLights.NumLights = effect->Lights.Size();
-	for (int j = 0; j < effect->Lights.Size(); j++)
+	m_stLights.NumLights = effect->Lights.size();
+	for (int j = 0; j < effect->Lights.size(); j++)
 		memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -763,8 +763,8 @@ bool Renderer11::drawWaterfalls()
 			updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 			m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-			m_stLights.NumLights = item->Lights.Size();
-			for (int j = 0; j < item->Lights.Size(); j++)
+			m_stLights.NumLights = item->Lights.size();
+			for (int j = 0; j < item->Lights.size(); j++)
 				memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 			updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 			m_context->PSSetConstantBuffers(2, 1, &m_cbLights);

@@ -5,9 +5,9 @@
 #define MAX_COLLECTED_PICKUPS 32
 
 void DrawHealthBarOverlay(int value);
-void DrawHealthBar(int value);
+void DrawHealthBar(float value);
 void UpdateHealtBar(int flash);
-void DrawAirBar(int value);
+void DrawAirBar(float value);
 void UpdateAirBar(int flash);
 void DrawDashBar(int value);
 void AddDisplayPickup(short objectNumber);
