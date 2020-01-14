@@ -1227,7 +1227,7 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO* room = &Rooms[roomNumber];
-	FLOOR_INFO* floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT)* room->xSize];
+	FLOOR_INFO* floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
@@ -1236,7 +1236,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			room = &Rooms[floor->skyRoom];
 			if (!(room->flags & ENV_FLAG_WATER))
 				return (floor->ceiling << 8);
-			floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT)* room->xSize];
+			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 		return NO_HEIGHT;
 	}
@@ -1247,7 +1247,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			room = &Rooms[floor->pitRoom];
 			if (room->flags & ENV_FLAG_WATER)
 				return (floor->floor << 8);
-			floor = &room->floor[((z - room->z) >> WALL_SHIFT) + ((x - room->x) >> WALL_SHIFT)* room->xSize];
+			floor = &XZ_GET_SECTOR(room, x - room->x, z - room->z);
 		}
 	}
 
@@ -3648,44 +3648,36 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
-		if (floor->skyRoom != NO_ROOM)
+		while (floor->skyRoom != NO_ROOM)
 		{
-			while (CheckNoColCeilingTriangle(floor, x, z) != 1)
-			{
-				r = &Rooms[floor->skyRoom];
-
-				if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
-					return r->minfloor;
-
-				floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
-				
-				if (floor->skyRoom == NO_ROOM)
-					break;
-			}
+			if (CheckNoColCeilingTriangle(floor, x, z) == 1)
+				break;
+			r = &Rooms[floor->skyRoom];
+			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
+				return r->minfloor;
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+			if (floor->skyRoom == NO_ROOM)
+				break;
 		}
 		
 		return r->maxceiling;
 	}
 	else
 	{
-		if (floor->pitRoom != NO_ROOM)
+		while (floor->pitRoom != NO_ROOM)
 		{
-			while (CheckNoColFloorTriangle(floor, x, z) != 1)
-			{
-				r = &Rooms[floor->pitRoom];
-
-				if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
-					return r->maxceiling;
-
-				floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);  
-
-				if (floor->pitRoom == NO_ROOM)
-					break;
-			}
+			if (CheckNoColFloorTriangle(floor, x, z) == 1)
+				break;
+			r = &Rooms[floor->pitRoom];
+			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+				return r->maxceiling;
+			floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+			if (floor->pitRoom == NO_ROOM)
+				break;
 		}
-		
-		return NO_HEIGHT;
 	}
+
+	return NO_HEIGHT;
 }
 
 void Inject_Control()
