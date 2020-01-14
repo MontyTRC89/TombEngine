@@ -74,7 +74,7 @@ void Renderer11::collectStatics(short roomNumber)
 
 	MESH_INFO * mesh = r->mesh;
 
-	int numStatics = room.Statics.size();
+	int numStatics = r->numMeshes;
 
 	for (int i = 0; i < numStatics; i++)
 	{
