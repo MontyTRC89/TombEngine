@@ -2366,8 +2366,6 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 			if (bucket->Vertices.size() == 0)
 				continue;
 
-			if (!animated)
-
 				if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
 					m_context->RSSetState(m_states->CullNone());
 				else
