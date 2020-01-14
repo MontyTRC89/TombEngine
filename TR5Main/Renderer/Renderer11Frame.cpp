@@ -6,7 +6,7 @@ void Renderer11::collectRooms()
 	for (int i = 0; i < NumberRooms; i++)
 	{
 		m_rooms[i].Visited = false;
-		m_rooms[i].LightsToDraw.Clear();
+		m_rooms[i].LightsToDraw.clear();
 	}
 
 	Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
@@ -92,7 +92,7 @@ void Renderer11::collectStatics(short roomNumber)
 
 void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect * effect)
 {
-	effect->Lights.Clear();
+	effect->Lights.clear();
 	if (m_rooms.size() <= roomNumber) {
 		return;
 	}
@@ -188,13 +188,13 @@ void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect * effec
 
 	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
 	{
-		effect->Lights.Add(m_tempItemLights[i]);
+		effect->Lights.push_back(m_tempItemLights[i]);
 	}
 }
 
 void Renderer11::collectLightsForItem(short roomNumber, RendererItem * item)
 {
-	item->Lights.Clear();
+	item->Lights.clear();
 	if (m_rooms.size() <= roomNumber) {
 		return;
 	}
@@ -303,7 +303,7 @@ void Renderer11::collectLightsForItem(short roomNumber, RendererItem * item)
 
 	for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
 	{
-		item->Lights.Add(m_tempItemLights[i]);
+		item->Lights.push_back(m_tempItemLights[i]);
 	}
 
 	if (item->Item->objectNumber == ID_LARA)
@@ -355,7 +355,7 @@ void Renderer11::collectLightsForRoom(short roomNumber)
 		// If the distance is less than the circle's radius, an intersection occurs
 		float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
 		if (distanceSquared < SQUARE(light->Out))
-			room.LightsToDraw.Add(light);
+			room.LightsToDraw.push_back(light);
 	}
 }
 
