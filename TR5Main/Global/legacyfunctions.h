@@ -67,6 +67,7 @@
 #define Legacy_UpdateShockwaves ((void (__cdecl*)()) 0x004849A0)
 #define Legacy_GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 #define Legacy_GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
+#define Legacy_GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
 
 // DOOR.CPP
 #define Legacy_InitialiseDoor ((void (__cdecl*)(short)) 0x0043DB60)

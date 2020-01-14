@@ -3604,6 +3604,90 @@ int TriggerActive(ITEM_INFO* item)
 	return flag;
 }
 
+int GetWaterHeight(int x, int y, int z, short roomNumber)
+{
+	ROOM_INFO* r = &Rooms[roomNumber];
+	FLOOR_INFO* floor;
+	short adjoiningRoom = NO_ROOM;
+
+	do 
+	{
+		int xBlock = (x - r->x) >> WALL_SHIFT;
+		int zBlock = (z - r->z) >> WALL_SHIFT;
+
+		if (zBlock <= 0)
+		{
+			zBlock = 0;
+			if (xBlock < 1)
+				xBlock = 1;
+			else if (xBlock > r->ySize - 2)
+				xBlock = r->ySize - 2;
+		}
+		else if (zBlock >= r->xSize - 1)
+		{
+			zBlock = r->xSize - 1;
+			if (xBlock < 1)
+				xBlock = 1;
+			else if (xBlock > r->ySize - 2)
+				xBlock = r->ySize - 2;
+		}
+		else if (xBlock < 0)
+			xBlock = 0;
+		else if (xBlock >= r->ySize)
+			xBlock = r->ySize - 1;
+
+		floor = &r->floor[zBlock + xBlock * r->xSize];
+		adjoiningRoom = GetDoor(floor);
+
+		if (adjoiningRoom != NO_ROOM)
+		{
+			roomNumber = adjoiningRoom;
+			r = &Rooms[adjoiningRoom];
+		}
+	} while (adjoiningRoom != NO_ROOM);
+
+	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	{
+		if (floor->skyRoom != NO_ROOM)
+		{
+			while (CheckNoColCeilingTriangle(floor, x, z) != 1)
+			{
+				r = &Rooms[floor->skyRoom];
+
+				if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
+					return r->minfloor;
+
+				floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
+				
+				if (floor->skyRoom == NO_ROOM)
+					break;
+			}
+		}
+		
+		return r->maxceiling;
+	}
+	else
+	{
+		if (floor->pitRoom != NO_ROOM)
+		{
+			while (CheckNoColFloorTriangle(floor, x, z) != 1)
+			{
+				r = &Rooms[floor->pitRoom];
+
+				if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+					return r->maxceiling;
+
+				floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);  
+
+				if (floor->pitRoom == NO_ROOM)
+					break;
+			}
+		}
+		
+		return NO_HEIGHT;
+	}
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
