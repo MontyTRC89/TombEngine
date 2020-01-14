@@ -3,7 +3,9 @@
 
 extern COLL_INFO coll;
 
-void GetLaraDeadlyBounds();
+#define GetLaraDeadlyBounds ((void (__cdecl*)()) 0x004569C0)
+
+//void GetLaraDeadlyBounds();
 void DelAlignLaraToRope(ITEM_INFO* item);
 void InitialiseLaraAnims(ITEM_INFO* item);
 void InitialiseLaraLoad(short itemNumber);
