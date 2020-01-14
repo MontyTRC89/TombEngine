@@ -859,7 +859,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
-		FlipStats[index] = value;
+		//FlipStats[index] = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkFlipMap))
@@ -867,8 +867,8 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
 		FlipMap[index] = value;
-		if (value)
-			DoFlipMap(value);
+		if ((value & 0x3E00) == 0x3E00)
+			DoFlipMap(index);
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkCdFlags))
