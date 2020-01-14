@@ -3405,6 +3405,8 @@ void DoFlipMap(short group)
 			r->fxNumber = flipped->fxNumber;
 			
 			AddRoomFlipItems(r);
+
+			g_Renderer->FlipRooms(i, r->flippedRoom);
 		}
 	}
 
