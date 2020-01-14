@@ -519,6 +519,6 @@ void Inject_Items()
 	INJECT(0x00440B60, RemoveActiveItem);
 	INJECT(0x00440C40, RemoveDrawnItem);
 	INJECT(0x004408B0, InitialiseItem);
-	INJECT(0x00440840, ClearItem);
+	INJECT(0x00408550, ClearItem);
 	INJECT(0x00440590, InitialiseItemArray);
 }
