@@ -4085,6 +4085,17 @@ void InitialiseObjects()
 		Rats = (RAT_STRUCT*)GameMalloc(NUM_RATS * sizeof(RAT_STRUCT));
 }
 
+void InitialiseGameFlags()
+{
+	ZeroMemory(FlipMap, 255 * sizeof(int));
+	ZeroMemory(FlipStats, 255 * sizeof(int));
+	
+	FlipEffect = -1;
+	FlipStatus = 0;
+	IsAtmospherePlaying = 0;
+	Camera.underwater = 0;
+}
+
 void Inject_Setup()
 {
 	INJECT(0x00473600, InitialiseObjects);

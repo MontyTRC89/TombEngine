@@ -695,12 +695,19 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 	Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 	up = Vector3::Transform(up, upRotation);
 
+	int zNear = 20;
+	int zFar = g_Configuration.MaxDrawDistance * 1024;
+
 	FieldOfView = fov;
 	View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), up);
-	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, 20.0f, g_Configuration.MaxDrawDistance * 1024.0f);
+	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, zNear, zFar);
 
 	m_stCameraMatrices.View = View;
 	m_stCameraMatrices.Projection = Projection;
+
+	// Setup legacy variables
+	PhdZNear = zNear << W2V_SHIFT;
+	PhdZFar = zFar << W2V_SHIFT;
 }
 
 bool Renderer11::EnumerateVideoModes()
@@ -849,6 +856,7 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 		m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
 		m_rooms[node->To].Visited = true;
 		m_roomsToDraw.push_back(&m_rooms[node->To]);
+		Rooms[node->To].boundActive = true;
 
 		collectLightsForRoom(node->To);
 		collectItems(node->To);

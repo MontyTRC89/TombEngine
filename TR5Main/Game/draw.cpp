@@ -4,6 +4,20 @@
 
 Renderer11* g_Renderer;
 
+int Outside;
+int Underwater;
+short BoundList[128];
+short DrawnRooms[128];
+int BoundStart;
+int BoundEnd;
+int NumberDrawnRooms;
+int OutsideTop;
+int OutsideBottom;
+int OutsideLeft;
+int OutsideRight;
+bool OutsideRoomExists;
+PHD_VECTOR DoorBuffer[4];
+
 int DrawPhaseGame()
 {
 	// Control routines uses joints calculated here for getting Lara joint positions
@@ -295,8 +309,294 @@ void _phd_PopMatrix_I(void)
 {
 	MatrixPtr -= 12;
 	DxMatrixPtr -= 48;
-	//dword_E6E468 -= 48;
-	//dword_E6D834 -= 48;
+}
+
+void CollectRooms(short roomNumber)
+{
+	roomNumber = Camera.pos.roomNumber;
+
+	if (roomNumber < 0)
+		return;
+
+	ROOM_INFO* r = &Rooms[roomNumber];
+
+	r->testLeft = 0;
+	PhdLeft = 0;
+	r->testTop = 0;
+	PhdTop = 0;
+	r->testRight = PhdWindowXmax;
+	PhdRight = PhdWindowXmax;
+	r->testBottom = PhdWindowYmax;
+	PhdBottom = PhdWindowYmax;
+
+	OutsideRoomExists = false;
+	Outside = r->flags & ENV_FLAG_OUTSIDE;
+	Underwater = r->flags & ENV_FLAG_WATER;
+
+	r->boundActive = 2;
+
+	BoundList[0] = roomNumber;
+	BoundStart = 0;
+	BoundEnd = 1;
+	NumberDrawnRooms = 0;
+
+	if (Outside)
+	{
+		OutsideTop = 0;
+		OutsideLeft = 0;
+		OutsideRight = PhdWindowXmax;
+		OutsideBottom = PhdWindowYmax;
+	}
+	else
+	{
+		OutsideLeft = PhdWindowXmax;
+		OutsideTop = PhdWindowYmax;
+		OutsideBottom = 0;
+		OutsideRight = 0;
+	}
+
+	GetRoomBounds();
+
+	printf("Number rooms: %d\n", NumberDrawnRooms);
+}
+
+void GetRoomBounds()
+{
+	short roomNumber;
+	ROOM_INFO* r;
+	short* door;
+	short numDoors;
+
+	while (BoundStart != BoundEnd)
+	{
+		roomNumber = BoundList[(BoundStart++) % 128];
+		r = &Rooms[roomNumber];
+		r->boundActive -= 2;
+
+		if (r->testLeft < r->left)
+			r->left = r->testLeft;
+		if (r->testTop < r->top)
+			r->top = r->testTop;
+		if (r->testRight > r->right)
+			r->right = r->testRight;
+		if (r->testBottom > r->bottom)
+			r->bottom = r->testBottom;
+
+		if (!(r->boundActive & 1))
+		{
+			DrawnRooms[NumberDrawnRooms++] = roomNumber;
+			
+			if (r->flags & ENV_FLAG_OUTSIDE)
+				Outside = ENV_FLAG_OUTSIDE;
+		}
+
+		if (r->flags & ENV_FLAG_OUTSIDE)
+		{
+			if (r->left < OutsideLeft)
+				OutsideLeft = r->left;
+			if (r->right > OutsideRight)
+				OutsideRight = r->right;
+			if (r->top < OutsideTop)
+				OutsideTop = r->top;
+			if (r->bottom > OutsideBottom)
+				OutsideBottom = r->bottom;
+		}
+
+		phd_PushMatrix();
+		phd_TranslateAbs(r->x, r->y, r->z);
+
+		door = r->door;
+		if (door)
+		{
+			numDoors = *(door++);
+
+			for (int i = 0; i < numDoors; i++, door += 15)
+			{
+				roomNumber = *(door++);
+
+				if (Rooms[roomNumber].flags & ENV_FLAG_OUTSIDE)
+					OutsideRoomExists = true;
+
+				int xc = W2VMatrix[M03];
+				int yc = W2VMatrix[M13];
+				int zc = W2VMatrix[M23];
+
+				// TODO: discard W2VMatrix and use directly camera position
+				if ((int)(door[0] * (r->x + door[3] - W2VMatrix[M03]))
+					+ (int)(door[1] * (r->y + door[4] - W2VMatrix[M13]))
+					+ (int)(door[2] * (r->z + door[5] - W2VMatrix[M23]))
+					>= 0)
+					continue;
+
+				SetRoomBounds(door, roomNumber, r);
+			}
+		}
+
+		phd_PopMatrix();
+	}
+}
+
+void SetRoomBounds(short* door, int roomNumber, ROOM_INFO* parent)
+{
+	ROOM_INFO* r = &Rooms[roomNumber];
+	PHD_VECTOR* dest;
+	PHD_VECTOR* last;
+	int xv, yv, zv;
+	int xs, ys, zs;
+
+	if (r->left <= parent->testLeft
+		&& r->right >= parent->testRight
+		&& r->top <= parent->testTop
+		&& r->bottom >= parent->testBottom)
+		return;
+
+	int left = parent->testRight;
+	int right = parent->testLeft;
+	int top = parent->testBottom;
+	int bottom = parent->testTop;
+
+	door += 3;
+
+	int zBehind = 0;
+	int zTooFar = 0;
+
+	dest = DoorBuffer;
+
+	for (int i = 0; i < 4; i++, dest++, door += 3)
+	{
+		for (int i = 0; i < 16; i++)
+			printf("M%d: %d ", i, MatrixPtr[i]);
+		printf("\n");
+
+		dest->x = xv = (int)(MatrixPtr[M00] * door[0] + MatrixPtr[M01] * door[1] + MatrixPtr[M02] * door[2] + MatrixPtr[M03]);
+		dest->y = yv = (int)(MatrixPtr[M10] * door[0] + MatrixPtr[M11] * door[1] + MatrixPtr[M12] * door[2] + MatrixPtr[M13]);
+		dest->z = zv = (int)(MatrixPtr[M20] * door[0] + MatrixPtr[M21] * door[1] + MatrixPtr[M22] * door[2] + MatrixPtr[M23]);
+
+		/* Convert to screen space (special if -z behind you) */
+		if (zv > 0)
+		{
+			/* Keep count of number of points too far away */
+			if (zv > PhdZFar)
+				zTooFar++;
+
+			zv /= PhdPerspective;
+			if (zv)
+			{
+				xs = xv / zv + PhdCentreX;
+				ys = yv / zv + PhdCentreY;
+			}
+			else
+			{
+				xs = (xv >= 0) ? PhdRight : PhdLeft;
+				ys = (yv >= 0) ? PhdBottom : PhdTop;
+			}
+
+			/* See if change bounds */
+			if (xs - 1 < left)
+				left = xs - 1;
+			if (xs + 1 > right)
+				right = xs + 1;
+
+			if (ys - 1 < top)
+				top = ys - 1;
+			if (ys + 1 > bottom)
+				bottom = ys + 1;
+		}
+		else
+			zBehind++;
+	}
+
+	if (zBehind == 4)
+		return;
+
+	if (zBehind > 0)
+	{
+		dest = &DoorBuffer[0];
+		last = &DoorBuffer[3];
+
+		for (int i = 0; i < 4; i++, last = dest, dest++)
+		{
+			/* Only if one point in front and one behind z=0 */
+			if ((dest->z <= 0) ^ (last->z <= 0))
+			{
+				/* x-clip */
+				if (dest->x < 0 && last->x < 0)
+					left = 0;
+				else if (dest->x > 0 && last->x > 0)
+					right = PhdWindowXmax;
+				else
+				{
+					left = 0;
+					right = PhdWindowXmax;
+				}
+
+				/* y-clip */
+				if (dest->y < 0 && last->y < 0)
+					top = 0;
+				else if (dest->y > 0 && last->y > 0)
+					bottom = PhdWindowYmax;
+				else
+				{
+					top = 0;
+					bottom = PhdWindowYmax;
+				}
+			}
+		}
+	}
+
+	/* Clip bounds to parent window */
+	if (left < parent->testLeft)
+		left = parent->testLeft;
+	if (right > parent->testRight)
+		right = parent->testRight;
+	if (top < parent->testTop)
+		top = parent->testTop;
+	if (bottom > parent->testBottom)
+		bottom = parent->testBottom;
+
+	if (left >= right || top >= bottom)
+		return;
+
+	if (r->boundActive & 2)
+	{
+		if (r->testLeft > left)
+		{
+			r->Separator5[0] = left;
+			r->testLeft = left;
+		}
+
+		if (r->testTop > top)
+		{
+			r->Separator5[2] = top;
+			r->testTop = top;
+		}
+
+		if (r->testRight < right)
+		{
+			r->Separator5[1] = right;
+			r->testRight = right;
+		}
+
+		if (r->testBottom < bottom)
+		{
+			r->Separator5[3] = bottom;
+			r->testBottom = bottom;
+		}
+	}
+	else
+	{
+		BoundList[(BoundEnd++) % 128] = roomNumber;
+		
+		r->boundActive |= 2u;
+		r->testLeft = left;
+		r->testRight = right;
+		r->testTop = top;
+		r->testBottom = bottom;
+		r->Separator5[0] = left;
+		r->Separator5[1] = right;
+		r->Separator5[2] = top;
+		r->Separator5[3] = bottom;
+	}
 }
 
 void Inject_Draw()

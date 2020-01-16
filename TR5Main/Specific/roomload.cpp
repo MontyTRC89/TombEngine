@@ -10,6 +10,8 @@
 #include "..\Scripting\GameFlowScript.h"
 #include "..\Game\control.h"
 #include "..\Game\pickup.h"
+#include "../Game/door.h"
+#include "../Game/box.h"
 
 #include "IO/ChunkId.h"
 #include "IO/ChunkReader.h"
@@ -264,10 +266,6 @@ void LoadObjects()
 
 		Objects[objNum].loaded = true;
 	}
-
-	// TODO: this functions seems to not be useful anymore. Hairs and skinning works fine without it.
-	//if (LaraDrawType != LARA_DIVESUIT)
-	//	CreateSkinningData();
 
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
@@ -589,6 +587,45 @@ unsigned __stdcall LoadLevel(void* data)
 	_endthreadex(1);
 
 	return true;
+}
+
+void LoadBoxes()
+{
+	// Read boxes
+	NumberBoxes = ReadInt32();
+	Boxes = (BOX_INFO*)GameMalloc(NumberBoxes * sizeof(BOX_INFO));
+	ReadBytes(Boxes, NumberBoxes * sizeof(BOX_INFO));
+
+	// Read overlaps
+	NumberOverlaps = ReadInt32();
+	Overlaps = (short*)GameMalloc(NumberOverlaps * sizeof(short));
+	ReadBytes(Overlaps, NumberOverlaps * sizeof(short));
+
+	// Read zones
+	for (int i = 0; i < 2; i++)
+	{
+		// Ground zones
+		for (int j = 0; j < 4; j++)
+		{
+			short* zone = (short*)GameMalloc(NumberBoxes * sizeof(short));
+			ReadBytes(zone, NumberBoxes * sizeof(short));
+			Zones[j][i] = zone;
+		}
+
+		// Fly zone
+		short* zone = (short*)GameMalloc(NumberBoxes * sizeof(short));
+		ReadBytes(zone, NumberBoxes * sizeof(short));
+		Zones[4][i] = zone;
+	}
+
+	// By default all blockable boxes are blocked
+	for (int i = 0; i < NumberBoxes; i++)
+	{
+		if (Boxes[i].overlapIndex & BLOCKABLE)
+		{
+			Boxes[i].overlapIndex |= BLOCKED;
+		}
+	}
 }
 
 int S_LoadLevelFile(int levelIndex)

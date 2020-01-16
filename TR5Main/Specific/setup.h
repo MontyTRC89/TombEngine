@@ -7,7 +7,7 @@ void ObjectObjects();
 void TrapObjects();
 void InitialiseHair();
 void InitialiseSpecialEffects();
-
+void InitialiseGameFlags();
 void CustomObjects();
 void InitialiseObjects();
 
