@@ -16,6 +16,8 @@ extern SPLASH_SETUP SplashSetup;
 extern int SmokeWeapon;
 extern int SmokeCountL;
 extern int SmokeCountR;
+extern PHD_VECTOR NodeVectors[16];
+extern NODEOFFSET_INFO NodeOffsets[16];
 
 void DetatchSpark(int num, int type);
 int GetFreeSpark();

@@ -10,6 +10,10 @@
 #define TRIG_BITS(T) ((T & 0x3fff) >> 10)
 
 extern int KeyTriggerActive;
+extern byte IsAtmospherePlaying;
+extern byte FlipStatus;
+extern int FlipStats[255];
+extern int FlipMap[255];
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);

@@ -2,6 +2,12 @@
 
 #include "..\Global\global.h"
 
+extern int NumberBoxes;
+extern BOX_INFO* Boxes;
+extern int NumberOverlaps;
+extern short* Overlaps;
+extern short* Zones[5][2];
+
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
 void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
 void FindAITargetObject(CREATURE_INFO* creature, short objectNumber);

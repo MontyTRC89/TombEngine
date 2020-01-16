@@ -10,6 +10,7 @@
 #include "debris.h"
 #include "control.h"
 #include "switch.h"
+#include "box.h"
 
 int lastWaterfallY = 0;
 short TightRopeBounds[12] = 

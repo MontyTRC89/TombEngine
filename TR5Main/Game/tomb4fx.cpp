@@ -22,26 +22,6 @@ char LaserSightActive = 0;
 char LaserSightCol = 0;
 int NextGunshell = 0;
 
-NODEOFFSET_INFO NodeOffsets[16] = // offset 0xA0A24
-{
-	{ -0x10, 0x28, 0xA0, -0xE, 0 },
-	{ -0x10, -8, 0xA0, 0, 0 },
-	{ 0, 0, 0x100, 8, 0 },
-	{ 0, 0, 0x100, 0x11, 0 },
-	{ 0, 0, 0x100, 0x1A, 0 },
-	{ 0, 0x90, 0x28, 0xA, 0 },
-	{ -0x28, 0x40, 0x168, 0xE, 0 },
-	{ 0, -0x258, -0x28, 0, 0 },
-	{ 0, 0x20, 0x10, 9, 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 }
-};
-
 int LaserSightX;
 int LaserSightY;
 int LaserSightZ;
@@ -55,7 +35,6 @@ int NextSpider = 0;
 int NextGunShell = 0;
 
 GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; 
-PHD_VECTOR NodeVectors[16]; 
 FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE]; 
 SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; 
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; 

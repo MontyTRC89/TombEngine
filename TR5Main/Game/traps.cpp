@@ -201,7 +201,7 @@ void FlameControl(short fxNumber)
 					Lara.burnSmoke = true;
 			}
 
-			TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, -1, 255 - ((Lara.currentZvel >> 10) & 1));
+			TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, -1, 255 - Lara.burnSmoke);
 		}
 	}
 

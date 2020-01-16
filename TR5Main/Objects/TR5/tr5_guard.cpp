@@ -523,7 +523,7 @@ void ControlGuard(short itemNum)
 					{
 						if (info.distance > 0x900000)
 						{
-							if (!(item->InDrawRoom))
+							if (!(item->inDrawRoom))
 								item->goalAnimState = 7;
 						}
 					}

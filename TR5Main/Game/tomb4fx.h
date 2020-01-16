@@ -1,18 +1,6 @@
 #pragma once
 #include "..\Global\types.h"
 
-struct NODEOFFSET_INFO
-{
-	short x; // size=0, offset=0
-	short y; // size=0, offset=2
-	short z; // size=0, offset=4
-	char meshNum; // size=0, offset=6
-	unsigned char gotIt; // size=0, offset=7
-};
-
-extern PHD_VECTOR NodeVectors[16]; // offset 0xA3274
-
-
 extern int LaserSightX;
 extern int LaserSightY;
 extern int LaserSightZ;
