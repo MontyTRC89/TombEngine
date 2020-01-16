@@ -1,4 +1,5 @@
 #include "lot.h"
+#include "box.h"
 #include "..\Global\global.h"
 #include <stdio.h>
 
@@ -283,8 +284,8 @@ void CreateZone(ITEM_INFO* item)
 	}
 	else
 	{
-		short* zone = GroundZones[creature->LOT.zone];
-		short* flippedZone = GroundZones[creature->LOT.zone + 1];
+		short* zone = Zones[creature->LOT.zone][0];
+		short* flippedZone = Zones[creature->LOT.zone][1];
 
 		short zoneNumber = zone[item->boxNumber];
 		short flippedZoneNumber = flippedZone[item->boxNumber];

@@ -1,5 +1,8 @@
 #include "Renderer11.h"
 #include "../Game/footprint.h"
+#include "../Game/effect2.h"
+#include "../Game/sphere.h"
+#include "../Game/lara.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -103,6 +106,13 @@ void Renderer11::drawFires()
 
 void Renderer11::drawSparks()
 {
+	PHD_VECTOR nodePos;
+
+	for (int i = 0; i < 16; i++)
+	{
+		NodeOffsets[i].gotIt = false;
+	}
+
 	for (int i = 0; i < MAX_SPARKS; i++)
 	{
 		SPARKS* spark = &Sparks[i];
@@ -120,19 +130,67 @@ void Renderer11::drawSparks()
 					pos.y += fx->pos.yPos;
 					pos.z += fx->pos.zPos;
 				}
-				else if (spark->flags & SP_ITEM)
+				else if (!(spark->flags & SP_ITEM))
+				{
+					pos.x = spark->x;
+					pos.y = spark->y;
+					pos.z = spark->z;
+				}
+				else
 				{
 					ITEM_INFO* item = &Items[spark->fxObj];
 
-					pos.x += item->pos.xPos;
-					pos.y += item->pos.yPos;
-					pos.z += item->pos.zPos;
+					if (spark->flags & SP_NODEATTATCH)
+					{
+						if (NodeOffsets[spark->nodeNumber].gotIt)
+						{
+							nodePos.x = NodeVectors[spark->nodeNumber].x;
+							nodePos.y = NodeVectors[spark->nodeNumber].y;
+							nodePos.z = NodeVectors[spark->nodeNumber].z;
+						}
+						else
+						{
+							nodePos.x = NodeOffsets[spark->nodeNumber].x;
+							nodePos.y = NodeOffsets[spark->nodeNumber].y;
+							nodePos.z = NodeOffsets[spark->nodeNumber].z;
+							
+							int meshNum = NodeOffsets[spark->nodeNumber].meshNum;
+							if (meshNum >= 0)
+								GetJointAbsPosition(item, &nodePos, meshNum);
+							else
+								GetLaraJointPosition(&nodePos, -meshNum);
+
+							NodeOffsets[spark->nodeNumber].gotIt = true;
+							
+							NodeVectors[spark->nodeNumber].x = nodePos.x;
+							NodeVectors[spark->nodeNumber].y = nodePos.y;
+							NodeVectors[spark->nodeNumber].z = nodePos.z;
+						}
+
+						pos.x += nodePos.x;
+						pos.y += nodePos.y;
+						pos.z += nodePos.z;
+
+						if (spark->sLife - spark->life > (rand() & 3) + 8)
+						{
+							spark->flags &= ~SP_ITEM;
+							spark->x = pos.x;
+							spark->y = pos.y;
+							spark->z = pos.z;
+						}
+					}
+					else
+					{
+						pos.x += item->pos.xPos;
+						pos.y += item->pos.yPos;
+						pos.z += item->pos.zPos;
+					}
 				}
 
 				AddSpriteBillboard(m_sprites[spark->def],
 					pos,
 					Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
-					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 12.0f, spark->size * 12.0f,
+					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size, spark->size,
 					BLENDMODE_ALPHABLEND);
 			}
 			else

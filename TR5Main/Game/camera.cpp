@@ -24,8 +24,7 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 		return;
 
 	// Maybe we should add this code, let's test before
-	/*short angles[2];
-	phd_GetVectorAngles(targetX - posX, targetY - posY, targetZ - posZ, angles);
+	/*
 	v13 = HIWORD(targetZ);
 	v15 = roll;
 	v14 = targetZ;
@@ -43,6 +42,28 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	Camera.pos.y = posY;
 	Camera.pos.z = posZ;
 	Camera.*/
+
+	short angles[2];
+	phd_GetVectorAngles(targetX - posX, targetY - posY, targetZ - posZ, angles);
+
+	PHD_3DPOS pos;
+	pos.xPos = posX;
+	pos.yPos = posY;
+	pos.zPos = posZ;
+	pos.xRot = angles[1];
+	pos.yRot = angles[0];
+	pos.zRot = roll;
+
+	/*roll = (v10 - targetX) * (v10 - targetX) + (v12 - v7) * (v12 - v7);
+	CamRotX = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
+	v8 = mGetAngle(posZ, posX, v7, targetX);
+	CamRotZ = 0;
+	CamRotY = v8 >> 4;
+	Camera.pos.x = posX;
+	Camera.pos.y = posY;
+	Camera.pos.z = posZ;*/
+
+	phd_GenerateW2V(&pos);
 
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }

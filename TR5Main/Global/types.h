@@ -227,7 +227,7 @@ typedef struct item_info_t {
 	unsigned int poisoned : 1; // offset=133.0
 	unsigned int aiBits : 5; // offset=133.1
 	unsigned int reallyActive : 1; // offset=133.6
-	unsigned int InDrawRoom : 1; // offset=133.7
+	unsigned int inDrawRoom : 1; // offset=133.7
 	int swapMeshFlags;// OFF=5614
 	short drawRoom;
 	short TOSSPAD; 
@@ -665,7 +665,7 @@ typedef struct room_info_t {
 	unsigned char reverbType; // size=0, offset=52
 	unsigned char flipNumber; // size=0, offset=53
 	byte meshEffect; // size=0, offset=54
-	byte bound_active; // size=0, offset=55
+	byte boundActive; // size=0, offset=55
 	short left; // size=0, offset=56
 	short right; // size=0, offset=58
 	short top; // size=0, offset=60
@@ -1403,6 +1403,15 @@ struct SP_DYNAMIC
 	unsigned char B; // size=0, offset=4
 	unsigned char Flags; // size=0, offset=5
 	unsigned char Pad[2]; // size=2, offset=6
+};
+
+struct NODEOFFSET_INFO
+{
+	short x; // size=0, offset=0
+	short y; // size=0, offset=2
+	short z; // size=0, offset=4
+	char meshNum; // size=0, offset=6
+	unsigned char gotIt; // size=0, offset=7
 };
 
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);

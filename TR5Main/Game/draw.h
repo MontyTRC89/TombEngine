@@ -7,7 +7,7 @@
 #define GetBestFrame ((short* (__cdecl*)(ITEM_INFO*)) 0x0042D020)
 #define CalcLaraMatrices ((void (__cdecl*)(int)) 0x0041E120)
 #define Sync ((int (__cdecl*)()) 0x004D1A40)
-#define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
+//#define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
 #define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 #define IsRoomOutside ((int (__cdecl*)(int, int, int)) 0x00418E90) 
 #define DrawBaddieGunFlash ((void (__cdecl*)(ITEM_INFO*)) 0x00466880)
@@ -51,6 +51,9 @@
 int DrawPhaseGame();
 void DrawAnimatingItem(ITEM_INFO* item);
 int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate);
+void CollectRooms(short roomNumber);
+void GetRoomBounds();
+void SetRoomBounds(short* door, int roomNumber, ROOM_INFO* parent);
 
 /* phd function (DX11 version) */
 // TODO: phd_XX function after this lign is used with DX11 one, when it's finished, delete the #define one and delete this sign: "_" at the beginning of the new function. (delete the unused if needed)

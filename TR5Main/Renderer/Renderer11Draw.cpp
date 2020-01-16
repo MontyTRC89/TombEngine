@@ -11,6 +11,7 @@
 #include "../Game/gameflow.h"
 #include "../Game/rope.h"
 #include "../Game/tomb4fx.h"
+#include "../Game/door.h"
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 int Renderer11::DrawPickup(short objectNum)
 {
@@ -1913,6 +1914,11 @@ bool Renderer11::drawScene(bool dump)
 
 	// Prepare the scene to draw
 	auto time1 = chrono::high_resolution_clock::now();
+
+	ProcessClosedDoors();
+	
+	// TEST
+	CollectRooms(CurrentRoom);
 
 	clearSceneItems();
 	collectRooms();

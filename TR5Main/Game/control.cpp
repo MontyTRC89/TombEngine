@@ -51,6 +51,10 @@ int rand_1 = -747505337;
 int rand_2 = -747505337;
 int RumbleTimer = 0;
 int InGameCnt = 0;
+byte IsAtmospherePlaying = 0;
+byte FlipStatus = 0;
+int FlipStats[255];
+int FlipMap[255];
 
 #define _NormalizeVector ((PHD_VECTOR* (__cdecl*)(PHD_VECTOR*)) 0x0046DE10)
 
@@ -3701,4 +3705,5 @@ void Inject_Control()
 	INJECT(0x004A7C90, SeedRandomDraw);
 	INJECT(0x00415300, AnimateItem);
 	INJECT(0x0041A170, GetTargetOnLOS);
+	INJECT(0x00415DA0, GetWaterHeight);
 }
