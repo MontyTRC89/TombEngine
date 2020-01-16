@@ -883,8 +883,10 @@ void AnimateLara(ITEM_INFO* item)
 		item->speed = velocity >> 16;
 	}
 
-	/*if (lara.RopePtr != -1)
-		result = j_SomeRopeCollisionFunc(item);*/
+#define SomeRopeCollisionFunc ((void (__cdecl*)(ITEM_INFO*)) 0x0046D510)
+
+	if (Lara.ropePtr != -1)
+		SomeRopeCollisionFunc(item);
 
 	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
