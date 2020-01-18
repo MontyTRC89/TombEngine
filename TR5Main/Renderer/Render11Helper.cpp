@@ -954,7 +954,7 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 			Vector4 a = p[i];
 			Vector4 b = p[(i + 1) % 4];
 
-			if ((a.w <= 0.0f) ^ (b.w <= 0.0f)) {
+			if ((a.w > 0.0f) ^ (b.w > 0.0f)) {
 
 				if (a.x < 0.0f && b.x < 0.0f)
 					clipPort->x = -1.0f;
