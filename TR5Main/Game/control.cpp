@@ -263,6 +263,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (Objects[item->objectNumber].control)
 					Objects[item->objectNumber].control(itemNum);
+
+				if (item->afterDeath < 128 && item->afterDeath > 0 && !(Wibble & 3))
+					item->afterDeath++;
+				if (item->afterDeath == 128)
+					KillItem(itemNum);
 			}
 			else
 			{
@@ -932,14 +937,14 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				item->flags |= flags & 0x3E00;
 			}
 
-			if ((item->flags & 0x3E00) & 0x3E00)
+			if ((item->flags & 0x3E00) == 0x3E00)
 			{
 				item->flags |= 0x20;
 
 				if (flags & 0x100)
 					item->flags |= 1;
 
-				if (!(item->active))
+				if (!(item->active) && !(item->flags & IFLAG_KILLED))
 				{
 					if (Objects[item->objectNumber].intelligent)
 					{
