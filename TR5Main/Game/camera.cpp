@@ -4,7 +4,12 @@
 #include <stdio.h>
 #include "draw.h"
 
+#define LfAspectCorrection VAR_U_(0x0055DA30, float)
+
 extern int KeyTriggerActive;
+
+PHD_VECTOR CurrentCameraPosition;
+SVECTOR CurrentCameraRotation;
 
 void ActivateCamera()
 {
@@ -23,30 +28,11 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	if (posX == targetX && posY == targetY && posZ == targetZ)
 		return;
 
-	// Maybe we should add this code, let's test before
-	/*
-	v13 = HIWORD(targetZ);
-	v15 = roll;
-	v14 = targetZ;
-	v10 = posX;
-	v11 = posY;
-	v12 = posZ;
-	roll = (v10 - targetX) * (v10 - targetX) + (v12 - v7) * (v12 - v7);
-	CamRotX = j_mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
-	v8 = j_mGetAngle(posZ, posX, v7, targetX);
-	CamRotZ = 0;
-	CamRotY = v8 >> 4;
-	CameraPosX = posX;
-	CameraPosY = posY;
-	Camera.pos.x = posX;
-	Camera.pos.y = posY;
-	Camera.pos.z = posZ;
-	Camera.*/
-
 	short angles[2];
 	phd_GetVectorAngles(targetX - posX, targetY - posY, targetZ - posZ, angles);
 
 	PHD_3DPOS pos;
+
 	pos.xPos = posX;
 	pos.yPos = posY;
 	pos.zPos = posZ;
@@ -54,14 +40,13 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	pos.yRot = angles[0];
 	pos.zRot = roll;
 
-	/*roll = (v10 - targetX) * (v10 - targetX) + (v12 - v7) * (v12 - v7);
-	CamRotX = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
-	v8 = mGetAngle(posZ, posX, v7, targetX);
-	CamRotZ = 0;
-	CamRotY = v8 >> 4;
-	Camera.pos.x = posX;
-	Camera.pos.y = posY;
-	Camera.pos.z = posZ;*/
+	CurrentCameraPosition.x = posX;
+	CurrentCameraPosition.y = posY;
+	CurrentCameraPosition.z = posZ;
+
+	CurrentCameraRotation.vx = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
+	CurrentCameraRotation.vy = mGetAngle(posZ, posX, targetZ, targetX) >> 4;
+	CurrentCameraRotation.vz = 0;
 
 	phd_GenerateW2V(&pos);
 
@@ -72,6 +57,7 @@ void AlterFOV(int value)
 { 
 	CurrentFOV = value;
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
+	LfAspectCorrection = 1; // 1.3333334f / (float)(PhdWidth / PhdHeight);
 }
 
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)

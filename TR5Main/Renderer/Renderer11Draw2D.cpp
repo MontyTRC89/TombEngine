@@ -1,35 +1,116 @@
 #include "Renderer11.h"
 
-bool Renderer11::DrawBar(int x, int y, int w, int h, int percent, int color1, int color2)
+RendererHUDBar* g_HealthBar;
+RendererHUDBar* g_AirBar;
+RendererHUDBar* g_DashBar;
+RendererHUDBar* g_MusicVolumeBar;
+RendererHUDBar* g_SFXVolumeBar;
+
+bool Renderer11::initialiseBars()
 {
-	byte r1 = (color1 >> 16) & 0xFF;
-	byte g1 = (color1 >> 8) & 0xFF;
-	byte b1 = (color1 >> 0) & 0xFF;
+	array<Vector4, 9> healthColors = {
+		//top
+		Vector4(82 / 255.0f,0,0,1),
+		Vector4(36 / 255.0f,46 / 255.0f,0,1),
+		Vector4(0,82 / 255.0f,0,1),
+		//center
+		Vector4(159 / 255.0f,0,0,1),
+		Vector4(78 / 255.0f,81 / 255.0f,0,1),
+		Vector4(0,158 / 255.0f,0,1),
+		//bottom
+		Vector4(82 / 255.0f,0,0,1),
+		Vector4(36 / 255.0f,46 / 255.0f,0,1),
+		Vector4(0,82 / 255.0f,0,1),
+	};
 
-	byte r2 = (color2 >> 16) & 0xFF;
-	byte g2 = (color2 >> 8) & 0xFF;
-	byte b2 = (color2 >> 0) & 0xFF;
+	array<Vector4, 9> airColors = {
+		//top
+		Vector4(0 ,0,90 / 255.0f,1),
+		Vector4(0 / 255.0f,28 / 255.0f,84 / 255.0f,1),
+		Vector4(0 ,47 / 255.0f,96/255.0f,1),
+		//center
+		Vector4(0,3 / 255,153 / 255.0f,1),
+		Vector4(0,39 / 255,155 / 255.0f,1),
+		Vector4(0,78 / 255.0f,159/255.0f,1),
+		//bottom
+		Vector4(0 ,0,90 / 255.0f,1),
+		Vector4(0 / 255.0f,28 / 255.0f,84 / 255.0f,1),
+		Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
+	};
 
-	float factorX = ScreenWidth / 800.0f;
-	float factorY = ScreenHeight / 600.0f;
+	array<Vector4, 9> dashColors = {
+		//top
+		Vector4(78 / 255.0f,4 / 255.0f,0,1),
+		Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
+		Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
+		//center
+		Vector4(211 / 255.0f,29 / 255.0f,23 / 255.0f,1),
+		Vector4(245 / 255.0f,119 / 255,24 / 255.0f,1),
+		Vector4(207 / 255.0f,183 / 255.0f,27 / 255.0f,1),
+		//bottom
+		Vector4(78 / 255.0f,4 / 255.0f,0,1),
+		Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
+		Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
+	};
+	array<Vector4, 9> soundSettingColors = {
+		//top
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		//center
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		//bottom
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+		Vector4(0.18f,0.3f,0.72f,1),
+	};
+	g_HealthBar = new RendererHUDBar(m_device, 20, 32, 150, 8, 1, healthColors);
+	g_AirBar = new RendererHUDBar(m_device, 630, 32, 150, 8, 1, airColors);
+	g_DashBar = new RendererHUDBar(m_device, 630, 32 + 8 + 4, 150, 8, 1, dashColors);
+	g_MusicVolumeBar = new RendererHUDBar(m_device, 400, 212, 150, 8, 1, soundSettingColors);
+	g_SFXVolumeBar = new RendererHUDBar(m_device, 400, 230, 150, 8, 1, soundSettingColors);
+	return true;
+}
+bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
+{
+	UINT strides = sizeof(RendererVertex);
+	UINT offset = 0;
+	float color[] = { 0,0,0,1.0f };
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetVertexBuffers(0, 1, &bar->vertexBufferBorder->Buffer, &strides, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetIndexBuffer(bar->indexBufferBorder->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
+	m_context->VSSetShader(m_vsHUD, NULL, 0);
+	m_context->PSSetShaderResources(0, 1, &m_HUDBarBorderTexture->ShaderResourceView);
+	ID3D11SamplerState* sampler = m_states->LinearClamp();
+	m_context->PSSetSamplers(0, 1, &sampler);
+	m_context->PSSetShader(m_psHUDTexture, NULL, 0);
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
+	m_context->RSSetState(m_states->CullNone());
+	m_context->DrawIndexed(56, 0, 0);
 
-	int realX = x * factorX;
-	int realY = y * factorY;
-	int realW = w * factorX;
-	int realH = h * factorY;
-
-	int realPercent = percent / 100.0f * realW;
-
-	for (int i = 0; i < realH; i++)
-		AddLine2D(realX, realY + i, realX + realW, realY + i, 0, 0, 0, 255);
-
-	for (int i = 0; i < realH; i++)
-		AddLine2D(realX, realY + i, realX + realPercent, realY + i, r1, g1, b1, 255);
-
-	AddLine2D(realX, realY, realX + realW, realY, 255, 255, 255, 255);
-	AddLine2D(realX, realY + realH, realX + realW, realY + realH, 255, 255, 255, 255);
-	AddLine2D(realX, realY, realX, realY + realH, 255, 255, 255, 255);
-	AddLine2D(realX + realW, realY, realX + realW, realY + realH + 1, 255, 255, 255, 255);
+	
+	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+	m_context->IASetInputLayout(m_inputLayout);
+	m_context->IASetVertexBuffers(0, 1, &bar->vertexBuffer->Buffer, &strides, &offset);
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->IASetIndexBuffer(bar->indexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_stHUDBar.Percent = percent;
+	updateConstantBuffer(m_cbHUDBar, &m_stHUDBar, sizeof(CHUDBarBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
+	m_context->PSSetConstantBuffers(0, 1, &m_cbHUDBar);
+	m_context->VSSetShader(m_vsHUD,NULL,0);
+	m_context->PSSetShader(m_psHUDBarColor, NULL,0);
+	m_context->OMSetBlendState(m_states->Opaque(), NULL,0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthNone(),NULL);
+	m_context->RSSetState(m_states->CullNone());
+	m_context->DrawIndexed(24, 0, 0);
+	
 
 	return true;
 }

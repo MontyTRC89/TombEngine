@@ -27,154 +27,20 @@
 
 #define DX11_RELEASE(x) if (x != NULL) x->Release()
 #define DX11_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-
+constexpr int REFERENCE_RES_WIDTH = 800;
+constexpr int REFERENCE_RES_HEIGHT = 450;
+constexpr float HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
+constexpr float HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
+constexpr float HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace std;
-
-template <class T>
-class PreallocatedVector 
-{
-private:
-	T**			m_objects;
-	int		m_maxItems;
-	int		m_numItems;
-	int		m_startSize;
-
-public:
-	PreallocatedVector()
-	{
-		m_objects = NULL;
-		m_maxItems = 0;
-		m_startSize = 0;
-		m_numItems = 0;
-	}
-
-	~PreallocatedVector()
-	{
-	}
-
-	inline void Reserve(int numItems)
-	{
-		m_objects = (T**)malloc(sizeof(T*) * numItems);
-		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
-		m_maxItems = numItems;
-		m_numItems = 0;
-		m_startSize = numItems;
-	}
-
-	inline void Clear()
-	{
-		m_numItems = 0;
-		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
-	}
-
-	inline int Size()
-	{
-		return m_numItems;
-	}
-
-	inline void Sort(int(*compareFunc)(T*, T*))
-	{
-		qsort(m_objects, m_numItems, sizeof(T), compareFunc);
-	}
-
-	inline T*& operator[] (int x) {
-		if (x >= m_maxItems)
-			return m_objects[0];
-		return m_objects[x];
-	}
-
-	inline void Add(T* value)
-	{
-		if (m_numItems >= m_maxItems)
-			return;
-		m_objects[m_numItems++] = value;
-	}
-};
-
-template <class T, class U>
-class PreallocatedDictionary
-{
-private:
-	T**			m_keys;
-	U**			m_objects;
-	int		m_maxItems;
-	int		m_numItems;
-	int		m_startSize;
-
-public:
-	PreallocatedDictionary()
-	{
-		m_keys = NULL;
-		m_objects = NULL;
-		m_maxItems = 0;
-		m_startSize = 0;
-		m_numItems = 0;
-	}
-
-	~PreallocatedDictionary()
-	{
-		free(m_keys);
-		free(m_objects);
-	}
-
-	inline void Reserve(int numItems)
-	{
-		m_keys = (T**)malloc(sizeof(T*) * numItems);
-		m_objects = (U**)malloc(sizeof(U*) * numItems);
-		ZeroMemory(m_keys, sizeof(T*) * m_maxItems);
-		ZeroMemory(m_objects, sizeof(U*) * m_maxItems);
-		m_maxItems = numItems;
-		m_numItems = 0;
-		m_startSize = numItems;
-	}
-
-	inline void Clear()
-	{
-		m_numItems = 0;
-		ZeroMemory(m_keys, sizeof(T*) * m_maxItems);
-		ZeroMemory(m_objects, sizeof(T*) * m_maxItems);
-	}
-
-	inline int Size()
-	{
-		return m_numItems;
-	}
-
-	inline T*& operator[] (int x) {
-		return m_objects[x];
-	}
-
-	inline bool KeyExists(T* key)
-	{
-		for (int i = 0; i < m_numItems; i++)
-			if (m_keys[i] == key)
-				return true;
-		return false;
-	}
-
-	inline U* Get(T* key)
-	{
-		for (int i = 0; i < m_numItems; i++)
-			if (m_keys[i] == key)
-				return m_objects[i];
-		return NULL;
-	}
-
-	inline void Add(T* key, U* value)
-	{
-		m_keys[m_numItems] = key;
-		m_objects[m_numItems++] = value;
-	}
-};
 
 struct RendererDisplayMode {
 	int Width;
 	int Height;
 	int RefreshRate;
 };
-
 struct RendererVideoAdapter {
 	string Name;
 	int Index;
@@ -475,6 +341,22 @@ public:
 	}
 };
 
+typedef struct RendererHUDBar {
+	VertexBuffer* vertexBufferBorder;
+	IndexBuffer* indexBufferBorder;
+	VertexBuffer* vertexBuffer;
+	IndexBuffer* indexBuffer;
+	/*
+		Initialises a new Bar for rendering. the Coordinates are set in the Reference Resolution (default 800x600).
+		The colors are setup like this
+		0-----------1-----------2
+		|           |           |
+		3-----------4-----------5
+		|           |           |
+		6-----------7-----------8
+	*/
+	RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4,9> colors);
+};
 struct RendererStringToDraw
 {
 	float X;
@@ -541,6 +423,13 @@ struct ShaderLight {
 	float Range;
 };
 
+struct CHUDBuffer {
+	Matrix View;
+	Matrix Projection;
+};
+struct CHUDBarBuffer {
+	float Percent;
+};
 struct CCameraMatrixBuffer
 {
 	Matrix View;
@@ -594,14 +483,7 @@ struct RendererAnimatedTexture
 struct RendererAnimatedTextureSet 
 {
 	int NumTextures;
-	RendererAnimatedTexture** Textures;
-
-	~RendererAnimatedTextureSet()
-	{
-		for (int i = 0; i < NumTextures; i++)
-			delete Textures[i];
-		free(Textures);
-	}
+	vector<RendererAnimatedTexture> Textures;
 };
 
 struct RendererBucket
@@ -635,7 +517,7 @@ struct RendererRoom
 	bool Visited;
 	float Distance;
 	int RoomNumber;
-	PreallocatedVector<RendererLight> LightsToDraw;
+	vector<RendererLight*> LightsToDraw;
 };
 
 struct RendererRoomNode {
@@ -653,7 +535,7 @@ struct RendererItem {
 	Matrix Scale;
 	Matrix AnimationTransforms[32];
 	int NumMeshes;
-	PreallocatedVector<RendererLight> Lights;
+	vector<RendererLight*> Lights;
 };
 
 struct RendererMesh
@@ -668,7 +550,7 @@ struct RendererEffect {
 	FX_INFO* Effect;
 	Matrix World;
 	RendererMesh* Mesh;
-	PreallocatedVector<RendererLight> Lights;
+	vector<RendererLight*> Lights;
 };
 
 struct RendererObject
@@ -700,21 +582,33 @@ struct RendererSprite {
 
 struct RendererSpriteSequence {
 	int Id;
-	RendererSprite** SpritesList;
+	vector<RendererSprite*> SpritesList;
 	int NumSprites;
 
+	RendererSpriteSequence()
+	{
+	}
 	RendererSpriteSequence(int id, int num)
 	{
 		Id = id;
 		NumSprites = num;
-		SpritesList = (RendererSprite**)malloc(sizeof(RendererSprite*) * num);
+		SpritesList = vector<RendererSprite*>(NumSprites);
 	}
 
-	~RendererSpriteSequence()
-	{
-		/*for (int i = 0; i < NumSprites; i++)
-			delete SpritesList[i];
-		free(SpritesList);*/
+	RendererSpriteSequence(const RendererSpriteSequence& rhs) {
+		Id = rhs.Id;
+		NumSprites = rhs.NumSprites;
+		SpritesList = rhs.SpritesList;
+	}
+
+	RendererSpriteSequence& operator=(const RendererSpriteSequence& other) {
+		if (this != &other) {
+			Id = other.Id;
+			NumSprites = other.NumSprites;
+			SpritesList = vector<RendererSprite*>(NumSprites);
+			std::copy(other.SpritesList.begin(), other.SpritesList.end(),back_inserter(SpritesList));
+		}
+		return *this;
 	}
 };
 
@@ -813,7 +707,10 @@ private:
 	ID3D11PixelShader*								m_psFullScreenQuad;
 	ID3D11VertexShader*								m_vsShadowMap;
 	ID3D11PixelShader*								m_psShadowMap;
-
+	ID3D11VertexShader*								m_vsHUD;
+	ID3D11PixelShader*								m_psHUDColor;
+	ID3D11PixelShader*								m_psHUDTexture;
+	ID3D11PixelShader*								m_psHUDBarColor;
 
 	ID3D11ShaderResourceView* m_shadowMapRV;
 	ID3D11Texture2D* m_shadowMapTexture;
@@ -835,7 +732,10 @@ private:
 	ID3D11Buffer*									m_cbRoom;
 	CShadowLightBuffer   							m_stShadowMap;
 	ID3D11Buffer*									m_cbShadowMap;
-
+	CHUDBuffer										m_stHUD;
+	ID3D11Buffer*									m_cbHUD;
+	CHUDBarBuffer									m_stHUDBar;
+	ID3D11Buffer*									m_cbHUDBar;
 	// Text and sprites
 	SpriteFont*										m_gameFont;
 	SpriteBatch*									m_spriteBatch;
@@ -845,6 +745,7 @@ private:
 	PrimitiveBatch<RendererVertex>*					m_primitiveBatch;
 
 	// System resources
+	Texture2D*										m_HUDBarBorderTexture;
 	Texture2D*										m_caustics[NUM_CAUSTICS_TEXTURES];
 	Texture2D*										m_binocularsTexture;
 	Texture2D*										m_whiteTexture;
@@ -894,10 +795,10 @@ private:
 	int												m_numStatics;
 	int												m_numSprites;
 	int												m_numSpritesSequences;
-	RendererSpriteSequence**						m_spriteSequences;
+	vector<RendererSpriteSequence>					m_spriteSequences;
 	unordered_map<unsigned int, RendererMesh*>		m_meshPointersToMesh;
 	Matrix											m_LaraWorldMatrix;
-	RendererAnimatedTextureSet**					m_animatedTextureSets;
+	vector<RendererAnimatedTextureSet>				m_animatedTextureSets;
 	int												m_numAnimatedTextureSets;
 	int												m_currentCausticsFrame;
 	RendererUnderwaterDustParticle					m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
@@ -1011,7 +912,7 @@ private:
 	bool											isInRoom(int x, int y, int z, short roomNumber);
 	bool											drawColoredQuad(int x, int y, int w, int h, Vector4 color);
 	bool											initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
-
+	bool											initialiseBars();
 public:
 	Matrix											View;
 	Matrix											Projection;
@@ -1055,7 +956,8 @@ public:
 	void											AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void											AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
-	bool											DrawBar(int x, int y, int w, int h, int percent, int color1, int color2);
+	bool DrawBar(float percent, const RendererHUDBar* const bar);
+	void											FlipRooms(short roomNumber1, short roomNumber2);
 private:
 	void drawFootprints();
 };

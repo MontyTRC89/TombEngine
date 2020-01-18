@@ -8,8 +8,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_moveableObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
 	ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
 
-	m_spriteSequences = (RendererSpriteSequence * *)malloc(sizeof(RendererSpriteSequence*) * ID_NUMBER_OBJECTS);
-	ZeroMemory(m_spriteSequences, sizeof(RendererSpriteSequence*) * ID_NUMBER_OBJECTS);
+	m_spriteSequences = vector<RendererSpriteSequence>(ID_NUMBER_OBJECTS);
 
 	m_staticObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * NUM_STATICS);
 	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);
@@ -23,17 +22,18 @@ bool Renderer11::PrepareDataForTheRenderer()
 	short* animatedPtr = AnimatedTextureRanges;
 	animatedPtr++;
 
-	m_animatedTextureSets = (RendererAnimatedTextureSet * *)malloc(sizeof(RendererAnimatedTextureSet*) * NUM_ANIMATED_SETS);
+	m_animatedTextureSets = vector<RendererAnimatedTextureSet>(NUM_ANIMATED_SETS);
 	m_numAnimatedTextureSets = numSets;
 
 	for (int i = 0; i < numSets; i++)
 	{
-		RendererAnimatedTextureSet* set = new RendererAnimatedTextureSet();
+		m_animatedTextureSets[i] = RendererAnimatedTextureSet();
+		RendererAnimatedTextureSet& const set = m_animatedTextureSets[i];
 		short numTextures = *animatedPtr + 1;
 		animatedPtr++;
 
-		set->Textures = (RendererAnimatedTexture * *)malloc(sizeof(RendererAnimatedTexture) * numTextures);
-		set->NumTextures = numTextures;
+		set.Textures = vector<RendererAnimatedTexture>(numTextures);
+		set.NumTextures = numTextures;
 
 		for (int j = 0; j < numTextures; j++)
 		{
@@ -42,22 +42,19 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 			OBJECT_TEXTURE* texture = &ObjectTextures[textureId];
 			int tile = texture->tileAndFlag & 0x7FFF;
-
-			RendererAnimatedTexture* newTexture = new RendererAnimatedTexture();
-			newTexture->Id = textureId;
+			set.Textures[j] = RendererAnimatedTexture();
+			RendererAnimatedTexture& const newTexture = set.Textures[j];
+			newTexture.Id = textureId;
 
 			for (int k = 0; k < 4; k++)
 			{
 				float x = (texture->vertices[k].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
 				float y = (texture->vertices[k].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 
-				newTexture->UV[k] = Vector2(x, y);
+				newTexture.UV[k] = Vector2(x, y);
 			}
 
-			set->Textures[j] = newTexture;
 		}
-
-		m_animatedTextureSets[i] = set;
 	}
 
 	// Step 1: create the texture atlas
@@ -142,8 +139,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 		r.RoomNumber = i;
 		r.Room = room;
 		r.AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
-		r.LightsToDraw.Reserve(32);
-		r.Statics.resize(128);
+		r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
+		r.Statics.resize(room->numMeshes);
 
 		if (room->NumVertices == 0)
 			continue;
@@ -793,12 +790,12 @@ bool Renderer11::PrepareDataForTheRenderer()
 		{
 			short numSprites = abs(obj->nmeshes);
 			short baseSprite = obj->meshIndex;
-
-			RendererSpriteSequence* sequence = new RendererSpriteSequence(MoveablesIds[i], numSprites);
+			m_spriteSequences[MoveablesIds[i]] = RendererSpriteSequence(MoveablesIds[i], numSprites);
+			RendererSpriteSequence& sequence = m_spriteSequences[MoveablesIds[i]];
 
 			for (int j = baseSprite; j < baseSprite + numSprites; j++)
 			{
-				sequence->SpritesList[j - baseSprite] = m_sprites[j];
+				sequence.SpritesList[j - baseSprite] = m_sprites[j];
 			}
 
 			m_spriteSequences[MoveablesIds[i]] = sequence;
