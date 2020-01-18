@@ -13,6 +13,9 @@
 #include "../Game/tomb4fx.h"
 #include "../Game/door.h"
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
+extern RendererHUDBar* g_DashBar;
+extern RendererHUDBar* g_SFXVolumeBar;
+extern RendererHUDBar* g_MusicVolumeBar;
 int Renderer11::DrawPickup(short objectNum)
 {
 	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
@@ -386,8 +389,8 @@ bool Renderer11::drawGunShells()
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-	m_stLights.NumLights = item->Lights.Size();
-	for (int j = 0; j < item->Lights.Size(); j++)
+	m_stLights.NumLights = item->Lights.size();
+	for (int j = 0; j < item->Lights.size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -848,7 +851,8 @@ int Renderer11::drawInventoryScene()
 						PrintString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
-						DrawBar(400, y + 4, 150, 18, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+						//DrawBar(400, y + 4, 150, 18, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
+						DrawBar(ring->Configuration.MusicVolume / 100.0f, g_MusicVolumeBar);
 
 						y += 25;
 
@@ -856,8 +860,8 @@ int Renderer11::drawInventoryScene()
 						PrintString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
 							PRINTSTRING_COLOR_ORANGE,
 							PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
-						DrawBar(400, y + 4, 150, 18, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
-
+						//DrawBar(400, y + 4, 150, 18, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
+						DrawBar(ring->Configuration.SfxVolume / 100.0f, g_SFXVolumeBar);
 						y += 25;
 
 						// Apply and cancel
@@ -1100,8 +1104,8 @@ int Renderer11::drawInventoryScene()
 	if (g_Inventory->GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
 	{
 		// Draw main logo
-		float factorX = ScreenWidth / 800.0f;
-		float factorY = ScreenHeight / 600.0f;
+		float factorX = (float)ScreenWidth / REFERENCE_RES_WIDTH;
+		float factorY = (float)ScreenHeight / REFERENCE_RES_HEIGHT;
 
 		RECT rect;
 		rect.left = 250 * factorX;
@@ -1329,7 +1333,6 @@ bool Renderer11::drawLines2D()
 
 	m_context->VSSetShader(m_vsSolid, NULL, 0);
 	m_context->PSSetShader(m_psSolid, NULL, 0);
-
 	Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth, m_viewport.MaxDepth);
 
 	m_stCameraMatrices.View = Matrix::Identity;
@@ -1783,7 +1786,7 @@ void Renderer11::DrawLoadingScreen(char* fileName)
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		m_swapChain->Present(0, 0);
-
+		m_context->ClearState();
 		if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor >= 1.0f)
 		{
 			m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
@@ -1918,7 +1921,7 @@ bool Renderer11::drawScene(bool dump)
 	ProcessClosedDoors();
 	
 	// TEST
-	CollectRooms(CurrentRoom);
+	//CollectRooms(CurrentRoom);
 
 	clearSceneItems();
 	collectRooms();
@@ -2030,7 +2033,7 @@ bool Renderer11::drawScene(bool dump)
 	// Bars
 	int flash = FlashIt();
 	if (DashTimer < 120)
-		DrawBar(630, 32, 150, 12, 100 * (unsigned short)DashTimer / 120, 0xA0A000, 0xA000);
+		DrawBar(DashTimer / 120.0f, g_DashBar);
 	UpdateHealtBar(flash);
 	UpdateAirBar(flash);
 	DrawAllPickups();
@@ -2171,8 +2174,8 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-	m_stLights.NumLights = item->Lights.Size();
-	for (int j = 0; j < item->Lights.Size(); j++)
+	m_stLights.NumLights = item->Lights.size();
+	for (int j = 0; j < item->Lights.size(); j++)
 		memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 	updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 	m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
@@ -2345,9 +2348,9 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	{
 		RendererRoom* room = m_roomsToDraw[i];
 
-		m_stLights.NumLights = room->LightsToDraw.Size();
-		for (int j = 0; j < room->LightsToDraw.Size(); j++)
-			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));
+		m_stLights.NumLights = 0; // room->LightsToDraw.size();
+		/*for (int j = 0; j < room->LightsToDraw.size(); j++)
+			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));*/
 		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
 
@@ -2368,8 +2371,6 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 
 			if (bucket->Vertices.size() == 0)
 				continue;
-
-			if (!animated)
 
 				if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
 					m_context->RSSetState(m_states->CullNone());

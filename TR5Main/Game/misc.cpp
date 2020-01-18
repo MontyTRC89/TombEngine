@@ -41,7 +41,7 @@ void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 			}
 
 			if (!adjoiningRoomFound)
-				roomArray[*numRooms++] = adjoiningRoom;
+				roomArray[*(numRooms++)] = adjoiningRoom;
 
 			door += 16;
 		}

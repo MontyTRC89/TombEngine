@@ -81,11 +81,11 @@ void Renderer11::updateAnimatedTextures()
 			for (int p = 0; p < bucket->Polygons.size(); p++)
 			{
 				RendererPolygon* polygon = &bucket->Polygons[p];
-				RendererAnimatedTextureSet* set = m_animatedTextureSets[polygon->AnimatedSet];
+				RendererAnimatedTextureSet& const set = m_animatedTextureSets[polygon->AnimatedSet];
 				int textureIndex = -1;
-				for (int j = 0; j < set->NumTextures; j++)
+				for (int j = 0; j < set.NumTextures; j++)
 				{
-					if (set->Textures[j]->Id == polygon->TextureId)
+					if (set.Textures[j].Id == polygon->TextureId)
 					{
 						textureIndex = j;
 						break;
@@ -94,17 +94,17 @@ void Renderer11::updateAnimatedTextures()
 				if (textureIndex == -1)
 					continue;
 
-				if (textureIndex == set->NumTextures - 1)
+				if (textureIndex == set.NumTextures - 1)
 					textureIndex = 0;
 				else
 					textureIndex++;
 
-				polygon->TextureId = set->Textures[textureIndex]->Id;
+				polygon->TextureId = set.Textures[textureIndex].Id;
 
 				for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
 				{
-					bucket->Vertices[polygon->Indices[v]].UV.x = set->Textures[textureIndex]->UV[v].x;
-					bucket->Vertices[polygon->Indices[v]].UV.y = set->Textures[textureIndex]->UV[v].y;
+					bucket->Vertices[polygon->Indices[v]].UV.x = set.Textures[textureIndex].UV[v].x;
+					bucket->Vertices[polygon->Indices[v]].UV.y = set.Textures[textureIndex].UV[v].y;
 				}
 			}
 		}
@@ -668,10 +668,10 @@ int Renderer11::getAnimatedTextureInfo(short textureId)
 {
 	for (int i = 0; i < m_numAnimatedTextureSets; i++)
 	{
-		RendererAnimatedTextureSet* set = m_animatedTextureSets[i];
-		for (int j = 0; j < set->NumTextures; j++)
+		RendererAnimatedTextureSet& const set = m_animatedTextureSets[i];
+		for (int j = 0; j < set.NumTextures; j++)
 		{
-			if (set->Textures[j]->Id == textureId)
+			if (set.Textures[j].Id == textureId)
 				return i;
 		}
 	}
@@ -893,15 +893,17 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 
 bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort)
 {
-	//return true;
-
 	ROOM_INFO* room = &Rooms[roomIndex];
 
-	Vector3 n = Vector3(*(portal + 1), *(portal + 2), *(portal + 3));
-	Vector3 v = Vector3(Camera.pos.x - (room->x + *(portal + 4)),
-		Camera.pos.y - (room->y + *(portal + 5)),
-		Camera.pos.z - (room->z + *(portal + 6)));
+	portal++;
 
+	Vector3 n = Vector3(portal[0], portal[1], portal[2]);
+	Vector3 v = Vector3(
+		Camera.pos.x - (room->x + portal[3]),
+		Camera.pos.y - (room->y + portal[4]),
+		Camera.pos.z - (room->z + portal[5]));
+
+	// Test camera and normal positions and decide if process door or not
 	if (n.Dot(v) <= 0.0f)
 		return false;
 
@@ -913,13 +915,19 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 	clipPort->z = FLT_MIN;
 	clipPort->w = FLT_MIN;
 
-	for (int i = 0; i < 4; i++) {
+	portal += 3;
 
-		Vector4 tmp = Vector4(*(portal + 4 + 3 * i) + room->x, *(portal + 4 + 3 * i + 1) + room->y,
-			*(portal + 4 + 3 * i + 2) + room->z, 1.0f);
+	// Project all portal's corners in screen space
+	for (int i = 0; i < 4; i++, portal += 3) 
+	{
+		Vector4 tmp = Vector4(portal[0] + room->x, portal[1] + room->y, portal[2] + room->z, 1.0f);
+
+		// Project corner on screen
 		Vector4::Transform(tmp, ViewProjection, p[i]);
 
-		if (p[i].w > 0.0f) {
+		if (p[i].w > 0.0f) 
+		{
+			// The corner is in front of camera
 			p[i].x *= (1.0f / p[i].w);
 			p[i].y *= (1.0f / p[i].w);
 			p[i].z *= (1.0f / p[i].w);
@@ -930,25 +938,31 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 			clipPort->w = max(clipPort->w, p[i].y);
 		}
 		else
+			// The corner is behind camera
 			zClip++;
 	}
 
+	// If all points are behind camera then door is not visible
 	if (zClip == 4)
 		return false;
 
-	if (zClip > 0) {
-		for (int i = 0; i < 4; i++) {
+	// If door crosses camera plane...
+	if (zClip > 0)
+	{
+		for (int i = 0; i < 4; i++) 
+		{
 			Vector4 a = p[i];
 			Vector4 b = p[(i + 1) % 4];
 
-			if ((a.w > 0.0f) ^ (b.w > 0.0f)) {
+			if ((a.w <= 0.0f) ^ (b.w <= 0.0f)) {
 
 				if (a.x < 0.0f && b.x < 0.0f)
 					clipPort->x = -1.0f;
 				else
 					if (a.x > 0.0f && b.x > 0.0f)
 						clipPort->z = 1.0f;
-					else {
+					else 
+					{
 						clipPort->x = -1.0f;
 						clipPort->z = 1.0f;
 					}
@@ -958,7 +972,8 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 				else
 					if (a.y > 0.0f && b.y > 0.0f)
 						clipPort->w = 1.0f;
-					else {
+					else 
+					{
 						clipPort->y = -1.0f;
 						clipPort->w = 1.0f;
 					}
@@ -967,13 +982,13 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 		}
 	}
 
-	if (clipPort->x > viewPort->z || clipPort->y > viewPort->w || clipPort->z < viewPort->x || clipPort->w < viewPort->y)
-		return false;
-
 	clipPort->x = max(clipPort->x, viewPort->x);
 	clipPort->y = max(clipPort->y, viewPort->y);
 	clipPort->z = min(clipPort->z, viewPort->z);
 	clipPort->w = min(clipPort->w, viewPort->w);
+
+	if (clipPort->x > viewPort->z || clipPort->y > viewPort->w || clipPort->z < viewPort->x || clipPort->w < viewPort->y)
+		return false;
 
 	return true;
 }
@@ -999,4 +1014,15 @@ bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 s
 void Renderer11::GetLaraBonePosition(Vector3* pos, int bone)
 {
 
+}
+
+void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
+{
+	RendererRoom temporary;
+
+	temporary = m_rooms[roomNumber1];
+	m_rooms[roomNumber1] = m_rooms[roomNumber2];
+	m_rooms[roomNumber2] = temporary;
+	m_rooms[roomNumber1].Room = &Rooms[roomNumber1];
+	m_rooms[roomNumber2].Room = &Rooms[roomNumber2];
 }

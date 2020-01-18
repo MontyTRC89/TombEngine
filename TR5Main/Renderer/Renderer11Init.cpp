@@ -49,7 +49,9 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 		if (m_caustics[i] == NULL)
 			return false;
 	}
-
+	m_HUDBarBorderTexture = Texture2D::LoadFromFile(m_device, "bar_border.png");
+	if (!m_HUDBarBorderTexture)
+		return false;
 	m_titleScreen = Texture2D::LoadFromFile(m_device, (char*)g_GameFlow->GetLevel(0)->Background.c_str());
 	if (m_titleScreen == NULL)
 		return false;
@@ -164,6 +166,19 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	if (m_psShadowMap == NULL)
 		return false;
 
+	m_vsHUD = compileVertexShader("Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", &blob);
+	if (m_vsHUD == NULL)
+		return false;
+	m_psHUDColor = compilePixelShader("Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", &blob);
+	if (m_psHUDColor == NULL)
+		return false;
+	m_psHUDTexture = compilePixelShader("Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", &blob);
+	if (m_psHUDTexture == NULL)
+		return false;
+	m_psHUDBarColor = compilePixelShader("Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", &blob);
+	if (m_psHUDBarColor == NULL)
+		return false;
+
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
 	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
@@ -172,6 +187,12 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
 	m_cbShadowMap = createConstantBuffer(sizeof(CShadowLightBuffer));
 	m_cbRoom = createConstantBuffer(sizeof(CRoomBuffer));
+	//Prepare HUD Constant buffer
+	m_cbHUDBar = createConstantBuffer(sizeof(CHUDBarBuffer));
+	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
+	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0)).Transpose();
+	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f).Transpose();
+	updateConstantBuffer(m_cbHUD, &m_stHUD, sizeof(CHUDBuffer));
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
@@ -193,8 +214,8 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{
-		m_items[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
-		m_effects[i].Lights.Reserve(MAX_LIGHTS_PER_ITEM);
+		m_items[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+		m_effects[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
 	m_textureAtlas = NULL;
@@ -211,7 +232,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_device->CreateBlendState(&blendStateDesc, &m_subtractiveBlendState);
-
+	initialiseBars();
 	return true;
 }
 
@@ -412,7 +433,7 @@ bool Renderer11::Create()
 #ifdef _RELEASE
 	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context);
 #else
-	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
+	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
 #endif
 
 	if (FAILED(res))

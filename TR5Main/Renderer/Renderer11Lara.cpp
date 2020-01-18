@@ -304,8 +304,8 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	if (!shadowMap)
 	{
-		m_stLights.NumLights = item->Lights.Size();
-		for (int j = 0; j < item->Lights.Size(); j++)
+		m_stLights.NumLights = item->Lights.size();
+		for (int j = 0; j < item->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
 		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);

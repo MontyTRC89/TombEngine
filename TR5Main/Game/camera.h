@@ -22,6 +22,8 @@
 #define SaveD3DCameraMatrix ((void(__cdecl*)()) 0x00497280)
 #define UnknownCamera ((void(__cdecl*)()) 0x004975D0)
 
+extern PHD_VECTOR CurrentCameraPosition;
+
 void ActivateCamera();
 void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
 void AlterFOV(int value);
