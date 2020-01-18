@@ -126,7 +126,8 @@ void SaveGame::saveItem(int itemNumber, int runtimeItem)
 		LEB128::Write(m_stream, 0x2000);
 		hasData = false;
 	}
-	else if (item->flags & (IFLAG_ACTIVATION_MASK | IFLAG_INVISIBLE | 0x20) || item->objectNumber == ID_LARA)
+	else if (item->flags & (IFLAG_ACTIVATION_MASK | IFLAG_INVISIBLE | 0x20) 
+		|| item->objectNumber == ID_LARA)
 	{
 		LEB128::Write(m_stream, 0x8000);
 		hasData = true;
@@ -557,10 +558,12 @@ bool SaveGame::readItem()
 
 	if (itemKind == 0x2000)
 	{
+		m_reader->ReadChunks(&readItemChunks, itemNumber);
+		DisableBaddieAI(itemNumber);
 		KillItem(itemNumber);
 		item->status = ITEM_DEACTIVATED;
-		//*(pItem - 35) |= 1u;
-		m_reader->ReadChunks(&readItemChunks, itemNumber);
+		item->flags |= ONESHOT;
+		item->afterDeath = 128;
 	}
 	else if (itemKind == 0x8000)
 	{
