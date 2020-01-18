@@ -51,9 +51,6 @@
 int DrawPhaseGame();
 void DrawAnimatingItem(ITEM_INFO* item);
 int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate);
-void CollectRooms(short roomNumber);
-void GetRoomBounds();
-void SetRoomBounds(short* door, int roomNumber, ROOM_INFO* parent);
 
 /* phd function (DX11 version) */
 // TODO: phd_XX function after this lign is used with DX11 one, when it's finished, delete the #define one and delete this sign: "_" at the beginning of the new function. (delete the unused if needed)
