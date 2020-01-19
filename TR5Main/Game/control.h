@@ -14,6 +14,13 @@ extern byte IsAtmospherePlaying;
 extern byte FlipStatus;
 extern int FlipStats[255];
 extern int FlipMap[255];
+extern bool InItemControlLoop;
+extern short ItemNewRoomNo;
+extern short ItemNewRooms[512];
+extern short NextFxActive;
+extern short NextFxFree;
+extern short NextItemActive;
+extern short NextItemFree;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);
