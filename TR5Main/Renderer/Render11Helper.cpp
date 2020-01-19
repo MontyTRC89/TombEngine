@@ -995,20 +995,9 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 
 bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
 {
-	//Vector3 closestPointInAabb = Vector3::Min(Vector3::Max(sphereCentre, boxMin), boxMax);
-	//double distanceSquared = (closestPointInAabb - sphereCentre).LengthSquared();
-	//return (distanceSquared < (sphereRadius * sphereRadius));
-
-	/*float x = max(boxMin.x, min(sphereCentre.x, boxMax.x));
-	float y = max(boxMin.y, min(sphereCentre.y, boxMax.y));
-	float z = max(boxMin.z, min(sphereCentre.z, boxMax.z));
-
-	float distance = sqrt((x - sphereCentre.x) * (x - sphereCentre.x) +
-		(y - sphereCentre.y) * (y - sphereCentre.y) +
-		(z - sphereCentre.z) * (z - sphereCentre.z));
-
-	return (distance < sphereRadius);*/
-	return 0;
+	BoundingBox box = BoundingBox(boxMin, boxMax);
+	BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
+	return box.Intersects(sphere);
 }
 
 void Renderer11::GetLaraBonePosition(Vector3* pos, int bone)
