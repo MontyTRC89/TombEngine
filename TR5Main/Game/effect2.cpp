@@ -885,9 +885,9 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	}
 	else
 	{
-		spark->xVel = GetRandomControl() - 128;
-		spark->yVel = -16 - (GetRandomControl() & 0xF);
-		spark->zVel = GetRandomControl() - 128;
+		spark->xVel = (byte)GetRandomControl() - 128;
+		spark->yVel = -16 - ((byte)GetRandomControl() & 0xF);
+		spark->zVel = (byte)GetRandomControl() - 128;
 		if (type == 1)
 			spark->friction = 51;
 		else
