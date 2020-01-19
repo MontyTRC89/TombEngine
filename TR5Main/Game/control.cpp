@@ -55,6 +55,13 @@ byte IsAtmospherePlaying = 0;
 byte FlipStatus = 0;
 int FlipStats[255];
 int FlipMap[255];
+bool InItemControlLoop;
+short ItemNewRoomNo;
+short ItemNewRooms[512];
+short NextFxActive;
+short NextFxFree;
+short NextItemActive;
+short NextItemFree;
 
 #define _NormalizeVector ((PHD_VECTOR* (__cdecl*)(PHD_VECTOR*)) 0x0046DE10)
 
@@ -287,8 +294,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		while (fxNum != NO_ITEM)
 		{
 			short nextFx = Effects[fxNum].nextActive;
-			if (Objects[Effects[fxNum].objectNumber].control)
-				Objects[Effects[fxNum].objectNumber].control(fxNum);
+			FX_INFO* fx = &Effects[fxNum];
+			if (Objects[fx->objectNumber].control)
+				Objects[fx->objectNumber].control(fxNum);
 			fxNum = nextFx;
 		}
 

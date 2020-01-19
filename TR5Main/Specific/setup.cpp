@@ -3106,8 +3106,8 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
+	// Flame is always loaded
 	obj = &Objects[ID_FLAME];
-	if (obj->loaded)
 	{
 		obj->control = FlameControl;
 		obj->drawRoutine = NULL;
