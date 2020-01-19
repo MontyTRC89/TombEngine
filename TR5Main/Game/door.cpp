@@ -825,7 +825,7 @@ void InitialiseDoor(short itemNumber)
 		item->inDrawRoom = true;
 	}
 
-	if (twoRoom != NO_ROOM && item->objectNumber >= ID_CLOSED_DOOR1 && item->objectNumber <= ID_LIFT_DOORS2)
+	/*if (twoRoom != NO_ROOM && item->objectNumber >= ID_CLOSED_DOOR1 && item->objectNumber <= ID_LIFT_DOORS2)
 	{
 		FillDoorPointers(door, item, twoRoom, dz, dx);
 		
@@ -860,7 +860,7 @@ void InitialiseDoor(short itemNumber)
 		door->item = item;
 
 		AssignClosedDoor(item);
-	}
+	}*/
 }
 
 void InitialiseClosedDoors()
