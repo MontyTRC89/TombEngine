@@ -2348,9 +2348,9 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	{
 		RendererRoom* room = m_roomsToDraw[i];
 
-		m_stLights.NumLights = 0; // room->LightsToDraw.size();
-		/*for (int j = 0; j < room->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));*/
+		m_stLights.NumLights = room->LightsToDraw.size();
+		for (int j = 0; j < room->LightsToDraw.size(); j++)
+			memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));
 		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
 		m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
 

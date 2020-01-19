@@ -104,3 +104,18 @@
 #define Legacy_FlashIt ((int (__cdecl*)()) 0x00439C10)
 #define Legacy_UpdateHealtBar ((void (__cdecl*)(int)) 0x00439E50)
 #define Legacy_UpdateAirBar ((void (__cdecl*)(int)) 0x00439FC0)
+
+// ITEMS.CPP
+#define Legacy_ItemNewRoom ((void (__cdecl*)(short, short)) 0x00440DA0)
+#define Legacy_EffectNewRoom ((void (__cdecl*)(short, short)) 0x004412F0)
+#define Legacy_KillEffect ((void (__cdecl*)(short)) 0x00441180)
+#define Legacy_CreateNewEffect ((short (__cdecl*)(short)) 0x004410F0)
+#define Legacy_InitialiseFXArray ((void (__cdecl*)(int)) 0x00441080)
+#define Legacy_AddActiveItem ((void (__cdecl*)(short)) 0x00440D10)
+#define Legacy_RemoveActiveItem ((void (__cdecl*)(short)) 0x00440B60)
+#define Legacy_RemoveDrawnItem ((void (__cdecl*)(short)) 0x00440C40)
+#define Legacy_InitialiseItem ((void (__cdecl*)(short)) 0x004408B0)
+#define Legacy_CreateItem ((short (__cdecl*)()) 0x00440840)
+#define Legacy_KillItem ((void (__cdecl*)(short)) 0x00440620)
+#define Legacy_ItemNearLara ((int (__cdecl*)(PHD_3DPOS*, int)) 0x00432580)
+#define Legacy_TranslateItem ((void (__cdecl*)(ITEM_INFO*, int, int, int)) 0x00415960)
