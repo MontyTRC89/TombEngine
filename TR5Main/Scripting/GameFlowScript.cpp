@@ -446,7 +446,7 @@ bool GameFlow::DoGameflow()
 
 		CurrentAtmosphere = level->Soundtrack;
 
-		if (level->Sky)
+		if (level->Horizon)
 		{
 			SkyColor1.r = level->Layer1.R;
 			SkyColor1.g = level->Layer1.G;
