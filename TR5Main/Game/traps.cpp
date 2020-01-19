@@ -192,7 +192,7 @@ void FlameControl(short fxNumber)
 			fx->pos.yPos = 0;
 			fx->pos.zPos = 0;
 
-			GetLaraJointPosition((PHD_VECTOR*)& fx->pos, i);
+			GetLaraJointPosition((PHD_VECTOR*)&fx->pos, i);
 
 			if (Lara.BurnCount)
 			{
