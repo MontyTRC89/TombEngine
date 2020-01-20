@@ -438,6 +438,15 @@ void SaveGame::End()
 	delete m_chunkSpiders;
 	delete m_chunkLaraExtraInfo;
 	delete m_chunkWeaponInfo;
+	delete m_chunkPuzzle;
+	delete m_chunkKey;
+	delete m_chunkPickup;
+	delete m_chunkExamine;
+	delete m_chunkPuzzleCombo;
+	delete m_chunkKeyCombo;
+	delete m_chunkPickupCombo;
+	delete m_chunkExamineCombo;
+	delete m_chunkWeaponItem;
 }
 
 bool SaveGame::Save(char* fileName)

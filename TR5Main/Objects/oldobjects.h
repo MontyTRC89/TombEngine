@@ -92,3 +92,6 @@ void TriggerLaraElectricitySparks(int flame);
 int ElectricityWireCheckDeadlyBounds(PHD_VECTOR* pos, short delta);
 void ElectricityWiresControl(short itemNumber);
 void InitialiseRomeHammer(short itemNumber);
+void InitialiseSmokeEmitter(short itemNumber);
+void SmokeEmitterControl(short itemNumber);
+

@@ -995,7 +995,9 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 
 bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
 {
-	BoundingBox box = BoundingBox(boxMin, boxMax);
+	Vector3 centre = (boxMin + boxMax) / 2.0f;
+	Vector3 extens = boxMax - centre;
+	BoundingBox box = BoundingBox(centre, extens);
 	BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
 	return box.Intersects(sphere);
 }

@@ -1335,13 +1335,13 @@ short* FindPlinth(ITEM_INFO* item)
 		MESH_INFO* mesh = &room->mesh[i];
 		if (mesh->Flags & 1)
 		{
-			if (item->pos.xPos == mesh->x && item->pos.yPos == mesh->y && item->pos.zPos == mesh->z)
+			if (item->pos.xPos == mesh->x && item->pos.zPos == mesh->z)
 			{
 				short* frame = GetBestFrame(item);
 				STATIC_INFO* s = &StaticObjects[mesh->staticNumber];
 				if (frame[0] <= s->xMaxc && frame[1] >= s->xMinc && frame[4] <= s->zMaxc && frame[5] >= s->zMinc && (s->xMinc || s->xMaxc))
 				{
-					found = i;
+					found = mesh->staticNumber;
 					break;
 				}
 			}
