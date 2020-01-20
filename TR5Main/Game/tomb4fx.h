@@ -1,5 +1,6 @@
 #pragma once
 #include "..\Global\types.h"
+#include "..\Global\constants.h"
 
 extern int LaserSightX;
 extern int LaserSightY;
@@ -14,6 +15,8 @@ extern int NextDrip;
 extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
+
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void TriggerExplosionBubble(int x, int y, int z, short roomNum);
