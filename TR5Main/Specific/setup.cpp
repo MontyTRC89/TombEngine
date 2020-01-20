@@ -2891,6 +2891,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
 	}
 
@@ -2900,6 +2901,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
 	}
 
@@ -2909,6 +2911,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
 	}
 
