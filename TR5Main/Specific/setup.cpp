@@ -2891,6 +2891,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
 	}
 
@@ -2900,6 +2901,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
 	}
 
@@ -2909,6 +2911,7 @@ void ObjectObjects()
 		obj->initialise = InitialiseSmokeEmitter;
 		obj->control = SmokeEmitterControl;
 		obj->drawRoutine = NULL;
+		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
 	}
 
@@ -3106,8 +3109,8 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
+	// Flame is always loaded
 	obj = &Objects[ID_FLAME];
-	if (obj->loaded)
 	{
 		obj->control = FlameControl;
 		obj->drawRoutine = NULL;
@@ -4083,6 +4086,17 @@ void InitialiseObjects()
 
 	if (Objects[ID_RATS].loaded)
 		Rats = (RAT_STRUCT*)GameMalloc(NUM_RATS * sizeof(RAT_STRUCT));
+}
+
+void InitialiseGameFlags()
+{
+	ZeroMemory(FlipMap, 255 * sizeof(int));
+	ZeroMemory(FlipStats, 255 * sizeof(int));
+	
+	FlipEffect = -1;
+	FlipStatus = 0;
+	IsAtmospherePlaying = 0;
+	Camera.underwater = 0;
 }
 
 void Inject_Setup()

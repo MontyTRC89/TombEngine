@@ -1,17 +1,6 @@
 #pragma once
 #include "..\Global\types.h"
-
-struct NODEOFFSET_INFO
-{
-	short x; // size=0, offset=0
-	short y; // size=0, offset=2
-	short z; // size=0, offset=4
-	char meshNum; // size=0, offset=6
-	unsigned char gotIt; // size=0, offset=7
-};
-
-extern PHD_VECTOR NodeVectors[16]; // offset 0xA3274
-
+#include "..\Global\constants.h"
 
 extern int LaserSightX;
 extern int LaserSightY;
@@ -26,6 +15,8 @@ extern int NextDrip;
 extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
+
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void TriggerExplosionBubble(int x, int y, int z, short roomNum);

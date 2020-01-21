@@ -14,5 +14,10 @@ void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd);
 void InitialiseDoor(short itemNumber);
 void InitialiseSteelDoor(short itemNumber);
 void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void AssignClosedDoor(ITEM_INFO* item);
+void InitialiseClosedDoors();
+void ProcessClosedDoors();
+void GetClosedDoorNormal(ROOM_INFO* room, short** dptr, byte* n, int z, int x, int absX, int absZ);
+void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, int dz, int dx);
 
 void Inject_Door();

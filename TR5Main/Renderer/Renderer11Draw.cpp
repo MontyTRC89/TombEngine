@@ -11,6 +11,7 @@
 #include "../Game/gameflow.h"
 #include "../Game/rope.h"
 #include "../Game/tomb4fx.h"
+#include "../Game/door.h"
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_SFXVolumeBar;
@@ -1917,6 +1918,11 @@ bool Renderer11::drawScene(bool dump)
 	// Prepare the scene to draw
 	auto time1 = chrono::high_resolution_clock::now();
 
+	ProcessClosedDoors();
+	
+	// TEST
+	//CollectRooms(CurrentRoom);
+
 	clearSceneItems();
 	collectRooms();
 	updateLaraAnimations();
@@ -2060,6 +2066,7 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
 		printDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
 		printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
+		printDebugMessage("Room.y, minFloor, minCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 		printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 #endif
@@ -2365,8 +2372,6 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 
 			if (bucket->Vertices.size() == 0)
 				continue;
-
-			if (!animated)
 
 				if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
 					m_context->RSSetState(m_states->CullNone());
