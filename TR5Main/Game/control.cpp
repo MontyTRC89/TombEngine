@@ -50,6 +50,17 @@ int rand_1 = -747505337;
 int rand_2 = -747505337;
 int RumbleTimer = 0;
 int InGameCnt = 0;
+byte IsAtmospherePlaying = 0;
+byte FlipStatus = 0;
+int FlipStats[255];
+int FlipMap[255];
+bool InItemControlLoop;
+short ItemNewRoomNo;
+short ItemNewRooms[512];
+short NextFxActive;
+short NextFxFree;
+short NextItemActive;
+short NextItemFree;
 
 #define _NormalizeVector ((PHD_VECTOR* (__cdecl*)(PHD_VECTOR*)) 0x0046DE10)
 
@@ -258,6 +269,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (Objects[item->objectNumber].control)
 					Objects[item->objectNumber].control(itemNum);
+
+				if (item->afterDeath < 128 && item->afterDeath > 0 && !(Wibble & 3))
+					item->afterDeath++;
+				if (item->afterDeath == 128)
+					KillItem(itemNum);
 			}
 			else
 			{
@@ -277,8 +293,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		while (fxNum != NO_ITEM)
 		{
 			short nextFx = Effects[fxNum].nextActive;
-			if (Objects[Effects[fxNum].objectNumber].control)
-				Objects[Effects[fxNum].objectNumber].control(fxNum);
+			FX_INFO* fx = &Effects[fxNum];
+			if (Objects[fx->objectNumber].control)
+				Objects[fx->objectNumber].control(fxNum);
 			fxNum = nextFx;
 		}
 
@@ -927,14 +944,14 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				item->flags |= flags & 0x3E00;
 			}
 
-			if ((item->flags & 0x3E00) & 0x3E00)
+			if ((item->flags & 0x3E00) == 0x3E00)
 			{
 				item->flags |= 0x20;
 
 				if (flags & 0x100)
 					item->flags |= 1;
 
-				if (!(item->active))
+				if (!(item->active) && !(item->flags & IFLAG_KILLED))
 				{
 					if (Objects[item->objectNumber].intelligent)
 					{
@@ -3694,4 +3711,5 @@ void Inject_Control()
 	INJECT(0x004A7C90, SeedRandomDraw);
 	INJECT(0x00415300, AnimateItem);
 	INJECT(0x0041A170, GetTargetOnLOS);
+	INJECT(0x00415DA0, GetWaterHeight);
 }

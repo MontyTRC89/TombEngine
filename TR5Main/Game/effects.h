@@ -1,6 +1,7 @@
 #pragma once
 
 #include "..\Global\global.h"
+#include "control.h"
 
 #define DoLotsOfBlood ((void (__cdecl*)(int, int, int, short, short, short, int)) 0x00432800) 
 #define SoundEffects ((void (__cdecl*)()) 0x00432640)

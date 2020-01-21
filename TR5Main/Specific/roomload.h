@@ -14,7 +14,7 @@ struct LEB128;
 
 #define DoSomethingWithRooms ((void (__cdecl*)()) 0x004774D0)
 #define FreeItemsStuff ((void (__cdecl*)(int)) 0x00440590)
-#define InitialiseClosedDoors ((void (__cdecl*)()) 0x00473600) 
+//#define InitialiseClosedDoors ((void (__cdecl*)()) 0x00473600) 
 #define CreateSkinningData ((void (__cdecl*)()) 0x00456AE0)
 #define ProcessMeshData ((void (__cdecl*)(int)) 0x0049A3D0)
 #define ReadFileEx ((int (__cdecl*)(void*, int, int, FILE*)) 0x004E1D20)
@@ -24,7 +24,7 @@ struct LEB128;
 #define FileOpen ((FILE* (__cdecl*)(char*)) 0x004A3CD0)
 #define FileClose ((void (__cdecl*)(FILE*)) 0x004A3DA0)
 #define LoadSoundEffects ((void (__cdecl*)()) 0x004A5D90)
-#define LoadBoxes ((void (__cdecl*)()) 0x004A5E50)
+#define Legacy_LoadBoxes ((void (__cdecl*)()) 0x004A5E50)
 #define LoadAnimatedTextures ((void (__cdecl*)()) 0x004A6060)
 #define LoadTextureInfos ((void (__cdecl*)()) 0x004A60E0)
 #define LoadAIObjects ((void (__cdecl*)()) 0x004A67F0)
@@ -33,7 +33,6 @@ struct LEB128;
 #define InitialiseLaraLoad ((void (__cdecl*)(short)) 0x004568C0)
 #define LoadRooms ((void (__cdecl*)()) 0x004A4DA0)
 #define InitialiseGameStuff ((void (__cdecl*)()) 0x004778F0)
-#define InitialiseGameFlags ((void (__cdecl*)()) 0x00477880)
 #define InitialiseLaraMeshes ((void (__cdecl*)()) 0x00455680)
 #define InitialiseLaraAnims ((void (__cdecl*)(ITEM_INFO*)) 0x00456900)
 
@@ -73,6 +72,7 @@ void InitialiseLara(int restore);
 void LoadSprites();
 void GetCarriedItems();
 void GetAIPickups();
+void LoadBoxes();
 
 unsigned __stdcall LoadLevel(void* data);
 

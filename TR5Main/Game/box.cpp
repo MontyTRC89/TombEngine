@@ -11,6 +11,12 @@
 #include "misc.h"
 #include "control.h"
 
+int NumberBoxes;
+BOX_INFO* Boxes;
+int NumberOverlaps;
+short* Overlaps;
+short* Zones[5][2];
+
 extern LaraExtraInfo g_LaraExtra;
 
 #define ESCAPE_DIST (WALL_SIZE*5)
@@ -116,7 +122,7 @@ short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 	r = &Rooms[targetItem->roomNumber];
 	targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->pos.xPos - r->x, targetItem->pos.zPos - r->z).box;
 
-	zone = GroundZones[ZONE(creature->LOT.zone)];
+	zone = Zones[creature->LOT.zone][FlipStatus];
 	return (zone[item->boxNumber] == zone[targetItem->boxNumber]);
 }
 
@@ -517,7 +523,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	creature = (CREATURE_INFO*)item->data;
 	LOT = &creature->LOT;
-	zone = GroundZones[ZONE(LOT->zone)];
+	zone = Zones[LOT->zone][FlipStatus];
 	boxHeight = Boxes[item->boxNumber].height;
 	old.x = item->pos.xPos;
 	old.y = item->pos.yPos;
@@ -955,7 +961,7 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	short* zone;
 
 	creature = (CREATURE_INFO*)item->data;
-	zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
+	zone = Zones[creature->LOT.zone][FlipStatus];
 	if (creature->LOT.fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return FALSE;
 
@@ -1039,16 +1045,8 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 	short* zone, index, searchZone, boxNumber, delta;
 	bool done;
 	
-	if (LOT->fly == NO_FLYING)
-	{
-		zone = GroundZones[ZONE(LOT->zone)];
-		searchZone = zone[LOT->head];
-	}
-	else
-	{
-		zone = GroundZones[ZONE(LOT->zone)];
-		searchZone = FLY_ZONE;
-	}
+	zone = Zones[LOT->zone][FlipStatus];
+	searchZone = zone[LOT->head];
 
 	for (int i = 0; i < depth; i++)
 	{
@@ -1412,7 +1410,7 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->itemFlags[3] && aiObject->roomNumber != 255)
 			{
-				short* zone = GroundZones[FlipStatus + 2 * creature->LOT.zone];
+				short* zone = Zones[creature->LOT.zone][FlipStatus];
 
 				ROOM_INFO* r = &Rooms[item->roomNumber];
 				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & 0x7FF;
@@ -1475,7 +1473,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 		creature->enemy = LaraItem;
 	}
 
-	zone = GroundZones[ZONE(creature->LOT.zone)];
+	zone = Zones[creature->LOT.zone][FlipStatus];
 
 	r = &Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & BOX_NUMBER;
