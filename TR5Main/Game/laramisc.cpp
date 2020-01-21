@@ -9,6 +9,8 @@
 #include "effect2.h"
 #include "healt.h"
 #include "misc.h"
+#include "rope.h"
+#include "draw.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
@@ -883,10 +885,8 @@ void AnimateLara(ITEM_INFO* item)
 		item->speed = velocity >> 16;
 	}
 
-#define SomeRopeCollisionFunc ((void (__cdecl*)(ITEM_INFO*)) 0x0046D510)
-
 	if (Lara.ropePtr != -1)
-		SomeRopeCollisionFunc(item);
+		DelAlignLaraToRope(item);
 
 	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
@@ -896,4 +896,88 @@ void AnimateLara(ITEM_INFO* item)
 		item->pos.xPos += lateral * SIN(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
 		item->pos.zPos += lateral * COS(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
 	}
+}
+
+void DelAlignLaraToRope(ITEM_INFO* item)
+{
+	ROPE_STRUCT* rope;
+	short ropeY;
+	PHD_VECTOR vec, vec2, vec3, vec4, vec5, pos, pos2, diff, diff2;
+	int matrix[12];
+	short angle[3];
+	ANIM_FRAME* frame;
+
+	vec.x = 4096;
+	vec.y = 0;
+	vec.z = 0;
+	frame = (ANIM_FRAME*) GetBestFrame(item);
+	ropeY = Lara.ropeY - ANGLE(90);
+	rope = &Ropes[Lara.ropePtr];
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->OffsetY, &pos.x, &pos.y, &pos.z);
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->OffsetY - 192, &pos2.x, &pos2.y, &pos2.z);
+	diff.x = pos.x - pos2.x << 16;
+	diff.y = pos.y - pos2.y << 16;
+	diff.z = pos.z - pos2.z << 16;
+	NormaliseRopeVector(&diff);
+	diff.x >>= 2;
+	diff.y >>= 2;
+	diff.z >>= 2;
+	ScaleVector(&diff, DotProduct(&vec, &diff), &vec2);
+	vec2.x = vec.x - vec2.x;
+	vec2.y = vec.y - vec2.y;
+	vec2.z = vec.z - vec2.z;
+	vec3.x = vec2.x;
+	vec3.y = vec2.y;
+	vec3.z = vec2.z;
+	vec4.x = vec2.x;
+	vec4.y = vec2.y;
+	vec4.z = vec2.z;
+	diff2.x = diff.x;
+	diff2.y = diff.y;
+	diff2.z = diff.z;
+	ScaleVector(&vec3, COS(ropeY), &vec3);
+	ScaleVector(&diff2, DotProduct(&diff2, &vec2), &diff2);
+	ScaleVector(&diff2, 4096 - COS(ropeY), &diff2);
+	CrossProduct(&diff, &vec2, &vec4);
+	ScaleVector(&vec4, SIN(ropeY), &vec4);
+	diff2.x += vec3.x;
+	diff2.y += vec3.y;
+	diff2.z += vec3.z;
+	vec2.x = diff2.x + vec4.x << 16;
+	vec2.y = diff2.y + vec4.y << 16;
+	vec2.z = diff2.z + vec4.z << 16;
+	NormaliseRopeVector(&vec2);
+	vec2.x >>= 2;
+	vec2.y >>= 2;
+	vec2.z >>= 2;
+	CrossProduct(&diff, &vec2, &vec5);
+	vec5.x <<= 16;
+	vec5.y <<= 16;
+	vec5.z <<= 16;
+	NormaliseRopeVector(&vec5);
+	vec5.x >>= 2;
+	vec5.y >>= 2;
+	vec5.z >>= 2;
+	matrix[M00] = vec5.x;
+	matrix[M01] = diff.x;
+	matrix[M02] = vec2.x;
+	matrix[M10] = vec5.y;
+	matrix[M11] = diff.y;
+	matrix[M12] = vec2.y;
+	matrix[M20] = vec5.z;
+	matrix[M21] = diff.z;
+	matrix[M22] = vec2.z;
+	_0x0046D420(matrix, angle);
+	item->pos.xPos = rope->position.x + (rope->meshSegment[Lara.ropeSegment].x >> 16);
+	item->pos.yPos = rope->position.y + (rope->meshSegment[Lara.ropeSegment].y >> 16) + Lara.ropeOffset;
+	item->pos.zPos = rope->position.z + (rope->meshSegment[Lara.ropeSegment].z >> 16);
+	phd_PushUnitMatrix();
+	phd_RotYXZ(angle[1], angle[0], angle[2]);
+	item->pos.xPos += -112 * MatrixPtr[M02] >> W2V_SHIFT;
+	item->pos.yPos += -112 * MatrixPtr[M12] >> W2V_SHIFT;
+	item->pos.zPos += -112 * MatrixPtr[M22] >> W2V_SHIFT;
+	phd_PopMatrix();
+	item->pos.xRot = angle[0];
+	item->pos.yRot = angle[1];
+	item->pos.zRot = angle[2];
 }
