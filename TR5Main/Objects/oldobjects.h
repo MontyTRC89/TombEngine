@@ -24,7 +24,7 @@
 #define InitialiseSpiders ((void (__cdecl*)(short)) 0x0043F2B0)
 #define ControlSpiders ((void (__cdecl*)(short)) 0x0047A200)
 //#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
-#define ControlRomanStatue ((void (__cdecl*)(short)) 0x0046BC10)
+//#define ControlRomanStatue ((void (__cdecl*)(short)) 0x0046BC10)
 #define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
 #define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
 
@@ -99,3 +99,6 @@ void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, int color);
 void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags);
 void TriggerRomanStatueAttackEffect1(short itemNum, int factor);
 void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count);
+void ControlRomanStatue(short itemNumber);
+void InitialiseTeleporter(short itemNumber);
+void ControlTeleporter(short itemNumber);

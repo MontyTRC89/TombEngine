@@ -2993,6 +2993,15 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveMesh = true;
 	}
+
+	obj = &Objects[ID_TELEPORTER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTeleporter;
+		obj->control = ControlTeleporter;
+		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+	}
 }
 
 void TrapObjects()
