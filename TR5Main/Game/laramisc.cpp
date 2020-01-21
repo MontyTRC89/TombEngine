@@ -20,18 +20,17 @@ extern short FXType;
 COLL_INFO coll;
 short SubsuitAir = 0;
 
-/*void GetLaraDeadlyBounds()//4B408(<), 4B86C (F)
+void GetLaraDeadlyBounds() // (F) (D)
 {
-#if PSX_VERSION || PSXPC_VERSION///@TODO PC subs not there yet.
 	short* bounds;
 	short tbounds[6];
 
 	bounds = GetBoundsAccurate(LaraItem);
-	mPushUnitMatrix();
-	mRotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
-	mSetTrans(0, 0, 0);
-	mRotBoundingBoxNoPersp(bounds, &tbounds[0]);
-	mPopMatrix();
+	phd_PushUnitMatrix();
+	phd_RotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
+	phd_SetTrans(0, 0, 0);
+	phd_RotBoundingBoxNoPersp(bounds, tbounds);
+	phd_PopMatrix();
 
 	DeadlyBounds[0] = LaraItem->pos.xPos + tbounds[0];
 	DeadlyBounds[1] = LaraItem->pos.xPos + tbounds[1];
@@ -39,17 +38,9 @@ short SubsuitAir = 0;
 	DeadlyBounds[3] = LaraItem->pos.yPos + tbounds[3];
 	DeadlyBounds[4] = LaraItem->pos.zPos + tbounds[4];
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds[5];
-#else
-	UNIMPLEMENTED();
-#endif
 }
 
-void DelAlignLaraToRope(ITEM_INFO* item)//4B3D8, 4B83C
-{
-	UNIMPLEMENTED();
-}*/
-
-void InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
+void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -70,7 +61,7 @@ void InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
 	}
 }
 
-void InitialiseLaraLoad(short itemNum)//4B308, 4B76C (F)
+void InitialiseLaraLoad(short itemNum) // (F) (D)
 {
 	Lara.itemNumber = itemNum;
 	LaraItem = &Items[itemNum];
@@ -898,7 +889,7 @@ void AnimateLara(ITEM_INFO* item)
 	}
 }
 
-void DelAlignLaraToRope(ITEM_INFO* item)
+void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 {
 	ROPE_STRUCT* rope;
 	short ropeY;
