@@ -878,7 +878,7 @@ void BaddyControl(short itemNum)
 			}
 			if (currentCreature->enemy->roomNumber == 255 ||
 				currentCreature->enemy->status == ITEM_INVISIBLE ||
-				currentCreature->enemy->InDrawRoom)
+				currentCreature->enemy->inDrawRoom)
 			{
 				currentCreature->enemy = NULL;
 				break;

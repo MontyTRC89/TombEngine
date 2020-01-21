@@ -695,12 +695,19 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 	Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 	up = Vector3::Transform(up, upRotation);
 
+	int zNear = 20;
+	int zFar = g_Configuration.MaxDrawDistance * 1024;
+
 	FieldOfView = fov;
 	View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), up);
-	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, 20.0f, g_Configuration.MaxDrawDistance * 1024.0f);
+	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, zNear, zFar);
 
 	m_stCameraMatrices.View = View;
 	m_stCameraMatrices.Projection = Projection;
+
+	// Setup legacy variables
+	PhdZNear = zNear << W2V_SHIFT;
+	PhdZFar = zFar << W2V_SHIFT;
 }
 
 bool Renderer11::EnumerateVideoModes()
@@ -849,6 +856,7 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 		m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
 		m_rooms[node->To].Visited = true;
 		m_roomsToDraw.push_back(&m_rooms[node->To]);
+		Rooms[node->To].boundActive = true;
 
 		collectLightsForRoom(node->To);
 		collectItems(node->To);
@@ -885,15 +893,17 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 
 bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort)
 {
-	//return true;
-
 	ROOM_INFO* room = &Rooms[roomIndex];
 
-	Vector3 n = Vector3(*(portal + 1), *(portal + 2), *(portal + 3));
-	Vector3 v = Vector3(Camera.pos.x - (room->x + *(portal + 4)),
-		Camera.pos.y - (room->y + *(portal + 5)),
-		Camera.pos.z - (room->z + *(portal + 6)));
+	portal++;
 
+	Vector3 n = Vector3(portal[0], portal[1], portal[2]);
+	Vector3 v = Vector3(
+		Camera.pos.x - (room->x + portal[3]),
+		Camera.pos.y - (room->y + portal[4]),
+		Camera.pos.z - (room->z + portal[5]));
+
+	// Test camera and normal positions and decide if process door or not
 	if (n.Dot(v) <= 0.0f)
 		return false;
 
@@ -905,13 +915,19 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 	clipPort->z = FLT_MIN;
 	clipPort->w = FLT_MIN;
 
-	for (int i = 0; i < 4; i++) {
+	portal += 3;
 
-		Vector4 tmp = Vector4(*(portal + 4 + 3 * i) + room->x, *(portal + 4 + 3 * i + 1) + room->y,
-			*(portal + 4 + 3 * i + 2) + room->z, 1.0f);
+	// Project all portal's corners in screen space
+	for (int i = 0; i < 4; i++, portal += 3) 
+	{
+		Vector4 tmp = Vector4(portal[0] + room->x, portal[1] + room->y, portal[2] + room->z, 1.0f);
+
+		// Project corner on screen
 		Vector4::Transform(tmp, ViewProjection, p[i]);
 
-		if (p[i].w > 0.0f) {
+		if (p[i].w > 0.0f) 
+		{
+			// The corner is in front of camera
 			p[i].x *= (1.0f / p[i].w);
 			p[i].y *= (1.0f / p[i].w);
 			p[i].z *= (1.0f / p[i].w);
@@ -922,14 +938,19 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 			clipPort->w = max(clipPort->w, p[i].y);
 		}
 		else
+			// The corner is behind camera
 			zClip++;
 	}
 
+	// If all points are behind camera then door is not visible
 	if (zClip == 4)
 		return false;
 
-	if (zClip > 0) {
-		for (int i = 0; i < 4; i++) {
+	// If door crosses camera plane...
+	if (zClip > 0)
+	{
+		for (int i = 0; i < 4; i++) 
+		{
 			Vector4 a = p[i];
 			Vector4 b = p[(i + 1) % 4];
 
@@ -940,7 +961,8 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 				else
 					if (a.x > 0.0f && b.x > 0.0f)
 						clipPort->z = 1.0f;
-					else {
+					else 
+					{
 						clipPort->x = -1.0f;
 						clipPort->z = 1.0f;
 					}
@@ -950,7 +972,8 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 				else
 					if (a.y > 0.0f && b.y > 0.0f)
 						clipPort->w = 1.0f;
-					else {
+					else 
+					{
 						clipPort->y = -1.0f;
 						clipPort->w = 1.0f;
 					}
@@ -959,33 +982,24 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 		}
 	}
 
-	if (clipPort->x > viewPort->z || clipPort->y > viewPort->w || clipPort->z < viewPort->x || clipPort->w < viewPort->y)
-		return false;
-
 	clipPort->x = max(clipPort->x, viewPort->x);
 	clipPort->y = max(clipPort->y, viewPort->y);
 	clipPort->z = min(clipPort->z, viewPort->z);
 	clipPort->w = min(clipPort->w, viewPort->w);
+
+	if (clipPort->x > viewPort->z || clipPort->y > viewPort->w || clipPort->z < viewPort->x || clipPort->w < viewPort->y)
+		return false;
 
 	return true;
 }
 
 bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
 {
-	//Vector3 closestPointInAabb = Vector3::Min(Vector3::Max(sphereCentre, boxMin), boxMax);
-	//double distanceSquared = (closestPointInAabb - sphereCentre).LengthSquared();
-	//return (distanceSquared < (sphereRadius * sphereRadius));
-
-	/*float x = max(boxMin.x, min(sphereCentre.x, boxMax.x));
-	float y = max(boxMin.y, min(sphereCentre.y, boxMax.y));
-	float z = max(boxMin.z, min(sphereCentre.z, boxMax.z));
-
-	float distance = sqrt((x - sphereCentre.x) * (x - sphereCentre.x) +
-		(y - sphereCentre.y) * (y - sphereCentre.y) +
-		(z - sphereCentre.z) * (z - sphereCentre.z));
-
-	return (distance < sphereRadius);*/
-	return 0;
+	Vector3 centre = (boxMin + boxMax) / 2.0f;
+	Vector3 extens = boxMax - centre;
+	BoundingBox box = BoundingBox(centre, extens);
+	BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
+	return box.Intersects(sphere);
 }
 
 void Renderer11::GetLaraBonePosition(Vector3* pos, int bone)

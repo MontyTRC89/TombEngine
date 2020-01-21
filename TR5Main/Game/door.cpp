@@ -9,6 +9,7 @@
 #include "sphere.h"
 #include "switch.h"
 #include "misc.h"
+#include "Box.h"
 
 PHD_VECTOR DoubleDoorPos = { 0, 0, 220 };
 PHD_VECTOR PullDoorPos = { -201, 0, 322 };
@@ -32,7 +33,7 @@ static short CrowbarDoorBounds[12] =
 	0xFE00, 0x0200, 0xFC00, 0x0000, 0x0000, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0, 0xC720, 0x38E0
 };
 
-int ClosedDoors[32];
+ITEM_INFO* ClosedDoors[32];
 byte LiftDoor;
 
 extern byte SequenceUsed[6];
@@ -550,13 +551,13 @@ void DoorControl(short itemNumber)
 		}
 		if (!door->opened)
 		{
-			DontUnlockBox = TRUE;
+			DontUnlockBox = true;
 			OpenThatDoor(&door->d1, door);
 			OpenThatDoor(&door->d2, door);
 			OpenThatDoor(&door->d1flip, door);
 			OpenThatDoor(&door->d2flip, door);
-			DontUnlockBox = FALSE;
-			door->opened = TRUE;
+			DontUnlockBox = false;
+			door->opened = true;
 		}
 	}
 }
@@ -565,7 +566,7 @@ void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 {
 	FLOOR_INFO* floor = doorPos->floor;
 
-	if (floor)
+	if (floor != NULL)
 	{
 		memcpy(doorPos->floor, &doorPos->data, sizeof(FLOOR_INFO));
 		
@@ -821,42 +822,174 @@ void InitialiseDoor(short itemNumber)
 		roomNumber = item->roomNumber;
 		ItemNewRoom(itemNumber, twoRoom);
 		item->roomNumber = roomNumber;
-		item->InDrawRoom = true;
+		item->inDrawRoom = true;
 	}
 
-	// TODO: we'll rewrite this maybe
-	/*if (item->objectNumber >= ID_LIFT_DOORS1 && item->objectNumber <= ID_LIFT_DOORS2)
+	/*if (twoRoom != NO_ROOM && item->objectNumber >= ID_CLOSED_DOOR1 && item->objectNumber <= ID_LIFT_DOORS2)
 	{
-		sub_401BB8(v4, item, twoRoom, v54, v53);
-		v49 = *(v4 + 58);
-		*v49 = 0;
-		v49[1] = 0;
-		v49[2] = 0;
-		v50 = *(v4 + 66);
-		*v50 = 0;
-		v50[1] = 0;
-		v50[2] = 0;
+		FillDoorPointers(door, item, twoRoom, dz, dx);
+		
+		door->dptr1[0] = 0;
+		door->dptr1[1] = 0;
+		door->dptr1[2] = 0;
+
+		door->dptr3[0] = 0;
+		door->dptr3[1] = 0;
+		door->dptr3[2] = 0;
+
 		if (Rooms[item->roomNumber].flippedRoom != -1)
 		{
-			v51 = *(v4 + 62);
-			if (!v51)
-				MEMORY[1] = 1;
-			*v51 = 0;
-			v51[1] = 0;
-			v51[2] = 0;
+			//if (!door->dptr2)
+			//	MEMORY[1] = 1;
+			
+			door->dptr2[0] = 0;
+			door->dptr2[1] = 0;
+			door->dptr2[2] = 0;
 		}
-		if (Rooms[*&item->pad2[4]].flippedRoom != -1)
+
+		if (Rooms[item->drawRoom].flippedRoom != -1)
 		{
-			v52 = *(v4 + 70);
-			if (!v52)
-				MEMORY[1] = 1;
-			*v52 = 0;
-			v52[1] = 0;
-			v52[2] = 0;
+			//if (!door->dptr4)
+			//	MEMORY[1] = 1;
+
+			door->dptr4[0] = 0;
+			door->dptr4[1] = 0;
+			door->dptr4[2] = 0;
 		}
-		*(v4 + 78) = item;
-		result = sub_401CF8(item);
+
+		door->item = item;
+
+		AssignClosedDoor(item);
 	}*/
+}
+
+void InitialiseClosedDoors()
+{
+	ZeroMemory(ClosedDoors, 32 * sizeof(ITEM_INFO*));
+}
+
+void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, int dz, int dx)
+{
+	int absX = (dx << WALL_SHIFT) + item->pos.xPos;
+	int absZ = (dz << WALL_SHIFT) + item->pos.zPos;
+
+	dx <<= WALL_SHIFT;
+	dz <<= WALL_SHIFT;
+
+	ROOM_INFO* r = &Rooms[item->roomNumber];
+	GetClosedDoorNormal(r, &doorData->dptr1, &doorData->dn1, dz, dx, absX, absZ);
+
+	if (r->flippedRoom != -1)
+		GetClosedDoorNormal(&Rooms[r->flippedRoom], &doorData->dptr2, &doorData->dn2, dz, dx, absX, absZ);
+	
+	r = &Rooms[roomNumber];
+	GetClosedDoorNormal(r, &doorData->dptr3, &doorData->dn3, dz, dx, absX, absZ);
+
+	if (r->flippedRoom != -1)
+		GetClosedDoorNormal(&Rooms[r->flippedRoom], &doorData->dptr4, &doorData->dn4, dz, dx, absX, absZ);
+}
+
+void GetClosedDoorNormal(ROOM_INFO* room, short** dptr, byte* n, int z, int x, int absX, int absZ)
+{
+	*dptr = NULL;
+
+	if (room->door)
+	{
+		if (room->door > 0)
+		{
+			int numDoors = *(room->door);
+			short* door = &room->door[1];
+
+			int halfX = x >> 1;
+			int halfZ = z >> 1;
+
+			for (int i = 0; i < numDoors; i++)
+			{
+				int x1 = halfX + room->x + (door[4] + 128) & 0xFFFFFF00;
+				int x2 = halfX + room->x + (door[10] + 128) & 0xFFFFFF00;
+
+				if (x1 > x2)
+				{
+					int temp = x1;
+					x1 = x2;
+					x2 = temp;
+				}
+
+				int z1 = halfZ + room->z + (door[6] + 128) & 0xFFFFFF00;
+				int z2 = halfZ + room->z + (door[12] + 128) & 0xFFFFFF00;
+
+				if (z1 > z2)
+				{
+					int temp = z1;
+					z1 = z2;
+					z2 = temp;
+				}
+
+				if (absX >= x1 && absX <= x2 && absZ >= z1 && absZ <= z2)
+				{
+					*dptr = &door[1];
+
+					if (door[1])
+					{
+						*n = (byte)door[1] & 0x81 | 1;
+					}
+					else if (door[2])
+					{
+						*n = (byte)door[2] & 0x82 | 2;
+					}
+					else
+					{
+						*n = (byte)door[3] & 0x84 | 4;
+					}
+				}
+
+				door += 16;
+			}
+		}
+	}
+}
+
+void ProcessClosedDoors()
+{
+	for (int i = 0; i < 32; i++)
+	{
+		ITEM_INFO* item = ClosedDoors[i];
+		
+		if (item == NULL)
+			break;
+
+		short roomNumber = item->roomNumber;
+		if (!Rooms[roomNumber].boundActive && !Rooms[item->drawRoom].boundActive)
+			continue;
+
+		if (Rooms[item->drawRoom].boundActive)
+		{
+			if (!(item->inDrawRoom))
+			{
+				ItemNewRoom((item - Items) / sizeof(ITEM_INFO), item->drawRoom);
+				item->roomNumber = roomNumber;
+				item->inDrawRoom = true;
+			}
+		}
+		else if (item->inDrawRoom)
+		{
+			item->roomNumber = item->drawRoom;
+			ItemNewRoom((item - Items) / sizeof(ITEM_INFO), roomNumber);
+			item->inDrawRoom = false;
+		}
+	}
+}
+
+void AssignClosedDoor(ITEM_INFO* item)
+{
+	for (int i = 0; i < 32; i++)
+	{
+		if (ClosedDoors[i] == NULL)
+		{
+			ClosedDoors[i] = item;
+			return;
+		}
+	}
 }
 
 void InitialiseSteelDoor(short itemNumber)

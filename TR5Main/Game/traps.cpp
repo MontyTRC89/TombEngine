@@ -192,7 +192,7 @@ void FlameControl(short fxNumber)
 			fx->pos.yPos = 0;
 			fx->pos.zPos = 0;
 
-			GetLaraJointPosition((PHD_VECTOR*)& fx->pos, i);
+			GetLaraJointPosition((PHD_VECTOR*)&fx->pos, i);
 
 			if (Lara.BurnCount)
 			{
@@ -201,7 +201,7 @@ void FlameControl(short fxNumber)
 					Lara.burnSmoke = true;
 			}
 
-			TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, -1, 255 - ((Lara.currentZvel >> 10) & 1));
+			TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, -1, 255 - Lara.burnSmoke);
 		}
 	}
 

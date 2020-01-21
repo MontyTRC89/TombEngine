@@ -271,12 +271,12 @@ short CreateNewEffect(short roomNum)
 void InitialiseFXArray(int allocmem)
 {
 	if (allocmem)
-		Effects = (FX_INFO*)GameMalloc(24 * sizeof(FX_INFO));
+		Effects = (FX_INFO*)GameMalloc(NUM_EFFECTS * sizeof(FX_INFO));
 
 	FX_INFO* fx = Effects;
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
-	for (int i = 1; i < 24; i++, fx++)
+	for (int i = 1; i < NUM_EFFECTS; i++, fx++)
 	{
 		fx->nextFx = i;
 	}

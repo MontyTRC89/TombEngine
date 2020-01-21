@@ -3,8 +3,8 @@
 #include "..\Global\global.h"
 
 #define ExplodingDeath ((void (__cdecl*)(short, int, int)) 0x00484080)
-#define InitialiseSmokeEmitter ((void (__cdecl*)(short)) 0x0043D9D0)
-#define SmokeEmitterControl ((void (__cdecl*)(short)) 0x00431560)
+//#define InitialiseSmokeEmitter ((void (__cdecl*)(short)) 0x0043D9D0)
+//#define SmokeEmitterControl ((void (__cdecl*)(short)) 0x00431560)
 #define DrawLensFlare ((void (__cdecl*)(ITEM_INFO*)) 0x00485290)
 
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
@@ -16,6 +16,8 @@ extern SPLASH_SETUP SplashSetup;
 extern int SmokeWeapon;
 extern int SmokeCountL;
 extern int SmokeCountR;
+extern PHD_VECTOR NodeVectors[16];
+extern NODEOFFSET_INFO NodeOffsets[16];
 
 void DetatchSpark(int num, int type);
 int GetFreeSpark();

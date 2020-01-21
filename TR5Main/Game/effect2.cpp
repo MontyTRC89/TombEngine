@@ -28,6 +28,25 @@ int SmokeCountR;
 //int SmokeWindZ;
 int SplashCount = 0;
 SPARKS Sparks[MAX_SPARKS];
+PHD_VECTOR NodeVectors[16];
+NODEOFFSET_INFO NodeOffsets[16] = {
+	{ -0x10, 0x28, 0xA0, -0xE, 0 },
+	{ -0x10, -8, 0xA0, 0, 0 },
+	{ 0, 0, 0x100, 8, 0 },
+	{ 0, 0, 0x100, 0x11, 0 },
+	{ 0, 0, 0x100, 0x1A, 0 },
+	{ 0, 0x90, 0x28, 0xA, 0 },
+	{ -0x28, 0x40, 0x168, 0xE, 0 },
+	{ 0, -0x258, -0x28, 0, 0 },
+	{ 0, 0x20, 0x10, 9, 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 }
+};
 
 extern GameFlow* g_GameFlow;
 
@@ -748,7 +767,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 		return;
 
-	SPARKS * spark = &Sparks[GetFreeSpark()];
+	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = true;
 	if (type == 2)
 	{
@@ -866,9 +885,9 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 	}
 	else
 	{
-		spark->xVel = GetRandomControl() - 128;
-		spark->yVel = -16 - (GetRandomControl() & 0xF);
-		spark->zVel = GetRandomControl() - 128;
+		spark->xVel = (byte)GetRandomControl() - 128;
+		spark->yVel = -16 - ((byte)GetRandomControl() & 0xF);
+		spark->zVel = (byte)GetRandomControl() - 128;
 		if (type == 1)
 			spark->friction = 51;
 		else

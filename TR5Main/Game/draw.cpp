@@ -1,6 +1,7 @@
 #include "draw.h"
 #include "Lara.h"
 #include "..\Renderer\Renderer11.h"
+#include "camera.h"
 
 Renderer11* g_Renderer;
 
@@ -295,8 +296,6 @@ void _phd_PopMatrix_I(void)
 {
 	MatrixPtr -= 12;
 	DxMatrixPtr -= 48;
-	//dword_E6E468 -= 48;
-	//dword_E6D834 -= 48;
 }
 
 void Inject_Draw()

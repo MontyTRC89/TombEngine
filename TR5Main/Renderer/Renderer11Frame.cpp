@@ -1,4 +1,7 @@
 #include "Renderer11.h"
+#include "../Game/draw.h"
+#include "../Game/camera.h"
+
 void Renderer11::collectRooms()
 {
 	short baseRoomIndex = Camera.pos.roomNumber;
@@ -318,11 +321,7 @@ void Renderer11::collectLightsForRoom(short roomNumber)
 		return;
 	}
 	RendererRoom& const room = m_rooms[roomNumber];
-
-	ROOM_INFO* r = room.Room;
-
-	if (r->numLights <= 0)
-		return;
+	ROOM_INFO* r = &Rooms[roomNumber];
 
 	int numLights = room.Lights.size();
 
@@ -331,30 +330,11 @@ void Renderer11::collectLightsForRoom(short roomNumber)
 	{
 		RendererLight* light = m_dynamicLights[i];
 
-		float left = r->x + WALL_SIZE;
-		float bottom = r->z + WALL_SIZE;
-		float right = r->x + (r->xSize - 1) * WALL_SIZE;
-		float top = r->z + (r->ySize - 1) * WALL_SIZE;
+		Vector3 boxMin = Vector3(r->x - WALL_SIZE, -r->minfloor, r->z - WALL_SIZE);
+		Vector3 boxMax = Vector3(r->x + r->xSize * WALL_SIZE, -r->maxceiling, r->z + r->ySize * WALL_SIZE);
+		Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
-		float closestX = light->Position.x;
-		if (closestX < left)
-			closestX = left;
-		else if (closestX > right)
-			closestX = right;
-
-		float closestZ = light->Position.z;
-		if (closestZ < bottom)
-			closestZ = bottom;
-		else if (closestZ > top)
-			closestZ = top;
-
-		// Calculate the distance between the circle's center and this closest point
-		float distanceX = light->Position.x - closestX;
-		float distanceY = light->Position.z - closestZ;
-
-		// If the distance is less than the circle's radius, an intersection occurs
-		float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
-		if (distanceSquared < SQUARE(light->Out))
+		if (sphereBoxIntersection(boxMin, boxMax, center, light->Out))
 			room.LightsToDraw.push_back(light);
 	}
 }

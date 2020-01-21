@@ -62,7 +62,7 @@ void DemigodControl(short itemNum)
 	{
 		ROOM_INFO* room = &Rooms[item->roomNumber];
 
-		short* zone = GroundZones[FlipStatus * 2 + creature->LOT.zone];
+		short* zone = Zones[FlipStatus * 2 + creature->LOT.zone];
 		
 		LaraItem->boxNumber = room->floor[((LaraItem->pos.zPos - room->z) >> WALL_SHIFT) +
 			((LaraItem->pos.xPos - room->x) >> WALL_SHIFT) * room->xSize].box;
