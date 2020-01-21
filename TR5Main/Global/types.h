@@ -1405,6 +1405,21 @@ struct SP_DYNAMIC
 	unsigned char Pad[2]; // size=2, offset=6
 };
 
+struct ANIM_FRAME // Variable size
+{
+	short MinX; // size=0, offset=0
+	short MaxX; // size=0, offset=2
+	short MinY; // size=0, offset=4
+	short MaxY; // size=0, offset=6
+	short MinZ; // size=0, offset=8
+	short MaxZ; // size=0, offset=10
+	short OffsetX; // size=0, offset=12
+	short OffsetY; // size=0, offset=14
+	short OffsetZ; // size=0, offset=16
+	short NumValues; // size=0, offset=18
+	unsigned short AngleSets[1]; // Variable size
+};
+
 typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
 typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);

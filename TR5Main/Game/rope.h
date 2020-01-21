@@ -23,11 +23,24 @@ struct PENDULUM
 	ROPE_STRUCT* Rope; // size=1172, offset=28
 };
 
-//#define InitialiseRope ((void (__cdecl*)(short)) 0x0046F060)
-#define RopeControl ((void (__cdecl*)(short)) 0x0046DD40)
-#define RopeCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0046DAE0)
+extern PENDULUM CurrentPendulum;
+
 #define CalculateRopePoints ((void (__cdecl*)(ROPE_STRUCT*)) 0x0046EC70)
 
 void InitialiseRope(short itemNumber);
 void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int length, ITEM_INFO* item);
-void NormaliseRopeVector(PHD_VECTOR* vec);
+PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec);
+void _0x0046D130(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z);
+int DotProduct(PHD_VECTOR* u, PHD_VECTOR* v);
+void ScaleVector(PHD_VECTOR* src, int c, PHD_VECTOR* dest);
+void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* dest);
+void _0x0046D420(int* array, short* angle);
+void RopeControl(short itemNumber);
+void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void RopeDynamics(ROPE_STRUCT* rope);
+int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int value);
+void ApplyVelocityToRope(int node, short angle, short n);
+void SetPendulumVelocity(int x, int y, int z);
+void _0x0046E1C0(ROPE_STRUCT* rope, int node);
+void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value);
+void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length);
