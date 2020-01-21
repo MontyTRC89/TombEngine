@@ -201,7 +201,6 @@ void LookUpDown();
 void ResetLook();
 void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
 int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
-void ApplyVelocityToRope(int node, short angle, short n);
 void UpdateRopeSwing(ITEM_INFO* item);
 void JumpOffRope(ITEM_INFO* item);
 void FallFromRope(ITEM_INFO* item);
@@ -236,7 +235,6 @@ short LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 void GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
-void SetPendulumVelocity(int x, int y, int z);
 void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
 
 //int GetLaraJointPos(PHD_VECTOR* pos, int joint);

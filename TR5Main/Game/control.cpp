@@ -41,7 +41,6 @@
 #include <stdio.h>
 
 int KeyTriggerActive;
-PENDULUM CurrentPendulum;
 int number_los_rooms;
 short los_rooms[20];
 int ClosestItem;

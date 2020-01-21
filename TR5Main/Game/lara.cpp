@@ -35,7 +35,6 @@ static short RightClimbTab[4] = // offset 0xA0640
 };
 
 extern Inventory* g_Inventory;
-extern PENDULUM CurrentPendulum;
 
 short angle = 0;
 short elevation = 57346;
@@ -3496,33 +3495,6 @@ void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll)//17958(<), 17A8C(<) (F)
 
 	if (TrInput & IN_LOOK)
 		LookUpDown();
-}
-
-void ApplyVelocityToRope(int node, short angle, short n)//178E4, 17A18 (F)
-{
-	SetPendulumVelocity(
-		(unsigned short) n * SIN(angle) >> 2,
-		0,
-		(unsigned short) n * COS(angle) >> 2);
-}
-
-void SetPendulumVelocity(int x, int y, int z)
-{
-	int node;
-
-	node = 2 * (CurrentPendulum.node >> 1);
-	if (node < 24)
-	{
-		int val = 4096 / (24 - node) * 256;
-
-		x = (x * val) >> 16;
-		y = (y * val) >> 16;
-		z = (z * val) >> 16;
-	}
-
-	CurrentPendulum.Velocity.x += x;
-	CurrentPendulum.Velocity.y += y;
-	CurrentPendulum.Velocity.z += z;
 }
 
 void UpdateRopeSwing(ITEM_INFO* item)//17508, 1763C
