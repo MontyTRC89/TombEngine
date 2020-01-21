@@ -55,5 +55,6 @@ void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int num);
 int GetFreeSpider();
 void SetFadeClip(short height, short speed);
+void TriggerLightningGlow(int x, int y, int z, int rgb);
 
 void Inject_Tomb4FX();
