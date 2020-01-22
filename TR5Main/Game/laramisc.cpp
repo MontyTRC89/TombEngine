@@ -19,6 +19,7 @@ extern short FXType;
 
 COLL_INFO coll;
 short SubsuitAir = 0;
+short cheatHitPoints;
 
 void GetLaraDeadlyBounds() // (F) (D)
 {
@@ -67,32 +68,62 @@ void InitialiseLaraLoad(short itemNum) // (F) (D)
 	LaraItem = &Items[itemNum];
 }
 
-void LaraCheatyBits()
+void LaraCheatGetStuff() // (F) (D)
 {
-	if (TrInput & IN_D)
-	{
-		//LaraCheatGetStuff();
-		//LaraItem->hitPoints = 1000;
-	}
+	g_LaraExtra.NumFlares = -1;
+	g_LaraExtra.NumSmallMedipacks = -1;
+	g_LaraExtra.NumLargeMedipacks = -1;
+	if (Objects[ID_CROWBAR_ITEM].loaded)
+		g_LaraExtra.Crowbar = true;
+	g_LaraExtra.Lasersight = true;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = false;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasSilencer = false;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] = -1;
+	g_LaraExtra.Weapons[WEAPON_UZI].Present = true;
+	g_LaraExtra.Weapons[WEAPON_UZI].SelectedAmmo = WEAPON_AMMO1;
+	g_LaraExtra.Weapons[WEAPON_UZI].HasLasersight = false;
+	g_LaraExtra.Weapons[WEAPON_UZI].HasSilencer = false;
+	g_LaraExtra.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasLasersight = false;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasSilencer = false;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
+}
 
-	if (TrInput & IN_PAUSE)
+void LaraCheatyBits() // (F) (ND)
+{
+	if (g_GameFlow->FlyCheat)
 	{
-		LaraItem->pos.yPos -= 128;
-		if (Lara.waterStatus != LW_FLYCHEAT)
+		if (TrInput & IN_PAUSE) /* @FIXME: this should be if (TrInput & IN_D) */
 		{
+			LaraCheatGetStuff();
 			LaraItem->hitPoints = 1000;
-			Lara.waterStatus = LW_FLYCHEAT;
-			LaraItem->animNumber = ANIMATION_LARA_UNDERWATER_SWIM_SOLID;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-			LaraItem->currentAnimState = STATE_LARA_UNDERWATER_FORWARD;
-			LaraItem->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
-			LaraItem->gravityStatus = 0;
-			LaraItem->pos.xRot = ANGLE(30);
-			LaraItem->fallspeed = 30;
-			Lara.air = 1800;
-			Lara.deathCount = 0;
-			Lara.torsoXrot = Lara.torsoYrot = 0;
-			Lara.headXrot = Lara.headYrot = 0;
+		}
+
+		if (TrInput & IN_PAUSE) /* @FIXME: this should be if (TrInput & IN_CHEAT) */
+		{
+			LaraItem->pos.yPos -= 128;
+			if (Lara.waterStatus != LW_FLYCHEAT)
+			{
+				Lara.waterStatus = LW_FLYCHEAT;
+				LaraItem->animNumber = ANIMATION_LARA_DOZY;
+				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+				LaraItem->currentAnimState = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM;
+				LaraItem->goalAnimState = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM;
+				LaraItem->gravityStatus = false;
+				LaraItem->pos.xRot = ANGLE(30);
+				LaraItem->fallspeed = 30;
+				Lara.air = 1800;
+				Lara.deathCount = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				cheatHitPoints = LaraItem->hitPoints;
+			}
 		}
 	}
 }
@@ -574,7 +605,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		SQUARE(item->pos.zPos - oldZ));
 }
 
-void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
+void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	LaraItem->hitPoints = 1000;
 	LaraUnderWater(item, coll);
@@ -592,14 +623,16 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
 		Lara.gunStatus = LG_NO_ARMS;
 		LaraInitialiseMeshes();
 		Lara.meshEffects = 0;
+		LaraItem->hitPoints = cheatHitPoints;
 	}
 }
 
-void LaraInitialiseMeshes()//4A684, 4AAE8 (F)
+void LaraInitialiseMeshes() // (AF) (D)
 {
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		INIT_LARA_MESHES(i, ID_LARA, ID_LARA_SKIN);
+		MESHES(ID_LARA, i) = MESHES(ID_LARA_SKIN, i);
+		LARA_MESHES(ID_LARA, i);
 	}
 
 	/*if (gfCurrentLevel >= LVL5_GALLOWS_TREE && gfCurrentLevel <= LVL5_OLD_MILL)
@@ -608,17 +641,23 @@ void LaraInitialiseMeshes()//4A684, 4AAE8 (F)
 	}*/
 
 	if (Lara.gunType == WEAPON_HK)
+	{
 		Lara.backGun = WEAPON_HK;
+	}
 	else if (!g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present)
+	{
 		if (g_LaraExtra.Weapons[WEAPON_HK].Present)
 			Lara.backGun = WEAPON_HK;
+	}
 	else
+	{
 		Lara.backGun = WEAPON_UZI;
+	}
 
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.frameNumber = 0;
-	Lara.target = 0;
+	Lara.target = NULL;
 	Lara.rightArm.lock = 0;
 	Lara.leftArm.lock = 0;
 }
