@@ -3200,7 +3200,7 @@ void TrapObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseHighObject1;
-		obj->control = HighObject1Control;
+		obj->control = ControlHighObject1;
 		obj->collision = ObjectCollision;
 		obj->saveFlags = true;
 		obj->savePosition = true;
