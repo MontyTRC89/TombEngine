@@ -3594,7 +3594,7 @@ int TriggerActive(ITEM_INFO* item)
 {
 	int flag;
 
-	flag = item->flags & IFLAG_REVERSE ? 0 : 1;
+	flag = (~item->flags & IFLAG_REVERSE) >> 14;
 	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 	{
 		flag = !flag;

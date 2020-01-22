@@ -102,3 +102,5 @@ void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count);
 void ControlRomanStatue(short itemNumber);
 void InitialiseTeleporter(short itemNumber);
 void ControlTeleporter(short itemNumber);
+void InitialiseHighObject1(short itemNumber);
+void ControlHighObject1(short itemNumber);
