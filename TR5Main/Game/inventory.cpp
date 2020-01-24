@@ -22,15 +22,15 @@ void CombinePuzzle(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Puzzles[object] = true;
-		g_LaraExtra.PuzzlesCombo[object] = false;
-		g_LaraExtra.PuzzlesCombo[object + 1] = false;
+		g_LaraExtra.Puzzles[object - INV_OBJECT_PUZZLE1]++;
+		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1]--;
+		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1 + 1]--;
 	}
 	else
 	{
-		g_LaraExtra.Puzzles[object] = false;
-		g_LaraExtra.PuzzlesCombo[object] = true;
-		g_LaraExtra.PuzzlesCombo[object + 1] = true;
+		g_LaraExtra.Puzzles[object - INV_OBJECT_PUZZLE1]--;
+		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1]++;
+		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1 + 1]++;
 	}
 }
 
@@ -38,15 +38,15 @@ void CombineKey(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Keys[object] = true;
-		g_LaraExtra.KeysCombo[object] = false;
-		g_LaraExtra.KeysCombo[object + 1] = false;
+		g_LaraExtra.Keys[object - INV_OBJECT_KEY1]++;
+		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1]--;
+		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1 + 1]--;
 	}
 	else
 	{
-		g_LaraExtra.Keys[object] = false;
-		g_LaraExtra.KeysCombo[object] = true;
-		g_LaraExtra.KeysCombo[object + 1] = true;
+		g_LaraExtra.Keys[object - INV_OBJECT_KEY1]--;
+		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1]++;
+		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1 + 1]++;
 	}
 }
 
@@ -54,15 +54,15 @@ void CombinePickup(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Pickups[object] = true;
-		g_LaraExtra.PickupsCombo[object] = false;
-		g_LaraExtra.PickupsCombo[object + 1] = false;
+		g_LaraExtra.Pickups[object - INV_OBJECT_PICKUP1]++;
+		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1]--;
+		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1 + 1] = false;
 	}
 	else
 	{
-		g_LaraExtra.Pickups[object] = false;
-		g_LaraExtra.PickupsCombo[object] = true;
-		g_LaraExtra.PickupsCombo[object + 1] = true;
+		g_LaraExtra.Pickups[object - INV_OBJECT_PICKUP1]--;
+		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1]++;
+		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1 + 1]++;
 	}
 }
 
@@ -70,15 +70,15 @@ void CombineExamine(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Examines[object] = true;
-		g_LaraExtra.ExaminesCombo[object] = false;
-		g_LaraExtra.ExaminesCombo[object + 1] = false;
+		g_LaraExtra.Examines[object - INV_OBJECT_EXAMINE1]++;
+		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1]--;
+		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1 + 1]--;
 	}
 	else
 	{
-		g_LaraExtra.Examines[object] = false;
-		g_LaraExtra.ExaminesCombo[object] = true;
-		g_LaraExtra.ExaminesCombo[object + 1] = true;
+		g_LaraExtra.Examines[object - INV_OBJECT_EXAMINE1]--;
+		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1]++;
+		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1 + 1]++;
 	}
 }
 
