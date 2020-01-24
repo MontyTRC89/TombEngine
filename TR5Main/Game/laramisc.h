@@ -17,3 +17,4 @@ void LaraInitialiseMeshes();
 void AnimateLara(ITEM_INFO* item);
 void LaraCheatyBits();
 void LaraCheatGetStuff();
+void DelsGiveLaraItemsCheat();
