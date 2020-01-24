@@ -68,6 +68,37 @@ void InitialiseLaraLoad(short itemNum) // (F) (D)
 	LaraItem = &Items[itemNum];
 }
 
+void DelsGiveLaraItemsCheat() // (AF) (D)
+{
+	int i;
+
+	if (Objects[ID_CROWBAR_ITEM].loaded)
+		g_LaraExtra.Crowbar = true;
+	for (i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
+			g_LaraExtra.Puzzles[i] = 1;
+		g_LaraExtra.PuzzlesCombo[2 * i] = false;
+		g_LaraExtra.PuzzlesCombo[2 * i + 1] = false;
+	}
+	for (i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_KEY_ITEM1 + i].loaded)
+			g_LaraExtra.Keys[i] = 1;
+		g_LaraExtra.KeysCombo[2 * i] = false;
+		g_LaraExtra.KeysCombo[2 * i + 1] = false;
+	}
+	for (i = 0; i < 3; ++i)
+	{
+		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
+			g_LaraExtra.Pickups[i] = 1;
+		g_LaraExtra.PickupsCombo[2 * i] = false;
+		g_LaraExtra.PickupsCombo[2 * i + 1] = false;
+	}
+
+	/* Hardcoded code */
+}
+
 void LaraCheatGetStuff() // (F) (D)
 {
 	g_LaraExtra.NumFlares = -1;
@@ -93,18 +124,27 @@ void LaraCheatGetStuff() // (F) (D)
 	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
 }
 
-void LaraCheatyBits() // (F) (ND)
+void LaraCheatyBits() // (F) (D)
 {
 	if (g_GameFlow->FlyCheat)
 	{
-		if (TrInput & IN_PAUSE) /* @FIXME: this should be if (TrInput & IN_D) */
+#ifdef _DEBUG
+		if (TrInput & IN_PAUSE)
+#else
+		if (TrInput & IN_D)
+#endif
 		{
 			LaraCheatGetStuff();
 			LaraItem->hitPoints = 1000;
 		}
 
-		if (TrInput & IN_PAUSE) /* @FIXME: this should be if (TrInput & IN_CHEAT) */
+#ifdef _DEBUG
+		if (TrInput & IN_PAUSE)
+#else
+		if (TrInput & IN_CHEAT)
+#endif
 		{
+			DelsGiveLaraItemsCheat();
 			LaraItem->pos.yPos -= 128;
 			if (Lara.waterStatus != LW_FLYCHEAT)
 			{
@@ -635,10 +675,7 @@ void LaraInitialiseMeshes() // (AF) (D)
 		LARA_MESHES(ID_LARA, i);
 	}
 
-	/*if (gfCurrentLevel >= LVL5_GALLOWS_TREE && gfCurrentLevel <= LVL5_OLD_MILL)
-	{
-		Lara.mesh_ptrs[LM_TORSO] = meshes[Objects[ANIMATING6_MIP].mesh_index + 2 * LM_TORSO];
-	}*/
+	/* Hardcoded code */
 
 	if (Lara.gunType == WEAPON_HK)
 	{
