@@ -28,7 +28,7 @@
 #define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
 #define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
 
-#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
+//#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
 
 void InitialiseGuard(short itemNum);
 void InitialiseGuardM16(short itemNum);
@@ -99,6 +99,7 @@ void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, int color);
 void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags);
 void TriggerRomanStatueAttackEffect1(short itemNum, int factor);
 void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count);
+void InitialiseRomanStatue(short itemNum);
 void ControlRomanStatue(short itemNumber);
 void InitialiseTeleporter(short itemNumber);
 void ControlTeleporter(short itemNumber);

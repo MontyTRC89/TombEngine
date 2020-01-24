@@ -956,7 +956,7 @@ int Renderer11::drawInventoryScene()
 					short inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
 					char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
 
-					if (g_Inventory->IsCurrentObjectWeapon() && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+					if (/*g_Inventory->IsCurrentObjectWeapon() &&*/ ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
 						y = 100;
 
