@@ -168,7 +168,7 @@ void LaraCheatyBits() // (F) (D)
 	}
 }
 
-void LaraControl(short itemNumber)//4A838, 4AC9C
+void LaraControl(short itemNumber) // (F) (D)
 {
 	ITEM_INFO* item = LaraItem;
 
@@ -176,15 +176,16 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 
 	if (Lara.isMoving)
 	{
-		if (++Lara.moveCount > 90)
+		if (Lara.moveCount > 90)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
 		} 
+		++Lara.moveCount;
 	} 
 
 	if (!DisableLaraControl)
-		Lara.locationPad = -128;
+		Lara.locationPad = 128;
 
 	int oldX = LaraItem->pos.xPos; 
 	int oldY = LaraItem->pos.yPos; 
@@ -203,7 +204,13 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		DashTimer++;
 
 	Lara.isDucked = false;
+
+#if 1
+	bool isWater = Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
+#else
 	bool isWater = Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP);
+#endif
+
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
@@ -214,14 +221,18 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		hfw = NO_HEIGHT;
 	Lara.waterSurfaceDist = -hfw;
 	
+#if 0
 	if (g_LaraExtra.Vehicle == NO_ITEM)
+#endif
 		WadeSplash(item, wh, wd);
 	
 	short roomNumber;
 	short height = 0;
 
+#if 0
 	if (g_LaraExtra.Vehicle == NO_ITEM && g_LaraExtra.ExtraAnim == 0)
 	{
+#endif
 		switch (Lara.waterStatus)
 		{
 			case LW_ABOVE_WATER:
@@ -236,6 +247,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 							{
 								item->goalAnimState = STATE_LARA_STOP;
 							}
+#if 0
 							else if (isWater & ENV_FLAG_SWAMP)
 							{
 								if (item->currentAnimState == STATE_LARA_SWANDIVE_BEGIN || item->currentAnimState == STATE_LARA_SWANDIVE_END)			// Is Lara swan-diving?
@@ -246,9 +258,14 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 								item->animNumber = ANIMATION_LARA_WADE;
 								item->frameNumber = GF(ANIMATION_LARA_WADE, 0);
 							}
+#endif
 						}
 					}
+#if 1
+					else if (isWater)
+#else
 					else if (!(isWater & ENV_FLAG_SWAMP))
+#endif
 					{
 						Lara.air = 1800;
 						Lara.waterStatus = LW_UNDERWATER;
@@ -291,7 +308,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 					}
 
 					Camera.targetElevation = -ANGLE(22);
-					if (hfw >= 256)
+					if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
 					{
 						if (hfw > 730)
 						{
@@ -356,16 +373,8 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 				roomNumber = item->roomNumber;
 				GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
 
-				height = 0;
-				if (wd != NO_HEIGHT)
-				{
-					height = -hfw;
-					if (hfw >= 0)
-						height = hfw;
-				}
-
-				if (height >= 256
-					|| wd == NO_HEIGHT
+				if (wd == NO_HEIGHT
+					|| abs(hfw) >= 256
 					|| Rooms[roomNumber].flags & ENV_FLAG_WATER
 					|| item->animNumber == ANIMATION_LARA_UNDERWATER_TO_ONWATER
 					|| item->animNumber == ANIMATION_LARA_FREE_FALL_TO_UNDERWATER_ALTERNATE)
@@ -382,6 +391,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 							item->speed = item->fallspeed / 4;
 							item->gravityStatus = true;
 
+							item->fallspeed = 0;
 							LaraItem->pos.zRot = 0;
 							LaraItem->pos.xRot = 0;
 							Lara.torsoYrot = 0;
@@ -400,7 +410,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 							item->fallspeed = 0;
 							Lara.diveCount = 11;
 							LaraItem->pos.zRot = 0;
-							item->pos.xRot = 0;
+							LaraItem->pos.xRot = 0;
 							Lara.torsoYrot = 0;
 							Lara.torsoXrot = 0;
 							Lara.headYrot = 0;
@@ -451,8 +461,8 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 						Lara.waterStatus = LW_WADE;
 						item->animNumber = ANIMATION_LARA_STAY_IDLE;
 						item->frameNumber = Anims[item->animNumber].frameBase;
-						item->goalAnimState = STATE_LARA_STOP;
-						item->currentAnimState = STATE_LARA_WADE_FORWARD;
+						item->goalAnimState = STATE_LARA_WADE_FORWARD;
+						item->currentAnimState = STATE_LARA_STOP;
 
 						AnimateItem(item);
 					}
@@ -469,9 +479,13 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 
 			case LW_WADE:
 				Camera.targetElevation = -ANGLE(22);
-				if (hfw >= 256)
+				if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
 				{
+#if 1
+					if (hfw > 730)
+#else
 					if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
+#endif
 					{
 						Lara.waterStatus = LW_SURFACE;
 						item->pos.yPos += 1 - hfw;
@@ -528,9 +542,9 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 				}
 				break;
 		}
+#if 0
 	}
-
-	//S_SetReverbType(room[item->roomNumber].ReverbType);
+#endif
 
 	if (item->hitPoints <= 0)
 	{
@@ -551,6 +565,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 	{
 	case LW_ABOVE_WATER:
 	case LW_WADE:
+#if 0
 		if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -775)
 		{
 			if (item->hitPoints >= 0)
@@ -565,24 +580,29 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 			}
 		}
 		else if (Lara.gassed)
+#else
+		if (Lara.gassed)
+#endif
 		{
 			if (item->hitPoints >= 0 && --Lara.air < 0)
 			{
 				Lara.air = -1;
 				item->hitPoints -= 5;
-				LaraAboveWater(item, &coll);
-				break;
 			}
 		}
 		else if (Lara.air < 1800 && item->hitPoints >= 0)
 		{
+#if 0
 			/* lara is not equipped with any vehicle */
 			if (g_LaraExtra.Vehicle == NO_ITEM) // only for the upv !!
 			{
+#endif
 				Lara.air += 10;
 				if (Lara.air > 1800)
 					Lara.air = 1800;
+#if 0
 			}
+#endif
 		}
 		LaraAboveWater(item, &coll);
 		break;
@@ -590,29 +610,14 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 	case LW_UNDERWATER:
 		if (item->hitPoints >= 0)
 		{
-			/*if (LaraDrawType == LARA_DIVESUIT)
+			if (LaraDrawType == LARA_DIVESUIT)
 			{
-				if (CheckCutPlayed(40))
-				{
-					v32 = Lara.Anxiety + 8;
-					v33 = v32 + word_51CEE0;
-					word_51CEE0 += v32;
-					if (word_51CEE0 > 80)
-					{
-						v34 = (v33 - 1) / 0x50u;
-						word_51CEE0 = -80 * v34 + v33;
-						do
-						{
-							--Lara.air;
-							--v34;
-						} while (v34);
-					}
-				}
+				/* Hardcoded code */
 			}
 			else
-			{*/
-			Lara.air--;
-			//}
+			{
+				Lara.air--;
+			}
 			if (Lara.air < 0)
 			{
 				if (LaraDrawType == LARA_DIVESUIT && Lara.anxiety < 251)
@@ -628,7 +633,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		if (item->hitPoints >= 0)
 		{
 			Lara.air += 10;
-			if (Lara.air > 1790)
+			if (Lara.air > 1800)
 				Lara.air = 1800;
 		}
 		LaraSurface(item, &coll);
