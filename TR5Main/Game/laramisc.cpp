@@ -11,6 +11,7 @@
 #include "misc.h"
 #include "rope.h"
 #include "draw.h"
+#include "inventory.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
@@ -96,6 +97,8 @@ void DelsGiveLaraItemsCheat() // (AF) (D)
 		g_LaraExtra.PickupsCombo[2 * i + 1] = false;
 	}
 
+	g_Inventory->LoadObjects(false);
+
 	/* Hardcoded code */
 }
 
@@ -122,6 +125,8 @@ void LaraCheatGetStuff() // (F) (D)
 	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasLasersight = false;
 	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasSilencer = false;
 	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
+
+	g_Inventory->LoadObjects(false);
 }
 
 void LaraCheatyBits() // (F) (D)
@@ -168,7 +173,7 @@ void LaraCheatyBits() // (F) (D)
 	}
 }
 
-void LaraControl(short itemNumber) // (F) (D)
+void LaraControl(short itemNumber) // (AF) (D)
 {
 	ITEM_INFO* item = LaraItem;
 
@@ -227,7 +232,6 @@ void LaraControl(short itemNumber) // (F) (D)
 		WadeSplash(item, wh, wd);
 	
 	short roomNumber;
-	short height = 0;
 
 #if 0
 	if (g_LaraExtra.Vehicle == NO_ITEM && g_LaraExtra.ExtraAnim == 0)
@@ -458,7 +462,7 @@ void LaraControl(short itemNumber) // (F) (D)
 					}
 					else
 					{
-						Lara.waterStatus = LW_WADE;
+						Lara.waterStatus = LW_WADE; /* @DEAD_CODE: Lara has to reach a room without water while in the surface but then GetWaterHeight() return value never will make hfw > 256 */
 						item->animNumber = ANIMATION_LARA_STAY_IDLE;
 						item->frameNumber = Anims[item->animNumber].frameBase;
 						item->goalAnimState = STATE_LARA_WADE_FORWARD;
