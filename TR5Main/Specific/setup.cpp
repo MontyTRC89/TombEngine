@@ -2796,10 +2796,58 @@ void ObjectObjects()
 	INIT_ANIMATING(ID_ANIMATING10);
 	INIT_ANIMATING(ID_ANIMATING11);
 	INIT_ANIMATING(ID_ANIMATING12);
-	INIT_ANIMATING(ID_ANIMATING13);
-	INIT_ANIMATING(ID_ANIMATING14);
-	INIT_ANIMATING(ID_ANIMATING15);
-	INIT_ANIMATING(ID_ANIMATING16);
+
+	obj = &Objects[ID_ANIMATING13];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseAnimating;
+		obj->control = AnimatingControl;
+		obj->collision = NULL;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+		Bones[obj->boneIndex] |= ROT_Y;
+		Bones[obj->boneIndex + 4] |= ROT_X;
+	}
+
+	obj = &Objects[ID_ANIMATING14];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseAnimating;
+		obj->control = AnimatingControl;
+		obj->collision = NULL;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+		Bones[obj->boneIndex] |= ROT_Y;
+		Bones[obj->boneIndex + 4] |= ROT_X;
+	}
+
+	obj = &Objects[ID_ANIMATING15];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseAnimating;
+		obj->control = AnimatingControl;
+		obj->collision = NULL;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+		Bones[obj->boneIndex] |= ROT_Y;
+		Bones[obj->boneIndex + 4] |= ROT_X;
+	}
+
+	obj = &Objects[ID_ANIMATING16];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseAnimating;
+		obj->control = AnimatingControl;
+		obj->collision = NULL;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveMesh = true;
+		Bones[obj->boneIndex] |= ROT_Y;
+		Bones[obj->boneIndex + 4] |= ROT_X;
+	}
 
 	obj = &Objects[ID_TIGHT_ROPE];
 	if (obj->loaded)
