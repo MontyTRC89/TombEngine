@@ -3049,7 +3049,7 @@ void TrapObjects()
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (obj->loaded)
 	{
-		obj->control = KillAllTriggersControl;
+		obj->control = KillAllCurrentItems;
 		obj->drawRoutine = NULL;
 		obj->hitPoints = 0;
 		obj->saveFlags = true;
@@ -3059,7 +3059,7 @@ void TrapObjects()
 	obj = &Objects[ID_FALLING_CEILING];
 	if (obj->loaded)
 	{
-		obj->collision = FallingCeilingCollision;
+		obj->collision = TrapCollision;
 		obj->control = FallingCeilingControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -3189,7 +3189,7 @@ void TrapObjects()
 	obj = &Objects[ID_GEN_SLOT4];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGenSlot4;
+		//obj->initialise = InitialiseGenSlot4;
 		obj->control = GenSlot4Control;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
