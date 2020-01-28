@@ -54,7 +54,6 @@ void SeedRandomControl(int seed);
 int GetRandomDraw();
 void SeedRandomDraw(int seed);
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
-PHD_VECTOR* NormalizeVector(PHD_VECTOR* vec);
 int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
 void AnimateItem(ITEM_INFO* item);
 void DoFlipMap(short group);

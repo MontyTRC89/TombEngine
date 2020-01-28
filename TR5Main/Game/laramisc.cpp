@@ -11,6 +11,7 @@
 #include "misc.h"
 #include "rope.h"
 #include "draw.h"
+#include "inventory.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
@@ -19,19 +20,19 @@ extern short FXType;
 
 COLL_INFO coll;
 short SubsuitAir = 0;
+short cheatHitPoints;
 
-/*void GetLaraDeadlyBounds()//4B408(<), 4B86C (F)
+void GetLaraDeadlyBounds() // (F) (D)
 {
-#if PSX_VERSION || PSXPC_VERSION///@TODO PC subs not there yet.
 	short* bounds;
 	short tbounds[6];
 
 	bounds = GetBoundsAccurate(LaraItem);
-	mPushUnitMatrix();
-	mRotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
-	mSetTrans(0, 0, 0);
-	mRotBoundingBoxNoPersp(bounds, &tbounds[0]);
-	mPopMatrix();
+	phd_PushUnitMatrix();
+	phd_RotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
+	phd_SetTrans(0, 0, 0);
+	phd_RotBoundingBoxNoPersp(bounds, tbounds);
+	phd_PopMatrix();
 
 	DeadlyBounds[0] = LaraItem->pos.xPos + tbounds[0];
 	DeadlyBounds[1] = LaraItem->pos.xPos + tbounds[1];
@@ -39,17 +40,9 @@ short SubsuitAir = 0;
 	DeadlyBounds[3] = LaraItem->pos.yPos + tbounds[3];
 	DeadlyBounds[4] = LaraItem->pos.zPos + tbounds[4];
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds[5];
-#else
-	UNIMPLEMENTED();
-#endif
 }
 
-void DelAlignLaraToRope(ITEM_INFO* item)//4B3D8, 4B83C
-{
-	UNIMPLEMENTED();
-}*/
-
-void InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
+void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -70,43 +63,117 @@ void InitialiseLaraAnims(ITEM_INFO* item)//4B340(<), 4B7A4 (F)
 	}
 }
 
-void InitialiseLaraLoad(short itemNum)//4B308, 4B76C (F)
+void InitialiseLaraLoad(short itemNum) // (F) (D)
 {
 	Lara.itemNumber = itemNum;
 	LaraItem = &Items[itemNum];
 }
 
-void LaraCheatyBits()
+void DelsGiveLaraItemsCheat() // (AF) (D)
 {
-	if (TrInput & IN_D)
+	int i;
+
+	if (Objects[ID_CROWBAR_ITEM].loaded)
+		g_LaraExtra.Crowbar = true;
+	for (i = 0; i < 8; ++i)
 	{
-		//LaraCheatGetStuff();
-		//LaraItem->hitPoints = 1000;
+		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
+			g_LaraExtra.Puzzles[i] = 1;
+		g_LaraExtra.PuzzlesCombo[2 * i] = false;
+		g_LaraExtra.PuzzlesCombo[2 * i + 1] = false;
+	}
+	for (i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_KEY_ITEM1 + i].loaded)
+			g_LaraExtra.Keys[i] = 1;
+		g_LaraExtra.KeysCombo[2 * i] = false;
+		g_LaraExtra.KeysCombo[2 * i + 1] = false;
+	}
+	for (i = 0; i < 3; ++i)
+	{
+		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
+			g_LaraExtra.Pickups[i] = 1;
+		g_LaraExtra.PickupsCombo[2 * i] = false;
+		g_LaraExtra.PickupsCombo[2 * i + 1] = false;
 	}
 
-	if (TrInput & IN_PAUSE)
+	g_Inventory->LoadObjects(false);
+
+	/* Hardcoded code */
+}
+
+void LaraCheatGetStuff() // (F) (D)
+{
+	g_LaraExtra.NumFlares = -1;
+	g_LaraExtra.NumSmallMedipacks = -1;
+	g_LaraExtra.NumLargeMedipacks = -1;
+	if (Objects[ID_CROWBAR_ITEM].loaded)
+		g_LaraExtra.Crowbar = true;
+	g_LaraExtra.Lasersight = true;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = false;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasSilencer = false;
+	g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] = -1;
+	g_LaraExtra.Weapons[WEAPON_UZI].Present = true;
+	g_LaraExtra.Weapons[WEAPON_UZI].SelectedAmmo = WEAPON_AMMO1;
+	g_LaraExtra.Weapons[WEAPON_UZI].HasLasersight = false;
+	g_LaraExtra.Weapons[WEAPON_UZI].HasSilencer = false;
+	g_LaraExtra.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasLasersight = false;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasSilencer = false;
+	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
+
+	g_Inventory->LoadObjects(false);
+}
+
+void LaraCheatyBits() // (F) (D)
+{
+	if (g_GameFlow->FlyCheat)
 	{
-		LaraItem->pos.yPos -= 128;
-		if (Lara.waterStatus != LW_FLYCHEAT)
+#ifdef _DEBUG
+		if (TrInput & IN_PAUSE)
+#else
+		if (TrInput & IN_D)
+#endif
 		{
+			LaraCheatGetStuff();
 			LaraItem->hitPoints = 1000;
-			Lara.waterStatus = LW_FLYCHEAT;
-			LaraItem->animNumber = ANIMATION_LARA_UNDERWATER_SWIM_SOLID;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-			LaraItem->currentAnimState = STATE_LARA_UNDERWATER_FORWARD;
-			LaraItem->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
-			LaraItem->gravityStatus = 0;
-			LaraItem->pos.xRot = ANGLE(30);
-			LaraItem->fallspeed = 30;
-			Lara.air = 1800;
-			Lara.deathCount = 0;
-			Lara.torsoXrot = Lara.torsoYrot = 0;
-			Lara.headXrot = Lara.headYrot = 0;
+		}
+
+#ifdef _DEBUG
+		if (TrInput & IN_PAUSE)
+#else
+		if (TrInput & IN_CHEAT)
+#endif
+		{
+			DelsGiveLaraItemsCheat();
+			LaraItem->pos.yPos -= 128;
+			if (Lara.waterStatus != LW_FLYCHEAT)
+			{
+				Lara.waterStatus = LW_FLYCHEAT;
+				LaraItem->animNumber = ANIMATION_LARA_DOZY;
+				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+				LaraItem->currentAnimState = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM;
+				LaraItem->goalAnimState = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM;
+				LaraItem->gravityStatus = false;
+				LaraItem->pos.xRot = ANGLE(30);
+				LaraItem->fallspeed = 30;
+				Lara.air = 1800;
+				Lara.deathCount = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				cheatHitPoints = LaraItem->hitPoints;
+			}
 		}
 	}
 }
 
-void LaraControl(short itemNumber)//4A838, 4AC9C
+void LaraControl(short itemNumber) // (AF) (D)
 {
 	ITEM_INFO* item = LaraItem;
 
@@ -114,15 +181,16 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 
 	if (Lara.isMoving)
 	{
-		if (++Lara.moveCount > 90)
+		if (Lara.moveCount > 90)
 		{
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_NO_ARMS;
 		} 
+		++Lara.moveCount;
 	} 
 
 	if (!DisableLaraControl)
-		Lara.locationPad = -128;
+		Lara.locationPad = 128;
 
 	int oldX = LaraItem->pos.xPos; 
 	int oldY = LaraItem->pos.yPos; 
@@ -141,7 +209,13 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		DashTimer++;
 
 	Lara.isDucked = false;
+
+#if 1
+	bool isWater = Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
+#else
 	bool isWater = Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP);
+#endif
+
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
@@ -152,14 +226,17 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		hfw = NO_HEIGHT;
 	Lara.waterSurfaceDist = -hfw;
 	
+#if 0
 	if (g_LaraExtra.Vehicle == NO_ITEM)
+#endif
 		WadeSplash(item, wh, wd);
 	
 	short roomNumber;
-	short height = 0;
 
+#if 0
 	if (g_LaraExtra.Vehicle == NO_ITEM && g_LaraExtra.ExtraAnim == 0)
 	{
+#endif
 		switch (Lara.waterStatus)
 		{
 			case LW_ABOVE_WATER:
@@ -174,6 +251,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 							{
 								item->goalAnimState = STATE_LARA_STOP;
 							}
+#if 0
 							else if (isWater & ENV_FLAG_SWAMP)
 							{
 								if (item->currentAnimState == STATE_LARA_SWANDIVE_BEGIN || item->currentAnimState == STATE_LARA_SWANDIVE_END)			// Is Lara swan-diving?
@@ -184,9 +262,14 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 								item->animNumber = ANIMATION_LARA_WADE;
 								item->frameNumber = GF(ANIMATION_LARA_WADE, 0);
 							}
+#endif
 						}
 					}
+#if 1
+					else if (isWater)
+#else
 					else if (!(isWater & ENV_FLAG_SWAMP))
+#endif
 					{
 						Lara.air = 1800;
 						Lara.waterStatus = LW_UNDERWATER;
@@ -229,7 +312,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 					}
 
 					Camera.targetElevation = -ANGLE(22);
-					if (hfw >= 256)
+					if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
 					{
 						if (hfw > 730)
 						{
@@ -294,16 +377,8 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 				roomNumber = item->roomNumber;
 				GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
 
-				height = 0;
-				if (wd != NO_HEIGHT)
-				{
-					height = -hfw;
-					if (hfw >= 0)
-						height = hfw;
-				}
-
-				if (height >= 256
-					|| wd == NO_HEIGHT
+				if (wd == NO_HEIGHT
+					|| abs(hfw) >= 256
 					|| Rooms[roomNumber].flags & ENV_FLAG_WATER
 					|| item->animNumber == ANIMATION_LARA_UNDERWATER_TO_ONWATER
 					|| item->animNumber == ANIMATION_LARA_FREE_FALL_TO_UNDERWATER_ALTERNATE)
@@ -320,6 +395,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 							item->speed = item->fallspeed / 4;
 							item->gravityStatus = true;
 
+							item->fallspeed = 0;
 							LaraItem->pos.zRot = 0;
 							LaraItem->pos.xRot = 0;
 							Lara.torsoYrot = 0;
@@ -338,7 +414,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 							item->fallspeed = 0;
 							Lara.diveCount = 11;
 							LaraItem->pos.zRot = 0;
-							item->pos.xRot = 0;
+							LaraItem->pos.xRot = 0;
 							Lara.torsoYrot = 0;
 							Lara.torsoXrot = 0;
 							Lara.headYrot = 0;
@@ -386,11 +462,11 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 					}
 					else
 					{
-						Lara.waterStatus = LW_WADE;
+						Lara.waterStatus = LW_WADE; /* @DEAD_CODE: Lara has to reach a room without water while in the surface but then GetWaterHeight() return value never will make hfw > 256 */
 						item->animNumber = ANIMATION_LARA_STAY_IDLE;
 						item->frameNumber = Anims[item->animNumber].frameBase;
-						item->goalAnimState = STATE_LARA_STOP;
-						item->currentAnimState = STATE_LARA_WADE_FORWARD;
+						item->goalAnimState = STATE_LARA_WADE_FORWARD;
+						item->currentAnimState = STATE_LARA_STOP;
 
 						AnimateItem(item);
 					}
@@ -407,9 +483,13 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 
 			case LW_WADE:
 				Camera.targetElevation = -ANGLE(22);
-				if (hfw >= 256)
+				if (hfw >= 256) /* @ORIGINAL_BUG: checking hfw for equality with 256 results in the wade bug */
 				{
+#if 1
+					if (hfw > 730)
+#else
 					if (hfw > 730 && !(isWater & ENV_FLAG_SWAMP))
+#endif
 					{
 						Lara.waterStatus = LW_SURFACE;
 						item->pos.yPos += 1 - hfw;
@@ -466,9 +546,9 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 				}
 				break;
 		}
+#if 0
 	}
-
-	//S_SetReverbType(room[item->roomNumber].ReverbType);
+#endif
 
 	if (item->hitPoints <= 0)
 	{
@@ -489,6 +569,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 	{
 	case LW_ABOVE_WATER:
 	case LW_WADE:
+#if 0
 		if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -775)
 		{
 			if (item->hitPoints >= 0)
@@ -503,24 +584,29 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 			}
 		}
 		else if (Lara.gassed)
+#else
+		if (Lara.gassed)
+#endif
 		{
 			if (item->hitPoints >= 0 && --Lara.air < 0)
 			{
 				Lara.air = -1;
 				item->hitPoints -= 5;
-				LaraAboveWater(item, &coll);
-				break;
 			}
 		}
 		else if (Lara.air < 1800 && item->hitPoints >= 0)
 		{
+#if 0
 			/* lara is not equipped with any vehicle */
 			if (g_LaraExtra.Vehicle == NO_ITEM) // only for the upv !!
 			{
+#endif
 				Lara.air += 10;
 				if (Lara.air > 1800)
 					Lara.air = 1800;
+#if 0
 			}
+#endif
 		}
 		LaraAboveWater(item, &coll);
 		break;
@@ -528,29 +614,14 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 	case LW_UNDERWATER:
 		if (item->hitPoints >= 0)
 		{
-			/*if (LaraDrawType == LARA_DIVESUIT)
+			if (LaraDrawType == LARA_DIVESUIT)
 			{
-				if (CheckCutPlayed(40))
-				{
-					v32 = Lara.Anxiety + 8;
-					v33 = v32 + word_51CEE0;
-					word_51CEE0 += v32;
-					if (word_51CEE0 > 80)
-					{
-						v34 = (v33 - 1) / 0x50u;
-						word_51CEE0 = -80 * v34 + v33;
-						do
-						{
-							--Lara.air;
-							--v34;
-						} while (v34);
-					}
-				}
+				/* Hardcoded code */
 			}
 			else
-			{*/
-			Lara.air--;
-			//}
+			{
+				Lara.air--;
+			}
 			if (Lara.air < 0)
 			{
 				if (LaraDrawType == LARA_DIVESUIT && Lara.anxiety < 251)
@@ -566,7 +637,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		if (item->hitPoints >= 0)
 		{
 			Lara.air += 10;
-			if (Lara.air > 1790)
+			if (Lara.air > 1800)
 				Lara.air = 1800;
 		}
 		LaraSurface(item, &coll);
@@ -583,7 +654,7 @@ void LaraControl(short itemNumber)//4A838, 4AC9C
 		SQUARE(item->pos.zPos - oldZ));
 }
 
-void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
+void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	LaraItem->hitPoints = 1000;
 	LaraUnderWater(item, coll);
@@ -601,33 +672,38 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)//4A790(<), 4ABF4(<) (F)
 		Lara.gunStatus = LG_NO_ARMS;
 		LaraInitialiseMeshes();
 		Lara.meshEffects = 0;
+		LaraItem->hitPoints = cheatHitPoints;
 	}
 }
 
-void LaraInitialiseMeshes()//4A684, 4AAE8 (F)
+void LaraInitialiseMeshes() // (AF) (D)
 {
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		INIT_LARA_MESHES(i, ID_LARA, ID_LARA_SKIN);
+		MESHES(ID_LARA, i) = MESHES(ID_LARA_SKIN, i);
+		LARA_MESHES(ID_LARA, i);
 	}
 
-	/*if (gfCurrentLevel >= LVL5_GALLOWS_TREE && gfCurrentLevel <= LVL5_OLD_MILL)
-	{
-		Lara.mesh_ptrs[LM_TORSO] = meshes[Objects[ANIMATING6_MIP].mesh_index + 2 * LM_TORSO];
-	}*/
+	/* Hardcoded code */
 
 	if (Lara.gunType == WEAPON_HK)
+	{
 		Lara.backGun = WEAPON_HK;
+	}
 	else if (!g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present)
+	{
 		if (g_LaraExtra.Weapons[WEAPON_HK].Present)
 			Lara.backGun = WEAPON_HK;
+	}
 	else
+	{
 		Lara.backGun = WEAPON_UZI;
+	}
 
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.frameNumber = 0;
-	Lara.target = 0;
+	Lara.target = NULL;
 	Lara.rightArm.lock = 0;
 	Lara.leftArm.lock = 0;
 }
@@ -898,7 +974,7 @@ void AnimateLara(ITEM_INFO* item)
 	}
 }
 
-void DelAlignLaraToRope(ITEM_INFO* item)
+void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 {
 	ROPE_STRUCT* rope;
 	short ropeY;
