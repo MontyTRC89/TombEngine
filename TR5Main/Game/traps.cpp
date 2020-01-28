@@ -6,6 +6,7 @@
 #include "effects.h"
 #include "lara.h"
 #include "collide.h"
+#include "switch.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
@@ -657,5 +658,220 @@ void _WreckingBallControl(short itemNumber)
 	else
 	{
 
+	}
+}
+
+void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (Lara.gunType != WEAPON_TORCH
+		|| Lara.gunStatus != LG_READY
+		|| Lara.leftArm.lock 
+		|| Lara.litTorch == (item->status & 1)
+		|| item->timer == -1
+		|| !(TrInput & IN_ACTION)
+		|| l->currentAnimState != STATE_LARA_STOP
+		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
+		|| l->gravityStatus)
+	{
+		if (item->objectNumber == ID_BURNING_ROOTS)
+			ObjectCollision(itemNumber, l, coll);
+	}
+	else
+	{
+		short bounds[6];
+
+		switch (item->objectNumber)
+		{
+		case ID_FLAME_EMITTER:
+			bounds[0] = -256;
+			bounds[1] = 256;
+			bounds[2] = 0;
+			bounds[3] = 1024;
+			bounds[4] = -800;
+			bounds[5] = 800;
+			break;
+
+		case ID_FLAME_EMITTER2:
+			bounds[0] = -256;
+			bounds[1] = 256;
+			bounds[2] = 0;
+			bounds[3] = 1024;
+			bounds[4] = -600;
+			bounds[5] = 600;
+			break;
+
+		case ID_BURNING_ROOTS:
+			bounds[0] = -384;
+			bounds[1] = 384;
+			bounds[2] = 0;
+			bounds[3] = 2048;
+			bounds[4] = -384;
+			bounds[5] = 384;
+			break;
+
+		}
+
+		short oldYrot = item->pos.yRot;
+		item->pos.yRot = l->pos.yRot;
+
+		if (TestLaraPosition(bounds, item, l))
+		{
+			if (item->objectNumber == ID_BURNING_ROOTS)
+			{
+				l->animNumber = ANIMATION_LARA_TORCH_LIGHT_5;
+			}
+			else
+			{
+				int dy = abs(l->pos.yPos - item->pos.yPos);
+				l->itemFlags[3] = 1;
+				l->animNumber = (dy >> 8) + ANIMATION_LARA_TORCH_LIGHT_1;
+			}
+			
+			l->currentAnimState = STATE_LARA_MISC_CONTROL;
+			l->frameNumber = Anims[l->animNumber].frameBase;
+			Lara.flareControlLeft = false;
+			Lara.leftArm.lock = 3;
+			Lara.generalPtr = (void*)itemNumber;
+		}
+		
+		item->pos.yRot = oldYrot;
+	}
+
+	if (Lara.generalPtr == (void*)itemNumber 
+		&& item->status != ITEM_ACTIVE 
+		&& l->currentAnimState == STATE_LARA_MISC_CONTROL)
+	{
+		if (l->animNumber >= ANIMATION_LARA_TORCH_LIGHT_1 && l->animNumber <= ANIMATION_LARA_TORCH_LIGHT_5)
+		{
+			if (l->frameNumber - Anims[l->animNumber].frameBase == 40)
+			{
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
+				
+				item->flags |= 0x3E00;
+				item->itemFlags[3] = 0;
+				item->status = ITEM_ACTIVE;
+
+				AddActiveItem(itemNumber);
+			}
+		}
+	}
+}
+
+void InitialiseFlameEmitter2(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	item->pos.yPos -= 64;
+	
+	if (item->triggerFlags != 123)
+	{
+		if (item->pos.yRot > 0)
+		{
+			if (item->pos.yRot == ANGLE(90))
+			{
+				if (item->triggerFlags == 2)
+					item->pos.xPos += 80;
+				else
+					item->pos.xPos += 256;
+			}
+		}
+		else if (item->pos.yRot < 0)
+		{
+			if (item->pos.yRot == -ANGLE(180))
+			{
+				if (item->triggerFlags == 2)
+					item->pos.zPos -= 80;
+				else
+					item->pos.zPos -= 256;
+			}
+			else if (item->pos.yRot == -ANGLE(90))
+			{
+				if (item->triggerFlags == 2)
+					item->pos.xPos -= 80;
+				else
+					item->pos.xPos -= 256;
+			}
+		}
+		else
+		{
+			if (item->triggerFlags == 2)
+				item->pos.zPos += 80;
+			else
+				item->pos.zPos += 256;
+		}
+	}
+}
+
+void InitialiseFlameEmitter(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (item->triggerFlags > 0)
+	{
+		if (item->triggerFlags == 33)
+		{
+			if (item->pos.yRot > 0)
+			{
+				if (item->pos.yRot == ANGLE(90))
+					item->pos.xPos += 144;
+			}
+			else
+			{
+				if (item->pos.yRot == 0)
+				{
+					item->pos.zPos += 144;
+					item->pos.yPos += 32;
+					return;
+				}
+				else if (item->pos.yRot == -ANGLE(180))
+				{
+					item->pos.zPos -= 144;
+					item->pos.yPos += 32;
+					return;
+				}
+				else if (item->pos.yRot == -ANGLE(90))
+				{
+					item->pos.xPos -= 144;
+					item->pos.yPos += 32;
+					return;
+				}
+			}
+
+			item->pos.yPos += 32;
+			return;
+		}
+	}
+	else
+	{
+		item->itemFlags[0] = (GetRandomControl() & 0x3F) + 90;
+		item->itemFlags[2] = 256;
+		
+		if (((-item->triggerFlags) & 7) == 7)
+		{
+			if (item->pos.yRot > 0)
+			{
+				if (item->pos.yRot == ANGLE(90))
+				{
+					item->pos.xPos += 512;
+				}
+			}
+			else if (item->pos.yRot < 0)
+			{
+				if (item->pos.yRot == -ANGLE(180))
+				{
+					item->pos.zPos -= 512;
+				}
+				else if (item->pos.yRot == -ANGLE(90))
+				{
+					item->pos.xPos -= 512;
+				}
+			}
+			else
+			{
+				item->pos.zPos += 512;
+			}
+		}
 	}
 }

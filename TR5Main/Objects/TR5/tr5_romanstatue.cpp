@@ -26,24 +26,6 @@
 #define ANIMATION_ROMAN_STATUE_DEATH			14
 #define ANIMATION_ROMAN_STATUE_START_JUMP_DOWN	16
 
-struct ENERGY_ARC
-{
-	PHD_VECTOR pos1;	// 0
-	PHD_VECTOR pos2;	// 12
-	PHD_VECTOR pos3;	// 24
-	PHD_VECTOR pos4;	// 36
-	byte r;				// 48
-	byte g;				// 49
-	byte b;				// 50
-	byte on;			// 51
-	byte byte34;		// 52
-	byte gap35[8];		// 53
-	byte byte3D;		// 61
-	byte flags;			// 62
-	byte byte3F;		// 63
-	byte byte40;		// 64
-};
-
 struct ROMAN_STATUE_STRUCT
 {
 	PHD_VECTOR pos;
