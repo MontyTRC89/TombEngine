@@ -3079,7 +3079,7 @@ void TrapObjects()
 	{
 		obj->initialise = InitialiseDeathSlide;
 		obj->collision = DeathSlideCollision;
-		obj->control = DeathSlideControl;
+		obj->control = ControlDeathSlide;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
