@@ -113,3 +113,5 @@ void InitialiseGenSlot3(short itemNumber);
 void DartControl(short itemNumber);
 void DartEmitterControl(short itemNumber);
 void FallingCeilingControl(short itemNumber);
+void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void RollingBallControl(short itemNumber);
