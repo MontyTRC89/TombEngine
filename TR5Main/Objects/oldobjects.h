@@ -115,3 +115,6 @@ void DartEmitterControl(short itemNumber);
 void FallingCeilingControl(short itemNumber);
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void RollingBallControl(short itemNumber);
+void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void ControlDeathSlide(short itemNumber);
+void InitialiseDeathSlide(short itemNumber);
