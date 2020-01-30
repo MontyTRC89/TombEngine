@@ -12,10 +12,13 @@
 #include "../Game/rope.h"
 #include "../Game/tomb4fx.h"
 #include "../Game/door.h"
+#include "../Objects/oldobjects.h"
+
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_SFXVolumeBar;
 extern RendererHUDBar* g_MusicVolumeBar;
+
 int Renderer11::DrawPickup(short objectNum)
 {
 	drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY

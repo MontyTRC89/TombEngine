@@ -248,6 +248,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR5\tr5_misc_objects.cpp" />
     <ClCompile Include="Objects\TR5\tr5_missile.cpp" />
     <ClCompile Include="Objects\TR5\tr5_moving_block.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_particle_enemies.cpp" />
     <ClCompile Include="Objects\TR5\tr5_rats.cpp" />
     <ClCompile Include="Objects\TR5\tr5_reaper.cpp" />
     <ClCompile Include="Objects\TR5\tr5_romanstatue.cpp" />

@@ -157,7 +157,7 @@ LABEL_13:
 		pos2.z = 90;
 		GetJointAbsPosition(item, &pos2, 1);
 
-		TriggerTorpedoSparks(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1, &pos2, 0);
 
 		pos1.x = 200;
 		pos1.y = 320;
@@ -169,7 +169,7 @@ LABEL_13:
 		pos2.z = -100;
 		GetJointAbsPosition(item, &pos2, 1);
 
-		TriggerTorpedoSparks(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1, &pos2, 0);
 	}
 	else
 	{
@@ -185,7 +185,7 @@ LABEL_13:
 		pos2.z = 90;
 		GetJointAbsPosition(item, &pos2, 2);
 
-		TriggerTorpedoSparks(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1, &pos2, 0);
 		
 		pos1.x = -200;
 		pos1.y = 320;
@@ -197,7 +197,7 @@ LABEL_13:
 		pos2.z = -100;
 		GetJointAbsPosition(item, &pos2, 2);
 
-		TriggerTorpedoSparks(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1, &pos2, 0);
 	}
 
 	TriggerSubmarineSparks(itemNumber);
@@ -242,7 +242,7 @@ LABEL_13:
 	CreatureUnderwater(item, -14080);
 }
 
-void TriggerTorpedoSparks(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor)
+void TriggerTorpedoBubbles(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -431,7 +431,7 @@ void ChaffFlareControl(short itemNumber)
 	pos2.z = 8 * ((GlobalCounter & 1) != 0 ? 48 : -48);
 	GetJointAbsPosition(item, &pos2, 0);
 
-	TriggerTorpedoSparks(&pos1, &pos2, 1);
+	TriggerTorpedoBubbles(&pos1, &pos2, 1);
 
 	if (item->itemFlags[0] >= 300)
 	{
@@ -611,7 +611,7 @@ void TorpedoControl(short itemNumber)
 			pos2.z = -64 << ((GlobalCounter & 1) + 2);
 			GetJointAbsPosition(item, &pos2, 0);
 
-			TriggerTorpedoSparks(&pos1, &pos2, 1);
+			TriggerTorpedoBubbles(&pos1, &pos2, 1);
 		}
 	}
 	else
