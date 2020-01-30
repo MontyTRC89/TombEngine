@@ -183,7 +183,7 @@ void GetFlameTorch()
 	Lara.meshPtrs[LM_LHAND] = Meshes[Objects[ID_LARA].meshIndex + 26];
 }
 
-void TorchControl(short itemNumber)
+void TorchControl(short itemNumber) // (F) (D)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	
@@ -192,20 +192,23 @@ void TorchControl(short itemNumber)
 	int oldZ = item->pos.zPos;
 
 	if (item->fallspeed)
-		item->pos.zRot += ANGLE(1);
+		item->pos.zRot += ANGLE(5);
 	else if (!item->speed)
 	{
 		item->pos.xRot = 0;
 		item->pos.zRot = 0;
 	}
 
-	item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
+	int zv = item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+
+	item->pos.xPos += xv;
+	item->pos.zPos += zv;
 
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		item->fallspeed += (5 - item->fallspeed) / 2;
-		item->speed += (5 - item->speed) >> 1;
+		item->speed += (5 - item->speed) / 2;
 		if (item->itemFlags[3] != 0)
 			item->itemFlags[3] = 0;
 	}
@@ -216,14 +219,14 @@ void TorchControl(short itemNumber)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, SIN(item->pos.yRot) >> W2V_SHIFT, item->fallspeed);
+	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
 		coll.enableBaddiePush = true;
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)
-				ObjectCollision((CollidedItems[0] - Items) / sizeof(ITEM_INFO), item, &coll);
+				ObjectCollision(CollidedItems[0] - Items, item, &coll);
 		}
 		else
 		{
