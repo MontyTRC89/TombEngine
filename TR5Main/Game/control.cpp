@@ -30,6 +30,7 @@
 #include "sphere.h"
 #include "debris.h"
 #include "larafire.h"
+#include "..\Objects\oldobjects.h"
 
 #include "footprint.h"
 #include "..\Specific\roomload.h"
@@ -1740,7 +1741,7 @@ void UpdateBats()
 		return;
 
 	short* bounds = GetBoundsAccurate(LaraItem);
-	
+
 	int x1 = LaraItem->pos.xPos + bounds[0] - (bounds[0] >> 2);
 	int x2 = LaraItem->pos.xPos + bounds[1] - (bounds[1] >> 2);
 
@@ -1749,19 +1750,19 @@ void UpdateBats()
 
 	int z1 = LaraItem->pos.zPos + bounds[4] - (bounds[4] >> 2);
 	int z2 = LaraItem->pos.zPos + bounds[5] - (bounds[5] >> 2);
-	
+
 	int minDistance = 0xFFFFFFF; // v40
 	int minIndex = -1;
 
-	for (int i=0;i<64;i++)
+	for (int i = 0; i < NUM_BATS; i++)
 	{
 		BAT_STRUCT* bat = &Bats[i];
 
 		if (!bat->on)
 			continue;
 
-		if ((Lara.burn || LaraItem->hitPoints <= 0) 
-			&& bat->counter > 90 
+		if ((Lara.burn || LaraItem->hitPoints <= 0)
+			&& bat->counter > 90
 			&& !(GetRandomControl() & 7))
 			bat->counter = 90;
 
@@ -1811,7 +1812,7 @@ void UpdateBats()
 		if (bat->counter > 90)
 		{
 			int speed = bat->speed * 128;
-			
+
 			short xAngle = abs(angles[1] - bat->pos.yRot) >> 3;
 			short yAngle = abs(angles[0] - bat->pos.yRot) >> 3;
 
@@ -1834,7 +1835,7 @@ void UpdateBats()
 		bat->pos.xPos += sp * SIN(bat->pos.yRot) >> W2V_SHIFT;
 		bat->pos.yPos += bat->speed * SIN(-bat->pos.xRot) >> W2V_SHIFT;
 		bat->pos.zPos += sp * COS(bat->pos.yRot) >> W2V_SHIFT;
-		
+
 		if ((i % 2 == 0)
 			&& bat->pos.xPos > x1
 			&& bat->pos.xPos < x2
