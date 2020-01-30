@@ -519,7 +519,7 @@ void ControlGrenade(short itemNumber)
 		short sYrot = item->pos.yRot;
 		item->pos.yRot = item->goalAnimState;
 
-		DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv);
+		DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
 
 		item->goalAnimState = item->pos.yRot;
 		item->pos.yRot = sYrot;
