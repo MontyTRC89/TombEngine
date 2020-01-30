@@ -3079,7 +3079,7 @@ void TrapObjects()
 	{
 		obj->initialise = InitialiseDeathSlide;
 		obj->collision = DeathSlideCollision;
-		obj->control = DeathSlideControl;
+		obj->control = ControlDeathSlide;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -3097,7 +3097,7 @@ void TrapObjects()
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (obj->loaded)
 	{
-		obj->control = KillAllTriggersControl;
+		obj->control = KillAllCurrentItems;
 		obj->drawRoutine = NULL;
 		obj->hitPoints = 0;
 		obj->saveFlags = true;
@@ -3107,7 +3107,7 @@ void TrapObjects()
 	obj = &Objects[ID_FALLING_CEILING];
 	if (obj->loaded)
 	{
-		obj->collision = FallingCeilingCollision;
+		obj->collision = TrapCollision;
 		obj->control = FallingCeilingControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -3237,7 +3237,7 @@ void TrapObjects()
 	obj = &Objects[ID_GEN_SLOT4];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGenSlot4;
+		//obj->initialise = InitialiseGenSlot4;
 		obj->control = GenSlot4Control;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -3248,7 +3248,7 @@ void TrapObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseHighObject1;
-		obj->control = HighObject1Control;
+		obj->control = ControlHighObject1;
 		obj->collision = ObjectCollision;
 		obj->saveFlags = true;
 		obj->savePosition = true;
