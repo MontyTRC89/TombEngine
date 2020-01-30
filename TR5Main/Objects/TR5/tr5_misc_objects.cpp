@@ -11,6 +11,10 @@
 #include "../../Game/sphere.h"
 #include "../../Game/effect2.h"
 #include "../../Game/tomb4fx.h"
+#include "../../Game/switch.h"
+
+short DeathSlideBounds[12] = { -256, 256, -100, 100, 256, 512, 0, 0, -25 * ONE_DEGREE, 25 * ONE_DEGREE, 0, 0 };
+PHD_VECTOR DeathSlidePosition = { 0, 0, 371 };
 
 void InitialiseRaisingBlock(short itemNumber)
 {
@@ -1002,5 +1006,439 @@ void ControlTeleporter(short itemNumber)
 			RemoveActiveItem(itemNumber);
 			item->flags &= 0xC1FFu;
 		}
+	}
+}
+
+void InitialiseHighObject1(short itemNumber)
+{
+	int x = 0;
+	int y = 0;
+	int z = 0;
+
+	ITEM_INFO* item = &Items[itemNumber];
+
+	for (int i = 0; i < LevelItems; i++)
+	{
+		ITEM_INFO* currentItem = &Items[i];
+
+		if (currentItem->objectNumber != ID_TRIGGER_TRIGGERER)
+		{
+			if (currentItem->objectNumber == ID_PUZZLE_ITEM4_COMBO2)
+			{
+				item->itemFlags[3] |= (i << 8);
+				currentItem->pos.yPos = item->pos.yPos - 512;
+				continue;
+			}
+		}
+
+		if (currentItem->triggerFlags == 111)
+		{
+			item->itemFlags[3] |= i;
+			continue;
+		}
+
+		if (currentItem->triggerFlags != 112)
+		{
+			if (currentItem->objectNumber == ID_PUZZLE_ITEM4_COMBO2)
+			{
+				item->itemFlags[3] |= (i << 8);
+				currentItem->pos.yPos = item->pos.yPos - 512;
+				continue;
+			}
+		}
+		else
+		{
+			x = currentItem->pos.xPos;
+			y = currentItem->pos.yPos;
+			z = currentItem->pos.zPos;
+		}
+
+	}
+
+	for (int i = 0; i < LevelItems; i++)
+	{
+		ITEM_INFO* currentItem = &Items[i];
+
+		if (currentItem->objectNumber == ID_PULLEY
+			&& currentItem->pos.xPos == x
+			&& currentItem->pos.yPos == y
+			&& currentItem->pos.zPos == z)
+		{
+			item->itemFlags[2] |= i;
+			break;
+		}
+	}
+}
+
+void ControlHighObject1(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!TriggerActive(item))
+	{
+		if (item->itemFlags[0] == 4)
+		{
+			item->itemFlags[1]--;
+
+			if (!item->itemFlags[1])
+			{
+				ITEM_INFO* targetItem = &Items[item->itemFlags[3] & 0xFF];
+				targetItem->flags = (item->flags & 0xC1FF) | 0x20;
+				item->itemFlags[0] = 6;
+				item->itemFlags[1] = 768;
+				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+			}
+
+			return;
+		}
+		
+		if (item->itemFlags[0] == 6)
+		{
+			item->itemFlags[1] -= 8;
+			
+			if (item->itemFlags[1] >= 0)
+			{
+				int flags = 0;
+
+				if (item->itemFlags[1] >= 256)
+				{
+					if (item->itemFlags[1] <= 512)
+						flags = 31;
+					else
+						flags = (768 - item->itemFlags[1]) >> 3;
+				}
+				else
+				{
+					flags = item->itemFlags[1] >> 3;
+				}
+
+				SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags << 8) | 8);
+
+				item->pos.yPos += 8;
+
+				ITEM_INFO* targetItem = &Items[(item->itemFlags[3] >> 8) & 0xFF];
+				targetItem->flags |= 0x20u;
+				targetItem->pos.yPos = item->pos.yPos - 560;
+			}
+
+			if (item->itemFlags[1] < -60)
+			{
+				ITEM_INFO* targetItem = &Items[item->itemFlags[2] & 0xFF];
+				targetItem->itemFlags[1] = 0;
+				targetItem->flags |= 0x20u;
+				item->itemFlags[0] = 0;
+				item->itemFlags[1] = 0;
+				
+				RemoveActiveItem(itemNumber);
+
+				item->flags &= 0xC1FF;
+				item->status = ITEM_INACTIVE;
+
+				return;
+			}
+		}
+	}
+	else if (item->itemFlags[0] >= 3)
+	{
+		if (item->itemFlags[0] == 4)
+		{
+			item->itemFlags[0] = 5;
+			item->itemFlags[1] = 0;
+		}
+		else if (item->itemFlags[0] == 5 
+			&& !item->itemFlags[1] 
+			&& Items[(item->itemFlags[3] >> 8) & 0xFF].flags < 0)
+		{
+			DoFlipMap(3);
+			FlipMap[3] ^= 0x3E00u;
+			item->itemFlags[1] = 1;
+		}
+	}
+	else
+	{
+		if (item->itemFlags[1] >= 256)
+		{
+			item->itemFlags[1] = 0;
+			item->itemFlags[0]++;
+
+			if (item->itemFlags[0] == 3)
+			{
+				item->itemFlags[1] = 30 * item->triggerFlags;
+				item->itemFlags[0] = 4;
+
+				short targetItemNumber = item->itemFlags[3] & 0xFF;
+				ITEM_INFO* targetItem = &Items[targetItemNumber];
+
+				AddActiveItem(targetItemNumber);
+
+				targetItem->flags |= 0x3E20u;
+				targetItem->status = ITEM_ACTIVE;
+
+				targetItemNumber = item->itemFlags[2] & 0xFF;
+				targetItem = &Items[targetItemNumber];
+
+				targetItem->itemFlags[1] = 1;
+				targetItem->flags |= 0x20;
+				targetItem->flags &= 0xC1FF;
+
+				return;
+			}
+
+			RemoveActiveItem(itemNumber);
+
+			item->flags &= 0xC1FF;
+			item->status = ITEM_INACTIVE;
+
+			return;
+		}
+
+		int flags = 0;
+		
+		if (item->itemFlags[1] >= 31)
+		{
+			if (item->itemFlags[1] <= 224)
+				flags = 31;
+			else
+				flags = 255 - item->itemFlags[1];
+		}
+		else
+		{
+			flags = item->itemFlags[1];
+		}
+
+		SoundEffect(SFX_BLK_PLAT_RAISE_LOW, &item->pos, (flags << 8) | 8);
+
+		item->itemFlags[1] += 16;
+		item->pos.yPos -= 16;
+
+		short targetItemNumber = (item->itemFlags[3] >> 8) & 0xFF;
+		ITEM_INFO* targetItem = &Items[targetItemNumber];
+		targetItem->flags |= 0x20;
+		targetItem->pos.yPos = item->pos.yPos - 560;
+	}
+}
+
+void GenSlot1Control(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (TriggerActive(item) && !item->triggerFlags)
+	{
+		int df = item->frameNumber - Anims[item->animNumber].frameBase;
+		
+		if (df == 10 || df == 11)
+		{
+			GetLaraDeadlyBounds();
+
+			DeadlyBounds[0] -= 350;
+			DeadlyBounds[1] += 350;
+			DeadlyBounds[4] -= 350;
+			DeadlyBounds[5] += 350;
+
+			bool found = false;
+			for (int i = 0; i < 6; i++)
+			{
+				PHD_VECTOR pos;
+				pos.x = 0;
+				pos.y = -350;
+				pos.z = 0;
+
+				GetJointAbsPosition(item, &pos, i + 1);
+
+				if (pos.x > DeadlyBounds[0]
+					&& pos.x < DeadlyBounds[1]
+					&& pos.y > DeadlyBounds[2]
+					&& pos.y < DeadlyBounds[3]
+					&& pos.z > DeadlyBounds[4]
+					&& pos.z < DeadlyBounds[5])
+				{
+					found = true;
+				}
+			}
+
+			if (found)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					PHD_VECTOR pos;
+					pos.x = 0;
+					pos.y = 0;
+					pos.z = 0;
+
+					GetLaraJointPosition(&pos, i + 7);
+
+					int x = pos.x + (GetRandomControl() & 0xFF) - 128;
+					int y = pos.y + (GetRandomControl() & 0xFF) - 128;
+					int z = pos.z + (GetRandomControl() & 0xFF) - 128;
+
+					DoBloodSplat(x, y, z, 1, -1, LaraItem->roomNumber);
+				}
+
+				LaraItem->hitPoints = 0;
+			}
+		}
+		
+		AnimateItem(item);
+	}
+}
+
+void InitialiseGenSlot3(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	if (CurrentLevel != 7)
+		item->meshBits = item->triggerFlags;
+}
+
+void InitialiseGenSlot4(short itemNumber)
+{
+	/*ITEM_INFO* item = &Items[itemNumber];
+
+	HIWORD(v1) = HIWORD(items);
+	item = &items[itemNumber];
+	LOWORD(v1) = item->pos.yRot;
+	v3 = item->pos.xPos;
+	v4 = 2 * ((v1 >> 3) & 0x1FFE);
+	v5 = 5 * *(__int16*)((char*)rcossin_tbl + v4);
+	v6 = item->pos.zPos;
+	v7 = v6 + (10240 * *(__int16*)((char*)& rcossin_tbl[1] + v4) >> 14);
+	item->item_flags[2] = 1;
+	BYTE1(v4) = v6 >> 9;
+	LOBYTE(v4) = v3 >> 9;
+	item->item_flags[0] = v4;
+	LOBYTE(v6) = (item->pos.xPos + (v5 << 11 >> 14)) >> 9;
+	BYTE1(v6) = v7 >> 9;
+
+	item->itemFlags[1] = item->pos.xPos + 2560 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	item->itemFlags[3] = 0;
+	item->triggerFlags = 0;*/
+}
+
+void InitialiseDeathSlide(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	GAME_VECTOR* pos = (GAME_VECTOR*)GameMalloc(sizeof(GAME_VECTOR));
+	item->data = pos;
+
+	pos->x = item->pos.xPos;
+	pos->y = item->pos.yPos;
+	pos->z = item->pos.zPos;
+	pos->roomNumber = item->roomNumber;
+}
+
+void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	if (!(TrInput & IN_ACTION) 
+		|| l->gravityStatus 
+		|| Lara.gunStatus != LG_NO_ARMS 
+		|| l->currentAnimState != STATE_LARA_STOP)
+		return;
+
+	ITEM_INFO* item = &Items[itemNumber];
+	if (item->status != ITEM_INACTIVE)
+		return;
+
+	if (TestLaraPosition(DeathSlideBounds, item, LaraItem))
+	{
+		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
+		Lara.gunStatus = LG_HANDS_BUSY;
+
+		l->goalAnimState = STATE_LARA_ZIPLINE_RIDE;
+		do
+			AnimateItem(l);
+		while (l->currentAnimState != STATE_LARA_GRABBING);
+
+		if (!item->active)
+			AddActiveItem(itemNumber);
+
+		item->status = ITEM_ACTIVE;
+		item->flags |= ONESHOT;
+	}
+}
+
+void ControlDeathSlide(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (item->status == ITEM_ACTIVE)
+	{
+		if (!(item->flags & ONESHOT))
+		{
+			GAME_VECTOR* old = (GAME_VECTOR*)item->data;
+
+			item->pos.xPos = old->x;
+			item->pos.yPos = old->y;
+			item->pos.zPos = old->z;
+
+			if (old->roomNumber != item->roomNumber)
+				ItemNewRoom(itemNumber, old->roomNumber);
+
+			item->status = ITEM_INACTIVE;
+			item->currentAnimState = item->goalAnimState = 1;
+			item->animNumber = Objects[item->objectNumber].animIndex;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+
+			RemoveActiveItem(itemNumber);
+
+			return;
+		}
+
+		if (item->currentAnimState == 1)
+		{
+			AnimateItem(item);
+			return;
+		}
+
+		AnimateItem(item);
+
+		if (item->fallspeed < 100)
+			item->fallspeed += 5;
+
+		int c = COS(item->pos.yRot);
+		int s = SIN(item->pos.yRot);
+
+		item->pos.zPos += item->fallspeed * c >> W2V_SHIFT;
+		item->pos.xPos += item->fallspeed * s >> W2V_SHIFT;
+		item->pos.yPos += item->fallspeed >> 2;
+
+		short roomNumber = item->roomNumber;
+		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		if (roomNumber != item->roomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
+
+		if (LaraItem->currentAnimState == STATE_LARA_ZIPLINE_RIDE)
+		{
+			LaraItem->pos.xPos = item->pos.xPos;
+			LaraItem->pos.yPos = item->pos.yPos;
+			LaraItem->pos.zPos = item->pos.zPos;
+		}
+
+		int x = item->pos.xPos + (1024 * s >> W2V_SHIFT);
+		int y = item->pos.yPos + 64;
+		int z = item->pos.zPos + (1024 * c >> W2V_SHIFT);
+		
+		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+		
+		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
+		{
+			if (LaraItem->currentAnimState == STATE_LARA_ZIPLINE_RIDE)
+			{
+				LaraItem->goalAnimState = STATE_LARA_JUMP_FORWARD;
+				AnimateLara(LaraItem);
+				LaraItem->gravityStatus = true;
+				LaraItem->speed = item->fallspeed;
+				LaraItem->fallspeed = item->fallspeed >> 2;
+			}
+
+			// TODO: sounds
+			// Stop
+			SoundEffect(SFX_COGS_ROME, &item->pos, 0);
+			RemoveActiveItem(itemNumber);
+			item->status = ITEM_INACTIVE;
+			item->flags -= ONESHOT;
+		}
+		else
+			// Whizz
+			SoundEffect(SFX_GOD_HEAD_LASER_LOOPS, &item->pos, 0);  
 	}
 }

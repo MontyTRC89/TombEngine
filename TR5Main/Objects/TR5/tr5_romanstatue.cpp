@@ -1,4 +1,4 @@
-#include "../newobjects.h"
+#include "../oldobjects.h"
 #include "../../Game/sphere.h"
 #include "../../Game/items.h"
 #include "../../Game/tomb4fx.h"
@@ -6,24 +6,34 @@
 #include "../../Game/Box.h"
 #include "../../Game/people.h"
 #include "../../Game/debris.h"
+#include "../../Game/draw.h"
+#include "../../Game/control.h"
+#include "../../Game/effects.h"
 
 #define STATE_ROMAN_STATUE_STOP					1
 #define STATE_ROMAN_STATUE_SCREAMING			2
 #define STATE_ROMAN_STATUE_ATTACK1				3
 #define STATE_ROMAN_STATUE_ATTACK2				4
 #define STATE_ROMAN_STATUE_ATTACK3				5
-#define STATE_ROMAN_STATUE_ATTACK4				6
+#define STATE_ROMAN_STATUE_HIT					6
+#define STATE_ROMAN_STATUE_ATTACK4				9
 #define STATE_ROMAN_STATUE_WALK					7
+#define STATE_ROMAN_STATUE_TURN_180				10
 #define STATE_ROMAN_STATUE_DEATH				11
+#define STATE_ROMAN_STATUE_ENERGY_ATTACK		12
 
+#define ANIMATION_ROMAN_STATUE_HIT				5
+#define ANIMATION_ROMAN_STATUE_DEATH			14
 #define ANIMATION_ROMAN_STATUE_START_JUMP_DOWN	16
 
 struct ROMAN_STATUE_STRUCT
 {
 	PHD_VECTOR pos;
+	ENERGY_ARC* energyArcs[8];
 	int counter;
 };
 
+BITE_INFO RomanStatueBite { 0, 0, 0, 15 };
 ROMAN_STATUE_STRUCT RomanStatueData;
 
 void InitialiseRomanStatue(short itemNum)
@@ -88,21 +98,18 @@ void ControlRomanStatue(short itemNumber)
 	// Play hit animation
 	if (oldSwapMeshFlags != item->swapMeshFlags)
 	{
-		item->goalAnimState = 6;
-		item->currentAnimState = 6;
-		item->animNumber = Objects[ID_ROMAN_GOD].animIndex + 5;
+		item->goalAnimState = STATE_ROMAN_STATUE_HIT;
+		item->currentAnimState = STATE_ROMAN_STATUE_HIT;
+		item->animNumber = Objects[ID_ROMAN_GOD].animIndex + ANIMATION_ROMAN_STATUE_HIT;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 	}
 
-/*
 	if (item->hitPoints > 0)
 	{
 		creature->enemy = LaraItem;
 
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
-		
-		v23 = 1;
 		
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
@@ -123,9 +130,15 @@ void ControlRomanStatue(short itemNumber)
 		byte color;
 		int i;
 		int x, y, z;
-		ROOM_INFO* r;
+		ROOM_INFO* room;
 		FLOOR_INFO* floor;
 		MESH_INFO* mesh;
+		bool unk = false;
+		short angles[2];
+		short roomNumber;
+		PHD_3DPOS attackPos;
+		byte r, g, b;
+		ENERGY_ARC* arc;
 
 		switch (item->currentAnimState)
 		{
@@ -153,7 +166,7 @@ void ControlRomanStatue(short itemNumber)
 			}
 			else if (info.angle > 20480 || info.angle < -20480)
 			{
-				item->goalAnimState = 10;
+				item->goalAnimState = STATE_ROMAN_STATUE_TURN_180;
 			}
 			else if (info.ahead && info.distance < SQUARE(1024))
 			{
@@ -182,11 +195,11 @@ void ControlRomanStatue(short itemNumber)
 				{
 					if (Targetable(item, &info) && GetRandomControl() & 1)
 					{
-						item->goalAnimState = 12;
+						item->goalAnimState = STATE_ROMAN_STATUE_ENERGY_ATTACK;
 						break;
 					}
 				}
-				if (item->triggerFlags || info.distance >= (signed int)& unk_640000 || !info.bite)
+				if (item->triggerFlags || info.distance >= SQUARE(2560) || !info.bite)
 				{
 					item->goalAnimState = STATE_ROMAN_STATUE_WALK;
 					break;
@@ -197,7 +210,7 @@ void ControlRomanStatue(short itemNumber)
 			break;
 
 		case STATE_ROMAN_STATUE_SCREAMING:    
-			v84 = 0;
+			unk = false;
 
 			pos1.x = -32;
 			pos1.y = 48;
@@ -270,11 +283,64 @@ void ControlRomanStatue(short itemNumber)
 
 			GetJointAbsPosition(item, &pos, 14);
 
-			v57 = (GetRandomControl() & 0x3F) + 128;
+			color = (GetRandomControl() & 0x3F) + 128;
+			
 			pos1.x = (GetRandomControl() & 0xFFF) + item->pos.xPos - 2048;
 			pos1.y = item->pos.yPos - (GetRandomControl() & 0x3FF) - 4096;
 			pos1.z = (GetRandomControl() & 0xFFF) + item->pos.zPos - 2048;
-			v58 = dword_51CFA4;
+			
+			for (i = 0; i < 8; i++)
+			{
+				arc = RomanStatueData.energyArcs[i];
+
+				if (arc && arc->on)
+				{
+					arc->pos4.x = pos2.x;
+					arc->pos4.y = pos2.y;
+					arc->pos4.z = pos2.z;
+
+					if (item->triggerFlags)
+						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, (color >> 1) | ((color | 0x100000) << 8));
+					else
+						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, color | (((color >> 1) | 0x100000) << 8));
+
+					continue;
+				}
+
+				if (!(GlobalCounter & 3) || unk)
+				{
+					unk = 1;
+					continue;
+				}
+
+				if (item->triggerFlags)
+				{
+					/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
+						(PHD_VECTOR*)& dest.xRot,
+						(PHD_VECTOR*)& dest,
+						(GetRandomControl() & 0x3F) + 16,
+						(color >> 1) | ((color | 0x180000) << 8),
+						15,
+						48,
+						5);*/
+
+					TriggerLightningGlow(pos1.x, pos1.y, pos1.z, (color >> 1) | ((color | 0x100000) << 8));
+					unk = 1;
+					continue;
+				}
+
+				/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
+					&pos2,
+					&pos1,
+					(GetRandomControl() & 0x3F) + 16,
+					color | (((color >> 1) | 0x180000) << 8),
+					15,
+					48,
+					5);*/
+
+				TriggerLightningGlow(pos1.x, pos1.y, pos1.z, color | (((color >> 1) | 0x100000) << 8));
+				unk = 1;
+			}
 
 			break;
 
@@ -304,15 +370,15 @@ void ControlRomanStatue(short itemNumber)
 				
 				GetJointAbsPosition(item, &pos, 16);
 
-				r = &Rooms[item->roomNumber];
-				floor = &XZ_GET_SECTOR(r, pos.x - r->x, pos.z - r->z);
+				room = &Rooms[item->roomNumber];
+				floor = &XZ_GET_SECTOR(room, pos.x - room->x, pos.z - room->z);
 
 				// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 				if (floor->stopper)
 				{
-					for (i = 0; i < r->numMeshes; i++)
+					for (i = 0; i < room->numMeshes; i++)
 					{
-						mesh = &r->mesh[i];
+						mesh = &room->mesh[i];
 						
 						if (!((mesh->z ^ pos.z) & 0xFFFFFC00) && !((mesh->x ^ pos.x) & 0xFFFFFC00))
 						{
@@ -320,7 +386,7 @@ void ControlRomanStatue(short itemNumber)
 							{
 								ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 								SoundEffect(
-									(unsigned __int8)ShatterSounds[CurrentLevel - 5][mesh->staticNumber],
+									(byte)ShatterSounds[CurrentLevel - 5][mesh->staticNumber],
 									(PHD_3DPOS*)mesh,
 									0);
 
@@ -339,7 +405,7 @@ void ControlRomanStatue(short itemNumber)
 					{
 						LaraItem->hitPoints -= 200;
 						LaraItem->hitStatus = true;
-						CreatureEffect2(item, (int)&unk_509CF0, 20, item->pos.yRot, DoBloodSplat);
+						CreatureEffect2(item, &RomanStatueBite, 20, item->pos.yRot, DoBloodSplat);
 						SoundEffect(SFX_LARA_THUD, &item->pos, 0);
 						creature->flags = 1;
 					}
@@ -350,306 +416,285 @@ void ControlRomanStatue(short itemNumber)
 					pos1.x = -40;
 					pos1.y = 64;
 					pos1.z = 360;
+					
 					GetJointAbsPosition(item, &pos1, 14);
 
-					*(_DWORD*)& dest.zRot = item->pos.yPos - 64;
+					pos1.y = item->pos.yPos - 64;
+					
 					if (item->frameNumber == Anims[item->animNumber].frameBase + 34 && item->currentAnimState == 3)
 					{
-						v42 = item->itemFlags[0];
-						if (v42)
-							item->itemFlags[0] = v42 - 1;
-						TriggerShockwave((int)& dest.xRot, (int)& unk_A00010, 96, 0x30004080, 0x10000);
+						if (item->itemFlags[0])
+							item->itemFlags[0]--;
+						
+						//TriggerShockwave((PHD_3DPOS*)&pos1, (int)& unk_A00010, 96, 0x30004080, 0x10000);
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 0x80004080);
-						*(_DWORD*)& dest.zRot -= 64;
-						TriggerShockwave((int)& dest.xRot, (int)& unk_600010, 64, 0x30004080, 0x10000);
+						pos1.y -= 64;
+						//TriggerShockwave((PHD_3DPOS*)&pos1, (int)& unk_600010, 64, 0x30004080, 0x10000);
 					}
-					v43 = item->frameNumber;
-					v44 = &Anims[item->animNumber];
-					v45 = v44->frame_end - v43;
-					if (v45 >= 16)
+
+					deltaFrame = item->frameNumber - Anims[item->animNumber].frameBase;
+					deltaFrame2 = Anims[item->animNumber].frameEnd - item->frameNumber;
+					
+					if (deltaFrame2 >= 16)
 					{
-						v46 = v43 - v44->frameBase;
-						if (v46 > 16)
-							v46 = 16;
-						TriggerRomanStatueAttackEffect1(a1, v46);
+						if (deltaFrame > 16)
+							deltaFrame = 16;
+						TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame);
 					}
 					else
 					{
-						TriggerRomanStatueAttackEffect1(a1, v45);
+						TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame2);
 					}
 				}
 			}
 			
 			break;
 
-		case STATE_ROMAN_STATUE_WALK:                                   // STATE_ROMAN_STATUE_WALK
-												  // 
-			v30 = info.angle;
+		case STATE_ROMAN_STATUE_WALK:
 			creature->flags = 0;
-			joint2 = v30;
-			if (creature->mood == 1)
+			joint2 = info.angle;
+
+			if (creature->mood == ATTACK_MOOD)
 			{
-				creature->maximumTurn = 1274;
+				creature->maximumTurn = ANGLE(7);
 			}
 			else
 			{
 				creature->maximumTurn = 0;
-				if (abs((signed __int16)info.angle) >= 364)
+				if (abs(info.angle) >= ANGLE(2))
 				{
-					if ((info.angle & 0x8000u) == 0)
-						item->pos.yRot += 364;
+					if (info.angle > 0)
+						item->pos.yRot += ANGLE(2);
 					else
-						item->pos.yRot -= 364;
+						item->pos.yRot -= ANGLE(2);
 				}
 				else
 				{
 					item->pos.yRot += info.angle;
 				}
 			}
-			v31 = info.distance;
-			if (info.distance < 0x100000)
+
+			if (info.distance < SQUARE(1024))
 			{
-				item->goalAnimState = 1;
-				goto LABEL_166;
+				item->goalAnimState = STATE_ROMAN_STATUE_STOP;
+				break;
 			}
-			if (info.bite && info.distance < 3211264)
+
+			if (info.bite && info.distance < SQUARE(1792))
 			{
 				item->goalAnimState = 9;
-				goto LABEL_166;
+				break;
 			}
-			if (item->triggerFlags != 1)
-				goto LABEL_76;
-			if (Targetable((int)item, (int)& info) && !(GetRandomControl() & 3))
-				goto LABEL_78;
-			v31 = info.distance;
-		LABEL_76:
-			if (item->triggerFlags)
-				goto LABEL_175;
-			if (v31 >= (signed int)& unk_640000)
-				LABEL_175:
-			item->goalAnimState = 7;
-			else
-				LABEL_78:
-			item->goalAnimState = v23;
-			goto LABEL_166;
-		case 10:                                  // STATE_ROMAN_STATUE_TURN_180
-												  // 
-			creature->flags = 0;
-			creature->maximumTurn = 0;
-			if ((info.angle & 0x8000u) == 0)
-				item->pos.yRot -= 364;
-			else
-				item->pos.yRot += 364;
-			if (item->frameNumber == Anims[item->animNumber].frame_end)
-				item->pos.yRot += -32768;
-			goto LABEL_166;
-		case 12:
-			creature->flags = 0;
-			creature->maximumTurn = 0;
-			if (RomanStatueData_Counter)
+
+			if (item->triggerFlags == 1)
 			{
-				v64 = --RomanStatueData_Counter * ((GetRandomControl() & 0x3F) + 128) >> 4;
-				TriggerDynamic(RomanStatueData_X, RomanStatueData_Y, RomanStatueData_Z, 16, 0, v64, v64 >> 1);
-			}
-			v65 = item->frameNumber - Anims[item->animNumber].frameBase;
-			if (v65 == 34)
-			{
-				v94 = -48;
-				v95 = 48;
-				v96 = 1024;
-				GetJointAbsPosition((int)item, (int)& v94, 14);
-				a1a = -48;
-				v98 = 48;
-				a3 = 450;
-				GetJointAbsPosition((int)item, (int)& a1a, 14);
-				phd_GetVectorAngles(v94 - a1a, v95 - v98, v96 - a3, (int)a4);
-				LOWORD(v66) = item->room_number;
-				v100 = a4[1];
-				v101 = a4[0];
-				*(_DWORD*)roomNumber = v66;
-				GetFloor(a1a, v98, a3, roomNumber);
-				RomanStatueAttack((PHD_3DPOS*)& a1a, roomNumber[0], 1);
-				v67 = GetRandomControl();
-				TriggerRomanStatueShockwaveAttackSparks(
-					a1a,
-					v98,
-					a3,
-					(((v67 & 0x3F) + 128) >> 1) | ((((v67 & 0x3F) + 128) | 0x400000) << 8));
-				RomanStatueData_Counter = 16;
-				RomanStatueData_X = a1a;
-				RomanStatueData_Y = v98;
-				RomanStatueData_Z = a3;
-				v68 = item->itemFlags[0];
-				if (v68)
-					item->itemFlags[0] = v68 - 1;
-			}
-			else if (v65 < 10 || v65 > 49)
-			{
-				goto LABEL_166;
-			}
-			v69 = v65 - 10;
-			if (v69 < 32)
-			{
-				dest.xPos = -32;
-				dest.yPos = 48;
-				dest.zPos = 64;
-				GetJointAbsPosition((int)item, (int)& dest, 14);
-				*(_DWORD*)& dest.xRot = -48;
-				*(_DWORD*)& dest.zRot = 48;
-				a5 = 490;
-				GetJointAbsPosition((int)item, (int)& dest.xRot, 14);
-				v70 = 0;
-				do
+				if (Targetable(item, &info) && !(GetRandomControl() & 3))
 				{
-					v71 = GetRandomControl();
-					v72 = v69 * ((v71 & 0x3F) + 128) >> 4;
-					v73 = v69 * ((v71 & 0x3F) + 128) >> 5;
-					*(_DWORD*)roomNumber = v69 * ((v71 & 0x3F) + 128) >> 5;
-					if (!v70)
+					item->goalAnimState = STATE_ROMAN_STATUE_STOP;
+					break;
+				}
+			}
+
+			if (item->triggerFlags || info.distance >= SQUARE(2560))
+				item->goalAnimState = STATE_ROMAN_STATUE_WALK;
+			else
+				item->goalAnimState = STATE_ROMAN_STATUE_STOP;
+
+			break;
+
+		case STATE_ROMAN_STATUE_TURN_180: 
+			creature->flags = 0;
+			creature->maximumTurn = 0;
+
+			if (info.angle > 0)
+				item->pos.yRot -= ANGLE(2);
+			else
+				item->pos.yRot += ANGLE(2);
+
+			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+				item->pos.yRot += -ANGLE(180);
+		
+			break;
+
+		case STATE_ROMAN_STATUE_ENERGY_ATTACK:
+			creature->flags = 0;
+			creature->maximumTurn = 0;
+			
+			if (RomanStatueData.counter)
+			{
+				RomanStatueData.counter--;
+				color = RomanStatueData.counter * ((GetRandomControl() & 0x3F) + 128) >> 4;
+				TriggerDynamicLight(RomanStatueData.pos.x, RomanStatueData.pos.y, RomanStatueData.pos.z, 16, 0, color, color >> 1);
+			}
+			
+			deltaFrame = item->frameNumber - Anims[item->animNumber].frameBase;
+
+			if (deltaFrame == 34)
+			{
+				pos1.x = -48;
+				pos1.y = 48;
+				pos1.z = 1024;
+				GetJointAbsPosition(item, &pos1, 14);
+
+				pos2.x = -48;
+				pos2.y = 48;
+				pos2.z = 450;
+				GetJointAbsPosition(item, &pos2, 14);
+
+				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
+
+				attackPos.xPos = pos2.x;
+				attackPos.yPos = pos2.y;
+				attackPos.zPos = pos2.z;
+				attackPos.xRot = angles[1];
+				attackPos.yRot = angles[0];
+				attackPos.zRot = 0;
+
+				roomNumber = item->roomNumber;
+				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
+
+				RomanStatueAttack(&attackPos, roomNumber, 1);
+
+				TriggerRomanStatueShockwaveAttackSparks(
+					attackPos.xPos,
+					attackPos.yPos,
+					attackPos.zPos,
+					(((GetRandomControl() & 0x3F) + 128) >> 1) | ((((GetRandomControl() & 0x3F) + 128) | 0x400000) << 8));
+				
+				RomanStatueData.counter = 16;	
+				RomanStatueData.pos.x = attackPos.xPos;
+				RomanStatueData.pos.y = attackPos.yPos;
+				RomanStatueData.pos.z = attackPos.zPos;
+				
+				if (item->itemFlags[0])
+					item->itemFlags[0]--;
+			}
+			else if (deltaFrame < 10 || deltaFrame > 49)
+			{
+				break;
+			}
+			
+			deltaFrame -= 10;
+			if (deltaFrame < 32)
+			{
+				pos1.x = -32;
+				pos1.y = 48;
+				pos1.z = 64;
+				GetJointAbsPosition(item, &pos1, 14);
+				
+				pos2.x = -48;
+				pos2.y = 48;
+				pos2.z = 490;
+				GetJointAbsPosition(item, &pos2, 14);
+				
+				for (i = 0; i < 4; i++)
+				{
+					r = deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 5;
+					g = deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 4;
+					b = deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 5;
+					
+					if (i == 0)
 					{
-						TriggerDynamic(
-							*(int*)& dest.xRot,
-							*(int*)& dest.zRot,
-							a5,
+						TriggerDynamicLight(
+							pos2.x,
+							pos2.y,
+							pos2.z,
 							8,
 							0,
-							v69 * ((v71 & 0x3F) + 128) >> 5,
-							v69 * ((v71 & 0x3F) + 128) >> 6);
-						v73 = *(_DWORD*)roomNumber;
+							deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 5,
+							deltaFrame * ((GetRandomControl() & 0x3F) + 128) >> 6);
 					}
-					v74 = dword_51CFA4[v70];
-					if (v74 && v69 && v69 != 24)
+
+					arc = RomanStatueData.energyArcs[i];
+
+					if (arc && deltaFrame && deltaFrame != 24)
 					{
-						if (v69 < 16)
+						if (deltaFrame < 16)
 						{
-							*(_BYTE*)(v74 + 51) = 56;
-							*(_BYTE*)(v74 + 48) = 0;
-							*(_BYTE*)(v74 + 49) = v72;
-							*(_BYTE*)(v74 + 50) = v73;
+							arc->on = 56;
+							arc->r = 0;
+							arc->g = g;
+							arc->b = b;
 						}
-						*(_DWORD*)v74 = dest.xPos;
-						*(_DWORD*)(v74 + 4) = dest.yPos;
-						*(_DWORD*)(v74 + 8) = dest.zPos;
-						*(_DWORD*)(v74 + 36) = *(_DWORD*)& dest.xRot;
-						*(_DWORD*)(v74 + 40) = *(_DWORD*)& dest.zRot;
-						*(_DWORD*)(v74 + 44) = a5;
+
+						arc->pos1.x = pos1.x;
+						arc->pos1.y = pos1.y;
+						arc->pos1.z = pos1.z;
+						arc->pos4.x = pos2.x;
+						arc->pos4.y = pos2.y;
+						arc->pos4.z = pos2.z;
 					}
-					else if (v69 >= 16)
+					else if (deltaFrame >= 16)
 					{
-						if (v69 == 24)
+						if (deltaFrame == 24)
 						{
-							v77 = GetRandomControl();
-							v78 = (((v77 & 0x3F) + 128) >> 1) | ((((v77 & 0x3F) + 128) | 0x200000) << 8);
-							v79 = GetRandomControl();
-							TriggerEnergyArc((PHD_VECTOR*)& dest, (PHD_VECTOR*)& dest.xRot, (v79 & 0xF) + 24, v78, 13, 64, 4);
+							/*TriggerEnergyArc(
+								&pos1, 
+								&pos2, 
+								(GetRandomControl() & 0xF) + 24, 
+								(((GetRandomControl() & 0x3F) + 128) >> 1) | ((((GetRandomControl() & 0x3F) + 128) | 0x200000) << 8), 
+								13, 
+								64, 
+								4);*/
 						}
 					}
 					else
 					{
-						v75 = v73 | ((v72 | 0x180000) << 8);
-						v76 = GetRandomControl();
-						dword_51CFA4[v70] = (int)TriggerEnergyArc(
-							(PHD_VECTOR*)& dest,
-							(PHD_VECTOR*)& dest.xRot,
-							(v76 & 7) + 8,
-							v75,
+						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
+							&pos1,
+							&pos2,
+							(GetRandomControl() & 7) + 8,
+							cb | ((cg | 0x180000) << 8),
 							12,
 							64,
-							4);
+							4);*/
 					}
-					++v70;
-				} while (v70 < 4);
+				}
 			}
-			goto LABEL_166;
+
+			break;
+
 		default:
-			goto LABEL_166;
-		}
-		while (1)
-		{
-			v59 = *v58;
-			if (*v58 && *(_BYTE*)(v59 + 51))
-			{
-				*(_DWORD*)(v59 + 36) = dest.xPos;
-				*(_DWORD*)(*v58 + 40) = dest.yPos;
-				*(_DWORD*)(*v58 + 44) = dest.zPos;
-				if (item->triggerFlags)
-					TriggerLightningGlow(dest.xPos, dest.yPos, dest.zPos, (v57 >> 1) | ((v57 | 0x100000) << 8));
-				else
-					TriggerLightningGlow(dest.xPos, dest.yPos, dest.zPos, v57 | (((v57 >> 1) | 0x100000) << 8));
-				goto LABEL_142;
-			}
-			if (!(GlobalCounter & 3) || v84)
-				goto LABEL_138;
-			if (item->triggerFlags)
-				break;
-			v60 = GetRandomControl();
-			v61 = TriggerEnergyArc(
-				(PHD_VECTOR*)& dest.xRot,
-				(PHD_VECTOR*)& dest,
-				(v60 & 0x3F) + 16,
-				v57 | (((v57 >> 1) | 0x180000) << 8),
-				15,
-				48,
-				5);
-			v62 = dest.yPos;
-			*v58 = (int)v61;
-			TriggerLightningGlow(dest.xPos, v62, dest.zPos, v57 | (((v57 >> 1) | 0x100000) << 8));
-			v84 = 1;
-		LABEL_142:
-			++v58;
-			if ((signed int)v58 >= (signed int)& RomanStatueData_Counter)
-				goto LABEL_166;
-		}
-		v63 = GetRandomControl();
-		*v58 = (int)TriggerEnergyArc(
-			(PHD_VECTOR*)& dest.xRot,
-			(PHD_VECTOR*)& dest,
-			(v63 & 0x3F) + 16,
-			(v57 >> 1) | ((v57 | 0x180000) << 8),
-			15,
-			48,
-			5);
-		TriggerLightningGlow(dest.xPos, dest.yPos, dest.zPos, (v57 >> 1) | ((v57 | 0x100000) << 8));
-	LABEL_138:
-		v84 = 1;
-		goto LABEL_142;
-	}
+			break;
 
-	item->hitPoints = 0;
-
-	// STATE_ROMAN_STATUE_DEATH
-	if (item->currentAnimState == STATE_ROMAN_STATUE_DEATH)
-	{
-		if (item->frameNumber > Anims[item->animNumber].frameBase + 54 
-			&& item->frameNumber < Anims[item->animNumber].frameBase + 74 
-			&& item->touchBits)
-		{
-			LaraItem->hitPoints -= 40;
-			LaraItem->hitStatus = true;
-		}
-		else if (item->frameNumber == Anims[item->animNumber].frameEnd)
-		{
-			// Activate trigger on death
-			short roomNumber = item->itemFlags[2] & 0xFF;
-			short floorHeight = item->itemFlags[2] & 0xFF00;
-			ROOM_INFO* r = &Rooms[roomNumber];
-
-			int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
-			int y = r->minfloor + floorHeight;
-			int z = r->z + ((item->TOSSPAD & 0xFF) << WALL_SHIFT) + 512;
-
-			FLOOR_INFO * floor = GetFloor(x, y, z, &roomNumber);
-			GetFloorHeight(floor, x, y, z);
-			TestTriggers(TriggerIndex, 1, 0);
 		}
 	}
 	else
 	{
-		item->animNumber = Objects[ID_ROMAN_GOD].animIndex + 14;
-		item->currentAnimState = STATE_ROMAN_STATUE_DEATH;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->hitPoints = 0;
+
+		if (item->currentAnimState == STATE_ROMAN_STATUE_DEATH)
+		{
+			if (item->frameNumber > Anims[item->animNumber].frameBase + 54
+				&& item->frameNumber < Anims[item->animNumber].frameBase + 74
+				&& item->touchBits)
+			{
+				LaraItem->hitPoints -= 40;
+				LaraItem->hitStatus = true;
+			}
+			else if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			{
+				// Activate trigger on death
+				short roomNumber = item->itemFlags[2] & 0xFF;
+				short floorHeight = item->itemFlags[2] & 0xFF00;
+				ROOM_INFO* r = &Rooms[roomNumber];
+
+				int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
+				int y = r->minfloor + floorHeight;
+				int z = r->z + ((item->TOSSPAD & 0xFF) << WALL_SHIFT) + 512;
+
+				FLOOR_INFO * floor = GetFloor(x, y, z, &roomNumber);
+				GetFloorHeight(floor, x, y, z);
+				TestTriggers(TriggerIndex, 1, 0);
+			}
+		}
+		else
+		{
+			item->animNumber = Objects[ID_ROMAN_GOD].animIndex + ANIMATION_ROMAN_STATUE_DEATH;
+			item->currentAnimState = STATE_ROMAN_STATUE_DEATH;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+		}
 	}
-LABEL_166:
 
 	CreatureTilt(item, 0);
 	CreatureJoint(item, 0, joint0);
@@ -659,7 +704,7 @@ LABEL_166:
 	if (item->swapMeshFlags & 0x400)
 	{
 		PHD_VECTOR pos;
-		pos.x = (GAME_VECTOR*)((v81 & 0x1F) - 16);
+		pos.x = (GetRandomControl() & 0x1F) - 16;
 		pos.y = 86;
 		pos.z = (GetRandomControl() & 0x1F) - 16;
 		RomanStatueHitEffect(item, &pos, 10);
@@ -677,13 +722,13 @@ LABEL_166:
 	if (item->swapMeshFlags & 0x100)
 	{
 		PHD_VECTOR pos;
-		pos.x = (GAME_VECTOR*)((v83 & 0x3F) + 54);
+		pos.x = (GetRandomControl() & 0x3F) + 54;
 		pos.y = -170;
 		pos.z = (GetRandomControl() & 0x1F) + 27;
 		RomanStatueHitEffect(item, &pos, 8);
 	}
 
-	CreatureAnimation(itemNumber, angle, 0);*/
+	CreatureAnimation(itemNumber, angle, 0);
 }
 
 void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)

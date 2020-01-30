@@ -656,3 +656,777 @@ void InitialiseRomeHammer(short itemNumber)
 	item->itemFlags[0] = 2;
 	item->itemFlags[3] = 250;
 }
+
+void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
+{
+	int x, y, z;
+
+	if (abs(intensity) == 1)
+	{
+		x = (bounds[0]+bounds[1]) >> 1;
+		if (intensity >= 0)
+			y = bounds[3];
+		else
+			y = bounds[2];
+		z = (bounds[4] + bounds[5]) >> 1;
+	}
+	else
+	{
+		y = (bounds[2]+bounds[3]) >> 1;
+		if (rot & 0x7FFF)
+		{
+			if (intensity >= 0)
+				z = bounds[5];
+			else
+				z = bounds[4];
+			x = (bounds[0]+bounds[1]) >> 1;
+		}
+		else
+		{
+			if (intensity >= 0)
+				x = bounds[1];
+			else
+				x = bounds[0];
+			z = (bounds[4] + bounds[5]) >> 1;
+		}
+	}
+
+	if (abs(Camera.pos.x-x) <= 7168)
+	{
+		if (abs(Camera.pos.y-y) <= 7168)
+		{
+			if (abs(Camera.pos.z-z) <= 7168)
+			{
+				SPARKS* spark = &Sparks[GetFreeSpark()];
+				
+				spark->on = 1;
+				spark->sR = 0;
+				spark->sG = 0;
+				spark->sB = 0;
+				spark->dR = spark->dG = 48 * speed >> 7;
+				spark->colFadeSpeed = 4;
+				spark->fadeToBlack = 8;
+				spark->dB = speed * ((GetRandomControl() & 8) + 48) >> 7;
+				spark->transType = COLADD;
+				spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
+				
+				if (abs(intensity) == 1)
+				{
+					int factor = 3 * (bounds[1]-bounds[0]) >> 3;
+					short angle = 2 * GetRandomControl();
+
+					spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * SIN(angle) >> W2V_SHIFT);
+					spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * COS(angle) >> W2V_SHIFT);
+					
+					if (intensity >= 0)
+						spark->y = bounds[3];
+					else
+						spark->y = bounds[2];
+
+					spark->zVel = 0;
+					spark->xVel = 0;
+					spark->yVel = 32 * intensity * ((GetRandomControl() & 0x1F) + 224);
+				}
+				else
+				{
+					int factor = 3 * (bounds[3] - bounds[2]) >> 3;
+					short angle = 2 * GetRandomControl();
+
+					spark->y = (bounds[2] + bounds[3]) >> 1;
+
+					if (rot & 0x7FFF)
+					{
+						if (intensity >= 0)
+							spark->z = bounds[5];
+						else
+							spark->z = bounds[4];
+
+						spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * COS(angle) >> W2V_SHIFT);
+						spark->y += (GetRandomControl() % factor) * SIN(angle) >> W2V_SHIFT;
+						spark->xVel = 0;
+						spark->zVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
+					}
+					else
+					{
+						if (intensity >= 0)
+							spark->x = bounds[1];
+						else
+							spark->x = bounds[0];
+
+						spark->y += (GetRandomControl() % factor) * SIN(angle) >> W2V_SHIFT;
+						spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * COS(angle) >> W2V_SHIFT);
+						spark->zVel = 0;
+						spark->xVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
+					}
+
+					spark->yVel = 0;
+				}
+
+				spark->friction = 85;
+				spark->xVel = speed * spark->xVel >> 7;
+				spark->yVel = speed * spark->yVel >> 7;
+				spark->zVel = speed * spark->zVel >> 7;
+				spark->maxYvel = 0;
+				spark->gravity = 0;
+				spark->flags = 0;
+			}
+		}
+	}
+}
+
+void InitialiseVentilator(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	item->itemFlags[0] = item->triggerFlags << WALL_SHIFT;
+	if (item->itemFlags[0] < 2048)
+		item->itemFlags[0] = 3072;
+}
+
+void VentilatorControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	AnimateItem(item);
+
+	int xChange = 0;
+	int zChange = 0;
+
+	if (TriggerActive(item))
+	{
+		xChange = 1;
+	}
+	else
+	{
+		xChange = 1;
+		TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
+		if (item->currentAnimState == 1)
+		{
+			//result = 5 * item->animNumber;
+			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+				return;
+		}
+		else
+		{
+			item->goalAnimState = 1;
+		}
+	}
+
+	int speed = 0;
+	if (item->currentAnimState == 1)
+	{
+		speed = Anims[item->animNumber].frameEnd - item->frameNumber;
+	}
+	else
+	{
+		speed = 128;
+	}
+
+	short* bounds = GetBoundsAccurate(item);
+	short effectBounds[6];
+
+	effectBounds[2] = item->pos.yPos + bounds[2];
+	effectBounds[3] = item->pos.yPos + bounds[3];
+
+	if (item->objectNumber != ID_PROPELLER_V) // TODO: check this ID
+	{
+		if (item->pos.yRot != -ANGLE(180))
+		{
+			if (item->pos.yRot == -ANGLE(90))
+			{
+				effectBounds[0] = item->pos.xPos - bounds[5];
+				effectBounds[1] = item->pos.xPos - bounds[4];
+				effectBounds[4] = item->pos.zPos + bounds[0];
+				effectBounds[5] = item->pos.zPos + bounds[1];
+				xChange = 0;
+				zChange = 1;
+			}
+			else
+			{
+				if (item->pos.yRot != ANGLE(90))
+				{
+					effectBounds[0] = item->pos.xPos + bounds[0];
+					effectBounds[1] = item->pos.xPos + bounds[1];
+					effectBounds[4] = item->pos.zPos + bounds[4];
+					effectBounds[5] = item->pos.zPos + bounds[5];
+					zChange = 0;
+				}
+				else
+				{
+					effectBounds[0] = item->pos.xPos + bounds[4];
+					effectBounds[1] = item->pos.xPos + bounds[5];
+					effectBounds[4] = item->pos.zPos - bounds[1];
+					effectBounds[5] = item->pos.zPos - bounds[0];
+					xChange = 0;
+					zChange = 1;
+				}
+			}
+		}
+		else
+		{
+			effectBounds[0] = item->pos.xPos - bounds[1];
+			effectBounds[1] = item->pos.xPos - bounds[0];
+			effectBounds[4] = item->pos.zPos - bounds[5];
+			effectBounds[5] = item->pos.zPos - bounds[4];
+			zChange = 0;
+		}
+
+		VentilatorEffect(effectBounds, 2, item->pos.yRot, speed);
+		VentilatorEffect(effectBounds, -2, item->pos.yRot, speed);
+
+		if (LaraItem->pos.yPos >= effectBounds[2] && LaraItem->pos.yPos <= effectBounds[3])
+		{
+			if (zChange)
+			{
+				if (LaraItem->pos.xPos >= effectBounds[0] && LaraItem->pos.xPos <= effectBounds[1])
+				{
+					int z1 = abs(LaraItem->pos.zPos - effectBounds[4]);
+					int z2 = abs(LaraItem->pos.zPos - effectBounds[5]);
+
+					if (z2 >= z1)
+						zChange = -zChange;
+					else
+						z1 = z2;
+
+					if (z1 < item->itemFlags[0])
+					{
+						int dz = 96 * zChange * (item->itemFlags[0] - z1) / item->itemFlags[0];
+						if (item->currentAnimState == 1)
+							dz = speed * dz / 120;
+						LaraItem->pos.zPos += dz;
+					}
+				}
+			}
+			else
+			{
+				if (LaraItem->pos.zPos >= effectBounds[4] && LaraItem->pos.zPos <= effectBounds[5])
+				{
+					int x1 = abs(LaraItem->pos.xPos - effectBounds[0]);
+					int x2 = abs(LaraItem->pos.xPos - effectBounds[0]);
+
+					if (x2 >= x1)
+						xChange = -xChange;
+					else
+						x1 = x2;
+
+					if (x1 < item->itemFlags[0])
+					{
+						int dx = 96 * xChange * (item->itemFlags[0] - x1) / item->itemFlags[0];
+						if (item->currentAnimState == 1)
+							dx = speed * dx / 120;
+						LaraItem->pos.xPos += dx;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		phd_PushUnitMatrix();
+		phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
+		phd_SetTrans(0, 0, 0);
+		short tbounds[6];
+		phd_RotBoundingBoxNoPersp(bounds, tbounds);
+		phd_PopMatrix();
+
+		effectBounds[0] = item->pos.xPos + tbounds[0];
+		effectBounds[1] = item->pos.xPos + tbounds[1];
+		effectBounds[4] = item->pos.zPos + tbounds[4];
+		effectBounds[5] = item->pos.zPos + tbounds[5];
+
+		VentilatorEffect(effectBounds, 1, 0, speed);
+		VentilatorEffect(effectBounds, -1, 0, speed);
+
+		if (LaraItem->pos.xPos >= effectBounds[0] && LaraItem->pos.xPos <= effectBounds[1])
+		{
+			if (LaraItem->pos.zPos >= effectBounds[4] && LaraItem->pos.zPos <= effectBounds[5])
+			{
+				int y = effectBounds[3];
+
+				if (LaraItem->pos.yPos <= effectBounds[3])
+				{
+					if (effectBounds[2] - LaraItem->pos.yPos >= item->itemFlags[0])
+						return;
+					y = 96 * (effectBounds[3] - item->itemFlags[0]) / item->itemFlags[0];
+				}
+				else
+				{
+					if (LaraItem->pos.yPos - effectBounds[3] >= item->itemFlags[0])
+						return;
+					y = 96 * (item->itemFlags[0] - (LaraItem->pos.yPos - effectBounds[3])) / item->itemFlags[0];
+				}
+				if (item->currentAnimState == 1)
+					y = speed * y / 120;
+				LaraItem->pos.yPos += y;
+			}
+		}
+	}
+}
+
+void DartControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (item->touchBits)
+	{
+		LaraItem->hitPoints -= 25;
+		LaraItem->hitStatus = true;
+		Lara.poisoned += 160;
+		DoBloodSplat(item->pos.xPos, item->pos.yPos, item->pos.zPos, (GetRandomControl() & 3) + 4, LaraItem->pos.yRot, LaraItem->roomNumber);
+		KillItem(itemNumber);
+	}
+	else
+	{
+		item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.yPos -= item->speed * SIN(item->pos.xRot) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+
+		short roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+
+		if (item->roomNumber != roomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
+		
+		int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		item->floor = height;
+	
+		if (item->pos.yPos >= height)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				TriggerDartSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 0, 0, 1);
+			}
+			
+			KillItem(itemNumber);
+		}
+	}
+}
+
+void DartEmitterControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (item->active)
+	{
+		if (item->timer > 0)
+		{
+			item->timer--;
+			return;
+		}
+		else
+		{
+			item->timer = 24;
+		}
+	}
+	
+	short dartItemNumber = CreateItem();
+
+	if (dartItemNumber != NO_ITEM)
+	{
+		ITEM_INFO* dartItem = &Items[dartItemNumber];
+
+		dartItem->objectNumber = ID_DARTS;
+		dartItem->roomNumber = item->roomNumber;
+		
+		int x = 0;
+		int z = 0;
+
+		if (item->pos.yRot > 0)
+		{
+			if (item->pos.yRot == ANGLE(90))
+				x = 512;
+		}
+		else if (item->pos.yRot < 0)
+		{
+			if (item->pos.yRot == -ANGLE(180))
+			{
+				z = -512;
+			}
+			else if (item->pos.yRot == -ANGLE(90))
+			{
+				x = -512;
+			}
+		}
+		else
+		{
+			z = 512;
+		}
+
+		dartItem->pos.xPos = x + item->pos.xPos;
+		dartItem->pos.yPos = item->pos.yPos - 512;
+		dartItem->pos.zPos = z + item->pos.zPos;
+
+		InitialiseItem(dartItemNumber);
+
+		dartItem->pos.xRot = 0;
+		dartItem->pos.yRot = item->pos.yRot + -ANGLE(180);
+		dartItem->speed = 256;
+
+		int xf = 0;
+		int zf = 0;
+
+		if (x)
+			xf = abs(2 * x) - 1;
+		else
+			zf = abs(2 * z) - 1;
+
+		for (int i = 0; i < 5; i++)
+		{
+			int random = -GetRandomControl();
+			
+			int xv = 0;
+			int zv = 0;
+
+			if (z >= 0)
+				zv = zf & random;
+			else
+				zv = -(zf & random);
+
+			if (x >= 0)
+				xv = xf & random;
+			else
+				xv = -(xf & random);
+
+			TriggerDartSmoke(dartItem->pos.xPos, dartItem->pos.yPos, dartItem->pos.zPos, xv, zv, 0);
+		}
+
+		AddActiveItem(dartItemNumber);
+		dartItem->status = ITEM_ACTIVE;
+		SoundEffect(SFX_LIFT_DOORS, &dartItem->pos, 0);
+	}
+}
+
+void FallingCeilingControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (item->currentAnimState)
+	{
+		if (item->currentAnimState == 1 && item->touchBits)
+		{
+			LaraItem->hitPoints -= 300;
+			LaraItem->hitStatus = true;
+		}
+	}
+	else
+	{
+		item->goalAnimState = 1;
+		item->gravityStatus = true;;
+	}
+	
+	AnimateItem(item);
+
+	if (item->status == ITEM_DEACTIVATED)
+	{
+		RemoveActiveItem(itemNumber);
+	}
+	else
+	{
+		short roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		
+		if (roomNumber != item->roomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
+
+		if (item->currentAnimState == 1)
+		{
+			if (item->pos.yPos >= item->floor)
+			{
+				item->pos.yPos = item->floor;
+				item->gravityStatus = false;
+				item->goalAnimState = 2;
+				item->fallspeed = 0;
+			}
+		}
+	}
+}
+
+void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	
+	if (TestBoundsCollide(item, l, coll->radius))
+	{
+		if (TestCollision(item, l))
+		{
+			if (TriggerActive(item) && (item->itemFlags[0] || item->fallspeed))
+			{
+				LaraItem->animNumber = ANIMATION_LARA_SQUASH_BOULDER;
+				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+				LaraItem->goalAnimState = STATE_LARA_DEATH;
+				LaraItem->currentAnimState = STATE_LARA_DEATH;
+				LaraItem->gravityStatus = false;
+			}
+			else
+			{
+				ObjectCollision(itemNumber, l, coll);
+			}
+		}
+	}
+}
+
+void RollingBallControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!TriggerActive(item))
+		return;
+
+	item->fallspeed += GRAVITY;
+
+	item->pos.xPos += item->itemFlags[0] >> 5;
+	item->pos.yPos += item->fallspeed;
+	item->pos.zPos += item->itemFlags[1] >> 5;
+
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	int dh = height - 512;
+
+	if (item->pos.yPos > height - 512)
+	{
+		if (abs(item->fallspeed) > 16)
+		{
+			int distance = SQRT_ASM(
+				SQUARE(Camera.pos.x - item->pos.xPos) +
+				SQUARE(Camera.pos.y - item->pos.yPos) +
+				SQUARE(Camera.pos.z - item->pos.zPos));
+
+			if (distance < 16384)
+				Camera.bounce = -((16384 - distance) * abs(item->fallspeed) >> 14);
+		}
+
+		if (item->pos.yPos - dh < 512)
+			item->pos.yPos = dh;
+
+		if (item->fallspeed <= 64)
+		{
+			if (abs(item->speed) <= 512 || GetRandomControl() & 0x1F)
+				item->fallspeed = 0;
+			else
+				item->fallspeed = -(short)(GetRandomControl() % (item->speed >> 3));
+		}
+		else
+		{
+			item->fallspeed = -(short)(item->fallspeed >> 2);
+		}
+	}
+
+	int x = item->pos.xPos;
+	int y = item->pos.yPos;
+	int z = item->pos.zPos;
+
+	floor = GetFloor(x, y, z + 128, &roomNumber);
+	int y1a = GetFloorHeight(floor, x, y, z + 128) - 512;
+
+	floor = GetFloor(x, y, z - 128, &roomNumber);
+	int y2a = GetFloorHeight(floor, x, y, z - 128) - 512;
+
+	floor = GetFloor(x + 128, y, z, &roomNumber);
+	int y3a = GetFloorHeight(floor, x + 128, y, z) - 512;
+
+	floor = GetFloor(x - 128, y, z, &roomNumber);
+	int y4a = GetFloorHeight(floor, x - 128, y, z) - 512;
+
+	floor = GetFloor(x, y, z + 512, &roomNumber);
+	int y1b = GetFloorHeight(floor, x, y, z + 512) - 512;
+
+	floor = GetFloor(x, y, z - 512, &roomNumber);
+	int y2b = GetFloorHeight(floor, x, y, z - 512) - 512;
+
+	floor = GetFloor(x + 512, y, z, &roomNumber);
+	int y3b = GetFloorHeight(floor, x + 512, y, z) - 512;
+
+	floor = GetFloor(x - 512, y, z, &roomNumber);
+	int y4b = GetFloorHeight(floor, x - 512, y, z) - 512;
+
+	if (item->pos.yPos - dh > -256
+		|| item->pos.yPos - y1b >= 512
+		|| item->pos.yPos - y3b >= 512
+		|| item->pos.yPos - y2b >= 512
+		|| item->pos.yPos - y4b >= 512)
+	{
+		int counterZ = 0;
+
+		if (y1a - dh <= 256)
+		{
+			if (y1b - dh < -1024 || y1a - dh < -256)
+			{
+				if (item->itemFlags[1] <= 0)
+				{
+					if (!item->itemFlags[1] && item->itemFlags[0])
+					{
+						item->pos.zPos = (item->pos.zPos & 0xFFFFFE00) + 512;
+					}
+				}
+				else
+				{
+					item->itemFlags[1] = -item->itemFlags[1] >> 1;
+					item->pos.zPos = (item->pos.zPos & 0xFFFFFE00) + 512;
+				}
+			}
+			else if (y1a == dh)
+			{
+				counterZ = 1;
+			}
+			else
+			{
+				item->itemFlags[1] += (y1a - dh) >> 1;
+			}
+		}
+
+		if (y2a - dh <= 256)
+		{
+			if (y2b - dh < -1024 || y2a - dh < -256)
+			{
+				if (item->itemFlags[1] >= 0)
+				{
+					if (!item->itemFlags[1] && item->itemFlags[0])
+					{
+						item->pos.zPos = (item->pos.zPos & 0xFFFFFE00) + 512;
+					}
+				}
+				else
+				{
+					item->itemFlags[1] = -item->itemFlags[1] >> 1;
+					item->pos.zPos = (item->pos.zPos & 0xFFFFFE00) + 512;
+				}
+			}
+			else if (y2a == dh)
+			{
+				counterZ++;
+			}
+			else
+			{
+				item->itemFlags[1] -= (y2a - dh) >> 1;
+			}
+		}
+
+		if (counterZ == 2)
+		{
+			if (abs(item->itemFlags[1]) <= 64)
+				item->itemFlags[1] = 0;
+			else
+				item->itemFlags[1] = item->itemFlags[1] - (item->itemFlags[1] >> 6);
+		}
+
+		int counterX = 0;
+
+		if (y4a - dh <= 256)
+		{
+			if (y4b - dh < -1024 || y4a - dh < -256)
+			{
+				if (item->itemFlags[0] >= 0)
+				{
+					if (!item->itemFlags[0] && item->itemFlags[1])
+					{
+						item->pos.xPos = (item->pos.xPos & 0xFFFFFE00) + 512;
+					}
+				}
+				else
+				{
+					item->itemFlags[0] = -item->itemFlags[0] >> 1;
+					item->pos.xPos = (item->pos.xPos & 0xFFFFFE00) + 512;
+				}
+			}
+			else if (y4a == dh)
+			{
+				counterX = 1;
+			}
+			else
+			{
+				item->itemFlags[0] -= (y4a - dh) >> 1;
+			}
+		}
+
+		if (y3a - dh <= 256)
+		{
+			if (y3b - dh < -1024 || y3a - dh < -256)
+			{
+				if (item->itemFlags[0] <= 0)
+				{
+					if (!item->itemFlags[0] && item->itemFlags[1])
+					{
+						item->pos.xPos = (item->pos.xPos & 0xFFFFFE00) + 512;
+					}
+				}
+				else
+				{
+					item->itemFlags[0] = -item->itemFlags[0] >> 1;
+					item->pos.xPos = (item->pos.xPos & 0xFFFFFE00) + 512;
+				}
+			}
+			else if (y3a == dh)
+			{
+				counterX++;
+			}
+			else
+			{
+				item->itemFlags[0] += (y3a - dh) >> 1;
+			}
+		}
+
+		if (counterX == 2)
+		{
+			if (abs(item->itemFlags[0]) <= 64)
+				item->itemFlags[0] = 0;
+			else
+				item->itemFlags[0] = item->itemFlags[0] - (item->itemFlags[0] >> 6);
+		}
+	}
+
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
+
+	if (item->itemFlags[0] <= 3072)
+	{
+		if (item->itemFlags[0] < -3072)
+			item->itemFlags[0] = -3072;
+	}
+	else
+	{
+		item->itemFlags[0] = 3072;
+	}
+
+	if (item->itemFlags[1] <= 3072)
+	{
+		if (item->itemFlags[1] < -3072)
+			item->itemFlags[1] = -3072;
+	}
+	else
+	{
+		item->itemFlags[1] = 3072;
+	}
+
+	short angle = 0;
+
+	if (item->itemFlags[1] || item->itemFlags[0])
+		angle = ATAN(item->itemFlags[1], item->itemFlags[0]);
+	else
+		angle = item->pos.yRot;
+
+	if (item->pos.yRot != angle)
+	{
+		if (((angle - item->pos.yRot) & 0x7FFFu) >= 0x200)
+		{
+			if (angle <= item->pos.yRot || angle - item->pos.yRot >= 0x8000)
+				item->pos.yRot -= 512;
+			else
+				item->pos.yRot += 512;
+		}
+		else
+		{
+			item->pos.yRot = angle;
+		}
+	}
+
+	item->pos.xRot -= (abs(item->itemFlags[0]) + abs(item->itemFlags[1])) >> 1;
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	TestTriggers(TriggerIndex, 1, 0);
+}

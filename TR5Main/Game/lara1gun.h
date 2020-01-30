@@ -36,7 +36,7 @@ void ControlGrenade(short itemNumber);
 void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void FireHarpoon();
 void ControlHarpoonBolt(short itemNumber);
-void DrawShotgun(int weaponType);
+void draw_shotgun(int weaponType);
 void AnimateShotgun(int weaponType);
 void ControlCrossbowBolt(short itemNumber);
 void FireCrossbow(PHD_3DPOS* pos);
