@@ -753,7 +753,7 @@ void ControlGrenade(short itemNumber)
 	}
 }
 
-void DrawShotgun(int weaponType)
+void draw_shotgun(int weaponType)
 {
 	ITEM_INFO* item;
 
