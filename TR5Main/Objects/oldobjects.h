@@ -19,8 +19,8 @@
 #define InitialiseLagoonWitch ((void (__cdecl*)(short)) 0x0047D2D0) // not used anymore !
 #define ControlLagoonWitch ((void (__cdecl*)(short)) 0x0047D360)    // not used anymore !
 //#define ControlInvisibleGhost ((void (__cdecl*)(short)) 0x00477AB0)
-#define InitialiseLittleBats ((void (__cdecl*)(short)) 0x00407EC0)
-#define ControlLittleBats ((void (__cdecl*)(short)) 0x00407F50)
+//#define InitialiseLittleBats ((void (__cdecl*)(short)) 0x00407EC0)
+//#define ControlLittleBats ((void (__cdecl*)(short)) 0x00407F50)
 #define InitialiseSpiders ((void (__cdecl*)(short)) 0x0043F2B0)
 #define ControlSpiders ((void (__cdecl*)(short)) 0x0047A200)
 //#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
@@ -29,6 +29,9 @@
 #define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
 
 //#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
+
+extern int NumBats;
+extern BAT_STRUCT* Bats;
 
 void InitialiseGuard(short itemNum);
 void InitialiseGuardM16(short itemNum);
@@ -119,9 +122,13 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void ControlDeathSlide(short itemNumber);
 void InitialiseDeathSlide(short itemNumber);
 void ControlSubmarine(short itemNumber);
-void TriggerTorpedoSparks(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor);
+void TriggerTorpedoBubbles(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor);
 void TriggerSubmarineSparks(short itemNumber);
 void SubmarineAttack(ITEM_INFO* item);
 void TriggerTorpedoSparks2(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char scale);
 void ChaffFlareControl(short itemNumber);
 void TorpedoControl(short itemNumber);
+void InitialiseLittleBats(short itemNumber);
+void ControlLittleBats(short itemNumber);
+short GetFreeBat();
+void TriggerLittleBat(ITEM_INFO* item);
