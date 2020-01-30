@@ -44,9 +44,9 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	CurrentCameraPosition.y = posY;
 	CurrentCameraPosition.z = posZ;
 
-	CurrentCameraRotation.vx = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
+	/*CurrentCameraRotation.vx = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
 	CurrentCameraRotation.vy = mGetAngle(posZ, posX, targetZ, targetX) >> 4;
-	CurrentCameraRotation.vz = 0;
+	CurrentCameraRotation.vz = 0;*/
 
 	phd_GenerateW2V(&pos);
 

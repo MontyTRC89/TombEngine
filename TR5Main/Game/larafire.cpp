@@ -52,7 +52,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	{
 		{ -ANGLE(60), ANGLE(60), -ANGLE(60), ANGLE(60) },
 		{ -ANGLE(10), ANGLE(10), -ANGLE(80), ANGLE(80) },
-		{  ANGLE(0),   ANGLE(0),   ANGLE(0),   ANGLE(0) },
+		{  ANGLE(0),   ANGLE(0),   ANGLE(0),  ANGLE(0) },
 		ANGLE(10),
 		ANGLE(4),
 		650,
@@ -450,7 +450,7 @@ void LaraGun() // (F) (D)
 #endif
 				if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
 					Camera.type = COMBAT_CAMERA;
-				DrawShotgun(Lara.gunType);
+				draw_shotgun(Lara.gunType);
 				break;
 
 			case WEAPON_FLARE:

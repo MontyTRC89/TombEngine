@@ -2,7 +2,7 @@
 #include "../Global/global.h"
 
 //#define ControlGuard ((void (__cdecl*)(short)) 0x0046F5E0)
-#define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
+//#define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
 //#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
 ///#define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
 //#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
@@ -19,8 +19,8 @@
 #define InitialiseLagoonWitch ((void (__cdecl*)(short)) 0x0047D2D0) // not used anymore !
 #define ControlLagoonWitch ((void (__cdecl*)(short)) 0x0047D360)    // not used anymore !
 //#define ControlInvisibleGhost ((void (__cdecl*)(short)) 0x00477AB0)
-#define InitialiseLittleBats ((void (__cdecl*)(short)) 0x00407EC0)
-#define ControlLittleBats ((void (__cdecl*)(short)) 0x00407F50)
+//#define InitialiseLittleBats ((void (__cdecl*)(short)) 0x00407EC0)
+//#define ControlLittleBats ((void (__cdecl*)(short)) 0x00407F50)
 #define InitialiseSpiders ((void (__cdecl*)(short)) 0x0043F2B0)
 #define ControlSpiders ((void (__cdecl*)(short)) 0x0047A200)
 //#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
@@ -28,7 +28,10 @@
 #define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
 #define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
 
-#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
+//#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
+
+extern int NumBats;
+extern BAT_STRUCT* Bats;
 
 void InitialiseGuard(short itemNum);
 void InitialiseGuardM16(short itemNum);
@@ -99,6 +102,33 @@ void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, int color);
 void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags);
 void TriggerRomanStatueAttackEffect1(short itemNum, int factor);
 void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count);
+void InitialiseRomanStatue(short itemNum);
 void ControlRomanStatue(short itemNumber);
 void InitialiseTeleporter(short itemNumber);
 void ControlTeleporter(short itemNumber);
+void InitialiseHighObject1(short itemNumber);
+void ControlHighObject1(short itemNumber);
+void VentilatorEffect(short* bounds, int intensity, short rot, int speed);
+void InitialiseVentilator(short itemNumber);
+void VentilatorControl(short itemNumber);
+void GenSlot1Control(short itemNumber);
+void InitialiseGenSlot3(short itemNumber);
+void DartControl(short itemNumber);
+void DartEmitterControl(short itemNumber);
+void FallingCeilingControl(short itemNumber);
+void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void RollingBallControl(short itemNumber);
+void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void ControlDeathSlide(short itemNumber);
+void InitialiseDeathSlide(short itemNumber);
+void ControlSubmarine(short itemNumber);
+void TriggerTorpedoBubbles(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor);
+void TriggerSubmarineSparks(short itemNumber);
+void SubmarineAttack(ITEM_INFO* item);
+void TriggerTorpedoSparks2(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char scale);
+void ChaffFlareControl(short itemNumber);
+void TorpedoControl(short itemNumber);
+void InitialiseLittleBats(short itemNumber);
+void ControlLittleBats(short itemNumber);
+short GetFreeBat();
+void TriggerLittleBat(ITEM_INFO* item);

@@ -10,6 +10,7 @@
 #include "traps.h"
 #include "..\Game\laramisc.h"
 #include "..\Objects\newobjects.h"
+#include "..\Objects\oldobjects.h"
 #include "..\Game\sound.h"
 
 FileStream* SaveGame::m_stream;
