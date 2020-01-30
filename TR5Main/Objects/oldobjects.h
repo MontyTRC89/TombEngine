@@ -2,7 +2,7 @@
 #include "../Global/global.h"
 
 //#define ControlGuard ((void (__cdecl*)(short)) 0x0046F5E0)
-#define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
+//#define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
 //#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
 ///#define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
 //#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
@@ -118,3 +118,10 @@ void RollingBallControl(short itemNumber);
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void ControlDeathSlide(short itemNumber);
 void InitialiseDeathSlide(short itemNumber);
+void ControlSubmarine(short itemNumber);
+void TriggerTorpedoSparks(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor);
+void TriggerSubmarineSparks(short itemNumber);
+void SubmarineAttack(ITEM_INFO* item);
+void TriggerTorpedoSparks2(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char scale);
+void ChaffFlareControl(short itemNumber);
+void TorpedoControl(short itemNumber);
