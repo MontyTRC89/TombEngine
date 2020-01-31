@@ -1487,55 +1487,6 @@ void undraw_shotgun_meshes(int weapon)
 	LARA_MESHES(ID_LARA, LM_RHAND);
 }
 
-void draw_shotgun(int weapon)
-{
-	ITEM_INFO* item;
-
-	if (Lara.weaponItem == NO_ITEM)
-	{
-		Lara.weaponItem = CreateItem();
-		item = &Items[Lara.weaponItem];
-		item->objectNumber = WeaponObject(weapon);
-		item->animNumber = Objects[item->objectNumber].animIndex;
-		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 1;
-		item->currentAnimState = 1;
-		item->status = ITEM_ACTIVE;
-		item->roomNumber = 255;
-		Lara.rightArm.frameBase = Objects[item->objectNumber].frameBase;
-		Lara.leftArm.frameBase = Lara.rightArm.frameBase;
-	}
-	else
-	{
-		item = &Items[Lara.weaponItem];
-	}
-
-	AnimateItem(item);
-	
-	if (item->currentAnimState && item->currentAnimState != 6)
-	{
-		if (item->frameNumber - Anims[item->animNumber].frameBase == Weapons[weapon].drawFrame)
-		{
-			draw_shotgun_meshes(weapon);
-		}
-		else if (Lara.waterStatus == LW_UNDERWATER)
-		{
-			item->goalAnimState = 6;
-		}
-	}
-	else
-	{
-		ready_shotgun(weapon);
-	}
-
-	Lara.rightArm.frameBase = Anims[item->animNumber].framePtr;
-	Lara.leftArm.frameBase = Anims[item->animNumber].framePtr;
-	Lara.rightArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
-	Lara.leftArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
-	Lara.rightArm.animNumber = item->animNumber;
-	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
-}
-
 void draw_shotgun_meshes(int weaponType)
 {
 	Lara.backGun = WEAPON_NONE;

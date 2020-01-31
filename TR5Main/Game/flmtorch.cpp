@@ -167,7 +167,7 @@ void DoFlameTorch()
 	}
 }
 
-void GetFlameTorch()
+void GetFlameTorch() // (F) (D)
 {
 	if (Lara.gunType == WEAPON_FLARE)
 		CreateFlare(ID_FLARE_ITEM, 0);
@@ -180,7 +180,7 @@ void GetFlameTorch()
 	Lara.leftArm.lock = 0;
 	Lara.leftArm.frameNumber = 0;
 	Lara.leftArm.frameBase = Anims[Lara.leftArm.animNumber].framePtr;
-	Lara.meshPtrs[LM_LHAND] = Meshes[Objects[ID_LARA].meshIndex + 26];
+	LARA_MESHES(ID_LARA_TORCH_ANIM, LM_LHAND);
 }
 
 void TorchControl(short itemNumber) // (F) (D)
