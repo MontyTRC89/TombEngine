@@ -97,6 +97,7 @@ void Renderer11::updateLaraAnimations()
 		break;
 
 		case WEAPON_FLARE:
+		case WEAPON_TORCH:
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
