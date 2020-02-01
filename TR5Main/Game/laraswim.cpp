@@ -20,9 +20,8 @@ extern LaraExtraInfo g_LaraExtra;
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
 
-void LaraWaterCurrent(COLL_INFO* coll)//4CD34, 4D198
+void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 {
-	// CHECK TOMB21 code
 	if (Lara.currentActive)
 	{
 		OBJECT_VECTOR* sink = &Cameras[Lara.currentActive - 1];

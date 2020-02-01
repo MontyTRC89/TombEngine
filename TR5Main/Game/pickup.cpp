@@ -16,6 +16,7 @@
 #include "laraflar.h"
 #include "lara1gun.h"
 #include "lara2gun.h"
+#include "flmtorch.h"
 
 #include "..\Global\global.h"
 
@@ -921,7 +922,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 						{
 							AddDisplayPickup(ID_BURNING_TORCH_ITEM);
-							//sub_402FC7();
+							GetFlameTorch();
 							Lara.litTorch = (item->itemFlags[3] & 1);
 							
 							KillItem(itemNum);

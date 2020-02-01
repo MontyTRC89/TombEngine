@@ -353,7 +353,7 @@ void Renderer11::drawBlood()
 
 		if (blood->on)
 		{
-			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 15],
+			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 				Vector3(blood->x, blood->y, blood->z),
 				Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
 				TR_ANGLE_TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
@@ -477,11 +477,13 @@ bool Renderer11::drawGunFlashes()
 void Renderer11::drawFootprints()
 {
 	const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
-	if (g_NumSprites > spriteIndex) {
-		for (auto i = footprints.begin(); i != footprints.end(); i++) {
+	if (g_NumSprites > spriteIndex && m_sprites[spriteIndex] != nullptr)
+	{
+		for (auto i = footprints.begin(); i != footprints.end(); i++)
+		{
 			FOOTPRINT_STRUCT& footprint = *i;
-			if (footprint.active) {
-				float y = footprint.pos.yPos;
+			if (footprint.active)
+			{
 				Matrix rot = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(footprint.pos.yRot) + PI);
 				Vector3 p1 = Vector3(-64, 0, -64);
 				Vector3 p2 = Vector3(64, 0, -64);
@@ -495,9 +497,7 @@ void Renderer11::drawFootprints()
 				p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 				p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 				p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-				if (m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 1] != nullptr)
-					AddSprite3D(m_sprites[Objects[ID_MISC_SPRITES].meshIndex + 1], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f),
-						0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
+				AddSprite3D(m_sprites[spriteIndex], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f), 0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
 			}
 		}
 	}
