@@ -52,7 +52,7 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	{
 		{ -ANGLE(60), ANGLE(60), -ANGLE(60), ANGLE(60) },
 		{ -ANGLE(10), ANGLE(10), -ANGLE(80), ANGLE(80) },
-		{  ANGLE(0),   ANGLE(0),   ANGLE(0),   ANGLE(0) },
+		{  ANGLE(0),   ANGLE(0),   ANGLE(0),  ANGLE(0) },
 		ANGLE(10),
 		ANGLE(4),
 		650,
@@ -238,7 +238,7 @@ extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 bool MonksAttackLara;
 
-int WeaponObject(int weaponType)
+int WeaponObject(int weaponType) // (F) (D)
 {
 	switch (weaponType)
 	{
@@ -252,6 +252,7 @@ int WeaponObject(int weaponType)
 		return ID_CROSSBOW_ANIM;
 	case WEAPON_HK:
 		return ID_HK_ANIM;
+#if 0
 	case WEAPON_FLARE:
 		return ID_LARA_FLARE_ANIM;
 	case WEAPON_GRENADE_LAUNCHER:
@@ -260,14 +261,15 @@ int WeaponObject(int weaponType)
 		return ID_ROCKET_ANIM;
 	case WEAPON_HARPOON_GUN:
 		return ID_HARPOON_ANIM;
+#endif
 	default:
 		return ID_PISTOLS_ANIM;
 	}
 }
 
-void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
+void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 {
-	short rotY, rotX, speed = 0, x = 0, y = 0;
+	short rotY, rotX, speed, x, y;
 
 	speed = winfo->aimSpeed;
 
@@ -306,24 +308,16 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm)
 	arm->zRot = 0;
 }
 
-void SmashItem(short itemNum)
+void SmashItem(short itemNum) // (F) (D)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
 	{
 		SmashObject(itemNum);
 	}
-	/*else if (item->objectNumber == ID_BELL_SWITCH)
-	{
-		if (item->status != ITEM_ACTIVE)
-		{
-			item->status = ITEM_ACTIVE;
-			AddActiveItem(itemNum);
-		}
-	}*/
 }
 
-void LaraGun()
+void LaraGun() // (F) (D)
 {
 	if (Lara.leftArm.flash_gun > 0)
 		--Lara.leftArm.flash_gun;
@@ -373,18 +367,24 @@ void LaraGun()
 				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT)
 				&& (Lara.requestGunType == WEAPON_HK
 				|| Lara.requestGunType == WEAPON_CROSSBOW
+#if 1
+				|| Lara.requestGunType == WEAPON_SHOTGUN))
+#else
 				|| Lara.requestGunType == WEAPON_SHOTGUN
 				|| Lara.requestGunType == WEAPON_HARPOON_GUN))
+#endif
 			{
 				if (Lara.gunType == WEAPON_FLARE)
 					Lara.requestGunType = WEAPON_FLARE;
 			}
 			else if (Lara.requestGunType == WEAPON_FLARE
+#if 0
 				|| g_LaraExtra.Vehicle == NO_ITEM
 				&& (Lara.requestGunType == WEAPON_HARPOON_GUN
+#endif
 				|| Lara.waterStatus == LW_ABOVE_WATER
 				|| Lara.waterStatus == LW_WADE
-				&& Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight))
+				&& Lara.waterSurfaceDist > -Weapons[Lara.gunType].gunHeight)
 			{
 				if (Lara.gunType == WEAPON_FLARE)
 				{
@@ -412,7 +412,11 @@ void LaraGun()
 	}
 	else if (Lara.gunStatus == LG_READY)
 	{
+#if 0
 		if ((TrInput & IN_DRAW) || Lara.requestGunType != Lara.gunType || Lara.gunType != WEAPON_HARPOON_GUN && Lara.waterStatus != LW_ABOVE_WATER && Lara.waterStatus != LW_WADE || Lara.waterSurfaceDist < -Weapons[Lara.gunType].gunHeight)
+#else
+		if ((TrInput & IN_DRAW) || Lara.requestGunType != Lara.gunType || Lara.waterStatus != LW_ABOVE_WATER && Lara.waterStatus != LW_WADE || Lara.waterSurfaceDist < -Weapons[Lara.gunType].gunHeight)
+#endif
 			Lara.gunStatus = LG_UNDRAW_GUNS;
 	}
 	else if (Lara.gunStatus == LG_HANDS_BUSY && (TrInput & IN_FLARE) && LaraItem->currentAnimState == STATE_LARA_CRAWL_IDLE && LaraItem->animNumber == ANIMATION_LARA_CRAWL_IDLE)
@@ -423,7 +427,7 @@ void LaraGun()
 	switch (Lara.gunStatus)
 	{
 		case LG_DRAW_GUNS:
-			if (Lara.gunType != WEAPON_FLARE && Lara.gunType)
+			if (Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_NONE)
 				Lara.lastGunType = Lara.gunType;
 
 		switch (Lara.gunType)
@@ -439,12 +443,14 @@ void LaraGun()
 			case WEAPON_SHOTGUN:
 			case WEAPON_CROSSBOW:
 			case WEAPON_HK:
+#if 0
 			case WEAPON_GRENADE_LAUNCHER:
 			case WEAPON_ROCKET_LAUNCHER:
 			case WEAPON_HARPOON_GUN:
+#endif
 				if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
 					Camera.type = COMBAT_CAMERA;
-				DrawShotgun(Lara.gunType);
+				draw_shotgun(Lara.gunType);
 				break;
 
 			case WEAPON_FLARE:
@@ -475,9 +481,11 @@ void LaraGun()
 				case WEAPON_SHOTGUN:
 				case WEAPON_CROSSBOW:
 				case WEAPON_HK:
+#if 0
 				case WEAPON_GRENADE_LAUNCHER:
 				case WEAPON_ROCKET_LAUNCHER:
 				case WEAPON_HARPOON_GUN:
+#endif
 					undraw_shotgun(Lara.gunType);
 					break;
 
@@ -503,8 +511,7 @@ void LaraGun()
 			{
 				if (!*GetAmmo(Lara.gunType))
 				{
-					Lara.requestGunType = (Objects[ID_PISTOLS_ITEM].loaded == true) ? WEAPON_PISTOLS : WEAPON_NONE;
-					//SoundEffect(SFX_EMPTY_WEAPON, &LaraItem->pos, 0);
+					Lara.requestGunType = Objects[ID_PISTOLS_ITEM].loaded ? WEAPON_PISTOLS : WEAPON_NONE;
 					return;
 				}
 			}
@@ -519,9 +526,11 @@ void LaraGun()
 				case WEAPON_SHOTGUN:
 				case WEAPON_CROSSBOW:
 				case WEAPON_HK:
+#if 0
 				case WEAPON_GRENADE_LAUNCHER:
 				case WEAPON_ROCKET_LAUNCHER:
 				case WEAPON_HARPOON_GUN:
+#endif
 				case WEAPON_REVOLVER:
 					RifleHandler(Lara.gunType);
 					break;
@@ -534,7 +543,11 @@ void LaraGun()
 		case LG_NO_ARMS:
 			if (Lara.gunType == WEAPON_FLARE)
 			{
+#if 1
+				if (CheckForHoldingState(LaraItem->currentAnimState))
+#else
 				if (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
+#endif
 				{
 					if (Lara.flareControlLeft)
 					{
@@ -565,7 +578,11 @@ void LaraGun()
 			{
 				if (CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND))
 				{
+#if 0
 					Lara.flareControlLeft = (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
+#else
+					Lara.flareControlLeft = CheckForHoldingState(LaraItem->currentAnimState);
+#endif
 					DoFlareInHand(Lara.flareAge);
 					set_flare_arm(Lara.leftArm.frameNumber);
 				}
@@ -709,7 +726,7 @@ int DetectCrouchWhenFiring(ITEM_INFO* src, WEAPON_INFO* weapon)
 		return int(weapon->gunHeight);
 }
 
-int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
+int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
 {
 	short* ammo = GetAmmo(weaponType);
 	if (!*ammo)
@@ -726,8 +743,11 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.zPos = 0;
 	GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
 
-	pos.xRot = angles[1] + (short) ((GetRandomControl() - 16384) * weapon->shotAccuracy / 65536);
-	pos.yRot = angles[0] + (short) ((GetRandomControl() - 16384) * weapon->shotAccuracy / 65536);
+	pos.xPos = src->pos.xPos;
+	pos.zPos = src->pos.zPos;
+
+	pos.xRot = angles[1] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
+	pos.yRot = angles[0] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
 	pos.zRot = 0;
 
 	phd_GenerateW2V(&pos);
@@ -760,15 +780,15 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	vSrc.z = pos.zPos;
 	
 	short roomNumber = src->roomNumber;
-	FLOOR_INFO* floor = GetFloor(pos.xPos, pos.yPos, pos.zPos, &roomNumber);
+	GetFloor(pos.xPos, pos.yPos, pos.zPos, &roomNumber);
 	vSrc.roomNumber = roomNumber;
 
 	if (best < 0)
 	{
 		GAME_VECTOR vDest;
-		vDest.x = vSrc.x + ((MatrixPtr[M20] * weapon->targetDist) >> W2V_SHIFT);
-		vDest.y = vSrc.y + ((MatrixPtr[M21] * weapon->targetDist) >> W2V_SHIFT);
-		vDest.z = vSrc.z + ((MatrixPtr[M22] * weapon->targetDist) >> W2V_SHIFT);
+		vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
+		vDest.y = vSrc.y + (MatrixPtr[M21] * 5 >> 2);
+		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);
 
 		GetTargetOnLOS(&vSrc, &vDest, 0, 1);
 		
@@ -827,17 +847,15 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 		
 		return 1;
 	}
-
-	return 0;
 }
 
-void find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
+void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 {
-	short* bounds = GetBestFrame(item);
+	ANIM_FRAME* bounds = (ANIM_FRAME*) GetBestFrame(item);
 
-	int x = (int)((bounds[0] + bounds[1]) / 2);
-	int y = (int)(bounds[2] + (bounds[3] - bounds[2]) / 3);
-	int z = (int)((bounds[4] + bounds[5]) / 2);
+	int x = (bounds->MinX + bounds->MaxX) / 2;
+	int y = bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
+	int z = (bounds->MinZ + bounds->MaxZ) / 2;
 
 	int c = COS(item->pos.yRot);
 	int s = SIN(item->pos.yRot);
@@ -849,25 +867,25 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target)
 	target->roomNumber = item->roomNumber;
 }
 
-void LaraTargetInfo(WEAPON_INFO* weapon)
+void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 {
 	if (!Lara.target)
 	{
-		Lara.rightArm.lock = false;
-		Lara.leftArm.lock = false;
+		Lara.rightArm.lock = 0;
+		Lara.leftArm.lock = 0;
 		Lara.targetAngles[1] = 0;
 		Lara.targetAngles[0] = 0;
 		return;
 	}
 
 	GAME_VECTOR pos;
-	//pos.x = 0;
-	//pos.y = 0;
-	//pos.z = 0;
-	//GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
+
+	pos.x = 0;
+	pos.y = 0;
+	pos.z = 0;
+	GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
 
 	pos.x = LaraItem->pos.xPos;
-	pos.y = LaraItem->pos.yPos - DetectCrouchWhenFiring(LaraItem, weapon);
 	pos.z = LaraItem->pos.zPos;
 	pos.roomNumber = LaraItem->roomNumber;
 	
@@ -887,8 +905,8 @@ void LaraTargetInfo(WEAPON_INFO* weapon)
 		&&  angles[1] >= weapon->lockAngles[2]
 		&&  angles[1] <= weapon->lockAngles[3])
 		{
-			Lara.rightArm.lock = true;
-			Lara.leftArm.lock = true;
+			Lara.rightArm.lock = 1;
+			Lara.leftArm.lock = 1;
 		}
 		else
 		{
@@ -898,7 +916,7 @@ void LaraTargetInfo(WEAPON_INFO* weapon)
 					 angles[0] > weapon->leftAngles[1] ||
 					 angles[1] < weapon->leftAngles[2] ||
 					 angles[1] > weapon->leftAngles[3]))
-					Lara.leftArm.lock = false;
+					Lara.leftArm.lock = 0;
 			}
 
 			if (Lara.rightArm.lock)
@@ -907,26 +925,28 @@ void LaraTargetInfo(WEAPON_INFO* weapon)
 					 angles[0] > weapon->rightAngles[1] ||
 					 angles[1] < weapon->rightAngles[2] ||
 					 angles[1] > weapon->rightAngles[3]))
-					Lara.rightArm.lock = false;
+					Lara.rightArm.lock = 0;
 			}
 		}
 	}
 	else
 	{
-		Lara.rightArm.lock = false;
-		Lara.leftArm.lock = false;
+		Lara.rightArm.lock = 0;
+		Lara.leftArm.lock = 0;
 	}
 
 	Lara.targetAngles[0] = angles[0];
 	Lara.targetAngles[1] = angles[1];
 }
 
-int CheckForHoldingState(int state)
+int CheckForHoldingState(int state) // (F) (D)
 {
 	short* holdState = HoldStates;
 
-	/*if (g_LaraExtra.ExtraAnim)
-		return 0;*/
+#if 0
+	if (g_LaraExtra.ExtraAnim)
+		return 0;
+#endif
 
 	while (*holdState >= 0)
 	{
