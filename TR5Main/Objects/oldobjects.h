@@ -12,7 +12,7 @@
 //#define InitialiseChef ((void (__cdecl*)(short)) 0x00410990) // not used anymore !
 //#define ControlChef ((void (__cdecl*)(short)) 0x00410A60)    // not used anymore !
 #define ControlGuardLaser ((void (__cdecl*)(short)) 0x0048CDD0)
-#define ControlHydra ((void (__cdecl*)(short)) 0x0043BF70)
+//#define ControlHydra ((void (__cdecl*)(short)) 0x0043BF70)
 //#define ControlImp ((void (__cdecl*)(short)) 0x0043BEA0)
 #define ControlLightingGuide ((void (__cdecl*)(short)) 0x0048E580)
 //#define ControlBrowsBeast ((void (__cdecl*)(short)) 0x0048E960)
@@ -135,3 +135,6 @@ void TriggerLittleBat(ITEM_INFO* item);
 void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv);
 void ControlCyborg(short itemNumber);
 void ControlGunShip(short itemNumber);
+void ControlHydra(short itemNumber);
+void TriggerHydraSparks(short itemNumber, int frame);
+void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count);
