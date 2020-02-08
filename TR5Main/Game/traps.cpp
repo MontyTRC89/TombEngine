@@ -7,12 +7,32 @@
 #include "lara.h"
 #include "collide.h"
 #include "switch.h"
+#include "sphere.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
 static short FloorTrapDoorBounds[12] = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR FloorTrapDoorPos = {0, 0, -655};
 static short WreckingBallData[2] = {0, 0};
+byte Flame3xzoffs[16][2] =
+{
+	{ 0x09, 0x09 },
+	{ 0x18, 0x09 },
+	{ 0x28, 0x09 },
+	{ 0x37, 0x09 },
+	{ 0x09, 0x18 },
+	{ 0x18, 0x18 },
+	{ 0x28, 0x18 },
+	{ 0x37, 0x18 },
+	{ 0x09, 0x28 },
+	{ 0x18, 0x28 },
+	{ 0x28, 0x28 },
+	{ 0x37, 0x28 },
+	{ 0x09, 0x37 },
+	{ 0x18, 0x37 },
+	{ 0x28, 0x37 },
+	{ 0x37, 0x37 }
+};
 
 void LaraBurn()
 {
@@ -871,6 +891,149 @@ void InitialiseFlameEmitter(short itemNumber)
 			else
 			{
 				item->pos.zPos += 512;
+			}
+		}
+	}
+}
+
+void FlameEmitter3Control(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (TriggerActive(item))
+	{
+		if (item->triggerFlags)
+		{
+			// Electricity bolts
+
+			SoundEffect(SFX_2GUNTEX_HIT_GUNS, &item->pos, 0);
+
+			byte color1 = (GetRandomControl() & 0x3F) + 192;
+			byte color2 = (GetRandomControl() & 0x3F) + 192;
+
+			PHD_VECTOR src;
+			PHD_VECTOR dest;
+
+			src.x = item->pos.xPos;
+			src.y = item->pos.yPos;
+			src.z = item->pos.zPos;
+
+			// Secondary energy arc
+			if (!(GlobalCounter & 3))
+			{
+				if (item->triggerFlags == 2 || item->triggerFlags == 4)
+				{
+					dest.x = item->pos.xPos + 2048 * SIN(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					dest.y = item->pos.yPos;
+					dest.z = item->pos.zPos + 2048 * COS(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					
+					if (GetRandomControl() & 3)
+					{
+						//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 64, color2 | ((color1 | 0x180000) << 8), 0, 32, 3);
+					}
+					else
+					{
+						//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 96, color2 | ((color1 | 0x200000) << 8), 1, 32, 3);
+					}
+				}
+			}
+
+			// Connected to item
+			if (item->triggerFlags >= 3 && !(GlobalCounter & 1))
+			{
+				short targetItemNumber = item->itemFlags[((GlobalCounter >> 2) & 1) + 2];
+				ITEM_INFO* targetItem = &Items[targetItemNumber];
+
+				dest.x = 0;
+				dest.y = -64;
+				dest.z = 20;
+				GetJointAbsPosition(targetItem, &dest, 0);
+
+				if (!(GlobalCounter & 3))
+				{
+					if (GetRandomControl() & 3)
+					{
+						//TriggerEnergyArc(&dest.x_rot, &dest, (GetRandomControl() & 0x1F) + 64, color2 | ((color1 | 0x180000) << 8), 0, 32, 5);
+					}
+					else
+					{
+						//TriggerEnergyArc(&dest.x_rot, &dest, (GetRandomControl() & 0x1F) + 96, color2 | ((color1 | 0x200000) << 8), 1, 32, 5);
+					}
+				}
+				if (item->triggerFlags != 3 || targetItem->triggerFlags)
+					TriggerLightningGlow(dest.x, dest.y, dest.z, color2 | ((color1 | 0x400000) << 8));
+			}
+
+			if ((GlobalCounter & 3) == 2)
+			{
+				src.x = item->pos.xPos;
+				src.y = item->pos.yPos;
+				src.z = item->pos.zPos;
+				
+				dest.x = (GetRandomControl() & 0x1FF) + src.x - 256;
+				dest.y = (GetRandomControl() & 0x1FF) + src.y - 256;
+				dest.z = (GetRandomControl() & 0x1FF) + src.z - 256;
+
+				//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0xF) + 16, color2 | ((color1 | 0x180000) << 8), 3, 32, 3);
+				TriggerLightningGlow(dest.x, dest.y, dest.z, color2 | ((color1 | 0x400000) << 8));
+			}
+		}
+		else
+		{
+			// Small fires
+
+			if (item->itemFlags[0])
+			{
+				item->itemFlags[0]--;
+			}
+			else
+			{
+				item->itemFlags[0] = (GetRandomControl() & 3) + 8;
+				int flags = GetRandomControl() & 0x3F;
+				if (item->itemFlags[1] == flags)
+					flags = (flags + 13) & 0x3F;
+				item->itemFlags[1] = flags;
+			}
+
+			int x, z, i;
+
+			if (!(Wibble & 4))
+			{
+				i = 2 * (item->itemFlags[1] & 7);
+				x = 16 * (Flame3xzoffs[i][0] - 32);
+				z = 16 * (Flame3xzoffs[i][1] - 32);
+				TriggerFireFlame(x + item->pos.xPos, item->pos.yPos, z + item->pos.zPos, -1, 2);
+			}
+			else
+			{
+				i = 2 * (item->itemFlags[1] >> 3);
+				x = 16 * (Flame3xzoffs[i + 8][0] - 32);
+				z = 16 * (Flame3xzoffs[i + 8][1] - 32);
+				TriggerFireFlame(x + item->pos.xPos, item->pos.yPos, z + item->pos.zPos, -1, 2);
+			}
+
+			SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+
+			TriggerDynamicLight(x, item->pos.yPos, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
+			
+			PHD_3DPOS pos;
+			pos.xPos = item->pos.xPos;
+			pos.yPos = item->pos.yPos;
+			pos.zPos = item->pos.zPos;
+
+			if (ItemNearLara(&pos, 600))
+			{
+				if (!Lara.burn)
+				{
+					LaraItem->hitPoints -= 5;
+					LaraItem->hitStatus = true;
+
+					int dx = LaraItem->pos.xPos - item->pos.xPos;
+					int dz = LaraItem->pos.zPos - item->pos.zPos;
+			
+					if (SQUARE(dx) + SQUARE(dz) < 202500)
+						LaraBurn();
+				}
 			}
 		}
 	}

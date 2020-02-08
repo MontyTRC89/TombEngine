@@ -9,6 +9,10 @@
 #include "../../Game/lara.h"
 #include "../../Game/traps.h"
 
+#define STATE_CYBORG_STOP					1
+
+#define ANIMATION_CYBORG_STAY_IDLE			4
+
 BITE_INFO CyborgGun = { 0x00, 0x12C, 0x40, 0x07 };
 byte CyborgJoints[12] = { 0x0F, 0x0E, 0x0D, 6, 5, 0x0C, 7, 4, 0x0A, 0x0B, 0x13 };
 
@@ -18,10 +22,10 @@ void InitialiseCyborg(short itemNum)
 
     item = &Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex + 4;
+    item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_CYBORG_STAY_IDLE;
     item->frameNumber = Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+    item->goalAnimState = STATE_CYBORG_STOP;
+    item->currentAnimState = STATE_CYBORG_STOP;
 }
 
 void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv)
