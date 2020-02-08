@@ -26,7 +26,7 @@
 //#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
 //#define ControlRomanStatue ((void (__cdecl*)(short)) 0x0046BC10)
 #define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
-#define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
+//#define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
 
 //#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
 
@@ -134,3 +134,4 @@ short GetFreeBat();
 void TriggerLittleBat(ITEM_INFO* item);
 void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv);
 void ControlCyborg(short itemNumber);
+void ControlGunShip(short itemNumber);
