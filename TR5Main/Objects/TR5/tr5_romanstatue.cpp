@@ -293,7 +293,7 @@ void ControlRomanStatue(short itemNumber)
 			{
 				arc = RomanStatueData.energyArcs[i];
 
-				if (arc && arc->on)
+				if (arc && arc->life)
 				{
 					arc->pos4.x = pos2.x;
 					arc->pos4.y = pos2.y;
@@ -611,7 +611,7 @@ void ControlRomanStatue(short itemNumber)
 					{
 						if (deltaFrame < 16)
 						{
-							arc->on = 56;
+							arc->life = 56;
 							arc->r = 0;
 							arc->g = g;
 							arc->b = b;

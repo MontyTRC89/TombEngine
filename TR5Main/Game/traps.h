@@ -32,7 +32,7 @@
 //#define FlameEmitterControl ((void (__cdecl*)(short)) 0x00489F70)
 //#define InitialiseFlameEmitter2 ((void (__cdecl*)(short)) 0x0043D4E0)
 //#define FlameEmitter2Control ((void (__cdecl*)(short)) 0x0048A3B0)
-#define FlameEmitter3Control ((void (__cdecl*)(short)) 0x0048A570)
+//#define FlameEmitter3Control ((void (__cdecl*)(short)) 0x0048A570)
 //#define FlameControl ((void (__cdecl*)(short)) 0x0048AB80)
 #define InitialiseRopeTrap ((void (__cdecl*)()) 0x0046EE40)
 //#define GenSlot1Control ((void (__cdecl*)(short)) 0x00406580)
@@ -80,3 +80,4 @@ void _WreckingBallControl(short itemNumber);
 void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void InitialiseFlameEmitter2(short itemNumber);
 void InitialiseFlameEmitter(short itemNumber);
+void FlameEmitter3Control(short itemNumber);

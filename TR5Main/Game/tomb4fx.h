@@ -11,13 +11,13 @@ struct ENERGY_ARC
 	byte r;				// 48
 	byte g;				// 49
 	byte b;				// 50
-	byte on;			// 51
+	byte life;			// 51
 	byte byte34;		// 52
 	byte gap35[8];		// 53
 	byte byte3D;		// 61
 	byte flags;			// 62
 	byte byte3F;		// 63
-	byte byte40;		// 64
+	int byte40;		// 64
 };
 
 extern int LaserSightX;
