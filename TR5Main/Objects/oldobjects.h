@@ -25,7 +25,7 @@
 #define ControlSpiders ((void (__cdecl*)(short)) 0x0047A200)
 //#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
 //#define ControlRomanStatue ((void (__cdecl*)(short)) 0x0046BC10)
-#define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
+//#define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
 //#define ControlGunShip ((void (__cdecl*)(short)) 0x00487FF0)
 
 //#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
@@ -138,3 +138,5 @@ void ControlGunShip(short itemNumber);
 void ControlHydra(short itemNumber);
 void TriggerHydraSparks(short itemNumber, int frame);
 void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count);
+void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade);
+void ControlAutoGuns(short itemNumber);

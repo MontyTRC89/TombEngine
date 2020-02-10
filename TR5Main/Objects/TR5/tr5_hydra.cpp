@@ -208,6 +208,7 @@ void ControlHydra(short itemNumber)
 						CreatureEffect2(item, &HydraBite, 10, item->pos.yRot, DoBloodSplat);
 						creature->flags = 1;
 					}
+
 					if (item->hitStatus && info.distance < SQUARE(1792))
 					{
 						distance = SQRT_ASM(info.distance);
@@ -281,7 +282,7 @@ void ControlHydra(short itemNumber)
 					pos.yPos = pos1.y;
 					pos.zPos = pos1.z;
 					pos.xRot = angles[1];
-					pos.yRot = angles[2];
+					pos.yRot = angles[0];
 					pos.zRot = 0;
 					
 					roomNumber = item->roomNumber;
@@ -352,10 +353,12 @@ void ControlHydra(short itemNumber)
 		}
 
 		CreatureTilt(item, tilt);
+
 		CreatureJoint(item, 0, joint0);
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
 		CreatureJoint(item, 3, joint3);
+
 		CreatureAnimation(itemNumber, 0, 0);
 	}
 }
