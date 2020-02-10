@@ -3668,6 +3668,44 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
+int is_object_in_room(short roomNumber, short objectNumber)
+{
+	short itemNumber = Rooms[roomNumber].itemNumber;
+	
+	if (itemNumber == NO_ITEM)
+		return 0;
+
+	while (true)
+	{
+		ITEM_INFO* item = &Items[itemNumber];
+
+		if (item->objectNumber == objectNumber)
+			break;
+
+		itemNumber = item->nextItem;
+
+		if (itemNumber == NO_ITEM)
+			return 0;
+	}
+
+	return 1;
+}
+
+void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
+{
+	short deltaAngle = angle - *rotation;
+
+	if (deltaAngle < -32768)
+		deltaAngle += 65536;
+	else if (deltaAngle > 32768)
+		deltaAngle -= 65536;
+
+	if (outAngle)
+		* outAngle = deltaAngle;
+
+	*rotation += deltaAngle >> shift;
+}
+
 void Inject_Control()
 {
 	INJECT(0x00416760, TestTriggers);
