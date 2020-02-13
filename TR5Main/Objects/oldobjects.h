@@ -140,3 +140,5 @@ void TriggerHydraSparks(short itemNumber, int frame);
 void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count);
 void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade);
 void ControlAutoGuns(short itemNumber);
+void TriggerLaserHeadSparks1(PHD_VECTOR* pos, int count, CVECTOR* color, int unk);
+void LaserHeadCharge(ITEM_INFO* item);
