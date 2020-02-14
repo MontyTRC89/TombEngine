@@ -71,7 +71,6 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int num);
-int GetFreeSpider();
 void SetFadeClip(short height, short speed);
 void TriggerLightningGlow(int x, int y, int z, int rgb);
 

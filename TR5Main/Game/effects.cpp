@@ -9,6 +9,8 @@
 #include "draw.h"
 #include "sphere.h"
 #include "footprint.h"
+#include "..\Objects\oldobjects.h"
+
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
@@ -242,21 +244,6 @@ void invisibility_off(ITEM_INFO* item)
 void invisibility_on(ITEM_INFO* item)
 {
 	item->status = ITEM_INVISIBLE;
-}
-
-void ClearSpiders()// (F)
-{
-	/*if (Objects[ID_SPIDER].loaded)
-	{
-		memset((char*)&Spiders, 0, 64 * sizeof(SPIDER_STRUCT));
-		NextSpider = 0;
-		FlipEffect = -1;
-	}*/
-}
-
-void ClearSpidersPatch(ITEM_INFO* item)//39AA4(<), 39FA4(<) (F)
-{
-	ClearSpiders();
 }
 
 /*void SetFog()
