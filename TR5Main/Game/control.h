@@ -2,7 +2,7 @@
 
 #include "..\Global\global.h"
 
-#define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
+//#define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 #define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
 #define DoRayBox_sub_401523 ((int (__cdecl*)(PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*)) 0x00401523)
@@ -40,9 +40,7 @@ int CheckNoColCeilingTriangle(FLOOR_INFO* floor, int x, int z);
 int CheckNoColFloorTriangle(FLOOR_INFO* floor, int x, int z);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
-void UpdateRats();
 void UpdateDebris();
-void UpdateBats();
 int LOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* end);
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* end);

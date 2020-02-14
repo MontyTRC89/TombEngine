@@ -21,8 +21,8 @@
 //#define ControlInvisibleGhost ((void (__cdecl*)(short)) 0x00477AB0)
 //#define InitialiseLittleBats ((void (__cdecl*)(short)) 0x00407EC0)
 //#define ControlLittleBats ((void (__cdecl*)(short)) 0x00407F50)
-#define InitialiseSpiders ((void (__cdecl*)(short)) 0x0043F2B0)
-#define ControlSpiders ((void (__cdecl*)(short)) 0x0047A200)
+//#define InitialiseSpiders ((void (__cdecl*)(short)) 0x0043F2B0)
+//#define ControlSpiders ((void (__cdecl*)(short)) 0x0047A200)
 //#define ControlGladiator ((void (__cdecl*)(short)) 0x00436700)
 //#define ControlRomanStatue ((void (__cdecl*)(short)) 0x0046BC10)
 //#define ControlAutoGuns ((void (__cdecl*)(short)) 0x004078A0)
@@ -30,8 +30,14 @@
 
 //#define InitialiseRomanStatue ((void (__cdecl*)(short)) 0x0046BB00) // need to check a dword_ variable before decompiling
 
-extern int NumBats;
+extern int NextBat;
 extern BAT_STRUCT* Bats;
+
+extern int NextSpider;
+extern SPIDER_STRUCT* Spiders;
+
+extern int NextRat;
+extern RAT_STRUCT* Rats;
 
 void InitialiseGuard(short itemNum);
 void InitialiseGuardM16(short itemNum);
@@ -130,7 +136,7 @@ void ChaffFlareControl(short itemNumber);
 void TorpedoControl(short itemNumber);
 void InitialiseLittleBats(short itemNumber);
 void ControlLittleBats(short itemNumber);
-short GetFreeBat();
+short GetNextBat();
 void TriggerLittleBat(ITEM_INFO* item);
 void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv);
 void ControlCyborg(short itemNumber);
@@ -142,3 +148,13 @@ void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade);
 void ControlAutoGuns(short itemNumber);
 void TriggerLaserHeadSparks1(PHD_VECTOR* pos, int count, CVECTOR* color, int unk);
 void LaserHeadCharge(ITEM_INFO* item);
+short GetNextSpider();
+void ControlSpiders(short itemNumber);
+void InitialiseSpiders(short itemNumber);
+void ClearSpidersPatch(ITEM_INFO* item);
+void ClearSpiders();
+void InitialiseLittleRats(short itemNumber);
+void ClearRats();
+void UpdateSpiders();
+void UpdateRats();
+void UpdateBats();

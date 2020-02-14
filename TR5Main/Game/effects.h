@@ -31,8 +31,6 @@ void lara_hands_free(ITEM_INFO* item);
 void shoot_right_gun(ITEM_INFO* item);
 void shoot_left_gun(ITEM_INFO* item);
 void SetFog(ITEM_INFO* item);
-void ClearSpidersPatch(ITEM_INFO* item);
-void ClearSpiders();
 void invisibility_on(ITEM_INFO* item);
 void invisibility_off(ITEM_INFO* item);
 void reset_hair(ITEM_INFO* item);
