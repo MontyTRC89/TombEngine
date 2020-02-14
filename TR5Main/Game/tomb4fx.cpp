@@ -31,7 +31,6 @@ int NextSmokeSpark = 0;
 int NextBubble = 0;
 int NextDrip = 0;
 int NextBlood = 0;
-int NextSpider = 0;
 int NextGunShell = 0;
 
 GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; 
@@ -1813,40 +1812,12 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)//(F)
 		spark->friction = 4;
 	}
 
-	//loc_365C4
 	spark->flags = 0;
 	spark->gravity = (GetRandomControl() & 0xF) + ((crane << 4) + 16);
 	spark->maxYvel = 0;
 }
 
-int GetFreeSpider()// (F)
-{
-	SPIDER_STRUCT* peter = &Spiders[NextSpider];
-	int peter_num = NextSpider;
-	int count = 0;
-
-	while (peter->on)
-	{
-		if (peter_num == 63)
-		{
-			peter = &Spiders[0];
-			peter_num = 0;
-		}
-		else
-		{
-			peter++;
-			peter_num++;
-		}
-
-		if (++count >= 64)
-			return -1;
-	}
-
-	NextSpider = (peter_num + 1) & 63;
-	return peter_num;
-}
-
-void TriggerSmallSplash(int x, int y, int z, int num)// (F)
+void TriggerSmallSplash(int x, int y, int z, int num) 
 {
 	int i;
 	int angle;
