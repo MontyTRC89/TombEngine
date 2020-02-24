@@ -96,17 +96,17 @@ void SaveGame::saveItems()
 	}
 
 	// Save special items
-	if (Objects[ID_BATS].loaded)
+	if (Objects[ID_BATS_EMITTER].loaded)
 		for (int i = 0; i < NUM_BATS; i++)
 			if (Bats[i].on)
 				m_writer->WriteChunk(m_chunkBats, &saveBats, i, 0);
 
-	if (Objects[ID_RATS].loaded)
+	if (Objects[ID_RATS_EMITTER].loaded)
 		for (int i = 0; i < NUM_RATS; i++)
 			if (Rats[i].on)
 				m_writer->WriteChunk(m_chunkRats, &saveRats, i, 0);
 
-	if (Objects[ID_SPIDER].loaded)
+	if (Objects[ID_SPIDERS_EMITTER].loaded)
 		for (int i = 0; i < NUM_SPIDERS; i++)
 			if (Spiders[i].on)
 				m_writer->WriteChunk(m_chunkSpiders, &saveSpiders, i, 0);

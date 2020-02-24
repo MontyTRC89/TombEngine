@@ -1,8 +1,10 @@
 #pragma once
 
-//#define InitialiseHair ((void (__cdecl*)()) 0x00438BE0)
-#define HairControl ((short (__cdecl*)(short, short, short)) 0x00438C80)
+#include "..\Global\global.h"
+
+extern HAIR_STRUCT Hairs[2][7];
 
 void InitialiseHair();
+void HairControl(int cutscene, int ponytail, int ignoreHit);
 
 void Inject_Hair();

@@ -1,6 +1,10 @@
 #include "Renderer11.h"
 #include "../Game/draw.h"
+#include "../Game/hair.h"
+#include "../Global/global.h"
+
 extern GameFlow* g_GameFlow;
+
 void Renderer11::updateLaraAnimations()
 {
 	Matrix translation;
@@ -168,8 +172,8 @@ void Renderer11::updateLaraAnimations()
 				RendererMesh* mesh = hairsObj->ObjectMeshes[i];
 				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_SOLID];
 
-				translation = Matrix::CreateTranslation(Hairs[7 * p + i].pos.xPos, Hairs[7 * p + i].pos.yPos, Hairs[7 * p + i].pos.zPos);
-				rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.yRot), TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.xRot), TR_ANGLE_TO_RAD(Hairs[7 * p + i].pos.zRot));
+				translation = Matrix::CreateTranslation(Hairs[p][i + 1].pos.xPos, Hairs[p][i + 1].pos.yPos, Hairs[p][i + 1].pos.zPos);
+				rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(Hairs[p][i + 1].pos.yRot), TR_ANGLE_TO_RAD(Hairs[p][i + 1].pos.xRot), 0);
 				m_hairsMatrices[6 * p + i] = rotation * translation;
 
 				int baseVertex = lastVertex;

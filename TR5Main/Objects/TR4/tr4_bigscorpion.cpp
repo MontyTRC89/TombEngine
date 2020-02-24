@@ -16,13 +16,13 @@ void InitialiseScorpion(short itemNum)
 	{
 		item->goalAnimState = 8;
 		item->currentAnimState = 8;
-		item->animNumber = Objects[ID_SCORPION].animIndex + 7;
+		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 7;
 	}
 	else
 	{
 		item->goalAnimState = 1;
 		item->currentAnimState = 1;
-		item->animNumber = Objects[ID_SCORPION].animIndex + 2;
+		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
 	}
 
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -114,7 +114,7 @@ void ScorpionControl(short itemNum)
 					{
 						ITEM_INFO* currentItem = &Items[baddy->itemNum];
 
-						if (currentItem->objectNumber != ID_SCORPION &&
+						if (currentItem->objectNumber != ID_BIG_SCORPION &&
 							(currentItem != LaraItem || creature->hurtByLara))
 						{
 							int dx = currentItem->pos.xPos - item->pos.xPos;

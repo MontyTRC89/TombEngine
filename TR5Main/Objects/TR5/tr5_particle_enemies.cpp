@@ -40,7 +40,7 @@ void InitialiseLittleBats(short itemNumber)
 		item->pos.xPos += 512;
 	}
 
-	if (Objects[ID_BATS].loaded)
+	if (Objects[ID_BATS_EMITTER].loaded)
 		ZeroMemory(Bats, NUM_BATS * sizeof(BAT_STRUCT));
 
 	//LOWORD(item) = sub_402F27(ebx0, Bats, 0, 1920);
@@ -146,7 +146,7 @@ short GetNextSpider()
 
 void ClearSpiders() 
 {
-	if (Objects[ID_SPIDER].loaded)
+	if (Objects[ID_SPIDERS_EMITTER].loaded)
 	{
 		ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SPIDER_STRUCT));
 		NextSpider = 0;
@@ -317,7 +317,7 @@ void ControlLittleRats(short itemNumber)
 
 void ClearRats()
 {
-	if (Objects[ID_RATS].loaded)
+	if (Objects[ID_RATS_EMITTER].loaded)
 	{
 		ZeroMemory(Rats, NUM_RATS * sizeof(RAT_STRUCT));
 		NextRat = 0;
@@ -366,7 +366,7 @@ void InitialiseLittleRats(short itemNumber)
 
 void UpdateBats()
 {
-	if (!Objects[ID_BATS].loaded)
+	if (!Objects[ID_BATS_EMITTER].loaded)
 		return;
 
 	short* bounds = GetBoundsAccurate(LaraItem);
@@ -490,7 +490,7 @@ void UpdateBats()
 
 void UpdateRats()
 {
-	if (Objects[ID_RATS].loaded)
+	if (Objects[ID_RATS_EMITTER].loaded)
 	{
 		for (int i = 0; i < NUM_RATS; i++)
 		{
@@ -642,7 +642,7 @@ void UpdateRats()
 
 void UpdateSpiders()
 {
-	if (Objects[ID_SPIDER].loaded)
+	if (Objects[ID_SPIDERS_EMITTER].loaded)
 	{
 		for (int i = 0; i < NUM_SPIDERS; i++)
 		{

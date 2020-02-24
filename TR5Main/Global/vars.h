@@ -55,7 +55,7 @@
 #define LaraItem					VAR_U_(0x00E5BF08, ITEM_INFO*)
 #define Lara						VAR_U_(0x00E5BD60, LARA_INFO)
 #define LaraDrawType				VAR_U_(0x00EEEAD0, char)
-#define Hairs						ARRAY_(0x00E5C000, HAIR_STRUCT, [DOUBLE_HAIR_SEGMENTS])
+//#define Hairs						ARRAY_(0x00E5C000, HAIR_STRUCT, [DOUBLE_HAIR_SEGMENTS])
 #define gfNumMips					VAR_U_(0x0051CE37, char)
 #define Frames						VAR_U_(0x00875174, short*)
 #define gfMips						ARRAY_(0x00E5C2C0, char, [8])
@@ -287,7 +287,7 @@
 //#define PoisonFlag					VAR_U_(0x00E5BF3E, byte)
 //#define SplashSetup					VAR_U_(0x00E6CAC0, SPLASH_SETUP)
 #define NullRotations               ARRAY_(0x0051CD68, short, [12])
-#define FirstHair                   VAR_U_(0x00E5BF60, int)
+//#define FirstHair                   VAR_U_(0x00E5BF60, int)
 
 // JeepBaddieCollision
 #define Unk_0080DE1A				VAR_U_(0x0080DE1A, short)
