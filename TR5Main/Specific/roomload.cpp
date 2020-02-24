@@ -314,8 +314,6 @@ void LoadObjects()
 		StaticObjects[i].meshNumber *= 2;
 	}
 
-	ProcessMeshData(2 * numMeshes);
-
 	// HACK: to remove after decompiling LoadSprites
 	MoveablesIds.push_back(ID_DEFAULT_SPRITES);
 }
