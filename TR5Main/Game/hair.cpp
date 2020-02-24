@@ -37,7 +37,7 @@ void InitialiseHair()
 }
 
 
-void HairControl(int cutscene, int ponytail, int ignoreHit)
+void HairControl(int cutscene, int ponytail, short* framePtr)
 {
 	SPHERE sphere[5];
 	OBJECT_INFO* object = &Objects[ID_LARA];
@@ -45,7 +45,7 @@ void HairControl(int cutscene, int ponytail, int ignoreHit)
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG;
 
-	if (!ignoreHit)
+	if (framePtr == NULL)
 	{
 		if (Lara.hitDirection >= 0)
 		{
@@ -87,6 +87,10 @@ void HairControl(int cutscene, int ponytail, int ignoreHit)
 		}
 		else
 			frame = GetBestFrame(LaraItem);
+	}
+	else
+	{
+		frame = framePtr;
 	}
 
 	phd_PushUnitMatrix();
