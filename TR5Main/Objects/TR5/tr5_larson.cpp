@@ -336,7 +336,7 @@ void ControlLarson(short itemNumber)
 			}
 			if (item->frameNumber == Anims[item->animNumber].frameBase)
 			{
-				if (item->objectNumber == ID_TR5_PIERRE)
+				if (item->objectNumber == ID_PIERRE)
 				{
 					ShotLara(item, &info, &PierreGun1, joint0, 20);
 					ShotLara(item, &info, &PierreGun2, joint0, 20);
@@ -359,7 +359,7 @@ void ControlLarson(short itemNumber)
 	else if (item->currentAnimState == STATE_TR5_LARSON_DIE)
 	{
 		// When Larson dies, it activates trigger at start position
-		if (item->objectNumber == ID_TR5_LARSON 
+		if (item->objectNumber == ID_LARSON 
 			&& item->frameNumber == Anims[item->animNumber].frameEnd)
 		{
 			short roomNumber= item->itemFlags[2] & 0xFF;
@@ -380,10 +380,10 @@ void ControlLarson(short itemNumber)
 	else
 	{
 		// Die
-		if (item->objectNumber == ID_TR5_PIERRE)
-			item->animNumber = Objects[ID_TR5_PIERRE].animIndex + ANIMATION_TR5_PIERRE_DIE;
+		if (item->objectNumber == ID_PIERRE)
+			item->animNumber = Objects[ID_PIERRE].animIndex + ANIMATION_TR5_PIERRE_DIE;
 		else
-			item->animNumber = Objects[ID_TR5_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
+			item->animNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
 		item->currentAnimState = STATE_TR5_LARSON_DIE;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 	}

@@ -115,8 +115,8 @@ typedef struct item_light_t
 typedef struct hair_struct
 {
 	PHD_3DPOS pos;
-	//PHD_VECTOR hvel;
-	byte unknown[24];
+	PHD_VECTOR hvel;
+	PHD_VECTOR unknown;
 } HAIR_STRUCT;
 
 typedef struct box_node_t
