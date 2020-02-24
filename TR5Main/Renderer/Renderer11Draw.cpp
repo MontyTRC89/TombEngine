@@ -1393,11 +1393,11 @@ bool Renderer11::drawSpiders()
 	/*XMMATRIX world;
 	UINT cPasses = 1;
 
-	if (Objects[ID_SPIDER].loaded)
+	if (Objects[ID_SPIDERS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_SPIDER];
-		RendererObject* moveableObj = m_moveableObjects[ID_SPIDER].get();
-		short* meshPtr = Meshes[Objects[ID_SPIDER].meshIndex + ((Wibble >> 2) & 2)];
+		OBJECT_INFO* obj = &Objects[ID_SPIDERS_EMITTER];
+		RendererObject* moveableObj = m_moveableObjects[ID_SPIDERS_EMITTER].get();
+		short* meshPtr = Meshes[Objects[ID_SPIDERS_EMITTER].meshIndex + ((Wibble >> 2) & 2)];
 		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
 		RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 
@@ -1466,10 +1466,10 @@ bool Renderer11::drawRats()
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	if (Objects[ID_RATS].loaded)
+	if (Objects[ID_RATS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_BATS];
-		RendererObject* moveableObj = m_moveableObjects[ID_BATS];
+		OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
+		RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
 
 		for (int m = 0; m < 32; m++)
 			memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
@@ -1480,7 +1480,7 @@ bool Renderer11::drawRats()
 
 			if (rat->on)
 			{
-				short* meshPtr = Meshes[Objects[ID_BATS].meshIndex + (((i + Wibble) >> 2) & 0xE)];
+				short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (((i + Wibble) >> 2) & 0xE)];
 				RendererMesh * mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 
 				Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
@@ -1519,11 +1519,11 @@ bool Renderer11::drawBats()
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 
-	if (Objects[ID_BATS].loaded)
+	if (Objects[ID_BATS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_BATS];
-		RendererObject* moveableObj = m_moveableObjects[ID_BATS];
-		short* meshPtr = Meshes[Objects[ID_BATS].meshIndex + 2 * (-GlobalCounter & 3)];
+		OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
+		RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
+		short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + 2 * (-GlobalCounter & 3)];
 		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 
 		for (int m = 0; m < 32; m++)

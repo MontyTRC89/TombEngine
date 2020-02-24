@@ -833,7 +833,7 @@ void NewObjects()
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_SCORPION];
+	obj = &Objects[ID_BIG_SCORPION];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseScorpion;
@@ -1534,7 +1534,7 @@ void BaddyObjects()
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 13 * 2];
 	}
 
-	obj = &Objects[ID_TR5_PIERRE];
+	obj = &Objects[ID_PIERRE];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 1;
@@ -1558,7 +1558,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_TR5_LARSON];
+	obj = &Objects[ID_LARSON];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 3;
@@ -1826,7 +1826,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 8 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_RATS];
+	obj = &Objects[ID_RATS_EMITTER];
 	if (obj->loaded)
 	{
 		obj->drawRoutine = NULL;
@@ -1835,7 +1835,7 @@ void BaddyObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_BATS];
+	obj = &Objects[ID_BATS_EMITTER];
 	if (obj->loaded)
 	{
 		obj->drawRoutine = NULL;
@@ -1846,7 +1846,7 @@ void BaddyObjects()
 
 	// TODO: spider is deleted !
 	/*
-	obj = &Objects[ID_SPIDER];
+	obj = &Objects[ID_SPIDERS_EMITTER];
 	if (obj->loaded)
 	{
 		//*(&Objects[95] + 25) &= 0xFDFFu;
@@ -2109,70 +2109,18 @@ void ObjectObjects()
 		obj->saveMesh = true;
 	}
 
-	obj = &Objects[ID_SWITCH_TYPE1];
-	if (obj->loaded)
+	for (int objNum = ID_SWITCH_TYPE1; objNum <= ID_SWITCH_TYPE16; objNum++)
 	{
-		obj->initialise = InitialiseSwitch;
-		obj->collision = SwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-	}
-
-	obj = &Objects[ID_SWITCH_TYPE2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSwitch;
-		obj->collision = SwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-	}
-
-	obj = &Objects[ID_SWITCH_TYPE3];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSwitch;
-		obj->collision = SwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-	}
-
-	obj = &Objects[ID_SWITCH_TYPE4];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSwitch;
-		obj->collision = SwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-	}
-
-	obj = &Objects[ID_SWITCH_TYPE5];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSwitch;
-		obj->collision = SwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
-	}
-
-	obj = &Objects[ID_SWITCH_TYPE6];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSwitch;
-		obj->collision = SwitchCollision;
-		obj->control = SwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveMesh = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseSwitch;
+			obj->collision = SwitchCollision;
+			obj->control = SwitchControl;
+			obj->saveFlags = true;
+			obj->saveAnim = true;
+			obj->saveMesh = true;
+		}
 	}
 
 	obj = &Objects[ID_AIRLOCK_SWITCH];
@@ -2211,22 +2159,16 @@ void ObjectObjects()
 		obj->saveAnim = true;
 	}
 
-	obj = &Objects[ID_UNDERWATER_SWITCH1];
-	if (obj->loaded)
+	for (int objNum = ID_UNDERWATER_SWITCH1; objNum <= ID_UNDERWATER_SWITCH4; objNum++)
 	{
-		obj->control = SwitchControl;
-		obj->collision = UnderwaterSwitchCollision;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_UNDERWATER_SWITCH2];
-	if (obj->loaded)
-	{
-		obj->control = SwitchControl;
-		obj->collision = UnderwaterSwitchCollision; // UnderwaterSwitchCollision2 ?
-		obj->saveFlags = true;
-		obj->saveAnim = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->control = SwitchControl;
+			obj->collision = UnderwaterSwitchCollision;
+			obj->saveFlags = true;
+			obj->saveAnim = true;
+		}
 	}
 
 	obj = &Objects[ID_LEVER_SWITCH];
@@ -2286,155 +2228,18 @@ void ObjectObjects()
 		obj->saveMesh = true;
 	}
 
-	obj = &Objects[ID_DOOR_TYPE1];
-	if (obj->loaded)
+	for (int objNum = ID_DOOR_TYPE1; objNum <= ID_CLOSED_DOOR6; objNum++)
 	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_DOOR_TYPE2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_DOOR_TYPE3];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_DOOR_TYPE4];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_DOOR_TYPE5];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_DOOR_TYPE6];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_DOOR_TYPE7];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_DOOR_TYPE8];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_CLOSED_DOOR1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_CLOSED_DOOR1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_CLOSED_DOOR2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_CLOSED_DOOR3];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_CLOSED_DOOR4];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_CLOSED_DOOR5];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
-	obj = &Objects[ID_CLOSED_DOOR6];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->control = DoorControl;
-		obj->collision = DoorCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->control = DoorControl;
+			obj->collision = DoorCollision;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+			obj->saveMesh = true;
+		}
 	}
 
 	obj = &Objects[ID_LIFT_DOORS1];
@@ -2485,41 +2290,17 @@ void ObjectObjects()
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_PUSHPULL_DOOR1];
-	if (obj->loaded)
+	for (int objNum = ID_PUSHPULL_DOOR1; objNum <= ID_KICK_DOOR4; objNum++)
 	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = PushPullKickDoorCollision;
-		obj->control = PushPullKickDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-	obj = &Objects[ID_PUSHPULL_DOOR2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = PushPullKickDoorCollision;
-		obj->control = PushPullKickDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-	obj = &Objects[ID_KICK_DOOR1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = PushPullKickDoorCollision;
-		obj->control = PushPullKickDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-	obj = &Objects[ID_KICK_DOOR2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = PushPullKickDoorCollision;
-		obj->control = PushPullKickDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->collision = PushPullKickDoorCollision;
+			obj->control = PushPullKickDoorControl;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+		}
 	}
 
 	obj = &Objects[ID_FLOOR_TRAPDOOR1];
@@ -2531,6 +2312,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
 	obj = &Objects[ID_FLOOR_TRAPDOOR2];
 	if (obj->loaded)
 	{
@@ -2540,6 +2322,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
 	obj = &Objects[ID_CEILING_TRAPDOOR1];
 	if (obj->loaded)
 	{
@@ -2549,6 +2332,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
 	obj = &Objects[ID_CEILING_TRAPDOOR2];
 	if (obj->loaded)
 	{
@@ -2558,6 +2342,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
 	obj = &Objects[ID_TRAPDOOR1];
 	if (obj->loaded)
 	{
@@ -2567,6 +2352,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
 	obj = &Objects[ID_TRAPDOOR2];
 	if (obj->loaded)
 	{
@@ -2576,6 +2362,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
 	obj = &Objects[ID_TRAPDOOR3];
 	if (obj->loaded)
 	{
@@ -2593,6 +2380,7 @@ void ObjectObjects()
 		obj->collision = SearchObjectCollision;
 		obj->control = SearchObjectControl;
 	}
+
 	obj = &Objects[ID_SEARCH_OBJECT2];
 	if (obj->loaded)
 	{
@@ -2600,6 +2388,7 @@ void ObjectObjects()
 		obj->collision = SearchObjectCollision;
 		obj->control = SearchObjectControl;
 	}
+
 	obj = &Objects[ID_SEARCH_OBJECT3];
 	if (obj->loaded)
 	{
@@ -2607,6 +2396,7 @@ void ObjectObjects()
 		obj->collision = SearchObjectCollision;
 		obj->control = SearchObjectControl;
 	}
+
 	obj = &Objects[ID_SEARCH_OBJECT4];
 	if (obj->loaded)
 	{
@@ -2645,55 +2435,18 @@ void ObjectObjects()
 		obj->saveAnim = true;
 	}
 
-	obj = &Objects[ID_PUSHABLE_OBJECT1];
-	if (obj->loaded)
+	for (int objNum = ID_PUSHABLE_OBJECT1; objNum <= ID_PUSHABLE_OBJECT10; objNum++)
 	{
-		obj->initialise = InitialisePushableBlock;
-		obj->control = PushableBlockControl;
-		obj->collision = PushableBlockCollision;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-	}
-	obj = &Objects[ID_PUSHABLE_OBJECT2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialisePushableBlock;
-		obj->control = PushableBlockControl;
-		obj->collision = PushableBlockCollision;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-	}
-	obj = &Objects[ID_PUSHABLE_OBJECT3];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialisePushableBlock;
-		obj->control = PushableBlockControl;
-		obj->collision = PushableBlockCollision;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-	}
-	obj = &Objects[ID_PUSHABLE_OBJECT4];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialisePushableBlock;
-		obj->control = PushableBlockControl;
-		obj->collision = PushableBlockCollision;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-	}
-	obj = &Objects[ID_PUSHABLE_OBJECT5];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialisePushableBlock;
-		obj->control = PushableBlockControl;
-		obj->collision = PushableBlockCollision;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialisePushableBlock;
+			obj->control = PushableBlockControl;
+			obj->collision = PushableBlockCollision;
+			obj->saveFlags = true;
+			obj->savePosition = true;
+			obj->saveAnim = true;
+		}
 	}
 
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
@@ -2759,43 +2512,25 @@ void ObjectObjects()
 		obj->saveFlags = true;
 	}
 
-	INIT_KEYHOLE(ID_KEY_HOLE1);
-	INIT_KEYHOLE(ID_KEY_HOLE2);
-	INIT_KEYHOLE(ID_KEY_HOLE3);
-	INIT_KEYHOLE(ID_KEY_HOLE4);
-	INIT_KEYHOLE(ID_KEY_HOLE5);
-	INIT_KEYHOLE(ID_KEY_HOLE6);
-	INIT_KEYHOLE(ID_KEY_HOLE7);
-	INIT_KEYHOLE(ID_KEY_HOLE8);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE1);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE2);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE3);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE4);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE5);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE6);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE7);
-	INIT_PUZZLEHOLE(ID_PUZZLE_HOLE8);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE1);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE2);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE3);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE4);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE5);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE6);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE7);
-	INIT_PUZZLEDONE(ID_PUZZLE_DONE8);
+	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
+	{
+		INIT_KEYHOLE(objNum);
+	}
 
-	INIT_ANIMATING(ID_ANIMATING1);
-	INIT_ANIMATING(ID_ANIMATING2);
-	INIT_ANIMATING(ID_ANIMATING3);
-	INIT_ANIMATING(ID_ANIMATING4);
-	INIT_ANIMATING(ID_ANIMATING5);
-	INIT_ANIMATING(ID_ANIMATING6);
-	INIT_ANIMATING(ID_ANIMATING7);
-	INIT_ANIMATING(ID_ANIMATING8);
-	INIT_ANIMATING(ID_ANIMATING9);
-	INIT_ANIMATING(ID_ANIMATING10);
-	INIT_ANIMATING(ID_ANIMATING11);
-	INIT_ANIMATING(ID_ANIMATING12);
+	for (int objNum = ID_PUZZLE_HOLE1; objNum <= ID_PUZZLE_HOLE16; objNum++)
+	{
+		INIT_PUZZLEHOLE(objNum);
+	}
+
+	for (int objNum = ID_PUZZLE_DONE1; objNum <= ID_PUZZLE_DONE16; objNum++)
+	{
+		INIT_PUZZLEDONE(objNum);
+	}
+	
+	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING64; objNum++)
+	{
+		INIT_ANIMATING(objNum);
+	}
 
 	obj = &Objects[ID_ANIMATING13];
 	if (obj->loaded)
@@ -2917,20 +2652,15 @@ void ObjectObjects()
 		obj->control = HighObject2Control;
 	}
 
-	obj = &Objects[ID_RAISING_BLOCK1];
-	if (obj->loaded)
+	for (int objNum = ID_RAISING_BLOCK1; objNum <= ID_RAISING_BLOCK4; objNum++)
 	{
-		obj->initialise = InitialiseRaisingBlock;
-		obj->control = ControlRaisingBlock;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_RAISING_BLOCK2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseRaisingBlock;
-		obj->control = ControlRaisingBlock;
-		obj->saveFlags = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseRaisingBlock;
+			obj->control = ControlRaisingBlock;
+			obj->saveFlags = true;
+		}
 	}
 
 	obj = &Objects[ID_SMOKE_EMITTER_BLACK];
@@ -2986,25 +2716,14 @@ void ObjectObjects()
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_WATERFALL1];
-	if (obj->loaded)
+	for (int objNum = ID_WATERFALL1; objNum <= ID_WATERFALL6; objNum++)
 	{
-		obj->control = ControlWaterfall;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_WATERFALL2];
-	if (obj->loaded)
-	{
-		obj->control = ControlWaterfall;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_WATERFALL3];
-	if (obj->loaded)
-	{
-		obj->control = ControlWaterfall;
-		obj->saveFlags = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->control = ControlWaterfall;
+			obj->saveFlags = true;
+		}
 	}
 
 	obj = &Objects[ID_WATERFALLSS1];
@@ -3020,26 +2739,19 @@ void ObjectObjects()
 		obj->control = ControlWaterfall;
 		obj->saveFlags = true;
 	}
-	obj = &Objects[ID_SHOOT_SWITCH1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseShootSwitch;
-		obj->control = ControlAnimatingSlots;
-		obj->collision = ShootSwitchCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
-	}
 
-	obj = &Objects[ID_SHOOT_SWITCH2];
-	if (obj->loaded)
+	for (int objNum = ID_SHOOT_SWITCH1; objNum <= ID_SHOOT_SWITCH4; objNum++)
 	{
-		obj->initialise = InitialiseShootSwitch;
-		obj->control = ControlAnimatingSlots;
-		obj->collision = ShootSwitchCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveMesh = true;
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseShootSwitch;
+			obj->control = ControlAnimatingSlots;
+			obj->collision = ShootSwitchCollision;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+			obj->saveMesh = true;
+		}
 	}
 
 	obj = &Objects[ID_TELEPORTER];
@@ -3368,69 +3080,11 @@ void PickupObjects()
 {
 	OBJECT_INFO* obj;
 
-	INIT_PICKUP(ID_PUZZLE_ITEM1);
-	INIT_PICKUP(ID_PUZZLE_ITEM2);
-	INIT_PICKUP(ID_PUZZLE_ITEM3);
-	INIT_PICKUP(ID_PUZZLE_ITEM4);
-	INIT_PICKUP(ID_PUZZLE_ITEM5);
-	INIT_PICKUP(ID_PUZZLE_ITEM6);
-	INIT_PICKUP(ID_PUZZLE_ITEM7);
-	INIT_PICKUP(ID_PUZZLE_ITEM8);
-	INIT_PICKUP(ID_PUZZLE_ITEM1_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM1_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM2_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM2_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM3_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM3_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM4_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM4_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM5_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM5_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM6_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM6_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM7_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM7_COMBO2);
-	INIT_PICKUP(ID_PUZZLE_ITEM8_COMBO1);
-	INIT_PICKUP(ID_PUZZLE_ITEM8_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM1);
-	INIT_PICKUP(ID_KEY_ITEM2);
-	INIT_PICKUP(ID_KEY_ITEM3);
-	INIT_PICKUP(ID_KEY_ITEM4);
-	INIT_PICKUP(ID_KEY_ITEM5);
-	INIT_PICKUP(ID_KEY_ITEM6);
-	INIT_PICKUP(ID_KEY_ITEM7);
-	INIT_PICKUP(ID_KEY_ITEM8);
-	INIT_PICKUP(ID_KEY_ITEM1_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM1_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM2_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM2_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM3_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM3_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM4_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM4_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM5_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM5_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM6_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM6_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM7_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM7_COMBO2);
-	INIT_PICKUP(ID_KEY_ITEM8_COMBO1);
-	INIT_PICKUP(ID_KEY_ITEM8_COMBO2);
-	INIT_PICKUP(ID_PICKUP_ITEM1);
-	INIT_PICKUP(ID_PICKUP_ITEM2);
-	INIT_PICKUP(ID_PICKUP_ITEM3);
-	INIT_PICKUP(ID_PICKUP_ITEM4);
-	INIT_PICKUP(ID_PICKUP_ITEM1_COMBO1);
-	INIT_PICKUP(ID_PICKUP_ITEM1_COMBO2);
-	INIT_PICKUP(ID_PICKUP_ITEM2_COMBO1);
-	INIT_PICKUP(ID_PICKUP_ITEM2_COMBO2);
-	INIT_PICKUP(ID_PICKUP_ITEM3_COMBO1);
-	INIT_PICKUP(ID_PICKUP_ITEM3_COMBO2);
-	INIT_PICKUP(ID_PICKUP_ITEM4_COMBO1);
-	INIT_PICKUP(ID_PICKUP_ITEM4_COMBO2);
-	INIT_PICKUP(ID_EXAMINE1);
-	INIT_PICKUP(ID_EXAMINE2);
-	INIT_PICKUP(ID_EXAMINE3);
+	for (int objNum = ID_PUZZLE_ITEM1; objNum <= ID_EXAMINE8_COMBO2; objNum++)
+	{
+		INIT_PICKUP(objNum);
+	}
+
 	INIT_PICKUP(ID_GAME_PIECE1);
 	INIT_PICKUP(ID_GAME_PIECE2);
 	INIT_PICKUP(ID_GAME_PIECE3);
@@ -3447,6 +3101,15 @@ void PickupObjects()
 	INIT_PICKUP(ID_CROSSBOW_ITEM);
 	INIT_PICKUP(ID_CROSSBOW_AMMO1_ITEM);
 	INIT_PICKUP(ID_CROSSBOW_AMMO2_ITEM);
+	INIT_PICKUP(ID_CROSSBOW_AMMO3_ITEM);
+	INIT_PICKUP(ID_GRENADE_ITEM);
+	INIT_PICKUP(ID_GRENADE_AMMO1_ITEM);
+	INIT_PICKUP(ID_GRENADE_AMMO2_ITEM);
+	INIT_PICKUP(ID_GRENADE_AMMO3_ITEM);
+	INIT_PICKUP(ID_HARPOON_ITEM);
+	INIT_PICKUP(ID_HARPOON_AMMO_ITEM);
+	INIT_PICKUP(ID_ROCKET_LAUNCHER_ITEM);
+	INIT_PICKUP(ID_ROCKET_LAUNCHER_AMMO_ITEM);
 	INIT_PICKUP(ID_HK_ITEM);
 	INIT_PICKUP(ID_HK_AMMO_ITEM);
 	INIT_PICKUP(ID_REVOLVER_ITEM);
@@ -3457,6 +3120,12 @@ void PickupObjects()
 	INIT_PICKUP(ID_BINOCULARS_ITEM);
 	INIT_PICKUP(ID_SILENCER_ITEM);
 	INIT_PICKUP(ID_FLARE_INV_ITEM);
+	INIT_PICKUP(ID_WATERSKIN1_EMPTY);
+	INIT_PICKUP(ID_WATERSKIN2_EMPTY);
+	INIT_PICKUP(ID_CLOCKWORK_BEETLE);
+	INIT_PICKUP(ID_CLOCKWORK_BEETLE_COMBO1);
+	INIT_PICKUP(ID_CLOCKWORK_BEETLE_COMBO2);
+	INIT_PICKUP(ID_GOLDROSE_ITEM);
 }
 
 void CustomObjects()
@@ -4135,13 +3804,13 @@ void InitialiseObjects()
 	SequenceUsed[4] = 0;
 	SequenceUsed[5] = 0;
 
-	if (Objects[ID_BATS].loaded)
+	if (Objects[ID_BATS_EMITTER].loaded)
 		Bats = (BAT_STRUCT*)GameMalloc(NUM_BATS * sizeof(BAT_STRUCT));
 
-	if (Objects[ID_SPIDER].loaded)
+	if (Objects[ID_SPIDERS_EMITTER].loaded)
 		Spiders = (SPIDER_STRUCT*)GameMalloc(NUM_SPIDERS * sizeof(SPIDER_STRUCT));
 
-	if (Objects[ID_RATS].loaded)
+	if (Objects[ID_RATS_EMITTER].loaded)
 		Rats = (RAT_STRUCT*)GameMalloc(NUM_RATS * sizeof(RAT_STRUCT));
 }
 

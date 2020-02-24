@@ -67,9 +67,9 @@ void TroopsControl(short itemNum)
 	{
 		if (item->currentAnimState != 7 && item->currentAnimState != 15)
 		{
-			if (creature->enemy && creature->enemy->objectNumber == ID_SCORPION && (item->itemFlags[0] < 80))
+			if (creature->enemy && creature->enemy->objectNumber == ID_BIG_SCORPION && (item->itemFlags[0] < 80))
 			{
-				if (creature->enemy->animNumber == Objects[ID_SCORPION].animIndex + 6)
+				if (creature->enemy->animNumber == Objects[ID_BIG_SCORPION].animIndex + 6)
 				{
 					item->animNumber = Objects[item->objectNumber].animIndex + 23;
 					if (item->currentAnimState == 16)
