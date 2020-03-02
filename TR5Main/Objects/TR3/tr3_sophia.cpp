@@ -355,7 +355,7 @@ static void ExplodeLondonBoss(ITEM_INFO* item)
 		for (lp = 0; lp < 2; lp++)
 			TriggerExplosionSparks(x, y, z, 3, -1, 2, 0);
 
-		SoundEffect(SFX_TR3_BOSS_EXPLODE_ID76, &item->pos, PITCH_SHIFT | 0x800000);
+		SoundEffect(SFX_TR3_BLAST_CIRCLE, &item->pos, PITCH_SHIFT | 0x800000);
 	}
 
 	// Adjust shield coordinates.

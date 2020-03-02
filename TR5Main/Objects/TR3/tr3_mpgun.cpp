@@ -90,7 +90,7 @@ void MPGunControl(short itemNumber)
 					torsoY = info.angle;
 					head = info.angle;
 					ShotLara(item, &info, &mpgunBite, torsoY, 32);
-					SoundEffect(SFX_TR3_OIL_SMG_FIRE_ID72, &item->pos, 3 << 13);
+					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->pos, 3 << 13);
 				}
 			}
 
@@ -162,7 +162,7 @@ void MPGunControl(short itemNumber)
 		if (laraInfo.distance < SQUARE(1024) || item->hitStatus || TargetVisible(item, &laraInfo)) 
 		{
 			if (!creature->alerted)
-				SoundEffect(SFX_TR3_AMERCAN_HOY_ID300, &item->pos, 0);
+				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->pos, 0);
 			AlertAllGuards(itemNumber);
 		}
 		creature->enemy = enemy;

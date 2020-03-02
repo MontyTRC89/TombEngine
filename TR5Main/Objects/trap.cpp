@@ -300,7 +300,7 @@ void StargateControl(short itemNum)
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(SFX_TR4_STARGATE_SWIRL_ID23, &item->pos, 0);
+		SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->pos, 0);
 		item->itemFlags[0] = 57521664;
 		AnimateItem(item);
 	}
@@ -563,8 +563,8 @@ void SlicerDicerControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_2_ID20, &item->pos, 0);
-	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_1_ID12, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP, &item->pos, 0);
 	
 	int factor = (9 * COS(item->triggerFlags) << 9 >> W2V_SHIFT) * COS(item->pos.yRot) >> W2V_SHIFT;
 
@@ -735,7 +735,7 @@ void MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->currentAnimState = 8;
 				l->speed = 0;
 
-				SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY_ID103, &item->pos, 0);
+				SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &item->pos, 0);
 			}
 		}
 		else
@@ -772,7 +772,7 @@ void MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					KillItem(i);
 
 					if (!(GetRandomControl() & 3))
-						SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY_ID103, &currentItem->pos, 0);
+						SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &currentItem->pos, 0);
 
 					currentItem->status = ITEM_INVISIBLE;
 				}
@@ -846,7 +846,7 @@ void SentryGunControl(short itemNum)
 				{
 					if (info.distance < SQUARE(9 * WALL_SIZE))
 					{
-						if (!ObjectInInventory(ID_PUZZLE_ITEM5) && 
+						if (!g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && 
 							!item->itemFlags[0])
 						{
 							if (info.distance <= SQUARE(2048))
@@ -862,7 +862,7 @@ void SentryGunControl(short itemNum)
 								item->itemFlags[0] = 2;
 
 								ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
-								SoundEffect(SFX_TR4_AUTOGUNS_ID358, &item->pos, 0);
+								SoundEffect(SFX_TR4_AUTOGUNS, &item->pos, 0);
 
 								item->itemFlags[2] += 256;
 								if (item->itemFlags[2] > 6144)

@@ -443,7 +443,7 @@ bool GameFlow::DoGameflow()
 	{
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
-
+		//level->LaraType = LARA_YOUNG;
 		CurrentAtmosphere = level->Soundtrack;
 
 		if (level->Horizon)

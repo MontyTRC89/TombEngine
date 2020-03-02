@@ -120,7 +120,7 @@ static void FireSubHarpoon(ITEM_INFO* v)
 
 		AddActiveItem(itemNum);
 
-		SoundEffect(SFX_TR3_UPV_HARPOON_SHOT_ID23, &LaraItem->pos, 2);
+		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &LaraItem->pos, 2);
 
 		// if lara have ammo, reduce it.
 		if (g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0])

@@ -64,15 +64,6 @@ bool Renderer11::PrepareDataForTheRenderer()
 	int blockX = 0;
 	int blockY = 0;
 
-	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG)
-	{
-		memcpy(m_laraSkinJointRemap, m_youngLaraSkinJointRemap, 15 * 32 * 2);
-	}
-	else
-	{
-		memcpy(m_laraSkinJointRemap, m_normalLaraSkinJointRemap, 15 * 32 * 2);
-	}
-
 	for (int p = 0; p < NumTexturePages; p++)
 	{
 		for (int y = 0; y < 256; y++)
@@ -594,6 +585,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 			// Fix Lara skin joints and hairs
 			if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
 			{
+				int bonesToCheck[2] = { 0,0 };
+
 				RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
 
 				for (int j = 1; j < obj->nmeshes; j++)
@@ -601,17 +594,24 @@ bool Renderer11::PrepareDataForTheRenderer()
 					RendererMesh* jointMesh = moveable->ObjectMeshes[j];
 					RendererBone* jointBone = moveable->LinearizedBones[j];
 
+					bonesToCheck[0] = jointBone->Parent->Index;
+					bonesToCheck[1] = j; 
+
 					for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
 					{
 						RendererBucket* jointBucket = &jointMesh->Buckets[b1];
+						
 						for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
 						{
 							RendererVertex* jointVertex = &jointBucket->Vertices[v1];
-							if (jointVertex->Bone != j)
-							{
-								RendererMesh* skinMesh = objSkin->ObjectMeshes[jointVertex->Bone];
-								RendererBone* skinBone = objSkin->LinearizedBones[jointVertex->Bone];
 
+							bool done = false;
+
+							for (int k = 0; k < 2; k++)
+							{
+								RendererMesh* skinMesh = objSkin->ObjectMeshes[bonesToCheck[k]];
+								RendererBone* skinBone = objSkin->LinearizedBones[bonesToCheck[k]];
+			
 								for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
 								{
 									RendererBucket* skinBucket = &skinMesh->Buckets[b2];
@@ -629,12 +629,21 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 										if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 										{
+											jointVertex->Bone = bonesToCheck[k];
 											jointVertex->Position.x = skinVertex->Position.x;
 											jointVertex->Position.y = skinVertex->Position.y;
 											jointVertex->Position.z = skinVertex->Position.z;
+											done = true;
+											break;
 										}
 									}
+
+									if (done)
+										break;
 								}
+
+								if (done)
+									break;
 							}
 						}
 					}

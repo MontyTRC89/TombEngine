@@ -1997,6 +1997,8 @@ int Inventory::DoPassport()
 		}
 		else if (DbInput & IN_LEFT || moveLeft)
 		{
+			SoundEffect(SFX_TR3_MENU_PASSPORT, NULL, 0);
+
 			moveLeft = false;
 			moveRight = false;
 			closePassport = false;
@@ -2015,6 +2017,8 @@ int Inventory::DoPassport()
 		}
 		else if (DbInput & IN_RIGHT || moveRight)
 		{
+			SoundEffect(SFX_TR3_MENU_PASSPORT, NULL, 0);
+
 			moveLeft = false;
 			moveRight = false;
 			closePassport = false;

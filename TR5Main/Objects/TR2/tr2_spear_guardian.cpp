@@ -14,7 +14,7 @@ void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &spearRightBite, DoBloodSplat);
 		xian->flags |= 1;
-		SoundEffect(SFX_TR2_SWORD_HITTARGET_ID318, &item->pos, 0);
+		SoundEffect(SFX_TR2_CRUNCH3, &item->pos, 0);
 	}
 
 	if (!(xian->flags & 2) && (item->touchBits & 0x800))
@@ -23,7 +23,7 @@ void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &spearLeftBite, DoBloodSplat);
 		xian->flags |= 2;
-		SoundEffect(SFX_TR2_SWORD_HITTARGET_ID318, &item->pos, 0);
+		SoundEffect(SFX_TR2_CRUNCH3, &item->pos, 0);
 	}
 }
 

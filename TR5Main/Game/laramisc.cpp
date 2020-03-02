@@ -751,16 +751,14 @@ void InitialiseLara(int restore)
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.skelebob = 0;
 
-	short gun;
+	short gun = WEAPON_NONE;
 
-	// TODO: we should script this behaviour
 	if (Objects[ID_HK_ITEM].loaded)
 		gun = WEAPON_HK;
-	else if (Objects[ID_PISTOLS_ITEM].loaded)
+	
+	if (Objects[ID_PISTOLS_ITEM].loaded)
 		gun = WEAPON_PISTOLS;
-	else
-		gun = WEAPON_NONE; // avoid problem with empty gun level
-
+	
 	Lara.lastGunType = Lara.gunType = Lara.requestGunType = gun;
 
 	LaraInitialiseMeshes();

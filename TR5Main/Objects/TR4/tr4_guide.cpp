@@ -729,7 +729,7 @@ void GuideControl(short itemNum)
 			{
 				item->requiredAnimState = 3;
 				item->swapMeshFlags |= 0x200000;
-				SoundEffect(SFX_TR4_GUIDE_SCARED_ID194, &item->pos, 0);
+				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->pos, 0);
 			}
 		}
 		else if (enemy->pos.yRot - item->pos.yRot <= ANGLE(2))
