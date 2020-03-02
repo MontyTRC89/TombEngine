@@ -519,8 +519,6 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 			vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 
 			vertex.Bone = boneIndex;
-			if (isJoints && boneIndex != 0 && m_laraSkinJointRemap[boneIndex][indices[v]] != -1)
-				vertex.Bone = m_laraSkinJointRemap[boneIndex][indices[v]];
 			if (isHairs)
 				vertex.Bone = indices[v];
 
@@ -616,8 +614,6 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 			vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
 
 			vertex.Bone = boneIndex;
-			if (isJoints && boneIndex != 0 && m_laraSkinJointRemap[boneIndex][indices[v]] != -1)
-				vertex.Bone = m_laraSkinJointRemap[boneIndex][indices[v]];
 			if (isHairs)
 				vertex.Bone = indices[v];
 

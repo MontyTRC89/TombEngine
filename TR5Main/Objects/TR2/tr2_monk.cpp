@@ -208,7 +208,7 @@ void MonkControl(short itemNum)
 					LaraItem->hitStatus = true;
 
 					monk->flags |= 0x1000;
-					SoundEffect(SFX_TR2_MONK_HIT_TARGET_ID245, &item->pos, 0);
+					SoundEffect(SFX_TR2_CRUNCH1, &item->pos, 0);
 					CreatureEffect(item, &monkBite, DoBloodSplat);
 				}
 			}
@@ -224,7 +224,7 @@ void MonkControl(short itemNum)
 						enemy->hitStatus = true;
 
 						monk->flags |= 0x1000;
-						SoundEffect(SFX_TR2_MONK_HIT_TARGET_ID245, &item->pos, 0);
+						SoundEffect(SFX_TR2_CRUNCH1, &item->pos, 0);
 					}
 				}
 			}

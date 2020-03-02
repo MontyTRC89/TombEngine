@@ -16,6 +16,10 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
 }; 
 
 vector<AudioTrack> g_AudioTracks;
+short SampleLUT[SOUND_NEW_SOUNDMAP_MAX_SIZE];
+short SoundMapSize;
+int NumSamplesInfos;
+SAMPLE_INFO* SampleInfo;
 
 bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	// Replaces DXCreateSampleADPCM()
 {
@@ -98,7 +102,7 @@ bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	//
 
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 {
-	if (effectID >= SOUND_LEGACY_SOUNDMAP_SIZE)
+	if (effectID >= SoundMapSize)
 		return 0;
 
 	if (BASS_GetDevice() == -1)

@@ -764,9 +764,6 @@ private:
 	IndexBuffer*									m_staticsIndexBuffer;
 	vector<RendererRoom>							m_rooms;
 	Matrix											m_hairsMatrices[12];
-	short											m_normalLaraSkinJointRemap[15][32];
-	short											m_youngLaraSkinJointRemap[15][32];
-	short											m_laraSkinJointRemap[15][32];
 	short											m_numHairVertices;
 	short											m_numHairIndices;
 	vector<RendererVertex>							m_hairVertices;

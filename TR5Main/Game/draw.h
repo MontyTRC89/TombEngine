@@ -36,6 +36,8 @@
 #define phd_RotY_I ((void(__cdecl*)(short)) 0x0042BFC0)
 #define phd_RotX_I ((void(__cdecl*)(short)) 0x0042C030)
 #define phd_RotZ_I ((void(__cdecl*)(short)) 0x0042C0A0)
+#define phd_SetTrans ((void (__cdecl*)(int, int, int)) 0x0048FA40)
+#define phd_RotBoundingBoxNoPersp ((void (__cdecl*)(short*, short*)) 0x0042E240)
 
 #define phd_DxTranslateRel ((void(__cdecl*)(int, int, int)) 0x00490790)
 #define phd_DxTranslateAbs ((void(__cdecl*)(int, int, int)) 0x00490610)

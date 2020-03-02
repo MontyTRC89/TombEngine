@@ -703,7 +703,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if ((fh > -STEP_SIZE) && (fh < STEP_SIZE))
 		{
 			if ((Wibble & 7) == 0)
-				SoundEffect(SFX_TR3_MINECART_HIT_ID202, &v->pos, 2);
+				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &v->pos, 2);
 
 			v->pos.xPos += (TURN_DEATH_VEL * SIN(v->pos.yRot)) >> W2V_SHIFT;
 			v->pos.zPos += (TURN_DEATH_VEL * COS(v->pos.yRot)) >> W2V_SHIFT;

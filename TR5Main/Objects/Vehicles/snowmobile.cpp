@@ -354,9 +354,9 @@ void SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 		if (LaraItem->currentAnimState != SKID_HIT)
 		{
 			if (collide == SKIDOO_HIT_FRONT)
-				SoundEffect(SFX_TR2_SNOWMOBILE_HITF_ID201, &skidoo->pos, 0);
+				SoundEffect(SFX_TR2_CLATTER_1, &skidoo->pos, 0);
 			else
-				SoundEffect(SFX_TR2_SNOWMOBILE_HITB_ID202, &skidoo->pos, 0);
+				SoundEffect(SFX_TR2_CLATTER_2, &skidoo->pos, 0);
 			LaraItem->animNumber = (short)(Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + collide);
 			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = SKID_HIT;
@@ -429,7 +429,7 @@ void SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 		case SKID_FALL:
 			if (skidoo->fallspeed <= 0 || skinfo->left_fallspeed <= 0 || skinfo->right_fallspeed <= 0)
 			{
-				SoundEffect(SFX_TR2_SNOWMOBILE_FALL_ID203, &skidoo->pos, 0);
+				SoundEffect(SFX_TR2_CLATTER_3, &skidoo->pos, 0);
 				LaraItem->goalAnimState = SKID_SIT;
 			}
 			else if (skidoo->fallspeed > DAMAGE_START + DAMAGE_LENGTH) // when Lara let's go, it's terminal
@@ -1029,13 +1029,13 @@ int SkidooControl()
 
 		/* Do engine noise */
 		skinfo->pitch += (pitch - skinfo->pitch) >> 2;
-		SoundEffect(SFX_TR2_SNOWMOBILE_MOVE_ID155, &skidoo->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - skinfo->pitch) * 100) << 8));
+		SoundEffect(SFX_TR2_SNOWMOBILE_HIGH_ENGINE_RPM, &skidoo->pos, 4 + ((0x10000 - (SKIDOO_MAX_SPEED - skinfo->pitch) * 100) << 8));
 	}
 	else
 	{
 		skinfo->track_mesh = 0;
 		if (!drive)
-			SoundEffect(SFX_TR2_SNOWMOBILE_IDLE_ID153, &skidoo->pos, 0);
+			SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &skidoo->pos, 0);
 		skinfo->pitch = 0;
 	}
 	skidoo->floor = height;
