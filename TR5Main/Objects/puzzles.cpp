@@ -131,7 +131,7 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 			else if (l->frameNumber == Anims[402].frameBase + 51)
 			{
-				SoundEffect(SFX_TR4_POUR_ID97, &l->pos, 0);
+				SoundEffect(SFX_TR4_POUR, &l->pos, 0);
 				item->pos.yRot = rotY;
 			}
 			else if (l->frameNumber == Anims[402].frameBase + 74)
@@ -238,7 +238,7 @@ void LaraDoubleControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP_1_ID12, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP, &item->pos, 0);
 
 	if (CreatureActive(itemNum))
 	{

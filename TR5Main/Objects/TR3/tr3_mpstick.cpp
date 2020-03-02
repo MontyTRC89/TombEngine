@@ -140,7 +140,7 @@ void MPStickControl(short itemNumber)
 		if (item->hitStatus || ((laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo)) && (abs(LaraItem->pos.yPos - item->pos.yPos) < 1024))) // TS- TODO: take this back out after demo!!
 		{
 			if (!creature->alerted)
-				SoundEffect(SFX_TR3_AMERCAN_HOY_ID300, &item->pos, 0);
+				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->pos, 0);
 			AlertAllGuards(itemNumber);
 		}
 		creature->enemy = enemy;

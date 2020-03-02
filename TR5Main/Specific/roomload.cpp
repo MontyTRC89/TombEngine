@@ -480,7 +480,7 @@ unsigned __stdcall LoadLevel(void* data)
 	char* filename = (char*)data;
 
 	LevelDataPtr = NULL;
-	LevelFilePtr = 0;
+	LevelFilePtr = NULL;
 
 	g_Renderer->UpdateProgress(0);
 
@@ -536,7 +536,7 @@ unsigned __stdcall LoadLevel(void* data)
 
 		LoadItems();
 		LoadAIObjects();
-		LoadDemoData();
+		//LoadDemoData();
 		LoadSamples();
 		g_Renderer->UpdateProgress(80);
 
@@ -585,6 +585,55 @@ unsigned __stdcall LoadLevel(void* data)
 	_endthreadex(1);
 
 	return true;
+}
+
+void LoadSamples()
+{
+	// Legacy soundmap size was 450, for now let's store new soundmap size into NumDemoData field
+	SoundMapSize = ReadInt16();
+
+	if (SoundMapSize == 0)
+		SoundMapSize = SOUND_LEGACY_SOUNDMAP_SIZE;
+
+	for (int i = 0; i < SoundMapSize; i++)
+		SampleLUT[i] = ReadInt16();
+
+	NumSamplesInfos = ReadInt32();
+	if (NumSamplesInfos)
+	{
+		SampleInfo = (SAMPLE_INFO*)GameMalloc(NumSamplesInfos * sizeof(SAMPLE_INFO));
+		ReadBytes(SampleInfo, NumSamplesInfos * sizeof(SAMPLE_INFO));
+
+		int numSampleIndices = ReadInt32();
+		if (numSampleIndices)
+		{
+			int numSamples = 0;
+			ReadFileEx(&numSamples, 1, 4, LevelFilePtr);
+			//if (feof(LevelFilePtr))
+			//	return;
+
+			if (numSamples <= 0)
+				return;
+
+			int uncompressedSize;
+			int compressedSize;
+			char* buffer = (char*)malloc(1048576);
+
+			for (int i = 0; i < numSamples; i++)
+			{
+				ReadFileEx(&uncompressedSize, 4, 1, LevelFilePtr);
+				ReadFileEx(&compressedSize, 4, 1, LevelFilePtr);
+				ReadFileEx(buffer, 1, compressedSize, LevelFilePtr);
+				Sound_LoadSample(buffer, compressedSize, uncompressedSize, i);
+			}
+
+			free(buffer);
+		}
+	}
+	else
+	{
+		//Log(1, aNoSampleInfos);
+	}
 }
 
 void LoadBoxes()

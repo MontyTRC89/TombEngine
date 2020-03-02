@@ -5,11 +5,6 @@
 
 using namespace std;
 
-// Legacy stuff
-#define ObjectInInventory ((int (__cdecl*)(short)) 0x00464360)
-
-void Inject_Inventory();
-
 // New inventory
 #define NUM_INVENTORY_OBJECTS_PER_RING	120
 #define NUM_INVENTORY_RINGS				5

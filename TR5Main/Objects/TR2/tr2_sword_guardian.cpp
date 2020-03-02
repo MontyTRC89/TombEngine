@@ -30,7 +30,7 @@ void SwordGuardianFly(ITEM_INFO* item)
 	pos.z = (GetRandomControl() << 8 >> 15) + item->pos.zPos - 128;
 
 	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, WEAPON_GRENADE_LAUNCHER, 32);
-	SoundEffect(SFX_TR2_SWORD_GUARDIAN_FLYING_ID312, &item->pos, 0);
+	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->pos, 0);
 }
 
 void SwordGuardianControl(short itemNum)

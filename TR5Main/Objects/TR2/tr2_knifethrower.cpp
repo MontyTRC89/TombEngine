@@ -63,7 +63,7 @@ void KnifeControl(short fxNum)
 		fx->speed = LaraItem->speed;
 		fx->frameNumber = fx->counter = 0;
 
-		SoundEffect(SFX_TR2_HIT_BY_KNIFE_ID317, &fx->pos, 0); // knife hit lara sound
+		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0); // knife hit lara sound
 		DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 80, fx->pos.yRot, fx->roomNumber);
 		KillEffect(fxNum);
 	}
