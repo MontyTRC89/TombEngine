@@ -618,6 +618,8 @@ int Inventory::DoInventory()
 
 	g_Renderer->DumpGameScene();
 
+	SoundEffect(SFX_TR3_MENU_SPININ, NULL, 0);
+
 	OpenRing(m_activeRing, true);
 
 	while (!ResetFlag)
@@ -631,7 +633,7 @@ int Inventory::DoInventory()
 		// Handle input
 		if (DbInput & IN_DESELECT)
 		{
-			SoundEffect(SFX_MENU_SELECT, NULL, 0);
+			//SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
 			// Exit from inventory
 			m_enterObject = NO_ITEM;
@@ -782,6 +784,8 @@ int Inventory::DoInventory()
 
 		UpdateSceneAndDrawInventory();
 	}
+
+	SoundEffect(SFX_TR3_MENU_SPINOUT, NULL, 0);
 
 	CloseRing(m_activeRing, true);
 
@@ -1960,6 +1964,8 @@ int Inventory::DoPassport()
 	}
 
 	ring->passportAction = choices[0];
+	
+	SoundEffect(SFX_TR3_MENU_CHOOSE, NULL, 0);
 
 	PopupObject();
 
