@@ -1468,21 +1468,20 @@ bool Renderer11::drawRats()
 
 	if (Objects[ID_RATS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
-		RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
+		OBJECT_INFO* obj = &Objects[ID_RATS_EMITTER];
+		RendererObject* moveableObj = m_moveableObjects[ID_RATS_EMITTER];
 
 		for (int m = 0; m < 32; m++)
 			memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-		for (int i = 0; i < NUM_RATS; i += 4)
+		for (int i = 0; i < NUM_RATS; i++)
 		{
 			RAT_STRUCT* rat = &Rats[i];
 
 			if (rat->on)
 			{
-				short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (((i + Wibble) >> 2) & 0xE)];
+				short* meshPtr = Meshes[Objects[ID_RATS_EMITTER].meshIndex + (((i + Wibble) >> 2) & 0xE)];
 				RendererMesh * mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
-
 				Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
 				Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
 				Matrix world = rotation * translation;

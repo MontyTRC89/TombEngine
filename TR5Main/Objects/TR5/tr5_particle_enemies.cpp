@@ -329,13 +329,15 @@ void InitialiseLittleRats(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	short flags = item->triggerFlags / -24;
+	char flags = item->triggerFlags / -24;
+
+	item->pos.yPos -= 128;
 
 	item->pos.xRot = ANGLE(45);
 	item->itemFlags[1] = flags & 2;
 	item->itemFlags[2] = flags & 4;
 	item->itemFlags[0] = flags & 1;
-	item->triggerFlags = flags % 1000;
+	item->triggerFlags = item->triggerFlags % 1000;
 
 	if (flags & 1)
 	{
@@ -380,7 +382,7 @@ void UpdateBats()
 	int z1 = LaraItem->pos.zPos + bounds[4] - (bounds[4] >> 2);
 	int z2 = LaraItem->pos.zPos + bounds[5] - (bounds[5] >> 2);
 
-	int minDistance = 0xFFFFFFF; // v40
+	int minDistance = 0xFFFFFFF;
 	int minIndex = -1;
 
 	for (int i = 0; i < NUM_BATS; i++)
@@ -415,23 +417,19 @@ void UpdateBats()
 			LaraItem->pos.zPos + 8 * bat->zTarget - bat->pos.zPos,
 			angles);
 
-		int distance = SQUARE(LaraItem->pos.zPos - bat->pos.zPos) + SQUARE(LaraItem->pos.xPos - bat->pos.xPos);
+		int distance = SQUARE(LaraItem->pos.zPos - bat->pos.zPos) +
+					   SQUARE(LaraItem->pos.xPos - bat->pos.xPos);
 		if (distance < minDistance)
 		{
 			minDistance = distance;
 			minIndex = i;
 		}
 
-		distance = SQRT_ASM(distance) / 8;
-		if (distance <= 128)
-		{
-			if (distance < 48)
-				distance = 48;
-		}
-		else
-		{
+		distance = SQRT_ASM(distance) >> 3;
+		if (distance < 48)
+			distance = 48;
+		else if (distance > 128)
 			distance = 128;
-		}
 
 		if (bat->speed < distance)
 			bat->speed++;
@@ -440,26 +438,26 @@ void UpdateBats()
 
 		if (bat->counter > 90)
 		{
-			int speed = bat->speed * 128;
+			short speed = bat->speed << 7;
 
-			short xAngle = abs(angles[1] - bat->pos.yRot) >> 3;
+			short xAngle = abs(angles[1] - bat->pos.xRot) >> 3;
 			short yAngle = abs(angles[0] - bat->pos.yRot) >> 3;
 
-			if (xAngle <= -speed)
+			if (xAngle < -speed)
 				xAngle = -speed;
-			else if (xAngle >= speed)
+			else if (xAngle > speed)
 				xAngle = speed;
 
-			if (yAngle <= -speed)
+			if (yAngle < -speed)
 				yAngle = -speed;
-			else if (yAngle >= speed)
+			else if (yAngle > speed)
 				yAngle = speed;
 
 			bat->pos.yRot += yAngle;
 			bat->pos.xRot += xAngle;
 		}
 
-		int sp = bat->speed * SIN(bat->pos.xRot) >> W2V_SHIFT;
+		int sp = bat->speed * COS(bat->pos.xRot) >> W2V_SHIFT;
 
 		bat->pos.xPos += sp * SIN(bat->pos.yRot) >> W2V_SHIFT;
 		bat->pos.yPos += bat->speed * SIN(-bat->pos.xRot) >> W2V_SHIFT;
@@ -506,7 +504,7 @@ void UpdateRats()
 				rat->pos.yPos += rat->fallspeed;
 				rat->pos.zPos += rat->speed * COS(rat->pos.yRot) >> W2V_SHIFT;
 
-				rat->fallspeed += 6;
+				rat->fallspeed += GRAVITY;
 
 				int dx = LaraItem->pos.xPos - rat->pos.xPos;
 				int dy = LaraItem->pos.yPos - rat->pos.yPos;
@@ -528,10 +526,10 @@ void UpdateRats()
 				{
 					if (abs(dz) + abs(dx) <= 1024)
 					{
-						if (rat->speed & 1)
+						/*if (rat->speed & 1)
 							rat->pos.yRot += 512;
 						else
-							rat->pos.yRot -= 512;
+							rat->pos.yRot -= 512;*/
 						rat->speed = 48 - (abs(angle) >> 10);
 					}
 					else
@@ -561,9 +559,10 @@ void UpdateRats()
 				{
 					if (rat->flags > 170)
 					{
-						rat->on = false;
+						rat->on = 0;
 						NextRat = 0;
 					}
+
 					if (angle <= 0)
 						rat->pos.yRot -= ANGLE(90);
 					else
@@ -572,7 +571,6 @@ void UpdateRats()
 					rat->pos.xPos = oldX;
 					rat->pos.yPos = oldY;
 					rat->pos.zPos = oldZ;
-
 					rat->fallspeed = 0;
 				}
 				else
@@ -608,7 +606,7 @@ void UpdateRats()
 					}
 				}
 
-				if (!(Wibble & 0x3C))
+				if (!(Wibble & 60))
 					rat->flags += 2;
 
 				ROOM_INFO* r = &Rooms[rat->roomNumber];
