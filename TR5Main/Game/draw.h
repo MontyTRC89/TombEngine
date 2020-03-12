@@ -91,5 +91,6 @@ void phd_PopMatrix(void);
 void _phd_PopMatrix_I(void);
 
 extern Renderer11* g_Renderer;
+extern BITE_INFO EnemyBites[9];
 
 void Inject_Draw();
