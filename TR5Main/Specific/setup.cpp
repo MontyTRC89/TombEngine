@@ -3767,6 +3767,7 @@ void InitialiseObjects()
 		obj->semiTransparent = false;
 		obj->undead = false;
 		obj->zoneType = ZONE_NULL;
+		obj->biteOffset = 0xFFFF;
 		obj->frameBase += (short)Frames;
 	}
 

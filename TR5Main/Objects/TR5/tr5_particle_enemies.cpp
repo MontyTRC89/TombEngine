@@ -297,7 +297,7 @@ void ControlLittleRats(short itemNumber)
 				if (item->itemFlags[0])
 				{
 					rat->pos.yRot = 2 * GetRandomControl();
-					rat->fallspeed = -16 - (GetRandomControl() & 0x1F);
+					rat->fallspeed = -16 - (GetRandomControl() & 31);
 				}
 				else
 				{
@@ -308,8 +308,8 @@ void ControlLittleRats(short itemNumber)
 				rat->pos.xRot = 0;
 				rat->pos.zRot = 0;
 				rat->on = 1;
-				rat->flags = GetRandomControl() & 0x1E;
-				rat->speed = (GetRandomControl() & 0x1F) + 1;
+				rat->flags = GetRandomControl() & 30;
+				rat->speed = (GetRandomControl() & 31) + 1;
 			}
 		}
 	}
@@ -329,9 +329,7 @@ void InitialiseLittleRats(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	char flags = item->triggerFlags / -24;
-
-	item->pos.yPos -= 128;
+	char flags = item->triggerFlags / 1000;
 
 	item->pos.xRot = ANGLE(45);
 	item->itemFlags[1] = flags & 2;
@@ -512,9 +510,16 @@ void UpdateRats()
 
 				short angle;
 				if (rat->flags >= 170)
-					angle = rat->pos.yRot - ATAN(dz, dx);
+					angle = rat->pos.yRot - (short)ATAN(dz, dx);
 				else
-					angle = ATAN(dz, dx) - rat->pos.yRot;
+					angle = (short)ATAN(dz, dx) - rat->pos.yRot;
+
+				if (i == 0)
+				{
+					printf("xRot: %d, yRot: %d, fallspeed: %d, speed: %d, angle: %d, flags: %d, dx: %d, dz: %d, Y: %d\n",
+						rat->pos.xRot, rat->pos.yRot, rat->fallspeed, rat->speed, angle, rat->flags, dx, dz, rat->pos.yPos);
+				}
+
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
@@ -522,19 +527,21 @@ void UpdateRats()
 					LaraItem->hitStatus = true;
 				}
 
+				// if life is even
 				if (rat->flags & 1)
 				{
+					// if rat is very near
 					if (abs(dz) + abs(dx) <= 1024)
 					{
-						/*if (rat->speed & 1)
+						if (rat->speed & 1)
 							rat->pos.yRot += 512;
 						else
-							rat->pos.yRot -= 512;*/
+							rat->pos.yRot -= 512;
 						rat->speed = 48 - (abs(angle) >> 10);
 					}
 					else
 					{
-						if (rat->speed < (i & 0x1F) + 24)
+						if (rat->speed < (i & 31) + 24)
 							rat->speed++;
 
 						if (abs(angle) >= 2048)
@@ -555,8 +562,12 @@ void UpdateRats()
 
 				FLOOR_INFO* floor = GetFloor(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, &rat->roomNumber);
 				int height = GetFloorHeight(floor, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-				if (height < rat->pos.yPos - 1280 || height == NO_HEIGHT)
+				
+				// if height is higher than 5 clicks 
+				if (height < rat->pos.yPos - 1280 || 
+					height == NO_HEIGHT)
 				{
+					// if timer is higher than 170 time to disappear 
 					if (rat->flags > 170)
 					{
 						rat->on = 0;
@@ -568,6 +579,7 @@ void UpdateRats()
 					else
 						rat->pos.yRot += ANGLE(90);
 
+					// reset rat to old position and disable fall
 					rat->pos.xPos = oldX;
 					rat->pos.yPos = oldY;
 					rat->pos.zPos = oldZ;
@@ -575,11 +587,15 @@ void UpdateRats()
 				}
 				else
 				{
+					// if height is lower than Y + 64
 					if (height >= rat->pos.yPos - 64)
 					{
-						if (rat->pos.yPos <= height)
+						// if rat is higher than floor
+						if (height >= rat->pos.yPos)
 						{
-							if (rat->fallspeed >= 500 || rat->flags >= 200)
+							// if fallspeed is too much or life is ended then kill rat
+							if (rat->fallspeed >= 500 || 
+								rat->flags >= 200)
 							{
 								rat->on = 0;
 								NextRat = 0;
@@ -598,6 +614,7 @@ void UpdateRats()
 					}
 					else
 					{
+						// if block is higher than rat position then run vertically
 						rat->pos.xRot = 14336;
 						rat->pos.xPos = oldX;
 						rat->pos.yPos = oldY - 24;
