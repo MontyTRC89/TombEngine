@@ -3,6 +3,7 @@
 #include "../Game/effect2.h"
 #include "../Game/sphere.h"
 #include "../Game/lara.h"
+#include "../Game/draw.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -456,6 +457,86 @@ bool Renderer11::drawGunFlashes()
 					world = laraObj->AnimationTransforms[LM_RHAND].Transpose() * m_LaraWorldMatrix;
 					world = offset * world;
 					world = rotation2 * world;
+
+					m_stItem.World = world.Transpose();
+					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+					m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+
+					m_context->DrawIndexed(flashBucket->NumIndices, flashBucket->StartIndex, 0);
+					m_numDrawCalls++;
+				}
+			}
+		}
+	}
+
+	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+	return true;
+}
+
+bool Renderer11::drawBaddieGunflashes()
+{
+	rand();
+	rand();
+	rand();
+	rand();
+
+	for (int i = 0; i < m_itemsToDraw.size(); i++)
+	{
+		RendererItem* item = m_itemsToDraw[i];
+
+		// Does the item need gunflash?
+		OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
+		if (obj->biteOffset == 0xFFFF || !item->Item->firedWeapon)
+			continue;
+
+		RendererRoom& const room = m_rooms[item->Item->roomNumber];
+		RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
+		
+		m_stItem.AmbientLight = room.AmbientLight;
+		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+
+		m_stLights.NumLights = item->Lights.size();
+		for (int j = 0; j < item->Lights.size(); j++)
+			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+
+		m_stMisc.AlphaTest = true;
+		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+
+		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+		BITE_INFO* bites[2] = {
+			&EnemyBites[obj->biteOffset],
+			&EnemyBites[obj->biteOffset + 1]
+		};
+
+		int numBites = (bites[0]->meshNum < 0) + 1;
+
+		for (int k = 0; k < numBites; k++)
+		{
+			int joint = abs(bites[k]->meshNum);
+			
+			RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
+
+			for (int b = 0; b < NUM_BUCKETS; b++)
+			{
+				RendererBucket* flashBucket = &flashMesh->Buckets[b];
+
+				if (flashBucket->NumVertices != 0)
+				{
+					Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
+					Matrix rotationX = Matrix::CreateRotationX(TR_ANGLE_TO_RAD(49152));
+					Matrix rotationZ = Matrix::CreateRotationZ(TR_ANGLE_TO_RAD(2 * GetRandomControl()));
+
+					Matrix world = item->AnimationTransforms[joint].Transpose() * item->World;
+					world = rotationX * world;
+					world = offset * world;
+					world = rotationZ * world;
 
 					m_stItem.World = world.Transpose();
 					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));

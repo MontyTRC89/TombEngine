@@ -868,6 +868,7 @@ private:
 	bool											drawStatics(bool transparent);
 	bool											drawItems(bool transparent, bool animated);
 	bool											drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
+	bool											drawBaddieGunflashes();
 	bool											drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
 	bool											drawWaterfalls();
 	bool											drawShadowMap();

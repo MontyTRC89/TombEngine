@@ -1974,6 +1974,7 @@ bool Renderer11::drawScene(bool dump)
 	drawEffects(false);
 	drawGunFlashes();
 	drawGunShells();
+	drawBaddieGunflashes();
 	drawDebris(false);
 	drawBats();
 	drawRats();

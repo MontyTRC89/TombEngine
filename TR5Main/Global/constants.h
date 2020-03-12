@@ -132,7 +132,7 @@ constexpr auto MAX_SPLASH = 8;
 
 #define NUM_BATS	64
 #define NUM_SPIDERS	64
-#define NUM_RATS	128
+#define NUM_RATS	32
 
 #define NUM_DEBRIS 256
 
