@@ -10,6 +10,22 @@ BITE_INFO SwatGun = { 80, 200, 13, 0 };
 BITE_INFO SniperGun = { 0, 480, 110, 13 };
 BITE_INFO ArmedBaddy2Gun = { -50, 220, 60, 13 };
 
+#define STATE_GUARD_STOP				1
+#define STATE_GUARD_TURN180				2
+#define STATE_GUARD_SHOOT_SINGLE		3
+#define STATE_GUARD_AIM					4
+#define STATE_GUARD_WALK				5
+#define STATE_GUARD_RUN					7
+#define STATE_GUARD_DEATH1				6
+#define STATE_GUARD_DEATH2				8
+#define STATE_GUARD_START_JUMP			26
+#define STATE_GUARD_SHOOT_FAST			35
+
+#define ANIMATION_GUARD_DEATH1			11
+#define ANIMATION_GUARD_DEATH2			16
+#define ANIMATION_GUARD_START_JUMP		41
+
+
 void InitialiseGuard(short itemNum)
 {
     ITEM_INFO* item, *item2;
@@ -27,7 +43,7 @@ void InitialiseGuard(short itemNum)
         case 0:
         case 10:
             item->animNumber = anim;
-            item->goalAnimState = 1;
+            item->goalAnimState = STATE_GUARD_STOP;
             break;
         case 1:
             item->goalAnimState = 11;
@@ -93,7 +109,7 @@ void InitialiseGuard(short itemNum)
             item->animNumber = anim + 46;
             break;
         case 11:
-            item->goalAnimState = 7;
+            item->goalAnimState = STATE_GUARD_RUN;
             item->animNumber = anim + 12;
             break;
         default:
@@ -109,8 +125,8 @@ void InitialiseGuardM16(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+    item->goalAnimState = STATE_GUARD_STOP;
+    item->currentAnimState = STATE_GUARD_STOP;
     item->pos.yPos += STEP_SIZE*2;
     item->pos.xPos += SIN(item->pos.yRot);
     item->pos.zPos += COS(item->pos.yRot);
@@ -124,8 +140,8 @@ void InitialiseGuardLaser(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex + 6;
     item->frameNumber = Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+    item->goalAnimState = STATE_GUARD_STOP;
+    item->currentAnimState = STATE_GUARD_STOP;
 }
 
 void ControlGuard(short itemNum)
@@ -230,18 +246,18 @@ void ControlGuard(short itemNum)
 	
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 8 && item->currentAnimState != 6)
+		if (item->currentAnimState != STATE_GUARD_DEATH1 && item->currentAnimState != STATE_GUARD_DEATH2)
 		{
 			if (laraInfo.angle >= 12288 || laraInfo.angle <= -12288)
 			{
-				item->currentAnimState = 8;
-				item->animNumber = animIndex + 16;;
+				item->currentAnimState = STATE_GUARD_DEATH2;
+				item->animNumber = animIndex + ANIMATION_GUARD_DEATH2;
 				item->pos.yRot += laraInfo.angle + -ANGLE(180);
 			}
 			else
 			{
-				item->currentAnimState = 6;
-				item->animNumber = animIndex + 11;
+				item->currentAnimState = STATE_GUARD_DEATH1;
+				item->animNumber = animIndex + ANIMATION_GUARD_DEATH1;
 				item->pos.yRot += laraInfo.angle;
 			}
 			item->frameNumber = Anims[item->animNumber].frameBase;
@@ -282,8 +298,8 @@ void ControlGuard(short itemNum)
 				creature->mood = ESCAPE_MOOD;
 				if (item->hitPoints <= 0)
 				{
-					item->currentAnimState = 8;
-					item->animNumber = animIndex + 16;
+					item->currentAnimState = STATE_GUARD_DEATH2;
+					item->animNumber = animIndex + ANIMATION_GUARD_DEATH2;
 					item->frameNumber = Anims[item->animNumber].frameBase;
 				}
 			}
@@ -330,7 +346,7 @@ void ControlGuard(short itemNum)
 
 		switch (item->currentAnimState)
 		{
-		case 1:
+		case STATE_GUARD_STOP:
 			creature->LOT.isJumping = false;
 			joint2 = laraInfo.angle;
 			creature->flags = 0;
@@ -368,25 +384,25 @@ void ControlGuard(short itemNum)
 			}
 			else if (creature->enemy == LaraItem && (laraInfo.angle > 20480 || laraInfo.angle < -20480) && item->objectNumber != ID_SCIENTIST)
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_GUARD_TURN180;
 			}
 			else if (item->aiBits & PATROL1)
 			{
-				item->goalAnimState = 5;
+				item->goalAnimState = STATE_GUARD_WALK;
 			}
 			else if (item->aiBits & AMBUSH)
 			{
-				item->goalAnimState = 7;
+				item->goalAnimState = STATE_GUARD_RUN;
 			}
 			else if (Targetable(item, &info) && item->objectNumber != ID_SCIENTIST)
 			{
 				if (info.distance >= 0x1000000 && info.zoneNumber == info.enemyZone)
 				{
 					if (!(item->aiBits & MODIFY))
-						item->goalAnimState = 5;
+						item->goalAnimState = STATE_GUARD_WALK;
 				}
 				else
-					item->goalAnimState = 4;
+					item->goalAnimState = STATE_GUARD_AIM;
 			}
 			else if (canJump1block || canJump2blocks)
 			{
@@ -408,21 +424,21 @@ void ControlGuard(short itemNum)
 			{
 				if (info.distance < 0x900000 || item->aiBits & FOLLOW)
 				{
-					item->goalAnimState = 5;
+					item->goalAnimState = STATE_GUARD_WALK;
 				}
 				else
-					item->goalAnimState = 7;
+					item->goalAnimState = STATE_GUARD_RUN;
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			}
 
 			if (item->triggerFlags == 11)
 				item->triggerFlags = 0;
 			break;
 
-		case 2:
+		case STATE_GUARD_TURN180:
 			creature->flags = 0;
 			if (info.angle >= 0)
 				item->pos.yRot -= ANGLE(2);
@@ -432,8 +448,8 @@ void ControlGuard(short itemNum)
 				item->pos.yRot += -ANGLE(180);
 			break;
 
-		case 3:
-		case 35:
+		case STATE_GUARD_SHOOT_SINGLE:
+		case STATE_GUARD_SHOOT_FAST:
 			joint0 = laraInfo.angle >> 1;
 			joint2 = laraInfo.angle >> 1;
 			if (info.ahead)
@@ -450,7 +466,7 @@ void ControlGuard(short itemNum)
 				item->pos.yRot += info.angle;
 			}
 
-			if (item->currentAnimState == 35)
+			if (item->currentAnimState == STATE_GUARD_SHOOT_FAST)
 			{
 				if (creature->flags)
 				{
@@ -464,14 +480,14 @@ void ControlGuard(short itemNum)
 			{
 				creature->flags = 1;
 				item->firedWeapon = 2;
-				if (item->currentAnimState == 3)
+				if (item->currentAnimState == STATE_GUARD_SHOOT_SINGLE)
 					ShotLara(item, &info, &SwatGun, joint0, 30);
 				else
 					ShotLara(item, &info, &SwatGun, joint0, 10);
 			}
 			break;
 
-		case 4:
+		case STATE_GUARD_AIM:
 			creature->flags = 0;
 			joint0 = laraInfo.angle >> 1;
 			joint2 = laraInfo.angle >> 1;
@@ -490,14 +506,14 @@ void ControlGuard(short itemNum)
 			}
 
 			if (!Targetable(item, &info))
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			else if (item->objectNumber == ID_BLUE_GUARD || item->objectNumber == ID_CRANE_GUY)
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_GUARD_SHOOT_SINGLE;
 			else
-				item->goalAnimState = 35;
+				item->goalAnimState = STATE_GUARD_SHOOT_FAST;
 			break;
 
-		case 5:
+		case STATE_GUARD_WALK:
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(5);
 			if (!Targetable(item, &info)
@@ -524,31 +540,31 @@ void ControlGuard(short itemNum)
 						if (info.distance > 0x900000)
 						{
 							if (!(item->inDrawRoom))
-								item->goalAnimState = 7;
+								item->goalAnimState = STATE_GUARD_RUN;
 						}
 					}
 					else
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_GUARD_STOP;
 					}
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_GUARD_STOP;
 				}
 			}
 			else
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_GUARD_AIM;
 			}
 			break;
 
-		case 7:
+		case STATE_GUARD_RUN:
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(10);
 			if (Targetable(item, &info) && (info.distance < 0x1000000 || info.enemyZone == info.zoneNumber) && item->objectNumber != ID_SCIENTIST)
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_GUARD_AIM;
 			}
 			else if (canJump1block || canJump2blocks)
 			{
@@ -564,11 +580,11 @@ void ControlGuard(short itemNum)
 			}
 			else if (los)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			}
 			else if (info.distance < 0x900000)
 			{
-				item->goalAnimState = 5;
+				item->goalAnimState = STATE_GUARD_WALK;
 			}
 			if (item->triggerFlags == 11)
 			{
@@ -583,7 +599,7 @@ void ControlGuard(short itemNum)
 			if (item->pos.yPos <= item->floor - 2048 || item->triggerFlags != 5)
 			{
 				if (item->pos.yPos >= item->floor - 512)
-					item->goalAnimState = 4;
+					item->goalAnimState = STATE_GUARD_AIM;
 			}
 			else
 			{
@@ -671,7 +687,7 @@ void ControlGuard(short itemNum)
 		case 19:
 			joint2 = AIGuard(creature);
 			if (creature->alerted)
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			break;
 
 		case 30:
@@ -685,7 +701,7 @@ void ControlGuard(short itemNum)
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(5);
 			if (canJump1block || canJump2blocks || info.distance < 0x100000 || !los || item->hitStatus)
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			break;
 
 		case 36:
@@ -744,7 +760,7 @@ void ControlGuard(short itemNum)
 					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 					GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					TestTriggers(TriggerIndex, 1, 0);
-					item->requiredAnimState = 5;
+					item->requiredAnimState = STATE_GUARD_WALK;
 					item->swapMeshFlags = 0;
 				}
 			}
@@ -769,7 +785,7 @@ void ControlGuard(short itemNum)
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			}
 			break;
 
@@ -778,7 +794,7 @@ void ControlGuard(short itemNum)
 			{
 				if (item->triggerFlags == 7 || item->triggerFlags == 9)
 					item->requiredAnimState = 38;
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			}
 
 			if (item->frameNumber == Anims[item->animNumber].frameBase + 39)
@@ -808,7 +824,7 @@ void ControlGuard(short itemNum)
 		{
 			if (enemy->flags & 0x10)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 				item->requiredAnimState = 38;
 				item->triggerFlags = 300;
 				item->aiBits = GUARD | PATROL1;
@@ -817,7 +833,7 @@ void ControlGuard(short itemNum)
 			{
 				if (enemy->flags & 0x20)
 				{
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_GUARD_STOP;
 					item->requiredAnimState = 36;
 					item->aiBits = PATROL1 | MODIFY;
 				}
@@ -827,12 +843,12 @@ void ControlGuard(short itemNum)
 					floor = GetFloor(creature->enemy->pos.xPos, creature->enemy->pos.yPos, creature->enemy->pos.zPos, &roomNumber);
 					GetFloorHeight(floor, creature->enemy->pos.xPos, creature->enemy->pos.yPos, creature->enemy->pos.zPos);
 					TestTriggers(TriggerIndex, 1, 0);
-					item->requiredAnimState = 5;
+					item->requiredAnimState = STATE_GUARD_WALK;
 					if (creature->enemy->flags & 2)
 						item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
 					if (creature->enemy->flags & 8)
 					{
-						item->requiredAnimState = 1;
+						item->requiredAnimState = STATE_GUARD_STOP;
 						item->triggerFlags = 300;
 						item->aiBits |= GUARD | PATROL1;
 					}
@@ -841,7 +857,7 @@ void ControlGuard(short itemNum)
 		}
 		else
 		{
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_GUARD_STOP;
 			item->requiredAnimState = 37;
 		}
 	}
@@ -961,7 +977,7 @@ void ControlGuardM16(short itemNumber)
 			case 1:
 				item->meshBits = 0;
 				if (TargetVisible(item, &info))
-					item->goalAnimState = 2;
+					item->goalAnimState = STATE_GUARD_TURN180;
 				break;
 
 			case 2:
@@ -974,11 +990,11 @@ void ControlGuardM16(short itemNumber)
 					|| item->hitStatus
 					&& GetRandomControl() & 1)
 				{
-					item->goalAnimState = 5;
+					item->goalAnimState = STATE_GUARD_WALK;
 				}
 				else if (!(GetRandomControl() & 0x1F))
 				{
-					item->goalAnimState = 4;
+					item->goalAnimState = STATE_GUARD_AIM;
 				}
 				break;
 
@@ -1023,8 +1039,8 @@ void InitialiseArmedBaddy2(short itemNum)
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->goalAnimState = STATE_GUARD_STOP;
+	item->currentAnimState = STATE_GUARD_STOP;
 	item->swapMeshFlags = 9216;
 }
 
@@ -1177,7 +1193,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			else if (item->swapMeshFlags == 9216)
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_GUARD_TURN180;
 				break;
 			}
 
@@ -1185,18 +1201,18 @@ void ArmedBaddy2Control(short itemNum)
 			{
 				if (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone)
 				{
-					item->goalAnimState = 4;
+					item->goalAnimState = STATE_GUARD_AIM;
 				}
 				else if (!(item->aiBits & MODIFY))
 				{
-					item->goalAnimState = 5;
+					item->goalAnimState = STATE_GUARD_WALK;
 				}
 			}
 			else
 			{
 				if (item->aiBits & PATROL1)
 				{
-					item->goalAnimState = 5;
+					item->goalAnimState = STATE_GUARD_WALK;
 				}
 				else
 				{
@@ -1217,11 +1233,11 @@ void ArmedBaddy2Control(short itemNum)
 					{
 						if (info.distance >= SQUARE(3072))
 							goto LABEL_82;
-						item->goalAnimState = 5;
+						item->goalAnimState = STATE_GUARD_WALK;
 					}
 					else
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_GUARD_STOP;
 					}
 				}
 			}
@@ -1292,7 +1308,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = 3;
+				item->goalAnimState = STATE_GUARD_SHOOT_SINGLE;
 			}
 			else if (laraInfo.angle > 20480 || laraInfo.angle < -20480)
 			{
@@ -1300,7 +1316,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_GUARD_STOP;
 			}
 			break;
 
@@ -1309,7 +1325,7 @@ void ArmedBaddy2Control(short itemNum)
 			creature->maximumTurn = ANGLE(5);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_GUARD_AIM;
 			}
 			else
 			{
@@ -1331,11 +1347,11 @@ void ArmedBaddy2Control(short itemNum)
 				{
 					if (info.distance > SQUARE(3072))
 						LABEL_82:
-					item->goalAnimState = 7;
+					item->goalAnimState = STATE_GUARD_RUN;
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_GUARD_STOP;
 				}
 			}
 			break;
@@ -1345,7 +1361,7 @@ void ArmedBaddy2Control(short itemNum)
 			creature->maximumTurn = ANGLE(10);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_GUARD_AIM;
 			}
 			else if (canJump1sector || canJump2sectors)
 			{
@@ -1361,7 +1377,7 @@ void ArmedBaddy2Control(short itemNum)
 			}
 			else if (info.distance < SQUARE(3072))
 			{
-				item->goalAnimState = 5;
+				item->goalAnimState = STATE_GUARD_WALK;
 			}
 			break;
 

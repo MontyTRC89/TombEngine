@@ -1304,6 +1304,7 @@ void BaddyObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
