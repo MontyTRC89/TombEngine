@@ -76,8 +76,8 @@ void BatControl(short itemNum)
 		CreatureAIInfo(item, &info);
 
 		GetCreatureMood(item, &info, TIMID);
-		if (item->flags)
-			creature->mood = ESCAPE_MOOD;
+		//if (item->flags)
+		//	creature->mood = ESCAPE_MOOD;
 		CreatureMood(item, &info, TIMID);
 
 		angle = CreatureTurn(item, ANGLE(20));
