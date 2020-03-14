@@ -109,6 +109,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_FLYER;
 	}
 
 	obj = &Objects[ID_CHAIN];
