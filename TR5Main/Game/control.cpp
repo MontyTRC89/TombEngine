@@ -2132,7 +2132,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							}
 							else
 							{
-								if (item->objectNumber != ID_TWOGUN)
+								if (item->objectNumber != ID_GUARD_LASER)
 								{
 									item->hitPoints -= 30;
 									if (item->hitPoints < 0)

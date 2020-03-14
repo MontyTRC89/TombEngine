@@ -25,7 +25,6 @@ BITE_INFO ArmedBaddy2Gun = { -50, 220, 60, 13 };
 #define ANIMATION_GUARD_DEATH2			16
 #define ANIMATION_GUARD_START_JUMP		41
 
-
 void InitialiseGuard(short itemNum)
 {
     ITEM_INFO* item, *item2;
@@ -36,7 +35,7 @@ void InitialiseGuard(short itemNum)
     ClearItem(itemNum);
     anim = Objects[ID_SWAT].animIndex;
     if (!Objects[ID_SWAT].loaded)
-        anim = Objects[ID_BLUE_GUARD].animIndex;
+        anim = Objects[ID_GUARD1].animIndex;
 
     switch (item->triggerFlags)
     {
@@ -153,7 +152,7 @@ void ControlGuard(short itemNum)
 	if (Objects[ID_SWAT].loaded)
 		animIndex= Objects[ID_SWAT].animIndex;
 	else
-		animIndex = Objects[ID_BLUE_GUARD].animIndex;
+		animIndex = Objects[ID_GUARD1].animIndex;
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
@@ -507,7 +506,7 @@ void ControlGuard(short itemNum)
 
 			if (!Targetable(item, &info))
 				item->goalAnimState = STATE_GUARD_STOP;
-			else if (item->objectNumber == ID_BLUE_GUARD || item->objectNumber == ID_CRANE_GUY)
+			else if (item->objectNumber == ID_GUARD1 || item->objectNumber == ID_GUARD2)
 				item->goalAnimState = STATE_GUARD_SHOOT_SINGLE;
 			else
 				item->goalAnimState = STATE_GUARD_SHOOT_FAST;

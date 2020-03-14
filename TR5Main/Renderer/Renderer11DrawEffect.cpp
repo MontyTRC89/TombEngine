@@ -488,7 +488,7 @@ bool Renderer11::drawBaddieGunflashes()
 
 		// Does the item need gunflash?
 		OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
-		if (obj->biteOffset == 0xFFFF || !item->Item->firedWeapon)
+		if (obj->biteOffset == -1 || !item->Item->firedWeapon)
 			continue;
 
 		RendererRoom& const room = m_rooms[item->Item->roomNumber];
