@@ -87,7 +87,7 @@ short ThrowKnife(int x, int y, int z, short speed, short yrot, short room_number
 		fx->pos.yRot = yrot;
 		fx->speed = 150;
 		fx->frameNumber = 0;
-		fx->objectNumber = ID_BLUE_GUARD; // TODO: change the ID to ID_KNIFETHOWER_KNIFE
+		fx->objectNumber = ID_GUARD1; // TODO: change the ID to ID_KNIFETHOWER_KNIFE
 		fx->shade = 14 * 256;
 		ShootAtLara(fx);
 	}

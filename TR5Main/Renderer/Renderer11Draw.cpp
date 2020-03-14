@@ -2170,6 +2170,7 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	}
 	RendererRoom& const room = m_rooms[item->Item->roomNumber];
 	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
 
 	m_stItem.World = item->World.Transpose();
 	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
@@ -2190,7 +2191,16 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 
 	for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 	{
-		RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+		RendererMesh* mesh;
+		if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1))
+		{
+			RendererObject* swapMeshObj = m_moveableObjects[obj->meshSwapSlot];
+			mesh = swapMeshObj->ObjectMeshes[k];
+		}
+		else
+		{
+			mesh = moveableObj->ObjectMeshes[k];
+		}
 
 		for (int j = firstBucket; j < lastBucket; j++)
 		{

@@ -280,7 +280,7 @@ void TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short room_nu
 		fx->pos.yPos = pos.y;
 		fx->pos.zPos = pos.z;
 		fx->pos.yRot = angle;
-		fx->objectNumber = ID_BLUE_GUARD; // TONYFIREBALL
+		fx->objectNumber = ID_GUARD1; // TONYFIREBALL
 		fx->speed = speed;
 		fx->fallspeed = fallspeed;
 		fx->flag1 = type;
