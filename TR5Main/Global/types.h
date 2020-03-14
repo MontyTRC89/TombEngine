@@ -501,8 +501,7 @@ typedef struct object_info_t {
 	unsigned short unknown : 2; // offset=51.6
 	void(*drawRoutineExtra)(ITEM_INFO* item); // size=0, offset=52
 	unsigned int explodableMeshbits; // size=0, offset=56
-	unsigned int padfuck; // size=0, offset=60
-	short meshSwapSlot;
+	int meshSwapSlot;
 } OBJECT_INFO;
 
 typedef struct tr5_room_layer_t   // 56 bytes

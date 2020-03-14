@@ -1211,12 +1211,13 @@ void BaddyObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		//Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
+		//Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
 	}
 
 	obj = &Objects[ID_GUARD1];
@@ -1273,12 +1274,13 @@ void BaddyObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		//Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
+		//Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
 	}
 
 	obj = &Objects[ID_MAFIA];
@@ -1337,12 +1339,13 @@ void BaddyObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
 		Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
 		Bones[Objects[69].boneIndex + 13 * 4] |= ROT_Y;
 		Bones[Objects[69].boneIndex + 13 * 4] |= ROT_X;
-		Meshes[Objects[69].meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		Meshes[Objects[69].meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		//Meshes[Objects[69].meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
+		//Meshes[Objects[69].meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
 	}
 
 	obj = &Objects[ID_GUARD2];
