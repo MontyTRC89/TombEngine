@@ -159,7 +159,7 @@ short AIGuard(CREATURE_INFO* creature)
 	if (creature->headRight)
 		return 0;
 
-	return -0x4000;
+	return -ANGLE(90);
 }
 
 void AlertNearbyGuards(ITEM_INFO* item) 
@@ -287,7 +287,7 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 	int waterLevel;
 	if (depth < 0)
 	{
-		waterLevel = -depth;
+		waterLevel = abs(depth);
 		depth = 0;
 	}
 	else
@@ -295,23 +295,25 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 		waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	}
 
-	if (item->pos.yPos < depth)
+	waterLevel += depth;
+
+	if (item->pos.yPos < waterLevel)
 	{
 		FLOOR_INFO* floor;
 		short roomNumber;
-		int floorHeight;
+		int height;
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		floorHeight = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		if (floorHeight < depth)
+		if (waterLevel > height)
 		{
-			item->pos.yPos = floorHeight;
+			item->pos.yPos = height;
 		}
 		else
 		{
-			item->pos.yPos = depth;
+			item->pos.yPos = waterLevel;
 		}
 
 		if (item->pos.xRot > ANGLE(2))
@@ -356,14 +358,14 @@ void CreatureFloat(short itemNumber)
 
 	if (item->pos.yPos <= waterLevel)
 	{
-		if (item->frameNumber == GF2(item->objectNumber, item->animNumber, 0))
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
 		{
 			item->pos.yPos = waterLevel;
 			item->collidable = false;
 			item->status = ITEM_DEACTIVATED;
 			DisableBaddieAI(itemNumber);
 			RemoveActiveItem(itemNumber);
-			item->afterDeath = true;
+			item->afterDeath = 1;
 		}
 	}
 }
@@ -398,15 +400,13 @@ void CreatureTilt(ITEM_INFO* item, short angle)
 	else if (angle > ANGLE(3))
 		angle = ANGLE(3);
 
-	item->pos.zRot += angle;
-
-	/*
 	short theAngle = -ANGLE(3);
 
 	short absRot = abs(item->pos.zRot);
 	if (absRot < ANGLE(15) || absRot > ANGLE(30))
 		angle >>= 1;
-	*/
+	
+	item->pos.zRot += angle;
 }
 
 short CreatureTurn(ITEM_INFO* item, short maximumTurn)
@@ -893,25 +893,25 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 
 	floor = GetFloor(x, y, z, &roomNumber);
 	if (floor->box == NO_BOX)
-		return TRUE;
+		return true;
 
 	if (LOT->isJumping)
-		return FALSE;
+		return false;
 
 	if (Boxes[floor->box].overlapIndex & LOT->blockMask)
-		return TRUE;
+		return true;
 
 	height = Boxes[floor->box].height;
 	if (boxHeight - height > LOT->step || boxHeight - height < LOT->drop)
-		return TRUE;
+		return true;
 
 	if (boxHeight - height < -LOT->step && height > nextHeight)
-		return TRUE;
+		return true;
 
 	if ((LOT->fly != NO_FLYING) && y > height + LOT->fly)
-		return TRUE;
+		return true;
 
-	return FALSE;
+	return false;
 }
 
 int CreatureCreature(short itemNumber)  
@@ -963,17 +963,17 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	creature = (CREATURE_INFO*)item->data;
 	zone = Zones[creature->LOT.zone][FlipStatus];
 	if (creature->LOT.fly == NO_FLYING && zone[boxNumber] != zoneNumber)
-		return FALSE;
+		return false;
 
 	box = &Boxes[boxNumber];
 	if (box->overlapIndex & creature->LOT.blockMask)
-		return FALSE;
+		return false;
 
 	if ((item->pos.zPos > (box->left << WALL_SHIFT)) && item->pos.zPos < ((box->right  << WALL_SHIFT)) &&
 		(item->pos.xPos > (box->top  << WALL_SHIFT)) && item->pos.xPos < ((box->bottom << WALL_SHIFT)))
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
@@ -985,15 +985,15 @@ int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber)
 	z = (int(box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
 	
 	if (x > -ESCAPE_DIST && x < ESCAPE_DIST && z > -ESCAPE_DIST && z < ESCAPE_DIST)
-		return FALSE;
+		return false;
 
 	if (((x > 0) ^ (item->pos.xPos > enemy->pos.xPos)) && ((z > 0) ^ (item->pos.zPos > enemy->pos.zPos)))
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
-void TargetBox(LOT_INFO* LOT, short boxNumber) 
+void TargetBox(LOT_INFO* LOT, short boxNumber)
 {
 	BOX_INFO* box;
 
@@ -1002,7 +1002,7 @@ void TargetBox(LOT_INFO* LOT, short boxNumber)
 
 	//LOT->target.x = (((((box->bottom - box->top) - 1) * GetRandomControl()) / 32) + (box->top * 1024)) + 512;
 	//LOT->target.z = (((((box->right - box->left) - 1) * GetRandomControl()) / 32) + (box->left * 1024)) + 512;
-	LOT->target.x = ((box->top << WALL_SHIFT) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + WALL_SIZE/2;
+	LOT->target.x = ((box->top << WALL_SHIFT) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + WALL_SIZE / 2;
 	LOT->target.z = ((box->left << WALL_SHIFT) + GetRandomControl() * ((box->right - box->left) - 1) >> 5) + WALL_SIZE / 2;
 	LOT->requiredBox = boxNumber;
 
@@ -1048,6 +1048,9 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 	zone = Zones[LOT->zone][FlipStatus];
 	searchZone = zone[LOT->head];
 
+	if (depth <= 0)
+		return 1;
+
 	for (int i = 0; i < depth; i++)
 	{
 		if (LOT->head == NO_BOX)
@@ -1060,7 +1063,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 		box = &Boxes[LOT->head];
 
 		index = box->overlapIndex & OVERLAP_INDEX;
-		done = FALSE;
+		done = false;
 		do
 		{
 			boxNumber = Overlaps[index++];
@@ -1477,17 +1480,11 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	r = &Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & BOX_NUMBER;
-	if (creature->LOT.fly == NO_FLYING)
-		info->zoneNumber = zone[item->boxNumber];
-	else
-		info->zoneNumber = FLY_ZONE;
+	info->zoneNumber = zone[item->boxNumber];
 	
 	r = &Rooms[enemy->roomNumber];
 	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box & BOX_NUMBER;
-	if (creature->LOT.fly == NO_FLYING)
-		info->enemyZone = zone[enemy->boxNumber];
-	else
-		info->enemyZone = FLY_ZONE;
+	info->enemyZone = zone[enemy->boxNumber];
 		
 	if (!obj->nonLot)
 	{
