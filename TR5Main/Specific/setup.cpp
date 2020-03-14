@@ -1616,30 +1616,13 @@ void BaddyObjects()
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->undead = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
+
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
-
-		/*
-		v44 = 20;(short)
-		v24 = 0;(short)
-		v41 = 0;(short)
-		do
-		{
-			(&meshes[v24 + 1])[Objects[ID_HITMAN].mesh_index] = meshes[v24 + Objects[ID_MESHSWAP1].mesh_index];
-			v24 = v41 + 2;
-			v25 = v44 == 1;
-			v41 += 2;
-			--v44;
-		} while (!v25);
-		*/
-
-		for (int i = (obj->nmeshes - 1); i > 0; i--)
-		{
-			Meshes[obj->meshIndex + i * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + i * 2];
-		}
 	}
 
 	obj = &Objects[ID_SNIPER];
