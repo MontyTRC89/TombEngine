@@ -180,15 +180,16 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
 
 		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 88 * 4] |= ROT_X;
 
-		Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 16 * 2];
-		Meshes[obj->meshIndex + 30 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 28 * 2];
-		Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 11 * 2];
+		/*Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 16 * 2];
+		Meshes[obj->meshIndex + 30 * 2] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 28 * 2];
+		Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 11 * 2];*/
 	}
 
 	obj = &Objects[ID_BADDY2];
@@ -206,6 +207,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
 
 		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
@@ -1217,7 +1219,7 @@ void BaddyObjects()
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
 	}
 
-	obj = &Objects[ID_BLUE_GUARD];
+	obj = &Objects[ID_GUARD1];
 	if (obj->loaded)
 	{
 		if (Objects[ID_SWAT].loaded) // object required
@@ -1252,7 +1254,7 @@ void BaddyObjects()
 	{
 		short animIndex;
 		if (!Objects[ID_SWAT].loaded)
-			animIndex = Objects[ID_BLUE_GUARD].animIndex;
+			animIndex = Objects[ID_GUARD1].animIndex;
 		else
 			animIndex = Objects[ID_SWAT].animIndex;
 		obj->animIndex = animIndex;
@@ -1284,7 +1286,7 @@ void BaddyObjects()
 	{
 		short animIndex;
 		if (!Objects[ID_SWAT].loaded)
-			animIndex = Objects[ID_BLUE_GUARD].animIndex;
+			animIndex = Objects[ID_GUARD1].animIndex;
 		else
 			animIndex = Objects[ID_SWAT].animIndex;
 		obj->animIndex = animIndex;
@@ -1318,7 +1320,7 @@ void BaddyObjects()
 	{
 		short animIndex;
 		if (!Objects[ID_SWAT].loaded)
-			animIndex = Objects[ID_BLUE_GUARD].animIndex;
+			animIndex = Objects[ID_GUARD1].animIndex;
 		else
 			animIndex = Objects[ID_SWAT].animIndex;
 		obj->animIndex = animIndex;
@@ -1343,12 +1345,12 @@ void BaddyObjects()
 		Meshes[Objects[69].meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
 	}
 
-	obj = &Objects[ID_CRANE_GUY];
+	obj = &Objects[ID_GUARD2];
 	if (obj->loaded)
 	{
 		short animIndex;
 		if (!Objects[ID_SWAT].loaded)
-			animIndex = Objects[ID_BLUE_GUARD].animIndex;
+			animIndex = Objects[ID_GUARD1].animIndex;
 		else
 			animIndex = Objects[ID_SWAT].animIndex;
 		obj->animIndex = animIndex;
@@ -1368,6 +1370,7 @@ void BaddyObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -1376,22 +1379,25 @@ void BaddyObjects()
 		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[405].meshIndex + 13 * 2];
 	}
 
-	obj = &Objects[ID_SAILOR];
+	obj = &Objects[ID_GUARD3];
 	if (obj->loaded)
 	{
 		short animIndex;
 		if (!Objects[ID_SWAT].loaded)
-			animIndex = Objects[ID_BLUE_GUARD].animIndex;
+			animIndex = Objects[ID_GUARD1].animIndex;
 		else
 			animIndex = Objects[ID_SWAT].animIndex;
 		obj->animIndex = animIndex;
+		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
-		obj->collision = CreatureCollision;
 		obj->control = ControlGuard;
+		obj->collision = CreatureCollision;
+		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
 		obj->radius = 102;
+		obj->explodableMeshbits = 0x4000;
 		obj->intelligent = true;
 		obj->savePosition = true;
 		obj->saveFlags = true;
@@ -1403,6 +1409,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[405].meshIndex + 10 * 2];
+		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[405].meshIndex + 13 * 2];
 	}
 
 	obj = &Objects[ID_ATTACK_SUB];
@@ -1526,13 +1534,16 @@ void BaddyObjects()
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
+		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
+
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 7 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 7 * 2];
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 13 * 2];
+
+		/*Meshes[obj->meshIndex + 7 * 2] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 7 * 2];
+		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 10 * 2];
+		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 13 * 2];*/
 	}
 
 	obj = &Objects[ID_PIERRE];
@@ -1653,7 +1664,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_TWOGUN];
+	obj = &Objects[ID_GUARD_LASER];
 	if (obj->loaded)
 	{
 		obj->biteOffset = 0;
@@ -1720,11 +1731,14 @@ void BaddyObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->meshSwapSlot = ID_MESHSWAP_IMP;
+
 		Bones[obj->meshIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->meshIndex + 4 * 4] |= ROT_X;
 		Bones[obj->meshIndex + 9 * 4] |= ROT_Z;
 		Bones[obj->meshIndex + 9 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
+
+		//Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP_IMP].meshIndex + 10 * 2];
 	}
 
 	obj = &Objects[ID_WILLOWISP];
@@ -1911,16 +1925,18 @@ void BaddyObjects()
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_SMOKE;
+		obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD;
+
 		Bones[obj->boneIndex + 24] |= ROT_Y;
 		Bones[obj->boneIndex + 24] |= ROT_X;
 		Bones[obj->boneIndex + 52] |= ROT_Y;
 		Bones[obj->boneIndex + 52] |= ROT_X;
 
-		for (int i = (obj->nmeshes - 1); i > 0; i--)
+		/*for (int i = (obj->nmeshes - 1); i > 0; i--)
 		{
-			Meshes[obj->meshIndex + i * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + i * 2];
+			Meshes[obj->meshIndex + i * 2] = Meshes[Objects[ID_MESHSWAP_ROMAN_GOD].meshIndex + i * 2];
 		}
-		/*
+		
 		do
 		{
 			(&meshes[v38 + 1])[Objects[61].mesh_index] = meshes[v38 + Objects[405].mesh_index];
@@ -3768,7 +3784,8 @@ void InitialiseObjects()
 		obj->semiTransparent = false;
 		obj->undead = false;
 		obj->zoneType = ZONE_NULL;
-		obj->biteOffset = 0xFFFF;
+		obj->biteOffset = -1;
+		obj->meshSwapSlot = -1;
 		obj->frameBase += (short)Frames;
 	}
 

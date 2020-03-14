@@ -20,7 +20,7 @@ void InitialiseGuard(short itemNum)
 	
 	short animIndex = Objects[ID_SWAT].animIndex;
 	if (!Objects[ID_SWAT].loaded)
-		animIndex = Objects[ID_BLUE_GUARD].animIndex;
+		animIndex = Objects[ID_GUARD1].animIndex;
 
 	switch (item->triggerFlags)
 	{
