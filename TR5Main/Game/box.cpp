@@ -795,8 +795,9 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else if (LOT->isJumping)
 	{
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		
+		int height2 = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		item->floor = height2;
+
 		if (LOT->isMonkeying)
 		{
 			ceiling = GetCeiling(floor, item->pos.xPos, y, item->pos.zPos);
@@ -804,15 +805,18 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		}
 		else
 		{
-			if (item->pos.yPos > height + STEP_SIZE)
+			if (item->pos.yPos > item->floor)
 			{
-				item->pos.xPos = old.x;
-				item->pos.yPos = old.y;
-				item->pos.zPos = old.z;
-			}
-			else
-			{
-				item->pos.yPos = height;
+				if (item->pos.yPos > item->floor + STEP_SIZE)
+				{
+					item->pos.xPos = old.x;
+					item->pos.yPos = old.y;
+					item->pos.zPos = old.z;
+				}
+				else
+				{
+					item->pos.yPos = item->floor;
+				}
 			}
 		}
 	} 
