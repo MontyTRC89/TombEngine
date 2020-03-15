@@ -9,26 +9,34 @@
 #include "../../Game/lara.h"
 #include "../../Game/traps.h"
 
-#define STATE_CYBORG_STOP					1
+#define STATE_HITMAN_STOP					1
+#define STATE_HITMAN_WALK					2
+#define STATE_HITMAN_RUN					3
+#define STATE_HITMAN_START_END_MONKEY		4
+#define STATE_HITMAN_MONKEY					5
+#define STATE_HITMAN_JUMP					15
+#define STATE_HITMAN_JUMP_2BLOCKS			16
+#define STATE_HITMAN_AIM					38
+#define STATE_HITMAN_FIRE					39
+#define STATE_HITMAN_GASSED					42
+#define STATE_HITMAN_DEATH					43
 
-#define ANIMATION_CYBORG_STAY_IDLE			4
+BITE_INFO CyborgGun = { 0, 300, 64, 7 };
+byte CyborgJoints[12] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
-BITE_INFO CyborgGun = { 0x00, 0x12C, 0x40, 0x07 };
-byte CyborgJoints[12] = { 0x0F, 0x0E, 0x0D, 6, 5, 0x0C, 7, 4, 0x0A, 0x0B, 0x13 };
-
-void InitialiseCyborg(short itemNum)
+void InitialiseHitman(short itemNum)
 {
     ITEM_INFO* item;
 
     item = &Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_CYBORG_STAY_IDLE;
+    item->animNumber = Objects[item->objectNumber].animIndex + 4;
     item->frameNumber = Anims[item->animNumber].frameBase;
-    item->goalAnimState = STATE_CYBORG_STOP;
-    item->currentAnimState = STATE_CYBORG_STOP;
+    item->goalAnimState = STATE_HITMAN_STOP;
+    item->currentAnimState = STATE_HITMAN_STOP;
 }
 
-void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv)
+void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -44,15 +52,15 @@ void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv)
 		spark->on = 1;
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 5;
-		spark->dG = (rand() & 0x7F) + 64;
+		spark->dG = (rand() & 127) + 64;
 		spark->dB = -64 - spark->dG;
 		spark->life = 10;
 		spark->sLife = 10;
 		spark->transType = COLADD;
 		spark->friction = 34;
 		spark->scalar = 1;
-		spark->x = (rand() & 7) + x - 3;
 		spark->flags = SP_SCALE;
+		spark->x = (rand() & 7) + x - 3;
 		spark->y = ((rand() >> 3) & 7) + y - 3;
 		spark->z = ((rand() >> 6) & 7) + z - 3;
 		spark->xVel = (byte)(rand() >> 2) + xv - 128;
@@ -65,7 +73,7 @@ void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv)
 	}
 }
 
-void ControlCyborg(short itemNumber)
+void HitmanControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{
@@ -157,7 +165,7 @@ void ControlCyborg(short itemNumber)
 
 		byte random = (byte)GetRandomControl();
 		if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
-			random &= 0x1Fu;
+			random &= 31;
 		if (random < item->itemFlags[0])
 		{
 			PHD_VECTOR pos;
@@ -167,7 +175,7 @@ void ControlCyborg(short itemNumber)
 			GetJointAbsPosition(item, &pos, CyborgJoints[random]);
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 807411776);
-			TriggerCyborgSparks(pos.x, pos.y, pos.z, -1, -1, -1);
+			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
 			SoundEffect(SFX_HITMAN_ELEC_SHORT, &item->pos, 0);
@@ -188,7 +196,7 @@ void ControlCyborg(short itemNumber)
 					GetJointAbsPosition(item, &pos2, 6);
 					if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER && item->hitPoints > 0)
 					{
-						item->currentAnimState = 43;
+						item->currentAnimState = STATE_HITMAN_DEATH;
 						item->animNumber = obj->animIndex + 69;
 						item->hitPoints = 0;
 						item->frameNumber = Anims[item->animNumber].frameBase;
@@ -230,7 +238,7 @@ void ControlCyborg(short itemNumber)
 
 				if (item->hitPoints <= 0)
 				{
-					item->currentAnimState = 42;
+					item->currentAnimState = STATE_HITMAN_GASSED;
 					item->animNumber = obj->animIndex + 68;
 					item->frameNumber = Anims[item->animNumber].frameBase;
 				}
@@ -258,7 +266,7 @@ void ControlCyborg(short itemNumber)
 
 			switch (item->currentAnimState)
 			{
-			case 1:
+			case STATE_HITMAN_STOP:
 				creature->LOT.isJumping = false;
 				joint2 = laraInfo.angle;
 				creature->flags = 0;
@@ -293,18 +301,18 @@ void ControlCyborg(short itemNumber)
 					{
 						if (info.distance < SQUARE(4096) || info.zoneNumber != info.enemyZone)
 						{
-							item->goalAnimState = 38;
+							item->goalAnimState = STATE_HITMAN_AIM;
 						}
 						else if (item->aiBits != MODIFY)
 						{
-							item->goalAnimState = 2;
+							item->goalAnimState = STATE_HITMAN_WALK;
 						}
 					}
 					else
 					{
 						if (item->aiBits & PATROL1)
 						{
-							item->goalAnimState = 2;
+							item->goalAnimState = STATE_HITMAN_WALK;
 						}
 						else
 						{
@@ -312,10 +320,10 @@ void ControlCyborg(short itemNumber)
 							{
 								creature->maximumTurn = 0;
 								item->animNumber = obj->animIndex + 22;
-								item->currentAnimState = 15;
+								item->currentAnimState = STATE_HITMAN_JUMP;
 								item->frameNumber = Anims[item->animNumber].frameBase;
 								if (canJump2blocks)
-									item->goalAnimState = 16;
+									item->goalAnimState = STATE_HITMAN_JUMP_2BLOCKS;
 								creature->LOT.isJumping = true;
 							}
 							else if (!creature->monkeyAhead)
@@ -323,13 +331,13 @@ void ControlCyborg(short itemNumber)
 								if (creature->mood)
 								{
 									if (info.distance < SQUARE(3072) || item->aiBits & FOLLOW)
-										item->goalAnimState = 2;
+										item->goalAnimState = STATE_HITMAN_WALK;
 									else
-										item->goalAnimState = 3;
+										item->goalAnimState = STATE_HITMAN_RUN;
 								}
 								else
 								{
-									item->goalAnimState = 1;
+									item->goalAnimState = STATE_HITMAN_STOP;
 								}
 							}
 							else
@@ -337,23 +345,24 @@ void ControlCyborg(short itemNumber)
 								floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 								height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 								if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
-									goto LABEL_145;
-								item->goalAnimState = 2;
+									item->goalAnimState = STATE_HITMAN_START_END_MONKEY;
+								else
+									item->goalAnimState = STATE_HITMAN_WALK;
 							}
 						}
 					}
 				}
 				break;
 
-			case 2:
+			case STATE_HITMAN_WALK:
 				creature->LOT.isJumping = false;
 				creature->maximumTurn = ANGLE(5);
 				if (Targetable(item, &info)
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
 				{
-					item->goalAnimState = 1;
-					item->requiredAnimState = 38;
+					item->goalAnimState = STATE_HITMAN_STOP;
+					item->requiredAnimState = STATE_HITMAN_AIM;
 				}
 				else
 				{
@@ -361,10 +370,10 @@ void ControlCyborg(short itemNumber)
 					{
 						creature->maximumTurn = 0;
 						item->animNumber = obj->animIndex + 22;
-						item->currentAnimState = 15;
+						item->currentAnimState = STATE_HITMAN_JUMP;
 						item->frameNumber = Anims[item->animNumber].frameBase;
 						if (canJump2blocks)
-							item->goalAnimState = 16;
+							item->goalAnimState = STATE_HITMAN_JUMP_2BLOCKS;
 						creature->LOT.isJumping = true;
 					}
 					else if (!creature->monkeyAhead)
@@ -374,22 +383,22 @@ void ControlCyborg(short itemNumber)
 							if (info.distance > SQUARE(3072))
 							{
 								if (!item->aiBits)
-									item->goalAnimState = 3;
+									item->goalAnimState = STATE_HITMAN_RUN;
 							}
 						}
 						else
 						{
-							item->goalAnimState = 1;
+							item->goalAnimState = STATE_HITMAN_STOP;
 						}
 					}
 					else
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_HITMAN_STOP;
 					}
 				}
 				break;
 
-			case 3:
+			case STATE_HITMAN_RUN:
 				creature->LOT.isJumping = false;
 				creature->maximumTurn = ANGLE(10);
 
@@ -397,31 +406,31 @@ void ControlCyborg(short itemNumber)
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
 				{
-					item->goalAnimState = 1;
-					item->requiredAnimState = 38;
+					item->goalAnimState = STATE_HITMAN_STOP;
+					item->requiredAnimState = STATE_HITMAN_AIM;
 				}
 				else if (canJump1block || canJump2blocks)
 				{
 					creature->maximumTurn = 0;
 					item->animNumber = obj->animIndex + 22;
-					item->currentAnimState = 15;
+					item->currentAnimState = STATE_HITMAN_JUMP;
 					item->frameNumber = Anims[item->animNumber].frameBase;
 					if (canJump2blocks)
-						item->goalAnimState = 16;
+						item->goalAnimState = STATE_HITMAN_JUMP_2BLOCKS;
 					creature->LOT.isJumping = true;
 				}
 				else
 				{
 					if (creature->monkeyAhead)
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_HITMAN_STOP;
 					}
 					else if (info.distance < SQUARE(3072))
-						item->goalAnimState = 2;
+						item->goalAnimState = STATE_HITMAN_WALK;
 				}
 				break;
 
-			case 4:
+			case STATE_HITMAN_START_END_MONKEY:
 				creature->maximumTurn = 0;
 				
 				if (item->boxNumber == creature->LOT.targetBox 
@@ -430,15 +439,15 @@ void ControlCyborg(short itemNumber)
 					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 					height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_HITMAN_STOP;
 				}
 				else
 				{
-					item->goalAnimState = 5;
+					item->goalAnimState = STATE_HITMAN_MONKEY;
 				}
 				break;
 
-			case 5:
+			case STATE_HITMAN_MONKEY:
 				creature->LOT.isMonkeying = true;
 				creature->LOT.isJumping = true;
 				creature->maximumTurn = ANGLE(5);
@@ -449,12 +458,11 @@ void ControlCyborg(short itemNumber)
 					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 					height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
-						LABEL_145:
-					item->goalAnimState = 4;
+						item->goalAnimState = STATE_HITMAN_START_END_MONKEY;
 				}
 				break;
 
-			case 38:
+			case STATE_HITMAN_AIM:
 				joint0 = laraInfo.angle >> 1;
 				joint2 = laraInfo.angle >> 1;
 				creature->flags = 0;
@@ -478,12 +486,12 @@ void ControlCyborg(short itemNumber)
 				if (Targetable(item, &info) 
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
-					item->goalAnimState = 39;
+					item->goalAnimState = STATE_HITMAN_FIRE;
 				else
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_HITMAN_STOP;
 				break;
 
-			case 39:
+			case STATE_HITMAN_FIRE:
 				joint0 = laraInfo.angle >> 1;
 				joint2 = laraInfo.angle >> 1;
 
@@ -571,14 +579,14 @@ void ControlCyborg(short itemNumber)
 				GetFloorHeight(floor, creature->enemy->pos.xPos, creature->enemy->pos.yPos, creature->enemy->pos.zPos);
 				TestTriggers(TriggerIndex, 1, 0);
 				
-				item->requiredAnimState = 2;
+				item->requiredAnimState = STATE_HITMAN_WALK;
 
 				if (creature->enemy->flags & 2)
 					item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
 
 				if (creature->enemy->flags & 8)
 				{
-					item->requiredAnimState = 1;
+					item->requiredAnimState = STATE_HITMAN_STOP;
 					item->triggerFlags = 300;
 					item->aiBits = GUARD | PATROL1;
 				}
