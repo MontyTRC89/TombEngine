@@ -1,17 +1,17 @@
 #pragma once
 #include "../Global/global.h"
 
-//#define ControlGuard ((void (__cdecl*)(short)) 0x0046F5E0)
+//#define GuardControl ((void (__cdecl*)(short)) 0x0046F5E0)
 //#define ControlSubmarine ((void (__cdecl*)(short)) 0x0045D3F0)
 //#define ControlDoberman ((void (__cdecl*)(short)) 0x00428A10)
 //#define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
 //#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
 //#define ControlLarson ((void (__cdecl*)(short)) 0x0046A080)
 //#define ControlCyborg ((void (__cdecl*)(short)) 0x0043A340)
-//#define ControlGuardM16 ((void (__cdecl*)(short)) 0x00478250)
+//#define SniperControl ((void (__cdecl*)(short)) 0x00478250)
 //#define InitialiseChef ((void (__cdecl*)(short)) 0x00410990) // not used anymore !
 //#define ControlChef ((void (__cdecl*)(short)) 0x00410A60)    // not used anymore !
-#define ControlGuardLaser ((void (__cdecl*)(short)) 0x0048CDD0)
+#define GuardControlLaser ((void (__cdecl*)(short)) 0x0048CDD0)
 //#define ControlHydra ((void (__cdecl*)(short)) 0x0043BF70)
 //#define ControlImp ((void (__cdecl*)(short)) 0x0043BEA0)
 #define ControlLightingGuide ((void (__cdecl*)(short)) 0x0048E580)
@@ -40,7 +40,7 @@ extern int NextRat;
 extern RAT_STRUCT* Rats;
 
 void InitialiseGuard(short itemNum);
-void InitialiseGuardM16(short itemNum);
+void InitialiseSniper(short itemNum);
 void InitialiseGuardLaser(short itemNum);
 void InitialiseSubmarine(short itemNum);
 void InitialiseDoberman(short itemNum);
@@ -63,10 +63,10 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 int TestBlockMovable(ITEM_INFO* item, int blokhite);
 int TestBlockPush(ITEM_INFO* item, int blokhite, unsigned short quadrant);
 int TestBlockPull(ITEM_INFO* item, int blokhite, short quadrant);
-void ControlGuard(short itemNum);
+void GuardControl(short itemNum);
 void ControlDoberman(short itemNumber);
 void ControlReaper(short itemNumber);
-void ControlGuardM16(short itemNumber);
+void SniperControl(short itemNumber);
 void ImpThrowStones(ITEM_INFO* item);
 void ControlImp(short itemNumber);
 void ControlGladiator(short itemNumber);
@@ -74,8 +74,8 @@ void ControlBrowsBeast(short itemNumber);
 void ControlInvisibleGhost(short itemNumber);
 short GetNextRat();
 void ControlLittleRats(short itemNumber);
-void InitialiseArmedBaddy2(short itemNum);
-void ArmedBaddy2Control(short itemNum);
+void InitialiseMafia2(short itemNum);
+void Mafia2Control(short itemNum);
 void ControlDog(short itemNumber);
 void ControlLarson(short itemNumber);
 void InitialiseRaisingBlock(short itemNumber);
