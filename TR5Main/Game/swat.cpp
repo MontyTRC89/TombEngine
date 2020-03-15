@@ -116,7 +116,7 @@ LABEL_21:
 	return result;
 }
 
-void ControlGuard(int itemNum)
+void GuardControl(int itemNum)
 {
 	int v1; // eax
 	int v2; // ecx

@@ -1174,7 +1174,7 @@ void BaddyObjects()
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseGuard;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 40;
@@ -1199,7 +1199,7 @@ void BaddyObjects()
 		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
@@ -1229,7 +1229,7 @@ void BaddyObjects()
 		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->pivotLength = 50;
 		obj->shadowSize = UNIT_SHADOW / 2;
@@ -1263,7 +1263,7 @@ void BaddyObjects()
 		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
@@ -1296,7 +1296,7 @@ void BaddyObjects()
 		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
@@ -1328,7 +1328,7 @@ void BaddyObjects()
 			animIndex = Objects[ID_SWAT].animIndex;
 		obj->animIndex = animIndex;
 		obj->initialise = InitialiseGuard;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
@@ -1360,7 +1360,7 @@ void BaddyObjects()
 		obj->animIndex = animIndex;
 		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
@@ -1394,7 +1394,7 @@ void BaddyObjects()
 		obj->animIndex = animIndex;
 		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
-		obj->control = ControlGuard;
+		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
@@ -1522,9 +1522,9 @@ void BaddyObjects()
 	if (obj->loaded)
 	{
 		obj->biteOffset = 7;
-		obj->initialise = InitialiseArmedBaddy2;
+		obj->initialise = InitialiseMafia2;
 		obj->collision = CreatureCollision;
-		obj->control = ArmedBaddy2Control;
+		obj->control = Mafia2Control;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 26;
@@ -1630,9 +1630,9 @@ void BaddyObjects()
 	if (obj->loaded)
 	{
 		obj->biteOffset = 6;
-		obj->initialise = InitialiseGuardM16;
+		obj->initialise = InitialiseSniper;
 		obj->collision = CreatureCollision;
-		obj->control = ControlGuardM16;
+		obj->control = SniperControl;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 35;
@@ -1657,7 +1657,7 @@ void BaddyObjects()
 		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuardLaser;
 		obj->collision = CreatureCollision;
-		obj->control = ControlGuardLaser;
+		obj->control = GuardControlLaser;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
