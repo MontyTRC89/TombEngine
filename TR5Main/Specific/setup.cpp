@@ -1602,9 +1602,9 @@ void BaddyObjects()
 	if (obj->loaded)
 	{
 		obj->biteOffset = 5;
-		obj->initialise = InitialiseCyborg;
+		obj->initialise = InitialiseHitman;
 		obj->collision = CreatureCollision;
-		obj->control = ControlCyborg;
+		obj->control = HitmanControl;
 		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 50;

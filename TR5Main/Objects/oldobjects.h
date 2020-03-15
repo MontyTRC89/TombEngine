@@ -7,7 +7,7 @@
 //#define ControlDog ((void (__cdecl*)(short)) 0x0043B730)
 //#define ControlReaper ((void (__cdecl*)(short)) 0x0045DAF0)
 //#define ControlLarson ((void (__cdecl*)(short)) 0x0046A080)
-//#define ControlCyborg ((void (__cdecl*)(short)) 0x0043A340)
+//#define HitmanControl ((void (__cdecl*)(short)) 0x0043A340)
 //#define SniperControl ((void (__cdecl*)(short)) 0x00478250)
 //#define InitialiseChef ((void (__cdecl*)(short)) 0x00410990) // not used anymore !
 //#define ControlChef ((void (__cdecl*)(short)) 0x00410A60)    // not used anymore !
@@ -47,7 +47,7 @@ void InitialiseDoberman(short itemNum);
 void InitialiseDog(short itemNum);
 void InitialiseReaper(short itemNum);
 void InitialiseLarson(short itemNum);
-void InitialiseCyborg(short itemNum);
+void InitialiseHitman(short itemNum);
 void InitialiseHydra(short itemNum);
 void InitialiseImp(short itemNum);
 void InitialiseLightingGuide(short itemNum);
@@ -138,8 +138,8 @@ void InitialiseLittleBats(short itemNumber);
 void ControlLittleBats(short itemNumber);
 short GetNextBat();
 void TriggerLittleBat(ITEM_INFO* item);
-void TriggerCyborgSparks(int x, int y, int z, short xv, short yv, short zv);
-void ControlCyborg(short itemNumber);
+void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv);
+void HitmanControl(short itemNumber);
 void ControlGunShip(short itemNumber);
 void ControlHydra(short itemNumber);
 void TriggerHydraSparks(short itemNumber, int frame);
