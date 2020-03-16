@@ -834,7 +834,7 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 	int lastBucket = (transparent ? 4 : 2);
 
 	RendererRoom & const room = m_rooms[effect->Effect->roomNumber];
-	RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
+	//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
 	m_stItem.World = effect->World.Transpose();
 	m_stItem.Position = Vector4(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos, 1.0f);

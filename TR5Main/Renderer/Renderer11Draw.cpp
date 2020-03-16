@@ -1481,7 +1481,7 @@ bool Renderer11::drawRats()
 
 			if (rat->on)
 			{
-				short* meshPtr = Meshes[Objects[ID_RATS_EMITTER].meshIndex + (((i + Wibble) >> 2) & 0xE)];
+				short* meshPtr = Meshes[Objects[ID_RATS_EMITTER].meshIndex + (((i + Wibble) >> 1) & 0xE)];
 				RendererMesh * mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 				Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
 				Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
@@ -1523,7 +1523,7 @@ bool Renderer11::drawBats()
 	{
 		OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
 		RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
-		short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + 2 * (-GlobalCounter & 3)];
+		short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3)];
 		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 
 		for (int m = 0; m < 32; m++)
