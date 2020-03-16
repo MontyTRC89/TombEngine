@@ -417,6 +417,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateGunShells();
 		updateFootprints();
 		UpdateSplashes();
+		UpdateEnergyArcs();
 		UpdateDrips();
 		UpdateRats();
 		UpdateBats();
@@ -2810,7 +2811,6 @@ void AnimateItem(ITEM_INFO* item)
 						item->afterDeath = 1;
 					item->status = ITEM_DEACTIVATED;
 					break;
-
 				case COMMAND_SOUND_FX:
 				case COMMAND_EFFECT:
 					cmd += 2;

@@ -13,6 +13,7 @@
 #include "../Game/tomb4fx.h"
 #include "../Game/door.h"
 #include "../Objects/oldobjects.h"
+#include "..\Specific\roomload.h"
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
@@ -2009,8 +2010,7 @@ bool Renderer11::drawScene(bool dump)
 	drawUnderwaterDust();
 	drawSplahes();
 	drawShockwaves();
-
-
+	drawEnergyArcs();
 
 	switch (level->Weather)
 	{

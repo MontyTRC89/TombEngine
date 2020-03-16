@@ -41,7 +41,8 @@ BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 BUBBLE_STRUCT Bubbles[MAX_BUBBLES]; 
 DRIP_STRUCT Drips[MAX_DRIPS]; 
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
-FIRE_LIST Fires[MAX_FIRE_LIST];  
+FIRE_LIST Fires[MAX_FIRE_LIST];
+ENERGY_ARC EnergyArcs[MAX_ENERGY_ARCS];
 
 extern int NextSpark;
 extern SPARKS Sparks[MAX_SPARKS];
@@ -321,6 +322,19 @@ void UpdateFireSparks()
 			spark->z += spark->zVel >> 5;
 
 			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);
+		}
+	}
+}
+
+void UpdateEnergyArcs()
+{
+	for (int i = 0; i < MAX_ENERGY_ARCS; i++)
+	{
+		ENERGY_ARC* arc = &EnergyArcs[i];
+
+		if (arc->life > 0)
+		{
+			arc->life--;
 		}
 	}
 }
@@ -1860,6 +1874,29 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 		sptr->maxYvel = 0;
 		sptr->gravity = (GetRandomControl() & 0xF) + 64;
 	}
+}
+
+void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, int segmentSize, byte life)
+{
+	ENERGY_ARC* arc = NULL;
+
+	for (int i = 0; i < 16; i++)
+	{
+		arc = &EnergyArcs[i];
+		if (arc->life == 0)
+			break;
+	}
+
+	if (arc == NULL)
+		return;
+
+	arc->pos1 = *start;
+	arc->pos4 = *end;
+	arc->life = life;
+	arc->r = r;
+	arc->g = g;
+	arc->b = b;
+	arc->segmentSize = segmentSize;
 }
 
 void Inject_Tomb4FX()
