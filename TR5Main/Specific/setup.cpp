@@ -27,6 +27,8 @@
 #include "..\Game\hydra.h"
 #include "..\Game\guardian.h"
 
+#include "roomload.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -2707,8 +2709,14 @@ void ObjectObjects()
 	obj = &Objects[ID_BUBBLES];
 	if (obj->loaded)
 	{
-		obj->control = ControlEnemyMissile;
-		//obj->drawRoutine = true;
+		obj->control = MissileControl;
+		obj->nmeshes = 0;
+	}
+
+	obj = &Objects[ID_IMP_ROCK];
+	if (obj->loaded)
+	{
+		obj->control = MissileControl;
 		obj->nmeshes = 0;
 	}
 

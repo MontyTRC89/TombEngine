@@ -8,6 +8,7 @@
 #include "laramisc.h"
 #include "switch.h"
 #include "items.h"
+#include "..\Specific\roomload.h"
 
 short FireBounds[12] =
 {

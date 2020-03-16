@@ -10,6 +10,7 @@
 #include "sphere.h"
 #include "footprint.h"
 #include "..\Objects\oldobjects.h"
+#include "..\Specific\roomload.h"
 
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;

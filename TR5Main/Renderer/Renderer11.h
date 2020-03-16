@@ -878,6 +878,7 @@ private:
 	void											drawFires();
 	void											drawSparks();
 	void											drawSmokes();
+	void											drawEnergyArcs();
 	void											drawBlood();
 	void											drawDrips();
 	void											drawBubbles();

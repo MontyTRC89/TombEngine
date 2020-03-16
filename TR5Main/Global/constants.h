@@ -65,6 +65,7 @@
 #define MAX_FIRE_LIST       32        // FIRE_SPARKS list
 #define MAX_SPARKS_SMOKE    32
 #define MAX_SPARKS_BLOOD    32
+#define MAX_ENERGY_ARCS		256
 #define MAX_GUNSHELL        24
 #define MAX_GUNFLASH        4
 #define MAX_DRIPS           32
