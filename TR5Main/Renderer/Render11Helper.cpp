@@ -393,8 +393,7 @@ void Renderer11::buildHierarchy(RendererObject* obj)
 	}
 }
 
-RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short* refMeshPtr,
-	short boneIndex, int isJoints, int isHairs)
+RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short boneIndex, int isJoints, int isHairs)
 {
 	RendererMesh* mesh = new RendererMesh();
 
@@ -650,10 +649,16 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 	if (normals != NULL) free(normals);
 	if (colors != NULL) free(colors);
 
-	unsigned int castedMeshPtr = reinterpret_cast<unsigned int>(refMeshPtr);
+	unsigned int castedMeshPtr = reinterpret_cast<unsigned int>(basePtr);
 
 	if (m_meshPointersToMesh.find(castedMeshPtr) == m_meshPointersToMesh.end())
+	{
 		m_meshPointersToMesh.insert(pair<unsigned int, RendererMesh*>(castedMeshPtr, mesh));
+	}
+	/*else if (m_meshPointersToMesh[castedMeshPtr] == NULL)
+	{
+		m_meshPointersToMesh[castedMeshPtr] = mesh;
+	}*/
 
 	m_meshes.push_back(mesh);
 

@@ -2724,7 +2724,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 							if (newDist < minDistance)
 							{
 								minDistance = newDist;
-								meshPtr = Meshes[obj->meshIndex + 2 * i];
+								meshPtr = Meshes[obj->meshIndex + i];
 								bit = 1 << i;
 								sp = i;
 							}
@@ -3125,7 +3125,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		GetSpheres(item, SphereList, 3);
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.bit = 1 << Node;
-		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + 2 * Node];
+		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + Node];
 		ShatterItem.sphere.x = SphereList[Node].x;
 		ShatterItem.sphere.y = SphereList[Node].y;
 		ShatterItem.sphere.z = SphereList[Node].z;

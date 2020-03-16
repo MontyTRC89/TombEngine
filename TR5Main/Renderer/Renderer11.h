@@ -839,7 +839,7 @@ private:
 	ID3D11Buffer*									createConstantBuffer(int size);
 	int												getAnimatedTextureInfo(short textureId);
 	void											initialiseHairRemaps();
-	RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short* refMeshPtr, short boneIndex, int isJoints, int isHairs);
+	RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short boneIndex, int isJoints, int isHairs);
 	void											fromTrAngle(Matrix* matrix, short* frameptr, int index);
 	void											buildHierarchy(RendererObject* obj);
 	void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
