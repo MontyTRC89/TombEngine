@@ -488,188 +488,192 @@ bool Renderer11::PrepareDataForTheRenderer()
 				// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 				// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 				// and vertices have bone index 0 and not 10
-				int meshPtrIndex = RawMeshPointers[obj->meshIndex / 2 + j] / 2;
-				int boneIndex = (meshPtrIndex == 0 ? LM_RHAND : j);
-
-				short* meshPtr = &RawMeshData[meshPtrIndex];
+				int boneIndex = (Meshes[obj->meshIndex + j] == Meshes[0] ? LM_RHAND : j);
+			
 				RendererMesh * mesh = getRendererMeshFromTrMesh(moveable,
-					meshPtr,
-					Meshes[obj->meshIndex + 2 * j],
+					Meshes[obj->meshIndex + j],
 					boneIndex, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 					MoveablesIds[i] == ID_LARA_HAIR);
 				moveable->ObjectMeshes.push_back(mesh);
 			}
 
-			int* bone = &Bones[obj->boneIndex];
-
-			stack<RendererBone*> stack;
-
-			for (int j = 0; j < obj->nmeshes; j++)
+			if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES)
 			{
-				moveable->LinearizedBones.push_back(new RendererBone(j));
-				moveable->AnimationTransforms.push_back(Matrix::Identity);
-				moveable->BindPoseTransforms.push_back(Matrix::Identity);
+				obj->nmeshes = 0;
 			}
-
-			RendererBone* currentBone = moveable->LinearizedBones[0];
-			RendererBone* stackBone = moveable->LinearizedBones[0];
-
-			for (int mi = 0; mi < obj->nmeshes - 1; mi++)
+			else
 			{
-				int j = mi + 1;
+				int* bone = &Bones[obj->boneIndex];
 
-				int opcode = *(bone++);
-				int linkX = *(bone++);
-				int linkY = *(bone++);
-				int linkZ = *(bone++);
+				stack<RendererBone*> stack;
 
-				byte flags = opcode & 0x1C;
-
-				moveable->LinearizedBones[j]->ExtraRotationFlags = flags;
-
-				switch (opcode & 0x03)
+				for (int j = 0; j < obj->nmeshes; j++)
 				{
-				case 0:
-					moveable->LinearizedBones[j]->Parent = currentBone;
-					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-					currentBone->Children.push_back(moveable->LinearizedBones[j]);
-					currentBone = moveable->LinearizedBones[j];
-
-					break;
-				case 1:
-					if (stack.empty())
-						continue;
-					currentBone = stack.top();
-					stack.pop();
-
-					moveable->LinearizedBones[j]->Parent = currentBone;
-					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-					currentBone->Children.push_back(moveable->LinearizedBones[j]);
-					currentBone = moveable->LinearizedBones[j];
-
-					break;
-				case 2:
-					stack.push(currentBone);
-
-					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-					moveable->LinearizedBones[j]->Parent = currentBone;
-					currentBone->Children.push_back(moveable->LinearizedBones[j]);
-					currentBone = moveable->LinearizedBones[j];
-
-					break;
-				case 3:
-					if (stack.empty())
-						continue;
-					RendererBone* theBone = stack.top();
-					stack.pop();
-
-					moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-					moveable->LinearizedBones[j]->Parent = theBone;
-					theBone->Children.push_back(moveable->LinearizedBones[j]);
-					currentBone = moveable->LinearizedBones[j];
-					stack.push(theBone);
-
-					break;
+					moveable->LinearizedBones.push_back(new RendererBone(j));
+					moveable->AnimationTransforms.push_back(Matrix::Identity);
+					moveable->BindPoseTransforms.push_back(Matrix::Identity);
 				}
-			}
 
-			for (int n = 0; n < obj->nmeshes; n++)
-				moveable->LinearizedBones[n]->Transform = Matrix::CreateTranslation(
-					moveable->LinearizedBones[n]->Translation.x,
-					moveable->LinearizedBones[n]->Translation.y,
-					moveable->LinearizedBones[n]->Translation.z);
+				RendererBone* currentBone = moveable->LinearizedBones[0];
+				RendererBone* stackBone = moveable->LinearizedBones[0];
 
-			moveable->Skeleton = moveable->LinearizedBones[0];
-			buildHierarchy(moveable);
-
-			// Fix Lara skin joints and hairs
-			if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
-			{
-				int bonesToCheck[2] = { 0,0 };
-
-				RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
-
-				for (int j = 1; j < obj->nmeshes; j++)
+				for (int mi = 0; mi < obj->nmeshes - 1; mi++)
 				{
-					RendererMesh* jointMesh = moveable->ObjectMeshes[j];
-					RendererBone* jointBone = moveable->LinearizedBones[j];
+					int j = mi + 1;
 
-					bonesToCheck[0] = jointBone->Parent->Index;
-					bonesToCheck[1] = j; 
+					int opcode = *(bone++);
+					int linkX = *(bone++);
+					int linkY = *(bone++);
+					int linkZ = *(bone++);
 
-					for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
+					byte flags = opcode & 0x1C;
+
+					moveable->LinearizedBones[j]->ExtraRotationFlags = flags;
+
+					switch (opcode & 0x03)
 					{
-						RendererBucket* jointBucket = &jointMesh->Buckets[b1];
-						
-						for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
+					case 0:
+						moveable->LinearizedBones[j]->Parent = currentBone;
+						moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+						currentBone->Children.push_back(moveable->LinearizedBones[j]);
+						currentBone = moveable->LinearizedBones[j];
+
+						break;
+					case 1:
+						if (stack.empty())
+							continue;
+						currentBone = stack.top();
+						stack.pop();
+
+						moveable->LinearizedBones[j]->Parent = currentBone;
+						moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+						currentBone->Children.push_back(moveable->LinearizedBones[j]);
+						currentBone = moveable->LinearizedBones[j];
+
+						break;
+					case 2:
+						stack.push(currentBone);
+
+						moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+						moveable->LinearizedBones[j]->Parent = currentBone;
+						currentBone->Children.push_back(moveable->LinearizedBones[j]);
+						currentBone = moveable->LinearizedBones[j];
+
+						break;
+					case 3:
+						if (stack.empty())
+							continue;
+						RendererBone* theBone = stack.top();
+						stack.pop();
+
+						moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+						moveable->LinearizedBones[j]->Parent = theBone;
+						theBone->Children.push_back(moveable->LinearizedBones[j]);
+						currentBone = moveable->LinearizedBones[j];
+						stack.push(theBone);
+
+						break;
+					}
+				}
+
+				for (int n = 0; n < obj->nmeshes; n++)
+					moveable->LinearizedBones[n]->Transform = Matrix::CreateTranslation(
+						moveable->LinearizedBones[n]->Translation.x,
+						moveable->LinearizedBones[n]->Translation.y,
+						moveable->LinearizedBones[n]->Translation.z);
+
+				moveable->Skeleton = moveable->LinearizedBones[0];
+				buildHierarchy(moveable);
+
+				// Fix Lara skin joints and hairs
+				if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
+				{
+					int bonesToCheck[2] = { 0,0 };
+
+					RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
+
+					for (int j = 1; j < obj->nmeshes; j++)
+					{
+						RendererMesh* jointMesh = moveable->ObjectMeshes[j];
+						RendererBone* jointBone = moveable->LinearizedBones[j];
+
+						bonesToCheck[0] = jointBone->Parent->Index;
+						bonesToCheck[1] = j;
+
+						for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
 						{
-							RendererVertex* jointVertex = &jointBucket->Vertices[v1];
+							RendererBucket* jointBucket = &jointMesh->Buckets[b1];
 
-							bool done = false;
-
-							for (int k = 0; k < 2; k++)
+							for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
 							{
-								RendererMesh* skinMesh = objSkin->ObjectMeshes[bonesToCheck[k]];
-								RendererBone* skinBone = objSkin->LinearizedBones[bonesToCheck[k]];
-			
-								for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
+								RendererVertex* jointVertex = &jointBucket->Vertices[v1];
+
+								bool done = false;
+
+								for (int k = 0; k < 2; k++)
 								{
-									RendererBucket* skinBucket = &skinMesh->Buckets[b2];
-									for (int v2 = 0; v2 < skinBucket->Vertices.size(); v2++)
+									RendererMesh* skinMesh = objSkin->ObjectMeshes[bonesToCheck[k]];
+									RendererBone* skinBone = objSkin->LinearizedBones[bonesToCheck[k]];
+
+									for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
 									{
-										RendererVertex* skinVertex = &skinBucket->Vertices[v2];
-
-										int x1 = jointBucket->Vertices[v1].Position.x + jointBone->GlobalTranslation.x;
-										int y1 = jointBucket->Vertices[v1].Position.y + jointBone->GlobalTranslation.y;
-										int z1 = jointBucket->Vertices[v1].Position.z + jointBone->GlobalTranslation.z;
-
-										int x2 = skinBucket->Vertices[v2].Position.x + skinBone->GlobalTranslation.x;
-										int y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
-										int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
-
-										if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+										RendererBucket* skinBucket = &skinMesh->Buckets[b2];
+										for (int v2 = 0; v2 < skinBucket->Vertices.size(); v2++)
 										{
-											jointVertex->Bone = bonesToCheck[k];
-											jointVertex->Position.x = skinVertex->Position.x;
-											jointVertex->Position.y = skinVertex->Position.y;
-											jointVertex->Position.z = skinVertex->Position.z;
-											done = true;
-											break;
+											RendererVertex* skinVertex = &skinBucket->Vertices[v2];
+
+											int x1 = jointBucket->Vertices[v1].Position.x + jointBone->GlobalTranslation.x;
+											int y1 = jointBucket->Vertices[v1].Position.y + jointBone->GlobalTranslation.y;
+											int z1 = jointBucket->Vertices[v1].Position.z + jointBone->GlobalTranslation.z;
+
+											int x2 = skinBucket->Vertices[v2].Position.x + skinBone->GlobalTranslation.x;
+											int y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
+											int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
+
+											if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+											{
+												jointVertex->Bone = bonesToCheck[k];
+												jointVertex->Position.x = skinVertex->Position.x;
+												jointVertex->Position.y = skinVertex->Position.y;
+												jointVertex->Position.z = skinVertex->Position.z;
+												done = true;
+												break;
+											}
 										}
+
+										if (done)
+											break;
 									}
 
 									if (done)
 										break;
 								}
-
-								if (done)
-									break;
 							}
 						}
 					}
 				}
-			}
 
-			if (MoveablesIds[i] == ID_LARA_HAIR)
-			{
-				for (int j = 0; j < moveable->ObjectMeshes.size(); j++)
+				if (MoveablesIds[i] == ID_LARA_HAIR)
 				{
-					RendererMesh* mesh = moveable->ObjectMeshes[j];
-					for (int n = 0; n < NUM_BUCKETS; n++)
+					for (int j = 0; j < moveable->ObjectMeshes.size(); j++)
 					{
-						m_numHairVertices += mesh->Buckets[n].NumVertices;
-						m_numHairIndices += mesh->Buckets[n].NumIndices;
+						RendererMesh* mesh = moveable->ObjectMeshes[j];
+						for (int n = 0; n < NUM_BUCKETS; n++)
+						{
+							m_numHairVertices += mesh->Buckets[n].NumVertices;
+							m_numHairIndices += mesh->Buckets[n].NumIndices;
+						}
 					}
+
+					m_hairVertices.clear();
+					m_hairIndices.clear();
+
+					RendererVertex vertex;
+					for (int m = 0; m < m_numHairVertices * 2; m++)
+						m_hairVertices.push_back(vertex);
+					for (int m = 0; m < m_numHairIndices * 2; m++)
+						m_hairIndices.push_back(0);
 				}
-
-				m_hairVertices.clear();
-				m_hairIndices.clear();
-
-				RendererVertex vertex;
-				for (int m = 0; m < m_numHairVertices * 2; m++)
-					m_hairVertices.push_back(vertex);
-				for (int m = 0; m < m_numHairIndices * 2; m++)
-					m_hairIndices.push_back(0);
 			}
 
 			m_moveableObjects[MoveablesIds[i]] = moveable;
@@ -715,8 +719,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 		RendererObject* staticObject = new RendererObject();
 		staticObject->Id = StaticObjectsIds[i];
 
-		short* meshPtr = &RawMeshData[RawMeshPointers[obj->meshNumber / 2] / 2];
-		RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, meshPtr, Meshes[obj->meshNumber], 0, false, false);
+		short* meshPtr = Meshes[obj->meshNumber];
+		RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, Meshes[obj->meshNumber], 0, false, false);
 
 		staticObject->ObjectMeshes.push_back(mesh);
 
@@ -744,22 +748,19 @@ bool Renderer11::PrepareDataForTheRenderer()
 	}
 
 	// Create missing meshes (effect objects like ID_BODY_PART have nmeshes = 0 and they are "lost" with current procedures)
-	for (int i = 0; i < NumMeshPointers; i++)
+	/*for (int i = 0; i < NumMeshPointers; i++)
 	{
-		unsigned int mp = reinterpret_cast<unsigned int>(Meshes[i * 2]);
-		RendererMesh* mesh = m_meshPointersToMesh[mp];
-		if (mesh == NULL)
+		unsigned int mp = reinterpret_cast<unsigned int>(Meshes[i]);
+		//RendererMesh* mesh = m_meshPointersToMesh[mp];
+		if (m_meshPointersToMesh.find(mp) == m_meshPointersToMesh.end())
 		{
-			int meshPtrIndex = RawMeshPointers[i] / 2;
-			short* meshPtr = &RawMeshData[meshPtrIndex];
 			RendererMesh* mesh = getRendererMeshFromTrMesh(NULL,
-				meshPtr,
-				Meshes[i * 2],
+				Meshes[i],
 				0,
 				false,
 				false);
 		}
-	}
+	}*/
 
 	// Create a single vertex buffer and a single index buffer for all statics
 	m_staticsVertexBuffer = VertexBuffer::Create(m_device, staticsVertices.size(), staticsVertices.data());

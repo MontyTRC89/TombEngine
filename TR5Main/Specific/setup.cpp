@@ -190,9 +190,9 @@ void NewObjects()
 		Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 88 * 4] |= ROT_X;
 
-		/*Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 16 * 2];
-		Meshes[obj->meshIndex + 30 * 2] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 28 * 2];
-		Meshes[obj->meshIndex + 18 * 2] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 11 * 2];*/
+		/*Meshes[obj->meshIndex + 18] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 16];
+		Meshes[obj->meshIndex + 30] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 28];
+		Meshes[obj->meshIndex + 18] = Meshes[Objects[ID_MESHSWAP_BADDY1].meshIndex + 11];*/
 	}
 
 	obj = &Objects[ID_BADDY2];
@@ -931,9 +931,9 @@ void NewObjects()
 		Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
 
 		// TODO: check if constants are byte, short or int
-		Meshes[obj->meshIndex + 60 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 60 * 2];
-		Meshes[obj->meshIndex + 72 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 72 * 2];
-		Meshes[obj->meshIndex + 84 * 2] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 84 * 2];
+		Meshes[obj->meshIndex + 60] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 60];
+		Meshes[obj->meshIndex + 72] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 72];
+		Meshes[obj->meshIndex + 84] = Meshes[Objects[ID_MESHSWAP2].meshIndex + 84];
 	}
 
 	obj = &Objects[ID_CROCODILE];
@@ -1219,8 +1219,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		//Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		//Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		//Meshes[obj->meshIndex + 10] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10];
+		//Meshes[obj->meshIndex + 13] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13];
 	}
 
 	obj = &Objects[ID_GUARD1];
@@ -1249,8 +1249,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		Meshes[obj->meshIndex + 10] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10];
+		Meshes[obj->meshIndex + 13] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13];
 	}
 
 	obj = &Objects[ID_SWAT_PLUS];
@@ -1282,8 +1282,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		//Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		//Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		//Meshes[obj->meshIndex + 10] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10];
+		//Meshes[obj->meshIndex + 13] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13];
 	}
 
 	obj = &Objects[ID_MAFIA];
@@ -1316,8 +1316,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		Meshes[obj->meshIndex + 10] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10];
+		Meshes[obj->meshIndex + 13] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13];
 	}
 
 	obj = &Objects[ID_SCIENTIST];
@@ -1347,8 +1347,8 @@ void BaddyObjects()
 		Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
 		Bones[Objects[69].boneIndex + 13 * 4] |= ROT_Y;
 		Bones[Objects[69].boneIndex + 13 * 4] |= ROT_X;
-		//Meshes[Objects[69].meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10 * 2];
-		//Meshes[Objects[69].meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13 * 2];
+		//Meshes[Objects[69].meshIndex + 10] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 10];
+		//Meshes[Objects[69].meshIndex + 13] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 13];
 	}
 
 	obj = &Objects[ID_GUARD2];
@@ -1381,8 +1381,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[405].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[405].meshIndex + 13 * 2];
+		Meshes[obj->meshIndex + 10] = Meshes[Objects[405].meshIndex + 10];
+		Meshes[obj->meshIndex + 13] = Meshes[Objects[405].meshIndex + 13];
 	}
 
 	obj = &Objects[ID_GUARD3];
@@ -1415,8 +1415,8 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[405].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[405].meshIndex + 13 * 2];
+		Meshes[obj->meshIndex + 10] = Meshes[Objects[405].meshIndex + 10];
+		Meshes[obj->meshIndex + 13] = Meshes[Objects[405].meshIndex + 13];
 	}
 
 	obj = &Objects[ID_ATTACK_SUB];
@@ -1547,9 +1547,9 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 
-		/*Meshes[obj->meshIndex + 7 * 2] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 7 * 2];
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 10 * 2];
-		Meshes[obj->meshIndex + 13 * 2] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 13 * 2];*/
+		/*Meshes[obj->meshIndex + 7] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 7];
+		Meshes[obj->meshIndex + 10] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 10];
+		Meshes[obj->meshIndex + 13] = Meshes[Objects[ID_MESHSWAP_MAFIA2].meshIndex + 13];*/
 	}
 
 	obj = &Objects[ID_PIERRE];
@@ -1676,7 +1676,7 @@ void BaddyObjects()
 		Bones[obj->boneIndex] |= ROT_X;
 		Bones[obj->boneIndex + 4] |= ROT_Y;
 		Bones[obj->boneIndex + 4] |= ROT_X;
-		Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 2 * 2];
+		Meshes[obj->meshIndex + 10] = Meshes[Objects[ID_MESHSWAP1].meshIndex + 2];
 	}
 
 	obj = &Objects[ID_HYDRA];
@@ -1727,7 +1727,7 @@ void BaddyObjects()
 		Bones[obj->meshIndex + 9 * 4] |= ROT_Z;
 		Bones[obj->meshIndex + 9 * 4] |= ROT_X;
 
-		//Meshes[obj->meshIndex + 10 * 2] = Meshes[Objects[ID_MESHSWAP_IMP].meshIndex + 10 * 2];
+		//Meshes[obj->meshIndex + 10] = Meshes[Objects[ID_MESHSWAP_IMP].meshIndex + 10];
 	}
 
 	obj = &Objects[ID_WILLOWISP];
@@ -1884,7 +1884,7 @@ void BaddyObjects()
 
 		for (int i = (obj->nmeshes - 1); i > 0; i--)
 		{
-			Meshes[obj->meshIndex + i * 2] = Meshes[Objects[ID_MESHSWAP1].meshIndex + i * 2];
+			Meshes[obj->meshIndex + i] = Meshes[Objects[ID_MESHSWAP1].meshIndex + i];
 		}
 		/*
 		do
@@ -1923,7 +1923,7 @@ void BaddyObjects()
 
 		/*for (int i = (obj->nmeshes - 1); i > 0; i--)
 		{
-			Meshes[obj->meshIndex + i * 2] = Meshes[Objects[ID_MESHSWAP_ROMAN_GOD].meshIndex + i * 2];
+			Meshes[obj->meshIndex + i] = Meshes[Objects[ID_MESHSWAP_ROMAN_GOD].meshIndex + i];
 		}
 		
 		do
@@ -2717,7 +2717,7 @@ void ObjectObjects()
 	if (obj->loaded)
 	{
 		obj->control = MissileControl;
-		obj->nmeshes = 0;
+		//obj->nmeshes = 0;
 	}
 
 	obj = &Objects[ID_WATERFALLMIST];

@@ -80,7 +80,7 @@ void ImpThrowStones(ITEM_INFO* item)
 		if (fx->speed < 256)
 			fx->speed = 256;
 		fx->fallspeed = 0;
-		fxNum = Objects[ID_IMP_ROCK].meshIndex + 2 * (GetRandomControl() & 7);
+		fxNum = Objects[ID_IMP_ROCK].meshIndex + (GetRandomControl() & 7);
 		fx->objectNumber = ID_IMP_ROCK;
 		fx->shade = 16912;
 		fx->counter = 0;
