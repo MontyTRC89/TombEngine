@@ -1,6 +1,7 @@
 #include "Renderer11.h"
 #include "../Game/draw.h"
 #include "../Game/camera.h"
+#include "..\Specific\roomload.h"
 
 void Renderer11::collectRooms()
 {
@@ -441,7 +442,7 @@ void Renderer11::collectEffects(short roomNumber)
 		newEffect->Effect = fx;
 		newEffect->Id = fxNum;
 		newEffect->World = Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-		newEffect->Mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Meshes[0 (obj->nmeshes ? obj->meshIndex : fx->frameNumber * 2)])];
+		newEffect->Mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber / 2)])];
 
 		collectLightsForEffect(fx->roomNumber, newEffect);
 

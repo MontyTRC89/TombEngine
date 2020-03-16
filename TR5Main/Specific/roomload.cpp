@@ -43,6 +43,8 @@ int NumStaticObjects;
 int NumMeshPointers;
 int NumObjectTextures;
 int NumTextureTiles;
+short* MeshBase;
+short** Meshes;
 
 uintptr_t hLoadLevel;
 unsigned int ThreadId;

@@ -7,6 +7,7 @@
 #include "../../Game/sphere.h"
 #include "../../Game/draw.h"
 #include "../../Game/misc.h"
+#include "..\..\Specific\roomload.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

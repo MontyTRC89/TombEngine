@@ -30,11 +30,11 @@ struct LEB128;
 #define LoadAIObjects ((void (__cdecl*)()) 0x004A67F0)
 #define LoadDemoData ((void (__cdecl*)()) 0x004A67D0)
 //#define LoadSamples ((void (__cdecl*)()) 0x004A6880)
-#define InitialiseLaraLoad ((void (__cdecl*)(short)) 0x004568C0)
+//#define InitialiseLaraLoad ((void (__cdecl*)(short)) 0x004568C0)
 #define LoadRooms ((void (__cdecl*)()) 0x004A4DA0)
 #define InitialiseGameStuff ((void (__cdecl*)()) 0x004778F0)
 #define InitialiseLaraMeshes ((void (__cdecl*)()) 0x00455680)
-#define InitialiseLaraAnims ((void (__cdecl*)(ITEM_INFO*)) 0x00456900)
+//#define InitialiseLaraAnims ((void (__cdecl*)(ITEM_INFO*)) 0x00456900)
 
 using namespace std;
 
@@ -59,6 +59,8 @@ extern int IsLevelLoading;
 extern int NumTextureTiles;
 extern int g_NumSprites;
 extern int g_NumSpritesSequences;
+extern short* MeshBase;
+extern short** Meshes;
 
 void LoadTextures();
 int LoadRoomsNew();
