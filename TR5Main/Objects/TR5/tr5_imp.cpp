@@ -7,6 +7,19 @@
 #include "../../Game/effect2.h"
 #include "../../Game/Box.h"
 
+#define STATE_IMP_WALK			0
+#define STATE_IMP_STOP			1
+#define STATE_IMP_RUN			2
+#define STATE_IMP_ATTACK1		3
+#define STATE_IMP_ATTACK2		5
+#define STATE_IMP_SCARED		6
+#define STATE_IMP_START_CLIMB	7
+#define STATE_IMP_START_ROLL	8
+#define STATE_IMP_DEATH			9
+#define STATE_IMP_THROW_STONES	11
+
+#define ANIMATION_IMP_DEATH		18
+
 BITE_INFO ImpBite = { 0, 0x64, 0, 9 };
 
 void InitialiseImp(short itemNum)
@@ -16,14 +29,15 @@ void InitialiseImp(short itemNum)
 
     item = &Items[itemNum];
     ClearItem(itemNum);
+
     if (item->triggerFlags == 2 || item->triggerFlags == 12)
     {
-        stateid = 8;
+        stateid = STATE_IMP_START_ROLL;
         item->animNumber = Objects[ID_IMP].animIndex + 8;
     }
     else if (item->triggerFlags == 1 || item->triggerFlags == 11)
     {
-        stateid = 7;
+        stateid = STATE_IMP_START_CLIMB;
         item->animNumber = Objects[ID_IMP].animIndex + 7;
     }
     else
@@ -144,7 +158,7 @@ void ControlImp(short itemNumber)
 			info.xAngle = ATAN(d2, d1);
 
 			GetCreatureMood(item, &info, VIOLENT);
-			if (item->currentAnimState == 6)
+			if (item->currentAnimState == STATE_IMP_SCARED)
 				creature->mood = ESCAPE_MOOD;
 
 			CreatureMood(item, &info, VIOLENT);
@@ -162,66 +176,66 @@ void ControlImp(short itemNumber)
 
 			switch (item->currentAnimState)
 			{
-			case 0:
+			case STATE_IMP_WALK:
 				creature->maximumTurn = ANGLE(7);
 				if (info.distance <= SQUARE(2048))
 				{
 					if (info.distance < SQUARE(2048))
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_IMP_STOP;
 				}
 				else
 				{
-					item->goalAnimState = 2;
+					item->goalAnimState = STATE_IMP_RUN;
 				}
 				break;
 
-			case 1:
+			case STATE_IMP_STOP:
 				creature->maximumTurn = -1;
 				creature->flags = 0;
 				if (info.bite && info.distance < SQUARE(170) && item->triggerFlags < 10)
 				{
 					if (GetRandomControl() & 1)
-						item->goalAnimState = 3;
+						item->goalAnimState = STATE_IMP_ATTACK1;
 					else
-						item->goalAnimState = 5;
+						item->goalAnimState = STATE_IMP_ATTACK2;
 				}
 				else if (item->aiBits & FOLLOW)
 				{
-					item->goalAnimState = 0;
+					item->goalAnimState = STATE_IMP_WALK;
 				}
 				else
 				{
 					if (item->triggerFlags == 3)
 					{
-						item->goalAnimState = 11;
+						item->goalAnimState = STATE_IMP_THROW_STONES;
 					}
 					else if (info.distance <= SQUARE(2048))
 					{
 						if (info.distance > SQUARE(512) || item->triggerFlags < 10)
-							item->goalAnimState = 0;
+							item->goalAnimState = STATE_IMP_WALK;
 					}
 					else
 					{
-						item->goalAnimState = 2;
+						item->goalAnimState = STATE_IMP_RUN;
 					}
 				}
 				break;
 
-			case 2:
+			case STATE_IMP_RUN:
 				creature->maximumTurn = ANGLE(7);
 				if (info.distance >= SQUARE(512))
 				{
 					if (info.distance < SQUARE(2048))
-						item->goalAnimState = 0;
+						item->goalAnimState = STATE_IMP_WALK;
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_IMP_STOP;
 				}
 				break;
 
-			case 3:
-			case 5:
+			case STATE_IMP_ATTACK1:
+			case STATE_IMP_ATTACK2:
 				creature->maximumTurn = -1;
 				if (creature->flags == 0 
 					&& item->touchBits & 0x280)
@@ -232,18 +246,18 @@ void ControlImp(short itemNumber)
 				}
 				break;
 
-			case 6:
+			case STATE_IMP_SCARED:
 				creature->maximumTurn = ANGLE(7);
 				if (TorchRoom != 11)
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_IMP_STOP;
 				break;
 
-			case 7:
-			case 8:
+			case STATE_IMP_START_CLIMB:
+			case STATE_IMP_START_ROLL:
 				creature->maximumTurn = 0;
 				break;
 
-			case 11:
+			case STATE_IMP_THROW_STONES:
 				creature->maximumTurn = -1;
 				if (item->frameNumber - Anims[item->animNumber].frameBase == 40)
 					ImpThrowStones(item);
@@ -257,10 +271,10 @@ void ControlImp(short itemNumber)
 		else
 		{
 			item->hitPoints = 0;
-			if (item->currentAnimState != 9)
+			if (item->currentAnimState != STATE_IMP_DEATH)
 			{
-				item->animNumber = Objects[ID_IMP].animIndex + 45;
-				item->currentAnimState = 9;
+				item->animNumber = Objects[ID_IMP].animIndex + ANIMATION_IMP_DEATH;
+				item->currentAnimState = STATE_IMP_DEATH;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 			}
 		}
@@ -282,7 +296,7 @@ void ControlImp(short itemNumber)
 		}
 
 		if (TorchRoom == 11)
-			item->goalAnimState = 6;
+			item->goalAnimState = STATE_IMP_SCARED;
 
 		CreatureTilt(item, 0);
 		CreatureJoint(item, 1, joint1);
