@@ -49,8 +49,6 @@ void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2,
 	m_spritesToDraw.push_back(spr);
 }
 
-RendererLine3D ArcBuffer[1024];
-
 void Renderer11::drawEnergyArcs()
 {
 	for (int i = 0; i < MAX_ENERGY_ARCS; i++)
@@ -59,19 +57,33 @@ void Renderer11::drawEnergyArcs()
 
 		if (arc->life > 0)
 		{
-			Vector3 pos1 = Vector3(arc->pos1.x, arc->pos1.y, arc->pos1.z);
-			Vector3 pos2 = Vector3(arc->pos4.x, arc->pos4.y, arc->pos4.z);
+			Vector3 start = Vector3(arc->pos1.x, arc->pos1.y, arc->pos1.z) + Vector3(rand() % 32 - 16, rand() % 32 - 16, rand() % 32 - 16);
+			Vector3 end = Vector3(arc->pos4.x, arc->pos4.y, arc->pos4.z) + Vector3(rand() % 64 - 32, rand() % 64 - 32, rand() % 64 - 32);
+			Vector3 direction = (end - start);
+			direction.Normalize();
 
-			float length = Vector3::Distance(pos1, pos2);
+			float length = Vector3::Distance(start, end);
 			int numSegments = (length / arc->segmentSize) + 1;
 
-			Vector3 pos = pos1;
-			Vector3 dp = Vector3(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+			Vector3 pos1 = start;
 
-			for (int j = 1; j < numSegments; j++)
+			float delta = 2 * PI / numSegments;
+			float deltaAmplitude = arc->amplitude / 60;
+
+			float amplitude = arc->amplitude + deltaAmplitude;
+			if (amplitude>arc->amplitude)
+				amplitude= arc->amplitude - deltaAmplitude;
+			else if (amplitude < arc->amplitude)
+				amplitude = arc->amplitude + deltaAmplitude;
+			arc->amplitude = amplitude;
+
+			for (int j = 0; j < numSegments; j++)
 			{
-				AddLine3D(pos, pos + dp, Vector4(arc->r / 255.0f, arc->g / 255.0f, arc->b / 255.0f, 1.0f));
-				pos = pos + dp;
+				Vector3 pos1 = start + direction * (length / numSegments) * j + Vector3(0, arc->amplitude / 2 * sin(delta * j), 0);
+				Vector3 pos2 = start + direction * (length / numSegments) * (j + 1) + Vector3(0, arc->amplitude / 2 * sin(delta * (j + 1)), 0);
+
+				AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING], pos2, pos1,pos1+Vector3(0,32,0), pos2 + Vector3(0, 32, 0),
+					Vector4(arc->r / 255.0f, arc->g / 255.0f, arc->b / 255.0f, 1.0f), 0.0f, 1.0f, 1.0f, 1.0f, BLENDMODE_ALPHABLEND);
 			}
 		}
 	}
