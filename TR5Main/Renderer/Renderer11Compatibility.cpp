@@ -488,17 +488,17 @@ bool Renderer11::PrepareDataForTheRenderer()
 				// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 				// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 				// and vertices have bone index 0 and not 10
-				int boneIndex = (Meshes[obj->meshIndex + j] == Meshes[0] ? LM_RHAND : j);
-			
 				RendererMesh * mesh = getRendererMeshFromTrMesh(moveable,
 					Meshes[obj->meshIndex + j],
-					boneIndex, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
+					j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 					MoveablesIds[i] == ID_LARA_HAIR);
 				moveable->ObjectMeshes.push_back(mesh);
 			}
 
-			if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES)
+			if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES || objNum == ID_BODY_PART)
 			{
+				// HACK: these objects must have nmeshes = 0 because engine will use them in a different way while drawing Effects.
+				// In Core's code this was done in SETUP.C but we must do it here because we need to create renderer's meshes.
 				obj->nmeshes = 0;
 			}
 			else
@@ -746,21 +746,6 @@ bool Renderer11::PrepareDataForTheRenderer()
 			baseStaticsIndex += bucket->Indices.size();
 		}
 	}
-
-	// Create missing meshes (effect objects like ID_BODY_PART have nmeshes = 0 and they are "lost" with current procedures)
-	/*for (int i = 0; i < NumMeshPointers; i++)
-	{
-		unsigned int mp = reinterpret_cast<unsigned int>(Meshes[i]);
-		//RendererMesh* mesh = m_meshPointersToMesh[mp];
-		if (m_meshPointersToMesh.find(mp) == m_meshPointersToMesh.end())
-		{
-			RendererMesh* mesh = getRendererMeshFromTrMesh(NULL,
-				Meshes[i],
-				0,
-				false,
-				false);
-		}
-	}*/
 
 	// Create a single vertex buffer and a single index buffer for all statics
 	m_staticsVertexBuffer = VertexBuffer::Create(m_device, staticsVertices.size(), staticsVertices.data());
