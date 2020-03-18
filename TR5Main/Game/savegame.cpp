@@ -12,6 +12,7 @@
 #include "..\Objects\newobjects.h"
 #include "..\Objects\oldobjects.h"
 #include "..\Game\sound.h"
+#include "..\Specific\roomload.h"
 
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
