@@ -1481,7 +1481,7 @@ bool Renderer11::drawRats()
 
 			if (rat->on)
 			{
-				short* meshPtr = Meshes[Objects[ID_RATS_EMITTER].meshIndex + (((i + Wibble) >> 1) & 0xE)];
+				short* meshPtr = Meshes[Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8)];
 				RendererMesh * mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 				Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
 				Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
