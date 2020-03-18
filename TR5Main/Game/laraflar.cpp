@@ -298,7 +298,7 @@ void set_flare_arm(int frame) // (F) (D)
 	Lara.leftArm.frameBase = Anims[anim].framePtr;
 }
 
-void CreateFlare(short objectNum, int thrown)//49BBC, 4A020
+void CreateFlare(short objectNum, int thrown) // (F) (D)
 {
 	short itemNum = CreateItem();
 	if (itemNum != NO_ITEM)
@@ -319,18 +319,15 @@ void CreateFlare(short objectNum, int thrown)//49BBC, 4A020
 		item->pos.yPos = pos.y;
 		item->pos.zPos = pos.z;
 
-		ITEM_INFO* tmp1[128];
-		MESH_INFO* tmp2[128];
-
 		short roomNumber = LaraItem->roomNumber;
 		FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-		int collided = GetCollidedObjects(item, 0, 1, &tmp1[0], &tmp2[0], 0);
+		int collided = GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0);
 		if (collided || GetFloorHeight(floor, pos.x, pos.y, pos.z) < pos.y)
 		{
 			flag = true;
-			item->pos.yRot = LaraItem->pos.yRot - ANGLE(180);
-			item->pos.xPos = LaraItem->pos.xPos + 80 * SIN(item->pos.yRot) >> W2V_SHIFT;
-			item->pos.zPos = LaraItem->pos.zPos + 80 * COS(item->pos.yRot) >> W2V_SHIFT;
+			item->pos.yRot = LaraItem->pos.yRot + ANGLE(180);
+			item->pos.xPos = LaraItem->pos.xPos + (320 * SIN(item->pos.yRot) >> W2V_SHIFT);
+			item->pos.zPos = LaraItem->pos.zPos + (320 * COS(item->pos.yRot) >> W2V_SHIFT);
 			item->roomNumber = LaraItem->roomNumber;
 		}
 		else
@@ -371,7 +368,7 @@ void CreateFlare(short objectNum, int thrown)//49BBC, 4A020
 		}
 		else
 		{
-			item->itemFlags[3] = (Lara.currentZvel >> W2V_SHIFT) & 1;
+			item->itemFlags[3] = Lara.litTorch;
 		}
 
 		AddActiveItem(itemNum);

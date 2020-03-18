@@ -52,7 +52,7 @@ void TriggerTorchFlame(char fxObj, char node)
 	spark->dSize = spark->size >> 3;
 }
 
-void DoFlameTorch()
+void DoFlameTorch() // (F) (D)
 {
 	switch (Lara.leftArm.lock)
 	{
@@ -98,6 +98,7 @@ void DoFlameTorch()
 			if (Lara.leftArm.frameNumber == 27)
 			{
 				Lara.litTorch = false;
+				Lara.flareControlLeft = false;
 				Lara.leftArm.lock = 0;
 				Lara.gunType = Lara.lastGunType;
 				Lara.requestGunType = WEAPON_NONE;
@@ -105,7 +106,7 @@ void DoFlameTorch()
 			}
 			else if (Lara.leftArm.frameNumber == 12)
 			{
-				Lara.meshPtrs[LM_LHAND] = Meshes[Objects[ID_LARA].meshIndex + LM_LHAND];
+				LARA_MESHES(ID_LARA, LM_LHAND);
 				CreateFlare(ID_BURNING_TORCH_ITEM, 1);
 			}
 		}
@@ -117,14 +118,15 @@ void DoFlameTorch()
 		if (Lara.leftArm.frameNumber == 41)
 		{
 			Lara.litTorch = false;
+			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 0;
 			Lara.lastGunType = WEAPON_NONE;
-			Lara.requestGunType = WEAPON_NONE;
+			Lara.gunType = WEAPON_NONE;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 		else if (Lara.leftArm.frameNumber == 36)
 		{
-			Lara.meshPtrs[LM_LHAND] = Meshes[Objects[ID_LARA].meshIndex + LM_LHAND];
+			LARA_MESHES(ID_LARA, LM_LHAND);
 			CreateFlare(ID_BURNING_TORCH_ITEM, 0);
 		}
 		break;
