@@ -17,7 +17,7 @@ struct ENERGY_ARC
 	byte byte3D;		// 61
 	byte flags;			// 62
 	byte byte3F;		// 63
-	int byte40;		// 64
+	int segmentSize;		// 64
 };
 
 extern int LaserSightX;
@@ -35,6 +35,7 @@ extern int NextSpider;
 extern int NextGunShell;
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+extern ENERGY_ARC EnergyArcs[MAX_ENERGY_ARCS];
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void TriggerExplosionBubble(int x, int y, int z, short roomNum);
@@ -73,5 +74,7 @@ void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int num);
 void SetFadeClip(short height, short speed);
 void TriggerLightningGlow(int x, int y, int z, int rgb);
+void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, int  segmentSize, byte life);
+void UpdateEnergyArcs();
 
 void Inject_Tomb4FX();

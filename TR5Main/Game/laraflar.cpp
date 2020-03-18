@@ -1,6 +1,7 @@
 #include "laraflar.h"
 
 #include "..\Global\global.h"
+#include "..\Specific\roomload.h"
 
 #include "draw.h"
 #include "items.h"
