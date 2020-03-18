@@ -4,6 +4,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
+#include "../../Game/tomb4fx.h"
 #include "../../Game/draw.h"
 
 BITE_INFO SwatGun = { 80, 200, 13, 0 };
@@ -380,6 +381,8 @@ void GuardControl(short itemNum)
 		ITEM_INFO* currentItem;
 		short currentItemNumber;
 
+		PHD_VECTOR pos1, pos2;
+
 		switch (item->currentAnimState)
 		{
 		case STATE_GUARD_STOP:
@@ -520,6 +523,8 @@ void GuardControl(short itemNum)
 					ShotLara(item, &info, &SwatGun, joint0, 30);
 				else
 					ShotLara(item, &info, &SwatGun, joint0, 10);
+
+				TriggerEnergyArc((PHD_VECTOR*)& item->pos, (PHD_VECTOR*)& LaraItem->pos, 0, 0, 128, 256, 150);
 			}
 			break;
 

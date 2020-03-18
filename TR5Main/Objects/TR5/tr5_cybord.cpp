@@ -21,8 +21,8 @@
 #define STATE_HITMAN_GASSED					42
 #define STATE_HITMAN_DEATH					43
 
-BITE_INFO CyborgGun = { 0, 300, 64, 7 };
-byte CyborgJoints[12] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
+BITE_INFO HitmanGun = { 0, 300, 64, 7 };
+byte HitmanJoints[12] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
 void InitialiseHitman(short itemNum)
 {
@@ -135,10 +135,10 @@ void HitmanControl(short itemNumber)
 		if (item->firedWeapon)
 		{
 			PHD_VECTOR pos;
-			pos.x = CyborgGun.x;
-			pos.y = CyborgGun.y;
-			pos.z = CyborgGun.z;
-			GetJointAbsPosition(item, &pos, CyborgGun.meshNum);
+			pos.x = HitmanGun.x;
+			pos.y = HitmanGun.y;
+			pos.z = HitmanGun.z;
+			GetJointAbsPosition(item, &pos, HitmanGun.meshNum);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 10, 192, 128, 32);
 			item->firedWeapon--;
 		}
@@ -157,7 +157,7 @@ void HitmanControl(short itemNumber)
 			{
 				if (item->itemFlags[0] < 11)
 				{
-					item->swapMeshFlags |= 1 << CyborgJoints[item->itemFlags[0]];
+					item->swapMeshFlags |= 1 << HitmanJoints[item->itemFlags[0]];
 					item->itemFlags[0]++;
 				}
 			}
@@ -172,7 +172,7 @@ void HitmanControl(short itemNumber)
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 50;
-			GetJointAbsPosition(item, &pos, CyborgJoints[random]);
+			GetJointAbsPosition(item, &pos, HitmanJoints[random]);
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 807411776);
 			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
@@ -517,7 +517,7 @@ void HitmanControl(short itemNumber)
 					&& ((byte)item->frameNumber - (byte)Anims[item->animNumber].frameBase) & 1)
 				{
 					item->firedWeapon = 1;
-					ShotLara(item, &info, &CyborgGun, joint0, 12);
+					ShotLara(item, &info, &HitmanGun, joint0, 12);
 				}
 				break;
 

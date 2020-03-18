@@ -2,6 +2,7 @@
 #include "../Game/footprint.h"
 #include "../Game/effect2.h"
 #include "../Game/sphere.h"
+#include "../Game/tomb4fx.h"
 #include "../Game/lara.h"
 #include "../Game/draw.h"
 
@@ -16,8 +17,10 @@ extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
+extern ENERGY_ARC EnergyArcs[MAX_ENERGY_ARCS];
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern int g_NumSprites;
+
 void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
 {
 	if (m_nextSprite >= MAX_SPRITES)
@@ -44,6 +47,34 @@ void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2,
 	spr->BlendMode = blendMode;
 
 	m_spritesToDraw.push_back(spr);
+}
+
+RendererLine3D ArcBuffer[1024];
+
+void Renderer11::drawEnergyArcs()
+{
+	for (int i = 0; i < MAX_ENERGY_ARCS; i++)
+	{
+		ENERGY_ARC* arc = &EnergyArcs[i];
+
+		if (arc->life > 0)
+		{
+			Vector3 pos1 = Vector3(arc->pos1.x, arc->pos1.y, arc->pos1.z);
+			Vector3 pos2 = Vector3(arc->pos4.x, arc->pos4.y, arc->pos4.z);
+
+			float length = Vector3::Distance(pos1, pos2);
+			int numSegments = (length / arc->segmentSize) + 1;
+
+			Vector3 pos = pos1;
+			Vector3 dp = Vector3(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+
+			for (int j = 1; j < numSegments; j++)
+			{
+				AddLine3D(pos, pos + dp, Vector4(arc->r / 255.0f, arc->g / 255.0f, arc->b / 255.0f, 1.0f));
+				pos = pos + dp;
+			}
+		}
+	}
 }
 
 void Renderer11::drawSmokes()
@@ -803,7 +834,7 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 	int lastBucket = (transparent ? 4 : 2);
 
 	RendererRoom & const room = m_rooms[effect->Effect->roomNumber];
-	RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
+	//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
 	m_stItem.World = effect->World.Transpose();
 	m_stItem.Position = Vector4(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos, 1.0f);

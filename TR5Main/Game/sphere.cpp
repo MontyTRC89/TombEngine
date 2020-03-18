@@ -1,5 +1,6 @@
 #include "sphere.h"
 #include "draw.h"
+#include "../Specific/roomload.h"
 
 int NumLaraSpheres;
 bool GotLaraSpheres;

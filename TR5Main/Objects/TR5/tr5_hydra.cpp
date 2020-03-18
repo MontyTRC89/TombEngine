@@ -362,3 +362,42 @@ void ControlHydra(short itemNumber)
 		CreatureAnimation(itemNumber, 0, 0);
 	}
 }
+
+void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+	
+	spark->on = 1;
+	spark->sB = 0;
+	spark->sR = (GetRandomControl() & 0x3F) - 96;
+	spark->sG = spark->sR >> 1;
+	spark->dB = 0;
+	spark->dR = (GetRandomControl() & 0x3F) - 96;
+	spark->dG = spark->dR >> 1;
+	spark->fadeToBlack = 8;
+	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
+	spark->transType = COLADD;
+	spark->dynamic = -1;
+	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
+	spark->y = 0;
+	spark->x = (GetRandomControl() & 0xF) - 8;
+	spark->z = (GetRandomControl() & 0xF) - 8;
+	spark->x += pos->x;
+	spark->y += pos->y;
+	spark->z += pos->z;
+	spark->xVel = xv;
+	spark->yVel = yv;
+	spark->zVel = zv;
+	spark->friction = 68;
+	spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
+	spark->rotAng = GetRandomControl() & 0xFFF;
+	if (GetRandomControl() & 1)
+		spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+	else
+		spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+	spark->gravity = 0;
+	spark->maxYvel = 0;
+	spark->scalar = 1;
+	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
+	spark->dSize = spark->size >> 2;
+}

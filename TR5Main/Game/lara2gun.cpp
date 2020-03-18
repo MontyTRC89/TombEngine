@@ -4,6 +4,7 @@
 #include "lara.h"
 #include "effect2.h"
 #include "tomb4fx.h"
+#include "..\Specific\roomload.h"
 
 PISTOL_DEF PistolsTable[4] =
 {
