@@ -917,3 +917,37 @@ void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 16;
 	}
 }
+
+void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+	
+	spark->on = 1;
+	spark->sR = 0;
+	spark->sG = (GetRandomControl() & 0x3F) - 96;
+	spark->sB = spark->sG >> 1;
+	spark->dR = 0;
+	spark->dG = (GetRandomControl() & 0x3F) - 96;
+	spark->dB = spark->dG >> 1;
+	spark->fadeToBlack = 8;
+	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
+	spark->transType = COLADD;
+	spark->dynamic = -1;
+	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
+	spark->x = pos->x + (GetRandomControl() & 0xF) - 8;
+	spark->y = pos->y + (GetRandomControl() & 0xF) - 8;
+	spark->z = pos->z + (GetRandomControl() & 0xF) - 8;
+	spark->xVel = (GetRandomControl() & 0x3FF) - 512;
+	spark->yVel = (GetRandomControl() & 0x3FF) - 512;
+	spark->zVel = (GetRandomControl() & 0x3FF) - 512;
+	spark->friction = 68;
+	spark->flags = SP_ROTATE | SP_FX | SP_ROTATE | SP_DEF | SP_SCALE;
+	spark->rotAng = GetRandomControl() & 0xFFF;
+	spark->gravity = 0;
+	spark->maxYvel = 0;
+	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
+	spark->fxObj = fxObj;
+	spark->scalar = 2;
+	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
+	spark->dSize = spark->size >> 2;
+}

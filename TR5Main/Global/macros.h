@@ -20,7 +20,7 @@
 #define BLUE(rgb) ((rgb) & 0xFF)
 #define ALPHA(rgb) (((rgb) >> 24) & 0xFF)
 
-#define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh * 2]
+#define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh]
 #define MESH_BITS(x) (1 << x)
 #define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)

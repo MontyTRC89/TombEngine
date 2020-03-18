@@ -7,6 +7,8 @@
 #include "../../Game/collide.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/items.h"
+#include "..\..\Specific\roomload.h"
+#include "..\..\Specific\roomload.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

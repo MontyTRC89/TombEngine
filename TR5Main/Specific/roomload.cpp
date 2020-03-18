@@ -43,6 +43,8 @@ int NumStaticObjects;
 int NumMeshPointers;
 int NumObjectTextures;
 int NumTextureTiles;
+short* MeshBase;
+short** Meshes;
 
 uintptr_t hLoadLevel;
 unsigned int ThreadId;
@@ -185,20 +187,17 @@ void LoadObjects()
 
 	MeshBase = (short*)GameMalloc(numMeshDataBytes);
 	ReadBytes(MeshBase, numMeshDataBytes);
-	RawMeshData = (short*)malloc(numMeshDataBytes);
-	memcpy(RawMeshData, MeshBase, numMeshDataBytes);
 
 	MeshDataSize = numMeshDataBytes;
 
-	// TR5 functions do something strange with meshes so I save just for me raw meshes and raw mesh pointers
 	int numMeshPointers = ReadInt32();
-	Meshes = (short**)GameMalloc(8 * numMeshPointers);
-	RawMeshPointers = (int*)malloc(4 * numMeshPointers);
-	ReadBytes(RawMeshPointers, 4 * numMeshPointers);
-	memcpy(Meshes, RawMeshPointers, 4 * numMeshPointers);
+	Meshes = (short**)GameMalloc(4 * numMeshPointers);
+	ReadBytes(Meshes, 4 * numMeshPointers);
 
-	for (int i = 0; i < numMeshPointers; i++)
+	for (int i = 0; i < numMeshPointers; i++) 
+	{
 		Meshes[i] = &MeshBase[(int)Meshes[i] / 2];
+	}
 
 	int numMeshes = numMeshPointers;
 	NumMeshPointers = numMeshes;
@@ -267,19 +266,6 @@ void LoadObjects()
 		Objects[objNum].loaded = true;
 	}
 
-	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
-	{
-		Objects[i].meshIndex *= 2;
-	}
-
-	memcpy(&Meshes[numMeshes], &Meshes[0], sizeof(short*) * numMeshes);
-
-	for (int i = 0; i < numMeshes; i++)
-	{
-		Meshes[2 * i] = Meshes[numMeshes + i];
-		Meshes[2 * i + 1] = Meshes[numMeshes + i];
-	}
-
 	InitialiseObjects();
 	InitialiseClosedDoors();
 
@@ -307,11 +293,6 @@ void LoadObjects()
 		StaticObjects[meshID].zMaxc = ReadInt16();
 
 		StaticObjects[meshID].flags = ReadInt16();
-	}
-
-	for (int i = 0; i < NUM_STATICS; i++)
-	{
-		StaticObjects[i].meshNumber *= 2;
 	}
 
 	// HACK: to remove after decompiling LoadSprites

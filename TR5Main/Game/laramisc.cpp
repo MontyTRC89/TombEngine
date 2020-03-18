@@ -1,5 +1,6 @@
 #include "laramisc.h"
 #include "..\Global\global.h"
+#include "..\Specific\roomload.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "effects.h"
 #include "collide.h"
@@ -42,7 +43,7 @@ void GetLaraDeadlyBounds() // (F) (D)
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds[5];
 }
 
-void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
+void InitialiseLaraAnims(ITEM_INFO* item) 
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
