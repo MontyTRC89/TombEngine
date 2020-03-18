@@ -2362,6 +2362,7 @@ void ObjectObjects()
 	obj = &Objects[ID_BURNING_TORCH_ITEM];
 	if (obj->loaded)
 	{
+		obj->collision = PickupCollision;
 		obj->control = TorchControl;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -3028,7 +3029,6 @@ void PickupObjects()
 	INIT_PICKUP(ID_GAME_PIECE3);
 	INIT_PICKUP(ID_HAMMER_ITEM);
 	INIT_PICKUP(ID_CROWBAR_ITEM);
-	INIT_PICKUP(ID_BURNING_TORCH_ITEM);
 	INIT_PICKUP(ID_PISTOLS_ITEM);
 	INIT_PICKUP(ID_PISTOLS_AMMO_ITEM);
 	INIT_PICKUP(ID_UZI_ITEM);
