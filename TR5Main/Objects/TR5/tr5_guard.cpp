@@ -336,6 +336,7 @@ void GuardControl(short itemNum)
 		ITEM_INFO* currentItem;
 		short currentItemNumber;
 		PHD_VECTOR pos1, pos2;
+		PHD_VECTOR pos;
 		switch (item->currentAnimState)
 		{
 		case STATE_GUARD_STOP:
@@ -468,7 +469,14 @@ void GuardControl(short itemNum)
 					ShotLara(item, &info, &SwatGun, joint0, 30);
 				else
 					ShotLara(item, &info, &SwatGun, joint0, 10);
-				TriggerEnergyArc((PHD_VECTOR*)& item->pos, (PHD_VECTOR*)& LaraItem->pos, 0, 0, 128, 256, 150);
+				
+				// TODO: just for testing energy arcs
+				/*pos1.x = SwatGun.x;
+				pos1.y = SwatGun.y;
+				pos1.z = SwatGun.z;
+				GetJointAbsPosition(item, &pos1, SwatGun.meshNum);
+				TriggerEnergyArc(&pos1, (PHD_VECTOR*)& LaraItem->pos, 192, 128, 192, 256, 150, 256);*/
+
 			}
 			break;
 		case STATE_GUARD_AIM:

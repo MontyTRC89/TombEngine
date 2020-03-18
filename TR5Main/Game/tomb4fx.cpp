@@ -1876,7 +1876,7 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 	}
 }
 
-void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, int segmentSize, byte life)
+void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude)
 {
 	ENERGY_ARC* arc = NULL;
 
@@ -1892,11 +1892,13 @@ void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b
 
 	arc->pos1 = *start;
 	arc->pos4 = *end;
+	arc->sLife = life;
 	arc->life = life;
+	arc->amplitude = amplitude;
+	arc->segmentSize = segmentSize;
 	arc->r = r;
 	arc->g = g;
 	arc->b = b;
-	arc->segmentSize = segmentSize;
 }
 
 void Inject_Tomb4FX()
