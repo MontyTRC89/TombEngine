@@ -33,6 +33,7 @@ byte Flame3xzoffs[16][2] =
 	{ 0x28, 0x37 },
 	{ 0x37, 0x37 }
 };
+static short FireBounds[12] = {0, 0, 0, 0, 0, 0, -1820, 1820, -5460, 5460, -1820, 1820};
 
 void LaraBurn()
 {
@@ -285,7 +286,7 @@ void LavaBurn(ITEM_INFO* item)
 	}
 }
 
-void InitialiseTrapDoor(short itemNumber)
+void InitialiseTrapDoor(short itemNumber) // (F) (D)
 {
 	ITEM_INFO* item;
 
@@ -293,7 +294,7 @@ void InitialiseTrapDoor(short itemNumber)
 	CloseTrapDoor(item);
 }
 
-void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 {
 	ITEM_INFO* item;
 
@@ -302,7 +303,7 @@ void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		ObjectCollision(itemNumber, l, coll);
 }
 
-void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 {
 	ITEM_INFO* item;
 	int result, result2;
@@ -347,7 +348,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		ObjectCollision(itemNumber, l, coll);
 }
 
-void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 {
 	ITEM_INFO* item;
 
@@ -396,7 +397,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		ObjectCollision(itemNumber, l, coll);
 }
 
-void TrapDoorControl(short itemNumber)
+void TrapDoorControl(short itemNumber) // (F) (D)
 {
 	ITEM_INFO* item;
 
@@ -434,7 +435,7 @@ void TrapDoorControl(short itemNumber)
 	}
 }
 
-void CloseTrapDoor(ITEM_INFO* item)
+void CloseTrapDoor(ITEM_INFO* item) // (F) (D)
 {
 	ROOM_INFO* r;
 	FLOOR_INFO* floor;
@@ -467,7 +468,7 @@ void CloseTrapDoor(ITEM_INFO* item)
 	item->itemFlags[3] = pitsky;
 }
 
-void OpenTrapDoor(ITEM_INFO* item)
+void OpenTrapDoor(ITEM_INFO* item) // (F) (D)
 {
 	ROOM_INFO* r;
 	FLOOR_INFO* floor;
@@ -681,7 +682,7 @@ void _WreckingBallControl(short itemNumber)
 	}
 }
 
-void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	
@@ -700,35 +701,33 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		short bounds[6];
-
 		switch (item->objectNumber)
 		{
 		case ID_FLAME_EMITTER:
-			bounds[0] = -256;
-			bounds[1] = 256;
-			bounds[2] = 0;
-			bounds[3] = 1024;
-			bounds[4] = -800;
-			bounds[5] = 800;
+			FireBounds[0] = -256;
+			FireBounds[1] = 256;
+			FireBounds[2] = 0;
+			FireBounds[3] = 1024;
+			FireBounds[4] = -800;
+			FireBounds[5] = 800;
 			break;
 
 		case ID_FLAME_EMITTER2:
-			bounds[0] = -256;
-			bounds[1] = 256;
-			bounds[2] = 0;
-			bounds[3] = 1024;
-			bounds[4] = -600;
-			bounds[5] = 600;
+			FireBounds[0] = -256;
+			FireBounds[1] = 256;
+			FireBounds[2] = 0;
+			FireBounds[3] = 1024;
+			FireBounds[4] = -600;
+			FireBounds[5] = 600;
 			break;
 
 		case ID_BURNING_ROOTS:
-			bounds[0] = -384;
-			bounds[1] = 384;
-			bounds[2] = 0;
-			bounds[3] = 2048;
-			bounds[4] = -384;
-			bounds[5] = 384;
+			FireBounds[0] = -384;
+			FireBounds[1] = 384;
+			FireBounds[2] = 0;
+			FireBounds[3] = 2048;
+			FireBounds[4] = -384;
+			FireBounds[5] = 384;
 			break;
 
 		}
@@ -736,7 +735,7 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		short oldYrot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
 
-		if (TestLaraPosition(bounds, item, l))
+		if (TestLaraPosition(FireBounds, item, l))
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 			{
