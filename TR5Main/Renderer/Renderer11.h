@@ -627,6 +627,7 @@ struct RendererSpriteToDraw {
 	float Width;
 	float Height;
 	BLEND_MODES BlendMode;
+	Vector3 ConstrainAxis;
 };
 
 struct RendererLine3D {
@@ -952,6 +953,7 @@ public:
 	bool											DoTitleImage();
 	void											AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 	void											AddSpriteBillboard(RendererSprite* sprite, Vector3 pos,Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
+	void											AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, Vector3 constrainAxis);
 	void											AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 	void											AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
