@@ -68,22 +68,53 @@ void Renderer11::drawEnergyArcs()
 			Vector3 pos1 = start;
 
 			float delta = 2 * PI / numSegments;
-			float deltaAmplitude = arc->amplitude / 60;
+			float deltaAmplitude = arc->sAmplitude/2 / 5;
 
-			float amplitude = arc->amplitude + deltaAmplitude;
-			if (amplitude>arc->amplitude)
-				amplitude= arc->amplitude - deltaAmplitude;
-			else if (amplitude < arc->amplitude)
-				amplitude = arc->amplitude + deltaAmplitude;
+			float amplitude = arc->amplitude + deltaAmplitude * arc->direction;
+			if (amplitude > arc->sAmplitude / 2)
+			{
+				amplitude = arc->sAmplitude / 2;
+				arc->direction = -1;
+			}
+			else if (amplitude < -arc->sAmplitude / 2)
+			{
+				amplitude = -arc->sAmplitude / 2;
+				arc->direction = 1;
+			}
 			arc->amplitude = amplitude;
+
+			float alpha = (float)arc->life / (float)arc->sLife;
+
+			Matrix rotationMatrix = Matrix::CreateFromAxisAngle(direction, TR_ANGLE_TO_RAD(arc->rotation));
 
 			for (int j = 0; j < numSegments; j++)
 			{
-				Vector3 pos1 = start + direction * (length / numSegments) * j + Vector3(0, arc->amplitude / 2 * sin(delta * j), 0);
-				Vector3 pos2 = start + direction * (length / numSegments) * (j + 1) + Vector3(0, arc->amplitude / 2 * sin(delta * (j + 1)), 0);
+				float shift1 = arc->amplitude / 2 * sin(delta * j);
+				float shift2 = arc->amplitude / 2 * sin(delta * (j + 1));
 
-				AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING], pos2, pos1,pos1+Vector3(0,32,0), pos2 + Vector3(0, 32, 0),
-					Vector4(arc->r / 255.0f, arc->g / 255.0f, arc->b / 255.0f, 1.0f), 0.0f, 1.0f, 1.0f, 1.0f, BLENDMODE_ALPHABLEND);
+				Vector3 sv1 = Vector3(0, shift1, 0);
+				Vector3 sv2 = Vector3(0, shift2, 0);
+
+				sv1 = Vector3::Transform(sv1, rotationMatrix);
+				sv2 = Vector3::Transform(sv2, rotationMatrix);
+
+				Vector3 pos1 = start + direction * (length / numSegments) * j + sv1;
+				Vector3 pos2 = start + direction * (length / numSegments) * (j + 1) + sv2;
+
+				Vector3 c = (pos1 + pos2) / 2.0f;
+
+				Vector3 d = pos2 - pos1;
+				d.Normalize();
+
+				AddSpriteBillboardConstrained(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+					c,
+					Vector4(arc->r / 255.0f, arc->g / 255.0f, arc->b / 255.0f, alpha),
+					SPRITE_ROTATION_90_DEGREES,
+					1.0f,
+					32.0f,
+					Vector3::Distance(pos1, pos2),
+					BLENDMODE_ALPHABLEND,
+					d);
 			}
 		}
 	}
@@ -127,6 +158,32 @@ void Renderer11::AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4
 	spr->Width = width;
 	spr->Height = height;
 	spr->BlendMode = blendMode;
+
+	m_spritesToDraw.push_back(spr);
+}
+
+void Renderer11::AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, Vector3 constrainAxis)
+{
+	if (m_nextSprite >= MAX_SPRITES)
+		return;
+
+	scale = 1.0f;
+
+	width *= scale;
+	height *= scale;
+
+	RendererSpriteToDraw * spr = &m_spritesBuffer[m_nextSprite++];
+
+	spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM;
+	spr->Sprite = sprite;
+	spr->pos = pos;
+	spr->color = color;
+	spr->Rotation = rotation;
+	spr->Scale = scale;
+	spr->Width = width;
+	spr->Height = height;
+	spr->BlendMode = blendMode;
+	spr->ConstrainAxis = constrainAxis;
 
 	m_spritesToDraw.push_back(spr);
 }
@@ -781,6 +838,81 @@ bool Renderer11::drawSprites()
 				v3.Position.z = p3t.z;
 				v3.UV.x = spr->Sprite->UV[3].x;
 				v3.UV.y = spr->Sprite->UV[3].y;
+				v3.Color = spr->color;
+
+				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
+			}
+			else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
+			{
+				float halfWidth = spr->Width / 2.0f;
+				float halfHeight = spr->Height / 2.0f;
+
+				Vector3 camf = Vector3::UnitY;
+				Vector3 objf = Vector3::UnitY;
+
+				Matrix billboardMatrix = Matrix::CreateConstrainedBillboard(
+					spr->pos,
+					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
+					spr->ConstrainAxis,
+					NULL,
+					NULL);
+
+				Vector2 uv[4] = {
+					Vector2(spr->Sprite->UV[0].x, spr->Sprite->UV[0].y),
+					Vector2(spr->Sprite->UV[1].x, spr->Sprite->UV[1].y),
+					Vector2(spr->Sprite->UV[2].x, spr->Sprite->UV[2].y),
+					Vector2(spr->Sprite->UV[3].x, spr->Sprite->UV[3].y)
+				};
+
+				for (int i = 0; i < spr->Rotation; i++)
+				{
+					Vector2 temp = uv[3];
+					uv[3] = uv[2];
+					uv[2] = uv[1];
+					uv[1] = uv[0];
+					uv[0] = temp;
+				}
+
+				Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
+				Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
+				Vector3 p2 = Vector3(halfWidth, halfHeight, 0);
+				Vector3 p3 = Vector3(-halfWidth, halfHeight, 0);
+
+				Vector3 p0t = Vector3::Transform(p0, billboardMatrix);
+				Vector3 p1t = Vector3::Transform(p1, billboardMatrix);
+				Vector3 p2t = Vector3::Transform(p2, billboardMatrix);
+				Vector3 p3t = Vector3::Transform(p3, billboardMatrix);
+
+				RendererVertex v0;
+				v0.Position.x = p0t.x;
+				v0.Position.y = p0t.y;
+				v0.Position.z = p0t.z;
+				v0.UV.x = uv[0].x;
+				v0.UV.y = uv[0].y;
+				v0.Color = spr->color;
+
+				RendererVertex v1;
+				v1.Position.x = p1t.x;
+				v1.Position.y = p1t.y;
+				v1.Position.z = p1t.z;
+				v1.UV.x = uv[1].x;
+				v1.UV.y = uv[1].y;
+				v1.Color = spr->color;
+
+				RendererVertex v2;
+				v2.Position.x = p2t.x;
+				v2.Position.y = p2t.y;
+				v2.Position.z = p2t.z;
+				v2.UV.x = uv[2].x;
+				v2.UV.y = uv[2].y;
+				v2.Color = spr->color;
+
+				RendererVertex v3;
+				v3.Position.x = p3t.x;
+				v3.Position.y = p3t.y;
+				v3.Position.z = p3t.z;
+				v3.UV.x = uv[3].x;
+				v3.UV.y = uv[3].y;
 				v3.Color = spr->color;
 
 				m_primitiveBatch->DrawQuad(v0, v1, v2, v3);

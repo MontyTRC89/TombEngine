@@ -5,7 +5,8 @@
 struct ENERGY_ARC
 {
 	PHD_VECTOR pos1;	// 0
-	PHD_VECTOR pos2;	// 12
+	short rotation;	// 12
+	short filler[5];
 	PHD_VECTOR pos3;	// 24
 	PHD_VECTOR pos4;	// 36
 	byte r;				// 48
@@ -15,11 +16,14 @@ struct ENERGY_ARC
 	short life;			// 51
 	short amplitude;
 	short segmentSize;	// 64
-	byte gap35[2];		// 53
-	byte byte3D;		// 61
+	short sAmplitude;		// 53
+	byte type;		// 61
 	byte flags;			// 62
-	byte byte3F;		// 63
+	signed char direction;		// 63
 };
+
+#define ENERGY_ARC_STRAIGHT_LINE	0
+#define ENERGY_ARC_CIRCLE			1
 
 extern int LaserSightX;
 extern int LaserSightY;
@@ -75,7 +79,7 @@ void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int num);
 void SetFadeClip(short height, short speed);
 void TriggerLightningGlow(int x, int y, int z, int rgb);
-void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude);
+void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte type);
 void UpdateEnergyArcs();
 
 void Inject_Tomb4FX();
