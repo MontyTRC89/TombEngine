@@ -152,7 +152,7 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_FLARES] = InventoryObjectDefinition(ID_FLARE_INV_ITEM, STRING_FLARES, -1, 0);
 	m_objectsTable[INV_OBJECT_TIMEX] = InventoryObjectDefinition(ID_COMPASS_ITEM, STRING_TIMEX, -1, 0);
 	m_objectsTable[INV_OBJECT_CROWBAR] = InventoryObjectDefinition(ID_CROWBAR_ITEM, STRING_CROWBAR, -1, 0);
-	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER] = InventoryObjectDefinition(ID_GRENADE_ITEM, STRING_GRENADE_LAUNCHER, -1, 0);
+	m_objectsTable[INV_OBJECT_GRENADE_LAUNCHER] = InventoryObjectDefinition(ID_GRENADE_GUN_ITEM, STRING_GRENADE_LAUNCHER, -1, 0);
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO1] = InventoryObjectDefinition(ID_GRENADE_AMMO1_ITEM, STRING_GRENADE_AMMO1, -1, 0);
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO2] = InventoryObjectDefinition(ID_GRENADE_AMMO2_ITEM, STRING_GRENADE_AMMO2, -1, 0);
 	m_objectsTable[INV_OBJECT_GRENADE_AMMO3] = InventoryObjectDefinition(ID_GRENADE_AMMO3_ITEM, STRING_GRENADE_AMMO3, -1, 0);
@@ -170,7 +170,7 @@ Inventory::Inventory()
 	m_objectsTable[INV_OBJECT_SUNGLASSES] = InventoryObjectDefinition(ID_INVENTORY_SUNGLASSES, STRING_DISPLAY, -1, 0);
 	m_objectsTable[INV_OBJECT_POLAROID] = InventoryObjectDefinition(ID_INVENTORY_POLAROID, STRING_LARA_HOME, -1, 0);
 	m_objectsTable[INV_OBJECT_HEADPHONES] = InventoryObjectDefinition(ID_INVENTORY_HEADPHONES, STRING_SOUND, -1, 0);
-	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY, STRING_DIARY, -1, 0);
+	m_objectsTable[INV_OBJECT_DIARY] = InventoryObjectDefinition(ID_DIARY_ITEM, STRING_DIARY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN1] = InventoryObjectDefinition(ID_WATERSKIN1_EMPTY, STRING_WATERSKIN1_EMPTY, -1, 0);
 	m_objectsTable[INV_OBJECT_WATERSKIN2] = InventoryObjectDefinition(ID_WATERSKIN2_EMPTY, STRING_WATERSKIN2_EMPTY, -1, 0);
 	
@@ -1639,7 +1639,7 @@ void Inventory::UseCurrentItem()
 	}
 
 	// Grenade launcher
-	if (objectNumber == ID_GRENADE_ITEM)
+	if (objectNumber == ID_GRENADE_GUN_ITEM)
 	{
 		if (canUseWeapons)
 		{

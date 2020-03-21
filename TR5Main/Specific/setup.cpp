@@ -588,7 +588,7 @@ void NewObjects()
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_GRENADE_ITEM];
+	obj = &Objects[ID_GRENADE_GUN_ITEM];
 	if (obj->loaded)
 	{
 		obj->collision = PickupCollision;
@@ -1121,7 +1121,7 @@ void NewObjects()
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_BOAT];
+	obj = &Objects[ID_SPEEDBOAT];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseBoat;
@@ -2211,24 +2211,30 @@ void ObjectObjects()
 		obj->saveFlags = true;
 	}
 
-	obj = &Objects[ID_DOUBLE_DOORS];
-	if (obj->loaded)
+	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
 	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = DoubleDoorCollision;
-		obj->control = PushPullKickDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
+		obj = &Objects[i];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->collision = DoubleDoorCollision;
+			obj->control = PushPullKickDoorControl;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+		}
 	}
 
-	obj = &Objects[ID_UNDERWATER_DOOR];
-	if (obj->loaded)
+	for (int i = ID_UNDERWATER_DOOR1; i <= ID_UNDERWATER_DOOR4; i++)
 	{
-		obj->initialise = InitialiseDoor;
-		obj->collision = UnderwaterDoorCollision;
-		obj->control = PushPullKickDoorControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
+		obj = &Objects[i];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseDoor;
+			obj->collision = UnderwaterDoorCollision;
+			obj->control = PushPullKickDoorControl;
+			obj->saveAnim = true;
+			obj->saveFlags = true;
+		}
 	}
 
 	for (int objNum = ID_PUSHPULL_DOOR1; objNum <= ID_KICK_DOOR4; objNum++)
@@ -2469,10 +2475,13 @@ void ObjectObjects()
 		INIT_PUZZLEDONE(objNum);
 	}
 	
-	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING64; objNum++)
+	for (int objNum = ID_ANIMATING1; objNum <= ID_ANIMATING128; objNum++)
 	{
 		INIT_ANIMATING(objNum);
 	}
+
+	INIT_ANIMATING(ID_GUARDIAN_BASE);
+	INIT_ANIMATING(ID_GUARDIAN_TENTACLE);
 
 	obj = &Objects[ID_ANIMATING13];
 	if (obj->loaded)
@@ -3040,7 +3049,7 @@ void PickupObjects()
 	INIT_PICKUP(ID_CROSSBOW_AMMO1_ITEM);
 	INIT_PICKUP(ID_CROSSBOW_AMMO2_ITEM);
 	INIT_PICKUP(ID_CROSSBOW_AMMO3_ITEM);
-	INIT_PICKUP(ID_GRENADE_ITEM);
+	INIT_PICKUP(ID_GRENADE_GUN_ITEM);
 	INIT_PICKUP(ID_GRENADE_AMMO1_ITEM);
 	INIT_PICKUP(ID_GRENADE_AMMO2_ITEM);
 	INIT_PICKUP(ID_GRENADE_AMMO3_ITEM);
