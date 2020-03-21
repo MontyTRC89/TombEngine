@@ -186,7 +186,7 @@ void PickedUpObject(short objectNumber)
 
 		break;
 
-	case ID_GRENADE_ITEM:
+	case ID_GRENADE_GUN_ITEM:
 		if (!(g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Present))
 		{
 			g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
@@ -343,7 +343,7 @@ void PickedUpObject(short objectNumber)
 		g_LaraExtra.Crowbar = true;
 		break;
 
-	case ID_DIARY:
+	case ID_DIARY_ITEM:
 		g_LaraExtra.Diary.Present = true;
 		break;
 
