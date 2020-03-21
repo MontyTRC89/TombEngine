@@ -47,7 +47,7 @@ void InitialiseLaserHead(short itemNumber)
 
 	for (int i = 0; i < LevelItems; i++)
 	{
-		if (Items[i].objectNumber == ID_ANIMATING12)
+		if (Items[i].objectNumber == ID_ANIMATING1)
 		{
 			info->baseItem = i;
 			break;
@@ -59,7 +59,7 @@ void InitialiseLaserHead(short itemNumber)
 	for (int i = 0; i < LevelItems; i++)
 	{
 		// ID_WINGED_MUMMY beccause we recycled MIP slots
-		if (Items[i].objectNumber == ID_WINGED_MUMMY && Items[i].pos.yRot == rotation)
+		if (Items[i].objectNumber == ID_ANIMATING2 && Items[i].pos.yRot == rotation)
 		{
 			info->arcsItems[j] = i;
 			rotation += ANGLE(45);
