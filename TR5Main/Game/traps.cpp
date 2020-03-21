@@ -907,8 +907,8 @@ void FlameEmitter3Control(short itemNumber)
 
 			SoundEffect(SFX_2GUNTEX_HIT_GUNS, &item->pos, 0);
 
-			byte color1 = (GetRandomControl() & 0x3F) + 192;
-			byte color2 = (GetRandomControl() & 0x3F) + 192;
+			byte g = (GetRandomControl() & 0x3F) + 192;
+			byte b = (GetRandomControl() & 0x3F) + 192;
 
 			PHD_VECTOR src;
 			PHD_VECTOR dest;
@@ -928,11 +928,11 @@ void FlameEmitter3Control(short itemNumber)
 					
 					if (GetRandomControl() & 3)
 					{
-						//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 64, color2 | ((color1 | 0x180000) << 8), 0, 32, 3);
+						//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 64, b | ((g | 0x180000) << 8), 0, 32, 3);
 					}
 					else
 					{
-						//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 96, color2 | ((color1 | 0x200000) << 8), 1, 32, 3);
+						//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 96, b | ((g | 0x200000) << 8), 1, 32, 3);
 					}
 				}
 			}
@@ -952,15 +952,15 @@ void FlameEmitter3Control(short itemNumber)
 				{
 					if (GetRandomControl() & 3)
 					{
-						//TriggerEnergyArc(&dest.x_rot, &dest, (GetRandomControl() & 0x1F) + 64, color2 | ((color1 | 0x180000) << 8), 0, 32, 5);
+						//TriggerEnergyArc(&dest.x_rot, &dest, (GetRandomControl() & 0x1F) + 64, b | ((g | 0x180000) << 8), 0, 32, 5);
 					}
 					else
 					{
-						//TriggerEnergyArc(&dest.x_rot, &dest, (GetRandomControl() & 0x1F) + 96, color2 | ((color1 | 0x200000) << 8), 1, 32, 5);
+						//TriggerEnergyArc(&dest.x_rot, &dest, (GetRandomControl() & 0x1F) + 96, b | ((g | 0x200000) << 8), 1, 32, 5);
 					}
 				}
 				if (item->triggerFlags != 3 || targetItem->triggerFlags)
-					TriggerLightningGlow(dest.x, dest.y, dest.z, color2 | ((color1 | 0x400000) << 8));
+					TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);
 			}
 
 			if ((GlobalCounter & 3) == 2)
@@ -973,8 +973,8 @@ void FlameEmitter3Control(short itemNumber)
 				dest.y = (GetRandomControl() & 0x1FF) + src.y - 256;
 				dest.z = (GetRandomControl() & 0x1FF) + src.z - 256;
 
-				//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0xF) + 16, color2 | ((color1 | 0x180000) << 8), 3, 32, 3);
-				TriggerLightningGlow(dest.x, dest.y, dest.z, color2 | ((color1 | 0x400000) << 8));
+				//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0xF) + 16, b | ((g | 0x180000) << 8), 3, 32, 3);
+				TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);  
 			}
 		}
 		else

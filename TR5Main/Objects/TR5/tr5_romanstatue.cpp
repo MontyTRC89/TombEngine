@@ -300,9 +300,9 @@ void ControlRomanStatue(short itemNumber)
 					arc->pos4.z = pos2.z;
 
 					if (item->triggerFlags)
-						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, (color >> 1) | ((color | 0x100000) << 8));
+						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color >> 1);
 					else
-						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, color | (((color >> 1) | 0x100000) << 8));
+						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color >> 1, color);
 
 					continue;
 				}
@@ -324,7 +324,7 @@ void ControlRomanStatue(short itemNumber)
 						48,
 						5);*/
 
-					TriggerLightningGlow(pos1.x, pos1.y, pos1.z, (color >> 1) | ((color | 0x100000) << 8));
+					TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color >> 1);
 					unk = 1;
 					continue;
 				}
@@ -338,7 +338,7 @@ void ControlRomanStatue(short itemNumber)
 					48,
 					5);*/
 
-				TriggerLightningGlow(pos1.x, pos1.y, pos1.z, color | (((color >> 1) | 0x100000) << 8));
+				TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color >> 1, color);
 				unk = 1;
 			}
 
@@ -426,10 +426,10 @@ void ControlRomanStatue(short itemNumber)
 						if (item->itemFlags[0])
 							item->itemFlags[0]--;
 						
-						//TriggerShockwave((PHD_3DPOS*)&pos1, (int)& unk_A00010, 96, 0x30004080, 0x10000);
+						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 96, 128, 64, 0, 48, 0, 1);
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 0x80004080);
 						pos1.y -= 64;
-						//TriggerShockwave((PHD_3DPOS*)&pos1, (int)& unk_600010, 64, 0x30004080, 0x10000);
+						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 128, 64, 0, 48, 0, 1);
 					}
 
 					deltaFrame = item->frameNumber - Anims[item->animNumber].frameBase;

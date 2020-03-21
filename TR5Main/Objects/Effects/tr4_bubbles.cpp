@@ -350,10 +350,10 @@ void BubblesControl(short fxNum)
 		{
 			TriggerShockwave(
 				(PHD_3DPOS*)&fx->pos,
-				0x2000,
-				0xA000,
+				32,
+				160,
 				64,
-				64, 80, 00,
+				64, 128, 00,
 				24,
 				(((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
 
@@ -389,11 +389,11 @@ void BubblesControl(short fxNum)
 						if (fx->flag1 == 6)
 						{
 							TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-							TriggerShockwave(&fx->pos, 0x3000, 0xF000, 64, 0, 96, 128, 24, 0x20000, 0);
+							TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 2);
 							fx->pos.yPos -= 128;
-							TriggerShockwave(&fx->pos, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0x2000);
+							TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
 							fx->pos.yPos += 256;
-							TriggerShockwave(&fx->pos, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0x2000);
+							TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
 						}
 					}
 					else
@@ -415,7 +415,7 @@ void BubblesControl(short fxNum)
 				life = 16;
 			}
 
-			TriggerShockwave(&fx->pos, 0x2000, 0xA000, 64, r, g, b, life, 0, 0);
+			TriggerShockwave(&fx->pos, 32, 160, 64, r, g, b, life, 0, 0);
 		}
 
 		KillEffect(fxNum);
@@ -434,7 +434,7 @@ void BubblesControl(short fxNum)
 
 		if (fx->flag1 == 1)
 		{
-			TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 64, 64, 128, 0, 24, 0, 0);
+			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 			LaraBurn();
 			//Lara.gassed = true; BYTE1(Lara_Flags) |= 2u;			
@@ -445,21 +445,21 @@ void BubblesControl(short fxNum)
 			{
 			case 3:
 			case 4:
-				TriggerShockwave((PHD_3DPOS*)fx, 0x2000, 0xA000, 64, 128, 64, 0, 16, 0, 256);
+				TriggerShockwave((PHD_3DPOS*)fx, 32, 160, 64, 128, 64, 0, 16, 0, 1);
 				break;
 			case 5:
-				TriggerShockwave((PHD_3DPOS*)fx, 0x2000, 0xA000, 64, 0, 96, 128, 16, 0, 512);
+				TriggerShockwave((PHD_3DPOS*)fx, 32, 160, 64, 0, 96, 128, 16, 0, 2);
 				break;
 			case 2:
-				TriggerShockwave((PHD_3DPOS*)fx, 0x2000, 0xA000, 64, 0, 128, 128, 16, 0, 512);
+				TriggerShockwave((PHD_3DPOS*)fx, 32, 160, 64, 0, 128, 128, 16, 0, 2);
 				break;
 			case 6:
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-				TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 64, 0, 96, 128, 24, 0, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 64, 0, 96, 128, 24, 0, 0);
 				fx->pos.yPos -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 				fx->pos.yPos += 256;
-				TriggerShockwave((PHD_3DPOS*)fx, 0x3000, 0xF000, 48, 0, 112, 128, 16, 0, 0);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 				LaraBurn();
 				break;
 			}
@@ -468,8 +468,8 @@ void BubblesControl(short fxNum)
 		{
 			TriggerShockwave(
 				(PHD_3DPOS*)fx,
-				0x1800,
-				0x5800,
+				24,
+				88,
 				48,
 				64, 128, 0, 16,
 				(((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);

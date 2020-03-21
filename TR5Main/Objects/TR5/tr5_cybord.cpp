@@ -174,7 +174,7 @@ void HitmanControl(short itemNumber)
 			pos.z = 50;
 			GetJointAbsPosition(item, &pos, HitmanJoints[random]);
 
-			TriggerLightningGlow(pos.x, pos.y, pos.z, 807411776);
+			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
 			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
