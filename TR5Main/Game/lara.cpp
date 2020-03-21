@@ -36,7 +36,6 @@ static short RightClimbTab[4] = // offset 0xA0640
 
 extern Inventory* g_Inventory;
 
-short angle = 0;
 short elevation = 57346;
 bool doJump = false;
 short OldAngle = 1;
@@ -5793,7 +5792,7 @@ LABEL_44:
 	return result;
 }*/
 
-void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)//12E54, 12F04 (F)
+void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F) (D)
 {
 	if (item->currentAnimState == STATE_LARA_SHIMMY_RIGHT)
 	{
@@ -5836,16 +5835,16 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)//12E54
 	}
 }
 
-int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)//12C54, 12D04 (F)
+int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	short* bounds;
+	ANIM_FRAME* bounds;
 	int shift, result;
 
 	if (Lara.climbStatus == 0)
-		return false;
+		return 0;
 
 	if (item->fallspeed < 0)
-		return false;
+		return 0;
 
 	switch ((unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90))
 	{
@@ -5863,7 +5862,7 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)//12C54, 12D04 (F)
 		break;
 	}
 
-	bounds = GetBoundsAccurate(item);
+	bounds = (ANIM_FRAME*) GetBoundsAccurate(item);
 
 	if (Lara.moveAngle != item->pos.yRot)
 	{
@@ -5871,18 +5870,22 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)//12C54, 12D04 (F)
 		short r = LaraCeilingFront(item, Lara.moveAngle, 128, 0);
 
 		if (abs(l - r) > 60)
-			return false;
+			return 0;
 	}
 
-	if (LaraTestClimbPos(item, coll->radius, coll->radius, bounds[2], bounds[3] - bounds[2], &shift) ||
-		LaraTestClimbPos(item, coll->radius, -coll->radius, bounds[2], bounds[3] - bounds[2], &shift) ||
-		LaraTestClimbPos(item, coll->radius, 0, bounds[2], bounds[3] - bounds[2], &shift))
+	if (LaraTestClimbPos(item, coll->radius, coll->radius, bounds->MinY, bounds->MaxY - bounds->MinY, &shift) &&
+		LaraTestClimbPos(item, coll->radius, -coll->radius, bounds->MinY, bounds->MaxY - bounds->MinY, &shift))
 	{
-		item->pos.yPos += shift;
-		return true;
+		result = LaraTestClimbPos(item, coll->radius, 0, bounds->MinY, bounds->MaxY - bounds->MinY, &shift);
+		if (result)
+		{
+			if (result != 1)
+				item->pos.yPos += shift;
+			return 1;
+		}
 	}
 
-	return false;
+	return 0;
 }
 
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
@@ -6325,7 +6328,7 @@ int LaraFallen(ITEM_INFO* item, COLL_INFO* coll)//11B6C, 11C1C (F)
 	return 0;
 }*/
 
-short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)//1189C, 1194C (F)
+short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
 {
 	short room = item->roomNumber;
 
@@ -6341,7 +6344,7 @@ short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)//1189C, 1194
 	return height;
 }
 
-short LaraFloorFront(ITEM_INFO* item, short ang, int dist)//117B0, 11860 (F)
+short LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
 {
 	short room = item->roomNumber;
 
@@ -6718,6 +6721,174 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 	OldAngle = angle;
 
 	return 1;
+}
+
+int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+{
+	int delta, flag, flag2, front, dfront, x, z, result;
+	short angle, hdif, cdif, dir;
+	ANIM_FRAME* frame;
+
+	delta = 0;
+	flag = 0;
+	angle = Lara.moveAngle;
+	if (angle == (short) (item->pos.yRot - ANGLE(90)))
+	{
+		delta = -100;
+	}
+	else if (angle == (short) (item->pos.yRot + ANGLE(90)))
+	{
+		delta = 100;
+	}
+	hdif = LaraFloorFront(item, angle, 100);
+	if (hdif < 200)
+		flag = 1;
+	cdif = LaraCeilingFront(item, angle, 100, 0);
+	dir = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	switch (dir)
+	{
+	case NORTH:
+		item->pos.zPos += 4;
+		break;
+	case EAST:
+		item->pos.xPos += 4;
+		break;
+	case SOUTH:
+		item->pos.zPos -= 4;
+		break;
+	case WEST:
+		item->pos.xPos -= 4;
+		break;
+	}
+	coll->badPos = NO_BAD_POS;
+	coll->badNeg = -STEPUP_HEIGHT;
+	coll->badCeiling = 0;
+	Lara.moveAngle = item->pos.yRot;
+	GetLaraCollisionInfo(item, coll);
+	result = 0;
+	if (Lara.climbStatus)
+	{
+		if (TrInput & IN_ACTION && item->hitPoints > 0)
+		{
+			Lara.moveAngle = angle;
+			if (!LaraTestHangOnClimbWall(item, coll))
+			{
+				if (item->animNumber != ANIMATION_LARA_LADDER_TO_HANDS_RIGHT && item->animNumber != ANIMATION_LARA_LADDER_TO_HANDS_LEFT)
+				{
+					SnapLaraToEdgeOfBlock(item, coll, dir);
+					item->pos.yPos = coll->old.y;
+					item->currentAnimState = STATE_LARA_HANG;
+					item->goalAnimState = STATE_LARA_HANG;
+					item->animNumber = ANIMATION_LARA_HANG_IDLE;
+					item->frameNumber = Anims[item->animNumber].frameBase + 21;
+				}
+				result = 1;
+			}
+			else
+			{
+				if (item->animNumber == ANIMATION_LARA_HANG_IDLE && item->frameNumber == Anims[ANIMATION_LARA_HANG_IDLE].frameBase + 21 && LaraTestClimbStance(item, coll))
+					item->goalAnimState = STATE_LARA_LADDER_IDLE;
+			}
+		}
+		else
+		{
+			item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
+			item->currentAnimState = STATE_LARA_JUMP_FORWARD;
+			item->goalAnimState = STATE_LARA_JUMP_FORWARD;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->pos.yPos += 256;
+			item->gravityStatus = true;
+			item->speed = 2;
+			item->fallspeed = 1;
+			Lara.gunStatus = LG_NO_ARMS;
+		}
+	}
+	else
+	{
+		if (TrInput & IN_ACTION && item->hitPoints > 0 && coll->frontFloor <= 0)
+		{
+			if (flag && hdif > 0 && (delta > 0 && coll->leftFloor > coll->rightFloor || delta < 0 && coll->leftFloor < coll->rightFloor))
+				flag = 0;
+			frame = (ANIM_FRAME*) GetBoundsAccurate(item);
+			front = coll->frontFloor;
+			dfront = coll->frontFloor - frame->MinY;
+			flag2 = 0;
+			x = item->pos.xPos;
+			z = item->pos.zPos;
+			switch (dir)
+			{
+			case NORTH:
+				x += delta;
+				break;
+			case EAST:
+				z -= delta;
+				break;
+			case SOUTH:
+				x -= delta;
+				break;
+			case WEST:
+				z += delta;
+				break;
+			}
+			Lara.moveAngle = angle;
+			if (256 << dir & GetClimbTrigger(x, item->pos.yPos, z, item->roomNumber))
+			{
+				if (!LaraTestHangOnClimbWall(item, coll))
+					dfront = 0;
+			}
+			else if (abs(coll->leftFloor2 - coll->rightFloor2) >= 60)
+			{
+				if (delta < 0 && coll->leftFloor2 != coll->frontFloor || delta > 0 && coll->rightFloor2 != coll->frontFloor)
+					flag2 = 1;
+			}
+			coll->frontFloor = front;
+			if (!flag2 && coll->midCeiling < 0 && coll->collType == CT_FRONT && !flag && !coll->hitStatic && cdif <= -950 && dfront >= -60 && dfront <= 60)
+			{
+				switch (dir)
+				{
+				case NORTH:
+				case SOUTH:
+					item->pos.zPos += coll->shift.z;
+					break;
+				case EAST:
+				case WEST:
+					item->pos.xPos += coll->shift.x;
+					break;
+				}
+				item->pos.yPos += dfront;
+			}
+			else
+			{
+				item->pos.xPos = coll->old.x;
+				item->pos.yPos = coll->old.y;
+				item->pos.zPos = coll->old.z;
+				if (item->currentAnimState == STATE_LARA_SHIMMY_LEFT || item->currentAnimState == STATE_LARA_SHIMMY_RIGHT)
+				{
+					item->currentAnimState = STATE_LARA_HANG;
+					item->goalAnimState = STATE_LARA_HANG;
+					item->animNumber = ANIMATION_LARA_HANG_IDLE;
+					item->frameNumber = Anims[item->animNumber].frameBase + 21;
+				}
+				result = 1;
+			}
+		}
+		else
+		{
+			item->currentAnimState = STATE_LARA_JUMP_UP;
+			item->goalAnimState = STATE_LARA_JUMP_UP;
+			item->animNumber = ANIMATION_LARA_TRY_HANG_VERTICAL;
+			item->frameNumber = Anims[item->animNumber].frameBase + 9;
+			frame = (ANIM_FRAME*) GetBoundsAccurate(item);
+			item->pos.xPos += coll->shift.x;
+			item->pos.yPos += frame->MaxY;
+			item->pos.zPos += coll->shift.z;
+			item->gravityStatus = true;
+			item->speed = 2;
+			item->fallspeed = 1;
+			Lara.gunStatus = LG_NO_ARMS;
+		}
+	}
+	return result;
 }
 
 void Inject_Lara()
