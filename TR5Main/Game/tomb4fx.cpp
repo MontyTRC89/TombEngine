@@ -1521,7 +1521,7 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 	}
 }
 
-void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel)
+void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -1529,13 +1529,13 @@ void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int ve
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
 		SPARKS* spark = &Sparks[GetFreeSpark()];
-		spark->dB = color & 0xFF;
+		spark->dB = b;
 		spark->on = true;
 		spark->sR = 0;
 		spark->sG = 0;
 		spark->sB = 0;
-		spark->dG = color >> 8;
-		spark->dR = color >> 16;
+		spark->dG = g;
+		spark->dR = r;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 8;
 		spark->transType = 2;
@@ -1615,7 +1615,7 @@ void UpdateShockwaves()
 							TriggerShockwaveHitEffect(LaraItem->pos.xPos,
 								sw->y,
 								LaraItem->pos.zPos,
-								(sw->r << 16) | (sw->g << 8) | sw->b,
+								sw->r, sw->g, sw->b,
 								angle,
 								sw->speed);
 							LaraItem->hitPoints -= sw->speed >> (((sw->flags >> 1) & 1) + 2);
@@ -1757,22 +1757,22 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 	SetUpLensFlare(0, 0, 0, &pos);
 }*/
 
-void TriggerLightningGlow(int x, int y, int z, int rgb)// (F)
+void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)// (F)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
-	spark->dG = GREEN(rgb);
-	spark->sG = GREEN(rgb);
+	spark->dG = g;
+	spark->sG = g;
 	spark->life = 4;
 	spark->sLife = 4;
-	spark->dR = RED(rgb);
-	spark->sR = RED(rgb);
+	spark->dR = r;
+	spark->sR = r;
 	spark->colFadeSpeed = 2;
 	spark->transType = 2;
 	spark->x = x;
 	spark->on = 1;
-	spark->dB = BLUE(rgb);
-	spark->sB = BLUE(rgb);
+	spark->dB = b;
+	spark->sB = b;
 	spark->fadeToBlack = 0;
 	spark->y = y;
 	spark->z = z;
@@ -1782,12 +1782,9 @@ void TriggerLightningGlow(int x, int y, int z, int rgb)// (F)
 	spark->flags = 10;
 	spark->scalar = 3;
 	spark->maxYvel = 0;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD;
 	spark->gravity = 0;
-	int size = ALPHA(rgb) + (GetRandomControl() & 3);
-	spark->dSize = size;
-	spark->sSize = size;
-	spark->size = size;
+	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 }
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)//(F)
@@ -1876,7 +1873,7 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 	}
 }
 
-void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte type)
+ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte type)
 {
 	ENERGY_ARC* arc = NULL;
 
@@ -1888,7 +1885,7 @@ void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b
 	}
 
 	if (arc == NULL)
-		return;
+		return NULL;
 
 	arc->pos1 = *start;
 	arc->pos4 = *end;
@@ -1903,6 +1900,8 @@ void TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b
 	arc->type = type;
 	arc->direction = 1;
 	arc->rotation = GetRandomControl();
+
+	return arc;
 }
 
 void Inject_Tomb4FX()

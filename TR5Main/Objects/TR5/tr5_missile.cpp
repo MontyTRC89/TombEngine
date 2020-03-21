@@ -112,9 +112,9 @@ void MissileControl(short itemNumber)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.yPos -= 64;
-				//TriggerShockwave((PHD_VECTOR*)fx, 16777264, 64, 402686016, 0x10000);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
 				fx->pos.yPos -= 128;
-				//TriggerShockwave((PHD_VECTOR*)fx, 15728688, 48, 402686016, 0x10000);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
 			}
 			else if (fx->flag1 == 2)
 			{
@@ -125,7 +125,7 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			//TriggerShockwave(fx, 15728688, 48, 411066368, 0x20000);
+			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 2);
 		}
 		
 		KillEffect(itemNumber);
@@ -140,9 +140,9 @@ void MissileControl(short itemNumber)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.yPos -= 64;
-				//TriggerShockwave(fx, 16777264, 64, 402686016, 0x10000);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
 				fx->pos.yPos -= 128;
-				//TriggerShockwave(fx, 15728688, 48, 402686016, 0x10000);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
 				LaraItem->hitPoints -= 200;			
 				KillEffect(itemNumber);
 			}
@@ -163,7 +163,7 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			//TriggerShockwave(fx, 15728688, 48, 411066368, 0);
+			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
 			if (LaraItem->hitPoints >= 500)
 				LaraItem->hitPoints -= 300;
 			else
