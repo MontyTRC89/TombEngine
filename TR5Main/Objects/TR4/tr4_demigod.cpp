@@ -468,8 +468,7 @@ void DemigodControl(short itemNum)
 					pos.y = height - 128;
 				}
 
-				// TODO:
-				//TriggerShockwave((PHD_3DPOS *)&pos, 0x00580018, 256, 545292416, 0x20000, 0);
+				TriggerShockwave((PHD_3DPOS *)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
 				DemigodHammerAttack(pos.x, pos.y + 128, pos.z, 8);
 
 				Camera.bounce = -128;

@@ -656,7 +656,7 @@ void ControlGrenade(short itemNumber)
 							{
 								TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
 								currentItem->pos.yPos -= 128; 
-								TriggerShockwave(&currentItem->pos, 0x3000, 0x3001, 64, 0, 96, 128, 24, 0, 0); // CHECK
+								TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
 								short currentItemNumber = (currentItem - Items) / sizeof(ITEM_INFO);
@@ -681,7 +681,7 @@ void ControlGrenade(short itemNumber)
 							{
 								TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
 								currentMesh->y -= 128;
-								TriggerShockwave((PHD_3DPOS*)&currentMesh, 0x2800, 0xB000, 64, 0, 96, 128, 16, 0, 0);
+								TriggerShockwave((PHD_3DPOS*)&currentMesh, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 								currentMesh->y += 128;
 								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
@@ -731,7 +731,7 @@ void ControlGrenade(short itemNumber)
 		else
 		{
 			item->pos.yPos -= 128;
-			TriggerShockwave(&item->pos, 0x3000, 0x3001, 96, 0, 96, 128, 24, 0, 0);
+			TriggerShockwave(&item->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
 			for (int x = 0; x < 2; x++)
@@ -1143,7 +1143,7 @@ void ControlCrossbowBolt(short itemNumber)
 						{
 							TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
 							currentItem->pos.yPos -= 128;
-							TriggerShockwave(&currentItem->pos, 0x3000, 0x3001, 96, 0, 96, 128, 24, 0, 0);
+							TriggerShockwave(&currentItem->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 							currentItem->pos.yPos += 128;
 							ExplodeItemNode(currentItem, 0, 0, 128);
 							short currentItemNumber = (currentItem - CollidedItems[0]) / sizeof(ITEM_INFO);
@@ -1184,7 +1184,7 @@ void ControlCrossbowBolt(short itemNumber)
 						{
 							TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
 							currentMesh->y -= 128;
-							TriggerShockwave((PHD_3DPOS*)&currentMesh, 0x2800, 0xB000, 64, 0, 96, 128, 16, 0, 0);
+							TriggerShockwave((PHD_3DPOS*)&currentMesh, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 							currentMesh->y += 128;
 						}
 						ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
@@ -1224,7 +1224,7 @@ void ControlCrossbowBolt(short itemNumber)
 		TriggerUnderwaterExplosion(item);
 	else
 	{
-		TriggerShockwave(&item->pos, 0x3000, 0x3001, 96, 0, 96, 128, 24, 0, 0);
+		TriggerShockwave(&item->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 		item->pos.yPos += 128;
 		TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
 		for (int j = 0; j < 2; j++)

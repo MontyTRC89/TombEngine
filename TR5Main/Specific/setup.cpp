@@ -1875,9 +1875,9 @@ void BaddyObjects()
 	obj = &Objects[ID_GUARDIAN];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseLaserHead;
+		obj->initialise = InitialiseGuardian;
 		obj->collision = CreatureCollision;
-		obj->control = ControlLaserHead;
+		obj->control = GuardianControl;
 		obj->explodableMeshbits = 6;
 		obj->nonLot = true;
 		obj->savePosition = true;
