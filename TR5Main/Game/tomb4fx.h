@@ -25,6 +25,8 @@ struct ENERGY_ARC
 #define ENERGY_ARC_STRAIGHT_LINE	0
 #define ENERGY_ARC_CIRCLE			1
 
+#define ENERGY_ARC_NO_RANDOMIZE		1
+
 extern int LaserSightX;
 extern int LaserSightY;
 extern int LaserSightZ;
@@ -79,7 +81,7 @@ void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int num);
 void SetFadeClip(short height, short speed);
 void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
-ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte type);
+ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte flags, byte type);
 void UpdateEnergyArcs();
 
 void Inject_Tomb4FX();

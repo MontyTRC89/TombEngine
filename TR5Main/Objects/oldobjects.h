@@ -149,7 +149,7 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv);
 void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade);
 void ControlAutoGuns(short itemNumber);
 void TriggerGuardianSparks(PHD_VECTOR* pos, int count, byte r, byte g, byte b, int unk);
-void LaserHeadCharge(ITEM_INFO* item);
+void GuardianCharge(ITEM_INFO* item);
 short GetNextSpider();
 void ControlSpiders(short itemNumber);
 void InitialiseSpiders(short itemNumber);
