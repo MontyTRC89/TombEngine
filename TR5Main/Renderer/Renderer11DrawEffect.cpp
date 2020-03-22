@@ -57,8 +57,15 @@ void Renderer11::drawEnergyArcs()
 
 		if (arc->life > 0)
 		{
-			Vector3 start = Vector3(arc->pos1.x, arc->pos1.y, arc->pos1.z) + Vector3(rand() % 32 - 16, rand() % 32 - 16, rand() % 32 - 16);
-			Vector3 end = Vector3(arc->pos4.x, arc->pos4.y, arc->pos4.z) + Vector3(rand() % 64 - 32, rand() % 64 - 32, rand() % 64 - 32);
+			Vector3 start = Vector3(arc->pos1.x, arc->pos1.y, arc->pos1.z);
+			Vector3 end = Vector3(arc->pos4.x, arc->pos4.y, arc->pos4.z);
+
+			if (!(arc->flags & ENERGY_ARC_NO_RANDOMIZE))
+			{
+				start += Vector3(rand() % 32 - 16, rand() % 32 - 16, rand() % 32 - 16);
+				end += Vector3(rand() % 64 - 32, rand() % 64 - 32, rand() % 64 - 32);
+			}
+
 			Vector3 direction = (end - start);
 			direction.Normalize();
 

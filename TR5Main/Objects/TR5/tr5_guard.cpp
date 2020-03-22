@@ -475,7 +475,7 @@ void GuardControl(short itemNum)
 				pos1.y = SwatGun.y;
 				pos1.z = SwatGun.z;
 				GetJointAbsPosition(item, &pos1, SwatGun.meshNum);
-				TriggerEnergyArc(&pos1, (PHD_VECTOR*)& LaraItem->pos, 192, 128, 192, 256, 150, 256, ENERGY_ARC_STRAIGHT_LINE);
+				TriggerEnergyArc(&pos1, (PHD_VECTOR*)& LaraItem->pos, 192, 128, 192, 256, 150, 256, 0, ENERGY_ARC_STRAIGHT_LINE);
 
 			}
 			break;

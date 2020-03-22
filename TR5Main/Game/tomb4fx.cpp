@@ -1873,7 +1873,7 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 	}
 }
 
-ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte type)
+ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte flags, byte type)
 {
 	ENERGY_ARC* arc = NULL;
 
@@ -1898,6 +1898,7 @@ ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g,
 	arc->g = g;
 	arc->b = b;
 	arc->type = type;
+	arc->flags = flags;
 	arc->direction = 1;
 	arc->rotation = GetRandomControl();
 
