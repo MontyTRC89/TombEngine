@@ -347,7 +347,7 @@ void GuardianControl(short itemNumber)
 						}
 
 						for (int i = 0, j = 0; i < 5; i += 4, j++)
-						{
+						{ 
 							// If eye was not destroyed then fire from it
 							if (2 * GuardianMeshes[i] & item->meshBits)
 							{
@@ -387,7 +387,7 @@ void GuardianControl(short itemNumber)
 
 								ENERGY_ARC* currentArc = LaserHeadData.fireArcs[j];
 
-								if (GlobalCounter & 1)
+								if (GlobalCounter & 1) 
 								{
 									TriggerGuardianSparks((PHD_VECTOR*)& src, 3, 0, g, b, 0);
 									TriggerLightningGlow(src.x, src.y, src.z, (GetRandomControl() & 3) + 32, 0, g, b);
