@@ -135,6 +135,50 @@ bool Renderer11::drawOverlays()
 	drawFullScreenQuad(m_binocularsTexture->ShaderResourceView, Vector3::One, false);
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
+	if (LaserSight)
+	{
+		// Draw the aiming point
+		RendererVertex vertices[4];
+
+		vertices[0].Position.x = -4.0f / ScreenWidth;
+		vertices[0].Position.y = 4.0f / ScreenHeight;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = 0.0f;
+		vertices[0].UV.y = 0.0f;
+		vertices[0].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+
+		vertices[1].Position.x = 4.0f / ScreenWidth;
+		vertices[1].Position.y = 4.0f / ScreenHeight;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = 1.0f;
+		vertices[1].UV.y = 0.0f;
+		vertices[1].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+
+		vertices[2].Position.x = 4.0f / ScreenWidth;
+		vertices[2].Position.y = -4.0f / ScreenHeight;
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = 1.0f;
+		vertices[2].UV.y = 1.0f;
+		vertices[2].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+
+		vertices[3].Position.x = -4.0f / ScreenWidth;
+		vertices[3].Position.y = -4.0f / ScreenHeight;
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = 0.0f;
+		vertices[3].UV.y = 1.0f;
+		vertices[3].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+
+		m_context->VSSetShader(m_vsFullScreenQuad, NULL, 0);
+		m_context->PSSetShader(m_psFullScreenQuad, NULL, 0);
+
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout);
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		m_primitiveBatch->End();
+	}
+
 	return true;
 }
 

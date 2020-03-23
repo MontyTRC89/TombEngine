@@ -2179,6 +2179,7 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
 	m_stLights.NumLights = item->Lights.size();
 	for (int j = 0; j < item->Lights.size(); j++)
