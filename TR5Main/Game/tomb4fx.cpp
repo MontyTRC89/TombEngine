@@ -1864,12 +1864,12 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 		sptr->friction = 5;
 		sptr->flags = 0;
 
-		sptr->x = x + (sptr->xVel >> 3);
+		sptr->x = x + (sptr->xVel >> 3);  
 		sptr->y = y - (sptr->yVel >> 5);
 		sptr->z = z + (sptr->zVel >> 3);
 
 		sptr->maxYvel = 0;
-		sptr->gravity = (GetRandomControl() & 0xF) + 64;
+		sptr->gravity = (GetRandomControl() & 0xF) + 64; 
 	}
 }
 
@@ -1877,7 +1877,7 @@ ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g,
 {
 	ENERGY_ARC* arc = NULL;
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++) 
 	{
 		arc = &EnergyArcs[i];
 		if (arc->life == 0)
