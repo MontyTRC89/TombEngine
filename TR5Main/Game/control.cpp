@@ -1774,7 +1774,7 @@ void UpdateDebris()
 	}
 }
 
-int LOS(GAME_VECTOR* start, GAME_VECTOR* end)
+int LOS(GAME_VECTOR* start, GAME_VECTOR* end) // (F) (D)
 {
 	int result1, result2;
 
@@ -1800,7 +1800,7 @@ int LOS(GAME_VECTOR* start, GAME_VECTOR* end)
 	return 0;
 }
 
-int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
+int xLOS(GAME_VECTOR* start, GAME_VECTOR* end) // (F) (D)
 {
 	int dx, dy, dz, x, y, z, flag;
 	short room, room2;
@@ -1905,7 +1905,7 @@ int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 	return flag;
 }
 
-int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
+int zLOS(GAME_VECTOR* start, GAME_VECTOR* end) // (F) (D)
 {
 	int dx, dy, dz, x, y, z, flag;
 	short room, room2;
@@ -2010,7 +2010,7 @@ int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 	return flag;
 }
 
-int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
+int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target) // (F) (D)
 {
 	short room;
 	int x, y, z, wx, wy, wz;
@@ -2058,7 +2058,7 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
 	return 1;
 }
 
-int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing)
+int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing) // (F) (D)
 {
 	GAME_VECTOR target;
 	int result, flag, itemNumber, count;
@@ -2292,7 +2292,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 	return flag;
 }
 
-int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh)
+int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh) // (F) (D)
 {
 	int r, m;
 	ROOM_INFO* room;
@@ -2360,29 +2360,29 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 	return ClosestItem;
 }
 
-int GetRandomControl()
+int GetRandomControl() // (F) (D)
 {
 	rand_1 = 1103515245 * rand_1 + 12345;
 	return rand_1 >> 10 & 0x7FFF;
 }
 
-void SeedRandomControl(int seed)
+void SeedRandomControl(int seed) // (F) (D)
 {
 	rand_1 = seed;
 }
 
-int GetRandomDraw()
+int GetRandomDraw() // (F) (D)
 {
 	rand_2 = 1103515245 * rand_2 + 12345;
 	return rand_2 >> 10 & 0x7FFF;
 }
 
-void SeedRandomDraw(int seed)
+void SeedRandomDraw(int seed) // (F) (D)
 {
 	rand_2 = seed;
 }
 
-int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
+int GetCeiling(FLOOR_INFO* floor, int x, int y, int z) // (F) (D)
 {
 	ROOM_INFO* room;
 	FLOOR_INFO* floor2;

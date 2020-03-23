@@ -15,7 +15,7 @@ short LeftExtRightIntTab[4] = // offset 0xA0B84
 	0x0200, 0x0400, 0x0800, 0x0100
 };
 
-short GetClimbTrigger(int x, int y, int z, short roomNumber)//46E38, 4729C (F)
+short GetClimbTrigger(int x, int y, int z, short roomNumber) // (F) (D)
 {
 	GetFloorHeight(GetFloor(x, y, z, &roomNumber), x, y, z);
 
@@ -24,15 +24,15 @@ short GetClimbTrigger(int x, int y, int z, short roomNumber)//46E38, 4729C (F)
 	if (data == NULL)
 		return 0;
 
-	if ((*data & 0x1F) == 5)
+	if ((*data & DATA_TYPE) == LAVA_TYPE)
 	{
-		if (*data & 0x8000)
+		if (*data & END_BIT)
 			return 0;
 
 		data++;
 	}
 
-	return (*data & 0x1F) == 6 ? *data : 0;
+	return (*data & DATA_TYPE) == CLIMB_TYPE ? *data : 0;
 }
 
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)//46E30(<), 47294(<) (F)
@@ -452,11 +452,11 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 	}
 }
 
-int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift)//462F8, 4675C (F)
+int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift) // (F) (D)
 {
 	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
-	int x = 0;
-	int z = 0;
+	int x;
+	int z;
 	int xfront = 0;
 	int zfront = 0;
 
