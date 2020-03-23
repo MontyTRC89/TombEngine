@@ -53,7 +53,6 @@ extern LaraExtraInfo g_LaraExtra;
 
 #define GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, int)) 0x0041E2A0)
 //#define AnimateLara ((int (__cdecl*)(ITEM_INFO*)) 0x004563F0)
-#define LaraHangTest ((int (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x004460F0)
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
@@ -214,7 +213,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle);
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll);
 int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll);
 int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
-//int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll);
+int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll);
 void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle);
 int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
