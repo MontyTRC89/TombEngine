@@ -263,7 +263,7 @@ void GuardianControl(short itemNumber)
 					int c = 8192 * COS(item->pos.xRot + 3328) >> W2V_SHIFT;
 					
 					dest.x = LaserHeadData.target.x = src.x + (c * SIN(item->pos.yRot) >> W2V_SHIFT);
-					dest.y = LaserHeadData.target.y = src.y + 8192 * SIN(3328 - item->pos.xRot) >> W2V_SHIFT;
+					dest.y = LaserHeadData.target.y = src.y + (8192 * SIN(3328 - item->pos.xRot) >> W2V_SHIFT);
 					dest.z = LaserHeadData.target.z = src.z + (c * COS(item->pos.yRot) >> W2V_SHIFT);
 				}
 				else
@@ -349,7 +349,7 @@ void GuardianControl(short itemNumber)
 						for (int i = 0, j = 0; i < 5; i += 4, j++)
 						{ 
 							// If eye was not destroyed then fire from it
-							if (2 * GuardianMeshes[i] & item->meshBits)
+							if ((1 << GuardianMeshes[i]) & item->meshBits)
 							{
 								src.x = 0;
 								src.y = 0;

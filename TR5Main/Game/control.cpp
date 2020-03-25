@@ -955,7 +955,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				{
 					if (Objects[item->objectNumber].intelligent)
 					{
-						if (item->status != ITEM_DEACTIVATED)
+						if (item->status != ITEM_INACTIVE)
 						{
 							if (item->status == ITEM_INVISIBLE)
 							{
