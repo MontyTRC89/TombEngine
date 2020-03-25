@@ -253,7 +253,6 @@ int WeaponObject(int weaponType) // (F) (D)
 		return ID_CROSSBOW_ANIM;
 	case WEAPON_HK:
 		return ID_HK_ANIM;
-#if 0
 	case WEAPON_FLARE:
 		return ID_LARA_FLARE_ANIM;
 	case WEAPON_GRENADE_LAUNCHER:
@@ -262,7 +261,6 @@ int WeaponObject(int weaponType) // (F) (D)
 		return ID_ROCKET_ANIM;
 	case WEAPON_HARPOON_GUN:
 		return ID_HARPOON_ANIM;
-#endif
 	default:
 		return ID_PISTOLS_ANIM;
 	}
