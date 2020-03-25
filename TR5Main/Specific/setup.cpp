@@ -1887,7 +1887,7 @@ void BaddyObjects()
 		obj->usingDrawAnimatingItem = false;
 		obj->undead = true; 
 		obj->unknown = 3;
-		obj->hitEffect = HIT_SMOKE;
+		obj->hitEffect = HIT_FRAGMENT;
 		obj->saveMesh = true;
 	}
 
@@ -3724,6 +3724,11 @@ void InitialiseObjects()
 	ObjectObjects();
 	TrapObjects();
 	PickupObjects();
+
+	for (int i = 0; i < 400; i++)
+	{
+		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
+	}
 	
 	// New objects imported from old TRs
 	NewObjects();
