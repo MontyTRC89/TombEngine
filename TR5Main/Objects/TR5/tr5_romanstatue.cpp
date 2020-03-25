@@ -42,7 +42,7 @@ void InitialiseRomanStatue(short itemNum)
     
 	ClearItem(itemNum);
     
-    item->animNumber = Objects[ID_ROMAN_GOD].animIndex + ANIMATION_ROMAN_STATUE_START_JUMP_DOWN;
+    item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_START_JUMP_DOWN;
     item->goalAnimState = 13;
     item->currentAnimState = 13;
     item->frameNumber = Anims[item->animNumber].frameBase;
@@ -100,7 +100,7 @@ void ControlRomanStatue(short itemNumber)
 	{
 		item->goalAnimState = STATE_ROMAN_STATUE_HIT;
 		item->currentAnimState = STATE_ROMAN_STATUE_HIT;
-		item->animNumber = Objects[ID_ROMAN_GOD].animIndex + ANIMATION_ROMAN_STATUE_HIT;
+		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_HIT;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 	}
 
@@ -139,6 +139,7 @@ void ControlRomanStatue(short itemNumber)
 		PHD_3DPOS attackPos;
 		byte r, g, b;
 		ENERGY_ARC* arc;
+		short random;
 
 		switch (item->currentAnimState)
 		{
@@ -250,9 +251,11 @@ void ControlRomanStatue(short itemNumber)
 				
 				for (int i = 0; i < 2; i++)
 				{
+					random = GetRandomControl();
+
 					x = (GetRandomControl() & 0x7FF) + pos.x - 1024;
 					y = (GetRandomControl() & 0x7FF) + pos.y - 1024;
-					z = (GetRandomControl() & 0x7FF) + pos.z - 1024;
+					z = (random & 0x7FF) + pos.z - 1024;
 					
 					TriggerRomanStatueScreamingSparks(
 						x,
@@ -260,7 +263,7 @@ void ControlRomanStatue(short itemNumber)
 						z,
 						8 * (pos.x - x),
 						8 * (pos.y - y),
-						8 * (1024 - (GetRandomControl() & 0x7FF)),
+						8 * (1024 - (random & 0x7FF)),
 						item->triggerFlags);
 				}
 			}
@@ -426,10 +429,10 @@ void ControlRomanStatue(short itemNumber)
 						if (item->itemFlags[0])
 							item->itemFlags[0]--;
 						
-						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 96, 128, 64, 0, 48, 0, 1);
-						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 0x80004080);
+						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
+						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 						pos1.y -= 64;
-						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 128, 64, 0, 48, 0, 1);
+						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 					}
 
 					deltaFrame = item->frameNumber - Anims[item->animNumber].frameBase;
@@ -559,7 +562,10 @@ void ControlRomanStatue(short itemNumber)
 					attackPos.xPos,
 					attackPos.yPos,
 					attackPos.zPos,
-					(((GetRandomControl() & 0x3F) + 128) >> 1) | ((((GetRandomControl() & 0x3F) + 128) | 0x400000) << 8));
+					0, 
+					(((GetRandomControl() & 0x3F) + 128) >> 1),
+					(((GetRandomControl() & 0x3F) + 128) | 0x400000),
+					128);
 				
 				RomanStatueData.counter = 16;	
 				RomanStatueData.pos.x = attackPos.xPos;
@@ -628,18 +634,16 @@ void ControlRomanStatue(short itemNumber)
 					{
 						if (deltaFrame == 24)
 						{
-							/*TriggerEnergyArc(
-								&pos1, 
-								&pos2, 
-								(GetRandomControl() & 0xF) + 24, 
-								(((GetRandomControl() & 0x3F) + 128) >> 1) | ((((GetRandomControl() & 0x3F) + 128) | 0x200000) << 8), 
-								13, 
-								64, 
-								4);*/
+							TriggerEnergyArc(&pos1, &pos2, 0, ((GetRandomControl() & 0x3F) + 128),
+								(((GetRandomControl() & 0x3F) + 128) >> 1), 256, 32, 32, ENERGY_ARC_NO_RANDOMIZE,
+								ENERGY_ARC_STRAIGHT_LINE);
 						}
 					}
 					else
 					{
+						TriggerEnergyArc(&pos1, &pos2, 0, g, b, 256, 24, 32, ENERGY_ARC_NO_RANDOMIZE,
+							ENERGY_ARC_STRAIGHT_LINE);
+
 						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
 							&pos1,
 							&pos2,
@@ -690,7 +694,7 @@ void ControlRomanStatue(short itemNumber)
 		}
 		else
 		{
-			item->animNumber = Objects[ID_ROMAN_GOD].animIndex + ANIMATION_ROMAN_STATUE_DEATH;
+			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_DEATH;
 			item->currentAnimState = STATE_ROMAN_STATUE_DEATH;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 		}
@@ -789,22 +793,22 @@ void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 	}
 }
 
-void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, int color)
+void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
-	spark->dG = (color >> 16) & 0xFF;
-	spark->sG = (color >> 16) & 0xFF;
+	spark->dG = g;
+	spark->sG = g;
 	spark->colFadeSpeed = 2;
-	spark->dR = (color >> 8) & 0xFF;
-	spark->sR = (color >> 8) & 0xFF;
+	spark->dR = r;
+	spark->sR = r;
 	spark->transType = COLADD;
 	spark->life = 16;
 	spark->sLife = 16;
 	spark->x = x;
 	spark->on = 1;
-	spark->dB = (color >> 24) & 0xFF;
-	spark->sB = (color >> 24) & 0xFF;
+	spark->dB = b;
+	spark->sB = b;
 	spark->fadeToBlack = 4;
 	spark->y = y;
 	spark->z = z;
@@ -816,7 +820,7 @@ void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, int color)
 	spark->maxYvel = 0;
 	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 	spark->gravity = 0;
-	spark->dSize = spark->sSize = spark->size = (color >> 24) + (GetRandomControl() & 3);
+	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 }
 
 void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags)
