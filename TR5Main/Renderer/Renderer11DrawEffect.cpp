@@ -442,7 +442,12 @@ void Renderer11::drawShockwaves()
 					Vector3(x2, shockwave->y, z2),
 					Vector3(x3, shockwave->y, z3),
 					Vector3(x4, shockwave->y, z4),
-					Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+					Vector4(
+						shockwave->r * shockwave->life / 255.0f / 64.0f, 
+						shockwave->g * shockwave->life / 255.0f / 64.0f, 
+						shockwave->b * shockwave->life / 255.0f / 64.0f, 
+						1.0f),
+					0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
 				x1 = x2;
 				z1 = z2;

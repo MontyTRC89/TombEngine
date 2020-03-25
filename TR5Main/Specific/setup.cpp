@@ -1847,29 +1847,32 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_ROMAN_GOD];
-	if (obj->loaded)
+	for (int i = 0; i < 2; i++)
 	{
-		obj->biteOffset = 0;
-		obj->initialise = InitialiseRomanStatue;
-		obj->collision = CreatureCollision;
-		obj->control = ControlRomanStatue;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 300;
-		obj->pivotLength = 50;
-		obj->radius = 256;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->saveHitpoints = true;
-		obj->hitEffect = HIT_SMOKE;
-		obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD;
+		obj = &Objects[ID_ROMAN_GOD1 + i];
+		if (obj->loaded)
+		{
+			obj->biteOffset = 0;
+			obj->initialise = InitialiseRomanStatue;
+			obj->collision = CreatureCollision;
+			obj->control = ControlRomanStatue;
+			obj->shadowSize = UNIT_SHADOW / 2;
+			obj->hitPoints = 300;
+			obj->pivotLength = 50;
+			obj->radius = 256;
+			obj->intelligent = true;
+			obj->savePosition = true;
+			obj->saveFlags = true;
+			obj->saveAnim = true;
+			obj->saveHitpoints = true;
+			obj->hitEffect = HIT_SMOKE;
+			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 
-		Bones[obj->boneIndex + 24] |= ROT_Y;
-		Bones[obj->boneIndex + 24] |= ROT_X;
-		Bones[obj->boneIndex + 52] |= ROT_Y;
-		Bones[obj->boneIndex + 52] |= ROT_X;
+			Bones[obj->boneIndex + 24] |= ROT_Y;
+			Bones[obj->boneIndex + 24] |= ROT_X;
+			Bones[obj->boneIndex + 52] |= ROT_Y;
+			Bones[obj->boneIndex + 52] |= ROT_X;
+		}
 	}
 
 	obj = &Objects[ID_GUARDIAN];

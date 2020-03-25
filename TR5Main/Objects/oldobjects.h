@@ -104,7 +104,7 @@ void InitialiseRomeHammer(short itemNumber);
 void InitialiseSmokeEmitter(short itemNumber);
 void SmokeEmitterControl(short itemNumber);
 void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint);
-void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, int color);
+void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size);
 void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags);
 void TriggerRomanStatueAttackEffect1(short itemNum, int factor);
 void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count);
