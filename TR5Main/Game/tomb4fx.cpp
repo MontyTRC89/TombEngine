@@ -431,7 +431,7 @@ void UpdateSmoke()
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
-			spark->yVel -= spark->gravity.to_float();
+			spark->yVel += spark->gravity.to_float();
 			
 			if (spark->maxYvel != 0)
 			{
