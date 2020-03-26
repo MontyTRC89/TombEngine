@@ -163,3 +163,4 @@ void UpdateBats();
 void MissileControl(short itemNumber);
 void InitialiseGuardian(short itemNumber);
 void GuardianControl(short itemNumber);
+void ControlBodyPart(short fxNumber);
