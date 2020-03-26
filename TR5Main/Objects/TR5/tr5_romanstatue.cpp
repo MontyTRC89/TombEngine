@@ -758,7 +758,7 @@ void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 			fx->objectNumber = ID_BODY_PART;
 			fx->shade = 16912;
 			fx->flag2 = 9729;
-			fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 2 * (GetRandomControl() & 7);
+			fx->frameNumber = Objects[ID_BUBBLES].meshIndex + (GetRandomControl() & 7);
 			fx->counter = 0;
 			fx->flag1 = 0;
 		}
@@ -778,11 +778,11 @@ void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 		spark->x = (GetRandomControl() & 0x1F) + pos->x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
 		spark->z = (GetRandomControl() & 0x1F) + pos->z - 16;
-		spark->yVel = 0;
 		spark->xVel = (GetRandomControl() & 0x7F) - 64;
+		spark->yVel = 0;
+		spark->zVel = (GetRandomControl() & 0x7F) - 64;
 		spark->friction = 4;
 		spark->flags = SP_ROTATE;
-		spark->zVel = (GetRandomControl() & 0x7F) - 64;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 		spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
 		spark->maxYvel = 0;

@@ -3122,7 +3122,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		{
 			Num = -64;
 		}
-		GetSpheres(item, SphereList, 3);
+		/*GetSpheres(item, SphereList, 3);
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.bit = 1 << Node;
 		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + Node];
@@ -3132,7 +3132,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData;
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterObject(&ShatterItem, 0, Num, item->roomNumber, NoXZVel);
-		item->meshBits &= ~ShatterItem.bit;
+		item->meshBits &= ~ShatterItem.bit;*/
 		return 1;
 	}
 	return 0;

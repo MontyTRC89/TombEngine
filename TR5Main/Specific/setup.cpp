@@ -2578,6 +2578,7 @@ void ObjectObjects()
 	// by default loaded, explosion time :D
 	obj = &Objects[ID_BODY_PART];
 	obj->loaded = true;
+	obj->control = ControlBodyPart;
 
 	obj = &Objects[ID_EARTHQUAKE];
 	if (obj->loaded)
