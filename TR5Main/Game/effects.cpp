@@ -11,6 +11,7 @@
 #include "footprint.h"
 #include "..\Objects\oldobjects.h"
 #include "..\Specific\roomload.h"
+#include "debris.h"
 
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
