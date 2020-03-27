@@ -967,7 +967,7 @@ void AnimateShotgun(int weaponType)
 		}
 
 		if (item->frameNumber - Anims[item->animNumber].frameBase == 12 && weaponType == WEAPON_SHOTGUN)
-			TriggerGunShell(1, 370, 4);
+			TriggerGunShell(1, ID_SHOTGUNSHELL, 4);
 		break;
 
 	case 8:

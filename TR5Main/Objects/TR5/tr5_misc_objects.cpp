@@ -14,6 +14,7 @@
 #include "../../Game/switch.h"
 #include "../../Game/debris.h"
 #include "../../Game/objects.h"
+#include "../../Game/missile.h"
 
 short DeathSlideBounds[12] = { -256, 256, -100, 100, 256, 512, 0, 0, -25 * ONE_DEGREE, 25 * ONE_DEGREE, 0, 0 };
 PHD_VECTOR DeathSlidePosition = { 0, 0, 371 };
@@ -1671,10 +1672,10 @@ void ControlBodyPart(short fxNumber)
 				fx->pos.yPos = y;
 				fx->pos.zPos = z;
 
-				/*if (fx->flag2 & 0x200)
+				if (fx->flag2 & 0x200)
 					ExplodeFX(fx, -2, 32);
 				else
-					ExplodeFX(fx, -1, 32);*/
+					ExplodeFX(fx, -1, 32);
 
 				KillEffect(fxNumber);
 				if (fx->flag2 & 0x800)

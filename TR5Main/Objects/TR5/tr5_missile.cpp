@@ -8,6 +8,8 @@
 #include "../../Game/draw.h"
 #include "../../Game/effects.h"
 #include "../../Game/traps.h"
+#include "../../Specific/roomload.h"
+#include "../../Game/debris.h"
 
 void MissileControl(short itemNumber)
 {
@@ -118,7 +120,7 @@ void MissileControl(short itemNumber)
 			}
 			else if (fx->flag1 == 2)
 			{
-				//ExplodeFX(fx, 0, 32);
+				ExplodeFX(fx, 0, 32);
 				SoundEffect(251, &fx->pos, 0);
 			}
 		}
@@ -150,7 +152,7 @@ void MissileControl(short itemNumber)
 			{
 				if (fx->flag1 == 2)
 				{
-					//ExplodeFX(fx, 0, 32);
+					ExplodeFX(fx, 0, 32);
 					LaraItem->hitPoints -= 50;
 					DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, (GetRandomControl() & 3) + 2, LaraItem->pos.yRot, LaraItem->roomNumber);
 					SoundEffect(251, &fx->pos, 0);
@@ -199,5 +201,25 @@ void MissileControl(short itemNumber)
 			}
 		}
 	}
+}
+
+void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
+{
+	short** meshpp = &Meshes[fx->frameNumber];
+
+	ShatterItem.yRot = fx->pos.yRot;
+	ShatterItem.meshp = *meshpp;
+	ShatterItem.sphere.x = fx->pos.xPos;
+	ShatterItem.sphere.y = fx->pos.yPos;
+	ShatterItem.sphere.z = fx->pos.zPos;
+	ShatterItem.bit = 0;
+	ShatterItem.flags = fx->flag2 & 0x1400;
+
+	if (fx->flag2 & 0x2000)
+		DebrisFlags = 1;
+
+	ShatterObject(&ShatterItem, 0, bits, fx->roomNumber, noXZVel);
+
+	DebrisFlags = 0;
 }
 

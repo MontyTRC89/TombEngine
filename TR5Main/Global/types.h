@@ -1114,28 +1114,28 @@ struct SMOKE_SPARKS
 	int x; // size=0, offset=0
 	int y; // size=0, offset=4
 	int z; // size=0, offset=8
-	numeric::Fixed<12 ,4> xVel; // size=0, offset=12
-	numeric::Fixed<12, 4> yVel; // size=0, offset=14
-	numeric::Fixed<12, 4> zVel; // size=0, offset=16
-	numeric::Fixed<8, 8> gravity; // size=0, offset=18
+	short xVel; // size=0, offset=12
+	short yVel; // size=0, offset=14
+	short zVel; // size=0, offset=16
+	short gravity; // size=0, offset=18
 	short rotAng; // size=0, offset=20
 	short flags; // size=0, offset=22
 	byte sSize; // size=0, offset=24
 	byte dSize; // size=0, offset=25
 	byte size; // size=0, offset=26
-	numeric::Fixed<2,6> friction; // size=0, offset=27
+	byte friction; // size=0, offset=27
 	byte scalar; // size=0, offset=28
 	byte def; // size=0, offset=29
-	byte rotAdd; // size=0, offset=30
-	numeric::Fixed<4, 4> maxYvel; // size=0, offset=31
+	signed char rotAdd; // size=0, offset=30
+	signed char maxYvel; // size=0, offset=31
 	byte on; // size=0, offset=32
 	byte sShade; // size=0, offset=33
 	byte dShade; // size=0, offset=34
 	byte shade; // size=0, offset=35
 	byte colFadeSpeed; // size=0, offset=36
 	byte fadeToBlack; // size=0, offset=37
-	byte sLife; // size=0, offset=38
-	byte life; // size=0, offset=39
+	signed char sLife; // size=0, offset=38
+	signed char life; // size=0, offset=39
 	byte transType; // size=0, offset=40
 	byte fxObj; // size=0, offset=41
 	byte nodeNumber; // size=0, offset=42

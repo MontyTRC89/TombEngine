@@ -7,6 +7,8 @@
 #include "..\Game\draw.h"
 #include "..\Game\tomb4fx.h"
 #include <stdio.h>
+#include "debris.h"
+#include "../Specific/roomload.h"
 
 #define SHARD_DAMAGE 30
 #define ROCKET_DAMAGE 100
