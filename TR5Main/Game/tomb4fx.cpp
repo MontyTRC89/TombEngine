@@ -417,13 +417,13 @@ void UpdateSmoke()
 			if (spark->shade >= 24)
 			{
 				if (spark->shade >= 80)
-					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_FIRE0;
 				else
-					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 1;
+					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_FIRE1;
 			}
 			else
 			{
-				spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 2;
+				spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_FIRE2;
 			}
 
 			if (spark->flags & SP_ROTATE)
@@ -431,33 +431,45 @@ void UpdateSmoke()
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
-			spark->yVel += spark->gravity.to_float();
+			spark->yVel += spark->gravity;
 			
 			if (spark->maxYvel != 0)
 			{
-				if (spark->yVel < 0) {
-					if (-spark->yVel.to_float() > (spark->maxYvel)) {
-						spark->yVel = -spark->maxYvel.to_float();
+				if (spark->yVel < 0) 
+				{
+					if (spark->yVel < spark->maxYvel) 
+					{
+						spark->yVel = spark->maxYvel;
 					}
 				}
-				else {
-					if (spark->yVel.to_float() > (spark->maxYvel)) {
-						spark->yVel = spark->maxYvel.to_float();
+				else 
+				{
+					if (spark->yVel > spark->maxYvel) 
+					{
+						spark->yVel = spark->maxYvel;
 					}
 				}
 			}
 			
-			spark->xVel -= spark->xVel * spark->friction.to_float();
-			spark->zVel -= spark->zVel * spark->friction.to_float();
-			spark->yVel -= spark->yVel * spark->friction.to_float();
-			spark->x += spark->xVel.to_float();
-			spark->y += spark->yVel.to_float();
-			spark->z += spark->zVel.to_float();
+			if (spark->friction & 0xF)
+			{
+				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
+				spark->zVel -= spark->zVel >> (spark->friction & 0xF);
+			}
+
+			if (spark->friction & 0xF0)
+			{
+				spark->yVel -= spark->yVel >> (spark->friction >> 4);
+			}
+
+			spark->x += spark->xVel >> 5;
+			spark->y += spark->yVel >> 5;
+			spark->z += spark->zVel >> 5;
 
 			if (spark->flags & SP_WIND)
 			{
 				spark->x += SmokeWindX >> 1;
-				spark->z += SmokeWindZ>>1;
+				spark->z += SmokeWindZ >> 1;
 			}
 
 			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);

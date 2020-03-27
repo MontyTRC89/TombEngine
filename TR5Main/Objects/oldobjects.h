@@ -164,3 +164,4 @@ void MissileControl(short itemNumber);
 void InitialiseGuardian(short itemNumber);
 void GuardianControl(short itemNumber);
 void ControlBodyPart(short fxNumber);
+void ExplodeFX(FX_INFO* fx, int noXZVel, int bits);

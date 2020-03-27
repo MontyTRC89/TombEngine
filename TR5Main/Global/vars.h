@@ -315,6 +315,7 @@
 #define TargetMesh					VAR_U_(0x00EEFAF8, int)
 #define WeaponsArray				ARRAY_(0x005085B0, WEAPON_INFO, [9])
 #define GetLaraOnLOS				VAR_U_(0x0051CA64, char)
+#define DebrisFlags					VAR_U_(0x0051CA88, int)
 
 extern bool MonksAttackLara;
 
