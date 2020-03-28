@@ -263,7 +263,7 @@ void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)//467E4(<), 46C48(<) (F)
 		item->goalAnimState = STATE_LARA_LADDER_IDLE;
 }
 
-/*void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//464E8, 4694C
+void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	int yShift;
 	int resultRight, resultLeft;
@@ -293,129 +293,72 @@ void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)//467E4(<), 46C48(<) (F)
 		if (!resultRight || !resultLeft || resultLeft == -2 || resultRight == -2)
 			return;
 
-		if (!ledgeRight || !ledgeLeft)
-		{
-			if (resultRight != 1 || resultLeft != 1)
-			{
-				item->goalAnimState = STATE_LARA_HANG;
-			}
-			else
-			{
-				item->goalAnimState = STATE_LARA_LADDER_DOWN;
-				item->pos.yPos += ledgeLeft;
-			}
-			return;
-		}
-		
-		if (ledgeRight < 0 != ledgeLeft < 0)
-			return;
+		yShift = ledgeLeft;
 
-		if (ledgeRight < 0)
+		if (ledgeRight && ledgeLeft)
 		{
-			if (ledgeRight < ledgeLeft)
-			{
-				if (resultRight != 1 || resultLeft != 1)
-				{
-					item->goalAnimState = STATE_LARA_HANG;
-				}
-				else
-				{
-					item->goalAnimState = STATE_LARA_LADDER_DOWN;
-					item->pos.yPos += ledgeRight;
-				}
+			if (ledgeLeft < 0 != ledgeRight < 0)
 				return;
-			}
+			if (ledgeRight < 0 == ledgeRight < ledgeLeft)
+				yShift = ledgeRight;
 		}
-		else if (ledgeRight <= 0 || ledgeRight <= ledgeLeft)
+
+		if (resultRight == 1 && resultLeft == 1)
 		{
-			if (ledgeRight < ledgeLeft)
-			{
-				if (resultRight != 1 || resultLeft != 1)
-				{
-					item->goalAnimState = STATE_LARA_HANG;
-				}
-				else
-				{
-					item->goalAnimState = STATE_LARA_LADDER_DOWN;
-					item->pos.yPos += ledgeLeft;
-				}
-				return;
-			}
+			item->goalAnimState = STATE_LARA_LADDER_DOWN;
+			item->pos.yPos += yShift;
+		}
+		else
+		{
+			item->goalAnimState = STATE_LARA_HANG;
 		}
 	}
 	else if (item->goalAnimState != STATE_LARA_GRABBING)
 	{
 		item->goalAnimState = STATE_LARA_LADDER_IDLE;
-		resultRight = LaraTestClimbUpPos(item, coll->radius, coll->radius + 120, &ledgeRight, &v21);
-		resultLeft = LaraTestClimbUpPos(item, coll->radius, -120 - coll->radius, &ledgeLeft, &v20);
-		if (v5)
+		resultRight = LaraTestClimbUpPos(item, coll->radius, coll->radius + 120, &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->radius, -120 - coll->radius, &shiftLeft, &ledgeLeft);
+
+		if (!resultRight || !resultLeft)
+			return;
+
+		if (resultRight >= 0 && resultLeft >= 0)
 		{
-			if (resultLeft)
+			yShift = shiftLeft;
+
+			if (shiftRight)
 			{
-				if (v5 < 0 || resultLeft < 0)
+				if (shiftLeft)
 				{
-					v10 = v20 - v21;
-					if (v20 - v21 < 0)
-						v10 = v21 - v20;
-					if (v10 <= 120)
-					{
-						if (v5 != -1 || resultLeft != -1)
-						{
-							item->goalAnimState = STATE_LARA_UNKNOWN_138;
-							item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
-						}
-						else
-						{
-							v11 = item->pos.yPos;
-							v12 = v20 + v21;
-							item->goalAnimState = STATE_LARA_GRABBING;
-							resultLeft = v12 / 2 - 256;
-							item->pos.yPos += resultLeft;
-						}
-					}
+					if (shiftLeft < 0 != shiftRight < 0)
+						return;
+					if (shiftRight < 0 == shiftRight < shiftLeft)
+						yShift = shiftRight;
 				}
 				else
 				{
-					LOBYTE(resultLeft) = item;
-					v6 = coll;
-					if (!item)
-					{
-					LABEL_18:
-						v9 = item->pos.yPos;
-						item->goal_anim_state = 57;
-						resultLeft = &v6[v9];
-						item->pos.yPos = resultLeft;
-						return resultLeft;
-					}
-					if (!coll)
-						goto LABEL_17;
-					if (item < 0 == coll < 0)
-					{
-						v7 = item == 0;
-						v8 = item < 0;
-						if (item >= 0)
-						{
-						LABEL_15:
-							if (v8 || v7 || item <= coll)
-								goto LABEL_18;
-							goto LABEL_17;
-						}
-						if (item >= coll)
-						{
-							v7 = item == 0;
-							v8 = item < 0;
-							goto LABEL_15;
-						}
-					LABEL_17:
-						v6 = item;
-						goto LABEL_18;
-					}
+					yShift = shiftRight;
 				}
+			}
+
+			item->goalAnimState = STATE_LARA_LADDER_UP;
+			item->pos.yPos += yShift;
+		}
+		else if (abs(ledgeLeft - ledgeRight) <= 120)
+		{
+			if (resultRight == -1 && resultLeft == -1)
+			{
+				item->goalAnimState = STATE_LARA_GRABBING;
+				item->pos.yPos += (ledgeRight + ledgeLeft) / 2 - 256;
+			}
+			else
+			{
+				item->goalAnimState = STATE_LARA_UNKNOWN_138;
+				item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
 			}
 		}
 	}
-	return resultLeft;
-}*/
+}
 
 void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 {

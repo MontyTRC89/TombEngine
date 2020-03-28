@@ -1,8 +1,6 @@
 #pragma once
 #include "..\Global\global.h"
 
-#define lara_col_climbstnc ((void (__cdecl*)(ITEM_INFO*, COLL_INFO*)) 0x00450E20)
-
 short GetClimbTrigger(int x, int y, int z, short roomNumber);
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll);
@@ -14,7 +12,7 @@ void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll);
-//void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll);
 
 int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift);
