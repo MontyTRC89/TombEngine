@@ -327,7 +327,7 @@ void ControlRomanStatue(short itemNumber)
 						48,
 						5);*/
 
-					TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color >> 1);
+					TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color, color >> 1);
 					unk = 1;
 					continue;
 				}
@@ -341,7 +341,7 @@ void ControlRomanStatue(short itemNumber)
 					48,
 					5);*/
 
-				TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color >> 1, color);
+				TriggerLightningGlow(pos.x, pos.y, pos.z, 16, 0, color >> 1, color);
 				unk = 1;
 			}
 
@@ -564,8 +564,8 @@ void ControlRomanStatue(short itemNumber)
 					attackPos.zPos,
 					0, 
 					(((GetRandomControl() & 0x3F) + 128) >> 1),
-					(((GetRandomControl() & 0x3F) + 128) | 0x400000),
-					128);
+					(((GetRandomControl() & 0x3F) + 128)),
+					64);
 				
 				RomanStatueData.counter = 16;	
 				RomanStatueData.pos.x = attackPos.xPos;
@@ -842,17 +842,17 @@ void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, 
 		spark->dB = (GetRandomControl() & 0x3F) - 64;
 		spark->dG = spark->dB >> 1;
 	}
-	spark->y = y;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 4;
 	spark->life = 16;
 	spark->sLife = 16;
-	spark->z = z;
 	spark->x = x;
-	spark->transType = COLADD;
+	spark->y = y;
+	spark->z = z;
 	spark->xVel = xv;
 	spark->yVel = yv;
 	spark->zVel = zv;
+	spark->transType = COLADD;
 	spark->friction = 34;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
@@ -918,7 +918,7 @@ void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 		fx->flag1 = 1;
 		fx->objectNumber = ID_BUBBLES;
 		fx->speed = (GetRandomControl() & 0x1F) + 64;
-		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 16;
+		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 8;
 	}
 }
 
@@ -938,9 +938,9 @@ void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
 	spark->transType = COLADD;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
-	spark->x = pos->x + (GetRandomControl() & 0xF) - 8;
-	spark->y = pos->y + (GetRandomControl() & 0xF) - 8;
-	spark->z = pos->z + (GetRandomControl() & 0xF) - 8;
+	spark->x = (GetRandomControl() & 0xF) - 8;
+	spark->y = (GetRandomControl() & 0xF) - 8;
+	spark->z = (GetRandomControl() & 0xF) - 8;
 	spark->xVel = (GetRandomControl() & 0x3FF) - 512;
 	spark->yVel = (GetRandomControl() & 0x3FF) - 512;
 	spark->zVel = (GetRandomControl() & 0x3FF) - 512;

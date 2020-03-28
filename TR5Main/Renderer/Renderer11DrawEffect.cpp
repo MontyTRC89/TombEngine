@@ -237,6 +237,14 @@ void Renderer11::drawSparks()
 					pos.x += fx->pos.xPos;
 					pos.y += fx->pos.yPos;
 					pos.z += fx->pos.zPos;
+
+					if ((spark->sLife - spark->life) > (rand() & 7) + 4)
+					{
+						spark->flags &= ~SP_FX;
+						spark->x = pos.x;
+						spark->y = pos.y;
+						spark->z = pos.z;
+					}
 				}
 				else if (!(spark->flags & SP_ITEM))
 				{
@@ -804,8 +812,8 @@ bool Renderer11::drawSprites()
 
 			if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
-				float halfWidth = spr->Width / 2.0f;
-				float halfHeight = spr->Height / 2.0f;
+				float halfWidth = spr->Width / 2.0f * spr->Scale;
+				float halfHeight = spr->Height / 2.0f * spr->Scale;
 
 				Matrix billboardMatrix;
 				createBillboardMatrix(&billboardMatrix, &spr->pos, &Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
