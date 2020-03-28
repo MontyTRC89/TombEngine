@@ -43,7 +43,7 @@ void GetLaraDeadlyBounds() // (F) (D)
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds[5];
 }
 
-void InitialiseLaraAnims(ITEM_INFO* item) 
+void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
