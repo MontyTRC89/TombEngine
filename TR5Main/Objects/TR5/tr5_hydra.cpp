@@ -7,6 +7,12 @@
 #include "../../Game/people.h"
 #include "../../Game/draw.h"
 
+#define STATE_HYDRA_STOP			0
+#define STATE_HYDRA_BITE_ATTACK1	1
+#define STATE_HYDRA_AIM				2
+#define STATE_HYDRA_HURT			4
+#define STATE_HYDRA_DEATH			11
+
 BITE_INFO HydraBite{ 0, 0, 0, 0x0B };
 
 void InitialiseHydra(short itemNum)
@@ -17,17 +23,17 @@ void InitialiseHydra(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = 30 * item->triggerFlags + Anims[item->animNumber].frameBase;
-    item->goalAnimState = 0;
-    item->currentAnimState = 0;
+    item->goalAnimState = STATE_HYDRA_STOP;
+    item->currentAnimState = STATE_HYDRA_STOP;
 
     if (item->triggerFlags == 1)
-        item->pos.zPos += STEPUP_HEIGHT;
+        item->pos.zPos += 384;
 
     if (item->triggerFlags == 2)
-        item->pos.zPos -= STEPUP_HEIGHT;
+        item->pos.zPos -= 384;
 
     item->pos.yRot = ANGLE(90);
-    item->pos.xPos -= STEP_SIZE;
+    item->pos.xPos -= 256;
 }
 
 void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
@@ -47,7 +53,7 @@ void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->flag1 = 0;
 		fx->objectNumber = ID_BUBBLES;
 		fx->speed = (GetRandomControl() & 0x1F) + 64;
-		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 16;
+		fx->frameNumber = Objects[ID_BUBBLES].meshIndex + 8;
 	}
 }
 
@@ -72,13 +78,13 @@ void TriggerHydraSparks(short itemNumber, int frame)
 	spark->transType = COLADD;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
-	spark->y = 0;
 	spark->x = (GetRandomControl() & 0xF) - 8;
+	spark->y = 0;
 	spark->z = (GetRandomControl() & 0xF) - 8;
+	spark->xVel = (byte)GetRandomControl() - 128;
 	spark->yVel = 0;
-	spark->xVel = GetRandomControl() - 128;
+	spark->zVel = (byte)GetRandomControl() - 128;
 	spark->friction = 4;
-	spark->zVel = GetRandomControl() - 128;
 	spark->flags = 4762;
 	spark->fxObj = itemNumber;
 	spark->nodeNumber = 5;
@@ -121,7 +127,9 @@ void ControlHydra(short itemNumber)
 			GetCreatureMood(item, &info, VIOLENT);
 			CreatureMood(item, &info, VIOLENT);
 
-			if (item->currentAnimState != 5 && item->currentAnimState != 10 && item->currentAnimState != 11)
+			if (item->currentAnimState != 5 
+				&& item->currentAnimState != 10 
+				&& item->currentAnimState != STATE_HYDRA_DEATH)
 			{
 				if (abs(info.angle) >= ANGLE(1))
 				{
@@ -162,7 +170,7 @@ void ControlHydra(short itemNumber)
 
 			switch (item->currentAnimState)
 			{
-			case 0:
+			case STATE_HYDRA_STOP:
 				creature->maximumTurn = ANGLE(1);
 				creature->flags = 0;
 				
@@ -180,11 +188,11 @@ void ControlHydra(short itemNumber)
 					if (info.distance >= SQUARE(2048) && GetRandomControl() & 0x1F)
 					{
 						if (!(GetRandomControl() & 0xF))
-							item->goalAnimState = 2;
+							item->goalAnimState = STATE_HYDRA_AIM;
 					}
 					else
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_HYDRA_BITE_ATTACK1;
 					}
 				}
 				else
@@ -193,7 +201,7 @@ void ControlHydra(short itemNumber)
 				}
 				break;
 
-			case 1:
+			case STATE_HYDRA_BITE_ATTACK1:
 			case 7:
 			case 8:
 			case 9:	
@@ -220,7 +228,7 @@ void ControlHydra(short itemNumber)
 						if (damage > 0)
 						{
 							item->hitPoints -= damage;
-							item->goalAnimState = 4;
+							item->goalAnimState = STATE_HYDRA_HURT;
 							CreatureEffect2(item, &HydraBite, 10 * damage, item->pos.yRot, DoBloodSplat);
 						}
 					}
@@ -334,10 +342,10 @@ void ControlHydra(short itemNumber)
 		{
 			item->hitPoints = 0;
 
-			if (item->currentAnimState != 11)
+			if (item->currentAnimState != STATE_HYDRA_DEATH)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 15;		
-				item->currentAnimState = 11;
+				item->currentAnimState = STATE_HYDRA_DEATH;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 			}
 
