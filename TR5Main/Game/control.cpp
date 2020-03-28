@@ -2058,7 +2058,7 @@ int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target) // (F) (D)
 	return 1;
 }
 
-int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing) // (F) (D)
+int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing) // (AF) (D)
 {
 	GAME_VECTOR target;
 	int result, flag, itemNumber, count;
@@ -2394,7 +2394,7 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z) // (F) (D)
 	floor2 = floor;
 	while (floor2->skyRoom != NO_ROOM)
 	{
-		if (CheckNoColCeilingTriangle(floor2, x, z) == 1)
+		if (CheckNoColCeilingTriangle(floor, x, z) == 1) /* @ORIGINAL_BUG: the call is made with floor (which is constant in the while loop) instead of floor2 */
 			break;
 		room = &Rooms[floor2->skyRoom];
 		floor2 = &XZ_GET_SECTOR(room, x - room->x, z - room->z);

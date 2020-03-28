@@ -155,7 +155,7 @@ void undraw_flare() // (F) (D)
 			Lara.flareFrame++;
 		}
 	}
-	else if (LaraItem->currentAnimState == STATE_LARA_STOP)
+	else if (LaraItem->currentAnimState == STATE_LARA_STOP) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
 	{
 		LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
 		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
