@@ -1416,8 +1416,7 @@ struct ANIM_FRAME // Variable size
 	short OffsetX; // size=0, offset=12
 	short OffsetY; // size=0, offset=14
 	short OffsetZ; // size=0, offset=16
-	short NumValues; // size=0, offset=18
-	unsigned short AngleSets[1]; // Variable size
+	unsigned short AngleSets[]; // Variable size
 };
 
 struct NODEOFFSET_INFO
