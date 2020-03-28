@@ -140,11 +140,12 @@ void MissileControl(short itemNumber)
 		{
 			if (fx->flag1 == 1)
 			{
+				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.yPos -= 64;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
 				fx->pos.yPos -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
+				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
 				LaraItem->hitPoints -= 200;			
 				KillEffect(itemNumber);
 			}
@@ -152,11 +153,12 @@ void MissileControl(short itemNumber)
 			{
 				if (fx->flag1 == 2)
 				{
+					// IMP hit effect
 					ExplodeFX(fx, 0, 32);
 					LaraItem->hitPoints -= 50;
 					DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, (GetRandomControl() & 3) + 2, LaraItem->pos.yRot, LaraItem->roomNumber);
-					SoundEffect(251, &fx->pos, 0);
-					SoundEffect(31, &LaraItem->pos, 0);
+					SoundEffect(SFX_IMP_STONE_HIT, &fx->pos, 0);
+					SoundEffect(SFX_LARA_INJURY_RND, &LaraItem->pos, 0);
 				}
 				
 				KillEffect(itemNumber);
@@ -164,6 +166,7 @@ void MissileControl(short itemNumber)
 		}
 		else
 		{
+			// HYDRA hit effect
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
 			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
 			if (LaraItem->hitPoints >= 500)
