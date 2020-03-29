@@ -5,6 +5,7 @@
 #include "../Game/tomb4fx.h"
 #include "../Game/lara.h"
 #include "../Game/draw.h"
+#include "../Game/debris.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -1170,7 +1171,7 @@ bool Renderer11::drawWaterfalls()
 
 bool Renderer11::drawDebris(bool transparent)
 {
-	UINT cPasses = 1;
+	/*UINT cPasses = 1;
 
 	// First collect debrises
 	vector<RendererVertex> vertices;
@@ -1271,5 +1272,43 @@ bool Renderer11::drawDebris(bool transparent)
 
 	m_primitiveBatch->End();
 
+	return true;
+	*/
+	extern vector<DebrisFragment> debrisFragments;
+	vector<RendererVertex> vertices;
+	for (auto deb = debrisFragments.begin(); deb != debrisFragments.end(); deb++) {
+		if (deb->active) {
+			//AddLine3D(deb->worldPosition, deb->worldPosition + Vector3(0, 100, 0), Vector4(1, 1, 1, 1));
+			Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
+			Matrix rotation = Matrix::CreateFromQuaternion(deb->rotation);
+			Matrix world = rotation* translation;
+			m_primitiveBatch->Begin();
+			m_context->VSSetShader(m_vsStatics, NULL, 0);
+			m_context->PSSetShader(m_psStatics, NULL, 0);
+			m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+			ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+			m_context->PSSetSamplers(0, 1, &sampler);
+			m_stCameraMatrices.View = View.Transpose();
+			m_stCameraMatrices.Projection = Projection.Transpose();
+			updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+			m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+			m_stMisc.AlphaTest = !transparent;
+			updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+			m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+			m_stStatic.World = Matrix::Identity;
+			m_stStatic.Color = Vector4::One;
+			updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+			m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
+			RendererVertex vtx0 = deb->mesh.vertices[0];
+			RendererVertex vtx1 = deb->mesh.vertices[1];
+			RendererVertex vtx2 = deb->mesh.vertices[2];
+			vtx0.Position = Vector3::Transform(deb->mesh.vertices[0].Position, world);
+			vtx1.Position = Vector3::Transform(deb->mesh.vertices[1].Position, world);
+			vtx2.Position = Vector3::Transform(deb->mesh.vertices[2].Position, world);
+			m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
+			m_numDrawCalls++;
+			m_primitiveBatch->End();
+		}
+	}
 	return true;
 }
