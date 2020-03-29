@@ -959,6 +959,7 @@ public:
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
 	bool DrawBar(float percent, const RendererHUDBar* const bar);
 	void											FlipRooms(short roomNumber1, short roomNumber2);
+	RendererMesh* getMeshFromMeshPtr(unsigned int meshp);
 private:
 	void drawFootprints();
 };
