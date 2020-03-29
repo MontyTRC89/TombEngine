@@ -20,7 +20,7 @@ void InitialiseSubmarine(short itemNum)
     item->frameNumber = Anims[item->animNumber].frameBase;
     item->goalAnimState = 0;
     item->currentAnimState = 0;
-    if (item->triggerFlags)
+    if (!item->triggerFlags)
         item->triggerFlags = 120;
 }
 

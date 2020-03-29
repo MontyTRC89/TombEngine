@@ -73,11 +73,11 @@ void ControlLarson(short itemNumber)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
 	// In Streets of Rome when Larson HP are below 40 he runs way
-	if (item->hitPoints <= TR5_LARSON_MIN_HP && !(item->flags & ONESHOT))
+	/*if (item->hitPoints <= TR5_LARSON_MIN_HP && !(item->flags & ONESHOT))
 	{
 		item->hitPoints = TR5_LARSON_MIN_HP;
 		creature->flags++;
-	}
+	}*/
 
 	// Fire weapon effects
 	if (item->firedWeapon)
@@ -128,7 +128,7 @@ void ControlLarson(short itemNumber)
 			joint2 = info.angle;
 
 		// FIXME: this should make Larson running away, but it's broken
-		if (creature->flags)
+		/*if (creature->flags)
 		{
 			item->hitPoints = 60;
 			item->gravityStatus = false;
@@ -136,7 +136,7 @@ void ControlLarson(short itemNumber)
 			item->collidable = false;
 			item->status = ITEM_DEACTIVATED;
 			creature->flags = 0;
-		}
+		}*/
 
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
@@ -394,7 +394,7 @@ void ControlLarson(short itemNumber)
 	CreatureJoint(item, 2, joint2);
 	CreatureAnimation(itemNumber, angle, 0);
 
-	if (creature->reachedGoal)
+	/*if (creature->reachedGoal)
 	{
 		if (CurrentLevel == 2)
 		{
@@ -413,5 +413,5 @@ void ControlLarson(short itemNumber)
 			DisableBaddieAI(itemNumber);
 			KillItem(itemNumber);
 		}
-	}
+	}*/
 }
