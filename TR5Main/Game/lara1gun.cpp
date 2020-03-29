@@ -1444,6 +1444,7 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item)
 			SplashSetup.z = item->pos.zPos;
 			SplashSetup.innerRadius = 160;
 			SplashSetup.splashPower = 2048 - dy;
+
 			SetupSplash(&SplashSetup);
 		}
 	}
