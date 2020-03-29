@@ -1725,7 +1725,7 @@ void BaddyObjects()
 		obj->collision = CreatureCollision;
 		obj->control = ControlBrowsBeast;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 4000;
+		obj->hitPoints = 100;
 		obj->pivotLength = 20;
 		obj->radius = 341;
 		obj->intelligent = true;
@@ -1740,16 +1740,9 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
 	
-	// TODO: LagoonWitch is deleted !
-	/*
-	obj = &Objects[ID_GREEN_TEETH];
+	obj = &Objects[ID_LAGOON_WITCH];
 	if (obj->loaded)
 	{
-		//v33 = (*(&Objects[79] + 25) | 2) & 0xF7FF;
-		//HIBYTE(v33) |= 4u;
-		//v33 |= 0x100u;
-		//LOBYTE(v33) = v33 | 0x70;
-		//*(&Objects[79] + 25) = v33 | 8;
 		obj->biteOffset = 256;
 		obj->initialise = InitialiseLagoonWitch;
 		obj->collision = CreatureCollision;
@@ -1763,13 +1756,14 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		//obj->undead = true;
 		obj->zoneType = ZONE_FLYER;
+
 		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
-	*/
 
 	obj = &Objects[ID_INVISIBLE_GHOST];
 	if (obj->loaded)
