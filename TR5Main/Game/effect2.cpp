@@ -1178,16 +1178,18 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 			ripple->worldPos = { (float)x,(float)y,(float)z };
 			ripple->currentColor = Vector4(0, 0, 0, 0);
 			if (flags & RIPPLE_FLAG_BLOOD ) {
-				ripple->SpriteID = SPR_FIRE3;
+				ripple->SpriteID = SPR_FIRE1;
 				ripple->initialColor = Vector4(1, 0, 0, 1);
-				ripple->lifeRate = 0.2f;
-				ripple->sizeRate = 1.2f;
+				ripple->lifeRate = 0.9f;
+				ripple->sizeRate = 8.0f;
+				ripple->isBillboard = true;
 			}
 			else {
 				ripple->SpriteID = SPR_RIPPLES;
 				ripple->initialColor = Vector4(1, 1, 1, 1);
 				ripple->lifeRate = 1.0f;
 				ripple->sizeRate = 4.0f;
+				ripple->isBillboard = false;
 			}
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
@@ -1208,7 +1210,7 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
-	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS);
+	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT);
 }
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
