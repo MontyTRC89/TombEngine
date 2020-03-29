@@ -1125,35 +1125,33 @@ void UpdateSplashes()
 	{
 		RIPPLE_STRUCT* ripple = &Ripples[i];
 
-		if (ripple->flags & 1)
+		if (ripple->active)
 		{
-			if (ripple->size < 252)
-			{
-				if (ripple->flags & 2)
-					ripple->size += 2;
-				else
-					ripple->size += 4;
-
-				if (ripple->init)
-				{
-					if (ripple->init < ripple->life)
-					{
-						if (ripple->flags & 2)
-							ripple->init += 8;
-						else
-							ripple->init += 4;
-
-						if (ripple->init >= ripple->life)
-							ripple->init = 0;
-					}
-				}
-				else
-				{
-					ripple->life -= 3;
-					if (ripple->life > 250)
-						ripple->flags = 0;
-				}
+			if (ripple->lifeTime > ripple->life) {
+				ripple->active = false;
+				continue;
 			}
+			//normalized Lifetime
+			float n = ripple->lifeTime / ripple->life;
+			n = fmin(n, 1.0f);
+			n = fmax(0.0f, n);
+			constexpr float peakTime = 0.2f;
+			constexpr float expIn = 1.5f;
+			constexpr float expOut = 1.0f;
+			if (n <= peakTime) {
+				float alpha = pow((n / peakTime), expIn);
+				//we ascend our color
+				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
+			}
+			else {
+				float alphaTerm = 1.0f - ((n - peakTime) / 1 - peakTime);
+				// float alpha = pow(alphaTerm, expOut);
+				float alpha = alphaTerm;
+				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
+				//we descend
+			}
+			ripple->size += ripple->sizeRate;
+			ripple->lifeTime += ripple->lifeRate;
 		}
 	}
 }
@@ -1166,44 +1164,53 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 	for (i = 0; i < MAX_RIPPLES; i++)
 	{
 		ripple = &Ripples[i];
-		if (!(ripple->flags & 1))
+		if (!(ripple->active)) {
+			ripple->active = true;
+			ripple->size = size;
+			ripple->lifeTime = 0;
+			if (flags & RIPPLE_FLAG_SHORT_LIFE) {
+				ripple->life = (rand() & 16) + 16;
+
+			}
+			else {
+				ripple->life = (rand() & 16) + 48;
+			}
+			ripple->worldPos = { (float)x,(float)y,(float)z };
+			ripple->currentColor = Vector4(0, 0, 0, 0);
+			if (flags & RIPPLE_FLAG_BLOOD ) {
+				ripple->SpriteID = SPR_FIRE1;
+				ripple->initialColor = Vector4(1, 0, 0, 1);
+				ripple->lifeRate = 0.9f;
+				ripple->sizeRate = 8.0f;
+				ripple->isBillboard = true;
+			}
+			else {
+				ripple->SpriteID = SPR_RIPPLES;
+				ripple->initialColor = Vector4(1, 1, 1, 1);
+				ripple->lifeRate = 1.0f;
+				ripple->sizeRate = 4.0f;
+				ripple->isBillboard = false;
+			}
+			if (flags & RIPPLE_FLAG_RAND_POS)
+			{
+				ripple->worldPos.x += frandMinMax(-32, 32);
+				ripple->worldPos.z += frandMinMax(-32, 32);
+			}
+			if (flags & RIPPLE_FLAG_RAND_ROT)
+			{
+				ripple->rotation = frandMinMax(-PI, PI);
+			}
+			else {
+				ripple->rotation = 0;
+			}
 			break;
-	}
-
-	if (i == MAX_RIPPLES)
-		return;
-
-	ripple->flags = flags | 1;
-	ripple->size = size;
-	ripple->life = (GetRandomControl() & 0xF) + 48;
-	ripple->init = 1;
-	ripple->x = x;
-	ripple->y = y;
-	ripple->z = z;
-	if (flags & 0x40)
-	{
-		ripple->x += (GetRandomControl() & 0x7F) - 64;
-		ripple->z += (GetRandomControl() & 0x7F) - 64;
+		}
 	}
 }
 
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		RIPPLE_STRUCT* ripple = &Ripples[i];
-		if (!(ripple->flags & 1))
-		{
-			ripple->flags = 0x31;
-			ripple->init = 1;
-			ripple->life = (GetRandomControl() & 7) - 16;
-			ripple->size = sizeme;
-			ripple->x = (GetRandomControl() & 0x3F) + x - 32;
-			ripple->y = y;
-			ripple->z = (GetRandomControl() & 0x3F) + z - 32;
-			return;
-		}
-	}
+	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT);
 }
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
@@ -1401,11 +1408,11 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 							{
 								if (item->currentAnimState == STATE_LARA_STOP)
 								{
-									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, 16);
+									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS);
 								}
 								else
 								{
-									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, 18);
+									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS);
 								}
 							}
 						}
