@@ -6564,7 +6564,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	{
 		if (TrInput & IN_ACTION && item->hitPoints > 0 && coll->frontFloor <= 0)
 		{
-			if (flag && hdif > 0 && (delta > 0 && coll->leftFloor > coll->rightFloor || delta < 0 && coll->leftFloor < coll->rightFloor))
+			if (flag && hdif > 0 && delta > 0 == coll->leftFloor > coll->rightFloor)
 				flag = 0;
 			frame = (ANIM_FRAME*) GetBoundsAccurate(item);
 			front = coll->frontFloor;
