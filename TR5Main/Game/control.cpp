@@ -40,6 +40,7 @@
 
 #include <process.h>
 #include <stdio.h>
+#include "..\Renderer\Renderer11.h"
 
 int KeyTriggerActive;
 int number_los_rooms;
@@ -413,7 +414,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSmoke();
 		UpdateBlood();
 		UpdateBubbles();
-		UpdateDebris();
+		updateDebris();
+		//UpdateDebris();
 		UpdateGunShells();
 		updateFootprints();
 		UpdateSplashes();
@@ -2066,7 +2068,9 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 	PHD_VECTOR vector;
 	ITEM_INFO* item;
 	short angle, room, triggerItems[8];
-
+	VECTOR dir;
+	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
+	direction.Normalize();
 	target.x = dest->x;
 	target.y = dest->y;
 	target.z = dest->z;
@@ -2108,7 +2112,10 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 				{
 					if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
 					{
-						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
+						shatterImpactInfo.impactDirection = direction;
+						shatterObject(NULL, mesh,128,target.roomNumber,0 );
+						shatterImpactInfo.impactDirection = Vector3(0,1,0);
+						//ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
@@ -2127,8 +2134,10 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 						{
 							if (!Objects[item->objectNumber].intelligent)
 							{
-								ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
 								item->meshBits &= ~TargetMesh;
+								shatterImpactInfo.impactDirection = direction;
+								shatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
+								shatterImpactInfo.impactDirection = Vector3(0, 1, 0);
 								TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
 							}
 							else
