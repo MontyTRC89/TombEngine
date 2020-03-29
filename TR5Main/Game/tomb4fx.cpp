@@ -1163,7 +1163,7 @@ void UpdateBubbles()
 
 			if (!(Rooms[roomNumber].flags & ENV_FLAG_WATER))
 			{
-				SetupRipple(bubble->pos.x, Rooms[bubble->roomNumber].maxceiling, bubble->pos.z, (GetRandomControl() & 0xF) + 48, 2);
+				SetupRipple(bubble->pos.x, Rooms[bubble->roomNumber].maxceiling, bubble->pos.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_LIFE+RIPPLE_FLAG_RAND_ROT);
 				bubble->size = 0;
 				continue;
 			}

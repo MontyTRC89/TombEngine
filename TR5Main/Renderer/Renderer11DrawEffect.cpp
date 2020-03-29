@@ -401,17 +401,19 @@ void Renderer11::drawRipples()
 	{
 		RIPPLE_STRUCT* ripple = &Ripples[i];
 
-		if (ripple->flags & 1)
+		if (ripple->active)
 		{
-			float x1 = ripple->x - ripple->size;
-			float z1 = ripple->z - ripple->size;
-			float x2 = ripple->x + ripple->size;
-			float z2 = ripple->z + ripple->size;
-			float y = ripple->y;
-
-			byte color = (ripple->init ? ripple->init << 1 : ripple->life << 1);
-
-			AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+			float x1 = ripple->worldPos.x - ripple->size;
+			float z1 = ripple->worldPos.z - ripple->size;
+			float x2 = ripple->worldPos.x + ripple->size;
+			float z2 = ripple->worldPos.z + ripple->size;
+			float y = ripple->worldPos.y;
+			if (ripple->isBillboard) {
+				AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, 0, 1, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+			}
+			else {
+				AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+			}
 		}
 	}
 }

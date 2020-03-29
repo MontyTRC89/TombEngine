@@ -1044,25 +1044,7 @@ struct DRIP_STRUCT
 	byte pad; // size=0, offset=23
 };
 
-struct RIPPLE_STRUCT
-{
-	int x; // size=0, offset=0
-	int y; // size=0, offset=4
-	int z; // size=0, offset=8
-	byte flags; // size=0, offset=12
-	unsigned char life; // size=0, offset=13
-	unsigned char size; // size=0, offset=14
-	unsigned char init; // size=0, offset=15
-};
 
-struct SPLASH_SETUP
-{
-	float x;
-	float y;
-	float z;
-	float splashPower;
-	float innerRadius;
-};
 
 struct FIRE_LIST
 {
