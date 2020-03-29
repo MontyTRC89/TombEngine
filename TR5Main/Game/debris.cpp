@@ -11,10 +11,12 @@ DebrisFragment* getFreeDebrisFragment()
 	}
 	return nullptr;
 }
+
 void Inject_Debris()
 {
-	INJECT(0x0041D6B0, ShatterObject);
+	//INJECT(0x0041D6B0, ShatterObject);
 }
+
 void shatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)
 {
 	extern Renderer11* g_Renderer;

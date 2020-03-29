@@ -2115,7 +2115,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 						shatterImpactInfo.impactDirection = direction;
 						shatterObject(NULL, mesh,128,target.roomNumber,0 );
 						shatterImpactInfo.impactDirection = Vector3(0,1,0);
-						//ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
+						//shatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
@@ -3140,7 +3140,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		ShatterItem.sphere.z = SphereList[Node].z;
 		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData;
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
-		ShatterObject(&ShatterItem, 0, Num, item->roomNumber, NoXZVel);
+		shatterObject(&ShatterItem, 0, Num, item->roomNumber, NoXZVel);
 		item->meshBits &= ~ShatterItem.bit;
 		return 1;
 	}

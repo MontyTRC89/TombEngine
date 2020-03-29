@@ -45,7 +45,7 @@ void SphinxControl(short itemNum)
 
 			if (mesh->z >> 10 == z >> 10 && mesh->x >> 10 == x >> 10 && mesh->staticNumber >= 50)
 			{
-				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
+				shatterObject(NULL, mesh, -64, item->roomNumber, 0);
 				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 				mesh->Flags &= ~0x100;

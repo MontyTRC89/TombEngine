@@ -174,7 +174,7 @@ void KnightTemplarControl(short itemNum)
 						floor(pos.z) == floor(mesh->z) &&
 						mesh->staticNumber >= 50)
 					{
-						ShatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
+						shatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 						mesh->Flags &= ~1;
