@@ -1,12 +1,40 @@
 #pragma once
-
+#include <d3d11.h>
 #include "..\Global\global.h"
 
 #define ExplodingDeath ((void (__cdecl*)(short, int, int)) 0x00484080)
 //#define InitialiseSmokeEmitter ((void (__cdecl*)(short)) 0x0043D9D0)
 //#define SmokeEmitterControl ((void (__cdecl*)(short)) 0x00431560)
 #define DrawLensFlare ((void (__cdecl*)(ITEM_INFO*)) 0x00485290)
+#define RIPPLE_FLAG_BLOOD 0x80
+#define RIPPLE_FLAG_RAND_POS 0x40
+#define RIPPLE_FLAG_RAND_ROT 0x20
+#define RIPPLE_FLAG_SHORT_LIFE 0x01
 
+struct RIPPLE_STRUCT
+{
+	Vector4 currentColor;
+	Vector4 initialColor;
+	Vector3 worldPos;
+	unsigned int SpriteID;
+	float rotation;
+	float size;
+	float sizeRate;
+	float life; //max life
+	float lifeTime; // current life
+	float lifeRate; // life change rate
+	bool active;
+	bool isBillboard; //used for Blood
+};
+
+struct SPLASH_SETUP
+{
+	float x;
+	float y;
+	float z;
+	float splashPower;
+	float innerRadius;
+};
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[32];
 extern int DeadlyBounds[6];
