@@ -322,7 +322,7 @@ void ControlGladiator(short itemNumber)
 								{
 									if (mesh->staticNumber >= 50 && mesh->staticNumber <= 59)
 									{
-										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
+										shatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
 										mesh->Flags &= 0xFEu;
 										GetFloorHeight(floor, pos.x, pos.y, pos.z);
