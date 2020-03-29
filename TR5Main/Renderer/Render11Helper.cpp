@@ -1018,3 +1018,8 @@ void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
 	m_rooms[roomNumber1].Room = &Rooms[roomNumber1];
 	m_rooms[roomNumber2].Room = &Rooms[roomNumber2];
 }
+
+RendererMesh* Renderer11::getMeshFromMeshPtr(unsigned int meshp)
+{
+	return m_meshPointersToMesh[meshp];
+}
