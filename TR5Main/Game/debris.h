@@ -1,7 +1,7 @@
 #pragma once
 
 #include "..\Global\global.h"
-#define ShatterObject ((void (__cdecl*)(SHATTER_ITEM*, MESH_INFO*, short, short, int)) 0x0041D6B0)
+//#define ShatterObject ((void (__cdecl*)(SHATTER_ITEM*, MESH_INFO*, short, short, int)) 0x0041D6B0)
 void Inject_Debris();
 extern struct ShatterImpactInfo {
 	Vector3 impactDirection;
