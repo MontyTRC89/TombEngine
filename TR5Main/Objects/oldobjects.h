@@ -167,3 +167,5 @@ void ControlBodyPart(short fxNumber);
 void ExplodeFX(FX_INFO* fx, int noXZVel, int bits);
 void InitialiseLagoonWitch(short itemNumber);
 void ControlLagoonWitch(short itemNumber);
+void InitialiseChef(short itemNumber);
+void ControlChef(short itemNumber);
