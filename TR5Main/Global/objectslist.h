@@ -761,6 +761,7 @@ typedef enum GAME_OBJECT_ID
 	ID_GLADIATOR,
 	ID_HITMAN,
 	ID_SNIPER,
+	ID_CHEF,
 
 	/* Soprannatural, boss and others */
 	ID_WINGED_MUMMY = 220,

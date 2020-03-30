@@ -71,7 +71,6 @@ void ControlSubmarine(short itemNumber)
 		tilt = -2048;
 	}
 
-LABEL_13:
 	item->itemFlags[0] = tilt;
 
 	if (abs(tilt) >= 64)

@@ -1413,6 +1413,31 @@ void BaddyObjects()
 		Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
+	obj = &Objects[ID_CHEF];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseChef;
+		obj->control = ControlChef;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 35;
+		obj->pivotLength = 50;
+		obj->radius = 102;
+		obj->biteOffset = 0;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->saveHitpoints = true;
+		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
+
+		Bones[obj->boneIndex + 24] |= ROT_Y;
+		Bones[obj->boneIndex + 24] |= ROT_X;
+		Bones[obj->boneIndex + 52] |= ROT_Y;
+		Bones[obj->boneIndex + 52] |= ROT_X;
+	}
+
 	obj = &Objects[ID_LION];
 	if (obj->loaded)
 	{
