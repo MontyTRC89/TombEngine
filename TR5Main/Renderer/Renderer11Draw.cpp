@@ -2193,6 +2193,9 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 
 	for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++)
 	{
+		if (!(item->Item->meshBits & (1 << k)))
+			continue;
+
 		RendererMesh* mesh;
 		if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1))
 		{
