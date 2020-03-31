@@ -284,20 +284,22 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, short(*generate)(int x, i
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)
 {
-	int waterLevel;
+	int waterLevel = depth;
+	int wh = 0;
+
 	if (depth < 0)
 	{
-		waterLevel = abs(depth);
-		depth = 0;
+		wh = abs(depth);
+		waterLevel = 0;
 	}
 	else
 	{
-		waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+		wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	}
 
-	waterLevel += depth;
+	int y = wh + waterLevel;
 
-	if (item->pos.yPos < waterLevel)
+	if (item->pos.yPos < y)
 	{
 		FLOOR_INFO* floor;
 		short roomNumber;
@@ -307,14 +309,9 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		if (waterLevel > height)
-		{
+		item->pos.yPos = y;
+		if (y > height)
 			item->pos.yPos = height;
-		}
-		else
-		{
-			item->pos.yPos = waterLevel;
-		}
 
 		if (item->pos.xRot > ANGLE(2))
 		{
@@ -722,7 +719,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		return TRUE;
 	}
 
-	if (LOT->fly != NO_FLYING)
+	if (LOT->fly != NO_FLYING && item->hitPoints > 0)
 	{
 		dy = creature->target.y - item->pos.yPos;
 		if (dy > LOT->fly)
@@ -731,48 +728,48 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			dy = -LOT->fly;
 
 		height = GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos);
-		if (item->pos.yPos + dy > height)
+		if (item->pos.yPos + dy <= height)
 		{
-			if (item->pos.yPos > height)
+			if (Objects[item->objectNumber].waterCreature)
 			{
-				item->pos.xPos = old.x;
-				item->pos.zPos = old.z;
-				dy = -LOT->fly;
+				ceiling = GetCeiling(floor, item->pos.xPos, y, item->pos.zPos);
+
+				if (item->objectNumber == ID_WHALE)
+					top = STEP_SIZE / 2;
+				else
+					top = bounds[2];
+
+				if (item->pos.yPos + top + dy < ceiling)
+				{
+					if (item->pos.yPos + top < ceiling)
+					{
+						item->pos.xPos = old.x;
+						item->pos.zPos = old.z;
+						dy = LOT->fly;
+					}
+					else
+						dy = 0;
+				}
 			}
 			else
 			{
-				dy = 0;
-				item->pos.yPos = height;
+				floor = GetFloor(item->pos.xPos, y + STEP_SIZE, item->pos.zPos, &roomNumber);
+				if (Rooms[roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+				{
+					dy = -LOT->fly;
+				}
 			}
 		}
-		else if (Objects[item->objectNumber].waterCreature)
+		else if (item->pos.yPos <= height)
 		{
-			floor = GetFloor(item->pos.xPos, y + STEP_SIZE, item->pos.zPos, &roomNumber);
-			if (Rooms[roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
-			{
-				dy = -LOT->fly;
-			}
+			dy = 0;
+			item->pos.yPos = height;
 		}
 		else
 		{
-			ceiling = GetCeiling(floor, item->pos.xPos, y, item->pos.zPos);
-
-			if (item->objectNumber == ID_WHALE)
-				top = STEP_SIZE / 2;
-			else
-				top = bounds[2];
-
-			if (item->pos.yPos + top + dy < ceiling)
-			{
-				if (item->pos.yPos + top < ceiling)
-				{
-					item->pos.xPos = old.x;
-					item->pos.zPos = old.z;
-					dy = LOT->fly;
-				}
-				else
-					dy = 0;
-			}
+			item->pos.xPos = old.x;
+			item->pos.zPos = old.z;
+			dy = -LOT->fly;
 		}
 
 		item->pos.yPos += dy;

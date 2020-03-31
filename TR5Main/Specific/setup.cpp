@@ -1432,10 +1432,10 @@ void BaddyObjects()
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 
-		Bones[obj->boneIndex + 24] |= ROT_Y;
-		Bones[obj->boneIndex + 24] |= ROT_X;
-		Bones[obj->boneIndex + 52] |= ROT_Y;
-		Bones[obj->boneIndex + 52] |= ROT_X;
+		Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
+		Bones[obj->boneIndex + 4 * 6] |= ROT_X;
+		Bones[obj->boneIndex + 4 * 13] |= ROT_Y;
+		Bones[obj->boneIndex + 4 * 13] |= ROT_X;
 	}
 
 	obj = &Objects[ID_LION];
@@ -1781,7 +1781,7 @@ void BaddyObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//obj->undead = true;
+		obj->waterCreature = true;
 		obj->zoneType = ZONE_FLYER;
 
 		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
