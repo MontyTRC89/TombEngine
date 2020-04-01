@@ -4,7 +4,7 @@
 #include "roomload.h"
 #include "..\Game\larafire.h"
 
-void PatchGame()
+void PatchGameCode()
 {
 	printf("Patching game code\n");
 

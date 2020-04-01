@@ -3,4 +3,4 @@
 #include "..\Global\global.h"
 #include <Windows.h>
 
-void PatchGame();
+void PatchGameCode();

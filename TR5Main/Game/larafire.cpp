@@ -983,7 +983,7 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 	source.roomNumber = LaraItem->roomNumber;
 	maxDistance = winfo->targetDist;
 	targets = 0;
-	for (slot = 0; slot < 5; ++slot)
+	for (slot = 0; slot < NUM_SLOTS; ++slot)
 	{
 		if (BaddieSlots[slot].itemNum != NO_ITEM)
 		{
