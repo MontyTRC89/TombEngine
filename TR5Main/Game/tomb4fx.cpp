@@ -4,6 +4,7 @@
 #include "effect2.h"
 #include "draw.h"
 #include "items.h"
+#include "../Specific/setup.h"
 
 char FlareTable[121] =
 {

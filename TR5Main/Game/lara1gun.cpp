@@ -20,6 +20,7 @@
 #include "..\Global\global.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "..\Specific\roomload.h"
+#include "../Specific/setup.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;

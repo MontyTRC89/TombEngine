@@ -2,6 +2,7 @@
 #include "..\Global\global.h"
 #include "effect2.h"
 #include <stdio.h>
+#include "../Specific/setup.h"
 
 void ClearItem(short itemNum)
 {

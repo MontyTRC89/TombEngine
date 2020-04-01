@@ -5,6 +5,8 @@
 #include "../../Game/people.h"
 #include "../../Game/items.h"
 #include "../../Game/draw.h"
+#include "../../specific/setup.h"
+#include "../../Game/lot.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

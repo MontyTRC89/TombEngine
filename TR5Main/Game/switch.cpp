@@ -9,6 +9,7 @@
 #include "inventory.h"
 #include "draw.h"
 #include "sphere.h"
+#include "../Specific/setup.h"
 
 byte SequenceUsed[6];
 byte SequenceResults[3][3][3];

@@ -9,6 +9,8 @@
 #include "effects.h"
 #include "sphere.h"
 #include "misc.h"
+#include "../Specific/patch.cpp"
+#include "../Specific/setup.h"
 
 char LM[] = {
 	LJ_HIPS,

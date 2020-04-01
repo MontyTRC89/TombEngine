@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/people.h"
+#include "../../Specific/setup.h"
 
 enum LARSON_STATE {
 	PEOPLE_EMPTY, PEOPLE_STOP, PEOPLE_WALK, PEOPLE_RUN, PEOPLE_AIM,

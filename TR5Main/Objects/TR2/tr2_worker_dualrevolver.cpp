@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/people.h"
+#include "../../specific/setup.h"
 
 BITE_INFO workerDualGunL = { -2, 275, 23, 6 };
 BITE_INFO workerDualGunR = { 2, 275, 23, 10 };

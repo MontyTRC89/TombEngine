@@ -2,11 +2,13 @@
 #include "box.h"
 #include "..\Global\global.h"
 #include <stdio.h>
+#include "../Specific/setup.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 
 int SlotsUsed;
+CREATURE_INFO* BaddieSlots;
 
 void InitialiseLOTarray(int allocMem)
 {

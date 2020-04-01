@@ -3,6 +3,7 @@
 #include "../../Game/effects.h"
 #include "../../Game/Box.h"
 #include "../../Game/people.h"
+#include "../../specific/setup.h"
 
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };

@@ -6,6 +6,7 @@
 #include "../Game/lara.h"
 #include "../Game/draw.h"
 #include "../Game/debris.h"
+#include "../Specific/setup.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];

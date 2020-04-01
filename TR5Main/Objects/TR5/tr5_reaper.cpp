@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/items.h"
 #include "../../Game/Box.h"
+#include "../../Specific/setup.h"
 
 void InitialiseReaper(short itemNum)
 {

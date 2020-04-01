@@ -41,6 +41,7 @@
 #include <process.h>
 #include <stdio.h>
 #include "..\Renderer\Renderer11.h"
+#include "../Specific/setup.h"
 
 int KeyTriggerActive;
 int number_los_rooms;
@@ -63,6 +64,7 @@ short NextFxActive;
 short NextFxFree;
 short NextItemActive;
 short NextItemFree;
+short* TriggerIndex;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -415,7 +417,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBlood();
 		UpdateBubbles();
 		UpdateDebris();
-		//UpdateDebris();
 		UpdateGunShells();
 		updateFootprints();
 		UpdateSplashes();
@@ -1737,45 +1738,6 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 
 	return height;
 }
-
-/*void UpdateDebris()
-{
-	for (int i = 0; i < 256; i++)
-	{
-		DEBRIS_STRUCT* debris = &Debris[i];
-
-		if (debris->on)
-		{
-			debris->yVel += debris->gravity;
-			if (debris->yVel > 4096)
-				debris->yVel = 4096;
-
-			debris->speed -= debris->speed >> 4;
-
-			debris->x += debris->speed * SIN(debris->dir) >> W2V_SHIFT;
-			debris->y += debris->yVel >> 4;
-			debris->z += debris->speed * COS(debris->dir) >> W2V_SHIFT;
-			
-			FLOOR_INFO* floor = GetFloor(debris->x, debris->y, debris->z, &debris->roomNumber);
-			int height = GetFloorHeight(floor, debris->x, debris->y, debris->z);
-			int ceiling = GetCeiling(floor, debris->x, debris->y, debris->z);
-
-			if (debris->y >= height || debris->y < ceiling)
-				debris->on--;
-			else
-			{
-				debris->xRot += debris->yVel >> 6;
-				
-				if (debris->yVel)
-					debris->yRot += debris->speed >> 5;
-
-				if (Rooms[debris->roomNumber].flags & ENV_FLAG_WATER)
-					debris->yVel -= debris->yVel >> 2;
-			}
-		}
-	}
-}
-*/
 
 int LOS(GAME_VECTOR* start, GAME_VECTOR* end) // (F) (D)
 {

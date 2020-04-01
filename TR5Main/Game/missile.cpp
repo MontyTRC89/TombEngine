@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "debris.h"
 #include "../Specific/roomload.h"
+#include "../Specific/setup.h"
 
 #define SHARD_DAMAGE 30
 #define ROCKET_DAMAGE 100

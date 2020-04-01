@@ -5,6 +5,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
 #include "../../Game/lot.h"
+#include "../../Specific/setup.h"
 
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2

@@ -2,6 +2,7 @@
 #include "../../Game/items.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO mummyBite1 = { 0, 0, 0, 11 };
 BITE_INFO mummyBite2 = { 0, 0, 0, 14 };
@@ -14,7 +15,7 @@ void InitialiseMummy(short itemNum)
 
 	if (item->triggerFlags == 2)
 	{
-		item->animNumber = Objects[ID_MUMMY].animIndex + 12;
+		item->animNumber = Objects[item->objectNumber].animIndex + 12;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->goalAnimState = 8;
 		item->currentAnimState = 8;
@@ -22,7 +23,7 @@ void InitialiseMummy(short itemNum)
 	}
 	else
 	{
-		item->animNumber = Objects[ID_MUMMY].animIndex + 19;
+		item->animNumber = Objects[item->objectNumber].animIndex + 19;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->goalAnimState = 0;
 		item->currentAnimState = 0;
@@ -64,12 +65,12 @@ void MummyControl(short itemNum)
 						if (item->currentAnimState == 3 || item->currentAnimState == 4)
 						{
 							item->currentAnimState = 6;
-							item->animNumber = Objects[ID_MUMMY].animIndex + 20;
+							item->animNumber = Objects[item->objectNumber].animIndex + 20;
 						}
 						else
 						{
 							item->currentAnimState = 5;
-							item->animNumber = Objects[ID_MUMMY].animIndex + 3;
+							item->animNumber = Objects[item->objectNumber].animIndex + 3;
 						}
 						item->frameNumber = Anims[item->animNumber].frameBase;
 						item->pos.yRot += info.angle;
@@ -77,7 +78,7 @@ void MummyControl(short itemNum)
 				}
 				else
 				{
-					item->animNumber = Objects[ID_MUMMY].animIndex + 10;
+					item->animNumber = Objects[item->objectNumber].animIndex + 10;
 					item->frameNumber = Anims[item->animNumber].frameBase;
 					item->currentAnimState = 7;
 					item->pos.yRot += info.angle;
@@ -190,7 +191,7 @@ void MummyControl(short itemNum)
 		if (info.distance < SQUARE(1024) || !(GetRandomControl() & 0x7F))
 		{
 			item->goalAnimState = 9;
-			item->hitPoints = Objects[ID_MUMMY].hitPoints;
+			item->hitPoints = Objects[item->objectNumber].hitPoints;
 		}
 		break;
 
@@ -222,7 +223,7 @@ void MummyControl(short itemNum)
 					LaraItem->hitPoints -= 100;
 					LaraItem->hitStatus = true;
 
-					if (item->animNumber == Objects[ID_MUMMY].animIndex + 15)
+					if (item->animNumber == Objects[item->objectNumber].animIndex + 15)
 					{
 						CreatureEffect2(
 							item,

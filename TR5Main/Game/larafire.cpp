@@ -16,6 +16,8 @@
 #include "effect2.h"
 #include "flmtorch.h"
 #include "..\Specific\roomload.h"
+#include "lot.h"
+#include "../Specific/setup.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {

@@ -22,15 +22,6 @@
 #define		CROSSBOW_EXPLODE_RADIUS	2048
 #define		GRENADE_EXPLODE_RADIUS	2048
 
-//#define ReadyShotgun ((void (__cdecl*)(int)) 0x0044DC30)  
-//#define DrawShotgunMeshes ((void (__cdecl*)(int)) 0x0044DBB0)  
-//#define UndrawShotgunMeshes ((void (__cdecl*)(int)) 0x0044DBF0)  
-//#define FireHK ((void (__cdecl*)(int)) 0x0044E4B0)  
-//#define FireShotgun ((void (__cdecl*)()) 0x0044E110)   
-//#define UndrawShotgun ((void (__cdecl*)(int)) 0x0044ECA0)  
-//#define CrossbowHitSwitchType78 ((void (__cdecl*)(ITEM_INFO*, ITEM_INFO*, int)) 0x0044E5E0)  
-//#define DoGrenadeDamageOnBaddie ((void (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x0044F690)  
-
 void FireGrenade();
 void ControlGrenade(short itemNumber);
 void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);

@@ -5,6 +5,7 @@
 #include "../../Game/items.h"
 #include "../../Game/effect2.h"
 #include "../../Game/lot.h"
+#include "../../specific/setup.h"
 
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 

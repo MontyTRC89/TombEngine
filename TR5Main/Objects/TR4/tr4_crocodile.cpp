@@ -3,6 +3,7 @@
 #include "../../Game/effects.h"
 #include "../../Game/people.h"
 #include "../../Game/items.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO crocodileBite = { 0, -156, 500, 9 };
 

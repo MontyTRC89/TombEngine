@@ -45,6 +45,7 @@ int NumObjectTextures;
 int NumTextureTiles;
 short* MeshBase;
 short** Meshes;
+int NumItems;
 
 uintptr_t hLoadLevel;
 unsigned int ThreadId;

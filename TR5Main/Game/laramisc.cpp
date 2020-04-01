@@ -1,6 +1,7 @@
 #include "laramisc.h"
 #include "..\Global\global.h"
 #include "..\Specific\roomload.h"
+#include "../Specific/setup.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "effects.h"
 #include "collide.h"

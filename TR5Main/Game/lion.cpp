@@ -6,6 +6,7 @@
 #include "lot.h"
 #include "box.h"
 #include "tomb4fx.h"
+#include "../Specific/setup.h"
 
 BITE_INFO LionBite1 = { 0xFFFFFFFE, 0xFFFFFFF6, 0xFA, 0x15 };
 BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };
@@ -16,7 +17,7 @@ void InitialiseLion(short itemNum)
 	
 	ClearItem(itemNum);
 
-	item->animNumber = Objects[ID_LION].animIndex;
+	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
@@ -40,7 +41,7 @@ void LionControl(short itemNum)
 			item->hitPoints = 0;
 			if (item->currentAnimState != 5)
 			{
-				item->animNumber = Objects[ID_LION].animIndex + (GetRandomControl() & 1) + 7;
+				item->animNumber = Objects[item->objectNumber].animIndex + (GetRandomControl() & 1) + 7;
 				item->currentAnimState = 5;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 			}

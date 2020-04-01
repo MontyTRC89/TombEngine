@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../specific/setup.h"
 
 enum RAPTOR_STATE
 {

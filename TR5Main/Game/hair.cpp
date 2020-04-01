@@ -3,6 +3,7 @@
 #include "draw.h"
 #include "laramisc.h"
 #include "..\Scripting\GameFlowScript.h"
+#include "../Specific/setup.h"
 
 int FirstHair[2];
 HAIR_STRUCT Hairs[2][7];

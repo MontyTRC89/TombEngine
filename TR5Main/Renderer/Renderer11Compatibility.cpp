@@ -2,6 +2,7 @@
 #include "../Specific/roomload.h"
 #include <stack>
 #include "../Game/savegame.h"
+#include "../Specific/setup.h"
 
 bool Renderer11::PrepareDataForTheRenderer()
 {

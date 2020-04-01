@@ -9,6 +9,7 @@
 #include "../../Game/draw.h"
 #include "../../Game/control.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 int NextBat;
 BAT_STRUCT* Bats;

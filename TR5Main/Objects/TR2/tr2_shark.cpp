@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../specific/setup.h"
 
 BITE_INFO sharkBite = { 17, -22, 344, 12 };
 
