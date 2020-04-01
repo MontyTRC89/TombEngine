@@ -238,6 +238,8 @@ short HoldStates[] = {
 extern GameFlow* g_GameFlow;
 extern LaraExtraInfo g_LaraExtra;
 bool MonksAttackLara;
+ITEM_INFO* LastTargets[8];
+ITEM_INFO* TargetList[8];
 
 int WeaponObject(int weaponType) // (F) (D)
 {
@@ -955,6 +957,127 @@ int CheckForHoldingState(int state) // (F) (D)
 	}
 	
 	return 0;
+}
+
+void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
+{
+	GAME_VECTOR source, target;
+	int bestDistance, maxDistance, targets, slot, x, y, z, distance;
+	ITEM_INFO* bestItem, *item;
+	short bestYrot, angle[2], match;
+	bool flag, loop;
+
+	if (BinocularRange)
+	{
+		Lara.target = NULL;
+		return;
+	}
+	bestItem = NULL;
+	bestYrot = 0x7FFF;
+	bestDistance = 0x7FFFFFFF;
+	source.x = LaraItem->pos.xPos;
+	source.y = LaraItem->pos.yPos - 650;
+	source.z = LaraItem->pos.zPos;
+	source.roomNumber = LaraItem->roomNumber;
+	maxDistance = winfo->targetDist;
+	targets = 0;
+	for (slot = 0; slot < 5; ++slot)
+	{
+		if (BaddieSlots[slot].itemNum != NO_ITEM)
+		{
+			item = &Items[BaddieSlots[slot].itemNum];
+			if (item->hitPoints > 0)
+			{
+				x = item->pos.xPos - source.x;
+				y = item->pos.yPos - source.y;
+				z = item->pos.zPos - source.z;
+				if (abs(x) <= maxDistance && abs(y) <= maxDistance && abs(z) <= maxDistance)
+				{
+					distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+					if (distance < SQUARE(maxDistance))
+					{
+						find_target_point(item, &target);
+						if (LOS(&source, &target))
+						{
+							phd_GetVectorAngles(target.x - source.x, target.y - source.y, target.z - source.z, angle);
+							angle[0] -= LaraItem->pos.yRot + Lara.torsoYrot;
+							angle[1] -= LaraItem->pos.xRot + Lara.torsoXrot;
+							if (angle[0] >= winfo->lockAngles[0] && angle[0] <= winfo->lockAngles[1] && angle[1] >= winfo->lockAngles[2] && angle[1] <= winfo->lockAngles[3])
+							{
+								TargetList[targets] = item;
+								++targets;
+								if (abs(angle[0]) < bestYrot + ANGLE(15) && distance < bestDistance)
+								{
+									bestDistance = distance;
+									bestYrot = abs(angle[0]);
+									bestItem = item;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	TargetList[targets] = NULL;
+	if (!TargetList[0])
+	{
+		Lara.target = NULL;
+	}
+	else
+	{
+		for (slot = 0; slot < 8; ++slot)
+		{
+			if (!TargetList[slot])
+				Lara.target = NULL;
+			if (TargetList[slot] == Lara.target)
+				break;
+		}
+		if (Lara.gunStatus != LG_NO_ARMS || TrInput & IN_LOOKSWITCH)
+		{
+			if (!Lara.target)
+			{
+				Lara.target = bestItem;
+				LastTargets[0] = NULL;
+			}
+			else if (TrInput & IN_LOOKSWITCH)
+			{
+				Lara.target = NULL;
+				flag = true;
+				for (match = 0; match < 8 && TargetList[match]; ++match)
+				{
+					loop = false;
+					for (slot = 0; slot < 8 && LastTargets[slot]; ++slot)
+					{
+						if (LastTargets[slot] == TargetList[match])
+						{
+							loop = true;
+							break;
+						}
+					}
+					if (!loop)
+					{
+						Lara.target = TargetList[match];
+						if (Lara.target)
+							flag = false;
+						break;
+					}
+				}
+				if (flag)
+				{
+					Lara.target = bestItem;
+					LastTargets[0] = NULL;
+				}
+			}
+		}
+	}
+	if (Lara.target != LastTargets[0])
+	{
+		for (slot = 7; slot > 0; --slot)
+			LastTargets[slot] = LastTargets[slot - 1];
+		LastTargets[0] = Lara.target;
+	}
+	LaraTargetInfo(winfo);
 }
 
 void Inject_LaraFire()
