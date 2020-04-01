@@ -207,11 +207,9 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\newobjects.h" />
     <ClInclude Include="Renderer\Enums.h" />
     <ClInclude Include="Scripting\GameLogicScript.h" />
-    <ClInclude Include="Specific\directx.h" />
     <ClInclude Include="Specific\init.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
-    <ClInclude Include="Specific\patch.h" />
     <ClInclude Include="Specific\roomload.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\winmain.h" />
@@ -391,7 +389,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Specific\input.cpp" />
     <ClCompile Include="Specific\game.cpp" />
     <ClCompile Include="Specific\game.h" />
-    <ClCompile Include="Specific\patch.cpp" />
     <ClCompile Include="Specific\roomload.cpp" />
     <ClCompile Include="Specific\setup.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
