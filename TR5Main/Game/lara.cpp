@@ -1294,7 +1294,7 @@ void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)//1BFB0, 1C0E4 (F)
 	}
 }
 
-void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)//1BE38, 1BF6C (F)
+void lara_col_back(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -1307,7 +1307,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)//1BE38, 1BF6C (F)
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 	coll->slopesArePits = true;
-	coll->slopesAreWalls = true;
+	coll->slopesAreWalls = 1;
 	GetLaraCollisionInfo(item, coll);
 
 	if (LaraHitCeiling(item, coll))
@@ -1319,7 +1319,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)//1BE38, 1BF6C (F)
 	if (LaraFallen(item, coll))
 		return;
 
-	if (coll->midFloor > STEP_SIZE/2 && coll->midFloor < STEPUP_HEIGHT)
+	if (coll->midFloor > STEP_SIZE / 2 && coll->midFloor < STEPUP_HEIGHT)
 	{
 		if (item->frameNumber >= 964 && item->frameNumber <= 993)
 		{
@@ -1336,10 +1336,15 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll)//1BE38, 1BF6C (F)
 	if (TestLaraSlide(item, coll))
 		return;
 
+#if 0
 	if (!(Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP) || coll->midFloor < 0)
 		item->pos.yPos += coll->midFloor;
 	else if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && coll->midFloor)
 		item->pos.yPos += SWAMP_GRAVITY;
+#else
+	if (coll->midFloor != NO_HEIGHT)
+		item->pos.yPos += coll->midFloor;
+#endif
 }
 
 void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)//1BD30, 1BE64 (F)
