@@ -4,6 +4,8 @@
 #include "../../Game/effect2.h"
 #include "../../Game/effects.h"
 #include "../../Game/people.h"
+#include "../../specific/setup.h"
+#include "../../Game/lot.h"
 
 enum MPGUN_STATES {
 	MPGUN_EMPTY, 

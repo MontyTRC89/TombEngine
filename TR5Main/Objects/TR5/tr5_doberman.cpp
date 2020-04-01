@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO DobermanBite = { 0, 0x1E, 0x8D, 0x14 };
 

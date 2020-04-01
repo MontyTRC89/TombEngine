@@ -11,6 +11,7 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/misc.h"
 #include "../../Game/camera.h"
+#include "../../Specific/setup.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

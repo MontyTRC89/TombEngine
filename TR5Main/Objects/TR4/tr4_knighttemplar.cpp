@@ -5,6 +5,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/debris.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 

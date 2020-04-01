@@ -7,6 +7,7 @@
 #include "../../Game/debris.h"
 #include "../../Game/effect2.h"
 #include "../../Game/lot.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 

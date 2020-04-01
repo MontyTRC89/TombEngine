@@ -10,6 +10,7 @@
 #include "sphere.h"
 #include "misc.h"
 #include "control.h"
+#include "../Specific/setup.h"
 
 int NumberBoxes;
 BOX_INFO* Boxes;

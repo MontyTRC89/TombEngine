@@ -13,6 +13,7 @@
 #include "..\Game\switch.h"
 #include "../Game/tomb4fx.h"
 #include "../Game/pickup.h"
+#include "../Specific/setup.h"
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 
 short ScalesBounds[12] = {

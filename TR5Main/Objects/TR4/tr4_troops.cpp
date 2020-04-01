@@ -5,6 +5,8 @@
 #include "../../Game/effect2.h"
 #include "../../Game/lara.h"
 #include "../../Game/people.h"
+#include "../../Specific/setup.h"
+#include "../../Game/lot.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 

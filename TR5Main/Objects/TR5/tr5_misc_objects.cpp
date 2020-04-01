@@ -15,6 +15,7 @@
 #include "../../Game/debris.h"
 #include "../../Game/objects.h"
 #include "../../Game/missile.h"
+#include "../../Specific/setup.h"
 
 short DeathSlideBounds[12] = { -256, 256, -100, 100, 256, 512, 0, 0, -25 * ONE_DEGREE, 25 * ONE_DEGREE, 0, 0 };
 PHD_VECTOR DeathSlidePosition = { 0, 0, 371 };

@@ -3,6 +3,7 @@
 #include "../../Game/items.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO sphinxBiteInfo = { 0, 0, 0, 6 };
 

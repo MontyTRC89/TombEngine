@@ -9,6 +9,7 @@
 #include "../../Game/draw.h"
 #include "../../Game/effects.h"
 #include "../../Game/lara1gun.h"
+#include "../../Specific/setup.h"
 
 void InitialiseSubmarine(short itemNum)
 {

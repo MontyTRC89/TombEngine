@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO barracudaBite = { 2, -60, 121, 7 };
 

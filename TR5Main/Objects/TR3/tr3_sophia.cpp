@@ -8,6 +8,7 @@
 #include "../../Game/draw.h"
 #include "../../Game/effects.h"
 #include "../../Game/misc.h"
+#include "../../Specific/setup.h"
 
 #define MAX_TRIGGER_RANGE 0x4000
 #define SMALL_FLASH 10

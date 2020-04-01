@@ -2,6 +2,8 @@
 #include "../../Game/Box.h"
 #include "../../Game/items.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
+#include "../../Game/lot.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 

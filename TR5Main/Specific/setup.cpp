@@ -51,7 +51,8 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-OBJECT_INFO Objects[2048];
+OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+STATIC_INFO StaticObjects[NUM_STATICS];
 
 void NewObjects()
 {
@@ -3041,7 +3042,6 @@ void InitialiseSpecialEffects()
 	NextGunShell = 0;
 	NextBubble = 0;
 	NextDrip = 0;
-	NextDebris = 0;
 	NextBlood = 0;
 	NextItem = NO_ITEM;
 }
@@ -3747,10 +3747,10 @@ void InitialiseObjects()
 	TrapObjects();
 	PickupObjects();
 
-	for (int i = 0; i < 400; i++)
+	/*for (int i = 0; i < 400; i++)
 	{
 		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
-	}
+	}*/
 	
 	// New objects imported from old TRs
 	NewObjects();

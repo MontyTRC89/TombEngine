@@ -2,6 +2,7 @@
 #include "../../Game/box.h"
 #include "../../Game/effects.h"
 #include "../../Game/items.h"
+#include "../../specific/setup.h"
 
 BITE_INFO eagleBite = { 15, 46, 21, 6 };
 BITE_INFO crowBite = { 2, 10, 60, 14 };

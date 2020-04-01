@@ -2,6 +2,7 @@
 #include "../Game/draw.h"
 #include "../Game/camera.h"
 #include "..\Specific\roomload.h"
+#include "../Specific/setup.h"
 
 void Renderer11::collectRooms()
 {

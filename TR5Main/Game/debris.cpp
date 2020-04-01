@@ -1,5 +1,6 @@
 #include "debris.h"
 #include "../Specific/roomload.h"
+#include "../Specific/setup.h"
 
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;

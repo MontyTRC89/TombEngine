@@ -2,6 +2,7 @@
 
 #include "..\Global\global.h"
 #include "..\Specific\roomload.h"
+#include "..\Specific\setup.h"
 
 #include "draw.h"
 #include "items.h"

@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO birdyBiteL = { 0, 224, 0, 19 };
 BITE_INFO birdyBiteR = { 0, 224, 0, 22 };
