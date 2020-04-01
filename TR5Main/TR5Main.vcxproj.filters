@@ -213,12 +213,6 @@
     <ClInclude Include="Specific\roomload.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Specific\directx.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Specific\patch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="CustomObjects\frogman.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -468,9 +462,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\roomload.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Specific\patch.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\input.cpp">
