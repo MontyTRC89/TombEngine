@@ -21,6 +21,7 @@ extern short NextFxActive;
 extern short NextFxFree;
 extern short NextItemActive;
 extern short NextItemFree;
+extern short* TriggerIndex;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);

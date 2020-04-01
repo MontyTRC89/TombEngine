@@ -5,10 +5,13 @@
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
 #include "../../Game/tomb4fx.h"
+#include "../../Specific/setup.h"
 #include "../../Game/draw.h"
+
 BITE_INFO SwatGun = { 80, 200, 13, 0 };
 BITE_INFO SniperGun = { 0, 480, 110, 13 };
 BITE_INFO ArmedBaddy2Gun = { -50, 220, 60, 13 };
+
 #define STATE_GUARD_STOP				1
 #define STATE_GUARD_TURN180				2
 #define STATE_GUARD_FIRE_SINGLE			3
@@ -34,9 +37,11 @@ BITE_INFO ArmedBaddy2Gun = { -50, 220, 60, 13 };
 #define STATE_GUARD_START_USE_COMPUTER	37
 #define STATE_GUARD_USE_COMPUTER		38
 #define STATE_GUARD_SURREND				39
+
 #define ANIMATION_GUARD_DEATH1			11
 #define ANIMATION_GUARD_DEATH2			16
 #define ANIMATION_GUARD_START_JUMP		41
+
 #define STATE_MAFIA2_STOP					1
 #define STATE_MAFIA2_TURN180_UNDRAW_GUNS	2
 #define STATE_MAFIA2_FIRE					3
@@ -51,12 +56,14 @@ BITE_INFO ArmedBaddy2Gun = { -50, 220, 60, 13 };
 #define STATE_MAFIA2_LANDING				29
 #define STATE_MAFIA2_TURN180				32
 #define STATE_MAFIA2_UNDRAW_GUNS			37
+
 #define STATE_SNIPER_STOP					1
 #define STATE_SNIPER_UNHIDE					2
 #define STATE_SNIPER_AIM					3
 #define STATE_SNIPER_FIRE					4
 #define STATE_SNIPER_HIDE					5
 #define STATE_SNIPER_DEATH					6
+
 void InitialiseGuard(short itemNum)
 {
     ITEM_INFO* item, *item2;

@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/people.h"
+#include "../../specific/setup.h"
 
 BITE_INFO silencerGun = { 3, 331, 56, 10 };
 

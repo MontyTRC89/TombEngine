@@ -8,6 +8,7 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/lara.h"
 #include "../../Game/traps.h"
+#include "../../Specific/setup.h"
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2

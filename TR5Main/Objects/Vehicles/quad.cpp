@@ -9,6 +9,7 @@
 #include <vector>
 #include "../../Game/lara1gun.h"
 #include "../../Game/misc.h"
+#include "../../Specific/setup.h"
 using namespace std;
 
 typedef enum QUAD_EFFECTS_POSITIONS {

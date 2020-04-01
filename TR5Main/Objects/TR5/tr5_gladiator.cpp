@@ -6,6 +6,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/effects.h"
 #include "../../Game/tomb4fx.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
 

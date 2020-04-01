@@ -7,6 +7,7 @@
 #include "../../Game/effects.h"
 #include "../../Game/tomb4fx.h"
 #include "../../Game/people.h"
+#include "../../Specific/setup.h"
 
 #define STATE_CHEF_COOKING			1
 #define STATE_CHEF_TURN_180			2

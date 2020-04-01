@@ -6,6 +6,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/draw.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 
 // TODO: custom render for DrawExplosionRings() and DrawTonyBossShield()
 // TODO: add flame effect for tony, check TriggerXX() function.

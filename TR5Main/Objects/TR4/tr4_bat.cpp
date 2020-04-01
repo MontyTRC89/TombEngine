@@ -2,6 +2,8 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/items.h"
+#include "../../Specific/setup.h"
+#include "../../Game/lot.h"
 
 BITE_INFO batBite = { 0, 16, 45, 4 };
 

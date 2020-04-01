@@ -2,6 +2,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/people.h"
+#include "../../specific/setup.h"
 
 BITE_INFO civvy_hit = { 0,0,0, 13 };
 

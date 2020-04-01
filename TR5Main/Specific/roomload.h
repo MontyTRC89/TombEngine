@@ -61,6 +61,7 @@ extern int g_NumSprites;
 extern int g_NumSpritesSequences;
 extern short* MeshBase;
 extern short** Meshes;
+extern int NumItems;
 
 void LoadTextures();
 int LoadRoomsNew();

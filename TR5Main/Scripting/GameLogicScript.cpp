@@ -3,6 +3,7 @@
 #include "..\Game\box.h"
 #include "..\Game\lot.h"
 #include "..\Game\sound.h"
+#include "../Specific/setup.h"
 
 extern GameFlow* g_GameFlow;
 
@@ -314,7 +315,7 @@ void GameScript::AssignItemsAndLara()
 	for (int i = 0; i < NUM_ITEMS; i++)
 		m_items[i].NativeItem = NULL;
 
-	for (int i = 0; i < NumItems; i++)
+	for (int i = 0; i < LevelItems; i++)
 		m_items[i].NativeItem = &Items[i];
 
 	(*m_lua)["Lara"] = m_items[Lara.itemNumber];

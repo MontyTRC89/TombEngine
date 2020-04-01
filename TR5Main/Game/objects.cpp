@@ -11,6 +11,7 @@
 #include "control.h"
 #include "switch.h"
 #include "box.h"
+#include "../Specific/setup.h"
 
 int lastWaterfallY = 0;
 short TightRopeBounds[12] = 

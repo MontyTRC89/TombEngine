@@ -1,5 +1,6 @@
 #include "../newobjects.h"
 #include "../../Game/items.h"
+#include "../../Specific/setup.h"
 
 void InitialiseLightingGuide(short itemNum)
 {

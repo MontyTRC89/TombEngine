@@ -2,6 +2,7 @@
 #include "Renderer11.h"
 #include "../Specific/configuration.h"
 #include "../Game/draw.h"
+#include "../Specific/setup.h"
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 bool Renderer11::isRoomUnderwater(short roomNumber)

@@ -3,6 +3,8 @@
 #include "../../Game/lara.h"
 #include "../../Game/effects.h"
 #include "../../Game/items.h"
+#include "../../specific/setup.h"
+#include "../../Game/lot.h"
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 

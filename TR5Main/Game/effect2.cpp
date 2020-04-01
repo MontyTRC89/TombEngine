@@ -4,6 +4,7 @@
 #include "traps.h"
 #include "math.h"
 #include "..\Scripting\GameFlowScript.h"
+#include "../Specific/setup.h"
 
 //long wibble;
 //long SplashCount;

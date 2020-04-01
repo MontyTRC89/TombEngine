@@ -10,6 +10,7 @@
 #include "../../Game/laraflar.h"
 
 #include <vector>
+#include "../../Specific/setup.h"
 using namespace std;
 
 #define JF_FALLING					0x40

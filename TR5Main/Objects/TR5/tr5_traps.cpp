@@ -14,6 +14,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/sphere.h"
 #include "../../Game/traps.h"
+#include "../../Specific/setup.h"
 
 short SPyoffs[8] =
 {

@@ -2,6 +2,9 @@
 
 #include "..\Global\global.h"
 
+extern OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+extern STATIC_INFO StaticObjects[NUM_STATICS];
+
 void BaddyObjects();
 void ObjectObjects();
 void TrapObjects();

@@ -2,6 +2,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effect2.h"
 #include "../../Game/items.h"
+#include "../../Specific/setup.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,

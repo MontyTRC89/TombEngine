@@ -1,6 +1,8 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../specific/setup.h"
+#include "../../Game/lot.h"
 
 extern BITE_INFO raptorBite;
 

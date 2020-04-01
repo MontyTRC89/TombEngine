@@ -3,6 +3,7 @@
 #include "../../Game/sphere.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Specific/setup.h"
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
 #include "../../Game/draw.h"

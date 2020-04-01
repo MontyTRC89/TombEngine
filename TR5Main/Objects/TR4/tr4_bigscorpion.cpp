@@ -2,6 +2,8 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/items.h"
+#include "../../Specific/setup.h"
+#include "../../Game/lot.h"
 
 BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };
 BITE_INFO scorpionBite2 = { 0, 0, 0, 23 };

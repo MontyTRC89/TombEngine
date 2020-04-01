@@ -17,6 +17,7 @@
 #include "lara1gun.h"
 #include "lara2gun.h"
 #include "flmtorch.h"
+#include "../Specific/setup.h"
 
 #include "..\Global\global.h"
 

@@ -1,4 +1,5 @@
 #include "../newobjects.h"
+#include "../../Specific/setup.h"
 
 void InitialiseJeanYves(short itemNum)
 {

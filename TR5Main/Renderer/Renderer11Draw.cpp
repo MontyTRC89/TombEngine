@@ -14,6 +14,7 @@
 #include "../Game/door.h"
 #include "../Objects/oldobjects.h"
 #include "..\Specific\roomload.h"
+#include "../Specific/setup.h"
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
