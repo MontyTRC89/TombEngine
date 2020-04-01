@@ -226,7 +226,7 @@ enum INPUT_BUTTONS
 	IN_LOOKBACK = (1 << 28),					// 0x10000000
 	IN_DUCK = (1 << 29),						// 0x20000000
 	IN_SPRINT = (1 << 30),						// 0x40000000
-	IN_UNK31 = (1 << 31),						// 0x80000000
+	IN_LOOKSWITCH = (1 << 31),					// 0x80000000
 	IN_ALL = ~0,								// 0xFFFFFFFF (-1)
 };
 
