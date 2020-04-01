@@ -414,7 +414,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSmoke();
 		UpdateBlood();
 		UpdateBubbles();
-		updateDebris();
+		UpdateDebris();
 		//UpdateDebris();
 		UpdateGunShells();
 		updateFootprints();
@@ -1738,7 +1738,7 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 	return height;
 }
 
-void UpdateDebris()
+/*void UpdateDebris()
 {
 	for (int i = 0; i < 256; i++)
 	{
@@ -1775,6 +1775,7 @@ void UpdateDebris()
 		}
 	}
 }
+*/
 
 int LOS(GAME_VECTOR* start, GAME_VECTOR* end) // (F) (D)
 {
@@ -2112,10 +2113,10 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 				{
 					if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
 					{
-						shatterImpactInfo.impactDirection = direction;
-						shatterObject(NULL, mesh,128,target.roomNumber,0 );
-						shatterImpactInfo.impactDirection = Vector3(0,1,0);
-						//shatterObject(NULL, mesh, 128, target.roomNumber, 0);
+						ShatterImpactData.impactDirection = direction;
+						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
+						ShatterImpactData.impactDirection = Vector3(0,1,0);
+						//ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
@@ -2135,9 +2136,9 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							if (!Objects[item->objectNumber].intelligent)
 							{
 								item->meshBits &= ~TargetMesh;
-								shatterImpactInfo.impactDirection = direction;
-								shatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
-								shatterImpactInfo.impactDirection = Vector3(0, 1, 0);
+								ShatterImpactData.impactDirection = direction;
+								ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
+								ShatterImpactData.impactDirection = Vector3(0, 1, 0);
 								TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
 							}
 							else
@@ -3140,7 +3141,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		ShatterItem.sphere.z = SphereList[Node].z;
 		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData;
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
-		shatterObject(&ShatterItem, 0, Num, item->roomNumber, NoXZVel);
+		ShatterObject(&ShatterItem, 0, Num, item->roomNumber, NoXZVel);
 		item->meshBits &= ~ShatterItem.bit;
 		return 1;
 	}

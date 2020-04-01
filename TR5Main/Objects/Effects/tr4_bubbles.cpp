@@ -231,7 +231,7 @@ int BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 	ShatterItem.sphere.z = fx->pos.zPos;
 	ShatterItem.bit = 0;
 	ShatterItem.flags = fx->flag2 & 0x400;
-	shatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
+	ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
 
 	return 1;
 }
