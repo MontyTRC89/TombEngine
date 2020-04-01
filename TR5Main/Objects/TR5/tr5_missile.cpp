@@ -221,7 +221,7 @@ void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 	if (fx->flag2 & 0x2000)
 		DebrisFlags = 1;
 
-	shatterObject(&ShatterItem, 0, bits, fx->roomNumber, noXZVel);
+	ShatterObject(&ShatterItem, 0, bits, fx->roomNumber, noXZVel);
 
 	DebrisFlags = 0;
 }

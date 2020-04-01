@@ -572,7 +572,7 @@ void SkeletonControl(short itemNum)
 							staticMesh = &room->mesh[i];
 							if (abs(pos.x - staticMesh->x) < 1024 && abs(pos.z - staticMesh->z) < 1024 && staticMesh->staticNumber >= 50)
 							{
-								shatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
+								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
 								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 								staticMesh->Flags &= ~1;
 								floor->stopper = 0;

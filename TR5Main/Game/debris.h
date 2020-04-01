@@ -1,17 +1,17 @@
 #pragma once
 
 #include "..\Global\global.h"
-//#define ShatterObject ((void (__cdecl*)(SHATTER_ITEM*, MESH_INFO*, short, short, int)) 0x0041D6B0)
-void Inject_Debris();
-extern struct ShatterImpactInfo {
+
+struct ShatterImpactInfo {
 	Vector3 impactDirection;
 	Vector3 impactLocation;
 };
-extern ShatterImpactInfo shatterImpactInfo;
+
 struct DebrisMesh {
 	RENDERER_BUCKETS bucket;
 	array<RendererVertex, 3> vertices;
 };
+
 struct DebrisFragment {
 	DebrisMesh mesh;
 	Quaternion rotation;
@@ -29,8 +29,15 @@ struct DebrisFragment {
 	bool active;
 };
 
-void shatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel);
-DebrisFragment* getFreeDebrisFragment();
-extern vector<DebrisFragment> debrisFragments;
-Vector3 calculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation);
-void updateDebris();
+extern SHATTER_ITEM ShatterItem;
+extern vector<DebrisFragment> DebrisFragments;
+extern ShatterImpactInfo ShatterImpactData;
+extern short SmashedMeshCount;
+extern MESH_INFO* SmashedMesh[32];
+extern short SmashedMeshRoom[32];
+
+void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel);
+DebrisFragment* GetFreeDebrisFragment();
+Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation);
+void UpdateDebris();
+void Inject_Debris();

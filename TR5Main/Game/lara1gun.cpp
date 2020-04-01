@@ -683,7 +683,7 @@ void ControlGrenade(short itemNumber)
 								currentMesh->y -= 128;
 								TriggerShockwave((PHD_3DPOS*)&currentMesh, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 								currentMesh->y += 128;
-								shatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
+								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 								SmashedMesh[SmashedMeshCount] = currentMesh;
 								SmashedMeshCount++;
@@ -1187,7 +1187,7 @@ void ControlCrossbowBolt(short itemNumber)
 							TriggerShockwave((PHD_3DPOS*)&currentMesh, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 							currentMesh->y += 128;
 						}
-						shatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
+						ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
 						SmashedMeshCount++;

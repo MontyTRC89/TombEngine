@@ -551,7 +551,7 @@ void ControlXRayMachine(short itemNumber)
 					item->pos.yPos == mesh->y &&
 					item->pos.zPos == mesh->z)
 				{
-					shatterObject(NULL, mesh, 128, item->roomNumber, 0);
+					ShatterObject(NULL, mesh, 128, item->roomNumber, 0);
 					mesh->Flags &= ~1;
 					SoundEffect(ShatterSounds[gfCurrentLevel - 5][mesh->staticNumber], (PHD_3DPOS*) & mesh->x, 0);
 				}
