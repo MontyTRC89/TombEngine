@@ -1,10 +1,15 @@
 #include "debris.h"
 #include "../Specific/roomload.h"
-ShatterImpactInfo shatterImpactInfo;
 
-DebrisFragment* getFreeDebrisFragment()
+ShatterImpactInfo ShatterImpactData;
+SHATTER_ITEM ShatterItem;
+short SmashedMeshCount;
+MESH_INFO* SmashedMesh[32];
+short SmashedMeshRoom[32];
+
+DebrisFragment* GetFreeDebrisFragment()
 {
-	for (auto frag = debrisFragments.begin(); frag != debrisFragments.end(); frag++) {
+	for (auto frag = DebrisFragments.begin(); frag != DebrisFragments.end(); frag++) {
 		if (!frag->active) {
 			return &*frag;
 		}
@@ -17,7 +22,7 @@ void Inject_Debris()
 	//INJECT(0x0041D6B0, ShatterObject);
 }
 
-void shatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)
+void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)
 {
 	extern Renderer11* g_Renderer;
 	short* meshPtr = nullptr;
@@ -40,7 +45,7 @@ void shatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		vector<RendererVertex>* meshVertices = &renderBucket.Vertices;
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
 		{
-			DebrisFragment* fragment = getFreeDebrisFragment();
+			DebrisFragment* fragment = GetFreeDebrisFragment();
 			if (!fragment) {
 				break;
 			}
@@ -68,7 +73,7 @@ void shatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->linearDrag = .98f;
 				fragment->angularVelocity = Vector3(frandMinMax(-1, 1) * 0.39, frandMinMax(-1, 1) * 0.39, frandMinMax(-1, 1) * 0.39);
 				fragment->angularDrag = frandMinMax(0.8f, 0.999f);
-				fragment->velocity = calculateFragmentImpactVelocity(fragment->worldPosition, shatterImpactInfo.impactDirection, shatterImpactInfo.impactLocation);
+				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
 				
@@ -78,16 +83,16 @@ void shatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 	}
 
 }
-vector<DebrisFragment> debrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
+vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
-DirectX::SimpleMath::Vector3 calculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
+DirectX::SimpleMath::Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
 {
 	return impactDirection * 300 * Vector3(frand() + 0.25f, (frand() - 0.5f) * 40, frand() + 0.25f);
 }
 
-void updateDebris()
+void UpdateDebris()
 {
-	for (auto deb = debrisFragments.begin(); deb != debrisFragments.end(); deb++) {
+	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++) {
 		if (deb->active) {
 			deb->velocity += deb->gravity;
 			deb->velocity *= deb->linearDrag;

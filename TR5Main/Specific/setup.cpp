@@ -3021,7 +3021,6 @@ void InitialiseSpecialEffects()
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&GunFlashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
-	memset(&Debris, 0, MAX_DEBRIS * sizeof(DEBRIS_STRUCT));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASH * sizeof(SPLASH_STRUCT));
 	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));

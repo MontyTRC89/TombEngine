@@ -1276,9 +1276,9 @@ bool Renderer11::drawDebris(bool transparent)
 
 	return true;
 	*/
-	extern vector<DebrisFragment> debrisFragments;
+	extern vector<DebrisFragment> DebrisFragments;
 	vector<RendererVertex> vertices;
-	for (auto deb = debrisFragments.begin(); deb != debrisFragments.end(); deb++) {
+	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++) {
 		if (deb->active) {
 			//AddLine3D(deb->worldPosition, deb->worldPosition + Vector3(0, 100, 0), Vector4(1, 1, 1, 1));
 			Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
