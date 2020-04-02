@@ -245,6 +245,10 @@ void ControlHydra(short itemNumber)
 
 			if (item->hitStatus)
 			{
+				// TEST: uncomment this for making HYDRA die on first hit event
+				/*item->hitPoints = 0;
+				break;*/
+
 				damage = 6 - SQRT_ASM(info.distance) / 1024;
 
 				if (Lara.gunType == WEAPON_SHOTGUN)
@@ -301,6 +305,7 @@ void ControlHydra(short itemNumber)
 				roomNumber = item->roomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
+				// TEST: uncomment this for making HYDRA not firing bubbles
 				HydraBubblesAttack(&pos, roomNumber, 1);
 			}
 			break;
@@ -379,7 +384,7 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	
-	spark->on = 1;
+	spark->on = true;
 	spark->sB = 0;
 	spark->sR = (GetRandomControl() & 0x3F) - 96;
 	spark->sG = spark->sR >> 1;
@@ -391,8 +396,8 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 	spark->transType = COLADD;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
-	spark->y = 0;
 	spark->x = (GetRandomControl() & 0xF) - 8;
+	spark->y = 0;
 	spark->z = (GetRandomControl() & 0xF) - 8;
 	spark->x += pos->x;
 	spark->y += pos->y;

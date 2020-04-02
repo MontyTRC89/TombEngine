@@ -773,8 +773,8 @@ typedef struct sparks_t
 	unsigned char friction; // size=0, offset=27
 	unsigned char scalar; // size=0, offset=28
 	unsigned char def; // size=0, offset=29
-	byte rotAdd; // size=0, offset=30
-	byte maxYvel; // size=0, offset=31
+	signed char rotAdd; // size=0, offset=30
+	signed char maxYvel; // size=0, offset=31
 	unsigned char on; // size=0, offset=32
 	unsigned char sR; // size=0, offset=33
 	unsigned char sG; // size=0, offset=34
@@ -791,7 +791,7 @@ typedef struct sparks_t
 	unsigned char life; // size=0, offset=45
 	unsigned char transType; // size=0, offset=46
 	unsigned char extras; // size=0, offset=47
-	byte dynamic; // size=0, offset=48
+	signed char dynamic; // size=0, offset=48
 	unsigned char fxObj; // size=0, offset=49
 	unsigned char roomNumber; // size=0, offset=50
 	unsigned char nodeNumber; // size=0, offset=51
