@@ -54,8 +54,15 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			int dy = abs(angles[0] - fx->pos.yRot) >> 3;
-			int dx = abs(angles[1] - fx->pos.xRot) >> 3;
+			int dy = angles[0] - fx->pos.yRot;
+			if (abs(dy) > 0x8000)
+				dy = -dy;
+			dy >>= 3;
+
+			int dx = angles[1] - fx->pos.xRot;
+			if (abs(dx) > 0x8000)
+				dx = -dx;
+			dx >>= 3;
 
 			if (dy <= dh)
 			{

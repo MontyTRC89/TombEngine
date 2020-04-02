@@ -136,7 +136,7 @@ void UpdateSparks()
 {
 	short* bounds = GetBoundsAccurate(LaraItem);
 
-	DeadlyBounds[0] = LaraItem->pos.xPos + *bounds;
+	DeadlyBounds[0] = LaraItem->pos.xPos + bounds[0];
 	DeadlyBounds[1] = LaraItem->pos.xPos + bounds[1];
 	DeadlyBounds[2] = LaraItem->pos.yPos + bounds[2];
 	DeadlyBounds[3] = LaraItem->pos.yPos + bounds[3];

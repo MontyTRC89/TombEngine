@@ -442,7 +442,7 @@ void Renderer11::collectEffects(short roomNumber)
 
 		newEffect->Effect = fx;
 		newEffect->Id = fxNum;
-		newEffect->World = Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+		newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.yRot, fx->pos.xPos, fx->pos.zPos) * Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 		newEffect->Mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)])];
 
 		collectLightsForEffect(fx->roomNumber, newEffect);
