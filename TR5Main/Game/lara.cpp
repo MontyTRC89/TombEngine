@@ -5942,21 +5942,21 @@ int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
 	return true;
 }
 
-int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)//11E60, 11F10 (F)
+int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge) // (F) (D)
 {
-	short* bounds = GetBoundsAccurate(item);
-	int hdif = coll->frontFloor - bounds[2];
+	ANIM_FRAME* bounds = (ANIM_FRAME*) GetBoundsAccurate(item);
+	int hdif = coll->frontFloor - bounds->MinY;
 
-	if (hdif < 0 && hdif + item->fallspeed < 0 || hdif > 0 && hdif + item->fallspeed > 0)
+	if (hdif < 0 == hdif + item->fallspeed < 0)
 	{
-		hdif = item->pos.yPos + bounds[2];
+		hdif = item->pos.yPos + bounds->MinY;
 
-		if (hdif >> (WALL_SHIFT - 2) != (hdif + item->fallspeed) >> (WALL_SHIFT - 2))
+		if ((hdif + item->fallspeed & 0xFFFFFF00) != (hdif & 0xFFFFFF00))
 		{
 			if (item->fallspeed > 0)
-				* edge = (hdif + item->fallspeed) & ~(256 - 1);
+				*edge = (hdif + item->fallspeed) & 0xFFFFFF00;
 			else
-				*edge = hdif & ~(256 - 1);
+				*edge = hdif & 0xFFFFFF00;
 
 			return -1;
 		}
@@ -5970,7 +5970,7 @@ int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)//11E60, 11F10
 	return 1;
 }
 
-int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)//11DC0, 11E70 (F)
+int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
 	{
@@ -5981,7 +5981,8 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)//11DC0, 11E70 (F)
 
 		return 1;
 	}
-	else if (coll->collType == CT_LEFT)
+
+	if (coll->collType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
 		item->pos.yRot += ANGLE(2);
@@ -5995,36 +5996,34 @@ int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll)//11DC0, 11E70 (F)
 	return 0;
 }
 
-int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)//11D18(<), 11DC8(<) (F)
+int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (coll->collType == CT_FRONT || coll->collType == CT_TOP_FRONT)
 	{
 		ShiftItem(item, coll);
 
-		item->goalAnimState = 2;
+		item->goalAnimState = STATE_LARA_STOP;
 		item->speed = 0;
-		item->gravityStatus = 0;
+		item->gravityStatus = false;
 
 		return 1;
 	}
-	else if (coll->collType == CT_LEFT)
+
+	if (coll->collType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
 		item->pos.yRot += ANGLE(5);
-		return 0;
 	}
-	else
+	else if (coll->collType == CT_RIGHT)
 	{
-		if (coll->collType == CT_RIGHT)
-		{
-			ShiftItem(item, coll);
-			item->pos.yRot -= ANGLE(5);
-		}
-		return 0;
+		ShiftItem(item, coll);
+		item->pos.yRot -= ANGLE(5);
 	}
+
+	return 0;
 }
 
-int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)//11C94, 11D44 (F)
+int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (coll->collType == CT_TOP || coll->collType == CT_CLAMP)
 	{
@@ -6036,18 +6035,15 @@ int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)//11C94, 11D44 (F)
 		item->currentAnimState = STATE_LARA_STOP;
 
 		item->animNumber = ANIMATION_LARA_STAY_SOLID;
-		item->frameNumber = Anims[ANIMATION_LARA_STAY_SOLID].frameBase;
+		item->frameNumber = Anims[item->animNumber].frameBase;
 
 		item->speed = 0;
 		item->fallspeed = 0;
-		item->gravityStatus = 0;
+		item->gravityStatus = false;
 
-		return true;
+		return 1;
 	}
-	else
-	{
-		return false;
-	}
+	return 0;
 }
 
 int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -6071,22 +6067,20 @@ int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return 0;
 }
 
-int LaraFallen(ITEM_INFO* item, COLL_INFO* coll)//11B6C, 11C1C (F)
+int LaraFallen(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (Lara.waterStatus == 4 || coll->midFloor <= 384)
+	if (Lara.waterStatus == LW_WADE || coll->midFloor <= STEPUP_HEIGHT)
 	{
-		return false;
+		return 0;
 	}
-	else
-	{
-		item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
-		item->currentAnimState = STATE_LARA_JUMP_FORWARD;
-		item->goalAnimState = STATE_LARA_JUMP_FORWARD;
-		item->frameNumber = Anims[ANIMATION_LARA_FREE_FALL_FORWARD].frameBase;
-		item->fallspeed = 0;
-		item->gravityStatus = true;
-		return true;
-	}
+
+	item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
+	item->currentAnimState = STATE_LARA_JUMP_FORWARD;
+	item->goalAnimState = STATE_LARA_JUMP_FORWARD;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->fallspeed = 0;
+	item->gravityStatus = true;
+	return 1;
 }
 
 short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
@@ -6436,21 +6430,21 @@ void DoSubsuitStuff()
 	UNIMPLEMENTED();
 }*/
 
-int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
+int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
 		return 0;
 
-	short angle = 0;
+	short angle = ANGLE(0);
 	if (coll->tiltX > 2)                       		 
 		angle = -ANGLE(90);
 	else if (coll->tiltX < -2)
 		angle = ANGLE(90);
 
 	if (coll->tiltZ > 2 && coll->tiltZ > abs(coll->tiltX))
-		angle = -ANGLE(180);
+		angle = ANGLE(180);
 	else if (coll->tiltZ < -2 && -coll->tiltZ > abs(coll->tiltX))
-		angle = 0;
+		angle = ANGLE(0);
 
 	short delta = angle - item->pos.yRot;
 
@@ -6465,7 +6459,7 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = STATE_LARA_SLIDE_BACK;
 		item->currentAnimState = STATE_LARA_SLIDE_BACK;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->pos.yRot = angle - ANGLE(180);
+		item->pos.yRot = angle + ANGLE(180);
 	}
 	else
 	{
