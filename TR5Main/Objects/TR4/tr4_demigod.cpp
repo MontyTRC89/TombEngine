@@ -527,8 +527,6 @@ void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
 			fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
 		}
 
-		printf("X: %d, Y: %d\n", fx->pos.xRot, fx->pos.yRot);
-
 		OBJECT_INFO* obj = &Objects[ID_ENERGY_BUBBLES];
 
 		fx->pos.zRot = 0;
