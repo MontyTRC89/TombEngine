@@ -2076,8 +2076,8 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 					if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
 					{
 						ShatterImpactData.impactDirection = direction;
+						ShatterImpactData.impactLocation = Vector3(mesh->x, mesh->y, mesh->z);
 						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
-						ShatterImpactData.impactDirection = Vector3(0,1,0);
 						//ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
@@ -2099,8 +2099,8 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							{
 								item->meshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = direction;
+								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y,ShatterItem.sphere.z);
 								ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
-								ShatterImpactData.impactDirection = Vector3(0, 1, 0);
 								TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
 							}
 							else
@@ -3109,6 +3109,8 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		ShatterItem.sphere.z = SphereList[Node].z;
 		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData;
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
+		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
+		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x,(float)ShatterItem.sphere.y,(float)ShatterItem.sphere.z };
 		ShatterObject(&ShatterItem, NULL, Num, item->roomNumber, NoXZVel);
 		item->meshBits &= ~ShatterItem.bit;
 		return 1;

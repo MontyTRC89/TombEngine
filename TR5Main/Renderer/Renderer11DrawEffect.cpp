@@ -1322,6 +1322,7 @@ bool Renderer11::drawDebris(bool transparent)
 			vtx0.Position = Vector3::Transform(deb->mesh.vertices[0].Position, world);
 			vtx1.Position = Vector3::Transform(deb->mesh.vertices[1].Position, world);
 			vtx2.Position = Vector3::Transform(deb->mesh.vertices[2].Position, world);
+			m_context->RSSetState(m_states->CullNone());
 			m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 			m_numDrawCalls++;
 			m_primitiveBatch->End();
