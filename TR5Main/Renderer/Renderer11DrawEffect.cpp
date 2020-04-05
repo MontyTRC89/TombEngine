@@ -429,31 +429,47 @@ void Renderer11::drawShockwaves()
 		{
 			byte color = shockwave->life * 8;
 
+			int dl = shockwave->outerRad - shockwave->innerRad;
+			Matrix rotationMatrix = Matrix::CreateRotationX(TR_ANGLE_TO_RAD(shockwave->xRot));
+			Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
+
 			// Inner circle
 			float angle = PI / 32.0f;
 			float c = cos(angle);
 			float s = sin(angle);
-			float x1 = shockwave->x + (shockwave->innerRad * c);
-			float z1 = shockwave->z + (shockwave->innerRad * s);
-			float x4 = shockwave->x + (shockwave->outerRad * c);
-			float z4 = shockwave->z + (shockwave->outerRad * s);
+			float x1 = (shockwave->innerRad * c);
+			float z1 = (shockwave->innerRad * s);
+			float x4 = (shockwave->outerRad * c);
+			float z4 = (shockwave->outerRad * s);
 			angle -= PI / 8.0f;
 
+			Vector3 p1 = Vector3(x1, 0, z1);
+			Vector3 p4 = Vector3(x4, 0, z4);
+			
+			p1 = Vector3::Transform(p1, rotationMatrix);
+			p4 = Vector3::Transform(p4, rotationMatrix);
+			
 			for (int j = 0; j < 16; j++)
 			{
 				c = cos(angle);
 				s = sin(angle);
-				float x2 = shockwave->x + (shockwave->innerRad * c);
-				float z2 = shockwave->z + (shockwave->innerRad * s);
-				float x3 = shockwave->x + (shockwave->outerRad * c);
-				float z3 = shockwave->z + (shockwave->outerRad * s);
+				float x2 = (shockwave->innerRad * c);
+				float z2 = (shockwave->innerRad * s);
+				float x3 = (shockwave->outerRad * c);
+				float z3 = (shockwave->outerRad * s);
 				angle -= PI / 8.0f;
 
+				Vector3 p2 = Vector3(x2, 0, z2);
+				Vector3 p3 = Vector3(x3, 0, z3);
+
+				p2 = Vector3::Transform(p2, rotationMatrix);
+				p3 = Vector3::Transform(p3, rotationMatrix);
+
 				AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-					Vector3(x1, shockwave->y, z1),
-					Vector3(x2, shockwave->y, z2),
-					Vector3(x3, shockwave->y, z3),
-					Vector3(x4, shockwave->y, z4),
+					pos + p1,
+					pos + p2,
+					pos + p3,
+					pos + p4,
 					Vector4(
 						shockwave->r * shockwave->life / 255.0f / 64.0f, 
 						shockwave->g * shockwave->life / 255.0f / 64.0f, 
@@ -461,10 +477,8 @@ void Renderer11::drawShockwaves()
 						1.0f),
 					0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 
-				x1 = x2;
-				z1 = z2;
-				x4 = x3;
-				z4 = z3;
+				p1 = p2;
+				p4 = p3;
 			}
 		}
 	}

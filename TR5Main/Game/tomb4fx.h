@@ -5,8 +5,7 @@
 struct ENERGY_ARC
 {
 	PHD_VECTOR pos1;	// 0
-	short rotation;	// 12
-	short filler[5];
+	PHD_VECTOR pos2;
 	PHD_VECTOR pos3;	// 24
 	PHD_VECTOR pos4;	// 36
 	byte r;				// 48
@@ -20,6 +19,8 @@ struct ENERGY_ARC
 	byte type;		// 61
 	byte flags;			// 62
 	signed char direction;		// 63
+	short rotation;
+	short filler;
 };
 
 #define ENERGY_ARC_STRAIGHT_LINE	0

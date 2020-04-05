@@ -91,7 +91,10 @@ void GuardianControl(short itemNumber)
 	LASER_HEAD_INFO* creature = (LASER_HEAD_INFO*)item->data;
 
 	GAME_VECTOR src, dest;
-	printf("Guardian Y: %d\n", item->pos.yPos);
+
+	// NOTICE: itemFlags[0] seems to be a state machine, if it's equal to 3 then death animations is triggered
+	// Other values still unknown
+	
 	if (item->itemFlags[0])
 	{
 		// Maybe number of eye hits?
@@ -150,8 +153,8 @@ void GuardianControl(short itemNumber)
 				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, 0, 2, item->roomNumber);
 				
 				TriggerShockwave(&item->pos, 32, 160, 64, 64, 128, 0, 36, 0, 0);
-				TriggerShockwave(&item->pos, 32, 160, 64, 64, 128, 0, 36, 0, 3);
-				TriggerShockwave(&item->pos, 32, 160, 64, 64, 128, 0, 36, 0, 6);
+				TriggerShockwave(&item->pos, 32, 160, 64, 64, 128, 0, 36, 0x3000, 0);
+				TriggerShockwave(&item->pos, 32, 160, 64, 64, 128, 0, 36, 0x6000, 0);
 
 				Items[creature->puzzleItem].pos.yPos = item->pos.yPos;
 				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
@@ -362,10 +365,6 @@ void GuardianControl(short itemNumber)
 								dest.y = src.y + (8192 * SIN(-angles[1]) >> W2V_SHIFT);
 								dest.z = src.z + (c * COS(item->pos.yRot) >> W2V_SHIFT);
 
-								/*dest.x = LaserHeadData.target.x;
-								dest.y = LaserHeadData.target.y;
-								dest.z = LaserHeadData.target.z;*/
-
 								if (item->itemFlags[3] != 90
 									&& LaserHeadData.fireArcs[j] != NULL)
 								{
@@ -556,7 +555,8 @@ void GuardianControl(short itemNumber)
 			}
 		}*/
 
-		if (i == 8 && !(item->meshBits & 6))
+		// If all tentacles animations are done and both eyes are destroyed it's time to die
+		if (/*i == 8*/   !(item->meshBits & 6))
 		{
 			if (LaserHeadData.fireArcs[0])
 				LaserHeadData.fireArcs[0]->life = 2;

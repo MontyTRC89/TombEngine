@@ -1529,7 +1529,7 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 		sptr->g = g;
 		sptr->b = b;
 		sptr->life = life;
-
+		
 		SoundEffect(SFX_IMP_STONE_HIT, pos, 0);
 	}
 }
@@ -1901,6 +1901,12 @@ ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g,
 		return NULL;
 
 	arc->pos1 = *start;
+	arc->pos2.x = (end->x + 3 * start->x) >> 2;
+	arc->pos2.y = (end->y + 3 * start->y) >> 2;
+	arc->pos2.z = (end->z + 3 * start->z) >> 2;
+	arc->pos3.x = (start->x + 3 * end->x) >> 2;
+	arc->pos3.y = (start->y + 3 * end->y) >> 2;
+	arc->pos3.z = (start->z + 3 * end->z) >> 2;
 	arc->pos4 = *end;
 	arc->sLife = life;
 	arc->life = life;

@@ -484,11 +484,6 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 		flag = 1;
 
-	printf("BinocularRange: %d\n", BinocularRange);
-	printf("Lara.gunStatus: %d\n", Lara.gunStatus);
-	printf("GetKeyTrigger(): %d\n", GetKeyTrigger(&Items[itemNum]));
-
-
 	if (!((TrInput & IN_ACTION || g_Inventory->GetSelectedObject() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
@@ -910,7 +905,6 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 				else
 				{
-					printf("Frame: %d\n", Anims[ANIMATION_LARA_PICKUP].frameBase);
 					if (l->frameNumber == Anims[ANIMATION_LARA_PICKUP].frameBase + 15
 						|| l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 22
 						|| l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 20
