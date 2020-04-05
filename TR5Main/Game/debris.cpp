@@ -67,13 +67,13 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				fragment->mesh.vertices[2] = vtx2;
 				fragment->mesh.bucket = (RENDERER_BUCKETS)bucket;
 				fragment->active = true;
-				fragment->terminalVelocity = 80;
+				fragment->terminalVelocity = 1024;
 				fragment->gravity = Vector3(0, 7, 0);
-				fragment->restitution = 0.4f;
-				fragment->friction = 0.4f;
-				fragment->linearDrag = .98f;
+				fragment->restitution = 0.6f;
+				fragment->friction = 0.6f;
+				fragment->linearDrag = .99f;
 				fragment->angularVelocity = Vector3(frandMinMax(-1, 1) * 0.39, frandMinMax(-1, 1) * 0.39, frandMinMax(-1, 1) * 0.39);
-				fragment->angularDrag = frandMinMax(0.8f, 0.999f);
+				fragment->angularDrag = frandMinMax(0.9f, 0.999f);
 				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
@@ -88,22 +88,39 @@ vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
 DirectX::SimpleMath::Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
 {
-	return impactDirection * 300 * Vector3(frand() + 0.25f, (frand() - 0.5f) * 40, frand() + 0.25f);
+	Vector3 radiusVector = (fragmentWorldPosition - impactLocation);
+	Vector3 radiusNormVec = radiusVector;
+	radiusNormVec.Normalize();
+	float radiusStrenght =  1-((fragmentWorldPosition - impactLocation).Length() / 1024);
+	radiusStrenght = fmax(radiusStrenght, 0);
+	Vector3 radiusRandomVector = Vector3(frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f)) + radiusNormVec;
+	radiusRandomVector.Normalize();
+	Vector3 radiusVelocity = radiusRandomVector * radiusStrenght*40;
+	Vector3 impactDirectionVelocity = (impactDirection + Vector3(frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f), frandMinMax(-0.2, 0.2f))) * 80 ;
+	return radiusVelocity + impactDirectionVelocity;
 }
 
 void UpdateDebris()
 {
 	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++) {
 		if (deb->active) {
-			deb->velocity += deb->gravity;
 			deb->velocity *= deb->linearDrag;
+			deb->velocity += deb->gravity;
 			deb->velocity = XMVector3ClampLength(deb->velocity, 0, deb->terminalVelocity);
 			deb->rotation *= Quaternion::CreateFromYawPitchRoll(deb->angularVelocity.x,deb->angularVelocity.y,deb->angularVelocity.z);
 			deb->worldPosition += deb->velocity;
 			deb->angularVelocity *= deb->angularDrag;
 			short room = deb->roomNumber;
 			const FLOOR_INFO* const floor = GetFloor(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z,&room);
+			if (deb->worldPosition.y < floor->ceiling) {
+				if (floor->skyRoom != NO_ROOM) {
+					deb->roomNumber = floor->skyRoom;
+				}
+			}
 			if (deb->worldPosition.y > floor->floor) {
+				if (floor->pitRoom != NO_ROOM) {
+					deb->roomNumber = floor->pitRoom;
+				}
 				if (deb->numBounces > 3) {
 					deb->active = false;
 					continue;
