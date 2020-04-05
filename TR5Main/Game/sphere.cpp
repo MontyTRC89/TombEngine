@@ -29,9 +29,9 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 	}
 	else
 	{
-		z = 0;
-		y = 0;
 		x = 0;
+		y = 0;
+		z = 0;
 
 		phd_PushMatrix();
 		phd_TranslateAbs(item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -41,7 +41,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 
 	short* frame = GetBestFrame(item);
 	phd_TranslateRel(frame[6], frame[7], frame[8]);
-	short* rotation = &frame[9];
+	short* rotation = frame + 9;
 	gar_RotYXZsuperpack(&rotation, 0);
 
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -59,6 +59,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 	ptr->y = y + (MatrixPtr[M13] >> W2V_SHIFT);
 	ptr->z = z + (MatrixPtr[M23] >> W2V_SHIFT);
 	ptr->r = (int)objPtr[3];
+	ptr++;
 
 	phd_PopMatrix();
 

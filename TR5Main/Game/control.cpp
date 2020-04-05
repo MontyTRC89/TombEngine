@@ -634,7 +634,7 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	while (true)
 	{
 		nframes = DrawPhaseGame();
-		result = ControlPhase(nframes, 0); //printf("LastSpotCam: %d\n", LastSpotCam);
+		result = ControlPhase(nframes, 0);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||
@@ -2093,11 +2093,11 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 					item = &Items[itemNumber];
 					if (item->objectNumber != ID_SHOOT_SWITCH1 && item->objectNumber != ID_SHOOT_SWITCH2)
 					{
-						if (Objects[item->objectNumber].explodableMeshbits & TargetMesh && LaserSight)
+						if (Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit && LaserSight)
 						{
 							if (!Objects[item->objectNumber].intelligent)
 							{
-								item->meshBits &= ~TargetMesh;
+								item->meshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = direction;
 								ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
 								ShatterImpactData.impactDirection = Vector3(0, 1, 0);
@@ -2168,7 +2168,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 					}
 					else
 					{
-						if (TargetMesh == 1 << Objects[item->objectNumber].nmeshes - 1)
+						if (ShatterItem.bit == 1 << Objects[item->objectNumber].nmeshes - 1)
 						{
 							if (!(item->flags & 0x40))
 							{
@@ -2638,9 +2638,11 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 	phd_PopMatrix();
 	
 	short* meshPtr = NULL;
-	int bit = 1;
+	int bit = 0;
 	int sp = -2;
 	int minDistance = 0x7FFFFFFF;
+
+	int action = TrInput & IN_ACTION;
 
 	if (closesItemNumber < 0)
 	{
@@ -2653,6 +2655,8 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 
 		GetSpheres(item, SphereList, 1);
 
+		SPHERE spheres[34];
+		memcpy(spheres, SphereList, sizeof(SPHERE) * 34);
 		if (obj->nmeshes <= 0)
 			return 0;
 
@@ -2709,6 +2713,8 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 		if (sp < -1)
 			return 0;
 	}
+
+	printf("Bit: %d \n", bit);
 
 	int distance = SQUARE(hitPos->x + itemOrStaticPos->xPos - start->x) 
 		+ SQUARE(hitPos->y + itemOrStaticPos->yPos - start->y)

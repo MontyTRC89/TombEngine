@@ -116,9 +116,6 @@ void ControlMissile(short fxNumber)
 		fx->frameNumber = fx->counter = 0;
 	}
 
-	printf("Bubbles\n");
-	printf("Num: %d\n", fx->objectNumber);
-
 	/* Create bubbles in wake of harpoon bolt */
 	//if (fx->objectNumber == ID_SCUBA_HARPOON && Rooms[fx->roomNumber].flags & 1)
 	//	CreateBubble(&fx->pos, fx->roomNumber, 1, 0);

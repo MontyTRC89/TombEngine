@@ -255,7 +255,8 @@ void Inventory::LoadObjects(bool isReload)
 		m_rings[i].numObjects = 0;
 		m_rings[i].rotation = 0;
 		m_rings[i].currentObject = 0;
-		
+		m_rings[i].selectedIndex = 0;
+
 		if (!isReload)
 		{
 			m_rings[i].focusState = INV_FOCUS_STATE_NONE;
@@ -1242,6 +1243,7 @@ bool Inventory::DoCombine()
 	m_activeRing = oldRing;
 	combineRing->draw = false;
 	ring->draw = true;
+	ring->selectedIndex = 0;
 
 	return combined;
 }
