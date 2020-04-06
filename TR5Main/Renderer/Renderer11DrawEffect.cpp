@@ -1319,6 +1319,9 @@ bool Renderer11::drawDebris(bool transparent)
 			RendererVertex vtx0 = deb->mesh.vertices[0];
 			RendererVertex vtx1 = deb->mesh.vertices[1];
 			RendererVertex vtx2 = deb->mesh.vertices[2];
+			vtx0.Color = m_rooms[deb->roomNumber].AmbientLight;
+			vtx1.Color = m_rooms[deb->roomNumber].AmbientLight;
+			vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
 			vtx0.Position = Vector3::Transform(deb->mesh.vertices[0].Position, world);
 			vtx1.Position = Vector3::Transform(deb->mesh.vertices[1].Position, world);
 			vtx2.Position = Vector3::Transform(deb->mesh.vertices[2].Position, world);
