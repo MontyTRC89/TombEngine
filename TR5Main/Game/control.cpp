@@ -745,13 +745,13 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 
 			if (HeavyFlags >= 0)
 			{
-				flags &= 0x3E00u;
+				flags &= CODE_BITS;
 				if (flags != HeavyFlags)
 					return;
 			}
 			else
 			{
-				flags |= 0x3E00u;
+				flags |= CODE_BITS;
 				flags += HeavyFlags;
 			}
 			break;
@@ -870,7 +870,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 	do
 	{
 		trigger = *(data++);
-		value = trigger & 0x3FF;
+		value = trigger & VALUE_BITS;
 		targetType = (trigger >> 10) & 0xF;
 
 		switch (targetType)
@@ -882,12 +882,12 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				(triggerType == TRIGGER_TYPES::ANTIPAD ||
 					triggerType == TRIGGER_TYPES::ANTITRIGGER ||
 					triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER) &&
-				item->flags & 0x80)
+				item->flags & ATONESHOT)
 				break;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH)
 			{
-				if (item->flags & 0x40)
+				if (item->flags & SWONESHOT)
 					break;
 				if (item->objectNumber == ID_DART_EMITTER && item->active)
 					break;
@@ -903,20 +903,20 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				if (HeavyFlags >= 0)
 				{
 					if (switchFlag)
-						item->flags |= (flags & 0x3E00);
+						item->flags |= (flags & CODE_BITS);
 					else
-						item->flags ^= (flags & 0x3E00);
+						item->flags ^= (flags & CODE_BITS);
 
-					if (flags & 0x100)
-						item->flags |= 0x40;
+					if (flags & ONESHOT)
+						item->flags |= SWONESHOT;
 				}
 				else
 				{
-					if (((flags ^ item->flags) & 0x3E00) == 0x3E00)
+					if (((flags ^ item->flags) & CODE_BITS) == CODE_BITS)
 					{
-						item->flags ^= (flags & 0x3E00);
-						if (flags & 0x100)
-							item->flags |= 0x40;
+						item->flags ^= (flags & CODE_BITS);
+						if (flags & ONESHOT)
+							item->flags |= SWONESHOT;
 					}
 				}
 			}
@@ -930,10 +930,10 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 					item->itemFlags[1] = 100;
 				}
 
-				item->flags &= ~(0x3E00 | 0x4000);
+				item->flags &= ~(CODE_BITS | REVERSE);
 
-				if (flags & 0x100)
-					item->flags |= 0x80;
+				if (flags & ONESHOT)
+					item->flags |= ATONESHOT;
 
 				if (item->active && Objects[item->objectNumber].intelligent)
 				{
@@ -942,17 +942,17 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 					KillItem(value);
 				}
 			}
-			else if (flags & 0x3E00)
+			else if (flags & CODE_BITS)
 			{
-				item->flags |= flags & 0x3E00;
+				item->flags |= flags & CODE_BITS;
 			}
 
-			if ((item->flags & 0x3E00) == 0x3E00)
+			if ((item->flags & CODE_BITS) == CODE_BITS)
 			{
 				item->flags |= 0x20;
 
-				if (flags & 0x100)
-					item->flags |= 1;
+				if (flags & ONESHOT)
+					item->flags |= ONESHOT;
 
 				if (!(item->active) && !(item->flags & IFLAG_KILLED))
 				{
@@ -1021,7 +1021,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				if (trigger & 0x100)
 					Camera.fixed[Camera.number].flags |= 0x100;
 
-				Camera.speed = ((trigger & 0x3E00) >> 6) + 1;
+				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
 				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
 			}
 			break;
@@ -1078,11 +1078,11 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				break;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH)
-				FlipMap[value] ^= (flags & 0x3E00);
-			else if (flags & 0x3E00)
-				FlipMap[value] |= (flags & 0x3E00);
+				FlipMap[value] ^= (flags & CODE_BITS);
+			else if (flags & CODE_BITS)
+				FlipMap[value] |= (flags & CODE_BITS);
 			
-			if ((FlipMap[value] & 0x3E00) == 0x3E00)
+			if ((FlipMap[value] & CODE_BITS) == CODE_BITS)
 			{
 
 				if (flags & 0x100)
@@ -1096,14 +1096,14 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 
 		case TO_FLIPON:
 			flipAvailable = true;
-			FlipMap[value] |= 0x3E00;
+			FlipMap[value] |= CODE_BITS;
 			if (!FlipStats[value])
 				flip = value;
 			break;
 
 		case TO_FLIPOFF:
 			flipAvailable = true;
-			FlipMap[value] &= ~0x3E00;
+			FlipMap[value] &= ~CODE_BITS;
 			if (FlipStats[value])
 				flip = value;
 			break;

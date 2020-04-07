@@ -148,6 +148,7 @@ void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				
 				AddActiveItem(itemNum);
 
+				item->itemFlags[0] = 0; // This enables the switch again (in TR5 this switch was always triggered by heavy triggers)
 				item->status = ITEM_ACTIVE;
 				item->pos.yRot = oldYrot;
 				Lara.isMoving = false;
@@ -186,8 +187,9 @@ void CrowDoveSwitchControl(short itemNumber)
 		SoundEffect(SFX_RAVENSWITCH_EXP, &item->pos, 0);
 		item->meshBits = 5;
 		RemoveActiveItem(itemNumber);
+		item->itemFlags[0] = 1; // I use this for not making it activable again by trigger
 	}
-	else
+	else if (!item->itemFlags[0])
 	{
 		if (item->currentAnimState == 0)
 			item->goalAnimState = 1;
@@ -205,6 +207,13 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+	if (!TriggerIndex)
+	{
+		ObjectCollision(itemNum, l, coll);
+		return;
+	}
+
 	short* trigger = TriggerIndex;
 	for (int i = *TriggerIndex; (i & 0x1F) != 4; trigger++)
 	{

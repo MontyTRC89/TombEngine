@@ -130,6 +130,10 @@ constexpr auto MAX_SPLASH = 8;
 #define DATA_STATIC 0xFF // probably add static collision
 #define END_BIT 0x8000
 #define VALUE_BITS 0x3FF
+#define CODE_BITS	0x3e00
+#define REVERSE	0x4000
+#define SWONESHOT	0x40		 
+#define ATONESHOT	0x80	 
 
 #define NUM_BATS	64
 #define NUM_SPIDERS	64
