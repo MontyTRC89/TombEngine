@@ -578,12 +578,17 @@ void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int flag = 0;
 	ITEM_INFO* item = &Items[itemNum];
 
-	if ((!(TrInput & IN_ACTION) || l->currentAnimState != STATE_LARA_STOP || l->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus)
-		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
+	if ((!(TrInput & IN_ACTION) 
+		|| l->currentAnimState != STATE_LARA_STOP 
+		|| l->animNumber != ANIMATION_LARA_STAY_IDLE 
+		|| Lara.gunStatus)
+		&& (!Lara.isMoving 
+			|| Lara.generalPtr != (void*)itemNum))
 	{
 		ObjectCollision(itemNum, l, coll);
+		return;
 	}
-	
+
 	if (item->currentAnimState)
 	{
 		if (item->currentAnimState == 1)
@@ -606,10 +611,11 @@ void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_NO_ARMS;
 			}
+
 			l->pos.yRot ^= (short)ANGLE(180);
+
 			if (flag)
 			{
-				item->goalAnimState = 1;
 				l->animNumber = ANIMATION_LARA_LEVERSWITCH_PUSH;
 				l->frameNumber = Anims[l->animNumber].frameBase;
 				l->goalAnimState = STATE_LARA_LEVERSWITCH_PUSH;
@@ -631,10 +637,34 @@ void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		
 		ObjectCollision(itemNum, l, coll);
 	}
-
-	if (!TestLaraPosition(RailSwitchBounds, item, l))
+	else
 	{
-		if (Lara.isMoving)
+		if (TestLaraPosition(RailSwitchBounds, item, l))
+		{
+			if (MoveLaraPosition(&RailSwitchPos, item, l))
+			{
+				item->goalAnimState = 1;
+				l->animNumber = ANIMATION_LARA_LEVERSWITCH_PUSH;
+				l->frameNumber = Anims[l->animNumber].frameBase;
+				l->goalAnimState = STATE_LARA_LEVERSWITCH_PUSH;
+				l->currentAnimState = STATE_LARA_LEVERSWITCH_PUSH;
+				Lara.isMoving = false;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
+
+				item->status = ITEM_ACTIVE;
+				AddActiveItem(itemNum);
+				AnimateItem(item);
+			}
+			else
+			{
+				Lara.generalPtr = (void*)itemNum;
+			}
+		}
+		else if (Lara.isMoving)
 		{
 			if (Lara.generalPtr == (void*)itemNum)
 			{
@@ -642,31 +672,9 @@ void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.gunStatus = LG_NO_ARMS;
 			}
 		}
-		
+
 		ObjectCollision(itemNum, l, coll);
 	}
-
-	if (!MoveLaraPosition(&RailSwitchPos, item, l))
-	{
-		Lara.generalPtr = (void*)itemNum;
-		ObjectCollision(itemNum, l, coll);
-	}
-
-	item->goalAnimState = 1;
-	l->animNumber = ANIMATION_LARA_LEVERSWITCH_PUSH;
-	l->frameNumber = Anims[l->animNumber].frameBase;
-	l->goalAnimState = STATE_LARA_LEVERSWITCH_PUSH;
-	l->currentAnimState = STATE_LARA_LEVERSWITCH_PUSH;
-	Lara.isMoving = false;
-	Lara.headYrot = 0;
-	Lara.headXrot = 0;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-	Lara.gunStatus = LG_HANDS_BUSY;
-	
-	item->status = ITEM_ACTIVE;
-	AddActiveItem(itemNum);
-	AnimateItem(item);
 }
 
 void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
