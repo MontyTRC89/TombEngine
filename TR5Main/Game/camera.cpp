@@ -5,6 +5,7 @@
 #include "draw.h"
 
 #define LfAspectCorrection VAR_U_(0x0055DA30, float)
+#define LastTarget			VAR_U_(0x00EEFA30, GAME_VECTOR)
 
 extern int KeyTriggerActive;
 
@@ -127,6 +128,41 @@ int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 	target->roomNumber = room2;
 
 	return flag == 0;
+}
+
+void InitialiseCamera()
+{
+	Camera.shift = LaraItem->pos.yPos - 1024;
+	
+	LastTarget.x = LaraItem->pos.xPos;
+	LastTarget.y = Camera.shift;
+	LastTarget.z = LaraItem->pos.zPos;
+	LastTarget.roomNumber = LaraItem->roomNumber;
+
+	Camera.target.x = LastTarget.x;
+	Camera.target.y = Camera.shift;
+	Camera.target.z = LastTarget.z;
+	Camera.target.roomNumber = LaraItem->roomNumber;
+
+	Camera.pos.x = LastTarget.x;
+	Camera.pos.y = Camera.shift;
+	Camera.pos.z = LastTarget.z - 100;
+	Camera.pos.roomNumber = LaraItem->roomNumber;
+
+	Camera.targetDistance = 1536;
+	Camera.item = NULL;
+	Camera.numberFrames = 1;
+	Camera.type = CHASE_CAMERA;
+	Camera.speed = 1;
+	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.bounce = 0;
+	Camera.number = -1;
+	Camera.fixedCamera = 0;
+	
+	AlterFOV(14560);
+	
+	UseForcedFixedCamera = 0;
+	CalculateCamera();
 }
 
 void Inject_Camera()
