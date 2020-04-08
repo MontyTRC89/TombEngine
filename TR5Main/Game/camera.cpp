@@ -4,6 +4,19 @@
 #include <stdio.h>
 #include "draw.h"
 
+struct OLD_CAMERA
+{
+	short currentAnimState;
+	short goalAnimState;
+	int targetDistance;
+	short actualElevation;
+	short targetElevation;
+	short actualAngle;
+	PHD_3DPOS pos;
+	PHD_3DPOS pos2;
+	PHD_VECTOR target;
+};
+
 #define LfAspectCorrection VAR_U_(0x0055DA30, float)
 #define LastTarget			VAR_U_(0x00EEFA30, GAME_VECTOR)
 
@@ -11,6 +24,9 @@ extern int KeyTriggerActive;
 
 PHD_VECTOR CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
+GAME_VECTOR LastIdeal;
+OLD_CAMERA OldCam;
+int CameraSnaps = 0;
 
 void ActivateCamera()
 {
@@ -165,9 +181,172 @@ void InitialiseCamera()
 	CalculateCamera();
 }
 
+void MoveCamera(GAME_VECTOR* ideal, int speed)
+{
+	GAME_VECTOR from, to;
+
+	if (BinocularOn < 0)
+	{
+		speed = 1;
+		BinocularOn++;
+	}
+
+	if (OldCam.pos.xRot != LaraItem->pos.xRot
+		|| OldCam.pos.yRot != LaraItem->pos.yRot
+		|| OldCam.pos.zRot != LaraItem->pos.zRot
+		|| OldCam.pos2.xRot != Lara.headXrot
+		|| OldCam.pos2.yRot != Lara.headYrot
+		|| OldCam.pos2.xPos != Lara.torsoXrot
+		|| OldCam.pos2.yPos != Lara.torsoYrot
+		|| OldCam.pos.xPos != LaraItem->pos.xPos
+		|| OldCam.pos.yPos != LaraItem->pos.yPos
+		|| OldCam.pos.zPos != LaraItem->pos.zPos
+		|| OldCam.currentAnimState != LaraItem->currentAnimState
+		|| OldCam.goalAnimState != LaraItem->goalAnimState
+		|| OldCam.targetDistance != Camera.targetDistance
+		|| OldCam.targetElevation != Camera.targetElevation
+		|| OldCam.actualElevation != Camera.actualElevation
+		|| OldCam.actualAngle != Camera.actualAngle
+		|| OldCam.target.x != Camera.target.x
+		|| OldCam.target.y != Camera.target.y
+		|| OldCam.target.z != Camera.target.z
+		|| Camera.oldType != Camera.type
+		|| SniperOverlay
+		|| BinocularOn < 0)
+	{
+		OldCam.pos.xRot = LaraItem->pos.xRot;
+		OldCam.pos.yRot = LaraItem->pos.yRot;
+		OldCam.pos.zRot = LaraItem->pos.zRot;
+		OldCam.pos2.xRot = Lara.headXrot;
+		OldCam.pos2.yRot = Lara.headYrot;
+		OldCam.pos2.xPos = Lara.torsoXrot;
+		OldCam.pos2.yPos = Lara.torsoYrot;
+		OldCam.pos.xPos = LaraItem->pos.xPos;
+		OldCam.pos.yPos = LaraItem->pos.yPos;
+		OldCam.pos.zPos = LaraItem->pos.zPos;
+		OldCam.currentAnimState = LaraItem->currentAnimState;
+		OldCam.goalAnimState = LaraItem->goalAnimState;
+		OldCam.targetDistance = Camera.targetDistance;
+		OldCam.targetElevation = Camera.targetElevation;
+		OldCam.actualElevation = Camera.actualElevation;
+		OldCam.actualAngle = Camera.actualAngle;
+		OldCam.target.x = Camera.target.x;
+		OldCam.target.y = Camera.target.y;
+		OldCam.target.z = Camera.target.z;
+		LastIdeal.x = ideal->x;
+		LastIdeal.y = ideal->y;
+		LastIdeal.z = ideal->z;
+		LastIdeal.roomNumber = ideal->roomNumber;
+	}
+	else
+	{
+		ideal->x = LastIdeal.x;
+		ideal->y = LastIdeal.y;
+		ideal->z = LastIdeal.z;
+		ideal->roomNumber = LastIdeal.roomNumber;
+	}
+
+	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
+	Camera.pos.y += (ideal->y - Camera.pos.y) / speed;
+	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
+	Camera.pos.roomNumber = ideal->roomNumber;
+
+	if (Camera.bounce)
+	{
+		if (Camera.bounce <= 0)
+		{
+			int bounce = -Camera.bounce;
+			int bounce2 = -Camera.bounce >> 2;
+			Camera.target.x += GetRandomControl() % bounce - bounce2;
+			Camera.target.y += GetRandomControl() % bounce - bounce2;
+			Camera.target.z += GetRandomControl() % bounce - bounce2;
+			Camera.bounce += 5;
+		}
+		else
+		{
+			Camera.pos.y += Camera.bounce;
+			Camera.target.y += Camera.bounce;
+			Camera.bounce = 0;
+		}
+	}
+
+	short roomNumber = Camera.pos.roomNumber;
+	FLOOR_INFO* floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &roomNumber);
+	int height = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+
+	if (Camera.pos.y < GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z) || Camera.pos.y > height)
+	{
+		mgLOS(&Camera.target, &Camera.pos, 0);
+		
+		if (abs(Camera.pos.x - ideal->x) < 768
+			&& abs(Camera.pos.y - ideal->y) < 768
+			&& abs(Camera.pos.z - ideal->z) < 768)
+		{
+			to.x = Camera.pos.x;
+			to.y = Camera.pos.y;
+			to.z = Camera.pos.z;
+			to.roomNumber = Camera.pos.roomNumber;
+
+			from.x = ideal->x;
+			from.y = ideal->y;
+			from.z = ideal->z;
+			from.roomNumber = ideal->roomNumber;
+
+			if (!mgLOS(&from, &to, 0) && ++CameraSnaps >= 8)
+			{
+				Camera.pos.x = ideal->x;
+				Camera.pos.y = ideal->y;
+				Camera.pos.z = ideal->z;
+				Camera.pos.roomNumber = ideal->roomNumber;
+				CameraSnaps = 0;
+			}
+		}
+	}
+
+	roomNumber = Camera.pos.roomNumber;
+	floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &roomNumber);
+	height = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	int ceiling = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
+
+	if (Camera.pos.y - 255 < ceiling && Camera.pos.y + 255 > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
+		Camera.pos.y = (height + ceiling) >> 1;
+	else if (Camera.pos.y + 255 > height && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
+		Camera.pos.y = height - 255;
+	else if (Camera.pos.y - 255 < ceiling && ceiling < height && ceiling != NO_HEIGHT && height != NO_HEIGHT)
+		Camera.pos.y = ceiling + 255;
+	else if (ceiling >= height || height == NO_HEIGHT || ceiling == NO_HEIGHT)
+	{
+		Camera.pos.x = ideal->x;
+		Camera.pos.y = ideal->y;
+		Camera.pos.z = ideal->z;
+		Camera.pos.roomNumber = ideal->roomNumber;
+	}
+
+	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
+	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	
+	if (Camera.mikeAtLara)
+	{
+		Camera.mikePos.x = LaraItem->pos.xPos;
+		Camera.mikePos.y = LaraItem->pos.yPos;
+		Camera.mikePos.z = LaraItem->pos.zPos;
+		Camera.oldType = Camera.type;
+	}
+	else
+	{
+		short angle = ATAN(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x += PhdPerspective * SIN(angle) >> W2V_SHIFT;
+		Camera.mikePos.y = Camera.pos.y;
+		Camera.mikePos.z += PhdPerspective * COS(angle) >> W2V_SHIFT;
+		Camera.oldType = Camera.type;
+	}
+}
+
 void Inject_Camera()
 {
 	INJECT(0x0048EDC0, AlterFOV);
 	INJECT(0x0048F760, LookAt);
 	INJECT(0x0040FA70, mgLOS);
+	INJECT(0x0040C7A0, MoveCamera);
+	INJECT(0x0040C690, InitialiseCamera);
 }
