@@ -3,6 +3,7 @@
 #include <d3dx9.h>
 #include <stdio.h>
 #include "draw.h"
+#include "lara.h"
 
 struct OLD_CAMERA
 {
@@ -342,6 +343,40 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	}
 }
 
+void ChaseCamera(ITEM_INFO* item)
+{
+
+}
+
+void UpdateCameraElevation()
+{
+	PHD_VECTOR pos;
+	PHD_VECTOR pos1;
+
+	if (Camera.laraNode != -1)
+	{
+		pos.z = 0;
+		pos.y = 0;
+		pos.x = 0;
+		GetLaraJointPosition(&pos, Camera.laraNode);
+
+		pos1.x = 0;
+		pos1.y = -256;
+		pos1.z = 2048;
+		GetLaraJointPosition(&pos1, Camera.laraNode);
+
+		pos.z = pos1.z - pos.z;
+		pos.x = pos1.x - pos.x;
+		Camera.actualAngle = Camera.targetAngle + ATAN(pos.z, pos.x);
+	}
+	else
+	{
+		Camera.actualAngle = LaraItem->pos.yRot + Camera.targetAngle;
+	}
+
+	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) >> 3;
+}
+
 void Inject_Camera()
 {
 	INJECT(0x0048EDC0, AlterFOV);
@@ -349,4 +384,6 @@ void Inject_Camera()
 	INJECT(0x0040FA70, mgLOS);
 	INJECT(0x0040C7A0, MoveCamera);
 	INJECT(0x0040C690, InitialiseCamera);
+	INJECT(0x004107C0, UpdateCameraElevation);
+	//INJECT(0x0040D150, ChaseCamera);
 }
