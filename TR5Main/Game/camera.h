@@ -9,7 +9,7 @@
 #define UseForcedFixedCamera		VAR_U_(0x00EEFA50, char)
 
 //#define InitialiseCamera ((void (__cdecl*)()) 0x0040C690)
-#define MoveCamera ((int(__cdecl*)(GAME_VECTOR*,int)) 0x0040C7A0)
+//#define MoveCamera ((int(__cdecl*)(GAME_VECTOR*,int)) 0x0040C7A0)
 #define ChaseCamera ((int(__cdecl*)(ITEM_INFO*)) 0x0040D150)
 #define CombatCamera ((int(__cdecl*)(ITEM_INFO*)) 0x0040D640)
 #define LookCamera ((void(__cdecl*)(ITEM_INFO*)) 0x0040DC10)
@@ -29,5 +29,6 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 void AlterFOV(int value);
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push);
 void InitialiseCamera();
+void MoveCamera(GAME_VECTOR* ideal, int speed);
 
 void Inject_Camera();
