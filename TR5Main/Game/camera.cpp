@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "Camera.h"
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <stdio.h>
@@ -26,8 +26,10 @@ extern int KeyTriggerActive;
 PHD_VECTOR CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
 GAME_VECTOR LastIdeal;
+GAME_VECTOR	Ideals[5];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
+int TargetSnaps = 0;
 
 void ActivateCamera()
 {
@@ -345,7 +347,141 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 
 void ChaseCamera(ITEM_INFO* item)
 {
+	if (!Camera.targetElevation)
+	{
+		Camera.targetElevation = -ANGLE(10);
+	}
 
+	Camera.targetElevation += item->pos.xRot;
+	UpdateCameraElevation();
+	
+	if (Camera.actualElevation > ANGLE(85))
+		Camera.actualElevation = ANGLE(85);
+	else if (Camera.actualElevation < -ANGLE(85))
+		Camera.actualElevation = -ANGLE(85);
+
+	int distance = Camera.targetDistance * COS(Camera.targetElevation) >> W2V_SHIFT;
+
+	GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
+	if (Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = Rooms[Camera.target.roomNumber].y - 256;
+
+	int wx = Camera.target.x;
+	int wy = Camera.target.y;
+	int wz = Camera.target.z;
+
+	short roomNumber = Camera.target.roomNumber;
+	FLOOR_INFO* floor = GetFloor(wx, wy, wz, &roomNumber);
+	int h = GetFloorHeight(floor, wx, wy, wz);
+	int c = GetCeiling(floor, wx, wy, wz);
+
+	if ((((wy < c) || (h < wy)) || (h <= c)) || ((h == NO_HEIGHT || (c == NO_HEIGHT))))
+	{
+		TargetSnaps++;
+		Camera.target.x = LastTarget.x;
+		Camera.target.y = LastTarget.y;
+		Camera.target.z = LastTarget.z;
+		Camera.target.roomNumber = LastTarget.roomNumber;
+	}
+	else
+	{
+		TargetSnaps = 0;
+	}
+	
+	for (int i = 0; i < 5; i++)
+	{
+		Ideals[i].y = Camera.target.y + (Camera.targetDistance * SIN(Camera.actualElevation) >> W2V_SHIFT);
+	}
+
+	int farthest = 0x7FFFFFFF;
+	int farthestnum = 0;
+	GAME_VECTOR temp[2];
+
+	for (int i = 0; i < 5; i++)
+	{
+		short angle;
+
+		if (i == 0)
+		{
+			angle = Camera.actualAngle;
+		}
+		else
+		{
+			angle = (i - 1) * ANGLE(90);
+		}
+
+		Ideals[i].x = Camera.target.x - ((distance * SIN(angle)) >> W2V_SHIFT);
+		Ideals[i].z = Camera.target.z - ((distance * COS(angle)) >> W2V_SHIFT);
+		Ideals[i].roomNumber = Camera.target.roomNumber;
+
+		if (mgLOS(&Camera.target, &Ideals[i], 200))
+		{
+			temp[0].x = Ideals[i].x;
+			temp[0].y = Ideals[i].y;
+			temp[0].z = Ideals[i].z;
+			temp[0].roomNumber = Ideals[i].roomNumber;
+
+			temp[1].x = Camera.pos.x;
+			temp[1].y = Camera.pos.y;
+			temp[1].z = Camera.pos.z;
+			temp[1].roomNumber = Camera.pos.roomNumber;
+
+			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			{
+				if (i == 0)
+				{
+					farthestnum = 0;
+					break;
+				}
+
+				int dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
+				dx += (Camera.pos.z - Ideals[i].z) * (Camera.pos.z - Ideals[i].z);
+				if (dx < farthest)
+				{
+					farthest = dx;
+					farthestnum = i;
+				}
+			}
+		}
+		else if (i == 0)
+		{
+			temp[0].x = Ideals[i].x;
+			temp[0].y = Ideals[i].y;
+			temp[0].z = Ideals[i].z;
+			temp[0].roomNumber = Ideals[i].roomNumber;
+			temp[1].x = Camera.pos.x;
+			temp[1].y = Camera.pos.y;
+			temp[1].z = Camera.pos.z;
+			temp[1].roomNumber = Camera.pos.roomNumber;
+
+			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			{
+				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
+				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
+
+				if ((dx + dz) > 0x90000)
+				{
+					farthestnum = 0;
+					break;
+				}
+			}
+		}
+	}
+
+	GAME_VECTOR ideal;
+	ideal.x = Ideals[farthestnum].x;
+	ideal.y = Ideals[farthestnum].y;
+	ideal.z = Ideals[farthestnum].z;
+	ideal.roomNumber = Ideals[farthestnum].roomNumber;
+
+	CameraCollisionBounds(&ideal, 384, 1);
+
+	if (Camera.oldType == FIXED_CAMERA)
+	{
+		Camera.speed = 1;
+	}
+
+	MoveCamera(&ideal, Camera.speed);
 }
 
 void UpdateCameraElevation()
@@ -385,5 +521,5 @@ void Inject_Camera()
 	INJECT(0x0040C7A0, MoveCamera);
 	INJECT(0x0040C690, InitialiseCamera);
 	INJECT(0x004107C0, UpdateCameraElevation);
-	//INJECT(0x0040D150, ChaseCamera);
+	INJECT(0x0040D150, ChaseCamera);
 }
