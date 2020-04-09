@@ -244,7 +244,7 @@ static void TriggerPlasmaBallFlame(short fx_number, long type, long xv, long yv,
 	sptr->gravity = sptr->maxYvel = 0;
 }
 
-static void TriggerPlasmaBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short room_number, short angle)
+static void TriggerPlasmaBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short roomNumber, short angle)
 {
 	FX_INFO* fx;
 	PHD_VECTOR pos;
@@ -258,7 +258,7 @@ static void TriggerPlasmaBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, shor
 	angles[0] = angle + GetRandomControl() + 0x4000;
 	angles[1] = 0x2000;
 
-	fx_number = CreateNewEffect(room_number);
+	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
 		fx = &Effects[fx_number];
@@ -420,7 +420,7 @@ void ControlLaserBolts(short item_number)
 	ITEM_INFO* item;
 	PHD_VECTOR	oldpos;
 	long g, b, rad;
-	short room_number, oldroom, hitlara;
+	short roomNumber, oldroom, hitlara;
 	int speed;
 
 	item = &Items[item_number];
@@ -447,11 +447,11 @@ void ControlLaserBolts(short item_number)
 		}
 	}
 
-	room_number = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-	if (item->roomNumber != room_number)
-		ItemNewRoom(item_number, room_number);
+	if (item->roomNumber != roomNumber)
+		ItemNewRoom(item_number, roomNumber);
 
 	if (!item->itemFlags[2])
 	{
@@ -536,7 +536,7 @@ void ControlLondBossPlasmaBall(short fx_number)
 	long speed;
 	long rnd, r, g, b, old_y;
 	byte radtab[2] = { 13,7 };
-	short room_number;
+	short roomNumber;
 
 	fx = &Effects[fx_number];
 	old_y = fx->pos.yPos;
@@ -554,8 +554,8 @@ void ControlLondBossPlasmaBall(short fx_number)
 	if ((Wibble & 15) == 0)
 		TriggerPlasmaBallFlame(fx_number, 0, 0, abs(old_y - fx->pos.yPos) << 3, 0);
 
-	room_number = fx->roomNumber;
-	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &room_number);
+	roomNumber = fx->roomNumber;
+	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 	if (fx->pos.yPos >= GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) ||
 		fx->pos.yPos < GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
 	{
@@ -563,7 +563,7 @@ void ControlLondBossPlasmaBall(short fx_number)
 		return;
 	}
 
-	if (Rooms[room_number].flags & ENV_FLAG_WATER)
+	if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
 		KillEffect(fx_number);
 		return;
@@ -577,7 +577,7 @@ void ControlLondBossPlasmaBall(short fx_number)
 		return;
 	}
 
-	if (room_number != fx->roomNumber)
+	if (roomNumber != fx->roomNumber)
 		EffectNewRoom(fx_number, LaraItem->roomNumber);
 
 	rnd = GetRandomControl();

@@ -203,7 +203,7 @@ int SkidooCheckGetOffOK(int direction)
 {
 	/* Check if getting off skidoo here is possible in the direction required by player */
 	int x, y, z, height, ceiling;
-	short room_number, angle;
+	short roomNumber, angle;
 	ITEM_INFO* skidoo;
 	FLOOR_INFO* floor;
 
@@ -218,8 +218,8 @@ int SkidooCheckGetOffOK(int direction)
 	y = skidoo->pos.yPos;
 	z = skidoo->pos.zPos - (SKIDOO_GETOFF_DIST * COS(angle) >> W2V_SHIFT);
 
-	room_number = skidoo->roomNumber;
-	floor = GetFloor(x, y, z, &room_number);
+	roomNumber = skidoo->roomNumber;
+	floor = GetFloor(x, y, z, &roomNumber);
 
 	height = GetFloorHeight(floor, x, y, z);
 
@@ -329,7 +329,7 @@ void DoSnowEffect(ITEM_INFO* skidoo)
 		else
 			fx->fallspeed = 0;
 		//*(phd_mxptr + M23) = 0; // no depthQ
-		//S_CalculateLight(fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos, fx->room_number);
+		//S_CalculateLight(fx->pos.x_pos, fx->pos.y_pos, fx->pos.z_pos, fx->roomNumber);
 		//fx->shade = ls_adder - 0x200;
 		//if (fx->shade < 0)
 		//	fx->shade = 0;
@@ -585,7 +585,7 @@ int DoSkidooDynamics(int height, int fallspeed, int* y)
 int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 {
 	int geton;
-	short rot, room_number;
+	short rot, roomNumber;
 	ITEM_INFO* skidoo;
 	FLOOR_INFO* floor;
 
@@ -609,8 +609,8 @@ int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 	if (!TestCollision(skidoo, LaraItem))
 		return 0;
 
-	room_number = skidoo->roomNumber;
-	floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &room_number);
+	roomNumber = skidoo->roomNumber;
+	floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &roomNumber);
 	if (GetFloorHeight(floor, skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos) < -32000)
 		return 0;
 
@@ -739,14 +739,14 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	else
 	{
 		/* A diagonal hit; means a barrage of tests needed to determine best shift */
-		short room_number;
+		short roomNumber;
 		FLOOR_INFO* floor;
 		int height;
 
 		x = z = 0;
 
-		room_number = skidoo->roomNumber;
-		floor = GetFloor(old->x, pos->y, pos->z, &room_number);
+		roomNumber = skidoo->roomNumber;
+		floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
 		height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -756,8 +756,8 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = WALL_SIZE - shift_z;
 		}
 
-		room_number = skidoo->roomNumber;
-		floor = GetFloor(pos->x, pos->y, old->z, &room_number);
+		roomNumber = skidoo->roomNumber;
+		floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
 		height = GetFloorHeight(floor, pos->x, pos->y, old->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -814,7 +814,7 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 	int hfr_old, hfl_old, hbr_old, hbl_old;
 	FLOOR_INFO* floor;
 	int height, slip, collide;
-	short room_number, rot;
+	short roomNumber, rot;
 	int newspeed;
 
 	skinfo = (SKIDOO_INFO*)skidoo->data;
@@ -922,8 +922,8 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 	if (hfr < fr_old.y - STEP_SIZE)
 		rot += DoSkidooShift(skidoo, &fr, &fr_old);
 
-	room_number = skidoo->roomNumber;
-	floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &room_number);
+	roomNumber = skidoo->roomNumber;
+	floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &roomNumber);
 	height = GetFloorHeight(floor, skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos);
 	if (height < skidoo->pos.yPos - STEP_SIZE)
 		DoSkidooShift(skidoo, (PHD_VECTOR*)&skidoo->pos, &old);
@@ -964,7 +964,7 @@ int SkidooControl()
 	int hfl, hfr;
 	FLOOR_INFO* floor;
 	int height, collide, drive;
-	short room_number, x_rot, z_rot, bandit_skidoo;
+	short roomNumber, x_rot, z_rot, bandit_skidoo;
 	int pitch, dead = 0;
 
 	skidoo = &Items[g_LaraExtra.Vehicle];
@@ -976,8 +976,8 @@ int SkidooControl()
 	hfl = TestSkidooHeight(skidoo, SKIDOO_FRONT, -SKIDOO_SIDE, &fl);
 	hfr = TestSkidooHeight(skidoo, SKIDOO_FRONT, SKIDOO_SIDE, &fr);
 
-	room_number = skidoo->roomNumber;
-	floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &room_number);
+	roomNumber = skidoo->roomNumber;
+	floor = GetFloor(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, &roomNumber);
 	height = GetFloorHeight(floor, skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos);
 
 	TestTriggers(TriggerIndex, 0, 0);
@@ -1059,10 +1059,10 @@ int SkidooControl()
 	if (skidoo->flags & ONESHOT)
 	{
 		/* This is a falling skidoo - Lara is elsewhere */
-		if (room_number != skidoo->roomNumber)
+		if (roomNumber != skidoo->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, room_number);
-			ItemNewRoom(Lara.itemNumber, room_number);
+			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
 		AnimateItem(LaraItem);
@@ -1075,10 +1075,10 @@ int SkidooControl()
 
 	SkidooAnimation(skidoo, collide, dead);
 
-	if (room_number != skidoo->roomNumber)
+	if (roomNumber != skidoo->roomNumber)
 	{
-		ItemNewRoom(g_LaraExtra.Vehicle, room_number);
-		ItemNewRoom(Lara.itemNumber, room_number);
+		ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
 	/* Move Lara to the skidoo position */
