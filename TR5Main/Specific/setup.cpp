@@ -3043,7 +3043,7 @@ void InitialiseSpecialEffects()
 	NextBubble = 0;
 	NextDrip = 0;
 	NextBlood = 0;
-	NextItem = NO_ITEM;
+	WBRoom = -1;
 }
 
 void PickupObjects()
