@@ -574,7 +574,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 		spark->dSize = size;
 	}
 
-	/*if (gfLevelFlags & 0x20 && LaraItem->room_number == gfMirrorRoom) // 0x20 = GF_MIRROR_ENABLED
+	/*if (gfLevelFlags & 0x20 && LaraItem->roomNumber == gfMirrorRoom) // 0x20 = GF_MIRROR_ENABLED
 	{
 		spark->mirror = 1;
 	}
@@ -1765,7 +1765,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 	pos.x = item->pos.x_pos;
 	pos.y = item->pos.y_pos;
 	pos.z = item->pos.z_pos;
-	pos.room_number = item->room_number;
+	pos.roomNumber = item->roomNumber;
 
 	SetUpLensFlare(0, 0, 0, &pos);
 }*/

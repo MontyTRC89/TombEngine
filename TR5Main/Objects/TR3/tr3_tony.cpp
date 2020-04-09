@@ -207,7 +207,7 @@ void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
 	}
 }
 
-void TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short room_number, short angle, long zdspeed)
+void TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short roomNumber, short angle, long zdspeed)
 {
 	FX_INFO* fx;
 	PHD_VECTOR pos;
@@ -273,7 +273,7 @@ void TriggerFireBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short room_nu
 		fallspeed = -(GetRandomControl() & 31) - 32;
 	}
 
-	fxNumber = CreateNewEffect(room_number);
+	fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != NO_ITEM)
 	{
 		fx = &Effects[fxNumber];
@@ -300,7 +300,7 @@ void TonyFireBallControl(short fxNumber)
 	long old_x, old_y, old_z, x;
 	long rnd, r, g, b;
 	unsigned char radtab[7] = { 16,0,14,9,7,7,7 };
-	short room_number;
+	short roomNumber;
 
 	fx = &Effects[fxNumber];
 
@@ -341,8 +341,8 @@ void TonyFireBallControl(short fxNumber)
 			TriggerFireBallFlame(fxNumber, fx->flag1, (old_x - fx->pos.xPos) << 3, (old_y - fx->pos.yPos) << 3, (old_z - fx->pos.zPos) << 3);
 	}
 
-	room_number = fx->roomNumber;
-	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &room_number);
+	roomNumber = fx->roomNumber;
+	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 	if (fx->pos.yPos >= GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) || fx->pos.yPos < GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
 	{
 		if (fx->flag1 == ROCKZAPPL || fx->flag1 == ROCKZAPPR || fx->flag1 == ZAPP || fx->flag1 == DROPPER)
@@ -374,20 +374,20 @@ void TonyFireBallControl(short fxNumber)
 
 			if (fx->flag1 == ROCKZAPPL || fx->flag1 == ROCKZAPPR)
 			{
-				room_number = LaraItem->roomNumber;
-				floor = GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &room_number);
+				roomNumber = LaraItem->roomNumber;
+				floor = GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &roomNumber);
 				pos.y = GetCeiling(floor, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos) + 256;
 				pos.x = LaraItem->pos.xPos + (GetRandomControl() & 1023) - 512;
 				pos.z = LaraItem->pos.zPos + (GetRandomControl() & 1023) - 512;
-				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, room_number);	// -2 = Set off a dynamic light controller.
-				TriggerFireBall((ITEM_INFO*)NULL, DROPPER, &pos, room_number, 0, 0);
+				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, roomNumber);	// -2 = Set off a dynamic light controller.
+				TriggerFireBall((ITEM_INFO*)NULL, DROPPER, &pos, roomNumber, 0, 0);
 			}
 		}
 		KillEffect(fxNumber);
 		return;
 	}
 
-	if (Rooms[room_number].flags & ENV_FLAG_WATER)
+	if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
 		KillEffect(fxNumber);
 		return;
@@ -403,7 +403,7 @@ void TonyFireBallControl(short fxNumber)
 		}
 	}
 
-	if (room_number != fx->roomNumber)
+	if (roomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, LaraItem->roomNumber);
 
 	if (radtab[fx->flag1])

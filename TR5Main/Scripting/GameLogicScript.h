@@ -25,7 +25,7 @@ using namespace std;
 #define ITEM_PARAM_GRAVITY_STATUS			7
 #define ITEM_PARAM_COLLIDABLE				8
 #define ITEM_PARAM_POISONED					9
-#define ITEM_PARAM_ROOM_NUMBER				10
+#define ITEM_PARAM_roomNumber				10
 
 #define LUA_VARIABLE_TYPE_INT				0
 #define LUA_VARIABLE_TYPE_BOOL				1
@@ -78,7 +78,7 @@ typedef struct GameScriptItem {
 			return NativeItem->collidable;
 		case ITEM_PARAM_POISONED:
 			return NativeItem->poisoned;
-		case ITEM_PARAM_ROOM_NUMBER:
+		case ITEM_PARAM_roomNumber:
 			return NativeItem->roomNumber;
 		default:
 			return 0;
@@ -114,7 +114,7 @@ typedef struct GameScriptItem {
 			NativeItem->collidable = value; break;
 		case ITEM_PARAM_POISONED:
 			NativeItem->poisoned = value; break;
-		case ITEM_PARAM_ROOM_NUMBER:
+		case ITEM_PARAM_roomNumber:
 			NativeItem->roomNumber = value; break;
 		default:
 			break;

@@ -144,7 +144,7 @@ void ShivaControl(short itemNum)
 
 	ITEM_INFO* item;
 	CREATURE_INFO* shiva;
-	short angle, head_x, head_y, torso_x, torso_y, tilt, room_number;
+	short angle, head_x, head_y, torso_x, torso_y, tilt, roomNumber;
 	int x, z;
 	int random, lara_alive;
 	AI_INFO info;
@@ -235,10 +235,10 @@ void ShivaControl(short itemNum)
 
 			if (shiva->mood == ESCAPE_MOOD)
 			{
-				room_number = item->roomNumber;
+				roomNumber = item->roomNumber;
 				x = item->pos.xPos + (WALL_SIZE * SIN(item->pos.yRot + 0x8000) >> W2V_SHIFT);
 				z = item->pos.zPos + (WALL_SIZE * COS(item->pos.yRot + 0x8000) >> W2V_SHIFT);
-				floor = GetFloor(x, item->pos.yPos, z, &room_number);
+				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
 				if (!shiva->flags && floor->box != NO_BOX && !(Boxes[floor->box].overlapIndex & BLOCKABLE))
 					item->goalAnimState = 8;
