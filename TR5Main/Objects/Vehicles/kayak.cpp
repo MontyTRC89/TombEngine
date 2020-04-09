@@ -66,7 +66,7 @@ void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 	RIPPLE_STRUCT* r;
 	int s, c, x, z;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 
 	c = COS(v->pos.yRot);
 	s = SIN(v->pos.yRot);
@@ -74,10 +74,10 @@ void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 	x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
 	z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
 
-	room_number = v->roomNumber;
-	floor = GetFloor(x, v->pos.yPos, z, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(x, v->pos.yPos, z, &roomNumber);
 
-	if (GetWaterHeight(x, v->pos.yPos, z, room_number) != NO_HEIGHT)
+	if (GetWaterHeight(x, v->pos.yPos, z, roomNumber) != NO_HEIGHT)
 	{
 		SetupRipple(x, v->pos.yPos, z, -2 - (GetRandomControl() & 1), 0);
 	}
@@ -164,7 +164,7 @@ int GetInKayak(short item_number, COLL_INFO* coll)
 	int x, z;
 	ITEM_INFO* kayak;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
 		return 0;
@@ -185,8 +185,8 @@ int GetInKayak(short item_number, COLL_INFO* coll)
 	 * SONY BUG FIX 10000001: If player stops in exactly right place and buries
 	 * skidoo in avalanche, then they can get on it and crash the game
 	 */
-	room_number = kayak->roomNumber;
-	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &room_number);
+	roomNumber = kayak->roomNumber;
+	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &roomNumber);
 	if (GetFloorHeight(floor, kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos) > -32000)
 	{
 		short ang;
@@ -352,7 +352,7 @@ int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 {
 	int h;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 
 	phd_PushUnitMatrix();
 	MatrixPtr[M03] = item->pos.xPos;
@@ -364,13 +364,13 @@ int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 	pos->y = (MatrixPtr[M13] >> W2V_SHIFT);
 	pos->z = (MatrixPtr[M23] >> W2V_SHIFT);
 
-	room_number = item->roomNumber;
-	GetFloor(pos->x, pos->y, pos->z, &room_number);
+	roomNumber = item->roomNumber;
+	GetFloor(pos->x, pos->y, pos->z, &roomNumber);
 
-	if ((h = GetWaterHeight(pos->x, pos->y, pos->z, room_number)) == NO_HEIGHT)
+	if ((h = GetWaterHeight(pos->x, pos->y, pos->z, roomNumber)) == NO_HEIGHT)
 	{
-		room_number = item->roomNumber;
-		floor = GetFloor(pos->x, pos->y, pos->z, &room_number);
+		roomNumber = item->roomNumber;
+		floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
 		if ((h = GetFloorHeight(floor, pos->x, pos->y, pos->z)) == NO_HEIGHT)
 			return h;
 	}
@@ -398,7 +398,7 @@ int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 	int shift_x, shift_z;
 	int height;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 
 	x = pos->x >> WALL_SHIFT;
 	z = pos->z >> WALL_SHIFT;
@@ -455,8 +455,8 @@ int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 		x = 0;
 		z = 0;
 
-		room_number = v->roomNumber;
-		floor = GetFloor(old->x, pos->y, pos->z, &room_number);
+		roomNumber = v->roomNumber;
+		floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
 		height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -466,8 +466,8 @@ int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = WALL_SIZE - shift_z;
 		}
 
-		room_number = v->roomNumber;
-		floor = GetFloor(pos->x, pos->y, old->z, &room_number);
+		roomNumber = v->roomNumber;
+		floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
 		height = GetFloorHeight(floor, pos->x, pos->y, old->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -519,7 +519,7 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	PHD_VECTOR pos;
 	int collide, oldx, oldz;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 	int height[8];
 	PHD_VECTOR oldpos[9];
 	int x, z;
@@ -607,9 +607,9 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 
 	/* -------- update the vehicle's actual position */
 
-	room_number = kayak->roomNumber;
-	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &room_number);
-	h = GetWaterHeight(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, room_number);
+	roomNumber = kayak->roomNumber;
+	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &roomNumber);
+	h = GetWaterHeight(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, roomNumber);
 
 	if (h == NO_HEIGHT)
 		h = GetFloorHeight(floor, kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos);
@@ -618,9 +618,9 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 		DoKayakShift(kayak, (PHD_VECTOR*)&kayak->pos, &oldpos[8]);
 
 	/* -------- if position is still invalid - find somewhere decent */
-	room_number = kayak->roomNumber;
-	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &room_number);
-	h = GetWaterHeight(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, room_number);
+	roomNumber = kayak->roomNumber;
+	floor = GetFloor(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, &roomNumber);
+	h = GetWaterHeight(kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos, roomNumber);
 
 	if (h == NO_HEIGHT)
 		h = GetFloorHeight(floor, kayak->pos.xPos, kayak->pos.yPos, kayak->pos.zPos);
@@ -1255,7 +1255,7 @@ int KayakControl()
 	ITEM_INFO* v, * l;
 	FLOOR_INFO* floor;
 	int ofs, water, lp;
-	short room_number;
+	short roomNumber;
 
 	l = LaraItem;
 	v = &Items[g_LaraExtra.Vehicle];
@@ -1270,12 +1270,12 @@ int KayakControl()
 	KayakToBackground(v, Kayak);
 
 	/* -------- determine water level */
-	room_number = v->roomNumber;
-	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 	h = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
 	TestTriggers(TriggerIndex, 0, 0);
 
-	Kayak->Water = water = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, room_number);
+	Kayak->Water = water = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber);
 	if (water == NO_HEIGHT)
 	{
 		Kayak->Water = water = h;
@@ -1300,10 +1300,10 @@ int KayakControl()
 	/* -------- move Lara to Kayak pos */
 	if (g_LaraExtra.Vehicle != NO_ITEM)
 	{
-		if (v->roomNumber != room_number)
+		if (v->roomNumber != roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, room_number);
-			ItemNewRoom(Lara.itemNumber, room_number);
+			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
 		l->pos.xPos = v->pos.xPos;

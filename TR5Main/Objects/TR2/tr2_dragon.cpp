@@ -69,20 +69,20 @@ void createBartoliLight(short ItemIndex, int type)
 		TriggerDynamicLight(item->pos.xPos, item->pos.yPos - STEP_SIZE, item->pos.zPos, (GetRandomControl() & 20) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
 }
 
-short dragonFire(int x, int y, int z, short speed, short yrot, short room_number)
+short dragonFire(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number = NO_ITEM;
 	/*
 	FX_INFO* fx;
 
-	fx_number = CreateNewEffect(room_number);
+	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
 		fx = &Effects[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
-		fx->roomNumber = room_number;
+		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
 		fx->pos.yRot = yrot;
 		fx->speed = 200;

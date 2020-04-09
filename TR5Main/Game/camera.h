@@ -13,11 +13,11 @@
 //#define ChaseCamera ((int(__cdecl*)(ITEM_INFO*)) 0x0040D150)
 //#define CombatCamera ((int(__cdecl*)(ITEM_INFO*)) 0x0040D640)
 #define LookCamera ((void(__cdecl*)(ITEM_INFO*)) 0x0040DC10)
-#define FixedCamera ((void(__cdecl*)()) 0x0040E890)
+//#define FixedCamera ((void(__cdecl*)()) 0x0040E890)
 #define CalculateCamera ((void(__cdecl*)()) 0x0040ED30)
 #define BinocularCamera ((void(__cdecl*)()) 0x0040FC20)
 //#define RefreshCamera ((void(__cdecl*)(short,short*)) 0x004165E0)
-#define CameraCollisionBounds ((int (__cdecl*)(GAME_VECTOR*,int,int)) 0x0040F5C0)
+//#define CameraCollisionBounds ((int (__cdecl*)(GAME_VECTOR*,int,int)) 0x0040F5C0)
 #define do_new_cutscene_camera ((void(__cdecl*)()) 0x00421480)
 #define SaveD3DCameraMatrix ((void(__cdecl*)()) 0x00497280)
 #define UnknownCamera ((void(__cdecl*)()) 0x004975D0)
@@ -33,5 +33,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed);
 void ChaseCamera(ITEM_INFO* item);
 void UpdateCameraElevation();
 void CombatCamera(ITEM_INFO* item);
+int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst);
+void FixedCamera();
 
 void Inject_Camera();
