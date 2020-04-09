@@ -515,13 +515,6 @@ void UpdateRats()
 				else
 					angle = (short)ATAN(dz, dx) - rat->pos.yRot;
 
-				if (i == 0)
-				{
-					printf("xRot: %d, yRot: %d, fallspeed: %d, speed: %d, angle: %d, flags: %d, dx: %d, dz: %d, Y: %d\n",
-						rat->pos.xRot, rat->pos.yRot, rat->fallspeed, rat->speed, angle, rat->flags, dx, dz, rat->pos.yPos);
-				}
-
-
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
 					LaraItem->hitPoints--;

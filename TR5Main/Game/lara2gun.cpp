@@ -290,7 +290,7 @@ void PistolHandler(int weaponType)
 		pos.z = (byte)GetRandomControl() - 128;
 
 		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LJ_LHAND : LJ_RHAND);
-		/*if (gfLevelFlags & 0x2000 && LaraItem->room_number == gfMirrorRoom)
+		/*if (gfLevelFlags & 0x2000 && LaraItem->roomNumber == gfMirrorRoom)
 		{
 			v8 = GetRandomControl() & 0x3F;
 			v9 = (GetRandomControl() & 0x1F) + 128;
