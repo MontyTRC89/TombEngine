@@ -68,7 +68,7 @@ void GetBoatGetOff(ITEM_INFO* boat)
 	/* Wait for last frame of getoff anims before returning to normal Lara control */
 	if ((LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
 	{
-		short room_number;
+		short roomNumber;
 		int x, y, z;
 		FLOOR_INFO* floor;
 
@@ -86,17 +86,17 @@ void GetBoatGetOff(ITEM_INFO* boat)
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 		g_LaraExtra.Vehicle = NO_ITEM;
 
-		room_number = LaraItem->roomNumber;
+		roomNumber = LaraItem->roomNumber;
 		x = LaraItem->pos.xPos + (360 * SIN(LaraItem->pos.yRot) >> W2V_SHIFT);
 		y = LaraItem->pos.yPos - 90;
 		z = LaraItem->pos.zPos + (360 * COS(LaraItem->pos.yRot) >> W2V_SHIFT);
-		floor = GetFloor(x, y, z, &room_number);
+		floor = GetFloor(x, y, z, &roomNumber);
 		if (GetFloorHeight(floor, x, y, z) >= y - STEP_SIZE)
 		{
 			LaraItem->pos.xPos = x;
 			LaraItem->pos.zPos = z;
-			if (room_number != LaraItem->roomNumber)
-				ItemNewRoom(Lara.itemNumber, room_number);
+			if (roomNumber != LaraItem->roomNumber)
+				ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 		LaraItem->pos.yPos = y;
 
@@ -110,7 +110,7 @@ int CanGetOff(int direction)
 {
 	ITEM_INFO* v;
 	FLOOR_INFO* floor;
-	short room_number, angle;
+	short roomNumber, angle;
 	int x, y, z, height, ceiling;
 
 	v = &Items[g_LaraExtra.Vehicle];
@@ -124,8 +124,8 @@ int CanGetOff(int direction)
 	y = v->pos.yPos;
 	z = v->pos.zPos + (GETOFF_DIST * COS(angle) >> W2V_SHIFT);
 
-	room_number = v->roomNumber;
-	floor = GetFloor(x, y, z, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(x, y, z, &roomNumber);
 	height = GetFloorHeight(floor, x, y, z);
 
 	if ((height - v->pos.yPos) < -(WALL_SIZE / 2))
@@ -207,7 +207,7 @@ int TestWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 		Moves the vector in 'pos' to the required test position too */
 	FLOOR_INFO* floor;
 	int s, c, height;
-	short room_number;
+	short roomNumber;
 
 	/* Get y pos correctly, but don't bother changing z_off and x_off using x_rot and z_rot */
 	pos->y = item->pos.yPos - (z_off * SIN(item->pos.xRot) >> W2V_SHIFT) +
@@ -220,12 +220,12 @@ int TestWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 	pos->x = item->pos.xPos + ((z_off * s + x_off * c) >> W2V_SHIFT);
 
 	/* Try to get water height; if none get ground height instead */
-	room_number = item->roomNumber;
-	GetFloor(pos->x, pos->y, pos->z, &room_number); // get correct room (as GetWaterHeight doesn't)
-	height = GetWaterHeight(pos->x, pos->y, pos->z, room_number);
+	roomNumber = item->roomNumber;
+	GetFloor(pos->x, pos->y, pos->z, &roomNumber); // get correct room (as GetWaterHeight doesn't)
+	height = GetWaterHeight(pos->x, pos->y, pos->z, roomNumber);
 	if (height == NO_HEIGHT)
 	{
-		floor = GetFloor(pos->x, pos->y, pos->z, &room_number);
+		floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
 		height = GetFloorHeight(floor, pos->x, pos->y, pos->z);
 		if (height == NO_HEIGHT)
 			return height;
@@ -322,14 +322,14 @@ short DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	else
 	{
 		/* A diagonal hit; means a barrage of tests needed to determine best shift */
-		short room_number;
+		short roomNumber;
 		FLOOR_INFO* floor;
 		int height;
 
 		x = z = 0;
 
-		room_number = skidoo->roomNumber;
-		floor = GetFloor(old->x, pos->y, pos->z, &room_number);
+		roomNumber = skidoo->roomNumber;
+		floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
 		height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -339,8 +339,8 @@ short DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = WALL_SIZE - shift_z;
 		}
 
-		room_number = skidoo->roomNumber;
-		floor = GetFloor(pos->x, pos->y, old->z, &room_number);
+		roomNumber = skidoo->roomNumber;
+		floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
 		height = GetFloorHeight(floor, pos->x, pos->y, old->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -454,7 +454,7 @@ int BoatDynamics(short itemNum)
 	int hfr_old, hfl_old, hbr_old, hbl_old, hf_old;
 	FLOOR_INFO* floor;
 	int height, slip, collide;
-	short room_number, rot;
+	short roomNumber, rot;
 	int newspeed;
 
 	boat = &Items[itemNum];
@@ -541,9 +541,9 @@ int BoatDynamics(short itemNum)
 			DoBoatShift(boat, &f, &f_old);
 	}
 
-	room_number = boat->roomNumber;
-	floor = GetFloor(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, &room_number);
-	height = GetWaterHeight(boat->pos.xPos, boat->pos.yPos - 5, boat->pos.zPos, room_number);
+	roomNumber = boat->roomNumber;
+	floor = GetFloor(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, &roomNumber);
+	height = GetWaterHeight(boat->pos.xPos, boat->pos.yPos - 5, boat->pos.zPos, roomNumber);
 
 	if (height == NO_HEIGHT)
 		height = GetFloorHeight(floor, boat->pos.xPos, boat->pos.yPos - 5, boat->pos.zPos);

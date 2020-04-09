@@ -10,20 +10,20 @@
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 
-void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD room_number)
+void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)
 {
 	short fx_number;
 	short cam_rot;
 	FX_INFO* fx;
 
-	fx_number = CreateNewEffect(room_number);
+	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
 		fx = &Effects[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
-		fx->roomNumber = room_number;
+		fx->roomNumber = roomNumber;
 		//phd_GetVectorAngles(fx->pos.xPos - Camera.pos.x,
 		//					fx->pos.yPos - Camera.pos.y,
 		//					fx->pos.zPos - Camera.pos.z, &cam_rot);

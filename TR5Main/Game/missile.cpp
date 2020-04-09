@@ -134,7 +134,7 @@ void ControlNatlaGun(short fx_number)
 	FX_INFO* fx, *newfx;
 	OBJECT_INFO* object;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 	int x, y, z;
 
 	fx = &Effects[fx_number];
@@ -149,14 +149,14 @@ void ControlNatlaGun(short fx_number)
 		z = fx->pos.zPos + (fx->speed * COS(fx->pos.yRot) >> W2V_SHIFT);
 		x = fx->pos.xPos + (fx->speed * SIN(fx->pos.yRot) >> W2V_SHIFT);
 		y = fx->pos.yPos;
-		room_number = fx->roomNumber;
-		floor = GetFloor(x, y, z, &room_number);
+		roomNumber = fx->roomNumber;
+		floor = GetFloor(x, y, z, &roomNumber);
 
 		/* Don't create one if hit a wall */
 		if (y >= GetFloorHeight(floor, x, y, z) || y <= GetCeiling(floor, x, y, z))
 			return;
 
-		fx_number = CreateNewEffect(room_number);
+		fx_number = CreateNewEffect(roomNumber);
 		if (fx_number != NO_ITEM)
 		{
 			newfx = &Effects[fx_number];
@@ -164,7 +164,7 @@ void ControlNatlaGun(short fx_number)
 			newfx->pos.yPos = y;
 			newfx->pos.zPos = z;
 			newfx->pos.yRot = fx->pos.yRot;
-			newfx->roomNumber = room_number;
+			newfx->roomNumber = roomNumber;
 			newfx->speed = fx->speed;
 			newfx->frameNumber = 0;
 			newfx->objectNumber = ID_PROJ_NATLA;
@@ -172,19 +172,19 @@ void ControlNatlaGun(short fx_number)
 	}
 }
 
-short ShardGun(int x, int y, int z, short speed, short yrot, short room_number)
+short ShardGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number;
 	FX_INFO* fx;
 
-	fx_number = CreateNewEffect(room_number);
+	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
 		fx = &Effects[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
-		fx->roomNumber = room_number;
+		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
 		fx->pos.yRot = yrot;
 		fx->speed = SHARD_SPEED;
@@ -197,19 +197,19 @@ short ShardGun(int x, int y, int z, short speed, short yrot, short room_number)
 	return (fx_number);
 }
 
-short BombGun(int x, int y, int z, short speed, short yrot, short room_number)
+short BombGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number;
 	FX_INFO* fx;
 
-	fx_number = CreateNewEffect(room_number);
+	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
 		fx = &Effects[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
-		fx->roomNumber = room_number;
+		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
 		fx->pos.yRot = yrot;
 		fx->speed = ROCKET_SPEED;
@@ -222,19 +222,19 @@ short BombGun(int x, int y, int z, short speed, short yrot, short room_number)
 	return (fx_number);
 }
 
-short NatlaGun(int x, int y, int z, short speed, short yrot, short room_number)
+short NatlaGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number;
 	FX_INFO* fx;
 
-	fx_number = CreateNewEffect(room_number);
+	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
 		fx = &Effects[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
-		fx->roomNumber = room_number;
+		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
 		fx->pos.yRot = yrot;
 		fx->speed = NATLAGUN_SPEED;

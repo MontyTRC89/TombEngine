@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include "draw.h"
 #include "lara.h"
+#include "effects.h"
+#include "effect2.h"
+#include "debris.h"
 
 struct OLD_CAMERA
 {
@@ -77,7 +80,7 @@ void AlterFOV(int value)
 { 
 	CurrentFOV = value;
 	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
-	LfAspectCorrection = 1; // 1.3333334f / (float)(PhdWidth / PhdHeight);
+	LfAspectCorrection = 1.3333334f / (float)(PhdWidth / PhdHeight);
 }
 
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
@@ -676,6 +679,194 @@ void CombatCamera(ITEM_INFO* item)
 	MoveCamera(&ideal, Camera.speed);
 }
 
+int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
+{
+	int wx = ideal->x;
+	int wy = ideal->y;
+	int wz = ideal->z;
+
+	short roomNumber;
+	FLOOR_INFO* floor;
+	int h;
+	int c;
+	
+	if (yFirst)
+	{
+		roomNumber = ideal->roomNumber;
+		floor = GetFloor(wx, wy, wz, &roomNumber);
+		h = GetFloorHeight(floor, wx, wy, wz);
+		c = GetCeiling(floor, wx, wy, wz);
+
+		if (wy - 255 < c && wy + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			wy = (h + c) >> 1;
+		else if (wy + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			wy = h - 255;
+		else if (wy - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			wy = c + 255;
+	}
+
+	roomNumber = ideal->roomNumber;
+	floor = GetFloor(wx - push, wy, wz, &roomNumber);
+	h = GetFloorHeight(floor, wx - push, wy, wz);
+	c = GetCeiling(floor, wx - push, wy, wz);
+	if (wy > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || wy < c)
+		wx = (wx & (~1023)) + push;
+
+	roomNumber = ideal->roomNumber;
+	floor = GetFloor(wx, wy, wz - push, &roomNumber);
+	h = GetFloorHeight(floor, wx, wy, wz - push);
+	c = GetCeiling(floor, wx, wy, wz - push);
+	if (wy > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || wy < c)
+		wz = (wz & (~1023)) + push;
+
+	roomNumber = ideal->roomNumber;
+	floor = GetFloor(wx + push, wy, wz, &roomNumber);
+	h = GetFloorHeight(floor, wx + push, wy, wz);
+	c = GetCeiling(floor, wx + push, wy, wz);
+	if (wy > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || wy < c)
+		wx = (wx | 1023) - push;
+
+	roomNumber = ideal->roomNumber;
+	floor = GetFloor(wx, wy, wz + push, &roomNumber);
+	h = GetFloorHeight(floor, wx, wy, wz + push);
+	c = GetCeiling(floor, wx, wy, wz + push);
+	if (wy > h || h == NO_HEIGHT || c == NO_HEIGHT || c >= h || wy < c)
+		wz = (wz | 1023) - push;
+
+	if (!yFirst)
+	{
+		roomNumber = ideal->roomNumber;
+		floor = GetFloor(wx, wy, wz, &roomNumber);
+		h = GetFloorHeight(floor, wx, wy, wz);
+		c = GetCeiling(floor, wx, wy, wz);
+
+		if (wy - 255 < c && wy + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			wy = (h + c) >> 1;
+		else if (wy + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			wy = h - 255;
+		else if (wy - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+			wy = c + 255;
+	}
+
+	roomNumber = ideal->roomNumber;
+	floor = GetFloor(wx, wy, wz, &roomNumber);
+	h = GetFloorHeight(floor, wx, wy, wz);
+	c = GetCeiling(floor, wx, wy, wz);
+	if (wy > h || wy < c || h == NO_HEIGHT || c == NO_HEIGHT || c >= h)
+		return 1;
+
+	floor = GetFloor(wx, wy, wz, &ideal->roomNumber);
+	ideal->x = wx;
+	ideal->y = wy;
+	ideal->z = wz;
+
+	return 0;
+}
+
+void FixedCamera()
+{
+	GAME_VECTOR from, to;
+
+	if (UseForcedFixedCamera)
+	{
+		from.x = ForcedFixedCamera.x;
+		from.y = ForcedFixedCamera.y;
+		from.z = ForcedFixedCamera.z;
+		from.roomNumber = ForcedFixedCamera.roomNumber;
+	}
+	else
+	{
+		OBJECT_VECTOR* camera = &Cameras[Camera.number];
+		
+		from.x = camera->x;
+		from.y = camera->y;
+		from.z = camera->z;
+		from.roomNumber = camera->data;
+
+		if (camera->flags & 2)
+		{
+			if (FlashFader > 2)
+			{
+				FlashFader = (FlashFader >> 1) & 0xFE;
+			}
+
+			SniperOverlay = 1;
+			
+			Camera.target.x = (Camera.target.x + 2 * LastTarget.x) / 3;
+			Camera.target.y = (Camera.target.y + 2 * LastTarget.y) / 3;
+			Camera.target.z = (Camera.target.z + 2 * LastTarget.z) / 3;
+			
+			if (SniperCount)
+			{
+				SniperCount--;
+			}
+			else
+			{
+				to.x = Camera.target.x + ((Camera.target.x - Camera.pos.x) >> 1);
+				to.y = Camera.target.y + ((Camera.target.y - Camera.pos.y) >> 1);
+				to.z = Camera.target.z + ((Camera.target.z - Camera.pos.z) >> 1);
+				
+				int los = LOS(&from, &to);
+				GetLaraOnLOS = 1;
+
+				PHD_VECTOR pos;
+				int objLos = ObjectOnLOS2(&from, &to, &pos, &CollidedMeshes[0]);
+				objLos = (objLos != 999 && objLos >= 0 && Items[objLos].objectNumber != ID_LARA);
+
+				if (!(GetRandomControl() & 0x3F)
+					|| !(GlobalCounter & 0x3F)
+					|| objLos && !(GlobalCounter & 0xF) && GetRandomControl() & 1)
+				{
+					SoundEffect(SFX_EXPLOSION1, 0, 83886084);
+					SoundEffect(SFX_HK_FIRE, 0, 0);
+					
+					FlashFadeR = 192;
+					FlashFadeB = 0;
+					FlashFader = 24;
+					FlashFadeG = (GetRandomControl() & 0x1F) + 160;
+					
+					SniperCount = 15;
+					
+					if (objLos && GetRandomControl() & 3)
+					{
+						DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->roomNumber);
+						LaraItem->hitPoints -= 100;
+						GetLaraOnLOS = 0;
+					}
+					else if (objLos < 0)
+					{
+						MESH_INFO* mesh = CollidedMeshes[0];
+						if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
+						{
+							ShatterObject(0, mesh, 128, to.roomNumber, 0);
+							mesh->Flags &= ~1;
+							SoundEffect(ShatterSounds[CurrentLevel - 5][mesh->staticNumber], (PHD_3DPOS*)mesh, 0);
+						}
+						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
+						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
+						GetLaraOnLOS = 0;
+					}
+					else if (!los)
+					{
+						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);
+					}
+				}
+				GetLaraOnLOS = 0;
+			}
+		}
+	}
+
+	Camera.fixedCamera = 1;
+
+	MoveCamera(&from, 1);
+
+	if (Camera.timer)
+	{
+		if (!--Camera.timer)
+			Camera.timer = -1;
+	}
+}
+
 void Inject_Camera()
 {
 	INJECT(0x0048EDC0, AlterFOV);
@@ -686,4 +877,6 @@ void Inject_Camera()
 	INJECT(0x004107C0, UpdateCameraElevation);
 	INJECT(0x0040D150, ChaseCamera);
 	INJECT(0x0040D640, CombatCamera);
+	INJECT(0x0040F5C0, CameraCollisionBounds);
+	INJECT(0x0040E890, FixedCamera);
 }

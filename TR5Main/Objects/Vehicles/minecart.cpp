@@ -71,7 +71,7 @@ static int TestHeight(ITEM_INFO* v, int x, int z)
 	PHD_VECTOR pos;
 	FLOOR_INFO* floor;
 	int s, c;
-	short room_number;
+	short roomNumber;
 
 	c = COS(v->pos.yRot);
 	s = SIN(v->pos.yRot);
@@ -80,8 +80,8 @@ static int TestHeight(ITEM_INFO* v, int x, int z)
 	pos.y = v->pos.yPos - (z * SIN(v->pos.xRot) >> W2V_SHIFT) + (x * SIN(v->pos.zRot) >> W2V_SHIFT);
 	pos.z = v->pos.zPos + (((z * c) - (x * s)) >> W2V_SHIFT);
 
-	room_number = v->roomNumber;
-	floor = GetFloor(pos.x, pos.y, pos.z, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	return GetFloorHeight(floor, pos.x, pos.y, pos.z);
 }
 
@@ -89,14 +89,14 @@ static short GetCollision(ITEM_INFO* v, short ang, int dist, short* ceiling)
 {
 	FLOOR_INFO* floor;
 	int x, y, z, height, cheight;
-	short room_number;
+	short roomNumber;
 
 	x = v->pos.xPos + ((SIN(ang) * dist) >> W2V_SHIFT);
 	y = v->pos.yPos - LARA_HITE;
 	z = v->pos.zPos + ((COS(ang) * dist) >> W2V_SHIFT);
 
-	room_number = v->roomNumber;
-	floor = GetFloor(x, y, z, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(x, y, z, &roomNumber);
 	height = GetFloorHeight(floor, x, y, z);
 	cheight = GetCeiling(floor, x, y, z);
 
@@ -113,7 +113,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	int dist;
 	int x, z;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || l->gravityStatus)
 		return 0;
@@ -133,8 +133,8 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	if (dist > SQUARE(WALL_SIZE/2))
 		return false;
 
-	room_number = v->roomNumber;
-	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 	if (GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos) < -32000)
 		return false;
 
@@ -145,7 +145,7 @@ static bool CanGetOut(int direction)
 {
 	ITEM_INFO* v;
 	FLOOR_INFO* floor;
-	short room_number, angle;
+	short roomNumber, angle;
 	int x, y, z, height, ceiling;
 
 	v = &Items[g_LaraExtra.Vehicle];
@@ -160,8 +160,8 @@ static bool CanGetOut(int direction)
 	y = v->pos.yPos;
 	z = v->pos.zPos - (GETOFF_DIST * COS(angle) >> W2V_SHIFT);
 
-	room_number = v->roomNumber;
-	floor = GetFloor(x, y, z, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(x, y, z, &roomNumber);
 	height = GetFloorHeight(floor, x, y, z);
 
 	if ((HeightType == BIG_SLOPE) || (HeightType == DIAGONAL) || (height == NO_HEIGHT))
@@ -220,7 +220,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 								if ((item->frameNumber == Anims[item->animNumber].frameBase) && (LaraItem->currentAnimState == CART_USE) && (LaraItem->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 6))
 								{
 									FLOOR_INFO* floor;
-									short frame, room_number;
+									short frame, roomNumber;
 
 									frame = LaraItem->frameNumber - Anims[LaraItem->animNumber].frameBase;
 
@@ -228,8 +228,8 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 									{
 										SoundEffect(220, &item->pos, 2);
 
-										room_number = item->roomNumber;
-										floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
+										roomNumber = item->roomNumber;
+										floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
 										TestTriggers(TriggerIndex, TRUE, 0); // heavytrigger enabled
 										item->frameNumber++;
@@ -874,7 +874,7 @@ int MineCartControl()
 	CART_INFO* cart;
 	ITEM_INFO* v;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 
 	v = &Items[g_LaraExtra.Vehicle];
 	if (v->data == NULL) { printf("v->data is nullptr !"); return 0; }
@@ -896,13 +896,13 @@ int MineCartControl()
 		LaraItem->pos.zRot = v->pos.zRot;
 	}
 
-	room_number = v->roomNumber;
-	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 
-	if (room_number != v->roomNumber)
+	if (roomNumber != v->roomNumber)
 	{
-		ItemNewRoom(g_LaraExtra.Vehicle, room_number);
-		ItemNewRoom(Lara.itemNumber, room_number);
+		ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
 	TestTriggers(TriggerIndex, FALSE, 0);

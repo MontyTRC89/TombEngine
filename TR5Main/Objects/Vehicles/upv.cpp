@@ -215,14 +215,14 @@ void SubEffects(short item_number)
 			if ((GetRandomControl() & 1) == 0)
 			{
 				PHD_3DPOS pos3d;
-				short room_number;
+				short roomNumber;
 
 				pos3d.xPos = pos.x + (GetRandomControl() & 63) - 32;
 				pos3d.yPos = pos.y + SUB_DRAW_SHIFT;
 				pos3d.zPos = pos.z + (GetRandomControl() & 63) - 32;
-				room_number = v->roomNumber;
-				GetFloor(pos3d.xPos, pos3d.yPos, pos3d.zPos, &room_number);
-				CreateBubble((PHD_VECTOR*)&pos3d, room_number, 4, 8, 0, 0, 0, 0); // CHECK
+				roomNumber = v->roomNumber;
+				GetFloor(pos3d.xPos, pos3d.yPos, pos3d.zPos, &roomNumber);
+				CreateBubble((PHD_VECTOR*)&pos3d, roomNumber, 4, 8, 0, 0, 0, 0); // CHECK
 			}
 		}
 	}
@@ -269,7 +269,7 @@ void SubEffects(short item_number)
 static int CanGetOff(ITEM_INFO* v)
 {
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 	int x, y, z, height, ceiling, speed;
 	short	yangle;
 
@@ -282,8 +282,8 @@ static int CanGetOff(ITEM_INFO* v)
 	z = v->pos.zPos + (speed * COS(yangle) >> W2V_SHIFT);
 	y = v->pos.yPos - ((GETOFF_DIST * SIN(-v->pos.xRot)) >> W2V_SHIFT);
 
-	room_number = v->roomNumber;
-	floor = GetFloor(x, y, z, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(x, y, z, &roomNumber);
 
 	height = GetFloorHeight(floor, x, y, z);
 	if (height == NO_HEIGHT || y > height)
@@ -303,7 +303,7 @@ int GetOnSub(short item_number, COLL_INFO* coll)
 	int x, y, z;
 	ITEM_INFO* v, * l;
 	FLOOR_INFO* floor;
-	short room_number, ang;
+	short roomNumber, ang;
 	unsigned short tempang;
 
 	l = LaraItem;
@@ -323,8 +323,8 @@ int GetOnSub(short item_number, COLL_INFO* coll)
 	if (dist > SQUARE(512))
 		return 0;
 
-	room_number = v->roomNumber;
-	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 
 	if (GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos) < -32000)
 		return 0;
@@ -841,7 +841,7 @@ int SubControl()
 	SUB_INFO* sub;
 	ITEM_INFO* v, * l;
 	FLOOR_INFO* floor;
-	short room_number;
+	short roomNumber;
 
 	l = LaraItem;
 	v = &Items[g_LaraExtra.Vehicle];
@@ -869,13 +869,13 @@ int SubControl()
 	}
 
 	/* -------- determine if vehicle is near the surface */
-	room_number = v->roomNumber;
-	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &room_number);
+	roomNumber = v->roomNumber;
+	floor = GetFloor(v->pos.xPos, v->pos.yPos, v->pos.zPos, &roomNumber);
 	v->floor = GetFloorHeight(floor, v->pos.xPos, v->pos.yPos, v->pos.zPos);
 
 	if ((sub->Flags & UPV_CONTROL) && (!(sub->Flags & UPV_DEAD)))
 	{
-		h = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, room_number);
+		h = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber);
 
 		if ((h != NO_HEIGHT) && (!(Rooms[v->roomNumber].flags & ENV_FLAG_WATER)))
 		{
@@ -947,10 +947,10 @@ int SubControl()
 			sub->WeaponTimer = HARPOON_RELOAD;
 		}
 
-		if (room_number != v->roomNumber)
+		if (roomNumber != v->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, room_number);
-			ItemNewRoom(Lara.itemNumber, room_number);
+			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
 		l->pos.xPos = v->pos.xPos;
@@ -980,8 +980,8 @@ int SubControl()
 	{
 		AnimateItem(l);
 
-		if (room_number != v->roomNumber)
-			ItemNewRoom(g_LaraExtra.Vehicle, room_number);
+		if (roomNumber != v->roomNumber)
+			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
 
 		BackgroundCollision(v, l, sub);
 
