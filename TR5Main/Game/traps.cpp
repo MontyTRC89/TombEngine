@@ -8,6 +8,8 @@
 #include "collide.h"
 #include "switch.h"
 #include "sphere.h"
+#include "camera.h"
+#include "objlight.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
@@ -638,12 +640,15 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void _WreckingBallControl(short itemNumber)
+void WreckingBallControl(short itemNumber)
 {
-	ITEM_INFO* item;
-	int x, z, test;
+	ITEM_INFO* item, *item2;
+	int test, x, z, oldX, oldZ, wx, wz, flagX, flagZ, height, dx, dz, ceilingX, ceilingZ, adx, adz;
+	short room;
 
 	item = &Items[itemNumber];
+	test = 1;
+	item2 = &Items[item->itemFlags[3]];
 	if (LaraItem->pos.xPos >= 45056 && LaraItem->pos.xPos <= 57344 && LaraItem->pos.zPos >= 26624 && LaraItem->pos.zPos <= 43008
 		|| item->itemFlags[2] < 900)
 	{
@@ -674,12 +679,195 @@ void _WreckingBallControl(short itemNumber)
 		++item->itemFlags[2];
 	if (GlobalPlayingCutscene)
 	{
-
+		room = item->roomNumber;
+		item->goalAnimState = 0;
+		item->pos.xPos = 47616;
+		item->pos.zPos = 34816;
+		item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1664;
 	}
-	else
+	else if (item->itemFlags[1] <= 0)
 	{
-
+		oldX = item->pos.xPos;
+		oldZ = item->pos.zPos;
+		x = x & 0xFFFFFE00 | 0x200;
+		z = z & 0xFFFFFE00 | 0x200;
+		dx = x - item->pos.xPos;
+		dz = z - item->pos.zPos;
+		wx = 0;
+		if (dx < 0)
+			wx = -1024;
+		else if (dx > 0)
+			wx = 1024;
+		wz = 0;
+		if (dz < 0)
+			wz = -1024;
+		else if (dz > 0)
+			wz = 1024;
+		room = item->roomNumber;
+		ceilingX = GetCeiling(GetFloor(item->pos.xPos + wx, item2->pos.yPos, item->pos.zPos, &room), item->pos.xPos + wx, item2->pos.yPos, item->pos.zPos);
+		room = item->roomNumber;
+		ceilingZ = GetCeiling(GetFloor(item->pos.xPos, item2->pos.yPos, item->pos.zPos + wz, &room), item->pos.xPos, item2->pos.yPos, item->pos.zPos + wz);
+		if (ceilingX <= item2->pos.yPos && ceilingX != NO_HEIGHT)
+			flagX = 1;
+		else
+			flagX = 0;
+		if (ceilingZ <= item2->pos.yPos && ceilingZ != NO_HEIGHT)
+			flagZ = 1;
+		else
+			flagZ = 0;
+		if (!item->itemFlags[0])
+		{
+			if (flagX && dx && (abs(dx) > abs(dz) || !flagZ || GetRandomControl() & 1))
+			{
+				item->itemFlags[0] = 1;
+			}
+			else if (flagZ && dz)
+			{
+				item->itemFlags[0] = 2;
+			}
+		}
+		if (item->itemFlags[0] == 1)
+		{
+			SoundEffect(SFX_GRAB_MOTOR_B_LP, &item->pos, 0);
+			adx = abs(dx);
+			if (adx >= 32)
+				adx = 32;
+			if (dx > 0)
+			{
+				item->pos.xPos += adx;
+			}
+			else if (dx < 0)
+			{
+				item->pos.xPos -= adx;
+			}
+			else
+			{
+				item->itemFlags[0] = 0;
+			}
+		}
+		if (item->itemFlags[0] == 2)
+		{
+			SoundEffect(SFX_GRAB_MOTOR_B_LP, &item->pos, 0);
+			adz = abs(dz);
+			if (adz >= 32)
+				adz = 32;
+			if (dz > 0)
+			{
+				item->pos.zPos += adz;
+			}
+			else if (dz < 0)
+			{
+				item->pos.zPos -= adz;
+			}
+			else
+			{
+				item->itemFlags[0] = 0;
+			}
+		}
+		if (item->itemFlags[1] == -1 && (oldX != item->pos.xPos || oldZ != item->pos.zPos))
+		{
+			item->itemFlags[1] = 0;
+			SoundEffect(SFX_GRAB_MOTOR_A, &item->pos, 0);
+		}
+		if ((item->pos.xPos & 0x3FF) == 512 && (item->pos.zPos & 0x3FF) == 512)
+			item->itemFlags[0] = 0;
+		if (x == item->pos.xPos && z == item->pos.zPos && test)
+		{
+			if (item->itemFlags[1] != -1)
+			{
+				StopSoundEffect(SFX_GRAB_MOTOR_B_LP);
+				SoundEffect(SFX_GRAB_MOTOR_C, &item->pos, 0);
+			}
+			item->itemFlags[1] = 1;
+			item->triggerFlags = 30;
+		}
 	}
+	else if (item->itemFlags[1] == 1)
+	{
+		if (!item->triggerFlags)
+		{
+			--item->triggerFlags;
+		}
+		else if (!item->currentAnimState)
+		{
+			item->goalAnimState = 1;
+		}
+		else if (item->frameNumber == Anims[item->animNumber].frameEnd)
+		{
+			SoundEffect(SFX_GRAB_DROP, &item->pos, 0);
+			++item->itemFlags[1];
+			item->fallspeed = 6;
+			item->pos.yPos += item->fallspeed;
+		}
+	}
+	else if (item->itemFlags[1] == 2)
+	{
+		item->fallspeed += 24;
+		item->pos.yPos += item->fallspeed;
+		room = item->roomNumber;
+		height = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		if (height < item->pos.yPos)
+		{
+			item->pos.yPos = height;
+			if (item->fallspeed > 48)
+			{
+				BounceCamera(item, 64, 8192);
+				item->fallspeed = -item->fallspeed >> 3;
+			}
+			else
+			{
+				++item->itemFlags[1];
+				item->fallspeed = 0;
+			}
+		}
+		else if (height - item->pos.yPos < 1536 && item->currentAnimState)
+		{
+			item->goalAnimState = 0;
+		}
+	}
+	else if (item->itemFlags[1] == 3)
+	{
+		item->fallspeed -= 3;
+		item->pos.yPos += item->fallspeed;
+		if (item->pos.yPos < item2->pos.yPos + 1644)
+		{
+			StopSoundEffect(SFX_GRAB_WINCH_UP_LP);
+			item->itemFlags[0] = 1;
+			item->pos.yPos = item2->pos.yPos + 1644;
+			if (item->fallspeed < -32)
+			{
+				SoundEffect(SFX_GRAB_IMPACT, &item->pos, 4104);
+				item->fallspeed = -item->fallspeed >> 3;
+				BounceCamera(item, 16, 8192);
+			}
+			else
+			{
+				item->itemFlags[1] = -1;
+				item->fallspeed = 0;
+				item->itemFlags[0] = 0;
+			}
+		}
+		else if (!item->itemFlags[0])
+		{
+			SoundEffect(SFX_GRAB_WINCH_UP_LP, &item->pos, 0);
+		}
+	}
+	item2->pos.xPos = item->pos.xPos;
+	item2->pos.zPos = item->pos.zPos;
+	room = item->roomNumber;
+	item2->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	GetFloor(item2->pos.xPos, item2->pos.yPos, item2->pos.zPos, &room);
+	if (room != item2->roomNumber)
+		ItemNewRoom(item->itemFlags[3], room);
+	TriggerAlertLight(item2->pos.xPos, item2->pos.yPos + 64, item2->pos.zPos, 255, 64, 0, 64 * (GlobalCounter & 0x3F), item2->roomNumber, 24);
+	TriggerAlertLight(item2->pos.xPos, item2->pos.yPos + 64, item2->pos.zPos, 255, 64, 0, 64 * (GlobalCounter - 32) & 0xFFF, item2->roomNumber, 24);
+	room = item->roomNumber;
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
+	if (room != item->roomNumber)
+		ItemNewRoom(itemNumber, room);
+	AnimateItem(item);
+	WBItem = item;
+	WBRoom = room;
 }
 
 void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)

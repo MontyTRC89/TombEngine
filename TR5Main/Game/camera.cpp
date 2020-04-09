@@ -129,6 +129,28 @@ int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 	return flag == 0;
 }
 
+void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
+{
+	int distance;
+
+	distance = SQRT_ASM(SQUARE(item->pos.xPos - Camera.pos.x) + SQUARE(item->pos.yPos - Camera.pos.y) + SQUARE(item->pos.zPos - Camera.pos.z));
+	if (distance < maxDistance)
+	{
+		if (maxDistance == -1)
+		{
+			Camera.bounce = bounce;
+		}
+		else
+		{
+			Camera.bounce = -(bounce * (maxDistance - distance) / maxDistance);
+		}
+	}
+	else if (maxDistance == -1)
+	{
+		Camera.bounce = bounce;
+	}
+}
+
 void Inject_Camera()
 {
 	INJECT(0x0048EDC0, AlterFOV);
