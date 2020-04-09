@@ -341,9 +341,9 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	else
 	{
 		short angle = ATAN(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x += PhdPerspective * SIN(angle) >> W2V_SHIFT;
+		Camera.mikePos.x = Camera.pos.x + (PhdPerspective * SIN(angle) >> W2V_SHIFT);
 		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z += PhdPerspective * COS(angle) >> W2V_SHIFT;
+		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * COS(angle) >> W2V_SHIFT);
 		Camera.oldType = Camera.type;
 	}
 }
@@ -867,6 +867,11 @@ void FixedCamera()
 	}
 }
 
+void LookCamera(ITEM_INFO*)
+{
+
+}
+
 void Inject_Camera()
 {
 	INJECT(0x0048EDC0, AlterFOV);
@@ -879,4 +884,5 @@ void Inject_Camera()
 	INJECT(0x0040D640, CombatCamera);
 	INJECT(0x0040F5C0, CameraCollisionBounds);
 	INJECT(0x0040E890, FixedCamera);
+	//INJECT(0x0040DC10, LookCamera);
 }
