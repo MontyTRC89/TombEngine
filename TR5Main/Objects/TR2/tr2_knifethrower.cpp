@@ -70,20 +70,20 @@ void KnifeControl(short fxNum)
 	}
 }
 
-short ThrowKnife(int x, int y, int z, short speed, short yrot, short room_number)
+short ThrowKnife(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number = 0;
 	/*
 	FX_INFO* fx;
 
-	fx_number = CreateNewEffect(room_number);
+	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
 		fx = &Effects[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
-		fx->roomNumber = room_number;
+		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
 		fx->pos.yRot = yrot;
 		fx->speed = 150;
