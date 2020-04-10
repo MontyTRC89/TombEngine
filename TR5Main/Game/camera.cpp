@@ -33,6 +33,8 @@ GAME_VECTOR	Ideals[5];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
+GAME_VECTOR LookCamPosition;
+GAME_VECTOR LookCamTarget;
 
 void ActivateCamera()
 {
@@ -867,9 +869,293 @@ void FixedCamera()
 	}
 }
 
-void LookCamera(ITEM_INFO*)
-{
 
+void LookCamera(ITEM_INFO* item)
+{
+	short headXrot = Lara.headXrot;
+	short headYrot = Lara.headYrot;
+	short torsoXrot = Lara.torsoXrot;
+	short torsoYrot = Lara.torsoYrot;
+
+	Lara.torsoXrot = 0;
+	Lara.torsoYrot = 0;
+	Lara.headXrot <<= 1;
+	Lara.headYrot <<= 1;
+
+	if (Lara.headXrot > ANGLE(55)) 
+		Lara.headXrot = ANGLE(55);
+	else if (Lara.headXrot < -ANGLE(75)) 
+		Lara.headXrot = -ANGLE(75);
+	if (Lara.headYrot < -ANGLE(80))
+		Lara.headYrot = -ANGLE(80);
+	else if (Lara.headYrot > ANGLE(80))
+		Lara.headYrot = ANGLE(80);
+
+	if (abs(Lara.headXrot - OldCam.pos.xRot) >= 16)
+		OldCam.pos.xRot = (Lara.headXrot + OldCam.pos.xRot) >> 1;
+	else
+		OldCam.pos.xRot = Lara.headXrot;
+	if (abs(Lara.headYrot - OldCam.pos.yRot) >= 16)
+		OldCam.pos.yRot = (Lara.headYrot + OldCam.pos.yRot) >> 1;
+	else
+		OldCam.pos.yRot = Lara.headYrot;
+
+	PHD_VECTOR pos;
+	pos.x = 0;
+	pos.y = 16;
+	pos.z = 64;
+	GetLaraJointPosition(&pos, LJ_HEAD);
+	
+	short roomNumber = LaraItem->roomNumber;
+	FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+	int h = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+	int c = GetCeiling(floor, pos.x, pos.y, pos.z);
+	if (h == NO_HEIGHT || c == NO_HEIGHT || c >= h || pos.y > h || pos.y < c)
+	{
+		pos.x = 0;
+		pos.y = 16;
+		pos.z = 0;
+		GetLaraJointPosition(&pos, LJ_HEAD);
+		
+		roomNumber = LaraItem->roomNumber;
+		floor = GetFloor(pos.x, pos.y + 256, pos.z, &roomNumber);
+		if (Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		{
+			pos.y = Rooms[roomNumber].y - 256;
+			floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+		}
+		else
+			floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+
+		h = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+		c = GetCeiling(floor, pos.x, pos.y, pos.z);
+		if (h == NO_HEIGHT || c == NO_HEIGHT || c >= h || pos.y > h || pos.y < c)
+		{
+			pos.x = 0;
+			pos.y = 16;
+			pos.z = -64;
+			GetLaraJointPosition(&pos, LJ_HEAD);
+		}
+	}
+
+	PHD_VECTOR pos2;
+	pos2.x = 0;
+	pos2.y = 0;
+	pos2.z = -1024;
+	GetLaraJointPosition(&pos2, LJ_HEAD);
+
+	PHD_VECTOR pos3;
+	pos3.x = 0;
+	pos3.y = 0;
+	pos3.z = 2048;
+	GetLaraJointPosition(&pos3, LJ_HEAD);
+
+	int dx = (pos2.x - pos.x) >> 3;
+	int dy = (pos2.y - pos.y) >> 3;
+	int dz = (pos2.z - pos.z) >> 3;
+	int wx = pos.x;
+	int wy = pos.y;
+	int wz = pos.z;
+
+	short roomNumber2 = LaraItem->roomNumber;
+	int i = 0;
+	for (i = 0; i < 8; i++)
+	{
+		roomNumber = roomNumber2;
+		floor = GetFloor(wx, wy + 256, wz, &roomNumber2);
+		if (Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
+		{
+			wy = Rooms[roomNumber2].y - 256;
+			break;
+		}
+		else
+			floor = GetFloor(wx, wy, wz, &roomNumber2);
+		h = GetFloorHeight(floor, wx, wy, wz);
+		c = GetCeiling(floor, wx, wy, wz);
+		if (h == NO_HEIGHT || c == NO_HEIGHT || c >= h || wy > h || wy < c)
+			break;
+		wx += dx;
+		wy += dy;
+		wz += dz;
+	}
+
+	if (i)
+	{
+		wx -= dx;
+		wy -= dy;
+		wz -= dz;
+	}
+
+	GAME_VECTOR ideal;
+	ideal.x = wx;
+	ideal.y = wy;
+	ideal.z = wz;
+	ideal.roomNumber = roomNumber;
+
+	if (OldCam.pos.xRot == Lara.headXrot &&
+		OldCam.pos.yRot == Lara.headYrot &&
+		OldCam.pos.xPos == LaraItem->pos.xPos &&
+		OldCam.pos.yPos == LaraItem->pos.yPos &&
+		OldCam.pos.zPos == LaraItem->pos.zPos &&
+		OldCam.currentAnimState == LaraItem->currentAnimState&&
+		OldCam.goalAnimState == LaraItem->goalAnimState&&
+		Camera.oldType == LOOK_CAMERA)
+	{
+		ideal.x = LookCamPosition.x;
+		ideal.y = LookCamPosition.y;
+		ideal.z = LookCamPosition.z;
+		ideal.roomNumber = LookCamPosition.roomNumber;
+		pos3.x = LookCamTarget.x;
+		pos3.y = LookCamTarget.y;
+		pos3.z = LookCamTarget.z;
+	}
+	else
+	{
+		OldCam.pos.xRot = Lara.headXrot;
+		OldCam.pos.yRot = Lara.headYrot;
+		OldCam.pos.xPos = LaraItem->pos.xPos;
+		OldCam.pos.yPos = LaraItem->pos.yPos;
+		OldCam.pos.zPos = LaraItem->pos.zPos;
+		OldCam.currentAnimState = LaraItem->currentAnimState;
+		OldCam.goalAnimState = LaraItem->goalAnimState;
+		LookCamPosition.x = ideal.x;
+		LookCamPosition.y = ideal.y;
+		LookCamPosition.z = ideal.z;
+		LookCamPosition.roomNumber = ideal.roomNumber;
+		LookCamTarget.x = pos3.x;
+		LookCamTarget.y = pos3.y;
+		LookCamTarget.z = pos3.z;
+	}
+
+	CameraCollisionBounds(&ideal, 224, 1);
+
+	if (Camera.oldType == FIXED_CAMERA)
+	{
+		Camera.pos.x = ideal.x;
+		Camera.pos.y = ideal.y;
+		Camera.pos.z = ideal.z;
+		Camera.target.x = pos3.x;
+		Camera.target.y = pos3.y;
+		Camera.target.z = pos3.z;
+		Camera.target.roomNumber = LaraItem->roomNumber;
+	}
+	else
+	{
+		Camera.pos.x += (ideal.x - Camera.pos.x) >> 2;
+		Camera.pos.y += (ideal.y - Camera.pos.y) >> 2;
+		Camera.pos.z += (ideal.z - Camera.pos.z) >> 2;
+		Camera.target.x += (pos3.x - Camera.target.x) >> 2;
+		Camera.target.y += (pos3.y - Camera.target.y) >> 2;
+		Camera.target.z += (pos3.z - Camera.target.z) >> 2;
+		Camera.target.roomNumber = LaraItem->roomNumber;
+	}
+
+	if (Camera.bounce && Camera.type == Camera.oldType)
+	{
+		if (Camera.bounce <= 0)
+		{
+			Camera.target.x += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
+			Camera.target.y += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
+			Camera.target.z += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
+			Camera.bounce += 5;
+		}
+		else
+		{
+			Camera.pos.y += Camera.bounce;
+			Camera.target.y += Camera.bounce;
+			Camera.bounce = 0;
+		}
+	}
+
+	wx = Camera.pos.x;
+	wy = Camera.pos.y;
+	wz = Camera.pos.z;
+	roomNumber = Camera.pos.roomNumber;
+	floor = GetFloor(wx, wy, wz, &roomNumber);
+	h = GetFloorHeight(floor, wx, wy, wz);
+	c = GetCeiling(floor, wx, wy, wz);
+
+	if (wy - 255 < c && wy + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+		Camera.pos.y = (h + c) >> 1;
+	else if (wy + 255 > h && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+		Camera.pos.y = h - 255;
+	else if (wy - 255 < c && c < h && c != NO_HEIGHT && h != NO_HEIGHT)
+		Camera.pos.y = c + 255;
+
+	wx = Camera.pos.x;
+	wy = Camera.pos.y;
+	wz = Camera.pos.z;
+	roomNumber = Camera.pos.roomNumber;
+	floor = GetFloor(wx, wy, wz, &roomNumber);
+	h = GetFloorHeight(floor, wx, wy, wz);
+	c = GetCeiling(floor, wx, wy, wz);
+	if ((Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
+		Camera.pos.y = Rooms[roomNumber].y - 256;
+	else	if (wy < c || wy > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
+		mgLOS(&Camera.target, &Camera.pos, 0);
+
+	wx = Camera.pos.x;
+	wy = Camera.pos.y;
+	wz = Camera.pos.z;
+	roomNumber = Camera.pos.roomNumber;
+	floor = GetFloor(wx, wy, wz, &roomNumber);
+	h = GetFloorHeight(floor, wx, wy, wz);
+	c = GetCeiling(floor, wx, wy, wz);
+	if (wy < c || wy > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT || (Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
+	{
+		Camera.pos.x = pos.x;
+		Camera.pos.y = pos.y;
+		Camera.pos.z = pos.z;
+		Camera.pos.roomNumber = LaraItem->roomNumber;
+	}
+
+	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
+	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+
+	if (Camera.mikeAtLara)
+	{
+		Camera.actualAngle = LaraItem->pos.yRot + Lara.headYrot + Lara.torsoYrot;
+		Camera.mikePos.x = LaraItem->pos.xPos;
+		Camera.mikePos.y = LaraItem->pos.yPos;
+		Camera.mikePos.z = LaraItem->pos.zPos;
+	}
+	else
+	{
+		Camera.actualAngle = ATAN(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * SIN(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * COS(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.y = Camera.pos.y;
+	}
+
+	Camera.oldType = Camera.type;
+
+	Lara.headXrot = headXrot;
+	Lara.headYrot = headYrot;
+	Lara.torsoXrot = torsoXrot;
+	Lara.torsoYrot = torsoYrot;
+
+}
+
+void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
+{
+	int distance;
+
+	distance = SQRT_ASM(SQUARE(item->pos.xPos - Camera.pos.x) + SQUARE(item->pos.yPos - Camera.pos.y) + SQUARE(item->pos.zPos - Camera.pos.z));
+	if (distance < maxDistance)
+	{
+		if (maxDistance == -1)
+		{
+			Camera.bounce = bounce;
+		}
+		else
+		{
+			Camera.bounce = -(bounce * (maxDistance - distance) / maxDistance);
+		}
+	}
+	else if (maxDistance == -1)
+	{
+		Camera.bounce = bounce;
+	}
 }
 
 void Inject_Camera()
@@ -884,5 +1170,5 @@ void Inject_Camera()
 	INJECT(0x0040D640, CombatCamera);
 	INJECT(0x0040F5C0, CameraCollisionBounds);
 	INJECT(0x0040E890, FixedCamera);
-	//INJECT(0x0040DC10, LookCamera);
+	INJECT(0x0040DC10, LookCamera);
 }

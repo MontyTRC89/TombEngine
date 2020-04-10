@@ -49,7 +49,7 @@
 #define DrawPortal ((void (__cdecl*)(ITEM_INFO*)) 0x004CFF80)
 //#define InitialiseWreckingBall ((void (__cdecl*)(short)) 0x0043EF20)
 //#define WreckingBallCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00441D50)
-#define WreckingBallControl ((void (__cdecl*)(short)) 0x00441410)
+//#define WreckingBallControl ((void (__cdecl*)(short)) 0x00441410)
 #define DrawWreckingBall ((void (__cdecl*)(ITEM_INFO*)) 0x00441F50)
 //#define InitialiseVentilator ((void (__cdecl*)(short)) 0x0043F3D0)
 //#define VentilatorControl ((void (__cdecl*)(short)) 0x00405610)
@@ -76,7 +76,7 @@ void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height);
 void FallingBlockCeiling(ITEM_INFO* item, int x, int y, int z, int* height);
 void InitialiseWreckingBall(short itemNumber);
 void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
-void _WreckingBallControl(short itemNumber);
+void WreckingBallControl(short itemNumber);
 void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void InitialiseFlameEmitter2(short itemNumber);
 void InitialiseFlameEmitter(short itemNumber);
