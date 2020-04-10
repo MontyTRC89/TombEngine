@@ -35,6 +35,7 @@ void UpdateCameraElevation();
 void CombatCamera(ITEM_INFO* item);
 int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst);
 void FixedCamera();
-void LookCamera(ITEM_INFO*);
+void LookCamera(ITEM_INFO* item);
+void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);
 
 void Inject_Camera();
