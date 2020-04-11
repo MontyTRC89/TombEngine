@@ -14,8 +14,8 @@
 //#define CombatCamera ((int(__cdecl*)(ITEM_INFO*)) 0x0040D640)
 //#define LookCamera ((void(__cdecl*)(ITEM_INFO*)) 0x0040DC10)
 //#define FixedCamera ((void(__cdecl*)()) 0x0040E890)
-#define CalculateCamera ((void(__cdecl*)()) 0x0040ED30)
-#define BinocularCamera ((void(__cdecl*)()) 0x0040FC20)
+//#define CalculateCamera ((void(__cdecl*)()) 0x0040ED30)
+//#define BinocularCamera ((void(__cdecl*)()) 0x0040FC20)
 //#define RefreshCamera ((void(__cdecl*)(short,short*)) 0x004165E0)
 //#define CameraCollisionBounds ((int (__cdecl*)(GAME_VECTOR*,int,int)) 0x0040F5C0)
 #define do_new_cutscene_camera ((void(__cdecl*)()) 0x00421480)
@@ -34,8 +34,12 @@ void ChaseCamera(ITEM_INFO* item);
 void UpdateCameraElevation();
 void CombatCamera(ITEM_INFO* item);
 int CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst);
-void FixedCamera();
+void FixedCamera(ITEM_INFO* item);
 void LookCamera(ITEM_INFO* item);
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);
+void BinocularCamera(ITEM_INFO* item);
+void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color);
+void ConfirmCameraTargetPos();
+void CalculateCamera();
 
 void Inject_Camera();
