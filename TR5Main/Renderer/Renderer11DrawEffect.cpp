@@ -324,7 +324,7 @@ void Renderer11::drawSparks()
 
 void Renderer11::drawSplahes()
 {
-	constexpr size_t NUM_POINTS = 12;
+	constexpr size_t NUM_POINTS = 8;
 	for (int i = 0; i < MAX_SPLASH; i++)
 	{
 		SPLASH_STRUCT& splash = Splashes[i];
