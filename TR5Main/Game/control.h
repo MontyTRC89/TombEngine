@@ -2,7 +2,6 @@
 
 #include "..\Global\global.h"
 
-//#define UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
 #define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 #define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
 #define DoRayBox_sub_401523 ((int (__cdecl*)(PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*)) 0x00401523)

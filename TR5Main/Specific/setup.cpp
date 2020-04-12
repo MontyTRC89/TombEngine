@@ -22,11 +22,7 @@
 #include "..\Objects\oldobjects.h"
 #include "..\Objects\newobjects.h"
 
-#include "..\Game\lion.h"
-#include "..\Game\mafia.h"
 #include "..\Game\rat.h"
-#include "..\Game\hydra.h"
-#include "..\Game\guardian.h"
 
 #include "roomload.h"
 
@@ -1189,7 +1185,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
@@ -1217,7 +1212,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->pivotLength = 50;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
@@ -1249,7 +1243,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
@@ -1280,7 +1273,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
@@ -1341,7 +1333,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
@@ -1373,7 +1364,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
@@ -1525,7 +1515,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseMafia2;
 		obj->collision = CreatureCollision;
 		obj->control = Mafia2Control;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 26;
 		obj->pivotLength = 50;
@@ -1553,7 +1542,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseLarson;
 		obj->collision = CreatureCollision;
 		obj->control = ControlLarson;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 60;
 		obj->pivotLength = 50;
@@ -1577,7 +1565,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseLarson;
 		obj->collision = CreatureCollision;
 		obj->control = ControlLarson;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 60;
 		obj->pivotLength = 50;
@@ -1601,7 +1588,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseHitman;
 		obj->collision = CreatureCollision;
 		obj->control = HitmanControl;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 50;
 		obj->pivotLength = 50;
@@ -1629,7 +1615,6 @@ void BaddyObjects()
 		obj->initialise = InitialiseSniper;
 		obj->collision = CreatureCollision;
 		obj->control = SniperControl;
-		obj->drawRoutineExtra = DrawBaddieGunFlash;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 35;
 		obj->pivotLength = 50;

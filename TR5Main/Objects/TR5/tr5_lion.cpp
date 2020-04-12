@@ -1,12 +1,12 @@
-#include "lion.h"
-#include "..\Global\global.h"
-#include "items.h"
-#include "effect2.h"
-#include "effects.h"
-#include "lot.h"
-#include "box.h"
-#include "tomb4fx.h"
-#include "../Specific/setup.h"
+#include "..\oldobjects.h"
+#include "..\..\Global\global.h"
+#include "..\..\game\items.h"
+#include "..\..\game\effect2.h"
+#include "..\..\game\effects.h"
+#include "..\..\game\lot.h"
+#include "..\..\game\box.h"
+#include "..\..\game\tomb4fx.h"
+#include "../../Specific/setup.h"
 
 BITE_INFO LionBite1 = { 0xFFFFFFFE, 0xFFFFFFF6, 0xFA, 0x15 };
 BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };
@@ -14,7 +14,7 @@ BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };
 void InitialiseLion(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	
+
 	ClearItem(itemNum);
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
@@ -29,9 +29,9 @@ void LionControl(short itemNum)
 	short angle = 0;
 	short tilt = 0;
 	short joint1 = 0;
-	
+
 	ITEM_INFO* item = &Items[itemNum];
-	
+
 	if (CreatureActive(itemNum))
 	{
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;

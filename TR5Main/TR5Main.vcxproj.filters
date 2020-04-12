@@ -60,16 +60,10 @@
     <ClInclude Include="Game\gameflow.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\guardian.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\hair.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\healt.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\hydra.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\items.h">
@@ -103,9 +97,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\lot.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\mafia.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\misc.h">
@@ -285,9 +276,6 @@
     <ClInclude Include="Specific\configuration.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\lion.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\swat.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -356,16 +344,10 @@
     <ClCompile Include="Game\gameflow.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\guardian.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\hair.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\healt.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\hydra.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\items.cpp">
@@ -399,9 +381,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\lot.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\mafia.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\missile.cpp">
@@ -501,9 +480,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\configuration.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\lion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\swat.cpp">
@@ -840,6 +816,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\tr5_chef.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\tr5_lion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
