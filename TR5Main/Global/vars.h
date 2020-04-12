@@ -2,7 +2,7 @@
 
 #include "..\Game\sound.h"
 
-#define Camera						VAR_U_(0x00EEF940, CAMERA_INFO)
+//#define Camera						VAR_U_(0x00EEF940, CAMERA_INFO)
 #define ForcedFixedCamera			VAR_U_(0x00EEFA20, GAME_VECTOR)
 #define UseForcedFixedCamera		VAR_U_(0x00EEFA50, char)
 #define MallocBuffer				VAR_U_(0x00E4B10C, char*)

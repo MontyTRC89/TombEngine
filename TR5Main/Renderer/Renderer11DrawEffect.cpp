@@ -5,6 +5,7 @@
 #include "../Game/tomb4fx.h"
 #include "../Game/lara.h"
 #include "../Game/draw.h"
+#include "../Game/camera.h"
 #include "../Game/debris.h"
 #include "../Specific/setup.h"
 

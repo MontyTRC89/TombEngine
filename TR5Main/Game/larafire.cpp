@@ -5,9 +5,8 @@
 #include "laraflar.h"
 #include "lara1gun.h"
 #include "lara2gun.h"
-
+#include "camera.h"
 #include "..\Scripting\GameFlowScript.h"
-
 #include <stdio.h>
 #include "objects.h"
 #include "effects.h"

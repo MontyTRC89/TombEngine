@@ -47,6 +47,7 @@ int ExittingBinos = 0;
 int LSHKShotsFired = 0;
 PHD_VECTOR CamOldPos;
 int TLFlag = 0;
+CAMERA_INFO Camera;
 
 void ActivateCamera()
 {
@@ -1575,7 +1576,7 @@ void CalculateCamera()
 		//Camera is in a water room, play water sound effect.
 		if ((Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 		{
-			SoundEffect(SFX_UNDERWATER, NULL, 2);
+			SoundEffect(SFX_UNDERWATER, NULL, SFX_ALWAYS);
 			if (Camera.underwater == 0)
 			{
 				/*if (GLOBAL_playing_cutseq == 0 && TLFlag == 0)
@@ -1632,7 +1633,7 @@ void CalculateCamera()
 			int dx = Camera.item->pos.xPos - item->pos.xPos;
 			int dz = Camera.item->pos.zPos - item->pos.zPos;
 			int shift = SQRT_ASM(SQUARE(dx) + SQUARE(dz));
-			short angle = ATAN(Camera.item->pos.zPos - item->pos.zPos, Camera.item->pos.xPos - item->pos.xPos) - item->pos.yRot;
+			short angle = ATAN(dz, dx) - item->pos.yRot;
 			short tilt = ATAN(shift, y - (bounds[2] + bounds[3]) / 2 - Camera.item->pos.yPos);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle >>= 1;

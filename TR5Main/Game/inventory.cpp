@@ -7,7 +7,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "Lara.h"
-
+#include "camera.h"
 #include "..\Global\global.h"
 #include "..\Specific\input.h"
 #include "..\Specific\configuration.h"

@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderer11.h"
 #include "../Specific/configuration.h"
+#include "../Game/camera.h"
 #include "../Game/draw.h"
 #include "../Specific/setup.h"
 extern GameConfiguration g_Configuration;

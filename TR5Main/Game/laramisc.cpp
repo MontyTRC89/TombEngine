@@ -14,6 +14,7 @@
 #include "rope.h"
 #include "draw.h"
 #include "inventory.h"
+#include "camera.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
