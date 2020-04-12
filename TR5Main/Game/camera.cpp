@@ -48,6 +48,16 @@ int LSHKShotsFired = 0;
 PHD_VECTOR CamOldPos;
 int TLFlag = 0;
 CAMERA_INFO Camera;
+GAME_VECTOR ForcedFixedCamera;
+int UseForcedFixedCamera;
+int NumberCameras;
+int SniperCameraActive;
+int BinocularRange;
+int BinocularOn;
+CAMERA_TYPE BinocularOldCamera;
+int LaserSight;
+int SniperCount;
+int ExitingBinocular;
 
 void ActivateCamera()
 {
@@ -791,7 +801,7 @@ void FixedCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OBJECT_VECTOR* camera = &Cameras[Camera.number];
+		OBJECT_VECTOR* camera = &Camera.fixed[Camera.number];
 		
 		from.x = camera->x;
 		from.y = camera->y;
@@ -1706,7 +1716,7 @@ void CalculateCamera()
 
 		if (Camera.type
 			&& Camera.flags != CHASE_OBJECT
-			&& (SniperCamActive = Cameras[Camera.number].flags & 3, Cameras[Camera.number].flags & 2))
+			&& (SniperCamActive = Camera.fixed[Camera.number].flags & 3, Camera.fixed[Camera.number].flags & 2))
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;

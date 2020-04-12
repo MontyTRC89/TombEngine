@@ -18,6 +18,7 @@
 #include "lara2gun.h"
 #include "flmtorch.h"
 #include "../Specific/setup.h"
+#include "camera.h"
 
 #include "..\Global\global.h"
 

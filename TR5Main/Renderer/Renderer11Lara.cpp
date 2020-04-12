@@ -1,6 +1,7 @@
 #include "Renderer11.h"
 #include "../Game/draw.h"
 #include "../Game/hair.h"
+#include "../game/camera.h"
 #include "../Global/global.h"
 
 extern GameFlow* g_GameFlow;
