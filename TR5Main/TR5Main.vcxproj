@@ -120,7 +120,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Game\swat.h" />
-    <ClInclude Include="Game\lion.h" />
     <ClInclude Include="Global\legacyfunctions.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
@@ -157,10 +156,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\effects.h" />
     <ClInclude Include="Game\flmtorch.h" />
     <ClInclude Include="Game\gameflow.h" />
-    <ClInclude Include="Game\guardian.h" />
     <ClInclude Include="Game\hair.h" />
     <ClInclude Include="Game\healt.h" />
-    <ClInclude Include="Game\hydra.h" />
     <ClInclude Include="Game\inventory.h" />
     <ClInclude Include="Game\items.h" />
     <ClInclude Include="Game\lara.h" />
@@ -173,7 +170,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\larasurf.h" />
     <ClInclude Include="Game\laraswim.h" />
     <ClInclude Include="Game\lot.h" />
-    <ClInclude Include="Game\mafia.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
     <ClInclude Include="Game\newinv2.h" />
@@ -218,7 +214,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
-    <ClCompile Include="Game\lion.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\swat.cpp" />
     <ClCompile Include="Global\math.cpp" />
@@ -245,6 +240,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR5\tr5_lagoon_witch.cpp" />
     <ClCompile Include="Objects\TR5\tr5_larson.cpp" />
     <ClCompile Include="Objects\TR5\tr5_laser_head.cpp" />
+    <ClCompile Include="Objects\TR5\tr5_lion.cpp" />
     <ClCompile Include="Objects\TR5\tr5_misc_objects.cpp" />
     <ClCompile Include="Objects\TR5\tr5_missile.cpp" />
     <ClCompile Include="Objects\TR5\tr5_moving_block.cpp" />
@@ -339,10 +335,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\effects.cpp" />
     <ClCompile Include="Game\flmtorch.cpp" />
     <ClCompile Include="Game\gameflow.cpp" />
-    <ClCompile Include="Game\guardian.cpp" />
     <ClCompile Include="Game\hair.cpp" />
     <ClCompile Include="Game\healt.cpp" />
-    <ClCompile Include="Game\hydra.cpp" />
     <ClCompile Include="Game\inventory.cpp" />
     <ClCompile Include="Game\items.cpp" />
     <ClCompile Include="Game\lara.cpp" />
@@ -355,7 +349,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\larasurf.cpp" />
     <ClCompile Include="Game\laraswim.cpp" />
     <ClCompile Include="Game\lot.cpp" />
-    <ClCompile Include="Game\mafia.cpp" />
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\newinv2.cpp" />
     <ClCompile Include="Game\objects.cpp" />
