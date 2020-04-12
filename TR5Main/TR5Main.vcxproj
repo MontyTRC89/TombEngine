@@ -124,6 +124,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
     <ClInclude Include="Renderer\CameraMatrixBuffer.h" />
+    <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\HUDBarBuffer.h" />
     <ClInclude Include="Renderer\HUDBuffer.h" />
     <ClInclude Include="Renderer\ItemBuffer.h" />
@@ -309,6 +310,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\tr4_sphinx.cpp" />
     <ClCompile Include="Objects\TR4\tr4_wildboard.cpp" />
     <ClCompile Include="Objects\Vehicles\upv.cpp" />
+    <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\Render11Helper.cpp" />
     <ClCompile Include="Renderer\Renderer11Compatibility.cpp" />
     <ClCompile Include="Renderer\Renderer11Debug.cpp" />
