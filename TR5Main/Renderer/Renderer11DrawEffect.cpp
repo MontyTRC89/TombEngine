@@ -579,11 +579,11 @@ bool Renderer11::drawGunFlashes()
 
 				if (Lara.leftArm.flash_gun)
 				{
-					world = laraObj->AnimationTransforms[LM_LHAND].Transpose() * m_LaraWorldMatrix;
+					world = laraObj->AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
 					world = offset * world;
 					world = rotation2 * world;
 
-					m_stItem.World = world.Transpose();
+					m_stItem.World = world;
 					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 					m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -593,11 +593,11 @@ bool Renderer11::drawGunFlashes()
 
 				if (Lara.rightArm.flash_gun)
 				{
-					world = laraObj->AnimationTransforms[LM_RHAND].Transpose() * m_LaraWorldMatrix;
+					world = laraObj->AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
 					world = offset * world;
 					world = rotation2 * world;
 
-					m_stItem.World = world.Transpose();
+					m_stItem.World = world;
 					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 					m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -672,12 +672,12 @@ bool Renderer11::drawBaddieGunflashes()
 					Matrix rotationX = Matrix::CreateRotationX(TR_ANGLE_TO_RAD(49152));
 					Matrix rotationZ = Matrix::CreateRotationZ(TR_ANGLE_TO_RAD(2 * GetRandomControl()));
 
-					Matrix world = item->AnimationTransforms[joint].Transpose() * item->World;
+					Matrix world = item->AnimationTransforms[joint] * item->World;
 					world = rotationX * world;
 					world = offset * world;
 					world = rotationZ * world;
 
-					m_stItem.World = world.Transpose();
+					m_stItem.World = world;
 					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 					m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -780,8 +780,6 @@ bool Renderer11::drawSprites()
 	m_context->VSSetShader(m_vsSprites, NULL, 0);
 	m_context->PSSetShader(m_psSprites, NULL, 0);
 
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -1019,7 +1017,7 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 	RendererRoom & const room = m_rooms[effect->Effect->roomNumber];
 	//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
-	m_stItem.World = effect->World.Transpose();
+	m_stItem.World = effect->World;
 	m_stItem.Position = Vector4(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos, 1.0f);
 	m_stItem.AmbientLight = room.AmbientLight;
 	Matrix matrices[1] = { Matrix::Identity };
@@ -1113,7 +1111,7 @@ bool Renderer11::drawWaterfalls()
 			RendererRoom& const room = m_rooms[item->Item->roomNumber];
 			RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 
-			m_stItem.World = item->World.Transpose();
+			m_stItem.World = item->World;
 			m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
 			m_stItem.AmbientLight = room.AmbientLight; //Vector4::One * 0.1f; // room->AmbientLight;
 			memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
@@ -1306,14 +1304,14 @@ bool Renderer11::drawDebris(bool transparent)
 			m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
 			ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 			m_context->PSSetSamplers(0, 1, &sampler);
-			m_stCameraMatrices.View = View.Transpose();
-			m_stCameraMatrices.Projection = Projection.Transpose();
-			updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-			m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+			//m_stCameraMatrices.View = View.Transpose();
+			//m_stCameraMatrices.Projection = Projection.Transpose();
+			//updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+			//m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 			m_stMisc.AlphaTest = !transparent;
 			updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 			m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
-			m_stStatic.World = Matrix::Identity;
+			m_stStatic.World = world;
 			m_stStatic.Color = Vector4::One;
 			updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 			m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
@@ -1323,9 +1321,6 @@ bool Renderer11::drawDebris(bool transparent)
 			vtx0.Color = m_rooms[deb->roomNumber].AmbientLight;
 			vtx1.Color = m_rooms[deb->roomNumber].AmbientLight;
 			vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
-			vtx0.Position = Vector3::Transform(deb->mesh.vertices[0].Position, world);
-			vtx1.Position = Vector3::Transform(deb->mesh.vertices[1].Position, world);
-			vtx2.Position = Vector3::Transform(deb->mesh.vertices[2].Position, world);
 			m_context->RSSetState(m_states->CullNone());
 			m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 			m_numDrawCalls++;

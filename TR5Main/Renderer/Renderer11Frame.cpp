@@ -453,3 +453,11 @@ void Renderer11::collectEffects(short roomNumber)
 		short hhh = 0;
 	}
 }
+
+void Renderer11::prepareCameraForFrame()
+{
+	// Set camera matrices
+	m_stCameraMatrices.ViewProjection = ViewProjection;
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+}
