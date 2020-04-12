@@ -9,6 +9,7 @@
 #include "inventory.h"
 #include "draw.h"
 #include "sphere.h"
+#include "camera.h"
 #include "../Specific/setup.h"
 
 byte SequenceUsed[6];

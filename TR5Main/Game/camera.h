@@ -5,8 +5,8 @@
 #include <d3dx9.h>
 
 //#define Camera						VAR_U_(0x00EEF940, CAMERA_INFO)
-#define ForcedFixedCamera			VAR_U_(0x00EEFA20, GAME_VECTOR)
-#define UseForcedFixedCamera		VAR_U_(0x00EEFA50, char)
+//#define ForcedFixedCamera			VAR_U_(0x00EEFA20, GAME_VECTOR)
+//#define UseForcedFixedCamera		VAR_U_(0x00EEFA50, char)
 
 //#define InitialiseCamera ((void (__cdecl*)()) 0x0040C690)
 //#define MoveCamera ((int(__cdecl*)(GAME_VECTOR*,int)) 0x0040C7A0)
@@ -24,6 +24,16 @@
 
 extern PHD_VECTOR CurrentCameraPosition;
 extern CAMERA_INFO Camera;
+extern GAME_VECTOR ForcedFixedCamera;
+extern int UseForcedFixedCamera;
+extern int NumberCameras;
+extern int SniperCameraActive;
+extern int BinocularRange;
+extern int BinocularOn;
+extern CAMERA_TYPE BinocularOldCamera;
+extern int LaserSight;
+extern int SniperCount;
+extern int ExitingBinocular;
 
 void ActivateCamera();
 void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
