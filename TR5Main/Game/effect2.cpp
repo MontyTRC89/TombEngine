@@ -1032,6 +1032,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 		if (!splash.isActive)
 		{
 			if (numSplashesSetup == 0) {
+				float splashPower =  fmin(256, setup->splashPower);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -1039,29 +1040,36 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.life = 62;
 				splash.isRipple = false;
 				splash.innerRad = setup->innerRadius;
-				splashVelocity = setup->splashPower / 16;
+				splashVelocity = splashPower / 16;
 				splash.innerRadVel = splashVelocity;
-				splash.heightSpeed = setup->splashPower * 1.5f;
+				splash.heightSpeed = splashPower * 1.5f;
 				splash.height = 0;
 				splash.heightVel = -16;
-				splash.outerRad = setup->innerRadius / 6;
-				splash.outerRadVel = splashVelocity *2;
+				splash.outerRad = setup->innerRadius / 3;
+				splash.outerRadVel = splashVelocity;
 				splash.spriteSequenceStart = 8; //Splash Texture
 				numSplashesSetup++;
 			}
 			else {
-				float thickness = frandMinMax(128,256);
+				float thickness = frandMinMax(256,512);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
 				splash.z = setup->z;
 				splash.isRipple = true;
-				float vel = (splashVelocity/2) + frandMinMax(3,16);
+				float vel;
+				if (numSplashesSetup == 2) {
+					vel = (splashVelocity / 8) + frandMinMax(1, 3);
+				}
+				else {
+					vel = (splashVelocity / 8) + frandMinMax(5, 8);
+				}
+				
 				float innerRadius = 0;
 				splash.innerRad = innerRadius;
 				splash.innerRadVel = vel;
-				splash.outerRad = innerRadius + thickness;
-				splash.outerRadVel = vel;
+				splash.outerRad = innerRadius;
+				splash.outerRadVel = vel * 3.0f;
 				splash.heightSpeed = 128;
 				splash.height = 0;
 				splash.heightVel = -16;
@@ -1070,7 +1078,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.life = lerp(48, 70, t);
 				splash.spriteSequenceStart = 4; //Splash Texture
 				splash.spriteSequenceEnd = 7; //Splash Texture
-				splash.animationSpeed = frandMinMax(0.05f, 0.15f);
+				splash.animationSpeed = frandMinMax(0.1f, 0.15f);
 
 				numSplashesSetup++;
 			}
