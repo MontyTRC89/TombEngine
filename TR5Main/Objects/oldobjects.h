@@ -169,3 +169,5 @@ void InitialiseLagoonWitch(short itemNumber);
 void ControlLagoonWitch(short itemNumber);
 void InitialiseChef(short itemNumber);
 void ControlChef(short itemNumber);
+void InitialiseLion(short itemNum);
+void LionControl(short itemNum);

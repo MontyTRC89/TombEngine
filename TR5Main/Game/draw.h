@@ -2,15 +2,12 @@
 
 #include "..\Global\global.h"
 
-///#define DrawAnimatingItem ((void (__cdecl*)(ITEM_INFO*)) 0x0042B900)
 #define GetBoundsAccurate ((short* (__cdecl*)(ITEM_INFO*)) 0x0042CF80)
 #define GetBestFrame ((short* (__cdecl*)(ITEM_INFO*)) 0x0042D020)
 #define CalcLaraMatrices ((void (__cdecl*)(int)) 0x0041E120)
 #define Sync ((int (__cdecl*)()) 0x004D1A40)
-//#define GetRoomBounds ((void (__cdecl*)()) 0x0042D4F0) 
 #define UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 #define IsRoomOutside ((int (__cdecl*)(int, int, int)) 0x00418E90) 
-#define DrawBaddieGunFlash ((void (__cdecl*)(ITEM_INFO*)) 0x00466880)
 #define sub_42B4C0 ((void (__cdecl*)(ITEM_INFO*,short*)) 0x0042B4C0)
 
 #define InitInterpolate ((void(__cdecl*)(int,int)) 0x0042BE90)

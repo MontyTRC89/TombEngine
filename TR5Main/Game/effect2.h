@@ -3,8 +3,6 @@
 #include "..\Global\global.h"
 
 #define ExplodingDeath ((void (__cdecl*)(short, int, int)) 0x00484080)
-//#define InitialiseSmokeEmitter ((void (__cdecl*)(short)) 0x0043D9D0)
-//#define SmokeEmitterControl ((void (__cdecl*)(short)) 0x00431560)
 #define DrawLensFlare ((void (__cdecl*)(ITEM_INFO*)) 0x00485290)
 #define RIPPLE_FLAG_BLOOD 0x80
 #define RIPPLE_FLAG_RAND_POS 0x40

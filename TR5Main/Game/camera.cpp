@@ -1613,7 +1613,7 @@ void CalculateCamera()
 
 	if (Camera.type == CINEMATIC_CAMERA)
 	{
-		do_new_cutscene_camera();
+		Legacy_do_new_cutscene_camera();
 		return;
 	}
 

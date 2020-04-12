@@ -35,6 +35,21 @@
 #define Legacy_FindAIObject ((int(__cdecl*)(CREATURE_INFO*,short)) 0x0040C070)
 #define Legacy_SameZoneAIObject ((int(__cdecl*)(CREATURE_INFO*,short)) 0x0040C460)
 
+// CAMERA.CPP
+#define Legacy_InitialiseCamera ((void (__cdecl*)()) 0x0040C690)
+#define Legacy_MoveCamera ((int(__cdecl*)(GAME_VECTOR*,int)) 0x0040C7A0)
+#define Legacy_ChaseCamera ((int(__cdecl*)(ITEM_INFO*)) 0x0040D150)
+#define Legacy_CombatCamera ((int(__cdecl*)(ITEM_INFO*)) 0x0040D640)
+#define Legacy_LookCamera ((void(__cdecl*)(ITEM_INFO*)) 0x0040DC10)
+#define Legacy_FixedCamera ((void(__cdecl*)()) 0x0040E890)
+#define Legacy_CalculateCamera ((void(__cdecl*)()) 0x0040ED30)
+#define Legacy_BinocularCamera ((void(__cdecl*)()) 0x0040FC20)
+#define Legacy_RefreshCamera ((void(__cdecl*)(short,short*)) 0x004165E0)
+#define Legacy_CameraCollisionBounds ((int (__cdecl*)(GAME_VECTOR*,int,int)) 0x0040F5C0)
+#define Legacy_do_new_cutscene_camera ((void(__cdecl*)()) 0x00421480)
+#define Legacy_SaveD3DCameraMatrix ((void(__cdecl*)()) 0x00497280)
+#define Legacy_UnknownCamera ((void(__cdecl*)()) 0x004975D0)
+
 // CONTROL.CPP
 #define Legacy_GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
 #define Legacy_GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
@@ -68,6 +83,7 @@
 #define Legacy_GetFloor ((FLOOR_INFO* (__cdecl*)(int, int, int, short*)) 0x00415B20)
 #define Legacy_GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
 #define Legacy_GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
+#define Legacy_UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
 
 // DOOR.CPP
 #define Legacy_InitialiseDoor ((void (__cdecl*)(short)) 0x0043DB60)
@@ -100,6 +116,10 @@
 #define Legacy_CreateBubble ((short (__cdecl*)(PHD_3DPOS*, short, int)) 0x0043C6C0); 
 #define Legacy_SetupRipple ((void (__cdecl*)(int, int, int, byte, byte)) 0x00430910); 
 
+// EFFECT2.CPP
+#define Legacy_InitialiseSmokeEmitter ((void (__cdecl*)(short)) 0x0043D9D0)
+#define Legacy_SmokeEmitterControl ((void (__cdecl*)(short)) 0x00431560)
+
 // HEALT.CPP
 #define Legacy_FlashIt ((int (__cdecl*)()) 0x00439C10)
 #define Legacy_UpdateHealtBar ((void (__cdecl*)(int)) 0x00439E50)
@@ -119,3 +139,6 @@
 #define Legacy_KillItem ((void (__cdecl*)(short)) 0x00440620)
 #define Legacy_ItemNearLara ((int (__cdecl*)(PHD_3DPOS*, int)) 0x00432580)
 #define Legacy_TranslateItem ((void (__cdecl*)(ITEM_INFO*, int, int, int)) 0x00415960)
+
+// LARA.CPP
+#define Legacy_AnimateLara ((int (__cdecl*)(ITEM_INFO*)) 0x004563F0)
