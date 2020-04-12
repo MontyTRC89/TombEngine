@@ -21,6 +21,16 @@
 #include <WICTextureLoader.h>
 
 #include "..\Global\global.h"
+#include <d3d9types.h>
+#include "StaticBuffer.h"
+#include "LightBuffer.h"
+#include "MiscBuffer.h"
+#include "HUDBarBuffer.h"
+#include "HUDBuffer.h"
+#include "ShadowLightBuffer.h"
+#include "RoomBuffer.h"
+#include "ItemBuffer.h"
+#include "CameraMatrixBuffer.h"
 
 #define PI 3.14159265358979323846f
 #define RADIAN 0.01745329252f
@@ -413,67 +423,6 @@ struct RendererLight {
 	}
 };
 
-struct ShaderLight {
-	Vector4 Position;
-	Vector4 Color;
-	Vector4 Direction;
-	float Intensity;
-	float In;
-	float Out;
-	float Range;
-};
-
-struct CHUDBuffer {
-	Matrix View;
-	Matrix Projection;
-};
-struct CHUDBarBuffer {
-	float Percent;
-};
-struct CCameraMatrixBuffer
-{
-	Matrix View;
-	Matrix Projection;
-};
-
-struct CItemBuffer
-{
-	Matrix World;
-	Matrix BonesMatrices[32];
-	Vector4 Position;
-	Vector4 AmbientLight;
-};
-
-struct CStaticBuffer
-{
-	Matrix World;
-	Vector4 Position;
-	Vector4 Color;
-};
-
-struct CShadowLightBuffer {
-	ShaderLight Light;
-	Matrix LightViewProjection;
-	int CastShadows;
-	float Padding[15];
-};
-
-struct CLightBuffer {
-	ShaderLight Lights[NUM_LIGHTS_PER_BUFFER];
-	int NumLights;
-	Vector3 CameraPosition;
-};
-
-struct CMiscBuffer {
-	int AlphaTest;
-	int Caustics;
-	float Padding[14];
-};
-
-struct CRoomBuffer {
-	Vector4 AmbientColor;
-};
-
 struct RendererAnimatedTexture 
 {
 	int Id;
@@ -833,11 +782,11 @@ private:
 	// Private functions
 	bool											drawScene(bool dump);
 	bool											drawAllStrings();
-	ID3D11VertexShader*								compileVertexShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode);
-	ID3D11GeometryShader*							compileGeometryShader(const char* fileName);
-	ID3D11PixelShader*								compilePixelShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode);
-	ID3D11ComputeShader*							compileComputeShader(const char* fileName);
-	ID3D11Buffer*									createConstantBuffer(int size);
+	ID3D11VertexShader*								compileVertexShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
+	ID3D11GeometryShader*							compileGeometryShader(const wchar_t * fileName);
+	ID3D11PixelShader*								compilePixelShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
+	ID3D11ComputeShader*							compileComputeShader(const wchar_t * fileName);
+	ID3D11Buffer*									createConstantBuffer(size_t size);
 	int												getAnimatedTextureInfo(short textureId);
 	void											initialiseHairRemaps();
 	RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short boneIndex, int isJoints, int isHairs);
@@ -962,4 +911,5 @@ public:
 	RendererMesh* getMeshFromMeshPtr(unsigned int meshp);
 private:
 	void drawFootprints();
+	void prepareCameraForFrame();
 };
