@@ -31,6 +31,7 @@
 #include "RoomBuffer.h"
 #include "ItemBuffer.h"
 #include "CameraMatrixBuffer.h"
+#include "Frustum.h"
 
 #define PI 3.14159265358979323846f
 #define RADIAN 0.01745329252f
@@ -610,6 +611,7 @@ struct RendererLine2D {
 class Renderer11
 {
 private:
+	Frustum frustum;
 	// Core DX11 objects
 	ID3D11Device*									m_device = NULL;
 	ID3D11DeviceContext*							m_context = NULL;

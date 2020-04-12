@@ -3,7 +3,6 @@
 #include "../Game/camera.h"
 #include "..\Specific\roomload.h"
 #include "../Specific/setup.h"
-
 void Renderer11::collectRooms()
 {
 	short baseRoomIndex = Camera.pos.roomNumber;
@@ -46,9 +45,10 @@ void Renderer11::collectItems(short roomNumber)
 
 		if (m_moveableObjects[item->objectNumber] == NULL)
 			continue;
-
 		RendererItem * newItem = &m_items[itemNum];
-
+		short* bounds = GetBoundsAccurate(item);
+		Vector3 min = Vector3(bounds[0], bounds[2], bounds[4]) + Vector3(item->pos.xPos,item->pos.yPos,item->pos.zPos);
+		Vector3 max = Vector3(bounds[1], bounds[3], bounds[5]) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		newItem->Item = item;
 		newItem->Id = itemNum;
 		newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
@@ -58,7 +58,9 @@ void Renderer11::collectItems(short roomNumber)
 			TR_ANGLE_TO_RAD(item->pos.zRot));
 		newItem->Scale = Matrix::CreateScale(1.0f);
 		newItem->World = newItem->Rotation * newItem->Translation;
-
+		if (!frustum.isVisible(((min+max)/2),1)) {
+			continue;
+		}
 		collectLightsForItem(item->roomNumber, newItem);
 
 		m_itemsToDraw.push_back(newItem);
@@ -460,4 +462,5 @@ void Renderer11::prepareCameraForFrame()
 	m_stCameraMatrices.ViewProjection = ViewProjection;
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+	frustum.calcPlanes(ViewProjection);
 }
