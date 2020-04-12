@@ -7,6 +7,7 @@
 #include "..\Game\Lara.h"
 #include "..\Game\savegame.h"
 #include "..\Game\spotcam.h"
+#include "..\Game\camera.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "..\Game\control.h"
 #include "..\Game\pickup.h"
@@ -305,8 +306,8 @@ void LoadCameras()
 	NumberCameras = ReadInt32();
 	if (NumberCameras != 0)
 	{
-		Cameras = (OBJECT_VECTOR*)GameMalloc(NumberCameras * sizeof(OBJECT_VECTOR));
-		ReadBytes(Cameras, NumberCameras * sizeof(OBJECT_VECTOR));
+		Camera.fixed = (OBJECT_VECTOR*)GameMalloc(NumberCameras * sizeof(OBJECT_VECTOR));
+		ReadBytes(Camera.fixed, NumberCameras * sizeof(OBJECT_VECTOR));
 	}
 
 	NumberSpotcams = ReadInt32();

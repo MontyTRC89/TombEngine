@@ -1,4 +1,5 @@
 #include "Renderer11.h"
+#include "../game/camera.h"
 
 RendererHUDBar* g_HealthBar;
 RendererHUDBar* g_AirBar;

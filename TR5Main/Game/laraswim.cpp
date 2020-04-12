@@ -14,6 +14,7 @@
 #include "larafire.h"
 #include "laramisc.h"
 #include "draw.h"
+#include "camera.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -24,7 +25,7 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 {
 	if (Lara.currentActive)
 	{
-		OBJECT_VECTOR* sink = &Cameras[Lara.currentActive - 1];
+		OBJECT_VECTOR* sink = &Camera.fixed[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
 		Lara.currentXvel += ((sink->data * (SIN(angle - ANGLE(90)) / 4) >> 2) - Lara.currentXvel) >> 4;
