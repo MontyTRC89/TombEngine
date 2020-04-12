@@ -9,6 +9,7 @@
 #include "draw.h"
 #include "sphere.h"
 #include "misc.h"
+#include "camera.h"
 #include "control.h"
 #include "../Specific/setup.h"
 

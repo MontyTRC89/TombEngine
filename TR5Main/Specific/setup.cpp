@@ -9,6 +9,7 @@
 #include "..\Game\missile.h"
 #include "..\Game\control.h"
 #include "..\Game\pickup.h"
+#include "../Game/camera.h"
 #include "..\Game\lara1gun.h"
 #include "..\Game\laraflar.h"
 #include "..\Game\larafire.h"

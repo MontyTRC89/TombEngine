@@ -1,4 +1,5 @@
 #include "sound.h"
+#include "camera.h"
 #include "..\Specific\configuration.h"
 
 HSTREAM BASS_3D_Mixdown;
