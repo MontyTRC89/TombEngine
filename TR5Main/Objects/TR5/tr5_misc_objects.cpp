@@ -14,6 +14,7 @@
 #include "../../Game/switch.h"
 #include "../../Game/debris.h"
 #include "../../Game/objects.h"
+#include "../../Game/camera.h"
 #include "../../Game/missile.h"
 #include "../../Specific/setup.h"
 

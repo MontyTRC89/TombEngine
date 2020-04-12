@@ -16,6 +16,7 @@
 #include "objects.h"
 #include "sphere.h"
 #include "traps.h"
+#include "camera.h"
 
 #include "..\Global\global.h"
 #include "..\Scripting\GameFlowScript.h"

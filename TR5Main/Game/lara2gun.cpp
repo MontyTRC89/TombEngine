@@ -6,6 +6,7 @@
 #include "tomb4fx.h"
 #include "..\Specific\roomload.h"
 #include "..\Specific\setup.h"
+#include "camera.h"
 
 PISTOL_DEF PistolsTable[4] =
 {

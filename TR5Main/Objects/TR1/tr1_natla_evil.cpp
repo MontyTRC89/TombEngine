@@ -2,6 +2,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effect2.h"
 #include "../../Game/items.h"
+#include "../../Game/camera.h"
 #include "../../Specific/setup.h"
 
 enum abortion_anims {

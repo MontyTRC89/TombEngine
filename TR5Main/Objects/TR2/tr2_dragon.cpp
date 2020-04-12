@@ -6,6 +6,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/lot.h"
 #include "../../Game/sphere.h"
+#include "../../Game/camera.h"
 #include "../../Specific/roomload.h"
 #include "../../specific/setup.h"
 
