@@ -597,12 +597,12 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (g_Inventory->GetSelectedObject() == NO_ITEM)
 			{
-				if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - 70))
-					g_Inventory->SetEnterObject(item->objectNumber - 70);
+				if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
+					g_Inventory->SetEnterObject(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
 				item->pos.yRot = oldYrot;
 				return;
 			}
-			if (g_Inventory->GetSelectedObject() != item->objectNumber - 70)
+			if (g_Inventory->GetSelectedObject() != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
 			{
 				item->pos.yRot = oldYrot;
 				return;
@@ -704,11 +704,11 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					return;
 				if (g_Inventory->GetSelectedObject() == NO_ITEM)
 				{
-					if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - 62))
-						g_Inventory->SetEnterObject(item->objectNumber - 62);
+					if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
+						g_Inventory->SetEnterObject(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
 					return;
 				}
-				if (g_Inventory->GetSelectedObject() != item->objectNumber - 62)
+				if (g_Inventory->GetSelectedObject() != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
 			}
 			
@@ -1374,7 +1374,7 @@ short* FindPlinth(ITEM_INFO* item)
 
 void PuzzleDone(ITEM_INFO* item, short itemNum)
 {
-	item->objectNumber += 8; 
+	item->objectNumber += (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1); 
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->requiredAnimState = 0;
