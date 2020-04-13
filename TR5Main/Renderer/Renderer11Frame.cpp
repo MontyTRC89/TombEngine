@@ -74,31 +74,24 @@ void Renderer11::collectStatics(short roomNumber)
 	ROOM_INFO* r = room.Room;
 	if (r->numMeshes <= 0)
 		return;
-
-	MESH_INFO * mesh = r->mesh;
-
 	int numStatics = r->numMeshes;
 	for (int i = 0; i < numStatics; i++)
 	{
-		
+		MESH_INFO* mesh = &r->mesh[i];
 		RendererStatic* newStatic = &room.Statics[i];
 		STATIC_INFO* staticInfo = &StaticObjects[mesh->staticNumber];
 		Vector3 min = Vector3(staticInfo->xMinc, staticInfo->yMinc, staticInfo->zMinc);
 		Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
 		min += Vector3(mesh->x, mesh->y, mesh->z);
 		max += Vector3(mesh->x, mesh->y, mesh->z);
-		//if (!frustum.AABBInFrustum(min, max))
-		//	continue;
+		if (!frustum.AABBInFrustum(min, max))
+			continue;
 		Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot));
 		Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
 		newStatic->Mesh = mesh;
-		
 		newStatic->RoomIndex = roomNumber;
 		newStatic->World = rotation * Matrix::CreateTranslation(translation);
-
 		m_staticsToDraw.push_back(newStatic);
-
-		mesh++;
 	}
 }
 
