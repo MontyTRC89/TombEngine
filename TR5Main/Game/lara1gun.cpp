@@ -22,6 +22,7 @@
 #include "..\Scripting\GameFlowScript.h"
 #include "..\Specific\roomload.h"
 #include "../Specific/setup.h"
+#include "bubble.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
@@ -226,7 +227,7 @@ void ControlHarpoonBolt(short itemNumber)
 		{
 			// Create bubbles
 			if ((Wibble & 15) == 0)
-				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 0, 0, 0, 0, 0, 0); // CHECK
+				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 0, 0,BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
 			//TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
 			item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * SIN(item->pos.xRot) >> W2V_SHIFT);
 			item->speed = (short)((HARPOON_SPEED >> 1) * COS(item->pos.xRot) >> W2V_SHIFT);

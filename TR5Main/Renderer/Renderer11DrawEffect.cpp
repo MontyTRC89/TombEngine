@@ -8,11 +8,11 @@
 #include "../Game/camera.h"
 #include "../Game/debris.h"
 #include "../Specific/setup.h"
+#include "../Game/bubble.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
-extern BUBBLE_STRUCT Bubbles[MAX_BUBBLES];
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
@@ -379,8 +379,8 @@ void Renderer11::drawBubbles()
 	for (int i = 0; i < MAX_BUBBLES; i++)
 	{
 		BUBBLE_STRUCT* bubble = &Bubbles[i];
-		if (bubble->size)
-			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES], Vector3(bubble->pos.x, bubble->pos.y, bubble->pos.z), Vector4(bubble->shade / 255.0f, bubble->shade / 255.0f, bubble->shade / 255.0f, 1.0f), 0.0f, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
+		if (bubble->active)
+			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum], Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z), bubble->color, bubble->rotation,1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
 	}
 }
 
