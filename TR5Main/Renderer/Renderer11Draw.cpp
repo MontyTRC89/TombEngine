@@ -245,7 +245,7 @@ bool Renderer11::drawShadowMap()
 		Vector3(0.0f, -1.0f, 0.0f));
 	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
 		(m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
-
+	m_stCameraMatrices.ViewProjection = view*projection;
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -1915,7 +1915,8 @@ bool Renderer11::drawScene(bool dump)
 	auto time1 = chrono::high_resolution_clock::now();
 	prepareCameraForFrame();
 	ProcessClosedDoors();
-	
+
+
 	// TEST
 	//CollectRooms(CurrentRoom);
 
@@ -1924,7 +1925,9 @@ bool Renderer11::drawScene(bool dump)
 	updateLaraAnimations();
 	updateItemsAnimations();
 	updateEffects();
-
+	if (g_Configuration.EnableShadows)
+		drawShadowMap();
+	prepareCameraForFrame();
 	m_items[Lara.itemNumber].Item = LaraItem;
 	collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber]);
 
@@ -1937,8 +1940,6 @@ bool Renderer11::drawScene(bool dump)
 	time1 = time2;
 
 	// Draw shadow map
-	if (g_Configuration.EnableShadows)
-		drawShadowMap();
 
 	// Reset GPU state
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
