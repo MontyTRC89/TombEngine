@@ -1,19 +1,22 @@
 #pragma once
 #include <d3d11.h>
 #include <SimpleMath.h>
-using namespace DirectX::SimpleMath;
-DirectX::SimpleMath::Matrix inverseOrtho(const DirectX::SimpleMath::Matrix& m);
-struct Frustum {
+#include <array>
 
-	Vector3 pos;
-	Vector4 planes[32];   // + buffer for OBB visibility test
-	int  start, count;
+class Frustum {
 
-	void calcPlanes(const Matrix& m);
-	// AABB visibility check
-	bool isVisible(const Vector3& min, const Vector3& max) const;
-	// OBB visibility check
-	bool isVisible(const Matrix& matrix, const Vector3& min, const Vector3& max);
-	// Sphere visibility check
-	bool isVisible(const Vector3& center, float radius);
+public:
+
+	Frustum() = default;
+
+	void Update(const DirectX::SimpleMath::Matrix& view, const DirectX::SimpleMath::Matrix& projection);
+	bool PointInFrustum(const DirectX::SimpleMath::Vector3& position) const;
+	bool SphereInFrustum(const DirectX::SimpleMath::Vector3& position, float radius) const;
+	bool AABBInFrustum(const DirectX::SimpleMath::Vector3& min, const DirectX::SimpleMath::Vector3& max) const;
+
+private:
+
+	void NormalizePlane(int32_t side);
+	std::array<std::array<float, 4>, 6> m_frustum = {};
+
 };
