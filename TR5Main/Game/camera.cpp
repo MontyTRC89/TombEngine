@@ -1716,7 +1716,7 @@ void CalculateCamera()
 
 		if (Camera.type
 			&& Camera.flags != CHASE_OBJECT
-			&& (SniperCamActive = Camera.fixed[Camera.number].flags & 3, Camera.fixed[Camera.number].flags & 2))
+			&& (Camera.number != -1 &&(SniperCamActive = Camera.fixed[Camera.number].flags & 3, Camera.fixed[Camera.number].flags & 2)))
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;
