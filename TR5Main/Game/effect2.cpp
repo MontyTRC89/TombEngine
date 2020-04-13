@@ -1069,7 +1069,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.innerRad = innerRadius;
 				splash.innerRadVel = vel;
 				splash.outerRad = innerRadius;
-				splash.outerRadVel = vel * 3.0f;
+				splash.outerRadVel = vel * 2.0f;
 				splash.heightSpeed = 128;
 				splash.height = 0;
 				splash.heightVel = -16;
