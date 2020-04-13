@@ -68,7 +68,6 @@ void TriggerGunShell(short hand, short objNum, int weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 int GetFreeBubble();
-void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv);
 void LaraBubbles(ITEM_INFO* item);
 void UpdateBubbles();
 int GetFreeDrip();

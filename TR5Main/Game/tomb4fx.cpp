@@ -5,6 +5,7 @@
 #include "draw.h"
 #include "items.h"
 #include "../Specific/setup.h"
+#include "bubble.h"
 
 char FlareTable[121] =
 {
@@ -39,7 +40,6 @@ FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; 
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; 
 BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; 
-BUBBLE_STRUCT Bubbles[MAX_BUBBLES]; 
 DRIP_STRUCT Drips[MAX_DRIPS]; 
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
 FIRE_LIST Fires[MAX_FIRE_LIST];
@@ -1039,58 +1039,9 @@ void AddWaterSparks(int x, int y, int z, int num)
 	}
 }
 
-int GetFreeBubble()//8BEAC(<), 8DEF0(<) (F)
-{
-	BUBBLE_STRUCT* bub = &Bubbles[NextBubble];
-	int bubNum = NextBubble;
 
-	while (bub->size != 0)
-	{
-		if (bubNum == MAX_BUBBLES - 1)
-		{
-			bub = &Bubbles[0];
-			bubNum = 0;
-		}
-		else
-		{
-			bubNum++;
-			bub++;
-		}
 
-		if (++bubNum >= MAX_BUBBLES)
-		{
-			break;
-		}
-	}
 
-	NextBubble = bubNum + 1;
-	if (bubNum + 1 >= MAX_BUBBLES)
-		NextBubble = 0;
-
-	return bubNum;
-}
-
-void CreateBubble(PHD_VECTOR * pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv)//8BF14(<), 8DF58(<) (F)
-{
-	GetFloor(pos->x, pos->y, pos->z, &roomNum);
-
-	if (Rooms[roomNum].flags & ENV_FLAG_WATER)
-	{
-		BUBBLE_STRUCT* bubble = &Bubbles[GetFreeBubble()];
-		bubble->pos = *pos;
-		bubble->roomNumber = roomNum;
-		bubble->speed = frand();
-		bubble->shade = 0;
-		int size = rand() % 4 + 6;
-		bubble->size = size;
-		bubble->dsize = 16 * size;
-		bubble->vel = (frand()*0.8f)+0.2f;
-		bubble->flags = flags;
-		bubble->xVel = xv;
-		bubble->yVel = yv;
-		bubble->zVel = zv;
-	}
-}
 
 void LaraBubbles(ITEM_INFO* item)// (F)
 {
@@ -1124,79 +1075,6 @@ void LaraBubbles(ITEM_INFO* item)// (F)
 	}
 }
 
-void UpdateBubbles()
-{
-	for (int i = 0; i < MAX_BUBBLES; i++)
-	{
-		BUBBLE_STRUCT* bubble = &Bubbles[i];
-
-		if (bubble->size)
-		{
-			bubble->speed += bubble->vel.to_float();
-			bubble->yRot += 6;
-			bubble->pos.y -= bubble->speed.to_float();
-
-			if (bubble->flags & 1)
-			{
-				bubble->pos.x += bubble->xVel.to_float();
-				bubble->pos.y += bubble->yVel.to_float();
-				bubble->pos.z += bubble->zVel.to_float();
-
-				bubble->xVel -= (bubble->xVel.to_float()/2.0f);
-				bubble->yVel -= (bubble->yVel.to_float()/2.0f);
-				bubble->zVel -= (bubble->zVel.to_float()/2.0f);
-			}
-			else
-			{
-				bubble->pos.x += sin(bubble->yRot)*5;
-				bubble->pos.z += cos(bubble->yRot)*5;
-			}
-
-			short roomNumber = bubble->roomNumber;
-			FLOOR_INFO* floor = GetFloor(bubble->pos.x, bubble->pos.y, bubble->pos.z, &roomNumber);
-			int height = GetFloorHeight(floor, bubble->pos.x, bubble->pos.y, bubble->pos.z);
-			
-			if (bubble->pos.y > height || !floor)
-			{
-				bubble->size = 0;
-				continue;
-			}
-
-			if (!(Rooms[roomNumber].flags & ENV_FLAG_WATER))
-			{
-				SetupRipple(bubble->pos.x, Rooms[bubble->roomNumber].maxceiling, bubble->pos.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_LIFE+RIPPLE_FLAG_RAND_ROT);
-				bubble->size = 0;
-				continue;
-			}
-
-			int ceiling = GetCeiling(floor, bubble->pos.x, bubble->pos.y, bubble->pos.z);
-			if (ceiling == NO_HEIGHT || bubble->pos.y <= ceiling)
-			{
-				bubble->size = 0;
-				continue;
-			}
-
-			if (bubble->size < bubble->dsize)
-				bubble->size++;
-			
-			if (bubble->flags & 1)
-			{
-				if (bubble->shade < 96)
-				{
-					bubble->shade += 16;
-					bubble->roomNumber = roomNumber;
-					continue;
-				}
-			}
-			else if (bubble->shade < 144)
-			{
-				bubble->shade += 2;
-			}
-
-			bubble->roomNumber = roomNumber;
-		}
-	}
-}
 
 int GetFreeDrip()
 {
@@ -1683,7 +1561,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
 			pos.y = (GetRandomControl() & 0x7F) + y - 64;
 			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
-			CreateBubble(&pos, roomNum, 6, 15, 0, 0, 0, 0);
+			CreateBubble(&pos, roomNum, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
 		}
 	}
 }
@@ -1946,10 +1824,7 @@ void Inject_Tomb4FX()
 	INJECT(0x00482A60, TriggerGunShell);
 	INJECT(0x00482D80, UpdateGunShells);
 	INJECT(0x00483180, AddWaterSparks);
-	INJECT(0x004832C0, GetFreeBubble);
-	INJECT(0x00483350, CreateBubble);
 	INJECT(0x00483470, LaraBubbles);
-	INJECT(0x00483540, UpdateBubbles);
 	INJECT(0x00483D00, GetFreeDrip);
 	INJECT(0x00483D90, UpdateDrips);
 	INJECT(0x00483F00, TriggerLaraDrips);

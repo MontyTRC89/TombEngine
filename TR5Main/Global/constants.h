@@ -69,7 +69,6 @@
 #define MAX_GUNSHELL        24
 #define MAX_GUNFLASH        4
 #define MAX_DRIPS           32
-#define MAX_BUBBLES         40
 #define MAX_DYNAMICS        64
 constexpr auto MAX_SPLASH = 8;
 #define MAX_RIPPLES         32
