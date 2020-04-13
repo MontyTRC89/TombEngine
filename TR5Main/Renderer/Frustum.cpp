@@ -1,86 +1,128 @@
 #include "Frustum.h"
+using namespace DirectX::SimpleMath;
 
+	void Frustum::Update(const Matrix& view, const Matrix& projection) {
+		std::array<float, 16> clip;
+		clip[0] = view._11 * projection._11 + view._12 * projection._21 + view._13 * projection._31 + view._14 * projection._41;
+		clip[1] = view._11 * projection._12 + view._12 * projection._22 + view._13 * projection._32 + view._14 * projection._42;
+		clip[2] = view._11 * projection._13 + view._12 * projection._23 + view._13 * projection._33 + view._14 * projection._43;
+		clip[3] = view._11 * projection._14 + view._12 * projection._24 + view._13 * projection._34 + view._14 * projection._44;
 
+		clip[4] = view._21 * projection._11 + view._22 * projection._21 + view._23 * projection._31 + view._24 * projection._41;
+		clip[5] = view._21 * projection._12 + view._22 * projection._22 + view._23 * projection._32 + view._24 * projection._42;
+		clip[6] = view._21 * projection._13 + view._22 * projection._23 + view._23 * projection._33 + view._24 * projection._43;
+		clip[7] = view._21 * projection._14 + view._22 * projection._24 + view._23 * projection._34 + view._24 * projection._44;
 
-DirectX::SimpleMath::Matrix inverseOrtho(const DirectX::SimpleMath::Matrix& m)
-{
-	DirectX::SimpleMath::Matrix r;
-	r._11 = m._11; r._21 = m._12; r._31 = m._13; r._41 = 0;
-	r._12 = m._21; r._22 = m._22; r._32 = m._23; r._42 = 0;
-	r._13 = m._31; r._23 = m._32; r._33 = m._33; r._43 = 0;
-	r._14 = -(m._14 * m._11 + m._24 * m._21 + m._34 * m._31); // -dot(pos, right)
-	r._24 = -(m._14 * m._12 + m._24 * m._22 + m._34 * m._32); // -dot(pos, up)
-	r._34 = -(m._14 * m._13 + m._24 * m._23 + m._34 * m._33); // -dot(pos, dir)
-	r._44 = 1;
+		clip[8] = view._31 * projection._11 + view._32 * projection._21 + view._33 * projection._31 + view._34 * projection._41;
+		clip[9] = view._31 * projection._12 + view._32 * projection._22 + view._33 * projection._32 + view._34 * projection._42;
+		clip[10] = view._31 * projection._13 + view._32 * projection._23 + view._33 * projection._33 + view._34 * projection._43;
+		clip[11] = view._31 * projection._14 + view._32 * projection._24 + view._33 * projection._34 + view._34 * projection._44;
+		
+		clip[12] = view._41 * projection._11 + view._42 * projection._21 + view._43 * projection._31 + view._44 * projection._41;
+		clip[13] = view._41 * projection._12 + view._42 * projection._22 + view._43 * projection._32 + view._44 * projection._42;
+		clip[14] = view._41 * projection._13 + view._42 * projection._23 + view._43 * projection._33 + view._44 * projection._43;
+		clip[15] = view._41 * projection._14 + view._42 * projection._24 + view._43 * projection._34 + view._44 * projection._44;
+		// This will extract the LEFT side of the frustum.
 
-	return r;
-}
+		m_frustum[1][0] = clip[3] - clip[0];
+		m_frustum[1][1] = clip[7] - clip[4];
+		m_frustum[1][2] = clip[11] - clip[8];
+		m_frustum[1][3] = clip[15] - clip[12];
 
-void Frustum::calcPlanes(const Matrix& mm)
-{
-	Matrix m = mm.Transpose();
-	start = 0;
+		NormalizePlane(1);
 
-	count = 5;
+		// This will extract the RIGHT side of the frustum.
 
-	planes[0] = Vector4(m._41 - m._31, m._42 - m._32, m._43 - m._33, m._44 - m._34); // near
-	planes[1] = Vector4(m._41 - m._21, m._42 - m._22, m._43 - m._23, m._44 - m._24); // top
-	planes[2] = Vector4(m._41 - m._11, m._42 - m._12, m._43 - m._13, m._44 - m._14); // right
-	planes[3] = Vector4(m._41 + m._21, m._42 + m._22, m._43 + m._23, m._44 + m._24); // bottom
-	planes[4] = Vector4(m._41 + m._11, m._42 + m._12, m._43 + m._13, m._44 + m._14); // left
+		m_frustum[0][0] = clip[3] + clip[0];
+		m_frustum[0][1] = clip[7] + clip[4];
+		m_frustum[0][2] = clip[11] + clip[8];
+		m_frustum[0][3] = clip[15] + clip[12];
 
-	for (int i = 0; i < count; i++)
+		NormalizePlane(0);
 
-		planes[i] *= 1.0f / DirectX::SimpleMath::Vector3(planes[i]).Length();
-}
+		// This will extract the BOTTOM side of the frustum.
 
-bool Frustum::isVisible(const Vector3& min, const Vector3& max) const
-{
-	if (count < 4) return false;
-	for (int i = start; i < start + count; i++) {
-		const Vector3& n = Vector3(planes[i]);
-		const float d = -planes[i].w;
-		if (n.Dot(max) < d &&
-			n.Dot(min) < d &&
-			n.Dot(Vector3(min.x, max.y, max.z)) < d &&
-			n.Dot(Vector3(max.x, min.y, max.z)) < d &&
-			n.Dot(Vector3(min.x, min.y, max.z)) < d &&
-			n.Dot(Vector3(max.x, max.y, min.z)) < d &&
-			n.Dot(Vector3(min.x, max.y, min.z)) < d &&
-			n.Dot(Vector3(max.x, min.y, min.z)) < d)
-			return false;
+		m_frustum[2][0] = clip[3] + clip[1];
+		m_frustum[2][1] = clip[7] + clip[5];
+		m_frustum[2][2] = clip[11] + clip[9];
+		m_frustum[2][3] = clip[15] + clip[13];
+
+		NormalizePlane(2);
+
+		// This will extract the TOP side of the frustum.
+
+		m_frustum[3][0] = clip[3] - clip[1];
+		m_frustum[3][1] = clip[7] - clip[5];
+		m_frustum[3][2] = clip[11] - clip[9];
+		m_frustum[3][3] = clip[15] - clip[13];
+
+		NormalizePlane(3);
+
+		// This will extract the BACK side of the frustum.
+
+		m_frustum[4][0] = clip[3] + clip[2];
+		m_frustum[4][1] = clip[7] + clip[6];
+		m_frustum[4][2] = clip[11] + clip[10];
+		m_frustum[4][3] = clip[15] + clip[14];
+
+		NormalizePlane(4);
+
+		// This will extract the FRONT side of the frustum.
+
+		m_frustum[5][0] = clip[3] - clip[2];
+		m_frustum[5][1] = clip[7] - clip[6];
+		m_frustum[5][2] = clip[11] - clip[10];
+		m_frustum[5][3] = clip[15] - clip[14];
+
+		NormalizePlane(5);
+
 	}
-	return true;
-}
 
-bool Frustum::isVisible(const Matrix& matrix, const Vector3& min, const Vector3& max)
-{
-	start = count;
 
-	// transform clip planes (relative)
 
-	Matrix m = inverseOrtho(matrix);
-	for (int i = 0; i < count; i++) {
-		Vector4& p = planes[i];
-		Vector4 o = Vector4::Transform(Vector4(p.x * (-p.w), p.y * (-p.w), p.z * (-p.w), 1.0f), m);
-		Vector4 n = Vector4::Transform(Vector4(p.x, p.y, p.z, 0), m);
-		planes[start + i] = Vector4(n.x, n.y, n.z, -Vector3(n).Dot(Vector3(o)));
+	bool Frustum::PointInFrustum(const Vector3& position) const {
+
+		for (uint32_t i = 0; i < 6; i++)
+			if (m_frustum[i][0] * position.x + m_frustum[i][1] * position.y + m_frustum[i][2] * position.z + m_frustum[i][3] <= 0.0f)
+				return false;
+		return true;
+	}
+
+
+
+	bool Frustum::SphereInFrustum(const Vector3& position, float radius) const {
+
+		for (uint32_t i = 0; i < 6; i++)
+			if (m_frustum[i][0] * position.x + m_frustum[i][1] * position.y + m_frustum[i][2] * position.z + m_frustum[i][3] <= -radius)
+				return false;
+		return true;
+	}
+
+
+
+	bool Frustum::AABBInFrustum(const Vector3& min, const Vector3& max) const {
+
+		for (uint32_t i = 0; i < 6; i++)
+
+			if (m_frustum[i][0] * min.x + m_frustum[i][1] * min.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f
+				&& m_frustum[i][0] * max.x + m_frustum[i][1] * min.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f
+				&& m_frustum[i][0] * min.x + m_frustum[i][1] * max.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f
+				&& m_frustum[i][0] * max.x + m_frustum[i][1] * max.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f
+				&& m_frustum[i][0] * min.x + m_frustum[i][1] * min.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f
+				&& m_frustum[i][0] * max.x + m_frustum[i][1] * min.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f
+				&& m_frustum[i][0] * min.x + m_frustum[i][1] * max.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f
+				&& m_frustum[i][0] * max.x + m_frustum[i][1] * max.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f)
+				return false;
+		return true;
 
 	}
 
-	bool visible = isVisible(min, max);
 
-	start = 0;
 
-	return visible;
-}
-
-bool Frustum::isVisible(const Vector3& center, float radius)
-{
-	if (count < 4) return false;
-
-	for (int i = 0; i < count; i++)
-		if (Vector3(planes[i]).Dot(center) + planes[i].w < -radius)
-			return false;
-	return true;
-}
+	void Frustum::NormalizePlane(int32_t side) {
+		float magnitude = sqrt(m_frustum[side][0] * m_frustum[side][0] + m_frustum[side][1] * m_frustum[side][1] + m_frustum[side][2] * m_frustum[side][2]);
+		m_frustum[side][0] /= magnitude;
+		m_frustum[side][1] /= magnitude;
+		m_frustum[side][2] /= magnitude;
+		m_frustum[side][3] /= magnitude;
+	}
