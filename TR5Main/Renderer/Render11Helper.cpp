@@ -313,7 +313,7 @@ void Renderer11::updateItemsAnimations()
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 
 			for (int m = 0; m < itemToDraw->NumMeshes; m++)
-				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m].Transpose();
+				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
 		}
 
 		// Update world matrix
@@ -704,10 +704,7 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 	FieldOfView = fov;
 	View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), up);
 	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, zNear, zFar);
-
-	m_stCameraMatrices.View = View;
-	m_stCameraMatrices.Projection = Projection;
-
+	ViewProjection = View * Projection;
 	// Setup legacy variables
 	PhdZNear = zNear << W2V_SHIFT;
 	PhdZFar = zFar << W2V_SHIFT;

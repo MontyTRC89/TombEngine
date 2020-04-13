@@ -2,6 +2,7 @@
 #include "draw.h"
 #include "pickup.h"
 #include "lara.h"
+#include "camera.h"
 
 short PickupX;
 short PickupY;

@@ -149,7 +149,7 @@ int Renderer11::SyncRenderer()
 	return nf;
 }
 
-ID3D11VertexShader* Renderer11::compileVertexShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode)
+ID3D11VertexShader* Renderer11::compileVertexShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode)
 {
 	HRESULT res;
 
@@ -157,8 +157,9 @@ ID3D11VertexShader* Renderer11::compileVertexShader(const char* fileName, const 
 	ID3DBlob* errors = NULL;
 
 	printf("Compiling vertex shader: %s\n", fileName);
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG;
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, flags, 0, NULL, bytecode, &errors, NULL);
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+
+	res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors);
 	if (FAILED(res))
 	{
 		printf("Compilation failed: %s\n", errors->GetBufferPointer());
@@ -173,7 +174,7 @@ ID3D11VertexShader* Renderer11::compileVertexShader(const char* fileName, const 
 	return shader;
 }
 
-ID3D11PixelShader* Renderer11::compilePixelShader(const char* fileName, const char* function, const char* model, ID3D10Blob** bytecode)
+ID3D11PixelShader* Renderer11::compilePixelShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode)
 {
 	HRESULT res;
 
@@ -181,8 +182,8 @@ ID3D11PixelShader* Renderer11::compilePixelShader(const char* fileName, const ch
 	ID3DBlob* errors = NULL;
 
 	printf("Compiling pixel shader: %s\n", fileName);
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG;
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, function, model, flags, 0, NULL, bytecode, &errors, NULL);
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+	res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors);
 	if (FAILED(res))
 	{
 		printf("Compilation failed: %s\n", errors->GetBufferPointer());
@@ -197,14 +198,14 @@ ID3D11PixelShader* Renderer11::compilePixelShader(const char* fileName, const ch
 	return shader;
 }
 
-ID3D11GeometryShader* Renderer11::compileGeometryShader(const char* fileName)
+ID3D11GeometryShader* Renderer11::compileGeometryShader(const wchar_t * fileName)
 {
 	HRESULT res;
 
 	ID3DBlob* bytecode = NULL;
 	ID3DBlob* errors = NULL;
 
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, NULL, "gs_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, &bytecode, &errors, NULL);
+	res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, NULL, "gs_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, &bytecode, &errors);
 	if (FAILED(res))
 		return NULL;
 
@@ -216,14 +217,14 @@ ID3D11GeometryShader* Renderer11::compileGeometryShader(const char* fileName)
 	return shader;
 }
 
-ID3D11ComputeShader* Renderer11::compileComputeShader(const char* fileName)
+ID3D11ComputeShader* Renderer11::compileComputeShader(const wchar_t * fileName)
 {
 	HRESULT res;
 
 	ID3DBlob* bytecode = NULL;
 	ID3DBlob* errors = NULL;
 
-	res = D3DX11CompileFromFileA(fileName, NULL, NULL, NULL, "gs_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0, NULL, &bytecode, &errors, NULL);
+	res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, NULL, "gs_4_0", D3D10_SHADER_OPTIMIZATION_LEVEL3, 0,&bytecode, &errors);
 	if (FAILED(res))
 		return NULL;
 
@@ -241,14 +242,14 @@ void Renderer11::UpdateProgress(float value)
 }
 
 
-ID3D11Buffer* Renderer11::createConstantBuffer(int size)
+ID3D11Buffer* Renderer11::createConstantBuffer(size_t size)
 {
 	ID3D11Buffer* buffer;
 
 	D3D11_BUFFER_DESC desc;	
 	ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
 		
-	desc.ByteWidth = ceil(size / 16.0f) * 16; // Constant buffer must have a size multiple of 16 bytes
+	desc.ByteWidth = size; // Constant buffer must have a size multiple of 16 bytes
 	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
