@@ -75,8 +75,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	// Set matrices
-	m_stCameraMatrices.View = view.Transpose();
-	m_stCameraMatrices.Projection = projection.Transpose();
+	m_stCameraMatrices.ViewProjection = view*projection;
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -93,9 +92,9 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 		world = world * translation;
 
 		if (obj->animIndex != -1)
-			m_stItem.World = (moveableObj->AnimationTransforms[n] * world).Transpose();
+			m_stItem.World = (moveableObj->AnimationTransforms[n] * world);
 		else
-			m_stItem.World = (moveableObj->BindPoseTransforms[n].Transpose() * world).Transpose();
+			m_stItem.World = (moveableObj->BindPoseTransforms[n] * world);
 		m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
@@ -246,13 +245,11 @@ bool Renderer11::drawShadowMap()
 		Vector3(0.0f, -1.0f, 0.0f));
 	Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
 		(m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
-
-	m_stCameraMatrices.View = view.Transpose();
-	m_stCameraMatrices.Projection = projection.Transpose();
+	m_stCameraMatrices.ViewProjection = view*projection;
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-	m_stShadowMap.LightViewProjection = (view * projection).Transpose();
+	m_stShadowMap.LightViewProjection = (view * projection);
 
 	m_stMisc.AlphaTest = true;
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
@@ -262,7 +259,7 @@ bool Renderer11::drawShadowMap()
 	RendererObject * laraSkin = m_moveableObjects[ID_LARA_SKIN];
 	RendererRoom & const room = m_rooms[LaraItem->roomNumber];
 
-	m_stItem.World = m_LaraWorldMatrix.Transpose();
+	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
@@ -417,7 +414,7 @@ bool Renderer11::drawGunShells()
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(gunshell->pos.yRot), TR_ANGLE_TO_RAD(gunshell->pos.xRot), TR_ANGLE_TO_RAD(gunshell->pos.zRot));
 			Matrix world = rotation * translation;
 
-			m_stItem.World = world.Transpose();
+			m_stItem.World = world;
 			updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 			m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -512,10 +509,9 @@ int Renderer11::drawInventoryScene()
 	float cameraY = g_Inventory->GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory->GetCameraTilt() * RADIAN);
 	float cameraZ = 0.0f;
 
-	m_stCameraMatrices.View = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
-		Vector3(0.0f, g_Inventory->GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)).Transpose();
-	m_stCameraMatrices.Projection = Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
-		g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f).Transpose();
+	m_stCameraMatrices.ViewProjection = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
+		Vector3(0.0f, g_Inventory->GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) * Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
+			g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f);
 
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
@@ -606,9 +602,9 @@ int Renderer11::drawInventoryScene()
 
 				// Finish the world matrix
 				if (obj->animIndex != -1)
-					m_stItem.World = (moveableObj->AnimationTransforms[n] * transform).Transpose();
+					m_stItem.World = (moveableObj->AnimationTransforms[n] * transform);
 				else
-					m_stItem.World = (moveableObj->BindPoseTransforms[n].Transpose() * transform).Transpose();
+					m_stItem.World = (moveableObj->BindPoseTransforms[n] * transform);
 				m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 				m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
@@ -1340,8 +1336,6 @@ bool Renderer11::drawLines2D()
 	m_context->PSSetShader(m_psSolid, NULL, 0);
 	Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth, m_viewport.MaxDepth);
 
-	m_stCameraMatrices.View = Matrix::Identity;
-	m_stCameraMatrices.Projection = Matrix::Identity;
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -1488,7 +1482,7 @@ bool Renderer11::drawRats()
 				Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
 				Matrix world = rotation * translation;
 
-				m_stItem.World = world.Transpose();
+				m_stItem.World = world;
 				m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
 				m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
 				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
@@ -1547,7 +1541,7 @@ bool Renderer11::drawBats()
 					Matrix rotation = Matrix::CreateFromYawPitchRoll(bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
 					Matrix world = rotation * translation;
 
-					m_stItem.World = world.Transpose();
+					m_stItem.World = world;
 					m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
 					m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
 					updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
@@ -1705,8 +1699,6 @@ bool Renderer11::drawLines3D()
 	m_context->VSSetShader(m_vsSolid, NULL, 0);
 	m_context->PSSetShader(m_psSolid, NULL, 0);
 
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -1921,9 +1913,10 @@ bool Renderer11::drawScene(bool dump)
 
 	// Prepare the scene to draw
 	auto time1 = chrono::high_resolution_clock::now();
-
+	prepareCameraForFrame();
 	ProcessClosedDoors();
-	
+
+
 	// TEST
 	//CollectRooms(CurrentRoom);
 
@@ -1932,7 +1925,9 @@ bool Renderer11::drawScene(bool dump)
 	updateLaraAnimations();
 	updateItemsAnimations();
 	updateEffects();
-
+	if (g_Configuration.EnableShadows)
+		drawShadowMap();
+	prepareCameraForFrame();
 	m_items[Lara.itemNumber].Item = LaraItem;
 	collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber]);
 
@@ -1945,8 +1940,6 @@ bool Renderer11::drawScene(bool dump)
 	time1 = time2;
 
 	// Draw shadow map
-	if (g_Configuration.EnableShadows)
-		drawShadowMap();
 
 	// Reset GPU state
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -2122,10 +2115,6 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
-	// Set camera matrices
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
-	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
 	m_stMisc.AlphaTest = !transparent;
@@ -2176,7 +2165,7 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
 	OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
 
-	m_stItem.World = item->World.Transpose();
+	m_stItem.World = item->World;
 	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
@@ -2268,8 +2257,6 @@ bool Renderer11::drawStatics(bool transparent)
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	// Set camera matrices
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -2285,7 +2272,7 @@ bool Renderer11::drawStatics(bool transparent)
 		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
 		RendererMesh* mesh = staticObj->ObjectMeshes[0];
 
-		m_stStatic.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z)).Transpose();
+		m_stStatic.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
 		m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
@@ -2341,9 +2328,6 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->PSSetSamplers(1, 1, &shadowSampler);
 	m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
 
-	// Set camera matrices
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -2352,7 +2336,7 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	{
 		memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
 		m_stShadowMap.CastShadows = true;
-		//m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert().Transpose();
+		//m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
 	}
 	else
 	{
@@ -2517,8 +2501,6 @@ bool Renderer11::drawHorizonAndSky()
 	m_context->VSSetShader(m_vsSky, NULL, 0);
 	m_context->PSSetShader(m_psSky, NULL, 0);
 
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -2538,7 +2520,7 @@ bool Renderer11::drawHorizonAndSky()
 		Matrix translation = Matrix::CreateTranslation(Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
 		Matrix world = rotation * translation;
 
-		m_stStatic.World = (rotation * translation).Transpose();
+		m_stStatic.World = (rotation * translation);
 		m_stStatic.Color = color;
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
@@ -2563,7 +2545,7 @@ bool Renderer11::drawHorizonAndSky()
 
 		RendererObject* moveableObj = m_moveableObjects[ID_HORIZON];
 
-		m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z).Transpose();
+		m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		m_stStatic.Position = Vector4::Zero;
 		m_stStatic.Color = Vector4::One;
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));

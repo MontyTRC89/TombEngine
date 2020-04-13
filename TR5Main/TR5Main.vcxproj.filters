@@ -294,6 +294,42 @@
     <ClInclude Include="Global\legacyfunctions.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\RoomBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\MiscBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ShaderLight.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ShadowLightBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\LightBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\StaticBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ItemBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\CameraMatrixBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\HUDBarBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\HUDBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Frustum.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\bubble.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
@@ -821,6 +857,12 @@
     <ClCompile Include="Objects\TR5\tr5_lion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Frustum.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\bubble.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.fx" />
@@ -864,6 +906,7 @@
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\HUD\DX11_PS_HUD.hlsl" />
     <None Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
+    <None Include="Shaders\CameraMatrixBuffer.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

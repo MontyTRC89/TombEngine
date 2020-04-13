@@ -2,7 +2,6 @@
 
 #include "bass.h"
 #include "bass_fx.h"
-#include <d3dx9math.h>
 #include <vector>
 
 #include "..\Game\control.h"

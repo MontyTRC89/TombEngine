@@ -71,7 +71,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	// Load shaders
 	ID3D10Blob * blob;
 
-	m_vsRooms = compileVertexShader("Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &blob);
+	m_vsRooms = compileVertexShader(L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &blob);
 	if (m_vsRooms == NULL)
 		return false;
 
@@ -90,92 +90,92 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	if (FAILED(res))
 		return false;
 
-	m_psRooms = compilePixelShader("Shaders\\DX11_Rooms.fx", "PS", "ps_4_0", &blob);
+	m_psRooms = compilePixelShader(L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_0", &blob);
 	if (m_psRooms == NULL)
 		return false;
 
-	m_vsItems = compileVertexShader("Shaders\\DX11_Items.fx", "VS", "vs_4_0", &blob);
+	m_vsItems = compileVertexShader(L"Shaders\\DX11_Items.fx", "VS", "vs_4_0", &blob);
 	if (m_vsItems == NULL)
 		return false;
 
-	m_psItems = compilePixelShader("Shaders\\DX11_Items.fx", "PS", "ps_4_0", &blob);
+	m_psItems = compilePixelShader(L"Shaders\\DX11_Items.fx", "PS", "ps_4_0", &blob);
 	if (m_psItems == NULL)
 		return false;
 
-	m_vsStatics = compileVertexShader("Shaders\\DX11_Statics.fx", "VS", "vs_4_0", &blob);
+	m_vsStatics = compileVertexShader(L"Shaders\\DX11_Statics.fx", "VS", "vs_4_0", &blob);
 	if (m_vsStatics == NULL)
 		return false;
 
-	m_psStatics = compilePixelShader("Shaders\\DX11_Statics.fx", "PS", "ps_4_0", &blob);
+	m_psStatics = compilePixelShader(L"Shaders\\DX11_Statics.fx", "PS", "ps_4_0", &blob);
 	if (m_psStatics == NULL)
 		return false;
 
-	m_vsHairs = compileVertexShader("Shaders\\DX11_Hairs.fx", "VS", "vs_4_0", &blob);
+	m_vsHairs = compileVertexShader(L"Shaders\\DX11_Hairs.fx", "VS", "vs_4_0", &blob);
 	if (m_vsHairs == NULL)
 		return false;
 
-	m_psHairs = compilePixelShader("Shaders\\DX11_Hairs.fx", "PS", "ps_4_0", &blob);
+	m_psHairs = compilePixelShader(L"Shaders\\DX11_Hairs.fx", "PS", "ps_4_0", &blob);
 	if (m_psHairs == NULL)
 		return false;
 
-	m_vsSky = compileVertexShader("Shaders\\DX11_Sky.fx", "VS", "vs_4_0", &blob);
+	m_vsSky = compileVertexShader(L"Shaders\\DX11_Sky.fx", "VS", "vs_4_0", &blob);
 	if (m_vsSky == NULL)
 		return false;
 
-	m_psSky = compilePixelShader("Shaders\\DX11_Sky.fx", "PS", "ps_4_0", &blob);
+	m_psSky = compilePixelShader(L"Shaders\\DX11_Sky.fx", "PS", "ps_4_0", &blob);
 	if (m_psSky == NULL)
 		return false;
 
-	m_vsSprites = compileVertexShader("Shaders\\DX11_Sprites.fx", "VS", "vs_4_0", &blob);
+	m_vsSprites = compileVertexShader(L"Shaders\\DX11_Sprites.fx", "VS", "vs_4_0", &blob);
 	if (m_vsSprites == NULL)
 		return false;
 
-	m_psSprites = compilePixelShader("Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", &blob);
+	m_psSprites = compilePixelShader(L"Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", &blob);
 	if (m_psSprites == NULL)
 		return false;
 
-	m_vsSolid = compileVertexShader("Shaders\\DX11_Solid.fx", "VS", "vs_4_0", &blob);
+	m_vsSolid = compileVertexShader(L"Shaders\\DX11_Solid.fx", "VS", "vs_4_0", &blob);
 	if (m_vsSolid == NULL)
 		return false;
 
-	m_psSolid = compilePixelShader("Shaders\\DX11_Solid.fx", "PS", "ps_4_0", &blob);
+	m_psSolid = compilePixelShader(L"Shaders\\DX11_Solid.fx", "PS", "ps_4_0", &blob);
 	if (m_psSolid == NULL)
 		return false;
 
-	m_vsInventory = compileVertexShader("Shaders\\DX11_Inventory.fx", "VS", "vs_4_0", &blob);
+	m_vsInventory = compileVertexShader(L"Shaders\\DX11_Inventory.fx", "VS", "vs_4_0", &blob);
 	if (m_vsInventory == NULL)
 		return false;
 
-	m_psInventory = compilePixelShader("Shaders\\DX11_Inventory.fx", "PS", "ps_4_0", &blob);
+	m_psInventory = compilePixelShader(L"Shaders\\DX11_Inventory.fx", "PS", "ps_4_0", &blob);
 	if (m_psInventory == NULL)
 		return false;
 
-	m_vsFullScreenQuad = compileVertexShader("Shaders\\DX11_FullScreenQuad.fx", "VS", "vs_4_0", &blob);
+	m_vsFullScreenQuad = compileVertexShader(L"Shaders\\DX11_FullScreenQuad.fx", "VS", "vs_4_0", &blob);
 	if (m_vsFullScreenQuad == NULL)
 		return false;
 
-	m_psFullScreenQuad = compilePixelShader("Shaders\\DX11_FullScreenQuad.fx", "PS", "ps_4_0", &blob);
+	m_psFullScreenQuad = compilePixelShader(L"Shaders\\DX11_FullScreenQuad.fx", "PS", "ps_4_0", &blob);
 	if (m_psFullScreenQuad == NULL)
 		return false;
 
-	m_vsShadowMap = compileVertexShader("Shaders\\DX11_ShadowMap.fx", "VS", "vs_4_0", &blob);
+	m_vsShadowMap = compileVertexShader(L"Shaders\\DX11_ShadowMap.fx", "VS", "vs_4_0", &blob);
 	if (m_vsShadowMap == NULL)
 		return false;
 
-	m_psShadowMap = compilePixelShader("Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", &blob);
+	m_psShadowMap = compilePixelShader(L"Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", &blob);
 	if (m_psShadowMap == NULL)
 		return false;
 
-	m_vsHUD = compileVertexShader("Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", &blob);
+	m_vsHUD = compileVertexShader(L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", &blob);
 	if (m_vsHUD == NULL)
 		return false;
-	m_psHUDColor = compilePixelShader("Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", &blob);
+	m_psHUDColor = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", &blob);
 	if (m_psHUDColor == NULL)
 		return false;
-	m_psHUDTexture = compilePixelShader("Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", &blob);
+	m_psHUDTexture = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", &blob);
 	if (m_psHUDTexture == NULL)
 		return false;
-	m_psHUDBarColor = compilePixelShader("Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", &blob);
+	m_psHUDBarColor = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", &blob);
 	if (m_psHUDBarColor == NULL)
 		return false;
 
@@ -190,8 +190,8 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer(sizeof(CHUDBarBuffer));
 	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
-	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0)).Transpose();
-	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f).Transpose();
+	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
+	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
 	updateConstantBuffer(m_cbHUD, &m_stHUD, sizeof(CHUDBuffer));
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;

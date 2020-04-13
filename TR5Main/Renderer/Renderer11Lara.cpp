@@ -247,7 +247,7 @@ void Renderer11::updateLaraAnimations()
 
 	// Transpose matrices for shaders
 	for (int m = 0; m < 15; m++)
-		laraObj->AnimationTransforms[m] = laraObj->AnimationTransforms[m].Transpose();
+		laraObj->AnimationTransforms[m] = laraObj->AnimationTransforms[m];
 }
 
 bool Renderer11::drawLara(bool transparent, bool shadowMap)
@@ -287,8 +287,6 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	// Set camera matrices
-	m_stCameraMatrices.View = View.Transpose();
-	m_stCameraMatrices.Projection = Projection.Transpose();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
@@ -300,7 +298,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
 	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 
-	m_stItem.World = m_LaraWorldMatrix.Transpose();
+	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
