@@ -87,8 +87,8 @@ void Renderer11::collectStatics(short roomNumber)
 		Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
 		min += Vector3(mesh->x, mesh->y, mesh->z);
 		max += Vector3(mesh->x, mesh->y, mesh->z);
-		if (!frustum.AABBInFrustum(min, max))
-			continue;
+		//if (!frustum.AABBInFrustum(min, max))
+		//	continue;
 		Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot));
 		Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
 		newStatic->Mesh = mesh;
