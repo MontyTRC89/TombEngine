@@ -191,7 +191,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	}
 	else
 	{
-		phd_TranslateRel(-4, -4, -48);
+		phd_TranslateRel(-4, -48, -48);
 	}
 
 	PHD_VECTOR pos;
