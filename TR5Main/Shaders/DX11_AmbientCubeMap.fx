@@ -1,8 +1,4 @@
-cbuffer CameraMatrixBuffer
-{
-	float4x4 View;
-	float4x4 Projection;
-};
+#include "./CameraMatrixBuffer.hlsli"
 
 struct VertexShaderInput
 {
@@ -28,7 +24,7 @@ PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
-	output.Position = mul(mul(float4(input.Position, 1.0f), View), Projection); 
+	output.Position = mul(float4(input.Position, 1.0f), ViewProjection); 
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;

@@ -3,7 +3,6 @@
 #include "../Game/camera.h"
 #include "..\Specific\roomload.h"
 #include "../Specific/setup.h"
-
 void Renderer11::collectRooms()
 {
 	short baseRoomIndex = Camera.pos.roomNumber;
@@ -46,9 +45,12 @@ void Renderer11::collectItems(short roomNumber)
 
 		if (m_moveableObjects[item->objectNumber] == NULL)
 			continue;
-
 		RendererItem * newItem = &m_items[itemNum];
-
+		short* bounds = GetBoundsAccurate(item);
+		Vector3 min = (Vector3(bounds[0], bounds[2], bounds[4])) + Vector3(item->pos.xPos,item->pos.yPos,item->pos.zPos);
+		Vector3 max = (Vector3(bounds[1], bounds[3], bounds[5])) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		if(!frustum.AABBInFrustum(min,max))
+			continue;
 		newItem->Item = item;
 		newItem->Id = itemNum;
 		newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
@@ -58,9 +60,7 @@ void Renderer11::collectItems(short roomNumber)
 			TR_ANGLE_TO_RAD(item->pos.zRot));
 		newItem->Scale = Matrix::CreateScale(1.0f);
 		newItem->World = newItem->Rotation * newItem->Translation;
-
 		collectLightsForItem(item->roomNumber, newItem);
-
 		m_itemsToDraw.push_back(newItem);
 	}
 }
@@ -71,27 +71,27 @@ void Renderer11::collectStatics(short roomNumber)
 		return;
 	}
 	RendererRoom& const room = m_rooms[roomNumber];
-
 	ROOM_INFO* r = room.Room;
-
 	if (r->numMeshes <= 0)
 		return;
-
-	MESH_INFO * mesh = r->mesh;
-
 	int numStatics = r->numMeshes;
-
 	for (int i = 0; i < numStatics; i++)
 	{
+		MESH_INFO* mesh = &r->mesh[i];
 		RendererStatic* newStatic = &room.Statics[i];
-
+		STATIC_INFO* staticInfo = &StaticObjects[mesh->staticNumber];
+		Vector3 min = Vector3(staticInfo->xMinc, staticInfo->yMinc, staticInfo->zMinc);
+		Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
+		min += Vector3(mesh->x, mesh->y, mesh->z);
+		max += Vector3(mesh->x, mesh->y, mesh->z);
+		if (!frustum.AABBInFrustum(min, max))
+			continue;
+		Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot));
+		Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
 		newStatic->Mesh = mesh;
 		newStatic->RoomIndex = roomNumber;
-		newStatic->World = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot)) * Matrix::CreateTranslation(mesh->x, mesh->y, mesh->z);
-
+		newStatic->World = rotation * Matrix::CreateTranslation(translation);
 		m_staticsToDraw.push_back(newStatic);
-
-		mesh++;
 	}
 }
 
@@ -452,4 +452,13 @@ void Renderer11::collectEffects(short roomNumber)
 		short* mp = Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)];
 		short hhh = 0;
 	}
+}
+
+void Renderer11::prepareCameraForFrame()
+{
+	// Set camera matrices
+	m_stCameraMatrices.ViewProjection = ViewProjection;
+	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+	frustum.Update(View,Projection);
 }
