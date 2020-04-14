@@ -12,6 +12,7 @@
 #include "../../Game/misc.h"
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
+#include "../../Game/bubble.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -222,7 +223,7 @@ void SubEffects(short item_number)
 				pos3d.zPos = pos.z + (GetRandomControl() & 63) - 32;
 				roomNumber = v->roomNumber;
 				GetFloor(pos3d.xPos, pos3d.yPos, pos3d.zPos, &roomNumber);
-				CreateBubble((PHD_VECTOR*)&pos3d, roomNumber, 4, 8, 0, 0, 0, 0); // CHECK
+				CreateBubble((PHD_VECTOR*)&pos3d, roomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0); // CHECK
 			}
 		}
 	}
