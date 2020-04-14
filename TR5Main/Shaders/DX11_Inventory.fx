@@ -1,8 +1,4 @@
-cbuffer CameraMatrixBuffer : register(b0)
-{
-	float4x4 View;
-	float4x4 Projection;
-};
+#include "./CameraMatrixBuffer.hlsli"
 
 cbuffer ItemBuffer : register(b1)
 {
@@ -42,7 +38,7 @@ PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
-	output.Position = mul(mul(mul(float4(input.Position, 1.0f), World), View), Projection);
+	output.Position = mul(mul(float4(input.Position, 1.0f), World), ViewProjection);
 	output.Normal = (mul(float4(input.Normal, 0.0f), World).xyz);
 	output.Color = input.Color;
 	output.UV = input.UV;

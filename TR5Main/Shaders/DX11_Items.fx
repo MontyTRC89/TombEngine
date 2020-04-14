@@ -13,11 +13,7 @@ struct RendererLight {
 	float Range;
 };
 
-cbuffer CameraMatrixBuffer : register(b0)
-{
-	float4x4 View;
-	float4x4 Projection;
-};
+#include "./CameraMatrixBuffer.hlsli"
 
 cbuffer ItemBuffer : register(b1) 
 {
@@ -67,7 +63,7 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	float4x4 world = mul(Bones[input.Bone], World);
 
-	output.Position = mul(mul(mul(float4(input.Position, 1.0f), world), View), Projection);
+	output.Position = mul(mul(float4(input.Position, 1.0f), world), ViewProjection);
 	output.Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
 	output.Color = input.Color;
 	output.UV = input.UV;
