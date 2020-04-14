@@ -426,8 +426,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBats();
 		UpdateSpiders();
 		UpdateShockwaves();
-		UpdateLightning();
-		UpdatePulseColor();
+		Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
 		if (level->Rumble)

@@ -30,6 +30,7 @@ char LM[] = {
 };
 
 int XFront, ZFront;
+BOUNDING_BOX GlobalCollisionBounds;
 
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
 {
@@ -1442,6 +1443,70 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 
 		if (Lara.hitDirection == -1)
 			Lara.hitFrame = 0;
+	}
+}
+
+void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	if (item->status != ITEM_INVISIBLE)
+	{
+		if (TestBoundsCollide(item, l, coll->radius))
+		{
+			int collided = TestCollision(item, l);
+			if (collided)
+			{
+				short oldRot = item->pos.yRot;
+
+				item->pos.yRot = 0;
+				GetSpheres(item, BaddieSpheres, 1);
+				item->pos.yRot = oldRot;
+				
+				SPHERE* sphere = &BaddieSpheres[0];
+				while (collided)
+				{
+					if (collided & 1)
+					{
+						GlobalCollisionBounds.X1 = sphere->x - sphere->r - item->pos.xPos;
+						GlobalCollisionBounds.X2 = sphere->x + sphere->r - item->pos.xPos;
+						GlobalCollisionBounds.Y1 = sphere->y - sphere->r - item->pos.yPos;
+						GlobalCollisionBounds.Y2 = sphere->y + sphere->r - item->pos.yPos;
+						GlobalCollisionBounds.Z1 = sphere->z - sphere->r - item->pos.zPos;
+						GlobalCollisionBounds.Z2 = sphere->z + sphere->r - item->pos.zPos;
+
+						int x = l->pos.xPos;
+						int y = l->pos.yPos;
+						int z = l->pos.zPos;
+
+						if (ItemPushLara(item, l, coll, (item->itemFlags[0] & (coll->enableSpaz >> 5) & 1), 3) && item->itemFlags[0] & 1)
+						{
+							l->hitPoints -= item->itemFlags[3];
+							
+							int dx = x - l->pos.xPos;
+							int dy = y - l->pos.yPos;
+							int dz = z - l->pos.zPos;
+
+							if (!coll->enableBaddiePush)
+							{
+								l->pos.xPos += dx;
+								l->pos.yPos += dy;
+								l->pos.zPos += dz;
+							}
+
+							if (dx || dy || dz)
+							{
+								if (TriggerActive(item))
+									TriggerLaraBlood();
+							}
+						}
+					}
+
+					collided >>= 1;
+					sphere++;
+				}
+			}
+		}
 	}
 }
 
