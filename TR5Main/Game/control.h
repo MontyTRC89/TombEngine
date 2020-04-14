@@ -2,8 +2,6 @@
 
 #include "..\Global\global.h"
 
-#define UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
-#define UpdatePulseColor ((void (__cdecl*)()) 0x00480830)
 #define DoRayBox_sub_401523 ((int (__cdecl*)(PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*)) 0x00401523)
 
 #define TRIG_BITS(T) ((T & 0x3fff) >> 10)

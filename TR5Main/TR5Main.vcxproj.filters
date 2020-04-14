@@ -18,9 +18,6 @@
     <ClInclude Include="targetver.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Anim.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Box.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -34,9 +31,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\debris.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\delstuff.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\deltapak.h">
@@ -302,9 +296,6 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\anim.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\box.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -318,9 +309,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\debris.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\delstuff.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\deltapak.cpp">

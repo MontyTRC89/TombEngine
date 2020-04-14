@@ -2446,7 +2446,7 @@ bool Renderer11::drawHorizonAndSky()
 	// Storm
 	if (level->Storm)
 	{
-		if (Unk_00E6D74C || Unk_00E6D73C)
+		if (LightningCount || LightningRand)
 		{
 			UpdateStorm();
 			if (StormTimer > -1)
@@ -2456,8 +2456,8 @@ bool Renderer11::drawHorizonAndSky()
 		}
 		else if (!(rand() & 0x7F))
 		{
-			Unk_00E6D74C = (rand() & 0x1F) + 16;
-			Unk_00E6E4DC = rand() + 256;
+			LightningCount = (rand() & 0x1F) + 16;
+			dLightningRand = rand() + 256;
 			StormTimer = (rand() & 3) + 12;
 		}
 
