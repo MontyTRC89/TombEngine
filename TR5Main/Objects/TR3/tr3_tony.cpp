@@ -654,7 +654,7 @@ void TonyControl(short itemNum)
 
 void DrawTony(ITEM_INFO* item)
 {
-	DrawAnimatingItem(item);
+	//DrawAnimatingItem(item);
 
 	// TODO: psx draw (need to be rewrited !)
 	//if (bossdata.explode_count && item->hitPoints <= 0)

@@ -1186,7 +1186,7 @@ void InitialiseKayak(short item_number)
 void DrawKayak(ITEM_INFO* kayak)
 {
 	kayak->pos.yPos += KAYAK_DRAW_SHIFT;
-	DrawAnimatingItem(kayak);
+	//DrawAnimatingItem(kayak);
 	kayak->pos.yPos -= KAYAK_DRAW_SHIFT;
 }
 
