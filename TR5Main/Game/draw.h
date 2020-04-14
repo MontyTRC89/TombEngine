@@ -2,10 +2,10 @@
 
 #include "..\Global\global.h"
 
-#define GetBoundsAccurate ((short* (__cdecl*)(ITEM_INFO*)) 0x0042CF80)
-#define GetBestFrame ((short* (__cdecl*)(ITEM_INFO*)) 0x0042D020)
+//#define GetBoundsAccurate ((short* (__cdecl*)(ITEM_INFO*)) 0x0042CF80)
+//#define GetBestFrame ((short* (__cdecl*)(ITEM_INFO*)) 0x0042D020)
 #define CalcLaraMatrices ((void (__cdecl*)(int)) 0x0041E120)
-#define Sync ((int (__cdecl*)()) 0x004D1A40)
+//#define Sync ((int (__cdecl*)()) 0x004D1A40)
 #define IsRoomOutside ((int (__cdecl*)(int, int, int)) 0x00418E90) 
 #define sub_42B4C0 ((void (__cdecl*)(ITEM_INFO*,short*)) 0x0042B4C0)
 
@@ -54,9 +54,14 @@ extern byte SkyStormColor[3];
 extern byte SkyStormColor2[3];
 
 int DrawPhaseGame();
-void DrawAnimatingItem(ITEM_INFO* item);
 int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate);
 void UpdateStorm();
+short* GetBoundsAccurate(ITEM_INFO* item);
+short* GetBestFrame(ITEM_INFO* item);
+int Sync();
+bool TIME_Init();
+bool TIME_Reset();
+void DrawAnimatingItem(ITEM_INFO* item);
 
 /* phd function (DX11 version) */
 // TODO: phd_XX function after this lign is used with DX11 one, when it's finished, delete the #define one and delete this sign: "_" at the beginning of the new function. (delete the unused if needed)
