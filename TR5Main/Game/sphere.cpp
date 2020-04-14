@@ -192,7 +192,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 {
 	int* MatrixStash = MatrixPtr;
 	int* IMStash = IMptr;
-	byte* DxMatrixStash = DxMatrixPtr;
+	int* DxMatrixStash = DxMatrixPtr;
 
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	
