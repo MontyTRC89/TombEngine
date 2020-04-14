@@ -163,7 +163,6 @@ bool TIME_Init()
 
 int Sync()
 {
-	int nFrames;
 	LARGE_INTEGER ct;
 	double dCounter;
 	
@@ -182,15 +181,50 @@ int Sync()
 void DrawAnimatingItem(ITEM_INFO* item)
 {
 	// TODO: to refactor
-	// Empty stub because actually we disable items draing when drawRoutine pointer is NULL in OBJECT_INFO
+	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
 }
 
-void _InitInterpolate(void)
+#define DxIMStack	ARRAY_(0x00E6D860, int, [768])
+#define DxIMptr		VAR_U_(0x00E6D834, int*)
+#define IMStack		ARRAY_(0x00E6CB00, int, [768])
+#define IMptr		VAR_U_(0x00E6E468, int*)
+#define IM_Rate		VAR_U_(0x00E6E464, int)
+#define IM_Frac		VAR_U_(0x00E6D734, int)
+
+void InitInterpolate(int frac, int rate)
 {
+	IM_Rate = rate;
+	IM_Frac = frac;
+	IMptr = IMStack;
+	DxIMptr = DxIMStack;
+	memcpy(IMStack, MatrixPtr, 48);
+	memcpy(DxIMStack, DxMatrixPtr, 48);
+}
+
+void phd_PushMatrix(void)
+{
+	memcpy((MatrixPtr + 12), MatrixPtr, 48);
+	MatrixPtr += 12;
+	DxMatrixPtr += 48;
+}
+
+void phd_PopMatrix(void)
+{
+	MatrixPtr -= 12;
+	DxMatrixPtr -= 48;
+}
+
+void phd_PopMatrix_I(void)
+{
+	MatrixPtr -= 12;
+	DxMatrixPtr -= 48;
+	IMptr -= 12;
+	DxIMptr -= 12;
 }
 
 void _phd_PushMatrix(void)
 {
+
 }
 
 void _phd_PushMatrix_I(void)
@@ -199,6 +233,7 @@ void _phd_PushMatrix_I(void)
 
 void _phd_PushUnitMatrix(void)
 {
+
 }
 
 void _phd_RotYXZ(short ry, short rx, short rz)
@@ -297,21 +332,12 @@ void _phd_DxRotYXZpack(int rangle)
 {
 }
 
-void phd_PopMatrix(void)
-{
-	MatrixPtr -= 12;
-	DxMatrixPtr -= 48;
-}
-
-void _phd_PopMatrix_I(void)
-{
-	MatrixPtr -= 12;
-	DxMatrixPtr -= 48;
-}
-
 void Inject_Draw()
 {
-	/*INJECT(GetBoundsAccurate, 0x0042CF80);
-	INJECT(GetBestFrame, 0x0042D020);
-	INJECT(Sync, 0x004D1A40);*/
+	INJECT(0x0048F9C0, phd_PushMatrix);
+	INJECT(0x0042CF80, GetBoundsAccurate);
+	INJECT(0x0042D020, GetBestFrame);
+	INJECT(0x004D1A40, Sync);
+	INJECT(0x0042BE90, InitInterpolate);
+	INJECT(0x0042BF00, phd_PopMatrix_I)
 }
