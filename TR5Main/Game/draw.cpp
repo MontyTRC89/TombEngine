@@ -201,20 +201,20 @@ void InitInterpolate(int frac, int rate)
 	memcpy(DxIMStack, DxMatrixPtr, 48);
 }
 
-void phd_PushMatrix(void)
+void phd_PushMatrix()
 {
 	memcpy((MatrixPtr + 12), MatrixPtr, 48);
 	MatrixPtr += 12;
 	DxMatrixPtr += 12;
 }
 
-void phd_PopMatrix(void)
+void phd_PopMatrix()
 {
 	MatrixPtr -= 12;
 	DxMatrixPtr -= 12;
 }
 
-void phd_PopMatrix_I(void)
+void phd_PopMatrix_I()
 {
 	MatrixPtr -= 12;
 	DxMatrixPtr -= 12;
@@ -222,18 +222,29 @@ void phd_PopMatrix_I(void)
 	DxIMptr -= 12;
 }
 
-void _phd_PushMatrix(void)
+void phd_PushMatrix_I()
 {
+	phd_PushMatrix();
 
+	memcpy((IMptr + 48), IMptr, 48);
+	memcpy((DxIMptr + 48), DxIMptr, 48);
+
+	IMptr += 12;
+	DxIMptr += 12;
 }
 
-void _phd_PushMatrix_I(void)
+void phd_PushUnitMatrix()
 {
-}
+	MatrixPtr += 12;
+	DxMatrixPtr += 12;
 
-void _phd_PushUnitMatrix(void)
-{
+	int* mptr = MatrixPtr;
 
+	ZeroMemory(mptr, 48);
+
+	*(mptr + M00) = 0x4000;
+	*(mptr + M11) = 0x4000;
+	*(mptr + M22) = 0x4000;
 }
 
 void phd_RotYXZ(short ry, short rx, short rz)
@@ -470,8 +481,92 @@ void phd_TranslateAbs(int x, int y, int z)
 	*(mptr + M23) = *(mptr + M20) * x + *(mptr + M21) * y + *(mptr + M22) * z;
 }
 
-void _phd_RotYXZpack(short ry, short rx, short rz)
+void phd_SetTrans(int x, int y, int z)
 {
+	int* mptr = MatrixPtr;
+
+	*(mptr + M03) = x;
+	*(mptr + M13) = y;
+	*(mptr + M23) = z;
+}
+
+void phd_GetVectorAngles(int x, int y, int z, short* angles)
+{
+	*(angles + 0) = ATAN(z, x);
+	while ((short)x != x || (short)y != y || (short)z != z)
+	{
+		x >>= 2;
+		y >>= 2;
+		z >>= 2;
+	}
+
+	short pitch = ATAN(SQRT_ASM(SQUARE(x) + SQUARE(z)), y);
+	if ((y > 0 && pitch > 0) || (y < 0 && pitch < 0))
+		pitch = -pitch;
+	*(angles + 1) = pitch;
+}
+
+void phd_RotYXZpack(int rots)
+{
+	int sina, cosa, r0, r1;
+	int* mptr = MatrixPtr;
+
+	int ang = (((rots >> 10) & 1023) << 6);		
+	if (ang)
+	{
+		sina = SIN(ang);
+		cosa = COS(ang);
+		r0 = *(mptr + M00) * cosa - *(mptr + M02) * sina;
+		r1 = *(mptr + M02) * cosa + *(mptr + M00) * sina;
+		*(mptr + M00) = r0 >> W2V_SHIFT;
+		*(mptr + M02) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M10) * cosa - *(mptr + M12) * sina;
+		r1 = *(mptr + M12) * cosa + *(mptr + M10) * sina;
+		*(mptr + M10) = r0 >> W2V_SHIFT;
+		*(mptr + M12) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M20) * cosa - *(mptr + M22) * sina;
+		r1 = *(mptr + M22) * cosa + *(mptr + M20) * sina;
+		*(mptr + M20) = r0 >> W2V_SHIFT;
+		*(mptr + M22) = r1 >> W2V_SHIFT;
+	}
+
+	ang = (((rots >> 20) & 1023) << 6);
+	if (ang)
+	{
+		sina = SIN(ang);
+		cosa = COS(ang);
+		r0 = *(mptr + M01) * cosa + *(mptr + M02) * sina;
+		r1 = *(mptr + M02) * cosa - *(mptr + M01) * sina;
+		*(mptr + M01) = r0 >> W2V_SHIFT;
+		*(mptr + M02) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M11) * cosa + *(mptr + M12) * sina;
+		r1 = *(mptr + M12) * cosa - *(mptr + M11) * sina;
+		*(mptr + M11) = r0 >> W2V_SHIFT;
+		*(mptr + M12) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M21) * cosa + *(mptr + M22) * sina;
+		r1 = *(mptr + M22) * cosa - *(mptr + M21) * sina;
+		*(mptr + M21) = r0 >> W2V_SHIFT;
+		*(mptr + M22) = r1 >> W2V_SHIFT;
+	}
+
+	ang = ((rots & 1023) << 6);	
+	if (ang)
+	{
+		sina = SIN(ang);
+		cosa = COS(ang);
+		r0 = *(mptr + M00) * cosa + *(mptr + M01) * sina;
+		r1 = *(mptr + M01) * cosa - *(mptr + M00) * sina;
+		*(mptr + M00) = r0 >> W2V_SHIFT;
+		*(mptr + M01) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M10) * cosa + *(mptr + M11) * sina;
+		r1 = *(mptr + M11) * cosa - *(mptr + M10) * sina;
+		*(mptr + M10) = r0 >> W2V_SHIFT;
+		*(mptr + M11) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M20) * cosa + *(mptr + M21) * sina;
+		r1 = *(mptr + M21) * cosa - *(mptr + M20) * sina;
+		*(mptr + M20) = r0 >> W2V_SHIFT;
+		*(mptr + M21) = r1 >> W2V_SHIFT;
+	}
 }
 
 void _gar_RotYXZsuperpack(short** pproc, int skip)
@@ -533,4 +628,9 @@ void Inject_Draw()
 	INJECT(0x0042C110, phd_TranslateRel_I);
 	INJECT(0x0042C190, phd_TranslateRel_ID);
 	INJECT(0x004903F0, phd_TranslateAbs);
+	INJECT(0x0048FA40, phd_SetTrans);
+	INJECT(0x0042BF50, phd_PushMatrix_I);
+	INJECT(0x0048FA90, phd_PushUnitMatrix);
+	INJECT(0x004904B0, phd_GetVectorAngles);
+	INJECT(0x0048FEB0, phd_RotYXZpack);
 }
