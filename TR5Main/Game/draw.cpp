@@ -24,6 +24,10 @@ int StormTimer;
 int dLightningRand;
 byte SkyStormColor[3];
 byte SkyStormColor2[3];
+short InterpolatedBounds[6];
+LARGE_INTEGER PerformanceCount;
+double LdFreq;
+double LdSync;
 
 int DrawPhaseGame()
 {
@@ -71,130 +75,37 @@ void UpdateStorm()
 	}
 }
 
-void DrawAnimatingItem(ITEM_INFO* item)
+short* GetBoundsAccurate(ITEM_INFO* item)
 {
-	/*OBJECT_INFO* obj;
-	CREATURE_INFO* creature;
-	int* bones;
-	int clip, i, poppush, frac, rate, bit;
-	short* frames[2];
-	short* extra_rotation;
-	short* rotation1, *rotation2;
-	short** mesh;
-
-	creature = (CREATURE_INFO*)item->data;
-	frac = GetFrame_D2(item, frames, &rate);
-	obj = &Objects[item->objectNumber];
-
-	//if (obj->shadowSize)
-	//	S_PrintShadow(obj->shadowSize, frames[0], item, NULL);
-
-	phd_PushMatrix();
-	phd_TranslateAbs(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-
-	// checking objectMip there, deleted !
-
-	sub_42B4C0(item, frames[0]);
-	if (phd_ClipBoundingBox(frames[0]))
+	int rate = 0;
+	short* framePtr[2];
+	
+	int frac = GetFrame_D2(item, framePtr, &rate);
+	if (frac == 0)
+		return framePtr[0];
+	else
 	{
-		//CalculateObjectLighting(item, frames[0]);
-
-		if (item->data == NULL)
-			extra_rotation = NullRotations;
-		else
-			extra_rotation = (short*)item->data;
-
-		mesh = &Meshes[Objects[item->objectNumber].meshIndex];
-		bones = &Bones[obj->boneIndex];
-		bit = 1;
-
-		if (!frac)
+		for (int i = 0; i < 6; i++)
 		{
-			phd_TranslateRel((int)*(frames[0] + 6), (int)*(frames[0] + 7), (int)*(frames[0] + 8)); // can be [0][6] etc.. ?
-			rotation1 = (short*)(frames[0] + 9);
-			gar_RotYXZsuperpack(&rotation1, 0);
-
-			if (item->meshBits & bit)
-				phd_PutPolygons(*mesh);
-
-			for (i = (obj->nmeshes - 1); i > 0; i--, bones += 4, mesh += 2)
-			{
-				poppush = *bones;
-
-				if (poppush & 1)
-				{
-					phd_PopMatrix();
-					phd_PopDxMatrix();
-				}
-
-				if (poppush & 2)
-					phd_PushMatrix();
-
-				phd_TranslateRel(*(bones + 1), *(bones + 2), *(bones + 3));
-				gar_RotYXZsuperpack(&rotation1, 0);
-
-				if (extra_rotation && (poppush & (ROT_X | ROT_Y | ROT_Z)))
-				{
-					if (poppush & ROT_Y)
-						phd_RotY(*(extra_rotation++));
-					if (poppush & ROT_X)
-						phd_RotX(*(extra_rotation++));
-					if (poppush & ROT_Z)
-						phd_RotZ(*(extra_rotation++));
-				}
-
-				bit <<= 1;
-				if (item->meshBits & bit)
-					phd_PutPolygons(*mesh);
-			}
+			InterpolatedBounds[i] = *(framePtr[0]) + ((*(framePtr[1]) - *(framePtr[0])) * frac) / rate;
+			framePtr[0]++;
+			framePtr[1]++;
 		}
-		else
-		{
-			InitInterpolate(frac, rate);
-			phd_TranslateRel_ID((int)*(frames[0] + 6), (int)*(frames[0] + 7), (int)*(frames[0] + 8), (int)*(frames[1] + 6), (int)*(frames[1] + 7), (int)*(frames[1] + 8));
-			rotation1 = (short*)(frames[0] + 9);
-			rotation2 = (short*)(frames[1] + 9);
-			gar_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
-
-			if (item->meshBits & bit)
-				phd_PutPolygons_I(*mesh);
-
-			for (i = (obj->nmeshes - 1); i > 0; i--, bones += 4, mesh += 2)
-			{
-				poppush = *bones;
-				if (poppush & 1)
-					phd_PopMatrix_I();
-
-				if (poppush & 2)
-					phd_PushMatrix_I();
-
-				phd_TranslateRel_I(*(bones + 1), *(bones + 2), *(bones + 3));
-				gar_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
-
-				if (extra_rotation && (poppush & (ROT_X | ROT_Y | ROT_Z)))
-				{
-					if (poppush & ROT_Y)
-						phd_RotY_I(*(extra_rotation++));
-					if (poppush & ROT_X)
-						phd_RotX_I(*(extra_rotation++));
-					if (poppush & ROT_Z)
-						phd_RotZ_I(*(extra_rotation++));
-				}
-
-				bit <<= 1;
-				if (item->meshBits & bit)
-					phd_PutPolygons_I(*mesh);
-			}
-		}
+		return InterpolatedBounds;
 	}
+}
 
-	PhdRight = PhdWidth;
-	PhdLeft = 0;
-	PhdTop = 0;
-	PhdBottom = PhdHeight;
-	phd_PopMatrix();
-	phd_PopDxMatrix();*/
+short* GetBestFrame(ITEM_INFO* item)
+{
+	int rate = 0;
+	short* framePtr[2];
+
+	int frac = GetFrame_D2(item, framePtr, &rate);
+
+	if (frac <= (rate >> 1))
+		return framePtr[0];
+	else
+		return framePtr[1];
 }
 
 int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
@@ -221,6 +132,57 @@ int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
 	if (second>anim->frameEnd)                       // Clamp KeyFrame to End if need be
 		*rate = anim->frameEnd - (second - rat);
 	return(interp);
+}
+
+bool TIME_Reset()
+{
+	LARGE_INTEGER fq;
+
+	QueryPerformanceCounter(&fq);
+
+	LdSync = (double)fq.LowPart + (double)fq.HighPart * (double)0xffffffff;
+	LdSync /= LdFreq;
+
+	return true;
+}
+
+bool TIME_Init()
+{
+	LARGE_INTEGER fq;
+
+	if (!QueryPerformanceFrequency(&fq))
+		return false;
+
+	LdFreq = (double)fq.LowPart + (double)fq.HighPart * (double)0xFFFFFFFF;
+	LdFreq /= 60.0;
+
+	TIME_Reset();
+
+	return true;
+}
+
+int Sync()
+{
+	int nFrames;
+	LARGE_INTEGER ct;
+	double dCounter;
+	
+	QueryPerformanceCounter(&ct);
+	
+	dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xFFFFFFFF;
+	dCounter /= LdFreq;
+	
+	nFrames = long(dCounter) - long(LdSync);
+	
+	LdSync = dCounter;
+	
+	return nFrames;
+}
+
+void DrawAnimatingItem(ITEM_INFO* item)
+{
+	// TODO: to refactor
+	// Empty stub because actually we disable items draing when drawRoutine pointer is NULL in OBJECT_INFO
 }
 
 void _InitInterpolate(void)
@@ -349,5 +311,7 @@ void _phd_PopMatrix_I(void)
 
 void Inject_Draw()
 {
-	//INJECT(0x0042B900, DrawAnimatingItem);
+	/*INJECT(GetBoundsAccurate, 0x0042CF80);
+	INJECT(GetBestFrame, 0x0042D020);
+	INJECT(Sync, 0x004D1A40);*/
 }

@@ -1108,7 +1108,7 @@ void LondonBossControl(short item_number)
 
 void S_DrawLondonBoss(ITEM_INFO* item)
 {
-	DrawAnimatingItem(item);
+	//DrawAnimatingItem(item);
 
 	if (bossdata.explode_count)
 	{
