@@ -2,15 +2,15 @@
 
 #include "..\Global\global.h"
 
-//#define GetBoundsAccurate ((short* (__cdecl*)(ITEM_INFO*)) 0x0042CF80)
-//#define GetBestFrame ((short* (__cdecl*)(ITEM_INFO*)) 0x0042D020)
 #define CalcLaraMatrices ((void (__cdecl*)(int)) 0x0041E120)
-//#define Sync ((int (__cdecl*)()) 0x004D1A40)
 #define IsRoomOutside ((int (__cdecl*)(int, int, int)) 0x00418E90) 
 #define sub_42B4C0 ((void (__cdecl*)(ITEM_INFO*,short*)) 0x0042B4C0)
 
-#define InitInterpolate ((void(__cdecl*)(int,int)) 0x0042BE90)
-#define phd_PushMatrix ((void(__cdecl*)(void)) 0x0048F9C0)
+//#define InitInterpolate ((void(__cdecl*)(int,int)) 0x0042BE90)
+//#define Sync ((int (__cdecl*)()) 0x004D1A40)
+//#define GetBoundsAccurate ((short* (__cdecl*)(ITEM_INFO*)) 0x0042CF80)
+//#define GetBestFrame ((short* (__cdecl*)(ITEM_INFO*)) 0x0042D020)
+//#define phd_PushMatrix ((void(__cdecl*)(void)) 0x0048F9C0)
 #define phd_PushMatrix_I ((void(__cdecl*)(void)) 0x0042BF50)
 #define phd_PushUnitMatrix ((void (__cdecl*)()) 0x0048FA90)
 #define phd_GetVectorAngles ((void(__cdecl*)(int, int, int, short*)) 0x004904B0)
@@ -25,7 +25,7 @@
 #define gar_RotYXZsuperpack ((void(__cdecl*)(short**,int)) 0x0042C310)
 #define gar_RotYXZsuperpack_I ((void(__cdecl*)(short**,short**,int)) 0x0042C290)
 #define phd_ClipBoundingBox ((int(__cdecl*)(short*)) 0x004B7EB0) // int S_GetObjectBounds(frames[0])
-#define phd_PopMatrix_I ((void(__cdecl*)(void)) 0x0042BF00)
+//#define phd_PopMatrix_I ((void(__cdecl*)(void)) 0x0042BF00)
 #define phd_RotY ((void(__cdecl*)(short)) 0x0048FCD0)
 #define phd_RotX ((void(__cdecl*)(short)) 0x0048FBE0)
 #define phd_RotZ ((void(__cdecl*)(short)) 0x0048FDC0)
@@ -63,11 +63,14 @@ bool TIME_Init();
 bool TIME_Reset();
 void DrawAnimatingItem(ITEM_INFO* item);
 
+void phd_PushMatrix(void);
+void InitInterpolate(int frac, int rate);
+void phd_PopMatrix(void);
+void phd_PopMatrix_I(void);
+
 /* phd function (DX11 version) */
 // TODO: phd_XX function after this lign is used with DX11 one, when it's finished, delete the #define one and delete this sign: "_" at the beginning of the new function. (delete the unused if needed)
 
-void _InitInterpolate(void);
-void _phd_PushMatrix(void);
 void _phd_PushMatrix_I(void);
 void _phd_PushUnitMatrix(void);
 void _phd_RotYXZ(short ry, short rx, short rz);
@@ -95,9 +98,6 @@ void _phd_DxRotX(short rx);
 void _phd_DxRotZ(short rz);
 void _phd_DxRotYXZ(short ry, short rx, short rz);
 void _phd_DxRotYXZpack(int rangle);
-
-void phd_PopMatrix(void);
-void _phd_PopMatrix_I(void);
 
 extern Renderer11* g_Renderer;
 extern BITE_INFO EnemyBites[9];
