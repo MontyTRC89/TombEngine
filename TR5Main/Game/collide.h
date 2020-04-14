@@ -7,8 +7,9 @@
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
 
-#define GenericSphereBoxCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00413A90)
+extern BOUNDING_BOX GlobalCollisionBounds;
 
+void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
 int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int flag1, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
 int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);

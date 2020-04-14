@@ -18,6 +18,13 @@ BITE_INFO EnemyBites[9] =
 
 Renderer11* g_Renderer;
 
+int LightningCount;
+int LightningRand;
+int StormTimer;
+int dLightningRand;
+byte SkyStormColor[3];
+byte SkyStormColor2[3];
+
 int DrawPhaseGame()
 {
 	// Control routines uses joints calculated here for getting Lara joint positions
@@ -33,6 +40,35 @@ int DrawPhaseGame()
 	phd_PopMatrix();
 
 	return Camera.numberFrames;
+}
+
+void UpdateStorm()
+{
+	if (LightningCount <= 0)
+	{
+		if (LightningRand < 4)
+			LightningRand = 0;
+		else
+			LightningRand = LightningRand - (LightningRand >> 2);
+	}
+	else if (--LightningCount)
+	{
+		dLightningRand = rand() & 0x1FF;
+		LightningRand = ((dLightningRand - LightningRand) >> 1) + LightningRand;
+	}
+	else
+	{
+		dLightningRand = 0;
+		LightningRand = (rand() & 0x7F) + 400;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		SkyStormColor2[i] += LightningRand * SkyStormColor2[i] >> 8;
+		SkyStormColor[i] = SkyStormColor2[i];
+		if (SkyStormColor[i] > 255)
+			SkyStormColor[i] = 255;
+	}
 }
 
 void DrawAnimatingItem(ITEM_INFO* item)

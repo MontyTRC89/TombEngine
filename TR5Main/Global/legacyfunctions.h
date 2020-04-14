@@ -50,6 +50,9 @@
 #define Legacy_SaveD3DCameraMatrix ((void(__cdecl*)()) 0x00497280)
 #define Legacy_UnknownCamera ((void(__cdecl*)()) 0x004975D0)
 
+// COLLIDE.CPP
+#define Legacy_GenericSphereBoxCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00413A90)
+
 // CONTROL.CPP
 #define Legacy_GetCeiling ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00417640)
 #define Legacy_GetRandomControl ((int (__cdecl*)()) 0x004A7C10)
@@ -84,6 +87,7 @@
 #define Legacy_GetFloorHeight ((int (__cdecl*)(FLOOR_INFO*, int, int, int)) 0x00415FB0)
 #define Legacy_GetWaterHeight ((int (__cdecl*)(int, int, int, short)) 0x00415DA0)
 #define Legacy_UpdateSpiders ((void (__cdecl*)()) 0x0047A340)
+#define Legacy_UpdateLightning ((void (__cdecl*)()) 0x00484CB0)
 
 // DOOR.CPP
 #define Legacy_InitialiseDoor ((void (__cdecl*)(short)) 0x0043DB60)
@@ -92,6 +96,9 @@
 #define Legacy_InitialiseSteelDoor ((void (__cdecl*)(short)) 0x0043F180)
 #define Legacy_SteelDoorControl ((void (__cdecl*)(short)) 0x00486BE0)
 #define Legacy_SteelDoorCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00487AD0)
+
+// DRAW.CPP
+#define Legacy_UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 
 // EFFECT2.CPP
 #define Legacy_DetatchSpark ((SPARKS* (__cdecl*)(int, int)) 0x0042E6A0)

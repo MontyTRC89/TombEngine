@@ -4,6 +4,7 @@
 #include "..\Game\lot.h"
 #include "..\Game\sound.h"
 #include "..\Game\savegame.h"
+#include "..\Game\draw.h"
 
 ChunkId* ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
 ChunkId* ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");

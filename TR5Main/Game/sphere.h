@@ -10,6 +10,7 @@
 #define InitInterpolate2 ((int (__cdecl*)(int, int)) 0x00479BB0)
 
 extern bool GotLaraSpheres;
+extern SPHERE BaddieSpheres[34];
 
 int TestCollision(ITEM_INFO* item, ITEM_INFO* l);
 int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace);
