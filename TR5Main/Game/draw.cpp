@@ -416,28 +416,58 @@ void phd_RotZ_I(short rz)
 	DxMatrixPtr = dxptr;
 }
 
-void _phd_PutPolygons(void)
+void phd_TranslateRel(int x, int y, int z)
 {
+	int* mptr = MatrixPtr;
+
+	*(mptr + M03) += *(mptr + M00) * x + *(mptr + M01) * y + *(mptr + M02) * z;
+	*(mptr + M13) += *(mptr + M10) * x + *(mptr + M11) * y + *(mptr + M12) * z;
+	*(mptr + M23) += *(mptr + M20) * x + *(mptr + M21) * y + *(mptr + M22) * z;
 }
 
-void _phd_PutPolygons_I(void)
+void phd_TranslateRel_I(int x, int y, int z)
 {
+	phd_TranslateRel(x, y, z);
+
+	int* mptr = MatrixPtr;
+	int* dxptr = DxMatrixPtr;
+
+	MatrixPtr = IMptr;
+	DxMatrixPtr = DxIMptr;
+
+	phd_TranslateRel(x, y, z);
+
+	MatrixPtr = mptr;
+	DxMatrixPtr = dxptr;
 }
 
-void _phd_TranslateRel(int x, int y, int z)
+void phd_TranslateRel_ID(int x1, int y1, int z1, int x2, int y2, int z2)
 {
+	phd_TranslateRel(x1, y1, z1);
+
+	int* mptr = MatrixPtr;
+	int* dxptr = DxMatrixPtr;
+
+	MatrixPtr = IMptr;
+	DxMatrixPtr = DxIMptr;
+
+	phd_TranslateRel(x2, y2, z2);
+
+	MatrixPtr = mptr;
+	DxMatrixPtr = dxptr;
 }
 
-void _phd_TranslateRel_I(int x, int y, int z)
+void phd_TranslateAbs(int x, int y, int z)
 {
-}
+	int* mptr = MatrixPtr;
 
-void _phd_TranslateRel_ID(int x1, int y1, int z1, int x2, int y2, int z2)
-{
-}
+	x -= *(W2VMatrix + M03);
+	y -= *(W2VMatrix + M13);
+	z -= *(W2VMatrix + M23);
 
-void _phd_TranslateAbs(int x, int y, int z)
-{
+	*(mptr + M03) = *(mptr + M00) * x + *(mptr + M01) * y + *(mptr + M02) * z;
+	*(mptr + M13) = *(mptr + M10) * x + *(mptr + M11) * y + *(mptr + M12) * z;
+	*(mptr + M23) = *(mptr + M20) * x + *(mptr + M21) * y + *(mptr + M22) * z;
 }
 
 void _phd_RotYXZpack(short ry, short rx, short rz)
@@ -499,4 +529,8 @@ void Inject_Draw()
 	INJECT(0x0042C030, phd_RotX_I);
 	INJECT(0x0042BFC0, phd_RotY_I);
 	INJECT(0x0042C0A0, phd_RotZ_I);
+	INJECT(0x0048FB20, phd_TranslateRel);
+	INJECT(0x0042C110, phd_TranslateRel_I);
+	INJECT(0x0042C190, phd_TranslateRel_ID);
+	INJECT(0x004903F0, phd_TranslateAbs);
 }
