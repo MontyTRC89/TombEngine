@@ -449,7 +449,7 @@ unsigned __stdcall GameMain(void*)
 
 	// We still need legacy matrices because control routines use them
 	MatrixPtr = MatrixStack;
-	DxMatrixPtr = (byte*)malloc(48 * 40);
+	DxMatrixPtr = (int*)malloc(4 * 12 * 40);
 
 	// Initialise legacy memory buffer and game timer
 	InitGameMalloc();

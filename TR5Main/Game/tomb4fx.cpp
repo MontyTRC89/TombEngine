@@ -1290,7 +1290,7 @@ int ExplodingDeath2(short itemNumber, int meshBits, short damage)
 		if (popPush & 1)
 		{
 			MatrixPtr -= 12;
-			DxMatrixPtr -= 48;
+			DxMatrixPtr -= 12;
 		}
 		else if (popPush & 2)
 		{
@@ -1369,8 +1369,7 @@ int ExplodingDeath2(short itemNumber, int meshBits, short damage)
 		}
 	}
 
-	MatrixPtr -= 12;
-	DxMatrixPtr = (DxMatrixPtr - 48);
+	phd_PopMatrix();
 
 	return (item->meshBits == 0);
 }

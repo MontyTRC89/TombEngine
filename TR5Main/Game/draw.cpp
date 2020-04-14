@@ -205,19 +205,19 @@ void phd_PushMatrix(void)
 {
 	memcpy((MatrixPtr + 12), MatrixPtr, 48);
 	MatrixPtr += 12;
-	DxMatrixPtr += 48;
+	DxMatrixPtr += 12;
 }
 
 void phd_PopMatrix(void)
 {
 	MatrixPtr -= 12;
-	DxMatrixPtr -= 48;
+	DxMatrixPtr -= 12;
 }
 
 void phd_PopMatrix_I(void)
 {
 	MatrixPtr -= 12;
-	DxMatrixPtr -= 48;
+	DxMatrixPtr -= 12;
 	IMptr -= 12;
 	DxIMptr -= 12;
 }
@@ -236,32 +236,184 @@ void _phd_PushUnitMatrix(void)
 
 }
 
-void _phd_RotYXZ(short ry, short rx, short rz)
+void phd_RotYXZ(short ry, short rx, short rz)
 {
+	int	sina, cosa, r0, r1;
+	int* mptr = MatrixPtr;
+	
+	if (ry)
+	{
+		sina = SIN(ry);
+		cosa = COS(ry);
+		r0 = *(mptr + M00) * cosa - *(mptr + M02) * sina;
+		r1 = *(mptr + M02) * cosa + *(mptr + M00) * sina;
+		*(mptr + M00) = r0 >> W2V_SHIFT;
+		*(mptr + M02) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M10) * cosa - *(mptr + M12) * sina;
+		r1 = *(mptr + M12) * cosa + *(mptr + M10) * sina;
+		*(mptr + M10) = r0 >> W2V_SHIFT;
+		*(mptr + M12) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M20) * cosa - *(mptr + M22) * sina;
+		r1 = *(mptr + M22) * cosa + *(mptr + M20) * sina;
+		*(mptr + M20) = r0 >> W2V_SHIFT;
+		*(mptr + M22) = r1 >> W2V_SHIFT;
+	}
+
+	if (rx)
+	{
+		sina = SIN(rx);
+		cosa = COS(rx);
+		r0 = *(mptr + M01) * cosa + *(mptr + M02) * sina;
+		r1 = *(mptr + M02) * cosa - *(mptr + M01) * sina;
+		*(mptr + M01) = r0 >> W2V_SHIFT;
+		*(mptr + M02) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M11) * cosa + *(mptr + M12) * sina;
+		r1 = *(mptr + M12) * cosa - *(mptr + M11) * sina;
+		*(mptr + M11) = r0 >> W2V_SHIFT;
+		*(mptr + M12) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M21) * cosa + *(mptr + M22) * sina;
+		r1 = *(mptr + M22) * cosa - *(mptr + M21) * sina;
+		*(mptr + M21) = r0 >> W2V_SHIFT;
+		*(mptr + M22) = r1 >> W2V_SHIFT;
+	}
+
+	if (rz)
+	{
+		sina = SIN(rz);
+		cosa = COS(rz);
+		r0 = *(mptr + M00) * cosa + *(mptr + M01) * sina;
+		r1 = *(mptr + M01) * cosa - *(mptr + M00) * sina;
+		*(mptr + M00) = r0 >> W2V_SHIFT;
+		*(mptr + M01) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M10) * cosa + *(mptr + M11) * sina;
+		r1 = *(mptr + M11) * cosa - *(mptr + M10) * sina;
+		*(mptr + M10) = r0 >> W2V_SHIFT;
+		*(mptr + M11) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M20) * cosa + *(mptr + M21) * sina;
+		r1 = *(mptr + M21) * cosa - *(mptr + M20) * sina;
+		*(mptr + M20) = r0 >> W2V_SHIFT;
+		*(mptr + M21) = r1 >> W2V_SHIFT;
+	}
 }
 
-void _phd_RotY(short ry)
+void phd_RotY(short ry)
 {
+	int	sina, cosa, r0, r1;
+	int* mptr = MatrixPtr;
+
+	if (ry)
+	{
+		sina = SIN(ry);
+		cosa = COS(ry);
+		r0 = *(mptr + M00) * cosa - *(mptr + M02) * sina;
+		r1 = *(mptr + M02) * cosa + *(mptr + M00) * sina;
+		*(mptr + M00) = r0 >> W2V_SHIFT;
+		*(mptr + M02) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M10) * cosa - *(mptr + M12) * sina;
+		r1 = *(mptr + M12) * cosa + *(mptr + M10) * sina;
+		*(mptr + M10) = r0 >> W2V_SHIFT;
+		*(mptr + M12) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M20) * cosa - *(mptr + M22) * sina;
+		r1 = *(mptr + M22) * cosa + *(mptr + M20) * sina;
+		*(mptr + M20) = r0 >> W2V_SHIFT;
+		*(mptr + M22) = r1 >> W2V_SHIFT;
+	}
 }
 
-void _phd_RotY_I(short ry)
+void phd_RotY_I(short ry)
 {
+	phd_RotY(ry);
+
+	int* mptr = MatrixPtr;
+	int* dxptr = DxMatrixPtr;
+	
+	MatrixPtr = IMptr;
+	DxMatrixPtr = DxIMptr;
+	
+	phd_RotY(ry);
+	
+	MatrixPtr = mptr;
+	DxMatrixPtr = dxptr;
 }
 
-void _phd_RotX(short rx)
+void phd_RotX(short rx)
 {
+	int	sina, cosa, r0, r1;
+	int* mptr = MatrixPtr;
+
+	if (rx)
+	{
+		sina = SIN(rx);
+		cosa = COS(rx);
+		r0 = *(mptr + M01) * cosa + *(mptr + M02) * sina;
+		r1 = *(mptr + M02) * cosa - *(mptr + M01) * sina;
+		*(mptr + M01) = r0 >> W2V_SHIFT;
+		*(mptr + M02) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M11) * cosa + *(mptr + M12) * sina;
+		r1 = *(mptr + M12) * cosa - *(mptr + M11) * sina;
+		*(mptr + M11) = r0 >> W2V_SHIFT;
+		*(mptr + M12) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M21) * cosa + *(mptr + M22) * sina;
+		r1 = *(mptr + M22) * cosa - *(mptr + M21) * sina;
+		*(mptr + M21) = r0 >> W2V_SHIFT;
+		*(mptr + M22) = r1 >> W2V_SHIFT;
+	}
 }
 
-void _phd_RotX_I(short rx)
+void phd_RotX_I(short rx)
 {
+	phd_RotX(rx);
+
+	int* mptr = MatrixPtr;
+	int* dxptr = DxMatrixPtr;
+
+	MatrixPtr = IMptr;
+	DxMatrixPtr = DxIMptr;
+
+	phd_RotX(rx);
+
+	MatrixPtr = mptr;
+	DxMatrixPtr = dxptr;
 }
 
-void _phd_RotZ(short rz)
+void phd_RotZ(short rz)
 {
+	int	sina, cosa, r0, r1;
+	int* mptr = MatrixPtr;
+
+	if (rz)
+	{
+		sina = SIN(rz);
+		cosa = COS(rz);
+		r0 = *(mptr + M00) * cosa + *(mptr + M01) * sina;
+		r1 = *(mptr + M01) * cosa - *(mptr + M00) * sina;
+		*(mptr + M00) = r0 >> W2V_SHIFT;
+		*(mptr + M01) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M10) * cosa + *(mptr + M11) * sina;
+		r1 = *(mptr + M11) * cosa - *(mptr + M10) * sina;
+		*(mptr + M10) = r0 >> W2V_SHIFT;
+		*(mptr + M11) = r1 >> W2V_SHIFT;
+		r0 = *(mptr + M20) * cosa + *(mptr + M21) * sina;
+		r1 = *(mptr + M21) * cosa - *(mptr + M20) * sina;
+		*(mptr + M20) = r0 >> W2V_SHIFT;
+		*(mptr + M21) = r1 >> W2V_SHIFT;
+	}
 }
 
-void _phd_RotZ_I(short rz)
+void phd_RotZ_I(short rz)
 {
+	phd_RotZ(rz);
+
+	int* mptr = MatrixPtr;
+	int* dxptr = DxMatrixPtr;
+
+	MatrixPtr = IMptr;
+	DxMatrixPtr = DxIMptr;
+
+	phd_RotZ(rz);
+
+	MatrixPtr = mptr;
+	DxMatrixPtr = dxptr;
 }
 
 void _phd_PutPolygons(void)
@@ -339,5 +491,12 @@ void Inject_Draw()
 	INJECT(0x0042D020, GetBestFrame);
 	INJECT(0x004D1A40, Sync);
 	INJECT(0x0042BE90, InitInterpolate);
-	INJECT(0x0042BF00, phd_PopMatrix_I)
+	INJECT(0x0042BF00, phd_PopMatrix_I);
+	INJECT(0x00490150, phd_RotYXZ);
+	INJECT(0x0048FBE0, phd_RotX);
+	INJECT(0x0048FCD0, phd_RotY);
+	INJECT(0x0048FDC0, phd_RotZ); 
+	INJECT(0x0042C030, phd_RotX_I);
+	INJECT(0x0042BFC0, phd_RotY_I);
+	INJECT(0x0042C0A0, phd_RotZ_I);
 }
