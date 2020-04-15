@@ -645,6 +645,94 @@ void InitialiseTightRope(short itemNumber)
 	}
 }
 
+void InitialiseAnimating(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	item->currentAnimState = 0;
+	item->animNumber = Objects[item->objectNumber].animIndex;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+}
+
+void AnimatingControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!TriggerActive(item))
+		return;
+
+	item->status = ITEM_ACTIVE;
+
+	AnimateItem(item);
+
+	if (item->frameNumber >= Anims[item->animNumber].frameEnd)
+	{
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		RemoveActiveItem(itemNumber);
+		item->aiBits = 0;
+		item->status = ITEM_INACTIVE;
+	}
+}
+
+void HighObject2Control(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!TriggerActive(item))
+		return;
+
+
+	if (!item->itemFlags[2])
+	{
+		int div = item->triggerFlags % 10 << 10;
+		int mod = item->triggerFlags / 10 << 10;
+		item->itemFlags[0] = GetRandomControl() % div;
+		item->itemFlags[1] = GetRandomControl() % mod;
+		item->itemFlags[2] = (GetRandomControl() & 0xF) + 15;
+	}
+
+	if (--item->itemFlags[2] < 15)
+	{
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+		spark->on = 1;
+		spark->sR = -1;
+		spark->sB = 16;
+		spark->sG = (GetRandomControl() & 0x1F) + 48;
+		spark->dR = (GetRandomControl() & 0x3F) - 64;
+		spark->dB = 0;
+		spark->dG = (GetRandomControl() & 0x3F) + -128;
+		spark->fadeToBlack = 4;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+		spark->transType = COLADD;
+		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
+		spark->x = item->itemFlags[1] + (GetRandomControl() & 0x3F) + item->pos.xPos - 544;
+		spark->y = item->pos.yPos;
+		spark->z = item->itemFlags[0] + (GetRandomControl() & 0x3F) + item->pos.zPos - 544;
+		spark->xVel = (GetRandomControl() & 0x1FF) - 256;
+		spark->friction = 6;
+		spark->zVel = (GetRandomControl() & 0x1FF) - 256;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
+		spark->maxYvel = 0;
+		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
+		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
+		spark->dSize = spark->size >> 2;
+
+		if (GetRandomControl() & 3)
+		{
+			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE | SP_EXPDEF;
+			spark->scalar = 3;
+			spark->gravity = (GetRandomControl() & 0x3F) + 32;
+		}
+		else
+		{
+			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
+			spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+			spark->scalar = 1;
+			spark->gravity = (GetRandomControl() & 0xF) + 64;
+		}
+	}
+}
+
 void Inject_Objects()
 {
 	INJECT(0x00465FE0, TightRopeCollision);

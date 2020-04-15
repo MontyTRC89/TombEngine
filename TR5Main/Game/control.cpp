@@ -3,7 +3,6 @@
 #include "..\Global\global.h"
  
 #include "pickup.h"
-#include "spotcam.h"
 #include "Camera.h"
 #include "Lara.h"
 #include "hair.h"
@@ -65,6 +64,7 @@ short NextFxFree;
 short NextItemActive;
 short NextItemFree;
 short* TriggerIndex;
+int DisableLaraControl = 0;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -3261,6 +3261,74 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 		* outAngle = deltaAngle;
 
 	*rotation += deltaAngle >> shift;
+}
+
+#define OutsideRoomTable VAR_U_(0x00EEF4AC, unsigned char*)
+#define OutsideRoomOffsets ARRAY_(0x00EEF040, short, [27 * 27])
+
+int IsRoomOutside(int x, int y, int z)
+{
+	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
+	if (offset == -1)
+		return -2;
+
+	if (offset < 0)
+	{
+		ROOM_INFO* r = &Rooms[(offset & 0x7FFF)];
+
+		if ((y > r->maxceiling) && (y < r->minfloor)
+			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
+			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
+		{
+			short roomNumber = offset & 0x7fff;
+			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+			int height = GetFloorHeight(floor, x, y, z);
+			if (height == NO_HEIGHT || y > height)
+				return -2;
+			height = GetCeiling(floor, x, y, z);
+			if (y < height)
+				return -2;
+
+			if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
+				return -3;
+
+			IsRoomOutsideNo = offset & 0x7FFF;
+			return 1;
+		}
+		else
+			return -2;
+	}
+	else
+	{
+		unsigned char* s = &OutsideRoomTable[offset];
+
+		while (*s != 0xFF)
+		{
+			ROOM_INFO* r = &Rooms[*s];
+
+			if ((y > r->maxceiling && y < r->minfloor)
+				&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
+				&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
+			{
+				short roomNumber = *s;
+				FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+				int height = GetFloorHeight(floor, x, y, z);
+				if (height == NO_HEIGHT || y > height)
+					return -2;
+				height = GetCeiling(floor, x, y, z);
+				if (y < height)
+					return -2;
+
+				if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
+					return -3;
+
+				IsRoomOutsideNo = *s;
+				return 1;
+			}
+			s++;
+		}
+		return -2;
+	}
 }
 
 void Inject_Control()

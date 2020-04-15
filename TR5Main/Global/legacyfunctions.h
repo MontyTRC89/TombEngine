@@ -99,6 +99,30 @@
 
 // DRAW.CPP
 #define Legacy_UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
+#define Legacy_InitInterpolate ((void(__cdecl*)(int,int)) 0x0042BE90)
+#define Legacy_Sync ((int (__cdecl*)()) 0x004D1A40)
+#define Legacy_GetBoundsAccurate ((short* (__cdecl*)(ITEM_INFO*)) 0x0042CF80)
+#define Legacy_GetBestFrame ((short* (__cdecl*)(ITEM_INFO*)) 0x0042D020)
+#define Legacy_phd_PushMatrix ((void(__cdecl*)(void)) 0x0048F9C0)
+#define Legacy_phd_RotYXZ ((void(__cdecl*)(short, short, short)) 0x00490150)
+#define Legacy_phd_TranslateRel ((void(__cdecl*)(int, int, int)) 0x0048FB20)
+#define Legacy_phd_TranslateRel_I ((void(__cdecl*)(int, int, int)) 0x0042C110)
+#define Legacy_phd_TranslateRel_ID ((void(__cdecl*)(int,int,int,int,int,int)) 0x0042C190)
+#define Legacy_phd_TranslateAbs ((void(__cdecl*)(int, int, int)) 0x004903F0)
+#define Legacy_phd_PopMatrix_I ((void(__cdecl*)(void)) 0x0042BF00)
+#define Legacy_phd_RotY ((void(__cdecl*)(short)) 0x0048FCD0)
+#define Legacy_phd_RotX ((void(__cdecl*)(short)) 0x0048FBE0)
+#define Legacy_phd_RotZ ((void(__cdecl*)(short)) 0x0048FDC0)
+#define Legacy_phd_RotY_I ((void(__cdecl*)(short)) 0x0042BFC0)
+#define Legacy_phd_RotX_I ((void(__cdecl*)(short)) 0x0042C030)
+#define Legacy_phd_RotZ_I ((void(__cdecl*)(short)) 0x0042C0A0)
+#define Legacy_phd_SetTrans ((void (__cdecl*)(int, int, int)) 0x0048FA40)
+#define Legacy_phd_PushMatrix_I ((void(__cdecl*)(void)) 0x0042BF50)
+#define Legacy_phd_PushUnitMatrix ((void (__cdecl*)()) 0x0048FA90)
+#define Legacy_phd_GetVectorAngles ((void(__cdecl*)(int, int, int, short*)) 0x004904B0)
+#define Legacy_phd_RotYXZpack ((void(__cdecl*)(int)) 0x0048FEB0)
+#define Legacy_gar_RotYXZsuperpack ((void(__cdecl*)(short**,int)) 0x0042C310)
+#define Legacy_gar_RotYXZsuperpack_I ((void(__cdecl*)(short**,short**,int)) 0x0042C290)
 
 // EFFECT2.CPP
 #define Legacy_DetatchSpark ((SPARKS* (__cdecl*)(int, int)) 0x0042E6A0)
@@ -149,3 +173,53 @@
 
 // LARA.CPP
 #define Legacy_AnimateLara ((int (__cdecl*)(ITEM_INFO*)) 0x004563F0)
+
+// OBJECTS.CPP
+#define Legacy_InitialiseTightRope ((void (__cdecl*)(short)) 0x0043ED30)
+#define Legacy_InitialiseRaisingBlock  ((void (__cdecl*)(short)) 0x0043D730)
+#define Legacy_RaisingBlockControl ((void (__cdecl*)(short)) 0x0048C3D0)
+#define Legacy_InitialiseRaisingCog ((void (__cdecl*)(short)) 0x00440320)
+#define Legacy_RaisingCogControl ((void (__cdecl*)(short)) 0x00406040)
+#define Legacy_InitialiseSmashObject ((void (__cdecl*)(short)) 0x0043D7F0)
+#define Legacy_InitialiseAnimating ((void (__cdecl*)(short)) 0x00440100)
+#define Legacy_AnimatingControl ((void (__cdecl*)(short)) 0x00465590)
+#define Legacy_InitialiseXRayMachine ((void (__cdecl*)(short)) 0x0043FA20)
+#define Legacy_HighObject2Control ((void (__cdecl*)(short)) 0x004070D0)
+
+
+// PICKUP.CPP
+#define Legacy_PickupCollision ((void (__cdecl*)(short, ITEM_INFO*, COLL_INFO*)) 0x00467C00)
+#define Legacy_InitialisePickup ((void (__cdecl*)(short)) 0x0043E260)
+#define Legacy_PickupControl ((void (__cdecl*)(short)) 0x004679D0)
+
+// ROPE.CPP
+#define Legacy_CalculateRopePoints ((void (__cdecl*)(ROPE_STRUCT*)) 0x0046EC70)
+
+// SAVEGAME.CPP
+#define Legacy_RestoreGame ((int (__cdecl*)()) 0x00472060)	
+#define Legacy_ReadSavegame ((int (__cdecl*)(int)) 0x004A8E10)	
+#define Legacy_CreateSavegame ((void (__cdecl*)()) 0x00470FA0)	
+#define Legacy_WriteSavegame ((int (__cdecl*)(int)) 0x004A8BC0)
+
+// SPHERE.CPP
+#define Legacy_TestCollision ((int (__cdecl*)(ITEM_INFO*, ITEM_INFO*)) 0x00479170)
+#define Legacy_GetJointAbsPosition ((int (__cdecl*)(ITEM_INFO*, PHD_VECTOR*, int)) 0x00479780)
+#define Legacy_GetSpheres ((int (__cdecl*)(ITEM_INFO*, SPHERE*, int)) 0x00479380)
+
+// SPOTCAM.CPP
+#define Legacy_InitSpotCamSequences ((void (__cdecl*)()) 0x0047A800)
+#define Legacy_CalculateSpotCameras ((void (__cdecl*)()) 0x0047B280)
+#define Legacy_InitialiseSpotCam ((void (__cdecl*)(short)) 0x0047A9D0)
+#define Legacy_TriggerTitleSpotcam ((void (__cdecl*)(int)) 0x004284A0)
+#define Legacy_Spline ((int (__cdecl*)(int, int*, int)) 0x0047A890)
+
+// SWITCH.CPP
+#define Legacy_InitialiseSwitch ((void (__cdecl*)(short)) 0x00440070)
+#define Legacy_SequenceControl ((void (__cdecl*)(short)) 0x0047F520)
+#define Legacy_SequenceCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0047F610)
+#define Legacy_LeverSwitchCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0047EE00)
+#define Legacy_InitialisePulleySwitch ((void (__cdecl*)(short)) 0x0043E1F0)
+#define Legacy_InitialiseCrowDoveSwitch ((void (__cdecl*)(short)) 0x0043ECF0)
+
+// MISC
+#define Legacy_SQRT_ASM ((int(__cdecl*)(int)) 0x0048F980)

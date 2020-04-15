@@ -120,7 +120,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\bubble.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
-    <ClInclude Include="Game\swat.h" />
     <ClInclude Include="Global\legacyfunctions.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
@@ -187,19 +186,16 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\objlight.h" />
     <ClInclude Include="Game\people.h" />
     <ClInclude Include="Game\pickup.h" />
-    <ClInclude Include="Game\rat.h" />
     <ClInclude Include="Game\rope.h" />
     <ClInclude Include="Game\savegame.h" />
     <ClInclude Include="Game\sound.h" />
     <ClInclude Include="Game\sphere.h" />
-    <ClInclude Include="Game\spikewall.h" />
     <ClInclude Include="Game\spotcam.h" />
     <ClInclude Include="Game\switch.h" />
     <ClInclude Include="Game\text.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
     <ClInclude Include="Game\tomb4fx.h" />
     <ClInclude Include="Game\traps.h" />
-    <ClInclude Include="Game\twogun.h" />
     <ClInclude Include="Global\constants.h" />
     <ClInclude Include="Global\enums.h" />
     <ClInclude Include="Global\global.h" />
@@ -226,7 +222,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\bubble.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
-    <ClCompile Include="Game\swat.cpp" />
     <ClCompile Include="Global\math.cpp" />
     <ClCompile Include="Objects\TR1\tr1_lara_evil.cpp" />
     <ClCompile Include="Objects\TR1\tr1_larson.cpp" />
@@ -365,7 +360,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\objlight.cpp" />
     <ClCompile Include="Game\people.cpp" />
     <ClCompile Include="Game\pickup.cpp" />
-    <ClCompile Include="Game\rat.cpp" />
     <ClCompile Include="Game\rope.cpp" />
     <ClCompile Include="Game\savegame.cpp" />
     <ClCompile Include="Game\sound.cpp" />
@@ -375,7 +369,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\text.cpp" />
     <ClCompile Include="Game\tomb4fx.cpp" />
     <ClCompile Include="Game\traps.cpp" />
-    <ClCompile Include="Game\twogun.cpp" />
     <ClCompile Include="Global\malloc.cpp" />
     <ClCompile Include="Objects\TR4\tr4_baddy.cpp" />
     <ClCompile Include="Objects\Vehicles\motorbike.cpp" />
