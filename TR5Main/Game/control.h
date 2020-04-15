@@ -19,6 +19,7 @@ extern short NextFxFree;
 extern short NextItemActive;
 extern short NextItemFree;
 extern short* TriggerIndex;
+extern int DisableLaraControl;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);
@@ -63,6 +64,7 @@ int TriggerActive(ITEM_INFO* item);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
 int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
+int IsRoomOutside(int x, int y, int z);
 
 unsigned __stdcall GameMain(void*);
 void Inject_Control();

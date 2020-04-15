@@ -22,20 +22,16 @@ enum spotcam_flags
 	SCF_CAMERA_ONE_SHOT = (1 << 15),		 // 0x8000
 };
 
-//#define InitSpotCamSequences ((void (__cdecl*)()) 0x0047A800)
-//#define CalculateSpotCameras ((void (__cdecl*)()) 0x0047B280)
-//#define InitialiseSpotCam ((void (__cdecl*)(short)) 0x0047A9D0)
-#define TriggerTitleSpotcam ((void (__cdecl*)(int)) 0x004284A0)
-#define Spline ((int (__cdecl*)(int, int*, int)) 0x0047A890)
-
 extern byte SpotCamRemap[16];
 extern byte CameraCnt[16];
 extern int LastSpotCam;
 extern SPOTCAM SpotCam[64];
 extern int NumberSpotcams;
+extern int UseSpotCam;
 
 void InitSpotCamSequences();
 void InitialiseSpotCam(short sequence);
 void CalculateSpotCameras();
+int Spline(int x, int* knots, int nk);
 
 void Inject_Spotcam();

@@ -42,7 +42,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 	short* frame = GetBestFrame(item);
 	phd_TranslateRel(frame[6], frame[7], frame[8]);
 	short* rotation = frame + 9;
-	gar_RotYXZsuperpack(&rotation, 0);
+	Legacy_gar_RotYXZsuperpack(&rotation, 0);
 
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	short** meshPtr = &Meshes[obj->meshIndex];
@@ -74,7 +74,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 			phd_PushMatrix();
 
 		phd_TranslateRel(*(bone), *(bone + 1), *(bone + 2));
-		gar_RotYXZsuperpack(&rotation, 0);
+		Legacy_gar_RotYXZsuperpack(&rotation, 0);
 
 		if ((poppush & (ROT_X | ROT_Y | ROT_Z)) && extraRotation)
 		{
@@ -216,7 +216,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 	{
 		phd_TranslateRel((int) * (frmptr[0] + 6), (int) * (frmptr[0] + 7), (int) * (frmptr[0] + 8));
 		short* rotation1 = frmptr[0] + 9;
-		gar_RotYXZsuperpack(&rotation1, 0);
+		Legacy_gar_RotYXZsuperpack(&rotation1, 0);
 
 		for (int i = 0; i < joint; i++, bone += 4)
 		{
@@ -229,7 +229,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 				phd_PushMatrix();
 
 			phd_TranslateRel(bone[1], bone[2], bone[3]);
-			gar_RotYXZsuperpack(&rotation1, 0);
+			Legacy_gar_RotYXZsuperpack(&rotation1, 0);
 
 			if (poppush & (ROT_X | ROT_Y | ROT_Z))
 			{
@@ -257,7 +257,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 		short* rotation2 = frmptr[1] + 9;
 		phd_TranslateRel_ID((int) * (frmptr[0] + 6), (int) * (frmptr[0] + 7), (int) * (frmptr[0] + 8),
 			(int) * (frmptr[1] + 6), (int) * (frmptr[1] + 7), (int) * (frmptr[1] + 8));
-		gar_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
+		Legacy_gar_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
 
 		for (int i = 0; i < joint; i++, bone += 4)
 		{
@@ -269,7 +269,7 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 				phd_PushMatrix_I();
 
 			phd_TranslateRel_I(bone[1], bone[2], bone[3]);
-			gar_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
+			Legacy_gar_RotYXZsuperpack_I(&rotation1, &rotation2, 0);
 
 			if (poppush & (ROT_X | ROT_Y | ROT_Z))
 			{

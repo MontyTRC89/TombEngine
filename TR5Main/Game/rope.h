@@ -25,8 +25,6 @@ struct PENDULUM
 
 extern PENDULUM CurrentPendulum;
 
-#define CalculateRopePoints ((void (__cdecl*)(ROPE_STRUCT*)) 0x0046EC70)
-
 void InitialiseRope(short itemNumber);
 void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int length, ITEM_INFO* item);
 PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec);
