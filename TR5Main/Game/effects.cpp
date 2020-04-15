@@ -503,6 +503,17 @@ void Richochet(PHD_3DPOS* pos)
 	SoundEffect(SFX_LARA_RICOCHET, pos, 0);
 }
 
+void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
+			y + 256 - (GetRandomControl() * 512 / 0x8000),
+			z + 256 - (GetRandomControl() * 512 / 0x8000),
+			speed, direction, roomNumber);
+	}
+}
+
 void Inject_Effects()
 {
 	INJECT(0x00432580, ItemNearLara);

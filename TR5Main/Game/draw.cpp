@@ -569,44 +569,62 @@ void phd_RotYXZpack(int rots)
 	}
 }
 
-void _gar_RotYXZsuperpack(short** pproc, int skip)
+void gar_RotYXZsuperpack(short** pprot, int skip)
 {
+	unsigned short* prot;
+	int packed;
+
+	while (skip)
+	{
+		prot = reinterpret_cast<unsigned short*>(*pprot);
+		if (*prot & (3 << 14))
+			(*pprot) += 1;
+		else
+			(*pprot) += 2;
+		skip--;
+	}
+
+	prot = reinterpret_cast<unsigned short*>(*pprot);
+	switch (*prot >> 14)
+	{
+	case 0:
+		packed = (*prot << 16) + *(prot + 1);
+		phd_RotYXZpack(packed);
+		(*pprot) += 2;
+		return;
+	case 1:
+		phd_RotX((short)((*prot & 1023) << 4));
+		break;
+	case 2:
+		phd_RotY((short)((*prot & 1023) << 4));
+		break;
+	default:
+		phd_RotZ((short)((*prot & 1023) << 4));
+		break;
+	}
+
+	(*pprot) += 1;
 }
 
-void _gar_RotYXZsuperpack_I(short** pproc1, short** pproc2, int skip)
+void gar_RotYXZsuperpack_I(short** framePtr1, short** framePtr2, int skip)
 {
+	gar_RotYXZsuperpack(framePtr1, skip);
+
+	int* mptr = MatrixPtr;
+	int* dxptr = DxMatrixPtr;
+
+	MatrixPtr = IMptr;
+	DxMatrixPtr = DxIMptr;
+
+	gar_RotYXZsuperpack(framePtr2, skip);
+
+	MatrixPtr = mptr;
+	DxMatrixPtr = dxptr;
 }
 
 void _phd_ClipBoundingBox(short* frames)
 {
-}
 
-void _phd_DxTranslateRel(int x, int y, int z)
-{
-}
-
-void _phd_DxTranslateAbs(int x, int y, int z)
-{
-}
-
-void _phd_DxRotY(short ry)
-{
-}
-
-void _phd_DxRotX(short rx)
-{
-}
-
-void _phd_DxRotZ(short rz)
-{
-}
-
-void _phd_DxRotYXZ(short ry, short rx, short rz)
-{
-}
-
-void _phd_DxRotYXZpack(int rangle)
-{
 }
 
 void Inject_Draw()
@@ -633,4 +651,6 @@ void Inject_Draw()
 	INJECT(0x0048FA90, phd_PushUnitMatrix);
 	INJECT(0x004904B0, phd_GetVectorAngles);
 	INJECT(0x0048FEB0, phd_RotYXZpack);
+	/*INJECT(0x0042C310, gar_RotYXZsuperpack);
+	INJECT(0x0042C290, gar_RotYXZsuperpack_I);*/
 }

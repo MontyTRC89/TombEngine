@@ -105,7 +105,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	int* bone = Bones + object->boneIndex;
 
 	phd_TranslateRel((int) * (frame + 6), (int) * (frame + 7), (int) * (frame + 8));
-	gar_RotYXZsuperpack(&rotation, 0);
+	Legacy_gar_RotYXZsuperpack(&rotation, 0);
 
 	// Hips
 	phd_PushMatrix();
@@ -119,7 +119,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 	phd_TranslateRel(*(bone + 1 + 24), *(bone + 2 + 24), *(bone + 3 + 24));
 
-	gar_RotYXZsuperpack(&rotation, 6);
+	Legacy_gar_RotYXZsuperpack(&rotation, 6);
 	phd_RotYXZ(Lara.torsoYrot, Lara.torsoXrot, Lara.torsoZrot);
 
 	// Torso
@@ -136,7 +136,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 	phd_PushMatrix();
 	phd_TranslateRel(*(bone + 1 + 28), *(bone + 2 + 28), *(bone + 3 + 28));
-	gar_RotYXZsuperpack(&rotation, 0);
+	Legacy_gar_RotYXZsuperpack(&rotation, 0);
 
 	// Right arm
 	objptr = Lara.meshPtrs[LM_RINARM];
@@ -149,7 +149,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 	phd_PushMatrix();
 	phd_TranslateRel(*(bone + 1 + 40), *(bone + 2 + 40), *(bone + 3 + 40));
-	gar_RotYXZsuperpack(&rotation, 2);
+	Legacy_gar_RotYXZsuperpack(&rotation, 2);
 
 	// Left arm
 	objptr = Lara.meshPtrs[LM_LINARM];
@@ -161,7 +161,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	phd_PopMatrix();
 
 	phd_TranslateRel(*(bone + 1 + 52), *(bone + 2 + 52), *(bone + 3 + 52));
-	gar_RotYXZsuperpack(&rotation, 2);
+	Legacy_gar_RotYXZsuperpack(&rotation, 2);
 	phd_RotYXZ(Lara.headYrot, Lara.headXrot, Lara.headZrot);
 
 	// Head

@@ -114,9 +114,6 @@
     <ClInclude Include="Game\pickup.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\rat.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\rope.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -142,9 +139,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\traps.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\twogun.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Global\malloc.h">
@@ -178,9 +172,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\setup.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\spikewall.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="CustomObjects\cobra.h">
@@ -268,9 +259,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\configuration.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\swat.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\oldobjects.h">
@@ -425,9 +413,6 @@
     <ClCompile Include="Game\pickup.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\rat.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\rope.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -453,9 +438,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\traps.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\twogun.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Global\malloc.cpp">
@@ -504,9 +486,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\configuration.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\swat.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\misc.cpp">

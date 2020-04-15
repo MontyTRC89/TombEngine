@@ -7,12 +7,7 @@
 #include "..\Specific\IO\LEB128.h"
 #include "..\Specific\IO\Streams.h"
 #include "..\Scripting\GameFlowScript.h"
-#include "..\Scripting\GameLogicScript.h"
-
-#define RestoreGame ((int (__cdecl*)()) 0x00472060)	
-#define ReadSavegame ((int (__cdecl*)(int)) 0x004A8E10)	
-#define CreateSavegame ((void (__cdecl*)()) 0x00470FA0)	
-#define WriteSavegame ((int (__cdecl*)(int)) 0x004A8BC0)	
+#include "..\Scripting\GameLogicScript.h"	
 
 #define SAVEGAME_BUFFER_SIZE 1048576
 

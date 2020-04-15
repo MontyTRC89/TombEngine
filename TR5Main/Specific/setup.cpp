@@ -22,8 +22,6 @@
 #include "..\Objects\oldobjects.h"
 #include "..\Objects\newobjects.h"
 
-#include "..\Game\rat.h"
-
 #include "roomload.h"
 
 #include <stdlib.h>
@@ -2571,14 +2569,14 @@ void ObjectObjects()
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_XRAY_CONTROLLER];
+	/*obj = &Objects[ID_XRAY_CONTROLLER];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseXRayMachine;
 		obj->control = ControlXRayMachine;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
-	}
+	}*/
 
 	// by default loaded, explosion time :D
 	obj = &Objects[ID_BODY_PART];
