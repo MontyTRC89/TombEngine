@@ -98,6 +98,7 @@
 #define Legacy_SteelDoorCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x00487AD0)
 
 // DRAW.CPP
+#define Legacy_IsRoomOutside ((int (__cdecl*)(int, int, int)) 0x00418E90) 
 #define Legacy_UpdateStorm ((void (__cdecl*)()) 0x0042A310)  
 #define Legacy_InitInterpolate ((void(__cdecl*)(int,int)) 0x0042BE90)
 #define Legacy_Sync ((int (__cdecl*)()) 0x004D1A40)
@@ -123,6 +124,7 @@
 #define Legacy_phd_RotYXZpack ((void(__cdecl*)(int)) 0x0048FEB0)
 #define Legacy_gar_RotYXZsuperpack ((void(__cdecl*)(short**,int)) 0x0042C310)
 #define Legacy_gar_RotYXZsuperpack_I ((void(__cdecl*)(short**,short**,int)) 0x0042C290)
+#define Legacy_phd_RotBoundingBoxNoPersp ((void (__cdecl*)(short*, short*)) 0x0042E240)
 
 // EFFECT2.CPP
 #define Legacy_DetatchSpark ((SPARKS* (__cdecl*)(int, int)) 0x0042E6A0)

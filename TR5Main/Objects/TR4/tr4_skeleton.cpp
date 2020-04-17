@@ -8,6 +8,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/lot.h"
 #include "../../Specific/setup.h"
+#include "../../Game/tomb4fx.h"
 
 BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 

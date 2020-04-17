@@ -3,11 +3,7 @@
 #include "..\Global\global.h"
 
 #define CalcLaraMatrices ((void (__cdecl*)(int)) 0x0041E120)
-//#define IsRoomOutside ((int (__cdecl*)(int, int, int)) 0x00418E90) 
-#define sub_42B4C0 ((void (__cdecl*)(ITEM_INFO*,short*)) 0x0042B4C0)
-#define phd_RotBoundingBoxNoPersp ((void (__cdecl*)(short*, short*)) 0x0042E240)
 #define mGetAngle ((int(__cdecl*)(int, int, int, int)) 0x0048F290)
-#define phd_GenerateW2V ((void(__cdecl*)(PHD_3DPOS*)) 0x0048F330)
 
 extern Renderer11* g_Renderer;
 extern BITE_INFO EnemyBites[9];
@@ -49,5 +45,6 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles);
 void phd_RotYXZpack(int rots);
 void gar_RotYXZsuperpack(short** framePtr, int skip);
 void gar_RotYXZsuperpack_I(short** framePtr1, short** framePtr2, int skip);
+void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds);
 
 void Inject_Draw();
