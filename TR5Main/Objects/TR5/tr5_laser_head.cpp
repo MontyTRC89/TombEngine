@@ -365,7 +365,7 @@ void GuardianControl(short itemNumber)
 								dest.y = src.y + (8192 * SIN(-angles[1]) >> W2V_SHIFT);
 								dest.z = src.z + (c * COS(item->pos.yRot) >> W2V_SHIFT);
 
-								if (item->itemFlags[3] != 90
+								if (item->itemFlags[3] != 90 
 									&& LaserHeadData.fireArcs[j] != NULL)
 								{
 									// Eye is aready firing
