@@ -555,7 +555,7 @@ void FallingBlockControl(short itemNumber)
 		else
 		{
 			item->meshBits = -2;
-			ExplodingDeath2(itemNumber, -1, 15265);
+			ExplodingDeath(itemNumber, -1, 15265);
 			item->itemFlags[0]++;
 		}
 	}

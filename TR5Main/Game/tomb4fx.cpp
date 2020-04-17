@@ -1199,7 +1199,7 @@ void TriggerLaraDrips()// (F)
 	}
 }
 
-int ExplodingDeath2(short itemNumber, int meshBits, short damage)
+int ExplodingDeath(short itemNumber, int meshBits, short damage)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
@@ -1827,7 +1827,7 @@ void Inject_Tomb4FX()
 	INJECT(0x00483D00, GetFreeDrip);
 	INJECT(0x00483D90, UpdateDrips);
 	INJECT(0x00483F00, TriggerLaraDrips);
-	INJECT(0x00484080, ExplodingDeath2);
+	INJECT(0x00484080, ExplodingDeath);
 	INJECT(0x00484640, GetFreeShockwave);
 	INJECT(0x00484670, TriggerShockwave);
 	INJECT(0x004849A0, UpdateShockwaves);
