@@ -924,12 +924,8 @@ void VentilatorControl(short itemNumber)
 	}
 	else
 	{
-		phd_PushUnitMatrix();
-		phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-		phd_SetTrans(0, 0, 0);
 		short tbounds[6];
-		phd_RotBoundingBoxNoPersp(bounds, tbounds);
-		phd_PopMatrix();
+		phd_RotBoundingBoxNoPersp(&item->pos, bounds, tbounds);
 
 		effectBounds[0] = item->pos.xPos + tbounds[0];
 		effectBounds[1] = item->pos.xPos + tbounds[1];

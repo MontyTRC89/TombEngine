@@ -5,6 +5,7 @@
 #include "../../Game/sphere.h"
 #include "../../Game/collide.h"
 #include "../../Game/camera.h"
+#include "../../Game/tomb4fx.h"
 #include "../../Game/effects.h"
 #include "../../Game/laraflar.h"
 #include <vector>

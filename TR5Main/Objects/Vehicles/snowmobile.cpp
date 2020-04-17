@@ -8,6 +8,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/lot.h"
+#include "../../Game/tomb4fx.h"
 #include "../../Game/sphere.h"
 #include "../../Specific/setup.h"
 

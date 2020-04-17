@@ -31,11 +31,7 @@ void GetLaraDeadlyBounds() // (F) (D)
 	short tbounds[6];
 
 	bounds = GetBoundsAccurate(LaraItem);
-	phd_PushUnitMatrix();
-	phd_RotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
-	phd_SetTrans(0, 0, 0);
-	phd_RotBoundingBoxNoPersp(bounds, tbounds);
-	phd_PopMatrix();
+	phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, tbounds);
 
 	DeadlyBounds[0] = LaraItem->pos.xPos + tbounds[0];
 	DeadlyBounds[1] = LaraItem->pos.xPos + tbounds[1];

@@ -409,11 +409,7 @@ void GuardianControl(short itemNumber)
 									short* bounds = GetBoundsAccurate(LaraItem);
 									short tbounds[6];
 
-									phd_PushUnitMatrix();
-									phd_RotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
-									phd_SetTrans(0, 0, 0);
-									phd_RotBoundingBoxNoPersp(bounds, tbounds);
-									phd_PopMatrix();
+									phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, tbounds);
 
 									int x1 = LaraItem->pos.xPos + tbounds[0];
 									int x2 = LaraItem->pos.xPos + tbounds[1];
