@@ -38,7 +38,7 @@
 #define ROT_Y 8
 #define ROT_Z 16
 
-// ExplodingDeath2() last argument flags
+// ExplodingDeath() last argument flags
 #define EXPLODE_HIT_EFFECT 258
 #define EXPLODE_NORMAL 256
 
