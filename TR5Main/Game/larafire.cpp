@@ -753,8 +753,6 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.xRot = angles[1] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
 	pos.yRot = angles[0] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
 	pos.zRot = 0;
-
-	phd_GenerateW2V(&pos);
 	
 	int num = GetSpheres(target, SphereList, 0);
 	int best = -1;

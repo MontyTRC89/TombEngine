@@ -12,6 +12,7 @@
 #include "switch.h"
 #include "box.h"
 #include "../Specific/setup.h"
+#include "tomb4fx.h"
 
 int lastWaterfallY = 0;
 short TightRopeBounds[12] = 
@@ -64,7 +65,7 @@ void SmashObject(short itemNumber)
 	item->collidable = 0;
 	item->meshBits = 0xFFFE;
 
-	ExplodingDeath(itemNumber, -1, 257); //ExplodingDeath
+	ExplodingDeath(itemNumber, -1, 257); 
 
 	item->flags |= IFLAG_INVISIBLE;
 

@@ -7,6 +7,7 @@
 #include "../../Game/lara1gun.h"
 #include "../../Game/items.h"
 #include "../../Game/camera.h"
+#include "../../Game/tomb4fx.h"
 #include "../../Game/sphere.h"
 #include "../../Game/laraflar.h"
 
