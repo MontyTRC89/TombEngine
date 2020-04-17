@@ -2539,121 +2539,54 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z) // (F) (D)
 
 int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber)
 {
-	PHD_VECTOR p1, p2;
+	// Ray
+	FXMVECTOR rayStart = { start->x, start->y, start->z };  
+	FXMVECTOR rayEnd = { end->x, end->y, end->z };
+	FXMVECTOR rayDir = { end->x - start->x, end->y - start->y, end->z - start->z };
+	XMVECTOR rayDirNormalized = XMVector3Normalize(rayDir);
+	
+	// Create the bounding box for raw collision detection
+	Vector3 boxCentre = Vector3(itemOrStaticPos->xPos + (box[1] + box[0]) / 2.0f, itemOrStaticPos->yPos + (box[3] + box[2]) / 2.0f, itemOrStaticPos->zPos + (box[5] + box[4]) / 2.0f);
+	Vector3 boxExtent = Vector3((box[1] - box[0]) / 2.0f, (box[3] - box[2]) / 2.0f, (box[5] - box[4]) / 2.0f);
+	Quaternion rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, TR_ANGLE_TO_RAD(itemOrStaticPos->yRot));
+	BoundingOrientedBox obox = BoundingOrientedBox(boxCentre, boxExtent, rotation);
 
-	p1.x = box[0] << 16;
-	p2.x = box[1] << 16;
-	p1.y = box[2] << 16;
-	p2.y = box[3] << 16;
-	p1.z = box[4] << 16;
-	p2.z = box[5] << 16;
+	// Get the collision with the bounding box
+	float distance;
+	bool collided = obox.Intersects(rayStart, rayDirNormalized, distance);
 
-	int dx2 = end->x - itemOrStaticPos->xPos;
-	int dy2 = end->y - itemOrStaticPos->yPos;
-	int dz2 = end->z - itemOrStaticPos->zPos;
-
-	phd_PushUnitMatrix();
-
-	phd_RotY(-itemOrStaticPos->yRot);
-
-	int a1 = MatrixPtr[M00] * dx2 + 
-		MatrixPtr[M01] * dy2 + 
-		MatrixPtr[M02] * dz2;
-
-	int a2 = MatrixPtr[M10] * dx2 +
-		MatrixPtr[M11] * dy2 +
-		MatrixPtr[M12] * dz2;
-
-	int a3 = MatrixPtr[M20] * dx2 +
-		MatrixPtr[M21] * dy2 +
-		MatrixPtr[M22] * dz2;
-
-	int dx1 = start->x - itemOrStaticPos->xPos;
-	int dy1 = start->y - itemOrStaticPos->yPos;
-	int dz1 = start->z - itemOrStaticPos->zPos;
-
-	int b1 = MatrixPtr[M00] * dx1 +
-		MatrixPtr[M01] * dy1 +
-		MatrixPtr[M02] * dz1;
-
-	int b2 = MatrixPtr[M10] * dx1 +
-		MatrixPtr[M11] * dy1 +
-		MatrixPtr[M12] * dz1;
-
-	int b3 = MatrixPtr[M20] * dx1 +
-		MatrixPtr[M21] * dy1 +
-		MatrixPtr[M22] * dz1;
-
-	phd_PopMatrix();
-
-	PHD_VECTOR vec;
-
-	vec.x = ((a1 >> W2V_SHIFT) - (b1 >> W2V_SHIFT)) << 16;
-	vec.y = ((a2 >> W2V_SHIFT) - (b2 >> W2V_SHIFT)) << 16;
-	vec.z = ((a3 >> W2V_SHIFT) - (b3 >> W2V_SHIFT)) << 16;
-
-	NormaliseRopeVector(&vec);
-
-	PHD_VECTOR pb;
-	pb.x = b1 >> W2V_SHIFT << 16;
-	pb.y = b2 >> W2V_SHIFT << 16;
-	pb.z = b3 >> W2V_SHIFT << 16;
-
-	vec.x <<= 8;
-	vec.y <<= 8;
-	vec.z <<= 8;
-
-	if (!DoRayBox_sub_401523(&p1, &p2, &pb, &vec, hitPos))
+	// If no collision happened, then don't test spheres
+	if (!collided)
 		return 0;
 
-	if (hitPos->x < box[0] 
-		|| hitPos->y < box[2] 
-		|| hitPos->z < box[4] 
-		|| hitPos->x > box[1] 
-		|| hitPos->y > box[3]
-		|| hitPos->z > box[5])
-		return 0;
+	// Get the raw collision point 
+	Vector3 collidedPoint = rayStart + distance * rayDirNormalized;
+	hitPos->x = collidedPoint.x - itemOrStaticPos->xPos;
+	hitPos->y = collidedPoint.y - itemOrStaticPos->yPos;
+	hitPos->z = collidedPoint.z - itemOrStaticPos->zPos;
 
-	phd_PushUnitMatrix();
-
-	phd_RotY(itemOrStaticPos->yRot);
-	
-	int c1 = MatrixPtr[M00] * hitPos->x +
-		MatrixPtr[M01] * hitPos->y +
-		MatrixPtr[M02] * hitPos->z;
-
-	int c2 = MatrixPtr[M10] * hitPos->x +
-		MatrixPtr[M11] * hitPos->y +
-		MatrixPtr[M12] * hitPos->z;
-
-	int c3 = MatrixPtr[M20] * hitPos->x +
-		MatrixPtr[M21] * hitPos->y +
-		MatrixPtr[M22] * hitPos->z;
-
-	hitPos->x = (c1 >> W2V_SHIFT);
-	hitPos->y = (c2 >> W2V_SHIFT);
-	hitPos->z = (c3 >> W2V_SHIFT);
-	
-	phd_PopMatrix();
-	
+	// Now in the case of items we need to test single spheres
 	short* meshPtr = NULL;
 	int bit = 0;
 	int sp = -2;
-	int minDistance = 0x7FFFFFFF;
+	float minDistance = SECTOR(1024);
 
 	int action = TrInput & IN_ACTION;
-
+	
 	if (closesItemNumber < 0)
 	{
+		// Static meshes don't require further tests
 		sp = -1;
+		minDistance = distance;
 	}
 	else
 	{
+		// For items instead we need to test spheres
 		ITEM_INFO* item = &Items[closesItemNumber];
 		OBJECT_INFO* obj = &Objects[item->objectNumber];
 
+		// Get the ransformed sphere of meshes
 		GetSpheres(item, SphereList, 1);
-
 		SPHERE spheres[34];
 		memcpy(spheres, SphereList, sizeof(SPHERE) * 34);
 		if (obj->nmeshes <= 0)
@@ -2663,47 +2596,28 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 
 		for (int i = 0; i < obj->nmeshes; i++)
 		{
+			// If mesh is visibile...
 			if (item->meshBits & (1 << i))
 			{
 				SPHERE* sphere = &SphereList[i];
 
-				if (item->meshBits & (1 << i))
+				// Create the bounding sphere and test it against the ray
+				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
+				float newDist;
+				if (sph.Intersects(rayStart, rayDirNormalized, newDist))
 				{
-					SPHERE* sphere = &SphereList[i];
+					// HACK: Core seems to take in account for distance not the real hit point but the centre of the sphere.
+					// This can work well for example for GUARDIAN because the head sphere is so big that would always be hit 
+					// and eyes would not be destroyed.
+					newDist = sqrt(SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z));
 
-					int dx = end->x - start->x;
-					int dy = end->y - start->y;
-					int dz = end->z - start->z;
-
-					int d1 = dx * (sphere->x - start->x) + dy * (sphere->y - start->y) + dz * (sphere->z - start->z);
-					int d2 = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
-
-					if ((d1 < 0 && d2 < 0) || (d1 > 0 && d2 > 0) || abs(d1) <= abs(d2))
+					// Test for min distance
+					if (newDist < minDistance)
 					{
-						int l;
-						if (d2 >> 16)
-							l = d1 / (d2 >> 16);
-						else
-							l = 0;
-
-						int x = start->x + (l * dx >> 16);
-						int y = start->y + (l * dy >> 16);
-						int z = start->z + (l * dz >> 16);
-
-						int d = SQUARE(x - sphere->x) + SQUARE(y - sphere->y) + SQUARE(z - sphere->z);
-
-						if (d <= SQUARE(sphere->r))
-						{
-							int newDist = SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z);
-
-							if (newDist < minDistance)
-							{
-								minDistance = newDist;
-								meshPtr = Meshes[obj->meshIndex + i];
-								bit = 1 << i;
-								sp = i;
-							}
-						}
+						minDistance = newDist;
+						meshPtr = Meshes[obj->meshIndex + i];
+						bit = 1 << i;
+						sp = i;
 					}
 				}
 			}
@@ -2713,21 +2627,17 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 			return 0;
 	}
 
-	printf("Bit: %d \n", bit);
-
-	int distance = SQUARE(hitPos->x + itemOrStaticPos->xPos - start->x) 
-		+ SQUARE(hitPos->y + itemOrStaticPos->yPos - start->y)
-		+ SQUARE(hitPos->z + itemOrStaticPos->zPos - start->z);
-
 	if (distance >= ClosestDist)
 		return 0;
-	
+
+	// Setup test result
 	ClosestCoord.x = hitPos->x + itemOrStaticPos->xPos;
 	ClosestCoord.y = hitPos->y + itemOrStaticPos->yPos;
 	ClosestCoord.z = hitPos->z + itemOrStaticPos->zPos;
 	ClosestDist = distance;
 	ClosestItem = closesItemNumber;
 
+	// If collided object is an item, then setup the shatter item data struct
 	if (sp >= 0)
 	{
 		ITEM_INFO* item = &Items[closesItemNumber];
@@ -2742,6 +2652,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 		ShatterItem.bit = bit;
 		ShatterItem.flags = 0;
 	}
+
 	return 1;
 }
 
