@@ -1186,7 +1186,7 @@ void RollingBallControl(short itemNumber)
 	{
 		if (abs(item->fallspeed) > 16)
 		{
-			int distance = SQRT_ASM(
+			int distance = sqrt(
 				SQUARE(Camera.pos.x - item->pos.xPos) +
 				SQUARE(Camera.pos.y - item->pos.yPos) +
 				SQUARE(Camera.pos.z - item->pos.zPos));

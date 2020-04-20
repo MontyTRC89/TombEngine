@@ -224,7 +224,7 @@ void ControlHydra(short itemNumber)
 
 				if (item->hitStatus && info.distance < SQUARE(1792))
 				{
-					distance = SQRT_ASM(info.distance);
+					distance = sqrt(info.distance);
 					damage = 5 - distance / 1024;
 
 					if (Lara.gunType == WEAPON_SHOTGUN)
@@ -249,7 +249,7 @@ void ControlHydra(short itemNumber)
 				/*item->hitPoints = 0;
 				break;*/
 
-				damage = 6 - SQRT_ASM(info.distance) / 1024;
+				damage = 6 - sqrt(info.distance) / 1024;
 
 				if (Lara.gunType == WEAPON_SHOTGUN)
 					damage *= 3;

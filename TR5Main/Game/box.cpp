@@ -62,7 +62,7 @@ int MoveCreature3DPos(PHD_3DPOS* srcpos, PHD_3DPOS* destpos, int velocity, short
 	x = destpos->xPos - srcpos->xPos;
 	y = destpos->yPos - srcpos->yPos;
 	z = destpos->zPos - srcpos->zPos;
-	distance = SQRT_ASM(SQUARE(x) + SQUARE(y) + SQUARE(z));
+	distance = sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
 
 	if (velocity < distance)
 	{

@@ -424,7 +424,7 @@ void UpdateBats()
 			minIndex = i;
 		}
 
-		distance = SQRT_ASM(distance) >> 3;
+		distance = sqrt(distance) / 8;
 		if (distance < 48)
 			distance = 48;
 		else if (distance > 128)

@@ -18,7 +18,6 @@
 #define TR_ANGLE_TO_DEGREES(x) ((x) / 65536.0f * 360.0f)
 #define TR_ANGLE_TO_RAD(x) ((x) / 65536.0f * 360.0f * RADIAN)
 
-#define SQRT_ASM(x) (int)sqrt(x)
 #define ATAN ((int(__cdecl*)(int, int)) 0x0048F8A0)
 #define SIN(x) (4 * rcossin_tbl[(int(x) >> 3) & 8190])
 #define COS(x) (4 * rcossin_tbl[((int(x) >> 3) & 8190) + 1])

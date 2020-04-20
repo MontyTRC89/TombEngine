@@ -388,7 +388,7 @@ void SasControl(short itemNum)
 
 				if (info.distance > 9437184)
 				{
-					joint1 = SQRT_ASM(info.distance) + info.xAngle - 1024;
+					joint1 = sqrt(info.distance) + info.xAngle - 1024;
 				}
 			}
 
