@@ -1,6 +1,7 @@
 #include "footprint.h"
 #include "control.h"
 #include "lara.h"
+#include "draw.h"
 #include "groundfx.h"
 
 std::deque<FOOTPRINT_STRUCT> footprints = deque<FOOTPRINT_STRUCT>();

@@ -462,3 +462,11 @@ void Renderer11::prepareCameraForFrame()
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	frustum.Update(View,Projection);
 }
+
+void Renderer11::ResetAnimations()
+{
+	for (int i = 0; i < NUM_ITEMS; i++)
+	{
+		m_items[i].DoneAnimations = false;
+	}
+}

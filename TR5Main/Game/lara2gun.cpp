@@ -3,6 +3,7 @@
 #include "larafire.h"
 #include "lara.h"
 #include "effect2.h"
+#include "draw.h"
 #include "tomb4fx.h"
 #include "..\Specific\roomload.h"
 #include "..\Specific\setup.h"
