@@ -3,7 +3,6 @@
 #include "..\Specific\input.h"
 #include "..\Specific\winmain.h"
 #include "..\Specific\roomload.h"
-#include "..\Specific\game.h"
 #include "..\Specific\configuration.h"
 
 #include "..\Game\draw.h"

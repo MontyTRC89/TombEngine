@@ -469,7 +469,7 @@ void CalculateSpotCameras()
 				dy = SQUARE(cy - ly);
 				dz = SQUARE(cz - lz);
 
-				tlen = SQRT_ASM(dx + dy + dz);
+				tlen = sqrt(dx + dy + dz);
 
 				if (tlen <= clen)
 				{
@@ -555,7 +555,7 @@ void CalculateSpotCameras()
 			dy = (Camera.pos.y - QuakeCam.epos.y);
 			dz = (Camera.pos.z - QuakeCam.epos.z);
 
-			if (SQRT_ASM(SQUARE(dx) * SQUARE(dy) * SQUARE(dz)) < QuakeCam.epos.boxNumber)
+			if (sqrt(SQUARE(dx) * SQUARE(dy) * SQUARE(dz)) < QuakeCam.epos.boxNumber)
 			{
 				dz = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber) >> 1;
 				dy = QuakeCam.spos.roomNumber + (((QuakeCam.epos.roomNumber - QuakeCam.spos.roomNumber) * -QuakeCam.epos.boxNumber) / QuakeCam.epos.boxNumber);
@@ -641,7 +641,7 @@ void CalculateSpotCameras()
 						QuakeCam.epos.roomNumber = 0;
 					}
 
-					QuakeCam.epos.boxNumber = SQRT_ASM(((QuakeCam.spos.x - QuakeCam.epos.x) * (QuakeCam.spos.x - QuakeCam.epos.x)) + ((QuakeCam.spos.y - QuakeCam.epos.y) * (QuakeCam.spos.y - QuakeCam.epos.y) + ((QuakeCam.spos.z - QuakeCam.epos.z) * (QuakeCam.spos.z - QuakeCam.epos.z))));
+					QuakeCam.epos.boxNumber = sqrt(((QuakeCam.spos.x - QuakeCam.epos.x) * (QuakeCam.spos.x - QuakeCam.epos.x)) + ((QuakeCam.spos.y - QuakeCam.epos.y) * (QuakeCam.spos.y - QuakeCam.epos.y) + ((QuakeCam.spos.z - QuakeCam.epos.z) * (QuakeCam.spos.z - QuakeCam.epos.z))));
 				}
 				else
 				{

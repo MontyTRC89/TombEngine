@@ -98,7 +98,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
 	short* objptr = Lara.meshPtrs[LM_HIPS];
 	PHD_VECTOR pos = { objptr[0], objptr[1], objptr[2] };
-	GetLaraJointPosition(&pos, LM_HIPS);
+	GetLaraJointPosition(&pos, LJ_HIPS);
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
@@ -106,7 +106,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 	objptr = Lara.meshPtrs[LM_TORSO];
 	pos = { objptr[0], objptr[1], objptr[2] };
-	GetLaraJointPosition(&pos, LM_TORSO);
+	GetLaraJointPosition(&pos, LJ_TORSO);
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
 	sphere[1].z = pos.z;
@@ -299,7 +299,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 				if (distance < SQUARE(sphere[j].r))
 				{
-					distance = SQRT_ASM(distance);
+					distance = sqrt(distance);
 
 					if (distance == 0)
 						distance = 1;
@@ -310,7 +310,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 				}
 			}
 
-			int distance = SQRT_ASM(SQUARE(Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos) + SQUARE(Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
+			int distance = sqrt(SQUARE(Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos) + SQUARE(Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
 			Hairs[ponytail][i - 1].pos.yRot = ATAN((Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos), (Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
 			Hairs[ponytail][i - 1].pos.xRot = -ATAN(distance, Hairs[ponytail][i].pos.yPos - Hairs[ponytail][i - 1].pos.yPos);
 

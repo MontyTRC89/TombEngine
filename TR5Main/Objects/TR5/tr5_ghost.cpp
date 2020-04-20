@@ -100,7 +100,7 @@ void ControlInvisibleGhost(short itemNumber)
 		}
 		else
 		{
-			item->afterDeath = SQRT_ASM(info.distance) >> 4;
+			item->afterDeath = sqrt(info.distance) / 16;
 			if (item->itemFlags[0] == 0)
 			{
 				item->itemFlags[0] = 1;

@@ -225,4 +225,4 @@
 #define Legacy_InitialiseCrowDoveSwitch ((void (__cdecl*)(short)) 0x0043ECF0)
 
 // MISC
-#define Legacy_SQRT_ASM ((int(__cdecl*)(int)) 0x0048F980)
+#define Legacy_sqrt ((int(__cdecl*)(int)) 0x0048F980)

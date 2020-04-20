@@ -190,7 +190,7 @@ void GuardianControl(short itemNumber)
 				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LJ_LHAND);
 
 				// Calculate distance between guardian and Lara
-				int distance = SQRT_ASM(SQUARE(src.x - dest.x) + SQUARE(src.y - dest.y) + SQUARE(src.z - dest.z));
+				int distance = sqrt(SQUARE(src.x - dest.x) + SQUARE(src.y - dest.y) + SQUARE(src.z - dest.z));
 
 				// Check if there's a valid LOS between guardian and Lara 
 				// and if distance is less than 8 sectors  and if Lara is alive and not burning
@@ -422,7 +422,7 @@ void GuardianControl(short itemNumber)
 									int yc = LaraItem->pos.yPos + ((bounds[2] + bounds[3]) >> 1);
 									int zc = LaraItem->pos.zPos + ((bounds[4] + bounds[5]) >> 1);
 
-									int distance = SQRT_ASM(SQUARE(xc - src.x) + SQUARE(yc - src.y) + SQUARE(zc - src.z));
+									int distance = sqrt(SQUARE(xc - src.x) + SQUARE(yc - src.y) + SQUARE(zc - src.z));
 
 									if (distance < 8192)
 									{
