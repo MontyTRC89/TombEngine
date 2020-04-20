@@ -7,6 +7,7 @@
 #include "collide.h"
 #include "laramisc.h"
 #include "switch.h"
+#include "draw.h"
 #include "items.h"
 #include "..\Specific\roomload.h"
 #include "../Specific/setup.h"

@@ -51,7 +51,7 @@
 #define MatrixPtr					VAR_U_(0x00E4B0F8, int*)
 #define IMptr						VAR_U_(0x00E6D834, int*)
 #define DxMatrixPtr					VAR_U_(0x0055DA2C, int*)
-#define W2VMatrix					ARRAY_(0x0055D26C, int, [16])
+#define W2VMatrix					VAR_U_(0x0055D26C, int*)
 #define Unk_876C48					VAR_U_(0x00876C48, int)
 #define Unk_007E7FE8				VAR_U_(0x007E7FE8, int)
 #define SamplePointer               ARRAY_(0x0086BEF0, HSAMPLE, [SOUND_MAX_SAMPLES])

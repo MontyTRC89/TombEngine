@@ -254,6 +254,71 @@ bool Renderer11::updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size
 	return true;
 }
 
+void Renderer11::UpdateItemAnimations(int itemNumber)
+{
+	RendererItem* itemToDraw = &m_items[itemNumber];
+	itemToDraw->Id = itemNumber;
+	itemToDraw->Item = &Items[itemNumber];
+
+	ITEM_INFO* item = itemToDraw->Item;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+
+	// Lara has her own routine
+	if (item->objectNumber == ID_LARA)
+		return;
+
+	// Has been already done?
+	/*if (itemToDraw->DoneAnimations)
+		return;*/
+
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	RendererObject* moveableObj = m_moveableObjects[item->objectNumber];
+
+	// Update animation matrices
+	if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
+	{
+		// Apply extra rotations
+		int lastJoint = 0;
+		for (int j = 0; j < moveableObj->LinearizedBones.size(); j++)
+		{
+			RendererBone* currentBone = moveableObj->LinearizedBones[j];
+			currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+
+			if (creature)
+			{
+				if (currentBone->ExtraRotationFlags & ROT_Y)
+				{
+					currentBone->ExtraRotation.y = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+					lastJoint++;
+				}
+
+				if (currentBone->ExtraRotationFlags & ROT_X)
+				{
+					currentBone->ExtraRotation.x = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+					lastJoint++;
+				}
+
+				if (currentBone->ExtraRotationFlags & ROT_Z)
+				{
+					currentBone->ExtraRotation.z = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+					lastJoint++;
+				}
+			}
+		}
+
+		short* framePtr[2];
+		int rate;
+		int frac = GetFrame_D2(item, framePtr, &rate);
+
+		updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+
+		for (int m = 0; m < itemToDraw->NumMeshes; m++)
+			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
+	}
+
+	itemToDraw->DoneAnimations = true;
+}
+
 void Renderer11::updateItemsAnimations()
 {
 	Matrix translation;
@@ -271,57 +336,7 @@ void Renderer11::updateItemsAnimations()
 		if (item->objectNumber == ID_LARA)
 			continue;
 
-		OBJECT_INFO * obj = &Objects[item->objectNumber];
-		RendererObject * moveableObj = m_moveableObjects[item->objectNumber];
-
-		// Update animation matrices
-		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
-		{
-			// Apply extra rotations
-			int lastJoint = 0;
-			for (int j = 0; j < moveableObj->LinearizedBones.size(); j++)
-			{
-				RendererBone* currentBone = moveableObj->LinearizedBones[j];
-				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
-
-				if (creature)
-				{
-					if (currentBone->ExtraRotationFlags & ROT_Y)
-					{
-						currentBone->ExtraRotation.y = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
-						lastJoint++;
-					}
-
-					if (currentBone->ExtraRotationFlags & ROT_X)
-					{
-						currentBone->ExtraRotation.x = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
-						lastJoint++;
-					}
-
-					if (currentBone->ExtraRotationFlags & ROT_Z)
-					{
-						currentBone->ExtraRotation.z = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
-						lastJoint++;
-					}
-				}
-			}
-
-			short* framePtr[2];
-			int rate;
-			int frac = GetFrame_D2(item, framePtr, &rate);
-
-			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
-
-			for (int m = 0; m < itemToDraw->NumMeshes; m++)
-				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
-		}
-
-		// Update world matrix
-		//translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		//rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot), TR_ANGLE_TO_RAD(item->pos.xRot), TR_ANGLE_TO_RAD(item->pos.zRot));
-		//itemToDraw->World = rotation * translation;
-
-		int test = 0;
+		UpdateItemAnimations(itemToDraw->Id);
 	}
 }
 
@@ -406,6 +421,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 	short cz = *meshPtr++;
 	short r1 = *meshPtr++;
 	short r2 = *meshPtr++;
+
+	mesh->Sphere = BoundingSphere(Vector3(cx, cy, cz), r1);
 
 	short numVertices = *meshPtr++;
 

@@ -95,6 +95,8 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	CurrentCameraRotation.vy = mGetAngle(posZ, posX, targetZ, targetX) >> 4;
 	CurrentCameraRotation.vz = 0;*/
 
+	phd_GenerateW2V(&pos);
+
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }
 
@@ -1506,7 +1508,7 @@ void ConfirmCameraTargetPos()
 	pos.y = 0;
 	pos.z = 0;
 
-	GetJointAbsPosition(LaraItem, &pos, LJ_LHAND);
+	GetLaraJointPosition(&pos, LJ_LHAND);
 
 	if (Camera.laraNode != -1)
 	{

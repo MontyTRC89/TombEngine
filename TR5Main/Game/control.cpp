@@ -626,6 +626,8 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	InitialiseHair();
 
 	int nframes = 2;
+	g_Renderer->ResetAnimations();
+	g_Renderer->UpdateLaraAnimations();
 	GAME_STATUS result = ControlPhase(nframes, 0);
 	g_Renderer->FadeIn();
 
@@ -633,6 +635,9 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	while (true)
 	{
 		nframes = DrawPhaseGame();
+		
+		g_Renderer->ResetAnimations();
+		g_Renderer->UpdateLaraAnimations();
 		result = ControlPhase(nframes, 0);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||

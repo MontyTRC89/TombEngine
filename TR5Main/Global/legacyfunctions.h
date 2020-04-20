@@ -175,6 +175,7 @@
 
 // LARA.CPP
 #define Legacy_AnimateLara ((int (__cdecl*)(ITEM_INFO*)) 0x004563F0)
+#define Legacy_GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, int)) 0x0041E2A0)
 
 // OBJECTS.CPP
 #define Legacy_InitialiseTightRope ((void (__cdecl*)(short)) 0x0043ED30)
