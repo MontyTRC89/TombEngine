@@ -1922,7 +1922,7 @@ bool Renderer11::drawScene(bool dump)
 
 	clearSceneItems();
 	collectRooms();
-	updateLaraAnimations();
+	//UpdateLaraAnimations();
 	updateItemsAnimations();
 	updateEffects();
 	if (g_Configuration.EnableShadows)

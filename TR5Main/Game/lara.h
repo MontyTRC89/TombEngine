@@ -51,8 +51,6 @@ typedef struct LaraExtraInfo {
 
 extern LaraExtraInfo g_LaraExtra;
 
-#define GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, int)) 0x0041E2A0)
-
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 
