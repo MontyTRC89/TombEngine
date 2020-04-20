@@ -486,7 +486,7 @@ void ControlLaserBolts(short item_number)
 				dx = SQUARE(LaraItem->pos.xPos - item->pos.xPos);
 				dy = SQUARE(LaraItem->pos.yPos - 256 - item->pos.yPos);
 				dz = SQUARE(LaraItem->pos.zPos - item->pos.zPos);
-				dx = SQRT_ASM(dx + dy + dz);
+				dx = sqrt(dx + dy + dz);
 				if (dx < 0x400)
 				{
 					LaraItem->hitPoints -= (0x400 - dx) >> (6 - ((item->itemFlags[0] >= 0) << 1));
@@ -1081,7 +1081,7 @@ void LondonBossControl(short item_number)
 			dx = SQUARE(dx);
 			dy = SQUARE(dy);
 			dz = SQUARE(dz);
-			dx = SQRT_ASM(dx + dy + dz);
+			dx = sqrt(dx + dy + dz);
 		}
 
 		if (dx < 0xB00)

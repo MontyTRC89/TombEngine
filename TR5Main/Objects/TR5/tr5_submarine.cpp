@@ -217,7 +217,7 @@ void ControlSubmarine(short itemNumber)
 
 	if (!LOS((GAME_VECTOR*)&pos1, &pos2))
 	{
-		int distance = SQRT_ASM(SQUARE(pos2.x - pos1.x) + SQUARE(pos2.y - pos1.y) + SQUARE(pos2.z - pos1.z));
+		int distance = sqrt(SQUARE(pos2.x - pos1.x) + SQUARE(pos2.y - pos1.y) + SQUARE(pos2.z - pos1.z));
 		if (distance < 16384)
 		{
 			distance = 16384 - distance;

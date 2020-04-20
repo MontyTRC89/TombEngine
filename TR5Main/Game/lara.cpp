@@ -6202,7 +6202,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->goalAnimState = STATE_LARA_JUMP_UP;
 			item->currentAnimState = STATE_LARA_STOP;
-			Lara.calcFallSpeed = -3 - SQRT_ASM(-9600 - 12 * coll->frontFloor);
+			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->frontFloor);
 			AnimateLara(item);
 		}
 		else

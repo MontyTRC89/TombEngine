@@ -692,18 +692,17 @@ void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	l->pos.yRot = item->pos.yRot;
 	l->pos.zRot = item->pos.zRot;
 	
-	phd_PushUnitMatrix();
-	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-	
-	x = item->pos.xPos + ((MatrixPtr[M00] * vec->x + MatrixPtr[M01] * vec->y + MatrixPtr[M02] * vec->z) >> W2V_SHIFT);
-	y = item->pos.yPos + ((MatrixPtr[M10] * vec->x + MatrixPtr[M11] * vec->y + MatrixPtr[M12] * vec->z) >> W2V_SHIFT);
-	z = item->pos.zPos + ((MatrixPtr[M20] * vec->x + MatrixPtr[M21] * vec->y + MatrixPtr[M22] * vec->z) >> W2V_SHIFT);
+	Matrix matrix = Matrix::CreateFromYawPitchRoll(
+		TR_ANGLE_TO_RAD(item->pos.yRot),
+		TR_ANGLE_TO_RAD(item->pos.xRot),
+		TR_ANGLE_TO_RAD(item->pos.zRot)
+	);
 
-	phd_PopMatrix();
+	Vector3 pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
 
-	l->pos.xPos = x;
-	l->pos.yPos = y;
-	l->pos.zPos = z;
+	l->pos.xPos = item->pos.xPos + pos.x;
+	l->pos.yPos = item->pos.yPos + pos.y;
+	l->pos.zPos = item->pos.zPos + pos.z;
 }
 
 void TriggerLaraBlood() 
@@ -749,19 +748,21 @@ int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l)
 		return FALSE;
 	if (zRotRel > bounds[11])
 		return FALSE;
+	
+	Vector3 pos = Vector3(l->pos.xPos - item->pos.xPos, l->pos.yPos - item->pos.yPos, l->pos.zPos - item->pos.zPos);
 
-	phd_PushUnitMatrix();
-	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-	
-	x = l->pos.xPos - item->pos.xPos;
-	y = l->pos.yPos - item->pos.yPos;
-	z = l->pos.zPos - item->pos.zPos;
-	rx = (x * MatrixPtr[M00] + y * MatrixPtr[M10] + z * MatrixPtr[M20]) >> W2V_SHIFT;
-	ry = (x * MatrixPtr[M01] + y * MatrixPtr[M11] + z * MatrixPtr[M21]) >> W2V_SHIFT;
-	rz = (x * MatrixPtr[M02] + y * MatrixPtr[M12] + z * MatrixPtr[M22]) >> W2V_SHIFT;
-	
-	phd_PopMatrix();
-	
+	Matrix matrix = Matrix::CreateFromYawPitchRoll(
+		TR_ANGLE_TO_RAD(item->pos.yRot),
+		TR_ANGLE_TO_RAD(item->pos.xRot),
+		TR_ANGLE_TO_RAD(item->pos.zRot)
+	);
+
+	pos = Vector3::Transform(pos, matrix);
+
+	rx = pos.x;
+	ry = pos.y;
+	rz = pos.z;
+
 	if (rx < bounds[0] || rx > bounds[1] || ry < bounds[2] || ry > bounds[3] || rz < bounds[4] || rz > bounds[5])
 		return FALSE;
 
@@ -777,7 +778,7 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 	x = dest->xPos - src->xPos;
 	y = dest->yPos - src->yPos;
 	z = dest->zPos - src->zPos;
-	distance = SQRT_ASM(SQUARE(x) + SQUARE(y) + SQUARE(z));
+	distance = sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
 
 	if (velocity < distance)
 	{
@@ -895,15 +896,20 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	dest.xRot = item->pos.xRot;
 	dest.yRot = item->pos.yRot;
 	dest.zRot = item->pos.zRot;
+
+	Vector3 pos = Vector3(vec->x, vec->y, vec->z);
+
+	Matrix matrix = Matrix::CreateFromYawPitchRoll(
+		TR_ANGLE_TO_RAD(item->pos.yRot),
+		TR_ANGLE_TO_RAD(item->pos.xRot),
+		TR_ANGLE_TO_RAD(item->pos.zRot)
+	);
+
+	pos = Vector3::Transform(pos, matrix);
 	
-	phd_PushUnitMatrix();
-	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-
-	dest.xPos = item->pos.xPos + ((MatrixPtr[M00] * vec->x + MatrixPtr[M01] * vec->y + MatrixPtr[M02] * vec->z) >> W2V_SHIFT);
-	dest.yPos = item->pos.yPos + ((MatrixPtr[M10] * vec->x + MatrixPtr[M11] * vec->y + MatrixPtr[M12] * vec->z) >> W2V_SHIFT);
-	dest.zPos = item->pos.zPos + ((MatrixPtr[M20] * vec->x + MatrixPtr[M21] * vec->y + MatrixPtr[M22] * vec->z) >> W2V_SHIFT);
-
-	phd_PopMatrix();
+	dest.xPos = item->pos.xPos + pos.x;
+	dest.yPos = item->pos.yPos + pos.y;
+	dest.zPos = item->pos.zPos + pos.z;
 
 	if (item->objectNumber != ID_FLARE_ITEM && item->objectNumber != ID_BURNING_TORCH_ITEM)
 		return Move3DPosTo3DPos(&l->pos, &dest, LARA_VELOCITY, ANGLE(2));
@@ -914,7 +920,7 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	
 	if (abs(height - l->pos.yPos) <= CLICK(2))
 	{
-		if (SQRT_ASM(SQUARE(dest.xPos - l->pos.xPos) + SQUARE(dest.yPos - l->pos.yPos) + SQUARE(dest.zPos - l->pos.zPos)) < (STEP_SIZE/2))
+		if (sqrt(SQUARE(dest.xPos - l->pos.xPos) + SQUARE(dest.yPos - l->pos.yPos) + SQUARE(dest.zPos - l->pos.zPos)) < (STEP_SIZE/2))
 			return TRUE;
 
 		return Move3DPosTo3DPos(&l->pos, &dest, LARA_VELOCITY, ANGLE(2));

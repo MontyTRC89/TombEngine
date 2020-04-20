@@ -647,7 +647,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 		break;
 	}
 
-	Savegame.Game.Distance += SQRT_ASM(
+	Savegame.Game.Distance += sqrt(
 		SQUARE(item->pos.xPos - oldX) +
 		SQUARE(item->pos.yPos - oldY) +
 		SQUARE(item->pos.zPos - oldZ));

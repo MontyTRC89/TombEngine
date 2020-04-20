@@ -601,7 +601,7 @@ void CutsceneRopeControl(short itemNumber)
 	dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
 	dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
-	item->itemFlags[1] = ((SQRT_ASM(dx + dy + dz) << 1) + SQRT_ASM(dx + dy + dz)) << 1;
+	item->itemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
 	item->pos.xRot = -4869;
 }
 

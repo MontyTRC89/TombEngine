@@ -1490,7 +1490,7 @@ void UpdateShockwaves()
 
 						int dx = LaraItem->pos.xPos - sw->x;
 						int dz = LaraItem->pos.zPos - sw->z;
-						int distance = SQRT_ASM(SQUARE(dx) + SQUARE(dz));
+						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
 						
 						if (sw->y <= LaraItem->pos.yPos + frame[2]
 							|| sw->y >= LaraItem->pos.yPos + frame[3] + 256

@@ -1161,7 +1161,7 @@ void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 {
 	int distance;
 
-	distance = SQRT_ASM(SQUARE(item->pos.xPos - Camera.pos.x) + SQUARE(item->pos.yPos - Camera.pos.y) + SQUARE(item->pos.zPos - Camera.pos.z));
+	distance = sqrt(SQUARE(item->pos.xPos - Camera.pos.x) + SQUARE(item->pos.yPos - Camera.pos.y) + SQUARE(item->pos.zPos - Camera.pos.z));
 	if (distance < maxDistance)
 	{
 		if (maxDistance == -1)
@@ -1491,13 +1491,13 @@ void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color)
 	
 	if (!LOS(&pos1, &pos2))
 	{
-		int l = SQRT_ASM(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) >> 8;
+		int l = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) * 256;
 		
 		if (l + 8 > 31)
 			l = 31;
 		
 		if (color - l >= 0)
-			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) >> 1);
+			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) * 2);
 	}
 }
 
@@ -1641,7 +1641,7 @@ void CalculateCamera()
 		{
 			int dx = Camera.item->pos.xPos - item->pos.xPos;
 			int dz = Camera.item->pos.zPos - item->pos.zPos;
-			int shift = SQRT_ASM(SQUARE(dx) + SQUARE(dz));
+			int shift = sqrt(SQUARE(dx) + SQUARE(dz));
 			short angle = ATAN(dz, dx) - item->pos.yRot;
 			short tilt = ATAN(shift, y - (bounds[2] + bounds[3]) / 2 - Camera.item->pos.yPos);
 			bounds = GetBoundsAccurate(Camera.item);

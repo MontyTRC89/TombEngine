@@ -94,7 +94,7 @@ PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec) // (F) (D)
 	if (length < 0)
 		length = -length;
 
-	length = 65536 / SQRT_ASM(length);
+	length = 65536 / sqrt(length);
 	
 	vec->x = (int64_t) length * vec->x >> 16;
 	vec->y = (int64_t) length * vec->y >> 16;
@@ -135,7 +135,7 @@ void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* destination) // (F) 
 
 void _0x0046D420(int* matrix, short* angle) // (F) (D)
 {
-	angle[0] = ATAN(SQRT_ASM(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
+	angle[0] = ATAN(sqrt(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
 	if (matrix[M12] >= 0 && angle[0] > 0 || matrix[M12] < 0 && angle[0] < 0)
 		angle[0] = -angle[0];
 	angle[1] = ATAN(matrix[M22], matrix[M02]);
@@ -431,7 +431,7 @@ void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeV
 	vec.x = pendulumPointer->Position.x + pendulumVelocity->x - rope->segment[0].x;
 	vec.y = pendulumPointer->Position.y + pendulumVelocity->y - rope->segment[0].y;
 	vec.z = pendulumPointer->Position.z + pendulumVelocity->z - rope->segment[0].z;
-	result = 65536 * SQRT_ASM(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - value;
+	result = 65536 * sqrt(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - value;
 	NormaliseRopeVector(&vec);
 	pendulumVelocity->x -= (int64_t) result * vec.x >> 16;
 	pendulumVelocity->y -= (int64_t) result * vec.y >> 16;
@@ -446,7 +446,7 @@ void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* veloc
 	vec.x = nextSegment->x + nextVelocity->x - segment->x - velocity->x;
 	vec.y = nextSegment->y + nextVelocity->y - segment->y - velocity->y;
 	vec.z = nextSegment->z + nextVelocity->z - segment->z - velocity->z;
-	result = 65536 * SQRT_ASM(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - length >> 1;
+	result = (65536 * sqrt(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - length) / 2;
 	NormaliseRopeVector(&vec);
 	vec.x = (int64_t) result * vec.x >> 16;
 	vec.y = (int64_t) result * vec.y >> 16;

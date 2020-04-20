@@ -69,7 +69,7 @@ void FireHarpoon()
 			find_target_point(Lara.target, &pos);
 
 			item->pos.yRot = ATAN(pos.z - item->pos.zPos, pos.x - item->pos.xPos);
-			int distance = SQRT_ASM(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
+			int distance = sqrt(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
 			item->pos.xRot = -ATAN(distance, pos.y - item->pos.yPos);
 		}
 		else
@@ -459,6 +459,7 @@ void ControlGrenade(short itemNumber)
 	if (item->speed && aboveWater)
 	{
 		// For now keep this legacy math
+		// PHD_MATH
 		phd_PushUnitMatrix();
 
 		MatrixPtr[M03] = 0;
@@ -473,6 +474,14 @@ void ControlGrenade(short itemNumber)
 		int wz = (MatrixPtr[M23] >> W2V_SHIFT);
 
 		phd_PopMatrix();
+
+		/*Matrix matrix = Matrix::CreateFromYawPitchRoll(
+			TR_ANGLE_TO_RAD(item->pos.yRot),
+			TR_ANGLE_TO_RAD(item->pos.xRot),
+			TR_ANGLE_TO_RAD(item->pos.zRot)
+		); */
+
+		
 
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 	}

@@ -31,7 +31,7 @@ void ShootAtLara(FX_INFO *fx)
 	bounds = GetBoundsAccurate(LaraItem);
 	y += bounds[3] + (bounds[2] - bounds[3]) * 3 / 4;
 
-	distance = SQRT_ASM(SQUARE(x) + SQUARE(z));
+	distance = sqrt(SQUARE(x) + SQUARE(z));
 	fx->pos.xRot = -ATAN(distance, y);
 	fx->pos.yRot = ATAN(z, x);
 
