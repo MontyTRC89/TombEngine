@@ -1,6 +1,6 @@
 #include "sphere.h"
 #include "draw.h"
-#include "../Specific/roomload.h"
+#include "../Specific/level.h"
 #include "../Specific/setup.h"
 
 int NumLaraSpheres;

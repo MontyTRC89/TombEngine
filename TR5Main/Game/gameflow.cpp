@@ -4,6 +4,7 @@
 
 #include "..\Specific\input.h"
 #include "..\Global\global.h"
+#include "../Specific/level.h"
 
 #include <string>
 

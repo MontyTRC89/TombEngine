@@ -5,6 +5,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/effects.h"
 #include "../../Game/tomb4fx.h"
+#include "..\..\Specific\level.h"
 
 void InitialiseAutoGuns(short itemNum)
 {

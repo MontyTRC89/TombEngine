@@ -12,6 +12,7 @@
 #include "camera.h"
 #include "control.h"
 #include "../Specific/setup.h"
+#include "../Specific/level.h"
 
 int NumberBoxes;
 BOX_INFO* Boxes;

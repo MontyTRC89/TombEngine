@@ -7,8 +7,8 @@
 #include "../../Game/collide.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/items.h"
-#include "..\..\Specific\roomload.h"
-#include "..\..\Specific\roomload.h"
+#include "..\..\Specific\level.h"
+#include "..\..\Specific\level.h"
 #include "../../Specific/setup.h"
 
 extern LaraExtraInfo g_LaraExtra;
@@ -354,6 +354,8 @@ int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 	FLOOR_INFO* floor;
 	short roomNumber;
 
+	// PHD_MATH:
+	/*
 	phd_PushUnitMatrix();
 	MatrixPtr[M03] = item->pos.xPos;
 	MatrixPtr[M13] = item->pos.yPos;
@@ -363,6 +365,7 @@ int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 	pos->x = (MatrixPtr[M03] >> W2V_SHIFT);
 	pos->y = (MatrixPtr[M13] >> W2V_SHIFT);
 	pos->z = (MatrixPtr[M23] >> W2V_SHIFT);
+	*/
 
 	roomNumber = item->roomNumber;
 	GetFloor(pos->x, pos->y, pos->z, &roomNumber);

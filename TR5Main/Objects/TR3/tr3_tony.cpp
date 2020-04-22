@@ -6,6 +6,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/draw.h"
 #include "../../Game/effects.h"
+#include "..\..\Specific\level.h"
 #include "../../Specific/setup.h"
 
 // TODO: custom render for DrawExplosionRings() and DrawTonyBossShield()

@@ -14,6 +14,7 @@
 #include "..\Specific\configuration.h"
 #include "lara1gun.h"
 #include "lara2gun.h"
+#include "../Specific/level.h"
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
@@ -1793,18 +1794,9 @@ bool Inventory::UpdateSceneAndDrawInventory()
 
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 	{
-		// Control routines uses joints calculated here for getting Lara joint positions
-		CalcLaraMatrices(0);
-		phd_PushUnitMatrix();
-		CalcLaraMatrices(1);
-
-		// Calls my new rock & roll renderer :)
 		g_Renderer->DumpGameScene();
 		g_Renderer->DrawInventory();
 		Camera.numberFrames = g_Renderer->SyncRenderer();
-
-		// We need to pop the matrix stack or the game will crash
-		phd_PopMatrix();
 
 		nframes = Camera.numberFrames;
 		ControlPhase(nframes, 0);

@@ -3,6 +3,7 @@
 #include "effect2.h"
 #include <stdio.h>
 #include "../Specific/setup.h"
+#include "../Specific/level.h"
 
 void ClearItem(short itemNum)
 {

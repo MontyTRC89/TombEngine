@@ -3,6 +3,7 @@
 #include "../../Game/effects.h"
 #include "../../specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
 
 extern BITE_INFO raptorBite;
 

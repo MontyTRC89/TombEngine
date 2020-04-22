@@ -32,7 +32,7 @@
 #include "..\Objects\oldobjects.h"
 
 #include "footprint.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "..\Specific\input.h"
 #include "..\Specific\init.h"
 #include "..\Specific\winmain.h"
@@ -65,6 +65,13 @@ short NextItemActive;
 short NextItemFree;
 short* TriggerIndex;
 int DisableLaraControl = 0;
+int WeatherType;
+int LaraDrawType;
+int NumberSoundSources;
+OBJECT_VECTOR* SoundSources;
+int NumAnimatedTextures;
+short* AnimTextureRanges;
+int nAnimUVRanges;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -444,7 +451,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 unsigned __stdcall GameMain(void*)
 {
-	DB_Log(2, "GameMain - DLL");
+	//DB_Log(2, "GameMain - DLL");
 	printf("GameMain\n");
 
 	// We still need legacy matrices because control routines use them
@@ -472,7 +479,7 @@ unsigned __stdcall GameMain(void*)
 
 GAME_STATUS DoTitle(int index)
 {
-	DB_Log(2, "DoTitle - DLL");
+	//DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
 
 	CreditsDone = false;
@@ -3184,6 +3191,8 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 
 int IsRoomOutside(int x, int y, int z)
 {
+	return 0;
+
 	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
 	if (offset == -1)
 		return -2;

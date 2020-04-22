@@ -13,6 +13,7 @@
 #include "../../Game/laramisc.h"
 #include "../../Game/traps.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 struct LASER_HEAD_INFO
 {

@@ -1,5 +1,8 @@
 #include "bubble.h"
+#include "../Specific/level.h"
+
 using namespace std;
+
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
 void UpdateBubbles()

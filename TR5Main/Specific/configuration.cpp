@@ -87,7 +87,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		DB_Log(6, "WM_INITDIALOG");
+		//DB_Log(6, "WM_INITDIALOG");
 
 		SendMessageA(GetDlgItem(handle, IDC_GROUP_GFXADAPTER), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_DISPLAY_ADAPTER));
 		SendMessageA(GetDlgItem(handle, IDC_GROUP_OUTPUT_SETTINGS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_OUTPUT_SETTINGS));
@@ -126,7 +126,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_COMMAND:
-		DB_Log(6, "WM_COMMAND");
+		//DB_Log(6, "WM_COMMAND");
 
 		// Checkboxes
 		if (HIWORD(wParam) == BN_CLICKED)

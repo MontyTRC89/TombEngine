@@ -21,6 +21,7 @@
 
 #include "..\Objects\newobjects.h"
 #include "..\Global\global.h"
+#include "../Specific/level.h"
 
 #include <stdio.h>
 

@@ -5,6 +5,7 @@
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
 #include "sphere.h"
+#include "../Specific/level.h"
 
 int FirstHair[2];
 HAIR_STRUCT Hairs[2][7];

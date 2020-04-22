@@ -5,6 +5,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/items.h"
 #include "../../Game/tomb4fx.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO swordBite = { 0, 37, 550, 15 };
 

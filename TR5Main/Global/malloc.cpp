@@ -24,7 +24,7 @@ char* GameMalloc(int size)
 	int memSize = (size + 3) & -4;
 	if (memSize > MallocFree)
 	{
-		DB_Log(0, "Out of memory");
+		//DB_Log(0, "Out of memory");
 		return NULL;
 	}
 	else

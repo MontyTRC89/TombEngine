@@ -13,6 +13,7 @@
 #include "box.h"
 #include "../Specific/setup.h"
 #include "tomb4fx.h"
+#include "..\Specific\level.h"
 
 int lastWaterfallY = 0;
 short TightRopeBounds[12] = 

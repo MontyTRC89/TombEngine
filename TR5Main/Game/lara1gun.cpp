@@ -20,7 +20,7 @@
 
 #include "..\Global\global.h"
 #include "..\Scripting\GameFlowScript.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
 #include "bubble.h"
 
@@ -458,9 +458,19 @@ void ControlGrenade(short itemNumber)
 
 	if (item->speed && aboveWater)
 	{
+		Matrix world = Matrix::CreateFromYawPitchRoll(
+			TR_ANGLE_TO_RAD(item->pos.yRot - ANGLE(180)),
+			TR_ANGLE_TO_RAD(item->pos.xRot),
+			TR_ANGLE_TO_RAD(item->pos.zRot)
+		) * Matrix::CreateTranslation(0, 0, -64);
+
+		int wx = world.Translation().x;
+		int wy = world.Translation().y;
+		int wz = world.Translation().z;
+
 		// For now keep this legacy math
 		// PHD_MATH
-		phd_PushUnitMatrix();
+		/*phd_PushUnitMatrix();
 
 		MatrixPtr[M03] = 0;
 		MatrixPtr[M13] = 0;
@@ -473,15 +483,7 @@ void ControlGrenade(short itemNumber)
 		int wy = (MatrixPtr[M13] >> W2V_SHIFT);
 		int wz = (MatrixPtr[M23] >> W2V_SHIFT);
 
-		phd_PopMatrix();
-
-		/*Matrix matrix = Matrix::CreateFromYawPitchRoll(
-			TR_ANGLE_TO_RAD(item->pos.yRot),
-			TR_ANGLE_TO_RAD(item->pos.xRot),
-			TR_ANGLE_TO_RAD(item->pos.zRot)
-		); */
-
-		
+		phd_PopMatrix();*/
 
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 	}

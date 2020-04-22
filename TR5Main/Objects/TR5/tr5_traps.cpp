@@ -16,6 +16,7 @@
 #include "../../Game/traps.h"
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 short SPyoffs[8] =
 {

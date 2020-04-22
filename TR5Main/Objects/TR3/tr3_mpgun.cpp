@@ -6,6 +6,7 @@
 #include "../../Game/people.h"
 #include "../../specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
 
 enum MPGUN_STATES {
 	MPGUN_EMPTY, 

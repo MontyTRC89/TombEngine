@@ -8,7 +8,7 @@
 #include "../../Game/draw.h"
 #include "../../Game/effects.h"
 #include "../../Game/traps.h"
-#include "../../Specific/roomload.h"
+#include "../../Specific/level.h"
 #include "../../Game/debris.h"
 
 void MissileControl(short itemNumber)

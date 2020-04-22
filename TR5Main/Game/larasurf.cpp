@@ -10,6 +10,7 @@
 #include "laraswim.h"
 #include "larafire.h"
 #include "laramisc.h"
+#include "..\Specific\level.h"
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
