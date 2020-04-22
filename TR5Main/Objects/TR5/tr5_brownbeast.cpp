@@ -5,6 +5,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/tomb4fx.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO BrownBeastBite1 = { 0, 0, 0, 16 };
 BITE_INFO BrownBeastBite2 = { 0, 0, 0, 22 };

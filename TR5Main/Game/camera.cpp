@@ -10,6 +10,7 @@
 #include "lara.h"
 #include "flmtorch.h"
 #include "sphere.h"
+#include "../Specific/level.h"
 
 struct OLD_CAMERA
 {

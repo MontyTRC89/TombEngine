@@ -7,6 +7,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
 #include "../../Game/draw.h"
+#include "..\..\Specific\level.h"
 
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1

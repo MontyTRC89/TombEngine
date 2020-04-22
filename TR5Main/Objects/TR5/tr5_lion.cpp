@@ -7,6 +7,7 @@
 #include "..\..\game\box.h"
 #include "..\..\game\tomb4fx.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO LionBite1 = { 0xFFFFFFFE, 0xFFFFFFF6, 0xFA, 0x15 };
 BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };

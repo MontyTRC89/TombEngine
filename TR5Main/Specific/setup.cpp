@@ -22,7 +22,7 @@
 #include "..\Objects\oldobjects.h"
 #include "..\Objects\newobjects.h"
 
-#include "roomload.h"
+#include "level.h"
 
 #include <stdlib.h>
 #include <stdio.h>

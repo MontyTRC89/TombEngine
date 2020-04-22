@@ -11,6 +11,7 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/sphere.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
 

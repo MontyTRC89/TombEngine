@@ -3,6 +3,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO mummyBite1 = { 0, 0, 0, 11 };
 BITE_INFO mummyBite2 = { 0, 0, 0, 14 };

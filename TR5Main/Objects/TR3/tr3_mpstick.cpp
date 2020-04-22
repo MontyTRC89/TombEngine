@@ -5,6 +5,7 @@
 #include "../../Game/items.h"
 #include "../../specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };

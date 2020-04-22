@@ -9,6 +9,7 @@
 #include "../../Game/lara.h"
 #include "../../Game/traps.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2

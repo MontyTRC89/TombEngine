@@ -4,6 +4,7 @@
 #include "../../Game/effects.h"
 #include "../../Game/effect2.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 

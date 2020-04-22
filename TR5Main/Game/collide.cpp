@@ -10,6 +10,7 @@
 #include "sphere.h"
 #include "misc.h"
 #include "../Specific/setup.h"
+#include "../Specific/level.h"
 
 char LM[] = {
 	LJ_HIPS,

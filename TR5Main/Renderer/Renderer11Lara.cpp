@@ -3,6 +3,7 @@
 #include "../Game/hair.h"
 #include "../game/camera.h"
 #include "../Global/global.h"
+#include "..\Specific\level.h"
 
 extern GameFlow* g_GameFlow;
 

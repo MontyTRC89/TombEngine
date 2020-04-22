@@ -2,6 +2,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/people.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO silencerGun = { 3, 331, 56, 10 };
 

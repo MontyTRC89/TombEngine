@@ -7,6 +7,7 @@
 #include "../../Game/lot.h"
 #include "../../specific/setup.h"
 #include "../../Game/tomb4fx.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 

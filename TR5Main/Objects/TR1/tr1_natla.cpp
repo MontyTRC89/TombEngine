@@ -3,6 +3,7 @@
 #include "../../Game/people.h"
 #include "../../Game/items.h"
 #include "../../Game/missile.h"
+#include "..\..\Specific\level.h"
 
 /* HIT POINTS for Natla when she enters her second stage */
 #define NATLA_NEAR_DEATH 200

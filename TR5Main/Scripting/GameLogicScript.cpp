@@ -4,6 +4,7 @@
 #include "..\Game\lot.h"
 #include "..\Game\sound.h"
 #include "../Specific/setup.h"
+#include "../Specific/level.h"
 
 extern GameFlow* g_GameFlow;
 

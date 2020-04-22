@@ -7,6 +7,7 @@
 #include "../../Game/people.h"
 #include "../../Specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 

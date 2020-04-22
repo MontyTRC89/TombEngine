@@ -195,6 +195,31 @@
 #define Legacy_InitialisePickup ((void (__cdecl*)(short)) 0x0043E260)
 #define Legacy_PickupControl ((void (__cdecl*)(short)) 0x004679D0)
 
+// ROOMLOAD.CPP
+#define Legacy_DoSomethingWithRooms ((void (__cdecl*)()) 0x004774D0)
+#define Legacy_FreeItemsStuff ((void (__cdecl*)(int)) 0x00440590)
+#define Legacy_InitialiseClosedDoors ((void (__cdecl*)()) 0x00473600) 
+#define Legacy_CreateSkinningData ((void (__cdecl*)()) 0x00456AE0)
+#define Legacy_ProcessMeshData ((void (__cdecl*)(int)) 0x0049A3D0)
+#define Legacy_ReadFileEx ((int (__cdecl*)(void*, int, int, FILE*)) 0x004E1D20)
+#define Legacy_Decompress ((int (__cdecl*)(byte*, byte*, int, int)) 0x004A3EF0)
+#define Legacy_ReadRoomOriginal ((int (__cdecl*)(ROOM_INFO*, ROOM_INFO*)) 0x004917D0)
+#define Legacy_ReadRoomsOriginal ((int (__cdecl*)()) 0x004916C0)
+#define Legacy_FileOpen ((FILE* (__cdecl*)(char*)) 0x004A3CD0)
+#define Legacy_FileClose ((void (__cdecl*)(FILE*)) 0x004A3DA0)
+#define Legacy_LoadSoundEffects ((void (__cdecl*)()) 0x004A5D90)
+#define Legacy_LoadBoxes ((void (__cdecl*)()) 0x004A5E50)
+#define Legacy_LoadAnimatedTextures ((void (__cdecl*)()) 0x004A6060)
+#define Legacy_LoadTextureInfos ((void (__cdecl*)()) 0x004A60E0)
+#define Legacy_LoadAIObjects ((void (__cdecl*)()) 0x004A67F0)
+#define Legacy_LoadDemoData ((void (__cdecl*)()) 0x004A67D0)
+#define Legacy_LoadSamples ((void (__cdecl*)()) 0x004A6880)
+#define Legacy_InitialiseLaraLoad ((void (__cdecl*)(short)) 0x004568C0)
+#define Legacy_LoadRooms ((void (__cdecl*)()) 0x004A4DA0)
+#define Legacy_InitialiseGameStuff ((void (__cdecl*)()) 0x004778F0)
+#define Legacy_InitialiseLaraMeshes ((void (__cdecl*)()) 0x00455680)
+#define Legacy_InitialiseLaraAnims ((void (__cdecl*)(ITEM_INFO*)) 0x00456900)
+
 // ROPE.CPP
 #define Legacy_CalculateRopePoints ((void (__cdecl*)(ROPE_STRUCT*)) 0x0046EC70)
 

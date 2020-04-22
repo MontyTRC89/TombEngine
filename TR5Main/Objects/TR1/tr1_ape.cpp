@@ -2,6 +2,7 @@
 #include "../../Game/box.h"
 #include "../../Game/effects.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO apeBite = { 0, -19, 75, 15 };
 

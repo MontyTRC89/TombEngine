@@ -13,7 +13,7 @@
 #include "../Game/tomb4fx.h"
 #include "../Game/door.h"
 #include "../Objects/oldobjects.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];

@@ -10,6 +10,7 @@
 #include "../../Game/control.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 int NextBat;
 BAT_STRUCT* Bats;

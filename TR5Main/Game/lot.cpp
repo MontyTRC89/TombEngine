@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "../Specific/setup.h"
 #include "camera.h"
+#include "..\Specific\level.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
@@ -13,7 +14,7 @@ CREATURE_INFO* BaddieSlots;
 
 void InitialiseLOTarray(int allocMem)
 {
-	DB_Log(0, "InitialiseLOTarray - DLL");
+	//DB_Log(0, "InitialiseLOTarray - DLL");
 
 	if (allocMem)
 		BaddieSlots = (CREATURE_INFO*)GameMalloc(sizeof(CREATURE_INFO) * NUM_SLOTS);

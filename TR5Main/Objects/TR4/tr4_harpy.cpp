@@ -8,6 +8,7 @@
 #include "../../Game/draw.h"
 #include "../../Specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };

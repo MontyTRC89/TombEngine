@@ -14,6 +14,7 @@
 #include "../Game/tomb4fx.h"
 #include "../Game/pickup.h"
 #include "../Specific/setup.h"
+#include "..\Specific\level.h"
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 
 short ScalesBounds[12] = {

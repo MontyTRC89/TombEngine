@@ -8,6 +8,8 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void InitialiseDemigod(short itemNum)

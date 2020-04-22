@@ -2,6 +2,7 @@
 #include "../../Game/items.h"
 #include "../../Game/effect2.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO horseBite1 = { 0, 0, 0, 0x0D };
 BITE_INFO horseBite2 = { 0, 0, 0, 0x11 };

@@ -5,6 +5,7 @@
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
 #include "../../Game/tomb4fx.h"
+#include "..\..\Specific\level.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,
