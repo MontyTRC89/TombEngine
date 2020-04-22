@@ -9,7 +9,7 @@
 #include "switch.h"
 #include "draw.h"
 #include "items.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
 
 short FireBounds[12] =

@@ -14,7 +14,7 @@
 #include "draw.h"
 #include "effect2.h"
 #include "flmtorch.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "lot.h"
 #include "../Specific/setup.h"
 

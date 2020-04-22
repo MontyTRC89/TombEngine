@@ -6,6 +6,7 @@
 #include "../../Game/people.h"
 #include "../../Game/lara.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
 

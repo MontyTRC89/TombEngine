@@ -15,6 +15,7 @@
 #include "laramisc.h"
 #include "draw.h"
 #include "camera.h"
+#include "..\Specific\level.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

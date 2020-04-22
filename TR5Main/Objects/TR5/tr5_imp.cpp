@@ -7,6 +7,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/Box.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1

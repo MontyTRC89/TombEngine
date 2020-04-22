@@ -11,6 +11,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "../Specific/setup.h"
+#include "..\Specific\level.h"
 
 byte SequenceUsed[6];
 byte SequenceResults[3][3][3];

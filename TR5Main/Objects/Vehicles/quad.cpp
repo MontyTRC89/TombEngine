@@ -12,6 +12,7 @@
 #include "../../Game/lara1gun.h"
 #include "../../Game/misc.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 using namespace std;
 
 typedef enum QUAD_EFFECTS_POSITIONS {

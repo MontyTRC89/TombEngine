@@ -3,6 +3,7 @@
 #include "../../Game/people.h"
 #include "../../Game/items.h"
 #include "../../specific/setup.h"
+#include "../../specific/level.h"
 
 BITE_INFO workerShotgun = { 0, 281, 40, 9 };
 

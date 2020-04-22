@@ -8,7 +8,7 @@
 #include "..\Game\tomb4fx.h"
 #include <stdio.h>
 #include "debris.h"
-#include "../Specific/roomload.h"
+#include "../Specific/level.h"
 #include "../Specific/setup.h"
 
 #define SHARD_DAMAGE 30

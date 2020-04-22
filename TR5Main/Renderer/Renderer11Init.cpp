@@ -8,7 +8,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 {
 	HRESULT res;
 
-	DB_Log(2, "Renderer::Initialise - DLL");
+	//DB_Log(2, "Renderer::Initialise - DLL");
 	printf("Initialising DX11\n");
 
 	CoInitialize(NULL);

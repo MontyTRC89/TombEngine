@@ -4,6 +4,7 @@
 #include "../Game/camera.h"
 #include "../Game/draw.h"
 #include "../Specific/setup.h"
+#include "..\Specific\level.h"
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 bool Renderer11::isRoomUnderwater(short roomNumber)

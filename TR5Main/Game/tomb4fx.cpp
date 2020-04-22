@@ -5,6 +5,7 @@
 #include "draw.h"
 #include "items.h"
 #include "../Specific/setup.h"
+#include "..\Specific\level.h"
 #include "bubble.h"
 
 char FlareTable[121] =
@@ -1206,13 +1207,20 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 
 	short* frame = GetBestFrame(item);
 	
+	Matrix world = Matrix::CreateFromYawPitchRoll(
+		TR_ANGLE_TO_RAD(item->pos.yRot),
+		TR_ANGLE_TO_RAD(item->pos.xRot),
+		TR_ANGLE_TO_RAD(item->pos.zRot)
+	);
+
+	// PHD_MATH:
 	phd_PushUnitMatrix();
 	
 	MatrixPtr[M03] = 0;
 	MatrixPtr[M13] = 0;
 	MatrixPtr[M23] = 0;
 
-	phd_RotYXZ(item->pos.yPos, item->pos.xRot, item->pos.zRot);
+	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
 	phd_TranslateRel(frame[6], frame[7], frame[8]);
 	
 	short* rotation = &frame[9];
@@ -1227,13 +1235,15 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 	{
 		if (damage & 0x100 || !(GetRandomControl() & 3))
 		{
+			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, 0);
+			
 			int fxNumber = CreateNewEffect(item->roomNumber);
 			if (fxNumber != NO_ITEM)
 			{
 				FX_INFO* fx = &Effects[fxNumber];
-				fx->pos.xPos = item->pos.xPos + (MatrixPtr[M03] >> W2V_SHIFT);
-				fx->pos.yPos = item->pos.yPos + (MatrixPtr[M13] >> W2V_SHIFT);
-				fx->pos.zPos = item->pos.zPos + (MatrixPtr[M23] >> W2V_SHIFT);
+				fx->pos.xPos = item->pos.xPos + boneMatrix.Translation().x; // (MatrixPtr[M03] >> W2V_SHIFT);
+				fx->pos.yPos = item->pos.yPos + boneMatrix.Translation().y; // (MatrixPtr[M13] >> W2V_SHIFT);
+				fx->pos.zPos = item->pos.zPos + boneMatrix.Translation().z; // (MatrixPtr[M23] >> W2V_SHIFT);
 				fx->roomNumber = item->roomNumber;
 				fx->pos.yRot = 0;
 				fx->pos.zRot = 0;
@@ -1285,42 +1295,20 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 
 	for (int i = 1; i < obj->nmeshes; i++, bone += 3)
 	{
-		short popPush = *(bone++);
-
-		if (popPush & 1)
-		{
-			MatrixPtr -= 12;
-			DxMatrixPtr -= 12;
-		}
-		else if (popPush & 2)
-		{
-			phd_PushMatrix();
-		}
-
-		phd_TranslateRel(bone[0], bone[1], bone[2]);
-		gar_RotYXZsuperpack(&rotation, 0);
-
-		if (popPush & (ROT_X | ROT_Y | ROT_Z))
-		{
-			if (popPush & ROT_Y)
-				phd_RotY(*(extraRotation++));
-			if (popPush & ROT_X)
-				phd_RotX(*(extraRotation++));
-			if (popPush & ROT_Z)
-				phd_RotZ(*(extraRotation++));
-		}
-
 		bits <<= 1;
 
 		if (bits & meshBits && bits & item->meshBits && (damage & 0x100 || !(GetRandomControl() & 3)))
 		{
+			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, i);
+			Matrix matrix = boneMatrix * world;
+
 			int fxNumber = CreateNewEffect(item->roomNumber);
 			if (fxNumber != NO_ITEM)
 			{
 				FX_INFO* fx = &Effects[fxNumber];
-				fx->pos.xPos = item->pos.xPos + (MatrixPtr[3] >> 14);
-				fx->pos.yPos = item->pos.yPos + (MatrixPtr[7] >> 14);
-				fx->pos.zPos = item->pos.zPos + (MatrixPtr[11] >> 14);
+				fx->pos.xPos = item->pos.xPos + matrix.Translation().x; // (MatrixPtr[3] >> 14);
+				fx->pos.yPos = item->pos.yPos + matrix.Translation().y; // (MatrixPtr[7] >> 14);
+				fx->pos.zPos = item->pos.zPos + matrix.Translation().z; // (MatrixPtr[11] >> 14);
 				fx->roomNumber = item->roomNumber;
 				fx->pos.yRot = 0;
 				fx->pos.zRot = 0;
@@ -1368,8 +1356,6 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 			item->meshBits -= bits;
 		}
 	}
-
-	phd_PopMatrix();
 
 	return (item->meshBits == 0);
 }

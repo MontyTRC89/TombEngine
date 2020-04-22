@@ -2,6 +2,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 byte DogAnims[] = { 20, 21, 22, 20 };
 BITE_INFO DogBite = { 0, 0, 100, 3 };

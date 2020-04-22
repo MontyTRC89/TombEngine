@@ -8,6 +8,7 @@
 #include "../../Game/effects.h"
 #include "../../Game/laramisc.h"
 #include "../../Game/Box.h"
+#include "..\..\Specific\level.h"
 
 short MovingBlockBounds[12] = { 
 	-300, 300, 0, 0, -692, -512,

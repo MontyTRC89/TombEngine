@@ -13,6 +13,7 @@
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
 #include "../../Game/bubble.h"
+#include "..\..\Specific\level.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

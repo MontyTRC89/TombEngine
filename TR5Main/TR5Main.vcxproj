@@ -47,8 +47,8 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)TR5Main\Libs\lua</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
+    <IncludePath>F:\Software\TR5Main\TR5Main\Libs\zlib;F:\Software\TR5Main\TR5Main\Libs\zlib\include;$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)TR5Main\Libs\lua</IncludePath>
+    <LibraryPath>F:\Software\TR5Main\TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -76,7 +76,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
@@ -212,7 +212,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Specific\init.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
-    <ClInclude Include="Specific\roomload.h" />
+    <ClInclude Include="Specific\level.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
@@ -383,7 +383,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Specific\configuration.cpp" />
     <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
-    <ClCompile Include="Specific\roomload.cpp" />
+    <ClCompile Include="Specific\level.cpp" />
     <ClCompile Include="Specific\setup.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
     <ClCompile Include="TR5Main.cpp" />

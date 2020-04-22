@@ -3,6 +3,7 @@
 #include "../../Game/effects.h"
 #include "../../Game/Box.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 

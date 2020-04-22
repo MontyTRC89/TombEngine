@@ -2,6 +2,7 @@
 #include "..\Global\global.h"
 #include "draw.h"
 #include "laramisc.h"
+#include "..\Specific\level.h"
 
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;

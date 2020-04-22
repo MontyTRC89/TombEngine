@@ -5,6 +5,7 @@
 #include "../../Game/lot.h"
 #include "../../specific/setup.h"
 #include "..\..\Game\camera.h"
+#include "..\..\Specific\level.h"
 
 enum PIERRE_STATE {
 	PEOPLE_EMPTY, PEOPLE_STOP, PEOPLE_WALK, PEOPLE_RUN, PEOPLE_AIM,

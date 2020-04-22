@@ -6,6 +6,7 @@
 #include "../../Game/people.h"
 #include "../../Game/lot.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2

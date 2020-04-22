@@ -5,6 +5,7 @@
 #include "math.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
+#include "../Specific/level.h"
 
 //long wibble;
 //long SplashCount;

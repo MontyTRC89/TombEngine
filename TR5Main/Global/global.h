@@ -22,7 +22,7 @@ using namespace DirectX::SimpleMath;
 
 #include "..\Renderer\Renderer11.h"
 
-#define DB_Log ((HWND (__cdecl*)(short, const char*)) 0x004DEB10)
+//#define DB_Log ((HWND (__cdecl*)(short, const char*)) 0x004DEB10)
 
 #pragma warning(disable:4996)
 

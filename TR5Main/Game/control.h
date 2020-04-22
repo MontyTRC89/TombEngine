@@ -20,6 +20,13 @@ extern short NextItemActive;
 extern short NextItemFree;
 extern short* TriggerIndex;
 extern int DisableLaraControl;
+extern int WeatherType;
+extern int LaraDrawType;
+extern int NumberSoundSources;
+extern OBJECT_VECTOR* SoundSources;
+extern int NumAnimatedTextures;
+extern short* AnimTextureRanges;
+extern int nAnimUVRanges;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);

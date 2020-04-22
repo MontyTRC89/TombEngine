@@ -3,6 +3,7 @@
 #include "../../Game/box.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 

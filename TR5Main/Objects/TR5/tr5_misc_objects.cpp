@@ -17,6 +17,7 @@
 #include "../../Game/camera.h"
 #include "../../Game/missile.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 short DeathSlideBounds[12] = { -256, 256, -100, 100, 256, 512, 0, 0, -25 * ONE_DEGREE, 25 * ONE_DEGREE, 0, 0 };
 PHD_VECTOR DeathSlidePosition = { 0, 0, 371 };

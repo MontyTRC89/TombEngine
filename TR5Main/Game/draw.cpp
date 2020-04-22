@@ -2,6 +2,7 @@
 #include "Lara.h"
 #include "..\Renderer\Renderer11.h"
 #include "camera.h"
+#include "../Specific/level.h"
 
 BITE_INFO EnemyBites[9] =
 {
