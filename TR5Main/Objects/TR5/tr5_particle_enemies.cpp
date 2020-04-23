@@ -11,6 +11,7 @@
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 int NextBat;
 BAT_STRUCT* Bats;

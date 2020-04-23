@@ -2,6 +2,7 @@
 #include "..\Global\global.h"
 #include "draw.h"
 #include "laramisc.h"
+#include "lara.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
 #include "sphere.h"

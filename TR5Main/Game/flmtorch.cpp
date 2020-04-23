@@ -11,6 +11,7 @@
 #include "items.h"
 #include "..\Specific\level.h"
 #include "../Specific/setup.h"
+#include "../Specific/input.h"
 
 short FireBounds[12] =
 {

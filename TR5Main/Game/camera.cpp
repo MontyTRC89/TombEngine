@@ -58,6 +58,7 @@ CAMERA_TYPE BinocularOldCamera;
 int LaserSight;
 int SniperCount;
 int ExitingBinocular;
+int PhdPerspective;
 
 void ActivateCamera()
 {
@@ -104,8 +105,7 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 void AlterFOV(int value)
 { 
 	CurrentFOV = value;
-	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
-	LfAspectCorrection = 1.3333334f / (float)(PhdWidth / PhdHeight);
+	PhdPerspective = g_Renderer->ScreenWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
 }
 
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)

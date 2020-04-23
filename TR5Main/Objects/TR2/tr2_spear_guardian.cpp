@@ -4,6 +4,7 @@
 #include "../../Game/items.h"
 #include "../../specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO spearLeftBite = { 0, 0, 920, 11 };
 BITE_INFO spearRightBite = { 0, 0, 920, 18 };

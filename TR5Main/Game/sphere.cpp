@@ -1,5 +1,6 @@
 #include "sphere.h"
 #include "draw.h"
+#include "lara.h"
 #include "../Specific/level.h"
 #include "../Specific/setup.h"
 

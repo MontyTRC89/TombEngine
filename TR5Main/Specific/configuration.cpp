@@ -297,14 +297,14 @@ bool SaveConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout1[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout[1][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
 		}
 	}
 
-	OptionAutoTarget = g_Configuration.AutoTarget;
+	//OptionAutoTarget = g_Configuration.AutoTarget;
 	GlobalMusicVolume = g_Configuration.MusicVolume;
 	GlobalFXVolume = g_Configuration.SfxVolume;
 
@@ -439,13 +439,13 @@ bool LoadConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout0[i]) != ERROR_SUCCESS)
+		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout[0][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
 		}
 
-		KeyboardLayout1[i] = (short)tempKey;
+		KeyboardLayout[1][i] = (short)tempKey;
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine
@@ -471,7 +471,7 @@ bool LoadConfiguration()
 
 	RegCloseKey(rootKey);
 
-	CheckKeyConflicts();
+	DefaultConflict();
 
 	return true;
 }

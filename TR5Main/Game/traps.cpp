@@ -12,6 +12,7 @@
 #include "objlight.h"
 #include "draw.h"
 #include "..\Specific\level.h"
+#include "../Specific/input.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};

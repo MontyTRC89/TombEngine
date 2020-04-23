@@ -15,6 +15,8 @@
 #include "../Game/pickup.h"
 #include "../Specific/setup.h"
 #include "..\Specific\level.h"
+#include "../Specific/input.h"
+
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 
 short ScalesBounds[12] = {

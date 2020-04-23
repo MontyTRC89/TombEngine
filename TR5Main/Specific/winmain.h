@@ -14,6 +14,7 @@ extern WINAPP	 App;
 extern unsigned int threadId;
 extern uintptr_t hThread;
 extern HACCEL hAccTable;
+extern HWND WindowsHandle;
 
 #define GameClose ((int (__cdecl*)(void)) 0x004A8575)
 #define WinAppProc2 ((int (__cdecl*)(HWND, UINT, WPARAM, LPARAM)) 0x004D2AB0)

@@ -2,8 +2,6 @@
 
 #include "..\Global\global.h"
 
-#define DoRayBox_sub_401523 ((int (__cdecl*)(PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*, PHD_VECTOR*)) 0x00401523)
-
 #define TRIG_BITS(T) ((T & 0x3fff) >> 10)
 
 extern int KeyTriggerActive;
@@ -27,6 +25,9 @@ extern OBJECT_VECTOR* SoundSources;
 extern int NumAnimatedTextures;
 extern short* AnimTextureRanges;
 extern int nAnimUVRanges;
+extern int Wibble;
+extern int SetDebounce;
+extern int CurrentAtmosphere;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);

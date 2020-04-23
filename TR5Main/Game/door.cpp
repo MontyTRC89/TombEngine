@@ -11,6 +11,7 @@
 #include "misc.h"
 #include "Box.h"
 #include "../Specific/level.h"
+#include "../Specific/input.h"
 
 PHD_VECTOR DoubleDoorPos = { 0, 0, 220 };
 PHD_VECTOR PullDoorPos = { -201, 0, 322 };

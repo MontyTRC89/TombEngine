@@ -15,6 +15,7 @@ extern CAMERA_TYPE BinocularOldCamera;
 extern int LaserSight;
 extern int SniperCount;
 extern int ExitingBinocular;
+extern int PhdPerspective;
 
 void ActivateCamera();
 void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);

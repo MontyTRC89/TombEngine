@@ -5,6 +5,7 @@
 #include "../../Game/items.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO crocodileBite = { 0, -156, 500, 9 };
 

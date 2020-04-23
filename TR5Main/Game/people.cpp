@@ -6,6 +6,7 @@
 #include "control.h"
 #include "sphere.h"
 #include "debris.h"
+#include "lara.h"
 #include "box.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 

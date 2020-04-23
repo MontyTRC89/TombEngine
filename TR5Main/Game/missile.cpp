@@ -10,6 +10,7 @@
 #include "debris.h"
 #include "../Specific/level.h"
 #include "../Specific/setup.h"
+#include "lara.h"
 
 #define SHARD_DAMAGE 30
 #define ROCKET_DAMAGE 100

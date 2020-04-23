@@ -1,6 +1,7 @@
 #include "../newobjects.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
+#include "../../Game/lara.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 

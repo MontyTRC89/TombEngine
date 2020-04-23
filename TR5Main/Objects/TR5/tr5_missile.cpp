@@ -10,6 +10,7 @@
 #include "../../Game/traps.h"
 #include "../../Specific/level.h"
 #include "../../Game/debris.h"
+#include "../../Game/lara.h"
 
 void MissileControl(short itemNumber)
 {
