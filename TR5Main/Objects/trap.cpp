@@ -12,6 +12,7 @@
 #include "../Game/collide.h"
 #include "../Game/draw.h"
 #include "../Game/tomb4fx.h"
+#include "../Game/lara.h"
 #include "../Game/misc.h"
 #include "../Specific/setup.h"
 #include "..\Specific\level.h"

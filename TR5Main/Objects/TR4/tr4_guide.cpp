@@ -8,6 +8,7 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
 BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };

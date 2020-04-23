@@ -158,6 +158,10 @@
 #define Legacy_UpdateHealtBar ((void (__cdecl*)(int)) 0x00439E50)
 #define Legacy_UpdateAirBar ((void (__cdecl*)(int)) 0x00439FC0)
 
+// INPUT.CPP
+#define Legacy_S_UpdateInput ((int (__cdecl*)()) 0x004A92D0)
+#define Legacy_CheckKeyConflicts ((int (__cdecl*)()) 0x004ADF40)
+
 // ITEMS.CPP
 #define Legacy_ItemNewRoom ((void (__cdecl*)(short, short)) 0x00440DA0)
 #define Legacy_EffectNewRoom ((void (__cdecl*)(short, short)) 0x004412F0)

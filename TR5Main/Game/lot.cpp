@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "../Specific/setup.h"
 #include "camera.h"
+#include "lara.h"
 #include "..\Specific\level.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16

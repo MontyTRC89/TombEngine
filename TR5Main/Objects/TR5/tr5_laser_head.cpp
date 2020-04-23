@@ -14,6 +14,7 @@
 #include "../../Game/traps.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 struct LASER_HEAD_INFO
 {

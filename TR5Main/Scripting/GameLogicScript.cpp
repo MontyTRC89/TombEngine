@@ -1,6 +1,7 @@
 #include "GameLogicScript.h"
 #include "..\Game\items.h"
 #include "..\Game\box.h"
+#include "..\Game\lara.h"
 #include "..\Game\lot.h"
 #include "..\Game\sound.h"
 #include "../Specific/setup.h"

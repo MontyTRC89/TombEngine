@@ -13,6 +13,8 @@
 #include "../../Game/misc.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Specific/input.h"
+
 using namespace std;
 
 typedef enum QUAD_EFFECTS_POSITIONS {

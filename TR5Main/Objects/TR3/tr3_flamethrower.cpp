@@ -8,6 +8,7 @@
 #include "../../specific/setup.h"
 #include "../../Game/lot.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

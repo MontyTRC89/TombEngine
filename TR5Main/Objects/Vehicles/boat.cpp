@@ -6,6 +6,7 @@
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
 #include "../../Specific/level.h"
+#include "../../Specific/input.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

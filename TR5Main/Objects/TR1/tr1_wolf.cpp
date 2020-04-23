@@ -2,6 +2,7 @@
 #include "../../Game/items.h"
 #include "../../Game/box.h"
 #include "../../Game/effects.h"
+#include "../../Game/lara.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 

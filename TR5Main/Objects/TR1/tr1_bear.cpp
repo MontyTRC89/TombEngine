@@ -3,6 +3,7 @@
 #include "../../Game/effects.h"
 #include "../../specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO bearBite = { 0, 96, 335, 14 };
 

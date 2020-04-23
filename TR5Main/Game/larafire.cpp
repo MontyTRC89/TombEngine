@@ -17,6 +17,7 @@
 #include "..\Specific\level.h"
 #include "lot.h"
 #include "../Specific/setup.h"
+#include "../Specific/input.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {

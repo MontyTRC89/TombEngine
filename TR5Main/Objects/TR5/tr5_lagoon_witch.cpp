@@ -7,6 +7,7 @@
 #include "../../Game/inventory.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 #define STATE_LAGOON_WITCH_SWIM			1
 #define STATE_LAGOON_WITCH_STOP			2

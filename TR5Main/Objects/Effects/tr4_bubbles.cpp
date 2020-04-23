@@ -7,6 +7,7 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/effects.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {

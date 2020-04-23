@@ -162,7 +162,7 @@ int Sync()
 	dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xFFFFFFFF;
 	dCounter /= LdFreq;
 	
-	nFrames = long(dCounter) - long(LdSync);
+	long nFrames = long(dCounter) - long(LdSync);
 	
 	LdSync = dCounter;
 	

@@ -1,7 +1,9 @@
 #include "sound.h"
+#include "lara.h"
 #include "camera.h"
 #include "..\Specific\configuration.h"
-#include "..\Specific\level.h"
+#include "..\Specific\level.h""
+#include "..\Specific\winmain.h"
 
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];
@@ -22,6 +24,8 @@ short SampleLUT[SOUND_NEW_SOUNDMAP_MAX_SIZE];
 short SoundMapSize;
 int NumSamplesInfos;
 SAMPLE_INFO* SampleInfo;
+int GlobalMusicVolume;
+int GlobalFXVolume;
 
 bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	// Replaces DXCreateSampleADPCM()
 {

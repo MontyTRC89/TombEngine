@@ -22,6 +22,8 @@
 #include "..\Scripting\GameFlowScript.h"
 #include "..\Specific\level.h"
 #include "../Specific/setup.h"
+#include "../Specific/input.h"
+
 #include "bubble.h"
 
 extern LaraExtraInfo g_LaraExtra;

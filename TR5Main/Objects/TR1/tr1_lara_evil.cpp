@@ -4,6 +4,7 @@
 #include "../../Game/larafire.h"
 #include "../../Game/misc.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 // TODO: Evil lara is not targetable and cant move like lara.
 

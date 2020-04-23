@@ -5,6 +5,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
 #include "../../Game/lot.h"
+#include "../../Game/lara.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 

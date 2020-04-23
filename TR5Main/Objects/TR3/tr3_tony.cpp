@@ -8,6 +8,7 @@
 #include "../../Game/effects.h"
 #include "..\..\Specific\level.h"
 #include "../../Specific/setup.h"
+#include "../../Game/lara.h"
 
 // TODO: custom render for DrawExplosionRings() and DrawTonyBossShield()
 // TODO: add flame effect for tony, check TriggerXX() function.

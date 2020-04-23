@@ -10,6 +10,7 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/sphere.h"
 #include "../../Game/laraflar.h"
+#include "../../Specific/input.h"
 
 #include <vector>
 #include "../../Specific/setup.h"

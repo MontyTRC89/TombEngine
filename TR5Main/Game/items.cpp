@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "../Specific/setup.h"
 #include "../Specific/level.h"
+#include "lara.h"
 
 void ClearItem(short itemNum)
 {

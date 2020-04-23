@@ -8,6 +8,7 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO GladiatorBite = { 0, 0, 0, 16 };
 
