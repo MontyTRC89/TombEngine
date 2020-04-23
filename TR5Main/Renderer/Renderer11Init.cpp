@@ -1,5 +1,6 @@
 #include "Renderer11.h"
 #include "../Specific/configuration.h"
+#include "../Specific/winmain.h"
 
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
@@ -410,16 +411,6 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	}
 
 	UpdateWindow(handle);
-
-	// Setup legacy variables
-	PhdWindowPosX = 0;
-	PhdWindowPosY = 0;
-	PhdWindowXmax = w - 1;
-	PhdWindowYmax = h - 1;
-	PhdWidth = w;
-	PhdHeight = h;
-	PhdCentreX = w / 2;
-	PhdCentreY = h / 2;
 
 	return true;
 }

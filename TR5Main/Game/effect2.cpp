@@ -3,6 +3,7 @@
 #include "tomb4fx.h"
 #include "traps.h"
 #include "math.h"
+#include "lara.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
 #include "../Specific/level.h"

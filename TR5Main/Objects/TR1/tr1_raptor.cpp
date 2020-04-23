@@ -3,6 +3,7 @@
 #include "../../Game/effects.h"
 #include "../../specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 enum RAPTOR_STATE
 {

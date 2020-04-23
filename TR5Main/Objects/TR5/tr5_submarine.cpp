@@ -11,6 +11,7 @@
 #include "../../Game/lara1gun.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 void InitialiseSubmarine(short itemNum)
 {

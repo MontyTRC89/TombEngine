@@ -8,6 +8,7 @@
 #include "..\Specific\level.h"
 #include "..\Specific\setup.h"
 #include "camera.h"
+#include "../Specific/input.h"
 
 PISTOL_DEF PistolsTable[4] =
 {

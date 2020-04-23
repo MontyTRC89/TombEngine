@@ -22,6 +22,7 @@
 #include "..\Objects\newobjects.h"
 #include "..\Global\global.h"
 #include "../Specific/level.h"
+#include "../Specific/input.h"
 
 #include <stdio.h>
 
@@ -42,6 +43,8 @@ bool doJump = false;
 short OldAngle = 1;
 LaraExtraInfo g_LaraExtra;
 int RopeSwing = 0;
+LARA_INFO Lara;
+ITEM_INFO* LaraItem;
 
 void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll) =
 {

@@ -26,6 +26,7 @@ uintptr_t hThread;
 HACCEL hAccTable;
 byte receivedWmClose = false;
 bool Debug = false;
+HWND WindowsHandle;
 
 extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
@@ -271,8 +272,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		return false;
 	}
 
-	PhdWidth = g_Configuration.Width;
-	PhdHeight = g_Configuration.Height;
 	WindowsHandle = App.WindowHandle;
 
 	// Initialise the renderer

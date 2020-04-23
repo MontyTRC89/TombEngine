@@ -4,6 +4,7 @@
 #include "../../Game/items.h"
 #include "../../Game/sphere.h"
 #include "../../Game/effect2.h"
+#include "../../Game/lara.h"
 #include "../../Game/people.h"
 #include "../../Game/draw.h"
 #include "../../Specific/setup.h"

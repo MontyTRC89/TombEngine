@@ -723,9 +723,6 @@ void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float 
 	View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), up);
 	Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, zNear, zFar);
 	ViewProjection = View * Projection;
-	// Setup legacy variables
-	PhdZNear = zNear << W2V_SHIFT;
-	PhdZFar = zFar << W2V_SHIFT;
 }
 
 bool Renderer11::EnumerateVideoModes()

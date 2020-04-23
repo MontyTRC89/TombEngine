@@ -7,6 +7,7 @@
 #include "../../Game/debris.h"
 #include "../../Game/effect2.h"
 #include "../../Game/lot.h"
+#include "../../Game/lara.h"
 #include "../../Specific/setup.h"
 #include "../../Game/tomb4fx.h"
 #include "..\..\Specific\level.h"

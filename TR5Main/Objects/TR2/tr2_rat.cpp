@@ -1,4 +1,5 @@
 #include "../newobjects.h"
+#include "../../Game/lara.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../specific/setup.h"

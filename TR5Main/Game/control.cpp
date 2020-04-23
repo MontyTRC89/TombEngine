@@ -36,6 +36,7 @@
 #include "..\Specific\input.h"
 #include "..\Specific\init.h"
 #include "..\Specific\winmain.h"
+#include "../Specific/input.h"
 
 #include <process.h>
 #include <stdio.h>
@@ -72,6 +73,9 @@ OBJECT_VECTOR* SoundSources;
 int NumAnimatedTextures;
 short* AnimTextureRanges;
 int nAnimUVRanges;
+int Wibble = 0;
+int SetDebounce = 0;
+int CurrentAtmosphere;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -343,7 +347,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				{
 					Lara.poisoned = 4096;
 				}
-				if ((gfLevelFlags & 0x80u) != 0 && !Lara.gassed)
+				if (/*(gfLevelFlags & 0x80u) != 0 &&*/ !Lara.gassed)
 				{
 					if (Lara.dpoisoned)
 					{
@@ -513,7 +517,6 @@ GAME_STATUS DoTitle(int index)
 		LastInventoryItem = -1;
 		DelCutSeqPlayer = 0;
 		TitleControlsLockedOut = false;
-		GameMode = 1;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();

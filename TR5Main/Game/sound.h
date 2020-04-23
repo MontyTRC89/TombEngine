@@ -2040,6 +2040,8 @@ extern short SampleLUT[SOUND_NEW_SOUNDMAP_MAX_SIZE];
 extern short SoundMapSize;
 extern int NumSamplesInfos;
 extern SAMPLE_INFO* SampleInfo;
+extern int GlobalMusicVolume;
+extern int GlobalFXVolume;
 
 #define SayNo ((void (__cdecl*)()) 0x004790E0)
 

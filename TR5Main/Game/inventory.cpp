@@ -15,6 +15,7 @@
 #include "lara1gun.h"
 #include "lara2gun.h"
 #include "../Specific/level.h"
+#include "../Specific/input.h"
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
@@ -625,7 +626,7 @@ int Inventory::DoInventory()
 
 	OpenRing(m_activeRing, true);
 
-	while (!ResetFlag)
+	while (true /*!ResetFlag*/)
 	{
 		SetDebounce = true;
 		S_UpdateInput();
@@ -1836,9 +1837,10 @@ int Inventory::DoTitleInventory()
 
 	int result = INV_RESULT_NONE;
 
-	while (!ResetFlag)
+	while (true /*!ResetFlag*/)
 	{
 		SetDebounce = true;
+
 		S_UpdateInput();
 		SetDebounce = false;
 
@@ -2504,7 +2506,7 @@ void Inventory::DoControlsSettings()
 	bool closeObject = false;
 
 	// Copy configuration to a temporary object
-	memcpy(&ring->Configuration.KeyboardLayout, &KeyboardLayout1, NUM_CONTROLS);
+	memcpy(&ring->Configuration.KeyboardLayout, &KeyboardLayout[1], NUM_CONTROLS);
 
 	// Do the passport
 	while (true)
@@ -2548,7 +2550,7 @@ void Inventory::DoControlsSettings()
 
 			if (ring->selectedIndex == NUM_CONTROLS)
 			{
-				memcpy(KeyboardLayout1, ring->Configuration.KeyboardLayout, NUM_CONTROLS);
+				memcpy(KeyboardLayout[1], ring->Configuration.KeyboardLayout, NUM_CONTROLS);
 				SaveConfiguration();
 
 				closeObject = true;
@@ -2568,7 +2570,7 @@ void Inventory::DoControlsSettings()
 		}
 
 		// If RETURN is pressed, then wait for a new key
-		if (KeyMap[TR_KEY_RETURN] & 0x80)
+		if (KeyMap[DIK_RETURN] & 0x80)
 		{
 			SoundEffect(SFX_MENU_SELECT, NULL, 0);
 
@@ -2601,13 +2603,13 @@ void Inventory::DoControlsSettings()
 					if (selectedKey && g_KeyNames[selectedKey])
 					{
 						// Can't rededefine special keys or the inventory will be not usable
-						if (!(selectedKey == TR_KEY_RETURN || selectedKey == TR_KEY_LEFT || selectedKey == TR_KEY_RIGHT ||
-							selectedKey == TR_KEY_UP || selectedKey == TR_KEY_DOWN))
+						if (!(selectedKey == DIK_RETURN || selectedKey == DIK_LEFT || selectedKey == DIK_RIGHT ||
+							selectedKey == DIK_UP || selectedKey == DIK_DOWN))
 						{
-							if (selectedKey != TR_KEY_ESCAPE)
+							if (selectedKey != DIK_ESCAPE)
 							{
-								KeyboardLayout1[ring->selectedIndex] = selectedKey;
-								CheckKeyConflicts();
+								KeyboardLayout[1][ring->selectedIndex] = selectedKey;
+								DefaultConflict();
 								ring->waitingForKey = false;
 								break;
 							}

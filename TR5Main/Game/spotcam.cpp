@@ -6,6 +6,8 @@
 #include "draw.h"
 #include "tomb4fx.h"
 #include "switch.h"
+#include "lara.h"
+#include "../Specific/input.h"
 
 int LastSequence;
 int SpotcamTimer;

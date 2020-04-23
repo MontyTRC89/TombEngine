@@ -12,6 +12,7 @@
 #include "../../Game/sphere.h"
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
+#include "../../Specific/input.h"
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
 
