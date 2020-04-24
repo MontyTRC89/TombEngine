@@ -1,6 +1,9 @@
 #pragma once
 #include "..\Global\global.h"
 
+extern OBJECT_TEXTURE* WaterfallTextures[6];
+extern float WaterfallY[6];
+
 void SmashObject(short itemNumber);
 void SmashObjectControl(short itemNumber);
 void BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height);
@@ -25,5 +28,3 @@ void InitialiseTightRope(short itemNumber);
 void InitialiseAnimating(short itemNumber);
 void AnimatingControl(short itemNumber);
 void HighObject2Control(short itemNumber);
-
-void Inject_Objects();

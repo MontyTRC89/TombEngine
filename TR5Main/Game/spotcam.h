@@ -28,10 +28,10 @@ extern int LastSpotCam;
 extern SPOTCAM SpotCam[64];
 extern int NumberSpotcams;
 extern int UseSpotCam;
+extern int SpotcamDontDrawLara;
+extern int SpotcamOverlay;
 
 void InitSpotCamSequences();
 void InitialiseSpotCam(short sequence);
 void CalculateSpotCameras();
 int Spline(int x, int* knots, int nk);
-
-void Inject_Spotcam();

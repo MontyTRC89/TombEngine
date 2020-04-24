@@ -4,6 +4,8 @@
 #include "..\Game\Lara.h"
 #include "winmain.h"
 #include "../Game/camera.h"
+#include "../Game/sound.h"
+#include "../Game/savegame.h"
 
 const char* g_KeyNames[] = {
 	NULL,		"ESC",	"1",		"2",		"3",		"4",		"5",		"6",
@@ -458,11 +460,4 @@ void DefaultConflict()
 			}
 		}
 	}
-}
-
-void Inject_Input()
-{
-	INJECT(0x004A2970, InitialiseDirectInput);
-	INJECT(0x004A2880, DI_ReadKeyboard);
-	INJECT(0x004A2D00, DD_SpinMessageLoopMaybe);
 }

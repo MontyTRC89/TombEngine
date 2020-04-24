@@ -12,10 +12,13 @@
 #include "healt.h"
 #include "misc.h"
 #include "rope.h"
+#include "rope.h"
 #include "draw.h"
+#include "savegame.h"
 #include "inventory.h"
 #include "camera.h"
 #include "../Specific/input.h"
+#include "sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
@@ -1045,12 +1048,18 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	item->pos.xPos = rope->position.x + (rope->meshSegment[Lara.ropeSegment].x >> 16);
 	item->pos.yPos = rope->position.y + (rope->meshSegment[Lara.ropeSegment].y >> 16) + Lara.ropeOffset;
 	item->pos.zPos = rope->position.z + (rope->meshSegment[Lara.ropeSegment].z >> 16);
-	phd_PushUnitMatrix();
-	phd_RotYXZ(angle[1], angle[0], angle[2]);
-	item->pos.xPos += -112 * MatrixPtr[M02] >> W2V_SHIFT;
-	item->pos.yPos += -112 * MatrixPtr[M12] >> W2V_SHIFT;
-	item->pos.zPos += -112 * MatrixPtr[M22] >> W2V_SHIFT;
-	phd_PopMatrix();
+
+	Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
+		TR_ANGLE_TO_DEGREES(angle[1]),
+		TR_ANGLE_TO_DEGREES(angle[0]),
+		TR_ANGLE_TO_DEGREES(angle[2])
+	);
+	
+	// PHD_MATH!
+	item->pos.xPos += -112 * rotMatrix.m[0][2]; // MatrixPtr[M02] >> W2V_SHIFT;
+	item->pos.yPos += -112 * rotMatrix.m[1][2]; // MatrixPtr[M12] >> W2V_SHIFT;
+	item->pos.zPos += -112 * rotMatrix.m[2][2]; // MatrixPtr[M22] >> W2V_SHIFT;
+	
 	item->pos.xRot = angle[0];
 	item->pos.yRot = angle[1];
 	item->pos.zRot = angle[2];

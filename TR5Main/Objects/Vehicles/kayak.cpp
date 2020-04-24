@@ -1176,7 +1176,7 @@ void InitialiseKayak(short item_number)
 	KAYAK_INFO* Kayak;
 
 	v = &Items[item_number];
-	Kayak = (KAYAK_INFO*)GameMalloc(sizeof(KAYAK_INFO));
+	Kayak = (KAYAK_INFO*)game_malloc(sizeof(KAYAK_INFO));
 	v->data = (void*)Kayak;
 	Kayak->Vel = 0;
 	Kayak->Rot = 0;

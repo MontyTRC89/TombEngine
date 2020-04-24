@@ -19,7 +19,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -49,6 +49,7 @@
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>F:\Software\TR5Main\TR5Main\Libs\zlib;F:\Software\TR5Main\TR5Main\Libs\zlib\include;$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)TR5Main\Libs\lua</IncludePath>
     <LibraryPath>F:\Software\TR5Main\TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -120,7 +121,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\bubble.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
-    <ClInclude Include="Global\legacyfunctions.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
     <ClInclude Include="Renderer\CameraMatrixBuffer.h" />
@@ -202,7 +202,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Global\macros.h" />
     <ClInclude Include="Global\objectslist.h" />
     <ClInclude Include="Global\types.h" />
-    <ClInclude Include="Global\vars.h" />
     <ClInclude Include="Global\malloc.h" />
     <ClInclude Include="Global\math.h" />
     <ClInclude Include="Global\vodoo.h" />
@@ -218,7 +217,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Game\bubble.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />

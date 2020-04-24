@@ -14,8 +14,6 @@ void InitialiseGameFlags();
 void CustomObjects();
 void InitialiseObjects();
 
-void Inject_Setup();
-
 #define INIT_PICKUP(obid) \
 obj = &Objects[obid]; \
 if (obj->loaded) \

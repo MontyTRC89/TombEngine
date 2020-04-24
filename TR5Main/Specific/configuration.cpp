@@ -8,6 +8,8 @@
 
 #include <CommCtrl.h>
 #include "configuration.h"
+#include <bass.h>
+#include "../Game/sound.h"
 
 extern Renderer11* g_Renderer;
 extern GameFlow* g_GameFlow;
@@ -188,11 +190,12 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int SetupDialog()
 {
-	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
+	// FIXME
+	/*HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
 	ShowCursor(true);
 	int result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
-	ShowCursor(false);
+	ShowCursor(false);*/
 
 	return true;
 }
@@ -465,7 +468,7 @@ bool LoadConfiguration()
 	g_Configuration.SoundDevice = soundDevice;
 
 	// Set legacy variables
-	OptionAutoTarget = autoTarget;
+	//OptionAutoTarget = autoTarget;
 	GlobalMusicVolume = musicVolume;
 	GlobalFXVolume = sfxVolume;
 

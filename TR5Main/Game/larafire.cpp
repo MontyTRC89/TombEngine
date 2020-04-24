@@ -18,6 +18,8 @@
 #include "lot.h"
 #include "../Specific/setup.h"
 #include "../Specific/input.h"
+#include "sound.h"
+#include "savegame.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -788,6 +790,8 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 
 	if (best < 0)
 	{
+		// PHD_MATH
+		/*
 		GAME_VECTOR vDest;
 		vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
 		vDest.y = vSrc.y + (MatrixPtr[M21] * 5 >> 2);
@@ -795,16 +799,17 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 
 		GetTargetOnLOS(&vSrc, &vDest, 0, 1);
 		
-		return -1;
+		return -1;*/
 	}
 	else
 	{
 		Savegame.Game.AmmoHits++;
 
+		// FIXME
 		GAME_VECTOR vDest;
-		vDest.x = vSrc.x + ((MatrixPtr[M20] * bestDistance) >> W2V_SHIFT);
+		/*vDest.x = vSrc.x + ((MatrixPtr[M20] * bestDistance) >> W2V_SHIFT);
 		vDest.y = vSrc.y + ((MatrixPtr[M21] * bestDistance) >> W2V_SHIFT);
-		vDest.z = vSrc.z + ((MatrixPtr[M22] * bestDistance) >> W2V_SHIFT);
+		vDest.z = vSrc.z + ((MatrixPtr[M22] * bestDistance) >> W2V_SHIFT);*/
 
 		// TODO: enable it when the slot is created !
 		/*
@@ -895,8 +900,9 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 	GAME_VECTOR targetPoint;
 	find_target_point(Lara.target, &targetPoint);
 
+	// FIXME
 	short angles[2];
-	phd_GetVectorAngles(targetPoint.x - pos.x, targetPoint.y - pos.y, targetPoint.z - pos.z, angles);
+	//phd_GetVectorAngles(targetPoint.x - pos.x, targetPoint.y - pos.y, targetPoint.z - pos.z, angles);
 
 	angles[0] -= LaraItem->pos.yRot;
 	angles[1] -= LaraItem->pos.xRot;
@@ -1001,7 +1007,8 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 						find_target_point(item, &target);
 						if (LOS(&source, &target))
 						{
-							phd_GetVectorAngles(target.x - source.x, target.y - source.y, target.z - source.z, angle);
+							// FIXME
+							//phd_GetVectorAngles(target.x - source.x, target.y - source.y, target.z - source.z, angle);
 							angle[0] -= LaraItem->pos.yRot + Lara.torsoYrot;
 							angle[1] -= LaraItem->pos.xRot + Lara.torsoXrot;
 							if (angle[0] >= winfo->lockAngles[0] && angle[0] <= winfo->lockAngles[1] && angle[1] >= winfo->lockAngles[2] && angle[1] <= winfo->lockAngles[3])
@@ -1080,15 +1087,4 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 		LastTargets[0] = Lara.target;
 	}
 	LaraTargetInfo(winfo);
-}
-
-void Inject_LaraFire()
-{
-	INJECT(0x00453490, AimWeapon);
-	INJECT(0x00453AE0, WeaponObject);
-	INJECT(0x00452430, LaraGun);
-	INJECT(0x004546C0, GetAmmo);
-	INJECT(0x00452B30, InitialiseNewWeapon);
-	INJECT(0x00453B50, WeaponObjectMesh);
-	//INJECT(0x00453A90, SmashItem);
 }

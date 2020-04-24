@@ -13,6 +13,7 @@
 #include "../Specific/setup.h"
 #include "..\Specific\level.h"
 #include "../Specific/input.h"
+#include "sound.h"
 
 byte SequenceUsed[6];
 byte SequenceResults[3][3][3];
@@ -1425,27 +1426,4 @@ void ShootSwitchCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (item->objectNumber == ID_SHOOT_SWITCH1 && !(item->meshBits & 1))
 		item->status = ITEM_INVISIBLE;
-}
-
-void Inject_Switch()
-{
-	INJECT(0x0047FD20, CrowDoveSwitchCollision);
-	INJECT(0x0047FC80, CrowDoveSwitchControl);
-	INJECT(0x0047F990, CogSwitchCollision);
-	INJECT(0x0047F810, CogSwitchControl);
-	INJECT(0x0047F610, FullBlockSwitchCollision);
-	INJECT(0x0047F520, FullBlockSwitchControl);
-	INJECT(0x0047F190, CrowbarSwitchCollision);
-	INJECT(0x0047F050, JumpSwitchCollision);
-	INJECT(0x0047EE00, RailSwitchCollision);
-	INJECT(0x0047E950, TurnSwitchCollision);
-	INJECT(0x0047E650, TurnSwitchControl);
-	INJECT(0x0047E450, PulleyCollision);
-	INJECT(0x0047E220, UnderwaterSwitchCollision);
-	INJECT(0x0047E0C0, SwitchCollision2);
-	INJECT(0x0047DC70, SwitchCollision);
-	INJECT(0x0047D9D0, TestTriggersAtXYZ);
-	INJECT(0x0047D8C0, GetKeyTrigger);
-	INJECT(0x0047D7B0, GetSwitchTrigger);
-	INJECT(0x0047D670, SwitchTrigger);
 }

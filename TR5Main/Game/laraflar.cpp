@@ -3,6 +3,7 @@
 #include "..\Global\global.h"
 #include "..\Specific\level.h"
 #include "..\Specific\setup.h"
+#include "sound.h"
 
 #include "draw.h"
 #include "items.h"
@@ -58,7 +59,8 @@ void FlareControl(short itemNumber) // (AF) (D)
 	
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	// FIXME
+	//DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	
 	short age = (short)(item->data) & 0x7FFF;
 	if (age >= 900)
@@ -474,9 +476,4 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 		return 0;
 	}
-}
-
-void Inject_LaraFlar()
-{
-
 }

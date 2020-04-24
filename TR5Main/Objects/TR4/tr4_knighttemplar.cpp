@@ -8,6 +8,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 

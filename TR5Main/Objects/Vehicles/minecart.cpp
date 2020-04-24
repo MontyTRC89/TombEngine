@@ -11,6 +11,7 @@
 #include "..\..\Specific\level.h"
 #include "../../Specific/setup.h"
 #include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -809,7 +810,7 @@ void InitialiseMineCart(short itemNum)
 	CART_INFO* cart;
 
 	v = &Items[itemNum];
-	cart = (CART_INFO*)GameMalloc(sizeof(CART_INFO));
+	cart = (CART_INFO*)game_malloc(sizeof(CART_INFO));
 	v->data = (void*)cart;
 	cart->Flags = NULL;
 	cart->Speed = 0;

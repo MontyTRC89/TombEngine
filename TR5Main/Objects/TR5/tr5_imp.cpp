@@ -71,8 +71,9 @@ void ImpThrowStones(ITEM_INFO* item)
 	int dy = pos1.y - pos2.y;
 	int dz = pos1.z - pos2.z;
 
+	// FIXME:
 	short angles[2];
-	phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+	//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 	
 	int distance = sqrt(SQUARE(dx) + SQUARE(dy) + SQUARE(dz));
 	if (distance < 8)

@@ -14,11 +14,14 @@
 #include "debris.h"
 #include "../Specific/setup.h"
 #include "camera.h"
+#include "savegame.h"
+#include "sound.h"
 
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 short FXType;
+FX_INFO* Effects;
 
 void(*effect_routines[59])(ITEM_INFO* item) =
 {
@@ -512,13 +515,4 @@ void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNu
 			z + 256 - (GetRandomControl() * 512 / 0x8000),
 			speed, direction, roomNumber);
 	}
-}
-
-void Inject_Effects()
-{
-	INJECT(0x00432580, ItemNearLara);
-	INJECT(0x00478FE0, StopSoundEffect);
-	INJECT(0x00432760, DoBloodSplat);
-	INJECT(0x00402FB3, ClearSpidersPatch);
-	INJECT(0x00432710, Richochet);
 }

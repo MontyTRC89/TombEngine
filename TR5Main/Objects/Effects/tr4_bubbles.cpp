@@ -241,12 +241,13 @@ void BubblesControl(short fxNum)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
+	// FIXME:
 	short angles[2];
-	phd_GetVectorAngles(
+	/*phd_GetVectorAngles(
 		LaraItem->pos.xPos - fx->pos.xPos,
 		LaraItem->pos.yPos - fx->pos.yPos - 256,
 		LaraItem->pos.zPos - fx->pos.zPos,
-		angles);
+		angles);*/
 
 	int unk1 = 0; // v44
 	int unk2 = 0; // v3

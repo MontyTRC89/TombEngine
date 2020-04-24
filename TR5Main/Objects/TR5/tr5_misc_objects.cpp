@@ -19,6 +19,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 short DeathSlideBounds[12] = { -256, 256, -100, 100, 256, 512, 0, 0, -25 * ONE_DEGREE, 25 * ONE_DEGREE, 0, 0 };
 PHD_VECTOR DeathSlidePosition = { 0, 0, 371 };
@@ -1325,7 +1326,7 @@ void InitialiseDeathSlide(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	GAME_VECTOR* pos = (GAME_VECTOR*)GameMalloc(sizeof(GAME_VECTOR));
+	GAME_VECTOR* pos = (GAME_VECTOR*)game_malloc(sizeof(GAME_VECTOR));
 	item->data = pos;
 
 	pos->x = item->pos.xPos;

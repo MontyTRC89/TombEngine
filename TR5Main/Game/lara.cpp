@@ -23,6 +23,7 @@
 #include "..\Global\global.h"
 #include "../Specific/level.h"
 #include "../Specific/input.h"
+#include "sound.h"
 
 #include <stdio.h>
 
@@ -45,6 +46,7 @@ LaraExtraInfo g_LaraExtra;
 int RopeSwing = 0;
 LARA_INFO Lara;
 ITEM_INFO* LaraItem;
+byte LaraNodeUnderwater[15];
 
 void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll) =
 {
@@ -6649,10 +6651,4 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		}
 	}
 	return result;
-}
-
-void Inject_Lara()
-{
-	//INJECT(0x00448010, lara_as_stop);
-	//INJECT(0x00442E70, LaraAboveWater);
 }

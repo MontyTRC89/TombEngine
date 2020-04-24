@@ -12,6 +12,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 int NextBat;
 BAT_STRUCT* Bats;
@@ -411,12 +412,13 @@ void UpdateBats()
 			bat->zTarget = (GetRandomControl() & 0x7F) - 64;
 		}
 
+		// FIXME
 		short angles[2];
-		phd_GetVectorAngles(
+		/*phd_GetVectorAngles(
 			LaraItem->pos.xPos + 8 * bat->xTarget - bat->pos.xPos,
 			LaraItem->pos.yPos - bat->laraTarget - bat->pos.yPos,
 			LaraItem->pos.zPos + 8 * bat->zTarget - bat->pos.zPos,
-			angles);
+			angles);*/
 
 		int distance = SQUARE(LaraItem->pos.zPos - bat->pos.zPos) +
 					   SQUARE(LaraItem->pos.xPos - bat->pos.xPos);
