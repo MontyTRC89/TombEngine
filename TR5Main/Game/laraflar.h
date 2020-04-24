@@ -12,5 +12,3 @@ void CreateFlare(short object, int thrown);
 void DrawFlareInAir(ITEM_INFO* item);
 void DoFlareInHand(int flare_age);
 int DoFlareLight(PHD_VECTOR* pos, int flare_age);
-
-void Inject_LaraFlar();

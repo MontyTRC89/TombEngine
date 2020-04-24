@@ -7,6 +7,7 @@
 #include "sphere.h"
 #include "debris.h"
 #include "lara.h"
+#include "sound.h"
 #include "box.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
@@ -174,14 +175,4 @@ int TargetVisible(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	return 0;
-}
-
-void Inject_People()
-{
-	INJECT(0x00467610, ShotLara);
-	INJECT(0x00467530, GunMiss);
-	INJECT(0x004673D1, GunHit);
-	INJECT(0x00467420, GunShot);
-	INJECT(0x004672F0, Targetable);
-	INJECT(0x004671E0, TargetVisible);
 }

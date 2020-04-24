@@ -8,6 +8,9 @@
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];
 SoundTrackSlot BASS_Soundtrack[NUM_SOUND_TRACK_TYPES];
+HSAMPLE SamplePointer[SOUND_MAX_SAMPLES];
+SoundEffectSlot SoundSlot[SOUND_MAX_CHANNELS];
+char TrackNamePrefix;
 
 const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb presets
 
@@ -700,29 +703,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 	return bassError != 0;
 }
 
-void Inject_Sound()
+void SayNo()
 {
-	INJECT(0x00479060, SOUND_Stop);
-	INJECT(0x004790A0, SOUND_Stop);			// Seems no difference from SOUND_Stop
-	INJECT(0x00478FE0, StopSoundEffect);
-	INJECT(0x00478570, SoundEffect);
-	INJECT(0x004A3510, Sound_LoadSample);	// DXCreateSampleADPCM
-	INJECT(0x004A3AA0, Sound_FreeSamples);	// ReleaseDXSoundBuffers
 
-	INJECT(0x00492990, S_CDPlay);			// Not really S_CDPlay, but parent singleton function
-	INJECT(0x00418BC0, S_CDPlayEx);			// "S_CDPlayEx" called by CD trigger events
-	INJECT(0x004929E0, S_CDStop);			// S_CDStop
-
-	//INJECT(0x004A3100, EmptySoundProc);	// DXDSCreate
-	//INJECT(0x004A3190, EmptySoundProc);	// DXCreateSample
-	//INJECT(0x004A3030, EmptySoundProc);	// DXSetOutputFormat
-	//INJECT(0x004A2E30, EmptySoundProc);	// SetSoundOutputFormat
-	//INJECT(0x004A3300, EmptySoundProc);	// StreamOpen
-	//INJECT(0x004A3470, EmptySoundProc);	// StreamClose
-	//INJECT(0x004931A0, EmptySoundProc);	// ACMClose
-	//INJECT(0x00493490, EmptySoundProc);	// ACMStream
-	//INJECT(0x00492DA0, EmptySoundProc);	// ACMInit
-	//INJECT(0x00492C20, EmptySoundProc);	// SetupNotifications
-	//INJECT(0x00493990, EmptySoundProc);	// StartAddress
-	//INJECT(0x00492B60, EmptySoundProc);	// fnCallback
 }

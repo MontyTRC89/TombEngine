@@ -83,5 +83,3 @@ void SetFadeClip(short height, short speed);
 void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
 ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte flags, byte type);
 void UpdateEnergyArcs();
-
-void Inject_Tomb4FX();

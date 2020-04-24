@@ -125,11 +125,6 @@ void CombineCrossbowLasersight(int action, short object)
 	}
 }
 
-void Inject_Inventory()
-{
-
-}
-
 Inventory::Inventory()
 {
 	ZeroMemory(&m_objectsTable[0], sizeof(InventoryObjectDefinition) * INVENTORY_TABLE_SIZE);

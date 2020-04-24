@@ -55,6 +55,7 @@ extern int AnimationsCount;
 extern short* FloorData;
 extern int nAIObjects;
 extern AIOBJECT* AIObjects;
+extern SPRITE* Sprites;
 
 void LoadTextures();
 void LoadRooms();
@@ -87,5 +88,3 @@ bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg);
 bool ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg);
 bool ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg);
 void LoadNewData(int size);
-
-void Inject_level();

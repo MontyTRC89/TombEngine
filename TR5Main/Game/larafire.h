@@ -2,8 +2,6 @@
 
 #include "..\Global\global.h"
 
-#define DoProperDetection ((void  (__cdecl*)(short, int, int, int, int, int, int)) 0x00453BE0)
-
 extern WEAPON_INFO Weapons[NUM_WEAPONS];
 
 void SmashItem(short itemNum);
@@ -19,5 +17,3 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
 void LaraTargetInfo(WEAPON_INFO* weapon);
 int CheckForHoldingState(int state);
 void LaraGetNewTarget(WEAPON_INFO* winfo);
-
-void Inject_LaraFire();

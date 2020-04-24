@@ -9,6 +9,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
 BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };

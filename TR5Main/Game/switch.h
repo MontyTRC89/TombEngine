@@ -29,5 +29,3 @@ void InitialiseShootSwitch(short itemNumber);
 void ShootSwitchCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 
 extern int PulleyItemNumber;
-
-void Inject_Switch();

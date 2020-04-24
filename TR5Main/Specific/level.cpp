@@ -25,6 +25,7 @@
 #include <map>
 #include "IO/Streams.h"
 #include <zlib.h>
+#include "../Game/sound.h"
 
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
 ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
@@ -78,6 +79,7 @@ int AnimationsCount;
 short* FloorData;
 int nAIObjects;
 AIOBJECT* AIObjects;
+SPRITE* Sprites;
 
 int g_NumSprites;
 int g_NumSpritesSequences;
@@ -119,7 +121,7 @@ int LoadItems()
 	if (NumItems == 0)
 		return false;
 
-	Items = (ITEM_INFO*)GameMalloc(sizeof(ITEM_INFO) * NUM_ITEMS);
+	Items = (ITEM_INFO*)game_malloc(sizeof(ITEM_INFO) * NUM_ITEMS);
 	LevelItems = NumItems;
 
 	InitialiseClosedDoors();
@@ -204,13 +206,13 @@ void LoadObjects()
 	int numMeshDataWords = ReadInt32();
 	int numMeshDataBytes = 2 * numMeshDataWords;
 
-	MeshBase = (short*)GameMalloc(numMeshDataBytes);
+	MeshBase = (short*)game_malloc(numMeshDataBytes);
 	ReadBytes(MeshBase, numMeshDataBytes);
 
 	MeshDataSize = numMeshDataBytes;
 
 	int numMeshPointers = ReadInt32();
-	Meshes = (short**)GameMalloc(4 * numMeshPointers);
+	Meshes = (short**)game_malloc(4 * numMeshPointers);
 	ReadBytes(Meshes, 4 * numMeshPointers);
 
 	for (int i = 0; i < numMeshPointers; i++) 
@@ -222,23 +224,23 @@ void LoadObjects()
 	NumMeshPointers = numMeshes;
 
 	int numAnimations = ReadInt32();
-	Anims = (ANIM_STRUCT*)GameMalloc(sizeof(ANIM_STRUCT) * numAnimations);
+	Anims = (ANIM_STRUCT*)game_malloc(sizeof(ANIM_STRUCT) * numAnimations);
 	ReadBytes(Anims, sizeof(ANIM_STRUCT) * numAnimations);
 
 	int numChanges = ReadInt32();
-	Changes = (CHANGE_STRUCT*)GameMalloc(sizeof(CHANGE_STRUCT) * numChanges);
+	Changes = (CHANGE_STRUCT*)game_malloc(sizeof(CHANGE_STRUCT) * numChanges);
 	ReadBytes(Changes, sizeof(CHANGE_STRUCT) * numChanges);
 
 	int numRanges = ReadInt32();
-	Ranges = (RANGE_STRUCT*)GameMalloc(sizeof(RANGE_STRUCT) * numRanges);
+	Ranges = (RANGE_STRUCT*)game_malloc(sizeof(RANGE_STRUCT) * numRanges);
 	ReadBytes(Ranges, sizeof(RANGE_STRUCT) * numRanges);
 
 	int numCommands = ReadInt32();
-	Commands = (short*)GameMalloc(2 * numCommands);
+	Commands = (short*)game_malloc(2 * numCommands);
 	ReadBytes(Commands, 2 * numCommands);
 
 	int numBones = ReadInt32();
-	Bones = (int*)GameMalloc(4 * numBones);
+	Bones = (int*)game_malloc(4 * numBones);
 	ReadBytes(Bones, 4 * numBones);
 
 	int* bone = Bones;
@@ -250,12 +252,12 @@ void LoadObjects()
 		int linkZ = *(bone++);
 	}
 	
-	MeshTrees = (int*)GameMalloc(4 * numBones);
+	MeshTrees = (int*)game_malloc(4 * numBones);
 
 	memcpy(MeshTrees, Bones, 4 * numBones);
 
 	int numFrames = ReadInt32();
-	Frames = (short*)GameMalloc(2 * numFrames);
+	Frames = (short*)game_malloc(2 * numFrames);
 	ReadBytes(Frames, 2 * numFrames);
 
 	AnimationsCount = numAnimations;
@@ -323,7 +325,7 @@ void LoadCameras()
 	NumberCameras = ReadInt32();
 	if (NumberCameras != 0)
 	{
-		Camera.fixed = (OBJECT_VECTOR*)GameMalloc(NumberCameras * sizeof(OBJECT_VECTOR));
+		Camera.fixed = (OBJECT_VECTOR*)game_malloc(NumberCameras * sizeof(OBJECT_VECTOR));
 		ReadBytes(Camera.fixed, NumberCameras * sizeof(OBJECT_VECTOR));
 	}
 
@@ -466,7 +468,7 @@ void ReadRooms()
 
 	int numRooms = ReadInt32();
 	NumberRooms = numRooms;
-	Rooms = (ROOM_INFO*)GameMalloc(NumberRooms * sizeof(ROOM_INFO));
+	Rooms = (ROOM_INFO*)game_malloc(NumberRooms * sizeof(ROOM_INFO));
 
 	printf("NumRooms: %d\n", numRooms);
 	
@@ -477,7 +479,7 @@ void ReadRooms()
 
 		// Read room data
 		int roomDataSize = ReadInt32();
-		byte* roomData = (byte*)GameMalloc(roomDataSize);
+		byte* roomData = (byte*)game_malloc(roomDataSize);
 		ReadBytes(roomData, roomDataSize);
 
 		// Put the room data in the struct
@@ -627,20 +629,20 @@ void LoadRooms()
 	
 	Wibble = 0;
 	//RoomLightsCount = 0;
-	Unk_007E7FE8 = 0;
+	//Unk_007E7FE8 = 0;
 
 	ReadRooms();
 	BuildOutsideRoomsTable();
 
 	int numFloorData = ReadInt32(); 
-	FloorData = (short*)GameMalloc(numFloorData * 2);
+	FloorData = (short*)game_malloc(numFloorData * 2);
 	ReadBytes(FloorData, numFloorData * 2);
 }
 
 void FreeLevel()
 {
-	MallocPtr = MallocBuffer;
-	MallocFree = MallocSize;
+	malloc_ptr = malloc_buffer;
+	malloc_free = malloc_size;
 	g_Renderer->FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
@@ -658,7 +660,7 @@ void LoadSoundEffects()
 	NumberSoundSources = ReadInt32();
 	if (NumberSoundSources)
 	{
-		SoundSources = (OBJECT_VECTOR*)GameMalloc(NumberSoundSources * sizeof(OBJECT_VECTOR));
+		SoundSources = (OBJECT_VECTOR*)game_malloc(NumberSoundSources * sizeof(OBJECT_VECTOR));
 		ReadBytes(SoundSources, NumberSoundSources * sizeof(OBJECT_VECTOR));
 	}
 }
@@ -667,7 +669,7 @@ void LoadAnimatedTextures()
 {
 	NumAnimatedTextures = ReadInt32();
 	
-	AnimTextureRanges = (short*)GameMalloc(NumAnimatedTextures * sizeof(short));
+	AnimTextureRanges = (short*)game_malloc(NumAnimatedTextures * sizeof(short));
 	ReadBytes(AnimTextureRanges, NumAnimatedTextures * sizeof(short));
 	
 	nAnimUVRanges = ReadInt8();
@@ -678,7 +680,7 @@ void LoadTextureInfos()
 	ReadInt32(); // TEX/0
 	
 	NumObjectTextures = ReadInt32();
-	ObjectTextures = (OBJECT_TEXTURE*)GameMalloc(NumObjectTextures * sizeof(OBJECT_TEXTURE));
+	ObjectTextures = (OBJECT_TEXTURE*)game_malloc(NumObjectTextures * sizeof(OBJECT_TEXTURE));
 
 	if (NumObjectTextures > 0)
 	{
@@ -818,7 +820,7 @@ void LoadAIObjects()
 	
 	if (nAIObjects != 0)
 	{
-		AIObjects = (AIOBJECT*)GameMalloc(nAIObjects * sizeof(AIOBJECT));
+		AIObjects = (AIOBJECT*)game_malloc(nAIObjects * sizeof(AIOBJECT));
 		ReadBytes(&AIObjects, nAIObjects * sizeof(AIOBJECT));
 	}
 }
@@ -997,7 +999,7 @@ void LoadSamples()
 	NumSamplesInfos = ReadInt32();
 	if (NumSamplesInfos)
 	{
-		SampleInfo = (SAMPLE_INFO*)GameMalloc(NumSamplesInfos * sizeof(SAMPLE_INFO));
+		SampleInfo = (SAMPLE_INFO*)game_malloc(NumSamplesInfos * sizeof(SAMPLE_INFO));
 		ReadBytes(SampleInfo, NumSamplesInfos * sizeof(SAMPLE_INFO));
 
 		int numSampleIndices = ReadInt32();
@@ -1036,12 +1038,12 @@ void LoadBoxes()
 {
 	// Read boxes
 	NumberBoxes = ReadInt32();
-	Boxes = (BOX_INFO*)GameMalloc(NumberBoxes * sizeof(BOX_INFO));
+	Boxes = (BOX_INFO*)game_malloc(NumberBoxes * sizeof(BOX_INFO));
 	ReadBytes(Boxes, NumberBoxes * sizeof(BOX_INFO));
 
 	// Read overlaps
 	NumberOverlaps = ReadInt32();
-	Overlaps = (short*)GameMalloc(NumberOverlaps * sizeof(short));
+	Overlaps = (short*)game_malloc(NumberOverlaps * sizeof(short));
 	ReadBytes(Overlaps, NumberOverlaps * sizeof(short));
 
 	// Read zones
@@ -1050,13 +1052,13 @@ void LoadBoxes()
 		// Ground zones
 		for (int j = 0; j < 4; j++)
 		{
-			short* zone = (short*)GameMalloc(NumberBoxes * sizeof(short));
+			short* zone = (short*)game_malloc(NumberBoxes * sizeof(short));
 			ReadBytes(zone, NumberBoxes * sizeof(short));
 			Zones[j][i] = zone;
 		}
 
 		// Fly zone
-		short* zone = (short*)GameMalloc(NumberBoxes * sizeof(short));
+		short* zone = (short*)game_malloc(NumberBoxes * sizeof(short));
 		ReadBytes(zone, NumberBoxes * sizeof(short));
 		Zones[4][i] = zone;
 	}
@@ -1081,7 +1083,6 @@ int S_LoadLevelFile(int levelIndex)
 	if (!g_FirstLevel)
 		FreeLevel();
 	g_FirstLevel = false;
-	RenderLoadBar = false;
 	
 	char filename[80];
 	GameScriptLevel* level = g_GameFlow->Levels[levelIndex];
@@ -1177,7 +1178,7 @@ void LoadSprites()
 
 	g_NumSprites = ReadInt32();
 
-	Sprites = (SPRITE*)GameMalloc(g_NumSprites * sizeof(SPRITE));
+	Sprites = (SPRITE*)game_malloc(g_NumSprites * sizeof(SPRITE));
 
 	for (int i = 0; i < g_NumSprites; i++)
 	{
@@ -1272,15 +1273,4 @@ void GetAIPickups()
 			item->TOSSPAD |= item->aiBits << 8 | (char) item->itemFlags[3];
 		}
 	}
-}
-
-void Inject_level()
-{
-	INJECT(0x004A6380, LoadItems);
-	INJECT(0x004A4E60, LoadObjects);
-	INJECT(0x004A3FC0, LoadTextures);
-	INJECT(0x0040130C, S_LoadLevelFile);
-	INJECT(0x004A7130, FreeLevel);
-	INJECT(0x004A5430, AdjustUV);
-	INJECT(0x004A5CA0, LoadCameras);
 }

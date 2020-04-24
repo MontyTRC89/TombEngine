@@ -14,6 +14,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 using namespace std;
 
@@ -1130,7 +1131,7 @@ void InitialiseQuadBike(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	
-	item->data = (QUAD_INFO *)GameMalloc(sizeof(QUAD_INFO));
+	item->data = (QUAD_INFO *)game_malloc(sizeof(QUAD_INFO));
 	QUAD_INFO* quad = (QUAD_INFO *)item->data;
 
 	quad->velocity = 0;

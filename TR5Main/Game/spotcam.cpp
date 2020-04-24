@@ -46,6 +46,9 @@ SPOTCAM SpotCam[64];
 int NumberSpotcams;
 int CheckTrigger = 0;
 int UseSpotCam = 0;
+int SlowMotion;
+int SpotcamDontDrawLara;
+int SpotcamOverlay;
 
 extern Renderer11* g_Renderer;
 
@@ -931,11 +934,4 @@ int Spline(int x, int* knots, int nk)
 				- nka)
 				* (int64_t)((int32_t)v3 - (v4 << 16)) >> 16))
 			* (int64_t)((int32_t)v3 - (v4 << 16)) >> 16));
-}
-
-void Inject_Spotcam()
-{
-	INJECT(0x0047A800, InitSpotCamSequences);
-	INJECT(0x0047A9D0, InitialiseSpotCam);
-	INJECT(0x0047B280, CalculateSpotCameras);
 }

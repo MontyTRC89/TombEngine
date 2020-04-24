@@ -29,6 +29,7 @@ short InterpolatedBounds[6];
 LARGE_INTEGER PerformanceCount;
 double LdFreq;
 double LdSync;
+int GnFrameCounter;
 
 int DrawPhaseGame()
 {
@@ -175,17 +176,6 @@ void DrawAnimatingItem(ITEM_INFO* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
 }
 
-void _phd_ClipBoundingBox(short* frames)
-{
-
-}
-
-void phd_PopMatrix()
-{
-	MatrixPtr -= 12;
-	DxMatrixPtr -= 12;
-}
-
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds)
 {
 	Matrix world = Matrix::CreateFromYawPitchRoll(
@@ -219,32 +209,4 @@ void GetLaraJointPosition(PHD_VECTOR* pos, int joint)
 	pos->x = p.x;
 	pos->y = p.y;
 	pos->z = p.z;
-}
-
-void Inject_Draw()
-{
-	//INJECT(0x0048F9C0, phd_PushMatrix);
-	INJECT(0x0042CF80, GetBoundsAccurate);
-	INJECT(0x0042D020, GetBestFrame);
-	INJECT(0x004D1A40, Sync);
-	//INJECT(0x0042BE90, InitInterpolate);
-	/*INJECT(0x0042BF00, phd_PopMatrix_I);
-	INJECT(0x00490150, phd_RotYXZ);
-	INJECT(0x0048FBE0, phd_RotX);
-	INJECT(0x0048FCD0, phd_RotY);
-	INJECT(0x0048FDC0, phd_RotZ); 
-	INJECT(0x0042C030, phd_RotX_I);
-	INJECT(0x0042BFC0, phd_RotY_I);
-	INJECT(0x0042C0A0, phd_RotZ_I);
-	INJECT(0x0048FB20, phd_TranslateRel);
-	INJECT(0x0042C110, phd_TranslateRel_I);
-	INJECT(0x0042C190, phd_TranslateRel_ID);
-	INJECT(0x004903F0, phd_TranslateAbs);
-	INJECT(0x0048FA40, phd_SetTrans);
-	INJECT(0x0042BF50, phd_PushMatrix_I);
-	INJECT(0x0048FA90, phd_PushUnitMatrix);
-	INJECT(0x004904B0, phd_GetVectorAngles);
-	INJECT(0x0048FEB0, phd_RotYXZpack);
-	/*INJECT(0x0042C310, gar_RotYXZsuperpack);
-	INJECT(0x0042C290, gar_RotYXZsuperpack_I);*/
 }

@@ -9,6 +9,7 @@
 #include "../../Game/draw.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO SwatGun = { 80, 200, 13, 0 };
 BITE_INFO SniperGun = { 0, 480, 110, 13 };

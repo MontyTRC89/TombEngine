@@ -2043,8 +2043,6 @@ extern SAMPLE_INFO* SampleInfo;
 extern int GlobalMusicVolume;
 extern int GlobalFXVolume;
 
-#define SayNo ((void (__cdecl*)()) 0x004790E0)
-
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags);
 void StopSoundEffect(short effectID);
 bool Sound_LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
@@ -2053,6 +2051,7 @@ void SOUND_Stop();
 void S_CDPlay(short index, unsigned int mode);
 void S_CDPlayEx(short index, DWORD mask, DWORD unknown);
 void S_CDStop();
+void SayNo();
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
 
@@ -2068,5 +2067,3 @@ float Sound_DistanceToListener(PHD_3DPOS *position);
 float Sound_DistanceToListener(Vector3 position);
 float Sound_Attenuate(float gain, float distance, float radius);
 bool  Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force = false);
-
-void Inject_Sound();

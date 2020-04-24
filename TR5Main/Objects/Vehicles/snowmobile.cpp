@@ -13,6 +13,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
 
@@ -63,7 +64,7 @@ void InitialiseSkidoo(short itemNum)
 	SKIDOO_INFO* skinfo;
 
 	skidoo = &Items[itemNum];
-	skinfo = (SKIDOO_INFO*)GameMalloc(sizeof(SKIDOO_INFO));
+	skinfo = (SKIDOO_INFO*)game_malloc(sizeof(SKIDOO_INFO));
 	skidoo->data = (void*)skinfo;
 	skinfo->already_cd_played = false;
 

@@ -10,6 +10,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/effects.h"
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
@@ -570,8 +571,9 @@ void DemigodEnergyAttack(short itemNum)
 
 			GetJointAbsPosition(item, &pos2, 16);
 
+			//FIXME:
 			short angles[2];
-			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+			//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 			PHD_3DPOS pos;
 			pos.xPos = pos1.x;
@@ -617,7 +619,7 @@ void DemigodEnergyAttack(short itemNum)
 			GetJointAbsPosition(item, &pos2, 16);
 
 			short angles[2];
-			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+			//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 			PHD_3DPOS pos;
 			pos.xPos = pos1.x;
@@ -668,7 +670,7 @@ void DemigodEnergyAttack(short itemNum)
 		}
 
 		short angles[2];
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+		//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 		PHD_3DPOS pos;
 		pos.xPos = pos1.x;

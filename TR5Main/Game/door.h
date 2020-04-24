@@ -19,5 +19,3 @@ void InitialiseClosedDoors();
 void ProcessClosedDoors();
 void GetClosedDoorNormal(ROOM_INFO* room, short** dptr, byte* n, int z, int x, int absX, int absZ);
 void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, int dz, int dx);
-
-void Inject_Door();

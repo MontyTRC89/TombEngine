@@ -4,13 +4,13 @@
 #include <vector>
 #include "../Global/types.h"
 #include "../Global/constants.h"
-#include "../Global/vars.h"
 #include "effect2.h"
-constexpr float MAX_BUBBLES = 256;
 
+constexpr float MAX_BUBBLES = 256;
 constexpr int BUBBLE_FLAG_BIG_SIZE = 0x1;
 constexpr int BUBBLE_FLAG_CLUMP = 0x2;
 constexpr int BUBBLE_FLAG_HIGH_AMPLITUDE = 0x4;
+
 struct BUBBLE_STRUCT
 {
 	DirectX::SimpleMath::Vector4 color;
@@ -30,11 +30,9 @@ struct BUBBLE_STRUCT
 	int age;
 	bool active;
 };
+
 extern std::vector<BUBBLE_STRUCT> Bubbles;
+
 void UpdateBubbles();
-
 int GetFreeBubble();//8BEAC(<), 8DEF0(<) (F)
-
 void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv);//8BF14(<), 8DF58(<) (F)
-
-void Inject_Bubble();

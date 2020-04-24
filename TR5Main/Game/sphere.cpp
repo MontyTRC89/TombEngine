@@ -9,6 +9,7 @@ bool GotLaraSpheres;
 SPHERE LaraSpheres[34];
 SPHERE BaddieSpheres[34];
 Matrix SphereMatrix[64];
+SPHERE SphereList[34];
 
 int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 {
@@ -159,9 +160,3 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 	vec->z = p.z;
 }
 
-
-void Inject_Sphere()
-{
-	INJECT(0x00479380, GetSpheres);
-	INJECT(0x00479170, TestCollision);
-}

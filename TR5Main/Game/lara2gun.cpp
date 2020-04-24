@@ -9,6 +9,8 @@
 #include "..\Specific\setup.h"
 #include "camera.h"
 #include "../Specific/input.h"
+#include "sound.h"
+#include "savegame.h"
 
 PISTOL_DEF PistolsTable[4] =
 {

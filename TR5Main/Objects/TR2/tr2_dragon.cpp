@@ -10,6 +10,7 @@
 #include "../../Specific/level.h"
 #include "../../specific/setup.h"
 #include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

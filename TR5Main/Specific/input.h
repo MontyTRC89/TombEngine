@@ -183,5 +183,3 @@ int DD_SpinMessageLoopMaybe();
 int S_UpdateInput();
 int Key(int number);
 void DefaultConflict();
-
-void Inject_Input();

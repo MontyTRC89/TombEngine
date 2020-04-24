@@ -4,6 +4,8 @@
 #include "traps.h"
 #include "math.h"
 #include "lara.h"
+#include "effects.h"
+#include "sound.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
 #include "../Specific/level.h"
@@ -1951,31 +1953,4 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 void KillEverything()//338AC(<), 33DAC(<) (F)
 {
 	KillEverythingFlag = 0;
-}
-
-void Inject_Effect2()
-{
-	INJECT(0x00431240, TriggerDynamicLight);
-	INJECT(0x004820A0, TriggerGunSmoke);
-	INJECT(0x0042E6A0, DetatchSpark);
-	INJECT(0x0042E790, GetFreeSpark);
-	INJECT(0x0042E8B0, UpdateSparks);
-	INJECT(0x0042F060, TriggerRicochetSpark);
-	INJECT(0x0042F460, TriggerCyborgSpark);
-	INJECT(0x0042F610, TriggerExplosionSparks);
-	INJECT(0x0042FA10, TriggerExplosionSmokeEnd);
-	INJECT(0x0042FC20, TriggerExplosionSmoke);
-	INJECT(0x0042FE20, TriggerFireFlame);
-	INJECT(0x00430350, TriggerSuperJetFlame);
-	INJECT(0x00430620, SetupSplash);
-	INJECT(0x00430710, UpdateSplashes);
-	INJECT(0x00430910, SetupRipple);
-	INJECT(0x004309B0, TriggerUnderwaterBlood);
-	INJECT(0x00430A40, TriggerWaterfallMist);
-	INJECT(0x00430D90, TriggerDartSmoke);
-	INJECT(0x00431030, KillAllCurrentItems);
-	INJECT(0x00431240, TriggerDynamicLight);
-	INJECT(0x00431530, ClearDynamicLights);
-	INJECT(0x00432A30, WadeSplash);
-	INJECT(0x00432900, Splash);
 }

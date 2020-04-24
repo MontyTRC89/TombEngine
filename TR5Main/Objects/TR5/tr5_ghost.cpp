@@ -6,6 +6,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 

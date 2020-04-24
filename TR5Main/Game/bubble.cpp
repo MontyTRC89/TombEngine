@@ -1,5 +1,6 @@
 #include "bubble.h"
 #include "../Specific/level.h"
+#include "control.h"
 
 using namespace std;
 
@@ -94,10 +95,4 @@ void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags,
 		bubble->waveSpeed = Vector3(1 / frandMinMax(8, 16), 1 / frandMinMax(8, 16), 1 / frandMinMax(8, 16));
 		bubble->roomNumber = roomNum;
 	}
-}
-
-void Inject_Bubble() {
-	INJECT(0x00483540, UpdateBubbles);
-	INJECT(0x004832C0, GetFreeBubble);
-	INJECT(0x00483350, CreateBubble);
 }
