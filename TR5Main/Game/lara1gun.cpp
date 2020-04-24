@@ -23,6 +23,8 @@
 #include "..\Specific\level.h"
 #include "../Specific/setup.h"
 #include "../Specific/input.h"
+#include "savegame.h"
+#include "sound.h"
 
 #include "bubble.h"
 
@@ -30,6 +32,9 @@ extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
 
 int HKCounter = 0;
+int HKTimer = 0;
+int HKFlag = 0;
+byte HKFlag2 = 0;
 
 void FireHarpoon()
 {
@@ -536,7 +541,8 @@ void ControlGrenade(short itemNumber)
 		short sYrot = item->pos.yRot;
 		item->pos.yRot = item->goalAnimState;
 
-		DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
+		// FIXME
+		//DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
 
 		item->goalAnimState = item->pos.yRot;
 		item->pos.yRot = sYrot;
@@ -1736,9 +1742,4 @@ void ready_shotgun(int weaponType)
 	Lara.target = NULL;
 	Lara.rightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
-}
-
-void Inject_Lara1Gun()
-{
-	
 }

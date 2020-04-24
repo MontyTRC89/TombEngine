@@ -15,6 +15,8 @@
 #include "../../Game/bubble.h"
 #include "..\..\Specific\level.h"
 #include "../../Specific/input.h"
+#include "../../Game/savegame.h"
+#include "../../Game/sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -768,7 +770,7 @@ void SubInitialise(short itemNum)
 	SUB_INFO* sub;
 
 	v = &Items[itemNum];
-	sub = (SUB_INFO*)GameMalloc(sizeof(SUB_INFO));
+	sub = (SUB_INFO*)game_malloc(sizeof(SUB_INFO));
 	v->data = (void*)sub;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 

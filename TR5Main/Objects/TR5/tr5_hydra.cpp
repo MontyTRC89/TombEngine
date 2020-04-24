@@ -9,6 +9,7 @@
 #include "../../Game/draw.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1
@@ -295,7 +296,8 @@ void ControlHydra(short itemNumber)
 				pos2.z = 40;
 				GetJointAbsPosition(item, &pos2, 10);
 
-				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
+				// FIXME:
+				//phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
 				pos.xPos = pos1.x;
 				pos.yPos = pos1.y;

@@ -8,6 +8,7 @@
 #include "../../Game/lot.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 enum MPGUN_STATES {
 	MPGUN_EMPTY, 

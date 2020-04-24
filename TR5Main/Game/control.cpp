@@ -43,6 +43,28 @@
 #include "..\Renderer\Renderer11.h"
 #include "../Specific/setup.h"
 
+short ShatterSounds[18][10] =
+{
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_WOOD,  SFX_SMASH_WOOD,  SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_METAL, SFX_SMASH_METAL, SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_METAL, SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS }
+};
+
 int KeyTriggerActive;
 int number_los_rooms;
 short los_rooms[20];
@@ -75,7 +97,56 @@ short* AnimTextureRanges;
 int nAnimUVRanges;
 int Wibble = 0;
 int SetDebounce = 0;
+
 int CurrentAtmosphere;
+short CurrentRoom;
+int GameTimer;
+short GlobalCounter;
+byte LevelComplete;
+short DelCutSeqPlayer;
+int LastInventoryItem;
+int TrackCameraInit;
+short TorchRoom;
+int InitialiseGame;
+int RequiredStartPos;
+int WeaponDelay;
+int WeaponEnemyTimer;
+int HeightType;
+int HeavyTriggered;
+short SkyPos1;
+short SkyPos2;
+signed char SkyVelocity1;
+signed char SkyVelocity2;
+CVECTOR SkyColor1;
+CVECTOR SkyColor2;
+int CutSeqNum;
+int CutSeqTriggered;
+int GlobalPlayingCutscene;
+int CurrentLevel;
+int SoundActive;
+int DoTheGame;
+int Unk_876C48;
+int OnFloor;
+int SmokeWindX;
+int SmokeWindZ;
+int OnObject;
+int KillEverythingFlag;
+int FlipTimer;
+int FlipEffect;
+int TriggerTimer;
+int JustLoaded;
+int PoisonFlags;
+int OldLaraBusy;
+int Infrared;
+short FlashFadeR;
+short FlashFadeG;
+short FlashFadeB;
+short FlashFader;
+short IsRoomOutsideNo;
+
+int TiltXOffset;
+int TiltYOffset;
+int FramesCount;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -437,13 +508,13 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBats();
 		UpdateSpiders();
 		UpdateShockwaves();
-		Legacy_UpdateLightning();
+		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
 		if (level->Rumble)
 			RumbleScreen();
 
-		SoundEffects();
+		//SoundEffects();
 
 		HealtBarTimer--;
 
@@ -458,12 +529,8 @@ unsigned __stdcall GameMain(void*)
 	//DB_Log(2, "GameMain - DLL");
 	printf("GameMain\n");
 
-	// We still need legacy matrices because control routines use them
-	MatrixPtr = MatrixStack;
-	DxMatrixPtr = (int*)malloc(4 * 12 * 40);
-
 	// Initialise legacy memory buffer and game timer
-	InitGameMalloc();
+	init_game_malloc();
 	TIME_Init();
 
 	// Do a fixed time title image
@@ -485,9 +552,6 @@ GAME_STATUS DoTitle(int index)
 {
 	//DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
-
-	CreditsDone = false;
-	CanLoad = false;
 
 	// Load the level
 	S_LoadLevelFile(index);
@@ -516,7 +580,6 @@ GAME_STATUS DoTitle(int index)
 
 		LastInventoryItem = -1;
 		DelCutSeqPlayer = 0;
-		TitleControlsLockedOut = false;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -559,9 +622,6 @@ GAME_STATUS DoTitle(int index)
 
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 {
-	CreditsDone = false;
-	CanLoad = false;
-
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
 	{
@@ -620,7 +680,6 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 
 	LastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
-	TitleControlsLockedOut = false;
 	g_Inventory->SetEnterObject(NO_ITEM);
 	g_Inventory->SetSelectedObject(NO_ITEM);
 
@@ -2124,7 +2183,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									item->hitPoints -= 30;
 									if (item->hitPoints < 0)
 										item->hitPoints = 0;
-									HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
 								{
@@ -2132,7 +2191,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									if (angle > -ANGLE(90) && angle < ANGLE(90))
 									{
 										item->hitPoints = 0;
-										HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 									}
 								}
 							}
@@ -2143,7 +2202,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							{
 								if (Objects[item->objectNumber].intelligent)
 								{
-									HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
 								{
@@ -2174,7 +2233,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									item->hitStatus = true;
 									if (!Objects[item->objectNumber].undead)
 									{
-										item->hitPoints -= WeaponsArray[Lara.gunType].damage;
+										item->hitPoints -= Weapons[Lara.gunType].damage;
 									}
 								}
 							}
@@ -3257,20 +3316,4 @@ int IsRoomOutside(int x, int y, int z)
 		}
 		return -2;
 	}
-}
-
-void Inject_Control()
-{
-	INJECT(0x00416760, TestTriggers);
-	INJECT(0x004167B0, TestTriggers);
-	INJECT(0x00415960, TranslateItem);
-	INJECT(0x00415B20, GetFloor);
-	INJECT(0x00417640, GetCeiling);
-	INJECT(0x004A7C10, GetRandomControl);
-	INJECT(0x004A7C40, GetRandomDraw);
-	INJECT(0x004A7C70, SeedRandomControl);
-	INJECT(0x004A7C90, SeedRandomDraw);
-	INJECT(0x00415300, AnimateItem);
-	INJECT(0x0041A170, GetTargetOnLOS);
-	INJECT(0x00415DA0, GetWaterHeight);
 }

@@ -11,6 +11,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 #define MAX_TRIGGER_RANGE 0x4000
 #define SMALL_FLASH 10
@@ -158,7 +159,8 @@ static void TriggerLaserBolt(PHD_VECTOR* pos, ITEM_INFO* item, long type, short 
 		}
 		else
 		{
-			phd_GetVectorAngles(LaraItem->pos.xPos - pos->x, LaraItem->pos.yPos - STEP_SIZE - pos->y, LaraItem->pos.zPos - pos->z, angles);
+			//FIXME:
+			//phd_GetVectorAngles(LaraItem->pos.xPos - pos->x, LaraItem->pos.yPos - STEP_SIZE - pos->y, LaraItem->pos.zPos - pos->z, angles);
 			bolt_item->pos.xRot = angles[1];
 			bolt_item->pos.yRot = yang;
 			bolt_item->pos.zRot = 0;

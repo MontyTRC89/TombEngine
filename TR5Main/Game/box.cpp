@@ -1662,7 +1662,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 		}
 	}
 
-	Unk_00EEFB6C = CalculateTarget(&creature->target, item, &creature->LOT);
+	/*Unk_00EEFB6C =*/ CalculateTarget(&creature->target, item, &creature->LOT);
 }
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
@@ -2015,43 +2015,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	short roomNumber = item->roomNumber;
 	GetFloor(x, item->pos.yPos, z, &roomNumber);
 	r = &Rooms[roomNumber];
-	
+
 	floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	floor->stopper = set;
-}
-
-void Inject_Box()
-{
-	INJECT(0x0040B5D0, CreatureVault);
-	INJECT(0x00408FD0, ValidBox);
-	INJECT(0x00408E20, TargetBox);
-	INJECT(0x00409770, StalkBox);
-	INJECT(0x00408EF0, EscapeBox);
-	INJECT(0x0040C2D0, SameZone);
-	INJECT(0x0040B820, CreatureKill);
-	INJECT(0x00409FB0, BadFloor);
-	INJECT(0x0040B550, CreatureEffect2);
-	INJECT(0x0040B4D0, CreatureEffect);
-	INJECT(0x0040C5A0, DropBaddyPickups);
-	INJECT(0x0040A090, CreatureDie);
-	INJECT(0x0040B240, CreatureJoint);
-	INJECT(0x0040B1B0, CreatureTilt);
-	INJECT(0x00409E20, CreatureCreature);
-	INJECT(0x00408630, CreatureActive);
-	//INJECT(0x0040AE90, CreatureTurn);
-	INJECT(0x0040C460, MoveCreature3DPos);
-	INJECT(0x004086C0, CreatureAIInfo);
-	INJECT(0x00409370, CreatureMood);
-	INJECT(0x004090A0, GetCreatureMood);
-	INJECT(0x0040BB10, AlertNearbyGuards);
-	INJECT(0x0040BA70, AlertAllGuards);
-	INJECT(0x00408B00, UpdateLOT);
-	INJECT(0x0040B400, CreatureUnderwater);
-	INJECT(0x0040B2C0, CreatureFloat);
-	INJECT(0x004098B0, CalculateTarget);
-	INJECT(0x0040A1D0, CreatureAnimation);
-	INJECT(0x00408550, InitialiseCreature);
-	INJECT(0x0040C070, FindAITargetObject);
-	INJECT(0x0040BBE0, AIGuard);
-	INJECT(0x0040BCC0, GetAITarget);
 }

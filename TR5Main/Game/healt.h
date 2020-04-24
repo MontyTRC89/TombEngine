@@ -25,6 +25,3 @@ extern int HealtBarTimer;
 extern int FlashState;
 extern int PoisonFlag;
 extern int DashTimer;
-
-void Inject_Healt();
-

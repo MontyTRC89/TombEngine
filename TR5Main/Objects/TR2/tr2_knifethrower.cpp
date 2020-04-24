@@ -6,6 +6,7 @@
 #include "../../specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };

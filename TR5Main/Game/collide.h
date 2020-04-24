@@ -8,6 +8,8 @@
 #define NO_BAD_NEG NO_HEIGHT
 
 extern BOUNDING_BOX GlobalCollisionBounds;
+extern ITEM_INFO* CollidedItems[1024];
+extern MESH_INFO* CollidedMeshes[1024];
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);
@@ -33,5 +35,3 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
-
-void Inject_Collide();

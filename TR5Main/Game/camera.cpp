@@ -11,6 +11,10 @@
 #include "flmtorch.h"
 #include "sphere.h"
 #include "../Specific/level.h"
+#include "collide.h"
+#include "sound.h"
+#include "savegame.h"
+#include "../Specific/input.h"
 
 struct OLD_CAMERA
 {
@@ -25,10 +29,9 @@ struct OLD_CAMERA
 	PHD_VECTOR target;
 };
 
-#define LfAspectCorrection VAR_U_(0x0055DA30, float)
-#define LastTarget			VAR_U_(0x00EEFA30, GAME_VECTOR)
-#define InputBusy			VAR_U_(0x00878C94, int)
-#define SniperCamActive		VAR_U_(0x0051CA1D, byte)
+float LfAspectCorrection;
+GAME_VECTOR LastTarget;
+byte SniperCamActive;
 
 extern int KeyTriggerActive;
 extern LaraExtraInfo g_LaraExtra;
@@ -59,6 +62,9 @@ int LaserSight;
 int SniperCount;
 int ExitingBinocular;
 int PhdPerspective;
+short CurrentFOV;
+int GetLaraOnLOS;
+int SniperOverlay;
 
 void ActivateCamera()
 {
@@ -77,8 +83,9 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	if (posX == targetX && posY == targetY && posZ == targetZ)
 		return;
 
+	//FIXME
 	short angles[2];
-	phd_GetVectorAngles(targetX - posX, targetY - posY, targetZ - posZ, angles);
+	//phd_GetVectorAngles(targetX - posX, targetY - posY, targetZ - posZ, angles);
 
 	PHD_3DPOS pos;
 
@@ -96,8 +103,6 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	/*CurrentCameraRotation.vx = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
 	CurrentCameraRotation.vy = mGetAngle(posZ, posX, targetZ, targetX) >> 4;
 	CurrentCameraRotation.vz = 0;*/
-
-	phd_GenerateW2V(&pos);
 
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }
@@ -1544,7 +1549,8 @@ void ConfirmCameraTargetPos()
 void CalculateCamera()
 {
 	SniperOverlay = 0;
-	SniperCamActive = 0;
+	// FIXME
+	//SniperCamActive = 0;
 
 	CamOldPos.x = Camera.pos.x;
 	CamOldPos.y = Camera.pos.y;
@@ -1613,7 +1619,7 @@ void CalculateCamera()
 
 	if (Camera.type == CINEMATIC_CAMERA)
 	{
-		Legacy_do_new_cutscene_camera();
+		//Legacy_do_new_cutscene_camera();
 		return;
 	}
 
@@ -1810,21 +1816,4 @@ void CalculateCamera()
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
-}
-
-void Inject_Camera()
-{
-	INJECT(0x0048EDC0, AlterFOV);
-	INJECT(0x0048F760, LookAt);
-	INJECT(0x0040FA70, mgLOS);
-	INJECT(0x0040C7A0, MoveCamera);
-	INJECT(0x0040C690, InitialiseCamera);
-	INJECT(0x004107C0, UpdateCameraElevation);
-	INJECT(0x0040D150, ChaseCamera);
-	INJECT(0x0040D640, CombatCamera);
-	INJECT(0x0040F5C0, CameraCollisionBounds);
-	INJECT(0x0040E890, FixedCamera);
-	INJECT(0x0040DC10, LookCamera);
-	INJECT(0x0040FC20, BinocularCamera);
-	INJECT(0x0040ED30, CalculateCamera);
 }

@@ -12,6 +12,7 @@
 #include "..\Specific\level.h"
 #include "../Specific/setup.h"
 #include "../Specific/input.h"
+#include "sound.h"
 
 short FireBounds[12] =
 {
@@ -225,7 +226,8 @@ void TorchControl(short itemNumber) // (F) (D)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	// FIXME
+	//DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
 		coll.enableBaddiePush = true;

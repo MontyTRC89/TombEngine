@@ -5,9 +5,12 @@
 #include "lara.h"
 #include "..\Specific\level.h"
 #include "../Specific/input.h"
+#include "control.h"
 
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;
+ROPE_STRUCT Ropes[12];
+int NumRopes;
 
 void InitialiseRope(short itemNumber) // (F) (D)
 {

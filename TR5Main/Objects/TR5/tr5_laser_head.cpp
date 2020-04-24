@@ -15,6 +15,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 struct LASER_HEAD_INFO
 {
@@ -45,7 +46,7 @@ void InitialiseGuardian(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	item->data = (LASER_HEAD_INFO*)GameMalloc(sizeof(LASER_HEAD_INFO));
+	item->data = (LASER_HEAD_INFO*)game_malloc(sizeof(LASER_HEAD_INFO));
 	LASER_HEAD_INFO* info = (LASER_HEAD_INFO*)item->data;
 
 	for (int i = 0; i < LevelItems; i++)
@@ -280,9 +281,10 @@ void GuardianControl(short itemNumber)
 				}
 			}
 
+			// FIXME_
 			short angles[2];
 			short outAngle;
-			phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
+			//phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
 			InterpolateAngle(angles[0], &item->pos.yRot, &LaserHeadData.yRot, LaserHeadData.byte1);
 			InterpolateAngle(angles[1] + 3328, &item->pos.xRot, &LaserHeadData.xRot, LaserHeadData.byte1);
 

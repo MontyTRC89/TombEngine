@@ -2,6 +2,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/control.h"
 
 void InitialiseJeanYves(short itemNum)
 {

@@ -15,7 +15,10 @@
 #include "tomb4fx.h"
 #include "..\Specific\level.h"
 #include "../Specific/input.h"
+#include "sound.h"
 
+OBJECT_TEXTURE* WaterfallTextures[6];
+float WaterfallY[6];
 int lastWaterfallY = 0;
 short TightRopeBounds[12] = 
 {
@@ -734,28 +737,4 @@ void HighObject2Control(short itemNumber)
 			spark->gravity = (GetRandomControl() & 0xF) + 64;
 		}
 	}
-}
-
-void Inject_Objects()
-{
-	INJECT(0x00465FE0, TightRopeCollision);
-	INJECT(0x00465200, SmashObject);
-
-	/*INJECT(0x00465200, SmashObject);
-	INJECT(0x00465330, SmashObjectControl);
-	INJECT(0x00465350, BridgeFlatFloor);
-	INJECT(0x00465390, BridgeFlatCeiling);
-	INJECT(0x00465410, BridgeTilt1Floor);
-	INJECT(0x00465480, BridgeTilt1Ceiling);
-	INJECT(0x004654D0, BridgeTilt2Floor);
-	INJECT(0x00465540, BridgeTilt2Ceiling);
-	//INJECT(0x00465590, AnimatingControl);
-	INJECT(0x00465A30, PoleCollision);
-	INJECT(0x00465D00, ControlTriggerTriggerer);
-	INJECT(0x00465DF0, AnimateWaterfalls);
-	INJECT(0x00465F10, ControlWaterfall);
-	INJECT(0x004661C0, ParallelBarsCollision);
-	INJECT(0x00466420, ControlXRayMachine);
-	INJECT(0x00466720, CutsceneRopeControl);
-	INJECT(0x00466AA0, HybridCollision);*/
 }

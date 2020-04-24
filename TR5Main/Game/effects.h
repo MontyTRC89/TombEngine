@@ -3,8 +3,7 @@
 #include "..\Global\global.h"
 #include "control.h"
 
-//#define DoLotsOfBlood ((void (__cdecl*)(int, int, int, short, short, short, int)) 0x00432800) 
-#define SoundEffects ((void (__cdecl*)()) 0x00432640)
+extern FX_INFO* Effects;
 
 int ItemNearLara(PHD_3DPOS* pos, int radius);
 void StopSoundEffect(short sampleIndex);
@@ -48,6 +47,3 @@ void TL_11(ITEM_INFO* item);
 void TL_12(ITEM_INFO* item);
 void Richochet(PHD_3DPOS* pos);
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
-
-void Inject_Effects();
-

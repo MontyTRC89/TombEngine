@@ -17,6 +17,7 @@
 #include "camera.h"
 #include "..\Specific\level.h"
 #include "../Specific/input.h"
+#include "sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

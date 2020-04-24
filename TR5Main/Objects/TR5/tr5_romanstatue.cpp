@@ -12,6 +12,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 #define STATE_ROMAN_STATUE_STOP					1
 #define STATE_ROMAN_STATUE_SCREAMING			2
@@ -547,7 +548,8 @@ void ControlRomanStatue(short itemNumber)
 				pos2.z = 450;
 				GetJointAbsPosition(item, &pos2, 14);
 
-				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
+				// FIXME
+				//phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
 				attackPos.xPos = pos2.x;
 				attackPos.yPos = pos2.y;

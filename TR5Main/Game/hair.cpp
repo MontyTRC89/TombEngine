@@ -3,6 +3,7 @@
 #include "draw.h"
 #include "laramisc.h"
 #include "lara.h"
+#include "control.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
 #include "sphere.h"
@@ -345,9 +346,4 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			//phd_PopMatrix();
 		}
 	}
-}
-
-void Inject_Hair()
-{
-	
 }

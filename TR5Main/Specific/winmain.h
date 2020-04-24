@@ -16,13 +16,11 @@ extern uintptr_t hThread;
 extern HACCEL hAccTable;
 extern HWND WindowsHandle;
 
-#define GameClose ((int (__cdecl*)(void)) 0x004A8575)
-#define WinAppProc2 ((int (__cdecl*)(HWND, UINT, WPARAM, LPARAM)) 0x004D2AB0)
+//#define GameClose ((int (__cdecl*)(void)) 0x004A8575)
+//#define WinAppProc2 ((int (__cdecl*)(HWND, UINT, WPARAM, LPARAM)) 0x004D2AB0)
 
 int WinProcMsg();
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 int WinClose();
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void __stdcall HandleWmCommand(unsigned short wParam);
-
-void Inject_WinMain();

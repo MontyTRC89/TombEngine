@@ -6,6 +6,7 @@
 #include "items.h"
 #include "../Specific/setup.h"
 #include "..\Specific\level.h"
+#include "sound.h"
 #include "bubble.h"
 
 char FlareTable[121] =
@@ -1214,7 +1215,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 	);
 
 	// PHD_MATH:
-	phd_PushUnitMatrix();
+	/*phd_PushUnitMatrix();
 	
 	MatrixPtr[M03] = 0;
 	MatrixPtr[M13] = 0;
@@ -1355,7 +1356,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 
 			item->meshBits -= bits;
 		}
-	}
+	}*/
 
 	return (item->meshBits == 0);
 }
@@ -1785,36 +1786,4 @@ ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g,
 	arc->rotation = GetRandomControl();
 
 	return arc;
-}
-
-void Inject_Tomb4FX()
-{
-	INJECT(0x004827E0, TriggerBlood);
-	INJECT(0x00431070, TriggerExplosionBubble);
-	INJECT(0x004812B0, GetFreeFireSpark);
-	INJECT(0x00481A00, TriggerGlobalStaticFlame);
-	INJECT(0x004816B0, TriggerGlobalFireSmoke);
-	INJECT(0x00481840, TriggerGlobalFireFlame);
-	INJECT(0x00481370, keep_those_fires_burning);
-	INJECT(0x00481B10, ClearFires);
-	INJECT(0x00481B10, AddFire);
-	INJECT(0x004813B0, UpdateFireSparks);
-	INJECT(0x00481D40, GetFreeSmokeSpark);
-	INJECT(0x00481DD0, UpdateSmoke);
-	INJECT(0x004820A0, TriggerGunSmoke);
-	INJECT(0x004823A0, TriggerShatterSmoke);
-	INJECT(0x00482580, GetFreeBlood);
-	INJECT(0x00482610, UpdateBlood);
-	INJECT(0x004829A0, GetFreeGunshell);
-	INJECT(0x00482A60, TriggerGunShell);
-	INJECT(0x00482D80, UpdateGunShells);
-	INJECT(0x00483180, AddWaterSparks);
-	INJECT(0x00483470, LaraBubbles);
-	INJECT(0x00483D00, GetFreeDrip);
-	INJECT(0x00483D90, UpdateDrips);
-	INJECT(0x00483F00, TriggerLaraDrips);
-	INJECT(0x00484080, ExplodingDeath);
-	INJECT(0x00484640, GetFreeShockwave);
-	INJECT(0x00484670, TriggerShockwave);
-	INJECT(0x004849A0, UpdateShockwaves);
 }

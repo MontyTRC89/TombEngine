@@ -9,6 +9,8 @@
 #include "../../Game/lot.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
+#include "../../Game/effects.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
@@ -347,7 +349,8 @@ short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		pos2.z = bite->z;
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+		// FIXME: 
+		//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 		fx->pos.xPos = pos1.x;
 		fx->pos.yPos = pos1.y;

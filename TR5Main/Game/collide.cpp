@@ -11,6 +11,7 @@
 #include "misc.h"
 #include "../Specific/setup.h"
 #include "../Specific/level.h"
+#include "sound.h"
 
 char LM[] = {
 	LJ_HIPS,
@@ -32,6 +33,8 @@ char LM[] = {
 
 int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
+ITEM_INFO* CollidedItems[1024];
+MESH_INFO* CollidedMeshes[1024];
 
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite)
 {
@@ -1515,12 +1518,4 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 	}
-}
-
-void Inject_Collide()
-{
-	INJECT(0x00411DB0, CollideStaticObjects);
-	INJECT(0x00413CF0, GetCollidedObjects);
-	INJECT(0x00410EF0, GetTiltType);
-	INJECT(0x00411100, GetCollisionInfo);
 }

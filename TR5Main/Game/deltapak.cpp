@@ -22,8 +22,3 @@ ITEM_INFO* FindItem(short objectNumber)
 
 	return NULL;
 }
-
-void Inject_DeltaPak()
-{
-	INJECT(0x00423470, FindItem);
-}

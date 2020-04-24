@@ -3,6 +3,8 @@
 #include <stack>
 #include "../Game/savegame.h"
 #include "../Specific/setup.h"
+#include "../Game/control.h"
+#include "../Game/objects.h"
 
 bool Renderer11::PrepareDataForTheRenderer()
 {

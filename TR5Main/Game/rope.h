@@ -24,6 +24,8 @@ struct PENDULUM
 };
 
 extern PENDULUM CurrentPendulum;
+extern ROPE_STRUCT Ropes[12];
+extern int NumRopes;
 
 void InitialiseRope(short itemNumber);
 void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int length, ITEM_INFO* item);

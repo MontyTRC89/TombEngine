@@ -7,6 +7,7 @@
 #include "../../Specific/setup.h"
 #include "../../Specific/level.h"
 #include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -796,7 +797,7 @@ void InitialiseBoat(short itemNum)
 	BOAT_INFO* binfo;
 
 	boat = &Items[itemNum];
-	binfo = (BOAT_INFO*)GameMalloc(sizeof(BOAT_INFO));
+	binfo = (BOAT_INFO*)game_malloc(sizeof(BOAT_INFO));
 	boat->data = (void*)binfo;
 	binfo->boat_turn = 0;
 	binfo->left_fallspeed = 0;

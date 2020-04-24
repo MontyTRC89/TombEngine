@@ -11,6 +11,9 @@
 #include "../../Specific/level.h"
 #include "../../Game/debris.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
+
+int DebrisFlags;
 
 void MissileControl(short itemNumber)
 {
@@ -31,12 +34,13 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
+		// FIXME:
 		short angles[2];
-		phd_GetVectorAngles(
+		/*phd_GetVectorAngles(
 			LaraItem->pos.xPos - fx->pos.xPos,
 			LaraItem->pos.yPos - fx->pos.yPos - 256,
 			LaraItem->pos.zPos - fx->pos.zPos,
-			angles);
+			angles);*/
 
 		int dh;
 		if (fx->flag1)

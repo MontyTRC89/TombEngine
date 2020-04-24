@@ -13,12 +13,16 @@
 #include "draw.h"
 #include "..\Specific\level.h"
 #include "../Specific/input.h"
+#include "sound.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
 static short FloorTrapDoorBounds[12] = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR FloorTrapDoorPos = {0, 0, -655};
 static short WreckingBallData[2] = {0, 0};
+ITEM_INFO* WBItem;
+short WBRoom;
+
 byte Flame3xzoffs[16][2] =
 {
 	{ 0x09, 0x09 },

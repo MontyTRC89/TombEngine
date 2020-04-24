@@ -15,6 +15,8 @@
 #include "../Objects/oldobjects.h"
 #include "..\Specific\level.h"
 #include "../Specific/setup.h"
+#include "../Game/control.h"
+#include "../Game/sound.h"
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;

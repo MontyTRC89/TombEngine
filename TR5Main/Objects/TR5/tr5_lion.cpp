@@ -163,9 +163,3 @@ void LionControl(short itemNum)
 	CreatureJoint(item, 1, joint1);
 	CreatureAnimation(itemNum, angle, 0);
 }
-
-void Inject_Lion()
-{
-	INJECT(0x0045AC80, InitialiseLion);
-	INJECT(0x0045AD00, LionControl);
-}

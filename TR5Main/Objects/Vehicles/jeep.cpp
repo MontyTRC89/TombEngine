@@ -11,6 +11,7 @@
 #include "../../Game/sphere.h"
 #include "../../Game/laraflar.h"
 #include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 #include <vector>
 #include "../../Specific/setup.h"
@@ -43,6 +44,10 @@ using namespace std;
 //bool QuadCanHandbrakeStart;
 char JeepSmokeStart;
 bool JeepNoGetOff;
+
+short Unk_0080DE1A;
+int Unk_0080DDE8;
+short Unk_0080DE24;
 
 extern LaraExtraInfo g_LaraExtra;
 extern Inventory* g_Inventory;
@@ -315,7 +320,7 @@ void InitialiseJeep(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
-	JEEP_INFO* jeep = (JEEP_INFO*)GameMalloc(sizeof(JEEP_INFO));
+	JEEP_INFO* jeep = (JEEP_INFO*)game_malloc(sizeof(JEEP_INFO));
 	item->data = jeep;
 
 	jeep->velocity = 0;

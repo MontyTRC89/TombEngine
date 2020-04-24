@@ -27,6 +27,7 @@ HACCEL hAccTable;
 byte receivedWmClose = false;
 bool Debug = false;
 HWND WindowsHandle;
+int App_Unk00D9ABFD;
 
 extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
@@ -124,8 +125,8 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
-	if (App_Unk00D9AC2B)
-		return 0;
+	//if (App_Unk00D9AC2B)
+	//	return 0;
 
 	if ((short)wParam)
 	{
@@ -329,12 +330,4 @@ int WinClose()
 	SaveGame::End();
 
 	return 0;
-}
-
-
-void Inject_WinMain()
-{
-	INJECT(0x004D23E0, WinClose);
-	INJECT(0x004D24C0, WinProcMsg);
-	INJECT(0x004D1C00, WinMain);
 }

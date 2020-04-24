@@ -1,6 +1,7 @@
 #include "debris.h"
 #include "../Specific/level.h"
 #include "../Specific/setup.h"
+#include "control.h"
 
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;
@@ -16,11 +17,6 @@ DebrisFragment* GetFreeDebrisFragment()
 		}
 	}
 	return nullptr;
-}
-
-void Inject_Debris()
-{
-	//INJECT(0x0041D6B0, ShatterObject);
 }
 
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)

@@ -12,6 +12,7 @@
 #include "../../Specific/setup.h"
 #include "..\..\Specific\level.h"
 #include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 void InitialiseSubmarine(short itemNum)
 {
@@ -419,7 +420,8 @@ void ChaffFlareControl(short itemNumber)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->fallspeed, dz);
+	// FIXME
+	//DoProperDetection(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->fallspeed, dz);
 
 	PHD_VECTOR pos1;
 	pos1.x = 0;
@@ -509,8 +511,9 @@ void TorpedoControl(short itemNumber)
 		}
 	}
 
+	// FIME
 	short angles[2];
-	phd_GetVectorAngles(pos.x - item->pos.xPos, pos.y - item->pos.yPos, pos.z - item->pos.zPos, angles);
+	//phd_GetVectorAngles(pos.x - item->pos.xPos, pos.y - item->pos.yPos, pos.z - item->pos.zPos, angles);
 
 	if (item->speed >= 48)
 	{
