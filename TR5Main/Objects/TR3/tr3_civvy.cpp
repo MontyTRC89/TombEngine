@@ -99,7 +99,7 @@ void CivvyControl(short item_number)
 		{
 			lara_dz = LaraItem->pos.zPos - item->pos.zPos;
 			lara_dx = LaraItem->pos.xPos - item->pos.xPos;
-			lara_info.angle = ATAN(lara_dz, lara_dx) - item->pos.yRot; //only need to fill out the bits of lara_info that will be needed by TargetVisible
+			lara_info.angle = phd_atan(lara_dz, lara_dx) - item->pos.yRot; //only need to fill out the bits of lara_info that will be needed by TargetVisible
 			lara_info.distance = lara_dz * lara_dz + lara_dx * lara_dx;
 		}
 

@@ -342,9 +342,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 		item->goalAnimState = 1;
 
 		UseForcedFixedCamera = 1;
-		ForcedFixedCamera.x = item->pos.xPos - SIN(item->pos.yRot) / 16;
+		ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 16;
 		ForcedFixedCamera.y = item->pos.yPos + 1024;
-		ForcedFixedCamera.z = item->pos.zPos - COS(item->pos.yRot) / 16;
+		ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 16;
 		ForcedFixedCamera.roomNumber = item->roomNumber;
 	}
 	else
@@ -383,11 +383,11 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 				item->goalAnimState = 1;
 
 				UseForcedFixedCamera = 1;
-				ForcedFixedCamera.x = item->pos.xPos - SIN(item->pos.yRot) / 8;
+				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 8;
 				ForcedFixedCamera.y = item->pos.yPos - 2048;
 				if (ForcedFixedCamera.y < Rooms[item->roomNumber].maxceiling)
 					ForcedFixedCamera.y = Rooms[item->roomNumber].maxceiling;
-				ForcedFixedCamera.z = item->pos.zPos - COS(item->pos.yRot) / 8;
+				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 8;
 				ForcedFixedCamera.roomNumber = item->roomNumber;
 			}
 			else
@@ -1117,9 +1117,9 @@ void FlameEmitter3Control(short itemNumber)
 			{
 				if (item->triggerFlags == 2 || item->triggerFlags == 4)
 				{
-					dest.x = item->pos.xPos + 2048 * SIN(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					dest.x = item->pos.xPos + 2048 * phd_sin(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
 					dest.y = item->pos.yPos;
-					dest.z = item->pos.zPos + 2048 * COS(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					dest.z = item->pos.zPos + 2048 * phd_cos(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
 					
 					if (GetRandomControl() & 3)
 					{

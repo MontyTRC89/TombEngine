@@ -131,7 +131,7 @@ void GuardianControl(short itemNumber)
 				}
 			}
 
-			item->pos.yPos = item->itemFlags[1] - ((192 - item->speed) * SIN(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - ((192 - item->speed) * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
 			item->itemFlags[2] += ONE_DEGREE * item->speed;
 
 			if (!(GlobalCounter & 7))
@@ -173,7 +173,7 @@ void GuardianControl(short itemNumber)
 		else
 		{
 			item->triggerFlags++;
-			item->pos.yPos = item->itemFlags[1] - (128 * SIN(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - (128 * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
 			item->itemFlags[2] += ANGLE(3);
 
 			// Get guardian head's position
@@ -230,10 +230,10 @@ void GuardianControl(short itemNumber)
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
-						int c = v * COS(-xRot) >> W2V_SHIFT;
-						dest.x = src.x + (c * SIN(yRot) >> W2V_SHIFT);
-						dest.y = src.y + (v * SIN(-xRot) >> W2V_SHIFT);
-						dest.z = src.z + (c * COS(yRot) >> W2V_SHIFT);
+						int c = v * phd_cos(-xRot) >> W2V_SHIFT;
+						dest.x = src.x + (c * phd_sin(yRot) >> W2V_SHIFT);
+						dest.y = src.y + (v * phd_sin(-xRot) >> W2V_SHIFT);
+						dest.z = src.z + (c * phd_cos(yRot) >> W2V_SHIFT);
 
 						if (condition)
 						{
@@ -267,11 +267,11 @@ void GuardianControl(short itemNumber)
 
 				if (JustLoaded)
 				{
-					int c = 8192 * COS(item->pos.xRot + 3328) >> W2V_SHIFT;
+					int c = 8192 * phd_cos(item->pos.xRot + 3328) >> W2V_SHIFT;
 					
-					dest.x = LaserHeadData.target.x = src.x + (c * SIN(item->pos.yRot) >> W2V_SHIFT);
-					dest.y = LaserHeadData.target.y = src.y + (8192 * SIN(3328 - item->pos.xRot) >> W2V_SHIFT);
-					dest.z = LaserHeadData.target.z = src.z + (c * COS(item->pos.yRot) >> W2V_SHIFT);
+					dest.x = LaserHeadData.target.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+					dest.y = LaserHeadData.target.y = src.y + (8192 * phd_sin(3328 - item->pos.xRot) >> W2V_SHIFT);
+					dest.z = LaserHeadData.target.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 				}
 				else
 				{
@@ -281,10 +281,9 @@ void GuardianControl(short itemNumber)
 				}
 			}
 
-			// FIXME_
 			short angles[2];
 			short outAngle;
-			//phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
+			phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
 			InterpolateAngle(angles[0], &item->pos.yRot, &LaserHeadData.yRot, LaserHeadData.byte1);
 			InterpolateAngle(angles[1] + 3328, &item->pos.xRot, &LaserHeadData.xRot, LaserHeadData.byte1);
 
@@ -364,10 +363,10 @@ void GuardianControl(short itemNumber)
 								src.z = 0;
 								GetJointAbsPosition(item, (PHD_VECTOR*)& src, GuardianMeshes[i]);
 
-								int c = 8192 * COS(angles[1]) >> W2V_SHIFT;
-								dest.x = src.x + (c * SIN(item->pos.yRot) >> W2V_SHIFT);
-								dest.y = src.y + (8192 * SIN(-angles[1]) >> W2V_SHIFT);
-								dest.z = src.z + (c * COS(item->pos.yRot) >> W2V_SHIFT);
+								int c = 8192 * phd_cos(angles[1]) >> W2V_SHIFT;
+								dest.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+								dest.y = src.y + (8192 * phd_sin(-angles[1]) >> W2V_SHIFT);
+								dest.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 
 								if (item->itemFlags[3] != 90 
 									&& LaserHeadData.fireArcs[j] != NULL)

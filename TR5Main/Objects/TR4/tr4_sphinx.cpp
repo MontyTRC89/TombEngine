@@ -31,9 +31,9 @@ void SphinxControl(short itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	int x = item->pos.xPos + 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	int x = item->pos.xPos + 614 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
 	int y = item->pos.yPos;
-	int z = item->pos.zPos + 614 * COS(item->pos.yRot) >> W2V_SHIFT;
+	int z = item->pos.zPos + 614 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -60,16 +60,16 @@ void SphinxControl(short itemNum)
 		}
 	}
 
-	x = item->pos.xPos - 614 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos - 614 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
 	y = item->pos.yPos;
-	z = item->pos.zPos - 614 * COS(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos - 614 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	roomNumber = item->roomNumber;
 
 	floor = GetFloor(x, y, z, &roomNumber);
 	int height2 = GetFloorHeight(floor, x, y, z);
 
-	ATAN(1228, height2 - height1);
+	phd_atan(1228, height2 - height1);
 
 	if (item->aiBits)
 		GetAITarget(creature);
@@ -80,7 +80,7 @@ void SphinxControl(short itemNum)
 	CreatureAIInfo(item, &info);
 
 	if (creature->enemy != LaraItem)
-		ATAN(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos);
+		phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos);
 
 	GetCreatureMood(item, &info, VIOLENT);
 	CreatureMood(item, &info, VIOLENT);

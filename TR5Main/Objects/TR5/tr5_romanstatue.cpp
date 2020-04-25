@@ -51,8 +51,8 @@ void InitialiseRomanStatue(short itemNum)
     item->currentAnimState = 13;
     item->frameNumber = Anims[item->animNumber].frameBase;
 	item->status = ITEM_INACTIVE;
-	item->pos.xPos += 486 * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-    item->pos.zPos += 486 * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+    item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 
 	ZeroMemory(&RomanStatueData, sizeof(ROMAN_STATUE_STRUCT));
 }
@@ -548,8 +548,7 @@ void ControlRomanStatue(short itemNumber)
 				pos2.z = 450;
 				GetJointAbsPosition(item, &pos2, 14);
 
-				// FIXME
-				//phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
+				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
 				attackPos.xPos = pos2.x;
 				attackPos.yPos = pos2.y;

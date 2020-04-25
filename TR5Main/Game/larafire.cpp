@@ -835,7 +835,7 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 		{
 			z = target->pos.zPos - lara_item->pos.zPos;
 			x = target->pos.xPos - lara_item->pos.xPos;
-			angle = 0x8000 + ATAN(z, x) - target->pos.yRot;
+			angle = 0x8000 + phd_atan(z, x) - target->pos.yRot;
 
 			if ((target->currentAnimState > 1 && target->currentAnimState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
@@ -865,8 +865,8 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 	int y = bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
 	int z = (bounds->MinZ + bounds->MaxZ) / 2;
 
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	target->x = item->pos.xPos + ((c * x + s * z) >> W2V_SHIFT);
 	target->y = item->pos.yPos + y;
@@ -900,9 +900,8 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 	GAME_VECTOR targetPoint;
 	find_target_point(Lara.target, &targetPoint);
 
-	// FIXME
 	short angles[2];
-	//phd_GetVectorAngles(targetPoint.x - pos.x, targetPoint.y - pos.y, targetPoint.z - pos.z, angles);
+	phd_GetVectorAngles(targetPoint.x - pos.x, targetPoint.y - pos.y, targetPoint.z - pos.z, angles);
 
 	angles[0] -= LaraItem->pos.yRot;
 	angles[1] -= LaraItem->pos.xRot;
@@ -1007,8 +1006,7 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 						find_target_point(item, &target);
 						if (LOS(&source, &target))
 						{
-							// FIXME
-							//phd_GetVectorAngles(target.x - source.x, target.y - source.y, target.z - source.z, angle);
+							phd_GetVectorAngles(target.x - source.x, target.y - source.y, target.z - source.z, angle);
 							angle[0] -= LaraItem->pos.yRot + Lara.torsoYrot;
 							angle[1] -= LaraItem->pos.xRot + Lara.torsoXrot;
 							if (angle[0] >= winfo->lockAngles[0] && angle[0] <= winfo->lockAngles[1] && angle[1] >= winfo->lockAngles[2] && angle[1] <= winfo->lockAngles[3])

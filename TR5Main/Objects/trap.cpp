@@ -389,8 +389,8 @@ void ControlSpikyWall(short itemNum)
 	/* Move wall */
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
-		int x = item->pos.xPos + SIN(item->pos.yRot) >> WALL_SHIFT;
-		int z = item->pos.zPos + COS(item->pos.yRot) >> WALL_SHIFT;
+		int x = item->pos.xPos + phd_sin(item->pos.yRot) >> WALL_SHIFT;
+		int z = item->pos.zPos + phd_cos(item->pos.yRot) >> WALL_SHIFT;
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
@@ -441,8 +441,8 @@ void SpinningBlade(short item_number)
 	{
 		if (item->goalAnimState != 1)
 		{
-			int x = item->pos.xPos + (WALL_SIZE * 3 / 2 * SIN(item->pos.yRot) >> W2V_SHIFT);
-			int z = item->pos.zPos + (WALL_SIZE * 3 / 2 * COS(item->pos.yRot) >> W2V_SHIFT);
+			int x = item->pos.xPos + (WALL_SIZE * 3 / 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+			int z = item->pos.zPos + (WALL_SIZE * 3 / 2 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 
 			short roomNumber = item->roomNumber;
 			FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
@@ -551,8 +551,8 @@ void InitialiseSlicerDicer(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	int dx = SIN(item->pos.yRot + ANGLE(90)) >> 5;
-	int dz = COS(item->pos.yRot + ANGLE(90)) >> 5;
+	int dx = phd_sin(item->pos.yRot + ANGLE(90)) >> 5;
+	int dz = phd_cos(item->pos.yRot + ANGLE(90)) >> 5;
 
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;
@@ -570,10 +570,10 @@ void SlicerDicerControl(short itemNum)
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP, &item->pos, 0);
 	
-	int factor = (9 * COS(item->triggerFlags) << 9 >> W2V_SHIFT) * COS(item->pos.yRot) >> W2V_SHIFT;
+	int factor = (9 * phd_cos(item->triggerFlags) << 9 >> W2V_SHIFT) * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos = (item->itemFlags[0] << 8) + factor;
-	item->pos.yPos = (item->itemFlags[1] << 8) - 4608 * SIN(item->triggerFlags);
+	item->pos.yPos = (item->itemFlags[1] << 8) - 4608 * phd_sin(item->triggerFlags);
 	item->pos.zPos = (item->itemFlags[2] << 8) + factor;
 
 	item->triggerFlags += 170;
@@ -840,7 +840,7 @@ void SentryGunControl(short itemNum)
 				item->pos.yPos += 512;
 
 				int deltaAngle = info.angle - creature->jointRotation[0];
-				//printf("Angle: %d\n", (int)TR_ANGLE_TO_DEGREES(info.angle));
+				//printf("Angle: %d\n", (int)TO_DEGREES(info.angle));
 
 				info.ahead = true;
 				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))

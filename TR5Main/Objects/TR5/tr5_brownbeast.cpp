@@ -67,7 +67,7 @@ void ControlBrowsBeast(short itemNumber)
 			{
 				int dx = LaraItem->pos.xPos - item->pos.xPos;
 				int dz = LaraItem->pos.zPos - item->pos.zPos;
-				ATAN(dz, dz);
+				phd_atan(dz, dz);
 				distance = SQUARE(dx) + SQUARE(dz);
 			}
 

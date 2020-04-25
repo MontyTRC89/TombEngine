@@ -1,5 +1,10 @@
 #include "math.h"
+#include "types.h"
 #include <cmath>
+#include <d3d11.h>
+#include <SimpleMath.h>
+
+using namespace DirectX::SimpleMath;
 
 // LUT for cos and sin
 // 8192 entries, even entry = Sin, odd entry = Cos
@@ -1314,7 +1319,7 @@ short ANGLE(double angle)
 
 float ANGLEF(short angle)
 {
-	return TR_ANGLE_TO_DEGREES(angle);
+	return TO_DEGREES(angle);
 }
 
 
@@ -1333,15 +1338,15 @@ const float lerp(float v0, float v1, float t) {
 	return (1 - t) * v0 + t * v1;
 }
 
-// FIXME: game code still expects >> 2 << W2V_SHIFT so we multiply by 16384.0f
-int SIN(short a)
+// FIXME: game code still expects << 2 >> W2V_SHIFT so we multiply by 16384.0f
+int phd_sin(short a)
 {
-	return (sin(TR_ANGLE_TO_RAD(a)) * 16384.0f);
+	return (sin(TO_RAD(a)) * 16384.0f);
 }
 
-int COS(short a)
+int phd_cos(short a)
 {
-	return (cos(TR_ANGLE_TO_RAD(a)) * 16384.0f);
+	return (cos(TO_RAD(a)) * 16384.0f);
 }
 
 int mGetAngle(int x1, int y1, int x2, int y2)
@@ -1391,7 +1396,7 @@ int mGetAngle(int x1, int y1, int x2, int y2)
 	return (-angle) & 0xFFFF;
 }
 
-int ATAN(int x, int y)
+int phd_atan(int x, int y)
 {
 	if ((x == 0) && (y == 0))
 		return 0;
@@ -1436,4 +1441,46 @@ int ATAN(int x, int y)
 		angle = n;
 
 	return angle;
+}
+
+void phd_GetVectorAngles(int x, int y, int z, short* angles)
+{
+	angles[0] = phd_atan(z, x);
+
+	while ((short)x != x || (short)y != y || (short)z != z)
+	{
+		x >>= 2;
+		y >>= 2;
+		z >>= 2;
+	}
+
+	int d = sqrt(SQUARE(x) + SQUARE(z));
+	short angle = phd_atan(d, y);
+
+	if (y > 0 && angle > 0 || y < 0 && angle < 0)
+		angle = -angle;
+
+	angles[1] = angle;
+}
+
+void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds)
+{
+	Matrix world = Matrix::CreateFromYawPitchRoll(
+		TO_RAD(pos->yRot),
+		TO_RAD(pos->xRot),
+		TO_RAD(pos->zRot)
+	);
+
+	Vector3 bMin = Vector3(bounds[0], bounds[2], bounds[4]);
+	Vector3 bMax = Vector3(bounds[1], bounds[3], bounds[5]);
+
+	bMin = Vector3::Transform(bMin, world);
+	bMax = Vector3::Transform(bMax, world);
+
+	tbounds[0] = bMin.x;
+	tbounds[2] = bMin.y;
+	tbounds[4] = bMin.z;
+	tbounds[1] = bMax.x;
+	tbounds[3] = bMax.y;
+	tbounds[5] = bMax.z;
 }

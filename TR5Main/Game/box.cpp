@@ -257,9 +257,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 
 	// TODO: exist in TR5 but just commented in case.
 	/*
-	ForcedFixedCamera.x = item->pos.xPos + (SIN(item->pos.yRot) << 13) >> W2V_SHIFT;
+	ForcedFixedCamera.x = item->pos.xPos + (phd_sin(item->pos.yRot) << 13) >> W2V_SHIFT;
 	ForcedFixedCamera.y = item->pos.yPos - WALL_SIZE;
-	ForcedFixedCamera.z = item->pos.zPos + (COS(item->pos.yRot) << 13) >> W2V_SHIFT;
+	ForcedFixedCamera.z = item->pos.zPos + (phd_cos(item->pos.yRot) << 13) >> W2V_SHIFT;
 	ForcedFixedCamera.roomNumber = item->roomNumber;
 	UseForcedFixedCamera = true;
 	*/
@@ -423,7 +423,7 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 
 	x = creature->target.x - item->pos.xPos;
 	z = creature->target.z - item->pos.zPos;
-	angle = ATAN(z, x) - item->pos.yRot;
+	angle = phd_atan(z, x) - item->pos.yRot;
 	range = (item->speed << W2V_SHIFT) / maximumTurn;
 	distance = SQUARE(x) + SQUARE(z);
 
@@ -453,16 +453,16 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 
 
 	// "<< 11" is really needed ? it can cause problem i think since it TR3 code the "<< 11" is not there !
-	xAngle1 = item->pos.xPos + SIN(item->pos.yRot + ANGLE(45)) << 11 >> W2V_SHIFT;
-	zAngle1 = item->pos.zPos + COS(item->pos.yRot + ANGLE(45)) << 11 >> W2V_SHIFT;
+	xAngle1 = item->pos.xPos + phd_sin(item->pos.yRot + ANGLE(45)) << 11 >> W2V_SHIFT;
+	zAngle1 = item->pos.zPos + phd_cos(item->pos.yRot + ANGLE(45)) << 11 >> W2V_SHIFT;
 	floorIndex1 = XZ_GET_SECTOR(r, xAngle1 - r->x, zAngle1 - r->z).index;
 
-	xAngle2 = item->pos.xPos + SIN(item->pos.yRot - ANGLE(45)) << 11 >> W2V_SHIFT;
-	zAngle2 = item->pos.zPos + COS(item->pos.yRot - ANGLE(45)) << 11 >> W2V_SHIFT;
+	xAngle2 = item->pos.xPos + phd_sin(item->pos.yRot - ANGLE(45)) << 11 >> W2V_SHIFT;
+	zAngle2 = item->pos.zPos + phd_cos(item->pos.yRot - ANGLE(45)) << 11 >> W2V_SHIFT;
 	floorIndex2 = XZ_GET_SECTOR(r, xAngle2 - r->x, zAngle2 - r->z).index;
 
-	xAngle3 = item->pos.xPos + SIN(item->pos.yRot) << 11 >> W2V_SHIFT;
-	zAngle3 = item->pos.zPos + COS(item->pos.yRot) << 11 >> W2V_SHIFT;
+	xAngle3 = item->pos.xPos + phd_sin(item->pos.yRot) << 11 >> W2V_SHIFT;
+	zAngle3 = item->pos.zPos + phd_cos(item->pos.yRot) << 11 >> W2V_SHIFT;
 	floorIndex3 = XZ_GET_SECTOR(r, xAngle3 - r->x, zAngle3 - r->z).index;
 
 	if (floorIndex1 && !floorIndex2 && !floorIndex3)
@@ -486,7 +486,7 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 
 	xDist = creature->target.x - item->pos.xPos;
 	zDist = creature->target.z - item->pos.zPos;
-	angle = ATAN(zDist, xDist) - item->pos.yRot;
+	angle = phd_atan(zDist, xDist) - item->pos.yRot;
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC)
 	{
@@ -779,7 +779,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
 		item->floor = GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos);
  
-		angle = (item->speed) ? ATAN(item->speed, -dy) : 0;
+		angle = (item->speed) ? phd_atan(item->speed, -dy) : 0;
 		if (angle < -ANGLE(20))
 			angle = -ANGLE(20);
 		else if (angle > ANGLE(20))
@@ -949,7 +949,7 @@ int CreatureCreature(short itemNumber)
 				distance = zDistance + (xDistance >> 1);
 
 			if (distance < radius + Objects[linked->objectNumber].radius)
-				return ATAN(linked->pos.zPos - z, linked->pos.xPos - x) - item->pos.yRot;
+				return phd_atan(linked->pos.zPos - z, linked->pos.xPos - x) - item->pos.yRot;
 		}
 
 		link = linked->nextItem;
@@ -1451,8 +1451,8 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 
 			if (!(creature->aiTarget.flags & 0x20))
 			{
-				creature->aiTarget.pos.xPos += SIN(creature->aiTarget.pos.yRot) >> 4;   
-				creature->aiTarget.pos.zPos += COS(creature->aiTarget.pos.yRot) >> 4;
+				creature->aiTarget.pos.xPos += phd_sin(creature->aiTarget.pos.yRot) >> 4;   
+				creature->aiTarget.pos.zPos += phd_cos(creature->aiTarget.pos.yRot) >> 4;
 			}
 		}
 	}
@@ -1500,17 +1500,17 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * SIN(Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * SIN(item->pos.yRot) >> W2V_SHIFT));
-		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * COS(Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * COS(item->pos.yRot) >> W2V_SHIFT));
+		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * phd_sin(item->pos.yRot) >> W2V_SHIFT));
+		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.moveAngle) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * phd_cos(item->pos.yRot) >> W2V_SHIFT));
 	}
 	else
 	{
-		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * SIN(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * SIN(item->pos.yRot) >> W2V_SHIFT));
-		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * COS(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * COS(item->pos.yRot) >> W2V_SHIFT));
+		x = (enemy->pos.xPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.xPos + (obj->pivotLength * phd_sin(item->pos.yRot) >> W2V_SHIFT));
+		z = (enemy->pos.zPos + (enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) >> W2V_SHIFT)) - (item->pos.zPos + (obj->pivotLength * phd_cos(item->pos.yRot) >> W2V_SHIFT));
 	}
 
 	y = item->pos.yPos - enemy->pos.yPos;
-	angle = ATAN(z, x);
+	angle = phd_atan(z, x);
 
 	if (x > 32000 || x < -32000 || z > 32000 || z < -32000)
 	{
@@ -1545,9 +1545,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	if (x > z)
-		info->xAngle = ATAN(x + (z >> 1), y);
+		info->xAngle = phd_atan(x + (z >> 1), y);
 	else
-		info->xAngle = ATAN(z + (x >> 1), y);
+		info->xAngle = phd_atan(z + (x >> 1), y);
 
 	info->ahead = (info->angle > -FRONT_ARC && info->angle < FRONT_ARC);
 	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= (STEP_SIZE*2));
@@ -2009,8 +2009,8 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	floor->stopper = set;
 
-	x = item->pos.xPos + ((1024 * SIN(dir)) >> W2V_SHIFT);
-	z = item->pos.zPos + ((1024 * COS(dir)) >> W2V_SHIFT);
+	x = item->pos.xPos + ((1024 * phd_sin(dir)) >> W2V_SHIFT);
+	z = item->pos.zPos + ((1024 * phd_cos(dir)) >> W2V_SHIFT);
 
 	short roomNumber = item->roomNumber;
 	GetFloor(x, item->pos.yPos, z, &roomNumber);

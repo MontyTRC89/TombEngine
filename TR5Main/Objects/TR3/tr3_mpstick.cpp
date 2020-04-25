@@ -131,7 +131,7 @@ void MPStickControl(short itemNumber)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 

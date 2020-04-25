@@ -451,14 +451,14 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 
 	if (item->pos.yRot == -ANGLE(180))
 	{
-		x = item->pos.xPos - (SIN(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2048] * wf) >> W2V_SHIFT);
-		z = item->pos.zPos - (COS(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2049] * wf) >> W2V_SHIFT);
+		x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2048] * wf) >> W2V_SHIFT);
+		z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2049] * wf) >> W2V_SHIFT);
 	}
 	else
 	{
 		//3934C
-		x = item->pos.xPos - (SIN(item->pos.yRot + ANGLE(180)) >> 3) + ((SIN(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
-		z = item->pos.zPos - (COS(item->pos.yRot + ANGLE(180)) >> 3) + ((COS(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
+		x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 3) + ((phd_sin(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
+		z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 3) + ((phd_cos(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
 	}
 
 	//393A0

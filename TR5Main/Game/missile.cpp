@@ -33,8 +33,8 @@ void ShootAtLara(FX_INFO *fx)
 	y += bounds[3] + (bounds[2] - bounds[3]) * 3 / 4;
 
 	distance = sqrt(SQUARE(x) + SQUARE(z));
-	fx->pos.xRot = -ATAN(distance, y);
-	fx->pos.yRot = ATAN(z, x);
+	fx->pos.xRot = -phd_atan(distance, y);
+	fx->pos.yRot = phd_atan(z, x);
 
 	/* Random scatter (only a little bit else it's too hard to avoid) */
 	fx->pos.xRot += (GetRandomControl() - 0x4000) / 0x40;
@@ -54,10 +54,10 @@ void ControlMissile(short fxNumber)
 	if (fx->objectNumber == ID_SCUBA_HARPOON && !(Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
 		fx->pos.xRot -= ONE_DEGREE;
 
-	fx->pos.yPos += (fx->speed * SIN(-fx->pos.xRot) >> W2V_SHIFT);
-	speed = fx->speed * COS(fx->pos.xRot) >> W2V_SHIFT;
-	fx->pos.zPos += (speed * COS(fx->pos.yRot) >> W2V_SHIFT);
-	fx->pos.xPos += (speed * SIN(fx->pos.yRot) >> W2V_SHIFT);
+	fx->pos.yPos += (fx->speed * phd_sin(-fx->pos.xRot) >> W2V_SHIFT);
+	speed = fx->speed * phd_cos(fx->pos.xRot) >> W2V_SHIFT;
+	fx->pos.zPos += (speed * phd_cos(fx->pos.yRot) >> W2V_SHIFT);
+	fx->pos.xPos += (speed * phd_sin(fx->pos.yRot) >> W2V_SHIFT);
 	roomNumber = fx->roomNumber;
 	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 
@@ -147,8 +147,8 @@ void ControlNatlaGun(short fx_number)
 	/* If first frame, then start another explosion at next position */
 	if (fx->frameNumber == -1)
 	{
-		z = fx->pos.zPos + (fx->speed * COS(fx->pos.yRot) >> W2V_SHIFT);
-		x = fx->pos.xPos + (fx->speed * SIN(fx->pos.yRot) >> W2V_SHIFT);
+		z = fx->pos.zPos + (fx->speed * phd_cos(fx->pos.yRot) >> W2V_SHIFT);
+		x = fx->pos.xPos + (fx->speed * phd_sin(fx->pos.yRot) >> W2V_SHIFT);
 		y = fx->pos.yPos;
 		roomNumber = fx->roomNumber;
 		floor = GetFloor(x, y, z, &roomNumber);

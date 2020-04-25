@@ -139,8 +139,8 @@ void InitialiseGuard(short itemNum)
         case 9:
             item->goalAnimState = STATE_GUARD_USE_COMPUTER;
             item->animNumber = anim + 59;
-            item->pos.xPos -= SIN(item->pos.yRot); // 4 * not exist there ??
-            item->pos.zPos -= COS(item->pos.yRot); // 4 * not exist there ??
+            item->pos.xPos -= phd_sin(item->pos.yRot); // 4 * not exist there ??
+            item->pos.zPos -= phd_cos(item->pos.yRot); // 4 * not exist there ??
             break;
         case 8:
             item->goalAnimState = STATE_GUARD_HUNTING_IDLE;
@@ -164,8 +164,8 @@ void InitialiseSniper(short itemNum)
     item->goalAnimState = STATE_SNIPER_STOP;
     item->currentAnimState = STATE_SNIPER_STOP;
 	item->pos.yPos += STEP_SIZE * 2;
-    item->pos.xPos += SIN(item->pos.yRot);
-    item->pos.zPos += COS(item->pos.yRot);
+    item->pos.xPos += phd_sin(item->pos.yRot);
+    item->pos.zPos += phd_cos(item->pos.yRot);
 }
 void InitialiseGuardLaser(short itemNum)
 {
@@ -194,8 +194,8 @@ void GuardControl(short itemNum)
 	short joint0 = 0;
 	int x = item->pos.xPos;
 	int z = item->pos.zPos;
-	int dx = 870 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int dz = 870 * COS(item->pos.yRot) >> W2V_SHIFT;
+	int dx = 870 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int dz = 870 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 	x += dx;
 	z += dz;
 	short roomNumber = item->roomNumber;
@@ -254,7 +254,7 @@ void GuardControl(short itemNum)
 	{
 		int dx = LaraItem->pos.xPos - item->pos.xPos;
 		int dz = LaraItem->pos.zPos - item->pos.zPos;
-		laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+		laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 		laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 	}
 	
@@ -1004,8 +1004,8 @@ void Mafia2Control(short itemNum)
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
-	int dx = 870 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int dz = 870 * COS(item->pos.yRot) >> W2V_SHIFT;
+	int dx = 870 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int dz = 870 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 	x += dx;
 	z += dz;
 	short roomNumber = item->roomNumber;
@@ -1069,7 +1069,7 @@ void Mafia2Control(short itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 		GetCreatureMood(item, &info, creature->enemy != LaraItem);

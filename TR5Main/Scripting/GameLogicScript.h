@@ -131,9 +131,9 @@ typedef struct GameScriptItem {
 		pos.x = NativeItem->pos.xPos;
 		pos.y = NativeItem->pos.yPos;
 		pos.z = NativeItem->pos.zPos;
-		pos.xRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.xRot);
-		pos.yRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.yRot);
-		pos.zRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.zRot);
+		pos.xRot = TO_DEGREES(NativeItem->pos.xRot);
+		pos.yRot = TO_DEGREES(NativeItem->pos.yRot);
+		pos.zRot = TO_DEGREES(NativeItem->pos.zRot);
 		pos.room = NativeItem->roomNumber;
 
 		return pos;

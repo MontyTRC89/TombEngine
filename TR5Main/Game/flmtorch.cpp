@@ -206,8 +206,8 @@ void TorchControl(short itemNumber) // (F) (D)
 		item->pos.zRot = 0;
 	}
 
-	int xv = item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int zv = item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int zv = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;

@@ -69,7 +69,7 @@ void ControlDog(short itemNumber)
 		{
 			int dx = LaraItem->pos.xPos - item->pos.xPos;
 			int dz = LaraItem->pos.zPos - item->pos.zPos;
-			ATAN(dz, dx);
+			phd_atan(dz, dx);
 			distance = SQUARE(dx) + SQUARE(dz);
 		}
 

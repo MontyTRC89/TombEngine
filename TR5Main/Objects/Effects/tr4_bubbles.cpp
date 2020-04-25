@@ -241,13 +241,12 @@ void BubblesControl(short fxNum)
 {
 	FX_INFO* fx = &Effects[fxNum];
 
-	// FIXME:
 	short angles[2];
-	/*phd_GetVectorAngles(
+	phd_GetVectorAngles(
 		LaraItem->pos.xPos - fx->pos.xPos,
 		LaraItem->pos.yPos - fx->pos.yPos - 256,
 		LaraItem->pos.zPos - fx->pos.zPos,
-		angles);*/
+		angles);
 
 	int unk1 = 0; // v44
 	int unk2 = 0; // v3
@@ -327,10 +326,10 @@ void BubblesControl(short fxNum)
 	int oldY = fx->pos.yPos;
 	int oldZ = fx->pos.zPos;
 
-	int c = fx->speed * COS(fx->pos.xRot) >> W2V_SHIFT;  
-	fx->pos.xPos += c * SIN(fx->pos.yRot) >> W2V_SHIFT; 
-	fx->pos.yPos += fx->speed * SIN(-fx->pos.xRot) >> W2V_SHIFT;  
-	fx->pos.zPos += c * COS(fx->pos.yRot) >> W2V_SHIFT;
+	int c = fx->speed * phd_cos(fx->pos.xRot) >> W2V_SHIFT;  
+	fx->pos.xPos += c * phd_sin(fx->pos.yRot) >> W2V_SHIFT; 
+	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot) >> W2V_SHIFT;  
+	fx->pos.zPos += c * phd_cos(fx->pos.yRot) >> W2V_SHIFT;
 	
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);

@@ -951,9 +951,9 @@ void UpdateGunShells()
 			gs->pos.yRot += gs->speed * ANGLE(1);
 			gs->pos.zRot += ANGLE(23);
 
-			gs->pos.xPos += gs->speed * SIN(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.xPos += gs->speed * phd_sin(gs->dirXrot) >> W2V_SHIFT;
 			gs->pos.yPos += gs->fallspeed;
-			gs->pos.zPos += gs->speed * COS(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.zPos += gs->speed * phd_cos(gs->dirXrot) >> W2V_SHIFT;
 
 			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
 			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
@@ -1209,9 +1209,9 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 	short* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TR_ANGLE_TO_RAD(item->pos.yRot),
-		TR_ANGLE_TO_RAD(item->pos.xRot),
-		TR_ANGLE_TO_RAD(item->pos.zRot)
+		TO_RAD(item->pos.yRot),
+		TO_RAD(item->pos.xRot),
+		TO_RAD(item->pos.zRot)
 	);
 
 	// PHD_MATH:
@@ -1419,9 +1419,9 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 
 		int speed = (GetRandomControl() & 0xF) + vel;
-		spark->xVel = speed * 16 * SIN(rot) >> W2V_SHIFT;
+		spark->xVel = speed * 16 * phd_sin(rot) >> W2V_SHIFT;
 		spark->yVel = -512 - (GetRandomControl() & 0x1FF);
-		spark->zVel = speed * 16 * COS(rot) >> W2V_SHIFT;
+		spark->zVel = speed * 16 * phd_cos(rot) >> W2V_SHIFT;
 
 		short angle;
 		if (GetRandomControl() & 1)
@@ -1430,8 +1430,8 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 			angle = rot - ANGLE(90);
 
 		int shift = (GetRandomControl() & 0x1FF) - 256;
-		x += (shift * SIN(angle) >> W2V_SHIFT);
-		z += (shift * COS(angle) >> W2V_SHIFT);
+		x += (shift * phd_sin(angle) >> W2V_SHIFT);
+		z += (shift * phd_cos(angle) >> W2V_SHIFT);
 
 		spark->x = (GetRandomControl() & 0x1F) + x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1488,7 +1488,7 @@ void UpdateShockwaves()
 						}
 						else
 						{
-							short angle = ATAN(dz, dx);
+							short angle = phd_atan(dz, dx);
 							TriggerShockwaveHitEffect(LaraItem->pos.xPos,
 								sw->y,
 								LaraItem->pos.zPos,
@@ -1734,9 +1734,9 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 
 		angle = GetRandomControl() << 3;
 
-		sptr->xVel = -SIN(angle) >> 5;
+		sptr->xVel = -phd_sin(angle) >> 5;
 		sptr->yVel = -640 - (GetRandomControl() & 0xFF);
-		sptr->zVel = COS(angle) >> 5;
+		sptr->zVel = phd_cos(angle) >> 5;
 
 		sptr->friction = 5;
 		sptr->flags = 0;

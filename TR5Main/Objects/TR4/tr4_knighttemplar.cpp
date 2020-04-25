@@ -75,7 +75,7 @@ void KnightTemplarControl(short itemNum)
 
 	int a = 0;
 	if (creature->enemy != LaraItem)
-		a = ATAN(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
+		a = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
 
 	GetCreatureMood(item, &info, VIOLENT);
 	CreatureMood(item, &info, VIOLENT);

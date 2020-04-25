@@ -147,7 +147,7 @@ void Renderer11::updateEffects()
 		RendererEffect* fx = m_effectsToDraw[i];
 
 		Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
-		Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(fx->Effect->pos.yRot), TR_ANGLE_TO_RAD(fx->Effect->pos.xRot), TR_ANGLE_TO_RAD(fx->Effect->pos.zRot));
+		Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
 		m_effectsToDraw[i]->World = rotation * translation;
 	}
 }
@@ -290,19 +290,19 @@ void Renderer11::UpdateItemAnimations(int itemNumber)
 			{
 				if (currentBone->ExtraRotationFlags & ROT_Y)
 				{
-					currentBone->ExtraRotation.y = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+					currentBone->ExtraRotation.y = TO_RAD(creature->jointRotation[lastJoint]);
 					lastJoint++;
 				}
 
 				if (currentBone->ExtraRotationFlags & ROT_X)
 				{
-					currentBone->ExtraRotation.x = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+					currentBone->ExtraRotation.x = TO_RAD(creature->jointRotation[lastJoint]);
 					lastJoint++;
 				}
 
 				if (currentBone->ExtraRotationFlags & ROT_Z)
 				{
-					currentBone->ExtraRotation.z = TR_ANGLE_TO_RAD(creature->jointRotation[lastJoint]);
+					currentBone->ExtraRotation.z = TO_RAD(creature->jointRotation[lastJoint]);
 					lastJoint++;
 				}
 			}

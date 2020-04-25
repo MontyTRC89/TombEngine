@@ -191,8 +191,8 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	{
 		rx = laraitem->pos.xPos - item->pos.xPos;
 		rz = laraitem->pos.zPos - item->pos.zPos;
-		c = COS(item->pos.yRot);
-		s = SIN(item->pos.yRot);
+		c = phd_cos(item->pos.yRot);
+		s = phd_sin(item->pos.yRot);
 
 		/* See if Lara within leg space of dragon; if so use different collision to sphere stuff */
 		side_shift = (rx * s + rz * c) >> W2V_SHIFT;
