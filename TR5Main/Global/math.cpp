@@ -1346,20 +1346,13 @@ int COS(short a)
 
 int mGetAngle(int x1, int y1, int x2, int y2)
 {
-	int x, y;
-	int	octant, n, angle;
+	int x = x2 - x1;
+	int y = y2 - y1;
 
-	/* -------- calculate gradient */
-
-	x = x2 - x1;
-	y = y2 - y1;
-
-	if ((x == 0) && (y == 0))
+	if (!x && !y)
 		return 0;
 
-	/* -------- determine octant */
-
-	octant = 0;
+	int octant = 0;
 
 	if (x < 0)
 	{
@@ -1376,64 +1369,71 @@ int mGetAngle(int x1, int y1, int x2, int y2)
 	if (y > x)
 	{
 		octant++;
-		n = x;
+		int n = x;
 		x = y;
 		y = n;
 	}
 
-	while ((short)y != y)		/* Scale X and Y down into Word */
-	{						/* So that when we shift Y up */
-		y >>= 1;				/* we dont overflow 32 Bits!! */
+	while ((short)y != y) 
+	{
+		y >>= 1;
 		x >>= 1;
 	}
 
-	n = atanTab[(y << 11) / x];
+	int n = atanTab[(y << 11) / x] + atanOctantTab[octant];
+	int angle;
 
-	if ((n += atanOctantTab[octant]) < 0)	/* add on req Octant*/
-		angle = -(n);
+	if (n < 0)
+		angle = -n;
 	else
 		angle = n;
 
-	return (-angle) & 0xffff;
+	return (-angle) & 0xFFFF;
 }
 
-int ATAN(int dz, int dx)
+int ATAN(int x, int y)
 {
-	/*
+	if ((x == 0) && (y == 0))
+		return 0;
 
-	push	ebx
-		push	ecx
-		push	edx
+	int octant = 0;
 
-		mov	eax, ecx; Win95 passes ecx, edx; this routine expects Watcom eax, edx
+	if (x < 0)
+	{
+		octant += 4;
+		x = -x;
+	}
 
-		mov		ebx, eax; copy X into ebx
-		xor ecx, ecx; clear Octant num
-		or eax, edx
-		jz		SHORT @@exit; if X = Y = 0 exit Angle = 0
-		test	ebx, ebx; is X < 0
-		jns		SHORT @@okx
-		add		ecx, 4; Octant 4, 5, 6 or 7
-		neg		ebx; make X positive
-		@@okx:  test	edx, edx
-		jns		SHORT @@oky; if Y < 0
-		add		ecx, 2; Add 2 to Octant Num
-		neg		edx; make Y positive
-		@@oky:xor eax, eax; clear out eax
-		cmp		edx, ebx; compare Y with X
-		jle		SHORT @@ylex
-		inc		ecx; if Y > X inc octant count
-		xchg	ebx, edx; swap Xand Y
-		@@ylex:	shrd	eax, edx, (32 - NUMSTEPBITS); get Y * NUMSTEPS in edx : eax
-		shr		edx, (32 - NUMSTEPBITS);
-	idiv	ebx; get Y * NUMSTEPS / X
-		mov		ax, phdtantab[eax * 2]; get Angle 0 - 45degrees
-		add		eax, phdtan2[ecx * 4]; add on req Octant
-		jns		SHORT @@exit
-		neg		eax; make Positive..
-		@@exit:	pop		edx
-		pop		ecx
-		pop		ebx
-		ret*/
-	return (atan2(dz, dx) * 180 / PI * 182);
+	if (y < 0)
+	{
+		octant += 2;
+		y = -y;
+	}
+
+	if (y > x)
+	{
+		octant++;
+		int n = x;
+		x = y;
+		y = n;
+	}
+
+	while ((short)y != y)
+	{
+		y >>= 1;
+		x >>= 1;
+	}
+
+	if (!x)
+		x = 1;
+
+	int n = atanTab[(y << 11) / x] + atanOctantTab[octant];
+	short angle;
+
+	if (n < 0)
+		angle = -n;
+	else
+		angle = n;
+
+	return angle;
 }
