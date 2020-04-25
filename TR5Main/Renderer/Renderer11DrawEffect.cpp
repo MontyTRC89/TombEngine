@@ -97,7 +97,7 @@ void Renderer11::drawEnergyArcs()
 
 			float alpha = (float)arc->life / (float)arc->sLife;
 
-			Matrix rotationMatrix = Matrix::CreateFromAxisAngle(direction, TR_ANGLE_TO_RAD(arc->rotation));
+			Matrix rotationMatrix = Matrix::CreateFromAxisAngle(direction, TO_RAD(arc->rotation));
 
 			for (int j = 0; j < numSegments; j++)
 			{
@@ -143,7 +143,7 @@ void Renderer11::drawSmokes()
 			AddSpriteBillboard(m_sprites[spark->def],
 				Vector3(spark->x, spark->y, spark->z),
 				Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
-				TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
+				TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
 				BLENDMODE_ALPHABLEND);
 		}
 	}
@@ -211,7 +211,7 @@ void Renderer11::drawFires()
 			{
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
-					AddSpriteBillboard(m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
+					AddSpriteBillboard(m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
 			}
 		}
 	}
@@ -311,7 +311,7 @@ void Renderer11::drawSparks()
 				AddSpriteBillboard(m_sprites[spark->def],
 					pos,
 					Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
-					TR_ANGLE_TO_RAD(spark->rotAng), spark->scalar, spark->size, spark->size,
+					TO_RAD(spark->rotAng), spark->scalar, spark->size, spark->size,
 					BLENDMODE_ALPHABLEND);
 			}
 			else
@@ -433,7 +433,7 @@ void Renderer11::drawShockwaves()
 			byte color = shockwave->life * 8;
 
 			int dl = shockwave->outerRad - shockwave->innerRad;
-			Matrix rotationMatrix = Matrix::CreateRotationX(TR_ANGLE_TO_RAD(shockwave->xRot));
+			Matrix rotationMatrix = Matrix::CreateRotationX(TO_RAD(shockwave->xRot));
 			Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
 			// Inner circle
@@ -498,7 +498,7 @@ void Renderer11::drawBlood()
 			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 				Vector3(blood->x, blood->y, blood->z),
 				Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
-				TR_ANGLE_TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
+				TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
 				BLENDMODE_ALPHABLEND);
 		}
 	}
@@ -577,7 +577,7 @@ bool Renderer11::drawGunFlashes()
 			if (flashBucket->NumVertices != 0)
 			{
 				Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
-				Matrix rotation2 = Matrix::CreateRotationX(TR_ANGLE_TO_RAD(rotationX));
+				Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
 				if (Lara.leftArm.flash_gun)
 				{
@@ -671,8 +671,8 @@ bool Renderer11::drawBaddieGunflashes()
 				if (flashBucket->NumVertices != 0)
 				{
 					Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-					Matrix rotationX = Matrix::CreateRotationX(TR_ANGLE_TO_RAD(49152));
-					Matrix rotationZ = Matrix::CreateRotationZ(TR_ANGLE_TO_RAD(2 * GetRandomControl()));
+					Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
+					Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
 					Matrix world = item->AnimationTransforms[joint] * item->World;
 					world = rotationX * world;
@@ -706,7 +706,7 @@ void Renderer11::drawFootprints()
 			FOOTPRINT_STRUCT& footprint = *i;
 			if (footprint.active)
 			{
-				Matrix rot = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(footprint.pos.yRot) + PI);
+				Matrix rot = Matrix::CreateRotationY(TO_RAD(footprint.pos.yRot) + PI);
 				Vector3 p1 = Vector3(-64, 0, -64);
 				Vector3 p2 = Vector3(64, 0, -64);
 				Vector3 p3 = Vector3(64, 0, 64);
@@ -1201,7 +1201,7 @@ bool Renderer11::drawDebris(bool transparent)
 		if (debris->on)
 		{
 			Matrix translation = Matrix::CreateTranslation(debris->x, debris->y, debris->z);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(debris->yRot), TR_ANGLE_TO_RAD(debris->xRot), 0);
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(debris->yRot), TO_RAD(debris->xRot), 0);
 			Matrix world = rotation * translation;
 
 			OBJECT_TEXTURE* texture = &ObjectTextures[(int)(debris->textInfo) & 0x7FFF];

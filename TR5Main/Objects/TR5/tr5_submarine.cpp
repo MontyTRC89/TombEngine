@@ -59,7 +59,7 @@ void ControlSubmarine(short itemNumber)
 		int dx = LaraItem->pos.xPos - item->pos.xPos;
 		int dz = LaraItem->pos.zPos - item->pos.zPos;
 
-		laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+		laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 		laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		laraInfo.ahead = true;
 	}
@@ -402,8 +402,8 @@ void ChaffFlareControl(short itemNumber)
 		item->pos.zRot += ANGLE(5);
 	}
 
-	int dx = item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int dz = item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	int dx = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int dz = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;
@@ -511,9 +511,8 @@ void TorpedoControl(short itemNumber)
 		}
 	}
 
-	// FIME
 	short angles[2];
-	//phd_GetVectorAngles(pos.x - item->pos.xPos, pos.y - item->pos.yPos, pos.z - item->pos.zPos, angles);
+	phd_GetVectorAngles(pos.x - item->pos.xPos, pos.y - item->pos.yPos, pos.z - item->pos.zPos, angles);
 
 	if (item->speed >= 48)
 	{
@@ -570,11 +569,11 @@ void TorpedoControl(short itemNumber)
 
 	item->pos.zRot += 16 * item->speed;
 
-	int c = item->speed * COS(item->pos.xRot) >> W2V_SHIFT;
+	int c = item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT;
 
-	item->pos.xPos += c * SIN(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.yPos += item->speed * SIN(-item->pos.xRot) >> W2V_SHIFT;
-	item->pos.zPos += c * COS(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += c * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot) >> W2V_SHIFT;
+	item->pos.zPos += c * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);

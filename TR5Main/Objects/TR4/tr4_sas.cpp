@@ -78,7 +78,7 @@ void SasControl(short itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			ang = ATAN(dz, dx) - item->pos.yRot;
+			ang = phd_atan(dz, dx) - item->pos.yRot;
 			distance = dx * dx + dz * dz;
 		}
 

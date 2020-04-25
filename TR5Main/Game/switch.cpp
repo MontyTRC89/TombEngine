@@ -704,8 +704,8 @@ void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				item->animNumber = Objects[item->objectNumber].animIndex + 4;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->itemFlags[0] = 1;
-				ForcedFixedCamera.x = item->pos.xPos - (1024 * SIN(item->pos.yRot) >> W2V_SHIFT);
-				ForcedFixedCamera.z = item->pos.zPos - (1024 * COS(item->pos.yRot) >> W2V_SHIFT);
+				ForcedFixedCamera.x = item->pos.xPos - (1024 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+				ForcedFixedCamera.z = item->pos.zPos - (1024 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 				Lara.isMoving = 0;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
@@ -746,8 +746,8 @@ void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					flag = 1;
 					l->frameNumber = Anims[319].frameBase;
 					item->itemFlags[0] = 2;
-					ForcedFixedCamera.x = item->pos.xPos + (1024 * SIN(item->pos.yRot) >> W2V_SHIFT);
-					ForcedFixedCamera.z = item->pos.zPos + (1024 * COS(item->pos.yRot) >> W2V_SHIFT);
+					ForcedFixedCamera.x = item->pos.xPos + (1024 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+					ForcedFixedCamera.z = item->pos.zPos + (1024 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 				}
 				else
 				{
@@ -974,9 +974,9 @@ void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			AddActiveItem(itemNum);
 			
-			ForcedFixedCamera.x = item->pos.xPos - 1024 * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 			ForcedFixedCamera.y = item->pos.yPos - 1024;
-			ForcedFixedCamera.z = item->pos.zPos - 1024 * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 			ForcedFixedCamera.roomNumber = item->roomNumber;
 
 			return;
@@ -1005,9 +1005,9 @@ void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			AddActiveItem(itemNum);
 
-			ForcedFixedCamera.x = item->pos.xPos - 1024 * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.x = item->pos.xPos - 1024 * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 			ForcedFixedCamera.y = item->pos.yPos - 1024;
-			ForcedFixedCamera.z = item->pos.zPos - 1024 * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+			ForcedFixedCamera.z = item->pos.zPos - 1024 * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 			ForcedFixedCamera.roomNumber = item->roomNumber;
 		}
 	}

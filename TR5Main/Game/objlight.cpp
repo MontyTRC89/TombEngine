@@ -11,9 +11,9 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, shor
 	source.z = z;
 	GetFloor(x, y, z, &room);
 	source.roomNumber = room;
-	target.x = x + SIN(16 * angle);
+	target.x = x + phd_sin(16 * angle);
 	target.y = y;
-	target.z = z + COS(16 * angle);
+	target.z = z + phd_cos(16 * angle);
 	if (!LOS(&source, &target))
 		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
 }

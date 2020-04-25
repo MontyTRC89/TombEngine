@@ -92,8 +92,8 @@ void HitmanControl(short itemNumber)
 		int x = item->pos.xPos;
 		int z = item->pos.zPos;
 
-		int dx = 808 * SIN(item->pos.yRot) >> W2V_SHIFT;
-		int dz = 808 * COS(item->pos.yRot) >> W2V_SHIFT;
+		int dx = 808 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+		int dz = 808 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 		x += dx;
 		z += dz;
@@ -226,7 +226,7 @@ void HitmanControl(short itemNumber)
 			{
 				int dx = LaraItem->pos.xPos - item->pos.xPos;
 				int dz = LaraItem->pos.zPos - item->pos.zPos;
-				laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+				laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 				laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			}
 

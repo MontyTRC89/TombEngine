@@ -49,41 +49,41 @@ void ScorpionControl(short itemNum)
 	short joint3 = 0;
 	short roomNumber = item->roomNumber;
 
-	int x = item->pos.xPos + 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int z = item->pos.zPos + 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+	int x = item->pos.xPos + 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int z = item->pos.zPos + 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height1) > 512)
 		height1 = item->pos.yPos;
 
-	x = item->pos.xPos - 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	z = item->pos.zPos - 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height2) > 512)
 		height2 = item->pos.yPos;
 
-	short angle1 = ATAN(1344, height2 - height1);
+	short angle1 = phd_atan(1344, height2 - height1);
 
-	x = item->pos.xPos - 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	z = item->pos.zPos + 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos + 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height3) > 512)
 		height3 = item->pos.yPos;
 
-	x = item->pos.xPos + 682 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	z = item->pos.zPos - 682 * COS(item->pos.yRot) >> W2V_SHIFT;
+	x = item->pos.xPos + 682 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 	int height4 = GetFloorHeight(floor, x, item->pos.yPos, z);
 	if (abs(item->pos.yPos - height4) > 512)
 		height4 = item->pos.yPos;
 
-	short angle2 = ATAN(1344, height4 - height3);
+	short angle2 = phd_atan(1344, height4 - height3);
 
 	if (item->hitPoints <= 0)
 	{

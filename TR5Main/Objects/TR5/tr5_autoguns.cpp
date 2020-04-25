@@ -79,7 +79,7 @@ void ControlAutoGuns(short itemNumber)
 			// FIXME:
 			if (los)
 			{
-				//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 				angles[0] -= item->pos.yRot;
 			}
 			else

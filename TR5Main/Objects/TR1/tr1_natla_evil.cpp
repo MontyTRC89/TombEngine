@@ -64,7 +64,7 @@ void NatlaEvilControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 
 		/* Work out required turn */
-		angle = (short)ATAN(abort->target.z - item->pos.zPos, abort->target.x - item->pos.xPos) - item->pos.yRot;
+		angle = (short)phd_atan(abort->target.z - item->pos.zPos, abort->target.x - item->pos.xPos) - item->pos.yRot;
 
 		/* Touch damage */
 		if (item->touchBits)

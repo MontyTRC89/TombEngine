@@ -57,9 +57,9 @@ void Renderer11::collectItems(short roomNumber)
 		newItem->Id = itemNum;
 		newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
 		newItem->Translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		newItem->Rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot),
-			TR_ANGLE_TO_RAD(item->pos.xRot),
-			TR_ANGLE_TO_RAD(item->pos.zRot));
+		newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot),
+			TO_RAD(item->pos.xRot),
+			TO_RAD(item->pos.zRot));
 		newItem->Scale = Matrix::CreateScale(1.0f);
 		newItem->World = newItem->Rotation * newItem->Translation;
 		collectLightsForItem(item->roomNumber, newItem);
@@ -88,7 +88,7 @@ void Renderer11::collectStatics(short roomNumber)
 		max += Vector3(mesh->x, mesh->y, mesh->z);
 		if (!frustum.AABBInFrustum(min, max))
 			continue;
-		Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot));
+		Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->yRot));
 		Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
 		newStatic->Mesh = mesh;
 		newStatic->RoomIndex = roomNumber;

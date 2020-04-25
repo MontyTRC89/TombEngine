@@ -47,7 +47,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 				break;
 			}
 			if (!fragment->active) {
-				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(yRot), 0, 0);
+				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
 				RendererVertex vtx0 = meshVertices->at(fragmentsMesh->Buckets[bucket].Indices[i]);
 				RendererVertex vtx1 = meshVertices->at(fragmentsMesh->Buckets[bucket].Indices[i + 1]);
 				RendererVertex vtx2 = meshVertices->at(fragmentsMesh->Buckets[bucket].Indices[i + 2]);

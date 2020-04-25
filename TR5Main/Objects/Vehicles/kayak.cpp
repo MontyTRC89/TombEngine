@@ -69,8 +69,8 @@ void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	c = COS(v->pos.yRot);
-	s = SIN(v->pos.yRot);
+	c = phd_cos(v->pos.yRot);
+	s = phd_sin(v->pos.yRot);
 
 	x = v->pos.xPos + (((zoff * s) + (xoff * c)) >> W2V_SHIFT);
 	z = v->pos.zPos + (((zoff * c) - (xoff * s)) >> W2V_SHIFT);
@@ -193,7 +193,7 @@ int GetInKayak(short item_number, COLL_INFO* coll)
 		short ang;
 		unsigned short tempang;
 
-		ang = ATAN(kayak->pos.zPos - LaraItem->pos.zPos, kayak->pos.xPos - LaraItem->pos.xPos);
+		ang = phd_atan(kayak->pos.zPos - LaraItem->pos.zPos, kayak->pos.xPos - LaraItem->pos.xPos);
 		ang -= kayak->pos.yRot;
 
 		tempang = LaraItem->pos.yRot - kayak->pos.yRot;
@@ -223,8 +223,8 @@ int GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 	{
 		int c, s, front, side;
 
-		c = COS(v->pos.yRot);
-		s = SIN(v->pos.yRot);
+		c = phd_cos(v->pos.yRot);
+		s = phd_sin(v->pos.yRot);
 
 		front = ((zdiff * c) + (xdiff * s)) >> W2V_SHIFT;
 		side = ((-zdiff * s) + (xdiff * c)) >> W2V_SHIFT;
@@ -559,8 +559,8 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	rh = TestKayakHeight(kayak, KAYAK_X, KAYAK_Z, &rpos);
 
 	kayak->pos.yRot += (kinfo->Rot >> 16);
-	kayak->pos.xPos += (kayak->speed * SIN(kayak->pos.yRot)) >> W2V_SHIFT;
-	kayak->pos.zPos += (kayak->speed * COS(kayak->pos.yRot)) >> W2V_SHIFT;
+	kayak->pos.xPos += (kayak->speed * phd_sin(kayak->pos.yRot)) >> W2V_SHIFT;
+	kayak->pos.zPos += (kayak->speed * phd_cos(kayak->pos.yRot)) >> W2V_SHIFT;
 
 	DoKayakCurrent(kayak);
 
@@ -571,8 +571,8 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	kayak->fallspeed = DoKayakDynamics(kinfo->Water, kayak->fallspeed, &kayak->pos.yPos);
 
 	h = (lpos.y + rpos.y) >> 1;
-	x = ATAN(1024, kayak->pos.yPos - fpos.y);
-	z = ATAN(KAYAK_X, h - lpos.y);
+	x = phd_atan(1024, kayak->pos.yPos - fpos.y);
+	z = phd_atan(KAYAK_X, h - lpos.y);
 
 	kayak->pos.xRot = x;
 	kayak->pos.zRot = z;
@@ -653,7 +653,7 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	{
 		int newspeed;
 
-		newspeed = ((kayak->pos.zPos - oldpos[8].z) * COS(kayak->pos.yRot) + (kayak->pos.xPos - oldpos[8].x) * SIN(kayak->pos.yRot)) >> W2V_SHIFT;
+		newspeed = ((kayak->pos.zPos - oldpos[8].z) * phd_cos(kayak->pos.yRot) + (kayak->pos.xPos - oldpos[8].x) * phd_sin(kayak->pos.yRot)) >> W2V_SHIFT;
 		newspeed <<= 8;
 
 		if (slip)

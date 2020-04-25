@@ -126,12 +126,11 @@ void HarpyAttack(ITEM_INFO* item, short itemNum)
 			pos.yPos = pos1.y;
 			pos.zPos = pos1.z;
 
-			// FIXME:
 			short angles[2];
-			/*phd_GetVectorAngles(pos3.x - pos1.x,
+			phd_GetVectorAngles(pos3.x - pos1.x,
 				pos3.y - pos1.y,
 				pos3.z - pos1.z,
-				angles);*/
+				angles);
 
 			pos.xRot = angles[1];
 			pos.yRot = angles[0];
@@ -156,10 +155,10 @@ void HarpyAttack(ITEM_INFO* item, short itemNum)
 			pos.zPos = pos1.z;
 
 			short angles[2];
-			/*phd_GetVectorAngles(pos3.x - pos1.x,
+			phd_GetVectorAngles(pos3.x - pos1.x,
 				pos3.y - pos1.y,
 				pos3.z - pos1.z,
-				angles);*/
+				angles);
 
 			pos.xRot = angles[1];
 			pos.yRot = angles[0];
