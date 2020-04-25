@@ -1308,8 +1308,8 @@ short GetDoor(FLOOR_INFO* floor)
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 {
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	item->pos.xPos += (c * x + s * z) >> W2V_SHIFT;
 	item->pos.yPos += y;
@@ -2187,7 +2187,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 								}
 								else
 								{
-									angle = ATAN(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
+									angle = phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
 									if (angle > -ANGLE(90) && angle < ANGLE(90))
 									{
 										item->hitPoints = 0;
@@ -2622,7 +2622,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 	// Create the bounding box for raw collision detection
 	Vector3 boxCentre = Vector3(itemOrStaticPos->xPos + (box[1] + box[0]) / 2.0f, itemOrStaticPos->yPos + (box[3] + box[2]) / 2.0f, itemOrStaticPos->zPos + (box[5] + box[4]) / 2.0f);
 	Vector3 boxExtent = Vector3((box[1] - box[0]) / 2.0f, (box[3] - box[2]) / 2.0f, (box[5] - box[4]) / 2.0f);
-	Quaternion rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, TR_ANGLE_TO_RAD(itemOrStaticPos->yRot));
+	Quaternion rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, TO_RAD(itemOrStaticPos->yRot));
 	BoundingOrientedBox obox = BoundingOrientedBox(boxCentre, boxExtent, rotation);
 
 	// Get the collision with the bounding box
@@ -2899,11 +2899,11 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
-	item->pos.xPos += lateral * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-	item->pos.zPos += lateral * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 }
 
 void DoFlipMap(short group)

@@ -79,8 +79,8 @@ void SkeletonControl(short itemNum)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	int dx = 870 * SIN(item->pos.yRot) >> 14;
-	int dz = 870 * COS(item->pos.yRot) >> 14;
+	int dx = 870 * phd_sin(item->pos.yRot) >> 14;
+	int dz = 870 * phd_cos(item->pos.yRot) >> 14;
 
 	x += dx;
 	z += dz;
@@ -170,7 +170,7 @@ void SkeletonControl(short itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.distance = dx * dx + dz * dz;
 		}
 
@@ -196,8 +196,8 @@ void SkeletonControl(short itemNum)
 		}
 		else
 		{
-			dx = 870 * SIN(item->pos.yRot + ANGLE(45)) >> 14;
-			dz = 870 * COS(item->pos.yRot + ANGLE(45)) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot + ANGLE(45)) >> 14;
+			dz = 870 * phd_cos(item->pos.yRot + ANGLE(45)) >> 14;
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -207,8 +207,8 @@ void SkeletonControl(short itemNum)
 			floor = GetFloor(x, y, z, &roomNumber);
 			int height4 = GetFloorHeight(floor, x, y, z);
 
-			dx = 870 * SIN(item->pos.yRot + 14336) >> 14;
-			dz = 870 * COS(item->pos.yRot + 14336) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot + 14336) >> 14;
+			dz = 870 * phd_cos(item->pos.yRot + 14336) >> 14;
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -227,8 +227,8 @@ void SkeletonControl(short itemNum)
 					someFlag2 = false;
 			}
 
-			dx = 870 * SIN(item->pos.yRot - 8192) >> 14;
-			dz = 870 * COS(item->pos.yRot - 8192) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot - 8192) >> 14;
+			dz = 870 * phd_cos(item->pos.yRot - 8192) >> 14;
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -238,8 +238,8 @@ void SkeletonControl(short itemNum)
 			floor = GetFloor(x, y, z, &roomNumber);
 			int height6 = GetFloorHeight(floor, x, y, z);
 
-			dx = 870 * SIN(item->pos.yRot - 14336) >> 14;
-			dz = 870 * COS(item->pos.yRot - 14336) >> 14;
+			dx = 870 * phd_sin(item->pos.yRot - 14336) >> 14;
+			dz = 870 * phd_cos(item->pos.yRot - 14336) >> 14;
 
 			x = item->pos.xPos + dx;
 			y = item->pos.yPos;
@@ -759,9 +759,9 @@ void WakeUpSkeleton(ITEM_INFO* item)
 		spark->x = fx->pos.xPos;
 		spark->y = fx->pos.yPos;
 		spark->z = fx->pos.zPos;
-		spark->xVel = SIN(fx->pos.yRot) >> 2;  
+		spark->xVel = phd_sin(fx->pos.yRot) >> 2;  
 		spark->yVel = 0;
-		spark->zVel = COS(fx->pos.yRot) >> 2;
+		spark->zVel = phd_cos(fx->pos.yRot) >> 2;
 		spark->transType = 2;
 		spark->friction = 68;
 		spark->flags = 26;

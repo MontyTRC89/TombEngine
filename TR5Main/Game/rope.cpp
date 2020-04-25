@@ -141,11 +141,11 @@ void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* destination) // (F) 
 
 void _0x0046D420(int* matrix, short* angle) // (F) (D)
 {
-	angle[0] = ATAN(sqrt(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
+	angle[0] = phd_atan(sqrt(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
 	if (matrix[M12] >= 0 && angle[0] > 0 || matrix[M12] < 0 && angle[0] < 0)
 		angle[0] = -angle[0];
-	angle[1] = ATAN(matrix[M22], matrix[M02]);
-	angle[2] = ATAN(matrix[M00] * COS(angle[1]) - matrix[M20] * SIN(angle[1]), matrix[M21] * SIN(angle[1]) - matrix[M01] * COS(angle[1]));
+	angle[1] = phd_atan(matrix[M22], matrix[M02]);
+	angle[2] = phd_atan(matrix[M00] * phd_cos(angle[1]) - matrix[M20] * phd_sin(angle[1]), matrix[M21] * phd_sin(angle[1]) - matrix[M01] * phd_cos(angle[1]));
 }
 
 void RopeControl(short itemNumber) // (F) (D)
@@ -178,7 +178,7 @@ void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && (l->currentAnimState == STATE_LARA_REACH || l->currentAnimState == STATE_LARA_JUMP_UP) && l->gravityStatus && l->fallspeed > 0 && rope->active)
 	{
 		frame = (ANIM_FRAME*) GetBoundsAccurate(l);
-		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->MinY + 512, l->pos.zPos + (frame->MaxZ * COS(l->pos.yRot) >> W2V_SHIFT), l->currentAnimState == STATE_LARA_REACH ? 128 : 320);
+		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->MinY + 512, l->pos.zPos + (frame->MaxZ * phd_cos(l->pos.yRot) >> W2V_SHIFT), l->currentAnimState == STATE_LARA_REACH ? 128 : 320);
 		if (segment >= 0)
 		{
 			if (l->currentAnimState == STATE_LARA_REACH)
@@ -390,9 +390,9 @@ int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int radius) // (F) (D)
 void ApplyVelocityToRope(int node, short angle, short n) // (F) (D)
 {
 	SetPendulumVelocity(
-		(unsigned short) n * SIN(angle) >> 2,
+		(unsigned short) n * phd_sin(angle) >> 2,
 		0,
-		(unsigned short) n * COS(angle) >> 2); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
+		(unsigned short) n * phd_cos(angle) >> 2); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
 }
 
 void SetPendulumVelocity(int x, int y, int z) // (F) (D)

@@ -30,10 +30,10 @@ void KnifeControl(short fxNum)
 		fx->counter--;
 	}
 
-	speed = (fx->speed * COS(fx->pos.xRot)) >> W2V_SHIFT;
-	fx->pos.zPos += (speed * COS(fx->pos.yRot)) >> W2V_SHIFT;
-	fx->pos.xPos += (speed * SIN(fx->pos.yRot)) >> W2V_SHIFT;
-	fx->pos.yPos += (fx->speed * SIN(-fx->pos.xRot) >> W2V_SHIFT);
+	speed = (fx->speed * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
+	fx->pos.zPos += (speed * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
+	fx->pos.xPos += (speed * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
+	fx->pos.yPos += (fx->speed * phd_sin(-fx->pos.xRot) >> W2V_SHIFT);
 
 	roomNumber = fx->roomNumber;
 	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);

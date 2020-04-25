@@ -71,9 +71,8 @@ void ImpThrowStones(ITEM_INFO* item)
 	int dy = pos1.y - pos2.y;
 	int dz = pos1.z - pos2.z;
 
-	// FIXME:
 	short angles[2];
-	//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+	phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 	
 	int distance = sqrt(SQUARE(dx) + SQUARE(dy) + SQUARE(dz));
 	if (distance < 8)
@@ -141,7 +140,7 @@ void ControlImp(short itemNumber)
 			}
 			else
 			{
-				angle2 = ATAN(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
+				angle2 = phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
 			}
 
 			int d1 = item->pos.yPos - LaraItem->pos.yPos + 384;
@@ -158,7 +157,7 @@ void ControlImp(short itemNumber)
 
 			int d2 = sqrt(info.distance);
 
-			info.xAngle = ATAN(d2, d1);
+			info.xAngle = phd_atan(d2, d1);
 
 			GetCreatureMood(item, &info, VIOLENT);
 			if (item->currentAnimState == STATE_IMP_SCARED)

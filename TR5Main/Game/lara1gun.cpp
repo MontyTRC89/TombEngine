@@ -75,9 +75,9 @@ void FireHarpoon()
 		{
 			find_target_point(Lara.target, &pos);
 
-			item->pos.yRot = ATAN(pos.z - item->pos.zPos, pos.x - item->pos.xPos);
+			item->pos.yRot = phd_atan(pos.z - item->pos.zPos, pos.x - item->pos.xPos);
 			int distance = sqrt(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
-			item->pos.xRot = -ATAN(distance, pos.y - item->pos.yPos);
+			item->pos.xRot = -phd_atan(distance, pos.y - item->pos.yPos);
 		}
 		else
 		{
@@ -87,8 +87,8 @@ void FireHarpoon()
 
 		item->pos.zRot = 0;
 
-		item->fallspeed = (short)(-HARPOON_SPEED * SIN(item->pos.xRot) >> W2V_SHIFT);
-		item->speed = (short)(HARPOON_SPEED * COS(item->pos.xRot) >> W2V_SHIFT);
+		item->fallspeed = (short)(-HARPOON_SPEED * phd_sin(item->pos.xRot) >> W2V_SHIFT);
+		item->speed = (short)(HARPOON_SPEED * phd_cos(item->pos.xRot) >> W2V_SHIFT);
 		item->hitPoints = HARPOON_TIME;
 
 		AddActiveItem(itemNumber);
@@ -107,9 +107,9 @@ void ControlHarpoonBolt(short itemNumber)
 	int oldZ = item->pos.zPos;
 	short oldRoom = item->roomNumber;
 
-	item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
 	item->pos.yPos += item->fallspeed;
-	item->pos.zPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -141,8 +141,8 @@ void ControlHarpoonBolt(short itemNumber)
 				continue;
 
 			// get vector from target to bolt and check against x,z bounds
-			short c = COS(target->pos.yRot);
-			short s = SIN(target->pos.yRot);
+			short c = phd_cos(target->pos.yRot);
+			short s = phd_sin(target->pos.yRot);
 
 			int x = item->pos.xPos - target->pos.xPos;
 			int z = item->pos.zPos - target->pos.zPos;
@@ -227,8 +227,8 @@ void ControlHarpoonBolt(short itemNumber)
 			item->pos.xRot -= ANGLE(1);
 			if (item->pos.xRot < -16384)
 				item->pos.xRot = -16384;
-			item->fallspeed = (short)(-HARPOON_SPEED * SIN(item->pos.xRot) >> W2V_SHIFT);
-			item->speed = (short)(HARPOON_SPEED * COS(item->pos.xRot) >> W2V_SHIFT);
+			item->fallspeed = (short)(-HARPOON_SPEED * phd_sin(item->pos.xRot) >> W2V_SHIFT);
+			item->speed = (short)(HARPOON_SPEED * phd_cos(item->pos.xRot) >> W2V_SHIFT);
 		}
 		else
 		{
@@ -236,8 +236,8 @@ void ControlHarpoonBolt(short itemNumber)
 			if ((Wibble & 15) == 0)
 				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 0, 0,BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
 			//TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
-			item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * SIN(item->pos.xRot) >> W2V_SHIFT);
-			item->speed = (short)((HARPOON_SPEED >> 1) * COS(item->pos.xRot) >> W2V_SHIFT);
+			item->fallspeed = (short)(-(HARPOON_SPEED >> 1) * phd_sin(item->pos.xRot) >> W2V_SHIFT);
+			item->speed = (short)((HARPOON_SPEED >> 1) * phd_cos(item->pos.xRot) >> W2V_SHIFT);
 		}
 	}
 
@@ -321,7 +321,7 @@ void FireGrenade()
 			}
 
 			item->speed = GRENADE_SPEED;
-			item->fallspeed = (-512 * SIN(item->pos.xRot)) >> W2V_SHIFT;
+			item->fallspeed = (-512 * phd_sin(item->pos.xRot)) >> W2V_SHIFT;
 			item->currentAnimState = item->pos.xRot;
 			item->goalAnimState = item->pos.yRot;
 			item->requiredAnimState = 0;
@@ -400,7 +400,7 @@ void ControlGrenade(short itemNumber)
 					newGrenade->pos.yRot = GetRandomControl() * 2;
 					newGrenade->pos.zRot = 0;
 					newGrenade->speed = 64;
-					newGrenade->fallspeed = -64 * SIN(newGrenade->pos.xRot) >> W2V_SHIFT;
+					newGrenade->fallspeed = -64 * phd_sin(newGrenade->pos.xRot) >> W2V_SHIFT;
 					newGrenade->currentAnimState = newGrenade->pos.xRot;
 					newGrenade->goalAnimState = newGrenade->pos.yRot;
 					newGrenade->requiredAnimState = 0;
@@ -466,9 +466,9 @@ void ControlGrenade(short itemNumber)
 	if (item->speed && aboveWater)
 	{
 		Matrix world = Matrix::CreateFromYawPitchRoll(
-			TR_ANGLE_TO_RAD(item->pos.yRot - ANGLE(180)),
-			TR_ANGLE_TO_RAD(item->pos.xRot),
-			TR_ANGLE_TO_RAD(item->pos.zRot)
+			TO_RAD(item->pos.yRot - ANGLE(180)),
+			TO_RAD(item->pos.xRot),
+			TO_RAD(item->pos.zRot)
 		) * Matrix::CreateTranslation(0, 0, -64);
 
 		int wx = world.Translation().x;
@@ -499,8 +499,8 @@ void ControlGrenade(short itemNumber)
 	XMMATRIX translation;
 	XMMATRIX rotation;
 
-	XMMATRIXRotationYawPitchRoll(&rotation, TR_ANGLE_TO_RAD(item->pos.yRot), TR_ANGLE_TO_RAD(item->pos.xRot),
-		TR_ANGLE_TO_RAD(item->pos.zRot));
+	XMMATRIXRotationYawPitchRoll(&rotation, TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot),
+		TO_RAD(item->pos.zRot));
 	XMMATRIXTranslation(&translation, 0, 0, -64);
 	XMMATRIXMultiply(&transform, &rotation, &translation);
 
@@ -512,9 +512,9 @@ void ControlGrenade(short itemNumber)
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 */
 
-	xv = ((item->speed * SIN(item->goalAnimState)) >> W2V_SHIFT);
+	xv = ((item->speed * phd_sin(item->goalAnimState)) >> W2V_SHIFT);
 	yv = item->fallspeed;
-	zv = ((item->speed * COS(item->goalAnimState)) >> W2V_SHIFT);
+	zv = ((item->speed * phd_cos(item->goalAnimState)) >> W2V_SHIFT);
 
 	item->pos.xPos += xv;
 	item->pos.yPos += yv;
@@ -1089,9 +1089,9 @@ void ControlCrossbowBolt(short itemNumber)
 		land = true;
 	}
 
-	item->pos.xPos += ((item->speed * COS(item->pos.xRot) >> W2V_SHIFT) * SIN(item->pos.yRot)) >> W2V_SHIFT;
-	item->pos.yPos += item->speed * SIN(-item->pos.xRot) >> W2V_SHIFT;
-	item->pos.zPos += ((item->speed * COS(item->pos.xRot) >> W2V_SHIFT) * COS(item->pos.yRot)) >> W2V_SHIFT;
+	item->pos.xPos += ((item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT) * phd_sin(item->pos.yRot)) >> W2V_SHIFT;
+	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot) >> W2V_SHIFT;
+	item->pos.zPos += ((item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT) * phd_cos(item->pos.yRot)) >> W2V_SHIFT;
 
 	roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -1299,9 +1299,9 @@ void RifleHandler(int weaponType)
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
 			TriggerDynamicLight(
-				LaraItem->pos.xPos + (SIN(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
+				LaraItem->pos.xPos + (phd_sin(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
 				LaraItem->pos.yPos + (GetRandomControl() & 0x7F) - 575,
-				LaraItem->pos.zPos + (COS(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
+				LaraItem->pos.zPos + (phd_cos(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
 				12,
 				(GetRandomControl() & 0x3F) + 192,
 				(GetRandomControl() & 0x1F) + 128,

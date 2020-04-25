@@ -54,10 +54,10 @@ extern Inventory* g_Inventory;
 
 int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
-	pos->y = item->pos.yPos - (dz * SIN(item->pos.xRot) >> W2V_SHIFT) + (dx * SIN(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
 
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
 	pos->x = item->pos.xPos + ((dz * s + dx * c) >> W2V_SHIFT);
@@ -227,9 +227,9 @@ int JeepCanGetOff()
 
 	short angle = item->pos.yRot + 0x4000;
 
-	int x = item->pos.xPos - (JEEP_GETOFF_DISTANCE * SIN(angle) >> W2V_SHIFT);
+	int x = item->pos.xPos - (JEEP_GETOFF_DISTANCE * phd_sin(angle) >> W2V_SHIFT);
 	int y = item->pos.yPos;
-	int z = item->pos.zPos - (JEEP_GETOFF_DISTANCE * COS(angle) >> W2V_SHIFT);
+	int z = item->pos.zPos - (JEEP_GETOFF_DISTANCE * phd_cos(angle) >> W2V_SHIFT);
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -285,9 +285,9 @@ void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short speed, int 
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;
-	spark->xVel = speed * SIN(angle) >> (W2V_SHIFT + 2);
+	spark->xVel = speed * phd_sin(angle) >> (W2V_SHIFT + 2);
 	spark->yVel = -8 - (GetRandomControl() & 7);
-	spark->zVel = speed * COS(angle) >> (W2V_SHIFT + 2);
+	spark->zVel = speed * phd_cos(angle) >> (W2V_SHIFT + 2);
 	spark->friction = 4;
 
 	if (GetRandomControl() & 1)
@@ -351,8 +351,8 @@ int JeepCheckGetOff()
 			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 			LaraItem->goalAnimState = STATE_LARA_STOP;
 			LaraItem->currentAnimState = STATE_LARA_STOP;
-			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * SIN(LaraItem->pos.yRot) >> W2V_SHIFT;
-			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * COS(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
+			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
 			g_LaraExtra.Vehicle = NO_ITEM;
@@ -417,7 +417,7 @@ int GetOnJeep(int itemNumber)
 	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < -32000)
 		return 0;
 
-	short angle = ATAN(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
+	short angle = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
 	angle -= item->pos.yRot;
 
 	if ((angle > -ANGLE(45)) && (angle < ANGLE(135)))
@@ -471,8 +471,8 @@ int GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 
 	if (p->x || p->z)
 	{
-		int c = COS(item->pos.yRot);
-		int s = SIN(item->pos.yRot);
+		int c = phd_cos(item->pos.yRot);
+		int s = phd_sin(item->pos.yRot);
 		int front = ((p->z * c) + (p->x * s)) >> W2V_SHIFT;
 		int side = (-(p->z * s) + (p->x * c)) >> W2V_SHIFT;
 
@@ -706,15 +706,15 @@ int JeepDynamics(ITEM_INFO* item)
 	if (item->pos.yPos < height)
 		speed = item->speed;
 	else
-		speed = item->speed * COS(item->pos.xRot) >> W2V_SHIFT;
+		speed = item->speed * phd_cos(item->pos.xRot) >> W2V_SHIFT;
 
-	item->pos.xPos += (speed * SIN(jeep->momentumAngle)) >> W2V_SHIFT;
-	item->pos.zPos += (speed * COS(jeep->momentumAngle)) >> W2V_SHIFT;
+	item->pos.xPos += (speed * phd_sin(jeep->momentumAngle)) >> W2V_SHIFT;
+	item->pos.zPos += (speed * phd_cos(jeep->momentumAngle)) >> W2V_SHIFT;
 	
 	int slip = 0;
 	if (item->pos.yPos >= height)
 	{
-		slip = JEEP_SLIP * SIN(item->pos.xRot) >> W2V_SHIFT;
+		slip = JEEP_SLIP * phd_sin(item->pos.xRot) >> W2V_SHIFT;
 
 		if (abs(slip) > 16)
 		{
@@ -726,20 +726,20 @@ int JeepDynamics(ITEM_INFO* item)
 			jeep->velocity = slip;
 		}
 
-		slip = JEEP_SLIP_SIDE * SIN(item->pos.zRot) >> W2V_SHIFT;
+		slip = JEEP_SLIP_SIDE * phd_sin(item->pos.zRot) >> W2V_SHIFT;
 		if (abs(slip) > JEEP_SLIP_SIDE / 4)
 		{
 			JeepNoGetOff = 1;
 
 			if (slip >= 0)
 			{
-				item->pos.xPos += (slip - 24) * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-				item->pos.zPos += (slip - 24) * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+				item->pos.xPos += (slip - 24) * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+				item->pos.zPos += (slip - 24) * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 			}
 			else
 			{
-				item->pos.xPos += (slip - 24) * SIN(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
-				item->pos.zPos += (slip - 24) * COS(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
+				item->pos.xPos += (slip - 24) * phd_sin(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
+				item->pos.zPos += (slip - 24) * phd_cos(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
 			}
 		}
 	}
@@ -822,7 +822,7 @@ int JeepDynamics(ITEM_INFO* item)
 	
 	if (collide)
 	{
-		newspeed = ((item->pos.zPos - oldPos.z) * COS(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * SIN(jeep->momentumAngle)) >> W2V_SHIFT;
+		newspeed = ((item->pos.zPos - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * phd_sin(jeep->momentumAngle)) >> W2V_SHIFT;
 		newspeed <<= 8;
 
 		if ((&Items[g_LaraExtra.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
@@ -1573,7 +1573,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				AddActiveItem(v4);
 			}*/
 
-			short ang = ATAN(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
+			short ang = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
 			ang -= item->pos.yRot;
 
 			if ((ang > -(ONE_DEGREE * 45)) && (ang < (ONE_DEGREE * 135)))
@@ -1716,26 +1716,26 @@ int JeepControl()
 	if (bc.y >= hbc)
 	{
 		if (height >= (hfl + hfr) >> 1)
-			xRot = ATAN(1100, hbc - height);
+			xRot = phd_atan(1100, hbc - height);
 		else
-			xRot = ATAN(550, hbc - item->pos.yPos);
+			xRot = phd_atan(550, hbc - item->pos.yPos);
 	}
 	else
 	{
 		if (height >= (hfl + hfr) >> 1)
 		{
-			xRot = ATAN(550, item->pos.yPos - height);
+			xRot = phd_atan(550, item->pos.yPos - height);
 		}
 		else
 		{
-			xRot = -ATAN(137, oldY - item->pos.yPos);
+			xRot = -phd_atan(137, oldY - item->pos.yPos);
 			if (jeep->velocity < 0)
 				xRot = -xRot;
 		}
 	}
 
 	item->pos.xRot += (xRot - item->pos.xRot) >> 2;
-	item->pos.zRot += (ATAN(256, height - fl.y) - item->pos.zRot) >> 2;
+	item->pos.zRot += (phd_atan(256, height - fl.y) - item->pos.zRot) >> 2;
 
 	if (!(jeep->flags & JF_DEAD))
 	{

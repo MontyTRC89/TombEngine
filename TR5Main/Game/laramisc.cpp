@@ -967,11 +967,11 @@ void AnimateLara(ITEM_INFO* item)
 
 	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
-		item->pos.xPos += item->speed * SIN(Lara.moveAngle) >> W2V_SHIFT; 
-		item->pos.zPos += item->speed * COS(Lara.moveAngle) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * phd_sin(Lara.moveAngle) >> W2V_SHIFT; 
+		item->pos.zPos += item->speed * phd_cos(Lara.moveAngle) >> W2V_SHIFT;
 
-		item->pos.xPos += lateral * SIN(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
-		item->pos.zPos += lateral * COS(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
+		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
 	}
 }
 
@@ -1012,11 +1012,11 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	diff2.x = diff.x;
 	diff2.y = diff.y;
 	diff2.z = diff.z;
-	ScaleVector(&vec3, COS(ropeY), &vec3);
+	ScaleVector(&vec3, phd_cos(ropeY), &vec3);
 	ScaleVector(&diff2, DotProduct(&diff2, &vec2), &diff2);
-	ScaleVector(&diff2, 4096 - COS(ropeY), &diff2);
+	ScaleVector(&diff2, 4096 - phd_cos(ropeY), &diff2);
 	CrossProduct(&diff, &vec2, &vec4);
-	ScaleVector(&vec4, SIN(ropeY), &vec4);
+	ScaleVector(&vec4, phd_sin(ropeY), &vec4);
 	diff2.x += vec3.x;
 	diff2.y += vec3.y;
 	diff2.z += vec3.z;
@@ -1050,9 +1050,9 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	item->pos.zPos = rope->position.z + (rope->meshSegment[Lara.ropeSegment].z >> 16);
 
 	Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
-		TR_ANGLE_TO_DEGREES(angle[1]),
-		TR_ANGLE_TO_DEGREES(angle[0]),
-		TR_ANGLE_TO_DEGREES(angle[2])
+		TO_DEGREES(angle[1]),
+		TO_DEGREES(angle[0]),
+		TO_DEGREES(angle[2])
 	);
 	
 	// PHD_MATH!

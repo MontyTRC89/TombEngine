@@ -122,7 +122,7 @@ void MonkeyControl(short itemNumber)
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
 
-			laraInfo.angle = ATAN(dz, dz) - item->pos.yRot; //only need to fill out the bits of laraInfo that will be needed by TargetVisible
+			laraInfo.angle = phd_atan(dz, dz) - item->pos.yRot; //only need to fill out the bits of laraInfo that will be needed by TargetVisible
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 

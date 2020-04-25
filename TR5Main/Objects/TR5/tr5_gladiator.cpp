@@ -86,7 +86,7 @@ void ControlGladiator(short itemNumber)
 				int dx = LaraItem->pos.xPos - item->pos.xPos;
 				int dz = LaraItem->pos.zPos - item->pos.zPos;
 			
-				rot = ATAN(dz, dx) - item->pos.yRot;
+				rot = phd_atan(dz, dx) - item->pos.yRot;
 				if (rot <= -ANGLE(90) || rot >= ANGLE(90))
 					unknown = false;
 

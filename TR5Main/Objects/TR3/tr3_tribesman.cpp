@@ -286,9 +286,8 @@ void TribesmanShotDart(ITEM_INFO* item)
 		pos2.z = tribesmanDartsBite2.z << 1;
 		GetJointAbsPosition(item, &pos2, tribesmanDartsBite2.meshNum);
 
-		// FIXME:
 		short angles[2];
-		//phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 		dartItem->pos.xPos = pos1.x;
 		dartItem->pos.yPos = pos1.y;

@@ -87,7 +87,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 
 		// Finish the world matrix
 		translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
-		rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(rotY), TR_ANGLE_TO_RAD(rotX), TR_ANGLE_TO_RAD(rotZ));
+		rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rotY), TO_RAD(rotX), TO_RAD(rotZ));
 		scale = Matrix::CreateScale(0.5f);
 
 		world = scale * rotation;
@@ -413,7 +413,7 @@ bool Renderer11::drawGunShells()
 			RendererObject* moveableObj = m_moveableObjects[gunshell->objectNumber];
 
 			Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(gunshell->pos.yRot), TR_ANGLE_TO_RAD(gunshell->pos.xRot), TR_ANGLE_TO_RAD(gunshell->pos.zRot));
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.yRot), TO_RAD(gunshell->pos.xRot), TO_RAD(gunshell->pos.zRot));
 			Matrix world = rotation * translation;
 
 			m_stItem.World = world;
@@ -568,7 +568,7 @@ int Renderer11::drawInventoryScene()
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
 			Matrix translation = Matrix::CreateTranslation(x, y, z);
-			Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
+			Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
 			Matrix transform = (scale * rotation) * translation;
 
 			OBJECT_INFO * obj = &Objects[objectNumber];
@@ -2274,7 +2274,7 @@ bool Renderer11::drawStatics(bool transparent)
 		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
 		RendererMesh* mesh = staticObj->ObjectMeshes[0];
 
-		m_stStatic.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
+		m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
 		m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);

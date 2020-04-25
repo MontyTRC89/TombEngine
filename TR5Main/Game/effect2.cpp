@@ -1250,9 +1250,9 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
 		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
-		spark->x = dl * SIN(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + x - 8;
+		spark->x = dl * phd_sin(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + x - 8;
 		spark->y = (GetRandomControl() & 0xF) + y - 8;
-		spark->z = dl * COS(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + z - 8;
+		spark->z = dl * phd_cos(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + z - 8;
 		spark->xVel = 0;
 		spark->zVel = 0;
 		spark->friction = 0;
@@ -1284,11 +1284,11 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 1;
 	dl = GetRandomControl() % 1408 + 64;
-	spark->x = dl * SIN(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + x - 16;
+	spark->x = dl * phd_sin(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->xVel = 0;
 	spark->zVel = 0;
-	spark->z = dl * COS(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + z - 16;
+	spark->z = dl * phd_cos(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + z - 16;
 	spark->friction = 0;
 	spark->flags = 10;
 	spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) + 128;

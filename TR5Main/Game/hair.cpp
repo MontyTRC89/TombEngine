@@ -187,7 +187,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			/**(MatrixPtr + M13) = world._24 = Hairs[ponytail][i].pos.yPos << W2V_SHIFT;
 			/**(MatrixPtr + M23) = world._34 = Hairs[ponytail][i].pos.zPos << W2V_SHIFT;*/
 
-			world = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(Hairs[ponytail][i].pos.yRot), TR_ANGLE_TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;
+			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;
 			//phd_RotYXZ(Hairs[ponytail][i].pos.yRot, Hairs[ponytail][i].pos.xRot, 0);
 			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
@@ -314,8 +314,8 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			}
 
 			int distance = sqrt(SQUARE(Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos) + SQUARE(Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
-			Hairs[ponytail][i - 1].pos.yRot = ATAN((Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos), (Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
-			Hairs[ponytail][i - 1].pos.xRot = -ATAN(distance, Hairs[ponytail][i].pos.yPos - Hairs[ponytail][i - 1].pos.yPos);
+			Hairs[ponytail][i - 1].pos.yRot = phd_atan((Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos), (Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
+			Hairs[ponytail][i - 1].pos.xRot = -phd_atan(distance, Hairs[ponytail][i].pos.yPos - Hairs[ponytail][i - 1].pos.yPos);
 
 			//phd_PushUnitMatrix();
 			world = Matrix::Identity;
@@ -326,7 +326,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			world = Matrix::CreateTranslation(Hairs[ponytail][i - 1].pos.xPos, Hairs[ponytail][i - 1].pos.yPos, Hairs[ponytail][i - 1].pos.zPos) * world;
 			
 			//phd_RotYXZ(Hairs[ponytail][i - 1].pos.yRot, Hairs[ponytail][i - 1].pos.xRot, 0);
-			world = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(Hairs[ponytail][i - 1].pos.yRot), TR_ANGLE_TO_RAD(Hairs[ponytail][i - 1].pos.xRot), 0) * world;
+			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i - 1].pos.yRot), TO_RAD(Hairs[ponytail][i - 1].pos.xRot), 0) * world;
 
 			if (i == HAIR_SEGMENTS - 1)
 				//phd_TranslateRel(*(bone - 3), *(bone - 2), *(bone - 1));

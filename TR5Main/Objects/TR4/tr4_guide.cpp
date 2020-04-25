@@ -84,7 +84,7 @@ void GuideControl(short itemNum)
 	int dx = LaraItem->pos.xPos - item->pos.xPos;
 	int dz = LaraItem->pos.zPos - item->pos.zPos;
 
-	laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+	laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 
 	laraInfo.ahead = true;
 	if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
@@ -103,9 +103,9 @@ void GuideControl(short itemNum)
 	short rot2 = 0;
 
 	if (dx <= dz)
-		laraInfo.xAngle = ATAN(dz + (dx >> 1), dy);
+		laraInfo.xAngle = phd_atan(dz + (dx >> 1), dy);
 	else
-		laraInfo.xAngle = ATAN(dx + (dz >> 1), dy);
+		laraInfo.xAngle = phd_atan(dx + (dz >> 1), dy);
 
 	ITEM_INFO* foundEnemy = NULL;
 

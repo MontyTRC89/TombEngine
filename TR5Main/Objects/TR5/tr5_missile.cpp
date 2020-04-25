@@ -34,13 +34,12 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		// FIXME:
 		short angles[2];
-		/*phd_GetVectorAngles(
+		phd_GetVectorAngles(
 			LaraItem->pos.xPos - fx->pos.xPos,
 			LaraItem->pos.yPos - fx->pos.yPos - 256,
 			LaraItem->pos.zPos - fx->pos.zPos,
-			angles);*/
+			angles);
 
 		int dh;
 		if (fx->flag1)
@@ -103,11 +102,11 @@ void MissileControl(short itemNumber)
 	int y = fx->pos.yPos;
 	int z = fx->pos.zPos;
 
-	int c = fx->speed * COS(fx->pos.xRot) >> W2V_SHIFT;
+	int c = fx->speed * phd_cos(fx->pos.xRot) >> W2V_SHIFT;
 
-	fx->pos.xPos += c * SIN(fx->pos.yRot) >> W2V_SHIFT;
-	fx->pos.yPos += fx->speed * SIN(-fx->pos.xRot) >> W2V_SHIFT;
-	fx->pos.zPos += c * COS(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.xPos += c * phd_sin(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot) >> W2V_SHIFT;
+	fx->pos.zPos += c * phd_cos(fx->pos.yRot) >> W2V_SHIFT;
 
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);

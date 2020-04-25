@@ -176,28 +176,6 @@ void DrawAnimatingItem(ITEM_INFO* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
 }
 
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds)
-{
-	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TR_ANGLE_TO_RAD(pos->yRot),
-		TR_ANGLE_TO_RAD(pos->xRot),
-		TR_ANGLE_TO_RAD(pos->zRot)
-	);
-
-	Vector3 bMin = Vector3(bounds[0], bounds[2], bounds[4]);
-	Vector3 bMax = Vector3(bounds[1], bounds[3], bounds[5]);
-
-	bMin = Vector3::Transform(bMin, world);
-	bMax = Vector3::Transform(bMax, world);
-
-	tbounds[0] = bMin.x;
-	tbounds[2] = bMin.y;
-	tbounds[4] = bMin.z;
-	tbounds[1] = bMax.x;
-	tbounds[3] = bMax.y;
-	tbounds[5] = bMax.z;
-}
-
 void GetLaraJointPosition(PHD_VECTOR* pos, int joint)
 {
 	if (joint > 14)

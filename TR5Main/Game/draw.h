@@ -21,5 +21,4 @@ int Sync();
 bool TIME_Init();
 bool TIME_Reset();
 void DrawAnimatingItem(ITEM_INFO* item);
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds);
 void GetLaraJointPosition(PHD_VECTOR* pos, int joint);
