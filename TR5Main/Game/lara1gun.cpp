@@ -1524,13 +1524,13 @@ void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int sear
 	{
 		if (search)
 		{
-			int numSpheres = GetSpheres(item2, SphereList, 1);
+			int numSpheres = GetSpheres(item2, SpheresList, 1, Matrix::Identity);
 			int best = -1;
 			int bestDistance = 0x7FFFFFFF;
 
 			for (int i = 0; i < numSpheres; i++)
 			{
-				SPHERE* sphere = &SphereList[i];
+				SPHERE* sphere = &SpheresList[i];
 
 				int dx = sphere->x - item1->pos.xPos;
 				int dy = sphere->y - item1->pos.yPos;

@@ -485,8 +485,66 @@ void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint)
 	}
 }
 
-int Renderer11::GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
+int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
 {
+	RendererItem* rendererItem = &m_items[itemNumber];
+	rendererItem->Id = itemNumber;
+	rendererItem->Item = &Items[itemNumber];
+	ITEM_INFO* item = rendererItem->Item;
+
+	if (!item)
+		return 0;
+
+	if (!rendererItem->DoneAnimations)
+	{
+		if (itemNumber == Lara.itemNumber)
+			UpdateLaraAnimations();
+		else
+			UpdateItemAnimations(itemNumber);
+	}
+
+	int x, y, z;
+	Matrix world;
+
+	if (worldSpace & 1)
+	{
+		x = item->pos.xPos;
+		y = item->pos.yPos;
+		z = item->pos.zPos;
+
+		world = Matrix::Identity;
+	}
+	else
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+
+		world = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos) * local;
+	}
+
+	world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
+
+	RendererObject* moveable = m_moveableObjects[item->objectNumber];
+	
+	for (int i = 0; i < moveable->ObjectMeshes.size(); i++)
+	{
+		RendererMesh* mesh = moveable->ObjectMeshes[i];
+
+		Vector3 pos;
+		if (worldSpace & 2)
+			pos = Vector3::Zero;
+		else
+			pos = mesh->Sphere.Center;
+
+		spheres[i].Center = Vector3(x, y, z) + Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
+		spheres[i].Radius = mesh->Sphere.Radius;
+	}
+
+	return moveable->ObjectMeshes.size();
+
+	/*
+
 	short itemNumber = (item - Items) / sizeof(ITEM_INFO);
 
 	int x, y, z;
@@ -555,7 +613,7 @@ int Renderer11::GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
 		ptr++;
 	}
 
-	return obj->ObjectMeshes.size();
+	return obj->ObjectMeshes.size();*/
 }
 
 Matrix Renderer11::GetBoneMatrix(ITEM_INFO* item, int joint)

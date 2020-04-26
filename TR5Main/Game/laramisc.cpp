@@ -973,6 +973,9 @@ void AnimateLara(ITEM_INFO* item)
 		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
 		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
 	}
+
+	// Update matrices
+	g_Renderer->UpdateLaraAnimations();
 }
 
 void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
