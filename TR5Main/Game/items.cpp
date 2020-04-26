@@ -378,13 +378,14 @@ void InitialiseItem(short itemNum)
 	}
 	else
 	{
-		item->meshBits = 0xFFFFFFFF;
+		item->meshBits = -1;
 	}
 
 	item->touchBits = 0;
 	item->afterDeath = false;
 	item->firedWeapon = 0;
 	item->data = NULL;
+	item->swapMeshFlags = 0;
 
 	if (item->flags & IFLAG_INVISIBLE)
 	{

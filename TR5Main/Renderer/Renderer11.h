@@ -917,7 +917,7 @@ public:
 	void											UpdateItemAnimations(int itemNumber);
 	void											GetLaraAbsBonePosition(Vector3* pos, int joint);
 	void											GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint);
-	int												GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace);
+	int												GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 	Matrix											GetBoneMatrix(ITEM_INFO* item, int joint);
 
 	RendererMesh* getMeshFromMeshPtr(unsigned int meshp);

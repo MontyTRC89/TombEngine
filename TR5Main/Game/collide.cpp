@@ -1470,10 +1470,10 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				short oldRot = item->pos.yRot;
 
 				item->pos.yRot = 0;
-				GetSpheres(item, BaddieSpheres, 1);
+				GetSpheres(item, SpheresList, 1, Matrix::Identity);
 				item->pos.yRot = oldRot;
 				
-				SPHERE* sphere = &BaddieSpheres[0];
+				SPHERE* sphere = &SpheresList[0];
 				while (collided)
 				{
 					if (collided & 1)

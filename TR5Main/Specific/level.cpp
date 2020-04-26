@@ -115,8 +115,6 @@ void ReadBytes(void* dest, int count)
 
 int LoadItems()
 {
-	//DB_Log(2, "LoadItems - DLL");
-
 	NumItems = ReadInt32();
 	if (NumItems == 0)
 		return false;
@@ -142,24 +140,6 @@ int LoadItems()
 			item->shade = ReadInt16();
 			item->triggerFlags = ReadInt16();
 			item->flags = ReadInt16();
-
-			// DEBUG: set Lara position
-			/*if (item->objectNumber == ID_LARA)
-			{
-				item->pos.xPos = 33050;
-				item->pos.yPos = 10000;
-				item->pos.zPos = 21162;
-				item->roomNumber = 0;
-			}*/
-
-			// ANDREA2
-			/*if (item->objectNumber == ID_LARA)
-			{
-				item->pos.xPos = 58*1024;
-				item->pos.yPos = 0;
-				item->pos.zPos = 39*1024;
-				item->roomNumber = 144;
-			}*/
 		}
 
 		for (int i = 0; i < NumItems; i++)

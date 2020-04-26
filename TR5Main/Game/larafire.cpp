@@ -756,22 +756,31 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.xRot = angles[1] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
 	pos.yRot = angles[0] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
 	pos.zRot = 0;
-	
-	int num = GetSpheres(target, SphereList, 0);
+
+	// Calculate ray from rotation angles
+	float x = sin(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
+	float y = -sin(TO_RAD(pos.xRot));
+	float z = cos(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
+	Vector3 direction = Vector3(x, y, z);
+	direction.Normalize();
+	Vector3 source = Vector3(pos.xPos, pos.yPos, pos.zPos);
+	Vector3 destination = source + direction * 1024.0f;
+	Ray ray = Ray(source, direction);
+
+	int num = GetSpheres(target, SpheresList, 1, Matrix::Identity);
 	int best = -1;
-	int bestDistance = 0x7FFFFFFF;
+	float bestDistance = FLT_MAX;
 
 	for (int i = 0; i < num; i++)
 	{
-		SPHERE* sphere = &SphereList[i];
-
-		r = sphere->r;									 
-		if ((abs(sphere->x)) < r && (abs(sphere->y)) < r &&  sphere->z > r && SQUARE(sphere->x) + SQUARE(sphere->y) <= SQUARE(r))
+		BoundingSphere sphere = BoundingSphere(Vector3(SpheresList[i].x, SpheresList[i].y, SpheresList[i].z), SpheresList[i].r);
+		float distance;
+		if (ray.Intersects(sphere, distance))
 		{
-			if (sphere->z - r < bestDistance)
+			if (distance < bestDistance)
 			{
-				bestDistance = sphere->z - r;
-				best = i;                 			 
+				bestDistance = distance;
+				best = i;
 			}
 		}
 	}
@@ -790,26 +799,30 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 
 	if (best < 0)
 	{
-		// PHD_MATH
-		/*
 		GAME_VECTOR vDest;
-		vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
+		/*vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
 		vDest.y = vSrc.y + (MatrixPtr[M21] * 5 >> 2);
-		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);
+		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);*/
+		
+		vDest.x = destination.x;
+		vDest.y = destination.y;
+		vDest.z = destination.z;
 
 		GetTargetOnLOS(&vSrc, &vDest, 0, 1);
 		
-		return -1;*/
+		return -1;
 	}
 	else
 	{
 		Savegame.Game.AmmoHits++;
 
-		// FIXME
 		GAME_VECTOR vDest;
-		/*vDest.x = vSrc.x + ((MatrixPtr[M20] * bestDistance) >> W2V_SHIFT);
-		vDest.y = vSrc.y + ((MatrixPtr[M21] * bestDistance) >> W2V_SHIFT);
-		vDest.z = vSrc.z + ((MatrixPtr[M22] * bestDistance) >> W2V_SHIFT);*/
+		
+		destination = source + direction * bestDistance;
+
+		vDest.x = destination.x;
+		vDest.y = destination.y;
+		vDest.z = destination.z;
 
 		// TODO: enable it when the slot is created !
 		/*

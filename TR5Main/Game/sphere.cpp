@@ -7,20 +7,34 @@
 int NumLaraSpheres;
 bool GotLaraSpheres;
 SPHERE LaraSpheres[34];
-SPHERE BaddieSpheres[34];
-Matrix SphereMatrix[64];
-SPHERE SphereList[34];
+SPHERE SpheresList[34];
 
-int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace)
+int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace, Matrix local)
 {
-	return g_Renderer->GetSpheres(item, ptr, worldSpace);
+	if (!item)
+		return 0;
+
+	BoundingSphere spheres[34];
+	short itemNumber = (item - Items); // / sizeof(ITEM_INFO);
+
+	int num = g_Renderer->GetSpheres(itemNumber, spheres, worldSpace, local);
+
+	for (int i = 0; i < 34; i++)
+	{
+		ptr[i].x = spheres[i].Center.x;
+		ptr[i].y = spheres[i].Center.y;
+		ptr[i].z = spheres[i].Center.z;
+		ptr[i].r = spheres[i].Radius;
+	}
+
+	return num;
 }
 
 int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 {
 	int flags = 0;
 
-	int num1 = GetSpheres(item, SphereList, 1);
+	int num1 = GetSpheres(item, SpheresList, 1, Matrix::Identity);
 	int num2 = 0;
 
 	if (l == LaraItem)
@@ -31,7 +45,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 		}
 		else
 		{
-			num2 = GetSpheres(l, LaraSpheres, 1);
+			num2 = GetSpheres(l, LaraSpheres, 1, Matrix::Identity);
 			NumLaraSpheres = num2;
 			if (l == LaraItem)
 				GotLaraSpheres = true;
@@ -41,7 +55,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	{
 		GotLaraSpheres = false;
 
-		num2 = GetSpheres(l, LaraSpheres, 1);
+		num2 = GetSpheres(l, LaraSpheres, 1, Matrix::Identity);
 		NumLaraSpheres = num2;
 		if (l == LaraItem)
 			GotLaraSpheres = true;
@@ -58,7 +72,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	{
 		for (int i = 0; i < num1; i++)
 		{
-			SPHERE* ptr1 = &SphereList[i];
+			SPHERE* ptr1 = &SpheresList[i];
 			
 			int x1 = item->pos.xPos + ptr1->x;
 			int y1 = item->pos.yPos + ptr1->y;
@@ -145,16 +159,16 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
 	}
 }
 
-Matrix DxMatrices[64];
-
 void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 {
+	// Get the real item number
 	short itemNumber = ((item - Items) / sizeof(ITEM_INFO));
 
+	// Use matrices done in the renderer and transform the input vector
 	Vector3 p = Vector3(vec->x, vec->y, vec->z);
-
 	g_Renderer->GetItemAbsBonePosition(itemNumber, &p, joint);
 
+	// Store the result
 	vec->x = p.x;
 	vec->y = p.y;
 	vec->z = p.z;
