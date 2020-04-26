@@ -344,12 +344,12 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 				{
 					if (result & 1)
 					{
-						GlobalCollisionBounds.X1 = SphereList[j].x - SphereList[j].r - item->pos.xPos;
-						GlobalCollisionBounds.Y1 = SphereList[j].y - SphereList[j].r - item->pos.yPos;
-						GlobalCollisionBounds.Z1 = SphereList[j].z - SphereList[j].r - item->pos.zPos;
-						GlobalCollisionBounds.X2 = SphereList[j].x + SphereList[j].r - item->pos.xPos;
-						GlobalCollisionBounds.Y2 = SphereList[j].y + SphereList[j].r - item->pos.yPos;
-						GlobalCollisionBounds.Z2 = SphereList[j].z + SphereList[j].r - item->pos.zPos;
+						GlobalCollisionBounds.X1 = SpheresList[j].x - SpheresList[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y1 = SpheresList[j].y - SpheresList[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z1 = SpheresList[j].z - SpheresList[j].r - item->pos.zPos;
+						GlobalCollisionBounds.X2 = SpheresList[j].x + SpheresList[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y2 = SpheresList[j].y + SpheresList[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z2 = SpheresList[j].z + SpheresList[j].r - item->pos.zPos;
 
 						int oldX = LaraItem->pos.xPos;
 						int oldY = LaraItem->pos.yPos;
@@ -362,7 +362,7 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 								TriggerActive(item))
 							{
 								DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32, 
-											 (GetRandomControl() & 0x1F) + SphereList[j].y - 16, 
+											 (GetRandomControl() & 0x1F) + SpheresList[j].y - 16, 
 											 (GetRandomControl() & 0x3F) + l->pos.zPos - 32, 
 											 (GetRandomControl() & 3) + 2, 
 											 2 * GetRandomControl(), 
@@ -646,7 +646,7 @@ void MineControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	int num = GetSpheres(item, SphereList, true);
+	int num = GetSpheres(item, SpheresList, 1, Matrix::Identity);
 	if (item->itemFlags[0] >= 150)
 	{
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0);
@@ -655,7 +655,7 @@ void MineControl(short itemNum)
 
 		if (num > 0)
 		{
-			SPHERE* sphere = &SphereList[0];
+			SPHERE* sphere = &SpheresList[0];
 
 			for (int i = 0; i < num; i++)
 			{
@@ -703,7 +703,7 @@ void MineControl(short itemNum)
 
 		for (int i = 0; i < num; i++)
 		{
-			SPHERE* sphere = &SphereList[i];
+			SPHERE* sphere = &SpheresList[i];
 
 			if (i == 0 || i > 5)
 				AddFire(sphere->x, sphere->y, sphere->z, 2, item->roomNumber, something);

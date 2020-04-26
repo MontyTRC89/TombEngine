@@ -695,9 +695,15 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	InitialiseHair();
 
 	int nframes = 2;
-	g_Renderer->ResetAnimations();
+	//g_Renderer->ResetAnimations();
+
+	// Calculate animations the first time (in next frames it will be done in AnimateLara)
 	g_Renderer->UpdateLaraAnimations();
+
+	// First control phase
 	GAME_STATUS result = ControlPhase(nframes, 0);
+
+	// Fade in screen
 	g_Renderer->FadeIn();
 
 	// The game loop, finally!
@@ -705,8 +711,8 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	{
 		nframes = DrawPhaseGame();
 		
-		g_Renderer->ResetAnimations();
-		g_Renderer->UpdateLaraAnimations();
+		//g_Renderer->ResetAnimations();
+		//g_Renderer->UpdateLaraAnimations();
 		result = ControlPhase(nframes, 0);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
@@ -2660,9 +2666,9 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 		OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 		// Get the ransformed sphere of meshes
-		GetSpheres(item, SphereList, 1);
+		GetSpheres(item, SpheresList, 1, Matrix::Identity);
 		SPHERE spheres[34];
-		memcpy(spheres, SphereList, sizeof(SPHERE) * 34);
+		memcpy(spheres, SpheresList, sizeof(SPHERE) * 34);
 		if (obj->nmeshes <= 0)
 			return 0;
 
@@ -2673,7 +2679,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 			// If mesh is visibile...
 			if (item->meshBits & (1 << i))
 			{
-				SPHERE* sphere = &SphereList[i];
+				SPHERE* sphere = &SpheresList[i];
 
 				// Create the bounding sphere and test it against the ray
 				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
@@ -2716,13 +2722,13 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 	{
 		ITEM_INFO* item = &Items[closesItemNumber];
 
-		GetSpheres(item, SphereList, 3);
+		GetSpheres(item, SpheresList, 3, Matrix::Identity);
 
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.meshp = meshPtr;
-		ShatterItem.sphere.x = SphereList[sp].x;
-		ShatterItem.sphere.y = SphereList[sp].y;
-		ShatterItem.sphere.z = SphereList[sp].z;
+		ShatterItem.sphere.x = SpheresList[sp].x;
+		ShatterItem.sphere.y = SpheresList[sp].y;
+		ShatterItem.sphere.z = SpheresList[sp].z;
 		ShatterItem.bit = bit;
 		ShatterItem.flags = 0;
 	}
@@ -2904,6 +2910,10 @@ void AnimateItem(ITEM_INFO* item)
 
 	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+
+	// Update matrices
+	short itemNumber = (item - Items) / sizeof(ITEM_INFO);
+	g_Renderer->UpdateItemAnimations(itemNumber);
 }
 
 void DoFlipMap(short group)
@@ -3084,13 +3094,13 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		{
 			Num = -64;
 		}
-		GetSpheres(item, SphereList, 3);
+		GetSpheres(item, SpheresList, 3, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.bit = 1 << Node;
 		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + Node];
-		ShatterItem.sphere.x = SphereList[Node].x;
-		ShatterItem.sphere.y = SphereList[Node].y;
-		ShatterItem.sphere.z = SphereList[Node].z;
+		ShatterItem.sphere.x = SpheresList[Node].x;
+		ShatterItem.sphere.y = SpheresList[Node].y;
+		ShatterItem.sphere.z = SpheresList[Node].z;
 		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData;
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
