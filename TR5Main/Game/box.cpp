@@ -919,7 +919,7 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 int CreatureCreature(short itemNumber)  
 {
 	ITEM_INFO* item, *linked;
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 	ROOM_INFO* r;
 	int x, z, xDistance, zDistance, distance = 0;
 	short link, radius;
@@ -1463,7 +1463,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	CREATURE_INFO* creature;
 	ITEM_INFO* enemy;
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 	ROOM_INFO* r;
 	short* zone, angle;
 	int x, y, z;

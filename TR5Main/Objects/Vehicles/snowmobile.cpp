@@ -115,7 +115,7 @@ void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 			ITEM_INFO* target = &Items[itemNum];
 			if (target->collidable && target->status != ITEM_INVISIBLE && target != LaraItem && target != skidoo)
 			{
-				OBJECT_INFO* object = &Objects[target->objectNumber];
+				ObjectInfo* object = &Objects[target->objectNumber];
 				if (object->collision && (object->intelligent || target->objectNumber == ID_ROLLINGBALL))
 				{
 					int x = skidoo->pos.xPos - target->pos.xPos;

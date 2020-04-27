@@ -333,7 +333,7 @@ void QuadBaddieCollision(ITEM_INFO* quad)
 			ITEM_INFO* item = &Items[itemNum];
 			if (item->collidable && item->status != ITEM_INVISIBLE && item != LaraItem && item != quad) 
 			{
-				OBJECT_INFO* object = &Objects[item->objectNumber];
+				ObjectInfo* object = &Objects[item->objectNumber];
 				if (object->collision && object->intelligent)
 				{
 					int x = quad->pos.xPos - item->pos.xPos;

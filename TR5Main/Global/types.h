@@ -341,43 +341,6 @@ typedef struct aiobject_t
 	short boxNumber; // size=0, offset=22
 } AIOBJECT;
 
-typedef struct object_info_t {
-	short nmeshes; // size=0, offset=0
-	short meshIndex; // size=0, offset=2
-	int boneIndex; // size=0, offset=4
-	short* frameBase; // size=0, offset=8
-	void(*initialise)(short itemNumber); // size=0, offset=12
-	void(*control)(short itemNumber); // size=0, offset=16
-	void(*floor)(ITEM_INFO* item, int x, int y, int z, int* height); // size=0, offset=20
-	void(*ceiling)(ITEM_INFO* item, int x, int y, int z, int* height); // size=0, offset=24
-	void(*drawRoutine)(ITEM_INFO* item); // size=0, offset=28
-	void(*collision)(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll); // size=0, offset=32
-	short zoneType; // size=0, offset=36
-	short animIndex; // size=0, offset=38
-	short hitPoints; // size=0, offset=40
-	short pivotLength; // size=0, offset=42
-	short radius; // size=0, offset=44
-	short shadowSize; // size=0, offset=46
-	short biteOffset; // size=0, offset=48
-	unsigned short loaded : 1; // offset=50.0
-	unsigned short intelligent : 1; // offset=50.1
-	unsigned short nonLot : 1; // offset=50.2
-	unsigned short savePosition : 1; // offset=50.3
-	unsigned short saveHitpoints : 1; // offset=50.4
-	unsigned short saveFlags : 1; // offset=50.5
-	unsigned short saveAnim : 1; // offset=50.6
-	unsigned short semiTransparent : 1; // offset=50.7
-	unsigned short waterCreature : 1; // offset=51.0
-	unsigned short usingDrawAnimatingItem : 1; // offset=51.1
-	unsigned short hitEffect : 2; // offset=51.2
-	unsigned short undead : 1; // offset=51.4
-	unsigned short saveMesh : 1; // offset=51.5
-	unsigned short unknown : 2; // offset=51.6
-	void(*drawRoutineExtra)(ITEM_INFO* item); // size=0, offset=52
-	unsigned int explodableMeshbits; // size=0, offset=56
-	int meshSwapSlot;
-} OBJECT_INFO;
-
 typedef struct tr5_room_layer_t   // 56 bytes
 {
 	unsigned int NumLayerVertices;   // Number of vertices in this layer (4 bytes)

@@ -119,7 +119,7 @@ void Renderer11::updateAnimatedTextures()
 	// Update waterfalls textures
 	for (int i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++)
 	{
-		OBJECT_INFO* obj = &Objects[i];
+		ObjectInfo* obj = &Objects[i];
 
 		if (obj->loaded)
 		{
@@ -275,7 +275,7 @@ void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
 	if (!force && itemToDraw->DoneAnimations)
 		return;
 
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 	RendererObject* moveableObj = m_moveableObjects[item->objectNumber];
 
 	// Update animation matrices

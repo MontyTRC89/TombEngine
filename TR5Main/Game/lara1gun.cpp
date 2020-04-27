@@ -1419,7 +1419,7 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 			{
 				dest->hitStatus = true;
 
-				OBJECT_INFO* obj = &Objects[dest->objectNumber];
+				ObjectInfo* obj = &Objects[dest->objectNumber];
 				if (!obj->undead)
 				{
 					HitTarget(dest, 0, 30, 1);
