@@ -5,12 +5,13 @@
 #include "../Game/control.h"
 #include "../Game/spotcam.h"
 #include "../game/camera.h"
+#include "../game/sphere.h"
 #include "../Global/global.h"
 #include "..\Specific\level.h"
 
 extern GameFlow* g_GameFlow;
 
-void Renderer11::UpdateLaraAnimations()
+void Renderer11::UpdateLaraAnimations(bool force)
 {
 	Matrix translation;
 	Matrix rotation;
@@ -18,6 +19,10 @@ void Renderer11::UpdateLaraAnimations()
 	Matrix hairMatrix;
 	Matrix identity;
 	Matrix world;
+
+	RendererItem* item = &m_items[Lara.itemNumber];
+	if (!force && item->DoneAnimations)
+		return;
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 
@@ -400,225 +405,4 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	}
 
 	return true;
-}
-
-void Renderer11::GetLaraAbsBonePosition(Vector3* pos, int joint)
-{
-	Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
-	world = world * m_LaraWorldMatrix;
-	*pos = Vector3::Transform(*pos, world);
-}
-
-void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint)
-{
-	ITEM_INFO* item = &Items[itemNumber];
-	RendererObject* obj = m_moveableObjects[item->objectNumber];
-
-	int rate;
-	short* frmptr[2];
-	int frac = GetFrame_D2(item, frmptr, &rate);
-
-	RendererBone* bones[32];
-	int nextBone = 0;
-
-	Matrix rotation;
-	Matrix transforms[32];
-	for (int i = 0; i < 32; i++)
-		transforms[i] = Matrix::Identity;
-
-	// Push
-	bones[nextBone++] = obj->Skeleton;
-
-	while (nextBone != 0)
-	{
-		// Pop the last bone in the stack
-		RendererBone* bone = bones[--nextBone];
-
-		Vector3 p = Vector3((int) * (frmptr[0] + 6), (int) * (frmptr[0] + 7), (int) * (frmptr[0] + 8));
-
-		fromTrAngle(&rotation, frmptr[0], bone->Index);
-
-		if (frac)
-		{
-			Vector3 p2 = Vector3((int) * (frmptr[1] + 6), (int) * (frmptr[1] + 7), (int) * (frmptr[1] + 8));
-			p = Vector3::Lerp(p, p2, frac / ((float)rate));
-
-			Matrix rotation2;
-			fromTrAngle(&rotation2, frmptr[1], bone->Index);
-
-			Quaternion q1, q2, q3;
-
-			q1 = Quaternion::CreateFromRotationMatrix(rotation);
-			q2 = Quaternion::CreateFromRotationMatrix(rotation2);
-			q3 = Quaternion::Slerp(q1, q2, frac / ((float)rate));
-
-			rotation = Matrix::CreateFromQuaternion(q3);
-		}
-
-		Matrix translation;
-		if (bone == obj->Skeleton)
-			translation = Matrix::CreateTranslation(p.x, p.y, p.z);
-
-		Matrix extraRotation;
-		extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-		rotation = extraRotation * rotation;
-
-		if (bone != obj->Skeleton)
-			transforms[bone->Index] = rotation * bone->Transform;
-		else
-			transforms[bone->Index] = rotation * translation;
-
-		if (bone != obj->Skeleton)
-			transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
-
-		if (bone->Index == joint)
-		{
-			*pos = Vector3::Transform(*pos, transforms[bone->Index]);
-			return;
-		}
-
-		for (int i = 0; i < bone->Children.size(); i++)
-		{
-			// Push
-			bones[nextBone++] = bone->Children[i];
-		}
-	}
-}
-
-int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
-{
-	RendererItem* rendererItem = &m_items[itemNumber];
-	rendererItem->Id = itemNumber;
-	rendererItem->Item = &Items[itemNumber];
-	ITEM_INFO* item = rendererItem->Item;
-
-	if (!item)
-		return 0;
-
-	if (!rendererItem->DoneAnimations)
-	{
-		if (itemNumber == Lara.itemNumber)
-			UpdateLaraAnimations();
-		else
-			UpdateItemAnimations(itemNumber);
-	}
-
-	int x, y, z;
-	Matrix world;
-
-	if (worldSpace & 1)
-	{
-		x = item->pos.xPos;
-		y = item->pos.yPos;
-		z = item->pos.zPos;
-
-		world = Matrix::Identity;
-	}
-	else
-	{
-		x = 0;
-		y = 0;
-		z = 0;
-
-		world = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos) * local;
-	}
-
-	world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
-
-	RendererObject* moveable = m_moveableObjects[item->objectNumber];
-	
-	for (int i = 0; i < moveable->ObjectMeshes.size(); i++)
-	{
-		RendererMesh* mesh = moveable->ObjectMeshes[i];
-
-		Vector3 pos;
-		if (worldSpace & 2)
-			pos = Vector3::Zero;
-		else
-			pos = mesh->Sphere.Center;
-
-		spheres[i].Center = Vector3(x, y, z) + Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
-		spheres[i].Radius = mesh->Sphere.Radius;
-	}
-
-	return moveable->ObjectMeshes.size();
-
-	/*
-
-	short itemNumber = (item - Items) / sizeof(ITEM_INFO);
-
-	int x, y, z;
-
-	Matrix transforms[32];
-	for (int i = 0; i < 32; i++)
-		transforms[i] = Matrix::Identity;
-
-	if (!item)
-		return 0;
-
-	transforms[0] = Matrix::CreateFromYawPitchRoll(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-
-	RendererBone* bones[32];
-	int nextBone = 0;
-	RendererObject* obj = m_moveableObjects[item->objectNumber];
-	short* frmptr = GetBestFrame(item);
-
-	// Push
-	bones[nextBone++] = obj->Skeleton;
-
-	while (nextBone != 0)
-	{
-		// Pop the last bone in the stack
-		RendererBone* bone = bones[--nextBone];
-
-		Vector3 p = Vector3((int) * (frmptr + 6), (int) * (frmptr + 7), (int) * (frmptr + 8));
-
-		Matrix rotation;
-		fromTrAngle(&rotation, frmptr, bone->Index);
-
-		Matrix translation;
-		if (bone == obj->Skeleton)
-			translation = Matrix::CreateTranslation(p.x, p.y, p.z);
-
-		Matrix extraRotation;
-		extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-		rotation = extraRotation * rotation;
-
-		if (bone != obj->Skeleton)
-			transforms[bone->Index] = rotation * bone->Transform;
-		else
-			transforms[bone->Index] = rotation * translation;
-
-		if (bone != obj->Skeleton)
-			transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
-
-		for (int i = 0; i < bone->Children.size(); i++)
-		{
-			// Push
-			bones[nextBone++] = bone->Children[i];
-		}
-	}
-
-	for (int i = 0; i < obj->ObjectMeshes.size(); i++)
-	{
-		RendererMesh* mesh = obj->ObjectMeshes[i];
-		
-		Vector3 c = Vector3::Transform(mesh->Sphere.Center, transforms[i]);
-		
-		ptr->x = c.x;
-		ptr->y = c.y;
-		ptr->z = c.z;
-		ptr->r = mesh->Sphere.Radius;
-
-		ptr++;
-	}
-
-	return obj->ObjectMeshes.size();*/
-}
-
-Matrix Renderer11::GetBoneMatrix(ITEM_INFO* item, int joint)
-{
-	int itemNumber = (item - Items) / sizeof(ITEM_INFO);
-	RendererObject* obj = m_moveableObjects[ID_LARA];
-	return obj->AnimationTransforms[joint] * m_LaraWorldMatrix;
 }

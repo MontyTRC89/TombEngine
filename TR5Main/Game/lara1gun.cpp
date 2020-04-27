@@ -670,7 +670,7 @@ void ControlGrenade(short itemNumber)
 									ExplodeItemNode(currentItem, Objects[ID_SHOOT_SWITCH1].nmeshes - 1, 0, 64);
 								}
 
-								AddActiveItem((currentItem - Items) / sizeof(ITEM_INFO));
+								AddActiveItem((currentItem - Items));
 								currentItem->status = ITEM_ACTIVE;
 								currentItem->triggerFlags |= 0x3E40;
 							}
@@ -681,7 +681,7 @@ void ControlGrenade(short itemNumber)
 								TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
-								short currentItemNumber = (currentItem - Items) / sizeof(ITEM_INFO);
+								short currentItemNumber = (currentItem - Items);
 								SmashObject(currentItemNumber);
 								KillItem(currentItemNumber);
 							}
@@ -1168,7 +1168,7 @@ void ControlCrossbowBolt(short itemNumber)
 							TriggerShockwave(&currentItem->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 							currentItem->pos.yPos += 128;
 							ExplodeItemNode(currentItem, 0, 0, 128);
-							short currentItemNumber = (currentItem - CollidedItems[0]) / sizeof(ITEM_INFO);
+							short currentItemNumber = (currentItem - CollidedItems[0]);
 							SmashObject(currentItemNumber);
 							KillItem(currentItemNumber);
 						}
@@ -1430,7 +1430,7 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 						if (src->hitPoints <= 0)
 						{
 							++Savegame.Level.Kills;
-							CreatureDie((dest - Items) / sizeof(ITEM_INFO), 1);
+							CreatureDie((dest - Items), 1);
 						}
 					}
 				}
@@ -1524,13 +1524,13 @@ void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int sear
 	{
 		if (search)
 		{
-			int numSpheres = GetSpheres(item2, SpheresList, 1, Matrix::Identity);
+			int numSpheres = GetSpheres(item2, CreatureSpheres, 1, Matrix::Identity);
 			int best = -1;
 			int bestDistance = 0x7FFFFFFF;
 
 			for (int i = 0; i < numSpheres; i++)
 			{
-				SPHERE* sphere = &SpheresList[i];
+				SPHERE* sphere = &CreatureSpheres[i];
 
 				int dx = sphere->x - item1->pos.xPos;
 				int dy = sphere->y - item1->pos.yPos;
@@ -1604,7 +1604,7 @@ void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int sear
 			if (item2->objectNumber == ID_SHOOT_SWITCH1)
 				ExplodeItemNode(item2, Objects[ID_SHOOT_SWITCH1].nmeshes - 1, 0, 64);
 			
-			AddActiveItem((item2 - Items) / sizeof(ITEM_INFO));
+			AddActiveItem((item2 - Items));
 			item2->flags |= 0x3E40;
 			item2->status = ITEM_ACTIVE;
 		}

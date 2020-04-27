@@ -970,7 +970,7 @@ void ProcessClosedDoors()
 		{
 			if (!(item->inDrawRoom))
 			{
-				ItemNewRoom((item - Items) / sizeof(ITEM_INFO), item->drawRoom);
+				ItemNewRoom(item - Items, item->drawRoom);
 				item->roomNumber = roomNumber;
 				item->inDrawRoom = true;
 			}
@@ -978,7 +978,7 @@ void ProcessClosedDoors()
 		else if (item->inDrawRoom)
 		{
 			item->roomNumber = item->drawRoom;
-			ItemNewRoom((item - Items) / sizeof(ITEM_INFO), roomNumber);
+			ItemNewRoom(item - Items, roomNumber);
 			item->inDrawRoom = false;
 		}
 	}

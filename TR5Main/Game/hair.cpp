@@ -148,7 +148,8 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		sphere[1].z = (sphere[1].z + sphere[2].z) / 2;
 	}
 	
-	Matrix world = g_Renderer->GetBoneMatrix(LaraItem, LM_HEAD);
+	Matrix world;
+	g_Renderer->GetBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
 
 	if (ponytail)
 	{
