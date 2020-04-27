@@ -1204,7 +1204,7 @@ void TriggerLaraDrips()// (F)
 int ExplodingDeath(short itemNumber, int meshBits, short damage)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	short* frame = GetBestFrame(item);
 	

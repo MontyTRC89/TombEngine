@@ -31,7 +31,7 @@ void KnightTemplarControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	if (item->animNumber == obj->animIndex ||
 		item->animNumber - obj->animIndex == 1 ||

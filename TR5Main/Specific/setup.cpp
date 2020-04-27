@@ -45,12 +45,12 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+ObjectInfo Objects[ID_NUMBER_OBJECTS];
 STATIC_INFO StaticObjects[NUM_STATICS];
 
 void NewObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
@@ -1131,7 +1131,7 @@ void NewObjects()
 
 void BaddyObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	/* Initialise Lara directly since lara will be used all the time. */
 	obj = &Objects[ID_LARA];
@@ -1925,7 +1925,7 @@ void BaddyObjects()
 // TODO: add the flags
 void ObjectObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_CAMERA_TARGET];
 	if (obj->loaded)
@@ -2719,7 +2719,7 @@ void ObjectObjects()
 
 void TrapObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_ELECTRICAL_CABLES];
 	if (obj->loaded)
@@ -3029,7 +3029,7 @@ void InitialiseSpecialEffects()
 
 void PickupObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	for (int objNum = ID_PUZZLE_ITEM1; objNum <= ID_EXAMINE8_COMBO2; objNum++)
 	{
@@ -3080,7 +3080,7 @@ void PickupObjects()
 
 void CustomObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_GOON_SILENCER1];
 	if (obj->loaded)
@@ -3687,7 +3687,7 @@ void CustomObjects()
 
 void InitialiseObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
@@ -3730,7 +3730,7 @@ void InitialiseObjects()
 
 	/*for (int i = 0; i < 400; i++)
 	{
-		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
+		memcpy(&LegacyObjects[i], &Objects[i], sizeof(ObjectInfo));
 	}*/
 	
 	// New objects imported from old TRs

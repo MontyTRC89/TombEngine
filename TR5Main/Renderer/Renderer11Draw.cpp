@@ -48,7 +48,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 	view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
 	projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
-	OBJECT_INFO * obj = &Objects[objectNum];
+	ObjectInfo * obj = &Objects[objectNum];
 	RendererObject * moveableObj = m_moveableObjects[objectNum];
 
 	if (obj->animIndex != -1)
@@ -409,7 +409,7 @@ bool Renderer11::drawGunShells()
 
 		if (gunshell->counter > 0)
 		{
-			OBJECT_INFO* obj = &Objects[gunshell->objectNumber];
+			ObjectInfo* obj = &Objects[gunshell->objectNumber];
 			RendererObject* moveableObj = m_moveableObjects[gunshell->objectNumber];
 
 			Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
@@ -571,7 +571,7 @@ int Renderer11::drawInventoryScene()
 			Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
 			Matrix transform = (scale * rotation) * translation;
 
-			OBJECT_INFO * obj = &Objects[objectNumber];
+			ObjectInfo * obj = &Objects[objectNumber];
 			RendererObject * moveableObj = m_moveableObjects[objectNumber];
 			if (moveableObj == NULL)
 				continue;
@@ -1393,7 +1393,7 @@ bool Renderer11::drawSpiders()
 
 	if (Objects[ID_SPIDERS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_SPIDERS_EMITTER];
+		ObjectInfo* obj = &Objects[ID_SPIDERS_EMITTER];
 		RendererObject* moveableObj = m_moveableObjects[ID_SPIDERS_EMITTER].get();
 		short* meshPtr = Meshes[Objects[ID_SPIDERS_EMITTER].meshIndex + ((Wibble >> 2) & 2)];
 		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
@@ -1466,7 +1466,7 @@ bool Renderer11::drawRats()
 
 	if (Objects[ID_RATS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_RATS_EMITTER];
+		ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
 		RendererObject* moveableObj = m_moveableObjects[ID_RATS_EMITTER];
 
 		for (int m = 0; m < 32; m++)
@@ -1518,7 +1518,7 @@ bool Renderer11::drawBats()
 
 	if (Objects[ID_BATS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
+		ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
 		RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
 		short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3)];
 		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
@@ -2165,7 +2165,7 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	}
 	RendererRoom& const room = m_rooms[item->Item->roomNumber];
 	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
-	OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
+	ObjectInfo* obj = &Objects[item->Item->objectNumber];
 
 	m_stItem.World = item->World;
 	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);

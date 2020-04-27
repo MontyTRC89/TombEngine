@@ -34,7 +34,7 @@ void GuideControl(short itemNum)
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	short angle = 0;
 	short tilt = 0;

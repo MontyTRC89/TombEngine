@@ -136,7 +136,7 @@ void BaddyControl(short itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
-	OBJECT_INFO* obj = &Objects[ID_BADDY1];
+	ObjectInfo* obj = &Objects[ID_BADDY1];
 
 	short tilt = 0;
 	short angle = 0;

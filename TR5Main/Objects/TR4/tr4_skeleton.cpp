@@ -18,7 +18,7 @@ BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 void InitialiseSkeleton(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[ID_SKELETON];
+	ObjectInfo* obj = &Objects[ID_SKELETON];
 
 	ClearItem(itemNum);
 

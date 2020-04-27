@@ -12,7 +12,7 @@ BITE_INFO crocodileBite = { 0, -156, 500, 9 };
 void InitialiseCrocodile(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 	ROOM_INFO* room = &Rooms[item->roomNumber];
 
 	ClearItem(itemNum);
@@ -40,7 +40,7 @@ void CrocodileControl(short itemNum)
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	int x = item->pos.xPos + phd_sin(item->pos.yRot) << 10 >> W2V_SHIFT;
 	int y = item->pos.yPos;
