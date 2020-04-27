@@ -180,7 +180,7 @@ void LoadObjects()
 {
 	//DB_Log(2, "LoadObjects - DLL");
 	 
-	memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
+	memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
 	memset(StaticObjects, 0, sizeof(STATIC_INFO) * NUM_STATICS);
 
 	int numMeshDataWords = ReadInt32();

@@ -516,7 +516,7 @@ bool Renderer11::drawGunFlashes()
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 	RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
 
-	OBJECT_INFO* obj = &Objects[0];
+	ObjectInfo* obj = &Objects[0];
 	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 	RendererItem* item = &m_items[Lara.itemNumber];
 
@@ -566,7 +566,7 @@ bool Renderer11::drawGunFlashes()
 			break;
 		}
 
-		OBJECT_INFO* flashObj = &Objects[ID_GUN_FLASH];
+		ObjectInfo* flashObj = &Objects[ID_GUN_FLASH];
 		RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
 		RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
 
@@ -628,7 +628,7 @@ bool Renderer11::drawBaddieGunflashes()
 		RendererItem* item = m_itemsToDraw[i];
 
 		// Does the item need gunflash?
-		OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
+		ObjectInfo* obj = &Objects[item->Item->objectNumber];
 		if (obj->biteOffset == -1 || !item->Item->firedWeapon)
 			continue;
 
@@ -1076,7 +1076,7 @@ bool Renderer11::drawEffects(bool transparent)
 	{
 		RendererEffect* effect = m_effectsToDraw[i];
 		RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
-		OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
+		ObjectInfo* obj = &Objects[effect->Effect->objectNumber];
 
 		drawEffect(effect, transparent);
 

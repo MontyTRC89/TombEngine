@@ -691,7 +691,7 @@ int WeaponObjectMesh(int weaponType)
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 	
 	item->hitStatus = true;
 	if (creature && item != LaraItem)

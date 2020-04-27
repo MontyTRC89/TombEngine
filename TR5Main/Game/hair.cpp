@@ -45,7 +45,7 @@ void InitialiseHair()
 void HairControl(int cutscene, int ponytail, short* framePtr)
 {
 	SPHERE sphere[5];
-	OBJECT_INFO* object = &Objects[ID_LARA];
+	ObjectInfo* object = &Objects[ID_LARA];
 	short* frame;
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG;

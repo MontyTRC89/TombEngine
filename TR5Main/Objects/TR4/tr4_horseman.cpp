@@ -14,7 +14,7 @@ BITE_INFO horsemanBite3 = { 0, 0, 0, 0x0A };
 void InitialiseHorse(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[ID_HORSE];
+	ObjectInfo* obj = &Objects[ID_HORSE];
 
 	item->animNumber = obj->animIndex + 2;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -25,7 +25,7 @@ void InitialiseHorse(short itemNum)
 void InitialiseHorseman(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[ID_HORSEMAN];
+	ObjectInfo* obj = &Objects[ID_HORSEMAN];
 
 	ClearItem(itemNum);
 

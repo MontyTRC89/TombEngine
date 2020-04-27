@@ -109,7 +109,7 @@ void DisableBaddieAI(short itemNumber)
 void InitialiseSlot(short itemNum, short slot)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 	CREATURE_INFO* creature = &BaddieSlots[slot];
 
 	item->data = creature;

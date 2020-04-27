@@ -1635,7 +1635,7 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 
 	int xOff, yOff, trigger;
 	ITEM_INFO* item;
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
 
 	do
@@ -2659,7 +2659,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 	{
 		// For items instead we need to test spheres
 		ITEM_INFO* item = &Items[closesItemNumber];
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		ObjectInfo* obj = &Objects[item->objectNumber];
 
 		// Get the ransformed sphere of meshes
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);

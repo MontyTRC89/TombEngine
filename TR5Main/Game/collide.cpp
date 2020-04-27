@@ -1374,7 +1374,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	l->hitStatus = false;
 	Lara.hitDirection = -1;

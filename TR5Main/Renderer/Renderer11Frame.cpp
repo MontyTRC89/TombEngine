@@ -438,7 +438,7 @@ void Renderer11::collectEffects(short roomNumber)
 		if (fx->objectNumber < 0)
 			continue;
 
-		OBJECT_INFO* obj = &Objects[fx->objectNumber];
+		ObjectInfo* obj = &Objects[fx->objectNumber];
 
 		RendererEffect* newEffect = &m_effects[fxNum];
 
