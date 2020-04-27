@@ -108,7 +108,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		receivedWmClose = true;
 		PostQuitMessage(0);
-		//DoTheGame = false;
+		DoTheGame = false;
 
 		return DefWindowProcA(hWnd, 0x10u, wParam, (LPARAM)lParam);
 	}
