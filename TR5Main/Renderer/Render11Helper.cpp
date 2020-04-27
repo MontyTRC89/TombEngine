@@ -6,6 +6,8 @@
 #include "../Specific/setup.h"
 #include "..\Specific\level.h"
 #include "../Game/control.h"
+#include "../Game/lara.h"
+#include "../Game/sphere.h"
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 bool Renderer11::isRoomUnderwater(short roomNumber)
@@ -256,7 +258,7 @@ bool Renderer11::updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size
 	return true;
 }
 
-void Renderer11::UpdateItemAnimations(int itemNumber)
+void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
 {
 	RendererItem* itemToDraw = &m_items[itemNumber];
 	itemToDraw->Id = itemNumber;
@@ -270,8 +272,8 @@ void Renderer11::UpdateItemAnimations(int itemNumber)
 		return;
 
 	// Has been already done?
-	/*if (itemToDraw->DoneAnimations)
-		return;*/
+	if (!force && itemToDraw->DoneAnimations)
+		return;
 
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	RendererObject* moveableObj = m_moveableObjects[item->objectNumber];
@@ -338,7 +340,7 @@ void Renderer11::updateItemsAnimations()
 		if (item->objectNumber == ID_LARA)
 			continue;
 
-		UpdateItemAnimations(itemToDraw->Id);
+		UpdateItemAnimations(itemToDraw->Id, false);
 	}
 }
 
@@ -1037,4 +1039,96 @@ void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
 RendererMesh* Renderer11::getMeshFromMeshPtr(unsigned int meshp)
 {
 	return m_meshPointersToMesh[meshp];
+}
+
+void Renderer11::GetLaraAbsBonePosition(Vector3* pos, int joint)
+{
+	Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
+	world = world * m_LaraWorldMatrix;
+	*pos = Vector3::Transform(*pos, world);
+}
+
+void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint)
+{
+	RendererItem* rendererItem = &m_items[itemNumber];
+	rendererItem->Id = itemNumber;
+	rendererItem->Item = &Items[itemNumber];
+	ITEM_INFO* item = rendererItem->Item;
+
+	if (!item)
+		return;
+
+	if (!rendererItem->DoneAnimations)
+	{
+		if (itemNumber == Lara.itemNumber)
+			UpdateLaraAnimations(false);
+		else
+			UpdateItemAnimations(itemNumber, false);
+	}
+
+	Matrix world = rendererItem->AnimationTransforms[joint] * rendererItem->World;
+	*pos = Vector3::Transform(*pos, world);
+}
+
+int Renderer11::GetSpheres(short itemNumber, BoundingSphere * spheres, char worldSpace, Matrix local)
+{
+	RendererItem* rendererItem = &m_items[itemNumber];
+	rendererItem->Id = itemNumber;
+	rendererItem->Item = &Items[itemNumber];
+	ITEM_INFO* item = rendererItem->Item;
+
+	if (!item)
+		return 0;
+
+	if (!rendererItem->DoneAnimations)
+	{
+		if (itemNumber == Lara.itemNumber)
+			UpdateLaraAnimations(false);
+		else
+			UpdateItemAnimations(itemNumber, false);
+	}
+
+	int x, y, z;
+	Matrix world;
+
+	if (worldSpace & SPHERES_SPACE_WORLD)
+	{
+		x = item->pos.xPos;
+		y = item->pos.yPos;
+		z = item->pos.zPos;
+		world = Matrix::Identity;
+	}
+	else
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+		world = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos) * local;
+	}
+
+	world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
+
+	RendererObject* moveable = m_moveableObjects[item->objectNumber];
+
+	for (int i = 0; i < moveable->ObjectMeshes.size(); i++)
+	{
+		RendererMesh* mesh = moveable->ObjectMeshes[i];
+
+		Vector3 pos;
+		if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
+			pos = Vector3::Zero;
+		else
+			pos = mesh->Sphere.Center;
+
+		spheres[i].Center = Vector3(x, y, z) + Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
+		spheres[i].Radius = mesh->Sphere.Radius;
+	}
+
+	return moveable->ObjectMeshes.size();
+}
+
+void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix * outMatrix)
+{
+	RendererObject* obj = m_moveableObjects[ID_LARA];
+	*outMatrix = obj->AnimationTransforms[joint] * m_LaraWorldMatrix;
 }

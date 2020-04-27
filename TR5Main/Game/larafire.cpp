@@ -767,13 +767,13 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	Vector3 destination = source + direction * 1024.0f;
 	Ray ray = Ray(source, direction);
 
-	int num = GetSpheres(target, SpheresList, 1, Matrix::Identity);
+	int num = GetSpheres(target, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int best = -1;
 	float bestDistance = FLT_MAX;
 
 	for (int i = 0; i < num; i++)
 	{
-		BoundingSphere sphere = BoundingSphere(Vector3(SpheresList[i].x, SpheresList[i].y, SpheresList[i].z), SpheresList[i].r);
+		BoundingSphere sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
 		float distance;
 		if (ray.Intersects(sphere, distance))
 		{

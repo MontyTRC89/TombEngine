@@ -975,7 +975,7 @@ void AnimateLara(ITEM_INFO* item)
 	}
 
 	// Update matrices
-	g_Renderer->UpdateLaraAnimations();
+	g_Renderer->UpdateLaraAnimations(true);
 }
 
 void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)

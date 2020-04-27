@@ -6,20 +6,20 @@
 
 int NumLaraSpheres;
 bool GotLaraSpheres;
-SPHERE LaraSpheres[34];
-SPHERE SpheresList[34];
+SPHERE LaraSpheres[MAX_SPHERES];
+SPHERE CreatureSpheres[MAX_SPHERES];
 
-int GetSpheres(ITEM_INFO* item, SPHERE* ptr, char worldSpace, Matrix local)
+int GetSpheres(ITEM_INFO* item, SPHERE* ptr, int worldSpace, Matrix local)
 {
 	if (!item)
 		return 0;
 
-	BoundingSphere spheres[34];
-	short itemNumber = (item - Items); // / sizeof(ITEM_INFO);
+	BoundingSphere spheres[MAX_SPHERES];
+	short itemNumber = (item - Items);
 
 	int num = g_Renderer->GetSpheres(itemNumber, spheres, worldSpace, local);
 
-	for (int i = 0; i < 34; i++)
+	for (int i = 0; i < MAX_SPHERES; i++)
 	{
 		ptr[i].x = spheres[i].Center.x;
 		ptr[i].y = spheres[i].Center.y;
@@ -34,7 +34,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 {
 	int flags = 0;
 
-	int num1 = GetSpheres(item, SpheresList, 1, Matrix::Identity);
+	int num1 = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int num2 = 0;
 
 	if (l == LaraItem)
@@ -45,7 +45,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 		}
 		else
 		{
-			num2 = GetSpheres(l, LaraSpheres, 1, Matrix::Identity);
+			num2 = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 			NumLaraSpheres = num2;
 			if (l == LaraItem)
 				GotLaraSpheres = true;
@@ -55,7 +55,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	{
 		GotLaraSpheres = false;
 
-		num2 = GetSpheres(l, LaraSpheres, 1, Matrix::Identity);
+		num2 = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 		NumLaraSpheres = num2;
 		if (l == LaraItem)
 			GotLaraSpheres = true;
@@ -72,7 +72,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	{
 		for (int i = 0; i < num1; i++)
 		{
-			SPHERE* ptr1 = &SpheresList[i];
+			SPHERE* ptr1 = &CreatureSpheres[i];
 			
 			int x1 = item->pos.xPos + ptr1->x;
 			int y1 = item->pos.yPos + ptr1->y;
@@ -162,7 +162,7 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
 void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 {
 	// Get the real item number
-	short itemNumber = ((item - Items) / sizeof(ITEM_INFO));
+	short itemNumber = item - Items;
 
 	// Use matrices done in the renderer and transform the input vector
 	Vector3 p = Vector3(vec->x, vec->y, vec->z);
