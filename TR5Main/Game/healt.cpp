@@ -20,7 +20,6 @@ int DashTimer = 0;
 extern RendererHUDBar* g_HealthBar;
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_AirBar;
-extern LaraExtraInfo g_LaraExtra;
 
 void DrawHealthBarOverlay(int value)
 {
@@ -115,8 +114,8 @@ void UpdateAirBar(int flash)
 	if (Lara.air == 1800 || LaraItem->hitPoints <= 0)
 		return;
 
-	if ((g_LaraExtra.Vehicle == NO_ITEM)
-		|| (Items[g_LaraExtra.Vehicle].objectNumber != ID_UPV))
+	if ((Lara.Vehicle == NO_ITEM)
+		|| (Items[Lara.Vehicle].objectNumber != ID_UPV))
 	{
 		if ((Lara.waterStatus != LW_UNDERWATER)
 			&& (Lara.waterStatus != LW_SURFACE)

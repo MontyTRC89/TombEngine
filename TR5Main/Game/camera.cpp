@@ -34,7 +34,6 @@ GAME_VECTOR LastTarget;
 byte SniperCamActive;
 
 extern int KeyTriggerActive;
-extern LaraExtraInfo g_LaraExtra;
 
 PHD_VECTOR CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
@@ -1375,11 +1374,11 @@ void BinocularCamera(ITEM_INFO* item)
 			}
 			else
 			{
-				if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+				if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
 				{
 					WeaponDelay = 12;
 					firing = 1;
-					if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+					if (Lara.Weapons[WEAPON_HK].HasSilencer)
 					{
 						SoundEffect(SFX_HK_SILENCED, 0, 0);
 					}
@@ -1389,7 +1388,7 @@ void BinocularCamera(ITEM_INFO* item)
 						SoundEffect(SFX_HK_FIRE, 0, 0);
 					}
 				}
-				else if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
+				else if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
 				{
 					if (!LSHKTimer)
 					{
@@ -1400,7 +1399,7 @@ void BinocularCamera(ITEM_INFO* item)
 						}
 						LSHKTimer = 4;
 						firing = 1;
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
@@ -1414,7 +1413,7 @@ void BinocularCamera(ITEM_INFO* item)
 					{
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
@@ -1429,7 +1428,7 @@ void BinocularCamera(ITEM_INFO* item)
 				{
 					if (LSHKTimer)
 					{
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
@@ -1443,7 +1442,7 @@ void BinocularCamera(ITEM_INFO* item)
 					{
 						LSHKTimer = 4;
 						firing = 1;
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}

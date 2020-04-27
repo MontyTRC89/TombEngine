@@ -557,7 +557,7 @@ void ElectricityWiresControl(short itemNumber)
 				item->itemFlags[0] = 28;
 				LaraBurn();
 				Lara.burnBlue = 1;
-				Lara.BurnCount = 48;
+				Lara.burnCount = 48;
 				LaraItem->hitPoints = 0;
 				return;
 			}
@@ -645,7 +645,7 @@ void ElectricityWiresControl(short itemNumber)
 					item->itemFlags[0] = 28;
 					LaraBurn();
 					Lara.burnBlue = 1;
-					Lara.BurnCount = 48;
+					Lara.burnCount = 48;
 					LaraItem->hitPoints = 0;
 				}
 			}

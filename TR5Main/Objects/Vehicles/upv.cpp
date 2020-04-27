@@ -18,7 +18,7 @@
 #include "../../Game/savegame.h"
 #include "../../Game/sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 enum UPV_FLAG
 {
@@ -129,8 +129,8 @@ static void FireSubHarpoon(ITEM_INFO* v)
 		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &LaraItem->pos, 2);
 
 		// if lara have ammo, reduce it.
-		if (g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
-			g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0]--;
+		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
+			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0]--;
 		Savegame.Game.AmmoUsed++;
 
 		lr ^= 1;
@@ -202,7 +202,7 @@ void SubEffects(short item_number)
 
 	/* -------- Lara is using this vehicle */
 
-	if (g_LaraExtra.Vehicle == item_number)
+	if (Lara.Vehicle == item_number)
 	{
 		if (!sub->Vel)
 			sub->FanRot += ANGLE(2);
@@ -633,7 +633,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 
 			Lara.waterStatus = LW_UNDERWATER;
 			Lara.gunStatus = LG_NO_ARMS;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 
 			v->hitPoints = 0;
 		}
@@ -676,7 +676,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			Lara.torsoXrot = Lara.torsoYrot = 0;
 			Lara.headXrot = Lara.headYrot = 0;
 			Lara.gunStatus = LG_NO_ARMS;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 
 			v->hitPoints = 0;
 		}
@@ -782,7 +782,7 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int geton;
 	ITEM_INFO* v;
 
-	if ((l->hitPoints <= 0) || (g_LaraExtra.Vehicle != NO_ITEM))
+	if ((l->hitPoints <= 0) || (Lara.Vehicle != NO_ITEM))
 		return;
 
 	v = &Items[itemNum];
@@ -790,7 +790,7 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	geton = GetOnSub(itemNum, coll);
 	if (geton)
 	{
-		g_LaraExtra.Vehicle = itemNum;
+		Lara.Vehicle = itemNum;
 		Lara.waterStatus = LW_ABOVE_WATER;
 
 		/* -------- throw flare away if using */
@@ -849,7 +849,7 @@ int SubControl()
 	short roomNumber;
 
 	l = LaraItem;
-	v = &Items[g_LaraExtra.Vehicle];
+	v = &Items[Lara.Vehicle];
 	sub = (SUB_INFO*)v->data;
 
 	/* -------- update dynamics */
@@ -939,10 +939,10 @@ int SubControl()
 	}
 
 	TestTriggers(TriggerIndex, false, 0);
-	SubEffects(g_LaraExtra.Vehicle);
+	SubEffects(Lara.Vehicle);
 
 	/* -------- update vehicle & Lara */
-	if ((g_LaraExtra.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))
+	if ((Lara.Vehicle != NO_ITEM) && (!(sub->Flags & UPV_DEAD)))
 	{
 		DoCurrent(v);
 
@@ -954,7 +954,7 @@ int SubControl()
 
 		if (roomNumber != v->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
@@ -986,7 +986,7 @@ int SubControl()
 		AnimateItem(l);
 
 		if (roomNumber != v->roomNumber)
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 
 		BackgroundCollision(v, l, sub);
 

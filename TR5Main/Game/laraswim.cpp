@@ -19,7 +19,7 @@
 #include "../Specific/input.h"
 #include "sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
@@ -823,7 +823,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		}
 	}
 
-	if (Lara.waterStatus != LW_FLYCHEAT && g_LaraExtra.ExtraAnim == 0)
+	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == 0)
 		LaraTestWaterDepth(item, coll);
 }
 

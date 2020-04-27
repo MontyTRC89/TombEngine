@@ -17,7 +17,7 @@
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 enum SKIDOO_STATE { SKID_SIT, SKID_GETON, SKID_LEFT, SKID_RIGHT, SKID_FALL, SKID_HIT, SKID_GETONL, SKID_GETOFFL, SKID_STILL, SKID_GETOFF, SKID_LETGO, SKID_DEATH, SKID_FALLOFF };
 
@@ -157,7 +157,7 @@ void SkidooGuns(void)
 	short angles[2];
 
 	winfo = &Weapons[WEAPON_SNOWMOBILE];
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 	skinfo = (SKIDOO_INFO*)skidoo->data;
 
 	/* Get Target Information; skidoo retargets all the time */
@@ -195,12 +195,12 @@ void SkidooExplode(ITEM_INFO* skidoo)
 			TriggerExplosionSparks(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, 3, -1, 0, skidoo->roomNumber);
 	}
 
-	ExplodingDeath(g_LaraExtra.Vehicle, -1, 256);
-	KillItem(g_LaraExtra.Vehicle);
+	ExplodingDeath(Lara.Vehicle, -1, 256);
+	KillItem(Lara.Vehicle);
 	skidoo->status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_EXPLOSION1, 0, 0);
 	SoundEffect(SFX_EXPLOSION2, 0, 0);
-	g_LaraExtra.Vehicle = NO_ITEM;
+	Lara.Vehicle = NO_ITEM;
 }
 
 int SkidooCheckGetOffOK(int direction)
@@ -211,7 +211,7 @@ int SkidooCheckGetOffOK(int direction)
 	ITEM_INFO* skidoo;
 	FLOOR_INFO* floor;
 
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 
 	if (direction == SKID_GETOFFL)
 		angle = skidoo->pos.yRot + 0x4000;
@@ -246,7 +246,7 @@ int SkidooCheckGetOffOK(int direction)
 int SkidooCheckGetOff()
 {
 	ITEM_INFO* skidoo;
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 
 	if ((LaraItem->currentAnimState == SKID_GETOFF || LaraItem->currentAnimState == SKID_GETOFFL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
 	{
@@ -262,7 +262,7 @@ int SkidooCheckGetOff()
 		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-		g_LaraExtra.Vehicle = NO_ITEM;
+		Lara.Vehicle = NO_ITEM;
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 	else if (LaraItem->currentAnimState == SKID_LETGO && (skidoo->pos.yPos == skidoo->floor || LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd))
@@ -628,7 +628,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	ITEM_INFO* skidoo;
 
 	/* If Lara dead or already on the skidoo, then no collision */
-	if (litem->hitPoints < 0 || g_LaraExtra.Vehicle != NO_ITEM)
+	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
 	/* If player isn't pressing control or Lara is busy, then do normal object collision */
@@ -640,7 +640,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	}
 
 	/* Yeeha! Get on that skidoo girly */
-	g_LaraExtra.Vehicle = itemNum;
+	Lara.Vehicle = itemNum;
 
 	/* Drop flare if in hand */
 	if (Lara.gunType == WEAPON_FLARE)
@@ -906,7 +906,7 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 
 	/* Test against bad guys too */
 	if (!(skidoo->flags & ONESHOT)) // ONESHOT flag set if skidoo no longer travelling with Lara
-		SkidooBaddieCollision(g_LaraExtra.Vehicle, skidoo);
+		SkidooBaddieCollision(Lara.Vehicle, skidoo);
 
 	/* Test new positions of points (one at a time) and shift skidoo accordingly */
 	rot = 0;
@@ -971,7 +971,7 @@ int SkidooControl()
 	short roomNumber, x_rot, z_rot, bandit_skidoo;
 	int pitch, dead = 0;
 
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 	skinfo = (SKIDOO_INFO*)skidoo->data;
 	collide = SkidooDynamics(skidoo);
 
@@ -1065,7 +1065,7 @@ int SkidooControl()
 		/* This is a falling skidoo - Lara is elsewhere */
 		if (roomNumber != skidoo->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
@@ -1081,7 +1081,7 @@ int SkidooControl()
 
 	if (roomNumber != skidoo->roomNumber)
 	{
-		ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+		ItemNewRoom(Lara.Vehicle, roomNumber);
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 

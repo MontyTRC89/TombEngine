@@ -20,7 +20,7 @@
 #include "../Specific/input.h"
 #include "sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 extern GameFlow* g_GameFlow;
 extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
@@ -77,27 +77,27 @@ void DelsGiveLaraItemsCheat() // (AF) (D)
 	int i;
 
 	if (Objects[ID_CROWBAR_ITEM].loaded)
-		g_LaraExtra.Crowbar = true;
+		Lara.Crowbar = true;
 	for (i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
-			g_LaraExtra.Puzzles[i] = 1;
-		g_LaraExtra.PuzzlesCombo[2 * i] = false;
-		g_LaraExtra.PuzzlesCombo[2 * i + 1] = false;
+			Lara.Puzzles[i] = 1;
+		Lara.PuzzlesCombo[2 * i] = false;
+		Lara.PuzzlesCombo[2 * i + 1] = false;
 	}
 	for (i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_KEY_ITEM1 + i].loaded)
-			g_LaraExtra.Keys[i] = 1;
-		g_LaraExtra.KeysCombo[2 * i] = false;
-		g_LaraExtra.KeysCombo[2 * i + 1] = false;
+			Lara.Keys[i] = 1;
+		Lara.KeysCombo[2 * i] = false;
+		Lara.KeysCombo[2 * i + 1] = false;
 	}
 	for (i = 0; i < 3; ++i)
 	{
 		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
-			g_LaraExtra.Pickups[i] = 1;
-		g_LaraExtra.PickupsCombo[2 * i] = false;
-		g_LaraExtra.PickupsCombo[2 * i + 1] = false;
+			Lara.Pickups[i] = 1;
+		Lara.PickupsCombo[2 * i] = false;
+		Lara.PickupsCombo[2 * i + 1] = false;
 	}
 
 	g_Inventory->LoadObjects(false);
@@ -107,27 +107,27 @@ void DelsGiveLaraItemsCheat() // (AF) (D)
 
 void LaraCheatGetStuff() // (F) (D)
 {
-	g_LaraExtra.NumFlares = -1;
-	g_LaraExtra.NumSmallMedipacks = -1;
-	g_LaraExtra.NumLargeMedipacks = -1;
+	Lara.NumFlares = -1;
+	Lara.NumSmallMedipacks = -1;
+	Lara.NumLargeMedipacks = -1;
 	if (Objects[ID_CROWBAR_ITEM].loaded)
-		g_LaraExtra.Crowbar = true;
-	g_LaraExtra.Lasersight = true;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = false;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasSilencer = false;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] = -1;
-	g_LaraExtra.Weapons[WEAPON_UZI].Present = true;
-	g_LaraExtra.Weapons[WEAPON_UZI].SelectedAmmo = WEAPON_AMMO1;
-	g_LaraExtra.Weapons[WEAPON_UZI].HasLasersight = false;
-	g_LaraExtra.Weapons[WEAPON_UZI].HasSilencer = false;
-	g_LaraExtra.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
-	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
-	g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
-	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasLasersight = false;
-	g_LaraExtra.Weapons[WEAPON_SHOTGUN].HasSilencer = false;
-	g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
+		Lara.Crowbar = true;
+	Lara.Lasersight = true;
+	Lara.Weapons[WEAPON_REVOLVER].Present = true;
+	Lara.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+	Lara.Weapons[WEAPON_REVOLVER].HasLasersight = false;
+	Lara.Weapons[WEAPON_REVOLVER].HasSilencer = false;
+	Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] = -1;
+	Lara.Weapons[WEAPON_UZI].Present = true;
+	Lara.Weapons[WEAPON_UZI].SelectedAmmo = WEAPON_AMMO1;
+	Lara.Weapons[WEAPON_UZI].HasLasersight = false;
+	Lara.Weapons[WEAPON_UZI].HasSilencer = false;
+	Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] = -1;
+	Lara.Weapons[WEAPON_SHOTGUN].Present = true;
+	Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
+	Lara.Weapons[WEAPON_SHOTGUN].HasLasersight = false;
+	Lara.Weapons[WEAPON_SHOTGUN].HasSilencer = false;
+	Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
 
 	g_Inventory->LoadObjects(false);
 }
@@ -230,14 +230,14 @@ void LaraControl(short itemNumber) // (AF) (D)
 	Lara.waterSurfaceDist = -hfw;
 	
 #if 0
-	if (g_LaraExtra.Vehicle == NO_ITEM)
+	if (Lara.Vehicle == NO_ITEM)
 #endif
 		WadeSplash(item, wh, wd);
 	
 	short roomNumber;
 
 #if 0
-	if (g_LaraExtra.Vehicle == NO_ITEM && g_LaraExtra.ExtraAnim == 0)
+	if (Lara.Vehicle == NO_ITEM && Lara.ExtraAnim == 0)
 	{
 #endif
 		switch (Lara.waterStatus)
@@ -601,7 +601,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 		{
 #if 0
 			/* lara is not equipped with any vehicle */
-			if (g_LaraExtra.Vehicle == NO_ITEM) // only for the upv !!
+			if (Lara.Vehicle == NO_ITEM) // only for the upv !!
 			{
 #endif
 				Lara.air += 10;
@@ -693,9 +693,9 @@ void LaraInitialiseMeshes() // (AF) (D)
 	{
 		Lara.backGun = WEAPON_HK;
 	}
-	else if (!g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present)
+	else if (!Lara.Weapons[WEAPON_SHOTGUN].Present)
 	{
-		if (g_LaraExtra.Weapons[WEAPON_HK].Present)
+		if (Lara.Weapons[WEAPON_HK].Present)
 			Lara.backGun = WEAPON_HK;
 	}
 	else
@@ -723,18 +723,15 @@ void InitialiseLara(int restore)
 
 	if (restore)
 	{
-		LARA_INFO backup;
-		memcpy(&backup, &Lara, sizeof(LARA_INFO));
-		ZeroMemory(&Lara, sizeof(LARA_INFO));
-		memcpy(&Lara.Legacy_pistolsTypeCarried, &backup.Legacy_pistolsTypeCarried, 59);
+		LaraInfo backup;
+		memcpy(&backup, &Lara, sizeof(LaraInfo));
+		ZeroMemory(&Lara, sizeof(LaraInfo));
 	}
 	else
 	{
-		ZeroMemory(&Lara, sizeof(LARA_INFO));
-		ZeroMemory(&g_LaraExtra, sizeof(LaraExtraInfo));
-
-		g_LaraExtra.ExtraAnim = 0;
-		g_LaraExtra.Vehicle = NO_ITEM;
+		ZeroMemory(&Lara, sizeof(LaraInfo));
+		Lara.ExtraAnim = 0;
+		Lara.Vehicle = NO_ITEM;
 	}
 
 	Lara.look = true;
@@ -768,24 +765,24 @@ void InitialiseLara(int restore)
 
 	if (gun == WEAPON_PISTOLS)
 	{
-		g_LaraExtra.Weapons[WEAPON_PISTOLS].Present = true;
-		g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1] = -1;
+		Lara.Weapons[WEAPON_PISTOLS].Present = true;
+		Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1] = -1;
 	}
 	else if (gun == WEAPON_HK)
 	{
-		g_LaraExtra.Weapons[WEAPON_HK].Present = true;
-		g_LaraExtra.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] = 100;
+		Lara.Weapons[WEAPON_HK].Present = true;
+		Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] = 100;
 	}
 
-	g_LaraExtra.Binoculars = true;
+	Lara.Binoculars = true;
 
 	if (!restore)
 	{
 		if (Objects[ID_FLARE_INV_ITEM].loaded)
-			g_LaraExtra.NumFlares = 3;
+			Lara.NumFlares = 3;
 
-		g_LaraExtra.NumSmallMedipacks = 3;
-		g_LaraExtra.NumLargeMedipacks = 1;
+		Lara.NumSmallMedipacks = 3;
+		Lara.NumLargeMedipacks = 1;
 	}
 
 	InitialiseLaraAnims(LaraItem);

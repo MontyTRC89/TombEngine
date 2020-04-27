@@ -11,7 +11,7 @@
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 void InitialiseTroops(short itemNum)
 {
@@ -172,7 +172,7 @@ void TroopsControl(short itemNum)
 		GetCreatureMood(item, &info, TIMID);
 
 		// Vehicle handling
-		if (g_LaraExtra.Vehicle != NO_ITEM && info.bite)
+		if (Lara.Vehicle != NO_ITEM && info.bite)
 			creature->mood == ESCAPE_MOOD;
 
 		CreatureMood(item, &info, TIMID);

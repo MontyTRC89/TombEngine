@@ -9,7 +9,7 @@
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 void InitialiseMonkey(short itemNumber)
 {
@@ -127,7 +127,7 @@ void MonkeyControl(short itemNumber)
 		}
 
 		GetCreatureMood(item, &info, VIOLENT);
-		if (g_LaraExtra.Vehicle != NO_ITEM)
+		if (Lara.Vehicle != NO_ITEM)
 			creature->mood = ESCAPE_MOOD;
 		CreatureMood(item, &info, VIOLENT);
 

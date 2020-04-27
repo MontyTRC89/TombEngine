@@ -303,10 +303,10 @@ int S_UpdateInput()// (F)
 		{
 			if (LaraItem->hitPoints > 0 && LaraItem->hitPoints < 1000 || Lara.poisoned)
 			{
-				if (g_LaraExtra.NumSmallMedipacks != 0)
+				if (Lara.NumSmallMedipacks != 0)
 				{
-					if (g_LaraExtra.NumSmallMedipacks != -1)
-						g_LaraExtra.NumSmallMedipacks--;
+					if (Lara.NumSmallMedipacks != -1)
+						Lara.NumSmallMedipacks--;
 
 					Lara.dpoisoned = 0;
 					LaraItem->hitPoints += 500;
@@ -329,10 +329,10 @@ int S_UpdateInput()// (F)
 		{
 			if (LaraItem->hitPoints > 0 && LaraItem->hitPoints < 1000 || Lara.poisoned)
 			{
-				if (g_LaraExtra.NumLargeMedipacks != 0)
+				if (Lara.NumLargeMedipacks != 0)
 				{
-					if (g_LaraExtra.NumLargeMedipacks != -1)
-						g_LaraExtra.NumLargeMedipacks--;
+					if (Lara.NumLargeMedipacks != -1)
+						Lara.NumLargeMedipacks--;
 
 					Lara.dpoisoned = 0;
 					LaraItem->hitPoints += 1000;

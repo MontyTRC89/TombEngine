@@ -19,21 +19,20 @@
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
-extern LaraExtraInfo g_LaraExtra;
 
 void CombinePuzzle(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Puzzles[object - INV_OBJECT_PUZZLE1]++;
-		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1]--;
-		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1 + 1]--;
+		Lara.Puzzles[object - INV_OBJECT_PUZZLE1]++;
+		Lara.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1]--;
+		Lara.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1 + 1]--;
 	}
 	else
 	{
-		g_LaraExtra.Puzzles[object - INV_OBJECT_PUZZLE1]--;
-		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1]++;
-		g_LaraExtra.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1 + 1]++;
+		Lara.Puzzles[object - INV_OBJECT_PUZZLE1]--;
+		Lara.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1]++;
+		Lara.PuzzlesCombo[object - INV_OBJECT_PUZZLE1_COMBO1 + 1]++;
 	}
 }
 
@@ -41,15 +40,15 @@ void CombineKey(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Keys[object - INV_OBJECT_KEY1]++;
-		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1]--;
-		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1 + 1]--;
+		Lara.Keys[object - INV_OBJECT_KEY1]++;
+		Lara.KeysCombo[object - INV_OBJECT_KEY1_COMBO1]--;
+		Lara.KeysCombo[object - INV_OBJECT_KEY1_COMBO1 + 1]--;
 	}
 	else
 	{
-		g_LaraExtra.Keys[object - INV_OBJECT_KEY1]--;
-		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1]++;
-		g_LaraExtra.KeysCombo[object - INV_OBJECT_KEY1_COMBO1 + 1]++;
+		Lara.Keys[object - INV_OBJECT_KEY1]--;
+		Lara.KeysCombo[object - INV_OBJECT_KEY1_COMBO1]++;
+		Lara.KeysCombo[object - INV_OBJECT_KEY1_COMBO1 + 1]++;
 	}
 }
 
@@ -57,15 +56,15 @@ void CombinePickup(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Pickups[object - INV_OBJECT_PICKUP1]++;
-		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1]--;
-		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1 + 1] = false;
+		Lara.Pickups[object - INV_OBJECT_PICKUP1]++;
+		Lara.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1]--;
+		Lara.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1 + 1] = false;
 	}
 	else
 	{
-		g_LaraExtra.Pickups[object - INV_OBJECT_PICKUP1]--;
-		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1]++;
-		g_LaraExtra.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1 + 1]++;
+		Lara.Pickups[object - INV_OBJECT_PICKUP1]--;
+		Lara.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1]++;
+		Lara.PickupsCombo[object - INV_OBJECT_PICKUP1_COMBO1 + 1]++;
 	}
 }
 
@@ -73,15 +72,15 @@ void CombineExamine(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Examines[object - INV_OBJECT_EXAMINE1]++;
-		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1]--;
-		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1 + 1]--;
+		Lara.Examines[object - INV_OBJECT_EXAMINE1]++;
+		Lara.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1]--;
+		Lara.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1 + 1]--;
 	}
 	else
 	{
-		g_LaraExtra.Examines[object - INV_OBJECT_EXAMINE1]--;
-		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1]++;
-		g_LaraExtra.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1 + 1]++;
+		Lara.Examines[object - INV_OBJECT_EXAMINE1]--;
+		Lara.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1]++;
+		Lara.ExaminesCombo[object - INV_OBJECT_EXAMINE1_COMBO1 + 1]++;
 	}
 }
 
@@ -89,13 +88,13 @@ void CombineRevolverLasersight(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Lasersight = false;
-		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = true;
+		Lara.Lasersight = false;
+		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = true;
 	}
 	else
 	{
-		g_LaraExtra.Lasersight = true;
-		g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = false;
+		Lara.Lasersight = true;
+		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = false;
 	}
 
 	if (Lara.gunStatus && Lara.gunType == WEAPON_REVOLVER)
@@ -109,13 +108,13 @@ void CombineCrossbowLasersight(int action, short object)
 {
 	if (action == INV_COMBINE_COMBINE)
 	{
-		g_LaraExtra.Lasersight = false;
-		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = true;
+		Lara.Lasersight = false;
+		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = true;
 	}
 	else
 	{
-		g_LaraExtra.Lasersight = true;
-		g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight = false;
+		Lara.Lasersight = true;
+		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = false;
 	}
 
 	if (Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
@@ -268,65 +267,65 @@ void Inventory::LoadObjects(bool isReload)
 		}
 	}
 
-	/*g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0] = 1000;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
-	g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight = true;
+	/*Lara.Weapons[WEAPON_REVOLVER].Present = true;
+	Lara.Weapons[WEAPON_REVOLVER].Ammo[0] = 1000;
+	Lara.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+	Lara.Weapons[WEAPON_REVOLVER].HasLasersight = true;
 
 	// DEBUG
 	{
-		/*g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present = true;
-		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0] = 1000;
-		g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1] = 1000;
-		g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
+		/*Lara.Weapons[WEAPON_SHOTGUN].Present = true;
+		Lara.Weapons[WEAPON_SHOTGUN].Ammo[0] = 1000;
+		Lara.Weapons[WEAPON_SHOTGUN].Ammo[1] = 1000;
+		Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
 
-		g_LaraExtra.Weapons[WEAPON_REVOLVER].Present = true;
-		g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0] = 1000;
-		g_LaraExtra.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+		Lara.Weapons[WEAPON_REVOLVER].Present = true;
+		Lara.Weapons[WEAPON_REVOLVER].Ammo[0] = 1000;
+		Lara.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
 
 		Lara.laserSight = true;
 
-		/*g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present = true;
-		g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] = 1000;
-		g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
+		/*Lara.Weapons[WEAPON_CROSSBOW].Present = true;
+		Lara.Weapons[WEAPON_CROSSBOW].Ammo[0] = 1000;
+		Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
 
-		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
-		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] = 1000;
-		g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
+		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
+		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] = 1000;
+		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
 
-		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Present = true;
-		g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;
+		Lara.Weapons[WEAPON_HARPOON_GUN].Present = true;
+		Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] = 1000;
 	}*/
 
 	// Now fill the rings
 	if (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_YOUNG)
 	{
 		// Pistols
-		if (g_LaraExtra.Weapons[WEAPON_PISTOLS].Present)
+		if (Lara.Weapons[WEAPON_PISTOLS].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_PISTOLS);
 
 		// Uzi
-		if (g_LaraExtra.Weapons[WEAPON_UZI].Present)
+		if (Lara.Weapons[WEAPON_UZI].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZIS);
-		else if (g_LaraExtra.Weapons[WEAPON_UZI].Ammo[0])
+		else if (Lara.Weapons[WEAPON_UZI].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_UZI_AMMO);
 
 		// Revolver
-		if (g_LaraExtra.Weapons[WEAPON_REVOLVER].Present)
+		if (Lara.Weapons[WEAPON_REVOLVER].Present)
 		{
-			if (g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight)
+			if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_LASER);
 			else
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER);
 		}
 		else
 		{
-			if (g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0])
+			if (Lara.Weapons[WEAPON_REVOLVER].Ammo[0])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_REVOLVER_AMMO);
 		}
 
 		// Shotgun
-		if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Present)
+		if (Lara.Weapons[WEAPON_SHOTGUN].Present)
 		{
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN);
 			//if (Lara.shotgunTypeCarried & 0x10)
@@ -334,138 +333,138 @@ void Inventory::LoadObjects(bool isReload)
 		}
 		else
 		{
-			if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0])
+			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN_AMMO1);
-			if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1])
+			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[1])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
 		// HK
-		if (g_LaraExtra.Weapons[WEAPON_HK].Present)
+		if (Lara.Weapons[WEAPON_HK].Present)
 		{
-			if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+			if (Lara.Weapons[WEAPON_HK].HasSilencer)
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_LASER);
 			else
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK);
 		}
-		else if (g_LaraExtra.Weapons[WEAPON_HK].Ammo[0])
+		else if (Lara.Weapons[WEAPON_HK].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HK_AMMO1);
 
 		// Crossbow
-		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Present)
+		if (Lara.Weapons[WEAPON_CROSSBOW].Present)
 		{
-			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight)
+			if (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_LASER);
 			else
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW);
 		}
 		else
 		{
-			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0])
+			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[0])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO1);
-			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[1])
+			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[1])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO2);
-			if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[2])
+			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[2])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROSSBOW_AMMO3);
 		}
 
 		// Grenade launcher
-		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
+		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_LAUNCHER);
 		else
 		{
-			if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0])
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO1);
-			if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1])
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO2);
-			if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2])
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2])
 				InsertObject(INV_RING_WEAPONS, INV_OBJECT_GRENADE_AMMO3);
 		}
 
 		// Harpoon
-		if (g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Present)
+		if (Lara.Weapons[WEAPON_HARPOON_GUN].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_GUN);
-		else if (g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
+		else if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_HARPOON_AMMO);
 
 		// Rocket launcher
-		if (g_LaraExtra.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
+		if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_LAUNCHER);
-		else if (g_LaraExtra.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0])
+		else if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0])
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_ROCKET_AMMO);
 
 		// Lasersight
-		if (g_LaraExtra.Lasersight)
+		if (Lara.Lasersight)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_LASERSIGHT);
 
 		// Silencer
-		if (g_LaraExtra.Silencer)
+		if (Lara.Silencer)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_SILENCER);
 
 		// Binoculars
-		if (g_LaraExtra.Binoculars)
+		if (Lara.Binoculars)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_BINOCULARS);
 
 		// Flares
-		if (g_LaraExtra.NumFlares)
+		if (Lara.NumFlares)
 			InsertObject(INV_RING_WEAPONS, INV_OBJECT_FLARES);
 	}
 
-	if (g_LaraExtra.NumSmallMedipacks)
+	if (Lara.NumSmallMedipacks)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_SMALL_MEDIPACK);
 
-	if (g_LaraExtra.NumLargeMedipacks)
+	if (Lara.NumLargeMedipacks)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_LARGE_MEDIPACK);
 
-	if (g_LaraExtra.Crowbar)
+	if (Lara.Crowbar)
 		InsertObject(INV_RING_WEAPONS, INV_OBJECT_CROWBAR);
 
 	int i;
 	for (i = 0; i < NUM_PUZZLES; i++)
 	{
-		if (g_LaraExtra.Puzzles[i])
+		if (Lara.Puzzles[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1);
 	}
 
 	for (i = 0; i < NUM_PUZZLES * 2; i++)
 	{
-		if (g_LaraExtra.PuzzlesCombo[i])
+		if (Lara.PuzzlesCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PUZZLE1_COMBO1);
 	}
 
 	for (i = 0; i < NUM_KEYS; i++)
 	{
-		if (g_LaraExtra.Keys[i])
+		if (Lara.Keys[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1);
 	}
 
 	for (i = 0; i < NUM_KEYS * 2; i++)
 	{
-		if (g_LaraExtra.KeysCombo[i])
+		if (Lara.KeysCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_KEY1_COMBO1);
 	}
 
 	for (i = 0; i < NUM_PICKUPS; i++)
 	{
-		if (g_LaraExtra.Pickups[i])
+		if (Lara.Pickups[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1);
 	}
 
 	for (i = 0; i < NUM_PICKUPS * 2; i++)
 	{
-		if (g_LaraExtra.PickupsCombo[i])
+		if (Lara.PickupsCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_PICKUP1_COMBO1);
 	}
 
 	for (i = 0; i < NUM_EXAMINES; i++)
 	{
-		if (g_LaraExtra.Examines[i])
+		if (Lara.Examines[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_EXAMINE1);
 	}
 
 	for (i = 0; i < NUM_EXAMINES * 2; i++)
 	{
-		if (g_LaraExtra.ExaminesCombo[i])
+		if (Lara.ExaminesCombo[i])
 			InsertObject(INV_RING_PUZZLES, i + INV_OBJECT_EXAMINE1_COMBO1);
 	}
 
@@ -478,10 +477,10 @@ void Inventory::LoadObjects(bool isReload)
 	if (Lara.bottle)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_BOTTLE);
 
-	if (g_LaraExtra.Waterskin1.Present)
+	if (Lara.Waterskin1.Present)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WATERSKIN1);
 
-	if (g_LaraExtra.Waterskin2.Present)
+	if (Lara.Waterskin2.Present)
 		InsertObject(INV_RING_PUZZLES, INV_OBJECT_WATERSKIN2);
 
 	InventoryRing* ring = &m_rings[INV_RING_OPTIONS];
@@ -1283,34 +1282,34 @@ void Inventory::DoSelectAmmo()
 	switch (ring->objects[ring->currentObject].inventoryObject)
 	{
 	case INV_OBJECT_SHOTGUN:
-		if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0] != 0)
+		if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_SHOTGUN_AMMO1;
-		if (g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1] != 0)
+		if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[1] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_SHOTGUN_AMMO2;
-		ammoRing->selectedIndex = g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo;
+		ammoRing->selectedIndex = Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo;
 
 		break;
 
 	case INV_OBJECT_GRENADE_LAUNCHER:
-		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] != 0)
+		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_GRENADE_AMMO1;
-		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1] != 0)
+		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_GRENADE_AMMO2;
-		if (g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2] != 0)
+		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_GRENADE_AMMO3;
-		ammoRing->selectedIndex = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
+		ammoRing->selectedIndex = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
 		
 		break;
 
 	case INV_OBJECT_CROSSBOW:
 	case INV_OBJECT_CROSSBOW_LASER:
-		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0] != 0)
+		if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[0] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_CROSSBOW_AMMO1;
-		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[1] != 0)
+		if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[1] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_CROSSBOW_AMMO2;
-		if (g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[2] != 0)
+		if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[2] != 0)
 			ammoRing->objects[ammoRing->numObjects++].inventoryObject = INV_OBJECT_CROSSBOW_AMMO3;
-		ammoRing->selectedIndex = g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
+		ammoRing->selectedIndex = Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
 		
 		break;
 	}
@@ -1394,16 +1393,16 @@ void Inventory::DoSelectAmmo()
 			switch (ring->objects[ring->currentObject].inventoryObject)
 			{
 			case INV_OBJECT_SHOTGUN:
-				g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo = ring->selectedIndex;
+				Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = ring->selectedIndex;
 				break;
 
 			case INV_OBJECT_GRENADE_LAUNCHER:
-				g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = ring->selectedIndex;
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = ring->selectedIndex;
 				break;
 
 			case INV_OBJECT_CROSSBOW:
 			case INV_OBJECT_CROSSBOW_LASER:
-				g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo = ring->selectedIndex;
+				Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = ring->selectedIndex;
 				break;
 
 			}
@@ -1444,8 +1443,8 @@ void Inventory::UseCurrentItem()
 			return;
 		}
 
-		if (g_LaraExtra.NumSmallMedipacks != -1)
-			g_LaraExtra.NumSmallMedipacks--;
+		if (Lara.NumSmallMedipacks != -1)
+			Lara.NumSmallMedipacks--;
 
 		Lara.dpoisoned = 0;
 		LaraItem->hitPoints += 500;
@@ -1469,8 +1468,8 @@ void Inventory::UseCurrentItem()
 			return;
 		}
 
-		if (g_LaraExtra.NumLargeMedipacks != -1)
-			g_LaraExtra.NumLargeMedipacks--;
+		if (Lara.NumLargeMedipacks != -1)
+			Lara.NumLargeMedipacks--;
 
 		Lara.dpoisoned = 0;
 		LaraItem->hitPoints += 1000;

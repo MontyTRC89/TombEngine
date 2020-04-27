@@ -558,7 +558,7 @@ void HitmanControl(short itemNumber)
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{
 					LaraBurn();
-					Lara.BurnCount = 48;
+					Lara.burnCount = 48;
 					Lara.burnBlue = 1;
 					LaraItem->hitPoints = 0;
 				}
