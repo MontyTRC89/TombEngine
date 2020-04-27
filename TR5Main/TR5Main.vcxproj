@@ -19,7 +19,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -47,8 +47,9 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)TR5Main\Libs\lua</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
+    <IncludePath>F:\Software\TR5Main\TR5Main\Libs\zlib;F:\Software\TR5Main\TR5Main\Libs\zlib\include;$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)TR5Main\Libs\lua</IncludePath>
+    <LibraryPath>F:\Software\TR5Main\TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -76,7 +77,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
@@ -120,8 +121,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\bubble.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
-    <ClInclude Include="Game\swat.h" />
-    <ClInclude Include="Global\legacyfunctions.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
     <ClInclude Include="Renderer\CameraMatrixBuffer.h" />
@@ -187,26 +186,22 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\objlight.h" />
     <ClInclude Include="Game\people.h" />
     <ClInclude Include="Game\pickup.h" />
-    <ClInclude Include="Game\rat.h" />
     <ClInclude Include="Game\rope.h" />
     <ClInclude Include="Game\savegame.h" />
     <ClInclude Include="Game\sound.h" />
     <ClInclude Include="Game\sphere.h" />
-    <ClInclude Include="Game\spikewall.h" />
     <ClInclude Include="Game\spotcam.h" />
     <ClInclude Include="Game\switch.h" />
     <ClInclude Include="Game\text.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
     <ClInclude Include="Game\tomb4fx.h" />
     <ClInclude Include="Game\traps.h" />
-    <ClInclude Include="Game\twogun.h" />
     <ClInclude Include="Global\constants.h" />
     <ClInclude Include="Global\enums.h" />
     <ClInclude Include="Global\global.h" />
     <ClInclude Include="Global\macros.h" />
     <ClInclude Include="Global\objectslist.h" />
     <ClInclude Include="Global\types.h" />
-    <ClInclude Include="Global\vars.h" />
     <ClInclude Include="Global\malloc.h" />
     <ClInclude Include="Global\math.h" />
     <ClInclude Include="Global\vodoo.h" />
@@ -216,17 +211,15 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Specific\init.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
-    <ClInclude Include="Specific\roomload.h" />
+    <ClInclude Include="Specific\level.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Game\bubble.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
-    <ClCompile Include="Game\swat.cpp" />
     <ClCompile Include="Global\math.cpp" />
     <ClCompile Include="Objects\TR1\tr1_lara_evil.cpp" />
     <ClCompile Include="Objects\TR1\tr1_larson.cpp" />
@@ -365,7 +358,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\objlight.cpp" />
     <ClCompile Include="Game\people.cpp" />
     <ClCompile Include="Game\pickup.cpp" />
-    <ClCompile Include="Game\rat.cpp" />
     <ClCompile Include="Game\rope.cpp" />
     <ClCompile Include="Game\savegame.cpp" />
     <ClCompile Include="Game\sound.cpp" />
@@ -375,7 +367,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\text.cpp" />
     <ClCompile Include="Game\tomb4fx.cpp" />
     <ClCompile Include="Game\traps.cpp" />
-    <ClCompile Include="Game\twogun.cpp" />
     <ClCompile Include="Global\malloc.cpp" />
     <ClCompile Include="Objects\TR4\tr4_baddy.cpp" />
     <ClCompile Include="Objects\Vehicles\motorbike.cpp" />
@@ -390,9 +381,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Specific\configuration.cpp" />
     <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
-    <ClCompile Include="Specific\game.cpp" />
-    <ClCompile Include="Specific\game.h" />
-    <ClCompile Include="Specific\roomload.cpp" />
+    <ClCompile Include="Specific\level.cpp" />
     <ClCompile Include="Specific\setup.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
     <ClCompile Include="TR5Main.cpp" />

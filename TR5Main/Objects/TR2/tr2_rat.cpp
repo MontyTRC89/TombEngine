@@ -1,7 +1,9 @@
 #include "../newobjects.h"
+#include "../../Game/lara.h"
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO ratBite = { 0, 0, 57, 2 };
 

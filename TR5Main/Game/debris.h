@@ -40,4 +40,3 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 DebrisFragment* GetFreeDebrisFragment();
 Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation);
 void UpdateDebris();
-void Inject_Debris();

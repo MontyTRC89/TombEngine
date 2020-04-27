@@ -2,6 +2,7 @@
 #include "../../Game/items.h"
 #include "../../Game/effect2.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO horseBite1 = { 0, 0, 0, 0x0D };
 BITE_INFO horseBite2 = { 0, 0, 0, 0x11 };
@@ -63,8 +64,8 @@ void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 		spark->flags = 0;
 		spark->gravity = (r >> 7) & 0x1F;
 		spark->maxYvel = 0;
-		spark->zVel = COS((r & 0x7FF) + param1 - 1024) >> 2;
-		spark->xVel = -SIN((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) >> 2;
 	}
 
 	for (int i = 0; i < num; i++)
@@ -105,8 +106,8 @@ void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 		spark->dSize = spark->sSize >> 1;
 		spark->flags = 26;
 		spark->maxYvel = 0;
-		spark->zVel = COS((r & 0x7FF) + param1 - 1024) >> 2;
-		spark->xVel = -SIN((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) >> 2;
+		spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) >> 2;
 	}
 }
 
@@ -162,21 +163,21 @@ void HorsemanControl(short itemNum)
 		y = horseItem->pos.yPos;
 		z = horseItem->pos.zPos;
 
-		x = horseItem->pos.xPos + 341 * SIN(horseItem->pos.yRot) >> 14;
+		x = horseItem->pos.xPos + 341 * phd_sin(horseItem->pos.yRot) >> 14;
 		y = horseItem->pos.yPos;
-		z = horseItem->pos.zPos + 341 * COS(horseItem->pos.yRot) >> 14;
+		z = horseItem->pos.zPos + 341 * phd_cos(horseItem->pos.yRot) >> 14;
 
 		floor = GetFloor(x, y, z, &roomNumber);
 		height1 = GetFloorHeight(floor, x, y, z);
 
-		x = horseItem->pos.xPos - 341 * SIN(horseItem->pos.yRot) >> 14;
+		x = horseItem->pos.xPos - 341 * phd_sin(horseItem->pos.yRot) >> 14;
 		y = horseItem->pos.yPos;
-		z = horseItem->pos.zPos - 341 * COS(horseItem->pos.yRot) >> 14;
+		z = horseItem->pos.zPos - 341 * phd_cos(horseItem->pos.yRot) >> 14;
 
 		floor = GetFloor(x, y, z, &roomNumber);
 		height2 = GetFloorHeight(floor, x, y, z);
 
-		xRot = ATAN(682, height2 - height1);
+		xRot = phd_atan(682, height2 - height1);
 	}
 
 	if (item->hitPoints <= 0)
@@ -259,7 +260,7 @@ void HorsemanControl(short itemNum)
 		deltaX = LaraItem->pos.zPos - item->pos.zPos;
 		deltaZ = LaraItem->pos.zPos - item->pos.zPos;
 
-		laraInfo.angle = ATAN(deltaX, deltaZ) - item->pos.yRot;
+		laraInfo.angle = phd_atan(deltaX, deltaZ) - item->pos.yRot;
 		laraInfo.distance = SQUARE(deltaX) + SQUARE(deltaZ);
 	}
 

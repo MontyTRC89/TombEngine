@@ -2,6 +2,8 @@
 #include "../../Game/Box.h"
 #include "../../Game/people.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/control.h"
 
 BITE_INFO mercUziBite = { 0, 150, 19, 17 };
 BITE_INFO mercAutoPistolBite = { 0, 230, 9, 17 };

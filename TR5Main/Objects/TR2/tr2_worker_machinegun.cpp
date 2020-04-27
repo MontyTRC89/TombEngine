@@ -3,6 +3,7 @@
 #include "../../Game/Box.h"
 #include "../../Game/items.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
 

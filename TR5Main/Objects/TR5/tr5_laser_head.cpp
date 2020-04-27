@@ -13,6 +13,9 @@
 #include "../../Game/laramisc.h"
 #include "../../Game/traps.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 struct LASER_HEAD_INFO
 {
@@ -43,7 +46,7 @@ void InitialiseGuardian(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	item->data = (LASER_HEAD_INFO*)GameMalloc(sizeof(LASER_HEAD_INFO));
+	item->data = (LASER_HEAD_INFO*)game_malloc(sizeof(LASER_HEAD_INFO));
 	LASER_HEAD_INFO* info = (LASER_HEAD_INFO*)item->data;
 
 	for (int i = 0; i < LevelItems; i++)
@@ -128,7 +131,7 @@ void GuardianControl(short itemNumber)
 				}
 			}
 
-			item->pos.yPos = item->itemFlags[1] - ((192 - item->speed) * SIN(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - ((192 - item->speed) * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
 			item->itemFlags[2] += ONE_DEGREE * item->speed;
 
 			if (!(GlobalCounter & 7))
@@ -170,7 +173,7 @@ void GuardianControl(short itemNumber)
 		else
 		{
 			item->triggerFlags++;
-			item->pos.yPos = item->itemFlags[1] - (128 * SIN(item->itemFlags[2]) >> W2V_SHIFT);
+			item->pos.yPos = item->itemFlags[1] - (128 * phd_sin(item->itemFlags[2]) >> W2V_SHIFT);
 			item->itemFlags[2] += ANGLE(3);
 
 			// Get guardian head's position
@@ -190,7 +193,7 @@ void GuardianControl(short itemNumber)
 				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LJ_LHAND);
 
 				// Calculate distance between guardian and Lara
-				int distance = SQRT_ASM(SQUARE(src.x - dest.x) + SQUARE(src.y - dest.y) + SQUARE(src.z - dest.z));
+				int distance = sqrt(SQUARE(src.x - dest.x) + SQUARE(src.y - dest.y) + SQUARE(src.z - dest.z));
 
 				// Check if there's a valid LOS between guardian and Lara 
 				// and if distance is less than 8 sectors  and if Lara is alive and not burning
@@ -227,10 +230,10 @@ void GuardianControl(short itemNumber)
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
-						int c = v * COS(-xRot) >> W2V_SHIFT;
-						dest.x = src.x + (c * SIN(yRot) >> W2V_SHIFT);
-						dest.y = src.y + (v * SIN(-xRot) >> W2V_SHIFT);
-						dest.z = src.z + (c * COS(yRot) >> W2V_SHIFT);
+						int c = v * phd_cos(-xRot) >> W2V_SHIFT;
+						dest.x = src.x + (c * phd_sin(yRot) >> W2V_SHIFT);
+						dest.y = src.y + (v * phd_sin(-xRot) >> W2V_SHIFT);
+						dest.z = src.z + (c * phd_cos(yRot) >> W2V_SHIFT);
 
 						if (condition)
 						{
@@ -264,11 +267,11 @@ void GuardianControl(short itemNumber)
 
 				if (JustLoaded)
 				{
-					int c = 8192 * COS(item->pos.xRot + 3328) >> W2V_SHIFT;
+					int c = 8192 * phd_cos(item->pos.xRot + 3328) >> W2V_SHIFT;
 					
-					dest.x = LaserHeadData.target.x = src.x + (c * SIN(item->pos.yRot) >> W2V_SHIFT);
-					dest.y = LaserHeadData.target.y = src.y + (8192 * SIN(3328 - item->pos.xRot) >> W2V_SHIFT);
-					dest.z = LaserHeadData.target.z = src.z + (c * COS(item->pos.yRot) >> W2V_SHIFT);
+					dest.x = LaserHeadData.target.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+					dest.y = LaserHeadData.target.y = src.y + (8192 * phd_sin(3328 - item->pos.xRot) >> W2V_SHIFT);
+					dest.z = LaserHeadData.target.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 				}
 				else
 				{
@@ -360,12 +363,12 @@ void GuardianControl(short itemNumber)
 								src.z = 0;
 								GetJointAbsPosition(item, (PHD_VECTOR*)& src, GuardianMeshes[i]);
 
-								int c = 8192 * COS(angles[1]) >> W2V_SHIFT;
-								dest.x = src.x + (c * SIN(item->pos.yRot) >> W2V_SHIFT);
-								dest.y = src.y + (8192 * SIN(-angles[1]) >> W2V_SHIFT);
-								dest.z = src.z + (c * COS(item->pos.yRot) >> W2V_SHIFT);
+								int c = 8192 * phd_cos(angles[1]) >> W2V_SHIFT;
+								dest.x = src.x + (c * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+								dest.y = src.y + (8192 * phd_sin(-angles[1]) >> W2V_SHIFT);
+								dest.z = src.z + (c * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 
-								if (item->itemFlags[3] != 90
+								if (item->itemFlags[3] != 90 
 									&& LaserHeadData.fireArcs[j] != NULL)
 								{
 									// Eye is aready firing
@@ -409,11 +412,7 @@ void GuardianControl(short itemNumber)
 									short* bounds = GetBoundsAccurate(LaraItem);
 									short tbounds[6];
 
-									phd_PushUnitMatrix();
-									phd_RotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
-									phd_SetTrans(0, 0, 0);
-									phd_RotBoundingBoxNoPersp(bounds, tbounds);
-									phd_PopMatrix();
+									phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, tbounds);
 
 									int x1 = LaraItem->pos.xPos + tbounds[0];
 									int x2 = LaraItem->pos.xPos + tbounds[1];
@@ -426,7 +425,7 @@ void GuardianControl(short itemNumber)
 									int yc = LaraItem->pos.yPos + ((bounds[2] + bounds[3]) >> 1);
 									int zc = LaraItem->pos.zPos + ((bounds[4] + bounds[5]) >> 1);
 
-									int distance = SQRT_ASM(SQUARE(xc - src.x) + SQUARE(yc - src.y) + SQUARE(zc - src.z));
+									int distance = sqrt(SQUARE(xc - src.x) + SQUARE(yc - src.y) + SQUARE(zc - src.z));
 
 									if (distance < 8192)
 									{

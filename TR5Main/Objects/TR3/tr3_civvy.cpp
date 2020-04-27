@@ -3,6 +3,9 @@
 #include "../../Game/effects.h"
 #include "../../Game/people.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO civvy_hit = { 0,0,0, 13 };
 
@@ -96,7 +99,7 @@ void CivvyControl(short item_number)
 		{
 			lara_dz = LaraItem->pos.zPos - item->pos.zPos;
 			lara_dx = LaraItem->pos.xPos - item->pos.xPos;
-			lara_info.angle = ATAN(lara_dz, lara_dx) - item->pos.yRot; //only need to fill out the bits of lara_info that will be needed by TargetVisible
+			lara_info.angle = phd_atan(lara_dz, lara_dx) - item->pos.yRot; //only need to fill out the bits of lara_info that will be needed by TargetVisible
 			lara_info.distance = lara_dz * lara_dz + lara_dx * lara_dx;
 		}
 

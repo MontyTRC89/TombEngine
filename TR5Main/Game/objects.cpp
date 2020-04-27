@@ -12,7 +12,13 @@
 #include "switch.h"
 #include "box.h"
 #include "../Specific/setup.h"
+#include "tomb4fx.h"
+#include "..\Specific\level.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
+OBJECT_TEXTURE* WaterfallTextures[6];
+float WaterfallY[6];
 int lastWaterfallY = 0;
 short TightRopeBounds[12] = 
 {
@@ -64,7 +70,7 @@ void SmashObject(short itemNumber)
 	item->collidable = 0;
 	item->meshBits = 0xFFFE;
 
-	ExplodingDeath(itemNumber, -1, 257); //ExplodingDeath2
+	ExplodingDeath(itemNumber, -1, 257); 
 
 	item->flags |= IFLAG_INVISIBLE;
 
@@ -600,7 +606,7 @@ void CutsceneRopeControl(short itemNumber)
 	dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
 	dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
-	item->itemFlags[1] = ((SQRT_ASM(dx + dy + dz) << 1) + SQRT_ASM(dx + dy + dz)) << 1;
+	item->itemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
 	item->pos.xRot = -4869;
 }
 
@@ -645,26 +651,90 @@ void InitialiseTightRope(short itemNumber)
 	}
 }
 
-void Inject_Objects()
+void InitialiseAnimating(short itemNumber)
 {
-	INJECT(0x00465FE0, TightRopeCollision);
-	INJECT(0x00465200, SmashObject);
+	ITEM_INFO* item = &Items[itemNumber];
+	item->currentAnimState = 0;
+	item->animNumber = Objects[item->objectNumber].animIndex;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+}
 
-	/*INJECT(0x00465200, SmashObject);
-	INJECT(0x00465330, SmashObjectControl);
-	INJECT(0x00465350, BridgeFlatFloor);
-	INJECT(0x00465390, BridgeFlatCeiling);
-	INJECT(0x00465410, BridgeTilt1Floor);
-	INJECT(0x00465480, BridgeTilt1Ceiling);
-	INJECT(0x004654D0, BridgeTilt2Floor);
-	INJECT(0x00465540, BridgeTilt2Ceiling);
-	//INJECT(0x00465590, AnimatingControl);
-	INJECT(0x00465A30, PoleCollision);
-	INJECT(0x00465D00, ControlTriggerTriggerer);
-	INJECT(0x00465DF0, AnimateWaterfalls);
-	INJECT(0x00465F10, ControlWaterfall);
-	INJECT(0x004661C0, ParallelBarsCollision);
-	INJECT(0x00466420, ControlXRayMachine);
-	INJECT(0x00466720, CutsceneRopeControl);
-	INJECT(0x00466AA0, HybridCollision);*/
+void AnimatingControl(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!TriggerActive(item))
+		return;
+
+	item->status = ITEM_ACTIVE;
+
+	AnimateItem(item);
+
+	if (item->frameNumber >= Anims[item->animNumber].frameEnd)
+	{
+		item->frameNumber = Anims[item->animNumber].frameBase;
+		RemoveActiveItem(itemNumber);
+		item->aiBits = 0;
+		item->status = ITEM_INACTIVE;
+	}
+}
+
+void HighObject2Control(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	if (!TriggerActive(item))
+		return;
+
+
+	if (!item->itemFlags[2])
+	{
+		int div = item->triggerFlags % 10 << 10;
+		int mod = item->triggerFlags / 10 << 10;
+		item->itemFlags[0] = GetRandomControl() % div;
+		item->itemFlags[1] = GetRandomControl() % mod;
+		item->itemFlags[2] = (GetRandomControl() & 0xF) + 15;
+	}
+
+	if (--item->itemFlags[2] < 15)
+	{
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+		spark->on = 1;
+		spark->sR = -1;
+		spark->sB = 16;
+		spark->sG = (GetRandomControl() & 0x1F) + 48;
+		spark->dR = (GetRandomControl() & 0x3F) - 64;
+		spark->dB = 0;
+		spark->dG = (GetRandomControl() & 0x3F) + -128;
+		spark->fadeToBlack = 4;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+		spark->transType = COLADD;
+		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
+		spark->x = item->itemFlags[1] + (GetRandomControl() & 0x3F) + item->pos.xPos - 544;
+		spark->y = item->pos.yPos;
+		spark->z = item->itemFlags[0] + (GetRandomControl() & 0x3F) + item->pos.zPos - 544;
+		spark->xVel = (GetRandomControl() & 0x1FF) - 256;
+		spark->friction = 6;
+		spark->zVel = (GetRandomControl() & 0x1FF) - 256;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
+		spark->maxYvel = 0;
+		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
+		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
+		spark->dSize = spark->size >> 2;
+
+		if (GetRandomControl() & 3)
+		{
+			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE | SP_EXPDEF;
+			spark->scalar = 3;
+			spark->gravity = (GetRandomControl() & 0x3F) + 32;
+		}
+		else
+		{
+			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
+			spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+			spark->scalar = 1;
+			spark->gravity = (GetRandomControl() & 0xF) + 64;
+		}
+	}
 }

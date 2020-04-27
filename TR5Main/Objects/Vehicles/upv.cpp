@@ -13,6 +13,10 @@
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
 #include "../../Game/bubble.h"
+#include "..\..\Specific\level.h"
+#include "../../Specific/input.h"
+#include "../../Game/savegame.h"
+#include "../../Game/sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -115,8 +119,8 @@ static void FireSubHarpoon(ITEM_INFO* v)
 		item->pos.yRot = v->pos.yRot;
 		item->pos.zRot = 0;
 
-		item->fallspeed = (short)(-HARPOON_SPEED * SIN(item->pos.xRot) >> W2V_SHIFT);
-		item->speed =     (short)(HARPOON_SPEED * COS(item->pos.xRot) >> W2V_SHIFT);
+		item->fallspeed = (short)(-HARPOON_SPEED * phd_sin(item->pos.xRot) >> W2V_SHIFT);
+		item->speed =     (short)(HARPOON_SPEED * phd_cos(item->pos.xRot) >> W2V_SHIFT);
 		item->hitPoints = HARPOON_TIME;
 		item->itemFlags[0] = 1;
 
@@ -160,8 +164,8 @@ void TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->x = x + ((GetRandomControl() & 15) - 8);
 	sptr->y = y + ((GetRandomControl() & 15) - 8);
 	sptr->z = z + ((GetRandomControl() & 15) - 8);
-	zv = (speed * COS(angle)) >> (W2V_SHIFT + 2);
-	xv = (speed * SIN(angle)) >> (W2V_SHIFT + 2);
+	zv = (speed * phd_cos(angle)) >> (W2V_SHIFT + 2);
+	xv = (speed * phd_sin(angle)) >> (W2V_SHIFT + 2);
 	sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
 	sptr->yVel = 0;
 	sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
@@ -278,10 +282,10 @@ static int CanGetOff(ITEM_INFO* v)
 		return 0;
 
 	yangle = v->pos.yRot + 0x8000;
-	speed = (GETOFF_DIST * COS(v->pos.xRot)) >> W2V_SHIFT;
-	x = v->pos.xPos + (speed * SIN(yangle) >> W2V_SHIFT);
-	z = v->pos.zPos + (speed * COS(yangle) >> W2V_SHIFT);
-	y = v->pos.yPos - ((GETOFF_DIST * SIN(-v->pos.xRot)) >> W2V_SHIFT);
+	speed = (GETOFF_DIST * phd_cos(v->pos.xRot)) >> W2V_SHIFT;
+	x = v->pos.xPos + (speed * phd_sin(yangle) >> W2V_SHIFT);
+	z = v->pos.zPos + (speed * phd_cos(yangle) >> W2V_SHIFT);
+	y = v->pos.yPos - ((GETOFF_DIST * phd_sin(-v->pos.xRot)) >> W2V_SHIFT);
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -423,7 +427,7 @@ void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	else
 		coll->facing = Lara.moveAngle = v->pos.yRot - 32768;
 
-	height = SIN(v->pos.xRot) * SUB_LENGTH >> W2V_SHIFT;
+	height = phd_sin(v->pos.xRot) * SUB_LENGTH >> W2V_SHIFT;
 	if (height < 0)
 		height = -height;
 	if (height < 200)
@@ -766,7 +770,7 @@ void SubInitialise(short itemNum)
 	SUB_INFO* sub;
 
 	v = &Items[itemNum];
-	sub = (SUB_INFO*)GameMalloc(sizeof(SUB_INFO));
+	sub = (SUB_INFO*)game_malloc(sizeof(SUB_INFO));
 	v->data = (void*)sub;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
@@ -864,9 +868,9 @@ int SubControl()
 		else if (v->pos.xRot < -UPDOWN_LIMIT)
 			v->pos.xRot = -UPDOWN_LIMIT;
 
-		v->pos.xPos += (((SIN(v->pos.yRot) * v->speed) >> W2V_SHIFT)* COS(v->pos.xRot)) >> W2V_SHIFT;
-		v->pos.yPos -= (SIN(v->pos.xRot) * v->speed) >> W2V_SHIFT;
-		v->pos.zPos += (((COS(v->pos.yRot) * v->speed) >> W2V_SHIFT)* COS(v->pos.xRot)) >> W2V_SHIFT;
+		v->pos.xPos += (((phd_sin(v->pos.yRot) * v->speed) >> W2V_SHIFT)* phd_cos(v->pos.xRot)) >> W2V_SHIFT;
+		v->pos.yPos -= (phd_sin(v->pos.xRot) * v->speed) >> W2V_SHIFT;
+		v->pos.zPos += (((phd_cos(v->pos.yRot) * v->speed) >> W2V_SHIFT)* phd_cos(v->pos.xRot)) >> W2V_SHIFT;
 	}
 
 	/* -------- determine if vehicle is near the surface */

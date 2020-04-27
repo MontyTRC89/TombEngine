@@ -4,6 +4,8 @@
 #include "../../Game/people.h"
 #include "../../Game/items.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO crocodileBite = { 0, -156, 500, 9 };
 
@@ -40,9 +42,9 @@ void CrocodileControl(short itemNum)
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	int x = item->pos.xPos + SIN(item->pos.yRot) << 10 >> W2V_SHIFT;
+	int x = item->pos.xPos + phd_sin(item->pos.yRot) << 10 >> W2V_SHIFT;
 	int y = item->pos.yPos;
-	int z = item->pos.zPos + COS(item->pos.yRot) << 10 >> W2V_SHIFT;
+	int z = item->pos.zPos + phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT;
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -51,9 +53,9 @@ void CrocodileControl(short itemNum)
 	if (abs(y - height1) > 512)
 		height1 = y;
 
-	x = item->pos.xPos - SIN(item->pos.yRot) << 10 >> W2V_SHIFT;
+	x = item->pos.xPos - phd_sin(item->pos.yRot) << 10 >> W2V_SHIFT;
 	y = item->pos.yPos;
-	z = item->pos.zPos - COS(item->pos.yRot) << 10 >> W2V_SHIFT;
+	z = item->pos.zPos - phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT;
 
 	roomNumber = item->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -62,7 +64,7 @@ void CrocodileControl(short itemNum)
 	if (abs(y - height2) > 512)
 		height2 = y;
 
-	short at = ATAN(2048, height2 - height1);
+	short at = phd_atan(2048, height2 - height1);
 	short angle = 0;
 	short joint0 = 0;
 	short joint2 = 0;
@@ -327,17 +329,17 @@ void CrocodileControl(short itemNum)
 		if (item->currentAnimState == 8)
 		{
 			GetFloor(
-				item->pos.xPos + (SIN(item->pos.yRot) << 10 >> W2V_SHIFT),
+				item->pos.xPos + (phd_sin(item->pos.yRot) << 10 >> W2V_SHIFT),
 				item->pos.yPos,
-				item->pos.zPos + (COS(item->pos.yRot) << 10 >> W2V_SHIFT),
+				item->pos.zPos + (phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT),
 				&roomNumber);
 		}
 		else
 		{
 			GetFloor(
-				item->pos.xPos + (SIN(item->pos.yRot) << 9 >> W2V_SHIFT),
+				item->pos.xPos + (phd_sin(item->pos.yRot) << 9 >> W2V_SHIFT),
 				item->pos.yPos,
-				item->pos.zPos + (COS(item->pos.yRot) << 10 >> W2V_SHIFT),
+				item->pos.zPos + (phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT),
 				&roomNumber);
 		}
 

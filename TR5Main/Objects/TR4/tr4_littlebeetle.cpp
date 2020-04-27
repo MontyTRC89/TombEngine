@@ -1,4 +1,5 @@
 #include "../newobjects.h"
+#include "..\..\Specific\level.h"
 
 void InitialiseLittleBeetle(short itemNum)
 {

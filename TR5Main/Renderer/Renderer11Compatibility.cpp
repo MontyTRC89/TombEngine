@@ -1,8 +1,10 @@
 #include "Renderer11.h"
-#include "../Specific/roomload.h"
+#include "../Specific/level.h"
 #include <stack>
 #include "../Game/savegame.h"
 #include "../Specific/setup.h"
+#include "../Game/control.h"
+#include "../Game/objects.h"
 
 bool Renderer11::PrepareDataForTheRenderer()
 {
@@ -19,8 +21,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_meshes.clear();
 
 	// Step 0: prepare animated textures
-	short numSets = *AnimatedTextureRanges;
-	short* animatedPtr = AnimatedTextureRanges;
+	short numSets = *AnimTextureRanges;
+	short* animatedPtr = AnimTextureRanges;
 	animatedPtr++;
 
 	m_animatedTextureSets = vector<RendererAnimatedTextureSet>(NUM_ANIMATED_SETS);

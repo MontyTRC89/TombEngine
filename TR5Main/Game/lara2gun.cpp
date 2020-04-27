@@ -3,10 +3,14 @@
 #include "larafire.h"
 #include "lara.h"
 #include "effect2.h"
+#include "draw.h"
 #include "tomb4fx.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "..\Specific\setup.h"
 #include "camera.h"
+#include "../Specific/input.h"
+#include "sound.h"
+#include "savegame.h"
 
 PISTOL_DEF PistolsTable[4] =
 {

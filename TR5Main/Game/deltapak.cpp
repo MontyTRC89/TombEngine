@@ -1,6 +1,7 @@
 #include "deltapak.h"
 #include "..\Global\global.h"
 #include <stdio.h>
+#include "../Specific/level.h"
 
 ITEM_INFO* FindItem(short objectNumber)
 {
@@ -8,7 +9,7 @@ ITEM_INFO* FindItem(short objectNumber)
 	printf("Called FindItem()\n");
 #endif
 
-	DB_Log(0, "FindItem - DLL");
+	//DB_Log(0, "FindItem - DLL");
 
 	if (LevelItems > 0)
 	{
@@ -20,9 +21,4 @@ ITEM_INFO* FindItem(short objectNumber)
 	}
 
 	return NULL;
-}
-
-void Inject_DeltaPak()
-{
-	INJECT(0x00423470, FindItem);
 }

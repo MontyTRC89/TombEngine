@@ -4,6 +4,9 @@
 #include "../../Game/effects.h"
 #include "../../Game/effect2.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 
@@ -100,7 +103,7 @@ void ControlInvisibleGhost(short itemNumber)
 		}
 		else
 		{
-			item->afterDeath = SQRT_ASM(info.distance) >> 4;
+			item->afterDeath = sqrt(info.distance) / 16;
 			if (item->itemFlags[0] == 0)
 			{
 				item->itemFlags[0] = 1;

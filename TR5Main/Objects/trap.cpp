@@ -12,8 +12,11 @@
 #include "../Game/collide.h"
 #include "../Game/draw.h"
 #include "../Game/tomb4fx.h"
+#include "../Game/lara.h"
+#include "../Game/sound.h"
 #include "../Game/misc.h"
 #include "../Specific/setup.h"
+#include "..\Specific\level.h"
 
 short StargateBounds[24] = 
 {
@@ -341,12 +344,12 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 				{
 					if (result & 1)
 					{
-						GlobalCollisionBounds.X1 = SphereList[j].x - SphereList[j].r - item->pos.xPos;
-						GlobalCollisionBounds.Y1 = SphereList[j].y - SphereList[j].r - item->pos.yPos;
-						GlobalCollisionBounds.Z1 = SphereList[j].z - SphereList[j].r - item->pos.zPos;
-						GlobalCollisionBounds.X2 = SphereList[j].x + SphereList[j].r - item->pos.xPos;
-						GlobalCollisionBounds.Y2 = SphereList[j].y + SphereList[j].r - item->pos.yPos;
-						GlobalCollisionBounds.Z2 = SphereList[j].z + SphereList[j].r - item->pos.zPos;
+						GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->pos.zPos;
+						GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->pos.zPos;
 
 						int oldX = LaraItem->pos.xPos;
 						int oldY = LaraItem->pos.yPos;
@@ -359,7 +362,7 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 								TriggerActive(item))
 							{
 								DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32, 
-											 (GetRandomControl() & 0x1F) + SphereList[j].y - 16, 
+											 (GetRandomControl() & 0x1F) + CreatureSpheres[j].y - 16, 
 											 (GetRandomControl() & 0x3F) + l->pos.zPos - 32, 
 											 (GetRandomControl() & 3) + 2, 
 											 2 * GetRandomControl(), 
@@ -386,8 +389,8 @@ void ControlSpikyWall(short itemNum)
 	/* Move wall */
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
-		int x = item->pos.xPos + SIN(item->pos.yRot) >> WALL_SHIFT;
-		int z = item->pos.zPos + COS(item->pos.yRot) >> WALL_SHIFT;
+		int x = item->pos.xPos + phd_sin(item->pos.yRot) >> WALL_SHIFT;
+		int z = item->pos.zPos + phd_cos(item->pos.yRot) >> WALL_SHIFT;
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
@@ -438,8 +441,8 @@ void SpinningBlade(short item_number)
 	{
 		if (item->goalAnimState != 1)
 		{
-			int x = item->pos.xPos + (WALL_SIZE * 3 / 2 * SIN(item->pos.yRot) >> W2V_SHIFT);
-			int z = item->pos.zPos + (WALL_SIZE * 3 / 2 * COS(item->pos.yRot) >> W2V_SHIFT);
+			int x = item->pos.xPos + (WALL_SIZE * 3 / 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+			int z = item->pos.zPos + (WALL_SIZE * 3 / 2 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 
 			short roomNumber = item->roomNumber;
 			FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
@@ -548,8 +551,8 @@ void InitialiseSlicerDicer(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	int dx = SIN(item->pos.yRot + ANGLE(90)) >> 5;
-	int dz = COS(item->pos.yRot + ANGLE(90)) >> 5;
+	int dx = phd_sin(item->pos.yRot + ANGLE(90)) >> 5;
+	int dz = phd_cos(item->pos.yRot + ANGLE(90)) >> 5;
 
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;
@@ -567,10 +570,10 @@ void SlicerDicerControl(short itemNum)
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP, &item->pos, 0);
 	
-	int factor = (9 * COS(item->triggerFlags) << 9 >> W2V_SHIFT) * COS(item->pos.yRot) >> W2V_SHIFT;
+	int factor = (9 * phd_cos(item->triggerFlags) << 9 >> W2V_SHIFT) * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos = (item->itemFlags[0] << 8) + factor;
-	item->pos.yPos = (item->itemFlags[1] << 8) - 4608 * SIN(item->triggerFlags);
+	item->pos.yPos = (item->itemFlags[1] << 8) - 4608 * phd_sin(item->triggerFlags);
 	item->pos.zPos = (item->itemFlags[2] << 8) + factor;
 
 	item->triggerFlags += 170;
@@ -643,7 +646,7 @@ void MineControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	int num = GetSpheres(item, SphereList, true);
+	int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	if (item->itemFlags[0] >= 150)
 	{
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0);
@@ -652,7 +655,7 @@ void MineControl(short itemNum)
 
 		if (num > 0)
 		{
-			SPHERE* sphere = &SphereList[0];
+			SPHERE* sphere = &CreatureSpheres[0];
 
 			for (int i = 0; i < num; i++)
 			{
@@ -700,7 +703,7 @@ void MineControl(short itemNum)
 
 		for (int i = 0; i < num; i++)
 		{
-			SPHERE* sphere = &SphereList[i];
+			SPHERE* sphere = &CreatureSpheres[i];
 
 			if (i == 0 || i > 5)
 				AddFire(sphere->x, sphere->y, sphere->z, 2, item->roomNumber, something);
@@ -837,7 +840,7 @@ void SentryGunControl(short itemNum)
 				item->pos.yPos += 512;
 
 				int deltaAngle = info.angle - creature->jointRotation[0];
-				//printf("Angle: %d\n", (int)TR_ANGLE_TO_DEGREES(info.angle));
+				//printf("Angle: %d\n", (int)TO_DEGREES(info.angle));
 
 				info.ahead = true;
 				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))

@@ -5,6 +5,9 @@
 #include "../../Game/sphere.h"
 #include "../../Game/items.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
 BITE_INFO shivaRightBite = { 0, 0, 920, 22 };
@@ -236,8 +239,8 @@ void ShivaControl(short itemNum)
 			if (shiva->mood == ESCAPE_MOOD)
 			{
 				roomNumber = item->roomNumber;
-				x = item->pos.xPos + (WALL_SIZE * SIN(item->pos.yRot + 0x8000) >> W2V_SHIFT);
-				z = item->pos.zPos + (WALL_SIZE * COS(item->pos.yRot + 0x8000) >> W2V_SHIFT);
+				x = item->pos.xPos + (WALL_SIZE * phd_sin(item->pos.yRot + 0x8000) >> W2V_SHIFT);
+				z = item->pos.zPos + (WALL_SIZE * phd_cos(item->pos.yRot + 0x8000) >> W2V_SHIFT);
 				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
 				if (!shiva->flags && floor->box != NO_BOX && !(Boxes[floor->box].overlapIndex & BLOCKABLE))

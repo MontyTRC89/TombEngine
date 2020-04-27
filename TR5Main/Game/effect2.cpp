@@ -3,8 +3,12 @@
 #include "tomb4fx.h"
 #include "traps.h"
 #include "math.h"
+#include "lara.h"
+#include "effects.h"
+#include "sound.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
+#include "../Specific/level.h"
 
 //long wibble;
 //long SplashCount;
@@ -1246,9 +1250,9 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
 		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
-		spark->x = dl * SIN(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + x - 8;
+		spark->x = dl * phd_sin(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + x - 8;
 		spark->y = (GetRandomControl() & 0xF) + y - 8;
-		spark->z = dl * COS(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + z - 8;
+		spark->z = dl * phd_cos(ang1) >> W2V_SHIFT + (GetRandomControl() & 0xF) + z - 8;
 		spark->xVel = 0;
 		spark->zVel = 0;
 		spark->friction = 0;
@@ -1280,11 +1284,11 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 1;
 	dl = GetRandomControl() % 1408 + 64;
-	spark->x = dl * SIN(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + x - 16;
+	spark->x = dl * phd_sin(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->xVel = 0;
 	spark->zVel = 0;
-	spark->z = dl * COS(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + z - 16;
+	spark->z = dl * phd_cos(ang1) >> W2V_SHIFT + (GetRandomControl() & 0x1F) + z - 16;
 	spark->friction = 0;
 	spark->flags = 10;
 	spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) + 128;
@@ -1949,31 +1953,4 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 void KillEverything()//338AC(<), 33DAC(<) (F)
 {
 	KillEverythingFlag = 0;
-}
-
-void Inject_Effect2()
-{
-	INJECT(0x00431240, TriggerDynamicLight);
-	INJECT(0x004820A0, TriggerGunSmoke);
-	INJECT(0x0042E6A0, DetatchSpark);
-	INJECT(0x0042E790, GetFreeSpark);
-	INJECT(0x0042E8B0, UpdateSparks);
-	INJECT(0x0042F060, TriggerRicochetSpark);
-	INJECT(0x0042F460, TriggerCyborgSpark);
-	INJECT(0x0042F610, TriggerExplosionSparks);
-	INJECT(0x0042FA10, TriggerExplosionSmokeEnd);
-	INJECT(0x0042FC20, TriggerExplosionSmoke);
-	INJECT(0x0042FE20, TriggerFireFlame);
-	INJECT(0x00430350, TriggerSuperJetFlame);
-	INJECT(0x00430620, SetupSplash);
-	INJECT(0x00430710, UpdateSplashes);
-	INJECT(0x00430910, SetupRipple);
-	INJECT(0x004309B0, TriggerUnderwaterBlood);
-	INJECT(0x00430A40, TriggerWaterfallMist);
-	INJECT(0x00430D90, TriggerDartSmoke);
-	INJECT(0x00431030, KillAllCurrentItems);
-	INJECT(0x00431240, TriggerDynamicLight);
-	INJECT(0x00431530, ClearDynamicLights);
-	INJECT(0x00432A30, WadeSplash);
-	INJECT(0x00432900, Splash);
 }
