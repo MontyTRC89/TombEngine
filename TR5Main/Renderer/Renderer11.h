@@ -913,12 +913,12 @@ public:
 	bool DrawBar(float percent, const RendererHUDBar* const bar);
 	void											FlipRooms(short roomNumber1, short roomNumber2);
 	void											ResetAnimations();
-	void											UpdateLaraAnimations();
-	void											UpdateItemAnimations(int itemNumber);
+	void											UpdateLaraAnimations(bool force);
+	void											UpdateItemAnimations(int itemNumber, bool force);
 	void											GetLaraAbsBonePosition(Vector3* pos, int joint);
 	void											GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint);
 	int												GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
-	Matrix											GetBoneMatrix(ITEM_INFO* item, int joint);
+	void											GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
 
 	RendererMesh* getMeshFromMeshPtr(unsigned int meshp);
 private:

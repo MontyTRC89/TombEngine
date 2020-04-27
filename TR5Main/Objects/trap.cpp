@@ -344,12 +344,12 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 				{
 					if (result & 1)
 					{
-						GlobalCollisionBounds.X1 = SpheresList[j].x - SpheresList[j].r - item->pos.xPos;
-						GlobalCollisionBounds.Y1 = SpheresList[j].y - SpheresList[j].r - item->pos.yPos;
-						GlobalCollisionBounds.Z1 = SpheresList[j].z - SpheresList[j].r - item->pos.zPos;
-						GlobalCollisionBounds.X2 = SpheresList[j].x + SpheresList[j].r - item->pos.xPos;
-						GlobalCollisionBounds.Y2 = SpheresList[j].y + SpheresList[j].r - item->pos.yPos;
-						GlobalCollisionBounds.Z2 = SpheresList[j].z + SpheresList[j].r - item->pos.zPos;
+						GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->pos.zPos;
+						GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->pos.xPos;
+						GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->pos.yPos;
+						GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->pos.zPos;
 
 						int oldX = LaraItem->pos.xPos;
 						int oldY = LaraItem->pos.yPos;
@@ -362,7 +362,7 @@ void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 								TriggerActive(item))
 							{
 								DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32, 
-											 (GetRandomControl() & 0x1F) + SpheresList[j].y - 16, 
+											 (GetRandomControl() & 0x1F) + CreatureSpheres[j].y - 16, 
 											 (GetRandomControl() & 0x3F) + l->pos.zPos - 32, 
 											 (GetRandomControl() & 3) + 2, 
 											 2 * GetRandomControl(), 
@@ -646,7 +646,7 @@ void MineControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	int num = GetSpheres(item, SpheresList, 1, Matrix::Identity);
+	int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	if (item->itemFlags[0] >= 150)
 	{
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0);
@@ -655,7 +655,7 @@ void MineControl(short itemNum)
 
 		if (num > 0)
 		{
-			SPHERE* sphere = &SpheresList[0];
+			SPHERE* sphere = &CreatureSpheres[0];
 
 			for (int i = 0; i < num; i++)
 			{
@@ -703,7 +703,7 @@ void MineControl(short itemNum)
 
 		for (int i = 0; i < num; i++)
 		{
-			SPHERE* sphere = &SpheresList[i];
+			SPHERE* sphere = &CreatureSpheres[i];
 
 			if (i == 0 || i > 5)
 				AddFire(sphere->x, sphere->y, sphere->z, 2, item->roomNumber, something);

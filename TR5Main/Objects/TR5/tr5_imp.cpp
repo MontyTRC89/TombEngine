@@ -60,7 +60,6 @@ void ImpThrowStones(ITEM_INFO* item)
 	pos1.z = 0;
 	GetJointAbsPosition(item, &pos1, 9);
 
-
 	PHD_VECTOR pos2;
 	pos2.x = 0;
 	pos2.y = 0;
