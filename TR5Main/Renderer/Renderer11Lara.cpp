@@ -1,12 +1,17 @@
 #include "Renderer11.h"
 #include "../Game/draw.h"
 #include "../Game/hair.h"
+#include "../Game/lara.h"
+#include "../Game/control.h"
+#include "../Game/spotcam.h"
 #include "../game/camera.h"
+#include "../game/sphere.h"
 #include "../Global/global.h"
+#include "..\Specific\level.h"
 
 extern GameFlow* g_GameFlow;
 
-void Renderer11::updateLaraAnimations()
+void Renderer11::UpdateLaraAnimations(bool force)
 {
 	Matrix translation;
 	Matrix rotation;
@@ -14,6 +19,10 @@ void Renderer11::updateLaraAnimations()
 	Matrix hairMatrix;
 	Matrix identity;
 	Matrix world;
+
+	RendererItem* item = &m_items[Lara.itemNumber];
+	if (!force && item->DoneAnimations)
+		return;
 
 	RendererObject* laraObj = m_moveableObjects[ID_LARA];
 
@@ -23,13 +32,13 @@ void Renderer11::updateLaraAnimations()
 
 	// Lara world matrix
 	translation = Matrix::CreateTranslation(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(LaraItem->pos.yRot), TR_ANGLE_TO_RAD(LaraItem->pos.xRot), TR_ANGLE_TO_RAD(LaraItem->pos.zRot));
+	rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(LaraItem->pos.yRot), TO_RAD(LaraItem->pos.xRot), TO_RAD(LaraItem->pos.zRot));
 
 	m_LaraWorldMatrix = rotation * translation;
 
 	// Update first Lara's animations
-	laraObj->LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.torsoXrot), TR_ANGLE_TO_RAD(Lara.torsoYrot), TR_ANGLE_TO_RAD(Lara.torsoZrot));
-	laraObj->LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TR_ANGLE_TO_RAD(Lara.headXrot), TR_ANGLE_TO_RAD(Lara.headYrot), TR_ANGLE_TO_RAD(Lara.headZrot));
+	laraObj->LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.torsoXrot), TO_RAD(Lara.torsoYrot), TO_RAD(Lara.torsoZrot));
+	laraObj->LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.headXrot), TO_RAD(Lara.headYrot), TO_RAD(Lara.headZrot));
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
@@ -50,8 +59,8 @@ void Renderer11::updateLaraAnimations()
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.leftArm.xRot), TR_ANGLE_TO_RAD(0), TR_ANGLE_TO_RAD(-Lara.leftArm.yRot));
-		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TR_ANGLE_TO_RAD(Lara.rightArm.xRot), TR_ANGLE_TO_RAD(0), TR_ANGLE_TO_RAD(-Lara.rightArm.yRot));
+		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(0), TO_RAD(-Lara.leftArm.yRot));
+		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(0), TO_RAD(-Lara.rightArm.yRot));
 
 		LARA_ARM * leftArm = &Lara.leftArm;
 		LARA_ARM * rightArm = &Lara.rightArm;
@@ -174,7 +183,7 @@ void Renderer11::updateLaraAnimations()
 				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_SOLID];
 
 				translation = Matrix::CreateTranslation(Hairs[p][i + 1].pos.xPos, Hairs[p][i + 1].pos.yPos, Hairs[p][i + 1].pos.zPos);
-				rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(Hairs[p][i + 1].pos.yRot), TR_ANGLE_TO_RAD(Hairs[p][i + 1].pos.xRot), 0);
+				rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[p][i + 1].pos.yRot), TO_RAD(Hairs[p][i + 1].pos.xRot), 0);
 				m_hairsMatrices[6 * p + i] = rotation * translation;
 
 				int baseVertex = lastVertex;
@@ -248,6 +257,8 @@ void Renderer11::updateLaraAnimations()
 	// Transpose matrices for shaders
 	for (int m = 0; m < 15; m++)
 		laraObj->AnimationTransforms[m] = laraObj->AnimationTransforms[m];
+
+	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
 bool Renderer11::drawLara(bool transparent, bool shadowMap)

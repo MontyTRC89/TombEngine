@@ -8,6 +8,8 @@
 
 #include <CommCtrl.h>
 #include "configuration.h"
+#include <bass.h>
+#include "../Game/sound.h"
 
 extern Renderer11* g_Renderer;
 extern GameFlow* g_GameFlow;
@@ -87,7 +89,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		DB_Log(6, "WM_INITDIALOG");
+		//DB_Log(6, "WM_INITDIALOG");
 
 		SendMessageA(GetDlgItem(handle, IDC_GROUP_GFXADAPTER), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_DISPLAY_ADAPTER));
 		SendMessageA(GetDlgItem(handle, IDC_GROUP_OUTPUT_SETTINGS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_OUTPUT_SETTINGS));
@@ -126,7 +128,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_COMMAND:
-		DB_Log(6, "WM_COMMAND");
+		//DB_Log(6, "WM_COMMAND");
 
 		// Checkboxes
 		if (HIWORD(wParam) == BN_CLICKED)
@@ -188,11 +190,12 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int SetupDialog()
 {
-	HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
+	// FIXME
+	/*HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
 	ShowCursor(true);
 	int result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
-	ShowCursor(false);
+	ShowCursor(false);*/
 
 	return true;
 }
@@ -297,14 +300,14 @@ bool SaveConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout1[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout[1][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
 		}
 	}
 
-	OptionAutoTarget = g_Configuration.AutoTarget;
+	//OptionAutoTarget = g_Configuration.AutoTarget;
 	GlobalMusicVolume = g_Configuration.MusicVolume;
 	GlobalFXVolume = g_Configuration.SfxVolume;
 
@@ -439,13 +442,13 @@ bool LoadConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout0[i]) != ERROR_SUCCESS)
+		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout[0][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
 		}
 
-		KeyboardLayout1[i] = (short)tempKey;
+		KeyboardLayout[1][i] = (short)tempKey;
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine
@@ -465,13 +468,13 @@ bool LoadConfiguration()
 	g_Configuration.SoundDevice = soundDevice;
 
 	// Set legacy variables
-	OptionAutoTarget = autoTarget;
+	//OptionAutoTarget = autoTarget;
 	GlobalMusicVolume = musicVolume;
 	GlobalFXVolume = sfxVolume;
 
 	RegCloseKey(rootKey);
 
-	CheckKeyConflicts();
+	DefaultConflict();
 
 	return true;
 }

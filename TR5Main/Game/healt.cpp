@@ -3,6 +3,8 @@
 #include "pickup.h"
 #include "lara.h"
 #include "camera.h"
+#include "../Specific/level.h"
+#include "control.h"
 
 short PickupX;
 short PickupY;
@@ -247,9 +249,4 @@ int FlashIt()
 		FlashCount = 5;
 	}
 	return FlashState;
-}
-
-void Inject_Healt()
-{
-
 }

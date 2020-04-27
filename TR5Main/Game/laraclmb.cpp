@@ -6,6 +6,8 @@
 #include "sphere.h"
 #include "laramisc.h"
 #include "camera.h"
+#include "..\Specific\level.h"
+#include "../Specific/input.h"
 
 short LeftIntRightExtTab[4] = // offset 0xA0B7C
 {

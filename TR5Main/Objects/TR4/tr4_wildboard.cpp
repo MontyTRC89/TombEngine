@@ -4,6 +4,8 @@
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 

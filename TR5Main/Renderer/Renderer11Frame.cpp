@@ -1,7 +1,9 @@
 #include "Renderer11.h"
 #include "../Game/draw.h"
+#include "../Game/lara.h"
+#include "../Game/effects.h"
 #include "../Game/camera.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
 void Renderer11::collectRooms()
 {
@@ -55,9 +57,9 @@ void Renderer11::collectItems(short roomNumber)
 		newItem->Id = itemNum;
 		newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
 		newItem->Translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		newItem->Rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(item->pos.yRot),
-			TR_ANGLE_TO_RAD(item->pos.xRot),
-			TR_ANGLE_TO_RAD(item->pos.zRot));
+		newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot),
+			TO_RAD(item->pos.xRot),
+			TO_RAD(item->pos.zRot));
 		newItem->Scale = Matrix::CreateScale(1.0f);
 		newItem->World = newItem->Rotation * newItem->Translation;
 		collectLightsForItem(item->roomNumber, newItem);
@@ -86,7 +88,7 @@ void Renderer11::collectStatics(short roomNumber)
 		max += Vector3(mesh->x, mesh->y, mesh->z);
 		if (!frustum.AABBInFrustum(min, max))
 			continue;
-		Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(mesh->yRot));
+		Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->yRot));
 		Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
 		newStatic->Mesh = mesh;
 		newStatic->RoomIndex = roomNumber;
@@ -461,4 +463,12 @@ void Renderer11::prepareCameraForFrame()
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	frustum.Update(View,Projection);
+}
+
+void Renderer11::ResetAnimations()
+{
+	for (int i = 0; i < NUM_ITEMS; i++)
+	{
+		m_items[i].DoneAnimations = false;
+	}
 }

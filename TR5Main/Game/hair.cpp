@@ -2,8 +2,12 @@
 #include "..\Global\global.h"
 #include "draw.h"
 #include "laramisc.h"
+#include "lara.h"
+#include "control.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "../Specific/setup.h"
+#include "sphere.h"
+#include "../Specific/level.h"
 
 int FirstHair[2];
 HAIR_STRUCT Hairs[2][7];
@@ -94,85 +98,48 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		frame = framePtr;
 	}
 
-	phd_PushUnitMatrix();
-
-	*(MatrixPtr + M03) = LaraItem->pos.xPos << W2V_SHIFT;
-	*(MatrixPtr + M13) = LaraItem->pos.yPos << W2V_SHIFT;
-	*(MatrixPtr + M23) = LaraItem->pos.zPos << W2V_SHIFT;
-	phd_RotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
-
-	short* rotation = frame + 9;
-	int* bone = Bones + object->boneIndex;
-
-	phd_TranslateRel((int) * (frame + 6), (int) * (frame + 7), (int) * (frame + 8));
-	gar_RotYXZsuperpack(&rotation, 0);
-
-	// Hips
-	phd_PushMatrix();
+	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
 	short* objptr = Lara.meshPtrs[LM_HIPS];
-	phd_TranslateRel(*objptr, *(objptr + 1), *(objptr + 2));
-	sphere[0].x = *(MatrixPtr + M03) >> W2V_SHIFT;
-	sphere[0].y = *(MatrixPtr + M13) >> W2V_SHIFT;
-	sphere[0].z = *(MatrixPtr + M23) >> W2V_SHIFT;
-	sphere[0].r = (int) * (objptr + 3);
-	phd_PopMatrix();
+	PHD_VECTOR pos = { objptr[0], objptr[1], objptr[2] };
+	GetLaraJointPosition(&pos, LJ_HIPS);
+	sphere[0].x = pos.x;
+	sphere[0].y = pos.y;
+	sphere[0].z = pos.z;
+	sphere[0].r = (int) *(objptr + 3);
 
-	phd_TranslateRel(*(bone + 1 + 24), *(bone + 2 + 24), *(bone + 3 + 24));
-
-	gar_RotYXZsuperpack(&rotation, 6);
-	phd_RotYXZ(Lara.torsoYrot, Lara.torsoXrot, Lara.torsoZrot);
-
-	// Torso
-	phd_PushMatrix();
 	objptr = Lara.meshPtrs[LM_TORSO];
-	phd_TranslateRel(*objptr, *(objptr + 1), *(objptr + 2));
-	sphere[1].x = *(MatrixPtr + M03) >> W2V_SHIFT;
-	sphere[1].y = *(MatrixPtr + M13) >> W2V_SHIFT;
-	sphere[1].z = *(MatrixPtr + M23) >> W2V_SHIFT;
+	pos = { objptr[0], objptr[1], objptr[2] };
+	GetLaraJointPosition(&pos, LJ_TORSO);
+	sphere[1].x = pos.x;
+	sphere[1].y = pos.y;
+	sphere[1].z = pos.z;
 	sphere[1].r = (int) * (objptr + 3);
 	if (youngLara)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
-	phd_PopMatrix();
 
-	phd_PushMatrix();
-	phd_TranslateRel(*(bone + 1 + 28), *(bone + 2 + 28), *(bone + 3 + 28));
-	gar_RotYXZsuperpack(&rotation, 0);
-
-	// Right arm
-	objptr = Lara.meshPtrs[LM_RINARM];
-	phd_TranslateRel(*objptr, *(objptr + 1), *(objptr + 2));
-	sphere[3].x = *(MatrixPtr + M03) >> W2V_SHIFT;
-	sphere[3].y = *(MatrixPtr + M13) >> W2V_SHIFT;
-	sphere[3].z = *(MatrixPtr + M23) >> W2V_SHIFT;
-	sphere[3].r = (int) * (objptr + 3) * 3 / 2; // 1.5 times sphere size gives better result
-	phd_PopMatrix();
-
-	phd_PushMatrix();
-	phd_TranslateRel(*(bone + 1 + 40), *(bone + 2 + 40), *(bone + 3 + 40));
-	gar_RotYXZsuperpack(&rotation, 2);
-
-	// Left arm
-	objptr = Lara.meshPtrs[LM_LINARM];
-	phd_TranslateRel(*objptr, *(objptr + 1), *(objptr + 2));
-	sphere[4].x = *(MatrixPtr + M03) >> W2V_SHIFT;
-	sphere[4].y = *(MatrixPtr + M13) >> W2V_SHIFT;
-	sphere[4].z = *(MatrixPtr + M23) >> W2V_SHIFT;
-	sphere[4].r = (int) * (objptr + 3) * 3 / 2;
-	phd_PopMatrix();
-
-	phd_TranslateRel(*(bone + 1 + 52), *(bone + 2 + 52), *(bone + 3 + 52));
-	gar_RotYXZsuperpack(&rotation, 2);
-	phd_RotYXZ(Lara.headYrot, Lara.headXrot, Lara.headZrot);
-
-	// Head
-	phd_PushMatrix();
 	objptr = Lara.meshPtrs[LM_HEAD];
-	phd_TranslateRel(*objptr, *(objptr + 1), *(objptr + 2));
-	sphere[2].x = *(MatrixPtr + M03) >> W2V_SHIFT;
-	sphere[2].y = *(MatrixPtr + M13) >> W2V_SHIFT;
-	sphere[2].z = *(MatrixPtr + M23) >> W2V_SHIFT;
+	pos = { objptr[0], objptr[1], objptr[2] };
+	GetLaraJointPosition(&pos, LM_HEAD);
+	sphere[2].x = pos.x;
+	sphere[2].y = pos.y;
+	sphere[2].z = pos.z;
 	sphere[2].r = (int) * (objptr + 3);
-	phd_PopMatrix();
+
+	objptr = Lara.meshPtrs[LM_RINARM];
+	pos = { objptr[0], objptr[1], objptr[2] };
+	GetLaraJointPosition(&pos, LM_RINARM);
+	sphere[3].x = pos.x;
+	sphere[3].y = pos.y;
+	sphere[3].z = pos.z;
+	sphere[3].r = (int) * (objptr + 3) * 3 / 2;
+
+	objptr = Lara.meshPtrs[LM_LINARM];
+	pos = { objptr[0], objptr[1], objptr[2] };
+	GetLaraJointPosition(&pos, LM_LINARM);
+	sphere[4].x = pos.x;
+	sphere[4].y = pos.y;
+	sphere[4].z = pos.z;
+	sphere[4].r = (int) * (objptr + 3) * 3 / 2;
 
 	if (youngLara)
 	{
@@ -180,28 +147,28 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		sphere[1].y = (sphere[1].y + sphere[2].y) / 2;
 		sphere[1].z = (sphere[1].z + sphere[2].z) / 2;
 	}
+	
+	Matrix world;
+	g_Renderer->GetBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
 
 	if (ponytail)
 	{
-		phd_TranslateRel(44, -48, -50);
+		world = Matrix::CreateTranslation(44, -48, -50) * world;
 	}
 	else if (youngLara)
 	{
-		phd_TranslateRel(-52, -48, -50);
+		world = Matrix::CreateTranslation(-52, -48, -50) * world;
 	}
 	else
 	{
-		phd_TranslateRel(-4, -48, -48);
+		world = Matrix::CreateTranslation(-4, -48, -48) * world;
 	}
 
-	PHD_VECTOR pos;
-	pos.x = *(MatrixPtr + M03) >> W2V_SHIFT;
-	pos.y = *(MatrixPtr + M13) >> W2V_SHIFT;
-	pos.z = *(MatrixPtr + M23) >> W2V_SHIFT;
+	pos.x = world.Translation().x; 
+	pos.y = world.Translation().y; 
+	pos.z = world.Translation().z;
 
-	phd_PopMatrix();
-
-	bone = bone + Objects[ID_LARA_HAIR].boneIndex;
+	int* bone = Bones + Objects[ID_LARA_HAIR].boneIndex;
 
 	if (FirstHair[ponytail])
 	{
@@ -213,20 +180,25 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 		for (int i = 0; i < HAIR_SEGMENTS - 1; i++, bone += 4)
 		{
-			phd_PushUnitMatrix();
+			world = Matrix::Identity;
+			//phd_PushUnitMatrix();
 
-			*(MatrixPtr + M03) = Hairs[ponytail][i].pos.xPos << W2V_SHIFT;
-			*(MatrixPtr + M13) = Hairs[ponytail][i].pos.yPos << W2V_SHIFT;
-			*(MatrixPtr + M23) = Hairs[ponytail][i].pos.zPos << W2V_SHIFT;
+			world = Matrix::CreateTranslation(Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos) * world;			 
+			/**(MatrixPtr + M03) =  world._14 = Hairs[ponytail][i].pos.xPos << W2V_SHIFT;
+			/**(MatrixPtr + M13) = world._24 = Hairs[ponytail][i].pos.yPos << W2V_SHIFT;
+			/**(MatrixPtr + M23) = world._34 = Hairs[ponytail][i].pos.zPos << W2V_SHIFT;*/
 
-			phd_RotYXZ(Hairs[ponytail][i].pos.yRot, Hairs[ponytail][i].pos.xRot, 0);
-			phd_TranslateRel(*(bone + 1), *(bone + 2), *(bone + 3));
+			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;
+			//phd_RotYXZ(Hairs[ponytail][i].pos.yRot, Hairs[ponytail][i].pos.xRot, 0);
+			
+			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
+			//phd_TranslateRel(*(bone + 1), *(bone + 2), *(bone + 3));
 
-			Hairs[ponytail][i + 1].pos.xPos = *(MatrixPtr + M03) >> W2V_SHIFT;
-			Hairs[ponytail][i + 1].pos.yPos = *(MatrixPtr + M13) >> W2V_SHIFT;
-			Hairs[ponytail][i + 1].pos.zPos = *(MatrixPtr + M23) >> W2V_SHIFT;
+			Hairs[ponytail][i + 1].pos.xPos = world.Translation().x; // *(MatrixPtr + M03) >> W2V_SHIFT;
+			Hairs[ponytail][i + 1].pos.yPos = world.Translation().y; // *(MatrixPtr + M13) >> W2V_SHIFT;
+			Hairs[ponytail][i + 1].pos.zPos = world.Translation().z; // *(MatrixPtr + M23) >> W2V_SHIFT;
 
-			phd_PopMatrix();
+			//phd_PopMatrix();
 		}
 
 		Wind = SmokeWindX = SmokeWindZ = 0;
@@ -331,7 +303,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 				if (distance < SQUARE(sphere[j].r))
 				{
-					distance = SQRT_ASM(distance);
+					distance = sqrt(distance);
 
 					if (distance == 0)
 						distance = 1;
@@ -342,36 +314,37 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 				}
 			}
 
-			int distance = SQRT_ASM(SQUARE(Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos) + SQUARE(Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
-			Hairs[ponytail][i - 1].pos.yRot = ATAN((Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos), (Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
-			Hairs[ponytail][i - 1].pos.xRot = -ATAN(distance, Hairs[ponytail][i].pos.yPos - Hairs[ponytail][i - 1].pos.yPos);
+			int distance = sqrt(SQUARE(Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos) + SQUARE(Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
+			Hairs[ponytail][i - 1].pos.yRot = phd_atan((Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos), (Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
+			Hairs[ponytail][i - 1].pos.xRot = -phd_atan(distance, Hairs[ponytail][i].pos.yPos - Hairs[ponytail][i - 1].pos.yPos);
 
-			phd_PushUnitMatrix();
+			//phd_PushUnitMatrix();
+			world = Matrix::Identity;
 
-			*(MatrixPtr + M03) = Hairs[ponytail][i - 1].pos.xPos << W2V_SHIFT;
+			/**(MatrixPtr + M03) = Hairs[ponytail][i - 1].pos.xPos << W2V_SHIFT;
 			*(MatrixPtr + M13) = Hairs[ponytail][i - 1].pos.yPos << W2V_SHIFT;
-			*(MatrixPtr + M23) = Hairs[ponytail][i - 1].pos.zPos << W2V_SHIFT;
-			phd_RotYXZ(Hairs[ponytail][i - 1].pos.yRot, Hairs[ponytail][i - 1].pos.xRot, 0);
+			*(MatrixPtr + M23) = Hairs[ponytail][i - 1].pos.zPos << W2V_SHIFT;*/
+			world = Matrix::CreateTranslation(Hairs[ponytail][i - 1].pos.xPos, Hairs[ponytail][i - 1].pos.yPos, Hairs[ponytail][i - 1].pos.zPos) * world;
+			
+			//phd_RotYXZ(Hairs[ponytail][i - 1].pos.yRot, Hairs[ponytail][i - 1].pos.xRot, 0);
+			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i - 1].pos.yRot), TO_RAD(Hairs[ponytail][i - 1].pos.xRot), 0) * world;
 
 			if (i == HAIR_SEGMENTS - 1)
-				phd_TranslateRel(*(bone - 3), *(bone - 2), *(bone - 1));
+				//phd_TranslateRel(*(bone - 3), *(bone - 2), *(bone - 1));
+				world = Matrix::CreateTranslation(*(bone - 3), *(bone - 2), *(bone - 1)) * world;
 			else
-				phd_TranslateRel(*(bone + 1), *(bone + 2), *(bone + 3));
+				//phd_TranslateRel(*(bone + 1), *(bone + 2), *(bone + 3));
+				world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
-			Hairs[ponytail][i].pos.xPos = *(MatrixPtr + M03) >> W2V_SHIFT;
-			Hairs[ponytail][i].pos.yPos = *(MatrixPtr + M13) >> W2V_SHIFT;
-			Hairs[ponytail][i].pos.zPos = *(MatrixPtr + M23) >> W2V_SHIFT;
+			Hairs[ponytail][i].pos.xPos = world.Translation().x; // *(MatrixPtr + M03) >> W2V_SHIFT;
+			Hairs[ponytail][i].pos.yPos = world.Translation().y; // *(MatrixPtr + M13) >> W2V_SHIFT;
+			Hairs[ponytail][i].pos.zPos = world.Translation().z; // *(MatrixPtr + M23) >> W2V_SHIFT;
 
 			Hairs[ponytail][i].hvel.x = Hairs[ponytail][i].pos.xPos - Hairs[ponytail][0].hvel.x;
 			Hairs[ponytail][i].hvel.y = Hairs[ponytail][i].pos.yPos - Hairs[ponytail][0].hvel.y;
 			Hairs[ponytail][i].hvel.z = Hairs[ponytail][i].pos.zPos - Hairs[ponytail][0].hvel.z;
 
-			phd_PopMatrix();
+			//phd_PopMatrix();
 		}
 	}
-}
-
-void Inject_Hair()
-{
-	
 }

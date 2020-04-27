@@ -21,5 +21,3 @@ void InitialiseItemArray(int numitems);
 void KillItem(short itemNum);
 ITEM_INFO* find_a_fucking_item(short objectNum);
 int FindItem(short objectNum);
-
-void Inject_Items();

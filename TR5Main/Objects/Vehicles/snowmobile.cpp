@@ -8,8 +8,12 @@
 #include "../../Game/effect2.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/lot.h"
+#include "../../Game/tomb4fx.h"
 #include "../../Game/sphere.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
 
@@ -60,7 +64,7 @@ void InitialiseSkidoo(short itemNum)
 	SKIDOO_INFO* skinfo;
 
 	skidoo = &Items[itemNum];
-	skinfo = (SKIDOO_INFO*)GameMalloc(sizeof(SKIDOO_INFO));
+	skinfo = (SKIDOO_INFO*)game_malloc(sizeof(SKIDOO_INFO));
 	skidoo->data = (void*)skinfo;
 	skinfo->already_cd_played = false;
 
@@ -214,9 +218,9 @@ int SkidooCheckGetOffOK(int direction)
 	else
 		angle = skidoo->pos.yRot - 0x4000;
 
-	x = skidoo->pos.xPos - (SKIDOO_GETOFF_DIST * SIN(angle) >> W2V_SHIFT);
+	x = skidoo->pos.xPos - (SKIDOO_GETOFF_DIST * phd_sin(angle) >> W2V_SHIFT);
 	y = skidoo->pos.yPos;
-	z = skidoo->pos.zPos - (SKIDOO_GETOFF_DIST * COS(angle) >> W2V_SHIFT);
+	z = skidoo->pos.zPos - (SKIDOO_GETOFF_DIST * phd_cos(angle) >> W2V_SHIFT);
 
 	roomNumber = skidoo->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -255,8 +259,8 @@ int SkidooCheckGetOff()
 		LaraItem->animNumber = 11;
 		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = LaraItem->goalAnimState = 2;
-		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * SIN(LaraItem->pos.yRot) >> W2V_SHIFT;
-		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * COS(LaraItem->pos.yRot) >> W2V_SHIFT;
+		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
+		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 		g_LaraExtra.Vehicle = NO_ITEM;
 		Lara.gunStatus = LG_NO_ARMS;
@@ -308,14 +312,14 @@ void DoSnowEffect(ITEM_INFO* skidoo)
 	fx_number = CreateNewEffect(skidoo->roomNumber);
 	if (fx_number != NO_ITEM)
 	{
-		s = SIN(skidoo->pos.yRot);
-		c = COS(skidoo->pos.yRot);
+		s = phd_sin(skidoo->pos.yRot);
+		c = phd_cos(skidoo->pos.yRot);
 
 		x = (GetRandomControl() - 0x4000) * SKIDOO_SIDE >> 14;
 
 		fx = &Effects[fx_number];
 		fx->pos.xPos = skidoo->pos.xPos - (SKIDOO_SNOW * s + x * c >> W2V_SHIFT);
-		fx->pos.yPos = skidoo->pos.yPos + (SKIDOO_SNOW * SIN(skidoo->pos.xRot) >> W2V_SHIFT);
+		fx->pos.yPos = skidoo->pos.yPos + (SKIDOO_SNOW * phd_sin(skidoo->pos.xRot) >> W2V_SHIFT);
 		fx->pos.zPos = skidoo->pos.zPos - (SKIDOO_SNOW * c - x * s >> W2V_SHIFT);
 		fx->roomNumber = skidoo->roomNumber;
 		fx->frameNumber = 0;
@@ -449,8 +453,8 @@ int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	if (moved->x || moved->z)
 	{
 		/* Get direction of movement relative to facing */
-		c = COS(skidoo->pos.yRot);
-		s = SIN(skidoo->pos.yRot);
+		c = phd_cos(skidoo->pos.yRot);
+		s = phd_sin(skidoo->pos.yRot);
 		front = (moved->z * c + moved->x * s) >> W2V_SHIFT;
 		side = (-moved->z * s + moved->x * c) >> W2V_SHIFT;
 		if (abs(front) > abs(side))
@@ -669,11 +673,11 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 /* Get height at a position offset from the origin. Moves the vector in 'pos' to the required test position too */
 int TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 {
-	pos->y = item->pos.yPos - (z_off * SIN(item->pos.xRot) >> W2V_SHIFT) +
-		                      (x_off * SIN(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - (z_off * phd_sin(item->pos.xRot) >> W2V_SHIFT) +
+		                      (x_off * phd_sin(item->pos.zRot) >> W2V_SHIFT);
 
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	pos->z = item->pos.zPos + ((z_off * c - x_off * s) >> W2V_SHIFT);
 	pos->x = item->pos.xPos + ((z_off * s + x_off * c) >> W2V_SHIFT);
@@ -878,22 +882,22 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 		skidoo->pos.yRot += skinfo->skidoo_turn + skinfo->extra_rotation;
 
 	/* Move skidoo according to speed */
-	skidoo->pos.zPos += skidoo->speed * COS(skinfo->momentum_angle) >> W2V_SHIFT;
-	skidoo->pos.xPos += skidoo->speed * SIN(skinfo->momentum_angle) >> W2V_SHIFT;
+	skidoo->pos.zPos += skidoo->speed * phd_cos(skinfo->momentum_angle) >> W2V_SHIFT;
+	skidoo->pos.xPos += skidoo->speed * phd_sin(skinfo->momentum_angle) >> W2V_SHIFT;
 
 	/* Slide skidoo according to tilts (to avoid getting stuck on slopes) */
-	slip = SKIDOO_SLIP * SIN(skidoo->pos.xRot) >> W2V_SHIFT;
+	slip = SKIDOO_SLIP * phd_sin(skidoo->pos.xRot) >> W2V_SHIFT;
 	if (abs(slip) > SKIDOO_SLIP / 2)
 	{
-		skidoo->pos.zPos -= slip * COS(skidoo->pos.yRot) >> W2V_SHIFT;
-		skidoo->pos.xPos -= slip * SIN(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.zPos -= slip * phd_cos(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.xPos -= slip * phd_sin(skidoo->pos.yRot) >> W2V_SHIFT;
 	}
 
-	slip = SKIDOO_SLIP_SIDE * SIN(skidoo->pos.zRot) >> W2V_SHIFT;
+	slip = SKIDOO_SLIP_SIDE * phd_sin(skidoo->pos.zRot) >> W2V_SHIFT;
 	if (abs(slip) > SKIDOO_SLIP_SIDE / 2)
 	{
-		skidoo->pos.zPos -= slip * SIN(skidoo->pos.yRot) >> W2V_SHIFT;
-		skidoo->pos.xPos += slip * COS(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.zPos -= slip * phd_sin(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.xPos += slip * phd_cos(skidoo->pos.yRot) >> W2V_SHIFT;
 	}
 
 	/* Remember desired position in case of collisions moving us about */
@@ -936,7 +940,7 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 	/* Check final actual movement; if speed is more than halved then reduce to zero */
 	if (collide)
 	{
-		newspeed = ((skidoo->pos.zPos - old.z) * COS(skinfo->momentum_angle) + (skidoo->pos.xPos - old.x) * SIN(skinfo->momentum_angle)) >> W2V_SHIFT;
+		newspeed = ((skidoo->pos.zPos - old.z) * phd_cos(skinfo->momentum_angle) + (skidoo->pos.xPos - old.x) * phd_sin(skinfo->momentum_angle)) >> W2V_SHIFT;
 		if (skidoo->speed > SKIDOO_MAX_SPEED + SKIDOO_ACCELERATION && newspeed < skidoo->speed - 10)
 		{
 			LaraItem->hitPoints -= (skidoo->speed - newspeed) >> 1;
@@ -1048,8 +1052,8 @@ int SkidooControl()
 
 	/* Rotate skidoo to match these heights */
 	height = (fl.y + fr.y) >> 1;
-	x_rot = ATAN(SKIDOO_FRONT, skidoo->pos.yPos - height);
-	z_rot = ATAN(SKIDOO_SIDE, height - fl.y);
+	x_rot = phd_atan(SKIDOO_FRONT, skidoo->pos.yPos - height);
+	z_rot = phd_atan(SKIDOO_SIDE, height - fl.y);
 
 	skidoo->pos.xRot += (x_rot - skidoo->pos.xRot) >> 1;
 	skidoo->pos.zRot += (z_rot - skidoo->pos.zRot) >> 1;

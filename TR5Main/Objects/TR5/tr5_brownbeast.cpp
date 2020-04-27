@@ -5,6 +5,9 @@
 #include "../../Game/effect2.h"
 #include "../../Game/tomb4fx.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO BrownBeastBite1 = { 0, 0, 0, 16 };
 BITE_INFO BrownBeastBite2 = { 0, 0, 0, 22 };
@@ -64,7 +67,7 @@ void ControlBrowsBeast(short itemNumber)
 			{
 				int dx = LaraItem->pos.xPos - item->pos.xPos;
 				int dz = LaraItem->pos.zPos - item->pos.zPos;
-				ATAN(dz, dz);
+				phd_atan(dz, dz);
 				distance = SQUARE(dx) + SQUARE(dz);
 			}
 

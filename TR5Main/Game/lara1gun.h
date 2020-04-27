@@ -41,5 +41,3 @@ void FireHK(int mode);
 void FireShotgun();
 void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search);
 void ready_shotgun(int weaponType);
-
-void Inject_Lara1Gun();

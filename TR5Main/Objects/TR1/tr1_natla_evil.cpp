@@ -4,6 +4,10 @@
 #include "../../Game/items.h"
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
+#include "../../Game/tomb4fx.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,
@@ -60,7 +64,7 @@ void NatlaEvilControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 
 		/* Work out required turn */
-		angle = (short)ATAN(abort->target.z - item->pos.zPos, abort->target.x - item->pos.xPos) - item->pos.yRot;
+		angle = (short)phd_atan(abort->target.z - item->pos.zPos, abort->target.x - item->pos.xPos) - item->pos.yRot;
 
 		/* Touch damage */
 		if (item->touchBits)

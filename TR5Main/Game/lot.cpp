@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include "../Specific/setup.h"
 #include "camera.h"
+#include "lara.h"
+#include "..\Specific\level.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
@@ -13,16 +15,16 @@ CREATURE_INFO* BaddieSlots;
 
 void InitialiseLOTarray(int allocMem)
 {
-	DB_Log(0, "InitialiseLOTarray - DLL");
+	//DB_Log(0, "InitialiseLOTarray - DLL");
 
 	if (allocMem)
-		BaddieSlots = (CREATURE_INFO*)GameMalloc(sizeof(CREATURE_INFO) * NUM_SLOTS);
+		BaddieSlots = (CREATURE_INFO*)game_malloc(sizeof(CREATURE_INFO) * NUM_SLOTS);
 
 	CREATURE_INFO* creature = BaddieSlots;
 	for (int i = 0; i < NUM_SLOTS; i++, creature++)
 	{
 		creature->itemNum = NO_ITEM;
-		creature->LOT.node = (BOX_NODE*)GameMalloc(sizeof(BOX_NODE) * NumberBoxes);
+		creature->LOT.node = (BOX_NODE*)game_malloc(sizeof(BOX_NODE) * NumberBoxes);
 	}
 
 	SlotsUsed = 0;
@@ -309,13 +311,4 @@ void CreateZone(ITEM_INFO* item)
 			flippedZone++;
 		}
 	}
-}
-
-void Inject_Lot()
-{
-	INJECT(0x0045B0C0, InitialiseLOTarray);
-	INJECT(0x0045B1A0, EnableBaddieAI);
-	INJECT(0x0045B150, DisableBaddieAI);
-	INJECT(0x0045B740, ClearLOT);
-	INJECT(0x0045B5E0, CreateZone);
 }

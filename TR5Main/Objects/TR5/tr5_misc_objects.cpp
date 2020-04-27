@@ -17,6 +17,9 @@
 #include "../../Game/camera.h"
 #include "../../Game/missile.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 short DeathSlideBounds[12] = { -256, 256, -100, 100, 256, 512, 0, 0, -25 * ONE_DEGREE, 25 * ONE_DEGREE, 0, 0 };
 PHD_VECTOR DeathSlidePosition = { 0, 0, 371 };
@@ -155,7 +158,7 @@ void PulseLightControl(short itemNumber)
 	{
 		item->itemFlags[0] -= 1024;
 
-		long pulse = 256 * SIN(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF)) >> W2V_SHIFT;
+		long pulse = 256 * phd_sin(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF)) >> W2V_SHIFT;
 		pulse = (HIDWORD(pulse) ^ pulse) - HIDWORD(pulse);
 		if (pulse > 255)
 			pulse = 255;
@@ -211,9 +214,9 @@ void StrobeLightControl(short itemNumber)
 			12);
 		
 		TriggerDynamicLight(
-			item->pos.xPos + 256 * SIN(item->pos.yRot + 22528) >> W2V_SHIFT,
+			item->pos.xPos + 256 * phd_sin(item->pos.yRot + 22528) >> W2V_SHIFT,
 			item->pos.yPos - 768,
-			item->pos.zPos + 256 * COS(item->pos.yRot + 22528) >> W2V_SHIFT,
+			item->pos.zPos + 256 * phd_cos(item->pos.yRot + 22528) >> W2V_SHIFT,
 			8,
 			r, g, b);
 	}
@@ -650,9 +653,9 @@ void SmokeEmitterControl(short itemNumber)
 
 		if (item->triggerFlags >= 0)
 		{
-			spark->xVel = flags * SIN(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT; 
+			spark->xVel = flags * phd_sin(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT; 
 			spark->yVel = -16 - (GetRandomControl() & 0xF);
-			spark->zVel = flags * COS(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+			spark->zVel = flags * phd_cos(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
 		}
 		else
 		{
@@ -750,8 +753,8 @@ void SmokeEmitterControl(short itemNumber)
 				spark->z = (GetRandomControl() & 0x3F) + item->pos.zPos - 32;
 				if (item->triggerFlags == 111)
 				{
-					spark->xVel = 512 * SIN(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
-					spark->zVel = 512 * COS(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					spark->xVel = 512 * phd_sin(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					spark->zVel = 512 * phd_cos(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
 					spark->friction = 5;
 				}
 				else
@@ -1314,7 +1317,7 @@ void InitialiseGenSlot4(short itemNumber)
 	LOBYTE(v6) = (item->pos.xPos + (v5 << 11 >> 14)) >> 9;
 	BYTE1(v6) = v7 >> 9;
 
-	item->itemFlags[1] = item->pos.xPos + 2560 * SIN(item->pos.yRot) >> W2V_SHIFT;
+	item->itemFlags[1] = item->pos.xPos + 2560 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
 	item->itemFlags[3] = 0;
 	item->triggerFlags = 0;*/
 }
@@ -1323,7 +1326,7 @@ void InitialiseDeathSlide(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	GAME_VECTOR* pos = (GAME_VECTOR*)GameMalloc(sizeof(GAME_VECTOR));
+	GAME_VECTOR* pos = (GAME_VECTOR*)game_malloc(sizeof(GAME_VECTOR));
 	item->data = pos;
 
 	pos->x = item->pos.xPos;
@@ -1400,8 +1403,8 @@ void ControlDeathSlide(short itemNumber)
 		if (item->fallspeed < 100)
 			item->fallspeed += 5;
 
-		int c = COS(item->pos.yRot);
-		int s = SIN(item->pos.yRot);
+		int c = phd_cos(item->pos.yRot);
+		int s = phd_sin(item->pos.yRot);
 
 		item->pos.zPos += item->fallspeed * c >> W2V_SHIFT;
 		item->pos.xPos += item->fallspeed * s >> W2V_SHIFT;
@@ -1648,9 +1651,9 @@ void ControlBodyPart(short fxNumber)
 			fx->fallspeed += 2;
 	}
 
-	fx->pos.xPos += fx->speed * SIN(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot) >> W2V_SHIFT;
 	fx->pos.yPos += fx->fallspeed;
-	fx->pos.zPos += fx->speed * COS(fx->pos.yRot) >> W2V_SHIFT;
+	fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot) >> W2V_SHIFT;
 
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);

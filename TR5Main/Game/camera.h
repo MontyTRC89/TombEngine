@@ -15,6 +15,10 @@ extern CAMERA_TYPE BinocularOldCamera;
 extern int LaserSight;
 extern int SniperCount;
 extern int ExitingBinocular;
+extern int PhdPerspective;
+extern short CurrentFOV;
+extern int GetLaraOnLOS;
+extern int SniperOverlay;
 
 void ActivateCamera();
 void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
@@ -33,5 +37,3 @@ void BinocularCamera(ITEM_INFO* item);
 void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
-
-void Inject_Camera();

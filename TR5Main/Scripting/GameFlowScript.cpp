@@ -312,10 +312,6 @@ bool __cdecl readGameFlowChunks(ChunkId* chunkId, int maxSize, int arg)
 
 bool __cdecl LoadScript()
 {
-	// Initialise an empty legacy GAMEFLOW object for avoiding exceptions in the few functions left that use it
-	LegacyGameFlow = (GAMEFLOW*)malloc(sizeof(GAMEFLOW));
-	ZeroMemory(LegacyGameFlow, sizeof(GAMEFLOW));
-
 	// Load the new script file
 	FileStream stream("Script.dat", true, false);
 	g_ScriptChunkIO = new ChunkReader(0x4D355254, &stream);

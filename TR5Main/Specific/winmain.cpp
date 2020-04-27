@@ -1,4 +1,3 @@
-#include "game.h"
 #include "init.h"
 #include "winmain.h"
 #include <CommCtrl.h>
@@ -16,7 +15,8 @@
 #include "..\Game\control.h"
 #include "..\Game\gameflow.h"
 #include "..\Game\savegame.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
+#include "..\Specific\level.h"
 
 #include "configuration.h"
 
@@ -26,6 +26,8 @@ uintptr_t hThread;
 HACCEL hAccTable;
 byte receivedWmClose = false;
 bool Debug = false;
+HWND WindowsHandle;
+int App_Unk00D9ABFD;
 
 extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
@@ -37,7 +39,7 @@ int WinProcMsg()
 	int result;
 	struct tagMSG Msg;
 
-	DB_Log(2, "WinProcMsg");
+	//DB_Log(2, "WinProcMsg");
 	do
 	{
 		GetMessageA(&Msg, 0, 0, 0);
@@ -56,17 +58,17 @@ void __stdcall HandleWmCommand(unsigned short wParam)
 {
 	if (wParam == 8)
 	{
-		DB_Log(5, "Pressed ALT + ENTER");
+		//DB_Log(5, "Pressed ALT + ENTER");
 
 		if (!IsLevelLoading)
 		{
 			SuspendThread((HANDLE)hThread);
-			DB_Log(5, "Game thread suspended");
+			//DB_Log(5, "Game thread suspended");
 			
 			g_Renderer->ToggleFullScreen();
 
 			ResumeThread((HANDLE)hThread);
-			DB_Log(5, "Game thread resumed");
+			//DB_Log(5, "Game thread resumed");
 
 			if (g_Renderer->IsFullsScreen())
 			{
@@ -93,7 +95,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (msg == WM_COMMAND)
 		{
-			DB_Log(6, "WM_COMMAND");
+			//DB_Log(6, "WM_COMMAND");
 			HandleWmCommand((unsigned short)wParam);
 		}
 
@@ -102,11 +104,11 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	if (msg == WM_CLOSE)
 	{
-		DB_Log(6, "WM_CLOSE");
+		//DB_Log(6, "WM_CLOSE");
 
 		receivedWmClose = true;
 		PostQuitMessage(0);
-		//DoTheGame = false;
+		DoTheGame = false;
 
 		return DefWindowProcA(hWnd, 0x10u, wParam, (LPARAM)lParam);
 	}
@@ -116,43 +118,43 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
-	DB_Log(6, "WM_ACTIVATE");
+	//DB_Log(6, "WM_ACTIVATE");
 
 	if (receivedWmClose)
 	{
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
-	if (App_Unk00D9AC2B)
-		return 0;
+	//if (App_Unk00D9AC2B)
+	//	return 0;
 
 	if ((short)wParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
-			DB_Log(6, "WM_ACTIVE");
+			//DB_Log(6, "WM_ACTIVE");
 
 			if (!Debug)
 				ResumeThread((HANDLE)hThread);
 
 			App_Unk00D9ABFD = 0;
 
-			DB_Log(5, "Game Thread Resumed");
+			//DB_Log(5, "Game Thread Resumed");
 
 			return 0;
 		}
 	}
 	else
 	{
-		DB_Log(6, "WM_INACTIVE");
-		DB_Log(5, "HangGameThread");
+		//DB_Log(6, "WM_INACTIVE");
+		//DB_Log(5, "HangGameThread");
 
 		App_Unk00D9ABFD = 1;
 
 		if (!Debug)
 			SuspendThread((HANDLE)hThread);
 
-		DB_Log(5, "Game Thread Suspended");
+		//DB_Log(5, "Game Thread Suspended");
 	}
 
 	return 0;
@@ -271,8 +273,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		return false;
 	}
 
-	PhdWidth = g_Configuration.Width;
-	PhdHeight = g_Configuration.Height;
 	WindowsHandle = App.WindowHandle;
 
 	// Initialise the renderer
@@ -316,7 +316,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 int WinClose()
 {
-	DB_Log(2, "WinClose - DLL");
+	//DB_Log(2, "WinClose - DLL");
 
 	DestroyAcceleratorTable(hAccTable);
 
@@ -330,12 +330,4 @@ int WinClose()
 	SaveGame::End();
 
 	return 0;
-}
-
-
-void Inject_WinMain()
-{
-	INJECT(0x004D23E0, WinClose);
-	INJECT(0x004D24C0, WinProcMsg);
-	INJECT(0x004D1C00, WinMain);
 }

@@ -6,6 +6,7 @@
 #include "../../Game/people.h"
 #include "../../Game/lara.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
 
@@ -77,7 +78,7 @@ void SasControl(short itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			ang = ATAN(dz, dx) - item->pos.yRot;
+			ang = phd_atan(dz, dx) - item->pos.yRot;
 			distance = dx * dx + dz * dz;
 		}
 
@@ -388,7 +389,7 @@ void SasControl(short itemNum)
 
 				if (info.distance > 9437184)
 				{
-					joint1 = SQRT_ASM(info.distance) + info.xAngle - 1024;
+					joint1 = sqrt(info.distance) + info.xAngle - 1024;
 				}
 			}
 
