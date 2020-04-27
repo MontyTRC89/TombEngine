@@ -13,7 +13,7 @@
 #include "../../Specific/input.h"
 #include "../../Game/sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 typedef enum MINECART_STATE {
 	CART_GETIN,
@@ -67,7 +67,7 @@ typedef enum MINECART_FLAGS
 #define CART_NHITS 25
 #define CART_BADDIE_RADIUS STEP_SIZE
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 static int TestHeight(ITEM_INFO* v, int x, int z)
 {
@@ -151,7 +151,7 @@ static bool CanGetOut(int direction)
 	short roomNumber, angle;
 	int x, y, z, height, ceiling;
 
-	v = &Items[g_LaraExtra.Vehicle];
+	v = &Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = v->pos.yRot + 0x4000;
@@ -267,7 +267,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	if (cart->StopDelay)
 		cart->StopDelay--;
 
-	if (((g_LaraExtra.mineL) && (g_LaraExtra.mineR) && (!cart->StopDelay)) && (((v->pos.xPos & 0x380) == 512) || ((v->pos.zRot & 0x380) == 512)))
+	if (((Lara.mineL) && (Lara.mineR) && (!cart->StopDelay)) && (((v->pos.xPos & 0x380) == 512) || ((v->pos.zRot & 0x380) == 512)))
 	{
 		if (cart->Speed < 0xf000)	// can't do this - bastard
 		{
@@ -280,10 +280,10 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	}
 
 	// initiate turns
-	if ((g_LaraExtra.mineL || g_LaraExtra.mineR) && (!(g_LaraExtra.mineL && g_LaraExtra.mineR)) && (!cart->StopDelay) && (!(cart->Flags & (CF_TURNINGL | CF_TURNINGR))))
+	if ((Lara.mineL || Lara.mineR) && (!(Lara.mineL && Lara.mineR)) && (!cart->StopDelay) && (!(cart->Flags & (CF_TURNINGL | CF_TURNINGR))))
 	{
 		short ang;
-		unsigned short rot = (((unsigned short)v->pos.yRot) >> 14) | (g_LaraExtra.mineL << 2);
+		unsigned short rot = (((unsigned short)v->pos.yRot) >> 14) | (Lara.mineL << 2);
 
 		switch (rot)
 		{
@@ -339,7 +339,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			cart->TurnLen = ang;
 		}
 
-		cart->Flags |= (g_LaraExtra.mineL) ? CF_TURNINGL : CF_TURNINGR;
+		cart->Flags |= (Lara.mineL) ? CF_TURNINGL : CF_TURNINGR;
 	}
 
 	// move vehicle
@@ -654,7 +654,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->animNumber = 13;
 			l->frameNumber = GF(11, 0);
 			l->currentAnimState = l->goalAnimState = 2;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 		break;
@@ -675,7 +675,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->animNumber = 11;
 			l->frameNumber = GF(11, 0);
 			l->currentAnimState = l->goalAnimState = 2;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 		break;
@@ -734,7 +734,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	}
 
 	/* -------- sync vehicle's anims with Lara */
-	if ((g_LaraExtra.Vehicle != NO_ITEM) && (!(cart->Flags & CF_NOANIM)))
+	if ((Lara.Vehicle != NO_ITEM) && (!(cart->Flags & CF_NOANIM)))
 	{
 		AnimateItem(l);
 
@@ -825,14 +825,14 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int geton;
 	short ang;
 
-	if ((l->hitPoints < 0) || (g_LaraExtra.Vehicle != NO_ITEM))
+	if ((l->hitPoints < 0) || (Lara.Vehicle != NO_ITEM))
 		return;
 
 	v = &Items[itemNum];
 
 	if ((geton = GetInMineCart(v, l, coll)))
 	{
-		g_LaraExtra.Vehicle = itemNum;
+		Lara.Vehicle = itemNum;
 
 		/* -------- throw flare away if using */
 		if (Lara.gunType == WEAPON_FLARE)
@@ -879,7 +879,7 @@ int MineCartControl()
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	v = &Items[g_LaraExtra.Vehicle];
+	v = &Items[Lara.Vehicle];
 	if (v->data == NULL) { printf("v->data is nullptr !"); return 0; }
 	cart = (CART_INFO*)v->data;
 
@@ -889,7 +889,7 @@ int MineCartControl()
 		MoveCart(v, LaraItem, cart);
 
 	/* -------- move Lara to vehicle pos */
-	if (g_LaraExtra.Vehicle != NO_ITEM)
+	if (Lara.Vehicle != NO_ITEM)
 	{
 		LaraItem->pos.xPos = v->pos.xPos;
 		LaraItem->pos.yPos = v->pos.yPos;
@@ -904,7 +904,7 @@ int MineCartControl()
 
 	if (roomNumber != v->roomNumber)
 	{
-		ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+		ItemNewRoom(Lara.Vehicle, roomNumber);
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
@@ -916,5 +916,5 @@ int MineCartControl()
 		Camera.targetDistance = WALL_SIZE * 2;
 	}
 
-	return (g_LaraExtra.Vehicle == NO_ITEM) ? 0 : 1;
+	return (Lara.Vehicle == NO_ITEM) ? 0 : 1;
 }

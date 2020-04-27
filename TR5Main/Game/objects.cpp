@@ -40,7 +40,7 @@ short PoleBounds[12] = // offset 0xA1250
 	0xF8E4, 0x071C
 };
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 void InitialiseSmashObject(short itemNumber)
 {
@@ -495,7 +495,7 @@ void ControlXRayMachine(short itemNumber)
 
 		if (Lara.skelebob)
 		{
-			if (g_LaraExtra.Weapons[WEAPON_HK].Present)
+			if (Lara.Weapons[WEAPON_HK].Present)
 			{
 				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, 0);
 				item->itemFlags[0] = 666;

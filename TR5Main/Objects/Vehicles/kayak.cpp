@@ -12,7 +12,7 @@
 #include "../../Specific/setup.h"
 #include "../../Specific/input.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 #define MAX_SPEED 0x380000
 #define KAYAK_COLLIDE 64
@@ -1005,7 +1005,7 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 			lara->fallspeed = 0;
 			lara->gravityStatus = true;
 			Lara.gunStatus = LG_NO_ARMS;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 		}
 		break;
 
@@ -1030,7 +1030,7 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 			lara->fallspeed = 0;
 			lara->gravityStatus = true;
 			Lara.gunStatus = LG_NO_ARMS;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 		}
 	}
 
@@ -1163,7 +1163,7 @@ void LaraRapidsDrown()
 
 	AnimateItem(l);
 
-	g_LaraExtra.ExtraAnim = 1;
+	Lara.ExtraAnim = 1;
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.gunType = WEAPON_NONE;
 	Lara.hitDirection = -1;
@@ -1198,7 +1198,7 @@ void KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
 
-	if ((l->hitPoints < 0) || (g_LaraExtra.Vehicle != NO_ITEM))
+	if ((l->hitPoints < 0) || (Lara.Vehicle != NO_ITEM))
 		return;
 
 	if ((geton = GetInKayak(item_number, coll)))
@@ -1206,7 +1206,7 @@ void KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 		KAYAK_INFO* Kayak;
 		ITEM_INFO* v = &Items[item_number];
 
-		g_LaraExtra.Vehicle = item_number;
+		Lara.Vehicle = item_number;
 
 		/* -------- throw flare away if using */
 		if (Lara.gunType == WEAPON_FLARE)
@@ -1262,7 +1262,7 @@ int KayakControl()
 	short roomNumber;
 
 	l = LaraItem;
-	v = &Items[g_LaraExtra.Vehicle];
+	v = &Items[Lara.Vehicle];
 	Kayak = (KAYAK_INFO*)v->data;
 
 	if (TrInput & IN_LOOK)
@@ -1302,11 +1302,11 @@ int KayakControl()
 	}
 
 	/* -------- move Lara to Kayak pos */
-	if (g_LaraExtra.Vehicle != NO_ITEM)
+	if (Lara.Vehicle != NO_ITEM)
 	{
 		if (v->roomNumber != roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
@@ -1371,5 +1371,5 @@ int KayakControl()
 	*/
 
 	KayakToBaddieCollision(v);
-	return (g_LaraExtra.Vehicle != NO_ITEM) ? 1 : 0;
+	return (Lara.Vehicle != NO_ITEM) ? 1 : 0;
 }

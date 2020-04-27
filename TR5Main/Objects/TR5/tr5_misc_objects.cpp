@@ -826,7 +826,7 @@ void ControlTeleporter(short itemNumber)
 	{
 		if (item->itemFlags[2])
 		{
-			g_LaraExtra.Puzzles[1] = 1;
+			Lara.Puzzles[1] = 1;
 			RemoveActiveItem(itemNumber);
 			item->flags &= 0xC1FF;
 		}

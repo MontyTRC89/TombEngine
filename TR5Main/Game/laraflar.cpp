@@ -13,8 +13,6 @@
 #include "collide.h"
 #include "effect2.h"
 
-extern LaraExtraInfo g_LaraExtra;
-
 void FlareControl(short itemNumber) // (AF) (D)
 {
 	ITEM_INFO* item = &Items[itemNumber];
@@ -119,7 +117,7 @@ void undraw_flare() // (F) (D)
 
 #if 0
 	if (LaraItem->goalAnimState == STATE_LARA_STOP &&
-		g_LaraExtra.Vehicle == NO_ITEM)
+		Lara.Vehicle == NO_ITEM)
 #else
 	if (LaraItem->goalAnimState == STATE_LARA_STOP)
 #endif

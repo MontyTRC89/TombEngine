@@ -49,7 +49,7 @@ short Unk_0080DE1A;
 int Unk_0080DDE8;
 short Unk_0080DE24;
 
-extern LaraExtraInfo g_LaraExtra;
+
 extern Inventory* g_Inventory;
 
 int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
@@ -223,7 +223,7 @@ int DoJeepDynamics(int height, int speed, int* y, int flags)
 
 int JeepCanGetOff()
 {
-	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
+	ITEM_INFO* item = &Items[Lara.Vehicle];
 
 	short angle = item->pos.yRot + 0x4000;
 
@@ -355,7 +355,7 @@ int JeepCheckGetOff()
 			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 			CurrentAtmosphere = 110;
 			IsAtmospherePlaying = true;
@@ -591,12 +591,12 @@ void JeepExplode(ITEM_INFO* item)
 		}
 	}
 
-	ExplodingDeath(g_LaraExtra.Vehicle, -1, 256);
-	KillItem(g_LaraExtra.Vehicle);
+	ExplodingDeath(Lara.Vehicle, -1, 256);
+	KillItem(Lara.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_EXPLOSION1, 0, 0);
 	SoundEffect(SFX_EXPLOSION2, 0, 0);
-	g_LaraExtra.Vehicle = NO_ITEM;
+	Lara.Vehicle = NO_ITEM;
 }
 
 int JeepDynamics(ITEM_INFO* item)
@@ -825,7 +825,7 @@ int JeepDynamics(ITEM_INFO* item)
 		newspeed = ((item->pos.zPos - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * phd_sin(jeep->momentumAngle)) >> W2V_SHIFT;
 		newspeed <<= 8;
 
-		if ((&Items[g_LaraExtra.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
+		if ((&Items[Lara.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
 		{
 			LaraItem->hitPoints -= (JEEP_MAX_SPEED - newspeed) >> 7;
 			LaraItem->hitStatus = true;
@@ -1532,13 +1532,13 @@ void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 
 void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (l->hitPoints > 0 && g_LaraExtra.Vehicle == NO_ITEM)
+	if (l->hitPoints > 0 && Lara.Vehicle == NO_ITEM)
 	{
 		ITEM_INFO* item = &Items[itemNumber];
 
 		if (GetOnJeep(itemNumber))
 		{
-			g_LaraExtra.Vehicle = itemNumber;
+			Lara.Vehicle = itemNumber;
 
 			if (Lara.gunType == WEAPON_FLARE)
 			{
@@ -1622,7 +1622,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 int JeepControl()
 {
-	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
+	ITEM_INFO* item = &Items[Lara.Vehicle];
 	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
 
 	int drive = -1;
@@ -1741,7 +1741,7 @@ int JeepControl()
 	{
 		if (roomNumber != item->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 

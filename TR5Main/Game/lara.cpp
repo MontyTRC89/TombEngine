@@ -42,9 +42,8 @@ extern Inventory* g_Inventory;
 short elevation = 57346;
 bool doJump = false;
 short OldAngle = 1;
-LaraExtraInfo g_LaraExtra;
 int RopeSwing = 0;
-LARA_INFO Lara;
+LaraInfo Lara;
 ITEM_INFO* LaraItem;
 byte LaraNodeUnderwater[15];
 
@@ -350,7 +349,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = 100;
 	coll->trigger = 0;
 
-	if ((TrInput & IN_LOOK) && g_LaraExtra.ExtraAnim == 0 && Lara.look)
+	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == 0 && Lara.look)
 		LookLeftRight();
 	else
 		ResetLook();
@@ -358,9 +357,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.look = true;
 
 	// Process Vehicles
-	if (g_LaraExtra.Vehicle != NO_ITEM)
+	if (Lara.Vehicle != NO_ITEM)
 	{
-		switch (Items[g_LaraExtra.Vehicle].objectNumber)
+		switch (Items[Lara.Vehicle].objectNumber)
 		{
 			case ID_QUAD:
 				if (QuadBikeControl())
@@ -418,13 +417,13 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Animate Lara
 	AnimateLara(item);
 
-	if (g_LaraExtra.ExtraAnim == 0)
+	if (Lara.ExtraAnim == 0)
 	{
 		// Check for collision with items
 		LaraBaddieCollision(item, coll);
 
 		// Handle Lara collision
-		if (g_LaraExtra.Vehicle == NO_ITEM)
+		if (Lara.Vehicle == NO_ITEM)
 			(*lara_collision_routines[item->currentAnimState])(item, coll);
 	}
 
@@ -454,9 +453,9 @@ int UseSpecialItem(ITEM_INFO* item)
 		if (selectedObject != ID_WATERSKIN1_3 && selectedObject != ID_WATERSKIN2_5)
 		{
 			if (selectedObject >= ID_WATERSKIN2_EMPTY)
-				g_LaraExtra.Waterskin2.Quantity = 5;
+				Lara.Waterskin2.Quantity = 5;
 			else
-				g_LaraExtra.Waterskin1.Quantity = 3;
+				Lara.Waterskin1.Quantity = 3;
 
 			item->animNumber = ANIMATION_LARA_WATERSKIN_FILL;
 		}
@@ -464,13 +463,13 @@ int UseSpecialItem(ITEM_INFO* item)
 		{
 			if (selectedObject >= ID_WATERSKIN2_EMPTY)
 			{
-				item->itemFlags[3] = g_LaraExtra.Waterskin2.Quantity;
-				g_LaraExtra.Waterskin2.Quantity = 1;
+				item->itemFlags[3] = Lara.Waterskin2.Quantity;
+				Lara.Waterskin2.Quantity = 1;
 			}
 			else
 			{
-				item->itemFlags[3] = g_LaraExtra.Waterskin1.Quantity;
-				g_LaraExtra.Waterskin1.Quantity = 1;
+				item->itemFlags[3] = Lara.Waterskin1.Quantity;
+				Lara.Waterskin1.Quantity = 1;
 			}
 
 			item->animNumber = ANIMATION_LARA_WATERSKIN_EMPTY;

@@ -62,7 +62,7 @@ vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
 
 extern GameFlow* g_GameFlow;
-extern LaraExtraInfo g_LaraExtra;
+
 char* LevelDataPtr;
 OBJECT_TEXTURE* ObjectTextures;
 ITEM_INFO* Items;
@@ -953,7 +953,7 @@ unsigned __stdcall LoadLevel(void* data)
 	GetAIPickups();
 	SeedRandomDraw(0xD371F947);
 	SeedRandomControl(0xD371F947);
-	g_LaraExtra.Vehicle = -1;
+	Lara.Vehicle = -1;
 	g_GameScript->AssignItemsAndLara();
 
 	// Level loaded

@@ -225,10 +225,10 @@ void FlameControl(short fxNumber)
 
 			GetLaraJointPosition((PHD_VECTOR*)&fx->pos, i);
 
-			if (Lara.BurnCount)
+			if (Lara.burnCount)
 			{
-				Lara.BurnCount--;
-				if (!Lara.BurnCount)
+				Lara.burnCount--;
+				if (!Lara.burnCount)
 					Lara.burnSmoke = true;
 			}
 

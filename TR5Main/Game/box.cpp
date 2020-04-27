@@ -20,8 +20,6 @@ int NumberOverlaps;
 short* Overlaps;
 short* Zones[5][2];
 
-extern LaraExtraInfo g_LaraExtra;
-
 #define ESCAPE_DIST (WALL_SIZE*5)
 #define STALK_DIST (WALL_SIZE*3)
 #define REACHED_GOAL_RADIUS 640
@@ -243,7 +241,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 
 	AnimateItem(LaraItem);
 
-	g_LaraExtra.ExtraAnim = 1;
+	Lara.ExtraAnim = 1;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	Lara.gunType = WEAPON_NONE;
 	Lara.hitDirection = -1;
