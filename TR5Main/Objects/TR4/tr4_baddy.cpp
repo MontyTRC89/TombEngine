@@ -12,7 +12,7 @@
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 void ClampRotation(PHD_3DPOS *pos, short angle, short rot)
 {
@@ -338,7 +338,7 @@ void BaddyControl(short itemNum)
 		GetCreatureMood(item, &info, VIOLENT);
 
 		// Vehicle handling
-		if (g_LaraExtra.Vehicle != NO_ITEM && info.bite)
+		if (Lara.Vehicle != NO_ITEM && info.bite)
 			currentCreature->mood == ESCAPE_MOOD;
 
 		CreatureMood(item, &info, VIOLENT);

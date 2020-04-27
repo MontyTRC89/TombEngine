@@ -12,7 +12,7 @@
 #include "../../Specific/input.h"
 #include "../../Game/sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 // TODO: test the dragon and bartoli to check if it work !
 // TODO: upgrade the collision of dragon to pick the dagger correctly.
@@ -236,7 +236,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				AnimateItem(LaraItem);
 
 				/* Flag that Lara is running animations from another project */
-				g_LaraExtra.ExtraAnim = 1;
+				Lara.ExtraAnim = 1;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.hitDirection = -1;
 

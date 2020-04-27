@@ -9,7 +9,7 @@
 #include "../../Specific/input.h"
 #include "../../Game/sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 enum BOAT_STATE {
 	BOAT_GETON,
@@ -88,7 +88,7 @@ void GetBoatGetOff(ITEM_INFO* boat)
 		LaraItem->fallspeed = -40;
 		LaraItem->speed = 20;
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-		g_LaraExtra.Vehicle = NO_ITEM;
+		Lara.Vehicle = NO_ITEM;
 
 		roomNumber = LaraItem->roomNumber;
 		x = LaraItem->pos.xPos + (360 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
@@ -117,7 +117,7 @@ int CanGetOff(int direction)
 	short roomNumber, angle;
 	int x, y, z, height, ceiling;
 
-	v = &Items[g_LaraExtra.Vehicle];
+	v = &Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = v->pos.yRot - 0x4000;
@@ -251,7 +251,7 @@ void DoBoatCollision(int itemNum)
 	{
 		item = &Items[item_number];
 
-		if (item->objectNumber == ID_SPEEDBOAT && item_number != itemNum && g_LaraExtra.Vehicle != item_number)
+		if (item->objectNumber == ID_SPEEDBOAT && item_number != itemNum && Lara.Vehicle != item_number)
 		{
 			// other boat
 			x = item->pos.xPos - boat->pos.xPos;
@@ -815,7 +815,7 @@ void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	ITEM_INFO* boat;
 
 	/* If Lara dead or already on the boat, then no collision */
-	if (litem->hitPoints < 0 || g_LaraExtra.Vehicle != NO_ITEM)
+	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
 	boat = &Items[itemNum];
@@ -866,7 +866,7 @@ void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	//S_CDPlay(12, 0);
 
 	/* Yeeha! Get in that boat girly */
-	g_LaraExtra.Vehicle = itemNum;
+	Lara.Vehicle = itemNum;
 }
 
 void BoatControl(short itemNumber)
@@ -899,7 +899,7 @@ void BoatControl(short itemNumber)
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);
 
 	/* Deal with user input; will effect next frame, but relies on info calced this frame */
-	if (g_LaraExtra.Vehicle == itemNumber && LaraItem->hitPoints > 0)
+	if (Lara.Vehicle == itemNumber && LaraItem->hitPoints > 0)
 	{
 		switch (LaraItem->currentAnimState)
 		{
@@ -969,13 +969,13 @@ void BoatControl(short itemNumber)
 		boat->pos.zRot = 0;
 
 	/* If Lara is on the boat, do all her animation and move her to same position as boat, etc */
-	if (g_LaraExtra.Vehicle == itemNumber)
+	if (Lara.Vehicle == itemNumber)
 	{
 		BoatAnimation(boat, collide);
 
 		if (roomNumber != boat->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
@@ -1022,7 +1022,7 @@ void BoatControl(short itemNumber)
 	//	if (boat->speed && water-5 == boat->pos.y_pos)
 	//		DoWakeEffect(boat);
 
-	if (g_LaraExtra.Vehicle != itemNumber)
+	if (Lara.Vehicle != itemNumber)
 		return;
 
 	GetBoatGetOff(boat);

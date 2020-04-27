@@ -140,7 +140,7 @@ bool QuadCanHandbrakeStart;
 int QuadSmokeStart;
 bool QuadNoGetOff;
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 void QuadbikeExplode(ITEM_INFO* item)
 {
@@ -155,21 +155,21 @@ void QuadbikeExplode(ITEM_INFO* item)
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
 	}
 
-	ExplodingDeath(g_LaraExtra.Vehicle, 0xfffffffe, 1);
-	KillItem(g_LaraExtra.Vehicle);
+	ExplodingDeath(Lara.Vehicle, 0xfffffffe, 1);
+	KillItem(Lara.Vehicle);
 	item->status = ITEM_DEACTIVATED;
 
 	SoundEffect(SFX_EXPLOSION1, NULL, 0);
 	SoundEffect(SFX_EXPLOSION2, NULL, 0);
 
-	g_LaraExtra.Vehicle = NO_ITEM;
+	Lara.Vehicle = NO_ITEM;
 }
 
 int CanQuadbikeGetOff(int direction)
 {
 	short angle;
 
-	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
+	ITEM_INFO* item = &Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = item->pos.yRot - ANGLE(90);
@@ -200,7 +200,7 @@ int CanQuadbikeGetOff(int direction)
 
 int QuadCheckGetOff()
 {
-	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
+	ITEM_INFO* item = &Items[Lara.Vehicle];
 
 	if (((LaraItem->currentAnimState == 10) || (LaraItem->currentAnimState == 24)) && (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd))
 	{
@@ -215,7 +215,7 @@ int QuadCheckGetOff()
 		LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-		g_LaraExtra.Vehicle = NO_ITEM;
+		Lara.Vehicle = NO_ITEM;
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 	else if (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
@@ -741,7 +741,7 @@ int QuadDynamics(ITEM_INFO* item)
 
 		newspeed <<= 8;
 
-		if ((&Items[g_LaraExtra.Vehicle] == item)
+		if ((&Items[Lara.Vehicle] == item)
 			&& (quad->velocity == MAX_VELOCITY)
 			&& (newspeed < (quad->velocity - 10)))
 		{
@@ -1150,14 +1150,14 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	int geton;
 
 	if ((LaraItem->hitPoints < 0)
-		|| (g_LaraExtra.Vehicle != NO_ITEM))
+		|| (Lara.Vehicle != NO_ITEM))
 		return;
 
 	if ((geton = GetOnQuadBike(itemNumber, coll)))
 	{
 		short ang;
 
-		g_LaraExtra.Vehicle = itemNumber;
+		Lara.Vehicle = itemNumber;
 
 		if (Lara.gunType == WEAPON_FLARE)
 		{
@@ -1271,7 +1271,7 @@ int QuadBikeControl()
 	short xRot, zRot, rotadd;
 	int pitch, dead = 0;
 
-	ITEM_INFO* item = &Items[g_LaraExtra.Vehicle];
+	ITEM_INFO* item = &Items[Lara.Vehicle];
 	QUAD_INFO* quad = (QUAD_INFO *)item->data;
 
 	GAME_VECTOR	oldpos;
@@ -1365,7 +1365,7 @@ int QuadBikeControl()
 	{
 		if (roomNumber != item->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 

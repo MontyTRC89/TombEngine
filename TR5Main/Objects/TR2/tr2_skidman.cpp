@@ -10,7 +10,7 @@
 #include "..\..\Specific\level.h"
 #include "../../Game/sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
 
@@ -73,7 +73,7 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	}
 
 	/* If Lara is walking and hit by skidoo, gets hurt a lot */
-	if (g_LaraExtra.Vehicle == NO_ITEM && item->speed > 0)
+	if (Lara.Vehicle == NO_ITEM && item->speed > 0)
 	{
 		laraitem->hitStatus = true;
 		laraitem->hitPoints -= 100;
@@ -191,7 +191,7 @@ void SkidManControl(short riderNum)
 	{
 		if (!skidman->flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->hitPoints > 0)
 		{
-			damage = (g_LaraExtra.Vehicle != NO_ITEM) ? 10 : 50; // more damage if Lara on foot
+			damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50; // more damage if Lara on foot
 
 			if (ShotLara(item, &info, &skidooLeft, 0, damage) + ShotLara(item, &info, &skidooRight, 0, damage))
 				skidman->flags = 5;

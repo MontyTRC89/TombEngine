@@ -465,7 +465,7 @@ void GuardianControl(short itemNumber)
 											if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
 											{
 												LaraBurn();
-												Lara.BurnCount = 48;
+												Lara.burnCount = 48;
 												Lara.burnBlue = 2;
 												LaraItem->hitPoints = 0;
 												break;

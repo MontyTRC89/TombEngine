@@ -28,7 +28,6 @@
 
 #include "bubble.h"
 
-extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
 
 int HKCounter = 0;
@@ -39,7 +38,7 @@ byte HKFlag2 = 0;
 void FireHarpoon()
 {
 	// If no ammo then exit
-	//if (g_LaraExtra.numHarpoonAmmos <= 0)
+	//if (Lara.numHarpoonAmmos <= 0)
 	//	return;
 
 	// Create a new item for harpoon
@@ -333,7 +332,7 @@ void FireGrenade()
 			if (*ammo != -1)
 				(*ammo)--;
 
-			item->itemFlags[0] = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
+			item->itemFlags[0] = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
 
 			Savegame.Level.AmmoUsed++;
 			Savegame.Game.AmmoUsed++;
@@ -925,7 +924,7 @@ void AnimateShotgun(int weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3)) 
+						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3)) 
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_ROCKET_LAUNCHER)
@@ -945,7 +944,7 @@ void AnimateShotgun(int weaponType)
 						FireHK(0);
 						HKFlag = 1;
 
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(14, 0, 0);
 						}
@@ -964,7 +963,7 @@ void AnimateShotgun(int weaponType)
 					item->goalAnimState = 0; 
 			}
 
-			if (item->goalAnimState != 2 && HKFlag && !(g_LaraExtra.Weapons[WEAPON_HK].HasSilencer))
+			if (item->goalAnimState != 2 && HKFlag && !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(68);
 				SoundEffect(69, &LaraItem->pos, 0);
@@ -973,7 +972,7 @@ void AnimateShotgun(int weaponType)
 		}
 		else if (HKFlag)
 		{
-			if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+			if (Lara.Weapons[WEAPON_HK].HasSilencer)
 			{
 				SoundEffect(14, 0, 0);
 			}
@@ -1004,7 +1003,7 @@ void AnimateShotgun(int weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon();
-						if (!(g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3))
+						if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] & 3))
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_HK && (/*!(Lara.HKtypeCarried & 0x18) || */!HKTimer))
@@ -1012,7 +1011,7 @@ void AnimateShotgun(int weaponType)
 						FireHK(1);
 						HKFlag = 1;
 						item->goalAnimState = 8;
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(14, 0, 0);
 						}
@@ -1032,7 +1031,7 @@ void AnimateShotgun(int weaponType)
 				else if (Lara.leftArm.lock)
 					item->goalAnimState = 6;
 			}
-			else if (item->goalAnimState != 8 && HKFlag && !(g_LaraExtra.Weapons[WEAPON_HK].HasSilencer))
+			else if (item->goalAnimState != 8 && HKFlag && !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(68);
 				SoundEffect(69, &LaraItem->pos, 0);
@@ -1040,7 +1039,7 @@ void AnimateShotgun(int weaponType)
 			}
 			else if (HKFlag)
 			{
-				if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+				if (Lara.Weapons[WEAPON_HK].HasSilencer)
 				{
 					SoundEffect(14, 0, 0);
 				}
@@ -1401,7 +1400,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 
 		AddActiveItem(itemNumber);
 		
-		item->itemFlags[0] = g_LaraExtra.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
+		item->itemFlags[0] = Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
 
 		SoundEffect(235, 0, 0);
 
@@ -1613,11 +1612,11 @@ void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int sear
 
 void FireHK(int mode)
 {
-	if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+	if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
 	{
 		HKTimer = 12;
 	}
-	else if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
+	else if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
 	{
 		HKCounter++;
 		if (HKCounter == 5)
@@ -1673,7 +1672,7 @@ void FireShotgun()
 
 	short loopAngles[2];
 	bool fired = false;
-	int value = (g_LaraExtra.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
+	int value = (Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
 
 	for (int i = 0; i < 6; i++)
 	{

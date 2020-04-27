@@ -10,7 +10,7 @@
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 void InitialiseSas(short itemNum)
 {
@@ -85,7 +85,7 @@ void SasControl(short itemNum)
 		GetCreatureMood(item, &info, creature->enemy != LaraItem);
 
 		// Vehicle handling
-		if (g_LaraExtra.Vehicle != NO_ITEM && info.bite)
+		if (Lara.Vehicle != NO_ITEM && info.bite)
 			creature->mood == ESCAPE_MOOD;
 
 		CreatureMood(item, &info, creature->enemy != LaraItem);

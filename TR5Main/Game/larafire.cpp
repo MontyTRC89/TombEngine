@@ -242,7 +242,6 @@ short HoldStates[] = {
 };
 
 extern GameFlow* g_GameFlow;
-extern LaraExtraInfo g_LaraExtra;
 bool MonksAttackLara;
 ITEM_INFO* LastTargets[8];
 ITEM_INFO* TargetList[8];
@@ -359,10 +358,10 @@ void LaraGun() // (F) (D)
 					Lara.gunStatus = LG_UNDRAW_GUNS;
 				}
 			}
-			else if (g_LaraExtra.NumFlares)
+			else if (Lara.NumFlares)
 			{
-				if (g_LaraExtra.NumFlares != -1)
-					g_LaraExtra.NumFlares--;
+				if (Lara.NumFlares != -1)
+					Lara.NumFlares--;
 				Lara.requestGunType = WEAPON_FLARE;
 			}
 		}
@@ -386,7 +385,7 @@ void LaraGun() // (F) (D)
 			}
 			else if (Lara.requestGunType == WEAPON_FLARE
 #if 0
-				|| g_LaraExtra.Vehicle == NO_ITEM
+				|| Lara.Vehicle == NO_ITEM
 				&& (Lara.requestGunType == WEAPON_HARPOON_GUN
 #endif
 				|| Lara.waterStatus == LW_ABOVE_WATER
@@ -553,7 +552,7 @@ void LaraGun() // (F) (D)
 #if 1
 				if (CheckForHoldingState(LaraItem->currentAnimState))
 #else
-				if (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
+				if (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
 #endif
 				{
 					if (Lara.flareControlLeft)
@@ -586,7 +585,7 @@ void LaraGun() // (F) (D)
 				if (CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND))
 				{
 #if 0
-					Lara.flareControlLeft = (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
+					Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
 #else
 					Lara.flareControlLeft = CheckForHoldingState(LaraItem->currentAnimState);
 #endif
@@ -600,7 +599,7 @@ void LaraGun() // (F) (D)
 
 short* GetAmmo(int weaponType)
 {
-	return &g_LaraExtra.Weapons[weaponType].Ammo[g_LaraExtra.Weapons[weaponType].SelectedAmmo];
+	return &Lara.Weapons[weaponType].Ammo[Lara.Weapons[weaponType].SelectedAmmo];
 }
 
 void InitialiseNewWeapon()
@@ -660,7 +659,7 @@ int WeaponObjectMesh(int weaponType)
 	switch (weaponType)
 	{
 	case WEAPON_REVOLVER:
-		return (g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight == true ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
+		return (Lara.Weapons[WEAPON_REVOLVER].HasLasersight == true ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
 
 	case WEAPON_UZI:
 		return ID_UZI_ANIM;
@@ -672,7 +671,7 @@ int WeaponObjectMesh(int weaponType)
 		return ID_HK_ANIM;
 
 	case WEAPON_CROSSBOW:
-		return (g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight == true ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
+		return (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight == true ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
 		
 	case WEAPON_GRENADE_LAUNCHER:
 		return ID_GRENADE_ANIM;
@@ -965,7 +964,7 @@ int CheckForHoldingState(int state) // (F) (D)
 	short* holdState = HoldStates;
 
 #if 0
-	if (g_LaraExtra.ExtraAnim)
+	if (Lara.ExtraAnim)
 		return 0;
 #endif
 
