@@ -7,6 +7,7 @@
 #include "../../Game/people.h"
 #include "../../Specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
@@ -165,7 +166,7 @@ void TroopsControl(short itemNum)
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
 			distance = dx * dx + dz * dz;
-			rot = ATAN(dz, dx) - item->pos.yRot;
+			rot = phd_atan(dz, dx) - item->pos.yRot;
 		}
 
 		GetCreatureMood(item, &info, TIMID);

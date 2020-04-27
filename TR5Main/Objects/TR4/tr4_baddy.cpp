@@ -7,6 +7,7 @@
 #include "../../Game/people.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
@@ -105,8 +106,8 @@ void InitialiseBaddy(short itemNum)
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->goalAnimState = 39;
 		item->currentAnimState = 39;
-		item->pos.xPos += SIN(item->pos.yRot) * 1024 >> 14;;
-		item->pos.zPos += COS(item->pos.yRot) * 1024 >> 14;;
+		item->pos.xPos += phd_sin(item->pos.yRot) * 1024 >> 14;;
+		item->pos.zPos += phd_cos(item->pos.yRot) * 1024 >> 14;;
 
 		return;
 	}
@@ -117,8 +118,8 @@ void InitialiseBaddy(short itemNum)
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->goalAnimState = 26;
 		item->currentAnimState = 26;
-		item->pos.xPos += SIN(item->pos.yRot) * 1024 >> 14;;
-		item->pos.zPos += COS(item->pos.yRot) * 1024 >> 14;;
+		item->pos.xPos += phd_sin(item->pos.yRot) * 1024 >> 14;;
+		item->pos.zPos += phd_cos(item->pos.yRot) * 1024 >> 14;;
 		item->itemFlags[3] = ocb;
 
 		return;
@@ -167,8 +168,8 @@ void BaddyControl(short itemNum)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	int dx = 942 * SIN(item->pos.yRot) >> 14;
-	int dz = 942 * COS(item->pos.yRot) >> 14;
+	int dx = 942 * phd_sin(item->pos.yRot) >> 14;
+	int dz = 942 * phd_cos(item->pos.yRot) >> 14;
 
 	x += dx;
 	z += dz;
@@ -325,7 +326,7 @@ void BaddyControl(short itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.ahead = true;
 
 			if (laraInfo.angle <= -16384 || laraInfo.angle >= 16384)
@@ -359,8 +360,8 @@ void BaddyControl(short itemNum)
 			jump = false;
 		}
 
-		dx = 942 * SIN(item->pos.yRot + ANGLE(45)) >> 14;
-		dz = 942 * COS(item->pos.yRot + ANGLE(45)) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot + ANGLE(45)) >> 14;
+		dz = 942 * phd_cos(item->pos.yRot + ANGLE(45)) >> 14;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -370,8 +371,8 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height4 = GetFloorHeight(floor, x, y, z);
 
-		dx = 942 * SIN(item->pos.yRot + 14336) >> 14;
-		dz = 942 * COS(item->pos.yRot + 14336) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot + 14336) >> 14;
+		dz = 942 * phd_cos(item->pos.yRot + 14336) >> 14;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -390,8 +391,8 @@ void BaddyControl(short itemNum)
 				jump = false;
 		}
 
-		dx = 942 * SIN(item->pos.yRot - 8192) >> 14;
-		dz = 942 * COS(item->pos.yRot - 8192) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot - 8192) >> 14;
+		dz = 942 * phd_cos(item->pos.yRot - 8192) >> 14;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -401,8 +402,8 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height6 = GetFloorHeight(floor, x, y, z);
 
-		dx = 942 * SIN(item->pos.yRot - 14336) >> 14;
-		dz = 942 * COS(item->pos.yRot - 14336) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot - 14336) >> 14;
+		dz = 942 * phd_cos(item->pos.yRot - 14336) >> 14;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;

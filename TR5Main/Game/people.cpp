@@ -6,6 +6,8 @@
 #include "control.h"
 #include "sphere.h"
 #include "debris.h"
+#include "lara.h"
+#include "sound.h"
 #include "box.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
@@ -18,7 +20,7 @@ int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotatio
 
 	if (info->distance <= SQUARE(8192) && Targetable(item, info))
 	{
-		int distance = SIN(info->enemyFacing) * enemy->speed >> W2V_SHIFT * SQUARE(8192) / 300;
+		int distance = phd_sin(info->enemyFacing) * enemy->speed >> W2V_SHIFT * SQUARE(8192) / 300;
 		distance = info->distance + SQUARE(distance);
 		if (distance <= SQUARE(8192))
 		{
@@ -102,7 +104,7 @@ short GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
 	pos.y = 0;
 	pos.z = 0;
 
-	GetJointAbsPosition(LaraItem, &pos, (25 * GetRandomControl()) >> 15);
+	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->pos.yRot, LaraItem->roomNumber);
 	SoundEffect(SFX_LARA_INJURY_RND, &LaraItem->pos, 0);
@@ -173,14 +175,4 @@ int TargetVisible(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	return 0;
-}
-
-void Inject_People()
-{
-	INJECT(0x00467610, ShotLara);
-	INJECT(0x00467530, GunMiss);
-	INJECT(0x004673D1, GunHit);
-	INJECT(0x00467420, GunShot);
-	INJECT(0x004672F0, Targetable);
-	INJECT(0x004671E0, TargetVisible);
 }

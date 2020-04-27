@@ -5,7 +5,10 @@
 #include "../../Game/items.h"
 #include "../../Game/effect2.h"
 #include "../../Game/lot.h"
+#include "../../Game/lara.h"
 #include "../../specific/setup.h"
+#include "../../Game/tomb4fx.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 

@@ -7,6 +7,8 @@
 #include "../../Game/people.h"
 #include "../../Game/sphere.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 

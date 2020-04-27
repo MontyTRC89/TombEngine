@@ -7,6 +7,8 @@
 #include "../../Game/missile.h"
 #include "../../Game/tomb4fx.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/effects.h"
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 
@@ -24,12 +26,12 @@ void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
 		fx->roomNumber = roomNumber;
-		//phd_GetVectorAngles(fx->pos.xPos - Camera.pos.x,
-		//					fx->pos.yPos - Camera.pos.y,
-		//					fx->pos.zPos - Camera.pos.z, &cam_rot);
-		//fx->pos.x_rot = fx->pos.z_rot = 0;
-		//fx->pos.y_rot = cam_rot;
-		fx->speed = 200;
+		/*phd_GetVectorAngles(fx->pos.xPos - Camera.pos.x,
+							fx->pos.yPos - Camera.pos.y,
+							fx->pos.zPos - Camera.pos.z, &cam_rot);
+		fx->pos.x_rot = fx->pos.z_rot = 0;
+		fx->pos.y_rot = cam_rot;
+		fx->speed = 200;*/
 		//fx->objectNumber = Utils.getObjects(TR2_DRAGON_FIRE);
 		fx->shade = 14 * 256;
 		fx->counter = 40;

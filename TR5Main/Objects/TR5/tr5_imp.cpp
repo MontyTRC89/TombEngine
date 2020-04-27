@@ -7,6 +7,7 @@
 #include "../../Game/effect2.h"
 #include "../../Game/Box.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1
@@ -59,7 +60,6 @@ void ImpThrowStones(ITEM_INFO* item)
 	pos1.z = 0;
 	GetJointAbsPosition(item, &pos1, 9);
 
-
 	PHD_VECTOR pos2;
 	pos2.x = 0;
 	pos2.y = 0;
@@ -73,7 +73,7 @@ void ImpThrowStones(ITEM_INFO* item)
 	short angles[2];
 	phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 	
-	int distance = SQRT_ASM(SQUARE(dx) + SQUARE(dy) + SQUARE(dz));
+	int distance = sqrt(SQUARE(dx) + SQUARE(dy) + SQUARE(dz));
 	if (distance < 8)
 		distance = 8;
 
@@ -91,7 +91,7 @@ void ImpThrowStones(ITEM_INFO* item)
 		fx->pos.xRot = angles[1] + distance >> 1;
 		fx->pos.yRot = angles[0];
 		fx->pos.zRot = 0;
-		fx->speed = 4 * SQRT_ASM(distance);
+		fx->speed = 4 * sqrt(distance);
 		if (fx->speed < 256)
 			fx->speed = 256;
 		fx->fallspeed = 0;
@@ -139,7 +139,7 @@ void ControlImp(short itemNumber)
 			}
 			else
 			{
-				angle2 = ATAN(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
+				angle2 = phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
 			}
 
 			int d1 = item->pos.yPos - LaraItem->pos.yPos + 384;
@@ -154,9 +154,9 @@ void ControlImp(short itemNumber)
 				d1 = item->pos.yPos - LaraItem->pos.yPos;
 			}
 
-			int d2 = SQRT_ASM(info.distance);
+			int d2 = sqrt(info.distance);
 
-			info.xAngle = ATAN(d2, d1);
+			info.xAngle = phd_atan(d2, d1);
 
 			GetCreatureMood(item, &info, VIOLENT);
 			if (item->currentAnimState == STATE_IMP_SCARED)

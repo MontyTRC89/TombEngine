@@ -10,6 +10,9 @@
 #include "../../Game/control.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 #define STATE_ROMAN_STATUE_STOP					1
 #define STATE_ROMAN_STATUE_SCREAMING			2
@@ -48,8 +51,8 @@ void InitialiseRomanStatue(short itemNum)
     item->currentAnimState = 13;
     item->frameNumber = Anims[item->animNumber].frameBase;
 	item->status = ITEM_INACTIVE;
-	item->pos.xPos += 486 * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-    item->pos.zPos += 486 * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+    item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 
 	ZeroMemory(&RomanStatueData, sizeof(ROMAN_STATUE_STRUCT));
 }

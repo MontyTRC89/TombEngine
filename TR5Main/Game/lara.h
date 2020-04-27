@@ -50,8 +50,9 @@ typedef struct LaraExtraInfo {
 };
 
 extern LaraExtraInfo g_LaraExtra;
-
-#define GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, int)) 0x0041E2A0)
+extern LARA_INFO Lara;
+extern ITEM_INFO* LaraItem;
+extern byte LaraNodeUnderwater[15];
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
@@ -234,11 +235,3 @@ void GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
-
-//int GetLaraJointPos(PHD_VECTOR* pos, int joint);
-//void SetLaraUnderwaterNodes();
-//void FireChaff();
-//void GetLaraJointPosRot(PHD_VECTOR* pos, int a2, int a3, SVECTOR* a4);
-//void DoSubsuitStuff();
-
-void Inject_Lara();

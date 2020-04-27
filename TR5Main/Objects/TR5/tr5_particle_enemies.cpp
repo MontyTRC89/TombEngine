@@ -10,6 +10,9 @@
 #include "../../Game/control.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 int NextBat;
 BAT_STRUCT* Bats;
@@ -424,7 +427,7 @@ void UpdateBats()
 			minIndex = i;
 		}
 
-		distance = SQRT_ASM(distance) >> 3;
+		distance = sqrt(distance) / 8;
 		if (distance < 48)
 			distance = 48;
 		else if (distance > 128)
@@ -456,11 +459,11 @@ void UpdateBats()
 			bat->pos.xRot += xAngle;
 		}
 
-		int sp = bat->speed * COS(bat->pos.xRot) >> W2V_SHIFT;
+		int sp = bat->speed * phd_cos(bat->pos.xRot) >> W2V_SHIFT;
 
-		bat->pos.xPos += sp * SIN(bat->pos.yRot) >> W2V_SHIFT;
-		bat->pos.yPos += bat->speed * SIN(-bat->pos.xRot) >> W2V_SHIFT;
-		bat->pos.zPos += sp * COS(bat->pos.yRot) >> W2V_SHIFT;
+		bat->pos.xPos += sp * phd_sin(bat->pos.yRot) >> W2V_SHIFT;
+		bat->pos.yPos += bat->speed * phd_sin(-bat->pos.xRot) >> W2V_SHIFT;
+		bat->pos.zPos += sp * phd_cos(bat->pos.yRot) >> W2V_SHIFT;
 
 		if ((i % 2 == 0)
 			&& bat->pos.xPos > x1
@@ -499,9 +502,9 @@ void UpdateRats()
 				int oldY = rat->pos.yPos;
 				int oldZ = rat->pos.zPos;
 
-				rat->pos.xPos += rat->speed * SIN(rat->pos.yRot) >> W2V_SHIFT;
+				rat->pos.xPos += rat->speed * phd_sin(rat->pos.yRot) >> W2V_SHIFT;
 				rat->pos.yPos += rat->fallspeed;
-				rat->pos.zPos += rat->speed * COS(rat->pos.yRot) >> W2V_SHIFT;
+				rat->pos.zPos += rat->speed * phd_cos(rat->pos.yRot) >> W2V_SHIFT;
 
 				rat->fallspeed += GRAVITY;
 
@@ -511,9 +514,9 @@ void UpdateRats()
 
 				short angle;
 				if (rat->flags >= 170)
-					angle = rat->pos.yRot - (short)ATAN(dz, dx);
+					angle = rat->pos.yRot - (short)phd_atan(dz, dx);
 				else
-					angle = (short)ATAN(dz, dx) - rat->pos.yRot;
+					angle = (short)phd_atan(dz, dx) - rat->pos.yRot;
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
@@ -662,16 +665,16 @@ void UpdateSpiders()
 				int y = spider->pos.yPos;
 				int z = spider->pos.zPos;
 
-				spider->pos.xPos += spider->speed * SIN(spider->pos.yRot) >> W2V_SHIFT;
+				spider->pos.xPos += spider->speed * phd_sin(spider->pos.yRot) >> W2V_SHIFT;
 				spider->pos.yPos += spider->fallspeed;
-				spider->pos.zPos += spider->speed * COS(spider->pos.yRot) >> W2V_SHIFT;
+				spider->pos.zPos += spider->speed * phd_cos(spider->pos.yRot) >> W2V_SHIFT;
 				spider->fallspeed += GRAVITY;
 				
 				int dx = LaraItem->pos.xPos - spider->pos.xPos;
 				int dy = LaraItem->pos.yPos - spider->pos.yPos;
 				int dz = LaraItem->pos.zPos - spider->pos.zPos; 
 				
-				short angle = ATAN(dz, dx) - spider->pos.yRot;
+				short angle = phd_atan(dz, dx) - spider->pos.yRot;
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{

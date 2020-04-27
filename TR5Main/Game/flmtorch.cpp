@@ -7,9 +7,12 @@
 #include "collide.h"
 #include "laramisc.h"
 #include "switch.h"
+#include "draw.h"
 #include "items.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
 short FireBounds[12] =
 {
@@ -203,8 +206,8 @@ void TorchControl(short itemNumber) // (F) (D)
 		item->pos.zRot = 0;
 	}
 
-	int xv = item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int zv = item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int zv = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
@@ -223,7 +226,8 @@ void TorchControl(short itemNumber) // (F) (D)
 
 	item->pos.yPos += item->fallspeed;
 
-	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	// FIXME
+	//DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
 		coll.enableBaddiePush = true;

@@ -8,8 +8,10 @@
 #include "../../Game/draw.h"
 #include "../../Game/misc.h"
 #include "../../Game/camera.h"
-#include "..\..\Specific\roomload.h"
+#include "..\..\Specific\level.h"
 #include "../../Specific/setup.h"
+#include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 
@@ -74,11 +76,11 @@ static int TestHeight(ITEM_INFO* v, int x, int z)
 	int s, c;
 	short roomNumber;
 
-	c = COS(v->pos.yRot);
-	s = SIN(v->pos.yRot);
+	c = phd_cos(v->pos.yRot);
+	s = phd_sin(v->pos.yRot);
 
 	pos.x = v->pos.xPos + (((z * s) + (x * c)) >> W2V_SHIFT);
-	pos.y = v->pos.yPos - (z * SIN(v->pos.xRot) >> W2V_SHIFT) + (x * SIN(v->pos.zRot) >> W2V_SHIFT);
+	pos.y = v->pos.yPos - (z * phd_sin(v->pos.xRot) >> W2V_SHIFT) + (x * phd_sin(v->pos.zRot) >> W2V_SHIFT);
 	pos.z = v->pos.zPos + (((z * c) - (x * s)) >> W2V_SHIFT);
 
 	roomNumber = v->roomNumber;
@@ -92,9 +94,9 @@ static short GetCollision(ITEM_INFO* v, short ang, int dist, short* ceiling)
 	int x, y, z, height, cheight;
 	short roomNumber;
 
-	x = v->pos.xPos + ((SIN(ang) * dist) >> W2V_SHIFT);
+	x = v->pos.xPos + ((phd_sin(ang) * dist) >> W2V_SHIFT);
 	y = v->pos.yPos - LARA_HITE;
-	z = v->pos.zPos + ((COS(ang) * dist) >> W2V_SHIFT);
+	z = v->pos.zPos + ((phd_cos(ang) * dist) >> W2V_SHIFT);
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -157,9 +159,9 @@ static bool CanGetOut(int direction)
 		angle = v->pos.yRot - 0x4000;
 
 
-	x = v->pos.xPos - (GETOFF_DIST * SIN(angle) >> W2V_SHIFT);
+	x = v->pos.xPos - (GETOFF_DIST * phd_sin(angle) >> W2V_SHIFT);
 	y = v->pos.yPos;
-	z = v->pos.zPos - (GETOFF_DIST * COS(angle) >> W2V_SHIFT);
+	z = v->pos.zPos - (GETOFF_DIST * phd_cos(angle) >> W2V_SHIFT);
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -398,20 +400,20 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			switch (quad)
 			{
 			case 0:
-				x = -COS(deg);
-				z = SIN(deg);
+				x = -phd_cos(deg);
+				z = phd_sin(deg);
 				break;
 			case 1:
-				x = SIN(deg);
-				z = COS(deg);
+				x = phd_sin(deg);
+				z = phd_cos(deg);
 				break;
 			case 2:
-				x = COS(deg);
-				z = -SIN(deg);
+				x = phd_cos(deg);
+				z = -phd_sin(deg);
 				break;
 			default:
-				x = -SIN(deg);
-				z = -COS(deg);
+				x = -phd_sin(deg);
+				z = -phd_cos(deg);
 				break;
 			}
 
@@ -428,8 +430,8 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	else
 	{
 		// move cart normally
-		v->pos.xPos += (v->speed * SIN(v->pos.yRot)) >> W2V_SHIFT;
-		v->pos.zPos += (v->speed * COS(v->pos.yRot)) >> W2V_SHIFT;
+		v->pos.xPos += (v->speed * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+		v->pos.zPos += (v->speed * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
 	}
 
 	// tilt cart on slopes
@@ -708,8 +710,8 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			if ((Wibble & 7) == 0)
 				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &v->pos, 2);
 
-			v->pos.xPos += (TURN_DEATH_VEL * SIN(v->pos.yRot)) >> W2V_SHIFT;
-			v->pos.zPos += (TURN_DEATH_VEL * COS(v->pos.yRot)) >> W2V_SHIFT;
+			v->pos.xPos += (TURN_DEATH_VEL * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+			v->pos.zPos += (TURN_DEATH_VEL * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
 		}
 		else
 		{
@@ -808,7 +810,7 @@ void InitialiseMineCart(short itemNum)
 	CART_INFO* cart;
 
 	v = &Items[itemNum];
-	cart = (CART_INFO*)GameMalloc(sizeof(CART_INFO));
+	cart = (CART_INFO*)game_malloc(sizeof(CART_INFO));
 	v->data = (void*)cart;
 	cart->Flags = NULL;
 	cart->Speed = 0;

@@ -5,6 +5,9 @@
 #include "../../Game/items.h"
 #include "../../specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };
@@ -128,7 +131,7 @@ void MPStickControl(short itemNumber)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 

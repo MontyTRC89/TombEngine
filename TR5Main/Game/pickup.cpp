@@ -19,6 +19,10 @@
 #include "flmtorch.h"
 #include "../Specific/setup.h"
 #include "camera.h"
+#include "..\Specific\level.h"
+#include "../Specific/input.h"
+#include "sound.h"
+#include "savegame.h"
 
 #include "..\Global\global.h"
 
@@ -1648,21 +1652,4 @@ void SearchObjectControl(short itemNumber)
 			item->status = ITEM_INACTIVE;
 		}
 	}
-}
-
-void Inject_Pickup()
-{
-	INJECT(0x0043A130, DrawAllPickups);
-	INJECT(0x00463B60, PickedUpObject);
-	INJECT(0x0043E260, InitialisePickup);
-	INJECT(0x004679D0, PickupControl);
-	INJECT(0x00467AF0, RegeneratePickups);
-	INJECT(0x00467C00, PickupCollision);
-	INJECT(0x00468770, FindPlinth);
-	INJECT(0x00468930, KeyHoleCollision);
-	INJECT(0x00468C00, PuzzleDoneCollision);
-	INJECT(0x00468C70, PuzzleHoleCollision);
-	INJECT(0x004693A0, PuzzleDone);
-	INJECT(0x00469550, KeyTrigger);
-	INJECT(0x004695E0, PickupTrigger);
 }

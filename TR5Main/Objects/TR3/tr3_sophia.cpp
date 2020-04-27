@@ -9,6 +9,9 @@
 #include "../../Game/effects.h"
 #include "../../Game/misc.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 #define MAX_TRIGGER_RANGE 0x4000
 #define SMALL_FLASH 10
@@ -296,7 +299,7 @@ static long KnockBackCollision(EXPLOSION_RING* erptr)
 		/* Whump! Been hit by sphere - throw Lara through air */
 		LaraItem->hitPoints -= 200;
 		LaraItem->hitStatus = true;
-		angle = ATAN(z, x);
+		angle = phd_atan(z, x);
 		diff = LaraItem->pos.yRot - angle;
 		if (abs(diff) < 0x4000)
 		{
@@ -430,10 +433,10 @@ void ControlLaserBolts(short item_number)
 	oldpos.z = item->pos.zPos;
 	oldroom = item->roomNumber;
 
-	speed = (item->speed * COS(item->pos.xRot)) >> W2V_SHIFT;
-	item->pos.zPos += (speed * COS(item->pos.yRot)) >> W2V_SHIFT;
-	item->pos.xPos += (speed * SIN(item->pos.yRot)) >> W2V_SHIFT;
-	item->pos.yPos += -((item->speed * SIN(item->pos.xRot)) >> W2V_SHIFT);
+	speed = (item->speed * phd_cos(item->pos.xRot)) >> W2V_SHIFT;
+	item->pos.zPos += (speed * phd_cos(item->pos.yRot)) >> W2V_SHIFT;
+	item->pos.xPos += (speed * phd_sin(item->pos.yRot)) >> W2V_SHIFT;
+	item->pos.yPos += -((item->speed * phd_sin(item->pos.xRot)) >> W2V_SHIFT);
 	if (item->speed < BOLT_SPEED)
 		item->speed += (item->speed >> 3) + 2;
 
@@ -486,7 +489,7 @@ void ControlLaserBolts(short item_number)
 				dx = SQUARE(LaraItem->pos.xPos - item->pos.xPos);
 				dy = SQUARE(LaraItem->pos.yPos - 256 - item->pos.yPos);
 				dz = SQUARE(LaraItem->pos.zPos - item->pos.zPos);
-				dx = SQRT_ASM(dx + dy + dz);
+				dx = sqrt(dx + dy + dz);
 				if (dx < 0x400)
 				{
 					LaraItem->hitPoints -= (0x400 - dx) >> (6 - ((item->itemFlags[0] >= 0) << 1));
@@ -547,10 +550,10 @@ void ControlLondBossPlasmaBall(short fx_number)
 	if (fx->pos.xRot > -0x3c00)
 		fx->pos.xRot -= 0x100;
 
-	speed = (fx->speed * COS(fx->pos.xRot)) >> W2V_SHIFT;
-	fx->pos.zPos += (speed * COS(fx->pos.yRot)) >> W2V_SHIFT;
-	fx->pos.xPos += (speed * SIN(fx->pos.yRot)) >> W2V_SHIFT;
-	fx->pos.yPos += -((fx->speed * SIN(fx->pos.xRot)) >> W2V_SHIFT) + fx->fallspeed;
+	speed = (fx->speed * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
+	fx->pos.zPos += (speed * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
+	fx->pos.xPos += (speed * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
+	fx->pos.yPos += -((fx->speed * phd_sin(fx->pos.xRot)) >> W2V_SHIFT) + fx->fallspeed;
 	if ((Wibble & 15) == 0)
 		TriggerPlasmaBallFlame(fx_number, 0, 0, abs(old_y - fx->pos.yPos) << 3, 0);
 
@@ -717,12 +720,12 @@ void LondonBossControl(short item_number)
 			lara_dx = LaraItem->pos.xPos - item->pos.xPos;
 			lara_dy = item->pos.yPos - LaraItem->pos.yPos;
 
-			lara_info.angle = ATAN(lara_dz, lara_dx) - item->pos.yRot; //only need to fill out the bits of lara_info that will be needed by TargetVisible
+			lara_info.angle = phd_atan(lara_dz, lara_dx) - item->pos.yRot; //only need to fill out the bits of lara_info that will be needed by TargetVisible
 			lara_info.distance = lara_dz * lara_dz + lara_dx * lara_dx;
 			if (abs(lara_dx) > abs(lara_dz))
-				lara_info.xAngle = ATAN(abs(lara_dx) + (abs(lara_dz) >> 1), lara_dy);
+				lara_info.xAngle = phd_atan(abs(lara_dx) + (abs(lara_dz) >> 1), lara_dy);
 			else
-				lara_info.xAngle = ATAN(abs(lara_dz) + (abs(lara_dx) >> 1), lara_dy);
+				lara_info.xAngle = phd_atan(abs(lara_dz) + (abs(lara_dx) >> 1), lara_dy);
 
 		}
 
@@ -1081,7 +1084,7 @@ void LondonBossControl(short item_number)
 			dx = SQUARE(dx);
 			dy = SQUARE(dy);
 			dz = SQUARE(dz);
-			dx = SQRT_ASM(dx + dy + dz);
+			dx = sqrt(dx + dy + dz);
 		}
 
 		if (dx < 0xB00)

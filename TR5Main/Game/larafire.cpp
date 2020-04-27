@@ -14,9 +14,12 @@
 #include "draw.h"
 #include "effect2.h"
 #include "flmtorch.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "lot.h"
 #include "../Specific/setup.h"
+#include "../Specific/input.h"
+#include "sound.h"
+#include "savegame.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -754,23 +757,30 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.yRot = angles[0] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
 	pos.zRot = 0;
 
-	phd_GenerateW2V(&pos);
-	
-	int num = GetSpheres(target, SphereList, 0);
+	// Calculate ray from rotation angles
+	float x = sin(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
+	float y = -sin(TO_RAD(pos.xRot));
+	float z = cos(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
+	Vector3 direction = Vector3(x, y, z);
+	direction.Normalize();
+	Vector3 source = Vector3(pos.xPos, pos.yPos, pos.zPos);
+	Vector3 destination = source + direction * 1024.0f;
+	Ray ray = Ray(source, direction);
+
+	int num = GetSpheres(target, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int best = -1;
-	int bestDistance = 0x7FFFFFFF;
+	float bestDistance = FLT_MAX;
 
 	for (int i = 0; i < num; i++)
 	{
-		SPHERE* sphere = &SphereList[i];
-
-		r = sphere->r;									 
-		if ((abs(sphere->x)) < r && (abs(sphere->y)) < r &&  sphere->z > r && SQUARE(sphere->x) + SQUARE(sphere->y) <= SQUARE(r))
+		BoundingSphere sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
+		float distance;
+		if (ray.Intersects(sphere, distance))
 		{
-			if (sphere->z - r < bestDistance)
+			if (distance < bestDistance)
 			{
-				bestDistance = sphere->z - r;
-				best = i;                 			 
+				bestDistance = distance;
+				best = i;
 			}
 		}
 	}
@@ -790,9 +800,13 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	if (best < 0)
 	{
 		GAME_VECTOR vDest;
-		vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
+		/*vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
 		vDest.y = vSrc.y + (MatrixPtr[M21] * 5 >> 2);
-		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);
+		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);*/
+		
+		vDest.x = destination.x;
+		vDest.y = destination.y;
+		vDest.z = destination.z;
 
 		GetTargetOnLOS(&vSrc, &vDest, 0, 1);
 		
@@ -803,9 +817,12 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 		Savegame.Game.AmmoHits++;
 
 		GAME_VECTOR vDest;
-		vDest.x = vSrc.x + ((MatrixPtr[M20] * bestDistance) >> W2V_SHIFT);
-		vDest.y = vSrc.y + ((MatrixPtr[M21] * bestDistance) >> W2V_SHIFT);
-		vDest.z = vSrc.z + ((MatrixPtr[M22] * bestDistance) >> W2V_SHIFT);
+		
+		destination = source + direction * bestDistance;
+
+		vDest.x = destination.x;
+		vDest.y = destination.y;
+		vDest.z = destination.z;
 
 		// TODO: enable it when the slot is created !
 		/*
@@ -831,7 +848,7 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 		{
 			z = target->pos.zPos - lara_item->pos.zPos;
 			x = target->pos.xPos - lara_item->pos.xPos;
-			angle = 0x8000 + ATAN(z, x) - target->pos.yRot;
+			angle = 0x8000 + phd_atan(z, x) - target->pos.yRot;
 
 			if ((target->currentAnimState > 1 && target->currentAnimState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
@@ -861,8 +878,8 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 	int y = bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
 	int z = (bounds->MinZ + bounds->MaxZ) / 2;
 
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	target->x = item->pos.xPos + ((c * x + s * z) >> W2V_SHIFT);
 	target->y = item->pos.yPos + y;
@@ -1081,15 +1098,4 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 		LastTargets[0] = Lara.target;
 	}
 	LaraTargetInfo(winfo);
-}
-
-void Inject_LaraFire()
-{
-	INJECT(0x00453490, AimWeapon);
-	INJECT(0x00453AE0, WeaponObject);
-	INJECT(0x00452430, LaraGun);
-	INJECT(0x004546C0, GetAmmo);
-	INJECT(0x00452B30, InitialiseNewWeapon);
-	INJECT(0x00453B50, WeaponObjectMesh);
-	//INJECT(0x00453A90, SmashItem);
 }

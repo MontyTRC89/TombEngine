@@ -1,6 +1,6 @@
 #include "laramisc.h"
 #include "..\Global\global.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
 #include "..\Scripting\GameFlowScript.h"
 #include "effects.h"
@@ -12,9 +12,13 @@
 #include "healt.h"
 #include "misc.h"
 #include "rope.h"
+#include "rope.h"
 #include "draw.h"
+#include "savegame.h"
 #include "inventory.h"
 #include "camera.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
 extern LaraExtraInfo g_LaraExtra;
 extern GameFlow* g_GameFlow;
@@ -31,11 +35,7 @@ void GetLaraDeadlyBounds() // (F) (D)
 	short tbounds[6];
 
 	bounds = GetBoundsAccurate(LaraItem);
-	phd_PushUnitMatrix();
-	phd_RotYXZ(LaraItem->pos.yRot, LaraItem->pos.xRot, LaraItem->pos.zRot);
-	phd_SetTrans(0, 0, 0);
-	phd_RotBoundingBoxNoPersp(bounds, tbounds);
-	phd_PopMatrix();
+	phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, tbounds);
 
 	DeadlyBounds[0] = LaraItem->pos.xPos + tbounds[0];
 	DeadlyBounds[1] = LaraItem->pos.xPos + tbounds[1];
@@ -651,7 +651,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 		break;
 	}
 
-	Savegame.Game.Distance += SQRT_ASM(
+	Savegame.Game.Distance += sqrt(
 		SQUARE(item->pos.xPos - oldX) +
 		SQUARE(item->pos.yPos - oldY) +
 		SQUARE(item->pos.zPos - oldZ));
@@ -967,12 +967,15 @@ void AnimateLara(ITEM_INFO* item)
 
 	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
-		item->pos.xPos += item->speed * SIN(Lara.moveAngle) >> W2V_SHIFT; 
-		item->pos.zPos += item->speed * COS(Lara.moveAngle) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * phd_sin(Lara.moveAngle) >> W2V_SHIFT; 
+		item->pos.zPos += item->speed * phd_cos(Lara.moveAngle) >> W2V_SHIFT;
 
-		item->pos.xPos += lateral * SIN(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
-		item->pos.zPos += lateral * COS(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
+		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
 	}
+
+	// Update matrices
+	g_Renderer->UpdateLaraAnimations(true);
 }
 
 void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
@@ -1012,11 +1015,11 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	diff2.x = diff.x;
 	diff2.y = diff.y;
 	diff2.z = diff.z;
-	ScaleVector(&vec3, COS(ropeY), &vec3);
+	ScaleVector(&vec3, phd_cos(ropeY), &vec3);
 	ScaleVector(&diff2, DotProduct(&diff2, &vec2), &diff2);
-	ScaleVector(&diff2, 4096 - COS(ropeY), &diff2);
+	ScaleVector(&diff2, 4096 - phd_cos(ropeY), &diff2);
 	CrossProduct(&diff, &vec2, &vec4);
-	ScaleVector(&vec4, SIN(ropeY), &vec4);
+	ScaleVector(&vec4, phd_sin(ropeY), &vec4);
 	diff2.x += vec3.x;
 	diff2.y += vec3.y;
 	diff2.z += vec3.z;
@@ -1048,12 +1051,18 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	item->pos.xPos = rope->position.x + (rope->meshSegment[Lara.ropeSegment].x >> 16);
 	item->pos.yPos = rope->position.y + (rope->meshSegment[Lara.ropeSegment].y >> 16) + Lara.ropeOffset;
 	item->pos.zPos = rope->position.z + (rope->meshSegment[Lara.ropeSegment].z >> 16);
-	phd_PushUnitMatrix();
-	phd_RotYXZ(angle[1], angle[0], angle[2]);
-	item->pos.xPos += -112 * MatrixPtr[M02] >> W2V_SHIFT;
-	item->pos.yPos += -112 * MatrixPtr[M12] >> W2V_SHIFT;
-	item->pos.zPos += -112 * MatrixPtr[M22] >> W2V_SHIFT;
-	phd_PopMatrix();
+
+	Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
+		TO_DEGREES(angle[1]),
+		TO_DEGREES(angle[0]),
+		TO_DEGREES(angle[2])
+	);
+	
+	// PHD_MATH!
+	item->pos.xPos += -112 * rotMatrix.m[0][2]; // MatrixPtr[M02] >> W2V_SHIFT;
+	item->pos.yPos += -112 * rotMatrix.m[1][2]; // MatrixPtr[M12] >> W2V_SHIFT;
+	item->pos.zPos += -112 * rotMatrix.m[2][2]; // MatrixPtr[M22] >> W2V_SHIFT;
+	
 	item->pos.xRot = angle[0];
 	item->pos.yRot = angle[1];
 	item->pos.zRot = angle[2];

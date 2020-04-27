@@ -12,7 +12,7 @@
 #include "..\Objects\newobjects.h"
 #include "..\Objects\oldobjects.h"
 #include "..\Game\sound.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
 #include "camera.h"
 
@@ -21,6 +21,7 @@ ChunkReader* SaveGame::m_reader;
 ChunkWriter* SaveGame::m_writer;
 vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
+SAVEGAME_INFO Savegame;
 
 ChunkId* SaveGame::m_chunkGameStatus;
 ChunkId* SaveGame::m_chunkItems;
@@ -219,7 +220,7 @@ void SaveGame::saveLara(int arg1, int arg2)
 
 	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
 	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
-	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)MallocBuffer;
+	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)malloc_buffer;
 
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
 	
@@ -522,7 +523,7 @@ bool SaveGame::readLara()
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;
-	Lara.generalPtr = ADD_PTR(Lara.generalPtr, char, MallocBuffer);
+	Lara.generalPtr = ADD_PTR(Lara.generalPtr, char, malloc_buffer);
 	Lara.weaponItem = NO_ITEM;
 
 	// Is Lara burning?
@@ -1045,7 +1046,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		creature->mood = (MOOD_TYPE)LEB128::ReadInt32(m_stream);
 
 		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
-		creature->enemy = ADD_PTR(enemy, ITEM_INFO, MallocBuffer);
+		creature->enemy = ADD_PTR(enemy, ITEM_INFO, malloc_buffer);
 
 		creature->aiTarget.objectNumber = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.roomNumber = LEB128::ReadInt16(m_stream);
@@ -1068,7 +1069,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 	}
 	else if (chunkId->EqualsTo(m_chunkItemQuadInfo))
 	{
-		QUAD_INFO* quadInfo = (QUAD_INFO*)GameMalloc(sizeof(QUAD_INFO));
+		QUAD_INFO* quadInfo = (QUAD_INFO*)game_malloc(sizeof(QUAD_INFO));
 		m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
 		if (item->objectNumber == ID_QUAD)
 			item->data = (void*)quadInfo;
@@ -1156,7 +1157,7 @@ void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	ITEM_INFO* enemy = (ITEM_INFO*)((char*)creature->enemy - (ptrdiff_t)MallocBuffer);
+	ITEM_INFO* enemy = (ITEM_INFO*)((char*)creature->enemy - (ptrdiff_t)malloc_buffer);
 
 	LEB128::Write(m_stream, creature->jointRotation[0]);
 	LEB128::Write(m_stream, creature->jointRotation[1]);
