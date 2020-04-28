@@ -3,16 +3,20 @@
 
 // fix "improperly terminated macro invocation"
 // fix "expression must have integral or unscoped enum type"
-short ANGLE(double angle)
+short ANGLE(float angle)
 {
-	return angle * 65536.0 / 360.0;
+	return angle * 65536.0f / 360.0f;
 }
 
-float ANGLEF(short angle)
+float TR_ANGLE_TO_DEGREES(short angle)
 {
-	return TR_ANGLE_TO_DEGREES(angle);
+	return (unsigned short) angle * 360.0f / 65536.0f;
 }
 
+float TR_ANGLE_TO_RAD(short angle)
+{
+	return angle * 360.0f / 65536.0f * RADIAN;
+}
 
 const float frand() {
 	int randValue = rand();

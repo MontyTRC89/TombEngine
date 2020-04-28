@@ -338,7 +338,7 @@ void SaveGame::saveWeaponInfo(int arg1, int arg2)
 void SaveGame::saveVariables()
 {
 	m_luaVariables.clear();
-	g_GameScript->GetVariables(&m_luaVariables);
+	//g_GameScript->GetVariables(&m_luaVariables);
 	for (int i = 0; i < m_luaVariables.size(); i++)
 		m_writer->WriteChunk(m_chunkLuaVariable, &saveVariable, i, 0);
 }
@@ -703,7 +703,7 @@ bool SaveGame::Load(char* fileName)
 	//delete m_writer;
 	//delete m_stream;
 
-	g_GameScript->SetVariables(&m_luaVariables);
+	//g_GameScript->SetVariables(&m_luaVariables);
 
 	JustLoaded = true;
 

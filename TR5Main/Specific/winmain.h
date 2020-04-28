@@ -18,6 +18,7 @@ extern HACCEL hAccTable;
 #define GameClose ((int (__cdecl*)(void)) 0x004A8575)
 #define WinAppProc2 ((int (__cdecl*)(HWND, UINT, WPARAM, LPARAM)) 0x004D2AB0)
 
+int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description);
 int WinProcMsg();
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 int WinClose();
