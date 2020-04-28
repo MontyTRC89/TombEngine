@@ -32,6 +32,11 @@ extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 
+int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description)
+{
+	return luaL_error(L, description.data());
+}
+
 int WinProcMsg()
 {
 	int result;
@@ -189,6 +194,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	// Initialise the new scripting system
 	sol::state luaState;
 	luaState.open_libraries(sol::lib::base);
+	luaState.set_exception_handler(lua_exception_handler);
 
 	g_GameFlow = new GameFlow(&luaState);
 	LoadScript();
@@ -323,8 +329,9 @@ int WinClose()
 	if (g_Configuration.EnableSound)
 		Sound_DeInit();
 	
-	delete g_Renderer;
 	delete g_Inventory;
+	delete g_Renderer;
+	delete g_GameScript;
 	delete g_GameFlow;
 
 	SaveGame::End();

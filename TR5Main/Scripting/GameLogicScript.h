@@ -38,126 +38,81 @@ typedef struct LuaFunction {
 	bool Executed;
 };
 
-typedef struct GameScriptItemPosition {
-	int x;
-	int y;
-	int z;
-	short xRot;
-	short yRot;
-	short zRot;
-	short room;
+class GameScriptPosition {
+private:
+	float								xPos;
+	float								yPos;
+	float								zPos;
+
+public:
+	GameScriptPosition(float x, float y, float z);
+
+	float								GetXPos();
+	void								SetXPos(float x);
+	float								GetYPos();
+	void								SetYPos(float y);
+	float								GetZPos();
+	void								SetZPos(float z);
 };
 
-typedef struct GameScriptItem {
-	ITEM_INFO*		NativeItem;
+class GameScriptRotation {
+private:
+	float								xRot;
+	float								yRot;
+	float								zRot;
 
-	short Get(int param)
-	{
-		if (NativeItem == NULL)
-			return 0;
+public:
+	GameScriptRotation(float x, float y, float z);
 
-		switch (param)
-		{
-		case ITEM_PARAM_currentAnimState:
-			return NativeItem->currentAnimState;
-		case ITEM_PARAM_REQUIRED_ANIM_STATE:
-			return NativeItem->requiredAnimState;
-		case ITEM_PARAM_goalAnimState:
-			return NativeItem->goalAnimState;
-		case ITEM_PARAM_animNumber:
-			return NativeItem->animNumber;
-		case ITEM_PARAM_frameNumber:
-			return NativeItem->frameNumber;
-		case ITEM_PARAM_hitPoints:
-			return NativeItem->hitPoints;
-		case ITEM_PARAM_HIT_STATUS:
-			return NativeItem->hitStatus;
-		case ITEM_PARAM_GRAVITY_STATUS:
-			return NativeItem->gravityStatus;
-		case ITEM_PARAM_COLLIDABLE:
-			return NativeItem->collidable;
-		case ITEM_PARAM_POISONED:
-			return NativeItem->poisoned;
-		case ITEM_PARAM_roomNumber:
-			return NativeItem->roomNumber;
-		default:
-			return 0;
-		}
-	}
+	float								GetXRot();
+	void								SetXRot(float x);
+	float								GetYRot();
+	void								SetYRot(float y);
+	float								GetZRot();
+	void								SetZRot(float z);
+};
 
-	void Set(int param, short value)
-	{
-		if (NativeItem == NULL)
-			return;
+class GameScriptItem {
+private:
+	short								NativeItemNumber;
+	ITEM_INFO*							NativeItem;
 
-		switch (param)
-		{
-		case ITEM_PARAM_currentAnimState:
-			NativeItem->currentAnimState = value; break;
-		case ITEM_PARAM_REQUIRED_ANIM_STATE:
-			NativeItem->requiredAnimState = value; break;
-		case ITEM_PARAM_goalAnimState:
-			NativeItem->goalAnimState = value; break;
-		case ITEM_PARAM_animNumber:
-			NativeItem->animNumber = value;
-			//NativeItem->frameNumber = Anims[NativeItem->animNumber].frameBase;
-			break;
-		case ITEM_PARAM_frameNumber:
-			NativeItem->frameNumber = value; break;
-		case ITEM_PARAM_hitPoints:
-			NativeItem->hitPoints = value; break;
-		case ITEM_PARAM_HIT_STATUS:
-			NativeItem->hitStatus = value; break;
-		case ITEM_PARAM_GRAVITY_STATUS:
-			NativeItem->gravityStatus = value; break;
-		case ITEM_PARAM_COLLIDABLE:
-			NativeItem->collidable = value; break;
-		case ITEM_PARAM_POISONED:
-			NativeItem->poisoned = value; break;
-		case ITEM_PARAM_roomNumber:
-			NativeItem->roomNumber = value; break;
-		default:
-			break;
-		}
-	}
+public:
+	GameScriptItem(short itemNumber);
 
-	GameScriptItemPosition GetItemPosition()
-	{
-		GameScriptItemPosition pos;
-		
-		//if (m_item == NULL)
-		//	return pos;
+	float								GetXPos();
+	void								SetXPos(float x);
+	float								GetYPos();
+	void								SetYPos(float y);
+	float								GetZPos();
+	void								SetZPos(float z);
+	float								GetXRot();
+	void								SetXRot(float x);
+	float								GetYRot();
+	void								SetYRot(float y);
+	float								GetZRot();
+	void								SetZRot(float z);
+	short								GetHP();
+	void								SetHP(short hp);
+	short								GetRoom();
+	void								SetRoom(short room);
+	short								GetCurrentState();
+	void								SetCurrentState(short state);
+	short								GetGoalState();
+	void								SetGoalState(short state);
+	short								GetRequiredState();
+	void								SetRequiredState(short state);
+	void								EnableItem();
+	void								DisableItem();
+};
 
-		pos.x = NativeItem->pos.xPos;
-		pos.y = NativeItem->pos.yPos;
-		pos.z = NativeItem->pos.zPos;
-		pos.xRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.xRot);
-		pos.yRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.yRot);
-		pos.zRot = TR_ANGLE_TO_DEGREES(NativeItem->pos.zRot);
-		pos.room = NativeItem->roomNumber;
+class LuaVariables
+{
+public:
+	map<string, sol::object>			variables;
 
-		return pos;
-	}
-
-	void SetItemPosition(int x, int y, int z)
-	{
-		if (NativeItem == NULL)
-			return;
-
-		NativeItem->pos.xPos = x;
-		NativeItem->pos.yPos = y;
-		NativeItem->pos.zPos = z;
-	}
-
-	void SetItemRotation(int x, int y, int z)
-	{
-		if (NativeItem == NULL)
-			return;
-
-		NativeItem->pos.xRot = ANGLE(x);
-		NativeItem->pos.yRot = ANGLE(y);
-		NativeItem->pos.zRot = ANGLE(z);
-	}
+	sol::object							GetVariable(string key);
+	void								SetVariable(string key, sol::object value);
 };
 
 typedef struct LuaVariable
@@ -175,39 +130,45 @@ class GameScript
 {
 private:
 	sol::state*							m_lua;
-	sol::table							m_globals;
-	sol::table							m_locals;
-	map<int, int>				m_itemsMap;
+	LuaVariables						m_globals;
+	LuaVariables						m_locals;
+	map<int, short>						m_itemsMapId;
+	map<string, short>					m_itemsMapName;
 	vector<LuaFunction*>				m_triggers;
-	GameScriptItem						m_items[NUM_ITEMS];
 
 	string								loadScriptFromFile(char* luaFilename);
 
 public:	
 	GameScript(sol::state* lua);
-	~GameScript();
-	
-	bool								ExecuteScript(char* luaFilename);
+
+	bool								ExecuteScript(char* luaFilename, string* message);
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
-	void								AddLuaId(int luaId, int itemId);
-	void								SetItem(int index, ITEM_INFO* item);
+	void								AddLuaId(int luaId, short itemNumber);
+	void								AddLuaName(string luaName, short itemNumber);
 	void								AssignItemsAndLara();
 	void								ResetVariables();
-	void								GetVariables(vector<LuaVariable>* list);
-	void								SetVariables(vector<LuaVariable>* list);
 
-	void								EnableItem(short id);
-	void								DisableItem(short id);
+	void								GetBooleanVariables(map<string, bool>* locals, map<string, bool>* globals);
+	void								SetBooleanVariables(map<string, bool>* locals, map<string, bool>* globals);
+	void								GetNumberVariables(map<string, float>* locals, map<string, float>* globals);
+	void								SetNumberVariables(map<string, float>* locals, map<string, float>* globals);
+	void								GetStringVariables(map<string, string>* locals, map<string, string>* globals);
+	void								SetStringVariables(map<string, string>* locals, map<string, string>* globals);
 	void								PlayAudioTrack(short track);
 	void								ChangeAmbientSoundTrack(short track);
 	bool								ExecuteTrigger(short index);
 	void								JumpToLevel(int levelNum);
-	int								GetSecretsCount();
+	int									GetSecretsCount();
 	void								SetSecretsCount(int secretsNum);
 	void								AddOneSecret();
 	void								MakeItemInvisible(short id);
-	GameScriptItem						GetItem(short id);
+	unique_ptr<GameScriptItem>			GetItemById(int id);
+	unique_ptr<GameScriptItem>			GetItemByName(string name);
 	void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
 	void								PlaySoundEffect(short id, int flags);
+	GameScriptPosition					CreatePosition(float x, float y, float z);
+	GameScriptRotation					CreateRotation(float x, float y, float z);
+	float								CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
+	float								CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 };
