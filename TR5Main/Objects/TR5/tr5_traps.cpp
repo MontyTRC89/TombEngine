@@ -615,7 +615,7 @@ void ElectricityWiresControl(short itemNumber)
 			pos1.x = 0;
 			pos1.y = 0;
 			pos1.z = 0;			
-			GetLaraJointPosition(&pos1, LJ_LFOOT);
+			GetLaraJointPosition(&pos1, LM_LFOOT);
 
 			short roomNumber1 = LaraItem->roomNumber;
 			GetFloor(pos1.x, pos1.y, pos1.z, &roomNumber1);
@@ -624,7 +624,7 @@ void ElectricityWiresControl(short itemNumber)
 			pos2.x = 0;
 			pos2.y = 0;
 			pos2.z = 0;
-			GetLaraJointPosition(&pos2, LJ_RFOOT);
+			GetLaraJointPosition(&pos2, LM_RFOOT);
 
 			short roomNumber2 = LaraItem->roomNumber;
 			GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber2);

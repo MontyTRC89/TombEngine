@@ -1464,7 +1464,7 @@ void ControlGunShip(short itemNumber)
 		pos.x = ((GetRandomControl() & 0x1FF) - 255);
 		pos.y = (GetRandomControl() & 0x1FF) - 255;
 		pos.z = (GetRandomControl() & 0x1FF) - 255;
-		GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_TORSO);
+		GetLaraJointPosition((PHD_VECTOR*)&pos, LM_TORSO);
 
 		GAME_VECTOR end = pos;
 

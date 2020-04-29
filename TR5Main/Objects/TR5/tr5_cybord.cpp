@@ -535,7 +535,7 @@ void HitmanControl(short itemNumber)
 			pos.x = 0;			
 			pos.y = 0;
 			pos.z = 0;
-			GetLaraJointPosition(&pos, LJ_LFOOT);
+			GetLaraJointPosition(&pos, LM_LFOOT);
 			
 			short roomNumberLeft = LaraItem->roomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
@@ -543,7 +543,7 @@ void HitmanControl(short itemNumber)
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 0; 
-			GetLaraJointPosition(&pos, LJ_RFOOT);
+			GetLaraJointPosition(&pos, LM_RFOOT);
 
 			short roomNumberRight = LaraItem->roomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberRight);
