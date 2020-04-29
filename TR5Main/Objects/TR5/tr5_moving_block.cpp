@@ -117,7 +117,7 @@ void PushableBlockControl(short itemNumber)
 			DoPushPull = 1;
 		}
 
-		GetLaraJointPosition(&pos, LJ_LHAND);
+		GetLaraJointPosition(&pos, LM_LHAND);
 
 		switch (quadrant)
 		{
@@ -181,7 +181,7 @@ void PushableBlockControl(short itemNumber)
 			DoPushPull = 1;
 		}
 
-		GetLaraJointPosition(&pos, LJ_LHAND);
+		GetLaraJointPosition(&pos, LM_LHAND);
 		
 		switch (quadrant)
 		{
@@ -350,7 +350,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 		pos.y = 0;
 		pos.z = 0;
 
-		GetLaraJointPosition(&pos, LJ_LHAND);
+		GetLaraJointPosition(&pos, LM_LHAND);
 
 		l->itemFlags[0] = pos.x;
 		l->itemFlags[2] = pos.z;

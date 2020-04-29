@@ -836,7 +836,7 @@ void TriggerGunShell(short hand, short objNum, int weaponType)
 			break;
 		}
 
-		GetLaraJointPosition(&pos, LJ_RHAND);
+		GetLaraJointPosition(&pos, LM_RHAND);
 	}
 	else
 	{
@@ -846,7 +846,7 @@ void TriggerGunShell(short hand, short objNum, int weaponType)
 			pos.y = 48;
 			pos.z = 40;
 
-			GetLaraJointPosition(&pos, LJ_LHAND);
+			GetLaraJointPosition(&pos, LM_LHAND);
 		}
 		else if (weaponType == WEAPON_UZI)
 		{
@@ -854,7 +854,7 @@ void TriggerGunShell(short hand, short objNum, int weaponType)
 			pos.y = 35;
 			pos.z = 48;
 
-			GetLaraJointPosition(&pos, LJ_LHAND);
+			GetLaraJointPosition(&pos, LM_LHAND);
 		}		
 	}
 
@@ -1059,14 +1059,14 @@ void LaraBubbles(ITEM_INFO* item)// (F)
 		pos.y = -192;
 		pos.z = -160;
 
-		GetLaraJointPosition(&pos, LJ_TORSO);
+		GetLaraJointPosition(&pos, LM_TORSO);
 	}
 	else
 	{
 		pos.y = -4;
 		pos.z = 64;
 
-		GetLaraJointPosition(&pos, LJ_HEAD);
+		GetLaraJointPosition(&pos, LM_HEAD);
 	}
 
 	num = (GetRandomControl() & 1) + 2;

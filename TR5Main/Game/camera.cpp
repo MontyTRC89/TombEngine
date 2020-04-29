@@ -82,26 +82,6 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	if (posX == targetX && posY == targetY && posZ == targetZ)
 		return;
 
-	short angles[2];
-	phd_GetVectorAngles(targetX - posX, targetY - posY, targetZ - posZ, angles);
-
-	PHD_3DPOS pos;
-
-	pos.xPos = posX;
-	pos.yPos = posY;
-	pos.zPos = posZ;
-	pos.xRot = angles[1];
-	pos.yRot = angles[0];
-	pos.zRot = roll;
-
-	CurrentCameraPosition.x = posX;
-	CurrentCameraPosition.y = posY;
-	CurrentCameraPosition.z = posZ;
-
-	/*CurrentCameraRotation.vx = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
-	CurrentCameraRotation.vy = mGetAngle(posZ, posX, targetZ, targetX) >> 4;
-	CurrentCameraRotation.vz = 0;*/
-
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }
 
@@ -930,7 +910,7 @@ void LookCamera(ITEM_INFO* item)
 	pos.x = 0;
 	pos.y = 16;
 	pos.z = 64;
-	GetLaraJointPosition(&pos, LJ_HEAD);
+	GetLaraJointPosition(&pos, LM_HEAD);
 	
 	short roomNumber = LaraItem->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
@@ -941,7 +921,7 @@ void LookCamera(ITEM_INFO* item)
 		pos.x = 0;
 		pos.y = 16;
 		pos.z = 0;
-		GetLaraJointPosition(&pos, LJ_HEAD);
+		GetLaraJointPosition(&pos, LM_HEAD);
 		
 		roomNumber = LaraItem->roomNumber;
 		floor = GetFloor(pos.x, pos.y + 256, pos.z, &roomNumber);
@@ -960,7 +940,7 @@ void LookCamera(ITEM_INFO* item)
 			pos.x = 0;
 			pos.y = 16;
 			pos.z = -64;
-			GetLaraJointPosition(&pos, LJ_HEAD);
+			GetLaraJointPosition(&pos, LM_HEAD);
 		}
 	}
 
@@ -968,13 +948,13 @@ void LookCamera(ITEM_INFO* item)
 	pos2.x = 0;
 	pos2.y = 0;
 	pos2.z = -1024;
-	GetLaraJointPosition(&pos2, LJ_HEAD);
+	GetLaraJointPosition(&pos2, LM_HEAD);
 
 	PHD_VECTOR pos3;
 	pos3.x = 0;
 	pos3.y = 0;
 	pos3.z = 2048;
-	GetLaraJointPosition(&pos3, LJ_HEAD);
+	GetLaraJointPosition(&pos3, LM_HEAD);
 
 	int dx = (pos2.x - pos.x) >> 3;
 	int dy = (pos2.y - pos.y) >> 3;
@@ -1512,7 +1492,7 @@ void ConfirmCameraTargetPos()
 	pos.y = 0;
 	pos.z = 0;
 
-	GetLaraJointPosition(&pos, LJ_LHAND);
+	GetLaraJointPosition(&pos, LM_LHAND);
 
 	if (Camera.laraNode != -1)
 	{
@@ -1726,7 +1706,7 @@ void CalculateCamera()
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 0;
-			GetLaraJointPosition(&pos, LJ_TORSO);
+			GetLaraJointPosition(&pos, LM_TORSO);
 
 			x = pos.x;
 			y = pos.y;

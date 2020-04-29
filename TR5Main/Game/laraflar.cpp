@@ -314,7 +314,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		pos.y = 32;
 		pos.z = 42;
 
-		GetLaraJointPosition(&pos, LJ_LHAND);
+		GetLaraJointPosition(&pos, LM_LHAND);
 
 		item->pos.xPos = pos.x;
 		item->pos.yPos = pos.y;
@@ -385,7 +385,7 @@ void DoFlareInHand(int flare_age) // (AF) (D)
 	pos.y = 32;
 	pos.z = 41;
 
-	GetLaraJointPosition(&pos, LJ_LHAND);
+	GetLaraJointPosition(&pos, LM_LHAND);
 	DoFlareLight(&pos, flare_age);
 
 	/* Hardcoded code */

@@ -64,7 +64,7 @@ void ImpThrowStones(ITEM_INFO* item)
 	pos2.x = 0;
 	pos2.y = 0;
 	pos2.z = 0;
-	GetLaraJointPosition(&pos2, LJ_HEAD);
+	GetLaraJointPosition(&pos2, LM_HEAD);
 
 	int dx = pos1.x - pos2.x;
 	int dy = pos1.y - pos2.y;
