@@ -161,7 +161,7 @@ void DoFlameTorch() // (F) (D)
 		pos.y = 64;
 		pos.z = 256;
 
-		GetLaraJointPosition(&pos, LJ_LHAND);
+		GetLaraJointPosition(&pos, LM_LHAND);
 
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 		

@@ -318,7 +318,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)//2A940(<), 2AB68(<) 
 		s.y = -256;
 		s.z = 0;
 
-		GetLaraJointPosition((PHD_VECTOR*)&s, LJ_HEAD);
+		GetLaraJointPosition((PHD_VECTOR*)&s, LM_HEAD);
 		s.roomNumber = LaraItem->roomNumber;
 
 		GAME_VECTOR d;

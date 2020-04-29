@@ -101,7 +101,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
 	short* objptr = Lara.meshPtrs[LM_HIPS];
 	PHD_VECTOR pos = { objptr[0], objptr[1], objptr[2] };
-	GetLaraJointPosition(&pos, LJ_HIPS);
+	GetLaraJointPosition(&pos, LM_HIPS);
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
@@ -109,7 +109,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 	objptr = Lara.meshPtrs[LM_TORSO];
 	pos = { objptr[0], objptr[1], objptr[2] };
-	GetLaraJointPosition(&pos, LJ_TORSO);
+	GetLaraJointPosition(&pos, LM_TORSO);
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
 	sphere[1].z = pos.z;
@@ -180,25 +180,13 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 
 		for (int i = 0; i < HAIR_SEGMENTS - 1; i++, bone += 4)
 		{
-			world = Matrix::Identity;
-			//phd_PushUnitMatrix();
-
-			world = Matrix::CreateTranslation(Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos) * world;			 
-			/**(MatrixPtr + M03) =  world._14 = Hairs[ponytail][i].pos.xPos << W2V_SHIFT;
-			/**(MatrixPtr + M13) = world._24 = Hairs[ponytail][i].pos.yPos << W2V_SHIFT;
-			/**(MatrixPtr + M23) = world._34 = Hairs[ponytail][i].pos.zPos << W2V_SHIFT;*/
-
-			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;
-			//phd_RotYXZ(Hairs[ponytail][i].pos.yRot, Hairs[ponytail][i].pos.xRot, 0);
-			
+			world = Matrix::CreateTranslation(Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos);		
+			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
-			//phd_TranslateRel(*(bone + 1), *(bone + 2), *(bone + 3));
 
-			Hairs[ponytail][i + 1].pos.xPos = world.Translation().x; // *(MatrixPtr + M03) >> W2V_SHIFT;
-			Hairs[ponytail][i + 1].pos.yPos = world.Translation().y; // *(MatrixPtr + M13) >> W2V_SHIFT;
-			Hairs[ponytail][i + 1].pos.zPos = world.Translation().z; // *(MatrixPtr + M23) >> W2V_SHIFT;
-
-			//phd_PopMatrix();
+			Hairs[ponytail][i + 1].pos.xPos = world.Translation().x;
+			Hairs[ponytail][i + 1].pos.yPos = world.Translation().y;
+			Hairs[ponytail][i + 1].pos.zPos = world.Translation().z;
 		}
 
 		Wind = SmokeWindX = SmokeWindZ = 0;

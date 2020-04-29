@@ -749,7 +749,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 			pos.y = 0;
 			pos.z = 0;
 
-			GetLaraJointPosition(&pos, LJ_RFOOT);
+			GetLaraJointPosition(&pos, LM_RFOOT);
 
 			item->pos.xPos = pos.x;
 			item->pos.yPos = pos.y + 75;

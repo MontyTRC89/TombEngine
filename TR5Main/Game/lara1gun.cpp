@@ -58,7 +58,7 @@ void FireHarpoon()
 		pos.z = dxPos.z = 77;
 
 		g_Renderer->GetLaraBonePosition(&dxPos, LM_RHAND);
-		GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
+		GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
 
 		/*item->pos.xPos = pos.x = dxPos.x;
 		item->pos.yPos = pos.y = dxPos.y;
@@ -275,7 +275,7 @@ void FireGrenade()
 			jointPos.y = 276;
 			jointPos.z = 80;
 
-			GetLaraJointPosition(&jointPos, LJ_RHAND);
+			GetLaraJointPosition(&jointPos, LM_RHAND);
 
 			item->pos.xPos = x = jointPos.x;
 			item->pos.yPos = y = jointPos.y;
@@ -295,7 +295,7 @@ void FireGrenade()
 			jointPos.y = 1204;
 			jointPos.z = 5;
 
-			GetLaraJointPosition(&jointPos, LJ_RHAND);
+			GetLaraJointPosition(&jointPos, LM_RHAND);
 
 			SmokeCountL = 32;
 			SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
@@ -870,7 +870,7 @@ void AnimateShotgun(int weaponType)
 			pos.z = 72;
 		}
 
-		GetLaraJointPosition(&pos, LJ_LOUTARM);
+		GetLaraJointPosition(&pos, LM_LOUTARM);
 
 		if (LaraItem->meshBits)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
@@ -1315,7 +1315,7 @@ void RifleHandler(int weaponType)
 			pos.y = (GetRandomControl() & 0x7F) - 63;
 			pos.z = GetRandomControl() - 128;
 
-			GetLaraJointPosition(&pos, LJ_RHAND);
+			GetLaraJointPosition(&pos, LM_RHAND);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12,
 				(GetRandomControl() & 0x3F) + 192,
@@ -1362,7 +1362,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 			jointPos.y = 228;
 			jointPos.z = 32;
 
-			GetLaraJointPosition(&jointPos, LJ_RHAND);
+			GetLaraJointPosition(&jointPos, LM_RHAND);
 
 			item->roomNumber = LaraItem->roomNumber;
 			
@@ -1691,7 +1691,7 @@ void FireShotgun()
 		pos.y = 228;
 		pos.z = 32;
 
-		GetLaraJointPosition(&pos, LJ_RHAND);
+		GetLaraJointPosition(&pos, LM_RHAND);
 
 		PHD_VECTOR pos2;
 
@@ -1703,7 +1703,7 @@ void FireShotgun()
 		pos.y = 1508;
 		pos.z = 32;
 
-		GetLaraJointPosition(&pos, LJ_RHAND);
+		GetLaraJointPosition(&pos, LM_RHAND);
 
 		SmokeCountL = 32;
 		SmokeWeapon = WEAPON_SHOTGUN;

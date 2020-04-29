@@ -747,7 +747,7 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.xPos = 0;
 	pos.yPos = 0;
 	pos.zPos = 0;
-	GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
+	GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
 
 	pos.xPos = src->pos.xPos;
 	pos.zPos = src->pos.zPos;
@@ -903,7 +903,7 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 	pos.x = 0;
 	pos.y = 0;
 	pos.z = 0;
-	GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
+	GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
 
 	pos.x = LaraItem->pos.xPos;
 	pos.z = LaraItem->pos.zPos;
