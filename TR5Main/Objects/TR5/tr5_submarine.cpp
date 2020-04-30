@@ -420,8 +420,7 @@ void ChaffFlareControl(short itemNumber)
 
 	item->pos.yPos += item->fallspeed;
 
-	// FIXME
-	//DoProperDetection(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->fallspeed, dz);
+	DoProperDetection(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->fallspeed, dz);
 
 	PHD_VECTOR pos1;
 	pos1.x = 0;

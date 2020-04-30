@@ -74,6 +74,8 @@ extern short FlashFadeG;
 extern short FlashFadeB;
 extern short FlashFader;
 extern short IsRoomOutsideNo;
+extern int TiltXOffset;
+extern int TiltYOffset;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);

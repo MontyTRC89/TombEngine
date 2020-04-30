@@ -81,9 +81,9 @@ bool Renderer11::PrepareDataForTheRenderer()
 				byte b = Texture32[oldPixelIndex + 2];
 				byte a = Texture32[oldPixelIndex + 3];
 
-				buffer[pixelIndex + 2] = r;
-				buffer[pixelIndex + 1] = g;
 				buffer[pixelIndex + 0] = b;
+				buffer[pixelIndex + 1] = g;
+				buffer[pixelIndex + 2] = r;
 				buffer[pixelIndex + 3] = a;
 			}
 		}

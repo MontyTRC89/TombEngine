@@ -17,3 +17,4 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
 void LaraTargetInfo(WEAPON_INFO* weapon);
 int CheckForHoldingState(int state);
 void LaraGetNewTarget(WEAPON_INFO* winfo);
+void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
