@@ -3,10 +3,14 @@
 #include "larafire.h"
 #include "lara.h"
 #include "effect2.h"
+#include "draw.h"
 #include "tomb4fx.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "..\Specific\setup.h"
 #include "camera.h"
+#include "../Specific/input.h"
+#include "sound.h"
+#include "savegame.h"
 
 PISTOL_DEF PistolsTable[4] =
 {
@@ -51,7 +55,7 @@ void AnimatePistols(int weaponType)
 				break;
 			}
 
-			GetLaraJointPosition(&pos, LJ_LHAND);
+			GetLaraJointPosition(&pos, LM_LHAND);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, (byte)0, SmokeWeapon, SmokeCountL);
 		}
 
@@ -78,7 +82,7 @@ void AnimatePistols(int weaponType)
 				break;
 			}
 
-			GetLaraJointPosition(&pos, LJ_RHAND);
+			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, (byte)0, SmokeWeapon, SmokeCountR);
 		}
 	}
@@ -290,7 +294,7 @@ void PistolHandler(int weaponType)
 		pos.y = (GetRandomControl() & 0x7F) - 63;
 		pos.z = (byte)GetRandomControl() - 128;
 
-		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LJ_LHAND : LJ_RHAND);
+		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LM_LHAND : LM_RHAND);
 		/*if (gfLevelFlags & 0x2000 && LaraItem->roomNumber == gfMirrorRoom)
 		{
 			v8 = GetRandomControl() & 0x3F;

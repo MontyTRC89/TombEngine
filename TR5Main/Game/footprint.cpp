@@ -1,9 +1,12 @@
 #include "footprint.h"
 #include "control.h"
 #include "lara.h"
+#include "draw.h"
 #include "groundfx.h"
+#include "../Specific/level.h"
 
 std::deque<FOOTPRINT_STRUCT> footprints = deque<FOOTPRINT_STRUCT>();
+
 bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPosition){
 	int x = item.pos.xPos;
 	int y = item.pos.yPos;

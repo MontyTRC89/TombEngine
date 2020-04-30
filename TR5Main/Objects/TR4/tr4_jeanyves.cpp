@@ -1,10 +1,13 @@
 #include "../newobjects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/control.h"
 
 void InitialiseJeanYves(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 	
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;

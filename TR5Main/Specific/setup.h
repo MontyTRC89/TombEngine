@@ -2,7 +2,46 @@
 
 #include "..\Global\global.h"
 
-extern OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+struct ObjectInfo {
+	short nmeshes; 
+	short meshIndex; 
+	int boneIndex; 
+	short* frameBase; 
+	void(*initialise)(short itemNumber); 
+	void(*control)(short itemNumber); 
+	void(*floor)(ITEM_INFO* item, int x, int y, int z, int* height); 
+	void(*ceiling)(ITEM_INFO* item, int x, int y, int z, int* height); 
+	void(*drawRoutine)(ITEM_INFO* item);
+	void(*drawRoutineExtra)(ITEM_INFO* item);
+	void(*collision)(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll); 
+	short zoneType; 
+	short animIndex; 
+	short hitPoints; 
+	short pivotLength; 
+	short radius; 
+	short shadowSize; 
+	short biteOffset; 
+	bool loaded;
+	bool intelligent;
+	bool nonLot;
+	bool savePosition;
+	bool saveHitpoints;
+	bool saveFlags;
+	bool saveAnim;
+	bool semiTransparent;
+	bool waterCreature;
+	bool usingDrawAnimatingItem;
+	bool hitEffect;
+	bool undead;
+	bool saveMesh;
+	bool unknown; 
+	bool friendly;
+	bool castShadows;
+	unsigned int explodableMeshbits;
+	int meshSwapSlot;
+};
+
+extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[NUM_STATICS];
 
 void BaddyObjects();
@@ -13,8 +52,6 @@ void InitialiseSpecialEffects();
 void InitialiseGameFlags();
 void CustomObjects();
 void InitialiseObjects();
-
-void Inject_Setup();
 
 #define INIT_PICKUP(obid) \
 obj = &Objects[obid]; \

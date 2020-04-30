@@ -8,6 +8,9 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/people.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 #define STATE_CHEF_COOKING			1
 #define STATE_CHEF_TURN_180			2
@@ -30,8 +33,8 @@ void InitialiseChef(short itemNumber)
 	item->goalAnimState = STATE_CHEF_COOKING;
 	item->currentAnimState = STATE_CHEF_COOKING;
 	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->pos.xPos += 192 * SIN(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += 192 * COS(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += 192 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.zPos += 192 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 }
 
 void ControlChef(short itemNumber)
@@ -82,7 +85,7 @@ void ControlChef(short itemNumber)
 			int dx = LaraItem->pos.xPos - item->pos.xPos;
 			int dz = LaraItem->pos.zPos - item->pos.zPos;
 
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.ahead = true;
 			if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
 				laraInfo.ahead = false;

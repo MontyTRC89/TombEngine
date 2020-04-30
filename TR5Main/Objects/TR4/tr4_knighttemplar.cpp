@@ -6,6 +6,9 @@
 #include "../../Game/debris.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
@@ -28,7 +31,7 @@ void KnightTemplarControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &Items[itemNum];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	if (item->animNumber == obj->animIndex ||
 		item->animNumber - obj->animIndex == 1 ||
@@ -72,7 +75,7 @@ void KnightTemplarControl(short itemNum)
 
 	int a = 0;
 	if (creature->enemy != LaraItem)
-		a = ATAN(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
+		a = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
 
 	GetCreatureMood(item, &info, VIOLENT);
 	CreatureMood(item, &info, VIOLENT);

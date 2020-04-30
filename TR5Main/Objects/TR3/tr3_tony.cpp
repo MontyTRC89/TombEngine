@@ -6,7 +6,9 @@
 #include "../../Game/Box.h"
 #include "../../Game/draw.h"
 #include "../../Game/effects.h"
+#include "..\..\Specific\level.h"
 #include "../../Specific/setup.h"
+#include "../../Game/lara.h"
 
 // TODO: custom render for DrawExplosionRings() and DrawTonyBossShield()
 // TODO: add flame effect for tony, check TriggerXX() function.
@@ -335,8 +337,8 @@ void TonyFireBallControl(short fxNumber)
 		if (fx->fallspeed > 512)
 			fx->fallspeed = 512;
 		fx->pos.yPos += fx->fallspeed >> 1;
-		fx->pos.zPos += (fx->speed * COS(fx->pos.yRot) >> W2V_SHIFT);
-		fx->pos.xPos += (fx->speed * SIN(fx->pos.yRot) >> W2V_SHIFT);
+		fx->pos.zPos += (fx->speed * phd_cos(fx->pos.yRot) >> W2V_SHIFT);
+		fx->pos.xPos += (fx->speed * phd_sin(fx->pos.yRot) >> W2V_SHIFT);
 		if (Wibble & 4)
 			TriggerFireBallFlame(fxNumber, fx->flag1, (old_x - fx->pos.xPos) << 3, (old_y - fx->pos.yPos) << 3, (old_z - fx->pos.zPos) << 3);
 	}

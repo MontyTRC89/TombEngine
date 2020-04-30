@@ -4,6 +4,8 @@
 #include "../../Game/items.h"
 #include "../../Specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO batBite = { 0, 16, 45, 4 };
 

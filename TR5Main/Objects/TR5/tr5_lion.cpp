@@ -7,6 +7,8 @@
 #include "..\..\game\box.h"
 #include "..\..\game\tomb4fx.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO LionBite1 = { 0xFFFFFFFE, 0xFFFFFFF6, 0xFA, 0x15 };
 BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };
@@ -160,10 +162,4 @@ void LionControl(short itemNum)
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureAnimation(itemNum, angle, 0);
-}
-
-void Inject_Lion()
-{
-	INJECT(0x0045AC80, InitialiseLion);
-	INJECT(0x0045AD00, LionControl);
 }

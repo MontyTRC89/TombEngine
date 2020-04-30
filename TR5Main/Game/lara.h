@@ -15,12 +15,106 @@ typedef struct DiaryInfo {
 	bool Present;
 };
 
-typedef struct WaterskinInfo {
+struct WaterskinInfo {
 	bool Present;
 	int Quantity;
 };
 
-typedef struct LaraExtraInfo {
+struct LaraInfo {
+	short itemNumber;
+	short gunStatus; 
+	short gunType;
+	short requestGunType;
+	short lastGunType; 
+	short calcFallSpeed;
+	short waterStatus;
+	short climbStatus; 
+	short poseCount;
+	short hitFrame; 
+	short hitDirection; 
+	short air;
+	short diveCount;
+	short deathCount;
+	short currentActive;
+	short currentXvel;
+	short currentYvel;
+	short currentZvel; 
+	short spazEffectCount;
+	short flareAge; 
+	short burnCount;
+	short weaponItem;
+	short backGun; 
+	short flareFrame;
+	short poisoned;
+	short dpoisoned;
+	byte anxiety; 
+	byte wet[15];
+	bool flareControlLeft; 
+	bool unused1;
+	bool look;
+	bool burn;
+	bool keepDucked;
+	bool isMoving;
+	bool canMonkeySwing;
+	byte burnBlue;
+	bool gassed;
+	bool burnSmoke;
+	bool isDucked;
+	bool hasFired;
+	bool busy;
+	bool litTorch;
+	bool isClimbing;
+	bool fired;
+	int waterSurfaceDist;
+	PHD_VECTOR lastPos;
+	FX_INFO* spazEffect;
+	int meshEffects;
+	short* meshPtrs[15];
+	ITEM_INFO* target;
+	short targetAngles[2];
+	short turnRate;
+	short moveAngle;
+	short headYrot;
+	short headXrot;
+	short headZrot;
+	short torsoYrot;
+	short torsoXrot;
+	short torsoZrot;
+	LARA_ARM leftArm; 
+	LARA_ARM rightArm;
+	unsigned short holster;
+	CREATURE_INFO* creature;
+	int cornerX;
+	int cornerZ;
+	byte ropeSegment;
+	byte ropeDirection;
+	short ropeArcFront;
+	short ropeArcBack;
+	short ropeLastX;
+	short ropeMaxXForward;
+	short ropeMaxXBackward;
+	int ropeDFrame;
+	int ropeFrame;
+	unsigned short ropeFrameRate;
+	unsigned short ropeY;
+	int ropePtr; 
+	void* generalPtr; 
+	int ropeOffset;
+	int ropeDownVel;
+	byte ropeFlag;
+	byte moveCount;
+	int ropeCount;
+	byte skelebob;
+	byte wetcloth;
+	byte bottle;
+	byte location; 
+	byte highestLocation;
+	byte locationPad;
+	byte tightRopeOnCount;
+	byte tightRopeOff;
+	byte tightRopeFall;
+	byte chaffTimer;
+
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;
@@ -49,9 +143,9 @@ typedef struct LaraExtraInfo {
 	int NumFlares;
 };
 
-extern LaraExtraInfo g_LaraExtra;
-
-#define GetLaraJointPosition ((void (__cdecl*)(PHD_VECTOR*, int)) 0x0041E2A0)
+extern LaraInfo Lara;
+extern ITEM_INFO* LaraItem;
+extern byte LaraNodeUnderwater[15];
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
@@ -234,11 +328,3 @@ void GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
-
-//int GetLaraJointPos(PHD_VECTOR* pos, int joint);
-//void SetLaraUnderwaterNodes();
-//void FireChaff();
-//void GetLaraJointPosRot(PHD_VECTOR* pos, int a2, int a3, SVECTOR* a4);
-//void DoSubsuitStuff();
-
-void Inject_Lara();

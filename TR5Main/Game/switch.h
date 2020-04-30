@@ -1,12 +1,6 @@
 #pragma once
 #include "..\Global\global.h"
 
-//#define InitialiseSwitch ((void (__cdecl*)(short)) 0x00440070)
-//#define SequenceControl ((void (__cdecl*)(short)) 0x0047F520)
-//#define SequenceCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0047F610)
-//#define LeverSwitchCollision ((void (__cdecl*)(short,ITEM_INFO*,COLL_INFO*)) 0x0047EE00)
-//#define InitialisePulleySwitch ((void (__cdecl*)(short)) 0x0043E1F0)
-//#define InitialiseCrowDoveSwitch ((void (__cdecl*)(short)) 0x0043ECF0)
 void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void CrowDoveSwitchControl(short itemNumber);
 void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
@@ -35,5 +29,3 @@ void InitialiseShootSwitch(short itemNumber);
 void ShootSwitchCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 
 extern int PulleyItemNumber;
-
-void Inject_Switch();

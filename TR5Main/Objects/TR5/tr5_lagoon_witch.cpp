@@ -6,6 +6,8 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/inventory.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 #define STATE_LAGOON_WITCH_SWIM			1
 #define STATE_LAGOON_WITCH_STOP			2
@@ -43,7 +45,7 @@ void ControlLagoonWitch(short itemNumber)
 
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	if (item->hitPoints <= 0)
 	{

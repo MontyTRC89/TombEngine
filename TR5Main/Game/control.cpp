@@ -3,7 +3,6 @@
 #include "..\Global\global.h"
  
 #include "pickup.h"
-#include "spotcam.h"
 #include "Camera.h"
 #include "Lara.h"
 #include "hair.h"
@@ -33,15 +32,38 @@
 #include "..\Objects\oldobjects.h"
 
 #include "footprint.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "..\Specific\input.h"
 #include "..\Specific\init.h"
 #include "..\Specific\winmain.h"
+#include "../Specific/input.h"
 
 #include <process.h>
 #include <stdio.h>
 #include "..\Renderer\Renderer11.h"
 #include "../Specific/setup.h"
+
+short ShatterSounds[18][10] =
+{
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_WOOD,  SFX_SMASH_WOOD,  SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_METAL, SFX_SMASH_METAL, SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_METAL, SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_METAL, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS },
+	{ SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS }
+};
 
 int KeyTriggerActive;
 int number_los_rooms;
@@ -65,7 +87,69 @@ short NextFxFree;
 short NextItemActive;
 short NextItemFree;
 short* TriggerIndex;
+
 string LuaMessage;
+
+int DisableLaraControl = 0;
+int WeatherType;
+int LaraDrawType;
+int NumberSoundSources;
+OBJECT_VECTOR* SoundSources;
+int NumAnimatedTextures;
+short* AnimTextureRanges;
+int nAnimUVRanges;
+int Wibble = 0;
+int SetDebounce = 0;
+
+int CurrentAtmosphere;
+short CurrentRoom;
+int GameTimer;
+short GlobalCounter;
+byte LevelComplete;
+short DelCutSeqPlayer;
+int LastInventoryItem;
+int TrackCameraInit;
+short TorchRoom;
+int InitialiseGame;
+int RequiredStartPos;
+int WeaponDelay;
+int WeaponEnemyTimer;
+int HeightType;
+int HeavyTriggered;
+short SkyPos1;
+short SkyPos2;
+signed char SkyVelocity1;
+signed char SkyVelocity2;
+CVECTOR SkyColor1;
+CVECTOR SkyColor2;
+int CutSeqNum;
+int CutSeqTriggered;
+int GlobalPlayingCutscene;
+int CurrentLevel;
+int SoundActive;
+int DoTheGame;
+int Unk_876C48;
+int OnFloor;
+int SmokeWindX;
+int SmokeWindZ;
+int OnObject;
+int KillEverythingFlag;
+int FlipTimer;
+int FlipEffect;
+int TriggerTimer;
+int JustLoaded;
+int PoisonFlags;
+int OldLaraBusy;
+int Infrared;
+short FlashFadeR;
+short FlashFadeG;
+short FlashFadeB;
+short FlashFader;
+short IsRoomOutsideNo;
+
+int TiltXOffset;
+int TiltYOffset;
+int FramesCount;
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
@@ -217,9 +301,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			else if (BinocularRange == 0)
 			{
 				if (Lara.gunStatus == LG_READY
-					&& ((Lara.gunType == WEAPON_REVOLVER && g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight)
+					&& ((Lara.gunType == WEAPON_REVOLVER && Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
 						|| (Lara.gunType == WEAPON_HK)
-						|| (Lara.gunType == WEAPON_CROSSBOW && g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight)))
+						|| (Lara.gunType == WEAPON_CROSSBOW && Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)))
 				{
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;
@@ -342,7 +426,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				{
 					Lara.poisoned = 4096;
 				}
-				if ((gfLevelFlags & 0x80u) != 0 && !Lara.gassed)
+				if (/*(gfLevelFlags & 0x80u) != 0 &&*/ !Lara.gassed)
 				{
 					if (Lara.dpoisoned)
 					{
@@ -432,13 +516,13 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBats();
 		UpdateSpiders();
 		UpdateShockwaves();
-		Legacy_UpdateLightning();
+		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
 		if (level->Rumble)
 			RumbleScreen();
 
-		SoundEffects();
+		//SoundEffects();
 
 		HealtBarTimer--;
 
@@ -450,15 +534,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 unsigned __stdcall GameMain(void*)
 {
-	DB_Log(2, "GameMain - DLL");
+	//DB_Log(2, "GameMain - DLL");
 	printf("GameMain\n");
 
-	// We still need legacy matrices because control routines use them
-	MatrixPtr = MatrixStack;
-	DxMatrixPtr = (byte*)malloc(48 * 40);
-
 	// Initialise legacy memory buffer and game timer
-	InitGameMalloc();
+	init_game_malloc();
 	TIME_Init();
 
 	// Do a fixed time title image
@@ -478,11 +558,8 @@ unsigned __stdcall GameMain(void*)
 
 GAME_STATUS DoTitle(int index)
 {
-	DB_Log(2, "DoTitle - DLL");
+	//DB_Log(2, "DoTitle - DLL");
 	printf("DoTitle\n");
-
-	CreditsDone = false;
-	CanLoad = false;
 
 	// Load the level
 	S_LoadLevelFile(index);
@@ -511,8 +588,6 @@ GAME_STATUS DoTitle(int index)
 
 		LastInventoryItem = -1;
 		DelCutSeqPlayer = 0;
-		TitleControlsLockedOut = false;
-		GameMode = 1;
 
 		// Initialise flyby cameras
 		InitSpotCamSequences();
@@ -555,9 +630,6 @@ GAME_STATUS DoTitle(int index)
 
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 {
-	CreditsDone = false;
-	CanLoad = false;
-
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
 	{
@@ -616,7 +688,6 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 
 	LastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
-	TitleControlsLockedOut = false;
 	g_Inventory->SetEnterObject(NO_ITEM);
 	g_Inventory->SetSelectedObject(NO_ITEM);
 
@@ -632,13 +703,20 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	InitialiseHair();
 
 	int nframes = 2;
+	
+	// First control phase
+	g_Renderer->ResetAnimations();
 	GAME_STATUS result = ControlPhase(nframes, 0);
+
+	// Fade in screen
 	g_Renderer->FadeIn();
 
 	// The game loop, finally!
 	while (true)
 	{
 		nframes = DrawPhaseGame();
+		
+		g_Renderer->ResetAnimations();
 		result = ControlPhase(nframes, 0);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
@@ -1240,8 +1318,8 @@ short GetDoor(FLOOR_INFO* floor)
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 {
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	item->pos.xPos += (c * x + s * z) >> W2V_SHIFT;
 	item->pos.yPos += y;
@@ -1565,7 +1643,7 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 
 	int xOff, yOff, trigger;
 	ITEM_INFO* item;
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
 
 	do
@@ -2115,15 +2193,15 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									item->hitPoints -= 30;
 									if (item->hitPoints < 0)
 										item->hitPoints = 0;
-									HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
 								{
-									angle = ATAN(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
+									angle = phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
 									if (angle > -ANGLE(90) && angle < ANGLE(90))
 									{
 										item->hitPoints = 0;
-										HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 									}
 								}
 							}
@@ -2134,7 +2212,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							{
 								if (Objects[item->objectNumber].intelligent)
 								{
-									HitTarget(item, &target, WeaponsArray[Lara.gunType].damage, 0);
+									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
 								{
@@ -2165,7 +2243,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									item->hitStatus = true;
 									if (!Objects[item->objectNumber].undead)
 									{
-										item->hitPoints -= WeaponsArray[Lara.gunType].damage;
+										item->hitPoints -= Weapons[Lara.gunType].damage;
 									}
 								}
 							}
@@ -2545,123 +2623,56 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z) // (F) (D)
 
 int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber)
 {
-	PHD_VECTOR p1, p2;
+	// Ray
+	FXMVECTOR rayStart = { start->x, start->y, start->z };  
+	FXMVECTOR rayEnd = { end->x, end->y, end->z };
+	FXMVECTOR rayDir = { end->x - start->x, end->y - start->y, end->z - start->z };
+	XMVECTOR rayDirNormalized = XMVector3Normalize(rayDir);
+	
+	// Create the bounding box for raw collision detection
+	Vector3 boxCentre = Vector3(itemOrStaticPos->xPos + (box[1] + box[0]) / 2.0f, itemOrStaticPos->yPos + (box[3] + box[2]) / 2.0f, itemOrStaticPos->zPos + (box[5] + box[4]) / 2.0f);
+	Vector3 boxExtent = Vector3((box[1] - box[0]) / 2.0f, (box[3] - box[2]) / 2.0f, (box[5] - box[4]) / 2.0f);
+	Quaternion rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, TO_RAD(itemOrStaticPos->yRot));
+	BoundingOrientedBox obox = BoundingOrientedBox(boxCentre, boxExtent, rotation);
 
-	p1.x = box[0] << 16;
-	p2.x = box[1] << 16;
-	p1.y = box[2] << 16;
-	p2.y = box[3] << 16;
-	p1.z = box[4] << 16;
-	p2.z = box[5] << 16;
+	// Get the collision with the bounding box
+	float distance;
+	bool collided = obox.Intersects(rayStart, rayDirNormalized, distance);
 
-	int dx2 = end->x - itemOrStaticPos->xPos;
-	int dy2 = end->y - itemOrStaticPos->yPos;
-	int dz2 = end->z - itemOrStaticPos->zPos;
-
-	phd_PushUnitMatrix();
-
-	phd_RotY(-itemOrStaticPos->yRot);
-
-	int a1 = MatrixPtr[M00] * dx2 + 
-		MatrixPtr[M01] * dy2 + 
-		MatrixPtr[M02] * dz2;
-
-	int a2 = MatrixPtr[M10] * dx2 +
-		MatrixPtr[M11] * dy2 +
-		MatrixPtr[M12] * dz2;
-
-	int a3 = MatrixPtr[M20] * dx2 +
-		MatrixPtr[M21] * dy2 +
-		MatrixPtr[M22] * dz2;
-
-	int dx1 = start->x - itemOrStaticPos->xPos;
-	int dy1 = start->y - itemOrStaticPos->yPos;
-	int dz1 = start->z - itemOrStaticPos->zPos;
-
-	int b1 = MatrixPtr[M00] * dx1 +
-		MatrixPtr[M01] * dy1 +
-		MatrixPtr[M02] * dz1;
-
-	int b2 = MatrixPtr[M10] * dx1 +
-		MatrixPtr[M11] * dy1 +
-		MatrixPtr[M12] * dz1;
-
-	int b3 = MatrixPtr[M20] * dx1 +
-		MatrixPtr[M21] * dy1 +
-		MatrixPtr[M22] * dz1;
-
-	phd_PopMatrix();
-
-	PHD_VECTOR vec;
-
-	vec.x = ((a1 >> W2V_SHIFT) - (b1 >> W2V_SHIFT)) << 16;
-	vec.y = ((a2 >> W2V_SHIFT) - (b2 >> W2V_SHIFT)) << 16;
-	vec.z = ((a3 >> W2V_SHIFT) - (b3 >> W2V_SHIFT)) << 16;
-
-	NormaliseRopeVector(&vec);
-
-	PHD_VECTOR pb;
-	pb.x = b1 >> W2V_SHIFT << 16;
-	pb.y = b2 >> W2V_SHIFT << 16;
-	pb.z = b3 >> W2V_SHIFT << 16;
-
-	vec.x <<= 8;
-	vec.y <<= 8;
-	vec.z <<= 8;
-
-	if (!DoRayBox_sub_401523(&p1, &p2, &pb, &vec, hitPos))
+	// If no collision happened, then don't test spheres
+	if (!collided)
 		return 0;
 
-	if (hitPos->x < box[0] 
-		|| hitPos->y < box[2] 
-		|| hitPos->z < box[4] 
-		|| hitPos->x > box[1] 
-		|| hitPos->y > box[3]
-		|| hitPos->z > box[5])
-		return 0;
+	// Get the raw collision point 
+	Vector3 collidedPoint = rayStart + distance * rayDirNormalized;
+	hitPos->x = collidedPoint.x - itemOrStaticPos->xPos;
+	hitPos->y = collidedPoint.y - itemOrStaticPos->yPos;
+	hitPos->z = collidedPoint.z - itemOrStaticPos->zPos;
 
-	phd_PushUnitMatrix();
-
-	phd_RotY(itemOrStaticPos->yRot);
-	
-	int c1 = MatrixPtr[M00] * hitPos->x +
-		MatrixPtr[M01] * hitPos->y +
-		MatrixPtr[M02] * hitPos->z;
-
-	int c2 = MatrixPtr[M10] * hitPos->x +
-		MatrixPtr[M11] * hitPos->y +
-		MatrixPtr[M12] * hitPos->z;
-
-	int c3 = MatrixPtr[M20] * hitPos->x +
-		MatrixPtr[M21] * hitPos->y +
-		MatrixPtr[M22] * hitPos->z;
-
-	hitPos->x = (c1 >> W2V_SHIFT);
-	hitPos->y = (c2 >> W2V_SHIFT);
-	hitPos->z = (c3 >> W2V_SHIFT);
-	
-	phd_PopMatrix();
-	
+	// Now in the case of items we need to test single spheres
 	short* meshPtr = NULL;
 	int bit = 0;
 	int sp = -2;
-	int minDistance = 0x7FFFFFFF;
+	float minDistance = SECTOR(1024);
 
 	int action = TrInput & IN_ACTION;
-
+	
 	if (closesItemNumber < 0)
 	{
+		// Static meshes don't require further tests
 		sp = -1;
+		minDistance = distance;
 	}
 	else
 	{
+		// For items instead we need to test spheres
 		ITEM_INFO* item = &Items[closesItemNumber];
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		ObjectInfo* obj = &Objects[item->objectNumber];
 
-		GetSpheres(item, SphereList, 1);
-
+		// Get the ransformed sphere of meshes
+		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 		SPHERE spheres[34];
-		memcpy(spheres, SphereList, sizeof(SPHERE) * 34);
+		memcpy(spheres, CreatureSpheres, sizeof(SPHERE) * 34);
 		if (obj->nmeshes <= 0)
 			return 0;
 
@@ -2669,47 +2680,28 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 
 		for (int i = 0; i < obj->nmeshes; i++)
 		{
+			// If mesh is visibile...
 			if (item->meshBits & (1 << i))
 			{
-				SPHERE* sphere = &SphereList[i];
+				SPHERE* sphere = &CreatureSpheres[i];
 
-				if (item->meshBits & (1 << i))
+				// Create the bounding sphere and test it against the ray
+				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
+				float newDist;
+				if (sph.Intersects(rayStart, rayDirNormalized, newDist))
 				{
-					SPHERE* sphere = &SphereList[i];
+					// HACK: Core seems to take in account for distance not the real hit point but the centre of the sphere.
+					// This can work well for example for GUARDIAN because the head sphere is so big that would always be hit 
+					// and eyes would not be destroyed.
+					newDist = sqrt(SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z));
 
-					int dx = end->x - start->x;
-					int dy = end->y - start->y;
-					int dz = end->z - start->z;
-
-					int d1 = dx * (sphere->x - start->x) + dy * (sphere->y - start->y) + dz * (sphere->z - start->z);
-					int d2 = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
-
-					if ((d1 < 0 && d2 < 0) || (d1 > 0 && d2 > 0) || abs(d1) <= abs(d2))
+					// Test for min distance
+					if (newDist < minDistance)
 					{
-						int l;
-						if (d2 >> 16)
-							l = d1 / (d2 >> 16);
-						else
-							l = 0;
-
-						int x = start->x + (l * dx >> 16);
-						int y = start->y + (l * dy >> 16);
-						int z = start->z + (l * dz >> 16);
-
-						int d = SQUARE(x - sphere->x) + SQUARE(y - sphere->y) + SQUARE(z - sphere->z);
-
-						if (d <= SQUARE(sphere->r))
-						{
-							int newDist = SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z);
-
-							if (newDist < minDistance)
-							{
-								minDistance = newDist;
-								meshPtr = Meshes[obj->meshIndex + i];
-								bit = 1 << i;
-								sp = i;
-							}
-						}
+						minDistance = newDist;
+						meshPtr = Meshes[obj->meshIndex + i];
+						bit = 1 << i;
+						sp = i;
 					}
 				}
 			}
@@ -2719,35 +2711,32 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOr
 			return 0;
 	}
 
-	printf("Bit: %d \n", bit);
-
-	int distance = SQUARE(hitPos->x + itemOrStaticPos->xPos - start->x) 
-		+ SQUARE(hitPos->y + itemOrStaticPos->yPos - start->y)
-		+ SQUARE(hitPos->z + itemOrStaticPos->zPos - start->z);
-
 	if (distance >= ClosestDist)
 		return 0;
-	
+
+	// Setup test result
 	ClosestCoord.x = hitPos->x + itemOrStaticPos->xPos;
 	ClosestCoord.y = hitPos->y + itemOrStaticPos->yPos;
 	ClosestCoord.z = hitPos->z + itemOrStaticPos->zPos;
 	ClosestDist = distance;
 	ClosestItem = closesItemNumber;
 
+	// If collided object is an item, then setup the shatter item data struct
 	if (sp >= 0)
 	{
 		ITEM_INFO* item = &Items[closesItemNumber];
 
-		GetSpheres(item, SphereList, 3);
+		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.meshp = meshPtr;
-		ShatterItem.sphere.x = SphereList[sp].x;
-		ShatterItem.sphere.y = SphereList[sp].y;
-		ShatterItem.sphere.z = SphereList[sp].z;
+		ShatterItem.sphere.x = CreatureSpheres[sp].x;
+		ShatterItem.sphere.y = CreatureSpheres[sp].y;
+		ShatterItem.sphere.z = CreatureSpheres[sp].z;
 		ShatterItem.bit = bit;
 		ShatterItem.flags = 0;
 	}
+
 	return 1;
 }
 
@@ -2920,11 +2909,15 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	item->pos.zPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
-	item->pos.xPos += lateral * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-	item->pos.zPos += lateral * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.xPos += lateral * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+
+	// Update matrices
+	short itemNumber = item - Items;
+	g_Renderer->UpdateItemAnimations(itemNumber, true);
 }
 
 void DoFlipMap(short group)
@@ -3105,13 +3098,13 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		{
 			Num = -64;
 		}
-		GetSpheres(item, SphereList, 3);
+		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.bit = 1 << Node;
 		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + Node];
-		ShatterItem.sphere.x = SphereList[Node].x;
-		ShatterItem.sphere.y = SphereList[Node].y;
-		ShatterItem.sphere.z = SphereList[Node].z;
+		ShatterItem.sphere.x = CreatureSpheres[Node].x;
+		ShatterItem.sphere.y = CreatureSpheres[Node].y;
+		ShatterItem.sphere.z = CreatureSpheres[Node].z;
 		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData;
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
@@ -3269,18 +3262,72 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += deltaAngle >> shift;
 }
 
-void Inject_Control()
+#define OutsideRoomTable VAR_U_(0x00EEF4AC, unsigned char*)
+#define OutsideRoomOffsets ARRAY_(0x00EEF040, short, [27 * 27])
+
+int IsRoomOutside(int x, int y, int z)
 {
-	INJECT(0x00416760, TestTriggers);
-	INJECT(0x004167B0, TestTriggers);
-	INJECT(0x00415960, TranslateItem);
-	INJECT(0x00415B20, GetFloor);
-	INJECT(0x00417640, GetCeiling);
-	INJECT(0x004A7C10, GetRandomControl);
-	INJECT(0x004A7C40, GetRandomDraw);
-	INJECT(0x004A7C70, SeedRandomControl);
-	INJECT(0x004A7C90, SeedRandomDraw);
-	INJECT(0x00415300, AnimateItem);
-	INJECT(0x0041A170, GetTargetOnLOS);
-	INJECT(0x00415DA0, GetWaterHeight);
+	return 0;
+
+	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
+	if (offset == -1)
+		return -2;
+
+	if (offset < 0)
+	{
+		ROOM_INFO* r = &Rooms[(offset & 0x7FFF)];
+
+		if ((y > r->maxceiling) && (y < r->minfloor)
+			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
+			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
+		{
+			short roomNumber = offset & 0x7fff;
+			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+			int height = GetFloorHeight(floor, x, y, z);
+			if (height == NO_HEIGHT || y > height)
+				return -2;
+			height = GetCeiling(floor, x, y, z);
+			if (y < height)
+				return -2;
+
+			if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
+				return -3;
+
+			IsRoomOutsideNo = offset & 0x7FFF;
+			return 1;
+		}
+		else
+			return -2;
+	}
+	else
+	{
+		unsigned char* s = &OutsideRoomTable[offset];
+
+		while (*s != 0xFF)
+		{
+			ROOM_INFO* r = &Rooms[*s];
+
+			if ((y > r->maxceiling && y < r->minfloor)
+				&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
+				&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
+			{
+				short roomNumber = *s;
+				FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+				int height = GetFloorHeight(floor, x, y, z);
+				if (height == NO_HEIGHT || y > height)
+					return -2;
+				height = GetCeiling(floor, x, y, z);
+				if (y < height)
+					return -2;
+
+				if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
+					return -3;
+
+				IsRoomOutsideNo = *s;
+				return 1;
+			}
+			s++;
+		}
+		return -2;
+	}
 }

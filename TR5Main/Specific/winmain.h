@@ -14,9 +14,10 @@ extern WINAPP	 App;
 extern unsigned int threadId;
 extern uintptr_t hThread;
 extern HACCEL hAccTable;
+extern HWND WindowsHandle;
 
-#define GameClose ((int (__cdecl*)(void)) 0x004A8575)
-#define WinAppProc2 ((int (__cdecl*)(HWND, UINT, WPARAM, LPARAM)) 0x004D2AB0)
+//#define GameClose ((int (__cdecl*)(void)) 0x004A8575)
+//#define WinAppProc2 ((int (__cdecl*)(HWND, UINT, WPARAM, LPARAM)) 0x004D2AB0)
 
 int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description);
 int WinProcMsg();
@@ -24,5 +25,3 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 int WinClose();
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void __stdcall HandleWmCommand(unsigned short wParam);
-
-void Inject_WinMain();

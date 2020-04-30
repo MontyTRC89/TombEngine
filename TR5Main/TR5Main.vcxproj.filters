@@ -114,9 +114,6 @@
     <ClInclude Include="Game\pickup.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\rat.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\rope.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -144,9 +141,6 @@
     <ClInclude Include="Game\traps.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\twogun.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Global\malloc.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -154,9 +148,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Global\types.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\vars.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Global\global.h">
@@ -180,9 +171,6 @@
     <ClInclude Include="Specific\setup.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\spikewall.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="CustomObjects\cobra.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -193,9 +181,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="CustomObjects\dino.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Specific\roomload.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="CustomObjects\frogman.h">
@@ -270,9 +255,6 @@
     <ClInclude Include="Specific\configuration.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\swat.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\oldobjects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -283,9 +265,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\footprint.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\legacyfunctions.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\RoomBuffer.h">
@@ -324,12 +303,12 @@
     <ClInclude Include="Game\bubble.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Specific\level.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="dllmain.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\box.cpp">
@@ -425,9 +404,6 @@
     <ClCompile Include="Game\pickup.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\rat.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\rope.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -455,28 +431,16 @@
     <ClCompile Include="Game\traps.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\twogun.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Global\malloc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\setup.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Specific\roomload.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Specific\input.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\winmain.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Specific\game.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Specific\game.h">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\inventory.cpp">
@@ -504,9 +468,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\configuration.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\swat.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\misc.cpp">
@@ -849,6 +810,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\bubble.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\level.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

@@ -14,9 +14,12 @@
 #include "draw.h"
 #include "effect2.h"
 #include "flmtorch.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "lot.h"
 #include "../Specific/setup.h"
+#include "../Specific/input.h"
+#include "sound.h"
+#include "savegame.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -239,7 +242,6 @@ short HoldStates[] = {
 };
 
 extern GameFlow* g_GameFlow;
-extern LaraExtraInfo g_LaraExtra;
 bool MonksAttackLara;
 ITEM_INFO* LastTargets[8];
 ITEM_INFO* TargetList[8];
@@ -356,10 +358,10 @@ void LaraGun() // (F) (D)
 					Lara.gunStatus = LG_UNDRAW_GUNS;
 				}
 			}
-			else if (g_LaraExtra.NumFlares)
+			else if (Lara.NumFlares)
 			{
-				if (g_LaraExtra.NumFlares != -1)
-					g_LaraExtra.NumFlares--;
+				if (Lara.NumFlares != -1)
+					Lara.NumFlares--;
 				Lara.requestGunType = WEAPON_FLARE;
 			}
 		}
@@ -383,7 +385,7 @@ void LaraGun() // (F) (D)
 			}
 			else if (Lara.requestGunType == WEAPON_FLARE
 #if 0
-				|| g_LaraExtra.Vehicle == NO_ITEM
+				|| Lara.Vehicle == NO_ITEM
 				&& (Lara.requestGunType == WEAPON_HARPOON_GUN
 #endif
 				|| Lara.waterStatus == LW_ABOVE_WATER
@@ -550,7 +552,7 @@ void LaraGun() // (F) (D)
 #if 1
 				if (CheckForHoldingState(LaraItem->currentAnimState))
 #else
-				if (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
+				if (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState))
 #endif
 				{
 					if (Lara.flareControlLeft)
@@ -583,7 +585,7 @@ void LaraGun() // (F) (D)
 				if (CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND))
 				{
 #if 0
-					Lara.flareControlLeft = (g_LaraExtra.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
+					Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
 #else
 					Lara.flareControlLeft = CheckForHoldingState(LaraItem->currentAnimState);
 #endif
@@ -597,7 +599,7 @@ void LaraGun() // (F) (D)
 
 short* GetAmmo(int weaponType)
 {
-	return &g_LaraExtra.Weapons[weaponType].Ammo[g_LaraExtra.Weapons[weaponType].SelectedAmmo];
+	return &Lara.Weapons[weaponType].Ammo[Lara.Weapons[weaponType].SelectedAmmo];
 }
 
 void InitialiseNewWeapon()
@@ -657,7 +659,7 @@ int WeaponObjectMesh(int weaponType)
 	switch (weaponType)
 	{
 	case WEAPON_REVOLVER:
-		return (g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight == true ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
+		return (Lara.Weapons[WEAPON_REVOLVER].HasLasersight == true ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
 
 	case WEAPON_UZI:
 		return ID_UZI_ANIM;
@@ -669,7 +671,7 @@ int WeaponObjectMesh(int weaponType)
 		return ID_HK_ANIM;
 
 	case WEAPON_CROSSBOW:
-		return (g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight == true ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
+		return (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight == true ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
 		
 	case WEAPON_GRENADE_LAUNCHER:
 		return ID_GRENADE_ANIM;
@@ -689,7 +691,7 @@ int WeaponObjectMesh(int weaponType)
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 	
 	item->hitStatus = true;
 	if (creature && item != LaraItem)
@@ -745,7 +747,7 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.xPos = 0;
 	pos.yPos = 0;
 	pos.zPos = 0;
-	GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
+	GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
 
 	pos.xPos = src->pos.xPos;
 	pos.zPos = src->pos.zPos;
@@ -754,23 +756,30 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	pos.yRot = angles[0] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
 	pos.zRot = 0;
 
-	phd_GenerateW2V(&pos);
-	
-	int num = GetSpheres(target, SphereList, 0);
+	// Calculate ray from rotation angles
+	float x = sin(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
+	float y = -sin(TO_RAD(pos.xRot));
+	float z = cos(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
+	Vector3 direction = Vector3(x, y, z);
+	direction.Normalize();
+	Vector3 source = Vector3(pos.xPos, pos.yPos, pos.zPos);
+	Vector3 destination = source + direction * 1024.0f;
+	Ray ray = Ray(source, direction);
+
+	int num = GetSpheres(target, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int best = -1;
-	int bestDistance = 0x7FFFFFFF;
+	float bestDistance = FLT_MAX;
 
 	for (int i = 0; i < num; i++)
 	{
-		SPHERE* sphere = &SphereList[i];
-
-		r = sphere->r;									 
-		if ((abs(sphere->x)) < r && (abs(sphere->y)) < r &&  sphere->z > r && SQUARE(sphere->x) + SQUARE(sphere->y) <= SQUARE(r))
+		BoundingSphere sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
+		float distance;
+		if (ray.Intersects(sphere, distance))
 		{
-			if (sphere->z - r < bestDistance)
+			if (distance < bestDistance)
 			{
-				bestDistance = sphere->z - r;
-				best = i;                 			 
+				bestDistance = distance;
+				best = i;
 			}
 		}
 	}
@@ -790,9 +799,13 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	if (best < 0)
 	{
 		GAME_VECTOR vDest;
-		vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
+		/*vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
 		vDest.y = vSrc.y + (MatrixPtr[M21] * 5 >> 2);
-		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);
+		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);*/
+		
+		vDest.x = destination.x;
+		vDest.y = destination.y;
+		vDest.z = destination.z;
 
 		GetTargetOnLOS(&vSrc, &vDest, 0, 1);
 		
@@ -803,9 +816,12 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 		Savegame.Game.AmmoHits++;
 
 		GAME_VECTOR vDest;
-		vDest.x = vSrc.x + ((MatrixPtr[M20] * bestDistance) >> W2V_SHIFT);
-		vDest.y = vSrc.y + ((MatrixPtr[M21] * bestDistance) >> W2V_SHIFT);
-		vDest.z = vSrc.z + ((MatrixPtr[M22] * bestDistance) >> W2V_SHIFT);
+		
+		destination = source + direction * bestDistance;
+
+		vDest.x = destination.x;
+		vDest.y = destination.y;
+		vDest.z = destination.z;
 
 		// TODO: enable it when the slot is created !
 		/*
@@ -831,7 +847,7 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 		{
 			z = target->pos.zPos - lara_item->pos.zPos;
 			x = target->pos.xPos - lara_item->pos.xPos;
-			angle = 0x8000 + ATAN(z, x) - target->pos.yRot;
+			angle = 0x8000 + phd_atan(z, x) - target->pos.yRot;
 
 			if ((target->currentAnimState > 1 && target->currentAnimState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
@@ -861,8 +877,8 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 	int y = bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
 	int z = (bounds->MinZ + bounds->MaxZ) / 2;
 
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	target->x = item->pos.xPos + ((c * x + s * z) >> W2V_SHIFT);
 	target->y = item->pos.yPos + y;
@@ -887,7 +903,7 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 	pos.x = 0;
 	pos.y = 0;
 	pos.z = 0;
-	GetLaraJointPosition((PHD_VECTOR*)&pos, LJ_RHAND);
+	GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
 
 	pos.x = LaraItem->pos.xPos;
 	pos.z = LaraItem->pos.zPos;
@@ -948,7 +964,7 @@ int CheckForHoldingState(int state) // (F) (D)
 	short* holdState = HoldStates;
 
 #if 0
-	if (g_LaraExtra.ExtraAnim)
+	if (Lara.ExtraAnim)
 		return 0;
 #endif
 
@@ -1083,13 +1099,500 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 	LaraTargetInfo(winfo);
 }
 
-void Inject_LaraFire()
+void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
 {
-	INJECT(0x00453490, AimWeapon);
-	INJECT(0x00453AE0, WeaponObject);
-	INJECT(0x00452430, LaraGun);
-	INJECT(0x004546C0, GetAmmo);
-	INJECT(0x00452B30, InitialiseNewWeapon);
-	INJECT(0x00453B50, WeaponObjectMesh);
-	//INJECT(0x00453A90, SmashItem);
+	int ceiling, height, oldtype, oldonobj, oldheight;
+	int bs, yang;
+
+	ITEM_INFO* item = &Items[itemNumber];
+
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	oldheight = GetFloorHeight(floor, x, y, z);
+	oldonobj = OnObject;
+	oldtype = HeightType;
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	if (item->pos.yPos >= height)
+	{
+		bs = 0;
+
+		if ((HeightType == BIG_SLOPE || HeightType == DIAGONAL) && oldheight < height)
+		{
+			yang = (long)((unsigned short)item->pos.yRot);
+			if (TiltYOffset < 0)
+			{
+				if (yang >= 0x8000)
+					bs = 1;
+			}
+			else if (TiltYOffset > 0)
+			{
+				if (yang <= 0x8000)
+					bs = 1;
+			}
+
+			if (TiltXOffset < 0)
+			{
+				if (yang >= 0x4000 && yang <= 0xc000)
+					bs = 1;
+			}
+			else if (TiltXOffset > 0)
+			{
+				if (yang <= 0x4000 || yang >= 0xc000)
+					bs = 1;
+			}
+		}
+
+		/* If last position of item was also below this floor height, we've hit a wall, else we've hit a floor */
+
+		if (y > (height + 32) && bs == 0 &&
+			(((x >> WALL_SHIFT) != (item->pos.xPos >> WALL_SHIFT)) ||
+			((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
+		{
+			// Need to know which direction the wall is.
+
+			long	xs;
+
+			if ((x & (~(WALL_SIZE - 1))) != (item->pos.xPos & (~(WALL_SIZE - 1))) &&	// X crossed boundary?
+				(z & (~(WALL_SIZE - 1))) != (item->pos.zPos & (~(WALL_SIZE - 1))))	// Z crossed boundary as well?
+			{
+				if (abs(x - item->pos.xPos) < abs(z - item->pos.zPos))
+					xs = 1;	// X has travelled the shortest, so (maybe) hit first. (Seems to work ok).
+				else
+					xs = 0;
+			}
+			else
+				xs = 1;
+
+			if ((x & (~(WALL_SIZE - 1))) != (item->pos.xPos & (~(WALL_SIZE - 1))) && xs)	// X crossed boundary?
+			{
+				if (xv <= 0)	// Hit angle = 0xc000.
+					item->pos.yRot = 0x4000 + (0xc000 - item->pos.yRot);
+				else			// Hit angle = 0x4000.
+					item->pos.yRot = 0xc000 + (0x4000 - item->pos.yRot);
+			}
+			else		// Z crossed boundary.
+				item->pos.yRot = 0x8000 - item->pos.yRot;
+
+			item->speed >>= 1;
+
+			/* Put item back in its last position */
+			item->pos.xPos = x;
+			item->pos.yPos = y;
+			item->pos.zPos = z;
+		}
+		else if (HeightType == BIG_SLOPE || HeightType == DIAGONAL) 	// Hit a steep slope?
+		{
+			// Need to know which direction the slope is.
+
+			item->speed -= item->speed >> 2;
+
+			if (TiltYOffset < 0 && ((abs(TiltYOffset)) - (abs(TiltXOffset)) >= 2))	// Hit angle = 0x4000
+			{
+				if (((unsigned short)item->pos.yRot) > 0x8000)
+				{
+					item->pos.yRot = 0x4000 + (0xc000 - (unsigned short)item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed -= TiltYOffset << 1;
+						if ((unsigned short)item->pos.yRot > 0x4000 && (unsigned short)item->pos.yRot < 0xc000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot < 0x4000)
+								item->pos.yRot = 0x4000;
+						}
+						else if ((unsigned short)item->pos.yRot < 0x4000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot > 0x4000)
+								item->pos.yRot = 0x4000;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+			else if (TiltYOffset > 0 && ((abs(TiltYOffset)) - (abs(TiltXOffset)) >= 2))	// Hit angle = 0xc000
+			{
+				if (((unsigned short)item->pos.yRot) < 0x8000)
+				{
+					item->pos.yRot = 0xc000 + (0x4000 - (unsigned short)item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed += TiltYOffset << 1;
+						if ((unsigned short)item->pos.yRot > 0xc000 || (unsigned short)item->pos.yRot < 0x4000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot < 0xc000)
+								item->pos.yRot = 0xc000;
+						}
+						else if ((unsigned short)item->pos.yRot < 0xc000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot > 0xc000)
+								item->pos.yRot = 0xc000;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+			else if (TiltXOffset < 0 && ((abs(TiltXOffset)) - (abs(TiltYOffset)) >= 2))	// Hit angle = 0
+			{
+				if (((unsigned short)item->pos.yRot) > 0x4000 && ((unsigned short)item->pos.yRot) < 0xc000)
+				{
+					item->pos.yRot = (0x8000 - item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed -= TiltXOffset << 1;
+
+						if ((unsigned short)item->pos.yRot < 0x8000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot > 0xf000)
+								item->pos.yRot = 0;
+						}
+						else if ((unsigned short)item->pos.yRot >= 0x8000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot < 0x1000)
+								item->pos.yRot = 0;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+			else if (TiltXOffset > 0 && ((abs(TiltXOffset)) - (abs(TiltYOffset)) >= 2))	// Hit angle = 0x8000
+			{
+				if (((unsigned short)item->pos.yRot) > 0xc000 || ((unsigned short)item->pos.yRot) < 0x4000)
+				{
+					item->pos.yRot = (0x8000 - item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed += TiltXOffset << 1;
+
+						if ((unsigned short)item->pos.yRot > 0x8000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot < 0x8000)
+								item->pos.yRot = 0x8000;
+						}
+						else if ((unsigned short)item->pos.yRot < 0x8000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot > 0x8000)
+								item->pos.yRot = 0x8000;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+			else if (TiltYOffset < 0 && TiltXOffset < 0)	// Hit angle = 0x2000
+			{
+				if (((unsigned short)item->pos.yRot) > 0x6000 && ((unsigned short)item->pos.yRot) < 0xe000)
+				{
+					item->pos.yRot = 0x2000 + (0xa000 - (unsigned short)item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed += (-TiltYOffset) + (-TiltXOffset);
+						if ((unsigned short)item->pos.yRot > 0x2000 && (unsigned short)item->pos.yRot < 0xa000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot < 0x2000)
+								item->pos.yRot = 0x2000;
+						}
+						else if ((unsigned short)item->pos.yRot != 0x2000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot > 0x2000)
+								item->pos.yRot = 0x2000;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+			else if (TiltYOffset < 0 && TiltXOffset > 0)	// Hit angle = 0x6000
+			{
+				if (((unsigned short)item->pos.yRot) > 0xa000 || ((unsigned short)item->pos.yRot) < 0x2000)
+				{
+					item->pos.yRot = 0x6000 + (0xe000 - (unsigned short)item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed += (-TiltYOffset) + TiltXOffset;
+						if ((unsigned short)item->pos.yRot < 0xe000 && (unsigned short)item->pos.yRot > 0x6000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot < 0x6000)
+								item->pos.yRot = 0x6000;
+						}
+						else if ((unsigned short)item->pos.yRot != 0x6000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot > 0x6000)
+								item->pos.yRot = 0x6000;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+			else if (TiltYOffset > 0 && TiltXOffset > 0)	// Hit angle = 0xa000
+			{
+				if (((unsigned short)item->pos.yRot) > 0xe000 || ((unsigned short)item->pos.yRot) < 0x6000)
+				{
+					item->pos.yRot = 0xa000 + (0x2000 - (unsigned short)item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed += TiltYOffset + TiltXOffset;
+						if ((unsigned short)item->pos.yRot < 0x2000 || (unsigned short)item->pos.yRot > 0xa000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot < 0xa000)
+								item->pos.yRot = 0xa000;
+						}
+						else if ((unsigned short)item->pos.yRot != 0xa000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot > 0xa000)
+								item->pos.yRot = 0xa000;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+			else if (TiltYOffset > 0 && TiltXOffset < 0)	// Hit angle = 0xe000
+			{
+				if (((unsigned short)item->pos.yRot) > 0x2000 && ((unsigned short)item->pos.yRot) < 0xa000)
+				{
+					item->pos.yRot = 0xe000 + (0x6000 - (unsigned short)item->pos.yRot - 1);
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+				}
+				else
+				{
+					if (item->speed < 32)
+					{
+						item->speed += TiltYOffset + (-TiltXOffset);
+						if ((unsigned short)item->pos.yRot < 0x6000 || (unsigned short)item->pos.yRot > 0xe000)
+						{
+							item->pos.yRot -= 4096;
+							if ((unsigned short)item->pos.yRot < 0xe000)
+								item->pos.yRot = 0xe000;
+						}
+						else if ((unsigned short)item->pos.yRot != 0xe000)
+						{
+							item->pos.yRot += 4096;
+							if ((unsigned short)item->pos.yRot > 0xe000)
+								item->pos.yRot = 0xe000;
+						}
+					}
+
+					if (item->fallspeed > 0)
+						item->fallspeed = -(item->fallspeed >> 1);
+					else
+						item->fallspeed = 0;
+				}
+			}
+
+			/* Put item back in its last position */
+			item->pos.xPos = x;
+			item->pos.yPos = y;
+			item->pos.zPos = z;
+		}
+		else
+		{
+			/* Hit the floor; bounce and slow down */
+			if (item->fallspeed > 0)
+			{
+				if (item->fallspeed > 16)
+				{
+					if (item->objectNumber == ID_GRENADE)
+						item->fallspeed = -(item->fallspeed - (item->fallspeed >> 1));
+					else
+					{
+						item->fallspeed = -(item->fallspeed >> 2);
+						if (item->fallspeed < -100)
+							item->fallspeed = -100;
+					}
+				}
+				else
+				{
+					/* Roll on floor */
+					item->fallspeed = 0;
+					if (item->objectNumber == ID_GRENADE)
+					{
+						item->requiredAnimState = 1;
+						item->pos.xRot = 0;
+						item->speed--;
+					}
+					else
+						item->speed -= 3;
+
+					if (item->speed < 0)
+						item->speed = 0;
+				}
+			}
+			item->pos.yPos = height;
+		}
+	}
+	else	// Check for on top of object.
+	{
+		if (yv >= 0)
+		{
+			roomNumber = item->roomNumber;
+			floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
+			oldheight = GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos);
+			oldonobj = OnObject;
+			roomNumber = item->roomNumber;
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+			/* Bounce off floor */
+			if (item->pos.yPos >= oldheight && oldonobj)	// If old and new pos above object then detect.
+			{
+				/* Hit the floor; bounce and slow down */
+				if (item->fallspeed > 0)
+				{
+					if (item->fallspeed > 16)
+					{
+						if (item->objectNumber == ID_GRENADE)
+							item->fallspeed = -(item->fallspeed - (item->fallspeed >> 1));
+						else
+						{
+							item->fallspeed = -(item->fallspeed >> 2);
+							if (item->fallspeed < -100)
+								item->fallspeed = -100;
+						}
+					}
+					else
+					{
+						/* Roll on floor */
+						item->fallspeed = 0;
+						if (item->objectNumber == ID_GRENADE)
+						{
+							item->requiredAnimState = 1;
+							item->pos.xRot = 0;
+							item->speed--;
+						}
+						else
+							item->speed -= 3;
+
+						if (item->speed < 0)
+							item->speed = 0;
+					}
+				}
+				item->pos.yPos = oldheight;
+			}
+		}
+		//		else
+		{
+			/* Bounce off ceiling */
+			roomNumber = item->roomNumber;
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			if (item->pos.yPos < ceiling)
+			{
+				if (y < ceiling &&
+					(((x >> WALL_SHIFT) != (item->pos.xPos >> WALL_SHIFT)) ||
+					((z >> WALL_SHIFT) != (item->pos.zPos >> WALL_SHIFT))))
+				{
+					// Need to know which direction the wall is.
+
+					if ((x & (~(WALL_SIZE - 1))) != (item->pos.xPos & (~(WALL_SIZE - 1))))	// X crossed boundary?
+					{
+						if (xv <= 0)	// Hit angle = 0xc000.
+							item->pos.yRot = 0x4000 + (0xc000 - item->pos.yRot);
+						else			// Hit angle = 0x4000.
+							item->pos.yRot = 0xc000 + (0x4000 - item->pos.yRot);
+					}
+					else		// Z crossed boundary.
+					{
+						item->pos.yRot = 0x8000 - item->pos.yRot;
+					}
+
+					if (item->objectNumber == ID_GRENADE)
+						item->speed -= item->speed >> 3;
+					else
+						item->speed >>= 1;
+
+					/* Put item back in its last position */
+					item->pos.xPos = x;
+					item->pos.yPos = y;
+					item->pos.zPos = z;
+				}
+				else
+					item->pos.yPos = ceiling;
+
+				if (item->fallspeed < 0)
+					item->fallspeed = -item->fallspeed;
+			}
+		}
+	}
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	if (roomNumber != item->roomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
 }

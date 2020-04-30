@@ -3,6 +3,9 @@
 #include "effect2.h"
 #include <stdio.h>
 #include "../Specific/setup.h"
+#include "../Specific/level.h"
+#include "lara.h"
+#include "effects.h"
 
 void ClearItem(short itemNum)
 {
@@ -272,7 +275,7 @@ short CreateNewEffect(short roomNum)
 void InitialiseFXArray(int allocmem)
 {
 	if (allocmem)
-		Effects = (FX_INFO*)GameMalloc(NUM_EFFECTS * sizeof(FX_INFO));
+		Effects = (FX_INFO*)game_malloc(NUM_EFFECTS * sizeof(FX_INFO));
 
 	FX_INFO* fx = Effects;
 	NextFxActive = NO_ITEM;
@@ -375,13 +378,14 @@ void InitialiseItem(short itemNum)
 	}
 	else
 	{
-		item->meshBits = 0xFFFFFFFF;
+		item->meshBits = -1;
 	}
 
 	item->touchBits = 0;
 	item->afterDeath = false;
 	item->firedWeapon = 0;
 	item->data = NULL;
+	item->swapMeshFlags = 0;
 
 	if (item->flags & IFLAG_INVISIBLE)
 	{
@@ -505,21 +509,4 @@ int FindItem(short objectNum)
 	}
 
 	return NO_ITEM;
-}
-
-void Inject_Items()
-{
-	INJECT(0x00440840, CreateItem);
-	INJECT(0x00440D10, AddActiveItem);
-	INJECT(0x00440620, KillItem);
-	INJECT(0x00440DA0, ItemNewRoom);
-	INJECT(0x004412F0, EffectNewRoom);
-	INJECT(0x00441180, KillEffect);
-	INJECT(0x00441080, InitialiseFXArray);
-	INJECT(0x004410F0, CreateNewEffect);
-	INJECT(0x00440B60, RemoveActiveItem);
-	INJECT(0x00440C40, RemoveDrawnItem);
-	INJECT(0x004408B0, InitialiseItem);
-	INJECT(0x00408550, ClearItem);
-	INJECT(0x00440590, InitialiseItemArray);
 }

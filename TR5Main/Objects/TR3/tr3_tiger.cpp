@@ -2,6 +2,8 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO tigerBite = { 19, -13, 3, 26 };
 

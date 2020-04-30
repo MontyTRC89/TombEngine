@@ -8,6 +8,8 @@
 #include "../../Game/draw.h"
 #include "../../Specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };
@@ -257,7 +259,7 @@ void HarpyControl(short itemNum)
 		return;
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	short angle = 0;
 	short joint0 = 0;

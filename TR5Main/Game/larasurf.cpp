@@ -10,6 +10,8 @@
 #include "laraswim.h"
 #include "larafire.h"
 #include "laramisc.h"
+#include "..\Specific\level.h"
+#include "../Specific/input.h"
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
@@ -270,8 +272,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 
 	AnimateLara(item);
 
-	item->pos.xPos += item->fallspeed * SIN(Lara.moveAngle) >> (W2V_SHIFT + 2);
-	item->pos.zPos += item->fallspeed * COS(Lara.moveAngle) >> (W2V_SHIFT + 2);
+	item->pos.xPos += item->fallspeed * phd_sin(Lara.moveAngle) >> (W2V_SHIFT + 2);
+	item->pos.zPos += item->fallspeed * phd_cos(Lara.moveAngle) >> (W2V_SHIFT + 2);
 
 	LaraBaddieCollision(item, coll);
 

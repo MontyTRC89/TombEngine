@@ -2,9 +2,15 @@
 #include "..\Global\global.h"
 #include "draw.h"
 #include "laramisc.h"
+#include "lara.h"
+#include "..\Specific\level.h"
+#include "../Specific/input.h"
+#include "control.h"
 
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;
+ROPE_STRUCT Ropes[12];
+int NumRopes;
 
 void InitialiseRope(short itemNumber) // (F) (D)
 {
@@ -94,7 +100,7 @@ PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec) // (F) (D)
 	if (length < 0)
 		length = -length;
 
-	length = 65536 / SQRT_ASM(length);
+	length = 65536 / sqrt(length);
 	
 	vec->x = (int64_t) length * vec->x >> 16;
 	vec->y = (int64_t) length * vec->y >> 16;
@@ -135,11 +141,11 @@ void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* destination) // (F) 
 
 void _0x0046D420(int* matrix, short* angle) // (F) (D)
 {
-	angle[0] = ATAN(SQRT_ASM(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
+	angle[0] = phd_atan(sqrt(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
 	if (matrix[M12] >= 0 && angle[0] > 0 || matrix[M12] < 0 && angle[0] < 0)
 		angle[0] = -angle[0];
-	angle[1] = ATAN(matrix[M22], matrix[M02]);
-	angle[2] = ATAN(matrix[M00] * COS(angle[1]) - matrix[M20] * SIN(angle[1]), matrix[M21] * SIN(angle[1]) - matrix[M01] * COS(angle[1]));
+	angle[1] = phd_atan(matrix[M22], matrix[M02]);
+	angle[2] = phd_atan(matrix[M00] * phd_cos(angle[1]) - matrix[M20] * phd_sin(angle[1]), matrix[M21] * phd_sin(angle[1]) - matrix[M01] * phd_cos(angle[1]));
 }
 
 void RopeControl(short itemNumber) // (F) (D)
@@ -172,7 +178,7 @@ void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && (l->currentAnimState == STATE_LARA_REACH || l->currentAnimState == STATE_LARA_JUMP_UP) && l->gravityStatus && l->fallspeed > 0 && rope->active)
 	{
 		frame = (ANIM_FRAME*) GetBoundsAccurate(l);
-		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->MinY + 512, l->pos.zPos + (frame->MaxZ * COS(l->pos.yRot) >> W2V_SHIFT), l->currentAnimState == STATE_LARA_REACH ? 128 : 320);
+		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->MinY + 512, l->pos.zPos + (frame->MaxZ * phd_cos(l->pos.yRot) >> W2V_SHIFT), l->currentAnimState == STATE_LARA_REACH ? 128 : 320);
 		if (segment >= 0)
 		{
 			if (l->currentAnimState == STATE_LARA_REACH)
@@ -384,9 +390,9 @@ int _0x0046D200(ROPE_STRUCT* rope, int x, int y, int z, int radius) // (F) (D)
 void ApplyVelocityToRope(int node, short angle, short n) // (F) (D)
 {
 	SetPendulumVelocity(
-		(unsigned short) n * SIN(angle) >> 2,
+		(unsigned short) n * phd_sin(angle) >> 2,
 		0,
-		(unsigned short) n * COS(angle) >> 2); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
+		(unsigned short) n * phd_cos(angle) >> 2); /* @ORIGINAL_BUG: casting n to unsigned short results in the rope glitch */
 }
 
 void SetPendulumVelocity(int x, int y, int z) // (F) (D)
@@ -431,7 +437,7 @@ void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeV
 	vec.x = pendulumPointer->Position.x + pendulumVelocity->x - rope->segment[0].x;
 	vec.y = pendulumPointer->Position.y + pendulumVelocity->y - rope->segment[0].y;
 	vec.z = pendulumPointer->Position.z + pendulumVelocity->z - rope->segment[0].z;
-	result = 65536 * SQRT_ASM(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - value;
+	result = 65536 * sqrt(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - value;
 	NormaliseRopeVector(&vec);
 	pendulumVelocity->x -= (int64_t) result * vec.x >> 16;
 	pendulumVelocity->y -= (int64_t) result * vec.y >> 16;
@@ -446,7 +452,7 @@ void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* veloc
 	vec.x = nextSegment->x + nextVelocity->x - segment->x - velocity->x;
 	vec.y = nextSegment->y + nextVelocity->y - segment->y - velocity->y;
 	vec.z = nextSegment->z + nextVelocity->z - segment->z - velocity->z;
-	result = 65536 * SQRT_ASM(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - length >> 1;
+	result = (65536 * sqrt(abs(SQUARE(vec.x >> 16) + SQUARE(vec.y >> 16) + SQUARE(vec.z >> 16))) - length) / 2;
 	NormaliseRopeVector(&vec);
 	vec.x = (int64_t) result * vec.x >> 16;
 	vec.y = (int64_t) result * vec.y >> 16;
