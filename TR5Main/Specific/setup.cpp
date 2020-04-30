@@ -1815,17 +1815,14 @@ void BaddyObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	// TODO: spider is deleted !
-	/*
 	obj = &Objects[ID_SPIDERS_EMITTER];
 	if (obj->loaded)
 	{
-		//*(&Objects[95] + 25) &= 0xFDFFu;
 		obj->drawRoutine = NULL;
 		obj->initialise = InitialiseSpiders;
 		obj->control = ControlSpiders;
+		obj->usingDrawAnimatingItem = false;
 	}
-	*/
 
 	obj = &Objects[ID_GLADIATOR];
 	if (obj->loaded)

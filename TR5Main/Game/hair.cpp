@@ -306,33 +306,21 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			Hairs[ponytail][i - 1].pos.yRot = phd_atan((Hairs[ponytail][i].pos.zPos - Hairs[ponytail][i - 1].pos.zPos), (Hairs[ponytail][i].pos.xPos - Hairs[ponytail][i - 1].pos.xPos));
 			Hairs[ponytail][i - 1].pos.xRot = -phd_atan(distance, Hairs[ponytail][i].pos.yPos - Hairs[ponytail][i - 1].pos.yPos);
 
-			//phd_PushUnitMatrix();
-			world = Matrix::Identity;
-
-			/**(MatrixPtr + M03) = Hairs[ponytail][i - 1].pos.xPos << W2V_SHIFT;
-			*(MatrixPtr + M13) = Hairs[ponytail][i - 1].pos.yPos << W2V_SHIFT;
-			*(MatrixPtr + M23) = Hairs[ponytail][i - 1].pos.zPos << W2V_SHIFT;*/
-			world = Matrix::CreateTranslation(Hairs[ponytail][i - 1].pos.xPos, Hairs[ponytail][i - 1].pos.yPos, Hairs[ponytail][i - 1].pos.zPos) * world;
-			
-			//phd_RotYXZ(Hairs[ponytail][i - 1].pos.yRot, Hairs[ponytail][i - 1].pos.xRot, 0);
+			world = Matrix::CreateTranslation(Hairs[ponytail][i - 1].pos.xPos, Hairs[ponytail][i - 1].pos.yPos, Hairs[ponytail][i - 1].pos.zPos);
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i - 1].pos.yRot), TO_RAD(Hairs[ponytail][i - 1].pos.xRot), 0) * world;
 
 			if (i == HAIR_SEGMENTS - 1)
-				//phd_TranslateRel(*(bone - 3), *(bone - 2), *(bone - 1));
 				world = Matrix::CreateTranslation(*(bone - 3), *(bone - 2), *(bone - 1)) * world;
 			else
-				//phd_TranslateRel(*(bone + 1), *(bone + 2), *(bone + 3));
 				world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
-			Hairs[ponytail][i].pos.xPos = world.Translation().x; // *(MatrixPtr + M03) >> W2V_SHIFT;
-			Hairs[ponytail][i].pos.yPos = world.Translation().y; // *(MatrixPtr + M13) >> W2V_SHIFT;
-			Hairs[ponytail][i].pos.zPos = world.Translation().z; // *(MatrixPtr + M23) >> W2V_SHIFT;
+			Hairs[ponytail][i].pos.xPos = world.Translation().x;
+			Hairs[ponytail][i].pos.yPos = world.Translation().y;
+			Hairs[ponytail][i].pos.zPos = world.Translation().z;
 
 			Hairs[ponytail][i].hvel.x = Hairs[ponytail][i].pos.xPos - Hairs[ponytail][0].hvel.x;
 			Hairs[ponytail][i].hvel.y = Hairs[ponytail][i].pos.yPos - Hairs[ponytail][0].hvel.y;
 			Hairs[ponytail][i].hvel.z = Hairs[ponytail][i].pos.zPos - Hairs[ponytail][0].hvel.z;
-
-			//phd_PopMatrix();
 		}
 	}
 }
