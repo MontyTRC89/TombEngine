@@ -3,6 +3,8 @@
 #include "../../Game/Box.h"
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 void LaraTyrannosaurDeath(ITEM_INFO* item)
 {

@@ -7,10 +7,12 @@
 #include "../../Game/lot.h"
 #include "../../Game/sphere.h"
 #include "../../Game/camera.h"
-#include "../../Specific/roomload.h"
+#include "../../Specific/level.h"
 #include "../../specific/setup.h"
+#include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 // TODO: test the dragon and bartoli to check if it work !
 // TODO: upgrade the collision of dragon to pick the dagger correctly.
@@ -189,8 +191,8 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	{
 		rx = laraitem->pos.xPos - item->pos.xPos;
 		rz = laraitem->pos.zPos - item->pos.zPos;
-		c = COS(item->pos.yRot);
-		s = SIN(item->pos.yRot);
+		c = phd_cos(item->pos.yRot);
+		s = phd_sin(item->pos.yRot);
 
 		/* See if Lara within leg space of dragon; if so use different collision to sphere stuff */
 		side_shift = (rx * s + rz * c) >> W2V_SHIFT;
@@ -234,7 +236,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				AnimateItem(LaraItem);
 
 				/* Flag that Lara is running animations from another project */
-				g_LaraExtra.ExtraAnim = 1;
+				Lara.ExtraAnim = 1;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.hitDirection = -1;
 

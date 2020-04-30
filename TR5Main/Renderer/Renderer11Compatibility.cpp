@@ -1,8 +1,10 @@
 #include "Renderer11.h"
-#include "../Specific/roomload.h"
+#include "../Specific/level.h"
 #include <stack>
 #include "../Game/savegame.h"
 #include "../Specific/setup.h"
+#include "../Game/control.h"
+#include "../Game/objects.h"
 
 bool Renderer11::PrepareDataForTheRenderer()
 {
@@ -19,8 +21,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 	m_meshes.clear();
 
 	// Step 0: prepare animated textures
-	short numSets = *AnimatedTextureRanges;
-	short* animatedPtr = AnimatedTextureRanges;
+	short numSets = *AnimTextureRanges;
+	short* animatedPtr = AnimTextureRanges;
 	animatedPtr++;
 
 	m_animatedTextureSets = vector<RendererAnimatedTextureSet>(NUM_ANIMATED_SETS);
@@ -79,9 +81,9 @@ bool Renderer11::PrepareDataForTheRenderer()
 				byte b = Texture32[oldPixelIndex + 2];
 				byte a = Texture32[oldPixelIndex + 3];
 
-				buffer[pixelIndex + 2] = r;
-				buffer[pixelIndex + 1] = g;
 				buffer[pixelIndex + 0] = b;
+				buffer[pixelIndex + 1] = g;
+				buffer[pixelIndex + 2] = r;
 				buffer[pixelIndex + 3] = a;
 			}
 		}
@@ -458,7 +460,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	for (int i = 0; i < MoveablesIds.size(); i++)
 	{
 		int objNum = MoveablesIds[i];
-		OBJECT_INFO* obj = &Objects[objNum];
+		ObjectInfo* obj = &Objects[objNum];
 
 		if (obj->nmeshes > 0)
 		{
@@ -780,7 +782,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	for (int i = 0; i < MoveablesIds.size(); i++)
 	{
-		OBJECT_INFO* obj = &Objects[MoveablesIds[i]];
+		ObjectInfo* obj = &Objects[MoveablesIds[i]];
 
 		if (obj->nmeshes < 0)
 		{

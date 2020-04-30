@@ -7,6 +7,9 @@
 #include "../../Game/effect2.h"
 #include "../../Game/people.h"
 #include "../../Game/draw.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1
@@ -224,7 +227,7 @@ void ControlHydra(short itemNumber)
 
 				if (item->hitStatus && info.distance < SQUARE(1792))
 				{
-					distance = SQRT_ASM(info.distance);
+					distance = sqrt(info.distance);
 					damage = 5 - distance / 1024;
 
 					if (Lara.gunType == WEAPON_SHOTGUN)
@@ -249,7 +252,7 @@ void ControlHydra(short itemNumber)
 				/*item->hitPoints = 0;
 				break;*/
 
-				damage = 6 - SQRT_ASM(info.distance) / 1024;
+				damage = 6 - sqrt(info.distance) / 1024;
 
 				if (Lara.gunType == WEAPON_SHOTGUN)
 					damage *= 3;

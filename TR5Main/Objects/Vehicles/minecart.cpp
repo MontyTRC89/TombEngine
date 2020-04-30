@@ -8,10 +8,12 @@
 #include "../../Game/draw.h"
 #include "../../Game/misc.h"
 #include "../../Game/camera.h"
-#include "..\..\Specific\roomload.h"
+#include "..\..\Specific\level.h"
 #include "../../Specific/setup.h"
+#include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 typedef enum MINECART_STATE {
 	CART_GETIN,
@@ -65,7 +67,7 @@ typedef enum MINECART_FLAGS
 #define CART_NHITS 25
 #define CART_BADDIE_RADIUS STEP_SIZE
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 static int TestHeight(ITEM_INFO* v, int x, int z)
 {
@@ -74,11 +76,11 @@ static int TestHeight(ITEM_INFO* v, int x, int z)
 	int s, c;
 	short roomNumber;
 
-	c = COS(v->pos.yRot);
-	s = SIN(v->pos.yRot);
+	c = phd_cos(v->pos.yRot);
+	s = phd_sin(v->pos.yRot);
 
 	pos.x = v->pos.xPos + (((z * s) + (x * c)) >> W2V_SHIFT);
-	pos.y = v->pos.yPos - (z * SIN(v->pos.xRot) >> W2V_SHIFT) + (x * SIN(v->pos.zRot) >> W2V_SHIFT);
+	pos.y = v->pos.yPos - (z * phd_sin(v->pos.xRot) >> W2V_SHIFT) + (x * phd_sin(v->pos.zRot) >> W2V_SHIFT);
 	pos.z = v->pos.zPos + (((z * c) - (x * s)) >> W2V_SHIFT);
 
 	roomNumber = v->roomNumber;
@@ -92,9 +94,9 @@ static short GetCollision(ITEM_INFO* v, short ang, int dist, short* ceiling)
 	int x, y, z, height, cheight;
 	short roomNumber;
 
-	x = v->pos.xPos + ((SIN(ang) * dist) >> W2V_SHIFT);
+	x = v->pos.xPos + ((phd_sin(ang) * dist) >> W2V_SHIFT);
 	y = v->pos.yPos - LARA_HITE;
-	z = v->pos.zPos + ((COS(ang) * dist) >> W2V_SHIFT);
+	z = v->pos.zPos + ((phd_cos(ang) * dist) >> W2V_SHIFT);
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -149,7 +151,7 @@ static bool CanGetOut(int direction)
 	short roomNumber, angle;
 	int x, y, z, height, ceiling;
 
-	v = &Items[g_LaraExtra.Vehicle];
+	v = &Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = v->pos.yRot + 0x4000;
@@ -157,9 +159,9 @@ static bool CanGetOut(int direction)
 		angle = v->pos.yRot - 0x4000;
 
 
-	x = v->pos.xPos - (GETOFF_DIST * SIN(angle) >> W2V_SHIFT);
+	x = v->pos.xPos - (GETOFF_DIST * phd_sin(angle) >> W2V_SHIFT);
 	y = v->pos.yPos;
-	z = v->pos.zPos - (GETOFF_DIST * COS(angle) >> W2V_SHIFT);
+	z = v->pos.zPos - (GETOFF_DIST * phd_cos(angle) >> W2V_SHIFT);
 
 	roomNumber = v->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -206,7 +208,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 			ITEM_INFO* item = &Items[itemNum];
 			if (item->collidable && item->status != ITEM_INVISIBLE && item != LaraItem && item != v)
 			{
-				OBJECT_INFO* object = &Objects[item->objectNumber];
+				ObjectInfo* object = &Objects[item->objectNumber];
 				if (object->collision && (object->intelligent || item->objectNumber == ID_ROLLINGBALL || item->objectNumber == ID_ANIMATING2))
 				{
 					int x = v->pos.xPos - item->pos.xPos;
@@ -265,7 +267,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	if (cart->StopDelay)
 		cart->StopDelay--;
 
-	if (((g_LaraExtra.mineL) && (g_LaraExtra.mineR) && (!cart->StopDelay)) && (((v->pos.xPos & 0x380) == 512) || ((v->pos.zRot & 0x380) == 512)))
+	if (((Lara.mineL) && (Lara.mineR) && (!cart->StopDelay)) && (((v->pos.xPos & 0x380) == 512) || ((v->pos.zRot & 0x380) == 512)))
 	{
 		if (cart->Speed < 0xf000)	// can't do this - bastard
 		{
@@ -278,10 +280,10 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	}
 
 	// initiate turns
-	if ((g_LaraExtra.mineL || g_LaraExtra.mineR) && (!(g_LaraExtra.mineL && g_LaraExtra.mineR)) && (!cart->StopDelay) && (!(cart->Flags & (CF_TURNINGL | CF_TURNINGR))))
+	if ((Lara.mineL || Lara.mineR) && (!(Lara.mineL && Lara.mineR)) && (!cart->StopDelay) && (!(cart->Flags & (CF_TURNINGL | CF_TURNINGR))))
 	{
 		short ang;
-		unsigned short rot = (((unsigned short)v->pos.yRot) >> 14) | (g_LaraExtra.mineL << 2);
+		unsigned short rot = (((unsigned short)v->pos.yRot) >> 14) | (Lara.mineL << 2);
 
 		switch (rot)
 		{
@@ -337,7 +339,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			cart->TurnLen = ang;
 		}
 
-		cart->Flags |= (g_LaraExtra.mineL) ? CF_TURNINGL : CF_TURNINGR;
+		cart->Flags |= (Lara.mineL) ? CF_TURNINGL : CF_TURNINGR;
 	}
 
 	// move vehicle
@@ -398,20 +400,20 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			switch (quad)
 			{
 			case 0:
-				x = -COS(deg);
-				z = SIN(deg);
+				x = -phd_cos(deg);
+				z = phd_sin(deg);
 				break;
 			case 1:
-				x = SIN(deg);
-				z = COS(deg);
+				x = phd_sin(deg);
+				z = phd_cos(deg);
 				break;
 			case 2:
-				x = COS(deg);
-				z = -SIN(deg);
+				x = phd_cos(deg);
+				z = -phd_sin(deg);
 				break;
 			default:
-				x = -SIN(deg);
-				z = -COS(deg);
+				x = -phd_sin(deg);
+				z = -phd_cos(deg);
 				break;
 			}
 
@@ -428,8 +430,8 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	else
 	{
 		// move cart normally
-		v->pos.xPos += (v->speed * SIN(v->pos.yRot)) >> W2V_SHIFT;
-		v->pos.zPos += (v->speed * COS(v->pos.yRot)) >> W2V_SHIFT;
+		v->pos.xPos += (v->speed * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+		v->pos.zPos += (v->speed * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
 	}
 
 	// tilt cart on slopes
@@ -652,7 +654,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->animNumber = 13;
 			l->frameNumber = GF(11, 0);
 			l->currentAnimState = l->goalAnimState = 2;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 		break;
@@ -673,7 +675,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->animNumber = 11;
 			l->frameNumber = GF(11, 0);
 			l->currentAnimState = l->goalAnimState = 2;
-			g_LaraExtra.Vehicle = NO_ITEM;
+			Lara.Vehicle = NO_ITEM;
 			Lara.gunStatus = LG_NO_ARMS;
 		}
 		break;
@@ -708,8 +710,8 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			if ((Wibble & 7) == 0)
 				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &v->pos, 2);
 
-			v->pos.xPos += (TURN_DEATH_VEL * SIN(v->pos.yRot)) >> W2V_SHIFT;
-			v->pos.zPos += (TURN_DEATH_VEL * COS(v->pos.yRot)) >> W2V_SHIFT;
+			v->pos.xPos += (TURN_DEATH_VEL * phd_sin(v->pos.yRot)) >> W2V_SHIFT;
+			v->pos.zPos += (TURN_DEATH_VEL * phd_cos(v->pos.yRot)) >> W2V_SHIFT;
 		}
 		else
 		{
@@ -732,7 +734,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	}
 
 	/* -------- sync vehicle's anims with Lara */
-	if ((g_LaraExtra.Vehicle != NO_ITEM) && (!(cart->Flags & CF_NOANIM)))
+	if ((Lara.Vehicle != NO_ITEM) && (!(cart->Flags & CF_NOANIM)))
 	{
 		AnimateItem(l);
 
@@ -808,7 +810,7 @@ void InitialiseMineCart(short itemNum)
 	CART_INFO* cart;
 
 	v = &Items[itemNum];
-	cart = (CART_INFO*)GameMalloc(sizeof(CART_INFO));
+	cart = (CART_INFO*)game_malloc(sizeof(CART_INFO));
 	v->data = (void*)cart;
 	cart->Flags = NULL;
 	cart->Speed = 0;
@@ -823,14 +825,14 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int geton;
 	short ang;
 
-	if ((l->hitPoints < 0) || (g_LaraExtra.Vehicle != NO_ITEM))
+	if ((l->hitPoints < 0) || (Lara.Vehicle != NO_ITEM))
 		return;
 
 	v = &Items[itemNum];
 
 	if ((geton = GetInMineCart(v, l, coll)))
 	{
-		g_LaraExtra.Vehicle = itemNum;
+		Lara.Vehicle = itemNum;
 
 		/* -------- throw flare away if using */
 		if (Lara.gunType == WEAPON_FLARE)
@@ -877,7 +879,7 @@ int MineCartControl()
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	v = &Items[g_LaraExtra.Vehicle];
+	v = &Items[Lara.Vehicle];
 	if (v->data == NULL) { printf("v->data is nullptr !"); return 0; }
 	cart = (CART_INFO*)v->data;
 
@@ -887,7 +889,7 @@ int MineCartControl()
 		MoveCart(v, LaraItem, cart);
 
 	/* -------- move Lara to vehicle pos */
-	if (g_LaraExtra.Vehicle != NO_ITEM)
+	if (Lara.Vehicle != NO_ITEM)
 	{
 		LaraItem->pos.xPos = v->pos.xPos;
 		LaraItem->pos.yPos = v->pos.yPos;
@@ -902,7 +904,7 @@ int MineCartControl()
 
 	if (roomNumber != v->roomNumber)
 	{
-		ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+		ItemNewRoom(Lara.Vehicle, roomNumber);
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 
@@ -914,5 +916,5 @@ int MineCartControl()
 		Camera.targetDistance = WALL_SIZE * 2;
 	}
 
-	return (g_LaraExtra.Vehicle == NO_ITEM) ? 0 : 1;
+	return (Lara.Vehicle == NO_ITEM) ? 0 : 1;
 }

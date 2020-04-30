@@ -2,7 +2,9 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/items.h"
+#include "../../Game/lara.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO cobraBite = { 0, 0, 0, 13 };
 

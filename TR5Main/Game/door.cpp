@@ -10,6 +10,9 @@
 #include "switch.h"
 #include "misc.h"
 #include "Box.h"
+#include "../Specific/level.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
 PHD_VECTOR DoubleDoorPos = { 0, 0, 220 };
 PHD_VECTOR PullDoorPos = { -201, 0, 322 };
@@ -35,6 +38,7 @@ static short CrowbarDoorBounds[12] =
 
 ITEM_INFO* ClosedDoors[32];
 byte LiftDoor;
+int DontUnlockBox;
 
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
@@ -709,7 +713,7 @@ void InitialiseDoor(short itemNumber)
 	if (item->objectNumber == ID_LIFT_DOORS1 || item->objectNumber == ID_LIFT_DOORS2)
 		item->itemFlags[0] = 4096;
 
-	DOOR_DATA * door = (DOOR_DATA*)GameMalloc(sizeof(DOOR_DATA));
+	DOOR_DATA * door = (DOOR_DATA*)game_malloc(sizeof(DOOR_DATA));
 
 	item->data = door;
 	door->opened = false;
@@ -966,7 +970,7 @@ void ProcessClosedDoors()
 		{
 			if (!(item->inDrawRoom))
 			{
-				ItemNewRoom((item - Items) / sizeof(ITEM_INFO), item->drawRoom);
+				ItemNewRoom(item - Items, item->drawRoom);
 				item->roomNumber = roomNumber;
 				item->inDrawRoom = true;
 			}
@@ -974,7 +978,7 @@ void ProcessClosedDoors()
 		else if (item->inDrawRoom)
 		{
 			item->roomNumber = item->drawRoom;
-			ItemNewRoom((item - Items) / sizeof(ITEM_INFO), roomNumber);
+			ItemNewRoom(item - Items, roomNumber);
 			item->inDrawRoom = false;
 		}
 	}
@@ -1015,17 +1019,4 @@ void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 	}
-}
-
-void Inject_Door()
-{
-	INJECT(0x00429EC0, SequenceDoorControl);
-	INJECT(0x00429CF0, UnderwaterDoorCollision);
-	INJECT(0x00429B30, DoubleDoorCollision);
-	INJECT(0x004298D0, PushPullKickDoorCollision);
-	INJECT(0x00429840, PushPullKickDoorControl);
-	INJECT(0x00429550, DoorCollision);
-	INJECT(0x00429140, DoorControl);
-	INJECT(0x00428FD0, OpenThatDoor);
-	INJECT(0x00428EF0, ShutThatDoor);
 }

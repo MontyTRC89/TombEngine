@@ -2,7 +2,9 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Game/items.h"
+#include "../../Game/lara.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO yetiBiteR = { 12, 101, 19, 10 };
 BITE_INFO yetiBiteL = { 12, 101, 19, 13 };

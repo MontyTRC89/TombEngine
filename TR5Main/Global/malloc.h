@@ -1,14 +1,11 @@
 #pragma once
 
-#define MallocBuffer				VAR_U_(0x00E4B10C, char*)
-#define MallocSize					VAR_U_(0x00E4B058, int)
-#define MallocPtr					VAR_U_(0x00E4B0DC, char*)
-#define MallocFree					VAR_U_(0x00E4B0F4, int)
-#define MallocUsed					VAR_U_(0x00E4B0F0, int)
+extern char* malloc_buffer;
+extern int malloc_size;
+extern char* malloc_ptr;
+extern int malloc_free;
+extern int malloc_used;
 
-#define InitGameMalloc ((void (__cdecl*)()) 0x004A7CB0)
-#define GameMallocReal ((char* (__cdecl*)(int)) 0x004A7D00)
-
-char* GameMalloc(int size);
-
-void Inject_Malloc();
+char* game_malloc(int size);
+void init_game_malloc();
+void game_free(int size, int type);

@@ -21,6 +21,9 @@
 
 #include "..\Objects\newobjects.h"
 #include "..\Global\global.h"
+#include "../Specific/level.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
 #include <stdio.h>
 
@@ -39,8 +42,10 @@ extern Inventory* g_Inventory;
 short elevation = 57346;
 bool doJump = false;
 short OldAngle = 1;
-LaraExtraInfo g_LaraExtra;
 int RopeSwing = 0;
+LaraInfo Lara;
+ITEM_INFO* LaraItem;
+byte LaraNodeUnderwater[15];
 
 void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll) =
 {
@@ -344,7 +349,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = 100;
 	coll->trigger = 0;
 
-	if ((TrInput & IN_LOOK) && g_LaraExtra.ExtraAnim == 0 && Lara.look)
+	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == 0 && Lara.look)
 		LookLeftRight();
 	else
 		ResetLook();
@@ -352,9 +357,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.look = true;
 
 	// Process Vehicles
-	if (g_LaraExtra.Vehicle != NO_ITEM)
+	if (Lara.Vehicle != NO_ITEM)
 	{
-		switch (Items[g_LaraExtra.Vehicle].objectNumber)
+		switch (Items[Lara.Vehicle].objectNumber)
 		{
 			case ID_QUAD:
 				if (QuadBikeControl())
@@ -412,13 +417,13 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Animate Lara
 	AnimateLara(item);
 
-	if (g_LaraExtra.ExtraAnim == 0)
+	if (Lara.ExtraAnim == 0)
 	{
 		// Check for collision with items
 		LaraBaddieCollision(item, coll);
 
 		// Handle Lara collision
-		if (g_LaraExtra.Vehicle == NO_ITEM)
+		if (Lara.Vehicle == NO_ITEM)
 			(*lara_collision_routines[item->currentAnimState])(item, coll);
 	}
 
@@ -448,9 +453,9 @@ int UseSpecialItem(ITEM_INFO* item)
 		if (selectedObject != ID_WATERSKIN1_3 && selectedObject != ID_WATERSKIN2_5)
 		{
 			if (selectedObject >= ID_WATERSKIN2_EMPTY)
-				g_LaraExtra.Waterskin2.Quantity = 5;
+				Lara.Waterskin2.Quantity = 5;
 			else
-				g_LaraExtra.Waterskin1.Quantity = 3;
+				Lara.Waterskin1.Quantity = 3;
 
 			item->animNumber = ANIMATION_LARA_WATERSKIN_FILL;
 		}
@@ -458,13 +463,13 @@ int UseSpecialItem(ITEM_INFO* item)
 		{
 			if (selectedObject >= ID_WATERSKIN2_EMPTY)
 			{
-				item->itemFlags[3] = g_LaraExtra.Waterskin2.Quantity;
-				g_LaraExtra.Waterskin2.Quantity = 1;
+				item->itemFlags[3] = Lara.Waterskin2.Quantity;
+				Lara.Waterskin2.Quantity = 1;
 			}
 			else
 			{
-				item->itemFlags[3] = g_LaraExtra.Waterskin1.Quantity;
-				g_LaraExtra.Waterskin1.Quantity = 1;
+				item->itemFlags[3] = Lara.Waterskin1.Quantity;
+				Lara.Waterskin1.Quantity = 1;
 			}
 
 			item->animNumber = ANIMATION_LARA_WATERSKIN_EMPTY;
@@ -713,9 +718,9 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)//1D244, 1D3D8 (F)
 
 	if (item->frameNumber == Anims[item->animNumber].frameEnd)
 	{
-		item->pos.xPos += 700 * SIN(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.xPos += 700 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
 		item->pos.yPos -= 361;
-		item->pos.zPos += 700 * COS(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.zPos += 700 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 		item->animNumber = ANIMATION_LARA_TRY_HANG_SOLID;
 		item->frameNumber = Anims[item->animNumber].frameBase;
@@ -744,7 +749,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 			pos.y = 0;
 			pos.z = 0;
 
-			GetLaraJointPosition(&pos, LJ_RFOOT);
+			GetLaraJointPosition(&pos, LM_RFOOT);
 
 			item->pos.xPos = pos.x;
 			item->pos.yPos = pos.y + 75;
@@ -3826,8 +3831,8 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
 		}
 		else
 		{
-			item->pos.xPos -= (SIN(item->pos.yRot)) << 6 >> W2V_SHIFT;
-			item->pos.zPos -= (COS(item->pos.yRot)) << 6 >> W2V_SHIFT;
+			item->pos.xPos -= (phd_sin(item->pos.yRot)) << 6 >> W2V_SHIFT;
+			item->pos.zPos -= (phd_cos(item->pos.yRot)) << 6 >> W2V_SHIFT;
 			item->goalAnimState = STATE_LARA_FREEFALL;
 		}
 	}
@@ -4885,13 +4890,13 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 								int x = item->pos.xPos;
 								int z = item->pos.zPos;
 
-								item->pos.xPos += 128 * SIN(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
-								item->pos.zPos += 128 * COS(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
+								item->pos.xPos += 128 * phd_sin(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
+								item->pos.zPos += 128 * phd_cos(item->pos.yRot - ANGLE(90)) >> W2V_SHIFT;
 
 								heightl = LaraFloorFront(item, item->pos.yRot, -300);
 
-								item->pos.xPos += 256 * SIN(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
-								item->pos.zPos += 256 * COS(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+								item->pos.xPos += 256 * phd_sin(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
+								item->pos.zPos += 256 * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 
 								heightr = LaraFloorFront(item, item->pos.yRot, -300);
 
@@ -4916,8 +4921,8 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 										int x = item->pos.xPos;
 										int z = item->pos.zPos;
 
-										item->pos.xPos -= 100 * SIN(coll->facing) >> W2V_SHIFT;
-										item->pos.zPos -= 100 * COS(coll->facing) >> W2V_SHIFT;
+										item->pos.xPos -= 100 * phd_sin(coll->facing) >> W2V_SHIFT;
+										item->pos.zPos -= 100 * phd_cos(coll->facing) >> W2V_SHIFT;
 
 										//tmp = GetCollidedObjects(item, 100, 1, wat, wat, 0);
 										//S_Warn("[lara_col_all4s] - Warning: Core Design function call shittery\n");
@@ -5006,9 +5011,9 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 			s.z = LaraItem->pos.zPos;
 			s.roomNumber = LaraItem->roomNumber;
 
-			d.x = s.x + (768 * SIN(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.x = s.x + (768 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
 			d.y = s.y + 160;
-			d.z = s.z + (768 * COS(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.z = s.z + (768 * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT);
 
 			if (LOS(&s, &d))
 			{
@@ -5682,8 +5687,8 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
 		break;
 
 	case CT_CLAMP:
-		item->pos.zPos -= (400 * COS(coll->facing)) >> W2V_SHIFT;
-		item->pos.xPos -= (400 * SIN(coll->facing)) >> W2V_SHIFT;
+		item->pos.zPos -= (400 * phd_cos(coll->facing)) >> W2V_SHIFT;
+		item->pos.xPos -= (400 * phd_sin(coll->facing)) >> W2V_SHIFT;
 
 		item->speed = 0;
 
@@ -5746,8 +5751,8 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 		item->pos.yRot -= ANGLE(5);
 		break;
 	case CT_CLAMP:
-		item->pos.xPos -= (100 * 4 * SIN(coll->facing)) >> W2V_SHIFT;
-		item->pos.zPos -= (100 * 4 * COS(coll->facing)) >> W2V_SHIFT;
+		item->pos.xPos -= (100 * 4 * phd_sin(coll->facing)) >> W2V_SHIFT;
+		item->pos.zPos -= (100 * 4 * phd_cos(coll->facing)) >> W2V_SHIFT;
 
 		item->speed = 0;
 		coll->midFloor = 0;
@@ -6087,9 +6092,9 @@ short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h) // (F) (D)
 {
 	short room = item->roomNumber;
 
-	int x = item->pos.xPos + ((dist * SIN(ang)) >> W2V_SHIFT);
+	int x = item->pos.xPos + ((dist * phd_sin(ang)) >> W2V_SHIFT);
 	int y = item->pos.yPos - h;
-	int z = item->pos.zPos + ((dist * COS(ang)) >> W2V_SHIFT);
+	int z = item->pos.zPos + ((dist * phd_cos(ang)) >> W2V_SHIFT);
 
 	int height = GetCeiling(GetFloor(x, y, z, &room), x, y, z);
 
@@ -6103,9 +6108,9 @@ short LaraFloorFront(ITEM_INFO* item, short ang, int dist) // (F) (D)
 {
 	short room = item->roomNumber;
 
-	int x = item->pos.xPos + ((dist * SIN(ang)) >> W2V_SHIFT);
+	int x = item->pos.xPos + ((dist * phd_sin(ang)) >> W2V_SHIFT);
 	int y = item->pos.yPos - 762;
-	int z = item->pos.zPos + ((dist * COS(ang)) >> W2V_SHIFT);
+	int z = item->pos.zPos + ((dist * phd_cos(ang)) >> W2V_SHIFT);
 
 	int height = GetFloorHeight(GetFloor(x, y, z, &room), x, y, z);
 
@@ -6202,7 +6207,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->goalAnimState = STATE_LARA_JUMP_UP;
 			item->currentAnimState = STATE_LARA_STOP;
-			Lara.calcFallSpeed = -3 - SQRT_ASM(-9600 - 12 * coll->frontFloor);
+			Lara.calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->frontFloor);
 			AnimateLara(item);
 		}
 		else
@@ -6645,10 +6650,4 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		}
 	}
 	return result;
-}
-
-void Inject_Lara()
-{
-	//INJECT(0x00448010, lara_as_stop);
-	//INJECT(0x00442E70, LaraAboveWater);
 }

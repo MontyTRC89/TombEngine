@@ -10,15 +10,18 @@
 #include "sphere.h"
 #include "footprint.h"
 #include "..\Objects\oldobjects.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "debris.h"
 #include "../Specific/setup.h"
 #include "camera.h"
+#include "savegame.h"
+#include "sound.h"
 
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 
 short FXType;
+FX_INFO* Effects;
 
 void(*effect_routines[59])(ITEM_INFO* item) =
 {
@@ -448,14 +451,14 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 
 	if (item->pos.yRot == -ANGLE(180))
 	{
-		x = item->pos.xPos - (SIN(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2048] * wf) >> W2V_SHIFT);
-		z = item->pos.zPos - (COS(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2049] * wf) >> W2V_SHIFT);
+		x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2048] * wf) >> W2V_SHIFT);
+		z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 3) + ((rcossin_tbl[2049] * wf) >> W2V_SHIFT);
 	}
 	else
 	{
 		//3934C
-		x = item->pos.xPos - (SIN(item->pos.yRot + ANGLE(180)) >> 3) + ((SIN(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
-		z = item->pos.zPos - (COS(item->pos.yRot + ANGLE(180)) >> 3) + ((COS(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
+		x = item->pos.xPos - (phd_sin(item->pos.yRot + ANGLE(180)) >> 3) + ((phd_sin(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
+		z = item->pos.zPos - (phd_cos(item->pos.yRot + ANGLE(180)) >> 3) + ((phd_cos(item->pos.yRot + ANGLE(90)) * wf) >> W2V_SHIFT);
 	}
 
 	//393A0
@@ -503,11 +506,13 @@ void Richochet(PHD_3DPOS* pos)
 	SoundEffect(SFX_LARA_RICOCHET, pos, 0);
 }
 
-void Inject_Effects()
+void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
 {
-	INJECT(0x00432580, ItemNearLara);
-	INJECT(0x00478FE0, StopSoundEffect);
-	INJECT(0x00432760, DoBloodSplat);
-	INJECT(0x00402FB3, ClearSpidersPatch);
-	INJECT(0x00432710, Richochet);
+	for (int i = 0; i < count; i++)
+	{
+		DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
+			y + 256 - (GetRandomControl() * 512 / 0x8000),
+			z + 256 - (GetRandomControl() * 512 / 0x8000),
+			speed, direction, roomNumber);
+	}
 }

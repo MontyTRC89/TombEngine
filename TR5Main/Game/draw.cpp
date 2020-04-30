@@ -2,6 +2,7 @@
 #include "Lara.h"
 #include "..\Renderer\Renderer11.h"
 #include "camera.h"
+#include "../Specific/level.h"
 
 BITE_INFO EnemyBites[9] =
 {
@@ -28,21 +29,12 @@ short InterpolatedBounds[6];
 LARGE_INTEGER PerformanceCount;
 double LdFreq;
 double LdSync;
+int GnFrameCounter;
 
 int DrawPhaseGame()
 {
-	// Control routines uses joints calculated here for getting Lara joint positions
-	CalcLaraMatrices(0);
-	phd_PushUnitMatrix();
-	CalcLaraMatrices(1);
-
-	// Calls my new rock & roll renderer :)
 	g_Renderer->Draw();
 	Camera.numberFrames = g_Renderer->SyncRenderer();
-
-	// We need to pop the matrix stack or the game will crash
-	phd_PopMatrix();
-
 	return Camera.numberFrames;
 }
 
@@ -163,7 +155,6 @@ bool TIME_Init()
 
 int Sync()
 {
-	int nFrames;
 	LARGE_INTEGER ct;
 	double dCounter;
 	
@@ -172,7 +163,7 @@ int Sync()
 	dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xFFFFFFFF;
 	dCounter /= LdFreq;
 	
-	nFrames = long(dCounter) - long(LdSync);
+	long nFrames = long(dCounter) - long(LdSync);
 	
 	LdSync = dCounter;
 	
@@ -182,136 +173,18 @@ int Sync()
 void DrawAnimatingItem(ITEM_INFO* item)
 {
 	// TODO: to refactor
-	// Empty stub because actually we disable items draing when drawRoutine pointer is NULL in OBJECT_INFO
+	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in ObjectInfo
 }
 
-void _InitInterpolate(void)
+void GetLaraJointPosition(PHD_VECTOR* pos, int joint)
 {
-}
+	if (joint > 14)
+		joint = 14;
 
-void _phd_PushMatrix(void)
-{
-}
+	Vector3 p = Vector3(pos->x, pos->y, pos->z);
+	g_Renderer->GetLaraAbsBonePosition(&p, joint);
 
-void _phd_PushMatrix_I(void)
-{
-}
-
-void _phd_PushUnitMatrix(void)
-{
-}
-
-void _phd_RotYXZ(short ry, short rx, short rz)
-{
-}
-
-void _phd_RotY(short ry)
-{
-}
-
-void _phd_RotY_I(short ry)
-{
-}
-
-void _phd_RotX(short rx)
-{
-}
-
-void _phd_RotX_I(short rx)
-{
-}
-
-void _phd_RotZ(short rz)
-{
-}
-
-void _phd_RotZ_I(short rz)
-{
-}
-
-void _phd_PutPolygons(void)
-{
-}
-
-void _phd_PutPolygons_I(void)
-{
-}
-
-void _phd_TranslateRel(int x, int y, int z)
-{
-}
-
-void _phd_TranslateRel_I(int x, int y, int z)
-{
-}
-
-void _phd_TranslateRel_ID(int x1, int y1, int z1, int x2, int y2, int z2)
-{
-}
-
-void _phd_TranslateAbs(int x, int y, int z)
-{
-}
-
-void _phd_RotYXZpack(short ry, short rx, short rz)
-{
-}
-
-void _gar_RotYXZsuperpack(short** pproc, int skip)
-{
-}
-
-void _gar_RotYXZsuperpack_I(short** pproc1, short** pproc2, int skip)
-{
-}
-
-void _phd_ClipBoundingBox(short* frames)
-{
-}
-
-void _phd_DxTranslateRel(int x, int y, int z)
-{
-}
-
-void _phd_DxTranslateAbs(int x, int y, int z)
-{
-}
-
-void _phd_DxRotY(short ry)
-{
-}
-
-void _phd_DxRotX(short rx)
-{
-}
-
-void _phd_DxRotZ(short rz)
-{
-}
-
-void _phd_DxRotYXZ(short ry, short rx, short rz)
-{
-}
-
-void _phd_DxRotYXZpack(int rangle)
-{
-}
-
-void phd_PopMatrix(void)
-{
-	MatrixPtr -= 12;
-	DxMatrixPtr -= 48;
-}
-
-void _phd_PopMatrix_I(void)
-{
-	MatrixPtr -= 12;
-	DxMatrixPtr -= 48;
-}
-
-void Inject_Draw()
-{
-	/*INJECT(GetBoundsAccurate, 0x0042CF80);
-	INJECT(GetBestFrame, 0x0042D020);
-	INJECT(Sync, 0x004D1A40);*/
+	pos->x = p.x;
+	pos->y = p.y;
+	pos->z = p.z;
 }

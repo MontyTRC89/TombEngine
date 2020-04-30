@@ -7,10 +7,11 @@
 #include "../../Game/people.h"
 #include "../../Specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 void InitialiseTroops(short itemNum)
 {
@@ -39,7 +40,7 @@ void TroopsControl(short itemNum)
 
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 	short angle = 0;
 	short tilt = 0;
 	short joint0 = 0;
@@ -165,13 +166,13 @@ void TroopsControl(short itemNum)
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
 			distance = dx * dx + dz * dz;
-			rot = ATAN(dz, dx) - item->pos.yRot;
+			rot = phd_atan(dz, dx) - item->pos.yRot;
 		}
 
 		GetCreatureMood(item, &info, TIMID);
 
 		// Vehicle handling
-		if (g_LaraExtra.Vehicle != NO_ITEM && info.bite)
+		if (Lara.Vehicle != NO_ITEM && info.bite)
 			creature->mood == ESCAPE_MOOD;
 
 		CreatureMood(item, &info, TIMID);

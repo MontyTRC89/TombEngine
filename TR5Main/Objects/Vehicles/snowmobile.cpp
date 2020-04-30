@@ -8,12 +8,16 @@
 #include "../../Game/effect2.h"
 #include "../../Game/laraflar.h"
 #include "../../Game/lot.h"
+#include "../../Game/tomb4fx.h"
 #include "../../Game/sphere.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Specific/input.h"
+#include "../../Game/sound.h"
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 enum SKIDOO_STATE { SKID_SIT, SKID_GETON, SKID_LEFT, SKID_RIGHT, SKID_FALL, SKID_HIT, SKID_GETONL, SKID_GETOFFL, SKID_STILL, SKID_GETOFF, SKID_LETGO, SKID_DEATH, SKID_FALLOFF };
 
@@ -60,7 +64,7 @@ void InitialiseSkidoo(short itemNum)
 	SKIDOO_INFO* skinfo;
 
 	skidoo = &Items[itemNum];
-	skinfo = (SKIDOO_INFO*)GameMalloc(sizeof(SKIDOO_INFO));
+	skinfo = (SKIDOO_INFO*)game_malloc(sizeof(SKIDOO_INFO));
 	skidoo->data = (void*)skinfo;
 	skinfo->already_cd_played = false;
 
@@ -111,7 +115,7 @@ void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 			ITEM_INFO* target = &Items[itemNum];
 			if (target->collidable && target->status != ITEM_INVISIBLE && target != LaraItem && target != skidoo)
 			{
-				OBJECT_INFO* object = &Objects[target->objectNumber];
+				ObjectInfo* object = &Objects[target->objectNumber];
 				if (object->collision && (object->intelligent || target->objectNumber == ID_ROLLINGBALL))
 				{
 					int x = skidoo->pos.xPos - target->pos.xPos;
@@ -153,7 +157,7 @@ void SkidooGuns(void)
 	short angles[2];
 
 	winfo = &Weapons[WEAPON_SNOWMOBILE];
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 	skinfo = (SKIDOO_INFO*)skidoo->data;
 
 	/* Get Target Information; skidoo retargets all the time */
@@ -191,12 +195,12 @@ void SkidooExplode(ITEM_INFO* skidoo)
 			TriggerExplosionSparks(skidoo->pos.xPos, skidoo->pos.yPos, skidoo->pos.zPos, 3, -1, 0, skidoo->roomNumber);
 	}
 
-	ExplodingDeath(g_LaraExtra.Vehicle, -1, 256);
-	KillItem(g_LaraExtra.Vehicle);
+	ExplodingDeath(Lara.Vehicle, -1, 256);
+	KillItem(Lara.Vehicle);
 	skidoo->status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_EXPLOSION1, 0, 0);
 	SoundEffect(SFX_EXPLOSION2, 0, 0);
-	g_LaraExtra.Vehicle = NO_ITEM;
+	Lara.Vehicle = NO_ITEM;
 }
 
 int SkidooCheckGetOffOK(int direction)
@@ -207,16 +211,16 @@ int SkidooCheckGetOffOK(int direction)
 	ITEM_INFO* skidoo;
 	FLOOR_INFO* floor;
 
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 
 	if (direction == SKID_GETOFFL)
 		angle = skidoo->pos.yRot + 0x4000;
 	else
 		angle = skidoo->pos.yRot - 0x4000;
 
-	x = skidoo->pos.xPos - (SKIDOO_GETOFF_DIST * SIN(angle) >> W2V_SHIFT);
+	x = skidoo->pos.xPos - (SKIDOO_GETOFF_DIST * phd_sin(angle) >> W2V_SHIFT);
 	y = skidoo->pos.yPos;
-	z = skidoo->pos.zPos - (SKIDOO_GETOFF_DIST * COS(angle) >> W2V_SHIFT);
+	z = skidoo->pos.zPos - (SKIDOO_GETOFF_DIST * phd_cos(angle) >> W2V_SHIFT);
 
 	roomNumber = skidoo->roomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
@@ -242,7 +246,7 @@ int SkidooCheckGetOffOK(int direction)
 int SkidooCheckGetOff()
 {
 	ITEM_INFO* skidoo;
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 
 	if ((LaraItem->currentAnimState == SKID_GETOFF || LaraItem->currentAnimState == SKID_GETOFFL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
 	{
@@ -255,10 +259,10 @@ int SkidooCheckGetOff()
 		LaraItem->animNumber = 11;
 		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = LaraItem->goalAnimState = 2;
-		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * SIN(LaraItem->pos.yRot) >> W2V_SHIFT;
-		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * COS(LaraItem->pos.yRot) >> W2V_SHIFT;
+		LaraItem->pos.xPos -= SKIDOO_GETOFF_DIST * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
+		LaraItem->pos.zPos -= SKIDOO_GETOFF_DIST * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-		g_LaraExtra.Vehicle = NO_ITEM;
+		Lara.Vehicle = NO_ITEM;
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 	else if (LaraItem->currentAnimState == SKID_LETGO && (skidoo->pos.yPos == skidoo->floor || LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd))
@@ -308,14 +312,14 @@ void DoSnowEffect(ITEM_INFO* skidoo)
 	fx_number = CreateNewEffect(skidoo->roomNumber);
 	if (fx_number != NO_ITEM)
 	{
-		s = SIN(skidoo->pos.yRot);
-		c = COS(skidoo->pos.yRot);
+		s = phd_sin(skidoo->pos.yRot);
+		c = phd_cos(skidoo->pos.yRot);
 
 		x = (GetRandomControl() - 0x4000) * SKIDOO_SIDE >> 14;
 
 		fx = &Effects[fx_number];
 		fx->pos.xPos = skidoo->pos.xPos - (SKIDOO_SNOW * s + x * c >> W2V_SHIFT);
-		fx->pos.yPos = skidoo->pos.yPos + (SKIDOO_SNOW * SIN(skidoo->pos.xRot) >> W2V_SHIFT);
+		fx->pos.yPos = skidoo->pos.yPos + (SKIDOO_SNOW * phd_sin(skidoo->pos.xRot) >> W2V_SHIFT);
 		fx->pos.zPos = skidoo->pos.zPos - (SKIDOO_SNOW * c - x * s >> W2V_SHIFT);
 		fx->roomNumber = skidoo->roomNumber;
 		fx->frameNumber = 0;
@@ -449,8 +453,8 @@ int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	if (moved->x || moved->z)
 	{
 		/* Get direction of movement relative to facing */
-		c = COS(skidoo->pos.yRot);
-		s = SIN(skidoo->pos.yRot);
+		c = phd_cos(skidoo->pos.yRot);
+		s = phd_sin(skidoo->pos.yRot);
 		front = (moved->z * c + moved->x * s) >> W2V_SHIFT;
 		side = (-moved->z * s + moved->x * c) >> W2V_SHIFT;
 		if (abs(front) > abs(side))
@@ -624,7 +628,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	ITEM_INFO* skidoo;
 
 	/* If Lara dead or already on the skidoo, then no collision */
-	if (litem->hitPoints < 0 || g_LaraExtra.Vehicle != NO_ITEM)
+	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
 	/* If player isn't pressing control or Lara is busy, then do normal object collision */
@@ -636,7 +640,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	}
 
 	/* Yeeha! Get on that skidoo girly */
-	g_LaraExtra.Vehicle = itemNum;
+	Lara.Vehicle = itemNum;
 
 	/* Drop flare if in hand */
 	if (Lara.gunType == WEAPON_FLARE)
@@ -669,11 +673,11 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 /* Get height at a position offset from the origin. Moves the vector in 'pos' to the required test position too */
 int TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 {
-	pos->y = item->pos.yPos - (z_off * SIN(item->pos.xRot) >> W2V_SHIFT) +
-		                      (x_off * SIN(item->pos.zRot) >> W2V_SHIFT);
+	pos->y = item->pos.yPos - (z_off * phd_sin(item->pos.xRot) >> W2V_SHIFT) +
+		                      (x_off * phd_sin(item->pos.zRot) >> W2V_SHIFT);
 
-	int c = COS(item->pos.yRot);
-	int s = SIN(item->pos.yRot);
+	int c = phd_cos(item->pos.yRot);
+	int s = phd_sin(item->pos.yRot);
 
 	pos->z = item->pos.zPos + ((z_off * c - x_off * s) >> W2V_SHIFT);
 	pos->x = item->pos.xPos + ((z_off * s + x_off * c) >> W2V_SHIFT);
@@ -878,22 +882,22 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 		skidoo->pos.yRot += skinfo->skidoo_turn + skinfo->extra_rotation;
 
 	/* Move skidoo according to speed */
-	skidoo->pos.zPos += skidoo->speed * COS(skinfo->momentum_angle) >> W2V_SHIFT;
-	skidoo->pos.xPos += skidoo->speed * SIN(skinfo->momentum_angle) >> W2V_SHIFT;
+	skidoo->pos.zPos += skidoo->speed * phd_cos(skinfo->momentum_angle) >> W2V_SHIFT;
+	skidoo->pos.xPos += skidoo->speed * phd_sin(skinfo->momentum_angle) >> W2V_SHIFT;
 
 	/* Slide skidoo according to tilts (to avoid getting stuck on slopes) */
-	slip = SKIDOO_SLIP * SIN(skidoo->pos.xRot) >> W2V_SHIFT;
+	slip = SKIDOO_SLIP * phd_sin(skidoo->pos.xRot) >> W2V_SHIFT;
 	if (abs(slip) > SKIDOO_SLIP / 2)
 	{
-		skidoo->pos.zPos -= slip * COS(skidoo->pos.yRot) >> W2V_SHIFT;
-		skidoo->pos.xPos -= slip * SIN(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.zPos -= slip * phd_cos(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.xPos -= slip * phd_sin(skidoo->pos.yRot) >> W2V_SHIFT;
 	}
 
-	slip = SKIDOO_SLIP_SIDE * SIN(skidoo->pos.zRot) >> W2V_SHIFT;
+	slip = SKIDOO_SLIP_SIDE * phd_sin(skidoo->pos.zRot) >> W2V_SHIFT;
 	if (abs(slip) > SKIDOO_SLIP_SIDE / 2)
 	{
-		skidoo->pos.zPos -= slip * SIN(skidoo->pos.yRot) >> W2V_SHIFT;
-		skidoo->pos.xPos += slip * COS(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.zPos -= slip * phd_sin(skidoo->pos.yRot) >> W2V_SHIFT;
+		skidoo->pos.xPos += slip * phd_cos(skidoo->pos.yRot) >> W2V_SHIFT;
 	}
 
 	/* Remember desired position in case of collisions moving us about */
@@ -902,7 +906,7 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 
 	/* Test against bad guys too */
 	if (!(skidoo->flags & ONESHOT)) // ONESHOT flag set if skidoo no longer travelling with Lara
-		SkidooBaddieCollision(g_LaraExtra.Vehicle, skidoo);
+		SkidooBaddieCollision(Lara.Vehicle, skidoo);
 
 	/* Test new positions of points (one at a time) and shift skidoo accordingly */
 	rot = 0;
@@ -936,7 +940,7 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 	/* Check final actual movement; if speed is more than halved then reduce to zero */
 	if (collide)
 	{
-		newspeed = ((skidoo->pos.zPos - old.z) * COS(skinfo->momentum_angle) + (skidoo->pos.xPos - old.x) * SIN(skinfo->momentum_angle)) >> W2V_SHIFT;
+		newspeed = ((skidoo->pos.zPos - old.z) * phd_cos(skinfo->momentum_angle) + (skidoo->pos.xPos - old.x) * phd_sin(skinfo->momentum_angle)) >> W2V_SHIFT;
 		if (skidoo->speed > SKIDOO_MAX_SPEED + SKIDOO_ACCELERATION && newspeed < skidoo->speed - 10)
 		{
 			LaraItem->hitPoints -= (skidoo->speed - newspeed) >> 1;
@@ -967,7 +971,7 @@ int SkidooControl()
 	short roomNumber, x_rot, z_rot, bandit_skidoo;
 	int pitch, dead = 0;
 
-	skidoo = &Items[g_LaraExtra.Vehicle];
+	skidoo = &Items[Lara.Vehicle];
 	skinfo = (SKIDOO_INFO*)skidoo->data;
 	collide = SkidooDynamics(skidoo);
 
@@ -1048,8 +1052,8 @@ int SkidooControl()
 
 	/* Rotate skidoo to match these heights */
 	height = (fl.y + fr.y) >> 1;
-	x_rot = ATAN(SKIDOO_FRONT, skidoo->pos.yPos - height);
-	z_rot = ATAN(SKIDOO_SIDE, height - fl.y);
+	x_rot = phd_atan(SKIDOO_FRONT, skidoo->pos.yPos - height);
+	z_rot = phd_atan(SKIDOO_SIDE, height - fl.y);
 
 	skidoo->pos.xRot += (x_rot - skidoo->pos.xRot) >> 1;
 	skidoo->pos.zRot += (z_rot - skidoo->pos.zRot) >> 1;
@@ -1061,7 +1065,7 @@ int SkidooControl()
 		/* This is a falling skidoo - Lara is elsewhere */
 		if (roomNumber != skidoo->roomNumber)
 		{
-			ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+			ItemNewRoom(Lara.Vehicle, roomNumber);
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 		}
 
@@ -1077,7 +1081,7 @@ int SkidooControl()
 
 	if (roomNumber != skidoo->roomNumber)
 	{
-		ItemNewRoom(g_LaraExtra.Vehicle, roomNumber);
+		ItemNewRoom(Lara.Vehicle, roomNumber);
 		ItemNewRoom(Lara.itemNumber, roomNumber);
 	}
 

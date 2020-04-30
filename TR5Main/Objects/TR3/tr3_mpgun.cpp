@@ -6,6 +6,9 @@
 #include "../../Game/people.h"
 #include "../../specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
 
 enum MPGUN_STATES {
 	MPGUN_EMPTY, 
@@ -140,7 +143,7 @@ void MPGunControl(short itemNumber)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot; 
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot; 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 
@@ -149,9 +152,9 @@ void MPGunControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		int x = item->pos.xPos + (WALL_SIZE * SIN(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
+		int x = item->pos.xPos + (WALL_SIZE * phd_sin(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
 		int y = item->pos.yPos;
-		int z = item->pos.zPos + (WALL_SIZE * COS(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
+		int z = item->pos.zPos + (WALL_SIZE * phd_cos(item->pos.yRot + laraInfo.angle) >> W2V_SHIFT);
 		
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);

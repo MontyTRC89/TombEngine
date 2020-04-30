@@ -22,9 +22,7 @@
 #include "..\Objects\oldobjects.h"
 #include "..\Objects\newobjects.h"
 
-#include "..\Game\rat.h"
-
-#include "roomload.h"
+#include "level.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,12 +45,12 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASH];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+ObjectInfo Objects[ID_NUMBER_OBJECTS];
 STATIC_INFO StaticObjects[NUM_STATICS];
 
 void NewObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
@@ -1133,7 +1131,7 @@ void NewObjects()
 
 void BaddyObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	/* Initialise Lara directly since lara will be used all the time. */
 	obj = &Objects[ID_LARA];
@@ -1637,7 +1635,7 @@ void BaddyObjects()
 		obj->biteOffset = 0;
 		obj->initialise = InitialiseGuardLaser;
 		obj->collision = CreatureCollision;
-		obj->control = GuardControlLaser;
+		//obj->control = GuardControlLaser;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 24;
 		obj->pivotLength = 50;
@@ -1710,7 +1708,7 @@ void BaddyObjects()
 	{
 		obj->biteOffset = 256;
 		obj->initialise = InitialiseLightingGuide;
-		obj->control = ControlLightingGuide;
+		//obj->control = ControlLightingGuide;
 		obj->drawRoutine = NULL;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->radius = 256;
@@ -1817,17 +1815,14 @@ void BaddyObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	// TODO: spider is deleted !
-	/*
 	obj = &Objects[ID_SPIDERS_EMITTER];
 	if (obj->loaded)
 	{
-		//*(&Objects[95] + 25) &= 0xFDFFu;
 		obj->drawRoutine = NULL;
 		obj->initialise = InitialiseSpiders;
 		obj->control = ControlSpiders;
+		obj->usingDrawAnimatingItem = false;
 	}
-	*/
 
 	obj = &Objects[ID_GLADIATOR];
 	if (obj->loaded)
@@ -1927,7 +1922,7 @@ void BaddyObjects()
 // TODO: add the flags
 void ObjectObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_CAMERA_TARGET];
 	if (obj->loaded)
@@ -2196,7 +2191,6 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
-		obj->drawRoutine = Legacy_DrawLiftDoor;
 		obj->saveFlags = true;
 	}
 
@@ -2205,7 +2199,6 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseDoor;
 		obj->control = DoorControl;
-		obj->drawRoutine = Legacy_DrawLiftDoor;
 		obj->saveFlags = true;
 	}
 
@@ -2564,21 +2557,21 @@ void ObjectObjects()
 	{
 		obj->initialise = InitialiseSteelDoor;
 		obj->collision = SteelDoorCollision;
-		obj->control = Legacy_SteelDoorControl;
+		//obj->control = Legacy_SteelDoorControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->saveMesh = true;
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_XRAY_CONTROLLER];
+	/*obj = &Objects[ID_XRAY_CONTROLLER];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseXRayMachine;
 		obj->control = ControlXRayMachine;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
-	}
+	}*/
 
 	// by default loaded, explosion time :D
 	obj = &Objects[ID_BODY_PART];
@@ -2643,7 +2636,7 @@ void ObjectObjects()
 	obj = &Objects[ID_LENS_FLARE];
 	if (obj->loaded)
 	{
-		obj->drawRoutine = DrawLensFlare;
+		//obj->drawRoutine = DrawLensFlare;
 		obj->saveFlags = true;
 	}
 
@@ -2723,7 +2716,7 @@ void ObjectObjects()
 
 void TrapObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_ELECTRICAL_CABLES];
 	if (obj->loaded)
@@ -2811,7 +2804,7 @@ void TrapObjects()
 	if (obj->loaded)
 	{
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->drawRoutine = DrawDart;
+		//obj->drawRoutine = DrawDart;
 		obj->collision = ObjectCollision;
 		obj->control = DartControl;
 		obj->usingDrawAnimatingItem = false;
@@ -2886,9 +2879,9 @@ void TrapObjects()
 	obj = &Objects[ID_GEN_SLOT2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGenSlot2;
+		/*obj->initialise = InitialiseGenSlot2;
 		obj->control = GenSlot2Control;
-		obj->drawRoutine = DrawGenSlot2;
+		obj->drawRoutine = DrawGenSlot2;*/
 		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
 	}
@@ -2907,7 +2900,7 @@ void TrapObjects()
 	if (obj->loaded)
 	{
 		//obj->initialise = InitialiseGenSlot4;
-		obj->control = GenSlot4Control;
+		//obj->control = GenSlot4Control;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -2926,7 +2919,7 @@ void TrapObjects()
 	obj = &Objects[ID_PORTAL];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialisePortal;
+		//obj->initialise = InitialisePortal;
 		//obj->control = PortalControl;        // TODO: found the control procedure !
 		obj->drawRoutine = NULL;             // go to nullsub_44() !
 		obj->saveFlags = true; 
@@ -2942,7 +2935,8 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	InitialiseRopeTrap();
+	//FIXME
+	//InitialiseRopeTrap();
 
 	obj = &Objects[ID_ROPE];
 	if (obj->loaded)
@@ -2968,7 +2962,7 @@ void TrapObjects()
 		obj->initialise = InitialiseWreckingBall;
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
-		obj->drawRoutineExtra = DrawWreckingBall;
+		//obj->drawRoutineExtra = DrawWreckingBall;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -3006,7 +3000,7 @@ void InitialiseSpecialEffects()
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
-	memset(&GunFlashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
+	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASH * sizeof(SPLASH_STRUCT));
 	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));
@@ -3032,7 +3026,7 @@ void InitialiseSpecialEffects()
 
 void PickupObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	for (int objNum = ID_PUZZLE_ITEM1; objNum <= ID_EXAMINE8_COMBO2; objNum++)
 	{
@@ -3083,7 +3077,7 @@ void PickupObjects()
 
 void CustomObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_GOON_SILENCER1];
 	if (obj->loaded)
@@ -3690,7 +3684,7 @@ void CustomObjects()
 
 void InitialiseObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
@@ -3733,7 +3727,7 @@ void InitialiseObjects()
 
 	/*for (int i = 0; i < 400; i++)
 	{
-		memcpy(&LegacyObjects[i], &Objects[i], sizeof(OBJECT_INFO));
+		memcpy(&LegacyObjects[i], &Objects[i], sizeof(ObjectInfo));
 	}*/
 	
 	// New objects imported from old TRs
@@ -3761,13 +3755,13 @@ void InitialiseObjects()
 	SequenceUsed[5] = 0;
 
 	if (Objects[ID_BATS_EMITTER].loaded)
-		Bats = (BAT_STRUCT*)GameMalloc(NUM_BATS * sizeof(BAT_STRUCT));
+		Bats = (BAT_STRUCT*)game_malloc(NUM_BATS * sizeof(BAT_STRUCT));
 
 	if (Objects[ID_SPIDERS_EMITTER].loaded)
-		Spiders = (SPIDER_STRUCT*)GameMalloc(NUM_SPIDERS * sizeof(SPIDER_STRUCT));
+		Spiders = (SPIDER_STRUCT*)game_malloc(NUM_SPIDERS * sizeof(SPIDER_STRUCT));
 
 	if (Objects[ID_RATS_EMITTER].loaded)
-		Rats = (RAT_STRUCT*)GameMalloc(NUM_RATS * sizeof(RAT_STRUCT));
+		Rats = (RAT_STRUCT*)game_malloc(NUM_RATS * sizeof(RAT_STRUCT));
 }
 
 void InitialiseGameFlags()
@@ -3779,12 +3773,4 @@ void InitialiseGameFlags()
 	FlipStatus = 0;
 	IsAtmospherePlaying = 0;
 	Camera.underwater = 0;
-}
-
-void Inject_Setup()
-{
-	INJECT(0x00473600, InitialiseObjects);
-	INJECT(0x004737C0, BaddyObjects);
-	INJECT(0x00476360, ObjectObjects);
-	INJECT(0x00475D40, TrapObjects);
 }

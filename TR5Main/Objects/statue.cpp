@@ -9,7 +9,7 @@
 void DrawStatue(ITEM_INFO* item)
 {
 	/*
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 	CREATURE_INFO* creature;
 	int* bones;
 	int clip, i, poppush, frac, rate, bit;

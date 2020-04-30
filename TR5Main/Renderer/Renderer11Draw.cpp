@@ -13,8 +13,10 @@
 #include "../Game/tomb4fx.h"
 #include "../Game/door.h"
 #include "../Objects/oldobjects.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
+#include "../Game/control.h"
+#include "../Game/sound.h"
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
@@ -47,7 +49,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 	view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
 	projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
-	OBJECT_INFO * obj = &Objects[objectNum];
+	ObjectInfo * obj = &Objects[objectNum];
 	RendererObject * moveableObj = m_moveableObjects[objectNum];
 
 	if (obj->animIndex != -1)
@@ -86,7 +88,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 
 		// Finish the world matrix
 		translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
-		rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(rotY), TR_ANGLE_TO_RAD(rotX), TR_ANGLE_TO_RAD(rotZ));
+		rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rotY), TO_RAD(rotX), TO_RAD(rotZ));
 		scale = Matrix::CreateScale(0.5f);
 
 		world = scale * rotation;
@@ -408,11 +410,11 @@ bool Renderer11::drawGunShells()
 
 		if (gunshell->counter > 0)
 		{
-			OBJECT_INFO* obj = &Objects[gunshell->objectNumber];
+			ObjectInfo* obj = &Objects[gunshell->objectNumber];
 			RendererObject* moveableObj = m_moveableObjects[gunshell->objectNumber];
 
 			Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
-			Matrix rotation = Matrix::CreateFromYawPitchRoll(TR_ANGLE_TO_RAD(gunshell->pos.yRot), TR_ANGLE_TO_RAD(gunshell->pos.xRot), TR_ANGLE_TO_RAD(gunshell->pos.zRot));
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.yRot), TO_RAD(gunshell->pos.xRot), TO_RAD(gunshell->pos.zRot));
 			Matrix world = rotation * translation;
 
 			m_stItem.World = world;
@@ -567,10 +569,10 @@ int Renderer11::drawInventoryScene()
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
 			Matrix translation = Matrix::CreateTranslation(x, y, z);
-			Matrix rotation = Matrix::CreateRotationY(TR_ANGLE_TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
+			Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
 			Matrix transform = (scale * rotation) * translation;
 
-			OBJECT_INFO * obj = &Objects[objectNumber];
+			ObjectInfo * obj = &Objects[objectNumber];
 			RendererObject * moveableObj = m_moveableObjects[objectNumber];
 			if (moveableObj == NULL)
 				continue;
@@ -595,10 +597,10 @@ int Renderer11::drawInventoryScene()
 				RendererMesh* mesh = moveableObj->ObjectMeshes[n];
 
 				// HACK: revolver and crossbow + lasersight
-				if (moveableObj->Id == ID_REVOLVER_ITEM && !g_LaraExtra.Weapons[WEAPON_REVOLVER].HasLasersight && n > 0)
+				if (moveableObj->Id == ID_REVOLVER_ITEM && !Lara.Weapons[WEAPON_REVOLVER].HasLasersight && n > 0)
 					break;
 
-				if (moveableObj->Id == ID_CROSSBOW_ITEM && !g_LaraExtra.Weapons[WEAPON_CROSSBOW].HasLasersight && n > 0)
+				if (moveableObj->Id == ID_CROSSBOW_ITEM && !Lara.Weapons[WEAPON_CROSSBOW].HasLasersight && n > 0)
 					break;
 
 				// Finish the world matrix
@@ -915,7 +917,7 @@ int Renderer11::drawInventoryScene()
 							}
 							else
 							{
-								PrintString(400, y, (char*)g_KeyNames[KeyboardLayout1[k]],
+								PrintString(400, y, (char*)g_KeyNames[KeyboardLayout[1][k]],
 									PRINTSTRING_COLOR_ORANGE,
 									PRINTSTRING_OUTLINE);
 							}
@@ -993,87 +995,87 @@ int Renderer11::drawInventoryScene()
 					switch (objectNumber)
 					{
 					case ID_BIGMEDI_ITEM:
-						quantity = g_LaraExtra.NumLargeMedipacks;
+						quantity = Lara.NumLargeMedipacks;
 						break;
 					case ID_SMALLMEDI_ITEM:
-						quantity = g_LaraExtra.NumSmallMedipacks;
+						quantity = Lara.NumSmallMedipacks;
 						break;
 					case ID_FLARE_INV_ITEM:
-						quantity = g_LaraExtra.NumFlares;
+						quantity = Lara.NumFlares;
 						break;
 					case ID_SHOTGUN_AMMO1_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_SHOTGUN].Ammo[0];
 						if (quantity != -1)
 							quantity /= 6;
 						break;
 					case ID_SHOTGUN_AMMO2_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_SHOTGUN].Ammo[1];
+						quantity = Lara.Weapons[WEAPON_SHOTGUN].Ammo[1];
 						if (quantity != -1)
 							quantity /= 6;
 						break;
 					case ID_HK_AMMO_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_HK].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_HK].Ammo[0];
 						break;
 					case ID_CROSSBOW_AMMO1_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_CROSSBOW].Ammo[0];
 						break;
 					case ID_CROSSBOW_AMMO2_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[1];
+						quantity = Lara.Weapons[WEAPON_CROSSBOW].Ammo[1];
 						break;
 					case ID_CROSSBOW_AMMO3_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_CROSSBOW].Ammo[2];
+						quantity = Lara.Weapons[WEAPON_CROSSBOW].Ammo[2];
 						break;
 					case ID_REVOLVER_AMMO_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_REVOLVER].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_REVOLVER].Ammo[0];
 						break;
 					case ID_UZI_AMMO_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_UZI].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_UZI].Ammo[0];
 						break;
 					case ID_PISTOLS_AMMO_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_PISTOLS].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_PISTOLS].Ammo[0];
 						break;
 					case ID_GRENADE_AMMO1_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0];
 						break;
 					case ID_GRENADE_AMMO2_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1];
+						quantity = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1];
 						break;
 					case ID_GRENADE_AMMO3_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2];
+						quantity = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2];
 						break;
 					case ID_HARPOON_AMMO_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_HARPOON_GUN].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0];
 						break;
 					case ID_ROCKET_LAUNCHER_AMMO_ITEM:
-						quantity = g_LaraExtra.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0];
+						quantity = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0];
 						break;
 					case ID_PICKUP_ITEM4:
 						quantity = Savegame.Level.Secrets;
 						break;
 					default:
 						if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
-							quantity = g_LaraExtra.Puzzles[objectNumber - ID_PUZZLE_ITEM1];
+							quantity = Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1];
 
 						else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
-							quantity = g_LaraExtra.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1];
+							quantity = Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1];
 
 						else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
-							quantity = g_LaraExtra.Keys[objectNumber - ID_KEY_ITEM1];
+							quantity = Lara.Keys[objectNumber - ID_KEY_ITEM1];
 
 						else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
-							quantity = g_LaraExtra.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1];
+							quantity = Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1];
 
 						else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM3)
-							quantity = g_LaraExtra.Pickups[objectNumber - ID_PICKUP_ITEM1];
+							quantity = Lara.Pickups[objectNumber - ID_PICKUP_ITEM1];
 
 						else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM3_COMBO2)
-							quantity = g_LaraExtra.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1];
+							quantity = Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1];
 
 						else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
-							quantity = g_LaraExtra.Pickups[objectNumber - ID_EXAMINE1];
+							quantity = Lara.Pickups[objectNumber - ID_EXAMINE1];
 
 						else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
-							quantity = g_LaraExtra.PickupsCombo[objectNumber - ID_EXAMINE1_COMBO1];
+							quantity = Lara.PickupsCombo[objectNumber - ID_EXAMINE1_COMBO1];
 
 					}
 
@@ -1392,7 +1394,7 @@ bool Renderer11::drawSpiders()
 
 	if (Objects[ID_SPIDERS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_SPIDERS_EMITTER];
+		ObjectInfo* obj = &Objects[ID_SPIDERS_EMITTER];
 		RendererObject* moveableObj = m_moveableObjects[ID_SPIDERS_EMITTER].get();
 		short* meshPtr = Meshes[Objects[ID_SPIDERS_EMITTER].meshIndex + ((Wibble >> 2) & 2)];
 		RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
@@ -1465,7 +1467,7 @@ bool Renderer11::drawRats()
 
 	if (Objects[ID_RATS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_RATS_EMITTER];
+		ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
 		RendererObject* moveableObj = m_moveableObjects[ID_RATS_EMITTER];
 
 		for (int m = 0; m < 32; m++)
@@ -1517,7 +1519,7 @@ bool Renderer11::drawBats()
 
 	if (Objects[ID_BATS_EMITTER].loaded)
 	{
-		OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
+		ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
 		RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
 		short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3)];
 		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
@@ -1923,7 +1925,7 @@ bool Renderer11::drawScene(bool dump)
 
 	clearSceneItems();
 	collectRooms();
-	updateLaraAnimations();
+	UpdateLaraAnimations(false);
 	updateItemsAnimations();
 	updateEffects();
 	if (g_Configuration.EnableShadows)
@@ -2165,7 +2167,7 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 	}
 	RendererRoom& const room = m_rooms[item->Item->roomNumber];
 	RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
-	OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
+	ObjectInfo* obj = &Objects[item->Item->objectNumber];
 
 	m_stItem.World = item->World;
 	m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
@@ -2274,7 +2276,7 @@ bool Renderer11::drawStatics(bool transparent)
 		RendererObject* staticObj = m_staticObjects[msh->staticNumber];
 		RendererMesh* mesh = staticObj->ObjectMeshes[0];
 
-		m_stStatic.World = (Matrix::CreateRotationY(TR_ANGLE_TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
+		m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
 		m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
 		updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
 		m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
