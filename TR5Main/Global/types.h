@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
 #include "enums.h"
-#include <fixed_point.h>
 
 #pragma pack(push, 1)
 typedef struct vector_t
