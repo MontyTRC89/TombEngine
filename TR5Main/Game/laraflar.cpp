@@ -17,13 +17,11 @@ void FlareControl(short itemNumber) // (AF) (D)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-#if 0
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 	{
 		KillItem(itemNumber);
 		return;
 	}
-#endif
 
 	if (item->fallspeed)
 	{
@@ -57,8 +55,7 @@ void FlareControl(short itemNumber) // (AF) (D)
 	
 	item->pos.yPos += item->fallspeed;
 
-	// FIXME
-	//DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	
 	short age = (short)(item->data) & 0x7FFF;
 	if (age >= 900)
