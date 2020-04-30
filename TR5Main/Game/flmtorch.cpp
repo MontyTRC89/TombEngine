@@ -226,8 +226,7 @@ void TorchControl(short itemNumber) // (F) (D)
 
 	item->pos.yPos += item->fallspeed;
 
-	// FIXME
-	//DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
 		coll.enableBaddiePush = true;
