@@ -7,9 +7,12 @@
 #include "collide.h"
 #include "laramisc.h"
 #include "switch.h"
+#include "draw.h"
 #include "items.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "../Specific/setup.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
 short FireBounds[12] =
 {
@@ -158,7 +161,7 @@ void DoFlameTorch() // (F) (D)
 		pos.y = 64;
 		pos.z = 256;
 
-		GetLaraJointPosition(&pos, LJ_LHAND);
+		GetLaraJointPosition(&pos, LM_LHAND);
 
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 		
@@ -203,8 +206,8 @@ void TorchControl(short itemNumber) // (F) (D)
 		item->pos.zRot = 0;
 	}
 
-	int xv = item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int zv = item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int zv = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;

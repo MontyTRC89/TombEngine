@@ -10,6 +10,11 @@
 #include "lara.h"
 #include "flmtorch.h"
 #include "sphere.h"
+#include "../Specific/level.h"
+#include "collide.h"
+#include "sound.h"
+#include "savegame.h"
+#include "../Specific/input.h"
 
 struct OLD_CAMERA
 {
@@ -24,13 +29,11 @@ struct OLD_CAMERA
 	PHD_VECTOR target;
 };
 
-#define LfAspectCorrection VAR_U_(0x0055DA30, float)
-#define LastTarget			VAR_U_(0x00EEFA30, GAME_VECTOR)
-#define InputBusy			VAR_U_(0x00878C94, int)
-#define SniperCamActive		VAR_U_(0x0051CA1D, byte)
+float LfAspectCorrection;
+GAME_VECTOR LastTarget;
+byte SniperCamActive;
 
 extern int KeyTriggerActive;
-extern LaraExtraInfo g_LaraExtra;
 
 PHD_VECTOR CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
@@ -57,6 +60,10 @@ CAMERA_TYPE BinocularOldCamera;
 int LaserSight;
 int SniperCount;
 int ExitingBinocular;
+int PhdPerspective;
+short CurrentFOV;
+int GetLaraOnLOS;
+int SniperOverlay;
 
 void ActivateCamera()
 {
@@ -68,34 +75,12 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	Vector3 position = Vector3(posX, posY, posZ);
 	Vector3 target = Vector3(targetX, targetY, targetZ);
 	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
-	float fov = TR_ANGLE_TO_RAD(CurrentFOV / 1.333333f);
-	float r = TR_ANGLE_TO_RAD(roll);
+	float fov = TO_RAD(CurrentFOV / 1.333333f);
+	float r = TO_RAD(roll);
 
 	// This should not be needed but it seems to solve our issues
 	if (posX == targetX && posY == targetY && posZ == targetZ)
 		return;
-
-	short angles[2];
-	phd_GetVectorAngles(targetX - posX, targetY - posY, targetZ - posZ, angles);
-
-	PHD_3DPOS pos;
-
-	pos.xPos = posX;
-	pos.yPos = posY;
-	pos.zPos = posZ;
-	pos.xRot = angles[1];
-	pos.yRot = angles[0];
-	pos.zRot = roll;
-
-	CurrentCameraPosition.x = posX;
-	CurrentCameraPosition.y = posY;
-	CurrentCameraPosition.z = posZ;
-
-	/*CurrentCameraRotation.vx = mGetAngle(0, 0, sqrt(roll), posY - targetY) >> 4;
-	CurrentCameraRotation.vy = mGetAngle(posZ, posX, targetZ, targetX) >> 4;
-	CurrentCameraRotation.vz = 0;*/
-
-	phd_GenerateW2V(&pos);
 
 	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }
@@ -103,8 +88,7 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 void AlterFOV(int value)
 { 
 	CurrentFOV = value;
-	PhdPerspective = PhdWidth / 2 * COS(CurrentFOV / 2) / SIN(CurrentFOV / 2);
-	LfAspectCorrection = 1.3333334f / (float)(PhdWidth / PhdHeight);
+	PhdPerspective = g_Renderer->ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
 
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
@@ -364,10 +348,10 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	}
 	else
 	{
-		short angle = ATAN(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + (PhdPerspective * SIN(angle) >> W2V_SHIFT);
+		short angle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x = Camera.pos.x + (PhdPerspective * phd_sin(angle) >> W2V_SHIFT);
 		Camera.mikePos.y = Camera.pos.y;
-		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * COS(angle) >> W2V_SHIFT);
+		Camera.mikePos.z = Camera.pos.z + (PhdPerspective * phd_cos(angle) >> W2V_SHIFT);
 		Camera.oldType = Camera.type;
 	}
 }
@@ -387,7 +371,7 @@ void ChaseCamera(ITEM_INFO* item)
 	else if (Camera.actualElevation < -ANGLE(85))
 		Camera.actualElevation = -ANGLE(85);
 
-	int distance = Camera.targetDistance * COS(Camera.actualElevation) >> W2V_SHIFT;
+	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation) >> W2V_SHIFT;
 
 	GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
 	if (Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
@@ -417,7 +401,7 @@ void ChaseCamera(ITEM_INFO* item)
 	
 	for (int i = 0; i < 5; i++)
 	{
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * SIN(Camera.actualElevation) >> W2V_SHIFT);
+		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation) >> W2V_SHIFT);
 	}
 
 	int farthest = 0x7FFFFFFF;
@@ -437,8 +421,8 @@ void ChaseCamera(ITEM_INFO* item)
 			angle = (i - 1) * ANGLE(90);
 		}
 
-		Ideals[i].x = Camera.target.x - ((distance * SIN(angle)) >> W2V_SHIFT);
-		Ideals[i].z = Camera.target.z - ((distance * COS(angle)) >> W2V_SHIFT);
+		Ideals[i].x = Camera.target.x - ((distance * phd_sin(angle)) >> W2V_SHIFT);
+		Ideals[i].z = Camera.target.z - ((distance * phd_cos(angle)) >> W2V_SHIFT);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
 		if (mgLOS(&Camera.target, &Ideals[i], 200))
@@ -531,7 +515,7 @@ void UpdateCameraElevation()
 
 		pos.z = pos1.z - pos.z;
 		pos.x = pos1.x - pos.x;
-		Camera.actualAngle = Camera.targetAngle + ATAN(pos.z, pos.x);
+		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
 	{
@@ -604,11 +588,11 @@ void CombatCamera(ITEM_INFO* item)
 	UpdateCameraElevation();
 
 	Camera.targetDistance = 1536;
-	int distance = Camera.targetDistance * COS(Camera.actualElevation) >> W2V_SHIFT;
+	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation) >> W2V_SHIFT;
 
 	for (int i = 0; i < 5; i++)
 	{
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * SIN(Camera.actualElevation) >> W2V_SHIFT);
+		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation) >> W2V_SHIFT);
 	}
 
 	int farthest = 0x7FFFFFFF;
@@ -628,8 +612,8 @@ void CombatCamera(ITEM_INFO* item)
 			angle = (i - 1) * ANGLE(90);
 		}
 
-		Ideals[i].x = Camera.target.x - ((distance * SIN(angle)) >> W2V_SHIFT);
-		Ideals[i].z = Camera.target.z - ((distance * COS(angle)) >> W2V_SHIFT);
+		Ideals[i].x = Camera.target.x - ((distance * phd_sin(angle)) >> W2V_SHIFT);
+		Ideals[i].z = Camera.target.z - ((distance * phd_cos(angle)) >> W2V_SHIFT);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
 		if (mgLOS(&Camera.target, &Ideals[i], 200))
@@ -926,7 +910,7 @@ void LookCamera(ITEM_INFO* item)
 	pos.x = 0;
 	pos.y = 16;
 	pos.z = 64;
-	GetLaraJointPosition(&pos, LJ_HEAD);
+	GetLaraJointPosition(&pos, LM_HEAD);
 	
 	short roomNumber = LaraItem->roomNumber;
 	FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
@@ -937,7 +921,7 @@ void LookCamera(ITEM_INFO* item)
 		pos.x = 0;
 		pos.y = 16;
 		pos.z = 0;
-		GetLaraJointPosition(&pos, LJ_HEAD);
+		GetLaraJointPosition(&pos, LM_HEAD);
 		
 		roomNumber = LaraItem->roomNumber;
 		floor = GetFloor(pos.x, pos.y + 256, pos.z, &roomNumber);
@@ -956,7 +940,7 @@ void LookCamera(ITEM_INFO* item)
 			pos.x = 0;
 			pos.y = 16;
 			pos.z = -64;
-			GetLaraJointPosition(&pos, LJ_HEAD);
+			GetLaraJointPosition(&pos, LM_HEAD);
 		}
 	}
 
@@ -964,13 +948,13 @@ void LookCamera(ITEM_INFO* item)
 	pos2.x = 0;
 	pos2.y = 0;
 	pos2.z = -1024;
-	GetLaraJointPosition(&pos2, LJ_HEAD);
+	GetLaraJointPosition(&pos2, LM_HEAD);
 
 	PHD_VECTOR pos3;
 	pos3.x = 0;
 	pos3.y = 0;
 	pos3.z = 2048;
-	GetLaraJointPosition(&pos3, LJ_HEAD);
+	GetLaraJointPosition(&pos3, LM_HEAD);
 
 	int dx = (pos2.x - pos.x) >> 3;
 	int dy = (pos2.y - pos.y) >> 3;
@@ -1143,9 +1127,9 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.actualAngle = ATAN(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * SIN(Camera.actualAngle)) >> W2V_SHIFT);
-		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * COS(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * phd_sin(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * phd_cos(Camera.actualAngle)) >> W2V_SHIFT);
 		Camera.mikePos.y = Camera.pos.y;
 	}
 
@@ -1161,7 +1145,7 @@ void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 {
 	int distance;
 
-	distance = SQRT_ASM(SQUARE(item->pos.xPos - Camera.pos.x) + SQUARE(item->pos.yPos - Camera.pos.y) + SQUARE(item->pos.zPos - Camera.pos.z));
+	distance = sqrt(SQUARE(item->pos.xPos - Camera.pos.x) + SQUARE(item->pos.yPos - Camera.pos.y) + SQUARE(item->pos.zPos - Camera.pos.z));
 	if (distance < maxDistance)
 	{
 		if (maxDistance == -1)
@@ -1240,11 +1224,11 @@ void BinocularCamera(ITEM_INFO* item)
 	Camera.pos.z = z;	
 	Camera.pos.roomNumber = roomNumber;
 	
-	int l = 20736 * COS(headXrot) >> W2V_SHIFT;
+	int l = 20736 * phd_cos(headXrot) >> W2V_SHIFT;
 	
-	int tx = x + (l * SIN(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
-	int ty = y - (20736 * SIN(headXrot) >> W2V_SHIFT);
-	int tz = z + (l * COS(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
+	int tx = x + (l * phd_sin(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
+	int ty = y - (20736 * phd_sin(headXrot) >> W2V_SHIFT);
+	int tz = z + (l * phd_cos(LaraItem->pos.yRot + headYrot) >> W2V_SHIFT);
 
 	if (Camera.oldType == FIXED_CAMERA)
 	{
@@ -1289,9 +1273,9 @@ void BinocularCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.actualAngle = ATAN(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * SIN(Camera.actualAngle)) >> W2V_SHIFT);
-		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * COS(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos.x = Camera.pos.x + ((PhdPerspective * phd_sin(Camera.actualAngle)) >> W2V_SHIFT);
+		Camera.mikePos.z = Camera.pos.z + ((PhdPerspective * phd_cos(Camera.actualAngle)) >> W2V_SHIFT);
 		Camera.mikePos.y = Camera.pos.y;
 	}
 
@@ -1370,11 +1354,11 @@ void BinocularCamera(ITEM_INFO* item)
 			}
 			else
 			{
-				if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+				if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
 				{
 					WeaponDelay = 12;
 					firing = 1;
-					if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+					if (Lara.Weapons[WEAPON_HK].HasSilencer)
 					{
 						SoundEffect(SFX_HK_SILENCED, 0, 0);
 					}
@@ -1384,7 +1368,7 @@ void BinocularCamera(ITEM_INFO* item)
 						SoundEffect(SFX_HK_FIRE, 0, 0);
 					}
 				}
-				else if (g_LaraExtra.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
+				else if (Lara.Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
 				{
 					if (!LSHKTimer)
 					{
@@ -1395,7 +1379,7 @@ void BinocularCamera(ITEM_INFO* item)
 						}
 						LSHKTimer = 4;
 						firing = 1;
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
@@ -1409,7 +1393,7 @@ void BinocularCamera(ITEM_INFO* item)
 					{
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
@@ -1424,7 +1408,7 @@ void BinocularCamera(ITEM_INFO* item)
 				{
 					if (LSHKTimer)
 					{
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
@@ -1438,7 +1422,7 @@ void BinocularCamera(ITEM_INFO* item)
 					{
 						LSHKTimer = 4;
 						firing = 1;
-						if (g_LaraExtra.Weapons[WEAPON_HK].HasSilencer)
+						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(SFX_HK_SILENCED, 0, 0);
 						}
@@ -1491,13 +1475,13 @@ void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color)
 	
 	if (!LOS(&pos1, &pos2))
 	{
-		int l = SQRT_ASM(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) >> 8;
+		int l = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) * 256;
 		
 		if (l + 8 > 31)
 			l = 31;
 		
 		if (color - l >= 0)
-			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) >> 1);
+			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) * 2);
 	}
 }
 
@@ -1508,7 +1492,7 @@ void ConfirmCameraTargetPos()
 	pos.y = 0;
 	pos.z = 0;
 
-	GetJointAbsPosition(LaraItem, &pos, LJ_LHAND);
+	GetLaraJointPosition(&pos, LM_LHAND);
 
 	if (Camera.laraNode != -1)
 	{
@@ -1543,7 +1527,8 @@ void ConfirmCameraTargetPos()
 void CalculateCamera()
 {
 	SniperOverlay = 0;
-	SniperCamActive = 0;
+	// FIXME
+	//SniperCamActive = 0;
 
 	CamOldPos.x = Camera.pos.x;
 	CamOldPos.y = Camera.pos.y;
@@ -1612,7 +1597,7 @@ void CalculateCamera()
 
 	if (Camera.type == CINEMATIC_CAMERA)
 	{
-		Legacy_do_new_cutscene_camera();
+		//Legacy_do_new_cutscene_camera();
 		return;
 	}
 
@@ -1641,9 +1626,9 @@ void CalculateCamera()
 		{
 			int dx = Camera.item->pos.xPos - item->pos.xPos;
 			int dz = Camera.item->pos.zPos - item->pos.zPos;
-			int shift = SQRT_ASM(SQUARE(dx) + SQUARE(dz));
-			short angle = ATAN(dz, dx) - item->pos.yRot;
-			short tilt = ATAN(shift, y - (bounds[2] + bounds[3]) / 2 - Camera.item->pos.yPos);
+			int shift = sqrt(SQUARE(dx) + SQUARE(dz));
+			short angle = phd_atan(dz, dx) - item->pos.yRot;
+			short tilt = phd_atan(shift, y - (bounds[2] + bounds[3]) / 2 - Camera.item->pos.yPos);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle >>= 1;
 			tilt >>= 1;
@@ -1721,7 +1706,7 @@ void CalculateCamera()
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 0;
-			GetLaraJointPosition(&pos, LJ_TORSO);
+			GetLaraJointPosition(&pos, LM_TORSO);
 
 			x = pos.x;
 			y = pos.y;
@@ -1734,8 +1719,8 @@ void CalculateCamera()
 		else
 		{
 			int shift = (bounds[0] + bounds[1] + bounds[4] + bounds[5]) >> 2;
-			x = item->pos.xPos + (shift * SIN(item->pos.yRot) >> W2V_SHIFT);
-			z = item->pos.zPos + (shift * COS(item->pos.yRot) >> W2V_SHIFT);
+			x = item->pos.xPos + (shift * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+			z = item->pos.zPos + (shift * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 
 			Camera.target.x = x;
 			Camera.target.z = z;
@@ -1809,21 +1794,4 @@ void CalculateCamera()
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
-}
-
-void Inject_Camera()
-{
-	INJECT(0x0048EDC0, AlterFOV);
-	INJECT(0x0048F760, LookAt);
-	INJECT(0x0040FA70, mgLOS);
-	INJECT(0x0040C7A0, MoveCamera);
-	INJECT(0x0040C690, InitialiseCamera);
-	INJECT(0x004107C0, UpdateCameraElevation);
-	INJECT(0x0040D150, ChaseCamera);
-	INJECT(0x0040D640, CombatCamera);
-	INJECT(0x0040F5C0, CameraCollisionBounds);
-	INJECT(0x0040E890, FixedCamera);
-	INJECT(0x0040DC10, LookCamera);
-	INJECT(0x0040FC20, BinocularCamera);
-	INJECT(0x0040ED30, CalculateCamera);
 }

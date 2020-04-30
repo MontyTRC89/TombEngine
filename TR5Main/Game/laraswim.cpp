@@ -15,8 +15,11 @@
 #include "laramisc.h"
 #include "draw.h"
 #include "camera.h"
+#include "..\Specific\level.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
-extern LaraExtraInfo g_LaraExtra;
+
 
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
@@ -28,8 +31,8 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 		OBJECT_VECTOR* sink = &Camera.fixed[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
-		Lara.currentXvel += ((sink->data * (SIN(angle - ANGLE(90)) / 4) >> 2) - Lara.currentXvel) >> 4;
-		Lara.currentZvel += ((sink->data * (COS(angle - ANGLE(90)) / 4) >> 2) - Lara.currentZvel) >> 4;
+		Lara.currentXvel += ((sink->data * (phd_sin(angle - ANGLE(90)) / 4) >> 2) - Lara.currentXvel) >> 4;
+		Lara.currentZvel += ((sink->data * (phd_cos(angle - ANGLE(90)) / 4) >> 2) - Lara.currentZvel) >> 4;
 
 		LaraItem->pos.yPos += (sink->y - LaraItem->pos.yPos) >> 4;
 	}
@@ -63,7 +66,7 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 	LaraItem->pos.zPos += Lara.currentZvel >> 8;
 	Lara.currentActive = 0;
 
-	coll->facing = ATAN(LaraItem->pos.zPos - coll->old.z, LaraItem->pos.xPos - coll->old.x);
+	coll->facing = phd_atan(LaraItem->pos.zPos - coll->old.z, LaraItem->pos.xPos - coll->old.x);
 
 	GetCollisionInfo(coll, LaraItem->pos.xPos, LaraItem->pos.yPos + 200, LaraItem->pos.zPos, LaraItem->roomNumber, 400);
 	
@@ -507,9 +510,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)//4BFB4, 4C418 (F)
 
 	AnimateLara(item);
 
-	item->pos.xPos += COS(item->pos.xRot) * (item->fallspeed * SIN(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
-	item->pos.yPos -= item->fallspeed * SIN(item->pos.xRot) >> (W2V_SHIFT + 2);
-	item->pos.zPos += COS(item->pos.xRot) * (item->fallspeed * COS(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
+	item->pos.xPos += phd_cos(item->pos.xRot) * (item->fallspeed * phd_sin(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
+	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) >> (W2V_SHIFT + 2);
+	item->pos.zPos += phd_cos(item->pos.xRot) * (item->fallspeed * phd_cos(item->pos.yRot) >> (W2V_SHIFT + 2)) >> W2V_SHIFT;
 
 	LaraBaddieCollision(item, coll);
 
@@ -679,7 +682,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		coll->facing = item->pos.yRot;
 	}
 
-	short height = 762 * SIN(item->pos.xRot) >> W2V_SHIFT;
+	short height = 762 * phd_sin(item->pos.xRot) >> W2V_SHIFT;
 	height = abs(height);
 
 	if (height < ((LaraDrawType == LARA_DIVESUIT) << 6) + 200)
@@ -820,7 +823,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		}
 	}
 
-	if (Lara.waterStatus != LW_FLYCHEAT && g_LaraExtra.ExtraAnim == 0)
+	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == 0)
 		LaraTestWaterDepth(item, coll);
 }
 

@@ -8,6 +8,10 @@
 #include "../../Game/tomb4fx.h"
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/effects.h"
+
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void InitialiseDemigod(short itemNum)
@@ -125,7 +129,7 @@ void DemigodControl(short itemNum)
 		{
 			dx = LaraItem->pos.xPos - item->pos.xPos;
 			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.xAngle = 0;
 
 			laraInfo.ahead = true;
@@ -137,9 +141,9 @@ void DemigodControl(short itemNum)
 			dz = abs(dz);
 
 			if (dx <= dz)
-				laraInfo.xAngle = ATAN(dz + (dx >> 1), dy);
+				laraInfo.xAngle = phd_atan(dz + (dx >> 1), dy);
 			else
-				laraInfo.xAngle = ATAN(dx + (dz >> 1), dy);
+				laraInfo.xAngle = phd_atan(dx + (dz >> 1), dy);
 		}
 
 		GetCreatureMood(item, &info, VIOLENT);
@@ -528,7 +532,7 @@ void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
 			fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
 		}
 
-		OBJECT_INFO* obj = &Objects[ID_ENERGY_BUBBLES];
+		ObjectInfo* obj = &Objects[ID_ENERGY_BUBBLES];
 
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;
@@ -700,9 +704,9 @@ void DemigodHammerAttack(int x, int y, int z, int something)
 			spark->x = (GetRandomControl() & 0x1F) + x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			spark->xVel = (byte)(GetRandomControl() + 256) * SIN(angle) >> W2V_SHIFT;
+			spark->xVel = (byte)(GetRandomControl() + 256) * phd_sin(angle) >> W2V_SHIFT;
 			spark->yVel = -32 - (GetRandomControl() & 0x3F);
-			spark->zVel = (byte)(GetRandomControl() + 256) * COS(angle) >> W2V_SHIFT;
+			spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle) >> W2V_SHIFT;
 			spark->friction = 9;
 
 			if (GetRandomControl() & 1)

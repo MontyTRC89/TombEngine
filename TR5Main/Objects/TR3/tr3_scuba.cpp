@@ -2,7 +2,9 @@
 #include "../../Game/items.h"
 #include "../../Game/effects.h"
 #include "../../Game/Box.h"
+#include "../../Game/lara.h"
 #include "../../specific/setup.h"
+#include "..\..\Specific\level.h"
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 
@@ -49,10 +51,10 @@ void HarpoonControl(short itemNum)
 		int ox = item->pos.xPos;
 		int oz = item->pos.zPos;
 
-		short speed = (item->speed * COS(item->pos.xRot)) >> W2V_SHIFT;
-		item->pos.zPos += (speed * COS(item->pos.yRot)) >> W2V_SHIFT;
-		item->pos.xPos += (speed * SIN(item->pos.yRot)) >> W2V_SHIFT;
-		item->pos.yPos += -((item->speed * SIN(item->pos.xRot)) >> W2V_SHIFT);
+		short speed = (item->speed * phd_cos(item->pos.xRot)) >> W2V_SHIFT;
+		item->pos.zPos += (speed * phd_cos(item->pos.yRot)) >> W2V_SHIFT;
+		item->pos.xPos += (speed * phd_sin(item->pos.yRot)) >> W2V_SHIFT;
+		item->pos.yPos += -((item->speed * phd_sin(item->pos.xRot)) >> W2V_SHIFT);
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);

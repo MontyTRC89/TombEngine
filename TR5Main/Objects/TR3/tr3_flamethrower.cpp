@@ -7,6 +7,10 @@
 #include "../../Game/draw.h"
 #include "../../specific/setup.h"
 #include "../../Game/lot.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
+#include "../../Game/sound.h"
+#include "../../Game/effects.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
@@ -102,7 +106,7 @@ void FlameThrowerControl(short itemNumber)
 			int dx = LaraItem->pos.xPos - item->pos.xPos;
 			int dz = LaraItem->pos.zPos - item->pos.zPos;
 			
-			laraInfo.angle = ATAN(dz, dz) - item->pos.yRot; 
+			laraInfo.angle = phd_atan(dz, dz) - item->pos.yRot; 
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			
 			info.xAngle -= 0x800;
@@ -366,19 +370,19 @@ short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		for (int i = 0; i < 2; i++)
 		{
 			speed = (GetRandomControl() % (speed << 2)) + 32;
-			velocity = (speed * COS(fx->pos.xRot)) >> W2V_SHIFT;
+			velocity = (speed * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
 			
-			xv = (velocity * SIN(fx->pos.yRot)) >> W2V_SHIFT;
-			yv = -((speed * SIN(fx->pos.xRot)) >> W2V_SHIFT);
-			zv = (velocity * COS(fx->pos.yRot)) >> W2V_SHIFT;
+			xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
+			yv = -((speed * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
+			zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
 
 			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -1);
 		}
 
-		velocity = ((speed << 1) * COS(fx->pos.xRot)) >> W2V_SHIFT;
-		zv = (velocity * COS(fx->pos.yRot)) >> W2V_SHIFT;
-		xv = (velocity * SIN(fx->pos.yRot)) >> W2V_SHIFT;
-		yv = -(((speed << 1) * SIN(fx->pos.xRot)) >> W2V_SHIFT);
+		velocity = ((speed << 1) * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
+		zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
+		xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
+		yv = -(((speed << 1) * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
 		
 		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -2);
 	}

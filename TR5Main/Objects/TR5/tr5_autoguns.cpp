@@ -5,6 +5,8 @@
 #include "../../Game/effect2.h"
 #include "../../Game/effects.h"
 #include "../../Game/tomb4fx.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/sound.h"
 
 void InitialiseAutoGuns(short itemNum)
 {
@@ -12,7 +14,7 @@ void InitialiseAutoGuns(short itemNum)
 
     item = &Items[itemNum];
     item->meshBits = 1024;
-    item->data = (void*)GameMalloc(5702);
+    item->data = (void*)game_malloc(5702);
 }
 
 void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
@@ -74,6 +76,7 @@ void ControlAutoGuns(short itemNumber)
 
 			int los = LOS(&pos1, &pos2);
 
+			// FIXME:
 			if (los)
 			{
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);

@@ -486,10 +486,12 @@ struct RendererItem {
 	Matrix AnimationTransforms[32];
 	int NumMeshes;
 	vector<RendererLight*> Lights;
+	bool DoneAnimations;
 };
 
 struct RendererMesh
 {
+	BoundingSphere				Sphere;
 	RendererBucket				Buckets[NUM_BUCKETS];
 	RendererBucket				AnimatedBuckets[NUM_BUCKETS];
 	vector<Vector3>				Positions;
@@ -809,7 +811,6 @@ private:
 	void											prepareLights();
 	void											clearSceneItems();
 	bool											updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size);
-	void											updateLaraAnimations();
 	void											updateItemsAnimations();
 	void											updateEffects();
 	int												getFrame(short animation, short frame, short** framePtr, int* rate);
@@ -864,6 +865,7 @@ private:
 	bool											drawColoredQuad(int x, int y, int w, int h, Vector4 color);
 	bool											initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
 	bool											initialiseBars();
+
 public:
 	Matrix											View;
 	Matrix											Projection;
@@ -910,6 +912,14 @@ public:
 	bool											ChangeScreenResolution(int width, int height, int frequency, bool windowed);
 	bool DrawBar(float percent, const RendererHUDBar* const bar);
 	void											FlipRooms(short roomNumber1, short roomNumber2);
+	void											ResetAnimations();
+	void											UpdateLaraAnimations(bool force);
+	void											UpdateItemAnimations(int itemNumber, bool force);
+	void											GetLaraAbsBonePosition(Vector3* pos, int joint);
+	void											GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint);
+	int												GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
+	void											GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
+
 	RendererMesh* getMeshFromMeshPtr(unsigned int meshp);
 private:
 	void drawFootprints();

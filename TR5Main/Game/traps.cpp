@@ -10,12 +10,19 @@
 #include "sphere.h"
 #include "camera.h"
 #include "objlight.h"
+#include "draw.h"
+#include "..\Specific\level.h"
+#include "../Specific/input.h"
+#include "sound.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
 static short FloorTrapDoorBounds[12] = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR FloorTrapDoorPos = {0, 0, -655};
 static short WreckingBallData[2] = {0, 0};
+ITEM_INFO* WBItem;
+short WBRoom;
+
 byte Flame3xzoffs[16][2] =
 {
 	{ 0x09, 0x09 },
@@ -218,10 +225,10 @@ void FlameControl(short fxNumber)
 
 			GetLaraJointPosition((PHD_VECTOR*)&fx->pos, i);
 
-			if (Lara.BurnCount)
+			if (Lara.burnCount)
 			{
-				Lara.BurnCount--;
-				if (!Lara.BurnCount)
+				Lara.burnCount--;
+				if (!Lara.burnCount)
 					Lara.burnSmoke = true;
 			}
 
@@ -335,9 +342,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 		item->goalAnimState = 1;
 
 		UseForcedFixedCamera = 1;
-		ForcedFixedCamera.x = item->pos.xPos - SIN(item->pos.yRot) / 16;
+		ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 16;
 		ForcedFixedCamera.y = item->pos.yPos + 1024;
-		ForcedFixedCamera.z = item->pos.zPos - COS(item->pos.yRot) / 16;
+		ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 16;
 		ForcedFixedCamera.roomNumber = item->roomNumber;
 	}
 	else
@@ -376,11 +383,11 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 				item->goalAnimState = 1;
 
 				UseForcedFixedCamera = 1;
-				ForcedFixedCamera.x = item->pos.xPos - SIN(item->pos.yRot) / 8;
+				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 8;
 				ForcedFixedCamera.y = item->pos.yPos - 2048;
 				if (ForcedFixedCamera.y < Rooms[item->roomNumber].maxceiling)
 					ForcedFixedCamera.y = Rooms[item->roomNumber].maxceiling;
-				ForcedFixedCamera.z = item->pos.zPos - COS(item->pos.yRot) / 8;
+				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 8;
 				ForcedFixedCamera.roomNumber = item->roomNumber;
 			}
 			else
@@ -555,7 +562,7 @@ void FallingBlockControl(short itemNumber)
 		else
 		{
 			item->meshBits = -2;
-			ExplodingDeath2(itemNumber, -1, 15265);
+			ExplodingDeath(itemNumber, -1, 15265);
 			item->itemFlags[0]++;
 		}
 	}
@@ -1110,9 +1117,9 @@ void FlameEmitter3Control(short itemNumber)
 			{
 				if (item->triggerFlags == 2 || item->triggerFlags == 4)
 				{
-					dest.x = item->pos.xPos + 2048 * SIN(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					dest.x = item->pos.xPos + 2048 * phd_sin(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
 					dest.y = item->pos.yPos;
-					dest.z = item->pos.zPos + 2048 * COS(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					dest.z = item->pos.zPos + 2048 * phd_cos(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
 					
 					if (GetRandomControl() & 3)
 					{

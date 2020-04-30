@@ -2,66 +2,42 @@
 #include <stdlib.h>
 #include "..\Global\global.h"
 
-char* GameMalloc(int size)
-{
-	//printf("Size: %d, MallocFree: %d\n", size, MallocFree);
-	return GameMallocReal(size);
-}
+char* malloc_buffer;
+int malloc_size;
+char* malloc_ptr;
+int malloc_free;
+int malloc_used;
 
-/*
-void InitGameMalloc()
+char* game_malloc(int size)
 {
-	char* buffer = (char*)malloc(GAME_BUFFER_SIZE);
-	MallocBuffer = buffer;
-	MallocSize = GAME_BUFFER_SIZE;
-	MallocPtr = buffer;
-	MallocFree = GAME_BUFFER_SIZE;
-	MallocUsed = 0;
-}
+	char* ptr;
 
-char* GameMalloc(int size)
-{
-	int memSize = (size + 3) & -4;
-	if (memSize > MallocFree)
+	size = (size + 3) & 0xfffffffc;
+	if (size <= malloc_free)
 	{
-		DB_Log(0, "Out of memory");
-		return NULL;
-	}
-	else
-	{
-		char* ptr = MallocPtr;
-		MallocFree -= memSize;
-		MallocUsed += memSize;
-		MallocPtr += memSize;
-		memset(ptr, 0, 4 * (memSize >> 2));
+		ptr = malloc_ptr;
+		malloc_free -= size;
+		malloc_used += size;
+		malloc_ptr += size;
 		return ptr;
 	}
+
+	return 0;
 }
 
-void GameFree(int size)
+void init_game_malloc()
 {
-	int memSize = (size + 3) & -4;
-	MallocPtr -= memSize;
-	MallocFree += memSize;
-	MallocUsed -= memSize;
+	malloc_size = 1048576 * 128;
+	malloc_buffer = (char*)malloc(malloc_size);
+	malloc_ptr = malloc_buffer;
+	malloc_free = malloc_size;
+	malloc_used = 0;
 }
 
-void* Malloc(int size)
+void game_free(int size, int type)
 {
-	return malloc(size);
-}
-
-void Free(void* ptr)
-{
-	free(ptr);
-}*/
-
-void Inject_Malloc()
-{
-	INJECT(0x0040101E, GameMalloc);
-	/*INJECT(0x004A7CB0, InitGameMalloc);
-	INJECT(0x0040101E, GameMalloc);
-	INJECT(0x00403116, GameFree);
-	INJECT(0x004E2220, Malloc);
-	INJECT(0x004E2C90, Free);*/
+	size = (size + 3) & (~3); 
+	malloc_ptr -= size;
+	malloc_free += size;
+	malloc_used -= size;
 }

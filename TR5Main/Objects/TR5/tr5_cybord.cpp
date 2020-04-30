@@ -9,6 +9,8 @@
 #include "../../Game/lara.h"
 #include "../../Game/traps.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/sound.h"
 
 #define STATE_HITMAN_STOP					1
 #define STATE_HITMAN_WALK					2
@@ -80,7 +82,7 @@ void HitmanControl(short itemNumber)
 	{
 		ITEM_INFO* item = &Items[itemNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		ObjectInfo* obj = &Objects[item->objectNumber];
 
 		short angle = 0;
 		short joint2 = 0;
@@ -90,8 +92,8 @@ void HitmanControl(short itemNumber)
 		int x = item->pos.xPos;
 		int z = item->pos.zPos;
 
-		int dx = 808 * SIN(item->pos.yRot) >> W2V_SHIFT;
-		int dz = 808 * COS(item->pos.yRot) >> W2V_SHIFT;
+		int dx = 808 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+		int dz = 808 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 		x += dx;
 		z += dz;
@@ -224,7 +226,7 @@ void HitmanControl(short itemNumber)
 			{
 				int dx = LaraItem->pos.xPos - item->pos.xPos;
 				int dz = LaraItem->pos.zPos - item->pos.zPos;
-				laraInfo.angle = ATAN(dz, dx) - item->pos.yRot;
+				laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 				laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
@@ -533,7 +535,7 @@ void HitmanControl(short itemNumber)
 			pos.x = 0;			
 			pos.y = 0;
 			pos.z = 0;
-			GetLaraJointPosition(&pos, LJ_LFOOT);
+			GetLaraJointPosition(&pos, LM_LFOOT);
 			
 			short roomNumberLeft = LaraItem->roomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
@@ -541,7 +543,7 @@ void HitmanControl(short itemNumber)
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 0; 
-			GetLaraJointPosition(&pos, LJ_RFOOT);
+			GetLaraJointPosition(&pos, LM_RFOOT);
 
 			short roomNumberRight = LaraItem->roomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberRight);
@@ -556,7 +558,7 @@ void HitmanControl(short itemNumber)
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{
 					LaraBurn();
-					Lara.BurnCount = 48;
+					Lara.burnCount = 48;
 					Lara.burnBlue = 1;
 					LaraItem->hitPoints = 0;
 				}

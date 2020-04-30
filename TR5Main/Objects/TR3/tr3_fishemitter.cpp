@@ -1,6 +1,8 @@
 #include "../newobjects.h"
 #include "../../Game/effects.h"
 #include "../../Game/draw.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 #define PIRAHNA_DAMAGE	4
 #define X	0
@@ -250,8 +252,8 @@ void ControlFish(short itemNumber)
 	int x = fish->x;
 	int z = fish->z;
 	
-	x += -fish->speed * SIN(fish->angle << 4) >> W2V_SHIFT;  //   -(((rcossin_tbl[(fish->angle << 1)]) * (fish->speed)) >> 13);
-	z += fish->speed * COS(fish->angle << 4) >> W2V_SHIFT;  //   (((rcossin_tbl[(fish->angle << 1) + 1]) * (fish->speed)) >> 13);
+	x += -fish->speed * phd_sin(fish->angle << 4) >> W2V_SHIFT;  //   -(((rcossin_tbl[(fish->angle << 1)]) * (fish->speed)) >> 13);
+	z += fish->speed * phd_cos(fish->angle << 4) >> W2V_SHIFT;  //   (((rcossin_tbl[(fish->angle << 1) + 1]) * (fish->speed)) >> 13);
 	
 	if (pirahnaAttack == 0)
 	{
@@ -428,8 +430,8 @@ void ControlFish(short itemNumber)
 		fish->swim += (fish->speed >> 4) + (fish->speed >> 5);
 		fish->swim &= 63;
 
-		x = fish->x - fish->speed * SIN(fish->angle << 4) >> W2V_SHIFT; //   (((rcossin_tbl[(fish->angle << 1)])* (fish->speed)) >> 13);
-		z = fish->z + fish->speed * COS(fish->angle << 4) >> W2V_SHIFT; //
+		x = fish->x - fish->speed * phd_sin(fish->angle << 4) >> W2V_SHIFT; //   (((rcossin_tbl[(fish->angle << 1)])* (fish->speed)) >> 13);
+		z = fish->z + fish->speed * phd_cos(fish->angle << 4) >> W2V_SHIFT; //
 
 		if (z < -32000)
 			z = -32000;

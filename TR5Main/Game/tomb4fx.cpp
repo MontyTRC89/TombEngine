@@ -5,6 +5,8 @@
 #include "draw.h"
 #include "items.h"
 #include "../Specific/setup.h"
+#include "..\Specific\level.h"
+#include "sound.h"
 #include "bubble.h"
 
 char FlareTable[121] =
@@ -834,7 +836,7 @@ void TriggerGunShell(short hand, short objNum, int weaponType)
 			break;
 		}
 
-		GetLaraJointPosition(&pos, LJ_RHAND);
+		GetLaraJointPosition(&pos, LM_RHAND);
 	}
 	else
 	{
@@ -844,7 +846,7 @@ void TriggerGunShell(short hand, short objNum, int weaponType)
 			pos.y = 48;
 			pos.z = 40;
 
-			GetLaraJointPosition(&pos, LJ_LHAND);
+			GetLaraJointPosition(&pos, LM_LHAND);
 		}
 		else if (weaponType == WEAPON_UZI)
 		{
@@ -852,7 +854,7 @@ void TriggerGunShell(short hand, short objNum, int weaponType)
 			pos.y = 35;
 			pos.z = 48;
 
-			GetLaraJointPosition(&pos, LJ_LHAND);
+			GetLaraJointPosition(&pos, LM_LHAND);
 		}		
 	}
 
@@ -949,9 +951,9 @@ void UpdateGunShells()
 			gs->pos.yRot += gs->speed * ANGLE(1);
 			gs->pos.zRot += ANGLE(23);
 
-			gs->pos.xPos += gs->speed * SIN(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.xPos += gs->speed * phd_sin(gs->dirXrot) >> W2V_SHIFT;
 			gs->pos.yPos += gs->fallspeed;
-			gs->pos.zPos += gs->speed * COS(gs->dirXrot) >> W2V_SHIFT;
+			gs->pos.zPos += gs->speed * phd_cos(gs->dirXrot) >> W2V_SHIFT;
 
 			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
 			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
@@ -1057,14 +1059,14 @@ void LaraBubbles(ITEM_INFO* item)// (F)
 		pos.y = -192;
 		pos.z = -160;
 
-		GetLaraJointPosition(&pos, LJ_TORSO);
+		GetLaraJointPosition(&pos, LM_TORSO);
 	}
 	else
 	{
 		pos.y = -4;
 		pos.z = 64;
 
-		GetLaraJointPosition(&pos, LJ_HEAD);
+		GetLaraJointPosition(&pos, LM_HEAD);
 	}
 
 	num = (GetRandomControl() & 1) + 2;
@@ -1199,20 +1201,27 @@ void TriggerLaraDrips()// (F)
 	}
 }
 
-int ExplodingDeath2(short itemNumber, int meshBits, short damage)
+int ExplodingDeath(short itemNumber, int meshBits, short damage)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	short* frame = GetBestFrame(item);
 	
-	phd_PushUnitMatrix();
+	Matrix world = Matrix::CreateFromYawPitchRoll(
+		TO_RAD(item->pos.yRot),
+		TO_RAD(item->pos.xRot),
+		TO_RAD(item->pos.zRot)
+	);
+
+	// PHD_MATH:
+	/*phd_PushUnitMatrix();
 	
 	MatrixPtr[M03] = 0;
 	MatrixPtr[M13] = 0;
 	MatrixPtr[M23] = 0;
 
-	phd_RotYXZ(item->pos.yPos, item->pos.xRot, item->pos.zRot);
+	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
 	phd_TranslateRel(frame[6], frame[7], frame[8]);
 	
 	short* rotation = &frame[9];
@@ -1227,13 +1236,15 @@ int ExplodingDeath2(short itemNumber, int meshBits, short damage)
 	{
 		if (damage & 0x100 || !(GetRandomControl() & 3))
 		{
+			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, 0);
+			
 			int fxNumber = CreateNewEffect(item->roomNumber);
 			if (fxNumber != NO_ITEM)
 			{
 				FX_INFO* fx = &Effects[fxNumber];
-				fx->pos.xPos = item->pos.xPos + (MatrixPtr[M03] >> W2V_SHIFT);
-				fx->pos.yPos = item->pos.yPos + (MatrixPtr[M13] >> W2V_SHIFT);
-				fx->pos.zPos = item->pos.zPos + (MatrixPtr[M23] >> W2V_SHIFT);
+				fx->pos.xPos = item->pos.xPos + boneMatrix.Translation().x; // (MatrixPtr[M03] >> W2V_SHIFT);
+				fx->pos.yPos = item->pos.yPos + boneMatrix.Translation().y; // (MatrixPtr[M13] >> W2V_SHIFT);
+				fx->pos.zPos = item->pos.zPos + boneMatrix.Translation().z; // (MatrixPtr[M23] >> W2V_SHIFT);
 				fx->roomNumber = item->roomNumber;
 				fx->pos.yRot = 0;
 				fx->pos.zRot = 0;
@@ -1285,42 +1296,20 @@ int ExplodingDeath2(short itemNumber, int meshBits, short damage)
 
 	for (int i = 1; i < obj->nmeshes; i++, bone += 3)
 	{
-		short popPush = *(bone++);
-
-		if (popPush & 1)
-		{
-			MatrixPtr -= 12;
-			DxMatrixPtr -= 48;
-		}
-		else if (popPush & 2)
-		{
-			phd_PushMatrix();
-		}
-
-		phd_TranslateRel(bone[0], bone[1], bone[2]);
-		gar_RotYXZsuperpack(&rotation, 0);
-
-		if (popPush & (ROT_X | ROT_Y | ROT_Z))
-		{
-			if (popPush & ROT_Y)
-				phd_RotY(*(extraRotation++));
-			if (popPush & ROT_X)
-				phd_RotX(*(extraRotation++));
-			if (popPush & ROT_Z)
-				phd_RotZ(*(extraRotation++));
-		}
-
 		bits <<= 1;
 
 		if (bits & meshBits && bits & item->meshBits && (damage & 0x100 || !(GetRandomControl() & 3)))
 		{
+			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, i);
+			Matrix matrix = boneMatrix * world;
+
 			int fxNumber = CreateNewEffect(item->roomNumber);
 			if (fxNumber != NO_ITEM)
 			{
 				FX_INFO* fx = &Effects[fxNumber];
-				fx->pos.xPos = item->pos.xPos + (MatrixPtr[3] >> 14);
-				fx->pos.yPos = item->pos.yPos + (MatrixPtr[7] >> 14);
-				fx->pos.zPos = item->pos.zPos + (MatrixPtr[11] >> 14);
+				fx->pos.xPos = item->pos.xPos + matrix.Translation().x; // (MatrixPtr[3] >> 14);
+				fx->pos.yPos = item->pos.yPos + matrix.Translation().y; // (MatrixPtr[7] >> 14);
+				fx->pos.zPos = item->pos.zPos + matrix.Translation().z; // (MatrixPtr[11] >> 14);
 				fx->roomNumber = item->roomNumber;
 				fx->pos.yRot = 0;
 				fx->pos.zRot = 0;
@@ -1367,10 +1356,7 @@ int ExplodingDeath2(short itemNumber, int meshBits, short damage)
 
 			item->meshBits -= bits;
 		}
-	}
-
-	MatrixPtr -= 12;
-	DxMatrixPtr = (DxMatrixPtr - 48);
+	}*/
 
 	return (item->meshBits == 0);
 }
@@ -1433,9 +1419,9 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 
 		int speed = (GetRandomControl() & 0xF) + vel;
-		spark->xVel = speed * 16 * SIN(rot) >> W2V_SHIFT;
+		spark->xVel = speed * 16 * phd_sin(rot) >> W2V_SHIFT;
 		spark->yVel = -512 - (GetRandomControl() & 0x1FF);
-		spark->zVel = speed * 16 * COS(rot) >> W2V_SHIFT;
+		spark->zVel = speed * 16 * phd_cos(rot) >> W2V_SHIFT;
 
 		short angle;
 		if (GetRandomControl() & 1)
@@ -1444,8 +1430,8 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 			angle = rot - ANGLE(90);
 
 		int shift = (GetRandomControl() & 0x1FF) - 256;
-		x += (shift * SIN(angle) >> W2V_SHIFT);
-		z += (shift * COS(angle) >> W2V_SHIFT);
+		x += (shift * phd_sin(angle) >> W2V_SHIFT);
+		z += (shift * phd_cos(angle) >> W2V_SHIFT);
 
 		spark->x = (GetRandomControl() & 0x1F) + x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1491,7 +1477,7 @@ void UpdateShockwaves()
 
 						int dx = LaraItem->pos.xPos - sw->x;
 						int dz = LaraItem->pos.zPos - sw->z;
-						int distance = SQRT_ASM(SQUARE(dx) + SQUARE(dz));
+						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
 						
 						if (sw->y <= LaraItem->pos.yPos + frame[2]
 							|| sw->y >= LaraItem->pos.yPos + frame[3] + 256
@@ -1502,7 +1488,7 @@ void UpdateShockwaves()
 						}
 						else
 						{
-							short angle = ATAN(dz, dx);
+							short angle = phd_atan(dz, dx);
 							TriggerShockwaveHitEffect(LaraItem->pos.xPos,
 								sw->y,
 								LaraItem->pos.zPos,
@@ -1748,9 +1734,9 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 
 		angle = GetRandomControl() << 3;
 
-		sptr->xVel = -SIN(angle) >> 5;
+		sptr->xVel = -phd_sin(angle) >> 5;
 		sptr->yVel = -640 - (GetRandomControl() & 0xFF);
-		sptr->zVel = COS(angle) >> 5;
+		sptr->zVel = phd_cos(angle) >> 5;
 
 		sptr->friction = 5;
 		sptr->flags = 0;
@@ -1800,36 +1786,4 @@ ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g,
 	arc->rotation = GetRandomControl();
 
 	return arc;
-}
-
-void Inject_Tomb4FX()
-{
-	INJECT(0x004827E0, TriggerBlood);
-	INJECT(0x00431070, TriggerExplosionBubble);
-	INJECT(0x004812B0, GetFreeFireSpark);
-	INJECT(0x00481A00, TriggerGlobalStaticFlame);
-	INJECT(0x004816B0, TriggerGlobalFireSmoke);
-	INJECT(0x00481840, TriggerGlobalFireFlame);
-	INJECT(0x00481370, keep_those_fires_burning);
-	INJECT(0x00481B10, ClearFires);
-	INJECT(0x00481B10, AddFire);
-	INJECT(0x004813B0, UpdateFireSparks);
-	INJECT(0x00481D40, GetFreeSmokeSpark);
-	INJECT(0x00481DD0, UpdateSmoke);
-	INJECT(0x004820A0, TriggerGunSmoke);
-	INJECT(0x004823A0, TriggerShatterSmoke);
-	INJECT(0x00482580, GetFreeBlood);
-	INJECT(0x00482610, UpdateBlood);
-	INJECT(0x004829A0, GetFreeGunshell);
-	INJECT(0x00482A60, TriggerGunShell);
-	INJECT(0x00482D80, UpdateGunShells);
-	INJECT(0x00483180, AddWaterSparks);
-	INJECT(0x00483470, LaraBubbles);
-	INJECT(0x00483D00, GetFreeDrip);
-	INJECT(0x00483D90, UpdateDrips);
-	INJECT(0x00483F00, TriggerLaraDrips);
-	INJECT(0x00484080, ExplodingDeath2);
-	INJECT(0x00484640, GetFreeShockwave);
-	INJECT(0x00484670, TriggerShockwave);
-	INJECT(0x004849A0, UpdateShockwaves);
 }

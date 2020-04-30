@@ -73,7 +73,7 @@ void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
 void TriggerLaraDrips();
-int ExplodingDeath2(short itemNumber, int meshBits, short damage);
+int ExplodingDeath(short itemNumber, int meshBits, short damage);
 int GetFreeShockwave();
 void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel);
@@ -83,5 +83,3 @@ void SetFadeClip(short height, short speed);
 void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
 ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g, byte b, short segmentSize, short life, short amplitude, byte flags, byte type);
 void UpdateEnergyArcs();
-
-void Inject_Tomb4FX();

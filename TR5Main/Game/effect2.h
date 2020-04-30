@@ -2,8 +2,6 @@
 #include <d3d11.h>
 #include "..\Global\global.h"
 
-#define ExplodingDeath ((void (__cdecl*)(short, int, int)) 0x00484080)
-#define DrawLensFlare ((void (__cdecl*)(ITEM_INFO*)) 0x00485290)
 #define RIPPLE_FLAG_BLOOD 0x80
 #define RIPPLE_FLAG_RAND_POS 0x40
 #define RIPPLE_FLAG_RAND_ROT 0x20
@@ -71,4 +69,3 @@ void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
 void WadeSplash(ITEM_INFO* item, int wh, int wd);
 void Splash(ITEM_INFO* item);
-void Inject_Effect2();

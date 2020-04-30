@@ -2,6 +2,8 @@
 #include "../../Game/Box.h"
 #include "../../Game/effects.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/lara.h"
 
 byte DogAnims[] = { 20, 21, 22, 20 };
 BITE_INFO DogBite = { 0, 0, 100, 3 };
@@ -33,7 +35,7 @@ void ControlDog(short itemNumber)
 
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	if (item->hitPoints <= 0)
 	{
@@ -67,7 +69,7 @@ void ControlDog(short itemNumber)
 		{
 			int dx = LaraItem->pos.xPos - item->pos.xPos;
 			int dz = LaraItem->pos.zPos - item->pos.zPos;
-			ATAN(dz, dx);
+			phd_atan(dz, dx);
 			distance = SQUARE(dx) + SQUARE(dz);
 		}
 

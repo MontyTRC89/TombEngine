@@ -16,6 +16,8 @@
 #include "../../Game/traps.h"
 #include "../../Game/camera.h"
 #include "../../Specific/setup.h"
+#include "..\..\Specific\level.h"
+#include "../../Game/sound.h"
 
 short SPyoffs[8] =
 {
@@ -555,7 +557,7 @@ void ElectricityWiresControl(short itemNumber)
 				item->itemFlags[0] = 28;
 				LaraBurn();
 				Lara.burnBlue = 1;
-				Lara.BurnCount = 48;
+				Lara.burnCount = 48;
 				LaraItem->hitPoints = 0;
 				return;
 			}
@@ -613,7 +615,7 @@ void ElectricityWiresControl(short itemNumber)
 			pos1.x = 0;
 			pos1.y = 0;
 			pos1.z = 0;			
-			GetLaraJointPosition(&pos1, LJ_LFOOT);
+			GetLaraJointPosition(&pos1, LM_LFOOT);
 
 			short roomNumber1 = LaraItem->roomNumber;
 			GetFloor(pos1.x, pos1.y, pos1.z, &roomNumber1);
@@ -622,7 +624,7 @@ void ElectricityWiresControl(short itemNumber)
 			pos2.x = 0;
 			pos2.y = 0;
 			pos2.z = 0;
-			GetLaraJointPosition(&pos2, LJ_RFOOT);
+			GetLaraJointPosition(&pos2, LM_RFOOT);
 
 			short roomNumber2 = LaraItem->roomNumber;
 			GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber2);
@@ -643,7 +645,7 @@ void ElectricityWiresControl(short itemNumber)
 					item->itemFlags[0] = 28;
 					LaraBurn();
 					Lara.burnBlue = 1;
-					Lara.BurnCount = 48;
+					Lara.burnCount = 48;
 					LaraItem->hitPoints = 0;
 				}
 			}
@@ -717,8 +719,8 @@ void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 					int factor = 3 * (bounds[1]-bounds[0]) >> 3;
 					short angle = 2 * GetRandomControl();
 
-					spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * SIN(angle) >> W2V_SHIFT);
-					spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * COS(angle) >> W2V_SHIFT);
+					spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT);
+					spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
 					
 					if (intensity >= 0)
 						spark->y = bounds[3];
@@ -743,8 +745,8 @@ void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 						else
 							spark->z = bounds[4];
 
-						spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * COS(angle) >> W2V_SHIFT);
-						spark->y += (GetRandomControl() % factor) * SIN(angle) >> W2V_SHIFT;
+						spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
+						spark->y += (GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT;
 						spark->xVel = 0;
 						spark->zVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
 					}
@@ -755,8 +757,8 @@ void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 						else
 							spark->x = bounds[0];
 
-						spark->y += (GetRandomControl() % factor) * SIN(angle) >> W2V_SHIFT;
-						spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * COS(angle) >> W2V_SHIFT);
+						spark->y += (GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT;
+						spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
 						spark->zVel = 0;
 						spark->xVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
 					}
@@ -924,12 +926,8 @@ void VentilatorControl(short itemNumber)
 	}
 	else
 	{
-		phd_PushUnitMatrix();
-		phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-		phd_SetTrans(0, 0, 0);
 		short tbounds[6];
-		phd_RotBoundingBoxNoPersp(bounds, tbounds);
-		phd_PopMatrix();
+		phd_RotBoundingBoxNoPersp(&item->pos, bounds, tbounds);
 
 		effectBounds[0] = item->pos.xPos + tbounds[0];
 		effectBounds[1] = item->pos.xPos + tbounds[1];
@@ -979,9 +977,9 @@ void DartControl(short itemNumber)
 	}
 	else
 	{
-		item->pos.xPos += item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-		item->pos.yPos -= item->speed * SIN(item->pos.xRot) >> W2V_SHIFT;
-		item->pos.xPos += item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+		item->pos.yPos -= item->speed * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -1190,7 +1188,7 @@ void RollingBallControl(short itemNumber)
 	{
 		if (abs(item->fallspeed) > 16)
 		{
-			int distance = SQRT_ASM(
+			int distance = sqrt(
 				SQUARE(Camera.pos.x - item->pos.xPos) +
 				SQUARE(Camera.pos.y - item->pos.yPos) +
 				SQUARE(Camera.pos.z - item->pos.zPos));
@@ -1406,7 +1404,7 @@ void RollingBallControl(short itemNumber)
 	short angle = 0;
 
 	if (item->itemFlags[1] || item->itemFlags[0])
-		angle = ATAN(item->itemFlags[1], item->itemFlags[0]);
+		angle = phd_atan(item->itemFlags[1], item->itemFlags[0]);
 	else
 		angle = item->pos.yRot;
 

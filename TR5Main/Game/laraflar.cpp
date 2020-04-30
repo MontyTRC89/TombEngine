@@ -1,8 +1,9 @@
 #include "laraflar.h"
 
 #include "..\Global\global.h"
-#include "..\Specific\roomload.h"
+#include "..\Specific\level.h"
 #include "..\Specific\setup.h"
+#include "sound.h"
 
 #include "draw.h"
 #include "items.h"
@@ -12,19 +13,15 @@
 #include "collide.h"
 #include "effect2.h"
 
-extern LaraExtraInfo g_LaraExtra;
-
 void FlareControl(short itemNumber) // (AF) (D)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-#if 0
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 	{
 		KillItem(itemNumber);
 		return;
 	}
-#endif
 
 	if (item->fallspeed)
 	{
@@ -41,8 +38,8 @@ void FlareControl(short itemNumber) // (AF) (D)
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
 
-	int xv = item->speed * SIN(item->pos.yRot) >> W2V_SHIFT;
-	int zv = item->speed * COS(item->pos.yRot) >> W2V_SHIFT;
+	int xv = item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	int zv = item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
@@ -117,7 +114,7 @@ void undraw_flare() // (F) (D)
 
 #if 0
 	if (LaraItem->goalAnimState == STATE_LARA_STOP &&
-		g_LaraExtra.Vehicle == NO_ITEM)
+		Lara.Vehicle == NO_ITEM)
 #else
 	if (LaraItem->goalAnimState == STATE_LARA_STOP)
 #endif
@@ -314,7 +311,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		pos.y = 32;
 		pos.z = 42;
 
-		GetLaraJointPosition(&pos, LJ_LHAND);
+		GetLaraJointPosition(&pos, LM_LHAND);
 
 		item->pos.xPos = pos.x;
 		item->pos.yPos = pos.y;
@@ -327,8 +324,8 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		{
 			flag = true;
 			item->pos.yRot = LaraItem->pos.yRot + ANGLE(180);
-			item->pos.xPos = LaraItem->pos.xPos + (320 * SIN(item->pos.yRot) >> W2V_SHIFT);
-			item->pos.zPos = LaraItem->pos.zPos + (320 * COS(item->pos.yRot) >> W2V_SHIFT);
+			item->pos.xPos = LaraItem->pos.xPos + (320 * phd_sin(item->pos.yRot) >> W2V_SHIFT);
+			item->pos.zPos = LaraItem->pos.zPos + (320 * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 			item->roomNumber = LaraItem->roomNumber;
 		}
 		else
@@ -385,7 +382,7 @@ void DoFlareInHand(int flare_age) // (AF) (D)
 	pos.y = 32;
 	pos.z = 41;
 
-	GetLaraJointPosition(&pos, LJ_LHAND);
+	GetLaraJointPosition(&pos, LM_LHAND);
 	DoFlareLight(&pos, flare_age);
 
 	/* Hardcoded code */
@@ -474,9 +471,4 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 		return 0;
 	}
-}
-
-void Inject_LaraFlar()
-{
-
 }
