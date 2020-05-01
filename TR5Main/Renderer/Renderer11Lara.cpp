@@ -21,6 +21,9 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	Matrix world;
 
 	RendererItem* item = &m_items[Lara.itemNumber];
+	item->Id = Lara.itemNumber;
+	item->Item = LaraItem;
+
 	if (!force && item->DoneAnimations)
 		return;
 
@@ -35,6 +38,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(LaraItem->pos.yRot), TO_RAD(LaraItem->pos.xRot), TO_RAD(LaraItem->pos.zRot));
 
 	m_LaraWorldMatrix = rotation * translation;
+	item->World = m_LaraWorldMatrix;
 
 	// Update first Lara's animations
 	laraObj->LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.torsoXrot), TO_RAD(Lara.torsoYrot), TO_RAD(Lara.torsoZrot));
@@ -46,7 +50,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	int rate, frac;
 
 	frac = GetFrame_D2(LaraItem, framePtr, &rate);
-	updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+	updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
 	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.flareControlLeft)
@@ -54,7 +58,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 		frac = GetFrame_D2(LaraItem, framePtr, &rate);
-		updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+		updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 	}
 	else
 	{
@@ -78,12 +82,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
-			updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
-			updateAnimation(NULL, laraObj, &shotgunFramePtr, 0, 1, mask);
+			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 			break;
 
 		case WEAPON_PISTOLS:
@@ -97,15 +101,15 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber - Anims[Lara.leftArm.animNumber].frameBase) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
-			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
-			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
+			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
+			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber - Anims[Lara.rightArm.animNumber].frameBase) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
-			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
-			updateAnimation(NULL, laraObj, &pistolFramePtr, 0, 1, mask);
+			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
+			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 		}
 
 		break;
@@ -115,15 +119,19 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+			updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			frac = GetFrame_D2(LaraItem, framePtr, &rate);
-			updateAnimation(NULL, laraObj, framePtr, frac, rate, mask);
+			updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 			break;
 		}
 	}
+
+	// Copy matrices in Lara object
+	for (int m = 0; m < 15; m++)
+		laraObj->AnimationTransforms[m] = item->AnimationTransforms[m];
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
 	if (m_moveableObjects[ID_LARA_HAIR] != NULL)
@@ -253,10 +261,6 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			}
 		}
 	}
-
-	// Transpose matrices for shaders
-	for (int m = 0; m < 15; m++)
-		laraObj->AnimationTransforms[m] = laraObj->AnimationTransforms[m];
 
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }

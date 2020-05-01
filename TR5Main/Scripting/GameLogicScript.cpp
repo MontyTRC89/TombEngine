@@ -1439,7 +1439,7 @@ void GameScriptItem::SetZPos(float z)
 
 float GameScriptItem::GetXRot()
 {
-	return TR_ANGLE_TO_DEGREES(NativeItem->pos.xRot);
+	return TO_DEGREES(NativeItem->pos.xRot);
 }
 
 void GameScriptItem::SetXRot(float x)
@@ -1452,7 +1452,7 @@ void GameScriptItem::SetXRot(float x)
 
 float GameScriptItem::GetYRot()
 {
-	return TR_ANGLE_TO_DEGREES(NativeItem->pos.yRot);
+	return TO_DEGREES(NativeItem->pos.yRot);
 }
 
 void GameScriptItem::SetYRot(float y)
@@ -1465,7 +1465,7 @@ void GameScriptItem::SetYRot(float y)
 
 float GameScriptItem::GetZRot()
 {
-	return TR_ANGLE_TO_DEGREES(NativeItem->pos.zRot);
+	return TO_DEGREES(NativeItem->pos.zRot);
 }
 
 void GameScriptItem::SetZRot(float z)

@@ -1078,16 +1078,8 @@ bool Renderer11::drawEffects(bool transparent)
 		RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
 		ObjectInfo* obj = &Objects[effect->Effect->objectNumber];
 
-		drawEffect(effect, transparent);
-
-		if (obj->nmeshes > 0)
-		{
-
-		}
-		else
-		{
-
-		}
+		if (obj->drawRoutine && obj->loaded)
+			drawEffect(effect, transparent);
 	}
 
 	return true;
