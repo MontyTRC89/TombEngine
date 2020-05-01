@@ -5024,6 +5024,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 					item->frameNumber = Anims[item->animNumber].frameBase;
 					item->goalAnimState = STATE_LARA_MISC_CONTROL;
 					item->currentAnimState = STATE_LARA_MISC_CONTROL;
+					Lara.gunStatus = LG_HANDS_BUSY;
 				/*}*/
 			}
 		}
