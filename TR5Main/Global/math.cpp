@@ -1317,12 +1317,12 @@ short ANGLE(float angle)
 	return angle * 65536.0f / 360.0f;
 }
 
-float TR_ANGLE_TO_DEGREES(short angle)
+float TO_DEGREES(short angle)
 {
 	return (unsigned short) angle * 360.0f / 65536.0f;
 }
 
-float TR_ANGLE_TO_RAD(short angle)
+float TO_RAD(short angle)
 {
 	return angle * 360.0f / 65536.0f * RADIAN;
 }
