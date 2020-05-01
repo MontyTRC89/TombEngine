@@ -1853,11 +1853,19 @@ int Renderer11::drawFinalPass()
 	m_swapChain->Present(0, 0);
 
 	// Update fade status
-	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN)
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor < 1.0f)
+	{
 		m_fadeFactor += FADE_FACTOR;
+		if (m_fadeFactor >= 0.9f)
+			m_fadeFactor = 1.0f;
+	}
 
-	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT)
+	if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeStatus > 0.0f)
+	{
 		m_fadeFactor -= FADE_FACTOR;
+		if (m_fadeFactor <= 0.1f)
+			m_fadeFactor = 0.0f;
+	}
 
 	return 0;
 }
