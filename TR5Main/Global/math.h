@@ -13,16 +13,9 @@
 #define CLICK(x) ((x) * STEP_SIZE)
 #define SECTOR(x) ((x) * WALL_SIZE)
 
-#define TO_DEGREES(x) ((x) / 65536.0f * 360.0f)
-#define TO_RAD(x) ((x) / 65536.0f * 360.0f * RADIAN)
-
-//#define ATAN ((int(__cdecl*)(int, int)) 0x0048F8A0)
-
-
 short ANGLE(float angle);
-
-float TR_ANGLE_TO_DEGREES(short angle);
-float TR_ANGLE_TO_RAD(short angle);
+float TO_DEGREES(short angle);
+float TO_RAD(short angle);
 
 extern short rcossin_tbl[8192];
 
