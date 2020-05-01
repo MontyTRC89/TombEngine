@@ -87,6 +87,9 @@ short NextFxFree;
 short NextItemActive;
 short NextItemFree;
 short* TriggerIndex;
+
+string LuaMessage;
+
 int DisableLaraControl = 0;
 int WeatherType;
 int LaraDrawType;
@@ -182,6 +185,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		{
 			if (S_UpdateInput() == -1)
 				return GAME_STATUS_NONE;
+		}
+
+		if ((TrInput & IN_SPRINT) == IN_SPRINT)
+		{
+			g_GameScript->ExecuteScript("script.lua", &LuaMessage);
 		}
 
 		// Has Lara control been disabled?
