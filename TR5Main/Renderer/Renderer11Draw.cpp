@@ -2076,6 +2076,7 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Lara.gunType: %d", Lara.gunType);
 		printDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
 		printDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->speed, LaraItem->fallspeed);
+		printDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
 		printDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE, r->z + r->ySize * WALL_SIZE);
 		printDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 		printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
