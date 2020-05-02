@@ -5149,7 +5149,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 	
 }
 
-void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll) //fairly sure this function is useless
+void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 
 	/*stop Lara from doing it in front of holes*/
@@ -5177,7 +5177,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll) //fairly sure this fu
 	}
 }
 
-void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll) //lmao this whole shit is ignored, ok
+void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
@@ -5196,11 +5196,12 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll) //lmao this whole sh
 		coll->slopesAreWalls = true; //collide with slopes
 		GetLaraCollisionInfo(item, coll);
 
-
+/* not sure about these just yet
 		if (LaraHitCeiling(item, coll))
 			return;
 
 		ShiftItem(item, coll);
+*/
 }
 
 
