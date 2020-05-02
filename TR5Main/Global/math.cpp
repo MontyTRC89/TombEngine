@@ -1482,9 +1482,9 @@ void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds)
 	bMax = Vector3::Transform(bMax, world);
 
 	tbounds[0] = bMin.x;
-	tbounds[2] = bMin.y;
-	tbounds[4] = bMin.z;
 	tbounds[1] = bMax.x;
+	tbounds[2] = bMin.y;
 	tbounds[3] = bMax.y;
+	tbounds[4] = bMin.z;
 	tbounds[5] = bMax.z;
 }

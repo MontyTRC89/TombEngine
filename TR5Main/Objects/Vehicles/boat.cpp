@@ -893,8 +893,11 @@ void BoatControl(short itemNumber)
 	height = GetFloorHeight(floor, boat->pos.xPos, boat->pos.yPos, boat->pos.zPos);
 	ceiling = GetCeiling(floor, boat->pos.xPos, boat->pos.yPos, boat->pos.zPos);
 	
-	TestTriggers(TriggerIndex, 0, 0);
-	TestTriggers(TriggerIndex, 1, 0); // HEAVY too
+	if (Lara.Vehicle == itemNumber)
+	{
+		TestTriggers(TriggerIndex, 0, 0);
+		TestTriggers(TriggerIndex, 1, 0); // HEAVY too
+	}
 
 	binfo->water = water = GetWaterHeight(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, roomNumber);
 
