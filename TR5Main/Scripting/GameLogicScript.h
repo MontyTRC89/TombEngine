@@ -136,12 +136,13 @@ private:
 	map<string, short>					m_itemsMapName;
 	vector<LuaFunction*>				m_triggers;
 
-	string								loadScriptFromFile(char* luaFilename);
+	string								loadScriptFromFile(const char* luaFilename);
 
 public:	
 	GameScript(sol::state* lua);
 
-	bool								ExecuteScript(char* luaFilename, string* message);
+	bool								ExecuteScript(const char* luaFilename, string* message);
+	bool								ExecuteString(const char* command, string* message);
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);
