@@ -19,7 +19,10 @@
 #include "..\Specific\level.h"
 
 #include "configuration.h"
-
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <windows.h>
 WINAPP	 App;
 unsigned int threadId;
 uintptr_t hThread;
@@ -28,12 +31,13 @@ byte receivedWmClose = false;
 bool Debug = false;
 HWND WindowsHandle;
 int App_Unk00D9ABFD;
-
+extern string LuaMessage;
 extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
-
+DWORD DebugConsoleThreadID;
+DWORD MainThreadID;
 int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
@@ -89,8 +93,32 @@ void __stdcall HandleWmCommand(unsigned short wParam)
 	}
 }
 
+void HandleScriptMessage(WPARAM wParam)
+{
+	string message = *(string*)(wParam);
+	const string luafileSuffix(".lua");
+	//check whether line starts with "lua "
+	if (message.rfind("lua ", 0) == 0) {
+		string scriptSubstring = message.substr(4);
+		//check whether the string ends with .lua, if yes execute from file, otherwise execute directly
+		if (scriptSubstring.rfind(luafileSuffix) == (scriptSubstring.size() - luafileSuffix.size())) {
+			g_GameScript->ExecuteScript(scriptSubstring.c_str(),&LuaMessage);
+		}
+		else {
+			g_GameScript->ExecuteString(scriptSubstring.c_str(), &LuaMessage);
+		}
+
+	}
+		
+}
+
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (msg == WM_USER + 0) {
+		HandleScriptMessage(wParam);
+
+		return 0;
+	}
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU) {
 		return 0;
@@ -184,7 +212,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		if (wcscmp(argv[i], L"/debug") == 0)
 			Debug = true;
 	}
-
 	LocalFree(argv);
 
 	// Clear Application Structure
@@ -280,7 +307,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	}
 
 	WindowsHandle = App.WindowHandle;
-
 	// Initialise the renderer
 	g_Renderer->Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, 
 						   g_Configuration.Windowed, App.WindowHandle);
@@ -298,7 +324,34 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	UpdateWindow(WindowsHandle);
 	ShowWindow(WindowsHandle, nShowCmd);
-
+	//Create debug script terminal
+	if (Debug) {
+		MainThreadID = GetWindowThreadProcessId(WindowsHandle, NULL);
+		AllocConsole();
+		HANDLE handle_in = GetStdHandle(STD_INPUT_HANDLE);
+		DWORD consoleModeIn;
+		int hCrt = _open_osfhandle((long)handle_in, _O_BINARY);
+		FILE* hf_in = _fdopen(hCrt, "r");
+		setvbuf(hf_in, NULL, _IONBF, 512);
+		*stdin = *hf_in;
+		GetConsoleMode(handle_in, &consoleModeIn);
+		consoleModeIn = consoleModeIn | ENABLE_LINE_INPUT;
+		SetConsoleMode(handle_in, consoleModeIn);
+		LPTHREAD_START_ROUTINE readConsoleLoop = [](LPVOID params) -> DWORD {
+			DWORD read;
+			CHAR buffer[4096];
+			while (true) {
+				BOOL success = ReadFile(params, &buffer, 4096, &read, NULL);
+				if (success) {
+					//Only send the actual written message minus \r\n
+					string msg(buffer, read-2);
+					SendMessageA(WindowsHandle, WM_USER + 0, (WPARAM)&msg, NULL);
+				}
+			};
+			return 0;
+		};
+		CreateThread(NULL, 0, readConsoleLoop, handle_in, 0, &DebugConsoleThreadID);
+	}
 	SetCursor(0);
 	ShowCursor(0);
 	hAccTable = LoadAcceleratorsA(hInstance, (LPCSTR)0x65);

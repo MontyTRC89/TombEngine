@@ -1033,7 +1033,7 @@ void GameScript::FreeLevelScripts()
 	*/
 }
 
-string GameScript::loadScriptFromFile(char* luaFilename)
+string GameScript::loadScriptFromFile(const char* luaFilename)
 {
 	ifstream ifs(luaFilename, ios::in | ios::binary | ios::ate);
 
@@ -1046,11 +1046,24 @@ string GameScript::loadScriptFromFile(char* luaFilename)
 	return string(bytes.data(), fileSize);
 }
 
-bool GameScript::ExecuteScript(char* luaFilename, string* message)
+bool GameScript::ExecuteScript(const char* luaFilename, string* message)
 { 
 	sol::protected_function_result result;
-
 	result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
+	if (!result.valid())
+	{
+		sol::error error = result;
+		*message = error.what();
+		return false;
+	}
+	message->clear();
+	return true;
+}
+
+bool GameScript::ExecuteString(const char* command, string* message)
+{
+	sol::protected_function_result result;
+	result = m_lua->safe_script(command);
 	if (!result.valid())
 	{
 		sol::error error = result;
