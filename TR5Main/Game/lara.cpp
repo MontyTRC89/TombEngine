@@ -5152,8 +5152,9 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 
-	/*stop Lara from doing it in front of holes*/
-	if (LaraFloorFront(item, item->pos.yRot, 1024) >= 512) //1024 to stop Lara from doing it one sector away. too far?
+	/*stop Lara from doing it in these conditions to avoid trouble*/
+	if (LaraFloorFront(item, item->pos.yRot, 1024) >= 512 ||  //4 clicks away from holes in the floor	
+		TestWall(item, 1024, 0, -640))			 //4 clicks away from walls
 	{
 		return;
 	}
@@ -5172,10 +5173,11 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState = STATE_LARA_CROUCH_ROLL;
 		item->goalAnimState = STATE_LARA_CROUCH_IDLE;
 		item->animNumber = ANIMATION_LARA_CROUCH_ROLL_FORWARD_BEGIN;
-		item->frameNumber = Anims[ANIMATION_LARA_CROUCH_ROLL_FORWARD_BEGIN].frameBase;
+		item->frameNumber = Anims[ANIMATION_LARA_CROUCH_ROLL_FORWARD_BEGIN].frameBase; //fix it being slow
 
 	}
 }
+
 
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -5185,23 +5187,19 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	
-		Lara.isDucked = true; //keep ducked 
-		item->gravityStatus = false; //no gravity 
-		item->fallspeed = 0; //^
+		Lara.isDucked = true;
+		item->gravityStatus = false;
+		item->fallspeed = 0;
 		Lara.moveAngle = item->pos.yRot;
 		coll->facing = item->pos.yRot;
 		coll->badPos = STEPUP_HEIGHT;
 		coll->badNeg = -STEPUP_HEIGHT;
 		coll->badCeiling = 0;
-		coll->slopesAreWalls = true; //collide with slopes
+		coll->slopesAreWalls = true;
 		GetLaraCollisionInfo(item, coll);
 
-/* not sure about these just yet
-		if (LaraHitCeiling(item, coll))
-			return;
-
 		ShiftItem(item, coll);
-*/
+		item->pos.yPos += coll->midFloor;
 }
 
 
