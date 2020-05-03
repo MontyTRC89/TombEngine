@@ -6269,6 +6269,25 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		}
 		return 1;
 	}
+		else if (Lara.canMonkeySwing)
+			{
+			int h = (Rooms->maxceiling) - (item->pos.yPos);
+
+				if (h > 1792 ||
+					h < -1792)
+				{
+					return 0;
+				}
+
+			item->animNumber = ANIMATION_LARA_STAY_IDLE;
+			item->frameNumber = Anims[ANIMATION_LARA_STAY_IDLE].frameBase;
+			item->goalAnimState = STATE_LARA_JUMP_UP;
+			item->currentAnimState = STATE_LARA_NULL_62;
+			AnimateLara(item);
+			return 1;
+			}
+
+	else
 	return 0;
 }
 
