@@ -333,10 +333,16 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		int hCrt = _open_osfhandle((long)handle_in, _O_BINARY);
 		FILE* hf_in = _fdopen(hCrt, "r");
 		setvbuf(hf_in, NULL, _IONBF, 512);
-		*stdin = *hf_in;
 		GetConsoleMode(handle_in, &consoleModeIn);
 		consoleModeIn = consoleModeIn | ENABLE_LINE_INPUT;
 		SetConsoleMode(handle_in, consoleModeIn);
+		freopen_s(&hf_in, "CONIN$", "r", stdin);
+
+		HANDLE ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+		int SystemOutput = _open_osfhandle(intptr_t(ConsoleOutput), _O_TEXT);
+		FILE* COutputHandle = _fdopen(SystemOutput, "w");
+		freopen_s(&COutputHandle, "CONOUT$", "w", stdout);
+
 		LPTHREAD_START_ROUTINE readConsoleLoop = [](LPVOID params) -> DWORD {
 			DWORD read;
 			CHAR buffer[4096];
