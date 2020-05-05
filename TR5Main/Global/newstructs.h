@@ -11,9 +11,9 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 struct TrTexturePage {
-	int width;
-	int height;
-	int flags;
+	short width;
+	short height;
+	short flags;
 	short format;
 	byte* colorMap;
 	byte* normalMap;
@@ -119,6 +119,7 @@ struct TrBone {
 	int index;
 	TrBone* parent;
 	vector<TrBone*> children;
+	Vector3 translation;
 	Matrix bindPoseTransform;
 	Matrix animationTransform;
 };
