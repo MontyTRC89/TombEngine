@@ -260,13 +260,14 @@ struct TrFlybyCamera {
 	string script;
 };
 
-struct TrFlybySequences {
+struct TrFlybySequence {
 	vector<TrFlybyCamera> cameras;
 	int flags;
 	string script;
 };
 
 struct TrSprite {
+	int Id;
 	TrTexturePage* texture;
 	Vector2 textureCoords[4];
 };
@@ -281,12 +282,11 @@ struct TrLevel {
 	vector<TrMoveable> moveables;
 	vector<TrStatic> statics;
 	vector<TrAnimatedTexturesSequence> animatedTextures;
-	vector<TrItem> items;
 	vector<TrItem> nullmeshItems;
 	vector<TrCamera> cameras;
 	vector<TrSoundSource> soundSources;
 	vector<TrSink> sinks;
-	vector<TrFlybySequences> flybySequences;
+	vector<TrFlybySequence> flybySequences;
 	vector<TrBox> boxes;
 	vector<int> zones;
 	short soundMap[SOUND_NEW_SOUNDMAP_MAX_SIZE];
