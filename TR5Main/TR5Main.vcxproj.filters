@@ -306,6 +306,9 @@
     <ClInclude Include="Specific\level.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Global\newstructs.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TR5Main.cpp">
