@@ -799,9 +799,6 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	if (best < 0)
 	{
 		GAME_VECTOR vDest;
-		/*vDest.x = vSrc.x + (MatrixPtr[M20] * 5 >> 2);
-		vDest.y = vSrc.y + (MatrixPtr[M21] * 5 >> 2);
-		vDest.z = vSrc.z + (MatrixPtr[M22] * 5 >> 2);*/
 		
 		vDest.x = destination.x;
 		vDest.y = destination.y;
