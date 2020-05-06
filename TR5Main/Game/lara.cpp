@@ -121,7 +121,7 @@ void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* co
 	lara_void_func,
 	lara_as_deathslide,
 	lara_as_duck,
-	lara_as_duck,
+	lara_as_crouch_roll,
 	lara_as_dash,
 	lara_as_dashdive,
 	lara_as_hang2,
@@ -3847,7 +3847,7 @@ void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)//16DB8(<), 16EEC(<) (F)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
-	item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
+	item->goalAnimState = STATE_LARA_MONKEYSWING_TURNAROUND;
 }
 
 void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)//16D64(<), 16E98(<) (F)
@@ -4133,6 +4133,13 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
 		{
 			item->goalAnimState = STATE_LARA_MONKEYSWING_TURN_RIGHT;
 		}
+		else if (TrInput & IN_ROLL)
+			{
+				item->currentAnimState = STATE_LARA_MONKEYSWING_TURNAROUND;
+				item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
+				item->animNumber = ANIMATION_LARA_MONKEY_TURN_AROUND;
+				item->frameNumber = Anims[ANIMATION_LARA_MONKEY_TURN_AROUND].frameBase;
+			}
 
 		MonkeySwingSnap(item, coll);
 	}
@@ -5123,7 +5130,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 		&& !(Rooms[roomNum].flags & ENV_FLAG_WATER))
 	{
 
-		if ((item->animNumber == ANIMATION_LARA_CROUCH_IDLE 
+		if ((item->animNumber == ANIMATION_LARA_CROUCH_IDLE
 			|| item->animNumber == ANIMATION_LARA_CROUCH_PREPARE)
 			&& !(TrInput & IN_FLARE || TrInput & IN_DRAW)
 			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
@@ -5133,8 +5140,75 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 
 			item->goalAnimState = STATE_LARA_CRAWL_IDLE;
 		}
+
+	}
+		else 
+
+			/*crouch roll*/
+			if ((TrInput & IN_SPRINT) //maybe change this roll? or jump?
+				&& (TrInput & IN_DUCK || Lara.keepDucked)
+				&& Lara.gunStatus == LG_NO_ARMS
+				&& Lara.waterStatus != LW_WADE
+				&& !(Rooms[roomNum].flags & ENV_FLAG_WATER)) //is this necessary?
+			{   
+				lara_as_crouch_roll(item, coll);
+			}
+	
+}
+
+void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+{
+
+	/*stop Lara from doing it in these conditions to avoid trouble*/
+	if (LaraFloorFront(item, item->pos.yRot, 1024) >= 512 ||  //4 clicks away from holes in the floor	
+		TestWall(item, 1024, 0, -640))			 //4 clicks away from walls
+	{
+		return;
+	}
+
+	/*do actual anim*/
+	if ((item->animNumber == ANIMATION_LARA_CROUCH_IDLE //)
+		|| item->animNumber == ANIMATION_LARA_CROUCH_PREPARE) // not exactly necessary but makes gameplay much faster, make optional in the future.
+		&& !(TrInput & IN_FLARE || TrInput & IN_DRAW) //avoids some flare spawning/wep stuff
+		&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
+
+	{
+		Lara.torsoYrot = 0;
+		Lara.torsoXrot = 0;
+
+		lara_col_crouch_roll(item, coll);
+		item->currentAnimState = STATE_LARA_CROUCH_ROLL;
+		item->goalAnimState = STATE_LARA_CROUCH_IDLE;
+		item->animNumber = ANIMATION_LARA_CROUCH_ROLL_FORWARD_BEGIN;
+		item->frameNumber = Anims[ANIMATION_LARA_CROUCH_ROLL_FORWARD_BEGIN].frameBase; //fix it being slow
+
 	}
 }
+
+
+void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = STATE_LARA_CROUCH_IDLE;
+		return;
+	}
+	
+		Lara.isDucked = true;
+		item->gravityStatus = false;
+		item->fallspeed = 0;
+		Lara.moveAngle = item->pos.yRot;
+		coll->facing = item->pos.yRot;
+		coll->badPos = STEPUP_HEIGHT;
+		coll->badNeg = -STEPUP_HEIGHT;
+		coll->badCeiling = 0;
+		coll->slopesAreWalls = true;
+		GetLaraCollisionInfo(item, coll);
+
+		ShiftItem(item, coll);
+		item->pos.yPos += coll->midFloor;
+}
+
 
 void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)//14534, 145E4 (F)
 {
@@ -6269,6 +6343,25 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		}
 		return 1;
 	}
+		else if (Lara.canMonkeySwing)
+			{
+			int h = (Rooms->maxceiling) - (item->pos.yPos);
+
+				if (h > 1792 ||
+					h < -1792)
+				{
+					return 0;
+				}
+
+			item->animNumber = ANIMATION_LARA_STAY_IDLE;
+			item->frameNumber = Anims[ANIMATION_LARA_STAY_IDLE].frameBase;
+			item->goalAnimState = STATE_LARA_JUMP_UP;
+			item->currentAnimState = STATE_LARA_NULL_62;
+			AnimateLara(item);
+			return 1;
+			}
+
+	else
 	return 0;
 }
 
