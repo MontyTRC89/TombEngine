@@ -88,8 +88,6 @@ short NextItemActive;
 short NextItemFree;
 short* TriggerIndex;
 
-string LuaMessage;
-
 int DisableLaraControl = 0;
 int WeatherType;
 int LaraDrawType;
@@ -159,6 +157,7 @@ extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
+extern bool BlockTrInput;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -187,10 +186,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				return GAME_STATUS_NONE;
 		}
 
-		if ((TrInput & IN_SPRINT) == IN_SPRINT)
-		{
-			g_GameScript->ExecuteScript("script.lua", &LuaMessage);
-		}
+		if (BlockTrInput)
+			TrInput = 0;
 
 		// Has Lara control been disabled?
 		if (DisableLaraControl || CurrentLevel == 0)

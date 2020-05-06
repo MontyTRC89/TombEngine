@@ -22,7 +22,6 @@ extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_SFXVolumeBar;
 extern RendererHUDBar* g_MusicVolumeBar;
-extern string LuaMessage;
 
 int Renderer11::DrawPickup(short objectNum)
 {
@@ -2081,7 +2080,6 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 		printDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		printDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
-		printDebugMessage("Lua message: %s", LuaMessage.c_str());
 #endif
 	}
 
