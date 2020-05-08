@@ -4877,7 +4877,9 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 				Lara.waterStatus != LW_WADE)
 			{
 				if (item->animNumber == ANIMATION_LARA_CRAWL_IDLE ||
-					item->animNumber == ANIMATION_LARA_CROUCH_TO_CRAWL_END)
+				item->animNumber == ANIMATION_LARA_CROUCH_TO_CRAWL_END ||
+				item->animNumber == ANIMATION_LARA_CRAWL_FORWARD_TO_IDLE_END_RIGHT ||
+				item->animNumber == ANIMATION_LARA_CRAWL_FORWARD_TO_IDLE_END_LEFT)
 				{
 					if (TrInput & IN_FORWARD)
 					{
