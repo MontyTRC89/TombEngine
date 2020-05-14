@@ -392,7 +392,7 @@ void TriggerElectricityWiresSparks(int x, int z, char objNum, char node, int fla
 
 	spark->fxObj = objNum;
 	spark->transType = 2;
-	spark->flags = SP_ITEM | SP_NODEATTATCH | SP_SCALE | SP_DEF;
+	spark->flags = SP_ITEM | SP_NODEATTACH | SP_SCALE | SP_DEF;
 	spark->nodeNumber = node;
 	spark->x = x;
 	spark->z = z;

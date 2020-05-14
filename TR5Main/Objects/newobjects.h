@@ -124,19 +124,21 @@ typedef struct KAYAK_INFO {
 
 typedef struct BOSS_STRUCT
 {
-	short attack_count;
-	short death_count;
-	byte attack_flag;
-	byte attack_type;
-	byte attack_head_count;
-	byte ring_count;
-	short explode_count;
-	short lizman_item, lizman_room;
-	short hp_counter;
-	short dropped_icon;
-	byte charged;
-	byte dead;
-	PHD_VECTOR	BeamTarget;
+	PHD_VECTOR BeamTarget;
+	bool DroppedIcon;
+	bool IsInvincible;
+	bool DrawExplode; // allow explosion geometry
+	bool Charged;
+	bool Dead;
+	short AttackCount;
+	short DeathCount;
+	short AttackFlag;
+	short AttackType;
+	short AttackHeadCount;
+	short RingCount;
+	short ExplodeCount;
+	short LizmanItem, LizmanRoom;
+	short HpCounter;
 };
 
 typedef struct SHIELD_POINTS
@@ -261,8 +263,8 @@ void ControlFish(short itemNumber);
 bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item);
 void InitialiseTony(short itemNum);
 void TonyControl(short itemNum);
-void DrawTony(ITEM_INFO* item);
-void TonyFireBallControl(short fxNumber);
+void S_DrawTonyBoss(ITEM_INFO* item);
+void ControlTonyFireBall(short fxNumber);
 void InitialiseShiva(short itemNum);
 void ShivaControl(short itemNum);
 void ControlLaserBolts(short item_number);
