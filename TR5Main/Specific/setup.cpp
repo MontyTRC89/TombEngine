@@ -3259,7 +3259,7 @@ void CustomObjects()
 		obj->initialise = InitialiseTony;
 		obj->collision = CreatureCollision;
 		obj->control = TonyControl;
-		obj->drawRoutine = DrawTony;
+		obj->drawRoutine = S_DrawTonyBoss;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
 		obj->pivotLength = 50;
@@ -3273,6 +3273,10 @@ void CustomObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
+
+	obj = &Objects[ID_TONY_BOSS_FLAME];
+	obj->control = ControlTonyFireBall;
+	obj->drawRoutine = NULL;
 
 	obj = &Objects[ID_BIRDMONSTER];
 	if (obj->loaded)
@@ -3333,9 +3337,7 @@ void CustomObjects()
 
 	obj = &Objects[ID_KNIFETHROWER_KNIFE];
 	if (obj->loaded)
-	{
 		obj->control = KnifeControl;
-	}
 
 	obj = &Objects[ID_MERCENARY_UZI];
 	if (obj->loaded)
