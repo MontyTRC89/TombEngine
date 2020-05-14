@@ -33,53 +33,75 @@ int SmokeCountR;
 //int SmokeWindZ;
 int SplashCount = 0;
 SPARKS Sparks[MAX_SPARKS];
-PHD_VECTOR NodeVectors[16];
-NODEOFFSET_INFO NodeOffsets[16] = {
-	{ -0x10, 0x28, 0xA0, -0xE, 0 },
-	{ -0x10, -8, 0xA0, 0, 0 },
-	{ 0, 0, 0x100, 8, 0 },
-	{ 0, 0, 0x100, 0x11, 0 },
-	{ 0, 0, 0x100, 0x1A, 0 },
-	{ 0, 0x90, 0x28, 0xA, 0 },
-	{ -0x28, 0x40, 0x168, 0xE, 0 },
-	{ 0, -0x258, -0x28, 0, 0 },
-	{ 0, 0x20, 0x10, 9, 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 }
+PHD_VECTOR NodeVectors[MAX_NODE];
+NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
+	{ -16, 40, 160, -14, false }, // TR5 offset 0
+	{ -16, -8, 160, 0, false }, // TR5 offset 1
+	{ 0, 0, 256, 8, false }, // TR5 offset 2
+	{ 0, 0, 256, 17, false }, // TR5 offset 3
+	{ 0, 0, 256, 26, false }, // TR5 offset 4
+	{ 0, 144, 40, 10, false }, // TR5 offset 5
+	{ -40, 64, 360, 14, false }, // TR5 offset 6
+	{ 0, -600, -40, 0, false }, // TR5 offset 7
+	{ 0, 32, 16, 9, false }, // TR5 offset 8
+	{ 0, 340, 0, 7, false }, // TR3 offset 0
+	{ 0, 0, -96, 10, false }, // TR3 offset 1
+	{ 13, 48, 320, 13, false }, // TR3 offset 2
+	{ 0, -256, 0, 5, false }, // TR3 offset 3
+	{ 0, 64, 0, 10, false }, // TR3 offset 4 // tony left
+	{ 0, 64, 0, 13, false }, // TR3 offset 5 // tony right
+	{ -32, -16, -192, 13, false }, // TR3 offset 6
+	{ -64, 410, 0, 20, false }, // TR3 offset 7
+	{ 64, 410, 0, 23, false }, // TR3 offset 8
+	{ -160, -8, 16, 5, false }, // TR3 offset 9
+	{ -160, -8, 16, 9, false }, // TR3 offset 10
+	{ -160, -8, 16, 13, false }, // TR3 offset 11
+	{ 0, 0, 0, 0, false }, // TR3 offset 12
+	{ 0, 0, 0, 0, false }, // Empty
 };
 
 extern GameFlow* g_GameFlow;
 
-void DetatchSpark(int num, int type)//32D8C, 3328C (F)
+void DetatchSpark(int num, int type)// (F) (D)
 {
-	FX_INFO* fx = &Effects[num];
-	ITEM_INFO* item = &Items[num];
-	SPARKS* sptr = &Sparks[0];
-
+	FX_INFO* fx;
+	ITEM_INFO* item;
+	SPARKS* sptr;
+	
+	sptr = &Sparks[0];
 	for (int lp = 0; lp < MAX_SPARKS; lp++, sptr++)
 	{
-		if (sptr->on && sptr->flags & type && sptr->fxObj == num)
+		if (sptr->on && (sptr->flags & type) && sptr->fxObj == num)
 		{
-			if (type == 64)
+			if (type == SP_FX)
 			{
-				sptr->x += fx->pos.xPos;
-				sptr->y += fx->pos.yPos;
-				sptr->z += fx->pos.zPos;
-
-				sptr->flags &= 0xBF;
+				if (sptr->flags & SP_USEFXOBJPOS)
+				{
+					sptr->on = FALSE;
+				}
+				else
+				{
+					fx = &Effects[num];
+					sptr->x += fx->pos.xPos;
+					sptr->y += fx->pos.yPos;
+					sptr->z += fx->pos.zPos;
+					sptr->flags &= ~SP_FX;
+				}
 			}
-			else if (type == 128)
+			else if (type == SP_ITEM)
 			{
-				sptr->x += item->pos.xPos;
-				sptr->y += item->pos.yPos;
-				sptr->z += item->pos.zPos;
-
-				sptr->flags &= 0x7F;
+				if (sptr->flags & SP_USEFXOBJPOS)
+				{
+					sptr->on = FALSE;
+				}
+				else
+				{
+					item = &Items[num];
+					sptr->x += item->pos.xPos;
+					sptr->y += item->pos.yPos;
+					sptr->z += item->pos.zPos;
+					sptr->flags &= ~SP_ITEM;
+				}
 			}
 		}
 	}
