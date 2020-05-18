@@ -8,7 +8,7 @@
 
 using namespace std;
 
-enum SEEK_ORIGIN {
+enum SeekOrigin {
 	BEGIN,
 	CURRENT
 };
@@ -18,7 +18,7 @@ public:
 	virtual bool Read(char* buffer, int length) = 0;
 	virtual bool Write(char* buffer, int length) = 0;
 	virtual int GetCurrentPosition() = 0;
-	virtual bool Seek(int seek, SEEK_ORIGIN origin) = 0;
+	virtual bool Seek(int seek, SeekOrigin origin) = 0;
 	virtual bool IsEOF() = 0;
 	virtual bool Close() = 0;
 	
@@ -61,6 +61,58 @@ public:
 		(*value)[length] = NULL;
 
 		return true;
+	}
+
+	bool ReadVector2(Vector2* value)
+	{
+		ReadFloat(&value->x);
+		ReadFloat(&value->y);
+	}
+
+	bool ReadVector3(Vector3* value)
+	{
+		ReadFloat(&value->x);
+		ReadFloat(&value->y);
+		ReadFloat(&value->z);
+	}
+
+	bool ReadVector4(Vector4* value)
+	{
+		ReadFloat(&value->x);
+		ReadFloat(&value->y);
+		ReadFloat(&value->z);
+		ReadFloat(&value->w);
+	}
+
+	bool ReadQuaternion(Quaternion* value)
+	{
+		ReadFloat(&value->x);
+		ReadFloat(&value->y);
+		ReadFloat(&value->z);
+		ReadFloat(&value->w);
+	}
+
+	bool ReadBoundingBox(BoundingBox* value)
+	{
+		Vector3 minPos;
+		Vector3 maxPos;
+
+		ReadVector3(&minPos);
+		ReadVector3(&maxPos);
+
+		BoundingBox::CreateFromPoints(*value, minPos, maxPos);
+	}
+
+	bool ReadBoundingSphere(BoundingSphere* sphere)
+	{
+		Vector3 center;
+		float radius;
+
+		ReadVector3(&center);
+		ReadFloat(&radius);
+
+		sphere->Center = center;
+		sphere->Radius = radius;
 	}
 
 	bool WriteBytes(byte* value, int length)
@@ -148,9 +200,9 @@ public:
 		return (m_buffer - m_startBuffer);
 	}
 
-	bool Seek(int seek, SEEK_ORIGIN origin)
+	bool Seek(int seek, SeekOrigin origin)
 	{
-		if (origin == SEEK_ORIGIN::BEGIN)
+		if (origin == SeekOrigin::BEGIN)
 			m_buffer = m_startBuffer + seek;
 		else
 			m_buffer += seek;
@@ -206,9 +258,9 @@ public:
 		return (int)(m_stream.tellg());
 	}
 
-	bool Seek(int seek, SEEK_ORIGIN origin)
+	bool Seek(int seek, SeekOrigin origin)
 	{
-		m_stream.seekg(seek, (origin == SEEK_ORIGIN::BEGIN ? m_stream.beg : m_stream.cur));
+		m_stream.seekg(seek, (origin == SeekOrigin::BEGIN ? m_stream.beg : m_stream.cur));
 		return true;
 	}
 

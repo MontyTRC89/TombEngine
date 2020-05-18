@@ -44,7 +44,7 @@ public:
 			return;
 
 		// TODO: future use for compression
-		m_stream->Seek(4, SEEK_ORIGIN::CURRENT);
+		m_stream->Seek(4, SeekOrigin::CURRENT);
 		m_emptyChunk = new ChunkId(NULL, 0);
 		m_isValid = true;
 	}
@@ -79,7 +79,7 @@ public:
 
 			// Adjust _stream position if necessary
 			if (readDataCount != chunkSize)
-				m_stream->Seek(chunkSize - readDataCount, SEEK_ORIGIN::CURRENT);
+				m_stream->Seek(chunkSize - readDataCount, SeekOrigin::CURRENT);
 		} while (true);
 
 		return true;
