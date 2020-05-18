@@ -10,50 +10,64 @@ using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-struct TrTexturePage {
-	short width;
-	short height;
-	short flags;
-	short format;
+struct TrTexturePage 
+{
+	int width;
+	int height;
+	int flags;
+	int format;
 	byte* colorMap;
 	byte* normalMap;
 };
 
-struct TrPolygon {
-	int indices[3];
-	byte animatedSequence;
-	byte frame;
+struct TrPolygon
+{
+	vector<int> indices;
+	short animatedSequence;
+	short frame;
 };
 
-struct TrBucket {
-	TrTexturePage* texture;
+struct TrMaterial 
+{
+	int texture;
 	byte blendMode;
-	byte doubleSided;
+	bool animated;
+};
+
+struct TrBucket 
+{
+	TrMaterial material;
 	vector<Vector3> positions;
 	vector<Vector3> colors;
 	vector<Vector2> textureCoords;
 	vector<Vector3> normals;
 	vector<int> verticesEffects;
+	vector<int> bones;
 	vector<TrPolygon> polygons;
 };
 
-struct TrVolume {
+struct TrVolume 
+{
+	short type;
 	Vector3 position;
 	Quaternion rotation;
 	BoundingBox box;
 	BoundingSphere sphere;
-	byte type;
-};
-
-struct TrClimbVolume : TrVolume {
-	byte climbType;	
-};
-
-struct TrTriggerVolume : TrVolume {
 	string script;
 };
 
-struct TrSector {
+struct TrClimbVolume : TrVolume
+{
+	short climbType;
+};
+
+struct TrTriggerVolume : TrVolume
+{
+	short activators;
+};
+
+struct TrSector
+{
 	int boxIndex;
 	short pathfindingFlags;
 	short stepSound;
@@ -61,10 +75,11 @@ struct TrSector {
 	short roomAbove;
 	int floor;
 	int ceiling;
-	vector<short> floorData;
+	vector<int> floorData;
 };
 
-struct TrLight {
+struct TrLight 
+{
 	Vector3 position;
 	Vector3 color;
 	Vector3 direction;
@@ -75,9 +90,12 @@ struct TrLight {
 	float out;
 	float len;
 	float cutoff;
+	int flags;
 };
 
-struct TrRoomStatic {
+struct TrRoomStatic 
+{
+	string name;
 	Vector3 position;
 	Quaternion rotiation;
 	Vector3 scale;
@@ -85,11 +103,19 @@ struct TrRoomStatic {
 	Vector3 color;
 	bool receiveShadows;
 	bool castShadows;
-	short flags;
+	int flags;
 	string script;
 };
 
-struct TrRoom {
+struct TrPortal
+{
+	short AdjoiningRoom;
+	Vector3 normal;
+	vector<Vector3> vertices;
+};
+
+struct TrRoom
+{
 	int x;
 	int z;
 	int yBottom;
@@ -102,52 +128,58 @@ struct TrRoom {
 	float effectStrength;
 	short alternateRoom;
 	short alternatGroup;
+	int flags;
+	Vector3 ambient;
 	vector<TrBucket> buckets;
 	vector<TrLight> lights;
 	vector<TrRoomStatic> statics;
 	vector<TrSector> sectors;
+	vector<TrPortal> portals;
 	vector<TrTriggerVolume> triggers;
 	vector<TrClimbVolume> climbVolumes;
 };
 
-struct TrMesh {
+struct TrMesh 
+{
 	BoundingSphere sphere;
 	vector<TrBucket> buckets;
 };
 
-struct TrBone {
-	int index;
-	TrBone* parent;
-	vector<TrBone*> children;
-	Vector3 translation;
-	Matrix bindPoseTransform;
-	Matrix animationTransform;
+struct TrBone
+{
+	int opcode;
+	Vector3 offset;
 };
 
-struct TrKeyFrame {
+struct TrKeyFrame 
+{
 	Vector3 origin;
 	BoundingBox boundingBox;
 	vector<Quaternion> angles;
 };
 
-struct TrAnimCommand {
+struct TrAnimCommand
+{
 	short type;
 	vector<short> params;
 };
 
-struct TrAnimDispatch {
+struct TrAnimDispatch 
+{
 	short inFrame;
 	short outFrame;
 	short nextAnimation;
 	short nextFrame;
 };
 
-struct TrStateChange {
+struct TrStateChange 
+{
 	short state;
 	vector<TrAnimDispatch> dispatches;
 };
 
-struct TrAnimation {
+struct TrAnimation
+{
 	short framerate;
 	short state;
 	short nextAnimation;
@@ -163,80 +195,100 @@ struct TrAnimation {
 	vector<TrAnimCommand> commands;
 };
 
-struct TrMoveable {
+struct TrMoveable 
+{
 	short id;
 	vector<TrMesh> meshes;
 	vector<TrBone> bones;
-	TrBone* skeleton;
 	vector<TrAnimation> animations;
 };
 
-struct TrStatic {
+struct TrStatic 
+{
 	short id;
 	BoundingBox visibilityBox;
 	BoundingBox collisionBox;
 	vector<TrMesh> meshes;
 };
 
-struct TrAnimatedTexturesFrame {
-	TrTexturePage* texture;
-	Vector2 textureCoords[3];
+struct TrAnimatedTexturesFrame
+{
+	int texture;
+	vector<Vector2> textureCoords;
 };
 
-struct TrAnimatedTexturesSequence {
-	byte frameRate;
-	byte effect;
-	short params;
+struct TrAnimatedTexturesSequence 
+{
+	byte animationType;
+	float fps;
+	int uvRotate;
 	vector<TrAnimatedTexturesFrame> frames;
 };
 
-struct TrItem {
+struct TrItem
+{
+	string name;
 	Vector3 position;
 	Quaternion rotation;
 	Vector3 scale;
+	Vector3 color;
 	short roomNumber;
 	short objectNumber;
 	string script;
 };
 
-struct TrCamera {
+struct TrCamera 
+{
+	string name;
 	Vector3 position;
 	short roomNumber;
+	short type;
 	short flags;
 	string script;
 };
 
-struct TrSoundSource {
+struct TrSoundSource 
+{
+	string name;
 	Vector3 position;
 	short roomNumber;
 	float volume;
 	short sound;
-	short flags;
+	short playMode;
 };
 
-struct TrSink {
+struct TrSink 
+{
+	string name;
 	Vector3 position;
 	short roomNumber;
 	float strength;
+	int box;
 };
 
-struct TrOverlap {
-	short flags;
-	vector<TrBox*> boxes;
+struct TrOverlap 
+{
+	int flags;
+	int box;
 };
 
-struct TrBox {
+struct TrBox 
+{
 	Vector2 min;
 	Vector2 max;
 	int floor;
 	vector<TrOverlap> overlaps;
 };
 
-struct TrSample {
+struct TrSample 
+{
+	int uncompressedSize;
+	int compressedSize;
 	byte* data;
 };
 
-struct TrSoundDetails {
+struct TrSoundDetails 
+{
 	float volume;
 	float range;
 	float chance;
@@ -245,10 +297,14 @@ struct TrSoundDetails {
 	bool randomizeGain;
 	bool noPanoramic;
 	byte loop;
-	vector<TrSample*> samples;
+	vector<TrSample> samples;
 };
 
-struct TrFlybyCamera {
+struct TrFlybyCamera 
+{
+	string name;
+	short sequence;
+	short number;
 	Vector3 position;
 	Vector3 direction;
 	float fov;
@@ -260,19 +316,15 @@ struct TrFlybyCamera {
 	string script;
 };
 
-struct TrFlybySequence {
-	vector<TrFlybyCamera> cameras;
-	int flags;
-	string script;
+struct TrSprite 
+{
+	int texture;
+	vector<Vector2> textureCoords;
 };
 
-struct TrSprite {
-	int Id;
-	TrTexturePage* texture;
-	Vector2 textureCoords[4];
-};
-
-struct TrSpriteSequence {
+struct TrSpriteSequence 
+{
+	int id;
 	vector<TrSprite> sprites;
 };
 
@@ -281,16 +333,17 @@ struct TrLevel {
 	vector<TrRoom> rooms;
 	vector<TrMoveable> moveables;
 	vector<TrStatic> statics;
-	vector<TrAnimatedTexturesSequence> animatedTextures;
-	vector<TrItem> nullmeshItems;
+	vector<TrItem> items;
+	vector<TrItem> aiItems;
 	vector<TrCamera> cameras;
 	vector<TrSoundSource> soundSources;
 	vector<TrSink> sinks;
-	vector<TrFlybySequence> flybySequences;
+	vector<TrFlybyCamera> flybyCameras;
+	vector<TrSpriteSequence> spriteSequences;
+	vector<TrAnimatedTexturesSequence> animatedTextures;
 	vector<TrBox> boxes;
 	vector<int> zones;
-	short soundMap[SOUND_NEW_SOUNDMAP_MAX_SIZE];
-	vector<TrSample> samples;
+	vector<short> soundMap;
 	vector<TrSoundDetails> soundDetails;
 	string script;
 };
