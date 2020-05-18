@@ -306,7 +306,7 @@
     <ClInclude Include="Specific\level.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Global\newstructs.h">
+    <ClInclude Include="Specific\newlevel.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
