@@ -328,7 +328,8 @@ struct TrSpriteSequence
 	vector<TrSprite> sprites;
 };
 
-struct TrLevel {
+struct TrLevel 
+{
 	vector<TrTexturePage> textures;
 	vector<TrRoom> rooms;
 	vector<TrMoveable> moveables;
