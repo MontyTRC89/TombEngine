@@ -33,9 +33,9 @@ public:
 		// Update chunk size
 		long newPosition = m_stream->GetCurrentPosition();
 		long chunkSize = newPosition - m_previousPosition;
-		m_stream->Seek(m_chunkSizePosition, SEEK_ORIGIN::BEGIN);
+		m_stream->Seek(m_chunkSizePosition, SeekOrigin::BEGIN);
 		LEB128::Write(m_stream, chunkSize, m_maximumSize);
-		m_stream->Seek(newPosition, SEEK_ORIGIN::BEGIN);
+		m_stream->Seek(newPosition, SeekOrigin::BEGIN);
 	}
 };
 
