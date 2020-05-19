@@ -15,6 +15,11 @@ short GF2(short objectID, short animIndex, short frameToStart)
 	return short(Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart);
 }
 
+CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
+{
+    return (CREATURE_INFO*)item->data;
+}
+
 void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 {
 	short numDoors, *door, adjoiningRoom;

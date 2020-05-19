@@ -24,6 +24,8 @@
 #define PATROL1			4
 #define MODIFY			8
 #define FOLLOW			16
+#define PATROL2         32
+#define ALL_AIOBJ       (GUARD|AMBUSH|PATROL1|MODIFY|FOLLOW|PATROL2)
 
 #define BOX_BLOCKED		(1 << 14) // unpassable for other enemies, always set for movable blocks & closed doors
 #define BOX_LAST		(1 << 15) // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
