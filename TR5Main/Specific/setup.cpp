@@ -1032,6 +1032,18 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
+	obj = &Objects[ID_MOTORBIKE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMotorbike;
+		obj->collision = MotorbikeCollision;
+		//obj->drawRoutine = DrawMotorbike;
+		obj->drawRoutineExtra = DrawMotorbikeEffect;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
 	
 	obj = &Objects[ID_MP_WITH_GUN];
 	if (obj->loaded)

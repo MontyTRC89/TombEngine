@@ -37,6 +37,22 @@ typedef struct JEEP_INFO {
 	short unknown2;
 };
 
+struct MOTORBIKE_INFO
+{
+	int wheelRight;  // (two wheel: front and back)
+	int wheelLeft;   // (one wheel: left)
+	int velocity;
+	int revs;
+	int engineRevs;
+	short momentumAngle;
+	short extraRotation;
+	short wallShiftRotation;
+	int bikeTurn;
+	int pitch;
+	short flags;
+	short lightPower;
+};
+
 typedef struct SUB_INFO {
 	int Vel;
 	int Rot;
@@ -45,7 +61,6 @@ typedef struct SUB_INFO {
 	char Flags;
 	char WeaponTimer;
 };
-
 
 typedef struct CART_INFO {
 	int Speed;
@@ -420,19 +435,9 @@ void InitialiseJeep(short itemNum);
 int JeepControl();
 void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 
-// TODO: motorbike missing
-void InitialiseMotorbike(short itemNum);
-int MotorbikeControl();
-int MotorbikeCheckGetOff();
-int MotorbikeDynamics(ITEM_INFO* item);
-int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch);
-void AnimateMotorbike(ITEM_INFO* item, int collide, int dead);
-void MotorbikeExplode(ITEM_INFO* item);
-int MotorbikeCanGetOff();
-int DoMotorbikeDynamics(int height, int speed, int* y, int flags);
-void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, int moving);
-int GetOnMotorbike(int itemNumber);
-void MotorbikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
-int GetOnMotorbike(int itemNumber);
-int GetMotorbikeCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
-void MotorbikeBaddieCollision(ITEM_INFO* bike);
+void InitialiseMotorbike(short item_number);
+void MotorbikeCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* coll);
+int MotorbikeControl(void);
+void DrawMotorbike(ITEM_INFO* item);
+void DrawMotorbikeEffect(ITEM_INFO* item);
+void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* laraitem);
