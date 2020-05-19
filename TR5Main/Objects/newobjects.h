@@ -291,6 +291,8 @@ void InitialiseCivvy(short item_number);
 void CivvyControl(short item_number);
 
 // TR4 object
+void InitialiseAhmet(short item_number);
+void AhmetControl(short item_number);
 void InitialiseWildBoar(short itemNum);
 void WildBoarControl(short itemNum);
 void InitialiseSmallScorpion(short itemNum);

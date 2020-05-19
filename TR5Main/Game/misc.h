@@ -15,6 +15,7 @@ enum LARA_MESH_MASK
 
 short GF(short animIndex, short frameToStart); // for lara
 short GF2(short objectID, short animIndex, short frameToStart); // for entity
+CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item);
 
 void GetRoomList(short roomNumber, short* roomArray, short* numRooms); // return the value via roomArray and numRooms
 void GetRoomList(short roomNumber, vector<short>* DestRoomList);  // return the value via DestRoomList
