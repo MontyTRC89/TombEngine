@@ -2,10 +2,12 @@
 
 #include <stdlib.h>
 #include <memory>
-
+#include <functional>
 #include "ChunkId.h"
 #include "LEB128.h"
 #include "Streams.h"
+
+using namespace std;
 
 class ChunkReader
 {
@@ -85,6 +87,32 @@ public:
 		return true;
 	}
 
+	bool ReadChunks(std::mem_fn<int()> func, int arg)
+	{
+		do
+		{
+			ChunkId* chunkId = ChunkId::FromStream(m_stream);
+			if (chunkId->EqualsTo(m_emptyChunk)) // End reached
+				break;
+
+			// Read up to a 64 bit number for the chunk size
+			__int64 chunkSize = LEB128::ReadLong(m_stream);
+
+			// Try loading chunk content
+			bool chunkRecognized = false;
+			int startPos = m_stream->GetCurrentPosition();
+
+			chunkRecognized = func(chunkId, chunkSize, arg);
+			int readDataCount = m_stream->GetCurrentPosition() - startPos;
+
+			// Adjust _stream position if necessary
+			if (readDataCount != chunkSize)
+				m_stream->Seek(chunkSize - readDataCount, SeekOrigin::CURRENT);
+		} while (true);
+
+		return true;
+	}
+
 	char* ReadChunkArrayOfBytes(__int64 length)
 	{
 		char* value = (char*)malloc(length);
@@ -139,4 +167,3 @@ public:
 		return m_stream;
 	}
 };
-
