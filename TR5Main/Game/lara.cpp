@@ -5162,7 +5162,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 
 	/*stop Lara from doing it in these conditions to avoid trouble*/
-	if (LaraFloorFront(item, item->pos.yRot, 1024) >= 512 ||  //4 clicks away from holes in the floor	
+	if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor	
 		TestWall(item, 1024, 0, -128))			 //4 clicks away from walls
 	{
 		return;
