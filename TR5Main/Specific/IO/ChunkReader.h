@@ -87,7 +87,7 @@ public:
 		return true;
 	}
 
-	bool ReadChunks(std::mem_fn<int()> func, int arg)
+	bool ReadChunks(std::function<bool(ChunkId*, long, int)> func, int arg)
 	{
 		do
 		{
