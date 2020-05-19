@@ -346,8 +346,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->lavaIsPit = false;
 	coll->oldAnimNumber = item->animNumber;
 	coll->oldFrameNumber = item->frameNumber;
-	coll->radius = 100;
-	coll->trigger = 0;
+	coll->radius = LARA_RAD;
+	coll->trigger = NULL;
 
 	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == 0 && Lara.look)
 		LookLeftRight();
@@ -368,6 +368,11 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 			case ID_JEEP:
 				if (JeepControl())
+					return;
+				break;
+
+			case ID_MOTORBIKE:
+				if (MotorbikeControl())
 					return;
 				break;
 
@@ -399,19 +404,19 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Handle current Lara status
 	(*lara_control_routines[item->currentAnimState])(item, coll);
 
-	if (item->pos.zRot >= -ANGLE(1) && item->pos.zRot <= ANGLE(1)) 
+	if (item->pos.zRot >= -ANGLE(1.0f) && item->pos.zRot <= ANGLE(1.0f))
 		item->pos.zRot = 0;   
-	else if (item->pos.zRot < -ANGLE(1))
-		item->pos.zRot += ANGLE(1);
+	else if (item->pos.zRot < -ANGLE(1.0f))
+		item->pos.zRot += ANGLE(1.0f);
 	else
-		item->pos.zRot -= ANGLE(1);
+		item->pos.zRot -= ANGLE(1.0f);
 
-	if (Lara.turnRate >= -ANGLE(2) && Lara.turnRate <= ANGLE(2)) 
+	if (Lara.turnRate >= -ANGLE(2.0f) && Lara.turnRate <= ANGLE(2.0f))
 		Lara.turnRate = 0; 
-	else if (Lara.turnRate < -ANGLE(2))  
-		Lara.turnRate += ANGLE(2); 
+	else if (Lara.turnRate < -ANGLE(2.0f))
+		Lara.turnRate += ANGLE(2.0f);
 	else
-		Lara.turnRate -= ANGLE(2);
+		Lara.turnRate -= ANGLE(2.0f);
 	item->pos.yRot += Lara.turnRate;
 
 	// Animate Lara
@@ -444,7 +449,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	short selectedObject = g_Inventory->GetSelectedObject();
 
 	if (item->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus || selectedObject == NO_ITEM)
-		return 0;
+		return FALSE;
 
 	if (selectedObject >= ID_WATERSKIN1_EMPTY && selectedObject <= ID_WATERSKIN2_5)
 	{
@@ -482,7 +487,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	}
 	else
 	{
-		return 0;
+		return FALSE;
 	}
 
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -492,7 +497,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	Lara.gunStatus = LG_HANDS_BUSY;
 	g_Inventory->SetSelectedObject(NO_ITEM);
 
-	return 1;
+	return TRUE;
 }
 
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
