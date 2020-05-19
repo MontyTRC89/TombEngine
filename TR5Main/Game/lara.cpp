@@ -1131,10 +1131,16 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)//1C4A0(<), 1C5D4(<) (F)
 	if (coll->midFloor <= 0 && item->fallspeed > 0)
 	{
 		item->goalAnimState = STATE_LARA_STOP;
-
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
-
+		if (TrInput & IN_FORWARD && (item->goalAnimState = STATE_LARA_STOP))
+		{
+			item->animNumber = ANIMATION_LARA_LANDING_ROLL;  // this is important so Lara doesn't get stuck
+			item->frameNumber = Anims[ANIMATION_LARA_LANDING_ROLL].frameBase;
+			item->goalAnimState = STATE_LARA_RUN_FORWARD;
+			item->fallspeed = 0;
+			item->gravityStatus = 0;
+		}
 		if (coll->midFloor != NO_HEIGHT)
 			item->pos.yPos += coll->midFloor;
 	}
@@ -5861,6 +5867,11 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
 
 			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
 			{
+				if (TrInput & IN_FORWARD)
+				{
+					item->goalAnimState = STATE_LARA_RUN_FORWARD;
+				}
+				else
 				item->goalAnimState = STATE_LARA_STOP;
 				StopSoundEffect(SFX_LARA_SLIPPING);
 			}
@@ -6224,7 +6235,25 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			return 0;
 
 		int slope = abs(coll->leftFloor2 - coll->rightFloor2) >= 60;
+/*
+		if (coll->frontFloor >= 0 && coll->frontFloor <= -256)
+		{
+			if (!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256))
+			{
+				item->animNumber = ANIMATION_LARA_1CLICK_CRAWL_VAULT;
+				item->currentAnimState = STATE_LARA_GRABBING;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->goalAnimState = STATE_LARA_STOP;
+				item->pos.yPos += coll->frontFloor + 256;
+				Lara.gunStatus = LG_HANDS_BUSY;
+			}
 
+			else
+			{
+				return 0;
+			}
+		}
+*/
 		if (coll->frontFloor >= -640 && coll->frontFloor <= -384)
 		{
 			if (!slope &&
@@ -6241,6 +6270,15 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->currentAnimState = STATE_LARA_GRABBING;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_STOP;
+				item->pos.yPos += coll->frontFloor + 512;
+				Lara.gunStatus = LG_HANDS_BUSY;
+			}
+			else if(!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256))
+			{
+				item->animNumber = ANIMATION_LARA_2CLICK_CRAWL_VAULT;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->currentAnimState = STATE_LARA_GRABBING;
+				item->goalAnimState = STATE_LARA_CROUCH_IDLE;
 				item->pos.yPos += coll->frontFloor + 512;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
@@ -6265,6 +6303,15 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->currentAnimState = STATE_LARA_GRABBING;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_STOP;
+				item->pos.yPos += coll->frontFloor + 768;
+				Lara.gunStatus = LG_HANDS_BUSY;
+			}
+			else if (!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256))
+			{
+				item->animNumber = ANIMATION_LARA_3CLICK_CRAWL_VAULT;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->currentAnimState = STATE_LARA_GRABBING;
+				item->goalAnimState = STATE_LARA_CROUCH_IDLE;
 				item->pos.yPos += coll->frontFloor + 768;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}

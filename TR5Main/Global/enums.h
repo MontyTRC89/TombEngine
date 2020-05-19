@@ -852,6 +852,9 @@ enum LARA_ANIM
 	ANIMATION_LARA_CROWBAR_USE_ON_WALL2 = 471,                  // Pull object off wall (to use as crowbar) 
 	ANIMATION_LARA_LOOT_CHEST = 472,                            // Kneel to open box and pick up item (VCI-levels) 
 	ANIMATION_LARA_LADDER_TO_CROUCH = 473,                      // Climb wall > pull up in crawlspace 
+	ANIMATION_LARA_1CLICK_CRAWL_VAULT = 474,					// 1 click crawlspace vault
+	ANIMATION_LARA_2CLICK_CRAWL_VAULT = 475,					// 2 click crawlspace vault
+	ANIMATION_LARA_3CLICK_CRAWL_VAULT = 476,					// 3 click crawlspace vault
 
 	NUM_LARA_ANIMS
 };
