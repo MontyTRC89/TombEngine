@@ -110,7 +110,7 @@ struct TrRoomStatic
 
 struct TrPortal
 {
-	short AdjoiningRoom;
+	short adjoiningRoom;
 	Vector3 normal;
 	vector<Vector3> vertices;
 };
@@ -385,6 +385,11 @@ private:
 	ChunkReader* m_reader;
 	FileStream* m_stream;
 
+	bool readTexture();
+	bool readAnimatedTextureSequence();
+	bool readRoom();
+	bool readBucket(TrBucket* bucket);
+
 public:
 	vector<TrTexturePage> textures;
 	vector<TrRoom> rooms;
@@ -408,5 +413,3 @@ public:
 	~TrLevel();
 	bool Load();
 };
-
-bool readLevelChunks(ChunkReader* reader);
