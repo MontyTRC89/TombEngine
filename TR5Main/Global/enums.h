@@ -855,6 +855,9 @@ enum LARA_ANIM
 	ANIMATION_LARA_1CLICK_CRAWL_VAULT = 474,					// 1 click crawlspace vault
 	ANIMATION_LARA_2CLICK_CRAWL_VAULT = 475,					// 2 click crawlspace vault
 	ANIMATION_LARA_3CLICK_CRAWL_VAULT = 476,					// 3 click crawlspace vault
+	ANIMATION_LARA_1CLICK_CRAWL_EXIT = 477,						// 1 click crawlspace exit
+	ANIMATION_LARA_2CLICK_CRAWL_EXIT = 478,						// 2 click crawlspace exit
+	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL = 479,					// maneuver up 1 click in crawlspace
 
 	NUM_LARA_ANIMS
 };
