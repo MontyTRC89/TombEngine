@@ -5872,7 +5872,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
 
 			if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
 			{
-				if (TrInput & IN_FORWARD)
+				if (TrInput & IN_FORWARD && item->currentAnimState != STATE_LARA_SLIDE_BACK)
 				{
 					item->goalAnimState = STATE_LARA_RUN_FORWARD;
 				}
