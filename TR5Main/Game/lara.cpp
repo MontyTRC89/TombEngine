@@ -1138,14 +1138,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)//1C4A0(<), 1C5D4(<) (F)
 		item->goalAnimState = STATE_LARA_STOP;
 		item->fallspeed = 0;
 		item->gravityStatus = 0;
-		if (TrInput & IN_FORWARD && (item->goalAnimState = STATE_LARA_STOP))
-		{
-			item->animNumber = ANIMATION_LARA_LANDING_ROLL;  // this is important so Lara doesn't get stuck
-			item->frameNumber = Anims[ANIMATION_LARA_LANDING_ROLL].frameBase;
-			item->goalAnimState = STATE_LARA_RUN_FORWARD;
-			item->fallspeed = 0;
-			item->gravityStatus = 0;
-		}
+
 		if (coll->midFloor != NO_HEIGHT)
 			item->pos.yPos += coll->midFloor;
 	}
@@ -1209,6 +1202,11 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)//1C2B0, 1C3E4 (F)
 		return;
 	if (LaraFallen(item, coll))
 		return;
+
+	if (TrInput & IN_FORWARD && item->animNumber == ANIMATION_LARA_LANDING_ROLL)
+	{
+		item->goalAnimState = STATE_LARA_RUN_FORWARD;
+	}
 	
 	ShiftItem(item, coll);
 
