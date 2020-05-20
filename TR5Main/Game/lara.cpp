@@ -6402,7 +6402,8 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			int h = (Rooms->maxceiling) - (item->pos.yPos);
 
 				if (h > 1792 ||
-					h < -1792)
+					h < -1792 ||
+					abs(h) == 768)
 				{
 					return 0;
 				}
