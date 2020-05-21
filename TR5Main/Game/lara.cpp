@@ -5124,6 +5124,12 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 		Lara.gunStatus = LG_HANDS_BUSY;
 
 	Camera.targetElevation = -ANGLE(23);
+
+	if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WATER)
+	{
+		item->goalAnimState = STATE_LARA_CROUCH_IDLE;
+		item->requiredAnimState = STATE_LARA_STOP;
+	}
 }
 
 void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)//147C4, 148CC (F)
@@ -5201,7 +5207,9 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 		&& (TrInput & IN_DUCK || Lara.keepDucked)
 		&& Lara.gunStatus == LG_NO_ARMS
 		&& Lara.waterStatus != LW_WADE
-		&& !(Rooms[roomNum].flags & ENV_FLAG_WATER))
+		|| Lara.waterSurfaceDist == 256
+		&& !(Lara.waterSurfaceDist > 256)
+		/*&& !(Rooms[roomNum].flags & ENV_FLAG_WATER)*/)
 	{
 
 		if ((item->animNumber == ANIMATION_LARA_CROUCH_IDLE
@@ -5223,7 +5231,9 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 				&& (TrInput & IN_DUCK || Lara.keepDucked)
 				&& Lara.gunStatus == LG_NO_ARMS
 				&& Lara.waterStatus != LW_WADE
-				&& !(Rooms[roomNum].flags & ENV_FLAG_WATER)) //is this necessary?
+				|| Lara.waterSurfaceDist == 256
+				&& !(Lara.waterSurfaceDist > 256))
+				//&& !(Rooms[roomNum].flags & ENV_FLAG_WATER)) //is this necessary?- update: nope, it's not
 			{   
 				lara_as_crouch_roll(item, coll);
 			}
@@ -5235,7 +5245,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*stop Lara from doing it in these conditions to avoid trouble*/
 	if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor	
-		TestWall(item, 1024, 0, -128))			 //4 clicks away from walls
+		TestWall(item, 1024, 0, -256))			//4 clicks away from walls		 
 	{
 		return;
 	}

@@ -858,6 +858,9 @@ enum LARA_ANIM
 	ANIMATION_LARA_1CLICK_CRAWL_EXIT = 477,						// 1 click crawlspace exit
 	ANIMATION_LARA_2CLICK_CRAWL_EXIT = 478,						// 2 click crawlspace exit
 	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL = 479,					// maneuver up 1 click in crawlspace
+	ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK = 480,			// climb out of water to 2click crawlspace
+	ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK = 481,			// climb out of onwater to 2click crawlspace
+	ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL = 482,				// wade out of water to submerged crawlspace
 
 	NUM_LARA_ANIMS
 };
