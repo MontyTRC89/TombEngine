@@ -418,7 +418,20 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 			item->goalAnimState = STATE_LARA_STOP;
 		}
 	}
-	else if (128 > frontFloor >= 0)
+	else if (frontFloor > 128)
+	{
+		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
+		{
+			item->animNumber = ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+		}
+		else
+			item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+	}
+
+	else
 	{
 		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
 		{
@@ -432,58 +445,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->goalAnimState = STATE_LARA_STOP;
 		}
-	}
+		
 
-	if (frontFloor > 128)
-	{
-		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
-		{
-			item->animNumber = ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
-		}
-		else
-		item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
-		item->frameNumber = Anims[item->animNumber].frameBase;
-//		item->goalAnimState = STATE_LARA_STOP;
 	}
-
-/*
-	if (frontFloor >= -128)
-	{
-		if (frontFloor >= 128)
-		{
-			item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-		}
-		else
-		{
-			if (LaraFloorFront(item, item->pos.yRot, 256) == -256 &&
-				LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
-				LaraCeilingFront(item, item->pos.yRot, 256, 256) <= -512)
-			{
-				item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK;
-				item->frameNumber = Anims[item->animNumber].frameBase;
-			}
-			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-		}
-	}
-	else
-	{
-		if (LaraFloorFront(item, item->pos.yRot, 256) == -256 &&
-			LaraCeilingFront(item, item->pos.yRot, 256, 256) != NO_HEIGHT &&
-			LaraCeilingFront(item, item->pos.yRot, 256, 256) <= -512)
-		{
-			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-		}
-		item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER;
-		item->frameNumber = Anims[item->animNumber].frameBase;
-	}*/
 	
 	item->currentAnimState = STATE_LARA_ONWATER_EXIT;
-//	item->goalAnimState = STATE_LARA_STOP;
 	item->pos.yRot = rot;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;
