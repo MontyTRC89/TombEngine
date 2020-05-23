@@ -124,6 +124,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\bubble.h" />
+    <ClInclude Include="Game\chaffFX.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
@@ -223,6 +224,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\bubble.cpp" />
+    <ClCompile Include="Game\chaffFX.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Global\math.cpp" />
