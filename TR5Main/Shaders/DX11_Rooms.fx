@@ -99,7 +99,6 @@ float getShadowFactor(Texture2D shadowMap, SamplerState shadowMapSampler, float2
 	return shadowFactor / 9.0f;
 }
 
-[earlydepthstencil]
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
@@ -134,12 +133,12 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	if (doLights)
 	{
-		for (int i = 0; i < NumLights; i++)
+		for (uint i = 0; i < NumLights; i++)
 		{
 			float3 lightPos = Lights[i].Position.xyz;
 			float3 color = Lights[i].Color.xyz;
-			float radius = Lights[i].Out*20;
-			float intensity = Lights[i].Intensity*5;
+			float radius = Lights[i].Out;
+			float intensity = Lights[i].Intensity;
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);
@@ -148,7 +147,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 				continue;
 
 			lightVec = normalize(lightVec);
-			float attenuation = pow(((radius - distance) / radius),128);
+			float attenuation = pow(((radius - distance) / radius), 2);
 
 			lighting += color * intensity * attenuation;
 		}

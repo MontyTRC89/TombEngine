@@ -854,6 +854,7 @@ private:
 	bool drawGunFlashes();
 	bool drawGunShells();
 	bool drawDebris(bool transparent);
+	bool drawSmokeParticles();
 	int drawInventoryScene();
 	int drawFinalPass();
 	void updateAnimatedTextures();
