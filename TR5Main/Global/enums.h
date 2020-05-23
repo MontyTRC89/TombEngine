@@ -372,6 +372,9 @@ enum LARA_STATE
 	STATE_LARA_UNUSED16 = 136,
 	STATE_LARA_PICKUP_FROM_CHEST = 137,
 	STATE_LARA_UNKNOWN_138 = 138,
+	STATE_LARA_HANG_FEET = 139,
+	STATE_LARA_HANG_FEET_SHIMMYR = 140,
+	STATE_LARA_HANG_FEET_SHIMMYL = 141,
 
 	NUM_LARA_STATES
 };
@@ -861,6 +864,10 @@ enum LARA_ANIM
 	ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK = 480,			// climb out of water to 2click crawlspace
 	ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK = 481,			// climb out of onwater to 2click crawlspace
 	ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL = 482,				// wade out of water to submerged crawlspace
+	ANIMATION_LARA_HANG_FEET = 483,								// hang with feet supporting her
+	ANIMATION_LARA_HANG_FEET_SHIMMYR = 484,						// shimmy right with feet on wall
+	ANIMATION_LARA_HANG_FEET_SHIMMYL = 485,						// shimmy left with feet on wall
+	ANIMATION_LARA_HANG_FEET_CLIMB = 486,						// feet hang -> climb
 
 	NUM_LARA_ANIMS
 };
