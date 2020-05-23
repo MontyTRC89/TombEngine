@@ -868,6 +868,7 @@ enum LARA_ANIM
 	ANIMATION_LARA_HANG_FEET_SHIMMYR = 484,						// shimmy right with feet on wall
 	ANIMATION_LARA_HANG_FEET_SHIMMYL = 485,						// shimmy left with feet on wall
 	ANIMATION_LARA_HANG_FEET_CLIMB = 486,						// feet hang -> climb
+	ANIMATION_LARA_HANG_FEET_IDLE = 487,						// hang feet idle anim for shimmies/climbups 
 
 	NUM_LARA_ANIMS
 };
