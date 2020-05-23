@@ -1220,7 +1220,7 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 			}
 			else {
 				ripple->SpriteID = SPR_RIPPLES;
-				ripple->initialColor = Vector4(1, 1, 1, 1);
+				ripple->initialColor = Vector4(0.5, 0.5, 0.5, 1);
 				ripple->lifeRate = 1.0f;
 				ripple->sizeRate = 4.0f;
 				ripple->isBillboard = false;

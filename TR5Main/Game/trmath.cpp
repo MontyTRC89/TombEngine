@@ -1325,7 +1325,7 @@ float TO_RAD(short angle)
 
 const float frand()
 {
-	float result = float(rand() / RAND_MAX);
+	float result = float((float)rand() / RAND_MAX);
 	return result;
 }
 

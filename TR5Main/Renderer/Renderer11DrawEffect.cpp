@@ -12,7 +12,19 @@
 #include "bubble.h"
 #include "level.h"
 #include "effect.h"
+#include "Types/effects/smoke.h"
 
+extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
+extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+extern DRIP_STRUCT Drips[MAX_DRIPS];
+extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
+extern FIRE_LIST Fires[MAX_FIRE_LIST];
+extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
+extern SPARKS Sparks[MAX_SPARKS];
+extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
+extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
+extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern int g_NumSprites;
 
@@ -1308,6 +1320,16 @@ bool Renderer11::drawDebris(bool transparent)
 			m_numDrawCalls++;
 			m_primitiveBatch->End();
 		}
+	}
+	return true;
+}
+
+bool Renderer11::drawSmokeParticles()
+{
+	for (int i = 0; i < SmokeParticles.size(); i++) {
+		SmokeParticle& s = SmokeParticles[i];
+		if (!s.active) continue;
+		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex+SPR_FIRE1], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
 	}
 	return true;
 }
