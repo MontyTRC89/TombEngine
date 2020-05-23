@@ -1819,7 +1819,7 @@ void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byt
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
 	dynamicLight->Dynamic = 1;
-	dynamicLight->Intensity = 2.0f;
+	dynamicLight->Intensity = falloff/2;
 
 	m_dynamicLights.push_back(dynamicLight);
 	//NumDynamics++;
@@ -2006,6 +2006,7 @@ bool Renderer11::drawScene(bool dump)
 	// Do special effects and weather
 	drawFires();
 	drawSmokes();
+	drawSmokeParticles();
 	drawFootprints();
 	drawBlood();
 	drawSparks();

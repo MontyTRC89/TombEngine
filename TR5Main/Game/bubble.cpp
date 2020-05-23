@@ -83,14 +83,14 @@ void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags,
 		bubble->active = true;
 		bubble->size = 0;
 		bubble->age = 0;
-		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? frandMinMax(32, 48) : frandMinMax(16, 32);
+		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? frandMinMax(8, 16) : frandMinMax(8, 12);
 		bubble->sourceColor = Vector4(0, 0, 0, 1);
 		float shade = frandMinMax(0.3, 0.8);
 		bubble->destinationColor = Vector4(shade, shade, shade, 1);
 		bubble->color = bubble->sourceColor;
 		bubble->destinationSize = flags & BUBBLE_FLAG_BIG_SIZE ? frandMinMax(256, 512) : frandMinMax(96, 128);
 		bubble->spriteNum = flags & BUBBLE_FLAG_CLUMP ? SPR_UNKNOWN1 : SPR_BUBBLES;
-		bubble->rotation = frandMinMax(-1, 1) * PI;
+		bubble->rotation = 0;
 		bubble->worldPosition = Vector3(pos->x, pos->y, pos->z);
 		float maxAmplitude = flags & BUBBLE_FLAG_HIGH_AMPLITUDE ? 256 : 32;
 		bubble->amplitude = Vector3(frandMinMax(-maxAmplitude, maxAmplitude), frandMinMax(-maxAmplitude, maxAmplitude), frandMinMax(-maxAmplitude, maxAmplitude));
