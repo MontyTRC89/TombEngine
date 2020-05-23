@@ -187,7 +187,10 @@ void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* co
 	lara_as_null,
 	lara_as_null,
 	lara_as_null,
-	lara_as_null
+	lara_as_null,
+	lara_as_hang_feet,
+	lara_as_hang_feet_shimmyr,
+	lara_as_hang_feet_shimmyl,
 };
 
 void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll) =
@@ -330,7 +333,11 @@ void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* 
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_void_func
+	lara_void_func,
+	lara_col_hang_feet,
+	lara_col_hang_feet_shimmyr,
+	lara_col_hang_feet_shimmyl,
+
 };
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
@@ -2595,22 +2602,43 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	Lara.moveAngle = angle + item->pos.yRot;
 	short ang = (unsigned short) (Lara.moveAngle + ANGLE(45)) >> W2V_SHIFT;
 
-	switch (ang)
+	if (item->currentAnimState == STATE_LARA_HANG)
 	{
-	case 0:
-		z += 16;
-		break;
-	case 1:
-		x += 16;
-		break;
-	case 2:
-		z -= 16;
-		break;
-	case 3:
-		x -= 16;
-		break;
-	}
 
+		switch (ang)
+		{
+		case 0:
+			z += 16;
+			break;
+		case 1:
+			x += 16;
+			break;
+		case 2:
+			z -= 16;
+			break;
+		case 3:
+			x -= 16;
+			break;
+		}
+	}
+	else
+	{
+		switch (ang)
+		{
+		case 0:
+			z += 256;
+			break;
+		case 1:
+			x += 256;
+			break;
+		case 2:
+			z -= 256;
+			break;
+		case 3:
+			x -= 256;
+			break;
+		}
+	}
 	item->pos.xPos = x;
 	item->pos.zPos = z;
 
@@ -3017,10 +3045,20 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 		}
 		else
 		{
-			item->animNumber = ANIMATION_LARA_HANG_IDLE;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->currentAnimState = STATE_LARA_HANG;
-			item->goalAnimState = STATE_LARA_HANG;
+			if (TestHangNoFeet(item, angle))
+			{
+				item->animNumber = ANIMATION_LARA_HANG_IDLE;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->currentAnimState = STATE_LARA_HANG;
+				item->goalAnimState = STATE_LARA_HANG;
+			}
+			else
+			{
+				item->animNumber = ANIMATION_LARA_HANG_IDLE;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->currentAnimState = STATE_LARA_HANG;
+				item->goalAnimState = STATE_LARA_HANG_FEET;
+			}
 		}
 
 		short* bounds = GetBoundsAccurate(item);
@@ -3240,10 +3278,20 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 						}
 						else
 						{
-							item->animNumber = ANIMATION_LARA_HANG_IDLE;
-							item->frameNumber = Anims[item->animNumber].frameBase + 12;
-							item->goalAnimState = STATE_LARA_HANG;
-							item->currentAnimState = STATE_LARA_HANG;
+							if (TestHangNoFeet(item, angle))
+							{
+								item->animNumber = ANIMATION_LARA_HANG_IDLE;
+								item->frameNumber = Anims[item->animNumber].frameBase + 12;
+								item->currentAnimState = STATE_LARA_HANG;
+								item->goalAnimState = STATE_LARA_HANG;
+							}
+							else
+							{
+								item->animNumber = ANIMATION_LARA_HANG_IDLE;
+								item->frameNumber = Anims[item->animNumber].frameBase + 12;
+								item->currentAnimState = STATE_LARA_HANG;
+								item->goalAnimState = STATE_LARA_HANG_FEET;
+							}
 						}
 
 						bounds = (ANIM_FRAME*) GetBoundsAccurate(item);
@@ -4593,10 +4641,20 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 					}
 					else
 					{
-						item->animNumber = ANIMATION_LARA_HANG_IDLE;
-						item->frameNumber = Anims[item->animNumber].frameBase;
-						item->currentAnimState = STATE_LARA_HANG;
-						item->goalAnimState = STATE_LARA_HANG;
+						if (TestHangNoFeet(item, angle))
+						{
+							item->animNumber = ANIMATION_LARA_HANG_IDLE;
+							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->currentAnimState = STATE_LARA_HANG;
+							item->goalAnimState = STATE_LARA_HANG;
+						}
+						else
+						{
+							item->animNumber = ANIMATION_LARA_HANG_IDLE;
+							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->currentAnimState = STATE_LARA_HANG;
+							item->goalAnimState = STATE_LARA_HANG_FEET;
+						}
 					}
 
 					bounds = GetBoundsAccurate(item);
@@ -5770,6 +5828,46 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F)
 			return;
 		}
 	}
+
+	if (item->currentAnimState == STATE_LARA_HANG_FEET_SHIMMYR)
+	{
+		switch (angle)
+		{
+		case NORTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x720;
+			return;
+		case EAST:
+			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0xE0;
+			return;
+		case SOUTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0xE0;
+			return;
+		case WEST:
+		default:
+			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x720;
+			return;
+		}
+	}
+
+	if (item->currentAnimState == STATE_LARA_HANG_FEET_SHIMMYL)
+	{
+		switch (angle)
+		{
+		case NORTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0xE0;
+			return;
+		case EAST:
+			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x720;
+			return;
+		case SOUTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x720;
+			return;
+		case WEST:
+		default:
+			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0xE0;
+			return;
+		}
+	}
 }
 
 int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -6870,4 +6968,256 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		}
 	}
 	return result;
+}
+
+int TestHangNoFeet(ITEM_INFO* item, short angle)
+{
+	int x = item->pos.xPos;
+	int y = item->pos.yPos;
+	int z = item->pos.zPos;
+	short roomNum = item->roomNumber;
+	FLOOR_INFO* floor;
+	int h, c, g, m, j;
+
+	if (angle == ANGLE(180))
+	{
+		z -= 256;
+	}
+	else if (angle == -ANGLE(90))
+	{
+		x -= 256;
+	}
+	else if (angle == ANGLE(90))
+	{
+		x += 256;
+	}
+	else if (angle == ANGLE(0))
+	{
+		z += 256;
+	}
+
+	floor = GetFloor(x, y, z, &roomNum);
+	h = GetFloorHeight(floor, x, y, z);
+	c = GetCeiling(floor, x, y, z);
+	g = h - y;
+	m = c - y;
+	j = y - 128 - c;
+
+	if (item->currentAnimState == STATE_LARA_CRAWL_TO_CLIMB)
+	{
+		if (h != NO_HEIGHT)
+		{
+			if (((g) > 0)
+				&& ((m) < -128)
+				&& ((j) > -72))
+				return(0);
+		}
+		return(1);
+	}
+	else
+	{
+	if (h != NO_HEIGHT)
+	{
+		if (((g) > 0)
+			&& ((m) < -128)
+			&& ((j) > -72))
+			return(1);
+	}
+	return(0);
+	}
+}
+
+void lara_as_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.isClimbing = false;
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = STATE_LARA_STOP;
+		return;
+	}
+
+	if (TrInput & IN_LOOK)
+		LookUpDown();
+
+	coll->enableBaddiePush = false;
+	coll->enableSpaz = false;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(45);
+}
+void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->fallspeed = 0;
+	item->gravityStatus = false;
+
+	Lara.moveAngle = item->pos.yRot;
+
+	LaraHangTest(item, coll);
+
+	if (!(TrInput & IN_ACTION))
+		item->goalAnimState = STATE_LARA_JUMP_UP;
+
+	if (item->animNumber == ANIMATION_LARA_HANG_FEET)
+	{
+		int flag;
+
+		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
+		{
+			if (CanLaraHangSideways(item, coll, -ANGLE(90)))
+			{
+//				item->currentAnimState = STATE_LARA_HANG_FEET_SHIMMYL;
+				item->goalAnimState = STATE_LARA_HANG_FEET_SHIMMYL;
+//				item->animNumber = ANIMATION_LARA_HANG_FEET_SHIMMYL;
+//				item->frameNumber = Anims[item->animNumber].frameBase;
+
+				return;
+			}
+			/*
+						flag = LaraHangLeftCornerTest(item, coll);
+						if (flag != 0)
+						{
+							if (flag <= 0)
+								item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_INNER;
+							else
+								item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_OUTER;
+							return;
+						}*///commenting till daniel makes corner anims
+		}
+
+
+		if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
+		{
+			if (CanLaraHangSideways(item, coll, ANGLE(90)))
+			{
+//				item->currentAnimState = STATE_LARA_HANG_FEET_SHIMMYR;
+				item->goalAnimState = STATE_LARA_HANG_FEET_SHIMMYR;
+//				item->animNumber = ANIMATION_LARA_HANG_FEET_SHIMMYR;
+//				item->frameNumber = Anims[item->animNumber].frameBase;
+
+				return;
+			}
+			/*			flag = LaraHangRightCornerTest(item, coll);
+						if (flag != 0)
+						{
+							if (flag <= 0)
+								item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_INNER;
+							else
+								item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_OUTER;
+							return;
+						}*///commenting till daniel makes corner anims
+		}
+
+//	}
+
+
+
+
+
+
+//	if (item->animNumber == ANIMATION_LARA_HANG_FEET)
+//	{
+		TestForObjectOnLedge(item, coll);
+		if (TrInput & IN_FORWARD)
+		{
+			if (coll->frontFloor > -850)
+			{
+				if (coll->frontFloor < -650 &&
+					coll->frontFloor >= coll->frontCeiling &&
+					coll->frontFloor >= coll->leftCeiling2 &&
+					coll->frontFloor >= coll->rightCeiling2)
+				{
+					if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
+					{
+						if (TrInput & IN_WALK)
+						{
+							//till anim							item->goalAnimState = STATE_LARA_HANDSTAND;
+						}
+						else if (TrInput & IN_DUCK)
+						{
+							//till anim							item->goalAnimState = STATE_LARA_CLIMB_TO_CRAWL;
+							//till anim							item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
+						}
+						else
+						{
+//							item->currentAnimState = STATE_LARA_GRABBING;
+							item->goalAnimState = STATE_LARA_GRABBING;
+						}
+						return;
+					}
+				}
+			}
+			/*	if (coll->frontFloor < -650 &&
+					coll->frontFloor - coll->frontCeiling >= -256 &&
+					coll->frontFloor - coll->leftCeiling2 >= -256 &&
+					coll->frontFloor - coll->rightCeiling2 >= -256)
+				{
+					if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
+					{
+						item->goalAnimState = STATE_LARA_CLIMB_TO_CRAWL;
+						item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
+						return;
+					}
+				}
+			}
+			if (Lara.climbStatus != 0 &&
+				coll->midCeiling <= -256 &&
+				abs(coll->leftCeiling2 - coll->rightCeiling2) < 60)
+			{
+				if (LaraTestClimbStance(item, coll))
+				{
+					item->goalAnimState = STATE_LARA_LADDER_IDLE;
+				}
+				else
+				{
+					item->animNumber = ANIMATION_LARA_LADDER_UP_HANDS;
+					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->goalAnimState = STATE_LARA_HANG;
+					item->currentAnimState = STATE_LARA_HANG;
+				}
+			}
+			return;
+					}*///commenting till daniel makes anims
+		}
+	}
+	Lara.moveAngle = item->pos.yRot;
+	LaraHangTest(item, coll);
+}
+
+
+	void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
+{
+		coll->enableBaddiePush = false;
+		coll->enableSpaz = false;
+		Camera.targetAngle = 0;
+		Camera.targetElevation = -ANGLE(45);
+
+		if (item->animNumber == ANIMATION_LARA_HANG_FEET_SHIMMYR)
+			item->goalAnimState = STATE_LARA_HANG_FEET;
+}
+
+void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
+	LaraHangTest(item, coll);
+	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+}
+
+void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
+{
+
+	coll->enableBaddiePush = false;
+	coll->enableSpaz = false;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(45);
+	if (item->animNumber == ANIMATION_LARA_HANG_FEET_SHIMMYL)
+		item->goalAnimState = STATE_LARA_HANG_FEET;
+}
+
+void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
+	LaraHangTest(item, coll);
+	Lara.moveAngle = item->pos.yRot - ANGLE(90);
 }
