@@ -12,6 +12,7 @@
 #include "Lara.h"
 #include "collide.h"
 #include "effect2.h"
+#include "chaffFX.h"
 
 void FlareControl(short itemNumber) // (AF) (D)
 {
@@ -52,11 +53,11 @@ void FlareControl(short itemNumber) // (AF) (D)
 	}
 	else
 		item->fallspeed += 6;
-	
+
 	item->pos.yPos += item->fallspeed;
 
 	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
-	
+
 	short age = (short)(item->data) & 0x7FFF;
 	if (age >= 900)
 	{
@@ -70,9 +71,10 @@ void FlareControl(short itemNumber) // (AF) (D)
 	{
 		age++;
 	}
-	
+
 	if (DoFlareLight((PHD_VECTOR*)&item->pos, age))
 	{
+		TriggerChaffEffects(item);
 		/* Hardcoded code */
 
 		age |= 0x8000;
@@ -342,7 +344,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
 		item->shade = -1;
-		
+
 		if (thrown)
 		{
 			item->speed = LaraItem->speed + 50;
@@ -353,7 +355,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 			item->speed = LaraItem->speed + 10;
 			item->fallspeed = LaraItem->fallspeed + 50;
 		}
-		
+
 		if (flag)
 			item->speed >>= 1;
 
@@ -383,7 +385,8 @@ void DoFlareInHand(int flare_age) // (AF) (D)
 	pos.z = 41;
 
 	GetLaraJointPosition(&pos, LM_LHAND);
-	DoFlareLight(&pos, flare_age);
+	if (DoFlareLight(&pos, flare_age))
+		TriggerChaffEffects();
 
 	/* Hardcoded code */
 
