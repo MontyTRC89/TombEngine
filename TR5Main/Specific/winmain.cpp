@@ -17,6 +17,7 @@
 #include "..\Game\savegame.h"
 #include "..\Specific\level.h"
 #include "..\Specific\level.h"
+#include "..\Specific\newlevel.h"
 
 #include "configuration.h"
 #include <stdio.h>
@@ -200,6 +201,9 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	// Process the command line
 	bool setup = false;
+
+	TrLevel* level = new TrLevel(string("Data\\andrea1.t5m"));
+	level->Load();
 	
 	LPWSTR* argv;
 	int argc;
