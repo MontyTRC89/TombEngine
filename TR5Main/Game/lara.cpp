@@ -7057,7 +7057,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION))
 		item->goalAnimState = STATE_LARA_JUMP_UP;
 
-	if (item->animNumber == ANIMATION_LARA_HANG_FEET)
+	if (item->animNumber == ANIMATION_LARA_HANG_FEET_IDLE)
 	{
 		int flag;
 
@@ -7065,11 +7065,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (CanLaraHangSideways(item, coll, -ANGLE(90)))
 			{
-//				item->currentAnimState = STATE_LARA_HANG_FEET_SHIMMYL;
 				item->goalAnimState = STATE_LARA_HANG_FEET_SHIMMYL;
-//				item->animNumber = ANIMATION_LARA_HANG_FEET_SHIMMYL;
-//				item->frameNumber = Anims[item->animNumber].frameBase;
-
 				return;
 			}
 			/*
@@ -7089,10 +7085,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (CanLaraHangSideways(item, coll, ANGLE(90)))
 			{
-//				item->currentAnimState = STATE_LARA_HANG_FEET_SHIMMYR;
 				item->goalAnimState = STATE_LARA_HANG_FEET_SHIMMYR;
-//				item->animNumber = ANIMATION_LARA_HANG_FEET_SHIMMYR;
-//				item->frameNumber = Anims[item->animNumber].frameBase;
 
 				return;
 			}
@@ -7139,7 +7132,6 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 						}
 						else
 						{
-//							item->currentAnimState = STATE_LARA_GRABBING;
 							item->goalAnimState = STATE_LARA_GRABBING;
 						}
 						return;
@@ -7191,7 +7183,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 		Camera.targetAngle = 0;
 		Camera.targetElevation = -ANGLE(45);
 
-		if (item->animNumber == ANIMATION_LARA_HANG_FEET_SHIMMYR)
+		if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
 			item->goalAnimState = STATE_LARA_HANG_FEET;
 }
 
@@ -7210,7 +7202,7 @@ void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 	coll->enableSpaz = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45);
-	if (item->animNumber == ANIMATION_LARA_HANG_FEET_SHIMMYL)
+	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
 		item->goalAnimState = STATE_LARA_HANG_FEET;
 }
 
