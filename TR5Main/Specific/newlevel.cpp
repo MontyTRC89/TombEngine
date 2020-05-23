@@ -96,7 +96,7 @@ bool TrLevel::Load()
 		else if (id->EqualsTo(m_chunkBox))
 			return readBox();
 		else if (id->EqualsTo(m_chunkZone))
-			return readBox();
+			return readZones();
 		else
 			return false;
 		}, 0);
@@ -184,6 +184,7 @@ bool TrLevel::readRoom()
 	m_stream->ReadInt32(&room.numXsectors);
 	m_stream->ReadInt32(&room.numZsectors);
 	m_stream->ReadInt32(&room.roomType);
+	m_stream->ReadInt32(&room.reverb);
 	m_stream->ReadInt32(&room.effect);
 	m_stream->ReadFloat(&room.effectStrength);
 	m_stream->ReadInt32(&room.alternateRoom);
