@@ -24,8 +24,8 @@ struct TrTexturePage
 struct TrPolygon
 {
 	vector<int> indices;
-	short animatedSequence;
-	short frame;
+	int animatedSequence;
+	int frame;
 };
 
 struct TrMaterial 
@@ -49,7 +49,7 @@ struct TrBucket
 
 struct TrVolume 
 {
-	short type;
+	int type;
 	Vector3 position;
 	Quaternion rotation;
 	BoundingBox box;
@@ -59,21 +59,21 @@ struct TrVolume
 
 struct TrClimbVolume : TrVolume
 {
-	short climbType;
+	int climbType;
 };
 
 struct TrTriggerVolume : TrVolume
 {
-	short activators;
+	int activators;
 };
 
 struct TrSector
 {
 	int boxIndex;
-	short pathfindingFlags;
-	short stepSound;
-	short roomBelow;
-	short roomAbove;
+	int pathfindingFlags;
+	int stepSound;
+	int roomBelow;
+	int roomAbove;
 	int floor;
 	int ceiling;
 	vector<int> floorData;
@@ -98,9 +98,9 @@ struct TrRoomStatic
 {
 	string name;
 	Vector3 position;
-	Quaternion rotiation;
+	Quaternion rotation;
 	Vector3 scale;
-	short staticNumber;
+	int staticNumber;
 	Vector3 color;
 	bool receiveShadows;
 	bool castShadows;
@@ -110,7 +110,7 @@ struct TrRoomStatic
 
 struct TrPortal
 {
-	short adjoiningRoom;
+	int adjoiningRoom;
 	Vector3 normal;
 	vector<Vector3> vertices;
 };
@@ -121,14 +121,14 @@ struct TrRoom
 	int z;
 	int yBottom;
 	int yTop;
-	short numXsectors;
-	short numZsectors;
-	short roomType;
-	short reverb;
-	short effect;
+	int numXsectors;
+	int numZsectors;
+	int roomType;
+	int reverb;
+	int effect;
 	float effectStrength;
-	short alternateRoom;
-	short alternatGroup;
+	int alternateRoom;
+	int alternatGroup;
 	int flags;
 	Vector3 ambient;
 	vector<TrBucket> buckets;
@@ -161,32 +161,33 @@ struct TrKeyFrame
 
 struct TrAnimCommand
 {
-	short type;
-	vector<short> params;
+	int type;
+	int frame;
+	vector<int> params;
 };
 
 struct TrAnimDispatch 
 {
-	short inFrame;
-	short outFrame;
-	short nextAnimation;
-	short nextFrame;
+	int inFrame;
+	int outFrame;
+	int nextAnimation;
+	int nextFrame;
 };
 
 struct TrStateChange 
 {
-	short state;
+	int state;
 	vector<TrAnimDispatch> dispatches;
 };
 
 struct TrAnimation
 {
-	short framerate;
-	short state;
-	short nextAnimation;
-	short nextFrame;
-	short frameStart;
-	short frameEnd;
+	int framerate;
+	int state;
+	int nextAnimation;
+	int nextFrame;
+	int frameStart;
+	int frameEnd;
 	float speed;
 	float acceleration;
 	float lateralSpeed;
@@ -198,7 +199,7 @@ struct TrAnimation
 
 struct TrMoveable 
 {
-	short id;
+	int id;
 	vector<TrMesh> meshes;
 	vector<TrBone> bones;
 	vector<TrAnimation> animations;
@@ -206,7 +207,7 @@ struct TrMoveable
 
 struct TrStatic 
 {
-	short id;
+	int id;
 	BoundingBox visibilityBox;
 	BoundingBox collisionBox;
 	vector<TrMesh> meshes;
@@ -233,8 +234,8 @@ struct TrItem
 	Quaternion rotation;
 	Vector3 scale;
 	Vector3 color;
-	short roomNumber;
-	short objectNumber;
+	int roomNumber;
+	int objectNumber;
 	string script;
 };
 
@@ -242,9 +243,9 @@ struct TrCamera
 {
 	string name;
 	Vector3 position;
-	short roomNumber;
-	short type;
-	short flags;
+	int roomNumber;
+	int type;
+	int flags;
 	string script;
 };
 
@@ -252,17 +253,17 @@ struct TrSoundSource
 {
 	string name;
 	Vector3 position;
-	short roomNumber;
+	int roomNumber;
 	float volume;
-	short sound;
-	short playMode;
+	int sound;
+	int playMode;
 };
 
 struct TrSink 
 {
 	string name;
 	Vector3 position;
-	short roomNumber;
+	int roomNumber;
 	float strength;
 	int box;
 };
@@ -304,15 +305,15 @@ struct TrSoundDetails
 struct TrFlybyCamera 
 {
 	string name;
-	short sequence;
-	short number;
+	int sequence;
+	int number;
 	Vector3 position;
 	Vector3 direction;
 	float fov;
 	float roll;
 	float speed;
-	short timer;
-	short roomNumber;
+	int timer;
+	int roomNumber;
 	int flags;
 	string script;
 };
@@ -389,6 +390,21 @@ private:
 	bool readAnimatedTextureSequence();
 	bool readRoom();
 	bool readBucket(TrBucket* bucket);
+	bool readMesh(TrMesh* mesh);
+	bool readAnimation(TrAnimation* animation);
+	bool readMoveable();
+	bool readStatic();
+	bool readSpriteSequence();
+	bool readItem();
+	bool readAiItem();
+	bool readSink();
+	bool readCamera();
+	bool readFlybyCamera();
+	bool readSoundSource();
+	bool readBox();
+	bool readZones();
+	bool readSoundMap();
+	bool readSoundDetail();
 
 public:
 	vector<TrTexturePage> textures;
@@ -405,7 +421,7 @@ public:
 	vector<TrAnimatedTexturesSequence> animatedTextures;
 	vector<TrBox> boxes;
 	vector<int> zones;
-	vector<short> soundMap;
+	vector<int> soundMap;
 	vector<TrSoundDetails> soundDetails;
 	string script;
 
