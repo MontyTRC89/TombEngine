@@ -5,7 +5,11 @@
 #include <string>
 #include <stdlib.h>
 #include <stdlib.h>
+#include <d3d11.h>
+#include <SimpleMath.h>
 
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
 using namespace std;
 
 enum SeekOrigin {
@@ -63,10 +67,25 @@ public:
 		return true;
 	}
 
+	bool ReadString(string* value)
+	{
+		int length;
+		ReadInt32(&length);
+		char* buffer = (char*)malloc(length + 1);
+		Read(buffer, length);
+		buffer[length] = NULL;
+		*value = string(buffer);
+		free(buffer);
+
+		return true;
+	}
+
 	bool ReadVector2(Vector2* value)
 	{
 		ReadFloat(&value->x);
 		ReadFloat(&value->y);
+
+		return true;
 	}
 
 	bool ReadVector3(Vector3* value)
@@ -74,6 +93,8 @@ public:
 		ReadFloat(&value->x);
 		ReadFloat(&value->y);
 		ReadFloat(&value->z);
+
+		return true;
 	}
 
 	bool ReadVector4(Vector4* value)
@@ -82,6 +103,8 @@ public:
 		ReadFloat(&value->y);
 		ReadFloat(&value->z);
 		ReadFloat(&value->w);
+
+		return true;
 	}
 
 	bool ReadQuaternion(Quaternion* value)
@@ -90,6 +113,8 @@ public:
 		ReadFloat(&value->y);
 		ReadFloat(&value->z);
 		ReadFloat(&value->w);
+
+		return true;
 	}
 
 	bool ReadBoundingBox(BoundingBox* value)
@@ -101,6 +126,8 @@ public:
 		ReadVector3(&maxPos);
 
 		BoundingBox::CreateFromPoints(*value, minPos, maxPos);
+
+		return true;
 	}
 
 	bool ReadBoundingSphere(BoundingSphere* sphere)
@@ -113,6 +140,8 @@ public:
 
 		sphere->Center = center;
 		sphere->Radius = radius;
+
+		return true;
 	}
 
 	bool WriteBytes(byte* value, int length)
