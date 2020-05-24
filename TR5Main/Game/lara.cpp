@@ -191,6 +191,10 @@ void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* co
 	lara_as_hang_feet,
 	lara_as_hang_feet_shimmyr,
 	lara_as_hang_feet_shimmyl,
+	lara_as_hang_feet_inRcorner,
+	lara_as_hang_feet_inLcorner,
+	lara_as_hang_feet_outRcorner,
+	lara_as_hang_feet_outLcorner,
 };
 
 void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll) =
@@ -337,6 +341,10 @@ void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* 
 	lara_col_hang_feet,
 	lara_col_hang_feet_shimmyr,
 	lara_col_hang_feet_shimmyl,
+	lara_default_col,
+	lara_default_col,
+	lara_default_col,
+	lara_default_col,
 
 };
 
@@ -2602,8 +2610,6 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	Lara.moveAngle = angle + item->pos.yRot;
 	short ang = (unsigned short) (Lara.moveAngle + ANGLE(45)) >> W2V_SHIFT;
 
-	if (item->currentAnimState == STATE_LARA_HANG)
-	{
 
 		switch (ang)
 		{
@@ -2620,25 +2626,7 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 			x -= 16;
 			break;
 		}
-	}
-	else
-	{
-		switch (ang)
-		{
-		case 0:
-			z += 256;
-			break;
-		case 1:
-			x += 256;
-			break;
-		case 2:
-			z -= 256;
-			break;
-		case 3:
-			x -= 256;
-			break;
-		}
-	}
+
 	item->pos.xPos = x;
 	item->pos.zPos = z;
 
@@ -3045,19 +3033,19 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 		}
 		else
 		{
-			if (TestHangNoFeet(item, angle))
+			if (TestHangFeet(item, angle))
 			{
 				item->animNumber = ANIMATION_LARA_HANG_IDLE;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->currentAnimState = STATE_LARA_HANG;
-				item->goalAnimState = STATE_LARA_HANG;
+				item->goalAnimState = STATE_LARA_HANG_FEET;
 			}
 			else
 			{
 				item->animNumber = ANIMATION_LARA_HANG_IDLE;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->currentAnimState = STATE_LARA_HANG;
-				item->goalAnimState = STATE_LARA_HANG_FEET;
+				item->goalAnimState = STATE_LARA_HANG;
 			}
 		}
 
@@ -3278,19 +3266,19 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 						}
 						else
 						{
-							if (TestHangNoFeet(item, angle))
+							if (TestHangFeet(item, angle))
 							{
 								item->animNumber = ANIMATION_LARA_HANG_IDLE;
 								item->frameNumber = Anims[item->animNumber].frameBase + 12;
 								item->currentAnimState = STATE_LARA_HANG;
-								item->goalAnimState = STATE_LARA_HANG;
+								item->goalAnimState = STATE_LARA_HANG_FEET;
 							}
 							else
 							{
 								item->animNumber = ANIMATION_LARA_HANG_IDLE;
 								item->frameNumber = Anims[item->animNumber].frameBase + 12;
 								item->currentAnimState = STATE_LARA_HANG;
-								item->goalAnimState = STATE_LARA_HANG_FEET;
+								item->goalAnimState = STATE_LARA_HANG;
 							}
 						}
 
@@ -4641,19 +4629,19 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 					}
 					else
 					{
-						if (TestHangNoFeet(item, angle))
+						if (TestHangFeet(item, angle))
 						{
 							item->animNumber = ANIMATION_LARA_HANG_IDLE;
 							item->frameNumber = Anims[item->animNumber].frameBase;
 							item->currentAnimState = STATE_LARA_HANG;
-							item->goalAnimState = STATE_LARA_HANG;
+							item->goalAnimState = STATE_LARA_HANG_FEET;
 						}
 						else
 						{
 							item->animNumber = ANIMATION_LARA_HANG_IDLE;
 							item->frameNumber = Anims[item->animNumber].frameBase;
 							item->currentAnimState = STATE_LARA_HANG;
-							item->goalAnimState = STATE_LARA_HANG_FEET;
+							item->goalAnimState = STATE_LARA_HANG;
 						}
 					}
 
@@ -5441,7 +5429,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (item->animNumber != ANIMATION_LARA_HANG_IDLE)
+	if (item->animNumber != ANIMATION_LARA_HANG_IDLE || item->animNumber != ANIMATION_LARA_HANG_FEET)
 		return 0;
 
 	if (coll->hitStatic)
@@ -5596,7 +5584,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (item->animNumber != ANIMATION_LARA_HANG_IDLE)
+	if (item->animNumber != ANIMATION_LARA_HANG_IDLE || item->animNumber != ANIMATION_LARA_HANG_FEET)
 		return 0;
 
 	if (coll->hitStatic)
@@ -6969,9 +6957,21 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 	return result;
 }
+/**********************
 
-int TestHangNoFeet(ITEM_INFO* item, short angle)
+Current problems with with the feet hanging:
+-holding right/left at block ends makes Lara do the shimmy anim repeatedly
+-lara doesn't want to shimmy on uneven surfaces at all
+-going around corners isn't working. code is commented for now.
+-obviously, not all animations were made yet- we still need crouch pull up (works well, tested with placeholder anim) and corner anims (doesn't work) and handstand (not tested)
+-I'm *not* sure how Lara will react will react if the animations don't exist, but probably not good. This will be a problem until scrpting is done to enable/disable the entire system.
+
+***********************/
+int TestHangFeet(ITEM_INFO* item, short angle)
 {
+	if (Lara.climbStatus == 1)
+		return 0;
+
 	int x = item->pos.xPos;
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
@@ -7010,9 +7010,9 @@ int TestHangNoFeet(ITEM_INFO* item, short angle)
 			if (((g) > 0)
 				&& ((m) < -128)
 				&& ((j) > -72))
-				return(0);
+				return(1);
 		}
-		return(1);
+		return(0);
 	}
 	else
 	{
@@ -7021,9 +7021,9 @@ int TestHangNoFeet(ITEM_INFO* item, short angle)
 		if (((g) > 0)
 			&& ((m) < -128)
 			&& ((j) > -72))
-			return(1);
+			return(0);
 	}
-	return(0);
+	return(1);
 	}
 }
 
@@ -7068,16 +7068,16 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = STATE_LARA_HANG_FEET_SHIMMYL;
 				return;
 			}
-			/*
-						flag = LaraHangLeftCornerTest(item, coll);
-						if (flag != 0)
-						{
-							if (flag <= 0)
-								item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_INNER;
-							else
-								item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_OUTER;
-							return;
-						}*///commenting till daniel makes corner anims
+/*			flag = LaraHangLeftCornerTest(item, coll);
+			if (flag != 0)
+			{
+				if (flag <= 0)
+					item->goalAnimState = STATE_LARA_HANG_FEET_INCORNERL;
+				else
+					item->goalAnimState = STATE_LARA_HANG_FEET_OUTCORNERL;
+				return;
+			}*/
+
 		}
 
 
@@ -7089,26 +7089,18 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-			/*			flag = LaraHangRightCornerTest(item, coll);
-						if (flag != 0)
-						{
-							if (flag <= 0)
-								item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_INNER;
-							else
-								item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_OUTER;
-							return;
-						}*///commenting till daniel makes corner anims
+/*			flag = LaraHangRightCornerTest(item, coll);
+			if (flag != 0)
+			{
+				if (flag <= 0)
+					item->goalAnimState = STATE_LARA_HANG_FEET_INCORNERR;
+				else
+					item->goalAnimState = STATE_LARA_HANG_FEET_OUTCORNERR;
+				return;
+			}*/
 		}
 
-//	}
 
-
-
-
-
-
-//	if (item->animNumber == ANIMATION_LARA_HANG_FEET)
-//	{
 		TestForObjectOnLedge(item, coll);
 		if (TrInput & IN_FORWARD)
 		{
@@ -7127,8 +7119,8 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 						}
 						else if (TrInput & IN_DUCK)
 						{
-							//till anim							item->goalAnimState = STATE_LARA_CLIMB_TO_CRAWL;
-							//till anim							item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
+							item->goalAnimState = STATE_LARA_CLIMB_TO_CRAWL;
+							item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
 						}
 						else
 						{
@@ -7138,19 +7130,20 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 					}
 				}
 			}
-			/*	if (coll->frontFloor < -650 &&
-					coll->frontFloor - coll->frontCeiling >= -256 &&
-					coll->frontFloor - coll->leftCeiling2 >= -256 &&
-					coll->frontFloor - coll->rightCeiling2 >= -256)
+			if (coll->frontFloor < -650 &&
+				coll->frontFloor - coll->frontCeiling >= -256 &&
+				coll->frontFloor - coll->leftCeiling2 >= -256 &&
+				coll->frontFloor - coll->rightCeiling2 >= -256)
+			{
+				if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
 				{
-					if (abs(coll->leftFloor2 - coll->rightFloor2) < 60 && !coll->hitStatic)
-					{
-						item->goalAnimState = STATE_LARA_CLIMB_TO_CRAWL;
-						item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
-						return;
-					}
+					item->goalAnimState = STATE_LARA_CLIMB_TO_CRAWL;
+					item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
+					return;
 				}
 			}
+		}
+		/*
 			if (Lara.climbStatus != 0 &&
 				coll->midCeiling <= -256 &&
 				abs(coll->leftCeiling2 - coll->rightCeiling2) < 60)
@@ -7169,10 +7162,10 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			return;
 					}*///commenting till daniel makes anims
-		}
+
+		Lara.moveAngle = item->pos.yRot;
+		LaraHangTest(item, coll);
 	}
-	Lara.moveAngle = item->pos.yRot;
-	LaraHangTest(item, coll);
 }
 
 
@@ -7212,4 +7205,69 @@ void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+}
+
+void lara_as_hang_feet_inRcorner(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.laraNode = 8;
+	Camera.targetElevation = ANGLE(33);
+	SetCornerAnimFeet(item, coll, ANGLE(90),
+		item->animNumber = ANIMATION_LARA_HANG_FEET_IN_RCORNER);
+}
+void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.laraNode = 8;
+	Camera.targetElevation = ANGLE(33);
+	SetCornerAnimFeet(item, coll, -ANGLE(90),
+		item->animNumber = ANIMATION_LARA_HANG_FEET_IN_LCORNER);
+}
+void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.laraNode = 8;
+	Camera.targetElevation = ANGLE(33);
+	SetCornerAnimFeet(item, coll, -ANGLE(90),
+		item->animNumber = ANIMATION_LARA_HANG_FEET_OUT_RCORNER);
+}
+void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll)
+{
+	Camera.laraNode = 8;
+	Camera.targetElevation = ANGLE(33);
+	SetCornerAnimFeet(item, coll, ANGLE(90),
+		item->animNumber = ANIMATION_LARA_HANG_FEET_OUT_LCORNER);
+}
+
+void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
+{
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = STATE_LARA_JUMP_FORWARD;
+		item->currentAnimState = STATE_LARA_JUMP_FORWARD;
+		item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+
+		item->gravityStatus = true;
+		item->speed = 2;
+		item->pos.yPos += 256;
+		item->fallspeed = 1;
+
+		Lara.gunStatus = LG_NO_ARMS;
+
+		item->pos.yRot += rot / 2;
+	}
+	else if (flip)
+	{
+
+			item->animNumber = ANIMATION_LARA_HANG_FEET;
+			item->frameNumber = Anims[item->animNumber].frameBase + 24;
+			item->goalAnimState = STATE_LARA_HANG_FEET;
+			item->currentAnimState = STATE_LARA_HANG_FEET;
+
+		coll->old.x = Lara.cornerX;
+		item->pos.xPos = Lara.cornerX;
+
+		coll->old.z = Lara.cornerZ;
+		item->pos.zPos = Lara.cornerZ;
+
+		item->pos.yRot += rot;
+	}
 }
