@@ -37,6 +37,22 @@ typedef struct JEEP_INFO {
 	short unknown2;
 };
 
+struct MOTORBIKE_INFO
+{
+	int wheelRight;  // (two wheel: front and back)
+	int wheelLeft;   // (one wheel: left)
+	int velocity;
+	int revs;
+	int engineRevs;
+	short momentumAngle;
+	short extraRotation;
+	short wallShiftRotation;
+	int bikeTurn;
+	int pitch;
+	short flags;
+	short lightPower;
+};
+
 typedef struct SUB_INFO {
 	int Vel;
 	int Rot;
@@ -45,7 +61,6 @@ typedef struct SUB_INFO {
 	char Flags;
 	char WeaponTimer;
 };
-
 
 typedef struct CART_INFO {
 	int Speed;
@@ -124,19 +139,21 @@ typedef struct KAYAK_INFO {
 
 typedef struct BOSS_STRUCT
 {
-	short attack_count;
-	short death_count;
-	byte attack_flag;
-	byte attack_type;
-	byte attack_head_count;
-	byte ring_count;
-	short explode_count;
-	short lizman_item, lizman_room;
-	short hp_counter;
-	short dropped_icon;
-	byte charged;
-	byte dead;
-	PHD_VECTOR	BeamTarget;
+	PHD_VECTOR BeamTarget;
+	bool DroppedIcon;
+	bool IsInvincible;
+	bool DrawExplode; // allow explosion geometry
+	bool Charged;
+	bool Dead;
+	short AttackCount;
+	short DeathCount;
+	short AttackFlag;
+	short AttackType;
+	short AttackHeadCount;
+	short RingCount;
+	short ExplodeCount;
+	short LizmanItem, LizmanRoom;
+	short HpCounter;
 };
 
 typedef struct SHIELD_POINTS
@@ -261,8 +278,8 @@ void ControlFish(short itemNumber);
 bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item);
 void InitialiseTony(short itemNum);
 void TonyControl(short itemNum);
-void DrawTony(ITEM_INFO* item);
-void TonyFireBallControl(short fxNumber);
+void S_DrawTonyBoss(ITEM_INFO* item);
+void ControlTonyFireBall(short fxNumber);
 void InitialiseShiva(short itemNum);
 void ShivaControl(short itemNum);
 void ControlLaserBolts(short item_number);
@@ -274,6 +291,8 @@ void InitialiseCivvy(short item_number);
 void CivvyControl(short item_number);
 
 // TR4 object
+void InitialiseAhmet(short item_number);
+void AhmetControl(short item_number);
 void InitialiseWildBoar(short itemNum);
 void WildBoarControl(short itemNum);
 void InitialiseSmallScorpion(short itemNum);
@@ -418,19 +437,9 @@ void InitialiseJeep(short itemNum);
 int JeepControl();
 void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 
-// TODO: motorbike missing
-void InitialiseMotorbike(short itemNum);
-int MotorbikeControl();
-int MotorbikeCheckGetOff();
-int MotorbikeDynamics(ITEM_INFO* item);
-int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch);
-void AnimateMotorbike(ITEM_INFO* item, int collide, int dead);
-void MotorbikeExplode(ITEM_INFO* item);
-int MotorbikeCanGetOff();
-int DoMotorbikeDynamics(int height, int speed, int* y, int flags);
-void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, int moving);
-int GetOnMotorbike(int itemNumber);
-void MotorbikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
-int GetOnMotorbike(int itemNumber);
-int GetMotorbikeCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
-void MotorbikeBaddieCollision(ITEM_INFO* bike);
+void InitialiseMotorbike(short item_number);
+void MotorbikeCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* coll);
+int MotorbikeControl(void);
+void DrawMotorbike(ITEM_INFO* item);
+void DrawMotorbikeEffect(ITEM_INFO* item);
+void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* laraitem);

@@ -163,6 +163,26 @@ void NewObjects()
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_AHMET];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseAhmet;
+		obj->control = AhmetControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 80;
+		obj->pivotLength = 300;
+		obj->radius = 341;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
+
+		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
+	}
+
 	obj = &Objects[ID_BADDY1];
 	if (obj->loaded)
 	{
@@ -179,6 +199,7 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
+		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
@@ -202,6 +223,7 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
+		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
@@ -276,6 +298,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_WATER;
 
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
@@ -295,6 +318,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_WATER;
 
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
@@ -391,6 +415,7 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 50;
+		obj->zoneType = ZONE_WATER;
 
 		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
@@ -419,6 +444,7 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
+		obj->zoneType = ZONE_FLYER;
 	}
 
 	obj = &Objects[ID_CROW];
@@ -436,6 +462,7 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
+		obj->zoneType = ZONE_FLYER;
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_AX];
@@ -547,6 +574,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_APE;
 	}
 
 	obj = &Objects[ID_RAT];
@@ -901,6 +929,7 @@ void NewObjects()
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_FLYER;
 	}
 
 	obj = &Objects[ID_GUIDE];
@@ -937,6 +966,7 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->waterCreature = true;
+		obj->zoneType = ZONE_WATER;
 
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -1004,7 +1034,7 @@ void NewObjects()
 		//if (!Objects[MESHSWAP2].loaded)
 		//	S_ExitSystem("FATAL: Monkey requires MESHSWAP2 (Monkey + Pickups)");
 
-		//obj->draw_routine = (void*)DrawMonkey;
+		//obj->draw_routine = DrawMonkey;
 		obj->initialise = InitialiseMonkey;
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;
@@ -1028,6 +1058,18 @@ void NewObjects()
 	{
 		obj->initialise = InitialiseJeep;
 		obj->collision = JeepCollision;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_MOTORBIKE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMotorbike;
+		obj->collision = MotorbikeCollision;
+		//obj->drawRoutine = DrawMotorbike; // for wheel rotation
+		obj->drawRoutineExtra = DrawMotorbikeEffect;
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -1069,6 +1111,7 @@ void NewObjects()
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
@@ -1090,6 +1133,7 @@ void NewObjects()
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
 		Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
 	}
@@ -3259,7 +3303,7 @@ void CustomObjects()
 		obj->initialise = InitialiseTony;
 		obj->collision = CreatureCollision;
 		obj->control = TonyControl;
-		obj->drawRoutine = DrawTony;
+		obj->drawRoutine = S_DrawTonyBoss;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
 		obj->pivotLength = 50;
@@ -3273,6 +3317,10 @@ void CustomObjects()
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
+
+	obj = &Objects[ID_TONY_BOSS_FLAME];
+	obj->control = ControlTonyFireBall;
+	obj->drawRoutine = NULL;
 
 	obj = &Objects[ID_BIRDMONSTER];
 	if (obj->loaded)
@@ -3333,9 +3381,7 @@ void CustomObjects()
 
 	obj = &Objects[ID_KNIFETHROWER_KNIFE];
 	if (obj->loaded)
-	{
 		obj->control = KnifeControl;
-	}
 
 	obj = &Objects[ID_MERCENARY_UZI];
 	if (obj->loaded)
