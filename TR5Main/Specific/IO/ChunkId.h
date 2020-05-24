@@ -10,6 +10,11 @@
 
 using namespace std;
 
+class IHasChunkReader
+{
+
+};
+
 typedef struct ChunkId
 {
 private:
@@ -81,4 +86,3 @@ public:
 		return (strncmp((const char*)m_chunkBytes, (const char*)other->GetBytes(), m_length) == 0);
 	}
 };
-
