@@ -24,6 +24,8 @@
 #define PATROL1			4
 #define MODIFY			8
 #define FOLLOW			16
+#define PATROL2         32
+#define ALL_AIOBJ       (GUARD|AMBUSH|PATROL1|MODIFY|FOLLOW|PATROL2)
 
 #define BOX_BLOCKED		(1 << 14) // unpassable for other enemies, always set for movable blocks & closed doors
 #define BOX_LAST		(1 << 15) // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
@@ -60,9 +62,9 @@
 #define MAX_DRAW_STATICS    16384
 #define MAX_BONES			32
 #define MAX_SPRITES			16384
-#define MAX_SPARKS          1024      // 128 normally
+#define MAX_SPARKS          1024
 #define MAX_SPARKS_FIRE     20
-#define MAX_FIRE_LIST       32        // FIRE_SPARKS list
+#define MAX_FIRE_LIST       32
 #define MAX_SPARKS_SMOKE    32
 #define MAX_SPARKS_BLOOD    32
 #define MAX_ENERGY_ARCS		256
@@ -111,7 +113,7 @@ constexpr auto MAX_SPLASH = 8;
 #define	SP_EXPDEF		512
 #define	SP_USEFXOBJPOS	1024
 #define	SP_UNDERWEXP	2048
-#define	SP_NODEATTATCH	4096
+#define	SP_NODEATTACH	4096
 #define	SP_PLASMAEXP	8192
 
 #define	SD_EXPLOSION	1

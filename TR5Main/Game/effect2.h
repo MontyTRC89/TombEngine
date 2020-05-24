@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include "..\Global\global.h"
 
+#define MAX_NODE 23
 #define RIPPLE_FLAG_BLOOD 0x80
 #define RIPPLE_FLAG_RAND_POS 0x40
 #define RIPPLE_FLAG_RAND_ROT 0x20
@@ -40,8 +41,8 @@ extern SPLASH_SETUP SplashSetup;
 extern int SmokeWeapon;
 extern int SmokeCountL;
 extern int SmokeCountR;
-extern PHD_VECTOR NodeVectors[16];
-extern NODEOFFSET_INFO NodeOffsets[16];
+extern PHD_VECTOR NodeVectors[MAX_NODE];
+extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 void DetatchSpark(int num, int type);
 int GetFreeSpark();

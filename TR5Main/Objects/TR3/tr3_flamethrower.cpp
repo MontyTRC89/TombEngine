@@ -506,7 +506,7 @@ void TriggerPilotFlame(int itemnum)
 	spark->yVel = -(GetRandomControl() & 3);
 	spark->zVel = (GetRandomControl() & 31) - 16;
 
-	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTATCH;
+	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
 	spark->fxObj = itemnum;
 	spark->nodeNumber = 0;
 	spark->friction = 4;
