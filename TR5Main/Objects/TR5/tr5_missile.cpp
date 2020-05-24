@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "oldobjects.h"
 #include "items.h"
 #include "box.h"
@@ -6,7 +7,7 @@
 #include "tomb4fx.h"
 #include "effect2.h"
 #include "draw.h"
-#include "effects.h"
+#include "effect.h"
 #include "traps.h"
 #include "level.h"
 #include "debris.h"

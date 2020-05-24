@@ -1,5 +1,6 @@
+#include "framework.h"
 #include "newobjects.h"
-#include "effects.h"
+#include "effect.h"
 #include "draw.h"
 #include "level.h"
 #include "lara.h"

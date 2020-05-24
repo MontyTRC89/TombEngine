@@ -1,4 +1,5 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_troops.h"
 #include "box.h"
 #include "items.h"
 #include "sphere.h"

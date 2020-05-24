@@ -1,8 +1,4 @@
 #pragma once
-
-#include <stdlib.h>
-#include <memory>
-
 #include "ChunkId.h"
 #include "LEB128.h"
 #include "Streams.h"

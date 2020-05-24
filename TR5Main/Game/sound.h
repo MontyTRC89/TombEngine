@@ -1,14 +1,6 @@
 #pragma once
-
-#include "bass.h"
-#include "bass_fx.h"
-#include <vector>
-
-#include "control.h"
 #include "global.h"
-
-#include <SimpleMath.h>
-using namespace DirectX::SimpleMath;
+#include "control.h"
 
 typedef enum audio_tracks
 {

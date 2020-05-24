@@ -1,7 +1,6 @@
+#include "framework.h"
 #include "lot.h"
 #include "box.h"
-#include "global.h"
-#include <stdio.h>
 #include "setup.h"
 #include "camera.h"
 #include "lara.h"

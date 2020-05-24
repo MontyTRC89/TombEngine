@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "global.h"
 #include "box.h"
@@ -6,7 +7,7 @@
 #include "control.h"
 #include "effect2.h"
 #include "Lara.h"
-#include "effects.h"
+#include "effect.h"
 #include "draw.h"
 #include "collide.h"
 #include "sphere.h"

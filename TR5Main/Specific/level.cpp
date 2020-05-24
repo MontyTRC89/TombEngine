@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "level.h"
-#include "global.h"
 #include "items.h"
 #include "setup.h"
 #include "draw.h"
@@ -13,18 +13,11 @@
 #include "pickup.h"
 #include "door.h"
 #include "box.h"
-
 #include "ChunkId.h"
 #include "ChunkReader.h"
 #include "ChunkWriter.h" 
 #include "LEB128.h"
-
-#include <process.h>
-#include <stdio.h>
-#include <vector>
-#include <map>
 #include "Streams.h"
-#include <zlib.h>
 #include "sound.h"
 
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
@@ -55,8 +48,6 @@ uintptr_t hLoadLevel;
 unsigned int ThreadId;
 int IsLevelLoading;
 bool g_FirstLevel = true;
-
-using namespace std;
 
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;

@@ -1,10 +1,12 @@
+#include "framework.h"
 #include "Renderer11.h"
 #include "draw.h"
 #include "lara.h"
-#include "effects.h"
+#include "effect.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
+
 void Renderer11::collectRooms()
 {
 	short baseRoomIndex = Camera.pos.roomNumber;

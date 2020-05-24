@@ -1,10 +1,7 @@
-#include "math.h"
+#include "framework.h"
+#include "trmath.h"
 #include "types.h"
 #include <cmath>
-#include <d3d11.h>
-#include <SimpleMath.h>
-
-using namespace DirectX::SimpleMath;
 
 // LUT for cos and sin
 // 8192 entries, even entry = Sin, odd entry = Cos

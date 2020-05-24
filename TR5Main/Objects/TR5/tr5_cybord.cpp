@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "oldobjects.h"
 #include "items.h"
 #include "sphere.h"

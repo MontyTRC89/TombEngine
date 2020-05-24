@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "level.h"
 #include "sphere.h"
@@ -12,7 +13,7 @@
 #include "tomb4fx.h"
 #include "items.h"
 #include "sound.h"
-#include "healt.h"
+#include "health.h"
 #include "camera.h"
 
 // TODO: need to fix the bug about the shift, i dont know why it appear but it's in MotorbikeDynamics()

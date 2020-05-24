@@ -1,9 +1,8 @@
-#pragma once
+#include "framework.h"
 #include "Renderer11.h"
 #include "configuration.h"
-#include <chrono>
 #include "savegame.h"
-#include "healt.h"
+#include "health.h"
 #include "camera.h"
 #include "draw.h"
 #include "inventory.h"
@@ -12,7 +11,7 @@
 #include "rope.h"
 #include "tomb4fx.h"
 #include "door.h"
-#include "Objects/oldobjects.h"
+#include "oldobjects.h"
 #include "level.h"
 #include "setup.h"
 #include "control.h"

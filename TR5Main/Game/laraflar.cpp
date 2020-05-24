@@ -1,10 +1,8 @@
+#include "framework.h"
 #include "laraflar.h"
-
-#include "global.h"
 #include "level.h"
 #include "setup.h"
 #include "sound.h"
-
 #include "draw.h"
 #include "items.h"
 #include "sphere.h"

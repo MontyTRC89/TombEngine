@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 
 // TODO: finish the statue render (drawanimatingitem not work anymore with the new render)

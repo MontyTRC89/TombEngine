@@ -1,10 +1,7 @@
+#include "framework.h"
 #include "init.h"
 #include "winmain.h"
-#include <CommCtrl.h>
 #include "resource.h"
-#include <process.h>
-#include <crtdbg.h>
-#include <stdio.h>
 #include "sol.hpp"
 #include "draw.h"
 #include "sound.h"
@@ -13,12 +10,7 @@
 #include "gameflow.h"
 #include "savegame.h"
 #include "level.h"
-#include "level.h"
 #include "configuration.h"
-#include <stdio.h>
-#include <io.h>
-#include <fcntl.h>
-#include <windows.h>
 
 WINAPP App;
 unsigned int ThreadID;

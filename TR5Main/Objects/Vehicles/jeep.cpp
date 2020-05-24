@@ -1,9 +1,10 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "lara.h"
 #include "inventory.h"
 #include "effect2.h"
 #include "collide.h"
-#include "effects.h"
+#include "effect.h"
 #include "lara1gun.h"
 #include "items.h"
 #include "camera.h"
@@ -12,12 +13,8 @@
 #include "laraflar.h"
 #include "input.h"
 #include "sound.h"
-
-#include <vector>
 #include "setup.h"
 #include "level.h"
-
-using namespace std;
 
 #define JF_FALLING					0x40
 #define JF_DEAD						0x80

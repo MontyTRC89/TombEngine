@@ -3,10 +3,8 @@
 
 extern int NextBat;
 extern BAT_STRUCT* Bats;
-
 extern int NextSpider;
 extern SPIDER_STRUCT* Spiders;
-
 extern int NextRat;
 extern RAT_STRUCT* Rats;
 

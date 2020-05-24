@@ -1,9 +1,8 @@
+#include "framework.h"
 #include "control.h"
-
 #include "global.h"
- 
 #include "pickup.h"
-#include "Camera.h"
+#include "camera.h"
 #include "Lara.h"
 #include "hair.h"
 #include "items.h"
@@ -14,7 +13,7 @@
 #include "lot.h"
 #include "pickup.h"
 #include "draw.h"
-#include "healt.h"
+#include "health.h"
 #include "savegame.h"
 #include "sound.h"
 #include "spotcam.h"
@@ -25,21 +24,16 @@
 #include "rope.h"
 #include "tomb4fx.h"
 #include "traps.h"
-#include "effects.h"
+#include "effect.h"
 #include "sphere.h"
 #include "debris.h"
 #include "larafire.h"
 #include "oldobjects.h"
-
 #include "footprint.h"
 #include "level.h"
 #include "input.h"
 #include "init.h"
 #include "winmain.h"
-#include "input.h"
-
-#include <process.h>
-#include <stdio.h>
 #include "Renderer11.h"
 #include "setup.h"
 

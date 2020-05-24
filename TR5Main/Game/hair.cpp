@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "hair.h"
 #include "global.h"
 #include "draw.h"

@@ -1,7 +1,8 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_harpy.h"
 #include "people.h"
 #include "box.h"
-#include "effects.h"
+#include "effect.h"
 #include "effect2.h"
 #include "items.h"
 #include "sphere.h"
@@ -16,6 +17,76 @@ BITE_INFO harpyBite2 = { 0, 0, 0, 2 };
 BITE_INFO harpyBite3 = { 0, 0, 0, 21 };
 BITE_INFO harpyAttack1 = { 0, 128, 0, 2 };
 BITE_INFO harpyAttack2 = { 0, 128, 0, 4 };
+
+static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
+{
+	short fxNumber = CreateNewEffect(roomNumber);
+	if (fxNumber != -1)
+	{
+		FX_INFO* fx = &Effects[fxNumber];
+
+		fx->pos.xPos = pos->xPos;
+		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
+		fx->pos.zPos = pos->zPos;
+		fx->pos.xRot = pos->xRot;
+		fx->pos.yRot = pos->yRot;
+		fx->pos.zRot = 0;
+		fx->roomNumber = roomNumber;
+		fx->counter = 2 * GetRandomControl() + -32768;
+		fx->objectNumber = ID_ENERGY_BUBBLES;
+		fx->speed = (GetRandomControl() & 0x1F) + 96;
+		fx->flag1 = count;
+		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * count;
+	}
+}
+
+static void HarpySparks1(short itemNumber, byte num, int size)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	int dx = LaraItem->pos.xPos - item->pos.xPos;
+	int dz = LaraItem->pos.zPos - item->pos.zPos;
+
+	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	{
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+
+		spark->on = true;
+		spark->sR = 0;
+		spark->sG = 0;
+		spark->sB = 0;
+		spark->dB = 0;
+		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
+		spark->fadeToBlack = 8;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+		spark->transType = 2;
+		spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
+		spark->y = 0;
+		spark->x = (GetRandomControl() & 0xF) - 8;
+		spark->z = (GetRandomControl() & 0xF) - 8;
+		spark->yVel = 0;
+		spark->xVel = GetRandomControl() - 128;
+		spark->friction = 5;
+		spark->flags = 4762;
+		spark->zVel = GetRandomControl() - 128;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		if (GetRandomControl() & 1)
+		{
+			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+		}
+		else
+		{
+			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+		}
+		spark->maxYvel = 0;
+		spark->gravity = (GetRandomControl() & 0x1F) + 16;
+		spark->fxObj = itemNumber;
+		spark->nodeNumber = num;
+		spark->scalar = 2;
+		spark->sSize = spark->size = GetRandomControl() & 0xF + size;
+		spark->dSize = spark->size >> 4;
+	}
+}
 
 static void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 {
@@ -166,76 +237,6 @@ static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 
 			HarpyBubbles(&pos, item->roomNumber, 2);
 		}
-	}
-}
-
-static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
-{
-	short fxNumber = CreateNewEffect(roomNumber);
-	if (fxNumber != -1)
-	{
-		FX_INFO* fx = &Effects[fxNumber];
-
-		fx->pos.xPos = pos->xPos;
-		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
-		fx->pos.zPos = pos->zPos;
-		fx->pos.xRot = pos->xRot;
-		fx->pos.yRot = pos->yRot;
-		fx->pos.zRot = 0;
-		fx->roomNumber = roomNumber;
-		fx->counter = 2 * GetRandomControl() + -32768;
-		fx->objectNumber = ID_ENERGY_BUBBLES;
-		fx->speed = (GetRandomControl() & 0x1F) + 96;
-		fx->flag1 = count;
-		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * count;
-	}
-}
-
-static void HarpySparks1(short itemNumber, byte num, int size)
-{
-	ITEM_INFO* item = &Items[itemNumber];
-
-	int dx = LaraItem->pos.xPos - item->pos.xPos;
-	int dz = LaraItem->pos.zPos - item->pos.zPos;
-
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
-	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
-
-		spark->on = true;
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dB = 0;
-		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
-		spark->fadeToBlack = 8;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = 2;
-		spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
-		spark->y = 0;
-		spark->x = (GetRandomControl() & 0xF) - 8;
-		spark->z = (GetRandomControl() & 0xF) - 8;
-		spark->yVel = 0;
-		spark->xVel = GetRandomControl() - 128;
-		spark->friction = 5;
-		spark->flags = 4762;
-		spark->zVel = GetRandomControl() - 128;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		if (GetRandomControl() & 1)
-		{
-			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-		}
-		else
-		{
-			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-		}
-		spark->maxYvel = 0;
-		spark->gravity = (GetRandomControl() & 0x1F) + 16;
-		spark->fxObj = itemNumber;
-		spark->nodeNumber = num;
-		spark->scalar = 2;
-		spark->sSize = spark->size = GetRandomControl() & 0xF + size;
-		spark->dSize = spark->size >> 4;
 	}
 }
 

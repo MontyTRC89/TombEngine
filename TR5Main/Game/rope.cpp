@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "rope.h"
-#include "global.h"
 #include "draw.h"
 #include "laramisc.h"
 #include "lara.h"

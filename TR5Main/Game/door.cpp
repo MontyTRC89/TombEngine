@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "door.h"
 #include "items.h"
 #include "lot.h"

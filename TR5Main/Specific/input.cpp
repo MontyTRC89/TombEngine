@@ -1,11 +1,10 @@
+#include "framework.h"
 #include "input.h"
-#include "global.h"
 #include "Lara.h"
 #include "winmain.h"
 #include "camera.h"
 #include "sound.h"
 #include "savegame.h"
-#include <stdio.h>
 
 const char* g_KeyNames[] = {
 	NULL,		"ESC",	"1",		"2",		"3",		"4",		"5",		"6",

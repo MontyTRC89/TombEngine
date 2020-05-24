@@ -1,5 +1,6 @@
+#include "framework.h"
 #include "newobjects.h"
-#include "effects.h"
+#include "effect.h"
 #include "effect2.h"
 #include "draw.h"
 #include "camera.h"
@@ -8,11 +9,8 @@
 #include "laraflar.h"
 #include "items.h"
 #include "level.h"
-#include "level.h"
 #include "setup.h"
 #include "input.h"
-
-
 
 #define MAX_SPEED 0x380000
 #define KAYAK_COLLIDE 64

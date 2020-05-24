@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "lara.h"
 #include "items.h"

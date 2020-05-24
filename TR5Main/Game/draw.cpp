@@ -1,8 +1,9 @@
+#include "framework.h"
 #include "draw.h"
 #include "Lara.h"
-#include "Renderer11.h"
 #include "camera.h"
 #include "level.h"
+#include "Renderer11.h"
 
 BITE_INFO EnemyBites[9] =
 {

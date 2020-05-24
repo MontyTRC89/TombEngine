@@ -1,20 +1,14 @@
 #pragma once
-
 #include "global.h"
 
-#include <vector>
-#include <map>
-
-#include "IO/ChunkId.h"
-#include "IO/ChunkReader.h"
-#include "IO/LEB128.h"
+#include "ChunkId.h"
+#include "ChunkReader.h"
+#include "LEB128.h"
 
 struct ChunkId;
 struct LEB128;
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
-
-using namespace std;
 
 extern byte* Texture32;
 extern byte* Texture16;

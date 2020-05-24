@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "malloc.h"
-#include <stdlib.h>
 #include "global.h"
 
 char* malloc_buffer;

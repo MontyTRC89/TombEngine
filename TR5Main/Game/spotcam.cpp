@@ -1,7 +1,6 @@
+#include "framework.h"
 #include "spotcam.h"
-
-#include "global.h"
-#include "Camera.h"
+#include "camera.h"
 #include "control.h"
 #include "draw.h"
 #include "tomb4fx.h"

@@ -1,12 +1,13 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
 #include "people.h"
 #include "items.h"
 #include "missile.h"
 #include "level.h"
-#include <effects.h>
 #include "sound.h"
-#include "effects.h"
+#include "effect2.h"
+#include "effect.h"
 
 /* HIT POINTS for Natla when she enters her second stage */
 #define NATLA_NEAR_DEATH 200

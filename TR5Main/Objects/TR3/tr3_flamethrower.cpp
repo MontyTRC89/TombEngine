@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
 #include "sphere.h"
@@ -5,12 +6,12 @@
 #include "people.h"
 #include "items.h"
 #include "draw.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "lot.h"
 #include "level.h"
 #include "lara.h"
 #include "sound.h"
-#include "effects.h"
+#include "effect.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 

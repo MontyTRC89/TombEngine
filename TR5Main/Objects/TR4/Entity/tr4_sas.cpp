@@ -1,4 +1,5 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_sas.h"
 #include "sphere.h"
 #include "effect2.h"
 #include "box.h"

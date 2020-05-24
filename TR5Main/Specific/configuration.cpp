@@ -1,13 +1,12 @@
+#include "framework.h"
 #include "configuration.h"
 #include "winmain.h"
-#include <CommCtrl.h>
 #include "resource.h"
 #include "Renderer11.h"
 #include "input.h"
 #include "GameFlowScript.h"
 #include "configuration.h"
 #include "sound.h"
-#include <bass.h>
 
 extern Renderer11* g_Renderer;
 extern GameFlow* g_GameFlow;

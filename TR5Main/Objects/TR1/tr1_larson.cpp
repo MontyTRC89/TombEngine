@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
 #include "people.h"

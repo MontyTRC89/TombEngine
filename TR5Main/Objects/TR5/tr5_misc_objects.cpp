@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "oldobjects.h"
 #include "lara.h"
@@ -5,7 +6,7 @@
 #include "global.h"
 #include "items.h"
 #include "collide.h"
-#include "effects.h"
+#include "effect.h"
 #include "laramisc.h"
 #include "box.h"
 #include "sphere.h"

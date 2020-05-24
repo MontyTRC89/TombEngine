@@ -1,10 +1,9 @@
+#include "framework.h"
 #include "collide.h"
-#include "global.h"
 #include "draw.h"
 #include "Lara.h"
-#include <stdio.h>
 #include "items.h"
-#include "effects.h"
+#include "effect.h"
 #include "sphere.h"
 #include "misc.h"
 #include "setup.h"

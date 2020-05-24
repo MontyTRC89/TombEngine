@@ -1,4 +1,5 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_jeanyves.h"
 #include "setup.h"
 #include "level.h"
 #include "lara.h"

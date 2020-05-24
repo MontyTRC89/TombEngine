@@ -1,4 +1,5 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_demigod.h"
 #include "items.h"
 #include "box.h"
 #include "people.h"
@@ -10,7 +11,7 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
-#include "effects.h"
+#include "effect.h"
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 

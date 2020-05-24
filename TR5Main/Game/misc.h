@@ -1,6 +1,10 @@
 #pragma once
 #include "global.h"
 
+#define CHK_ANY(var, flag) (var & flag) != 0
+#define CHK_EXI(var, flag) var & flag
+#define CHK_NOP(var, flag) !(var & flag)
+
 enum LARA_MESH_MASK
 {
 	LARA_ONLY_LEGS = (0 << 1),

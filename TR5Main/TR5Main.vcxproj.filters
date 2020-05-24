@@ -42,9 +42,6 @@
     <ClInclude Include="Game\effect2.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\effects.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\flmtorch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -52,9 +49,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\hair.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\healt.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\items.h">
@@ -139,9 +133,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Global\malloc.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\math.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Global\types.h">
@@ -303,77 +294,89 @@
     <ClInclude Include="Specific\level.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_ahmet.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_baddy.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_bat.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_bigscorpion.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_crocodile.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_demigod.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_guide.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_harpy.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_horseman.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_jeanyves.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_knighttemplar.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_littlebeetle.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_mummy.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_sas.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_skeleton.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_smallscorpion.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_sphinx.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_troops.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_wildboar.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\tr4_wraith.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\tr4_objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\box.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_wraith.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_ahmet.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_baddy.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_bat.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_bigscorpion.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_crocodile.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_demigod.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_guide.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_harpy.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_horseman.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_jeanyves.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_knighttemplar.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_littlebeetle.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_mummy.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_sas.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_skeleton.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_smallscorpion.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_sphinx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_troops.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_wildboar.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_sentrygun.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Global\trmath.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\health.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\effect.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TR5Main.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\box.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -401,9 +404,6 @@
     <ClCompile Include="Game\effect2.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\effects.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\flmtorch.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -411,9 +411,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\hair.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\healt.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\items.cpp">
@@ -536,9 +533,6 @@
     <ClCompile Include="Game\misc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Global\math.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR1\tr1_lara_evil.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -641,9 +635,6 @@
     <ClCompile Include="Objects\TR2\tr2_worker_shotgun.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_horseman.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Vehicles\jeep.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -669,9 +660,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Vehicles\snowmobile.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\statue.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR3\tr3_tony.cpp">
@@ -725,67 +713,16 @@
     <ClCompile Include="Objects\TR3\tr3_trex.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_bat.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_bigscorpion.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_crocodile.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_harpy.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_littlebeetle.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_smallscorpion.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_sphinx.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Vehicles\upv.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_demigod.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_guide.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_jeanyves.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_knighttemplar.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_troops.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_wraith.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_baddy.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Vehicles\motorbike.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_mummy.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Vehicles\quad.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_sas.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR3\tr3_scuba.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_skeleton.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR3\tr3_tribesman.cpp">
@@ -875,59 +812,127 @@
     <ClCompile Include="Specific\level.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_ahmet.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_wildboar.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\tr4_objects.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_ahmet.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_bat.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_bigscorpion.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_crocodile.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_harpy.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_horseman.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_knighttemplar.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_littlebeetle.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_sas.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_skeleton.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_smallscorpion.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_sphinx.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_troops.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_wraith.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_sentrygun.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="framework.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Global\trmath.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\health.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\statue.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\effect.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Shader.fx" />
-    <None Include="Shaders\ClearGBuffer.fx" />
-    <None Include="Shaders\Depth.fx" />
-    <None Include="Shaders\FillGBuffer.fx" />
-    <None Include="Shaders\Horizon.fx" />
-    <None Include="Shaders\Items.fx" />
-    <None Include="Shaders\Rooms.fx" />
-    <None Include="Shaders\Basic.fx" />
-    <None Include="Shaders\Light.fx" />
-    <None Include="Shaders\CombineFinal.fx" />
-    <None Include="Shaders\Fxaa3_11.fxh" />
-    <None Include="Shaders\FXAA.fx" />
-    <None Include="Shaders\ReconstructZBuffer.fx" />
-    <None Include="Shaders\Sprites.fx" />
-    <None Include="Shaders\Rain.fx" />
-    <None Include="Shaders\Transparent.fx" />
-    <None Include="Scripting\Scripts\Settings.lua" />
-    <None Include="Scripting\Scripts\Title.lua" />
-    <None Include="Scripting\Scripts\English.lua" />
-    <None Include="Scripting\Scripts\Gameflow.lua" />
-    <None Include="Scripting\Scripts\Andrea2.lua" />
-    <None Include="Shaders\FinalPass.fx" />
-    <None Include="Scripting\Scripts\andrea1.lua" />
-    <None Include="Scripting\Scripts\Constants.lua" />
     <None Include="packages.config" />
     <None Include="Shaders\DX11\Test.fx" />
     <None Include="Shaders\DX11_Test.fx" />
-    <None Include="Shaders\DX11_AmbientCubeMap.fx" />
-    <None Include="Shaders\DX11_Rooms.fx" />
-    <None Include="Shaders\DX11_Items.fx" />
-    <None Include="Shaders\DX11_Hairs.fx" />
-    <None Include="Shaders\DX11_Statics.fx" />
-    <None Include="Shaders\DX11_Sky.fx" />
-    <None Include="Shaders\DX11_Solid.fx" />
-    <None Include="Shaders\DX11_Inventory.fx" />
-    <None Include="Shaders\DX11_FullscreenQuad.fx" />
-    <None Include="Shaders\DX11_ShadowMap.fx" />
     <None Include="RuleSet.ruleset" />
-    <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\HUD\DX11_PS_HUD.hlsl" />
     <None Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli" />
+    <None Include="Shaders\HUD\DX11_VS_HUD.hlsl" />
+    <None Include="Shaders\Fxaa3_11.fxh" />
+    <None Include="Shaders\Basic.fx" />
+    <None Include="Shaders\ClearGBuffer.fx" />
+    <None Include="Shaders\CombineFinal.fx" />
+    <None Include="Shaders\Depth.fx" />
+    <None Include="Shaders\DX11_AmbientCubeMap.fx" />
+    <None Include="Shaders\DX11_FinalPass.fx" />
+    <None Include="Shaders\DX11_FullscreenQuad.fx" />
+    <None Include="Shaders\DX11_Hairs.fx" />
+    <None Include="Shaders\DX11_Inventory.fx" />
+    <None Include="Shaders\DX11_Items.fx" />
+    <None Include="Shaders\DX11_Rooms.fx" />
+    <None Include="Shaders\DX11_ShadowMap.fx" />
+    <None Include="Shaders\DX11_Sky.fx" />
+    <None Include="Shaders\DX11_Solid.fx" />
+    <None Include="Shaders\DX11_Sprites.fx" />
+    <None Include="Shaders\DX11_Statics.fx" />
+    <None Include="Shaders\FillGBuffer.fx" />
+    <None Include="Shaders\FinalPass.fx" />
+    <None Include="Shaders\FXAA.fx" />
+    <None Include="Shaders\Horizon.fx" />
+    <None Include="Shaders\Items.fx" />
+    <None Include="Shaders\Light.fx" />
+    <None Include="Shaders\Rain.fx" />
+    <None Include="Shaders\ReconstructZBuffer.fx" />
+    <None Include="Shaders\Rooms.fx" />
+    <None Include="Shaders\Shader.fx" />
+    <None Include="Shaders\Sprites.fx" />
+    <None Include="Shaders\SSAO.fx" />
+    <None Include="Shaders\Transparent.fx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">
@@ -935,14 +940,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Shaders\DX11_FinalPass.fx" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Banner.bmp">
       <Filter>File di risorse</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\HUD\DX11_VS_HUD.hlsl" />
   </ItemGroup>
 </Project>

@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "items.h"
 #include "collide.h"
@@ -6,7 +7,7 @@
 #include "box.h"
 #include "people.h"
 #include "sphere.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "level.h"
 #include "sound.h"
 

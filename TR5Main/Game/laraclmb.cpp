@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "laraclmb.h"
-#include "global.h"
 #include "Lara.h"
 #include "control.h"
 #include "draw.h"

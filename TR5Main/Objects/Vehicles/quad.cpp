@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "lara.h"
 #include "effect2.h"
@@ -6,7 +7,7 @@
 #include "collide.h"
 #include "camera.h"
 #include "tomb4fx.h"
-#include "effects.h"
+#include "effect.h"
 #include "laraflar.h"
 #include <vector>
 #include "lara1gun.h"
@@ -15,8 +16,6 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-
-using namespace std;
 
 typedef enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,

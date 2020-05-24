@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "items.h"
 #include "effect2.h"
@@ -6,7 +7,7 @@
 #include "sphere.h"
 #include "people.h"
 #include "draw.h"
-#include "effects.h"
+#include "effect.h"
 #include "misc.h"
 #include "setup.h"
 #include "level.h"

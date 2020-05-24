@@ -1,14 +1,7 @@
 #pragma once
 
-#include <istream>
-#include <fstream>
-#include <string>
-#include <stdlib.h>
-#include <stdlib.h>
-
-using namespace std;
-
-enum SEEK_ORIGIN {
+enum SEEK_ORIGIN
+{
 	BEGIN,
 	CURRENT
 };

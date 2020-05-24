@@ -1,6 +1,6 @@
+#include "framework.h"
 #include "Renderer11.h"
 #include "level.h"
-#include <stack>
 #include "savegame.h"
 #include "setup.h"
 #include "control.h"

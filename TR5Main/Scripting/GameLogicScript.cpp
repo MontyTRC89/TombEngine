@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "GameLogicScript.h"
 #include "items.h"
 #include "box.h"

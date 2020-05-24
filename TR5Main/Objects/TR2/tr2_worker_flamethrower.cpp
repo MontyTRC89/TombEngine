@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
 #include "sphere.h"
@@ -6,9 +7,9 @@
 #include "items.h"
 #include "missile.h"
 #include "tomb4fx.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "level.h"
-#include "effects.h"
+#include "effect.h"
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 

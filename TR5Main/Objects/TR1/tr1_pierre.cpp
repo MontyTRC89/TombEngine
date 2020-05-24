@@ -1,9 +1,10 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "items.h"
 #include "box.h"
 #include "people.h"
 #include "lot.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "camera.h"
 #include "level.h"
 

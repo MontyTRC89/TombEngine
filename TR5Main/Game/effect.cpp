@@ -1,4 +1,5 @@
-#include "effects.h"
+#include "framework.h"
+#include "effect.h"
 #include "global.h"
 #include "Lara.h"
 #include "items.h"

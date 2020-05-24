@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "savegame.h"
-#include "global.h"
 #include "Lara.h"
 #include "items.h"
 #include "box.h"

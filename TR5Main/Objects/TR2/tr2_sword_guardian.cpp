@@ -1,6 +1,7 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
-#include "effects.h"
+#include "effect.h"
 #include "lot.h"
 #include "effect2.h"
 #include "items.h"

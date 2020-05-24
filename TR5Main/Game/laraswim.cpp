@@ -1,7 +1,5 @@
+#include "framework.h"
 #include "laraswim.h"
-
-#include "global.h"
-
 #include "control.h"
 #include "camera.h"
 #include "collide.h"
@@ -9,7 +7,7 @@
 #include "box.h"
 #include "Lara.h"
 #include "larasurf.h"
-#include "effects.h"
+#include "effect.h"
 #include "effect2.h"
 #include "larafire.h"
 #include "laramisc.h"
@@ -18,8 +16,6 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-
-
 
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;

@@ -1,8 +1,9 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
-#include "effects.h"
+#include "effect.h"
 #include "lara.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "level.h"
 
 BITE_INFO sharkBite = { 17, -22, 344, 12 };

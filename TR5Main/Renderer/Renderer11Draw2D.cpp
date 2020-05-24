@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "Renderer11.h"
 #include "camera.h"
 #include "spotcam.h"

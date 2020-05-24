@@ -1,4 +1,5 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_horseman.h"
 #include "items.h"
 #include "effect2.h"
 #include "setup.h"

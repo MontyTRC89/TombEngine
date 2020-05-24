@@ -1,9 +1,10 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "items.h"
-#include "effects.h"
+#include "effect.h"
 #include "box.h"
 #include "lara.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "level.h"
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };

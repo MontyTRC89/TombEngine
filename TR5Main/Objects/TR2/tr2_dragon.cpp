@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "lara.h"
 #include "effect2.h"
@@ -8,7 +9,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "level.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "input.h"
 #include "sound.h"
 

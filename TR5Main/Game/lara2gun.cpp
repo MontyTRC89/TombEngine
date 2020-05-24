@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "lara2gun.h"
-#include "global.h"
 #include "larafire.h"
 #include "lara.h"
 #include "effect2.h"

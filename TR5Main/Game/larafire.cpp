@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "larafire.h"
-
 #include "items.h"
 #include "Lara.h"
 #include "laraflar.h"
@@ -7,9 +7,8 @@
 #include "lara2gun.h"
 #include "camera.h"
 #include "GameFlowScript.h"
-#include <stdio.h>
 #include "objects.h"
-#include "effects.h"
+#include "effect.h"
 #include "sphere.h"
 #include "draw.h"
 #include "effect2.h"

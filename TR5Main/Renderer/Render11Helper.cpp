@@ -1,4 +1,4 @@
-#pragma once
+#include "framework.h"
 #include "Renderer11.h"
 #include "configuration.h"
 #include "camera.h"
@@ -8,8 +8,10 @@
 #include "control.h"
 #include "lara.h"
 #include "sphere.h"
+
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
+
 bool Renderer11::isRoomUnderwater(short roomNumber)
 {
 	return (m_rooms[roomNumber].Room->flags & ENV_FLAG_WATER);

@@ -1,9 +1,10 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_mummy.h"
 #include "items.h"
 #include "lara.h"
 #include "box.h"
 #include "lara.h"
-#include "effects.h"
+#include "effect.h"
 #include "setup.h"
 #include "level.h"
 

@@ -19,8 +19,6 @@
 struct ChunkId;
 struct LEB128;
 
-using namespace std;
-
 struct GameScriptSettings {
 	int ScreenWidth;
 	int ScreenHeight;

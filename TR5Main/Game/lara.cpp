@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "Lara.h"
-
 #include "control.h"
 #include "items.h"
 #include "collide.h"
@@ -8,7 +8,7 @@
 #include "misc.h"
 #include "draw.h"
 #include "sphere.h"
-#include "Camera.h"
+#include "camera.h"
 #include "larasurf.h"
 #include "laraswim.h"
 #include "lara1gun.h"
@@ -17,15 +17,12 @@
 #include "laramisc.h"
 #include "laraclmb.h"
 #include "rope.h"
-#include "healt.h"
-
+#include "health.h"
 #include "newobjects.h"
 #include "global.h"
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-
-#include <stdio.h>
 
 static short LeftClimbTab[4] = // offset 0xA0638
 {

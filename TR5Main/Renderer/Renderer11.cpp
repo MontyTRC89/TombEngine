@@ -1,12 +1,11 @@
+#include "framework.h"
 #include "Renderer11.h"
-
 #include "input.h"
 #include "winmain.h"
 #include "level.h"
 #include "configuration.h"
-
 #include "draw.h"
-#include "healt.h"
+#include "health.h"
 #include "pickup.h"
 #include "inventory.h"
 #include "gameflow.h"
@@ -14,13 +13,9 @@
 #include "effect2.h"
 #include "rope.h"
 #include "items.h"
-#include "Camera.h"
-#include "healt.h"
+#include "camera.h"
 #include "tomb4fx.h"
-#include "math.h"
-#include <D3Dcompiler.h>
-#include <chrono> 
-#include <stack>
+#include "trmath.h"
 #include "misc.h"
 #include "footprint.h"
 

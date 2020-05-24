@@ -1,4 +1,5 @@
-#include "newobjects.h"
+#include "framework.h"
+#include "tr4_littlebeetle.h"
 #include "level.h"
 
 void InitialiseLittleBeetle(short itemNumber)

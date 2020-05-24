@@ -1,9 +1,12 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
-#include "effects.h"
-#include "../specific/setup.h"
+#include "effect2.h"
+#include "effect.h"
+#include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "control.h"
 
 enum RAPTOR_STATE
 {

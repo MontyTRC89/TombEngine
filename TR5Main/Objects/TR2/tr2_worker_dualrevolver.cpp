@@ -1,7 +1,8 @@
+#include "framework.h"
 #include "newobjects.h"
 #include "box.h"
 #include "people.h"
-#include "../specific/setup.h"
+#include "setup.h"
 #include "level.h"
 #include "lara.h"
 

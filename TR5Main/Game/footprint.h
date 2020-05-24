@@ -1,7 +1,6 @@
-#include "types.h"
-#include "math.h"
-#include <queue>
 #pragma once
+#include "types.h"
+#include "trmath.h"
 
 constexpr size_t MAX_FOOTPRINTS = 20;
 typedef struct footprint_t {

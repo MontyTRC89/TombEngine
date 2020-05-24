@@ -1,14 +1,10 @@
+#include "framework.h"
 #include "gameflow.h"
 #include "draw.h"
 #include "savegame.h"
-
 #include "input.h"
 #include "global.h"
 #include "level.h"
-
-#include <string>
-
-using namespace std;
 
 SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
 SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];

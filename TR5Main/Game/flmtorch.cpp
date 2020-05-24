@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "flmtorch.h"
 #include "global.h"
 #include "effect2.h"

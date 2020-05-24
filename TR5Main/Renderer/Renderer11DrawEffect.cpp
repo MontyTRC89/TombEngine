@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "Renderer11.h"
 #include "footprint.h"
 #include "effect2.h"
@@ -10,7 +11,7 @@
 #include "setup.h"
 #include "bubble.h"
 #include "level.h"
-#include "effects.h"
+#include "effect.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];

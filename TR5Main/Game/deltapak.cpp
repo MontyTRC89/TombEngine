@@ -1,6 +1,6 @@
+#include "framework.h"
 #include "deltapak.h"
 #include "global.h"
-#include <stdio.h>
 #include "level.h"
 
 ITEM_INFO* FindItem(short objectNumber)
