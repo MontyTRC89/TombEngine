@@ -375,6 +375,10 @@ enum LARA_STATE
 	STATE_LARA_HANG_FEET = 139,
 	STATE_LARA_HANG_FEET_SHIMMYR = 140,
 	STATE_LARA_HANG_FEET_SHIMMYL = 141,
+	STATE_LARA_HANG_FEET_INCORNERR = 142,
+	STATE_LARA_HANG_FEET_INCORNERL = 143,
+	STATE_LARA_HANG_FEET_OUTCORNERR= 144,
+	STATE_LARA_HANG_FEET_OUTCORNERL = 145,
 
 	NUM_LARA_STATES
 };
@@ -869,6 +873,11 @@ enum LARA_ANIM
 	ANIMATION_LARA_HANG_FEET_SHIMMYL = 485,						// shimmy left with feet on wall
 	ANIMATION_LARA_HANG_FEET_CLIMB = 486,						// feet hang -> climb
 	ANIMATION_LARA_HANG_FEET_IDLE = 487,						// hang feet idle anim for shimmies/climbups 
+	ANIMATION_LARA_HANG_FEET_CLIMB_TO_CROUCH = 488,				// hang feet crouch climb
+	ANIMATION_LARA_HANG_FEET_IN_RCORNER = 489,					// hang feet shimmy around inner right corner
+	ANIMATION_LARA_HANG_FEET_IN_LCORNER = 490,					// hang feet shimmy around inner left corner
+	ANIMATION_LARA_HANG_FEET_OUT_RCORNER = 491,					// hang feet shimmy around outer right corner
+	ANIMATION_LARA_HANG_FEET_OUT_LCORNER = 492,					// hang feet shimmy around outer left corner
 
 	NUM_LARA_ANIMS
 };
