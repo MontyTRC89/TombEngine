@@ -1,11 +1,11 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/lara.h"
-#include "../../Game/effects.h"
-#include "../../Game/items.h"
-#include "../../specific/setup.h"
-#include "../../Game/lot.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "box.h"
+#include "lara.h"
+#include "effects.h"
+#include "items.h"
+#include "../specific/setup.h"
+#include "lot.h"
+#include "level.h"
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 

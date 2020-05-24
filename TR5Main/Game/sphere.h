@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 #define SPHERES_SPACE_LOCAL			0
 #define SPHERES_SPACE_WORLD			1

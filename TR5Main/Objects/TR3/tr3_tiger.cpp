@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
 
 BITE_INFO tigerBite = { 19, -13, 3, 26 };
 

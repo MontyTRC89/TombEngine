@@ -1,12 +1,12 @@
-#include "../newobjects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/control.h"
+#include "newobjects.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
+#include "control.h"
 
-void InitialiseJeanYves(short itemNum)
+void InitialiseJeanYves(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->objectNumber];
 	
 	item->goalAnimState = 1;
@@ -15,25 +15,20 @@ void InitialiseJeanYves(short itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void JeanYvesControl(short itemNum)
+void JeanYvesControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
 	if (item->triggerFlags >= Lara.highestLocation)
 	{
 		short state = 0;
 
 		if (GetRandomControl() & 3)
-		{
 			state = (GetRandomControl() & 1) + 1;
-		}
 		else
-		{
 			state = 3 * (GetRandomControl() & 1);
-		}
 
 		item->goalAnimState = (((byte)(item->currentAnimState) - 1) & 0xC) + state + 1;
-		
 		AnimateItem(item);
 	}
 	else

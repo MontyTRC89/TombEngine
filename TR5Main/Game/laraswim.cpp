@@ -1,6 +1,6 @@
 #include "laraswim.h"
 
-#include "..\Global\global.h"
+#include "global.h"
 
 #include "control.h"
 #include "camera.h"
@@ -15,8 +15,8 @@
 #include "laramisc.h"
 #include "draw.h"
 #include "camera.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
 

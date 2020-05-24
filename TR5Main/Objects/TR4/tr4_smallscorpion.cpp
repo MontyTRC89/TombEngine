@@ -1,19 +1,19 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/items.h"
-#include "../../Game/effects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "items.h"
+#include "effects.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
 
 BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 
-void InitialiseSmallScorpion(short itemNum)
+void InitialiseSmallScorpion(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -21,7 +21,7 @@ void InitialiseSmallScorpion(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void SmallScorpionControl(short itemNum)
+void SmallScorpionControl(short itemNumber)
 {
 	short angle = 0;
 	short head = 0;
@@ -32,10 +32,10 @@ void SmallScorpionControl(short itemNum)
 	short joint2 = 0;
 	short joint3 = 0;
 
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	if (item->hitPoints > 0)
@@ -167,5 +167,5 @@ void SmallScorpionControl(short itemNum)
 		}
 	}
 
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

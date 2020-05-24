@@ -1,24 +1,24 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/effect2.h"
-#include "../../Game/sphere.h"
-#include "../../Game/lot.h"
-#include "../../Game/effects.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "effect2.h"
+#include "sphere.h"
+#include "lot.h"
+#include "effects.h"
+#include "tomb4fx.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
+#include "sound.h"
 
 BITE_INFO guideBiteInfo1 = { 0, 20, 200, 18 };
 BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };
 
-void InitialiseGuide(short itemNum)
+void InitialiseGuide(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 4;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -27,12 +27,12 @@ void InitialiseGuide(short itemNum)
 	item->swapMeshFlags = 0x40000;
 }
 
-void GuideControl(short itemNum)
+void GuideControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ObjectInfo* obj = &Objects[item->objectNumber];
 
@@ -118,7 +118,7 @@ void GuideControl(short itemNum)
 		{
 			baddie = &BaddieSlots[i];
 
-			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
+			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 				continue;
 
 			ITEM_INFO* currentItem = &Items[baddie->itemNum];
@@ -204,7 +204,7 @@ void GuideControl(short itemNum)
 				CreatureJoint((int)item, 2, joint2);
 				CreatureJoint((int)item, 3, joint1);
 
-				CreatureAnimation(itemNum, angle, 0);
+				CreatureAnimation(itemNumber, angle, 0);
 
 				return;
 			}
@@ -292,8 +292,8 @@ void GuideControl(short itemNum)
 
 					case 0x3Eu:
 						item->status = ITEM_INVISIBLE;
-						RemoveActiveItem(itemNum);
-						DisableBaddieAI(itemNum);
+						RemoveActiveItem(itemNumber);
+						DisableBaddieAI(itemNumber);
 
 						break;
 
@@ -634,10 +634,10 @@ void GuideControl(short itemNum)
 			ROOM_INFO* room = &Rooms[item->roomNumber];
 			ITEM_INFO* currentItem = NULL;
 
-			short currentItemNumber = room->itemNumber;
-			while (currentItemNumber != NO_ITEM)
+			short currentitemNumber = room->itemNumber;
+			while (currentitemNumber != NO_ITEM)
 			{
-				currentItem = &Items[currentItemNumber];
+				currentItem = &Items[currentitemNumber];
 
 				if (currentItem->objectNumber >= ID_ANIMATING1
 					&& currentItem->objectNumber <= ID_ANIMATING15
@@ -647,7 +647,7 @@ void GuideControl(short itemNum)
 					break;
 				}
 
-				currentItemNumber = currentItem->nextItem;
+				currentitemNumber = currentItem->nextItem;
 			}
 
 			if (currentItem != NULL)
@@ -797,8 +797,8 @@ void GuideControl(short itemNum)
 		}
 		else
 		{
-			KillItem(itemNum);
-			DisableBaddieAI(itemNum);
+			KillItem(itemNumber);
+			DisableBaddieAI(itemNumber);
 			item->flags |= 1;
 		}
 
@@ -814,11 +814,9 @@ void GuideControl(short itemNum)
 	}
 
 	CreatureTilt(item, tilt);
-
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
 	CreatureJoint(item, 3, joint1);
-
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

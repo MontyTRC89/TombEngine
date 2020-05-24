@@ -1,10 +1,10 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/box.h"
-#include "../../Game/effects.h"
-#include "../../Game/lara.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "effects.h"
+#include "lara.h"
+#include "setup.h"
+#include "level.h"
 
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 

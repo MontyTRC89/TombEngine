@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 #define MAX_COLLECTED_PICKUPS 32
 

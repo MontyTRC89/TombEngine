@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/people.h"
-#include "../../Game/items.h"
-#include "../../specific/setup.h"
-#include "../../specific/level.h"
+#include "newobjects.h"
+#include "box.h"
+#include "people.h"
+#include "items.h"
+#include "../specific/setup.h"
+#include "../specific/level.h"
 
 BITE_INFO workerShotgun = { 0, 281, 40, 9 };
 

@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/sphere.h"
-#include "../../Game/items.h"
-#include "../../specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "effect2.h"
+#include "box.h"
+#include "effects.h"
+#include "sphere.h"
+#include "items.h"
+#include "../specific/setup.h"
+#include "level.h"
+#include "lara.h"
+#include "sound.h"
 
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
 BITE_INFO shivaRightBite = { 0, 0, 920, 22 };

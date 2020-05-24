@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "level.h"
 
-void InitialiseLittleBeetle(short itemNum)
+void InitialiseLittleBeetle(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
 	item->itemFlags[0] = (item->triggerFlags / 1000) & 1;
 	item->itemFlags[1] = (item->triggerFlags / 1000) & 2;
@@ -37,7 +37,7 @@ void InitialiseLittleBeetle(short itemNum)
 	}
 }
 
-void LittleBeetleControl(short itemNum)
+void LittleBeetleControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	printf("[LittleBeetle] Not Implemented !");
 }

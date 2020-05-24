@@ -1,10 +1,10 @@
 #include "GameFlowScript.h"
-#include "..\Game\items.h"
-#include "..\Game\box.h"
-#include "..\Game\lot.h"
-#include "..\Game\sound.h"
-#include "..\Game\savegame.h"
-#include "..\Game\draw.h"
+#include "items.h"
+#include "box.h"
+#include "lot.h"
+#include "sound.h"
+#include "savegame.h"
+#include "draw.h"
 
 ChunkId* ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
 ChunkId* ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");

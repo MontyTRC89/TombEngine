@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
 
 byte DogAnims[] = { 20, 21, 22, 20 };
 BITE_INFO DogBite = { 0, 0, 100, 3 };

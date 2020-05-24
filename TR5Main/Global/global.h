@@ -15,9 +15,9 @@ using namespace DirectX::SimpleMath;
 #include "macros.h"
 #include "malloc.h"
 
-#include "..\Scripting\GameLogicScript.h"
-#include "..\Scripting\GameFlowScript.h"
+#include "GameLogicScript.h"
+#include "GameFlowScript.h"
 
-#include "..\Renderer\Renderer11.h"
+#include "Renderer11.h"
 
 #pragma warning(disable:4996)

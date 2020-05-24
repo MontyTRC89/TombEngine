@@ -1,20 +1,20 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/lara.h"
-#include "../../Game/Box.h"
-#include "../../Game/lara.h"
-#include "../../Game/effects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "lara.h"
+#include "box.h"
+#include "lara.h"
+#include "effects.h"
+#include "setup.h"
+#include "level.h"
 
 BITE_INFO mummyBite1 = { 0, 0, 0, 11 };
 BITE_INFO mummyBite2 = { 0, 0, 0, 14 };
 
-void InitialiseMummy(short itemNum)
+void InitialiseMummy(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	if (item->triggerFlags == 2)
 	{
@@ -33,12 +33,12 @@ void InitialiseMummy(short itemNum)
 	}
 }
 
-void MummyControl(short itemNum)
+void MummyControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short tilt = 0;
@@ -93,7 +93,7 @@ void MummyControl(short itemNum)
 				CreatureJoint(item, 1, joint1);
 				CreatureJoint(item, 2, joint2);
 
-				CreatureAnimation(itemNum, angle, 0);
+				CreatureAnimation(itemNumber, angle, 0);
 
 				return;
 			}
@@ -257,6 +257,5 @@ void MummyControl(short itemNum)
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
-
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

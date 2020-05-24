@@ -1,21 +1,21 @@
-#include "../newobjects.h"
-#include "../../Game/box.h"
-#include "../../Game/effects.h"
-#include "../../Game/people.h"
-#include "../../Game/items.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "people.h"
+#include "items.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
 
 BITE_INFO crocodileBite = { 0, -156, 500, 9 };
 
-void InitialiseCrocodile(short itemNum)
+void InitialiseCrocodile(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->objectNumber];
 	ROOM_INFO* room = &Rooms[item->roomNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	if (room->flags & ENV_FLAG_WATER)
 	{
@@ -33,12 +33,12 @@ void InitialiseCrocodile(short itemNum)
 	}
 }
 
-void CrocodileControl(short itemNum)
+void CrocodileControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ObjectInfo* obj = &Objects[item->objectNumber];
 
@@ -93,7 +93,7 @@ void CrocodileControl(short itemNum)
 		}
 
 		if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
-			CreatureFloat(itemNum);
+			CreatureFloat(itemNumber);
 	}
 	else
 	{
@@ -114,7 +114,7 @@ void CrocodileControl(short itemNum)
 		{
 			if (!creature->alerted)
 				creature->alerted = true;
-			AlertAllGuards(itemNum);
+			AlertAllGuards(itemNumber);
 		}
 
 		joint0 = 4 * angle;
@@ -322,7 +322,7 @@ void CrocodileControl(short itemNum)
 		if (item->currentAnimState < 8)
 			item->pos.xRot = angle;
 
-		CreatureAnimation(itemNum, angle, 0);
+		CreatureAnimation(itemNumber, angle, 0);
 
 		roomNumber = item->roomNumber;
 

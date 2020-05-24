@@ -1,10 +1,10 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
-#include "../../specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "lara.h"
+#include "sound.h"
+#include "../specific/setup.h"
+#include "level.h"
 
 BITE_INFO monkBite = { -23,16,265, 14 };
 

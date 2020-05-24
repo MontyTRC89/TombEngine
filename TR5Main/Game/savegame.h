@@ -1,13 +1,13 @@
 #pragma once
 
-#include "..\Global\global.h"
-#include "..\Specific\IO\ChunkId.h"
-#include "..\Specific\IO\ChunkReader.h"
-#include "..\Specific\IO\ChunkWriter.h"
-#include "..\Specific\IO\LEB128.h"
-#include "..\Specific\IO\Streams.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "..\Scripting\GameLogicScript.h"	
+#include "global.h"
+#include "Specific\IO\ChunkId.h"
+#include "Specific\IO\ChunkReader.h"
+#include "Specific\IO\ChunkWriter.h"
+#include "Specific\IO\LEB128.h"
+#include "Specific\IO\Streams.h"
+#include "GameFlowScript.h"
+#include "GameLogicScript.h"	
 
 #define SAVEGAME_BUFFER_SIZE 1048576
 

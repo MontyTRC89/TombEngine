@@ -1,24 +1,253 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/people.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effect2.h"
-#include "../../Game/draw.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Game/camera.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/effects.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "people.h"
+#include "sphere.h"
+#include "effect2.h"
+#include "draw.h"
+#include "tomb4fx.h"
+#include "camera.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
+#include "effects.h"
 
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
-void InitialiseDemigod(short itemNum)
+static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	short fxNum = CreateNewEffect(roomNumber);
+	if (fxNum != -1)
+	{
+		FX_INFO* fx = &Effects[fxNum];
 
-	ClearItem(itemNum);
+		fx->pos.xPos = pos->xPos;
+		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
+		fx->pos.zPos = pos->zPos;
+		fx->pos.xRot = pos->xRot;
+		if (flags < 4)
+		{
+			fx->pos.yRot = pos->yRot;
+		}
+		else
+		{
+			fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
+		}
+
+		ObjectInfo* obj = &Objects[ID_ENERGY_BUBBLES];
+
+		fx->pos.zRot = 0;
+		fx->roomNumber = roomNumber;
+		fx->counter = 2 * GetRandomControl() + -ANGLE(180);
+		fx->flag1 = flags;
+		fx->speed = (GetRandomControl() & 0x1F) + 96;
+		fx->objectNumber = ID_ENERGY_BUBBLES;
+		if (flags >= 4)
+			flags--;
+		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
+	}
+}
+
+static void DemigodEnergyAttack(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	short animIndex = item->animNumber - Objects[item->objectNumber].animIndex;
+
+	if (animIndex == 8)
+	{
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		{
+			PHD_VECTOR pos1;
+			PHD_VECTOR pos2;
+
+			pos1.x = -544;
+			pos1.y = 96;
+			pos1.z = 0;
+
+			GetJointAbsPosition(item, &pos1, 16);
+
+			pos2.x = -900;
+			pos2.y = 96;
+			pos2.z = 0;
+
+			GetJointAbsPosition(item, &pos2, 16);
+
+			short angles[2];
+			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+
+			PHD_3DPOS pos;
+			pos.xPos = pos1.x;
+			pos.yPos = pos1.y;
+			pos.zPos = pos1.z;
+			pos.xRot = angles[1];
+			pos.yRot = angles[0];
+			pos.zRot = 0;
+
+			if (item->objectNumber == ID_DEMIGOD3)
+			{
+				DemigodThrowEnergyAttack(&pos, item->roomNumber, 3);
+			}
+			else
+			{
+				DemigodThrowEnergyAttack(&pos, item->roomNumber, 5);
+			}
+		}
+
+		return;
+	}
+
+	if (animIndex != 16)
+	{
+		if (animIndex != 19)
+			return;
+
+		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		{
+			PHD_VECTOR pos1;
+			PHD_VECTOR pos2;
+
+			pos1.x = -544;
+			pos1.y = 96;
+			pos1.z = 0;
+
+			GetJointAbsPosition(item, &pos1, 16);
+
+			pos2.x = -900;
+			pos2.y = 96;
+			pos2.z = 0;
+
+			GetJointAbsPosition(item, &pos2, 16);
+
+			short angles[2];
+			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+
+			PHD_3DPOS pos;
+			pos.xPos = pos1.x;
+			pos.yPos = pos1.y;
+			pos.zPos = pos1.z;
+			pos.xRot = angles[1];
+			pos.yRot = angles[0];
+			pos.zRot = 0;
+
+			if (item->objectNumber == ID_DEMIGOD3)
+			{
+				DemigodThrowEnergyAttack(&pos, item->roomNumber, 3);
+			}
+			else
+			{
+				DemigodThrowEnergyAttack(&pos, item->roomNumber, 5);
+			}
+		}
+
+		return;
+	}
+
+	// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
+	int frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+
+	if (frameNumber >= 8 && frameNumber <= 64)
+	{
+		PHD_VECTOR pos1;
+		PHD_VECTOR pos2;
+
+		pos1.x = 0;
+		pos1.y = 0;
+		pos1.z = 192;
+
+		pos2.x = 0;
+		pos2.y = 0;
+		pos2.z = 384;
+
+		if (GlobalCounter & 1)
+		{
+			GetJointAbsPosition(item, &pos1, 18);
+			GetJointAbsPosition(item, &pos2, 18);
+		}
+		else
+		{
+			GetJointAbsPosition(item, &pos1, 17);
+			GetJointAbsPosition(item, &pos2, 17);
+		}
+
+		short angles[2];
+		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+
+		PHD_3DPOS pos;
+		pos.xPos = pos1.x;
+		pos.yPos = pos1.y;
+		pos.zPos = pos1.z;
+		pos.xRot = angles[1];
+		pos.yRot = angles[0];
+		pos.zRot = 0;
+
+		DemigodThrowEnergyAttack(&pos, item->roomNumber, 4);
+	}
+}
+
+static void DemigodHammerAttack(int x, int y, int z, int something)
+{
+	int angle = 2 * GetRandomControl();
+	int deltaAngle = 0x10000 / something;
+
+	if (something > 0)
+	{
+		for (int i = 0; i < something; i++)
+		{
+			SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
+
+			spark->on = true;
+			spark->sShade = 0;
+			spark->colFadeSpeed = 4;
+			spark->dShade = (GetRandomControl() & 0x1F) + 96;
+			spark->fadeToBlack = 24 - (GetRandomControl() & 7);
+			spark->transType = 2;
+			spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
+			spark->x = (GetRandomControl() & 0x1F) + x - 16;
+			spark->y = (GetRandomControl() & 0x1F) + y - 16;
+			spark->z = (GetRandomControl() & 0x1F) + z - 16;
+			spark->xVel = (byte)(GetRandomControl() + 256) * phd_sin(angle) >> W2V_SHIFT;
+			spark->yVel = -32 - (GetRandomControl() & 0x3F);
+			spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle) >> W2V_SHIFT;
+			spark->friction = 9;
+
+			if (GetRandomControl() & 1)
+			{
+				spark->flags = 16;
+				spark->rotAng = GetRandomControl() & 0xFFF;
+				if (GetRandomControl() & 1)
+				{
+					spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
+				}
+				else
+				{
+					spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
+				}
+			}
+			else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
+			{
+				spark->flags = 256;
+			}
+			else
+			{
+				spark->flags = 0;
+			}
+			spark->gravity = -4 - (GetRandomControl() & 3);
+			spark->maxYvel = -4 - (GetRandomControl() & 3);
+			spark->dSize = ((GetRandomControl() & 0x3F) + 64);
+			spark->sSize = spark->dSize >> 3;
+			spark->size = spark->dSize >> 3;
+
+			angle += deltaAngle;
+		}
+	}
+}
+
+void InitialiseDemigod(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->goalAnimState = 0;
@@ -42,14 +271,14 @@ void InitialiseDemigod(short itemNum)
 	}*/
 }
 
-void DemigodControl(short itemNum)
+void DemigodControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
-	int someItemNum = item->itemFlags[0];
-	if (someItemNum && Items[someItemNum].status == ITEM_ACTIVE && Items[someItemNum].active)
+	ITEM_INFO* item = &Items[itemNumber];
+	int someitemNumber = item->itemFlags[0];
+	if (someitemNumber && Items[someitemNumber].status == ITEM_ACTIVE && Items[someitemNumber].active)
 	{
 		item->hitPoints = Objects[item->objectNumber].hitPoints;
 		return;
@@ -63,28 +292,6 @@ void DemigodControl(short itemNum)
 	short joint1 = 0;
 	short joint2 = 0;
 	short joint3 = 0;
-
-	/*if (CurrentLevel == 24)
-	{
-		ROOM_INFO* room = &Rooms[item->roomNumber];
-
-		short* zone = Zones[FlipStatus * 2 + creature->LOT.zone];
-		
-		LaraItem->boxNumber = room->floor[((LaraItem->pos.zPos - room->z) >> WALL_SHIFT) +
-			((LaraItem->pos.xPos - room->x) >> WALL_SHIFT) * room->xSize].box;
-
-		if (zone[item->boxNumber] == zone[LaraItem->boxNumber])
-		{
-			item->aiBits = 0;
-			creature->enemy = LaraItem;
-		}
-		else
-		{
-			item->aiBits = FOLLOW;
-			item->itemFlags[3] = Lara.location;
-			creature->enemy = NULL;
-		}
-	}*/
 
 	if (item->hitPoints <= 0)
 	{
@@ -341,7 +548,7 @@ void DemigodControl(short itemNum)
 
 		case 4:
 		case 12:
-			DemigodEnergyAttack(itemNum);
+			DemigodEnergyAttack(itemNumber);
 			break;
 
 		case 6:
@@ -365,7 +572,7 @@ void DemigodControl(short itemNum)
 		case 10:
 			creature->maximumTurn = ANGLE(7);
 
-			DemigodEnergyAttack(itemNum);
+			DemigodEnergyAttack(itemNumber);
 
 			if (!Targetable(item, &info) || info.distance < SQUARE(5120) || !GetRandomControl())
 			{
@@ -509,234 +716,5 @@ void DemigodControl(short itemNum)
 	CreatureJoint(item, 2, joint2);
 	CreatureJoint(item, 3, joint3);
 
-	CreatureAnimation(itemNum, angle, 0);
-}
-
-void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags)
-{
-	short fxNum = CreateNewEffect(roomNumber);
-	if (fxNum != -1)
-	{
-		FX_INFO* fx = &Effects[fxNum];
-
-		fx->pos.xPos = pos->xPos;
-		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
-		fx->pos.zPos = pos->zPos;
-		fx->pos.xRot = pos->xRot;
-		if (flags < 4)
-		{
-			fx->pos.yRot = pos->yRot;
-		}
-		else
-		{
-			fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
-		}
-
-		ObjectInfo* obj = &Objects[ID_ENERGY_BUBBLES];
-
-		fx->pos.zRot = 0;
-		fx->roomNumber = roomNumber;
-		fx->counter = 2 * GetRandomControl() + -ANGLE(180);
-		fx->flag1 = flags;
-		fx->speed = (GetRandomControl() & 0x1F) + 96;
-		fx->objectNumber = ID_ENERGY_BUBBLES;
-		if (flags >= 4)
-			flags--;
-		fx->frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + 2 * flags;
-	}
-}
-
-void DemigodEnergyAttack(short itemNum)
-{
-	ITEM_INFO* item = &Items[itemNum];
-
-	short animIndex = item->animNumber - Objects[item->objectNumber].animIndex;
-
-	if (animIndex == 8)
-	{
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
-		{
-			PHD_VECTOR pos1;
-			PHD_VECTOR pos2;
-
-			pos1.x = -544;
-			pos1.y = 96;
-			pos1.z = 0;
-
-			GetJointAbsPosition(item, &pos1, 16);
-
-			pos2.x = -900;
-			pos2.y = 96;
-			pos2.z = 0;
-
-			GetJointAbsPosition(item, &pos2, 16);
-
-			short angles[2];
-			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-			PHD_3DPOS pos;
-			pos.xPos = pos1.x;
-			pos.yPos = pos1.y;
-			pos.zPos = pos1.z;
-			pos.xRot = angles[1];
-			pos.yRot = angles[0];
-			pos.zRot = 0;
-
-			if (item->objectNumber == ID_DEMIGOD3)
-			{
-				DemigodThrowEnergyAttack(&pos, item->roomNumber, 3);
-			}
-			else
-			{
-				DemigodThrowEnergyAttack(&pos, item->roomNumber, 5);
-			}
-		}
-
-		return;
-	}
-
-	if (animIndex != 16)
-	{
-		if (animIndex != 19)
-			return;
-
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
-		{
-			PHD_VECTOR pos1;
-			PHD_VECTOR pos2;
-
-			pos1.x = -544;
-			pos1.y = 96;
-			pos1.z = 0;
-
-			GetJointAbsPosition(item, &pos1, 16);
-
-			pos2.x = -900;
-			pos2.y = 96;
-			pos2.z = 0;
-
-			GetJointAbsPosition(item, &pos2, 16);
-
-			short angles[2];
-			phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-			PHD_3DPOS pos;
-			pos.xPos = pos1.x;
-			pos.yPos = pos1.y;
-			pos.zPos = pos1.z;
-			pos.xRot = angles[1];
-			pos.yRot = angles[0];
-			pos.zRot = 0;
-
-			if (item->objectNumber == ID_DEMIGOD3)
-			{
-				DemigodThrowEnergyAttack(&pos, item->roomNumber, 3);
-			}
-			else
-			{
-				DemigodThrowEnergyAttack(&pos, item->roomNumber, 5);
-			}
-		}
-
-		return;
-	}
-
-	// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
-	int frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
-
-	if (frameNumber >= 8 && frameNumber <= 64)
-	{
-		PHD_VECTOR pos1;
-		PHD_VECTOR pos2;
-
-		pos1.x = 0;
-		pos1.y = 0;
-		pos1.z = 192;
-
-		pos2.x = 0;
-		pos2.y = 0;
-		pos2.z = 384;
-
-		if (GlobalCounter & 1)
-		{
-			GetJointAbsPosition(item, &pos1, 18);
-			GetJointAbsPosition(item, &pos2, 18);
-		}
-		else
-		{
-			GetJointAbsPosition(item, &pos1, 17);
-			GetJointAbsPosition(item, &pos2, 17);
-		}
-
-		short angles[2];
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-		PHD_3DPOS pos;
-		pos.xPos = pos1.x;
-		pos.yPos = pos1.y;
-		pos.zPos = pos1.z;
-		pos.xRot = angles[1];
-		pos.yRot = angles[0];
-		pos.zRot = 0;
-
-		DemigodThrowEnergyAttack(&pos, item->roomNumber, 4);
-	}
-}
-
-void DemigodHammerAttack(int x, int y, int z, int something)
-{
-	int angle = 2 * GetRandomControl();
-	int deltaAngle = 0x10000 / something;
-
-	if (something > 0)
-	{
-		for (int i = 0; i < something; i++)
-		{
-			SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
-
-			spark->on = true;
-			spark->sShade = 0;
-			spark->colFadeSpeed = 4;
-			spark->dShade = (GetRandomControl() & 0x1F) + 96;
-			spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-			spark->transType = 2;
-			spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
-			spark->x = (GetRandomControl() & 0x1F) + x - 16;
-			spark->y = (GetRandomControl() & 0x1F) + y - 16;
-			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			spark->xVel = (byte)(GetRandomControl() + 256) * phd_sin(angle) >> W2V_SHIFT;
-			spark->yVel = -32 - (GetRandomControl() & 0x3F);
-			spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle) >> W2V_SHIFT;
-			spark->friction = 9;
-
-			if (GetRandomControl() & 1)
-			{
-				spark->flags = 16;
-				spark->rotAng = GetRandomControl() & 0xFFF;
-				if (GetRandomControl() & 1)
-				{
-					spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
-				}
-				else
-				{
-					spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
-				}
-			}
-			else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
-			{
-				spark->flags = 256;
-			}
-			else
-			{
-				spark->flags = 0;
-			}
-			spark->gravity = -4 - (GetRandomControl() & 3);
-			spark->maxYvel = -4 - (GetRandomControl() & 3);
-			spark->dSize = ((GetRandomControl() & 0x3F) + 64);
-			spark->sSize = spark->dSize >> 3;
-			spark->size = spark->dSize >> 3;
-			
-			angle += deltaAngle;
-		}
-	}
+	CreatureAnimation(itemNumber, angle, 0);
 }

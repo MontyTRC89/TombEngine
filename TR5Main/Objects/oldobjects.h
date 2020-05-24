@@ -1,5 +1,5 @@
 #pragma once
-#include "../Global/global.h"
+#include "global.h"
 
 extern int NextBat;
 extern BAT_STRUCT* Bats;

@@ -1,16 +1,14 @@
 #include "collide.h"
+#include "global.h"
 #include "draw.h"
 #include "Lara.h"
-
-#include "..\Global\global.h"
-
 #include <stdio.h>
 #include "items.h"
 #include "effects.h"
 #include "sphere.h"
 #include "misc.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "setup.h"
+#include "level.h"
 #include "sound.h"
 
 char LM[] = {

@@ -1,20 +1,20 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/items.h"
-#include "../../Specific/setup.h"
-#include "../../Game/lot.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "items.h"
+#include "setup.h"
+#include "lot.h"
+#include "level.h"
+#include "lara.h"
 
 BITE_INFO scorpionBite1 = { 0, 0, 0, 8 };
 BITE_INFO scorpionBite2 = { 0, 0, 0, 23 };
 
-void InitialiseScorpion(short itemNum)
+void InitialiseScorpion(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	if (item->triggerFlags == 1)
 	{
@@ -32,12 +32,12 @@ void InitialiseScorpion(short itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void ScorpionControl(short itemNum)
+void ScorpionControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short angle = 0;
 	short head = 0;
@@ -114,7 +114,7 @@ void ScorpionControl(short itemNum)
 				{
 					baddy = &BaddieSlots[i];
 
-					if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNum)
+					if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 					{
 						ITEM_INFO* currentItem = &Items[baddy->itemNum];
 
@@ -327,5 +327,5 @@ void ScorpionControl(short itemNum)
 			item->pos.zRot += 256;
 	}
 
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

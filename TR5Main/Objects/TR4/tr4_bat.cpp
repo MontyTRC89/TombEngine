@@ -1,19 +1,19 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/items.h"
-#include "../../Specific/setup.h"
-#include "../../Game/lot.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "items.h"
+#include "setup.h"
+#include "lot.h"
+#include "level.h"
+#include "lara.h"
 
 BITE_INFO batBite = { 0, 16, 45, 4 };
 
-void InitialiseBat(short itemNum)
+void InitialiseBat(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_BAT].animIndex + 5;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -21,12 +21,12 @@ void InitialiseBat(short itemNum)
 	item->currentAnimState = 6;
 }
 
-void BatControl(short itemNum)
+void BatControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short angle = 0;
 	short head = 0;
@@ -57,7 +57,7 @@ void BatControl(short itemNum)
 
 			for (int i = 0; i < NUM_SLOTS; i++, baddie++)
 			{
-				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
+				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 					continue;
 
 				ITEM_INFO* target = &Items[baddie->itemNum];
@@ -158,5 +158,5 @@ void BatControl(short itemNum)
 		}
 	}
 
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

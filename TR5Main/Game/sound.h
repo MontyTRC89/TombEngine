@@ -4,8 +4,8 @@
 #include "bass_fx.h"
 #include <vector>
 
-#include "..\Game\control.h"
-#include "..\Global\global.h"
+#include "control.h"
+#include "global.h"
 
 #include <SimpleMath.h>
 using namespace DirectX::SimpleMath;

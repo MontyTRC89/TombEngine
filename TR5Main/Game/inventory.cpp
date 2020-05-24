@@ -9,13 +9,13 @@
 #include "Lara.h"
 #include "camera.h"
 #include "spotcam.h"
-#include "..\Global\global.h"
-#include "..\Specific\input.h"
-#include "..\Specific\configuration.h"
+#include "global.h"
+#include "input.h"
+#include "configuration.h"
 #include "lara1gun.h"
 #include "lara2gun.h"
-#include "../Specific/level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;

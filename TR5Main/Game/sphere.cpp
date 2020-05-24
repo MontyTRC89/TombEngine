@@ -1,8 +1,8 @@
 #include "sphere.h"
 #include "draw.h"
 #include "lara.h"
-#include "../Specific/level.h"
-#include "../Specific/setup.h"
+#include "level.h"
+#include "setup.h"
 
 int NumLaraSpheres;
 bool GotLaraSpheres;

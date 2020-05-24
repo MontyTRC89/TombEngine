@@ -1,22 +1,22 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effect2.h"
-#include "../../Game/debris.h"
-#include "../../Game/effects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "sphere.h"
+#include "effect2.h"
+#include "debris.h"
+#include "effects.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
+#include "sound.h"
 
 BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
-void InitialiseKnightTemplar(short itemNum)
+void InitialiseKnightTemplar(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
 	item->goalAnimState = 1;
@@ -25,12 +25,12 @@ void InitialiseKnightTemplar(short itemNum)
 	item->meshBits &= 0xF7FF;
 }
 
-void KnightTemplarControl(short itemNum)
+void KnightTemplarControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->objectNumber];
 
 	if (item->animNumber == obj->animIndex ||
@@ -259,5 +259,5 @@ void KnightTemplarControl(short itemNum)
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureAnimation(itemNumber, angle, tilt);
 }

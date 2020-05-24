@@ -1,23 +1,23 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/items.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effect2.h"
-#include "../../Game/lara.h"
-#include "../../Game/people.h"
-#include "../../Specific/setup.h"
-#include "../../Game/lot.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "box.h"
+#include "items.h"
+#include "sphere.h"
+#include "effect2.h"
+#include "lara.h"
+#include "people.h"
+#include "setup.h"
+#include "lot.h"
+#include "level.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
 
 
-void InitialiseTroops(short itemNum)
+void InitialiseTroops(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	if (item->triggerFlags == 1)
 	{
@@ -33,12 +33,12 @@ void InitialiseTroops(short itemNum)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void TroopsControl(short itemNum)
+void TroopsControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ObjectInfo* obj = &Objects[item->objectNumber];
 	short angle = 0;
@@ -126,7 +126,7 @@ void TroopsControl(short itemNum)
 			{
 				baddy = &BaddieSlots[i];
 
-				if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNum)
+				if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 				{
 					ITEM_INFO* currentItem = &Items[baddy->itemNum];
 
@@ -180,7 +180,7 @@ void TroopsControl(short itemNum)
 		angle = CreatureTurn(item, creature->maximumTurn);
 
 		if (item->hitStatus)
-			AlertAllGuards(itemNum);
+			AlertAllGuards(itemNumber);
 
 		switch (item->currentAnimState)
 		{
@@ -474,10 +474,8 @@ void TroopsControl(short itemNum)
 	}
 
 	CreatureTilt(item, tilt);
-	
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
-	
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

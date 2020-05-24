@@ -1,18 +1,16 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effect2.h"
-#include "../../Game/lara.h"
-#include "../../Game/people.h"
-#include "../../Game/effects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "sphere.h"
+#include "effect2.h"
+#include "lara.h"
+#include "people.h"
+#include "effects.h"
+#include "setup.h"
+#include "level.h"
 
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
-
-
 
 void ClampRotation(PHD_3DPOS *pos, short angle, short rot)
 {

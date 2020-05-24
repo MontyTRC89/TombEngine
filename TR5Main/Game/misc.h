@@ -1,5 +1,5 @@
 #pragma once
-#include "../Global/global.h"
+#include "global.h"
 
 enum LARA_MESH_MASK
 {

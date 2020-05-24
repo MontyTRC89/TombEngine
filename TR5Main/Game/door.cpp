@@ -9,9 +9,9 @@
 #include "sphere.h"
 #include "switch.h"
 #include "misc.h"
-#include "Box.h"
-#include "../Specific/level.h"
-#include "../Specific/input.h"
+#include "box.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
 PHD_VECTOR DoubleDoorPos = { 0, 0, 220 };

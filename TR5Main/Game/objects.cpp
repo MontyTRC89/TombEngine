@@ -1,5 +1,5 @@
 #include "objects.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "items.h"
 #include "effects.h"
 #include "effect2.h"
@@ -11,10 +11,10 @@
 #include "control.h"
 #include "switch.h"
 #include "box.h"
-#include "../Specific/setup.h"
+#include "setup.h"
 #include "tomb4fx.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];

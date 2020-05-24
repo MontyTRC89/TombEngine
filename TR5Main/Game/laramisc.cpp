@@ -1,8 +1,8 @@
 #include "laramisc.h"
-#include "..\Global\global.h"
-#include "..\Specific\level.h"
-#include "../Specific/setup.h"
-#include "..\Scripting\GameFlowScript.h"
+#include "global.h"
+#include "level.h"
+#include "setup.h"
+#include "GameFlowScript.h"
 #include "effects.h"
 #include "collide.h"
 #include "Lara.h"
@@ -17,7 +17,7 @@
 #include "savegame.h"
 #include "inventory.h"
 #include "camera.h"
-#include "../Specific/input.h"
+#include "input.h"
 #include "sound.h"
 
 

@@ -1,13 +1,13 @@
 #include "laraclmb.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "Lara.h"
 #include "control.h"
 #include "draw.h"
 #include "sphere.h"
 #include "laramisc.h"
 #include "camera.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 
 short LeftIntRightExtTab[4] = // offset 0xA0B7C
 {

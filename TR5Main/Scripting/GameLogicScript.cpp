@@ -1,12 +1,12 @@
 #include "GameLogicScript.h"
-#include "..\Game\items.h"
-#include "..\Game\box.h"
-#include "..\Game\lara.h"
-#include "../Game/savegame.h"
-#include "..\Game\lot.h"
-#include "..\Game\sound.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "items.h"
+#include "box.h"
+#include "lara.h"
+#include "savegame.h"
+#include "lot.h"
+#include "sound.h"
+#include "setup.h"
+#include "level.h"
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;

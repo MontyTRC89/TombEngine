@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 // used by coll->badPos
 #define NO_BAD_POS (-NO_HEIGHT)

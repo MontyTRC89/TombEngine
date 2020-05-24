@@ -10,11 +10,11 @@
 #include "lara.h"
 #include "flmtorch.h"
 #include "sphere.h"
-#include "../Specific/level.h"
+#include "level.h"
 #include "collide.h"
 #include "sound.h"
 #include "savegame.h"
-#include "../Specific/input.h"
+#include "input.h"
 
 struct OLD_CAMERA
 {

@@ -3,7 +3,7 @@
 #include "pickup.h"
 #include "lara.h"
 #include "camera.h"
-#include "../Specific/level.h"
+#include "level.h"
 #include "control.h"
 
 short PickupX;

@@ -1,11 +1,11 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/people.h"
-#include "../../Game/lot.h"
-#include "../../specific/setup.h"
-#include "..\..\Game\camera.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "people.h"
+#include "lot.h"
+#include "../specific/setup.h"
+#include "camera.h"
+#include "level.h"
 
 enum PIERRE_STATE {
 	PEOPLE_EMPTY, PEOPLE_STOP, PEOPLE_WALK, PEOPLE_RUN, PEOPLE_AIM,

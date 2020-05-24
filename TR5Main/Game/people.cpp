@@ -1,5 +1,5 @@
 #include "people.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "effects.h"
 #include "effect2.h"
 #include "draw.h"

@@ -6,7 +6,7 @@
 #include "lara1gun.h"
 #include "lara2gun.h"
 #include "camera.h"
-#include "..\Scripting\GameFlowScript.h"
+#include "GameFlowScript.h"
 #include <stdio.h>
 #include "objects.h"
 #include "effects.h"
@@ -14,10 +14,10 @@
 #include "draw.h"
 #include "effect2.h"
 #include "flmtorch.h"
-#include "..\Specific\level.h"
+#include "level.h"
 #include "lot.h"
-#include "../Specific/setup.h"
-#include "../Specific/input.h"
+#include "setup.h"
+#include "input.h"
 #include "sound.h"
 #include "savegame.h"
 

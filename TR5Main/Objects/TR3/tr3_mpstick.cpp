@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/people.h"
-#include "../../Game/items.h"
-#include "../../specific/setup.h"
-#include "../../Game/lot.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "people.h"
+#include "items.h"
+#include "../specific/setup.h"
+#include "lot.h"
+#include "level.h"
+#include "lara.h"
+#include "sound.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };

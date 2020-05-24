@@ -20,7 +20,7 @@
 #include <VertexTypes.h>
 #include <WICTextureLoader.h>
 
-#include "..\Global\global.h"
+#include "global.h"
 #include <d3d9types.h>
 #include "StaticBuffer.h"
 #include "LightBuffer.h"

@@ -1,10 +1,10 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/items.h"
-#include "../../Game/larafire.h"
-#include "../../Game/misc.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "items.h"
+#include "larafire.h"
+#include "misc.h"
+#include "level.h"
+#include "lara.h"
 
 // TODO: Evil lara is not targetable and cant move like lara.
 

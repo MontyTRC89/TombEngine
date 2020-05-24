@@ -3,7 +3,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "groundfx.h"
-#include "../Specific/level.h"
+#include "level.h"
 
 std::deque<FOOTPRINT_STRUCT> footprints = deque<FOOTPRINT_STRUCT>();
 

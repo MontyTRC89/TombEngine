@@ -1,12 +1,12 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/effect2.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "effects.h"
+#include "effect2.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
+#include "sound.h"
 
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 

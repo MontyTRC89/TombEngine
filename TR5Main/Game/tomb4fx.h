@@ -1,6 +1,6 @@
 #pragma once
-#include "..\Global\types.h"
-#include "..\Global\constants.h"
+#include "types.h"
+#include "constants.h"
 
 struct ENERGY_ARC
 {

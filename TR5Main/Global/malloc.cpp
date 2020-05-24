@@ -1,6 +1,6 @@
 #include "malloc.h"
 #include <stdlib.h>
-#include "..\Global\global.h"
+#include "global.h"
 
 char* malloc_buffer;
 int malloc_size;

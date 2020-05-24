@@ -1,5 +1,5 @@
 #include "flmtorch.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "effect2.h"
 #include "laraflar.h"
 #include "lara.h"
@@ -9,9 +9,9 @@
 #include "switch.h"
 #include "draw.h"
 #include "items.h"
-#include "..\Specific\level.h"
-#include "../Specific/setup.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "setup.h"
+#include "input.h"
 #include "sound.h"
 
 short FireBounds[12] =

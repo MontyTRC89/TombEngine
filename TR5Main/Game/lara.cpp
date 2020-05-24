@@ -19,10 +19,10 @@
 #include "rope.h"
 #include "healt.h"
 
-#include "..\Objects\newobjects.h"
-#include "..\Global\global.h"
-#include "../Specific/level.h"
-#include "../Specific/input.h"
+#include "newobjects.h"
+#include "global.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
 #include <stdio.h>

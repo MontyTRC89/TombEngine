@@ -1,15 +1,15 @@
-#include "../newobjects.h"
-#include "../../Game/people.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/items.h"
-#include "../../Game/sphere.h"
-#include "../../Game/draw.h"
-#include "../../Specific/setup.h"
-#include "../../Game/lot.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "people.h"
+#include "box.h"
+#include "effects.h"
+#include "effect2.h"
+#include "items.h"
+#include "sphere.h"
+#include "draw.h"
+#include "setup.h"
+#include "lot.h"
+#include "level.h"
+#include "lara.h"
 
 BITE_INFO harpyBite1 = { 0, 0, 0, 4 };
 BITE_INFO harpyBite2 = { 0, 0, 0, 2 };
@@ -17,7 +17,7 @@ BITE_INFO harpyBite3 = { 0, 0, 0, 21 };
 BITE_INFO harpyAttack1 = { 0, 128, 0, 2 };
 BITE_INFO harpyAttack2 = { 0, 128, 0, 4 };
 
-void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
+static void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;
@@ -53,7 +53,7 @@ void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 	}
 }
 
-void HarpyAttack(ITEM_INFO* item, short itemNum)
+static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 {
 	item->itemFlags[0]++;
 
@@ -100,11 +100,11 @@ void HarpyAttack(ITEM_INFO* item, short itemNum)
 	{
 		if ((Wibble & 0xF) == 8)
 		{
-			HarpySparks1(itemNum, 4, something);
+			HarpySparks1(itemNumber, 4, something);
 		}
 		else if (!(Wibble & 0xF))
 		{
-			HarpySparks1(itemNum, 5, something);
+			HarpySparks1(itemNumber, 5, something);
 		}
 	}
 
@@ -169,7 +169,7 @@ void HarpyAttack(ITEM_INFO* item, short itemNum)
 	}
 }
 
-void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
+static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
@@ -191,9 +191,9 @@ void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 	}
 }
 
-void HarpySparks1(short itemNum, byte num, int size)
+static void HarpySparks1(short itemNumber, byte num, int size)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
 	int dx = LaraItem->pos.xPos - item->pos.xPos;
 	int dz = LaraItem->pos.zPos - item->pos.zPos;
@@ -231,7 +231,7 @@ void HarpySparks1(short itemNum, byte num, int size)
 		}
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x1F) + 16;
-		spark->fxObj = itemNum;
+		spark->fxObj = itemNumber;
 		spark->nodeNumber = num;
 		spark->scalar = 2;
 		spark->sSize = spark->size = GetRandomControl() & 0xF + size;
@@ -239,11 +239,11 @@ void HarpySparks1(short itemNum, byte num, int size)
 	}
 }
 
-void InitialiseHarpy(short itemNum)
+void InitialiseHarpy(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_HARPY].animIndex + 4;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -251,11 +251,11 @@ void InitialiseHarpy(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void HarpyControl(short itemNum)
+void HarpyControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
@@ -297,7 +297,7 @@ void HarpyControl(short itemNum)
 				CreatureJoint(item, 1, joint1);
 				CreatureJoint(item, 2, joint2);
 
-				CreatureAnimation(itemNum, angle, 0);
+				CreatureAnimation(itemNumber, angle, 0);
 
 				return;
 			}
@@ -328,7 +328,7 @@ void HarpyControl(short itemNum)
 
 		for (int i = 0; i < NUM_SLOTS; i++, baddie++)
 		{
-			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNum)
+			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 				continue;
 
 			ITEM_INFO* target = &Items[baddie->itemNum];
@@ -570,7 +570,7 @@ void HarpyControl(short itemNum)
 
 		case 8:
 			// Flame attack
-			HarpyAttack(item, itemNum);
+			HarpyAttack(item, itemNumber);
 			break;
 
 		case 12:
@@ -596,10 +596,8 @@ void HarpyControl(short itemNum)
 	}
 
 	CreatureTilt(item, 0);
-
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
-
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

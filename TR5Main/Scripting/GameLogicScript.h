@@ -6,12 +6,12 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "..\Global\global.h"
-#include "..\Specific\IO\ChunkId.h"
-#include "..\Specific\IO\ChunkReader.h"
-#include "..\Specific\IO\ChunkWriter.h"
-#include "..\Specific\IO\LEB128.h"
-#include "..\Specific\IO\Streams.h"
+#include "Global\global.h"
+#include "Specific\IO\ChunkId.h"
+#include "Specific\IO\ChunkReader.h"
+#include "Specific\IO\ChunkWriter.h"
+#include "Specific\IO\LEB128.h"
+#include "Specific\IO\Streams.h"
 
 using namespace std;
 

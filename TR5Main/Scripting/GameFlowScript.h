@@ -7,10 +7,10 @@
 #include <fstream>
 #include <map>
 
-#include "..\Global\global.h"
-#include "..\Specific\IO\ChunkId.h"
-#include "..\Specific\IO\ChunkReader.h"
-#include "..\Specific\IO\LEB128.h"
+#include "global.h"
+#include "IO\ChunkId.h"
+#include "IO\ChunkReader.h"
+#include "IO\LEB128.h"
 #include "LanguageScript.h"
 
 #define TITLE_FLYBY			0

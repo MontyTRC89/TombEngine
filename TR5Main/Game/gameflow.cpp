@@ -2,9 +2,9 @@
 #include "draw.h"
 #include "savegame.h"
 
-#include "..\Specific\input.h"
-#include "..\Global\global.h"
-#include "../Specific/level.h"
+#include "input.h"
+#include "global.h"
+#include "level.h"
 
 #include <string>
 

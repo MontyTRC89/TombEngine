@@ -1,4 +1,4 @@
-#include "../Global/types.h"
+#include "types.h"
 #include "math.h"
 #include <queue>
 #pragma once

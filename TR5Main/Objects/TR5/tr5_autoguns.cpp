@@ -1,12 +1,12 @@
-#include "../newobjects.h"
-#include "../../Game/sphere.h"
-#include "../../Game/lara.h"
-#include "../../Game/draw.h"
-#include "../../Game/effect2.h"
-#include "../../Game/effects.h"
-#include "../../Game/tomb4fx.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "sphere.h"
+#include "lara.h"
+#include "draw.h"
+#include "effect2.h"
+#include "effects.h"
+#include "tomb4fx.h"
+#include "level.h"
+#include "sound.h"
 
 void InitialiseAutoGuns(short itemNum)
 {

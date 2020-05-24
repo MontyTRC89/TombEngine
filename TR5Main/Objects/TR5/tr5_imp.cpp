@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/sphere.h"
-#include "../../Game/lara.h"
-#include "../../Game/draw.h"
-#include "../../Game/effects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/Box.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "sphere.h"
+#include "lara.h"
+#include "draw.h"
+#include "effects.h"
+#include "effect2.h"
+#include "box.h"
+#include "setup.h"
+#include "level.h"
 
 #define STATE_IMP_WALK			0
 #define STATE_IMP_STOP			1

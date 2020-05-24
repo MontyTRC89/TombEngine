@@ -66,7 +66,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -99,7 +99,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_RELEASE;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main\Libs\fixedpoint;$(SolutionDir)TR5Main\Libs\sol2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -123,11 +123,33 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\box.h" />
     <ClInclude Include="Game\bubble.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
+    <ClInclude Include="Objects\TR4\tr4_ahmet.h" />
+    <ClInclude Include="Objects\TR4\tr4_baddy.h" />
+    <ClInclude Include="Objects\TR4\tr4_bat.h" />
+    <ClInclude Include="Objects\TR4\tr4_bigscorpion.h" />
+    <ClInclude Include="Objects\TR4\tr4_crocodile.h" />
+    <ClInclude Include="Objects\TR4\tr4_demigod.h" />
+    <ClInclude Include="Objects\TR4\tr4_guide.h" />
+    <ClInclude Include="Objects\TR4\tr4_harpy.h" />
+    <ClInclude Include="Objects\TR4\tr4_horseman.h" />
+    <ClInclude Include="Objects\TR4\tr4_jeanyves.h" />
+    <ClInclude Include="Objects\TR4\tr4_knighttemplar.h" />
+    <ClInclude Include="Objects\TR4\tr4_littlebeetle.h" />
+    <ClInclude Include="Objects\TR4\tr4_mummy.h" />
+    <ClInclude Include="Objects\TR4\tr4_sas.h" />
+    <ClInclude Include="Objects\TR4\tr4_skeleton.h" />
+    <ClInclude Include="Objects\TR4\tr4_smallscorpion.h" />
+    <ClInclude Include="Objects\TR4\tr4_sphinx.h" />
+    <ClInclude Include="Objects\TR4\tr4_troops.h" />
+    <ClInclude Include="Objects\TR4\tr4_wildboar.h" />
+    <ClInclude Include="Objects\TR4\tr4_wraith.h" />
+    <ClInclude Include="Objects\tr4_objects.h" />
     <ClInclude Include="Renderer\CameraMatrixBuffer.h" />
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\HUDBarBuffer.h" />
@@ -157,7 +179,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="CustomObjects\shark.h" />
     <ClInclude Include="CustomObjects\tribesman.h" />
     <ClInclude Include="Scripting\GameFlowScript.h" />
-    <ClInclude Include="Game\box.h" />
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
     <ClInclude Include="Game\collide.h" />
@@ -236,6 +257,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR3\tr3_civvy.cpp" />
     <ClCompile Include="Objects\TR3\tr3_sophia.cpp" />
     <ClCompile Include="Objects\TR4\tr4_ahmet.cpp" />
+    <ClCompile Include="Objects\tr4_objects.cpp" />
     <ClCompile Include="Objects\TR5\tr5_autoguns.cpp" />
     <ClCompile Include="Objects\TR5\tr5_brownbeast.cpp" />
     <ClCompile Include="Objects\TR5\tr5_chef.cpp" />
@@ -307,7 +329,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\tr4_littlebeetle.cpp" />
     <ClCompile Include="Objects\TR4\tr4_smallscorpion.cpp" />
     <ClCompile Include="Objects\TR4\tr4_sphinx.cpp" />
-    <ClCompile Include="Objects\TR4\tr4_wildboard.cpp" />
+    <ClCompile Include="Objects\TR4\tr4_wildboar.cpp" />
     <ClCompile Include="Objects\Vehicles\upv.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\Render11Helper.cpp" />
@@ -632,7 +654,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Banner.bmp" />
-    <Image Include="C:\Users\Monty\Desktop\Banner.bmp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\HUD\DX11_PS_HUD.hlsl">

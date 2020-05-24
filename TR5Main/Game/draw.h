@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 extern Renderer11* g_Renderer;
 extern BITE_INFO EnemyBites[9];

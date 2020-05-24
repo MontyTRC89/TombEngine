@@ -1,8 +1,8 @@
-#include "../newobjects.h"
-#include "../../Game/effects.h"
-#include "../../Game/draw.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "effects.h"
+#include "draw.h"
+#include "level.h"
+#include "lara.h"
 
 #define PIRAHNA_DAMAGE	4
 #define X	0

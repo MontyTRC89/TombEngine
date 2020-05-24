@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 #include "control.h"
 
 extern FX_INFO* Effects;

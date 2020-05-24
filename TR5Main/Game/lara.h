@@ -1,7 +1,7 @@
 #pragma once
 
-#include "..\Global\global.h"
-#include "..\Renderer\Renderer11.h"
+#include "global.h"
+#include "Renderer11.h"
 
 typedef struct CarriedWeaponInfo {
 	bool Present;

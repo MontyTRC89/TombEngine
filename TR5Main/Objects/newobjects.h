@@ -1,5 +1,5 @@
 #pragma once
-#include "../Global/global.h"
+#include "global.h"
 
 typedef struct QUAD_INFO {
 	int velocity;
@@ -291,23 +291,6 @@ void InitialiseCivvy(short item_number);
 void CivvyControl(short item_number);
 
 // TR4 object
-void InitialiseAhmet(short item_number);
-void AhmetControl(short item_number);
-void InitialiseWildBoar(short itemNum);
-void WildBoarControl(short itemNum);
-void InitialiseSmallScorpion(short itemNum);
-void SmallScorpionControl(short itemNum);
-void InitialiseBat(short itemNum);
-void BatControl(short itemNum);
-void InitialiseBaddy(short itemNum);
-void BaddyControl(short itemNum);
-void InitialiseSas(short itemNum);
-void SasControl(short itemNum);
-void InitialiseMummy(short itemNum);
-void MummyControl(short itemNum);
-void InitialiseSkeleton(short itemNum);
-void SkeletonControl(short itemNum);
-void WakeUpSkeleton(ITEM_INFO* item);
 void FourBladesControl(short itemNum);
 void BirdBladeControl(short itemNum);
 void CatwalkBlaldeControl(short itemNum);
@@ -318,56 +301,25 @@ void ChainControl(short itemNum);
 void PloughControl(short itemNum);
 void CogControl(short itemNum);
 void SpikeballControl(short itemNum);
-void InitialiseKnightTemplar(short itemNum);
-void KnightTemplarControl(short itemNum);
 void StargateControl(short itemNum);
 void StargateCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 void InitialiseSlicerDicer(short itemNum);
 void SlicerDicerControl(short itemNum);
 void BladeCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 void SarcophagusCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
-void InitialiseScorpion(short itemNum);
-void ScorpionControl(short itemNum);
 void InitialiseLaraDouble(short itemNum);
 void LaraDoubleControl(short itemNum);
-void InitialiseDemigod(short itemNum);
-void DemigodControl(short itemNum);
-void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int something);
-void DemigodEnergyAttack(short itemNum);
-void DemigodHammerAttack(int x, int y, int z, int something);
 void InitialiseMine(short itemNum);
 void MineControl(short itemNum);
 void MineCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 void InitialiseSentryGun(short itemNum);
 void SentryGunControl(short itemNum);
 void SentryGunThrowFire(ITEM_INFO* item);
-void InitialiseJeanYves(short itemNum);
-void JeanYvesControl(short itemNum);
 void ScalesControl(short itemNum);
 void ScalesCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 int RespawnAhmet(short itemNum);
-void InitialiseLittleBeetle(short itemNum);
-void LittleBeetleControl(short itemNum);
-void InitialiseTroops(short itemNum);
-void TroopsControl(short itemNum);
-void InitialiseHarpy(short itemNum);
-void HarpyControl(short itemNum);
-void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count);
-void HarpyAttack(ITEM_INFO* item, short itemNum);
-void HarpySparks1(short itemNum, byte num, int size);
-void HarpySparks2(int x, int y, int z, int xv, int yv, int zv);
-void InitialiseGuide(short itemNum);
-void GuideControl(short itemNum);
-void InitialiseCrocodile(short itemNum);
-void CrocodileControl(short itemNum);
-void InitialiseSphinx(short itemNum);
-void SphinxControl(short itemNum);
 void InitialiseBurningFloor(short itemNum);
 void BurningFloorControl(short itemNum);
-void InitialiseHorse(short itemNum);
-void InitialiseHorseman(short itemNum);
-void HorsemanControl(short itemNum);
-void HorsemanSparks(PHD_3DPOS* pos, int param1, int num);
 void BubblesControl(short fxNum);
 int BubblesShatterFunction(FX_INFO* fx, int param1, int param2);
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel);

@@ -1,8 +1,8 @@
 #include "laraflar.h"
 
-#include "..\Global\global.h"
-#include "..\Specific\level.h"
-#include "..\Specific\setup.h"
+#include "global.h"
+#include "level.h"
+#include "setup.h"
 #include "sound.h"
 
 #include "draw.h"

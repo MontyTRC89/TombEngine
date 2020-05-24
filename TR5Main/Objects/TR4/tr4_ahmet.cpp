@@ -1,15 +1,15 @@
-#include "../newobjects.h"
-#include "../../Game/control.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/sound.h"
-#include "../../Specific/setup.h"
-#include "../../Game/Box.h"
-#include "../../Specific/level.h"
-#include "../../Game/misc.h"
-#include "../../Game/lara.h"
-#include "../../Game/people.h"
+#include "newobjects.h"
+#include "control.h"
+#include "sphere.h"
+#include "effects.h"
+#include "effect2.h"
+#include "sound.h"
+#include "setup.h"
+#include "box.h"
+#include "level.h"
+#include "misc.h"
+#include "lara.h"
+#include "people.h"
 
 enum AHMET_STATE
 {
@@ -76,12 +76,12 @@ static void TriggerAhmetDeathEffect(ITEM_INFO* item)
     SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, NULL);
 }
 
-void InitialiseAhmet(short item_number)
+void InitialiseAhmet(short itemNumber)
 {
     ITEM_INFO* item;
-    item = &Items[item_number];
+    item = &Items[itemNumber];
 
-    InitialiseCreature(item_number);
+    InitialiseCreature(itemNumber);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = Anims[item->animNumber].frameBase;
     item->goalAnimState = AHMET_IDLE;
@@ -91,17 +91,17 @@ void InitialiseAhmet(short item_number)
     item->itemFlags[2] = item->pos.zPos >> (WALL_SHIFT);
 }
 
-void AhmetControl(short item_number)
+void AhmetControl(short itemNumber)
 {
+    if (!CreatureActive(itemNumber))
+        return;
+
     ITEM_INFO* item;
     CREATURE_INFO* ahmet;
     AI_INFO lara_info, info;
     short angle, head_y;
 
-    if (!CreatureActive(item_number))
-        return;
-
-    item = &Items[item_number];
+    item = &Items[itemNumber];
     if (item->triggerFlags == 1)
     {
         item->triggerFlags = 0;
@@ -114,7 +114,8 @@ void AhmetControl(short item_number)
 
     if (item->hitPoints <= 0)
     {
-        TriggerAhmetDeathEffect(item);
+        if (item->triggerFlags != 1)
+            TriggerAhmetDeathEffect(item);
 
         if (item->currentAnimState == AHMET_DIE)
         {
@@ -131,7 +132,7 @@ void AhmetControl(short item_number)
             item->frameNumber = Anims[item->animNumber].frameBase;
             item->currentAnimState = AHMET_DIE;
             item->goalAnimState = AHMET_DIE;
-            Lara.generalPtr = (void*)item_number;
+            Lara.generalPtr = (void*)itemNumber;
         }
     }
     else
@@ -164,7 +165,7 @@ void AhmetControl(short item_number)
         ahmet->enemy = LaraItem;
 
         if (lara_info.distance < AHMET_AWARE_DISTANCE || item->hitStatus || TargetVisible(item, &lara_info))
-            AlertAllGuards(item_number);
+            AlertAllGuards(itemNumber);
 
         if (info.ahead)
             head_y = info.angle;
@@ -350,5 +351,5 @@ void AhmetControl(short item_number)
     CreatureTilt(item, 0);
     CreatureJoint(item, 0, head_y);
     AhmetHeavyTriggers(item);
-    CreatureAnimation(item_number, angle, 0);
+    CreatureAnimation(itemNumber, angle, 0);
 }

@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effect2.h"
-#include "../../Game/people.h"
-#include "../../Game/lot.h"
-#include "../../Game/lara.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "sphere.h"
+#include "effect2.h"
+#include "people.h"
+#include "lot.h"
+#include "lara.h"
+#include "setup.h"
+#include "level.h"
 
 #define STATE_TR5_LARSON_STOP		1
 #define STATE_TR5_LARSON_WALK		2

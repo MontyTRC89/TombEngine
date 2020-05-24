@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/lara.h"
-#include "../../Game/items.h"
-#include "../../Game/collide.h"
-#include "../../Game/sphere.h"
-#include "../../Game/camera.h"
-#include "../../Specific/setup.h"
-#include "../../Specific/level.h"
-#include "../../Specific/input.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "lara.h"
+#include "items.h"
+#include "collide.h"
+#include "sphere.h"
+#include "camera.h"
+#include "setup.h"
+#include "level.h"
+#include "input.h"
+#include "sound.h"
 
 
 

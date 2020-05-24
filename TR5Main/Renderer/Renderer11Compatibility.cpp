@@ -1,10 +1,10 @@
 #include "Renderer11.h"
-#include "../Specific/level.h"
+#include "level.h"
 #include <stack>
-#include "../Game/savegame.h"
-#include "../Specific/setup.h"
-#include "../Game/control.h"
-#include "../Game/objects.h"
+#include "savegame.h"
+#include "setup.h"
+#include "control.h"
+#include "objects.h"
 
 bool Renderer11::PrepareDataForTheRenderer()
 {

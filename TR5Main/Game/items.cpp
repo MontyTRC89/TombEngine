@@ -1,9 +1,9 @@
 #include "items.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "effect2.h"
 #include <stdio.h>
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "setup.h"
+#include "level.h"
 #include "lara.h"
 #include "effects.h"
 

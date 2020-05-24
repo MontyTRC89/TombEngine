@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/debris.h"
-#include "../../Game/items.h"
-#include "../../Game/traps.h"
-#include "../../Game/draw.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Game/effects.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "effect2.h"
+#include "debris.h"
+#include "items.h"
+#include "traps.h"
+#include "draw.h"
+#include "tomb4fx.h"
+#include "effects.h"
+#include "level.h"
+#include "lara.h"
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {

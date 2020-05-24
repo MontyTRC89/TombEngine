@@ -1,6 +1,6 @@
 #include "debris.h"
-#include "../Specific/level.h"
-#include "../Specific/setup.h"
+#include "level.h"
+#include "setup.h"
 #include "control.h"
 
 ShatterImpactInfo ShatterImpactData;

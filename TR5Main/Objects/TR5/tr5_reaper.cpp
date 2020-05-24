@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
 
 void InitialiseReaper(short itemNum)
 {

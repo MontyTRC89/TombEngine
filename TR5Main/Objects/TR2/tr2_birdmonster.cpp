@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/lara.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "lara.h"
+#include "setup.h"
+#include "level.h"
 
 BITE_INFO birdyBiteL = { 0, 224, 0, 19 };
 BITE_INFO birdyBiteR = { 0, 224, 0, 22 };

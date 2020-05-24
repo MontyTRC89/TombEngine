@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/lara.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "lara.h"
+#include "setup.h"
+#include "level.h"
 
 BITE_INFO barracudaBite = { 2, -60, 121, 7 };
 

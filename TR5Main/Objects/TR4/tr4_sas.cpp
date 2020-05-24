@@ -1,22 +1,22 @@
-#include "../newobjects.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effect2.h"
-#include "../../Game/Box.h"
-#include "../../Game/items.h"
-#include "../../Game/people.h"
-#include "../../Game/lara.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "sphere.h"
+#include "effect2.h"
+#include "box.h"
+#include "items.h"
+#include "people.h"
+#include "lara.h"
+#include "setup.h"
+#include "level.h"
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
 
 
 
-void InitialiseSas(short itemNum)
+void InitialiseSas(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 12;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -24,12 +24,12 @@ void InitialiseSas(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void SasControl(short itemNum)
+void SasControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
 
@@ -92,7 +92,7 @@ void SasControl(short itemNum)
 		angle = CreatureTurn(item, creature->maximumTurn);
 
 		if (item->hitStatus)
-			AlertAllGuards(itemNum);
+			AlertAllGuards(itemNumber);
 
 		int angle1 = 0;
 		int angle2 = 0;
@@ -445,7 +445,7 @@ void SasControl(short itemNum)
 			break;
 		}
 
-		if ((unsigned __int8)WeaponEnemyTimer > 0x64u && item->currentAnimState != 17)
+		if (WeaponEnemyTimer > 100 && item->currentAnimState != 17)
 		{
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 28;
@@ -465,5 +465,5 @@ void SasControl(short itemNum)
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
 
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

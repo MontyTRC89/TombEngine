@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Game/inventory.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "effects.h"
+#include "effect2.h"
+#include "tomb4fx.h"
+#include "inventory.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
 
 #define STATE_LAGOON_WITCH_SWIM			1
 #define STATE_LAGOON_WITCH_STOP			2

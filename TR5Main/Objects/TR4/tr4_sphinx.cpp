@@ -1,20 +1,20 @@
-#include "../newobjects.h"
-#include "../../Game/debris.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "debris.h"
+#include "items.h"
+#include "box.h"
+#include "effects.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
+#include "sound.h"
 
 BITE_INFO sphinxBiteInfo = { 0, 0, 0, 6 };
 
-void InitialiseSphinx(short itemNum)
+void InitialiseSphinx(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->animNumber].animIndex + 1;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -22,12 +22,12 @@ void InitialiseSphinx(short itemNum)
 	item->currentAnimState = 1;
 }
 
-void SphinxControl(short itemNum)
+void SphinxControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ObjectInfo* obj = &Objects[item->objectNumber];
 
@@ -232,5 +232,5 @@ void SphinxControl(short itemNum)
 	item->itemFlags[2] = item->pos.xPos;
 	item->itemFlags[3] = item->pos.zPos;
 
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

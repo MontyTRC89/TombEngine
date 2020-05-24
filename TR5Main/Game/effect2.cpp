@@ -6,9 +6,9 @@
 #include "lara.h"
 #include "effects.h"
 #include "sound.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "GameFlowScript.h"
+#include "setup.h"
+#include "level.h"
 
 //long wibble;
 //long SplashCount;

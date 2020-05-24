@@ -1,6 +1,6 @@
 #include "control.h"
 
-#include "..\Global\global.h"
+#include "global.h"
  
 #include "pickup.h"
 #include "Camera.h"
@@ -29,19 +29,19 @@
 #include "sphere.h"
 #include "debris.h"
 #include "larafire.h"
-#include "..\Objects\oldobjects.h"
+#include "oldobjects.h"
 
 #include "footprint.h"
-#include "..\Specific\level.h"
-#include "..\Specific\input.h"
-#include "..\Specific\init.h"
-#include "..\Specific\winmain.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
+#include "init.h"
+#include "winmain.h"
+#include "input.h"
 
 #include <process.h>
 #include <stdio.h>
-#include "..\Renderer\Renderer11.h"
-#include "../Specific/setup.h"
+#include "Renderer11.h"
+#include "setup.h"
 
 short ShatterSounds[18][10] =
 {
@@ -128,7 +128,7 @@ int GlobalPlayingCutscene;
 int CurrentLevel;
 int SoundActive;
 int DoTheGame;
-int Unk_876C48;
+int ThreadEnded;
 int OnFloor;
 int SmokeWindX;
 int SmokeWindZ;
@@ -532,7 +532,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 	return GAME_STATUS_NONE;
 }
 
-unsigned __stdcall GameMain(void*)
+unsigned CALLBACK GameMain(void*)
 {
 	//DB_Log(2, "GameMain - DLL");
 	printf("GameMain\n");

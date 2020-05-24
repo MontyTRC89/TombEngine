@@ -1,10 +1,10 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/camera.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "camera.h"
+#include "setup.h"
+#include "level.h"
+#include "lara.h"
 
 void LaraTyrannosaurDeath(ITEM_INFO* item)
 {

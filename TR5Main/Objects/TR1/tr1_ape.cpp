@@ -1,9 +1,9 @@
-#include "../newobjects.h"
-#include "../../Game/box.h"
-#include "../../Game/effects.h"
-#include "../../specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "../specific/setup.h"
+#include "level.h"
+#include "lara.h"
 
 BITE_INFO apeBite = { 0, -19, 75, 15 };
 

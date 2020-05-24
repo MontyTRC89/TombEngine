@@ -1,26 +1,85 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/Box.h"
-#include "../../Game/people.h"
-#include "../../Game/effects.h"
-#include "../../Game/sphere.h"
-#include "../../Game/debris.h"
-#include "../../Game/effect2.h"
-#include "../../Game/lot.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
-#include "../../Specific/setup.h"
-#include "../../Game/tomb4fx.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "box.h"
+#include "people.h"
+#include "effects.h"
+#include "sphere.h"
+#include "debris.h"
+#include "effect2.h"
+#include "lot.h"
+#include "lara.h"
+#include "sound.h"
+#include "setup.h"
+#include "tomb4fx.h"
+#include "level.h"
 
 BITE_INFO skeletonBite = { 0, -16, 200, 11 };
 
-void InitialiseSkeleton(short itemNum)
+static void WakeUpSkeleton(ITEM_INFO* item)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	short fxNum = CreateNewEffect(item->roomNumber);
+	if (fxNum != NO_ITEM)
+	{
+		FX_INFO* fx = &Effects[fxNum];
+
+		short roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+
+		fx->pos.xPos = (byte)GetRandomControl() + item->pos.xPos - 128;
+		fx->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		fx->pos.zPos = (byte)GetRandomControl() + item->pos.zPos - 128;
+		fx->roomNumber = item->roomNumber;
+		fx->pos.yRot = 2 * GetRandomControl();
+		fx->speed = GetRandomControl() >> 11;
+		fx->fallspeed = -(GetRandomControl() >> 10);
+		fx->frameNumber = Objects[103].meshIndex;
+		fx->objectNumber = ID_BODY_PART;
+		fx->shade = 0x4210;
+		fx->flag2 = 0x601;
+
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+		spark->on = 1;
+		spark->sR = 0;
+		spark->sG = 0;
+		spark->sB = 0;
+		spark->dR = 100;
+		spark->dG = 60;
+		spark->dB = 30;
+		spark->fadeToBlack = 8;
+		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
+		spark->x = fx->pos.xPos;
+		spark->y = fx->pos.yPos;
+		spark->z = fx->pos.zPos;
+		spark->xVel = phd_sin(fx->pos.yRot) >> 2;
+		spark->yVel = 0;
+		spark->zVel = phd_cos(fx->pos.yRot) >> 2;
+		spark->transType = 2;
+		spark->friction = 68;
+		spark->flags = 26;
+		spark->rotAng = GetRandomControl() & 0xFFF;
+		if (GetRandomControl() & 1)
+		{
+			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
+		}
+		else
+		{
+			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+		}
+		spark->gravity = -4 - (GetRandomControl() & 3);
+		spark->scalar = 3;
+		spark->maxYvel = -4 - (GetRandomControl() & 3);
+		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 8;
+		spark->dSize = spark->size * 4;
+	}
+}
+
+void InitialiseSkeleton(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
 	ObjectInfo* obj = &Objects[ID_SKELETON];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	switch (item->triggerFlags)
 	{
@@ -56,12 +115,12 @@ void InitialiseSkeleton(short itemNum)
 	}
 }
 
-void SkeletonControl(short itemNum)
+void SkeletonControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
 	bool someFlag1 = false;
@@ -654,9 +713,9 @@ void SkeletonControl(short itemNum)
 			{
 				if (item->active)
 				{
-					ExplodingDeath(itemNum, -1, 929);
-					KillItem(itemNum);
-					DisableBaddieAI(itemNum);
+					ExplodingDeath(itemNumber, -1, 929);
+					KillItem(itemNumber);
+					DisableBaddieAI(itemNumber);
 					//Savegame.Kills++;
 				}
 			}
@@ -719,65 +778,6 @@ void SkeletonControl(short itemNum)
 			break;
 		}
 
-		CreatureAnimation(itemNum, angle, 0);
-	}
-}
-
-void WakeUpSkeleton(ITEM_INFO* item)
-{
-	short fxNum = CreateNewEffect(item->roomNumber);
-	if (fxNum != NO_ITEM)
-	{
-		FX_INFO* fx = &Effects[fxNum];
-
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		
-		fx->pos.xPos = (byte)GetRandomControl() + item->pos.xPos - 128;
-		fx->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		fx->pos.zPos = (byte)GetRandomControl() + item->pos.zPos - 128;
-		fx->roomNumber = item->roomNumber;
-		fx->pos.yRot = 2 * GetRandomControl();
-		fx->speed = GetRandomControl() >> 11;
-		fx->fallspeed = -(GetRandomControl() >> 10);
-		fx->frameNumber = Objects[103].meshIndex;
-		fx->objectNumber = ID_BODY_PART;
-		fx->shade = 0x4210;
-		fx->flag2 = 0x601;
-
-		SPARKS* spark = &Sparks[GetFreeSpark()];
-		spark->on = 1;
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dR = 100;
-		spark->dG = 60;
-		spark->dB = 30;
-		spark->fadeToBlack = 8;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
-		spark->x = fx->pos.xPos;
-		spark->y = fx->pos.yPos;
-		spark->z = fx->pos.zPos;
-		spark->xVel = phd_sin(fx->pos.yRot) >> 2;  
-		spark->yVel = 0;
-		spark->zVel = phd_cos(fx->pos.yRot) >> 2;
-		spark->transType = 2;
-		spark->friction = 68;
-		spark->flags = 26;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		if (GetRandomControl() & 1)
-		{
-			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-		}
-		else
-		{
-			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-		}
-		spark->gravity = -4 - (GetRandomControl() & 3);
-		spark->scalar = 3;
-		spark->maxYvel = -4 - (GetRandomControl() & 3);
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 8;
-		spark->dSize = spark->size * 4;
+		CreatureAnimation(itemNumber, angle, 0);
 	}
 }

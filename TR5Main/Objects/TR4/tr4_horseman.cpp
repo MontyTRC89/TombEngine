@@ -1,8 +1,8 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Game/effect2.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "effect2.h"
+#include "setup.h"
+#include "level.h"
 
 BITE_INFO horseBite1 = { 0, 0, 0, 0x0D };
 BITE_INFO horseBite2 = { 0, 0, 0, 0x11 };
@@ -11,32 +11,7 @@ BITE_INFO horsemanBite1 = { 0, 0, 0, 0x06 };
 BITE_INFO horsemanBite2 = { 0, 0, 0, 0x0E };
 BITE_INFO horsemanBite3 = { 0, 0, 0, 0x0A };
 
-void InitialiseHorse(short itemNum)
-{
-	ITEM_INFO* item = &Items[itemNum];
-	ObjectInfo* obj = &Objects[ID_HORSE];
-
-	item->animNumber = obj->animIndex + 2;
-	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
-}
-
-void InitialiseHorseman(short itemNum)
-{
-	ITEM_INFO* item = &Items[itemNum];
-	ObjectInfo* obj = &Objects[ID_HORSEMAN];
-
-	ClearItem(itemNum);
-
-	item->animNumber = obj->animIndex + 8;
-	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->goalAnimState = 9;
-	item->currentAnimState = 9;
-	item->itemFlags[0] = NO_ITEM; // No horse yet
-}
-
-void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
+static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
@@ -111,13 +86,39 @@ void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 	}
 }
 
-void HorsemanControl(short itemNum)
+void InitialiseHorse(short itemNumber)
 {
+	ITEM_INFO* item = &Items[itemNumber];
+	ObjectInfo* obj = &Objects[ID_HORSE];
+
+	item->animNumber = obj->animIndex + 2;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->goalAnimState = 1;
+	item->currentAnimState = 1;
+}
+
+void InitialiseHorseman(short itemNumber)
+{
+	ITEM_INFO* item = &Items[itemNumber];
+	ObjectInfo* obj = &Objects[ID_HORSEMAN];
+
+	ClearItem(itemNumber);
+
+	item->animNumber = obj->animIndex + 8;
+	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->goalAnimState = 9;
+	item->currentAnimState = 9;
+	item->itemFlags[0] = NO_ITEM; // No horse yet
+}
+
+void HorsemanControl(short itemNumber)
+{
+	printf("[Horseman] Not Implemented !");
 #ifdef OLD_CODE
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	// Try to find the horse
@@ -230,7 +231,7 @@ void HorsemanControl(short itemNum)
 				AnimateItem(horseItem);
 			END:
 				Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
-				CreatureAnimation(itemNum, angle, 0);
+				CreatureAnimation(itemNumber, angle, 0);
 				return;
 			}
 		}
@@ -275,7 +276,7 @@ void HorsemanControl(short itemNum)
 		if (!horseItem || !item->itemFlags[1])
 		{
 			Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
-			CreatureAnimation(itemNum, angle, 0);
+			CreatureAnimation(itemNumber, angle, 0);
 			return;
 		}
 
@@ -310,7 +311,7 @@ void HorsemanControl(short itemNum)
 		AnimateItem(horseItem);
 
 		Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
-		CreatureAnimation(itemNum, angle, 0);
+		CreatureAnimation(itemNumber, angle, 0);
 
 		if (item->currentAnimState != 15)
 		{

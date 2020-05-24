@@ -1,6 +1,6 @@
 #pragma once
 #include <d3d11.h>
-#include "..\Global\global.h"
+#include "global.h"
 
 #define MAX_NODE 23
 #define RIPPLE_FLAG_BLOOD 0x80

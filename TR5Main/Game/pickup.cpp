@@ -17,14 +17,14 @@
 #include "lara1gun.h"
 #include "lara2gun.h"
 #include "flmtorch.h"
-#include "../Specific/setup.h"
+#include "setup.h"
 #include "camera.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 #include "savegame.h"
 
-#include "..\Global\global.h"
+#include "global.h"
 
 static short PickUpBounds[12] = // offset 0xA1338
 {

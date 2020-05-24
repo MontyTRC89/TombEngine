@@ -1,10 +1,10 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effects.h"
-#include "../../Game/items.h"
-#include "../../Game/lara.h"
-#include "../../specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effects.h"
+#include "items.h"
+#include "lara.h"
+#include "../specific/setup.h"
+#include "level.h"
 
 BITE_INFO cobraBite = { 0, 0, 0, 13 };
 

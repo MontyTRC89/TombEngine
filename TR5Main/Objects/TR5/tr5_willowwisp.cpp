@@ -1,7 +1,7 @@
-#include "../newobjects.h"
-#include "../../Game/items.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
+#include "newobjects.h"
+#include "items.h"
+#include "setup.h"
+#include "level.h"
 
 void InitialiseLightingGuide(short itemNum)
 {

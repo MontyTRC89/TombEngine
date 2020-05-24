@@ -1,13 +1,13 @@
-#include "../newobjects.h"
-#include "../../Game/Box.h"
-#include "../../Game/effect2.h"
-#include "../../Game/items.h"
-#include "../../Game/camera.h"
-#include "../../Specific/setup.h"
-#include "../../Game/tomb4fx.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
-#include "../../Game/sound.h"
+#include "newobjects.h"
+#include "box.h"
+#include "effect2.h"
+#include "items.h"
+#include "camera.h"
+#include "setup.h"
+#include "tomb4fx.h"
+#include "level.h"
+#include "lara.h"
+#include "sound.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,

@@ -1,5 +1,5 @@
 #include "box.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "items.h"
 #include "tomb4fx.h"
 #include "lot.h"
@@ -11,8 +11,8 @@
 #include "misc.h"
 #include "camera.h"
 #include "control.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "setup.h"
+#include "level.h"
 
 int NumberBoxes;
 BOX_INFO* Boxes;
