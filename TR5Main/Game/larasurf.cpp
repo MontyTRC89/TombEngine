@@ -344,6 +344,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		return 0;
 
 	int frontFloor = coll->frontFloor + 700;
+	int frontCeiling = coll->frontCeiling + 700;
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
@@ -401,27 +402,54 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 1124;
 	}
 
-	if (frontFloor >= -128)
+
+	if (frontFloor <= -256)
 	{
-		if (frontFloor >= 128)
+		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
 		{
-			item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
+			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK;
 			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+		}
+		else
+		{
+			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = STATE_LARA_STOP;
+		}
+	}
+	else if (frontFloor > 128)
+	{
+		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
+		{
+			item->animNumber = ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+		}
+		else
+			item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+	}
+
+	else
+	{
+		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
+		{
+			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
 		}
 		else
 		{
 			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW;
 			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = STATE_LARA_STOP;
 		}
-	}
-	else
-	{
-		item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		
+
 	}
 	
 	item->currentAnimState = STATE_LARA_ONWATER_EXIT;
-	item->goalAnimState = STATE_LARA_STOP;
 	item->pos.yRot = rot;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;

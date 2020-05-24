@@ -221,10 +221,8 @@ void Renderer11::drawSparks()
 {
 	PHD_VECTOR nodePos;
 
-	for (int i = 0; i < 16; i++)
-	{
+	for (int i = 0; i < MAX_NODE; i++)
 		NodeOffsets[i].gotIt = false;
-	}
 
 	for (int i = 0; i < MAX_SPARKS; i++)
 	{
@@ -261,7 +259,7 @@ void Renderer11::drawSparks()
 				{
 					ITEM_INFO* item = &Items[spark->fxObj];
 
-					if (spark->flags & SP_NODEATTATCH)
+					if (spark->flags & SP_NODEATTACH)
 					{
 						if (NodeOffsets[spark->nodeNumber].gotIt)
 						{
@@ -282,7 +280,7 @@ void Renderer11::drawSparks()
 								GetLaraJointPosition(&nodePos, -meshNum);
 
 							NodeOffsets[spark->nodeNumber].gotIt = true;
-							
+
 							NodeVectors[spark->nodeNumber].x = nodePos.x;
 							NodeVectors[spark->nodeNumber].y = nodePos.y;
 							NodeVectors[spark->nodeNumber].z = nodePos.z;

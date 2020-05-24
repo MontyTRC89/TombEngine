@@ -891,7 +891,7 @@ void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->xVel = (byte)GetRandomControl() - 128;
 	spark->friction = 4;
 	spark->zVel = (byte)GetRandomControl() - 128;
-	spark->flags = SP_NODEATTATCH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE; // 4762;
+	spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE; // 4762;
 	spark->fxObj = itemNum;
 	spark->nodeNumber = 6;
 	spark->rotAng = GetRandomControl() & 0xFFF;

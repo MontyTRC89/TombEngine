@@ -12,9 +12,9 @@ using namespace std;
 class ChunkReader
 {
 private:
-	bool				m_isValid;
-	ChunkId*			m_emptyChunk;
-	BaseStream*			m_stream;
+	bool m_isValid;
+	ChunkId* m_emptyChunk = nullptr;
+	BaseStream* m_stream = nullptr;
 
 	int readInt32()
 	{

@@ -852,6 +852,15 @@ enum LARA_ANIM
 	ANIMATION_LARA_CROWBAR_USE_ON_WALL2 = 471,                  // Pull object off wall (to use as crowbar) 
 	ANIMATION_LARA_LOOT_CHEST = 472,                            // Kneel to open box and pick up item (VCI-levels) 
 	ANIMATION_LARA_LADDER_TO_CROUCH = 473,                      // Climb wall > pull up in crawlspace 
+	ANIMATION_LARA_1CLICK_CRAWL_VAULT = 474,					// 1 click crawlspace vault
+	ANIMATION_LARA_2CLICK_CRAWL_VAULT = 475,					// 2 click crawlspace vault
+	ANIMATION_LARA_3CLICK_CRAWL_VAULT = 476,					// 3 click crawlspace vault
+	ANIMATION_LARA_1CLICK_CRAWL_EXIT = 477,						// 1 click crawlspace exit
+	ANIMATION_LARA_2CLICK_CRAWL_EXIT = 478,						// 2 click crawlspace exit
+	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL = 479,					// maneuver up 1 click in crawlspace
+	ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK = 480,			// climb out of water to 2click crawlspace
+	ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK = 481,			// climb out of onwater to 2click crawlspace
+	ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL = 482,				// wade out of water to submerged crawlspace
 
 	NUM_LARA_ANIMS
 };
