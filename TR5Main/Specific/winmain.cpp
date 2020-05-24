@@ -202,8 +202,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	// Process the command line
 	bool setup = false;
 
-	TrLevel* level = new TrLevel(string("Data\\andrea1.t5m"));
-	level->Load();
+	//TrLevel* level = new TrLevel(string("Data\\andrea1.t5m"));
+	//level->Load();
 	
 	LPWSTR* argv;
 	int argc;
