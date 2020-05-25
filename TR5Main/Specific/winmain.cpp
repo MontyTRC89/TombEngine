@@ -10,6 +10,17 @@
 #include "gameflow.h"
 #include "savegame.h"
 #include "level.h"
+
+#include "..\Game\draw.h"
+#include "..\Game\sound.h"
+#include "..\Game\inventory.h"
+#include "..\Game\control.h"
+#include "..\Game\gameflow.h"
+#include "..\Game\savegame.h"
+#include "..\Specific\level.h"
+#include "..\Specific\level.h"
+#include "..\Specific\newlevel.h"
+
 #include "configuration.h"
 
 WINAPP App;
