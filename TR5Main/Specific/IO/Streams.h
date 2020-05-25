@@ -1,13 +1,23 @@
 #pragma once
 
-enum SeekOrigin
-{
+#include <istream>
+#include <fstream>
+#include <string>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <d3d11.h>
+#include <SimpleMath.h>
+
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
+using namespace std;
+
+enum SeekOrigin {
 	BEGIN,
 	CURRENT
 };
 
-class BaseStream
-{
+class BaseStream {
 public:
 	virtual bool Read(char* buffer, int length) = 0;
 	virtual bool Write(char* buffer, int length) = 0;
