@@ -1,12 +1,25 @@
 #pragma once
+
+#include <Windows.h>
+#include <stdlib.h>
+#include <memory>
+#include <string>
+
 #include "LEB128.h"
 #include "Streams.h"
+
+using namespace std;
+
+class IHasChunkReader
+{
+
+};
 
 typedef struct ChunkId
 {
 private:
-	byte* m_chunkBytes;
-	int m_length;
+	byte*		m_chunkBytes;
+	int		m_length;
 
 public:
 	ChunkId(char* bytes, int length)
@@ -73,4 +86,3 @@ public:
 		return (strncmp((const char*)m_chunkBytes, (const char*)other->GetBytes(), m_length) == 0);
 	}
 };
-

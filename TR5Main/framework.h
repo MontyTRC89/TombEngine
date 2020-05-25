@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <process.h>
 #include <memory>
+#include <functional>
 #include <io.h>
 #include <fcntl.h>
 #include <vector>
