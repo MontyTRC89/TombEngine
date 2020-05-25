@@ -23,7 +23,11 @@
 #include "level.h"
 #include "oldobjects.h"
 #include "newobjects.h"
+#include "tr1_objects.h"
+#include "tr2_objects.h"
+#include "tr3_objects.h"
 #include "tr4_objects.h"
+#include "tr5_objects.h"
 
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
@@ -812,17 +816,6 @@ void NewObjects()
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_SPEEDBOAT];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBoat;
-		obj->collision = BoatCollision;
-		obj->control = BoatControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 1 * 4] |= ROT_Z;
-	}
 }
 
 void BaddyObjects()
@@ -3425,6 +3418,9 @@ void InitialiseObjects()
 		obj->frameBase += (short)Frames;
 	}
 
+	InitialiseTR1Objects(); // Standard TR1 objects
+	InitialiseTR2Objects(); // Standard TR2 objects
+	InitialiseTR3Objects(); // Standard TR3 objects
 	InitialiseTR4Objects(); // Standard TR4 objects
 	InitialiseTR5Objects(); // Standard TR5 objects
 

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "boat.h"
 #include "lara.h"
 #include "items.h"
 #include "collide.h"
@@ -10,9 +10,20 @@
 #include "input.h"
 #include "sound.h"
 
+typedef struct BOAT_INFO
+{
+	int boat_turn;
+	int left_fallspeed;
+	int right_fallspeed;
+	int water;
+	int pitch;
+	short tilt_angle;
+	short extra_rotation;
+	short prop_rot;
+};
 
-
-enum BOAT_STATE {
+enum BOAT_STATE
+{
 	BOAT_GETON,
 	BOAT_STILL,
 	BOAT_MOVING,
@@ -68,7 +79,7 @@ enum BOAT_STATE {
 
 // TODO: (boat) render problem, water height problem, enter problem.
 
-void GetBoatGetOff(ITEM_INFO* boat)
+static void GetBoatGetOff(ITEM_INFO* boat)
 {
 	/* Wait for last frame of getoff anims before returning to normal Lara control */
 	if ((LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
@@ -111,7 +122,7 @@ void GetBoatGetOff(ITEM_INFO* boat)
 	}
 }
 
-int CanGetOff(int direction)
+static int CanGetOff(int direction)
 {
 	ITEM_INFO* v;
 	FLOOR_INFO* floor;
@@ -146,7 +157,7 @@ int CanGetOff(int direction)
 	return 1;
 }
 
-int BoatCheckGetOn(short itemNum, COLL_INFO* coll)
+static int BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 {
 	/* Returns 0 if no get on, 1 if right get on and 2 if left get on and 3 if jump geton */
 	int geton = 0, dist;
@@ -206,7 +217,7 @@ int BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 	return geton;
 }
 
-int TestWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
+static int TestBoatWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 {
 	/* Get water height at a position offset from the origin.
 		Moves the vector in 'pos' to the required test position too */
@@ -239,7 +250,7 @@ int TestWaterHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 	return height - 5; // make sure boat is above water line else all sorts of weirdness results
 }
 
-void DoBoatCollision(int itemNum)
+static void DoBoatCollision(int itemNum)
 {
 	ITEM_INFO* item, * boat;
 	int item_number, distance, x, z, radius;
@@ -273,7 +284,7 @@ void DoBoatCollision(int itemNum)
 	}
 }
 
-short DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
+static short DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
@@ -388,7 +399,7 @@ short DoBoatShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-int GetBoatCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
+static int GetBoatCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 {
 	int c, s, front, side;
 
@@ -421,7 +432,7 @@ int GetBoatCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	return 0;
 }
 
-int DoBoatDynamics(int height, int fallspeed, int* y)
+static int DoBoatDynamics(int height, int fallspeed, int* y)
 {
 	if (height > * y)
 	{
@@ -449,7 +460,7 @@ int DoBoatDynamics(int height, int fallspeed, int* y)
 	return fallspeed;
 }
 
-int BoatDynamics(short itemNum)
+static int BoatDynamics(short itemNum)
 {
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;
@@ -469,11 +480,11 @@ int BoatDynamics(short itemNum)
 	boat->pos.zRot -= binfo->tilt_angle;
 
 	/* First get positions and heights of boat's corners + centre */
-	hfl_old = TestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl_old);
-	hfr_old = TestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr_old);
-	hbl_old = TestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl_old);
-	hbr_old = TestWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br_old);
-	hf_old = TestWaterHeight(boat, BOAT_TIP, 0, &f_old);
+	hfl_old = TestBoatWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl_old);
+	hfr_old = TestBoatWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr_old);
+	hbl_old = TestBoatWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl_old);
+	hbr_old = TestBoatWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br_old);
+	hf_old = TestBoatWaterHeight(boat, BOAT_TIP, 0, &f_old);
 	old.x = boat->pos.xPos;
 	old.y = boat->pos.yPos;
 	old.z = boat->pos.zPos;
@@ -523,25 +534,25 @@ int BoatDynamics(short itemNum)
 
 	/* Test new positions of points (one at a time) and shift boat accordingly */
 	rot = 0;
-	hbl = TestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl);
+	hbl = TestBoatWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl);
 	if (hbl < bl_old.y - STEP_SIZE / 2)
 		rot = DoBoatShift(boat, &bl, &bl_old);
 
-	hbr = TestWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br);
+	hbr = TestBoatWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br);
 	if (hbr < br_old.y - STEP_SIZE / 2)
 		rot += DoBoatShift(boat, &br, &br_old);
 
-	hfl = TestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
+	hfl = TestBoatWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
 	if (hfl < fl_old.y - STEP_SIZE / 2)
 		rot += DoBoatShift(boat, &fl, &fl_old);
 
-	hfr = TestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
+	hfr = TestBoatWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
 	if (hfr < fr_old.y - STEP_SIZE / 2)
 		rot += DoBoatShift(boat, &fr, &fr_old);
 
 	if (!slip)
 	{
-		hf = TestWaterHeight(boat, BOAT_TIP, 0, &f);
+		hf = TestBoatWaterHeight(boat, BOAT_TIP, 0, &f);
 		if (hf < f_old.y - STEP_SIZE / 2)
 			DoBoatShift(boat, &f, &f_old);
 	}
@@ -597,7 +608,7 @@ int BoatDynamics(short itemNum)
 	return collide;
 }
 
-int BoatUserControl(ITEM_INFO* boat)
+static int BoatUserControl(ITEM_INFO* boat)
 {
 	/* Return whether to straighten up or not */
 	int no_turn = 1, max_speed;
@@ -684,7 +695,7 @@ int BoatUserControl(ITEM_INFO* boat)
 	return no_turn;
 }
 
-void BoatAnimation(ITEM_INFO* boat, int collide)
+static void BoatAnimation(ITEM_INFO* boat, int collide)
 {
 	BOAT_INFO* binfo;
 
@@ -763,7 +774,7 @@ void BoatAnimation(ITEM_INFO* boat, int collide)
 	}
 }
 
-void BoatSplash(ITEM_INFO* item, long fallspeed, long water)
+static void BoatSplash(ITEM_INFO* item, long fallspeed, long water)
 {
 	/*
 	splash_setup.x = item->pos.x_pos;
@@ -886,8 +897,8 @@ void BoatControl(short itemNumber)
 
 	/* Now got final position, so get heights under middle and corners (will only have changed
 		from above if collision occurred, but recalc anyway as hardly big maths) */
-	hfl = TestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
-	hfr = TestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
+	hfl = TestBoatWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
+	hfr = TestBoatWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
 
 	roomNumber = boat->roomNumber;
 	floor = GetFloor(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, &roomNumber);

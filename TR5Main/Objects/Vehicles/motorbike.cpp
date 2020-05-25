@@ -96,6 +96,25 @@ void InitialiseMotorbike(short item_number)
     item->meshBits = 0x3F7;
 }
 
+static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
+{
+    pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+
+    int c = phd_cos(item->pos.yRot);
+    int s = phd_sin(item->pos.yRot);
+
+    pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
+    pos->x = item->pos.xPos + ((dz * s + dx * c) >> W2V_SHIFT);
+
+    short roomNumber = item->roomNumber;
+    FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
+    int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
+    if (pos->y < ceiling || ceiling == NO_HEIGHT)
+        return NO_HEIGHT;
+
+    return GetFloorHeight(floor, pos->x, pos->y, pos->z);
+}
+
 static void DrawMotorbikeLight(ITEM_INFO* item)
 {
     MOTORBIKE_INFO* motorbike;
@@ -639,33 +658,33 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     int hfl = TestMotorbikeHeight(item, 500, -350, &fl);
     if (hfl < fl_old.y - STEP_SIZE)
     {
-        rot1 = abs(4 * DoJeepShift(item, &fl, &fl_old));
+        rot1 = abs(4 * DoMotorbikeShift(item, &fl, &fl_old));
     }
 
     int hbl = TestMotorbikeHeight(item, -500, -350, &bl);
     if (hbl < bl_old.y - STEP_SIZE)
     {
         if (rot1)
-            rot1 += abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot1 += abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
         else
-            rot1 -= abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot1 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
     }
 
     int hmtf = TestMotorbikeHeight(item, 500, 128, &mtf);
     if (hmtf < mtf_old.y - STEP_SIZE)
-        rot2 -= abs(4 * DoJeepShift(item, &bl, &bl_old));
+        rot2 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
 
     int hmtb = TestMotorbikeHeight(item, -500, 0, &mtb);
     if (hmtb < mtb_old.y - STEP_SIZE)
-        DoJeepShift(item, &mtb, &mtb_old);
+        DoMotorbikeShift(item, &mtb, &mtb_old);
 
     int hbr = TestMotorbikeHeight(item, -500, 128, &br);
     if (hbr < br_old.y - STEP_SIZE)
     {
         if (rot2)
-            rot2 -= abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot2 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
         else
-            rot2 += abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot2 += abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
     }
 
     if (rot1)
@@ -675,7 +694,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
     if (height < (item->pos.yPos - STEP_SIZE))
-        DoJeepShift(item, (PHD_VECTOR*)&item->pos, &oldpos);
+        DoMotorbikeShift(item, (PHD_VECTOR*)&item->pos, &oldpos);
 
     if (!motorbike->velocity)
         rot2 = 0;

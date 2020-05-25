@@ -191,7 +191,7 @@ void GuardianControl(short itemNumber)
 				dest.x = 0;
 				dest.y = 0;
 				dest.z = 0;
-				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LJ_LHAND);
+				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LM_LHAND);
 
 				// Calculate distance between guardian and Lara
 				int distance = sqrt(SQUARE(src.x - dest.x) + SQUARE(src.y - dest.y) + SQUARE(src.z - dest.z));
@@ -208,7 +208,7 @@ void GuardianControl(short itemNumber)
 					dest.x = 0;
 					dest.y = 0;
 					dest.z = 0;
-					GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LJ_HIPS);
+					GetJointAbsPosition(LaraItem, (PHD_VECTOR*)&dest, LM_HIPS);
 
 					LaserHeadData.target.x = dest.x;
 					LaserHeadData.target.y = dest.y;
@@ -512,7 +512,7 @@ void GuardianControl(short itemNumber)
 				dest.x = 0;
 				dest.y = 0;
 				dest.z = 0;
-				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)& dest, LJ_LHAND);
+				GetJointAbsPosition(LaraItem, (PHD_VECTOR*)& dest, LM_LHAND);
 
 				if (LOS(&src, &src))
 				{

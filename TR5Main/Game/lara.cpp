@@ -24,6 +24,15 @@
 #include "input.h"
 #include "sound.h"
 
+#include "cannon.h"
+#include "quad.h"
+#include "snowmobile.h"
+#include "jeep.h"
+#include "boat.h"
+#include "upv.h"
+#include "kayak.h"
+#include "minecart.h"
+
 static short LeftClimbTab[4] = // offset 0xA0638
 {
 	0x0200, 0x0400, 0x0800, 0x0100
@@ -382,6 +391,16 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 				if (SkidooControl())
 					return;
 				break;
+
+			//case ID_SPEEDBOAT:
+			//	if (BoatControl())
+			//		return;
+			//	break;
+
+			//case ID_RUBBERBOAT:
+			//	if (RubberBoatControl())
+			//		return;
+			//	break;
 
 			//case ID_UPV:
 			//	if (SubControl())

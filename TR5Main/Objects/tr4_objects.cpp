@@ -22,7 +22,6 @@
 #include "tr4_troops.h"
 #include "tr4_wildboar.h"
 #include "tr4_wraith.h"
-
 /// necessary import
 #include "collide.h"
 #include "setup.h"
@@ -441,13 +440,28 @@ static void InitialiseBaddy()
 		obj->saveFlags = true;
 	}
 
+	obj = &Objects[ID_BABOON_NORMAL];
+	if (obj->loaded)
+	{
 
+	}
+
+	obj = &Objects[ID_BABOON_INV];
+	if (obj->loaded)
+	{
+
+	}
+
+	obj = &Objects[ID_BABOON_SILENT];
+	if (obj->loaded)
+	{
+
+	}
 }
 
 static void InitialiseObject()
 {
 	ObjectInfo* obj;
-	
 
 }
 

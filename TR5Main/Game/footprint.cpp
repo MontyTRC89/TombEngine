@@ -8,7 +8,7 @@
 
 std::deque<FOOTPRINT_STRUCT> footprints = deque<FOOTPRINT_STRUCT>();
 
-bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPosition){
+bool CheckFootOnFloor(ITEM_INFO& const item, int joint, PHD_3DPOS& outFootprintPosition){
 	int x = item.pos.xPos;
 	int y = item.pos.yPos;
 	int z = item.pos.zPos;
@@ -22,12 +22,12 @@ bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPo
 	PHD_VECTOR pos;
 	pos.x = pos.z = 0;
 	pos.y = FOOT_HEIGHT_OFFSET;
-	GetLaraJointPosition(&pos, mesh);
+	GetLaraJointPosition(&pos, joint);
 	outFootprintPosition.xPos = pos.x;
 	outFootprintPosition.zPos = pos.z;
 	outFootprintPosition.yPos = height-1;
 	outFootprintPosition.yRot = item.pos.yRot;
-	return	abs(pos.y - height) < 32;
+	return abs(pos.y - height) < 32;
 }
 
 void updateFootprints()

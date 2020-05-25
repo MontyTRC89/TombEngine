@@ -21,4 +21,4 @@ int Sync();
 bool TIME_Init();
 bool TIME_Reset();
 void DrawAnimatingItem(ITEM_INFO* item);
-void GetLaraJointPosition(PHD_VECTOR* pos, int joint);
+void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum);

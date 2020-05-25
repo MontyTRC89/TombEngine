@@ -13,5 +13,5 @@ typedef struct footprint_t {
 } FOOTPRINT_STRUCT;
 
 constexpr int FOOT_HEIGHT_OFFSET = 64;
-bool CheckFootOnFloor(ITEM_INFO& const item, int mesh, PHD_3DPOS& outFootprintPosition);
+bool CheckFootOnFloor(ITEM_INFO& const item, int joint, PHD_3DPOS& outFootprintPosition);
 void updateFootprints();

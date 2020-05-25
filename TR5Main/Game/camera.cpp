@@ -1096,7 +1096,7 @@ void LookCamera(ITEM_INFO* item)
 	c = GetCeiling(floor, x, y, z);
 	if ((Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
 		Camera.pos.y = Rooms[roomNumber].y - 256;
-	else	if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
+	else if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
 		mgLOS(&Camera.target, &Camera.pos, 0);
 
 	x = Camera.pos.x;
@@ -1491,7 +1491,7 @@ void ConfirmCameraTargetPos()
 	pos.y = 0;
 	pos.z = 0;
 
-	GetLaraJointPosition(&pos, LM_LHAND);
+	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
 	{

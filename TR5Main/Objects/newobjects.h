@@ -17,25 +17,7 @@ typedef struct QUAD_INFO {
 	char flags;
 };
 
-typedef struct JEEP_INFO {
-	short rot1;
-	short rot2;
-	short rot3;
-	short rot4;
-	int velocity;
-	int revs;
-	short engineRevs;
-	short trackMesh;
-	int jeepTurn;
-	int fallSpeed;
-	short momentumAngle;
-	short extraRotation;
-	short unknown0;
-	int pitch;
-	short flags;
-	short unknown1;
-	short unknown2;
-};
+
 
 struct MOTORBIKE_INFO
 {
@@ -99,17 +81,7 @@ typedef struct FISH_LEADER_INFO
 	short	xRange, yRange, zRange;
 };
 
-typedef struct BOAT_INFO
-{
-	int boat_turn;
-	int left_fallspeed;
-	int right_fallspeed;
-	int water;
-	int pitch;
-	short tilt_angle;
-	short extra_rotation;
-	short prop_rot;
-};
+
 
 typedef struct SKIDOO_INFO
 {
@@ -323,72 +295,3 @@ void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel);
 void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel);
 void BubblesEffect3(short fxNum, short xVel, short yVel, short zVel);
 void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel);
-
-/* Vehicles: */
-
-// TODO: the boat is bugged, need to be fixed !
-void InitialiseBoat(short itemNum);
-void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll);
-void BoatControl(short itemNumber);
-
-void InitialiseSkidoo(short itemNum);
-void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll);
-int SkidooControl();
-void DrawSkidoo(ITEM_INFO* item);
-void DoSnowEffect(ITEM_INFO* skidoo);
-
-void QuadbikeExplode(ITEM_INFO* item);
-int CanQuadbikeGetOff(int direction);
-int QuadCheckGetOff();
-int GetOnQuadBike(short itemNumber, COLL_INFO* coll);
-void QuadBaddieCollision(ITEM_INFO* quad);
-int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
-int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos);
-int DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old);
-int DoQuadDynamics(int height, int fallspeed, int* y);
-int QuadDynamics(ITEM_INFO* item);
-void AnimateQuadBike(ITEM_INFO* item, int collide, int dead);
-int QuadUserControl(ITEM_INFO* item, int height, int* pitch);
-void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);
-void InitialiseQuadBike(short itemNumber);
-void QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
-int QuadBikeControl();
-
-// TODO: the kayak is bugged, need to be fixed !
-void InitialiseKayak(short item_number);
-void DrawKayak(ITEM_INFO* kayak);
-void KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll);
-int KayakControl();
-
-/// Underwater Propeller
-void SubInitialise(short itemNum);
-void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-int SubControl();
-
-void InitialiseMineCart(short itemNum); // minecart not tested !
-void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-int MineCartControl();
-
-int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos);
-int DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old);
-int DoJeepDynamics(int height, int speed, int* y, int flags);
-int JeepCanGetOff();
-void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short speed, int moving);
-int JeepCheckGetOff();
-int GetOnJeep(int itemNumber);
-int GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p);
-void JeepBaddieCollision(ITEM_INFO* jeep);
-void JeepExplode(ITEM_INFO* item);
-int JeepDynamics(ITEM_INFO* item);
-int JeepUserControl(ITEM_INFO* item, int height, int* pitch);
-void AnimateJeep(ITEM_INFO* item, int collide, int dead);
-void InitialiseJeep(short itemNum);
-int JeepControl();
-void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
-
-void InitialiseMotorbike(short item_number);
-void MotorbikeCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* coll);
-int MotorbikeControl(void);
-void DrawMotorbike(ITEM_INFO* item);
-void DrawMotorbikeEffect(ITEM_INFO* item);
-void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* laraitem);
