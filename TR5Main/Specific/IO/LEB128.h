@@ -1,9 +1,4 @@
 #pragma once
-
-#include <stdlib.h>
-#include <stdint.h>
-#include <windows.h>
-
 #include "Streams.h"
 
 extern char* LevelDataPtr;

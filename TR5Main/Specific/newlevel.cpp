@@ -1,6 +1,10 @@
+#include "framework.h"
 #include "newlevel.h"
-#include "../Specific/IO/ChunkId.h"
-#include "../Specific/IO/ChunkReader.h"
+#include "LEB128.h"
+#include "Streams.h"
+#include "ChunkId.h"
+#include "ChunkReader.h"
+#include "ChunkWriter.h"
 
 TrLevel::TrLevel(string filename)
 {
