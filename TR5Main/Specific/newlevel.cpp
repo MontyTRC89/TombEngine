@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "newlevel.h"
 #include "../Specific/IO/ChunkId.h"
 #include "../Specific/IO/ChunkReader.h"
