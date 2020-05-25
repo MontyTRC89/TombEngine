@@ -256,7 +256,6 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
-    <ClInclude Include="Specific\newlevel.h" />
     <ClInclude Include="Specific\setup.h" />
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
