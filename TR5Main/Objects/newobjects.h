@@ -1,64 +1,7 @@
 #pragma once
 #include "global.h"
 
-typedef struct QUAD_INFO {
-	int velocity;
-	short frontRot;
-	short rearRot;
-	int revs;
-	int engineRevs;
-	short trackMesh;
-	int skidooTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	short momentumAngle;
-	short extraRotation;
-	int pitch;
-	char flags;
-};
-
-
-
-struct MOTORBIKE_INFO
-{
-	int wheelRight;  // (two wheel: front and back)
-	int wheelLeft;   // (one wheel: left)
-	int velocity;
-	int revs;
-	int engineRevs;
-	short momentumAngle;
-	short extraRotation;
-	short wallShiftRotation;
-	int bikeTurn;
-	int pitch;
-	short flags;
-	short lightPower;
-};
-
-typedef struct SUB_INFO {
-	int Vel;
-	int Rot;
-	int RotX;
-	short FanRot;
-	char Flags;
-	char WeaponTimer;
-};
-
-typedef struct CART_INFO {
-	int Speed;
-	int MidPos;
-	int FrontPos;
-	int TurnX;
-	int TurnZ;
-	short TurnLen;
-	short TurnRot;
-	short YVel;
-	short Gradient;
-	char Flags;
-	char StopDelay;
-};
-
-typedef struct FISH_INFO
+struct FISH_INFO
 {
 	short x;
 	short y;
@@ -71,45 +14,17 @@ typedef struct FISH_INFO
 	byte swim;
 };
 
-typedef struct FISH_LEADER_INFO
+struct FISH_LEADER_INFO
 {
-	short	angle;
+	short angle;
 	byte speed;
 	byte on;
-	short	angleTime;
-	short	speedTime;
-	short	xRange, yRange, zRange;
+	short angleTime;
+	short speedTime;
+	short xRange, yRange, zRange;
 };
 
-
-
-typedef struct SKIDOO_INFO
-{
-	short track_mesh;
-	int skidoo_turn;
-	int left_fallspeed, right_fallspeed;
-	short momentum_angle, extra_rotation;
-	int pitch;
-	bool already_cd_played;
-	bool armed;
-	int flash_timer;
-};
-
-typedef struct KAYAK_INFO {
-	int Vel;
-	int Rot;
-	int FallSpeedF;
-	int FallSpeedL;
-	int FallSpeedR;
-	int Water;
-	PHD_3DPOS OldPos;
-	char Turn;
-	char Forward;
-	char TrueWater;
-	char Flags;
-};
-
-typedef struct BOSS_STRUCT
+struct BOSS_STRUCT
 {
 	PHD_VECTOR BeamTarget;
 	bool DroppedIcon;
@@ -128,7 +43,7 @@ typedef struct BOSS_STRUCT
 	short HpCounter;
 };
 
-typedef struct SHIELD_POINTS
+struct SHIELD_POINTS
 {
 	short x;
 	short y;
@@ -140,14 +55,14 @@ typedef struct SHIELD_POINTS
 	long rgb;
 };
 
-typedef struct EXPLOSION_VERTS
+struct EXPLOSION_VERTS
 {
 	short x;
 	short z;
 	long rgb;
 };
 
-typedef struct EXPLOSION_RING
+struct EXPLOSION_RING
 {
 	short on;
 	short life;   // 0 - 32.

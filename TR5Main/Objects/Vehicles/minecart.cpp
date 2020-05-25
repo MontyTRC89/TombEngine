@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "minecart.h"
 #include "lara.h"
 #include "collide.h"
 #include "effect.h"
@@ -13,8 +13,6 @@
 #include "setup.h"
 #include "input.h"
 #include "sound.h"
-
-
 
 typedef enum MINECART_STATE {
 	CART_GETIN,
@@ -68,9 +66,7 @@ typedef enum MINECART_FLAGS
 #define CART_NHITS 25
 #define CART_BADDIE_RADIUS STEP_SIZE
 
-
-
-static int TestHeight(ITEM_INFO* v, int x, int z)
+static int TestMinecartHeight(ITEM_INFO* v, int x, int z)
 {
 	PHD_VECTOR pos;
 	FLOOR_INFO* floor;
@@ -436,11 +432,11 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	}
 
 	// tilt cart on slopes
-	cart->MidPos = TestHeight(v, 0, 0);
+	cart->MidPos = TestMinecartHeight(v, 0, 0);
 
 	if (!cart->YVel)
 	{
-		cart->FrontPos = TestHeight(v, 0, 256);
+		cart->FrontPos = TestMinecartHeight(v, 0, 256);
 		cart->Gradient = cart->MidPos - cart->FrontPos;
 		v->pos.yPos = cart->MidPos;
 	}
@@ -873,7 +869,7 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-int MineCartControl()
+int MineCartControl(void)
 {
 	CART_INFO* cart;
 	ITEM_INFO* v;

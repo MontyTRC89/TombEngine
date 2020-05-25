@@ -294,9 +294,6 @@
     <ClInclude Include="Specific\level.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\tr4_objects.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\box.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -412,6 +409,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\Vehicles\cannon.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\tr4_objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -851,9 +851,6 @@
     <ClCompile Include="Specific\level.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\tr4_objects.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_ahmet.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -945,6 +942,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Vehicles\cannon.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\tr4_objects.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,13 +10,12 @@
 #include "setup.h"
 #include "level.h"
 #include "sound.h"
-
-
+#include "snowmobile.h"
 
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
 
-#define SMAN_MIN_TURN (ANGLE(6)/3)
-#define SMAN_TARGET_ANGLE ANGLE(15)
+#define SMAN_MIN_TURN (ANGLE(6.0f)/3)
+#define SMAN_TARGET_ANGLE ANGLE(15.0f)
 #define SMAN_WAIT_RANGE SQUARE(WALL_SIZE*4)
 #define SMAN_DEATH_ANIM 10
 

@@ -29,6 +29,13 @@
 #include "tr4_objects.h"
 #include "tr5_objects.h"
 
+#include "quad.h"
+#include "snowmobile.h"
+#include "upv.h"
+#include "cannon.h"
+#include "minecart.h"
+#include "kayak.h"
+
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
 extern byte Sequences[3];
@@ -707,28 +714,6 @@ void NewObjects()
 		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 0 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_JEEP];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseJeep;
-		obj->collision = JeepCollision;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_MOTORBIKE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseMotorbike;
-		obj->collision = MotorbikeCollision;
-		//obj->drawRoutine = DrawMotorbike; // for wheel rotation
-		obj->drawRoutineExtra = DrawMotorbikeEffect;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 	
 	obj = &Objects[ID_MP_WITH_GUN];
@@ -3240,7 +3225,7 @@ void CustomObjects()
 	if (obj->loaded)
 	{
 		obj->collision = SkidManCollision;
-		obj->drawRoutine = DrawSkidoo;
+		//obj->drawRoutine = DrawSkidoo; // TODO: recreate renderer for skidoo
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
 		obj->pivotLength = 0;

@@ -22,6 +22,14 @@
 #include "tr4_troops.h"
 #include "tr4_wildboar.h"
 #include "tr4_wraith.h"
+/// objects
+
+/// traps
+
+/// vehicles
+#include "motorbike.h"
+#include "jeep.h"
+
 /// necessary import
 #include "collide.h"
 #include "setup.h"
@@ -471,9 +479,36 @@ static void InitialiseTrap()
 	
 }
 
+static void InitialiseVehicles()
+{
+	ObjectInfo* obj;
+	obj = &Objects[ID_JEEP];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseJeep;
+		obj->collision = JeepCollision;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_MOTORBIKE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMotorbike;
+		obj->collision = MotorbikeCollision;
+		//obj->drawRoutine = DrawMotorbike; // for wheel rotation
+		obj->drawRoutineExtra = DrawMotorbikeEffect;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+}
+
 void InitialiseTR4Objects()
 {
     InitialiseBaddy();
     InitialiseObject();
     InitialiseTrap();
+	InitialiseVehicles();
 }

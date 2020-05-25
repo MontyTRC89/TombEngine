@@ -15,6 +15,7 @@
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
+#include "quad.h"
 
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;

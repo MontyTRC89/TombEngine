@@ -14,12 +14,12 @@
 #include "setup.h"
 #include "input.h"
 #include "sound.h"
+#include "snowmobile.h"
 
 short FireBounds[12] =
 {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
-
 
 void TriggerTorchFlame(char fxObj, char node)
 {

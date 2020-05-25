@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr2_objects.h"
+#include "snowmobile.h"
 #include "lara.h"
 #include "items.h"
 #include "collide.h"
@@ -301,7 +301,7 @@ static int SkidooCheckGetOff()
 	return 1;
 }
 
-static void DoSnowEffect(ITEM_INFO* skidoo)
+void DoSnowEffect(ITEM_INFO* skidoo)
 {
 	/*
 	int c, s, x, random;

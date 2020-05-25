@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "quad.h"
 #include "lara.h"
 #include "effect2.h"
 #include "items.h"
@@ -9,7 +9,6 @@
 #include "tomb4fx.h"
 #include "effect.h"
 #include "laraflar.h"
-#include <vector>
 #include "lara1gun.h"
 #include "misc.h"
 #include "setup.h"
@@ -107,22 +106,22 @@ typedef enum QUAD_ANIM_STATES {
 #define QUAD_MIN_BOUNCE ((MAX_VELOCITY/2)>>8)
 
 #define QUADBIKE_TURNL_A		3
-#define QUADBIKE_TURNL_F		GF2(ID_QUADBIKE, QUADBIKE_TURNL_A, 0)
+#define QUADBIKE_TURNL_F		GF2(ID_QUAD, QUADBIKE_TURNL_A, 0)
 #define QUADBIKE_TURNR_A		20
-#define QUADBIKE_TURNR_F		GF2(ID_QUADBIKE, QUADBIKE_TURNR_A, 0)
+#define QUADBIKE_TURNR_F		GF2(ID_QUAD, QUADBIKE_TURNR_A, 0)
 
 #define QUADBIKE_FALLSTART_A	6
-#define QUADBIKE_FALLSTART_F	GF2(ID_QUADBIKE, QUADBIKE_FALLSTART_A, 0)
+#define QUADBIKE_FALLSTART_F	GF2(ID_QUAD, QUADBIKE_FALLSTART_A, 0)
 #define QUADBIKE_FALL_A		7
-#define QUADBIKE_FALL_F		GF2(ID_QUADBIKE, QUADBIKE_FALL_A, 0)
+#define QUADBIKE_FALL_F		GF2(ID_QUAD, QUADBIKE_FALL_A, 0)
 #define QUADBIKE_GETONR_A	9
-#define QUADBIKE_GETONR_F	GF2(ID_QUADBIKE, QUADBIKE_GETONR_A, 0)
+#define QUADBIKE_GETONR_F	GF2(ID_QUAD, QUADBIKE_GETONR_A, 0)
 #define Q_HITB_A			11
 #define Q_HITF_A			12
 #define Q_HITL_A			14
 #define Q_HITR_A			13
 #define QUADBIKE_GETONL_A	23
-#define QUADBIKE_GETONL_F	GF2(ID_QUADBIKE, QUADBIKE_GETONL_A, 0)
+#define QUADBIKE_GETONL_F	GF2(ID_QUAD, QUADBIKE_GETONL_A, 0)
 #define QUADBIKE_FALLSTART2_A	25
 
 BITE_INFO quadEffectsPositions[6] = { 
@@ -139,9 +138,7 @@ bool QuadCanHandbrakeStart;
 int QuadSmokeStart;
 bool QuadNoGetOff;
 
-
-
-void QuadbikeExplode(ITEM_INFO* item)
+static void QuadbikeExplode(ITEM_INFO* item)
 {
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -164,7 +161,7 @@ void QuadbikeExplode(ITEM_INFO* item)
 	Lara.Vehicle = NO_ITEM;
 }
 
-int CanQuadbikeGetOff(int direction)
+static int CanQuadbikeGetOff(int direction)
 {
 	short angle;
 
@@ -197,7 +194,7 @@ int CanQuadbikeGetOff(int direction)
 	return true;
 }
 
-int QuadCheckGetOff()
+static int QuadCheckGetOff()
 {
 	ITEM_INFO* item = &Items[Lara.Vehicle];
 
@@ -259,7 +256,7 @@ int QuadCheckGetOff()
 	return true;
 }
 
-int GetOnQuadBike(short itemNumber, COLL_INFO* coll)
+static int GetOnQuadBike(short itemNumber, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -305,7 +302,7 @@ int GetOnQuadBike(short itemNumber, COLL_INFO* coll)
 	return true;
 }
 
-void QuadBaddieCollision(ITEM_INFO* quad)
+static void QuadBaddieCollision(ITEM_INFO* quad)
 {
 	vector<short> roomsList;
 
@@ -353,7 +350,7 @@ void QuadBaddieCollision(ITEM_INFO* quad)
 	}
 }
 
-int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
+static int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 {
 	p->x = item->pos.xPos - p->x;
 	p->z = item->pos.zPos - p->z;
@@ -384,7 +381,7 @@ int GetQuadCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 	return 0;
 }
 
-int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
+static int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
 	pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
 
@@ -403,7 +400,7 @@ int TestQuadHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-int DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
+static int DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x = pos->x >> WALL_SHIFT;
 	int z = pos->z >> WALL_SHIFT;
@@ -503,7 +500,7 @@ int DoQuadShift(ITEM_INFO* quad, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-int DoQuadDynamics(int height, int fallspeed, int *y)
+static int DoQuadDynamics(int height, int fallspeed, int *y)
 {
 	if (height > *y)
 	{
@@ -532,7 +529,7 @@ int DoQuadDynamics(int height, int fallspeed, int *y)
 	return fallspeed;
 }
 
-int QuadDynamics(ITEM_INFO* item)
+static int QuadDynamics(ITEM_INFO* item)
 {
 	/* Does all skidoo movement and collision and returns if collide value */
 	PHD_VECTOR moved, fl, fr, br, bl, mtl, mbl, mtr, mbr, mml, mmr;
@@ -761,7 +758,7 @@ int QuadDynamics(ITEM_INFO* item)
 	return collide;
 }
 
-void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
+static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 {
 	QUAD_INFO* quad = (QUAD_INFO *)item->data;
 
@@ -937,7 +934,7 @@ void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 	}
 }
 
-int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
+static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 {
 	bool drive = false;
 	int revs = 0;
@@ -1205,7 +1202,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		ObjectCollision(itemNumber, l, coll);
 }
 
-void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
+static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -1265,7 +1262,7 @@ void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int mo
 	spark->size = size >> 1;
 }
 
-int QuadBikeControl()
+int QuadBikeControl(void)
 {
 	short xRot, zRot, rotadd;
 	int pitch, dead = 0;
@@ -1437,7 +1434,9 @@ int QuadBikeControl()
 		}
 	}
 	else
+	{
 		QuadSmokeStart = 0;
+	}
 
 	return QuadCheckGetOff();
 }

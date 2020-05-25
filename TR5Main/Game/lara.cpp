@@ -24,6 +24,7 @@
 #include "input.h"
 #include "sound.h"
 
+#include "motorbike.h"
 #include "cannon.h"
 #include "quad.h"
 #include "snowmobile.h"
