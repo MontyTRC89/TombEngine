@@ -1,7 +1,9 @@
 #pragma once
-
+#include <SimpleMath.h>
 struct alignas(16) CCameraMatrixBuffer
 {
-	Matrix ViewProjection;
+	DirectX::SimpleMath::Matrix ViewProjection;
+	unsigned int Frame;
+	int CameraUnderwater;
 };
 
