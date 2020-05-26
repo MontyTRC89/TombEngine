@@ -864,20 +864,21 @@ enum LARA_ANIM
 	ANIMATION_LARA_3CLICK_CRAWL_VAULT = 476,					// 3 click crawlspace vault
 	ANIMATION_LARA_1CLICK_CRAWL_EXIT = 477,						// 1 click crawlspace exit
 	ANIMATION_LARA_2CLICK_CRAWL_EXIT = 478,						// 2 click crawlspace exit
-	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL = 479,					// maneuver up 1 click in crawlspace
-	ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK = 480,			// climb out of water to 2click crawlspace
-	ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK = 481,			// climb out of onwater to 2click crawlspace
-	ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL = 482,				// wade out of water to submerged crawlspace
-	ANIMATION_LARA_HANG_FEET = 483,								// hang with feet supporting her
-	ANIMATION_LARA_HANG_FEET_SHIMMYR = 484,						// shimmy right with feet on wall
-	ANIMATION_LARA_HANG_FEET_SHIMMYL = 485,						// shimmy left with feet on wall
-	ANIMATION_LARA_HANG_FEET_CLIMB = 486,						// feet hang -> climb
-	ANIMATION_LARA_HANG_FEET_IDLE = 487,						// hang feet idle anim for shimmies/climbups 
-	ANIMATION_LARA_HANG_FEET_CLIMB_TO_CROUCH = 488,				// hang feet crouch climb
-	ANIMATION_LARA_HANG_FEET_IN_RCORNER = 489,					// hang feet shimmy around inner right corner
-	ANIMATION_LARA_HANG_FEET_IN_LCORNER = 490,					// hang feet shimmy around inner left corner
-	ANIMATION_LARA_HANG_FEET_OUT_RCORNER = 491,					// hang feet shimmy around outer right corner
-	ANIMATION_LARA_HANG_FEET_OUT_LCORNER = 492,					// hang feet shimmy around outer left corner
+	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL_UP = 479,				// maneuver up 1 click in crawlspace
+	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL_DOWN = 480,			// maneuver down 1 click in crawlspace
+	ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK = 481,			// climb out of water to 2click crawlspace
+	ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK = 482,			// climb out of onwater to 2click crawlspace
+	ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL = 483,				// wade out of water to submerged crawlspace
+	ANIMATION_LARA_HANG_FEET = 484,								// hang with feet supporting her
+	ANIMATION_LARA_HANG_FEET_SHIMMYR = 485,						// shimmy right with feet on wall
+	ANIMATION_LARA_HANG_FEET_SHIMMYL = 486,						// shimmy left with feet on wall
+	ANIMATION_LARA_HANG_FEET_CLIMB = 487,						// feet hang -> climb
+	ANIMATION_LARA_HANG_FEET_IDLE = 488,						// hang feet idle anim for shimmies/climbups 
+	ANIMATION_LARA_HANG_FEET_CLIMB_TO_CROUCH = 489,				// hang feet crouch climb
+	ANIMATION_LARA_HANG_FEET_IN_RCORNER = 490,					// hang feet shimmy around inner right corner
+	ANIMATION_LARA_HANG_FEET_IN_LCORNER = 491,					// hang feet shimmy around inner left corner
+	ANIMATION_LARA_HANG_FEET_OUT_RCORNER = 492,					// hang feet shimmy around outer right corner
+	ANIMATION_LARA_HANG_FEET_OUT_LCORNER = 493,					// hang feet shimmy around outer left corner
 
 	NUM_LARA_ANIMS
 };
