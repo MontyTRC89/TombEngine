@@ -1519,3 +1519,41 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 }
+
+void CalcItemToFloorRotation(ITEM_INFO* item, short rotY, int radiusZ, int radiusX)
+{
+	FLOOR_INFO* floor;
+	float ratioXZ, frontHDif, sideHDif;
+	int frontX, frontZ, leftX, leftZ, rightX, rightZ;
+	int frontHeight, backHeight, leftHeight, rightHeight;
+	int x, y, z;
+	short troomNumber;
+
+	// this part with x, y, z, roomNumber can be GAME_VECTOR struct
+	x = item->pos.xPos;
+	y = item->pos.yPos;
+	z = item->pos.zPos;
+	troomNumber = item->roomNumber;
+
+	ratioXZ = radiusZ / float(radiusX);
+	frontX = (phd_sin(rotY) * radiusZ) >> W2V_SHIFT;
+	frontZ = (phd_cos(rotY) * radiusZ) >> W2V_SHIFT;
+	leftX = -frontZ * int(ratioXZ);
+	leftZ = frontX * int(ratioXZ);
+	rightX = frontZ * int(ratioXZ);
+	rightZ = -frontX * int(ratioXZ);
+
+	floor = GetFloor(x + frontX, y, z + frontZ, &troomNumber);
+	frontHeight = GetFloorHeight(floor, x + frontX, y, z + frontZ);
+	floor = GetFloor(x - frontX, y, z - frontZ, &troomNumber);
+	backHeight = GetFloorHeight(floor, x - frontX, y, z - frontZ);
+	floor = GetFloor(x + leftX, y, z + leftZ, &troomNumber);
+	leftHeight = GetFloorHeight(floor, x + leftX, y, z + leftZ);
+	floor = GetFloor(x + rightX, y, z + rightZ, &troomNumber);
+	rightHeight = GetFloorHeight(floor, x + rightX, y, z + rightZ);
+
+	frontHDif = float(backHeight - frontHeight);
+	sideHDif = float(rightHeight - leftHeight);
+	item->pos.xRot = ANGLE(atan2(frontHDif, 2 * radiusZ) / RADIAN);
+	item->pos.zRot = ANGLE(atan2(sideHDif, 2 * radiusX) / RADIAN);
+}
