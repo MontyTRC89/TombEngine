@@ -34,6 +34,7 @@ cbuffer CShadowLightBuffer : register(b4)
 cbuffer RoomBuffer : register(b5)
 {
 	float4 AmbientColor;
+	int water;
 };
 
 struct VertexShaderInput
@@ -65,8 +66,17 @@ SamplerState ShadowMapSampler : register(s1);
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
-
-	output.Position = mul(float4(input.Position, 1.0f), ViewProjection); 
+	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
+	float2 clipPos = screenPos.xy / screenPos.w;
+	if (cameraUnderwater != water) {
+		static const float PI = 3.14159265f;
+		float factor = (Frame + clipPos.x*320);
+		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024)*5;
+		float yOffset = (cos(factor*PI/20.0f))*(screenPos.z/1024)*5;
+		screenPos.x += xOffset;
+		screenPos.y += yOffset;
+	}
+	output.Position = screenPos;
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
@@ -118,7 +128,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			// If clip space z value greater than shadow map value then pixel is in shadow
 			float shadow = getShadowFactor(ShadowMap, ShadowMapSampler, coords, realDepth);
-			lighting = min(lighting, AmbientColor, saturate(shadow));
+			lighting = lerp(lighting, min(AmbientColor,lighting), saturate(shadow));
 		}
 	}
 

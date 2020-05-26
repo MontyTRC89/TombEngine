@@ -2377,7 +2377,9 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 		m_stRoom.AmbientColor = room->AmbientLight;
+		m_stRoom.water = (room->Room->flags & ENV_FLAG_WATER) != 0 ? 1: 0;
 		updateConstantBuffer(m_cbRoom, &m_stRoom, sizeof(CRoomBuffer));
+		m_context->VSSetConstantBuffers(5, 1, &m_cbRoom);
 		m_context->PSSetConstantBuffers(5, 1, &m_cbRoom);
 		for (int j = firstBucket; j < lastBucket; j++)
 		{

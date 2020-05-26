@@ -462,6 +462,8 @@ void Renderer11::prepareCameraForFrame()
 {
 	// Set camera matrices
 	m_stCameraMatrices.ViewProjection = ViewProjection;
+	m_stCameraMatrices.Frame = GnFrameCounter;
+	m_stCameraMatrices.CameraUnderwater = (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER) != 0 ? 1: 0;
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	frustum.Update(View,Projection);
