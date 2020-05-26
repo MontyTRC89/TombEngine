@@ -15,6 +15,7 @@
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
+bool EnableCrawlFlexWaterPullUp, EnableCrawlFlexSubmerged;
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
@@ -331,6 +332,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	if (coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
 		return 0;
 
+	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
+	EnableCrawlFlexWaterPullUp = true;
+	EnableCrawlFlexSubmerged = true;
+
+
 	if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60 
 		|| Lara.gunStatus 
 		&& (Lara.gunStatus != LG_READY 
@@ -405,7 +411,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 
 	if (frontFloor <= -256)
 	{
-		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
+		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
 		{
 			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK;
 			item->frameNumber = Anims[item->animNumber].frameBase;
@@ -420,7 +426,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	}
 	else if (frontFloor > 128)
 	{
-		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
+		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexSubmerged == true)
 		{
 			item->animNumber = ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL;
 			item->frameNumber = Anims[item->animNumber].frameBase;
@@ -433,7 +439,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 
 	else
 	{
-		if (LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512)
+		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
 		{
 			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK;
 			item->frameNumber = Anims[item->animNumber].frameBase;
