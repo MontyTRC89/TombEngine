@@ -1,27 +1,6 @@
 #pragma once
-
-#include <vector>
-#include <string>
-#include <array>
 #include "Enums.h"
-
-#include <D3D11.h>
-
-#include <SimpleMath.h>
-#include <CommonStates.h>
-#include <DirectXHelpers.h>
-#include <Effects.h>
-#include <GeometricPrimitive.h>
-#include <PostProcess.h>
-#include <PrimitiveBatch.h>
-#include <ScreenGrab.h>
-#include <SpriteBatch.h>
-#include <SpriteFont.h>
-#include <VertexTypes.h>
-#include <WICTextureLoader.h>
-
-#include "..\Global\global.h"
-#include <d3d9types.h>
+#include "global.h"
 #include "StaticBuffer.h"
 #include "LightBuffer.h"
 #include "MiscBuffer.h"
@@ -43,9 +22,6 @@ constexpr int REFERENCE_RES_HEIGHT = 450;
 constexpr float HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
 constexpr float HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
 constexpr float HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
-using namespace DirectX;
-using namespace DirectX::SimpleMath;
-using namespace std;
 
 struct RendererDisplayMode {
 	int Width;

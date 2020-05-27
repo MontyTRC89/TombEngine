@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "objlight.h"
 #include "control.h"
 #include "effect2.h"

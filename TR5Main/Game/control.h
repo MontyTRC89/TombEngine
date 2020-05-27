@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 #define TRIG_BITS(T) ((T & 0x3fff) >> 10)
 
@@ -56,7 +56,7 @@ extern int GlobalPlayingCutscene;
 extern int CurrentLevel;
 extern int SoundActive;
 extern int DoTheGame;
-extern int Unk_876C48;
+extern int ThreadEnded;
 extern int OnFloor;
 extern int SmokeWindX;
 extern int SmokeWindZ;
@@ -122,4 +122,4 @@ int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
 
-unsigned __stdcall GameMain(void*);
+unsigned CALLBACK GameMain(void*);

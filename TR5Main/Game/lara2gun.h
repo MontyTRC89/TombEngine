@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "global.h"
 
 void AnimatePistols(int weaponType);
 void PistolHandler(int weaponType);

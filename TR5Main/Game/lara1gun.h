@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 #define		HARPOON_DRAW_ANIM		1
 #define		ROCKET_DRAW_ANIM		0

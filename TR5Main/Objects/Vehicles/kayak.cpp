@@ -1,18 +1,16 @@
-#include "../newobjects.h"
-#include "../../Game/effects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/draw.h"
-#include "../../Game/camera.h"
-#include "../../Game/lara.h"
-#include "../../Game/collide.h"
-#include "../../Game/laraflar.h"
-#include "../../Game/items.h"
-#include "..\..\Specific\level.h"
-#include "..\..\Specific\level.h"
-#include "../../Specific/setup.h"
-#include "../../Specific/input.h"
-
-
+#include "framework.h"
+#include "kayak.h"
+#include "effect.h"
+#include "effect2.h"
+#include "draw.h"
+#include "camera.h"
+#include "lara.h"
+#include "collide.h"
+#include "laraflar.h"
+#include "items.h"
+#include "level.h"
+#include "setup.h"
+#include "input.h"
 
 #define MAX_SPEED 0x380000
 #define KAYAK_COLLIDE 64
@@ -62,7 +60,7 @@ enum KAYAK_STATE {
 	KS_CLIMBOUTR,
 };
 
-void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
+static void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 {
 	RIPPLE_STRUCT* r;
 	int s, c, x, z;
@@ -84,7 +82,7 @@ void DoKayakRipple(ITEM_INFO* v, short xoff, short zoff)
 	}
 }
 
-void KayakSplash(ITEM_INFO* item, long fallspeed, long water)
+static void KayakSplash(ITEM_INFO* item, long fallspeed, long water)
 {
 	/*
 	SplashSetup.x = item->pos.xPos;
@@ -113,7 +111,7 @@ void KayakSplash(ITEM_INFO* item, long fallspeed, long water)
 	*/
 }
 
-void TriggerRapidsMist(long x, long y, long z)
+static void TriggerRapidsMist(long x, long y, long z)
 {
 	SPARKS* sptr;
 	long xsize;
@@ -159,7 +157,7 @@ void TriggerRapidsMist(long x, long y, long z)
 	sptr->dSize = xsize;
 }
 
-int GetInKayak(short item_number, COLL_INFO* coll)
+static int GetInKayak(short itemNumber, COLL_INFO* coll)
 {
 	int dist;
 	int x, z;
@@ -170,7 +168,7 @@ int GetInKayak(short item_number, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
 		return 0;
 
-	kayak = &Items[item_number];
+	kayak = &Items[itemNumber];
 
 	/* -------- is Lara close enough to use the vehicle */
 
@@ -213,7 +211,7 @@ int GetInKayak(short item_number, COLL_INFO* coll)
 	return 0;
 }
 
-int GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
+static int GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 {
 	xdiff = v->pos.xPos - xdiff;
 	zdiff = v->pos.zPos - zdiff;
@@ -248,7 +246,7 @@ int GetKayakCollisionAnim(ITEM_INFO* v, int xdiff, int zdiff)
 	return 0;
 }
 
-int DoKayakDynamics(int height, int fallspeed, int* y)
+static int DoKayakDynamics(int height, int fallspeed, int* y)
 {
 	int kick;
 
@@ -282,7 +280,7 @@ int DoKayakDynamics(int height, int fallspeed, int* y)
 	return fallspeed;
 }
 
-void DoKayakCurrent(ITEM_INFO* item)
+static void DoKayakCurrent(ITEM_INFO* item)
 {
 	ROOM_INFO* r;
 	PHD_VECTOR target;
@@ -349,7 +347,7 @@ void DoKayakCurrent(ITEM_INFO* item)
 	Lara.currentActive = 0;
 }
 
-int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
+static int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 {
 	int h;
 	FLOOR_INFO* floor;
@@ -382,7 +380,7 @@ int TestKayakHeight(ITEM_INFO* item, int x, int z, PHD_VECTOR* pos)
 	return h - 5;
 }
 
-int CanKayakGetOut(ITEM_INFO* kayak, int direction)
+static int CanKayakGetOut(ITEM_INFO* kayak, int direction)
 {
 	int height;
 	PHD_VECTOR pos;
@@ -395,7 +393,7 @@ int CanKayakGetOut(ITEM_INFO* kayak, int direction)
 	return 1;
 }
 
-int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
+static int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
@@ -517,7 +515,7 @@ int DoKayakShift(ITEM_INFO* v, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
+static void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 {
 	int h, slip = 0, rot = 0;
 	PHD_VECTOR pos;
@@ -533,7 +531,6 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	kinfo->OldPos = kayak->pos;
 
 	/* -------- determine valid Kayak positions */
-
 	height[0] = TestKayakHeight(kayak, 0, 1024, &oldpos[0]);
 	height[1] = TestKayakHeight(kayak, -96, 512, &oldpos[1]);
 	height[2] = TestKayakHeight(kayak, 96, 512, &oldpos[2]);
@@ -676,7 +673,7 @@ void KayakToBackground(ITEM_INFO* kayak, KAYAK_INFO* kinfo)
 	}
 }
 
-void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
+static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 {
 	short frame;
 	char lr;
@@ -1068,7 +1065,7 @@ void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 	}
 }
 
-void KayakToBaddieCollision(ITEM_INFO* kayak)
+static void KayakToBaddieCollision(ITEM_INFO* kayak)
 {
 #define TARGET_DIST (WALL_SIZE*2)              // Up to this Distance more Complicated checks are made
 	vector<short> roomsList;
@@ -1148,7 +1145,7 @@ void KayakToBaddieCollision(ITEM_INFO* kayak)
 #undef TARGET_DIST
 }
 
-void LaraRapidsDrown()
+static void LaraRapidsDrown()
 {
 	ITEM_INFO* l = LaraItem;
 
@@ -1169,13 +1166,13 @@ void LaraRapidsDrown()
 	Lara.hitDirection = -1;
 }
 
-void InitialiseKayak(short item_number)
+void InitialiseKayak(short itemNumber)
 {
 	int i;
 	ITEM_INFO* v;
 	KAYAK_INFO* Kayak;
 
-	v = &Items[item_number];
+	v = &Items[itemNumber];
 	Kayak = (KAYAK_INFO*)game_malloc(sizeof(KAYAK_INFO));
 	v->data = (void*)Kayak;
 	Kayak->Vel = 0;
@@ -1194,19 +1191,19 @@ void DrawKayak(ITEM_INFO* kayak)
 	kayak->pos.yPos -= KAYAK_DRAW_SHIFT;
 }
 
-void KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
+void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	int geton;
 
 	if ((l->hitPoints < 0) || (Lara.Vehicle != NO_ITEM))
 		return;
 
-	if ((geton = GetInKayak(item_number, coll)))
+	if ((geton = GetInKayak(itemNumber, coll)))
 	{
 		KAYAK_INFO* Kayak;
-		ITEM_INFO* v = &Items[item_number];
+		ITEM_INFO* v = &Items[itemNumber];
 
-		Lara.Vehicle = item_number;
+		Lara.Vehicle = itemNumber;
 
 		/* -------- throw flare away if using */
 		if (Lara.gunType == WEAPON_FLARE)
@@ -1248,11 +1245,11 @@ void KayakCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
 	else
 	{
 		coll->enableBaddiePush = true;
-		ObjectCollision(item_number, l, coll);
+		ObjectCollision(itemNumber, l, coll);
 	}
 }
 
-int KayakControl()
+int KayakControl(void)
 {
 	int h;
 	KAYAK_INFO* Kayak;

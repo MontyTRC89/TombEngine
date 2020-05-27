@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "global.h"
 
 void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void CrowDoveSwitchControl(short itemNumber);

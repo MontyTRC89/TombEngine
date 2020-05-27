@@ -1,19 +1,20 @@
-#include "../newobjects.h"
-#include "../../Specific/level.h"
-#include "../../Game/sphere.h"
-#include "../../Game/control.h"
-#include "../../Game/effect2.h"
-#include "../../Game/lara.h"
-#include "../../Game/inventory.h"
-#include "../../Game/collide.h"
-#include "../../Game/laraflar.h"
-#include "../../Specific/setup.h"
-#include "../../Game/lara1gun.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Game/items.h"
-#include "../../Game/sound.h"
-#include "../../Game/healt.h"
-#include "../../Game/camera.h"
+#include "framework.h"
+#include "motorbike.h"
+#include "level.h"
+#include "sphere.h"
+#include "control.h"
+#include "effect2.h"
+#include "lara.h"
+#include "inventory.h"
+#include "collide.h"
+#include "laraflar.h"
+#include "setup.h"
+#include "lara1gun.h"
+#include "tomb4fx.h"
+#include "items.h"
+#include "sound.h"
+#include "health.h"
+#include "camera.h"
 
 // TODO: need to fix the bug about the shift, i dont know why it appear but it's in MotorbikeDynamics()
 
@@ -74,12 +75,12 @@ static MOTORBIKE_INFO* GetMotorbikeInfo(ITEM_INFO* item)
     return (MOTORBIKE_INFO*)item->data;
 }
 
-void InitialiseMotorbike(short item_number)
+void InitialiseMotorbike(short itemNumber)
 {
     ITEM_INFO* item;
     MOTORBIKE_INFO* motorbike;
 
-    item = &Items[item_number];
+    item = &Items[itemNumber];
     motorbike = (MOTORBIKE_INFO*)game_malloc(sizeof(MOTORBIKE_INFO));
     item->data = (void*)motorbike;
     motorbike->velocity = 0;
@@ -93,6 +94,123 @@ void InitialiseMotorbike(short item_number)
     motorbike->wheelLeft = 0; // left wheel
     motorbike->wheelRight = 0; // two wheel in the principal body
     item->meshBits = 0x3F7;
+}
+
+static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
+{
+    pos->y = item->pos.yPos - (dz * phd_sin(item->pos.xRot) >> W2V_SHIFT) + (dx * phd_sin(item->pos.zRot) >> W2V_SHIFT);
+
+    int c = phd_cos(item->pos.yRot);
+    int s = phd_sin(item->pos.yRot);
+
+    pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
+    pos->x = item->pos.xPos + ((dz * s + dx * c) >> W2V_SHIFT);
+
+    short roomNumber = item->roomNumber;
+    FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
+    int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
+    if (pos->y < ceiling || ceiling == NO_HEIGHT)
+        return NO_HEIGHT;
+
+    return GetFloorHeight(floor, pos->x, pos->y, pos->z);
+}
+
+static int DoMotorbikeShift(ITEM_INFO* motorbike, PHD_VECTOR* pos, PHD_VECTOR* old)
+{
+    int x = pos->x >> WALL_SHIFT;
+    int z = pos->z >> WALL_SHIFT;
+    int  oldX = old->x >> WALL_SHIFT;
+    int oldZ = old->z >> WALL_SHIFT;
+    int shiftX = pos->x & (WALL_SIZE - 1);
+    int shiftZ = pos->z & (WALL_SIZE - 1);
+
+    if (x == oldX)
+    {
+        if (z == oldZ)
+        {
+            motorbike->pos.zPos += (old->z - pos->z);
+            motorbike->pos.xPos += (old->x - pos->x);
+        }
+        else if (z > oldZ)
+        {
+            motorbike->pos.zPos -= shiftZ + 1;
+            return (pos->x - motorbike->pos.xPos);
+        }
+        else
+        {
+            motorbike->pos.zPos += WALL_SIZE - shiftZ;
+            return (motorbike->pos.xPos - pos->x);
+        }
+    }
+    else if (z == oldZ)
+    {
+        if (x > oldX)
+        {
+            motorbike->pos.xPos -= shiftX + 1;
+            return (motorbike->pos.zPos - pos->z);
+        }
+        else
+        {
+            motorbike->pos.xPos += WALL_SIZE - shiftX;
+            return (pos->z - motorbike->pos.zPos);
+        }
+    }
+    else
+    {
+        x = 0;
+        z = 0;
+
+        short roomNumber = motorbike->roomNumber;
+        FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
+        int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
+        if (height < old->y - STEP_SIZE)
+        {
+            if (pos->z > old->z)
+                z = -shiftZ - 1;
+            else
+                z = WALL_SIZE - shiftZ;
+        }
+
+        roomNumber = motorbike->roomNumber;
+        floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
+        height = GetFloorHeight(floor, pos->x, pos->y, old->z);
+        if (height < old->y - STEP_SIZE)
+        {
+            if (pos->x > old->x)
+                x = -shiftX - 1;
+            else
+                x = WALL_SIZE - shiftX;
+        }
+
+        if (x && z)
+        {
+            motorbike->pos.zPos += z;
+            motorbike->pos.xPos += x;
+        }
+        else if (z)
+        {
+            motorbike->pos.zPos += z;
+            if (z > 0)
+                return (motorbike->pos.xPos - pos->x);
+            else
+                return (pos->x - motorbike->pos.xPos);
+        }
+        else if (x)
+        {
+            motorbike->pos.xPos += x;
+            if (x > 0)
+                return (pos->z - motorbike->pos.zPos);
+            else
+                return (motorbike->pos.zPos - pos->z);
+        }
+        else
+        {
+            motorbike->pos.zPos += (old->z - pos->z);
+            motorbike->pos.xPos += (old->x - pos->x);
+        }
+    }
+
+    return 0;
 }
 
 static void DrawMotorbikeLight(ITEM_INFO* item)
@@ -118,7 +236,7 @@ static void DrawMotorbikeLight(ITEM_INFO* item)
         CreateSpotLight(&start, &target, item->pos.yRot, rnd);*/
 }
 
-static BOOL GetOnMotorBike(short item_number)
+static BOOL GetOnMotorBike(short itemNumber)
 {
     ITEM_INFO* item;
     FLOOR_INFO* floor;
@@ -127,7 +245,7 @@ static BOOL GetOnMotorBike(short item_number)
     short angle;
     short room_number;
 
-    item = &Items[item_number];
+    item = &Items[itemNumber];
     if (item->flags & ONESHOT || Lara.gunStatus == LG_HANDS_BUSY || LaraItem->gravityStatus)
         return FALSE;
 
@@ -163,14 +281,14 @@ static BOOL GetOnMotorBike(short item_number)
     return TRUE;
 }
 
-void MotorbikeCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* coll)
+void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
     ITEM_INFO* item;
     MOTORBIKE_INFO* motorbike;
 
     if (laraitem->hitPoints >= 0 && Lara.Vehicle == NO_ITEM)
     {
-        item = &Items[item_number];
+        item = &Items[itemNumber];
         motorbike = GetMotorbikeInfo(item);
 
         // update motorbike light
@@ -180,9 +298,9 @@ void MotorbikeCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* coll)
             DrawMotorbikeLight(item);
         }
 
-        if (GetOnMotorBike(item_number))
+        if (GetOnMotorBike(itemNumber))
         {
-            Lara.Vehicle = item_number;
+            Lara.Vehicle = itemNumber;
 
             if (Lara.gunType == WEAPON_FLARE)
             {
@@ -229,7 +347,7 @@ void MotorbikeCollision(short item_number, ITEM_INFO* laraitem, COLL_INFO* coll)
         }
         else
         {
-            ObjectCollision(item_number, laraitem, coll);
+            ObjectCollision(itemNumber, laraitem, coll);
         }
     }
 }
@@ -399,30 +517,6 @@ static int MotorBikeCheckGetOff(void)
     return FALSE;
 }
 
-int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
-{
-    FLOOR_INFO* floor;
-    int c, s, ceiling, height;
-    short room_number;
-
-    pos->y = item->pos.yPos - ((dx * phd_sin(item->pos.zRot) >> W2V_SHIFT) + (dz * phd_sin(item->pos.xRot)) >> W2V_SHIFT);
-    c = phd_cos(item->pos.yRot);
-    s = phd_sin(item->pos.yRot);
-    pos->z = item->pos.zPos + ((dz * c - dx * s) >> W2V_SHIFT);
-    pos->x = item->pos.xRot + ((dz * s + dx * c) >> W2V_SHIFT);
-
-    room_number = item->roomNumber;
-    floor = GetFloor(pos->x, pos->y, pos->z, &room_number);
-    ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
-
-    if (pos->y < ceiling || ceiling == -NO_HEIGHT)
-        return -NO_HEIGHT;
-    height = GetFloorHeight(floor, pos->x, pos->y, pos->z);
-    if (pos->y > height)
-        pos->y = height;
-    return height;
-}
-
 static int DoMotorBikeDynamics(int height, int fallspeed, int* y, int flags)
 {
     int kick;
@@ -466,6 +560,31 @@ static int DoMotorBikeDynamics(int height, int fallspeed, int* y, int flags)
     }
 
     return fallspeed;
+}
+
+static int GetMotorbikeCollisionAnim(ITEM_INFO* item, PHD_VECTOR* pos)
+{
+    pos->x = item->pos.xPos - pos->x;
+    pos->z = item->pos.zPos - pos->z;
+
+    if (pos->x || pos->z)
+    {
+        int c = phd_cos(item->pos.yRot);
+        int s = phd_sin(item->pos.yRot);
+        int front = ((pos->z * c) + (pos->x * s)) >> W2V_SHIFT;
+        int side = (-(pos->z * s) + (pos->x * c)) >> W2V_SHIFT;
+
+        if (abs(front) > abs(side))
+        {
+            return (front > 0) + 13;
+        }
+        else
+        {
+            return (side <= 0) + 11;
+        }
+    }
+
+    return 0;
 }
 
 static int MotorBikeDynamics(ITEM_INFO* item)
@@ -638,33 +757,33 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     int hfl = TestMotorbikeHeight(item, 500, -350, &fl);
     if (hfl < fl_old.y - STEP_SIZE)
     {
-        rot1 = abs(4 * DoJeepShift(item, &fl, &fl_old));
+        rot1 = abs(4 * DoMotorbikeShift(item, &fl, &fl_old));
     }
 
     int hbl = TestMotorbikeHeight(item, -500, -350, &bl);
     if (hbl < bl_old.y - STEP_SIZE)
     {
         if (rot1)
-            rot1 += abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot1 += abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
         else
-            rot1 -= abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot1 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
     }
 
     int hmtf = TestMotorbikeHeight(item, 500, 128, &mtf);
     if (hmtf < mtf_old.y - STEP_SIZE)
-        rot2 -= abs(4 * DoJeepShift(item, &bl, &bl_old));
+        rot2 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
 
     int hmtb = TestMotorbikeHeight(item, -500, 0, &mtb);
     if (hmtb < mtb_old.y - STEP_SIZE)
-        DoJeepShift(item, &mtb, &mtb_old);
+        DoMotorbikeShift(item, &mtb, &mtb_old);
 
     int hbr = TestMotorbikeHeight(item, -500, 128, &br);
     if (hbr < br_old.y - STEP_SIZE)
     {
         if (rot2)
-            rot2 -= abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot2 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
         else
-            rot2 += abs(4 * DoJeepShift(item, &bl, &bl_old));
+            rot2 += abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
     }
 
     if (rot1)
@@ -674,7 +793,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
     if (height < (item->pos.yPos - STEP_SIZE))
-        DoJeepShift(item, (PHD_VECTOR*)&item->pos, &oldpos);
+        DoMotorbikeShift(item, (PHD_VECTOR*)&item->pos, &oldpos);
 
     if (!motorbike->velocity)
         rot2 = 0;
@@ -688,7 +807,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     else
         motorbike->extraRotation = motorbike->wallShiftRotation;
 
-    collide = GetJeepCollisionAnim(item, &moved);
+    collide = GetMotorbikeCollisionAnim(item, &moved);
     if (collide)
     {
         newspeed = ((item->pos.zPos - oldpos.z) * phd_cos(motorbike->momentumAngle) + (item->pos.xPos - oldpos.x) * phd_sin(motorbike->momentumAngle)) >> 6;

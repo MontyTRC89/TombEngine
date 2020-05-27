@@ -1,13 +1,14 @@
+#include "framework.h"
 #include "Renderer11.h"
-#include "../Game/draw.h"
-#include "../Game/hair.h"
-#include "../Game/lara.h"
-#include "../Game/control.h"
-#include "../Game/spotcam.h"
-#include "../game/camera.h"
-#include "../game/sphere.h"
-#include "../Global/global.h"
-#include "..\Specific\level.h"
+#include "draw.h"
+#include "hair.h"
+#include "lara.h"
+#include "control.h"
+#include "spotcam.h"
+#include "camera.h"
+#include "sphere.h"
+#include "global.h"
+#include "level.h"
 
 extern GameFlow* g_GameFlow;
 

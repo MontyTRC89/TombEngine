@@ -1,13 +1,14 @@
+#include "framework.h"
 #include "hair.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "draw.h"
 #include "laramisc.h"
 #include "lara.h"
 #include "control.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "../Specific/setup.h"
+#include "GameFlowScript.h"
+#include "setup.h"
 #include "sphere.h"
-#include "../Specific/level.h"
+#include "level.h"
 
 int FirstHair[2];
 HAIR_STRUCT Hairs[2][7];

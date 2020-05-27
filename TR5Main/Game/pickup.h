@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 void InitialisePickup(short itemNumber);
 void PickedUpObject(short objectNumber);

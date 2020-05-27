@@ -1,31 +1,24 @@
+#include "framework.h"
 #include "level.h"
-#include "..\Global\global.h"
-#include "..\Game\items.h"
-#include "..\Specific\setup.h"
-#include "..\Game\draw.h"
-#include "..\Game\lot.h"
-#include "..\Game\Lara.h"
-#include "..\Game\savegame.h"
-#include "..\Game\spotcam.h"
-#include "..\Game\camera.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "..\Game\control.h"
-#include "..\Game\pickup.h"
-#include "../Game/door.h"
-#include "../Game/box.h"
-
-#include "IO/ChunkId.h"
-#include "IO/ChunkReader.h"
-#include "IO/ChunkWriter.h" 
-#include "IO/LEB128.h"
-
-#include <process.h>
-#include <stdio.h>
-#include <vector>
-#include <map>
-#include "IO/Streams.h"
-#include <zlib.h>
-#include "../Game/sound.h"
+#include "items.h"
+#include "setup.h"
+#include "draw.h"
+#include "lot.h"
+#include "Lara.h"
+#include "savegame.h"
+#include "spotcam.h"
+#include "camera.h"
+#include "GameFlowScript.h"
+#include "control.h"
+#include "pickup.h"
+#include "door.h"
+#include "box.h"
+#include "ChunkId.h"
+#include "ChunkReader.h"
+#include "ChunkWriter.h" 
+#include "LEB128.h"
+#include "Streams.h"
+#include "sound.h"
 
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
 ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
@@ -55,8 +48,6 @@ uintptr_t hLoadLevel;
 unsigned int ThreadId;
 int IsLevelLoading;
 bool g_FirstLevel = true;
-
-using namespace std;
 
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
