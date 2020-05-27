@@ -197,7 +197,7 @@ void TriggerGlobalFireFlame()
 	}
 
 	spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
-	spark->dSize = spark->size >> 4;
+	spark->dSize = spark->size;
 }
 
 void keep_those_fires_burning()
@@ -289,18 +289,9 @@ void UpdateFireSparks()
 
 			if (spark->flags & SP_ROTATE)
 				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
-
-			if (spark->r >= 24 || spark->g >= 24 || spark->b >= 24)
-			{
-				if (spark->r >= 80 || spark->g >= 80 || spark->b >= 80)
-					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-				else
-					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 1;
-			}
-			else
-			{
-				spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 2;
-			}
+			float alpha = fmin(1, fmax(0, 1 - (spark->life / (float)spark->sLife)));
+			int sprite = lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex+ (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
+			spark->def = sprite;
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 			spark->yVel += spark->gravity;

@@ -201,7 +201,7 @@ void Renderer11::drawFires()
 			{
 				FIRE_SPARKS* spark = &FireSparks[i];
 				if (spark->on)
-					AddSpriteBillboard(m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
+				  AddSpriteBillboard(m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
 			}
 		}
 	}
