@@ -1,23 +1,22 @@
-#include "../newobjects.h"
-#include "../../Game/lara.h"
-#include "../../Game/items.h"
-#include "../../Game/collide.h"
-#include "../../Game/effects.h"
-#include "../../Game/larafire.h"
-#include "../../Game/lara1gun.h"
-#include "../../Game/effect2.h"
-#include "../../Game/laraflar.h"
-#include "../../Game/lot.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Game/sphere.h"
-#include "../../Specific/setup.h"
-#include "..\..\Specific\level.h"
-#include "../../Specific/input.h"
-#include "../../Game/sound.h"
+#include "framework.h"
+#include "snowmobile.h"
+#include "lara.h"
+#include "items.h"
+#include "collide.h"
+#include "effect.h"
+#include "larafire.h"
+#include "lara1gun.h"
+#include "effect2.h"
+#include "laraflar.h"
+#include "lot.h"
+#include "tomb4fx.h"
+#include "sphere.h"
+#include "setup.h"
+#include "level.h"
+#include "input.h"
+#include "sound.h"
 
 // TODO: recreate the DrawSkidoo for the snowmobile.
-
-
 
 enum SKIDOO_STATE { SKID_SIT, SKID_GETON, SKID_LEFT, SKID_RIGHT, SKID_FALL, SKID_HIT, SKID_GETONL, SKID_GETOFFL, SKID_STILL, SKID_GETOFF, SKID_LETGO, SKID_DEATH, SKID_FALLOFF };
 
@@ -89,7 +88,7 @@ void InitialiseSkidoo(short itemNum)
 	}
 }
 
-void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
+static void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 {
 	vector<short> roomsList;
 	roomsList.push_back(skidoo->roomNumber);
@@ -149,7 +148,7 @@ void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 	}
 }
 
-void SkidooGuns(void)
+static void SkidooGuns(void)
 {
 	ITEM_INFO* skidoo;
 	SKIDOO_INFO* skinfo;
@@ -182,7 +181,7 @@ void SkidooGuns(void)
 		skidoo->itemFlags[0]--;
 }
 
-void SkidooExplode(ITEM_INFO* skidoo)
+static  void SkidooExplode(ITEM_INFO* skidoo)
 {
 	if (Rooms[skidoo->roomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -203,7 +202,7 @@ void SkidooExplode(ITEM_INFO* skidoo)
 	Lara.Vehicle = NO_ITEM;
 }
 
-int SkidooCheckGetOffOK(int direction)
+static int SkidooCheckGetOffOK(int direction)
 {
 	/* Check if getting off skidoo here is possible in the direction required by player */
 	int x, y, z, height, ceiling;
@@ -243,7 +242,7 @@ int SkidooCheckGetOffOK(int direction)
 
 /* Check if Lara is still under skidoo control. Return 0 if she is in that limbo state of the skidoo still needing
 		control (it is falling) and her needing normal control (so is she) */
-int SkidooCheckGetOff()
+static int SkidooCheckGetOff()
 {
 	ITEM_INFO* skidoo;
 	skidoo = &Items[Lara.Vehicle];
@@ -341,7 +340,7 @@ void DoSnowEffect(ITEM_INFO* skidoo)
 	*/
 }
 
-void SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
+static void SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 {
 	short cd;
 	SKIDOO_INFO* skinfo;
@@ -444,7 +443,7 @@ void SkidooAnimation(ITEM_INFO* skidoo, int collide, int dead)
 	}
 }
 
-int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
+static int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 {
 	int c, s, front, side;
 
@@ -476,7 +475,7 @@ int GetSkidooCollisionAnim(ITEM_INFO* skidoo, PHD_VECTOR* moved)
 	return 0;
 }
 
-int SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
+static int SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 {
 	int drive = 0, max_speed;
 	SKIDOO_INFO* skinfo;
@@ -555,7 +554,7 @@ int SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 	return drive;
 }
 
-int DoSkidooDynamics(int height, int fallspeed, int* y)
+static int DoSkidooDynamics(int height, int fallspeed, int* y)
 {
 	int kick;
 
@@ -586,7 +585,7 @@ int DoSkidooDynamics(int height, int fallspeed, int* y)
 }
 
 /* Returns 0 if no get on, 1 if right get on and 2 if left get on */
-int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
+static int SkidooCheckGetOn(short itemNum, COLL_INFO* coll)
 {
 	int geton;
 	short rot, roomNumber;
@@ -671,7 +670,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 }
 
 /* Get height at a position offset from the origin. Moves the vector in 'pos' to the required test position too */
-int TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
+static int TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 {
 	pos->y = item->pos.yPos - (z_off * phd_sin(item->pos.xRot) >> W2V_SHIFT) +
 		                      (x_off * phd_sin(item->pos.zRot) >> W2V_SHIFT);
@@ -691,7 +690,7 @@ int TestSkidooHeight(ITEM_INFO* item, int z_off, int x_off, PHD_VECTOR* pos)
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
+static short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
 	int x, z;
 	int x_old, z_old;
@@ -808,7 +807,7 @@ short DoSkidooShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	return 0;
 }
 
-int SkidooDynamics(ITEM_INFO* skidoo)
+static int SkidooDynamics(ITEM_INFO* skidoo)
 {
 	/* Does all skidoo movement and collision and returns if collide value */
 	SKIDOO_INFO* skinfo;
@@ -960,7 +959,7 @@ int SkidooDynamics(ITEM_INFO* skidoo)
 }
 
 /* Returns 1 if this controls Lara too, 0 if skidoo is no longer moving with Lara (so need normal Lara control) */
-int SkidooControl()
+int SkidooControl(void)
 {
 	ITEM_INFO* skidoo;
 	SKIDOO_INFO* skinfo;

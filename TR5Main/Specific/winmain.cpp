@@ -1,13 +1,15 @@
+#include "framework.h"
 #include "init.h"
 #include "winmain.h"
-#include <CommCtrl.h>
-
-#include "..\resource.h"
-
-#include <process.h>
-#include <crtdbg.h>
-#include <stdio.h>
+#include "resource.h"
 #include "sol.hpp"
+#include "draw.h"
+#include "sound.h"
+#include "inventory.h"
+#include "control.h"
+#include "gameflow.h"
+#include "savegame.h"
+#include "level.h"
 
 #include "..\Game\draw.h"
 #include "..\Game\sound.h"
@@ -20,13 +22,10 @@
 #include "..\Specific\newlevel.h"
 
 #include "configuration.h"
-#include <stdio.h>
-#include <io.h>
-#include <fcntl.h>
-#include <windows.h>
-WINAPP	 App;
-unsigned int threadId;
-uintptr_t hThread;
+
+WINAPP App;
+unsigned int ThreadID;
+uintptr_t ThreadHandle;
 HACCEL hAccTable;
 byte receivedWmClose = false;
 bool Debug = false;
@@ -39,46 +38,37 @@ extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD DebugConsoleThreadID;
 DWORD MainThreadID;
+
 int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
 }
 
-int WinProcMsg()
+void WinProcMsg()
 {
-	int result;
-	struct tagMSG Msg;
+	MSG Msg;
 
-	//DB_Log(2, "WinProcMsg");
 	do
 	{
-		GetMessageA(&Msg, 0, 0, 0);
-		if (!TranslateAcceleratorA(WindowsHandle, hAccTable, &Msg))
+		GetMessage(&Msg, 0, 0, 0);
+		if (!TranslateAccelerator(WindowsHandle, hAccTable, &Msg))
 		{
 			TranslateMessage(&Msg);
-			DispatchMessageA(&Msg);
+			DispatchMessage(&Msg);
 		}
-		result = Unk_876C48;
-	} while (!Unk_876C48 && Msg.message != WM_QUIT);
-
-	return result;
+	}
+	while (!ThreadEnded && Msg.message != WM_QUIT);
 }
 
-void __stdcall HandleWmCommand(unsigned short wParam)
+void CALLBACK HandleWmCommand(unsigned short wParam)
 {
 	if (wParam == 8)
 	{
-		//DB_Log(5, "Pressed ALT + ENTER");
-
 		if (!IsLevelLoading)
 		{
-			SuspendThread((HANDLE)hThread);
-			//DB_Log(5, "Game thread suspended");
-			
+			SuspendThread((HANDLE)ThreadHandle);
 			g_Renderer->ToggleFullScreen();
-
-			ResumeThread((HANDLE)hThread);
-			//DB_Log(5, "Game thread resumed");
+			ResumeThread((HANDLE)ThreadHandle);
 
 			if (g_Renderer->IsFullsScreen())
 			{
@@ -115,31 +105,26 @@ void HandleScriptMessage(WPARAM wParam)
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (msg == WM_USER + 0) {
+	if (msg == WM_USER + 0)
+	{
 		HandleScriptMessage(wParam);
+		return 0;
+	}
 
-		return 0;
-	}
 	// Disables ALT + SPACE
-	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU) {
+	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 		return 0;
-	}
 
 	if (msg > 0x10)
 	{
 		if (msg == WM_COMMAND)
-		{
-			//DB_Log(6, "WM_COMMAND");
 			HandleWmCommand((unsigned short)wParam);
-		}
 
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
 	if (msg == WM_CLOSE)
 	{
-		//DB_Log(6, "WM_CLOSE");
-
 		receivedWmClose = true;
 		PostQuitMessage(0);
 		DoTheGame = false;
@@ -148,53 +133,36 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	if (msg != WM_ACTIVATE)
-	{
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
-	}
-
-	//DB_Log(6, "WM_ACTIVATE");
 
 	if (receivedWmClose)
 	{
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
-	//if (App_Unk00D9AC2B)
-	//	return 0;
-
 	if ((short)wParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
-			//DB_Log(6, "WM_ACTIVE");
-
 			if (!Debug)
-				ResumeThread((HANDLE)hThread);
+				ResumeThread((HANDLE)ThreadHandle);
 
 			App_Unk00D9ABFD = 0;
-
-			//DB_Log(5, "Game Thread Resumed");
-
 			return 0;
 		}
 	}
 	else
 	{
-		//DB_Log(6, "WM_INACTIVE");
-		//DB_Log(5, "HangGameThread");
-
 		App_Unk00D9ABFD = 1;
 
 		if (!Debug)
-			SuspendThread((HANDLE)hThread);
-
-		//DB_Log(5, "Game Thread Suspended");
+			SuspendThread((HANDLE)ThreadHandle);
 	}
 
 	return 0;
 }
 
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	int RetVal;
 	int n;
@@ -268,7 +236,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	// Load configuration and optionally show the setup dialog
 	InitDefaultConfiguration();
-	//SetupDialog();
 	if (setup || !LoadConfiguration())
 	{
 		if (!SetupDialog())
@@ -280,13 +247,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		LoadConfiguration();
 	}
 
-	tagRECT Rect;
-
+	RECT Rect;
 	Rect.left = 0;
 	Rect.top = 0;
 	Rect.right = g_Configuration.Width;
 	Rect.bottom = g_Configuration.Height;
-
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
 	App.WindowHandle = CreateWindowEx(
@@ -294,8 +259,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		"TR5Main",
 		g_GameFlow->GetSettings()->WindowTitle.c_str(),
 		WS_POPUP,
-		0,
-		0,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
 		Rect.right - Rect.left,
 		Rect.bottom - Rect.top,
 		NULL,
@@ -321,15 +286,16 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	// Initialise the new inventory
 	g_Inventory = new Inventory();
-
 	
 	App.bNoFocus = false;
 	App.isInScene = false;
 
 	UpdateWindow(WindowsHandle);
 	ShowWindow(WindowsHandle, nShowCmd);
+
 	//Create debug script terminal
-	if (Debug) {
+	if (Debug)
+	{
 		MainThreadID = GetWindowThreadProcessId(WindowsHandle, NULL);
 		AllocConsole();
 		HANDLE handle_in = GetStdHandle(STD_INPUT_HANDLE);
@@ -350,9 +316,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		LPTHREAD_START_ROUTINE readConsoleLoop = [](LPVOID params) -> DWORD {
 			DWORD read;
 			CHAR buffer[4096];
-			while (true) {
+			while (true)
+			{
 				BOOL success = ReadFile(params, &buffer, 4096, &read, NULL);
-				if (success) {
+				if (success)
+				{
 					//Only send the actual written message minus \r\n
 					string msg(buffer, read-2);
 					SendMessageA(WindowsHandle, WM_USER + 0, (WPARAM)&msg, NULL);
@@ -362,8 +330,9 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		};
 		CreateThread(NULL, 0, readConsoleLoop, handle_in, 0, &DebugConsoleThreadID);
 	}
-	SetCursor(0);
-	ShowCursor(0);
+
+	SetCursor(NULL);
+	ShowCursor(FALSE);
 	hAccTable = LoadAcceleratorsA(hInstance, (LPCSTR)0x65);
 
 	//g_Renderer->Test();
@@ -371,22 +340,19 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	SoundActive = false;
 	DoTheGame = true;
 
-	Unk_876C48 = false;
-	hThread = _beginthreadex(0, 0, &GameMain, 0, 0, &threadId); 
+	ThreadEnded = false;
+	ThreadHandle = _beginthreadex(0, 0, &GameMain, 0, 0, &ThreadID); 
 	WinProcMsg();
-	Unk_876C48 = true;
+	ThreadEnded = true;
 
 	while (DoTheGame);
 	
 	WinClose();
-
-	return 0;
+	exit(EXIT_SUCCESS);
 }
 
-int WinClose()
+void WinClose()
 {
-	//DB_Log(2, "WinClose - DLL");
-
 	DestroyAcceleratorTable(hAccTable);
 
 	if (g_Configuration.EnableSound)
@@ -398,6 +364,4 @@ int WinClose()
 	delete g_GameFlow;
 
 	SaveGame::End();
-
-	return 0;
 }

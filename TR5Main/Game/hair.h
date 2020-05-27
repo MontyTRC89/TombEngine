@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 extern HAIR_STRUCT Hairs[2][7];
 

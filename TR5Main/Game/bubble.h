@@ -2,8 +2,8 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <vector>
-#include "../Global/types.h"
-#include "../Global/constants.h"
+#include "types.h"
+#include "constants.h"
 #include "effect2.h"
 
 constexpr float MAX_BUBBLES = 256;

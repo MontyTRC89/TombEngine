@@ -1,10 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
-using namespace std;
-
 // Define string ids
 #define STRING_PASSPORT					1
 #define STRING_LARA_HOME				2

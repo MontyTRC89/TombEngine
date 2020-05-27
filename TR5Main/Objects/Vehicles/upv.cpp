@@ -1,24 +1,23 @@
-#include "../newobjects.h"
-#include "../../Game/lara.h"
-#include "../../Game/items.h"
-#include "../../Game/sphere.h"
-#include "../../Game/effect2.h"
-#include "../../Game/effects.h"
-#include "../../Game/collide.h"
-#include "../../Game/box.h"
-#include "../../Game/laraflar.h"
-#include "../../Game/draw.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Game/misc.h"
-#include "../../Game/camera.h"
-#include "../../Specific/setup.h"
-#include "../../Game/bubble.h"
-#include "..\..\Specific\level.h"
-#include "../../Specific/input.h"
-#include "../../Game/savegame.h"
-#include "../../Game/sound.h"
-
-
+#include "framework.h"
+#include "upv.h"
+#include "lara.h"
+#include "items.h"
+#include "sphere.h"
+#include "effect2.h"
+#include "effect.h"
+#include "collide.h"
+#include "box.h"
+#include "laraflar.h"
+#include "draw.h"
+#include "tomb4fx.h"
+#include "misc.h"
+#include "camera.h"
+#include "setup.h"
+#include "bubble.h"
+#include "level.h"
+#include "input.h"
+#include "savegame.h"
+#include "sound.h"
 
 enum UPV_FLAG
 {
@@ -137,8 +136,7 @@ static void FireSubHarpoon(ITEM_INFO* v)
 	}
 }
 
-
-void TriggerSubMist(long x, long y, long z, long speed, short angle)
+static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 {
 	long size, xv, zv;
 	SPARKS* sptr;
@@ -190,7 +188,7 @@ void TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->dSize = size;
 }
 
-void SubEffects(short item_number)
+static void SubEffects(short item_number)
 {
 	ITEM_INFO* v;
 	SUB_INFO* sub;
@@ -301,7 +299,7 @@ static int CanGetOff(ITEM_INFO* v)
 	return 1;
 }
 
-int GetOnSub(short item_number, COLL_INFO* coll)
+static int GetOnSub(short item_number, COLL_INFO* coll)
 {
 	/* Returns 0 if no get on, 1 if right get on and 2 if left get on */
 	int dist;
@@ -337,7 +335,7 @@ int GetOnSub(short item_number, COLL_INFO* coll)
 	return 1;
 }
 
-void DoCurrent(ITEM_INFO* item)
+static void DoCurrent(ITEM_INFO* item)
 {
 	PHD_VECTOR target;
 
@@ -403,7 +401,7 @@ void DoCurrent(ITEM_INFO* item)
 	Lara.currentActive = 0;
 }
 
-void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
+static void BackgroundCollision(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 {
 	int height;
 	COLL_INFO cinfo, *coll = &cinfo;
@@ -840,7 +838,7 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-int SubControl()
+int SubControl(void)
 {
 	int h;
 	SUB_INFO* sub;

@@ -1,13 +1,12 @@
+#include "framework.h"
 #include "spotcam.h"
-
-#include "..\Global\global.h"
-#include "Camera.h"
+#include "camera.h"
 #include "control.h"
 #include "draw.h"
 #include "tomb4fx.h"
 #include "switch.h"
 #include "lara.h"
-#include "../Specific/input.h"
+#include "input.h"
 
 int LastSequence;
 int SpotcamTimer;
