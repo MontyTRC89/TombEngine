@@ -1,3 +1,4 @@
+#include "tr4_sas.h"
 #include "../newobjects.h"
 #include "../../Game/sphere.h"
 #include "../../Game/effect2.h"
@@ -18,10 +19,10 @@ void InitialiseSas(short itemNum)
 
 	ClearItem(itemNum);
 
-	item->animNumber = Objects[item->objectNumber].animIndex + 12;
+	item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_STAND;
 	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->goalAnimState = STATE_SAS_STOP;
+	item->currentAnimState = STATE_SAS_STOP;
 }
 
 void SasControl(short itemNum)
@@ -99,11 +100,11 @@ void SasControl(short itemNum)
 
 		switch (item->currentAnimState)
 		{
-		case 1:
+		case STATE_SAS_STOP:
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 			joint2 = ang;
-			if (item->animNumber == Objects[item->objectNumber].animIndex + 17)
+			if (item->animNumber == Objects[item->objectNumber].animIndex + ANIMATION_SAS_WALK_TO_STAND)
 			{
 				if (abs(info.angle) >= ANGLE(10))
 				{
@@ -137,12 +138,12 @@ void SasControl(short itemNum)
 				joint2 = AIGuard(creature);
 				if (!GetRandomControl())
 				{
-					if (item->currentAnimState == 1)
+					if (item->currentAnimState == STATE_SAS_STOP)
 					{
-						item->goalAnimState = 4;
+						item->goalAnimState = STATE_SAS_WAIT;
 						break;
 					}
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_SAS_STOP;
 				}
 			}
 			else if (!(item->aiBits & PATROL1) || (item->aiBits & 0x1F) == MODIFY /* || Lara_Bike*/)
@@ -153,33 +154,33 @@ void SasControl(short itemNum)
 					{
 						if (GetRandomControl() & 1)
 						{
-							item->goalAnimState = 8;
+							item->goalAnimState = STATE_SAS_SIGHT_AIM;
 						}
 						else if (GetRandomControl() & 1)
 						{
-							item->goalAnimState = 10;
+							item->goalAnimState = STATE_SAS_HOLD_AIM;
 						}
 						else
 						{
-							item->goalAnimState = 12;
+							item->goalAnimState = STATE_SAS_KNEEL_AIM;
 						}
 					}
 					else if (!(item->aiBits & MODIFY))
 					{
-						item->goalAnimState = 2;
+						item->goalAnimState = STATE_SAS_WALK;
 					}
 				}
 				else
 				{
 					if (item->aiBits & MODIFY)
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_SAS_STOP;
 					}
 					else
 					{
 						if (creature->mood == ESCAPE_MOOD)
 						{
-							item->goalAnimState = 3;
+							item->goalAnimState = STATE_SAS_RUN;
 						}
 						else
 						{
@@ -188,14 +189,14 @@ void SasControl(short itemNum)
 							{
 								if (creature->mood == BORED_MOOD || info.distance <= 0x400000)
 								{
-									item->goalAnimState = 2;
+									item->goalAnimState = STATE_SAS_WALK;
 									break;
 								}
-								item->goalAnimState = 3;
+								item->goalAnimState = STATE_SAS_RUN;
 							}
 							else
 							{
-								item->goalAnimState = 1;
+								item->goalAnimState = STATE_SAS_STOP;
 							}
 						}
 					}
@@ -203,12 +204,12 @@ void SasControl(short itemNum)
 			}
 			else
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_SAS_WALK;
 				joint2 = 0;
 			}
 			break;
 
-		case 4:
+		case STATE_SAS_WAIT:
 			joint2 = ang;
 			creature->flags = 0;
 			creature->maximumTurn = 0;
@@ -218,7 +219,7 @@ void SasControl(short itemNum)
 				joint2 = AIGuard(creature);
 				if (!GetRandomControl())
 				{
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_SAS_STOP;
 				}
 			}
 			else if (Targetable(item, &info)
@@ -227,62 +228,62 @@ void SasControl(short itemNum)
 				|| item->hitStatus
 				/*|| Lara_Bike*/)
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_SAS_STOP;
 			}
 			break;
 
-		case 2:
+		case STATE_SAS_WALK:
 			creature->flags = 0;
 			creature->maximumTurn = ANGLE(5);
 			joint2 = ang;
 
 			if (item->aiBits & PATROL1)
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_SAS_WALK;
 			}
 			else if (/*!Lara_Bike ||*/ !(item->aiBits & GUARD) && item->aiBits)
 			{
 				if (creature->mood == ESCAPE_MOOD)
 				{
-					item->goalAnimState = 3;
+					item->goalAnimState = STATE_SAS_RUN;
 				}
 				else
 				{
 					if (item->aiBits & GUARD || item->aiBits & FOLLOW && (creature->reachedGoal || distance > 0x400000))
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_SAS_STOP;
 						break;
 					}
 					if (Targetable(item, &info))
 					{
 						if (info.distance < 9437184 || info.enemyZone != info.zoneNumber)
 						{
-							item->goalAnimState = 1;
+							item->goalAnimState = STATE_SAS_STOP;
 							break;
 						}
-						item->goalAnimState = 9;
+						item->goalAnimState = STATE_SAS_WALK_AIM;
 					}
 					else if (creature->mood)
 					{
 						if (info.distance > 0x400000)
 						{
-							item->goalAnimState = 3;
+							item->goalAnimState = STATE_SAS_RUN;
 						}
 					}
 					else if (info.ahead)
 					{
-						item->goalAnimState = 1;
+						item->goalAnimState = STATE_SAS_STOP;
 						break;
 					}
 				}
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_SAS_STOP;
 			}
 			break;
 
-		case 3:
+		case STATE_SAS_RUN:
 			if (info.ahead)
 				joint2 = info.angle;
 			creature->maximumTurn = ANGLE(10);
@@ -299,29 +300,29 @@ void SasControl(short itemNum)
 
 			if (item->aiBits & GUARD || item->aiBits & FOLLOW && (creature->reachedGoal || distance > 0x400000))
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_SAS_WALK;
 				break;
 			}
 			if (creature->mood != ESCAPE_MOOD)
 			{
 				if (Targetable(item, &info))
 				{
-					item->goalAnimState = 2;
+					item->goalAnimState = STATE_SAS_WALK;
 				}
 				else
 				{
 					if (creature->mood != BORED_MOOD || creature->mood == STALK_MOOD && 
 						item->aiBits & FOLLOW && info.distance < 0x400000)
 					{
-						item->goalAnimState = 2;
+						item->goalAnimState = STATE_SAS_WALK;
 					}
 				}
 			}
 			break;
 
-		case 8:
-		case 10:
-		case 12:
+		case STATE_SAS_SIGHT_AIM:
+		case STATE_SAS_HOLD_AIM:
+		case STATE_SAS_KNEEL_AIM:
 			creature->flags = 0;
 			if (info.ahead)
 			{
@@ -329,32 +330,32 @@ void SasControl(short itemNum)
 				joint0 = info.angle; 
 				if (Targetable(item, &info))
 				{
-					if (item->currentAnimState == 8)
+					if (item->currentAnimState == STATE_SAS_SIGHT_AIM)
 					{
-						item->goalAnimState = 5;
+						item->goalAnimState = STATE_SAS_SIGHT_SHOOT;
 					}
-					else if (item->currentAnimState == 12)
+					else if (item->currentAnimState == STATE_SAS_KNEEL_AIM)
 					{
-						item->goalAnimState = 13;
+						item->goalAnimState = STATE_SAS_KNEEL_SHOOT;
 					}
 					else
 					{
 						if (!(GetRandomControl() & 1))
 						{
-							item->goalAnimState = 15;
+							item->goalAnimState = STATE_SAS_HOLD_PREPARE_GRENADE;
 							break;
 						}
-						item->goalAnimState = 11;
+						item->goalAnimState = STATE_SAS_HOLD_SHOOT;
 					}
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->goalAnimState = STATE_SAS_STOP;
 				}
 			}
 			break;
 
-		case 9:
+		case STATE_SAS_WALK_AIM:
 			creature->flags = 0;
 			if (info.ahead)
 			{
@@ -362,16 +363,16 @@ void SasControl(short itemNum)
 				joint0 = info.angle;
 				if (Targetable(item, &info))
 				{
-					item->goalAnimState = 6;
+					item->goalAnimState = STATE_SAS_WALK_SHOOT;
 				}
 				else
 				{
-					item->goalAnimState = 2;
+					item->goalAnimState = STATE_SAS_WALK;
 				}
 			}
 			break;
 
-		case 15:
+		case STATE_SAS_HOLD_PREPARE_GRENADE:
 			if (info.ahead)
 			{
 				joint1 = info.xAngle;
@@ -379,7 +380,7 @@ void SasControl(short itemNum)
 			}
 			break;
 
-		case 16:
+		case STATE_SAS_HOLD_SHOOT_GRENADE:
 			if (info.ahead)
 			{
 				angle1 = info.angle;
@@ -404,19 +405,22 @@ void SasControl(short itemNum)
 				}
 				//ShotGreanade((int)item, v28, v27);
 				if (Targetable(item, &info))
-					item->goalAnimState = 15;
+					item->goalAnimState = STATE_SAS_HOLD_PREPARE_GRENADE;
 			}
 			break;
 
-		case 11:
-		case 13:
-		case 5:
-		case 6:
-			if (item->currentAnimState == 11 || item->currentAnimState == 13)
+		case STATE_SAS_HOLD_SHOOT:
+		case STATE_SAS_KNEEL_SHOOT:
+		case STATE_SAS_SIGHT_SHOOT:
+		case STATE_SAS_WALK_SHOOT:
+			if (item->currentAnimState == STATE_SAS_HOLD_SHOOT || item->currentAnimState == STATE_SAS_KNEEL_SHOOT)
 			{
-				if (item->goalAnimState != 1 && item->goalAnimState != 14 && (creature->mood == ESCAPE_MOOD || !Targetable(item, &info)))
+				if (item->goalAnimState != STATE_SAS_STOP && item->goalAnimState != STATE_SAS_KNEEL_STOP && (creature->mood == ESCAPE_MOOD || !Targetable(item, &info)))
 				{
-					item->goalAnimState = item->currentAnimState != 11 ? 14 : 1;
+					if(item->currentAnimState == STATE_SAS_HOLD_SHOOT)
+						item->goalAnimState = STATE_SAS_STOP;
+					else
+						item->goalAnimState = STATE_SAS_KNEEL_STOP;
 				}
 			}
 			
@@ -436,34 +440,36 @@ void SasControl(short itemNum)
 			}
 			break;
 
-		case 17:
+		case STATE_SAS_BLIND:
 			if (!WeaponEnemyTimer && !(GetRandomControl() & 0x7F))
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_SAS_WAIT;
 			break;
 
 		default:
 			break;
 		}
 
-		if ((unsigned __int8)WeaponEnemyTimer > 0x64u && item->currentAnimState != 17)
+		if ((unsigned __int8)WeaponEnemyTimer > 0x64u && item->currentAnimState != STATE_SAS_BLIND)
 		{
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + 28;
+			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_BLIND;
 			item->frameNumber = Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
-			item->currentAnimState = 17;
+			item->currentAnimState = STATE_SAS_BLIND;
 		}
+
 	}
-	else if (item->currentAnimState != 7)
+	else if (item->currentAnimState != STATE_SAS_DEATH)
 	{
-		item->animNumber = Objects[item->objectNumber].animIndex + 19;
+		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_DEATH;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->currentAnimState = 7;
+		item->currentAnimState = STATE_SAS_DEATH;
 	}
 
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
+
 
 	CreatureAnimation(itemNum, angle, 0);
 }
