@@ -344,7 +344,7 @@ void PistolHandler(int weaponType)
 		}
 		else
 		{*/
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+			TriggerDynamicLight(pos.x+frandMinMax(-128,128), pos.y + frandMinMax(-128, 128), pos.z + frandMinMax(-128, 128), frandMinMax(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 		//}
 	}
 }
