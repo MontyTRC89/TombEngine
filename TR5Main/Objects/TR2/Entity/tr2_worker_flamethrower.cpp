@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_worker_flamethrower.h"
 #include "box.h"
 #include "sphere.h"
 #include "effect2.h"
@@ -13,7 +13,7 @@
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 
-void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)
+static void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)
 {
 	short fx_number;
 	short cam_rot;

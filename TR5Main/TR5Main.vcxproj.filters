@@ -372,31 +372,10 @@
     <ClInclude Include="Game\effect.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\Vehicles\boat.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\Vehicles\jeep.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\Vehicles\kayak.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Vehicles\minecart.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\Vehicles\motorbike.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Vehicles\quad.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Vehicles\snowmobile.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Vehicles\upv.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\Vehicles\cannon.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\tr4_objects.h">
@@ -415,6 +394,195 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR3\tr3_objects.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\bass\bass.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\bass\bass_fx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\bass\bassmix.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\fixedpoint\fixed_point.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\lua\lauxlib.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\lua\lua.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\lua\luaconf.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\lua\lualib.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\sol2\sol.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\zlib\unzip.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\zlib\zconf.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\zlib\zip.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\zlib\zlib.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Libs\zlib\ioapi.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_fourblades.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_catwalkblade.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_plinthblade.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_sethblade.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_chain.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_plough.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Switch\tr4_cog.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_stargate.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_spikeball.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_mine.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Floor\tr4_burningfloor.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_slicerdicer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_spikywall.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_spikyceiling.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Trap\tr2_springboard.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Trap\tr2_killerstatue.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_blade.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Trap\tr2_spinningblade.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\cannon.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\kayak.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\minecart.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\quad.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\upv.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Vehicles\boat.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Vehicles\snowmobile.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Vehicles\rubberboat.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_birdmonster.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_knifethrower.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_mercenary.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_monk.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_rat.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_shark.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_silencer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_skidman.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_spear_guardian.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_spider.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_sword_guardian.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_worker_dualrevolver.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_worker_flamethrower.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_worker_machinegun.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_worker_shotgun.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_yeti.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR2\Entity\tr2_eagle_or_crow.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\Entity\tr3_tony.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\boss.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR3\fish.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -551,9 +719,6 @@
     <ClCompile Include="Specific\Init.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\trap.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Scripting\GameFlowScript.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -575,28 +740,10 @@
     <ClCompile Include="Game\misc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\Vehicles\boat.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Vehicles\jeep.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\Vehicles\kayak.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\Vehicles\minecart.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\Vehicles\snowmobile.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\Vehicles\upv.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\Vehicles\motorbike.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\Vehicles\quad.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\Effects\tr4_bubbles.cpp">
@@ -726,9 +873,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\effect.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\Vehicles\cannon.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\tr4_objects.cpp">
@@ -908,9 +1052,6 @@
     <ClCompile Include="Objects\TR3\Entity\tr3_cobra.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR3\Entity\tr3_eagle_or_crow.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR3\Entity\tr3_fishemitter.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -953,6 +1094,90 @@
     <ClCompile Include="Objects\TR3\tr3_objects.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_fourblades.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_catwalkblade.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_plinthblade.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_sethblade.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_chain.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_plough.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Switch\tr4_cog.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_stargate.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_spikeball.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_mine.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Floor\tr4_burningfloor.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_slicerdicer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_spikywall.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_spikyceiling.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR2\Trap\tr2_springboard.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR2\Trap\tr2_killerstatue.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_blade.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR2\Trap\tr2_spinningblade.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Vehicles\cannon.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Vehicles\minecart.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Vehicles\quad.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Vehicles\upv.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR2\Vehicles\boat.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR2\Vehicles\snowmobile.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR3\Vehicles\rubberboat.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR2\Entity\tr2_eagle_or_crow.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -993,6 +1218,7 @@
     <None Include="Shaders\Sprites.fx" />
     <None Include="Shaders\SSAO.fx" />
     <None Include="Shaders\Transparent.fx" />
+    <None Include="Resources.aps" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

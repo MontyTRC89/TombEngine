@@ -4,6 +4,7 @@
 #include "draw.h"
 #include "level.h"
 #include "lara.h"
+#include "fish.h"
 
 #define PIRAHNA_DAMAGE	4
 #define X	0
@@ -184,7 +185,7 @@ void ControlFish(short itemNumber)
 	if (PirahnaHitWait)
 		PirahnaHitWait--;
 
-	FISH_INFO* fish = (FISH_INFO*)&Fishes[leader];
+	FISH_INFO* fish = &Fishes[leader];
 
 	if (pirahnaAttack)
 	{

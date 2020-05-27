@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_birdmonster.h"
 #include "box.h"
 #include "effect.h"
 #include "lara.h"

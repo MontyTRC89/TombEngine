@@ -1,81 +1,6 @@
 #pragma once
 #include "global.h"
 
-struct FISH_INFO
-{
-	short x;
-	short y;
-	short z;
-	int	angle;
-	short destY;
-	short angAdd;
-	byte speed;
-	byte acc;
-	byte swim;
-};
-
-struct FISH_LEADER_INFO
-{
-	short angle;
-	byte speed;
-	byte on;
-	short angleTime;
-	short speedTime;
-	short xRange, yRange, zRange;
-};
-
-struct BOSS_STRUCT
-{
-	PHD_VECTOR BeamTarget;
-	bool DroppedIcon;
-	bool IsInvincible;
-	bool DrawExplode; // allow explosion geometry
-	bool Charged;
-	bool Dead;
-	short AttackCount;
-	short DeathCount;
-	short AttackFlag;
-	short AttackType;
-	short AttackHeadCount;
-	short RingCount;
-	short ExplodeCount;
-	short LizmanItem, LizmanRoom;
-	short HpCounter;
-};
-
-struct SHIELD_POINTS
-{
-	short x;
-	short y;
-	short z;
-	byte rsub;
-	byte gsub;
-	byte bsub;
-	byte pad[3];
-	long rgb;
-};
-
-struct EXPLOSION_VERTS
-{
-	short x;
-	short z;
-	long rgb;
-};
-
-struct EXPLOSION_RING
-{
-	short on;
-	short life;   // 0 - 32.
-	short speed;
-	short radius; // Width is 1/4 of radius.
-	short xrot;
-	short zrot;
-	int x;
-	int y;
-	int z;
-	EXPLOSION_VERTS	verts[16];
-};
-
 void ClampRotation(PHD_3DPOS *pos, short angle, short rot);
 
 // TR1 objects
@@ -91,47 +16,6 @@ void LaraEvilControl(short itemNum);
 void DrawEvilLara(ITEM_INFO* item);
 void NatlaControl(short itemNum);
 void NatlaEvilControl(short itemNum);
-
-// TR2 objects
-void BarracudaControl(short itemNum);
-void SharkControl(short itemNum);
-void InitialiseSpinningBlade(short itemNum);
-void SpinningBlade(short itemNum);
-void InitialiseKillerStatue(short itemNum);
-void KillerStatueControl(short itemNum);
-void SpringBoardControl(short itemNum);
-void RatControl(short itemNum);
-void SilencerControl(short itemNum);
-void InitialiseYeti(short itemNum);
-void YetiControl(short itemNum);
-void WorkerShotgunControl(short itemNum);
-void InitialiseWorkerShotgun(short itemNum);
-void WorkerMachineGunControl(short itemNum);
-void InitialiseWorkerMachineGun(short itemNum);
-void SmallSpiderControl(short itemNum);
-void BigSpiderControl(short itemNum);
-void WorkerDualGunControl(short itemNum);
-void BirdMonsterControl(short itemNum);
-void WorkerFlamethrower(short itemNum);
-void InitialiseWorkerFlamethrower(short itemNum);
-void KnifethrowerControl(short itemNum);
-void KnifeControl(short fxNum);
-void MercenaryUziControl(short itemNum);
-void MercenaryAutoPistolControl(short itemNum);
-void MonkControl(short itemNum);
-void DrawStatue(ITEM_INFO* item); // compatible with all statue :)
-void InitialiseSwordGuardian(short itemNum);
-void SwordGuardianFly(ITEM_INFO* item); // only effect to fly
-void SwordGuardianControl(short itemNum);
-void InitialiseSpearGuardian(short itemNum);
-void SpearGuardianControl(short itemNum);
-void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
-void DragonControl(short backNum);
-void InitialiseBartoli(short itemNum);
-void BartoliControl(short itemNum);
-void InitialiseSkidman(short itemNum);
-void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
-void SkidManControl(short riderNum);
 
 // TR3 objects
 void TigerControl(short itemNum);
@@ -163,10 +47,6 @@ void SetupShoal(int shoalNumber);
 void SetupFish(int leader, ITEM_INFO* item);
 void ControlFish(short itemNumber);
 bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item);
-void InitialiseTony(short itemNum);
-void TonyControl(short itemNum);
-void S_DrawTonyBoss(ITEM_INFO* item);
-void ControlTonyFireBall(short fxNumber);
 void InitialiseShiva(short itemNum);
 void ShivaControl(short itemNum);
 void ControlLaserBolts(short item_number);
@@ -178,32 +58,12 @@ void InitialiseCivvy(short item_number);
 void CivvyControl(short item_number);
 
 // TR4 object
-void FourBladesControl(short itemNum);
-void BirdBladeControl(short itemNum);
-void CatwalkBlaldeControl(short itemNum);
-void PlinthBladeControl(short itemNum);
-void InitialiseSethBlade(short itemNum);
-void SethBladeControl(short itemNum);
-void ChainControl(short itemNum);
-void PloughControl(short itemNum);
-void CogControl(short itemNum);
-void SpikeballControl(short itemNum);
-void StargateControl(short itemNum);
-void StargateCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
-void InitialiseSlicerDicer(short itemNum);
-void SlicerDicerControl(short itemNum);
-void BladeCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 void SarcophagusCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 void InitialiseLaraDouble(short itemNum);
 void LaraDoubleControl(short itemNum);
-void InitialiseMine(short itemNum);
-void MineControl(short itemNum);
-void MineCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 void ScalesControl(short itemNum);
 void ScalesCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);
 int RespawnAhmet(short itemNum);
-void InitialiseBurningFloor(short itemNum);
-void BurningFloorControl(short itemNum);
 void BubblesControl(short fxNum);
 int BubblesShatterFunction(FX_INFO* fx, int param1, int param2);
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel);

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_dragon.h"
 #include "lara.h"
 #include "effect2.h"
 #include "items.h"
@@ -12,8 +12,6 @@
 #include "setup.h"
 #include "input.h"
 #include "sound.h"
-
-
 
 // TODO: test the dragon and bartoli to check if it work !
 // TODO: upgrade the collision of dragon to pick the dagger correctly.
@@ -60,7 +58,7 @@ enum DRAGON_STATE {
 	DRAGON_DEATH
 };
 
-void createBartoliLight(short ItemIndex, int type)
+static void createBartoliLight(short ItemIndex, int type)
 {
 	ITEM_INFO* item;
 	item = &Items[ItemIndex];
@@ -73,7 +71,7 @@ void createBartoliLight(short ItemIndex, int type)
 		TriggerDynamicLight(item->pos.xPos, item->pos.yPos - STEP_SIZE, item->pos.zPos, (GetRandomControl() & 20) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
 }
 
-short dragonFire(int x, int y, int z, short speed, short yrot, short roomNumber)
+static short dragonFire(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number = NO_ITEM;
 	/*
@@ -100,7 +98,7 @@ short dragonFire(int x, int y, int z, short speed, short yrot, short roomNumber)
 	return fx_number;
 }
 
-void createExplosion(ITEM_INFO* item)
+static void createExplosion(ITEM_INFO* item)
 {
 	ITEM_INFO* itemExplo;
 	short ExplIndex;
@@ -134,7 +132,7 @@ void createExplosion(ITEM_INFO* item)
 	}
 }
 
-void createDragonBone(short front_number)
+static void createDragonBone(short front_number)
 {
 	/* Create the bones of the dragon */
 	short bone_back, bone_front;

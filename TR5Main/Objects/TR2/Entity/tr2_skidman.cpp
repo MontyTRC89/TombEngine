@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_skidman.h"
 #include "items.h"
 #include "collide.h"
 #include "lara.h"

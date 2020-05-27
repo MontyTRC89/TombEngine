@@ -1,6 +1,5 @@
 #pragma once
 #include "global.h"
-
 #include "ChunkId.h"
 #include "ChunkReader.h"
 #include "LEB128.h"
@@ -75,7 +74,7 @@ void FileClose(FILE* ptr);
 void FixUpRoom(ROOM_INFO* room, ROOM_INFO* roomData);
 void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
 
-unsigned __stdcall LoadLevel(void* data);
+unsigned CALLBACK LoadLevel(void* data);
 
 // New functions for loading data from TR5M footer
 bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg);
