@@ -1,5 +1,6 @@
+#include "framework.h"
 #include "Renderer11.h"
-#include "../Specific/winmain.h"
+#include "winmain.h"
 
 bool Renderer11::ToggleFullScreen()
 {

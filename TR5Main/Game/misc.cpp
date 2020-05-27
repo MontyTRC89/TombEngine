@@ -1,9 +1,7 @@
+#include "framework.h"
 #include "misc.h"
-#include "../Specific/setup.h"
-#include "..\Specific\level.h"
-
-#define CHK_ANY(var, flag) (var & flag) != 0
-#define CHK_NOP(var, flag) !(var & flag)
+#include "setup.h"
+#include "level.h"
 
 short GF(short animIndex, short frameToStart)
 {

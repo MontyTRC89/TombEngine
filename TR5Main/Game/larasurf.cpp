@@ -1,6 +1,5 @@
+#include "framework.h"
 #include "larasurf.h"
-
-#include "..\Global\global.h"
 #include "control.h"
 #include "camera.h"
 #include "collide.h"
@@ -10,8 +9,8 @@
 #include "laraswim.h"
 #include "larafire.h"
 #include "laramisc.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 
 extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);

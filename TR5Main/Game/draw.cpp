@@ -1,8 +1,9 @@
+#include "framework.h"
 #include "draw.h"
 #include "Lara.h"
-#include "..\Renderer\Renderer11.h"
 #include "camera.h"
-#include "../Specific/level.h"
+#include "level.h"
+#include "Renderer11.h"
 
 BITE_INFO EnemyBites[9] =
 {
@@ -129,27 +130,20 @@ int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
 bool TIME_Reset()
 {
 	LARGE_INTEGER fq;
-
 	QueryPerformanceCounter(&fq);
-
 	LdSync = (double)fq.LowPart + (double)fq.HighPart * (double)0xffffffff;
 	LdSync /= LdFreq;
-
 	return true;
 }
 
 bool TIME_Init()
 {
 	LARGE_INTEGER fq;
-
 	if (!QueryPerformanceFrequency(&fq))
 		return false;
-
 	LdFreq = (double)fq.LowPart + (double)fq.HighPart * (double)0xFFFFFFFF;
 	LdFreq /= 60.0;
-
 	TIME_Reset();
-
 	return true;
 }
 
@@ -157,16 +151,11 @@ int Sync()
 {
 	LARGE_INTEGER ct;
 	double dCounter;
-	
 	QueryPerformanceCounter(&ct);
-	
 	dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xFFFFFFFF;
 	dCounter /= LdFreq;
-	
 	long nFrames = long(dCounter) - long(LdSync);
-	
 	LdSync = dCounter;
-	
 	return nFrames;
 }
 
@@ -176,13 +165,13 @@ void DrawAnimatingItem(ITEM_INFO* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in ObjectInfo
 }
 
-void GetLaraJointPosition(PHD_VECTOR* pos, int joint)
+void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum)
 {
-	if (joint > 14)
-		joint = 14;
+	if (LM_enum >= NUM_LARA_MESHES)
+		LM_enum = LM_HEAD;
 
 	Vector3 p = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer->GetLaraAbsBonePosition(&p, joint);
+	g_Renderer->GetLaraAbsBonePosition(&p, LM_enum);
 
 	pos->x = p.x;
 	pos->y = p.y;

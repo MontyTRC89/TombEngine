@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "global.h"
 #include "control.h"
 
 #define NUM_ITEMS 1024

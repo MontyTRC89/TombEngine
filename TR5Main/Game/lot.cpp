@@ -1,11 +1,10 @@
+#include "framework.h"
 #include "lot.h"
 #include "box.h"
-#include "..\Global\global.h"
-#include <stdio.h>
-#include "../Specific/setup.h"
+#include "setup.h"
 #include "camera.h"
 #include "lara.h"
-#include "..\Specific\level.h"
+#include "level.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32

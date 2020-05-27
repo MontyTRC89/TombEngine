@@ -1,31 +1,40 @@
+#include "framework.h"
 #include "setup.h"
-#include "..\Game\draw.h"
-#include "..\Game\collide.h"
-#include "..\Game\effect2.h"
-#include "..\Game\effects.h"
-#include "..\Game\tomb4fx.h"
-#include "..\Game\Box.h"
-#include "..\Game\switch.h"
-#include "..\Game\missile.h"
-#include "..\Game\control.h"
-#include "..\Game\pickup.h"
-#include "../Game/camera.h"
-#include "..\Game\lara1gun.h"
-#include "..\Game\laraflar.h"
-#include "..\Game\larafire.h"
-#include "..\Game\laramisc.h"
-#include "..\Game\objects.h"
-#include "..\Game\door.h"
-#include "..\Game\rope.h"
-#include "..\Game\traps.h"
-#include "..\Game\flmtorch.h"
-#include "..\Objects\oldobjects.h"
-#include "..\Objects\newobjects.h"
-
+#include "draw.h"
+#include "collide.h"
+#include "effect2.h"
+#include "effect.h"
+#include "tomb4fx.h"
+#include "box.h"
+#include "switch.h"
+#include "missile.h"
+#include "control.h"
+#include "pickup.h"
+#include "camera.h"
+#include "lara1gun.h"
+#include "laraflar.h"
+#include "larafire.h"
+#include "laramisc.h"
+#include "objects.h"
+#include "door.h"
+#include "rope.h"
+#include "traps.h"
+#include "flmtorch.h"
 #include "level.h"
+#include "oldobjects.h"
+#include "newobjects.h"
+#include "tr1_objects.h"
+#include "tr2_objects.h"
+#include "tr3_objects.h"
+#include "tr4_objects.h"
+#include "tr5_objects.h"
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "quad.h"
+#include "snowmobile.h"
+#include "upv.h"
+#include "cannon.h"
+#include "minecart.h"
+#include "kayak.h"
 
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
@@ -52,295 +61,7 @@ void NewObjects()
 {
 	ObjectInfo* obj;
 
-	obj = &Objects[ID_SMALL_SCORPION];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSmallScorpion;
-		obj->control = SmallScorpionControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 8;
-		obj->pivotLength = 20;
-		obj->radius = 128;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_WILD_BOAR];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseWildBoar;
-		obj->control = WildBoarControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 40;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
-		Bones[obj->boneIndex + 48 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 52 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 52 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_BAT];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBat;
-		obj->control = BatControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 5;
-		obj->pivotLength = 10;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->zoneType = ZONE_FLYER;
-	}
-
-	obj = &Objects[ID_CHAIN];
-	if (obj->loaded)
-	{
-		obj->control = ChainControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_PLOUGH];
-	if (obj->loaded)
-	{
-		obj->control = PloughControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_FLOOR_4BLADES];
-	if (obj->loaded)
-	{
-		obj->control = FourBladesControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_CEILING_4BLADES];
-	if (obj->loaded)
-	{
-		obj->control = FourBladesControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SPIKEBALL];
-	if (obj->loaded)
-	{
-		obj->control = SpikeballControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_COG];
-	if (obj->loaded)
-	{
-		obj->control = CogControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_AHMET];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseAhmet;
-		obj->control = AhmetControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 80;
-		obj->pivotLength = 300;
-		obj->radius = 341;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		obj->hitEffect = HIT_BLOOD;
-
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_BADDY1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBaddy;
-		obj->control = BaddyControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 25;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
-		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
-
-		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 88 * 4] |= ROT_X;
-	}
-
-	obj = &Objects[ID_BADDY2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBaddy;
-		obj->control = BaddyControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 25;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
-		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
-
-		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 88 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 88 * 4] |= ROT_X;
-	}
-
-	obj = &Objects[ID_SAS_CAIRO];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSas;
-		obj->control = SasControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 40;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex] |= ROT_X;
-		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-	}
-
-	obj = &Objects[ID_MUMMY];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseMummy;
-		obj->control = MummyControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 15;
-		obj->radius = 170;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
-		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 72 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_QUAD];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseQuadBike;
-		obj->collision = QuadBikeCollision;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SHARK];
-	if (obj->loaded)
-	{
-		obj->control = SharkControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 30;
-		obj->pivotLength = 200;
-		obj->radius = 340;
-		obj->intelligent = true;
-		obj->waterCreature = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->zoneType = ZONE_WATER;
-
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_BARRACUDA];
-	if (obj->loaded)
-	{
-		obj->control = BarracudaControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 12;
-		obj->pivotLength = 200;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->waterCreature = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->zoneType = ZONE_WATER;
-
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_ROLLING_SPINDLE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSpinningBlade;
-		obj->control = SpinningBlade;
-		obj->collision = ObjectCollision;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SPRINGBOARD];
-	if (obj->loaded)
-	{
-		obj->control = SpringBoardControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
+	
 
 	obj = &Objects[ID_TIGER];
 	if (obj->loaded)
@@ -427,42 +148,6 @@ void NewObjects()
 		obj->control = HarpoonControl;
 		obj->collision = ObjectCollision;
 		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_EAGLE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseEagle;
-		obj->control = EagleControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 20;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->pivotLength = 0;
-		obj->zoneType = ZONE_FLYER;
-	}
-
-	obj = &Objects[ID_CROW];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseEagle;
-		obj->control = EagleControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 15;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->pivotLength = 0;
-		obj->zoneType = ZONE_FLYER;
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_AX];
@@ -577,39 +262,7 @@ void NewObjects()
 		obj->zoneType = ZONE_APE;
 	}
 
-	obj = &Objects[ID_RAT];
-	if (obj->loaded)
-	{
-		obj->control = RatControl;
-		obj->collision = CreatureCollision;
-		obj->hitPoints = 5;
-		obj->shadowSize = 128;
-		obj->pivotLength = 50;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SKELETON];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSkeleton;
-		obj->control = SkeletonControl;
-		obj->collision = CreatureCollision;
-		obj->hitPoints = 15;
-		obj->shadowSize = 128;
-		obj->pivotLength = 50;
-		obj->radius = 128;
-		obj->explodableMeshbits = 0xA00;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
+	
 
 	obj = &Objects[ID_GRENADE_GUN_ITEM];
 	if (obj->loaded)
@@ -690,24 +343,6 @@ void NewObjects()
 		obj->control = ControlCrossbowBolt;
 	}
 
-	obj = &Objects[ID_STARGATE];
-	if (obj->loaded)
-	{
-		obj->control = StargateControl;
-		obj->collision = StargateCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SLICER_DICER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSlicerDicer;
-		obj->control = SlicerDicerControl;
-		obj->collision = BladeCollision;
-		obj->saveFlags = true;
-	}
-
 	obj = &Objects[ID_SARCOPHAGUS];
 	if (obj->loaded)
 	{
@@ -734,109 +369,6 @@ void NewObjects()
 		obj->saveAnim = true;
 	}
 
-	obj = &Objects[ID_KNIGHT_TEMPLAR];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseKnightTemplar;
-		obj->control = KnightTemplarControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 15;
-		obj->pivotLength = 50;
-		obj->radius = 128;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_DEMIGOD1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDemigod;
-		obj->control = DemigodControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 200;
-		obj->pivotLength = 50;
-		obj->radius = 341;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->hitEffect = HIT_FRAGMENT;
-		obj->undead = true;
-
-		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_DEMIGOD2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDemigod;
-		obj->control = DemigodControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 200;
-		obj->pivotLength = 50;
-		obj->radius = 341;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->hitEffect = HIT_FRAGMENT;
-		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_DEMIGOD3];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDemigod;
-		obj->control = DemigodControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 200;
-		obj->pivotLength = 50;
-		obj->radius = 341;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->hitEffect = HIT_FRAGMENT;
-		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
-		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_MINE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseMine;
-		obj->control = MineControl;
-		obj->collision = MineCollision;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_JEAN_YVES];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseJeanYves;
-		obj->control = JeanYvesControl;
-		obj->collision = ObjectCollision;
-		obj->nonLot = true;
-		obj->savePosition = true;
-	}
-
 	obj = &Objects[ID_WATERSKIN1_EMPTY];
 	if (obj->loaded)
 	{
@@ -855,139 +387,6 @@ void NewObjects()
 		obj->collision = PickupCollision;
 		obj->saveFlags = true;
 		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_BIG_SCORPION];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseScorpion;
-		obj->control = ScorpionControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 80;
-		obj->pivotLength = 50;
-		obj->radius = 512;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_TROOPS];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTroops;
-		obj->control = TroopsControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 40;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
-		Bones[obj->boneIndex] |= ROT_X | ROT_Y;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_X | ROT_Y;
-	}
-
-	obj = &Objects[ID_SENTRY_GUN];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSentryGun;
-		obj->control = SentryGunControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 30;
-		obj->pivotLength = 50;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->explodableMeshbits = 64;
-
-		Bones[obj->boneIndex + 0] |= ROT_Y;
-		Bones[obj->boneIndex + 1 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 2 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 3 * 4] |= ROT_Z;
-	}
-
-	obj = &Objects[ID_HARPY];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseHarpy;
-		obj->control = HarpyControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 60;
-		obj->pivotLength = 50;
-		obj->radius = 409;
-		obj->intelligent = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->zoneType = ZONE_FLYER;
-	}
-
-	obj = &Objects[ID_GUIDE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseGuide;
-		obj->control = GuideControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = -16384;
-		obj->pivotLength = 0;
-		obj->radius = 128;
-		obj->intelligent = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
-		Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
-	}
-
-	obj = &Objects[ID_CROCODILE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCrocodile;
-		obj->control = CrocodileControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 36;
-		obj->pivotLength = 300;
-		obj->radius = 409;
-		obj->intelligent = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->waterCreature = true;
-		obj->zoneType = ZONE_WATER;
-
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_SPHINX];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSphinx;
-		obj->control = SphinxControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 1000;
-		obj->pivotLength = 500;
-		obj->radius = 512;
-		obj->intelligent = true;
-		obj->saveHitpoints = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 
 	obj = &Objects[ID_FLAMETHROWER_BADDY];
@@ -1010,30 +409,13 @@ void NewObjects()
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_SPIKY_WALL];
-	if (obj->loaded)
-	{
-		obj->control = ControlSpikyWall;
-		obj->collision = ObjectCollision;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SPIKY_CEILING];
-	if (obj->loaded)
-	{
-		obj->control = ControlSpikyCeiling;
-		obj->collision = TrapCollision;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-	}
+	
 
 	obj = &Objects[ID_MONKEY];
 	if (obj->loaded)
 	{
 		//if (!Objects[MESHSWAP2].loaded)
 		//	S_ExitSystem("FATAL: Monkey requires MESHSWAP2 (Monkey + Pickups)");
-
 		//obj->draw_routine = DrawMonkey;
 		obj->initialise = InitialiseMonkey;
 		obj->control = MonkeyControl;
@@ -1051,28 +433,6 @@ void NewObjects()
 		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 0 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_JEEP];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseJeep;
-		obj->collision = JeepCollision;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_MOTORBIKE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseMotorbike;
-		obj->collision = MotorbikeCollision;
-		//obj->drawRoutine = DrawMotorbike; // for wheel rotation
-		obj->drawRoutineExtra = DrawMotorbikeEffect;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
 	}
 	
 	obj = &Objects[ID_MP_WITH_GUN];
@@ -1118,59 +478,12 @@ void NewObjects()
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_YETI];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseYeti;
-		obj->collision = CreatureCollision;
-		obj->control = YetiControl;
-		obj->hitPoints = 30;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->radius = 128;
-		obj->pivotLength = 100;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
-		Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
-	}
+	
 
-	obj = &Objects[ID_SNOWMOBILE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSkidoo;
-		obj->collision = SkidooCollision;
-		//obj->drawRoutine = DrawSkidoo; // TODO: create a new render for the skidoo. (with track animated)
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
+	
 
-	obj = &Objects[ID_KAYAK];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseKayak;
-		obj->collision = KayakCollision;
-		//obj->drawRoutine = DrawKayak;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
+	
 
-	obj = &Objects[ID_SPEEDBOAT];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBoat;
-		obj->collision = BoatCollision;
-		obj->control = BoatControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 1 * 4] |= ROT_Z;
-	}
 }
 
 void BaddyObjects()
@@ -3123,398 +2436,13 @@ void CustomObjects()
 {
 	ObjectInfo* obj;
 
-	obj = &Objects[ID_GOON_SILENCER1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = SilencerControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 25;
-		obj->biteOffset = 0;
-		obj->radius = 102;
-		obj->pivotLength = 50;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_GOON_SILENCER2];
-	if (obj->loaded)
-	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
-		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
-		}
-		else
-		{
-			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
-		}
-
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = SilencerControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 25;
-		obj->biteOffset = 0;
-		obj->radius = 102;
-		obj->pivotLength = 50;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_GOON_SILENCER3];
-	if (obj->loaded)
-	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
-		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
-		}
-		else
-		{
-			MessageBox(NULL, "ID_GOON_SILENCER1 not found !", NULL, MB_OK);
-		}
-
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = SilencerControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 25;
-		obj->biteOffset = 0;
-		obj->radius = 102;
-		obj->pivotLength = 50;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_WORKER_SHOTGUN];
-	if (obj->loaded)
-	{
-		obj->biteOffset = 0;
-		obj->initialise = InitialiseWorkerShotgun;
-		obj->collision = CreatureCollision;
-		obj->control = WorkerShotgunControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 25;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
-	}
-
-	obj = &Objects[ID_WORKER_MACHINEGUN];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseWorkerMachineGun;
-		obj->collision = CreatureCollision;
-		obj->control = WorkerMachineGunControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 20;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
-	}
-
-	obj = &Objects[ID_SMALL_SPIDER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = SmallSpiderControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 5;
-		obj->pivotLength = 0;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_BIG_SPIDER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = BigSpiderControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 40;
-		obj->pivotLength = 0;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_WORKER_DUAL_REVOLVER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = WorkerDualGunControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 150;
-		obj->pivotLength = 0;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 11*4] |= (ROT_X|ROT_Y);
-		Bones[obj->boneIndex + 0*4] |= (ROT_X|ROT_Y);
-	}
-
-	obj = &Objects[ID_TONY_BOSS];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTony;
-		obj->collision = CreatureCollision;
-		obj->control = TonyControl;
-		obj->drawRoutine = S_DrawTonyBoss;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 100;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-	}
-
-	obj = &Objects[ID_TONY_BOSS_FLAME];
-	obj->control = ControlTonyFireBall;
-	obj->drawRoutine = NULL;
-
-	obj = &Objects[ID_BIRDMONSTER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = BirdMonsterControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 200;
-		obj->pivotLength = 0;
-		obj->radius = 341;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_WORKER_FLAMETHROWER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseWorkerFlamethrower;
-		obj->collision = CreatureCollision;
-		obj->control = WorkerFlamethrower;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 20;
-		obj->pivotLength = 0;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 4 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_KNIFETHROWER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = KnifethrowerControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 60;
-		obj->pivotLength = 50;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		//Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
-		// TODO: find the correct for bones (knifethrower).
-	}
-
-	obj = &Objects[ID_KNIFETHROWER_KNIFE];
-	if (obj->loaded)
-		obj->control = KnifeControl;
-
-	obj = &Objects[ID_MERCENARY_UZI];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = MercenaryUziControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 45;
-		obj->pivotLength = 0;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_MERCENARY_AUTOPISTOLS1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = MercenaryAutoPistolControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 50;
-		obj->pivotLength = 0;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
-	if (obj->loaded)
-	{
-		if (Objects[ID_MERCENARY_AUTOPISTOLS1].loaded)
-		{
-			obj->animIndex = Objects[ID_MERCENARY_AUTOPISTOLS1].animIndex;
-			obj->frameBase = Objects[ID_MERCENARY_AUTOPISTOLS1].frameBase;
-		}
-		else
-		{
-			MessageBox(NULL, "ID_MERCENARY_AUTOPISTOLS1 not found !", NULL, MB_OK);
-		}
-
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = MercenaryAutoPistolControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 50;
-		obj->pivotLength = 0;
-		obj->radius = 102;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_MONK1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = MonkControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 50;
-		obj->pivotLength = 0;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_MONK2];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseCreature;
-		obj->collision = CreatureCollision;
-		obj->control = MonkControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 50;
-		obj->pivotLength = 0;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_SWORD_GUARDIAN];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSwordGuardian;
-		obj->collision = CreatureCollision;
-		obj->control = SwordGuardianControl;
-		obj->drawRoutine = DrawStatue;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 80;
-		obj->pivotLength = 0;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
-		// TODO: bones value is not correct (shiva) !
-		// need the correct one.
-	}
-
 	obj = &Objects[ID_SHIVA];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseShiva;
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;
-		obj->drawRoutine = DrawStatue;
+		//obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->hitPoints = 100;
 		obj->pivotLength = 0;
@@ -3526,106 +2454,6 @@ void CustomObjects()
 		obj->savePosition = true;
 		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		Bones[obj->boneIndex + 25 * 4] |= (ROT_X | ROT_Y);
-	}
-
-	obj = &Objects[ID_SPEAR_GUARDIAN];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSpearGuardian;
-		obj->collision = CreatureCollision;
-		obj->control = SpearGuardianControl;
-		obj->drawRoutine = DrawStatue;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 100;
-		obj->pivotLength = 0;
-		obj->radius = 204;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		//Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct id for bones ! (spear)
-	}
-
-	obj = &Objects[ID_DRAGON_FRONT];
-	if (obj->loaded)
-	{
-		if (!Objects[ID_DRAGON_BACK].loaded)
-			printf("FATAL: ID_DRAGON_BACK need ID_DRAGON_BACK !");
-
-		obj->collision = DragonCollision;
-		obj->control = DragonControl;
-		obj->hitPoints = 300;
-		obj->pivotLength = 300;
-		obj->radius = 256;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-		Bones[obj->boneIndex + 10 * 4] |= ROT_Z;
-	}
-
-	obj = &Objects[ID_DRAGON_BACK];
-	if (obj->loaded)
-	{
-		if (!Objects[ID_MARCO_BARTOLI].loaded)
-			printf("FATAL: ID_DRAGON_BACK need ID_MARCO_BARTOLI !");
-
-		obj->collision = DragonCollision;
-		obj->control = DragonControl;
-		obj->radius = 256;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_MARCO_BARTOLI];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseBartoli;
-		obj->control = BartoliControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SNOWMOBILE_GUN];
-	if (obj->loaded)
-	{
-		obj->collision = SkidManCollision;
-		obj->drawRoutine = DrawSkidoo;
-		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 100;
-		obj->pivotLength = 0;
-		obj->radius = 256;
-		obj->intelligent = true;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->saveHitpoints = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_SNOWMOBILE_DRIVER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSkidman;
-		obj->control = SkidManControl;
-		obj->hitPoints = 1;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_MINECART];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseMineCart;
-		obj->collision = MineCartCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_SOPHIA_LEE_BOSS];
@@ -3728,6 +2556,14 @@ void CustomObjects()
 	}
 }
 
+static void InitialiseTR5Objects()
+{
+	BaddyObjects();
+	ObjectObjects();
+	TrapObjects();
+	PickupObjects();
+}
+
 void InitialiseObjects()
 {
 	ObjectInfo* obj;
@@ -3765,17 +2601,12 @@ void InitialiseObjects()
 		obj->frameBase += (short)Frames;
 	}
 
-	// Standard TR5 objects
-	BaddyObjects();
-	ObjectObjects();
-	TrapObjects();
-	PickupObjects();
+	InitialiseTR1Objects(); // Standard TR1 objects
+	InitialiseTR2Objects(); // Standard TR2 objects
+	InitialiseTR3Objects(); // Standard TR3 objects
+	InitialiseTR4Objects(); // Standard TR4 objects
+	InitialiseTR5Objects(); // Standard TR5 objects
 
-	/*for (int i = 0; i < 400; i++)
-	{
-		memcpy(&LegacyObjects[i], &Objects[i], sizeof(ObjectInfo));
-	}*/
-	
 	// New objects imported from old TRs
 	NewObjects();
 
