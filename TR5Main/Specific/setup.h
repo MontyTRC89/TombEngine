@@ -1,8 +1,9 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
-struct ObjectInfo {
+struct ObjectInfo
+{
 	short nmeshes; 
 	short meshIndex; 
 	int boneIndex; 

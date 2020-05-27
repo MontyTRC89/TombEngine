@@ -1,9 +1,5 @@
 #pragma once
-
-#include "..\Specific\configuration.h"
-#include <vector>
-
-using namespace std;
+#include "configuration.h"
 
 // New inventory
 #define NUM_INVENTORY_OBJECTS_PER_RING	120

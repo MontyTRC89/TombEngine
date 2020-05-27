@@ -1,19 +1,15 @@
+#include "framework.h"
 #include "configuration.h"
-
 #include "winmain.h"
-#include "..\resource.h"
-#include "..\Renderer\Renderer11.h"
-#include "..\Specific\input.h"
-#include "..\Scripting\GameFlowScript.h"
-
-#include <CommCtrl.h>
+#include "resource.h"
+#include "Renderer11.h"
+#include "input.h"
+#include "GameFlowScript.h"
 #include "configuration.h"
-#include <bass.h>
-#include "../Game/sound.h"
+#include "sound.h"
 
 extern Renderer11* g_Renderer;
 extern GameFlow* g_GameFlow;
-
 GameConfiguration g_Configuration;
 
 void LoadResolutionsInCombobox(HWND handle, int index)

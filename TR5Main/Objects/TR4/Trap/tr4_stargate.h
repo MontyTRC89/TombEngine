@@ -1,0 +1,5 @@
+#pragma once
+#include "types.h"
+
+void StargateControl(short itemNum);
+void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c);

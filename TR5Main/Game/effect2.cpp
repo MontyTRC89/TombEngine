@@ -1,14 +1,15 @@
+#include "framework.h"
 #include "effect2.h"
 #include "draw.h"
 #include "tomb4fx.h"
 #include "traps.h"
-#include "math.h"
+#include "trmath.h"
 #include "lara.h"
-#include "effects.h"
+#include "effect.h"
 #include "sound.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "GameFlowScript.h"
+#include "setup.h"
+#include "level.h"
 
 //long wibble;
 //long SplashCount;
