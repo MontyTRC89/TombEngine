@@ -1,15 +1,6 @@
 #pragma once
-
-#include <d3d11.h>
-#include <SimpleMath.h>
-#include <vector>
-#include <string>
-#include "../Game/sound.h"
-#include "../Specific/IO/Streams.h"
-
-using namespace std;
-using namespace DirectX;
-using namespace DirectX::SimpleMath;
+#include "sound.h"
+#include "Streams.h"
 
 struct TrTexturePage 
 {

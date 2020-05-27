@@ -1,12 +1,8 @@
 #pragma once
-
-#include <vector>
-#include <string>
 #include "savegame.h"
 
-using namespace std;
-
-typedef struct SavegameInfo {
+typedef struct SavegameInfo
+{
 	bool present;
 	char levelName[75];
 	int saveNumber;

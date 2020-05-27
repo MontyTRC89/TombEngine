@@ -1,20 +1,13 @@
 #pragma once
-
-#include "..\Global\global.h"
-
-#include <vector>
-#include <map>
-
-#include "IO/ChunkId.h"
-#include "IO/ChunkReader.h"
-#include "IO/LEB128.h"
+#include "global.h"
+#include "ChunkId.h"
+#include "ChunkReader.h"
+#include "LEB128.h"
 
 struct ChunkId;
 struct LEB128;
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
-
-using namespace std;
 
 extern byte* Texture32;
 extern byte* Texture16;
@@ -81,7 +74,7 @@ void FileClose(FILE* ptr);
 void FixUpRoom(ROOM_INFO* room, ROOM_INFO* roomData);
 void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
 
-unsigned __stdcall LoadLevel(void* data);
+unsigned CALLBACK LoadLevel(void* data);
 
 // New functions for loading data from TR5M footer
 bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg);

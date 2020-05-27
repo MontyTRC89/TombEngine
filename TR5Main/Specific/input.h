@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "global.h"
 
 #define NUM_CONTROLS			18
 

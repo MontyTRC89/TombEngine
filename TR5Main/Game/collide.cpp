@@ -1,34 +1,32 @@
+#include "framework.h"
 #include "collide.h"
 #include "draw.h"
 #include "Lara.h"
-
-#include "..\Global\global.h"
-
-#include <stdio.h>
 #include "items.h"
-#include "effects.h"
+#include "effect.h"
 #include "sphere.h"
 #include "misc.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "setup.h"
+#include "level.h"
 #include "sound.h"
 
-char LM[] = {
-	LJ_HIPS,
-	LJ_LTHIGH,
-	LJ_LSHIN,
-	LJ_LFOOT,
-	LJ_RTHIGH,
-	LJ_RSHIN,
-	LJ_RFOOT,
-	LJ_TORSO,
-	LJ_RINARM,
-	LJ_ROUTARM,
-	LJ_RHAND,
-	LJ_LINARM,
-	LJ_LOUTARM,
-	LJ_LHAND,
-	LJ_HEAD,
+char LM[] =
+{
+	LM_HIPS,
+	LM_LTHIGH,
+	LM_LSHIN,
+	LM_LFOOT,
+	LM_RTHIGH,
+	LM_RSHIN,
+	LM_RFOOT,
+	LM_TORSO,
+	LM_RINARM,
+	LM_ROUTARM,
+	LM_RHAND,
+	LM_LINARM,
+	LM_LOUTARM,
+	LM_LHAND,
+	LM_HEAD,
 };
 
 int XFront, ZFront;

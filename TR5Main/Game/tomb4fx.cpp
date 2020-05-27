@@ -1,11 +1,12 @@
+#include "framework.h"
 #include "tomb4fx.h"
-#include "../Global/global.h"
+#include "global.h"
 #include "lara.h"
 #include "effect2.h"
 #include "draw.h"
 #include "items.h"
-#include "../Specific/setup.h"
-#include "..\Specific\level.h"
+#include "setup.h"
+#include "level.h"
 #include "sound.h"
 #include "bubble.h"
 
@@ -1201,7 +1202,7 @@ void TriggerLaraDrips()// (F)
 	}
 }
 
-int ExplodingDeath(short itemNumber, int meshBits, short damage)
+int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->objectNumber];
@@ -1234,7 +1235,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 	int bits = 1;
 	if (meshBits & 1 && item->meshBits & 1)
 	{
-		if (damage & 0x100 || !(GetRandomControl() & 3))
+		if (flags & 0x100 || !(GetRandomControl() & 3))
 		{
 			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, 0);
 			
@@ -1250,24 +1251,24 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 				fx->pos.zRot = 0;
 				fx->pos.xRot = 0;
 
-				if (damage & 0x10)
+				if (flags & 0x10)
 				{
 					fx->speed = 0;
 				}
 				else
 				{
-					if (damage & 0x20)
+					if (flags & 0x20)
 						fx->speed = GetRandomControl() >> 12;
 					else
 						fx->speed = GetRandomControl() >> 8;
 				}
-				if (damage & 0x40)
+				if (flags & 0x40)
 				{
 					fx->fallspeed = 0;
 				}
 				else
 				{
-					if ((damage & 0x80u) == 0)
+					if ((flags & 0x80u) == 0)
 						fx->fallspeed = -(GetRandomControl() >> 8);
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);

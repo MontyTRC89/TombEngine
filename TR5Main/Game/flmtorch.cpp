@@ -1,5 +1,6 @@
+#include "framework.h"
 #include "flmtorch.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "effect2.h"
 #include "laraflar.h"
 #include "lara.h"
@@ -9,16 +10,16 @@
 #include "switch.h"
 #include "draw.h"
 #include "items.h"
-#include "..\Specific\level.h"
-#include "../Specific/setup.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "setup.h"
+#include "input.h"
 #include "sound.h"
+#include "snowmobile.h"
 
 short FireBounds[12] =
 {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
-
 
 void TriggerTorchFlame(char fxObj, char node)
 {

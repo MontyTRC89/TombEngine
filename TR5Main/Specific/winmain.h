@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 #pragma comment(linker,"/manifestdependency:\"" \
     "type='win32' " \
@@ -11,17 +11,14 @@
     "language='*'\"")
 
 extern WINAPP	 App;
-extern unsigned int threadId;
-extern uintptr_t hThread;
+extern unsigned int ThreadID;
+extern uintptr_t ThreadHandle;
 extern HACCEL hAccTable;
 extern HWND WindowsHandle;
 
-//#define GameClose ((int (__cdecl*)(void)) 0x004A8575)
-//#define WinAppProc2 ((int (__cdecl*)(HWND, UINT, WPARAM, LPARAM)) 0x004D2AB0)
-
 int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description);
-int WinProcMsg();
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
-int WinClose();
+void WinProcMsg();
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
+void WinClose();
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-void __stdcall HandleWmCommand(unsigned short wParam);
+void CALLBACK HandleWmCommand(unsigned short wParam);

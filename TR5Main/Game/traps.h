@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 extern ITEM_INFO* WBItem;
 extern short WBRoom;

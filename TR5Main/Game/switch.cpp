@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "switch.h"
 #include "laramisc.h"
 #include "door.h"
@@ -10,9 +11,9 @@
 #include "draw.h"
 #include "sphere.h"
 #include "camera.h"
-#include "../Specific/setup.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "setup.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
 byte SequenceUsed[6];

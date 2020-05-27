@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 enum spotcam_flags
 {

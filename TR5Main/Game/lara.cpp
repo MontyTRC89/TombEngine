@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "Lara.h"
-
 #include "control.h"
 #include "items.h"
 #include "collide.h"
@@ -8,7 +8,7 @@
 #include "misc.h"
 #include "draw.h"
 #include "sphere.h"
-#include "Camera.h"
+#include "camera.h"
 #include "larasurf.h"
 #include "laraswim.h"
 #include "lara1gun.h"
@@ -17,15 +17,22 @@
 #include "laramisc.h"
 #include "laraclmb.h"
 #include "rope.h"
-#include "healt.h"
-
-#include "..\Objects\newobjects.h"
-#include "..\Global\global.h"
-#include "../Specific/level.h"
-#include "../Specific/input.h"
+#include "health.h"
+#include "newobjects.h"
+#include "global.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
-#include <stdio.h>
+#include "motorbike.h"
+#include "cannon.h"
+#include "quad.h"
+#include "snowmobile.h"
+#include "jeep.h"
+#include "boat.h"
+#include "upv.h"
+#include "kayak.h"
+#include "minecart.h"
 
 static short LeftClimbTab[4] = // offset 0xA0638
 {
@@ -402,6 +409,16 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 				if (SkidooControl())
 					return;
 				break;
+
+			//case ID_SPEEDBOAT:
+			//	if (BoatControl())
+			//		return;
+			//	break;
+
+			//case ID_RUBBERBOAT:
+			//	if (RubberBoatControl())
+			//		return;
+			//	break;
 
 			//case ID_UPV:
 			//	if (SubControl())

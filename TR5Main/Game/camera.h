@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 #include <d3d9.h>
 
 extern PHD_VECTOR CurrentCameraPosition;
