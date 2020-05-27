@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_sword_guardian.h"
 #include "box.h"
 #include "effect.h"
 #include "lot.h"
@@ -25,7 +25,7 @@ void InitialiseSwordGuardian(short itemNum)
 	//item->meshBits = 0;
 }
 
-void SwordGuardianFly(ITEM_INFO* item)
+static void SwordGuardianFly(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
 

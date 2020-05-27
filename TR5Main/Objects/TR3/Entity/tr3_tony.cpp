@@ -1,9 +1,10 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_tony.h"
 #include "effect2.h"
 #include "sphere.h"
 #include "items.h"
 #include "lot.h"
+#include "boss.h"
 #include "box.h"
 #include "draw.h"
 #include "effect.h"
@@ -31,7 +32,7 @@ struct TONY_FLAME
 	PHD_VECTOR pos;
 	int fallspeed;
 	int speed;
-	short y_rot;
+	short yRot;
 	short room_number;
 	TonyFlameType type;
 };
@@ -64,7 +65,7 @@ static void TriggerTonyEffect(const TONY_FLAME flame)
 		fx->pos.zPos = flame.pos.z;
 		fx->fallspeed = flame.fallspeed;
 		fx->pos.xRot = 0;
-		fx->pos.yRot = flame.y_rot;
+		fx->pos.yRot = flame.yRot;
 		fx->pos.zRot = 0;
 		fx->objectNumber = ID_TONY_BOSS_FLAME;
 		fx->speed = flame.speed;
@@ -84,7 +85,7 @@ static void TriggerTonyEffect(const TONY_FLAME flame)
 	}
 }
 
-void TriggerTonyFlame(short itemNum, int hand)
+static void TriggerTonyFlame(short itemNum, int hand)
 {
 	ITEM_INFO* item;
 	SPARKS* sptr;
@@ -144,7 +145,7 @@ void TriggerTonyFlame(short itemNum, int hand)
 	sptr->dSize = size >> 2;
 }
 
-void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
+static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
 {
 	SPARKS* sptr;
 	int dx, dz;
@@ -224,7 +225,7 @@ void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, long zv)
 	}
 }
 
-void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, short roomNumber, short angle, int zdspeed)
+static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, short roomNumber, short angle, int zdspeed)
 {
 	TONY_FLAME flame;
 	memset(&flame, 0, sizeof(TONY_FLAME));
@@ -239,7 +240,7 @@ void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, 
 		GetJointAbsPosition(item, &flame.pos, 10);
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.y_rot = item->pos.yRot;
+		flame.yRot = item->pos.yRot;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPL;
 		break;
@@ -251,7 +252,7 @@ void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, 
 		GetJointAbsPosition(item, &flame.pos, 13);
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.y_rot = item->pos.yRot;
+		flame.yRot = item->pos.yRot;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPR;
 		break;
@@ -263,7 +264,7 @@ void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, 
 		GetJointAbsPosition(item, &flame.pos, 13);
 		flame.fallspeed = (GetRandomControl() & 7) + 10;
 		flame.speed = 160;
-		flame.y_rot = item->pos.yRot;
+		flame.yRot = item->pos.yRot;
 		flame.room_number = roomNumber;
 		flame.type = T_ZAPP;
 		break;
@@ -274,7 +275,7 @@ void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, 
 		flame.pos.z = lara_pos->z;
 		flame.fallspeed = (GetRandomControl() & 3) + 4;
 		flame.speed = 0;
-		flame.y_rot = angle;
+		flame.yRot = angle;
 		flame.room_number = roomNumber;
 		flame.type = T_DROPPER;
 		break;
@@ -285,7 +286,7 @@ void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, 
 		flame.pos.z = lara_pos->z;
 		flame.fallspeed = (GetRandomControl() & 3) - 2;
 		flame.speed = zdspeed + (GetRandomControl() & 3);
-		flame.y_rot = GetRandomControl() << 1;
+		flame.yRot = GetRandomControl() << 1;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPDEBRIS;
 		break;
@@ -297,7 +298,7 @@ void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, 
 		flame.fallspeed = -(GetRandomControl() & 15) - 16;
 		flame.speed = (GetRandomControl() & 7) + 48;
 		angle += (GetRandomControl() & 0x1fff) - 0x9000;
-		flame.y_rot = angle;
+		flame.yRot = angle;
 		flame.room_number = roomNumber;
 		flame.type = T_ZAPPDEBRIS;
 		break;
@@ -308,7 +309,7 @@ void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, PHD_VECTOR* lara_pos, 
 		flame.pos.z = lara_pos->z;
 		flame.fallspeed = -(GetRandomControl() & 31) - 32;
 		flame.speed = (GetRandomControl() & 31) + 32;
-		flame.y_rot = GetRandomControl() << 1;
+		flame.yRot = GetRandomControl() << 1;
 		flame.room_number = roomNumber;
 		flame.type = T_DROPPERDEBRIS;
 		break;
@@ -444,7 +445,7 @@ void ControlTonyFireBall(short fxNumber)
 	}
 }
 
-void TonyBossDie(short itemNum)
+static void TonyBossDie(short itemNum)
 {
 	ITEM_INFO* item;
 	item = &Items[itemNum];

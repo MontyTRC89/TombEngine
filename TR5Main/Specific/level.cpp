@@ -841,9 +841,8 @@ void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 	}
 }
 
-unsigned __stdcall LoadLevel(void* data)
+unsigned CALLBACK LoadLevel(void* data)
 {
-	//DB_Log(5, "LoadLevel - DLL");
 	printf("LoadLevel\n");
 
 	char* filename = (char*)data;

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_yeti.h"
 #include "box.h"
 #include "effect.h"
 #include "items.h"

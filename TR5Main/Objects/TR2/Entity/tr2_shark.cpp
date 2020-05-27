@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_shark.h"
 #include "box.h"
 #include "effect.h"
 #include "lara.h"
@@ -102,5 +102,7 @@ void SharkControl(short itemNum)
 		CreatureUnderwater(item, 340);
 	}
 	else
+	{
 		AnimateItem(item);
+	}
 }

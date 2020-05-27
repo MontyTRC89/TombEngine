@@ -24,8 +24,23 @@
 #include "tr4_wraith.h"
 /// objects
 
+/// switch
+#include "tr4_cog.h"
 /// traps
-
+#include "tr4_birdblade.h"
+#include "tr4_blade.h"
+#include "tr4_catwalkblade.h"
+#include "tr4_chain.h"
+#include "tr4_fourblades.h"
+#include "tr4_mine.h"
+#include "tr4_plinthblade.h"
+#include "tr4_plough.h"
+#include "tr4_sethblade.h"
+#include "tr4_slicerdicer.h"
+#include "tr4_spikeball.h"
+#include "tr4_spikywall.h"
+#include "tr4_spikyceiling.h"
+#include "tr4_stargate.h"
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
@@ -35,9 +50,8 @@
 #include "setup.h"
 #include "level.h"
 
-static void InitialiseBaddy()
+static void InitialiseBaddy(ObjectInfo* obj)
 {
-    ObjectInfo* obj;
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
 	{
@@ -467,21 +481,144 @@ static void InitialiseBaddy()
 	}
 }
 
-static void InitialiseObject()
+static void InitialiseObject(ObjectInfo* obj)
 {
-	ObjectInfo* obj;
 
 }
 
-static void InitialiseTrap()
+static void InitialiseTrap(ObjectInfo* obj)
 {
-	ObjectInfo* obj;
-	
+	obj = &Objects[ID_CHAIN];
+	if (obj->loaded)
+	{
+		obj->control = ChainControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_PLOUGH];
+	if (obj->loaded)
+	{
+		obj->control = PloughControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_FLOOR_4BLADES];
+	if (obj->loaded)
+	{
+		obj->control = FourBladesControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_CEILING_4BLADES];
+	if (obj->loaded)
+	{
+		obj->control = FourBladesControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SPIKEBALL];
+	if (obj->loaded)
+	{
+		obj->control = SpikeballControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_CHAIN];
+	if (obj->loaded)
+	{
+		obj->control = ChainControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_PLOUGH];
+	if (obj->loaded)
+	{
+		obj->control = PloughControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_FLOOR_4BLADES];
+	if (obj->loaded)
+	{
+		obj->control = FourBladesControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_CEILING_4BLADES];
+	if (obj->loaded)
+	{
+		obj->control = FourBladesControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_STARGATE];
+	if (obj->loaded)
+	{
+		obj->control = StargateControl;
+		obj->collision = StargateCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SLICER_DICER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSlicerDicer;
+		obj->control = SlicerDicerControl;
+		obj->collision = BladeCollision;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_MINE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMine;
+		obj->control = MineControl;
+		obj->collision = MineCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_SPIKY_WALL];
+	if (obj->loaded)
+	{
+		obj->control = ControlSpikyWall;
+		obj->collision = ObjectCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SPIKY_CEILING];
+	if (obj->loaded)
+	{
+		obj->control = ControlSpikyCeiling;
+		obj->collision = TrapCollision;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
 }
 
-static void InitialiseVehicles()
+static void InitialiseVehicles(ObjectInfo* obj)
 {
-	ObjectInfo* obj;
 	obj = &Objects[ID_JEEP];
 	if (obj->loaded)
 	{
@@ -505,10 +642,24 @@ static void InitialiseVehicles()
 	}
 }
 
+static void InitialiseSwitch(ObjectInfo* obj)
+{
+	obj = &Objects[ID_COG];
+	if (obj->loaded)
+	{
+		obj->control = CogControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+}
+
+static ObjectInfo* objToInit;
 void InitialiseTR4Objects()
 {
-    InitialiseBaddy();
-    InitialiseObject();
-    InitialiseTrap();
-	InitialiseVehicles();
+    InitialiseBaddy(objToInit);
+    InitialiseObject(objToInit);
+	InitialiseSwitch(objToInit);
+    InitialiseTrap(objToInit);
+	InitialiseVehicles(objToInit);
 }
