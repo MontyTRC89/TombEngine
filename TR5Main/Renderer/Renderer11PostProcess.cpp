@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "Renderer11.h"
 
 void Renderer11::EnableCinematicBars(bool value)

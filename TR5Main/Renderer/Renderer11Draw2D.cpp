@@ -1,6 +1,7 @@
+#include "framework.h"
 #include "Renderer11.h"
-#include "../game/camera.h"
-#include "../Game/spotcam.h"
+#include "camera.h"
+#include "spotcam.h"
 
 RendererHUDBar* g_HealthBar;
 RendererHUDBar* g_AirBar;

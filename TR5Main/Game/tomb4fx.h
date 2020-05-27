@@ -1,6 +1,6 @@
 #pragma once
-#include "..\Global\types.h"
-#include "..\Global\constants.h"
+#include "types.h"
+#include "constants.h"
 
 struct ENERGY_ARC
 {
@@ -73,7 +73,7 @@ void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
 void TriggerLaraDrips();
-int ExplodingDeath(short itemNumber, int meshBits, short damage);
+int ExplodingDeath(short itemNumber, int meshBits, short flags);
 int GetFreeShockwave();
 void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel);

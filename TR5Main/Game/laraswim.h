@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "global.h"
 
 void LaraWaterCurrent(COLL_INFO* coll);
 int GetWaterDepth(int x, int y, int z, short roomNumber);

@@ -1,9 +1,10 @@
+#include "framework.h"
 #include "traps.h"
-#include "..\Global\global.h"
+#include "global.h"
 #include "items.h"
 #include "effect2.h"
 #include "tomb4fx.h"
-#include "effects.h"
+#include "effect.h"
 #include "lara.h"
 #include "collide.h"
 #include "switch.h"
@@ -11,8 +12,8 @@
 #include "camera.h"
 #include "objlight.h"
 #include "draw.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};

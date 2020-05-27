@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "global.h"
 
 extern OBJECT_TEXTURE* WaterfallTextures[6];
 extern float WaterfallY[6];
