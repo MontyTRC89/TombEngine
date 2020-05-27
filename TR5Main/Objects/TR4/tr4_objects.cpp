@@ -1,27 +1,27 @@
 #include "framework.h"
 #include "tr4_objects.h"
 /// entities
-#include "tr4_ahmet.h"
-#include "tr4_baddy.h"
-#include "tr4_bat.h"
-#include "tr4_bigscorpion.h"
-#include "tr4_crocodile.h"
-#include "tr4_demigod.h"
-#include "tr4_guide.h"
-#include "tr4_harpy.h"
-#include "tr4_horseman.h"
-#include "tr4_jeanyves.h"
-#include "tr4_knighttemplar.h"
+#include "tr4_ahmet.h" // OK
+#include "tr4_baddy.h" // OK
+#include "tr4_bat.h" // OK
+#include "tr4_bigscorpion.h" // OK
+#include "tr4_crocodile.h" // OK
+#include "tr4_demigod.h" // OK
+#include "tr4_guide.h" // OK
+#include "tr4_harpy.h" // OK
+#include "tr4_horseman.h" // OFF
+#include "tr4_jeanyves.h" // OK
+#include "tr4_knighttemplar.h" // OK
 #include "tr4_littlebeetle.h"
-#include "tr4_mummy.h"
-#include "tr4_sas.h"
-#include "tr4_sentrygun.h"
-#include "tr4_skeleton.h"
-#include "tr4_smallscorpion.h"
-#include "tr4_sphinx.h"
-#include "tr4_troops.h"
-#include "tr4_wildboar.h"
-#include "tr4_wraith.h"
+#include "tr4_mummy.h" // OK
+#include "tr4_sas.h" // OK
+#include "tr4_sentrygun.h" // OK
+#include "tr4_skeleton.h" // OK
+#include "tr4_smallscorpion.h" // OK
+#include "tr4_sphinx.h" // OK
+#include "tr4_troops.h" // OK
+#include "tr4_wildboar.h" // OK
+#include "tr4_wraith.h" // OFF
 /// objects
 
 /// switch
@@ -50,7 +50,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void InitialiseBaddy(ObjectInfo* obj)
+static void StartBaddy(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
@@ -481,12 +481,12 @@ static void InitialiseBaddy(ObjectInfo* obj)
 	}
 }
 
-static void InitialiseObject(ObjectInfo* obj)
+static void StartObject(ObjectInfo* obj)
 {
 
 }
 
-static void InitialiseTrap(ObjectInfo* obj)
+static void StartTrap(ObjectInfo* obj)
 {
 	obj = &Objects[ID_CHAIN];
 	if (obj->loaded)
@@ -617,7 +617,7 @@ static void InitialiseTrap(ObjectInfo* obj)
 	}
 }
 
-static void InitialiseVehicles(ObjectInfo* obj)
+static void StartVehicles(ObjectInfo* obj)
 {
 	obj = &Objects[ID_JEEP];
 	if (obj->loaded)
@@ -642,7 +642,7 @@ static void InitialiseVehicles(ObjectInfo* obj)
 	}
 }
 
-static void InitialiseSwitch(ObjectInfo* obj)
+static void StartSwitch(ObjectInfo* obj)
 {
 	obj = &Objects[ID_COG];
 	if (obj->loaded)
@@ -657,9 +657,9 @@ static void InitialiseSwitch(ObjectInfo* obj)
 static ObjectInfo* objToInit;
 void InitialiseTR4Objects()
 {
-    InitialiseBaddy(objToInit);
-    InitialiseObject(objToInit);
-	InitialiseSwitch(objToInit);
-    InitialiseTrap(objToInit);
-	InitialiseVehicles(objToInit);
+	StartBaddy(objToInit);
+	StartObject(objToInit);
+	StartSwitch(objToInit);
+	StartTrap(objToInit);
+	StartVehicles(objToInit);
 }

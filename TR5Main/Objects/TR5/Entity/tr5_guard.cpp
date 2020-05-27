@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "oldobjects.h"
+#include "tr5_guard.h"
 #include "items.h"
 #include "sphere.h"
 #include "box.h"
@@ -155,6 +155,7 @@ void InitialiseGuard(short itemNum)
             break;
     }
 }
+
 void InitialiseSniper(short itemNum)
 {
     ITEM_INFO* item;
@@ -168,6 +169,7 @@ void InitialiseSniper(short itemNum)
     item->pos.xPos += phd_sin(item->pos.yRot);
     item->pos.zPos += phd_cos(item->pos.yRot);
 }
+
 void InitialiseGuardLaser(short itemNum)
 {
     ITEM_INFO* item;
@@ -178,15 +180,23 @@ void InitialiseGuardLaser(short itemNum)
     item->goalAnimState = STATE_GUARD_STOP;
     item->currentAnimState = STATE_GUARD_STOP;
 }
+
+void ControlGuardLaser(short itemNumber)
+{
+
+}
+
 void GuardControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
+
 	int animIndex = 0;
 	if (Objects[ID_SWAT].loaded)
 		animIndex= Objects[ID_SWAT].animIndex;
 	else
 		animIndex = Objects[ID_GUARD1].animIndex;
+
 	ITEM_INFO* item = &Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short angle = 0;
@@ -887,6 +897,7 @@ void GuardControl(short itemNum)
 		}
 	}
 }
+
 void SniperControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
@@ -981,6 +992,7 @@ void SniperControl(short itemNumber)
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 }
+
 void InitialiseMafia2(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
@@ -991,6 +1003,7 @@ void InitialiseMafia2(short itemNum)
 	item->currentAnimState = STATE_GUARD_STOP;
 	item->swapMeshFlags = 9216;
 }
+
 void Mafia2Control(short itemNum)
 {
 	if (!CreatureActive(itemNum))
@@ -1374,9 +1387,4 @@ void Mafia2Control(short itemNum)
 			return;
 		}
 	}
-}
-
-void ControlGuardLaser(short itemNumber)
-{
-
 }

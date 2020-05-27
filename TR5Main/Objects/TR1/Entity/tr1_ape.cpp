@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr1_ape.h"
 #include "box.h"
 #include "effect.h"
 #include "setup.h"

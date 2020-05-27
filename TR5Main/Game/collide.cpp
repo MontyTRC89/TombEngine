@@ -1405,14 +1405,14 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 				if (item->collidable && item->status != ITEM_INVISIBLE)		 
 				{
 					obj = &Objects[item->objectNumber];
-					if (obj->collision)
+					if (obj->collision != nullptr)
 					{
 						int x = l->pos.xPos - item->pos.xPos; 
 						int y = l->pos.yPos - item->pos.yPos;
 						int z = l->pos.zPos - item->pos.zPos;
 						
 						if (x > -3072 && x < 3072 && z > -3072 && z < 3072 && y > -3072 && y < 3072)  
-							(*obj->collision)(itemNumber, l, coll);
+							obj->collision(itemNumber, l, coll);
 					}
 				}
 				itemNumber = item->nextItem;

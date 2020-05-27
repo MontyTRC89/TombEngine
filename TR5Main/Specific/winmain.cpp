@@ -10,17 +10,7 @@
 #include "gameflow.h"
 #include "savegame.h"
 #include "level.h"
-
-#include "..\Game\draw.h"
-#include "..\Game\sound.h"
-#include "..\Game\inventory.h"
-#include "..\Game\control.h"
-#include "..\Game\gameflow.h"
-#include "..\Game\savegame.h"
-#include "..\Specific\level.h"
-#include "..\Specific\level.h"
-#include "..\Specific\newlevel.h"
-
+#include "newlevel.h"
 #include "configuration.h"
 
 WINAPP App;
@@ -259,7 +249,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		"TR5Main",
 		g_GameFlow->GetSettings()->WindowTitle.c_str(),
 		WS_POPUP,
-		CW_USEDEFAULT,
+		CW_USEDEFAULT, // TODO: change this to center of screen !!!
 		CW_USEDEFAULT,
 		Rect.right - Rect.left,
 		Rect.bottom - Rect.top,
@@ -277,8 +267,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	WindowsHandle = App.WindowHandle;
 	// Initialise the renderer
-	g_Renderer->Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, 
-						   g_Configuration.Windowed, App.WindowHandle);
+	g_Renderer->Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, g_Configuration.Windowed, App.WindowHandle);
 
 	// Initialize audio
 	if (g_Configuration.EnableSound)	
@@ -323,7 +312,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				{
 					//Only send the actual written message minus \r\n
 					string msg(buffer, read-2);
-					SendMessageA(WindowsHandle, WM_USER + 0, (WPARAM)&msg, NULL);
+					SendMessage(WindowsHandle, WM_USER, (WPARAM)&msg, NULL);
 				}
 			};
 			return 0;
@@ -333,7 +322,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	SetCursor(NULL);
 	ShowCursor(FALSE);
-	hAccTable = LoadAcceleratorsA(hInstance, (LPCSTR)0x65);
+	hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
 
 	//g_Renderer->Test();
 
@@ -341,7 +330,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	DoTheGame = true;
 
 	ThreadEnded = false;
-	ThreadHandle = _beginthreadex(0, 0, &GameMain, 0, 0, &ThreadID); 
+	ThreadHandle = BeginThread(GameMain, ThreadID);
 	WinProcMsg();
 	ThreadEnded = true;
 

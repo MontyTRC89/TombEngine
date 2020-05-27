@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "oldobjects.h"
+#include "tr5_hydra.h"
 #include "items.h"
 #include "sphere.h"
 #include "box.h"
@@ -44,7 +44,7 @@ void InitialiseHydra(short itemNum)
     item->pos.xPos -= 256;
 }
 
-void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
+static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 {
 	short fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != NO_ITEM)
@@ -65,7 +65,46 @@ void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 	}
 }
 
-void TriggerHydraSparks(short itemNumber, int frame)
+void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = true;
+	spark->sB = 0;
+	spark->sR = (GetRandomControl() & 0x3F) - 96;
+	spark->sG = spark->sR >> 1;
+	spark->dB = 0;
+	spark->dR = (GetRandomControl() & 0x3F) - 96;
+	spark->dG = spark->dR >> 1;
+	spark->fadeToBlack = 8;
+	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
+	spark->transType = COLADD;
+	spark->dynamic = -1;
+	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
+	spark->x = (GetRandomControl() & 0xF) - 8;
+	spark->y = 0;
+	spark->z = (GetRandomControl() & 0xF) - 8;
+	spark->x += pos->x;
+	spark->y += pos->y;
+	spark->z += pos->z;
+	spark->xVel = xv;
+	spark->yVel = yv;
+	spark->zVel = zv;
+	spark->friction = 68;
+	spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
+	spark->rotAng = GetRandomControl() & 0xFFF;
+	if (GetRandomControl() & 1)
+		spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+	else
+		spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+	spark->gravity = 0;
+	spark->maxYvel = 0;
+	spark->scalar = 1;
+	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
+	spark->dSize = spark->size >> 2;
+}
+
+static void TriggerHydraSparks(short itemNumber, int frame)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	
@@ -105,7 +144,7 @@ void TriggerHydraSparks(short itemNumber, int frame)
 	spark->sSize = spark->size = frame * ((GetRandomControl() & 0xF) + 16) >> 4;
 }
 
-void ControlHydra(short itemNumber)
+void HydraControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -382,43 +421,4 @@ void ControlHydra(short itemNumber)
 	CreatureJoint(item, 3, joint3);
 
 	CreatureAnimation(itemNumber, 0, 0);
-}
-
-void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
-{
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-	
-	spark->on = true;
-	spark->sB = 0;
-	spark->sR = (GetRandomControl() & 0x3F) - 96;
-	spark->sG = spark->sR >> 1;
-	spark->dB = 0;
-	spark->dR = (GetRandomControl() & 0x3F) - 96;
-	spark->dG = spark->dR >> 1;
-	spark->fadeToBlack = 8;
-	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = COLADD;
-	spark->dynamic = -1;
-	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
-	spark->x = (GetRandomControl() & 0xF) - 8;
-	spark->y = 0;
-	spark->z = (GetRandomControl() & 0xF) - 8;
-	spark->x += pos->x;
-	spark->y += pos->y;
-	spark->z += pos->z;
-	spark->xVel = xv;
-	spark->yVel = yv;
-	spark->zVel = zv;
-	spark->friction = 68;
-	spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
-	spark->rotAng = GetRandomControl() & 0xFFF;
-	if (GetRandomControl() & 1)
-		spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-	else
-		spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-	spark->gravity = 0;
-	spark->maxYvel = 0;
-	spark->scalar = 1;
-	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
-	spark->dSize = spark->size >> 2;
 }

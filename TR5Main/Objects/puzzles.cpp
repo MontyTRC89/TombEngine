@@ -276,8 +276,8 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION &&
 		item->status != ITEM_ACTIVE &&
-		l->currentAnimState == 2 &&
-		l->animNumber == 103 &&
+		l->currentAnimState == STATE_LARA_STOP &&
+		l->animNumber == ANIMATION_LARA_STAY_IDLE &&
 		!Lara.gunStatus ||
 		Lara.isMoving && (short)Lara.generalPtr == itemNum)
 	{
@@ -285,8 +285,8 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&SarcophagusPosition, item, l))
 			{
-				l->animNumber = 439;
-				l->currentAnimState = 89;
+				l->animNumber = ANIMATION_LARA_PICKUP_SARCOPHAGUS;
+				l->currentAnimState = STATE_LARA_MISC_CONTROL;
 				l->frameNumber = Anims[l->animNumber].frameBase;
 				item->flags |= 0x3E00;
 
@@ -314,7 +314,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 	}
-	else if (l->animNumber != 439 || l->frameNumber != Anims[439].frameBase + 113)
+	else if (l->animNumber != ANIMATION_LARA_PICKUP_SARCOPHAGUS || l->frameNumber != Anims[ANIMATION_LARA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
 		ObjectCollision(itemNum, l, coll);
 	}
@@ -327,7 +327,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			if (linknum != itemNum && currentItem->pos.xPos == item->pos.xPos && currentItem->pos.zPos == item->pos.zPos)
 			{
-				if (Objects[currentItem->objectNumber].collision == PickupCollision)
+				if (Objects[currentItem->objectNumber].isPickup)
 				{
 					PickedUpObject(currentItem->objectNumber);
 					currentItem->status = ITEM_ACTIVE;

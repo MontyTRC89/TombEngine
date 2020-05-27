@@ -1311,12 +1311,12 @@ unsigned short atanTab[] = {
 // fix "expression must have integral or unscoped enum type"
 short ANGLE(float angle)
 {
-	return angle * 65536.0f / 360.0f;
+	return short(angle * 65536.0f / 360.0f);
 }
 
 float TO_DEGREES(short angle)
 {
-	return (unsigned short) angle * 360.0f / 65536.0f;
+	return float(angle) * 360.0f / 65536.0f;
 }
 
 float TO_RAD(short angle)

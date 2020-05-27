@@ -16,12 +16,12 @@ static short GetWeaponDamage(int weaponType)
 }
 
 // original:
-void InitialiseEvilLara(short itemNum)
+void InitialiseDoppelganger(short itemNum)
 {
 	ClearItem(itemNum);
 }
 
-void LaraEvilControl(short itemNum)
+void DoppelgangerControl(short itemNum)
 {
 	ITEM_INFO* item;
 	FLOOR_INFO* floor;

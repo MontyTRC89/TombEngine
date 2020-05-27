@@ -6,10 +6,10 @@
 #include "level.h"
 #include "lara.h"
 
-byte DogAnims[] = { 20, 21, 22, 20 };
-BITE_INFO DogBite = { 0, 0, 100, 3 };
+static BYTE DogAnims[] = { 20, 21, 22, 20 };
+static BITE_INFO DogBite = { 0, 0, 100, 3 };
 
-void InitialiseDog(short itemNum)
+void InitialiseTr5Dog(short itemNum)
 {
     ITEM_INFO* item;
 
@@ -24,7 +24,7 @@ void InitialiseDog(short itemNum)
     item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void ControlDog(short itemNumber)
+void Tr5DogControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;

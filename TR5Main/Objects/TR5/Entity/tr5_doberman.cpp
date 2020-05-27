@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_doberman.h"
 #include "box.h"
 #include "effect.h"
 #include "setup.h"
@@ -27,7 +27,7 @@ void InitialiseDoberman(short itemNum)
     item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void ControlDoberman(short itemNumber)
+void DobermanControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{

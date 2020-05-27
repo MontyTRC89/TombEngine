@@ -1,6 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
-#include "oldobjects.h"
+#include "tr5_pushableblock.h"
 #include "lara.h"
 #include "draw.h"
 #include "global.h"
@@ -15,9 +14,9 @@
 
 short MovingBlockBounds[12] = { 
 	-300, 300, 0, 0, -692, -512,
-	-10 * ONE_DEGREE, 10 * ONE_DEGREE,
-	-30 * ONE_DEGREE, 30 * ONE_DEGREE,
-	-10 * ONE_DEGREE, 10 * ONE_DEGREE
+	-ANGLE(10.0f), ANGLE(10.0f),
+	-ANGLE(30.0f), ANGLE(30.0f),
+	-ANGLE(10.0f), ANGLE(10.0f)
 };
 
 short PushableBlockBounds[12] = {
@@ -27,23 +26,12 @@ short PushableBlockBounds[12] = {
 };
 
 PHD_VECTOR PushableBlockPos = { 0, 0, 0 };
-
 int DoPushPull = 0;
-
-void InitialisePushableBlock(short itemNum)
-{
-	ITEM_INFO* item = &Items[itemNum];
-
-	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-
-	//if (item->status != ITEM_INVISIBLE)
-	//	AlterFloorHeight(item, -1024); 
-}
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	Boxes[floor->box].overlapIndex &= (~BLOCKED);	
+	Boxes[floor->box].overlapIndex &= (~BLOCKED);
 	short height = Boxes[floor->box].height;
 	short baseRoomNumber = roomNumber;
 
@@ -77,6 +65,16 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z - 1024, roomNumber);
 	}
+}
+
+void InitialisePushableBlock(short itemNum)
+{
+	ITEM_INFO* item = &Items[itemNum];
+
+	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+
+	//if (item->status != ITEM_INVISIBLE)
+	//	AlterFloorHeight(item, -1024); 
 }
 
 void PushableBlockControl(short itemNumber)

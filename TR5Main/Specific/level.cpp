@@ -1157,10 +1157,10 @@ void LoadSprites()
 		Sprites[i].y = ReadInt8();
 		Sprites[i].width = ReadInt16();
 		Sprites[i].height = ReadInt16();
-		Sprites[i].left = (ReadInt16() + 1) / 256.0;
-		Sprites[i].top = (ReadInt16() + 1) / 256.0;
-		Sprites[i].right = (ReadInt16() - 1) / 256.0;
-		Sprites[i].bottom = (ReadInt16() - 1) / 256.0;
+		Sprites[i].left = (ReadInt16() + 1) / 256.0f;
+		Sprites[i].top = (ReadInt16() + 1) / 256.0f;
+		Sprites[i].right = (ReadInt16() - 1) / 256.0f;
+		Sprites[i].bottom = (ReadInt16() - 1) / 256.0f;
 	}
 
 	g_NumSpritesSequences = ReadInt32();
@@ -1202,7 +1202,7 @@ void GetCarriedItems()
 				if (abs(item2->pos.xPos - item->pos.xPos) < 512
 					&& abs(item2->pos.zPos - item->pos.zPos) < 512
 					&& abs(item2->pos.yPos - item->pos.yPos) < 256
-					&& Objects[item2->objectNumber].collision == PickupCollision)
+					&& Objects[item2->objectNumber].isPickup)
 				{
 					item2->carriedItem = item->carriedItem;
 					item->carriedItem = linknum;

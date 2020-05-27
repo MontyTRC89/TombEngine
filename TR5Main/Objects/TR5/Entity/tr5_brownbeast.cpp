@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_brownbeast.h"
 #include "items.h"
 #include "box.h"
 #include "effect.h"

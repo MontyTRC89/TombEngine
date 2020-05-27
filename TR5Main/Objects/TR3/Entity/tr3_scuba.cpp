@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_scuba.h"
 #include "items.h"
 #include "effect.h"
 #include "box.h"
@@ -9,7 +9,7 @@
 
 BITE_INFO scubaGun = { 17, 164, 44, 18 };
 
-void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber)
+static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber)
 {
 	short harpoonItemNum = CreateItem();
 	if (harpoonItemNum != NO_ITEM)
@@ -36,7 +36,7 @@ void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yR
 	}
 }
 
-void HarpoonControl(short itemNum)
+void ScubaHarpoonControl(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 

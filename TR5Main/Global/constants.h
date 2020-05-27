@@ -49,6 +49,7 @@
 #define ALL_MESHBITS    -1
 
 #define GAME_BUFFER_SIZE	128 * 1000000
+#define MAX_FLIPMAP         255
 #define NUM_SLOTS			32
 #define NUM_ITEMS			1023
 #define NUM_ROOMS			1024
@@ -136,9 +137,9 @@ constexpr auto MAX_SPLASH = 8;
 #define SWONESHOT	0x40		 
 #define ATONESHOT	0x80	 
 
-#define NUM_BATS	64
-#define NUM_SPIDERS	64
-#define NUM_RATS	32
+
+
+
 
 #define NUM_DEBRIS 256
 
