@@ -1321,21 +1321,22 @@ float TO_DEGREES(short angle)
 
 float TO_RAD(short angle)
 {
-	return angle * 360.0f / 65536.0f * RADIAN;
+	return float(angle) * 360.0f / 65536.0f * RADIAN;
 }
 
-const float frand() {
-	int randValue = rand();
-	float result = randValue / (float)RAND_MAX;
+const float frand()
+{
+	float result = float(rand() / RAND_MAX);
 	return result;
 }
 
 const float frandMinMax(float min, float max)
 {
-	return frand()* (max - min) + min;
+	return frand() * (max - min) + min;
 }
 
-const float lerp(float v0, float v1, float t) {
+const float lerp(float v0, float v1, float t)
+{
 	return (1 - t) * v0 + t * v1;
 }
 
