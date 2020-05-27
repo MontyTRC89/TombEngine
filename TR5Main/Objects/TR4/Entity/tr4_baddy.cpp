@@ -10,6 +10,150 @@
 #include "setup.h"
 #include "level.h"
 
+enum BADDY_STATES {
+	STATE_BADDY_STOP = 0,
+	STATE_BADDY_WALK = 1,
+	STATE_BADDY_RUN = 2,
+	// 3
+	STATE_BADDY_DODGE_START = 4,
+	// 5
+	// 6
+	// 7
+	STATE_BADDY_UNKNOWN_8 = 8,
+	STATE_BADDY_UNKNOWN_9 = 9,
+	STATE_BADDY_DRAW_GUN = 10,
+	STATE_BADDY_HOLSTER_GUN = 11,
+	STATE_BADDY_DRAW_SWORD = 12,
+	STATE_BADDY_HOLSTER_SWORD = 13,
+	STATE_BADDY_FIRE = 14,
+	STATE_BADDY_SWORD_HIT_FRONT = 15,
+	STATE_BADDY_SWORD_HIT_RIGHT = 16,
+	STATE_BADDY_SWORD_HIT_LEFT = 17,
+	STATE_BADDY_MONKEY_GRAB = 18,
+	STATE_BADDY_MONKEY_IDLE = 19,
+	STATE_BADDY_MONKEY_FORWARD = 20,
+	STATE_BADDY_MONKEY_PUSH_OFF = 21,
+	STATE_BADDY_MONKEY_FALL_LAND = 22,
+	STATE_BADDY_ROLL_LEFT = 23,
+	STATE_BADDY_JUMP_RIGHT = 24,
+	STATE_BADDY_STAND_TO_CROUCH = 25,
+	STATE_BADDY_CROUCH = 26,
+	STATE_BADDY_CROUCH_PICKUP = 27,
+	STATE_BADDY_CROUCH_TO_STAND = 28,
+	STATE_BADDY_WALK_SWORD_HIT_RIGHT = 29,
+	STATE_BADDY_SOMERSAULT = 30,
+	STATE_BADDY_AIM = 31,
+	STATE_BADDY_DEATH = 32,
+	STATE_BADDY_JUMP_FORWARD_1_BLOCK = 33,
+	STATE_BADDY_JUMP_FORWARD_FALL = 34,
+	STATE_BADDY_MONKEY_TO_FREEFALL = 35,
+	STATE_BADDY_FREEFALL = 36,
+	STATE_BADDY_FREEFALL_LAND_DEATH = 37,
+	STATE_BADDY_JUMP_FORWARD_2_BLOCKS = 38,
+	STATE_BADDY_CLIMB_4_CLICKS = 39,
+	STATE_BADDY_CLIMB_3_CLICKS = 40,
+	STATE_BADDY_CLIMB_2_CLICKS = 41,
+	STATE_BADDY_JUMP_OFF_4_CLICKS = 42,
+	STATE_BADDY_JUMP_OFF_3_CLICKS = 43,
+	STATE_BADDY_BLIND = 44
+};
+
+enum BADDY_ANIM {
+	ANIMATION_BADDY_RUN = 0,
+	ANIMATION_BADDY_RUN_STOP_START = 1,
+	ANIMATION_BADDY_RUN_STOP_END = 2,
+	ANIMATION_BADDY_SOMERSAULT_START = 3,
+	ANIMATION_BADDY_SOMERSAULT_END = 4,
+	ANIMATION_BADDY_DODGE_START = 5,
+	// 6
+	// 7
+	// 8
+	ANIMATION_BADDY_MONKEY_GRAB = 9,
+	ANIMATION_BADDY_MONKEY_IDLE = 10,
+	ANIMATION_BADDY_MONKEY_FORWARD = 11,
+	ANIMATION_BADDY_MONKEY_IDLE_TO_FORWARD = 12,
+	ANIMATION_BADDY_MONKEY_STOP_LEFT = 13,
+	ANIMATION_BADDY_MONKEY_STOP_RIGHT = 14,
+	ANIMATION_BADDY_MONKEY_FALL_LAND = 15,
+	ANIMATION_BADDY_MONKEY_PUSH_OFF = 16,
+	ANIMATION_BADDY_DODGE_END = 17,
+	ANIMATION_BADDY_STAND_IDLE = 18,
+	ANIMATION_BADDY_DODGE_END_TO_STAND = 19,
+	ANIMATION_BADDY_DRAW_GUN = 20,
+	ANIMATION_BADDY_HOLSTER_GUN = 21,
+	ANIMATION_BADDY_DRAW_SWORD = 22,
+	ANIMATION_BADDY_HOLSTER_SWORD = 23,
+	ANIMATION_BADDY_STAND_TO_ROLL_LEFT = 24,
+	ANIMATION_BADDY_ROLL_LEFT_START = 25,
+	ANIMATION_BADDY_ROLL_LEFT_CONTINUE = 26,
+	ANIMATION_BADDY_ROLL_LEFT_END = 27,
+	ANIMATION_BADDY_ROLL_LEFT_TO_CROUCH = 28,
+	ANIMATION_BADDY_CROUCH = 29,
+	ANIMATION_BADDY_CROUCH_TO_STAND = 30,
+	ANIMATION_BADDY_STAND_TO_WALK = 31,
+	ANIMATION_BADDY_WALK = 32,
+	ANIMATION_BADDY_WALK_TO_RUN = 33,
+	ANIMATION_BADDY_STAND_TO_AIM = 34,
+	ANIMATION_BADDY_AIM = 35,
+	ANIMATION_BADDY_FIRE = 36,
+	ANIMATION_BADDY_AIM_TO_STAND = 37,
+	ANIMATION_BADDY_SWORD_HIT_FRONT = 38,
+	ANIMATION_BADDY_CROUCH_PICKUP = 39,
+	ANIMATION_BADDY_STAND_TO_CROUCH = 40,
+	ANIMATION_BADDY_SWORD_HIT_RIGHT = 41,
+	ANIMATION_BADDY_SWORD_HIT_RIGHT_TO_LEFT = 42,
+	ANIMATION_BADDY_SWORD_HIT_RIGHT_TO_STAND = 43,
+	ANIMATION_BADDY_SWORD_HIT_LEFT = 44,
+	ANIMATION_BADDY_STAND_DEATH = 45,
+	ANIMATION_BADDY_WALK_SWORD_HIT_RIGHT = 46,
+	ANIMATION_BADDY_STAND_TO_JUMP_RIGHT = 47,
+	ANIMATION_BADDY_JUMP_RIGHT_START = 48,
+	ANIMATION_BADDY_JUMP_RIGHT_CONTINUE = 49,
+	ANIMATION_BADDY_JUMP_RIGHT_END = 50,
+	ANIMATION_BADDY_RUN_TO_WALK = 51,
+	// 52
+	// 53
+	ANIMATION_BADDY_WALK_STOP_RIGHT = 54,
+	ANIMATION_BADDY_STAND_TO_JUMP_FORWARD = 55,
+	ANIMATION_BADDY_JUMP_FORWARD_1_BLOCK = 56,
+	ANIMATION_BADDY_JUMP_FORWARD_FALL = 57,
+	ANIMATION_BADDY_JUMP_FORWARD_LAND = 58,
+	ANIMATION_BADDY_MONKEY_TO_FREEFALL = 59,
+	ANIMATION_BADDY_FREEFALL = 60,
+	ANIMATION_BADDY_FREEFALL_LAND_DEATH = 61,
+	ANIMATION_BADDY_CLIMB_4_CLICKS = 62,
+	ANIMATION_BADDY_CLIMB_3_CLICKS = 63,
+	ANIMATION_BADDY_CLIMB_2_CLICKS = 64,
+	ANIMATION_BADDY_JUMP_OFF_4_CLICKS = 65,
+	ANIMATION_BADDY_JUMP_OFF_3_CLICKS = 66,
+	ANIMATION_BADDY_JUMP_FORWARD_2_BLOCKS = 67,
+	ANIMATION_BADDY_BLIND = 68,
+	ANIMATION_BADDY_BLIND_TO_STAND = 69,
+	ANIMATION_BADDY_DEAD = 70,
+};
+
+enum BADDY_FRAMES {
+	FRAME_BADDY_HOLSTER_GUN = 20,
+	FRAME_BADDY_DRAW_GUN = 21,
+	FRAME_BADDY_HOLSTER_SWORD = 22,
+	FRAME_BADDY_DRAW_SWORD = 12,
+	FRAME_BADDY_RUN_TO_SOMERSAULT = 11,
+	FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX = 12,
+	FRAME_BADDY_SWORD_HIT_DAMAGE_MIN = 13,
+	FRAME_BADDY_SWORD_HIT_DAMAGE_MAX = 21,
+	FRAME_BADDY_CROUCH_PICKUP = 9,
+	FRAME_BADDY_FIRE_MIN = 1,
+	FRAME_BADDY_FIRE_MAX = 13,
+	FRAME_BADDY_SOMERSAULT_START_TAKE_OFF = 18,
+};
+
+enum BADDY_SWAP_MESH_FLAGS {
+	SWAPMESHFLAGS_BADDY_EMPTY = 0x7FC800,
+	SWAPMESHFLAGS_BADDY_SWORD_SIMPLE = 0x7E0880,
+	SWAPMESHFLAGS_BADDY_SWORD_NINJA = 0x000880,
+	SWAPMESHFLAGS_BADDY_GUN = 0x7FC010,
+};
+
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
 
@@ -35,15 +179,16 @@ void InitialiseBaddy(short itemNum)
 	ClearItem(itemNum);
 
 	short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
+
 	if (item->objectNumber == ID_BADDY1)
 	{
-		item->swapMeshFlags = 0x7FC010;
+		item->swapMeshFlags = SWAPMESHFLAGS_BADDY_GUN;
 		item->meshBits = 0xFF81FFFF;
 		item->itemFlags[2] = 24;
 	}
 	else
 	{
-		item->swapMeshFlags = 0x880;
+		item->swapMeshFlags = SWAPMESHFLAGS_BADDY_SWORD_NINJA;
 		item->meshBits = -1;
 		item->itemFlags[2] = 0;
 	}
@@ -61,64 +206,64 @@ void InitialiseBaddy(short itemNum)
 	
 	if (!ocb || ocb > 4 && ocb < 7)
 	{
-		item->animNumber = Objects[objectNumber].animIndex + 18;
+		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_IDLE;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 0;
-		item->currentAnimState = 0;
+		item->goalAnimState = STATE_BADDY_STOP;
+		item->currentAnimState = STATE_BADDY_STOP;
 
 		return;
 	}
 
 	if (ocb == 1)
 	{
-		item->animNumber = Objects[objectNumber].animIndex + 47;
+		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_RIGHT;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 24;
-		item->currentAnimState = 24;
+		item->goalAnimState = STATE_BADDY_JUMP_RIGHT;
+		item->currentAnimState = STATE_BADDY_JUMP_RIGHT;
 
 		return;
 	}
 
 	if (ocb == 2)
 	{
-		item->animNumber = Objects[objectNumber].animIndex + 24;
+		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_ROLL_LEFT;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 23;
-		item->currentAnimState = 23;
+		item->goalAnimState = STATE_BADDY_ROLL_LEFT;
+		item->currentAnimState = STATE_BADDY_ROLL_LEFT;
 
 		return;
 	}
 	
 	if (ocb == 3)
 	{
-		item->animNumber = Objects[objectNumber].animIndex + 29;
+		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 26;
-		item->currentAnimState = 26;
+		item->goalAnimState = STATE_BADDY_CROUCH;
+		item->currentAnimState = STATE_BADDY_CROUCH;
 
 		return;
 	}
 
 	if (ocb == 4)
 	{
-		item->animNumber = Objects[objectNumber].animIndex + 62;
+		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 39;
-		item->currentAnimState = 39;
-		item->pos.xPos += phd_sin(item->pos.yRot) * 1024 >> 14;;
-		item->pos.zPos += phd_cos(item->pos.yRot) * 1024 >> 14;;
+		item->goalAnimState = STATE_BADDY_CLIMB_4_CLICKS;
+		item->currentAnimState = STATE_BADDY_CLIMB_4_CLICKS;
+		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
+		item->pos.zPos += phd_cos(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
 
 		return;
 	}
 
 	if (ocb > 100)
 	{
-		item->animNumber = Objects[objectNumber].animIndex + 29;
+		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 26;
-		item->currentAnimState = 26;
-		item->pos.xPos += phd_sin(item->pos.yRot) * 1024 >> 14;;
-		item->pos.zPos += phd_cos(item->pos.yRot) * 1024 >> 14;;
+		item->goalAnimState = STATE_BADDY_CROUCH;
+		item->currentAnimState = STATE_BADDY_CROUCH;
+		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
+		item->pos.zPos += phd_cos(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
 		item->itemFlags[3] = ocb;
 
 		return;
@@ -167,8 +312,8 @@ void BaddyControl(short itemNum)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	int dx = 942 * phd_sin(item->pos.yRot) >> 14;
-	int dz = 942 * phd_cos(item->pos.yRot) >> 14;
+	int dx = 942 * phd_sin(item->pos.yRot) >> W2V_SHIFT; 
+	int dz = 942 * phd_cos(item->pos.yRot) >> W2V_SHIFT; 
 
 	x += dx;
 	z += dz;
@@ -194,9 +339,9 @@ void BaddyControl(short itemNum)
 	int height = 0;
 	bool canJump1sector = true;
 	if (enemyItem && item->boxNumber == enemyItem->boxNumber
-		|| y >= height1 - 384
-		|| y >= height2 + 256
-		|| y <= height2 - 256)
+		|| y >= height1 - (STEP_SIZE * 1.5f)
+		|| y >= height2 + STEP_SIZE
+		|| y <= height2 - STEP_SIZE)
 	{
 		height = height2;
 		canJump1sector = false;
@@ -204,18 +349,18 @@ void BaddyControl(short itemNum)
 
 	bool canJump2sectors = true;
 	if (enemyItem && item->boxNumber == enemyItem->boxNumber
-		|| y >= height1 - 384
-		|| y >= height - 384
-		|| y >= height3 + 256
-		|| y <= height3 - 256)
+		|| y >= height1 - (STEP_SIZE * 1.5f)
+		|| y >= height - (STEP_SIZE * 1.5f)
+		|| y >= height3 + STEP_SIZE
+		|| y <= height3 - STEP_SIZE)
 	{
 		canJump2sectors = false;
 	}
 
 	CREATURE_INFO* currentCreature;
 
-	if (item->itemFlags[1] == item->roomNumber ||
-		Rooms[item->roomNumber].flippedRoom == -1)
+	if (item->itemFlags[1] == item->roomNumber
+		|| Rooms[item->roomNumber].flippedRoom == -1)
 	{
 		currentCreature = creature;
 	}
@@ -253,7 +398,7 @@ void BaddyControl(short itemNum)
 
 		switch (item->currentAnimState)
 		{
-		case 32:
+		case STATE_BADDY_DEATH:
 			item->gravityStatus = true;
 			currentCreature->LOT.isMonkeying = false;
 			if (item->pos.yPos >= item->floor)
@@ -264,40 +409,40 @@ void BaddyControl(short itemNum)
 			}
 			break;
 
-		case 35:
-			item->goalAnimState = 36;
+		case STATE_BADDY_MONKEY_TO_FREEFALL:
+			item->goalAnimState = STATE_BADDY_FREEFALL;
 			item->gravityStatus = false;
 			break;
 
-		case 36:
+		case STATE_BADDY_FREEFALL:
 			item->gravityStatus = true;
 			if (item->pos.yPos >= item->floor)
 			{
 				item->pos.yPos = item->floor;
 				item->fallspeed = 0;
 				item->gravityStatus = false;
-				item->goalAnimState = 37;
+				item->goalAnimState = STATE_BADDY_FREEFALL_LAND_DEATH;
 			}
 			break;
 
-		case 37:
+		case STATE_BADDY_FREEFALL_LAND_DEATH:
 			item->pos.yPos = item->floor;
 			break;
 
-		case 18:
-		case 19:
-		case 20:
-			item->animNumber = Objects[objectNumber].animIndex + 59;
+		case STATE_BADDY_MONKEY_GRAB:
+		case STATE_BADDY_MONKEY_IDLE:
+		case STATE_BADDY_MONKEY_FORWARD:
+			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_MONKEY_TO_FREEFALL;
 			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->currentAnimState = 35;
+			item->currentAnimState = STATE_BADDY_MONKEY_TO_FREEFALL;
 			item->speed = 0;
 			break;
 
 		default:
 			currentCreature->LOT.isJumping = true;
-			item->animNumber = Objects[objectNumber].animIndex + 45;
+			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_DEATH;
 			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->currentAnimState = 32;
+			item->currentAnimState = STATE_BADDY_DEATH;
 
 			// TODO: baddy respawn setup with OCB
 			break;
@@ -328,7 +473,7 @@ void BaddyControl(short itemNum)
 			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 			laraInfo.ahead = true;
 
-			if (laraInfo.angle <= -16384 || laraInfo.angle >= 16384)
+			if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
 				laraInfo.ahead = false;
 
 			laraInfo.distance = dx * dx + dz * dz;
@@ -347,20 +492,22 @@ void BaddyControl(short itemNum)
 		//currentCreature->enemy = LaraItem;
 
 		// Is baddy alerted?
-		if (item->hitStatus || laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo) && abs(LaraItem->pos.yPos - item->pos.yPos) < 1024)
+		if (item->hitStatus
+			|| laraInfo.distance < SQUARE(1024)
+			|| TargetVisible(item, &laraInfo) && abs(LaraItem->pos.yPos - item->pos.yPos) < STEP_SIZE * 4)
 		{
 			currentCreature->alerted = true;
 		}
 
 		if (item != Lara.target || laraInfo.distance <= 942 ||
-			laraInfo.angle <= -10240 || laraInfo.angle >= 10240)
+			laraInfo.angle <= -ANGLE(56.25f) || laraInfo.angle >= ANGLE(56.25f))
 		{
 			roll = false;
 			jump = false;
 		}
 
-		dx = 942 * phd_sin(item->pos.yRot + ANGLE(45)) >> 14;
-		dz = 942 * phd_cos(item->pos.yRot + ANGLE(45)) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
+		dz = 942 * phd_cos(item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -370,8 +517,8 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height4 = GetFloorHeight(floor, x, y, z);
 
-		dx = 942 * phd_sin(item->pos.yRot + 14336) >> 14;
-		dz = 942 * phd_cos(item->pos.yRot + 14336) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot + ANGLE(78.75f)) >> W2V_SHIFT;
+		dz = 942 * phd_cos(item->pos.yRot + ANGLE(78.75f)) >> W2V_SHIFT;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -381,7 +528,7 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height5 = GetFloorHeight(floor, x, y, z);
 
-		if (abs(height5 - item->pos.yPos) > 256)
+		if (abs(height5 - item->pos.yPos) > STEP_SIZE)
 			jump = false;
 		else
 		{
@@ -390,8 +537,8 @@ void BaddyControl(short itemNum)
 				jump = false;
 		}
 
-		dx = 942 * phd_sin(item->pos.yRot - 8192) >> 14;
-		dz = 942 * phd_cos(item->pos.yRot - 8192) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot - ANGLE(45)) >> W2V_SHIFT;
+		dz = 942 * phd_cos(item->pos.yRot - ANGLE(45)) >> W2V_SHIFT;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -401,8 +548,8 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height6 = GetFloorHeight(floor, x, y, z);
 
-		dx = 942 * phd_sin(item->pos.yRot - 14336) >> 14;
-		dz = 942 * phd_cos(item->pos.yRot - 14336) >> 14;
+		dx = 942 * phd_sin(item->pos.yRot - ANGLE(78.75f)) >> W2V_SHIFT;
+		dz = 942 * phd_cos(item->pos.yRot - ANGLE(78.75f)) >> W2V_SHIFT;
 
 		x = item->pos.xPos + dx;
 		y = item->pos.yPos;
@@ -412,7 +559,7 @@ void BaddyControl(short itemNum)
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height7 = GetFloorHeight(floor, x, y, z);
 
-		if (abs(height7 - item->pos.yPos) > 256 || height6 + 512 >= item->pos.yPos)
+		if (abs(height7 - item->pos.yPos) > STEP_SIZE || height6 + (STEP_SIZE * 2) >= item->pos.yPos)
 		{
 			roll = false;
 			someFlag3 = false;
@@ -424,7 +571,7 @@ void BaddyControl(short itemNum)
 
 		switch (item->currentAnimState)
 		{
-		case 0:
+		case STATE_BADDY_STOP:
 			currentCreature->LOT.isMonkeying = false;
 			currentCreature->LOT.isJumping = false;
 			currentCreature->flags = 0;
@@ -443,37 +590,37 @@ void BaddyControl(short itemNum)
 				break;
 			}
 
-			if (item->swapMeshFlags == 2176
+			if (item->swapMeshFlags == SWAPMESHFLAGS_BADDY_SWORD_NINJA
 				&& item == Lara.target
 				&& laraInfo.ahead
 				&& laraInfo.distance > SQUARE(682))
 			{
-				item->goalAnimState = 4;
+				item->goalAnimState = STATE_BADDY_DODGE_START;
 				break;
 			}
 
 			if (Targetable(item, &info) && item->itemFlags[2] > 0)
 			{
-				if (item->swapMeshFlags == 0x7FC010)
+				if (item->swapMeshFlags == SWAPMESHFLAGS_BADDY_GUN)
 				{
-					item->goalAnimState = 31;
+					item->goalAnimState = STATE_BADDY_AIM;
 					break;
 				}
 
-				if (item->swapMeshFlags != 0x7E0880 && item->swapMeshFlags != 2176)
+				if (item->swapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_SIMPLE && item->swapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_NINJA)
 				{
-					item->goalAnimState = 10;
+					item->goalAnimState = STATE_BADDY_DRAW_GUN;
 					break;
 				}
 
-				item->goalAnimState = 0;
+				item->goalAnimState = STATE_BADDY_STOP;
 				break;
 			}
 
 			if (item->aiBits & MODIFY)
 			{
-				item->goalAnimState = 0;
-				if (item->floor > item->pos.yPos + 768)
+				item->goalAnimState = STATE_BADDY_STOP;
+				if (item->floor > item->pos.yPos + (STEP_SIZE * 3))
 					item->aiBits &= ~MODIFY;
 				break;
 			}
@@ -481,15 +628,15 @@ void BaddyControl(short itemNum)
 			if (canJump1sector || canJump2sectors)
 			{
 				currentCreature->maximumTurn = 0;
-				item->animNumber = Objects[objectNumber].animIndex + 55;
+				item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_FORWARD;
 				item->frameNumber = Anims[item->animNumber].frameBase;
-				item->currentAnimState = 33;
+				item->currentAnimState = STATE_BADDY_JUMP_FORWARD_1_BLOCK;
 				currentCreature->LOT.isJumping = true;
 
 				if (!canJump2sectors)
-					item->goalAnimState = 33;
+					item->goalAnimState = STATE_BADDY_JUMP_FORWARD_1_BLOCK;
 				else
-					item->goalAnimState = 38;
+					item->goalAnimState = STATE_BADDY_JUMP_FORWARD_2_BLOCKS;
 				break;
 			}
 
@@ -498,15 +645,15 @@ void BaddyControl(short itemNum)
 				short objNum = currentCreature->enemy->objectNumber;
 				if ((objNum == ID_SMALLMEDI_ITEM || objNum == ID_UZI_AMMO_ITEM) && info.distance < 0x40000)
 				{
-					item->goalAnimState = 25;
-					item->requiredAnimState = 27;
+					item->goalAnimState = STATE_BADDY_STAND_TO_CROUCH;
+					item->requiredAnimState = STATE_BADDY_CROUCH_PICKUP;
 					break;
 				}
 			}
 
-			if (item->swapMeshFlags == 0x7FC010 && item->itemFlags[2] < 1)
+			if (item->swapMeshFlags == SWAPMESHFLAGS_BADDY_GUN && item->itemFlags[2] < 1)
 			{
-				item->goalAnimState = 11;
+				item->goalAnimState = STATE_BADDY_HOLSTER_GUN;
 				break;
 			}
 
@@ -514,20 +661,20 @@ void BaddyControl(short itemNum)
 			{
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 				height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-				if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
+				if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - (STEP_SIZE * 6))
 				{
-					if (item->swapMeshFlags == 0x7FC800)
+					if (item->swapMeshFlags == SWAPMESHFLAGS_BADDY_EMPTY)
 					{
-						item->goalAnimState = 18;
+						item->goalAnimState = STATE_BADDY_MONKEY_GRAB;
 						break;
 					}
-					if (item->swapMeshFlags == 0x7FC010)
+					if (item->swapMeshFlags == SWAPMESHFLAGS_BADDY_GUN)
 					{
-						item->goalAnimState = 11;
+						item->goalAnimState = STATE_BADDY_HOLSTER_GUN;
 						break;
 					}
 
-					item->goalAnimState = 13;
+					item->goalAnimState = STATE_BADDY_HOLSTER_SWORD;
 					break;
 				}
 			}
@@ -536,45 +683,45 @@ void BaddyControl(short itemNum)
 				if (roll)
 				{
 					currentCreature->maximumTurn = 0;
-					item->goalAnimState = 23;
+					item->goalAnimState = STATE_BADDY_ROLL_LEFT;
 					break;
 				}
 				if (jump)
 				{
 					currentCreature->maximumTurn = 0;
-					item->goalAnimState = 24;
+					item->goalAnimState = STATE_BADDY_JUMP_RIGHT;
 					break;
 				}
-				if (item->swapMeshFlags == 0x7FC800)
+				if (item->swapMeshFlags == SWAPMESHFLAGS_BADDY_EMPTY)
 				{
-					item->goalAnimState = 12;
+					item->goalAnimState = STATE_BADDY_DRAW_SWORD;
 					break;
 				}
 				if (currentCreature->enemy && currentCreature->enemy->hitPoints > 0 && info.distance < SQUARE(682))
 				{
-					if (item->swapMeshFlags == 0x7FC010)
+					if (item->swapMeshFlags == SWAPMESHFLAGS_BADDY_GUN)
 					{
-						item->goalAnimState = 11;
+						item->goalAnimState = STATE_BADDY_HOLSTER_GUN;
 					}
 					else if (info.distance >= 0x40000)
 					{
-						item->goalAnimState = 15;
+						item->goalAnimState = STATE_BADDY_SWORD_HIT_FRONT;
 					}
 					else if (GetRandomControl() & 1)
 					{
-						item->goalAnimState = 17;
+						item->goalAnimState = STATE_BADDY_SWORD_HIT_LEFT;
 					}
 					else
 					{
-						item->goalAnimState = 16;
+						item->goalAnimState = STATE_BADDY_SWORD_HIT_RIGHT;
 					}
 					break;
 				}
 			}
-			item->goalAnimState = 1;
+			item->goalAnimState = STATE_BADDY_WALK;
 			break;
 
-		case 1:
+		case STATE_BADDY_WALK:
 			currentCreature->LOT.isMonkeying = false;
 			currentCreature->LOT.isJumping = false;
 			currentCreature->maximumTurn = ANGLE(7);
@@ -590,61 +737,61 @@ void BaddyControl(short itemNum)
 			}
 			if (Targetable(item, &info) && item->itemFlags[2] > 0)
 			{
-				item->goalAnimState = 0;
+				item->goalAnimState = STATE_BADDY_STOP;
 				break;
 			}
 			if (canJump1sector || canJump2sectors)
 			{
 				currentCreature->maximumTurn = 0;
-				item->goalAnimState = 0;
+				item->goalAnimState = STATE_BADDY_STOP;
 				break;
 			}
 			if (currentCreature->reachedGoal && currentCreature->monkeyAhead)
 			{
-				item->goalAnimState = 0;
+				item->goalAnimState = STATE_BADDY_STOP;
 				break;
 			}
 
 			if (item->itemFlags[2] < 1)
 			{
-				if (item->swapMeshFlags != 0x7E0880 && item->swapMeshFlags != 2176)
+				if (item->swapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_SIMPLE && item->swapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_NINJA)
 				{
-					item->goalAnimState = 0;
+					item->goalAnimState = STATE_BADDY_STOP;
 					break;
 				}
 			}
 			if (info.ahead && info.distance < 0x40000)
 			{
-				item->goalAnimState = 0;
+				item->goalAnimState = STATE_BADDY_STOP;
 				break;
 			}
 			if (info.bite)
 			{
 				if (info.distance < SQUARE(482))
 				{
-					item->goalAnimState = 0;
+					item->goalAnimState = STATE_BADDY_STOP;
 					break;
 				}
 				if (info.distance < SQUARE(1024))
 				{
-					item->goalAnimState = 29;
+					item->goalAnimState = STATE_BADDY_WALK_SWORD_HIT_RIGHT;
 					break;
 				}
 			}
 			if (roll || jump)
 			{
-				item->currentAnimState = 0;
+				item->currentAnimState = STATE_BADDY_STOP;
 				break;
 			}
 			if (currentCreature->mood == ATTACK_MOOD &&
 				!(currentCreature->jumpAhead) &&
 				info.distance > SQUARE(1024))
 			{
-				item->goalAnimState = 2;
+				item->goalAnimState = STATE_BADDY_RUN;
 			}
 			break;
 
-		case 2:
+		case STATE_BADDY_RUN:
 			if (info.ahead)
 			{
 				joint3 = info.angle;
@@ -652,14 +799,14 @@ void BaddyControl(short itemNum)
 			currentCreature->maximumTurn = ANGLE(11);
 			tilt = abs(angle) / 2;
 			if (objectNumber == ID_BADDY2
-				&& item->frameNumber == Anims[item->animNumber].frameBase + 11
+				&& item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT
 				&& height3 == height1
-				&& abs(height1 - item->pos.yPos) < 384
-				&& (info.angle > -4096 && info.angle < 4096 &&
+				&& abs(height1 - item->pos.yPos) < STEP_SIZE * 1.5f
+				&& (info.angle > -ANGLE(22.5f) && info.angle < ANGLE(22.5f) &&
 					info.distance < SQUARE(3072)
 					|| height2 >= height1 + 512))
 			{
-				item->goalAnimState = 30;
+				item->goalAnimState = STATE_BADDY_SOMERSAULT;
 				currentCreature->maximumTurn = 0;
 				break;
 			}
@@ -672,24 +819,24 @@ void BaddyControl(short itemNum)
 				|| info.distance < SQUARE(614)
 				|| currentCreature->jumpAhead)
 			{
-				item->goalAnimState = 0;
+				item->goalAnimState = STATE_BADDY_STOP;
 				break;
 			}
 			if (info.distance < SQUARE(1024))
 			{
-				item->goalAnimState = 1;
+				item->goalAnimState = STATE_BADDY_WALK;
 				break;
 			}
 			break;
 
-		case 16:
-		case 15:
-		case 17:
-		case 29:
-			if (item->currentAnimState == 16 &&
+		case STATE_BADDY_SWORD_HIT_RIGHT:
+		case STATE_BADDY_SWORD_HIT_FRONT:
+		case STATE_BADDY_SWORD_HIT_LEFT:
+		case STATE_BADDY_WALK_SWORD_HIT_RIGHT:
+			if (item->currentAnimState == STATE_BADDY_SWORD_HIT_RIGHT &&
 				info.distance < 0x40000)
 			{
-				item->goalAnimState = 17;
+				item->goalAnimState = STATE_BADDY_SWORD_HIT_LEFT;
 			}
 			if (info.ahead)
 			{
@@ -697,8 +844,8 @@ void BaddyControl(short itemNum)
 				joint2 = info.xAngle;
 			}
 			currentCreature->maximumTurn = 0;
-			if (item->currentAnimState != 15 ||
-				item->frameNumber < Anims[item->animNumber].frameBase + 12)
+			if (item->currentAnimState != STATE_BADDY_SWORD_HIT_FRONT ||
+				item->frameNumber < Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
 			{
 				if (abs(info.angle) >= ANGLE(7))
 				{
@@ -720,8 +867,8 @@ void BaddyControl(short itemNum)
 			{
 				if (item->touchBits & 0x1C000)
 				{
-					if (item->frameNumber > Anims[item->animNumber].frameBase + 13 &&
-						item->frameNumber < Anims[item->animNumber].frameBase + 21)
+					if (item->frameNumber > Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
+						item->frameNumber < Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
 					{
 						LaraItem->hitPoints -= 120;
 						LaraItem->hitStatus = true;
@@ -741,7 +888,7 @@ void BaddyControl(short itemNum)
 			}
 			break;
 
-		case 19:
+		case STATE_BADDY_MONKEY_IDLE:
 			joint2 = 0;
 			joint1 = 0;
 			currentCreature->maximumTurn = 0;
@@ -752,28 +899,31 @@ void BaddyControl(short itemNum)
 
 			if (laraInfo.ahead
 				&& laraInfo.distance < SQUARE(682)
-				&& (LaraItem->currentAnimState > 74
-					&& LaraItem->currentAnimState < 80
-					|| LaraItem->currentAnimState == 82
-					|| LaraItem->currentAnimState == 83))
+				&& (LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_IDLE
+					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_FORWARD
+					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_LEFT
+					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_RIGHT
+					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURNAROUND
+					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_LEFT
+					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_RIGHT))
 			{
-				item->goalAnimState = 21;
+				item->goalAnimState = STATE_BADDY_MONKEY_PUSH_OFF;
 			}
 			else if (item->boxNumber != currentCreature->LOT.targetBox
 				&& currentCreature->monkeyAhead
-				|| GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) != height - 1536)
+				|| GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) != height - (STEP_SIZE * 6))
 			{
-				item->goalAnimState = 20;
+				item->goalAnimState = STATE_BADDY_MONKEY_FORWARD;
 			}
 			else
 			{
-				item->goalAnimState = 22;
+				item->goalAnimState = STATE_BADDY_MONKEY_FALL_LAND;
 				currentCreature->LOT.isMonkeying = false;
 				currentCreature->LOT.isJumping = false;
 			}
 			break;
 
-		case 20:
+		case STATE_BADDY_MONKEY_FORWARD:
 			joint2 = 0;
 			joint1 = 0;
 			currentCreature->LOT.isJumping = true;
@@ -785,9 +935,9 @@ void BaddyControl(short itemNum)
 			{
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 				height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-				if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
+				if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - (STEP_SIZE * 6))
 				{
-					item->goalAnimState = 19;
+					item->goalAnimState = STATE_BADDY_MONKEY_IDLE;
 				}
 			}
 			if (laraInfo.ahead)
@@ -795,60 +945,63 @@ void BaddyControl(short itemNum)
 				if (laraInfo.distance < SQUARE(682))
 				{
 
-					if (LaraItem->currentAnimState > 74 &&
-						LaraItem->currentAnimState < 80 ||
-						LaraItem->currentAnimState == 82 ||
-						LaraItem->currentAnimState == 83)
+					if (LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_IDLE
+						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_FORWARD
+						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_LEFT
+						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_RIGHT
+						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURNAROUND
+						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_LEFT
+						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_RIGHT)
 					{
-						item->goalAnimState = 19;
+						item->goalAnimState = STATE_BADDY_MONKEY_IDLE;
 					}
 				}
 			}
 			break;
 
-		case 21:
+		case STATE_BADDY_MONKEY_PUSH_OFF:
 			currentCreature->maximumTurn = ANGLE(7);
 			if (currentCreature->flags == someFlag3)
 			{
 				if (item->touchBits)
 				{
-					LaraItem->currentAnimState = 28;
-					LaraItem->goalAnimState = 28;
-					LaraItem->animNumber = 28;
+					LaraItem->currentAnimState = STATE_LARA_JUMP_UP;
+					LaraItem->goalAnimState = STATE_LARA_JUMP_UP;
+					LaraItem->animNumber = ANIMATION_LARA_TRY_HANG_VERTICAL;
 					LaraItem->frameNumber = Anims[LaraItem->frameNumber].frameBase + 9;
 					LaraItem->gravityStatus = true;
 					LaraItem->speed = 2;
 					LaraItem->fallspeed = 1;
-					LaraItem->pos.yPos += 192;
+					LaraItem->pos.yPos += (STEP_SIZE * 0.75f);
 					Lara.gunStatus = 0;
 					currentCreature->flags = 1;
 				}
 			}
 			break;
 
-		case 23:
-		case 24:
+		case STATE_BADDY_ROLL_LEFT:
+		case STATE_BADDY_JUMP_RIGHT:
 			currentCreature->alerted = false;
 			currentCreature->maximumTurn = someFlag3;
 			item->status = ITEM_ACTIVE;
 			break;
 
-		case 26:
+		case STATE_BADDY_CROUCH:
 			if (item->itemFlags[0] == someFlag3)
 			{
 				if (currentCreature->enemy)
 				{
-					if ((currentCreature->enemy->objectNumber == ID_SMALLMEDI_ITEM ||
-						currentCreature->enemy->objectNumber == ID_UZI_AMMO_ITEM) &&
-						info.distance < 0x40000)
+					if ((currentCreature->enemy->objectNumber == ID_SMALLMEDI_ITEM
+						|| currentCreature->enemy->objectNumber == ID_UZI_AMMO_ITEM) 
+						&& info.distance < 0x40000)
 					{
-						item->goalAnimState = 27;
+						item->goalAnimState = STATE_BADDY_CROUCH_PICKUP;
 						break;
 					}
 				}
 				if (currentCreature->alerted)
 				{
-					item->goalAnimState = 28;
+					item->goalAnimState = STATE_BADDY_CROUCH_TO_STAND;
 				}
 			}
 			else
@@ -857,14 +1010,14 @@ void BaddyControl(short itemNum)
 				{
 					break;
 				}
-				item->goalAnimState = 28;
+				item->goalAnimState = STATE_BADDY_CROUCH_TO_STAND;
 				currentCreature->enemy = NULL;
 			}
 			break;
 
-		case 27:
+		case STATE_BADDY_CROUCH_PICKUP:
 			ClampRotation(&item->pos, info.angle, ANGLE(11));
-			if (item->frameNumber != Anims[item->animNumber].frameBase + 9)
+			if (item->frameNumber != Anims[item->animNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
 			{
 				break;
 			}
@@ -877,7 +1030,7 @@ void BaddyControl(short itemNum)
 			{
 				break;
 			}
-			if (currentCreature->enemy->roomNumber == 255 ||
+			if (currentCreature->enemy->roomNumber == NO_ROOM ||
 				currentCreature->enemy->status == ITEM_INVISIBLE ||
 				currentCreature->enemy->inDrawRoom)
 			{
@@ -916,7 +1069,7 @@ void BaddyControl(short itemNum)
 			creature2->enemy = 0;*/
 			break;
 
-		case 31:
+		case STATE_BADDY_AIM:
 			currentCreature->maximumTurn = 0;
 			if (info.ahead)
 			{
@@ -924,24 +1077,24 @@ void BaddyControl(short itemNum)
 				joint2 = info.xAngle;
 			}
 			ClampRotation(&item->pos, info.angle, ANGLE(7));
-			if (!Targetable(item, &info) ||
-				item->itemFlags[2] < 1)
+			if (!Targetable(item, &info)
+				|| item->itemFlags[2] < 1)
 			{
-				item->goalAnimState = 0;
+				item->goalAnimState = STATE_BADDY_STOP;
 				break;
 			}
-			item->goalAnimState = 14;
+			item->goalAnimState = STATE_BADDY_FIRE;
 			break;
 
-		case 14:
+		case STATE_BADDY_FIRE:
 			if (info.ahead)
 			{
 				joint1 = info.angle;
 				joint2 = info.xAngle;
 			}
 			ClampRotation(&item->pos, info.angle, ANGLE(7));
-			if (item->frameNumber >= Anims[item->animNumber].frameBase + 13 ||
-				item->frameNumber == Anims[item->animNumber].frameBase + 1)
+			if (item->frameNumber >= Anims[item->animNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
+				item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_FIRE_MIN)
 			{
 				break;
 			}
@@ -951,89 +1104,88 @@ void BaddyControl(short itemNum)
 				item->itemFlags[2]--;
 			}
 			if (!ShotLara(item, &info, &baddyGun, joint1, 15));
-			item->goalAnimState = 0;
+			item->goalAnimState = STATE_BADDY_STOP;
 			break;
 
 		default:
 			break;
 
-		case 11:
-			//printf("%d %d\n", item->frameNumber, Anims[item->animNumber].frameBase + 20);
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 20)
+		case STATE_BADDY_HOLSTER_GUN:
+			if (item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
 			{
-				item->swapMeshFlags = 0x7FC800;
+				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_EMPTY;
 			}
 			break;
 
-		case 10:
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 21)
+		case STATE_BADDY_DRAW_GUN:
+			if (item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_DRAW_GUN)
 			{
-				item->swapMeshFlags = 0x7FC010;
+				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_GUN;
 			}
 			break;
 
-		case 13:
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 22)
+		case STATE_BADDY_HOLSTER_SWORD:
+			if (item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
 			{
-				item->swapMeshFlags = 0x7FC800;
+				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_EMPTY;
 			}
 			break;
 
-		case 12:
-			if (item->frameNumber != Anims[item->animNumber].frameBase + 12)
+		case STATE_BADDY_DRAW_SWORD:
+			if (item->frameNumber != Anims[item->animNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
 			{
 				break;
 			}
 			if (item->objectNumber == ID_BADDY1)
 			{
-				item->swapMeshFlags = 0x7E0880;
+				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_SWORD_SIMPLE;
 			}
 			else
 			{
-				item->swapMeshFlags = 2176;
+				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_SWORD_NINJA;
 			}
 			break;
 
-		case 8:
+		case STATE_BADDY_UNKNOWN_8:
 			currentCreature->maximumTurn = 0;
 			ClampRotation(&item->pos, info.angle, ANGLE(11));
 			if (laraInfo.distance < SQUARE(682) ||
 				item != Lara.target)
 			{
-				item->goalAnimState = 9;
+				item->goalAnimState = STATE_BADDY_UNKNOWN_9;
 			}
 			break;
 
-		case 44:
+		case STATE_BADDY_BLIND:
 			if (!WeaponEnemyTimer)
 			{
 				if ((GetRandomControl() & 0x7F) == 0)
 				{
-					item->goalAnimState = 0;
+					item->goalAnimState = STATE_BADDY_STOP;
 				}
 			}
 			break;
 
-		case 30:
-			if (item->animNumber == Objects[objectNumber].animIndex + 4)
+		case STATE_BADDY_SOMERSAULT:
+			if (item->animNumber == Objects[objectNumber].animIndex + ANIMATION_BADDY_SOMERSAULT_END)
 			{
 				ClampRotation(&item->pos, info.angle, ANGLE(7));
 				break;
 			}
-			if (item->frameNumber != Anims[item->animNumber].frameBase + 18)
+			if (item->frameNumber != Anims[item->animNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
 			{
 				break;
 			}
 			currentCreature->LOT.isJumping = true;
 			break;
 
-		case 33:
-		case 38:
+		case STATE_BADDY_JUMP_FORWARD_1_BLOCK:
+		case STATE_BADDY_JUMP_FORWARD_2_BLOCKS:
 			if (item->itemFlags[0] >= someFlag3)
 			{
 				break;
 			}
-			if (item->animNumber != Objects[objectNumber].animIndex + 55)
+			if (item->animNumber != Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_FORWARD)
 			{
 				item->itemFlags[0] += 2;
 			}
@@ -1046,12 +1198,12 @@ void BaddyControl(short itemNum)
 	CreatureJoint(item, 1, joint2);
 	CreatureJoint(item, 2, joint3);
 
-	if (item->currentAnimState >= 38 ||
-		item->currentAnimState == 33 ||
-		item->currentAnimState == 20 ||
-		item->currentAnimState == 32 ||
-		item->currentAnimState == 30 ||
-		item->currentAnimState == 44)
+	if (item->currentAnimState >= STATE_BADDY_JUMP_FORWARD_2_BLOCKS ||
+		item->currentAnimState == STATE_BADDY_JUMP_FORWARD_1_BLOCK ||
+		item->currentAnimState == STATE_BADDY_MONKEY_FORWARD ||
+		item->currentAnimState == STATE_BADDY_DEATH ||
+		item->currentAnimState == STATE_BADDY_SOMERSAULT ||
+		item->currentAnimState == STATE_BADDY_BLIND)
 	{
 		CreatureAnimation(itemNum, angle, 0);
 	}
@@ -1063,36 +1215,36 @@ void BaddyControl(short itemNum)
 		{
 		case 2:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[objectNumber].animIndex + 64;
-			item->currentAnimState = 41;
+			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_2_CLICKS;
+			item->currentAnimState = STATE_BADDY_CLIMB_2_CLICKS;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
 		case 3:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[objectNumber].animIndex + 63;
-			item->currentAnimState = 40;
+			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_3_CLICKS;
+			item->currentAnimState = STATE_BADDY_CLIMB_3_CLICKS;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
 		case 4:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[objectNumber].animIndex + 62;
-			item->currentAnimState = 39;
+			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
+			item->currentAnimState = STATE_BADDY_CLIMB_4_CLICKS;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
 		case -3:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[objectNumber].animIndex + 66;
-			item->currentAnimState = 43;
+			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_3_CLICKS;
+			item->currentAnimState = STATE_BADDY_JUMP_OFF_3_CLICKS;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
 		case -4:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[objectNumber].animIndex + 65;
-			item->currentAnimState = 42;
+			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_4_CLICKS;
+			item->currentAnimState = STATE_BADDY_JUMP_OFF_4_CLICKS;
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			break;
 
@@ -1103,9 +1255,9 @@ void BaddyControl(short itemNum)
 	else
 	{
 		creature->maximumTurn = 0;
-		item->animNumber = Objects[objectNumber].animIndex + 68;
+		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_BLIND;
 		item->frameNumber = Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
-		item->currentAnimState = 44;
+		item->currentAnimState = STATE_BADDY_BLIND;
 	}
 
 	return;
