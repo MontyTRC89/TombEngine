@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_spear_guardian.h"
 #include "box.h"
 #include "effect.h"
 #include "items.h"
@@ -11,7 +11,7 @@
 BITE_INFO spearLeftBite = { 0, 0, 920, 11 };
 BITE_INFO spearRightBite = { 0, 0, 920, 18 };
 
-void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
+static void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 {
 	if (!(xian->flags & 1) && (item->touchBits & 0x40000))
 	{

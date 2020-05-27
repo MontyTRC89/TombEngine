@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_knifethrower.h"
 #include "items.h"
 #include "effect.h"
 #include "box.h"
@@ -74,7 +74,7 @@ void KnifeControl(short fxNum)
 	}
 }
 
-short ThrowKnife(int x, int y, int z, short speed, short yrot, short roomNumber)
+static short ThrowKnife(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
 	short fx_number = 0;
 	/*

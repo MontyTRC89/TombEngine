@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_barracuda.h"
 #include "box.h"
 #include "effect.h"
 #include "lara.h"

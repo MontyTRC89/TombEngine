@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr2_spider.h"
 #include "effect.h"
 #include "sphere.h"
 #include "box.h"
@@ -14,7 +14,7 @@
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 
 // fix blood pos for small spider.
-void S_SpiderBite(ITEM_INFO* item)
+static void S_SpiderBite(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
 	pos.x = spiderBite.x;
@@ -24,7 +24,7 @@ void S_SpiderBite(ITEM_INFO* item)
 	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->pos.yPos, item->roomNumber);
 }
 
-void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
+static void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
 {
 	GAME_VECTOR vec;
 
