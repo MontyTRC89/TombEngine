@@ -28,7 +28,6 @@
 #include "sphere.h"
 #include "debris.h"
 #include "larafire.h"
-#include "oldobjects.h"
 #include "footprint.h"
 #include "level.h"
 #include "input.h"
@@ -36,6 +35,9 @@
 #include "winmain.h"
 #include "Renderer11.h"
 #include "setup.h"
+#include "tr5_rats_emitter.h"
+#include "tr5_bats_emitter.h"
+#include "tr5_spider_emitter.h"
 
 short ShatterSounds[18][10] =
 {
@@ -71,8 +73,8 @@ int RumbleTimer = 0;
 int InGameCnt = 0;
 byte IsAtmospherePlaying = 0;
 byte FlipStatus = 0;
-int FlipStats[255];
-int FlipMap[255];
+int FlipStats[MAX_FLIPMAP];
+int FlipMap[MAX_FLIPMAP];
 bool InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[512];
@@ -120,9 +122,9 @@ int CutSeqNum;
 int CutSeqTriggered;
 int GlobalPlayingCutscene;
 int CurrentLevel;
-int SoundActive;
-int DoTheGame;
-int ThreadEnded;
+bool SoundActive;
+bool DoTheGame;
+bool ThreadEnded;
 int OnFloor;
 int SmokeWindX;
 int SmokeWindZ;
@@ -528,7 +530,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 unsigned CALLBACK GameMain(void*)
 {
-	//DB_Log(2, "GameMain - DLL");
 	printf("GameMain\n");
 
 	// Initialise legacy memory buffer and game timer
@@ -544,10 +545,10 @@ unsigned CALLBACK GameMain(void*)
 	DoTheGame = false;
 
 	// Finish the thread
-	PostMessageA((HWND)WindowsHandle, 0x10u, 0, 0);
-	_endthreadex(1);
+	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
+	EndThread();
 	
-	return 1;   
+	return TRUE;
 }   
 
 GAME_STATUS DoTitle(int index)

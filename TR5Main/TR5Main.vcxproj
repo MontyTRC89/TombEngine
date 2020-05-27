@@ -66,7 +66,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -100,7 +100,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_RELEASE;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -144,6 +144,15 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Libs\zlib\zconf.h" />
     <ClInclude Include="Libs\zlib\zip.h" />
     <ClInclude Include="Libs\zlib\zlib.h" />
+    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
+    <ClInclude Include="Objects\TR5\Object\tr5_twoblockplatform.h" />
+    <ClInclude Include="Objects\Utils\ObjectsUtils.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_doppelganger.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_natla.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_natla_mutant.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_birdmonster.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
@@ -166,7 +175,21 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR2\Trap\tr2_killerstatue.h" />
     <ClInclude Include="Objects\TR2\Trap\tr2_springboard.h" />
     <ClInclude Include="Objects\TR3\boss.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_civvy.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_cobra.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_fishemitter.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_flamethrower.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_monkey.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_mpgun.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_mpstick.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_scuba.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_sophia.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_tribesman.h" />
     <ClInclude Include="Objects\TR3\fish.h" />
     <ClInclude Include="Objects\TR3\Vehicles\rubberboat.h" />
     <ClInclude Include="Objects\TR4\Floor\tr4_burningfloor.h" />
@@ -186,6 +209,30 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR4\Trap\tr4_spikywall.h" />
     <ClInclude Include="Objects\TR2\Trap\tr2_spinningblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_stargate.h" />
+    <ClInclude Include="Objects\TR5\Emitter\tr5_bats_emitter.h" />
+    <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
+    <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_autoguns.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_brownbeast.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_chef.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_cyborg.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_doberman.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_dog.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_ghost.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_gladiator.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_guard.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_gunship.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_hydra.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_imp.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_lagoon_witch.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_larson.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_laser_head.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_lion.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_reaper.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_roman_statue.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_submarine.h" />
+    <ClInclude Include="Objects\TR5\Entity\tr5_willowwisp.h" />
+    <ClInclude Include="Objects\TR5\Shatter\tr5_smashobject.h" />
     <ClInclude Include="Specific\newlevel.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\oldobjects.h" />
@@ -325,12 +372,11 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Global\trmath.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_lara_evil.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_larson.cpp" />
+    <ClCompile Include="Objects\TR5\Object\tr5_twoblockplatform.cpp" />
+    <ClCompile Include="Objects\Utils\ObjectsUtils.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_doppelganger.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_natla.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_natla_evil.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_pierre.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_raptor.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_natla_mutant.cpp" />
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_skidman.cpp" />
     <ClCompile Include="Objects\TR2\tr2_objects.cpp" />
@@ -360,30 +406,33 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\Trap\tr4_spikywall.cpp" />
     <ClCompile Include="Objects\TR2\Trap\tr2_spinningblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_stargate.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\tr5_bats_emitter.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_autoguns.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_brownbeast.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_chef.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_cybord.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\tr5_cyborg.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_doberman.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_dog.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_ghost.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_gladiator.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_guard.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\tr5_gunship.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_hydra.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_imp.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_lagoon_witch.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_larson.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_laser_head.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_lion.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_misc_objects.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_missile.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_moving_block.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_particle_enemies.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_rats.cpp" />
+    <ClCompile Include="Objects\TR5\Shatter\tr5_smashobject.cpp" />
+    <ClCompile Include="Objects\tr5_misc_objects.cpp" />
+    <ClCompile Include="Objects\tr5_missile.cpp" />
+    <ClCompile Include="Objects\TR5\Object\tr5_pushableblock.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_reaper.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_romanstatue.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\tr5_roman_statue.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_submarine.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\tr5_traps.cpp" />
+    <ClCompile Include="Objects\tr5_traps.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_willowwisp.cpp" />
     <ClCompile Include="Objects\TR5\tr5_objects.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\boat.cpp" />

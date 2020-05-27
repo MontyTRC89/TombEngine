@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_civvy.h"
 #include "box.h"
 #include "effect2.h"
 #include "effect.h"

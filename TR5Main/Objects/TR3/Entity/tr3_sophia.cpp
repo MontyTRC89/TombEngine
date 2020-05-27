@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_sophia.h"
 #include "items.h"
 #include "effect2.h"
 #include "lot.h"

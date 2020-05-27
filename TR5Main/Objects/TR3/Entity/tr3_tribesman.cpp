@@ -16,7 +16,7 @@ BITE_INFO tribesmanAxeBite = { 0, 16, 265, 13 };
 BITE_INFO tribesmanDartsBite1 = { 0, 0, -200, 13 };
 BITE_INFO tribesmanDartsBite2 = { 8, 40, -248, 13 };
 
-byte tribesmanAxeHit[13][3] = {
+unsigned char tribesmanAxeHit[13][3] = {
 	{0,0,0},
 	{0,0,0},
 	{0,0,0},
@@ -266,7 +266,7 @@ void TribemanAxeControl(short itemNum)
 	CreatureAnimation(itemNum, angle, 0);
 }
 
-void TribesmanShotDart(ITEM_INFO* item)
+static void TribesmanShotDart(ITEM_INFO* item)
 {
 	short dartItemNumber = CreateItem();
 	if (dartItemNumber != NO_ITEM)
@@ -315,7 +315,7 @@ void TribesmanShotDart(ITEM_INFO* item)
 	}
 }
 
-void TribesmanDartsControl(short itemNum)
+void TribemanDartsControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;

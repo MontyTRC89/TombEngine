@@ -17,6 +17,9 @@
 #include "camera.h"
 #include "savegame.h"
 #include "sound.h"
+#include "tr5_rats_emitter.h"
+#include "tr5_bats_emitter.h"
+#include "tr5_spider_emitter.h"
 
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
@@ -58,8 +61,8 @@ void(*effect_routines[59])(ITEM_INFO* item) =
 	void_effect,
 	LaraLocation,
 	ClearSpidersPatch,
-	AddFootprint, /*AddFootprint*/
-	void_effect /*ResetTest*/,
+	AddFootprint,
+	void_effect, // resettest
 	void_effect,
 	void_effect,
 	void_effect,
@@ -97,16 +100,21 @@ void TL_1(ITEM_INFO* item)
 	}
 }
 
-void AddFootprint(ITEM_INFO* item) {
-	if (item != LaraItem) {
+// TODO: here are sound for lara footstep too !
+void AddFootprint(ITEM_INFO* item)
+{
+	if (item != LaraItem)
 		return;
-	}
+
+	FOOTPRINT_STRUCT footprint;
 	PHD_3DPOS footprintPosition;
-	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition)) {
-		if (footprints.size() >= MAX_FOOTPRINTS) {
+
+	if (CheckFootOnFloor(*item, LM_LFOOT, footprintPosition))
+	{
+		if (footprints.size() >= MAX_FOOTPRINTS)
 			footprints.pop_back();
-		}
-		FOOTPRINT_STRUCT footprint;
+		
+		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
 		footprint.pos = footprintPosition;
 		footprint.lifeStartFading = 30 * 10;
 		footprint.startOpacity = 64;
@@ -114,11 +122,13 @@ void AddFootprint(ITEM_INFO* item) {
 		footprint.active = true;
 		footprints.push_front(footprint);
 	}
-	if (CheckFootOnFloor(*item, LM_RFOOT, footprintPosition)) {
-		if (footprints.size() >= MAX_FOOTPRINTS) {
+
+	if (CheckFootOnFloor(*item, LM_RFOOT, footprintPosition))
+	{
+		if (footprints.size() >= MAX_FOOTPRINTS)
 			footprints.pop_back();
-		}
-		FOOTPRINT_STRUCT footprint;
+
+		memset(&footprint, 0, sizeof(FOOTPRINT_STRUCT));
 		footprint.pos = footprintPosition;
 		footprint.lifeStartFading = 30*10;
 		footprint.startOpacity = 64;
@@ -126,7 +136,6 @@ void AddFootprint(ITEM_INFO* item) {
 		footprint.active = true;
 		footprints.push_front(footprint);
 	}
-	
 }
 
 void TL_2(ITEM_INFO* item)

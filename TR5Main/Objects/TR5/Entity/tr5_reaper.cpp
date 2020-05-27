@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_reaper.h"
 #include "items.h"
 #include "box.h"
 #include "setup.h"
@@ -19,7 +19,7 @@ void InitialiseReaper(short itemNum)
     item->currentAnimState = 2;
 }
 
-void ControlReaper(short itemNumber)
+void ReaperControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{

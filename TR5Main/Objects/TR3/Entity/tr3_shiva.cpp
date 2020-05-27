@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_shiva.h"
 #include "effect2.h"
 #include "box.h"
 #include "effect.h"
@@ -13,7 +13,7 @@
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
 BITE_INFO shivaRightBite = { 0, 0, 920, 22 };
 
-void TriggerShivaSmoke(long x, long y, long z, long uw)
+static void TriggerShivaSmoke(long x, long y, long z, long uw)
 {
 	long size;
 	SPARKS* sptr;
@@ -102,7 +102,7 @@ void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->dSize = size;
 }
 
-void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
+static void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 {
 	if (!(shiva->flags) && (item->touchBits & 0x2400000))
 	{

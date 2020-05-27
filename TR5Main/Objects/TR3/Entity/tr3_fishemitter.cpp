@@ -1,25 +1,30 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_fishemitter.h"
 #include "effect.h"
 #include "draw.h"
 #include "level.h"
 #include "lara.h"
 #include "fish.h"
 
-#define PIRAHNA_DAMAGE	4
-#define X	0
-#define Y	1
-#define Z 	2
+#define PIRAHNA_DAMAGE 4
+#define X 0
+#define Y 1
+#define Z 2
 #define XYZ	3
 #define MAX_FISH 8
-#define OCB_FISH_LETAL			0x1000
-#define OCB_FISH_EAT_CARCASS	0x2000
+#define OCB_FISH_LETAL 0x1000
+#define OCB_FISH_EAT_CARCASS 0x2000
 
 FISH_LEADER_INFO LeaderInfo[MAX_FISH];
 FISH_INFO Fishes[MAX_FISH + (MAX_FISH * 24)];
 
-byte FishRanges[1][3] = {
-	{ 2 << 2, 5 << 2, 3 }
+unsigned char FishRanges[1][3] =
+{
+	{
+		8,
+		20,
+		3
+	}
 };
 
 int PirahnaHitWait = false;
@@ -139,7 +144,6 @@ void SetupFish(int leader, ITEM_INFO* item)
 		Fishes[MAX_FISH + (leader * 24) + i].y = (GetRandomControl() % fishYRange);
 		Fishes[MAX_FISH + (leader * 24) + i].destY = (GetRandomControl() % fishYRange);
 		Fishes[MAX_FISH + (leader * 24) + i].z = (GetRandomControl() % (fishZRange << 1)) - fishZRange;
-
 		Fishes[MAX_FISH + (leader * 24) + i].angle = GetRandomControl() & 4095;
 		Fishes[MAX_FISH + (leader * 24) + i].speed = (GetRandomControl() & 31) + 32;
 		Fishes[MAX_FISH + (leader * 24) + i].swim = GetRandomControl() & 63;

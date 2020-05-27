@@ -1360,8 +1360,9 @@ short* FindPlinth(ITEM_INFO* item)
 	for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)
 	{
 		ITEM_INFO* current = &Items[itemNumber];
+		ObjectInfo* obj = &Objects[current->objectNumber];
 
-		if (Objects[current->objectNumber].collision != PickupCollision
+		if (!obj->isPickup
 			&& item->pos.xPos == current->pos.xPos
 			&& item->pos.yPos <= current->pos.yPos
 			&& item->pos.zPos == current->pos.zPos
@@ -1470,7 +1471,7 @@ void InitialiseSearchObject(short itemNumber)
 					break;
 				}
 			}
-			else if (Objects[item2->objectNumber].collision == PickupCollision
+			else if (Objects[item2->objectNumber].isPickup
 				&&  item->pos.xPos == item2->pos.xPos
 				&&  item->pos.yPos == item2->pos.yPos
 				&&  item->pos.zPos == item2->pos.zPos)
@@ -1601,7 +1602,7 @@ void SearchObjectControl(short itemNumber)
 		if (item->itemFlags[1] != -1)
 		{
 			item2 = &Items[item->itemFlags[1]];
-			if (Objects[item2->objectNumber].collision == PickupCollision)
+			if (Objects[item2->objectNumber].isPickup)
 			{
 				if (FlipStats[0])
 					item2->status = ITEM_INACTIVE;
@@ -1618,7 +1619,7 @@ void SearchObjectControl(short itemNumber)
 			if (item->itemFlags[1] != -1)
 			{
 				item2 = &Items[item->itemFlags[1]];
-				if (Objects[item2->objectNumber].collision == PickupCollision)
+				if (Objects[item2->objectNumber].isPickup)
 				{
 					AddDisplayPickup(item2->objectNumber);
 					KillItem(item->itemFlags[1]);

@@ -10,11 +10,15 @@
     "publicKeyToken='6595b64144ccf1df' " \
     "language='*'\"")
 
-extern WINAPP	 App;
+extern WINAPP App;
 extern unsigned int ThreadID;
 extern uintptr_t ThreadHandle;
 extern HACCEL hAccTable;
 extern HWND WindowsHandle;
+
+// return handle
+#define BeginThread(function, threadid) _beginthreadex(0, 0, &function, 0, 0, &threadid)
+#define EndThread() _endthreadex(1)
 
 int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description);
 void WinProcMsg();

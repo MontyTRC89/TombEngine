@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_imp.h"
 #include "items.h"
 #include "sphere.h"
 #include "lara.h"
@@ -53,7 +53,7 @@ void InitialiseImp(short itemNum)
     item->frameNumber = Anims[item->animNumber].frameBase;
 }
 
-void ImpThrowStones(ITEM_INFO* item)
+static void ImpThrowStones(ITEM_INFO* item)
 {
 	PHD_VECTOR pos1;
 	pos1.x = 0;
@@ -106,7 +106,7 @@ void ImpThrowStones(ITEM_INFO* item)
 	}
 }
 
-void ControlImp(short itemNumber)
+void ImpControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{

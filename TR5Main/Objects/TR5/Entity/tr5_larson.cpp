@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_larson.h"
 #include "items.h"
 #include "box.h"
 #include "sphere.h"
@@ -62,7 +62,7 @@ void InitialiseLarson(short itemNum)
 	}
 }
 
-void ControlLarson(short itemNumber)
+void LarsonControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
