@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_ghost.h"
 #include "items.h"
 #include "box.h"
 #include "effect.h"
@@ -24,7 +24,7 @@ void InitialiseInvisibleGhost(short itemNum)
     item->pos.yPos += CLICK(2);
 }
 
-void ControlInvisibleGhost(short itemNumber)
+void InvisibleGhostControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{

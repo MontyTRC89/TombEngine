@@ -13,6 +13,8 @@
 #include "debris.h"
 #include "lara.h"
 #include "sound.h"
+#include "tr5_roman_statue.h"
+#include "tr5_hydra.h"
 
 int DebrisFlags;
 
@@ -204,10 +206,9 @@ void MissileControl(short itemNumber)
 			int yv = y - fx->pos.yPos;
 			int zv = z - fx->pos.zPos;
 
-			if (fx->flag1)
+			if (fx->flag1 == 1)
 			{
-				if (fx->flag1 == 1)
-					TriggerRomanStatueMissileSparks(&pos, itemNumber);
+				TriggerRomanStatueMissileSparks(&pos, itemNumber);
 			}
 			else
 			{

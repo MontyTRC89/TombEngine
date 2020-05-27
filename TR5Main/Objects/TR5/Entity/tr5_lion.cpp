@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "oldobjects.h"
+#include "tr5_lion.h"
 #include "global.h"
 #include "items.h"
 #include "effect2.h"

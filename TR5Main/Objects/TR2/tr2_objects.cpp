@@ -1,25 +1,25 @@
 #include "framework.h"
 #include "tr2_objects.h"
 /// entities
-#include "tr2_barracuda.h"
-#include "tr2_birdmonster.h"
-#include "tr2_dragon.h"
-#include "tr2_eagle_or_crow.h"
-#include "tr2_knifethrower.h"
-#include "tr2_mercenary.h"
-#include "tr2_monk.h"
-#include "tr2_rat.h"
-#include "tr2_shark.h"
-#include "tr2_silencer.h"
-#include "tr2_skidman.h"
-#include "tr2_spear_guardian.h"
-#include "tr2_spider.h"
-#include "tr2_sword_guardian.h"
-#include "tr2_worker_dualrevolver.h"
-#include "tr2_worker_flamethrower.h"
-#include "tr2_worker_machinegun.h"
-#include "tr2_worker_shotgun.h"
-#include "tr2_yeti.h"
+#include "tr2_barracuda.h" // OK
+#include "tr2_birdmonster.h" // OK
+#include "tr2_dragon.h" // OK
+#include "tr2_eagle_or_crow.h" // OK
+#include "tr2_knifethrower.h" // OK
+#include "tr2_mercenary.h" // OK
+#include "tr2_monk.h" // OK
+#include "tr2_rat.h" // OK
+#include "tr2_shark.h" // OK
+#include "tr2_silencer.h" // OK
+#include "tr2_skidman.h" // OK
+#include "tr2_spear_guardian.h" // OK
+#include "tr2_spider.h" // OK
+#include "tr2_sword_guardian.h" // OK
+#include "tr2_worker_dualrevolver.h" // OK
+#include "tr2_worker_flamethrower.h" // OK
+#include "tr2_worker_machinegun.h" // OK
+#include "tr2_worker_shotgun.h" // OK
+#include "tr2_yeti.h" // OK
 /// objects
 
 /// trap
@@ -35,7 +35,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void InitialiseBaddy(ObjectInfo* obj)
+static void StartBaddy(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded)
@@ -600,12 +600,12 @@ static void InitialiseBaddy(ObjectInfo* obj)
 	}
 }
 
-static void InitialiseObject(ObjectInfo* obj)
+static void StartObject(ObjectInfo* obj)
 {
 	
 }
 
-static void InitialiseTrap(ObjectInfo* obj)
+static void StartTrap(ObjectInfo* obj)
 {
 	obj = &Objects[ID_ROLLING_SPINDLE];
 	if (obj->loaded)
@@ -628,7 +628,7 @@ static void InitialiseTrap(ObjectInfo* obj)
 }
 
 // boat, snowmobile, snowmobile gun
-static void InitialiseVehicles(ObjectInfo* obj)
+static void StartVehicles(ObjectInfo* obj)
 {
 	// TODO: fix BoatControl() not using int BoatControl(void)
 	obj = &Objects[ID_SPEEDBOAT];
@@ -657,8 +657,8 @@ static void InitialiseVehicles(ObjectInfo* obj)
 static ObjectInfo* objToInit;
 void InitialiseTR2Objects()
 {
-	InitialiseBaddy(objToInit);
-	InitialiseObject(objToInit);
-	InitialiseTrap(objToInit);
-	InitialiseVehicles(objToInit);
+	StartBaddy(objToInit);
+	StartObject(objToInit);
+	StartTrap(objToInit);
+	StartVehicles(objToInit);
 }

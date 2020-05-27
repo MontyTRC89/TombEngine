@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_mpstick.h"
 #include "box.h"
 #include "effect.h"
 #include "people.h"

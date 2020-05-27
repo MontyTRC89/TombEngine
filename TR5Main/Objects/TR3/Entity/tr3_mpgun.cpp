@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_mpgun.h"
 #include "box.h"
 #include "sphere.h"
 #include "effect2.h"
@@ -11,7 +11,8 @@
 #include "lara.h"
 #include "sound.h"
 
-enum MPGUN_STATES {
+enum MPGUN_STATES
+{
 	MPGUN_EMPTY, 
 	MPGUN_WAIT,
 	MPGUN_WALK, 
@@ -446,6 +447,5 @@ void MPGunControl(short itemNumber)
 	CreatureJoint(item, 0, torsoY);
 	CreatureJoint(item, 1, torsoX);
 	CreatureJoint(item, 2, head);
-
 	CreatureAnimation(itemNumber, angle, tilt);
 }

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_monkey.h"
 #include "box.h"
 #include "lara.h"
 #include "effect.h"
@@ -9,8 +9,6 @@
 #include "level.h"
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
-
-
 
 void InitialiseMonkey(short itemNumber)
 {

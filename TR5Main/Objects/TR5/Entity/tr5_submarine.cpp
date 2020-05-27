@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "oldobjects.h"
+#include "tr5_submarine.h"
 #include "items.h"
 #include "box.h"
 #include "people.h"
@@ -15,6 +15,153 @@
 #include "lara.h"
 #include "sound.h"
 
+static void TriggerSubmarineSparks(short itemNumber)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = 1;
+	spark->sR = -1;
+	spark->sG = -1;
+	spark->sB = -1;
+	spark->colFadeSpeed = 2;
+	spark->dG = (GetRandomControl() & 0x1F) - 32;
+	spark->life = 2;
+	spark->dR = spark->dG >> 1;
+	spark->dB = spark->dG >> 1;
+	spark->sLife = 2;
+	spark->transType = COLADD;
+	spark->fadeToBlack = 0;
+	spark->flags = 20650;
+	spark->fxObj = itemNumber;
+	spark->nodeNumber = 7;
+	spark->x = 0;
+	spark->z = 0;
+	spark->y = 0;
+	spark->xVel = 0;
+	spark->yVel = 0;
+	spark->zVel = 0;
+	spark->maxYvel = 0;
+	spark->gravity = 0;
+	spark->scalar = 1;
+	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
+}
+
+static void TriggerTorpedoBubbles(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = 1;
+	spark->sR = 32;
+	spark->sG = 32;
+	spark->sB = 32;
+	spark->dR = 80;
+	spark->dG = 80;
+	spark->dB = 80;
+	spark->colFadeSpeed = 2;
+	spark->fadeToBlack = 8;
+	spark->transType = COLADD;
+	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
+	spark->x = pos1->x + (GetRandomControl() & 0x1F);
+	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
+	spark->z = (GetRandomControl() & 0x1F) + pos1->z - 16;
+	spark->xVel = pos2->x + (GetRandomControl() & 0x7F) - pos1->x - 64;
+	spark->yVel = pos2->y + (GetRandomControl() & 0x7F) - pos1->y - 64;
+	spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - pos1->z - 64;
+	spark->friction = 0;
+	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
+	spark->maxYvel = 0;
+	spark->gravity = -4 - (GetRandomControl() & 3);
+	spark->scalar = 1;
+	spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
+	spark->rotAng = GetRandomControl() & 0xFFF;
+	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
+	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32 >> factor;
+	spark->dSize = spark->size << 1;
+}
+
+static void TriggerTorpedoSparks2(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char scale)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = 1;
+	spark->sR = 32;
+	spark->sG = 32;
+	spark->sB = 32;
+	spark->dR = -128;
+	spark->dG = -128;
+	spark->dB = -128;
+	spark->colFadeSpeed = 2;
+	spark->fadeToBlack = 8;
+	spark->transType = COLADD;
+	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
+	spark->x = pos1->x + (GetRandomControl() & 0x1F);
+	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
+	spark->z = (GetRandomControl() & 0x1F) + pos1->z - 16;
+	spark->xVel = pos2->x + (GetRandomControl() & 0x7F) - pos1->x - 64;
+	spark->yVel = pos2->y + (GetRandomControl() & 0x7F) - pos1->y - 64;
+	spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - pos1->z - 64;
+	spark->friction = 51;
+	spark->gravity = -4 - (GetRandomControl() & 3);
+	spark->maxYvel = 0;
+	spark->scalar = 2 - scale;
+	spark->flags = SP_EXPDEF | SP_ROTATE | SP_SCALE;
+	spark->rotAng = GetRandomControl() & 0xFFF;
+	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
+	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
+	spark->dSize = spark->size << 1;
+}
+
+static void SubmarineAttack(ITEM_INFO* item)
+{
+	short itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
+	{
+		ITEM_INFO* torpedoItem = &Items[itemNumber];
+
+		SoundEffect(SFX_UNDERWATER_TORPEDO, &torpedoItem->pos, 2);
+
+		torpedoItem->objectNumber = ID_TORPEDO;
+		torpedoItem->shade = -15856;
+
+		PHD_VECTOR pos1;
+		PHD_VECTOR pos2;
+
+		for (int i = 0; i < 8; i++)
+		{
+			pos1.x = (GetRandomControl() & 0x7F) - 414;
+			pos1.y = -320;
+			pos1.z = 352;
+			GetJointAbsPosition(item, &pos1, 4);
+
+			pos2.x = (GetRandomControl() & 0x3FF) - 862;
+			pos2.y = -320 - (GetRandomControl() & 0x3FF);
+			pos2.z = (GetRandomControl() & 0x3FF) - 160;
+			GetJointAbsPosition(item, &pos2, 4);
+
+			TriggerTorpedoSparks2(&pos1, &pos2, 0);
+		}
+
+		torpedoItem->roomNumber = item->roomNumber;
+		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->roomNumber);
+
+		torpedoItem->pos.xPos = pos1.x;
+		torpedoItem->pos.yPos = pos1.y;
+		torpedoItem->pos.zPos = pos1.z;
+
+		InitialiseItem(itemNumber);
+
+		torpedoItem->pos.xRot = 0;
+		torpedoItem->pos.yRot = item->pos.yRot;
+		torpedoItem->pos.zRot = 0;
+		torpedoItem->speed = 0;
+		torpedoItem->fallspeed = 0;
+		torpedoItem->itemFlags[0] = -1;
+
+		AddActiveItem(itemNumber);
+	}
+}
+
 void InitialiseSubmarine(short itemNum)
 {
     ITEM_INFO* item;
@@ -29,7 +176,7 @@ void InitialiseSubmarine(short itemNum)
         item->triggerFlags = 120;
 }
 
-void ControlSubmarine(short itemNumber)
+void SubmarineControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -244,153 +391,6 @@ void ControlSubmarine(short itemNumber)
 
 	CreatureAnimation(itemNumber, angle, tilt);
 	CreatureUnderwater(item, -14080);
-}
-
-void TriggerTorpedoBubbles(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char factor)
-{
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-
-	spark->on = 1;
-	spark->sR = 32;
-	spark->sG = 32;
-	spark->sB = 32;
-	spark->dR = 80;
-	spark->dG = 80;
-	spark->dB = 80;
-	spark->colFadeSpeed = 2;
-	spark->fadeToBlack = 8;
-	spark->transType = COLADD;
-	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
-	spark->x = pos1->x + (GetRandomControl() & 0x1F);
-	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + pos1->z - 16;
-	spark->xVel = LOWORD(pos2->x) + (GetRandomControl() & 0x7F) - LOWORD(pos1->x) - 64;
-	spark->yVel = LOWORD(pos2->y) + (GetRandomControl() & 0x7F) - LOWORD(pos1->y) - 64;
-	spark->zVel = LOWORD(pos2->z) + (GetRandomControl() & 0x7F) - LOWORD(pos1->z) - 64;
-	spark->friction = 0;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
-	spark->maxYvel = 0;
-	spark->gravity = -4 - (GetRandomControl() & 3);
-	spark->scalar = 1;
-	spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
-	spark->rotAng = GetRandomControl() & 0xFFF;
-	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
-	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32 >> factor;
-	spark->dSize = spark->size << 1;
-}
-
-void TriggerSubmarineSparks(short itemNumber)
-{
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-
-	spark->on = 1;
-	spark->sR = -1;
-	spark->sG = -1;
-	spark->sB = -1;
-	spark->colFadeSpeed = 2;
-	spark->dG = (GetRandomControl() & 0x1F) - 32;
-	spark->life = 2;
-	spark->dR = spark->dG >> 1;
-	spark->dB = spark->dG >> 1;
-	spark->sLife = 2;
-	spark->transType = COLADD;
-	spark->fadeToBlack = 0;
-	spark->flags = 20650;
-	spark->fxObj = itemNumber;
-	spark->nodeNumber = 7;
-	spark->x = 0;
-	spark->z = 0;
-	spark->y = 0;
-	spark->xVel = 0;
-	spark->yVel = 0;
-	spark->zVel = 0;
-	spark->maxYvel = 0;
-	spark->gravity = 0;
-	spark->scalar = 1;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
-	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
-}
-
-void SubmarineAttack(ITEM_INFO* item)
-{
-	short itemNumber = CreateItem();
-	if (itemNumber != NO_ITEM)
-	{
-		ITEM_INFO* torpedoItem = &Items[itemNumber];
-		
-		SoundEffect(SFX_UNDERWATER_TORPEDO, &torpedoItem->pos, 2);
-		
-		torpedoItem->objectNumber = ID_TORPEDO;
-		torpedoItem->shade = -15856;
-
-		PHD_VECTOR pos1;
-		PHD_VECTOR pos2;
-
-		for (int i = 0; i < 8; i++)
-		{
-			pos1.x = (GetRandomControl() & 0x7F) - 414;
-			pos1.y = -320;
-			pos1.z = 352;
-			GetJointAbsPosition(item, &pos1, 4);
-
-			pos2.x = (GetRandomControl() & 0x3FF) - 862;
-			pos2.y = -320 - (GetRandomControl() & 0x3FF);
-			pos2.z = (GetRandomControl() & 0x3FF) - 160;
-			GetJointAbsPosition(item, &pos2, 4);
-
-			TriggerTorpedoSparks2(&pos1, &pos2, 0);
-		}
-
-		torpedoItem->roomNumber = item->roomNumber;
-		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->roomNumber);
-
-		torpedoItem->pos.xPos = pos1.x;
-		torpedoItem->pos.yPos = pos1.y;
-		torpedoItem->pos.zPos = pos1.z;
-
-		InitialiseItem(itemNumber);
-
-		torpedoItem->pos.xRot = 0;
-		torpedoItem->pos.yRot = item->pos.yRot;
-		torpedoItem->pos.zRot = 0;
-		torpedoItem->speed = 0;
-		torpedoItem->fallspeed = 0;
-		torpedoItem->itemFlags[0] = -1;
-
-		AddActiveItem(itemNumber);
-	}
-}
-
-void TriggerTorpedoSparks2(PHD_VECTOR* pos1, PHD_VECTOR* pos2, char scale)
-{
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-	
-	spark->on = 1;
-	spark->sR = 32;
-	spark->sG = 32;
-	spark->sB = 32;
-	spark->dR = -128;
-	spark->dG = -128;
-	spark->dB = -128;
-	spark->colFadeSpeed = 2;
-	spark->fadeToBlack = 8;
-	spark->transType = COLADD;
-	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
-	spark->x = pos1->x + (GetRandomControl() & 0x1F);
-	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + pos1->z - 16;
-	spark->xVel = LOWORD(pos2->x) + (GetRandomControl() & 0x7F) - LOWORD(pos1->x) - 64;
-	spark->yVel = LOWORD(pos2->y) + (GetRandomControl() & 0x7F) - LOWORD(pos1->y) - 64;
-	spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - LOWORD(pos1->z) - 64;
-	spark->friction = 51;
-	spark->gravity = -4 - (GetRandomControl() & 3);
-	spark->maxYvel = 0;
-	spark->scalar = 2 - scale;
-	spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
-	spark->rotAng = GetRandomControl() & 0xFFF;
-	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
-	spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
-	spark->dSize = spark->size << 1;
 }
 
 void ChaffFlareControl(short itemNumber)

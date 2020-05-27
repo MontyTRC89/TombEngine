@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_lagoon_witch.h"
 #include "items.h"
 #include "box.h"
 #include "effect.h"
@@ -34,7 +34,7 @@ void InitialiseLagoonWitch(short itemNumber)
 	item->pos.yPos += 512;
 }
 
-void ControlLagoonWitch(short itemNumber)
+void LagoonWitchControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
@@ -144,12 +144,9 @@ void ControlLagoonWitch(short itemNumber)
 	}
 
 	CreatureTilt(item, 0);
-
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
-
 	CreatureAnimation(itemNumber, angle, 0);
-
 	CreatureUnderwater(item, 341);
 }

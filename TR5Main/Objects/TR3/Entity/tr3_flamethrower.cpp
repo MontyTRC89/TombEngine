@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_flamethrower.h"
 #include "box.h"
 #include "sphere.h"
 #include "effect2.h"
@@ -14,6 +14,201 @@
 #include "effect.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
+
+static void TriggerPilotFlame(int itemnum)
+{
+	int dx = LaraItem->pos.xPos - Items[itemnum].pos.xPos;
+	int dz = LaraItem->pos.zPos - Items[itemnum].pos.zPos;
+
+	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
+		return;
+
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = 1;
+	spark->sR = 48 + (GetRandomControl() & 31);
+	spark->sG = spark->sR;
+	spark->sB = 192 + (GetRandomControl() & 63);
+
+	spark->dR = 192 + (GetRandomControl() & 63);
+	spark->dG = 128 + (GetRandomControl() & 63);
+	spark->dB = 32;
+
+	spark->colFadeSpeed = 12 + (GetRandomControl() & 3);
+	spark->fadeToBlack = 4;
+	spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
+	spark->transType = 2;
+	spark->extras = 0;
+	spark->dynamic = -1;
+	spark->x = (GetRandomControl() & 31) - 16;
+	spark->y = (GetRandomControl() & 31) - 16;
+	spark->z = (GetRandomControl() & 31) - 16;
+
+	spark->xVel = (GetRandomControl() & 31) - 16;
+	spark->yVel = -(GetRandomControl() & 3);
+	spark->zVel = (GetRandomControl() & 31) - 16;
+
+	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
+	spark->fxObj = itemnum;
+	spark->nodeNumber = 0;
+	spark->friction = 4;
+	spark->gravity = -(GetRandomControl() & 3) - 2;
+	spark->maxYvel = -(GetRandomControl() & 3) - 4;
+	//spark->def = Objects[EXPLOSION1].mesh_index;
+	spark->scalar = 0;
+	int size = (GetRandomControl() & 7) + 32;
+	spark->size = size >> 1;
+	spark->dSize = size;
+}
+
+static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxnum)
+{
+	SPARKS* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = true;
+	spark->sR = 48 + (GetRandomControl() & 31);
+	spark->sG = spark->sR;
+	spark->sB = 192 + (GetRandomControl() & 63);
+
+	spark->dR = 192 + (GetRandomControl() & 63);
+	spark->dG = 128 + (GetRandomControl() & 63);
+	spark->dB = 32;
+
+	if (xv || yv || zv)
+	{
+		spark->colFadeSpeed = 6;
+		spark->fadeToBlack = 2;
+		spark->sLife = spark->life = (GetRandomControl() & 1) + 12;
+	}
+	else
+	{
+		spark->colFadeSpeed = 8;
+		spark->fadeToBlack = 16;
+		spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
+	}
+
+	spark->transType = 2;
+
+	spark->extras = 0;
+	spark->dynamic = -1;
+
+	spark->x = x + ((GetRandomControl() & 31) - 16);
+	spark->y = y;
+	spark->z = z + ((GetRandomControl() & 31) - 16);
+
+	spark->xVel = ((GetRandomControl() & 15) - 16) + xv;
+	spark->yVel = yv;
+	spark->zVel = ((GetRandomControl() & 15) - 16) + zv;
+	spark->friction = 0;
+
+	if (GetRandomControl() & 1)
+	{
+		if (fxnum >= 0)
+			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
+		else
+			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		spark->rotAng = GetRandomControl() & 4095;
+		if (GetRandomControl() & 1)
+			spark->rotAdd = -(GetRandomControl() & 15) - 16;
+		else
+			spark->rotAdd = (GetRandomControl() & 15) + 16;
+	}
+	else
+	{
+		if (fxnum >= 0)
+			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
+		else
+			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+	}
+
+	spark->fxObj = fxnum;
+	spark->gravity = 0;
+	spark->maxYvel = 0;
+	//spark->def = Objects[EXPLOSION1].mesh_index;
+	int size = (GetRandomControl() & 31) + 64;
+
+	if (xv || yv || zv)
+	{
+		spark->size = size >> 5;
+		if (fxnum == -2)
+			spark->scalar = 2;
+		else
+			spark->scalar = 3;
+	}
+	else
+	{
+		spark->size = size >> 4;
+		spark->scalar = 4;
+	}
+
+	spark->dSize = size >> 1;
+}
+
+static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
+{
+	PHD_VECTOR pos1;
+	PHD_VECTOR pos2;
+	short angles[2];
+	int velocity;
+	int xv;
+	int yv;
+	int zv;
+
+	short effectNumber = CreateNewEffect(item->roomNumber);
+	if (effectNumber != NO_ITEM)
+	{
+		FX_INFO* fx = &Effects[effectNumber];
+
+		pos1.x = bite->x;
+		pos1.y = bite->y;
+		pos1.z = bite->z;
+		GetJointAbsPosition(item, &pos1, bite->meshNum);
+
+		pos2.x = bite->x;
+		pos2.y = bite->y / 2;
+		pos2.z = bite->z;
+		GetJointAbsPosition(item, &pos2, bite->meshNum);
+
+		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+
+		fx->pos.xPos = pos1.x;
+		fx->pos.yPos = pos1.y;
+		fx->pos.zPos = pos1.z;
+
+		fx->roomNumber = item->roomNumber;
+
+		fx->pos.xRot = angles[1];
+		fx->pos.zRot = 0;
+		fx->pos.yRot = angles[0];
+		fx->speed = speed << 2;
+		//fx->objectNumber = DRAGON_FIRE;
+		fx->counter = 20;
+		fx->flag1 = 0;	// Set to orange flame.
+
+		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
+
+		for (int i = 0; i < 2; i++)
+		{
+			speed = (GetRandomControl() % (speed << 2)) + 32;
+			velocity = (speed * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
+
+			xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
+			yv = -((speed * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
+			zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
+
+			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -1);
+		}
+
+		velocity = ((speed << 1) * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
+		zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
+		xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
+		yv = -(((speed << 1) * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
+
+		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -2);
+	}
+
+	return effectNumber;
+}
 
 void FlameThrowerControl(short itemNumber)
 {
@@ -323,199 +518,4 @@ void FlameThrowerControl(short itemNumber)
 	CreatureJoint(item, 2, head);
 
 	CreatureAnimation(itemNumber, angle, 0);
-}
-
-short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
-{
-	PHD_VECTOR pos1;
-	PHD_VECTOR pos2;
-	short angles[2];
-	int velocity;
-	int xv;
-	int yv;
-	int zv;
-
-	short effectNumber = CreateNewEffect(item->roomNumber);
-	if (effectNumber != NO_ITEM)
-	{
-		FX_INFO* fx = &Effects[effectNumber];
-
-		pos1.x = bite->x;
-		pos1.y = bite->y;
-		pos1.z = bite->z;
-		GetJointAbsPosition(item, &pos1, bite->meshNum);
-
-		pos2.x = bite->x;
-		pos2.y = bite->y / 2;
-		pos2.z = bite->z;
-		GetJointAbsPosition(item, &pos2, bite->meshNum);
-
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-		fx->pos.xPos = pos1.x;
-		fx->pos.yPos = pos1.y;
-		fx->pos.zPos = pos1.z;
-
-		fx->roomNumber = item->roomNumber;
-
-		fx->pos.xRot = angles[1];
-		fx->pos.zRot = 0;
-		fx->pos.yRot = angles[0];
-		fx->speed = speed << 2;
-		//fx->objectNumber = DRAGON_FIRE;
-		fx->counter = 20;
-		fx->flag1 = 0;	// Set to orange flame.
-
-		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
-
-		for (int i = 0; i < 2; i++)
-		{
-			speed = (GetRandomControl() % (speed << 2)) + 32;
-			velocity = (speed * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
-			
-			xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
-			yv = -((speed * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
-			zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
-
-			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -1);
-		}
-
-		velocity = ((speed << 1) * phd_cos(fx->pos.xRot)) >> W2V_SHIFT;
-		zv = (velocity * phd_cos(fx->pos.yRot)) >> W2V_SHIFT;
-		xv = (velocity * phd_sin(fx->pos.yRot)) >> W2V_SHIFT;
-		yv = -(((speed << 1) * phd_sin(fx->pos.xRot)) >> W2V_SHIFT);
-		
-		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv << 5, yv << 5, zv << 5, -2);
-	}
-
-	return effectNumber;
-}
-
-void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxnum)
-{
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-
-	spark->on = true;
-	spark->sR = 48 + (GetRandomControl() & 31);
-	spark->sG = spark->sR;
-	spark->sB = 192 + (GetRandomControl() & 63);
-
-	spark->dR = 192 + (GetRandomControl() & 63);
-	spark->dG = 128 + (GetRandomControl() & 63);
-	spark->dB = 32;
-
-	if (xv || yv || zv)
-	{
-		spark->colFadeSpeed = 6;
-		spark->fadeToBlack = 2;
-		spark->sLife = spark->life = (GetRandomControl() & 1) + 12;
-	}
-	else
-	{
-		spark->colFadeSpeed = 8;
-		spark->fadeToBlack = 16;
-		spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
-	}
-
-	spark->transType = 2;
-
-	spark->extras = 0;
-	spark->dynamic = -1;
-
-	spark->x = x + ((GetRandomControl() & 31) - 16);
-	spark->y = y;
-	spark->z = z + ((GetRandomControl() & 31) - 16);
-
-	spark->xVel = ((GetRandomControl() & 15) - 16) + xv;
-	spark->yVel = yv;
-	spark->zVel = ((GetRandomControl() & 15) - 16) + zv;
-	spark->friction = 0;
-
-	if (GetRandomControl() & 1)
-	{
-		if (fxnum >= 0)
-			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
-		else
-			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		spark->rotAng = GetRandomControl() & 4095;
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -(GetRandomControl() & 15) - 16;
-		else
-			spark->rotAdd = (GetRandomControl() & 15) + 16;
-	}
-	else
-	{
-		if (fxnum >= 0)
-			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
-		else
-			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-	}
-
-	spark->fxObj = fxnum;
-	spark->gravity = 0;
-	spark->maxYvel = 0;
-	//spark->def = Objects[EXPLOSION1].mesh_index;
-	int size = (GetRandomControl() & 31) + 64;
-	
-	if (xv || yv || zv)
-	{
-		spark->size = size >> 5;
-		if (fxnum == -2)
-			spark->scalar = 2;
-		else
-			spark->scalar = 3;
-	}
-	else
-	{
-		spark->size = size >> 4;
-		spark->scalar = 4;
-	}
-
-	spark->dSize = size >> 1;
-}
-
-void TriggerPilotFlame(int itemnum)
-{
-	int dx = LaraItem->pos.xPos - Items[itemnum].pos.xPos;
-	int dz = LaraItem->pos.zPos - Items[itemnum].pos.zPos;
-
-	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
-		return;
-
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-
-	spark->on = 1;
-	spark->sR = 48 + (GetRandomControl() & 31);
-	spark->sG = spark->sR;
-	spark->sB = 192 + (GetRandomControl() & 63);
-
-	spark->dR = 192 + (GetRandomControl() & 63);
-	spark->dG = 128 + (GetRandomControl() & 63);
-	spark->dB = 32;
-
-	spark->colFadeSpeed = 12 + (GetRandomControl() & 3);
-	spark->fadeToBlack = 4;
-	spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
-	spark->transType = 2;
-	spark->extras = 0;
-	spark->dynamic = -1;
-	spark->x = (GetRandomControl() & 31) - 16;
-	spark->y = (GetRandomControl() & 31) - 16;
-	spark->z = (GetRandomControl() & 31) - 16;
-
-	spark->xVel = (GetRandomControl() & 31) - 16;
-	spark->yVel = -(GetRandomControl() & 3);
-	spark->zVel = (GetRandomControl() & 31) - 16;
-
-	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
-	spark->fxObj = itemnum;
-	spark->nodeNumber = 0;
-	spark->friction = 4;
-	spark->gravity = -(GetRandomControl() & 3) - 2;
-	spark->maxYvel = -(GetRandomControl() & 3) - 4;
-	//spark->def = Objects[EXPLOSION1].mesh_index;
-	spark->scalar = 0;
-	int size = (GetRandomControl() & 7) + 32;
-	spark->size = size >> 1;
-	spark->dSize = size;
 }

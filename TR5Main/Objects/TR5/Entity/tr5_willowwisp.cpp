@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_willowwisp.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"

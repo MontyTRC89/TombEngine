@@ -16,6 +16,9 @@
 #include "setup.h"
 #include "camera.h"
 #include "quad.h"
+#include "tr5_rats_emitter.h"
+#include "tr5_bats_emitter.h"
+#include "tr5_spider_emitter.h"
 
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
@@ -590,7 +593,7 @@ bool SaveGame::readItem()
 	}
 
 	// Some post-processing things
-	if (obj->collision == PuzzleHoleCollision && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
+	if (obj->isPuzzleHole && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
 	{
 		item->objectNumber += 8;
 		//*((_WORD *)pItem - 28) = v55 + Objects[*((_WORD *)pItem - 32)].anim_index;

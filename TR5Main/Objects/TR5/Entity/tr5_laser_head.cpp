@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "oldobjects.h"
+#include "tr5_laser_head.h"
 #include "sphere.h"
 #include "items.h"
 #include "tomb4fx.h"
@@ -43,7 +43,115 @@ PHD_VECTOR LaserHeadBasePosition = { 0, -640, 0 };
 PHD_VECTOR GuardianChargePositions[8];
 int GuardianMeshes[5] = { 1,0,0,0,2 };
 
-void InitialiseGuardian(short itemNumber)
+static void TriggerLaserHeadSparks(PHD_VECTOR* pos, int count, byte r, byte g, byte b, int unk)
+{
+	if (count > 0)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			SPARKS* spark = &Sparks[GetFreeSpark()];
+
+			spark->on = 1;
+			spark->sR = r;
+			spark->sG = g;
+			spark->sB = b;
+			spark->dB = 0;
+			spark->dG = 0;
+			spark->dR = 0;
+			spark->colFadeSpeed = 9 << unk;
+			spark->fadeToBlack = 0;
+			spark->life = 9 << unk;
+			spark->sLife = 9 << unk;
+			spark->transType = COLADD;
+			spark->x = pos->x;
+			spark->y = pos->y;
+			spark->z = pos->z;
+			spark->gravity = (GetRandomControl() >> 7) & 0x1F;
+			spark->yVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
+			spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
+			spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
+			spark->flags = 0;
+			spark->maxYvel = 0;
+			spark->friction = 34 << unk;
+		}
+	}
+}
+
+static void LaserHeadCharge(ITEM_INFO* item)
+{
+	byte size = item->itemFlags[3];
+	byte g = ((GetRandomControl() & 0x1F) + 128);
+	byte b = ((GetRandomControl() & 0x1F) + 64);
+
+	if (item->itemFlags[3] <= 32)
+	{
+		g = item->itemFlags[3] * g >> 5;
+		b = item->itemFlags[3] * b >> 5;
+	}
+	else
+	{
+		size = 32;
+	}
+
+	LASER_HEAD_INFO* creature = (LASER_HEAD_INFO*)item->data;
+
+	PHD_VECTOR src, dest;
+	dest.x = LaserHeadBasePosition.x;
+	dest.y = LaserHeadBasePosition.y;
+	dest.z = LaserHeadBasePosition.z;
+	GetJointAbsPosition(&Items[creature->baseItem], &dest, 0);
+
+	for (int i = 0; i < 4; i++)
+	{
+		ENERGY_ARC* arc = LaserHeadData.chargeArcs[i];
+
+		if (item->itemFlags[3] & 0x0F && arc != NULL)
+		{
+			arc->r = 0;
+			arc->g = g;
+			arc->b = b;
+			//arc->segmentSize = 50;
+		}
+		else
+		{
+			src.x = GuardianChargePositions[i].x;
+			src.y = GuardianChargePositions[i].y;
+			src.z = GuardianChargePositions[i].z;
+			GetJointAbsPosition(&Items[creature->baseItem], &src, 0);
+			//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 255, 255, 255, 256, 90, 64, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
+		}
+	}
+
+	if (GlobalCounter & 1)
+	{
+		for (int i = 0; i < 5; i += 4)
+		{
+			if (2 * GuardianMeshes[i] & item->meshBits)
+			{
+				src.x = 0;
+				src.y = 0;
+				src.z = 0;
+				GetJointAbsPosition(item, &src, GuardianMeshes[i]);
+
+				TriggerLightningGlow(src.x, src.y, src.z, size + (GetRandomControl() & 3), 0, g, b);
+				TriggerLaserHeadSparks(&src, 3, 0, g, b, 0);
+			}
+		}
+
+		TriggerLightningGlow(dest.x, dest.y, dest.z, (GetRandomControl() & 3) + size + 8, 0, g, b);
+		TriggerDynamicLight(dest.x, dest.y, dest.z, (GetRandomControl() & 3) + 16, 0, g, b);
+	}
+
+	if (!(GlobalCounter & 3))
+	{
+		TriggerEnergyArc(&dest, (PHD_VECTOR*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
+		//TriggerEnergyArc(&dest, &item->pos, (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x180000) << 8), 13, 64, 3);
+	}
+
+	TriggerLaserHeadSparks(&dest, 3, 0, g, b, 1);
+}
+
+void InitialiseLaserHead(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -89,7 +197,7 @@ void InitialiseGuardian(short itemNumber)
 	ZeroMemory(&LaserHeadData, sizeof(LASER_HEAD_STRUCT));
 }
 
-void GuardianControl(short itemNumber)
+void LaserHeadControl(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	LASER_HEAD_INFO* creature = (LASER_HEAD_INFO*)item->data;
@@ -315,7 +423,7 @@ void GuardianControl(short itemNumber)
 				if (item->itemFlags[3] <= 90)
 				{
 					SoundEffect(SFX_GOD_HEAD_CHARGE, &item->pos, 0);
-					GuardianCharge(item);
+					LaserHeadCharge(item);
 					item->itemFlags[3]++;
 					condition = item->itemFlags[3] >= 90;
 				}
@@ -393,7 +501,7 @@ void GuardianControl(short itemNumber)
 
 								if (GlobalCounter & 1) 
 								{
-									TriggerGuardianSparks((PHD_VECTOR*)& src, 3, 0, g, b, 0);
+									TriggerLaserHeadSparks((PHD_VECTOR*)& src, 3, 0, g, b, 0);
 									TriggerLightningGlow(src.x, src.y, src.z, (GetRandomControl() & 3) + 32, 0, g, b);
 									TriggerDynamicLight(src.x, src.y, src.z, (GetRandomControl() & 3) + 16, 0, g, b);
 
@@ -401,7 +509,7 @@ void GuardianControl(short itemNumber)
 									{
 										TriggerLightningGlow(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 16, 0, g, b);
 										TriggerDynamicLight(currentArc->pos4.x, currentArc->pos4.y, currentArc->pos4.z, (GetRandomControl() & 3) + 6, 0, g, b);
-										TriggerGuardianSparks((PHD_VECTOR*)& currentArc->pos4, 3, 0, g, b, 0);
+										TriggerLaserHeadSparks((PHD_VECTOR*)& currentArc->pos4, 3, 0, g, b, 0);
 									}
 								}
 
@@ -572,112 +680,4 @@ void GuardianControl(short itemNumber)
 			item->triggerFlags = item->pos.xRot + (GetRandomControl() & 0x1000) - 2048;
 		}
 	}
-}
-
-void TriggerGuardianSparks(PHD_VECTOR* pos, int count, byte r, byte g, byte b, int unk)
-{
-	if (count > 0)
-	{
-		for (int i = 0; i < count; i++)
-		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
-
-			spark->on = 1;
-			spark->sR = r;
-			spark->sG = g;
-			spark->sB = b;
-			spark->dB = 0;
-			spark->dG = 0;
-			spark->dR = 0;
-			spark->colFadeSpeed = 9 << unk;
-			spark->fadeToBlack = 0;
-			spark->life = 9 << unk;
-			spark->sLife = 9 << unk;
-			spark->transType = COLADD;
-			spark->x = pos->x;
-			spark->y = pos->y;
-			spark->z = pos->z;
-			spark->gravity = (GetRandomControl() >> 7) & 0x1F;
-			spark->yVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
-			spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
-			spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
-			spark->flags = 0;
-			spark->maxYvel = 0;
-			spark->friction = 34 << unk;
-		}
-	}
-}
-
-void GuardianCharge(ITEM_INFO* item)
-{	
-	byte size = item->itemFlags[3];
-	byte g = ((GetRandomControl() & 0x1F) + 128);
-	byte b = ((GetRandomControl() & 0x1F) + 64);
-
-	if (item->itemFlags[3] <= 32)
-	{
-		g = item->itemFlags[3] * g >> 5;
-		b = item->itemFlags[3] * b >> 5;
-	}
-	else
-	{
-		size = 32;
-	}
-
-	LASER_HEAD_INFO* creature = (LASER_HEAD_INFO*)item->data;
-	
-	PHD_VECTOR src, dest;
-	dest.x = LaserHeadBasePosition.x;
-	dest.y = LaserHeadBasePosition.y;
-	dest.z = LaserHeadBasePosition.z;
-	GetJointAbsPosition(&Items[creature->baseItem], &dest, 0);
-
-	for (int i = 0; i < 4; i++)
-	{
-		ENERGY_ARC* arc = LaserHeadData.chargeArcs[i];
-
-		if (item->itemFlags[3] & 0x0F && arc != NULL)
-		{
-			arc->r = 0;
-			arc->g = g;
-			arc->b = b;
-			//arc->segmentSize = 50;
-		}
-		else
-		{
-			src.x = GuardianChargePositions[i].x;
-			src.y = GuardianChargePositions[i].y;
-			src.z = GuardianChargePositions[i].z;
-			GetJointAbsPosition(&Items[creature->baseItem], &src, 0);
-			//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 255, 255, 255, 256, 90, 64, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
-		}
-	}
-
-	if (GlobalCounter & 1)
-	{
-		for (int i = 0; i < 5; i += 4)
-		{
-			if (2 * GuardianMeshes[i] & item->meshBits)
-			{
-				src.x = 0;
-				src.y = 0;
-				src.z = 0;
-				GetJointAbsPosition(item, &src, GuardianMeshes[i]);
-
-				TriggerLightningGlow(src.x, src.y, src.z, size + (GetRandomControl() & 3), 0, g, b);
-				TriggerGuardianSparks(&src, 3, 0, g, b, 0);
-			}
-		}
-
-		TriggerLightningGlow(dest.x, dest.y, dest.z, (GetRandomControl() & 3) + size + 8, 0, g, b);
-		TriggerDynamicLight(dest.x, dest.y, dest.z, (GetRandomControl() & 3) + 16, 0, g, b);
-	}
-
-	if (!(GlobalCounter & 3))
-	{
-		TriggerEnergyArc(&dest, (PHD_VECTOR*)&item->pos, 0, g, b, 256, 3, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE);
-		//TriggerEnergyArc(&dest, &item->pos, (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x180000) << 8), 13, 64, 3);
-	}
-
-	TriggerGuardianSparks(&dest, 3, 0, g, b, 1);
 }

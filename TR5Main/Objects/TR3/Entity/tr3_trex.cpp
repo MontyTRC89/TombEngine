@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_trex.h"
 #include "items.h"
 #include "box.h"
 #include "camera.h"

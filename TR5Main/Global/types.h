@@ -1080,41 +1080,6 @@ struct WEAPON_INFO
 	short sampleNum; // size=0, offset=36
 };
 
-
-
-struct RAT_STRUCT
-{
-	PHD_3DPOS pos; // size=20, offset=0
-	short roomNumber; // size=0, offset=20
-	short speed; // size=0, offset=22
-	short fallspeed; // size=0, offset=24
-	byte on; // size=0, offset=26
-	byte flags; // size=0, offset=27
-};
-
-struct BAT_STRUCT
-{
-	PHD_3DPOS pos; // size=20, offset=0
-	short roomNumber; // size=0, offset=20
-	short speed; // size=0, offset=22
-	short counter; // size=0, offset=24
-	short laraTarget; // size=0, offset=26
-	byte xTarget; // size=0, offset=28
-	byte zTarget; // size=0, offset=29
-	byte on; // size=0, offset=30
-	byte flags; // size=0, offset=31
-};
-
-struct SPIDER_STRUCT
-{
-	PHD_3DPOS pos; // size=20, offset=0
-	short roomNumber; // size=0, offset=20
-	short speed; // size=0, offset=22
-	short fallspeed; // size=0, offset=24
-	byte on; // size=0, offset=26
-	byte flags; // size=0, offset=27
-};
-
 struct DEBRIS_STRUCT
 {
 	void* textInfo; // size=0, offset=0

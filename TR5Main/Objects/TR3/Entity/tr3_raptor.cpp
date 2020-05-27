@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_raptor.h"
 #include "box.h"
 #include "effect.h"
 #include "setup.h"
@@ -7,9 +7,9 @@
 #include "level.h"
 #include "lara.h"
 
-extern BITE_INFO raptorBite;
+static BITE_INFO raptorBite = { 0, 66, 318, 22 };
 
-void Tr3RaptorControl(short itemNum)
+void RaptorControl(short itemNum)
 {
 	if (!CreatureActive(itemNum))
 		return;
@@ -21,7 +21,7 @@ void Tr3RaptorControl(short itemNum)
 	short neck = 0;
 	short angle = 0;
 	short tilt = 0;
-	int minDistance = 0x7FFFFFFF;
+	INT minDistance = MAXINT;
 
 	if (item->hitPoints <= 0)
 	{

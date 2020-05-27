@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "oldobjects.h"
+#include "tr5_cyborg.h"
 #include "items.h"
 #include "sphere.h"
 #include "box.h"
@@ -40,7 +40,7 @@ void InitialiseHitman(short itemNum)
     item->currentAnimState = STATE_HITMAN_STOP;
 }
 
-void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
+static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
 {
 	int dx = LaraItem->pos.xPos - x;
 	int dz = LaraItem->pos.zPos - z;

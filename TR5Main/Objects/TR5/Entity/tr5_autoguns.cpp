@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_autoguns.h"
 #include "sphere.h"
 #include "lara.h"
 #include "draw.h"
@@ -9,16 +9,16 @@
 #include "level.h"
 #include "sound.h"
 
-void InitialiseAutoGuns(short itemNum)
+void InitialiseAutoGuns(short itemNumber)
 {
     ITEM_INFO* item;
 
-    item = &Items[itemNum];
+    item = &Items[itemNumber];
     item->meshBits = 1024;
     item->data = (void*)game_malloc(5702);
 }
 
-void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
+static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 {
 	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
@@ -47,7 +47,7 @@ void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 	spark->size = spark->dSize >> 2;
 }
 
-void ControlAutoGuns(short itemNumber)
+void AutoGunsControl(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
@@ -63,13 +63,13 @@ void ControlAutoGuns(short itemNumber)
 			pos1.x = 0;
 			pos1.y = 0;
 			pos1.z = -64;
-			GetJointAbsPosition(item, (PHD_VECTOR*)& pos1, 8);
+			GetJointAbsPosition(item, (PHD_VECTOR*)&pos1, 8);
 
 			GAME_VECTOR pos2;
 			pos2.x = 0;
 			pos2.y = 0;
 			pos2.z = 0;
-			GetLaraJointPosition((PHD_VECTOR*)& pos2, 0);
+			GetLaraJointPosition((PHD_VECTOR*)&pos2, 0);
 
 			pos1.roomNumber = item->roomNumber;
 
@@ -166,7 +166,7 @@ void ControlAutoGuns(short itemNumber)
 			}
 
 			if (item->itemFlags[2])
-				TriggerAutoGunSmoke((PHD_VECTOR*)& pos1, item->itemFlags[2] >> 4);
+				TriggerAutoGunSmoke((PHD_VECTOR*)&pos1, item->itemFlags[2] >> 4);
 		}
 		else
 		{
