@@ -2,7 +2,6 @@
 #include "Lara.h"
 #include "control.h"
 #include "items.h"
-#include "collide.h"
 #include "inventory.h"
 #include "larafire.h"
 #include "misc.h"
@@ -19,7 +18,6 @@
 #include "rope.h"
 #include "health.h"
 #include "newobjects.h"
-#include "global.h"
 #include "level.h"
 #include "input.h"
 #include "sound.h"
@@ -52,12 +50,11 @@ short OldAngle = 1;
 int RopeSwing = 0;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
-byte LaraNodeUnderwater[15];
+byte LaraNodeUnderwater[NUM_LARA_MESHES];
 bool EnableCrouchRoll, EnableFeetHang, EnableMonkeyVault, EnableMonkeyRoll, EnableCrawlFlex1click, EnableCrawlFlex2click, EnableCrawlFlex3click;
 bool EnableCrawlFlex1clickE, EnableCrawlFlex2clickE, EnableCrawlFlex1clickup, EnableCrawlFlex1clickdown;
 
-void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll) =
-{
+function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_walk,
 	lara_as_run,
 	lara_as_stop,
@@ -205,9 +202,7 @@ void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* co
 	lara_as_hang_feet_outRcorner,
 	lara_as_hang_feet_outLcorner,
 };
-
-void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll) =
-{
+function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_walk,
 	lara_col_run,
 	lara_col_stop,
@@ -354,8 +349,10 @@ void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* 
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
-
 };
+/*function<LaraRoutineFunction> lara_camera_routines[NUM_LARA_STATES + 1] = {
+
+};*/
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -373,7 +370,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->radius = LARA_RAD;
 	coll->trigger = NULL;
 
-	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == 0 && Lara.look)
+	if ((TrInput & IN_LOOK) && Lara.ExtraAnim == NO_ITEM && Lara.look)
 		LookLeftRight();
 	else
 		ResetLook();
@@ -436,7 +433,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Handle current Lara status
-	(*lara_control_routines[item->currentAnimState])(item, coll);
+	lara_control_routines[item->currentAnimState](item, coll);
 
 	if (item->pos.zRot >= -ANGLE(1.0f) && item->pos.zRot <= ANGLE(1.0f))
 		item->pos.zRot = 0;   
@@ -456,14 +453,14 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Animate Lara
 	AnimateLara(item);
 
-	if (Lara.ExtraAnim == 0)
+	if (Lara.ExtraAnim == NO_ITEM)
 	{
 		// Check for collision with items
 		LaraBaddieCollision(item, coll);
 
 		// Handle Lara collision
 		if (Lara.Vehicle == NO_ITEM)
-			(*lara_collision_routines[item->currentAnimState])(item, coll);
+			lara_collision_routines[item->currentAnimState](item, coll);
 	}
 
 	UpdateLaraRoom(item, -LARA_HITE/2);

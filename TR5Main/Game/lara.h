@@ -1,9 +1,10 @@
 #pragma once
-
 #include "global.h"
-#include "Renderer11.h"
+#include "box.h"
+#include "collide.h"
 
-typedef struct CarriedWeaponInfo {
+typedef struct CarriedWeaponInfo
+{
 	bool Present;
 	short Ammo[3];
 	byte SelectedAmmo;
@@ -11,16 +12,19 @@ typedef struct CarriedWeaponInfo {
 	bool HasSilencer;
 };
 
-typedef struct DiaryInfo {
+typedef struct DiaryInfo
+{
 	bool Present;
 };
 
-struct WaterskinInfo {
+struct WaterskinInfo
+{
 	bool Present;
 	int Quantity;
 };
 
-struct LaraInfo {
+struct LaraInfo
+{
 	short itemNumber;
 	short gunStatus; 
 	short gunType;
@@ -47,10 +51,11 @@ struct LaraInfo {
 	short flareFrame;
 	short poisoned;
 	short dpoisoned;
+	short electric; // used for electric value in TR3
 	byte anxiety; 
-	byte wet[15];
+	byte wet[NUM_LARA_MESHES];
 	bool flareControlLeft; 
-	bool unused1;
+	bool flareControlRight; // not used
 	bool look;
 	bool burn;
 	bool keepDucked;
@@ -69,7 +74,7 @@ struct LaraInfo {
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;
 	int meshEffects;
-	short* meshPtrs[15];
+	short* meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
 	short targetAngles[2];
 	short turnRate;
@@ -82,7 +87,9 @@ struct LaraInfo {
 	short torsoZrot;
 	LARA_ARM leftArm; 
 	LARA_ARM rightArm;
-	unsigned short holster;
+	// changing it to holster_left/holster_right will be good instead of doing the 2 at the same time !
+	// note: no need 65535 for holster, just 255 is fine...
+	byte holster;
 	CREATURE_INFO* creature;
 	int cornerX;
 	int cornerZ;
@@ -114,7 +121,7 @@ struct LaraInfo {
 	byte tightRopeOff;
 	byte tightRopeFall;
 	byte chaffTimer;
-
+	/// =================================== NEW:
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;
@@ -123,7 +130,7 @@ struct LaraInfo {
 	DiaryInfo Diary;
 	WaterskinInfo Waterskin1;
 	WaterskinInfo Waterskin2;
-	RendererMesh* MeshesPointers[15];
+	RendererMesh* MeshesPointers[NUM_LARA_MESHES];
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];
@@ -145,10 +152,12 @@ struct LaraInfo {
 
 extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;
-extern byte LaraNodeUnderwater[15];
+extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
-extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
-extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
+#define LaraRoutineFunction void(ITEM_INFO* item, COLL_INFO* coll)
+extern function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
+extern function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
+///extern function<LaraRoutineFunction> lara_camera_routines[NUM_LARA_STATES + 1];
 
 void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_parallelbars(ITEM_INFO* item, COLL_INFO* coll);

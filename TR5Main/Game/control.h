@@ -1,5 +1,4 @@
 #pragma once
-
 #include "global.h"
 
 #define TRIG_BITS(T) ((T & 0x3fff) >> 10)

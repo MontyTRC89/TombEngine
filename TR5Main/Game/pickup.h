@@ -1,6 +1,6 @@
 #pragma once
-
 #include "global.h"
+#include "collide.h"
 
 void InitialisePickup(short itemNumber);
 void PickedUpObject(short objectNumber);

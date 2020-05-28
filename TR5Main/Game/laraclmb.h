@@ -1,5 +1,6 @@
 #pragma once
 #include "global.h"
+#include "collide.h"
 
 short GetClimbTrigger(int x, int y, int z, short roomNumber);
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll);

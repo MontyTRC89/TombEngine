@@ -5,7 +5,6 @@
 #include "items.h"
 #include "lot.h"
 #include "objects.h"
-#include "collide.h"
 #include "Lara.h"
 #include "inventory.h"
 #include "draw.h"

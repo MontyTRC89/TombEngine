@@ -144,8 +144,13 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Libs\zlib\zconf.h" />
     <ClInclude Include="Libs\zlib\zip.h" />
     <ClInclude Include="Libs\zlib\zlib.h" />
+    <ClInclude Include="Objects\TR4\Switch\tr4_raisingcog.h" />
+    <ClInclude Include="Objects\TR5\Emitter\tr5_dart_emitter.h" />
+    <ClInclude Include="Objects\TR5\Object\tr5_missile.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_twoblockplatform.h" />
+    <ClInclude Include="Objects\TR5\Trap\tr5_teethspike.h" />
+    <ClInclude Include="Objects\TR5\Trap\tr5_ventilator.h" />
     <ClInclude Include="Objects\Utils\ObjectsUtils.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
@@ -264,10 +269,10 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR5\tr5_objects.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat.h" />
     <ClInclude Include="Objects\TR3\Vehicles\cannon.h" />
-    <ClInclude Include="Objects\Vehicles\jeep.h" />
+    <ClInclude Include="Objects\TR4\Vehicles\jeep.h" />
     <ClInclude Include="Objects\TR3\Vehicles\kayak.h" />
     <ClInclude Include="Objects\TR3\Vehicles\minecart.h" />
-    <ClInclude Include="Objects\Vehicles\motorbike.h" />
+    <ClInclude Include="Objects\TR4\Vehicles\motorbike.h" />
     <ClInclude Include="Objects\TR3\Vehicles\quad.h" />
     <ClInclude Include="Objects\TR2\Vehicles\snowmobile.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv.h" />
@@ -372,7 +377,11 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Global\trmath.cpp" />
+    <ClCompile Include="Objects\TR4\Switch\tr4_raisingcog.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\tr5_dart_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_twoblockplatform.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\tr5_teethspike.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\tr5_ventilator.cpp" />
     <ClCompile Include="Objects\Utils\ObjectsUtils.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_doppelganger.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_natla.cpp" />
@@ -427,7 +436,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR5\Entity\tr5_lion.cpp" />
     <ClCompile Include="Objects\TR5\Shatter\tr5_smashobject.cpp" />
     <ClCompile Include="Objects\tr5_misc_objects.cpp" />
-    <ClCompile Include="Objects\tr5_missile.cpp" />
+    <ClCompile Include="Objects\TR5\Object\tr5_missile.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_pushableblock.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_reaper.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_roman_statue.cpp" />
@@ -448,7 +457,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_shotgun.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_horseman.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\cannon.cpp" />
-    <ClCompile Include="Objects\Vehicles\jeep.cpp" />
+    <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_knifethrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_mercenary.cpp" />
@@ -550,7 +559,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\traps.cpp" />
     <ClCompile Include="Global\malloc.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
-    <ClCompile Include="Objects\Vehicles\motorbike.cpp" />
+    <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\quad.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sas.cpp" />

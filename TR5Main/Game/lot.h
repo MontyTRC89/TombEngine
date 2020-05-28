@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.h"
+#include "box.h"
 
 extern int SlotsUsed;
 extern CREATURE_INFO* BaddieSlots;

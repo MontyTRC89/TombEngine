@@ -1,5 +1,6 @@
 #pragma once
 #include "types.h"
+#include "collide.h"
 
 struct KAYAK_INFO
 {

@@ -1,5 +1,8 @@
 #pragma once
 #include "global.h"
+#include "collide.h"
+
+extern int PulleyItemNumber;
 
 void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void CrowDoveSwitchControl(short itemNumber);
@@ -27,5 +30,3 @@ void InitialiseCrowDoveSwitch(short itemNumber);
 void ProcessExplodingSwitchType8(ITEM_INFO* item);
 void InitialiseShootSwitch(short itemNumber);
 void ShootSwitchCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
-
-extern int PulleyItemNumber;

@@ -1,6 +1,6 @@
 #pragma once
-
 #include "global.h"
+#include "collide.h"
 
 void SequenceDoorControl(short itemNumber);
 void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);

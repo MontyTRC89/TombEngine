@@ -1,5 +1,6 @@
 #pragma once
 #include "types.h"
+#include "collide.h"
 
 void InitialiseMine(short itemNum);
 void MineControl(short itemNum);
