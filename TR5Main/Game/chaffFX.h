@@ -8,7 +8,7 @@ void TriggerChaffEffects(ITEM_INFO* Item,int age);
 
 void TriggerChaffEffects(ITEM_INFO* Item, PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool isUnderwater,int age);
 
-void TriggerChaffSparkles(PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int age);
+void TriggerChaffSparkles(PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int age,ITEM_INFO* item);
 
 void TriggerChaffSmoke(PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool moving, bool wind);
 
