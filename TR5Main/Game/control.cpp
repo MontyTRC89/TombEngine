@@ -144,6 +144,8 @@ short FlashFadeB;
 short FlashFader;
 short IsRoomOutsideNo;
 
+int SplitFloor;
+int SplitCeiling;
 int TiltXOffset;
 int TiltYOffset;
 int FramesCount;
@@ -1615,6 +1617,7 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 	TiltXOffset = 0;
 	OnObject = 0;
 	HeightType = WALL;
+	SplitFloor = 0;
 
 	ROOM_INFO* r;
 	while (floor->pitRoom != NO_ROOM)
@@ -1742,6 +1745,7 @@ int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
 			xOff = yOff = 0;
 
 			HeightType = SPLIT_TRI;
+			SplitFloor = (type & DATA_TYPE);
 
 			if ((type & DATA_TYPE) == SPLIT1 ||
 				(type & DATA_TYPE) == NOCOLF1T ||
@@ -2442,6 +2446,7 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z) // (F) (D)
 	bool end;
 	ITEM_INFO* item;
 
+	SplitCeiling = 0;
 	floor2 = floor;
 	while (floor2->skyRoom != NO_ROOM)
 	{
@@ -2477,6 +2482,7 @@ int GetCeiling(FLOOR_INFO* floor, int x, int y, int z) // (F) (D)
 				{
 					if (function == SPLIT3 || function == SPLIT4 || function == NOCOLC1T || function == NOCOLC1B || function == NOCOLC2T || function == NOCOLC2B)
 					{
+						SplitCeiling = function;
 						dx = x & 0x3FF;
 						dz = z & 0x3FF;
 						t0 = -(*data & DATA_TILT);
