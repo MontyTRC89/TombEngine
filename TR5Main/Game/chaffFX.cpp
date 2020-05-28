@@ -6,7 +6,7 @@
 #include "lara.h"
 #include "draw.h"
 #include "../Specific/level.h"
-#include "./../Global/Types/effects/smoke.h"
+#include "smoke.h"
 #define	MAX_TRIGGER_RANGE	0x4000
 
 void TriggerChaffEffects(int flareAge)
@@ -87,7 +87,7 @@ void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int 
 			Vector3 position = Vector3(pos->x,pos->y,pos->z);
 			Vector3 direction = Vector3(vel->x, vel->y, vel->z);
 			direction.Normalize();
-			TriggerFlareSmoke(position+(direction*20), direction,age,item->roomNumber);
+			T5M::Effects::Smoke::TriggerFlareSmoke(position+(direction*20), direction,age,item->roomNumber);
 		}
 	}
 }

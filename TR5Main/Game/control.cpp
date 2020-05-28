@@ -39,7 +39,7 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "tr4_locusts.h"
-#include "../Global/Types/effects/smoke.h"
+#include "smoke.h"
 
 short ShatterSounds[18][10] =
 	{
@@ -504,7 +504,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
-		UpdateSmokeParticles();
+		T5M::Effects::Smoke::UpdateSmokeParticles();
 		UpdateShockwaves();
 		UpdateLocusts();
 		//Legacy_UpdateLightning();
