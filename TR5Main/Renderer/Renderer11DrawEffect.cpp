@@ -13,7 +13,9 @@
 #include "level.h"
 #include "effect.h"
 #include "smoke.h"
+#include "spark.h"
 
+using namespace T5M::Effects::Footprints;
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
@@ -25,7 +27,7 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
-extern std::deque<FOOTPRINT_STRUCT> footprints;
+
 extern int g_NumSprites;
 
 void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode)
@@ -316,8 +318,11 @@ void Renderer11::drawSparks()
 			}
 			else
 			{
+				Vector3 pos = Vector3(spark->x, spark->y, spark->z);
 				Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
 				v.Normalize();
+				//AddSpriteBillboardConstrained(m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], pos, Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark., spark->size, BLENDMODE_ALPHABLEND, v);
+				
 				AddLine3D(Vector3(spark->x, spark->y, spark->z), Vector3(spark->x + v.x * 24.0f, spark->y + v.y * 24.0f, spark->z + v.z * 24.0f), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f));
 			}
 		}
@@ -1331,7 +1336,20 @@ bool Renderer11::drawSmokeParticles()
 	for (int i = 0; i < SmokeParticles.size(); i++) {
 		SmokeParticle& s = SmokeParticles[i];
 		if (!s.active) continue;
-		AddSpriteBillboard(m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex+s.sprite], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
+		AddSpriteBillboard(m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
+	}
+	return true;
+}
+bool Renderer11::drawSparkParticles()
+{
+	using namespace T5M::Effects::Spark;
+	extern std::array<SparkParticle, 64> SparkParticles;
+	for (int i = 0; i < SparkParticles.size(); i++) {
+		SparkParticle& s = SparkParticles[i];
+		if (!s.active) continue;
+		Vector3 v;
+		s.velocity.Normalize(v);
+		AddSpriteBillboardConstrained(m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, s.width, s.height, BLENDMODE_ALPHABLEND, v);
 	}
 	return true;
 }

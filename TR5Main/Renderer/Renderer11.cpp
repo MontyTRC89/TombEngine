@@ -18,10 +18,7 @@
 #include "misc.h"
 #include "footprint.h"
 #include "setup.h"
-
-extern std::deque<FOOTPRINT_STRUCT> footprints;
 Renderer11* g_Renderer;
-
 Renderer11::Renderer11()
 {
 	initialiseHairRemaps();

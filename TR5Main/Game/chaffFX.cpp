@@ -5,8 +5,9 @@
 #include "control.h"
 #include "lara.h"
 #include "draw.h"
-#include "../Specific/level.h"
+#include "level.h"
 #include "smoke.h"
+#include "spark.h"
 #define	MAX_TRIGGER_RANGE	0x4000
 
 void TriggerChaffEffects(int flareAge)
@@ -77,7 +78,7 @@ void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int 
 		color.g = (GetRandomDraw() & 127) + 64;
 		color.b = 192 - color.g;
 
-		TriggerChaffSparkles(pos, vel, &color,age);
+		TriggerChaffSparkles(pos, vel, &color,age,item);
 		if (isUnderwater)
 		{
 			TriggerChaffBubbles(pos, item->roomNumber);
@@ -93,8 +94,9 @@ void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int 
 }
 
 
-void TriggerChaffSparkles (PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int age)
+void TriggerChaffSparkles (PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int age,ITEM_INFO* item)
 {
+	/*
 	SPARKS* sparkle;
 
 	sparkle = &Sparks[GetFreeSpark()];
@@ -127,6 +129,8 @@ void TriggerChaffSparkles (PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int 
 	sparkle->dSize = (GetRandomDraw() & 1) + 1;
 	sparkle->gravity = sparkle->maxYvel = 0;
 	sparkle->flags = SP_SCALE;
+	*/
+	T5M::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->roomNumber);
 }
 
 

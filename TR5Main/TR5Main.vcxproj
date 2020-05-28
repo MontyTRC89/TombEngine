@@ -135,6 +135,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\phd_global.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Game\smoke.h" />
+    <ClInclude Include="Game\spark.h" />
     <ClInclude Include="Libs\bass\bass.h" />
     <ClInclude Include="Libs\bass\bassmix.h" />
     <ClInclude Include="Libs\bass\bass_fx.h" />
@@ -396,6 +397,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\trmath.cpp" />
     <ClCompile Include="Game\smoke.cpp" />
+    <ClCompile Include="Game\spark.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
