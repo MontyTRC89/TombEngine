@@ -1,5 +1,6 @@
 #pragma once
 #include "global.h"
+#include "collide.h"
 
 // TR4 object
 void SarcophagusCollision(short itemNum, ITEM_INFO* item, COLL_INFO* coll);

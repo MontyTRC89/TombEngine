@@ -1,5 +1,4 @@
 #pragma once
-
 #include "global.h"
 
 extern HAIR_STRUCT Hairs[2][7];

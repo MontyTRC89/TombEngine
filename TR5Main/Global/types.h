@@ -118,65 +118,6 @@ typedef struct hair_struct
 	PHD_VECTOR unknown;
 } HAIR_STRUCT;
 
-typedef struct box_node_t
-{
-	short exitBox; // size=0, offset=0
-	unsigned short searchNumber; // size=0, offset=2
-	short nextExpansion; // size=0, offset=4
-	short boxNumber; // size=0, offset=6
-} BOX_NODE;
-
-typedef struct box_info_t
-{
-	unsigned char left; // size=0, offset=0
-	unsigned char right; // size=0, offset=1
-	unsigned char top; // size=0, offset=2
-	unsigned char bottom; // size=0, offset=3
-	short height; // size=0, offset=4
-	short overlapIndex; // size=0, offset=6
-} BOX_INFO;
-
-typedef struct ai_info_t
-{
-	short zoneNumber; // size=0, offset=0
-	short enemyZone; // size=0, offset=2
-	int distance; // size=0, offset=4
-	int ahead; // size=0, offset=8
-	int bite; // size=0, offset=12
-	short angle; // size=0, offset=16
-	short xAngle; // size=0, offset=18
-	short enemyFacing; // size=0, offset=20
-} AI_INFO;
-
-typedef struct bite_info_t {				// Offset into given Mesh
-	int	x;					// where Baddie kicks off Bite Effect
-	int	y;
-	int	z;
-	int	meshNum;
-} BITE_INFO;
-
-typedef struct lot_info_t
-{
-	BOX_NODE* node; // size=8, offset=0
-	short head; // size=0, offset=4
-	short tail; // size=0, offset=6
-	unsigned short searchNumber; // size=0, offset=8
-	unsigned short blockMask; // size=0, offset=10
-	short step; // size=0, offset=12
-	short drop; // size=0, offset=14
-	short zoneCount; // size=0, offset=16
-	short targetBox; // size=0, offset=18
-	short requiredBox; // size=0, offset=20
-	short fly; // size=0, offset=22
-	unsigned short canJump : 1; // offset=24.0
-	unsigned short canMonkey : 1; // offset=24.1
-	unsigned short isAmphibious : 1; // offset=24.2
-	unsigned short isJumping : 1; // offset=24.3
-	unsigned short isMonkeying : 1; // offset=24.4
-	PHD_VECTOR target; // size=12, offset=26
-	int zone; // size=4, offset=40
-} LOT_INFO;
-
 typedef struct floor_info_t {
 	unsigned short index; // size=0, offset=0
 	unsigned short fx : 4; // offset=2.0
@@ -232,28 +173,6 @@ typedef struct item_info_t {
 	short TOSSPAD; 
 } ITEM_INFO;
 
-typedef struct creature_info_t 
-{
-	short jointRotation[4]; // size=8, offset=0
-	short maximumTurn; // size=0, offset=8
-	short flags; // size=0, offset=10
-	unsigned short alerted : 1; // offset=12.0
-	unsigned short headLeft : 1; // offset=12.1
-	unsigned short headRight : 1; // offset=12.2
-	unsigned short reachedGoal : 1; // offset=12.3
-	unsigned short hurtByLara : 1; // offset=12.4
-	unsigned short patrol2 : 1; // offset=12.5
-	unsigned short jumpAhead : 1; // offset=12.6
-	unsigned short monkeyAhead : 1; // offset=12.7
-	MOOD_TYPE mood; // size=4, offset=14
-	ITEM_INFO* enemy; // size=144, offset=18
-	ITEM_INFO aiTarget; // size=144, offset=22
-	short pad; // size=0, offset=5644
-	short itemNum; // size=0, offset=5644
-	PHD_VECTOR target; // size=12, offset=5646
-	LOT_INFO LOT; // size=44, offset=5658
-} CREATURE_INFO;
-
 typedef struct lara_arm_t
 {
 	short* frameBase; // size=0, offset=0
@@ -281,51 +200,6 @@ typedef struct fx_info_t
 	short flag1; // size=0, offset=38
 	short flag2; // size=0, offset=40
 } FX_INFO;
-
-typedef struct coll_info_t
-{
-	int midFloor; // size=0, offset=0
-	int midCeiling; // size=0, offset=4
-	int midType; // size=0, offset=8
-	int frontFloor; // size=0, offset=12
-	int frontCeiling; // size=0, offset=16
-	int frontType; // size=0, offset=20
-	int leftFloor; // size=0, offset=24
-	int leftCeiling; // size=0, offset=28
-	int leftType; // size=0, offset=32
-	int rightFloor; // size=0, offset=36
-	int rightCeiling; // size=0, offset=40
-	int rightType; // size=0, offset=44
-	int leftFloor2; // size=0, offset=48
-	int leftCeiling2; // size=0, offset=52
-	int leftType2; // size=0, offset=56
-	int rightFloor2; // size=0, offset=60
-	int rightCeiling2; // size=0, offset=64
-	int rightType2; // size=0, offset=68
-	int radius; // size=0, offset=72
-	int badPos; // size=0, offset=76
-	int badNeg; // size=0, offset=80
-	int badCeiling; // size=0, offset=84
-	PHD_VECTOR shift; // size=12, offset=88
-	PHD_VECTOR old; // size=12, offset=100
-	short oldAnimState; // size=0, offset=112
-	short oldAnimNumber; // size=0, offset=114
-	short oldFrameNumber; // size=0, offset=116
-	short facing; // size=0, offset=118
-	short quadrant; // size=0, offset=120
-	short collType; // size=0, offset=122 USE ENUM CT_*
-	short* trigger; // size=0, offset=124
-	signed char tiltX; // size=0, offset=128
-	signed char tiltZ; // size=0, offset=129
-	byte hitByBaddie; // size=0, offset=130
-	byte hitStatic; // size=0, offset=131
-	unsigned short slopesAreWalls : 2; // offset=132.0
-	unsigned short slopesArePits : 1; // offset=132.2
-	unsigned short lavaIsPit : 1; // offset=132.3
-	unsigned short enableBaddiePush : 1; // offset=132.4
-	unsigned short enableSpaz : 1; // offset=132.5
-	unsigned short hitCeiling : 1; // offset=132.6
-} COLL_INFO;
 
 typedef struct aiobject_t
 {
@@ -782,8 +656,8 @@ struct OBJECT_TEXTURE
 
 struct WINAPP
 {
-	HINSTANCE				hInstance;
-	int		nFillMode;
+	HINSTANCE hInstance;
+	int nFillMode;
 	WNDCLASS WindowClass;
 	HWND WindowHandle;
 	bool bNoFocus;
@@ -1151,7 +1025,8 @@ struct SUBSUIT_INFO
 	short YVel; // size=0, offset=10
 };
 
-struct PISTOL_DEF {
+struct PISTOL_DEF
+{
 	short objectNum;
 	char draw1Anim2;
 	char draw1Anim;
@@ -1192,9 +1067,5 @@ struct NODEOFFSET_INFO
 	char meshNum; // size=0, offset=6
 	unsigned char gotIt; // size=0, offset=7
 };
-
-typedef void (cdecl *EFFECT_ROUTINE)(ITEM_INFO*);
-typedef void (cdecl *LARA_COLLISION_ROUTINE)(ITEM_INFO*, COLL_INFO*);
-typedef void (cdecl *LARA_CONTROL_ROUTINE)(ITEM_INFO*, COLL_INFO*);
 
 #pragma pack(pop)

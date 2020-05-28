@@ -33,22 +33,6 @@ enum SPRITE_TYPES
 	SPR_LIGHTHING
 };
 
-enum TYPE_ZONE
-{
-	ZONE_NULL = -1,  // default zone
-	ZONE_SKELLY = 0,
-	ZONE_BASIC,
-	ZONE_FLYER,
-	ZONE_HUMAN_CLASSIC,
-	ZONE_WATER,
-	ZONE_HUMAN_JUMP_AND_MONKEY,
-	ZONE_HUMAN_JUMP,
-	ZONE_SPIDER,
-	ZONE_BLOCKABLE, // for trex, shiva, etc..
-	ZONE_SOPHIALEE, // dont want sophia to go down again !
-	ZONE_APE,       // only 2 click climb
-};
-
 enum FLOOR_TYPES
 {
 	FLOOR_TYPE,

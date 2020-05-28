@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "oldobjects.h"
+#include "tr5_missile.h"
 #include "items.h"
 #include "box.h"
 #include "people.h"

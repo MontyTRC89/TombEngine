@@ -2,7 +2,6 @@
 #include "laraswim.h"
 #include "control.h"
 #include "camera.h"
-#include "collide.h"
 #include "items.h"
 #include "box.h"
 #include "Lara.h"
@@ -819,7 +818,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		}
 	}
 
-	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == 0)
+	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == NO_ITEM)
 		LaraTestWaterDepth(item, coll);
 }
 

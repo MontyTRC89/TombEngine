@@ -12,8 +12,6 @@
 #include "level.h"
 #include "input.h"
 
-extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
-extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
 bool EnableCrawlFlexWaterPullUp, EnableCrawlFlexSubmerged;
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
@@ -515,5 +513,5 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
 
 	Lara.waterStatus = LW_WADE;
 
-	return true;
+	return 1;
 }

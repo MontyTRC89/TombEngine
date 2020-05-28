@@ -788,7 +788,7 @@ static void StartBaddy(ObjectInfo* obj)
 		}
 	}
 
-	obj = &Objects[ID_GUARDIAN];
+	obj = &Objects[ID_LASERHEAD];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseLaserHead;
@@ -802,7 +802,6 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->usingDrawAnimatingItem = false;
 		obj->undead = true;
-		obj->unknown = 3;
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->saveMesh = true;
 	}

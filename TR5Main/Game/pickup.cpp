@@ -11,7 +11,6 @@
 #include "box.h"
 #include "health.h"
 #include "items.h"
-#include "collide.h"
 #include "switch.h"
 #include "larafire.h"
 #include "laraflar.h"
@@ -24,8 +23,6 @@
 #include "input.h"
 #include "sound.h"
 #include "savegame.h"
-
-#include "global.h"
 
 static short PickUpBounds[12] = // offset 0xA1338
 {

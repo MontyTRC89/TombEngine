@@ -169,8 +169,6 @@ int LoadItems()
 
 void LoadObjects()
 {
-	//DB_Log(2, "LoadObjects - DLL");
-	 
 	memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
 	memset(StaticObjects, 0, sizeof(STATIC_INFO) * NUM_STATICS);
 
@@ -183,8 +181,8 @@ void LoadObjects()
 	MeshDataSize = numMeshDataBytes;
 
 	int numMeshPointers = ReadInt32();
-	Meshes = (short**)game_malloc(4 * numMeshPointers);
-	ReadBytes(Meshes, 4 * numMeshPointers);
+	Meshes = (short**)game_malloc(sizeof(short*) * numMeshPointers);
+	ReadBytes(Meshes, sizeof(short*) * numMeshPointers);
 
 	for (int i = 0; i < numMeshPointers; i++) 
 	{
@@ -207,12 +205,12 @@ void LoadObjects()
 	ReadBytes(Ranges, sizeof(RANGE_STRUCT) * numRanges);
 
 	int numCommands = ReadInt32();
-	Commands = (short*)game_malloc(2 * numCommands);
-	ReadBytes(Commands, 2 * numCommands);
+	Commands = (short*)game_malloc(sizeof(short) * numCommands);
+	ReadBytes(Commands, sizeof(short) * numCommands);
 
 	int numBones = ReadInt32();
-	Bones = (int*)game_malloc(4 * numBones);
-	ReadBytes(Bones, 4 * numBones);
+	Bones = (int*)game_malloc(sizeof(int) * numBones);
+	ReadBytes(Bones, sizeof(int) * numBones);
 
 	int* bone = Bones;
 	for (int i = 0; i < 15; i++)
@@ -223,13 +221,13 @@ void LoadObjects()
 		int linkZ = *(bone++);
 	}
 	
-	MeshTrees = (int*)game_malloc(4 * numBones);
+	MeshTrees = (int*)game_malloc(sizeof(int) * numBones);
 
-	memcpy(MeshTrees, Bones, 4 * numBones);
+	memcpy(MeshTrees, Bones, sizeof(int) * numBones);
 
 	int numFrames = ReadInt32();
-	Frames = (short*)game_malloc(2 * numFrames);
-	ReadBytes(Frames, 2 * numFrames);
+	Frames = (short*)game_malloc(sizeof(short) * numFrames);
+	ReadBytes(Frames, sizeof(short) * numFrames);
 
 	AnimationsCount = numAnimations;
 	if (AnimationsCount > 0)
@@ -310,7 +308,6 @@ void LoadCameras()
 
 void LoadTextures()
 {
-	//DB_Log(2, "LoadTextures - DLL");
 	printf("LoadTextures\n");
 
 	int uncompressedSize = 0;
@@ -595,7 +592,6 @@ void BuildOutsideRoomsTable()
  
 void LoadRooms()
 {
-	//DB_Log(2, "LoadRooms - DLL");
 	printf("LoadRooms\n");
 	
 	Wibble = 0;
@@ -668,8 +664,8 @@ void LoadTextureInfos()
 
 			for (int j = 0; j < 4; j++)
 			{
-				texture->vertices[j].x = srctext.Vertices[j].Xpixel / 256.0;
-				texture->vertices[j].y = srctext.Vertices[j].Ypixel / 256.0;
+				texture->vertices[j].x = srctext.Vertices[j].Xpixel / 256.0f;
+				texture->vertices[j].y = srctext.Vertices[j].Ypixel / 256.0f;
 			}
 
 			// Adjust UV
