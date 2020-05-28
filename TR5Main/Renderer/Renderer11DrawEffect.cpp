@@ -333,7 +333,7 @@ void Renderer11::drawSplahes()
 		if (splash.isActive)
 		{
 			constexpr float alpha = 360 / NUM_POINTS;
-			byte color = (splash.life >= 32 ? 255 : (byte)((splash.life / 32.0f) * 255));
+			byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
 			if (!splash.isRipple) {
 				if (splash.heightSpeed < 0 && splash.height < 1024) {
 					float multiplier = splash.height / 1024.0f;
