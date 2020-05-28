@@ -11,6 +11,9 @@
 #include "level.h"
 #include "objectslist.h"
 #include "GameFlowScript.h"
+#include "spark.h"
+
+using namespace T5M::Effects::Spark;
 
 unsigned char TES_extra_tab[] =
 {
@@ -382,7 +385,7 @@ void UpdateSparks()
 
 void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 {
-	int random;
+	/*int random;
 	SPARKS* spark;
 
 	if (!unk)
@@ -503,7 +506,8 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 			spark->maxYvel = -4 - ((random >> 6) & 3);
 			spark->dSize = spark->size;
 		}
-	}
+	}*/
+	TriggerRicochetSpark(pos, angle, num);
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
