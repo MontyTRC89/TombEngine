@@ -12,7 +12,7 @@
 #include "bubble.h"
 #include "level.h"
 #include "effect.h"
-#include "Types/effects/smoke.h"
+#include "smoke.h"
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -1326,10 +1326,12 @@ bool Renderer11::drawDebris(bool transparent)
 
 bool Renderer11::drawSmokeParticles()
 {
+	using namespace T5M::Effects::Smoke;
+	extern std::array<SmokeParticle, 128> SmokeParticles;
 	for (int i = 0; i < SmokeParticles.size(); i++) {
 		SmokeParticle& s = SmokeParticles[i];
 		if (!s.active) continue;
-		AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex+SPR_FIRE1], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
+		AddSpriteBillboard(m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex+s.sprite], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
 	}
 	return true;
 }

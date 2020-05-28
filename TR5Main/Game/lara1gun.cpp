@@ -847,9 +847,9 @@ void AnimateShotgun(int weaponType)
 		}
 		else if (SmokeWeapon == WEAPON_SHOTGUN)
 		{
-			pos.x = -16;
+			pos.x = 0;
 			pos.y = 228;
-			pos.z = 32;
+			pos.z = 0;
 		}
 		else if (SmokeWeapon == WEAPON_GRENADE_LAUNCHER)
 		{
@@ -1298,10 +1298,18 @@ void RifleHandler(int weaponType)
 	{
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
+			PHD_VECTOR pos = {};
+			/*
+			pos.x = GetRandomControl() - 128;
+			pos.y = (GetRandomControl() & 0x7F) - 63;
+			pos.z = GetRandomControl() - 128;
+			*/
+			pos.y = -64;
+			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
-				LaraItem->pos.xPos + (phd_sin(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
-				LaraItem->pos.yPos + (GetRandomControl() & 0x7F) - 575,
-				LaraItem->pos.zPos + (phd_cos(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
+				pos.x,
+				pos.y,
+				pos.z,
 				12,
 				(GetRandomControl() & 0x3F) + 192,
 				(GetRandomControl() & 0x1F) + 128,
@@ -1310,10 +1318,13 @@ void RifleHandler(int weaponType)
 		}
 		else if (weaponType == WEAPON_REVOLVER)
 		{
-			PHD_VECTOR pos;
-			pos.x = (GetRandomControl() & 0xFF) - 0x80;
-			pos.y = (GetRandomControl() & 0x7F) - 0x3F;
-			pos.z = (GetRandomControl() & 0xFF) - 0x80;
+			PHD_VECTOR pos = {};
+			/*
+			pos.x = GetRandomControl() - 128;
+			pos.y = (GetRandomControl() & 0x7F) - 63;
+			pos.z = GetRandomControl() - 128;
+			*/
+			pos.y = -32;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
 		}

@@ -9,6 +9,7 @@
 #include "bubble.h"
 #include "trmath.h"
 #include "GameFlowScript.h"
+#include "smoke.h"
 
 char FlareTable[121] =
 {
@@ -485,6 +486,7 @@ byte TriggerGunSmoke_SubFunction(int weaponType)
 
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
 {
+	/*
 	SMOKE_SPARKS* spark;
 	
 	spark = &SmokeSparks[GetFreeSmokeSpark()];
@@ -572,6 +574,8 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	{
 		spark->mirror = 0;
 	}*/
+	T5M::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
+	
 }
 
 void TriggerShatterSmoke(int x, int y, int z)
