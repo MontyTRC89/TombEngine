@@ -1,6 +1,8 @@
 #pragma once
 
 #include "global.h"
+#include "box.h"
+#include "collide.h"
 
 struct ObjectInfo
 {
@@ -15,7 +17,7 @@ struct ObjectInfo
 	function<void(ITEM_INFO* item)> drawRoutine;
 	function<void(ITEM_INFO* item)> drawRoutineExtra;
 	function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;
-	short zoneType; 
+	ZoneTypeEnum zoneType;
 	short animIndex; 
 	short hitPoints; 
 	short pivotLength; 

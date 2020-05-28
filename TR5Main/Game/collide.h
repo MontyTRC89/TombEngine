@@ -1,11 +1,90 @@
 #pragma once
-
 #include "global.h"
 
 // used by coll->badPos
 #define NO_BAD_POS (-NO_HEIGHT)
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
+
+struct COLL_FLOOR
+{
+	int floor;
+	int ceiling;
+	int type;
+	int splitFloor;
+	int splitCeiling;
+};
+
+struct COLL_INFO
+{
+	/*
+	COLL_FLOOR middle;        // mid
+	COLL_FLOOR middle_left;   // left
+	COLL_FLOOR middle_right;  // right
+	COLL_FLOOR front;         // front
+	COLL_FLOOR front_left;    // left2
+	COLL_FLOOR front_right;   // right2
+	*/
+	int midFloor;
+	int midCeiling;
+	int midType;
+	int midSplitFloor;
+	int midSplitCeil;
+
+	int frontFloor;
+	int frontCeiling;
+	int frontType;
+	int frontSplitFloor;
+	int frontSplitCeil;
+
+	int leftFloor;
+	int leftCeiling;
+	int leftType;
+	int leftSplitFloor;
+	int leftSplitCeil;
+
+	int rightFloor;
+	int rightCeiling;
+	int rightType;
+	int rightSplitFloor;
+	int rightSplitCeil;
+
+	int leftFloor2;
+	int leftCeiling2;
+	int leftType2;
+	int leftSplitFloor2;
+	int leftSplitCeil2;
+
+	int rightFloor2;
+	int rightCeiling2;
+	int rightType2;
+	int rightSplitFloor2;
+	int rightSplitCeil2;
+
+	int radius;
+	int badPos;
+	int badNeg;
+	int badCeiling;
+	PHD_VECTOR shift;
+	PHD_VECTOR old;
+	short oldAnimState;
+	short oldAnimNumber;
+	short oldFrameNumber;
+	short facing;
+	short quadrant;
+	short collType; // CT_enum
+	short* trigger;
+	signed char tiltX;
+	signed char tiltZ;
+	bool hitByBaddie;
+	bool hitStatic;
+	bool slopesAreWalls;
+	bool slopesArePits;
+	bool lavaIsPit;
+	bool enableBaddiePush;
+	bool enableSpaz;
+	bool hitCeiling;
+};
 
 extern BOUNDING_BOX GlobalCollisionBounds;
 extern ITEM_INFO* CollidedItems[1024];

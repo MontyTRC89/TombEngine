@@ -3,7 +3,6 @@
 #include "items.h"
 #include "effect.h"
 #include "effect2.h"
-#include "collide.h"
 #include "draw.h"
 #include "Lara.h"
 #include "sphere.h"

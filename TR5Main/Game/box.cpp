@@ -19,17 +19,17 @@ int NumberBoxes;
 BOX_INFO* Boxes;
 int NumberOverlaps;
 short* Overlaps;
-short* Zones[5][2];
+short* Zones[ZONE_MAX][2];
 
-#define ESCAPE_DIST (WALL_SIZE*5)
-#define STALK_DIST (WALL_SIZE*3)
+#define ESCAPE_DIST SECTOR(5)
+#define STALK_DIST SECTOR(3)
 #define REACHED_GOAL_RADIUS 640
-#define ATTACK_RANGE SQUARE(WALL_SIZE*3)
+#define ATTACK_RANGE SQUARE(SECTOR(3))
 #define ESCAPE_CHANCE  0x800
 #define RECOVER_CHANCE 0x100
 #define BIFF_AVOID_TURN 1536
 #define FEELER_DISTANCE 512
-#define FEELER_ANGLE ANGLE(45)
+#define FEELER_ANGLE ANGLE(45.0f)
 
 void DropBaddyPickups(ITEM_INFO* item)
 {
@@ -125,7 +125,7 @@ short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 	targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->pos.xPos - r->x, targetItem->pos.zPos - r->z).box;
 
 	zone = Zones[creature->LOT.zone][FlipStatus];
-	return (zone[item->boxNumber] == zone[targetItem->boxNumber]);
+	return zone[item->boxNumber] == zone[targetItem->boxNumber];
 }
 
 short AIGuard(CREATURE_INFO* creature) 
@@ -161,7 +161,7 @@ short AIGuard(CREATURE_INFO* creature)
 	if (creature->headRight)
 		return 0;
 
-	return -ANGLE(90);
+	return -ANGLE(90.0f);
 }
 
 void AlertNearbyGuards(ITEM_INFO* item) 
@@ -251,8 +251,8 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	Camera.pos.roomNumber = LaraItem->roomNumber; 
 	Camera.type = CHASE_CAMERA;
 	Camera.flags = FOLLOW_CENTRE;
-	Camera.targetAngle = ANGLE(170);
-	Camera.targetElevation = -ANGLE(25);
+	Camera.targetAngle = ANGLE(170.0f);
+	Camera.targetElevation = -ANGLE(25.0f);
 
 	// TODO: exist in TR5 but just commented in case.
 	/*
@@ -264,24 +264,24 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	*/
 }
 
-short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, short (*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
+short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, function<CreatureEffectFunction> func)
 {
 	PHD_VECTOR pos;
 	pos.x = bite->x;
 	pos.y = bite->y;
 	pos.z = bite->z;
 	GetJointAbsPosition(item, &pos, bite->meshNum);
-	return generate(pos.x, pos.y, pos.z, damage, angle, item->roomNumber);
+	return func(pos.x, pos.y, pos.z, damage, angle, item->roomNumber);
 }
 
-short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, short(*generate)(int x, int y, int z, short speed, short yrot, short roomNumber))
+short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, function<CreatureEffectFunction> func)
 {
 	PHD_VECTOR pos;
 	pos.x = bite->x;
 	pos.y = bite->y;
 	pos.z = bite->z;
 	GetJointAbsPosition(item, &pos, bite->meshNum);
-	return generate(pos.x, pos.y, pos.z, item->speed, item->pos.yRot, item->roomNumber);
+	return func(pos.x, pos.y, pos.z, item->speed, item->pos.yRot, item->roomNumber);
 }
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)

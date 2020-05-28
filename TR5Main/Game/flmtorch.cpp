@@ -5,7 +5,6 @@
 #include "laraflar.h"
 #include "lara.h"
 #include "larafire.h"
-#include "collide.h"
 #include "laramisc.h"
 #include "switch.h"
 #include "draw.h"

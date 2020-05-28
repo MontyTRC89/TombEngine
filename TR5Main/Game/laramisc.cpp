@@ -730,7 +730,7 @@ void InitialiseLara(int restore)
 	else
 	{
 		ZeroMemory(&Lara, sizeof(LaraInfo));
-		Lara.ExtraAnim = 0;
+		Lara.ExtraAnim = NO_ITEM;
 		Lara.Vehicle = NO_ITEM;
 	}
 

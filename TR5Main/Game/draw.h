@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.h"
+#include "box.h"
 
 extern Renderer11* g_Renderer;
 extern BITE_INFO EnemyBites[9];

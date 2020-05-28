@@ -5,7 +5,6 @@
 #include "effect2.h"
 #include "effect.h"
 #include "tomb4fx.h"
-#include "box.h"
 #include "switch.h"
 #include "missile.h"
 #include "control.h"
@@ -574,8 +573,8 @@ void ObjectObjects()
 		InitAnimating(obj, objNum);
 	}
 
-	InitAnimating(obj, ID_GUARDIAN_BASE);
-	InitAnimating(obj, ID_GUARDIAN_TENTACLE);
+	InitAnimating(obj, ID_LASERHEAD_BASE);
+	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
 
 	obj = &Objects[ID_ANIMATING13];
 	if (obj->loaded)

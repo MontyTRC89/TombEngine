@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "collide.h"
 #include "control.h"
 #include "global.h"
 #include "pickup.h"

@@ -1,5 +1,6 @@
 #pragma once
 #include "types.h"
+#include "collide.h"
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
 void InitialisePushableBlock(short itemNum);

@@ -93,7 +93,7 @@ void SwordGuardianControl(short itemNum)
 		sword->LOT.step = STEP_SIZE;
 		sword->LOT.drop = -STEP_SIZE;
 		sword->LOT.fly = NO_FLYING;
-		sword->LOT.zone = 1;
+		sword->LOT.zone = ZONE_BASIC;
 		CreatureAIInfo(item, &info);
 
 		if (item->currentAnimState == 8)
@@ -104,7 +104,7 @@ void SwordGuardianControl(short itemNum)
 				sword->LOT.step = WALL_SIZE * 20;
 				sword->LOT.drop = -WALL_SIZE * 20;
 				sword->LOT.fly = STEP_SIZE / 4;
-				sword->LOT.zone = 4;
+				sword->LOT.zone = ZONE_FLYER;
 				CreatureAIInfo(item, &info);
 			}
 		}

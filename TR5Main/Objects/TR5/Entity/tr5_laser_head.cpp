@@ -160,7 +160,7 @@ void InitialiseLaserHead(short itemNumber)
 
 	for (int i = 0; i < LevelItems; i++)
 	{
-		if (Items[i].objectNumber == ID_GUARDIAN_BASE)
+		if (Items[i].objectNumber == ID_LASERHEAD_BASE)
 		{
 			info->baseItem = i;
 			break;
@@ -171,7 +171,7 @@ void InitialiseLaserHead(short itemNumber)
 	int j = 0;
 	for (int i = 0; i < LevelItems; i++)
 	{
-		if (Items[i].objectNumber == ID_GUARDIAN_TENTACLE && j < 8)
+		if (Items[i].objectNumber == ID_LASERHEAD_TENTACLE && j < 8)
 		{
 			info->tentacles[j] = i;
 			rotation += ANGLE(45);
