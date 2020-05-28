@@ -40,6 +40,7 @@
 #include "tr5_spider_emitter.h"
 #include "tr4_locusts.h"
 #include "smoke.h"
+#include "spark.h"
 
 short ShatterSounds[18][10] =
 	{
@@ -152,6 +153,7 @@ extern Inventory *g_Inventory;
 extern int SplashCount;
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
+using namespace T5M::Effects::Footprints;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern bool BlockAllInput;
 
@@ -504,6 +506,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
+		T5M::Effects::Spark::UpdateSparkParticles();
 		T5M::Effects::Smoke::UpdateSmokeParticles();
 		UpdateShockwaves();
 		UpdateLocusts();
