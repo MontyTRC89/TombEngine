@@ -6441,25 +6441,41 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		EnableMonkeyVault = true;
 	}
 
-
-
-
 	if (coll->collType == CT_FRONT)
 	{
 		short angle = item->pos.yRot;
-		if (angle >= -ANGLE(30) && angle <= ANGLE(30))
-			angle = 0;
-		else if (angle >= ANGLE(60) && angle <= ANGLE(120))
-			angle = ANGLE(90);
-		else if (angle >= ANGLE(150) || angle <= -ANGLE(150))
-			angle = ANGLE(180);
-		else if (angle >= -ANGLE(120) && angle <= -ANGLE(60))
-			angle = -ANGLE(90);
+		int slope = 0;
 
-		if (angle & 0x3FFF)
+		if (coll->midSplitFloor)
+		{
+			if (coll->frontSplitFloor != coll->midSplitFloor)
+				return 0;
+
+			if (angle >= ANGLE(15) && angle <= ANGLE(75))
+				angle = ANGLE(45);
+			else if (angle >= ANGLE(105) && angle <= ANGLE(165))
+				angle = ANGLE(135);
+			else if (angle >= -ANGLE(165) && angle <= -ANGLE(105))
+				angle = -ANGLE(135);
+			else if (angle >= -ANGLE(75) && angle <= -ANGLE(15))
+				angle = -ANGLE(45);
+		}
+		else
+		{
+			if (angle >= -ANGLE(30) && angle <= ANGLE(30))
+				angle = 0;
+			else if (angle >= ANGLE(60) && angle <= ANGLE(120))
+				angle = ANGLE(90);
+			else if (angle >= ANGLE(150) || angle <= -ANGLE(150))
+				angle = ANGLE(180);
+			else if (angle >= -ANGLE(120) && angle <= -ANGLE(60))
+				angle = -ANGLE(90);
+
+			slope = abs(coll->leftFloor2 - coll->rightFloor2) >= 60;
+		}
+
+		if (angle & 0x1FFF)
 			return 0;
-
-		int slope = abs(coll->leftFloor2 - coll->rightFloor2) >= 60;
 /*
 		if (coll->frontFloor >= 0 && coll->frontFloor <= -256)
 		{
@@ -6596,9 +6612,37 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->pos.yRot = angle;
 		ShiftItem(item, coll);
 
-		short dir = (unsigned short)(item->pos.yRot + ANGLE(45)) / ANGLE(90);
-		switch (dir)
+		if (coll->midSplitFloor) // diagonal alignment
 		{
+			int dx = item->pos.xPos & 0x3FF;
+			int dz = item->pos.zPos & 0x3FF;
+			item->pos.xPos -= dx;
+			item->pos.zPos -= dz;
+
+			switch (coll->midSplitFloor)
+			{
+			case SPLIT1:
+			case NOCOLF1T:
+			case NOCOLF1B:
+				item->pos.xPos += 500 + (dx - dz) / 2;
+				item->pos.zPos += 500 - (dx - dz) / 2;
+				break;
+			case SPLIT2:
+			case NOCOLF2T:
+			case NOCOLF2B:
+				item->pos.xPos += (dx + dz) / 2;
+				item->pos.zPos += (dx + dz) / 2;
+				break;
+			}
+
+			item->pos.xPos -= (phd_sin(angle) * 100) >> W2V_SHIFT;
+			item->pos.zPos -= (phd_cos(angle) * 100) >> W2V_SHIFT;
+		}
+		else // regular aligment
+		{
+			short dir = (unsigned short)(item->pos.yRot + ANGLE(45)) / ANGLE(90);
+			switch (dir)
+			{
 			case NORTH:
 				item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD;
 				break;
@@ -6614,6 +6658,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			case WEST:
 				item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD;
 				break;
+			}
 		}
 		return 1;
 	}
