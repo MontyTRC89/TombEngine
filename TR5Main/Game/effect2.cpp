@@ -1048,7 +1048,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 
 void SetupSplash(const SPLASH_SETUP* const setup)
 {
-	constexpr size_t NUM_SPLASHES = 4;
+	constexpr size_t NUM_SPLASHES = 3;
 	int numSplashesSetup = 0;
 	float splashVelocity;
 	for (int i = 0; i < MAX_SPLASHES; i++)
@@ -1067,16 +1067,16 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.innerRad = setup->innerRadius;
 				splashVelocity = splashPower / 16;
 				splash.innerRadVel = splashVelocity;
-				splash.heightSpeed = splashPower * 1.5f;
+				splash.heightSpeed = splashPower * 1.2f;
 				splash.height = 0;
 				splash.heightVel = -16;
 				splash.outerRad = setup->innerRadius / 3;
-				splash.outerRadVel = splashVelocity;
+				splash.outerRadVel = splashVelocity*1.5f;
 				splash.spriteSequenceStart = 8; //Splash Texture
 				numSplashesSetup++;
 			}
 			else {
-				float thickness = frandMinMax(256,512);
+				float thickness = frandMinMax(64,128);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -1084,17 +1084,17 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.isRipple = true;
 				float vel;
 				if (numSplashesSetup == 2) {
-					vel = (splashVelocity / 8) + frandMinMax(1, 3);
+					vel = (splashVelocity / 16) + frandMinMax(2, 4);
 				}
 				else {
-					vel = (splashVelocity / 8) + frandMinMax(5, 8);
+					vel = (splashVelocity / 7) + frandMinMax(3, 7);
 				}
 				
 				float innerRadius = 0;
 				splash.innerRad = innerRadius;
-				splash.innerRadVel = vel;
-				splash.outerRad = innerRadius;
-				splash.outerRadVel = vel * 2.0f;
+				splash.innerRadVel = vel*1.3f;
+				splash.outerRad = innerRadius+thickness;
+				splash.outerRadVel = vel*2.3f;
 				splash.heightSpeed = 128;
 				splash.height = 0;
 				splash.heightVel = -16;
@@ -1103,7 +1103,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.life = lerp(48, 70, t);
 				splash.spriteSequenceStart = 4; //Splash Texture
 				splash.spriteSequenceEnd = 7; //Splash Texture
-				splash.animationSpeed = frandMinMax(0.1f, 0.15f);
+				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);
 
 				numSplashesSetup++;
 			}
