@@ -25,6 +25,7 @@ namespace T5M {
 			void UpdateSparkParticles();
 			SparkParticle& getFreeSparkParticle();
 			void TriggerFlareSparkParticles(PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int room);
+			void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num);
 		}
 	}
 }
