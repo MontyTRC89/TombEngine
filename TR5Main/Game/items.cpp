@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "items.h"
-#include "constants.h"
 #include "effect2.h"
 #include "setup.h"
 #include "level.h"
@@ -212,8 +211,7 @@ void KillEffect(short fxNumber)
 	else
 	{
 		FX_INFO* fx = &Effects[fxNumber];
-
-		DetatchSpark(fxNumber, 128); // TODO: SP_FX have the value 64 but there it's 128 !!
+		DetatchSpark(fxNumber, SP_FX);
 
 		if (NextFxActive == fxNumber)
 		{

@@ -10,6 +10,8 @@
 #include "sphere.h"
 #include "people.h"
 #include "sound.h"
+#include "trmath.h"
+#include "objectslist.h"
 
 extern Inventory* g_Inventory;
 BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
@@ -136,11 +138,11 @@ void SentryGunControl(short itemNum)
 
 				if (Targetable(item, &info))
 				{
-					if (info.distance < SQUARE(9 * WALL_SIZE))
+					if (info.distance < SQUARE(SECTOR(9)))
 					{
 						if (!g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
 						{
-							if (info.distance <= SQUARE(2048))
+							if (info.distance <= SQUARE(SECTOR(2)))
 							{
 								// Throw fire
 								SentryGunThrowFire(item);

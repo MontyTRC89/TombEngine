@@ -27,6 +27,7 @@ typedef struct OBJECT_TEXTURE
 	struct OBJECT_TEXTURE_VERT vertices[4];
 };
 
+#pragma pack(push, 1)
 struct tr_object_texture_vert
 {
 	byte Xcoordinate; // 1 if Xpixel is the low value, 255 if Xpixel is the high value in the object texture
@@ -47,6 +48,7 @@ struct tr4_object_texture
 	int Height;    // Actually height-1
 	short Padding;
 };
+#pragma pack(pop)
 
 typedef struct AIOBJECT
 {

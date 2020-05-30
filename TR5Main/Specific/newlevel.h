@@ -1,6 +1,7 @@
 #pragma once
 #include "sound.h"
 #include "ChunkId.h"
+#include "ChunkReader.h"
 #include "Streams.h"
 
 struct TrTexturePage 

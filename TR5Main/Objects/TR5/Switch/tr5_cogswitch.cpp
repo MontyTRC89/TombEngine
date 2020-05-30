@@ -6,8 +6,9 @@
 #include "lara.h"
 #include "items.h"
 #include "sound.h"
+#include "door.h"
 
-static PHD_VECTOR CogSwitchPos = { 0, 0, -856 };
+static PHD_VECTOR CogSwitchPos(0, 0, -856);
 static short CogSwitchBounds[12] =
 {
 	0xFE00, 0x0200, 0x0000, 0x0000, 0xFA00, 0xFE00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,

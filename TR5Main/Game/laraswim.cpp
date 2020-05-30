@@ -15,6 +15,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include "GameFlowScript.h"
 
 typedef struct SUBSUIT_INFO
 {
