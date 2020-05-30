@@ -1,14 +1,16 @@
 #include "framework.h"
-#include "newlevel.h"
+#include "levelloader.h"
 #include "ChunkId.h"
 #include "ChunkReader.h"
+#include "level.h"
+#include <Specific\setup.h>
 
-TrLevel::TrLevel(string filename)
+LevelLoader::LevelLoader(string filename)
 {
 	m_filename = filename;
 }
 
-TrLevel::~TrLevel()
+LevelLoader::~LevelLoader()
 {
 	delete m_chunkTextureAtlas;
 	delete m_chunkTextureColor;
@@ -57,9 +59,10 @@ TrLevel::~TrLevel()
 	delete m_chunkDummy;
 	delete m_chunkAnimatedTextureSequence;
 	delete m_chunkAnimatedTextureFrame;
+	delete m_chunkFloorData;
 }
 
-bool TrLevel::Load()
+bool LevelLoader::Load()
 {
 	m_stream = new FileStream((char*)m_filename.c_str(), true, false);
 	m_reader = new ChunkReader(m_magicNumber, m_stream);
@@ -72,6 +75,22 @@ bool TrLevel::Load()
 			return readAnimatedTextureSequence();
 		else if (id->EqualsTo(m_chunkRoom))
 			return readRoom();
+		else if (id->EqualsTo(m_chunkFloorData))
+			return readRoom();
+		else if (id->EqualsTo(m_chunkMesh))
+			return readMesh();
+		else if (id->EqualsTo(m_chunkBone))
+			return readBone();
+		else if (id->EqualsTo(m_chunkStateChange))
+			return readChange();
+		else if (id->EqualsTo(m_chunkAnimDispatch))
+			return readDispatch();
+		else if (id->EqualsTo(m_chunkKeyFrame))
+			return readKeyFrame();
+		else if (id->EqualsTo(m_chunkAnimCommand))
+			return readCommand();
+		else if (id->EqualsTo(m_chunkAnimation))
+			return readAnimation();
 		else if (id->EqualsTo(m_chunkMoveable))
 			return readMoveable();
 		else if (id->EqualsTo(m_chunkStatic))
@@ -94,8 +113,12 @@ bool TrLevel::Load()
 			return readSoundMap();
 		else if (id->EqualsTo(m_chunkSoundDetail))
 			return readSoundDetail();
+		else if (id->EqualsTo(m_chunkSample))
+			return readSample();
 		else if (id->EqualsTo(m_chunkBox))
 			return readBox();
+		else if (id->EqualsTo(m_chunkOverlap))
+			return readOverlap();
 		else if (id->EqualsTo(m_chunkZone))
 			return readZones();
 		else
@@ -111,7 +134,7 @@ bool TrLevel::Load()
 
 ChunkReader* m_reader;
 
-bool TrLevel::readTexture()
+bool LevelLoader::readTexture()
 {
 	TrTexturePage texture;
 
@@ -135,11 +158,12 @@ bool TrLevel::readTexture()
 		}
 		}, 0);
 
-	textures.push_back(texture);
+	m_level.textures.push_back(texture);
+
 	return true;
 }
 
-bool TrLevel::readAnimatedTextureSequence()
+bool LevelLoader::readAnimatedTextureSequence()
 {
 	TrAnimatedTexturesSequence sequence;
 
@@ -170,11 +194,12 @@ bool TrLevel::readAnimatedTextureSequence()
 		}
 		}, 0);
 
-	animatedTextures.push_back(sequence);
+	m_level.animatedTextures.push_back(sequence);
+
 	return true;
 }
 
-bool TrLevel::readRoom()
+bool LevelLoader::readRoom()
 {
 	TrRoom room;
 
@@ -238,7 +263,10 @@ bool TrLevel::readRoom()
 		else if (id->EqualsTo(m_chunkRoomSector))
 		{
 			TrSector sector;
-			m_stream->ReadInt32(&sector.boxIndex);
+
+			m_stream->ReadInt32(&sector.floorDataIndex);
+			m_stream->ReadInt32(&sector.floorDataCount);
+			m_stream->ReadInt32(&sector.box);
 			m_stream->ReadInt32(&sector.pathfindingFlags);
 			m_stream->ReadInt32(&sector.stepSound);
 			m_stream->ReadInt32(&sector.roomBelow);
@@ -265,7 +293,7 @@ bool TrLevel::readRoom()
 	return true;
 }
 
-bool TrLevel::readBucket(TrBucket* bucket)
+bool LevelLoader::readBucket(TrBucket* bucket)
 {
 	m_reader->ReadChunks([this, bucket](ChunkId * id, long size, int arg) {
 		if (id->EqualsTo(m_chunkMaterial))
@@ -371,15 +399,30 @@ bool TrLevel::readBucket(TrBucket* bucket)
 	return true;
 }
 
-bool TrLevel::readMesh(TrMesh* mesh)
+bool LevelLoader::readFloorData()
 {
-	m_stream->ReadBoundingSphere(&mesh->sphere);
-	m_reader->ReadChunks([this, mesh](ChunkId * id, long size, int arg) {
+	int count;
+	m_stream->ReadInt32(&count);
+	for (int i = 0; i < count; i++)
+	{
+		int data;
+		m_stream->ReadInt32(&data);
+		m_level.floorData.push_back(data);
+	}
+	return true;
+}
+
+bool LevelLoader::readMesh()
+{
+	TrMesh mesh;
+
+	m_stream->ReadBoundingSphere(&mesh.sphere);
+	m_reader->ReadChunks([this, &mesh](ChunkId * id, long size, int arg) {
 		if (id->EqualsTo(m_chunkBucket))
 		{
 			TrBucket bucket;
 			readBucket(&bucket);
-			mesh->buckets.push_back(bucket);
+			mesh.buckets.push_back(bucket);
 			return true;
 		}
 		else
@@ -387,23 +430,36 @@ bool TrLevel::readMesh(TrMesh* mesh)
 			return false;
 		}
 		}, 0);
+	m_level.meshes.push_back(mesh);
+
 	return true;
 }
 
-bool TrLevel::readAnimation(TrAnimation* animation)
+bool LevelLoader::readAnimation()
 {
-	m_stream->ReadInt32(&animation->framerate);
-	m_stream->ReadInt32(&animation->state);
-	m_stream->ReadInt32(&animation->nextAnimation);
-	m_stream->ReadInt32(&animation->nextFrame);
-	m_stream->ReadInt32(&animation->frameStart);
-	m_stream->ReadInt32(&animation->frameEnd);
-	m_stream->ReadFloat(&animation->speed);
-	m_stream->ReadFloat(&animation->acceleration);
-	m_stream->ReadFloat(&animation->lateralSpeed);
-	m_stream->ReadFloat(&animation->lateralAcceleration);
+	TrAnimation animation;
 
-	m_reader->ReadChunks([this, animation](ChunkId * id, long size, int arg) {
+	m_stream->ReadInt32(&animation.framerate);
+	m_stream->ReadInt32(&animation.state);
+	m_stream->ReadInt32(&animation.nextAnimation);
+	m_stream->ReadInt32(&animation.nextFrame);
+	m_stream->ReadInt32(&animation.frameBase);
+	m_stream->ReadInt32(&animation.frameEnd);
+	m_stream->ReadFloat(&animation.speed);
+	m_stream->ReadFloat(&animation.acceleration);
+	m_stream->ReadFloat(&animation.lateralSpeed);
+	m_stream->ReadFloat(&animation.lateralAcceleration);
+	m_stream->ReadInt32(&animation.framesIndex);
+	m_stream->ReadInt32(&animation.framesCount);
+	m_stream->ReadInt32(&animation.changesIndex);
+	m_stream->ReadInt32(&animation.changesCount);
+	m_stream->ReadInt32(&animation.commandsIndex);
+	m_stream->ReadInt32(&animation.commandsCount);
+
+	m_reader->ReadChunks([this, &animation](ChunkId * id, long size, int arg) {
+		return false;
+
+		/*
 		if (id->EqualsTo(m_chunkKeyFrame))
 		{
 			TrKeyFrame kf;
@@ -470,20 +526,112 @@ bool TrLevel::readAnimation(TrAnimation* animation)
 		else
 		{
 			return false;
-		}
+		}*/
 		}, 0);
+
+	m_level.animations.push_back(animation);
 
 	return true;
 }
 
-bool TrLevel::readMoveable()
+bool LevelLoader::readChange()
+{
+	TrStateChange change;
+
+	m_stream->ReadInt32(&change.state);
+	m_stream->ReadInt32(&change.dispatchIndex);
+	m_stream->ReadInt32(&change.dispatchCount);
+
+	m_reader->ReadChunks([this, &change](ChunkId * id, long size, int arg) {
+		return false;
+		}, 0);
+
+	m_level.changes.push_back(change);
+
+	return true;
+}
+
+bool LevelLoader::readDispatch()
+{
+	TrAnimDispatch dispatch;
+
+	m_stream->ReadInt32(&dispatch.inFrame);
+	m_stream->ReadInt32(&dispatch.outFrame);
+	m_stream->ReadInt32(&dispatch.nextAnimation);
+	m_stream->ReadInt32(&dispatch.nextFrame);
+
+	m_level.dispatches.push_back(dispatch);
+
+	return true;
+}
+
+bool LevelLoader::readBone()
+{
+	TrBone bone;
+
+	m_stream->ReadInt32(&bone.opcode);
+	m_stream->ReadVector3(&bone.offset);
+
+	m_level.bones.push_back(bone);
+
+	return true;
+}
+
+bool LevelLoader::readCommand()
+{
+	TrAnimCommand cmd;
+
+	m_stream->ReadInt32(&cmd.type);
+	m_stream->ReadInt32(&cmd.frame);
+	int count = 0;
+	m_stream->ReadInt32(&count);
+	for (int i = 0; i < count; i++)
+	{
+		int p;
+		m_stream->ReadInt32(&p);
+		cmd.params.push_back(p);
+	}
+
+	m_level.commands.push_back(cmd);
+
+	return true;
+}
+
+bool LevelLoader::readKeyFrame()
+{
+	TrKeyFrame kf;
+
+	m_stream->ReadVector3(&kf.origin);
+	m_stream->ReadBoundingBox(&kf.boundingBox);
+	int count = 0;
+	m_stream->ReadInt32(&count);
+	for (int i = 0; i < count; i++)
+	{
+		Quaternion q;
+		m_stream->ReadQuaternion(&q);
+		kf.angles.push_back(q);
+	}
+
+	m_level.frames.push_back(kf);
+	
+	return true;
+}
+
+bool LevelLoader::readMoveable()
 {
 	TrMoveable moveable;
 
 	m_stream->ReadInt32(&moveable.id);
+	m_stream->ReadInt32(&moveable.meshIndex);
+	m_stream->ReadInt32(&moveable.meshCount);
+	m_stream->ReadInt32(&moveable.bonesIndex);
+	m_stream->ReadInt32(&moveable.bonesCount);
+	m_stream->ReadInt32(&moveable.animationIndex);
+	m_stream->ReadInt32(&moveable.animationCount);
 
 	m_reader->ReadChunks([this, &moveable](ChunkId * id, long size, int arg) {
-		if (id->EqualsTo(m_chunkMesh))
+		return false;
+		/*if (id->EqualsTo(m_chunkMesh))
 		{
 			TrMesh mesh;
 			readMesh(&mesh);
@@ -508,23 +656,26 @@ bool TrLevel::readMoveable()
 		else
 		{
 			return false;
-		}
+		}*/
 		}, 0);
 
-	moveables.push_back(moveable);
+	m_level.moveables.push_back(moveable);
 
 	return true;
 }
 
-bool TrLevel::readStatic()
+bool LevelLoader::readStatic()
 {
 	TrStatic st;
 
 	m_stream->ReadInt32(&st.id);
 	m_stream->ReadBoundingBox(&st.visibilityBox);
 	m_stream->ReadBoundingBox(&st.collisionBox);
+	m_stream->ReadInt32(&st.meshNumber);
+	m_stream->ReadInt32(&st.meshCount);
+
 	m_reader->ReadChunks([this, &st](ChunkId * id, long size, int arg) {
-		if (id->EqualsTo(m_chunkMesh))
+		/*if (id->EqualsTo(m_chunkMesh))
 		{
 			TrMesh mesh;
 			readMesh(&mesh);
@@ -534,22 +685,26 @@ bool TrLevel::readStatic()
 		else
 		{
 			return false;
-		}
+		}*/
+		return false;
 		}, 0);
 	
-	statics.push_back(st);
+	m_level.statics.push_back(st);
 
 	return true;
 }
 
 
-bool TrLevel::readSpriteSequence()
+bool LevelLoader::readSpriteSequence()
 {
 	TrSpriteSequence sequence;
 
 	m_stream->ReadInt32(&sequence.id);
+	m_stream->ReadInt32(&sequence.spritesIndex);
+	m_stream->ReadInt32(&sequence.spritesCount);
+
 	m_reader->ReadChunks([this, &sequence](ChunkId * id, long size, int arg) {
-		if (id->EqualsTo(m_chunkSprite))
+		/*if (id->EqualsTo(m_chunkSprite))
 		{
 			TrSprite sprite;
 
@@ -568,51 +723,55 @@ bool TrLevel::readSpriteSequence()
 		else
 		{
 			return false;
-		}
+		}*/
+
+		return false;
 		}, 0);
 
-	spriteSequences.push_back(sequence);
+	m_level.spriteSequences.push_back(sequence);
 
 	return true;
 }
 
-bool  TrLevel::readItem()
+bool  LevelLoader::readItem()
 {
 	TrItem item;
 
 	m_stream->ReadString(&item.name);
 	m_stream->ReadVector3(&item.position);
 	m_stream->ReadQuaternion(&item.rotation);
+	m_stream->ReadFloat(&item.angle);
 	m_stream->ReadVector3(&item.scale);
 	m_stream->ReadVector3(&item.color);
 	m_stream->ReadInt32(&item.roomNumber);
 	m_stream->ReadInt32(&item.objectNumber);
 	m_stream->ReadString(&item.script);
 
-	items.push_back(item);
+	m_level.items.push_back(item);
 
 	return true;
 }
 
-bool TrLevel::readAiItem()
+bool LevelLoader::readAiItem()
 {
 	TrItem item;
 
 	m_stream->ReadString(&item.name);
 	m_stream->ReadVector3(&item.position);
 	m_stream->ReadQuaternion(&item.rotation);
+	m_stream->ReadFloat(&item.angle);
 	m_stream->ReadVector3(&item.scale);
 	m_stream->ReadVector3(&item.color);
 	m_stream->ReadInt32(&item.roomNumber);
 	m_stream->ReadInt32(&item.objectNumber);
 	m_stream->ReadString(&item.script);
 
-	aiItems.push_back(item);
+	m_level.aiItems.push_back(item);
 
 	return true;
 }
 
-bool  TrLevel::readSink()
+bool  LevelLoader::readSink()
 {
 	TrSink sink;
 
@@ -624,12 +783,12 @@ bool  TrLevel::readSink()
 
 	m_reader->ReadChunks([this, sink](ChunkId * id, long size, int arg) { return false; }, 0);
 
-	sinks.push_back(sink);
+	m_level.sinks.push_back(sink);
 
 	return true;
 }
 
-bool  TrLevel::readCamera()
+bool  LevelLoader::readCamera()
 {
 	TrCamera camera;
 
@@ -642,12 +801,12 @@ bool  TrLevel::readCamera()
 
 	m_reader->ReadChunks([this, camera](ChunkId * id, long size, int arg) { return false; }, 0);
 
-	cameras.push_back(camera);
+	m_level.cameras.push_back(camera);
 
 	return true;
 }
 
-bool  TrLevel::readFlybyCamera()
+bool  LevelLoader::readFlybyCamera()
 {
 	TrFlybyCamera camera;
 
@@ -666,12 +825,12 @@ bool  TrLevel::readFlybyCamera()
 
 	m_reader->ReadChunks([this, camera](ChunkId * id, long size, int arg) { return false; }, 0);
 
-	flybyCameras.push_back(camera);
+	m_level.flybyCameras.push_back(camera);
 
 	return true;
 }
 
-bool  TrLevel::readSoundSource()
+bool  LevelLoader::readSoundSource()
 {
 	TrSoundSource soundSource;
 
@@ -683,12 +842,12 @@ bool  TrLevel::readSoundSource()
 
 	m_reader->ReadChunks([this, soundSource](ChunkId * id, long size, int arg) { return false; }, 0);
 
-	soundSources.push_back(soundSource);
+	m_level.soundSources.push_back(soundSource);
 
 	return true;
 }
 
-bool  TrLevel::readBox()
+bool  LevelLoader::readBox()
 {
 	TrBox box;
 
@@ -714,26 +873,26 @@ bool  TrLevel::readBox()
 		}
 		}, 0);
 
-	boxes.push_back(box);
+	m_level.boxes.push_back(box);
 
 	return true;
 }
 
-bool  TrLevel::readZones()
+bool  LevelLoader::readZones()
 {
-	for (int z = 0; z < 5; z++)
-		for (int a = 0; a < 2; a++)
-			for (int b = 0; b < boxes.size(); b++)
+	for (int a = 0; a < 2; a++)
+		for (int z = 0; z < 5; z++)
+			for (int b = 0; b < m_level.boxes.size(); b++)
 			{
 				int zone;
 				m_stream->ReadInt32(&zone);
-				zones.push_back(zone);
+				m_level.zones[z][a].push_back(zone);
 			}
 
 	return true;
 }
 
-bool  TrLevel::readSoundMap()
+bool  LevelLoader::readSoundMap()
 {
 	int count;
 	m_stream->ReadInt32(&count);
@@ -741,13 +900,13 @@ bool  TrLevel::readSoundMap()
 	{
 		int sound;
 		m_stream->ReadInt32(&sound);
-		soundMap.push_back(sound);
+		m_level.soundMap.push_back(sound);
 	}
 
 	return true;
 }
 
-bool  TrLevel::readSoundDetail()
+bool  LevelLoader::readSoundDetail()
 {
 	TrSoundDetails detail;
 
@@ -761,7 +920,7 @@ bool  TrLevel::readSoundDetail()
 	m_stream->ReadByte(&detail.loop);
 
 	m_reader->ReadChunks([this, &detail](ChunkId * id, long size, int arg) {
-		if (id->EqualsTo(m_chunkSample))
+		/*if (id->EqualsTo(m_chunkSample))
 		{
 			TrSample sample;
 
@@ -777,10 +936,40 @@ bool  TrLevel::readSoundDetail()
 		else
 		{
 			return false;
-		}
+		}*/
+		return false;
 		}, 0); 
 
-	soundDetails.push_back(detail);
+	m_level.soundDetails.push_back(detail);
+
+	return true;
+}
+
+bool LevelLoader::readSample()
+{
+	TrSample sample;
+
+	m_stream->ReadInt32(&sample.uncompressedSize);
+	m_stream->ReadInt32(&sample.compressedSize);
+	sample.data = (byte*)malloc(sample.compressedSize);
+	m_stream->ReadBytes(sample.data, sample.compressedSize);
+
+	Sound_LoadSample((char*)sample.data, sample.compressedSize, sample.uncompressedSize, m_numSamples);
+	m_numSamples++;
+
+	return true;
+}
+
+bool LevelLoader::readOverlap()
+{
+	TrOverlap overlap;
+
+	m_stream->ReadInt32(&overlap.box);
+	m_stream->ReadInt32(&overlap.flags);
+
+	m_reader->ReadChunks([this, &overlap](ChunkId * id, long size, int arg) { return false; }, 0);
+
+	m_level.overlaps.push_back(overlap);
 
 	return true;
 }
