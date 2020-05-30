@@ -6615,15 +6615,17 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	{
 		if (Lara.canMonkeySwing)
 		{
-			int h = (Rooms->maxceiling) - (item->pos.yPos);
+			FLOOR_INFO* F;
+			int c, h;
+			F = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+			c = GetCeiling(F, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			h = (c) - (item->pos.yPos);
 			if (h > 1792 ||
 				h < -1792 ||
 				abs(h) == 768)
 			{
 				return 0;
 			}
-
-
 			item->animNumber = ANIMATION_LARA_STAY_IDLE;
 			item->frameNumber = Anims[ANIMATION_LARA_STAY_IDLE].frameBase;
 			item->goalAnimState = STATE_LARA_JUMP_UP;
