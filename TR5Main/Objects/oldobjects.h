@@ -1,6 +1,6 @@
 #pragma once
-
 #include "collide.h"
+#include "effect.h"
 
 void InitialiseRaisingBlock(short itemNumber);
 void ControlRaisingBlock(short itemNumber);
@@ -8,7 +8,7 @@ void InitialiseTeethSpikes(short itemNumber);
 int CollidedWithTeethSpikes(ITEM_INFO* item);
 void ControlTeethSpikes(short itemNumber);
 void PulseLightControl(short itemNumber);
-void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int rot, __int16 roomNumber, __int16 falloff);
+void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int rot, short roomNumber, short falloff);
 void StrobeLightControl(short itemNumber);
 void ColorLightControl(short itemNumber);
 void ElectricalLightControl(short itemNumber);

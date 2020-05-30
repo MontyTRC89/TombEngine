@@ -3082,7 +3082,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 	if (1 << Node & item->meshBits)
 	{
 		Num = bits;
-		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7))
+		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 		{
 			SoundEffect(SFX_SMASH_METAL, &item->pos, 0);
 		}
@@ -3097,7 +3097,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		ShatterItem.sphere.x = CreatureSpheres[Node].x;
 		ShatterItem.sphere.y = CreatureSpheres[Node].y;
 		ShatterItem.sphere.z = CreatureSpheres[Node].z;
-		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData; // TODO: remove it or at last change it with the new renderer light...
+		ShatterItem.il = (ITEM_LIGHT*) &item->legacyLightData; // TODO: remove it or at last change it with the new renderer light...
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x,(float)ShatterItem.sphere.y,(float)ShatterItem.sphere.z };
@@ -3254,13 +3254,10 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += deltaAngle >> shift;
 }
 
-#define OutsideRoomTable VAR_U_(0x00EEF4AC, unsigned char*)
-#define OutsideRoomOffsets ARRAY_(0x00EEF040, short, [27 * 27])
-
 int IsRoomOutside(int x, int y, int z)
 {
 	return 0;
-
+	/*
 	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
 	if (offset == -1)
 		return -2;
@@ -3321,5 +3318,5 @@ int IsRoomOutside(int x, int y, int z)
 			s++;
 		}
 		return -2;
-	}
+	}*/
 }

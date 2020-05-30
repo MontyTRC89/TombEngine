@@ -372,6 +372,11 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 	}
 }
 
+void DrawFlareInAir(ITEM_INFO* item)
+{
+	printf("DrawFlareInAir() not implemented !");
+}
+
 void DoFlareInHand(int flare_age) // (AF) (D)
 {
 	PHD_VECTOR pos;

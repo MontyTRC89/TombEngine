@@ -7,11 +7,11 @@
 #include "tomb4fx.h"
 #include "items.h"
 #include "collide.h"
+#include "objectslist.h"
 
 void InitialiseMine(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
-
 	if (item->triggerFlags)
 		item->meshBits = 0;
 }
@@ -25,7 +25,7 @@ void MineControl(short itemNum)
 	{
 		SoundEffect(SFX_EXPLOSION1, &item->pos, 0);
 		SoundEffect(SFX_EXPLOSION2, &item->pos, 0);
-		SoundEffect(SFX_EXPLOSION1, &item->pos, 0x1800004);
+		SoundEffect(SFX_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
 
 		if (num > 0)
 		{
