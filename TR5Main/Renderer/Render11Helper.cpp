@@ -1,15 +1,18 @@
-#pragma once
+#include "framework.h"
 #include "Renderer11.h"
-#include "../Specific/configuration.h"
-#include "../Game/camera.h"
-#include "../Game/draw.h"
-#include "../Specific/setup.h"
-#include "..\Specific\level.h"
-#include "../Game/control.h"
-#include "../Game/lara.h"
-#include "../Game/sphere.h"
+#include "configuration.h"
+#include "camera.h"
+#include "draw.h"
+#include "setup.h"
+#include "level.h"
+#include "control.h"
+#include "lara.h"
+#include "sphere.h"
+#include "GameFlowScript.h"
+
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
+
 bool Renderer11::isRoomUnderwater(short roomNumber)
 {
 	return (m_rooms[roomNumber].Room->flags & ENV_FLAG_WATER);

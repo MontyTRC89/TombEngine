@@ -1,13 +1,14 @@
+#include "framework.h"
 #include "tomb4fx.h"
-#include "../Global/global.h"
 #include "lara.h"
 #include "effect2.h"
 #include "draw.h"
-#include "items.h"
-#include "../Specific/setup.h"
-#include "..\Specific\level.h"
+#include "setup.h"
+#include "level.h"
 #include "sound.h"
 #include "bubble.h"
+#include "trmath.h"
+#include "GameFlowScript.h"
 
 char FlareTable[121] =
 {
@@ -45,11 +46,7 @@ BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 DRIP_STRUCT Drips[MAX_DRIPS]; 
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
 FIRE_LIST Fires[MAX_FIRE_LIST];
-ENERGY_ARC EnergyArcs[MAX_ENERGY_ARCS];
-
-extern int NextSpark;
-extern SPARKS Sparks[MAX_SPARKS];
-extern Renderer11* g_Renderer;
+ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
 
 int GetFreeFireSpark()
 {
@@ -116,7 +113,7 @@ void TriggerGlobalStaticFlame()
 	spark->xVel = 0;
 	spark->yVel = 0;
 	spark->zVel = 0;
-	spark->flags = 0;
+	spark->flags = SP_NONE;
 	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 0x1F) + -128;
 }
 
@@ -153,7 +150,7 @@ void TriggerGlobalFireSmoke()
 	}
 	else
 	{
-		spark->flags = 0;
+		spark->flags = SP_NONE;
 	}
 
 	spark->gravity = -16 - (GetRandomControl() & 0xF);
@@ -196,7 +193,7 @@ void TriggerGlobalFireFlame()
 	}
 	else
 	{
-		spark->flags = 0;
+		spark->flags = SP_NONE;
 	}
 
 	spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
@@ -331,7 +328,7 @@ void UpdateFireSparks()
 
 void UpdateEnergyArcs()
 {
-	for (int i = 0; i < MAX_ENERGY_ARCS; i++)
+	for (int i = 0; i < MAX_ENERGYARCS; i++)
 	{
 		ENERGY_ARC* arc = &EnergyArcs[i];
 
@@ -487,7 +484,7 @@ byte TriggerGunSmoke_SubFunction(int weaponType)
 	case WEAPON_HK:
 	case WEAPON_ROCKET_LAUNCHER:
 	case WEAPON_GRENADE_LAUNCHER:
-		return 0x18; //(12) Rocket and Grenade value for TriggerGunSmoke in TR3 have the value 12 ! (the HK is not included there)
+		return 24; //(12) Rocket and Grenade value for TriggerGunSmoke in TR3 have the value 12 ! (the HK is not included there)
 
 	// other weapon
 	default:
@@ -514,7 +511,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 			spark->dShade = 64;
 	}
 
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->x = x + (GetRandomControl() & 31) - 16;
 	spark->y = y + (GetRandomControl() & 31) - 16;
 	spark->z = z + (GetRandomControl() & 31) - 16;
@@ -555,7 +552,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	}
 	else
 	{
-		spark->flags = 0;
+		spark->flags = SP_NONE;
 	}
 	float gravity = frand() * 1.25f;
 	spark->gravity = gravity;
@@ -595,7 +592,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->colFadeSpeed = 4;
 	spark->dShade = (GetRandomControl() & 0x1F) + 64;
 	spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -620,7 +617,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 	}
 	else
 	{
-		spark->flags = 0;
+		spark->flags = SP_NONE;
 	}
 
 	spark->gravity = -4 - (GetRandomControl() & 3);
@@ -1026,13 +1023,13 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->fadeToBlack = 8;
 		spark->life = 24;
 		spark->sLife = 24;
-		spark->transType = 2;	
+		spark->transType = COLADD;	
 		int random = GetRandomControl();
 		spark->xVel = -rcossin_tbl[2 * random] >> 5;
 		spark->yVel = -640 - GetRandomControl();
 		spark->zVel = rcossin_tbl[2 * random & 0xFFF + 1] >> 5;	
 		spark->friction = 5;
-		spark->flags = 0;
+		spark->flags = SP_NONE;
 		spark->x = x + (spark->xVel >> 3);
 		spark->y = y - (spark->yVel >> 5);
 		spark->z = z + (spark->zVel >> 3);
@@ -1040,10 +1037,6 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->gravity = (GetRandomControl() & 0xF) + 64;
 	}
 }
-
-
-
-
 
 void LaraBubbles(ITEM_INFO* item)// (F)
 {
@@ -1201,7 +1194,7 @@ void TriggerLaraDrips()// (F)
 	}
 }
 
-int ExplodingDeath(short itemNumber, int meshBits, short damage)
+int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->objectNumber];
@@ -1234,7 +1227,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 	int bits = 1;
 	if (meshBits & 1 && item->meshBits & 1)
 	{
-		if (damage & 0x100 || !(GetRandomControl() & 3))
+		if (flags & 0x100 || !(GetRandomControl() & 3))
 		{
 			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, 0);
 			
@@ -1250,24 +1243,24 @@ int ExplodingDeath(short itemNumber, int meshBits, short damage)
 				fx->pos.zRot = 0;
 				fx->pos.xRot = 0;
 
-				if (damage & 0x10)
+				if (flags & 0x10)
 				{
 					fx->speed = 0;
 				}
 				else
 				{
-					if (damage & 0x20)
+					if (flags & 0x20)
 						fx->speed = GetRandomControl() >> 12;
 					else
 						fx->speed = GetRandomControl() >> 8;
 				}
-				if (damage & 0x40)
+				if (flags & 0x40)
 				{
 					fx->fallspeed = 0;
 				}
 				else
 				{
-					if ((damage & 0x80u) == 0)
+					if ((flags & 0x80u) == 0)
 						fx->fallspeed = -(GetRandomControl() >> 8);
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);
@@ -1523,7 +1516,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 		spark->sB = 0;
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 12;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->x = x;
 		spark->y = y;
 		spark->z = z;
@@ -1580,7 +1573,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 	spark->fadeToBlack = 64;
 	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
 	if (unk)
-		spark->transType = 2;
+		spark->transType = COLADD;
 	else
 		spark->transType = 3;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
@@ -1645,7 +1638,7 @@ void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b
 	spark->dR = r;
 	spark->sR = r;
 	spark->colFadeSpeed = 2;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->on = 1;
 	spark->dB = b;
 	spark->sB = b;
@@ -1680,7 +1673,7 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)//(F)
 
 	spark->life = (GetRandomControl() & 7) + 24;
 	spark->sLife = (GetRandomControl() & 7) + 24;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->dynamic = -1;
 
 	spark->x = x;
@@ -1700,7 +1693,7 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)//(F)
 		spark->friction = 4;
 	}
 
-	spark->flags = 0;
+	spark->flags = SP_NONE;
 	spark->gravity = (GetRandomControl() & 0xF) + ((crane << 4) + 16);
 	spark->maxYvel = 0;
 }
@@ -1730,7 +1723,7 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 		sptr->life = 24;
 		sptr->sLife = 24;
 
-		sptr->transType = 2;
+		sptr->transType = COLADD;
 
 		angle = GetRandomControl() << 3;
 
@@ -1754,7 +1747,7 @@ ENERGY_ARC* TriggerEnergyArc(PHD_VECTOR* start, PHD_VECTOR* end, byte r, byte g,
 {
 	ENERGY_ARC* arc = NULL;
 
-	for (int i = 0; i < 16; i++) 
+	for (int i = 0; i < MAX_ENERGYARCS; i++)
 	{
 		arc = &EnergyArcs[i];
 		if (arc->life == 0)

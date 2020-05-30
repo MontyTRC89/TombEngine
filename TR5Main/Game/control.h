@@ -1,14 +1,69 @@
 #pragma once
+#include "phd_global.h"
+#include "items.h"
+#include "room.h"
 
-#include "..\Global\global.h"
+enum GAME_STATUS
+{
+	GAME_STATUS_NONE,
+	GAME_STATUS_NEW_GAME,
+	GAME_STATUS_LOAD_GAME,
+	GAME_STATUS_SAVE_GAME,
+	GAME_STATUS_EXIT_TO_TITLE,
+	GAME_STATUS_EXIT_GAME,
+	GAME_STATUS_LARA_DEAD,
+	GAME_STATUS_LEVEL_COMPLETED
+};
 
-#define TRIG_BITS(T) ((T & 0x3fff) >> 10)
+enum COLL_TYPE
+{
+	CT_NONE = 0,				// 0x00
+	CT_FRONT = (1 << 0),		// 0x01
+	CT_LEFT = (1 << 1),			// 0x02
+	CT_RIGHT = (1 << 2),		// 0x04
+	CT_TOP = (1 << 3),			// 0x08
+	CT_TOP_FRONT = (1 << 4),	// 0x10
+	CT_CLAMP = (1 << 5)			// 0x20
+};
+
+enum HEIGHT_TYPES
+{
+	WALL,
+	SMALL_SLOPE,
+	BIG_SLOPE,
+	DIAGONAL,
+	SPLIT_TRI
+};
+
+enum HEADINGS
+{
+	NORTH,
+	EAST,
+	SOUTH,
+	WEST
+};
+
+enum COMMAND_TYPES
+{
+	COMMAND_NULL = 0,
+	COMMAND_MOVE_ORIGIN,
+	COMMAND_JUMP_VELOCITY,
+	COMMAND_ATTACK_READY,
+	COMMAND_DEACTIVATE,
+	COMMAND_SOUND_FX,
+	COMMAND_EFFECT
+};
+
+#define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 
 extern int KeyTriggerActive;
 extern byte IsAtmospherePlaying;
 extern byte FlipStatus;
-extern int FlipStats[255];
-extern int FlipMap[255];
+
+constexpr auto MAX_FLIPMAP = 255;
+extern int FlipStats[MAX_FLIPMAP];
+extern int FlipMap[MAX_FLIPMAP];
+
 extern bool InItemControlLoop;
 extern short ItemNewRoomNo;
 extern short ItemNewRooms[512];
@@ -42,7 +97,7 @@ extern int InitialiseGame;
 extern int RequiredStartPos;
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
-extern int HeightType;
+extern HEIGHT_TYPES HeightType;
 extern int HeavyTriggered;
 extern short SkyPos1;
 extern short SkyPos2;
@@ -54,9 +109,9 @@ extern int CutSeqNum;
 extern int CutSeqTriggered;
 extern int GlobalPlayingCutscene;
 extern int CurrentLevel;
-extern int SoundActive;
-extern int DoTheGame;
-extern int Unk_876C48;
+extern bool SoundActive;
+extern bool DoTheGame;
+extern bool ThreadEnded;
 extern int OnFloor;
 extern int SmokeWindX;
 extern int SmokeWindZ;
@@ -122,4 +177,4 @@ int is_object_in_room(short roomNumber, short objectNumber);
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 int IsRoomOutside(int x, int y, int z);
 
-unsigned __stdcall GameMain(void*);
+unsigned CALLBACK GameMain(void*);

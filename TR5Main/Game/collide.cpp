@@ -1,34 +1,32 @@
+#include "framework.h"
 #include "collide.h"
 #include "draw.h"
 #include "Lara.h"
-
-#include "..\Global\global.h"
-
-#include <stdio.h>
 #include "items.h"
-#include "effects.h"
+#include "effect.h"
 #include "sphere.h"
 #include "misc.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "setup.h"
 #include "sound.h"
+#include "trmath.h"
 
-char LM[] = {
-	LJ_HIPS,
-	LJ_LTHIGH,
-	LJ_LSHIN,
-	LJ_LFOOT,
-	LJ_RTHIGH,
-	LJ_RSHIN,
-	LJ_RFOOT,
-	LJ_TORSO,
-	LJ_RINARM,
-	LJ_ROUTARM,
-	LJ_RHAND,
-	LJ_LINARM,
-	LJ_LOUTARM,
-	LJ_LHAND,
-	LJ_HEAD,
+char LM[] =
+{
+	LM_HIPS,
+	LM_LTHIGH,
+	LM_LSHIN,
+	LM_LFOOT,
+	LM_RTHIGH,
+	LM_RSHIN,
+	LM_RFOOT,
+	LM_TORSO,
+	LM_RINARM,
+	LM_ROUTARM,
+	LM_RHAND,
+	LM_LINARM,
+	LM_LOUTARM,
+	LM_LHAND,
+	LM_HEAD,
 };
 
 int XFront, ZFront;
@@ -66,7 +64,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 
 		for (int j = room->numMeshes; j > 0; j--, mesh++)
 		{
-			STATIC_INFO* sInfo = &StaticObjects[mesh->staticNumber];
+			StaticInfo* sInfo = &StaticObjects[mesh->staticNumber];
 			if ((sInfo->flags & 1)) // No collision
 				continue;
 
@@ -141,7 +139,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 			for (int j = 0; j < room->numMeshes; j++)
 			{
 				MESH_INFO* mesh = &room->mesh[j];
-				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
+				StaticInfo* staticMesh = &StaticObjects[mesh->staticNumber];
 
 				if (mesh->Flags & 1)
 				{
@@ -1407,14 +1405,14 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 				if (item->collidable && item->status != ITEM_INVISIBLE)		 
 				{
 					obj = &Objects[item->objectNumber];
-					if (obj->collision)
+					if (obj->collision != nullptr)
 					{
 						int x = l->pos.xPos - item->pos.xPos; 
 						int y = l->pos.yPos - item->pos.yPos;
 						int z = l->pos.zPos - item->pos.zPos;
 						
 						if (x > -3072 && x < 3072 && z > -3072 && z < 3072 && y > -3072 && y < 3072)  
-							(*obj->collision)(itemNumber, l, coll);
+							obj->collision(itemNumber, l, coll);
 					}
 				}
 				itemNumber = item->nextItem;

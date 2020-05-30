@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+
 
 #define NUM_CONTROLS			18
 
@@ -147,6 +147,44 @@
 #define DIK_MYCOMPUTER      0xEB    /* My Computer */
 #define DIK_MAIL            0xEC    /* Mail */
 #define DIK_MEDIASELECT     0xED    /* Media Select */
+
+enum INPUT_BUTTONS
+{
+	IN_NONE = 0,								// 0x00000000
+	IN_FORWARD = (1 << 0),						// 0x00000001
+	IN_BACK = (1 << 1),							// 0x00000002
+	IN_LEFT = (1 << 2),							// 0x00000004
+	IN_RIGHT = (1 << 3),						// 0x00000008
+	IN_JUMP = (1 << 4),							// 0x00000010
+	IN_DRAW = (1 << 5), // Space / Triangle		// 0x00000020
+	IN_ACTION = (1 << 6), // Ctrl / X			// 0x00000040
+	IN_WALK = (1 << 7), // Shift / R1			// 0x00000080
+	IN_OPTION = (1 << 8),						// 0x00000100
+	IN_LOOK = (1 << 9),							// 0x00000200
+	IN_LSTEP = (1 << 10),						// 0x00000400
+	IN_RSTEP = (1 << 11),						// 0x00000800
+	IN_ROLL = (1 << 12), // End / O				// 0x00001000
+	IN_PAUSE = (1 << 13),						// 0x00002000
+	IN_A = (1 << 14),							// 0x00004000
+	IN_B = (1 << 15),							// 0x00008000
+	IN_CHEAT = (1 << 16),						// 0x00010000
+	IN_D = (1 << 17),							// 0x00020000
+	IN_E = (1 << 18),							// 0x00040000
+	IN_FLARE = (1 << 19),						// 0x00080000
+	IN_SELECT = (1 << 20),						// 0x00100000
+	IN_DESELECT = (1 << 21),					// 0x00200000
+	IN_SAVE = (1 << 22), // F5					// 0x00400000
+	IN_LOAD = (1 << 23),  // F6					// 0x00800000
+	IN_STEPSHIFT = (1 << 24),					// 0x01000000
+	IN_LOOKLEFT = (1 << 25),					// 0x02000000
+	IN_LOOKRIGHT = (1 << 26),					// 0x04000000
+	IN_LOOKFORWARD = (1 << 27),					// 0x08000000
+	IN_LOOKBACK = (1 << 28),					// 0x10000000
+	IN_DUCK = (1 << 29),						// 0x20000000
+	IN_SPRINT = (1 << 30),						// 0x40000000
+	IN_LOOKSWITCH = (1 << 31),					// 0x80000000
+	IN_ALL = ~0,								// 0xFFFFFFFF (-1)
+};
 
 enum IKEYS
 {

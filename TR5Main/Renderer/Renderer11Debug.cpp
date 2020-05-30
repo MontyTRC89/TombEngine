@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "Renderer11.h"
 
 bool Renderer11::printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)

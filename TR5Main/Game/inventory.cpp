@@ -1,21 +1,21 @@
+#include "framework.h"
 #include "inventory.h"
 #include "draw.h"
 #include "control.h"
 #include "larafire.h"
-#include "sound.h"
 #include "gameflow.h"
 #include "sound.h"
 #include "savegame.h"
 #include "Lara.h"
 #include "camera.h"
 #include "spotcam.h"
-#include "..\Global\global.h"
-#include "..\Specific\input.h"
-#include "..\Specific\configuration.h"
+
+#include "input.h"
+#include "configuration.h"
 #include "lara1gun.h"
 #include "lara2gun.h"
-#include "../Specific/level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 
 Inventory* g_Inventory;
 extern GameFlow* g_GameFlow;
@@ -261,7 +261,7 @@ void Inventory::LoadObjects(bool isReload)
 
 		for (int j = 0; j < NUM_INVENTORY_OBJECTS_PER_RING; j++)
 		{
-			m_rings[i].objects[j].inventoryObject = -1;
+			m_rings[i].objects[j].inventoryObject = NO_ITEM;
 			m_rings[i].objects[j].rotation = 0;
 			m_rings[i].objects[j].scale = INV_OBJECTS_SCALE;
 		}

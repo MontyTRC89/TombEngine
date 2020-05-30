@@ -1,6 +1,8 @@
+#include "framework.h"
 #include "objlight.h"
 #include "control.h"
 #include "effect2.h"
+#include "trmath.h"
 
 void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, short room, int falloff)
 {

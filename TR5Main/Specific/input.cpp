@@ -1,11 +1,10 @@
+#include "framework.h"
 #include "input.h"
-#include "..\Global\global.h"
-#include <stdio.h>
-#include "..\Game\Lara.h"
+#include "Lara.h"
 #include "winmain.h"
-#include "../Game/camera.h"
-#include "../Game/sound.h"
-#include "../Game/savegame.h"
+#include "camera.h"
+#include "sound.h"
+#include "savegame.h"
 
 const char* g_KeyNames[] = {
 	NULL,		"ESC",	"1",		"2",		"3",		"4",		"5",		"6",
@@ -270,7 +269,8 @@ int S_UpdateInput()// (F)
 
 	if (Lara.gunStatus == LG_READY)
 	{
-		Savegame.AutoTarget = 1; // App.;
+		// TODO: AutoTarget Not Saved
+		//Savegame.AutoTarget = 1;
 
 		if (linput & IN_LOOK)
 		{

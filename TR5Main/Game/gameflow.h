@@ -1,12 +1,8 @@
 #pragma once
-
-#include <vector>
-#include <string>
 #include "savegame.h"
 
-using namespace std;
-
-typedef struct SavegameInfo {
+typedef struct SavegameInfo
+{
 	bool present;
 	char levelName[75];
 	int saveNumber;
@@ -18,6 +14,24 @@ typedef struct SavegameInfo {
 };
 
 #define MAX_SAVEGAMES 16
+
+struct GAMEFLOW
+{
+	unsigned int CheatEnabled : 1;
+	unsigned int LoadSaveEnabled : 1;
+	unsigned int TitleEnabled : 1;
+	unsigned int PlayAnyLevel : 1;
+	unsigned int Language : 3;
+	unsigned int DemoDisc : 1;
+	unsigned int Unused : 24;
+	unsigned int InputTimeout;
+	unsigned char SecurityTag;
+	unsigned char nLevels;
+	unsigned char nFileNames;
+	unsigned char Pad;
+	unsigned short FileNameLen;
+	unsigned short ScriptLen;
+};
 
 extern SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
 extern vector<string> g_NewStrings;

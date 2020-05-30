@@ -1,5 +1,5 @@
+#include "framework.h"
 #include "Renderer11.h"
-
 
 bool Renderer11::PrintString(int x, int y, char* string, D3DCOLOR color, int flags)
 {

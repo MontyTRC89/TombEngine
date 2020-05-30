@@ -1,8 +1,11 @@
+#include "framework.h"
 #include "sphere.h"
 #include "draw.h"
 #include "lara.h"
-#include "../Specific/level.h"
-#include "../Specific/setup.h"
+#include "level.h"
+#include "setup.h"
+#include "Renderer11.h"
+#include "trmath.h"
 
 int NumLaraSpheres;
 bool GotLaraSpheres;
@@ -96,7 +99,6 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 						int dy = y1 - y2;
 						int dz = z1 - z2;
 						int r = r1 + r2;
-
 
 						if (SQUARE(dx) + SQUARE(dy) + SQUARE(dz) < SQUARE(r))
 						{

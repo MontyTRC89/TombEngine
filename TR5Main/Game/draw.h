@@ -1,8 +1,20 @@
 #pragma once
+#include "box.h"
 
-#include "..\Global\global.h"
+struct ANIM_FRAME
+{
+	short MinX;
+	short MaxX;
+	short MinY;
+	short MaxY;
+	short MinZ;
+	short MaxZ;
+	short OffsetX;
+	short OffsetY;
+	short OffsetZ;
+	unsigned short AngleSets[]; // Variable size
+};
 
-extern Renderer11* g_Renderer;
 extern BITE_INFO EnemyBites[9];
 extern int LightningCount;
 extern int LightningRand;
@@ -21,4 +33,4 @@ int Sync();
 bool TIME_Init();
 bool TIME_Reset();
 void DrawAnimatingItem(ITEM_INFO* item);
-void GetLaraJointPosition(PHD_VECTOR* pos, int joint);
+void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum);

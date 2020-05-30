@@ -1,11 +1,12 @@
+#include "framework.h"
 #include "lara1gun.h"
 #include "items.h"
 #include "Lara.h"
 #include "larafire.h"
 #include "draw.h"
-#include "Box.h"
+#include "box.h"
 #include "control.h"
-#include "effects.h"
+#include "effect.h"
 #include "effect2.h"
 #include "tomb4fx.h"
 #include "lot.h"
@@ -17,15 +18,12 @@
 #include "sphere.h"
 #include "traps.h"
 #include "camera.h"
-
-#include "..\Global\global.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "..\Specific\level.h"
-#include "../Specific/setup.h"
-#include "../Specific/input.h"
+#include "GameFlowScript.h"
+#include "level.h"
+#include "setup.h"
+#include "input.h"
 #include "savegame.h"
 #include "sound.h"
-
 #include "bubble.h"
 
 extern GameFlow* g_GameFlow;
@@ -58,7 +56,7 @@ void FireHarpoon()
 		pos.z = dxPos.z = 77;
 
 		g_Renderer->GetLaraBonePosition(&dxPos, LM_RHAND);
-		GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
+		GetLaraJointPosition(&PHD_VECTOR(pos.x, pos.y, pos.z), LM_RHAND);
 
 		/*item->pos.xPos = pos.x = dxPos.x;
 		item->pos.yPos = pos.y = dxPos.y;
@@ -340,6 +338,15 @@ void FireGrenade()
 	}
 }
 
+enum GRENADE_TYPE
+{
+	GRENADE_NORMAL,
+	GRENADE_SUPER,
+	GRENADE_FLASH,
+	GRENADE_ULTRA,
+	GRENADE_FLAGS
+};
+
 void ControlGrenade(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
@@ -524,7 +531,7 @@ void ControlGrenade(short itemNumber)
 	int ceiling;
 	short roomNumber;
 
-	if (item->itemFlags[0] == WEAPON_AMMO4)
+	if (item->itemFlags[0] == GRENADE_ULTRA)
 	{
 		roomNumber = item->roomNumber;
 		
@@ -575,7 +582,7 @@ void ControlGrenade(short itemNumber)
     item->hitPoints = 1;*/
 	}
 
-	if (item->itemFlags[0] == WEAPON_AMMO4)
+	if (item->itemFlags[0] == GRENADE_ULTRA)
 		GrenadeLauncherSpecialEffect1(item->pos.xPos, item->pos.yPos, item->pos.zPos, -1, 1);
 
 	// Time to explode?
@@ -600,7 +607,7 @@ void ControlGrenade(short itemNumber)
 		}
 	}
 
-	if (!(item->itemFlags[0] == WEAPON_AMMO3 && explode))
+	if (!(item->itemFlags[0] == GRENADE_FLASH && explode))
 	{
 		int n = 0;
 		bool foundCollidedObjects = false;
@@ -616,7 +623,7 @@ void ControlGrenade(short itemNumber)
 
 			foundCollidedObjects = true;
 
-			if (item->itemFlags[0] != WEAPON_AMMO3 || explode)
+			if (item->itemFlags[0] != GRENADE_FLASH || explode)
 			{
 				if (CollidedItems[0])
 				{
@@ -724,9 +731,9 @@ void ControlGrenade(short itemNumber)
 		} while (n < 2);
 	}
 
-	if (explode || (item->itemFlags[0] == WEAPON_AMMO3 && explode))
+	if (explode || (item->itemFlags[0] == GRENADE_FLASH && explode))
 	{
-		if (item->itemFlags[0] == WEAPON_AMMO3)
+		if (item->itemFlags[0] == GRENADE_FLASH)
 		{
 			FlashFader = 32;
 			FlashFadeR = 255;
@@ -762,10 +769,10 @@ void ControlGrenade(short itemNumber)
 		SoundEffect(105, &item->pos, PITCH_SHIFT | 0x1800000);
 		SoundEffect(106, &item->pos, 0);
 
-		if (item->itemFlags[0] != WEAPON_AMMO1 && item->itemFlags[0] != 4)
+		if (item->itemFlags[0] != GRENADE_NORMAL && item->itemFlags[0] != 4)
 		{
 			item->meshBits = 0;
-			item->itemFlags[1] = (item->itemFlags[0] != WEAPON_AMMO2 ? 16 : 4);
+			item->itemFlags[1] = (item->itemFlags[0] != GRENADE_SUPER ? 16 : 4);
 			return;
 		}
 
@@ -1063,6 +1070,13 @@ void AnimateShotgun(int weaponType)
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
 }
 
+enum CROSSBOW_TYPE
+{
+	CROSSBOW_NORMAL,
+	CROSSBOW_POISON,
+	CROSSBOW_EXPLODE
+};
+
 void ControlCrossbowBolt(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
@@ -1080,7 +1094,7 @@ void ControlCrossbowBolt(short itemNumber)
 		if (item->speed > 64)
 			item->speed -= (item->speed >> 4);
 		if (GlobalCounter & 1)
-			CreateBubble((PHD_VECTOR*)&item->pos, roomNumber, 4, 7, 0, 0, 0, 0);
+			CreateBubble(&PHD_VECTOR(item->pos.xPos, item->pos.yPos, item->pos.zPos), roomNumber, 4, 7, 0, 0, 0, 0);
 	}
 	else
 	{
@@ -1103,15 +1117,17 @@ void ControlCrossbowBolt(short itemNumber)
 		item->pos.zPos = oldZ;
 
 		// If ammos are normal, then just shatter the bolt and quit
-		if (item->itemFlags[0] != WEAPON_AMMO3)
+		if (item->itemFlags[0] != CROSSBOW_EXPLODE)
 		{
-			ExplodeItemNode(item, 0, 0, 256);
+			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 			KillItem(itemNumber);
 			return;
 		}
-
-		// Otherwise, bolt must explode
-		explode = true;
+		else
+		{
+			// Otherwise, bolt must explode
+			explode = true;
+		}
 	}
 
 	// Has bolt changed room?
@@ -1140,7 +1156,7 @@ void ControlCrossbowBolt(short itemNumber)
 
 		foundCollidedObjects = true;
 
-		if (item->itemFlags[0] != WEAPON_AMMO3 || explode)
+		if (item->itemFlags[0] != CROSSBOW_EXPLODE || explode)
 		{
 			if (CollidedItems[0])
 			{
@@ -1155,16 +1171,14 @@ void ControlCrossbowBolt(short itemNumber)
 						if (item->objectNumber < ID_SMASH_OBJECT1 || item->objectNumber > ID_SMASH_OBJECT8)
 						{
 							if (currentItem->objectNumber == ID_SHOOT_SWITCH1 || currentItem->objectNumber == ID_SHOOT_SWITCH2)
-								CrossbowHitSwitchType78(item, currentItem, 0);
+								DoCrossbowDamage(item, currentItem, 0);
 							else if (Objects[item->objectNumber].hitEffect)
 								DoGrenadeDamageOnBaddie(currentItem, item);
 						}
 						else
 						{
 							TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-							currentItem->pos.yPos -= 128;
-							TriggerShockwave(&currentItem->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-							currentItem->pos.yPos += 128;
+							TriggerShockwave(&PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos), 48, 304, 96, 0, 96, 128, 24, 0, 0);
 							ExplodeItemNode(currentItem, 0, 0, 128);
 							short currentItemNumber = (currentItem - CollidedItems[0]);
 							SmashObject(currentItemNumber);
@@ -1174,14 +1188,14 @@ void ControlCrossbowBolt(short itemNumber)
 					else if (currentItem->objectNumber == ID_SHOOT_SWITCH1 || currentItem->objectNumber == ID_SHOOT_SWITCH2)
 					{
 						// Special case for ID_SWITCH_TYPE7 and ID_SWITCH_TYPE8
-						CrossbowHitSwitchType78(item, currentItem, 1);
+						DoCrossbowDamage(item, currentItem, 1);
 					}
 					else if (Objects[currentItem->objectNumber].hitEffect)
 					{
-						HitTarget(currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_CROSSBOW].damage, 0);
+						HitTarget(currentItem, &GAME_VECTOR(item->pos.xPos, item->pos.yPos, item->pos.zPos), Weapons[WEAPON_CROSSBOW].damage, 0);
 
 						// Poisoned ammos
-						if (item->itemFlags[0] == WEAPON_AMMO2 && !Objects[currentItem->objectNumber].explodableMeshbits)
+						if (item->itemFlags[0] == CROSSBOW_POISON && !Objects[currentItem->objectNumber].explodableMeshbits)
 							item->poisoned = true;
 					}
 
@@ -1198,16 +1212,14 @@ void ControlCrossbowBolt(short itemNumber)
 
 				do
 				{
-					if (currentMesh->staticNumber >= 50 && currentMesh->staticNumber < 58)
+					if (currentMesh->staticNumber >= 50 && currentMesh->staticNumber < 58) // SHATTER
 					{
 						if (explode)
 						{
 							TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
-							currentMesh->y -= 128;
-							TriggerShockwave((PHD_3DPOS*)&currentMesh, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-							currentMesh->y += 128;
+							TriggerShockwave(&PHD_3DPOS(currentMesh->x, currentMesh->y - 128, currentMesh->z, 0, currentMesh->yRot, 0), 40, 176, 64, 0, 96, 128, 16, 0, 0);
 						}
-						ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
+						ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0); // TODO: this wont work !!
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
 						SmashedMeshCount++;
@@ -1232,16 +1244,17 @@ void ControlCrossbowBolt(short itemNumber)
 	{
 		if (foundCollidedObjects)
 		{
-			ExplodeItemNode(item, 0, 0, 256);
+			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 			KillItem(itemNumber);
 		}
 		return;
 	}
 
 	// At this point, for sure bolt must explode
-
 	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	{
 		TriggerUnderwaterExplosion(item);
+	}
 	else
 	{
 		TriggerShockwave(&item->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
@@ -1253,12 +1266,12 @@ void ControlCrossbowBolt(short itemNumber)
 
 	AlertNearbyGuards(item);
 	
-	SoundEffect(105, &item->pos, PITCH_SHIFT | 0x1800000);
-	SoundEffect(106, &item->pos, 0);
+	SoundEffect(SFX_EXPLOSION1, &item->pos, PITCH_SHIFT | 0x1800000);
+	SoundEffect(SFX_EXPLOSION2, &item->pos, 0);
 
 	if (foundCollidedObjects || explode)
 	{
-		ExplodeItemNode(item, 0, 0, 256);
+		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 		KillItem(itemNumber);
 	}
 
@@ -1477,12 +1490,12 @@ void undraw_shotgun(int weapon)
 	
 	AnimateItem(item);
 
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DESACTIVATED)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
 		Lara.target = NULL;
-		Lara.rightArm.lock = 0;
-		Lara.leftArm.lock = 0;
+		Lara.rightArm.lock = false;
+		Lara.leftArm.lock = false;
 		
 		KillItem(Lara.weaponItem);
 
@@ -1515,7 +1528,7 @@ void draw_shotgun_meshes(int weaponType)
 	LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
 }
 
-void CrossbowHitSwitchType78(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
+void DoCrossbowDamage(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
 {
 	/*v4 = item2;
 	if (!(item2->flags & 0x40))
@@ -1675,10 +1688,10 @@ void FireShotgun()
 
 	for (int i = 0; i < 6; i++)
 	{
-		loopAngles[0] = angles[0] + value * (GetRandomControl() - ANGLE(90)) / 0x10000;
-		loopAngles[1] = angles[1] + value * (GetRandomControl() - ANGLE(90)) / 0x10000;
+		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
+		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
 
-		if (FireWeapon(WEAPON_SHOTGUN, Lara.target, LaraItem, loopAngles))
+		if (FireWeapon(WEAPON_SHOTGUN, Lara.target, LaraItem, loopAngles) == FW_MAYBEHIT)
 			fired = true;
 	}
 
@@ -1707,12 +1720,10 @@ void FireShotgun()
 		SmokeCountL = 32;
 		SmokeWeapon = WEAPON_SHOTGUN;
 
-		if (LaraItem->meshBits)
+		if (LaraItem->meshBits != 0)
 		{
 			for (int i = 0; i < 7; i++)
-			{
-				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, 32);
-			}
+				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, SmokeCountL);
 		}
 
 		Lara.rightArm.flash_gun = Weapons[WEAPON_SHOTGUN].flashTime;

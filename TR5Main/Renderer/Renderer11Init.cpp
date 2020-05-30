@@ -1,6 +1,8 @@
+#include "framework.h"
 #include "Renderer11.h"
-#include "../Specific/configuration.h"
-#include "../Specific/winmain.h"
+#include "configuration.h"
+#include "winmain.h"
+#include "GameFlowScript.h"
 
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;

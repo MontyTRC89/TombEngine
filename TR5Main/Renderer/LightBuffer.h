@@ -1,11 +1,10 @@
 #pragma once
-#include <SimpleMath.h>
 #include "ShaderLight.h"
-#include "Enums.h"
+#include "RenderEnums.h"
 
-struct alignas(16) CLightBuffer {
+struct alignas(16) CLightBuffer
+{
 	ShaderLight Lights[NUM_LIGHTS_PER_BUFFER];
 	int NumLights;
-	DirectX::SimpleMath::Vector3 CameraPosition;
+	Vector3 CameraPosition;
 };
-
