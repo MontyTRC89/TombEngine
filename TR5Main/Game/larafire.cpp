@@ -1,12 +1,10 @@
 #include "framework.h"
 #include "larafire.h"
 #include "items.h"
-#include "Lara.h"
 #include "laraflar.h"
 #include "lara1gun.h"
 #include "lara2gun.h"
 #include "camera.h"
-#include "GameFlowScript.h"
 #include "objects.h"
 #include "effect.h"
 #include "sphere.h"
@@ -19,6 +17,7 @@
 #include "input.h"
 #include "sound.h"
 #include "savegame.h"
+#include "GameFlowScript.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -317,9 +316,7 @@ void SmashItem(short itemNum) // (F) (D)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
-	{
 		SmashObject(itemNum);
-	}
 }
 
 void LaraGun() // (F) (D)
@@ -696,7 +693,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 	if (creature && item != LaraItem)
 		creature->hurtByLara = true;
 
-	if (hitPos)
+	if (hitPos != nullptr)
 	{
 		if (obj->hitEffect)
 		{
@@ -715,7 +712,8 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 			}
 		}
 	}
-	if (!obj->undead || flag || item->hitPoints == -16384)
+
+	if (!obj->undead || flag || item->hitPoints == NOT_TARGETABLE)
 	{
 		if (item->hitPoints > 0 && item->hitPoints <= damage)
 			++Savegame.Level.Kills;
@@ -723,50 +721,42 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 	}
 }
 
-int DetectCrouchWhenFiring(ITEM_INFO* src, WEAPON_INFO* weapon)
-{
-	if (src->currentAnimState == STATE_LARA_CROUCH_IDLE || src->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT || src->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT)
-		return STEP_SIZE;
-	else
-		return int(weapon->gunHeight);
-}
-
-int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
+FIREWEAPON_TYPE FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
 {
 	short* ammo = GetAmmo(weaponType);
 	if (!*ammo)
-		return 0;
+		return FW_NOAMMO;
 	if (*ammo != -1)
 		(*ammo)--;
 
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 	int r;
 
-	PHD_3DPOS pos;
-	pos.xPos = 0;
-	pos.yPos = 0;
-	pos.zPos = 0;
-	GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
+	PHD_VECTOR pos;
+	pos.x = 0;
+	pos.y = 0;
+	pos.z = 0;
+	GetLaraJointPosition(&pos, LM_RHAND);
 
-	pos.xPos = src->pos.xPos;
-	pos.zPos = src->pos.zPos;
-
-	pos.xRot = angles[1] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
-	pos.yRot = angles[0] + (GetRandomControl() - 16384) * weapon->shotAccuracy / 65536;
-	pos.zRot = 0;
+	pos.x = src->pos.xPos;
+	pos.z = src->pos.zPos;
+	PHD_3DPOS rotation;
+	rotation.xRot = angles[1] + (GetRandomControl() - 0x4000) * weapon->shotAccuracy / 0x10000;
+	rotation.yRot = angles[0] + (GetRandomControl() - 0x4000) * weapon->shotAccuracy / 0x10000;
+	rotation.zRot = 0;
 
 	// Calculate ray from rotation angles
-	float x = sin(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
-	float y = -sin(TO_RAD(pos.xRot));
-	float z = cos(TO_RAD(pos.yRot)) * cos(TO_RAD(pos.xRot));
+	float x =  sin(TO_RAD(rotation.yRot)) * cos(TO_RAD(rotation.xRot));
+	float y = -sin(TO_RAD(rotation.xRot));
+	float z =  cos(TO_RAD(rotation.yRot)) * cos(TO_RAD(rotation.xRot));
 	Vector3 direction = Vector3(x, y, z);
 	direction.Normalize();
-	Vector3 source = Vector3(pos.xPos, pos.yPos, pos.zPos);
-	Vector3 destination = source + direction * 1024.0f;
+	Vector3 source = Vector3(pos.x, pos.y, pos.z);
+	Vector3 destination = source + direction * float(weapon->targetDist);
 	Ray ray = Ray(source, direction);
 
 	int num = GetSpheres(target, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int best = -1;
+	int best = NO_ITEM;
 	float bestDistance = FLT_MAX;
 
 	for (int i = 0; i < num; i++)
@@ -787,34 +777,29 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 	Lara.fired = true;
 	
 	GAME_VECTOR vSrc;
-	vSrc.x = pos.xPos;
-	vSrc.y = pos.yPos;
-	vSrc.z = pos.zPos;
+	vSrc.x = pos.x;
+	vSrc.y = pos.y;
+	vSrc.z = pos.z;
 	
 	short roomNumber = src->roomNumber;
-	GetFloor(pos.xPos, pos.yPos, pos.zPos, &roomNumber);
+	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vSrc.roomNumber = roomNumber;
 
 	if (best < 0)
 	{
 		GAME_VECTOR vDest;
-		
 		vDest.x = destination.x;
 		vDest.y = destination.y;
 		vDest.z = destination.z;
-
-		GetTargetOnLOS(&vSrc, &vDest, 0, 1);
-		
-		return -1;
+		GetTargetOnLOS(&vSrc, &vDest, FALSE, TRUE);
+		return FW_MISS;
 	}
 	else
 	{
 		Savegame.Game.AmmoHits++;
-
-		GAME_VECTOR vDest;
-		
 		destination = source + direction * bestDistance;
 
+		GAME_VECTOR vDest;
 		vDest.x = destination.x;
 		vDest.y = destination.y;
 		vDest.z = destination.z;
@@ -857,11 +842,11 @@ int FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 		}
 		else
 		{*/
-			if (!GetTargetOnLOS(&vSrc, &vDest, 0, 1))
-				HitTarget(target, &vDest, weapon->damage, 0);
+			if (!GetTargetOnLOS(&vSrc, &vDest, FALSE, TRUE))
+				HitTarget(target, &vDest, weapon->damage, NULL);
 		//}
 		
-		return 1;
+		return FW_MAYBEHIT;
 	}
 }
 
@@ -887,42 +872,43 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 {
 	if (!Lara.target)
 	{
-		Lara.rightArm.lock = 0;
-		Lara.leftArm.lock = 0;
+		Lara.rightArm.lock = false;
+		Lara.leftArm.lock = false;
 		Lara.targetAngles[1] = 0;
 		Lara.targetAngles[0] = 0;
 		return;
 	}
 
-	GAME_VECTOR pos;
-
+	PHD_VECTOR pos;
 	pos.x = 0;
 	pos.y = 0;
 	pos.z = 0;
-	GetLaraJointPosition((PHD_VECTOR*)&pos, LM_RHAND);
+	GetLaraJointPosition(&pos, LM_RHAND);
 
-	pos.x = LaraItem->pos.xPos;
-	pos.z = LaraItem->pos.zPos;
-	pos.roomNumber = LaraItem->roomNumber;
+	GAME_VECTOR src;
+	src.x = LaraItem->pos.xPos;
+	src.y = pos.y;
+	src.z = LaraItem->pos.zPos;
+	src.roomNumber = LaraItem->roomNumber;
 	
 	GAME_VECTOR targetPoint;
 	find_target_point(Lara.target, &targetPoint);
 
 	short angles[2];
-	phd_GetVectorAngles(targetPoint.x - pos.x, targetPoint.y - pos.y, targetPoint.z - pos.z, angles);
+	phd_GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z, angles);
 
 	angles[0] -= LaraItem->pos.yRot;
 	angles[1] -= LaraItem->pos.xRot;
 
-	if (LOS(&pos, &targetPoint))
+	if (LOS(&src, &targetPoint))
 	{
 		if (angles[0] >= weapon->lockAngles[0]
 		&&  angles[0] <= weapon->lockAngles[1]
 		&&  angles[1] >= weapon->lockAngles[2]
 		&&  angles[1] <= weapon->lockAngles[3])
 		{
-			Lara.rightArm.lock = 1;
-			Lara.leftArm.lock = 1;
+			Lara.rightArm.lock = true;
+			Lara.leftArm.lock = true;
 		}
 		else
 		{
@@ -932,7 +918,7 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 					 angles[0] > weapon->leftAngles[1] ||
 					 angles[1] < weapon->leftAngles[2] ||
 					 angles[1] > weapon->leftAngles[3]))
-					Lara.leftArm.lock = 0;
+					Lara.leftArm.lock = false;
 			}
 
 			if (Lara.rightArm.lock)
@@ -941,37 +927,36 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 					 angles[0] > weapon->rightAngles[1] ||
 					 angles[1] < weapon->rightAngles[2] ||
 					 angles[1] > weapon->rightAngles[3]))
-					Lara.rightArm.lock = 0;
+					Lara.rightArm.lock = false;
 			}
 		}
 	}
 	else
 	{
-		Lara.rightArm.lock = 0;
-		Lara.leftArm.lock = 0;
+		Lara.rightArm.lock = false;
+		Lara.leftArm.lock = false;
 	}
 
 	Lara.targetAngles[0] = angles[0];
 	Lara.targetAngles[1] = angles[1];
 }
 
-int CheckForHoldingState(int state) // (F) (D)
+bool CheckForHoldingState(int state) // (F) (D)
 {
-	short* holdState = HoldStates;
-
 #if 0
-	if (Lara.ExtraAnim)
-		return 0;
+	if (Lara.ExtraAnim != NO_ITEM)
+		return false;
 #endif
 
+	short* holdState = HoldStates;
 	while (*holdState >= 0)
 	{
 		if (state == *holdState)
-			return 1;
+			return true;
 		holdState++;
 	}
 	
-	return 0;
+	return false;
 }
 
 void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
@@ -988,10 +973,15 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 		return;
 	}
 	bestItem = NULL;
-	bestYrot = 0x7FFF;
-	bestDistance = 0x7FFFFFFF;
+	bestYrot = MAXSHORT;
+	bestDistance = MAXINT;
+	PHD_VECTOR handpos;
+	handpos.x = 0;
+	handpos.y = 0;
+	handpos.z = 0;
+	GetLaraJointPosition(&handpos, LM_RHAND);
 	source.x = LaraItem->pos.xPos;
-	source.y = LaraItem->pos.yPos - 650;
+	source.y = LaraItem->pos.yPos - handpos.y;
 	source.z = LaraItem->pos.zPos;
 	source.roomNumber = LaraItem->roomNumber;
 	maxDistance = winfo->targetDist;
@@ -1034,6 +1024,7 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 			}
 		}
 	}
+
 	TargetList[targets] = NULL;
 	if (!TargetList[0])
 	{
@@ -1086,12 +1077,14 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 			}
 		}
 	}
+
 	if (Lara.target != LastTargets[0])
 	{
 		for (slot = 7; slot > 0; --slot)
 			LastTargets[slot] = LastTargets[slot - 1];
 		LastTargets[0] = Lara.target;
 	}
+
 	LaraTargetInfo(winfo);
 }
 

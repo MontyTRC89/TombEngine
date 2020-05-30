@@ -9,7 +9,7 @@
 #include "Lara.h"
 #include "camera.h"
 #include "spotcam.h"
-#include "global.h"
+
 #include "input.h"
 #include "configuration.h"
 #include "lara1gun.h"

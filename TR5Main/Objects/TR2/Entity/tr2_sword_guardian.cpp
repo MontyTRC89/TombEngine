@@ -21,7 +21,7 @@ void InitialiseSwordGuardian(short itemNum)
 
 	ClearItem(itemNum);
 
-	//item->status = ITEM_INACTIVE;
+	//item->status = ITEM_NOT_ACTIVE;
 	//item->meshBits = 0;
 }
 
@@ -66,7 +66,7 @@ void SwordGuardianControl(short itemNum)
 			//item->objectNumber = ID_SWAT;
 			DisableBaddieAI(itemNum);
 			KillItem(itemNum);
-			//item->status = ITEM_DEACTIVATED;
+			//item->status = ITEM_DESACTIVATED;
 			//item->flags |= ONESHOT;
 			item->currentAnimState = 12;
 
@@ -80,7 +80,7 @@ void SwordGuardianControl(short itemNum)
 				item->objectNumber = ID_SWAT;
 				DisableBaddieAI(itemNum);
 				KillItem(itemNum);
-				item->status = ITEM_DEACTIVATED;
+				item->status = ITEM_DESACTIVATED;
 				item->flags |= ONESHOT;
 			}
 			*/

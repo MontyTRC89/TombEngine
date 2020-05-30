@@ -3,7 +3,7 @@
 #include "draw.h"
 #include "savegame.h"
 #include "input.h"
-#include "global.h"
+
 #include "level.h"
 
 SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];

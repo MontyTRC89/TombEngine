@@ -1,6 +1,4 @@
 #pragma once
-
-#include "global.h"
 #include "ChunkId.h"
 #include "ChunkReader.h"
 #include "ChunkWriter.h"
@@ -13,7 +11,6 @@
 
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
-extern SAVEGAME_INFO Savegame;
 
 typedef struct SaveGameHeader
 {

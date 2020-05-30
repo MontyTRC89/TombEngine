@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "laramisc.h"
-#include "global.h"
+
 #include "level.h"
 #include "setup.h"
 #include "GameFlowScript.h"
@@ -707,8 +707,8 @@ void LaraInitialiseMeshes() // (AF) (D)
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.target = NULL;
-	Lara.rightArm.lock = 0;
-	Lara.leftArm.lock = 0;
+	Lara.rightArm.lock = false;
+	Lara.leftArm.lock = false;
 }
 
 void InitialiseLara(int restore)

@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "pickup.h"
+#include "phd_global.h"
 #include "lara.h"
 #include "draw.h"
 #include "inventory.h"
@@ -29,43 +30,43 @@ static short PickUpBounds[12] = // offset 0xA1338
 	0xFF00, 0x0100, 0xFF38, 0x00C8, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0x0000, 0x0000,
 	0x0000, 0x0000
 };
-static PHD_VECTOR PickUpPosition = { 0, 0, 0xFFFFFF9C }; // offset 0xA1350
+static PHD_VECTOR PickUpPosition(0, 0, -100); // offset 0xA1350
 static short HiddenPickUpBounds[12] = // offset 0xA135C
 {
 	0xFF00, 0x0100, 0xFF9C, 0x0064, 0xFCE0, 0xFF00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
-static PHD_VECTOR HiddenPickUpPosition = { 0, 0, 0xFFFFFD4E }; // offset 0xA1374
+static PHD_VECTOR HiddenPickUpPosition(0, 0, -690); // offset 0xA1374
 static short CrowbarPickUpBounds[12] = // offset 0xA1380
 {
 	0xFF00, 0x0100, 0xFF9C, 0x0064, 0x00C8, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
-static PHD_VECTOR CrowbarPickUpPosition = { 0, 0, 0xD7 }; // offset 0xA1398
+static PHD_VECTOR CrowbarPickUpPosition(0, 0, 215); // offset 0xA1398
 static short JobyCrowPickUpBounds[12] = // offset 0xA13A4
 {
 	0xFE00, 0x0000, 0xFF9C, 0x0064, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
-static PHD_VECTOR JobyCrowPickUpPosition = { 0xFFFFFF20, 0, 0xF0 }; // offset 0xA13BC
+static PHD_VECTOR JobyCrowPickUpPosition(-224, 0, 240); // offset 0xA13BC
 static short PlinthPickUpBounds[12] = // offset 0xA13C8
 {
 	0xFF00, 0x0100, 0xFD80, 0x0280, 0xFE01, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0x0000, 0x0000
 };
-static PHD_VECTOR PlinthPickUpPosition = { 0, 0, 0xFFFFFE34 }; // offset 0xA13E0
+static PHD_VECTOR PlinthPickUpPosition(0, 0, -460); // offset 0xA13E0
 static short PickUpBoundsUW[12] = // offset 0xA13EC
 {
 	0xFE00, 0x0200, 0xFE00, 0x0200, 0xFE00, 0x0200, 0xE002, 0x1FFE, 0xE002, 0x1FFE,
 	0xE002, 0x1FFE
 };
-static PHD_VECTOR PickUpPositionUW = { 0, 0xFFFFFF38, 0xFFFFFEA2 }; // offset 0xA1404
+static PHD_VECTOR PickUpPositionUW(0, -200, -350); // offset 0xA1404
 static short KeyHoleBounds[12] = // offset 0xA1410
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0x0000, 0x019C, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-static PHD_VECTOR KeyHolePosition = { 0, 0, 0x138 }; // offset 0xA1428
+static PHD_VECTOR KeyHolePosition(0, 0, 312); // offset 0xA1428
 static short PuzzleBounds[12] = // offset 0xA1434
 {
 	0x0000, 0x0000, 0xFF00, 0x0100, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
@@ -76,7 +77,7 @@ static short SOBounds[12] = // offset 0xA144C
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-static PHD_VECTOR SOPos = { 0, 0, 0 }; // offset 0xA1464
+static PHD_VECTOR SOPos(0, 0, 0); // offset 0xA1464
 short SearchCollectFrames[4] =
 {
 	0x00B4, 0x0064, 0x0099, 0x0053
@@ -108,7 +109,7 @@ void PickedUpObject(short objectNumber)
 	switch (objectNumber)
 	{
 		case ID_UZI_ITEM:
-			if (!(Lara.Weapons[WEAPON_UZI].Present))
+			if (!Lara.Weapons[WEAPON_UZI].Present)
 			{
 				Lara.Weapons[WEAPON_UZI].Present = true;
 				Lara.Weapons[WEAPON_UZI].SelectedAmmo = 0;
@@ -120,7 +121,7 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_PISTOLS_ITEM:
-		if (!(Lara.Weapons[WEAPON_PISTOLS].Present))
+		if (!Lara.Weapons[WEAPON_PISTOLS].Present)
 		{
 			Lara.Weapons[WEAPON_PISTOLS].Present = true;
 			Lara.Weapons[WEAPON_PISTOLS].SelectedAmmo = 0;
@@ -131,7 +132,7 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_SHOTGUN_ITEM:
-		if (!(Lara.Weapons[WEAPON_SHOTGUN].Present))
+		if (!Lara.Weapons[WEAPON_SHOTGUN].Present)
 		{
 			Lara.Weapons[WEAPON_SHOTGUN].Present = true;
 			Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = 0;
@@ -143,7 +144,7 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_REVOLVER_ITEM:
-		if (!(Lara.Weapons[WEAPON_REVOLVER].Present))
+		if (!Lara.Weapons[WEAPON_REVOLVER].Present)
 		{
 			Lara.Weapons[WEAPON_REVOLVER].Present = true;
 			Lara.Weapons[WEAPON_REVOLVER].SelectedAmmo = 0;
@@ -155,7 +156,7 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_CROSSBOW_ITEM:
-		if (!(Lara.Weapons[WEAPON_CROSSBOW].Present))
+		if (!Lara.Weapons[WEAPON_CROSSBOW].Present)
 		{
 			Lara.Weapons[WEAPON_CROSSBOW].Present = true;
 			Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = 0;
@@ -167,7 +168,7 @@ void PickedUpObject(short objectNumber)
 			break;
 
 	case ID_HK_ITEM:
-		if (!(Lara.Weapons[WEAPON_CROSSBOW].Present))
+		if (!Lara.Weapons[WEAPON_CROSSBOW].Present)
 		{
 			Lara.Weapons[WEAPON_HK].Present = true;
 			Lara.Weapons[WEAPON_HK].SelectedAmmo = 0;
@@ -179,7 +180,7 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_HARPOON_ITEM:
-		if (!(Lara.Weapons[WEAPON_HARPOON_GUN].Present))
+		if (!Lara.Weapons[WEAPON_HARPOON_GUN].Present)
 		{
 			Lara.Weapons[WEAPON_HARPOON_GUN].Present = true;
 			Lara.Weapons[WEAPON_HARPOON_GUN].SelectedAmmo = 0;
@@ -191,7 +192,7 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_GRENADE_GUN_ITEM:
-		if (!(Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present))
+		if (!Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
 		{
 			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
 			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = 0;
@@ -203,7 +204,7 @@ void PickedUpObject(short objectNumber)
 		break;
 
 	case ID_ROCKET_LAUNCHER_ITEM:
-		if (!(Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present))
+		if (!Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
 		{
 			Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present = true;
 			Lara.Weapons[WEAPON_ROCKET_LAUNCHER].SelectedAmmo = 0;
@@ -337,7 +338,7 @@ void PickedUpObject(short objectNumber)
 		
 	case ID_GOLDROSE_ITEM:
 		IsAtmospherePlaying = 0;
-		S_CDPlay(6, 0);
+		S_CDPlay(6, FALSE);
 		Lara.Secrets++;
 		Savegame.Level.Secrets++;
 		Savegame.Game.Secrets++;
@@ -462,7 +463,7 @@ int KeyTrigger(short itemNum)
 	oldkey = KeyTriggerActive;
 
 	if (!oldkey)
-		item->status = ITEM_DEACTIVATED;
+		item->status = ITEM_DESACTIVATED;
 
 	KeyTriggerActive = false;
 
@@ -702,7 +703,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (!Lara.isMoving)
 			{
-				if (item->status != ITEM_INACTIVE)
+				if (item->status != ITEM_NOT_ACTIVE)
 					return;
 				if (g_Inventory->GetSelectedObject() == NO_ITEM)
 				{
@@ -1275,7 +1276,7 @@ void RegeneratePickups()
 
 			if (ammo == 0)
 			{
-				item->status = ITEM_INACTIVE;
+				item->status = ITEM_NOT_ACTIVE;
 			}
 		}
 	}
@@ -1337,7 +1338,7 @@ short* FindPlinth(ITEM_INFO* item)
 			if (item->pos.xPos == mesh->x && item->pos.zPos == mesh->z)
 			{
 				short* frame = GetBestFrame(item);
-				STATIC_INFO* s = &StaticObjects[mesh->staticNumber];
+				StaticInfo* s = &StaticObjects[mesh->staticNumber];
 				if (frame[0] <= s->xMaxc && frame[1] >= s->xMinc && frame[4] <= s->zMaxc && frame[5] >= s->zMinc && (s->xMinc || s->xMaxc))
 				{
 					found = mesh->staticNumber;
@@ -1400,7 +1401,7 @@ void PuzzleDone(ITEM_INFO* item, short itemNum)
 			{
 				FlipMap(Items[i].triggerFlags - 7);
 				flipmap[Items[i].triggerFlags - 7] ^= IFLAG_ACTIVATION_MASK;
-				Items[i].status = ITEM_INACTIVE;
+				Items[i].status = ITEM_NOT_ACTIVE;
 				Items[i].flags |= 0x20;
 			}
 		}
@@ -1493,7 +1494,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 	item = &Items[itemNumber];
 	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
 
-	if (TrInput & IN_ACTION && laraitem->currentAnimState == STATE_LARA_STOP && laraitem->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS && (item->status == ITEM_INACTIVE && item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
+	if (TrInput & IN_ACTION && laraitem->currentAnimState == STATE_LARA_STOP && laraitem->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS && (item->status == ITEM_NOT_ACTIVE && item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
 		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 	{
 		bounds = GetBoundsAccurate(item);
@@ -1602,7 +1603,7 @@ void SearchObjectControl(short itemNumber)
 			if (Objects[item2->objectNumber].isPickup)
 			{
 				if (FlipStats[0])
-					item2->status = ITEM_INACTIVE;
+					item2->status = ITEM_NOT_ACTIVE;
 				else
 					item2->status = ITEM_INVISIBLE;
 			}
@@ -1638,7 +1639,7 @@ void SearchObjectControl(short itemNumber)
 	}
 
 	
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DESACTIVATED)
 	{
 		if (item->objectNumber == ID_SEARCH_OBJECT4)
 		{
@@ -1648,7 +1649,7 @@ void SearchObjectControl(short itemNumber)
 		else
 		{
 			RemoveActiveItem(itemNumber);
-			item->status = ITEM_INACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 
 void SetupShoal(int shoalNumber);
 void ControlFish(short itemNumber);

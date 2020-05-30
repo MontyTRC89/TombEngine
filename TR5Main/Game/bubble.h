@@ -1,8 +1,4 @@
 #pragma once
-#include <d3d11.h>
-#include <SimpleMath.h>
-#include <vector>
-#include "types.h"
 #include "constants.h"
 #include "effect2.h"
 
@@ -13,14 +9,14 @@ constexpr int BUBBLE_FLAG_HIGH_AMPLITUDE = 0x4;
 
 struct BUBBLE_STRUCT
 {
-	DirectX::SimpleMath::Vector4 color;
-	DirectX::SimpleMath::Vector4 sourceColor;
-	DirectX::SimpleMath::Vector4 destinationColor;
-	DirectX::SimpleMath::Vector3 worldPositionCenter; // goes straight up
-	DirectX::SimpleMath::Vector3 worldPosition; // actual position with wave motion
-	DirectX::SimpleMath::Vector3 amplitude;
-	DirectX::SimpleMath::Vector3 wavePeriod;
-	DirectX::SimpleMath::Vector3 waveSpeed;
+	Vector4 color;
+	Vector4 sourceColor;
+	Vector4 destinationColor;
+	Vector3 worldPositionCenter; // goes straight up
+	Vector3 worldPosition; // actual position with wave motion
+	Vector3 amplitude;
+	Vector3 wavePeriod;
+	Vector3 waveSpeed;
 	float speed;
 	float size;
 	float destinationSize;

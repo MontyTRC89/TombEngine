@@ -1,5 +1,5 @@
 #pragma once
-#include "global.h"
+
 #include "box.h"
 
 #define CHK_ANY(var, flag) (var & flag) != 0

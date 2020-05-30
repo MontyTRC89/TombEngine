@@ -59,7 +59,7 @@ static void HarpySparks1(short itemNumber, byte num, int size)
 		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
 		spark->y = 0;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -107,7 +107,7 @@ static void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 		spark->sLife = 16;
 		spark->colFadeSpeed = 4;
 		spark->y = y;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->fadeToBlack = 4;
 		spark->x = x;
 		spark->z = z;
@@ -120,7 +120,7 @@ static void HarpySparks2(int x, int y, int z, int xv, int yv, int zv)
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 		spark->dSize = (GetRandomControl() & 1) + 1;
-		spark->flags = 0;
+		spark->flags = SP_NONE;
 	}
 }
 

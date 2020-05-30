@@ -1,6 +1,6 @@
 #pragma once
 
-#include "global.h"
+
 
 void ShootAtLara(FX_INFO* fx);
 void ControlMissile(short fxNumber);

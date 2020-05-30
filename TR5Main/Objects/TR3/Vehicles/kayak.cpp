@@ -126,7 +126,7 @@ static void TriggerRapidsMist(long x, long y, long z)
 	sptr->colFadeSpeed = 2;
 	sptr->fadeToBlack = 4;	// 8
 	sptr->sLife = sptr->life = 6 + (GetRandomControl() & 3);
-	sptr->transType = 1;
+	sptr->transType = SEMITRANS;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 	sptr->x = x + ((GetRandomControl() & 15) - 8);

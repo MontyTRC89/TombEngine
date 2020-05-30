@@ -1,17 +1,26 @@
 #pragma once
+#include "phd_global.h"
 
-#include "vodoo.h"
-#include "types.h"
+constexpr auto PI = 3.14159265358979323846f;
+constexpr auto RADIAN = 0.01745329252f;
+constexpr auto ONE_DEGREE = 182;
+constexpr auto PREDICTIVE_SCALE_FACTOR = 14;
+constexpr auto W2V_SHIFT = 14; // Shift scale of View.Frame to World.Frame
+constexpr auto NODE_SHIFT = 15;
+constexpr auto W2V_SCALE = (1 << W2V_SHIFT); // Scale of View Frame to World Frame
+constexpr auto WALL_SHIFT = 10;
+constexpr auto STEP_SIZE = 256;
+constexpr auto WALL_SIZE = 1024;
+constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
+constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 
-#define PI 3.14159265358979323846f
-#define RADIAN 0.01745329252f
 #define SQUARE(x) ((x)*(x))
 #define CLAMP(x, a, b) ((x)<(a)?(a):((x)>(b)?(b):(x)))
 #define SIGN(x) ((0 < (x)) - ((x) < 0))
 #define CLAMPADD(x, a, b) ((x)<(a)?((x)+(a)):((x)>(b)?((x)-(b)):0))
-#define ONE_DEGREE 182
 #define CLICK(x) ((x) * STEP_SIZE)
 #define SECTOR(x) ((x) * WALL_SIZE)
+#define HIDWORD(l) ((DWORD)(((DWORDLONG)(l)>>32)&0xFFFFFFFF))
 
 short ANGLE(float angle);
 float TO_DEGREES(short angle);
@@ -21,7 +30,6 @@ extern short rcossin_tbl[8192];
 
 int phd_sin(short a);
 int phd_cos(short a);
-float ANGLEF(short angle);
 
 // returns a float between 0-1
 const float frand();

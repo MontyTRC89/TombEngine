@@ -232,7 +232,7 @@ void SkidManControl(short riderNum)
 		rider->animNumber = item->animNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
 		rider->frameNumber = item->frameNumber + (Anims[rider->animNumber].frameBase - Anims[item->animNumber].frameBase);
 	}
-	else if (rider->status == ITEM_DEACTIVATED && item->speed == 0 && item->fallspeed == 0)
+	else if (rider->status == ITEM_DESACTIVATED && item->speed == 0 && item->fallspeed == 0)
 	{
 		/* If rider has reached end of his death animation, turn his skidoo into one that Lara can ride */
 		RemoveActiveItem(riderNum);
@@ -242,7 +242,7 @@ void SkidManControl(short riderNum)
 
 		DisableBaddieAI(item_number);
 		item->objectNumber = ID_SNOWMOBILE;
-		item->status = ITEM_DEACTIVATED;
+		item->status = ITEM_DESACTIVATED;
 		InitialiseSkidoo(item_number);
 
 		((SKIDOO_INFO*)item->data)->armed = true;
