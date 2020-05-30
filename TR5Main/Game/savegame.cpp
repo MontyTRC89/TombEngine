@@ -9,7 +9,6 @@
 #include "spotcam.h"
 #include "traps.h"
 #include "laramisc.h"
-#include "oldobjects.h"
 #include "sound.h"
 #include "level.h"
 #include "setup.h"
@@ -67,6 +66,7 @@ ChunkId* SaveGame::m_chunkPickupCombo;
 ChunkId* SaveGame::m_chunkExamineCombo;
 ChunkId* SaveGame::m_chunkWeaponItem;
 
+SAVEGAME_INFO Savegame;
 extern vector<AudioTrack> g_AudioTracks;
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
@@ -514,18 +514,17 @@ bool SaveGame::readLara()
 	memcpy(&Lara, lara, sizeof(LaraInfo));
 	free(buffer);
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		Lara.meshPtrs[i] = ADD_PTR(Lara.meshPtrs[i], short, MeshBase);
-		//printf("MeshPtr: %d\n", Lara.meshPtrs[i]);
+		Lara.meshPtrs[i] = AddPtr(Lara.meshPtrs[i], short, MeshBase);
 	}
 
-	Lara.leftArm.frameBase = ADD_PTR(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
-	Lara.rightArm.frameBase = ADD_PTR(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
+	Lara.leftArm.frameBase = AddPtr(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
+	Lara.rightArm.frameBase = AddPtr(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;
-	Lara.generalPtr = ADD_PTR(Lara.generalPtr, char, malloc_buffer);
+	Lara.generalPtr = (void*)AddPtr(Lara.generalPtr, char, malloc_buffer);
 	Lara.weaponItem = NO_ITEM;
 
 	// Is Lara burning?
@@ -545,7 +544,6 @@ bool SaveGame::readLara()
 	}
 	
 	m_reader->ReadChunks(&readLaraChunks, 0);
-
 	return true;
 }
 
@@ -1044,7 +1042,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		creature->mood = (MOOD_TYPE)LEB128::ReadInt32(m_stream);
 
 		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
-		creature->enemy = ADD_PTR(enemy, ITEM_INFO, malloc_buffer);
+		creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
 
 		creature->aiTarget.objectNumber = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.roomNumber = LEB128::ReadInt16(m_stream);

@@ -6,6 +6,7 @@
 #include "items.h"
 #include "sound.h"
 #include "spotcam.h"
+#include "objectslist.h"
 
 void InitialiseRaisingCog(short itemNumber)
 {

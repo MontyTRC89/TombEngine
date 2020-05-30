@@ -43,10 +43,14 @@ typedef struct CAMERA_INFO
 	PHD_VECTOR mikePos; // size=12, offset=108
 };
 
+enum CAMERA_FLAGS
+{
+	CF_FOLLOW_CENTER = 1,
+	CF_NO_CHUNKY = 2,
+	CF_CHASE_OBJECT = 3,
+};
+
 constexpr auto MAX_CAMERA = 18;
-constexpr auto FOLLOW_CENTRE = 1;
-constexpr auto NO_CHUNKY = 2;
-constexpr auto CHASE_OBJECT = 3;
 constexpr auto NO_MINY = 0xFFFFFF;
 
 extern PHD_VECTOR CurrentCameraPosition;

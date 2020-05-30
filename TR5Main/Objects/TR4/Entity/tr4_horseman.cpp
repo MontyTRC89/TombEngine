@@ -4,6 +4,8 @@
 #include "effect2.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
+#include "trmath.h"
 
 BITE_INFO horseBite1 = { 0, 0, 0, 0x0D };
 BITE_INFO horseBite2 = { 0, 0, 0, 0x11 };

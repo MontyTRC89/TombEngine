@@ -20,6 +20,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include "setup.h"
 
 #include "motorbike.h"
 #include "cannon.h"

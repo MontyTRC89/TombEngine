@@ -1,5 +1,4 @@
 #pragma once
-#include "constants.h"
 #include "effect2.h"
 
 constexpr float MAX_BUBBLES = 256;
