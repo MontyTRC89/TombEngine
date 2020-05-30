@@ -1,9 +1,10 @@
+#include "framework.h"
 #include "sound.h"
 #include "lara.h"
 #include "camera.h"
-#include "..\Specific\configuration.h"
-#include "..\Specific\level.h""
-#include "..\Specific\winmain.h"
+#include "configuration.h"
+#include "level.h"
+#include "winmain.h"
 
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];

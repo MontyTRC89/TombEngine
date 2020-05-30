@@ -1,19 +1,10 @@
 #pragma once
-
-#include <sol.hpp>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <map>
-#include "..\Global\global.h"
-#include "..\Specific\IO\ChunkId.h"
-#include "..\Specific\IO\ChunkReader.h"
-#include "..\Specific\IO\ChunkWriter.h"
-#include "..\Specific\IO\LEB128.h"
-#include "..\Specific\IO\Streams.h"
-
-using namespace std;
+#include "ChunkId.h"
+#include "ChunkReader.h"
+#include "ChunkWriter.h"
+#include "LEB128.h"
+#include "Streams.h"
+#include "items.h"
 
 #define ITEM_PARAM_currentAnimState		0
 #define ITEM_PARAM_goalAnimState			1

@@ -1,9 +1,9 @@
+#include "framework.h"
+#include "collide.h"
 #include "control.h"
 
-#include "..\Global\global.h"
- 
 #include "pickup.h"
-#include "Camera.h"
+#include "camera.h"
 #include "Lara.h"
 #include "hair.h"
 #include "items.h"
@@ -14,7 +14,7 @@
 #include "lot.h"
 #include "pickup.h"
 #include "draw.h"
-#include "healt.h"
+#include "health.h"
 #include "savegame.h"
 #include "sound.h"
 #include "spotcam.h"
@@ -25,23 +25,20 @@
 #include "rope.h"
 #include "tomb4fx.h"
 #include "traps.h"
-#include "effects.h"
+#include "effect.h"
 #include "sphere.h"
 #include "debris.h"
 #include "larafire.h"
-#include "..\Objects\oldobjects.h"
-
 #include "footprint.h"
-#include "..\Specific\level.h"
-#include "..\Specific\input.h"
-#include "..\Specific\init.h"
-#include "..\Specific\winmain.h"
-#include "../Specific/input.h"
-
-#include <process.h>
-#include <stdio.h>
-#include "..\Renderer\Renderer11.h"
-#include "../Specific/setup.h"
+#include "level.h"
+#include "input.h"
+#include "init.h"
+#include "winmain.h"
+#include "Renderer11.h"
+#include "setup.h"
+#include "tr5_rats_emitter.h"
+#include "tr5_bats_emitter.h"
+#include "tr5_spider_emitter.h"
 
 short ShatterSounds[18][10] =
 {
@@ -77,8 +74,8 @@ int RumbleTimer = 0;
 int InGameCnt = 0;
 byte IsAtmospherePlaying = 0;
 byte FlipStatus = 0;
-int FlipStats[255];
-int FlipMap[255];
+int FlipStats[MAX_FLIPMAP];
+int FlipMap[MAX_FLIPMAP];
 bool InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[512];
@@ -114,7 +111,7 @@ int InitialiseGame;
 int RequiredStartPos;
 int WeaponDelay;
 int WeaponEnemyTimer;
-int HeightType;
+HEIGHT_TYPES HeightType;
 int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
@@ -126,9 +123,9 @@ int CutSeqNum;
 int CutSeqTriggered;
 int GlobalPlayingCutscene;
 int CurrentLevel;
-int SoundActive;
-int DoTheGame;
-int Unk_876C48;
+bool SoundActive;
+bool DoTheGame;
+bool ThreadEnded;
 int OnFloor;
 int SmokeWindX;
 int SmokeWindZ;
@@ -532,9 +529,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 	return GAME_STATUS_NONE;
 }
 
-unsigned __stdcall GameMain(void*)
+unsigned CALLBACK GameMain(void*)
 {
-	//DB_Log(2, "GameMain - DLL");
 	printf("GameMain\n");
 
 	// Initialise legacy memory buffer and game timer
@@ -550,10 +546,10 @@ unsigned __stdcall GameMain(void*)
 	DoTheGame = false;
 
 	// Finish the thread
-	PostMessageA((HWND)WindowsHandle, 0x10u, 0, 0);
-	_endthreadex(1);
+	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
+	EndThread();
 	
-	return 1;   
+	return TRUE;
 }   
 
 GAME_STATUS DoTitle(int index)
@@ -1020,7 +1016,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 
 				if (item->active && Objects[item->objectNumber].intelligent)
 				{
-					item->hitPoints = -16384;
+					item->hitPoints = NOT_TARGETABLE;
 					DisableBaddieAI(value);
 					KillItem(value);
 				}
@@ -1041,7 +1037,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				{
 					if (Objects[item->objectNumber].intelligent)
 					{
-						if (item->status != ITEM_INACTIVE)
+						if (item->status != ITEM_NOT_ACTIVE)
 						{
 							if (item->status == ITEM_INVISIBLE)
 							{
@@ -2138,7 +2134,6 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 
 	flag = 0;
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
-
 	if (itemNumber != 999)
 	{
 		target.x = vector.x - (vector.x - src->x >> 5);
@@ -2280,7 +2275,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									}
 								}
 							}
-							if (item->status != ITEM_DEACTIVATED)
+							if (item->status != ITEM_DESACTIVATED)
 							{
 								AddActiveItem(itemNumber);
 								item->status = ITEM_ACTIVE;
@@ -2388,7 +2383,7 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 		{
 			item = &Items[linknum];
 
-			if (item->status != ITEM_DEACTIVATED 
+			if (item->status != ITEM_DESACTIVATED 
 				&& item->status != ITEM_INVISIBLE 
 				&& (item->objectNumber != ID_LARA && Objects[item->objectNumber].collision != NULL
 				|| item->objectNumber == ID_LARA && GetLaraOnLOS))
@@ -2781,7 +2776,7 @@ void AnimateItem(ITEM_INFO* item)
 				case COMMAND_DEACTIVATE:
 					if (Objects[item->objectNumber].intelligent && !item->afterDeath)
 						item->afterDeath = 1;
-					item->status = ITEM_DEACTIVATED;
+					item->status = ITEM_DESACTIVATED;
 					break;
 				case COMMAND_SOUND_FX:
 				case COMMAND_EFFECT:
@@ -2983,10 +2978,7 @@ void RemoveRoomFlipItems(ROOM_INFO* r)
 	{
 		ITEM_INFO* item = &Items[linkNum];
 
-		if (item->flags & 0x100
-			&& Objects[item->objectNumber].intelligent
-			&& item->hitPoints <= 0
-			&& item->hitPoints != -16384)
+		if (item->flags & 0x100 && Objects[item->objectNumber].intelligent && item->hitPoints <= 0 && item->hitPoints != NOT_TARGETABLE)
 		{
 			KillItem(linkNum);
 		}
@@ -3090,7 +3082,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 	if (1 << Node & item->meshBits)
 	{
 		Num = bits;
-		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7))
+		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 		{
 			SoundEffect(SFX_SMASH_METAL, &item->pos, 0);
 		}
@@ -3105,7 +3097,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		ShatterItem.sphere.x = CreatureSpheres[Node].x;
 		ShatterItem.sphere.y = CreatureSpheres[Node].y;
 		ShatterItem.sphere.z = CreatureSpheres[Node].z;
-		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData; // TODO: remove it or at last change it with the new renderer light...
+		ShatterItem.il = (ITEM_LIGHT*) &item->legacyLightData; // TODO: remove it or at last change it with the new renderer light...
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x,(float)ShatterItem.sphere.y,(float)ShatterItem.sphere.z };
@@ -3262,13 +3254,10 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += deltaAngle >> shift;
 }
 
-#define OutsideRoomTable VAR_U_(0x00EEF4AC, unsigned char*)
-#define OutsideRoomOffsets ARRAY_(0x00EEF040, short, [27 * 27])
-
 int IsRoomOutside(int x, int y, int z)
 {
 	return 0;
-
+	/*
 	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
 	if (offset == -1)
 		return -2;
@@ -3329,5 +3318,5 @@ int IsRoomOutside(int x, int y, int z)
 			s++;
 		}
 		return -2;
-	}
+	}*/
 }

@@ -1,9 +1,10 @@
+#include "framework.h"
 #include "traps.h"
-#include "..\Global\global.h"
+
 #include "items.h"
 #include "effect2.h"
 #include "tomb4fx.h"
-#include "effects.h"
+#include "effect.h"
 #include "lara.h"
 #include "collide.h"
 #include "switch.h"
@@ -11,8 +12,8 @@
 #include "camera.h"
 #include "objlight.h"
 #include "draw.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
 
 static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
@@ -322,7 +323,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 	l->pos.yRot += ANGLE(180);
 	result2 = TestLaraPosition(CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
+	if (TrInput & IN_ACTION && item->status != ITEM_DESACTIVATED && l->currentAnimState == STATE_LARA_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
@@ -362,7 +363,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 	ITEM_INFO* item;
 
 	item = &Items[itemNumber];
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_STOP && l->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS
+	if (TrInput & IN_ACTION && item->status != ITEM_DESACTIVATED && l->currentAnimState == STATE_LARA_STOP && l->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS
 		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 	{
 		if (TestLaraPosition(FloorTrapDoorBounds, item, l))
@@ -575,7 +576,7 @@ void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height)
 		if (y <= item->pos.yPos)
 		{
 			*height = item->pos.yPos;
-			HeightType = 0;
+			HeightType = WALL;
 			OnFloor = 1;
 		}
 	}

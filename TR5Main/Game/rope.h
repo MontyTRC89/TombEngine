@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\Global\global.h"
+#include "collide.h"
 
 struct ROPE_STRUCT
 {

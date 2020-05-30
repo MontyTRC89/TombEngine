@@ -1,30 +1,26 @@
+#include "framework.h"
 #include "Renderer11.h"
-
-#include "..\Specific\input.h"
-#include "..\Specific\winmain.h"
-#include "..\Specific\level.h"
-#include "..\Specific\configuration.h"
-
-#include "..\Game\draw.h"
-#include "..\Game\healt.h"
-#include "..\Game\pickup.h"
-#include "..\Game\inventory.h"
-#include "..\Game\gameflow.h"
-#include "..\Game\Lara.h"
-#include "..\Game\effect2.h"
-#include "..\Game\rope.h"
-#include "..\Game\items.h"
-#include "..\Game\Camera.h"
-#include "..\Game\healt.h"
-#include "../Game/tomb4fx.h"
-#include "math.h"
-#include <D3Dcompiler.h>
-#include <chrono> 
-#include <stack>
-#include "../Game/misc.h"
-#include "../Game/footprint.h"
+#include "input.h"
+#include "winmain.h"
+#include "level.h"
+#include "configuration.h"
+#include "draw.h"
+#include "health.h"
+#include "pickup.h"
+#include "inventory.h"
+#include "gameflow.h"
+#include "Lara.h"
+#include "effect2.h"
+#include "rope.h"
+#include "camera.h"
+#include "tomb4fx.h"
+#include "trmath.h"
+#include "misc.h"
+#include "footprint.h"
+#include "setup.h"
 
 extern std::deque<FOOTPRINT_STRUCT> footprints;
+Renderer11* g_Renderer;
 
 Renderer11::Renderer11()
 {
@@ -101,7 +97,7 @@ void Renderer11::FreeRendererData()
 		DX11_DELETE(m_sprites[i]);
 	free(m_sprites);
 
-	for (int i = 0; i < NUM_STATICS; i++)
+	for (int i = 0; i < MAX_STATICS; i++)
 		DX11_DELETE(m_staticObjects[i]);
 	free(m_staticObjects);
 

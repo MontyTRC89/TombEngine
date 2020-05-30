@@ -1,15 +1,12 @@
+#include "framework.h"
 #include "missile.h"
-#include "..\Global\global.h"
-#include "..\Game\control.h"
-#include "..\Game\sound.h"
-#include "..\Game\items.h"
-#include "..\Game\effects.h"
-#include "..\Game\draw.h"
-#include "..\Game\tomb4fx.h"
-#include <stdio.h>
+#include "sound.h"
+#include "items.h"
+#include "effect.h"
+#include "draw.h"
 #include "debris.h"
-#include "../Specific/level.h"
-#include "../Specific/setup.h"
+#include "level.h"
+#include "setup.h"
 #include "lara.h"
 
 #define SHARD_DAMAGE 30

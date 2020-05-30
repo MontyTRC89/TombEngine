@@ -1,27 +1,28 @@
+#include "framework.h"
 #include "savegame.h"
-#include "..\Global\global.h"
-#include "..\Game\Lara.h"
-#include "..\Game\items.h"
-#include "..\Game\box.h"
-#include "..\Game\pickup.h"
-#include "..\Game\lot.h"
-#include "..\Game\switch.h"
-#include "..\Game\spotcam.h"
+#include "Lara.h"
+#include "items.h"
+#include "box.h"
+#include "pickup.h"
+#include "lot.h"
+#include "switch.h"
+#include "spotcam.h"
 #include "traps.h"
-#include "..\Game\laramisc.h"
-#include "..\Objects\newobjects.h"
-#include "..\Objects\oldobjects.h"
-#include "..\Game\sound.h"
-#include "..\Specific\level.h"
-#include "../Specific/setup.h"
+#include "laramisc.h"
+#include "sound.h"
+#include "level.h"
+#include "setup.h"
 #include "camera.h"
+#include "quad.h"
+#include "tr5_rats_emitter.h"
+#include "tr5_bats_emitter.h"
+#include "tr5_spider_emitter.h"
 
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
 ChunkWriter* SaveGame::m_writer;
 vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
-SAVEGAME_INFO Savegame;
 
 ChunkId* SaveGame::m_chunkGameStatus;
 ChunkId* SaveGame::m_chunkItems;
@@ -65,6 +66,7 @@ ChunkId* SaveGame::m_chunkPickupCombo;
 ChunkId* SaveGame::m_chunkExamineCombo;
 ChunkId* SaveGame::m_chunkWeaponItem;
 
+SAVEGAME_INFO Savegame;
 extern vector<AudioTrack> g_AudioTracks;
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
@@ -512,18 +514,17 @@ bool SaveGame::readLara()
 	memcpy(&Lara, lara, sizeof(LaraInfo));
 	free(buffer);
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		Lara.meshPtrs[i] = ADD_PTR(Lara.meshPtrs[i], short, MeshBase);
-		//printf("MeshPtr: %d\n", Lara.meshPtrs[i]);
+		Lara.meshPtrs[i] = AddPtr(Lara.meshPtrs[i], short, MeshBase);
 	}
 
-	Lara.leftArm.frameBase = ADD_PTR(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
-	Lara.rightArm.frameBase = ADD_PTR(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
+	Lara.leftArm.frameBase = AddPtr(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
+	Lara.rightArm.frameBase = AddPtr(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;
-	Lara.generalPtr = ADD_PTR(Lara.generalPtr, char, malloc_buffer);
+	Lara.generalPtr = (void*)AddPtr(Lara.generalPtr, char, malloc_buffer);
 	Lara.weaponItem = NO_ITEM;
 
 	// Is Lara burning?
@@ -543,7 +544,6 @@ bool SaveGame::readLara()
 	}
 	
 	m_reader->ReadChunks(&readLaraChunks, 0);
-
 	return true;
 }
 
@@ -575,7 +575,7 @@ bool SaveGame::readItem()
 		m_reader->ReadChunks(&readItemChunks, itemNumber);
 		DisableBaddieAI(itemNumber);
 		KillItem(itemNumber);
-		item->status = ITEM_DEACTIVATED;
+		item->status = ITEM_DESACTIVATED;
 		item->flags |= ONESHOT;
 		item->afterDeath = 128;
 	}
@@ -589,11 +589,8 @@ bool SaveGame::readItem()
 	}
 
 	// Some post-processing things
-	if (obj->collision == PuzzleHoleCollision && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
-	{
-		item->objectNumber += 8;
-		//*((_WORD *)pItem - 28) = v55 + Objects[*((_WORD *)pItem - 32)].anim_index;
-	}
+	if (obj->isPuzzleHole && (item->status == ITEM_DESACTIVATED || item->status == ITEM_ACTIVE))
+		item->objectNumber += NUM_PUZZLES;
 
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8 && (item->flags & ONESHOT))
 		item->meshBits = 0x100;
@@ -770,7 +767,6 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 	else if (chunkId->EqualsTo(m_chunkWeaponInfo))
 	{
 		int id = LEB128::ReadInt32(m_stream);
-
 		CarriedWeaponInfo* weapon = &Lara.Weapons[id];
 
 		weapon->Present = LEB128::ReadByte(m_stream);
@@ -1046,7 +1042,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 		creature->mood = (MOOD_TYPE)LEB128::ReadInt32(m_stream);
 
 		ITEM_INFO* enemy = (ITEM_INFO*)LEB128::ReadLong(m_stream);
-		creature->enemy = ADD_PTR(enemy, ITEM_INFO, malloc_buffer);
+		creature->enemy = AddPtr(enemy, ITEM_INFO, malloc_buffer);
 
 		creature->aiTarget.objectNumber = LEB128::ReadInt16(m_stream);
 		creature->aiTarget.roomNumber = LEB128::ReadInt16(m_stream);

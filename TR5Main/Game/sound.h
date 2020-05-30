@@ -1,14 +1,12 @@
 #pragma once
+#include "control.h"
 
-#include "bass.h"
-#include "bass_fx.h"
-#include <vector>
-
-#include "..\Game\control.h"
-#include "..\Global\global.h"
-
-#include <SimpleMath.h>
-using namespace DirectX::SimpleMath;
+enum SFX_TYPES
+{
+	SFX_LANDANDWATER = 0,
+	SFX_LANDONLY = (1 << 14),
+	SFX_WATERONLY = (2 << 14)
+};
 
 typedef enum audio_tracks
 {
@@ -1969,7 +1967,7 @@ typedef enum sound_effects
 #define SOUND_XFADETIME_HIJACKSOUND	50
 #define SOUND_BGM_DAMP_COEFFICIENT	0.6f
 
-struct SoundEffectSlot
+typedef struct SoundEffectSlot
 {
 	short state;
 	short effectID;
@@ -1978,13 +1976,13 @@ struct SoundEffectSlot
 	Vector3 origin;
 };
 
-struct SoundTrackSlot
+typedef struct SoundTrackSlot
 {
 	HSTREAM channel;
 	short   trackID;
 };
 
-enum sound_track_types
+typedef enum sound_track_types
 {
 	SOUND_TRACK_ONESHOT,
 	SOUND_TRACK_BGM,
@@ -1992,7 +1990,7 @@ enum sound_track_types
 	NUM_SOUND_TRACK_TYPES
 };
 
-enum sound_filters
+typedef enum sound_filters
 {
 	SOUND_FILTER_REVERB,
 	SOUND_FILTER_COMPRESSOR,
@@ -2001,14 +1999,14 @@ enum sound_filters
 	NUM_SOUND_FILTERS
 };
 
-enum sound_states
+typedef enum sound_states
 {
 	SOUND_STATE_IDLE,
 	SOUND_STATE_ENDING,
 	SOUND_STATE_ENDED
 };
 
-enum sound_flags
+typedef enum sound_flags
 { 
 	SOUND_NORMAL, 
 	SOUND_WAIT, 
@@ -2016,7 +2014,7 @@ enum sound_flags
 	SOUND_LOOPED 
 };
 
-enum reverb_type
+typedef enum reverb_type
 {
 	RVB_OUTSIDE,	   // 0x00   no reverberation
 	RVB_SMALL_ROOM,	   // 0x01   little reverberation
@@ -2027,7 +2025,17 @@ enum reverb_type
 	NUM_REVERB_TYPES
 };
 
-struct AudioTrack
+typedef struct SAMPLE_INFO
+{
+	short number;
+	byte volume;
+	byte radius;
+	byte randomness;
+	signed char pitch;
+	short flags;
+};
+
+typedef struct AudioTrack
 {
 	char* Name;
 	byte Mask;

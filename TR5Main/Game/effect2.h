@@ -1,14 +1,63 @@
 #pragma once
-#include <d3d11.h>
-#include "..\Global\global.h"
+#include "phd_global.h"
+#include "items.h"
 
-#define MAX_NODE 23
-#define RIPPLE_FLAG_BLOOD 0x80
-#define RIPPLE_FLAG_RAND_POS 0x40
-#define RIPPLE_FLAG_RAND_ROT 0x20
-#define RIPPLE_FLAG_SHORT_LIFE 0x01
+enum RIPPLE_TYPE
+{
+	RIPPLE_FLAG_NONE = 0x0,
+	RIPPLE_FLAG_SHORT_LIFE = 0x1,
+	RIPPLE_FLAG_RAND_ROT = 0x20,
+	RIPPLE_FLAG_RAND_POS = 0x40,
+	RIPPLE_FLAG_BLOOD = 0x80
+};
 
-struct RIPPLE_STRUCT
+enum SpriteEnumFlag
+{
+	SP_NONE = 0x0000,
+	SP_FLAT = 0x0001,
+	SP_SCALE = 0x0002,
+	SP_BLOOD = 0x0004,
+	SP_DEF = 0x0008,
+	SP_ROTATE = 0x0010,
+	SP_EXPLOSION = 0x0020,
+	SP_FX = 0x0040,
+	SP_ITEM = 0x0080,
+	SP_WIND = 0x0100,
+	SP_EXPDEF = 0x0200,
+	SP_USEFXOBJPOS = 0x0400,
+	SP_UNDERWEXP = 0x0800,
+	SP_NODEATTACH = 0x1000,
+	SP_PLASMAEXP = 0x2000
+};
+
+enum TransTypeEnum
+{
+	NOTRANS,
+	SEMITRANS,
+	COLADD,
+	COLSUB,
+	WEIRD
+};
+
+struct NODEOFFSET_INFO
+{
+	short x;
+	short y;
+	short z;
+	char meshNum;
+	unsigned char gotIt;
+};
+
+typedef struct SPLASH_SETUP
+{
+	float x;
+	float y;
+	float z;
+	float splashPower;
+	float innerRadius;
+};
+
+typedef struct RIPPLE_STRUCT
 {
 	Vector4 currentColor;
 	Vector4 initialColor;
@@ -24,27 +73,120 @@ struct RIPPLE_STRUCT
 	bool isBillboard; //used for Blood
 };
 
-struct SPLASH_SETUP
+typedef struct SPARKS
+{
+	int x;
+	int y;
+	int z;
+	short xVel;
+	short yVel;
+	short zVel;
+	short gravity;
+	short rotAng;
+	unsigned short flags; // SP_enum
+	unsigned char sSize;
+	unsigned char dSize;
+	unsigned char size;
+	unsigned char friction;
+	unsigned char scalar;
+	unsigned char def;
+	signed char rotAdd;
+	signed char maxYvel;
+	bool on;
+	byte sR;
+	byte sG;
+	byte sB;
+	byte dR;
+	byte dG;
+	byte dB;
+	byte r;
+	byte g;
+	byte b;
+	unsigned char colFadeSpeed;
+	unsigned char fadeToBlack;
+	unsigned char sLife;
+	unsigned char life;
+	TransTypeEnum transType;
+	unsigned char extras;
+	signed char dynamic;
+	unsigned char fxObj;
+	unsigned char roomNumber;
+	unsigned char nodeNumber;
+};
+
+typedef struct SPLASH_STRUCT
 {
 	float x;
 	float y;
 	float z;
-	float splashPower;
-	float innerRadius;
+	float innerRad;
+	float innerRadVel;
+	float heightVel;
+	float heightSpeed;
+	float height;
+	float outerRad;
+	float outerRadVel;
+	float animationSpeed;
+	float animationPhase;
+	short spriteSequenceStart;
+	short spriteSequenceEnd;
+	unsigned short life;
+	bool isRipple;
+	bool isActive;
 };
-extern SPLASH_STRUCT Splashes[MAX_SPLASH];
-extern RIPPLE_STRUCT Ripples[32];
+
+typedef struct DYNAMIC
+{
+	int x;
+	int y;
+	int z;
+	byte on;
+	byte r;
+	byte g;
+	byte b;
+	short falloff;
+	byte used;
+	byte pad1[1];
+	int FalloffScale;
+};
+
+typedef struct SP_DYNAMIC
+{
+	byte On;
+	byte Falloff;
+	byte R;
+	byte G;
+	byte B;
+	byte Flags;
+	byte Pad[2];
+};
+
+constexpr auto SD_EXPLOSION = 1;
+constexpr auto SD_UWEXPLOSION = 2;
+
+#define MAX_NODE 23
+#define MAX_DYNAMICS 64
+#define MAX_SPARKS 1024
+#define MAX_RIPPLES 32
+#define MAX_SPLASHES 8
+#define MAX_SPARKS_DYNAMICS 8
+
+extern int NextSpark;
 extern int DeadlyBounds[6];
-extern SPARKS Sparks[1024];
-extern SP_DYNAMIC SparkDynamics[8];
 extern SPLASH_SETUP SplashSetup;
+extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
+extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
+extern DYNAMIC Dynamics[MAX_DYNAMICS];
+extern SPARKS Sparks[MAX_SPARKS];
+extern SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
 extern int SmokeWeapon;
-extern int SmokeCountL;
-extern int SmokeCountR;
+extern byte SmokeCountL;
+extern byte SmokeCountR;
+extern int SplashCount;
 extern PHD_VECTOR NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
-void DetatchSpark(int num, int type);
+void DetatchSpark(int num, SpriteEnumFlag type);
 int GetFreeSpark();
 void UpdateSparks();
 void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk);
