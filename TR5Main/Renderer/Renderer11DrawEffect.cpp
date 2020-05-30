@@ -838,9 +838,9 @@ bool Renderer11::drawSprites()
 			{
 				float halfWidth = spr->Width / 2.0f * spr->Scale;
 				float halfHeight = spr->Height / 2.0f * spr->Scale;
-
-				Matrix billboardMatrix;
-				createBillboardMatrix(&billboardMatrix, &spr->pos, &Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), spr->Rotation);
+				//Extract Camera Up Vector and create Billboard matrix.
+				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
+				Matrix billboardMatrix = Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 
 				Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
 				Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
