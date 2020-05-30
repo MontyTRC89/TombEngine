@@ -9,7 +9,6 @@
 #include "gameflow.h"
 #include "savegame.h"
 #include "level.h"
-#include "newlevel.h"
 #include "configuration.h"
 #include "Renderer11.h"
 
