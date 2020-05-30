@@ -1,6 +1,6 @@
 #include "framework.h"
-#include "global.h"
 #include "items.h"
+#include "constants.h"
 #include "effect2.h"
 #include "setup.h"
 #include "level.h"
@@ -30,7 +30,7 @@ void KillItem(short itemNum)
 	{
 		ITEM_INFO* item = &Items[itemNum];
 
-		DetatchSpark(itemNum, 128);
+		DetatchSpark(itemNum, SP_ITEM);
 
 		item->active = false;
 		item->reallyActive = false;
@@ -52,7 +52,7 @@ void KillItem(short itemNum)
 			}
 		}
 
-		if (item->roomNumber != 255)
+		if (item->roomNumber != NO_ROOM)
 		{
 			if (Rooms[item->roomNumber].itemNumber == itemNum)
 			{
@@ -99,7 +99,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 		if (item->objectNumber == objectNumber)
 		{
 			RemoveActiveItem(currentItemNum);
-			item->status = ITEM_INACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 			item->flags &= 0xC1;
 		}
 
@@ -115,7 +115,7 @@ void AddActiveItem(short itemNumber)
 
 	if (Objects[item->objectNumber].control == NULL)
 	{
-		item->status = ITEM_INACTIVE;
+		item->status = ITEM_NOT_ACTIVE;
 		return;
 	}
 
@@ -355,7 +355,7 @@ void InitialiseItem(short itemNum)
 	item->itemFlags[0] = 0;
 
 	item->active = false;
-	item->status = ITEM_INACTIVE;
+	item->status = ITEM_NOT_ACTIVE;
 	item->gravityStatus = false;
 	item->hitStatus = false;
 	item->collidable = true;
@@ -467,7 +467,7 @@ short SpawnItem(ITEM_INFO* item, short objectNumber)
 
 		InitialiseItem(itemNumber);
 
-		spawn->status = ITEM_INACTIVE;
+		spawn->status = ITEM_NOT_ACTIVE;
 		spawn->shade = 0x4210;
 	}
 
@@ -495,11 +495,11 @@ int GlobalItemReplace(short search, short replace)
 
 ITEM_INFO* find_a_fucking_item(short objectNum)
 {
-	int itemNumber = FindItem(objectNum);
+	int itemNumber = FindItemNumber(objectNum);
 	return (itemNumber != NO_ITEM ? &Items[itemNumber] : NULL);
 }
 
-int FindItem(short objectNum)
+int FindItemNumber(short objectNum)
 {
 	for (int i = 0; i < LevelItems; i++)
 	{
@@ -509,4 +509,22 @@ int FindItem(short objectNum)
 	}
 
 	return NO_ITEM;
+}
+
+ITEM_INFO* FindItem(short objectNumber)
+{
+#ifdef _DEBUG
+	printf("Called FindItem()\n");
+#endif
+
+	if (LevelItems > 0)
+	{
+		for (int i = 0; i < LevelItems; i++)
+		{
+			if (Items[i].objectNumber == objectNumber)
+				return &Items[i];
+		}
+	}
+
+	return NULL;
 }

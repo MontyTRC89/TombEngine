@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_raisingcog.h"
+#include "tr5_raisingcog.h"
 #include "level.h"
 #include "switch.h"
 #include "control.h"
@@ -85,7 +85,7 @@ void RaisingCogControl(short itemNumber)
 				}
 
 				RemoveActiveItem(itemNumber);
-				item->status = ITEM_INACTIVE;
+				item->status = ITEM_NOT_ACTIVE;
 				item->aiBits = 0;
 			}
 			else

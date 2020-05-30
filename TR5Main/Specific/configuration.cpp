@@ -8,7 +8,6 @@
 #include "configuration.h"
 #include "sound.h"
 
-extern Renderer11* g_Renderer;
 extern GameFlow* g_GameFlow;
 GameConfiguration g_Configuration;
 

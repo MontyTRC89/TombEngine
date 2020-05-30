@@ -12,14 +12,15 @@
 #include "Lara.h"
 #include "effect2.h"
 #include "rope.h"
-#include "items.h"
 #include "camera.h"
 #include "tomb4fx.h"
 #include "trmath.h"
 #include "misc.h"
 #include "footprint.h"
+#include "setup.h"
 
 extern std::deque<FOOTPRINT_STRUCT> footprints;
+Renderer11* g_Renderer;
 
 Renderer11::Renderer11()
 {
@@ -96,7 +97,7 @@ void Renderer11::FreeRendererData()
 		DX11_DELETE(m_sprites[i]);
 	free(m_sprites);
 
-	for (int i = 0; i < NUM_STATICS; i++)
+	for (int i = 0; i < MAX_STATICS; i++)
 		DX11_DELETE(m_staticObjects[i]);
 	free(m_staticObjects);
 

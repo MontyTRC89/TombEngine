@@ -9,7 +9,6 @@
 #include "spotcam.h"
 #include "traps.h"
 #include "laramisc.h"
-#include "newobjects.h"
 #include "oldobjects.h"
 #include "sound.h"
 #include "level.h"
@@ -25,7 +24,6 @@ ChunkReader* SaveGame::m_reader;
 ChunkWriter* SaveGame::m_writer;
 vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
-SAVEGAME_INFO Savegame;
 
 ChunkId* SaveGame::m_chunkGameStatus;
 ChunkId* SaveGame::m_chunkItems;
@@ -579,7 +577,7 @@ bool SaveGame::readItem()
 		m_reader->ReadChunks(&readItemChunks, itemNumber);
 		DisableBaddieAI(itemNumber);
 		KillItem(itemNumber);
-		item->status = ITEM_DEACTIVATED;
+		item->status = ITEM_DESACTIVATED;
 		item->flags |= ONESHOT;
 		item->afterDeath = 128;
 	}
@@ -593,7 +591,7 @@ bool SaveGame::readItem()
 	}
 
 	// Some post-processing things
-	if (obj->isPuzzleHole && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
+	if (obj->isPuzzleHole && (item->status == ITEM_DESACTIVATED || item->status == ITEM_ACTIVE))
 		item->objectNumber += NUM_PUZZLES;
 
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8 && (item->flags & ONESHOT))
@@ -771,7 +769,6 @@ bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
 	else if (chunkId->EqualsTo(m_chunkWeaponInfo))
 	{
 		int id = LEB128::ReadInt32(m_stream);
-
 		CarriedWeaponInfo* weapon = &Lara.Weapons[id];
 
 		weapon->Present = LEB128::ReadByte(m_stream);

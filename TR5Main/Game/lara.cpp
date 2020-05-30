@@ -17,7 +17,6 @@
 #include "laraclmb.h"
 #include "rope.h"
 #include "health.h"
-#include "newobjects.h"
 #include "level.h"
 #include "input.h"
 #include "sound.h"
@@ -1797,13 +1796,13 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)//1B288, 1B3BC (F)
 				if (p->itemFlags[2])
 				{
 					p->itemFlags[2] = 0;
-					p->status = ITEM_DEACTIVATED;
+					p->status = ITEM_DESACTIVATED;
 				}
 			}
 			else
 			{
 				if (!p->itemFlags[1])
-					p->status = ITEM_DEACTIVATED;
+					p->status = ITEM_DESACTIVATED;
 
 				p->itemFlags[2] = 1;
 

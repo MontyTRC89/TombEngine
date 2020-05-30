@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "tr5_teethspike.h"
-#include "level.h"
+#include "control.h"
 #include "draw.h"
 #include "lara.h"
-#include "control.h"
+#include "level.h"
 #include "sound.h"
 #include "tomb4fx.h"
+#include "trmath.h"
 
 short SPyoffs[8] =
 {
@@ -24,13 +25,24 @@ short SPDETyoffs[8] =
 
 void InitialiseTeethSpikes(short itemNumber)
 {
-	short rotations[8] = { -ANGLE(180.0f), -ANGLE(135.0f), -ANGLE(90.0f), -ANGLE(45.0f), ANGLE(0.0f), ANGLE(45.0f), ANGLE(90.0f), ANGLE(135.0f) };
+	ITEM_INFO* item;
+	int angle;
 
-	ITEM_INFO* item = &Items[itemNumber];
-
+	item = &Items[itemNumber];
 	item->status = ITEM_INVISIBLE;
 
-	int angle;
+	short rotations[8] =
+	{
+		-ANGLE(180.0f),
+		-ANGLE(135.0f),
+		-ANGLE(90.0f),
+		-ANGLE(45.0f),
+		ANGLE(0.0f),
+		ANGLE(45.0f), 
+		ANGLE(90.0f),
+		ANGLE(135.0f)
+	};
+	
 	if (item->triggerFlags & 8)
 	{
 		angle = item->triggerFlags & 7;
@@ -50,7 +62,7 @@ void InitialiseTeethSpikes(short itemNumber)
 	item->pos.yPos += SPyoffs[angle];
 }
 
-int CollidedWithTeethSpikes(ITEM_INFO* item)
+static int CollidedWithTeethSpikes(ITEM_INFO* item)
 {
 	short angle;
 	int x;

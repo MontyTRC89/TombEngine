@@ -155,7 +155,7 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = 2;
+	sptr->transType = COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 

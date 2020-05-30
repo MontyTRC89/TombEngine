@@ -26,11 +26,12 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 /// objects
-
+#include "tr5_twoblockplatform.h"
+#include "tr5_raisingcog.h"
 /// traps
-
+#include "tr5_teethspike.h"
 /// switch
-
+#include "tr5_cogswitch.h"
 /// shatter
 #include "tr5_smashobject.h"
 /// necessary import
@@ -43,7 +44,8 @@
 #include "setup.h"
 #include "objects.h"
 #include "level.h"
-#include "ObjectsUtils.h"
+/// register objects
+#include "object_helper.h"
 
 static void StartBaddy(ObjectInfo* obj)
 {
@@ -841,11 +843,45 @@ static void StartObject(ObjectInfo* obj)
 
 	for (int objNumber = ID_PUSHABLE_OBJECT1; objNumber <= ID_PUSHABLE_OBJECT10; objNumber++)
 		InitPushableObject(obj, objNumber);
+
+	obj = &Objects[ID_TWOBLOCK_PLATFORM];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTwoBlocksPlatform;
+		obj->control = TwoBlocksPlatformControl;
+		obj->floor = TwoBlocksPlatformFloor;
+		obj->ceiling = TwoBlocksPlatformCeiling;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)
 {
 	
+}
+
+static void StartSwitch(ObjectInfo* obj)
+{
+	obj = &Objects[ID_COG_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = CogSwitchCollision;
+		obj->control = CogSwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_RAISING_COG];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseRaisingCog;
+		obj->control = RaisingCogControl;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
 }
 
 static void StartShatter(ObjectInfo* obj)
@@ -918,6 +954,7 @@ void InitialiseTR5Objects()
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartPickup(objToInit);
+	StartSwitch(objToInit);
 	StartShatter(objToInit);
 	StartProjectiles(objToInit);
 }

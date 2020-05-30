@@ -269,7 +269,8 @@ int S_UpdateInput()// (F)
 
 	if (Lara.gunStatus == LG_READY)
 	{
-		Savegame.AutoTarget = 1; // App.;
+		// TODO: AutoTarget Not Saved
+		//Savegame.AutoTarget = 1;
 
 		if (linput & IN_LOOK)
 		{
