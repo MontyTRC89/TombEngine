@@ -339,9 +339,6 @@
     <ClInclude Include="Objects\TR4\tr4_objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Specific\newlevel.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\TR5\tr5_objects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -741,6 +738,12 @@
     <ClInclude Include="Game\lara_struct.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Specific\levelloader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\newtypes.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1008,9 +1011,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\effect.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Specific\newlevel.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Entity\tr5_autoguns.cpp">
@@ -1353,6 +1353,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\trmath.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\levelloader.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
