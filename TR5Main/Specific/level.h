@@ -1,13 +1,95 @@
 #pragma once
-#include "global.h"
 #include "ChunkId.h"
 #include "ChunkReader.h"
 #include "LEB128.h"
+#include "Streams.h"
+
+#include "items.h"
+#include "room.h"
+
+#define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
+#define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh]
 
 struct ChunkId;
 struct LEB128;
 
-#define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
+typedef struct OBJECT_TEXTURE_VERT
+{
+	float x;
+	float y;
+};
+
+typedef struct OBJECT_TEXTURE
+{
+	short attribute;
+	short tileAndFlag;
+	short newFlags;
+	struct OBJECT_TEXTURE_VERT vertices[4];
+};
+
+#pragma pack(push, 1)
+struct tr_object_texture_vert
+{
+	byte Xcoordinate; // 1 if Xpixel is the low value, 255 if Xpixel is the high value in the object texture
+	byte Xpixel;
+	byte Ycoordinate; // 1 if Ypixel is the low value, 255 if Ypixel is the high value in the object texture
+	byte Ypixel;
+};
+
+struct tr4_object_texture
+{
+	short Attribute;
+	short TileAndFlag;
+	short NewFlags;
+	tr_object_texture_vert Vertices[4]; // The four corners of the texture
+	int OriginalU;
+	int OriginalV;
+	int Width;     // Actually width-1
+	int Height;    // Actually height-1
+	short Padding;
+};
+#pragma pack(pop)
+
+typedef struct AIOBJECT
+{
+	short objectNumber;
+	short roomNumber;
+	int x;
+	int y;
+	int z;
+	short triggerFlags;
+	short flags;
+	short yRot;
+	short boxNumber;
+};
+
+typedef struct CHANGE_STRUCT
+{
+	short goalAnimState;
+	short numberRanges;
+	short rangeIndex;
+};
+
+typedef struct RANGE_STRUCT
+{
+	short startFrame;
+	short endFrame;
+	short linkAnimNum;
+	short linkFrameNum;
+};
+
+typedef struct SPRITE
+{
+	short tile;
+	byte x;
+	byte y;
+	short width;
+	short height;
+	float left;
+	float top;
+	float right;
+	float bottom;
+};
 
 extern byte* Texture32;
 extern byte* Texture16;

@@ -55,7 +55,7 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 		spark->xVel = phd_sin(fx->pos.yRot) >> 2;
 		spark->yVel = 0;
 		spark->zVel = phd_cos(fx->pos.yRot) >> 2;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->friction = 68;
 		spark->flags = 26;
 		spark->rotAng = GetRandomControl() & 0xFFF;
@@ -110,7 +110,7 @@ void InitialiseSkeleton(short itemNumber)
 		item->currentAnimState = 25;
 		item->animNumber = obj->animIndex;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->status = ITEM_DEACTIVATED;
+		item->status = ITEM_DESACTIVATED;
 		break;
 
 	}

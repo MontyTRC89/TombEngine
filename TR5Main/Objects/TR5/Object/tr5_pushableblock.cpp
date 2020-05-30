@@ -2,7 +2,7 @@
 #include "tr5_pushableblock.h"
 #include "lara.h"
 #include "draw.h"
-#include "global.h"
+
 #include "items.h"
 #include "collide.h"
 #include "effect.h"
@@ -241,7 +241,7 @@ void PushableBlockControl(short itemNumber)
 			GetFloorHeight(floor, item->pos.xPos, item->pos.yPos - 256, item->pos.zPos);
 			TestTriggers(TriggerIndex, 1, item->flags & 0x3E00);
 			RemoveActiveItem(itemNumber);
-			item->status = ITEM_INACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 		}
 		break;
 	}
@@ -268,16 +268,16 @@ void PushableBlockControl(short itemNumber)
 	{                                              
 		item->gravityStatus = false;
 		item->pos.yPos = height;
-		item->status = ITEM_DEACTIVATED;
+		item->status = ITEM_DESACTIVATED;
 		floor_shake_effect(item);					 
 		SoundEffect(SFX_LARA_THUD, &item->pos, 0);
 	}
 
 	if (item->roomNumber != roomNumber)  
 		ItemNewRoom(itemNumber, roomNumber);
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DESACTIVATED)
 	{   
-		item->status = ITEM_INACTIVE;
+		item->status = ITEM_NOT_ACTIVE;
 		RemoveActiveItem(itemNumber);   
 
 		AlterFloorHeight(item, -1024);	 

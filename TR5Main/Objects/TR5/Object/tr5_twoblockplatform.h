@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 
 void InitialiseTwoBlocksPlatform(short itemNumber);
 void TwoBlocksPlatformControl(short itemNumber);

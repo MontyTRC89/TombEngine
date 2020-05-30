@@ -1,9 +1,8 @@
 #include "framework.h"
-#include "newobjects.h"
 #include "oldobjects.h"
 #include "lara.h"
 #include "draw.h"
-#include "global.h"
+
 #include "items.h"
 #include "collide.h"
 #include "effect.h"
@@ -1021,7 +1020,7 @@ void ControlHighObject1(short itemNumber)
 				RemoveActiveItem(itemNumber);
 
 				item->flags &= 0xC1FF;
-				item->status = ITEM_INACTIVE;
+				item->status = ITEM_NOT_ACTIVE;
 
 				return;
 			}
@@ -1076,7 +1075,7 @@ void ControlHighObject1(short itemNumber)
 			RemoveActiveItem(itemNumber);
 
 			item->flags &= 0xC1FF;
-			item->status = ITEM_INACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 
 			return;
 		}
@@ -1224,7 +1223,7 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		return;
 
 	ITEM_INFO* item = &Items[itemNumber];
-	if (item->status != ITEM_INACTIVE)
+	if (item->status != ITEM_NOT_ACTIVE)
 		return;
 
 	if (TestLaraPosition(DeathSlideBounds, item, LaraItem))
@@ -1262,7 +1261,7 @@ void ControlDeathSlide(short itemNumber)
 			if (old->roomNumber != item->roomNumber)
 				ItemNewRoom(itemNumber, old->roomNumber);
 
-			item->status = ITEM_INACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 			item->currentAnimState = item->goalAnimState = 1;
 			item->animNumber = Objects[item->objectNumber].animIndex;
 			item->frameNumber = Anims[item->animNumber].frameBase;
@@ -1323,7 +1322,7 @@ void ControlDeathSlide(short itemNumber)
 			// Stop
 			SoundEffect(SFX_COGS_ROME, &item->pos, 0);
 			RemoveActiveItem(itemNumber);
-			item->status = ITEM_INACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 			item->flags -= ONESHOT;
 		}
 		else

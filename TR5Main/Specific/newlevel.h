@@ -1,5 +1,7 @@
 #pragma once
 #include "sound.h"
+#include "ChunkId.h"
+#include "ChunkReader.h"
 #include "Streams.h"
 
 struct TrTexturePage 
@@ -321,7 +323,7 @@ struct TrSpriteSequence
 	vector<TrSprite> sprites;
 };
 
-class TrLevel : IHasChunkReader
+class TrLevel
 {
 private:
 	ChunkId* m_chunkTextureAtlas = ChunkId::FromString("T5MTex");

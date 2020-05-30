@@ -196,7 +196,7 @@ static  void SkidooExplode(ITEM_INFO* skidoo)
 
 	ExplodingDeath(Lara.Vehicle, -1, 256);
 	KillItem(Lara.Vehicle);
-	skidoo->status = ITEM_DEACTIVATED;
+	skidoo->status = ITEM_DESACTIVATED;
 	SoundEffect(SFX_EXPLOSION1, 0, 0);
 	SoundEffect(SFX_EXPLOSION2, 0, 0);
 	Lara.Vehicle = NO_ITEM;

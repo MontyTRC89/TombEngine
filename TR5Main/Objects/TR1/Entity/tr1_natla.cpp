@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr1_natla.h"
 #include "box.h"
 #include "people.h"
 #include "items.h"
@@ -8,6 +8,7 @@
 #include "sound.h"
 #include "effect2.h"
 #include "effect.h"
+#include "trmath.h"
 
 /* HIT POINTS for Natla when she enters her second stage */
 #define NATLA_NEAR_DEATH 200
@@ -20,9 +21,9 @@ BITE_INFO natla_gun = { 5, 220, 7, 4 };
 
 #define NATLA_FLYMODE 0x8000
 #define NATLA_TIMER   0x7fff
-#define NATLA_FIRE_ARC ANGLE(30)
-#define NATLA_FLY_TURN ANGLE(5)
-#define NATLA_RUN_TURN ANGLE(6)
+#define NATLA_FIRE_ARC ANGLE(30.0f)
+#define NATLA_FLY_TURN ANGLE(5.0f)
+#define NATLA_RUN_TURN ANGLE(6.0f)
 #define NATLA_LAND_CHANCE 0x100
 #define NATLA_DIE_TIME 30*16
 #define NATLA_SHOT_DAMAGE 100

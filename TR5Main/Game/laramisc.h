@@ -1,5 +1,5 @@
 #pragma once
-#include "global.h"
+
 #include "collide.h"
 
 extern COLL_INFO coll;

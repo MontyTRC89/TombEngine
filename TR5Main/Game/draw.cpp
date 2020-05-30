@@ -18,8 +18,6 @@ BITE_INFO EnemyBites[9] =
 	{ 0xA, 0xFFFFFFC4, 0xC8, 0xD }
 };
 
-Renderer11* g_Renderer;
-
 int LightningCount;
 int LightningRand;
 int StormTimer;

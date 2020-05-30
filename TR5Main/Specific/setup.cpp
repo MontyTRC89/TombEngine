@@ -21,13 +21,15 @@
 #include "flmtorch.h"
 #include "level.h"
 #include "oldobjects.h"
-#include "newobjects.h"
+#include "tr4_bubbles.h"
+/// objects initializer
 #include "tr1_objects.h"
 #include "tr2_objects.h"
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
-#include "ObjectsUtils.h"
+/// register objects
+#include "object_helper.h"
 
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
@@ -35,58 +37,20 @@ extern byte Sequences[3];
 extern byte CurrentSequence;
 extern int NumRPickups;
 
-extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
-extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
-extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
-extern DRIP_STRUCT Drips[MAX_DRIPS];
-extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
-extern SPARKS Sparks[MAX_SPARKS];
-extern SPLASH_STRUCT Splashes[MAX_SPLASH];
-extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-
 ObjectInfo Objects[ID_NUMBER_OBJECTS];
-STATIC_INFO StaticObjects[NUM_STATICS];
+StaticInfo StaticObjects[MAX_STATICS];
 
-void NewObjects()
+void InitialiseGameFlags()
 {
-	ObjectInfo* obj;
+	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
+	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
 
-	obj = &Objects[ID_SARCOPHAGUS];
-	if (obj->loaded)
-	{
-		obj->control = AnimatingControl;
-		obj->collision = SarcophagusCollision;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_LARA_DOUBLE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseLaraDouble;
-		obj->control = LaraDoubleControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 1000;
-		obj->pivotLength = 50;
-		obj->radius = 128;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
+	FlipEffect = -1;
+	FlipStatus = 0;
+	IsAtmospherePlaying = 0;
+	Camera.underwater = 0;
 }
 
-void BaddyObjects()
-{
-	
-}
-
-// TODO: add the flags
 void ObjectObjects()
 {
 	ObjectInfo* obj;
@@ -319,14 +283,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 	}
 
-	obj = &Objects[ID_COG_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = CogSwitchCollision;
-		obj->control = CogSwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
+	
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];
 	if (obj->loaded)
@@ -486,30 +443,6 @@ void ObjectObjects()
 		obj->control = TrapDoorControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-	}
-
-	
-
-	obj = &Objects[ID_TWOBLOCK_PLATFORM];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTwoBlocksPlatform;
-		obj->control = TwoBlocksPlatformControl;
-		obj->floor = TwoBlocksPlatformFloor;
-		obj->ceiling = TwoBlocksPlatformCeiling;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_RAISING_COG];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseRaisingCog;
-		obj->control = RaisingCogControl;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
 	}
 
 	obj = &Objects[ID_ELECTRICAL_LIGHT];
@@ -1080,7 +1013,7 @@ void InitialiseSpecialEffects()
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
-	memset(&Splashes, 0, MAX_SPLASH * sizeof(SPLASH_STRUCT));
+	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));
 	memset(&Drips, 0, MAX_DRIPS * sizeof(DRIP_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
@@ -1104,9 +1037,7 @@ void InitialiseSpecialEffects()
 
 void CustomObjects()
 {
-	BaddyObjects();
-	ObjectObjects();
-	TrapObjects();
+	
 }
 
 void InitialiseObjects()
@@ -1153,9 +1084,8 @@ void InitialiseObjects()
 	InitialiseTR3Objects(); // Standard TR3 objects
 	InitialiseTR4Objects(); // Standard TR4 objects
 	InitialiseTR5Objects(); // Standard TR5 objects
-
-	// New objects imported from old TRs
-	NewObjects();
+	ObjectObjects();
+	TrapObjects();
 
 	// User defined objects
 	CustomObjects();
@@ -1179,15 +1109,4 @@ void InitialiseObjects()
 	SequenceUsed[5] = 0;
 
 	AllocTR5Objects();
-}
-
-void InitialiseGameFlags()
-{
-	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
-	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
-	
-	FlipEffect = -1;
-	FlipStatus = 0;
-	IsAtmospherePlaying = 0;
-	Camera.underwater = 0;
 }

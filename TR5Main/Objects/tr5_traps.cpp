@@ -1,9 +1,8 @@
 #include "framework.h"
-#include "newobjects.h"
 #include "oldobjects.h"
 #include "lara.h"
 #include "draw.h"
-#include "global.h"
+
 #include "items.h"
 #include "collide.h"
 #include "effect.h"
@@ -46,7 +45,7 @@ void TriggerElectricityWiresSparks(int x, int z, char objNum, char node, int fla
 	}
 
 	spark->fxObj = objNum;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->flags = SP_ITEM | SP_NODEATTACH | SP_SCALE | SP_DEF;
 	spark->nodeNumber = node;
 	spark->x = x;
@@ -105,7 +104,7 @@ void TriggerLaraElectricitySparks(int flame)
 	spark->sG = color;
 	spark->dB = color;
 	spark->dG = color >> 1;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->fadeToBlack = 4;
 	spark->life = 12;
 	spark->sLife = 12;
@@ -118,7 +117,7 @@ void TriggerLaraElectricitySparks(int flame)
 	spark->friction = 51;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
-	spark->flags = 0;
+	spark->flags = SP_NONE;
 
 	if (flame)
 		TriggerFireFlame(pos.x, pos.y, pos.z, -1, 254);
@@ -336,7 +335,7 @@ void FallingCeilingControl(short itemNumber)
 	
 	AnimateItem(item);
 
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DESACTIVATED)
 	{
 		RemoveActiveItem(itemNumber);
 	}

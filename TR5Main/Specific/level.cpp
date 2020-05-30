@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "level.h"
-#include "items.h"
 #include "setup.h"
 #include "draw.h"
 #include "lot.h"
@@ -8,17 +7,12 @@
 #include "savegame.h"
 #include "spotcam.h"
 #include "camera.h"
-#include "GameFlowScript.h"
 #include "control.h"
 #include "pickup.h"
 #include "door.h"
 #include "box.h"
-#include "ChunkId.h"
-#include "ChunkReader.h"
-#include "ChunkWriter.h" 
-#include "LEB128.h"
-#include "Streams.h"
 #include "sound.h"
+#include "GameFlowScript.h"
 
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
 ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
@@ -149,7 +143,7 @@ int LoadItems()
 				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
 			{
 				int fl = floor->floor << 2;
-				STATIC_INFO* st = &StaticObjects[mesh->staticNumber];
+				StaticInfo* st = &StaticObjects[mesh->staticNumber];
 				if (fl <= mesh->y - st->yMaxc + 512 && fl < mesh->y - st->yMinc)
 				{
 					if (st->xMaxc == 0 || st->xMinc == 0 ||
@@ -170,7 +164,7 @@ int LoadItems()
 void LoadObjects()
 {
 	memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
-	memset(StaticObjects, 0, sizeof(STATIC_INFO) * NUM_STATICS);
+	memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshDataWords = ReadInt32();
 	int numMeshDataBytes = 2 * numMeshDataWords;
@@ -234,7 +228,7 @@ void LoadObjects()
 	{
 		int i = 0;
 		for (int i = 0; i < AnimationsCount; i++)
-			ADD_PTR(Anims[i].framePtr, short, Frames);
+			AddPtr(Anims[i].framePtr, short, Frames);
 	}
 
 	int numModels = ReadInt32();

@@ -162,7 +162,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 	spark->friction = 34;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
-	spark->flags = 0;
+	spark->flags = SP_NONE;
 }
 
 static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
@@ -272,7 +272,7 @@ void InitialiseRomanStatue(short itemNum)
     item->goalAnimState = 13;
     item->currentAnimState = 13;
     item->frameNumber = Anims[item->animNumber].frameBase;
-	item->status = ITEM_INACTIVE;
+	item->status = ITEM_NOT_ACTIVE;
 	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
     item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
 

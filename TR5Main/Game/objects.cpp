@@ -634,7 +634,7 @@ void AnimatingControl(short itemNumber)
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		RemoveActiveItem(itemNumber);
 		item->aiBits = 0;
-		item->status = ITEM_INACTIVE;
+		item->status = ITEM_NOT_ACTIVE;
 	}
 }
 
