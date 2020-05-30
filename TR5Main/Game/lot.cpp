@@ -1,11 +1,10 @@
+#include "framework.h"
 #include "lot.h"
 #include "box.h"
-#include "..\Global\global.h"
-#include <stdio.h>
-#include "../Specific/setup.h"
+#include "setup.h"
 #include "camera.h"
 #include "lara.h"
-#include "..\Specific\level.h"
+#include "level.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
@@ -15,8 +14,6 @@ CREATURE_INFO* BaddieSlots;
 
 void InitialiseLOTarray(int allocMem)
 {
-	//DB_Log(0, "InitialiseLOTarray - DLL");
-
 	if (allocMem)
 		BaddieSlots = (CREATURE_INFO*)game_malloc(sizeof(CREATURE_INFO) * NUM_SLOTS);
 
@@ -235,11 +232,13 @@ void InitialiseSlot(short itemNum, short slot)
 
 		case ZONE_BLOCKABLE:
 			creature->LOT.blockMask = BLOCKABLE;
+			creature->LOT.zone = ZONE_BASIC;
 			break;
 
 		case ZONE_SOPHIALEE:
 			creature->LOT.step = CLICK(4);
 			creature->LOT.drop = -CLICK(3);
+			creature->LOT.zone = ZONE_HUMAN_CLASSIC;
 			break;
 	}
 
@@ -289,8 +288,8 @@ void CreateZone(ITEM_INFO* item)
 	}
 	else
 	{
-		short* zone = Zones[creature->LOT.zone][0];
-		short* flippedZone = Zones[creature->LOT.zone][1];
+		short* zone = Zones[creature->LOT.zone][FALSE];
+		short* flippedZone = Zones[creature->LOT.zone][TRUE];
 
 		short zoneNumber = zone[item->boxNumber];
 		short flippedZoneNumber = flippedZone[item->boxNumber];

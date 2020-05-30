@@ -1,13 +1,14 @@
-#include "../newobjects.h"
-#include "../../Game/effect2.h"
-#include "../../Game/debris.h"
-#include "../../Game/items.h"
-#include "../../Game/traps.h"
-#include "../../Game/draw.h"
-#include "../../Game/tomb4fx.h"
-#include "../../Game/effects.h"
-#include "..\..\Specific\level.h"
-#include "../../Game/lara.h"
+#include "framework.h"
+#include "tr4_bubbles.h"
+#include "effect2.h"
+#include "debris.h"
+#include "items.h"
+#include "traps.h"
+#include "draw.h"
+#include "tomb4fx.h"
+#include "effect.h"
+#include "level.h"
+#include "lara.h"
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {
@@ -29,7 +30,7 @@ void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 		spark->dG = spark->dB + 64;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 		spark->y = 0;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -83,7 +84,7 @@ void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 		spark->y = 0;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -131,7 +132,7 @@ void BubblesEffect3(short fxNum, short xVel, short yVel, short zVel)
 		spark->dG = spark->dG >> 1;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 32;
 		spark->y = 0;
@@ -195,7 +196,7 @@ void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 		}
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 		spark->y = 0;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -223,7 +224,7 @@ void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 	}
 }
 
-int BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
+void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 {
 	ShatterItem.yRot = fx->pos.yRot;
 	ShatterItem.meshp = Meshes[fx->frameNumber];
@@ -233,8 +234,6 @@ int BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 	ShatterItem.bit = 0;
 	ShatterItem.flags = fx->flag2 & 0x400;
 	ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
-
-	return 1;
 }
 
 void BubblesControl(short fxNum)
@@ -244,17 +243,17 @@ void BubblesControl(short fxNum)
 	short angles[2];
 	phd_GetVectorAngles(
 		LaraItem->pos.xPos - fx->pos.xPos,
-		LaraItem->pos.yPos - fx->pos.yPos - 256,
+		LaraItem->pos.yPos - fx->pos.yPos - STEP_SIZE,
 		LaraItem->pos.zPos - fx->pos.zPos,
 		angles);
 
-	int unk1 = 0; // v44
-	int unk2 = 0; // v3
+	int maxRotation = 0;
+	int maxSpeed = 0;
 
 	if (fx->flag1 == 1)
 	{
-		unk1 = 512;
-		unk2 = 256;
+		maxRotation = 512;
+		maxSpeed = 256;
 	}
 	else
 	{
@@ -264,16 +263,16 @@ void BubblesControl(short fxNum)
 			{
 				fx->counter--;
 			}
-			unk1 = 256;
+			maxRotation = 256;
 		}
 		else
 		{
-			unk1 = 768;
+			maxRotation = 768;
 		}
-		unk2 = 192;
+		maxSpeed = 192;
 	}
 
-	if (fx->speed < unk2)
+	if (fx->speed < maxSpeed)
 	{
 		if (fx->flag1 == 6)
 		{
@@ -285,29 +284,27 @@ void BubblesControl(short fxNum)
 		}
 		
 		int dy = angles[0] - fx->pos.yRot;
-		if (abs(dy) > ANGLE(180))
+		if (abs(dy) > ANGLE(180.0f))
 		{
 			dy = -dy;
 		}
 
 		int dx = angles[1] - fx->pos.xRot;
-		if (abs(dx) > ANGLE(180))
-		{
+		if (abs(dx) > ANGLE(180.0f))
 			dx = -dx;
-		}
 
 		dy >>= 3;
 		dx >>= 3;
 
-		if (dy < -unk1)
-			dy = -unk1;
-		else if (dy > unk1)
-			dy = unk1;
+		if (dy < -maxRotation)
+			dy = -maxRotation;
+		else if (dy > maxRotation)
+			dy = maxRotation;
 
-		if (dx < -unk1)
-			dx = -unk1;
-		else if (dx > unk1)
-			dx = unk1;
+		if (dx < -maxRotation)
+			dx = -maxRotation;
+		else if (dx > maxRotation)
+			dx = maxRotation;
 
 		if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
 		{
@@ -318,9 +315,7 @@ void BubblesControl(short fxNum)
 
 	fx->pos.zRot += 16 * fx->speed;
 	if (fx->flag1 == 6)
-	{
 		fx->pos.zRot += 16 * fx->speed;
-	}
 
 	int oldX = fx->pos.xPos;
 	int oldY = fx->pos.yPos;
@@ -343,21 +338,11 @@ void BubblesControl(short fxNum)
 		fx->pos.zPos = oldZ;
 
 		if (fx->flag1 != 6)
-		{
 			BubblesShatterFunction(fx, 0, -32);
-		}
 		
 		if (fx->flag1 == 1)
 		{
-			TriggerShockwave(
-				(PHD_3DPOS*)&fx->pos,
-				32,
-				160,
-				64,
-				64, 128, 00,
-				24,
-				(((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
-
+			TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 		}
 		else
@@ -435,10 +420,9 @@ void BubblesControl(short fxNum)
 
 		if (fx->flag1 == 1)
 		{
-			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 64, 64, 128, 0, 24, 0, 0);
+			TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 			LaraBurn();
-			//Lara.gassed = true; BYTE1(Lara_Flags) |= 2u;			
 		}
 		else if (fx->flag1)
 		{
@@ -446,42 +430,34 @@ void BubblesControl(short fxNum)
 			{
 			case 3:
 			case 4:
-				TriggerShockwave((PHD_3DPOS*)fx, 32, 160, 64, 128, 64, 0, 16, 0, 1);
+				TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 1);
 				break;
 			case 5:
-				TriggerShockwave((PHD_3DPOS*)fx, 32, 160, 64, 0, 96, 128, 16, 0, 2);
+				TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 2);
 				break;
 			case 2:
-				TriggerShockwave((PHD_3DPOS*)fx, 32, 160, 64, 0, 128, 128, 16, 0, 2);
+				TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 2);
 				break;
 			case 6:
 				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 64, 0, 96, 128, 24, 0, 0);
+				TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 0);
 				fx->pos.yPos -= 128;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 112, 128, 16, 0, 0);
+				TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 				fx->pos.yPos += 256;
-				TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 112, 128, 16, 0, 0);
+				TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 				LaraBurn();
 				break;
 			}
 		}
 		else
 		{
-			TriggerShockwave(
-				(PHD_3DPOS*)fx,
-				24,
-				88,
-				48,
-				64, 128, 0, 16,
-				(((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
+			TriggerShockwave( &fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
 		}
 	}
 	else
 	{
 		if (roomNumber != fx->roomNumber)
-		{
 			EffectNewRoom(fxNum, roomNumber);
-		}
 
 		int dx = oldX - fx->pos.xPos;
 		int dy = oldY - fx->pos.yPos;
@@ -498,13 +474,9 @@ void BubblesControl(short fxNum)
 				else if (fx->flag1 < 3 || fx->flag1 > 5)
 				{
 					if (fx->flag1 == 2)
-					{
 						BubblesEffect2(fxNum, 16 * dx, 16 * dy, 16 * dz);
-					}
 					else if (fx->flag1 == 6)
-					{
 						BubblesEffect3(fxNum, 16 * dx, 16 * dy, 16 * dz);
-					}
 				}
 				else
 				{

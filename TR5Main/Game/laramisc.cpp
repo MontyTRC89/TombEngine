@@ -1,23 +1,23 @@
+#include "framework.h"
 #include "laramisc.h"
-#include "..\Global\global.h"
-#include "..\Specific\level.h"
-#include "../Specific/setup.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "effects.h"
+
+#include "level.h"
+#include "setup.h"
+#include "GameFlowScript.h"
+#include "effect.h"
 #include "collide.h"
 #include "Lara.h"
 #include "laraswim.h"
 #include "larasurf.h"
 #include "effect2.h"
-#include "healt.h"
+#include "health.h"
 #include "misc.h"
-#include "rope.h"
 #include "rope.h"
 #include "draw.h"
 #include "savegame.h"
 #include "inventory.h"
 #include "camera.h"
-#include "../Specific/input.h"
+#include "input.h"
 #include "sound.h"
 
 
@@ -707,8 +707,8 @@ void LaraInitialiseMeshes() // (AF) (D)
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.target = NULL;
-	Lara.rightArm.lock = 0;
-	Lara.leftArm.lock = 0;
+	Lara.rightArm.lock = false;
+	Lara.leftArm.lock = false;
 }
 
 void InitialiseLara(int restore)
@@ -730,7 +730,7 @@ void InitialiseLara(int restore)
 	else
 	{
 		ZeroMemory(&Lara, sizeof(LaraInfo));
-		Lara.ExtraAnim = 0;
+		Lara.ExtraAnim = NO_ITEM;
 		Lara.Vehicle = NO_ITEM;
 	}
 

@@ -1,8 +1,9 @@
+#include "framework.h"
 #include "bubble.h"
-#include "../Specific/level.h"
+#include "level.h"
 #include "control.h"
-
-using namespace std;
+#include "trmath.h"
+#include "objectslist.h"
 
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
@@ -57,16 +58,19 @@ int GetFreeBubble() //8BEAC(<), 8DEF0(<) (F)
 {
 	int oldestAgeIndex = 0;
 	int oldestAge = 0;
-	for (int i = 0; i < MAX_BUBBLES; i++) {
+	for (int i = 0; i < MAX_BUBBLES; i++)
+	{
 		BUBBLE_STRUCT* bub = &Bubbles[i];
-		if (!bub->active) {
+		if (!bub->active)
 			return i;
-		}
-		if (oldestAge < bub->age) {
+
+		if (oldestAge < bub->age)
+		{
 			oldestAge = bub->age;
 			oldestAgeIndex = i;
 		}
 	}
+
 	//incase we dont find any non-active bubble, take the one with the oldest age
 	return oldestAgeIndex;
 }

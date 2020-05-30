@@ -1,11 +1,18 @@
 #pragma once
-
-#include "..\Global\global.h"
+#include "items.h"
 
 #define SPHERES_SPACE_LOCAL			0
 #define SPHERES_SPACE_WORLD			1
 #define SPHERES_SPACE_BONE_ORIGIN	2	
 #define	MAX_SPHERES					34
+
+typedef struct SPHERE
+{
+	int x;
+	int y;
+	int z;
+	int r;
+};
 
 extern int NumLaraSpheres;
 extern bool GotLaraSpheres;

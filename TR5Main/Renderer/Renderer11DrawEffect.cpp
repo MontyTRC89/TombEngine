@@ -1,28 +1,18 @@
+#include "framework.h"
 #include "Renderer11.h"
-#include "../Game/footprint.h"
-#include "../Game/effect2.h"
-#include "../Game/sphere.h"
-#include "../Game/tomb4fx.h"
-#include "../Game/lara.h"
-#include "../Game/draw.h"
-#include "../Game/camera.h"
-#include "../Game/debris.h"
-#include "../Specific/setup.h"
-#include "../Game/bubble.h"
-#include "..\Specific\level.h"
-#include "../Game/effects.h"
+#include "footprint.h"
+#include "effect2.h"
+#include "sphere.h"
+#include "tomb4fx.h"
+#include "lara.h"
+#include "draw.h"
+#include "camera.h"
+#include "debris.h"
+#include "setup.h"
+#include "bubble.h"
+#include "level.h"
+#include "effect.h"
 
-extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
-extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
-extern DRIP_STRUCT Drips[MAX_DRIPS];
-extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
-extern SPARKS Sparks[MAX_SPARKS];
-extern SPLASH_STRUCT Splashes[MAX_SPLASH];
-extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-extern ENERGY_ARC EnergyArcs[MAX_ENERGY_ARCS];
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern int g_NumSprites;
 
@@ -56,7 +46,7 @@ void Renderer11::AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2,
 
 void Renderer11::drawEnergyArcs()
 {
-	for (int i = 0; i < MAX_ENERGY_ARCS; i++)
+	for (int i = 0; i < MAX_GUNFLASH; i++)
 	{
 		ENERGY_ARC* arc = &EnergyArcs[i];
 
@@ -325,7 +315,7 @@ void Renderer11::drawSparks()
 void Renderer11::drawSplahes()
 {
 	constexpr size_t NUM_POINTS = 8;
-	for (int i = 0; i < MAX_SPLASH; i++)
+	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
 		SPLASH_STRUCT& splash = Splashes[i];
 		if (splash.isActive)

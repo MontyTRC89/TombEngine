@@ -1,20 +1,31 @@
 #pragma once
+#include "box.h"
+#include "collide.h"
+#include "objectslist.h"
 
-#include "..\Global\global.h"
+typedef enum HitEffectEnum
+{
+    HIT_NONE,
+    HIT_BLOOD,
+    HIT_SMOKE,
+    HIT_FRAGMENT,
+    MAX_HIT_EFFECT
+};
 
-struct ObjectInfo {
+typedef struct ObjectInfo
+{
 	short nmeshes; 
 	short meshIndex; 
 	int boneIndex; 
 	short* frameBase; 
-	void(*initialise)(short itemNumber); 
-	void(*control)(short itemNumber); 
-	void(*floor)(ITEM_INFO* item, int x, int y, int z, int* height); 
-	void(*ceiling)(ITEM_INFO* item, int x, int y, int z, int* height); 
-	void(*drawRoutine)(ITEM_INFO* item);
-	void(*drawRoutineExtra)(ITEM_INFO* item);
-	void(*collision)(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll); 
-	short zoneType; 
+	function<void(short itemNumber)> initialise;
+	function<void(short itemNumber)> control;
+	function<void(ITEM_INFO* item, int x, int y, int z, int* height)> floor;
+	function<void(ITEM_INFO* item, int x, int y, int z, int* height)> ceiling;
+	function<void(ITEM_INFO* item)> drawRoutine;
+	function<void(ITEM_INFO* item)> drawRoutineExtra;
+	function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;
+	ZONE_TYPE zoneType;
 	short animIndex; 
 	short hitPoints; 
 	short pivotLength; 
@@ -31,75 +42,43 @@ struct ObjectInfo {
 	bool semiTransparent;
 	bool waterCreature;
 	bool usingDrawAnimatingItem;
-	bool hitEffect;
+	HitEffectEnum hitEffect;
 	bool undead;
 	bool saveMesh;
-	bool unknown; 
 	bool friendly;
 	bool castShadows;
-	unsigned int explodableMeshbits;
+	bool isPickup;
+	bool isPuzzleHole;
 	int meshSwapSlot;
+	DWORD explodableMeshbits;
 };
 
+typedef struct StaticInfo
+{
+	short meshNumber;
+	short flags;
+	short xMinp;
+	short xMaxp;
+	short yMinp;
+	short yMaxp;
+	short zMinp;
+	short zMaxp;
+	short xMinc;
+	short xMaxc;
+	short yMinc;
+	short yMaxc;
+	short zMinc;
+	short zMaxc;
+};
+
+#define MAX_STATICS 1000
+constexpr auto GRAVITY = 6;
+constexpr auto SWAMP_GRAVITY = 2;
+
 extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
-extern STATIC_INFO StaticObjects[NUM_STATICS];
+extern StaticInfo StaticObjects[MAX_STATICS];
 
-void BaddyObjects();
-void ObjectObjects();
-void TrapObjects();
-void InitialiseHair();
-void InitialiseSpecialEffects();
 void InitialiseGameFlags();
-void CustomObjects();
+void InitialiseSpecialEffects();
+void InitialiseHair();
 void InitialiseObjects();
-
-#define INIT_PICKUP(obid) \
-obj = &Objects[obid]; \
-if (obj->loaded) \
-{ \
-	obj->initialise = InitialisePickup; \
-	obj->collision = PickupCollision; \
-	obj->control = PickupControl; \
-}
-
-#define INIT_KEYHOLE(obid) \
-obj = &Objects[obid]; \
-if (obj->loaded) \
-{ \
-	obj->collision = KeyHoleCollision; \
-	obj->saveFlags = true; \
-}
-
-#define INIT_PUZZLEHOLE(obid) \
-obj = &Objects[obid]; \
-if (obj->loaded) \
-{ \
-	obj->collision = PuzzleHoleCollision; \
-	obj->control = AnimatingControl; \
-	obj->saveFlags = true; \
-	obj->saveAnim = true; \
-}
-
-#define INIT_PUZZLEDONE(obid) \
-obj = &Objects[obid]; \
-if (obj->loaded) \
-{ \
-	obj->collision = PuzzleDoneCollision; \
-	obj->control = AnimatingControl; \
-	obj->saveFlags = true; \
-	obj->saveAnim = true; \
-}
-
-#define INIT_ANIMATING(obid) \
-obj = &Objects[obid]; \
-if (obj->loaded) \
-{ \
-	obj->initialise = InitialiseAnimating; \
-	obj->control = AnimatingControl; \
-	obj->collision = ObjectCollision; \
-	obj->saveFlags = true; \
-	obj->saveAnim = true; \
-	obj->saveMesh = true; \
-	Bones[obj->boneIndex] |= ROT_Y; \
-	Bones[obj->boneIndex + 4] |= ROT_X; \
-}

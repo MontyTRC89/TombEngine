@@ -1,5 +1,6 @@
 #pragma once
-#include "..\Global\global.h"
+
+#include "collide.h"
 
 extern OBJECT_TEXTURE* WaterfallTextures[6];
 extern float WaterfallY[6];
@@ -25,6 +26,6 @@ void CutsceneRopeControl(short itemNumber);
 void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
 void InitialiseSmashObject(short itemNumber);
 void InitialiseTightRope(short itemNumber);
+void HighObject2Control(short itemNumber);
 void InitialiseAnimating(short itemNumber);
 void AnimatingControl(short itemNumber);
-void HighObject2Control(short itemNumber);

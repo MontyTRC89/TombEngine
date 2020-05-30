@@ -1,7 +1,7 @@
 #pragma once
+#include "box.h"
 
-#include "..\Global\global.h"
-
+constexpr auto NUM_SLOTS = 32;
 extern int SlotsUsed;
 extern CREATURE_INFO* BaddieSlots;
 

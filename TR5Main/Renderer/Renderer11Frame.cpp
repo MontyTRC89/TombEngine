@@ -1,10 +1,12 @@
+#include "framework.h"
 #include "Renderer11.h"
-#include "../Game/draw.h"
-#include "../Game/lara.h"
-#include "../Game/effects.h"
-#include "../Game/camera.h"
-#include "..\Specific\level.h"
-#include "../Specific/setup.h"
+#include "draw.h"
+#include "lara.h"
+#include "effect.h"
+#include "camera.h"
+#include "level.h"
+#include "setup.h"
+
 void Renderer11::collectRooms()
 {
 	short baseRoomIndex = Camera.pos.roomNumber;
@@ -81,7 +83,7 @@ void Renderer11::collectStatics(short roomNumber)
 	{
 		MESH_INFO* mesh = &r->mesh[i];
 		RendererStatic* newStatic = &room.Statics[i];
-		STATIC_INFO* staticInfo = &StaticObjects[mesh->staticNumber];
+		StaticInfo* staticInfo = &StaticObjects[mesh->staticNumber];
 		Vector3 min = Vector3(staticInfo->xMinc, staticInfo->yMinc, staticInfo->zMinc);
 		Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
 		min += Vector3(mesh->x, mesh->y, mesh->z);
