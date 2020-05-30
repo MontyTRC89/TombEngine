@@ -1,16 +1,7 @@
 #pragma once
-
-#include <sol.hpp>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <map>
-
-#include "global.h"
-#include "IO\ChunkId.h"
-#include "IO\ChunkReader.h"
-#include "IO\LEB128.h"
+#include "ChunkId.h"
+#include "ChunkReader.h"
+#include "LEB128.h"
 #include "LanguageScript.h"
 
 #define TITLE_FLYBY			0
@@ -19,7 +10,25 @@
 struct ChunkId;
 struct LEB128;
 
-struct GameScriptSettings {
+typedef enum WEATHER_TYPES
+{
+	WEATHER_NORMAL,
+	WEATHER_RAIN,
+	WEATHER_SNOW
+};
+
+typedef enum LARA_DRAW_TYPE
+{
+	LARA_NORMAL = 1,
+	LARA_YOUNG = 2,
+	LARA_BUNHEAD = 3,
+	LARA_CATSUIT = 4,
+	LARA_DIVESUIT = 5,
+	LARA_INVISIBLE = 7
+};
+
+struct GameScriptSettings
+{
 	int ScreenWidth;
 	int ScreenHeight;
 	bool EnableLoadSave;
@@ -32,7 +41,8 @@ struct GameScriptSettings {
 	bool ShowDebugInfo;
 };
 
-struct GameScriptSkyLayer {
+struct GameScriptSkyLayer
+{
 	bool Enabled;
 	byte R;
 	byte G;
@@ -55,7 +65,8 @@ struct GameScriptSkyLayer {
 	}
 };
 
-struct GameScriptFog {
+struct GameScriptFog
+{
 	byte R;
 	byte G;
 	byte B;
@@ -73,7 +84,8 @@ struct GameScriptFog {
 	}
 };
 
-struct GameScriptMirror {
+struct GameScriptMirror
+{
 	short Room;
 	int StartX;
 	int EndX;
@@ -96,7 +108,8 @@ struct GameScriptMirror {
 	}
 };
 
-struct GameScriptLevel {
+struct GameScriptLevel
+{
 	int NameStringIndex;
 	string FileName;
 	string ScriptFileName;

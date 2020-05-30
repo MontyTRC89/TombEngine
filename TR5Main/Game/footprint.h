@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 #include "trmath.h"
 
 constexpr size_t MAX_FOOTPRINTS = 20;

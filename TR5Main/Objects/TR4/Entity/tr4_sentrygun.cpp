@@ -10,6 +10,8 @@
 #include "sphere.h"
 #include "people.h"
 #include "sound.h"
+#include "trmath.h"
+#include "objectslist.h"
 
 extern Inventory* g_Inventory;
 BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
@@ -29,7 +31,7 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 		spark->dB = 32;
 		spark->colFadeSpeed = 12;
 		spark->fadeToBlack = 8;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 16;
 
 		PHD_VECTOR pos1;
@@ -136,11 +138,11 @@ void SentryGunControl(short itemNum)
 
 				if (Targetable(item, &info))
 				{
-					if (info.distance < SQUARE(9 * WALL_SIZE))
+					if (info.distance < SQUARE(SECTOR(9)))
 					{
 						if (!g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
 						{
-							if (info.distance <= SQUARE(2048))
+							if (info.distance <= SQUARE(SECTOR(2)))
 							{
 								// Throw fire
 								SentryGunThrowFire(item);
@@ -213,7 +215,7 @@ void SentryGunControl(short itemNum)
 			KillItem(itemNum);
 
 			item->flags |= 1u;
-			item->status = ITEM_DEACTIVATED;
+			item->status = ITEM_DESACTIVATED;
 
 			RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
 

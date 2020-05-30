@@ -1,158 +1,27 @@
-#pragma once
-#include "global.h"
-#include "box.h"
-#include "collide.h"
+﻿#pragma once
+#include "lara_struct.h"
 
-typedef struct CarriedWeaponInfo
-{
-	bool Present;
-	short Ammo[3];
-	byte SelectedAmmo;
-	bool HasLasersight;
-	bool HasSilencer;
-};
+#define FRONT_ARC ANGLE(90.0f)
+#define LARA_LEAN_RATE ANGLE(1.5f)
+#define LARA_LEAN_MAX ANGLE(11.0f)
+#define LARA_TURN_RATE ANGLE(2.25f)
+#define LARA_JUMP_TURN ANGLE(3.0f)
+#define LARA_SLOW_TURN ANGLE(4.0f)
+#define LARA_MED_TURN ANGLE(6.0f)
+#define LARA_FAST_TURN ANGLE(8.0f)
 
-typedef struct DiaryInfo
-{
-	bool Present;
-};
-
-struct WaterskinInfo
-{
-	bool Present;
-	int Quantity;
-};
-
-struct LaraInfo
-{
-	short itemNumber;
-	short gunStatus; 
-	short gunType;
-	short requestGunType;
-	short lastGunType; 
-	short calcFallSpeed;
-	short waterStatus;
-	short climbStatus; 
-	short poseCount;
-	short hitFrame; 
-	short hitDirection; 
-	short air;
-	short diveCount;
-	short deathCount;
-	short currentActive;
-	short currentXvel;
-	short currentYvel;
-	short currentZvel; 
-	short spazEffectCount;
-	short flareAge; 
-	short burnCount;
-	short weaponItem;
-	short backGun; 
-	short flareFrame;
-	short poisoned;
-	short dpoisoned;
-	short electric; // used for electric value in TR3
-	byte anxiety; 
-	byte wet[NUM_LARA_MESHES];
-	bool flareControlLeft; 
-	bool flareControlRight; // not used
-	bool look;
-	bool burn;
-	bool keepDucked;
-	bool isMoving;
-	bool canMonkeySwing;
-	byte burnBlue;
-	bool gassed;
-	bool burnSmoke;
-	bool isDucked;
-	bool hasFired;
-	bool busy;
-	bool litTorch;
-	bool isClimbing;
-	bool fired;
-	int waterSurfaceDist;
-	PHD_VECTOR lastPos;
-	FX_INFO* spazEffect;
-	int meshEffects;
-	short* meshPtrs[NUM_LARA_MESHES];
-	ITEM_INFO* target;
-	short targetAngles[2];
-	short turnRate;
-	short moveAngle;
-	short headYrot;
-	short headXrot;
-	short headZrot;
-	short torsoYrot;
-	short torsoXrot;
-	short torsoZrot;
-	LARA_ARM leftArm; 
-	LARA_ARM rightArm;
-	// changing it to holster_left/holster_right will be good instead of doing the 2 at the same time !
-	// note: no need 65535 for holster, just 255 is fine...
-	byte holster;
-	CREATURE_INFO* creature;
-	int cornerX;
-	int cornerZ;
-	byte ropeSegment;
-	byte ropeDirection;
-	short ropeArcFront;
-	short ropeArcBack;
-	short ropeLastX;
-	short ropeMaxXForward;
-	short ropeMaxXBackward;
-	int ropeDFrame;
-	int ropeFrame;
-	unsigned short ropeFrameRate;
-	unsigned short ropeY;
-	int ropePtr; 
-	void* generalPtr; 
-	int ropeOffset;
-	int ropeDownVel;
-	byte ropeFlag;
-	byte moveCount;
-	int ropeCount;
-	byte skelebob;
-	byte wetcloth;
-	byte bottle;
-	byte location; 
-	byte highestLocation;
-	byte locationPad;
-	byte tightRopeOnCount;
-	byte tightRopeOff;
-	byte tightRopeFall;
-	byte chaffTimer;
-	/// =================================== NEW:
-	short Vehicle;
-	short ExtraAnim;
-	bool mineL;
-	bool mineR;
-	CarriedWeaponInfo Weapons[NUM_WEAPONS];
-	DiaryInfo Diary;
-	WaterskinInfo Waterskin1;
-	WaterskinInfo Waterskin2;
-	RendererMesh* MeshesPointers[NUM_LARA_MESHES];
-	int Puzzles[NUM_PUZZLES];
-	int Keys[NUM_KEYS];
-	int Pickups[NUM_PICKUPS];
-	int Examines[NUM_EXAMINES];
-	int PuzzlesCombo[NUM_PUZZLES * 2];
-	int KeysCombo[NUM_KEYS * 2];
-	int PickupsCombo[NUM_PICKUPS * 2];
-	int ExaminesCombo[NUM_EXAMINES * 2];
-	int Secrets;
-	bool Lasersight;
-	bool Crowbar;
-	bool Torch;
-	bool Silencer;
-	bool Binoculars;
-	int NumSmallMedipacks;
-	int NumLargeMedipacks;
-	int NumFlares;
-};
+constexpr auto LARA_HITE = 762; // the size of lara (from the floor to the top of the head)
+constexpr auto LARA_FREEFALL_SPEED = 131;
+constexpr auto LARA_RAD = 100;
+constexpr auto LARA_VELOCITY = 12;
 
 extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;
 extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
+
+#define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
+#define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
+#define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)
 
 #define LaraRoutineFunction void(ITEM_INFO* item, COLL_INFO* coll)
 extern function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];

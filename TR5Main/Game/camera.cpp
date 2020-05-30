@@ -1698,7 +1698,7 @@ void CalculateCamera()
 		Camera.target.y = y;
 
 		if (Camera.type
-			&& Camera.flags != CHASE_OBJECT
+			&& Camera.flags != CF_CHASE_OBJECT
 			&& (Camera.number != -1 &&(SniperCamActive = Camera.fixed[Camera.number].flags & 3, Camera.fixed[Camera.number].flags & 2)))
 		{
 			PHD_VECTOR pos;
@@ -1771,7 +1771,7 @@ void CalculateCamera()
 			Camera.target.z = LastTarget.z;
 		}
 
-		if (Camera.type && Camera.flags != CHASE_OBJECT)
+		if (Camera.type && Camera.flags != CF_CHASE_OBJECT)
 			FixedCamera(item);
 		else
 			ChaseCamera(item);

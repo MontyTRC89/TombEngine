@@ -1,11 +1,7 @@
 #include "framework.h"
 #include "box.h"
-#include "global.h"
-#include "items.h"
 #include "tomb4fx.h"
 #include "lot.h"
-#include "deltapak.h"
-#include "items.h"
 #include "Lara.h"
 #include "draw.h"
 #include "sphere.h"
@@ -13,7 +9,8 @@
 #include "camera.h"
 #include "control.h"
 #include "setup.h"
-#include "level.h"
+#include "trmath.h"
+#include "objectslist.h"
 
 int NumberBoxes;
 BOX_INFO* Boxes;
@@ -21,6 +18,7 @@ int NumberOverlaps;
 short* Overlaps;
 short* Zones[ZONE_MAX][2];
 
+#define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
 #define STALK_DIST SECTOR(3)
 #define REACHED_GOAL_RADIUS 640
@@ -250,7 +248,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 
 	Camera.pos.roomNumber = LaraItem->roomNumber; 
 	Camera.type = CHASE_CAMERA;
-	Camera.flags = FOLLOW_CENTRE;
+	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 
@@ -335,7 +333,7 @@ void CreatureFloat(short itemNumber)
 	short roomNumber;
 
 	item = &Items[itemNumber];
-	item->hitPoints = -16384;
+	item->hitPoints = NOT_TARGETABLE;
 	item->pos.xRot = 0;
 
 	waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -361,7 +359,7 @@ void CreatureFloat(short itemNumber)
 		{
 			item->pos.yPos = waterLevel;
 			item->collidable = false;
-			item->status = ITEM_DEACTIVATED;
+			item->status = ITEM_DESACTIVATED;
 			DisableBaddieAI(itemNumber);
 			RemoveActiveItem(itemNumber);
 			item->afterDeath = 1;
@@ -537,7 +535,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	AnimateItem(item);
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DESACTIVATED)
 	{
 		CreatureDie(itemNumber, FALSE);
 		return FALSE;

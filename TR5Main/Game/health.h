@@ -1,8 +1,11 @@
 #pragma once
-
-#include "global.h"
-
 #define MAX_COLLECTED_PICKUPS 32
+
+typedef struct DISPLAY_PICKUP
+{
+	short life;
+	short objectNumber;
+};
 
 void DrawHealthBarOverlay(int value);
 void DrawHealthBar(float value);

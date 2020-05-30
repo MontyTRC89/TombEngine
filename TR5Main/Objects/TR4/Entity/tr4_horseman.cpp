@@ -4,6 +4,8 @@
 #include "effect2.h"
 #include "setup.h"
 #include "level.h"
+#include "control.h"
+#include "trmath.h"
 
 BITE_INFO horseBite1 = { 0, 0, 0, 0x0D };
 BITE_INFO horseBite2 = { 0, 0, 0, 0x11 };
@@ -31,13 +33,13 @@ static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 		spark->fadeToBlack = 4;
 		spark->life = 9;
 		spark->sLife = 9;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->x = pos->xPos;
 		spark->y = pos->yPos;
 		spark->z = pos->zPos;
 		spark->friction = 34;
 		spark->yVel = (r & 0xFFF) - 2048;
-		spark->flags = 0;
+		spark->flags = SP_NONE;
 		spark->gravity = (r >> 7) & 0x1F;
 		spark->maxYvel = 0;
 		spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) >> 2;
@@ -61,7 +63,7 @@ static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 		spark->dB = ((r >> 4) & 0x1F) + 48;
 		spark->life = 9;
 		spark->sLife = 9;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->x = pos->xPos;
 		spark->y = pos->yPos;
 		spark->z = pos->zPos;

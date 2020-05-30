@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "trmath.h"
-#include "types.h"
 #include <cmath>
 
 // LUT for cos and sin
