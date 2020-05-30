@@ -322,9 +322,9 @@ void DragonControl(short backNum)
 				// all over
 				DisableBaddieAI(itemNum);
 				KillItem(backNum);
-				back->status = ITEM_DEACTIVATED;
+				back->status = ITEM_DESACTIVATED;
 				KillItem(itemNum);
-				item->status = ITEM_DEACTIVATED;
+				item->status = ITEM_DESACTIVATED;
 				return;
 			}
 			else if (dragon->flags < -100)

@@ -177,7 +177,7 @@ void ControlGunShip(short itemNumber)
 			spark->zVel = 4 * (end.z - start.z);
 			spark->friction = 0;
 			spark->maxYvel = 0;
-			spark->flags = 0;
+			spark->flags = SP_NONE;
 		}
 
 		AnimateItem(item);

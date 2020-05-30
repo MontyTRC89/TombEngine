@@ -3,13 +3,14 @@
 #include "level.h"
 #include "sound.h"
 #include "items.h"
+#include "trmath.h"
 
 void InitialiseSlicerDicer(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	int dx = phd_sin(item->pos.yRot + ANGLE(90)) >> 5;
-	int dz = phd_cos(item->pos.yRot + ANGLE(90)) >> 5;
+	int dx = phd_sin(item->pos.yRot + ANGLE(90.0f)) >> 5;
+	int dz = phd_cos(item->pos.yRot + ANGLE(90.0f)) >> 5;
 
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;

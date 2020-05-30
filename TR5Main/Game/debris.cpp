@@ -3,12 +3,14 @@
 #include "level.h"
 #include "setup.h"
 #include "control.h"
+#include "trmath.h"
 
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;
 short SmashedMeshCount;
 MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
+vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
 DebrisFragment* GetFreeDebrisFragment()
 {
@@ -81,9 +83,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 	}
 
 }
-vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
-DirectX::SimpleMath::Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
+Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)
 {
 	Vector3 radiusVector = (fragmentWorldPosition - impactLocation);
 	Vector3 radiusNormVec = radiusVector;
@@ -99,26 +100,36 @@ DirectX::SimpleMath::Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWor
 
 void UpdateDebris()
 {
-	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++) {
-		if (deb->active) {
+	for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
+	{
+		if (deb->active)
+		{
+			FLOOR_INFO* floor;
+			short roomNumber;
+
 			deb->velocity *= deb->linearDrag;
 			deb->velocity += deb->gravity;
 			deb->velocity = XMVector3ClampLength(deb->velocity, 0, deb->terminalVelocity);
 			deb->rotation *= Quaternion::CreateFromYawPitchRoll(deb->angularVelocity.x,deb->angularVelocity.y,deb->angularVelocity.z);
 			deb->worldPosition += deb->velocity;
 			deb->angularVelocity *= deb->angularDrag;
-			short room = deb->roomNumber;
-			const FLOOR_INFO* const floor = GetFloor(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z,&room);
-			if (deb->worldPosition.y < floor->ceiling) {
-				if (floor->skyRoom != NO_ROOM) {
+
+			roomNumber = deb->roomNumber;
+			floor = GetFloor(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z,&roomNumber);
+
+			if (deb->worldPosition.y < floor->ceiling)
+			{
+				if (floor->skyRoom != NO_ROOM)
 					deb->roomNumber = floor->skyRoom;
-				}
 			}
-			if (deb->worldPosition.y > floor->floor) {
-				if (floor->pitRoom != NO_ROOM) {
+
+			if (deb->worldPosition.y > floor->floor)
+			{
+				if (floor->pitRoom != NO_ROOM)
 					deb->roomNumber = floor->pitRoom;
-				}
-				if (deb->numBounces > 3) {
+
+				if (deb->numBounces > 3)
+				{
 					deb->active = false;
 					continue;
 				}

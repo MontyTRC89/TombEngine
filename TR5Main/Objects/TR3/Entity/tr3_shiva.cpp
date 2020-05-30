@@ -52,9 +52,9 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->sLife = sptr->life = (GetRandomControl() & 31) + 96;
 
 	if (uw)
-		sptr->transType = 2;
+		sptr->transType = COLADD;
 	else
-		sptr->transType = 2;
+		sptr->transType = COLADD;
 
 	sptr->extras = 0;
 	sptr->dynamic = -1;
@@ -137,7 +137,7 @@ void InitialiseShiva(short itemNum)
 
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
-	//item->status = ITEM_INACTIVE;
+	//item->status = ITEM_NOT_ACTIVE;
 	//item->meshBits = 0;
 }
 

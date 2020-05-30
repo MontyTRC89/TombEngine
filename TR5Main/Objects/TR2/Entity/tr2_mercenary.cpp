@@ -5,6 +5,7 @@
 #include "setup.h"
 #include "level.h"
 #include "control.h"
+#include "trmath.h"
 
 BITE_INFO mercUziBite = { 0, 150, 19, 17 };
 BITE_INFO mercAutoPistolBite = { 0, 230, 9, 17 };
@@ -96,7 +97,7 @@ void MercenaryUziControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			mc1->maximumTurn = ANGLE(7);
+			mc1->maximumTurn = ANGLE(7.0f);
 
 			if (mc1->mood == ESCAPE_MOOD)
 			{
@@ -136,7 +137,7 @@ void MercenaryUziControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			mc1->maximumTurn = ANGLE(10);
+			mc1->maximumTurn = ANGLE(10.0f);
 			tilt = (angle / 3);
 
 			if (mc1->mood != ESCAPE_MOOD)

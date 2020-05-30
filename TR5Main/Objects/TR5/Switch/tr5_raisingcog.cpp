@@ -1,11 +1,12 @@
 #include "framework.h"
-#include "tr4_raisingcog.h"
+#include "tr5_raisingcog.h"
 #include "level.h"
 #include "switch.h"
 #include "control.h"
 #include "items.h"
 #include "sound.h"
 #include "spotcam.h"
+#include "objectslist.h"
 
 void InitialiseRaisingCog(short itemNumber)
 {
@@ -85,7 +86,7 @@ void RaisingCogControl(short itemNumber)
 				}
 
 				RemoveActiveItem(itemNumber);
-				item->status = ITEM_INACTIVE;
+				item->status = ITEM_NOT_ACTIVE;
 				item->aiBits = 0;
 			}
 			else

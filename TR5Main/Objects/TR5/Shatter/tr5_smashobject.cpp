@@ -5,6 +5,7 @@
 #include "sound.h"
 #include "tomb4fx.h"
 #include "items.h"
+#include "trmath.h"
 
 void InitialiseSmashObject(short itemNumber)
 {
@@ -40,7 +41,7 @@ void SmashObject(short itemNumber)
 
 	if (item->status == ITEM_ACTIVE)
 		RemoveActiveItem(itemNumber);
-	item->status = ITEM_DEACTIVATED;
+	item->status = ITEM_DESACTIVATED;
 }
 
 void SmashObjectControl(short itemNumber)

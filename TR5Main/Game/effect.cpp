@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "effect.h"
-#include "global.h"
+
 #include "Lara.h"
 #include "items.h"
 #include "lot.h"
@@ -402,7 +402,7 @@ void PoseidonSFX(ITEM_INFO* item)//395E0(<), 39AE0(<) (F)
 
 void RubbleFX(ITEM_INFO* item)//39534(<), 39A34(<) (F)
 {
-	int itemNumber = FindItem(ID_EARTHQUAKE);
+	int itemNumber = FindItemNumber(ID_EARTHQUAKE);
 
 	if (itemNumber != NO_ITEM)
 	{

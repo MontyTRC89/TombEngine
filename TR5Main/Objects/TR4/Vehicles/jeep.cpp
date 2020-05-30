@@ -297,7 +297,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 		spark->sLife = 9;
 	}
 
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;
@@ -609,7 +609,7 @@ static void JeepExplode(ITEM_INFO* item)
 
 	ExplodingDeath(Lara.Vehicle, -1, 256);
 	KillItem(Lara.Vehicle);
-	item->status = ITEM_DEACTIVATED;
+	item->status = ITEM_DESACTIVATED;
 	SoundEffect(SFX_EXPLOSION1, 0, 0);
 	SoundEffect(SFX_EXPLOSION2, 0, 0);
 	Lara.Vehicle = NO_ITEM;

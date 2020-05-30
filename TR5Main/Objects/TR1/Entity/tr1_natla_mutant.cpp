@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr1_natla_mutant.h"
 #include "box.h"
 #include "effect2.h"
 #include "items.h"
@@ -183,14 +183,14 @@ void NatlaEvilControl(short itemNum)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.gunType = WEAPON_NONE;
 
-				Camera.targetDistance = WALL_SIZE * 2;
-				Camera.flags = FOLLOW_CENTRE;
+				Camera.targetDistance = SECTOR(2);
+				Camera.flags = CF_FOLLOW_CENTER;
 			}
 			break;
 
 		case ABORT_KILL:
-			Camera.targetDistance = WALL_SIZE * 2;
-			Camera.flags = FOLLOW_CENTRE;
+			Camera.targetDistance = SECTOR(2);
+			Camera.flags = CF_FOLLOW_CENTER;
 			break;
 		}
 	}
@@ -214,7 +214,7 @@ void NatlaEvilControl(short itemNum)
 		CreatureAnimation(itemNum, 0, 0);
 
 	/* Explode on death and set off heavy trigger into the bargain */
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DESACTIVATED)
 	{
 		SoundEffect(171, &item->pos, NULL);
 		ExplodingDeath(itemNum, 0xffffffff, ABORT_PART_DAMAGE);
@@ -224,6 +224,6 @@ void NatlaEvilControl(short itemNum)
 		TestTriggers(TriggerIndex, TRUE, 0);
 
 		KillItem(itemNum);
-		item->status = ITEM_DEACTIVATED;
+		item->status = ITEM_DESACTIVATED;
 	}
 }
