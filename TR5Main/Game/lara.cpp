@@ -5067,13 +5067,11 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 	}
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED
-	if (item->animNumber == ANIMATION_LARA_CRAWL_IDLE)
-	{
 		EnableCrawlFlex1clickdown = true;
 		EnableCrawlFlex1clickup = true;
 		EnableCrawlFlex2clickE = true;
 		EnableCrawlFlex1clickE = true;
-	}
+
 	
 
 
@@ -5281,7 +5279,6 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 	GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &roomNum);
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED-
-	if (item->animNumber == ANIMATION_LARA_CROUCH_IDLE)
 		EnableCrouchRoll = true;
 
 
@@ -5466,7 +5463,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (item->animNumber != ANIMATION_LARA_HANG_IDLE || item->animNumber != ANIMATION_LARA_HANG_FEET)
+	if (item->animNumber != ANIMATION_LARA_HANG_IDLE && item->animNumber != ANIMATION_LARA_HANG_FEET)
 		return 0;
 
 	if (coll->hitStatic)
@@ -5621,7 +5618,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (item->animNumber != ANIMATION_LARA_HANG_IDLE || item->animNumber != ANIMATION_LARA_HANG_FEET)
+	if (item->animNumber != ANIMATION_LARA_HANG_IDLE && item->animNumber != ANIMATION_LARA_HANG_FEET)
 		return 0;
 
 	if (coll->hitStatic)
@@ -6419,13 +6416,10 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		return 0;
 
 	// FOR DEBUG PURPOSES UNTIL SCRPTING IS FINISHED-
-	if (item->currentAnimState == STATE_LARA_STOP)
-	{
 		EnableCrawlFlex1click = true;
 		EnableCrawlFlex2click = true;
 		EnableCrawlFlex3click = true;
 		EnableMonkeyVault = true;
-	}
 
 
 
@@ -7023,6 +7017,9 @@ int TestHangFeet(ITEM_INFO* item, short angle)
 	if (Lara.climbStatus == 1)
 		return 0;
 
+//	EnableFeetHang = true;
+
+
 	if (EnableFeetHang == false)
 		return 0;
 
@@ -7122,7 +7119,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = STATE_LARA_HANG_FEET_SHIMMYL;
 				return;
 			}
-/*			flag = LaraHangLeftCornerTest(item, coll);
+		/*	flag = LaraHangLeftCornerTest(item, coll);
 			if (flag != 0)
 			{
 				if (flag <= 0)
@@ -7143,7 +7140,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-/*			flag = LaraHangRightCornerTest(item, coll);
+		/*	flag = LaraHangRightCornerTest(item, coll);
 			if (flag != 0)
 			{
 				if (flag <= 0)
