@@ -1,5 +1,5 @@
 #pragma once
-#include "global.h"
+
 #include "collide.h"
 
 short GetClimbTrigger(int x, int y, int z, short roomNumber);

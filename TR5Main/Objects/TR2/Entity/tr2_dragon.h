@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 #include "collide.h"
 
 void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);

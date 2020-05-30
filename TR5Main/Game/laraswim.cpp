@@ -16,6 +16,14 @@
 #include "input.h"
 #include "sound.h"
 
+typedef struct SUBSUIT_INFO
+{
+	short XRot;
+	short dXRot;
+	short XRotVel;
+	short Vel[2];
+	short YVel;
+};
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
 

@@ -7,8 +7,8 @@
 #include "sphere.h"
 #include "misc.h"
 #include "setup.h"
-#include "level.h"
 #include "sound.h"
+#include "trmath.h"
 
 char LM[] =
 {
@@ -64,7 +64,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 
 		for (int j = room->numMeshes; j > 0; j--, mesh++)
 		{
-			STATIC_INFO* sInfo = &StaticObjects[mesh->staticNumber];
+			StaticInfo* sInfo = &StaticObjects[mesh->staticNumber];
 			if ((sInfo->flags & 1)) // No collision
 				continue;
 
@@ -139,7 +139,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 			for (int j = 0; j < room->numMeshes; j++)
 			{
 				MESH_INFO* mesh = &room->mesh[j];
-				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
+				StaticInfo* staticMesh = &StaticObjects[mesh->staticNumber];
 
 				if (mesh->Flags & 1)
 				{

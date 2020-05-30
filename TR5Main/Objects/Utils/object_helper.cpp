@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "ObjectsUtils.h"
+#include "object_helper.h"
 #include "collide.h"
 #include "objects.h"
 #include "pickup.h"

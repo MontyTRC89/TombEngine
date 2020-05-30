@@ -37,7 +37,7 @@ static void TriggerPilotFlame(int itemnum)
 	spark->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	spark->fadeToBlack = 4;
 	spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->extras = 0;
 	spark->dynamic = -1;
 	spark->x = (GetRandomControl() & 31) - 16;
@@ -87,7 +87,7 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 		spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
 	}
 
-	spark->transType = 2;
+	spark->transType = COLADD;
 
 	spark->extras = 0;
 	spark->dynamic = -1;

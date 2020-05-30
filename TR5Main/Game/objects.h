@@ -1,5 +1,5 @@
 #pragma once
-#include "global.h"
+
 #include "collide.h"
 
 extern OBJECT_TEXTURE* WaterfallTextures[6];

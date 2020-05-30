@@ -1,5 +1,5 @@
 #pragma once
-#include "global.h"
+
 #include "collide.h"
 
 struct ROPE_STRUCT
