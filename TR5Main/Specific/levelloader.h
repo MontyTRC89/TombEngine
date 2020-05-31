@@ -97,4 +97,5 @@ public:
 	LevelLoader(string filename);
 	~LevelLoader();
 	bool Load();
+	bool FillLegacyData();
 };

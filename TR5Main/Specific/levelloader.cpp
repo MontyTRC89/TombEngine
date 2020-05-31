@@ -76,7 +76,7 @@ bool LevelLoader::Load()
 		else if (id->EqualsTo(m_chunkRoom))
 			return readRoom();
 		else if (id->EqualsTo(m_chunkFloorData))
-			return readRoom();
+			return readFloorData();
 		else if (id->EqualsTo(m_chunkMesh))
 			return readMesh();
 		else if (id->EqualsTo(m_chunkBone))
@@ -129,6 +129,8 @@ bool LevelLoader::Load()
 	m_stream->Close();
 	//delete m_writer;
 	//delete m_stream;
+	g_Level = m_level;
+
 	return true;
 }
 
@@ -260,6 +262,25 @@ bool LevelLoader::readRoom()
 			room.statics.push_back(sm);
 			return true;
 		}
+		else if (id->EqualsTo(m_chunkRoomPortal))
+		{
+			TrPortal portal;
+
+			m_stream->ReadInt32(&portal.adjoiningRoom);
+			m_stream->ReadVector3(&portal.normal);
+			for (int i = 0; i < 4; i++)
+			{
+				Vector3 v;
+				m_stream->ReadVector3(&v);
+				portal.vertices.push_back(v);
+			}				
+			
+			m_reader->ReadChunks([this, room](ChunkId * id, long size, int arg) { return false; }, 0);
+			
+			room.portals.push_back(portal);
+			
+			return true;
+		}
 		else if (id->EqualsTo(m_chunkRoomSector))
 		{
 			TrSector sector;
@@ -290,6 +311,9 @@ bool LevelLoader::readRoom()
 			return false;
 		}
 		}, 0);
+
+	m_level.rooms.push_back(room);
+
 	return true;
 }
 
@@ -854,6 +878,8 @@ bool  LevelLoader::readBox()
 	m_stream->ReadVector2(&box.min);
 	m_stream->ReadVector2(&box.max);
 	m_stream->ReadInt32(&box.floor);
+	m_stream->ReadInt32(&box.overlapsIndex);
+	m_stream->ReadInt32(&box.overlapsCount);
 
 	m_reader->ReadChunks([this, &box](ChunkId * id, long size, int arg) {
 		if (id->EqualsTo(m_chunkOverlap))

@@ -3,7 +3,7 @@
 #include "ChunkReader.h"
 #include "LEB128.h"
 #include "Streams.h"
-
+#include "newtypes.h"
 #include "items.h"
 #include "room.h"
 
@@ -131,6 +131,8 @@ extern short* FloorData;
 extern int nAIObjects;
 extern AIOBJECT* AIObjects;
 extern SPRITE* Sprites;
+
+extern TrLevel g_Level;
 
 void LoadTextures();
 void LoadRooms();
