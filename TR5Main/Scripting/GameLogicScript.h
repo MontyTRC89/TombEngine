@@ -143,8 +143,8 @@ private:
 public:	
 	GameScript(sol::state* lua);
 
-	bool								ExecuteScript(const char* luaFilename, string* message);
-	bool								ExecuteString(const char* command, string* message);
+	bool								ExecuteScript(const string& luaFilename, string& message);
+	bool								ExecuteString(const string& command, string& message);
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);

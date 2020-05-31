@@ -1035,31 +1035,27 @@ void GameScript::FreeLevelScripts()
 	*/
 }
 
-bool GameScript::ExecuteScript(const char* luaFilename, string* message)
+bool GameScript::ExecuteScript(const string& luaFilename, string& message)
 { 
-	sol::protected_function_result result;
-	result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
+	auto result = m_lua->safe_script_file(luaFilename, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{
 		sol::error error = result;
-		*message = error.what();
+		message = error.what();
 		return false;
 	}
-	message->clear();
 	return true;
 }
 
-bool GameScript::ExecuteString(const char* command, string* message)
+bool GameScript::ExecuteString(const string& command, string& message)
 {
-	sol::protected_function_result result;
-	result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
+	auto result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{
 		sol::error error = result;
-		*message = error.what();
+		message = error.what();
 		return false;
 	}
-	message->clear();
 	return true;
 }
 
@@ -1213,8 +1209,7 @@ unique_ptr<GameScriptItem> GameScript::GetItemById(int id)
 		return unique_ptr<GameScriptItem>(nullptr);
 	}
 
-	short itemNumber = m_itemsMapId[id];
-	return unique_ptr<GameScriptItem>(new GameScriptItem(itemNumber));
+	return unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapId[id]));
 }
 
 unique_ptr<GameScriptItem> GameScript::GetItemByName(string name)
@@ -1226,8 +1221,7 @@ unique_ptr<GameScriptItem> GameScript::GetItemByName(string name)
 		return unique_ptr<GameScriptItem>(nullptr);
 	}
 
-	short itemNumber = m_itemsMapName[name];
-	return unique_ptr<GameScriptItem>(new GameScriptItem(itemNumber));
+	return unique_ptr<GameScriptItem>(new GameScriptItem(m_itemsMapName[name]));
 }
 
 void GameScript::PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags)

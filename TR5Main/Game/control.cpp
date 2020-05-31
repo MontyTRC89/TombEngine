@@ -157,7 +157,7 @@ extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
-extern bool BlockTrInput;
+extern bool BlockAllInput;
 
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
@@ -186,8 +186,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				return GAME_STATUS_NONE;
 		}
 
-		if (BlockTrInput)
+		if (BlockAllInput)
+		{
+			DbInput = 0;
 			TrInput = 0;
+		}
+
 
 		// Has Lara control been disabled?
 		if (DisableLaraControl || CurrentLevel == 0)

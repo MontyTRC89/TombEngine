@@ -37,8 +37,9 @@ extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD DebugConsoleThreadID;
 DWORD MainThreadID;
-bool BlockTrInput = true;
-int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description)
+bool BlockAllInput = true;
+
+int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
 }
@@ -95,18 +96,20 @@ void __stdcall HandleWmCommand(unsigned short wParam)
 
 void HandleScriptMessage(WPARAM wParam)
 {
-	string LuaMessage;
+	string ErrorMessage;
 	string message = *(string*)(wParam);
+	bool status;
 
 	//check whether line starts with "lua "
 	if (message.find("lua ") == 0) {
 		string scriptSubstring = message.substr(4);
-		g_GameScript->ExecuteScript(scriptSubstring.c_str(), &LuaMessage);
+		status = g_GameScript->ExecuteScript(scriptSubstring, ErrorMessage);
 	}
 	else {
-		g_GameScript->ExecuteString(message.c_str(), &LuaMessage);
+		status = g_GameScript->ExecuteString(message, ErrorMessage);
 	}
-	cout << LuaMessage << endl;
+	if (!status)
+		cout << ErrorMessage << endl;
 }
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -163,7 +166,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
 			//DB_Log(6, "WM_ACTIVE");
-			BlockTrInput = false;
+			BlockAllInput = false;
 			if (!Debug)
 				ResumeThread((HANDLE)hThread);
 
@@ -178,7 +181,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//DB_Log(6, "WM_INACTIVE");
 		//DB_Log(5, "HangGameThread");
-		BlockTrInput = true;
+		BlockAllInput = true;
 		App_Unk00D9ABFD = 1;
 
 		if (!Debug)
@@ -345,7 +348,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 			CHAR buffer[4096];
 			while (true) {
 				BOOL success = ReadFile(params, &buffer, 4096, &read, NULL);
-				if (success) {
+				if (success && read > 2) {
 					//Only send the actual written message minus \r\n
 					string msg(buffer, read-2);
 					SendMessageA(WindowsHandle, WM_USER + 0, (WPARAM)&msg, NULL);
