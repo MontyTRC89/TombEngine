@@ -12,6 +12,7 @@
 #include "door.h"
 #include "box.h"
 #include "sound.h"
+#include <Specific\levelloader.h>
 #include "GameFlowScript.h"
 
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
@@ -70,6 +71,8 @@ int g_NumSprites;
 int g_NumSpritesSequences;
 
 ChunkReader* g_levelChunkIO;
+
+TrLevel g_Level;
 
 short ReadInt8()
 {
@@ -831,6 +834,14 @@ void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 	}
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
 unsigned CALLBACK LoadLevel(void* data)
 {
 	printf("LoadLevel\n");
@@ -916,6 +927,15 @@ unsigned CALLBACK LoadLevel(void* data)
 	{
 		return false;
 	}
+
+	// Load also the new file format
+	string t5mFileName = string(filename);
+	std::transform(t5mFileName.begin(), t5mFileName.end(), t5mFileName.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+	replace(t5mFileName, ".trc", ".t5m");
+	LevelLoader* loader = new LevelLoader(t5mFileName);
+	loader->Load();
+	delete loader;
 
 	g_Renderer->UpdateProgress(90);
 	g_Renderer->PrepareDataForTheRenderer();
