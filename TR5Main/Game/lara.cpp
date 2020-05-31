@@ -52,7 +52,7 @@ LaraInfo Lara;
 ITEM_INFO* LaraItem;
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 bool EnableCrouchRoll, EnableFeetHang, EnableMonkeyVault, EnableMonkeyRoll, EnableCrawlFlex1click, EnableCrawlFlex2click, EnableCrawlFlex3click;
-bool EnableCrawlFlex1clickE, EnableCrawlFlex2clickE, EnableCrawlFlex1clickup, EnableCrawlFlex1clickdown;
+bool EnableCrawlFlex1clickE, EnableCrawlFlex2clickE, EnableCrawlFlex3clickE, EnableCrawlFlex1clickup, EnableCrawlFlex1clickdown;
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_walk,
@@ -5083,6 +5083,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED
 		EnableCrawlFlex1clickdown = true;
 		EnableCrawlFlex1clickup = true;
+		EnableCrawlFlex3clickE = true;
 		EnableCrawlFlex2clickE = true;
 		EnableCrawlFlex1clickE = true;
 
@@ -5096,7 +5097,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 		MESH_INFO* StaticMesh;
 		PHD_VECTOR v;
 
-		if (LaraFloorFront(item, item->pos.yRot, 512) > 512 &&
+		if (LaraFloorFront(item, item->pos.yRot, 512) > 768 &&
 			LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
 			LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
 		{
@@ -5123,6 +5124,29 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 				/*}*/
 			}
 		}
+		else if (LaraFloorFront(item, item->pos.yRot, 256) == 768 &&
+			LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
+			LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
+		{
+			s.x = LaraItem->pos.xPos;
+			s.y = LaraItem->pos.yPos - 96;
+			s.z = LaraItem->pos.zPos;
+			s.roomNumber = LaraItem->roomNumber;
+
+			d.x = s.x + (768 * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT);
+			d.y = s.y + 160;
+			d.z = s.z + (768 * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT);
+
+			if (LOS(&s, &d) && item->animNumber != ANIMATION_LARA_CROUCH_TO_CRAWL_BEGIN && item->animNumber != ANIMATION_LARA_CROUCH_TO_CRAWL_CONTINUE && EnableCrawlFlex3clickE == true)
+			{
+				item->animNumber = ANIMATION_LARA_2_3CLICK_CRAWL_EXIT;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->goalAnimState = STATE_LARA_MISC_CONTROL;
+				item->currentAnimState = STATE_LARA_MISC_CONTROL;
+				Lara.gunStatus = LG_HANDS_BUSY;
+
+			}
+		}	
 		else	if (LaraFloorFront(item, item->pos.yRot, 256) == 512 &&
 				LaraCeilingFront(item, item->pos.yRot, 768, 512) != NO_HEIGHT &&
 				LaraCeilingFront(item, item->pos.yRot, 768, 512) <= 0)
@@ -5139,7 +5163,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 
 			if (LOS(&s, &d) && item->animNumber != ANIMATION_LARA_CROUCH_TO_CRAWL_BEGIN && item->animNumber != ANIMATION_LARA_CROUCH_TO_CRAWL_CONTINUE && EnableCrawlFlex2clickE == true)
 			{
-				item->animNumber = ANIMATION_LARA_2CLICK_CRAWL_EXIT;
+				item->animNumber = ANIMATION_LARA_2_3CLICK_CRAWL_EXIT;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_MISC_CONTROL;
 				item->currentAnimState = STATE_LARA_MISC_CONTROL;
