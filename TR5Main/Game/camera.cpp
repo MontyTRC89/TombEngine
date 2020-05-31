@@ -1,20 +1,19 @@
-#include "Camera.h"
-#include <d3d9.h>
-#include <stdio.h>
+#include "framework.h"
+#include "camera.h"
 #include "draw.h"
 #include "lara.h"
-#include "effects.h"
+#include "effect.h"
 #include "effect2.h"
 #include "debris.h"
 #include "larafire.h"
 #include "lara.h"
 #include "flmtorch.h"
 #include "sphere.h"
-#include "../Specific/level.h"
+#include "level.h"
 #include "collide.h"
 #include "sound.h"
 #include "savegame.h"
-#include "../Specific/input.h"
+#include "input.h"
 
 struct OLD_CAMERA
 {
@@ -1097,7 +1096,7 @@ void LookCamera(ITEM_INFO* item)
 	c = GetCeiling(floor, x, y, z);
 	if ((Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
 		Camera.pos.y = Rooms[roomNumber].y - 256;
-	else	if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
+	else if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
 		mgLOS(&Camera.target, &Camera.pos, 0);
 
 	x = Camera.pos.x;
@@ -1492,7 +1491,7 @@ void ConfirmCameraTargetPos()
 	pos.y = 0;
 	pos.z = 0;
 
-	GetLaraJointPosition(&pos, LM_LHAND);
+	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
 	{
@@ -1699,7 +1698,7 @@ void CalculateCamera()
 		Camera.target.y = y;
 
 		if (Camera.type
-			&& Camera.flags != CHASE_OBJECT
+			&& Camera.flags != CF_CHASE_OBJECT
 			&& (Camera.number != -1 &&(SniperCamActive = Camera.fixed[Camera.number].flags & 3, Camera.fixed[Camera.number].flags & 2)))
 		{
 			PHD_VECTOR pos;
@@ -1772,7 +1771,7 @@ void CalculateCamera()
 			Camera.target.z = LastTarget.z;
 		}
 
-		if (Camera.type && Camera.flags != CHASE_OBJECT)
+		if (Camera.type && Camera.flags != CF_CHASE_OBJECT)
 			FixedCamera(item);
 		else
 			ChaseCamera(item);

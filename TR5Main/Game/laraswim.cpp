@@ -1,26 +1,30 @@
+#include "framework.h"
 #include "laraswim.h"
-
-#include "..\Global\global.h"
-
 #include "control.h"
 #include "camera.h"
-#include "collide.h"
 #include "items.h"
 #include "box.h"
 #include "Lara.h"
 #include "larasurf.h"
-#include "effects.h"
+#include "effect.h"
 #include "effect2.h"
 #include "larafire.h"
 #include "laramisc.h"
 #include "draw.h"
 #include "camera.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 #include "sound.h"
+#include "GameFlowScript.h"
 
-
-
+typedef struct SUBSUIT_INFO
+{
+	short XRot;
+	short dXRot;
+	short XRotVel;
+	short Vel[2];
+	short YVel;
+};
 SUBSUIT_INFO Subsuit;
 byte SubHitCount = 0;
 
@@ -823,7 +827,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		}
 	}
 
-	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == 0)
+	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == NO_ITEM)
 		LaraTestWaterDepth(item, coll);
 }
 

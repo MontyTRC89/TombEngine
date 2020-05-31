@@ -1,6 +1,5 @@
+#include "framework.h"
 #include "larasurf.h"
-
-#include "..\Global\global.h"
 #include "control.h"
 #include "camera.h"
 #include "collide.h"
@@ -10,11 +9,10 @@
 #include "laraswim.h"
 #include "larafire.h"
 #include "laramisc.h"
-#include "..\Specific\level.h"
-#include "../Specific/input.h"
+#include "level.h"
+#include "input.h"
 
-extern void(*lara_control_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
-extern void(*lara_collision_routines[NUM_LARA_STATES + 1])(ITEM_INFO* item, COLL_INFO* coll);
+bool EnableCrawlFlexWaterPullUp, EnableCrawlFlexSubmerged;
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
@@ -331,6 +329,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	if (coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
 		return 0;
 
+	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
+	EnableCrawlFlexWaterPullUp = true;
+	EnableCrawlFlexSubmerged = true;
+
+
 	if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60 
 		|| Lara.gunStatus 
 		&& (Lara.gunStatus != LG_READY 
@@ -344,6 +347,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		return 0;
 
 	int frontFloor = coll->frontFloor + 700;
+	int frontCeiling = coll->frontCeiling + 700;
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
@@ -401,27 +405,54 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 1124;
 	}
 
-	if (frontFloor >= -128)
+
+	if (frontFloor <= -256)
 	{
-		if (frontFloor >= 128)
+		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
 		{
-			item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
+			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK;
 			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+		}
+		else
+		{
+			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = STATE_LARA_STOP;
+		}
+	}
+	else if (frontFloor > 128)
+	{
+		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexSubmerged == true)
+		{
+			item->animNumber = ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+		}
+		else
+			item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
+		item->frameNumber = Anims[item->animNumber].frameBase;
+	}
+
+	else
+	{
+		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
+		{
+			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK;
+			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
 		}
 		else
 		{
 			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW;
 			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->goalAnimState = STATE_LARA_STOP;
 		}
-	}
-	else
-	{
-		item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		
+
 	}
 	
 	item->currentAnimState = STATE_LARA_ONWATER_EXIT;
-	item->goalAnimState = STATE_LARA_STOP;
 	item->pos.yRot = rot;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;
@@ -482,5 +513,5 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
 
 	Lara.waterStatus = LW_WADE;
 
-	return true;
+	return 1;
 }

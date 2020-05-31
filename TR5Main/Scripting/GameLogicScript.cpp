@@ -1,12 +1,13 @@
+#include "framework.h"
 #include "GameLogicScript.h"
-#include "..\Game\items.h"
-#include "..\Game\box.h"
-#include "..\Game\lara.h"
-#include "../Game/savegame.h"
-#include "..\Game\lot.h"
-#include "..\Game\sound.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
+#include "items.h"
+#include "box.h"
+#include "lara.h"
+#include "savegame.h"
+#include "lot.h"
+#include "sound.h"
+#include "setup.h"
+#include "level.h"
 
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
@@ -164,7 +165,7 @@ GameScript::GameScript(sol::state* lua)
 		{"CHEF", ID_CHEF},
 		{"WINGED_MUMMY", ID_WINGED_MUMMY},
 		{"CENTAUR_MUTANT", ID_CENTAUR_MUTANT},
-		{"EVIL_LARA", ID_EVIL_LARA},
+		{"DOPPELGANGER", ID_LARA_DOPPELGANGER},
 		{"NATLA", ID_NATLA},
 		{"WINGED_NATLA", ID_WINGED_NATLA},
 		{"GIANT_MUTANT", ID_GIANT_MUTANT},
@@ -216,7 +217,7 @@ GameScript::GameScript(sol::state* lua)
 		{"LARA_DOUBLE", ID_LARA_DOUBLE},
 		{"COMPY", ID_COMPY},
 		{"HYDRA", ID_HYDRA},
-		{"GUARDIAN", ID_GUARDIAN},
+		{"LASERHEAD", ID_LASERHEAD},
 		{"SCIENTIST", ID_SCIENTIST},
 		{"MERCENARY", ID_MERCENARY},
 		{"WILLOWISP", ID_WILLOWISP},
@@ -914,8 +915,8 @@ GameScript::GameScript(sol::state* lua)
 		{"ANIMATING126", ID_ANIMATING126},
 		{"ANIMATING127", ID_ANIMATING127},
 		{"ANIMATING128", ID_ANIMATING128},
-		{"GUARDIAN_BASE", ID_GUARDIAN_BASE},
-		{"GUARDIAN_TENTACLE", ID_GUARDIAN_TENTACLE},
+		{"LASERHEAD_BASE", ID_LASERHEAD_BASE},
+		{"LASERHEAD_TENTACLE", ID_LASERHEAD_TENTACLE},
 		{"BRIDGE_FLAT", ID_BRIDGE_FLAT},
 		{"BRIDGE_TILT1", ID_BRIDGE_TILT1},
 		{"BRIDGE_TILT2", ID_BRIDGE_TILT2},
@@ -1492,7 +1493,7 @@ void GameScriptItem::EnableItem()
 	{
 		if (Objects[NativeItem->objectNumber].intelligent)
 		{
-			if (NativeItem->status == ITEM_DEACTIVATED)
+			if (NativeItem->status == ITEM_DESACTIVATED)
 			{
 				NativeItem->touchBits = 0;
 				NativeItem->status = ITEM_ACTIVE;
@@ -1527,7 +1528,7 @@ void GameScriptItem::DisableItem()
 			if (NativeItem->status == ITEM_ACTIVE)
 			{
 				NativeItem->touchBits = 0;
-				NativeItem->status = ITEM_DEACTIVATED;
+				NativeItem->status = ITEM_DESACTIVATED;
 				RemoveActiveItem(NativeItemNumber);
 				DisableBaddieAI(NativeItemNumber);
 			}
@@ -1536,7 +1537,7 @@ void GameScriptItem::DisableItem()
 		{
 			NativeItem->touchBits = 0;
 			RemoveActiveItem(NativeItemNumber);
-			NativeItem->status = ITEM_DEACTIVATED;
+			NativeItem->status = ITEM_DESACTIVATED;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
-#include "..\Global\global.h"
+
+#include "collide.h"
 
 void TriggerTorchFlame(char fxObj, char node);
 void DoFlameTorch();

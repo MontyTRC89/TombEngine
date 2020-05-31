@@ -1,5 +1,5 @@
 #pragma once
-#include "..\Global\global.h"
+#include "items.h"
 
 void FlareControl(short item_number);
 void ready_flare();

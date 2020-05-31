@@ -1,85 +1,106 @@
+#include "framework.h"
 #include "effect2.h"
 #include "draw.h"
+#include "effect.h"
+#include "lara.h"
 #include "tomb4fx.h"
 #include "traps.h"
-#include "math.h"
-#include "lara.h"
-#include "effects.h"
+#include "trmath.h"
 #include "sound.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "../Specific/setup.h"
-#include "../Specific/level.h"
-
-//long wibble;
-//long SplashCount;
-//long KillEverythingFlag;
-int NextSpark;
+#include "setup.h"
+#include "level.h"
+#include "objectslist.h"
+#include "GameFlowScript.h"
 
 unsigned char TES_extra_tab[] =
 {
 	0x00, 0x04, 0x07, 0x0A, 0x00, 0x00
 };
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+
+int NextSpark;
 int DeadlyBounds[6];
-SPLASH_STRUCT Splashes[MAX_SPLASH];
+SPLASH_SETUP SplashSetup;
+SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 DYNAMIC Dynamics[MAX_DYNAMICS];
-SPLASH_SETUP SplashSetup;
-SP_DYNAMIC SparkDynamics[8];
-int SmokeWeapon;
-int SmokeCountL;
-int SmokeCountR;
-//int SmokeWindX;
-//int SmokeWindZ;
-int SplashCount = 0;
 SPARKS Sparks[MAX_SPARKS];
-PHD_VECTOR NodeVectors[16];
-NODEOFFSET_INFO NodeOffsets[16] = {
-	{ -0x10, 0x28, 0xA0, -0xE, 0 },
-	{ -0x10, -8, 0xA0, 0, 0 },
-	{ 0, 0, 0x100, 8, 0 },
-	{ 0, 0, 0x100, 0x11, 0 },
-	{ 0, 0, 0x100, 0x1A, 0 },
-	{ 0, 0x90, 0x28, 0xA, 0 },
-	{ -0x28, 0x40, 0x168, 0xE, 0 },
-	{ 0, -0x258, -0x28, 0, 0 },
-	{ 0, 0x20, 0x10, 9, 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0 }
+SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
+int SmokeWeapon;
+byte SmokeCountL;
+byte SmokeCountR;
+int SplashCount = 0;
+
+PHD_VECTOR NodeVectors[MAX_NODE];
+NODEOFFSET_INFO NodeOffsets[MAX_NODE] = {
+	{ -16, 40, 160, -14, false }, // TR5 offset 0
+	{ -16, -8, 160, 0, false }, // TR5 offset 1
+	{ 0, 0, 256, 8, false }, // TR5 offset 2
+	{ 0, 0, 256, 17, false }, // TR5 offset 3
+	{ 0, 0, 256, 26, false }, // TR5 offset 4
+	{ 0, 144, 40, 10, false }, // TR5 offset 5
+	{ -40, 64, 360, 14, false }, // TR5 offset 6
+	{ 0, -600, -40, 0, false }, // TR5 offset 7
+	{ 0, 32, 16, 9, false }, // TR5 offset 8
+	{ 0, 340, 0, 7, false }, // TR3 offset 0
+	{ 0, 0, -96, 10, false }, // TR3 offset 1
+	{ 13, 48, 320, 13, false }, // TR3 offset 2
+	{ 0, -256, 0, 5, false }, // TR3 offset 3
+	{ 0, 64, 0, 10, false }, // TR3 offset 4 // tony left
+	{ 0, 64, 0, 13, false }, // TR3 offset 5 // tony right
+	{ -32, -16, -192, 13, false }, // TR3 offset 6
+	{ -64, 410, 0, 20, false }, // TR3 offset 7
+	{ 64, 410, 0, 23, false }, // TR3 offset 8
+	{ -160, -8, 16, 5, false }, // TR3 offset 9
+	{ -160, -8, 16, 9, false }, // TR3 offset 10
+	{ -160, -8, 16, 13, false }, // TR3 offset 11
+	{ 0, 0, 0, 0, false }, // TR3 offset 12
+	{ 0, 0, 0, 0, false }, // Empty
 };
 
 extern GameFlow* g_GameFlow;
 
-void DetatchSpark(int num, int type)//32D8C, 3328C (F)
+void DetatchSpark(int num, SpriteEnumFlag type)// (F) (D)
 {
-	FX_INFO* fx = &Effects[num];
-	ITEM_INFO* item = &Items[num];
-	SPARKS* sptr = &Sparks[0];
-
-	for (int lp = 0; lp < MAX_SPARKS; lp++, sptr++)
+	FX_INFO* fx;
+	ITEM_INFO* item;
+	SPARKS* sptr;
+	int lp;
+	
+	sptr = &Sparks[0];
+	for (lp = 0; lp < MAX_SPARKS; lp++, sptr++)
 	{
-		if (sptr->on && sptr->flags & type && sptr->fxObj == num)
+		if (sptr->on && (sptr->flags & type) && sptr->fxObj == num)
 		{
-			if (type == 64)
+			switch (type)
 			{
-				sptr->x += fx->pos.xPos;
-				sptr->y += fx->pos.yPos;
-				sptr->z += fx->pos.zPos;
-
-				sptr->flags &= 0xBF;
-			}
-			else if (type == 128)
-			{
-				sptr->x += item->pos.xPos;
-				sptr->y += item->pos.yPos;
-				sptr->z += item->pos.zPos;
-
-				sptr->flags &= 0x7F;
+				case SP_FX:
+					if (sptr->flags & SP_USEFXOBJPOS)
+					{
+						sptr->on = FALSE;
+					}
+					else
+					{
+						fx = &Effects[num];
+						sptr->x += fx->pos.xPos;
+						sptr->y += fx->pos.yPos;
+						sptr->z += fx->pos.zPos;
+						sptr->flags &= ~SP_FX;
+					}
+					break;
+				case SP_ITEM:
+					if (sptr->flags & SP_USEFXOBJPOS)
+					{
+						sptr->on = FALSE;
+					}
+					else
+					{
+						item = &Items[num];
+						sptr->x += item->pos.xPos;
+						sptr->y += item->pos.yPos;
+						sptr->z += item->pos.zPos;
+						sptr->flags &= ~SP_ITEM;
+					}
+					break;
 			}
 		}
 	}
@@ -382,7 +403,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 			spark->fadeToBlack = 4;
 			spark->life = 9;
 			spark->sLife = 9;
-			spark->transType = 2;
+			spark->transType = COLADD;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -392,7 +413,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 			spark->zVel = rcossin_tbl[2 * ang + 1] >> 2;
 			spark->gravity = (random >> 7) & 0x1F;
 			spark->friction = 34;
-			spark->flags = 0;
+			spark->flags = SP_NONE;
 			spark->maxYvel = 0;
 		}
 		
@@ -410,7 +431,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 		spark->fadeToBlack = 0;
 		spark->life = 4;
 		spark->sLife = 4;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->x = pos->x;
 		spark->y = pos->y;
 		spark->z = pos->z;
@@ -468,7 +489,7 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 				spark->xVel = 0;
 				spark->zVel = 0;
 			}
-			spark->transType = 2;
+			spark->transType = COLADD;
 			spark->friction = 0;
 			spark->flags = 26;
 			spark->rotAng = random >> 3;
@@ -506,13 +527,13 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 		spark->dB = -64 - ((random & 0x7F) + 64);
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->x = (random & 7) + x - 3;
 		spark->y = ((random >> 3) & 7) + y - 3;
 		spark->z = ((random >> 6) & 7) + z - 3;
-		spark->flags = 2;
+		spark->flags = SP_SCALE;
 		spark->xVel = (random >> 2) + xv - 128;
 		spark->yVel = (random >> 4) + yv - 128;
 		spark->zVel = (random >> 6) + zv - 128;
@@ -549,7 +570,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark->colFadeSpeed = 7;
 		spark->dG = (GetRandomControl() & 0x1F) + 64;
 		spark->fadeToBlack = 8;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 		spark->roomNumber = roomNumber;
 	}
@@ -562,7 +583,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 		spark->colFadeSpeed = 8;
 		spark->dG = (GetRandomControl() & 0x3F) + -128;
 		spark->fadeToBlack = 16;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
 	}
 	spark->extras = extraTrig | 8 * (TES_extra_tab[extraTrig] + (GetRandomControl() & 7) + 28);
@@ -976,7 +997,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 		sptr->dB = 32;
 		sptr->colFadeSpeed = 8;
 		sptr->fadeToBlack = 8;
-		sptr->transType = 2;
+		sptr->transType = COLADD;
 		sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
 		sptr->x = (GetRandomControl() & 0x1F) + item->pos.xPos - 16;
 		sptr->y = (GetRandomControl() & 0x1F) + item->pos.yPos - 16;
@@ -1030,7 +1051,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 	constexpr size_t NUM_SPLASHES = 4;
 	int numSplashesSetup = 0;
 	float splashVelocity;
-	for (int i = 0; i < MAX_SPLASH; i++)
+	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
 		SPLASH_STRUCT& splash = Splashes[i];
 		if (!splash.isActive)
@@ -1106,7 +1127,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 
 void UpdateSplashes()
 {
-	for (int i = 0; i < MAX_SPLASH; i++)
+	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
 		SPLASH_STRUCT& splash = Splashes[i];
 		if (splash.isActive) {
@@ -1246,7 +1267,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->dG = 64;
 		spark->dB = 64;
 		spark->colFadeSpeed = 1;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
 		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
@@ -1280,7 +1301,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->dG = 96;
 	spark->dB = 96;
 	spark->colFadeSpeed = 1;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 1;
 	dl = GetRandomControl() % 1408 + 64;
@@ -1318,7 +1339,7 @@ void TriggerDartSmoke(int x, int y, int z, int xv, int zv, int hit)
 	spark->dB = 32;
 	spark->colFadeSpeed = 8;
 	spark->fadeToBlack = 4;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1480,7 +1501,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 28;
-	sptr->transType = 2;
+	sptr->transType = COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1536,7 +1557,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = 2;
+	sptr->transType = COLADD;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1589,7 +1610,7 @@ void GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
 	spark->dShade = -128;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 16;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 64;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1695,7 +1716,7 @@ void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 28;
 		}
 
-		spark->transType = 2;
+		spark->transType = COLADD;
 
 		if (flag1 != -1)
 		{
@@ -1886,7 +1907,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 5;
 		spark->y = ((r >> 3) & 7) + y - 3;
-		spark->transType = 2;
+		spark->transType = COLADD;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->z = ((r >> 6) & 7) + z - 3;
@@ -1908,7 +1929,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 			spark->sR = spark->dR >> 1;
 			spark->sG = spark->dG >> 1;
 			spark->fadeToBlack = 4;
-			spark->transType = 2;
+			spark->transType = COLADD;
 			spark->colFadeSpeed = (r & 3) + 8;
 			spark->sB = spark->dB >> 1;
 			spark->dR = 32;

@@ -1,9 +1,7 @@
+#include "framework.h"
 #include "misc.h"
-#include "../Specific/setup.h"
-#include "..\Specific\level.h"
-
-#define CHK_ANY(var, flag) (var & flag) != 0
-#define CHK_NOP(var, flag) !(var & flag)
+#include "setup.h"
+#include "level.h"
 
 short GF(short animIndex, short frameToStart)
 {
@@ -13,6 +11,11 @@ short GF(short animIndex, short frameToStart)
 short GF2(short objectID, short animIndex, short frameToStart)
 {
 	return short(Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart);
+}
+
+CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
+{
+    return (CREATURE_INFO*)item->data;
 }
 
 void GetRoomList(short roomNumber, short* roomArray, short* numRooms)

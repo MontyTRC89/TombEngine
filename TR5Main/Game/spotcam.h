@@ -1,6 +1,30 @@
 #pragma once
+#include "phd_global.h"
 
-#include "..\Global\global.h"
+struct QUAKE_CAMERA
+{
+	GAME_VECTOR spos;
+	GAME_VECTOR epos;
+};
+
+typedef struct SPOTCAM
+{
+	int x;
+	int y;
+	int z;
+	int tx;
+	int ty;
+	int tz;
+	unsigned char sequence;
+	unsigned char camera;
+	short fov;
+	short roll;
+	short timer;
+	short speed;
+	short flags;
+	short roomNumber;
+	short pad;
+};
 
 enum spotcam_flags
 {

@@ -1,31 +1,19 @@
+#include "framework.h"
 #include "level.h"
-#include "..\Global\global.h"
-#include "..\Game\items.h"
-#include "..\Specific\setup.h"
-#include "..\Game\draw.h"
-#include "..\Game\lot.h"
-#include "..\Game\Lara.h"
-#include "..\Game\savegame.h"
-#include "..\Game\spotcam.h"
-#include "..\Game\camera.h"
-#include "..\Scripting\GameFlowScript.h"
-#include "..\Game\control.h"
-#include "..\Game\pickup.h"
-#include "../Game/door.h"
-#include "../Game/box.h"
-
-#include "IO/ChunkId.h"
-#include "IO/ChunkReader.h"
-#include "IO/ChunkWriter.h" 
-#include "IO/LEB128.h"
-
-#include <process.h>
-#include <stdio.h>
-#include <vector>
-#include <map>
-#include "IO/Streams.h"
-#include <zlib.h>
-#include "../Game/sound.h"
+#include "setup.h"
+#include "draw.h"
+#include "lot.h"
+#include "Lara.h"
+#include "savegame.h"
+#include "spotcam.h"
+#include "camera.h"
+#include "control.h"
+#include "pickup.h"
+#include "door.h"
+#include "box.h"
+#include "sound.h"
+#include <Specific\levelloader.h>
+#include "GameFlowScript.h"
 
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
 ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
@@ -56,8 +44,6 @@ unsigned int ThreadId;
 int IsLevelLoading;
 bool g_FirstLevel = true;
 
-using namespace std;
-
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
 
@@ -85,6 +71,8 @@ int g_NumSprites;
 int g_NumSpritesSequences;
 
 ChunkReader* g_levelChunkIO;
+
+TrLevel g_Level;
 
 short ReadInt8()
 {
@@ -158,7 +146,7 @@ int LoadItems()
 				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
 			{
 				int fl = floor->floor << 2;
-				STATIC_INFO* st = &StaticObjects[mesh->staticNumber];
+				StaticInfo* st = &StaticObjects[mesh->staticNumber];
 				if (fl <= mesh->y - st->yMaxc + 512 && fl < mesh->y - st->yMinc)
 				{
 					if (st->xMaxc == 0 || st->xMinc == 0 ||
@@ -178,10 +166,8 @@ int LoadItems()
 
 void LoadObjects()
 {
-	//DB_Log(2, "LoadObjects - DLL");
-	 
 	memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
-	memset(StaticObjects, 0, sizeof(STATIC_INFO) * NUM_STATICS);
+	memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshDataWords = ReadInt32();
 	int numMeshDataBytes = 2 * numMeshDataWords;
@@ -192,8 +178,8 @@ void LoadObjects()
 	MeshDataSize = numMeshDataBytes;
 
 	int numMeshPointers = ReadInt32();
-	Meshes = (short**)game_malloc(4 * numMeshPointers);
-	ReadBytes(Meshes, 4 * numMeshPointers);
+	Meshes = (short**)game_malloc(sizeof(short*) * numMeshPointers);
+	ReadBytes(Meshes, sizeof(short*) * numMeshPointers);
 
 	for (int i = 0; i < numMeshPointers; i++) 
 	{
@@ -216,12 +202,12 @@ void LoadObjects()
 	ReadBytes(Ranges, sizeof(RANGE_STRUCT) * numRanges);
 
 	int numCommands = ReadInt32();
-	Commands = (short*)game_malloc(2 * numCommands);
-	ReadBytes(Commands, 2 * numCommands);
+	Commands = (short*)game_malloc(sizeof(short) * numCommands);
+	ReadBytes(Commands, sizeof(short) * numCommands);
 
 	int numBones = ReadInt32();
-	Bones = (int*)game_malloc(4 * numBones);
-	ReadBytes(Bones, 4 * numBones);
+	Bones = (int*)game_malloc(sizeof(int) * numBones);
+	ReadBytes(Bones, sizeof(int) * numBones);
 
 	int* bone = Bones;
 	for (int i = 0; i < 15; i++)
@@ -232,20 +218,20 @@ void LoadObjects()
 		int linkZ = *(bone++);
 	}
 	
-	MeshTrees = (int*)game_malloc(4 * numBones);
+	MeshTrees = (int*)game_malloc(sizeof(int) * numBones);
 
-	memcpy(MeshTrees, Bones, 4 * numBones);
+	memcpy(MeshTrees, Bones, sizeof(int) * numBones);
 
 	int numFrames = ReadInt32();
-	Frames = (short*)game_malloc(2 * numFrames);
-	ReadBytes(Frames, 2 * numFrames);
+	Frames = (short*)game_malloc(sizeof(short) * numFrames);
+	ReadBytes(Frames, sizeof(short) * numFrames);
 
 	AnimationsCount = numAnimations;
 	if (AnimationsCount > 0)
 	{
 		int i = 0;
 		for (int i = 0; i < AnimationsCount; i++)
-			ADD_PTR(Anims[i].framePtr, short, Frames);
+			AddPtr(Anims[i].framePtr, short, Frames);
 	}
 
 	int numModels = ReadInt32();
@@ -319,7 +305,6 @@ void LoadCameras()
 
 void LoadTextures()
 {
-	//DB_Log(2, "LoadTextures - DLL");
 	printf("LoadTextures\n");
 
 	int uncompressedSize = 0;
@@ -604,7 +589,6 @@ void BuildOutsideRoomsTable()
  
 void LoadRooms()
 {
-	//DB_Log(2, "LoadRooms - DLL");
 	printf("LoadRooms\n");
 	
 	Wibble = 0;
@@ -677,8 +661,8 @@ void LoadTextureInfos()
 
 			for (int j = 0; j < 4; j++)
 			{
-				texture->vertices[j].x = srctext.Vertices[j].Xpixel / 256.0;
-				texture->vertices[j].y = srctext.Vertices[j].Ypixel / 256.0;
+				texture->vertices[j].x = srctext.Vertices[j].Xpixel / 256.0f;
+				texture->vertices[j].y = srctext.Vertices[j].Ypixel / 256.0f;
 			}
 
 			// Adjust UV
@@ -850,9 +834,16 @@ void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 	}
 }
 
-unsigned __stdcall LoadLevel(void* data)
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+unsigned CALLBACK LoadLevel(void* data)
 {
-	//DB_Log(5, "LoadLevel - DLL");
 	printf("LoadLevel\n");
 
 	char* filename = (char*)data;
@@ -936,6 +927,15 @@ unsigned __stdcall LoadLevel(void* data)
 	{
 		return false;
 	}
+
+	// Load also the new file format
+	string t5mFileName = string(filename);
+	std::transform(t5mFileName.begin(), t5mFileName.end(), t5mFileName.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+	replace(t5mFileName, ".trc", ".t5m");
+	LevelLoader* loader = new LevelLoader(t5mFileName);
+	loader->Load();
+	delete loader;
 
 	g_Renderer->UpdateProgress(90);
 	g_Renderer->PrepareDataForTheRenderer();
@@ -1167,10 +1167,10 @@ void LoadSprites()
 		Sprites[i].y = ReadInt8();
 		Sprites[i].width = ReadInt16();
 		Sprites[i].height = ReadInt16();
-		Sprites[i].left = (ReadInt16() + 1) / 256.0;
-		Sprites[i].top = (ReadInt16() + 1) / 256.0;
-		Sprites[i].right = (ReadInt16() - 1) / 256.0;
-		Sprites[i].bottom = (ReadInt16() - 1) / 256.0;
+		Sprites[i].left = (ReadInt16() + 1) / 256.0f;
+		Sprites[i].top = (ReadInt16() + 1) / 256.0f;
+		Sprites[i].right = (ReadInt16() - 1) / 256.0f;
+		Sprites[i].bottom = (ReadInt16() - 1) / 256.0f;
 	}
 
 	g_NumSpritesSequences = ReadInt32();
@@ -1212,7 +1212,7 @@ void GetCarriedItems()
 				if (abs(item2->pos.xPos - item->pos.xPos) < 512
 					&& abs(item2->pos.zPos - item->pos.zPos) < 512
 					&& abs(item2->pos.yPos - item->pos.yPos) < 256
-					&& Objects[item2->objectNumber].collision == PickupCollision)
+					&& Objects[item2->objectNumber].isPickup)
 				{
 					item2->carriedItem = item->carriedItem;
 					item->carriedItem = linknum;

@@ -1,10 +1,4 @@
 #pragma once
-
-#include <Windows.h>
-#include <stdlib.h>
-#include <memory>
-#include <string>
-
 #include "LEB128.h"
 #include "Streams.h"
 
@@ -81,4 +75,3 @@ public:
 		return (strncmp((const char*)m_chunkBytes, (const char*)other->GetBytes(), m_length) == 0);
 	}
 };
-

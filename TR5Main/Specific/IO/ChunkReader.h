@@ -1,18 +1,16 @@
 #pragma once
-
-#include <stdlib.h>
-#include <memory>
-
 #include "ChunkId.h"
 #include "LEB128.h"
 #include "Streams.h"
 
+using namespace std;
+
 class ChunkReader
 {
 private:
-	bool				m_isValid;
-	ChunkId*			m_emptyChunk;
-	BaseStream*			m_stream;
+	bool m_isValid;
+	ChunkId* m_emptyChunk = nullptr;
+	BaseStream* m_stream = nullptr;
 
 	int readInt32()
 	{
@@ -44,7 +42,7 @@ public:
 			return;
 
 		// TODO: future use for compression
-		m_stream->Seek(4, SEEK_ORIGIN::CURRENT);
+		m_stream->Seek(4, SeekOrigin::CURRENT);
 		m_emptyChunk = new ChunkId(NULL, 0);
 		m_isValid = true;
 	}
@@ -79,7 +77,33 @@ public:
 
 			// Adjust _stream position if necessary
 			if (readDataCount != chunkSize)
-				m_stream->Seek(chunkSize - readDataCount, SEEK_ORIGIN::CURRENT);
+				m_stream->Seek(chunkSize - readDataCount, SeekOrigin::CURRENT);
+		} while (true);
+
+		return true;
+	}
+
+	bool ReadChunks(std::function<bool(ChunkId*, long, int)> func, int arg)
+	{
+		do
+		{
+			ChunkId* chunkId = ChunkId::FromStream(m_stream);
+			if (chunkId->EqualsTo(m_emptyChunk)) // End reached
+				break;
+
+			// Read up to a 64 bit number for the chunk size
+			__int64 chunkSize = LEB128::ReadLong(m_stream);
+
+			// Try loading chunk content
+			bool chunkRecognized = false;
+			int startPos = m_stream->GetCurrentPosition();
+
+			chunkRecognized = func(chunkId, chunkSize, arg);
+			int readDataCount = m_stream->GetCurrentPosition() - startPos;
+
+			// Adjust _stream position if necessary
+			if (readDataCount != chunkSize)
+				m_stream->Seek(chunkSize - readDataCount, SeekOrigin::CURRENT);
 		} while (true);
 
 		return true;
@@ -139,4 +163,3 @@ public:
 		return m_stream;
 	}
 };
-

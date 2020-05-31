@@ -1,6 +1,6 @@
 #pragma once
-#include <SimpleMath.h>
-struct alignas(16) CRoomBuffer {
-	DirectX::SimpleMath::Vector4 AmbientColor;
-};
 
+struct alignas(16) CRoomBuffer
+{
+	Vector4 AmbientColor;
+};

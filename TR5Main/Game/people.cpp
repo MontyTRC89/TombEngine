@@ -1,6 +1,6 @@
+#include "framework.h"
 #include "people.h"
-#include "..\Global\global.h"
-#include "effects.h"
+#include "effect.h"
 #include "effect2.h"
 #include "draw.h"
 #include "control.h"
@@ -8,7 +8,6 @@
 #include "debris.h"
 #include "lara.h"
 #include "sound.h"
-#include "box.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
