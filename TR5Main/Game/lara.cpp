@@ -6478,26 +6478,20 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			return 0;
 
 		int slope = abs(coll->leftFloor2 - coll->rightFloor2) >= 60;
-/*
-		if (coll->frontFloor >= 0 && coll->frontFloor <= -256)
+
+		if (coll->frontFloor < 0 && coll->frontFloor >= -256)
 		{
 			if (!slope && (abs(coll->frontCeiling - coll->frontFloor) < 256) && EnableCrawlFlex1click == true)
 			{
 				item->animNumber = ANIMATION_LARA_1CLICK_CRAWL_VAULT;
 				item->currentAnimState = STATE_LARA_GRABBING;
 				item->frameNumber = Anims[item->animNumber].frameBase;
-				item->goalAnimState = STATE_LARA_STOP;
+				item->goalAnimState = STATE_LARA_CROUCH_IDLE;
 				item->pos.yPos += coll->frontFloor + 256;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
-
-			else
-			{
-				return 0;
-			}
 		}
-*/
-		if (coll->frontFloor >= -640 && coll->frontFloor <= -384)
+		else if (coll->frontFloor >= -640 && coll->frontFloor <= -384)
 		{
 			if (!slope &&
 				coll->frontFloor - coll->frontCeiling >= 0 &&
