@@ -1,7 +1,7 @@
 #pragma once
 #include "lara.h"
 
-typedef enum FIREWEAPON_TYPE
+typedef enum FireWeaponType
 {
 	FW_MISS = -1,
 	FW_NOAMMO = 0,
@@ -33,7 +33,7 @@ void InitialiseNewWeapon();
 int WeaponObjectMesh(int weaponType);
 void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm);
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag);
-FIREWEAPON_TYPE FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
+FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
 void LaraTargetInfo(WEAPON_INFO* weapon);
 bool CheckForHoldingState(int state);
