@@ -72,6 +72,7 @@ struct COLL_INFO
 	short oldFrameNumber;
 	short facing;
 	short quadrant;
+	short octant;
 	short collType; // CT_enum
 	short* trigger;
 	signed char tiltX;
