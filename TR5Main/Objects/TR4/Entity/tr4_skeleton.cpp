@@ -110,7 +110,7 @@ void InitialiseSkeleton(short itemNumber)
 		item->currentAnimState = 25;
 		item->animNumber = obj->animIndex;
 		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->status = ITEM_DESACTIVATED;
+		item->status = ITEM_DEACTIVATED;
 		break;
 
 	}
