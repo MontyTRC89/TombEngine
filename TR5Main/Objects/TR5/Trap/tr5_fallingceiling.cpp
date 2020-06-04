@@ -24,7 +24,7 @@ void FallingCeilingControl(short itemNumber)
 
 	AnimateItem(item);
 
-	if (item->status == ITEM_DESACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
 	{
 		RemoveActiveItem(itemNumber);
 	}

@@ -106,7 +106,7 @@ void LarsonControl(short itemNumber)
 			item->gravityStatus = false;
 			item->hitStatus = false;
 			item->collidable = false;
-			item->status = ITEM_DESACTIVATED;
+			item->status = ITEM_DEACTIVATED;
 		}
 		else
 		{

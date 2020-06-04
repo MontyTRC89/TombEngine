@@ -447,7 +447,7 @@ int KeyTrigger(short itemNum)
     oldkey = KeyTriggerActive;
 
     if (!oldkey)
-        item->status = ITEM_DESACTIVATED;
+        item->status = ITEM_DEACTIVATED;
 
     KeyTriggerActive = false;
 
@@ -1615,7 +1615,7 @@ void SearchObjectControl(short itemNumber)
     }
 
     
-    if (item->status == ITEM_DESACTIVATED)
+    if (item->status == ITEM_DEACTIVATED)
     {
         if (item->objectNumber == ID_SEARCH_OBJECT4)
         {
