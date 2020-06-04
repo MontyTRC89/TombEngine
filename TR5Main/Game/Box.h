@@ -18,7 +18,7 @@ typedef enum TARGET_TYPE
 	SECONDARY_TARGET
 };
 
-typedef enum ZONE_TYPE
+typedef enum ZoneType
 {
 	ZONE_NULL = -1,  // default zone
 	ZONE_SKELLY = 0,
@@ -93,7 +93,7 @@ typedef struct LOT_INFO
 	bool isJumping;
 	bool isMonkeying;
 	PHD_VECTOR target;
-	ZONE_TYPE zone;
+	ZoneType zone;
 };
 
 typedef struct CREATURE_INFO

@@ -210,9 +210,6 @@
     <ClInclude Include="Specific\configuration.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\oldobjects.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -708,9 +705,6 @@
     <ClInclude Include="Objects\TR4\Trap\tr4_cog.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\TR5\Switch\tr5_cogswitch.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\TR4\Object\tr4_laradouble.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -742,6 +736,42 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\newtypes.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Light\tr5_light.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_raisingblock.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_bodypart.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_teleporter.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_highobject.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_genslot.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Trap\tr5_deathslide.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Effects\tr5_electricity.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_rollingball.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1277,12 +1307,6 @@
     <ClCompile Include="Objects\TR5\Entity\tr5_cyborg.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\tr5_misc_objects.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\tr5_traps.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR5\Entity\tr5_roman_statue.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1337,9 +1361,6 @@
     <ClCompile Include="Objects\TR4\Trap\tr4_cog.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR5\Switch\tr5_cogswitch.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR4\Object\tr4_laradouble.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1356,6 +1377,42 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\levelloader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Light\tr5_light.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_raisingblock.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_bodypart.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_highobject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Trap\tr5_deathslide.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Effects\tr5_electricity.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_rollingball.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

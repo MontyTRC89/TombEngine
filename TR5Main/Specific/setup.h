@@ -25,7 +25,7 @@ typedef struct ObjectInfo
 	function<void(ITEM_INFO* item)> drawRoutine;
 	function<void(ITEM_INFO* item)> drawRoutineExtra;
 	function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;
-	ZONE_TYPE zoneType;
+	ZoneType zoneType;
 	short animIndex; 
 	short hitPoints; 
 	short pivotLength; 

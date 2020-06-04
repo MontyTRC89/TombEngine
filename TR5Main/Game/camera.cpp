@@ -64,11 +64,6 @@ short CurrentFOV;
 int GetLaraOnLOS;
 int SniperOverlay;
 
-void ActivateCamera()
-{
-	KeyTriggerActive = 2;
-}
-
 void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll)
 {
 	Vector3 position = Vector3(posX, posY, posZ);

@@ -1,16 +1,13 @@
 #include "framework.h"
 #include "effect.h"
-
+#include "effect2.h"
 #include "Lara.h"
-#include "items.h"
 #include "lot.h"
 #include "tomb4fx.h"
-#include "effect2.h"
 #include "hair.h"
 #include "draw.h"
 #include "sphere.h"
 #include "footprint.h"
-#include "oldobjects.h"
 #include "level.h"
 #include "debris.h"
 #include "setup.h"
@@ -23,11 +20,10 @@
 
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
-
 short FXType;
 FX_INFO* Effects;
 
-void(*effect_routines[59])(ITEM_INFO* item) =
+function<EffectFunction> effect_routines[59] =
 {
 	turn180_effect,
 	floor_shake_effect,
