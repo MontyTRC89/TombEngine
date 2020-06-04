@@ -114,9 +114,9 @@ static bool SilencerIsEquiped()
 
 static bool LaserSightIsEquiped()
 {
-    return Lara.Weapons[WEAPON_REVOLVER].HasSilencer
-        || Lara.Weapons[WEAPON_CROSSBOW].HasSilencer
-        || Lara.Weapons[WEAPON_HK].HasSilencer;
+    return Lara.Weapons[WEAPON_REVOLVER].HasLasersight
+        || Lara.Weapons[WEAPON_CROSSBOW].HasLasersight
+        || Lara.Weapons[WEAPON_HK].HasLasersight;
 }
 
 void PickedUpObject(short objectNumber)
