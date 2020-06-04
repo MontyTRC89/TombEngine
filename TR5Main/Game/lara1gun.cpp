@@ -1490,7 +1490,7 @@ void undraw_shotgun(int weapon)
 	
 	AnimateItem(item);
 
-	if (item->status == ITEM_DESACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
 		Lara.target = NULL;

@@ -12,7 +12,7 @@ void ControlSpikyWall(short itemNum)
 	ITEM_INFO* item = &Items[itemNum];
 
 	/* Move wall */
-	if (TriggerActive(item) && item->status != ITEM_DESACTIVATED)
+	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
 		int x = item->pos.xPos + phd_sin(item->pos.yRot) >> WALL_SHIFT;
 		int z = item->pos.zPos + phd_cos(item->pos.yRot) >> WALL_SHIFT;
@@ -22,7 +22,7 @@ void ControlSpikyWall(short itemNum)
 
 		if (GetFloorHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
 		{
-			item->status = ITEM_DESACTIVATED;
+			item->status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_ROLLING_BALL);
 		}
 		else
