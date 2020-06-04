@@ -4673,11 +4673,32 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 					}
 					else
 					{
-						item->pos.yPos += coll->frontFloor - bounds[2];
-						item->pos.xPos += coll->shift.x;
-						item->pos.zPos += coll->shift.z;
-					}
 
+/*						item->pos.xPos += coll->shift.x;
+						item->pos.zPos += coll->shift.z;
+						@ORIGINAL_BUG: these two caused teleportation when Lara performed crawl2hang on triangulated geometry. replacing with shifts to the edges of blocks solved it*/
+
+						short angl = (unsigned short)(item->pos.yRot + ANGLE(45.0f)) / ANGLE(90.0f);
+						switch (angl)
+						{
+						case NORTH:
+							item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD;
+							break;
+
+						case EAST:
+							item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - LARA_RAD;
+							break;
+
+						case SOUTH:
+							item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + LARA_RAD;
+							break;
+
+						case WEST:
+							item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD;
+							break;
+						}
+					}
+					item->pos.yPos += coll->frontFloor - bounds[2];
 					item->pos.yRot = angle;
 
 					item->gravityStatus = true;
