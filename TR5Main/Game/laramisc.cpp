@@ -21,7 +21,7 @@
 
 extern GameFlow* g_GameFlow;
 extern short FXType;
-COLL_INFO coll;
+COLL_INFO lara_coll;
 short SubsuitAir = 0;
 short cheatHitPoints;
 
@@ -607,7 +607,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 			}
 #endif
 		}
-		LaraAboveWater(item, &coll);
+		LaraAboveWater(item, &lara_coll);
 		break;
 
 	case LW_UNDERWATER:
@@ -629,7 +629,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 				item->hitPoints -= 5;
 			}
 		}		
-		LaraUnderWater(item, &coll);
+		LaraUnderWater(item, &lara_coll);
 		break;
 
 	case LW_SURFACE:
@@ -639,11 +639,11 @@ void LaraControl(short itemNumber) // (AF) (D)
 			if (Lara.air > 1800)
 				Lara.air = 1800;
 		}
-		LaraSurface(item, &coll);
+		LaraSurface(item, &lara_coll);
 		break;
 
 	case LW_FLYCHEAT:
-		LaraCheat(item, &coll);
+		LaraCheat(item, &lara_coll);
 		break;
 	}
 
