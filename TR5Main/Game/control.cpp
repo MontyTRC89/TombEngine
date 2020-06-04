@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "collide.h"
 #include "control.h"
-
 #include "pickup.h"
 #include "camera.h"
 #include "Lara.h"
@@ -152,7 +151,6 @@ extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern Inventory* g_Inventory;
 extern int SplashCount;
-extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
@@ -1261,11 +1259,6 @@ void UpdateSky()
 			SkyPos2 -= 9728;
 		}
 	}
-}
-
-void ActivateKey()
-{
-	KeyTriggerActive = 1;
 }
 
 short GetDoor(FLOOR_INFO* floor)
@@ -2808,6 +2801,7 @@ void AnimateItem(ITEM_INFO* item)
 	{
 		short* cmd = &Commands[anim->commandIndex];
 		int flags;
+		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -2872,7 +2866,8 @@ void AnimateItem(ITEM_INFO* item)
 				}
 
 				FXType = cmd[1] & 0xC000;
-				(*effect_routines[(int)(cmd[1] & 0x3fff)])(item);
+				effectID = cmd[1] & 0x3FFF;
+				effect_routines[effectID](item);
 
 				cmd += 2;
 				break;

@@ -12,7 +12,7 @@
 #include "door.h"
 #include "box.h"
 #include "sound.h"
-#include <Specific\levelloader.h>
+#include "levelloader.h"
 #include "GameFlowScript.h"
 
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
@@ -927,7 +927,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	{
 		return false;
 	}
-
+	/*
 	// Load also the new file format
 	string t5mFileName = string(filename);
 	std::transform(t5mFileName.begin(), t5mFileName.end(), t5mFileName.begin(),
@@ -936,7 +936,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	LevelLoader* loader = new LevelLoader(t5mFileName);
 	loader->Load();
 	delete loader;
-
+	*/
 	g_Renderer->UpdateProgress(90);
 	g_Renderer->PrepareDataForTheRenderer();
 	

@@ -1,7 +1,7 @@
 #pragma once
 #include "items.h"
 
-#define NUM_BATS 64
+constexpr auto NUM_BATS = 64;
 
 struct BAT_STRUCT
 {

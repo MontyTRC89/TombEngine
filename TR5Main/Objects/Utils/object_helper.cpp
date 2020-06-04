@@ -86,7 +86,7 @@ void InitPickup(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitPickupItem(ObjectInfo* obj, function<void(short itemNumber)> func, int objectNumber, bool useDrawAnimItem)
+void InitPickupItem(ObjectInfo* obj, function<InitFunction> func, int objectNumber, bool useDrawAnimItem)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -109,7 +109,7 @@ void InitPickupItem(ObjectInfo* obj, function<void(short itemNumber)> func, int 
 	}
 }
 
-void InitProjectile(ObjectInfo* obj, function<void(short itemNumber)> func, int objectNumber, bool noLoad)
+void InitProjectile(ObjectInfo* obj, function<InitFunction> func, int objectNumber, bool noLoad)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded || noLoad)
