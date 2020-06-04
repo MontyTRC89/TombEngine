@@ -229,11 +229,11 @@ void TorchControl(short itemNumber) // (F) (D)
 	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
-		coll.enableBaddiePush = true;
+		lara_coll.enableBaddiePush = true;
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)
-				ObjectCollision(CollidedItems[0] - Items, item, &coll);
+				ObjectCollision(CollidedItems[0] - Items, item, &lara_coll);
 		}
 		else
 		{
@@ -243,7 +243,7 @@ void TorchControl(short itemNumber) // (F) (D)
 			pos.yPos = CollidedMeshes[0]->y;
 			pos.zPos = CollidedMeshes[0]->z;
 			pos.yRot = CollidedMeshes[0]->yRot;
-			ItemPushLaraStatic(item, &sobj->xMinc, &pos, &coll);
+			ItemPushLaraStatic(item, &sobj->xMinc, &pos, &lara_coll);
 		}
 		item->speed >>= 1;
 	}
