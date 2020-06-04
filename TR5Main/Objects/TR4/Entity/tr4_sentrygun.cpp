@@ -215,7 +215,7 @@ void SentryGunControl(short itemNum)
 			KillItem(itemNum);
 
 			item->flags |= 1u;
-			item->status = ITEM_DESACTIVATED;
+			item->status = ITEM_DEACTIVATED;
 
 			RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
 

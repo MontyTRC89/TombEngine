@@ -1797,13 +1797,13 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)//1B288, 1B3BC (F)
 				if (p->itemFlags[2])
 				{
 					p->itemFlags[2] = 0;
-					p->status = ITEM_DESACTIVATED;
+					p->status = ITEM_DEACTIVATED;
 				}
 			}
 			else
 			{
 				if (!p->itemFlags[1])
-					p->status = ITEM_DESACTIVATED;
+					p->status = ITEM_DEACTIVATED;
 
 				p->itemFlags[2] = 1;
 

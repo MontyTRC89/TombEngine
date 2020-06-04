@@ -2268,7 +2268,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									}
 								}
 							}
-							if (item->status != ITEM_DESACTIVATED)
+							if (item->status != ITEM_DEACTIVATED)
 							{
 								AddActiveItem(itemNumber);
 								item->status = ITEM_ACTIVE;
@@ -2376,7 +2376,7 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 		{
 			item = &Items[linknum];
 
-			if (item->status != ITEM_DESACTIVATED 
+			if (item->status != ITEM_DEACTIVATED 
 				&& item->status != ITEM_INVISIBLE 
 				&& (item->objectNumber != ID_LARA && Objects[item->objectNumber].collision != NULL
 				|| item->objectNumber == ID_LARA && GetLaraOnLOS))
@@ -2769,7 +2769,7 @@ void AnimateItem(ITEM_INFO* item)
 				case COMMAND_DEACTIVATE:
 					if (Objects[item->objectNumber].intelligent && !item->afterDeath)
 						item->afterDeath = 1;
-					item->status = ITEM_DESACTIVATED;
+					item->status = ITEM_DEACTIVATED;
 					break;
 				case COMMAND_SOUND_FX:
 				case COMMAND_EFFECT:

@@ -575,7 +575,7 @@ bool SaveGame::readItem()
 		m_reader->ReadChunks(&readItemChunks, itemNumber);
 		DisableBaddieAI(itemNumber);
 		KillItem(itemNumber);
-		item->status = ITEM_DESACTIVATED;
+		item->status = ITEM_DEACTIVATED;
 		item->flags |= ONESHOT;
 		item->afterDeath = 128;
 	}
@@ -589,7 +589,7 @@ bool SaveGame::readItem()
 	}
 
 	// Some post-processing things
-	if (obj->isPuzzleHole && (item->status == ITEM_DESACTIVATED || item->status == ITEM_ACTIVE))
+	if (obj->isPuzzleHole && (item->status == ITEM_DEACTIVATED || item->status == ITEM_ACTIVE))
 		item->objectNumber += NUM_PUZZLES;
 
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8 && (item->flags & ONESHOT))

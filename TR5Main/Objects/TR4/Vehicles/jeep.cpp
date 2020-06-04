@@ -609,7 +609,7 @@ static void JeepExplode(ITEM_INFO* item)
 
 	ExplodingDeath(Lara.Vehicle, -1, 256);
 	KillItem(Lara.Vehicle);
-	item->status = ITEM_DESACTIVATED;
+	item->status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_EXPLOSION1, 0, 0);
 	SoundEffect(SFX_EXPLOSION2, 0, 0);
 	Lara.Vehicle = NO_ITEM;

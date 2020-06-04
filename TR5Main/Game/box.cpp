@@ -359,7 +359,7 @@ void CreatureFloat(short itemNumber)
 		{
 			item->pos.yPos = waterLevel;
 			item->collidable = false;
-			item->status = ITEM_DESACTIVATED;
+			item->status = ITEM_DEACTIVATED;
 			DisableBaddieAI(itemNumber);
 			RemoveActiveItem(itemNumber);
 			item->afterDeath = 1;
@@ -535,7 +535,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	AnimateItem(item);
-	if (item->status == ITEM_DESACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
 	{
 		CreatureDie(itemNumber, FALSE);
 		return FALSE;

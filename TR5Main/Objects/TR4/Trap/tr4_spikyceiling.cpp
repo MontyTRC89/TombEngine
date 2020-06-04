@@ -11,7 +11,7 @@ void ControlSpikyCeiling(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	if (TriggerActive(item) && item->status != ITEM_DESACTIVATED)
+	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
 		int y = item->pos.yPos + ((item->itemFlags[0] == 1) ? 10 : 5);
 
@@ -20,7 +20,7 @@ void ControlSpikyCeiling(short itemNumber)
 
 		if (GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos) < y + 1024)
 		{
-			item->status = ITEM_DESACTIVATED;
+			item->status = ITEM_DEACTIVATED;
 			StopSoundEffect(147);
 		}
 		else
@@ -45,6 +45,6 @@ void ControlSpikyCeiling(short itemNumber)
 		SoundEffect(56, &item->pos, 0);
 	}
 
-	if (TriggerActive(item) && item->status != ITEM_DESACTIVATED && item->itemFlags[0] == 1)
+	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED && item->itemFlags[0] == 1)
 		AnimateItem(item);
 }

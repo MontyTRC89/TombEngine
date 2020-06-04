@@ -1228,7 +1228,7 @@ int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int AttatchedToSwitch)
 int SwitchTrigger(short itemNum, short timer) 
 {
 	ITEM_INFO* item = &Items[itemNum];
-	if (item->status == ITEM_DESACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
 	{
 		if ((!item->currentAnimState && item->objectNumber != ID_JUMP_SWITCH || item->currentAnimState == 1 && item->objectNumber == ID_JUMP_SWITCH) && timer > 0)
 		{
