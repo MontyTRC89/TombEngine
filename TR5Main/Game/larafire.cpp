@@ -690,12 +690,12 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 	ObjectInfo* obj = &Objects[item->objectNumber];
 	
 	item->hitStatus = true;
-	if (creature && item != LaraItem)
+	if (creature != nullptr && item != LaraItem)
 		creature->hurtByLara = true;
 
 	if (hitPos != nullptr)
 	{
-		if (obj->hitEffect)
+		if (obj->hitEffect != HIT_NONE)
 		{
 			switch (obj->hitEffect)
 			{
@@ -713,7 +713,7 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 		}
 	}
 
-	if (!obj->undead || flag || item->hitPoints == NOT_TARGETABLE)
+	if ((!obj->undead || flag) && item->hitPoints != NOT_TARGETABLE)
 	{
 		if (item->hitPoints > 0 && item->hitPoints <= damage)
 			++Savegame.Level.Kills;
@@ -721,24 +721,20 @@ void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 	}
 }
 
-FIREWEAPON_TYPE FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
+FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles) // (F) (D)
 {
 	short* ammo = GetAmmo(weaponType);
-	if (!*ammo)
+	if (*ammo == 0)
 		return FW_NOAMMO;
 	if (*ammo != -1)
-		(*ammo)--;
+		*ammo--;
 
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 	int r;
 
 	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
-	GetLaraJointPosition(&pos, LM_RHAND);
-
 	pos.x = src->pos.xPos;
+	pos.y = src->pos.yPos - weapon->gunHeight;
 	pos.z = src->pos.zPos;
 	PHD_3DPOS rotation;
 	rotation.xRot = angles[1] + (GetRandomControl() - 0x4000) * weapon->shotAccuracy / 0x10000;
@@ -752,7 +748,7 @@ FIREWEAPON_TYPE FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sh
 	Vector3 direction = Vector3(x, y, z);
 	direction.Normalize();
 	Vector3 source = Vector3(pos.x, pos.y, pos.z);
-	Vector3 destination = source + direction * float(weapon->targetDist);
+	Vector3 destination = source + direction * weapon->targetDist;
 	Ray ray = Ray(source, direction);
 
 	int num = GetSpheres(target, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -780,7 +776,6 @@ FIREWEAPON_TYPE FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sh
 	vSrc.x = pos.x;
 	vSrc.y = pos.y;
 	vSrc.z = pos.z;
-	
 	short roomNumber = src->roomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vSrc.roomNumber = roomNumber;
@@ -852,25 +847,25 @@ FIREWEAPON_TYPE FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sh
 
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 {
-	ANIM_FRAME* bounds = (ANIM_FRAME*) GetBestFrame(item);
+	ANIM_FRAME* bounds;
+	int x, y, z, c, s;
 
-	int x = (bounds->MinX + bounds->MaxX) / 2;
-	int y = bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
-	int z = (bounds->MinZ + bounds->MaxZ) / 2;
-
-	int c = phd_cos(item->pos.yRot);
-	int s = phd_sin(item->pos.yRot);
+	bounds = (ANIM_FRAME*)GetBestFrame(item);
+	x = (int)(bounds->MinX + bounds->MaxX) / 2;
+	y = (int) bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
+	z = (int)(bounds->MinZ + bounds->MaxZ) / 2;
+	c = phd_cos(item->pos.yRot);
+	s = phd_sin(item->pos.yRot);
 
 	target->x = item->pos.xPos + ((c * x + s * z) >> W2V_SHIFT);
 	target->y = item->pos.yPos + y;
 	target->z = item->pos.zPos + ((c * z - s * x) >> W2V_SHIFT);
-
 	target->roomNumber = item->roomNumber;
 }
 
 void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 {
-	if (!Lara.target)
+	if (Lara.target == nullptr)
 	{
 		Lara.rightArm.lock = false;
 		Lara.leftArm.lock = false;
@@ -879,22 +874,14 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 		return;
 	}
 
-	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
-	GetLaraJointPosition(&pos, LM_RHAND);
+	GAME_VECTOR src, targetPoint;
+	short angles[2];
 
-	GAME_VECTOR src;
 	src.x = LaraItem->pos.xPos;
-	src.y = pos.y;
+	src.y = LaraItem->pos.yPos - weapon->gunHeight;
 	src.z = LaraItem->pos.zPos;
 	src.roomNumber = LaraItem->roomNumber;
-	
-	GAME_VECTOR targetPoint;
 	find_target_point(Lara.target, &targetPoint);
-
-	short angles[2];
 	phd_GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z, angles);
 
 	angles[0] -= LaraItem->pos.yRot;
@@ -961,7 +948,7 @@ bool CheckForHoldingState(int state) // (F) (D)
 
 void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 {
-	GAME_VECTOR source, target;
+	GAME_VECTOR src, target;
 	int bestDistance, maxDistance, targets, slot, x, y, z, distance;
 	ITEM_INFO* bestItem, *item;
 	short bestYrot, angle[2], match;
@@ -972,20 +959,18 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 		Lara.target = NULL;
 		return;
 	}
+
+	src.x = LaraItem->pos.xPos;
+	src.y = LaraItem->pos.yPos - winfo->gunHeight;
+	src.z = LaraItem->pos.zPos;
+	src.roomNumber = LaraItem->roomNumber;
+
 	bestItem = NULL;
 	bestYrot = MAXSHORT;
 	bestDistance = MAXINT;
-	PHD_VECTOR handpos;
-	handpos.x = 0;
-	handpos.y = 0;
-	handpos.z = 0;
-	GetLaraJointPosition(&handpos, LM_RHAND);
-	source.x = LaraItem->pos.xPos;
-	source.y = LaraItem->pos.yPos - handpos.y;
-	source.z = LaraItem->pos.zPos;
-	source.roomNumber = LaraItem->roomNumber;
 	maxDistance = winfo->targetDist;
 	targets = 0;
+
 	for (slot = 0; slot < NUM_SLOTS; ++slot)
 	{
 		if (BaddieSlots[slot].itemNum != NO_ITEM)
@@ -993,25 +978,25 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 			item = &Items[BaddieSlots[slot].itemNum];
 			if (item->hitPoints > 0)
 			{
-				x = item->pos.xPos - source.x;
-				y = item->pos.yPos - source.y;
-				z = item->pos.zPos - source.z;
+				x = item->pos.xPos - src.x;
+				y = item->pos.yPos - src.y;
+				z = item->pos.zPos - src.z;
 				if (abs(x) <= maxDistance && abs(y) <= maxDistance && abs(z) <= maxDistance)
 				{
 					distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
 					if (distance < SQUARE(maxDistance))
 					{
 						find_target_point(item, &target);
-						if (LOS(&source, &target))
+						if (LOS(&src, &target))
 						{
-							phd_GetVectorAngles(target.x - source.x, target.y - source.y, target.z - source.z, angle);
+							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
 							angle[0] -= LaraItem->pos.yRot + Lara.torsoYrot;
 							angle[1] -= LaraItem->pos.xRot + Lara.torsoXrot;
 							if (angle[0] >= winfo->lockAngles[0] && angle[0] <= winfo->lockAngles[1] && angle[1] >= winfo->lockAngles[2] && angle[1] <= winfo->lockAngles[3])
 							{
 								TargetList[targets] = item;
 								++targets;
-								if (abs(angle[0]) < bestYrot + ANGLE(15) && distance < bestDistance)
+								if (abs(angle[0]) < bestYrot + ANGLE(15.0f) && distance < bestDistance)
 								{
 									bestDistance = distance;
 									bestYrot = abs(angle[0]);
