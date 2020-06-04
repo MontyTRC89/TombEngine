@@ -99,10 +99,25 @@ static short MSBounds[12] = // offset 0xA1488
 int NumRPickups;
 short RPickups[16];
 PHD_VECTOR OldPickupPos;
-
 extern int KeyTriggerActive;
-
 extern Inventory* g_Inventory;
+
+static bool SilencerIsEquiped()
+{
+	return Lara.Weapons[WEAPON_UZI].HasSilencer
+		|| Lara.Weapons[WEAPON_PISTOLS].HasSilencer
+		|| Lara.Weapons[WEAPON_SHOTGUN].HasSilencer
+		|| Lara.Weapons[WEAPON_REVOLVER].HasSilencer
+		|| Lara.Weapons[WEAPON_CROSSBOW].HasSilencer
+		|| Lara.Weapons[WEAPON_HK].HasSilencer;
+}
+
+static bool LaserSightIsEquiped()
+{
+	return Lara.Weapons[WEAPON_REVOLVER].HasSilencer
+		|| Lara.Weapons[WEAPON_CROSSBOW].HasSilencer
+		|| Lara.Weapons[WEAPON_HK].HasSilencer;
+}
 
 void PickedUpObject(short objectNumber)
 {
@@ -115,267 +130,236 @@ void PickedUpObject(short objectNumber)
 				Lara.Weapons[WEAPON_UZI].SelectedAmmo = 0;
 			}
 
-		if (Lara.Weapons[WEAPON_UZI].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_UZI].Ammo[0] += 30;
-
-		break;
-
-	case ID_PISTOLS_ITEM:
-		if (!Lara.Weapons[WEAPON_PISTOLS].Present)
-		{
-			Lara.Weapons[WEAPON_PISTOLS].Present = true;
-			Lara.Weapons[WEAPON_PISTOLS].SelectedAmmo = 0;
-		}
-
-		Lara.Weapons[WEAPON_PISTOLS].Ammo[0] = -1;
-
-		break;
-
-	case ID_SHOTGUN_ITEM:
-		if (!Lara.Weapons[WEAPON_SHOTGUN].Present)
-		{
-			Lara.Weapons[WEAPON_SHOTGUN].Present = true;
-			Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = 0;
-		}
-
-		if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_SHOTGUN].Ammo[0] += 36;
-
-		break;
-
-	case ID_REVOLVER_ITEM:
-		if (!Lara.Weapons[WEAPON_REVOLVER].Present)
-		{
-			Lara.Weapons[WEAPON_REVOLVER].Present = true;
-			Lara.Weapons[WEAPON_REVOLVER].SelectedAmmo = 0;
-		}
-
-		if (Lara.Weapons[WEAPON_REVOLVER].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_REVOLVER].Ammo[0] += 6;
-
-		break;
-
-	case ID_CROSSBOW_ITEM:
-		if (!Lara.Weapons[WEAPON_CROSSBOW].Present)
-		{
-			Lara.Weapons[WEAPON_CROSSBOW].Present = true;
-			Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = 0;
-		}
-
-		if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_CROSSBOW].Ammo[0] += 10;
+			if (Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] += 30;
 
 			break;
 
-	case ID_HK_ITEM:
-		if (!Lara.Weapons[WEAPON_CROSSBOW].Present)
-		{
-			Lara.Weapons[WEAPON_HK].Present = true;
-			Lara.Weapons[WEAPON_HK].SelectedAmmo = 0;
-		}
+		case ID_PISTOLS_ITEM:
+			if (!Lara.Weapons[WEAPON_PISTOLS].Present)
+			{
+				Lara.Weapons[WEAPON_PISTOLS].Present = true;
+				Lara.Weapons[WEAPON_PISTOLS].SelectedAmmo = 0;
+			}
 
-		if (Lara.Weapons[WEAPON_HK].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_HK].Ammo[0] += 30;
+			Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1] = -1;
+			break;
 
-		break;
+		case ID_SHOTGUN_ITEM:
+			if (!Lara.Weapons[WEAPON_SHOTGUN].Present)
+			{
+				Lara.Weapons[WEAPON_SHOTGUN].Present = true;
+				Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = 0;
+			}
 
-	case ID_HARPOON_ITEM:
-		if (!Lara.Weapons[WEAPON_HARPOON_GUN].Present)
-		{
-			Lara.Weapons[WEAPON_HARPOON_GUN].Present = true;
-			Lara.Weapons[WEAPON_HARPOON_GUN].SelectedAmmo = 0;
-		}
+			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] += 36;
+			break;
 
-		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] += 10;
+		case ID_REVOLVER_ITEM:
+			if (!Lara.Weapons[WEAPON_REVOLVER].Present)
+			{
+				Lara.Weapons[WEAPON_REVOLVER].Present = true;
+				Lara.Weapons[WEAPON_REVOLVER].SelectedAmmo = 0;
+			}
 
-		break;
+			if (Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] += 6;
+			break;
 
-	case ID_GRENADE_GUN_ITEM:
-		if (!Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
-		{
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = 0;
-		}
+		case ID_CROSSBOW_ITEM:
+			if (!Lara.Weapons[WEAPON_CROSSBOW].Present)
+			{
+				Lara.Weapons[WEAPON_CROSSBOW].Present = true;
+				Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = 0;
+			}
 
-		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] += 10;
+			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-		break;
+		case ID_HK_ITEM:
+			if (!Lara.Weapons[WEAPON_HK].Present)
+			{
+				Lara.Weapons[WEAPON_HK].Present = true;
+				Lara.Weapons[WEAPON_HK].SelectedAmmo = 0;
+			}
 
-	case ID_ROCKET_LAUNCHER_ITEM:
-		if (!Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
-		{
-			Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present = true;
-			Lara.Weapons[WEAPON_ROCKET_LAUNCHER].SelectedAmmo = 0;
-		}
+			if (Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] += 30;
+			break;
 
-		if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0] += 10;
+		case ID_HARPOON_ITEM:
+			if (!Lara.Weapons[WEAPON_HARPOON_GUN].Present)
+			{
+				Lara.Weapons[WEAPON_HARPOON_GUN].Present = true;
+				Lara.Weapons[WEAPON_HARPOON_GUN].SelectedAmmo = 0;
+			}
 
-		break;
+			if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-	case ID_SHOTGUN_AMMO1_ITEM:
-		if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_SHOTGUN].Ammo[0] += 36;
+		case ID_GRENADE_GUN_ITEM:
+			if (!Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
+			{
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = 0;
+			}
 
-		break;
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-	case ID_SHOTGUN_AMMO2_ITEM:
-		if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[1] != -1)
-			Lara.Weapons[WEAPON_SHOTGUN].Ammo[1] += 36;
+		case ID_ROCKET_LAUNCHER_ITEM:
+			if (!Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
+			{
+				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present = true;
+				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].SelectedAmmo = 0;
+			}
 
-		break;
+			if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-	case ID_HK_AMMO_ITEM:
-		if (Lara.Weapons[WEAPON_HK].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_HK].Ammo[0] += 30;
+		case ID_SHOTGUN_AMMO1_ITEM:
+			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] += 36;
+			break;
 
-		break;
+		case ID_SHOTGUN_AMMO2_ITEM:
+			if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2] != -1)
+				Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2] += 36;
+			break;
 
-	case ID_CROSSBOW_AMMO1_ITEM:
-		if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_CROSSBOW].Ammo[0] += 10;
+		case ID_HK_AMMO_ITEM:
+			if (Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] += 30;
+			break;
 
-		break;
+		case ID_CROSSBOW_AMMO1_ITEM:
+			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-	case ID_CROSSBOW_AMMO2_ITEM:
-		if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[1] != -1)
-			Lara.Weapons[WEAPON_CROSSBOW].Ammo[1] += 10;
+		case ID_CROSSBOW_AMMO2_ITEM:
+			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2] != -1)
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2] += 10;
+			break;
 
-		break;
+		case ID_CROSSBOW_AMMO3_ITEM:
+			if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3] != -1)
+				Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3] += 10;
+			break;
 
-	case ID_CROSSBOW_AMMO3_ITEM:
-		if (Lara.Weapons[WEAPON_CROSSBOW].Ammo[2] != -1)
-			Lara.Weapons[WEAPON_CROSSBOW].Ammo[2] += 10;
+		case ID_GRENADE_AMMO1_ITEM:
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-		break;
+		case ID_GRENADE_AMMO2_ITEM:
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2] != -1)
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2] += 10;
+			break;
 
-	case ID_GRENADE_AMMO1_ITEM:
-		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[0] += 10;
+		case ID_GRENADE_AMMO3_ITEM:
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3] != -1)
+				Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3] += 10;
+			break;
 
-		break;
+		case ID_REVOLVER_AMMO_ITEM:
+			if (Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1] += 6;
+			break;
 
-	case ID_GRENADE_AMMO2_ITEM:
-		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1] != -1)
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[1] += 10;
+		case ID_ROCKET_LAUNCHER_AMMO_ITEM:
+			if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-		break;
+		case ID_HARPOON_AMMO_ITEM:
+			if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1] += 10;
+			break;
 
-	case ID_GRENADE_AMMO3_ITEM:
-		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2] != -1)
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[2] += 10;
+		case ID_UZI_AMMO_ITEM:
+			if (Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] != -1)
+				Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1] += 30;
+			break;
 
-		break;
+		case ID_FLARE_INV_ITEM:
+			if (Lara.NumFlares != -1)
+				Lara.NumFlares += 12;
+			break;
 
-	case ID_REVOLVER_AMMO_ITEM:
-		if (Lara.Weapons[WEAPON_REVOLVER].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_REVOLVER].Ammo[0] += 6;
+		case ID_SILENCER_ITEM:
+			if (!SilencerIsEquiped())
+				Lara.Silencer = true;
+			break;
 
-		break;
+		case ID_LASERSIGHT_ITEM:
+			if (!LaserSightIsEquiped())
+				Lara.Lasersight = true;
+			break;
 
-	case ID_ROCKET_LAUNCHER_AMMO_ITEM:
-		if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[0] += 10;
+		case ID_BIGMEDI_ITEM:
+			if (Lara.NumLargeMedipacks != -1)
+				Lara.NumLargeMedipacks++;
+			break;
 
-		break;
+		case ID_SMALLMEDI_ITEM:
+			if (Lara.NumSmallMedipacks != -1)
+				Lara.NumSmallMedipacks++;
+			break;
 
-	case ID_HARPOON_AMMO_ITEM:
-		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[0] += 10;
+		case ID_BINOCULARS_ITEM:
+			Lara.Binoculars = true;
+			break;
 
-		break;
+		case ID_WATERSKIN1_EMPTY:
+			Lara.Waterskin1.Present = true;
+			Lara.Waterskin1.Quantity = 0;
+			break;
 
-	case ID_UZI_AMMO_ITEM:
-		if (Lara.Weapons[WEAPON_UZI].Ammo[0] != -1)
-			Lara.Weapons[WEAPON_UZI].Ammo[0] += 30;
-
-		break;
-
-	case ID_FLARE_INV_ITEM:
-		if (Lara.NumFlares != -1)
-			Lara.NumFlares += 12;
-		break;
-
-	case ID_SILENCER_ITEM:
-		if (!(Lara.Weapons[WEAPON_UZI].HasSilencer || Lara.Weapons[WEAPON_PISTOLS].HasSilencer || 
-			  Lara.Weapons[WEAPON_SHOTGUN].HasSilencer || Lara.Weapons[WEAPON_REVOLVER].HasSilencer || 
-			  Lara.Weapons[WEAPON_CROSSBOW].HasSilencer || Lara.Weapons[WEAPON_HK].HasSilencer))
-			Lara.Silencer = true;
-		break;
-
-	case ID_LASERSIGHT_ITEM:
-		if (!(Lara.Weapons[WEAPON_UZI].HasSilencer || Lara.Weapons[WEAPON_PISTOLS].HasSilencer ||
-			  Lara.Weapons[WEAPON_SHOTGUN].HasSilencer || Lara.Weapons[WEAPON_REVOLVER].HasSilencer ||
-			  Lara.Weapons[WEAPON_CROSSBOW].HasSilencer || Lara.Weapons[WEAPON_HK].HasSilencer))
-			Lara.Lasersight = true;
-		break;
-
-	case ID_BIGMEDI_ITEM:
-		if (Lara.NumLargeMedipacks != -1)
-			Lara.NumLargeMedipacks++;
-		break;
-
-	case ID_SMALLMEDI_ITEM:
-		if (Lara.NumSmallMedipacks != -1)
-			Lara.NumSmallMedipacks++;
-		break;
-
-	case ID_BINOCULARS_ITEM:
-		Lara.Binoculars = true;
-		break;
-
-	case ID_WATERSKIN1_EMPTY:
-		Lara.Waterskin1.Present = true;
-		Lara.Waterskin1.Quantity = 0;
-		break;
-
-	case ID_WATERSKIN2_EMPTY:
-		Lara.Waterskin2.Present = true;
-		Lara.Waterskin2.Quantity = 0;
-		break;
+		case ID_WATERSKIN2_EMPTY:
+			Lara.Waterskin2.Present = true;
+			Lara.Waterskin2.Quantity = 0;
+			break;
 		
-	case ID_GOLDROSE_ITEM:
-		IsAtmospherePlaying = 0;
-		S_CDPlay(6, FALSE);
-		Lara.Secrets++;
-		Savegame.Level.Secrets++;
-		Savegame.Game.Secrets++;
-		break;
+		case ID_GOLDROSE_ITEM:
+			IsAtmospherePlaying = 0;
+			S_CDPlay(6, FALSE);
+			Lara.Secrets++;
+			Savegame.Level.Secrets++;
+			Savegame.Game.Secrets++;
+			break;
 
-	case ID_CROWBAR_ITEM:
-		Lara.Crowbar = true;
-		break;
+		case ID_CROWBAR_ITEM:
+			Lara.Crowbar = true;
+			break;
 
-	case ID_DIARY_ITEM:
-		Lara.Diary.Present = true;
-		break;
+		case ID_DIARY_ITEM:
+			Lara.Diary.Present = true;
+			break;
 
-	default:
-		if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
-			Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1]++;
-
-		else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
-			Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]++;
-
-		else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
-			Lara.Keys[objectNumber - ID_KEY_ITEM1]++;
-
-		else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
-			Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]++;
-
-		else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM4)
-			Lara.Pickups[objectNumber - ID_PICKUP_ITEM1]++;
-
-		else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM4_COMBO2)
-			Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]++;
-
-		else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
-			Lara.Examines[objectNumber - ID_EXAMINE1] = 1;
-
-		else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
-			Lara.ExaminesCombo[objectNumber - ID_EXAMINE1_COMBO1] = 1;
+		default:
+			if (objectNumber >= ID_PUZZLE_ITEM1 && objectNumber <= ID_PUZZLE_ITEM8)
+				Lara.Puzzles[objectNumber - ID_PUZZLE_ITEM1]++;
+			else if (objectNumber >= ID_PUZZLE_ITEM1_COMBO1 && objectNumber <= ID_PUZZLE_ITEM8_COMBO2)
+				Lara.PuzzlesCombo[objectNumber - ID_PUZZLE_ITEM1_COMBO1]++;
+			else if (objectNumber >= ID_KEY_ITEM1 && objectNumber <= ID_KEY_ITEM8)
+				Lara.Keys[objectNumber - ID_KEY_ITEM1]++;
+			else if (objectNumber >= ID_KEY_ITEM1_COMBO1 && objectNumber <= ID_KEY_ITEM8_COMBO2)
+				Lara.KeysCombo[objectNumber - ID_KEY_ITEM1_COMBO1]++;
+			else if (objectNumber >= ID_PICKUP_ITEM1 && objectNumber <= ID_PICKUP_ITEM4)
+				Lara.Pickups[objectNumber - ID_PICKUP_ITEM1]++;
+			else if (objectNumber >= ID_PICKUP_ITEM1_COMBO1 && objectNumber <= ID_PICKUP_ITEM4_COMBO2)
+				Lara.PickupsCombo[objectNumber - ID_PICKUP_ITEM1_COMBO1]++;
+			else if (objectNumber >= ID_EXAMINE1 && objectNumber <= ID_EXAMINE3)
+				Lara.Examines[objectNumber - ID_EXAMINE1] = 1;
+			else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
+				Lara.ExaminesCombo[objectNumber - ID_EXAMINE1_COMBO1] = 1;
+			break;
 	}
 
 	g_Inventory->LoadObjects(false);
@@ -439,10 +423,10 @@ int PickupTrigger(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 
-	if (item->flags & IFLAG_KILLED 
-		|| ( item->status != ITEM_INVISIBLE 
-			|| item->itemFlags[3] != 1 
-			|| item->triggerFlags & 0x80))
+	if (item->flags & IFLAG_KILLED
+	|| (item->status != ITEM_INVISIBLE
+	||  item->itemFlags[3] != 1
+	||  item->triggerFlags & 0x80))
 	{
 		return 0;
 	}
@@ -734,6 +718,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->flags |= 0x20;
 				item->status = ITEM_ACTIVE;
+
 				if (item->triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
 				{
 					item->itemFlags[3] = 92;
@@ -763,7 +748,6 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &Items[itemNum];
-
 	short oldXrot = item->pos.xRot;
 	short oldYrot = item->pos.yRot;
 	short oldZrot = item->pos.zRot;
@@ -1221,7 +1205,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		Lara.torsoYrot = 0;
 		Lara.torsoXrot = 0;
 		l->frameNumber = Anims[l->animNumber].frameBase;
-		Lara.isMoving = FAILED_ACCESS_ACE_FLAG;
+		Lara.isMoving = true;
 		Lara.gunStatus = LG_HANDS_BUSY;
 	}
 
@@ -1239,36 +1223,28 @@ void RegeneratePickups()
 		if (item->status == ITEM_INVISIBLE)
 		{
 			short ammo = 0;
-
 			if (item->objectNumber == ID_CROSSBOW_AMMO1_ITEM)
 				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1];
 			else if (item->objectNumber == ID_CROSSBOW_AMMO2_ITEM)
 				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2];
 			else if (item->objectNumber == ID_CROSSBOW_AMMO3_ITEM)
 				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3];
-
 			else if(item->objectNumber == ID_GRENADE_AMMO1_ITEM)
 				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1];
 			else if (item->objectNumber == ID_GRENADE_AMMO2_ITEM)
 				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2];
 			else if (item->objectNumber == ID_GRENADE_AMMO3_ITEM)
 				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3];
-
 			else if (item->objectNumber == ID_HK_AMMO_ITEM)
 				ammo = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1];
-
 			else if (item->objectNumber == ID_UZI_AMMO_ITEM)
 				ammo = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1];
-
 			else if (item->objectNumber == ID_HARPOON_AMMO_ITEM)
 				ammo = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1];
-
 			else if (item->objectNumber == ID_ROCKET_LAUNCHER_AMMO_ITEM)
 				ammo = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1];
-
 			else if (item->objectNumber == ID_REVOLVER_AMMO_ITEM)
 				ammo = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1];
-
 			else if (item->objectNumber == ID_SHOTGUN_AMMO1_ITEM)
 				ammo = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1];
 			else if (item->objectNumber == ID_SHOTGUN_AMMO1_ITEM)
