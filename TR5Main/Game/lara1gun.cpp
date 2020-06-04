@@ -44,24 +44,22 @@ void FireHarpoon()
 	if (itemNumber != NO_ITEM)
 	{
 		GAME_VECTOR pos;
-		Vector3 dxPos;
-
+		PHD_VECTOR posGet;
 		ITEM_INFO* item = &Items[itemNumber];
 
 		item->shade = 0x4210 | 0x8000;
 		item->objectNumber = ID_HARPOON;
 		item->roomNumber = LaraItem->roomNumber;
-		pos.x = dxPos.x = -2;
-		pos.y = dxPos.y = 0; // -273 - 100;
-		pos.z = dxPos.z = 77;
-
-		g_Renderer->GetLaraBonePosition(&dxPos, LM_RHAND);
-		GetLaraJointPosition(&PHD_VECTOR(pos.x, pos.y, pos.z), LM_RHAND);
-
-		/*item->pos.xPos = pos.x = dxPos.x;
-		item->pos.yPos = pos.y = dxPos.y;
-		item->pos.zPos = pos.z = dxPos.z;*/
-
+		pos.x = -2;
+		pos.y = 0;
+		pos.z = 77;
+		posGet.x = pos.x;
+		posGet.y = pos.y;
+		posGet.z = pos.z;
+		GetLaraJointPosition(&posGet, LM_RHAND);
+		pos.x = posGet.z;
+		pos.y = posGet.y;
+		pos.z = posGet.z;
 		item->pos.xPos = pos.x;
 		item->pos.yPos = pos.y;
 		item->pos.zPos = pos.z;
@@ -1091,10 +1089,11 @@ void ControlCrossbowBolt(short itemNumber)
 
 	if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
+		PHD_VECTOR bubblePos(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->speed > 64)
 			item->speed -= (item->speed >> 4);
 		if (GlobalCounter & 1)
-			CreateBubble(&PHD_VECTOR(item->pos.xPos, item->pos.yPos, item->pos.zPos), roomNumber, 4, 7, 0, 0, 0, 0);
+			CreateBubble(&bubblePos, roomNumber, 4, 7, 0, 0, 0, 0);
 	}
 	else
 	{
@@ -1192,7 +1191,8 @@ void ControlCrossbowBolt(short itemNumber)
 					}
 					else if (Objects[currentItem->objectNumber].hitEffect)
 					{
-						HitTarget(currentItem, &GAME_VECTOR(item->pos.xPos, item->pos.yPos, item->pos.zPos), Weapons[WEAPON_CROSSBOW].damage, 0);
+						GAME_VECTOR pos(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+						HitTarget(currentItem, &pos, Weapons[WEAPON_CROSSBOW].damage, 0);
 
 						// Poisoned ammos
 						if (item->itemFlags[0] == CROSSBOW_POISON && !Objects[currentItem->objectNumber].explodableMeshbits)
@@ -1490,7 +1490,7 @@ void undraw_shotgun(int weapon)
 	
 	AnimateItem(item);
 
-	if (item->status == ITEM_DESACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
 		Lara.target = NULL;
@@ -1660,7 +1660,7 @@ void FireHK(int mode)
 		Weapons[WEAPON_HK].damage = 3;
 	}
 
-	if (FireWeapon(WEAPON_HK, Lara.target, LaraItem, angles))
+	if (FireWeapon(WEAPON_HK, Lara.target, LaraItem, angles) != FW_NOAMMO)
 	{
 		SmokeCountL = 12;
 		SmokeWeapon = WEAPON_HK;
@@ -1691,7 +1691,7 @@ void FireShotgun()
 		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
 		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
 
-		if (FireWeapon(WEAPON_SHOTGUN, Lara.target, LaraItem, loopAngles) == FW_MAYBEHIT)
+		if (FireWeapon(WEAPON_SHOTGUN, Lara.target, LaraItem, loopAngles) != FW_NOAMMO)
 			fired = true;
 	}
 

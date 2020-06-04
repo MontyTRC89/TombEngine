@@ -153,7 +153,7 @@ static void QuadbikeExplode(ITEM_INFO* item)
 
 	ExplodingDeath(Lara.Vehicle, 0xfffffffe, 1);
 	KillItem(Lara.Vehicle);
-	item->status = ITEM_DESACTIVATED;
+	item->status = ITEM_DEACTIVATED;
 
 	SoundEffect(SFX_EXPLOSION1, NULL, 0);
 	SoundEffect(SFX_EXPLOSION2, NULL, 0);

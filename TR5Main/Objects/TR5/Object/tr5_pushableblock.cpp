@@ -268,14 +268,14 @@ void PushableBlockControl(short itemNumber)
 	{                                              
 		item->gravityStatus = false;
 		item->pos.yPos = height;
-		item->status = ITEM_DESACTIVATED;
+		item->status = ITEM_DEACTIVATED;
 		floor_shake_effect(item);					 
 		SoundEffect(SFX_LARA_THUD, &item->pos, 0);
 	}
 
 	if (item->roomNumber != roomNumber)  
 		ItemNewRoom(itemNumber, roomNumber);
-	if (item->status == ITEM_DESACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
 	{   
 		item->status = ITEM_NOT_ACTIVE;
 		RemoveActiveItem(itemNumber);   

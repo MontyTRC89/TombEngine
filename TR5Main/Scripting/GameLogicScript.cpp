@@ -1535,7 +1535,7 @@ void GameScriptItem::EnableItem()
 	{
 		if (Objects[NativeItem->objectNumber].intelligent)
 		{
-			if (NativeItem->status == ITEM_DESACTIVATED)
+			if (NativeItem->status == ITEM_DEACTIVATED)
 			{
 				NativeItem->touchBits = 0;
 				NativeItem->status = ITEM_ACTIVE;
@@ -1570,7 +1570,7 @@ void GameScriptItem::DisableItem()
 			if (NativeItem->status == ITEM_ACTIVE)
 			{
 				NativeItem->touchBits = 0;
-				NativeItem->status = ITEM_DESACTIVATED;
+				NativeItem->status = ITEM_DEACTIVATED;
 				RemoveActiveItem(NativeItemNumber);
 				DisableBaddieAI(NativeItemNumber);
 			}
@@ -1579,7 +1579,7 @@ void GameScriptItem::DisableItem()
 		{
 			NativeItem->touchBits = 0;
 			RemoveActiveItem(NativeItemNumber);
-			NativeItem->status = ITEM_DESACTIVATED;
+			NativeItem->status = ITEM_DEACTIVATED;
 		}
 	}
 }

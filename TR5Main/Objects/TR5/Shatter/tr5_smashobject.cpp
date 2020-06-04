@@ -41,7 +41,7 @@ void SmashObject(short itemNumber)
 
 	if (item->status == ITEM_ACTIVE)
 		RemoveActiveItem(itemNumber);
-	item->status = ITEM_DESACTIVATED;
+	item->status = ITEM_DEACTIVATED;
 }
 
 void SmashObjectControl(short itemNumber)

@@ -22,6 +22,7 @@
 #include "tr4_troops.h" // OK
 #include "tr4_wildboar.h" // OK
 #include "tr4_wraith.h" // OFF
+#include "tr4_baboon.h" // OK
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -470,19 +471,61 @@ static void StartBaddy(ObjectInfo* obj)
 	obj = &Objects[ID_BABOON_NORMAL];
 	if (obj->loaded)
 	{
-
+		obj->initialise = InitialiseBaboon;
+		obj->control = BaboonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 200;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
 	}
 
 	obj = &Objects[ID_BABOON_INV];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseBaboon;
+		obj->control = BaboonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 200;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
 
+		if (Objects[ID_BABOON_NORMAL].loaded)
+			Objects[ID_BABOON_INV].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 	}
 
 	obj = &Objects[ID_BABOON_SILENT];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseBaboon;
+		obj->control = BaboonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 200;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
 
+		if (Objects[ID_BABOON_NORMAL].loaded)
+			Objects[ID_BABOON_SILENT].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 	}
 }
 
