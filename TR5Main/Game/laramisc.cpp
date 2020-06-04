@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "laramisc.h"
-
 #include "level.h"
 #include "setup.h"
 #include "GameFlowScript.h"
 #include "effect.h"
 #include "collide.h"
-#include "Lara.h"
+#include "lara.h"
 #include "laraswim.h"
 #include "larasurf.h"
 #include "effect2.h"
@@ -20,11 +19,8 @@
 #include "input.h"
 #include "sound.h"
 
-
 extern GameFlow* g_GameFlow;
-extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
-
 COLL_INFO coll;
 short SubsuitAir = 0;
 short cheatHitPoints;
@@ -857,6 +853,7 @@ void AnimateLara(ITEM_INFO* item)
 	{
 		short* cmd = &Commands[anim->commandIndex];
 		int flags;
+		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -896,7 +893,8 @@ void AnimateLara(ITEM_INFO* item)
 				}
 
 				FXType = cmd[1] & 0xC000;
-				(*effect_routines[(int)(cmd[1] & 0x3FFF)])(item);
+				effectID = cmd[1] & 0x3FFF;
+				effect_routines[effectID](item);
 
 				cmd += 2;
 				break;
