@@ -983,6 +983,17 @@ static void StartObject(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 	}
+
+	for (int objectNumber = ID_AI_GUARD; objectNumber <= ID_AI_X2; objectNumber++)
+	{
+		obj = &Objects[objectNumber];
+		if (obj->loaded)
+		{
+			obj->drawRoutine = nullptr;
+			obj->collision = AIPickupCollision;
+			obj->hitPoints = 0;
+		}
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)
