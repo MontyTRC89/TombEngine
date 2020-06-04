@@ -1033,6 +1033,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->shift.y = 0;
 	coll->shift.z = 0;
 	coll->quadrant = (unsigned short) (coll->facing + ANGLE(45)) / ANGLE(90);
+	coll->octant = (unsigned short) (coll->facing + ANGLE(22.5)) / ANGLE(45);
 
 	int x = xPos;
 	int y = yPos - objectHeight;
@@ -1063,7 +1064,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	
 	int xright, xleft, zright, zleft;
 
-	switch (coll->quadrant)
+	/*switch (coll->quadrant)
 	{
 	case 0:
 		XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
@@ -1106,7 +1107,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		xright = zright = 0;
 		XFront = ZFront = 0;
 		break;
-	}
+	}*/
+
+	XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
+	ZFront = (phd_cos(coll->facing) * coll->radius) >> (W2V_SHIFT);
+	xleft = ZFront;
+	zleft = -XFront;
+	xright = -ZFront;
+	zright = XFront;
 
 	x = XFront + xPos;
 	z = ZFront + zPos;
