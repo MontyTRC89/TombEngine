@@ -6635,7 +6635,8 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		{
 			FLOOR_INFO* F;
 			int c, h;
-			F = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+			short roomNum = item->roomNumber;
+			F = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum);
 			c = GetCeiling(F, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			h = (c) - (item->pos.yPos);
 			if (h > 1792 ||
