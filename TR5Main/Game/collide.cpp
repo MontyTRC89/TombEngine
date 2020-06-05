@@ -1111,10 +1111,10 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	XFront = (phd_sin(coll->facing) * coll->radius) >> (W2V_SHIFT);
 	ZFront = (phd_cos(coll->facing) * coll->radius) >> (W2V_SHIFT);
-	xleft = ZFront;
-	zleft = -XFront;
-	xright = -ZFront;
-	zright = XFront;
+	xleft = -ZFront;
+	zleft = XFront;
+	xright = ZFront;
+	zright = -XFront;
 
 	x = XFront + xPos;
 	z = ZFront + zPos;
