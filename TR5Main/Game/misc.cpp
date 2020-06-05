@@ -2,15 +2,17 @@
 #include "misc.h"
 #include "setup.h"
 #include "level.h"
+#include "lara.h"
+#include "draw.h"
 
 short GF(short animIndex, short frameToStart)
 {
-	return short(Anims[animIndex].frameBase + frameToStart);
+	return Anims[animIndex].frameBase + frameToStart;
 }
 
 short GF2(short objectID, short animIndex, short frameToStart)
 {
-	return short(Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart);
+	return Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart;
 }
 
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)

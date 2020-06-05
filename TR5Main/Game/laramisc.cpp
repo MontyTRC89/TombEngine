@@ -747,7 +747,7 @@ void InitialiseLara(int restore)
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.skelebob = 0;
 
-	short gun = WEAPON_NONE;
+	LARA_WEAPON_TYPE gun = WEAPON_NONE;
 
 	if (Objects[ID_HK_ITEM].loaded)
 		gun = WEAPON_HK;
