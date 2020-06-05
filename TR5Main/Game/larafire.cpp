@@ -23,9 +23,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
 	/* No weapons */
 	{
-		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
-		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
-		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
+		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
+		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
 		0,
 		0,
 		0,
@@ -38,13 +38,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Pistols */
 	{
-		{ -ANGLE(60),  ANGLE(60),  -ANGLE(60), ANGLE(60) },
-		{ -ANGLE(170), ANGLE(60),  -ANGLE(80), ANGLE(80) },
-		{ -ANGLE(60),  ANGLE(170), -ANGLE(80), ANGLE(80) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(60.0f),  ANGLE(60.0f),  -ANGLE(60.0f), ANGLE(60.0f) },
+		{ -ANGLE(170.0f), ANGLE(60.0f),  -ANGLE(80.0f), ANGLE(80.0f) },
+		{ -ANGLE(60.0f),  ANGLE(170.0f), -ANGLE(80.0f), ANGLE(80.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		650,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		1,
 		9,
 		3,
@@ -53,13 +53,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Revolver */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(60), ANGLE(60) },
-		{ -ANGLE(10), ANGLE(10), -ANGLE(80), ANGLE(80) },
-		{  ANGLE(0),   ANGLE(0),   ANGLE(0),  ANGLE(0) },
-		ANGLE(10),
-		ANGLE(4),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(60.0f), ANGLE(60.0f) },
+		{ -ANGLE(10.0f), ANGLE(10.0f), -ANGLE(80.0f), ANGLE(80.0f) },
+		{  ANGLE(0.0f),   ANGLE(0.0f),   ANGLE(0.0f),  ANGLE(0.0f) },
+		ANGLE(10.0f),
+		ANGLE(4.0f),
 		650,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		21,
 		16,
 		3,
@@ -68,13 +68,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Uzis */
 	{
-		{ -ANGLE(60),  ANGLE(60),  -ANGLE(60), ANGLE(60) },
-		{ -ANGLE(170), ANGLE(60),  -ANGLE(80), ANGLE(80) },
-		{ -ANGLE(60),  ANGLE(170), -ANGLE(80), ANGLE(80) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(60.0f), ANGLE(60.0f) },
+		{ -ANGLE(170.0f), ANGLE(60.0f),  -ANGLE(80.0f), ANGLE(80.0f) },
+		{ -ANGLE(60.0f),  ANGLE(170.0f), -ANGLE(80.0f), ANGLE(80.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		650,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		1,
 		3,
 		3,
@@ -83,13 +83,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Shotgun */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		ANGLE(10),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		ANGLE(10.0f),
 		0,
 		500,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		3,
 		9,
 		3,
@@ -98,13 +98,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* HK */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		ANGLE(10),
-		ANGLE(4),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		ANGLE(10.0f),
+		ANGLE(4.0f),
 		500,
-		12 * WALL_SIZE,
+		SECTOR(12),
 		4,
 		0,
 		3,
@@ -113,13 +113,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Crossbow */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		500,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		5,
 		0,
 		2,
@@ -128,9 +128,9 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Flare */
 	{
-		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
-		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
-		{ ANGLE(0), ANGLE(0), ANGLE(0), ANGLE(0) },
+		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
+		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
+		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
 		0,
 		0,
 		0,
@@ -143,13 +143,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Flare 2 */
 	{
-		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		400,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		3,
 		0,
 		2,
@@ -158,28 +158,28 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Grenade launcher */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		500,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		20,
-		0, 
+		0,
 		2,
 		10,
 		0
-	}, 
+	},
 	/* Harpoon gun */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(65), ANGLE(65) },
-		{ -ANGLE(20), ANGLE(20), -ANGLE(75), ANGLE(75) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(75), ANGLE(75) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		{ -ANGLE(20.0f), ANGLE(20.0f), -ANGLE(75.0f), ANGLE(75.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(75.0f), ANGLE(75.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		500,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		6,
 		0,
 		2,
@@ -188,13 +188,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Rocket launcher */
 	{
-		{ -ANGLE(60), ANGLE(60), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		{ -ANGLE(80), ANGLE(80), -ANGLE(65), ANGLE(65) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		500,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		30,
 		0,
 		2,
@@ -203,13 +203,13 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	},
 	/* Snowmobile */
 	{
-		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
-		{ -ANGLE(30), ANGLE(30), -ANGLE(55), ANGLE(55) },
-		ANGLE(10),
-		ANGLE(8),
+		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
+		ANGLE(10.0f),
+		ANGLE(8.0f),
 		400,
-		8 * WALL_SIZE,
+		SECTOR(8),
 		3,
 		0,
 		0,
@@ -608,7 +608,7 @@ void InitialiseNewWeapon()
 	Lara.rightArm.zRot = 0;
 	Lara.rightArm.yRot = 0;
 	Lara.rightArm.xRot = 0;
-	Lara.target = NULL;
+	Lara.target = nullptr;
 	Lara.rightArm.lock = false;
 	Lara.leftArm.lock = false;
 	Lara.rightArm.flash_gun = 0;
@@ -732,9 +732,10 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 	int r;
 
-	PHD_VECTOR pos;
+	PHD_VECTOR pos, muzzleOffset;
+	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 	pos.x = src->pos.xPos;
-	pos.y = src->pos.yPos - weapon->gunHeight;
+	pos.y = muzzleOffset.y;
 	pos.z = src->pos.zPos;
 	PHD_3DPOS rotation;
 	rotation.xRot = angles[1] + (GetRandomControl() - 0x4000) * weapon->shotAccuracy / 0x10000;
@@ -875,10 +876,12 @@ void LaraTargetInfo(WEAPON_INFO* weapon) // (F) (D)
 	}
 
 	GAME_VECTOR src, targetPoint;
+	PHD_VECTOR muzzleOffset;
 	short angles[2];
 
+	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 	src.x = LaraItem->pos.xPos;
-	src.y = LaraItem->pos.yPos - weapon->gunHeight;
+	src.y = muzzleOffset.y;
 	src.z = LaraItem->pos.zPos;
 	src.roomNumber = LaraItem->roomNumber;
 	find_target_point(Lara.target, &targetPoint);
@@ -946,9 +949,10 @@ bool CheckForHoldingState(int state) // (F) (D)
 	return false;
 }
 
-void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
+void LaraGetNewTarget(WEAPON_INFO* weapon) // (F) (D)
 {
 	GAME_VECTOR src, target;
+	PHD_VECTOR muzzleOffset;
 	int bestDistance, maxDistance, targets, slot, x, y, z, distance;
 	ITEM_INFO* bestItem, *item;
 	short bestYrot, angle[2], match;
@@ -956,19 +960,20 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 
 	if (BinocularRange)
 	{
-		Lara.target = NULL;
+		Lara.target = nullptr;
 		return;
 	}
 
+	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 	src.x = LaraItem->pos.xPos;
-	src.y = LaraItem->pos.yPos - winfo->gunHeight;
+	src.y = muzzleOffset.y;
 	src.z = LaraItem->pos.zPos;
 	src.roomNumber = LaraItem->roomNumber;
 
 	bestItem = NULL;
 	bestYrot = MAXSHORT;
 	bestDistance = MAXINT;
-	maxDistance = winfo->targetDist;
+	maxDistance = weapon->targetDist;
 	targets = 0;
 
 	for (slot = 0; slot < NUM_SLOTS; ++slot)
@@ -992,7 +997,7 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
 							angle[0] -= LaraItem->pos.yRot + Lara.torsoYrot;
 							angle[1] -= LaraItem->pos.xRot + Lara.torsoXrot;
-							if (angle[0] >= winfo->lockAngles[0] && angle[0] <= winfo->lockAngles[1] && angle[1] >= winfo->lockAngles[2] && angle[1] <= winfo->lockAngles[3])
+							if (angle[0] >= weapon->lockAngles[0] && angle[0] <= weapon->lockAngles[1] && angle[1] >= weapon->lockAngles[2] && angle[1] <= weapon->lockAngles[3])
 							{
 								TargetList[targets] = item;
 								++targets;
@@ -1070,12 +1075,13 @@ void LaraGetNewTarget(WEAPON_INFO* winfo) // (F) (D)
 		LastTargets[0] = Lara.target;
 	}
 
-	LaraTargetInfo(winfo);
+	LaraTargetInfo(weapon);
 }
 
 void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, int zv)
 {
-	int ceiling, height, oldtype, oldonobj, oldheight;
+	HEIGHT_TYPES oldtype;
+	int ceiling, height, oldonobj, oldheight;
 	int bs, yang;
 
 	ITEM_INFO* item = &Items[itemNumber];

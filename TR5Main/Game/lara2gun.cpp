@@ -374,7 +374,7 @@ void ready_pistols(int weaponType)
 	Lara.rightArm.xRot = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.leftArm.frameNumber = 0;
-	Lara.target = NULL;
+	Lara.target = nullptr;
 	Lara.rightArm.lock = false;
 	Lara.leftArm.lock = false;
 	Lara.rightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;

@@ -630,7 +630,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         Lara.headXrot = 0;
         Lara.torsoYrot = 0;
         Lara.torsoXrot = 0;
-        Lara.gunStatus = 1;
+        Lara.gunStatus = LG_HANDS_BUSY;
         item->flags |= 0x20;
         Lara.generalPtr = (void*)itemNum;
         g_Inventory->SetSelectedObject(NO_ITEM);

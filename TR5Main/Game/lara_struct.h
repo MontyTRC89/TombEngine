@@ -784,12 +784,12 @@ typedef struct LARA_ARM
 typedef struct LaraInfo
 {
 	short itemNumber;
-	short gunStatus; // LG_enum
-	short gunType; // WEAPON_enum
-	short requestGunType; // WEAPON_enum
-	short lastGunType; // WEAPON_enum
+	LARA_GUN_STATUS gunStatus; // LG_enum
+	LARA_WEAPON_TYPE gunType; // WEAPON_enum
+	LARA_WEAPON_TYPE requestGunType; // WEAPON_enum
+	LARA_WEAPON_TYPE lastGunType; // WEAPON_enum
 	short calcFallSpeed;
-	short waterStatus; // LW_enum
+	LARA_WATER_STATUS waterStatus; // LW_enum
 	short climbStatus;
 	short poseCount;
 	short hitFrame;
