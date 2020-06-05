@@ -6624,8 +6624,8 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			case SPLIT1:
 			case NOCOLF1T:
 			case NOCOLF1B:
-				item->pos.xPos += 500 + (dx - dz) / 2;
-				item->pos.zPos += 500 - (dx - dz) / 2;
+				item->pos.xPos += 512 + (dx - dz) / 2;
+				item->pos.zPos += 512 - (dx - dz) / 2;
 				break;
 			case SPLIT2:
 			case NOCOLF2T:
