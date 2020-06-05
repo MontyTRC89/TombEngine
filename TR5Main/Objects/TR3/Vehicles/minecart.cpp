@@ -837,7 +837,7 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			CreateFlare(ID_FLARE_ITEM, FALSE);
 			undraw_flare_meshes();
 			Lara.flareControlLeft = false;
-			Lara.requestGunType = Lara.gunType = LG_NO_ARMS;
+			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
 		}
 
 		Lara.gunStatus = LG_HANDS_BUSY;

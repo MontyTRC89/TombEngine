@@ -37,5 +37,5 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
 void LaraTargetInfo(WEAPON_INFO* weapon);
 bool CheckForHoldingState(int state);
-void LaraGetNewTarget(WEAPON_INFO* winfo);
+void LaraGetNewTarget(WEAPON_INFO* weapon);
 void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, int zv);

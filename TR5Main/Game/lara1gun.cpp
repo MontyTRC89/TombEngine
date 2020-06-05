@@ -44,32 +44,29 @@ void FireHarpoon()
 	if (itemNumber != NO_ITEM)
 	{
 		GAME_VECTOR pos;
-		PHD_VECTOR posGet;
+		PHD_VECTOR handr;
 		ITEM_INFO* item = &Items[itemNumber];
 
 		item->shade = 0x4210 | 0x8000;
 		item->objectNumber = ID_HARPOON;
 		item->roomNumber = LaraItem->roomNumber;
-		pos.x = -2;
-		pos.y = 0;
-		pos.z = 77;
-		posGet.x = pos.x;
-		posGet.y = pos.y;
-		posGet.z = pos.z;
-		GetLaraJointPosition(&posGet, LM_RHAND);
-		pos.x = posGet.z;
-		pos.y = posGet.y;
-		pos.z = posGet.z;
+
+		handr.x = -2;
+		handr.y = 0;
+		handr.z = 77;
+		GetLaraJointPosition(&handr, LM_RHAND);
+		pos.x = handr.z;
+		pos.y = handr.y;
+		pos.z = handr.z;
 		item->pos.xPos = pos.x;
 		item->pos.yPos = pos.y;
 		item->pos.zPos = pos.z;
 
 		InitialiseItem(itemNumber);
 
-		if (Lara.target)
+		if (Lara.target != nullptr)
 		{
 			find_target_point(Lara.target, &pos);
-
 			item->pos.yRot = phd_atan(pos.z - item->pos.zPos, pos.x - item->pos.xPos);
 			int distance = sqrt(SQUARE(pos.z - item->pos.zPos) + SQUARE(pos.x - item->pos.xPos));
 			item->pos.xRot = -phd_atan(distance, pos.y - item->pos.yPos);
@@ -96,7 +93,6 @@ void FireHarpoon()
 void ControlHarpoonBolt(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
@@ -817,13 +813,9 @@ void draw_shotgun(int weaponType)
 	if (item->currentAnimState != 0 && item->currentAnimState != 6)
 	{
 		if (item->frameNumber - Anims[item->animNumber].frameBase == Weapons[weaponType].drawFrame)
-		{
 			draw_shotgun_meshes(weaponType);
-		}
 		else if (Lara.waterStatus == 1)
-		{
 			item->goalAnimState = 6;
-		}
 	}
 	else
 	{
@@ -837,12 +829,10 @@ void draw_shotgun(int weaponType)
 
 void AnimateShotgun(int weaponType)
 {
-	bool harpoonFired = false;
-
 	if (HKTimer)
 	{
 		HKFlag = 0;
-		--HKTimer;
+		HKTimer--;
 	}
 
 	if (SmokeCountL)
@@ -874,7 +864,7 @@ void AnimateShotgun(int weaponType)
 			pos.z = 72;
 		}
 
-		GetLaraJointPosition(&pos, LM_LOUTARM);
+		GetLaraJointPosition(&pos, LM_RHAND);
 
 		if (LaraItem->meshBits)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
@@ -882,6 +872,7 @@ void AnimateShotgun(int weaponType)
 
 	ITEM_INFO* item = &Items[Lara.weaponItem];
 	bool running = (weaponType == WEAPON_HK && LaraItem->speed != 0);
+	bool harpoonFired = false;
 
 	switch (item->currentAnimState)
 	{
@@ -1283,17 +1274,15 @@ void RifleHandler(int weaponType)
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
 	LaraGetNewTarget(weapon);
-
 	if (TrInput & IN_ACTION)
 		LaraTargetInfo(weapon);
-
 	AimWeapon(weapon, &Lara.leftArm);
 
 	if (Lara.leftArm.lock)
 	{
 		Lara.torsoXrot = Lara.leftArm.xRot;
 		Lara.torsoYrot = Lara.leftArm.yRot;
-		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
+		if (Camera.oldType != LOOK_CAMERA && !BinocularRange)
 		{
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;
@@ -1310,9 +1299,9 @@ void RifleHandler(int weaponType)
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
 			TriggerDynamicLight(
-				LaraItem->pos.xPos + (phd_sin(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
+				LaraItem->pos.xPos + (phd_sin(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
 				LaraItem->pos.yPos + (GetRandomControl() & 0x7F) - 575,
-				LaraItem->pos.zPos + (phd_cos(LaraItem->pos.yRot) >> 4) + (byte)GetRandomControl() - 128,
+				LaraItem->pos.zPos + (phd_cos(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
 				12,
 				(GetRandomControl() & 0x3F) + 192,
 				(GetRandomControl() & 0x1F) + 128,
@@ -1322,17 +1311,11 @@ void RifleHandler(int weaponType)
 		else if (weaponType == WEAPON_REVOLVER)
 		{
 			PHD_VECTOR pos;
-
-			pos.x = GetRandomControl() - 128;
-			pos.y = (GetRandomControl() & 0x7F) - 63;
-			pos.z = GetRandomControl() - 128;
-
+			pos.x = (GetRandomControl() & 0xFF) - 0x80;
+			pos.y = (GetRandomControl() & 0x7F) - 0x3F;
+			pos.z = (GetRandomControl() & 0xFF) - 0x80;
 			GetLaraJointPosition(&pos, LM_RHAND);
-
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 12,
-				(GetRandomControl() & 0x3F) + 192,
-				(GetRandomControl() & 0x1F) + 128,
-				(GetRandomControl() & 0x3F));
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
 		}
 	}
 }
@@ -1493,12 +1476,10 @@ void undraw_shotgun(int weapon)
 	if (item->status == ITEM_DEACTIVATED)
 	{
 		Lara.gunStatus = LG_NO_ARMS;
-		Lara.target = NULL;
+		Lara.target = nullptr;
 		Lara.rightArm.lock = false;
 		Lara.leftArm.lock = false;
-		
 		KillItem(Lara.weaponItem);
-
 		Lara.weaponItem = NO_ITEM;
 		Lara.rightArm.frameNumber = 0;
 		Lara.leftArm.frameNumber = 0;
@@ -1748,7 +1729,7 @@ void ready_shotgun(int weaponType)
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.lock = false;
 	Lara.leftArm.lock = false;
-	Lara.target = NULL;
+	Lara.target = nullptr;
 	Lara.rightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 }
