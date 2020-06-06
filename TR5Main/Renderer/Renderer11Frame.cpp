@@ -83,7 +83,7 @@ void Renderer11::collectStatics(short roomNumber)
 	{
 		MESH_INFO* mesh = &r->mesh[i];
 		RendererStatic* newStatic = &room.Statics[i];
-		STATIC_INFO* staticInfo = &StaticObjects[mesh->staticNumber];
+		StaticInfo* staticInfo = &StaticObjects[mesh->staticNumber];
 		Vector3 min = Vector3(staticInfo->xMinc, staticInfo->yMinc, staticInfo->zMinc);
 		Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
 		min += Vector3(mesh->x, mesh->y, mesh->z);

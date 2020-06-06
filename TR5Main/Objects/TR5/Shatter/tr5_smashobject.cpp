@@ -5,6 +5,7 @@
 #include "sound.h"
 #include "tomb4fx.h"
 #include "items.h"
+#include "trmath.h"
 
 void InitialiseSmashObject(short itemNumber)
 {

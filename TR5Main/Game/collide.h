@@ -1,10 +1,21 @@
 #pragma once
-#include "global.h"
+#include "phd_global.h"
+#include "level.h"
 
 // used by coll->badPos
 #define NO_BAD_POS (-NO_HEIGHT)
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
+
+struct BOUNDING_BOX
+{
+	short X1;
+	short X2;
+	short Y1;
+	short Y2;
+	short Z1;
+	short Z2;
+};
 
 struct COLL_FLOOR
 {
@@ -88,8 +99,9 @@ struct COLL_INFO
 };
 
 extern BOUNDING_BOX GlobalCollisionBounds;
-extern ITEM_INFO* CollidedItems[1024];
-extern MESH_INFO* CollidedMeshes[1024];
+constexpr auto MAX_ITEMS = 1024;
+extern ITEM_INFO* CollidedItems[MAX_ITEMS];
+extern MESH_INFO* CollidedMeshes[MAX_ITEMS];
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber, int hite);

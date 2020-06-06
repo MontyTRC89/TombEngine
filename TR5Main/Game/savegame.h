@@ -1,6 +1,4 @@
 #pragma once
-
-#include "global.h"
 #include "ChunkId.h"
 #include "ChunkReader.h"
 #include "ChunkWriter.h"
@@ -11,9 +9,41 @@
 
 #define SAVEGAME_BUFFER_SIZE 1048576
 
-extern GameFlow* g_GameFlow;
-extern GameScript* g_GameScript;
-extern SAVEGAME_INFO Savegame;
+typedef struct STATS
+{
+	unsigned int Timer;
+	unsigned int Distance;
+	unsigned int AmmoUsed;
+	unsigned int AmmoHits;
+	unsigned short Kills;
+	unsigned char Secrets;
+	unsigned char HealthUsed;
+};
+
+typedef struct SAVEGAME_INFO
+{
+	short Checksum;
+	unsigned short VolumeCD;
+	unsigned short VolumeFX;
+	short ScreenX;
+	short ScreenY;
+	unsigned char ControlOption;
+	bool VibrateOn;
+	bool AutoTarget;
+	STATS Level;
+	STATS Game;
+	short WeaponObject;
+	short WeaponAnim;
+	short WeaponFrame;
+	short WeaponCurrent;
+	short WeaponGoal;
+	unsigned int CutSceneTriggered1;
+	unsigned int CutSceneTriggered2;
+	byte GameComplete;
+	unsigned char LevelNumber;
+	unsigned char CampaignSecrets[4];
+	unsigned char TLCount;
+};
 
 typedef struct SaveGameHeader
 {
@@ -27,6 +57,10 @@ typedef struct SaveGameHeader
 	int Count;
 	bool Present;
 };
+
+extern GameFlow* g_GameFlow;
+extern GameScript* g_GameScript;
+extern SAVEGAME_INFO Savegame;
 
 class SaveGame {
 private:
@@ -134,9 +168,7 @@ public:
 
 	static void Start();
 	static void End();
-
 	static bool Load(char* fileName);
 	static bool LoadHeader(char* fileName, SaveGameHeader* header);
-	
 	static bool Save(char* fileName);
 };

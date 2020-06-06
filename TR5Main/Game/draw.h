@@ -1,9 +1,20 @@
 #pragma once
-
-#include "global.h"
 #include "box.h"
 
-extern Renderer11* g_Renderer;
+struct ANIM_FRAME
+{
+	short MinX;
+	short MaxX;
+	short MinY;
+	short MaxY;
+	short MinZ;
+	short MaxZ;
+	short OffsetX;
+	short OffsetY;
+	short OffsetZ;
+	unsigned short AngleSets[]; // Variable size
+};
+
 extern BITE_INFO EnemyBites[9];
 extern int LightningCount;
 extern int LightningRand;

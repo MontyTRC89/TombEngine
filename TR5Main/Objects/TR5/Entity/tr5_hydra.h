@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "phd_global.h"
 
 void InitialiseHydra(short itemNum);
 void HydraControl(short itemNumber);

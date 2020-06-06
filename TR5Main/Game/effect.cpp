@@ -1,16 +1,13 @@
 #include "framework.h"
 #include "effect.h"
-#include "global.h"
+#include "effect2.h"
 #include "Lara.h"
-#include "items.h"
 #include "lot.h"
 #include "tomb4fx.h"
-#include "effect2.h"
 #include "hair.h"
 #include "draw.h"
 #include "sphere.h"
 #include "footprint.h"
-#include "oldobjects.h"
 #include "level.h"
 #include "debris.h"
 #include "setup.h"
@@ -23,11 +20,10 @@
 
 int wf = 256;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
-
 short FXType;
 FX_INFO* Effects;
 
-void(*effect_routines[59])(ITEM_INFO* item) =
+function<EffectFunction> effect_routines[59] =
 {
 	turn180_effect,
 	floor_shake_effect,
@@ -402,7 +398,7 @@ void PoseidonSFX(ITEM_INFO* item)//395E0(<), 39AE0(<) (F)
 
 void RubbleFX(ITEM_INFO* item)//39534(<), 39A34(<) (F)
 {
-	int itemNumber = FindItem(ID_EARTHQUAKE);
+	int itemNumber = FindItemNumber(ID_EARTHQUAKE);
 
 	if (itemNumber != NO_ITEM)
 	{
