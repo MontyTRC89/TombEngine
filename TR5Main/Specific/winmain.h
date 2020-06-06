@@ -1,7 +1,4 @@
 #pragma once
-
-#include "global.h"
-
 #pragma comment(linker,"/manifestdependency:\"" \
     "type='win32' " \
     "name='Microsoft.Windows.Common-Controls' " \
@@ -9,6 +6,16 @@
     "processorArchitecture='*' "  \
     "publicKeyToken='6595b64144ccf1df' " \
     "language='*'\"")
+
+typedef struct WINAPP
+{
+    HINSTANCE hInstance;
+    int nFillMode;
+    WNDCLASS WindowClass;
+    HWND WindowHandle;
+    bool bNoFocus;
+    bool isInScene;
+};
 
 extern WINAPP App;
 extern unsigned int ThreadID;

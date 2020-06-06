@@ -119,7 +119,7 @@ static void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 				spark->zVel = speed * spark->zVel >> 7;
 				spark->maxYvel = 0;
 				spark->gravity = 0;
-				spark->flags = 0;
+				spark->flags = SP_NONE;
 			}
 		}
 	}

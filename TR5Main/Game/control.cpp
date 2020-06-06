@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "collide.h"
 #include "control.h"
-#include "global.h"
 #include "pickup.h"
 #include "camera.h"
 #include "Lara.h"
@@ -111,7 +110,7 @@ int InitialiseGame;
 int RequiredStartPos;
 int WeaponDelay;
 int WeaponEnemyTimer;
-int HeightType;
+HEIGHT_TYPES HeightType;
 int HeavyTriggered;
 short SkyPos1;
 short SkyPos2;
@@ -154,7 +153,6 @@ extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern Inventory* g_Inventory;
 extern int SplashCount;
-extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
@@ -1018,7 +1016,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 
 				if (item->active && Objects[item->objectNumber].intelligent)
 				{
-					item->hitPoints = -16384;
+					item->hitPoints = NOT_TARGETABLE;
 					DisableBaddieAI(value);
 					KillItem(value);
 				}
@@ -1039,7 +1037,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 				{
 					if (Objects[item->objectNumber].intelligent)
 					{
-						if (item->status != ITEM_INACTIVE)
+						if (item->status != ITEM_NOT_ACTIVE)
 						{
 							if (item->status == ITEM_INVISIBLE)
 							{
@@ -1263,11 +1261,6 @@ void UpdateSky()
 			SkyPos2 -= 9728;
 		}
 	}
-}
-
-void ActivateKey()
-{
-	KeyTriggerActive = 1;
 }
 
 short GetDoor(FLOOR_INFO* floor)
@@ -2138,7 +2131,6 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 
 	flag = 0;
 	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
-
 	if (itemNumber != 999)
 	{
 		target.x = vector.x - (vector.x - src->x >> 5);
@@ -2815,6 +2807,7 @@ void AnimateItem(ITEM_INFO* item)
 	{
 		short* cmd = &Commands[anim->commandIndex];
 		int flags;
+		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -2879,7 +2872,8 @@ void AnimateItem(ITEM_INFO* item)
 				}
 
 				FXType = cmd[1] & 0xC000;
-				(*effect_routines[(int)(cmd[1] & 0x3fff)])(item);
+				effectID = cmd[1] & 0x3FFF;
+				effect_routines[effectID](item);
 
 				cmd += 2;
 				break;
@@ -2985,10 +2979,7 @@ void RemoveRoomFlipItems(ROOM_INFO* r)
 	{
 		ITEM_INFO* item = &Items[linkNum];
 
-		if (item->flags & 0x100
-			&& Objects[item->objectNumber].intelligent
-			&& item->hitPoints <= 0
-			&& item->hitPoints != -16384)
+		if (item->flags & 0x100 && Objects[item->objectNumber].intelligent && item->hitPoints <= 0 && item->hitPoints != NOT_TARGETABLE)
 		{
 			KillItem(linkNum);
 		}
@@ -3092,7 +3083,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 	if (1 << Node & item->meshBits)
 	{
 		Num = bits;
-		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7))
+		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 		{
 			SoundEffect(SFX_SMASH_METAL, &item->pos, 0);
 		}
@@ -3107,7 +3098,7 @@ int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits)
 		ShatterItem.sphere.x = CreatureSpheres[Node].x;
 		ShatterItem.sphere.y = CreatureSpheres[Node].y;
 		ShatterItem.sphere.z = CreatureSpheres[Node].z;
-		ShatterItem.il = (ITEM_LIGHT *) &item->legacyLightData; // TODO: remove it or at last change it with the new renderer light...
+		ShatterItem.il = (ITEM_LIGHT*) &item->legacyLightData; // TODO: remove it or at last change it with the new renderer light...
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x,(float)ShatterItem.sphere.y,(float)ShatterItem.sphere.z };
@@ -3264,13 +3255,10 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += deltaAngle >> shift;
 }
 
-#define OutsideRoomTable VAR_U_(0x00EEF4AC, unsigned char*)
-#define OutsideRoomOffsets ARRAY_(0x00EEF040, short, [27 * 27])
-
 int IsRoomOutside(int x, int y, int z)
 {
 	return 0;
-
+	/*
 	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
 	if (offset == -1)
 		return -2;
@@ -3331,5 +3319,5 @@ int IsRoomOutside(int x, int y, int z)
 			s++;
 		}
 		return -2;
-	}
+	}*/
 }

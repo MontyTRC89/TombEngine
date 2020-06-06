@@ -1,8 +1,7 @@
 #include "framework.h"
-#include "init.h"
 #include "winmain.h"
+#include "init.h"
 #include "resource.h"
-#include "sol.hpp"
 #include "draw.h"
 #include "sound.h"
 #include "inventory.h"
@@ -10,8 +9,8 @@
 #include "gameflow.h"
 #include "savegame.h"
 #include "level.h"
-#include "newlevel.h"
 #include "configuration.h"
+#include "Renderer11.h"
 
 WINAPP App;
 unsigned int ThreadID;
@@ -205,10 +204,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowClass.hIcon = NULL;
 	App.WindowClass.lpszMenuName = NULL;
 	App.WindowClass.lpszClassName = "TR5Main";
-	App.WindowClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	App.WindowClass.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
 	App.WindowClass.hInstance = hInstance;
 	App.WindowClass.style = CS_VREDRAW | CS_HREDRAW;
-	App.WindowClass.lpfnWndProc = (WNDPROC)WinAppProc;
+	App.WindowClass.lpfnWndProc = WinAppProc;
 	App.WindowClass.cbClsExtra = 0;
 	App.WindowClass.cbWndExtra = 0;
 	App.WindowClass.hCursor = LoadCursor(App.hInstance, IDC_ARROW);
