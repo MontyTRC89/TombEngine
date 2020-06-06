@@ -86,7 +86,7 @@ void PushableBlockControl(short itemNumber)
 	pos.y = 0;
 	pos.z = 0;
 
-	short quadrant = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short quadrant = GetQuadrant(LaraItem->pos.yRot);
 
 	int x, z;
 	FLOOR_INFO* floor;
@@ -318,7 +318,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 			return;
 		}
 
-		short quadrant = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
+		short quadrant = GetQuadrant(LaraItem->pos.yRot);
 
 		if (TrInput & IN_FORWARD)
 		{
@@ -418,7 +418,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 		l->pos.yPos != item->pos.yPos)
 		return;
 
-	unsigned short quadrant = (unsigned short)(l->pos.yRot + 0x2000) / 0x4000;
+	short quadrant = GetQuadrant(l->pos.yRot);
 	if (l->currentAnimState == STATE_LARA_STOP)
 	{
 		if (Lara.gunStatus != LG_NO_ARMS)  

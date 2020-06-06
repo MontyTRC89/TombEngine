@@ -801,7 +801,7 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 		if (Lara.waterStatus != LW_UNDERWATER)
 		{
 			angle = mGetAngle(dest->xPos, dest->zPos, src->xPos, src->zPos);
-			direction = ((unsigned short) (angle + ANGLE(45)) / ANGLE(90) - (unsigned short) (dest->yRot + ANGLE(45)) / ANGLE(90)) & 3;
+			direction = (GetQuadrant(angle) - GetQuadrant(dest->yRot)) & 3;
 
 			switch (direction)
 			{
@@ -1032,8 +1032,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	coll->shift.x = 0;
 	coll->shift.y = 0;
 	coll->shift.z = 0;
-	coll->quadrant = (unsigned short) (coll->facing + ANGLE(45)) / ANGLE(90);
-	coll->octant = (unsigned short) (coll->facing + ANGLE(22.5)) / ANGLE(45);
+	coll->quadrant = GetQuadrant(coll->facing);
+	coll->octant = GetOctant(coll->facing);
 
 	int x = xPos;
 	int y = yPos - objectHeight;
@@ -1626,4 +1626,64 @@ void CalcItemToFloorRotation(ITEM_INFO* item, short rotY, int radiusZ, int radiu
 	sideHDif = float(rightHeight - leftHeight);
 	item->pos.xRot = ANGLE(atan2(frontHDif, 2 * radiusZ) / RADIAN);
 	item->pos.zRot = ANGLE(atan2(sideHDif, 2 * radiusX) / RADIAN);
+}
+
+bool SnapToQuadrant(short& angle, int interval)
+{
+	if (abs(angle) <= ANGLE(interval))
+	{
+		angle = 0;
+		return true;
+	}
+	else if (angle >= ANGLE(90 - interval) && angle <= ANGLE(interval + 90))
+	{
+		angle = ANGLE(90);
+		return true;
+	}
+	else if (angle >= ANGLE(180 - interval) || angle <= -ANGLE(180 - interval))
+	{
+		angle = ANGLE(180);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 90) && angle <= -ANGLE(90 - interval))
+	{
+		angle = -ANGLE(90);
+		return true;
+	}
+	return false;
+}
+
+int GetQuadrant(short angle)
+{
+	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
+}
+
+bool SnapToDiagonal(short& angle, int interval)
+{
+	if (angle >= ANGLE(45 - interval) && angle <= ANGLE(interval + 45))
+	{
+		angle = ANGLE(45);
+		return true;
+	}
+	else if (angle >= ANGLE(135 - interval) && angle <= ANGLE(interval + 135))
+	{
+		angle = ANGLE(135);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 135) && angle <= -ANGLE(135 - interval))
+	{
+		angle = -ANGLE(135);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 45) && angle <= -ANGLE(45 - interval))
+	{
+		angle = -ANGLE(45);
+		return true;
+	}
+	return false;
+}
+
+int GetOctant(short angle)
+{
+	return (unsigned short) (angle + ANGLE(22.5)) / ANGLE(45);
 }

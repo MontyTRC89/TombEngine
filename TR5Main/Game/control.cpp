@@ -773,7 +773,7 @@ void TestTriggers(short* data, int heavy, int HeavyFlags)
 	{
 		if (!heavy)
 		{
-			short quad = (unsigned short)(LaraItem->pos.yRot + ANGLE(45)) / ANGLE(90);
+			short quad = GetQuadrant(LaraItem->pos.yRot);
 			if ((1 << (quad + 8)) & *data)
 				Lara.climbStatus = true;
 		}
