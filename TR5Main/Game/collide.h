@@ -116,3 +116,4 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 void CalcItemToFloorRotation(ITEM_INFO* item, short rotY, int radiusZ, int radiusX); // new function for rotating item along XZ slopes
+Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // finds xPos, zPos that intersects with diagonal on sector
