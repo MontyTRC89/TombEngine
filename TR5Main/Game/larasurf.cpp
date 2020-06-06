@@ -386,29 +386,9 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 
 	if (coll->midSplitFloor)
 	{
-		int dx = item->pos.xPos & 0x3FF;
-		int dz = item->pos.zPos & 0x3FF;
-		item->pos.xPos -= dx;
-		item->pos.zPos -= dz;
-
-		switch (coll->midSplitFloor)
-		{
-		case SPLIT1:
-		case NOCOLF1T:
-		case NOCOLF1B:
-			item->pos.xPos += 512 + (dx - dz) / 2;
-			item->pos.zPos += 512 - (dx - dz) / 2;
-			break;
-		case SPLIT2:
-		case NOCOLF2T:
-		case NOCOLF2B:
-			item->pos.xPos += (dx + dz) / 2;
-			item->pos.zPos += (dx + dz) / 2;
-			break;
-		}
-
-		item->pos.xPos += (phd_sin(rot) * 100) >> W2V_SHIFT;
-		item->pos.zPos += (phd_cos(rot) * 100) >> W2V_SHIFT;
+		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, -LARA_RAD, item->pos.yRot);
+		item->pos.xPos = v.x;
+		item->pos.zPos = v.y;
 	}
 	else
 	{
