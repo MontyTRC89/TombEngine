@@ -7,46 +7,6 @@
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
 
-enum COLL_TYPE
-{
-	CT_NONE = 0,			   // 0x00
-	CT_FRONT = (1 << 0),  // 0x01
-	CT_LEFT = (1 << 1),  // 0x02
-	CT_RIGHT = (1 << 2),  // 0x04
-	CT_TOP = (1 << 3),  // 0x08
-	CT_TOP_FRONT = (1 << 4),  // 0x10
-	CT_CLAMP = (1 << 5)   // 0x20
-};
-
-enum HEIGHT_TYPES
-{
-	WALL,
-	SMALL_SLOPE,
-	BIG_SLOPE,
-	DIAGONAL,
-	SPLIT_TRI
-};
-
-enum HEADINGS
-{
-	NORTH,
-	EAST,
-	SOUTH,
-	WEST
-};
-
-enum OCTANTS
-{
-	O_NORTH,
-	O_NORTHEAST,
-	O_EAST,
-	O_SOUTHEAST,
-	O_SOUTH,
-	O_SOUTHWEST,
-	O_WEST,
-	O_NORTHWEST
-}
-
 struct BOUNDING_BOX
 {
 	short X1;
