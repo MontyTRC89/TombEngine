@@ -160,3 +160,4 @@ bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
 int GetOctant(short angle);
+Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // finds xPos, zPos that intersects with diagonal on sector
