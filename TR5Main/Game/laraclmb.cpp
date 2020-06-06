@@ -400,13 +400,12 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 
 int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift) // (F) (D)
 {
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
 	int x;
 	int z;
 	int xfront = 0;
 	int zfront = 0;
 
-	switch (angle)
+	switch (GetQuadrant(item->pos.yRot))
 	{
 	case NORTH:
 		x = item->pos.xPos + right;
@@ -554,7 +553,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
 
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short angle = GetQuadrant(item->pos.yRot);
 	int x, z;
 
 	if (angle && angle != SOUTH)
@@ -652,7 +651,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
 
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
+	short angle = GetQuadrant(item->pos.yRot);
 	int x, z;
 
 	if (angle && angle != SOUTH)
@@ -839,13 +838,12 @@ int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, i
 int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* ledge)//45530, 45994
 {
 	int y = item->pos.yPos - 768;
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
 
 	int x, z;
 	int xFront = 0;
 	int zFront = 0;
 
-	switch(angle)
+	switch (GetQuadrant(item->pos.yRot))
 	{
 	case NORTH:
 		x = item->pos.xPos + right;

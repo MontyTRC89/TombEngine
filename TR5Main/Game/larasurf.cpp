@@ -352,30 +352,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		return 0;
 
 	short rot = item->pos.yRot;
-	if (item->pos.yRot < -ANGLE(35) || item->pos.yRot > ANGLE(35))
-	{
-		if (item->pos.yRot < 10014 || item->pos.yRot > 22754)
-		{
-			if (item->pos.yRot >= 26397 || item->pos.yRot <= -26397)
-			{
-				rot = ANGLE(180);
-			}
-			else if (item->pos.yRot >= -22754 && item->pos.yRot <= -10014)
-			{
-				rot = -ANGLE(90);
-			}
-		}
-		else
-		{
-			rot = ANGLE(90);
-		}
-	}
-	else
-	{
-		rot = 0;
-	}
-	
-	if (rot & 0x3FFF)
+	if (!SnapToQuadrant(rot, 35))
 		return 0;
 
 	item->pos.yPos += coll->frontFloor + 695;
