@@ -7,8 +7,8 @@
 #include "spotcam.h"
 #include "camera.h"
 #include "sphere.h"
-#include "global.h"
 #include "level.h"
+#include "GameFlowScript.h"
 
 extern GameFlow* g_GameFlow;
 

@@ -1160,8 +1160,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			CreateFlare(ID_FLARE_ITEM, 0);
 			undraw_flare_meshes();
 			Lara.flareControlLeft = 0;
-			Lara.requestGunType = LG_NO_ARMS;
-			Lara.gunType = LG_NO_ARMS;
+			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
 		}
 
 		Lara.gunStatus = LG_HANDS_BUSY;

@@ -11,6 +11,8 @@
 #include "misc.h"
 #include "lara.h"
 #include "people.h"
+#include "items.h"
+#include "lot.h"
 
 enum AHMET_STATE
 {
@@ -353,4 +355,44 @@ void AhmetControl(short itemNumber)
     CreatureJoint(item, 0, head_y);
     AhmetHeavyTriggers(item);
     CreatureAnimation(itemNumber, angle, 0);
+}
+
+bool RespawnAhmet(short itemNumber)
+{
+    ITEM_INFO* item = &Items[itemNumber];
+
+    if (item->currentAnimState != 7 || item->frameNumber != Anims[item->animNumber].frameEnd)
+        return false;
+
+    FlashFadeR = 255;
+    FlashFadeG = 64;
+    FlashFadeB = 0;
+    FlashFader = 32;
+
+    item->pos.xPos = (item->itemFlags[0] << 10) + 512;
+    item->pos.yPos = (item->itemFlags[1] << 8);
+    item->pos.zPos = (item->itemFlags[2] << 10) + 512;
+
+    IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+
+    if (item->roomNumber != IsRoomOutsideNo)
+        ItemNewRoom(itemNumber, IsRoomOutsideNo);
+
+    item->animNumber = Objects[item->objectNumber].animIndex;
+    item->goalAnimState = 1;
+    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->currentAnimState = 1;
+    item->hitPoints = Objects[item->objectNumber].hitPoints;
+
+    AddActiveItem(itemNumber);
+
+    item->flags &= 0xFE;
+    item->afterDeath = 0;
+    item->status = ITEM_ACTIVE;
+    item->collidable = true;
+
+    EnableBaddieAI(itemNumber, 1);
+
+    item->triggerFlags = 1;
+    return true;
 }

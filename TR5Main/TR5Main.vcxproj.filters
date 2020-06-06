@@ -30,9 +30,6 @@
     <ClInclude Include="Game\debris.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\deltapak.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\door.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -132,30 +129,6 @@
     <ClInclude Include="Game\traps.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Global\malloc.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\types.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\global.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\macros.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\vodoo.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\constants.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\enums.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Global\objectslist.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Specific\setup.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -204,9 +177,6 @@
     <ClInclude Include="Game\inventory.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\Enums.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Scripting\GameFlowScript.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -228,9 +198,6 @@
     <ClInclude Include="Specific\IO\ChunkWriter.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\newobjects.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -241,9 +208,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Specific\configuration.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\oldobjects.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp">
@@ -363,9 +327,6 @@
     <ClInclude Include="framework.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Global\trmath.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\health.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -373,9 +334,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\tr4_objects.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Specific\newlevel.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR5\tr5_objects.h">
@@ -451,9 +409,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Trap\tr4_plough.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Objects\TR4\Switch\tr4_cog.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Trap\tr4_stargate.h">
@@ -711,9 +666,6 @@
     <ClInclude Include="Objects\TR5\Shatter\tr5_smashobject.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\Utils\ObjectsUtils.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -726,9 +678,6 @@
     <ClInclude Include="Objects\TR5\Trap\tr5_teethspike.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Objects\TR4\Switch\tr4_raisingcog.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Objects\TR5\Trap\tr5_ventilator.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -739,6 +688,93 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Vehicles\motorbike.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Effects\tr4_bubbles.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Utils\object_helper.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Object\tr4_scales.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Trap\tr4_cog.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Object\tr4_laradouble.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\phd_global.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\room.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderEnums.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\malloc.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\trmath.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\objectslist.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\lara_struct.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\levelloader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Specific\newtypes.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Light\tr5_light.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_raisingblock.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_bodypart.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_teleporter.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_highobject.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_genslot.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Trap\tr5_deathslide.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\Effects\tr5_electricity.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR5\Object\tr5_rollingball.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_baboon.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -756,9 +792,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\debris.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\deltapak.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\door.cpp">
@@ -857,9 +890,6 @@
     <ClCompile Include="Game\traps.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Global\malloc.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Specific\setup.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -879,9 +909,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Scripting\GameLogicScript.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\puzzles.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Renderer11.cpp">
@@ -1013,22 +1040,10 @@
     <ClCompile Include="framework.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Global\trmath.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\health.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\statue.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\effect.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\TR4\tr4_objects.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Specific\newlevel.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Entity\tr5_autoguns.cpp">
@@ -1226,9 +1241,6 @@
     <ClCompile Include="Objects\TR4\Trap\tr4_plough.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR4\Switch\tr4_cog.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR4\Trap\tr4_stargate.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1298,12 +1310,6 @@
     <ClCompile Include="Objects\TR5\Entity\tr5_cyborg.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\tr5_misc_objects.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Objects\tr5_traps.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR5\Entity\tr5_roman_statue.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1322,9 +1328,6 @@
     <ClCompile Include="Objects\TR5\Shatter\tr5_smashobject.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\Utils\ObjectsUtils.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR5\Object\tr5_pushableblock.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1337,9 +1340,6 @@
     <ClCompile Include="Objects\TR5\Trap\tr5_teethspike.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Objects\TR4\Switch\tr4_raisingcog.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR5\Trap\tr5_ventilator.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1350,6 +1350,75 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Utils\object_helper.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Object\tr4_sarcophagus.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Object\tr4_scales.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Trap\tr4_cog.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Object\tr4_laradouble.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\tr4_objects.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\malloc.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\trmath.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Specific\levelloader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Light\tr5_light.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_raisingblock.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_bodypart.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_highobject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Trap\tr5_deathslide.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Effects\tr5_electricity.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR5\Object\tr5_rollingball.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_baboon.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

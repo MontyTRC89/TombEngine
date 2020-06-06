@@ -13,8 +13,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	m_spriteSequences = vector<RendererSpriteSequence>(ID_NUMBER_OBJECTS);
 
-	m_staticObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * NUM_STATICS);
-	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * NUM_STATICS);
+	m_staticObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * MAX_STATICS);
+	ZeroMemory(m_staticObjects, sizeof(RendererObject*) * MAX_STATICS);
 
 	m_rooms = vector<RendererRoom>(NUM_ROOMS);
 
@@ -718,7 +718,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	for (int i = 0; i < StaticObjectsIds.size(); i++)
 	{
-		STATIC_INFO* obj = &StaticObjects[StaticObjectsIds[i]];
+		StaticInfo* obj = &StaticObjects[StaticObjectsIds[i]];
 		RendererObject* staticObject = new RendererObject();
 		staticObject->Id = StaticObjectsIds[i];
 

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "traps.h"
-#include "global.h"
+
 #include "items.h"
 #include "effect2.h"
 #include "tomb4fx.h"
@@ -576,7 +576,7 @@ void FallingBlockFloor(ITEM_INFO* item, int x, int y, int z, int* height)
 		if (y <= item->pos.yPos)
 		{
 			*height = item->pos.yPos;
-			HeightType = 0;
+			HeightType = WALL;
 			OnFloor = 1;
 		}
 	}

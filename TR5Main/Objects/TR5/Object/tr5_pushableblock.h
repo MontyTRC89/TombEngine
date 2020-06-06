@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 #include "collide.h"
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);

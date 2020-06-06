@@ -49,8 +49,6 @@ int SlowMotion;
 int SpotcamDontDrawLara;
 int SpotcamOverlay;
 
-extern Renderer11* g_Renderer;
-
 void InitSpotCamSequences() 
 {
 	int s, cc, n, ce;
