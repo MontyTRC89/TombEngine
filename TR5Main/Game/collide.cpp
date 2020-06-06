@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "control.h"
 #include "collide.h"
 #include "draw.h"
 #include "Lara.h"
