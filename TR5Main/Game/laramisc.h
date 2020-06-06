@@ -1,8 +1,7 @@
 #pragma once
-#include "global.h"
 #include "collide.h"
 
-extern COLL_INFO coll;
+extern COLL_INFO lara_coll;
 
 void GetLaraDeadlyBounds();
 void DelAlignLaraToRope(ITEM_INFO* item);

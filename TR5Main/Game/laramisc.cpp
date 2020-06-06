@@ -1,12 +1,11 @@
 #include "framework.h"
 #include "laramisc.h"
-#include "global.h"
 #include "level.h"
 #include "setup.h"
 #include "GameFlowScript.h"
 #include "effect.h"
 #include "collide.h"
-#include "Lara.h"
+#include "lara.h"
 #include "laraswim.h"
 #include "larasurf.h"
 #include "effect2.h"
@@ -20,12 +19,9 @@
 #include "input.h"
 #include "sound.h"
 
-
 extern GameFlow* g_GameFlow;
-extern void(*effect_routines[59])(ITEM_INFO* item);
 extern short FXType;
-
-COLL_INFO coll;
+COLL_INFO lara_coll;
 short SubsuitAir = 0;
 short cheatHitPoints;
 
@@ -611,7 +607,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 			}
 #endif
 		}
-		LaraAboveWater(item, &coll);
+		LaraAboveWater(item, &lara_coll);
 		break;
 
 	case LW_UNDERWATER:
@@ -633,7 +629,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 				item->hitPoints -= 5;
 			}
 		}		
-		LaraUnderWater(item, &coll);
+		LaraUnderWater(item, &lara_coll);
 		break;
 
 	case LW_SURFACE:
@@ -643,11 +639,11 @@ void LaraControl(short itemNumber) // (AF) (D)
 			if (Lara.air > 1800)
 				Lara.air = 1800;
 		}
-		LaraSurface(item, &coll);
+		LaraSurface(item, &lara_coll);
 		break;
 
 	case LW_FLYCHEAT:
-		LaraCheat(item, &coll);
+		LaraCheat(item, &lara_coll);
 		break;
 	}
 
@@ -707,8 +703,8 @@ void LaraInitialiseMeshes() // (AF) (D)
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.target = NULL;
-	Lara.rightArm.lock = 0;
-	Lara.leftArm.lock = 0;
+	Lara.rightArm.lock = false;
+	Lara.leftArm.lock = false;
 }
 
 void InitialiseLara(int restore)
@@ -751,7 +747,7 @@ void InitialiseLara(int restore)
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.skelebob = 0;
 
-	short gun = WEAPON_NONE;
+	LARA_WEAPON_TYPE gun = WEAPON_NONE;
 
 	if (Objects[ID_HK_ITEM].loaded)
 		gun = WEAPON_HK;
@@ -857,6 +853,7 @@ void AnimateLara(ITEM_INFO* item)
 	{
 		short* cmd = &Commands[anim->commandIndex];
 		int flags;
+		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -896,7 +893,8 @@ void AnimateLara(ITEM_INFO* item)
 				}
 
 				FXType = cmd[1] & 0xC000;
-				(*effect_routines[(int)(cmd[1] & 0x3FFF)])(item);
+				effectID = cmd[1] & 0x3FFF;
+				effect_routines[effectID](item);
 
 				cmd += 2;
 				break;

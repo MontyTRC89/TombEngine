@@ -25,10 +25,28 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
+#include "tr5_dart_emitter.h"
+#include "tr5_smoke_emitter.h"
 /// objects
-
+#include "tr5_pushableblock.h"
+#include "tr5_twoblockplatform.h"
+#include "tr5_raisingcog.h"
+#include "tr5_raisingblock.h"
+#include "tr5_light.h"
+#include "tr5_bodypart.h"
+#include "tr5_teleporter.h"
+#include "tr5_highobject.h"
+#include "tr4_bubbles.h"
+#include "tr5_missile.h"
+#include "tr5_genslot.h"
 /// traps
-
+#include "tr5_teethspike.h"
+#include "tr5_ventilator.h"
+#include "tr5_deathslide.h"
+#include "tr5_electricity.h"
+#include "tr5_romehammer.h"
+#include "tr5_fallingceiling.h"
+#include "tr5_rollingball.h"
 /// switch
 
 /// shatter
@@ -41,9 +59,11 @@
 #include "pickup.h"
 #include "flmtorch.h"
 #include "setup.h"
+#include "switch.h"
 #include "objects.h"
 #include "level.h"
-#include "ObjectsUtils.h"
+/// register objects
+#include "object_helper.h"
 
 static void StartBaddy(ObjectInfo* obj)
 {
@@ -59,10 +79,6 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->usingDrawAnimatingItem = false;
-	}
-	else
-	{
-		printf("lara not found !");
 	}
 
 	obj = &Objects[ID_SAS];
@@ -841,11 +857,285 @@ static void StartObject(ObjectInfo* obj)
 
 	for (int objNumber = ID_PUSHABLE_OBJECT1; objNumber <= ID_PUSHABLE_OBJECT10; objNumber++)
 		InitPushableObject(obj, objNumber);
+
+	obj = &Objects[ID_TWOBLOCK_PLATFORM];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTwoBlocksPlatform;
+		obj->control = TwoBlocksPlatformControl;
+		obj->floor = TwoBlocksPlatformFloor;
+		obj->ceiling = TwoBlocksPlatformCeiling;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
+
+	for (int objNum = ID_RAISING_BLOCK1; objNum <= ID_RAISING_BLOCK4; objNum++)
+	{
+		obj = &Objects[objNum];
+		if (obj->loaded)
+		{
+			obj->initialise = InitialiseRaisingBlock;
+			obj->control = ControlRaisingBlock;
+			obj->saveFlags = true;
+		}
+	}
+
+	obj = &Objects[ID_ELECTRICAL_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = ElectricalLightControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_PULSE_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = PulseLightControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_STROBE_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = StrobeLightControl;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_COLOR_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = ColorLightControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_BLINKING_LIGHT];
+	if (obj->loaded)
+	{
+		obj->control = BlinkingLightControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_BODY_PART];
+	obj->loaded = true;
+	obj->control = ControlBodyPart;
+
+	obj = &Objects[ID_SMOKE_EMITTER_BLACK];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmokeEmitter;
+		obj->control = SmokeEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SMOKE_EMITTER_WHITE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmokeEmitter;
+		obj->control = SmokeEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_SMOKE_EMITTER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSmokeEmitter;
+		obj->control = SmokeEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_TELEPORTER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTeleporter;
+		obj->control = ControlTeleporter;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_HIGH_OBJECT1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseHighObject1;
+		obj->control = ControlHighObject1;
+		obj->collision = ObjectCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_GEN_SLOT1];
+	if (obj->loaded)
+	{
+		obj->control = GenSlot1Control;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	for (int objectNumber = ID_AI_GUARD; objectNumber <= ID_AI_X2; objectNumber++)
+	{
+		obj = &Objects[objectNumber];
+		if (obj->loaded)
+		{
+			obj->drawRoutine = nullptr;
+			obj->collision = AIPickupCollision;
+			obj->hitPoints = 0;
+		}
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)
 {
-	
+	obj = &Objects[ID_ZIPLINE_HANDLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseDeathSlide;
+		obj->collision = DeathSlideCollision;
+		obj->control = ControlDeathSlide;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_PROPELLER_H];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseVentilator;
+		obj->control = VentilatorControl;
+	}
+
+	obj = &Objects[ID_PROPELLER_V];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseVentilator;
+		obj->control = VentilatorControl;
+	}
+
+	obj = &Objects[ID_TEETH_SPIKES];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseTeethSpikes;
+		obj->control = ControlTeethSpikes;
+	}
+
+	obj = &Objects[ID_ELECTRICAL_CABLES];
+	if (obj->loaded)
+	{
+		obj->control = ElectricityWiresControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_ROME_HAMMER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseRomeHammer;
+		obj->collision = GenericSphereBoxCollision;
+		obj->control = AnimatingControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_FALLING_CEILING];
+	if (obj->loaded)
+	{
+		obj->collision = TrapCollision;
+		obj->control = FallingCeilingControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+
+	obj = &Objects[ID_ROLLINGBALL];
+	if (obj->loaded)
+	{
+		obj->collision = RollingBallCollision;
+		obj->control = RollingBallControl;
+		obj->savePosition = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_DARTS];
+	if (obj->loaded)
+	{
+		obj->shadowSize = UNIT_SHADOW / 2;
+		//obj->drawRoutine = DrawDart;
+		obj->collision = ObjectCollision;
+		obj->control = DartControl;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_DART_EMITTER];
+	if (obj->loaded)
+	{
+		obj->control = DartEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_HOMING_DART_EMITTER];
+	if (obj->loaded)
+	{
+		obj->control = DartEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->saveFlags = true;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_GEN_SLOT3];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseGenSlot3;
+		obj->collision = HybridCollision;
+		obj->control = AnimatingControl;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_GEN_SLOT4];
+	if (obj->loaded)
+	{
+		//obj->initialise = InitialiseGenSlot4;
+		//obj->control = GenSlot4Control;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+	}
+}
+
+static void StartSwitch(ObjectInfo* obj)
+{
+	obj = &Objects[ID_COG_SWITCH];
+	if (obj->loaded)
+	{
+		obj->collision = CogSwitchCollision;
+		obj->control = CogSwitchControl;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_RAISING_COG];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseRaisingCog;
+		obj->control = RaisingCogControl;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+	}
 }
 
 static void StartShatter(ObjectInfo* obj)
@@ -856,6 +1146,9 @@ static void StartShatter(ObjectInfo* obj)
 
 static void StartProjectiles(ObjectInfo* obj)
 {
+	InitProjectile(obj, BubblesControl, ID_ENERGY_BUBBLES, true);
+	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
+	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
 	InitProjectile(obj, TorpedoControl, ID_TORPEDO);
 	InitProjectile(obj, ControlGrenade, ID_GRENADE);
 	InitProjectile(obj, ControlHarpoonBolt, ID_HARPOON);
@@ -869,9 +1162,6 @@ static void StartPickup(ObjectInfo* obj)
 		InitPickup(obj, objNumber);
 	}
 
-	InitPickup(obj, ID_GAME_PIECE1);
-	InitPickup(obj, ID_GAME_PIECE2);
-	InitPickup(obj, ID_GAME_PIECE3);
 	InitPickup(obj, ID_HAMMER_ITEM);
 	InitPickup(obj, ID_CROWBAR_ITEM);
 	InitPickup(obj, ID_PISTOLS_ITEM);
@@ -918,6 +1208,7 @@ void InitialiseTR5Objects()
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartPickup(objToInit);
+	StartSwitch(objToInit);
 	StartShatter(objToInit);
 	StartProjectiles(objToInit);
 }

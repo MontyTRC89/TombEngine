@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr1_doppelganger.h"
 #include "box.h"
 #include "items.h"
 #include "larafire.h"

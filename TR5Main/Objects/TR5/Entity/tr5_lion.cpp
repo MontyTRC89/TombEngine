@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_lion.h"
-#include "global.h"
+
 #include "items.h"
 #include "effect2.h"
 #include "effect.h"
@@ -11,8 +11,8 @@
 #include "level.h"
 #include "lara.h"
 
-BITE_INFO LionBite1 = { 0xFFFFFFFE, 0xFFFFFFF6, 0xFA, 0x15 };
-BITE_INFO LionBite2 = { 0xFFFFFFFE, 0xFFFFFFF6, 0x84, 0x15 };
+BITE_INFO LionBite1 = { -2, -10, 250, 21 };
+BITE_INFO LionBite2 = { -2, -10, 132, 21 };
 
 void InitialiseLion(short itemNum)
 {

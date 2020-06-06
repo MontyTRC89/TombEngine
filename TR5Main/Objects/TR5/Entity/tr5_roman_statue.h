@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "phd_global.h"
 
 void InitialiseRomanStatue(short itemNum);
 void RomanStatueControl(short itemNumber);

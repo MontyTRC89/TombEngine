@@ -161,6 +161,19 @@ enum INVENTORY_OBJECTS {
 	INVENTORY_TABLE_SIZE
 };
 
+typedef struct INVOBJ
+{
+	short objectNumber;
+	short yOff;
+	short scale1;
+	short yRot;
+	short xRot;
+	short zRot;
+	short flags;
+	short objectName;
+	int meshBits;
+};
+
 // Focus state
 #define INV_FOCUS_STATE_NONE		0
 #define INV_FOCUS_STATE_POPUP		1
@@ -243,13 +256,15 @@ enum INVENTORY_OBJECTS {
 
 #define INV_NUM_COMBINATIONS				22
 
-struct InventoryObject {
+struct InventoryObject
+{
 	int inventoryObject;
 	int rotation;
 	float scale;
 };
 
-struct InventoryRing {
+struct InventoryRing
+{
 	InventoryObject objects[NUM_INVENTORY_OBJECTS_PER_RING];
 	int numObjects;
 	int currentObject;
@@ -273,7 +288,8 @@ struct InventoryRing {
 	int numActions = 3;
 };
 
-struct InventoryObjectDefinition {
+struct InventoryObjectDefinition
+{
 	short objectNumber;
 	short objectName;
 	int meshBits;
@@ -293,7 +309,8 @@ struct InventoryObjectDefinition {
 	}
 };
 
-struct InventoryObjectCombination {
+struct InventoryObjectCombination
+{
 	short piece1;
 	short piece2;
 	short combinedObject;

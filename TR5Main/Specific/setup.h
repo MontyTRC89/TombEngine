@@ -1,10 +1,18 @@
 #pragma once
-
-#include "global.h"
 #include "box.h"
 #include "collide.h"
+#include "objectslist.h"
 
-struct ObjectInfo
+typedef enum HitEffectEnum
+{
+    HIT_NONE,
+    HIT_BLOOD,
+    HIT_SMOKE,
+    HIT_FRAGMENT,
+    MAX_HIT_EFFECT
+};
+
+typedef struct ObjectInfo
 {
 	short nmeshes; 
 	short meshIndex; 
@@ -17,7 +25,7 @@ struct ObjectInfo
 	function<void(ITEM_INFO* item)> drawRoutine;
 	function<void(ITEM_INFO* item)> drawRoutineExtra;
 	function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;
-	ZoneTypeEnum zoneType;
+	ZoneType zoneType;
 	short animIndex; 
 	short hitPoints; 
 	short pivotLength; 
@@ -34,25 +42,43 @@ struct ObjectInfo
 	bool semiTransparent;
 	bool waterCreature;
 	bool usingDrawAnimatingItem;
-	bool hitEffect;
+	HitEffectEnum hitEffect;
 	bool undead;
 	bool saveMesh;
-	bool unknown;
 	bool friendly;
 	bool castShadows;
 	bool isPickup;
 	bool isPuzzleHole;
-	unsigned int explodableMeshbits;
 	int meshSwapSlot;
+	DWORD explodableMeshbits;
 };
 
+typedef struct StaticInfo
+{
+	short meshNumber;
+	short flags;
+	short xMinp;
+	short xMaxp;
+	short yMinp;
+	short yMaxp;
+	short zMinp;
+	short zMaxp;
+	short xMinc;
+	short xMaxc;
+	short yMinc;
+	short yMaxc;
+	short zMinc;
+	short zMaxc;
+};
+
+#define MAX_STATICS 1000
+constexpr auto GRAVITY = 6;
+constexpr auto SWAMP_GRAVITY = 2;
+
 extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
-extern STATIC_INFO StaticObjects[NUM_STATICS];
+extern StaticInfo StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags();
-void BaddyObjects();
-void ObjectObjects();
-void TrapObjects();
 void InitialiseSpecialEffects();
 void InitialiseHair();
 void InitialiseObjects();

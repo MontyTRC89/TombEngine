@@ -2,6 +2,7 @@
 #include "Renderer11.h"
 #include "configuration.h"
 #include "winmain.h"
+#include "GameFlowScript.h"
 
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;

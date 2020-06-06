@@ -70,7 +70,7 @@ static void TriggerLaserHeadSparks(PHD_VECTOR* pos, int count, byte r, byte g, b
 			spark->yVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
 			spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
 			spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) << unk;
-			spark->flags = 0;
+			spark->flags = SP_NONE;
 			spark->maxYvel = 0;
 			spark->friction = 34 << unk;
 		}

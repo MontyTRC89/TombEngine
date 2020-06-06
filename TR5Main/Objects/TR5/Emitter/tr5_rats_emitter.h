@@ -1,7 +1,7 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 
-#define NUM_RATS 32
+constexpr auto NUM_RATS = 32;
 
 struct RAT_STRUCT
 {

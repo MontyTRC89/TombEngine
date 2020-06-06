@@ -1,7 +1,26 @@
 #pragma once
-#include "global.h"
+#include "items.h"
 #include "control.h"
 
+#define EffectFunction void(ITEM_INFO* item)
+
+struct FX_INFO
+{
+	PHD_3DPOS pos;
+	short roomNumber;
+	short objectNumber;
+	short nextFx;
+	short nextActive;
+	short speed;
+	short fallspeed;
+	short frameNumber;
+	short counter;
+	short shade;
+	short flag1;
+	short flag2;
+};
+
+extern function<EffectFunction> effect_routines[];
 extern FX_INFO* Effects;
 
 int ItemNearLara(PHD_3DPOS* pos, int radius);

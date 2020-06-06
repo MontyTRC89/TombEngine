@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "hair.h"
-#include "global.h"
+
 #include "draw.h"
 #include "laramisc.h"
 #include "lara.h"
@@ -10,8 +10,8 @@
 #include "sphere.h"
 #include "level.h"
 
-int FirstHair[2];
-HAIR_STRUCT Hairs[2][7];
+int FirstHair[HAIR_MAX];
+HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS];
 int WindAngle;
 int DWindAngle;
 int Wind;
@@ -20,11 +20,11 @@ extern GameFlow* g_GameFlow;
 
 void InitialiseHair()
 {
-	for (int h = 0; h < 2; h++)
+	for (int h = 0; h < HAIR_MAX; h++)
 	{
 		FirstHair[h] = 1;
 
-		int* bone = Bones + Objects[ID_LARA_HAIR].boneIndex;
+		int* bone = &Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 		Hairs[h][0].pos.yRot = 0;
 		Hairs[h][0].pos.xRot = -0x4000;
@@ -45,7 +45,7 @@ void InitialiseHair()
 
 void HairControl(int cutscene, int ponytail, short* framePtr)
 {
-	SPHERE sphere[5];
+	SPHERE sphere[HAIR_SPHERE];
 	ObjectInfo* object = &Objects[ID_LARA];
 	short* frame;
 	int spaz;
@@ -106,7 +106,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
-	sphere[0].r = (int) *(objptr + 3);
+	sphere[0].r = (int) * (objptr + 3);
 
 	objptr = Lara.meshPtrs[LM_TORSO];
 	pos = { objptr[0], objptr[1], objptr[2] };
@@ -169,7 +169,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	pos.y = world.Translation().y; 
 	pos.z = world.Translation().z;
 
-	int* bone = Bones + Objects[ID_LARA_HAIR].boneIndex;
+	int* bone = &Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 	if (FirstHair[ponytail])
 	{
@@ -203,7 +203,9 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		int wh;
 
 		if (cutscene)
+		{
 			wh = NO_HEIGHT;
+		}
 		else
 		{
 			int x = LaraItem->pos.xPos + (frame[0] + frame[1]) / 2;
@@ -247,7 +249,9 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 				height = GetFloorHeight(floor, Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos);
 			}
 			else
+			{
 				height = 32767;
+			}
 
 			Hairs[ponytail][i].pos.xPos += Hairs[ponytail][i].hvel.x * 3 / 4;
 			Hairs[ponytail][i].pos.yPos += Hairs[ponytail][i].hvel.y * 3 / 4;
@@ -264,7 +268,9 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			case LW_ABOVE_WATER:
 				Hairs[ponytail][i].pos.yPos += 10;
 				if (wh != NO_HEIGHT && Hairs[ponytail][i].pos.yPos > wh)
+				{
 					Hairs[ponytail][i].pos.yPos = wh;
+				}
 				else if (Hairs[ponytail][i].pos.yPos > height)
 				{
 					Hairs[ponytail][i].pos.xPos = Hairs[ponytail][0].hvel.x;
@@ -282,7 +288,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 				break;
 			}
 
-			for (int j = 0; j < 5; j++)
+			for (int j = 0; j < HAIR_SPHERE; j++)
 			{
 				int x = Hairs[ponytail][i].pos.xPos - sphere[j].x;
 				int y = Hairs[ponytail][i].pos.yPos - sphere[j].y;

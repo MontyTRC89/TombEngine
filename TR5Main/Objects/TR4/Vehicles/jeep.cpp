@@ -297,7 +297,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 		spark->sLife = 9;
 	}
 
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;
@@ -1561,8 +1561,8 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				CreateFlare(ID_FLARE_ITEM, 0);
 				undraw_flare_meshes();
 				Lara.flareControlLeft = 0;
-				Lara.requestGunType = LG_NO_ARMS;
-				Lara.gunType = LG_NO_ARMS;
+				Lara.requestGunType = WEAPON_NONE;
+				Lara.gunType = WEAPON_NONE;
 			}
 
 			Lara.gunStatus = LG_HANDS_BUSY;
