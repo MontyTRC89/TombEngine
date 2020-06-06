@@ -2624,10 +2624,8 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	int res;
 
 	Lara.moveAngle = angle + item->pos.yRot;
-	short ang = (unsigned short) (Lara.moveAngle + ANGLE(45)) >> W2V_SHIFT;
 
-
-		switch (ang)
+		switch (GetQuadrant(Lara.moveAngle))
 		{
 		case 0:
 			z += 16;
@@ -2951,7 +2949,8 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 
 	GetLaraCollisionInfo(item, coll);
 
-	short angle = 1;
+	short angle;
+	bool result = false;
 	int edge = 0;
 	int edgeCatch = 0;
 
@@ -2985,33 +2984,12 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 			if (!(!edgeCatch || edgeCatch < 0 && !LaraTestHangOnClimbWall(item, coll)))
 			{
 				angle = item->pos.yRot;
-				if (abs(angle) > ANGLE(35))
-				{
-					if (angle < 10014 || angle > 22754)
-					{
-						if (angle >= 26397 || angle <= -26397)
-						{
-							angle = -ANGLE(180);
-						}
-						else if (angle >= -22754 && angle <= -10014)
-						{
-							angle = -ANGLE(90);
-						}
-					}
-					else
-					{
-						angle = ANGLE(90);
-					}
-				}
-				else
-				{
-					angle = 0;
-				}
+				result = SnapToQuadrant(angle, 35);
 			}
 		}
 	}
 
-	if (angle & 0x3FFF)
+	if (!result)
 	{
 		LaraSlideEdgeJump(item, coll);
 		GetLaraCollisionInfo(item, coll);
@@ -3075,8 +3053,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 		{
 			item->pos.yPos += coll->frontFloor - bounds[2];
 
-			short dir = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
-			switch (dir)
+			switch (GetQuadrant(item->pos.yRot))
 			{
 			case NORTH:
 				item->pos.zPos = (item->pos.zPos | 0x3FF) - 100;
@@ -3252,24 +3229,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				{
 					short angle = item->pos.yRot;
 
-					if (abs(angle) <= ANGLE(35))
-					{
-						angle = 0;
-					}
-					else if (angle >= ANGLE(55) && angle <= ANGLE(125))
-					{
-						angle = ANGLE(90);
-					}
-					else if (angle >= ANGLE(145) || angle <= -ANGLE(145))
-					{
-						angle = ANGLE(180);
-					}
-					else if (angle >= -ANGLE(125) && angle <= -ANGLE(55))
-					{
-						angle = -ANGLE(90);
-					}
-
-					if ((angle & 0x3FFF) == 0)
+					if (SnapToQuadrant(angle, 35))
 					{
 						ANIM_FRAME* bounds;
 
@@ -4607,31 +4567,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 			if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
 			{
 				short angle = item->pos.yRot;
-
-				if (abs(angle) > ANGLE(35))
-				{
-					if (angle >= 10014 && angle <= 22754)
-					{
-						angle = ANGLE(90);
-					}
-					else
-					{
-						if (abs(angle) >= 26397)
-						{
-							angle = -ANGLE(180);
-						}
-						else if (angle >= -22754 && angle <= -10014)
-						{
-							angle = -ANGLE(90);
-						}
-					}
-				}
-				else
-				{
-					angle = 0;
-				}
-
-				if ((angle & 0x3FFF) == 0)
+				if (SnapToQuadrant(angle, 35))
 				{
 					short* bounds;
 
@@ -5017,7 +4953,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 
 										if (!tmp)
 										{
-											switch ((unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90))
+											switch (GetQuadrant(item->pos.yRot))
 											{
 											case 0:
 												item->pos.yRot = 0;
@@ -5494,7 +5430,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	short oldYrot = item->pos.yRot;
 	int oldFrontFloor = coll->frontFloor;
 
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short angle = GetQuadrant(item->pos.yRot);
 	if (angle != NORTH && angle != SOUTH)
 	{
 		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
@@ -5649,7 +5585,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	short oldYrot = item->pos.yRot;
 	int oldFrontFloor = coll->frontFloor;
 
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short angle = GetQuadrant(item->pos.yRot);
 	if (angle != NORTH && angle != SOUTH)
 	{
 		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + SECTOR(1);
@@ -5793,7 +5729,7 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
 		return 0;
 
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short angle = GetQuadrant(item->pos.yRot);
 	switch (angle)
 	{
 	case NORTH:
@@ -5920,7 +5856,7 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	if (item->fallspeed < 0)
 		return 0;
 
-	switch ((unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90))
+	switch (GetQuadrant(item->pos.yRot))
 	{
 	case NORTH:
 	case SOUTH:
@@ -6154,7 +6090,7 @@ int TestWall(ITEM_INFO* item, int front, int right, int down)//12550, 12600 (F)
 	int y = item->pos.yPos + down;
 	int z = item->pos.zPos;
 
-	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	short angle = GetQuadrant(item->pos.yRot);
 	short roomNum = item->roomNumber;
 
 	FLOOR_INFO* floor;
@@ -6445,36 +6381,20 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	{
 		short angle = item->pos.yRot;
 		int slope = 0;
-
+		bool result;
 		if (coll->midSplitFloor)
 		{
 			if (coll->frontSplitFloor != coll->midSplitFloor)
 				return 0;
-
-			if (angle >= ANGLE(15) && angle <= ANGLE(75))
-				angle = ANGLE(45);
-			else if (angle >= ANGLE(105) && angle <= ANGLE(165))
-				angle = ANGLE(135);
-			else if (angle >= -ANGLE(165) && angle <= -ANGLE(105))
-				angle = -ANGLE(135);
-			else if (angle >= -ANGLE(75) && angle <= -ANGLE(15))
-				angle = -ANGLE(45);
+			result = SnapToDiagonal(angle, 30);
 		}
 		else
 		{
-			if (angle >= -ANGLE(30) && angle <= ANGLE(30))
-				angle = 0;
-			else if (angle >= ANGLE(60) && angle <= ANGLE(120))
-				angle = ANGLE(90);
-			else if (angle >= ANGLE(150) || angle <= -ANGLE(150))
-				angle = ANGLE(180);
-			else if (angle >= -ANGLE(120) && angle <= -ANGLE(60))
-				angle = -ANGLE(90);
-
+			result = SnapToQuadrant(angle, 30);
 			slope = abs(coll->leftFloor2 - coll->rightFloor2) >= 60;
 		}
 
-		if (angle & 0x1FFF)
+		if (!result)
 			return 0;
 /*
 		if (coll->frontFloor >= 0 && coll->frontFloor <= -256)
@@ -6640,8 +6560,7 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		}
 		else // regular aligment
 		{
-			short dir = (unsigned short)(item->pos.yRot + ANGLE(45)) / ANGLE(90);
-			switch (dir)
+			switch (GetQuadrant(item->pos.yRot))
 			{
 			case NORTH:
 				item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD;
@@ -6921,7 +6840,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	if (hdif < 200)
 		flag = 1;
 	cdif = LaraCeilingFront(item, angle, 100, 0);
-	dir = (unsigned short) (item->pos.yRot + ANGLE(45)) / ANGLE(90);
+	dir = GetQuadrant(item->pos.yRot);
 	switch (dir)
 	{
 	case NORTH:
