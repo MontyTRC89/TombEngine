@@ -72,6 +72,22 @@ typedef struct BITE_INFO
 	int	y;
 	int	z;
 	int	meshNum;
+
+	BITE_INFO()
+	{
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
+		this->meshNum = 0;
+	}
+
+	BITE_INFO(int xpos, int ypos, int zpos, int meshNumber)
+	{
+		this->x = xpos;
+		this->y = ypos;
+		this->z = zpos;
+		this->meshNum = meshNumber;
+	}
 };
 
 typedef struct LOT_INFO
