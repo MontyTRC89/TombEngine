@@ -1687,3 +1687,42 @@ int GetOctant(short angle)
 {
 	return (unsigned short) (angle + ANGLE(22.5)) / ANGLE(45);
 }
+
+Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot)
+{
+	Vector2 vect;
+
+	int dx = (xPos % WALL_SIZE) - WALL_SIZE/2;
+	int dz = (zPos % WALL_SIZE) - WALL_SIZE/2;
+	int xGrid = xPos - dx;
+	int zGrid = zPos - dz;
+	
+	switch (splitType)
+	{
+	case SPLIT1:
+	case NOCOLF1T:
+	case NOCOLF1B:
+		xPos = xGrid + (dx - dz) / 2;
+		zPos = zGrid - (dx - dz) / 2;
+		break;
+	case SPLIT2:
+	case NOCOLF2T:
+	case NOCOLF2B:
+		xPos = xGrid + (dx + dz) / 2;
+		zPos = zGrid + (dx + dz) / 2;
+		break;
+	default:
+		break;
+	}
+
+	if (splitType)
+	{
+		xPos -= int(radius * sin(TO_RAD(yRot)));
+		zPos -= int(radius * cos(TO_RAD(yRot)));
+	}
+
+	vect.x = xPos;
+	vect.y = zPos;
+
+	return vect;
+}
