@@ -55,9 +55,6 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 	// Collect all the rooms where to check
 	GetRoomList(roomNumber, roomList, &numRooms);
 
-	if (numRooms <= 0)
-		return 0;
-
 	for (int i = 0; i < numRooms; i++)
 	{
 		room = &Rooms[roomList[i]];
@@ -71,37 +68,14 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 
 			int yMin = mesh->y + sInfo->xMinc;
 			int yMax = mesh->y + sInfo->yMaxc;
-			short yRot = mesh->yRot;
 
-			if (yRot == ANGLE(180))
-			{
-				xMin = mesh->x - sInfo->xMaxc;
-				xMax = mesh->x - sInfo->xMinc;
-				zMin = mesh->z - sInfo->zMaxc;
-				zMax = mesh->z - sInfo->zMinc;
-			}
-			else if (yRot == -ANGLE(90))
-			{
-				xMin = mesh->x - sInfo->zMaxc;
-				xMax = mesh->x - sInfo->zMinc;
-				zMin = mesh->z + sInfo->xMinc;
-				zMax = mesh->z + sInfo->xMaxc;
-			}
-			else if (yRot == ANGLE(90))
-			{
+			array<float, 4> box{sInfo->xMinc, sInfo->zMinc, sInfo->xMaxc, sInfo->zMaxc};
+			RotateBoundingBox(box, mesh->yRot);
 
-				xMin = mesh->x + sInfo->zMinc;
-				xMax = mesh->x + sInfo->zMaxc;
-				zMin = mesh->z - sInfo->xMaxc;
-				zMax = mesh->z - sInfo->xMinc;
-			}
-			else
-			{
-				xMin = mesh->x + sInfo->xMinc;
-				xMax = mesh->x + sInfo->xMaxc;
-				zMin = mesh->z + sInfo->zMinc;
-				zMax = mesh->z + sInfo->zMaxc;
-			}
+			xMin = box[0];
+			zMin = box[1];
+			xMax = box[2];
+			zMax = box[3];
 
 			if (inXmax <= xMin
 			||  inXmin >= xMax
@@ -1725,4 +1699,28 @@ Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, shor
 	vect.y = zPos;
 
 	return vect;
+}
+
+void RotateBoundingBox(array<float, 4>& box, short angle)
+{
+	float s = sin(TO_RAD(angle));
+	float c = cos(TO_RAD(angle));
+
+	array<float, 4> x, z;
+	x[0] = box[0] * c;
+	z[0] = -box[0] * s;
+	x[1] = box[1] * s;
+	z[1] = box[1] * c;
+	x[2] = box[2] * c;
+	z[2] = -box[2] * s;
+	x[3] = box[3] * s;
+	z[3] = box[3] * c;
+
+	auto xPair = minmax_element(begin(x), end(x));
+	auto zPair = minmax_element(begin(z), end(z));
+
+	box[0] = *xPair.first;
+	box[1] = *zPair.first;
+	box[2] = *xPair.second;
+	box[3] = *zPair.second;
 }
