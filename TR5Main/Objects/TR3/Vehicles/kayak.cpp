@@ -126,7 +126,7 @@ static void TriggerRapidsMist(long x, long y, long z)
 	sptr->colFadeSpeed = 2;
 	sptr->fadeToBlack = 4;	// 8
 	sptr->sLife = sptr->life = 6 + (GetRandomControl() & 3);
-	sptr->transType = 1;
+	sptr->transType = SEMITRANS;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 	sptr->x = x + ((GetRandomControl() & 15) - 8);
@@ -1211,7 +1211,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			CreateFlare(ID_FLARE_ITEM, FALSE);
 			undraw_flare_meshes();
 			Lara.flareControlLeft = 0;
-			Lara.requestGunType = Lara.gunType = LG_NO_ARMS;
+			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
 		}
 
 		/* -------- initiate animation */

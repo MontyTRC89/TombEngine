@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 
 void ControlTonyFireBall(short fxNumber);
 void InitialiseTony(short itemNum);

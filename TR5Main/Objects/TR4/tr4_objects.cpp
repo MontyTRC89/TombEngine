@@ -22,10 +22,13 @@
 #include "tr4_troops.h" // OK
 #include "tr4_wildboar.h" // OK
 #include "tr4_wraith.h" // OFF
+#include "tr4_baboon.h" // OK
 /// objects
-
+#include "tr4_sarcophagus.h"
+/// puzzle
+#include "tr4_scales.h"
 /// switch
-#include "tr4_cog.h"
+
 /// traps
 #include "tr4_birdblade.h"
 #include "tr4_blade.h"
@@ -41,12 +44,15 @@
 #include "tr4_spikywall.h"
 #include "tr4_spikyceiling.h"
 #include "tr4_stargate.h"
+#include "tr4_cog.h"
+#include "tr4_laradouble.h"
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
 
 /// necessary import
 #include "collide.h"
+#include "objects.h"
 #include "setup.h"
 #include "level.h"
 
@@ -465,25 +471,74 @@ static void StartBaddy(ObjectInfo* obj)
 	obj = &Objects[ID_BABOON_NORMAL];
 	if (obj->loaded)
 	{
-
+		obj->initialise = InitialiseBaboon;
+		obj->control = BaboonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 200;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
 	}
 
 	obj = &Objects[ID_BABOON_INV];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseBaboon;
+		obj->control = BaboonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 200;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
 
+		if (Objects[ID_BABOON_NORMAL].loaded)
+			Objects[ID_BABOON_INV].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 	}
 
 	obj = &Objects[ID_BABOON_SILENT];
 	if (obj->loaded)
 	{
+		obj->initialise = InitialiseBaboon;
+		obj->control = BaboonControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 30;
+		obj->pivotLength = 200;
+		obj->radius = 256;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveHitpoints = true;
+		obj->savePosition = true;
+		obj->hitEffect = HIT_BLOOD;
 
+		if (Objects[ID_BABOON_NORMAL].loaded)
+			Objects[ID_BABOON_SILENT].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
 	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
-
+	obj = &Objects[ID_SARCOPHAGUS];
+	if (obj->loaded)
+	{
+		obj->control = AnimatingControl;
+		obj->collision = SarcophagusCollision;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)
@@ -615,6 +670,32 @@ static void StartTrap(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->saveFlags = true;
 	}
+
+	obj = &Objects[ID_COG];
+	if (obj->loaded)
+	{
+		obj->control = CogControl;
+		obj->collision = GenericSphereBoxCollision;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+	}
+
+	obj = &Objects[ID_LARA_DOUBLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLaraDouble;
+		obj->control = LaraDoubleControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = 128;
+		obj->hitPoints = 1000;
+		obj->pivotLength = 50;
+		obj->radius = 128;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
 }
 
 static void StartVehicles(ObjectInfo* obj)
@@ -644,14 +725,7 @@ static void StartVehicles(ObjectInfo* obj)
 
 static void StartSwitch(ObjectInfo* obj)
 {
-	obj = &Objects[ID_COG];
-	if (obj->loaded)
-	{
-		obj->control = CogControl;
-		obj->collision = GenericSphereBoxCollision;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
+	
 }
 
 static ObjectInfo* objToInit;

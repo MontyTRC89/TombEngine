@@ -1,6 +1,6 @@
 #pragma once
 
-#include "global.h"
+
 #include "Lara.h"
 
 void _cdecl lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll);

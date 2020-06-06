@@ -47,7 +47,7 @@ void InitialiseSpearGuardian(short itemNum)
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
 
-	//item->status = ITEM_INACTIVE;
+	//item->status = ITEM_NOT_ACTIVE;
 	//item->meshBits = 0;
 }
 
@@ -82,7 +82,7 @@ void SpearGuardianControl(short itemNum)
 			item->objectNumber = ID_SPEAR_GUARDIAN;
 			DisableBaddieAI(itemNum);
 			KillItem(itemNum);
-			item->status = ITEM_DEACTIVATED;
+			item->status = ITEM_DESACTIVATED;
 			item->flags |= ONESHOT;
 			*/
 		}

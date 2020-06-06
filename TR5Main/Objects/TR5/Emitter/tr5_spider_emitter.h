@@ -1,7 +1,7 @@
 #pragma once
-#include "types.h"
+#include "items.h"
 
-#define NUM_SPIDERS 64
+constexpr auto NUM_SPIDERS = 64;
 
 struct SPIDER_STRUCT
 {

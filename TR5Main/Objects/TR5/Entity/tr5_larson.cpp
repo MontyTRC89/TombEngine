@@ -138,7 +138,7 @@ void LarsonControl(short itemNumber)
 			item->gravityStatus = false;
 			item->hitStatus = false;
 			item->collidable = false;
-			item->status = ITEM_DEACTIVATED;
+			item->status = ITEM_DESACTIVATED;
 			creature->flags = 0;
 		}*/
 
@@ -408,7 +408,7 @@ void LarsonControl(short itemNumber)
 			item->gravityStatus = false;
 			item->hitStatus = false;
 			item->collidable = false;
-			item->status = ITEM_INACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 			item->triggerFlags = 0;
 		}
 		else

@@ -42,6 +42,7 @@
 #include <zlib.h>
 #include "bass.h"
 #include "bass_fx.h"
+#include "sol.hpp"
 
 using namespace std;
 using namespace DirectX;

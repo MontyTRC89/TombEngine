@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "flmtorch.h"
-#include "global.h"
+
 #include "effect2.h"
 #include "laraflar.h"
 #include "lara.h"
@@ -32,7 +32,7 @@ void TriggerTorchFlame(char fxObj, char node)
 	spark->dG = (GetRandomControl() & 0x3F) + -128;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 12;
-	spark->transType = 2;
+	spark->transType = COLADD;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
 	spark->y = 0;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -80,7 +80,7 @@ void DoFlameTorch() // (F) (D)
 			&& LaraItem->currentAnimState != STATE_LARA_JUMP_RIGHT
 			|| Lara.waterStatus == LW_UNDERWATER)
 		{
-			Lara.leftArm.lock = 1;
+			Lara.leftArm.lock = true;
 			Lara.leftArm.frameNumber = 1;
 			Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 1;
 			if (Lara.waterStatus == LW_UNDERWATER)
@@ -92,7 +92,7 @@ void DoFlameTorch() // (F) (D)
 	case 1:
 		if (Lara.leftArm.frameNumber < 12 && LaraItem->gravityStatus)
 		{
-			Lara.leftArm.lock = 0;
+			Lara.leftArm.lock = false;
 			Lara.leftArm.frameNumber = 0;
 			Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 		}
@@ -103,7 +103,7 @@ void DoFlameTorch() // (F) (D)
 			{
 				Lara.litTorch = false;
 				Lara.flareControlLeft = false;
-				Lara.leftArm.lock = 0;
+				Lara.leftArm.lock = false;
 				Lara.gunType = Lara.lastGunType;
 				Lara.requestGunType = WEAPON_NONE;
 				Lara.gunStatus = LG_NO_ARMS;
@@ -123,7 +123,7 @@ void DoFlameTorch() // (F) (D)
 		{
 			Lara.litTorch = false;
 			Lara.flareControlLeft = false;
-			Lara.leftArm.lock = 0;
+			Lara.leftArm.lock = false;
 			Lara.lastGunType = WEAPON_NONE;
 			Lara.gunType = WEAPON_NONE;
 			Lara.gunStatus = LG_NO_ARMS;
@@ -137,7 +137,7 @@ void DoFlameTorch() // (F) (D)
 	case 3:
 		if (LaraItem->currentAnimState != STATE_LARA_MISC_CONTROL)
 		{
-			Lara.leftArm.lock = 0;
+			Lara.leftArm.lock = false;
 			Lara.leftArm.frameNumber = 0;
 			Lara.flareControlLeft = true;
 			Lara.litTorch = LaraItem->itemFlags[3] & 1;
@@ -184,7 +184,7 @@ void GetFlameTorch() // (F) (D)
 	Lara.flareControlLeft = true;
 	Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 	Lara.gunStatus = LG_READY;
-	Lara.leftArm.lock = 0;
+	Lara.leftArm.lock = false;
 	Lara.leftArm.frameNumber = 0;
 	Lara.leftArm.frameBase = Anims[Lara.leftArm.animNumber].framePtr;
 	LARA_MESHES(ID_LARA_TORCH_ANIM, LM_LHAND);
@@ -229,21 +229,21 @@ void TorchControl(short itemNumber) // (F) (D)
 	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 	if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
 	{
-		coll.enableBaddiePush = true;
+		lara_coll.enableBaddiePush = true;
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)
-				ObjectCollision(CollidedItems[0] - Items, item, &coll);
+				ObjectCollision(CollidedItems[0] - Items, item, &lara_coll);
 		}
 		else
 		{
-			STATIC_INFO* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
+			StaticInfo* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
 			PHD_3DPOS pos;
 			pos.xPos = CollidedMeshes[0]->x;
 			pos.yPos = CollidedMeshes[0]->y;
 			pos.zPos = CollidedMeshes[0]->z;
 			pos.yRot = CollidedMeshes[0]->yRot;
-			ItemPushLaraStatic(item, &sobj->xMinc, &pos, &coll);
+			ItemPushLaraStatic(item, &sobj->xMinc, &pos, &lara_coll);
 		}
 		item->speed >>= 1;
 	}

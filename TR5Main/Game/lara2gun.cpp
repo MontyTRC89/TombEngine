@@ -12,6 +12,14 @@
 #include "sound.h"
 #include "savegame.h"
 
+struct PISTOL_DEF
+{
+	short objectNum;
+	char draw1Anim2;
+	char draw1Anim;
+	char draw2Anim;
+	char recoilAnim;
+};
 PISTOL_DEF PistolsTable[4] =
 {
 	{ ID_LARA, 0, 0, 0, 0 },
@@ -56,7 +64,7 @@ void AnimatePistols(int weaponType)
 			}
 
 			GetLaraJointPosition(&pos, LM_LHAND);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, (byte)0, SmokeWeapon, SmokeCountL);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
 		}
 
 		if (SmokeCountR)
@@ -83,7 +91,7 @@ void AnimatePistols(int weaponType)
 			}
 
 			GetLaraJointPosition(&pos, LM_RHAND);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, (byte)0, SmokeWeapon, SmokeCountR);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountR);
 		}
 	}
 
@@ -103,7 +111,7 @@ void AnimatePistols(int weaponType)
 					angleRight[0] = Lara.rightArm.yRot + LaraItem->pos.yRot;
 					angleRight[1] = Lara.rightArm.xRot;
 
-					if (FireWeapon(weaponType, Lara.target, LaraItem, angleRight))
+					if (FireWeapon(weaponType, Lara.target, LaraItem, angleRight) != FW_NOAMMO)
 					{
 						SmokeCountR = 28;
 						SmokeWeapon = weaponType;
@@ -173,7 +181,7 @@ void AnimatePistols(int weaponType)
 				angleLeft[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
 				angleLeft[1] = Lara.leftArm.xRot;
 
-				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft))
+				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft) != FW_NOAMMO)
 				{
 					if (weaponType == WEAPON_REVOLVER)
 					{
@@ -366,9 +374,9 @@ void ready_pistols(int weaponType)
 	Lara.rightArm.xRot = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.leftArm.frameNumber = 0;
-	Lara.target = NULL;
-	Lara.rightArm.lock = 0;
-	Lara.leftArm.lock = 0;
+	Lara.target = nullptr;
+	Lara.rightArm.lock = false;
+	Lara.leftArm.lock = false;
 	Lara.rightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 	Lara.leftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 }
@@ -443,8 +451,8 @@ void undraw_pistols(int weaponType)
 		Lara.leftArm.frameNumber = 0;
 		Lara.rightArm.frameNumber = 0;
 		Lara.target = NULL;
-		Lara.rightArm.lock = 0;
-		Lara.leftArm.lock = 0;
+		Lara.rightArm.lock = false;
+		Lara.leftArm.lock = false;
 	}
 
 	if (!(TrInput & IN_LOOK))
