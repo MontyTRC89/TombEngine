@@ -330,14 +330,11 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		return 0;
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS READY-
-	EnableCrawlFlexWaterPullUp = true;
-	EnableCrawlFlexSubmerged = true;
+	EnableCrawlFlexWaterPullUp = false;
+	EnableCrawlFlexSubmerged = false;
 
 
-	if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60 
-		|| Lara.gunStatus 
-		&& (Lara.gunStatus != LG_READY 
-			|| Lara.gunType != WEAPON_FLARE))
+	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
 		return 0;
 
 	if (coll->frontCeiling > 0)
@@ -352,40 +349,57 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 		return 0;
 
 	short rot = item->pos.yRot;
-	if (!SnapToQuadrant(rot, 35))
-		return 0;
+	int slope = 0;
+	bool result;
 
-	item->pos.yPos += coll->frontFloor + 695;
-	
-	UpdateLaraRoom(item, -381);
-
-	if (rot > 0)
+	if (coll->midSplitFloor)
 	{
-		if (rot == ANGLE(90))
-		{
-			item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) + 1124;
-		}
-	}
-	else if (rot)
-	{
-		if (rot == ANGLE(180))
-		{
-			item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) - 100;
-		}
-		else if (rot == -ANGLE(90))
-		{
-			item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) - 100;
-		}
+		result = SnapToDiagonal(rot, 35);
 	}
 	else
 	{
-		item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 1124;
+		if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60)
+			return 0;
+
+		result = SnapToQuadrant(rot, 35);
 	}
 
+	if (!result)
+		return 0;
+
+	item->pos.yPos += frontFloor - 5;
+
+	UpdateLaraRoom(item, -LARA_HITE / 2);
+
+	if (coll->midSplitFloor)
+	{
+		Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, -LARA_RAD, item->pos.yRot);
+		item->pos.xPos = v.x;
+		item->pos.zPos = v.y;
+	}
+	else
+	{
+		int dir = (unsigned short)(rot + ANGLE(45)) / ANGLE(90);
+		switch (dir)
+		{
+		case NORTH:
+			item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + WALL_SIZE + LARA_RAD;
+			break;
+		case EAST:
+			item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + WALL_SIZE + LARA_RAD;
+			break;
+		case SOUTH:
+			item->pos.zPos = (item->pos.zPos & -WALL_SIZE) - LARA_RAD;
+			break;
+		case WEST:
+			item->pos.xPos = (item->pos.xPos & -WALL_SIZE) - LARA_RAD;
+			break;
+		}
+	}
 
 	if (frontFloor <= -256)
 	{
-		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
+		if ((LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
 		{
 			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK;
 			item->frameNumber = Anims[item->animNumber].frameBase;
@@ -400,7 +414,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	}
 	else if (frontFloor > 128)
 	{
-		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexSubmerged == true)
+		if ((LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512) && EnableCrawlFlexSubmerged == true)
 		{
 			item->animNumber = ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL;
 			item->frameNumber = Anims[item->animNumber].frameBase;
@@ -413,7 +427,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 
 	else
 	{
-		if ((LaraCeilingFront(item, item->pos.yRot, 256, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
+		if ((LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
 		{
 			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK;
 			item->frameNumber = Anims[item->animNumber].frameBase;
@@ -425,10 +439,10 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 			item->frameNumber = Anims[item->animNumber].frameBase;
 			item->goalAnimState = STATE_LARA_STOP;
 		}
-		
+
 
 	}
-	
+
 	item->currentAnimState = STATE_LARA_ONWATER_EXIT;
 	item->pos.yRot = rot;
 	Lara.gunStatus = LG_HANDS_BUSY;
