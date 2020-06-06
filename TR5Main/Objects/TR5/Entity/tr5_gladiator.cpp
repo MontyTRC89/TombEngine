@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr5_gladiator.h"
 #include "items.h"
 #include "box.h"
 #include "sphere.h"

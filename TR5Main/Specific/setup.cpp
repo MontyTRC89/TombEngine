@@ -20,14 +20,15 @@
 #include "traps.h"
 #include "flmtorch.h"
 #include "level.h"
-#include "oldobjects.h"
-#include "newobjects.h"
+#include "tr4_bubbles.h"
+/// objects initializer
 #include "tr1_objects.h"
 #include "tr2_objects.h"
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
-#include "ObjectsUtils.h"
+/// register objects
+#include "object_helper.h"
 
 extern byte SequenceUsed[6];
 extern byte SequenceResults[3][3][3];
@@ -35,58 +36,20 @@ extern byte Sequences[3];
 extern byte CurrentSequence;
 extern int NumRPickups;
 
-extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
-extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
-extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
-extern DRIP_STRUCT Drips[MAX_DRIPS];
-extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
-extern SPARKS Sparks[MAX_SPARKS];
-extern SPLASH_STRUCT Splashes[MAX_SPLASH];
-extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-
 ObjectInfo Objects[ID_NUMBER_OBJECTS];
-STATIC_INFO StaticObjects[NUM_STATICS];
+StaticInfo StaticObjects[MAX_STATICS];
 
-void NewObjects()
+void InitialiseGameFlags()
 {
-	ObjectInfo* obj;
+	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
+	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
 
-	obj = &Objects[ID_SARCOPHAGUS];
-	if (obj->loaded)
-	{
-		obj->control = AnimatingControl;
-		obj->collision = SarcophagusCollision;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_LARA_DOUBLE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseLaraDouble;
-		obj->control = LaraDoubleControl;
-		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
-		obj->hitPoints = 1000;
-		obj->pivotLength = 50;
-		obj->radius = 128;
-		obj->intelligent = true;
-		obj->savePosition = true;
-		obj->saveHitpoints = true;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
+	FlipEffect = -1;
+	FlipStatus = 0;
+	IsAtmospherePlaying = 0;
+	Camera.underwater = 0;
 }
 
-void BaddyObjects()
-{
-	
-}
-
-// TODO: add the flags
 void ObjectObjects()
 {
 	ObjectInfo* obj;
@@ -319,14 +282,7 @@ void ObjectObjects()
 		obj->saveAnim = true;
 	}
 
-	obj = &Objects[ID_COG_SWITCH];
-	if (obj->loaded)
-	{
-		obj->collision = CogSwitchCollision;
-		obj->control = CogSwitchControl;
-		obj->saveFlags = true;
-		obj->saveAnim = true;
-	}
+	
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];
 	if (obj->loaded)
@@ -488,71 +444,6 @@ void ObjectObjects()
 		obj->saveFlags = true;
 	}
 
-	
-
-	obj = &Objects[ID_TWOBLOCK_PLATFORM];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTwoBlocksPlatform;
-		obj->control = TwoBlocksPlatformControl;
-		obj->floor = TwoBlocksPlatformFloor;
-		obj->ceiling = TwoBlocksPlatformCeiling;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_RAISING_COG];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseRaisingCog;
-		obj->control = RaisingCogControl;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-		obj->saveAnim = true;
-	}
-
-	obj = &Objects[ID_ELECTRICAL_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = ElectricalLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_PULSE_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = PulseLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_STROBE_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = StrobeLightControl;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_COLOR_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = ColorLightControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_BLINKING_LIGHT];
-	if (obj->loaded)
-	{
-		obj->control = BlinkingLightControl;
-		obj->saveFlags = true;
-	}
-
 	for (int objNum = ID_KEY_HOLE1; objNum <= ID_KEY_HOLE16; objNum++)
 	{
 		InitKeyHole(obj, objNum);
@@ -656,20 +547,6 @@ void ObjectObjects()
 		obj->savePosition = true;
 	}
 
-	/*obj = &Objects[ID_XRAY_CONTROLLER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseXRayMachine;
-		obj->control = ControlXRayMachine;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-	}*/
-
-	// by default loaded, explosion time :D
-	obj = &Objects[ID_BODY_PART];
-	obj->loaded = true;
-	obj->control = ControlBodyPart;
-
 	obj = &Objects[ID_EARTHQUAKE];
 	if (obj->loaded)
 	{
@@ -684,57 +561,12 @@ void ObjectObjects()
 		obj->control = HighObject2Control;
 	}
 
-	for (int objNum = ID_RAISING_BLOCK1; objNum <= ID_RAISING_BLOCK4; objNum++)
-	{
-		obj = &Objects[objNum];
-		if (obj->loaded)
-		{
-			obj->initialise = InitialiseRaisingBlock;
-			obj->control = ControlRaisingBlock;
-			obj->saveFlags = true;
-		}
-	}
-
-	obj = &Objects[ID_SMOKE_EMITTER_BLACK];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSmokeEmitter;
-		obj->control = SmokeEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SMOKE_EMITTER_WHITE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSmokeEmitter;
-		obj->control = SmokeEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_SMOKE_EMITTER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseSmokeEmitter;
-		obj->control = SmokeEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->usingDrawAnimatingItem = false;
-		obj->saveFlags = true;
-	}
-
 	obj = &Objects[ID_LENS_FLARE];
 	if (obj->loaded)
 	{
 		//obj->drawRoutine = DrawLensFlare;
 		obj->saveFlags = true;
 	}
-
-	InitProjectile(obj, BubblesControl, ID_ENERGY_BUBBLES, true);
-	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
-	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
 
 	obj = &Objects[ID_WATERFALLMIST];
 	if (obj->loaded)
@@ -781,59 +613,11 @@ void ObjectObjects()
 			obj->saveMesh = true;
 		}
 	}
-
-	obj = &Objects[ID_TELEPORTER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTeleporter;
-		obj->control = ControlTeleporter;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-	}
 }
 
 void TrapObjects()
 {
 	ObjectInfo* obj;
-
-	obj = &Objects[ID_ELECTRICAL_CABLES];
-	if (obj->loaded)
-	{
-		obj->control = ElectricityWiresControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_ROME_HAMMER];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseRomeHammer;
-		obj->collision = GenericSphereBoxCollision;
-		obj->control = AnimatingControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_ZIPLINE_HANDLE];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseDeathSlide;
-		obj->collision = DeathSlideCollision;
-		obj->control = ControlDeathSlide;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_ROLLINGBALL];
-	if (obj->loaded)
-	{
-		obj->collision = RollingBallCollision;
-		obj->control = RollingBallControl;
-		obj->savePosition = true;
-		obj->saveFlags = true;
-	}
-
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (obj->loaded)
 	{
@@ -842,16 +626,6 @@ void TrapObjects()
 		obj->hitPoints = 0;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_FALLING_CEILING];
-	if (obj->loaded)
-	{
-		obj->collision = TrapCollision;
-		obj->control = FallingCeilingControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_FALLING_BLOCK];
@@ -876,34 +650,6 @@ void TrapObjects()
 		obj->ceiling = FallingBlockCeiling;
 		obj->saveFlags = true;
 		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_DARTS];
-	if (obj->loaded)
-	{
-		obj->shadowSize = UNIT_SHADOW / 2;
-		//obj->drawRoutine = DrawDart;
-		obj->collision = ObjectCollision;
-		obj->control = DartControl;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_DART_EMITTER];
-	if (obj->loaded)
-	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_HOMING_DART_EMITTER];
-	if (obj->loaded)
-	{
-		obj->control = DartEmitterControl;
-		obj->drawRoutine = nullptr;
-		obj->saveFlags = true;
-		obj->usingDrawAnimatingItem = false;
 	}
 
 	// Flame is always loaded
@@ -946,14 +692,6 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_GEN_SLOT1];
-	if (obj->loaded)
-	{
-		obj->control = GenSlot1Control;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
 	obj = &Objects[ID_GEN_SLOT2];
 	if (obj->loaded)
 	{
@@ -962,36 +700,6 @@ void TrapObjects()
 		obj->drawRoutine = DrawGenSlot2;*/
 		obj->usingDrawAnimatingItem = false;
 		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_GEN_SLOT3];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseGenSlot3;
-		obj->collision = HybridCollision;
-		obj->control = AnimatingControl;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-	}
-
-	obj = &Objects[ID_GEN_SLOT4];
-	if (obj->loaded)
-	{
-		//obj->initialise = InitialiseGenSlot4;
-		//obj->control = GenSlot4Control;
-		obj->saveAnim = true;
-		obj->saveFlags = true;
-		obj->savePosition = true;
-	}
-
-	obj = &Objects[ID_HIGH_OBJECT1];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseHighObject1;
-		obj->control = ControlHighObject1;
-		obj->collision = ObjectCollision;
-		obj->saveFlags = true;
-		obj->savePosition = true;
 	}
 
 	obj = &Objects[ID_PORTAL];
@@ -1045,28 +753,6 @@ void TrapObjects()
 		obj->saveFlags = true;
 		obj->savePosition = true;
 	}
-
-	obj = &Objects[ID_PROPELLER_H];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseVentilator;
-		obj->control = VentilatorControl;
-	}
-
-	obj = &Objects[ID_PROPELLER_V];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseVentilator;
-		obj->control = VentilatorControl;
-	}
-
-	obj = &Objects[ID_TEETH_SPIKES];
-	if (obj->loaded)
-	{
-		obj->initialise = InitialiseTeethSpikes;
-		obj->control = ControlTeethSpikes;
-		//obj->drawRoutine = DrawScaledSpike;
-	}
 }
 
 void InitialiseSpecialEffects()
@@ -1080,7 +766,7 @@ void InitialiseSpecialEffects()
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
-	memset(&Splashes, 0, MAX_SPLASH * sizeof(SPLASH_STRUCT));
+	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));
 	memset(&Drips, 0, MAX_DRIPS * sizeof(DRIP_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
@@ -1104,9 +790,7 @@ void InitialiseSpecialEffects()
 
 void CustomObjects()
 {
-	BaddyObjects();
-	ObjectObjects();
-	TrapObjects();
+	
 }
 
 void InitialiseObjects()
@@ -1153,9 +837,8 @@ void InitialiseObjects()
 	InitialiseTR3Objects(); // Standard TR3 objects
 	InitialiseTR4Objects(); // Standard TR4 objects
 	InitialiseTR5Objects(); // Standard TR5 objects
-
-	// New objects imported from old TRs
-	NewObjects();
+	ObjectObjects();
+	TrapObjects();
 
 	// User defined objects
 	CustomObjects();
@@ -1179,15 +862,4 @@ void InitialiseObjects()
 	SequenceUsed[5] = 0;
 
 	AllocTR5Objects();
-}
-
-void InitialiseGameFlags()
-{
-	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
-	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
-	
-	FlipEffect = -1;
-	FlipStatus = 0;
-	IsAtmospherePlaying = 0;
-	Camera.underwater = 0;
 }

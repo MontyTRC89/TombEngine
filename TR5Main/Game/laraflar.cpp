@@ -88,8 +88,8 @@ void ready_flare() // (F) (D)
 	Lara.rightArm.zRot = 0;
 	Lara.rightArm.yRot = 0;
 	Lara.rightArm.xRot = 0;
-	Lara.rightArm.lock = 0;
-	Lara.leftArm.lock = 0;
+	Lara.rightArm.lock = false;
+	Lara.leftArm.lock = false;
 	Lara.target = NULL;
 }
 
@@ -138,8 +138,8 @@ void undraw_flare() // (F) (D)
 				InitialiseNewWeapon();
 
 				Lara.target = NULL;
-				Lara.rightArm.lock = 0;
-				Lara.leftArm.lock = 0;
+				Lara.rightArm.lock = false;
+				Lara.leftArm.lock = false;
 				LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
 				Lara.flareFrame = Anims[LaraItem->animNumber].frameBase;
 				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
@@ -196,8 +196,8 @@ void undraw_flare() // (F) (D)
 
 			Lara.flareControlLeft = false;
 			Lara.target = NULL;
-			Lara.rightArm.lock = 0;
-			Lara.leftArm.lock = 0;
+			Lara.rightArm.lock = false;
+			Lara.leftArm.lock = false;
 			Lara.flareFrame = 0;
 		}
 		else if (frame2 < 21)
@@ -370,6 +370,11 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		AddActiveItem(itemNum);
 		item->status = ITEM_ACTIVE;
 	}
+}
+
+void DrawFlareInAir(ITEM_INFO* item)
+{
+	printf("DrawFlareInAir() not implemented !");
 }
 
 void DoFlareInHand(int flare_age) // (AF) (D)

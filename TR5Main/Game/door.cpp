@@ -13,13 +13,14 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include "trmath.h"
 
-PHD_VECTOR DoubleDoorPos = { 0, 0, 220 };
-PHD_VECTOR PullDoorPos = { -201, 0, 322 };
-PHD_VECTOR PushDoorPos = { 201, 0, -702 };
-PHD_VECTOR KickDoorPos = { 0, 0, -917 };
-PHD_VECTOR UnderwaterDoorPos = { -251, -540, -46 };
-PHD_VECTOR CrowbarDoorPos = { -412, 0, 256 };
+PHD_VECTOR DoubleDoorPos(0, 0, 220);
+PHD_VECTOR PullDoorPos(-201, 0, 322);
+PHD_VECTOR PushDoorPos(201, 0, -702);
+PHD_VECTOR KickDoorPos(0, 0, -917);
+PHD_VECTOR UnderwaterDoorPos(-251, -540, -46);
+PHD_VECTOR CrowbarDoorPos(-412, 0, 256);
 
 static short PushPullKickDoorBounds[12] =
 {
@@ -109,7 +110,7 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	&&  !Lara.gunStatus
 	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
-		l->pos.yRot ^= ANGLE(180);
+		l->pos.yRot ^= ANGLE(180.0f);
 		
 		if (TestLaraPosition(UnderwaterDoorBounds, item, l))
 		{
@@ -330,7 +331,7 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &Items[itemNum];
 
 	if (item->triggerFlags == 2
-	&&  item->status == ITEM_INACTIVE && !item->gravityStatus // CHECK
+	&&  item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
 	&&  ((TrInput & IN_ACTION || g_Inventory->GetSelectedObject() == ID_CROWBAR_ITEM)
 	&&  l->currentAnimState == STATE_LARA_STOP
 	&&  l->animNumber == ANIMATION_LARA_STAY_IDLE

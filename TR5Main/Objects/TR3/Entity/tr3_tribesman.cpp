@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "newobjects.h"
+#include "tr3_tribesman.h"
 #include "box.h"
 #include "effect.h"
 #include "items.h"

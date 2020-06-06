@@ -973,7 +973,7 @@ void BaddyControl(short itemNum)
 					LaraItem->speed = 2;
 					LaraItem->fallspeed = 1;
 					LaraItem->pos.yPos += (STEP_SIZE * 0.75f);
-					Lara.gunStatus = 0;
+					Lara.gunStatus = LG_NO_ARMS;
 					currentCreature->flags = 1;
 				}
 			}
