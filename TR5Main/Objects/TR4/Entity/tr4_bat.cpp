@@ -9,7 +9,6 @@
 #include "setup.h"
 #include "trmath.h"
 
-
 enum BAT_STATE
 {
 	BAT_EMPTY,
@@ -21,17 +20,9 @@ enum BAT_STATE
 	BAT_IDLE
 };
 
-enum BAT_ANIM
-{
-	ANIM_BAT_START,
-	ANIM_BAT_FLY,
-	ANIM_BAT_ATK,
-	ANIM_BAT_FALLING,
-	ANIM_BAT_HIT_FLOOR,
-	ANIM_BAT_IDLE
-};
-
 #define BAT_ANGLE ANGLE(20.0f)
+constexpr auto BAT_ANIM_FALLING = 3;
+constexpr auto BAT_ANIM_IDLE = 5;
 constexpr auto BAT_ATTACK_RANGE = SQUARE(CLICK(1));
 constexpr auto BAT_TARGETING_RANGE = SQUARE(SECTOR(5));
 constexpr auto BAT_TARGET_YPOS = SQUARE(CLICK(2) / 18);
@@ -47,7 +38,7 @@ void InitialiseBat(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 	InitialiseCreature(itemNumber);
-	item->animNumber = Objects[item->objectNumber].animIndex + ANIM_BAT_IDLE;
+	item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_IDLE;
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->goalAnimState = BAT_IDLE;
 	item->currentAnimState = BAT_IDLE;
@@ -78,7 +69,7 @@ void BatControl(short itemNumber)
         }
         else
         {
-            item->animNumber = Objects[item->objectNumber].animIndex + ANIM_BAT_FALLING;
+            item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_FALLING;
             item->frameNumber = Anims[item->animNumber].frameBase;
             item->goalAnimState = BAT_FALLING;
             item->currentAnimState = BAT_FALLING;
