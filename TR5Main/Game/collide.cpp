@@ -1675,7 +1675,7 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 	int xGrid = xPos - (xPos % WALL_SIZE);
 	int zGrid = zPos - (zPos % WALL_SIZE);
 
-	int dir = (unsigned short)(yRot) / ANGLE(90);
+	int dir = (unsigned short)(yRot + ANGLE(45)) / ANGLE(90);
 	switch (dir)
 	{
 	case NORTH:
