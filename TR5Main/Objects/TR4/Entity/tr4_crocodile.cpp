@@ -174,14 +174,12 @@ void CrocodileControl(short itemNumber)
             crocodile->LOT.step = CLICK(1);
             crocodile->LOT.drop = -CLICK(1);
             crocodile->LOT.fly = NO_FLYING;
-            CreatureUnderwater(item, CLICK(0));
         }
         else
         {
             crocodile->LOT.step = SECTOR(20);
             crocodile->LOT.drop = -SECTOR(20);
             crocodile->LOT.fly = CROC_SWIM_SPEED;
-            CreatureUnderwater(item, CLICK(1));
         }
 
         GetCreatureMood(item, &info, VIOLENT);
@@ -348,4 +346,18 @@ void CrocodileControl(short itemNumber)
     if (item->currentAnimState < WCROC_SWIM)
         CalcItemToFloorRotation(item, 2);
     CreatureAnimation(itemNumber, angle, 0);
+
+    int transitionLandAnim = obj->animIndex + CROC_ANIM_LAND_MODE;
+    int transitionWaterAnim = obj->animIndex + CROC_ANIM_SWIM_MODE;
+    if (item->animNumber != transitionLandAnim && item->animNumber != transitionWaterAnim)
+    {
+        if (item->currentAnimState >= WCROC_SWIM && item->currentAnimState <= WCROC_DIE)
+            CreatureUnderwater(item, CLICK(1));
+        else
+            CreatureUnderwater(item, CLICK(0));
+    }
+    else
+    {
+        item->pos.xRot = 0;
+    }
 }
