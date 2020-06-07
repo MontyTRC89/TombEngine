@@ -284,8 +284,14 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, function<CreatureEffectFu
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)
 {
+	FLOOR_INFO* floor;
+	short roomNumber;
+	int height;
 	int waterLevel = depth;
 	int wh = 0;
+
+	waterLevel = depth;
+	wh = 0;
 
 	if (depth < 0)
 	{
@@ -301,10 +307,6 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 
 	if (item->pos.yPos < y)
 	{
-		FLOOR_INFO* floor;
-		short roomNumber;
-		int height;
-
 		roomNumber = item->roomNumber;
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -313,14 +315,10 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 		if (y > height)
 			item->pos.yPos = height;
 
-		if (item->pos.xRot > ANGLE(2))
-		{
-			item->pos.xRot -= ANGLE(2);
-		}
+		if (item->pos.xRot > ANGLE(2.0f))
+			item->pos.xRot -= ANGLE(2.0f);
 		else if (item->pos.xRot > 0)
-		{
 			item->pos.xRot = 0;
-		}
 	}
 }
 
