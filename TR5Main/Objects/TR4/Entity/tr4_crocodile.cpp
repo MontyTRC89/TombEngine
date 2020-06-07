@@ -119,13 +119,11 @@ void CrocodileControl(short itemNumber)
 {
     ITEM_INFO* item;
     ObjectInfo* obj;
-    GAME_VECTOR transitionLand, transitionWater;
     CREATURE_INFO* crocodile;
     AI_INFO info;
     CROCODILE_BONE boneRot;
     short angle;
     short bone_angle;
-    bool nextRoomIsWater = false;
 
     item = &Items[itemNumber];
     obj = &Objects[item->objectNumber];
