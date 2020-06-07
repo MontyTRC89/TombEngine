@@ -153,6 +153,7 @@ static void UpdateRespawnedBaboon(short itemNumber)
         return;
 
     item->pos = baboon->pos;
+    // TODO: Warning: IsRoomOutside() is Empty !!
     IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
     if (item->roomNumber != IsRoomOutsideNo)
         ItemNewRoom(itemNumber, IsRoomOutsideNo);
@@ -206,8 +207,8 @@ void InitialiseBaboon(short itemNumber)
     item->goalAnimState = BABOON_SIT_IDLE;
     item->currentAnimState = BABOON_SIT_IDLE;
 
-    if (item->objectNumber == ID_BABOON_SILENT)
-        BaboonRespawn.Add(item, 2);
+    if (item->objectNumber == ID_BABOON_SILENT && item->triggerFlags != 0)
+        BaboonRespawn.Add(item, item->triggerFlags);
     else
         item->itemFlags[0] = NO_BABOON;
 }
