@@ -1657,8 +1657,39 @@ Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, shor
 
 	if (splitType)
 	{
+		yRot = floor(yRot / 16384.0f) * ANGLE(90) + ANGLE(45);
 		xPos -= int(radius * sin(TO_RAD(yRot)));
 		zPos -= int(radius * cos(TO_RAD(yRot)));
+	}
+
+	vect.x = xPos;
+	vect.y = zPos;
+
+	return vect;
+}
+
+Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
+{
+	Vector2 vect;
+
+	int xGrid = xPos - (xPos % WALL_SIZE);
+	int zGrid = zPos - (zPos % WALL_SIZE);
+
+	int dir = (unsigned short)(yRot) / ANGLE(90);
+	switch (dir)
+	{
+	case NORTH:
+		zPos = zGrid + (WALL_SIZE - 1) - radius;
+		break;
+	case EAST:
+		xPos = xGrid + (WALL_SIZE - 1) - radius;
+		break;
+	case SOUTH:
+		zPos = zGrid + radius;
+		break;
+	case WEST:
+		xPos = xGrid + radius;
+		break;
 	}
 
 	vect.x = xPos;
