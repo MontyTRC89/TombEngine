@@ -17,10 +17,10 @@
 #include "laraclmb.h"
 #include "rope.h"
 #include "health.h"
-#include "newobjects.h"
 #include "level.h"
 #include "input.h"
 #include "sound.h"
+#include "setup.h"
 
 #include "motorbike.h"
 #include "cannon.h"
@@ -5141,7 +5141,7 @@ void lara_as_all4s(ITEM_INFO* item, COLL_INFO* coll)//14970, 14A78 (F)
 
 			if (LOS(&s, &d) && item->animNumber != ANIMATION_LARA_CROUCH_TO_CRAWL_BEGIN && item->animNumber != ANIMATION_LARA_CROUCH_TO_CRAWL_CONTINUE && EnableCrawlFlex2clickE == true)
 			{
-				item->animNumber = ANIMATION_LARA_2CLICK_CRAWL_EXIT;
+				item->animNumber = ANIMATION_LARA_2_3CLICK_CRAWL_EXIT;
 				item->frameNumber = Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_MISC_CONTROL;
 				item->currentAnimState = STATE_LARA_MISC_CONTROL;
@@ -6620,25 +6620,9 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		}
 		else // regular aligment
 		{
-			short dir = (unsigned short)(item->pos.yRot + ANGLE(45)) / ANGLE(90);
-			switch (dir)
-			{
-			case NORTH:
-				item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD;
-				break;
-
-			case EAST:
-				item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - LARA_RAD;
-				break;
-
-			case SOUTH:
-				item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + LARA_RAD;
-				break;
-
-			case WEST:
-				item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD;
-				break;
-			}
+			Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
+			item->pos.xPos = v.x;
+			item->pos.zPos = v.y;
 		}
 		return 1;
 	}
