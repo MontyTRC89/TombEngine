@@ -2984,29 +2984,11 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 
 			if (!(!edgeCatch || edgeCatch < 0 && !LaraTestHangOnClimbWall(item, coll)))
 			{
-				angle = item->pos.yRot;
 				if (coll->midSplitFloor && coll->frontSplitFloor == coll->midSplitFloor)
-				{
-					if (angle >= ANGLE(10) && angle <= ANGLE(80))
-						angle = ANGLE(45);
-					else if (angle >= ANGLE(100) && angle <= ANGLE(170))
-						angle = ANGLE(135);
-					else if (angle >= -ANGLE(170) && angle <= -ANGLE(100))
-						angle = -ANGLE(135);
-					else if (angle >= -ANGLE(75) && angle <= -ANGLE(15))
-						angle = -ANGLE(45);
-				}
+					SnapToDiagonal(item->pos.yRot, 35);
 				else
-				{
-					if (angle >= -ANGLE(35) && angle <= ANGLE(35))
-						angle = 0;
-					else if (angle >= ANGLE(55) && angle <= ANGLE(125))
-						angle = ANGLE(90);
-					else if (angle >= ANGLE(145) || angle <= -ANGLE(145))
-						angle = ANGLE(180);
-					else if (angle >= -ANGLE(125) && angle <= -ANGLE(55))
-						angle = -ANGLE(90);
-				}
+					SnapToQuadrant(item->pos.yRot, 35);
+				angle = item->pos.yRot;
 			}
 		}
 	}
@@ -3088,8 +3070,6 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 				item->pos.zPos = v.y;
 			}
 		}
-
-		item->pos.yRot = angle;
 
 		item->gravityStatus = true;
 		item->speed = 2;
@@ -3240,30 +3220,12 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			{
 				if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
 				{
-					short angle = item->pos.yRot;
-
 					if (coll->midSplitFloor && coll->frontSplitFloor == coll->midSplitFloor)
-					{
-						if (angle >= ANGLE(10) && angle <= ANGLE(80))
-							angle = ANGLE(45);
-						else if (angle >= ANGLE(100) && angle <= ANGLE(170))
-							angle = ANGLE(135);
-						else if (angle >= -ANGLE(170) && angle <= -ANGLE(100))
-							angle = -ANGLE(135);
-						else if (angle >= -ANGLE(75) && angle <= -ANGLE(15))
-							angle = -ANGLE(45);
-					}
+						SnapToDiagonal(item->pos.yRot, 35);
 					else
-					{
-						if (angle >= -ANGLE(35) && angle <= ANGLE(35))
-							angle = 0;
-						else if (angle >= ANGLE(55) && angle <= ANGLE(125))
-							angle = ANGLE(90);
-						else if (angle >= ANGLE(145) || angle <= -ANGLE(145))
-							angle = ANGLE(180);
-						else if (angle >= -ANGLE(125) && angle <= -ANGLE(55))
-							angle = -ANGLE(90);
-					}
+						SnapToQuadrant(item->pos.yRot, 35);
+
+					short angle = item->pos.yRot;
 
 					if (!(angle & 0x1FFF))
 					{
@@ -3313,7 +3275,6 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 							item->pos.xPos = v.x;
 							item->pos.zPos = v.y;
 						}
-						item->pos.yRot = angle;
 
 						item->gravityStatus = false;
 						item->speed = 0;
@@ -4612,32 +4573,14 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 		{
 			if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
 			{
+				if (coll->midSplitFloor && coll->midSplitFloor == coll->frontSplitFloor)
+					SnapToDiagonal(item->pos.yRot, 30);
+				else
+					SnapToDiagonal(item->pos.yRot, 30);
+
 				short angle = item->pos.yRot;
 
-				if (abs(angle) > ANGLE(35.0f))
-				{
-					if (angle >= 10014 && angle <= 22754)
-					{
-						angle = ANGLE(90.0f);
-					}
-					else
-					{
-						if (abs(angle) >= 26397)
-						{
-							angle = -ANGLE(180.0f);
-						}
-						else if (angle >= -22754 && angle <= -10014)
-						{
-							angle = -ANGLE(90.0f);
-						}
-					}
-				}
-				else
-				{
-					angle = 0;
-				}
-
-				if ((angle & 0x3FFF) == 0)
+				if (!(angle & 0x1FFF))
 				{
 					short* bounds;
 
@@ -4684,28 +4627,22 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 												item->pos.zPos += coll->shift.z;
 												@ORIGINAL_BUG: these two caused teleportation when Lara performed crawl2hang on triangulated geometry. replacing with shifts to the edges of blocks solved it*/
 
-						short angl = (unsigned short)(item->pos.yRot + ANGLE(45.0f)) / ANGLE(90.0f);
-						switch (angl)
+						if (coll->midSplitFloor)
 						{
-						case NORTH:
-							item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD;
-							break;
-
-						case EAST:
-							item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - LARA_RAD;
-							break;
-
-						case SOUTH:
-							item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + LARA_RAD;
-							break;
-
-						case WEST:
-							item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD;
-							break;
+							Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, LARA_RAD, item->pos.yRot);
+							item->pos.xPos = v.x;
+							item->pos.zPos = v.y;
+						}
+						else
+						{
+							Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot);
+							item->pos.xPos = v.x;
+							item->pos.zPos = v.y;
 						}
 					}
+
 					item->pos.yPos += coll->frontFloor - bounds[2];
-					item->pos.yRot = angle;
+					//item->pos.yRot = angle;
 
 					item->gravityStatus = true;
 					item->speed = 2;
@@ -5044,24 +4981,23 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 
 										if (!tmp)
 										{
-											switch ((unsigned short)(item->pos.yRot + ANGLE(45.0f)) / ANGLE(90.0f))
+											if (coll->midSplitFloor)
 											{
-											case 0:
-												item->pos.yRot = 0;
-												item->pos.zPos = (item->pos.zPos & 0xFFFFFC00) + 225;
-												break;
-											case 1:
-												item->pos.yRot = ANGLE(90.0f);
-												item->pos.xPos = (item->pos.xPos & 0xFFFFFC00) + 225;
-												break;
-											case 2:
-												item->pos.yRot = -ANGLE(180.0f);
-												item->pos.zPos = (item->pos.zPos | 0x3FF) - 225;
-												break;
-											case 3:
-												item->pos.yRot = -ANGLE(90.0f);
-												item->pos.xPos = (item->pos.xPos | 0x3FF) - 225;
-												break;
+												if (SnapToDiagonal(item->pos.yRot, 30))
+												{
+													Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, LARA_RAD, item->pos.yRot + ANGLE(180));
+													item->pos.xPos = v.x;
+													item->pos.zPos = v.y;
+												}
+											}
+											else
+											{
+												if (SnapToQuadrant(item->pos.yRot, 30))
+												{
+													Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot + ANGLE(180));
+													item->pos.xPos = v.x;
+													item->pos.zPos = v.y;
+												}
 											}
 
 											item->goalAnimState = STATE_LARA_CRAWL_TO_CLIMB;
@@ -5501,23 +5437,6 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	short roomNum = item->roomNumber;
 	FLOOR_INFO* floor;
 	int h, c;
-
-	/*if (angle == ANGLE(180))
-	{
-		z -= 256;
-	}
-	else if (angle == -ANGLE(90))
-	{
-		x -= 256;
-	}
-	else if (angle == ANGLE(90))
-	{
-		x += 256;
-	}
-	else if (angle == ANGLE(0))
-	{
-		z += 256;
-	}*/
 
 	z += (phd_cos(angle) * STEP_SIZE) >> W2V_SHIFT;
 	x += (phd_sin(angle) * STEP_SIZE) >> W2V_SHIFT;
@@ -6499,31 +6418,16 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			if (coll->frontSplitFloor != coll->midSplitFloor)
 				return 0;
 
-			if (angle >= ANGLE(15) && angle <= ANGLE(75))
-				angle = ANGLE(45);
-			else if (angle >= ANGLE(105) && angle <= ANGLE(165))
-				angle = ANGLE(135);
-			else if (angle >= -ANGLE(165) && angle <= -ANGLE(105))
-				angle = -ANGLE(135);
-			else if (angle >= -ANGLE(75) && angle <= -ANGLE(15))
-				angle = -ANGLE(45);
-		}
+			if (!SnapToDiagonal(item->pos.yRot, 30))
+				return 0;
+		}	
 		else
 		{
-			if (angle >= -ANGLE(30) && angle <= ANGLE(30))
-				angle = 0;
-			else if (angle >= ANGLE(60) && angle <= ANGLE(120))
-				angle = ANGLE(90);
-			else if (angle >= ANGLE(150) || angle <= -ANGLE(150))
-				angle = ANGLE(180);
-			else if (angle >= -ANGLE(120) && angle <= -ANGLE(60))
-				angle = -ANGLE(90);
+			if (!SnapToQuadrant(item->pos.yRot, 30))
+				return 0;
 
 			slope = abs(coll->leftFloor2 - coll->rightFloor2) >= 60;
 		}
-
-		if (angle & 0x1FFF)
-			return 0;
 
 		if (coll->frontFloor < 0 && coll->frontFloor >= -256)
 		{
@@ -6651,7 +6555,6 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			AnimateLara(item);
 		}
 
-		item->pos.yRot = angle;
 		ShiftItem(item, coll);
 
 		if (coll->midSplitFloor) // diagonal alignment
