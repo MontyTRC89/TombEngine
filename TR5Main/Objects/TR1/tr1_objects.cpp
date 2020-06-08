@@ -7,6 +7,7 @@
 #include "tr1_natla.h" // OK
 #include "tr1_natla_mutant.h" // OK
 #include "tr1_wolf.h" // OK
+#include "tr1_bigrat.h" // OK
 /// objects
 
 /// traps
@@ -72,6 +73,26 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_APE;
+	}
+
+	obj = &Objects[ID_BIG_RAT];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseBigRat;
+		obj->control = BigRatControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = 5;
+		obj->pivotLength = 200;
+		obj->radius = 204;
+		obj->intelligent = true;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->waterCreature = true; // dont want the rat to be killed when going in water !
+		obj->zoneType = ZONE_WATER;
+		Bones[obj->boneIndex + 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_NATLA];
