@@ -83,7 +83,8 @@ typedef enum GAME_OBJECT_ID
 	ID_WHALE,
 	ID_SMALL_DINOSAUR,		// TR3 - 34
 	ID_FISH_EMITTER,		// TR3 - 338 - OK - Needs testing and drawing
-	ID_RAT,
+	ID_RAT,					// TR2 - TR3 - OK
+	ID_BIG_RAT,				// TR1 - (Land And Water)
 	ID_CROCODILE,
 	ID_BAT,
 	ID_SPHINX,
