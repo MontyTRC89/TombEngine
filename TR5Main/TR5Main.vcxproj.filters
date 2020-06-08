@@ -726,9 +726,6 @@
     <ClInclude Include="Game\trmath.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\objectslist.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\lara_struct.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -775,6 +772,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Objects\TR4\Entity\tr4_baboon.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\objectslist.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1419,6 +1422,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR4\Entity\tr4_baboon.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
