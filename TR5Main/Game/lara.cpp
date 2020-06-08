@@ -4983,18 +4983,18 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 										{
 											if (coll->midSplitFloor)
 											{
-												if (SnapToDiagonal(item->pos.yRot, 30))
+												if (SnapToDiagonal(item->pos.yRot, 35))
 												{
-													Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, LARA_RAD, item->pos.yRot + ANGLE(180));
+													Vector2 v = GetDiagonalIntersect(item->pos.xPos, item->pos.zPos, coll->midSplitFloor, 225, item->pos.yRot + ANGLE(180));
 													item->pos.xPos = v.x;
 													item->pos.zPos = v.y;
 												}
 											}
 											else
 											{
-												if (SnapToQuadrant(item->pos.yRot, 30))
+												if (SnapToQuadrant(item->pos.yRot, 35))
 												{
-													Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, LARA_RAD, item->pos.yRot + ANGLE(180));
+													Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, 225, item->pos.yRot + ANGLE(180));
 													item->pos.xPos = v.x;
 													item->pos.zPos = v.y;
 												}
