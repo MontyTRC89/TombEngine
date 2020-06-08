@@ -1632,6 +1632,67 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 	item->pos.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
 }
 
+bool SnapToQuadrant(short& angle, int interval)
+{
+	if (abs(angle) <= ANGLE(interval))
+	{
+		angle = 0;
+		return true;
+	}
+	else if (angle >= ANGLE(90 - interval) && angle <= ANGLE(interval + 90))
+	{
+		angle = ANGLE(90);
+		return true;
+	}
+	else if (angle >= ANGLE(180 - interval) || angle <= -ANGLE(180 - interval))
+	{
+		angle = ANGLE(180);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 90) && angle <= -ANGLE(90 - interval))
+	{
+		angle = -ANGLE(90);
+		return true;
+	}
+	return false;
+}
+
+int GetQuadrant(short angle)
+{
+	return (unsigned short)(angle + ANGLE(45)) / ANGLE(90);
+}
+
+bool SnapToDiagonal(short& angle, int interval)
+{
+	if (angle >= ANGLE(45 - interval) && angle <= ANGLE(interval + 45))
+	{
+		angle = ANGLE(45);
+		return true;
+	}
+	else if (angle >= ANGLE(135 - interval) && angle <= ANGLE(interval + 135))
+	{
+		angle = ANGLE(135);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 135) && angle <= -ANGLE(135 - interval))
+	{
+		angle = -ANGLE(135);
+		return true;
+	}
+	else if (angle >= -ANGLE(interval + 45) && angle <= -ANGLE(45 - interval))
+	{
+		angle = -ANGLE(45);
+		return true;
+	}
+	return false;
+}
+
+int GetOctant(short angle)
+{
+	return (unsigned short)(angle + ANGLE(22.5)) / ANGLE(45);
+}
+
+
 Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot)
 {
 	Vector2 vect;
@@ -1700,4 +1761,28 @@ Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
 	vect.y = zPos;
 
 	return vect;
+}
+
+void RotateBoundingBox(array<float, 4>& box, short angle)
+{
+	float s = sin(TO_RAD(angle));
+	float c = cos(TO_RAD(angle));
+
+	array<float, 4> x, z;
+	x[0] = box[0] * c;
+	z[0] = -box[0] * s;
+	x[1] = box[1] * s;
+	z[1] = box[1] * c;
+	x[2] = box[2] * c;
+	z[2] = -box[2] * s;
+	x[3] = box[3] * s;
+	z[3] = box[3] * c;
+
+	auto xPair = minmax_element(begin(x), end(x));
+	auto zPair = minmax_element(begin(z), end(z));
+
+	box[0] = *xPair.first;
+	box[1] = *zPair.first;
+	box[2] = *xPair.second;
+	box[3] = *zPair.second;
 }
