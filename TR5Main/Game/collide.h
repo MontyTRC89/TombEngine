@@ -127,10 +127,15 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNumber, int objectHeight);
 void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
-void CalcItemToFloorRotation(ITEM_INFO* item, short rotY, int radiusZ, int radiusX); // new function for rotating item along XZ slopes
 bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
 int GetOctant(short angle);
-Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // finds xPos, zPos that intersects with diagonal on sector
 void RotateBoundingBox(array<float, 4>& box, short angle);
+// New function for rotating item along XZ slopes.
+// (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
+// Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).
+// Warning: dont set it to 0 !!!!
+void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
+Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // find xPos, zPos that intersects with diagonal on sector
+Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
