@@ -20,15 +20,15 @@ byte receivedWmClose = false;
 bool Debug = false;
 HWND WindowsHandle;
 int App_Unk00D9ABFD;
-extern string LuaMessage;
 extern int IsLevelLoading;
 extern GameFlow* g_GameFlow;
 extern GameScript* g_GameScript;
 extern GameConfiguration g_Configuration;
 DWORD DebugConsoleThreadID;
 DWORD MainThreadID;
+bool BlockAllInput = true;
 
-int lua_exception_handler(lua_State *L, sol::optional<const exception&> maybe_exception, sol::string_view description)
+int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
 }
@@ -75,21 +75,20 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 
 void HandleScriptMessage(WPARAM wParam)
 {
+	string ErrorMessage;
 	string message = *(string*)(wParam);
-	const string luafileSuffix(".lua");
-	//check whether line starts with "lua "
-	if (message.rfind("lua ", 0) == 0) {
-		string scriptSubstring = message.substr(4);
-		//check whether the string ends with .lua, if yes execute from file, otherwise execute directly
-		if (scriptSubstring.rfind(luafileSuffix) == (scriptSubstring.size() - luafileSuffix.size())) {
-			g_GameScript->ExecuteScript(scriptSubstring.c_str(),&LuaMessage);
-		}
-		else {
-			g_GameScript->ExecuteString(scriptSubstring.c_str(), &LuaMessage);
-		}
+	bool status;
 
+	//check whether line starts with "lua "
+	if (message.find("lua ") == 0) {
+		string scriptSubstring = message.substr(4);
+		status = g_GameScript->ExecuteScript(scriptSubstring, ErrorMessage);
 	}
-		
+	else {
+		status = g_GameScript->ExecuteString(message, ErrorMessage);
+	}
+	if (!status)
+		cout << ErrorMessage << endl;
 }
 
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -133,6 +132,8 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
+			//DB_Log(6, "WM_ACTIVE");
+			BlockAllInput = false;
 			if (!Debug)
 				ResumeThread((HANDLE)ThreadHandle);
 
@@ -142,6 +143,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
+		//DB_Log(6, "WM_INACTIVE");
+		//DB_Log(5, "HangGameThread");
+		BlockAllInput = true;
 		App_Unk00D9ABFD = 1;
 
 		if (!Debug)
@@ -307,7 +311,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			while (true)
 			{
 				BOOL success = ReadFile(params, &buffer, 4096, &read, NULL);
-				if (success)
+				if (success && read > 2)
 				{
 					//Only send the actual written message minus \r\n
 					string msg(buffer, read-2);
