@@ -34,9 +34,16 @@ private:
 	float								xPos;
 	float								yPos;
 	float								zPos;
+	function<float()>					readXPos;
+	function<void(float)>				writeXPos;
+	function<float()>					readYPos;
+	function<void(float)>				writeYPos;
+	function<float()>					readZPos;
+	function<void(float)>				writeZPos;
 
 public:
 	GameScriptPosition(float x, float y, float z);
+	GameScriptPosition(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ);
 
 	float								GetXPos();
 	void								SetXPos(float x);
@@ -51,9 +58,16 @@ private:
 	float								xRot;
 	float								yRot;
 	float								zRot;
+	function<float()>					readXRot;
+	function<void(float)>				writeXRot;
+	function<float()>					readYRot;
+	function<void(float)>				writeYRot;
+	function<float()>					readZRot;
+	function<void(float)>				writeZRot;
 
 public:
 	GameScriptRotation(float x, float y, float z);
+	GameScriptRotation(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ);
 
 	float								GetXRot();
 	void								SetXRot(float x);
@@ -71,18 +85,8 @@ private:
 public:
 	GameScriptItem(short itemNumber);
 
-	float								GetXPos();
-	void								SetXPos(float x);
-	float								GetYPos();
-	void								SetYPos(float y);
-	float								GetZPos();
-	void								SetZPos(float z);
-	float								GetXRot();
-	void								SetXRot(float x);
-	float								GetYRot();
-	void								SetYRot(float y);
-	float								GetZRot();
-	void								SetZRot(float z);
+	GameScriptPosition					GetPosition();
+	GameScriptRotation					GetRotation();
 	short								GetHP();
 	void								SetHP(short hp);
 	short								GetRoom();
@@ -127,13 +131,11 @@ private:
 	map<string, short>					m_itemsMapName;
 	vector<LuaFunction*>				m_triggers;
 
-	string								loadScriptFromFile(const char* luaFilename);
-
 public:	
 	GameScript(sol::state* lua);
 
-	bool								ExecuteScript(const char* luaFilename, string* message);
-	bool								ExecuteString(const char* command, string* message);
+	bool								ExecuteScript(const string& luaFilename, string& message);
+	bool								ExecuteString(const string& command, string& message);
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);
@@ -141,12 +143,10 @@ public:
 	void								AssignItemsAndLara();
 	void								ResetVariables();
 
-	void								GetBooleanVariables(map<string, bool>* locals, map<string, bool>* globals);
-	void								SetBooleanVariables(map<string, bool>* locals, map<string, bool>* globals);
-	void								GetNumberVariables(map<string, float>* locals, map<string, float>* globals);
-	void								SetNumberVariables(map<string, float>* locals, map<string, float>* globals);
-	void								GetStringVariables(map<string, string>* locals, map<string, string>* globals);
-	void								SetStringVariables(map<string, string>* locals, map<string, string>* globals);
+	template <typename T>
+	void								GetVariables(map<string, T>& locals, map<string, T>& globals);
+	template <typename T>
+	void								SetVariables(map<string, T>& locals, map<string, T>& globals);
 	void								PlayAudioTrack(short track);
 	void								ChangeAmbientSoundTrack(short track);
 	bool								ExecuteTrigger(short index);
@@ -160,6 +160,7 @@ public:
 	void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
 	void								PlaySoundEffect(short id, int flags);
 	GameScriptPosition					CreatePosition(float x, float y, float z);
+	GameScriptPosition					CreateSectorPosition(float x, float y, float z);
 	GameScriptRotation					CreateRotation(float x, float y, float z);
 	float								CalculateDistance(GameScriptPosition pos1, GameScriptPosition pos2);
 	float								CalculateHorizontalDistance(GameScriptPosition pos1, GameScriptPosition pos2);
