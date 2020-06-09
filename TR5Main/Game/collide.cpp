@@ -1242,25 +1242,25 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	
 	if (coll->midFloor == NO_HEIGHT)	 
 	{
-		//coll->shift.x = coll->old.x - xPos;
-		//coll->shift.y = coll->old.y - yPos;
-		//coll->shift.z = coll->old.z - zPos;
+		coll->shift.x = coll->old.x - xPos;
+		coll->shift.y = coll->old.y - yPos;
+		coll->shift.z = coll->old.z - zPos;
 		coll->collType = CT_FRONT;
 		return;
 	}
 
 	if (coll->midFloor - coll->midCeiling <= 0)
 	{
-		//coll->shift.x = coll->old.x - xPos;
-		//coll->shift.y = coll->old.y - yPos;
-		//coll->shift.z = coll->old.z - zPos;
+		coll->shift.x = coll->old.x - xPos;	 
+		coll->shift.y = coll->old.y - yPos;	 
+		coll->shift.z = coll->old.z - zPos;
 		coll->collType = CT_CLAMP;
 		return;
 	}
 
 	if (coll->midCeiling >= 0)
 	{
-		//coll->shift.y = coll->midCeiling;
+		coll->shift.y = coll->midCeiling;	
 		coll->collType = CT_TOP;
 		coll->hitCeiling = true;
 	}
@@ -1272,8 +1272,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 		if ((coll->frontType == DIAGONAL)
 			|| (coll->frontType == SPLIT_TRI))
 		{
-			//coll->shift.x = coll->old.x - xPos;
-			//coll->shift.z = coll->old.z - zPos;
+			coll->shift.x = coll->old.x - xPos; 
+			coll->shift.z = coll->old.z - zPos; 
 		}
 		else
 		{
@@ -1281,14 +1281,14 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				//coll->shift.x = coll->old.x - xPos;
-				//coll->shift.z = FindGridShift(zPos + ZFront, zPos);
+				coll->shift.x = coll->old.x - xPos;  
+				coll->shift.z = FindGridShift(zPos + ZFront, zPos); 
 				break;
 
 			case 1:
 			case 3:
-				//coll->shift.x = FindGridShift(xPos + XFront, xPos);
-				//coll->shift.z = coll->old.z - zPos;
+				coll->shift.x = FindGridShift(xPos + XFront, xPos);	 
+				coll->shift.z = coll->old.z - zPos;  
 				break;
 
 			}
@@ -1300,9 +1300,9 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 
 	if (coll->frontCeiling >= coll->badCeiling)
 	{
-		//coll->shift.x = coll->old.x - xPos;
-		//coll->shift.y = coll->old.y - yPos;
-		//coll->shift.z = coll->old.z - zPos;
+		coll->shift.x = coll->old.x - xPos; 
+		coll->shift.y = coll->old.y - yPos;
+		coll->shift.z = coll->old.z - zPos;
 		coll->collType = CT_TOP_FRONT;
 		return;
 	}
@@ -1313,8 +1313,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		if (coll->leftType == SPLIT_TRI && coll->midType == SPLIT_TRI)
 		{
-			//coll->shift.x = coll->old.x - xPos;
-			//coll->shift.z = coll->old.z - zPos;
+			coll->shift.x = coll->old.x - xPos; 
+			coll->shift.z = coll->old.z - zPos;   
 		}
 		else
 		{
@@ -1322,12 +1322,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				//coll->shift.x = FindGridShift(xPos + xleft, xPos + XFront);
+				coll->shift.x = FindGridShift(xPos + xleft, xPos + XFront);
 				break;
 
 			case 1:
 			case 3:
-				//coll->shift.z = FindGridShift(zPos + zleft, zPos + ZFront);
+				coll->shift.z = FindGridShift(zPos + zleft, zPos + ZFront);
 				break;
 			}
 		}
@@ -1367,8 +1367,8 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 	{
 		if (coll->rightType == SPLIT_TRI && coll->midType == SPLIT_TRI)
 		{
-			//coll->shift.x = coll->old.x - xPos;
-			//coll->shift.z = coll->old.z - zPos;
+			coll->shift.x = coll->old.x - xPos;   
+			coll->shift.z = coll->old.z - zPos;  
 		}
 		else
 		{
@@ -1376,12 +1376,12 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 			{
 			case 0:
 			case 2:
-				//coll->shift.x = FindGridShift(xPos + xright, xPos + XFront);
+				coll->shift.x = FindGridShift(xPos + xright, xPos + XFront);
 				break;
 
 			case 1:
 			case 3:
-				//coll->shift.z = FindGridShift(zPos + zright, zPos + ZFront);
+				coll->shift.z = FindGridShift(zPos + zright, zPos + ZFront);
 				break;
 			}
 		}
