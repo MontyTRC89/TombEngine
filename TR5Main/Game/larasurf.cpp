@@ -379,22 +379,9 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	}
 	else
 	{
-		int dir = (unsigned short)(rot + ANGLE(45)) / ANGLE(90);
-		switch (dir)
-		{
-		case NORTH:
-			item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + WALL_SIZE + LARA_RAD;
-			break;
-		case EAST:
-			item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + WALL_SIZE + LARA_RAD;
-			break;
-		case SOUTH:
-			item->pos.zPos = (item->pos.zPos & -WALL_SIZE) - LARA_RAD;
-			break;
-		case WEST:
-			item->pos.xPos = (item->pos.xPos & -WALL_SIZE) - LARA_RAD;
-			break;
-		}
+		Vector2 v = GetOrthogonalIntersect(item->pos.xPos, item->pos.zPos, -LARA_RAD, item->pos.yRot);
+		item->pos.xPos = v.x;
+		item->pos.zPos = v.y;
 	}
 
 	if (frontFloor <= -256)
