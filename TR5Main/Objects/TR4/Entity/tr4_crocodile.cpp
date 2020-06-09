@@ -7,382 +7,346 @@
 #include "setup.h"
 #include "level.h"
 #include "lara.h"
+#include "draw.h"
+#include "misc.h"
 
-BITE_INFO crocodileBite = { 0, -156, 500, 9 };
+struct CROCODILE_BONE
+{
+    short torsoY;
+    short torsoX;
+    short hipsY;
+    short hipsX;
+
+    CROCODILE_BONE()
+    {
+        this->torsoY = 0;
+        this->torsoX = 0;
+        this->hipsY = 0;
+        this->hipsX = 0;
+    }
+
+    CROCODILE_BONE(short angle)
+    {
+        this->torsoY = angle;
+        this->torsoX = angle;
+        this->hipsY = -angle;
+        this->hipsX = -angle;
+    }
+
+    CROCODILE_BONE(short torsoY, short torsoX)
+    {
+        this->torsoY = torsoY;
+        this->torsoX = torsoX;
+        this->hipsY = 0;
+        this->hipsX = 0;
+    }
+};
+
+enum CROCODILE_STATE
+{
+    CROC_EMPTY,
+    CROC_IDLE,
+    CROC_RUN,
+    CROC_WALK,
+    CROC_HIT,
+    CROC_ATK,
+    CROC_EMPTY1,
+    CROC_DIE,
+    WCROC_SWIM,
+    WCROC_ATK,
+    WCROC_DIE,
+};
+
+#define CROC_WALK_ANGLE ANGLE(3.0f)
+#define CROC_SWIM_ANGLE ANGLE(3.0f)
+#define CROC_RUN_ANGLE ANGLE(5.0f)
+
+constexpr auto CROC_ANIM_IDLE = 0;
+constexpr auto CROC_ANIM_DIE = 11;
+constexpr auto CROC_ANIM_SWIM = 12;
+constexpr auto CROC_ANIM_WDIE = 16;
+constexpr auto CROC_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
+constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
+constexpr auto CROC_RUN_RANGE = SQUARE(SECTOR(1));
+constexpr auto CROC_MAXRUN_RANGE = SQUARE(SECTOR(1) + CLICK(2));
+constexpr auto CROC_ATTACK_RANGE = SQUARE(CLICK(2)); // NOTE: TR4 is CLICK(3), but the crocodile not go near lara to do damage in certain case !
+constexpr auto CROC_SWIM_SPEED = 16;
+constexpr auto CROC_TOUCHBITS = 768;
+constexpr auto CROC_DAMAGE = 120;
+static BITE_INFO crocBite = { 0, -100, 500, 9 };
+
+// crocodile mode (land or swim) transition anim
+constexpr auto CROC_ANIM_SWIM_MODE = 17;
+constexpr auto CROC_ANIM_LAND_MODE = 18;
+
+static bool CrocodileIsInWater(ITEM_INFO* item, CREATURE_INFO* crocodile)
+{
+    EntityStoringInfo info;
+    info.x = item->pos.xPos;
+    info.y = item->pos.yPos;
+    info.z = item->pos.zPos;
+    info.roomNumber = item->roomNumber;
+    GetFloor(info.x, info.y, info.z, &info.roomNumber);
+    info.waterDepth = GetWaterSurface(info.x, info.y, info.z, info.roomNumber);
+    if (info.waterDepth != NO_HEIGHT)
+    {
+        crocodile->LOT.step = SECTOR(20);
+        crocodile->LOT.drop = -SECTOR(20);
+        crocodile->LOT.fly = CROC_SWIM_SPEED;
+        return true;
+    }
+    else
+    {
+        crocodile->LOT.step = CLICK(1);
+        crocodile->LOT.drop = -CLICK(1);
+        crocodile->LOT.fly = NO_FLYING;
+        return false;
+    }
+}
 
 void InitialiseCrocodile(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[item->objectNumber];
-	ROOM_INFO* room = &Rooms[item->roomNumber];
+    ITEM_INFO* item = &Items[itemNumber];
+    InitialiseCreature(itemNumber);
 
-	ClearItem(itemNumber);
-
-	if (room->flags & ENV_FLAG_WATER)
-	{
-		item->animNumber = obj->animIndex + 12;
-		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 8;
-		item->currentAnimState = 8;
-	}
-	else
-	{
-		item->animNumber = obj->animIndex;
-		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->goalAnimState = 1;
-		item->currentAnimState = 1;
-	}
+    // if the room is a "water room"
+    if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+    {
+        item->animNumber = Objects[item->objectNumber].animIndex + CROC_ANIM_SWIM;
+        item->frameNumber = Anims[item->animNumber].frameBase;
+        item->currentAnimState = WCROC_SWIM;
+        item->goalAnimState = WCROC_SWIM;
+    }
+    // then it's a "ground room"
+    else
+    {
+        item->animNumber = Objects[item->objectNumber].animIndex + CROC_ANIM_IDLE;
+        item->frameNumber = Anims[item->animNumber].frameBase;
+        item->currentAnimState = CROC_IDLE;
+        item->goalAnimState = CROC_IDLE;
+    }
 }
 
 void CrocodileControl(short itemNumber)
 {
-	if (!CreatureActive(itemNumber))
-		return;
+    if (!CreatureActive(itemNumber))
+        return;
 
-	ITEM_INFO* item = &Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+    ITEM_INFO* item;
+    ObjectInfo* obj;
+    CREATURE_INFO* crocodile;
+    AI_INFO info;
+    CROCODILE_BONE boneRot;
+    short angle;
+    short bone_angle;
 
-	int x = item->pos.xPos + phd_sin(item->pos.yRot) << 10 >> W2V_SHIFT;
-	int y = item->pos.yPos;
-	int z = item->pos.zPos + phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT;
+    item = &Items[itemNumber];
+    obj = &Objects[item->objectNumber];
+    crocodile = GetCreatureInfo(item);
+    angle = 0;
+    bone_angle = 0;
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int height1 = GetFloorHeight(floor, x, y, z);
+    if (item->hitPoints <= 0)
+    {
+        angle = 0;
+        bone_angle = 0;
 
-	if (abs(y - height1) > 512)
-		height1 = y;
+        if (item->currentAnimState != CROC_DIE && item->currentAnimState != WCROC_DIE)
+        {
+            // water
+            if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+            {
+                item->animNumber = obj->animIndex + CROC_ANIM_WDIE;
+                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->currentAnimState = WCROC_DIE;
+                item->goalAnimState = WCROC_DIE;
+            }
+            // land
+            else
+            {
+                item->animNumber = obj->animIndex + CROC_ANIM_DIE;
+                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->currentAnimState = CROC_DIE;
+                item->goalAnimState = CROC_DIE;
+            }
+        }
 
-	x = item->pos.xPos - phd_sin(item->pos.yRot) << 10 >> W2V_SHIFT;
-	y = item->pos.yPos;
-	z = item->pos.zPos - phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT;
+        // creature in water are floating after death.
+        if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+            CreatureFloat(itemNumber);
+    }
+    else
+    {
+        if (item->aiBits & ALL_AIOBJ)
+            GetAITarget(crocodile);
+        else if (crocodile->hurtByLara)
+            crocodile->enemy = LaraItem;
 
-	roomNumber = item->roomNumber;
-	floor = GetFloor(x, y, z, &roomNumber);
-	int height2 = GetFloorHeight(floor, x, y, z);
+        CreatureAIInfo(item, &info);
+        GetCreatureMood(item, &info, VIOLENT);
+        CreatureMood(item, &info, VIOLENT);
+        angle = CreatureTurn(item, crocodile->maximumTurn);
 
-	if (abs(y - height2) > 512)
-		height2 = y;
+        if ((item->hitStatus || info.distance < CROC_ALERT_RANGE) || (TargetVisible(item, &info) && info.distance < CROC_VISIBILITY_RANGE))
+        {
+            if (!crocodile->alerted)
+                crocodile->alerted = TRUE;
+            AlertAllGuards(itemNumber);
+        }
 
-	short at = phd_atan(2048, height2 - height1);
-	short angle = 0;
-	short joint0 = 0;
-	short joint2 = 0;
+        bone_angle = angle << 2;
+        switch (item->currentAnimState)
+        {
+        case CROC_IDLE:
+            crocodile->maximumTurn = 0;
 
-	if (item->hitPoints <= 0)
-	{
-		item->hitPoints = 0;
+            if (item->aiBits & GUARD)
+            {
+                bone_angle = item->itemFlags[0];
+                item->goalAnimState = CROC_IDLE;
+                item->itemFlags[0] = item->itemFlags[1] + bone_angle;
 
-		if (item->currentAnimState != 7 && item->currentAnimState != 10)
-		{
-			if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
-			{
-				item->animNumber = obj->animIndex + 16;
-				item->goalAnimState = 10;
-				item->frameNumber = Anims[item->animNumber].frameBase;
-				item->currentAnimState = 10;
-				item->hitPoints = -16384;
-			}
-			else
-			{
-				item->animNumber = obj->animIndex + 11;
-				item->goalAnimState = 7;
-				item->frameNumber = Anims[item->animNumber].frameBase;
-				item->currentAnimState = 7;
-			}
-		}
+                if (!(GetRandomControl() & 0x1F))
+                {
+                    if (GetRandomControl() & 1)
+                        item->itemFlags[1] = 0;
+                    else
+                        item->itemFlags[1] = (GetRandomControl() & 1) != 0 ? 12 : -12;
+                }
 
-		if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
-			CreatureFloat(itemNumber);
-	}
-	else
-	{
-		if (item->aiBits)
-			GetAITarget(creature);
-		else if (creature->hurtByLara)
-			creature->enemy = LaraItem;
+                CLAMP(item->itemFlags[0], -1024, 1024);
+            }
+            else if (info.bite && info.distance < CROC_ATTACK_RANGE)
+            {
+                item->goalAnimState = CROC_ATK;
+            }
+            else
+            {
+                if (info.ahead && info.distance < CROC_RUN_RANGE)
+                    item->goalAnimState = CROC_WALK;
+                else
+                    item->goalAnimState = CROC_RUN;
+            }
+            break;
+        case CROC_WALK:
+            crocodile->maximumTurn = CROC_WALK_ANGLE;
 
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+            // land to water transition:
+            if (CrocodileIsInWater(item, crocodile))
+            {
+                item->requiredAnimState = WCROC_SWIM;
+                item->goalAnimState = WCROC_SWIM;
+                break;
+            }
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+            if (item->requiredAnimState)
+                item->goalAnimState = item->requiredAnimState;
+            else if (info.bite && info.distance < CROC_ATTACK_RANGE)
+                item->goalAnimState = CROC_IDLE;
+            else if (!info.ahead || info.distance > CROC_MAXRUN_RANGE)
+                item->goalAnimState = CROC_RUN;
+            break;
+        case CROC_RUN:
+            crocodile->maximumTurn = CROC_RUN_ANGLE;
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+            // land to water transition:
+            if (CrocodileIsInWater(item, crocodile))
+            {
+                item->requiredAnimState = CROC_WALK;
+                item->goalAnimState = CROC_WALK;
+                break;
+            }
 
-		if (item->hitStatus || info.distance < SQUARE(1536) || TargetVisible(item, &info) && info.distance < SQUARE(5120))
-		{
-			if (!creature->alerted)
-				creature->alerted = true;
-			AlertAllGuards(itemNumber);
-		}
+            if (item->requiredAnimState)
+                item->goalAnimState = item->requiredAnimState;
+            else if (info.bite && info.distance < CROC_ATTACK_RANGE)
+                item->goalAnimState = CROC_IDLE;
+            else if (info.ahead && info.distance < CROC_RUN_RANGE)
+                item->goalAnimState = CROC_WALK;
+            break;
+        case CROC_ATK:
+            if (item->frameNumber == Anims[item->animNumber].frameBase)
+                item->requiredAnimState = 0;
 
-		joint0 = 4 * angle;
+            if (info.bite && (item->touchBits & CROC_TOUCHBITS))
+            {
+                if (!item->requiredAnimState)
+                {
+                    CreatureEffect2(item, &crocBite, 10, -1, DoBloodSplat);
+                    LaraItem->hitPoints -= CROC_DAMAGE;
+                    LaraItem->hitStatus = TRUE;
+                    item->requiredAnimState = CROC_IDLE;
+                }
+            }
+            else
+            {
+                item->goalAnimState = CROC_IDLE;
+            }
+            break;
+        case WCROC_SWIM:
+            crocodile->maximumTurn = CROC_SWIM_ANGLE;
 
-		switch (item->currentAnimState)
-		{
-		case 1:
-			creature->maximumTurn = 0;
+            // water to land transition:
+            if (!CrocodileIsInWater(item, crocodile))
+            {
+                item->animNumber = obj->animIndex + CROC_ANIM_LAND_MODE;
+                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->requiredAnimState = CROC_WALK;
+                item->currentAnimState = CROC_WALK;
+                item->goalAnimState = CROC_WALK;
+                break;
+            }
 
-			if (item->aiBits & GUARD)
-			{
-				joint0 = item->itemFlags[0];
-				item->goalAnimState = 1;
-				item->itemFlags[0] += item->itemFlags[1];
+            if (item->requiredAnimState)
+            {
+                item->goalAnimState = item->requiredAnimState;
+            }
+            else if (info.bite)
+            {
+                if (item->touchBits & 768)
+                    item->goalAnimState = WCROC_ATK;
+            }
+            break;
+        case WCROC_ATK:
+            if (item->frameNumber == Anims[item->animNumber].frameBase)
+                item->requiredAnimState = CROC_EMPTY;
 
-				if (!(GetRandomControl() & 0x1F))
-				{
-					if (GetRandomControl() & 1)
-					{
-						item->itemFlags[1] = 0;
-					}
-					else
-					{
-						item->itemFlags[1] = (GetRandomControl() & 1) != 0 ? 12 : -12;
-					}
-				}
+            if (info.bite && (item->touchBits & CROC_TOUCHBITS))
+            {
+                if (!item->requiredAnimState)
+                {
+                    CreatureEffect2(item, &crocBite, 10, -1, DoBloodSplat);
+                    LaraItem->hitPoints -= CROC_DAMAGE;
+                    LaraItem->hitStatus = TRUE;
+                    item->requiredAnimState = WCROC_SWIM;
+                }
+            }
+            else
+            {
+                item->goalAnimState = WCROC_SWIM;
+            }
+            break;
+        }
+    }
 
-				if (item->itemFlags[0] <= 1024)
-				{
-					if (item->itemFlags[0] < -1024)
-					{
-						item->itemFlags[0] = -1024;
-					}
-				}
-				else
-				{
-					item->itemFlags[0] = 1024;
-				}
-			}
-			else if (info.angle && info.distance < SQUARE(768))
-			{
-				item->goalAnimState = 5;
-			}
-			else
-			{
-				if (!info.ahead || info.distance >= SQUARE(1024))
-				{
-					item->goalAnimState = 2;
-					break;
-				}
-				item->goalAnimState = 3;
-			}
+    if (item->currentAnimState == CROC_IDLE || item->currentAnimState == CROC_ATK || item->currentAnimState == WCROC_ATK)
+        boneRot = CROCODILE_BONE(info.angle, info.xAngle);
+    else
+        boneRot = CROCODILE_BONE(bone_angle);
 
-			break;
+    CreatureTilt(item, 0);
+    CreatureJoint(item, 0, boneRot.torsoY);
+    CreatureJoint(item, 1, boneRot.torsoX);
+    CreatureJoint(item, 2, boneRot.hipsY);
+    CreatureJoint(item, 3, boneRot.hipsX);
 
-		case 2:
-			creature->maximumTurn = ANGLE(3);
+    if (item->currentAnimState < WCROC_SWIM)
+        CalcItemToFloorRotation(item, 2);
 
-			if (item->requiredAnimState)
-			{
-				item->goalAnimState = item->requiredAnimState;
-			}
-			else
-			{
-				if (info.angle && info.distance < SQUARE(768))
-				{
-					item->goalAnimState = 1;
-				}
-				if (info.ahead)
-				{
-					if (info.distance < SQUARE(1024))
-					{
-						item->goalAnimState = 3;
-					}
-				}
-			}
+    CreatureAnimation(itemNumber, angle, 0);
 
-			break;
-
-		case 3:
-			creature->maximumTurn = ANGLE(3);
-			creature->LOT.step = 256;
-			creature->LOT.drop = -256;
-
-			if (item->requiredAnimState)
-			{
-				item->goalAnimState = item->requiredAnimState;
-			}
-			else if (info.angle && info.distance < SQUARE(768))
-			{
-				item->goalAnimState = 1;
-			}
-			else if (!info.ahead || info.distance > SQUARE(1536))
-			{
-				item->goalAnimState = 2;
-			}
-
-			break;
-
-		case 5:
-			if (item->frameNumber == Anims[item->animNumber].frameBase)
-			{
-				item->requiredAnimState = 0;
-			}
-			if (info.angle && item->touchBits & 0x300)
-			{
-				if (!item->requiredAnimState)
-				{
-					CreatureEffect2(
-						item,
-						&crocodileBite,
-						10,
-						-1,
-						DoBloodSplat);
-
-					LaraItem->hitPoints -= 120;
-					LaraItem->hitStatus = true;
-
-					item->requiredAnimState = 1;
-				}
-			}
-			else
-			{
-				item->goalAnimState = 1;
-			}
-
-			break;
-
-		case 8:
-			creature->maximumTurn = ANGLE(3);
-			creature->LOT.step = 20480;
-			creature->LOT.drop = -20480;
-
-			if (item->requiredAnimState)
-			{
-				item->goalAnimState = item->requiredAnimState;
-			}
-			else if (info.angle)
-			{
-				if (item->touchBits & 0x300)
-				{
-					item->goalAnimState = 9;
-				}
-			}
-
-			break;
-
-		case 9:
-			if (item->frameNumber == Anims[item->animNumber].frameBase)
-			{
-				item->requiredAnimState = 0;
-			}
-			if (info.angle && item->touchBits & 0x300)
-			{
-				if (!item->requiredAnimState)
-				{
-					CreatureEffect2(
-						item,
-						&crocodileBite,
-						10,
-						-1,
-						DoBloodSplat);
-
-					LaraItem->hitPoints -= 120;
-					LaraItem->hitStatus = true;
-
-					item->requiredAnimState = 8;
-				}
-			}
-			else
-			{
-				item->goalAnimState = 8;
-			}
-
-			break;
-
-		default:
-			break;
-		}
-	}
-
-	CreatureTilt(item, 0);
-
-	CreatureJoint(item, 0, joint0);
-	CreatureJoint(item, 1, joint0);
-	CreatureJoint(item, 2, -joint0);
-	CreatureJoint(item, 3, -joint0);
-
-	short xRot = item->pos.xRot;
-
-	if (!(abs(angle - item->pos.xRot) < 256 || item->currentAnimState >= 8))
-	{
-		if (angle <= xRot)
-		{
-			if (angle < xRot)
-				item->pos.xRot = xRot - 256;
-		}
-		else
-		{
-			item->pos.xRot = xRot + 256;
-		}
-	}
-	else
-	{
-		if (item->currentAnimState < 8)
-			item->pos.xRot = angle;
-
-		CreatureAnimation(itemNumber, angle, 0);
-
-		roomNumber = item->roomNumber;
-
-		if (item->currentAnimState == 8)
-		{
-			GetFloor(
-				item->pos.xPos + (phd_sin(item->pos.yRot) << 10 >> W2V_SHIFT),
-				item->pos.yPos,
-				item->pos.zPos + (phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT),
-				&roomNumber);
-		}
-		else
-		{
-			GetFloor(
-				item->pos.xPos + (phd_sin(item->pos.yRot) << 9 >> W2V_SHIFT),
-				item->pos.yPos,
-				item->pos.zPos + (phd_cos(item->pos.yRot) << 10 >> W2V_SHIFT),
-				&roomNumber);
-		}
-
-		if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
-		{
-			if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
-			{
-				if (item->currentAnimState == 2)
-				{
-					item->requiredAnimState = 3;
-					item->goalAnimState = 3;
-				}
-				else if (item->currentAnimState == 3)
-				{
-					item->requiredAnimState = 8;
-					item->goalAnimState = 8;
-				}
-				else if (item->animNumber != obj->animIndex + 17)
-				{
-					creature->LOT.step = 20480;
-					creature->LOT.drop = -20480;
-					creature->LOT.fly = 16;
-
-					CreatureUnderwater(item, STEP_SIZE);
-				}
-			}
-			else
-			{
-				item->requiredAnimState = 3;
-				item->goalAnimState = 3;
-				creature->LOT.step = 256;
-				creature->LOT.drop = -256;
-				creature->LOT.fly = 0;
-
-				CreatureUnderwater(item, 0);
-			}
-		}
-		else
-		{
-			creature->LOT.fly = 0;
-		}
-
-		return;
-	}
+    if (item->currentAnimState >= WCROC_SWIM && item->currentAnimState <= WCROC_DIE)
+        CreatureUnderwater(item, CLICK(1));
+    else
+        CreatureUnderwater(item, CLICK(0));
 }

@@ -1565,42 +1565,46 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void CalcItemToFloorRotation(ITEM_INFO* item, short rotY, int radiusZ, int radiusX)
+void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 {
 	FLOOR_INFO* floor;
-	float ratioXZ, frontHDif, sideHDif;
+	ANIM_FRAME* bounds;
+	GAME_VECTOR pos;
+	int ratioXZ, frontHDif, sideHDif;
 	int frontX, frontZ, leftX, leftZ, rightX, rightZ;
 	int frontHeight, backHeight, leftHeight, rightHeight;
-	int x, y, z;
-	short troomNumber;
+	int radiusZ, radiusX;
 
-	// this part with x, y, z, roomNumber can be GAME_VECTOR struct
-	x = item->pos.xPos;
-	y = item->pos.yPos;
-	z = item->pos.zPos;
-	troomNumber = item->roomNumber;
+	bounds = (ANIM_FRAME*)GetBoundsAccurate(item);
+	pos.x = item->pos.xPos;
+	pos.y = item->pos.yPos;
+	pos.z = item->pos.zPos;
+	pos.roomNumber = item->roomNumber;
+	radiusX = bounds->MaxX;
+	radiusZ = bounds->MaxZ / radiusDivide; // need divide in any case else it's too much !
 
-	ratioXZ = radiusZ / float(radiusX);
-	frontX = (phd_sin(rotY) * radiusZ) >> W2V_SHIFT;
-	frontZ = (phd_cos(rotY) * radiusZ) >> W2V_SHIFT;
-	leftX = -frontZ * int(ratioXZ);
-	leftZ = frontX * int(ratioXZ);
-	rightX = frontZ * int(ratioXZ);
-	rightZ = -frontX * int(ratioXZ);
+	ratioXZ = radiusZ / radiusX;
+	frontX = (phd_sin(item->pos.yRot) * radiusZ) >> W2V_SHIFT;
+	frontZ = (phd_cos(item->pos.yRot) * radiusZ) >> W2V_SHIFT;
+	leftX = -frontZ * ratioXZ;
+	leftZ = frontX * ratioXZ;
+	rightX = frontZ * ratioXZ;
+	rightZ = -frontX * ratioXZ;
 
-	floor = GetFloor(x + frontX, y, z + frontZ, &troomNumber);
-	frontHeight = GetFloorHeight(floor, x + frontX, y, z + frontZ);
-	floor = GetFloor(x - frontX, y, z - frontZ, &troomNumber);
-	backHeight = GetFloorHeight(floor, x - frontX, y, z - frontZ);
-	floor = GetFloor(x + leftX, y, z + leftZ, &troomNumber);
-	leftHeight = GetFloorHeight(floor, x + leftX, y, z + leftZ);
-	floor = GetFloor(x + rightX, y, z + rightZ, &troomNumber);
-	rightHeight = GetFloorHeight(floor, x + rightX, y, z + rightZ);
+	floor = GetFloor(pos.x + frontX, pos.y, pos.z + frontZ, &pos.roomNumber);
+	frontHeight = GetFloorHeight(floor, pos.x + frontX, pos.y, pos.z + frontZ);
+	floor = GetFloor(pos.x - frontX, pos.y, pos.z - frontZ, &pos.roomNumber);
+	backHeight = GetFloorHeight(floor, pos.x - frontX, pos.y, pos.z - frontZ);
+	floor = GetFloor(pos.x + leftX, pos.y, pos.z + leftZ, &pos.roomNumber);
+	leftHeight = GetFloorHeight(floor, pos.x + leftX, pos.y, pos.z + leftZ);
+	floor = GetFloor(pos.x + rightX, pos.y, pos.z + rightZ, &pos.roomNumber);
+	rightHeight = GetFloorHeight(floor, pos.x + rightX, pos.y, pos.z + rightZ);
 
-	frontHDif = float(backHeight - frontHeight);
-	sideHDif = float(rightHeight - leftHeight);
-	item->pos.xRot = ANGLE(atan2(frontHDif, 2 * radiusZ) / RADIAN);
-	item->pos.zRot = ANGLE(atan2(sideHDif, 2 * radiusX) / RADIAN);
+	frontHDif = backHeight - frontHeight;
+	sideHDif = rightHeight - leftHeight;
+	// NOTE: float(atan2()) is required, else warning about double !
+	item->pos.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
+	item->pos.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
 }
 
 bool SnapToQuadrant(short& angle, int interval)
@@ -1692,6 +1696,7 @@ Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, shor
 
 	if (splitType)
 	{
+		yRot = floor(yRot / 16384.0f) * ANGLE(90) + ANGLE(45);
 		xPos -= int(radius * sin(TO_RAD(yRot)));
 		zPos -= int(radius * cos(TO_RAD(yRot)));
 	}
@@ -1724,4 +1729,34 @@ void RotateBoundingBox(array<float, 4>& box, short angle)
 	box[1] = *zPair.first;
 	box[2] = *xPair.second;
 	box[3] = *zPair.second;
+}
+
+Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot)
+{
+	Vector2 vect;
+
+	int xGrid = xPos - (xPos % WALL_SIZE);
+	int zGrid = zPos - (zPos % WALL_SIZE);
+
+	int dir = (unsigned short)(yRot + ANGLE(45)) / ANGLE(90);
+	switch (dir)
+	{
+	case NORTH:
+		zPos = zGrid + (WALL_SIZE - 1) - radius;
+		break;
+	case EAST:
+		xPos = xGrid + (WALL_SIZE - 1) - radius;
+		break;
+	case SOUTH:
+		zPos = zGrid + radius;
+		break;
+	case WEST:
+		xPos = xGrid + radius;
+		break;
+	}
+
+	vect.x = xPos;
+	vect.y = zPos;
+
+	return vect;
 }
