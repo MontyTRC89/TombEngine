@@ -2067,6 +2067,7 @@ bool Renderer11::drawScene(bool dump)
 		printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
 		printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 		printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
+		printDebugMessage("Lara.moveAngle: %d", Lara.moveAngle);
 		printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
 		printDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
 		printDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
