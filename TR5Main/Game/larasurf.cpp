@@ -348,18 +348,37 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	if (frontFloor <= -512 || frontFloor > 316)
 		return 0;
 
+	short rot = item->pos.yRot;
 	int slope = 0;
 
 	if (coll->midSplitFloor)
 	{
-		if (!SnapToDiagonal(item->pos.yRot, 35))
-			return 0;
+		if (rot >= ANGLE(10) && rot <= ANGLE(80))
+			rot = ANGLE(45);
+		else if (rot >= ANGLE(100) && rot <= ANGLE(170))
+			rot = ANGLE(135);
+		else if (rot >= -ANGLE(170) && rot <= -ANGLE(100))
+			rot = -ANGLE(135);
+		else if (rot >= -ANGLE(80) && rot <= -ANGLE(10))
+			rot = -ANGLE(45);
 	}
 	else
 	{
-		if (!SnapToQuadrant(item->pos.yRot, 35))
+		if (abs(coll->rightFloor2 - coll->leftFloor2) >= 60)
 			return 0;
+
+		if (rot >= -ANGLE(35) && rot <= ANGLE(35))
+			rot = 0;
+		else if (rot >= ANGLE(55) && rot <= ANGLE(125))
+			rot = ANGLE(90);
+		else if (rot >= ANGLE(145) || rot <= -ANGLE(145))
+			rot = ANGLE(180);
+		else if (rot >= -ANGLE(125) && rot <= -ANGLE(55))
+			rot = -ANGLE(90);
 	}
+
+	if (rot & 0x1FFF)
+		return 0;
 
 	item->pos.yPos += frontFloor - 5;
 
@@ -425,6 +444,7 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	}
 
 	item->currentAnimState = STATE_LARA_ONWATER_EXIT;
+	item->pos.yRot = rot;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;

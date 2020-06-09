@@ -132,10 +132,5 @@ void LaraBaddieCollision(ITEM_INFO* item, COLL_INFO* coll);
 // Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).
 // Warning: dont set it to 0 !!!!
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
-bool SnapToQuadrant(short& angle, int interval);
-int GetQuadrant(short angle);
-bool SnapToDiagonal(short& angle, int interval);
-int GetOctant(short angle);
 Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, short yRot); // find xPos, zPos that intersects with diagonal on sector
 Vector2 GetOrthogonalIntersect(int xPos, int zPos, int radius, short yRot); // find xPos, zPos near sector bound, offset by radius;
-void RotateBoundingBox(array<float, 4>& box, short angle);
