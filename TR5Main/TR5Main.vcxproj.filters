@@ -780,6 +780,12 @@
     <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Effects\tr4_locusts.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1425,6 +1431,12 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\Effects\tr4_locusts.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
