@@ -36,6 +36,54 @@ typedef enum ZoneType
 	ZONE_APE,       // only 2 click climb
 };
 
+typedef struct OBJECT_BONES
+{
+	short bone0;
+	short bone1;
+	short bone2;
+	short bone3;
+
+	OBJECT_BONES()
+	{
+		this->bone0 = 0;
+		this->bone1 = 0;
+		this->bone2 = 0;
+		this->bone3 = 0;
+	}
+
+	OBJECT_BONES(short all)
+	{
+		this->bone0 = all;
+		this->bone1 = all;
+		this->bone2 = -all;
+		this->bone3 = -all;
+	}
+
+	OBJECT_BONES(short angleY, short angleX)
+	{
+		this->bone0 = angleY;
+		this->bone1 = angleX;
+		this->bone2 = angleY;
+		this->bone3 = angleX;
+	}
+
+	OBJECT_BONES(short angleY, short angleX, bool total)
+	{
+		this->bone0 = angleY;
+		this->bone1 = angleX;
+		if (total)
+		{
+			this->bone2 = angleY;
+			this->bone3 = angleX;
+		}
+		else
+		{
+			this->bone2 = 0;
+			this->bone3 = 0;
+		}
+	}
+};
+
 typedef struct BOX_NODE
 {
 	short exitBox;

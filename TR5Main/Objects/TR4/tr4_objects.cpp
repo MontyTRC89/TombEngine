@@ -23,6 +23,8 @@
 #include "tr4_wildboar.h" // OK
 #include "tr4_wraith.h" // OFF
 #include "tr4_baboon.h" // OK
+#include "tr4_mutant.h" // OK
+#include "tr4_locusts.h" // OK
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -49,7 +51,6 @@
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
-
 /// necessary import
 #include "collide.h"
 #include "objects.h"
@@ -526,6 +527,36 @@ static void StartBaddy(ObjectInfo* obj)
 
 		if (Objects[ID_BABOON_NORMAL].loaded)
 			Objects[ID_BABOON_SILENT].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
+	}
+
+	obj = &Objects[ID_CROCODILE_GOD];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMutant;
+		obj->control = MutantControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = NOT_TARGETABLE;
+		obj->pivotLength = 50;
+		obj->radius = 128;
+		obj->intelligent = TRUE;
+		obj->saveAnim = TRUE;
+		obj->saveFlags = TRUE;
+		obj->saveMesh = TRUE;
+		obj->savePosition = TRUE;
+		obj->undead = TRUE;
+		obj->hitEffect = HIT_SMOKE;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y | ROT_X;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_Y | ROT_X;
+	}
+
+	obj = &Objects[ID_LOCUSTS_EMITTER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLocust;
+		obj->control = LocustControl;
+		obj->drawRoutine = NULL;
+		obj->saveFlags = TRUE;
 	}
 }
 
