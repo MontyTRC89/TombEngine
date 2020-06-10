@@ -25,32 +25,32 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 80;
 		Lara.waterStatus = LW_UNDERWATER;
 	}
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DD90(<), 4E1F4(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+	Lara.moveAngle = ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DD64(<), 4E1C8(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+	Lara.moveAngle = -ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)//4DD38(<), 4E19C(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(180);
+	Lara.moveAngle = ANGLE(180);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14C(<) (F)
 {
 	coll->badNeg = -384;
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	LaraSurfaceCollision(item, coll);
 	LaraTestWaterClimbOut(item, coll);
 }
@@ -270,8 +270,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)//4D684, 4DAE8 (F)
 
 	AnimateLara(item);
 
-	item->pos.xPos += item->fallspeed * phd_sin(Lara.moveAngle) >> (W2V_SHIFT + 2);
-	item->pos.zPos += item->fallspeed * phd_cos(Lara.moveAngle) >> (W2V_SHIFT + 2);
+	item->pos.xPos += item->fallspeed * phd_sin(item->pos.yRot + Lara.moveAngle) >> (W2V_SHIFT + 2);
+	item->pos.zPos += item->fallspeed * phd_cos(item->pos.yRot + Lara.moveAngle) >> (W2V_SHIFT + 2);
 
 	LaraBaddieCollision(item, coll);
 

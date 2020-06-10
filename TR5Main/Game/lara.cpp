@@ -649,7 +649,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (!wade)
 			{
-				Lara.moveAngle = item->pos.yRot;
+				Lara.moveAngle = 0;
 				coll->badPos = NO_BAD_POS;
 				coll->badNeg = -STEPUP_HEIGHT;
 				coll->badCeiling = 0;
@@ -697,7 +697,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				Lara.moveAngle = item->pos.yRot;
+				Lara.moveAngle = 0;
 
 				coll->badPos = NO_BAD_POS;
 				coll->badNeg = -STEPUP_HEIGHT;
@@ -1048,7 +1048,7 @@ void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)//1C80C(<), 1C940(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	coll->badPos = 384;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -1059,7 +1059,7 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)//1C80C(<), 1C940(<) (F)
 
 void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1129,7 +1129,7 @@ void lara_col_wade(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)//1C558(<), 1C68C(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1155,7 +1155,7 @@ void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)//1C558(<), 1C68C(<) (F)
 
 void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)//1C4A0(<), 1C5D4(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1178,7 +1178,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)//1C4A0(<), 1C5D4(<) (F)
 void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)//1C384, 1C4B8 (F)
 {
 	Camera.laraNode = 0;
-	Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1214,7 +1214,7 @@ void lara_col_roll2(ITEM_INFO* item, COLL_INFO* coll)//1C384, 1C4B8 (F)
 
 void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)//1C2B0, 1C3E4 (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1247,13 +1247,13 @@ void lara_col_roll(ITEM_INFO* item, COLL_INFO* coll)//1C2B0, 1C3E4 (F)
 
 void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll)//1C284(<), 1C3B8(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 	lara_slide_slope(item, coll);
 }
 
 void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)//1C1B4(<), 1C2E8(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1279,25 +1279,25 @@ void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)//1C1B4(<), 1C2E8(<) (F)
 
 void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll)//1C188(<), 1C2BC(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+	Lara.moveAngle = -ANGLE(90);
 	lara_col_jumper(item, coll);
 }
 
 void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)//1C15C(<), 1C290(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+	Lara.moveAngle = ANGLE(90);
 	lara_col_jumper(item, coll);
 }
 
 void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)//1C130(<), 1C264(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 	lara_col_jumper(item, coll);
 }
 
 void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)//1C108(<), 1C23C(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	lara_slide_slope(item, coll);
 }
 
@@ -1309,9 +1309,9 @@ void lara_col_stepleft(ITEM_INFO* item, COLL_INFO* coll)//1C0E8(<), 1C21C(<) (F)
 void lara_col_stepright(ITEM_INFO* item, COLL_INFO* coll)//1BFB0, 1C0E4 (F)
 {
 	if (item->currentAnimState == STATE_LARA_WALK_RIGHT)
-		Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+		Lara.moveAngle = ANGLE(90);
 	else
-		Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+		Lara.moveAngle = -ANGLE(90);
 
 	item->gravityStatus = false;
 	item->fallspeed = 0;
@@ -1343,7 +1343,7 @@ void lara_col_back(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 
 	if (Lara.waterStatus == LW_WADE)
 		coll->badPos = NO_BAD_POS;
@@ -1433,7 +1433,7 @@ void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)//1BD10(<), 1BE44(<) (F)
 
 void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)//1BC74(<), 1BDA8(<) (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->slopesAreWalls = true;
 	coll->slopesArePits = true;
@@ -1488,7 +1488,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)//1BADC(<), 1BC10(<) (F)
 {
 	StopSoundEffect(SFX_LARA_FALL);
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	coll->badPos = 384;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -1513,7 +1513,7 @@ void lara_col_turn_r(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	coll->badPos = STEPUP_HEIGHT;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -1555,7 +1555,7 @@ void lara_col_fastback(ITEM_INFO* item, COLL_INFO* coll)//1B89C, 1B9D0 (F)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 
 	coll->slopesAreWalls = 0;
 	coll->slopesArePits = true;
@@ -1597,7 +1597,7 @@ void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)//1B87C(<), 1B9B0(<) (F)
 
 void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)//1B64C, 1B780 (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1681,7 +1681,7 @@ void lara_col_walk(ITEM_INFO* item, COLL_INFO* coll)//1B3E8, 1B51C (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = 384;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -1882,7 +1882,7 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)//1B038, 1B16C (F)
 		LaraItem->speed = 100;
 		LaraItem->fallspeed = 40;
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 	}
 }
 
@@ -2302,22 +2302,22 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_FORWARD && LaraFloorFront(item, item->pos.yRot, 256) >= -384)
 		{
 			item->goalAnimState = STATE_LARA_JUMP_FORWARD;
-			Lara.moveAngle = item->pos.yRot;
+			Lara.moveAngle = 0;
 		}
 		else if (TrInput & IN_LEFT && LaraFloorFront(item, item->pos.yRot - ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = STATE_LARA_JUMP_RIGHT;
-			Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+			Lara.moveAngle = -ANGLE(90);
 		}
 		else if (TrInput & IN_RIGHT && LaraFloorFront(item, item->pos.yRot + ANGLE(90.0f), 256) >= -384)
 		{
 			item->goalAnimState = STATE_LARA_JUMP_LEFT;
-			Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+			Lara.moveAngle = ANGLE(90);
 		}
 		else if (TrInput & IN_BACK && LaraFloorFront(item, item->pos.yRot - ANGLE(180.0f), 256) >= -384)
 		{
 			item->goalAnimState = STATE_LARA_JUMP_BACK;
-			Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+			Lara.moveAngle = ANGLE(180);
 		}
 	}
 
@@ -2413,10 +2413,10 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)//1A0
 
 void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+	Lara.moveAngle = ANGLE(90);
 	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
 	LaraHangTest(item, coll);
-	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+	Lara.moveAngle = ANGLE(90);
 }
 
 void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -2431,10 +2431,10 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+	Lara.moveAngle = -ANGLE(90);
 	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
 	LaraHangTest(item, coll);
-	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+	Lara.moveAngle = -ANGLE(90);
 }
 
 void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -2499,7 +2499,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
 		}
 	}
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	LaraHangTest(item, coll);
 
@@ -2623,9 +2623,9 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	int z = item->pos.zPos;
 	int res;
 
-	Lara.moveAngle = angle + item->pos.yRot;
+	Lara.moveAngle = angle;
 
-	switch (GetQuadrant(Lara.moveAngle))
+	switch (GetQuadrant(item->pos.yRot + Lara.moveAngle))
 	{
 	case 0:
 		z += 16;
@@ -2651,7 +2651,7 @@ int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)//19930, 1
 	item->pos.xPos = oldx;
 	item->pos.zPos = oldz;
 
-	Lara.moveAngle = angle + item->pos.yRot;
+	Lara.moveAngle = angle;
 
 	return !res;
 }
@@ -2941,7 +2941,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 	if (Lara.ropePtr == -1)
 		item->gravityStatus = true;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = 0;
@@ -3094,9 +3094,9 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)//18CE0(<), 18E14(<) (F)
 void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18B88, 18CBC (F)
 {
 	if (item->speed < 0)
-		Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+		Lara.moveAngle = ANGLE(180);
 	else
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -3106,7 +3106,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)//18B88, 18CBC (F)
 	LaraDeflectEdgeJump(item, coll);
 
 	if (item->speed < 0)
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 	if (coll->midFloor <= 0 && item->fallspeed > 0)
 	{
@@ -3187,7 +3187,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		return;
 	}
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -3351,7 +3351,7 @@ void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 void lara_col_stop(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	coll->badPos = STEPUP_HEIGHT;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
@@ -3720,7 +3720,7 @@ void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->slopesAreWalls = true;
 
@@ -3821,7 +3821,7 @@ void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll)//16DFC, 16F30 (F)
 		coll->badNeg = -STEPUP_HEIGHT;
 		coll->badCeiling = BAD_JUMP_CEILING;
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 		coll->facing = Lara.moveAngle;
 		coll->radius = 100;
@@ -3914,7 +3914,7 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)//16C94(<), 16DC8(<) (
 		coll->badNeg = -STEPUP_HEIGHT;
 		coll->badCeiling = 0;
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 		coll->facing = item->pos.yRot;
 		coll->radius = 100;
@@ -4051,7 +4051,7 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)//16828, 1695C (F)
 		coll->badNeg = NO_HEIGHT;
 		coll->badCeiling = 0;
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 		coll->enableSpaz = false;
 		coll->enableBaddiePush = false;
@@ -4148,7 +4148,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
 		coll->facing = Lara.moveAngle;
 		coll->radius = 100;
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 600);
 
@@ -4276,7 +4276,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)//161EC(<), 16320(<) (F)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
-	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+	Lara.moveAngle = ANGLE(90);
 	coll->slopesAreWalls = 0;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
@@ -4312,7 +4312,7 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)//160CC(<), 16200(<) (F)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = NO_HEIGHT;
 	coll->badCeiling = 0;
-	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+	Lara.moveAngle = -ANGLE(90);
 	coll->slopesAreWalls = 0;
 	coll->facing = Lara.moveAngle;
 	coll->radius = 100;
@@ -4372,9 +4372,9 @@ void MonkeySwingFall(ITEM_INFO* item)//16004(<), 16138(<) (F)
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E5C, 15F90 (F)
 {
 	if (item->speed < 0)
-		Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+		Lara.moveAngle = ANGLE(180);
 	else
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -256;
@@ -4388,7 +4388,7 @@ void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E5C, 15F90 (F)
 	if (!LaraFallen(item, coll))
 	{
 		if (item->speed < 0)
-			Lara.moveAngle = item->pos.yRot;
+			Lara.moveAngle = 0;
 
 		if (coll->midFloor <= 0 && item->fallspeed > 0)
 		{
@@ -4431,7 +4431,7 @@ void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll)//15E1C(<), 15F50(<) (F)
 
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)//15C50, 15D84 (F)
 {
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -4574,7 +4574,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 		coll->badNeg = -STEPUP_HEIGHT;
 		coll->badCeiling = BAD_JUMP_CEILING;
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 		coll->facing = Lara.moveAngle;
 
 		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 870);
@@ -4678,7 +4678,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)//15614, 15748 (F)
 	coll->slopesArePits = true;
 	coll->slopesAreWalls = true;
 
-	Lara.moveAngle = item->pos.yRot - ANGLE(180.0f);
+	Lara.moveAngle = ANGLE(180);
 
 	coll->facing = Lara.moveAngle;
 
@@ -4706,7 +4706,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)//15614, 15748 (F)
 		if (coll->midFloor != NO_HEIGHT && coll->midFloor > -256)
 			item->pos.yPos += coll->midFloor;
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 	}
 }
 
@@ -4804,7 +4804,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)//1523C, 15370 (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->radius = 200;
 
@@ -4894,7 +4894,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 
 	if (item->goalAnimState != STATE_LARA_CRAWL_TO_CLIMB)
 	{
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 		coll->facing = Lara.moveAngle;
 
 		coll->radius = 200;
@@ -5225,7 +5225,7 @@ void lara_col_duck(ITEM_INFO* item, COLL_INFO* coll)//147C4, 148CC (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->facing = item->pos.yRot;
 	coll->badPos = 384;
@@ -5374,7 +5374,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	Lara.isDucked = true;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	coll->facing = item->pos.yRot;
 	coll->badPos = STEPUP_HEIGHT;
 	coll->badNeg = -STEPUP_HEIGHT;
@@ -5397,7 +5397,7 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)//14534, 145E4 (F)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	coll->facing = item->pos.yRot;
 	coll->badPos = 384;
@@ -5521,7 +5521,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
+				Lara.moveAngle = 0;
 				return result;
 			}
 		}
@@ -5532,7 +5532,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
+				Lara.moveAngle = 0;
 				return result;
 			}
 		}
@@ -5541,7 +5541,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
+	Lara.moveAngle = 0;
 
 	if (LaraFloorFront(item, oldYrot - ANGLE(90.0f), 116) < 0)
 		return 0;
@@ -5582,14 +5582,14 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->pos.xPos = oldXpos;
 		item->pos.zPos = oldZpos;
 		item->pos.yRot = oldYrot;
-		Lara.moveAngle = oldYrot;
+		Lara.moveAngle = 0;
 		return result;
 	}
 
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
+	Lara.moveAngle = 0;
 
 	if (!Lara.climbStatus)
 	{
@@ -5676,7 +5676,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
+				Lara.moveAngle = 0;
 				return result;
 			}
 		}
@@ -5687,7 +5687,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				item->pos.xPos = oldXpos;
 				item->pos.zPos = oldZpos;
 				item->pos.yRot = oldYrot;
-				Lara.moveAngle = oldYrot;
+				Lara.moveAngle = 0;
 				return result;
 			}
 		}
@@ -5696,7 +5696,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
+	Lara.moveAngle = 0;
 
 	if (LaraFloorFront(item, oldYrot + ANGLE(90.0f), 116) < 0)
 		return 0;
@@ -5737,14 +5737,14 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->pos.xPos = oldXpos;
 		item->pos.zPos = oldZpos;
 		item->pos.yRot = oldYrot;
-		Lara.moveAngle = oldYrot;
+		Lara.moveAngle = 0;
 		return result;
 	}
 
 	item->pos.xPos = oldXpos;
 	item->pos.zPos = oldZpos;
 	item->pos.yRot = oldYrot;
-	Lara.moveAngle = oldYrot;
+	Lara.moveAngle = 0;
 
 	if (!Lara.climbStatus)
 	{
@@ -5789,7 +5789,7 @@ int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (LaraFloorFront(item, Lara.moveAngle, 100) < 200)
+	if (LaraFloorFront(item, item->pos.yRot + Lara.moveAngle, 100) < 200)
 		return 0;
 
 	short angle = GetQuadrant(item->pos.yRot);
@@ -5815,7 +5815,7 @@ int IsValidHangPos(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	coll->badNeg = -512;
 	coll->badCeiling = 0;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	GetLaraCollisionInfo(item, coll);
 
@@ -5937,10 +5937,10 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 	bounds = (ANIM_FRAME*)GetBoundsAccurate(item);
 
-	if (Lara.moveAngle != item->pos.yRot)
+	if (Lara.moveAngle)
 	{
 		short l = LaraCeilingFront(item, item->pos.yRot, 0, 0);
-		short r = LaraCeilingFront(item, Lara.moveAngle, 128, 0);
+		short r = LaraCeilingFront(item, item->pos.yRot + Lara.moveAngle, 128, 0);
 
 		if (abs(l - r) > 60)
 			return 0;
@@ -6027,7 +6027,7 @@ void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12904, 129B4 (F)
 			}
 
 			item->speed /= 4;
-			Lara.moveAngle -= ANGLE(180.0f);
+			Lara.moveAngle += ANGLE(180);
 
 			if (item->fallspeed <= 0)
 				item->fallspeed = 1;
@@ -6823,6 +6823,7 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->currentAnimState = STATE_LARA_SLIDE_BACK;
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->pos.yRot = angle + ANGLE(180.0f);
+		Lara.moveAngle = ANGLE(180);
 	}
 	else
 	{
@@ -6834,9 +6835,9 @@ int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		item->frameNumber = Anims[item->animNumber].frameBase;
 		item->currentAnimState = STATE_LARA_SLIDE_FORWARD;
 		item->pos.yRot = angle;
+		Lara.moveAngle = 0;
 	}
 
-	Lara.moveAngle = angle;
 	OldAngle = angle;
 
 	return 1;
@@ -6851,18 +6852,18 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	delta = 0;
 	flag = 0;
 	angle = Lara.moveAngle;
-	if (angle == (short)(item->pos.yRot - ANGLE(90.0f)))
+	if (angle == -ANGLE(90))
 	{
 		delta = -100;
 	}
-	else if (angle == (short)(item->pos.yRot + ANGLE(90.0f)))
+	else if (angle == ANGLE(90))
 	{
 		delta = 100;
 	}
-	hdif = LaraFloorFront(item, angle, 100);
+	hdif = LaraFloorFront(item, item->pos.yRot + angle, 100);
 	if (hdif < 200)
 		flag = 1;
-	cdif = LaraCeilingFront(item, angle, 100, 0);
+	cdif = LaraCeilingFront(item, item->pos.yRot + angle, 100, 0);
 	dir = GetQuadrant(item->pos.yRot);
 	switch (dir)
 	{
@@ -6882,7 +6883,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	coll->badPos = NO_BAD_POS;
 	coll->badNeg = -STEPUP_HEIGHT;
 	coll->badCeiling = 0;
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 	GetLaraCollisionInfo(item, coll);
 	result = 0;
 	if (Lara.climbStatus)
@@ -7108,7 +7109,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = 0;
 
 	LaraHangTest(item, coll);
 
@@ -7221,7 +7222,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 					}*///commenting till daniel makes anims
 
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 		LaraHangTest(item, coll);
 	}
 }
@@ -7240,10 +7241,10 @@ void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+	Lara.moveAngle = ANGLE(90);
 	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
 	LaraHangTest(item, coll);
-	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
+	Lara.moveAngle = ANGLE(90);
 }
 
 void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
@@ -7259,10 +7260,10 @@ void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+	Lara.moveAngle = -ANGLE(90);
 	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
 	LaraHangTest(item, coll);
-	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
+	Lara.moveAngle = -ANGLE(90);
 }
 
 void lara_as_hang_feet_inRcorner(ITEM_INFO* item, COLL_INFO* coll)
