@@ -227,7 +227,7 @@ void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)//46908(<), 46D6C(<) (
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		Lara.moveAngle = item->pos.yRot + ANGLE(90);
+		Lara.moveAngle = ANGLE(90);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift), shift);
 	}
 }
@@ -249,7 +249,7 @@ void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)//46834(<), 46C98(<) (F
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		Lara.moveAngle = item->pos.yRot - ANGLE(90);
+		Lara.moveAngle = -ANGLE(90);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->radius, -(coll->radius + 120), -512, 512, &shift), shift);
 	}
 }
@@ -380,12 +380,12 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
 		item->goalAnimState = STATE_LARA_LADDER_LEFT;
-		Lara.moveAngle = item->pos.yRot - ANGLE(90);
+		Lara.moveAngle = -ANGLE(90);
 	}
 	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 	{
 		item->goalAnimState = STATE_LARA_LADDER_RIGHT;
-		Lara.moveAngle = item->pos.yRot + ANGLE(90);
+		Lara.moveAngle = ANGLE(90);
 	}
 	else if (TrInput & IN_JUMP)
 	{
@@ -393,7 +393,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 		{
 			item->goalAnimState = STATE_LARA_JUMP_BACK;
 			Lara.gunStatus = LG_NO_ARMS;
-			Lara.moveAngle = item->pos.yRot - ANGLE(180);
+			Lara.moveAngle = ANGLE(180);
 		}
 	}
 }
@@ -576,7 +576,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 		item->pos.zPos = z;
 		Lara.cornerZ = z;
 		item->pos.yRot += ANGLE(90);
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 		result = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift);
 	}
@@ -584,7 +584,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 	if (!result)
 	{
 		item->pos.xPos = oldX;
-		Lara.moveAngle = oldYrot;
+		Lara.moveAngle = 0;
 		item->pos.yRot = oldYrot;
 		item->pos.zPos = oldZ;
 
@@ -622,7 +622,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 			item->pos.zPos = newZ;
 			Lara.cornerZ = newZ;
 			item->pos.yRot -= ANGLE(90);
-			Lara.moveAngle = item->pos.yRot;
+			Lara.moveAngle = 0;
 			result = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &shift) != 0;
 		}
 	}
@@ -634,7 +634,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 	item->pos.xPos = oldX;
 	item->pos.yRot = oldYrot;
 	item->pos.zPos = oldZ;
-	Lara.moveAngle = oldYrot;
+	Lara.moveAngle = 0;
 
 	return result;
 }
@@ -674,7 +674,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 		item->pos.zPos = z;
 		Lara.cornerZ = z;
 		item->pos.yRot -= ANGLE(90);
-		Lara.moveAngle = item->pos.yRot;
+		Lara.moveAngle = 0;
 
 		result = LaraTestClimbPos(item, coll->radius, -coll->radius - 120, -512, 512, &shift);
 		item->itemFlags[3] = result;
@@ -683,7 +683,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 	if (!result)
 	{
 		item->pos.xPos = oldX;
-		Lara.moveAngle = oldYrot;
+		Lara.moveAngle = 0;
 		item->pos.yRot = oldYrot;
 		item->pos.zPos = oldZ;
 
@@ -721,7 +721,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 			item->pos.zPos = newZ;
 			Lara.cornerZ = newZ;
 			item->pos.yRot += ANGLE(90);
-			Lara.moveAngle = item->pos.yRot;
+			Lara.moveAngle = 0;
 			item->itemFlags[3] = LaraTestClimbPos(item, coll->radius, -coll->radius - 120, -512, 512, &shift);
 			result = item->itemFlags[3] != 0;
 		}
@@ -734,7 +734,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 	item->pos.xPos = oldX;
 	item->pos.yRot = oldYrot;
 	item->pos.zPos = oldZ;
-	Lara.moveAngle = oldYrot;
+	Lara.moveAngle = 0;
 
 	return result;
 }

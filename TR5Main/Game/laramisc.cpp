@@ -962,11 +962,11 @@ void AnimateLara(ITEM_INFO* item)
 
 	if (!Lara.isMoving) // TokyoSU: i dont know why but it's wreid, in TR3 only the 2 first line there is used and worked fine !
 	{
-		item->pos.xPos += item->speed * phd_sin(Lara.moveAngle) >> W2V_SHIFT; 
-		item->pos.zPos += item->speed * phd_cos(Lara.moveAngle) >> W2V_SHIFT;
+		item->pos.xPos += item->speed * phd_sin(item->pos.yRot + Lara.moveAngle) >> W2V_SHIFT;
+		item->pos.zPos += item->speed * phd_cos(item->pos.yRot + Lara.moveAngle) >> W2V_SHIFT;
 
-		item->pos.xPos += lateral * phd_sin(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;  
-		item->pos.zPos += lateral * phd_cos(Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+		item->pos.xPos += lateral * phd_sin(item->pos.yRot + Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
+		item->pos.zPos += lateral * phd_cos(item->pos.yRot + Lara.moveAngle + ANGLE(90)) >> W2V_SHIFT;
 	}
 
 	// Update matrices
