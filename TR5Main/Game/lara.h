@@ -204,7 +204,6 @@ int LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 short LaraFloorFront(ITEM_INFO* item, short ang, int dist);
-void GetLaraCollisionInfo(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
