@@ -148,9 +148,11 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Libs\zlib\zip.h" />
     <ClInclude Include="Libs\zlib\zlib.h" />
     <ClInclude Include="Objects\Effects\tr4_bubbles.h" />
+    <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_baboon.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_laradouble.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
@@ -390,9 +392,11 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\trmath.cpp" />
+    <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baboon.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_laradouble.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_sarcophagus.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_scales.cpp" />

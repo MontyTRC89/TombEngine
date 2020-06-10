@@ -38,6 +38,7 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
+#include "tr4_locusts.h"
 
 short ShatterSounds[18][10] =
 {
@@ -512,6 +513,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateBats();
 		UpdateSpiders();
 		UpdateShockwaves();
+		UpdateLocusts();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 

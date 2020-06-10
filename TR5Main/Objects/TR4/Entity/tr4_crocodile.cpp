@@ -10,38 +10,6 @@
 #include "draw.h"
 #include "misc.h"
 
-struct CROCODILE_BONE
-{
-    short torsoY;
-    short torsoX;
-    short hipsY;
-    short hipsX;
-
-    CROCODILE_BONE()
-    {
-        this->torsoY = 0;
-        this->torsoX = 0;
-        this->hipsY = 0;
-        this->hipsX = 0;
-    }
-
-    CROCODILE_BONE(short angle)
-    {
-        this->torsoY = angle;
-        this->torsoX = angle;
-        this->hipsY = -angle;
-        this->hipsX = -angle;
-    }
-
-    CROCODILE_BONE(short torsoY, short torsoX)
-    {
-        this->torsoY = torsoY;
-        this->torsoX = torsoX;
-        this->hipsY = 0;
-        this->hipsX = 0;
-    }
-};
-
 enum CROCODILE_STATE
 {
     CROC_EMPTY,
@@ -136,7 +104,7 @@ void CrocodileControl(short itemNumber)
     ObjectInfo* obj;
     CREATURE_INFO* crocodile;
     AI_INFO info;
-    CROCODILE_BONE boneRot;
+    OBJECT_BONES boneRot;
     short angle;
     short bone_angle;
 
@@ -330,15 +298,15 @@ void CrocodileControl(short itemNumber)
     }
 
     if (item->currentAnimState == CROC_IDLE || item->currentAnimState == CROC_ATK || item->currentAnimState == WCROC_ATK)
-        boneRot = CROCODILE_BONE(info.angle, info.xAngle);
+        boneRot = OBJECT_BONES(info.angle, info.xAngle);
     else
-        boneRot = CROCODILE_BONE(bone_angle);
+        boneRot = OBJECT_BONES(bone_angle);
 
     CreatureTilt(item, 0);
-    CreatureJoint(item, 0, boneRot.torsoY);
-    CreatureJoint(item, 1, boneRot.torsoX);
-    CreatureJoint(item, 2, boneRot.hipsY);
-    CreatureJoint(item, 3, boneRot.hipsX);
+    CreatureJoint(item, 0, boneRot.bone0);
+    CreatureJoint(item, 1, boneRot.bone1);
+    CreatureJoint(item, 2, boneRot.bone2);
+    CreatureJoint(item, 3, boneRot.bone3);
 
     if (item->currentAnimState < WCROC_SWIM)
         CalcItemToFloorRotation(item, 2);

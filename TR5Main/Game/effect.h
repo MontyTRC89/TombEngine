@@ -23,7 +23,8 @@ struct FX_INFO
 extern function<EffectFunction> effect_routines[];
 extern FX_INFO* Effects;
 
-int ItemNearLara(PHD_3DPOS* pos, int radius);
+bool ItemNearLara(PHD_3DPOS* pos, int radius);
+bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 void StopSoundEffect(short sampleIndex);
 short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
 //void SoundEffects();
