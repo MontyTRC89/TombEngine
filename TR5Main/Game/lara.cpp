@@ -5528,7 +5528,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	int h, c;
 
 	//debug till scripting be ready
-	TR12_OSCILLATE_HANG = true;
+//	TR12_OSCILLATE_HANG = true;
 
 	if (angle == ANGLE(180.0f))
 	{
