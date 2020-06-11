@@ -53,6 +53,7 @@ ITEM_INFO* LaraItem;
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 bool EnableCrouchRoll, EnableFeetHang, EnableMonkeyVault, EnableMonkeyRoll, EnableCrawlFlex1click, EnableCrawlFlex2click, EnableCrawlFlex3click;
 bool EnableCrawlFlex1clickE, EnableCrawlFlex2clickE, EnableCrawlFlex3clickE, EnableCrawlFlex1clickup, EnableCrawlFlex1clickdown;
+bool TR12_OSCILLATE_HANG;
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_walk,
@@ -2943,6 +2944,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 	if (Lara.ropePtr == -1)
 		item->gravityStatus = true;
 
+
+
+
 	Lara.moveAngle = item->pos.yRot;
 
 	coll->badPos = NO_BAD_POS;
@@ -3037,15 +3041,28 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 	{
 		if (TestHangSwingIn(item, angle))
 		{
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
-
-			item->animNumber = ANIMATION_LARA_OSCILLATE_HANG_ON;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->currentAnimState = STATE_LARA_MONKEYSWING_IDLE;
-			item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
+			if (TR12_OSCILLATE_HANG == true)
+			{
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				item->animNumber = ANIMATION_LARA_HANG_THIN_LEDGE;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->currentAnimState = STATE_LARA_HANG;
+				item->goalAnimState = STATE_LARA_HANG;
+			}
+			else
+			{
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				item->animNumber = ANIMATION_LARA_OSCILLATE_HANG_ON;
+				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->currentAnimState = STATE_LARA_MONKEYSWING_IDLE;
+				item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
+			}
 		}
 		else
 		{
@@ -3275,10 +3292,10 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 						if (TestHangSwingIn(item, angle))
 						{
-							item->animNumber = ANIMATION_LARA_MONKEY_GRAB;
-							item->frameNumber = Anims[item->animNumber].frameBase;
-							item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
-							item->currentAnimState = STATE_LARA_MONKEYSWING_IDLE;
+								item->animNumber = ANIMATION_LARA_MONKEY_GRAB;
+								item->frameNumber = Anims[item->animNumber].frameBase;
+								item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
+								item->currentAnimState = STATE_LARA_MONKEYSWING_IDLE;
 						}
 						else
 						{
@@ -4635,17 +4652,31 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 				{
 					short* bounds;
 
-					if (TestHangSwingIn(item, angle))
+					if (!TestHangSwingIn(item, angle))
 					{
-						Lara.headYrot = 0;
-						Lara.headXrot = 0;
-						Lara.torsoYrot = 0;
-						Lara.torsoXrot = 0;
 
-						item->animNumber = ANIMATION_LARA_OSCILLATE_HANG_ON;
-						item->frameNumber = Anims[item->animNumber].frameBase;
-						item->currentAnimState = STATE_LARA_MONKEYSWING_IDLE;
-						item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
+						if (TR12_OSCILLATE_HANG == true)
+						{
+							Lara.headYrot = 0;
+							Lara.headXrot = 0;
+							Lara.torsoYrot = 0;
+							Lara.torsoXrot = 0;
+							item->animNumber = ANIMATION_LARA_HANG_THIN_LEDGE;
+							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->currentAnimState = STATE_LARA_HANG;
+							item->goalAnimState = STATE_LARA_HANG;
+						}
+						else
+						{
+							Lara.headYrot = 0;
+							Lara.headXrot = 0;
+							Lara.torsoYrot = 0;
+							Lara.torsoXrot = 0;
+							item->animNumber = ANIMATION_LARA_OSCILLATE_HANG_ON;
+							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->currentAnimState = STATE_LARA_MONKEYSWING_IDLE;
+							item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
+						}
 					}
 					else
 					{
@@ -5496,6 +5527,9 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	FLOOR_INFO* floor;
 	int h, c;
 
+	//debug till scripting be ready
+	TR12_OSCILLATE_HANG = true;
+
 	if (angle == ANGLE(180.0f))
 	{
 		z -= 256;
@@ -5517,7 +5551,23 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	h = GetFloorHeight(floor, x, y, z);
 	c = GetCeiling(floor, x, y, z);
 
-	return h != NO_HEIGHT && h - y > 0 && c - y < -400 && y - c - 819 > -72;
+	if (h != NO_HEIGHT)
+	{
+		if (TR12_OSCILLATE_HANG == true)
+		{
+			if (((h - y) > 0)
+				&& ((c - y) < -400))
+				return(1);
+		}
+		else
+		{
+			if (((h - y) > 0)
+				&& ((c - y) < -400)
+				&& ((y - 819 - c) > -72))
+				return(1);
+		}
+	}
+	return(0);
 }
 
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -6482,7 +6532,6 @@ int TestLaraVault(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 
 
-
 	if (coll->collType == CT_FRONT)
 	{
 		short angle = item->pos.yRot;
@@ -7037,6 +7086,13 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 					item->animNumber = ANIMATION_LARA_HANG_IDLE;
 					item->frameNumber = Anims[item->animNumber].frameBase + 21;
 				}
+				else if (item->currentAnimState == STATE_LARA_HANG_FEET_SHIMMYL || item->currentAnimState == STATE_LARA_HANG_FEET_SHIMMYR)
+					{
+						item->currentAnimState = STATE_LARA_HANG_FEET;
+						item->goalAnimState = STATE_LARA_HANG_FEET;
+						item->animNumber = ANIMATION_LARA_HANG_FEET_IDLE;
+						item->frameNumber = Anims[item->animNumber].frameBase;
+					}
 				result = 1;
 			}
 		}
@@ -7061,7 +7117,6 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 /**********************
 
 Current problems with with the feet hanging:
--holding right/left at block ends makes Lara do the shimmy anim repeatedly
 -lara doesn't want to shimmy on uneven surfaces at all
 -going around corners isn't working. code is commented for now.
 -obviously, not all animations were made yet- we still need crouch pull up (works well, tested with placeholder anim) and corner anims (doesn't work) and handstand (not tested)

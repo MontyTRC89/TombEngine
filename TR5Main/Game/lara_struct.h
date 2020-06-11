@@ -660,6 +660,8 @@ enum LARA_ANIM
 	ANIMATION_LARA_HANG_FEET_IN_LCORNER = 491,					// hang feet shimmy around inner left corner
 	ANIMATION_LARA_HANG_FEET_OUT_RCORNER = 492,					// hang feet shimmy around outer right corner
 	ANIMATION_LARA_HANG_FEET_OUT_LCORNER = 493,					// hang feet shimmy around outer left corner
+	ANIMATION_LARA_HANG_FEET_HANDSTAND = 494,					// reserving for later
+	ANIMATION_LARA_HANG_THIN_LEDGE = 495,						// TR1/2 hang on flat/1 click edges. in TR3+ it was replaced with monkeybar anim which is long and annoying, and some builders might want to customize.
 
 	NUM_LARA_ANIMS
 };
