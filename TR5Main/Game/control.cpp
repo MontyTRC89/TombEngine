@@ -155,7 +155,9 @@ extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
 extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern bool BlockAllInput;
-
+extern int skipLoop;
+extern int skipFrames;
+extern bool incontrolphase;
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
@@ -170,7 +172,15 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
-	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
+	if (skipLoop != -1)
+	{
+		if (skipLoop == 0)
+			return GAME_STATUS_NONE;
+		else
+			--skipLoop;
+	}
+
+	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= skipFrames)
 	{
 		GlobalCounter++;
 
@@ -714,8 +724,9 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 		nframes = DrawPhaseGame();
 		
 		g_Renderer->ResetAnimations();
+		incontrolphase = true;
 		result = ControlPhase(nframes, 0);
-
+		incontrolphase = false;
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||
 			result == GAME_STATUS_LEVEL_COMPLETED)

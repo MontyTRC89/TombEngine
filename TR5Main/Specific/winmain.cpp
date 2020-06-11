@@ -27,7 +27,9 @@ extern GameConfiguration g_Configuration;
 DWORD DebugConsoleThreadID;
 DWORD MainThreadID;
 bool BlockAllInput = true;
-
+int skipLoop = -1;
+int skipFrames = 2;
+bool incontrolphase = false;
 int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
@@ -77,7 +79,7 @@ void HandleScriptMessage(WPARAM wParam)
 {
 	string ErrorMessage;
 	string message = *(string*)(wParam);
-	bool status;
+	bool status = false;
 
 	//check whether line starts with "lua "
 	if (message.find("lua ") == 0) {
@@ -85,7 +87,22 @@ void HandleScriptMessage(WPARAM wParam)
 		status = g_GameScript->ExecuteScript(scriptSubstring, ErrorMessage);
 	}
 	else {
-		status = g_GameScript->ExecuteString(message, ErrorMessage);
+		if (message.find("skipLoop=") == 0)
+		{
+			string scriptSubstring = message.substr(9);
+			if (!incontrolphase)
+			skipLoop = stoi(scriptSubstring);
+		}
+		else if (message.find("skipFrames=") == 0)
+		{
+			string scriptSubstring = message.substr(11);
+			if (!incontrolphase)
+			skipFrames = stoi(scriptSubstring);
+		}
+		else
+		{
+			status = g_GameScript->ExecuteString(message, ErrorMessage);
+		}
 	}
 	if (!status)
 		cout << ErrorMessage << endl;
