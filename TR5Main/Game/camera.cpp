@@ -352,6 +352,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 
 void ChaseCamera(ITEM_INFO* item)
 {
+	return;
 	if (!Camera.targetElevation)
 	{
 		Camera.targetElevation = -ANGLE(10);
