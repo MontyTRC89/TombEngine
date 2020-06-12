@@ -64,8 +64,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(0), TO_RAD(-Lara.leftArm.yRot));
-		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(0), TO_RAD(-Lara.rightArm.yRot));
+		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
+		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.zRot), TO_RAD(-Lara.rightArm.yRot));
 
 		LARA_ARM * leftArm = &Lara.leftArm;
 		LARA_ARM * rightArm = &Lara.rightArm;

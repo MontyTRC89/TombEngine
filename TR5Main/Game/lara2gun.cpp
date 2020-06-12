@@ -95,15 +95,21 @@ void AnimatePistols(int weaponType)
 		}
 	}
 
-	short frameRight = Lara.rightArm.frameNumber;
+	// Shooting action for right arm.
+	short frameRight = Lara.rightArm.frameNumber;  // frame number of DRAW_END?
 	if (Lara.rightArm.lock || (TrInput & IN_ACTION && !Lara.target))
 	{
+		// POINT ARMS FORWARD
+		// at or beyond (2) DRAW_END start frame AND before (0) SHOOT_START end frame...
 		if ((frameRight >= 0) && (frameRight < p->draw1Anim2))
 		{
+			// ...increment toward (0) SHOOT_START end frame
 			frameRight++;
 		}
+		// at (0) SHOOT_START end frame
 		else if (frameRight == p->draw1Anim2)
 		{
+			// actually shoot, bang bang
 			if (TrInput & IN_ACTION)
 			{
 				if (weaponType != WEAPON_REVOLVER)
@@ -111,7 +117,7 @@ void AnimatePistols(int weaponType)
 					angleRight[0] = Lara.rightArm.yRot + LaraItem->pos.yRot;
 					angleRight[1] = Lara.rightArm.xRot;
 
-					if (FireWeapon(weaponType, Lara.target, LaraItem, angleRight) != FW_NOAMMO)
+					if (FireWeapon(weaponType, Lara.target, LaraItem, angleRight))
 					{
 						SmokeCountR = 28;
 						SmokeWeapon = weaponType;
@@ -130,6 +136,7 @@ void AnimatePistols(int weaponType)
 					}
 				}
 
+				// go to (3) SHOOT_CONTINUE start frame
 				frameRight = p->recoilAnim;
 			}
 			else if (UziRight)
@@ -138,6 +145,7 @@ void AnimatePistols(int weaponType)
 				UziRight = false;
 			}
 		}
+		// at or beyond (3) SHOOT_CONTINUE start frame
 		else if (frameRight >= p->recoilAnim)
 		{
 			if (weaponType == WEAPON_UZI)
@@ -146,18 +154,33 @@ void AnimatePistols(int weaponType)
 				UziRight = true;
 			}
 
+			// increment toward (3) SHOOT_CONTINUE end frame (finish recoil before allowing to shoot again)
 			frameRight++;
 
+			// at (3) SHOOT_CONTINUE end frame, go to (0) START_SHOOT end frame
 			if (frameRight == (p->recoilAnim + weapon->recoilFrame))
 				frameRight = p->draw1Anim2;
 		}
 	}
+	// HAS LET GO OF ACTION
 	else
 	{
-		if (frameRight >= p->recoilAnim)
+		// BUGFIX: rapid-fire no more. -Sezz
+		// let (3) SHOOT_CONTINUE finish
+		if ((frameRight >= p->recoilAnim) && (frameRight < p->recoilAnim + weapon->recoilFrame))
+			frameRight++;
+		// at (3) SHOOT_CONTINUE end frame, go to (0) START_SHOOT end frame
+		if (frameRight == (p->recoilAnim + weapon->recoilFrame))
 			frameRight = p->draw1Anim2;
+		// go back to ready stance
 		else if ((frameRight > 0) && (frameRight <= p->draw1Anim2))
 			frameRight--;
+
+		// OLD:
+		//if (frameRight >= p->recoilAnim)
+		//	frameRight = p->draw1Anim2;
+		//else if ((frameRight > 0) && (frameRight <= p->draw1Anim2))
+		//	frameRight--;
 
 		if (UziRight)
 		{
@@ -167,6 +190,7 @@ void AnimatePistols(int weaponType)
 	}
 	set_arm_info(&Lara.rightArm, frameRight);
 
+	// Shooting for left arm.
 	short frameLeft = Lara.leftArm.frameNumber;
 	if (Lara.leftArm.lock || (TrInput & IN_ACTION && !Lara.target))
 	{
@@ -181,7 +205,7 @@ void AnimatePistols(int weaponType)
 				angleLeft[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
 				angleLeft[1] = Lara.leftArm.xRot;
 
-				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft) != FW_NOAMMO)
+				if (FireWeapon(weaponType, Lara.target, LaraItem, angleLeft))
 				{
 					if (weaponType == WEAPON_REVOLVER)
 					{
@@ -233,10 +257,18 @@ void AnimatePistols(int weaponType)
 	}
 	else       																// Havent GOT a LOCK ON..
 	{
-		if (frameLeft >= p->recoilAnim) 									// If Gun is Recoiling Stop it now...
+		if ((frameLeft >= p->recoilAnim) && (frameLeft < p->recoilAnim + weapon->recoilFrame))
+			frameLeft++;
+		if (frameLeft == (p->recoilAnim + weapon->recoilFrame))
 			frameLeft = p->draw1Anim2;
-		else if (frameLeft > 0 && frameLeft <= p->draw1Anim2)
-			frameLeft--;													// UnLock ARM
+		else if ((frameLeft > 0) && (frameLeft <= p->draw1Anim2))
+			frameLeft--;
+
+		// OLD:
+		//if (frameLeft >= p->recoilAnim) 									// If Gun is Recoiling Stop it now...
+		//	frameLeft = p->draw1Anim2;
+		//else if (frameLeft > 0 && frameLeft <= p->draw1Anim2)
+		//	frameLeft--;													// UnLock ARM
 
 		if (UziLeft)
 		{
@@ -384,12 +416,21 @@ void ready_pistols(int weaponType)
 void undraw_pistols(int weaponType)
 {
 	PISTOL_DEF* p = &PistolsTable[Lara.gunType];
+	WEAPON_INFO* weapon = &Weapons[weaponType];
 
 	short frameLeft = Lara.leftArm.frameNumber;
-	if (frameLeft >= p->recoilAnim)
+
+	// To go along with the rapid-fire BUGFIX, finish recoil anim before holstering weapon too. -Sezz
+	if ((frameLeft >= p->recoilAnim) && (frameLeft < p->recoilAnim + weapon->recoilFrame))
+		frameLeft++;
+	if (frameLeft == (p->recoilAnim + weapon->recoilFrame))
+		frameLeft = p->draw1Anim2;
+
+	// OLD:
+	/*if (frameLeft >= p->recoilAnim)
 	{
 		frameLeft = p->draw1Anim2;
-	}
+	}*/
 	else if (frameLeft > 0 && frameLeft < p->draw1Anim)
 	{
 		Lara.leftArm.xRot -= Lara.leftArm.xRot / frameLeft;
@@ -416,10 +457,17 @@ void undraw_pistols(int weaponType)
 	set_arm_info(&Lara.leftArm, frameLeft);
 
 	short frameRight = Lara.rightArm.frameNumber;
-	if (frameRight >= p->recoilAnim)
+
+	if ((frameRight >= p->recoilAnim) && (frameRight < p->recoilAnim + weapon->recoilFrame))
+		frameRight++;
+	if (frameRight == (p->recoilAnim + weapon->recoilFrame))
+		frameRight = p->draw1Anim2;
+
+	// OLD:
+	/*if (frameRight >= p->recoilAnim)
 	{
 		frameRight = p->draw1Anim2;
-	}
+	}*/
 	else if (frameRight > 0 && frameRight < p->draw1Anim)
 	{
 		Lara.rightArm.xRot -= Lara.rightArm.xRot / frameRight;
@@ -451,8 +499,8 @@ void undraw_pistols(int weaponType)
 		Lara.leftArm.frameNumber = 0;
 		Lara.rightArm.frameNumber = 0;
 		Lara.target = NULL;
-		Lara.rightArm.lock = false;
-		Lara.leftArm.lock = false;
+		Lara.rightArm.lock = 0;
+		Lara.leftArm.lock = 0;
 	}
 
 	if (!(TrInput & IN_LOOK))
