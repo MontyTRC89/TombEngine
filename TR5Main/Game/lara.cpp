@@ -2453,7 +2453,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	if (item->animNumber == ANIMATION_LARA_HANG_IDLE && item->frameNumber == Anims[item->animNumber].frameBase + 21)
+	if (item->animNumber == ANIMATION_LARA_HANG_IDLE)
 	{
 		int flag;
 
@@ -2504,7 +2504,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
 
 	LaraHangTest(item, coll);
 
-	if (item->animNumber == ANIMATION_LARA_HANG_IDLE && item->frameNumber == Anims[item->animNumber].frameBase + 21)
+	if (item->animNumber == ANIMATION_LARA_HANG_IDLE)
 	{
 		TestForObjectOnLedge(item, coll);
 
@@ -2564,7 +2564,6 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
 				{
 					item->animNumber = ANIMATION_LARA_LADDER_UP_HANDS;
 					item->frameNumber = Anims[item->animNumber].frameBase;
-
 					item->goalAnimState = STATE_LARA_HANG;
 					item->currentAnimState = STATE_LARA_HANG;
 				}
@@ -2578,19 +2577,16 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)//19AC8, 19BFC (F)
 			coll->midFloor > 344 && 
 			item->animNumber == ANIMATION_LARA_HANG_IDLE)
 		{
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 21)
+			if (LaraTestClimbStance(item, coll))
 			{
-				if (LaraTestClimbStance(item, coll))
-				{
-					item->goalAnimState = STATE_LARA_LADDER_IDLE;
-				}
-				else
-				{
-					item->animNumber = ANIMATION_LARA_LADDER_DOWN_HANDS;
-					item->goalAnimState = STATE_LARA_HANG;
-					item->currentAnimState = STATE_LARA_HANG;
-					item->frameNumber = Anims[item->animNumber].frameBase;
-				}
+				item->goalAnimState = STATE_LARA_LADDER_IDLE;
+			}
+			else
+			{
+				item->animNumber = ANIMATION_LARA_LADDER_DOWN_HANDS;
+				item->goalAnimState = STATE_LARA_HANG;
+				item->currentAnimState = STATE_LARA_HANG;
+				item->frameNumber = Anims[item->animNumber].frameBase;
 			}
 		}
 	}
@@ -5514,7 +5510,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	int h, c;
 
 	//debug till scripting be ready
-	TR12_OSCILLATE_HANG = true;
+//	TR12_OSCILLATE_HANG = true;
 
 	if (angle == ANGLE(180.0f))
 	{
