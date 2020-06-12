@@ -157,9 +157,33 @@ extern std::deque<FOOTPRINT_STRUCT> footprints;
 extern bool BlockAllInput;
 extern int skipLoop;
 extern int skipFrames;
-extern bool incontrolphase;
+extern int lockInput;
+extern int newSkipLoop;
+extern int newSkipFrames;
+extern int newLockInput;
+extern bool newSkipFramesValue;
+extern bool newSkipLoopValue;
+extern bool newLockInputValue;
+
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
+	short oldLaraFrame;
+	if (newSkipFramesValue)
+	{
+		skipFrames = newSkipFrames;
+		newSkipFramesValue = false;
+	}
+	if (newSkipLoopValue)
+	{
+		skipLoop = newSkipLoop;
+		newSkipLoopValue = false;
+	}
+	if (newLockInputValue)
+	{
+		lockInput = newLockInput;
+		newLockInputValue = false;
+	}
+
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
@@ -177,7 +201,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (skipLoop == 0)
 			return GAME_STATUS_NONE;
 		else
-			--skipLoop;
+			oldLaraFrame = LaraItem->frameNumber;
 	}
 
 	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= skipFrames)
@@ -199,6 +223,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			TrInput = 0;
 		}
 
+		if (lockInput)
+			TrInput = lockInput;
 
 		// Has Lara control been disabled?
 		if (DisableLaraControl || CurrentLevel == 0)
@@ -537,6 +563,12 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		GameTimer++;
 	}
 
+	if (skipLoop != -1)
+	{
+		if (oldLaraFrame != LaraItem->frameNumber)
+			--skipLoop;
+	}
+
 	return GAME_STATUS_NONE;
 }
 
@@ -724,9 +756,7 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 		nframes = DrawPhaseGame();
 		
 		g_Renderer->ResetAnimations();
-		incontrolphase = true;
 		result = ControlPhase(nframes, 0);
-		incontrolphase = false;
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
 			result == GAME_STATUS_LOAD_GAME ||
 			result == GAME_STATUS_LEVEL_COMPLETED)

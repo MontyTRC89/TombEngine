@@ -29,7 +29,14 @@ DWORD MainThreadID;
 bool BlockAllInput = true;
 int skipLoop = -1;
 int skipFrames = 2;
-bool incontrolphase = false;
+int lockInput = 0;
+int newSkipLoop = -1;
+int newSkipFrames = 2;
+int newLockInput = 0;
+bool newSkipFramesValue = false;
+bool newSkipLoopValue = false;
+bool newLockInputValue = false;
+
 int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
 {
 	return luaL_error(L, description.data());
@@ -87,17 +94,23 @@ void HandleScriptMessage(WPARAM wParam)
 		status = g_GameScript->ExecuteScript(scriptSubstring, ErrorMessage);
 	}
 	else {
-		if (message.find("skipLoop=") == 0)
+		if (message.find("SL=") == 0)
 		{
-			string scriptSubstring = message.substr(9);
-			if (!incontrolphase)
-			skipLoop = stoi(scriptSubstring);
+			string scriptSubstring = message.substr(3);
+			newSkipLoop = stoi(scriptSubstring);
+			newSkipLoopValue = true;
 		}
-		else if (message.find("skipFrames=") == 0)
+		else if (message.find("SF=") == 0)
 		{
-			string scriptSubstring = message.substr(11);
-			if (!incontrolphase)
-			skipFrames = stoi(scriptSubstring);
+			string scriptSubstring = message.substr(3);
+			newSkipFrames = stoi(scriptSubstring);
+			newSkipFramesValue = true;
+		}
+		else if (message.find("LI=") == 0)
+		{
+			string scriptSubstring = message.substr(3);
+			newLockInput = stoi(scriptSubstring);
+			newLockInputValue = true;
 		}
 		else
 		{
