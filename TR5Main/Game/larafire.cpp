@@ -277,18 +277,20 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 
 	speed = winfo->aimSpeed;
 
+	// Have target lock, so get XY angles for arms.
 	if (arm->lock)
 	{
 		y = Lara.targetAngles[0];
 		x = Lara.targetAngles[1];
 	}
+	// No target lock, so aim straight.
 	else
 	{
 		y = 0;
 		x = 0;
 	}
 
-	/* move y axis */
+	// Rotate arms on y axis toward target.
 	rotY = arm->yRot;
 	if ((rotY >= y - speed) && (rotY <= y + speed))
 		rotY = y;
@@ -298,7 +300,7 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 		rotY -= speed;
 	arm->yRot = rotY;
 
-	/* move x axis */
+	// Rotate arms on x axis toward target.
 	rotX = arm->xRot;
 	if ((rotX >= x - speed) && (rotX <= x + speed))
 		rotX = x;
@@ -308,7 +310,7 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 		rotX -= speed;
 	arm->xRot = rotX;
 
-	/* move z axis */
+	// TODO: set arm rotations to inherit rotations of parent bones. -Sezz
 	arm->zRot = 0;
 }
 
