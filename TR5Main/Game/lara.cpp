@@ -4652,31 +4652,17 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 				{
 					short* bounds;
 
-					if (!TestHangSwingIn(item, angle))
+					if (TestHangSwingIn(item, angle))
 					{
 
-						if (TR12_OSCILLATE_HANG == true)
-						{
 							Lara.headYrot = 0;
 							Lara.headXrot = 0;
 							Lara.torsoYrot = 0;
 							Lara.torsoXrot = 0;
-							item->animNumber = ANIMATION_LARA_HANG_THIN_LEDGE;
-							item->frameNumber = Anims[item->animNumber].frameBase;
-							item->currentAnimState = STATE_LARA_HANG;
-							item->goalAnimState = STATE_LARA_HANG;
-						}
-						else
-						{
-							Lara.headYrot = 0;
-							Lara.headXrot = 0;
-							Lara.torsoYrot = 0;
-							Lara.torsoXrot = 0;
-							item->animNumber = ANIMATION_LARA_OSCILLATE_HANG_ON;
+							item->animNumber = ANIMATION_LARA_MONKEY_GRAB;
 							item->frameNumber = Anims[item->animNumber].frameBase;
 							item->currentAnimState = STATE_LARA_MONKEYSWING_IDLE;
 							item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
-						}
 					}
 					else
 					{
@@ -5528,7 +5514,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 	int h, c;
 
 	//debug till scripting be ready
-//	TR12_OSCILLATE_HANG = true;
+	TR12_OSCILLATE_HANG = true;
 
 	if (angle == ANGLE(180.0f))
 	{
