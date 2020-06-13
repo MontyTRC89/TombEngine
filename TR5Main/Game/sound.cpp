@@ -706,5 +706,5 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 
 void SayNo()
 {
-
+	SoundEffect(SFX_LARA_NO, NULL, SFX_ALWAYS);
 }
