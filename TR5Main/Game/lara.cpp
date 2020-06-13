@@ -202,6 +202,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = {
 	lara_as_hang_feet_inLcorner,
 	lara_as_hang_feet_outRcorner,
 	lara_as_hang_feet_outLcorner,
+	lara_as_controlledl,
 };
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_walk,
@@ -350,6 +351,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
+	lara_void_func,
 };
 /*function<LaraRoutineFunction> lara_camera_routines[NUM_LARA_STATES + 1] = {
 
