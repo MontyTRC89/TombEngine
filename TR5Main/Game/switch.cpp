@@ -1354,15 +1354,14 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					Lara.torsoXrot = 0;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					Lara.generalPtr = target;
+					item->goalAnimState = 1;
+					item->status = ITEM_ACTIVE;
 					l->animNumber = ANIMATION_LARA_COGWHEEL_GRAB;
 					l->goalAnimState = STATE_LARA_COGWHEEL;
 					l->currentAnimState = STATE_LARA_COGWHEEL;
 					l->frameNumber = Anims[l->animNumber].frameBase;
 
 					AddActiveItem(itemNum);
-
-					item->goalAnimState = 1;
-					item->status = ITEM_ACTIVE;
 					if (!door->opened)
 					{
 						AddActiveItem((target - Items));
@@ -1397,7 +1396,7 @@ void CogSwitchControl(short itemNum)
 	{
 		if (item->goalAnimState == 1 && !(TrInput & IN_ACTION))
 		{
-			LaraItem->goalAnimState = STATE_LARA_STOP;
+			LaraItem->goalAnimState = STATE_LARA_COGWHEEL_UNGRAB;
 			item->goalAnimState = 0;
 		}
 
@@ -1414,7 +1413,7 @@ void CogSwitchControl(short itemNum)
 	}
 	else
 	{
-		if (item->frameNumber == Anims[item->animNumber].frameEnd)
+		if (item->frameNumber == Anims[item->animNumber].frameEnd && LaraItem->animNumber != ANIMATION_LARA_COGWHEEL_UNGRAB)
 		{
 			item->currentAnimState = 0;
 			item->status = ITEM_NOT_ACTIVE;
