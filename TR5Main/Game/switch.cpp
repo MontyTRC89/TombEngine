@@ -1362,11 +1362,14 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->frameNumber = Anims[l->animNumber].frameBase;
 
 					AddActiveItem(itemNum);
-					if (!door->opened)
+					if (door != NULL)
 					{
-						AddActiveItem((target - Items));
-						target->itemFlags[2] = target->pos.yPos;
-						target->status = ITEM_ACTIVE;
+						if (!door->opened)
+						{
+							AddActiveItem((target - Items));
+							target->itemFlags[2] = target->pos.yPos;
+							target->status = ITEM_ACTIVE;
+						}
 					}
 				}
 				else
