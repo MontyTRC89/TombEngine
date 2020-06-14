@@ -124,7 +124,6 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->patrol2 = false;
 	creature->jumpAhead = false;
 	creature->monkeyAhead = false;
-	creature->alerted = false;
 	creature->LOT.canJump = false;
 	creature->LOT.canMonkey = false;
 	creature->LOT.isAmphibious = false; // only the crocodile can go water and land. (default: true)
@@ -147,12 +146,7 @@ void InitialiseSlot(short itemNum, short slot)
 			else if (!obj->undead && obj->hitPoints)
 				obj->hitEffect = HIT_BLOOD;
 		}
-
-		// init the basic zone for creature.
-		// ignore if the zoneType is specified in the Objects[] already with other than ZONE_NULL.
-		if (obj->zoneType == ZONE_NULL)
-			obj->zoneType = ZONE_BASIC; // only entity that use CreatureActive() will reach InitialiseSlot() !
-
+		
 		obj->nonLot = false; // change to use pathfinding
 	}
 
@@ -160,6 +154,9 @@ void InitialiseSlot(short itemNum, short slot)
 	{
 		default:
 		case ZONE_NULL:
+		    creature->LOT.step = SECTOR(1) - CLICK(3);
+			creature->LOT.drop = -(SECTOR(1) - CLICK(3));
+			obj->zoneType = ZONE_BASIC; // only entity that use CreatureActive() will reach InitialiseSlot() !
 			break;
 
 		case ZONE_SKELLY:
