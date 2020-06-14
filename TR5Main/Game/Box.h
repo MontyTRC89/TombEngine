@@ -55,8 +55,8 @@ typedef struct OBJECT_BONES
 	{
 		this->bone0 = all;
 		this->bone1 = all;
-		this->bone2 = -all;
-		this->bone3 = -all;
+		this->bone2 = all;
+		this->bone3 = all;
 	}
 
 	OBJECT_BONES(short angleY, short angleX)

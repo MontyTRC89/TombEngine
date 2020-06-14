@@ -106,18 +106,18 @@ void CrocodileControl(short itemNumber)
     AI_INFO info;
     OBJECT_BONES boneRot;
     short angle;
-    short bone_angle;
+    short boneAngle;
 
     item = &Items[itemNumber];
     obj = &Objects[item->objectNumber];
     crocodile = GetCreatureInfo(item);
     angle = 0;
-    bone_angle = 0;
+    boneAngle = 0;
 
     if (item->hitPoints <= 0)
     {
         angle = 0;
-        bone_angle = 0;
+        boneAngle = 0;
 
         if (item->currentAnimState != CROC_DIE && item->currentAnimState != WCROC_DIE)
         {
@@ -162,7 +162,7 @@ void CrocodileControl(short itemNumber)
             AlertAllGuards(itemNumber);
         }
 
-        bone_angle = angle << 2;
+        boneAngle = angle << 2;
         switch (item->currentAnimState)
         {
         case CROC_IDLE:
@@ -170,9 +170,9 @@ void CrocodileControl(short itemNumber)
 
             if (item->aiBits & GUARD)
             {
-                bone_angle = item->itemFlags[0];
+                boneAngle = item->itemFlags[0];
                 item->goalAnimState = CROC_IDLE;
-                item->itemFlags[0] = item->itemFlags[1] + bone_angle;
+                item->itemFlags[0] = item->itemFlags[1] + boneAngle;
 
                 if (!(GetRandomControl() & 0x1F))
                 {
@@ -298,9 +298,19 @@ void CrocodileControl(short itemNumber)
     }
 
     if (item->currentAnimState == CROC_IDLE || item->currentAnimState == CROC_ATK || item->currentAnimState == WCROC_ATK)
-        boneRot = OBJECT_BONES(info.angle, info.xAngle);
+    {
+        boneRot.bone0 = info.angle;
+        boneRot.bone1 = info.angle;
+        boneRot.bone2 = 0;
+        boneRot.bone3 = 0;
+    }
     else
-        boneRot = OBJECT_BONES(bone_angle);
+    {
+        boneRot.bone0 = boneAngle;
+        boneRot.bone1 = boneAngle;
+        boneRot.bone2 = -boneAngle;
+        boneRot.bone3 = -boneAngle;
+    }
 
     CreatureTilt(item, 0);
     CreatureJoint(item, 0, boneRot.bone0);
