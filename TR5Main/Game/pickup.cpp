@@ -98,6 +98,7 @@ static short MSBounds[12] = // offset 0xA1488
 
 int NumRPickups;
 short RPickups[16];
+short pickupitem;
 PHD_VECTOR OldPickupPos;
 extern int KeyTriggerActive;
 extern Inventory* g_Inventory;
@@ -408,16 +409,6 @@ void CollectCarriedItems(ITEM_INFO* item)
     }
     item->carriedItem = NO_ITEM;
 }
-
-/*void SearchObjectCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
-{
-    UNIMPLEMENTED();
-}
-
-void SearchObjectControl(short itemNumber)//52D54, 531B8
-{
-    UNIMPLEMENTED();
-}*/
 
 int PickupTrigger(short itemNum) 
 {
@@ -745,6 +736,104 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     return;
 }
 
+void do_pickup()
+{
+	ITEM_INFO* item = &Items[pickupitem];
+	pickupitem = item->objectNumber;
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
+
+	if (item->objectNumber == ID_BURNING_TORCH_ITEM)
+	{
+		AddDisplayPickup(ID_BURNING_TORCH_ITEM);
+		GetFlameTorch();
+		Lara.litTorch = (item->itemFlags[3] & 1);
+
+		KillItem(pickupitem);
+		item->pos.xRot = oldXrot;
+		item->pos.yRot = oldYrot;
+		item->pos.zRot = oldZrot;
+		return;
+	}
+	else
+	if (item->objectNumber == ID_FLARE_ITEM)
+	{
+		if (LaraItem->currentAnimState == ANIMATION_LARA_UNDERWATER_FLARE_PICKUP)
+		{
+			Lara.requestGunType = WEAPON_FLARE;
+			Lara.gunType = WEAPON_FLARE;
+			InitialiseNewWeapon();
+			Lara.gunStatus = LG_SPECIAL;
+			Lara.flareAge = (int)(item->data) & 0x7FFF;
+			draw_flare_meshes();
+			KillItem(pickupitem);
+
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
+			return;
+		}
+		else 
+		if (LaraItem->currentAnimState == STATE_LARA_FLARE_PICKUP)
+		{
+			Lara.requestGunType = WEAPON_FLARE;
+			Lara.gunType = WEAPON_FLARE;
+			InitialiseNewWeapon();
+			Lara.gunStatus = LG_SPECIAL;
+			Lara.flareAge = (short)(item->data) & 0x7FFF;
+			return;
+		}
+	}
+	else
+	{
+		if (LaraItem->animNumber == ANIMATION_LARA_UNDERWATER_PICKUP)
+		{
+			AddDisplayPickup(item->objectNumber);
+			if (!(item->triggerFlags & 0xC0))
+			{
+				KillItem(pickupitem);
+			}
+			else
+			{
+				item->itemFlags[3] = 1;
+				item->flags |= 0x20;
+				item->status = ITEM_INVISIBLE;
+			}
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
+			return;
+		}
+		else
+		{
+			if (LaraItem->animNumber == ANIMATION_LARA_PICKUP)
+			{
+				AddDisplayPickup(item->objectNumber);
+				if (item->triggerFlags & 0x100)
+				{
+					for (int i = 0; i < LevelItems; i++)
+					{
+						if (Items[i].objectNumber == item->objectNumber)
+							KillItem(i);
+					}
+				}
+				if (item->triggerFlags & 0xC0)
+				{
+					item->itemFlags[3] = 1;
+					item->flags |= 0x20;
+					item->status = ITEM_INVISIBLE;
+				}
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
+				KillItem(pickupitem);//?
+				return;
+			}
+		}
+	}
+}
+
 void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
     ITEM_INFO* item = &Items[itemNum];
@@ -817,7 +906,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 return;
             }
             
-            if ((short)Lara.generalPtr != itemNum
+         /*   if ((short)Lara.generalPtr != itemNum
                 || l->currentAnimState != STATE_LARA_PICKUP
                 || l->frameNumber != Anims[ANIMATION_LARA_UNDERWATER_PICKUP].frameBase + 18)
             {
@@ -850,12 +939,12 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 item->itemFlags[3] = 1;
                 item->flags |= 0x20;
                 item->status = ITEM_INVISIBLE;
-            }
+            }*/
         }
 
-        item->pos.xRot = oldXrot;
+/*        item->pos.xRot = oldXrot;
         item->pos.yRot = oldYrot;
-        item->pos.zRot = oldZrot;
+        item->pos.zRot = oldZrot;*/
         return;
     }
     
@@ -871,7 +960,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             {
                 if (l->currentAnimState != STATE_LARA_PICKUP && l->currentAnimState != STATE_LARA_HOLE)
                 {
-                    if ((short)Lara.generalPtr == itemNum
+                /*    if ((short)Lara.generalPtr == itemNum
                         && l->currentAnimState == STATE_LARA_FLARE_PICKUP
                         && (l->animNumber == ANIMATION_LARA_CROUCH_PICKUP_FLARE &&
                             l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP_FLARE].frameBase + 22)
@@ -883,7 +972,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                         Lara.gunStatus = LG_SPECIAL;
                         Lara.flareAge = (short)(item->data) & 0x7FFF;
                     }
-                    else
+                    else*/
                     {
                         item->pos.xRot = oldXrot;
                         item->pos.yRot = oldYrot;
@@ -891,66 +980,67 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                         return;
                     }
                 }
-                else
-                {
-                    if (l->frameNumber == Anims[ANIMATION_LARA_PICKUP].frameBase + 15
-                        || l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 22
-                        || l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 20
-                        || l->frameNumber == Anims[ANIMATION_LARA_PICKUP_PEDESTAL_LOW].frameBase + 29
-                        || l->frameNumber == Anims[ANIMATION_LARA_PICKUP_PEDESTAL_HIGH].frameBase + 45
-                        || l->frameNumber == Anims[ANIMATION_LARA_HOLE_GRAB].frameBase + 42
-                        || l->frameNumber == Anims[ANIMATION_LARA_CROWBAR_USE_ON_WALL2].frameBase + 183
-                        || (l->animNumber == ANIMATION_LARA_CROWBAR_USE_ON_WALL && l->frameNumber != Anims[ANIMATION_LARA_CROWBAR_USE_ON_WALL].frameBase + 123))
-                    {
-                        if (item->objectNumber == ID_BURNING_TORCH_ITEM)
-                        {
-                            AddDisplayPickup(ID_BURNING_TORCH_ITEM);
-                            GetFlameTorch();
-                            Lara.litTorch = (item->itemFlags[3] & 1);
-                            
-                            KillItem(itemNum);
-                            item->pos.xRot = oldXrot;
-                            item->pos.yRot = oldYrot;
-                            item->pos.zRot = oldZrot;
-                            return;
-                        }
-                        else
-                        {
-                            if (item->objectNumber != ID_FLARE_ITEM)
-                            {
-                                AddDisplayPickup(item->objectNumber);
-                                if (item->triggerFlags & 0x100)
-                                {
-                                    for (int i = 0; i < LevelItems; i++)
-                                    {
-                                        if (Items[i].objectNumber == item->objectNumber)
-                                            KillItem(i);
-                                    }
-                                }
-                            }
-                            if (item->triggerFlags & 0xC0)
-                            {
-                                item->itemFlags[3] = 1;
-                                item->flags |= 0x20;
-                                item->status = ITEM_INVISIBLE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        item->pos.xRot = oldXrot;
-                        item->pos.yRot = oldYrot;
-                        item->pos.zRot = oldZrot;
-                        return;
-                    }
-                }
+				else
+				{
+					/*   if (l->frameNumber == Anims[ANIMATION_LARA_PICKUP].frameBase + 15
+						   || l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 22
+						   || l->frameNumber == Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 20
+						   || l->frameNumber == Anims[ANIMATION_LARA_PICKUP_PEDESTAL_LOW].frameBase + 29
+						   || l->frameNumber == Anims[ANIMATION_LARA_PICKUP_PEDESTAL_HIGH].frameBase + 45
+						   || l->frameNumber == Anims[ANIMATION_LARA_HOLE_GRAB].frameBase + 42
+						   || l->frameNumber == Anims[ANIMATION_LARA_CROWBAR_USE_ON_WALL2].frameBase + 183
+						   || (l->animNumber == ANIMATION_LARA_CROWBAR_USE_ON_WALL && l->frameNumber != Anims[ANIMATION_LARA_CROWBAR_USE_ON_WALL].frameBase + 123))
+					   {
+						   if (item->objectNumber == ID_BURNING_TORCH_ITEM)
+						   {
+							   AddDisplayPickup(ID_BURNING_TORCH_ITEM);
+							   GetFlameTorch();
+							   Lara.litTorch = (item->itemFlags[3] & 1);
 
-                KillItem(itemNum);
+							   KillItem(itemNum);
+							   item->pos.xRot = oldXrot;
+							   item->pos.yRot = oldYrot;
+							   item->pos.zRot = oldZrot;
+							   return;
+						   }
+						   else
+						   {
+							   if (item->objectNumber != ID_FLARE_ITEM)
+							   {
+								   AddDisplayPickup(item->objectNumber);
+								   if (item->triggerFlags & 0x100)
+								   {
+									   for (int i = 0; i < LevelItems; i++)
+									   {
+										   if (Items[i].objectNumber == item->objectNumber)
+											   KillItem(i);
+									   }
+								   }
+							   }
+							   if (item->triggerFlags & 0xC0)
+							   {
+								   item->itemFlags[3] = 1;
+								   item->flags |= 0x20;
+								   item->status = ITEM_INVISIBLE;
+							   }
+						   }
+					   }
+					   else
+					   {
+						   item->pos.xRot = oldXrot;
+						   item->pos.yRot = oldYrot;
+						   item->pos.zRot = oldZrot;
+						   return;
+					   }
+				   }
 
-                item->pos.xRot = oldXrot;
-                item->pos.yRot = oldYrot;
-                item->pos.zRot = oldZrot;
-                return;
+				   KillItem(itemNum);*/
+
+					item->pos.xRot = oldXrot;
+					item->pos.yRot = oldYrot;
+					item->pos.zRot = oldZrot;
+					return;
+				}
             }
         }
 
