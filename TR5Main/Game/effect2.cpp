@@ -12,7 +12,8 @@
 #include "objectslist.h"
 #include "GameFlowScript.h"
 #include "spark.h"
-
+#include "explosion.h"
+using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
 
 unsigned char TES_extra_tab[] =
@@ -550,18 +551,19 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	int shift = 0;
+
+	/*int shift = 0;
 	if ((roomNumber & 0x8000) != 0)
 	{
 		//v7 = -roomNumber;
 		roomNumber = -roomNumber;
 		shift = 1;
 	}
-	/*if (v7 == gfMirrorRoom && gfLevelFlags & 0x2000)
+	/ *if (v7 == gfMirrorRoom && gfLevelFlags & 0x2000)
 		v27 = 1;
 	z_bis = z;
 	do
-	{*/
+	{* /
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = 1;
 	spark->sR = -1;
@@ -677,7 +679,8 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	else
 	{
 		TriggerExplosionSmokeEnd(x, y, z, uw);
-	}
+	}*/
+	TriggerExplosion(Vector3(x, y, z), 512, true, false, true, roomNumber);
 	//} while (!v24);
 }
 
