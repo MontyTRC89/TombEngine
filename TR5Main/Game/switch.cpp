@@ -1421,11 +1421,11 @@ void CogSwitchControl(short itemNum)
 			item->currentAnimState = 0;
 			item->status = ITEM_NOT_ACTIVE;
 			RemoveActiveItem(itemNum);
-			LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = STATE_LARA_STOP;
-			LaraItem->currentAnimState = STATE_LARA_STOP;
-			Lara.gunStatus = LG_NO_ARMS;
+//			LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+//			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->goalAnimState = STATE_LARA_COGWHEEL_UNGRAB;
+//			LaraItem->currentAnimState = STATE_LARA_STOP;
+//			Lara.gunStatus = LG_NO_ARMS; /*must add this as an anim command instead to avoid trouble!*/
 		}
 	}
 }
