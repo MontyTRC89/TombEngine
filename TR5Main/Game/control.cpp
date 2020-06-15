@@ -41,7 +41,10 @@
 #include "tr4_locusts.h"
 #include "smoke.h"
 #include "spark.h"
-
+#include "explosion.h"
+using namespace T5M::Effects::Explosion;
+using namespace T5M::Effects::Spark;
+using namespace T5M::Effects::Smoke;
 short ShatterSounds[18][10] =
 	{
 		{SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS},
@@ -506,8 +509,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
-		T5M::Effects::Spark::UpdateSparkParticles();
-		T5M::Effects::Smoke::UpdateSmokeParticles();
+		UpdateSparkParticles();
+		UpdateSmokeParticles();
+		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateLocusts();
 		//Legacy_UpdateLightning();

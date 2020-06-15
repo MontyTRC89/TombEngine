@@ -2008,6 +2008,7 @@ bool Renderer11::drawScene(bool dump)
 	drawSmokes();
 	drawSmokeParticles();
 	drawSparkParticles();
+	drawExplosionParticles();
 	drawFootprints();
 	drawBlood();
 	drawSparks();

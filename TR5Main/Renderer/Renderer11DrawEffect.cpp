@@ -14,7 +14,8 @@
 #include "effect.h"
 #include "smoke.h"
 #include "spark.h"
-
+#include "drip.h"
+#include "explosion.h"
 using namespace T5M::Effects::Footprints;
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -1349,6 +1350,29 @@ bool Renderer11::drawSparkParticles()
 		Vector3 v;
 		s.velocity.Normalize(v);
 		AddSpriteBillboardConstrained(m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, s.width, s.height, BLENDMODE_ALPHABLEND, v);
+	}
+	return true;
+}
+
+bool Renderer11::drawDripParticles()
+{
+	using namespace T5M::Effects::Drip;
+	for (int i = 0; i < dripParticles.size(); i++) {
+		DripParticle& d = dripParticles[i];
+		if (!d.active) continue;
+		Vector3 v;
+		d.velocity.Normalize(v);
+		AddSpriteBillboardConstrained(m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, DRIP_WIDTH, d.height, BLENDMODE_ALPHABLEND, v);
+	}
+	return true;
+}
+
+bool Renderer11::drawExplosionParticles() {
+	using namespace T5M::Effects::Explosion;
+	for (int i = 0; i < explosionParticles.size(); i++) {
+		ExplosionParticle& e = explosionParticles[i];
+		if (!e.active) continue;
+		AddSpriteBillboard(m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, e.size, e.size, BLENDMODE_ALPHABLEND);
 	}
 	return true;
 }
