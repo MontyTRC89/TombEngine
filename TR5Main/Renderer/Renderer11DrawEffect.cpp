@@ -807,7 +807,23 @@ bool Renderer11::drawSprites()
 
 		int numSpritesToDraw = m_spritesToDraw.size();
 		int lastSprite = 0;
+		switch (currentBlendMode) {
+		case BLENDMODE_ALPHABLEND:
+			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
+			break;
+		case BLENDMODE_ALPHATEST:
+			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+
+			break;
+		case BLENDMODE_OPAQUE:
+			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			break;
+		case BLENDMODE_SUBTRACTIVE:
+			m_context->OMSetBlendState(m_subtractiveBlendState, NULL, 0xFFFFFFFF);
+
+			break;
+		}
 		m_primitiveBatch->Begin();
 
 		for (int i = 0; i < numSpritesToDraw; i++)
@@ -816,23 +832,6 @@ bool Renderer11::drawSprites()
 
 			if (spr->BlendMode != currentBlendMode)
 				continue;
-			switch (currentBlendMode) {
-			case BLENDMODE_ALPHABLEND:
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-
-				break;
-			case BLENDMODE_ALPHATEST:
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-
-				break;
-			case BLENDMODE_OPAQUE:
-				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-				break;
-			case BLENDMODE_SUBTRACTIVE:
-				m_context->OMSetBlendState(m_subtractiveBlendState, NULL, 0xFFFFFFFF);
-
-				break;
-			}
 
 			if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
