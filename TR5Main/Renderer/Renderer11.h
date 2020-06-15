@@ -872,6 +872,8 @@ private:
 	bool											initialiseBars();
 	bool											drawSmokeParticles();
 	bool											drawSparkParticles();
+	bool                                            drawDripParticles();
+	bool											drawExplosionParticles();
 public:
 	Matrix View;
 	Matrix Projection;

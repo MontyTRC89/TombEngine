@@ -795,6 +795,12 @@
     <ClInclude Include="Game\spark.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\drip.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\explosion.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1455,6 +1461,12 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\spark.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\drip.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\explosion.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
