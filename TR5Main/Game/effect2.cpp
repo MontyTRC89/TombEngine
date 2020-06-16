@@ -13,6 +13,7 @@
 #include "GameFlowScript.h"
 #include "spark.h"
 #include "explosion.h"
+#include <Game\drip.h>
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
 
@@ -1053,7 +1054,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 	}
 }
 
-void SetupSplash(const SPLASH_SETUP* const setup)
+void SetupSplash(const SPLASH_SETUP* const setup,int room)
 {
 	constexpr size_t NUM_SPLASHES = 3;
 	int numSplashesSetup = 0;
@@ -1120,7 +1121,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 			continue;
 		}
 	}
-
+	T5M::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y, setup->z),256,room);
 	PHD_3DPOS soundPosition;
 	soundPosition.xPos = setup->x;
 	soundPosition.yPos = setup->y;
@@ -1465,7 +1466,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 						SplashSetup.z = item->pos.zPos;
 						SplashSetup.innerRadius = 16;
 						SplashSetup.splashPower = item->speed;
-						SetupSplash(&SplashSetup);
+						SetupSplash(&SplashSetup,roomNumber);
 						SplashCount = 16;
 					}
 				}
@@ -1488,7 +1489,7 @@ void Splash(ITEM_INFO* item)
 		SplashSetup.z = item->pos.zPos;
 		SplashSetup.splashPower = item->fallspeed;
 		SplashSetup.innerRadius = 64;
-		SetupSplash(&SplashSetup);
+		SetupSplash(&SplashSetup,roomNumber);
 	}
 }
 

@@ -42,6 +42,7 @@
 #include "smoke.h"
 #include "spark.h"
 #include "explosion.h"
+#include "drip.h"
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
@@ -511,6 +512,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateSpiders();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
+		T5M::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateLocusts();

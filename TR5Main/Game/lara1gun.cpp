@@ -1472,7 +1472,7 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item)
 			SplashSetup.innerRadius = 160;
 			SplashSetup.splashPower = 2048 - dy;
 
-			SetupSplash(&SplashSetup);
+			SetupSplash(&SplashSetup,item->roomNumber);
 		}
 	}
 }
