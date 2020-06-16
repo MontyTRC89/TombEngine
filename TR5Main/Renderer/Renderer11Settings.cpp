@@ -135,9 +135,6 @@ bool Renderer11::ChangeScreenResolution(int width, int height, int frequency, bo
 	ID3D11RenderTargetView* nullViews[] = { nullptr };
 	m_context->OMSetRenderTargets(0, nullViews, NULL);
 
-	DX11_DELETE(m_renderTarget);
-	DX11_DELETE(m_dumpScreenRenderTarget);
-	DX11_DELETE(m_shadowMap);
 	DX11_DELETE(m_gameFont);
 	DX11_DELETE(m_spriteBatch);
 	DX11_DELETE(m_primitiveBatch);

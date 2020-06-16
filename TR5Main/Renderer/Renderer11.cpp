@@ -76,10 +76,6 @@ Renderer11::~Renderer11()
 	DX11_RELEASE(m_cbLights);
 	DX11_RELEASE(m_cbMisc);
 
-	DX11_DELETE(m_renderTarget);
-	DX11_DELETE(m_dumpScreenRenderTarget);
-	DX11_DELETE(m_shadowMap);
-
 	DX11_RELEASE(m_swapChain);
 	DX11_RELEASE(m_context);
 	DX11_RELEASE(m_device);

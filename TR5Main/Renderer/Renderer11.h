@@ -15,6 +15,9 @@
 #include "effect.h"
 #include <IndexBuffer.h>
 #include "VertexBuffer.h"
+#include "RenderTarget2D.h"
+
+class RenderTarget2D;
 
 #define MESH_BITS(x) (1 << x)
 #define DX11_RELEASE(x) if (x != NULL) x->Release()
@@ -53,107 +56,6 @@ struct RendererVertex
 	float Bone;
 };
 
-class RenderTarget2D
-{
-public:
-	ID3D11RenderTargetView*	RenderTargetView;
-	ID3D11ShaderResourceView* ShaderResourceView;
-	ID3D11Texture2D* Texture;
-	ID3D11DepthStencilView*	DepthStencilView;
-	ID3D11Texture2D* DepthStencilTexture;
-	ID3D11ShaderResourceView* DepthShaderResourceView;
-	bool IsValid = false;
-
-	RenderTarget2D()
-	{
-
-	}
-
-	static RenderTarget2D* Create(ID3D11Device* device, int w, int h, DXGI_FORMAT format)
-	{
-		RenderTarget2D* rt = new RenderTarget2D();
-
-		D3D11_TEXTURE2D_DESC desc;
-		desc.Width = w;
-		desc.Height = h;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format = format;
-		desc.SampleDesc.Count = 1;
-		desc.SampleDesc.Quality = 0;
-		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-		desc.CPUAccessFlags = 0;
-		desc.MiscFlags = 0;
-
-		rt->Texture = NULL;
-		HRESULT res = device->CreateTexture2D(&desc, NULL, &rt->Texture);
-		if (FAILED(res))
-			return NULL;
-
-		D3D11_RENDER_TARGET_VIEW_DESC viewDesc;
-		viewDesc.Format = desc.Format;
-		viewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		viewDesc.Texture2D.MipSlice = 0;
-
-		res = device->CreateRenderTargetView(rt->Texture, &viewDesc, &rt->RenderTargetView);
-		if (FAILED(res))
-			return NULL;
-
-		// Setup the description of the shader resource view.
-		D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
-		shaderDesc.Format = desc.Format;
-		shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		shaderDesc.Texture2D.MostDetailedMip = 0;
-		shaderDesc.Texture2D.MipLevels = 1;
-
-		res = device->CreateShaderResourceView(rt->Texture, &shaderDesc, &rt->ShaderResourceView);
-		if (FAILED(res))
-			return NULL;
-
-		D3D11_TEXTURE2D_DESC depthTexDesc;
-		ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
-		depthTexDesc.Width = w;
-		depthTexDesc.Height = h;
-		depthTexDesc.MipLevels = 1;
-		depthTexDesc.ArraySize = 1;
-		depthTexDesc.SampleDesc.Count = 1;
-		depthTexDesc.SampleDesc.Quality = 0;
-		depthTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-		depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		depthTexDesc.CPUAccessFlags = 0;
-		depthTexDesc.MiscFlags = 0;
-
-		rt->DepthStencilTexture = NULL;
-		res = device->CreateTexture2D(&depthTexDesc, NULL, &rt->DepthStencilTexture);
-		if (FAILED(res))
-			return NULL;
-
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-		ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
-		dsvDesc.Format = depthTexDesc.Format;
-		dsvDesc.Flags = 0;
-		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		dsvDesc.Texture2D.MipSlice = 0;
-
-		rt->DepthStencilView = NULL;
-		res = device->CreateDepthStencilView(rt->DepthStencilTexture, &dsvDesc, &rt->DepthStencilView);
-		if (FAILED(res))
-			return NULL;
-
-		return rt;
-	}
-
-	~RenderTarget2D()
-	{
-		DX11_RELEASE(RenderTargetView);
-		DX11_RELEASE(ShaderResourceView);
-		DX11_RELEASE(Texture);
-		DX11_RELEASE(DepthStencilView);
-		DX11_RELEASE(DepthStencilTexture);
-	}
-};
 
 class Texture2D
 {
@@ -234,7 +136,7 @@ public:
 };
 
 
-typedef struct RendererHUDBar
+struct RendererHUDBar
 {
 	VertexBuffer vertexBufferBorder;
 	IndexBuffer indexBufferBorder;
@@ -296,7 +198,7 @@ struct RendererLight
 	Vector3 Position;
 	float Type;
 	Vector3 Color;
-	float Dynamic;
+	bool Dynamic;
 	Vector4 Direction;
 	float Intensity;
 	float In;
@@ -305,7 +207,6 @@ struct RendererLight
 
 	RendererLight()
 	{
-		Dynamic = 0.0f;
 	}
 };
 
@@ -537,10 +438,10 @@ private:
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11Texture2D* m_depthStencilTexture;
 
-	RenderTarget2D* m_dumpScreenRenderTarget;
-	RenderTarget2D* m_renderTarget;
-	RenderTarget2D* m_currentRenderTarget;
-	RenderTarget2D* m_shadowMap;
+	RenderTarget2D m_dumpScreenRenderTarget;
+	RenderTarget2D m_renderTarget;
+	RenderTarget2D m_currentRenderTarget;
+	RenderTarget2D m_shadowMap;
 
 	// Shaders
 	ID3D11VertexShader* m_vsRooms;

@@ -338,9 +338,9 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	m_primitiveBatch = new PrimitiveBatch<RendererVertex>(m_context);
 
 	// Initialise buffers
-	m_renderTarget = RenderTarget2D::Create(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
-	m_dumpScreenRenderTarget = RenderTarget2D::Create(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
-	m_shadowMap = RenderTarget2D::Create(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
+	m_renderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_dumpScreenRenderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_shadowMap = RenderTarget2D(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
 
 	// Shadow map
 	/*D3D11_TEXTURE2D_DESC depthTexDesc;
