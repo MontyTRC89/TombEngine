@@ -11,7 +11,7 @@ namespace T5M {
 		namespace Drip {
 			using namespace DirectX::SimpleMath;
 
-			std::array<DripParticle, 128> dripParticles;
+			std::array<DripParticle, 256> dripParticles;
 			constexpr Vector4 DRIP_COLOR = Vector4(1, 1, 1, 1);
 			void UpdateDrips()
 			{
@@ -27,7 +27,7 @@ namespace T5M {
 						d.velocity.z = SmokeWindZ / 2;
 					}
 					d.pos += d.velocity;
-					float normalizedAge = d.age / DRIP_LIFE;
+					float normalizedAge = d.age / d.life;
 					d.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
 					d.height = lerp(DRIP_WIDTH / 0.15625, 0, normalizedAge);
 					short room = d.room;
@@ -49,14 +49,33 @@ namespace T5M {
 				return dripParticles[0];
 			}
 
-			void SpawnDrip(Vector3 pos, int room)
+			void SpawnWetnessDrip(Vector3 pos, int room)
 			{
 				DripParticle& d = getFreeDrip();
 				d = {};
 				d.active = true;
 				d.pos = pos;
 				d.room = room;
+				d.life = DRIP_LIFE;
 				d.gravity = frandMinMax(3, 6);
+			}
+
+			void SpawnSplashDrips(Vector3& pos, int num,int room)
+			{
+				for (int i = 0; i < num; i++) {
+					Vector3 dripPos = pos + Vector3(frandMinMax(-128, 128), frandMinMax(-128, 128), frandMinMax(-128, 128));
+					Vector3 dir = (dripPos - pos);
+					dir.Normalize();
+					DripParticle& drip = getFreeDrip();
+					drip = {};
+					drip.pos = dripPos;
+					drip.velocity = dir*16;
+					drip.velocity -= Vector3(0, frandMinMax(32, 64), 0);
+					drip.gravity = frandMinMax(3, 6);
+					drip.room = room;
+					drip.life = DRIP_LIFE_LONG;
+					drip.active = true;
+				}
 			}
 
 		}

@@ -61,25 +61,26 @@ namespace T5M {
 
 			void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num)
 			{
-				SparkParticle& s = getFreeSparkParticle();
-				s = {};
-				s.age = 0;
-				s.life = frand() * 10 + 10;
-				s.friction = 0.98f;
-				s.gravity = 1.2f;
-				s.width = 8;
-				s.room = pos->roomNumber;
-				s.pos = Vector3(pos->x, pos->y, pos->z);
-				float ang = TO_RAD(angle);
-				Vector3 v = Vector3(sin(ang+ frandMinMax(-PI/2, PI/2)), frandMinMax(-1,1), cos(ang + frandMinMax(-PI/2, PI/2)));
-				v += Vector3(frandMinMax(-64, 64), frandMinMax(-64, 64), frandMinMax(-64, 64));
-				v.Normalize(v);
-				s.velocity = v * frandMinMax(17, 24);
-				s.sourceColor = Vector4(1, 0.8, 0.2f, 1)*3;
-				s.destinationColor = Vector4(0,0, 0, 0);
-				s.active = true;
+				for (int i = 0; i < num; i++) {
+					SparkParticle& s = getFreeSparkParticle();
+					s = {};
+					s.age = 0;
+					s.life = frand() * 10 + 10;
+					s.friction = 0.98f;
+					s.gravity = 1.2f;
+					s.width = 8;
+					s.room = pos->roomNumber;
+					s.pos = Vector3(pos->x, pos->y, pos->z);
+					float ang = TO_RAD(angle);
+					Vector3 v = Vector3(sin(ang + frandMinMax(-PI / 2, PI / 2)), frandMinMax(-1, 1), cos(ang + frandMinMax(-PI / 2, PI / 2)));
+					v += Vector3(frandMinMax(-64, 64), frandMinMax(-64, 64), frandMinMax(-64, 64));
+					v.Normalize(v);
+					s.velocity = v * frandMinMax(17, 24);
+					s.sourceColor = Vector4(1, 0.8, 0.2f, 1) * 3;
+					s.destinationColor = Vector4(0, 0, 0, 0);
+					s.active = true;
+				}
 			}
-
 		}
 	}
 }

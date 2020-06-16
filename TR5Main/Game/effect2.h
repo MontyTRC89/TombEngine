@@ -55,6 +55,7 @@ typedef struct SPLASH_SETUP
 	float z;
 	float splashPower;
 	float innerRadius;
+	int room;
 };
 
 typedef struct RIPPLE_STRUCT
@@ -196,7 +197,7 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
 void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly);
-void SetupSplash(const SPLASH_SETUP* const setup);
+void SetupSplash(const SPLASH_SETUP* const setup,int room);
 void UpdateSplashes();
 void SetupRipple(int x, int y, int z, char size, char flags);
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
