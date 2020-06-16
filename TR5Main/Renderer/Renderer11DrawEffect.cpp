@@ -16,6 +16,7 @@
 #include "spark.h"
 #include "drip.h"
 #include "explosion.h"
+using namespace T5M::Renderer;
 using namespace T5M::Effects::Footprints;
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -1072,10 +1073,10 @@ bool Renderer11::drawEffects(bool transparent)
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
 
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	for (int i = 0; i < m_effectsToDraw.size(); i++)
 	{

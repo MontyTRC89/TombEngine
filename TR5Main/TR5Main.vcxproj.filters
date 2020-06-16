@@ -801,6 +801,15 @@
     <ClInclude Include="Game\explosion.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\Utils.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\IndexBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\VertexBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1467,6 +1476,15 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\explosion.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Utils.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\IndexBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\VertexBuffer.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
