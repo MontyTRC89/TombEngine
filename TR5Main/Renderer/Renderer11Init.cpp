@@ -3,6 +3,7 @@
 #include "configuration.h"
 #include "winmain.h"
 #include "GameFlowScript.h"
+using namespace T5M::Renderer;
 
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;

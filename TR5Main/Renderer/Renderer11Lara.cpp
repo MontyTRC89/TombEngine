@@ -9,6 +9,7 @@
 #include "sphere.h"
 #include "level.h"
 #include "GameFlowScript.h"
+using namespace T5M::Renderer;
 
 extern GameFlow* g_GameFlow;
 
@@ -278,10 +279,10 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
 
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	RendererItem * item = &m_items[Lara.itemNumber];
 
