@@ -1,4 +1,4 @@
-#include "./CameraMatrixBuffer.hlsli"
+#include "CameraMatrixBuffer.hlsli"
 
 struct RendererLight {
 	float4 Position;
@@ -68,7 +68,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	PixelShaderInput output;
 	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
 	float2 clipPos = screenPos.xy / screenPos.w;
-	if (cameraUnderwater != water) {
+	if (CameraUnderwater != water) {
 		static const float PI = 3.14159265f;
 		float factor = (Frame + clipPos.x*320);
 		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024)*5;

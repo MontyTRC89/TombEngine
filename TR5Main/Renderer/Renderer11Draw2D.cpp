@@ -83,9 +83,9 @@ bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
 	float color[] = { 0,0,0,1.0f };
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetVertexBuffers(0, 1, &bar->vertexBufferBorder->Buffer, &strides, &offset);
+	m_context->IASetVertexBuffers(0, 1, bar->vertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetIndexBuffer(bar->indexBufferBorder->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(bar->indexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
 	m_context->VSSetShader(m_vsHUD, NULL, 0);
 	m_context->PSSetShaderResources(0, 1, &m_HUDBarBorderTexture->ShaderResourceView);
@@ -100,9 +100,9 @@ bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
 	
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetVertexBuffers(0, 1, &bar->vertexBuffer->Buffer, &strides, &offset);
+	m_context->IASetVertexBuffers(0, 1, bar->vertexBuffer.Buffer.GetAddressOf(), &strides, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->IASetIndexBuffer(bar->indexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(bar->indexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	m_stHUDBar.Percent = percent;
 	updateConstantBuffer(m_cbHUDBar, &m_stHUDBar, sizeof(CHUDBarBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);

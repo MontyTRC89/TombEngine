@@ -1,9 +1,20 @@
 #pragma once
 #include <SimpleMath.h>
-struct alignas(16) CCameraMatrixBuffer
-{
-	DirectX::SimpleMath::Matrix ViewProjection;
-	unsigned int Frame;
-	int CameraUnderwater;
-};
+namespace T5M {
+	namespace Renderer {
+		using DirectX::SimpleMath::Matrix;
+		struct alignas(16) CCameraMatrixBuffer
+		{
+			Matrix ViewProjection;
+			Matrix View;
+			Matrix Projection;
+			Vector3 WorldPosition;
+			Vector3 WorldDirection;
+			Vector2 ViewSize;
+			Vector2 InvViewSize;
+			alignas(16) int Frame;
+			alignas(16) int CameraUnderwater;
+		};
+	}
+}
 

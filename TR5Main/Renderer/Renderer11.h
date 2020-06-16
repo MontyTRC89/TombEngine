@@ -13,6 +13,8 @@
 
 #include "items.h"
 #include "effect.h"
+#include <IndexBuffer.h>
+#include "VertexBuffer.h"
 
 #define MESH_BITS(x) (1 << x)
 #define DX11_RELEASE(x) if (x != NULL) x->Release()
@@ -231,118 +233,13 @@ public:
 	}
 };
 
-class VertexBuffer
-{
-public:
-	ID3D11Buffer* Buffer;
-
-	VertexBuffer()
-	{
-
-	}
-
-	~VertexBuffer()
-	{
-		DX11_RELEASE(Buffer);
-	}
-
-	static VertexBuffer* Create(ID3D11Device* device, int numVertices, RendererVertex* vertices)
-	{
-		HRESULT res;
-
-		VertexBuffer* vb = new VertexBuffer();
-
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-
-		desc.Usage = D3D11_USAGE_DYNAMIC;   
-		desc.ByteWidth = sizeof(RendererVertex) * numVertices; 
-		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;  
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE; 
-
-		res = device->CreateBuffer(&desc, NULL, &vb->Buffer);
-		if (FAILED(res))
-			return NULL;
-
-		if (vertices != NULL)
-		{
-			ID3D11DeviceContext* context = NULL;
-			device->GetImmediateContext(&context);
-
-			D3D11_MAPPED_SUBRESOURCE ms;
-
-			res = context->Map(vb->Buffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
-			if (FAILED(res))
-				return NULL;
-
-			memcpy(ms.pData, vertices, sizeof(RendererVertex) * numVertices);
-
-			context->Unmap(vb->Buffer, NULL);
-		}
-
-		return vb;
-	}
-};
-
-class IndexBuffer
-{
-public:
-	ID3D11Buffer* Buffer;
-
-	IndexBuffer()
-	{
-
-	}
-
-	~IndexBuffer()
-	{
-		DX11_RELEASE(Buffer);
-	}
-
-	static IndexBuffer* Create(ID3D11Device* device, int numIndices, int* indices)
-	{
-		HRESULT res;
-
-		IndexBuffer* ib = new IndexBuffer();
-
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.ByteWidth = sizeof(int) * numIndices;
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		
-		res = device->CreateBuffer(&desc, NULL, &ib->Buffer);
-		if (FAILED(res))
-			return NULL;
-
-		if (indices != NULL)
-		{
-			ID3D11DeviceContext* context = NULL;
-			device->GetImmediateContext(&context);
-
-			D3D11_MAPPED_SUBRESOURCE ms;
-
-			res = context->Map(ib->Buffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
-			if (FAILED(res))
-				return NULL;
-
-			memcpy(ms.pData, indices, sizeof(int) * numIndices);
-
-			context->Unmap(ib->Buffer, NULL);
-		}
-
-		return ib;
-	}
-};
 
 typedef struct RendererHUDBar
 {
-	VertexBuffer* vertexBufferBorder;
-	IndexBuffer* indexBufferBorder;
-	VertexBuffer* vertexBuffer;
-	IndexBuffer* indexBuffer;
+	VertexBuffer vertexBufferBorder;
+	IndexBuffer indexBufferBorder;
+	VertexBuffer vertexBuffer;
+	IndexBuffer indexBuffer;
 	/*
 		Initialises a new Bar for rendering. the Coordinates are set in the Reference Resolution (default 800x600).
 		The colors are setup like this
@@ -677,7 +574,7 @@ private:
 
 
 	// Constant buffers
-	CCameraMatrixBuffer m_stCameraMatrices;
+	T5M::Renderer::CCameraMatrixBuffer m_stCameraMatrices;
 	ID3D11Buffer* m_cbCameraMatrices;
 	CItemBuffer m_stItem;
 	ID3D11Buffer* m_cbItem;
@@ -715,12 +612,12 @@ private:
 	Texture2D* m_textureAtlas;
 	Texture2D* m_skyTexture;
 	Texture2D* m_logo;
-	VertexBuffer* m_roomsVertexBuffer;
-	IndexBuffer* m_roomsIndexBuffer;
-	VertexBuffer* m_moveablesVertexBuffer;
-	IndexBuffer* m_moveablesIndexBuffer;
-	VertexBuffer* m_staticsVertexBuffer;
-	IndexBuffer* m_staticsIndexBuffer;
+	VertexBuffer m_roomsVertexBuffer;
+	IndexBuffer m_roomsIndexBuffer;
+	VertexBuffer m_moveablesVertexBuffer;
+	IndexBuffer m_moveablesIndexBuffer;
+	VertexBuffer m_staticsVertexBuffer;
+	IndexBuffer m_staticsIndexBuffer;
 	vector<RendererRoom> m_rooms;
 	Matrix m_hairsMatrices[12];
 	short m_numHairVertices;
