@@ -62,7 +62,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 	Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
 	// Clear just the Z-buffer so we can start drawing on top of the scene
-	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Set vertex buffer
 	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -214,9 +214,9 @@ bool Renderer11::drawShadowMap()
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	// Bind and clear render target
-	m_context->ClearRenderTargetView(m_shadowMap->RenderTargetView, Colors::White);
-	m_context->ClearDepthStencilView(m_shadowMap->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	m_context->OMSetRenderTargets(1, &m_shadowMap->RenderTargetView, m_shadowMap->DepthStencilView);
+	m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView.Get(), Colors::White);
+	m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView.GetAddressOf(), m_shadowMap.DepthStencilView.Get());
 
 	m_context->RSSetViewports(1, &m_shadowMapViewport);
 
@@ -469,9 +469,9 @@ int Renderer11::drawInventoryScene()
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 	// Bind and clear render target
-	m_context->ClearRenderTargetView(m_renderTarget->RenderTargetView, Colors::Black);
-	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	m_context->OMSetRenderTargets(1, &m_renderTarget->RenderTargetView, m_renderTarget->DepthStencilView);
+	m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
+	m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
 	m_context->RSSetViewports(1, &m_viewport);
 
 	// Clear the Z-Buffer after drawing the background	
@@ -480,14 +480,14 @@ int Renderer11::drawInventoryScene()
 		if (g_GameFlow->TitleType == TITLE_BACKGROUND)
 			drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
 		else
-			drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(1.0f, 1.0f, 1.0f), false);
+			drawFullScreenQuad(m_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(1.0f, 1.0f, 1.0f), false);
 	}
 	else
 	{
-		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.2f, 0.2f, 0.2f), false);
+		drawFullScreenQuad(m_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(0.2f, 0.2f, 0.2f), false);
 	}
 
-	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
@@ -1820,7 +1820,7 @@ void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byt
 	dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-	dynamicLight->Dynamic = 1;
+	dynamicLight->Dynamic = true;
 	dynamicLight->Intensity = falloff/2;
 
 	m_dynamicLights.push_back(dynamicLight);
@@ -1850,7 +1850,7 @@ int Renderer11::drawFinalPass()
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 
-	drawFullScreenQuad(m_renderTarget->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
+	drawFullScreenQuad(m_renderTarget.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
 
 	m_swapChain->Present(0, 0);
 
@@ -1962,9 +1962,9 @@ bool Renderer11::drawScene(bool dump)
 	// Bind and clear render target
 	m_currentRenderTarget = (dump ? m_dumpScreenRenderTarget : m_renderTarget);
 
-	m_context->ClearRenderTargetView(m_currentRenderTarget->RenderTargetView, Colors::Black);
-	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	m_context->OMSetRenderTargets(1, &m_currentRenderTarget->RenderTargetView, m_currentRenderTarget->DepthStencilView);
+	m_context->ClearRenderTargetView(m_currentRenderTarget.RenderTargetView.Get(), Colors::Black);
+	m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, m_currentRenderTarget.RenderTargetView.GetAddressOf(), m_currentRenderTarget.DepthStencilView.Get());
 
 	m_context->RSSetViewports(1, &m_viewport);
 
@@ -2343,7 +2343,7 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->PSSetSamplers(0, 1, &sampler);
 	m_context->PSSetShaderResources(1, 1, &m_caustics[m_currentCausticsFrame / 2]->ShaderResourceView);
 	m_context->PSSetSamplers(1, 1, &shadowSampler);
-	m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
+	m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
@@ -2604,7 +2604,7 @@ bool Renderer11::drawHorizonAndSky()
 	}
 
 	// Clear just the Z-buffer so we can start drawing on top of the horizon
-	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	return true;
 }
