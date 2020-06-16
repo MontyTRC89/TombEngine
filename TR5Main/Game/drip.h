@@ -6,6 +6,7 @@ namespace T5M {
 	namespace Effects {
 		namespace Drip {
 			constexpr float DRIP_LIFE = 25.0f;
+			constexpr float DRIP_LIFE_LONG = 60.0f;
 			constexpr float DRIP_WIDTH = 4;
 			struct DripParticle {
 				DirectX::SimpleMath::Vector3 pos;
@@ -13,14 +14,16 @@ namespace T5M {
 				DirectX::SimpleMath::Vector4 color;
 				int room;
 				float gravity;
+				float life;
 				float age;
 				float height;
 				bool active;
 			};
-			extern std::array<DripParticle, 128> dripParticles;
+			extern std::array<DripParticle, 256> dripParticles;
 			void UpdateDrips();
 			DripParticle& getFreeDrip();
-			void SpawnDrip(DirectX::SimpleMath::Vector3 pos, int room);
+			void SpawnWetnessDrip(DirectX::SimpleMath::Vector3 pos, int room);
+			void SpawnSplashDrips(Vector3& pos, int num, int room);
 		}
 	}
 }
