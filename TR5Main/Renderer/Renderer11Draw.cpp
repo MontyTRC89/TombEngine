@@ -475,7 +475,7 @@ int Renderer11::drawInventoryScene()
 	m_context->RSSetViewports(1, &m_viewport);
 
 	// Clear the Z-Buffer after drawing the background	
-	if (g_Inventory->GetType() == INV_TYPE_TITLE)
+	if (g_Inventory.GetType() == INV_TYPE_TITLE)
 	{
 		if (g_GameFlow->TitleType == TITLE_BACKGROUND)
 			drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
@@ -507,15 +507,15 @@ int Renderer11::drawInventoryScene()
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
-	InventoryRing* activeRing = g_Inventory->GetRing(g_Inventory->GetActiveRing());
+	InventoryRing* activeRing = g_Inventory.GetRing(g_Inventory.GetActiveRing());
 	int lastRing = 0;
 
-	float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory->GetCameraTilt() * RADIAN);
-	float cameraY = g_Inventory->GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory->GetCameraTilt() * RADIAN);
+	float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory.GetCameraTilt() * RADIAN);
+	float cameraY = g_Inventory.GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory.GetCameraTilt() * RADIAN);
 	float cameraZ = 0.0f;
 
 	m_stCameraMatrices.ViewProjection = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
-		Vector3(0.0f, g_Inventory->GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) * Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
+		Vector3(0.0f, g_Inventory.GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) * Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
 			g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f);
 
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
@@ -523,7 +523,7 @@ int Renderer11::drawInventoryScene()
 
 	for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
 	{
-		InventoryRing* ring = g_Inventory->GetRing(k);
+		InventoryRing* ring = g_Inventory.GetRing(k);
 		if (ring->draw == false || ring->numObjects == 0)
 			continue;
 
@@ -533,13 +533,13 @@ int Renderer11::drawInventoryScene()
 		objectIndex = ring->currentObject;
 
 		// Yellow title
-		if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory->GetType() != INV_TYPE_TITLE)
+		if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory.GetType() != INV_TYPE_TITLE)
 			PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
 		for (int i = 0; i < numObjects; i++)
 		{
 			short inventoryObject = ring->objects[objectIndex].inventoryObject;
-			short objectNumber = g_Inventory->GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
+			short objectNumber = g_Inventory.GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
 
 			//if (ring->focusState != INV_FOCUS_STATE_NONE && (k != g_Inventory->GetActiveRing() || inventoryObject != ring->objects[i].inventoryObject))
 			//	continue;
@@ -551,7 +551,7 @@ int Renderer11::drawInventoryScene()
 			currentAngle = steps * deltaAngle;
 			currentAngle += ring->rotation;
 
-			if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory->GetActiveRing())
+			if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory.GetActiveRing())
 			{
 				if (objectIndex == ring->currentObject)
 					ring->objects[objectIndex].rotation += 45 * 360 / 30;
@@ -559,19 +559,19 @@ int Renderer11::drawInventoryScene()
 					ring->objects[objectIndex].rotation += 45 * 360 / 30;
 			}
 			else if (ring->focusState != INV_FOCUS_STATE_POPUP && ring->focusState != INV_FOCUS_STATE_POPOVER)
-				g_Inventory->GetRing(k)->objects[objectIndex].rotation = 0;
+				g_Inventory.GetRing(k)->objects[objectIndex].rotation = 0;
 
 			if (ring->objects[objectIndex].rotation > 65536.0f)
 				ring->objects[objectIndex].rotation = 0;
 
 			int x = ring->distance * cos(currentAngle * RADIAN);
-			int y = g_Inventory->GetRing(k)->y;
+			int y = g_Inventory.GetRing(k)->y;
 			int z = ring->distance * sin(currentAngle * RADIAN);
 
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
 			Matrix translation = Matrix::CreateTranslation(x, y, z);
-			Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
+			Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory.GetInventoryObject(inventoryObject)->rotY));
 			Matrix transform = (scale * rotation) * translation;
 
 			ObjectInfo * obj = &Objects[objectNumber];
@@ -581,7 +581,7 @@ int Renderer11::drawInventoryScene()
 
 			// Build the object animation matrices
 			if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
-				objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
+				objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
 			{
 				short* framePtr[2];
 				int rate = 0;
@@ -637,9 +637,9 @@ int Renderer11::drawInventoryScene()
 			short inventoryItem = ring->objects[objectIndex].inventoryObject;
 
 			// Draw special stuff if needed
-			if (objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
+			if (objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
 			{
-				if (g_Inventory->GetActiveRing() == INV_RING_OPTIONS)
+				if (g_Inventory.GetActiveRing() == INV_RING_OPTIONS)
 				{
 					/* **************** PASSAPORT ************* */
 					if (inventoryItem == INV_OBJECT_PASSPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
@@ -953,14 +953,14 @@ int Renderer11::drawInventoryScene()
 					else
 					{
 						// Draw the description below the object
-						char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
+						char* string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
 						PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					}
 				}
 				else
 				{
-					short inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
-					char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
+					short inventoryItem = g_Inventory.GetRing(k)->objects[objectIndex].inventoryObject;
+					char* string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
 
 					if (/*g_Inventory->IsCurrentObjectWeapon() &&*/ ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
@@ -1107,7 +1107,7 @@ int Renderer11::drawInventoryScene()
 	drawLines2D();
 	drawAllStrings();
 
-	if (g_Inventory->GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
+	if (g_Inventory.GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
 	{
 		// Draw main logo
 		float factorX = (float)ScreenWidth / REFERENCE_RES_WIDTH;

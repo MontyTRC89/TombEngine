@@ -153,7 +153,7 @@ int FramesCount;
 
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
-extern Inventory *g_Inventory;
+extern Inventory g_Inventory;
 extern int SplashCount;
 extern short FXType;
 extern vector<AudioTrack> g_AudioTracks;
@@ -210,11 +210,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		SetDebounce = false;
 		if (CurrentLevel != 0 && !g_Renderer->IsFading())
 		{
-			if ((DbInput & IN_DESELECT || g_Inventory->GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
+			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
 				// Stop all sounds
 				SOUND_Stop();
-				int inventoryResult = g_Inventory->DoInventory();
+				int inventoryResult = g_Inventory.DoInventory();
 				switch (inventoryResult)
 				{
 				case INV_RESULT_LOAD_GAME:
@@ -234,7 +234,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
 		{
-			int inventoryResult = g_Inventory->DoInventory();
+			int inventoryResult = g_Inventory.DoInventory();
 			switch (inventoryResult)
 			{
 			case INV_RESULT_NEW_GAME:
@@ -604,11 +604,11 @@ GAME_STATUS DoTitle(int index)
 		InitialiseHair();
 
 		ControlPhase(2, 0);
-		inventoryResult = g_Inventory->DoTitleInventory();
+		inventoryResult = g_Inventory.DoTitleInventory();
 	}
 	else
 	{
-		inventoryResult = g_Inventory->DoTitleInventory();
+		inventoryResult = g_Inventory.DoTitleInventory();
 	}
 
 	UseSpotCam = false;
@@ -687,8 +687,8 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 
 	LastInventoryItem = -1;
 	DelCutSeqPlayer = 0;
-	g_Inventory->SetEnterObject(NO_ITEM);
-	g_Inventory->SetSelectedObject(NO_ITEM);
+	g_Inventory.SetEnterObject(NO_ITEM);
+	g_Inventory.SetSelectedObject(NO_ITEM);
 
 	// Initialise flyby cameras
 	InitSpotCamSequences();

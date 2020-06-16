@@ -13,7 +13,7 @@ namespace T5M {
 			Vector2 ViewSize;
 			Vector2 InvViewSize;
 			alignas(16) int Frame;
-			alignas(16) int CameraUnderwater;
+			int CameraUnderwater;
 		};
 	}
 }
