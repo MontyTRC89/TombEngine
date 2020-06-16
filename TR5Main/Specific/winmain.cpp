@@ -277,7 +277,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		Sound_Init();
 
 	// Initialise the new inventory
-	g_Inventory = new Inventory();
+	//g_Inventory = Inventory();
 	
 	App.bNoFocus = false;
 	App.isInScene = false;
@@ -350,7 +350,6 @@ void WinClose()
 	if (g_Configuration.EnableSound)
 		Sound_DeInit();
 	
-	delete g_Inventory;
 	delete g_Renderer;
 	delete g_GameScript;
 	delete g_GameFlow;

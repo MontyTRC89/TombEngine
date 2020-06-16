@@ -127,7 +127,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			// If clip space z value greater than shadow map value then pixel is in shadow
 			float shadow = getShadowFactor(ShadowMap, ShadowMapSampler, coords, realDepth);
-			lighting = lerp(lighting, min(AmbientColor,lighting), saturate(shadow));
+			lighting = lerp(lighting, min(AmbientColor*2,lighting), saturate(shadow));
 		}
 	}
 

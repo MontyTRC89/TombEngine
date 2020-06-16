@@ -17,7 +17,7 @@
 #include "level.h"
 #include "input.h"
 
-Inventory* g_Inventory;
+Inventory g_Inventory;
 extern GameFlow* g_GameFlow;
 
 void CombinePuzzle(int action, short object)

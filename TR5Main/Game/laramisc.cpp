@@ -96,7 +96,7 @@ void DelsGiveLaraItemsCheat() // (AF) (D)
 		Lara.PickupsCombo[2 * i + 1] = false;
 	}
 
-	g_Inventory->LoadObjects(false);
+	g_Inventory.LoadObjects(false);
 
 	/* Hardcoded code */
 }
@@ -125,7 +125,7 @@ void LaraCheatGetStuff() // (F) (D)
 	Lara.Weapons[WEAPON_SHOTGUN].HasSilencer = false;
 	Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
 
-	g_Inventory->LoadObjects(false);
+	g_Inventory.LoadObjects(false);
 }
 
 void LaraCheatyBits() // (F) (D)
