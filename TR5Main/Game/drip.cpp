@@ -6,12 +6,13 @@
 #include "level.h"
 #include "room.h"
 #include "trmath.h"
+#include <Game\effect2.h>
 namespace T5M {
 	namespace Effects {
 		namespace Drip {
 			using namespace DirectX::SimpleMath;
 
-			std::array<DripParticle, 256> dripParticles;
+			std::array<DripParticle, NUM_DRIPS> dripParticles;
 			constexpr Vector4 DRIP_COLOR = Vector4(1, 1, 1, 1);
 			void UpdateDrips()
 			{
@@ -19,7 +20,7 @@ namespace T5M {
 					DripParticle& d = dripParticles[i];
 					if (!d.active) continue;
 					d.age++;
-					if (d.age > DRIP_LIFE)
+					if (d.age > d.life)
 						d.active = false;
 					d.velocity.y += d.gravity;
 					if (Rooms[d.room].flags & ENV_FLAG_WIND) {
@@ -33,8 +34,14 @@ namespace T5M {
 					short room = d.room;
 					FLOOR_INFO* floor = GetFloor(d.pos.x, d.pos.y, d.pos.z, &room);
 					int floorheight = floor->floor;
-					if (d.pos.y > floorheight)
+					int wh = GetWaterHeight(d.pos.x, d.pos.y, d.pos.z, d.room);
+					if (d.pos.y > floorheight) {
 						d.active = false;
+					}
+					if (d.pos.y > wh) {
+						d.active = false;
+						SetupRipple(d.pos.x, wh, d.pos.z, frandMinMax(16,24), RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY);
+					}
 
 				}
 			}
@@ -72,6 +79,24 @@ namespace T5M {
 					drip.velocity = dir*16;
 					drip.velocity -= Vector3(0, frandMinMax(32, 64), 0);
 					drip.gravity = frandMinMax(3, 6);
+					drip.room = room;
+					drip.life = DRIP_LIFE_LONG;
+					drip.active = true;
+				}
+			}
+
+			void SpawnGunshellDrips(Vector3& pos, int room)
+			{
+				for (int i = 0; i < 4; i++) {
+					Vector3 dripPos = pos + Vector3(frandMinMax(-16, 16), frandMinMax(-16, 16), frandMinMax(-16, 16));
+					Vector3 dir = (dripPos - pos);
+					dir.Normalize();
+					DripParticle& drip = getFreeDrip();
+					drip = {};
+					drip.pos = dripPos;
+					drip.velocity = dir * 16;
+					drip.velocity -= Vector3(0, frandMinMax(16, 24), 0);
+					drip.gravity = frandMinMax(2, 3);
 					drip.room = room;
 					drip.life = DRIP_LIFE_LONG;
 					drip.active = true;

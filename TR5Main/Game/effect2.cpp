@@ -1121,7 +1121,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 			continue;
 		}
 	}
-	T5M::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y, setup->z),256,room);
+	T5M::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
 	PHD_3DPOS soundPosition;
 	soundPosition.xPos = setup->x;
 	soundPosition.yPos = setup->y;
@@ -1179,18 +1179,19 @@ void UpdateSplashes()
 			n = fmax(0.0f, n);
 			constexpr float peakTime = 0.2f;
 			constexpr float expIn = 1.5f;
-			constexpr float expOut = 1.0f;
+			constexpr float expOut = 2.0f;
 			if (n <= peakTime) {
-				float alpha = pow((n / peakTime), expIn);
 				//we ascend our color
+				float alpha = pow((n / peakTime), expIn);
 				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
 			}
 			else {
-				float alphaTerm = 1.0f - ((n - peakTime) / 1 - peakTime);
-				// float alpha = pow(alphaTerm, expOut);
-				float alpha = alphaTerm;
-				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
 				//we descend
+				float alphaTerm = 1.0f - ((n - peakTime) / 1 - peakTime);
+				float alpha = pow(alphaTerm, expOut);
+				//float alpha = alphaTerm;
+				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
+				
 			}
 			ripple->size += ripple->sizeRate;
 			ripple->lifeTime += ripple->lifeRate;
@@ -1233,6 +1234,8 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 				ripple->sizeRate = 4.0f;
 				ripple->isBillboard = false;
 			}
+			if (flags & RIPPLE_FLAG_LOW_OPACITY)
+				ripple->initialColor *= 0.6f;
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
 				ripple->worldPos.x += frandMinMax(-32, 32);
