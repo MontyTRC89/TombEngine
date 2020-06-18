@@ -10,6 +10,7 @@
 #include "trmath.h"
 #include "GameFlowScript.h"
 #include "smoke.h"
+#include "drip.h"
 
 char FlareTable[121] =
 {
@@ -951,7 +952,9 @@ void UpdateGunShells()
 			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
 				&& !(Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
-				AddWaterSparks(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
+
+				T5M::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
+				//AddWaterSparks(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
 				SetupRipple(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2);
 				gs->fallspeed >>= 5;
 				continue;
