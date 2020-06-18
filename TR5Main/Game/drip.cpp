@@ -6,7 +6,7 @@
 #include "level.h"
 #include "room.h"
 #include "trmath.h"
-#include <Game\effect2.h>
+#include "effect2.h"
 namespace T5M {
 	namespace Effects {
 		namespace Drip {
