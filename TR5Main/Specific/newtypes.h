@@ -13,7 +13,7 @@ struct TrTexturePage
 
 struct TrPolygon
 {
-	vector<int> indices;
+	std::vector<int> indices;
 	int animatedSequence;
 	int frame;
 };
@@ -28,13 +28,13 @@ struct TrMaterial
 struct TrBucket
 {
 	TrMaterial material;
-	vector<Vector3> positions;
-	vector<Vector3> colors;
-	vector<Vector2> textureCoords;
-	vector<Vector3> normals;
-	vector<int> verticesEffects;
-	vector<int> bones;
-	vector<TrPolygon> polygons;
+	std::vector<Vector3> positions;
+	std::vector<Vector3> colors;
+	std::vector<Vector2> textureCoords;
+	std::vector<Vector3> normals;
+	std::vector<int> verticesEffects;
+	std::vector<int> bones;
+	std::vector<TrPolygon> polygons;
 };
 
 struct TrVolume
@@ -44,7 +44,7 @@ struct TrVolume
 	Quaternion rotation;
 	BoundingBox box;
 	BoundingSphere sphere;
-	string script;
+	std::string script;
 };
 
 struct TrClimbVolume : TrVolume
@@ -68,7 +68,7 @@ struct TrSector
 	int roomAbove;
 	int floor;
 	int ceiling;
-	vector<int> floorData;
+	std::vector<int> floorData;
 };
 
 struct TrLight
@@ -88,7 +88,7 @@ struct TrLight
 
 struct TrRoomStatic
 {
-	string name;
+	std::string name;
 	Vector3 position;
 	Quaternion rotation;
 	Vector3 scale;
@@ -97,14 +97,14 @@ struct TrRoomStatic
 	bool receiveShadows;
 	bool castShadows;
 	int flags;
-	string script;
+	std::string script;
 };
 
 struct TrPortal
 {
 	int adjoiningRoom;
 	Vector3 normal;
-	vector<Vector3> vertices;
+	std::vector<Vector3> vertices;
 };
 
 struct TrRoom
@@ -123,13 +123,13 @@ struct TrRoom
 	int alternatGroup;
 	int flags;
 	Vector3 ambient;
-	vector<TrBucket> buckets;
-	vector<TrLight> lights;
-	vector<TrRoomStatic> statics;
-	vector<TrSector> sectors;
-	vector<TrPortal> portals;
-	vector<TrTriggerVolume> triggers;
-	vector<TrClimbVolume> climbVolumes;
+	std::vector<TrBucket> buckets;
+	std::vector<TrLight> lights;
+	std::vector<TrRoomStatic> statics;
+	std::vector<TrSector> sectors;
+	std::vector<TrPortal> portals;
+	std::vector<TrTriggerVolume> triggers;
+	std::vector<TrClimbVolume> climbVolumes;
 	int itemNumber;
 	int fxNumber;
 };
@@ -137,7 +137,7 @@ struct TrRoom
 struct TrMesh
 {
 	BoundingSphere sphere;
-	vector<TrBucket> buckets;
+	std::vector<TrBucket> buckets;
 };
 
 struct TrBone
@@ -150,14 +150,14 @@ struct TrKeyFrame
 {
 	Vector3 origin;
 	BoundingBox boundingBox;
-	vector<Quaternion> angles;
+	std::vector<Quaternion> angles;
 };
 
 struct TrAnimCommand
 {
 	int type;
 	int frame;
-	vector<int> params;
+	std::vector<int> params;
 };
 
 struct TrAnimDispatch
@@ -173,7 +173,7 @@ struct TrStateChange
 	int state;
 	int dispatchIndex;
 	int dispatchCount;
-	vector<TrAnimDispatch> dispatches;
+	std::vector<TrAnimDispatch> dispatches;
 };
 
 struct TrAnimation
@@ -194,9 +194,9 @@ struct TrAnimation
 	int changesCount;
 	int commandsIndex;
 	int commandsCount;
-	vector<TrKeyFrame> keyframes;
-	vector<TrStateChange> changes;
-	vector<TrAnimCommand> commands;
+	std::vector<TrKeyFrame> keyframes;
+	std::vector<TrStateChange> changes;
+	std::vector<TrAnimCommand> commands;
 };
 
 struct TrMoveable
@@ -208,9 +208,9 @@ struct TrMoveable
 	int meshCount;
 	int bonesIndex;
 	int bonesCount;
-	vector<TrMesh> meshes;
-	vector<TrBone> bones;
-	vector<TrAnimation> animations;
+	std::vector<TrMesh> meshes;
+	std::vector<TrBone> bones;
+	std::vector<TrAnimation> animations;
 };
 
 struct TrStatic
@@ -220,13 +220,13 @@ struct TrStatic
 	BoundingBox collisionBox;
 	int meshNumber;
 	int meshCount;
-	vector<TrMesh> meshes;
+	std::vector<TrMesh> meshes;
 };
 
 struct TrAnimatedTexturesFrame
 {
 	int texture;
-	vector<Vector2> textureCoords;
+	std::vector<Vector2> textureCoords;
 };
 
 struct TrAnimatedTexturesSequence
@@ -234,12 +234,12 @@ struct TrAnimatedTexturesSequence
 	byte animationType;
 	float fps;
 	int uvRotate;
-	vector<TrAnimatedTexturesFrame> frames;
+	std::vector<TrAnimatedTexturesFrame> frames;
 };
 
 struct TrItem
 {
-	string name;
+	std::string name;
 	Vector3 position;
 	Quaternion rotation;
 	float angle;
@@ -247,22 +247,22 @@ struct TrItem
 	Vector3 color;
 	int roomNumber;
 	int objectNumber;
-	string script;
+	std::string script;
 };
 
 struct TrCamera
 {
-	string name;
+	std::string name;
 	Vector3 position;
 	int roomNumber;
 	int type;
 	int flags;
-	string script;
+	std::string script;
 };
 
 struct TrSoundSource
 {
-	string name;
+	std::string name;
 	Vector3 position;
 	int roomNumber;
 	float volume;
@@ -272,7 +272,7 @@ struct TrSoundSource
 
 struct TrSink
 {
-	string name;
+	std::string name;
 	Vector3 position;
 	int roomNumber;
 	float strength;
@@ -293,7 +293,7 @@ struct TrBox
 	int flags;
 	int overlapsIndex;
 	int overlapsCount;
-	vector<TrOverlap> overlaps;
+	std::vector<TrOverlap> overlaps;
 };
 
 struct TrSample
@@ -313,12 +313,12 @@ struct TrSoundDetails
 	bool randomizeGain;
 	bool noPanoramic;
 	byte loop;
-	vector<TrSample> samples;
+	std::vector<TrSample> samples;
 };
 
 struct TrFlybyCamera
 {
-	string name;
+	std::string name;
 	int sequence;
 	int number;
 	Vector3 position;
@@ -329,13 +329,13 @@ struct TrFlybyCamera
 	int timer;
 	int roomNumber;
 	int flags;
-	string script;
+	std::string script;
 };
 
 struct TrSprite
 {
 	int texture;
-	vector<Vector2> textureCoords;
+	std::vector<Vector2> textureCoords;
 };
 
 struct TrSpriteSequence
@@ -343,36 +343,36 @@ struct TrSpriteSequence
 	int id;
 	int spritesIndex;
 	int spritesCount;
-	vector<TrSprite> sprites;
+	std::vector<TrSprite> sprites;
 };
 
 struct TrLevel
 {
-	vector<TrTexturePage> textures;
-	vector<TrRoom> rooms;
-	vector<int> floorData;
-	vector<TrMesh> meshes;
-	vector<TrAnimation> animations;
-	vector<TrBone> bones;
-	vector<TrStateChange> changes;
-	vector<TrAnimDispatch> dispatches;
-	vector<TrKeyFrame> frames;
-	vector<TrAnimCommand> commands;
-	vector<TrAnimatedTexturesSequence> animatedTextures;
-	vector<TrSprite> sprites;
-	vector<TrSpriteSequence> spriteSequences;
-	vector<int> soundMap;
-	vector<TrSoundDetails> soundDetails;
-	vector<TrSample> samples;
-	vector<TrItem> items;
-	vector<TrItem> aiItems;
-	vector<TrMoveable> moveables;
-	vector<TrStatic> statics;
-	vector<TrBox> boxes;
-	vector<TrOverlap> overlaps;
-	vector<int> zones[5][2];
-	vector<TrSink> sinks;
-	vector<TrCamera> cameras;
-	vector<TrSoundSource> soundSources;
-	vector<TrFlybyCamera> flybyCameras;
+	std::vector<TrTexturePage> textures;
+	std::vector<TrRoom> rooms;
+	std::vector<int> floorData;
+	std::vector<TrMesh> meshes;
+	std::vector<TrAnimation> animations;
+	std::vector<TrBone> bones;
+	std::vector<TrStateChange> changes;
+	std::vector<TrAnimDispatch> dispatches;
+	std::vector<TrKeyFrame> frames;
+	std::vector<TrAnimCommand> commands;
+	std::vector<TrAnimatedTexturesSequence> animatedTextures;
+	std::vector<TrSprite> sprites;
+	std::vector<TrSpriteSequence> spriteSequences;
+	std::vector<int> soundMap;
+	std::vector<TrSoundDetails> soundDetails;
+	std::vector<TrSample> samples;
+	std::vector<TrItem> items;
+	std::vector<TrItem> aiItems;
+	std::vector<TrMoveable> moveables;
+	std::vector<TrStatic> statics;
+	std::vector<TrBox> boxes;
+	std::vector<TrOverlap> overlaps;
+	std::vector<int> zones[5][2];
+	std::vector<TrSink> sinks;
+	std::vector<TrCamera> cameras;
+	std::vector<TrSoundSource> soundSources;
+	std::vector<TrFlybyCamera> flybyCameras;
 };

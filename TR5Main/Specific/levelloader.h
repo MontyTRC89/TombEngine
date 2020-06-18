@@ -59,7 +59,7 @@ private:
 	ChunkId* m_chunkFloorData = ChunkId::FromString("T5MFloorData");
 	
 	int m_magicNumber = 0x4D355254;
-	string m_filename;
+	std::string m_filename;
 	ChunkReader* m_reader;
 	FileStream* m_stream;
 	int m_numSamples = 0;
@@ -94,7 +94,7 @@ private:
 	bool readSample();
 
 public:
-	LevelLoader(string filename);
+	LevelLoader(std::string filename);
 	~LevelLoader();
 	bool Load();
 	bool FillLegacyData();
