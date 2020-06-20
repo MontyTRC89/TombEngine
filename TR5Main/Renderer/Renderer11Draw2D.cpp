@@ -11,7 +11,7 @@ RendererHUDBar* g_SFXVolumeBar;
 
 bool Renderer11::initialiseBars()
 {
-	array<Vector4, 9> healthColors = {
+	std::array<Vector4, 9> healthColors = {
 		//top
 		Vector4(82 / 255.0f,0,0,1),
 		Vector4(36 / 255.0f,46 / 255.0f,0,1),
@@ -26,7 +26,7 @@ bool Renderer11::initialiseBars()
 		Vector4(0,82 / 255.0f,0,1),
 	};
 
-	array<Vector4, 9> airColors = {
+	std::array<Vector4, 9> airColors = {
 		//top
 		Vector4(0 ,0,90 / 255.0f,1),
 		Vector4(0 / 255.0f,28 / 255.0f,84 / 255.0f,1),
@@ -41,7 +41,7 @@ bool Renderer11::initialiseBars()
 		Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
 	};
 
-	array<Vector4, 9> dashColors = {
+	std::array<Vector4, 9> dashColors = {
 		//top
 		Vector4(78 / 255.0f,4 / 255.0f,0,1),
 		Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
@@ -55,7 +55,7 @@ bool Renderer11::initialiseBars()
 		Vector4(161 / 255.0f,25 / 255.0f,84 / 255.0f,1),
 		Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 	};
-	array<Vector4, 9> soundSettingColors = {
+	std::array<Vector4, 9> soundSettingColors = {
 		//top
 		Vector4(0.18f,0.3f,0.72f,1),
 		Vector4(0.18f,0.3f,0.72f,1),

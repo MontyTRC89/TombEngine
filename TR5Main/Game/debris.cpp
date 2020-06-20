@@ -4,7 +4,7 @@
 #include "setup.h"
 #include "control.h"
 #include "trmath.h"
-
+using std::vector;
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;
 short SmashedMeshCount;

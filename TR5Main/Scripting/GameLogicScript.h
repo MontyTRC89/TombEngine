@@ -24,8 +24,8 @@
 #define LUA_VARIABLE_TYPE_STRING			3
 
 typedef struct LuaFunction {
-	string Name;
-	string Code;
+	std::string Name;
+	std::string Code;
 	bool Executed;
 };
 
@@ -106,18 +106,18 @@ class LuaVariables
 public:
 	map<string, sol::object>			variables;
 
-	sol::object							GetVariable(string key);
-	void								SetVariable(string key, sol::object value);
+	sol::object							GetVariable(std::string key);
+	void								SetVariable(std::string key, sol::object value);
 };
 
 typedef struct LuaVariable
 {
 	bool IsGlobal;
-	string Name;
+	std::string Name;
 	int Type;
 	float FloatValue;
 	int IntValue;
-	string StringValue;
+	std::string StringValue;
 	bool BoolValue;
 };
 
@@ -139,7 +139,7 @@ public:
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);
-	void								AddLuaName(string luaName, short itemNumber);
+	void								AddLuaName(std::string luaName, short itemNumber);
 	void								AssignItemsAndLara();
 	void								ResetVariables();
 
@@ -156,7 +156,7 @@ public:
 	void								AddOneSecret();
 	void								MakeItemInvisible(short id);
 	unique_ptr<GameScriptItem>			GetItemById(int id);
-	unique_ptr<GameScriptItem>			GetItemByName(string name);
+	unique_ptr<GameScriptItem>			GetItemByName(std::string name);
 	void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
 	void								PlaySoundEffect(short id, int flags);
 	GameScriptPosition					CreatePosition(float x, float y, float z);
