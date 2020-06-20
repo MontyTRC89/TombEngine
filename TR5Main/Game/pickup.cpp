@@ -738,8 +738,8 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void do_pickup()
 {
+	pickupitem = (short)Lara.generalPtr;
 	ITEM_INFO* item = &Items[pickupitem];
-	pickupitem = item->objectNumber;
 	short oldXrot = item->pos.xRot;
 	short oldYrot = item->pos.yRot;
 	short oldZrot = item->pos.zRot;
@@ -757,68 +757,45 @@ void do_pickup()
 		return;
 	}
 	else
-	if (item->objectNumber == ID_FLARE_ITEM)
-	{
-		if (LaraItem->currentAnimState == ANIMATION_LARA_UNDERWATER_FLARE_PICKUP)
+		if (item->objectNumber == ID_FLARE_ITEM)
 		{
-			Lara.requestGunType = WEAPON_FLARE;
-			Lara.gunType = WEAPON_FLARE;
-			InitialiseNewWeapon();
-			Lara.gunStatus = LG_SPECIAL;
-			Lara.flareAge = (int)(item->data) & 0x7FFF;
-			draw_flare_meshes();
-			KillItem(pickupitem);
-
-			item->pos.xRot = oldXrot;
-			item->pos.yRot = oldYrot;
-			item->pos.zRot = oldZrot;
-			return;
-		}
-		else 
-		if (LaraItem->currentAnimState == STATE_LARA_FLARE_PICKUP)
-		{
-			Lara.requestGunType = WEAPON_FLARE;
-			Lara.gunType = WEAPON_FLARE;
-			InitialiseNewWeapon();
-			Lara.gunStatus = LG_SPECIAL;
-			Lara.flareAge = (short)(item->data) & 0x7FFF;
-			return;
-		}
-	}
-	else
-	{
-		if (LaraItem->animNumber == ANIMATION_LARA_UNDERWATER_PICKUP)
-		{
-			AddDisplayPickup(item->objectNumber);
-			if (!(item->triggerFlags & 0xC0))
+			if (LaraItem->currentAnimState == ANIMATION_LARA_UNDERWATER_FLARE_PICKUP)
 			{
+				Lara.requestGunType = WEAPON_FLARE;
+				Lara.gunType = WEAPON_FLARE;
+				InitialiseNewWeapon();
+				Lara.gunStatus = LG_SPECIAL;
+				Lara.flareAge = (int)(item->data) & 0x7FFF;
+				draw_flare_meshes();
 				KillItem(pickupitem);
+
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
+				return;
 			}
 			else
-			{
-				item->itemFlags[3] = 1;
-				item->flags |= 0x20;
-				item->status = ITEM_INVISIBLE;
-			}
-			item->pos.xRot = oldXrot;
-			item->pos.yRot = oldYrot;
-			item->pos.zRot = oldZrot;
-			return;
+				if (LaraItem->currentAnimState == STATE_LARA_FLARE_PICKUP)
+				{
+					Lara.requestGunType = WEAPON_FLARE;
+					Lara.gunType = WEAPON_FLARE;
+					InitialiseNewWeapon();
+					Lara.gunStatus = LG_SPECIAL;
+					Lara.flareAge = (short)(item->data) & 0x7FFF;
+					KillItem(pickupitem);
+					return;
+				}
 		}
 		else
 		{
-			if (LaraItem->animNumber == ANIMATION_LARA_PICKUP)
+			if (LaraItem->animNumber == ANIMATION_LARA_UNDERWATER_PICKUP)//dirty but what can I do, it uses the same state
 			{
 				AddDisplayPickup(item->objectNumber);
-				if (item->triggerFlags & 0x100)
+				if (!(item->triggerFlags & 0xC0))
 				{
-					for (int i = 0; i < LevelItems; i++)
-					{
-						if (Items[i].objectNumber == item->objectNumber)
-							KillItem(i);
-					}
+					KillItem(pickupitem);
 				}
-				if (item->triggerFlags & 0xC0)
+				else
 				{
 					item->itemFlags[3] = 1;
 					item->flags |= 0x20;
@@ -827,11 +804,35 @@ void do_pickup()
 				item->pos.xRot = oldXrot;
 				item->pos.yRot = oldYrot;
 				item->pos.zRot = oldZrot;
-				KillItem(pickupitem);//?
 				return;
 			}
+			else
+			{
+				if (LaraItem->currentAnimState == STATE_LARA_PICKUP || LaraItem->currentAnimState == STATE_LARA_PICKUP_FROM_CHEST)
+				{
+					AddDisplayPickup(item->objectNumber);
+					if (item->triggerFlags & 0x100)
+					{
+						for (int i = 0; i < LevelItems; i++)
+						{
+							if (Items[i].objectNumber == item->objectNumber)
+								KillItem(i);
+						}
+					}
+					if (item->triggerFlags & 0xC0)
+					{
+						item->itemFlags[3] = 1;
+						item->flags |= 0x20;
+						item->status = ITEM_INVISIBLE;
+					}
+					item->pos.xRot = oldXrot;
+					item->pos.yRot = oldYrot;
+					item->pos.zRot = oldZrot;
+					KillItem(pickupitem);//?
+					return;
+				}
+			}
 		}
-	}
 }
 
 void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
