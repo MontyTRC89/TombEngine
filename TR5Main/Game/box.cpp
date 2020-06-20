@@ -262,7 +262,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	*/
 }
 
-short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, function<CreatureEffectFunction> func)
+short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
 {
 	PHD_VECTOR pos;
 	pos.x = bite->x;
@@ -272,7 +272,7 @@ short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angl
 	return func(pos.x, pos.y, pos.z, damage, angle, item->roomNumber);
 }
 
-short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, function<CreatureEffectFunction> func)
+short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
 {
 	PHD_VECTOR pos;
 	pos.x = bite->x;

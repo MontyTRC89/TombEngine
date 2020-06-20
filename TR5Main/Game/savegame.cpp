@@ -17,7 +17,8 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-
+using std::string;
+using std::vector;
 FileStream* SaveGame::m_stream;
 ChunkReader* SaveGame::m_reader;
 ChunkWriter* SaveGame::m_writer;

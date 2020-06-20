@@ -14,7 +14,8 @@
 #include "sound.h"
 #include "levelloader.h"
 #include "GameFlowScript.h"
-
+using std::vector;
+using std::string;
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
 ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
 ChunkId* ChunkLuaIds = ChunkId::FromString("Tr5LuaIds");

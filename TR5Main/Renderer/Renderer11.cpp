@@ -21,6 +21,7 @@
 #include "Utils.h"
 #include "VertexBuffer.h"
 using namespace T5M::Renderer::Utils;
+using std::array;
 Renderer11* g_Renderer;
 Renderer11::Renderer11()
 {

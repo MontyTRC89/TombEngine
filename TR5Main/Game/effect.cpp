@@ -18,7 +18,7 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "pickup.h"
-
+using std::function;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 int wf = 256;
 using namespace T5M::Effects::Footprints;
