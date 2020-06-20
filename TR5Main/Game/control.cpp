@@ -43,6 +43,7 @@
 #include "spark.h"
 #include "explosion.h"
 #include "drip.h"
+using std::vector;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;

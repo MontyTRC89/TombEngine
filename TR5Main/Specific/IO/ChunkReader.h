@@ -3,7 +3,6 @@
 #include "LEB128.h"
 #include "Streams.h"
 
-using namespace std;
 
 class ChunkReader
 {
@@ -12,154 +11,38 @@ private:
 	ChunkId* m_emptyChunk = nullptr;
 	BaseStream* m_stream = nullptr;
 
-	int readInt32()
-	{
-		int value = 0;
-		m_stream->Read(reinterpret_cast<char *>(&value), 4);
-		return value;
-	}
+	int readInt32();
 
-	short readInt16()
-	{
-		short value = 0;
-		m_stream->Read(reinterpret_cast<char *>(&value), 2);
-		return value;
-	}
+	short readInt16();
 
 public:
-	ChunkReader(int expectedMagicNumber, BaseStream* stream)
-	{
-		m_isValid = false;
+	ChunkReader(int expectedMagicNumber, BaseStream* stream);
 
-		if (stream == NULL)
-			return;
+	~ChunkReader();
 
-		m_stream = stream;
+	bool IsValid();
 
-		// Check the magic number
-		int magicNumber = readInt32();
-		if (magicNumber != expectedMagicNumber)
-			return;
+	bool ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg);
 
-		// TODO: future use for compression
-		m_stream->Seek(4, SeekOrigin::CURRENT);
-		m_emptyChunk = new ChunkId(NULL, 0);
-		m_isValid = true;
-	}
+	bool ReadChunks(std::function<bool(ChunkId*, long, int)> func, int arg);
 
-	~ChunkReader()
-	{
-		delete m_emptyChunk;
-	}
+	char* ReadChunkArrayOfBytes(__int64 length);
 
-	bool IsValid()
-	{
-		return m_isValid;
-	}
+	bool ReadChunkBool(__int64 length);
 
-	bool ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg)
-	{
-		do
-		{
-			ChunkId* chunkId = ChunkId::FromStream(m_stream);
-			if (chunkId->EqualsTo(m_emptyChunk)) // End reached
-				break;
+	__int64 ReadChunkLong(__int64 length);
 
-			// Read up to a 64 bit number for the chunk size
-			__int64 chunkSize = LEB128::ReadLong(m_stream);
+	int ReadChunkInt32(__int64 length);
 
-			// Try loading chunk content
-			bool chunkRecognized = false;
-			int startPos = m_stream->GetCurrentPosition();
+	unsigned int ReadChunkUInt32(__int64 length);
 
-			chunkRecognized = func(chunkId, chunkSize, arg);
-			int readDataCount = m_stream->GetCurrentPosition() - startPos;
+	short ReadChunkInt16(__int64 length);
 
-			// Adjust _stream position if necessary
-			if (readDataCount != chunkSize)
-				m_stream->Seek(chunkSize - readDataCount, SeekOrigin::CURRENT);
-		} while (true);
+	unsigned short ReadChunkUInt16(__int64 length);
 
-		return true;
-	}
+	byte ReadChunkByte(__int64 length);
 
-	bool ReadChunks(std::function<bool(ChunkId*, long, int)> func, int arg)
-	{
-		do
-		{
-			ChunkId* chunkId = ChunkId::FromStream(m_stream);
-			if (chunkId->EqualsTo(m_emptyChunk)) // End reached
-				break;
+	char* ReadChunkString(long length);
 
-			// Read up to a 64 bit number for the chunk size
-			__int64 chunkSize = LEB128::ReadLong(m_stream);
-
-			// Try loading chunk content
-			bool chunkRecognized = false;
-			int startPos = m_stream->GetCurrentPosition();
-
-			chunkRecognized = func(chunkId, chunkSize, arg);
-			int readDataCount = m_stream->GetCurrentPosition() - startPos;
-
-			// Adjust _stream position if necessary
-			if (readDataCount != chunkSize)
-				m_stream->Seek(chunkSize - readDataCount, SeekOrigin::CURRENT);
-		} while (true);
-
-		return true;
-	}
-
-	char* ReadChunkArrayOfBytes(__int64 length)
-	{
-		char* value = (char*)malloc(length);
-		m_stream->Read(value, length);
-		return value;
-	}
-
-	bool ReadChunkBool(__int64 length)
-	{
-		return (LEB128::ReadByte(m_stream) != 0);
-	}
-
-	__int64 ReadChunkLong(__int64 length)
-	{
-		return LEB128::ReadLong(m_stream);
-	}
-
-	int ReadChunkInt32(__int64 length)
-	{
-		return LEB128::ReadInt32(m_stream);
-	}
-
-	unsigned int ReadChunkUInt32(__int64 length)
-	{
-		return LEB128::ReadUInt32(m_stream);
-	}
-
-	short ReadChunkInt16(__int64 length)
-	{
-		return LEB128::ReadInt16(m_stream);
-	}
-
-	unsigned short ReadChunkUInt16(__int64 length)
-	{
-		return LEB128::ReadUInt16(m_stream);
-	}
-
-	byte ReadChunkByte(__int64 length)
-	{
-		return LEB128::ReadByte(m_stream);
-	}
-
-	char* ReadChunkString(long length)
-	{
-		char* value = (char*)malloc(length);
-		memcpy(value, LevelDataPtr, length);
-		return value;
-	}
-
-	BaseStream* GetRawStream()
-	{
-		return m_stream;
-	}
+	BaseStream* GetRawStream();
 };
