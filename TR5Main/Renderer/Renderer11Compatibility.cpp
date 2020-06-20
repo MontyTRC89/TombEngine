@@ -51,8 +51,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 			for (int k = 0; k < 4; k++)
 			{
-				float x = (texture->vertices[k].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-				float y = (texture->vertices[k].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+				float x = texture->vertices[k].x;
+				float y = texture->vertices[k].y;
 
 				newTexture.UV[k] = Vector2(x, y);
 			}
@@ -61,7 +61,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	}
 
 	// Step 1: create the texture atlas
-	byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
+	/*byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 	ZeroMemory(buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
 
 	int blockX = 0;
@@ -110,11 +110,40 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	m_skyTexture = Texture2D::LoadFromByteArray(m_device, 256, 256, &buffer[0]);
 	if (m_skyTexture == NULL)
+		return false;*/
+
+		//D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
+
+		//free(buffer);
+
+		// Upload textures to GPU memory
+	for (int i = 0; i < RoomTextures.size(); i++)
+	{
+		TEXTURE* texture = &RoomTextures[i];
+		m_roomTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+	}
+
+	for (int i = 0; i < MoveablesTextures.size(); i++)
+	{
+		TEXTURE* texture = &MoveablesTextures[i];
+		m_moveablesTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+	}
+
+	for (int i = 0; i < StaticsTextures.size(); i++)
+	{
+		TEXTURE* texture = &StaticsTextures[i];
+		m_staticsTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+	}
+
+	for (int i = 0; i < SpritesTextures.size(); i++)
+	{
+		TEXTURE* texture = &SpritesTextures[i];
+		m_spritesTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+	}
+
+	m_skyTexture = Texture2D::LoadFromMemory(m_device, MiscTextures.data.data(), MiscTextures.size);
+	if (m_skyTexture == NULL)
 		return false;
-
-	//D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
-
-	free(buffer);
 
 	// Step 2: prepare rooms
 	vector<RendererVertex> roomVertices;
@@ -225,8 +254,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 						vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
 						vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
 
-						vertex.UV.x = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-						vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+						vertex.UV.x = texture->vertices[v].x;
+						vertex.UV.y = texture->vertices[v].y;
 
 						vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
 						vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
@@ -333,8 +362,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 						vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
 						vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
 
-						vertex.UV.x = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-						vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+						vertex.UV.x = texture->vertices[v].x;
+						vertex.UV.y = texture->vertices[v].y;
 
 						vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
 						vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
@@ -756,7 +785,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	// Step 5: prepare sprites
 	m_sprites = (RendererSprite * *)malloc(sizeof(RendererSprite*) * g_NumSprites);
-	ZeroMemory(m_sprites, sizeof(RendererSprite*) * g_NumSprites);
+	ZeroMemory(m_sprites, sizeof(RendererSprite*)* g_NumSprites);
 
 	for (int i = 0; i < g_NumSprites; i++)
 	{
@@ -764,18 +793,11 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 		RendererSprite* sprite = new RendererSprite();
 
-		sprite->Width = (oldSprite->right - oldSprite->left) * 256.0f;
-		sprite->Height = (oldSprite->bottom - oldSprite->top) * 256.0f;
-
-		float left = (oldSprite->left * 256.0f + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
-		float top = (oldSprite->top * 256.0f + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
-		float right = (oldSprite->right * 256.0f + GET_ATLAS_PAGE_X(oldSprite->tile - 1));
-		float bottom = (oldSprite->bottom * 256.0f + GET_ATLAS_PAGE_Y(oldSprite->tile - 1));
-
-		sprite->UV[0] = Vector2(left / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
-		sprite->UV[1] = Vector2(right / (float)TEXTURE_ATLAS_SIZE, top / (float)TEXTURE_ATLAS_SIZE);
-		sprite->UV[2] = Vector2(right / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
-		sprite->UV[3] = Vector2(left / (float)TEXTURE_ATLAS_SIZE, bottom / (float)TEXTURE_ATLAS_SIZE);
+		sprite->UV[0] = Vector2(oldSprite->x1, oldSprite->y1);
+		sprite->UV[1] = Vector2(oldSprite->x2, oldSprite->y2);
+		sprite->UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
+		sprite->UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
+		sprite->Texture = m_spritesTextures[oldSprite->tile];
 
 		m_sprites[i] = sprite;
 	}

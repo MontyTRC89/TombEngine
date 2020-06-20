@@ -1,6 +1,14 @@
 #pragma once
 #include "framework.h"
 
+struct TEXTURE
+{
+	int width;
+	int height;
+	int size;
+	vector<byte> data;
+};
+
 struct TrTexturePage
 {
 	int width;

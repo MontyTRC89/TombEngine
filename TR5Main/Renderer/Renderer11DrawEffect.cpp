@@ -796,10 +796,6 @@ bool Renderer11::drawSprites()
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
-	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
-	m_context->PSSetSamplers(0, 1, &sampler);
-
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
 
@@ -834,6 +830,10 @@ bool Renderer11::drawSprites()
 
 			if (spr->BlendMode != currentBlendMode)
 				continue;
+
+			m_context->PSSetShaderResources(0, 1, &spr->Sprite->Texture->ShaderResourceView);
+			ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+			m_context->PSSetSamplers(0, 1, &sampler);
 
 			if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
@@ -1301,7 +1301,7 @@ bool Renderer11::drawDebris(bool transparent)
 			m_primitiveBatch->Begin();
 			m_context->VSSetShader(m_vsStatics, NULL, 0);
 			m_context->PSSetShader(m_psStatics, NULL, 0);
-			m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+			m_context->PSSetShaderResources(0, 1, &m_staticsTextures[0]->ShaderResourceView);
 			ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 			m_context->PSSetSamplers(0, 1, &sampler);
 			//m_stCameraMatrices.View = View.Transpose();

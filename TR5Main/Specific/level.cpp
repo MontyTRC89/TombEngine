@@ -22,9 +22,6 @@ ChunkId* ChunkLuaId = ChunkId::FromString("Tr5LuaId");
 
 extern GameScript* g_GameScript;
 
-byte* Texture32;
-byte* Texture16;
-byte* MiscTextures;
 short* RawMeshData;
 int MeshDataSize;
 int* MeshTrees;
@@ -50,7 +47,7 @@ vector<int> StaticObjectsIds;
 extern GameFlow* g_GameFlow;
 
 char* LevelDataPtr;
-OBJECT_TEXTURE* ObjectTextures;
+vector<OBJECT_TEXTURE> ObjectTextures;
 ITEM_INFO* Items;
 int LevelItems;
 int NumberRooms;
@@ -66,6 +63,12 @@ short* FloorData;
 int nAIObjects;
 AIOBJECT* AIObjects;
 SPRITE* Sprites;
+
+vector<TEXTURE> RoomTextures;
+vector<TEXTURE> MoveablesTextures;
+vector<TEXTURE> StaticsTextures;
+vector<TEXTURE> SpritesTextures;
+TEXTURE MiscTextures;
 
 int g_NumSprites;
 int g_NumSpritesSequences;
@@ -91,6 +94,13 @@ short ReadInt16()
 int ReadInt32()
 {
 	int value = *(int*)LevelDataPtr;
+	LevelDataPtr += 4;
+	return value;
+}
+
+float ReadFloat()
+{
+	float value = *(float*)LevelDataPtr;
 	LevelDataPtr += 4;
 	return value;
 }
@@ -307,42 +317,82 @@ void LoadTextures()
 {
 	printf("LoadTextures\n");
 
-	int uncompressedSize = 0;
-	int compressedSize = 0;
+	int numTextures;
+	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	for (int i = 0; i < numTextures; i++)
+	{
+		TEXTURE texture;
 
-	// Read 32 bit textures
-	ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
-	ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
-	
-	Texture32 = (byte*)malloc(uncompressedSize);
-	byte* buffer = (byte*)malloc(compressedSize);
-	
-	ReadFileEx(buffer, compressedSize, 1, LevelFilePtr);
-	Decompress(Texture32, buffer, compressedSize, uncompressedSize);
-	free(buffer);
+		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.size, 1, 4, LevelFilePtr);
+		texture.data.reserve(texture.size);
+		byte* buffer = (byte*)malloc(texture.size);
+		ReadFileEx(buffer, 1, texture.size, LevelFilePtr);
+		std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+		free(buffer);
 
-	// Read 16 bit textures
-	ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
-	ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
+		RoomTextures.push_back(texture);
+	}
 
-	Texture16 = (byte*)malloc(uncompressedSize);
-	buffer = (byte*)malloc(compressedSize);
+	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	for (int i = 0; i < numTextures; i++)
+	{
+		TEXTURE texture;
 
-	ReadFileEx(buffer, compressedSize, 1u, LevelFilePtr);
-	Decompress(Texture16, buffer, compressedSize, uncompressedSize);
-	free(buffer);
+		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.size, 1, 4, LevelFilePtr);
+		texture.data.reserve(texture.size);
+		byte* buffer = (byte*)malloc(texture.size);
+		ReadFileEx(buffer, 1, texture.size, LevelFilePtr);
+		std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+		free(buffer);
 
-	// Read misc textures
-	ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
-	ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
+		MoveablesTextures.push_back(texture);
+	}
 
-	printf("%d\n", uncompressedSize);
+	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	for (int i = 0; i < numTextures; i++)
+	{
+		TEXTURE texture;
 
-	MiscTextures = (byte*)malloc(uncompressedSize);
-	buffer = (byte*)malloc(compressedSize);
+		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.size, 1, 4, LevelFilePtr);
+		texture.data.reserve(texture.size);
+		byte* buffer = (byte*)malloc(texture.size);
+		ReadFileEx(buffer, 1, texture.size, LevelFilePtr);
+		std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+		free(buffer);
 
-	ReadFileEx(buffer, compressedSize, 1u, LevelFilePtr);
-	Decompress(MiscTextures, buffer, compressedSize, uncompressedSize);
+		StaticsTextures.push_back(texture);
+	}
+
+	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	for (int i = 0; i < numTextures; i++)
+	{
+		TEXTURE texture;
+
+		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
+		ReadFileEx(&texture.size, 1, 4, LevelFilePtr);
+		texture.data.reserve(texture.size);
+		byte* buffer = (byte*)malloc(texture.size);
+		ReadFileEx(buffer, 1, texture.size, LevelFilePtr);
+		std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+		free(buffer);
+
+		SpritesTextures.push_back(texture);
+	}
+
+	ReadFileEx(&MiscTextures.width, 1, 4, LevelFilePtr);
+	ReadFileEx(&MiscTextures.height, 1, 4, LevelFilePtr);
+	ReadFileEx(&MiscTextures.size, 1, 4, LevelFilePtr);
+	MiscTextures.data.reserve(MiscTextures.size);
+	byte* buffer = (byte*)malloc(MiscTextures.size);
+	ReadFileEx(buffer, 1, MiscTextures.size, LevelFilePtr);
+	std::copy(buffer, buffer + MiscTextures.size, std::back_inserter(MiscTextures.data));
 	free(buffer);
 }
 
@@ -607,6 +657,11 @@ void FreeLevel()
 {
 	malloc_ptr = malloc_buffer;
 	malloc_free = malloc_size;
+	RoomTextures.clear();
+	MoveablesTextures.clear();
+	StaticsTextures.clear();
+	SpritesTextures.clear();
+	ObjectTextures.clear();
 	g_Renderer->FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
@@ -644,136 +699,22 @@ void LoadTextureInfos()
 	ReadInt32(); // TEX/0
 	
 	NumObjectTextures = ReadInt32();
-	ObjectTextures = (OBJECT_TEXTURE*)game_malloc(NumObjectTextures * sizeof(OBJECT_TEXTURE));
-
+	
 	if (NumObjectTextures > 0)
 	{
 		for (int i = 0; i < NumObjectTextures; i++)
 		{
-			tr4_object_texture srctext;
-			ReadBytes(&srctext, sizeof(tr4_object_texture));
-
-			OBJECT_TEXTURE* texture = &ObjectTextures[i];
-
-			texture->attribute = srctext.Attribute;
-			texture->tileAndFlag = srctext.TileAndFlag; // &0x7FFF;
-			texture->newFlags = texture->newFlags; // srctext.TileAndFlag ^ (srctext.TileAndFlag ^ srctext.NewFlags) & 0x7FFF;
-
+			OBJECT_TEXTURE texture;
+			texture.attribute = ReadInt32();
+			texture.tileAndFlag = ReadInt32();
+			texture.newFlags = ReadInt32();
 			for (int j = 0; j < 4; j++)
 			{
-				texture->vertices[j].x = srctext.Vertices[j].Xpixel / 256.0f;
-				texture->vertices[j].y = srctext.Vertices[j].Ypixel / 256.0f;
+				texture.vertices[j].x = ReadFloat();
+				texture.vertices[j].y = ReadFloat();
 			}
-
-			// Adjust UV
-			float fx = 1.0f / 256.0f;
-			float fy = 1.0f / 256.0f;
-
-			int correction = texture->newFlags & 7;
-
-			if (texture->tileAndFlag & 0x8000)
-			{
-				if (correction == 1)
-				{
-					texture->vertices[0].x = texture->vertices[0].x - fx;
-					texture->vertices[0].y = texture->vertices[0].y + fy;
-					texture->vertices[1].x = texture->vertices[1].x + fx;
-					texture->vertices[1].y = texture->vertices[1].y + fy;
-					texture->vertices[2].x = texture->vertices[2].x + fx;
-					texture->vertices[2].y = texture->vertices[2].y - fy;
-					texture->vertices[3].x = texture->vertices[3].x - fx;
-					texture->vertices[3].y = texture->vertices[3].y - fy;
-				}
-				else
-				{
-					texture->vertices[0].x = texture->vertices[0].x + fx;
-					texture->vertices[0].y = texture->vertices[0].y + fy;
-					texture->vertices[1].x = texture->vertices[1].x - fx;
-					texture->vertices[1].y = texture->vertices[1].y + fy;
-					texture->vertices[2].x = texture->vertices[2].x - fx;
-					texture->vertices[2].y = texture->vertices[2].y - fy;
-					texture->vertices[3].x = texture->vertices[3].x + fx;
-					texture->vertices[3].y = texture->vertices[3].y - fy;
-				}
-			}
-			else
-			{
-				switch (correction)
-				{
-				case 0:
-					texture->vertices[0].x = texture->vertices[0].x + fx;
-					texture->vertices[0].y = texture->vertices[0].y + fy;
-					texture->vertices[1].x = texture->vertices[1].x - fx;
-					texture->vertices[1].y = texture->vertices[1].y + fy;
-					texture->vertices[2].x = texture->vertices[2].x + fx;
-					texture->vertices[2].y = texture->vertices[2].y - fy;
-					break;
-
-				case 1:
-					texture->vertices[0].x = texture->vertices[0].x - fx;
-					texture->vertices[0].y = texture->vertices[0].y + fy;
-					texture->vertices[1].x = texture->vertices[1].x - fx;
-					texture->vertices[1].y = texture->vertices[1].y - fy;
-					texture->vertices[2].x = texture->vertices[2].x - fx;
-					texture->vertices[2].y = texture->vertices[2].y + fy;
-					break;
-
-				case 2:
-					texture->vertices[0].x = texture->vertices[0].x - fx;
-					texture->vertices[0].y = texture->vertices[0].y - fy;
-					texture->vertices[1].x = texture->vertices[1].x + fx;
-					texture->vertices[1].y = texture->vertices[1].y - fy;
-					texture->vertices[2].x = texture->vertices[2].x - fx;
-					texture->vertices[2].y = texture->vertices[2].y + fy;
-					break;
-
-				case 3:
-					texture->vertices[0].x = texture->vertices[0].x + fx;
-					texture->vertices[0].y = texture->vertices[0].y - fy;
-					texture->vertices[1].x = texture->vertices[1].x + fx;
-					texture->vertices[1].y = texture->vertices[1].y + fy;
-					texture->vertices[2].x = texture->vertices[2].x - fx;
-					texture->vertices[2].y = texture->vertices[2].y - fy;
-					break;
-
-				case 4:
-					texture->vertices[0].x = texture->vertices[0].x - fx;
-					texture->vertices[0].y = texture->vertices[0].y + fy;
-					texture->vertices[1].x = texture->vertices[1].x + fx;
-					texture->vertices[1].y = texture->vertices[1].y + fy;
-					texture->vertices[2].x = texture->vertices[2].x - fx;
-					texture->vertices[2].y = texture->vertices[2].y - fy;
-					break;
-
-				case 5:
-					texture->vertices[0].x = texture->vertices[0].x + fx;
-					texture->vertices[0].y = texture->vertices[0].y + fy;
-					texture->vertices[1].x = texture->vertices[1].x + fx;
-					texture->vertices[1].y = texture->vertices[1].y - fy;
-					texture->vertices[2].x = texture->vertices[2].x - fx;
-					texture->vertices[2].y = texture->vertices[2].y + fy;
-					break;
-
-				case 6:
-					texture->vertices[0].x = texture->vertices[0].x + fx;
-					texture->vertices[0].y = texture->vertices[0].y - fy;
-					texture->vertices[1].x = texture->vertices[1].x - fx;
-					texture->vertices[1].y = texture->vertices[1].y - fy;
-					texture->vertices[2].x = texture->vertices[2].x + fx;
-					texture->vertices[2].y = texture->vertices[2].y + fy;
-					break;
-
-				case 7:
-					texture->vertices[0].x = texture->vertices[0].x - fx;
-					texture->vertices[0].y = texture->vertices[0].y - fy;
-					texture->vertices[1].x = texture->vertices[1].x - fx;
-					texture->vertices[1].y = texture->vertices[1].y + fy;
-					texture->vertices[2].x = texture->vertices[2].x + fx;
-					texture->vertices[2].y = texture->vertices[2].y - fy;
-					break;
-
-				}
-			}
+			texture.destination = ReadInt32();
+			ObjectTextures.push_back(texture);
 		}
 	}
 }
@@ -862,12 +803,7 @@ unsigned CALLBACK LoadLevel(void* data)
 		short numBumpTextureTiles;
 
 		ReadFileEx(&version, 1, 4, LevelFilePtr);
-		ReadFileEx(&numRoomTextureTiles, 1, 2, LevelFilePtr);
-		ReadFileEx(&numObjectsTextureTiles, 1, 2, LevelFilePtr);
-		ReadFileEx(&numBumpTextureTiles, 1, 2, LevelFilePtr);
-
-		g_Renderer->NumTexturePages = numRoomTextureTiles + numObjectsTextureTiles + numBumpTextureTiles;
-
+		
 		LoadTextures();
 
 		g_Renderer->UpdateProgress(20);
@@ -1162,15 +1098,15 @@ void LoadSprites()
 
 	for (int i = 0; i < g_NumSprites; i++)
 	{
-		Sprites[i].tile = ReadInt16() + 1;
-		Sprites[i].x = ReadInt8();
-		Sprites[i].y = ReadInt8();
-		Sprites[i].width = ReadInt16();
-		Sprites[i].height = ReadInt16();
-		Sprites[i].left = (ReadInt16() + 1) / 256.0f;
-		Sprites[i].top = (ReadInt16() + 1) / 256.0f;
-		Sprites[i].right = (ReadInt16() - 1) / 256.0f;
-		Sprites[i].bottom = (ReadInt16() - 1) / 256.0f;
+		Sprites[i].tile = ReadInt32();
+		Sprites[i].x1 = ReadFloat();
+		Sprites[i].y1 = ReadFloat();
+		Sprites[i].x2 = ReadFloat();
+		Sprites[i].y2 = ReadFloat();
+		Sprites[i].x3 = ReadFloat();
+		Sprites[i].y3 = ReadFloat();
+		Sprites[i].x4 = ReadFloat();
+		Sprites[i].y4 = ReadFloat();
 	}
 
 	g_NumSpritesSequences = ReadInt32();
