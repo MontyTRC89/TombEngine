@@ -40,7 +40,7 @@ typedef struct ShatterImpactInfo
 typedef struct DebrisMesh
 {
 	RENDERER_BUCKETS bucket;
-	array<RendererVertex, 3> vertices;
+	std::array<RendererVertex, 3> vertices;
 };
 
 typedef struct DebrisFragment
@@ -85,7 +85,7 @@ typedef struct DEBRIS_STRUCT
 };
 
 extern SHATTER_ITEM ShatterItem;
-extern vector<DebrisFragment> DebrisFragments;
+extern std::vector<DebrisFragment> DebrisFragments;
 extern ShatterImpactInfo ShatterImpactData;
 extern short SmashedMeshCount;
 extern MESH_INFO* SmashedMesh[32];

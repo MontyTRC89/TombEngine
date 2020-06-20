@@ -20,7 +20,7 @@ struct FX_INFO
 	short flag2;
 };
 
-extern function<EffectFunction> effect_routines[];
+extern std::function<EffectFunction> effect_routines[];
 extern FX_INFO* Effects;
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius);

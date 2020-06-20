@@ -47,7 +47,7 @@ typedef struct SAVEGAME_INFO
 
 typedef struct SaveGameHeader
 {
-	string LevelName;
+	std::string LevelName;
 	int Days;
 	int Hours;
 	int Minutes;
