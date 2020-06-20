@@ -66,7 +66,7 @@ short Unk_0080DE1A;
 int Unk_0080DDE8;
 short Unk_0080DE24;
 
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;
 
 static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
@@ -388,7 +388,7 @@ static int GetOnJeep(int itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	if (!(TrInput & IN_ACTION) && g_Inventory->GetSelectedObject() != ID_PUZZLE_ITEM1)
+	if (!(TrInput & IN_ACTION) && g_Inventory.GetSelectedObject() != ID_PUZZLE_ITEM1)
 	{
 		return 0;
 	}
@@ -441,15 +441,15 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
 		{
-			if (g_Inventory->GetSelectedObject() == ID_PUZZLE_ITEM1)
+			if (g_Inventory.GetSelectedObject() == ID_PUZZLE_ITEM1)
 			{
-				g_Inventory->SetSelectedObject(NO_ITEM);
+				g_Inventory.SetSelectedObject(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-					g_Inventory->SetEnterObject(ID_PUZZLE_ITEM1);
+				if (g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
+					g_Inventory.SetEnterObject(ID_PUZZLE_ITEM1);
 				return 0;
 			}
 		}
@@ -461,15 +461,15 @@ static int GetOnJeep(int itemNumber)
 		int tempAngle = LaraItem->pos.yRot - item->pos.yRot;
 		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
 		{
-			if (g_Inventory->GetSelectedObject() == ID_PUZZLE_ITEM1)
+			if (g_Inventory.GetSelectedObject() == ID_PUZZLE_ITEM1)
 			{
-				g_Inventory->SetSelectedObject(NO_ITEM);
+				g_Inventory.SetSelectedObject(NO_ITEM);
 				return 1;
 			}
 			else
 			{
-				if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
-					g_Inventory->SetEnterObject(ID_PUZZLE_ITEM1);
+				if (g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM1))
+					g_Inventory.SetEnterObject(ID_PUZZLE_ITEM1);
 				return 0;
 			}
 		}

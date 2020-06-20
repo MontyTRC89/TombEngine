@@ -18,10 +18,10 @@
 #include "misc.h"
 #include "footprint.h"
 #include "setup.h"
-
-extern std::deque<FOOTPRINT_STRUCT> footprints;
+#include "Utils.h"
+#include "VertexBuffer.h"
+using namespace T5M::Renderer::Utils;
 Renderer11* g_Renderer;
-
 Renderer11::Renderer11()
 {
 	initialiseHairRemaps();
@@ -76,10 +76,6 @@ Renderer11::~Renderer11()
 	DX11_RELEASE(m_cbLights);
 	DX11_RELEASE(m_cbMisc);
 
-	DX11_DELETE(m_renderTarget);
-	DX11_DELETE(m_dumpScreenRenderTarget);
-	DX11_DELETE(m_shadowMap);
-
 	DX11_RELEASE(m_swapChain);
 	DX11_RELEASE(m_context);
 	DX11_RELEASE(m_device);
@@ -105,12 +101,6 @@ void Renderer11::FreeRendererData()
 
 	DX11_DELETE(m_textureAtlas);
 	DX11_DELETE(m_skyTexture);
-	DX11_DELETE(m_roomsVertexBuffer);
-	DX11_DELETE(m_roomsIndexBuffer);
-	DX11_DELETE(m_moveablesVertexBuffer);
-	DX11_DELETE(m_moveablesIndexBuffer);
-	DX11_DELETE(m_staticsVertexBuffer);
-	DX11_DELETE(m_staticsIndexBuffer);
 }
 
 void Renderer11::clearSceneItems()
@@ -153,18 +143,13 @@ ID3D11VertexShader* Renderer11::compileVertexShader(const wchar_t * fileName, co
 
 	printf("Compiling vertex shader: %s\n", fileName);
 	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
-
 	res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors);
-	if (FAILED(res))
-	{
-		printf("Compilation failed: %s\n", errors->GetBufferPointer());
-		return NULL;
-	}
+	throwIfFailed(res);
+
 
 	ID3D11VertexShader* shader = NULL;
 	res = m_device->CreateVertexShader((*bytecode)->GetBufferPointer(), (*bytecode)->GetBufferSize(), NULL, &shader);
-	if (FAILED(res))
-		return NULL;
+	throwIfFailed(res);
 
 	return shader;
 }
@@ -178,18 +163,10 @@ ID3D11PixelShader* Renderer11::compilePixelShader(const wchar_t * fileName, cons
 
 	printf("Compiling pixel shader: %s\n", fileName);
 	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
-	res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors);
-	if (FAILED(res))
-	{
-		printf("Compilation failed: %s\n", errors->GetBufferPointer());
-		return NULL;
-	}
+	throwIfFailed(D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors)) ;
 
 	ID3D11PixelShader* shader = NULL;
-	res = m_device->CreatePixelShader((*bytecode)->GetBufferPointer(), (*bytecode)->GetBufferSize(), NULL, &shader);
-	if (FAILED(res))
-		return NULL;
-
+	throwIfFailed(m_device->CreatePixelShader((*bytecode)->GetBufferPointer(), (*bytecode)->GetBufferSize(), NULL, &shader)) ;
 	return shader;
 }
 
@@ -255,9 +232,6 @@ ID3D11Buffer* Renderer11::createConstantBuffer(size_t size)
 
 	return buffer;
 }
-
-
-
 
 RendererHUDBar::RendererHUDBar(ID3D11Device* m_device,int x, int y, int w, int h, int borderSize, array<Vector4,9> colors)
 {
@@ -370,8 +344,8 @@ RendererHUDBar::RendererHUDBar(ID3D11Device* m_device,int x, int y, int w, int h
 		vertices[i].Normal = Vector3(0, 0, 0);
 		vertices[i].Bone = 0.0f;
 	}
-	vertexBuffer = VertexBuffer::Create(m_device, vertices.size(), vertices.data());
-	indexBuffer = IndexBuffer::Create(m_device, barIndices.size(), barIndices.data());
+	vertexBuffer = VertexBuffer(m_device, vertices.size(), vertices.data());
+	indexBuffer = IndexBuffer(m_device, barIndices.size(), barIndices.data());
 
 	array<RendererVertex, barBorderVertices.size()> verticesBorder;
 	for (int i = 0; i < barBorderVertices.size(); i++) {
@@ -381,7 +355,7 @@ RendererHUDBar::RendererHUDBar(ID3D11Device* m_device,int x, int y, int w, int h
 		verticesBorder[i].Normal = Vector3(0, 0, 0);
 		verticesBorder[i].Bone = 0.0f;
 	}
-	vertexBufferBorder = VertexBuffer::Create(m_device, verticesBorder.size(), verticesBorder.data());
-	indexBufferBorder = IndexBuffer::Create(m_device, barBorderIndices.size(), barBorderIndices.data());
+	vertexBufferBorder = VertexBuffer(m_device, verticesBorder.size(), verticesBorder.data());
+	indexBufferBorder = IndexBuffer(m_device, barBorderIndices.size(), barBorderIndices.data());
 	
 }

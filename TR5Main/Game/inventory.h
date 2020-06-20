@@ -397,4 +397,4 @@ public:
 	void						SetSelectedObject(short objNum);
 };
 
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;

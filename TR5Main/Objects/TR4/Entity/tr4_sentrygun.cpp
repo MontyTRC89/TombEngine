@@ -13,7 +13,7 @@
 #include "trmath.h"
 #include "objectslist.h"
 
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;
 BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
 
 static void SentryGunThrowFire(ITEM_INFO* item)
@@ -140,7 +140,7 @@ void SentryGunControl(short itemNum)
 				{
 					if (info.distance < SQUARE(SECTOR(9)))
 					{
-						if (!g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+						if (!g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
 						{
 							if (info.distance <= SQUARE(SECTOR(2)))
 							{

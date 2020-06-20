@@ -21,7 +21,8 @@
 
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 int wf = 256;
-extern std::deque<FOOTPRINT_STRUCT> footprints;
+using namespace T5M::Effects::Footprints;
+
 short FXType;
 FX_INFO* Effects;
 

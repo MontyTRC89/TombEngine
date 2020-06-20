@@ -42,7 +42,7 @@ static short RightClimbTab[4] = // offset 0xA0640
 	0x0800, 0x0100, 0x0200, 0x0400
 };
 
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;
 
 short elevation = 57346;
 bool doJump = false;
@@ -480,7 +480,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 int UseSpecialItem(ITEM_INFO* item)
 {
-	short selectedObject = g_Inventory->GetSelectedObject();
+	short selectedObject = g_Inventory.GetSelectedObject();
 
 	if (item->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus || selectedObject == NO_ITEM)
 		return FALSE;
@@ -529,7 +529,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	item->currentAnimState = STATE_LARA_MISC_CONTROL;
 
 	Lara.gunStatus = LG_HANDS_BUSY;
-	g_Inventory->SetSelectedObject(NO_ITEM);
+	g_Inventory.SetSelectedObject(NO_ITEM);
 
 	return TRUE;
 }

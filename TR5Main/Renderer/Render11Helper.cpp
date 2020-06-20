@@ -35,12 +35,13 @@ vector<RendererVideoAdapter>* Renderer11::GetAdapters()
 
 void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation)
 {
+	/*
 	Vector3 look = *particlePos;
 	look = look - *cameraPos;
 	look.Normalize();
 
-	Vector3 cameraUp = Vector3(0.0f, -1.0f, 0.0f);
-
+	*out = Matrix::CreateBillboard(*particlePos, *cameraPos, cameraUp);
+	
 	Vector3 right;
 	right = cameraUp.Cross(look);
 	right.Normalize();
@@ -70,6 +71,7 @@ void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector
 	out->_41 = particlePos->x;
 	out->_42 = particlePos->y;
 	out->_43 = particlePos->z;
+	*/
 }
 
 void Renderer11::updateAnimatedTextures()

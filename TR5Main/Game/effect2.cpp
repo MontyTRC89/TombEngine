@@ -11,6 +11,11 @@
 #include "level.h"
 #include "objectslist.h"
 #include "GameFlowScript.h"
+#include "spark.h"
+#include "explosion.h"
+#include <Game\drip.h>
+using T5M::Effects::Explosion::TriggerExplosion;
+using namespace T5M::Effects::Spark;
 
 unsigned char TES_extra_tab[] =
 {
@@ -382,7 +387,7 @@ void UpdateSparks()
 
 void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 {
-	int random;
+	/*int random;
 	SPARKS* spark;
 
 	if (!unk)
@@ -503,7 +508,8 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 			spark->maxYvel = -4 - ((random >> 6) & 3);
 			spark->dSize = spark->size;
 		}
-	}
+	}*/
+	TriggerRicochetSpark(pos, angle, num);
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
@@ -546,18 +552,19 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-	int shift = 0;
+
+	/*int shift = 0;
 	if ((roomNumber & 0x8000) != 0)
 	{
 		//v7 = -roomNumber;
 		roomNumber = -roomNumber;
 		shift = 1;
 	}
-	/*if (v7 == gfMirrorRoom && gfLevelFlags & 0x2000)
+	/ *if (v7 == gfMirrorRoom && gfLevelFlags & 0x2000)
 		v27 = 1;
 	z_bis = z;
 	do
-	{*/
+	{* /
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = 1;
 	spark->sR = -1;
@@ -673,7 +680,8 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	else
 	{
 		TriggerExplosionSmokeEnd(x, y, z, uw);
-	}
+	}*/
+	TriggerExplosion(Vector3(x, y, z), 512, true, false, true, roomNumber);
 	//} while (!v24);
 }
 
@@ -1046,9 +1054,9 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 	}
 }
 
-void SetupSplash(const SPLASH_SETUP* const setup)
+void SetupSplash(const SPLASH_SETUP* const setup,int room)
 {
-	constexpr size_t NUM_SPLASHES = 4;
+	constexpr size_t NUM_SPLASHES = 3;
 	int numSplashesSetup = 0;
 	float splashVelocity;
 	for (int i = 0; i < MAX_SPLASHES; i++)
@@ -1067,16 +1075,16 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.innerRad = setup->innerRadius;
 				splashVelocity = splashPower / 16;
 				splash.innerRadVel = splashVelocity;
-				splash.heightSpeed = splashPower * 1.5f;
+				splash.heightSpeed = splashPower * 1.2f;
 				splash.height = 0;
 				splash.heightVel = -16;
 				splash.outerRad = setup->innerRadius / 3;
-				splash.outerRadVel = splashVelocity;
+				splash.outerRadVel = splashVelocity*1.5f;
 				splash.spriteSequenceStart = 8; //Splash Texture
 				numSplashesSetup++;
 			}
 			else {
-				float thickness = frandMinMax(256,512);
+				float thickness = frandMinMax(64,128);
 				splash.isActive = true;
 				splash.x = setup->x;
 				splash.y = setup->y;
@@ -1084,17 +1092,17 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.isRipple = true;
 				float vel;
 				if (numSplashesSetup == 2) {
-					vel = (splashVelocity / 8) + frandMinMax(1, 3);
+					vel = (splashVelocity / 16) + frandMinMax(2, 4);
 				}
 				else {
-					vel = (splashVelocity / 8) + frandMinMax(5, 8);
+					vel = (splashVelocity / 7) + frandMinMax(3, 7);
 				}
 				
 				float innerRadius = 0;
 				splash.innerRad = innerRadius;
-				splash.innerRadVel = vel;
-				splash.outerRad = innerRadius;
-				splash.outerRadVel = vel * 2.0f;
+				splash.innerRadVel = vel*1.3f;
+				splash.outerRad = innerRadius+thickness;
+				splash.outerRadVel = vel*2.3f;
 				splash.heightSpeed = 128;
 				splash.height = 0;
 				splash.heightVel = -16;
@@ -1103,7 +1111,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 				splash.life = lerp(48, 70, t);
 				splash.spriteSequenceStart = 4; //Splash Texture
 				splash.spriteSequenceEnd = 7; //Splash Texture
-				splash.animationSpeed = frandMinMax(0.1f, 0.15f);
+				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);
 
 				numSplashesSetup++;
 			}
@@ -1113,7 +1121,7 @@ void SetupSplash(const SPLASH_SETUP* const setup)
 			continue;
 		}
 	}
-
+	T5M::Effects::Drip::SpawnSplashDrips(Vector3(setup->x, setup->y-15, setup->z),32,room);
 	PHD_3DPOS soundPosition;
 	soundPosition.xPos = setup->x;
 	soundPosition.yPos = setup->y;
@@ -1171,18 +1179,19 @@ void UpdateSplashes()
 			n = fmax(0.0f, n);
 			constexpr float peakTime = 0.2f;
 			constexpr float expIn = 1.5f;
-			constexpr float expOut = 1.0f;
+			constexpr float expOut = 2.0f;
 			if (n <= peakTime) {
-				float alpha = pow((n / peakTime), expIn);
 				//we ascend our color
+				float alpha = pow((n / peakTime), expIn);
 				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
 			}
 			else {
-				float alphaTerm = 1.0f - ((n - peakTime) / 1 - peakTime);
-				// float alpha = pow(alphaTerm, expOut);
-				float alpha = alphaTerm;
-				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
 				//we descend
+				float alphaTerm = 1.0f - ((n - peakTime) / 1 - peakTime);
+				float alpha = pow(alphaTerm, expOut);
+				//float alpha = alphaTerm;
+				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
+				
 			}
 			ripple->size += ripple->sizeRate;
 			ripple->lifeTime += ripple->lifeRate;
@@ -1220,11 +1229,13 @@ void SetupRipple(int x, int y, int z, char size, char flags)
 			}
 			else {
 				ripple->SpriteID = SPR_RIPPLES;
-				ripple->initialColor = Vector4(1, 1, 1, 1);
+				ripple->initialColor = Vector4(0.5, 0.5, 0.5, 1);
 				ripple->lifeRate = 1.0f;
 				ripple->sizeRate = 4.0f;
 				ripple->isBillboard = false;
 			}
+			if (flags & RIPPLE_FLAG_LOW_OPACITY)
+				ripple->initialColor *= 0.6f;
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
 				ripple->worldPos.x += frandMinMax(-32, 32);
@@ -1458,7 +1469,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 						SplashSetup.z = item->pos.zPos;
 						SplashSetup.innerRadius = 16;
 						SplashSetup.splashPower = item->speed;
-						SetupSplash(&SplashSetup);
+						SetupSplash(&SplashSetup,roomNumber);
 						SplashCount = 16;
 					}
 				}
@@ -1481,7 +1492,7 @@ void Splash(ITEM_INFO* item)
 		SplashSetup.z = item->pos.zPos;
 		SplashSetup.splashPower = item->fallspeed;
 		SplashSetup.innerRadius = 64;
-		SetupSplash(&SplashSetup);
+		SetupSplash(&SplashSetup,roomNumber);
 	}
 }
 
