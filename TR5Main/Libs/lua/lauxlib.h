@@ -218,7 +218,7 @@ LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
 ** ===================================================================
 */
 
-/* print a string */
+/* print a std::string */
 #if !defined(lua_writestring)
 #define lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
 #endif

@@ -35,7 +35,7 @@ struct GameScriptSettings
 	bool EnableDynamicShadows;
 	bool EnableWaterCaustics;
 	bool Windowed;
-	string WindowTitle;
+	std::string WindowTitle;
 	int DrawingDistance;
 	bool ShowRendererSteps;
 	bool ShowDebugInfo;
@@ -111,10 +111,10 @@ struct GameScriptMirror
 struct GameScriptLevel
 {
 	int NameStringIndex;
-	string FileName;
-	string ScriptFileName;
-	string LoadScreenFileName;
-	string Background;
+	std::string FileName;
+	std::string ScriptFileName;
+	std::string LoadScreenFileName;
+	std::string Background;
 	int Name;
 	int Soundtrack;
 	GameScriptSkyLayer Layer1;
