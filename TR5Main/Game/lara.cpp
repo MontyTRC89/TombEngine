@@ -31,7 +31,7 @@
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
-
+using std::function;
 static short LeftClimbTab[4] = // offset 0xA0638
 {
 	0x0200, 0x0400, 0x0800, 0x0100

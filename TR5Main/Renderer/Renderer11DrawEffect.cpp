@@ -18,6 +18,7 @@
 #include "explosion.h"
 using namespace T5M::Renderer;
 using namespace T5M::Effects::Footprints;
+using std::vector;
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];

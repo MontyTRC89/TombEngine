@@ -4,7 +4,7 @@
 #include "winmain.h"
 #include "GameFlowScript.h"
 using namespace T5M::Renderer;
-
+using std::vector;
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 
