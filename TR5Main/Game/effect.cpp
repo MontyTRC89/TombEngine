@@ -17,7 +17,7 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-using namespace T5M::Effects::Footprints;
+#include "pickup.h"
 
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 int wf = 256;
@@ -37,7 +37,7 @@ function<EffectFunction> effect_routines[59] =
 	ActivateKey,
 	RubbleFX,
 	SwapCrowbar,
-	void_effect,
+	pickup,
 	SoundFlipEffect,
 	ExplosionFX,
 	lara_hands_free,
@@ -97,6 +97,11 @@ void TL_1(ITEM_INFO* item)
 		S_CDPlay(9, 0);
 		Savegame.TLCount = 1;
 	}
+}
+
+void pickup(ITEM_INFO* item)
+{
+	do_pickup();
 }
 
 // TODO: here are sound for lara footstep too !
