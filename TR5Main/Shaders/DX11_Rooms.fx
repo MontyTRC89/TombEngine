@@ -1,4 +1,4 @@
-#include "./CameraMatrixBuffer.hlsli"
+#include "CameraMatrixBuffer.hlsli"
 
 struct RendererLight {
 	float4 Position;
@@ -34,6 +34,7 @@ cbuffer CShadowLightBuffer : register(b4)
 cbuffer RoomBuffer : register(b5)
 {
 	float4 AmbientColor;
+	int water;
 };
 
 struct VertexShaderInput
@@ -65,8 +66,17 @@ SamplerState ShadowMapSampler : register(s1);
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
-
-	output.Position = mul(float4(input.Position, 1.0f), ViewProjection); 
+	float4 screenPos = mul(float4(input.Position, 1.0f), ViewProjection);
+	float2 clipPos = screenPos.xy / screenPos.w;
+	if (CameraUnderwater != water) {
+		static const float PI = 3.14159265f;
+		float factor = (Frame + clipPos.x*320);
+		float xOffset = (sin(factor * PI/20.0f)) * (screenPos.z/1024)*5;
+		float yOffset = (cos(factor*PI/20.0f))*(screenPos.z/1024)*5;
+		screenPos.x += xOffset;
+		screenPos.y += yOffset;
+	}
+	output.Position = screenPos;
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
@@ -89,7 +99,6 @@ float getShadowFactor(Texture2D shadowMap, SamplerState shadowMapSampler, float2
 	return shadowFactor / 9.0f;
 }
 
-[earlydepthstencil]
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
@@ -118,13 +127,13 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			// If clip space z value greater than shadow map value then pixel is in shadow
 			float shadow = getShadowFactor(ShadowMap, ShadowMapSampler, coords, realDepth);
-			lighting = lerp(lighting,lighting*0.5f, saturate(shadow));
+			lighting = lerp(lighting, min(AmbientColor*2,lighting), saturate(shadow));
 		}
 	}
 
 	if (doLights)
 	{
-		for (int i = 0; i < NumLights; i++)
+		for (uint i = 0; i < NumLights; i++)
 		{
 			float3 lightPos = Lights[i].Position.xyz;
 			float3 color = Lights[i].Color.xyz;
@@ -138,7 +147,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 				continue;
 
 			lightVec = normalize(lightVec);
-			float attenuation = (radius - distance) / radius;
+			float attenuation = pow(((radius - distance) / radius), 2);
 
 			lighting += color * intensity * attenuation;
 		}

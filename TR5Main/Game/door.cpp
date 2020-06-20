@@ -46,7 +46,7 @@ extern byte SequenceResults[3][3][3];
 extern byte Sequences[3];
 extern byte CurrentSequence;
 extern PHD_VECTOR OldPickupPos;
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;
 
 void SequenceDoorControl(short itemNumber) 
 {
@@ -332,7 +332,7 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (item->triggerFlags == 2
 	&&  item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
-	&&  ((TrInput & IN_ACTION || g_Inventory->GetSelectedObject() == ID_CROWBAR_ITEM)
+	&&  ((TrInput & IN_ACTION || g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM)
 	&&  l->currentAnimState == STATE_LARA_STOP
 	&&  l->animNumber == ANIMATION_LARA_STAY_IDLE
 	&&  !l->hitStatus
@@ -344,11 +344,11 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (!Lara.isMoving)
 			{
-				if (g_Inventory->GetSelectedObject() == NO_ITEM)
+				if (g_Inventory.GetSelectedObject() == NO_ITEM)
 				{
-					if (g_Inventory->IsObjectPresentInInventory(ID_CROWBAR_ITEM))
+					if (g_Inventory.IsObjectPresentInInventory(ID_CROWBAR_ITEM))
 					{
-						g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
+						g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
 						item->pos.yRot ^= ANGLE(180);
 					}
 					else
@@ -364,14 +364,14 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					}
 					return;
 				}
-				if (g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM)
+				if (g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
 				{
 					item->pos.yRot ^= ANGLE(180);
 					return;
 				}
 			}
 
-			g_Inventory->SetSelectedObject(NO_ITEM);
+			g_Inventory.SetSelectedObject(NO_ITEM);
 			if (MoveLaraPosition(&CrowbarDoorPos, item, l))
 			{
 				l->animNumber = ANIMATION_LARA_DOOR_OPEN_CROWBAR;

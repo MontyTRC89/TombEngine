@@ -9,6 +9,8 @@
 #include "bubble.h"
 #include "trmath.h"
 #include "GameFlowScript.h"
+#include "smoke.h"
+#include "drip.h"
 
 char FlareTable[121] =
 {
@@ -197,7 +199,7 @@ void TriggerGlobalFireFlame()
 	}
 
 	spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
-	spark->dSize = spark->size >> 4;
+	spark->dSize = spark->size;
 }
 
 void keep_those_fires_burning()
@@ -289,18 +291,9 @@ void UpdateFireSparks()
 
 			if (spark->flags & SP_ROTATE)
 				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
-
-			if (spark->r >= 24 || spark->g >= 24 || spark->b >= 24)
-			{
-				if (spark->r >= 80 || spark->g >= 80 || spark->b >= 80)
-					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-				else
-					spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 1;
-			}
-			else
-			{
-				spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 2;
-			}
+			float alpha = fmin(1, fmax(0, 1 - (spark->life / (float)spark->sLife)));
+			int sprite = lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex+ (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
+			spark->def = sprite;
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 			spark->yVel += spark->gravity;
@@ -494,6 +487,7 @@ byte TriggerGunSmoke_SubFunction(int weaponType)
 
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
 {
+	/*
 	SMOKE_SPARKS* spark;
 	
 	spark = &SmokeSparks[GetFreeSmokeSpark()];
@@ -581,6 +575,8 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	{
 		spark->mirror = 0;
 	}*/
+	T5M::Effects::Smoke::TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
+	
 }
 
 void TriggerShatterSmoke(int x, int y, int z)
@@ -956,7 +952,9 @@ void UpdateGunShells()
 			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
 				&& !(Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
-				AddWaterSparks(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
+
+				T5M::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
+				//AddWaterSparks(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
 				SetupRipple(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2);
 				gs->fallspeed >>= 5;
 				continue;

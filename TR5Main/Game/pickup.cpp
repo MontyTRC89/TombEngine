@@ -101,7 +101,7 @@ short RPickups[16];
 short pickupitem;
 PHD_VECTOR OldPickupPos;
 extern int KeyTriggerActive;
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;
 
 static bool SilencerIsEquiped()
 {
@@ -363,7 +363,7 @@ void PickedUpObject(short objectNumber)
             break;
     }
 
-    g_Inventory->LoadObjects(false);
+    g_Inventory.LoadObjects(false);
 }
 
 void RemoveObjectFromInventory(short objectNumber, int count)
@@ -392,7 +392,7 @@ void RemoveObjectFromInventory(short objectNumber, int count)
     else if (objectNumber >= ID_EXAMINE1_COMBO1 && objectNumber <= ID_EXAMINE3_COMBO2)
         Lara.PickupsCombo[objectNumber - ID_EXAMINE1_COMBO1] = 0;
 
-    g_Inventory->LoadObjects(false);
+    g_Inventory.LoadObjects(false);
 }
 
 void CollectCarriedItems(ITEM_INFO* item) 
@@ -463,7 +463,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     else
         flag = 1;
 
-    if (!((TrInput & IN_ACTION || g_Inventory->GetSelectedObject() != NO_ITEM)
+    if (!((TrInput & IN_ACTION || g_Inventory.GetSelectedObject() != NO_ITEM)
         && !BinocularRange
         && !Lara.gunStatus
         && l->currentAnimState == STATE_LARA_STOP
@@ -573,14 +573,14 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
         if (!Lara.isMoving)
         {
-            if (g_Inventory->GetSelectedObject() == NO_ITEM)
+            if (g_Inventory.GetSelectedObject() == NO_ITEM)
             {
-                if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
-                    g_Inventory->SetEnterObject(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
+                if (g_Inventory.IsObjectPresentInInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
+                    g_Inventory.SetEnterObject(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
                 item->pos.yRot = oldYrot;
                 return;
             }
-            if (g_Inventory->GetSelectedObject() != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
+            if (g_Inventory.GetSelectedObject() != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
             {
                 item->pos.yRot = oldYrot;
                 return;
@@ -593,7 +593,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             if (!MoveLaraPosition(&pos, item, l))
             {
                 Lara.generalPtr = (void*)itemNum;
-                g_Inventory->SetSelectedObject(NO_ITEM);
+                g_Inventory.SetSelectedObject(NO_ITEM);
                 item->pos.yRot = oldYrot;
                 return;
             }
@@ -624,7 +624,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         Lara.gunStatus = LG_HANDS_BUSY;
         item->flags |= 0x20;
         Lara.generalPtr = (void*)itemNum;
-        g_Inventory->SetSelectedObject(NO_ITEM);
+        g_Inventory.SetSelectedObject(NO_ITEM);
         item->pos.yRot = oldYrot;
         return;
     }
@@ -662,7 +662,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         }
     }
 
-    if ((!(TrInput & IN_ACTION) && g_Inventory->GetSelectedObject() == NO_ITEM
+    if ((!(TrInput & IN_ACTION) && g_Inventory.GetSelectedObject() == NO_ITEM
         || BinocularRange
         || Lara.gunStatus
         || l->currentAnimState != STATE_LARA_STOP
@@ -680,13 +680,13 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             {
                 if (item->status != ITEM_NOT_ACTIVE)
                     return;
-                if (g_Inventory->GetSelectedObject() == NO_ITEM)
+                if (g_Inventory.GetSelectedObject() == NO_ITEM)
                 {
-                    if (g_Inventory->IsObjectPresentInInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
-                        g_Inventory->SetEnterObject(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
+                    if (g_Inventory.IsObjectPresentInInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
+                        g_Inventory.SetEnterObject(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
                     return;
                 }
-                if (g_Inventory->GetSelectedObject() != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
+                if (g_Inventory.GetSelectedObject() != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
                     return;
             }
             
@@ -713,7 +713,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 if (item->triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
                 {
                     item->itemFlags[3] = 92;
-                    g_Inventory->SetSelectedObject(NO_ITEM);
+                    g_Inventory.SetSelectedObject(NO_ITEM);
                     return;
                 }
             }
@@ -722,7 +722,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 Lara.generalPtr = (void*)itemNum;
             }
 
-            g_Inventory->SetSelectedObject(NO_ITEM);
+            g_Inventory.SetSelectedObject(NO_ITEM);
             return;
         }
 
@@ -949,7 +949,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         return;
     }
     
-    if (!(TrInput & IN_ACTION) && (g_Inventory->GetSelectedObject() == NO_ITEM || triggerFlags != 2)
+    if (!(TrInput & IN_ACTION) && (g_Inventory.GetSelectedObject() == NO_ITEM || triggerFlags != 2)
         || BinocularRange
         || (l->currentAnimState != STATE_LARA_STOP || l->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus)
         && (l->currentAnimState != STATE_LARA_CROUCH_IDLE || l->animNumber != ANIMATION_LARA_CROUCH_IDLE || Lara.gunStatus)
@@ -1110,23 +1110,23 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         }
         if (!Lara.isMoving)
         {
-            if (g_Inventory->GetSelectedObject() == NO_ITEM)
+            if (g_Inventory.GetSelectedObject() == NO_ITEM)
             {
-                if (g_Inventory->IsObjectPresentInInventory(ID_CROWBAR_ITEM))
-                    g_Inventory->SetEnterObject(ID_CROWBAR_ITEM);
+                if (g_Inventory.IsObjectPresentInInventory(ID_CROWBAR_ITEM))
+                    g_Inventory.SetEnterObject(ID_CROWBAR_ITEM);
                 item->pos.xRot = oldXrot;
                 item->pos.yRot = oldYrot;
                 item->pos.zRot = oldZrot;
                 return;
             }
-            if (g_Inventory->GetSelectedObject() != ID_CROWBAR_ITEM)
+            if (g_Inventory.GetSelectedObject() != ID_CROWBAR_ITEM)
             {
                 item->pos.xRot = oldXrot;
                 item->pos.yRot = oldYrot;
                 item->pos.zRot = oldZrot;
                 return;
             }
-            g_Inventory->SetSelectedObject(NO_ITEM);
+            g_Inventory.SetSelectedObject(NO_ITEM);
         }
         if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
         {

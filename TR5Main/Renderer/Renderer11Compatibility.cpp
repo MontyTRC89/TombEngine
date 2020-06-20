@@ -445,8 +445,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 	// Create a single vertex buffer and a single index buffer for all rooms
 	// NOTICE: in theory, a 1,000,000 vertices scene should have a VB of 52 MB and an IB of 4 MB
-	m_roomsVertexBuffer = VertexBuffer::Create(m_device, roomVertices.size(), roomVertices.data());
-	m_roomsIndexBuffer = IndexBuffer::Create(m_device, roomIndices.size(), roomIndices.data());
+	m_roomsVertexBuffer = VertexBuffer(m_device, roomVertices.size(), roomVertices.data());
+	m_roomsIndexBuffer = IndexBuffer(m_device, roomIndices.size(), roomIndices.data());
 
 	m_numHairVertices = 0;
 	m_numHairIndices = 0;
@@ -707,8 +707,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 	}
 
 	// Create a single vertex buffer and a single index buffer for all moveables
-	m_moveablesVertexBuffer = VertexBuffer::Create(m_device, moveablesVertices.size(), moveablesVertices.data());
-	m_moveablesIndexBuffer = IndexBuffer::Create(m_device, moveablesIndices.size(), moveablesIndices.data());
+	m_moveablesVertexBuffer = VertexBuffer(m_device, moveablesVertices.size(), moveablesVertices.data());
+	m_moveablesIndexBuffer = IndexBuffer(m_device, moveablesIndices.size(), moveablesIndices.data());
 
 	// Step 4: prepare static meshes
 	vector<RendererVertex> staticsVertices;
@@ -751,8 +751,8 @@ bool Renderer11::PrepareDataForTheRenderer()
 	}
 
 	// Create a single vertex buffer and a single index buffer for all statics
-	m_staticsVertexBuffer = VertexBuffer::Create(m_device, staticsVertices.size(), staticsVertices.data());
-	m_staticsIndexBuffer = IndexBuffer::Create(m_device, staticsIndices.size(), staticsIndices.data());
+	m_staticsVertexBuffer = VertexBuffer(m_device, staticsVertices.size(), staticsVertices.data());
+	m_staticsIndexBuffer = IndexBuffer(m_device, staticsIndices.size(), staticsIndices.data());
 
 	// Step 5: prepare sprites
 	m_sprites = (RendererSprite * *)malloc(sizeof(RendererSprite*) * g_NumSprites);
