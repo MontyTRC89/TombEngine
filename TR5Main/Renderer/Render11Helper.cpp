@@ -542,8 +542,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 				vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
 			}
 
-			vertex.UV.x = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.UV.x = texture->vertices[v].x;
+			vertex.UV.y = texture->vertices[v].y;
 
 			vertex.Bone = boneIndex;
 			if (isHairs)
@@ -637,8 +637,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 				vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
 			}
 
-			vertex.UV.x = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.UV.x = texture->vertices[v].x;
+			vertex.UV.y = texture->vertices[v].y;
 
 			vertex.Bone = boneIndex;
 			if (isHairs)

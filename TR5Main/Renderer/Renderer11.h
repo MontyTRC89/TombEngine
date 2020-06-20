@@ -133,6 +133,23 @@ public:
 		
 		return texture;
 	}
+
+	static Texture2D* LoadFromMemory(ID3D11Device* device, byte* data, int length)
+	{
+		Texture2D* texture = new Texture2D();
+
+		ID3D11Resource* resource = NULL;
+		ID3D11DeviceContext* context = NULL;
+		device->GetImmediateContext(&context);
+
+		HRESULT res = CreateWICTextureFromMemory(device, context, data, length, &resource, &texture->ShaderResourceView, (size_t)0);
+		if (FAILED(res))
+			return NULL;
+
+		resource->QueryInterface(IID_ID3D11Texture2D, (void**)& texture->Texture);
+
+		return texture;
+	}
 };
 
 
@@ -321,6 +338,7 @@ struct RendererSprite
 	int Width;
 	int Height;
 	Vector2 UV[4];
+	Texture2D* Texture;
 };
 
 struct RendererSpriteSequence
@@ -558,6 +576,10 @@ private:
 	RendererUnderwaterDustParticle m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool m_firstUnderwaterDustParticles = true;
 	vector<RendererMesh*> m_meshes;
+	vector<Texture2D*> m_roomTextures;
+	vector<Texture2D*> m_moveablesTextures;
+	vector<Texture2D*> m_staticsTextures;
+	vector<Texture2D*> m_spritesTextures;
 
 	// Debug variables
 	int m_numDrawCalls = 0;
