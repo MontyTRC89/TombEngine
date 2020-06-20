@@ -101,6 +101,22 @@ void Renderer11::FreeRendererData()
 
 	DX11_DELETE(m_textureAtlas);
 	DX11_DELETE(m_skyTexture);
+
+	for (int i = 0; i < m_roomTextures.size(); i++)
+		DX11_DELETE(m_roomTextures[i]);
+	m_roomTextures.clear();
+
+	for (int i = 0; i < m_moveablesTextures.size(); i++)
+		DX11_DELETE(m_moveablesTextures[i]);
+	m_moveablesTextures.clear();
+
+	for (int i = 0; i < m_staticsTextures.size(); i++)
+		DX11_DELETE(m_staticsTextures[i]);
+	m_staticsTextures.clear();
+
+	for (int i = 0; i < m_spritesTextures.size(); i++)
+		DX11_DELETE(m_spritesTextures[i]);
+	m_spritesTextures.clear();
 }
 
 void Renderer11::clearSceneItems()

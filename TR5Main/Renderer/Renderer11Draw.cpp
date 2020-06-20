@@ -75,7 +75,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 	m_context->PSSetShader(m_psInventory, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -240,7 +240,7 @@ bool Renderer11::drawShadowMap()
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -503,7 +503,7 @@ int Renderer11::drawInventoryScene()
 	m_context->PSSetShader(m_psInventory, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2129,7 +2129,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	m_context->PSSetShader(m_psItems, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2270,7 +2270,7 @@ bool Renderer11::drawStatics(bool transparent)
 	m_context->PSSetShader(m_psStatics, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_staticsTextures[0]->ShaderResourceView);
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2338,7 +2338,7 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->PSSetShader(m_psRooms, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_roomTextures[0]->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
 	ID3D11SamplerState* shadowSampler = m_states->PointClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
@@ -2559,7 +2559,7 @@ bool Renderer11::drawHorizonAndSky()
 		m_context->IASetInputLayout(m_inputLayout);
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+		m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 		sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
