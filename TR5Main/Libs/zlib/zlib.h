@@ -285,7 +285,7 @@ ZEXTERN int ZEXPORT deflateEnd OF((z_streamp strm));
      deflateEnd returns Z_OK if success, Z_STREAM_ERROR if the
    stream state was inconsistent, Z_DATA_ERROR if the stream was freed
    prematurely (some input or output was discarded). In the error case,
-   msg may be set but then points to a static string (which must not be
+   msg may be set but then points to a static std::string (which must not be
    deallocated).
 */
 
@@ -388,7 +388,7 @@ ZEXTERN int ZEXPORT inflateEnd OF((z_streamp strm));
 
      inflateEnd returns Z_OK if success, Z_STREAM_ERROR if the stream state
    was inconsistent. In the error case, msg may be set but then points to a
-   static string (which must not be deallocated).
+   static std::string (which must not be deallocated).
 */
 
                         /* Advanced functions */
@@ -427,10 +427,10 @@ ZEXTERN int ZEXPORT deflateInit2 OF((z_streamp strm,
      The strategy parameter is used to tune the compression algorithm. Use the
    value Z_DEFAULT_STRATEGY for normal data, Z_FILTERED for data produced by a
    filter (or predictor), or Z_HUFFMAN_ONLY to force Huffman encoding only (no
-   string match).  Filtered data consists mostly of small values with a
+   std::string match).  Filtered data consists mostly of small values with a
    somewhat random distribution. In this case, the compression algorithm is
    tuned to compress them better. The effect of Z_FILTERED is to force more
-   Huffman coding and less string matching; it is somewhat intermediate
+   Huffman coding and less std::string matching; it is somewhat intermediate
    between Z_DEFAULT and Z_HUFFMAN_ONLY. The strategy parameter only affects
    the compression ratio but not the correctness of the compressed output even
    if it is not set appropriately.
@@ -718,7 +718,7 @@ ZEXTERN int ZEXPORTVA   gzprintf OF((gzFile file, const char *format, ...));
 
 ZEXTERN int ZEXPORT gzputs OF((gzFile file, const char *s));
 /*
-      Writes the given null-terminated string to the compressed file, excluding
+      Writes the given null-terminated std::string to the compressed file, excluding
    the terminating null character.
       gzputs returns the number of characters written, or -1 in case of error.
 */
@@ -727,7 +727,7 @@ ZEXTERN char * ZEXPORT gzgets OF((gzFile file, char *buf, int len));
 /*
       Reads bytes from the compressed file until len-1 characters are read, or
    a newline character is read and transferred to buf, or an end-of-file
-   condition is encountered.  The string is then terminated with a null
+   condition is encountered.  The std::string is then terminated with a null
    character.
       gzgets returns buf, or Z_NULL in case of error.
 */

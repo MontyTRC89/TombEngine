@@ -4,7 +4,7 @@
 #include "ChunkReader.h"
 #include "level.h"
 #include <Specific\setup.h>
-
+using std::string;
 LevelLoader::LevelLoader(string filename)
 {
 	m_filename = filename;

@@ -677,7 +677,7 @@ void ControlGrenade(short itemNumber)
 							{
 								TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
 								currentItem->pos.yPos -= 128; 
-								TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
+								//TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
 								short currentItemNumber = (currentItem - Items);
@@ -702,7 +702,7 @@ void ControlGrenade(short itemNumber)
 							{
 								TriggerExplosionSparks(currentMesh->x, currentMesh->y, currentMesh->z, 3, -2, 0, item->roomNumber);
 								currentMesh->y -= 128;
-								TriggerShockwave((PHD_3DPOS*)&currentMesh, 40, 176, 64, 0, 96, 128, 16, 0, 0);
+								//TriggerShockwave((PHD_3DPOS*)&currentMesh, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 								currentMesh->y += 128;
 								ShatterObject((SHATTER_ITEM*)item, NULL, -128, item->roomNumber, 0);
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
@@ -847,9 +847,9 @@ void AnimateShotgun(int weaponType)
 		}
 		else if (SmokeWeapon == WEAPON_SHOTGUN)
 		{
-			pos.x = -16;
+			pos.x = 0;
 			pos.y = 228;
-			pos.z = 32;
+			pos.z = 0;
 		}
 		else if (SmokeWeapon == WEAPON_GRENADE_LAUNCHER)
 		{
@@ -1298,10 +1298,18 @@ void RifleHandler(int weaponType)
 	{
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
+			PHD_VECTOR pos = {};
+			/*
+			pos.x = GetRandomControl() - 128;
+			pos.y = (GetRandomControl() & 0x7F) - 63;
+			pos.z = GetRandomControl() - 128;
+			*/
+			pos.y = -64;
+			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
-				LaraItem->pos.xPos + (phd_sin(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
-				LaraItem->pos.yPos + (GetRandomControl() & 0x7F) - 575,
-				LaraItem->pos.zPos + (phd_cos(LaraItem->pos.yRot) >> 4) + GetRandomControl() - 128,
+				pos.x,
+				pos.y,
+				pos.z,
 				12,
 				(GetRandomControl() & 0x3F) + 192,
 				(GetRandomControl() & 0x1F) + 128,
@@ -1310,10 +1318,13 @@ void RifleHandler(int weaponType)
 		}
 		else if (weaponType == WEAPON_REVOLVER)
 		{
-			PHD_VECTOR pos;
-			pos.x = (GetRandomControl() & 0xFF) - 0x80;
-			pos.y = (GetRandomControl() & 0x7F) - 0x3F;
-			pos.z = (GetRandomControl() & 0xFF) - 0x80;
+			PHD_VECTOR pos = {};
+			/*
+			pos.x = GetRandomControl() - 128;
+			pos.y = (GetRandomControl() & 0x7F) - 63;
+			pos.z = GetRandomControl() - 128;
+			*/
+			pos.y = -32;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
 		}
@@ -1461,7 +1472,7 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item)
 			SplashSetup.innerRadius = 160;
 			SplashSetup.splashPower = 2048 - dy;
 
-			SetupSplash(&SplashSetup);
+			SetupSplash(&SplashSetup,item->roomNumber);
 		}
 	}
 }

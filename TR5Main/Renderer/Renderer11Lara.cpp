@@ -9,6 +9,7 @@
 #include "sphere.h"
 #include "level.h"
 #include "GameFlowScript.h"
+using namespace T5M::Renderer;
 
 extern GameFlow* g_GameFlow;
 
@@ -64,8 +65,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(0), TO_RAD(-Lara.leftArm.yRot));
-		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(0), TO_RAD(-Lara.rightArm.yRot));
+		laraObj->LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
+		laraObj->LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.zRot), TO_RAD(-Lara.rightArm.yRot));
 
 		LARA_ARM * leftArm = &Lara.leftArm;
 		LARA_ARM * rightArm = &Lara.rightArm;
@@ -278,10 +279,10 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
 
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	RendererItem * item = &m_items[Lara.itemNumber];
 
@@ -298,7 +299,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	}
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 

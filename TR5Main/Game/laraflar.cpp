@@ -10,6 +10,14 @@
 #include "Lara.h"
 #include "collide.h"
 #include "effect2.h"
+#include "chaffFX.h"
+
+
+constexpr std::array<float, 28> FlareFlickerTable = { 0.7590,0.9880,0.8790,0.920,0.8020,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.84642,0.7896,0.817634,0.923424,0.7589,0.81399,0.92834,0.9978,0.7610,0.97878,0.8978,0.9983,0.934763,0.8485,0.762573,0.74642 };
+constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1,0.52947, 0.3921);
+constexpr std::array<float, 28> FlareFlickerTableLow = { 0.7590,0.1880,0.0790,0.920,0.8020,0.07610,0.197878,0.38978,0.09983,0.00934763,0.8485,0.0762573,0.84642,0.7896,0.517634,0.0923424,0.7589,0.081399,0.92834,0.01978,0.17610,0.497878,0.8978,0.69983,0.934763,0.28485,0.1762573,0.374642 };
+
+
 
 void FlareControl(short itemNumber) // (AF) (D)
 {
@@ -50,11 +58,11 @@ void FlareControl(short itemNumber) // (AF) (D)
 	}
 	else
 		item->fallspeed += 6;
-	
+
 	item->pos.yPos += item->fallspeed;
 
 	DoProperDetection(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
-	
+
 	short age = (short)(item->data) & 0x7FFF;
 	if (age >= 900)
 	{
@@ -68,9 +76,10 @@ void FlareControl(short itemNumber) // (AF) (D)
 	{
 		age++;
 	}
-	
+
 	if (DoFlareLight((PHD_VECTOR*)&item->pos, age))
 	{
+		TriggerChaffEffects(item,age);
 		/* Hardcoded code */
 
 		age |= 0x8000;
@@ -340,7 +349,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
 		item->shade = -1;
-		
+
 		if (thrown)
 		{
 			item->speed = LaraItem->speed + 50;
@@ -351,7 +360,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 			item->speed = LaraItem->speed + 10;
 			item->fallspeed = LaraItem->fallspeed + 50;
 		}
-		
+
 		if (flag)
 			item->speed >>= 1;
 
@@ -386,7 +395,8 @@ void DoFlareInHand(int flare_age) // (AF) (D)
 	pos.z = 41;
 
 	GetLaraJointPosition(&pos, LM_LHAND);
-	DoFlareLight(&pos, flare_age);
+	if (DoFlareLight(&pos, flare_age))
+		TriggerChaffEffects(flare_age);
 
 	/* Hardcoded code */
 
@@ -405,73 +415,49 @@ int DoFlareLight(PHD_VECTOR* pos, int age)//49708, 49B6C (F)
 {
 	int x, y, z;
 	int r, g, b;
-	int random;
+	float random;
 	int falloff;
-
 	if (age >= 900 || age == 0)
 		return 0;
+	random = frand();
 
-	random = GetRandomControl();
-
-	x = pos->x + (random << 3 & 120);
-	y = pos->y + (random >> 1 & 120) - 256;
-	z = pos->z + (random >> 5 & 120);
+	x = pos->x + (random* 120);
+	y = pos->y + (random * 120) - 256;
+	z = pos->z + (random * 120);
 
 	if (age < 4)
 	{
-		falloff = (random & 3) + 4 * (age + 1);
-		if (falloff > 16)
-			falloff -= (random >> 12) & 3;
-
-		r = (random >> 4 & 0x1F) + 8 * (age + 4);
-		g = (random & 0x1F) + 16 * (age + 10);
-		b = (random >> 8 & 0x1F) + 16 * age;
+		falloff = 12 + ((1-(age / 4.0f))*16);
+		
+		r = FlareMainColor.x*255;
+		g = FlareMainColor.y * 255;
+		b = FlareMainColor.z * 255;
 
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
-		return 1;
+		return (random < 0.9f);
 	}
-	else if (age < 16)
+	else if (age < 810)
 	{
-		falloff = (random & 1) + age + 2;
+		float multiplier = FlareFlickerTable[age % FlareFlickerTable.size()];
+		falloff = 12*multiplier;
 
-		r = (random >> 4 & 0x1F) + 4 * age + 64;
-		g = (random & 0x3F) + 4 * age + 128;
-		b = (random >> 8 & 0x1F) + 4 * age + 16;
-
+		r = FlareMainColor.x * 255 * multiplier;
+		g = FlareMainColor.y * 255 * multiplier;
+		b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
-		return 1;
+		return (random < 0.4f);
 	}
-	else if (age < 810 || random & 0x2000)
+	else 
 	{
-		falloff = 16;
-
-		r = (random >> 4 & 0x1F) + 128;
-		g = (random & 0x3F) + 192;
-		b = (random >> 8 & 0x20) + (random >> 8 & 0x3F);
-
-		TriggerDynamicLight(x, y, z, falloff, r, g, b);
-		return 1;
+		float multiplier = FlareFlickerTableLow[age % FlareFlickerTableLow.size()];
+		
+		falloff = 12* (1.0f - ((age-810) / (900-810)));
+		r = FlareMainColor.x * 255 * multiplier;
+		g = FlareMainColor.y * 255 * multiplier;
+		b = FlareMainColor.z * 255 * multiplier;
+			TriggerDynamicLight(x, y, z, falloff, r, g, b);
+			return (random < .3f);
+		
 	}
-	else if (age >= 876)
-	{
-		falloff = 16 - ((age - 876) >> 1);
 
-		r = (GetRandomControl() & 0x3F) + 64;
-		g = (GetRandomControl() & 0x3F) + 192;
-		b = GetRandomControl() & 0x1F;
-
-		TriggerDynamicLight(x, y, z, falloff, r, g, b);
-		return random & 1;
-	}
-	else
-	{
-		falloff = (GetRandomControl() & 6) + 8;
-
-		r = (GetRandomControl() & 0x3F) + 64;
-		g = (GetRandomControl() & 0x3F) + 192;
-		b = GetRandomControl() & 0x7F;
-
-		TriggerDynamicLight(x, y, z, falloff, r, g, b);
-		return 0;
-	}
 }

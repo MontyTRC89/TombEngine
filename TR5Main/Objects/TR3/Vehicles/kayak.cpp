@@ -11,7 +11,7 @@
 #include "level.h"
 #include "setup.h"
 #include "input.h"
-
+using std::vector;
 #define MAX_SPEED 0x380000
 #define KAYAK_COLLIDE 64
 #define GETOFF_DIST CLICK(3)		// minimum collision distance
