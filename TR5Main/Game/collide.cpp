@@ -70,7 +70,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 			int yMin = mesh->y + sInfo->xMinc;
 			int yMax = mesh->y + sInfo->yMaxc;
 
-			array<float, 4> box{sInfo->xMinc, sInfo->zMinc, sInfo->xMaxc, sInfo->zMaxc};
+			std::array<float, 4> box{sInfo->xMinc, sInfo->zMinc, sInfo->xMaxc, sInfo->zMaxc};
 			RotateBoundingBox(box, mesh->yRot);
 
 			xMin = box[0];
@@ -1707,12 +1707,12 @@ Vector2 GetDiagonalIntersect(int xPos, int zPos, int splitType, int radius, shor
 	return vect;
 }
 
-void RotateBoundingBox(array<float, 4>& box, short angle)
+void RotateBoundingBox(std::array<float, 4>& box, short angle)
 {
 	float s = sin(TO_RAD(angle));
 	float c = cos(TO_RAD(angle));
 
-	array<float, 4> x, z;
+	std::array<float, 4> x, z;
 	x[0] = box[0] * c;
 	z[0] = -box[0] * s;
 	x[1] = box[1] * s;
@@ -1722,8 +1722,8 @@ void RotateBoundingBox(array<float, 4>& box, short angle)
 	x[3] = box[3] * s;
 	z[3] = box[3] * c;
 
-	auto xPair = minmax_element(begin(x), end(x));
-	auto zPair = minmax_element(begin(z), end(z));
+	auto xPair = std::minmax_element(begin(x), end(x));
+	auto zPair = std::minmax_element(begin(z), end(z));
 
 	box[0] = *xPair.first;
 	box[1] = *zPair.first;
