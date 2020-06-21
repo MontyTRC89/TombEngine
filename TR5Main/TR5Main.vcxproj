@@ -138,6 +138,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Game\smoke.h" />
     <ClInclude Include="Game\spark.h" />
+    <ClInclude Include="Renderer\RenderView\LevelRenderView.h" />
     <ClInclude Include="Libs\bass\bass.h" />
     <ClInclude Include="Libs\bass\bassmix.h" />
     <ClInclude Include="Libs\bass\bass_fx.h" />
@@ -265,7 +266,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR5\Entity\tr5_submarine.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_willowwisp.h" />
     <ClInclude Include="Objects\TR5\Shatter\tr5_smashobject.h" />
-    <ClInclude Include="Renderer\IndexBuffer.h" />
+    <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="Renderer\RenderEnums.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
@@ -303,20 +304,21 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR3\Vehicles\quad.h" />
     <ClInclude Include="Objects\TR2\Vehicles\snowmobile.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv.h" />
-    <ClInclude Include="Renderer\CameraMatrixBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h" />
     <ClInclude Include="Renderer\Frustum.h" />
-    <ClInclude Include="Renderer\HUDBarBuffer.h" />
-    <ClInclude Include="Renderer\HUDBuffer.h" />
-    <ClInclude Include="Renderer\ItemBuffer.h" />
-    <ClInclude Include="Renderer\LightBuffer.h" />
-    <ClInclude Include="Renderer\MiscBuffer.h" />
-    <ClInclude Include="Renderer\RoomBuffer.h" />
-    <ClInclude Include="Renderer\ShaderLight.h" />
-    <ClInclude Include="Renderer\ShadowLightBuffer.h" />
-    <ClInclude Include="Renderer\StaticBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\HUDBarBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\HUDBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\ItemBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\LightBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\MiscBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\RoomBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\ShaderLight.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\ShadowLightBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\StaticBuffer.h" />
     <ClInclude Include="Renderer\Texture2D\Texture2D.h" />
     <ClInclude Include="Renderer\Utils.h" />
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
+    <ClInclude Include="Renderer\RenderView\RenderView.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -391,7 +393,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
-    <ClInclude Include="Renderer\VertexBuffer.h" />
+    <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="framework.cpp">
@@ -407,6 +409,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\trmath.cpp" />
     <ClCompile Include="Game\smoke.cpp" />
     <ClCompile Include="Game\spark.cpp" />
+    <ClCompile Include="Renderer\RenderView\LevelRenderView.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
@@ -539,7 +542,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\upv.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
-    <ClCompile Include="Renderer\IndexBuffer.cpp">
+    <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Renderer\Render11Helper.cpp" />
@@ -557,6 +560,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Renderer\Texture2D\Texture2D.cpp" />
     <ClCompile Include="Renderer\Utils.cpp" />
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
+    <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
@@ -627,7 +631,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Specific\setup.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
-    <ClCompile Include="Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Objects\Effects\tr4_bubbles.cpp" />
