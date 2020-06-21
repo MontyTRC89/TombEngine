@@ -1,5 +1,5 @@
 /*
-** $Id: lauxlib.h,v 1.131 2016/12/06 14:54:31 roberto Exp $
+** $Id: lauxlib.h,v 1.131.1.1 2017/04/19 17:20:42 roberto Exp $
 ** Auxiliary functions for building Lua libraries
 ** See Copyright Notice in lua.h
 */
@@ -218,7 +218,7 @@ LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
 ** ===================================================================
 */
 
-/* print a std::string */
+/* print a string */
 #if !defined(lua_writestring)
 #define lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
 #endif
