@@ -1,19 +1,19 @@
 #include "framework.h"
 #include "ChunkReader.h"
 
-inline int ChunkReader::readInt32() {
+int ChunkReader::readInt32() {
 	int value = 0;
 	m_stream->Read(reinterpret_cast<char*>(&value), 4);
 	return value;
 }
 
-inline short ChunkReader::readInt16() {
+short ChunkReader::readInt16() {
 	short value = 0;
 	m_stream->Read(reinterpret_cast<char*>(&value), 2);
 	return value;
 }
 
-inline ChunkReader::ChunkReader(int expectedMagicNumber, BaseStream* stream) {
+ChunkReader::ChunkReader(int expectedMagicNumber, BaseStream* stream) {
 	m_isValid = false;
 
 	if (stream == NULL)
@@ -32,15 +32,15 @@ inline ChunkReader::ChunkReader(int expectedMagicNumber, BaseStream* stream) {
 	m_isValid = true;
 }
 
-inline ChunkReader::~ChunkReader() {
+ChunkReader::~ChunkReader() {
 	delete m_emptyChunk;
 }
 
-inline bool ChunkReader::IsValid() {
+bool ChunkReader::IsValid() {
 	return m_isValid;
 }
 
-inline bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg) {
+bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg) {
 	do {
 		ChunkId* chunkId = ChunkId::FromStream(m_stream);
 		if (chunkId->EqualsTo(m_emptyChunk)) // End reached
@@ -64,7 +64,7 @@ inline bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxS
 	return true;
 }
 
-inline bool ChunkReader::ReadChunks(std::function<bool(ChunkId*, long, int)> func, int arg) {
+bool ChunkReader::ReadChunks(std::function<bool(ChunkId*, long, int)> func, int arg) {
 	do {
 		ChunkId* chunkId = ChunkId::FromStream(m_stream);
 		if (chunkId->EqualsTo(m_emptyChunk)) // End reached
@@ -88,46 +88,46 @@ inline bool ChunkReader::ReadChunks(std::function<bool(ChunkId*, long, int)> fun
 	return true;
 }
 
-inline char* ChunkReader::ReadChunkArrayOfBytes(__int64 length) {
+char* ChunkReader::ReadChunkArrayOfBytes(__int64 length) {
 	char* value = (char*)malloc(length);
 	m_stream->Read(value, length);
 	return value;
 }
 
-inline bool ChunkReader::ReadChunkBool(__int64 length) {
+bool ChunkReader::ReadChunkBool(__int64 length) {
 	return (LEB128::ReadByte(m_stream) != 0);
 }
 
-inline __int64 ChunkReader::ReadChunkLong(__int64 length) {
+__int64 ChunkReader::ReadChunkLong(__int64 length) {
 	return LEB128::ReadLong(m_stream);
 }
 
-inline int ChunkReader::ReadChunkInt32(__int64 length) {
+int ChunkReader::ReadChunkInt32(__int64 length) {
 	return LEB128::ReadInt32(m_stream);
 }
 
-inline unsigned int ChunkReader::ReadChunkUInt32(__int64 length) {
+unsigned int ChunkReader::ReadChunkUInt32(__int64 length) {
 	return LEB128::ReadUInt32(m_stream);
 }
 
-inline short ChunkReader::ReadChunkInt16(__int64 length) {
+short ChunkReader::ReadChunkInt16(__int64 length) {
 	return LEB128::ReadInt16(m_stream);
 }
 
-inline unsigned short ChunkReader::ReadChunkUInt16(__int64 length) {
+unsigned short ChunkReader::ReadChunkUInt16(__int64 length) {
 	return LEB128::ReadUInt16(m_stream);
 }
 
-inline byte ChunkReader::ReadChunkByte(__int64 length) {
+byte ChunkReader::ReadChunkByte(__int64 length) {
 	return LEB128::ReadByte(m_stream);
 }
 
-inline char* ChunkReader::ReadChunkString(long length) {
+char* ChunkReader::ReadChunkString(long length) {
 	char* value = (char*)malloc(length);
 	memcpy(value, LevelDataPtr, length);
 	return value;
 }
 
-inline BaseStream* ChunkReader::GetRawStream() {
+BaseStream* ChunkReader::GetRawStream() {
 	return m_stream;
 }
