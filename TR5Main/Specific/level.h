@@ -21,10 +21,11 @@ typedef struct OBJECT_TEXTURE_VERT
 
 typedef struct OBJECT_TEXTURE
 {
-	short attribute;
-	short tileAndFlag;
-	short newFlags;
+	int attribute;
+	int tileAndFlag;
+	int newFlags;
 	struct OBJECT_TEXTURE_VERT vertices[4];
+	int destination;
 };
 
 #pragma pack(push, 1)
@@ -80,20 +81,17 @@ typedef struct RANGE_STRUCT
 
 typedef struct SPRITE
 {
-	short tile;
-	byte x;
-	byte y;
-	short width;
-	short height;
-	float left;
-	float top;
-	float right;
-	float bottom;
+	int tile;
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+	float x3;
+	float y3;
+	float x4;
+	float y4;
 };
 
-extern byte* Texture32;
-extern byte* Texture16;
-extern byte* MiscTextures;
 extern short* MeshData;
 extern int MeshDataSize;
 extern OBJECT_TEXTURE* NewObjectTextures;
@@ -102,8 +100,8 @@ extern int NumMeshPointers;
 extern int* MeshTrees;
 extern int NumObjects;
 extern int NumStaticObjects;
-extern vector<int> MoveablesIds;
-extern vector<int> StaticObjectsIds;
+extern std::vector<int> MoveablesIds;
+extern std::vector<int> StaticObjectsIds;
 extern int* RawMeshPointers;
 extern short* RawMeshData;
 extern int NumObjectTextures;
@@ -115,7 +113,7 @@ extern int g_NumSpritesSequences;
 extern short* MeshBase;
 extern short** Meshes;
 extern int NumItems;
-extern OBJECT_TEXTURE* ObjectTextures;
+extern std::vector<OBJECT_TEXTURE> ObjectTextures;
 extern ITEM_INFO* Items;
 extern int LevelItems;
 extern int NumberRooms;
@@ -131,6 +129,12 @@ extern short* FloorData;
 extern int nAIObjects;
 extern AIOBJECT* AIObjects;
 extern SPRITE* Sprites;
+
+extern std::vector<TEXTURE> RoomTextures;
+extern std::vector<TEXTURE> MoveablesTextures;
+extern std::vector<TEXTURE> StaticsTextures;
+extern std::vector<TEXTURE> SpritesTextures;
+extern TEXTURE MiscTextures;
 
 extern TrLevel g_Level;
 

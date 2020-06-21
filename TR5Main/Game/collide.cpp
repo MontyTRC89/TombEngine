@@ -10,7 +10,7 @@
 #include "setup.h"
 #include "sound.h"
 #include "trmath.h"
-
+using std::vector;
 char LM[] =
 {
 	LM_HIPS,

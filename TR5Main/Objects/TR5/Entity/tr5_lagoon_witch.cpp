@@ -17,7 +17,7 @@
 
 #define ANIMATION_LAGOON_WITCH_DEATH	7
 
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;
 
 BITE_INFO LagoonWitchBite = { 0, 0, 0, 7 };
 
@@ -60,7 +60,7 @@ void LagoonWitchControl(short itemNumber)
 	}
 	else
 	{
-		if (g_Inventory->IsObjectPresentInInventory(ID_PUZZLE_ITEM2))
+		if (g_Inventory.IsObjectPresentInInventory(ID_PUZZLE_ITEM2))
 		{
 			item->aiBits = 0;
 			creature->enemy = LaraItem;

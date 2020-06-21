@@ -44,7 +44,6 @@
 #include "bass_fx.h"
 #include "sol.hpp"
 
-using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 

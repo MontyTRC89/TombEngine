@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
+using namespace T5M::Renderer;
 
 void Renderer11::collectRooms()
 {
@@ -462,6 +463,15 @@ void Renderer11::prepareCameraForFrame()
 {
 	// Set camera matrices
 	m_stCameraMatrices.ViewProjection = ViewProjection;
+	m_stCameraMatrices.Frame = GnFrameCounter;
+	m_stCameraMatrices.CameraUnderwater = (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER) != 0 ? 1: 0;
+	m_stCameraMatrices.Projection = Projection;
+	m_stCameraMatrices.View = View;
+	m_stCameraMatrices.WorldPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	m_stCameraMatrices.ViewSize = Vector2(ScreenWidth, ScreenHeight);
+	m_stCameraMatrices.InvViewSize = Vector2(1 / ScreenWidth, 1 / ScreenHeight);
+	m_stCameraMatrices.WorldDirection = Vector3(Camera.target.x, Camera.target.y, Camera.target.z) - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+	m_stCameraMatrices.WorldDirection.Normalize();
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 	frustum.Update(View,Projection);

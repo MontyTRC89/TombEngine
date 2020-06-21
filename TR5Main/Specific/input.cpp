@@ -297,6 +297,25 @@ int S_UpdateInput()// (F)
 
 	static int medipack_timeout = 0;
 
+	/***************************WEAPON HOTKEYS***************************/
+	if (KeyMap[DIK_1] && Lara.Weapons[WEAPON_PISTOLS].Present == true)
+		Lara.requestGunType = WEAPON_PISTOLS;
+	if (KeyMap[DIK_2] && Lara.Weapons[WEAPON_SHOTGUN].Present == true)
+		Lara.requestGunType = WEAPON_SHOTGUN;
+	if (KeyMap[DIK_3] && Lara.Weapons[WEAPON_REVOLVER].Present == true)
+		Lara.requestGunType = WEAPON_REVOLVER;
+	if (KeyMap[DIK_4] && Lara.Weapons[WEAPON_UZI].Present == true)
+		Lara.requestGunType = WEAPON_UZI;
+	/*	if (KeyMap[DIK_5] && Lara.Weapons[WEAPON_HARPOON_GUN].Present == true)
+			Lara.requestGunType = WEAPON_HARPOON_GUN;*/
+	if (KeyMap[DIK_6] && Lara.Weapons[WEAPON_HK].Present == true)
+		Lara.requestGunType = WEAPON_HK;
+	/*	if (KeyMap[DIK_7] && Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present == true)
+			Lara.requestGunType = WEAPON_ROCKET_LAUNCHER;
+		if (KeyMap[DIK_8] && Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present == true)
+			Lara.requestGunType = WEAPON_GRENADE_LAUNCHER*/
+			/*------------------------------------------------------------------*/
+
 	if (KeyMap[DIK_0])
 	{
 		if (medipack_timeout == 0)

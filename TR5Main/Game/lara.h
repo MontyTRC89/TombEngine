@@ -24,8 +24,8 @@ extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 #define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)
 
 #define LaraRoutineFunction void(ITEM_INFO* item, COLL_INFO* coll)
-extern function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
-extern function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
+extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
+extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
 ///extern function<LaraRoutineFunction> lara_camera_routines[NUM_LARA_STATES + 1];
 
 void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll);

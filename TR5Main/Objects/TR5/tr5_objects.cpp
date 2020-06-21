@@ -372,6 +372,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
@@ -392,6 +393,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -411,6 +413,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
@@ -478,6 +481,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -501,6 +505,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -577,6 +582,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->undead = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex] |= ROT_X;
 		Bones[obj->boneIndex + 4] |= ROT_Y;
@@ -601,6 +607,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->undead = true;
+		obj->zoneType = ZONE_BASIC;
 		Bones[obj->boneIndex + 0] |= ROT_Y;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_X;
@@ -625,6 +632,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->meshSwapSlot = ID_MESHSWAP_IMP;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->meshIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->meshIndex + 4 * 4] |= ROT_X;
@@ -655,6 +663,7 @@ static void StartBaddy(ObjectInfo* obj)
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
 
+
 	obj = &Objects[ID_BROWN_BEAST];
 	if (obj->loaded)
 	{
@@ -672,6 +681,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
@@ -695,7 +705,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->waterCreature = true;
-		obj->zoneType = ZONE_FLYER;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
@@ -720,6 +730,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
@@ -770,6 +781,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
 		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
@@ -796,6 +808,8 @@ static void StartBaddy(ObjectInfo* obj)
 			obj->saveHitpoints = true;
 			obj->hitEffect = HIT_SMOKE;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
+			obj->zoneType = ZONE_HUMAN_CLASSIC;
+			obj->castShadows = true;
 
 			Bones[obj->boneIndex + 24] |= ROT_Y;
 			Bones[obj->boneIndex + 24] |= ROT_X;
@@ -845,6 +859,20 @@ static void StartBaddy(ObjectInfo* obj)
 		Bones[obj->boneIndex + 0] |= ROT_Y;
 		Bones[obj->boneIndex + 4] |= ROT_X;
 	}
+
+	// TR5 SUBMARINE
+	obj = &Objects[ID_ATTACK_SUB];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSubmarine;
+		obj->control = SubmarineControl;
+		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
+		obj->hitEffect = HIT_BLOOD;
+		obj->castShadows = TRUE;
+		obj->hitPoints = 100;
+	}
+
 }
 
 static void StartObject(ObjectInfo* obj)
