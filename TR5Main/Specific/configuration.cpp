@@ -7,7 +7,7 @@
 #include "GameFlowScript.h"
 #include "configuration.h"
 #include "sound.h"
-
+using std::vector;
 extern GameFlow* g_GameFlow;
 GameConfiguration g_Configuration;
 

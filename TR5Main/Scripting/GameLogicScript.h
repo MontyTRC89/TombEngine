@@ -24,8 +24,8 @@
 #define LUA_VARIABLE_TYPE_STRING			3
 
 typedef struct LuaFunction {
-	string Name;
-	string Code;
+	std::string Name;
+	std::string Code;
 	bool Executed;
 };
 
@@ -34,16 +34,16 @@ private:
 	float								xPos;
 	float								yPos;
 	float								zPos;
-	function<float()>					readXPos;
-	function<void(float)>				writeXPos;
-	function<float()>					readYPos;
-	function<void(float)>				writeYPos;
-	function<float()>					readZPos;
-	function<void(float)>				writeZPos;
+	std::function<float()>					readXPos;
+	std::function<void(float)>				writeXPos;
+	std::function<float()>					readYPos;
+	std::function<void(float)>				writeYPos;
+	std::function<float()>					readZPos;
+	std::function<void(float)>				writeZPos;
 
 public:
 	GameScriptPosition(float x, float y, float z);
-	GameScriptPosition(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ);
+	GameScriptPosition(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ);
 
 	float								GetXPos();
 	void								SetXPos(float x);
@@ -58,16 +58,16 @@ private:
 	float								xRot;
 	float								yRot;
 	float								zRot;
-	function<float()>					readXRot;
-	function<void(float)>				writeXRot;
-	function<float()>					readYRot;
-	function<void(float)>				writeYRot;
-	function<float()>					readZRot;
-	function<void(float)>				writeZRot;
+	std::function<float()>					readXRot;
+	std::function<void(float)>				writeXRot;
+	std::function<float()>					readYRot;
+	std::function<void(float)>				writeYRot;
+	std::function<float()>					readZRot;
+	std::function<void(float)>				writeZRot;
 
 public:
 	GameScriptRotation(float x, float y, float z);
-	GameScriptRotation(function<float()> readX, function<void(float)> writeX, function<float()> readY, function<void(float)> writeY, function<float()> readZ, function<void(float)> writeZ);
+	GameScriptRotation(std::function<float()> readX, std::function<void(float)> writeX, std::function<float()> readY, std::function<void(float)> writeY, std::function<float()> readZ, std::function<void(float)> writeZ);
 
 	float								GetXRot();
 	void								SetXRot(float x);
@@ -104,20 +104,20 @@ public:
 class LuaVariables
 {
 public:
-	map<string, sol::object>			variables;
+	std::map<std::string, sol::object>			variables;
 
-	sol::object							GetVariable(string key);
-	void								SetVariable(string key, sol::object value);
+	sol::object							GetVariable(std::string key);
+	void								SetVariable(std::string key, sol::object value);
 };
 
 typedef struct LuaVariable
 {
 	bool IsGlobal;
-	string Name;
+	std::string Name;
 	int Type;
 	float FloatValue;
 	int IntValue;
-	string StringValue;
+	std::string StringValue;
 	bool BoolValue;
 };
 
@@ -127,26 +127,26 @@ private:
 	sol::state*							m_lua;
 	LuaVariables						m_globals;
 	LuaVariables						m_locals;
-	map<int, short>						m_itemsMapId;
-	map<string, short>					m_itemsMapName;
-	vector<LuaFunction*>				m_triggers;
+	std::map<int, short>						m_itemsMapId;
+	std::map<std::string, short>					m_itemsMapName;
+	std::vector<LuaFunction*>				m_triggers;
 
 public:	
 	GameScript(sol::state* lua);
 
-	bool								ExecuteScript(const string& luaFilename, string& message);
-	bool								ExecuteString(const string& command, string& message);
+	bool								ExecuteScript(const std::string& luaFilename, std::string& message);
+	bool								ExecuteString(const std::string& command, std::string& message);
 	void								FreeLevelScripts();
 	void								AddTrigger(LuaFunction* function);
 	void								AddLuaId(int luaId, short itemNumber);
-	void								AddLuaName(string luaName, short itemNumber);
+	void								AddLuaName(std::string luaName, short itemNumber);
 	void								AssignItemsAndLara();
 	void								ResetVariables();
 
 	template <typename T>
-	void								GetVariables(map<string, T>& locals, map<string, T>& globals);
+	void								GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	template <typename T>
-	void								SetVariables(map<string, T>& locals, map<string, T>& globals);
+	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	void								PlayAudioTrack(short track);
 	void								ChangeAmbientSoundTrack(short track);
 	bool								ExecuteTrigger(short index);
@@ -155,8 +155,8 @@ public:
 	void								SetSecretsCount(int secretsNum);
 	void								AddOneSecret();
 	void								MakeItemInvisible(short id);
-	unique_ptr<GameScriptItem>			GetItemById(int id);
-	unique_ptr<GameScriptItem>			GetItemByName(string name);
+	std::unique_ptr<GameScriptItem>			GetItemById(int id);
+	std::unique_ptr<GameScriptItem>			GetItemByName(std::string name);
 	void								PlaySoundEffectAtPosition(short id, int x, int y, int z, int flags);
 	void								PlaySoundEffect(short id, int flags);
 	GameScriptPosition					CreatePosition(float x, float y, float z);

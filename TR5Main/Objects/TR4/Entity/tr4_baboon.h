@@ -13,7 +13,7 @@ struct BaboonRespawnStruct
 class BaboonRespawnClass
 {
 private:
-    vector<BaboonRespawnStruct> baboonRespawnArray;
+    std::vector<BaboonRespawnStruct> baboonRespawnArray;
 public:
     void Free(void);
     void Add(ITEM_INFO* item, int max_count);

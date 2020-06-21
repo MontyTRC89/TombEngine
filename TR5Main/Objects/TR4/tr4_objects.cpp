@@ -23,6 +23,8 @@
 #include "tr4_wildboar.h" // OK
 #include "tr4_wraith.h" // OFF
 #include "tr4_baboon.h" // OK
+#include "tr4_mutant.h" // OK
+#include "tr4_locusts.h" // OK
 /// objects
 #include "tr4_sarcophagus.h"
 /// puzzle
@@ -49,7 +51,6 @@
 /// vehicles
 #include "motorbike.h"
 #include "jeep.h"
-
 /// necessary import
 #include "collide.h"
 #include "objects.h"
@@ -73,6 +74,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_BIG_SCORPION];
@@ -90,6 +92,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_WILD_BOAR];
@@ -107,6 +110,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex + 48 * 4] |= ROT_Z;
 		Bones[obj->boneIndex + 48 * 4] |= ROT_Y;
@@ -148,6 +152,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
@@ -215,6 +220,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 
 		Bones[obj->boneIndex] |= ROT_Y;
 		Bones[obj->boneIndex] |= ROT_X;
@@ -236,6 +242,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
 		Bones[obj->boneIndex + 28 * 4] |= ROT_X;
@@ -258,6 +265,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_KNIGHT_TEMPLAR];
@@ -275,6 +283,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
@@ -297,6 +306,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->undead = true;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
@@ -318,6 +328,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->hitEffect = HIT_FRAGMENT;
+		obj->zoneType = ZONE_BASIC;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 	}
@@ -338,6 +349,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->hitEffect = HIT_FRAGMENT;
+		obj->zoneType = ZONE_BASIC;
 		Bones[obj->boneIndex + 4 * 4] |= ROT_X | ROT_Y | ROT_Z;
 		Bones[obj->boneIndex + 5 * 4] |= ROT_Y;
 	}
@@ -350,6 +362,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->collision = ObjectCollision;
 		obj->nonLot = true;
 		obj->savePosition = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_TROOPS];
@@ -366,6 +379,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex] |= ROT_X | ROT_Y;
 		Bones[obj->boneIndex + 7 * 4] |= ROT_X | ROT_Y;
@@ -386,6 +400,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->explodableMeshbits = 64;
+		obj->zoneType = ZONE_BASIC;
 
 		Bones[obj->boneIndex + 0] |= ROT_Y;
 		Bones[obj->boneIndex + 1 * 4] |= ROT_X;
@@ -424,6 +439,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_HUMAN_CLASSIC;
 
 		Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
 		Bones[obj->boneIndex + 20 * 4] |= ROT_X | ROT_Y;
@@ -466,6 +482,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_BABOON_NORMAL];
@@ -484,6 +501,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 	}
 
 	obj = &Objects[ID_BABOON_INV];
@@ -502,6 +520,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 
 		if (Objects[ID_BABOON_NORMAL].loaded)
 			Objects[ID_BABOON_INV].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
@@ -523,9 +542,48 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_BLOOD;
+		obj->zoneType = ZONE_BASIC;
 
 		if (Objects[ID_BABOON_NORMAL].loaded)
 			Objects[ID_BABOON_SILENT].animIndex = Objects[ID_BABOON_NORMAL].animIndex;
+	}
+
+	obj = &Objects[ID_CROCODILE_GOD];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseMutant;
+		obj->control = MutantControl;
+		obj->collision = CreatureCollision;
+		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->hitPoints = NOT_TARGETABLE;
+		obj->pivotLength = 50;
+		obj->radius = 128;
+		obj->intelligent = TRUE;
+		obj->saveAnim = TRUE;
+		obj->saveFlags = TRUE;
+		obj->saveMesh = TRUE;
+		obj->savePosition = TRUE;
+		obj->undead = TRUE;
+		obj->hitEffect = HIT_SMOKE;
+		obj->zoneType = ZONE_WATER;
+		Bones[obj->boneIndex + 6 * 4] |= ROT_Y | ROT_X;
+		Bones[obj->boneIndex + 7 * 4] |= ROT_Y | ROT_X;
+	}
+
+	obj = &Objects[ID_LOCUSTS_EMITTER];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLocust;
+		obj->control = LocustControl;
+		obj->drawRoutine = NULL;
+		obj->saveFlags = TRUE;
+		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_WRAITH3];
+	if (obj->loaded)
+	{
+		//not decompiled yet and multiple versions of wraiths exist
 	}
 }
 
@@ -695,6 +753,7 @@ static void StartTrap(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 }
 

@@ -16,8 +16,8 @@
 #include "lara2gun.h"
 #include "level.h"
 #include "input.h"
-
-Inventory* g_Inventory;
+using std::vector;
+Inventory g_Inventory;
 extern GameFlow* g_GameFlow;
 
 void CombinePuzzle(int action, short object)
@@ -1437,6 +1437,13 @@ void Inventory::UseCurrentItem()
 	// Small medipack
 	if (objectNumber == ID_SMALLMEDI_ITEM)
 	{
+
+		if (Lara.NumSmallMedipacks == 0)
+		{
+			SayNo();
+			return;
+		}
+
 		if ((LaraItem->hitPoints <= 0 || LaraItem->hitPoints >= 1000) && !Lara.poisoned)
 		{
 			SayNo();
@@ -1462,6 +1469,13 @@ void Inventory::UseCurrentItem()
 	// Big medipack
 	if (objectNumber == ID_BIGMEDI_ITEM)
 	{
+
+		if (Lara.NumLargeMedipacks == 0)
+		{
+			SayNo();
+			return;
+		}
+
 		if ((LaraItem->hitPoints <= 0 || LaraItem->hitPoints >= 1000) && !Lara.poisoned)
 		{
 			SayNo();

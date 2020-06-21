@@ -168,7 +168,7 @@ extern int ZEXPORT unzGetGlobalComment OF((unzFile file,
 										   char *szComment,
 					   uLong uSizeBuf));
 /*
-  Get the global comment string of the ZipFile, in the szComment buffer.
+  Get the global comment std::string of the ZipFile, in the szComment buffer.
   uSizeBuf is the size of the szComment buffer.
   return the number of byte copied or an error code <0
 */
@@ -215,12 +215,12 @@ extern int ZEXPORT unzGetCurrentFileInfo OF((unzFile file,
   Get Info about the current file
   if pfile_info!=NULL, the *pfile_info structure will contain somes info about
 	    the current file
-  if szFileName!=NULL, the filemane string will be copied in szFileName
+  if szFileName!=NULL, the filemane std::string will be copied in szFileName
 			(fileNameBufferSize is the size of the buffer)
   if extraField!=NULL, the extra field information will be copied in extraField
 			(extraFieldBufferSize is the size of the buffer).
 			This is the Central-header version of the extra field
-  if szComment!=NULL, the comment string of the file will be copied in szComment
+  if szComment!=NULL, the comment std::string of the file will be copied in szComment
 			(commentBufferSize is the size of the buffer)
 */
 
