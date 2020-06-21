@@ -35,7 +35,7 @@ struct GameScriptSettings
 	bool EnableDynamicShadows;
 	bool EnableWaterCaustics;
 	bool Windowed;
-	string WindowTitle;
+	std::string WindowTitle;
 	int DrawingDistance;
 	bool ShowRendererSteps;
 	bool ShowDebugInfo;
@@ -111,10 +111,10 @@ struct GameScriptMirror
 struct GameScriptLevel
 {
 	int NameStringIndex;
-	string FileName;
-	string ScriptFileName;
-	string LoadScreenFileName;
-	string Background;
+	std::string FileName;
+	std::string ScriptFileName;
+	std::string LoadScreenFileName;
+	std::string Background;
 	int Name;
 	int Soundtrack;
 	GameScriptSkyLayer Layer1;
@@ -163,8 +163,8 @@ private:
 	sol::state*							m_lua;
 	GameScriptSettings					m_settings;
 	
-	string								loadScriptFromFile(char* luaFilename);
-	map<short, short>				m_itemsMap;
+	std::string								loadScriptFromFile(char* luaFilename);
+	std::map<short, short>				m_itemsMap;
 
 public:
 	Vector3								SkyColorLayer1;
@@ -188,8 +188,8 @@ public:
 
 	// Selected language set
 	LanguageScript*						CurrentStrings;
-	vector<LanguageScript*>				Strings;
-	vector<GameScriptLevel*>			Levels;
+	std::vector<LanguageScript*>				Strings;
+	std::vector<GameScriptLevel*>			Levels;
 
 	GameFlow(sol::state* lua);
 	~GameFlow();

@@ -8,7 +8,7 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
-
+using namespace std;
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 bool WarningsAsErrors = false;
@@ -116,6 +116,8 @@ GameScript::GameScript(sol::state* lua)
 		{"SPIDERS_EMITTER", ID_SPIDERS_EMITTER},
 		{"LION", ID_LION},
 		{"DOBERMAN", ID_DOBERMAN},
+		{"HAMMERHEAD", ID_HAMMERHEAD},
+		{"CROCODILE_GOD", ID_CROCODILE_GOD},
 		{"SCUBA_HARPOON", ID_SCUBA_HARPOON},
 		{"SCUBA_DIVER", ID_SCUBA_DIVER},
 		{"GOON_SILENCER1", ID_GOON_SILENCER1},

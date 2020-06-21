@@ -17,9 +17,12 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-
+#include "pickup.h"
+using std::function;
+constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 int wf = 256;
-extern std::deque<FOOTPRINT_STRUCT> footprints;
+using namespace T5M::Effects::Footprints;
+
 short FXType;
 FX_INFO* Effects;
 
@@ -34,7 +37,7 @@ function<EffectFunction> effect_routines[59] =
 	ActivateKey,
 	RubbleFX,
 	SwapCrowbar,
-	void_effect,
+	pickup,
 	SoundFlipEffect,
 	ExplosionFX,
 	lara_hands_free,
@@ -94,6 +97,11 @@ void TL_1(ITEM_INFO* item)
 		S_CDPlay(9, 0);
 		Savegame.TLCount = 1;
 	}
+}
+
+void pickup(ITEM_INFO* item)
+{
+	do_pickup();
 }
 
 // TODO: here are sound for lara footstep too !
@@ -474,51 +482,85 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 
 short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
 {
-	GetFloor(x, y, z, &roomNumber);
-	if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
+	short roomNum = roomNumber;
+	GetFloor(x, y, z, &roomNum);
+	if (Rooms[roomNum].flags & ENV_FLAG_WATER)
 		TriggerUnderwaterBlood(x, y, z, a4);
 	else
 		TriggerBlood(x, y, z, a5 >> 4, a4);
-
 	return 0;
 }
 
-int ItemNearLara(PHD_3DPOS* pos, int radius)
+static bool ItemCollide(int value, int radius)
 {
-	int dx = pos->xPos - LaraItem->pos.xPos;
-	int dy = pos->yPos - LaraItem->pos.yPos;
-	int dz = pos->zPos - LaraItem->pos.zPos;
+	return value >= -radius && value <= radius;
+}
 
-	if (dx >= -radius
-		&& dx <= radius
-		&& dz >= -radius
-		&& dz <= radius
-		&& dy >= -3072
-		&& dy <= 3072
-		&& SQUARE(dx) + SQUARE(dz) <= SQUARE(radius))
-	{
-		short* bounds = GetBoundsAccurate(LaraItem);
-		if (dy >= bounds[2] && dy <= bounds[3] + 100)
-			return 1;
-	}
+static bool ItemInRange(int x, int z, int radius)
+{
+	return (SQUARE(x) + SQUARE(z)) <= SQUARE(radius);
+}
 
-	return 0;
+bool ItemNearLara(PHD_3DPOS* pos, int radius)
+{
+	ANIM_FRAME* bounds;
+	GAME_VECTOR target;
+	target.x = pos->xPos - LaraItem->pos.xPos;
+	target.y = pos->yPos - LaraItem->pos.yPos;
+	target.z = pos->zPos - LaraItem->pos.zPos;
+	if (!ItemCollide(target.y, ITEM_RADIUS_YMAX))
+		return false;
+	if (!ItemCollide(target.x, radius) || !ItemCollide(target.z, radius))
+		return false;
+	if (!ItemInRange(target.x, target.z, radius))
+		return false;
+
+	bounds = (ANIM_FRAME*)GetBoundsAccurate(LaraItem);
+	if (target.y >= bounds->MinY && target.y <= (bounds->MaxY + LARA_RAD))
+		return true;
+
+	return false;
+}
+
+bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
+{
+	ANIM_FRAME* bounds;
+	PHD_VECTOR pos;
+	pos.x = src->xPos - target->pos.xPos;
+	pos.y = src->yPos - target->pos.yPos;
+	pos.z = src->zPos - target->pos.zPos;
+	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
+		return false;
+	if (!ItemCollide(pos.x, radius) || !ItemCollide(pos.z, radius))
+		return false;
+	if (!ItemInRange(pos.x, pos.z, radius))
+		return false;
+
+	bounds = (ANIM_FRAME*)GetBoundsAccurate(target);
+	if (pos.y >= bounds->MinY && pos.y <= bounds->MaxY)
+		return true;
+
+	return false;
 }
 
 void Richochet(PHD_3DPOS* pos)
 {
 	short angle = mGetAngle(pos->zPos, pos->xPos, LaraItem->pos.zPos, LaraItem->pos.xPos);
-	TriggerRicochetSpark((GAME_VECTOR*)pos, angle / 16, 3, 0);
+	GAME_VECTOR target;
+	target.x = pos->xPos;
+	target.y = pos->yPos;
+	target.z = pos->zPos;
+	TriggerRicochetSpark(&target, angle / 16, 3, 0);
 	SoundEffect(SFX_LARA_RICOCHET, pos, 0);
 }
 
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
 {
-	for (int i = 0; i < count; i++)
-	{
-		DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
-			y + 256 - (GetRandomControl() * 512 / 0x8000),
-			z + 256 - (GetRandomControl() * 512 / 0x8000),
-			speed, direction, roomNumber);
-	}
+    for (int i = 0; i < count; i++)
+    {
+        DoBloodSplat(x + 256 - (GetRandomControl() * 512 / 0x8000),
+                     y + 256 - (GetRandomControl() * 512 / 0x8000),
+                     z + 256 - (GetRandomControl() * 512 / 0x8000),
+                     speed, direction, roomNumber);
+    }
 }

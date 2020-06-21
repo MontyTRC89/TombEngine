@@ -1,6 +1,6 @@
 #pragma once
 
-// Define string ids
+// Define std::string ids
 #define STRING_PASSPORT					1
 #define STRING_LARA_HOME				2
 #define STRING_CONTROLS					3
@@ -104,8 +104,8 @@
 class LanguageScript
 {
 public:
-	string Name;
-	vector<string> Strings;
+	std::string Name;
+	std::vector<std::string> Strings;
 
 	LanguageScript(char* name);
 	~LanguageScript();

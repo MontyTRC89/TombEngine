@@ -9,7 +9,8 @@
 #include "lara.h"
 #include "sphere.h"
 #include "GameFlowScript.h"
-
+using std::vector;
+using std::pair;
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 
@@ -35,12 +36,13 @@ vector<RendererVideoAdapter>* Renderer11::GetAdapters()
 
 void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector3* cameraPos, float rotation)
 {
+	/*
 	Vector3 look = *particlePos;
 	look = look - *cameraPos;
 	look.Normalize();
 
-	Vector3 cameraUp = Vector3(0.0f, -1.0f, 0.0f);
-
+	*out = Matrix::CreateBillboard(*particlePos, *cameraPos, cameraUp);
+	
 	Vector3 right;
 	right = cameraUp.Cross(look);
 	right.Normalize();
@@ -70,6 +72,7 @@ void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector
 	out->_41 = particlePos->x;
 	out->_42 = particlePos->y;
 	out->_43 = particlePos->z;
+	*/
 }
 
 void Renderer11::updateAnimatedTextures()
@@ -540,8 +543,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 				vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
 			}
 
-			vertex.UV.x = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.UV.x = texture->vertices[v].x;
+			vertex.UV.y = texture->vertices[v].y;
 
 			vertex.Bone = boneIndex;
 			if (isHairs)
@@ -635,8 +638,8 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 				vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
 			}
 
-			vertex.UV.x = (texture->vertices[v].x * 256.0f + 0.5f + GET_ATLAS_PAGE_X(tile)) / (float)TEXTURE_ATLAS_SIZE;
-			vertex.UV.y = (texture->vertices[v].y * 256.0f + 0.5f + GET_ATLAS_PAGE_Y(tile)) / (float)TEXTURE_ATLAS_SIZE;
+			vertex.UV.x = texture->vertices[v].x;
+			vertex.UV.y = texture->vertices[v].y;
 
 			vertex.Bone = boneIndex;
 			if (isHairs)
