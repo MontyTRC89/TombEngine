@@ -88,7 +88,7 @@ bool Renderer11::DrawBar(float percent,const RendererHUDBar* const bar)
 	m_context->IASetIndexBuffer(bar->indexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
 	m_context->VSSetShader(m_vsHUD, NULL, 0);
-	m_context->PSSetShaderResources(0, 1, &m_HUDBarBorderTexture->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_HUDBarBorderTexture.ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState* sampler = m_states->LinearClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 	m_context->PSSetShader(m_psHUDTexture, NULL, 0);
@@ -135,7 +135,7 @@ bool Renderer11::drawOverlays()
 		return true;
 
 	m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
-	drawFullScreenQuad(m_binocularsTexture->ShaderResourceView, Vector3::One, false);
+	drawFullScreenQuad(m_binocularsTexture.ShaderResourceView.Get(), Vector3::One, false);
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 	if (LaserSight)
@@ -197,7 +197,7 @@ bool Renderer11::drawColoredQuad(int x, int y, int w, int h, Vector4 color)
 	rect.right = (x + w) * factorW;
 
 	m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->AlphaBlend(), NULL, m_states->DepthRead());
-	m_spriteBatch->Draw(m_whiteTexture->ShaderResourceView, rect, color);
+	m_spriteBatch->Draw(m_whiteTexture.ShaderResourceView.Get(), rect, color);
 	m_spriteBatch->End();
 
 	int shiftW = 4 * factorW;
