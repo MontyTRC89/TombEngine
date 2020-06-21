@@ -19,7 +19,7 @@
 #include "footprint.h"
 #include "setup.h"
 #include "Utils.h"
-#include "VertexBuffer.h"
+#include "VertexBuffer/VertexBuffer.h"
 namespace T5M::Renderer {
 	using namespace T5M::Renderer::Utils;
 	using std::array;

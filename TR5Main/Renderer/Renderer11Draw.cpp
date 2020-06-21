@@ -18,7 +18,7 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-#include "CameraMatrixBuffer.h"
+#include "ConstantBuffers/CameraMatrixBuffer.h"
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern T5M::Renderer::RendererHUDBar* g_DashBar;
 extern T5M::Renderer::RendererHUDBar* g_SFXVolumeBar;
