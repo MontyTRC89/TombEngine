@@ -1,5 +1,5 @@
 /*
-** $Id: luaconf.h,v 1.259 2016/12/22 13:08:50 roberto Exp $
+** $Id: luaconf.h,v 1.259.1.1 2017/04/19 17:29:57 roberto Exp $
 ** Configuration file for Lua
 ** See Copyright Notice in lua.h
 */
@@ -160,7 +160,7 @@
 
 /*
 ** LUA_PATH_SEP is the character that separates templates in a path.
-** LUA_PATH_MARK is the std::string that marks the substitution points in a
+** LUA_PATH_MARK is the string that marks the substitution points in a
 ** template.
 ** LUA_EXEC_DIR in a Windows path is replaced by the executable's
 ** directory.
@@ -427,7 +427,7 @@
 @@ lua_number2str converts a float to a string.
 @@ l_mathop allows the addition of an 'l' or 'f' to all math operations.
 @@ l_floor takes the floor of a float.
-@@ lua_str2number converts a decimal numeric std::string to a number.
+@@ lua_str2number converts a decimal numeric string to a number.
 */
 
 
@@ -612,7 +612,7 @@
 
 
 /*
-@@ lua_strx2number converts an hexadecimal numeric std::string to a number.
+@@ lua_strx2number converts an hexadecimal numeric string to a number.
 ** In C99, 'strtod' does that conversion. Otherwise, you can
 ** leave 'lua_strx2number' undefined and Lua will provide its own
 ** implementation.
@@ -620,6 +620,13 @@
 #if !defined(LUA_USE_C89)
 #define lua_strx2number(s,p)		lua_str2number(s,p)
 #endif
+
+
+/*
+@@ lua_pointer2str converts a pointer to a readable string in a
+** non-specified way.
+*/
+#define lua_pointer2str(buff,sz,p)	l_sprintf(buff,sz,"%p",p)
 
 
 /*
