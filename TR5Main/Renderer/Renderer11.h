@@ -1,21 +1,21 @@
 #pragma once
 #include "RenderEnums.h"
-#include "StaticBuffer.h"
-#include "LightBuffer.h"
-#include "MiscBuffer.h"
-#include "HUDBarBuffer.h"
-#include "HUDBuffer.h"
-#include "ShadowLightBuffer.h"
-#include "RoomBuffer.h"
-#include "ItemBuffer.h"
+#include "ConstantBuffers/StaticBuffer.h"
+#include "ConstantBuffers/LightBuffer.h"
+#include "ConstantBuffers/MiscBuffer.h"
+#include "ConstantBuffers/HUDBarBuffer.h"
+#include "ConstantBuffers/HUDBuffer.h"
+#include "ConstantBuffers/ShadowLightBuffer.h"
+#include "ConstantBuffers/RoomBuffer.h"
+#include "ConstantBuffers/ItemBuffer.h"
 #include "Frustum.h"
 
 #include "items.h"
 #include "effect.h"
-#include <IndexBuffer.h>
-#include "VertexBuffer.h"
+#include "IndexBuffer/IndexBuffer.h"
+#include "VertexBuffer/VertexBuffer.h"
 #include "RenderTarget2D/RenderTarget2D.h"
-#include "CameraMatrixBuffer.h"
+#include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "Texture2D/Texture2D.h"
 
 namespace T5M::Renderer
