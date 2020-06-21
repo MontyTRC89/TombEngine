@@ -24,7 +24,7 @@ int wf = 256;
 using namespace T5M::Effects::Footprints;
 
 short FXType;
-FX_INFO* Effects;
+FX_INFO* EffectList;
 
 function<EffectFunction> effect_routines[59] =
 {

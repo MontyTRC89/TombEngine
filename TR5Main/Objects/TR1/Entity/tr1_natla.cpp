@@ -101,7 +101,7 @@ void NatlaControl(short itemNum)
 				fx_number = CreatureEffect(item, &natla_gun, ShardGun);
 				if (fx_number != NO_ITEM)
 				{
-					fx = &Effects[fx_number];
+					fx = &EffectList[fx_number];
 					gun = fx->pos.xRot;
 					SoundEffect(123, &fx->pos, NULL);
 				}
@@ -117,7 +117,7 @@ void NatlaControl(short itemNum)
 				fx_number = CreatureEffect(item, &natla_gun, ShardGun);
 				if (fx_number != NO_ITEM)
 				{
-					fx = &Effects[fx_number];
+					fx = &EffectList[fx_number];
 					gun = fx->pos.xRot;
 					SoundEffect(123, &fx->pos, NULL);
 				}
@@ -225,7 +225,7 @@ void NatlaControl(short itemNum)
 				fx_number = CreatureEffect(item, &natla_gun, BombGun);
 				if (fx_number != NO_ITEM)
 				{
-					fx = &Effects[fx_number];
+					fx = &EffectList[fx_number];
 					gun = fx->pos.xRot;
 					SoundEffect(123, &fx->pos, NULL);
 				}
@@ -248,13 +248,13 @@ void NatlaControl(short itemNum)
 				/* Eat this ... */
 				fx_number = CreatureEffect(item, &natla_gun, BombGun);
 				if (fx_number != NO_ITEM)
-					gun = Effects[fx_number].pos.xRot;
+					gun = EffectList[fx_number].pos.xRot;
 				fx_number = CreatureEffect(item, &natla_gun, BombGun);
 				if (fx_number != NO_ITEM)
-					Effects[fx_number].pos.yRot += (short)((GetRandomControl() - 0x4000) / 4);
+					EffectList[fx_number].pos.yRot += (short)((GetRandomControl() - 0x4000) / 4);
 				fx_number = CreatureEffect(item, &natla_gun, BombGun);
 				if (fx_number != NO_ITEM)
-					Effects[fx_number].pos.yRot += (short)((GetRandomControl() - 0x4000) / 4);
+					EffectList[fx_number].pos.yRot += (short)((GetRandomControl() - 0x4000) / 4);
 
 				item->requiredAnimState = NATLA_STOP;
 			}

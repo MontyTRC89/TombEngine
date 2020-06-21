@@ -175,7 +175,7 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 	}
 	else
 	{
-		FX_INFO* fx = &Effects[fxNumber];
+		FX_INFO* fx = &EffectList[fxNumber];
 		ROOM_INFO* r = &Rooms[fx->roomNumber];
 
 		if (r->fxNumber == fxNumber)
@@ -185,11 +185,11 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 		else
 		{
 			short linknum;
-			for (linknum = r->fxNumber; linknum != -1; linknum = Effects[linknum].nextFx)
+			for (linknum = r->fxNumber; linknum != -1; linknum = EffectList[linknum].nextFx)
 			{
-				if (Effects[linknum].nextFx == fxNumber)
+				if (EffectList[linknum].nextFx == fxNumber)
 				{
-					Effects[linknum].nextFx = fx->nextFx;
+					EffectList[linknum].nextFx = fx->nextFx;
 					break;
 				}
 			}
@@ -210,7 +210,7 @@ void KillEffect(short fxNumber)
 	}
 	else
 	{
-		FX_INFO* fx = &Effects[fxNumber];
+		FX_INFO* fx = &EffectList[fxNumber];
 		DetatchSpark(fxNumber, SP_FX);
 
 		if (NextFxActive == fxNumber)
@@ -219,11 +219,11 @@ void KillEffect(short fxNumber)
 		}
 		else
 		{
-			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = Effects[linknum].nextActive)
+			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = EffectList[linknum].nextActive)
 			{
-				if (Effects[linknum].nextActive == fxNumber)
+				if (EffectList[linknum].nextActive == fxNumber)
 				{
-					Effects[linknum].nextActive = fx->nextActive;
+					EffectList[linknum].nextActive = fx->nextActive;
 					break;
 				}
 			}
@@ -235,11 +235,11 @@ void KillEffect(short fxNumber)
 		}
 		else
 		{
-			for (short linknum = Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = Effects[linknum].nextFx)
+			for (short linknum = Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = EffectList[linknum].nextFx)
 			{
-				if (Effects[linknum].nextFx == fxNumber)
+				if (EffectList[linknum].nextFx == fxNumber)
 				{
-					Effects[linknum].nextFx = fx->nextFx;
+					EffectList[linknum].nextFx = fx->nextFx;
 					break;
 				}
 			}
@@ -256,7 +256,7 @@ short CreateNewEffect(short roomNum)
 
 	if (NextFxFree != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[NextFxFree];
+		FX_INFO* fx = &EffectList[NextFxFree];
 		NextFxFree = fx->nextFx;
 		ROOM_INFO* r = &Rooms[roomNum];
 		fx->roomNumber = roomNum;
@@ -273,9 +273,9 @@ short CreateNewEffect(short roomNum)
 void InitialiseFXArray(int allocmem)
 {
 	if (allocmem)
-		Effects = (FX_INFO*)game_malloc(NUM_EFFECTS * sizeof(FX_INFO));
+		EffectList = (FX_INFO*)game_malloc(NUM_EFFECTS * sizeof(FX_INFO));
 
-	FX_INFO* fx = Effects;
+	FX_INFO* fx = EffectList;
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
 	for (int i = 1; i < NUM_EFFECTS; i++, fx++)

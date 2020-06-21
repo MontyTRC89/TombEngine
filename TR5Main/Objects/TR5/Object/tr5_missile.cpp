@@ -20,7 +20,7 @@ int DebrisFlags;
 
 void MissileControl(short itemNumber)
 {
-	FX_INFO* fx = &Effects[itemNumber];
+	FX_INFO* fx = &EffectList[itemNumber];
 	if (fx->flag1 == 2)
 	{
 		fx->pos.zRot += 16 * fx->speed;
