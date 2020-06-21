@@ -18,7 +18,9 @@
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
-
+#include "CameraMatrixBuffer.h"
+using namespace T5M::Renderer;
+using namespace std::chrono;
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_SFXVolumeBar;
@@ -60,20 +62,20 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 	Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
 	// Clear just the Z-buffer so we can start drawing on top of the scene
-	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Set vertex buffer
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set shaders
 	m_context->VSSetShader(m_vsInventory, NULL, 0);
 	m_context->PSSetShader(m_psInventory, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -212,9 +214,9 @@ bool Renderer11::drawShadowMap()
 	m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	// Bind and clear render target
-	m_context->ClearRenderTargetView(m_shadowMap->RenderTargetView, Colors::White);
-	m_context->ClearDepthStencilView(m_shadowMap->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	m_context->OMSetRenderTargets(1, &m_shadowMap->RenderTargetView, m_shadowMap->DepthStencilView);
+	m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView.Get(), Colors::White);
+	m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView.GetAddressOf(), m_shadowMap.DepthStencilView.Get());
 
 	m_context->RSSetViewports(1, &m_shadowMapViewport);
 
@@ -232,13 +234,13 @@ bool Renderer11::drawShadowMap()
 	m_context->VSSetShader(m_vsShadowMap, NULL, 0);
 	m_context->PSSetShader(m_psShadowMap, NULL, 0);
 
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -467,53 +469,53 @@ int Renderer11::drawInventoryScene()
 	m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 	// Bind and clear render target
-	m_context->ClearRenderTargetView(m_renderTarget->RenderTargetView, Colors::Black);
-	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	m_context->OMSetRenderTargets(1, &m_renderTarget->RenderTargetView, m_renderTarget->DepthStencilView);
+	m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
+	m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
 	m_context->RSSetViewports(1, &m_viewport);
 
 	// Clear the Z-Buffer after drawing the background	
-	if (g_Inventory->GetType() == INV_TYPE_TITLE)
+	if (g_Inventory.GetType() == INV_TYPE_TITLE)
 	{
 		if (g_GameFlow->TitleType == TITLE_BACKGROUND)
 			drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
 		else
-			drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(1.0f, 1.0f, 1.0f), false);
+			drawFullScreenQuad(m_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(1.0f, 1.0f, 1.0f), false);
 	}
 	else
 	{
-		drawFullScreenQuad(m_dumpScreenRenderTarget->ShaderResourceView, Vector3(0.2f, 0.2f, 0.2f), false);
+		drawFullScreenQuad(m_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(0.2f, 0.2f, 0.2f), false);
 	}
 
-	m_context->ClearDepthStencilView(m_renderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
 	// Set vertex buffer
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set shaders
 	m_context->VSSetShader(m_vsInventory, NULL, 0);
 	m_context->PSSetShader(m_psInventory, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
-	InventoryRing* activeRing = g_Inventory->GetRing(g_Inventory->GetActiveRing());
+	InventoryRing* activeRing = g_Inventory.GetRing(g_Inventory.GetActiveRing());
 	int lastRing = 0;
 
-	float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory->GetCameraTilt() * RADIAN);
-	float cameraY = g_Inventory->GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory->GetCameraTilt() * RADIAN);
+	float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory.GetCameraTilt() * RADIAN);
+	float cameraY = g_Inventory.GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory.GetCameraTilt() * RADIAN);
 	float cameraZ = 0.0f;
 
 	m_stCameraMatrices.ViewProjection = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
-		Vector3(0.0f, g_Inventory->GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) * Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
+		Vector3(0.0f, g_Inventory.GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) * Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
 			g_Renderer->ScreenWidth / (float)g_Renderer->ScreenHeight, 1.0f, 200000.0f);
 
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
@@ -521,7 +523,7 @@ int Renderer11::drawInventoryScene()
 
 	for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
 	{
-		InventoryRing* ring = g_Inventory->GetRing(k);
+		InventoryRing* ring = g_Inventory.GetRing(k);
 		if (ring->draw == false || ring->numObjects == 0)
 			continue;
 
@@ -531,13 +533,13 @@ int Renderer11::drawInventoryScene()
 		objectIndex = ring->currentObject;
 
 		// Yellow title
-		if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory->GetType() != INV_TYPE_TITLE)
+		if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory.GetType() != INV_TYPE_TITLE)
 			PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
 		for (int i = 0; i < numObjects; i++)
 		{
 			short inventoryObject = ring->objects[objectIndex].inventoryObject;
-			short objectNumber = g_Inventory->GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
+			short objectNumber = g_Inventory.GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
 
 			//if (ring->focusState != INV_FOCUS_STATE_NONE && (k != g_Inventory->GetActiveRing() || inventoryObject != ring->objects[i].inventoryObject))
 			//	continue;
@@ -549,7 +551,7 @@ int Renderer11::drawInventoryScene()
 			currentAngle = steps * deltaAngle;
 			currentAngle += ring->rotation;
 
-			if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory->GetActiveRing())
+			if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory.GetActiveRing())
 			{
 				if (objectIndex == ring->currentObject)
 					ring->objects[objectIndex].rotation += 45 * 360 / 30;
@@ -557,19 +559,19 @@ int Renderer11::drawInventoryScene()
 					ring->objects[objectIndex].rotation += 45 * 360 / 30;
 			}
 			else if (ring->focusState != INV_FOCUS_STATE_POPUP && ring->focusState != INV_FOCUS_STATE_POPOVER)
-				g_Inventory->GetRing(k)->objects[objectIndex].rotation = 0;
+				g_Inventory.GetRing(k)->objects[objectIndex].rotation = 0;
 
 			if (ring->objects[objectIndex].rotation > 65536.0f)
 				ring->objects[objectIndex].rotation = 0;
 
 			int x = ring->distance * cos(currentAngle * RADIAN);
-			int y = g_Inventory->GetRing(k)->y;
+			int y = g_Inventory.GetRing(k)->y;
 			int z = ring->distance * sin(currentAngle * RADIAN);
 
 			// Prepare the object transform
 			Matrix scale = Matrix::CreateScale(ring->objects[objectIndex].scale, ring->objects[objectIndex].scale, ring->objects[objectIndex].scale);
 			Matrix translation = Matrix::CreateTranslation(x, y, z);
-			Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory->GetInventoryObject(inventoryObject)->rotY));
+			Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory.GetInventoryObject(inventoryObject)->rotY));
 			Matrix transform = (scale * rotation) * translation;
 
 			ObjectInfo * obj = &Objects[objectNumber];
@@ -579,7 +581,7 @@ int Renderer11::drawInventoryScene()
 
 			// Build the object animation matrices
 			if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
-				objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
+				objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
 			{
 				short* framePtr[2];
 				int rate = 0;
@@ -635,9 +637,9 @@ int Renderer11::drawInventoryScene()
 			short inventoryItem = ring->objects[objectIndex].inventoryObject;
 
 			// Draw special stuff if needed
-			if (objectIndex == ring->currentObject && k == g_Inventory->GetActiveRing())
+			if (objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
 			{
-				if (g_Inventory->GetActiveRing() == INV_RING_OPTIONS)
+				if (g_Inventory.GetActiveRing() == INV_RING_OPTIONS)
 				{
 					/* **************** PASSAPORT ************* */
 					if (inventoryItem == INV_OBJECT_PASSPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
@@ -951,14 +953,14 @@ int Renderer11::drawInventoryScene()
 					else
 					{
 						// Draw the description below the object
-						char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
+						char* string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
 						PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					}
 				}
 				else
 				{
-					short inventoryItem = g_Inventory->GetRing(k)->objects[objectIndex].inventoryObject;
-					char* string = g_GameFlow->GetString(g_Inventory->GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
+					short inventoryItem = g_Inventory.GetRing(k)->objects[objectIndex].inventoryObject;
+					char* string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
 
 					if (/*g_Inventory->IsCurrentObjectWeapon() &&*/ ring->focusState == INV_FOCUS_STATE_FOCUSED)
 					{
@@ -1105,7 +1107,7 @@ int Renderer11::drawInventoryScene()
 	drawLines2D();
 	drawAllStrings();
 
-	if (g_Inventory->GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
+	if (g_Inventory.GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
 	{
 		// Draw main logo
 		float factorX = (float)ScreenWidth / REFERENCE_RES_WIDTH;
@@ -1460,10 +1462,10 @@ bool Renderer11::drawRats()
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	if (Objects[ID_RATS_EMITTER].loaded)
 	{
@@ -1512,10 +1514,10 @@ bool Renderer11::drawBats()
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1,m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	if (Objects[ID_BATS_EMITTER].loaded)
 	{
@@ -1818,8 +1820,8 @@ void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byt
 	dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
 	dynamicLight->Out = falloff * 256.0f;
 	dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-	dynamicLight->Dynamic = 1;
-	dynamicLight->Intensity = 2.0f;
+	dynamicLight->Dynamic = true;
+	dynamicLight->Intensity = falloff/2;
 
 	m_dynamicLights.push_back(dynamicLight);
 	//NumDynamics++;
@@ -1848,7 +1850,7 @@ int Renderer11::drawFinalPass()
 	m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 
-	drawFullScreenQuad(m_renderTarget->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
+	drawFullScreenQuad(m_renderTarget.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
 
 	m_swapChain->Present(0, 0);
 
@@ -1901,8 +1903,8 @@ int Renderer11::DrawInventory()
 
 bool Renderer11::drawScene(bool dump)
 {
-	using ns = chrono::nanoseconds;
-	using get_time = chrono::steady_clock;
+	using ns = std::chrono::nanoseconds;
+	using get_time = std::chrono::steady_clock;
 	m_timeUpdate = 0;
 	m_timeDraw = 0;
 	m_timeFrame = 0;
@@ -1923,7 +1925,7 @@ bool Renderer11::drawScene(bool dump)
 	m_stLights.CameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 	// Prepare the scene to draw
-	auto time1 = chrono::high_resolution_clock::now();
+	auto time1 = std::chrono::high_resolution_clock::now();
 	prepareCameraForFrame();
 	ProcessClosedDoors();
 
@@ -1946,8 +1948,8 @@ bool Renderer11::drawScene(bool dump)
 	if (GnFrameCounter % 2 == 0)
 		updateAnimatedTextures();
 
-	auto time2 = chrono::high_resolution_clock::now();
-	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	auto time2 = std::chrono::high_resolution_clock::now();
+	m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
 
 	// Draw shadow map
@@ -1960,9 +1962,9 @@ bool Renderer11::drawScene(bool dump)
 	// Bind and clear render target
 	m_currentRenderTarget = (dump ? m_dumpScreenRenderTarget : m_renderTarget);
 
-	m_context->ClearRenderTargetView(m_currentRenderTarget->RenderTargetView, Colors::Black);
-	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	m_context->OMSetRenderTargets(1, &m_currentRenderTarget->RenderTargetView, m_currentRenderTarget->DepthStencilView);
+	m_context->ClearRenderTargetView(m_currentRenderTarget.RenderTargetView.Get(), Colors::Black);
+	m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->OMSetRenderTargets(1, m_currentRenderTarget.RenderTargetView.GetAddressOf(), m_currentRenderTarget.DepthStencilView.Get());
 
 	m_context->RSSetViewports(1, &m_viewport);
 
@@ -2006,7 +2008,11 @@ bool Renderer11::drawScene(bool dump)
 	// Do special effects and weather
 	drawFires();
 	drawSmokes();
+	drawSmokeParticles();
+	drawSparkParticles();
+	drawExplosionParticles();
 	drawFootprints();
+	drawDripParticles();
 	drawBlood();
 	drawSparks();
 	drawBubbles();
@@ -2034,8 +2040,8 @@ bool Renderer11::drawScene(bool dump)
 	drawSprites();
 	drawLines3D();
 
-	time2 = chrono::high_resolution_clock::now();
-	m_timeFrame = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	time2 = std::chrono::high_resolution_clock::now();
+	m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
 
 	// Bars
@@ -2112,10 +2118,10 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
 
-	m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	RendererItem * item = &m_items[Lara.itemNumber];
 
@@ -2124,7 +2130,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	m_context->PSSetShader(m_psItems, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2255,17 +2261,17 @@ bool Renderer11::drawStatics(bool transparent)
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
 
-	m_context->IASetVertexBuffers(0, 1, &m_staticsVertexBuffer->Buffer, &stride, &offset);
+	m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout);
-	m_context->IASetIndexBuffer(m_staticsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set shaders
 	m_context->VSSetShader(m_vsStatics, NULL, 0);
 	m_context->PSSetShader(m_psStatics, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_staticsTextures[0]->ShaderResourceView);
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2322,10 +2328,10 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	if (!animated)
 	{
 		// Set vertex buffer
-		m_context->IASetVertexBuffers(0, 1, &m_roomsVertexBuffer->Buffer, &stride, &offset);
+		m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout);
-		m_context->IASetIndexBuffer(m_roomsIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	}
 
 	// Set shaders
@@ -2333,13 +2339,13 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->PSSetShader(m_psRooms, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, &m_roomTextures[0]->ShaderResourceView);
 	ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
 	ID3D11SamplerState* shadowSampler = m_states->PointClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 	m_context->PSSetShaderResources(1, 1, &m_caustics[m_currentCausticsFrame / 2]->ShaderResourceView);
 	m_context->PSSetSamplers(1, 1, &shadowSampler);
-	m_context->PSSetShaderResources(2, 1, &m_shadowMap->ShaderResourceView);
+	m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
 	updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
@@ -2378,7 +2384,9 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 		m_stRoom.AmbientColor = room->AmbientLight;
+		m_stRoom.water = (room->Room->flags & ENV_FLAG_WATER) != 0 ? 1: 0;
 		updateConstantBuffer(m_cbRoom, &m_stRoom, sizeof(CRoomBuffer));
+		m_context->VSSetConstantBuffers(5, 1, &m_cbRoom);
 		m_context->PSSetConstantBuffers(5, 1, &m_cbRoom);
 		for (int j = firstBucket; j < lastBucket; j++)
 		{
@@ -2547,12 +2555,12 @@ bool Renderer11::drawHorizonAndSky()
 	// Draw horizon
 	if (m_moveableObjects[ID_HORIZON] != NULL)
 	{
-		m_context->IASetVertexBuffers(0, 1, &m_moveablesVertexBuffer->Buffer, &stride, &offset);
+		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout);
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
+		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		m_context->PSSetShaderResources(0, 1, &m_textureAtlas->ShaderResourceView);
+		m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
 		sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2598,7 +2606,7 @@ bool Renderer11::drawHorizonAndSky()
 	}
 
 	// Clear just the Z-buffer so we can start drawing on top of the horizon
-	m_context->ClearDepthStencilView(m_currentRenderTarget->DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	return true;
 }

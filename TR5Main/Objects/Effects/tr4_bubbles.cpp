@@ -9,6 +9,7 @@
 #include "effect.h"
 #include "level.h"
 #include "lara.h"
+#include "tr4_mutant.h"
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {
@@ -109,58 +110,6 @@ void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 		spark->scalar = 2;
 		spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
 		spark->dSize = spark->size >> 5;
-	}
-}
-
-void BubblesEffect3(short fxNum, short xVel, short yVel, short zVel)
-{
-	FX_INFO* fx = &Effects[fxNum];
-
-	int dx = LaraItem->pos.xPos - fx->pos.xPos;
-	int dz = LaraItem->pos.zPos - fx->pos.zPos;
-
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
-	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
-
-		spark->on = 1;
-		spark->sB = 0;
-		spark->sR = (GetRandomControl() & 0x3F) + -128;
-		spark->sG = spark->sG >> 1;
-		spark->dB = 0;
-		spark->dR = (GetRandomControl() & 0x3F) + -128;
-		spark->dG = spark->dG >> 1;
-		spark->fadeToBlack = 8;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->transType = COLADD;
-		spark->dynamic = -1;
-		spark->life = spark->sLife = (GetRandomControl() & 7) + 32;
-		spark->y = 0;
-		spark->x = (GetRandomControl() & 0xF) - 8;
-		spark->z = (GetRandomControl() & 0xF) - 8;
-		spark->x += fx->pos.xPos;
-		spark->y += fx->pos.yPos;
-		spark->z += fx->pos.zPos;
-		spark->xVel = xVel;
-		spark->yVel = yVel;
-		spark->zVel = zVel;
-		spark->friction = 34;
-		spark->flags = 538;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		if (GetRandomControl() & 1)
-		{
-			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-		}
-		else
-		{
-			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-		}
-		spark->gravity = 0;
-		spark->maxYvel = 0;
-		spark->fxObj = fxNum;
-		spark->scalar = 2;
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 128;
-		spark->dSize = spark->size >> 2;
 	}
 }
 
@@ -463,29 +412,25 @@ void BubblesControl(short fxNum)
 		int dy = oldY - fx->pos.yPos;
 		int dz = oldZ - fx->pos.zPos;
 
-		if (Wibble & 4 || fx->flag1 == 1 || fx->flag1 == 5 || fx->flag1 == 2)
+		if (Wibble & 4)
 		{
-			if (fx->flag1)
+			switch (fx->flag1)
 			{
-				if (fx->flag1 == 1)
-				{
+				default:
+				case 1:
 					BubblesEffect1(fxNum, 32 * dx, 32 * dy, 32 * dz);
-				}
-				else if (fx->flag1 < 3 || fx->flag1 > 5)
-				{
-					if (fx->flag1 == 2)
-						BubblesEffect2(fxNum, 16 * dx, 16 * dy, 16 * dz);
-					else if (fx->flag1 == 6)
-						BubblesEffect3(fxNum, 16 * dx, 16 * dy, 16 * dz);
-				}
-				else
-				{
+					break;
+				case 2:
+					BubblesEffect2(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					break;
+				case 3:
+				case 4:
+				case 5:
 					BubblesEffect4(fxNum, 16 * dx, 16 * dy, 16 * dz);
-				}
-			}
-			else
-			{
-				BubblesEffect1(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					break;
+				case 6:
+					TriggerMutantRocketEffects(fxNum, 16 * dx, 16 * dy, 16 * dz);
+					break;
 			}
 		}
 	}

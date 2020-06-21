@@ -10,38 +10,6 @@
 #include "draw.h"
 #include "misc.h"
 
-struct CROCODILE_BONE
-{
-    short torsoY;
-    short torsoX;
-    short hipsY;
-    short hipsX;
-
-    CROCODILE_BONE()
-    {
-        this->torsoY = 0;
-        this->torsoX = 0;
-        this->hipsY = 0;
-        this->hipsX = 0;
-    }
-
-    CROCODILE_BONE(short angle)
-    {
-        this->torsoY = angle;
-        this->torsoX = angle;
-        this->hipsY = -angle;
-        this->hipsX = -angle;
-    }
-
-    CROCODILE_BONE(short torsoY, short torsoX)
-    {
-        this->torsoY = torsoY;
-        this->torsoX = torsoX;
-        this->hipsY = 0;
-        this->hipsX = 0;
-    }
-};
-
 enum CROCODILE_STATE
 {
     CROC_EMPTY,
@@ -136,20 +104,20 @@ void CrocodileControl(short itemNumber)
     ObjectInfo* obj;
     CREATURE_INFO* crocodile;
     AI_INFO info;
-    CROCODILE_BONE boneRot;
+    OBJECT_BONES boneRot;
     short angle;
-    short bone_angle;
+    short boneAngle;
 
     item = &Items[itemNumber];
     obj = &Objects[item->objectNumber];
     crocodile = GetCreatureInfo(item);
     angle = 0;
-    bone_angle = 0;
+    boneAngle = 0;
 
     if (item->hitPoints <= 0)
     {
         angle = 0;
-        bone_angle = 0;
+        boneAngle = 0;
 
         if (item->currentAnimState != CROC_DIE && item->currentAnimState != WCROC_DIE)
         {
@@ -194,7 +162,7 @@ void CrocodileControl(short itemNumber)
             AlertAllGuards(itemNumber);
         }
 
-        bone_angle = angle << 2;
+        boneAngle = angle << 2;
         switch (item->currentAnimState)
         {
         case CROC_IDLE:
@@ -202,9 +170,9 @@ void CrocodileControl(short itemNumber)
 
             if (item->aiBits & GUARD)
             {
-                bone_angle = item->itemFlags[0];
+                boneAngle = item->itemFlags[0];
                 item->goalAnimState = CROC_IDLE;
-                item->itemFlags[0] = item->itemFlags[1] + bone_angle;
+                item->itemFlags[0] = item->itemFlags[1] + boneAngle;
 
                 if (!(GetRandomControl() & 0x1F))
                 {
@@ -330,15 +298,25 @@ void CrocodileControl(short itemNumber)
     }
 
     if (item->currentAnimState == CROC_IDLE || item->currentAnimState == CROC_ATK || item->currentAnimState == WCROC_ATK)
-        boneRot = CROCODILE_BONE(info.angle, info.xAngle);
+    {
+        boneRot.bone0 = info.angle;
+        boneRot.bone1 = info.angle;
+        boneRot.bone2 = 0;
+        boneRot.bone3 = 0;
+    }
     else
-        boneRot = CROCODILE_BONE(bone_angle);
+    {
+        boneRot.bone0 = boneAngle;
+        boneRot.bone1 = boneAngle;
+        boneRot.bone2 = -boneAngle;
+        boneRot.bone3 = -boneAngle;
+    }
 
     CreatureTilt(item, 0);
-    CreatureJoint(item, 0, boneRot.torsoY);
-    CreatureJoint(item, 1, boneRot.torsoX);
-    CreatureJoint(item, 2, boneRot.hipsY);
-    CreatureJoint(item, 3, boneRot.hipsX);
+    CreatureJoint(item, 0, boneRot.bone0);
+    CreatureJoint(item, 1, boneRot.bone1);
+    CreatureJoint(item, 2, boneRot.bone2);
+    CreatureJoint(item, 3, boneRot.bone3);
 
     if (item->currentAnimState < WCROC_SWIM)
         CalcItemToFloorRotation(item, 2);

@@ -333,7 +333,7 @@ private:
 	float								m_deltaMovement;
 	InventoryObjectDefinition			m_objectsTable[INVENTORY_TABLE_SIZE];
 	int									m_type;
-	vector<InventoryObjectCombination>	m_combinations;
+	std::vector<InventoryObjectCombination>	m_combinations;
 	int									m_activeGui;
 	float								m_cameraY;
 	float								m_cameraTilt;
@@ -397,4 +397,4 @@ public:
 	void						SetSelectedObject(short objNum);
 };
 
-extern Inventory* g_Inventory;
+extern Inventory g_Inventory;

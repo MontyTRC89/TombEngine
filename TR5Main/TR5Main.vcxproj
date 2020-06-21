@@ -47,14 +47,14 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
   </PropertyGroup>
@@ -71,7 +71,7 @@
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -105,7 +105,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -128,11 +128,16 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\box.h" />
     <ClInclude Include="Game\bubble.h" />
+    <ClInclude Include="Game\chaffFX.h" />
+    <ClInclude Include="Game\drip.h" />
+    <ClInclude Include="Game\explosion.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Game\lara_struct.h" />
     <ClInclude Include="Game\phd_global.h" />
     <ClInclude Include="Game\room.h" />
+    <ClInclude Include="Game\smoke.h" />
+    <ClInclude Include="Game\spark.h" />
     <ClInclude Include="Libs\bass\bass.h" />
     <ClInclude Include="Libs\bass\bassmix.h" />
     <ClInclude Include="Libs\bass\bass_fx.h" />
@@ -148,9 +153,11 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Libs\zlib\zip.h" />
     <ClInclude Include="Libs\zlib\zlib.h" />
     <ClInclude Include="Objects\Effects\tr4_bubbles.h" />
+    <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_baboon.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_laradouble.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
@@ -258,6 +265,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Objects\TR5\Entity\tr5_submarine.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_willowwisp.h" />
     <ClInclude Include="Objects\TR5\Shatter\tr5_smashobject.h" />
+    <ClInclude Include="Renderer\IndexBuffer.h" />
     <ClInclude Include="Renderer\RenderEnums.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
@@ -306,6 +314,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Renderer\ShaderLight.h" />
     <ClInclude Include="Renderer\ShadowLightBuffer.h" />
     <ClInclude Include="Renderer\StaticBuffer.h" />
+    <ClInclude Include="Renderer\Utils.h" />
+    <ClInclude Include="Renderer\RenderTarget2D.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -380,6 +390,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Specific\winmain.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
+    <ClInclude Include="Renderer\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="framework.cpp">
@@ -387,12 +398,19 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Game\bubble.cpp" />
+    <ClCompile Include="Game\chaffFX.cpp" />
+    <ClCompile Include="Game\drip.cpp" />
+    <ClCompile Include="Game\explosion.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\trmath.cpp" />
+    <ClCompile Include="Game\smoke.cpp" />
+    <ClCompile Include="Game\spark.cpp" />
+    <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baboon.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_laradouble.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_sarcophagus.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_scales.cpp" />
@@ -520,6 +538,9 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\upv.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
+    <ClCompile Include="Renderer\IndexBuffer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Renderer\Render11Helper.cpp" />
     <ClCompile Include="Renderer\Renderer11Compatibility.cpp" />
     <ClCompile Include="Renderer\Renderer11Debug.cpp" />
@@ -532,6 +553,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Renderer\Renderer11Settings.cpp" />
     <ClCompile Include="Renderer\Renderer11String.cpp" />
     <ClCompile Include="Renderer\Renderer11Frame.cpp" />
+    <ClCompile Include="Renderer\Utils.cpp" />
+    <ClCompile Include="Renderer\RenderTarget2D.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
@@ -594,11 +617,15 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Specific\configuration.cpp" />
     <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
+    <ClCompile Include="Specific\IO\ChunkId.cpp" />
+    <ClCompile Include="Specific\IO\ChunkReader.cpp" />
+    <ClCompile Include="Specific\IO\Streams.cpp" />
     <ClCompile Include="Specific\level.cpp" />
     <ClCompile Include="Specific\levelloader.cpp" />
     <ClCompile Include="Specific\setup.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
+    <ClCompile Include="Renderer\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Objects\Effects\tr4_bubbles.cpp" />
