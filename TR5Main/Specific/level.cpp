@@ -1010,7 +1010,10 @@ int S_LoadLevelFile(int levelIndex)
 	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
 
 	// This function loops until progress is 100%. Not very thread safe, but behaviour should be predictable.
-	g_Renderer->DrawLoadingScreen((char*)(level->LoadScreenFileName.c_str()));
+	wchar_t loadscreenFileName[80];
+	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(),80);
+	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
+	g_Renderer->DrawLoadingScreen(loadScreenFile);
 
 	while (IsLevelLoading);
 
