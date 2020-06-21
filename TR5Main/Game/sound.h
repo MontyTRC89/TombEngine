@@ -2041,9 +2041,7 @@ typedef struct AudioTrack
 	byte Mask;
 };
 
-using namespace std;
-
-extern vector<AudioTrack> g_AudioTracks;
+extern std::vector<AudioTrack> g_AudioTracks;
 extern short SampleLUT[SOUND_NEW_SOUNDMAP_MAX_SIZE];
 extern short SoundMapSize;
 extern int NumSamplesInfos;

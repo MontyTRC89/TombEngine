@@ -8,7 +8,8 @@ enum RIPPLE_TYPE
 	RIPPLE_FLAG_SHORT_LIFE = 0x1,
 	RIPPLE_FLAG_RAND_ROT = 0x20,
 	RIPPLE_FLAG_RAND_POS = 0x40,
-	RIPPLE_FLAG_BLOOD = 0x80
+	RIPPLE_FLAG_BLOOD = 0x80,
+	RIPPLE_FLAG_LOW_OPACITY = 0x02
 };
 
 enum SpriteEnumFlag
@@ -55,6 +56,7 @@ typedef struct SPLASH_SETUP
 	float z;
 	float splashPower;
 	float innerRadius;
+	int room;
 };
 
 typedef struct RIPPLE_STRUCT
@@ -167,7 +169,7 @@ constexpr auto SD_UWEXPLOSION = 2;
 #define MAX_NODE 23
 #define MAX_DYNAMICS 64
 #define MAX_SPARKS 1024
-#define MAX_RIPPLES 32
+#define MAX_RIPPLES 256
 #define MAX_SPLASHES 8
 #define MAX_SPARKS_DYNAMICS 8
 
@@ -196,7 +198,7 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
 void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly);
-void SetupSplash(const SPLASH_SETUP* const setup);
+void SetupSplash(const SPLASH_SETUP* const setup,int room);
 void UpdateSplashes();
 void SetupRipple(int x, int y, int z, char size, char flags);
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme);
