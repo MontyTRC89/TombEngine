@@ -84,7 +84,7 @@ static void ImpThrowStones(ITEM_INFO* item)
 	short fxNum = CreateNewEffect(item->roomNumber);
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 		fx->pos.xPos = pos1.x;
 		fx->pos.yPos = pos1.y;
 		fx->pos.zPos = pos1.z;

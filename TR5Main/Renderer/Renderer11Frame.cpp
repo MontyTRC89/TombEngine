@@ -434,9 +434,9 @@ void Renderer11::collectEffects(short roomNumber)
 	ROOM_INFO * r = room.Room;
 
 	short fxNum = NO_ITEM;
-	for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = Effects[fxNum].nextFx)
+	for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 		
 		if (fx->objectNumber < 0)
 			continue;

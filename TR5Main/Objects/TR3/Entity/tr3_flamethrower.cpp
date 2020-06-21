@@ -157,7 +157,7 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 	short effectNumber = CreateNewEffect(item->roomNumber);
 	if (effectNumber != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[effectNumber];
+		FX_INFO* fx = &EffectList[effectNumber];
 
 		pos1.x = bite->x;
 		pos1.y = bite->y;
