@@ -34,7 +34,7 @@ struct GAMEFLOW
 };
 
 extern SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
-extern vector<string> g_NewStrings;
+extern std::vector<std::string> g_NewStrings;
 extern SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];
 
 int LoadSavegameInfos();
