@@ -1302,7 +1302,7 @@ bool Renderer11::drawDebris(bool transparent)
 			m_primitiveBatch->Begin();
 			m_context->VSSetShader(m_vsStatics, NULL, 0);
 			m_context->PSSetShader(m_psStatics, NULL, 0);
-			m_context->PSSetShaderResources(0, 1, &m_staticsTextures[0]->ShaderResourceView);
+			m_context->PSSetShaderResources(0, 1, m_staticsTextures[0].ShaderResourceView.GetAddressOf());
 			ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 			m_context->PSSetSamplers(0, 1, &sampler);
 			//m_stCameraMatrices.View = View.Transpose();

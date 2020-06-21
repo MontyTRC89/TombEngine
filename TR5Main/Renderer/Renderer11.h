@@ -14,10 +14,9 @@
 #include "effect.h"
 #include <IndexBuffer.h>
 #include "VertexBuffer.h"
-#include "RenderTarget2D.h"
+#include "RenderTarget2D/RenderTarget2D.h"
 #include "CameraMatrixBuffer.h"
-
-class RenderTarget2D;
+#include "Texture2D/Texture2D.h"
 
 #define MESH_BITS(x) (1 << x)
 #define DX11_RELEASE(x) if (x != NULL) x->Release()
@@ -57,100 +56,6 @@ struct RendererVertex
 };
 
 
-class Texture2D
-{
-public:
-	ID3D11ShaderResourceView* ShaderResourceView;
-	ID3D11Texture2D* Texture;
-
-	Texture2D()
-	{		
-		
-	}
-
-	~Texture2D()
-	{
-		DX11_RELEASE(ShaderResourceView);
-		DX11_RELEASE(Texture);
-	}
-
-	static Texture2D* LoadFromByteArray(ID3D11Device* device, int w, int h, byte* data)
-	{
-		Texture2D* texture = new Texture2D();
-
-		D3D11_TEXTURE2D_DESC desc;
-		desc.Width = w;
-		desc.Height = h;
-		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		desc.SampleDesc.Count = 1;
-		desc.SampleDesc.Quality = 0;
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		
-		D3D11_SUBRESOURCE_DATA subresourceData; 
-		subresourceData.pSysMem = data; 
-		subresourceData.SysMemPitch = w * 4; 
-		subresourceData.SysMemSlicePitch = 0;
-		
-		HRESULT res = device->CreateTexture2D(&desc, &subresourceData, &texture->Texture);
-		if (FAILED(res))
-			return NULL;
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
-		shaderDesc.Format = desc.Format;
-		shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		shaderDesc.Texture2D.MostDetailedMip = 0;
-		shaderDesc.Texture2D.MipLevels = 1;
-
-		res = device->CreateShaderResourceView(texture->Texture, &shaderDesc, &texture->ShaderResourceView);
-		if (FAILED(res))
-			return NULL;
-		
-		return texture;
-	}
-
-	static Texture2D* LoadFromFile(ID3D11Device* device, const char* fileName)
-	{
-		Texture2D* texture = new Texture2D();
-
-		wchar_t buffer[255];
-		size_t converted = 0;
-		mbstowcs_s(&converted, buffer, fileName, strlen(fileName));
-
-		ID3D11Resource* resource = NULL;
-		ID3D11DeviceContext* context = NULL;
-		device->GetImmediateContext(&context);
-
-		HRESULT res = CreateWICTextureFromFile(device, context, &buffer[0], &resource, &texture->ShaderResourceView, (size_t)0);
-		if (FAILED(res))
-			return NULL;
-
-		resource->QueryInterface(IID_ID3D11Texture2D, (void **)&texture->Texture);
-		
-		return texture;
-	}
-
-	static Texture2D* LoadFromMemory(ID3D11Device* device, byte* data, int length)
-	{
-		Texture2D* texture = new Texture2D();
-
-		ID3D11Resource* resource = NULL;
-		ID3D11DeviceContext* context = NULL;
-		device->GetImmediateContext(&context);
-
-		HRESULT res = CreateWICTextureFromMemory(device, context, data, length, &resource, &texture->ShaderResourceView, (size_t)0);
-		if (FAILED(res))
-			return NULL;
-
-		resource->QueryInterface(IID_ID3D11Texture2D, (void**)& texture->Texture);
-
-		return texture;
-	}
-};
 
 
 struct RendererHUDBar
@@ -338,7 +243,7 @@ struct RendererSprite
 	int Width;
 	int Height;
 	Vector2 UV[4];
-	Texture2D* Texture;
+	T5M::Renderer::Texture2D* Texture;
 };
 
 struct RendererSpriteSequence
@@ -456,10 +361,10 @@ private:
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11Texture2D* m_depthStencilTexture;
 
-	RenderTarget2D m_dumpScreenRenderTarget;
-	RenderTarget2D m_renderTarget;
-	RenderTarget2D m_currentRenderTarget;
-	RenderTarget2D m_shadowMap;
+	T5M::Renderer::RenderTarget2D m_dumpScreenRenderTarget;
+	T5M::Renderer::RenderTarget2D m_renderTarget;
+	T5M::Renderer::RenderTarget2D m_currentRenderTarget;
+	T5M::Renderer::RenderTarget2D m_shadowMap;
 
 	// Shaders
 	ID3D11VertexShader* m_vsRooms;
@@ -520,17 +425,17 @@ private:
 	PrimitiveBatch<RendererVertex>* m_primitiveBatch;
 
 	// System resources
-	Texture2D* m_HUDBarBorderTexture;
-	Texture2D* m_caustics[NUM_CAUSTICS_TEXTURES];
-	Texture2D* m_binocularsTexture;
-	Texture2D* m_whiteTexture;
+	T5M::Renderer::Texture2D m_HUDBarBorderTexture;
+	T5M::Renderer::Texture2D m_caustics[NUM_CAUSTICS_TEXTURES];
+	T5M::Renderer::Texture2D m_binocularsTexture;
+	T5M::Renderer::Texture2D m_whiteTexture;
 
 	// Level data
-	Texture2D* m_titleScreen;
-	Texture2D* m_loadScreen;
-	Texture2D* m_textureAtlas;
-	Texture2D* m_skyTexture;
-	Texture2D* m_logo;
+	T5M::Renderer::Texture2D m_titleScreen;
+	T5M::Renderer::Texture2D m_loadScreen;
+	T5M::Renderer::Texture2D m_textureAtlas;
+	T5M::Renderer::Texture2D m_skyTexture;
+	T5M::Renderer::Texture2D m_logo;
 	VertexBuffer m_roomsVertexBuffer;
 	IndexBuffer m_roomsIndexBuffer;
 	VertexBuffer m_moveablesVertexBuffer;
@@ -576,10 +481,10 @@ private:
 	RendererUnderwaterDustParticle m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 	bool m_firstUnderwaterDustParticles = true;
 	std::vector<RendererMesh*> m_meshes;
-	std::vector<Texture2D*> m_roomTextures;
-	std::vector<Texture2D*> m_moveablesTextures;
-	std::vector<Texture2D*> m_staticsTextures;
-	std::vector<Texture2D*> m_spritesTextures;
+	std::vector<T5M::Renderer::Texture2D> m_roomTextures;
+	std::vector<T5M::Renderer::Texture2D> m_moveablesTextures;
+	std::vector<T5M::Renderer::Texture2D> m_staticsTextures;
+	std::vector<T5M::Renderer::Texture2D> m_spritesTextures;
 
 	// Debug variables
 	int m_numDrawCalls = 0;
@@ -724,7 +629,7 @@ public:
 	void EnableCinematicBars(bool value);
 	void FadeIn();
 	void FadeOut();
-	void DrawLoadingScreen(char* fileName);
+	void DrawLoadingScreen(std::wstring& fileName);
 	void UpdateProgress(float value);
 	bool IsFading();
 	void GetLaraBonePosition(DirectX::SimpleMath::Vector3* pos, int bone);

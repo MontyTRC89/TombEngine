@@ -121,30 +121,28 @@ bool Renderer11::PrepareDataForTheRenderer()
 	for (int i = 0; i < RoomTextures.size(); i++)
 	{
 		TEXTURE* texture = &RoomTextures[i];
-		m_roomTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+		m_roomTextures.push_back(T5M::Renderer::Texture2D(m_device, texture->data.data(), texture->size));
 	}
 
 	for (int i = 0; i < MoveablesTextures.size(); i++)
 	{
 		TEXTURE* texture = &MoveablesTextures[i];
-		m_moveablesTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+		m_moveablesTextures.push_back(T5M::Renderer::Texture2D(m_device, texture->data.data(), texture->size));
 	}
 
 	for (int i = 0; i < StaticsTextures.size(); i++)
 	{
 		TEXTURE* texture = &StaticsTextures[i];
-		m_staticsTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+		m_staticsTextures.push_back(T5M::Renderer::Texture2D(m_device, texture->data.data(), texture->size));
 	}
 
 	for (int i = 0; i < SpritesTextures.size(); i++)
 	{
 		TEXTURE* texture = &SpritesTextures[i];
-		m_spritesTextures.push_back(Texture2D::LoadFromMemory(m_device, texture->data.data(), texture->size));
+		m_spritesTextures.push_back(T5M::Renderer::Texture2D(m_device, texture->data.data(), texture->size));
 	}
 
-	m_skyTexture = Texture2D::LoadFromMemory(m_device, MiscTextures.data.data(), MiscTextures.size);
-	if (m_skyTexture == NULL)
-		return false;
+	m_skyTexture = T5M::Renderer::Texture2D(m_device, MiscTextures.data.data(), MiscTextures.size);
 
 	// Step 2: prepare rooms
 	vector<RendererVertex> roomVertices;
@@ -798,7 +796,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		sprite->UV[1] = Vector2(oldSprite->x2, oldSprite->y2);
 		sprite->UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
 		sprite->UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
-		sprite->Texture = m_spritesTextures[oldSprite->tile];
+		sprite->Texture = &m_spritesTextures[oldSprite->tile];
 
 		m_sprites[i] = sprite;
 	}

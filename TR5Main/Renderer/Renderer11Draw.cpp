@@ -75,7 +75,7 @@ bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short
 	m_context->PSSetShader(m_psInventory, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -240,7 +240,7 @@ bool Renderer11::drawShadowMap()
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -357,33 +357,32 @@ bool Renderer11::drawShadowMap()
 
 bool Renderer11::DoTitleImage()
 {
-	Texture2D* texture = Texture2D::LoadFromFile(m_device, (char*)g_GameFlow->Intro);
-	if (!texture)
-		return false;
+	wchar_t wideString[255];
+	std::mbstowcs(wideString, g_GameFlow->Intro,255);
+	std::wstring introFilename = std::wstring(wideString);
+	Texture2D& texture = Texture2D(m_device, introFilename);
 
 	float currentFade = 0;
 	while (currentFade <= 1.0f)
 	{
-		drawFullScreenImage(texture->ShaderResourceView, currentFade);
+		drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade);
 		SyncRenderer();
 		currentFade += FADE_FACTOR;
 	}
 
 	for (int i = 0; i < 30 * 1.5f; i++)
 	{
-		drawFullScreenImage(texture->ShaderResourceView, 1.0f);
+		drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f);
 		SyncRenderer();
 	}
 
 	currentFade = 1.0f;
 	while (currentFade >= 0.0f)
 	{
-		drawFullScreenImage(texture->ShaderResourceView, currentFade);
+		drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade);
 		SyncRenderer();
 		currentFade -= FADE_FACTOR;
 	}
-
-	delete texture;
 
 	return true;
 }
@@ -478,7 +477,7 @@ int Renderer11::drawInventoryScene()
 	if (g_Inventory.GetType() == INV_TYPE_TITLE)
 	{
 		if (g_GameFlow->TitleType == TITLE_BACKGROUND)
-			drawFullScreenQuad(m_titleScreen->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
+			drawFullScreenQuad(m_titleScreen.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
 		else
 			drawFullScreenQuad(m_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(1.0f, 1.0f, 1.0f), false);
 	}
@@ -503,7 +502,7 @@ int Renderer11::drawInventoryScene()
 	m_context->PSSetShader(m_psInventory, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -1120,7 +1119,7 @@ int Renderer11::drawInventoryScene()
 		rect.bottom = 200 * factorY;
 
 		m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->Additive());
-		m_spriteBatch->Draw(m_logo->ShaderResourceView, rect, Vector4::One);
+		m_spriteBatch->Draw(m_logo.ShaderResourceView.Get(), rect, Vector4::One);
 		m_spriteBatch->End();
 	}
 
@@ -1750,13 +1749,11 @@ void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
 	m_lines3DToDraw.push_back(line);
 }
 
-void Renderer11::DrawLoadingScreen(char* fileName)
+void Renderer11::DrawLoadingScreen(std::wstring& fileName)
 {
 	return;
 
-	Texture2D* texture = Texture2D::LoadFromFile(m_device, fileName);
-	if (texture == NULL)
-		return;
+	const Texture2D& texture = Texture2D(m_device, fileName);
 
 	m_fadeStatus = RENDERER_FADE_STATUS::FADE_IN;
 	m_fadeFactor = 0.0f;
@@ -1783,7 +1780,7 @@ void Renderer11::DrawLoadingScreen(char* fileName)
 		m_context->RSSetViewports(1, &m_viewport);
 
 		// Draw the full screen background
-		drawFullScreenQuad(texture->ShaderResourceView, Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
+		drawFullScreenQuad(texture.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		m_swapChain->Present(0, 0);
@@ -1805,8 +1802,6 @@ void Renderer11::DrawLoadingScreen(char* fileName)
 			break;
 		}
 	}
-
-	delete texture;
 }
 
 void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -2129,7 +2124,7 @@ bool Renderer11::drawItems(bool transparent, bool animated)
 	m_context->PSSetShader(m_psItems, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2270,7 +2265,7 @@ bool Renderer11::drawStatics(bool transparent)
 	m_context->PSSetShader(m_psStatics, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_staticsTextures[0]->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_staticsTextures[0].ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState * sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2338,11 +2333,11 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 	m_context->PSSetShader(m_psRooms, NULL, 0);
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, &m_roomTextures[0]->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_roomTextures[0].ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
 	ID3D11SamplerState* shadowSampler = m_states->PointClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
-	m_context->PSSetShaderResources(1, 1, &m_caustics[m_currentCausticsFrame / 2]->ShaderResourceView);
+	m_context->PSSetShaderResources(1, 1, m_caustics[m_currentCausticsFrame / 2].ShaderResourceView.GetAddressOf());
 	m_context->PSSetSamplers(1, 1, &shadowSampler);
 	m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
@@ -2528,7 +2523,7 @@ bool Renderer11::drawHorizonAndSky()
 	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	m_context->PSSetShaderResources(0, 1, &m_skyTexture->ShaderResourceView);
+	m_context->PSSetShaderResources(0, 1, m_skyTexture.ShaderResourceView.GetAddressOf());
 	sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2559,7 +2554,7 @@ bool Renderer11::drawHorizonAndSky()
 		m_context->IASetInputLayout(m_inputLayout);
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		m_context->PSSetShaderResources(0, 1, &m_moveablesTextures[0]->ShaderResourceView);
+		m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
 		sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
