@@ -40,7 +40,7 @@ static void TriggerMutantRocket(PHD_3DPOS* src, short roomNumber, short counter)
     fxNumber = CreateNewEffect(roomNumber);
     if (fxNumber != NO_ITEM)
     {
-        fx = &Effects[fxNumber];
+        fx = &EffectList[fxNumber];
         fx->pos.xPos = src->xPos;
         fx->pos.yPos = src->yPos - (GetRandomControl() & 0x3F) - 32;
         fx->pos.zPos = src->zPos;
@@ -66,7 +66,7 @@ void TriggerMutantRocketEffects(short fxNumber, short xVel, short yVel, short zV
     //z = LaraItem->pos.zPos - Effects[m_fxNumber].pos.zPos;
     //if (x >= -0x4000u && x <= 0x4000 && z >= -0x4000u && z <= 0x4000)
 
-    fx = &Effects[fxNumber];
+    fx = &EffectList[fxNumber];
     sptr = &Sparks[GetFreeSpark()];
     sptr->on = TRUE;
     color = (GetRandomControl() & 0x3F) - 128;

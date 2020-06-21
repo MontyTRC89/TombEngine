@@ -40,7 +40,7 @@ typedef struct ShatterImpactInfo
 typedef struct DebrisMesh
 {
 	RENDERER_BUCKETS bucket;
-	std::array<RendererVertex, 3> vertices;
+	std::array<T5M::Renderer::RendererVertex, 3> vertices;
 };
 
 typedef struct DebrisFragment

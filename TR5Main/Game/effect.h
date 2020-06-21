@@ -21,7 +21,7 @@ struct FX_INFO
 };
 
 extern std::function<EffectFunction> effect_routines[];
-extern FX_INFO* Effects;
+extern FX_INFO* EffectList;
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
