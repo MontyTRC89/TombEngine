@@ -13,7 +13,7 @@
 #include "setup.h"
 #include "input.h"
 #include "sound.h"
-
+using std::vector;
 typedef enum MINECART_STATE {
 	CART_GETIN,
 	CART_GETOUT,

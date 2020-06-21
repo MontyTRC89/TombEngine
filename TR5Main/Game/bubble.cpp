@@ -4,7 +4,7 @@
 #include "control.h"
 #include "trmath.h"
 #include "objectslist.h"
-
+using std::vector;
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
 void UpdateBubbles()

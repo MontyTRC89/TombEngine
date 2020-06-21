@@ -5,7 +5,7 @@
 #include "configuration.h"
 #include "level.h"
 #include "winmain.h"
-
+using std::vector;
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[NUM_SOUND_FILTERS];
 SoundTrackSlot BASS_Soundtrack[NUM_SOUND_TRACK_TYPES];

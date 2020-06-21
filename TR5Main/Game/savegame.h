@@ -67,7 +67,7 @@ private:
 	static FileStream* m_stream;
 	static ChunkReader* m_reader;
 	static ChunkWriter* m_writer;
-	static vector<LuaVariable> m_luaVariables;
+	static std::vector<LuaVariable> m_luaVariables;
 
 	static ChunkId* m_chunkGameStatus;
 	static ChunkId* m_chunkItems;
