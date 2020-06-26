@@ -518,10 +518,9 @@ void ReadRooms()
 			room.floor.push_back(floor);
 		}
 
-		room.ambient.r = ReadInt8();
-		room.ambient.g = ReadInt8();
-		room.ambient.b = ReadInt8();
-		ReadInt8();
+		room.ambient.x = ReadFloat();
+		room.ambient.y = ReadFloat();
+		room.ambient.z = ReadFloat();
 
 		short numLights = ReadInt16();
 		room.lights.reserve(numLights);
