@@ -5,7 +5,8 @@
 #include "setup.h"
 #include "control.h"
 #include "objects.h"
-
+using std::vector;
+using std::stack;
 bool Renderer11::PrepareDataForTheRenderer()
 {
 	m_moveableObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * ID_NUMBER_OBJECTS);

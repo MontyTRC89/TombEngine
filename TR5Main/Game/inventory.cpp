@@ -16,7 +16,7 @@
 #include "lara2gun.h"
 #include "level.h"
 #include "input.h"
-
+using std::vector;
 Inventory g_Inventory;
 extern GameFlow* g_GameFlow;
 

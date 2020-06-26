@@ -15,7 +15,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-
+using std::vector;
 typedef enum QUAD_EFFECTS_POSITIONS {
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,

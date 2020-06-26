@@ -6,7 +6,7 @@ struct TEXTURE
 	int width;
 	int height;
 	int size;
-	vector<byte> data;
+	std::vector<byte> data;
 };
 
 struct TrTexturePage

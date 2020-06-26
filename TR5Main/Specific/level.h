@@ -113,7 +113,7 @@ extern int g_NumSpritesSequences;
 extern short* MeshBase;
 extern short** Meshes;
 extern int NumItems;
-extern vector<OBJECT_TEXTURE> ObjectTextures;
+extern std::vector<OBJECT_TEXTURE> ObjectTextures;
 extern ITEM_INFO* Items;
 extern int LevelItems;
 extern std::vector<ROOM_INFO> Rooms;
@@ -129,10 +129,10 @@ extern int nAIObjects;
 extern AIOBJECT* AIObjects;
 extern SPRITE* Sprites;
 
-extern vector<TEXTURE> RoomTextures;
-extern vector<TEXTURE> MoveablesTextures;
-extern vector<TEXTURE> StaticsTextures;
-extern vector<TEXTURE> SpritesTextures;
+extern std::vector<TEXTURE> RoomTextures;
+extern std::vector<TEXTURE> MoveablesTextures;
+extern std::vector<TEXTURE> StaticsTextures;
+extern std::vector<TEXTURE> SpritesTextures;
 extern TEXTURE MiscTextures;
 
 extern TrLevel g_Level;

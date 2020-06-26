@@ -8,7 +8,7 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
-
+using namespace std;
 extern GameFlow* g_GameFlow;
 GameScript* g_GameScript;
 bool WarningsAsErrors = false;

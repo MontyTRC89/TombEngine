@@ -9,7 +9,8 @@
 #include "lara.h"
 #include "sphere.h"
 #include "GameFlowScript.h"
-
+using std::vector;
+using std::pair;
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 
