@@ -50,72 +50,59 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 
 void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 {
-	short numDoors, *door, adjoiningRoom;
+	short numDoors, * door, adjoiningRoom;
 	int i, j;
 	bool adjoiningRoomFound;
 
 	roomArray[0] = roomNumber;
-	door = Rooms[roomNumber].door;
-	if (door)
+	ROOM_INFO* room = &Rooms[roomNumber];
+
+	for (i = 0; i < room->doors.size(); i++)
 	{
-		numDoors = *door;
-		door++;
+		adjoiningRoom = room->doors[i].room;
+		adjoiningRoomFound = false;
 
-		for (i = 0; i < numDoors; i++)
+		for (j = 0; j < *numRooms; j++)
 		{
-			adjoiningRoom = *door;
-			adjoiningRoomFound = false;
-
-			for (j = 0; j < *numRooms; j++)
+			if (roomArray[i] == adjoiningRoom)
 			{
-				if (roomArray[i] == adjoiningRoom)
-				{
-					adjoiningRoomFound = true;
-					break;
-				}
+				adjoiningRoomFound = true;
+				break;
 			}
-
-			if (!adjoiningRoomFound)
-				roomArray[*(numRooms++)] = adjoiningRoom;
-
-			door += 16;
 		}
+
+		if (!adjoiningRoomFound)
+			roomArray[*(numRooms++)] = adjoiningRoom;
 	}
 }
 
 void GetRoomList(short roomNumber, vector<short>* destRoomList)
 {
 	vector<short> roomList;
-	short numDoors, *door, adjoiningRoom;
+	short adjoiningRoom;
 	int i, j;
 	bool adjoiningRoomFound;
 
 	roomList.push_back(roomNumber);
-	door = Rooms[roomNumber].door;
-	if (door)
+	ROOM_INFO* room = &Rooms[roomNumber];
+
+	for (i = 0; i < room->doors.size(); i++)
 	{
-		numDoors = *door;
-		door++;
+		adjoiningRoom = room->doors[i].room;
+		adjoiningRoomFound = false;
 
-		for (i = 0; i < numDoors; i++)
+		for (j = 0; j < roomList.size(); j++)
 		{
-			adjoiningRoom = *door;
-			adjoiningRoomFound = false;
-
-			for (j = 0; j < roomList.size(); j++)
+			if (roomList[i] == adjoiningRoom)
 			{
-				if (roomList[i] == adjoiningRoom)
-				{
-					adjoiningRoomFound = true;
-					break;
-				}
+				adjoiningRoomFound = true;
+				break;
 			}
-
-			if (!adjoiningRoomFound)
-				roomList.push_back(adjoiningRoom);
-
-			door += 16;
 		}
+
+		if (!adjoiningRoomFound)
+			roomList.push_back(adjoiningRoom);
+
 	}
 
 	*destRoomList = roomList;

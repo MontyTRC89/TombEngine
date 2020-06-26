@@ -183,14 +183,11 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 	LEB128::Write(m_stream, FlipTimer);
 	LEB128::Write(m_stream, CurrentAtmosphere);
 	LEB128::Write(m_stream, CurrentSequence);
-	
+
 	// Now the sub-chunks
-	if (NumberRooms > 0)
-	{
-		for (int i = 0; i < NumberRooms; i++)
-			for (int j = 0; j < Rooms[i].numMeshes; j++)
-				m_writer->WriteChunk(m_chunkStaticFlags, &saveStaticFlag, i, j);
-	}
+	for (int i = 0; i < Rooms.size(); i++)
+		for (int j = 0; j < Rooms[i].mesh.size(); j++)
+			m_writer->WriteChunk(m_chunkStaticFlags, &saveStaticFlag, i, j);
 
 	for (int i = 0; i < 6; i++)
 		m_writer->WriteChunk(m_chunkSequenceSwitch, &saveSequenceSwitch, i, SequenceUsed[i]);
@@ -741,7 +738,7 @@ void SaveGame::saveStaticFlag(int arg1, int arg2)
 {
 	LEB128::Write(m_stream, arg1);
 	LEB128::Write(m_stream, arg2);
-	LEB128::Write(m_stream, Rooms[arg1].mesh[arg2].Flags);
+	LEB128::Write(m_stream, Rooms[arg1].mesh[arg2].flags);
 }
 
 bool SaveGame::readLaraChunks(ChunkId* chunkId, int maxSize, int arg)
@@ -851,7 +848,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 		short roomIndex = LEB128::ReadInt16(m_stream);
 		short staticIndex = LEB128::ReadInt16(m_stream);
 		short flags = LEB128::ReadInt16(m_stream);
-		Rooms[roomIndex].mesh[staticIndex].Flags = flags;
+		Rooms[roomIndex].mesh[staticIndex].flags = flags;
 
 		if (!flags)
 		{

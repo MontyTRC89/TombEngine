@@ -116,8 +116,7 @@ extern int NumItems;
 extern vector<OBJECT_TEXTURE> ObjectTextures;
 extern ITEM_INFO* Items;
 extern int LevelItems;
-extern int NumberRooms;
-extern ROOM_INFO* Rooms;
+extern std::vector<ROOM_INFO> Rooms;
 extern ANIM_STRUCT* Anims;
 extern CHANGE_STRUCT* Changes;
 extern RANGE_STRUCT* Ranges;
@@ -159,7 +158,6 @@ void LoadTextureInfos();
 void LoadAIObjects();
 FILE* FileOpen(const char* fileName);
 void FileClose(FILE* ptr);
-void FixUpRoom(ROOM_INFO* room, ROOM_INFO* roomData);
 void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
 
 unsigned CALLBACK LoadLevel(void* data);

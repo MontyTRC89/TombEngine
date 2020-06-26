@@ -512,16 +512,10 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 
 	roomsList.push_back(jeep->roomNumber);
 
-	door = Rooms[jeep->roomNumber].door;
-	if (door)
+	ROOM_INFO* room = &Rooms[jeep->roomNumber];
+	for (int i = 0; i < room->doors.size(); i++)
 	{
-		numDoors = *door;
-		door++;
-		for (int i = 0; i < numDoors; i++)
-		{
-			roomsList.push_back(*door);
-			door += 16;
-		}
+		roomsList.push_back(room->doors[i].room);
 	}
 
 	for (int i = 0; i < roomsList.size(); i++)
