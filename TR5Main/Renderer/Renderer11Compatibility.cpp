@@ -153,7 +153,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 	int baseRoomVertex = 0;
 	int baseRoomIndex = 0;
 
-	for (int i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < Rooms.size(); i++)
 	{
 		ROOM_INFO* room = &Rooms[i];
 
@@ -164,247 +164,223 @@ bool Renderer11::PrepareDataForTheRenderer()
 		r.Room = room;
 		r.AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
 		r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
-		r.Statics.resize(room->numMeshes);
+		r.Statics.resize(room->mesh.size());
 
-		if (room->NumVertices == 0)
+		if (room->vertices.size() == 0)
 			continue;
 
-		int lastRectangle = 0;
-		int lastTriangle = 0;
+		tr5_room_vertex * vertices = room->vertices.data();
 
-		tr5_room_layer * layers = (tr5_room_layer*)room->LayerOffset;
-
-		for (int l = 0; l < room->NumLayers; l++)
+		for (int n = 0; n < room->quads.size(); n++)
 		{
-			tr5_room_layer* layer = &layers[l];
-			if (layer->NumLayerVertices == 0)
-				continue;
+			tr4_mesh_face4* poly = &room->quads[n];
 
-			byte * polygons = (byte*)layer->PolyOffset;
-			tr5_room_vertex * vertices = (tr5_room_vertex*)layer->VerticesOffset;
+			// Get the real texture index and if double sided
+			short textureIndex = poly->Texture & 0x3FFF;
+			bool doubleSided = (poly->Texture & 0x8000) >> 15;
 
-			if (layer->NumLayerRectangles > 0)
+			// Get the object texture
+			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
+			int tile = texture->tileAndFlag & 0x7FFF;
+
+			// Create vertices
+			RendererBucket* bucket;
+
+			int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
+			int bucketIndex = RENDERER_BUCKET_SOLID;
+
+			if (!doubleSided)
 			{
-				for (int n = 0; n < layer->NumLayerRectangles; n++)
-				{
-					tr4_mesh_face4* poly = (tr4_mesh_face4*)polygons;
-
-					// Get the real texture index and if double sided
-					short textureIndex = poly->Texture & 0x3FFF;
-					bool doubleSided = (poly->Texture & 0x8000) >> 15;
-
-					// Get the object texture
-					OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-					int tile = texture->tileAndFlag & 0x7FFF;
-
-					// Create vertices
-					RendererBucket* bucket;
-
-					int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
-					int bucketIndex = RENDERER_BUCKET_SOLID;
-
-					if (!doubleSided)
-					{
-						if (texture->attribute == 2)
-							bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-						else
-							bucketIndex = RENDERER_BUCKET_SOLID;
-					}
-					else
-					{
-						if (texture->attribute == 2)
-							bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
-						else
-							bucketIndex = RENDERER_BUCKET_SOLID_DS;
-					}
-
-					if (animatedSetIndex == -1)
-					{
-						bucket = &r.Buckets[bucketIndex];
-					}
-					else
-					{
-						bucket = &r.AnimatedBuckets[bucketIndex];
-					}
-
-					// Calculate face normal
-					Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
-						vertices[poly->Vertices[0]].Vertex.y,
-						vertices[poly->Vertices[0]].Vertex.z);
-					Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
-						vertices[poly->Vertices[1]].Vertex.y,
-						vertices[poly->Vertices[1]].Vertex.z);
-					Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
-						vertices[poly->Vertices[2]].Vertex.y,
-						vertices[poly->Vertices[2]].Vertex.z);
-					Vector3 e1 = p1 - p0;
-					Vector3 e2 = p1 - p2;
-					Vector3 normal = e1.Cross(e2);
-					normal.Normalize();
-
-					int baseVertices = bucket->NumVertices;
-					for (int v = 0; v < 4; v++)
-					{
-						RendererVertex vertex;
-
-						vertex.Position.x = room->x + vertices[poly->Vertices[v]].Vertex.x;
-						vertex.Position.y = room->y + vertices[poly->Vertices[v]].Vertex.y;
-						vertex.Position.z = room->z + vertices[poly->Vertices[v]].Vertex.z;
-
-						vertex.Normal.x = vertices[poly->Vertices[v]].Normal.x;
-						vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
-						vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
-
-						vertex.UV.x = texture->vertices[v].x;
-						vertex.UV.y = texture->vertices[v].y;
-
-						vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
-						vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
-						vertex.Color.z = ((vertices[poly->Vertices[v]].Colour >> 0) & 0xFF) / 255.0f;
-						vertex.Color.w = 1.0f;
-
-						vertex.Bone = 0;
-
-						bucket->NumVertices++;
-						bucket->Vertices.push_back(vertex);
-					}
-
-					bucket->Indices.push_back(baseVertices);
-					bucket->Indices.push_back(baseVertices + 1);
-					bucket->Indices.push_back(baseVertices + 3);
-					bucket->Indices.push_back(baseVertices + 2);
-					bucket->Indices.push_back(baseVertices + 3);
-					bucket->Indices.push_back(baseVertices + 1);
-					bucket->NumIndices += 6;
-
-					RendererPolygon newPolygon;
-					newPolygon.Shape = SHAPE_RECTANGLE;
-					newPolygon.AnimatedSet = animatedSetIndex;
-					newPolygon.TextureId = textureIndex;
-					newPolygon.Indices[0] = baseVertices;
-					newPolygon.Indices[1] = baseVertices + 1;
-					newPolygon.Indices[2] = baseVertices + 2;
-					newPolygon.Indices[3] = baseVertices + 3;
-					bucket->Polygons.push_back(newPolygon);
-
-					polygons += sizeof(tr4_mesh_face4);
-				}
+				if (texture->attribute == 2)
+					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
+				else
+					bucketIndex = RENDERER_BUCKET_SOLID;
+			}
+			else
+			{
+				if (texture->attribute == 2)
+					bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
+				else
+					bucketIndex = RENDERER_BUCKET_SOLID_DS;
 			}
 
-			if (layer->NumLayerTriangles > 0)
+			if (animatedSetIndex == -1)
 			{
-				for (int n = 0; n < layer->NumLayerTriangles; n++)
-				{
-					tr4_mesh_face3* poly = (tr4_mesh_face3*)polygons;
-
-					// Get the real texture index and if double sided
-					short textureIndex = poly->Texture & 0x3FFF;
-					bool doubleSided = (poly->Texture & 0x8000) >> 15;
-
-					// Get the object texture
-					OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-					int tile = texture->tileAndFlag & 0x7FFF;
-
-					// Create vertices
-					RendererBucket* bucket;
-
-					int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
-					int bucketIndex = RENDERER_BUCKET_SOLID;
-
-					if (!doubleSided)
-					{
-						if (texture->attribute == 2)
-							bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-						else
-							bucketIndex = RENDERER_BUCKET_SOLID;
-					}
-					else
-					{
-						if (texture->attribute == 2)
-							bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
-						else
-							bucketIndex = RENDERER_BUCKET_SOLID_DS;
-					}
-
-					if (animatedSetIndex == -1)
-					{
-						bucket = &r.Buckets[bucketIndex];
-					}
-					else
-					{
-						bucket = &r.AnimatedBuckets[bucketIndex];
-					}
-
-					// Calculate face normal
-					Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
-						vertices[poly->Vertices[0]].Vertex.y,
-						vertices[poly->Vertices[0]].Vertex.z);
-					Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
-						vertices[poly->Vertices[1]].Vertex.y,
-						vertices[poly->Vertices[1]].Vertex.z);
-					Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
-						vertices[poly->Vertices[2]].Vertex.y,
-						vertices[poly->Vertices[2]].Vertex.z);
-					Vector3 e1 = p1 - p0;
-					Vector3 e2 = p1 - p2;
-					Vector3 normal = e1.Cross(e2);
-					normal.Normalize();
-
-					int baseVertices = bucket->NumVertices;
-					for (int v = 0; v < 3; v++)
-					{
-						RendererVertex vertex;
-
-						vertex.Position.x = room->x + vertices[poly->Vertices[v]].Vertex.x;
-						vertex.Position.y = room->y + vertices[poly->Vertices[v]].Vertex.y;
-						vertex.Position.z = room->z + vertices[poly->Vertices[v]].Vertex.z;
-
-						vertex.Normal.x = vertices[poly->Vertices[v]].Normal.x;
-						vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
-						vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
-
-						vertex.UV.x = texture->vertices[v].x;
-						vertex.UV.y = texture->vertices[v].y;
-
-						vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
-						vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
-						vertex.Color.z = ((vertices[poly->Vertices[v]].Colour >> 0) & 0xFF) / 255.0f;
-						vertex.Color.w = 1.0f;
-
-						vertex.Bone = 0;
-
-						bucket->NumVertices++;
-						bucket->Vertices.push_back(vertex);
-					}
-
-					bucket->Indices.push_back(baseVertices);
-					bucket->Indices.push_back(baseVertices + 1);
-					bucket->Indices.push_back(baseVertices + 2);
-					bucket->NumIndices += 3;
-
-					RendererPolygon newPolygon;
-					newPolygon.Shape = SHAPE_TRIANGLE;
-					newPolygon.AnimatedSet = animatedSetIndex;
-					newPolygon.TextureId = textureIndex;
-					newPolygon.Indices[0] = baseVertices;
-					newPolygon.Indices[1] = baseVertices + 1;
-					newPolygon.Indices[2] = baseVertices + 2;
-					bucket->Polygons.push_back(newPolygon);
-
-					polygons += sizeof(tr4_mesh_face3);
-				}
+				bucket = &r.Buckets[bucketIndex];
 			}
+			else
+			{
+				bucket = &r.AnimatedBuckets[bucketIndex];
+			}
+
+			// Calculate face normal
+			Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
+				vertices[poly->Vertices[0]].Vertex.y,
+				vertices[poly->Vertices[0]].Vertex.z);
+			Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
+				vertices[poly->Vertices[1]].Vertex.y,
+				vertices[poly->Vertices[1]].Vertex.z);
+			Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
+				vertices[poly->Vertices[2]].Vertex.y,
+				vertices[poly->Vertices[2]].Vertex.z);
+			Vector3 e1 = p1 - p0;
+			Vector3 e2 = p1 - p2;
+			Vector3 normal = e1.Cross(e2);
+			normal.Normalize();
+
+			int baseVertices = bucket->NumVertices;
+			for (int v = 0; v < 4; v++)
+			{
+				RendererVertex vertex;
+
+				vertex.Position.x = room->x + vertices[poly->Vertices[v]].Vertex.x;
+				vertex.Position.y = room->y + vertices[poly->Vertices[v]].Vertex.y;
+				vertex.Position.z = room->z + vertices[poly->Vertices[v]].Vertex.z;
+
+				vertex.Normal.x = vertices[poly->Vertices[v]].Normal.x;
+				vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
+				vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
+
+				vertex.UV.x = texture->vertices[v].x;
+				vertex.UV.y = texture->vertices[v].y;
+
+				vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
+				vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
+				vertex.Color.z = ((vertices[poly->Vertices[v]].Colour >> 0) & 0xFF) / 255.0f;
+				vertex.Color.w = 1.0f;
+
+				vertex.Bone = 0;
+
+				bucket->NumVertices++;
+				bucket->Vertices.push_back(vertex);
+			}
+
+			bucket->Indices.push_back(baseVertices);
+			bucket->Indices.push_back(baseVertices + 1);
+			bucket->Indices.push_back(baseVertices + 3);
+			bucket->Indices.push_back(baseVertices + 2);
+			bucket->Indices.push_back(baseVertices + 3);
+			bucket->Indices.push_back(baseVertices + 1);
+			bucket->NumIndices += 6;
+
+			RendererPolygon newPolygon;
+			newPolygon.Shape = SHAPE_RECTANGLE;
+			newPolygon.AnimatedSet = animatedSetIndex;
+			newPolygon.TextureId = textureIndex;
+			newPolygon.Indices[0] = baseVertices;
+			newPolygon.Indices[1] = baseVertices + 1;
+			newPolygon.Indices[2] = baseVertices + 2;
+			newPolygon.Indices[3] = baseVertices + 3;
+			bucket->Polygons.push_back(newPolygon);
 		}
 
-		if (room->numLights != 0)
+		for (int n = 0; n < room->triangles.size(); n++)
 		{
-			tr5_room_light* oldLight = room->light;
+			tr4_mesh_face3* poly = &room->triangles[n];
 
-			for (int l = 0; l < room->numLights; l++)
+			// Get the real texture index and if double sided
+			short textureIndex = poly->Texture & 0x3FFF;
+			bool doubleSided = (poly->Texture & 0x8000) >> 15;
+
+			// Get the object texture
+			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
+			int tile = texture->tileAndFlag & 0x7FFF;
+
+			// Create vertices
+			RendererBucket* bucket;
+
+			int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
+			int bucketIndex = RENDERER_BUCKET_SOLID;
+
+			if (!doubleSided)
+			{
+				if (texture->attribute == 2)
+					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
+				else
+					bucketIndex = RENDERER_BUCKET_SOLID;
+			}
+			else
+			{
+				if (texture->attribute == 2)
+					bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
+				else
+					bucketIndex = RENDERER_BUCKET_SOLID_DS;
+			}
+
+			if (animatedSetIndex == -1)
+			{
+				bucket = &r.Buckets[bucketIndex];
+			}
+			else
+			{
+				bucket = &r.AnimatedBuckets[bucketIndex];
+			}
+
+			// Calculate face normal
+			Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
+				vertices[poly->Vertices[0]].Vertex.y,
+				vertices[poly->Vertices[0]].Vertex.z);
+			Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
+				vertices[poly->Vertices[1]].Vertex.y,
+				vertices[poly->Vertices[1]].Vertex.z);
+			Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
+				vertices[poly->Vertices[2]].Vertex.y,
+				vertices[poly->Vertices[2]].Vertex.z);
+			Vector3 e1 = p1 - p0;
+			Vector3 e2 = p1 - p2;
+			Vector3 normal = e1.Cross(e2);
+			normal.Normalize();
+
+			int baseVertices = bucket->NumVertices;
+			for (int v = 0; v < 3; v++)
+			{
+				RendererVertex vertex;
+
+				vertex.Position.x = room->x + vertices[poly->Vertices[v]].Vertex.x;
+				vertex.Position.y = room->y + vertices[poly->Vertices[v]].Vertex.y;
+				vertex.Position.z = room->z + vertices[poly->Vertices[v]].Vertex.z;
+
+				vertex.Normal.x = vertices[poly->Vertices[v]].Normal.x;
+				vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
+				vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
+
+				vertex.UV.x = texture->vertices[v].x;
+				vertex.UV.y = texture->vertices[v].y;
+
+				vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
+				vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
+				vertex.Color.z = ((vertices[poly->Vertices[v]].Colour >> 0) & 0xFF) / 255.0f;
+				vertex.Color.w = 1.0f;
+
+				vertex.Bone = 0;
+
+				bucket->NumVertices++;
+				bucket->Vertices.push_back(vertex);
+			}
+
+			bucket->Indices.push_back(baseVertices);
+			bucket->Indices.push_back(baseVertices + 1);
+			bucket->Indices.push_back(baseVertices + 2);
+			bucket->NumIndices += 3;
+
+			RendererPolygon newPolygon;
+			newPolygon.Shape = SHAPE_TRIANGLE;
+			newPolygon.AnimatedSet = animatedSetIndex;
+			newPolygon.TextureId = textureIndex;
+			newPolygon.Indices[0] = baseVertices;
+			newPolygon.Indices[1] = baseVertices + 1;
+			newPolygon.Indices[2] = baseVertices + 2;
+			bucket->Polygons.push_back(newPolygon);
+		}
+
+		if (room->lights.size() != 0)
+		{
+			for (int l = 0; l < room->lights.size(); l++)
 			{
 				RendererLight light;
+				ROOM_LIGHT* oldLight = &room->lights[l];
 
-				if (oldLight->LightType == LIGHT_TYPES::LIGHT_TYPE_SUN)
+				if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 				{
 					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
@@ -413,38 +389,38 @@ bool Renderer11::PrepareDataForTheRenderer()
 
 					r.Lights.push_back(light);
 				}
-				else if (oldLight->LightType == LIGHT_TYPE_POINT)
+				else if (oldLight->type == LIGHT_TYPE_POINT)
 				{
 					light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Intensity = 1.0f;
-					light.In = oldLight->In;
-					light.Out = oldLight->Out;
+					light.In = oldLight->in;
+					light.Out = oldLight->out;
 					light.Type = LIGHT_TYPE_POINT;
 
 					r.Lights.push_back(light);
 				}
-				else if (oldLight->LightType == LIGHT_TYPE_SHADOW)
+				else if (oldLight->type == LIGHT_TYPE_SHADOW)
 				{
 					light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
-					light.In = oldLight->In;
-					light.Out = oldLight->Out;
+					light.In = oldLight->in;
+					light.Out = oldLight->out;
 					light.Type = LIGHT_TYPE_SHADOW;
 					light.Intensity = 1.0f;
 
 					r.Lights.push_back(light);
 				}
-				else if (oldLight->LightType == LIGHT_TYPE_SPOT)
+				else if (oldLight->type == LIGHT_TYPE_SPOT)
 				{
 					light.Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 					light.Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 					light.Direction = Vector4(oldLight->dx, oldLight->dy, oldLight->dz, 1.0f);
 					light.Intensity = 1.0f;
-					light.In = oldLight->In;
-					light.Out = oldLight->Out;
-					light.Range = oldLight->Range;
+					light.In = oldLight->in;
+					light.Out = oldLight->out;
+					light.Range = oldLight->range;
 					light.Type = LIGHT_TYPE_SPOT;
 
 					r.Lights.push_back(light);
