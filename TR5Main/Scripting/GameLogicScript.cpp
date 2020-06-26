@@ -1485,7 +1485,7 @@ short GameScriptItem::GetRoom()
 
 void GameScriptItem::SetRoom(short room)
 {
-	if (room < 0 || room >= NumberRooms)
+	if (room < 0 || room >= Rooms.size())
 	{
 		if (WarningsAsErrors)
 			throw runtime_error("invalid room number");

@@ -93,16 +93,10 @@ static void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 	vector<short> roomsList;
 	roomsList.push_back(skidoo->roomNumber);
 
-	short* door = Rooms[skidoo->roomNumber].door;
-	if (door)
+	ROOM_INFO* room = &Rooms[skidoo->roomNumber];
+	for (int i = 0; i < room->doors.size(); i++)
 	{
-		short numDoors = *door;
-		door++;
-		for (int i = 0; i < numDoors; i++)
-		{
-			roomsList.push_back(*door);
-			door += 16;
-		}
+		roomsList.push_back(room->doors[i].room);
 	}
 
 	for (int i = 0; i < roomsList.size(); i++)

@@ -896,67 +896,58 @@ void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, in
 
 void GetClosedDoorNormal(ROOM_INFO* room, short** dptr, byte* n, int z, int x, int absX, int absZ)
 {
-	*dptr = NULL;
+	/**dptr = NULL;
 
-	if (room->door)
-	{
-		if (room->door > 0)
+		int halfX = x >> 1;
+		int halfZ = z >> 1;
+
+		for (int i = 0; i < room->doors.size(); i++)
 		{
-			int numDoors = *(room->door);
-			short* door = &room->door[1];
+			ROOM_DOOR door = room->doors[i];
 
-			int halfX = x >> 1;
-			int halfZ = z >> 1;
+			int x1 = halfX + room->x + ((int)door.vertices[0].x + 128) & 0xFFFFFF00;
+			int x2 = halfX + room->x + ((int)door.vertices[2].x + 128) & 0xFFFFFF00;
 
-			for (int i = 0; i < numDoors; i++)
+			if (x1 > x2)
 			{
-				int x1 = halfX + room->x + (door[4] + 128) & 0xFFFFFF00;
-				int x2 = halfX + room->x + (door[10] + 128) & 0xFFFFFF00;
-
-				if (x1 > x2)
-				{
-					int temp = x1;
-					x1 = x2;
-					x2 = temp;
-				}
-
-				int z1 = halfZ + room->z + (door[6] + 128) & 0xFFFFFF00;
-				int z2 = halfZ + room->z + (door[12] + 128) & 0xFFFFFF00;
-
-				if (z1 > z2)
-				{
-					int temp = z1;
-					z1 = z2;
-					z2 = temp;
-				}
-
-				if (absX >= x1 && absX <= x2 && absZ >= z1 && absZ <= z2)
-				{
-					*dptr = &door[1];
-
-					if (door[1])
-					{
-						*n = (byte)door[1] & 0x81 | 1;
-					}
-					else if (door[2])
-					{
-						*n = (byte)door[2] & 0x82 | 2;
-					}
-					else
-					{
-						*n = (byte)door[3] & 0x84 | 4;
-					}
-				}
-
-				door += 16;
+				int temp = x1;
+				x1 = x2;
+				x2 = temp;
 			}
-		}
-	}
+
+			int z1 = halfZ + room->z + ((int)door.vertices[0].z + 128) & 0xFFFFFF00;
+			int z2 = halfZ + room->z + ((int)door.vertices[2].z + 128) & 0xFFFFFF00;
+
+			if (z1 > z2)
+			{
+				int temp = z1;
+				z1 = z2;
+				z2 = temp;
+			}
+
+			if (absX >= x1 && absX <= x2 && absZ >= z1 && absZ <= z2)
+			{
+				*dptr = &door[1];
+
+				if (door[1])
+				{
+					*n = (byte)door[1] & 0x81 | 1;
+				}
+				else if (door[2])
+				{
+					*n = (byte)door[2] & 0x82 | 2;
+				}
+				else
+				{
+					*n = (byte)door[3] & 0x84 | 4;
+				}
+			}
+		}*/
 }
 
 void ProcessClosedDoors()
 {
-	for (int i = 0; i < 32; i++)
+	/*for (int i = 0; i < 32; i++)
 	{
 		ITEM_INFO* item = ClosedDoors[i];
 		
@@ -982,7 +973,7 @@ void ProcessClosedDoors()
 			ItemNewRoom(item - Items, roomNumber);
 			item->inDrawRoom = false;
 		}
-	}
+	}*/
 }
 
 void AssignClosedDoor(ITEM_INFO* item)
