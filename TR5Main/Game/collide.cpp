@@ -59,11 +59,11 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 	for (int i = 0; i < numRooms; i++)
 	{
 		room = &Rooms[roomList[i]];
-		mesh = room->mesh;
-
-		for (int j = room->numMeshes; j > 0; j--, mesh++)
+		for (int j = room->mesh.size(); j > 0; j--, mesh++)
 		{
+			mesh = &room->mesh[j];
 			StaticInfo* sInfo = &StaticObjects[mesh->staticNumber];
+
 			if ((sInfo->flags & 1)) // No collision
 				continue;
 
@@ -112,12 +112,12 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 		{
 			room = &Rooms[roomsArray[i]];
 
-			for (int j = 0; j < room->numMeshes; j++)
+			for (int j = 0; j < room->mesh.size(); j++)
 			{
 				MESH_INFO* mesh = &room->mesh[j];
 				StaticInfo* staticMesh = &StaticObjects[mesh->staticNumber];
 
-				if (mesh->Flags & 1)
+				if (mesh->flags & 1)
 				{
 					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->y + staticMesh->yMinc)
 					{
@@ -1431,16 +1431,11 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 		short* door, numDoors;
 
 		roomsList.push_back(l->roomNumber);
-		door = Rooms[l->roomNumber].door;
-		if (door)
+
+		ROOM_INFO room = Rooms[l->roomNumber];
+		for (int i = 0; i < room.doors.size(); i++)
 		{
-			numDoors = *door;
-			door++;
-			for (int i = 0; i < numDoors; i++)
-			{
-				roomsList.push_back(*door);
-				door += 16;
-			}
+			roomsList.push_back(room.doors[i].room);
 		}
 
 		for (int i = 0; i < roomsList.size(); i++)
@@ -1467,12 +1462,11 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 
 			if (coll->enableSpaz)
 			{
-				MESH_INFO* mesh = Rooms[roomsList[i]].mesh;
-				int numMeshes = Rooms[roomsList[i]].numMeshes;
-
-				for (int j = 0; j < numMeshes; j++)
+				for (int j = 0; j < Rooms[roomsList[i]].mesh.size(); j++)
 				{
-					if (mesh->Flags & 1)
+					MESH_INFO* mesh = &Rooms[roomsList[i]].mesh[j];
+
+					if (mesh->flags & 1)
 					{
 						int x = l->pos.xPos - mesh->x;
 						int y = l->pos.yPos - mesh->y;

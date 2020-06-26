@@ -624,7 +624,7 @@ private:
 	void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 	void											updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 	bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
-	bool											checkPortal(short roomIndex, short* portal, DirectX::SimpleMath::Vector4* viewPort, DirectX::SimpleMath::Vector4* clipPort);
+	bool											checkPortal(short roomIndex, ROOM_DOOR* portal, DirectX::SimpleMath::Vector4* viewPort, DirectX::SimpleMath::Vector4* clipPort);
 	void											getVisibleRooms(int from, int to, DirectX::SimpleMath::Vector4* viewPort, bool water, int count);
 	void											collectRooms();
 	void											collectItems(short roomNumber);

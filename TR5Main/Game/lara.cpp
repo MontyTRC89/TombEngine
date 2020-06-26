@@ -692,13 +692,13 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 
-			if (height >= -STEP_SIZE || fheight >= -STEP_SIZE)
-			{
+//			if (height >= -STEP_SIZE || fheight >= -STEP_SIZE)
+//			{
 				if (TrInput & IN_WALK)
 					lara_as_walk(item, coll);
 				else
 					lara_as_run(item, coll);
-			}
+/*			}
 			else
 			{
 				Lara.moveAngle = 0;
@@ -717,7 +717,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 					coll->radius = LARA_RAD;
 					item->goalAnimState = STATE_LARA_STOP;
 				}
-			}
+			}*/
 		}
 		else if (TrInput & IN_BACK)
 		{
