@@ -162,7 +162,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		RendererRoom& r = m_rooms[i];
 		r.RoomNumber = i;
 		r.Room = room;
-		r.AmbientLight = Vector4(room->ambient.b / 255.0f, room->ambient.g / 255.0f, room->ambient.r / 255.0f, 1.0f);
+		r.AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
 		r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
 		r.Statics.resize(room->mesh.size());
 
