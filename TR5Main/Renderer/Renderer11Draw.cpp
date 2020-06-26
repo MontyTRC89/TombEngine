@@ -20,7 +20,7 @@
 #include "tr5_spider_emitter.h"
 #include "CameraMatrixBuffer.h"
 using namespace T5M::Renderer;
-
+using namespace std::chrono;
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_SFXVolumeBar;
@@ -1903,8 +1903,8 @@ int Renderer11::DrawInventory()
 
 bool Renderer11::drawScene(bool dump)
 {
-	using ns = chrono::nanoseconds;
-	using get_time = chrono::steady_clock;
+	using ns = std::chrono::nanoseconds;
+	using get_time = std::chrono::steady_clock;
 	m_timeUpdate = 0;
 	m_timeDraw = 0;
 	m_timeFrame = 0;
@@ -1925,7 +1925,7 @@ bool Renderer11::drawScene(bool dump)
 	m_stLights.CameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 	// Prepare the scene to draw
-	auto time1 = chrono::high_resolution_clock::now();
+	auto time1 = std::chrono::high_resolution_clock::now();
 	prepareCameraForFrame();
 	ProcessClosedDoors();
 
@@ -1948,8 +1948,8 @@ bool Renderer11::drawScene(bool dump)
 	if (GnFrameCounter % 2 == 0)
 		updateAnimatedTextures();
 
-	auto time2 = chrono::high_resolution_clock::now();
-	m_timeUpdate = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	auto time2 = std::chrono::high_resolution_clock::now();
+	m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
 
 	// Draw shadow map
@@ -2040,8 +2040,8 @@ bool Renderer11::drawScene(bool dump)
 	drawSprites();
 	drawLines3D();
 
-	time2 = chrono::high_resolution_clock::now();
-	m_timeFrame = (chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	time2 = std::chrono::high_resolution_clock::now();
+	m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 	time1 = time2;
 
 	// Bars

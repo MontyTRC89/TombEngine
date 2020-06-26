@@ -6,7 +6,7 @@
 #include "level.h"
 #include "tr5_smashobject.h"
 #include "tr5_pushableblock.h"
-
+using std::function;
 void InitSmashObject(ObjectInfo* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];

@@ -31,7 +31,7 @@
 #include "upv.h"
 #include "kayak.h"
 #include "minecart.h"
-
+using std::function;
 static short LeftClimbTab[4] = // offset 0xA0638
 {
 	0x0200, 0x0400, 0x0800, 0x0100
@@ -691,13 +691,13 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 
-			if (height >= -STEP_SIZE || fheight >= -STEP_SIZE)
-			{
+//			if (height >= -STEP_SIZE || fheight >= -STEP_SIZE)
+//			{
 				if (TrInput & IN_WALK)
 					lara_as_walk(item, coll);
 				else
 					lara_as_run(item, coll);
-			}
+/*			}
 			else
 			{
 				Lara.moveAngle = item->pos.yRot;
@@ -715,7 +715,7 @@ void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)
 					coll->radius = LARA_RAD;
 					item->goalAnimState = STATE_LARA_STOP;
 				}
-			}
+			}*/
 		}
 		else if (TrInput & IN_BACK)
 		{

@@ -15,7 +15,7 @@
 #include "level.h"
 #include "input.h"
 #include "sound.h"
-
+using std::vector;
 // TODO: recreate the DrawSkidoo for the snowmobile.
 
 enum SKIDOO_STATE { SKID_SIT, SKID_GETON, SKID_LEFT, SKID_RIGHT, SKID_FALL, SKID_HIT, SKID_GETONL, SKID_GETOFFL, SKID_STILL, SKID_GETOFF, SKID_LETGO, SKID_DEATH, SKID_FALLOFF };
