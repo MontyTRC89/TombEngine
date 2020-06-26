@@ -943,9 +943,9 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             }*/
         }
 
-/*        item->pos.xRot = oldXrot;
+        item->pos.xRot = oldXrot;
         item->pos.yRot = oldYrot;
-        item->pos.zRot = oldZrot;*/
+        item->pos.zRot = oldZrot;
         return;
     }
     
