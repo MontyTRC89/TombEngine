@@ -605,7 +605,7 @@ void RomanStatueControl(short itemNumber)
 				// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 				if (floor->stopper)
 				{
-					for (i = 0; i < room->numMeshes; i++)
+					for (i = 0; i < room->mesh.size(); i++)
 					{
 						mesh = &room->mesh[i];
 						
@@ -619,7 +619,7 @@ void RomanStatueControl(short itemNumber)
 									(PHD_3DPOS*)mesh,
 									0);
 
-								mesh->Flags &= ~1;
+								mesh->flags &= ~1;
 								floor->stopper = false;
 								GetFloorHeight(floor, pos.x, pos.y, pos.z);
 								TestTriggers(TriggerIndex, 1, 0);

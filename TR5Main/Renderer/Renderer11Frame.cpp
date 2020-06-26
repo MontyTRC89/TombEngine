@@ -12,7 +12,7 @@ void Renderer11::collectRooms()
 {
 	short baseRoomIndex = Camera.pos.roomNumber;
 
-	for (int i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < Rooms.size(); i++)
 	{
 		m_rooms[i].Visited = false;
 		m_rooms[i].LightsToDraw.clear();
@@ -77,9 +77,9 @@ void Renderer11::collectStatics(short roomNumber)
 	}
 	RendererRoom& const room = m_rooms[roomNumber];
 	ROOM_INFO* r = room.Room;
-	if (r->numMeshes <= 0)
+	if (r->mesh.size() <= 0)
 		return;
-	int numStatics = r->numMeshes;
+	int numStatics = r->mesh.size();
 	for (int i = 0; i < numStatics; i++)
 	{
 		MESH_INFO* mesh = &r->mesh[i];
@@ -110,7 +110,7 @@ void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect * effec
 
 	ROOM_INFO* r = room.Room;
 
-	if (r->numLights <= 0)
+	if (r->lights.size() <= 0)
 		return;
 
 	m_tempItemLights.clear();
@@ -212,7 +212,7 @@ void Renderer11::collectLightsForItem(short roomNumber, RendererItem * item)
 
 	ROOM_INFO* r = room.Room;
 
-	if (r->numLights <= 0)
+	if (r->lights.size() <= 0)
 		return;
 
 	m_tempItemLights.clear();
