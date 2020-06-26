@@ -189,7 +189,7 @@ typedef struct ROOM_INFO
 	short xSize;
 	short ySize;
 	std::vector<FLOOR_INFO> floor;
-	CVECTOR ambient;
+	Vector3 ambient;
 	std::vector<ROOM_LIGHT> lights;
 	std::vector<MESH_INFO> mesh;
 	short flippedRoom;
