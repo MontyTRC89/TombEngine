@@ -6,7 +6,8 @@
 #include "sound.h"
 #include "savegame.h"
 #include "draw.h"
-
+using std::string;
+using std::vector;
 ChunkId* ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
 ChunkId* ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");
 ChunkId* ChunkGameFlowLevelFlags = ChunkId::FromString("Tr5MainLevelFlags");
@@ -328,6 +329,8 @@ bool __cdecl LoadScript()
 
 string GameFlow::loadScriptFromFile(char* luaFilename)
 {
+	using std::ifstream;
+	using std::ios;
 	ifstream ifs(luaFilename, ios::in | ios::binary | ios::ate);
 
 	ifstream::pos_type fileSize = ifs.tellg();

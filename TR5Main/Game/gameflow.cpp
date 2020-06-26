@@ -5,7 +5,8 @@
 #include "input.h"
 
 #include "level.h"
-
+using std::string;
+using std::vector;
 SavegameInfo g_SavegameInfos[MAX_SAVEGAMES];
 SaveGameHeader g_NewSavegameInfos[MAX_SAVEGAMES];
 vector<string> g_NewStrings;

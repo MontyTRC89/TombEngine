@@ -4,7 +4,7 @@
 #include "level.h"
 #include "lara.h"
 #include "draw.h"
-
+using std::vector;
 short GF(short animIndex, short frameToStart)
 {
 	return Anims[animIndex].frameBase + frameToStart;

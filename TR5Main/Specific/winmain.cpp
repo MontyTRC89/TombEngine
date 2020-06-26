@@ -11,7 +11,10 @@
 #include "level.h"
 #include "configuration.h"
 #include "Renderer11.h"
-
+using std::exception;
+using std::string;
+using std::cout;
+using std::endl;
 WINAPP App;
 unsigned int ThreadID;
 uintptr_t ThreadHandle;

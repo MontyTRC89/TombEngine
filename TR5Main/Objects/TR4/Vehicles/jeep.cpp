@@ -15,7 +15,7 @@
 #include "sound.h"
 #include "setup.h"
 #include "level.h"
-
+using std::vector;
 typedef struct JEEP_INFO
 {
 	short rot1;

@@ -47,14 +47,14 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol2;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)\TR5Main\Libs\zlib;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua</LibraryPath>
     <OutDir>$(ProjectDir)..\Build\</OutDir>
   </PropertyGroup>
@@ -71,7 +71,7 @@
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -105,7 +105,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -617,6 +617,9 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Specific\configuration.cpp" />
     <ClCompile Include="Specific\Init.cpp" />
     <ClCompile Include="Specific\input.cpp" />
+    <ClCompile Include="Specific\IO\ChunkId.cpp" />
+    <ClCompile Include="Specific\IO\ChunkReader.cpp" />
+    <ClCompile Include="Specific\IO\Streams.cpp" />
     <ClCompile Include="Specific\level.cpp" />
     <ClCompile Include="Specific\levelloader.cpp" />
     <ClCompile Include="Specific\setup.cpp" />
