@@ -629,21 +629,17 @@ void SkeletonControl(short itemNumber)
 				FLOOR_INFO* floor = &room->floor[((z - room->z) >> 10) + room->ySize * ((x - room->x) >> 10)];
 				if (floor->stopper)
 				{
-					MESH_INFO* staticMesh = room->mesh;
-					if (room->numMeshes > 0)
+					for (int i = 0; i < room->mesh.size(); i++)
 					{
-						for (int i = 0; i < room->numMeshes; i++)
+						MESH_INFO* staticMesh = &room->mesh[i];
+						if (abs(pos.x - staticMesh->x) < 1024 && abs(pos.z - staticMesh->z) < 1024 && staticMesh->staticNumber >= 50)
 						{
-							staticMesh = &room->mesh[i];
-							if (abs(pos.x - staticMesh->x) < 1024 && abs(pos.z - staticMesh->z) < 1024 && staticMesh->staticNumber >= 50)
-							{
-								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
-								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
-								staticMesh->Flags &= ~1;
-								floor->stopper = 0;
-								GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-								TestTriggers(TriggerIndex, 1, 0);
-							}
+							ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
+							SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
+							staticMesh->flags &= ~1;
+							floor->stopper = 0;
+							GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+							TestTriggers(TriggerIndex, 1, 0);
 						}
 					}
 				}

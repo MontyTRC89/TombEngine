@@ -78,7 +78,7 @@ void Renderer11::createBillboardMatrix(Matrix* out, Vector3* particlePos, Vector
 void Renderer11::updateAnimatedTextures()
 {
 	// Update room's animated textures
-	for (int i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < Rooms.size(); i++)
 	{
 		if (m_rooms.size() <= i) continue;
 		RendererRoom & const room = m_rooms[i];
@@ -889,43 +889,32 @@ void Renderer11::getVisibleRooms(int from, int to, Vector4* viewPort, bool water
 
 		Vector4 clipPort;
 
-		if (room->door != NULL)
+		for (int i = 0; i < room->doors.size(); i++) 
 		{
-			short numDoors = *(room->door);
-			if (numDoors)
+			short adjoiningRoom = room->doors[i].room;
+
+			if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort))
 			{
-				short* door = room->door + 1;
-				for (int i = 0; i < numDoors; i++) {
-					short adjoiningRoom = *(door);
+				RendererRoomNode* childNode = &nodes[nextNode++];
+				childNode->From = node->To;
+				childNode->To = adjoiningRoom;
 
-					if (node->From != adjoiningRoom && checkPortal(node->To, door, viewPort, &node->ClipPort))
-					{
-						RendererRoomNode* childNode = &nodes[nextNode++];
-						childNode->From = node->To;
-						childNode->To = adjoiningRoom;
-
-						// Push
-						stack[stackDepth++] = childNode;
-					}
-
-					door += 16;
-				}
+				// Push
+				stack[stackDepth++] = childNode;
 			}
 		}
 	}
 }
 
-bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, Vector4* clipPort)
+bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort)
 {
 	ROOM_INFO* room = &Rooms[roomIndex];
 
-	portal++;
-
-	Vector3 n = Vector3(portal[0], portal[1], portal[2]);
+	Vector3 n = portal->normal;
 	Vector3 v = Vector3(
-		Camera.pos.x - (room->x + portal[3]),
-		Camera.pos.y - (room->y + portal[4]),
-		Camera.pos.z - (room->z + portal[5]));
+		Camera.pos.x - (room->x + portal->vertices[0].x),
+		Camera.pos.y - (room->y + portal->vertices[0].y),
+		Camera.pos.z - (room->z + portal->vertices[0].z));
 
 	// Test camera and normal positions and decide if process door or not
 	if (n.Dot(v) <= 0.0f)
@@ -939,12 +928,10 @@ bool Renderer11::checkPortal(short roomIndex, short* portal, Vector4* viewPort, 
 	clipPort->z = FLT_MIN;
 	clipPort->w = FLT_MIN;
 
-	portal += 3;
-
 	// Project all portal's corners in screen space
-	for (int i = 0; i < 4; i++, portal += 3) 
+	for (int i = 0; i < 4; i++) 
 	{
-		Vector4 tmp = Vector4(portal[0] + room->x, portal[1] + room->y, portal[2] + room->z, 1.0f);
+		Vector4 tmp = Vector4(portal->vertices[i].x + room->x, portal->vertices[i].y + room->y, portal->vertices[i].z + room->z, 1.0f);
 
 		// Project corner on screen
 		Vector4::Transform(tmp, ViewProjection, p[i]);

@@ -317,7 +317,7 @@ void ControlGladiator(short itemNumber)
 					floor = &XZ_GET_SECTOR(r, pos.x - r->x, pos.z - r->z);
 					if (floor->stopper)
 					{
-						for (i = 0; i < r->numMeshes; i++)
+						for (i = 0; i < r->mesh.size(); i++)
 						{
 							mesh = &r->mesh[i];
 
@@ -329,7 +329,7 @@ void ControlGladiator(short itemNumber)
 									{
 										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
-										mesh->Flags &= 0xFEu;
+										mesh->flags &= 0xFEu;
 										GetFloorHeight(floor, pos.x, pos.y, pos.z);
 										TestTriggers(TriggerIndex, 1, 0);
 									}
