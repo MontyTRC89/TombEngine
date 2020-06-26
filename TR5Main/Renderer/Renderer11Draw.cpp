@@ -2282,7 +2282,7 @@ bool Renderer11::drawStatics(bool transparent)
 	{
 		MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
 
-		if (!(msh->Flags & 1))
+		if (!(msh->flags & 1))
 			continue;
 
 		RendererRoom& const room = m_rooms[m_staticsToDraw[i]->RoomIndex];

@@ -44,7 +44,7 @@ void SphinxControl(short itemNumber)
 	{
 		ROOM_INFO* room = &Rooms[item->roomNumber];
 
-		for (int i = 0; i < room->numMeshes; i++)
+		for (int i = 0; i < room->mesh.size(); i++)
 		{
 			MESH_INFO* mesh = &room->mesh[i];
 
@@ -53,7 +53,7 @@ void SphinxControl(short itemNumber)
 				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
 				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
-				mesh->Flags &= ~0x100;
+				mesh->flags &= ~0x100;
 				floor->stopper = false;
 
 				TestTriggers(TriggerIndex, 1, 0);

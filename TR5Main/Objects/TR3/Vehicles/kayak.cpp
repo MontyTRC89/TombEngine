@@ -1073,17 +1073,10 @@ static void KayakToBaddieCollision(ITEM_INFO* kayak)
 
 	roomsList.push_back(kayak->roomNumber);
 
-	/* -------- get nearby rooms */
-	door = Rooms[kayak->roomNumber].door;
-	if (door)
+	ROOM_INFO* room = &Rooms[kayak->roomNumber];
+	for (int i = 0; i < room->doors.size(); i++)
 	{
-		numDoors = *door;
-		door++;
-		for (int i = 0; i < numDoors; i++)
-		{
-			roomsList.push_back(*door);
-			door += 16;
-		}
+		roomsList.push_back(room->doors[i].room);
 	}
 
 	/* -------- collide with all baddies in these rooms */
