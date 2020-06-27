@@ -14,6 +14,7 @@
 #include "sound.h"
 #include "levelloader.h"
 #include "GameFlowScript.h"
+using T5M::Renderer::g_Renderer;
 using std::vector;
 using std::string;
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
@@ -737,7 +738,7 @@ void FreeLevel()
 	StaticsTextures.clear();
 	SpritesTextures.clear();
 	ObjectTextures.clear();
-	g_Renderer->FreeRendererData();
+	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
 
@@ -867,7 +868,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	LevelDataPtr = NULL;
 	LevelFilePtr = NULL;
 
-	g_Renderer->UpdateProgress(0);
+	g_Renderer.UpdateProgress(0);
 
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
@@ -881,7 +882,7 @@ unsigned CALLBACK LoadLevel(void* data)
 		
 		LoadTextures();
 
-		g_Renderer->UpdateProgress(20);
+		g_Renderer.UpdateProgress(20);
 
 		short buffer[32];
 		ReadFileEx(&buffer, 2, 16, LevelFilePtr);
@@ -898,27 +899,27 @@ unsigned CALLBACK LoadLevel(void* data)
 		ReadFileEx(LevelDataPtr, uncompressedSize, 1, LevelFilePtr);
 
 		LoadRooms();
-		g_Renderer->UpdateProgress(40);
+		g_Renderer.UpdateProgress(40);
 
 		LoadObjects();
-		g_Renderer->UpdateProgress(50);
+		g_Renderer.UpdateProgress(50);
 
 		InitialiseLOTarray(true);
 		LoadSprites();
 		LoadCameras();
 		LoadSoundEffects();
-		g_Renderer->UpdateProgress(60);
+		g_Renderer.UpdateProgress(60);
 
 		LoadBoxes();
 		LoadAnimatedTextures();
 		LoadTextureInfos();
-		g_Renderer->UpdateProgress(70);
+		g_Renderer.UpdateProgress(70);
 
 		LoadItems();
 		LoadAIObjects();
 		//LoadDemoData();
 		LoadSamples();
-		g_Renderer->UpdateProgress(80);
+		g_Renderer.UpdateProgress(80);
 
 		int extraSize = 0;
 		ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
@@ -948,8 +949,8 @@ unsigned CALLBACK LoadLevel(void* data)
 	loader->Load();
 	delete loader;
 	*/
-	g_Renderer->UpdateProgress(90);
-	g_Renderer->PrepareDataForTheRenderer();
+	g_Renderer.UpdateProgress(90);
+	g_Renderer.PrepareDataForTheRenderer();
 	
 	// Initialise the game
 	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
@@ -969,7 +970,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 	// Level loaded
 	IsLevelLoading = false;
-	g_Renderer->UpdateProgress(100);
+	g_Renderer.UpdateProgress(100);
 
 	_endthreadex(1);
 
@@ -1084,7 +1085,10 @@ int S_LoadLevelFile(int levelIndex)
 	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
 
 	// This function loops until progress is 100%. Not very thread safe, but behaviour should be predictable.
-	g_Renderer->DrawLoadingScreen((char*)(level->LoadScreenFileName.c_str()));
+	wchar_t loadscreenFileName[80];
+	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(),80);
+	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
+	g_Renderer.DrawLoadingScreen(loadScreenFile);
 
 	while (IsLevelLoading);
 
