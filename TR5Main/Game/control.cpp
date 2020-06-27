@@ -47,6 +47,7 @@ using std::vector;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
+using T5M::Renderer::g_Renderer;
 short ShatterSounds[18][10] =
 	{
 		{SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS},
@@ -209,7 +210,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		// Does the player want to enter inventory?
 		SetDebounce = false;
-		if (CurrentLevel != 0 && !g_Renderer->IsFading())
+		if (CurrentLevel != 0 && !g_Renderer.IsFading())
 		{
 			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
@@ -340,7 +341,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Clear dynamic lights
 		ClearDynamicLights();
 		ClearFires();
-		g_Renderer->ClearDynamicLights();
+		g_Renderer.ClearDynamicLights();
 
 		GotLaraSpheres = false;
 
@@ -380,8 +381,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		short fxNum = NextFxActive;
 		while (fxNum != NO_ITEM)
 		{
-			short nextFx = Effects[fxNum].nextActive;
-			FX_INFO *fx = &Effects[fxNum];
+			short nextFx = EffectList[fxNum].nextActive;
+			FX_INFO *fx = &EffectList[fxNum];
 			if (Objects[fx->objectNumber].control)
 				Objects[fx->objectNumber].control(fxNum);
 			fxNum = nextFx;
@@ -542,7 +543,7 @@ unsigned CALLBACK GameMain(void *)
 	TIME_Init();
 
 	// Do a fixed time title image
-	g_Renderer->DoTitleImage();
+	g_Renderer.DoTitleImage();
 
 	// Execute the LUA gameflow and play the game
 	g_GameFlow->DoGameflow();
@@ -705,18 +706,18 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	int nframes = 2;
 
 	// First control phase
-	g_Renderer->ResetAnimations();
+	g_Renderer.ResetAnimations();
 	GAME_STATUS result = ControlPhase(nframes, 0);
 
 	// Fade in screen
-	g_Renderer->FadeIn();
+	g_Renderer.FadeIn();
 
 	// The game loop, finally!
 	while (true)
 	{
 		nframes = DrawPhaseGame();
 
-		g_Renderer->ResetAnimations();
+		g_Renderer.ResetAnimations();
 		result = ControlPhase(nframes, 0);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
@@ -2890,7 +2891,7 @@ void AnimateItem(ITEM_INFO *item)
 
 	// Update matrices
 	short itemNumber = item - Items;
-	g_Renderer->UpdateItemAnimations(itemNumber, true);
+	g_Renderer.UpdateItemAnimations(itemNumber, true);
 }
 
 void DoFlipMap(short group)
@@ -2919,7 +2920,7 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(r);
 
-			g_Renderer->FlipRooms(i, r->flippedRoom);
+			g_Renderer.FlipRooms(i, r->flippedRoom);
 		}
 	}
 

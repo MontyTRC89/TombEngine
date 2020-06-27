@@ -4,7 +4,7 @@
 #include "camera.h"
 #include "level.h"
 #include "Renderer11.h"
-
+using T5M::Renderer::g_Renderer;
 BITE_INFO EnemyBites[9] =
 {
 	{ 20, -95, 240, 13 },
@@ -32,8 +32,8 @@ int GnFrameCounter;
 
 int DrawPhaseGame()
 {
-	g_Renderer->Draw();
-	Camera.numberFrames = g_Renderer->SyncRenderer();
+	g_Renderer.Draw();
+	Camera.numberFrames = g_Renderer.SyncRenderer();
 	return Camera.numberFrames;
 }
 
@@ -169,7 +169,7 @@ void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum)
 		LM_enum = LM_HEAD;
 
 	Vector3 p = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer->GetLaraAbsBonePosition(&p, LM_enum);
+	g_Renderer.GetLaraAbsBonePosition(&p, LM_enum);
 
 	pos->x = p.x;
 	pos->y = p.y;
