@@ -14,6 +14,7 @@
 #include "spark.h"
 #include "explosion.h"
 #include <Game\drip.h>
+using T5M::Renderer::g_Renderer;
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
 
@@ -85,7 +86,7 @@ void DetatchSpark(int num, SpriteEnumFlag type)// (F) (D)
 					}
 					else
 					{
-						fx = &Effects[num];
+						fx = &EffectList[num];
 						sptr->x += fx->pos.xPos;
 						sptr->y += fx->pos.yPos;
 						sptr->z += fx->pos.zPos;
@@ -1414,7 +1415,7 @@ void KillAllCurrentItems(short itemNumber)
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
-	g_Renderer->AddDynamicLight(x, y, z, falloff, r, g, b);
+	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
 // Really needed?

@@ -891,7 +891,7 @@ typedef struct LaraInfo
 	DiaryInfo Diary;
 	WaterskinInfo Waterskin1;
 	WaterskinInfo Waterskin2;
-	RendererMesh* MeshesPointers[NUM_LARA_MESHES];
+	T5M::Renderer::RendererMesh* MeshesPointers[NUM_LARA_MESHES];
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];
