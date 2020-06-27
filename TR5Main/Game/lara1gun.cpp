@@ -708,7 +708,7 @@ void ControlGrenade(short itemNumber)
 								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 								SmashedMesh[SmashedMeshCount] = currentMesh;
 								SmashedMeshCount++;
-								currentMesh->Flags &= ~1;
+								currentMesh->flags &= ~1;
 							}
 
 							k++;
@@ -1214,7 +1214,7 @@ void ControlCrossbowBolt(short itemNumber)
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
 						SmashedMeshCount++;
-						currentMesh->Flags &= ~1;
+						currentMesh->flags &= ~1;
 					}
 
 					k++;

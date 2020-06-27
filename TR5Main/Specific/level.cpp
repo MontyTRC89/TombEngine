@@ -52,8 +52,7 @@ char* LevelDataPtr;
 vector<OBJECT_TEXTURE> ObjectTextures;
 ITEM_INFO* Items;
 int LevelItems;
-int NumberRooms;
-ROOM_INFO* Rooms;
+std::vector<ROOM_INFO> Rooms;
 ANIM_STRUCT* Anims;
 CHANGE_STRUCT* Changes;
 RANGE_STRUCT* Ranges;
@@ -89,6 +88,13 @@ short ReadInt8()
 short ReadInt16()
 {
 	short value = *(short*)LevelDataPtr;
+	LevelDataPtr += 2;
+	return value;
+}
+
+unsigned short ReadUInt16()
+{
+	unsigned short value = *(unsigned short*)LevelDataPtr;
 	LevelDataPtr += 2;
 	return value;
 }
@@ -146,11 +152,11 @@ int LoadItems()
 			InitialiseItem(i);
 	}
 
-	for (int r = 0; r < NumberRooms; r++)
+	for (int r = 0; r < Rooms.size(); r++)
 	{
-		MESH_INFO* mesh = Rooms[r].mesh;
+		MESH_INFO* mesh = Rooms[r].mesh.data();
 
-		for (int m = 0; m < Rooms[r].numMeshes; m++)
+		for (int m = 0; m < Rooms[r].mesh.size(); m++)
 		{
 			FLOOR_INFO* floor = &Rooms[r].floor[((mesh->z - Rooms[r].z) >> 10) + Rooms[r].xSize * ((mesh->x - Rooms[r].x) >> 10)];
 			 
@@ -398,109 +404,177 @@ void LoadTextures()
 	free(buffer);
 }
 
-void ReadRoom(ROOM_INFO* room, ROOM_INFO* roomData)
-{
-	/*ADD_PTR(roomData->door, short, roomData + 1);
-	ADD_PTR(roomData->floor, FLOOR_INFO, roomData + 1);
-	ADD_PTR(roomData->light, LIGHTINFO, roomData + 1);
-	ADD_PTR(roomData->mesh, MESH_INFO, roomData + 1);
-	ADD_PTR(roomData->Separator4, void, roomData + 1);
-	ADD_PTR(roomData->LayerOffset, tr5_room_layer, roomData + 1);
-	ADD_PTR(roomData->PolyOffset, void, roomData + 1);
-	ADD_PTR(roomData->PolyOffset2, void, roomData + 1);
-	ADD_PTR(roomData->VerticesOffset, tr5_room_vertex, roomData + 1);
-
-	roomData->LightDataSize += (int)(roomData + 1);
-
-	if ((byte)roomData->door & 1)
-	{
-		////DB_Log(0, "%X", roomData->door);
-		roomData->door = 0;
-	}
-
-	byte* polyOff = (byte*)roomData->PolyOffset;
-	byte* polyOff2 = (byte*)roomData->PolyOffset2;
-	byte* vertOff = (byte*)roomData->VerticesOffset;
-
-	for (int i = 0; i < roomData->NumLayers; i++)
-	{
-		roomData->LayerOffset[i].PolyOffset = polyOff;
-		roomData->LayerOffset[i].PolyOffset2 = polyOff2;
-		roomData->LayerOffset[i].VerticesOffset = vertOff;
-
-		polyOff += sizeof(tr4_mesh_face3) * roomData->LayerOffset[i].NumLayerTriangles +
-			sizeof(tr4_mesh_face4) * roomData->LayerOffset[i].NumLayerRectangles;
-
-		polyOff2 += 4 * roomData->LayerOffset[i].NumLayerVertices; // todo find what struct this is
-
-		vertOff += sizeof(tr5_room_vertex) * roomData->LayerOffset[i].NumLayerVertices;
-	}
-
-	memcpy(room, roomData, sizeof(ROOM_INFO));*/
-}
-
-void FixUpRoom(ROOM_INFO* room, ROOM_INFO* roomData) 
-{
-	AddPtr(roomData->door, short, roomData + 1);
-	AddPtr(roomData->floor, FLOOR_INFO, roomData + 1);
-	AddPtr(roomData->light, tr5_room_light, roomData + 1);
-	AddPtr(roomData->mesh, MESH_INFO, roomData + 1);
-	//AddPtr(roomData->RoomLights, tr5_room_light, roomData + 1);
-	AddPtr(roomData->LayerOffset, tr5_room_layer, roomData + 1);
-	AddPtr(roomData->PolyOffset, void, roomData + 1);
-	AddPtr(roomData->PolyOffset2, void, roomData + 1);
-	AddPtr(roomData->VerticesOffset, tr5_room_vertex, roomData + 1);
-
-	roomData->LightDataSize += (uint32_t)(roomData + 1);
-
-	if ((uint8_t)roomData->door & 1)
-	{
-		roomData->door = nullptr;
-	}
-
-	auto* polyOff = (char*)roomData->PolyOffset;
-	auto* polyOff2 = (char*)roomData->PolyOffset2;
-	auto* vertOff = (char*)roomData->VerticesOffset;
-
-	for (int i = 0; i < roomData->NumLayers; i++)
-	{
-		roomData->LayerOffset[i].PolyOffset = polyOff;
-		roomData->LayerOffset[i].PolyOffset2 = polyOff2;
-		roomData->LayerOffset[i].VerticesOffset = vertOff;
-
-		polyOff += sizeof(struct tr4_mesh_face3) * roomData->LayerOffset[i].NumLayerTriangles +
-			sizeof(struct tr4_mesh_face4) * roomData->LayerOffset[i].NumLayerRectangles;
-
-		polyOff2 += 4 * roomData->LayerOffset[i].NumLayerVertices; // todo find what struct this is
-
-		vertOff += sizeof(tr5_room_vertex) * roomData->LayerOffset[i].NumLayerVertices;
-	}
-
-	memcpy(room, roomData, sizeof(ROOM_INFO));
-}
-
 void ReadRooms()
 {
 	ReadInt32();
 
 	int numRooms = ReadInt32();
-	NumberRooms = numRooms;
-	Rooms = (ROOM_INFO*)game_malloc(NumberRooms * sizeof(ROOM_INFO));
-
+	//NumberRooms = numRooms;
+	//Rooms = (ROOM_INFO*)game_malloc(NumberRooms * sizeof(ROOM_INFO));
+	Rooms.clear();
+	
 	printf("NumRooms: %d\n", numRooms);
 	
-	for (int i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < numRooms; i++)
 	{
-		// Ignore XELA
-		int xela = ReadInt32();
+		ROOM_INFO room;
 
-		// Read room data
-		int roomDataSize = ReadInt32();
-		byte* roomData = (byte*)game_malloc(roomDataSize);
-		ReadBytes(roomData, roomDataSize);
+		room.x = ReadInt32();
+		room.y = 0;
+		room.z = ReadInt32();
+		room.minfloor = ReadInt32();
+		room.maxceiling = ReadInt32();
 
-		// Put the room data in the struct
-		FixUpRoom(&Rooms[i], (ROOM_INFO*)roomData);
+		int numDataWords = ReadInt32();
+
+		short numVertices = ReadInt16();
+		room.vertices.reserve(numVertices);
+		for (int j = 0; j < numVertices; j++)
+		{
+			tr5_room_vertex vertex;
+			vertex.Vertex.x = ReadInt16();
+			vertex.Vertex.y = ReadInt16();
+			vertex.Vertex.z = ReadInt16();
+			vertex.Colour = ReadInt32();
+			ReadInt16();
+			room.vertices.push_back(vertex);
+		}
+
+		short numQuads = ReadInt16();
+		room.quads.reserve(numQuads);
+		for (int j = 0; j < numQuads; j++)
+		{
+			tr4_mesh_face4 poly;
+			poly.Vertices[0] = ReadInt16();
+			poly.Vertices[1] = ReadInt16();
+			poly.Vertices[2] = ReadInt16();
+			poly.Vertices[3] = ReadInt16();
+			poly.Texture = ReadInt16();
+			room.quads.push_back(poly);
+		}
+
+		short numTriangles = ReadInt16();
+		room.triangles.reserve(numTriangles);
+		for (int j = 0; j < numTriangles; j++)
+		{
+			tr4_mesh_face3 poly;
+			poly.Vertices[0] = ReadInt16();
+			poly.Vertices[1] = ReadInt16();
+			poly.Vertices[2] = ReadInt16();
+			poly.Texture = ReadInt16();
+			room.triangles.push_back(poly);
+		}
+
+		short numPortals = ReadInt16();
+		for (int j = 0; j < numPortals; j++)
+		{
+			ROOM_DOOR door;
+
+			door.room = ReadInt16();
+			door.normal.x = ReadInt16();
+			door.normal.y = ReadInt16();
+			door.normal.z = ReadInt16();
+			for (int k = 0; k < 4; k++)
+			{
+				door.vertices[k].x = ReadInt16();
+				door.vertices[k].y = ReadInt16();
+				door.vertices[k].z = ReadInt16();
+			}
+
+			room.doors.push_back(door);
+		}
+
+		room.xSize = ReadInt16();
+		room.ySize = ReadInt16();
+		room.floor.reserve(room.xSize * room.ySize);
+		for (int j = 0; j < room.xSize * room.ySize; j++)
+		{
+			FLOOR_INFO floor;
+
+			floor.index = ReadInt32();
+			floor.box = ReadInt32();
+			floor.fx = ReadInt32();
+			floor.stopper = ReadInt32();
+			floor.pitRoom = ReadInt32();
+			floor.floor = ReadInt32();
+			floor.skyRoom = ReadInt32();
+			floor.ceiling = ReadInt32();
+			floor.floorCollision.split = ReadInt32();
+			floor.floorCollision.noCollision = ReadInt32();
+			floor.floorCollision.planes[0].a = ReadFloat();
+			floor.floorCollision.planes[0].b = ReadFloat();
+			floor.floorCollision.planes[0].c = ReadFloat();
+			floor.floorCollision.planes[1].a = ReadFloat();
+			floor.floorCollision.planes[1].b = ReadFloat();
+			floor.floorCollision.planes[1].c = ReadFloat();
+			floor.ceilingCollision.split = ReadInt32();
+			floor.ceilingCollision.noCollision = ReadInt32();
+			floor.ceilingCollision.planes[0].a = ReadFloat();
+			floor.ceilingCollision.planes[0].b = ReadFloat();
+			floor.ceilingCollision.planes[0].c = ReadFloat();
+			floor.ceilingCollision.planes[1].a = ReadFloat();
+			floor.ceilingCollision.planes[1].b = ReadFloat();
+			floor.ceilingCollision.planes[1].c = ReadFloat();
+
+			room.floor.push_back(floor);
+		}
+
+		room.ambient.x = ReadFloat();
+		room.ambient.y = ReadFloat();
+		room.ambient.z = ReadFloat();
+
+		short numLights = ReadInt16();
+		room.lights.reserve(numLights);
+		for (int j = 0; j < numLights; j++)
+		{
+			ROOM_LIGHT light;
+
+			light.x = ReadFloat();
+			light.y = ReadFloat();
+			light.z = ReadFloat();
+			light.r = ReadFloat();
+			light.g = ReadFloat();
+			light.b = ReadFloat();
+			light.in = ReadFloat();
+			light.out = ReadFloat();
+			light.radIn = ReadFloat();
+			light.radOut = ReadFloat();
+			light.range = ReadFloat();
+			light.dx = ReadFloat();
+			light.dy = ReadFloat();
+			light.dz = ReadFloat();
+			light.type = ReadInt8();
+
+			room.lights.push_back(light);
+		}
+		
+		short numStatics = ReadInt16();
+		room.mesh.reserve(numStatics);
+		for (int j = 0; j < numStatics; j++)
+		{
+			MESH_INFO mesh;
+
+			mesh.x = ReadInt32();
+			mesh.y = ReadInt32();
+			mesh.z = ReadInt32();
+			mesh.yRot = ReadUInt16();
+			mesh.shade = ReadUInt16();
+			mesh.flags = ReadUInt16();
+			mesh.staticNumber = ReadUInt16();
+
+			room.mesh.push_back(mesh);
+		}
+
+		room.flippedRoom = ReadInt16();
+		room.flags = ReadInt16();
+		room.meshEffect = ReadInt8();
+		room.reverbType = ReadInt8();
+		room.flipNumber = ReadInt8();
+
+		room.itemNumber = NO_ITEM;
+		room.fxNumber = NO_ITEM;
+
+		Rooms.push_back(room);
 	}
 }
 

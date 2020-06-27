@@ -531,8 +531,8 @@ namespace T5M::Renderer
 		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void											updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
-		bool											checkPortal(short roomIndex, short* portal, DirectX::SimpleMath::Vector4* viewPort, DirectX::SimpleMath::Vector4* clipPort);
 		void											getVisibleRooms(int from, int to, DirectX::SimpleMath::Vector4* viewPort, bool water, int count);
+		bool checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort);
 		void											collectRooms();
 		void											collectItems(short roomNumber);
 		void											collectStatics(short roomNumber);
