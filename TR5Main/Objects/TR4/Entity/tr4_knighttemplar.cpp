@@ -171,10 +171,10 @@ void KnightTemplarControl(short itemNumber)
 
 			if (currentFloor->stopper)
 			{
-				MESH_INFO* mesh = room->mesh;
-
-				for (int i = 0; i < room->numMeshes; i++)
+				for (int i = 0; i < room->mesh.size(); i++)
 				{
+					MESH_INFO* mesh = &room->mesh[i];
+
 					if (floor(pos.x) == floor(mesh->x) &&
 						floor(pos.z) == floor(mesh->z) &&
 						mesh->staticNumber >= 50)
@@ -182,7 +182,7 @@ void KnightTemplarControl(short itemNumber)
 						ShatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
-						mesh->Flags &= ~1;
+						mesh->flags &= ~1;
 						currentFloor->stopper = false;
 						int height = GetFloorHeight(currentFloor, pos.x, pos.y, pos.z);
 						TestTriggers(TriggerIndex, 1, 0);

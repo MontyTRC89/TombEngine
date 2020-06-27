@@ -943,9 +943,9 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             }*/
         }
 
-/*        item->pos.xRot = oldXrot;
+        item->pos.xRot = oldXrot;
         item->pos.yRot = oldYrot;
-        item->pos.zRot = oldZrot;*/
+        item->pos.zRot = oldZrot;
         return;
     }
     
@@ -1394,13 +1394,12 @@ void PickupControl(short itemNum)
 short* FindPlinth(ITEM_INFO* item)
 {
     ROOM_INFO* room = &Rooms[item->roomNumber];
-    MESH_INFO* mesh = room->mesh;
-
+    
     int found = -1;
-    for (int i = 0; i < room->numMeshes; i++)
+    for (int i = 0; i < room->mesh.size(); i++)
     {
         MESH_INFO* mesh = &room->mesh[i];
-        if (mesh->Flags & 1)
+        if (mesh->flags & 1)
         {
             if (item->pos.xPos == mesh->x && item->pos.zPos == mesh->z)
             {
