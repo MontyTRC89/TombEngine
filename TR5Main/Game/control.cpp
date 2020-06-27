@@ -2147,7 +2147,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
-						mesh->Flags &= ~0x1;
+						mesh->flags &= ~0x1;
 						SoundEffect(ShatterSounds[CurrentLevel - 5][mesh->staticNumber], (PHD_3DPOS *)mesh, 0);
 					}
 					TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
@@ -2345,11 +2345,11 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 	{
 		room = &Rooms[los_rooms[r]];
 
-		for (m = 0; m < room->numMeshes; m++)
+		for (m = 0; m < room->mesh.size(); m++)
 		{
 			meshp = &room->mesh[m];
 
-			if (meshp->Flags & 1)
+			if (meshp->flags & 1)
 			{
 				pos.xPos = meshp->x;
 				pos.yPos = meshp->y;
@@ -2898,7 +2898,7 @@ void DoFlipMap(short group)
 {
 	ROOM_INFO temp;
 
-	for (int i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < Rooms.size(); i++)
 	{
 		ROOM_INFO *r = &Rooms[i];
 

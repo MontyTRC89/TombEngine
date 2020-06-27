@@ -841,7 +841,7 @@ void FixedCamera(ITEM_INFO* item)
 						if (mesh->staticNumber >= 50 && mesh->staticNumber < 58)
 						{
 							ShatterObject(0, mesh, 128, to.roomNumber, 0);
-							mesh->Flags &= ~1;
+							mesh->flags &= ~1;
 							SoundEffect(ShatterSounds[CurrentLevel - 5][mesh->staticNumber], (PHD_3DPOS*)mesh, 0);
 						}
 						TriggerRicochetSpark(&to, 2 * GetRandomControl(), 3, 0);

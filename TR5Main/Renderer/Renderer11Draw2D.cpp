@@ -8,7 +8,6 @@ T5M::Renderer::RendererHUDBar* g_DashBar;
 T5M::Renderer::RendererHUDBar* g_MusicVolumeBar;
 T5M::Renderer::RendererHUDBar* g_SFXVolumeBar;
 namespace T5M::Renderer {
-	
 
 	bool Renderer11::initialiseBars() {
 		std::array<Vector4, 9> healthColors = {

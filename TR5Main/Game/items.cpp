@@ -13,7 +13,7 @@ void ClearItem(short itemNum)
 
 	item->collidable = true;
 	item->data = NULL;
-	item->drawRoom = (((item->pos.zPos - room->z) >> WALL_SHIFT) & 0xFF) | ((((item->pos.xPos - room->mesh->x) >> WALL_SHIFT) & 0xFF) << 8);
+	item->drawRoom = (((item->pos.zPos - room->z) >> WALL_SHIFT) & 0xFF) | ((((item->pos.xPos - room->x) >> WALL_SHIFT) & 0xFF) << 8);
 	item->TOSSPAD = item->pos.yRot & 0xE000;
 	item->itemFlags[2] = item->roomNumber | ((item->pos.yPos - room->minfloor) & 0xFF00);
 }
@@ -475,7 +475,7 @@ short SpawnItem(ITEM_INFO* item, short objectNumber)
 int GlobalItemReplace(short search, short replace)
 {
 	int changed = 0;
-	for (int i = 0; i < NumberRooms; i++)
+	for (int i = 0; i < Rooms.size(); i++)
 	{
 		ROOM_INFO* room = &Rooms[i];
 		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)

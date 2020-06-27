@@ -1,4 +1,5 @@
 #pragma once
+#include <framework.h>
 
 typedef struct tr5_room_layer
 {
@@ -36,6 +37,13 @@ typedef struct tr5_room_vertex
 	DWORD Colour;			// 32-bit colour
 };
 
+struct ROOM_DOOR
+{
+	short room;
+	Vector3 normal;
+	Vector3 vertices[4];
+};
+
 typedef struct tr4_mesh_face3    // 10 bytes
 {
 	short Vertices[3];
@@ -50,7 +58,7 @@ typedef struct tr4_mesh_face4    // 12 bytes
 	short Effects;
 };
 
-typedef struct tr_room_portal  // 32 bytes
+typedef struct tr_ROOM_DOOR  // 32 bytes
 {
 	short AdjoiningRoom; // Which room this portal leads to
 	TR_VERTEX Normal;
@@ -67,21 +75,17 @@ typedef struct tr_room_sector // 8 bytes
 	signed char Ceiling;    // Absolute height of ceiling
 };
 
-typedef struct tr5_room_light
+typedef struct ROOM_LIGHT
 {
 	float x, y, z;       // Position of light, in world coordinates
 	float r, g, b;       // Colour of the light
-	int Separator;		 // Dummy value = 0xCDCDCDCD
-	float In;            // Cosine of the IN value for light / size of IN value
-	float Out;           // Cosine of the OUT value for light / size of OUT value
-	float RadIn;         // (IN radians) * 2
-	float RadOut;        // (OUT radians) * 2
-	float Range;         // Range of light
+	float in;            // Cosine of the IN value for light / size of IN value
+	float out;           // Cosine of the OUT value for light / size of OUT value
+	float radIn;         // (IN radians) * 2
+	float radOut;        // (OUT radians) * 2
+	float range;         // Range of light
 	float dx, dy, dz;    // Direction - used only by sun and spot lights
-	int x2, y2, z2;		 // Same as position, only in integer.
-	int dx2, dy2, dz2;	 // Same as direction, only in integer.
-	byte LightType;
-	byte Filler[3];      // Dummy values = 3 x 0xCD
+	byte type;
 };
 
 typedef struct MESH_INFO
@@ -91,7 +95,7 @@ typedef struct MESH_INFO
 	int z;
 	short yRot;
 	short shade;
-	short Flags;
+	short flags;
 	short staticNumber;
 };
 
@@ -115,16 +119,46 @@ typedef struct LIGHTINFO
 	short Cutoff; // size=0, offset=30
 };
 
+enum SECTOR_SPLIT_TYPE
+{
+	ST_NONE = 0,
+	ST_SPLIT1 = 1,
+	ST_SPLIT2 = 2
+};
+
+enum SECTOR_NOCOLLISION_TYPE
+{
+	NC_NONE = 0,
+	NC_TRIANGLE1 = 1,
+	NC_TRIANGLE2 = 2
+};
+
+struct SECTOR_PLANE
+{
+	float a;
+	float b;
+	float c;
+};
+
+struct SECTOR_COLLISION_INFO
+{
+	int split;
+	int noCollision;
+	SECTOR_PLANE planes[2];
+};
+
 typedef struct FLOOR_INFO
 {
-	unsigned short index;
-	unsigned short fx : 4;
-	unsigned short box : 11;
-	unsigned short stopper : 1;
-	unsigned char pitRoom;
-	signed char floor;
-	unsigned char skyRoom;
-	signed char ceiling;
+	int index;
+	int box;
+	int fx;
+	int stopper;
+	int pitRoom;
+	int floor;
+	int skyRoom;
+	int ceiling;
+	SECTOR_COLLISION_INFO floorCollision;
+	SECTOR_COLLISION_INFO ceilingCollision;
 };
 
 typedef enum RoomEnumFlag
@@ -143,64 +177,29 @@ typedef enum RoomEnumFlag
 
 typedef struct ROOM_INFO
 {
-	short* data;
-	short* door;
-	FLOOR_INFO* floor;
-	void* something;
-	MESH_INFO* mesh;
 	int x;
 	int y;
 	int z;
 	int minfloor;
 	int maxceiling;
+	std::vector<tr5_room_vertex> vertices;
+	std::vector<tr4_mesh_face4> quads;
+	std::vector<tr4_mesh_face3> triangles;
+	std::vector<ROOM_DOOR> doors;
 	short xSize;
 	short ySize;
-	CVECTOR ambient;
-	short numLights;
-	short numMeshes;
+	std::vector<FLOOR_INFO> floor;
+	Vector3 ambient;
+	std::vector<ROOM_LIGHT> lights;
+	std::vector<MESH_INFO> mesh;
+	short flippedRoom;
+	unsigned short flags;
+	byte meshEffect;
 	unsigned char reverbType;
 	unsigned char flipNumber;
-	byte meshEffect;
-	byte boundActive;
-	short left;
-	short right;
-	short top;
-	short bottom;
-	short testLeft;
-	short testRight;
-	short testTop;
-	short testBottom;
 	short itemNumber;
 	short fxNumber;
-	short flippedRoom;
-	unsigned short flags; // ENV_FLAG_enum
-	unsigned int Unknown1;
-	unsigned int Unknown2;     // Always 0
-	unsigned int Unknown3;     // Always 0
-	unsigned int Separator;    // 0xCDCDCDCD
-	unsigned short Unknown4;
-	unsigned short Unknown5;
-	float RoomX;
-	float RoomY;
-	float RoomZ;
-	unsigned int Separator1[4]; // Always 0xCDCDCDCD
-	unsigned int Separator2;    // 0 for normal rooms and 0xCDCDCDCD for null rooms
-	unsigned int Separator3;    // Always 0xCDCDCDCD
-	unsigned int NumRoomTriangles;
-	unsigned int NumRoomRectangles;
-	tr5_room_light* light;     // Always 0
-	unsigned int LightDataSize;
-	unsigned int NumLights2;    // Always same as NumLights
-	unsigned int Unknown6;
-	int RoomYTop;
-	int RoomYBottom;
-	unsigned int NumLayers;
-	tr5_room_layer* LayerOffset;
-	tr5_room_vertex* VerticesOffset;
-	void* PolyOffset;
-	void* PolyOffset2;   // Same as PolyOffset
-	int NumVertices;
-	int Separator5[4];  // Always 0xCDCDCDCD
+	bool boundActive;
 };
 
 typedef struct ANIM_STRUCT
