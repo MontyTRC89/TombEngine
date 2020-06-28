@@ -283,11 +283,6 @@ bool Renderer11::drawShadowMap()
 			if (bucket->Vertices.size() == 0)
 				continue;
 
-			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
-				m_context->RSSetState(m_states->CullNone());
-			else
-				m_context->RSSetState(m_states->CullCounterClockwise());
-
 			// Draw vertices
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
 			m_numDrawCalls++;
@@ -2224,11 +2219,6 @@ bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool an
 			if (bucket->Vertices.size() == 0)
 				continue;
 
-			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
-				m_context->RSSetState(m_states->CullNone());
-			else
-				m_context->RSSetState(m_states->CullCounterClockwise());
-
 			// Draw vertices
 			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
 			m_numDrawCalls++;
@@ -2297,11 +2287,6 @@ bool Renderer11::drawStatics(bool transparent)
 
 		for (int j = firstBucket; j < lastBucket; j++)
 		{
-			if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
-				m_context->RSSetState(m_states->CullNone());
-			else
-				m_context->RSSetState(m_states->CullCounterClockwise());
-
 			RendererBucket * bucket = &mesh->Buckets[j];
 
 			if (bucket->Vertices.size() == 0)
@@ -2398,14 +2383,9 @@ bool Renderer11::drawRooms(bool transparent, bool animated)
 			if (bucket->Vertices.size() == 0)
 				continue;
 
-				if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
-					m_context->RSSetState(m_states->CullNone());
-				else
-					m_context->RSSetState(m_states->CullCounterClockwise());
-
 			if (!animated)
 			{
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 				m_numDrawCalls++;
 			}
 			else
@@ -2586,16 +2566,6 @@ bool Renderer11::drawHorizonAndSky()
 
 				if (bucket->Vertices.size() == 0)
 					continue;
-
-				if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
-					m_context->RSSetState(m_states->CullNone());
-				else
-					m_context->RSSetState(m_states->CullCounterClockwise());
-
-				if (j == RENDERER_BUCKET_TRANSPARENT || j == RENDERER_BUCKET_TRANSPARENT_DS)
-					m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-				else
-					m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 				// Draw vertices
 				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);

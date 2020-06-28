@@ -123,7 +123,7 @@ void Renderer11::updateAnimatedTextures()
 	}
 
 	// Update waterfalls textures
-	for (int i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++)
+	/*for (int i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++)
 	{
 		ObjectInfo* obj = &Objects[i];
 
@@ -145,7 +145,7 @@ void Renderer11::updateAnimatedTextures()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void Renderer11::updateEffects()
@@ -507,13 +507,6 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 			else
 				bucketIndex = RENDERER_BUCKET_SOLID;
 		}
-		else
-		{
-			if (texture->attribute == 2 || (effects & 1))
-				bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
-			else
-				bucketIndex = RENDERER_BUCKET_SOLID_DS;
-		}
 
 		// ColAddHorizon special handling
 		if (obj != NULL && obj->Id == ID_HORIZON && g_GameFlow->GetLevel(CurrentLevel)->ColAddHorizon)
@@ -612,13 +605,7 @@ RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, short* 
 			else
 				bucketIndex = RENDERER_BUCKET_SOLID;
 		}
-		else
-		{
-			if (texture->attribute == 2 || (effects & 1))
-				bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
-			else
-				bucketIndex = RENDERER_BUCKET_SOLID_DS;
-		}
+		
 		bucket = &mesh->Buckets[bucketIndex];
 		if (obj != NULL) obj->HasDataInBucket[bucketIndex] = true;
 
