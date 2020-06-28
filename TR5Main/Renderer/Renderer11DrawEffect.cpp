@@ -1053,11 +1053,6 @@ bool Renderer11::drawEffect(RendererEffect* effect, bool transparent)
 		if (bucket->Vertices.size() == 0)
 			continue;
 
-		if (j == RENDERER_BUCKET_SOLID_DS || j == RENDERER_BUCKET_TRANSPARENT_DS)
-			m_context->RSSetState(m_states->CullNone());
-		else
-			m_context->RSSetState(m_states->CullCounterClockwise());
-
 		// Draw vertices
 		m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
 		m_numDrawCalls++;

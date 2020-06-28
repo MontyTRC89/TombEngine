@@ -61,63 +61,7 @@ bool Renderer11::PrepareDataForTheRenderer()
 		}
 	}
 
-	// Step 1: create the texture atlas
-	/*byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
-	ZeroMemory(buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
-
-	int blockX = 0;
-	int blockY = 0;
-
-	for (int p = 0; p < NumTexturePages; p++)
-	{
-		for (int y = 0; y < 256; y++)
-		{
-			for (int x = 0; x < 256; x++)
-			{
-				int pixelIndex = blockY * TEXTURE_PAGE_SIZE * NUM_TEXTURE_PAGES_PER_ROW + y * 256 * NUM_TEXTURE_PAGES_PER_ROW * 4 + blockX * 256 * 4 + x * 4;
-				int oldPixelIndex = p * TEXTURE_PAGE_SIZE + y * 256 * 4 + x * 4;
-
-				byte r = Texture32[oldPixelIndex];
-				byte g = Texture32[oldPixelIndex + 1];
-				byte b = Texture32[oldPixelIndex + 2];
-				byte a = Texture32[oldPixelIndex + 3];
-
-				buffer[pixelIndex + 0] = b;
-				buffer[pixelIndex + 1] = g;
-				buffer[pixelIndex + 2] = r;
-				buffer[pixelIndex + 3] = a;
-			}
-		}
-
-		blockX++;
-		if (blockX == NUM_TEXTURE_PAGES_PER_ROW)
-		{
-			blockX = 0;
-			blockY++;
-		}
-	}
-
-	if (m_textureAtlas != NULL)
-		delete m_textureAtlas;
-
-	m_textureAtlas = Texture2D::LoadFromByteArray(m_device, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, &buffer[0]);
-	if (m_textureAtlas == NULL)
-		return false;
-
-	free(buffer);
-
-	buffer = (byte*)malloc(256 * 256 * 4);
-	memcpy(buffer, MiscTextures + 256 * 512 * 4, 256 * 256 * 4);
-
-	m_skyTexture = Texture2D::LoadFromByteArray(m_device, 256, 256, &buffer[0]);
-	if (m_skyTexture == NULL)
-		return false;*/
-
-		//D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
-
-		//free(buffer);
-
-		// Upload textures to GPU memory
+	// Step 1: upload textures to GPU memory
 	for (int i = 0; i < RoomTextures.size(); i++)
 	{
 		TEXTURE* texture = &RoomTextures[i];
@@ -157,7 +101,6 @@ bool Renderer11::PrepareDataForTheRenderer()
 	{
 		ROOM_INFO* room = &Rooms[i];
 
-
 		m_rooms[i] = RendererRoom();
 		RendererRoom& r = m_rooms[i];
 		r.RoomNumber = i;
@@ -169,208 +112,57 @@ bool Renderer11::PrepareDataForTheRenderer()
 		if (room->vertices.size() == 0)
 			continue;
 
-		tr5_room_vertex * vertices = room->vertices.data();
+		ROOM_VERTEX* vertices = room->vertices.data();
 
-		for (int n = 0; n < room->quads.size(); n++)
+		for (int n = 0; n < room->buckets.size(); n++)
 		{
-			tr4_mesh_face4* poly = &room->quads[n];
-
-			// Get the real texture index and if double sided
-			short textureIndex = poly->Texture & 0x3FFF;
-			bool doubleSided = (poly->Texture & 0x8000) >> 15;
-
-			// Get the object texture
-			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-			int tile = texture->tileAndFlag & 0x7FFF;
-
-			// Create vertices
+			BUCKET* levelBucket = &room->buckets[n];
 			RendererBucket* bucket;
+			int bucketIndex;
 
-			int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
-			int bucketIndex = RENDERER_BUCKET_SOLID;
-
-			if (!doubleSided)
-			{
-				if (texture->attribute == 2)
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			}
+			if (levelBucket->blendMode != 0)
+				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
 			else
-			{
-				if (texture->attribute == 2)
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID_DS;
-			}
+				bucketIndex = RENDERER_BUCKET_SOLID;
 
-			if (animatedSetIndex == -1)
-			{
-				bucket = &r.Buckets[bucketIndex];
-			}
+			//if (!levelBucket->animated)
+			//{
+			bucket = &r.Buckets[bucketIndex];
+			/*}
 			else
 			{
 				bucket = &r.AnimatedBuckets[bucketIndex];
-			}
+			}*/
 
-			// Calculate face normal
-			Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
-				vertices[poly->Vertices[0]].Vertex.y,
-				vertices[poly->Vertices[0]].Vertex.z);
-			Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
-				vertices[poly->Vertices[1]].Vertex.y,
-				vertices[poly->Vertices[1]].Vertex.z);
-			Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
-				vertices[poly->Vertices[2]].Vertex.y,
-				vertices[poly->Vertices[2]].Vertex.z);
-			Vector3 e1 = p1 - p0;
-			Vector3 e2 = p1 - p2;
-			Vector3 normal = e1.Cross(e2);
-			normal.Normalize();
-
-			int baseVertices = bucket->NumVertices;
-			for (int v = 0; v < 4; v++)
+			for (int v = 0; v < levelBucket->indices.size(); v++)
 			{
+				int index = levelBucket->indices[v];
+				ROOM_VERTEX* levelVertex = &vertices[index];
+
 				RendererVertex vertex;
 
-				vertex.Position.x = room->x + vertices[poly->Vertices[v]].Vertex.x;
-				vertex.Position.y = room->y + vertices[poly->Vertices[v]].Vertex.y;
-				vertex.Position.z = room->z + vertices[poly->Vertices[v]].Vertex.z;
+				vertex.Position.x = room->x + levelVertex->position.x;
+				vertex.Position.y = room->y + levelVertex->position.y;
+				vertex.Position.z = room->z + levelVertex->position.z;
 
-				vertex.Normal.x = vertices[poly->Vertices[v]].Normal.x;
-				vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
-				vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
+				vertex.Normal.x = levelVertex->normal.x;
+				vertex.Normal.y = levelVertex->normal.y;
+				vertex.Normal.z = levelVertex->normal.z;
 
-				vertex.UV.x = texture->vertices[v].x;
-				vertex.UV.y = texture->vertices[v].y;
+				vertex.UV.x = levelVertex->textureCoordinates.x;
+				vertex.UV.y = levelVertex->textureCoordinates.y;
 
-				vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
-				vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
-				vertex.Color.z = ((vertices[poly->Vertices[v]].Colour >> 0) & 0xFF) / 255.0f;
+				vertex.Color.x = levelVertex->color.x;
+				vertex.Color.y = levelVertex->color.y;
+				vertex.Color.z = levelVertex->color.z;
 				vertex.Color.w = 1.0f;
 
 				vertex.Bone = 0;
 
+				bucket->Indices.push_back(bucket->NumVertices);
 				bucket->NumVertices++;
 				bucket->Vertices.push_back(vertex);
 			}
-
-			bucket->Indices.push_back(baseVertices);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->Indices.push_back(baseVertices + 3);
-			bucket->Indices.push_back(baseVertices + 2);
-			bucket->Indices.push_back(baseVertices + 3);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->NumIndices += 6;
-
-			RendererPolygon newPolygon;
-			newPolygon.Shape = SHAPE_RECTANGLE;
-			newPolygon.AnimatedSet = animatedSetIndex;
-			newPolygon.TextureId = textureIndex;
-			newPolygon.Indices[0] = baseVertices;
-			newPolygon.Indices[1] = baseVertices + 1;
-			newPolygon.Indices[2] = baseVertices + 2;
-			newPolygon.Indices[3] = baseVertices + 3;
-			bucket->Polygons.push_back(newPolygon);
-		}
-
-		for (int n = 0; n < room->triangles.size(); n++)
-		{
-			tr4_mesh_face3* poly = &room->triangles[n];
-
-			// Get the real texture index and if double sided
-			short textureIndex = poly->Texture & 0x3FFF;
-			bool doubleSided = (poly->Texture & 0x8000) >> 15;
-
-			// Get the object texture
-			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-			int tile = texture->tileAndFlag & 0x7FFF;
-
-			// Create vertices
-			RendererBucket* bucket;
-
-			int animatedSetIndex = getAnimatedTextureInfo(textureIndex);
-			int bucketIndex = RENDERER_BUCKET_SOLID;
-
-			if (!doubleSided)
-			{
-				if (texture->attribute == 2)
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			}
-			else
-			{
-				if (texture->attribute == 2)
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT_DS;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID_DS;
-			}
-
-			if (animatedSetIndex == -1)
-			{
-				bucket = &r.Buckets[bucketIndex];
-			}
-			else
-			{
-				bucket = &r.AnimatedBuckets[bucketIndex];
-			}
-
-			// Calculate face normal
-			Vector3 p0 = Vector3(vertices[poly->Vertices[0]].Vertex.x,
-				vertices[poly->Vertices[0]].Vertex.y,
-				vertices[poly->Vertices[0]].Vertex.z);
-			Vector3 p1 = Vector3(vertices[poly->Vertices[1]].Vertex.x,
-				vertices[poly->Vertices[1]].Vertex.y,
-				vertices[poly->Vertices[1]].Vertex.z);
-			Vector3 p2 = Vector3(vertices[poly->Vertices[2]].Vertex.x,
-				vertices[poly->Vertices[2]].Vertex.y,
-				vertices[poly->Vertices[2]].Vertex.z);
-			Vector3 e1 = p1 - p0;
-			Vector3 e2 = p1 - p2;
-			Vector3 normal = e1.Cross(e2);
-			normal.Normalize();
-
-			int baseVertices = bucket->NumVertices;
-			for (int v = 0; v < 3; v++)
-			{
-				RendererVertex vertex;
-
-				vertex.Position.x = room->x + vertices[poly->Vertices[v]].Vertex.x;
-				vertex.Position.y = room->y + vertices[poly->Vertices[v]].Vertex.y;
-				vertex.Position.z = room->z + vertices[poly->Vertices[v]].Vertex.z;
-
-				vertex.Normal.x = vertices[poly->Vertices[v]].Normal.x;
-				vertex.Normal.y = vertices[poly->Vertices[v]].Normal.y;
-				vertex.Normal.z = vertices[poly->Vertices[v]].Normal.z;
-
-				vertex.UV.x = texture->vertices[v].x;
-				vertex.UV.y = texture->vertices[v].y;
-
-				vertex.Color.x = ((vertices[poly->Vertices[v]].Colour >> 16) & 0xFF) / 255.0f;
-				vertex.Color.y = ((vertices[poly->Vertices[v]].Colour >> 8) & 0xFF) / 255.0f;
-				vertex.Color.z = ((vertices[poly->Vertices[v]].Colour >> 0) & 0xFF) / 255.0f;
-				vertex.Color.w = 1.0f;
-
-				vertex.Bone = 0;
-
-				bucket->NumVertices++;
-				bucket->Vertices.push_back(vertex);
-			}
-
-			bucket->Indices.push_back(baseVertices);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->Indices.push_back(baseVertices + 2);
-			bucket->NumIndices += 3;
-
-			RendererPolygon newPolygon;
-			newPolygon.Shape = SHAPE_TRIANGLE;
-			newPolygon.AnimatedSet = animatedSetIndex;
-			newPolygon.TextureId = textureIndex;
-			newPolygon.Indices[0] = baseVertices;
-			newPolygon.Indices[1] = baseVertices + 1;
-			newPolygon.Indices[2] = baseVertices + 2;
-			bucket->Polygons.push_back(newPolygon);
 		}
 
 		if (room->lights.size() != 0)
