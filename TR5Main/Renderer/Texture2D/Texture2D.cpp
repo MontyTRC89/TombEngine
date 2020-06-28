@@ -37,7 +37,7 @@ namespace T5M::Renderer {
 		device->GetImmediateContext(&context);
 
 		throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0));
-		throwIfFailed(resource.As<ID3D11Texture2D>(&Texture));
+		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
 	Texture2D::Texture2D(ID3D11Device* device, byte* data, int length) {
 
@@ -45,7 +45,7 @@ namespace T5M::Renderer {
 		ID3D11DeviceContext* context = nullptr;
 		device->GetImmediateContext(&context);
 		throwIfFailed(CreateWICTextureFromMemory(device, context, data, length, resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0));
-		throwIfFailed(resource.As<ID3D11Texture2D>(&Texture));
+		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
 }
 

@@ -713,7 +713,7 @@ namespace T5M::Renderer {
 
 			
 		}
-
+		
 		for (int i = 0; i < MoveablesIds.size(); i++) {
 			ObjectInfo* obj = &Objects[MoveablesIds[i]];
 

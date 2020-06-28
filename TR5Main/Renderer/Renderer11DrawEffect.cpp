@@ -16,6 +16,7 @@
 #include "spark.h"
 #include "drip.h"
 #include "explosion.h"
+#include "Quad/RenderQuad.h"
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
@@ -194,6 +195,30 @@ namespace T5M::Renderer {
 		m_spritesToDraw.push_back(spr);
 	}
 
+	void Renderer11::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 lookAtAxis) {
+		if (m_nextSprite >= MAX_SPRITES)
+			return;
+
+		scale = 1.0f;
+
+		width *= scale;
+		height *= scale;
+
+		RendererSpriteToDraw* spr = &m_spritesBuffer[m_nextSprite++];
+
+		spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT;
+		spr->Sprite = sprite;
+		spr->pos = pos;
+		spr->color = color;
+		spr->Rotation = rotation;
+		spr->Scale = scale;
+		spr->Width = width;
+		spr->Height = height;
+		spr->BlendMode = blendMode;
+		spr->LookAtAxis = lookAtAxis;
+		m_spritesToDraw.push_back(spr);
+	}
+
 	void Renderer11::drawFires() {
 		for (int k = 0; k < MAX_FIRE_LIST; k++) {
 			FIRE_LIST* fire = &Fires[k];
@@ -368,15 +393,12 @@ namespace T5M::Renderer {
 			RIPPLE_STRUCT* ripple = &Ripples[i];
 
 			if (ripple->active) {
-				float x1 = ripple->worldPos.x - ripple->size;
-				float z1 = ripple->worldPos.z - ripple->size;
-				float x2 = ripple->worldPos.x + ripple->size;
-				float z2 = ripple->worldPos.z + ripple->size;
 				float y = ripple->worldPos.y;
 				if (ripple->isBillboard) {
-					AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, 0, 1, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+					AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 				} else {
-					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+					AddSpriteBillboardConstrainedLookAt(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size*2, ripple->size*2, BLENDMODE_ALPHABLEND, Vector3(0,-1,0));
+					//AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 				}
 			}
 		}
@@ -707,6 +729,8 @@ namespace T5M::Renderer {
 	}
 
 	bool Renderer11::drawSprites() {
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
 		m_context->RSSetState(m_states->CullNone());
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
@@ -720,9 +744,9 @@ namespace T5M::Renderer {
 		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_context->IASetInputLayout(m_inputLayout);
-
+		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 		for (int b = 0; b < 4; b++) {
 			BLEND_MODES currentBlendMode = (BLEND_MODES)b;
 
@@ -745,141 +769,58 @@ namespace T5M::Renderer {
 
 				break;
 			}
-			m_primitiveBatch->Begin();
+			//m_primitiveBatch->Begin();
 
 			for (int i = 0; i < numSpritesToDraw; i++) {
+				Matrix billboardMatrix;
 				RendererSpriteToDraw* spr = m_spritesToDraw[i];
 
 				if (spr->BlendMode != currentBlendMode)
 					continue;
 
-				m_context->PSSetShaderResources(0, 1, &spr->Sprite->Texture->ShaderResourceView);
+				m_context->PSSetShaderResources(0, 1, spr->Sprite->Texture->ShaderResourceView.GetAddressOf());
 				ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 				m_context->PSSetSamplers(0, 1, &sampler);
-
+				Matrix scale = Matrix::CreateScale((spr->Width)*spr->Scale, (spr->Height) * spr->Scale, 1);
 				if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
-					float halfWidth = spr->Width / 2.0f * spr->Scale;
-					float halfHeight = spr->Height / 2.0f * spr->Scale;
+					Matrix rotation = Matrix::CreateRotationZ(spr->Rotation);
 					//Extract Camera Up Vector and create Billboard matrix.
 					Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-					Matrix billboardMatrix = Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
-
-					Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
-					Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
-					Vector3 p2 = Vector3(halfWidth, halfHeight, 0);
-					Vector3 p3 = Vector3(-halfWidth, halfHeight, 0);
-
-					Vector3 p0t = Vector3::Transform(p0, billboardMatrix);
-					Vector3 p1t = Vector3::Transform(p1, billboardMatrix);
-					Vector3 p2t = Vector3::Transform(p2, billboardMatrix);
-					Vector3 p3t = Vector3::Transform(p3, billboardMatrix);
-
-					RendererVertex v0;
-					v0.Position.x = p0t.x;
-					v0.Position.y = p0t.y;
-					v0.Position.z = p0t.z;
-					v0.UV.x = spr->Sprite->UV[0].x;
-					v0.UV.y = spr->Sprite->UV[0].y;
-					v0.Color = spr->color;
-
-					RendererVertex v1;
-					v1.Position.x = p1t.x;
-					v1.Position.y = p1t.y;
-					v1.Position.z = p1t.z;
-					v1.UV.x = spr->Sprite->UV[1].x;
-					v1.UV.y = spr->Sprite->UV[1].y;
-					v1.Color = spr->color;
-
-					RendererVertex v2;
-					v2.Position.x = p2t.x;
-					v2.Position.y = p2t.y;
-					v2.Position.z = p2t.z;
-					v2.UV.x = spr->Sprite->UV[2].x;
-					v2.UV.y = spr->Sprite->UV[2].y;
-					v2.Color = spr->color;
-
-					RendererVertex v3;
-					v3.Position.x = p3t.x;
-					v3.Position.y = p3t.y;
-					v3.Position.z = p3t.z;
-					v3.UV.x = spr->Sprite->UV[3].x;
-					v3.UV.y = spr->Sprite->UV[3].y;
-					v3.Color = spr->color;
-
-					m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
+					Matrix billboardMatrix = scale* rotation *Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+					m_stSprite.billboardMatrix = billboardMatrix;
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = true;
+					updateConstantBuffer(m_cbSprite, &m_stSprite, sizeof(CSpriteBuffer));
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
+					m_context->Draw(4, 0);
 				} else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-					float halfWidth = spr->Width / 2.0f;
-					float halfHeight = spr->Height / 2.0f;
+					Matrix rotation = Matrix::CreateRotationZ(spr->Rotation);
+					Vector3 quadForward = Vector3(0, 0, 1);
 
-					Vector3 camf = Vector3::UnitY;
-					Vector3 objf = Vector3::UnitY;
-
-					Matrix billboardMatrix = Matrix::CreateConstrainedBillboard(
+					billboardMatrix = scale*rotation * Matrix::CreateConstrainedBillboard(
 						spr->pos,
 						Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 						spr->ConstrainAxis,
 						NULL,
-						NULL);
+						&quadForward);
+					m_stSprite.billboardMatrix = billboardMatrix;
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = true;
+					updateConstantBuffer(m_cbSprite, &m_stSprite, sizeof(CSpriteBuffer));
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
+					m_context->Draw(4, 0);
+				} else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
+					Matrix translation = Matrix::CreateTranslation(spr->pos);
+					Matrix rotation = Matrix::CreateLookAt(Vector3::Zero,spr->LookAtAxis,Vector3::UnitZ);
 
-					Vector2 uv[4] = {
-						Vector2(spr->Sprite->UV[0].x, spr->Sprite->UV[0].y),
-						Vector2(spr->Sprite->UV[1].x, spr->Sprite->UV[1].y),
-						Vector2(spr->Sprite->UV[2].x, spr->Sprite->UV[2].y),
-						Vector2(spr->Sprite->UV[3].x, spr->Sprite->UV[3].y)
-					};
-
-					for (int i = 0; i < spr->Rotation; i++) {
-						Vector2 temp = uv[3];
-						uv[3] = uv[2];
-						uv[2] = uv[1];
-						uv[1] = uv[0];
-						uv[0] = temp;
-					}
-
-					Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
-					Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
-					Vector3 p2 = Vector3(halfWidth, halfHeight, 0);
-					Vector3 p3 = Vector3(-halfWidth, halfHeight, 0);
-
-					Vector3 p0t = Vector3::Transform(p0, billboardMatrix);
-					Vector3 p1t = Vector3::Transform(p1, billboardMatrix);
-					Vector3 p2t = Vector3::Transform(p2, billboardMatrix);
-					Vector3 p3t = Vector3::Transform(p3, billboardMatrix);
-
-					RendererVertex v0;
-					v0.Position.x = p0t.x;
-					v0.Position.y = p0t.y;
-					v0.Position.z = p0t.z;
-					v0.UV.x = uv[0].x;
-					v0.UV.y = uv[0].y;
-					v0.Color = spr->color;
-
-					RendererVertex v1;
-					v1.Position.x = p1t.x;
-					v1.Position.y = p1t.y;
-					v1.Position.z = p1t.z;
-					v1.UV.x = uv[1].x;
-					v1.UV.y = uv[1].y;
-					v1.Color = spr->color;
-
-					RendererVertex v2;
-					v2.Position.x = p2t.x;
-					v2.Position.y = p2t.y;
-					v2.Position.z = p2t.z;
-					v2.UV.x = uv[2].x;
-					v2.UV.y = uv[2].y;
-					v2.Color = spr->color;
-
-					RendererVertex v3;
-					v3.Position.x = p3t.x;
-					v3.Position.y = p3t.y;
-					v3.Position.z = p3t.z;
-					v3.UV.x = uv[3].x;
-					v3.UV.y = uv[3].y;
-					v3.Color = spr->color;
-
-					m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
-				} else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+					billboardMatrix = scale * rotation * translation;
+					m_stSprite.billboardMatrix = billboardMatrix;
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = true;
+					updateConstantBuffer(m_cbSprite, &m_stSprite, sizeof(CSpriteBuffer));
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
+					m_context->Draw(4, 0);
+				}/* else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
 					Vector3 p0t = spr->vtx1;
 					Vector3 p1t = spr->vtx2;
 					Vector3 p2t = spr->vtx3;
@@ -918,10 +859,9 @@ namespace T5M::Renderer {
 					v3.Color = spr->color;
 
 					m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
-				}
+				}*/
 			}
-
-			m_primitiveBatch->End();
+			//m_primitiveBatch->End();
 		}
 
 		m_context->RSSetState(m_states->CullCounterClockwise());
