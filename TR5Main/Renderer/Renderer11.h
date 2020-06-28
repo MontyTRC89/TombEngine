@@ -467,9 +467,9 @@ namespace T5M::Renderer
 		RendererLine2D* m_lines2DBuffer;
 		int m_nextLine2D;
 		RendererLight* m_shadowLight;
-		RendererObject** m_moveableObjects;
-		RendererObject** m_staticObjects;
-		RendererSprite** m_sprites;
+		std::vector<std::optional<RendererObject>> m_moveableObjects;
+		std::vector<std::optional<RendererObject>> m_staticObjects;
+		std::vector<RendererSprite> m_sprites;
 		int m_numMoveables;
 		int m_numStatics;
 		int m_numSprites;
@@ -529,7 +529,7 @@ namespace T5M::Renderer
 		void											fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
 		void											buildHierarchy(RendererObject* obj);
 		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-		void											updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
+		void											updateAnimation(RendererItem* item, RendererObject& obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 		void											getVisibleRooms(int from, int to, DirectX::SimpleMath::Vector4* viewPort, bool water, int count);
 		bool checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort);
