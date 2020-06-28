@@ -119,10 +119,10 @@ namespace T5M::Renderer {
             ObjectInfo* obj = &Objects[i];
 
             if (obj->loaded) {
-                RendererObject* waterfall = m_moveableObjects[i];
+                RendererObject& waterfall = *m_moveableObjects[i];
 
-                for (int m = 0; m < waterfall->ObjectMeshes.size(); m++) {
-                    RendererMesh* mesh = waterfall->ObjectMeshes[m];
+                for (int m = 0; m < waterfall.ObjectMeshes.size(); m++) {
+                    RendererMesh* mesh = waterfall.ObjectMeshes[m];
                     RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_TRANSPARENT_DS];
 
                     for (int v = 0; v < bucket->Vertices.size(); v++) {
@@ -146,16 +146,16 @@ namespace T5M::Renderer {
         }
     }
 
-    void Renderer11::updateAnimation(RendererItem* item, RendererObject* obj, short** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation) {
+    void Renderer11::updateAnimation(RendererItem* item, RendererObject& obj, short** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation) {
         RendererBone* bones[32];
         int nextBone = 0;
 
         Matrix rotation;
 
-        Matrix* transforms = (item == NULL ? obj->AnimationTransforms.data() : &item->AnimationTransforms[0]);
+        Matrix* transforms = (item == NULL ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
 
         // Push
-        bones[nextBone++] = obj->Skeleton;
+        bones[nextBone++] = obj.Skeleton;
 
         while (nextBone != 0) {
             // Pop the last bone in the stack
@@ -185,7 +185,7 @@ namespace T5M::Renderer {
                 }
 
                 Matrix translation;
-                if (bone == obj->Skeleton)
+                if (bone == obj.Skeleton)
                     translation = Matrix::CreateTranslation(p.x, p.y, p.z);
 
                 Matrix extraRotation;
@@ -198,12 +198,12 @@ namespace T5M::Renderer {
                     rotation = extraRotation * rotation;
                 }
 
-                if (bone != obj->Skeleton)
+                if (bone != obj.Skeleton)
                     transforms[bone->Index] = rotation * bone->Transform;
                 else
                     transforms[bone->Index] = rotation * translation;
 
-                if (bone != obj->Skeleton)
+                if (bone != obj.Skeleton)
 
                     transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
             }
@@ -258,14 +258,14 @@ namespace T5M::Renderer {
             return;
 
         ObjectInfo* obj = &Objects[item->objectNumber];
-        RendererObject* moveableObj = m_moveableObjects[item->objectNumber];
+        RendererObject& moveableObj = *m_moveableObjects[item->objectNumber];
 
         // Update animation matrices
         if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/) {
             // Apply extra rotations
             int lastJoint = 0;
-            for (int j = 0; j < moveableObj->LinearizedBones.size(); j++) {
-                RendererBone* currentBone = moveableObj->LinearizedBones[j];
+            for (int j = 0; j < moveableObj.LinearizedBones.size(); j++) {
+                RendererBone* currentBone = moveableObj.LinearizedBones[j];
                 currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
                 if (creature) {
@@ -995,10 +995,10 @@ namespace T5M::Renderer {
 
         world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
 
-        RendererObject* moveable = m_moveableObjects[item->objectNumber];
+        RendererObject& moveable = *m_moveableObjects[item->objectNumber];
 
-        for (int i = 0; i < moveable->ObjectMeshes.size(); i++) {
-            RendererMesh* mesh = moveable->ObjectMeshes[i];
+        for (int i = 0; i < moveable.ObjectMeshes.size(); i++) {
+            RendererMesh* mesh = moveable.ObjectMeshes[i];
 
             Vector3 pos;
             if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
@@ -1010,11 +1010,11 @@ namespace T5M::Renderer {
             spheres[i].Radius = mesh->Sphere.Radius;
         }
 
-        return moveable->ObjectMeshes.size();
+        return moveable.ObjectMeshes.size();
     }
 
     void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix) {
-        RendererObject* obj = m_moveableObjects[ID_LARA];
-        *outMatrix = obj->AnimationTransforms[joint] * m_LaraWorldMatrix;
+        RendererObject& obj = *m_moveableObjects[ID_LARA];
+        *outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;
     }
 }

@@ -53,7 +53,7 @@ namespace T5M::Renderer {
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
         ObjectInfo* obj = &Objects[objectNum];
-        RendererObject* moveableObj = m_moveableObjects[objectNum];
+        RendererObject& moveableObj = *m_moveableObjects[objectNum];
 
         if (obj->animIndex != -1) {
             updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
@@ -84,8 +84,8 @@ namespace T5M::Renderer {
         updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-        for (int n = 0; n < moveableObj->ObjectMeshes.size(); n++) {
-            RendererMesh* mesh = moveableObj->ObjectMeshes[n];
+        for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++) {
+            RendererMesh* mesh = moveableObj.ObjectMeshes[n];
 
             // Finish the world matrix
             translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
@@ -96,9 +96,9 @@ namespace T5M::Renderer {
             world = world * translation;
 
             if (obj->animIndex != -1)
-                m_stItem.World = (moveableObj->AnimationTransforms[n] * world);
+                m_stItem.World = (moveableObj.AnimationTransforms[n] * world);
             else
-                m_stItem.World = (moveableObj->BindPoseTransforms[n] * world);
+                m_stItem.World = (moveableObj.BindPoseTransforms[n] * world);
             m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
             updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
             m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
@@ -246,19 +246,19 @@ namespace T5M::Renderer {
         updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-        RendererObject* laraObj = m_moveableObjects[ID_LARA];
-        RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
+        RendererObject& laraObj = *m_moveableObjects[ID_LARA];
+        RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
         RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 
         m_stItem.World = m_LaraWorldMatrix;
         m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
-        memcpy(m_stItem.BonesMatrices, laraObj->AnimationTransforms.data(), sizeof(Matrix) * 32);
+        memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
         updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
         m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
         m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-        for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++) {
+        for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++) {
             RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
 
             for (int j = 0; j < 2; j++) {
@@ -278,11 +278,11 @@ namespace T5M::Renderer {
             }
         }
 
-        if (m_moveableObjects[ID_LARA_SKIN_JOINTS] != NULL) {
-            RendererObject* laraSkinJoints = m_moveableObjects[ID_LARA_SKIN_JOINTS];
+        if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value()) {
+            RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
-            for (int k = 0; k < laraSkinJoints->ObjectMeshes.size(); k++) {
-                RendererMesh* mesh = laraSkinJoints->ObjectMeshes[k];
+            for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++) {
+                RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
 
                 for (int j = 0; j < 2; j++) {
                     RendererBucket* bucket = &mesh->Buckets[j];
@@ -297,8 +297,8 @@ namespace T5M::Renderer {
             }
         }
 
-        for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++) {
-            RendererMesh* mesh = laraSkin->ObjectMeshes[k];
+        for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++) {
+            RendererMesh* mesh = laraSkin.ObjectMeshes[k];
 
             for (int j = 0; j < NUM_BUCKETS; j++) {
                 RendererBucket* bucket = &mesh->Buckets[j];
@@ -321,7 +321,7 @@ namespace T5M::Renderer {
         m_stItem.World = Matrix::Identity;
         updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
-        if (m_moveableObjects[ID_LARA_HAIR] != NULL) {
+        if (m_moveableObjects[ID_LARA_HAIR].has_value()) {
             m_primitiveBatch->Begin();
             m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
                                           (const unsigned short*)m_hairIndices.data(), m_numHairIndices,
@@ -382,7 +382,7 @@ namespace T5M::Renderer {
 
             if (gunshell->counter > 0) {
                 ObjectInfo* obj = &Objects[gunshell->objectNumber];
-                RendererObject* moveableObj = m_moveableObjects[gunshell->objectNumber];
+                RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
 
                 Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
                 Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.yRot), TO_RAD(gunshell->pos.xRot), TO_RAD(gunshell->pos.zRot));
@@ -392,7 +392,7 @@ namespace T5M::Renderer {
                 updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
                 m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-                RendererMesh* mesh = moveableObj->ObjectMeshes[0];
+                RendererMesh* mesh = moveableObj.ObjectMeshes[0];
 
                 for (int b = 0; b < NUM_BUCKETS; b++) {
                     RendererBucket* bucket = &mesh->Buckets[b];
@@ -536,9 +536,9 @@ namespace T5M::Renderer {
                 Matrix transform = (scale * rotation) * translation;
 
                 ObjectInfo* obj = &Objects[objectNumber];
-                RendererObject* moveableObj = m_moveableObjects[objectNumber];
-                if (moveableObj == NULL)
+                if(!m_moveableObjects[objectNumber].has_value())
                     continue;
+                RendererObject& moveableObj = *m_moveableObjects[objectNumber];
 
                 // Build the object animation matrices
                 if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
@@ -552,21 +552,21 @@ namespace T5M::Renderer {
                         updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
                 }
 
-                for (int n = 0; n < moveableObj->ObjectMeshes.size(); n++) {
-                    RendererMesh* mesh = moveableObj->ObjectMeshes[n];
+                for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++) {
+                    RendererMesh* mesh = moveableObj.ObjectMeshes[n];
 
                     // HACK: revolver and crossbow + lasersight
-                    if (moveableObj->Id == ID_REVOLVER_ITEM && !Lara.Weapons[WEAPON_REVOLVER].HasLasersight && n > 0)
+                    if (moveableObj.Id == ID_REVOLVER_ITEM && !Lara.Weapons[WEAPON_REVOLVER].HasLasersight && n > 0)
                         break;
 
-                    if (moveableObj->Id == ID_CROSSBOW_ITEM && !Lara.Weapons[WEAPON_CROSSBOW].HasLasersight && n > 0)
+                    if (moveableObj.Id == ID_CROSSBOW_ITEM && !Lara.Weapons[WEAPON_CROSSBOW].HasLasersight && n > 0)
                         break;
 
                     // Finish the world matrix
                     if (obj->animIndex != -1)
-                        m_stItem.World = (moveableObj->AnimationTransforms[n] * transform);
+                        m_stItem.World = (moveableObj.AnimationTransforms[n] * transform);
                     else
-                        m_stItem.World = (moveableObj->BindPoseTransforms[n] * transform);
+                        m_stItem.World = (moveableObj.BindPoseTransforms[n] * transform);
                     m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
                     updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
                     m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
@@ -1231,7 +1231,7 @@ namespace T5M::Renderer {
                     Vector3 p3 = m_viewportToolkit->Unproject(Vector3(x3, y3, depth), Projection, View, world);
                     Vector3 p4 = m_viewportToolkit->Unproject(Vector3(x4, y4, depth), Projection, View, world);
 
-                    AddSprite3D(m_sprites[20],
+                    AddSprite3D(&m_sprites[20],
                                 Vector3(p1.x, p1.y, p1.z),
                                 Vector3(p2.x, p2.y, p2.z),
                                 Vector3(p3.x, p3.y, p3.z),
@@ -1383,7 +1383,7 @@ namespace T5M::Renderer {
 
         if (Objects[ID_RATS_EMITTER].loaded) {
             ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
-            RendererObject* moveableObj = m_moveableObjects[ID_RATS_EMITTER];
+            RendererObject& moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
@@ -1430,7 +1430,7 @@ namespace T5M::Renderer {
 
         if (Objects[ID_BATS_EMITTER].loaded) {
             ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
-            RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
+            RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
             short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3)];
             RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
 
@@ -1507,7 +1507,7 @@ namespace T5M::Renderer {
                 continue;
             }
 
-            AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
+            AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
                                0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
                                BLENDMODE_ALPHABLEND);
 
@@ -2011,10 +2011,10 @@ namespace T5M::Renderer {
         for (int i = 0; i < m_itemsToDraw.size(); i++) {
             RendererItem* item = m_itemsToDraw[i];
             RendererRoom& const room = m_rooms[item->Item->roomNumber];
-            RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+            RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
             short objectNumber = item->Item->objectNumber;
-            if (moveableObj->DoNotDraw) {
+            if (moveableObj.DoNotDraw) {
                 continue;
             } else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2) {
                 // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
@@ -2040,7 +2040,7 @@ namespace T5M::Renderer {
             return true;
         }
         RendererRoom& const room = m_rooms[item->Item->roomNumber];
-        RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+        RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
         ObjectInfo* obj = &Objects[item->Item->objectNumber];
 
         m_stItem.World = item->World;
@@ -2061,16 +2061,16 @@ namespace T5M::Renderer {
         updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-        for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++) {
+        for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
             if (!(item->Item->meshBits & (1 << k)))
                 continue;
 
             RendererMesh* mesh;
             if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1)) {
-                RendererObject* swapMeshObj = m_moveableObjects[obj->meshSwapSlot];
-                mesh = swapMeshObj->ObjectMeshes[k];
+                RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
+                mesh = swapMeshObj.ObjectMeshes[k];
             } else {
-                mesh = moveableObj->ObjectMeshes[k];
+                mesh = moveableObj.ObjectMeshes[k];
             }
 
             for (int j = firstBucket; j < lastBucket; j++) {
@@ -2137,8 +2137,8 @@ namespace T5M::Renderer {
 
             RendererRoom& const room = m_rooms[m_staticsToDraw[i]->RoomIndex];
 
-            RendererObject* staticObj = m_staticObjects[msh->staticNumber];
-            RendererMesh* mesh = staticObj->ObjectMeshes[0];
+            RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
+            RendererMesh* mesh = staticObj.ObjectMeshes[0];
 
             m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
             m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
@@ -2381,7 +2381,7 @@ namespace T5M::Renderer {
         }
 
         // Draw horizon
-        if (m_moveableObjects[ID_HORIZON] != NULL) {
+        if (m_moveableObjects[ID_HORIZON].has_value()) {
             m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
             m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             m_context->IASetInputLayout(m_inputLayout);
@@ -2391,7 +2391,7 @@ namespace T5M::Renderer {
             sampler = m_states->AnisotropicClamp();
             m_context->PSSetSamplers(0, 1, &sampler);
 
-            RendererObject* moveableObj = m_moveableObjects[ID_HORIZON];
+            RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
 
             m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
             m_stStatic.Position = Vector4::Zero;
@@ -2404,8 +2404,8 @@ namespace T5M::Renderer {
             updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
             m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-            for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++) {
-                RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+            for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
+                RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
                 for (int j = 0; j < NUM_BUCKETS; j++) {
                     RendererBucket* bucket = &mesh->Buckets[j];
