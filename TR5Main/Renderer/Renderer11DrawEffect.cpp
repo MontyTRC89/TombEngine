@@ -322,7 +322,7 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::drawSplahes() {
-		constexpr size_t NUM_POINTS = 8;
+		constexpr size_t NUM_POINTS = 9;
 		for (int i = 0; i < MAX_SPLASHES; i++) {
 			SPLASH_STRUCT& splash = Splashes[i];
 			if (splash.isActive) {
@@ -769,7 +769,6 @@ namespace T5M::Renderer {
 
 				break;
 			}
-			//m_primitiveBatch->Begin();
 
 			for (int i = 0; i < numSpritesToDraw; i++) {
 				Matrix billboardMatrix;
@@ -820,7 +819,8 @@ namespace T5M::Renderer {
 					updateConstantBuffer(m_cbSprite, &m_stSprite, sizeof(CSpriteBuffer));
 					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
 					m_context->Draw(4, 0);
-				}/* else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+				}else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+					m_primitiveBatch->Begin();
 					Vector3 p0t = spr->vtx1;
 					Vector3 p1t = spr->vtx2;
 					Vector3 p2t = spr->vtx3;
@@ -857,11 +857,16 @@ namespace T5M::Renderer {
 					v3.UV.x = spr->Sprite->UV[3].x;
 					v3.UV.y = spr->Sprite->UV[3].y;
 					v3.Color = spr->color;
-
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = false;
+					updateConstantBuffer(m_cbSprite, &m_stSprite, sizeof(CSpriteBuffer));
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
 					m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
-				}*/
+					m_primitiveBatch->End();
+				}
 			}
-			//m_primitiveBatch->End();
+			
+
 		}
 
 		m_context->RSSetState(m_states->CullCounterClockwise());
