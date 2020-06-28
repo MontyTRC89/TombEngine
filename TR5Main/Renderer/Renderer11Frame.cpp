@@ -45,7 +45,7 @@ namespace T5M::Renderer {
 			if (item->status == ITEM_INVISIBLE)
 				continue;
 
-			if (m_moveableObjects[item->objectNumber] == NULL)
+			if (!m_moveableObjects[item->objectNumber].has_value())
 				continue;
 			RendererItem* newItem = &m_items[itemNum];
 			short* bounds = GetBoundsAccurate(item);

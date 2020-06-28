@@ -75,19 +75,9 @@ namespace T5M::Renderer {
 
 	void Renderer11::FreeRendererData() {
 		m_meshPointersToMesh.clear();
-
-		for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
-			DX11_DELETE(m_moveableObjects[i]);
-		free(m_moveableObjects);
-
-		for (int i = 0; i < g_NumSprites; i++)
-			DX11_DELETE(m_sprites[i]);
-		free(m_sprites);
-
-		for (int i = 0; i < MAX_STATICS; i++)
-			DX11_DELETE(m_staticObjects[i]);
-		free(m_staticObjects);
-
+		m_moveableObjects.clear();
+		m_staticObjects.clear();
+		m_sprites.clear();
 		m_rooms.clear();
 		m_roomTextures.clear();
 		m_moveablesTextures.clear();

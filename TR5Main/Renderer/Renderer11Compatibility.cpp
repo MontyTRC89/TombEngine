@@ -7,16 +7,12 @@
 #include "objects.h"
 using std::vector;
 using std::stack;
+using std::optional;
 namespace T5M::Renderer {
 	bool Renderer11::PrepareDataForTheRenderer() {
-		m_moveableObjects = (RendererObject**)malloc(sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
-		ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
-
-		m_spriteSequences = vector<RendererSpriteSequence>(ID_NUMBER_OBJECTS);
-
-		m_staticObjects = (RendererObject**)malloc(sizeof(RendererObject*) * MAX_STATICS);
-		ZeroMemory(m_staticObjects, sizeof(RendererObject*) * MAX_STATICS);
-
+		m_moveableObjects.resize(ID_NUMBER_OBJECTS);
+		m_spriteSequences.resize(ID_NUMBER_OBJECTS);
+		m_staticObjects.resize(MAX_STATICS);
 		m_rooms = vector<RendererRoom>(NUM_ROOMS);
 
 		m_meshes.clear();
@@ -432,8 +428,9 @@ namespace T5M::Renderer {
 			ObjectInfo* obj = &Objects[objNum];
 
 			if (obj->nmeshes > 0) {
-				RendererObject* moveable = new RendererObject();
-				moveable->Id = MoveablesIds[i];
+				m_moveableObjects[MoveablesIds[i]] = RendererObject();
+				RendererObject& moveable = *m_moveableObjects[MoveablesIds[i]];
+				moveable.Id = MoveablesIds[i];
 
 				// Assign the draw routine
 				/*if (objNum == ID_FLAME || objNum == ID_FLAME_EMITTER || objNum == ID_FLAME_EMITTER2 || objNum == ID_FLAME_EMITTER3 ||
@@ -452,17 +449,17 @@ namespace T5M::Renderer {
 					moveable->DoNotDraw = false;
 				}*/
 
-				moveable->DoNotDraw = (obj->drawRoutine == NULL);
+				moveable.DoNotDraw = (obj->drawRoutine == NULL);
 
 				for (int j = 0; j < obj->nmeshes; j++) {
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 					// and vertices have bone index 0 and not 10
-					RendererMesh* mesh = getRendererMeshFromTrMesh(moveable,
+					RendererMesh* mesh = getRendererMeshFromTrMesh(&moveable,
 																   Meshes[obj->meshIndex + j],
 																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 																   MoveablesIds[i] == ID_LARA_HAIR);
-					moveable->ObjectMeshes.push_back(mesh);
+					moveable.ObjectMeshes.push_back(mesh);
 				}
 
 				if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES || objNum == ID_BODY_PART) {
@@ -475,13 +472,13 @@ namespace T5M::Renderer {
 					stack<RendererBone*> stack;
 
 					for (int j = 0; j < obj->nmeshes; j++) {
-						moveable->LinearizedBones.push_back(new RendererBone(j));
-						moveable->AnimationTransforms.push_back(Matrix::Identity);
-						moveable->BindPoseTransforms.push_back(Matrix::Identity);
+						moveable.LinearizedBones.push_back(new RendererBone(j));
+						moveable.AnimationTransforms.push_back(Matrix::Identity);
+						moveable.BindPoseTransforms.push_back(Matrix::Identity);
 					}
 
-					RendererBone* currentBone = moveable->LinearizedBones[0];
-					RendererBone* stackBone = moveable->LinearizedBones[0];
+					RendererBone* currentBone = moveable.LinearizedBones[0];
+					RendererBone* stackBone = moveable.LinearizedBones[0];
 
 					for (int mi = 0; mi < obj->nmeshes - 1; mi++) {
 						int j = mi + 1;
@@ -493,14 +490,14 @@ namespace T5M::Renderer {
 
 						byte flags = opcode & 0x1C;
 
-						moveable->LinearizedBones[j]->ExtraRotationFlags = flags;
+						moveable.LinearizedBones[j]->ExtraRotationFlags = flags;
 
 						switch (opcode & 0x03) {
 						case 0:
-							moveable->LinearizedBones[j]->Parent = currentBone;
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							currentBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
+							moveable.LinearizedBones[j]->Parent = currentBone;
+							moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+							currentBone->Children.push_back(moveable.LinearizedBones[j]);
+							currentBone = moveable.LinearizedBones[j];
 
 							break;
 						case 1:
@@ -509,19 +506,19 @@ namespace T5M::Renderer {
 							currentBone = stack.top();
 							stack.pop();
 
-							moveable->LinearizedBones[j]->Parent = currentBone;
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							currentBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
+							moveable.LinearizedBones[j]->Parent = currentBone;
+							moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+							currentBone->Children.push_back(moveable.LinearizedBones[j]);
+							currentBone = moveable.LinearizedBones[j];
 
 							break;
 						case 2:
 							stack.push(currentBone);
 
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							moveable->LinearizedBones[j]->Parent = currentBone;
-							currentBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
+							moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+							moveable.LinearizedBones[j]->Parent = currentBone;
+							currentBone->Children.push_back(moveable.LinearizedBones[j]);
+							currentBone = moveable.LinearizedBones[j];
 
 							break;
 						case 3:
@@ -530,10 +527,10 @@ namespace T5M::Renderer {
 							RendererBone* theBone = stack.top();
 							stack.pop();
 
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							moveable->LinearizedBones[j]->Parent = theBone;
-							theBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
+							moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+							moveable.LinearizedBones[j]->Parent = theBone;
+							theBone->Children.push_back(moveable.LinearizedBones[j]);
+							currentBone = moveable.LinearizedBones[j];
 							stack.push(theBone);
 
 							break;
@@ -541,23 +538,23 @@ namespace T5M::Renderer {
 					}
 
 					for (int n = 0; n < obj->nmeshes; n++)
-						moveable->LinearizedBones[n]->Transform = Matrix::CreateTranslation(
-							moveable->LinearizedBones[n]->Translation.x,
-							moveable->LinearizedBones[n]->Translation.y,
-							moveable->LinearizedBones[n]->Translation.z);
+						moveable.LinearizedBones[n]->Transform = Matrix::CreateTranslation(
+							moveable.LinearizedBones[n]->Translation.x,
+							moveable.LinearizedBones[n]->Translation.y,
+							moveable.LinearizedBones[n]->Translation.z);
 
-					moveable->Skeleton = moveable->LinearizedBones[0];
-					buildHierarchy(moveable);
+					moveable.Skeleton = moveable.LinearizedBones[0];
+					buildHierarchy(&moveable);
 
 					// Fix Lara skin joints and hairs
 					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS) {
 						int bonesToCheck[2] = { 0,0 };
 
-						RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
+						RendererObject& objSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 						for (int j = 1; j < obj->nmeshes; j++) {
-							RendererMesh* jointMesh = moveable->ObjectMeshes[j];
-							RendererBone* jointBone = moveable->LinearizedBones[j];
+							RendererMesh* jointMesh = moveable.ObjectMeshes[j];
+							RendererBone* jointBone = moveable.LinearizedBones[j];
 
 							bonesToCheck[0] = jointBone->Parent->Index;
 							bonesToCheck[1] = j;
@@ -571,8 +568,8 @@ namespace T5M::Renderer {
 									bool done = false;
 
 									for (int k = 0; k < 2; k++) {
-										RendererMesh* skinMesh = objSkin->ObjectMeshes[bonesToCheck[k]];
-										RendererBone* skinBone = objSkin->LinearizedBones[bonesToCheck[k]];
+										RendererMesh* skinMesh = objSkin.ObjectMeshes[bonesToCheck[k]];
+										RendererBone* skinBone = objSkin.LinearizedBones[bonesToCheck[k]];
 
 										for (int b2 = 0; b2 < NUM_BUCKETS; b2++) {
 											RendererBucket* skinBucket = &skinMesh->Buckets[b2];
@@ -610,8 +607,8 @@ namespace T5M::Renderer {
 					}
 
 					if (MoveablesIds[i] == ID_LARA_HAIR) {
-						for (int j = 0; j < moveable->ObjectMeshes.size(); j++) {
-							RendererMesh* mesh = moveable->ObjectMeshes[j];
+						for (int j = 0; j < moveable.ObjectMeshes.size(); j++) {
+							RendererMesh* mesh = moveable.ObjectMeshes[j];
 							for (int n = 0; n < NUM_BUCKETS; n++) {
 								m_numHairVertices += mesh->Buckets[n].NumVertices;
 								m_numHairIndices += mesh->Buckets[n].NumIndices;
@@ -629,11 +626,10 @@ namespace T5M::Renderer {
 					}
 				}
 
-				m_moveableObjects[MoveablesIds[i]] = moveable;
 
 				// Merge vertices and indices in a single list
-				for (int m = 0; m < moveable->ObjectMeshes.size(); m++) {
-					RendererMesh* msh = moveable->ObjectMeshes[m];
+				for (int m = 0; m < moveable.ObjectMeshes.size(); m++) {
+					RendererMesh* msh = moveable.ObjectMeshes[m];
 
 					for (int j = 0; j < NUM_BUCKETS; j++) {
 						RendererBucket* bucket = &msh->Buckets[j];
@@ -666,18 +662,19 @@ namespace T5M::Renderer {
 
 		for (int i = 0; i < StaticObjectsIds.size(); i++) {
 			StaticInfo* obj = &StaticObjects[StaticObjectsIds[i]];
-			RendererObject* staticObject = new RendererObject();
-			staticObject->Id = StaticObjectsIds[i];
+			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
+			RendererObject& staticObject = *m_staticObjects[StaticObjectsIds[i]];
+			staticObject.Id = StaticObjectsIds[i];
 
 			short* meshPtr = Meshes[obj->meshNumber];
-			RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, Meshes[obj->meshNumber], 0, false, false);
+			RendererMesh* mesh = getRendererMeshFromTrMesh(&staticObject, Meshes[obj->meshNumber], 0, false, false);
 
-			staticObject->ObjectMeshes.push_back(mesh);
+			staticObject.ObjectMeshes.push_back(mesh);
 
 			m_staticObjects[StaticObjectsIds[i]] = staticObject;
 
 			// Merge vertices and indices in a single list
-			RendererMesh* msh = staticObject->ObjectMeshes[0];
+			RendererMesh* msh = staticObject.ObjectMeshes[0];
 
 			for (int j = 0; j < NUM_BUCKETS; j++) {
 				RendererBucket* bucket = &msh->Buckets[j];
@@ -701,21 +698,20 @@ namespace T5M::Renderer {
 		m_staticsIndexBuffer = IndexBuffer(m_device, staticsIndices.size(), staticsIndices.data());
 
 		// Step 5: prepare sprites
-		m_sprites = (RendererSprite**)malloc(sizeof(RendererSprite*) * g_NumSprites);
-		ZeroMemory(m_sprites, sizeof(RendererSprite*) * g_NumSprites);
+		m_sprites.resize(g_NumSprites);
 
 		for (int i = 0; i < g_NumSprites; i++) {
 			SPRITE* oldSprite = &Sprites[i];
+			m_sprites[i] = RendererSprite();
+			RendererSprite& sprite = m_sprites[i];
 
-			RendererSprite* sprite = new RendererSprite();
+			sprite.UV[0] = Vector2(oldSprite->x1, oldSprite->y1);
+			sprite.UV[1] = Vector2(oldSprite->x2, oldSprite->y2);
+			sprite.UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
+			sprite.UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
+			sprite.Texture = &m_spritesTextures[oldSprite->tile];
 
-			sprite->UV[0] = Vector2(oldSprite->x1, oldSprite->y1);
-			sprite->UV[1] = Vector2(oldSprite->x2, oldSprite->y2);
-			sprite->UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
-			sprite->UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
-			sprite->Texture = &m_spritesTextures[oldSprite->tile];
-
-			m_sprites[i] = sprite;
+			
 		}
 
 		for (int i = 0; i < MoveablesIds.size(); i++) {
@@ -728,7 +724,7 @@ namespace T5M::Renderer {
 				RendererSpriteSequence& sequence = m_spriteSequences[MoveablesIds[i]];
 
 				for (int j = baseSprite; j < baseSprite + numSprites; j++) {
-					sequence.SpritesList[j - baseSprite] = m_sprites[j];
+					sequence.SpritesList[j - baseSprite] = &m_sprites[j];
 				}
 
 				m_spriteSequences[MoveablesIds[i]] = sequence;
