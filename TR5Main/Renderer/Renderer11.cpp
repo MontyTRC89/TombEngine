@@ -67,10 +67,12 @@ namespace T5M::Renderer {
 		DX11_RELEASE(m_cbStatic);
 		DX11_RELEASE(m_cbLights);
 		DX11_RELEASE(m_cbMisc);
-
+		DX11_RELEASE(m_cbHUD);
+		DX11_RELEASE(m_cbHUDBar);
 		DX11_RELEASE(m_swapChain);
 		DX11_RELEASE(m_context);
 		DX11_RELEASE(m_device);
+		DX11_RELEASE(m_cbSprite);
 	}
 
 	void Renderer11::FreeRendererData() {

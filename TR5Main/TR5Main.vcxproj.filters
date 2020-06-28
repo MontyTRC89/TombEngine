@@ -822,6 +822,12 @@
     <ClInclude Include="Renderer\ConstantBuffers\StaticBuffer.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\Quad\RenderQuad.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\SpriteBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1518,6 +1524,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Quad\RenderQuad.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

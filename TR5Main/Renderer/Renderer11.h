@@ -17,6 +17,7 @@
 #include "RenderTarget2D/RenderTarget2D.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "Texture2D/Texture2D.h"
+#include <Renderer\ConstantBuffers\SpriteBuffer.h>
 
 namespace T5M::Renderer
 {
@@ -304,6 +305,7 @@ namespace T5M::Renderer
 		float Height;
 		BLEND_MODES BlendMode;
 		DirectX::SimpleMath::Vector3 ConstrainAxis;
+		DirectX::SimpleMath::Vector3 LookAtAxis;
 	};
 	
 	struct RendererLine3D
@@ -418,6 +420,8 @@ namespace T5M::Renderer
 		ID3D11Buffer* m_cbHUD;
 		CHUDBarBuffer m_stHUDBar;
 		ID3D11Buffer* m_cbHUDBar;
+		CSpriteBuffer m_stSprite;
+		ID3D11Buffer* m_cbSprite;
 		// Text and sprites
 		SpriteFont* m_gameFont;
 		SpriteBatch* m_spriteBatch;
@@ -642,6 +646,7 @@ namespace T5M::Renderer
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 		void AddSpriteBillboard(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos,DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 constrainAxis);
+		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 lookAtAxis);
 		void AddSprite3D(RendererSprite* sprite, DirectX::SimpleMath::Vector3 vtx1, DirectX::SimpleMath::Vector3 vtx2, DirectX::SimpleMath::Vector3 vtx3, DirectX::SimpleMath::Vector3 vtx4, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
 		void AddLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
 		bool ChangeScreenResolution(int width, int height, int frequency, bool windowed);
