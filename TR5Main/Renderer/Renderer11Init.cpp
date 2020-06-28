@@ -3,6 +3,7 @@
 #include "configuration.h"
 #include "winmain.h"
 #include "GameFlowScript.h"
+#include "Quad/RenderQuad.h"
 using namespace T5M::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
@@ -188,6 +189,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer(sizeof(CHUDBarBuffer));
 	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
+	m_cbSprite = createConstantBuffer(sizeof(CSpriteBuffer));
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
 	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
 	updateConstantBuffer(m_cbHUD, &m_stHUD, sizeof(CHUDBuffer));
@@ -229,6 +231,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_device->CreateBlendState(&blendStateDesc, &m_subtractiveBlendState);
 	initialiseBars();
+	initQuad(m_device);
 	return true;
 }
 
