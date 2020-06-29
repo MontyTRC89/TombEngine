@@ -20,7 +20,7 @@ static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags
 	short fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != -1)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;

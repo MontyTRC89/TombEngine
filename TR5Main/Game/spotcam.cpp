@@ -7,7 +7,7 @@
 #include "switch.h"
 #include "lara.h"
 #include "input.h"
-
+using namespace T5M::Renderer;
 int LastSequence;
 int SpotcamTimer;
 int SpotcamLoopCnt;
@@ -165,7 +165,7 @@ void InitialiseSpotCam(short Sequence)
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS) /*|| gfGameMode == 1*/)
 	{
 		DisableLaraControl = 1;
-		g_Renderer->EnableCinematicBars(true);
+		g_Renderer.EnableCinematicBars(true);
 		//SetFadeClip(16, 1);
 	}
 
@@ -682,7 +682,7 @@ void CalculateSpotCameras()
 					{
 						//SetFadeClip(16, 1);
 						if (CurrentLevel)
-							g_Renderer->EnableCinematicBars(true);
+							g_Renderer.EnableCinematicBars(true);
 						DisableLaraControl = true;
 					}
 
@@ -783,7 +783,7 @@ void CalculateSpotCameras()
 					}
 
 					//SetFadeClip(0, 1);
-					g_Renderer->EnableCinematicBars(false);
+					g_Renderer.EnableCinematicBars(false);
 
 					UseSpotCam = 0;
 					DisableLaraControl = 0;
@@ -893,7 +893,7 @@ void CalculateSpotCameras()
 	}
 	else
 	{
-		g_Renderer->EnableCinematicBars(false);
+		g_Renderer.EnableCinematicBars(false);
 		UseSpotCam = false;
 		DisableLaraControl = false;
 		Camera.speed = 1;

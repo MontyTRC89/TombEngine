@@ -21,7 +21,7 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 	short fxNum = CreateNewEffect(item->roomNumber);
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);

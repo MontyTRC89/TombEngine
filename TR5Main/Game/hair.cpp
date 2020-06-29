@@ -9,7 +9,7 @@
 #include "setup.h"
 #include "sphere.h"
 #include "level.h"
-
+using T5M::Renderer::g_Renderer;
 int FirstHair[HAIR_MAX];
 HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS];
 int WindAngle;
@@ -150,7 +150,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	}
 	
 	Matrix world;
-	g_Renderer->GetBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
+	g_Renderer.GetBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
 
 	if (ponytail)
 	{

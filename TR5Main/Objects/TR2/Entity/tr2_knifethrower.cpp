@@ -19,7 +19,7 @@ void KnifeControl(short fxNum)
 	short roomNumber;
 	FLOOR_INFO* floor;
 
-	fx = &Effects[fxNum];
+	fx = &EffectList[fxNum];
 
 	if (fx->counter <= 0)
 	{

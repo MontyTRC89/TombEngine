@@ -11,7 +11,7 @@ short SmashedMeshCount;
 MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
 vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
-
+using namespace T5M::Renderer;
 DebrisFragment* GetFreeDebrisFragment()
 {
 	for (auto frag = DebrisFragments.begin(); frag != DebrisFragments.end(); frag++) {
@@ -24,7 +24,6 @@ DebrisFragment* GetFreeDebrisFragment()
 
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)
 {
-	extern Renderer11* g_Renderer;
 	short* meshPtr = nullptr;
 	RendererMesh* fragmentsMesh;
 	short yRot = 0;
@@ -39,7 +38,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		yRot = item->yRot;
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
-	fragmentsMesh = g_Renderer->getMeshFromMeshPtr(reinterpret_cast<unsigned int>(meshPtr));
+	fragmentsMesh = g_Renderer.getMeshFromMeshPtr(reinterpret_cast<unsigned int>(meshPtr));
 	for (int bucket = RENDERER_BUCKET_SOLID; bucket <= RENDERER_BUCKET_TRANSPARENT; bucket++) {
 		RendererBucket renderBucket = fragmentsMesh->Buckets[bucket];
 		vector<RendererVertex>* meshVertices = &renderBucket.Vertices;

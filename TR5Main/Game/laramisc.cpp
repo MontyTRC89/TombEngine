@@ -18,7 +18,7 @@
 #include "camera.h"
 #include "input.h"
 #include "sound.h"
-
+using T5M::Renderer::g_Renderer;
 extern GameFlow* g_GameFlow;
 extern short FXType;
 COLL_INFO lara_coll;
@@ -1033,7 +1033,7 @@ void AnimateLara(ITEM_INFO* item)
 	}
 
 	// Update matrices
-	g_Renderer->UpdateLaraAnimations(true);
+	g_Renderer.UpdateLaraAnimations(true);
 }
 
 void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)

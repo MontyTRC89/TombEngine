@@ -7,7 +7,7 @@
 
 void ControlBodyPart(short fxNumber)
 {
-	FX_INFO* fx = &Effects[fxNumber];
+	FX_INFO* fx = &EffectList[fxNumber];
 	int x = fx->pos.xPos;
 	int y = fx->pos.yPos;
 	int z = fx->pos.zPos;

@@ -16,6 +16,7 @@
 #include "lara2gun.h"
 #include "level.h"
 #include "input.h"
+using namespace T5M::Renderer;
 using std::vector;
 Inventory g_Inventory;
 extern GameFlow* g_GameFlow;
@@ -571,14 +572,14 @@ int Inventory::DoInventory()
 		m_activeRing = INV_RING_OPTIONS;
 		m_rings[m_activeRing].currentObject = 0;
 
-		g_Renderer->DumpGameScene();
+		g_Renderer.DumpGameScene();
 
 		OpenRing(m_activeRing, true);
 
 		int passportResult = DoPassport();
 
 		// Fade out
-		g_Renderer->FadeOut();
+		g_Renderer.FadeOut();
 		for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 		{
 			UpdateSceneAndDrawInventory();
@@ -614,7 +615,7 @@ int Inventory::DoInventory()
 
 	int result = INV_RESULT_NONE;
 
-	g_Renderer->DumpGameScene();
+	g_Renderer.DumpGameScene();
 
 	SoundEffect(SFX_TR3_MENU_SPININ, NULL, 0);
 
@@ -725,7 +726,7 @@ int Inventory::DoInventory()
 						passportResult == INV_RESULT_LOAD_GAME)
 					{
 						// Fade out
-						g_Renderer->FadeOut();
+						g_Renderer.FadeOut();
 						for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 						{
 							UpdateSceneAndDrawInventory();
@@ -1803,17 +1804,17 @@ bool Inventory::UpdateSceneAndDrawInventory()
 
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 	{
-		g_Renderer->DumpGameScene();
-		g_Renderer->DrawInventory();
-		Camera.numberFrames = g_Renderer->SyncRenderer();
+		g_Renderer.DumpGameScene();
+		g_Renderer.DrawInventory();
+		Camera.numberFrames = g_Renderer.SyncRenderer();
 
 		nframes = Camera.numberFrames;
 		ControlPhase(nframes, 0);
 	}
 	else
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		g_Renderer.DrawInventory();
+		g_Renderer.SyncRenderer();
 	}
 
 	return true;
@@ -1831,7 +1832,7 @@ int Inventory::DoTitleInventory()
 	m_activeRing = INV_RING_OPTIONS;
 
 	// Fade in
-	g_Renderer->FadeIn();
+	g_Renderer.FadeIn();
 	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
@@ -1931,7 +1932,7 @@ int Inventory::DoTitleInventory()
 	CloseRing(INV_RING_OPTIONS, true);
 
 	// Fade out
-	g_Renderer->FadeOut();
+	g_Renderer.FadeOut();
 	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
@@ -2651,7 +2652,7 @@ void Inventory::DoGraphicsSettings()
 	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
 
 	// Get current display mode
-	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[ring->Configuration.Adapter];
 	ring->SelectedVideoMode = 0;
 	for (int i = 0; i < adapter->DisplayModes.size(); i++)
@@ -2782,7 +2783,7 @@ void Inventory::DoGraphicsSettings()
 				SaveConfiguration();
 
 				// Reset screen and go back
-				g_Renderer->ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 
+				g_Renderer.ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 
 												   ring->Configuration.RefreshRate, ring->Configuration.Windowed);
 				closeObject = true;
 
