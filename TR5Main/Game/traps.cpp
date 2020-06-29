@@ -52,7 +52,7 @@ void LaraBurn()
 		short fxNum = CreateNewEffect(LaraItem->roomNumber);
 		if (fxNum != NO_ITEM)
 		{
-			Effects[fxNum].objectNumber = ID_FLAME;
+			EffectList[fxNum].objectNumber = ID_FLAME;
 			Lara.burn = true;
 		}
 	}
@@ -214,7 +214,7 @@ void FlameEmitter2Control(short itemNumber)//5A1BC, 5A638 (F)
 
 void FlameControl(short fxNumber)
 {
-	FX_INFO* fx = &Effects[fxNumber];
+	FX_INFO* fx = &EffectList[fxNumber];
 
 	for (int i = 0; i < 14; i++)
 	{

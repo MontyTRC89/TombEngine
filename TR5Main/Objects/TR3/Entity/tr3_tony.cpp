@@ -59,7 +59,7 @@ static void TriggerTonyEffect(const TONY_FLAME flame)
 	short fx_number = CreateNewEffect(flame.room_number);
 	if (fx_number != -1)
 	{
-		FX_INFO* fx = &Effects[fx_number];
+		FX_INFO* fx = &EffectList[fx_number];
 		fx->pos.xPos = flame.pos.x;
 		fx->pos.yPos = flame.pos.y;
 		fx->pos.zPos = flame.pos.z;
@@ -150,8 +150,8 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	SPARKS* sptr;
 	int dx, dz;
 
-	dx = LaraItem->pos.xPos - Effects[fxNumber].pos.xPos;
-	dz = LaraItem->pos.zPos - Effects[fxNumber].pos.zPos;
+	dx = LaraItem->pos.xPos - EffectList[fxNumber].pos.xPos;
+	dz = LaraItem->pos.zPos - EffectList[fxNumber].pos.zPos;
 	if (dx < -MAX_TONY_TRIGGER_RANGE || dx > MAX_TONY_TRIGGER_RANGE || dz < -MAX_TONY_TRIGGER_RANGE || dz > MAX_TONY_TRIGGER_RANGE)
 		return;
 
@@ -329,7 +329,7 @@ void ControlTonyFireBall(short fxNumber)
 	TonyFlameType type;
 	short room_number;
 
-	fx = &Effects[fxNumber];
+	fx = &EffectList[fxNumber];
 	old_x = fx->pos.xPos;
 	old_y = fx->pos.yPos;
 	old_z = fx->pos.zPos;

@@ -14,7 +14,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "input.h"
-
+using T5M::Renderer::g_Renderer;
 struct OLD_CAMERA
 {
 	short currentAnimState;
@@ -76,13 +76,13 @@ void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ,
 	if (posX == targetX && posY == targetY && posZ == targetZ)
 		return;
 
-	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
+	g_Renderer.UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
 }
 
 void AlterFOV(int value)
 { 
 	CurrentFOV = value;
-	PhdPerspective = g_Renderer->ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+	PhdPerspective = g_Renderer.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
 
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
