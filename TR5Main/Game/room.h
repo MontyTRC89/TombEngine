@@ -30,11 +30,13 @@ typedef struct tr5_vertex
 	float z;
 };
 
-typedef struct tr5_room_vertex
+struct ROOM_VERTEX
 {
-	tr5_vertex Vertex;		// Vertex is now floating-point
-	tr5_vertex Normal;
-	DWORD Colour;			// 32-bit colour
+	Vector3 position;
+	Vector3 normal;
+	Vector2 textureCoordinates;
+	Vector3 color;
+	int effects;
 };
 
 struct ROOM_DOOR
@@ -58,11 +60,19 @@ typedef struct tr4_mesh_face4    // 12 bytes
 	short Effects;
 };
 
-typedef struct tr_ROOM_DOOR  // 32 bytes
+struct POLYGON
 {
-	short AdjoiningRoom; // Which room this portal leads to
-	TR_VERTEX Normal;
-	TR_VERTEX Vertices[4];
+	int shape;
+	int baseIndex;
+	int texture;
+};
+
+struct BUCKET 
+{
+	int texture;
+	byte blendMode;
+	bool animated;
+	std::vector<int> indices;
 };
 
 typedef struct tr_room_sector // 8 bytes
@@ -182,21 +192,20 @@ typedef struct ROOM_INFO
 	int z;
 	int minfloor;
 	int maxceiling;
-	std::vector<tr5_room_vertex> vertices;
-	std::vector<tr4_mesh_face4> quads;
-	std::vector<tr4_mesh_face3> triangles;
+	std::vector<ROOM_VERTEX> vertices;
+	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
-	short xSize;
-	short ySize;
+	int xSize;
+	int ySize;
 	std::vector<FLOOR_INFO> floor;
 	Vector3 ambient;
 	std::vector<ROOM_LIGHT> lights;
 	std::vector<MESH_INFO> mesh;
-	short flippedRoom;
-	unsigned short flags;
-	byte meshEffect;
-	unsigned char reverbType;
-	unsigned char flipNumber;
+	int flippedRoom;
+	int flags;
+	int meshEffect;
+	int reverbType;
+	int flipNumber;
 	short itemNumber;
 	short fxNumber;
 	bool boundActive;
