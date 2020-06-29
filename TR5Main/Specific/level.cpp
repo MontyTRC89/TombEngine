@@ -425,47 +425,45 @@ void ReadRooms()
 		room.minfloor = ReadInt32();
 		room.maxceiling = ReadInt32();
 
-		int numDataWords = ReadInt32();
-
-		short numVertices = ReadInt16();
+		int numVertices = ReadInt32();
 		room.vertices.reserve(numVertices);
 		for (int j = 0; j < numVertices; j++)
 		{
-			tr5_room_vertex vertex;
-			vertex.Vertex.x = ReadInt16();
-			vertex.Vertex.y = ReadInt16();
-			vertex.Vertex.z = ReadInt16();
-			vertex.Colour = ReadInt32();
-			ReadInt16();
+			ROOM_VERTEX vertex;
+			vertex.position.x = ReadFloat();
+			vertex.position.y = ReadFloat();
+			vertex.position.z = ReadFloat();
+			vertex.normal.x = ReadFloat();
+			vertex.normal.y = ReadFloat();
+			vertex.normal.z = ReadFloat();
+			vertex.textureCoordinates.x = ReadFloat();
+			vertex.textureCoordinates.y = ReadFloat();
+			vertex.color.x = ReadFloat();
+			vertex.color.y = ReadFloat();
+			vertex.color.z = ReadFloat();
+			vertex.effects = ReadInt32();
 			room.vertices.push_back(vertex);
 		}
 
-		short numQuads = ReadInt16();
-		room.quads.reserve(numQuads);
-		for (int j = 0; j < numQuads; j++)
+		int numBuckets = ReadInt32();
+		room.buckets.reserve(numBuckets);
+		for (int j = 0; j < numBuckets; j++)
 		{
-			tr4_mesh_face4 poly;
-			poly.Vertices[0] = ReadInt16();
-			poly.Vertices[1] = ReadInt16();
-			poly.Vertices[2] = ReadInt16();
-			poly.Vertices[3] = ReadInt16();
-			poly.Texture = ReadInt16();
-			room.quads.push_back(poly);
+			BUCKET bucket;
+
+			bucket.texture = ReadInt32();
+			bucket.blendMode = ReadInt8();
+			bucket.animated = ReadInt8();
+
+			int numIndices = ReadInt32();
+			bucket.indices.reserve(numIndices);
+			for (int k = 0; k < numIndices; k++)
+				bucket.indices.push_back(ReadInt32());
+
+			room.buckets.push_back(bucket);
 		}
 
-		short numTriangles = ReadInt16();
-		room.triangles.reserve(numTriangles);
-		for (int j = 0; j < numTriangles; j++)
-		{
-			tr4_mesh_face3 poly;
-			poly.Vertices[0] = ReadInt16();
-			poly.Vertices[1] = ReadInt16();
-			poly.Vertices[2] = ReadInt16();
-			poly.Texture = ReadInt16();
-			room.triangles.push_back(poly);
-		}
-
-		short numPortals = ReadInt16();
+		int numPortals = ReadInt32();
 		for (int j = 0; j < numPortals; j++)
 		{
 			ROOM_DOOR door;
@@ -484,8 +482,8 @@ void ReadRooms()
 			room.doors.push_back(door);
 		}
 
-		room.xSize = ReadInt16();
-		room.ySize = ReadInt16();
+		room.xSize = ReadInt32();
+		room.ySize = ReadInt32();
 		room.floor.reserve(room.xSize * room.ySize);
 		for (int j = 0; j < room.xSize * room.ySize; j++)
 		{
@@ -523,7 +521,7 @@ void ReadRooms()
 		room.ambient.y = ReadFloat();
 		room.ambient.z = ReadFloat();
 
-		short numLights = ReadInt16();
+		int numLights = ReadInt32();
 		room.lights.reserve(numLights);
 		for (int j = 0; j < numLights; j++)
 		{
@@ -548,7 +546,7 @@ void ReadRooms()
 			room.lights.push_back(light);
 		}
 		
-		short numStatics = ReadInt16();
+		int numStatics = ReadInt32();
 		room.mesh.reserve(numStatics);
 		for (int j = 0; j < numStatics; j++)
 		{
@@ -565,11 +563,11 @@ void ReadRooms()
 			room.mesh.push_back(mesh);
 		}
 
-		room.flippedRoom = ReadInt16();
-		room.flags = ReadInt16();
-		room.meshEffect = ReadInt8();
-		room.reverbType = ReadInt8();
-		room.flipNumber = ReadInt8();
+		room.flippedRoom = ReadInt32();
+		room.flags = ReadInt32();
+		room.meshEffect = ReadInt32();
+		room.reverbType = ReadInt32();
+		room.flipNumber = ReadInt32();
 
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;

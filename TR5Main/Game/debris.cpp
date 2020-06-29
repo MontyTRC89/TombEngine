@@ -39,7 +39,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
 	fragmentsMesh = g_Renderer.getMeshFromMeshPtr(reinterpret_cast<unsigned int>(meshPtr));
-	for (int bucket = RENDERER_BUCKET_SOLID; bucket <= RENDERER_BUCKET_TRANSPARENT_DS; bucket++) {
+	for (int bucket = RENDERER_BUCKET_SOLID; bucket <= RENDERER_BUCKET_TRANSPARENT; bucket++) {
 		RendererBucket renderBucket = fragmentsMesh->Buckets[bucket];
 		vector<RendererVertex>* meshVertices = &renderBucket.Vertices;
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
