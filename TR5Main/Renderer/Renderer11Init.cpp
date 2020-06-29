@@ -49,28 +49,22 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	for (int i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
 	{
-		m_caustics[i] = Texture2D::LoadFromFile(m_device, causticsNames[i]);
-		if (m_caustics[i] == NULL)
-			return false;
+		wchar_t causticsFile[255];
+		std::mbstowcs(causticsFile, causticsNames[i], 255);
+		std::wstring causticsFilename = std::wstring(causticsFile);
+		m_caustics[i] = Texture2D(m_device, causticsFilename);
 	}
-	m_HUDBarBorderTexture = Texture2D::LoadFromFile(m_device, "bar_border.png");
-	if (!m_HUDBarBorderTexture)
-		return false;
-	m_titleScreen = Texture2D::LoadFromFile(m_device, (char*)g_GameFlow->GetLevel(0)->Background.c_str());
-	if (m_titleScreen == NULL)
-		return false;
+	m_HUDBarBorderTexture = Texture2D(m_device, L"bar_border.png");
+	wchar_t titleScreenFile[255];
+	std::wstring titleFile = std::wstring(titleScreenFile);
+	std::mbstowcs(titleScreenFile, g_GameFlow->GetLevel(0)->Background.c_str(),255);
 
-	m_binocularsTexture = Texture2D::LoadFromFile(m_device, "Binoculars.png");
-	if (m_binocularsTexture == NULL)
-		return false;
+	m_titleScreen = Texture2D(m_device, titleScreenFile);
 
-	m_whiteTexture = Texture2D::LoadFromFile(m_device, "WhiteSprite.png");
-	if (m_whiteTexture == NULL)
-		return false;
+	m_binocularsTexture = Texture2D(m_device, L"Binoculars.png");
+	m_whiteTexture = Texture2D(m_device, L"WhiteSprite.png");
 
-	m_logo = Texture2D::LoadFromFile(m_device, "Logo.png");
-	if (m_logo == NULL)
-		return false;
+	m_logo = Texture2D(m_device, L"Logo.png");
 
 	// Load shaders
 	ID3D10Blob * blob;
@@ -222,8 +216,6 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 		m_effects[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
-	m_textureAtlas = NULL;
-	m_skyTexture = NULL;
 	D3D11_BLEND_DESC blendStateDesc{};
 	blendStateDesc.AlphaToCoverageEnable = FALSE;
 	blendStateDesc.IndependentBlendEnable = FALSE;

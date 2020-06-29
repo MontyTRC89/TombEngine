@@ -23,7 +23,7 @@ static void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber
 	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &Effects[fx_number];
+		fx = &EffectList[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
