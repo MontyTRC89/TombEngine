@@ -9,8 +9,8 @@
 namespace T5M::Renderer {
 	using namespace T5M::Renderer;
 
-	void Renderer11::collectRooms() {
-		short baseRoomIndex = Camera.pos.roomNumber;
+	void Renderer11::collectRooms(const Matrix& viewProjection,int roomNumber) {
+		short baseRoomIndex = roomNumber;
 
 		for (int i = 0; i < Rooms.size(); i++) {
 			m_rooms[i].Visited = false;
@@ -19,7 +19,7 @@ namespace T5M::Renderer {
 
 		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 
-		getVisibleRooms(-1, baseRoomIndex, &vp, false, 0);
+		getVisibleRooms(-1, baseRoomIndex, &vp, false, 0,viewProjection);
 	}
 
 	void Renderer11::collectItems(short roomNumber) {

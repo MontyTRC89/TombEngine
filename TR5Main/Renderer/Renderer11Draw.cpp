@@ -335,21 +335,24 @@ namespace T5M::Renderer {
 
         float currentFade = 0;
         while (currentFade <= 1.0f) {
-            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade);
+            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade,m_backBufferRTV,m_depthStencilView);
             SyncRenderer();
             currentFade += FADE_FACTOR;
+            m_swapChain->Present(0, 0);
         }
 
         for (int i = 0; i < 30 * 1.5f; i++) {
-            drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f);
+            drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f,m_backBufferRTV,m_depthStencilView);
             SyncRenderer();
+            m_swapChain->Present(0, 0);
         }
 
         currentFade = 1.0f;
         while (currentFade >= 0.0f) {
-            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade);
+            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade,m_backBufferRTV,m_depthStencilView);
             SyncRenderer();
             currentFade -= FADE_FACTOR;
+            m_swapChain->Present(0, 0);
         }
         return true;
     }
@@ -403,7 +406,7 @@ namespace T5M::Renderer {
         return true;
     }
 
-    int Renderer11::drawInventoryScene() {
+    int Renderer11::drawInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,ID3D11ShaderResourceView* background) {
         char stringBuffer[255];
 
         bool drawLogo = true;
@@ -429,22 +432,16 @@ namespace T5M::Renderer {
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
         // Bind and clear render target
-        m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
-        m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
+        //m_context->ClearRenderTargetView(target, Colors::Black);
+        //m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->OMSetRenderTargets(1, &target, depthTarget);
         m_context->RSSetViewports(1, &m_viewport);
 
-        // Clear the Z-Buffer after drawing the background
-        if (g_Inventory.GetType() == INV_TYPE_TITLE) {
-            if (g_GameFlow->TitleType == TITLE_BACKGROUND)
-                drawFullScreenQuad(m_titleScreen.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
-            else
-                drawFullScreenQuad(m_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(1.0f, 1.0f, 1.0f), false);
-        } else {
-            drawFullScreenQuad(m_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(0.2f, 0.2f, 0.2f), false);
-        }
+        if (background != nullptr) {
+            drawFullScreenImage(background, 0.5f,target,depthTarget);
+       }
 
-        m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -1707,6 +1704,8 @@ namespace T5M::Renderer {
     }
 
     int Renderer11::drawFinalPass() {
+        return 0;
+        /*
         // Update fade status
         if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor > 0.99f)
             m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
@@ -1719,9 +1718,9 @@ namespace T5M::Renderer {
         m_context->RSSetState(m_states->CullCounterClockwise());
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-        m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-        m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+        m_context->ClearRenderTargetView(target, Colors::Black);
+        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->OMSetRenderTargets(1, &target, depthTarget);
 
         drawFullScreenQuad(m_renderTarget.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
 
@@ -1741,36 +1740,41 @@ namespace T5M::Renderer {
         }
 
         return 0;
+        */
     }
 
-    bool Renderer11::drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade) {
+    bool Renderer11::drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade,ID3D11RenderTargetView* target,ID3D11DepthStencilView* depthTarget) {
         // Reset GPU state
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->RSSetState(m_states->CullCounterClockwise());
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
-        m_context->ClearRenderTargetView(m_backBufferRTV, Colors::White);
-        m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
+        m_context->OMSetRenderTargets(1, &target, depthTarget);
         m_context->RSSetViewports(1, &m_viewport);
-
         drawFullScreenQuad(texture, Vector3(fade, fade, fade), false);
-
-        m_swapChain->Present(0, 0);
-
         return true;
     }
 
     int Renderer11::DrawInventory() {
-        if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
-            drawScene(true);
-        drawInventoryScene();
-        drawFinalPass();
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+		drawInventoryScene(m_backBufferRTV, m_depthStencilView,m_dumpScreenRenderTarget.ShaderResourceView.Get());
+		m_swapChain->Present(0, 0);
+		return 0;
+    }
 
+    int Renderer11::DrawTitle() {
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_context->ClearRenderTargetView(m_backBufferRTV,Colors::Black);
+
+		drawScene(m_backBufferRTV, m_depthStencilView);
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+		drawInventoryScene(m_backBufferRTV, m_depthStencilView,nullptr);
+        m_swapChain->Present(0, 0);
         return 0;
     }
 
-    bool Renderer11::drawScene(bool dump) {
+    bool Renderer11::drawScene(ID3D11RenderTargetView* target,ID3D11DepthStencilView* depthTarget) {
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
         m_timeUpdate = 0;
@@ -1796,12 +1800,11 @@ namespace T5M::Renderer {
         auto time1 = std::chrono::high_resolution_clock::now();
         prepareCameraForFrame();
         ProcessClosedDoors();
-
         // TEST
         //CollectRooms(CurrentRoom);
 
         clearSceneItems();
-        collectRooms();
+        collectRooms(ViewProjection,Camera.pos.roomNumber);
         UpdateLaraAnimations(false);
         updateItemsAnimations();
         updateEffects();
@@ -1827,15 +1830,14 @@ namespace T5M::Renderer {
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
         // Bind and clear render target
-        m_currentRenderTarget = (dump ? m_dumpScreenRenderTarget : m_renderTarget);
 
-        m_context->ClearRenderTargetView(m_currentRenderTarget.RenderTargetView.Get(), Colors::Black);
-        m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        m_context->OMSetRenderTargets(1, m_currentRenderTarget.RenderTargetView.GetAddressOf(), m_currentRenderTarget.DepthStencilView.Get());
+        m_context->ClearRenderTargetView(target, Colors::Black);
+        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->OMSetRenderTargets(1, &target, depthTarget);
 
         m_context->RSSetViewports(1, &m_viewport);
 
-        drawHorizonAndSky();
+        drawHorizonAndSky(depthTarget);
 
         // Opaque geometry
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -1957,19 +1959,11 @@ namespace T5M::Renderer {
 
         drawAllStrings();
 
-        /*m_spriteBatch->Begin();
-        RECT rect; rect.top = rect.left = 0; rect.right = rect.bottom = 128;
-        m_spriteBatch->Draw(m_shadowMap->ShaderResourceView, rect, Colors::White);
-        m_spriteBatch->End();*/
-
-        if (!dump)
-            m_swapChain->Present(0, 0);
-
         return true;
     }
 
     int Renderer11::DumpGameScene() {
-        drawScene(true);
+        drawScene(m_dumpScreenRenderTarget.RenderTargetView.Get(),m_dumpScreenRenderTarget.DepthStencilView.Get());
         return 0;
     }
 
@@ -2249,7 +2243,7 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawHorizonAndSky() {
+    bool Renderer11::drawHorizonAndSky(ID3D11DepthStencilView* depthTarget) {
         // Update the sky
         GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
         Vector4 color = Vector4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
@@ -2405,7 +2399,7 @@ namespace T5M::Renderer {
         }
 
         // Clear just the Z-buffer so we can start drawing on top of the horizon
-        m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
         return true;
     }
@@ -2415,9 +2409,9 @@ namespace T5M::Renderer {
     }
 
     int Renderer11::Draw() {
-        drawScene(false);
-        drawFinalPass();
-
+        drawScene(m_backBufferRTV,m_depthStencilView);
+        //drawFinalPass();
+        m_swapChain->Present(0, 0);
         return 0;
     }
 }

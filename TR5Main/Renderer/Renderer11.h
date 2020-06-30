@@ -17,7 +17,8 @@
 #include "RenderTarget2D/RenderTarget2D.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "Texture2D/Texture2D.h"
-#include <Renderer\ConstantBuffers\SpriteBuffer.h>
+#include "ConstantBuffers\SpriteBuffer.h"
+#include "RenderTargetCube\RenderTargetCube.h"
 
 namespace T5M::Renderer
 {
@@ -369,7 +370,7 @@ namespace T5M::Renderer
 		T5M::Renderer::RenderTarget2D m_renderTarget;
 		T5M::Renderer::RenderTarget2D m_currentRenderTarget;
 		T5M::Renderer::RenderTarget2D m_shadowMap;
-	
+		T5M::Renderer::RenderTargetCube m_reflectionCubemap;
 		// Shaders
 		ID3D11VertexShader* m_vsRooms;
 		ID3D11PixelShader* m_psRooms;
@@ -513,14 +514,14 @@ namespace T5M::Renderer
 		bool m_firstWeather;
 		RendererWeatherParticle	m_rain[NUM_RAIN_DROPS];
 		RendererWeatherParticle	m_snow[NUM_SNOW_PARTICLES];
-		RENDERER_FADE_STATUS m_fadeStatus;
+		RENDERER_FADE_STATUS m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
 		float m_fadeFactor;
 		int m_progress;
 		bool m_enableCinematicBars = false;
 		int m_pickupRotation;
 	
 		// Private functions
-		bool											drawScene(bool dump);
+		bool											drawScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		bool											drawAllStrings();
 		ID3D11VertexShader*								compileVertexShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
 		ID3D11GeometryShader*							compileGeometryShader(const wchar_t * fileName);
@@ -535,9 +536,9 @@ namespace T5M::Renderer
 		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void											updateAnimation(RendererItem* item, RendererObject& obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
-		void											getVisibleRooms(int from, int to, DirectX::SimpleMath::Vector4* viewPort, bool water, int count);
-		bool checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort);
-		void											collectRooms();
+		void											getVisibleRooms(int from, int to, DirectX::SimpleMath::Vector4* viewPort, bool water, int count,const Matrix& viewProjection);
+		bool checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort,const Matrix& viewProjection);
+		void											collectRooms(const Matrix& viewProjection,int roomNumber);
 		void											collectItems(short roomNumber);
 		void											collectStatics(short roomNumber);
 		void											collectLightsForRoom(short roomNumber);
@@ -552,7 +553,7 @@ namespace T5M::Renderer
 		int												getFrame(short animation, short frame, short** framePtr, int* rate);
 		bool											drawAmbientCubeMap(short roomNumber);
 		bool											sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
-		bool											drawHorizonAndSky();
+		bool											drawHorizonAndSky(ID3D11DepthStencilView* depthTarget);
 		bool											drawRooms(bool transparent, bool animated);
 		bool											drawStatics(bool transparent);
 		bool											drawItems(bool transparent, bool animated);
@@ -584,9 +585,10 @@ namespace T5M::Renderer
 		bool											drawSpiders();
 		bool											drawGunFlashes();
 		bool											drawGunShells();
+		int drawInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
 		bool											drawDebris(bool transparent);
-		int												drawInventoryScene();
 		int												drawFinalPass();
+		bool drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		void											updateAnimatedTextures();
 		void											createBillboardMatrix(DirectX::SimpleMath::Matrix* out, DirectX::SimpleMath::Vector3* particlePos, DirectX::SimpleMath::Vector3* cameraPos, float rotation);
 		void											drawShockwaves();
@@ -595,7 +597,6 @@ namespace T5M::Renderer
 		bool											doRain();
 		bool											doSnow();
 		bool											drawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool cinematicBars);
-		bool											drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade);
 		bool											isRoomUnderwater(short roomNumber);
 		bool											isInRoom(int x, int y, int z, short roomNumber);
 		bool											drawColoredQuad(int x, int y, int w, int h, DirectX::SimpleMath::Vector4 color);
@@ -605,6 +606,7 @@ namespace T5M::Renderer
 		bool											drawSparkParticles();
 		bool                                            drawDripParticles();
 		bool											drawExplosionParticles();
+		void renderToCubemap(const RenderTargetCube& dest,const Vector3& pos);
 	public:
 		DirectX::SimpleMath::Matrix View;
 		DirectX::SimpleMath::Matrix Projection;
@@ -626,6 +628,7 @@ namespace T5M::Renderer
 		void UpdateCameraMatrices(float posX, float posY, float posZ, float targetX, float targetY, float targetZ, float roll, float fov);
 		int DumpGameScene();
 		int DrawInventory();
+		int DrawTitle();
 		int DrawPickup(short objectNum);
 		int SyncRenderer();
 		bool PrintString(int x, int y, char* string, D3DCOLOR color, int flags);

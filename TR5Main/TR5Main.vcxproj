@@ -321,6 +321,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Renderer\Utils.h" />
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderView\RenderView.h" />
+    <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -566,6 +567,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Renderer\Utils.cpp" />
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
+    <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
