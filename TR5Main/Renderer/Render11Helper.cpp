@@ -637,6 +637,7 @@ namespace T5M::Renderer {
 		return (!Windowed);
 	}
 	bool Renderer11::IsFading() {
+		return false;
 		return (m_fadeStatus != FADEMODE_NONE);
 	}
 
@@ -757,13 +758,13 @@ namespace T5M::Renderer {
 		return (a->Distance - b->Distance);
 	}
 
-	void Renderer11::getVisibleRooms(int from, int to, Vector4 * viewPort, bool water, int count) {
+	void Renderer11::getVisibleRooms(int from, int to, Vector4 * viewPort, bool water, int count,const Matrix& viewProjection) {
 		// Avoid allocations, 1024 should be fine
-		RendererRoomNode nodes[1024];
+		RendererRoomNode nodes[256];
 		int nextNode = 0;
 
 		// Avoid reallocations, 1024 should be fine
-		RendererRoomNode* stack[1024];
+		RendererRoomNode* stack[256];
 		int stackDepth = 0;
 
 		RendererRoomNode* node = &nodes[nextNode++];
@@ -802,7 +803,7 @@ namespace T5M::Renderer {
 			for (int i = 0; i < room->doors.size(); i++) {
 				short adjoiningRoom = room->doors[i].room;
 
-				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort)) {
+				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort, viewProjection)) {
 					RendererRoomNode* childNode = &nodes[nextNode++];
 					childNode->From = node->To;
 					childNode->To = adjoiningRoom;
@@ -814,7 +815,7 @@ namespace T5M::Renderer {
 		}
 	}
 
-	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR * portal, Vector4 * viewPort, Vector4 * clipPort) {
+	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR * portal, Vector4 * viewPort, Vector4 * clipPort,const Matrix& viewProjection) {
 		ROOM_INFO* room = &Rooms[roomIndex];
 
 		Vector3 n = portal->normal;
@@ -840,7 +841,7 @@ namespace T5M::Renderer {
 			Vector4 tmp = Vector4(portal->vertices[i].x + room->x, portal->vertices[i].y + room->y, portal->vertices[i].z + room->z, 1.0f);
 
 			// Project corner on screen
-			Vector4::Transform(tmp, ViewProjection, p[i]);
+			Vector4::Transform(tmp, viewProjection, p[i]);
 
 			if (p[i].w > 0.0f) {
 				// The corner is in front of camera

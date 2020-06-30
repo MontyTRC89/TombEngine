@@ -336,7 +336,7 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	m_renderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_shadowMap = RenderTarget2D(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
-
+	m_reflectionCubemap = RenderTargetCube(m_device, 64, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	// Shadow map
 	/*D3D11_TEXTURE2D_DESC depthTexDesc;
 	ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));

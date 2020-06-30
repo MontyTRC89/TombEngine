@@ -207,6 +207,18 @@ namespace T5M::Renderer {
 		return buffer;
 	}
 
+	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos) {
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
+		m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		for (int i = 0; i < 6; i++) {
+			m_context->ClearRenderTargetView(dest.RenderTargetView[i].Get(), Colors::Black);
+			m_context->ClearDepthStencilView(dest.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0, 0x0);
+			m_context->OMSetRenderTargets(6, dest.RenderTargetView[i].GetAddressOf(), dest.DepthStencilView.Get());
+		}
+		
+	}
+
 	RendererHUDBar::RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4, 9> colors) {
 		array<Vector3, 9> barVertices = {
 			Vector3(x, HUD_ZERO_Y + y, 0.5),
