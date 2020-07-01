@@ -68,4 +68,5 @@ T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int reso
 		res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, DepthStencilView[i].GetAddressOf());
 		throwIfFailed(res);
 	}
+
 }
