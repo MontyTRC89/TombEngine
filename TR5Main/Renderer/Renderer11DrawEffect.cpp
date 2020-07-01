@@ -737,7 +737,7 @@ namespace T5M::Renderer {
 		m_context->VSSetShader(m_vsSprites, NULL, 0);
 		m_context->PSSetShader(m_psSprites, NULL, 0);
 
-		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+		updateConstantBuffer(m_cbCameraMatrices, &gameCamera, sizeof(CCameraMatrixBuffer));
 		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
 		m_stMisc.AlphaTest = true;

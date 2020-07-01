@@ -143,7 +143,7 @@ namespace T5M::Renderer {
 			r.RoomNumber = i;
 			r.Room = room;
 			r.AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
-			r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
+			//r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
 			r.Statics.resize(room->mesh.size());
 
 			if (room->vertices.size() == 0)

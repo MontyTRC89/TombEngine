@@ -64,19 +64,15 @@ short CurrentFOV;
 int GetLaraOnLOS;
 int SniperOverlay;
 
-void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll)
+void LookAt(CAMERA_INFO* cam, short roll)
 {
-	Vector3 position = Vector3(posX, posY, posZ);
-	Vector3 target = Vector3(targetX, targetY, targetZ);
+	Vector3 position = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
+	Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
 	float r = TO_RAD(roll);
 
-	// This should not be needed but it seems to solve our issues
-	if (posX == targetX && posY == targetY && posZ == targetZ)
-		return;
-
-	g_Renderer.UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
+	g_Renderer.UpdateCameraMatrices(cam, r, fov);
 }
 
 void AlterFOV(int value)
@@ -331,7 +327,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	}
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	LookAt(&Camera, 0);
 	
 	if (Camera.mikeAtLara)
 	{
@@ -1110,7 +1106,7 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	LookAt(&Camera, 0);
 
 	if (Camera.mikeAtLara)
 	{
@@ -1256,7 +1252,7 @@ void BinocularCamera(ITEM_INFO* item)
 	}
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	LookAt(&Camera, 0);
 
 	if (Camera.mikeAtLara)
 	{
