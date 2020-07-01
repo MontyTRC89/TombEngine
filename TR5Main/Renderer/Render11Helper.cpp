@@ -274,7 +274,7 @@ namespace T5M::Renderer {
 						currentBone->ExtraRotation.y = TO_RAD(creature->jointRotation[lastJoint]);
 						lastJoint++;
 					}
-
+					
 					if (currentBone->ExtraRotationFlags & ROT_X) {
 						currentBone->ExtraRotation.x = TO_RAD(creature->jointRotation[lastJoint]);
 						lastJoint++;
@@ -643,7 +643,7 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov) {
-		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width , (float)g_Configuration.Height);
+		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width , g_Configuration.Height);
 	}
 
 	bool Renderer11::EnumerateVideoModes() {

@@ -1827,7 +1827,7 @@ namespace T5M::Renderer {
         m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
         m_context->OMSetRenderTargets(1, &target, depthTarget);
 
-        m_context->RSSetViewports(1, &m_viewport);
+        m_context->RSSetViewports(1, &view.viewport);
 
 
         // Opaque geometry
@@ -1978,7 +1978,7 @@ namespace T5M::Renderer {
         m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
         m_context->OMSetRenderTargets(1, &target, depthTarget);
 
-        m_context->RSSetViewports(1, &m_viewport);
+        m_context->RSSetViewports(1, &view.viewport);
 
         // Opaque geometry
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
