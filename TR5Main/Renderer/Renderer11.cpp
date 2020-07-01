@@ -20,11 +20,13 @@
 #include "setup.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
+#include "RenderView/RenderView.h"
+using std::vector;
 namespace T5M::Renderer {
 	using namespace T5M::Renderer::Utils;
 	using std::array;
 	Renderer11 g_Renderer;
-	Renderer11::Renderer11() {
+	Renderer11::Renderer11() : gameCamera({ 0,0,0 }, { 0,0,1 }, {0,1,0},1,1,0,1,10,90) {
 		initialiseHairRemaps();
 
 		m_blinkColorDirection = 1;
@@ -85,6 +87,7 @@ namespace T5M::Renderer {
 		m_moveablesTextures.clear();
 		m_staticsTextures.clear();
 		m_spritesTextures.clear();
+		gameCamera.clear();
 	}
 
 	void Renderer11::clearSceneItems() {
@@ -96,6 +99,7 @@ namespace T5M::Renderer {
 		m_spritesToDraw.clear();
 		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
+		gameCamera.clear();
 	}
 
 	int Renderer11::SyncRenderer() {
@@ -207,16 +211,15 @@ namespace T5M::Renderer {
 		return buffer;
 	}
 
-	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos) {
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-		m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
 		for (int i = 0; i < 6; i++) {
 			m_context->ClearRenderTargetView(dest.RenderTargetView[i].Get(), Colors::Black);
-			m_context->ClearDepthStencilView(dest.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0, 0x0);
-			m_context->OMSetRenderTargets(6, dest.RenderTargetView[i].GetAddressOf(), dest.DepthStencilView.Get());
+			m_context->ClearDepthStencilView(dest.DepthStencilView[i].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0x0);
+			m_context->OMSetRenderTargets(1, dest.RenderTargetView[i].GetAddressOf(), dest.DepthStencilView[i].Get());
+			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,static_cast<int>(Camera.pos.roomNumber),10.0f,204800,90);
+			drawSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
+			m_context->ClearState();
 		}
-		
 	}
 
 	RendererHUDBar::RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4, 9> colors) {

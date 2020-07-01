@@ -9,6 +9,7 @@
 #include "lara.h"
 #include "sphere.h"
 #include "GameFlowScript.h"
+#include <Renderer\RenderView\RenderView.h>
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 namespace T5M::Renderer {
@@ -641,20 +642,8 @@ namespace T5M::Renderer {
 		return (m_fadeStatus != FADEMODE_NONE);
 	}
 
-	void Renderer11::UpdateCameraMatrices(float posX, float posY, float posZ, float targetX, float targetY, float targetZ, float roll, float fov) {
-		g_Configuration.MaxDrawDistance = 200;
-
-		Vector3 up = -Vector3::UnitY;
-		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
-		up = Vector3::Transform(up, upRotation);
-
-		int zNear = 20;
-		int zFar = g_Configuration.MaxDrawDistance * 1024;
-
-		FieldOfView = fov;
-		View = Matrix::CreateLookAt(Vector3(posX, posY, posZ), Vector3(targetX, targetY, targetZ), up);
-		Projection = Matrix::CreatePerspectiveFieldOfView(fov, ScreenWidth / (float)ScreenHeight, zNear, zFar);
-		ViewProjection = View * Projection;
+	void Renderer11::UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov) {
+		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width , (float)g_Configuration.Height);
 	}
 
 	bool Renderer11::EnumerateVideoModes() {
@@ -758,7 +747,7 @@ namespace T5M::Renderer {
 		return (a->Distance - b->Distance);
 	}
 
-	void Renderer11::getVisibleRooms(int from, int to, Vector4 * viewPort, bool water, int count,const Matrix& viewProjection) {
+	void Renderer11::getVisibleObjects(int from, int to, Vector4 * viewPort, bool water, int count,RenderView& renderView) {
 		// Avoid allocations, 1024 should be fine
 		RendererRoomNode nodes[256];
 		int nextNode = 0;
@@ -790,20 +779,20 @@ namespace T5M::Renderer {
 
 			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
 			m_rooms[node->To].Visited = true;
-			m_roomsToDraw.push_back(&m_rooms[node->To]);
+			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
 			Rooms[node->To].boundActive = true;
 
-			collectLightsForRoom(node->To);
-			collectItems(node->To);
-			collectStatics(node->To);
-			collectEffects(node->To);
+			collectLightsForRoom(node->To,renderView);
+			collectItems(node->To, renderView);
+			collectStatics(node->To, renderView);
+			collectEffects(node->To, renderView);
 
 			Vector4 clipPort;
 
 			for (int i = 0; i < room->doors.size(); i++) {
 				short adjoiningRoom = room->doors[i].room;
 
-				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort, viewProjection)) {
+				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort, renderView.camera.ViewProjection)) {
 					RendererRoomNode* childNode = &nodes[nextNode++];
 					childNode->From = node->To;
 					childNode->To = adjoiningRoom;

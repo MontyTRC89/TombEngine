@@ -52,10 +52,12 @@ struct PixelShaderInput
 	float3 WorldPosition : POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
+	float3 ReflectionVector : TEXCOORD1;
 };
 
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
+TextureCube Reflection : register (t1);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -68,11 +70,11 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = input.Color;
 	output.UV = input.UV;
 	output.WorldPosition = (mul(float4(input.Position, 1.0f), world));
+	output.ReflectionVector = reflect(normalize(CamPositionWS - output.WorldPosition.xyz), normalize(output.Normal));
 
 	return output;
 }
 
-[earlydepthstencil]
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
@@ -80,7 +82,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		clip(output.w - 0.5f);
 
 	float3 lighting = AmbientLight.xyz * 2.0f;
-
+	float4 reflectionColor = Reflection.Sample(Sampler,input.ReflectionVector.xyz);
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Position.w;
@@ -162,6 +164,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 
 	output.xyz *= lighting.xyz;
-
+	output += reflectionColor;
 	return output;
 }
