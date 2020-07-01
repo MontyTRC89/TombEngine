@@ -125,7 +125,7 @@ namespace T5M::Renderer {
 		ID3DBlob* errors = NULL;
 
 		printf("Compiling vertex shader: %s\n", fileName);
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
 		res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors);
 		throwIfFailed(res);
 
@@ -144,7 +144,7 @@ namespace T5M::Renderer {
 		ID3DBlob* errors = NULL;
 
 		printf("Compiling pixel shader: %s\n", fileName);
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
 		throwIfFailed(D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors));
 
 		ID3D11PixelShader* shader = NULL;

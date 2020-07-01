@@ -224,24 +224,6 @@ namespace T5M::Renderer {
 		return GetFrame_D2(&item, framePtr, rate);
 	}
 
-	bool Renderer11::updateConstantBuffer(ID3D11Buffer * buffer, void* data, int size) {
-		HRESULT res;
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-		// Lock the constant buffer so it can be written to.
-		res = m_context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		if (FAILED(res))
-			return false;
-
-		// Get a pointer to the data in the constant buffer.
-		char* dataPtr = reinterpret_cast<char*>(mappedResource.pData);
-		memcpy(dataPtr, data, size);
-		// Unlock the constant buffer.
-		m_context->Unmap(buffer, 0);
-
-		return true;
-	}
-
 	void Renderer11::UpdateItemAnimations(int itemNumber, bool force) {
 		RendererItem* itemToDraw = &m_items[itemNumber];
 		itemToDraw->Id = itemNumber;
