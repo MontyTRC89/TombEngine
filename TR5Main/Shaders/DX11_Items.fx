@@ -64,13 +64,15 @@ PixelShaderInput VS(VertexShaderInput input)
 	PixelShaderInput output;
 
 	float4x4 world = mul(Bones[input.Bone], World);
-
+	float3 Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
+	float3 WorldPosition = (mul(float4(input.Position, 1.0f), world));
+	float3 ReflectionVector = reflect(normalize(-CamDirectionWS.xyz), normalize(Normal));
 	output.Position = mul(mul(float4(input.Position, 1.0f), world), ViewProjection);
-	output.Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
+	output.Normal = Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
-	output.WorldPosition = (mul(float4(input.Position, 1.0f), world));
-	output.ReflectionVector = reflect(normalize(CamPositionWS- output.WorldPosition.xyz), normalize(output.Normal));
+	output.WorldPosition = WorldPosition;
+	output.ReflectionVector = ReflectionVector;
 
 	return output;
 }
@@ -104,9 +106,12 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float attenuation = (radius - distance) / radius;
 
 			float d = dot(input.Normal, lightVec);
+			d *= 0.5;
+			d += 0.5f;
+			d *= d;
 			if (d < 0)
 				continue;
-
+			
 			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + lightVec);
 			float s = pow(saturate(dot(h, input.Normal)), 0.5f);
 
@@ -121,9 +126,12 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			direction = normalize(direction);
 
 			float d = dot(input.Normal, direction);
+			d *= 0.5;
+			d += 0.5f;
+			d *= d;
 			if (d < 0)
 				continue;
-
+			
 			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + direction);
 			float s = pow(saturate(dot(h, input.Normal)), 0.5f);
 			
@@ -153,6 +161,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float attenuation = (range - distance) / range * (inCone - outAngle) / (1.0f - outAngle);
 
 			float d = dot(input.Normal, lightVec);
+			d *= 0.5;
+			d += 0.5f;
+			d *= d;
 			if (d < 0)
 				continue;
 
@@ -163,7 +174,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		}
 	}
 
-	output.xyz *= lighting.xyz;
-	output.xyz = reflectionColor;
+	output.xyz *= lighting.xyz*2;
 	return output;
 }

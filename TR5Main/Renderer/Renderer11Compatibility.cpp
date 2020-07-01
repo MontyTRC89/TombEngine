@@ -459,6 +459,7 @@ namespace T5M::Renderer {
 													jointVertex->Position.x = skinVertex->Position.x;
 													jointVertex->Position.y = skinVertex->Position.y;
 													jointVertex->Position.z = skinVertex->Position.z;
+													jointVertex->Normal = skinVertex->Normal;
 													done = true;
 													break;
 												}

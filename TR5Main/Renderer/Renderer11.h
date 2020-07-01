@@ -548,7 +548,6 @@ namespace T5M::Renderer
 		void											prepareLights();
 		void collectEffects(short roomNumber, RenderView& renderView);
 		void											clearSceneItems();
-		bool											updateConstantBuffer(ID3D11Buffer* buffer, void* data, int size);
 		void											updateItemsAnimations();
 		void											updateEffects();
 		int												getFrame(short animation, short frame, short** framePtr, int* rate);
@@ -669,6 +668,26 @@ namespace T5M::Renderer
 		RendererMesh* getMeshFromMeshPtr(unsigned int meshp);
 	private:
 		void drawFootprints();
-	};
+
+		template<typename CBuff>
+		bool updateConstantBuffer(ID3D11Buffer* buffer, CBuff& data) {
+			HRESULT res;
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+			// Lock the constant buffer so it can be written to.
+			res = m_context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+			if (FAILED(res))
+				return false;
+
+			// Get a pointer to the data in the constant buffer.
+			void* dataPtr = (mappedResource.pData);
+			memcpy(dataPtr, &data, sizeof(CBuff));
+			// Unlock the constant buffer.
+			m_context->Unmap(buffer, 0);
+
+			return true;
+		}
+
+};
 	extern Renderer11 g_Renderer;
 }
