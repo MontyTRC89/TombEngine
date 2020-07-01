@@ -82,7 +82,7 @@ namespace T5M::Renderer {
         // Set matrices
         CCameraMatrixBuffer HudCamera;
         HudCamera.ViewProjection = view * projection;
-        updateConstantBuffer(m_cbCameraMatrices, &HudCamera, sizeof(CCameraMatrixBuffer));
+        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, HudCamera);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++) {
@@ -101,7 +101,7 @@ namespace T5M::Renderer {
             else
                 m_stItem.World = (moveableObj.BindPoseTransforms[n] * world);
             m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-            updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+            updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
             m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
             m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -116,7 +116,7 @@ namespace T5M::Renderer {
                     m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
                 m_stMisc.AlphaTest = (m < 2);
-                updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+                updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
                 m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
                 m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
@@ -239,13 +239,13 @@ namespace T5M::Renderer {
                                                                  (m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
         CCameraMatrixBuffer shadowProjection;
         shadowProjection.ViewProjection = view * projection;
-        updateConstantBuffer(m_cbCameraMatrices, &shadowProjection, sizeof(CCameraMatrixBuffer));
+        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, shadowProjection);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         m_stShadowMap.LightViewProjection = (view * projection);
 
         m_stMisc.AlphaTest = true;
-        updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
         RendererObject& laraObj = *m_moveableObjects[ID_LARA];
@@ -256,7 +256,7 @@ namespace T5M::Renderer {
         m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-        updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
         m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
         m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -316,7 +316,7 @@ namespace T5M::Renderer {
                               Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
         memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
         m_stItem.World = Matrix::Identity;
-        updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 
         if (m_moveableObjects[ID_LARA_HAIR].has_value()) {
             m_primitiveBatch->Begin();
@@ -370,11 +370,11 @@ namespace T5M::Renderer {
         m_stLights.NumLights = item->Lights.size();
         for (int j = 0; j < item->Lights.size(); j++)
             memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-        updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+        updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
         m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
         m_stMisc.AlphaTest = true;
-        updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
         for (int i = 0; i < 24; i++) {
@@ -389,7 +389,7 @@ namespace T5M::Renderer {
                 Matrix world = rotation * translation;
 
                 m_stItem.World = world;
-                updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+                updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
                 m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
                 RendererMesh* mesh = moveableObj.ObjectMeshes[0];
@@ -476,7 +476,7 @@ namespace T5M::Renderer {
             Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
                                                  g_Renderer.ScreenWidth / (float)g_Renderer.ScreenHeight, 1.0f, 200000.0f);
 
-        updateConstantBuffer(m_cbCameraMatrices, &inventoryCam, sizeof(CCameraMatrixBuffer));
+        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, inventoryCam);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         for (int k = 0; k < NUM_INVENTORY_RINGS; k++) {
@@ -562,7 +562,7 @@ namespace T5M::Renderer {
                     else
                         m_stItem.World = (moveableObj.BindPoseTransforms[n] * transform);
                     m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-                    updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+                    updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
                     m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
                     m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -577,7 +577,7 @@ namespace T5M::Renderer {
                             m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
                         m_stMisc.AlphaTest = (m < 2);
-                        updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+                        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
                         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
                         m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
@@ -1392,7 +1392,7 @@ namespace T5M::Renderer {
                     m_stItem.World = world;
                     m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
                     m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
-                    updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+                    updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 
                     for (int b = 0; b < 2; b++) {
                         RendererBucket* bucket = &mesh->Buckets[b];
@@ -1445,7 +1445,7 @@ namespace T5M::Renderer {
                         m_stItem.World = world;
                         m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
                         m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
-                        updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+                        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 
                         m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
                         m_numDrawCalls++;
@@ -1833,10 +1833,10 @@ namespace T5M::Renderer {
         // Opaque geometry
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         CCameraMatrixBuffer cameraConstantBuffer;
-        view.createConstantBuffer(cameraConstantBuffer);
+        view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-        updateConstantBuffer(m_cbCameraMatrices, &cameraConstantBuffer, sizeof(CCameraMatrixBuffer));
+        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
@@ -1983,23 +1983,13 @@ namespace T5M::Renderer {
         // Opaque geometry
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         CCameraMatrixBuffer cameraConstantBuffer;
-        view.createConstantBuffer(cameraConstantBuffer);
+        view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-        updateConstantBuffer(m_cbCameraMatrices, &cameraConstantBuffer, sizeof(CCameraMatrixBuffer));
+        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices,cameraConstantBuffer);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
-        drawRooms(false, true, view);
-        // Transparent geometry
-        m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-        m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-        drawRooms(true, false, view);
-        drawRooms(true, true, view);
-        drawStatics(true, view);
-        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-        m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
         return true;
     }
 
@@ -2033,7 +2023,7 @@ namespace T5M::Renderer {
         m_context->PSSetSamplers(0, 1, &sampler);
 
         m_stMisc.AlphaTest = !transparent;
-        updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
         for (int i = 0; i < view.itemsToDraw.size(); i++) {
@@ -2075,18 +2065,18 @@ namespace T5M::Renderer {
         m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-        updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
         m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
         m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
         m_stLights.NumLights = item->Lights.size();
         for (int j = 0; j < item->Lights.size(); j++)
             memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-        updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+        updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
         m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
         m_stMisc.AlphaTest = !transparent;
-        updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
         for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
@@ -2161,7 +2151,7 @@ namespace T5M::Renderer {
 
             m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
             m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
-            updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+            updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
             m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
             for (int j = firstBucket; j < lastBucket; j++) {
@@ -2216,7 +2206,7 @@ namespace T5M::Renderer {
             m_stShadowMap.CastShadows = false;
         }
 
-        updateConstantBuffer(m_cbShadowMap, &m_stShadowMap, sizeof(CShadowLightBuffer));
+        updateConstantBuffer<CShadowLightBuffer>(m_cbShadowMap, m_stShadowMap);
         m_context->VSSetConstantBuffers(4, 1, &m_cbShadowMap);
         m_context->PSSetConstantBuffers(4, 1, &m_cbShadowMap);
 
@@ -2229,16 +2219,16 @@ namespace T5M::Renderer {
             m_stLights.NumLights = view.lightsToDraw.size();
             for (int j = 0; j < view.lightsToDraw.size(); j++)
                 memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
-            updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+            updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
             m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
 
             m_stMisc.Caustics = (room->Room->flags & ENV_FLAG_WATER);
             m_stMisc.AlphaTest = !transparent;
-            updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+            updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
             m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
             m_stRoom.AmbientColor = room->AmbientLight;
             m_stRoom.water = (room->Room->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-            updateConstantBuffer(m_cbRoom, &m_stRoom, sizeof(CRoomBuffer));
+            updateConstantBuffer<CRoomBuffer>(m_cbRoom, m_stRoom);
             m_context->VSSetConstantBuffers(5, 1, &m_cbRoom);
             m_context->PSSetConstantBuffers(5, 1, &m_cbRoom);
             for (int j = firstBucket; j < lastBucket; j++) {
@@ -2358,7 +2348,7 @@ namespace T5M::Renderer {
         m_context->PSSetShader(m_psSky, NULL, 0);
 
         m_stMisc.AlphaTest = true;
-        updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
         m_context->PSSetShaderResources(0, 1, m_skyTexture.ShaderResourceView.GetAddressOf());
@@ -2374,7 +2364,7 @@ namespace T5M::Renderer {
 
             m_stStatic.World = (rotation * translation);
             m_stStatic.Color = color;
-            updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+            updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
             m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
             m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
 
@@ -2399,12 +2389,12 @@ namespace T5M::Renderer {
             m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
             m_stStatic.Position = Vector4::Zero;
             m_stStatic.Color = Vector4::One;
-            updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+            updateConstantBuffer<CStaticBuffer>(m_cbStatic,m_stStatic);
             m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
             m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
 
             m_stMisc.AlphaTest = true;
-            updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+            updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
             m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
             for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {

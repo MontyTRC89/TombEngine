@@ -102,7 +102,7 @@ namespace T5M::Renderer {
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_stHUDBar.Percent = percent;
-		updateConstantBuffer(m_cbHUDBar, &m_stHUDBar, sizeof(CHUDBarBuffer));
+		updateConstantBuffer<CHUDBarBuffer>(m_cbHUDBar, m_stHUDBar);
 		m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
 		m_context->PSSetConstantBuffers(0, 1, &m_cbHUDBar);
 		m_context->VSSetShader(m_vsHUD, NULL, 0);

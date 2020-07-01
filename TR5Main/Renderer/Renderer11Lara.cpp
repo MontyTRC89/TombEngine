@@ -304,12 +304,8 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
-	// Set camera matrices
-	updateConstantBuffer(m_cbCameraMatrices, &gameCamera, sizeof(CCameraMatrixBuffer));
-	m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
 	m_stMisc.AlphaTest = !transparent;
-	updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+	updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
@@ -320,7 +316,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-	updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+	updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
@@ -329,7 +325,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 		m_stLights.NumLights = item->Lights.size();
 		for (int j = 0; j < item->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+		updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
 		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 	}
 
@@ -396,7 +392,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 							   Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
 		m_stItem.World = Matrix::Identity;
-		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+		updateConstantBuffer<CItemBuffer>(m_cbItem,m_stItem);
 
 		if (m_moveableObjects[ID_LARA_HAIR].has_value())
 		{
