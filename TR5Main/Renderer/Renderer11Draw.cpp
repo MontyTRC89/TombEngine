@@ -19,6 +19,7 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
+#include "RenderView/RenderView.h"
 extern T5M::Renderer::RendererHUDBar* g_DashBar;
 extern T5M::Renderer::RendererHUDBar* g_SFXVolumeBar;
 extern T5M::Renderer::RendererHUDBar* g_MusicVolumeBar;
@@ -79,8 +80,9 @@ namespace T5M::Renderer {
         m_context->PSSetSamplers(0, 1, &sampler);
 
         // Set matrices
-        m_stCameraMatrices.ViewProjection = view * projection;
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+        CCameraMatrixBuffer HudCamera;
+        HudCamera.ViewProjection = view * projection;
+        updateConstantBuffer(m_cbCameraMatrices, &HudCamera, sizeof(CCameraMatrixBuffer));
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++) {
@@ -235,8 +237,9 @@ namespace T5M::Renderer {
                                            Vector3(0.0f, -1.0f, 0.0f));
         Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
                                                                  (m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
-        m_stCameraMatrices.ViewProjection = view * projection;
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+        CCameraMatrixBuffer shadowProjection;
+        shadowProjection.ViewProjection = view * projection;
+        updateConstantBuffer(m_cbCameraMatrices, &shadowProjection, sizeof(CCameraMatrixBuffer));
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         m_stShadowMap.LightViewProjection = (view * projection);
@@ -467,13 +470,13 @@ namespace T5M::Renderer {
         float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory.GetCameraTilt() * RADIAN);
         float cameraY = g_Inventory.GetCameraY() - INV_CAMERA_DISTANCE * sin(g_Inventory.GetCameraTilt() * RADIAN);
         float cameraZ = 0.0f;
-
-        m_stCameraMatrices.ViewProjection = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
+        CCameraMatrixBuffer inventoryCam;
+        inventoryCam.ViewProjection = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
                                                                  Vector3(0.0f, g_Inventory.GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) *
             Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
                                                  g_Renderer.ScreenWidth / (float)g_Renderer.ScreenHeight, 1.0f, 200000.0f);
 
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
+        updateConstantBuffer(m_cbCameraMatrices, &inventoryCam, sizeof(CCameraMatrixBuffer));
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         for (int k = 0; k < NUM_INVENTORY_RINGS; k++) {
@@ -1249,9 +1252,6 @@ namespace T5M::Renderer {
         m_context->PSSetShader(m_psSolid, NULL, 0);
         Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth, m_viewport.MaxDepth);
 
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
         m_context->IASetInputLayout(m_inputLayout);
 
@@ -1587,8 +1587,6 @@ namespace T5M::Renderer {
         m_context->VSSetShader(m_vsSolid, NULL, 0);
         m_context->PSSetShader(m_psSolid, NULL, 0);
 
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
         m_context->IASetInputLayout(m_inputLayout);
@@ -1765,8 +1763,8 @@ namespace T5M::Renderer {
     int Renderer11::DrawTitle() {
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		m_context->ClearRenderTargetView(m_backBufferRTV,Colors::Black);
-
-		drawScene(m_backBufferRTV, m_depthStencilView);
+		
+		drawScene(m_backBufferRTV, m_depthStencilView,gameCamera);
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		drawInventoryScene(m_backBufferRTV, m_depthStencilView,nullptr);
@@ -1774,7 +1772,7 @@ namespace T5M::Renderer {
         return 0;
     }
 
-    bool Renderer11::drawScene(ID3D11RenderTargetView* target,ID3D11DepthStencilView* depthTarget) {
+    bool Renderer11::drawScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view) {
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
         m_timeUpdate = 0;
@@ -1793,26 +1791,20 @@ namespace T5M::Renderer {
 
         GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-        ViewProjection = View * Projection;
-        m_stLights.CameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+        m_stLights.CameraPosition = view.camera.WorldPosition;
 
         // Prepare the scene to draw
         auto time1 = std::chrono::high_resolution_clock::now();
-        prepareCameraForFrame();
-        ProcessClosedDoors();
-        // TEST
-        //CollectRooms(CurrentRoom);
-
+        //prepareCameraForFrame();
         clearSceneItems();
-        collectRooms(ViewProjection,Camera.pos.roomNumber);
+        collectRooms(view);
         UpdateLaraAnimations(false);
         updateItemsAnimations();
         updateEffects();
         if (g_Configuration.EnableShadows)
             drawShadowMap();
-        prepareCameraForFrame();
         m_items[Lara.itemNumber].Item = LaraItem;
-        collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber]);
+        collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
 
         // Update animated textures every 2 frames
         if (GnFrameCounter % 2 == 0)
@@ -1837,17 +1829,23 @@ namespace T5M::Renderer {
 
         m_context->RSSetViewports(1, &m_viewport);
 
-        drawHorizonAndSky(depthTarget);
 
         // Opaque geometry
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-
-        drawRooms(false, false);
-        drawRooms(false, true);
-        drawStatics(false);
+        CCameraMatrixBuffer cameraConstantBuffer;
+        view.createConstantBuffer(cameraConstantBuffer);
+        cameraConstantBuffer.Frame = GnFrameCounter;
+        cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+        updateConstantBuffer(m_cbCameraMatrices, &cameraConstantBuffer, sizeof(CCameraMatrixBuffer));
+        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+        drawHorizonAndSky(depthTarget);
+        drawRooms(false, false, view);
+        drawRooms(false, true, view);
+        drawStatics(false, view);
+        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawLara(false, false);
-        drawItems(false, false);
-        drawItems(false, true);
+        drawItems(false, false, view);
+        drawItems(false, true, view);
         drawEffects(false);
         drawGunFlashes();
         drawGunShells();
@@ -1861,12 +1859,12 @@ namespace T5M::Renderer {
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-        drawRooms(true, false);
-        drawRooms(true, true);
-        drawStatics(true);
+        drawRooms(true, false, view);
+        drawRooms(true, true, view);
+        drawStatics(true, view);
         drawLara(true, false);
-        drawItems(true, false);
-        drawItems(true, true);
+        drawItems(true, false, view);
+        drawItems(true, true, view);
         drawEffects(true);
         drawWaterfalls();
         drawDebris(true);
@@ -1962,12 +1960,55 @@ namespace T5M::Renderer {
         return true;
     }
 
+
+    bool Renderer11::drawSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view) {
+        GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+
+        collectRooms(view);
+        // Draw shadow map
+
+        // Reset GPU state
+        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+        m_context->RSSetState(m_states->CullCounterClockwise());
+        m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+
+        // Bind and clear render target
+
+        m_context->ClearRenderTargetView(target, Colors::Black);
+        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->OMSetRenderTargets(1, &target, depthTarget);
+
+        m_context->RSSetViewports(1, &m_viewport);
+
+        // Opaque geometry
+        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+        CCameraMatrixBuffer cameraConstantBuffer;
+        view.createConstantBuffer(cameraConstantBuffer);
+        cameraConstantBuffer.Frame = GnFrameCounter;
+        cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+        updateConstantBuffer(m_cbCameraMatrices, &cameraConstantBuffer, sizeof(CCameraMatrixBuffer));
+        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+        drawHorizonAndSky(depthTarget);
+        drawRooms(false, false, view);
+        drawRooms(false, true, view);
+        // Transparent geometry
+        m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+        m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+        drawRooms(true, false, view);
+        drawRooms(true, true, view);
+        drawStatics(true, view);
+        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+        m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+        return true;
+    }
+
     int Renderer11::DumpGameScene() {
-        drawScene(m_dumpScreenRenderTarget.RenderTargetView.Get(),m_dumpScreenRenderTarget.DepthStencilView.Get());
+        drawScene(m_dumpScreenRenderTarget.RenderTargetView.Get(),m_dumpScreenRenderTarget.DepthStencilView.Get(), gameCamera);
         return 0;
     }
 
-    bool Renderer11::drawItems(bool transparent, bool animated) {
+    bool Renderer11::drawItems(bool transparent, bool animated,RenderView& view) {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -1987,17 +2028,16 @@ namespace T5M::Renderer {
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
         ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
-
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
         m_stMisc.AlphaTest = !transparent;
         updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-        for (int i = 0; i < m_itemsToDraw.size(); i++) {
-            RendererItem* item = m_itemsToDraw[i];
+        for (int i = 0; i < view.itemsToDraw.size(); i++) {
+            RendererItem* item = view.itemsToDraw[i];
             RendererRoom& const room = m_rooms[item->Item->roomNumber];
             RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
@@ -2086,7 +2126,7 @@ namespace T5M::Renderer {
         }
     }
 
-    bool Renderer11::drawStatics(bool transparent) {
+    bool Renderer11::drawStatics(bool transparent,RenderView& view) {
         //return true;
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2108,17 +2148,13 @@ namespace T5M::Renderer {
         ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
-        // Set camera matrices
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
-        for (int i = 0; i < m_staticsToDraw.size(); i++) {
-            MESH_INFO* msh = m_staticsToDraw[i]->Mesh;
+        for (int i = 0; i < view.staticsToDraw.size(); i++) {
+            MESH_INFO* msh = view.staticsToDraw[i]->Mesh;
 
             if (!(msh->flags & 1))
                 continue;
 
-            RendererRoom& const room = m_rooms[m_staticsToDraw[i]->RoomIndex];
+            RendererRoom& const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
 
             RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
             RendererMesh* mesh = staticObj.ObjectMeshes[0];
@@ -2143,7 +2179,7 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawRooms(bool transparent, bool animated) {
+    bool Renderer11::drawRooms(bool transparent, bool animated,RenderView& view) {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2171,9 +2207,6 @@ namespace T5M::Renderer {
         m_context->PSSetSamplers(1, 1, &shadowSampler);
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
         // Set shadow map data
         if (m_shadowLight != NULL) {
             memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
@@ -2190,12 +2223,12 @@ namespace T5M::Renderer {
         if (animated)
             m_primitiveBatch->Begin();
 
-        for (int i = 0; i < m_roomsToDraw.size(); i++) {
-            RendererRoom* room = m_roomsToDraw[i];
+        for (int i = 0; i < view.roomsToDraw.size(); i++) {
+            RendererRoom* room = view.roomsToDraw[i];
 
-            m_stLights.NumLights = room->LightsToDraw.size();
-            for (int j = 0; j < room->LightsToDraw.size(); j++)
-                memcpy(&m_stLights.Lights[j], room->LightsToDraw[j], sizeof(ShaderLight));
+            m_stLights.NumLights = view.lightsToDraw.size();
+            for (int j = 0; j < view.lightsToDraw.size(); j++)
+                memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
             updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
             m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
 
@@ -2324,9 +2357,6 @@ namespace T5M::Renderer {
         m_context->VSSetShader(m_vsSky, NULL, 0);
         m_context->PSSetShader(m_psSky, NULL, 0);
 
-        updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
         m_stMisc.AlphaTest = true;
         updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
@@ -2409,7 +2439,10 @@ namespace T5M::Renderer {
     }
 
     int Renderer11::Draw() {
-        drawScene(m_backBufferRTV,m_depthStencilView);
+
+        renderToCubemap(m_reflectionCubemap,Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos-1024, LaraItem->pos.zPos ),LaraItem->roomNumber);
+        drawScene(m_backBufferRTV,m_depthStencilView,gameCamera);
+        m_context->ClearState();
         //drawFinalPass();
         m_swapChain->Present(0, 0);
         return 0;

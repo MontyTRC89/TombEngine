@@ -2,7 +2,7 @@
 #include "RenderTargetCube.h"
 #include "Utils.h"
 using T5M::Renderer::Utils::throwIfFailed;
-T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT format) {
+T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT format) : resolution(resolution) {
 
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = resolution;
@@ -62,8 +62,10 @@ T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int reso
 	dsvDesc.Format = depthTexDesc.Format;
 	dsvDesc.Flags = 0;
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-	dsvDesc.Texture2DArray.ArraySize = 6;
-	dsvDesc.Texture2DArray.FirstArraySlice = 0;
-	res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, DepthStencilView.GetAddressOf());
-	throwIfFailed(res);
+	dsvDesc.Texture2DArray.ArraySize = 1;
+	for (int i = 0; i < 6; i++) {
+		dsvDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i, 1);
+		res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, DepthStencilView[i].GetAddressOf());
+		throwIfFailed(res);
+	}
 }

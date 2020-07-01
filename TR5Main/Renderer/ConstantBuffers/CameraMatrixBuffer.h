@@ -14,6 +14,7 @@ namespace T5M {
 			Vector2 InvViewSize;
 			alignas(16) int Frame;
 			int CameraUnderwater;
+			int RoomNumber;
 		};
 	}
 }

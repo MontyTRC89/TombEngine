@@ -6,23 +6,24 @@
 #include "camera.h"
 #include "level.h"
 #include "setup.h"
+#include "RenderView\RenderView.h"
 namespace T5M::Renderer {
 	using namespace T5M::Renderer;
-
-	void Renderer11::collectRooms(const Matrix& viewProjection,int roomNumber) {
-		short baseRoomIndex = roomNumber;
+	using std::vector;
+	void Renderer11::collectRooms(RenderView& renderView) {
+		short baseRoomIndex = renderView.camera.RoomNumber;
 
 		for (int i = 0; i < Rooms.size(); i++) {
 			m_rooms[i].Visited = false;
-			m_rooms[i].LightsToDraw.clear();
 		}
 
 		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
-
-		getVisibleRooms(-1, baseRoomIndex, &vp, false, 0,viewProjection);
+		vector<RendererRoom*> collectedRooms;
+		collectedRooms.reserve(128);
+		getVisibleObjects(-1, baseRoomIndex, &vp, false, 0,renderView);
 	}
 
-	void Renderer11::collectItems(short roomNumber) {
+	void Renderer11::collectItems(short roomNumber,RenderView& renderView) {
 		if (m_rooms.size() <= roomNumber) {
 			return;
 		}
@@ -51,7 +52,7 @@ namespace T5M::Renderer {
 			short* bounds = GetBoundsAccurate(item);
 			Vector3 min = (Vector3(bounds[0], bounds[2], bounds[4])) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			Vector3 max = (Vector3(bounds[1], bounds[3], bounds[5])) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			if (!frustum.AABBInFrustum(min, max))
+			if (!renderView.camera.frustum.AABBInFrustum(min, max))
 				continue;
 			newItem->Item = item;
 			newItem->Id = itemNum;
@@ -62,12 +63,12 @@ namespace T5M::Renderer {
 															   TO_RAD(item->pos.zRot));
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
-			collectLightsForItem(item->roomNumber, newItem);
-			m_itemsToDraw.push_back(newItem);
+			collectLightsForItem(item->roomNumber, newItem,renderView);
+			renderView.itemsToDraw.push_back(newItem);
 		}
 	}
 
-	void Renderer11::collectStatics(short roomNumber) {
+	void Renderer11::collectStatics(short roomNumber, RenderView& renderView) {
 		if (m_rooms.size() <= roomNumber) {
 			return;
 		}
@@ -84,18 +85,18 @@ namespace T5M::Renderer {
 			Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
 			min += Vector3(mesh->x, mesh->y, mesh->z);
 			max += Vector3(mesh->x, mesh->y, mesh->z);
-			if (!frustum.AABBInFrustum(min, max))
+			if (!renderView.camera.frustum.AABBInFrustum(min, max))
 				continue;
 			Matrix rotation = Matrix::CreateRotationY(TO_RAD(mesh->yRot));
 			Vector3 translation = Vector3(mesh->x, mesh->y, mesh->z);
 			newStatic->Mesh = mesh;
 			newStatic->RoomIndex = roomNumber;
 			newStatic->World = rotation * Matrix::CreateTranslation(translation);
-			m_staticsToDraw.push_back(newStatic);
+			renderView.staticsToDraw.push_back(newStatic);
 		}
 	}
 
-	void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect* effect) {
+	void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView) {
 		effect->Lights.clear();
 		if (m_rooms.size() <= roomNumber) {
 			return;
@@ -180,11 +181,11 @@ namespace T5M::Renderer {
 		}
 
 		for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++) {
-			effect->Lights.push_back(m_tempItemLights[i]);
+			renderView.lightsToDraw.push_back(m_tempItemLights[i]);
 		}
 	}
 
-	void Renderer11::collectLightsForItem(short roomNumber, RendererItem* item) {
+	void Renderer11::collectLightsForItem(short roomNumber, RendererItem* item,RenderView& renderView) {
 		item->Lights.clear();
 		if (m_rooms.size() <= roomNumber) {
 			return;
@@ -288,7 +289,7 @@ namespace T5M::Renderer {
 		}
 	}
 
-	void Renderer11::collectLightsForRoom(short roomNumber) {
+	void Renderer11::collectLightsForRoom(short roomNumber,RenderView& renderView) {
 		if (m_rooms.size() <= roomNumber) {
 			return;
 		}
@@ -306,7 +307,7 @@ namespace T5M::Renderer {
 			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
 			if (sphereBoxIntersection(boxMin, boxMax, center, light->Out))
-				room.LightsToDraw.push_back(light);
+				renderView.lightsToDraw.push_back(light);
 		}
 	}
 
@@ -384,7 +385,7 @@ namespace T5M::Renderer {
 		m_shadowLight = brightestLight;
 	}
 
-	void Renderer11::collectEffects(short roomNumber) {
+	void Renderer11::collectEffects(short roomNumber,RenderView& renderView) {
 		if (m_rooms.size() <= roomNumber) return;
 		RendererRoom& const room = m_rooms[roomNumber];
 
@@ -406,30 +407,13 @@ namespace T5M::Renderer {
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.yRot, fx->pos.xPos, fx->pos.zPos) * Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 			newEffect->Mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)])];
 
-			collectLightsForEffect(fx->roomNumber, newEffect);
+			collectLightsForEffect(fx->roomNumber, newEffect,renderView);
 
-			m_effectsToDraw.push_back(newEffect);
+			renderView.effectsToDraw.push_back(newEffect);
 
 			short* mp = Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)];
 			short hhh = 0;
 		}
-	}
-
-	void Renderer11::prepareCameraForFrame() {
-		// Set camera matrices
-		m_stCameraMatrices.ViewProjection = ViewProjection;
-		m_stCameraMatrices.Frame = GnFrameCounter;
-		m_stCameraMatrices.CameraUnderwater = (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-		m_stCameraMatrices.Projection = Projection;
-		m_stCameraMatrices.View = View;
-		m_stCameraMatrices.WorldPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		m_stCameraMatrices.ViewSize = Vector2(ScreenWidth, ScreenHeight);
-		m_stCameraMatrices.InvViewSize = Vector2(1 / ScreenWidth, 1 / ScreenHeight);
-		m_stCameraMatrices.WorldDirection = Vector3(Camera.target.x, Camera.target.y, Camera.target.z) - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		m_stCameraMatrices.WorldDirection.Normalize();
-		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-		frustum.Update(View, Projection);
 	}
 
 	void Renderer11::ResetAnimations() {
