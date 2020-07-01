@@ -30,13 +30,31 @@ namespace T5M::Renderer {
 	};
 	struct RenderView {
 		RenderViewCamera camera;
+		D3D11_VIEWPORT viewport;
 		std::vector<RendererRoom*> roomsToDraw;
 		std::vector<RendererStatic*> staticsToDraw;
 		std::vector<RendererEffect*> effectsToDraw;
 		std::vector<RendererItem*> itemsToDraw;
 		std::vector<RendererLight*> lightsToDraw;
-		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane,w,h) {};
-		RenderView(const Vector3& pos,const Vector3& dir,const Vector3& up,int w, int h,int room, float nearPlane, float farPlane,float fov) : camera(pos,dir,up,room,w,h,fov,nearPlane,farPlane) {};
+		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : camera(cam, roll, fov, nearPlane, farPlane,w,h) {
+			viewport = {};
+			viewport.TopLeftX = 0;
+			viewport.TopLeftY = 0;
+			viewport.Width = w;
+			viewport.Height = h;
+			viewport.MinDepth = 0;
+			viewport.MaxDepth = 1;
+		};
+		RenderView(const Vector3& pos,const Vector3& dir,const Vector3& up,int w, int h,int room, float nearPlane, float farPlane,float fov) : camera(pos,dir,up,room,w,h,fov,nearPlane,farPlane) {
+		
+			viewport = {};
+			viewport.TopLeftX = 0;
+			viewport.TopLeftY = 0;
+			viewport.Width = w;
+			viewport.Height = h;
+			viewport.MinDepth = 0;
+			viewport.MaxDepth = 1;
+		};
 		void createConstantBuffer(CCameraMatrixBuffer& bufferToFill);
 		void clear();
 	};

@@ -70,7 +70,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = input.Color;
 	output.UV = input.UV;
 	output.WorldPosition = (mul(float4(input.Position, 1.0f), world));
-	output.ReflectionVector = reflect(normalize(CamPositionWS - output.WorldPosition.xyz), normalize(output.Normal));
+	output.ReflectionVector = reflect(normalize(CamPositionWS- output.WorldPosition.xyz), normalize(output.Normal));
 
 	return output;
 }
@@ -164,6 +164,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 
 	output.xyz *= lighting.xyz;
-	output += reflectionColor;
+	output.xyz = reflectionColor;
 	return output;
 }

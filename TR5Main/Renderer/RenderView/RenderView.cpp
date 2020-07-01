@@ -29,7 +29,7 @@ T5M::Renderer::RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, 
 	Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 	up = Vector3::Transform(up, upRotation);
 	View = Matrix::CreateLookAt(WorldPosition, WorldPosition + WorldDirection, up);
-	Projection = Matrix::CreatePerspectiveFieldOfView(fov, (float)w/h, n, f);
+	Projection = Matrix::CreatePerspectiveFieldOfView(fov,w/(float)h,n,f);
 	ViewProjection = View * Projection;
 	ViewSize = { (float)w,(float)h };
 	InvViewSize = { 1.0f / w,1.0f / h };
@@ -41,7 +41,8 @@ T5M::Renderer::RenderViewCamera::RenderViewCamera(const Vector3& pos, const Vect
 	WorldPosition = pos;
 	WorldDirection = dir;
 	View = Matrix::CreateLookAt(pos, pos+dir, up);
-	Projection = Matrix::CreatePerspectiveFieldOfView(fov, width / (float)height, n, f);
+	float aspect = (float)width / (float)height;
+	Projection = Matrix::CreatePerspectiveFieldOfView(fov,aspect, n, f);
 	ViewProjection = View * Projection;
 	ViewSize = { (float)width,(float)height };
 	InvViewSize = { 1.0f / width,1.0f / height };

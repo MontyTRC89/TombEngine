@@ -213,10 +213,7 @@ namespace T5M::Renderer {
 
 	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
 		for (int i = 0; i < 6; i++) {
-			m_context->ClearRenderTargetView(dest.RenderTargetView[i].Get(), Colors::Black);
-			m_context->ClearDepthStencilView(dest.DepthStencilView[i].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0x0);
-			m_context->OMSetRenderTargets(1, dest.RenderTargetView[i].GetAddressOf(), dest.DepthStencilView[i].Get());
-			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,static_cast<int>(Camera.pos.roomNumber),10.0f,204800,90);
+			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,Camera.pos.roomNumber,10,20480, 90* RADIAN);
 			drawSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
 		}
