@@ -612,12 +612,11 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			if ((l->frameNumber == GF2(ID_MINECART, 7, 0) + 20) && (cart->Flags & CF_MESH))
 			{
-				short* tmp;
-
-				tmp = Lara.meshPtrs[LM_RHAND];
+				/*MESH tmp = Meshes[Lara.meshPtrs[LM_RHAND]];
 				
 				LARA_MESHES(ID_MINECART_LARA_ANIMS, LM_RHAND);
-				Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
+				Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;*/
+				Lara.meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 
 				cart->Flags &= ~CF_MESH;
 			}
@@ -674,11 +673,9 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_GETIN:
 		if ((l->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 5) && (l->frameNumber == GF2(ID_MINECART, 5, 0) + 20) && (!cart->Flags & CF_MESH))
 		{
-			short* tmp;
+			MESH tmp = Meshes[Lara.meshPtrs[LM_RHAND]];
 
-			tmp = Lara.meshPtrs[LM_RHAND];
-
-			Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND];
+			Lara.meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 			Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
 
 			cart->Flags |= CF_MESH;

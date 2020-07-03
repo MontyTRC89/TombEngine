@@ -215,9 +215,6 @@ void SaveGame::saveLara(int arg1, int arg2)
 	LaraInfo lara;
 	memcpy(&lara, &Lara, sizeof(Lara));
 
-	for (int i = 0; i < 15; i++)
-		lara.meshPtrs[i] = (short*)((char*)lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
-
 	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
 	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
 	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)malloc_buffer;
@@ -511,11 +508,6 @@ bool SaveGame::readLara()
 	LaraInfo* lara = reinterpret_cast<LaraInfo*>(buffer);
 	memcpy(&Lara, lara, sizeof(LaraInfo));
 	free(buffer);
-
-	for (int i = 0; i < NUM_LARA_MESHES; i++)
-	{
-		Lara.meshPtrs[i] = AddPtr(Lara.meshPtrs[i], short, MeshBase);
-	}
 
 	Lara.leftArm.frameBase = AddPtr(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
 	Lara.rightArm.frameBase = AddPtr(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);

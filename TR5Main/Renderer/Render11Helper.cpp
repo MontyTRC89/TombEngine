@@ -11,30 +11,34 @@
 #include "GameFlowScript.h"
 #include <Renderer\RenderView\RenderView.h>
 extern GameConfiguration g_Configuration;
-extern GameFlow* g_GameFlow;
-namespace T5M::Renderer {
+extern GameFlow *g_GameFlow;
+namespace T5M::Renderer
+{
 	using std::pair;
 	using std::vector;
 
-
-	bool Renderer11::isRoomUnderwater(short roomNumber) {
+	bool Renderer11::isRoomUnderwater(short roomNumber)
+	{
 		return (m_rooms[roomNumber].Room->flags & ENV_FLAG_WATER);
 	}
 
-	bool Renderer11::isInRoom(int x, int y, int z, short roomNumber) {
-		RendererRoom& const room = m_rooms[roomNumber];
-		ROOM_INFO* r = room.Room;
+	bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
+	{
+		RendererRoom &const room = m_rooms[roomNumber];
+		ROOM_INFO *r = room.Room;
 
 		return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
-			y >= r->maxceiling && y <= r->minfloor &&
-			z >= r->z && z <= r->z + r->ySize * 1024.0f);
+				y >= r->maxceiling && y <= r->minfloor &&
+				z >= r->z && z <= r->z + r->ySize * 1024.0f);
 	}
 
-	vector<RendererVideoAdapter>* Renderer11::GetAdapters() {
+	vector<RendererVideoAdapter> *Renderer11::GetAdapters()
+	{
 		return &m_adapters;
 	}
 
-	void Renderer11::createBillboardMatrix(Matrix * out, Vector3 * particlePos, Vector3 * cameraPos, float rotation) {
+	void Renderer11::createBillboardMatrix(Matrix *out, Vector3 *particlePos, Vector3 *cameraPos, float rotation)
+	{
 		/*
 		Vector3 look = *particlePos;
 		look = look - *cameraPos;
@@ -74,25 +78,31 @@ namespace T5M::Renderer {
 		*/
 	}
 
-	void Renderer11::updateAnimatedTextures() {
+	void Renderer11::updateAnimatedTextures()
+	{
 		// Update room's animated textures
-		for (int i = 0; i < Rooms.size(); i++) {
+		for (int i = 0; i < Rooms.size(); i++)
+		{
 			if (m_rooms.size() <= i)
 				continue;
-			RendererRoom & const room = m_rooms[i];
+			RendererRoom &const room = m_rooms[i];
 
-			for (int bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++) {
-				RendererBucket* bucket = &room.AnimatedBuckets[bucketIndex];
+			for (int bucketIndex = 0; bucketIndex < NUM_BUCKETS; bucketIndex++)
+			{
+				RendererBucket *bucket = &room.AnimatedBuckets[bucketIndex];
 
 				if (bucket->Vertices.size() == 0)
 					continue;
 
-				for (int p = 0; p < bucket->Polygons.size(); p++) {
-					RendererPolygon* polygon = &bucket->Polygons[p];
-					RendererAnimatedTextureSet& const set = m_animatedTextureSets[polygon->AnimatedSet];
+				for (int p = 0; p < bucket->Polygons.size(); p++)
+				{
+					RendererPolygon *polygon = &bucket->Polygons[p];
+					RendererAnimatedTextureSet &const set = m_animatedTextureSets[polygon->AnimatedSet];
 					int textureIndex = -1;
-					for (int j = 0; j < set.NumTextures; j++) {
-						if (set.Textures[j].Id == polygon->TextureId) {
+					for (int j = 0; j < set.NumTextures; j++)
+					{
+						if (set.Textures[j].Id == polygon->TextureId)
+						{
 							textureIndex = j;
 							break;
 						}
@@ -107,7 +117,8 @@ namespace T5M::Renderer {
 
 					polygon->TextureId = set.Textures[textureIndex].Id;
 
-					for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++) {
+					for (int v = 0; v < (polygon->Shape == SHAPE_RECTANGLE ? 4 : 3); v++)
+					{
 						bucket->Vertices[polygon->Indices[v]].UV.x = set.Textures[textureIndex].UV[v].x;
 						bucket->Vertices[polygon->Indices[v]].UV.y = set.Textures[textureIndex].UV[v].y;
 					}
@@ -137,9 +148,11 @@ namespace T5M::Renderer {
 		}*/
 	}
 
-	void Renderer11::updateEffects() {
-		for (int i = 0; i < m_effectsToDraw.size(); i++) {
-			RendererEffect* fx = m_effectsToDraw[i];
+	void Renderer11::updateEffects()
+	{
+		for (int i = 0; i < m_effectsToDraw.size(); i++)
+		{
+			RendererEffect *fx = m_effectsToDraw[i];
 
 			Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
@@ -147,30 +160,34 @@ namespace T5M::Renderer {
 		}
 	}
 
-	void Renderer11::updateAnimation(RendererItem * item, RendererObject& obj, short** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation) {
-		RendererBone* bones[32];
+	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, short **frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	{
+		RendererBone *Bones[32];
 		int nextBone = 0;
 
 		Matrix rotation;
 
-		Matrix* transforms = (item == NULL ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
+		Matrix *transforms = (item == NULL ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
 
 		// Push
-		bones[nextBone++] = obj.Skeleton;
+		Bones[nextBone++] = obj.Skeleton;
 
-		while (nextBone != 0) {
+		while (nextBone != 0)
+		{
 			// Pop the last bone in the stack
-			RendererBone* bone = bones[--nextBone];
+			RendererBone *bone = Bones[--nextBone];
 
 			bool calculateMatrix = (mask >> bone->Index) & 1;
 
-			if (calculateMatrix) {
-				Vector3 p = Vector3((int) * (frmptr[0] + 6), (int) * (frmptr[0] + 7), (int) * (frmptr[0] + 8));
+			if (calculateMatrix)
+			{
+				Vector3 p = Vector3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
 
 				fromTrAngle(&rotation, frmptr[0], bone->Index);
 
-				if (frac) {
-					Vector3 p2 = Vector3((int) * (frmptr[1] + 6), (int) * (frmptr[1] + 7), (int) * (frmptr[1] + 8));
+				if (frac)
+				{
+					Vector3 p2 = Vector3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
 					Matrix rotation2;
@@ -191,12 +208,14 @@ namespace T5M::Renderer {
 
 				Matrix extraRotation;
 				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-				if (useObjectWorldRotation) {
+				if (useObjectWorldRotation)
+				{
 					Quaternion invertedQuat;
 					transforms[bone->Parent->Index].Invert().Decompose(Vector3(), invertedQuat, Vector3());
 					rotation = extraRotation * rotation * Matrix::CreateFromQuaternion(invertedQuat);
 				}
-				else {
+				else
+				{
 					rotation = extraRotation * rotation;
 				}
 
@@ -210,13 +229,15 @@ namespace T5M::Renderer {
 					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
 			}
 
-			for (int i = 0; i < bone->Children.size(); i++) {
+			for (int i = 0; i < bone->Children.size(); i++)
+			{
 				// Push
-				bones[nextBone++] = bone->Children[i];
+				Bones[nextBone++] = bone->Children[i];
 			}
 		}
 	}
-	int Renderer11::getFrame(short animation, short frame, short** framePtr, int* rate) {
+	int Renderer11::getFrame(short animation, short frame, short **framePtr, int *rate)
+	{
 		ITEM_INFO item;
 		item.animNumber = animation;
 		item.frameNumber = frame;
@@ -224,13 +245,14 @@ namespace T5M::Renderer {
 		return GetFrame_D2(&item, framePtr, rate);
 	}
 
-	void Renderer11::UpdateItemAnimations(int itemNumber, bool force) {
-		RendererItem* itemToDraw = &m_items[itemNumber];
+	void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
+	{
+		RendererItem *itemToDraw = &m_items[itemNumber];
 		itemToDraw->Id = itemNumber;
 		itemToDraw->Item = &Items[itemNumber];
 
-		ITEM_INFO* item = itemToDraw->Item;
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		ITEM_INFO *item = itemToDraw->Item;
+		CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
 
 		// Lara has her own routine
 		if (item->objectNumber == ID_LARA)
@@ -240,36 +262,42 @@ namespace T5M::Renderer {
 		if (!force && itemToDraw->DoneAnimations)
 			return;
 
-		ObjectInfo * obj = &Objects[item->objectNumber];
-		RendererObject& moveableObj = *m_moveableObjects[item->objectNumber];
+		ObjectInfo *obj = &Objects[item->objectNumber];
+		RendererObject &moveableObj = *m_moveableObjects[item->objectNumber];
 
 		// Update animation matrices
-		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/) {
+		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
+		{
 			// Apply extra rotations
 			int lastJoint = 0;
-			for (int j = 0; j < moveableObj.LinearizedBones.size(); j++) {
-				RendererBone* currentBone = moveableObj.LinearizedBones[j];
+			for (int j = 0; j < moveableObj.LinearizedBones.size(); j++)
+			{
+				RendererBone *currentBone = moveableObj.LinearizedBones[j];
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
-				if (creature) {
-					if (currentBone->ExtraRotationFlags & ROT_Y) {
+				if (creature)
+				{
+					if (currentBone->ExtraRotationFlags & ROT_Y)
+					{
 						currentBone->ExtraRotation.y = TO_RAD(creature->jointRotation[lastJoint]);
 						lastJoint++;
 					}
-					
-					if (currentBone->ExtraRotationFlags & ROT_X) {
+
+					if (currentBone->ExtraRotationFlags & ROT_X)
+					{
 						currentBone->ExtraRotation.x = TO_RAD(creature->jointRotation[lastJoint]);
 						lastJoint++;
 					}
 
-					if (currentBone->ExtraRotationFlags & ROT_Z) {
+					if (currentBone->ExtraRotationFlags & ROT_Z)
+					{
 						currentBone->ExtraRotation.z = TO_RAD(creature->jointRotation[lastJoint]);
 						lastJoint++;
 					}
 				}
 			}
 
-			short* framePtr[2];
+			short *framePtr[2];
 			int rate;
 			int frac = GetFrame_D2(item, framePtr, &rate);
 
@@ -282,16 +310,18 @@ namespace T5M::Renderer {
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::updateItemsAnimations() {
+	void Renderer11::updateItemsAnimations()
+	{
 		Matrix translation;
 		Matrix rotation;
 
 		int numItems = m_itemsToDraw.size();
 
-		for (int i = 0; i < numItems; i++) {
-			RendererItem* itemToDraw = m_itemsToDraw[i];
-			ITEM_INFO* item = itemToDraw->Item;
-			CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		for (int i = 0; i < numItems; i++)
+		{
+			RendererItem *itemToDraw = m_itemsToDraw[i];
+			ITEM_INFO *item = itemToDraw->Item;
+			CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
 
 			// Lara has her own routine
 			if (item->objectNumber == ID_LARA)
@@ -301,11 +331,13 @@ namespace T5M::Renderer {
 		}
 	}
 
-	void Renderer11::fromTrAngle(Matrix * matrix, short* frameptr, int index) {
-		short* ptr = &frameptr[0];
+	void Renderer11::fromTrAngle(Matrix *matrix, short *frameptr, int index)
+	{
+		short *ptr = &frameptr[0];
 
 		ptr += 9;
-		for (int i = 0; i < index; i++) {
+		for (int i = 0; i < index; i++)
+		{
 			ptr += ((*ptr & 0xc000) == 0 ? 2 : 1);
 		}
 
@@ -317,16 +349,17 @@ namespace T5M::Renderer {
 		int rotY;
 		int rotZ;
 
-		switch (frameMode) {
+		switch (frameMode)
+		{
 		case 0:
 			rot1 = *ptr++;
 			rotX = ((rot0 & 0x3ff0) >> 4);
 			rotY = (((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff);
-			rotZ = ((rot1) & 0x3ff);
+			rotZ = ((rot1)&0x3ff);
 
 			*matrix = Matrix::CreateFromYawPitchRoll(rotY * (360.0f / 1024.0f) * RADIAN,
-				rotX * (360.0f / 1024.0f) * RADIAN,
-				rotZ * (360.0f / 1024.0f) * RADIAN);
+													 rotX * (360.0f / 1024.0f) * RADIAN,
+													 rotZ * (360.0f / 1024.0f) * RADIAN);
 			break;
 
 		case 0x4000:
@@ -343,272 +376,103 @@ namespace T5M::Renderer {
 		}
 	}
 
-	void Renderer11::buildHierarchyRecursive(RendererObject * obj, RendererBone * node, RendererBone * parentNode) {
+	void Renderer11::buildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
+	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 		node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
-		for (int j = 0; j < node->Children.size(); j++) {
+		for (int j = 0; j < node->Children.size(); j++)
+		{
 			buildHierarchyRecursive(obj, node->Children[j], node);
 		}
 	}
 
-	void Renderer11::buildHierarchy(RendererObject * obj) {
+	void Renderer11::buildHierarchy(RendererObject *obj)
+	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 
-		for (int j = 0; j < obj->Skeleton->Children.size(); j++) {
+		for (int j = 0; j < obj->Skeleton->Children.size(); j++)
+		{
 			buildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
 		}
 	}
 
-	RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject * obj, short* meshPtr, short boneIndex, int isJoints, int isHairs) {
-		RendererMesh* mesh = new RendererMesh();
+	RendererMesh *Renderer11::getRendererMeshFromTrMesh(RendererObject *obj, MESH *meshPtr, short boneIndex, int isJoints, int isHairs)
+	{
+		RendererMesh *mesh = new RendererMesh();
 
-		short* basePtr = meshPtr;
+		mesh->Sphere = meshPtr->sphere;
 
-		short cx = *meshPtr++;
-		short cy = *meshPtr++;
-		short cz = *meshPtr++;
-		short r1 = *meshPtr++;
-		short r2 = *meshPtr++;
+		if (meshPtr->vertices.size() == 0)
+			return mesh;
 
-		mesh->Sphere = BoundingSphere(Vector3(cx, cy, cz), r1);
+		MESH_VERTEX *vertices = meshPtr->vertices.data();
 
-		short numVertices = *meshPtr++;
-
-		VECTOR* vertices = (VECTOR*)malloc(sizeof(VECTOR) * numVertices);
-		for (int v = 0; v < numVertices; v++) {
-			short x = *meshPtr++;
-			short y = *meshPtr++;
-			short z = *meshPtr++;
-
-			vertices[v].vx = x;
-			vertices[v].vy = y;
-			vertices[v].vz = z;
-
-			mesh->Positions.push_back(Vector3(x, y, z));
-		}
-
-		short numNormals = *meshPtr++;
-		VECTOR* normals = NULL;
-		short* colors = NULL;
-		if (numNormals > 0) {
-			normals = (VECTOR*)malloc(sizeof(VECTOR) * numNormals);
-			for (int v = 0; v < numNormals; v++) {
-				short x = *meshPtr++;
-				short y = *meshPtr++;
-				short z = *meshPtr++;
-
-				normals[v].vx = x;
-				normals[v].vy = y;
-				normals[v].vz = z;
-			}
-		}
-		else {
-			short numLights = -numNormals;
-			colors = (short*)malloc(sizeof(short) * numLights);
-			for (int v = 0; v < numLights; v++) {
-				colors[v] = *meshPtr++;
-			}
-		}
-
-		short numRectangles = *meshPtr++;
-
-		for (int r = 0; r < numRectangles; r++) {
-			short v1 = *meshPtr++;
-			short v2 = *meshPtr++;
-			short v3 = *meshPtr++;
-			short v4 = *meshPtr++;
-			short textureId = *meshPtr++;
-			short effects = *meshPtr++;
-
-			short indices[4] = { v1, v2, v3, v4 };
-
-			short textureIndex = textureId & 0x7FFF;
-			bool doubleSided = (textureId & 0x8000) >> 15;
-
-			// Get the object texture
-			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-			int tile = texture->tileAndFlag & 0x7FFF;
-
-			// Create vertices
-			RendererBucket* bucket;
-			int bucketIndex = RENDERER_BUCKET_SOLID;
-				if (texture->attribute == 2 || (effects & 1))
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			
-			// ColAddHorizon special handling
-			if (obj != NULL && obj->Id == ID_HORIZON && g_GameFlow->GetLevel(CurrentLevel)->ColAddHorizon) {
-				if (texture->attribute == 2 || (effects & 1))
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			}
-
-			bucket = &mesh->Buckets[bucketIndex];
-			if (obj != NULL)
-				obj->HasDataInBucket[bucketIndex] = true;
-
-			int baseVertices = bucket->NumVertices;
-			for (int v = 0; v < 4; v++) {
-				RendererVertex vertex;
-
-				vertex.Position.x = vertices[indices[v]].vx;
-				vertex.Position.y = vertices[indices[v]].vy;
-				vertex.Position.z = vertices[indices[v]].vz;
-
-				if (numNormals > 0) {
-					vertex.Normal.x = normals[indices[v]].vx / 16300.0f;
-					vertex.Normal.y = normals[indices[v]].vy / 16300.0f;
-					vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
-				}
-
-				vertex.UV.x = texture->vertices[v].x;
-				vertex.UV.y = texture->vertices[v].y;
-
-				vertex.Bone = boneIndex;
-				if (isHairs)
-					vertex.Bone = indices[v];
-
-				if (colors == NULL) {
-					vertex.Color = Vector4::One * 0.5f;
-				}
-				else {
-					short shade = colors[indices[v]];
-					shade = (255 - shade * 255 / 8191) & 0xFF;
-					vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
-				}
-
-				bucket->NumVertices++;
-				bucket->Vertices.push_back(vertex);
-			}
-
-			bucket->Indices.push_back(baseVertices);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->Indices.push_back(baseVertices + 3);
-			bucket->Indices.push_back(baseVertices + 2);
-			bucket->Indices.push_back(baseVertices + 3);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->NumIndices += 6;
-
-			RendererPolygon newPolygon;
-			newPolygon.Shape = SHAPE_RECTANGLE;
-			newPolygon.TextureId = textureId;
-			newPolygon.Indices[0] = baseVertices;
-			newPolygon.Indices[1] = baseVertices + 1;
-			newPolygon.Indices[2] = baseVertices + 2;
-			newPolygon.Indices[3] = baseVertices + 3;
-			bucket->Polygons.push_back(newPolygon);
-		}
-
-		short numTriangles = *meshPtr++;
-
-		for (int r = 0; r < numTriangles; r++) {
-			short v1 = *meshPtr++;
-			short v2 = *meshPtr++;
-			short v3 = *meshPtr++;
-			short textureId = *meshPtr++;
-			short effects = *meshPtr++;
-
-			short indices[3] = { v1, v2, v3 };
-
-			short textureIndex = textureId & 0x7FFF;
-			bool doubleSided = (textureId & 0x8000) >> 15;
-
-			// Get the object texture
-			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-			int tile = texture->tileAndFlag & 0x7FFF;
-
-			// Create vertices
-			RendererBucket* bucket;
-			int bucketIndex = RENDERER_BUCKET_SOLID;
-				if (texture->attribute == 2 || (effects & 1))
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			
-			bucket = &mesh->Buckets[bucketIndex];
-			if (obj != NULL)
-				obj->HasDataInBucket[bucketIndex] = true;
-
-			int baseVertices = bucket->NumVertices;
-			for (int v = 0; v < 3; v++) {
-				RendererVertex vertex;
-
-				vertex.Position.x = vertices[indices[v]].vx;
-				vertex.Position.y = vertices[indices[v]].vy;
-				vertex.Position.z = vertices[indices[v]].vz;
-
-				if (numNormals > 0) {
-					vertex.Normal.x = normals[indices[v]].vx / 16300.0f;
-					vertex.Normal.y = normals[indices[v]].vy / 16300.0f;
-					vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
-				}
-
-				vertex.UV.x = texture->vertices[v].x;
-				vertex.UV.y = texture->vertices[v].y;
-
-				vertex.Bone = boneIndex;
-				if (isHairs)
-					vertex.Bone = indices[v];
-
-				if (colors == NULL) {
-					vertex.Color = Vector4::One * 0.5f;
-				}
-				else {
-					short shade = colors[indices[v]];
-					shade = (255 - shade * 255 / 8191) & 0xFF;
-					vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
-				}
-
-				bucket->NumVertices++;
-				bucket->Vertices.push_back(vertex);
-			}
-
-			bucket->Indices.push_back(baseVertices);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->Indices.push_back(baseVertices + 2);
-			bucket->NumIndices += 3;
-
-			RendererPolygon newPolygon;
-			newPolygon.Shape = SHAPE_TRIANGLE;
-			newPolygon.TextureId = textureId;
-			newPolygon.Indices[0] = baseVertices;
-			newPolygon.Indices[1] = baseVertices + 1;
-			newPolygon.Indices[2] = baseVertices + 2;
-			bucket->Polygons.push_back(newPolygon);
-		}
-
-		free(vertices);
-		if (normals != NULL)
-			free(normals);
-		if (colors != NULL)
-			free(colors);
-
-		unsigned int castedMeshPtr = reinterpret_cast<unsigned int>(basePtr);
-
-		if (m_meshPointersToMesh.find(castedMeshPtr) == m_meshPointersToMesh.end()) {
-			m_meshPointersToMesh.insert(pair<unsigned int, RendererMesh*>(castedMeshPtr, mesh));
-		}
-		/*else if (m_meshPointersToMesh[castedMeshPtr] == NULL)
+		for (int n = 0; n < meshPtr->buckets.size(); n++)
 		{
-			m_meshPointersToMesh[castedMeshPtr] = mesh;
-		}*/
+			BUCKET *levelBucket = &meshPtr->buckets[n];
+			RendererBucket *bucket;
+			int bucketIndex;
+
+			if (levelBucket->blendMode != 0)
+				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
+			else
+				bucketIndex = RENDERER_BUCKET_SOLID;
+
+			bucket = &mesh->Buckets[bucketIndex];
+
+			for (int v = 0; v < levelBucket->indices.size(); v++)
+			{
+				int index = levelBucket->indices[v];
+				MESH_VERTEX *levelVertex = &vertices[index];
+
+				RendererVertex vertex;
+
+				vertex.Position.x = levelVertex->position.x;
+				vertex.Position.y = levelVertex->position.y;
+				vertex.Position.z = levelVertex->position.z;
+
+				vertex.Normal.x = levelVertex->normal.x;
+				vertex.Normal.y = levelVertex->normal.y;
+				vertex.Normal.z = levelVertex->normal.z;
+
+				vertex.UV.x = levelVertex->textureCoordinates.x;
+				vertex.UV.y = levelVertex->textureCoordinates.y;
+
+				vertex.Color.x = levelVertex->color.x;
+				vertex.Color.y = levelVertex->color.y;
+				vertex.Color.z = levelVertex->color.z;
+				vertex.Color.w = 1.0f;
+
+				vertex.Bone = boneIndex;
+				//vertex.Index = index;
+				if (isHairs)
+					vertex.Bone = index;
+
+				mesh->Positions.push_back(vertex.Position);
+
+				bucket->Indices.push_back(bucket->NumVertices);
+				bucket->NumVertices++;
+				bucket->Vertices.push_back(vertex);
+			}
+		}
 
 		m_meshes.push_back(mesh);
 
 		return mesh;
 	}
 
-	int Renderer11::getAnimatedTextureInfo(short textureId) {
-		for (int i = 0; i < m_numAnimatedTextureSets; i++) {
-			RendererAnimatedTextureSet& const set = m_animatedTextureSets[i];
-			for (int j = 0; j < set.NumTextures; j++) {
+	int Renderer11::getAnimatedTextureInfo(short textureId)
+	{
+		for (int i = 0; i < m_numAnimatedTextureSets; i++)
+		{
+			RendererAnimatedTextureSet &const set = m_animatedTextureSets[i];
+			for (int j = 0; j < set.NumTextures; j++)
+			{
 				if (set.Textures[j].Id == textureId)
 					return i;
 			}
@@ -616,29 +480,34 @@ namespace T5M::Renderer {
 
 		return -1;
 	}
-	bool Renderer11::IsFullsScreen() {
+	bool Renderer11::IsFullsScreen()
+	{
 		return (!Windowed);
 	}
-	bool Renderer11::IsFading() {
+	bool Renderer11::IsFading()
+	{
 		return false;
 		return (m_fadeStatus != FADEMODE_NONE);
 	}
 
-	void Renderer11::UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov) {
-		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width , g_Configuration.Height);
+	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov)
+	{
+		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width, g_Configuration.Height);
 	}
 
-	bool Renderer11::EnumerateVideoModes() {
+	bool Renderer11::EnumerateVideoModes()
+	{
 		HRESULT res;
 
-		IDXGIFactory* dxgiFactory = NULL;
-		res = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)& dxgiFactory);
+		IDXGIFactory *dxgiFactory = NULL;
+		res = CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)&dxgiFactory);
 		if (FAILED(res))
 			return false;
 
-		IDXGIAdapter* dxgiAdapter = NULL;
+		IDXGIAdapter *dxgiAdapter = NULL;
 
-		for (int i = 0; dxgiFactory->EnumAdapters(i, &dxgiAdapter) != DXGI_ERROR_NOT_FOUND; i++) {
+		for (int i = 0; dxgiFactory->EnumAdapters(i, &dxgiAdapter) != DXGI_ERROR_NOT_FOUND; i++)
+		{
 			DXGI_ADAPTER_DESC adapterDesc;
 			UINT stringLength;
 			char videoCardDescription[128];
@@ -654,13 +523,13 @@ namespace T5M::Renderer {
 			printf("Adapter %d\n", i);
 			printf("\t Device Name: %s\n", videoCardDescription);
 
-			IDXGIOutput* output = NULL;
+			IDXGIOutput *output = NULL;
 			res = dxgiAdapter->EnumOutputs(0, &output);
 			if (FAILED(res))
 				return false;
 
 			UINT numModes = 0;
-			DXGI_MODE_DESC* displayModes = NULL;
+			DXGI_MODE_DESC *displayModes = NULL;
 			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 			// Get the number of elements
@@ -671,13 +540,15 @@ namespace T5M::Renderer {
 			// Get the list
 			displayModes = new DXGI_MODE_DESC[numModes];
 			res = output->GetDisplayModeList(format, 0, &numModes, displayModes);
-			if (FAILED(res)) {
+			if (FAILED(res))
+			{
 				delete displayModes;
 				return false;
 			}
 
-			for (int j = 0; j < numModes; j++) {
-				DXGI_MODE_DESC* mode = &displayModes[j];
+			for (int j = 0; j < numModes; j++)
+			{
+				DXGI_MODE_DESC *mode = &displayModes[j];
 
 				RendererDisplayMode newMode;
 
@@ -690,10 +561,12 @@ namespace T5M::Renderer {
 				newMode.RefreshRate = mode->RefreshRate.Numerator / mode->RefreshRate.Denominator;
 
 				bool found = false;
-				for (int k = 0; k < adapter.DisplayModes.size(); k++) {
-					RendererDisplayMode* currentMode = &adapter.DisplayModes[k];
+				for (int k = 0; k < adapter.DisplayModes.size(); k++)
+				{
+					RendererDisplayMode *currentMode = &adapter.DisplayModes[k];
 					if (currentMode->Width == newMode.Width && currentMode->Height == newMode.Height &&
-						currentMode->RefreshRate == newMode.RefreshRate) {
+						currentMode->RefreshRate == newMode.RefreshRate)
+					{
 						found = true;
 						break;
 					}
@@ -715,48 +588,53 @@ namespace T5M::Renderer {
 		return true;
 	}
 
-	int SortLightsFunction(RendererLight * a, RendererLight * b) {
+	int SortLightsFunction(RendererLight *a, RendererLight *b)
+	{
 		if (a->Dynamic > b->Dynamic)
 			return -1;
 		return 0;
 	}
 
-	bool SortRoomsFunction(RendererRoom * a, RendererRoom * b) {
+	bool SortRoomsFunction(RendererRoom *a, RendererRoom *b)
+	{
 		return (a->Distance < b->Distance);
 	}
 
-	int SortRoomsFunctionNonStd(RendererRoom * a, RendererRoom * b) {
+	int SortRoomsFunctionNonStd(RendererRoom *a, RendererRoom *b)
+	{
 		return (a->Distance - b->Distance);
 	}
 
-	void Renderer11::getVisibleObjects(int from, int to, Vector4 * viewPort, bool water, int count,RenderView& renderView) {
+	void Renderer11::getVisibleObjects(int from, int to, Vector4 *viewPort, bool water, int count, RenderView &renderView)
+	{
 		// Avoid allocations, 1024 should be fine
 		RendererRoomNode nodes[256];
 		int nextNode = 0;
 
 		// Avoid reallocations, 1024 should be fine
-		RendererRoomNode* stack[256];
+		RendererRoomNode *stack[256];
 		int stackDepth = 0;
 
-		RendererRoomNode* node = &nodes[nextNode++];
+		RendererRoomNode *node = &nodes[nextNode++];
 		node->To = to;
 		node->From = -1;
 
 		// Push
 		stack[stackDepth++] = node;
 
-		while (stackDepth > 0) {
+		while (stackDepth > 0)
+		{
 			// Pop
 			node = stack[--stackDepth];
 
 			if (m_rooms[node->To].Visited)
 				continue;
 
-			ROOM_INFO* room = &Rooms[node->To];
+			ROOM_INFO *room = &Rooms[node->To];
 
 			Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f,
-				(room->minfloor + room->maxceiling) / 2.0f,
-				room->z + room->ySize * WALL_SIZE / 2.0f);
+										 (room->minfloor + room->maxceiling) / 2.0f,
+										 room->z + room->ySize * WALL_SIZE / 2.0f);
 			Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
@@ -764,18 +642,20 @@ namespace T5M::Renderer {
 			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
 			Rooms[node->To].boundActive = true;
 
-			collectLightsForRoom(node->To,renderView);
+			collectLightsForRoom(node->To, renderView);
 			collectItems(node->To, renderView);
 			collectStatics(node->To, renderView);
 			collectEffects(node->To, renderView);
 
 			Vector4 clipPort;
 
-			for (int i = 0; i < room->doors.size(); i++) {
+			for (int i = 0; i < room->doors.size(); i++)
+			{
 				short adjoiningRoom = room->doors[i].room;
 
-				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort, renderView.camera.ViewProjection)) {
-					RendererRoomNode* childNode = &nodes[nextNode++];
+				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], viewPort, &node->ClipPort, renderView.camera.ViewProjection))
+				{
+					RendererRoomNode *childNode = &nodes[nextNode++];
 					childNode->From = node->To;
 					childNode->To = adjoiningRoom;
 
@@ -786,8 +666,9 @@ namespace T5M::Renderer {
 		}
 	}
 
-	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR * portal, Vector4 * viewPort, Vector4 * clipPort,const Matrix& viewProjection) {
-		ROOM_INFO* room = &Rooms[roomIndex];
+	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR *portal, Vector4 *viewPort, Vector4 *clipPort, const Matrix &viewProjection)
+	{
+		ROOM_INFO *room = &Rooms[roomIndex];
 
 		Vector3 n = portal->normal;
 		Vector3 v = Vector3(
@@ -808,13 +689,15 @@ namespace T5M::Renderer {
 		clipPort->w = FLT_MIN;
 
 		// Project all portal's corners in screen space
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++)
+		{
 			Vector4 tmp = Vector4(portal->vertices[i].x + room->x, portal->vertices[i].y + room->y, portal->vertices[i].z + room->z, 1.0f);
 
 			// Project corner on screen
 			Vector4::Transform(tmp, viewProjection, p[i]);
 
-			if (p[i].w > 0.0f) {
+			if (p[i].w > 0.0f)
+			{
 				// The corner is in front of camera
 				p[i].x *= (1.0f / p[i].w);
 				p[i].y *= (1.0f / p[i].w);
@@ -835,18 +718,22 @@ namespace T5M::Renderer {
 			return false;
 
 		// If door crosses camera plane...
-		if (zClip > 0) {
-			for (int i = 0; i < 4; i++) {
+		if (zClip > 0)
+		{
+			for (int i = 0; i < 4; i++)
+			{
 				Vector4 a = p[i];
 				Vector4 b = p[(i + 1) % 4];
 
-				if ((a.w > 0.0f) ^ (b.w > 0.0f)) {
+				if ((a.w > 0.0f) ^ (b.w > 0.0f))
+				{
 
 					if (a.x < 0.0f && b.x < 0.0f)
 						clipPort->x = -1.0f;
 					else if (a.x > 0.0f && b.x > 0.0f)
 						clipPort->z = 1.0f;
-					else {
+					else
+					{
 						clipPort->x = -1.0f;
 						clipPort->z = 1.0f;
 					}
@@ -855,7 +742,8 @@ namespace T5M::Renderer {
 						clipPort->y = -1.0f;
 					else if (a.y > 0.0f && b.y > 0.0f)
 						clipPort->w = 1.0f;
-					else {
+					else
+					{
 						clipPort->y = -1.0f;
 						clipPort->w = 1.0f;
 					}
@@ -874,7 +762,8 @@ namespace T5M::Renderer {
 		return true;
 	}
 
-	bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius) {
+	bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
+	{
 		Vector3 centre = (boxMin + boxMax) / 2.0f;
 		Vector3 extens = boxMax - centre;
 		BoundingBox box = BoundingBox(centre, extens);
@@ -882,9 +771,10 @@ namespace T5M::Renderer {
 		return box.Intersects(sphere);
 	}
 
-	void Renderer11::GetLaraBonePosition(Vector3 * pos, int bone) {}
+	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone) {}
 
-	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2) {
+	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
+	{
 		RendererRoom temporary;
 
 		temporary = m_rooms[roomNumber1];
@@ -894,26 +784,30 @@ namespace T5M::Renderer {
 		m_rooms[roomNumber2].Room = &Rooms[roomNumber2];
 	}
 
-	RendererMesh* Renderer11::getMeshFromMeshPtr(unsigned int meshp) {
-		return m_meshPointersToMesh[meshp];
+	RendererMesh *Renderer11::getMesh(int meshIndex)
+	{
+		return m_meshes[meshIndex];
 	}
 
-	void Renderer11::GetLaraAbsBonePosition(Vector3 * pos, int joint) {
+	void Renderer11::GetLaraAbsBonePosition(Vector3 *pos, int joint)
+	{
 		Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
 		world = world * m_LaraWorldMatrix;
 		*pos = Vector3::Transform(*pos, world);
 	}
 
-	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 * pos, int joint) {
-		RendererItem* rendererItem = &m_items[itemNumber];
+	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
+	{
+		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
 		rendererItem->Item = &Items[itemNumber];
-		ITEM_INFO* item = rendererItem->Item;
+		ITEM_INFO *item = rendererItem->Item;
 
 		if (!item)
 			return;
 
-		if (!rendererItem->DoneAnimations) {
+		if (!rendererItem->DoneAnimations)
+		{
 			if (itemNumber == Lara.itemNumber)
 				UpdateLaraAnimations(false);
 			else
@@ -924,16 +818,18 @@ namespace T5M::Renderer {
 		*pos = Vector3::Transform(*pos, world);
 	}
 
-	int Renderer11::GetSpheres(short itemNumber, BoundingSphere * spheres, char worldSpace, Matrix local) {
-		RendererItem* rendererItem = &m_items[itemNumber];
+	int Renderer11::GetSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
+	{
+		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
 		rendererItem->Item = &Items[itemNumber];
-		ITEM_INFO* item = rendererItem->Item;
+		ITEM_INFO *item = rendererItem->Item;
 
 		if (!item)
 			return 0;
 
-		if (!rendererItem->DoneAnimations) {
+		if (!rendererItem->DoneAnimations)
+		{
 			if (itemNumber == Lara.itemNumber)
 				UpdateLaraAnimations(false);
 			else
@@ -943,13 +839,15 @@ namespace T5M::Renderer {
 		int x, y, z;
 		Matrix world;
 
-		if (worldSpace & SPHERES_SPACE_WORLD) {
+		if (worldSpace & SPHERES_SPACE_WORLD)
+		{
 			x = item->pos.xPos;
 			y = item->pos.yPos;
 			z = item->pos.zPos;
 			world = Matrix::Identity;
 		}
-		else {
+		else
+		{
 			x = 0;
 			y = 0;
 			z = 0;
@@ -958,10 +856,11 @@ namespace T5M::Renderer {
 
 		world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
 
-		RendererObject& moveable = *m_moveableObjects[item->objectNumber];
+		RendererObject &moveable = *m_moveableObjects[item->objectNumber];
 
-		for (int i = 0; i < moveable.ObjectMeshes.size(); i++) {
-			RendererMesh* mesh = moveable.ObjectMeshes[i];
+		for (int i = 0; i < moveable.ObjectMeshes.size(); i++)
+		{
+			RendererMesh *mesh = moveable.ObjectMeshes[i];
 
 			Vector3 pos;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
@@ -976,8 +875,9 @@ namespace T5M::Renderer {
 		return moveable.ObjectMeshes.size();
 	}
 
-	void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix * outMatrix) {
-		RendererObject& obj = *m_moveableObjects[ID_LARA];
+	void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
+	{
+		RendererObject &obj = *m_moveableObjects[ID_LARA];
 		*outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;
 	}
-}
+} // namespace T5M::Renderer
