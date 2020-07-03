@@ -20,11 +20,13 @@
 #include "setup.h"
 #include "Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
+#include "RenderView/RenderView.h"
+using std::vector;
 namespace T5M::Renderer {
 	using namespace T5M::Renderer::Utils;
 	using std::array;
 	Renderer11 g_Renderer;
-	Renderer11::Renderer11() {
+	Renderer11::Renderer11() : gameCamera({ 0,0,0 }, { 0,0,1 }, {0,1,0},1,1,0,1,10,90) {
 		initialiseHairRemaps();
 
 		m_blinkColorDirection = 1;
@@ -67,32 +69,25 @@ namespace T5M::Renderer {
 		DX11_RELEASE(m_cbStatic);
 		DX11_RELEASE(m_cbLights);
 		DX11_RELEASE(m_cbMisc);
-
+		DX11_RELEASE(m_cbHUD);
+		DX11_RELEASE(m_cbHUDBar);
 		DX11_RELEASE(m_swapChain);
 		DX11_RELEASE(m_context);
 		DX11_RELEASE(m_device);
+		DX11_RELEASE(m_cbSprite);
 	}
 
 	void Renderer11::FreeRendererData() {
 		m_meshPointersToMesh.clear();
-
-		for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
-			DX11_DELETE(m_moveableObjects[i]);
-		free(m_moveableObjects);
-
-		for (int i = 0; i < g_NumSprites; i++)
-			DX11_DELETE(m_sprites[i]);
-		free(m_sprites);
-
-		for (int i = 0; i < MAX_STATICS; i++)
-			DX11_DELETE(m_staticObjects[i]);
-		free(m_staticObjects);
-
+		m_moveableObjects.clear();
+		m_staticObjects.clear();
+		m_sprites.clear();
 		m_rooms.clear();
 		m_roomTextures.clear();
 		m_moveablesTextures.clear();
 		m_staticsTextures.clear();
 		m_spritesTextures.clear();
+		gameCamera.clear();
 	}
 
 	void Renderer11::clearSceneItems() {
@@ -104,6 +99,7 @@ namespace T5M::Renderer {
 		m_spritesToDraw.clear();
 		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
+		gameCamera.clear();
 	}
 
 	int Renderer11::SyncRenderer() {
@@ -129,7 +125,7 @@ namespace T5M::Renderer {
 		ID3DBlob* errors = NULL;
 
 		printf("Compiling vertex shader: %s\n", fileName);
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
 		res = D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors);
 		throwIfFailed(res);
 
@@ -148,7 +144,7 @@ namespace T5M::Renderer {
 		ID3DBlob* errors = NULL;
 
 		printf("Compiling pixel shader: %s\n", fileName);
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
 		throwIfFailed(D3DCompileFromFile(fileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, function, model, flags, 0, bytecode, &errors));
 
 		ID3D11PixelShader* shader = NULL;
@@ -213,6 +209,14 @@ namespace T5M::Renderer {
 			return NULL;
 
 		return buffer;
+	}
+
+	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
+		for (int i = 0; i < 6; i++) {
+			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,Camera.pos.roomNumber,10,20480, 90* RADIAN);
+			drawSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
+			m_context->ClearState();
+		}
 	}
 
 	RendererHUDBar::RendererHUDBar(ID3D11Device* m_device, int x, int y, int w, int h, int borderSize, array<Vector4, 9> colors) {

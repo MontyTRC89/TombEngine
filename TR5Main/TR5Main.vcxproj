@@ -138,7 +138,8 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Game\smoke.h" />
     <ClInclude Include="Game\spark.h" />
-    <ClInclude Include="Renderer\RenderView\LevelRenderView.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\SpriteBuffer.h" />
+    <ClInclude Include="Renderer\Quad\RenderQuad.h" />
     <ClInclude Include="Libs\bass\bass.h" />
     <ClInclude Include="Libs\bass\bassmix.h" />
     <ClInclude Include="Libs\bass\bass_fx.h" />
@@ -315,10 +316,11 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Renderer\ConstantBuffers\ShaderLight.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ShadowLightBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\StaticBuffer.h" />
+    <ClInclude Include="Renderer\RenderView\RenderView.h" />
     <ClInclude Include="Renderer\Texture2D\Texture2D.h" />
     <ClInclude Include="Renderer\Utils.h" />
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
-    <ClInclude Include="Renderer\RenderView\RenderView.h" />
+    <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -408,7 +410,9 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\trmath.cpp" />
     <ClCompile Include="Game\smoke.cpp" />
     <ClCompile Include="Game\spark.cpp" />
-    <ClCompile Include="Renderer\RenderView\LevelRenderView.cpp" />
+    <ClCompile Include="Renderer\Quad\RenderQuad.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
@@ -556,10 +560,11 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Renderer\Renderer11Settings.cpp" />
     <ClCompile Include="Renderer\Renderer11String.cpp" />
     <ClCompile Include="Renderer\Renderer11Frame.cpp" />
+    <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
     <ClCompile Include="Renderer\Texture2D\Texture2D.cpp" />
     <ClCompile Include="Renderer\Utils.cpp" />
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
-    <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
+    <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Scripting\LanguageScript.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />

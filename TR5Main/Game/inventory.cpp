@@ -579,11 +579,11 @@ int Inventory::DoInventory()
 		int passportResult = DoPassport();
 
 		// Fade out
-		g_Renderer.FadeOut();
-		for (int i = 0; i < FADE_FRAMES_COUNT; i++)
-		{
+		//g_Renderer.FadeOut();
+		//for (int i = 0; i < FADE_FRAMES_COUNT; i++)
+		//{
 			UpdateSceneAndDrawInventory();
-		}
+		//}
 
 		return passportResult;
 	}
@@ -1804,8 +1804,7 @@ bool Inventory::UpdateSceneAndDrawInventory()
 
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 	{
-		g_Renderer.DumpGameScene();
-		g_Renderer.DrawInventory();
+		g_Renderer.DrawTitle();
 		Camera.numberFrames = g_Renderer.SyncRenderer();
 
 		nframes = Camera.numberFrames;

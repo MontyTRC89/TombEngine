@@ -5,26 +5,23 @@
 #include "setup.h"
 #include "control.h"
 #include "objects.h"
-using std::vector;
+using std::optional;
 using std::stack;
-namespace T5M::Renderer {
+using std::vector;
+namespace T5M::Renderer
+{
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
-		m_moveableObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
-		ZeroMemory(m_moveableObjects, sizeof(RendererObject*) * ID_NUMBER_OBJECTS);
-
-		m_spriteSequences = vector<RendererSpriteSequence>(ID_NUMBER_OBJECTS);
-
-		m_staticObjects = (RendererObject * *)malloc(sizeof(RendererObject*) * MAX_STATICS);
-		ZeroMemory(m_staticObjects, sizeof(RendererObject*) * MAX_STATICS);
-
+		m_moveableObjects.resize(ID_NUMBER_OBJECTS);
+		m_spriteSequences.resize(ID_NUMBER_OBJECTS);
+		m_staticObjects.resize(MAX_STATICS);
 		m_rooms = vector<RendererRoom>(NUM_ROOMS);
 
 		m_meshes.clear();
 
 		// Step 0: prepare animated textures
 		short numSets = *AnimTextureRanges;
-		short* animatedPtr = AnimTextureRanges;
+		short *animatedPtr = AnimTextureRanges;
 		animatedPtr++;
 
 		m_animatedTextureSets = vector<RendererAnimatedTextureSet>(NUM_ANIMATED_SETS);
@@ -33,7 +30,7 @@ namespace T5M::Renderer {
 		for (int i = 0; i < numSets; i++)
 		{
 			m_animatedTextureSets[i] = RendererAnimatedTextureSet();
-			RendererAnimatedTextureSet& const set = m_animatedTextureSets[i];
+			RendererAnimatedTextureSet &const set = m_animatedTextureSets[i];
 			short numTextures = *animatedPtr + 1;
 			animatedPtr++;
 
@@ -45,10 +42,10 @@ namespace T5M::Renderer {
 				short textureId = *animatedPtr;
 				animatedPtr++;
 
-				OBJECT_TEXTURE* texture = &ObjectTextures[textureId];
+				OBJECT_TEXTURE *texture = &ObjectTextures[textureId];
 				int tile = texture->tileAndFlag & 0x7FFF;
 				set.Textures[j] = RendererAnimatedTexture();
-				RendererAnimatedTexture& const newTexture = set.Textures[j];
+				RendererAnimatedTexture &const newTexture = set.Textures[j];
 				newTexture.Id = textureId;
 
 				for (int k = 0; k < 4; k++)
@@ -58,7 +55,6 @@ namespace T5M::Renderer {
 
 					newTexture.UV[k] = Vector2(x, y);
 				}
-
 			}
 		}
 
@@ -104,33 +100,36 @@ namespace T5M::Renderer {
 		if (m_skyTexture == NULL)
 			return false;*/
 
-			//D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
+		//D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
 
-			//free(buffer);
+		//free(buffer);
 
-			// Upload textures to GPU memory
-		for (int i = 0; i < RoomTextures.size(); i++) {
-			TEXTURE* texture = &RoomTextures[i];
+		// Upload textures to GPU memory
+		for (int i = 0; i < RoomTextures.size(); i++)
+		{
+			TEXTURE *texture = &RoomTextures[i];
 			m_roomTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
 		}
 
-		for (int i = 0; i < MoveablesTextures.size(); i++) {
-			TEXTURE* texture = &MoveablesTextures[i];
+		for (int i = 0; i < MoveablesTextures.size(); i++)
+		{
+			TEXTURE *texture = &MoveablesTextures[i];
 			m_moveablesTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
 		}
 
-		for (int i = 0; i < StaticsTextures.size(); i++) {
-			TEXTURE* texture = &StaticsTextures[i];
+		for (int i = 0; i < StaticsTextures.size(); i++)
+		{
+			TEXTURE *texture = &StaticsTextures[i];
 			m_staticsTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
 		}
 
-		for (int i = 0; i < SpritesTextures.size(); i++) {
-			TEXTURE* texture = &SpritesTextures[i];
+		for (int i = 0; i < SpritesTextures.size(); i++)
+		{
+			TEXTURE *texture = &SpritesTextures[i];
 			m_spritesTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
 		}
 
 		m_skyTexture = Texture2D(m_device, MiscTextures.data.data(), MiscTextures.size);
-
 
 		// Step 2: prepare rooms
 		vector<RendererVertex> roomVertices;
@@ -141,25 +140,25 @@ namespace T5M::Renderer {
 
 		for (int i = 0; i < Rooms.size(); i++)
 		{
-			ROOM_INFO* room = &Rooms[i];
+			ROOM_INFO *room = &Rooms[i];
 
 			m_rooms[i] = RendererRoom();
-			RendererRoom& r = m_rooms[i];
+			RendererRoom &r = m_rooms[i];
 			r.RoomNumber = i;
 			r.Room = room;
 			r.AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
-			r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
+			//r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
 			r.Statics.resize(room->mesh.size());
 
 			if (room->vertices.size() == 0)
 				continue;
 
-			ROOM_VERTEX * vertices = room->vertices.data();
+			ROOM_VERTEX *vertices = room->vertices.data();
 
 			for (int n = 0; n < room->buckets.size(); n++)
 			{
-				BUCKET* levelBucket = &room->buckets[n];
-				RendererBucket* bucket;
+				BUCKET *levelBucket = &room->buckets[n];
+				RendererBucket *bucket;
 				int bucketIndex;
 
 				if (levelBucket->blendMode != 0)
@@ -179,7 +178,7 @@ namespace T5M::Renderer {
 				for (int v = 0; v < levelBucket->indices.size(); v++)
 				{
 					int index = levelBucket->indices[v];
-					ROOM_VERTEX* levelVertex = &vertices[index];
+					ROOM_VERTEX *levelVertex = &vertices[index];
 
 					RendererVertex vertex;
 
@@ -212,7 +211,7 @@ namespace T5M::Renderer {
 				for (int l = 0; l < room->lights.size(); l++)
 				{
 					RendererLight light;
-					ROOM_LIGHT* oldLight = &room->lights[l];
+					ROOM_LIGHT *oldLight = &room->lights[l];
 
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 					{
@@ -267,7 +266,7 @@ namespace T5M::Renderer {
 			// Merge vertices and indices in a single list
 			for (int j = 0; j < NUM_BUCKETS; j++)
 			{
-				RendererBucket* bucket = &r.Buckets[j];
+				RendererBucket *bucket = &r.Buckets[j];
 
 				bucket->StartVertex = baseRoomVertex;
 				bucket->StartIndex = baseRoomIndex;
@@ -297,13 +296,16 @@ namespace T5M::Renderer {
 		int baseMoveablesIndex = 0;
 
 		// Step 3: prepare moveables
-		for (int i = 0; i < MoveablesIds.size(); i++) {
+		for (int i = 0; i < MoveablesIds.size(); i++)
+		{
 			int objNum = MoveablesIds[i];
-			ObjectInfo* obj = &Objects[objNum];
+			ObjectInfo *obj = &Objects[objNum];
 
-			if (obj->nmeshes > 0) {
-				RendererObject* moveable = new RendererObject();
-				moveable->Id = MoveablesIds[i];
+			if (obj->nmeshes > 0)
+			{
+				m_moveableObjects[MoveablesIds[i]] = RendererObject();
+				RendererObject &moveable = *m_moveableObjects[MoveablesIds[i]];
+				moveable.Id = MoveablesIds[i];
 
 				// Assign the draw routine
 				/*if (objNum == ID_FLAME || objNum == ID_FLAME_EMITTER || objNum == ID_FLAME_EMITTER2 || objNum == ID_FLAME_EMITTER3 ||
@@ -315,48 +317,53 @@ namespace T5M::Renderer {
 					objNum == ID_CAMERA_TARGET || objNum == ID_WATERFALLMIST || objNum == ID_SMOKE_EMITTER_BLACK ||
 					objNum == ID_SMOKE_EMITTER_WHITE)
 				{
-					moveable->DoNotDraw = true;
+					moveable.DoNotDraw = true;
 				}
 				else
 				{
-					moveable->DoNotDraw = false;
+					moveable.DoNotDraw = false;
 				}*/
 
-				moveable->DoNotDraw = (obj->drawRoutine == NULL);
+				moveable.DoNotDraw = (obj->drawRoutine == NULL);
 
-				for (int j = 0; j < obj->nmeshes; j++) {
+				for (int j = 0; j < obj->nmeshes; j++)
+				{
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 					// and vertices have bone index 0 and not 10
-					RendererMesh* mesh = getRendererMeshFromTrMesh(moveable,
-						&Meshes[obj->meshIndex + j],
-						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-						MoveablesIds[i] == ID_LARA_HAIR);
-					moveable->ObjectMeshes.push_back(mesh);
+					RendererMesh *mesh = getRendererMeshFromTrMesh(&moveable,
+																   &Meshes[obj->meshIndex + j],
+																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
+																   MoveablesIds[i] == ID_LARA_HAIR);
+					moveable.ObjectMeshes.push_back(mesh);
 				}
 
-				if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES || objNum == ID_BODY_PART) {
+				if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES || objNum == ID_BODY_PART)
+				{
 					// HACK: these objects must have nmeshes = 0 because engine will use them in a different way while drawing Effects.
 					// In Core's code this was done in SETUP.C but we must do it here because we need to create renderer's meshes.
 					obj->nmeshes = 0;
 				}
-				else {
-					for (int j = 0; j < obj->nmeshes; j++) {
-						moveable->LinearizedBones.push_back(new RendererBone(j));
-						moveable->AnimationTransforms.push_back(Matrix::Identity);
-						moveable->BindPoseTransforms.push_back(Matrix::Identity);
+				else
+				{
+					for (int j = 0; j < obj->nmeshes; j++)
+					{
+						moveable.LinearizedBones.push_back(new RendererBone(j));
+						moveable.AnimationTransforms.push_back(Matrix::Identity);
+						moveable.BindPoseTransforms.push_back(Matrix::Identity);
 					}
 
 					if (obj->nmeshes > 1)
 					{
-						int* bone = &Bones[obj->boneIndex];
+						int *bone = &Bones[obj->boneIndex];
 
-						stack<RendererBone*> stack;
+						stack<RendererBone *> stack;
 
-						RendererBone* currentBone = moveable->LinearizedBones[0];
-						RendererBone* stackBone = moveable->LinearizedBones[0];
+						RendererBone *currentBone = moveable.LinearizedBones[0];
+						RendererBone *stackBone = moveable.LinearizedBones[0];
 
-						for (int mi = 0; mi < obj->nmeshes - 1; mi++) {
+						for (int mi = 0; mi < obj->nmeshes - 1; mi++)
+						{
 							int j = mi + 1;
 
 							int opcode = *(bone++);
@@ -366,14 +373,15 @@ namespace T5M::Renderer {
 
 							byte flags = opcode & 0x1C;
 
-							moveable->LinearizedBones[j]->ExtraRotationFlags = flags;
+							moveable.LinearizedBones[j]->ExtraRotationFlags = flags;
 
-							switch (opcode & 0x03) {
+							switch (opcode & 0x03)
+							{
 							case 0:
-								moveable->LinearizedBones[j]->Parent = currentBone;
-								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-								currentBone->Children.push_back(moveable->LinearizedBones[j]);
-								currentBone = moveable->LinearizedBones[j];
+								moveable.LinearizedBones[j]->Parent = currentBone;
+								moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								currentBone->Children.push_back(moveable.LinearizedBones[j]);
+								currentBone = moveable.LinearizedBones[j];
 
 								break;
 							case 1:
@@ -382,76 +390,83 @@ namespace T5M::Renderer {
 								currentBone = stack.top();
 								stack.pop();
 
-								moveable->LinearizedBones[j]->Parent = currentBone;
-								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-								currentBone->Children.push_back(moveable->LinearizedBones[j]);
-								currentBone = moveable->LinearizedBones[j];
+								moveable.LinearizedBones[j]->Parent = currentBone;
+								moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								currentBone->Children.push_back(moveable.LinearizedBones[j]);
+								currentBone = moveable.LinearizedBones[j];
 
 								break;
 							case 2:
 								stack.push(currentBone);
 
-								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-								moveable->LinearizedBones[j]->Parent = currentBone;
-								currentBone->Children.push_back(moveable->LinearizedBones[j]);
-								currentBone = moveable->LinearizedBones[j];
+								moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								moveable.LinearizedBones[j]->Parent = currentBone;
+								currentBone->Children.push_back(moveable.LinearizedBones[j]);
+								currentBone = moveable.LinearizedBones[j];
 
 								break;
 							case 3:
 								if (stack.empty())
 									continue;
-								RendererBone* theBone = stack.top();
+								RendererBone *theBone = stack.top();
 								stack.pop();
 
-								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-								moveable->LinearizedBones[j]->Parent = theBone;
-								theBone->Children.push_back(moveable->LinearizedBones[j]);
-								currentBone = moveable->LinearizedBones[j];
+								moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								moveable.LinearizedBones[j]->Parent = theBone;
+								theBone->Children.push_back(moveable.LinearizedBones[j]);
+								currentBone = moveable.LinearizedBones[j];
 								stack.push(theBone);
 
 								break;
 							}
 						}
-					}					
+					}
 
 					for (int n = 0; n < obj->nmeshes; n++)
-						moveable->LinearizedBones[n]->Transform = Matrix::CreateTranslation(
-							moveable->LinearizedBones[n]->Translation.x,
-							moveable->LinearizedBones[n]->Translation.y,
-							moveable->LinearizedBones[n]->Translation.z);
+						moveable.LinearizedBones[n]->Transform = Matrix::CreateTranslation(
+							moveable.LinearizedBones[n]->Translation.x,
+							moveable.LinearizedBones[n]->Translation.y,
+							moveable.LinearizedBones[n]->Translation.z);
 
-					moveable->Skeleton = moveable->LinearizedBones[0];
-					buildHierarchy(moveable);
+					moveable.Skeleton = moveable.LinearizedBones[0];
+					buildHierarchy(&moveable);
 
 					// Fix Lara skin joints and hairs
-					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS) {
-						int BonesToCheck[2] = { 0,0 };
+					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
+					{
+						int BonesToCheck[2] = {0, 0};
 
-						RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
+						RendererObject &objSkin = *m_moveableObjects[ID_LARA_SKIN];
 
-						for (int j = 1; j < obj->nmeshes; j++) {
-							RendererMesh* jointMesh = moveable->ObjectMeshes[j];
-							RendererBone* jointBone = moveable->LinearizedBones[j];
+						for (int j = 1; j < obj->nmeshes; j++)
+						{
+							RendererMesh *jointMesh = moveable.ObjectMeshes[j];
+							RendererBone *jointBone = moveable.LinearizedBones[j];
 
 							BonesToCheck[0] = jointBone->Parent->Index;
 							BonesToCheck[1] = j;
 
-							for (int b1 = 0; b1 < NUM_BUCKETS; b1++) {
-								RendererBucket* jointBucket = &jointMesh->Buckets[b1];
+							for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
+							{
+								RendererBucket *jointBucket = &jointMesh->Buckets[b1];
 
-								for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++) {
-									RendererVertex* jointVertex = &jointBucket->Vertices[v1];
+								for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
+								{
+									RendererVertex *jointVertex = &jointBucket->Vertices[v1];
 
 									bool done = false;
 
-									for (int k = 0; k < 2; k++) {
-										RendererMesh* skinMesh = objSkin->ObjectMeshes[BonesToCheck[k]];
-										RendererBone* skinBone = objSkin->LinearizedBones[BonesToCheck[k]];
+									for (int k = 0; k < 2; k++)
+									{
+										RendererMesh *skinMesh = objSkin.ObjectMeshes[BonesToCheck[k]];
+										RendererBone *skinBone = objSkin.LinearizedBones[BonesToCheck[k]];
 
-										for (int b2 = 0; b2 < NUM_BUCKETS; b2++) {
-											RendererBucket* skinBucket = &skinMesh->Buckets[b2];
-											for (int v2 = 0; v2 < skinBucket->Vertices.size(); v2++) {
-												RendererVertex* skinVertex = &skinBucket->Vertices[v2];
+										for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
+										{
+											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
+											for (int v2 = 0; v2 < skinBucket->Vertices.size(); v2++)
+											{
+												RendererVertex *skinVertex = &skinBucket->Vertices[v2];
 
 												int x1 = jointBucket->Vertices[v1].Position.x + jointBone->GlobalTranslation.x;
 												int y1 = jointBucket->Vertices[v1].Position.y + jointBone->GlobalTranslation.y;
@@ -461,7 +476,8 @@ namespace T5M::Renderer {
 												int y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
 												int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
 
-												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2) {
+												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+												{
 													jointVertex->Bone = BonesToCheck[k];
 													jointVertex->Position = skinVertex->Position;
 													jointVertex->Normal = skinVertex->Normal;
@@ -483,10 +499,13 @@ namespace T5M::Renderer {
 						}
 					}
 
-					if (MoveablesIds[i] == ID_LARA_HAIR) {
-						for (int j = 0; j < moveable->ObjectMeshes.size(); j++) {
-							RendererMesh* mesh = moveable->ObjectMeshes[j];
-							for (int n = 0; n < NUM_BUCKETS; n++) {
+					if (MoveablesIds[i] == ID_LARA_HAIR)
+					{
+						for (int j = 0; j < moveable.ObjectMeshes.size(); j++)
+						{
+							RendererMesh *mesh = moveable.ObjectMeshes[j];
+							for (int n = 0; n < NUM_BUCKETS; n++)
+							{
 								m_numHairVertices += mesh->Buckets[n].NumVertices;
 								m_numHairIndices += mesh->Buckets[n].Indices.size();
 							}
@@ -503,14 +522,14 @@ namespace T5M::Renderer {
 					}
 				}
 
-				m_moveableObjects[MoveablesIds[i]] = moveable;
-
 				// Merge vertices and indices in a single list
-				for (int m = 0; m < moveable->ObjectMeshes.size(); m++) {
-					RendererMesh* msh = moveable->ObjectMeshes[m];
+				for (int m = 0; m < moveable.ObjectMeshes.size(); m++)
+				{
+					RendererMesh *msh = moveable.ObjectMeshes[m];
 
-					for (int j = 0; j < NUM_BUCKETS; j++) {
-						RendererBucket* bucket = &msh->Buckets[j];
+					for (int j = 0; j < NUM_BUCKETS; j++)
+					{
+						RendererBucket *bucket = &msh->Buckets[j];
 
 						bucket->StartVertex = baseMoveablesVertex;
 						bucket->StartIndex = baseMoveablesIndex;
@@ -538,22 +557,25 @@ namespace T5M::Renderer {
 		int baseStaticsVertex = 0;
 		int baseStaticsIndex = 0;
 
-		for (int i = 0; i < StaticObjectsIds.size(); i++) {
-			StaticInfo* obj = &StaticObjects[StaticObjectsIds[i]];
-			RendererObject* staticObject = new RendererObject();
-			staticObject->Id = StaticObjectsIds[i];
+		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		{
+			StaticInfo *obj = &StaticObjects[StaticObjectsIds[i]];
+			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
+			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
+			staticObject.Id = StaticObjectsIds[i];
 
-			RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, &Meshes[obj->meshNumber], 0, false, false);
+			RendererMesh *mesh = getRendererMeshFromTrMesh(&staticObject, &Meshes[obj->meshNumber], 0, false, false);
 
-			staticObject->ObjectMeshes.push_back(mesh);
+			staticObject.ObjectMeshes.push_back(mesh);
 
 			m_staticObjects[StaticObjectsIds[i]] = staticObject;
 
 			// Merge vertices and indices in a single list
-			RendererMesh* msh = staticObject->ObjectMeshes[0];
+			RendererMesh *msh = staticObject.ObjectMeshes[0];
 
-			for (int j = 0; j < NUM_BUCKETS; j++) {
-				RendererBucket* bucket = &msh->Buckets[j];
+			for (int j = 0; j < NUM_BUCKETS; j++)
+			{
+				RendererBucket *bucket = &msh->Buckets[j];
 
 				bucket->StartVertex = baseStaticsVertex;
 				bucket->StartIndex = baseStaticsIndex;
@@ -574,44 +596,47 @@ namespace T5M::Renderer {
 		m_staticsIndexBuffer = IndexBuffer(m_device, staticsIndices.size(), staticsIndices.data());
 
 		// Step 5: prepare sprites
-		m_sprites = (RendererSprite * *)malloc(sizeof(RendererSprite*) * g_NumSprites);
-		ZeroMemory(m_sprites, sizeof(RendererSprite*) * g_NumSprites);
+		m_sprites.resize(g_NumSprites);
 
-		for (int i = 0; i < g_NumSprites; i++) {
-			SPRITE* oldSprite = &Sprites[i];
+		for (int i = 0; i < g_NumSprites; i++)
+		{
+			SPRITE *oldSprite = &Sprites[i];
+			m_sprites[i] = RendererSprite();
+			RendererSprite &sprite = m_sprites[i];
 
-			RendererSprite* sprite = new RendererSprite();
-
-			sprite->UV[0] = Vector2(oldSprite->x1, oldSprite->y1);
-			sprite->UV[1] = Vector2(oldSprite->x2, oldSprite->y2);
-			sprite->UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
-			sprite->UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
-			sprite->Texture = &m_spritesTextures[oldSprite->tile];
-
-			m_sprites[i] = sprite;
+			sprite.UV[0] = Vector2(oldSprite->x1, oldSprite->y1);
+			sprite.UV[1] = Vector2(oldSprite->x2, oldSprite->y2);
+			sprite.UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
+			sprite.UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
+			sprite.Texture = &m_spritesTextures[oldSprite->tile];
 		}
 
-		for (int i = 0; i < MoveablesIds.size(); i++) {
-			ObjectInfo* obj = &Objects[MoveablesIds[i]];
+		for (int i = 0; i < MoveablesIds.size(); i++)
+		{
+			ObjectInfo *obj = &Objects[MoveablesIds[i]];
 
-			if (obj->nmeshes < 0) {
+			if (obj->nmeshes < 0)
+			{
 				short numSprites = abs(obj->nmeshes);
 				short baseSprite = obj->meshIndex;
 				m_spriteSequences[MoveablesIds[i]] = RendererSpriteSequence(MoveablesIds[i], numSprites);
-				RendererSpriteSequence& sequence = m_spriteSequences[MoveablesIds[i]];
+				RendererSpriteSequence &sequence = m_spriteSequences[MoveablesIds[i]];
 
-				for (int j = baseSprite; j < baseSprite + numSprites; j++) {
-					sequence.SpritesList[j - baseSprite] = m_sprites[j];
+				for (int j = baseSprite; j < baseSprite + numSprites; j++)
+				{
+					sequence.SpritesList[j - baseSprite] = &m_sprites[j];
 				}
 
 				m_spriteSequences[MoveablesIds[i]] = sequence;
 			}
 		}
 
-		for (int i = 0; i < 6; i++) {
-			if (Objects[ID_WATERFALL1 + i].loaded) {
+		for (int i = 0; i < 6; i++)
+		{
+			if (Objects[ID_WATERFALL1 + i].loaded)
+			{
 				// Get the first textured bucket
-				RendererBucket* bucket = NULL;
+				RendererBucket *bucket = NULL;
 				for (int j = 0; j < NUM_BUCKETS; j++)
 					if (m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j].Polygons.size() > 0)
 						bucket = &m_moveableObjects[ID_WATERFALL1 + i]->ObjectMeshes[0]->Buckets[j];
@@ -619,7 +644,7 @@ namespace T5M::Renderer {
 				if (bucket == NULL)
 					continue;
 
-				OBJECT_TEXTURE * texture = &ObjectTextures[bucket->Polygons[0].TextureId];
+				OBJECT_TEXTURE *texture = &ObjectTextures[bucket->Polygons[0].TextureId];
 				WaterfallTextures[i] = texture;
 				WaterfallY[i] = texture->vertices[0].y;
 			}
@@ -627,4 +652,4 @@ namespace T5M::Renderer {
 
 		return true;
 	}
-}
+} // namespace T5M::Renderer

@@ -16,6 +16,7 @@
 #include "spark.h"
 #include "drip.h"
 #include "explosion.h"
+#include "Quad/RenderQuad.h"
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
@@ -117,7 +118,7 @@ namespace T5M::Renderer {
 					Vector3 d = pos2 - pos1;
 					d.Normalize();
 
-					AddSpriteBillboardConstrained(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 												  c,
 												  Vector4(arc->r / 255.0f, arc->g / 255.0f, arc->b / 255.0f, alpha),
 												  SPRITE_ROTATION_90_DEGREES,
@@ -136,7 +137,7 @@ namespace T5M::Renderer {
 			SMOKE_SPARKS* spark = &SmokeSparks[i];
 
 			if (spark->on) {
-				AddSpriteBillboard(m_sprites[spark->def],
+				AddSpriteBillboard(&m_sprites[spark->def],
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
 								   TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f,
@@ -194,6 +195,30 @@ namespace T5M::Renderer {
 		m_spritesToDraw.push_back(spr);
 	}
 
+	void Renderer11::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 lookAtAxis) {
+		if (m_nextSprite >= MAX_SPRITES)
+			return;
+
+		scale = 1.0f;
+
+		width *= scale;
+		height *= scale;
+
+		RendererSpriteToDraw* spr = &m_spritesBuffer[m_nextSprite++];
+
+		spr->Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT;
+		spr->Sprite = sprite;
+		spr->pos = pos;
+		spr->color = color;
+		spr->Rotation = rotation;
+		spr->Scale = scale;
+		spr->Width = width;
+		spr->Height = height;
+		spr->BlendMode = blendMode;
+		spr->LookAtAxis = lookAtAxis;
+		m_spritesToDraw.push_back(spr);
+	}
+
 	void Renderer11::drawFires() {
 		for (int k = 0; k < MAX_FIRE_LIST; k++) {
 			FIRE_LIST* fire = &Fires[k];
@@ -201,7 +226,7 @@ namespace T5M::Renderer {
 				for (int i = 0; i < MAX_SPARKS_FIRE; i++) {
 					FIRE_SPARKS* spark = &FireSparks[i];
 					if (spark->on)
-						AddSpriteBillboard(m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
+						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), TO_RAD(spark->rotAng), spark->scalar, spark->size * 4.0f, spark->size * 4.0f, BLENDMODE_ALPHABLEND);
 				}
 			}
 		}
@@ -279,7 +304,7 @@ namespace T5M::Renderer {
 						}
 					}
 
-					AddSpriteBillboard(m_sprites[spark->def],
+					AddSpriteBillboard(&m_sprites[spark->def],
 									   pos,
 									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
 									   TO_RAD(spark->rotAng), spark->scalar, spark->size, spark->size,
@@ -297,7 +322,7 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::drawSplahes() {
-		constexpr size_t NUM_POINTS = 8;
+		constexpr size_t NUM_POINTS = 9;
 		for (int i = 0; i < MAX_SPLASHES; i++) {
 			SPLASH_STRUCT& splash = Splashes[i];
 			if (splash.isActive) {
@@ -339,7 +364,7 @@ namespace T5M::Renderer {
 					x2Outer += splash.x;
 					z2Outer = outerRadius * cos(alpha * j * PI / 180);
 					z2Outer += splash.z;
-					AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], Vector3(xOuter, yOuter, zOuter), Vector3(x2Outer, yOuter, z2Outer), Vector3(x2Inner, yInner, z2Inner), Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], Vector3(xOuter, yOuter, zOuter), Vector3(x2Outer, yOuter, z2Outer), Vector3(x2Inner, yInner, z2Inner), Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0, 1, 0, 0, BLENDMODE_ALPHABLEND);
 				}
 			}
 		}
@@ -349,7 +374,7 @@ namespace T5M::Renderer {
 		for (int i = 0; i < MAX_BUBBLES; i++) {
 			BUBBLE_STRUCT* bubble = &Bubbles[i];
 			if (bubble->active)
-				AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum], Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z), bubble->color, bubble->rotation, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum], Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z), bubble->color, bubble->rotation, 1.0f, bubble->size * 0.5f, bubble->size * 0.5f, BLENDMODE_ALPHABLEND);
 		}
 	}
 
@@ -368,15 +393,12 @@ namespace T5M::Renderer {
 			RIPPLE_STRUCT* ripple = &Ripples[i];
 
 			if (ripple->active) {
-				float x1 = ripple->worldPos.x - ripple->size;
-				float z1 = ripple->worldPos.z - ripple->size;
-				float x2 = ripple->worldPos.x + ripple->size;
-				float z2 = ripple->worldPos.z + ripple->size;
 				float y = ripple->worldPos.y;
 				if (ripple->isBillboard) {
-					AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, 0, 1, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+					AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 				} else {
-					AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+					AddSpriteBillboardConstrainedLookAt(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, ripple->size*2, ripple->size*2, BLENDMODE_ALPHABLEND, Vector3(0,-1,0));
+					//AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
 				}
 			}
 		}
@@ -424,7 +446,7 @@ namespace T5M::Renderer {
 					p2 = Vector3::Transform(p2, rotationMatrix);
 					p3 = Vector3::Transform(p3, rotationMatrix);
 
-					AddSprite3D(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
 								pos + p1,
 								pos + p2,
 								pos + p3,
@@ -448,7 +470,7 @@ namespace T5M::Renderer {
 			BLOOD_STRUCT* blood = &Blood[i];
 
 			if (blood->on) {
-				AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
 								   TO_RAD(blood->rotAng), 1.0f, blood->size * 8.0f, blood->size * 8.0f,
@@ -465,8 +487,8 @@ namespace T5M::Renderer {
 		Matrix translation;
 		Matrix rotation;
 
-		RendererObject* laraObj = m_moveableObjects[ID_LARA];
-		RendererObject* laraSkin = m_moveableObjects[ID_LARA_SKIN];
+		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
+		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 		ObjectInfo* obj = &Objects[0];
 		RendererRoom& const room = m_rooms[LaraItem->roomNumber];
@@ -478,11 +500,11 @@ namespace T5M::Renderer {
 		m_stLights.NumLights = item->Lights.size();
 		for (int j = 0; j < item->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+		updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
 		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
 		m_stMisc.AlphaTest = true;
-		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+		updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 		short length = 0;
@@ -517,8 +539,8 @@ namespace T5M::Renderer {
 			}
 
 			ObjectInfo* flashObj = &Objects[ID_GUN_FLASH];
-			RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
-			RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
+			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
+			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
 			for (int b = 0; b < NUM_BUCKETS; b++) {
 				RendererBucket* flashBucket = &flashMesh->Buckets[b];
@@ -528,12 +550,12 @@ namespace T5M::Renderer {
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
 					if (Lara.leftArm.flash_gun) {
-						world = laraObj->AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
+						world = laraObj.AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
 						world = offset * world;
 						world = rotation2 * world;
 
 						m_stItem.World = world;
-						updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+						updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 						m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
@@ -541,12 +563,12 @@ namespace T5M::Renderer {
 					}
 
 					if (Lara.rightArm.flash_gun) {
-						world = laraObj->AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
+						world = laraObj.AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
 						world = offset * world;
 						world = rotation2 * world;
 
 						m_stItem.World = world;
-						updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+						updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 						m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
@@ -577,7 +599,7 @@ namespace T5M::Renderer {
 				continue;
 
 			RendererRoom& const room = m_rooms[item->Item->roomNumber];
-			RendererObject* flashMoveable = m_moveableObjects[ID_GUN_FLASH];
+			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
 			m_stItem.AmbientLight = room.AmbientLight;
 			memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -585,11 +607,11 @@ namespace T5M::Renderer {
 			m_stLights.NumLights = item->Lights.size();
 			for (int j = 0; j < item->Lights.size(); j++)
 				memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-			updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+			updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
 			m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
 			m_stMisc.AlphaTest = true;
-			updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+			updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 			m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -605,7 +627,7 @@ namespace T5M::Renderer {
 			for (int k = 0; k < numBites; k++) {
 				int joint = abs(bites[k]->meshNum);
 
-				RendererMesh* flashMesh = flashMoveable->ObjectMeshes[0];
+				RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
 				for (int b = 0; b < NUM_BUCKETS; b++) {
 					RendererBucket* flashBucket = &flashMesh->Buckets[b];
@@ -621,7 +643,7 @@ namespace T5M::Renderer {
 						world = rotationZ * world;
 
 						m_stItem.World = world;
-						updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+						updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 						m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
@@ -639,7 +661,7 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawFootprints() {
 		const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
-		if (g_NumSprites > spriteIndex && m_sprites[spriteIndex] != nullptr) {
+		if (g_NumSprites > spriteIndex) {
 			for (auto i = footprints.begin(); i != footprints.end(); i++) {
 				FOOTPRINT_STRUCT& footprint = *i;
 				if (footprint.active) {
@@ -656,7 +678,7 @@ namespace T5M::Renderer {
 					p2 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 					p3 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
 					p4 += Vector3(footprint.pos.xPos, footprint.pos.yPos, footprint.pos.zPos);
-					AddSprite3D(m_sprites[spriteIndex], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f), 0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
+					AddSprite3D(&m_sprites[spriteIndex], p1, p2, p3, p4, Vector4(footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f, footprint.opacity / 255.0f), 0, 1, 1, 1, BLENDMODE_SUBTRACTIVE);
 				}
 			}
 		}
@@ -695,7 +717,7 @@ namespace T5M::Renderer {
 			dust->Life++;
 			byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-			AddSpriteBillboard(m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, 12, 12, BLENDMODE_ALPHABLEND);
+			AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, 12, 12, BLENDMODE_ALPHABLEND);
 
 			if (dust->Life >= 32)
 				dust->Reset = true;
@@ -707,22 +729,21 @@ namespace T5M::Renderer {
 	}
 
 	bool Renderer11::drawSprites() {
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
 		m_context->RSSetState(m_states->CullNone());
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
 		m_context->VSSetShader(m_vsSprites, NULL, 0);
 		m_context->PSSetShader(m_psSprites, NULL, 0);
 
-		updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-		m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
-
 		m_stMisc.AlphaTest = true;
-		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+		updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_context->IASetInputLayout(m_inputLayout);
-
+		m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 		for (int b = 0; b < 4; b++) {
 			BLEND_MODES currentBlendMode = (BLEND_MODES)b;
 
@@ -745,141 +766,58 @@ namespace T5M::Renderer {
 
 				break;
 			}
-			m_primitiveBatch->Begin();
 
 			for (int i = 0; i < numSpritesToDraw; i++) {
+				Matrix billboardMatrix;
 				RendererSpriteToDraw* spr = m_spritesToDraw[i];
 
 				if (spr->BlendMode != currentBlendMode)
 					continue;
 
-				m_context->PSSetShaderResources(0, 1, &spr->Sprite->Texture->ShaderResourceView);
+				m_context->PSSetShaderResources(0, 1, spr->Sprite->Texture->ShaderResourceView.GetAddressOf());
 				ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 				m_context->PSSetSamplers(0, 1, &sampler);
-
+				Matrix scale = Matrix::CreateScale((spr->Width)*spr->Scale, (spr->Height) * spr->Scale, 1);
 				if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
-					float halfWidth = spr->Width / 2.0f * spr->Scale;
-					float halfHeight = spr->Height / 2.0f * spr->Scale;
+					Matrix rotation = Matrix::CreateRotationZ(spr->Rotation);
 					//Extract Camera Up Vector and create Billboard matrix.
 					Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-					Matrix billboardMatrix = Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
-
-					Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
-					Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
-					Vector3 p2 = Vector3(halfWidth, halfHeight, 0);
-					Vector3 p3 = Vector3(-halfWidth, halfHeight, 0);
-
-					Vector3 p0t = Vector3::Transform(p0, billboardMatrix);
-					Vector3 p1t = Vector3::Transform(p1, billboardMatrix);
-					Vector3 p2t = Vector3::Transform(p2, billboardMatrix);
-					Vector3 p3t = Vector3::Transform(p3, billboardMatrix);
-
-					RendererVertex v0;
-					v0.Position.x = p0t.x;
-					v0.Position.y = p0t.y;
-					v0.Position.z = p0t.z;
-					v0.UV.x = spr->Sprite->UV[0].x;
-					v0.UV.y = spr->Sprite->UV[0].y;
-					v0.Color = spr->color;
-
-					RendererVertex v1;
-					v1.Position.x = p1t.x;
-					v1.Position.y = p1t.y;
-					v1.Position.z = p1t.z;
-					v1.UV.x = spr->Sprite->UV[1].x;
-					v1.UV.y = spr->Sprite->UV[1].y;
-					v1.Color = spr->color;
-
-					RendererVertex v2;
-					v2.Position.x = p2t.x;
-					v2.Position.y = p2t.y;
-					v2.Position.z = p2t.z;
-					v2.UV.x = spr->Sprite->UV[2].x;
-					v2.UV.y = spr->Sprite->UV[2].y;
-					v2.Color = spr->color;
-
-					RendererVertex v3;
-					v3.Position.x = p3t.x;
-					v3.Position.y = p3t.y;
-					v3.Position.z = p3t.z;
-					v3.UV.x = spr->Sprite->UV[3].x;
-					v3.UV.y = spr->Sprite->UV[3].y;
-					v3.Color = spr->color;
-
-					m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
+					Matrix billboardMatrix = scale* rotation *Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+					m_stSprite.billboardMatrix = billboardMatrix;
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = true;
+					updateConstantBuffer<CSpriteBuffer>(m_cbSprite, m_stSprite);
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
+					m_context->Draw(4, 0);
 				} else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-					float halfWidth = spr->Width / 2.0f;
-					float halfHeight = spr->Height / 2.0f;
+					Matrix rotation = Matrix::CreateRotationZ(spr->Rotation);
+					Vector3 quadForward = Vector3(0, 0, 1);
 
-					Vector3 camf = Vector3::UnitY;
-					Vector3 objf = Vector3::UnitY;
-
-					Matrix billboardMatrix = Matrix::CreateConstrainedBillboard(
+					billboardMatrix = scale*rotation * Matrix::CreateConstrainedBillboard(
 						spr->pos,
 						Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 						spr->ConstrainAxis,
 						NULL,
-						NULL);
+						&quadForward);
+					m_stSprite.billboardMatrix = billboardMatrix;
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = true;
+					updateConstantBuffer<CSpriteBuffer>(m_cbSprite, m_stSprite);
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
+					m_context->Draw(4, 0);
+				} else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
+					Matrix translation = Matrix::CreateTranslation(spr->pos);
+					Matrix rotation = Matrix::CreateLookAt(Vector3::Zero,spr->LookAtAxis,Vector3::UnitZ);
 
-					Vector2 uv[4] = {
-						Vector2(spr->Sprite->UV[0].x, spr->Sprite->UV[0].y),
-						Vector2(spr->Sprite->UV[1].x, spr->Sprite->UV[1].y),
-						Vector2(spr->Sprite->UV[2].x, spr->Sprite->UV[2].y),
-						Vector2(spr->Sprite->UV[3].x, spr->Sprite->UV[3].y)
-					};
-
-					for (int i = 0; i < spr->Rotation; i++) {
-						Vector2 temp = uv[3];
-						uv[3] = uv[2];
-						uv[2] = uv[1];
-						uv[1] = uv[0];
-						uv[0] = temp;
-					}
-
-					Vector3 p0 = Vector3(-halfWidth, -halfHeight, 0);
-					Vector3 p1 = Vector3(halfWidth, -halfHeight, 0);
-					Vector3 p2 = Vector3(halfWidth, halfHeight, 0);
-					Vector3 p3 = Vector3(-halfWidth, halfHeight, 0);
-
-					Vector3 p0t = Vector3::Transform(p0, billboardMatrix);
-					Vector3 p1t = Vector3::Transform(p1, billboardMatrix);
-					Vector3 p2t = Vector3::Transform(p2, billboardMatrix);
-					Vector3 p3t = Vector3::Transform(p3, billboardMatrix);
-
-					RendererVertex v0;
-					v0.Position.x = p0t.x;
-					v0.Position.y = p0t.y;
-					v0.Position.z = p0t.z;
-					v0.UV.x = uv[0].x;
-					v0.UV.y = uv[0].y;
-					v0.Color = spr->color;
-
-					RendererVertex v1;
-					v1.Position.x = p1t.x;
-					v1.Position.y = p1t.y;
-					v1.Position.z = p1t.z;
-					v1.UV.x = uv[1].x;
-					v1.UV.y = uv[1].y;
-					v1.Color = spr->color;
-
-					RendererVertex v2;
-					v2.Position.x = p2t.x;
-					v2.Position.y = p2t.y;
-					v2.Position.z = p2t.z;
-					v2.UV.x = uv[2].x;
-					v2.UV.y = uv[2].y;
-					v2.Color = spr->color;
-
-					RendererVertex v3;
-					v3.Position.x = p3t.x;
-					v3.Position.y = p3t.y;
-					v3.Position.z = p3t.z;
-					v3.UV.x = uv[3].x;
-					v3.UV.y = uv[3].y;
-					v3.Color = spr->color;
-
-					m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
-				} else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+					billboardMatrix = scale * rotation * translation;
+					m_stSprite.billboardMatrix = billboardMatrix;
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = true;
+					updateConstantBuffer<CSpriteBuffer>(m_cbSprite, m_stSprite);
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
+					m_context->Draw(4, 0);
+				}else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+					m_primitiveBatch->Begin();
 					Vector3 p0t = spr->vtx1;
 					Vector3 p1t = spr->vtx2;
 					Vector3 p2t = spr->vtx3;
@@ -916,12 +854,16 @@ namespace T5M::Renderer {
 					v3.UV.x = spr->Sprite->UV[3].x;
 					v3.UV.y = spr->Sprite->UV[3].y;
 					v3.Color = spr->color;
-
+					m_stSprite.color = spr->color;
+					m_stSprite.isBillboard = false;
+					updateConstantBuffer<CSpriteBuffer>(m_cbSprite, m_stSprite);
+					m_context->VSSetConstantBuffers(4, 1, &m_cbSprite);
 					m_primitiveBatch->DrawQuad(v0, v1, v2, v3);
+					m_primitiveBatch->End();
 				}
 			}
+			
 
-			m_primitiveBatch->End();
 		}
 
 		m_context->RSSetState(m_states->CullCounterClockwise());
@@ -945,17 +887,17 @@ namespace T5M::Renderer {
 		m_stItem.AmbientLight = room.AmbientLight;
 		Matrix matrices[1] = { Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
-		updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+		updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 		m_stLights.NumLights = effect->Lights.size();
 		for (int j = 0; j < effect->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
-		updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+		updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
 		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
 		m_stMisc.AlphaTest = !transparent;
-		updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+		updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 		m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 		RendererMesh* mesh = effect->Mesh;
@@ -1008,34 +950,34 @@ namespace T5M::Renderer {
 		for (int i = 0; i < m_itemsToDraw.size(); i++) {
 			RendererItem* item = m_itemsToDraw[i];
 			RendererRoom& const room = m_rooms[item->Item->roomNumber];
-			RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+			RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
 			short objectNumber = item->Item->objectNumber;
 			if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2) {
 				RendererRoom& const room = m_rooms[item->Item->roomNumber];
-				RendererObject* moveableObj = m_moveableObjects[item->Item->objectNumber];
+				RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
 				m_stItem.World = item->World;
 				m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
 				m_stItem.AmbientLight = room.AmbientLight; //Vector4::One * 0.1f; // room->AmbientLight;
 				memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-				updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
+				updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 				m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
 				m_stLights.NumLights = item->Lights.size();
 				for (int j = 0; j < item->Lights.size(); j++)
 					memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-				updateConstantBuffer(m_cbLights, &m_stLights, sizeof(CLightBuffer));
+				updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
 				m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
 
 				m_stMisc.AlphaTest = false;
-				updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+				updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 				m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
 				m_primitiveBatch->Begin();
 
-				for (int k = 0; k < moveableObj->ObjectMeshes.size(); k++) {
-					RendererMesh* mesh = moveableObj->ObjectMeshes[k];
+				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
+					RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
 					for (int b = 0; b < NUM_BUCKETS; b++) {
 						RendererBucket* bucket = &mesh->Buckets[b];
@@ -1204,11 +1146,11 @@ namespace T5M::Renderer {
 				//updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
 				//m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 				m_stMisc.AlphaTest = !transparent;
-				updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
+				updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 				m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 				m_stStatic.World = world;
 				m_stStatic.Color = Vector4::One;
-				updateConstantBuffer(m_cbStatic, &m_stStatic, sizeof(CStaticBuffer));
+				updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
 				m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 				RendererVertex vtx0 = deb->mesh.vertices[0];
 				RendererVertex vtx1 = deb->mesh.vertices[1];
@@ -1231,7 +1173,7 @@ namespace T5M::Renderer {
 		for (int i = 0; i < SmokeParticles.size(); i++) {
 			SmokeParticle& s = SmokeParticles[i];
 			if (!s.active) continue;
-			AddSpriteBillboard(m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
+			AddSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, s.size, s.size, BLENDMODE_ALPHABLEND);
 		}
 		return true;
 	}
@@ -1245,7 +1187,7 @@ namespace T5M::Renderer {
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			AddSpriteBillboardConstrained(m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, s.width, s.height, BLENDMODE_ALPHABLEND, v);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, s.width, s.height, BLENDMODE_ALPHABLEND, v);
 		}
 		return true;
 	}
@@ -1259,7 +1201,7 @@ namespace T5M::Renderer {
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			AddSpriteBillboardConstrained(m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, DRIP_WIDTH, d.height, BLENDMODE_ALPHABLEND, v);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, DRIP_WIDTH, d.height, BLENDMODE_ALPHABLEND, v);
 		}
 		return true;
 	}
@@ -1270,7 +1212,7 @@ namespace T5M::Renderer {
 		for (int i = 0; i < explosionParticles.size(); i++) {
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
-			AddSpriteBillboard(m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, e.size, e.size, BLENDMODE_ALPHABLEND);
+			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, e.size, e.size, BLENDMODE_ALPHABLEND);
 		}
 		return true;
 	}
