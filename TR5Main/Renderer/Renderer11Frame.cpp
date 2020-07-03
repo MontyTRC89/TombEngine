@@ -7,35 +7,41 @@
 #include "level.h"
 #include "setup.h"
 #include "RenderView\RenderView.h"
-namespace T5M::Renderer {
+namespace T5M::Renderer
+{
 	using namespace T5M::Renderer;
 	using std::vector;
-	void Renderer11::collectRooms(RenderView& renderView) {
+	void Renderer11::collectRooms(RenderView &renderView)
+	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
-		for (int i = 0; i < Rooms.size(); i++) {
+		for (int i = 0; i < Rooms.size(); i++)
+		{
 			m_rooms[i].Visited = false;
 		}
 
 		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
-		vector<RendererRoom*> collectedRooms;
+		vector<RendererRoom *> collectedRooms;
 		collectedRooms.reserve(128);
-		getVisibleObjects(-1, baseRoomIndex, &vp, false, 0,renderView);
+		getVisibleObjects(-1, baseRoomIndex, &vp, false, 0, renderView);
 	}
 
-	void Renderer11::collectItems(short roomNumber,RenderView& renderView) {
-		if (m_rooms.size() <= roomNumber) {
+	void Renderer11::collectItems(short roomNumber, RenderView &renderView)
+	{
+		if (m_rooms.size() <= roomNumber)
+		{
 			return;
 		}
-		RendererRoom& const room = m_rooms[roomNumber];
+		RendererRoom &const room = m_rooms[roomNumber];
 
-		ROOM_INFO* r = room.Room;
+		ROOM_INFO *r = room.Room;
 
 		short itemNum = NO_ITEM;
-		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem) {
+		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
+		{
 			//printf("ItemNum: %d, NextItem: %d\n", itemNum, Items[itemNum].nextItem);
 
-			ITEM_INFO* item = &Items[itemNum];
+			ITEM_INFO *item = &Items[itemNum];
 
 			if (item->objectNumber == ID_LARA && itemNum == Items[itemNum].nextItem)
 				break;
@@ -48,8 +54,8 @@ namespace T5M::Renderer {
 
 			if (!m_moveableObjects[item->objectNumber].has_value())
 				continue;
-			RendererItem* newItem = &m_items[itemNum];
-			short* bounds = GetBoundsAccurate(item);
+			RendererItem *newItem = &m_items[itemNum];
+			short *bounds = GetBoundsAccurate(item);
 			Vector3 min = (Vector3(bounds[0], bounds[2], bounds[4])) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			Vector3 max = (Vector3(bounds[1], bounds[3], bounds[5])) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			if (!renderView.camera.frustum.AABBInFrustum(min, max))
@@ -63,24 +69,27 @@ namespace T5M::Renderer {
 															   TO_RAD(item->pos.zRot));
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
-			collectLightsForItem(item->roomNumber, newItem,renderView);
+			collectLightsForItem(item->roomNumber, newItem, renderView);
 			renderView.itemsToDraw.push_back(newItem);
 		}
 	}
 
-	void Renderer11::collectStatics(short roomNumber, RenderView& renderView) {
-		if (m_rooms.size() <= roomNumber) {
+	void Renderer11::collectStatics(short roomNumber, RenderView &renderView)
+	{
+		if (m_rooms.size() <= roomNumber)
+		{
 			return;
 		}
-		RendererRoom& const room = m_rooms[roomNumber];
-		ROOM_INFO* r = room.Room;
+		RendererRoom &const room = m_rooms[roomNumber];
+		ROOM_INFO *r = room.Room;
 		if (r->mesh.size() <= 0)
 			return;
 		int numStatics = r->mesh.size();
-		for (int i = 0; i < numStatics; i++) {
-			MESH_INFO* mesh = &r->mesh[i];
-			RendererStatic* newStatic = &room.Statics[i];
-			StaticInfo* staticInfo = &StaticObjects[mesh->staticNumber];
+		for (int i = 0; i < numStatics; i++)
+		{
+			MESH_INFO *mesh = &r->mesh[i];
+			RendererStatic *newStatic = &room.Statics[i];
+			StaticInfo *staticInfo = &StaticObjects[mesh->staticNumber];
 			Vector3 min = Vector3(staticInfo->xMinc, staticInfo->yMinc, staticInfo->zMinc);
 			Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
 			min += Vector3(mesh->x, mesh->y, mesh->z);
@@ -96,14 +105,16 @@ namespace T5M::Renderer {
 		}
 	}
 
-	void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView) {
+	void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
+	{
 		effect->Lights.clear();
-		if (m_rooms.size() <= roomNumber) {
+		if (m_rooms.size() <= roomNumber)
+		{
 			return;
 		}
-		RendererRoom& const room = m_rooms[roomNumber];
+		RendererRoom &const room = m_rooms[roomNumber];
 
-		ROOM_INFO* r = room.Room;
+		ROOM_INFO *r = room.Room;
 
 		if (r->lights.size() <= 0)
 			return;
@@ -113,8 +124,9 @@ namespace T5M::Renderer {
 		Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
 
 		// Dynamic lights have the priority
-		for (int i = 0; i < m_dynamicLights.size(); i++) {
-			RendererLight* light = m_dynamicLights[i];
+		for (int i = 0; i < m_dynamicLights.size(); i++)
+		{
+			RendererLight *light = m_dynamicLights[i];
 
 			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
@@ -128,16 +140,20 @@ namespace T5M::Renderer {
 		int numLights = room.Lights.size();
 
 		m_shadowLight = NULL;
-		RendererLight* brightestLight = NULL;
+		RendererLight *brightestLight = NULL;
 		float brightest = 0.0f;
 
-		for (int j = 0; j < numLights; j++) {
-			RendererLight* light = &room.Lights[j];
+		for (int j = 0; j < numLights; j++)
+		{
+			RendererLight *light = &room.Lights[j];
 
 			// Check only lights different from sun
-			if (light->Type == LIGHT_TYPE_SUN) {
+			if (light->Type == LIGHT_TYPE_SUN)
+			{
 				// Sun is added without checks
-			} else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW) {
+			}
+			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+			{
 				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
 				float distance = (itemPosition - lightPosition).Length();
@@ -151,16 +167,20 @@ namespace T5M::Renderer {
 					continue;
 
 				// If Lara, try to collect shadow casting light
-				if (effect->Effect->objectNumber == ID_LARA) {
+				if (effect->Effect->objectNumber == ID_LARA)
+				{
 					float attenuation = 1.0f - distance / light->Out;
 					float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
-					if (intensity >= brightest) {
+					if (intensity >= brightest)
+					{
 						brightest = intensity;
 						brightestLight = light;
 					}
 				}
-			} else if (light->Type == LIGHT_TYPE_SPOT) {
+			}
+			else if (light->Type == LIGHT_TYPE_SPOT)
+			{
 				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
 				float distance = (itemPosition - lightPosition).Length();
@@ -172,7 +192,9 @@ namespace T5M::Renderer {
 				// Check the range
 				if (distance > light->Range)
 					continue;
-			} else {
+			}
+			else
+			{
 				// Invalid light type
 				continue;
 			}
@@ -180,19 +202,22 @@ namespace T5M::Renderer {
 			m_tempItemLights.push_back(light);
 		}
 
-		for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++) {
+		for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
+		{
 			renderView.lightsToDraw.push_back(m_tempItemLights[i]);
 		}
 	}
 
-	void Renderer11::collectLightsForItem(short roomNumber, RendererItem* item,RenderView& renderView) {
+	void Renderer11::collectLightsForItem(short roomNumber, RendererItem *item, RenderView &renderView)
+	{
 		item->Lights.clear();
-		if (m_rooms.size() <= roomNumber) {
+		if (m_rooms.size() <= roomNumber)
+		{
 			return;
 		}
-		RendererRoom& const room = m_rooms[roomNumber];
+		RendererRoom &const room = m_rooms[roomNumber];
 
-		ROOM_INFO* r = room.Room;
+		ROOM_INFO *r = room.Room;
 
 		if (r->lights.size() <= 0)
 			return;
@@ -202,8 +227,9 @@ namespace T5M::Renderer {
 		Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
 
 		// Dynamic lights have the priority
-		for (int i = 0; i < m_dynamicLights.size(); i++) {
-			RendererLight* light = m_dynamicLights[i];
+		for (int i = 0; i < m_dynamicLights.size(); i++)
+		{
+			RendererLight *light = m_dynamicLights[i];
 
 			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
@@ -217,16 +243,20 @@ namespace T5M::Renderer {
 		int numLights = room.Lights.size();
 
 		m_shadowLight = NULL;
-		RendererLight* brightestLight = NULL;
+		RendererLight *brightestLight = NULL;
 		float brightest = 0.0f;
 
-		for (int j = 0; j < numLights; j++) {
-			RendererLight* light = &room.Lights[j];
+		for (int j = 0; j < numLights; j++)
+		{
+			RendererLight *light = &room.Lights[j];
 
 			// Check only lights different from sun
-			if (light->Type == LIGHT_TYPE_SUN) {
+			if (light->Type == LIGHT_TYPE_SUN)
+			{
 				// Sun is added without checks
-			} else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW) {
+			}
+			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+			{
 				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
 				float distance = (itemPosition - lightPosition).Length();
@@ -240,16 +270,20 @@ namespace T5M::Renderer {
 					continue;
 
 				// If Lara, try to collect shadow casting light
-				if (item->Item->objectNumber == ID_LARA) {
+				if (item->Item->objectNumber == ID_LARA)
+				{
 					float attenuation = 1.0f - distance / light->Out;
 					float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
-					if (intensity >= brightest) {
+					if (intensity >= brightest)
+					{
 						brightest = intensity;
 						brightestLight = light;
 					}
 				}
-			} else if (light->Type == LIGHT_TYPE_SPOT) {
+			}
+			else if (light->Type == LIGHT_TYPE_SPOT)
+			{
 				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
 				float distance = (itemPosition - lightPosition).Length();
@@ -263,16 +297,20 @@ namespace T5M::Renderer {
 					continue;
 
 				// If Lara, try to collect shadow casting light
-				if (item->Item->objectNumber == ID_LARA) {
+				if (item->Item->objectNumber == ID_LARA)
+				{
 					float attenuation = 1.0f - distance / light->Range;
 					float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
-					if (intensity >= brightest) {
+					if (intensity >= brightest)
+					{
 						brightest = intensity;
 						brightestLight = light;
 					}
 				}
-			} else {
+			}
+			else
+			{
 				// Invalid light type
 				continue;
 			}
@@ -280,27 +318,32 @@ namespace T5M::Renderer {
 			m_tempItemLights.push_back(light);
 		}
 
-		for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++) {
+		for (int i = 0; i < min(MAX_LIGHTS_PER_ITEM, m_tempItemLights.size()); i++)
+		{
 			item->Lights.push_back(m_tempItemLights[i]);
 		}
 
-		if (item->Item->objectNumber == ID_LARA) {
+		if (item->Item->objectNumber == ID_LARA)
+		{
 			m_shadowLight = brightestLight;
 		}
 	}
 
-	void Renderer11::collectLightsForRoom(short roomNumber,RenderView& renderView) {
-		if (m_rooms.size() <= roomNumber) {
+	void Renderer11::collectLightsForRoom(short roomNumber, RenderView &renderView)
+	{
+		if (m_rooms.size() <= roomNumber)
+		{
 			return;
 		}
-		RendererRoom& const room = m_rooms[roomNumber];
-		ROOM_INFO* r = &Rooms[roomNumber];
+		RendererRoom &const room = m_rooms[roomNumber];
+		ROOM_INFO *r = &Rooms[roomNumber];
 
 		int numLights = room.Lights.size();
 
 		// Collect dynamic lights for rooms
-		for (int i = 0; i < m_dynamicLights.size(); i++) {
-			RendererLight* light = m_dynamicLights[i];
+		for (int i = 0; i < m_dynamicLights.size(); i++)
+		{
+			RendererLight *light = m_dynamicLights[i];
 
 			Vector3 boxMin = Vector3(r->x - WALL_SIZE, -r->minfloor, r->z - WALL_SIZE);
 			Vector3 boxMax = Vector3(r->x + r->xSize * WALL_SIZE, -r->maxceiling, r->z + r->ySize * WALL_SIZE);
@@ -311,7 +354,8 @@ namespace T5M::Renderer {
 		}
 	}
 
-	void Renderer11::prepareLights() {
+	void Renderer11::prepareLights()
+	{
 		// Add dynamic lights
 		for (int i = 0; i < m_dynamicLights.size(); i++)
 			m_lightsToDraw.push_back(m_dynamicLights[i]);
@@ -325,16 +369,18 @@ namespace T5M::Renderer {
 		//	m_lightsToDraw.resize(32);
 
 		// Now try to search for a shadow caster, using Lara as reference
-		RendererRoom& const room = m_rooms[LaraItem->roomNumber];
+		RendererRoom &const room = m_rooms[LaraItem->roomNumber];
 
 		// Search for the brightest light. We do a simple version of the classic calculation done in pixel shader.
-		RendererLight* brightestLight = NULL;
+		RendererLight *brightestLight = NULL;
 		float brightest = 0.0f;
 
 		// Try room lights
-		if (room.Lights.size() != 0) {
-			for (int j = 0; j < room.Lights.size(); j++) {
-				RendererLight* light = &room.Lights[j];
+		if (room.Lights.size() != 0)
+		{
+			for (int j = 0; j < room.Lights.size(); j++)
+			{
+				RendererLight *light = &room.Lights[j];
 
 				Vector4 itemPos = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 				Vector4 lightVector = itemPos - light->Position;
@@ -349,7 +395,8 @@ namespace T5M::Renderer {
 				float attenuationRange;
 				float attenuationAngle;
 
-				switch ((int)light->Type) {
+				switch ((int)light->Type)
+				{
 				case LIGHT_TYPES::LIGHT_TYPE_POINT:
 					if (distance > light->Out || light->Out < 2048.0f)
 						continue;
@@ -357,21 +404,23 @@ namespace T5M::Renderer {
 					attenuation = 1.0f - distance / light->Out;
 					intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
-					if (intensity >= brightest) {
+					if (intensity >= brightest)
+					{
 						brightest = intensity;
 						brightestLight = light;
 					}
 
 					break;
 
-				case  LIGHT_TYPES::LIGHT_TYPE_SPOT:
+				case LIGHT_TYPES::LIGHT_TYPE_SPOT:
 					if (distance > light->Range)
 						continue;
 
 					attenuation = 1.0f - distance / light->Range;
 					intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
-					if (intensity >= brightest) {
+					if (intensity >= brightest)
+					{
 						brightest = intensity;
 						brightestLight = light;
 					}
@@ -385,40 +434,42 @@ namespace T5M::Renderer {
 		m_shadowLight = brightestLight;
 	}
 
-	void Renderer11::collectEffects(short roomNumber,RenderView& renderView) {
-		if (m_rooms.size() <= roomNumber) return;
-		RendererRoom& const room = m_rooms[roomNumber];
+	void Renderer11::collectEffects(short roomNumber, RenderView &renderView)
+	{
+		if (m_rooms.size() <= roomNumber)
+			return;
+		RendererRoom &const room = m_rooms[roomNumber];
 
-		ROOM_INFO* r = room.Room;
+		ROOM_INFO *r = room.Room;
 
 		short fxNum = NO_ITEM;
-		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx) {
-			FX_INFO* fx = &EffectList[fxNum];
+		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)
+		{
+			FX_INFO *fx = &EffectList[fxNum];
 
 			if (fx->objectNumber < 0)
 				continue;
 
-			ObjectInfo* obj = &Objects[fx->objectNumber];
+			ObjectInfo *obj = &Objects[fx->objectNumber];
 
-			RendererEffect* newEffect = &m_effects[fxNum];
+			RendererEffect *newEffect = &m_effects[fxNum];
 
 			newEffect->Effect = fx;
 			newEffect->Id = fxNum;
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.yRot, fx->pos.xPos, fx->pos.zPos) * Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-			newEffect->Mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)])];
+			newEffect->Mesh = getMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
-			collectLightsForEffect(fx->roomNumber, newEffect,renderView);
+			collectLightsForEffect(fx->roomNumber, newEffect, renderView);
 
-			renderView.effectsToDraw.push_back(newEffect);
-
-			short* mp = Meshes[(obj->nmeshes ? obj->meshIndex : fx->frameNumber)];
-			short hhh = 0;
+			m_effectsToDraw.push_back(newEffect);
 		}
 	}
 
-	void Renderer11::ResetAnimations() {
-		for (int i = 0; i < NUM_ITEMS; i++) {
+	void Renderer11::ResetAnimations()
+	{
+		for (int i = 0; i < NUM_ITEMS; i++)
+		{
 			m_items[i].DoneAnimations = false;
 		}
 	}
-}
+} // namespace T5M::Renderer

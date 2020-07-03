@@ -20,22 +20,25 @@
 #include "tr5_spider_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "RenderView/RenderView.h"
-extern T5M::Renderer::RendererHUDBar* g_DashBar;
-extern T5M::Renderer::RendererHUDBar* g_SFXVolumeBar;
-extern T5M::Renderer::RendererHUDBar* g_MusicVolumeBar;
+extern T5M::Renderer::RendererHUDBar *g_DashBar;
+extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
+extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
-namespace T5M::Renderer {
+namespace T5M::Renderer
+{
     using namespace T5M::Renderer;
     using namespace std::chrono;
 
-    int Renderer11::DrawPickup(short objectNum) {
+    int Renderer11::DrawPickup(short objectNum)
+    {
         drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
         m_pickupRotation += 45 * 360 / 30;
         return 0;
     }
 
-    bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ) {
+    bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)
+    {
         Matrix translation;
         Matrix rotation;
         Matrix world;
@@ -52,10 +55,11 @@ namespace T5M::Renderer {
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
-        ObjectInfo* obj = &Objects[objectNum];
-        RendererObject& moveableObj = *m_moveableObjects[objectNum];
+        ObjectInfo *obj = &Objects[objectNum];
+        RendererObject &moveableObj = *m_moveableObjects[objectNum];
 
-        if (obj->animIndex != -1) {
+        if (obj->animIndex != -1)
+        {
             updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
         }
 
@@ -76,7 +80,7 @@ namespace T5M::Renderer {
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
         // Set matrices
@@ -85,8 +89,9 @@ namespace T5M::Renderer {
         updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, HudCamera);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-        for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++) {
-            RendererMesh* mesh = moveableObj.ObjectMeshes[n];
+        for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
+        {
+            RendererMesh *mesh = moveableObj.ObjectMeshes[n];
 
             // Finish the world matrix
             translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
@@ -105,8 +110,9 @@ namespace T5M::Renderer {
             m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
             m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-            for (int m = 0; m < NUM_BUCKETS; m++) {
-                RendererBucket* bucket = &mesh->Buckets[m];
+            for (int m = 0; m < NUM_BUCKETS; m++)
+            {
+                RendererBucket *bucket = &mesh->Buckets[m];
                 if (bucket->NumVertices == 0)
                     continue;
 
@@ -119,30 +125,36 @@ namespace T5M::Renderer {
                 updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
                 m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
             }
         }
 
         return true;
     }
 
-    bool Renderer11::drawShadowMap() {
+    bool Renderer11::drawShadowMap()
+    {
         m_shadowLight = NULL;
-        RendererLight* brightestLight = NULL;
+        RendererLight *brightestLight = NULL;
         float brightest = 0.0f;
         Vector3 itemPosition = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 
-        for (int k = 0; k < m_roomsToDraw.size(); k++) {
-            RendererRoom* room = m_roomsToDraw[k];
+        for (int k = 0; k < m_roomsToDraw.size(); k++)
+        {
+            RendererRoom *room = m_roomsToDraw[k];
             int numLights = room->Lights.size();
 
-            for (int j = 0; j < numLights; j++) {
-                RendererLight* light = &room->Lights[j];
+            for (int j = 0; j < numLights; j++)
+            {
+                RendererLight *light = &room->Lights[j];
 
                 // Check only lights different from sun
-                if (light->Type == LIGHT_TYPE_SUN) {
+                if (light->Type == LIGHT_TYPE_SUN)
+                {
                     // Sun is added without checks
-                } else if (light->Type == LIGHT_TYPE_POINT) {
+                }
+                else if (light->Type == LIGHT_TYPE_POINT)
+                {
                     Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
                     float distance = (itemPosition - lightPosition).Length();
@@ -158,11 +170,14 @@ namespace T5M::Renderer {
                     float attenuation = 1.0f - distance / light->Out;
                     float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
-                    if (intensity >= brightest) {
+                    if (intensity >= brightest)
+                    {
                         brightest = intensity;
                         brightestLight = light;
                     }
-                } else if (light->Type == LIGHT_TYPE_SPOT) {
+                }
+                else if (light->Type == LIGHT_TYPE_SPOT)
+                {
                     Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
                     float distance = (itemPosition - lightPosition).Length();
@@ -179,11 +194,14 @@ namespace T5M::Renderer {
                     float attenuation = 1.0f - distance / light->Range;
                     float intensity = max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
-                    if (intensity >= brightest) {
+                    if (intensity >= brightest)
+                    {
                         brightest = intensity;
                         brightestLight = light;
                     }
-                } else {
+                }
+                else
+                {
                     // Invalid light type
                     continue;
                 }
@@ -228,7 +246,7 @@ namespace T5M::Renderer {
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
         // Set camera matrices
@@ -248,9 +266,9 @@ namespace T5M::Renderer {
         updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-        RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-        RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-        RendererRoom& const room = m_rooms[LaraItem->roomNumber];
+        RendererObject &laraObj = *m_moveableObjects[ID_LARA];
+        RendererObject &laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+        RendererRoom &const room = m_rooms[LaraItem->roomNumber];
 
         m_stItem.World = m_LaraWorldMatrix;
         m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
@@ -260,51 +278,58 @@ namespace T5M::Renderer {
         m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
         m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-        for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++) {
-            RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
+        for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+        {
+            RendererMesh *mesh = getMesh(Lara.meshPtrs[k]);
 
-            for (int j = 0; j < 2; j++) {
-                RendererBucket* bucket = &mesh->Buckets[j];
+            for (int j = 0; j < 2; j++)
+            {
+                RendererBucket *bucket = &mesh->Buckets[j];
 
                 if (bucket->Vertices.size() == 0)
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
 
-        if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value()) {
-            RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
+        if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
+        {
+            RendererObject &laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
-            for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++) {
-                RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
+            for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
+            {
+                RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
 
-                for (int j = 0; j < 2; j++) {
-                    RendererBucket* bucket = &mesh->Buckets[j];
+                for (int j = 0; j < 2; j++)
+                {
+                    RendererBucket *bucket = &mesh->Buckets[j];
 
                     if (bucket->Vertices.size() == 0)
                         continue;
 
                     // Draw vertices
-                    m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
         }
 
-        for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++) {
-            RendererMesh* mesh = laraSkin.ObjectMeshes[k];
+        for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+        {
+            RendererMesh *mesh = laraSkin.ObjectMeshes[k];
 
-            for (int j = 0; j < NUM_BUCKETS; j++) {
-                RendererBucket* bucket = &mesh->Buckets[j];
+            for (int j = 0; j < NUM_BUCKETS; j++)
+            {
+                RendererBucket *bucket = &mesh->Buckets[j];
 
                 if (bucket->Vertices.size() == 0)
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -312,16 +337,17 @@ namespace T5M::Renderer {
         // Draw items
 
         // Hairs are pre-transformed
-        Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
-                              Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
+        Matrix matrices[8] = {Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
+                              Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity};
         memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
         m_stItem.World = Matrix::Identity;
         updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 
-        if (m_moveableObjects[ID_LARA_HAIR].has_value()) {
+        if (m_moveableObjects[ID_LARA_HAIR].has_value())
+        {
             m_primitiveBatch->Begin();
             m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-                                          (const unsigned short*)m_hairIndices.data(), m_numHairIndices,
+                                          (const unsigned short *)m_hairIndices.data(), m_numHairIndices,
                                           m_hairVertices.data(), m_numHairVertices);
             m_primitiveBatch->End();
         }
@@ -329,30 +355,34 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::DoTitleImage() {
+    bool Renderer11::DoTitleImage()
+    {
         wchar_t introFileChars[255];
 
-        std::mbstowcs(introFileChars, g_GameFlow->Intro,255);
+        std::mbstowcs(introFileChars, g_GameFlow->Intro, 255);
         std::wstring titleStringFileName(introFileChars);
         Texture2D texture = Texture2D(m_device, titleStringFileName);
 
         float currentFade = 0;
-        while (currentFade <= 1.0f) {
-            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade,m_backBufferRTV,m_depthStencilView);
+        while (currentFade <= 1.0f)
+        {
+            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade, m_backBufferRTV, m_depthStencilView);
             SyncRenderer();
             currentFade += FADE_FACTOR;
             m_swapChain->Present(0, 0);
         }
 
-        for (int i = 0; i < 30 * 1.5f; i++) {
-            drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f,m_backBufferRTV,m_depthStencilView);
+        for (int i = 0; i < 30 * 1.5f; i++)
+        {
+            drawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f, m_backBufferRTV, m_depthStencilView);
             SyncRenderer();
             m_swapChain->Present(0, 0);
         }
 
         currentFade = 1.0f;
-        while (currentFade >= 0.0f) {
-            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade,m_backBufferRTV,m_depthStencilView);
+        while (currentFade >= 0.0f)
+        {
+            drawFullScreenImage(texture.ShaderResourceView.Get(), currentFade, m_backBufferRTV, m_depthStencilView);
             SyncRenderer();
             currentFade -= FADE_FACTOR;
             m_swapChain->Present(0, 0);
@@ -360,9 +390,10 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawGunShells() {
-        RendererRoom& const room = m_rooms[LaraItem->roomNumber];
-        RendererItem* item = &m_items[Lara.itemNumber];
+    bool Renderer11::drawGunShells()
+    {
+        RendererRoom &const room = m_rooms[LaraItem->roomNumber];
+        RendererItem *item = &m_items[Lara.itemNumber];
 
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -377,12 +408,14 @@ namespace T5M::Renderer {
         updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-        for (int i = 0; i < 24; i++) {
-            GUNSHELL_STRUCT* gunshell = &Gunshells[i];
+        for (int i = 0; i < 24; i++)
+        {
+            GUNSHELL_STRUCT *gunshell = &Gunshells[i];
 
-            if (gunshell->counter > 0) {
-                ObjectInfo* obj = &Objects[gunshell->objectNumber];
-                RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
+            if (gunshell->counter > 0)
+            {
+                ObjectInfo *obj = &Objects[gunshell->objectNumber];
+                RendererObject &moveableObj = *m_moveableObjects[gunshell->objectNumber];
 
                 Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
                 Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.yRot), TO_RAD(gunshell->pos.xRot), TO_RAD(gunshell->pos.zRot));
@@ -392,15 +425,16 @@ namespace T5M::Renderer {
                 updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
                 m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-                RendererMesh* mesh = moveableObj.ObjectMeshes[0];
+                RendererMesh *mesh = moveableObj.ObjectMeshes[0];
 
-                for (int b = 0; b < NUM_BUCKETS; b++) {
-                    RendererBucket* bucket = &mesh->Buckets[b];
+                for (int b = 0; b < NUM_BUCKETS; b++)
+                {
+                    RendererBucket *bucket = &mesh->Buckets[b];
 
                     if (bucket->NumVertices == 0)
                         continue;
 
-                    m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
@@ -409,7 +443,8 @@ namespace T5M::Renderer {
         return true;
     }
 
-    int Renderer11::drawInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,ID3D11ShaderResourceView* background) {
+    int Renderer11::drawInventoryScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, ID3D11ShaderResourceView *background)
+    {
         char stringBuffer[255];
 
         bool drawLogo = true;
@@ -440,9 +475,10 @@ namespace T5M::Renderer {
         m_context->OMSetRenderTargets(1, &target, depthTarget);
         m_context->RSSetViewports(1, &m_viewport);
 
-        if (background != nullptr) {
-            drawFullScreenImage(background, 0.5f,target,depthTarget);
-       }
+        if (background != nullptr)
+        {
+            drawFullScreenImage(background, 0.5f, target, depthTarget);
+        }
 
         m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -461,10 +497,10 @@ namespace T5M::Renderer {
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
-        InventoryRing* activeRing = g_Inventory.GetRing(g_Inventory.GetActiveRing());
+        InventoryRing *activeRing = g_Inventory.GetRing(g_Inventory.GetActiveRing());
         int lastRing = 0;
 
         float cameraX = INV_CAMERA_DISTANCE * cos(g_Inventory.GetCameraTilt() * RADIAN);
@@ -472,15 +508,16 @@ namespace T5M::Renderer {
         float cameraZ = 0.0f;
         CCameraMatrixBuffer inventoryCam;
         inventoryCam.ViewProjection = Matrix::CreateLookAt(Vector3(cameraX, cameraY, cameraZ),
-                                                                 Vector3(0.0f, g_Inventory.GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) *
-            Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
-                                                 g_Renderer.ScreenWidth / (float)g_Renderer.ScreenHeight, 1.0f, 200000.0f);
+                                                           Vector3(0.0f, g_Inventory.GetCameraY() - 512.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)) *
+                                      Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
+                                                                           g_Renderer.ScreenWidth / (float)g_Renderer.ScreenHeight, 1.0f, 200000.0f);
 
         updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, inventoryCam);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
 
-        for (int k = 0; k < NUM_INVENTORY_RINGS; k++) {
-            InventoryRing* ring = g_Inventory.GetRing(k);
+        for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
+        {
+            InventoryRing *ring = g_Inventory.GetRing(k);
             if (ring->draw == false || ring->numObjects == 0)
                 continue;
 
@@ -493,7 +530,8 @@ namespace T5M::Renderer {
             if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory.GetType() != INV_TYPE_TITLE)
                 PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
-            for (int i = 0; i < numObjects; i++) {
+            for (int i = 0; i < numObjects; i++)
+            {
                 short inventoryObject = ring->objects[objectIndex].inventoryObject;
                 short objectNumber = g_Inventory.GetInventoryObject(ring->objects[objectIndex].inventoryObject)->objectNumber;
 
@@ -508,12 +546,14 @@ namespace T5M::Renderer {
                 currentAngle = steps * deltaAngle;
                 currentAngle += ring->rotation;
 
-                if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory.GetActiveRing()) {
+                if (ring->focusState == INV_FOCUS_STATE_NONE && k == g_Inventory.GetActiveRing())
+                {
                     if (objectIndex == ring->currentObject)
                         ring->objects[objectIndex].rotation += 45 * 360 / 30;
                     else if (ring->objects[objectIndex].rotation != 0)
                         ring->objects[objectIndex].rotation += 45 * 360 / 30;
-                } else if (ring->focusState != INV_FOCUS_STATE_POPUP && ring->focusState != INV_FOCUS_STATE_POPOVER)
+                }
+                else if (ring->focusState != INV_FOCUS_STATE_POPUP && ring->focusState != INV_FOCUS_STATE_POPOVER)
                     g_Inventory.GetRing(k)->objects[objectIndex].rotation = 0;
 
                 if (ring->objects[objectIndex].rotation > 65536.0f)
@@ -529,25 +569,29 @@ namespace T5M::Renderer {
                 Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory.GetInventoryObject(inventoryObject)->rotY));
                 Matrix transform = (scale * rotation) * translation;
 
-                ObjectInfo* obj = &Objects[objectNumber];
-                if(!m_moveableObjects[objectNumber].has_value())
+                ObjectInfo *obj = &Objects[objectNumber];
+                if (!m_moveableObjects[objectNumber].has_value())
                     continue;
-                RendererObject& moveableObj = *m_moveableObjects[objectNumber];
+                RendererObject &moveableObj = *m_moveableObjects[objectNumber];
 
                 // Build the object animation matrices
                 if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
-                    objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing()) {
-                    short* framePtr[2];
+                    objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
+                {
+                    short *framePtr[2];
                     int rate = 0;
                     getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
                     updateAnimation(NULL, moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
-                } else {
+                }
+                else
+                {
                     if (obj->animIndex != -1)
                         updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
                 }
 
-                for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++) {
-                    RendererMesh* mesh = moveableObj.ObjectMeshes[n];
+                for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
+                {
+                    RendererMesh *mesh = moveableObj.ObjectMeshes[n];
 
                     // HACK: revolver and crossbow + lasersight
                     if (moveableObj.Id == ID_REVOLVER_ITEM && !Lara.Weapons[WEAPON_REVOLVER].HasLasersight && n > 0)
@@ -566,8 +610,9 @@ namespace T5M::Renderer {
                     m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
                     m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
-                    for (int m = 0; m < NUM_BUCKETS; m++) {
-                        RendererBucket* bucket = &mesh->Buckets[m];
+                    for (int m = 0; m < NUM_BUCKETS; m++)
+                    {
+                        RendererBucket *bucket = &mesh->Buckets[m];
                         if (bucket->NumVertices == 0)
                             continue;
 
@@ -580,30 +625,36 @@ namespace T5M::Renderer {
                         updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
                         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-                        m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     }
                 }
 
                 short inventoryItem = ring->objects[objectIndex].inventoryObject;
 
                 // Draw special stuff if needed
-                if (objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing()) {
-                    if (g_Inventory.GetActiveRing() == INV_RING_OPTIONS) {
+                if (objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
+                {
+                    if (g_Inventory.GetActiveRing() == INV_RING_OPTIONS)
+                    {
                         /* **************** PASSAPORT ************* */
-                        if (inventoryItem == INV_OBJECT_PASSPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED) {
+                        if (inventoryItem == INV_OBJECT_PASSPORT && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        {
                             /* **************** LOAD AND SAVE MENU ************* */
-                            if (ring->passportAction == INV_WHAT_PASSPORT_LOAD_GAME || ring->passportAction == INV_WHAT_PASSPORT_SAVE_GAME) {
+                            if (ring->passportAction == INV_WHAT_PASSPORT_LOAD_GAME || ring->passportAction == INV_WHAT_PASSPORT_SAVE_GAME)
+                            {
                                 y = 44;
 
-                                for (int n = 0; n < MAX_SAVEGAMES; n++) {
+                                for (int n = 0; n < MAX_SAVEGAMES; n++)
+                                {
                                     if (!g_NewSavegameInfos[n].Present)
                                         PrintString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
                                                     PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
-                                    else {
+                                    else
+                                    {
                                         sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n].Count);
                                         PrintString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                                        PrintString(250, y, (char*)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                                        PrintString(250, y, (char *)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
                                         sprintf(stringBuffer, g_GameFlow->GetString(44), g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
                                         PrintString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
@@ -624,7 +675,8 @@ namespace T5M::Renderer {
                                 //drawColoredQuad(180, 24, 440, y + 20 - 24, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
                             }
                             /* **************** SELECT LEVEL ************* */
-                            else if (ring->passportAction == INV_WHAT_PASSPORT_SELECT_LEVEL) {
+                            else if (ring->passportAction == INV_WHAT_PASSPORT_SELECT_LEVEL)
+                            {
                                 drawLogo = false;
 
                                 drawGuiRect = true;
@@ -637,16 +689,18 @@ namespace T5M::Renderer {
 
                                 short lastY = 50;
 
-                                for (int n = 1; n < g_GameFlow->GetNumLevels(); n++) {
-                                    GameScriptLevel* levelScript = g_GameFlow->GetLevel(n);
+                                for (int n = 1; n < g_GameFlow->GetNumLevels(); n++)
+                                {
+                                    GameScriptLevel *levelScript = g_GameFlow->GetLevel(n);
                                     PrintString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
                                                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n - 1 ? PRINTSTRING_BLINK : 0));
 
                                     lastY += 24;
                                 }
                             }
-                            char* string = (char*)"";
-                            switch (ring->passportAction) {
+                            char *string = (char *)"";
+                            switch (ring->passportAction)
+                            {
                             case INV_WHAT_PASSPORT_NEW_GAME:
                                 string = g_GameFlow->GetString(STRING_NEW_GAME);
                                 break;
@@ -670,9 +724,10 @@ namespace T5M::Renderer {
                             PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
                         }
                         /* **************** GRAPHICS SETTINGS ************* */
-                        else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED) {
+                        else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        {
                             // Draw settings menu
-                            RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
+                            RendererVideoAdapter *adapter = &m_adapters[g_Configuration.Adapter];
 
                             int y = 200;
 
@@ -686,7 +741,7 @@ namespace T5M::Renderer {
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
-                            RendererDisplayMode* mode = &adapter->DisplayModes[ring->SelectedVideoMode];
+                            RendererDisplayMode *mode = &adapter->DisplayModes[ring->SelectedVideoMode];
                             char buffer[255];
                             ZeroMemory(buffer, 255);
                             sprintf(buffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
@@ -760,7 +815,8 @@ namespace T5M::Renderer {
                             //drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
                         }
                         /* **************** AUDIO SETTINGS ************* */
-                        else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED) {
+                        else if (inventoryItem == INV_OBJECT_HEADPHONES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        {
                             // Draw sound menu
 
                             y = 200;
@@ -831,7 +887,8 @@ namespace T5M::Renderer {
                             //drawColoredQuad(180, 180, 440, y + 20 - 180, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
                         }
                         /* **************** CONTROLS SETTINGS ************* */
-                        else if (inventoryItem == INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED) {
+                        else if (inventoryItem == INV_OBJECT_KEYS && ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        {
                             // Draw sound menu
                             y = 40;
 
@@ -840,18 +897,22 @@ namespace T5M::Renderer {
 
                             y += 25;
 
-                            for (int k = 0; k < 18; k++) {
+                            for (int k = 0; k < 18; k++)
+                            {
                                 PrintString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
                                             PRINTSTRING_COLOR_WHITE,
                                             PRINTSTRING_OUTLINE | (ring->selectedIndex == k ? PRINTSTRING_BLINK : 0) |
-                                            (ring->waitingForKey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                                                (ring->waitingForKey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                                if (ring->waitingForKey && k == ring->selectedIndex) {
+                                if (ring->waitingForKey && k == ring->selectedIndex)
+                                {
                                     PrintString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
                                                 PRINTSTRING_COLOR_YELLOW,
                                                 PRINTSTRING_OUTLINE | PRINTSTRING_BLINK);
-                                } else {
-                                    PrintString(400, y, (char*)g_KeyNames[KeyboardLayout[1][k]],
+                                }
+                                else
+                                {
+                                    PrintString(400, y, (char *)g_KeyNames[KeyboardLayout[1][k]],
                                                 PRINTSTRING_COLOR_ORANGE,
                                                 PRINTSTRING_OUTLINE);
                                 }
@@ -881,19 +942,25 @@ namespace T5M::Renderer {
                             guiRect.bottom = y + 20 - 20;
 
                             //drawColoredQuad(180, 20, 440, y + 20 - 20, Vector4(0.0f, 0.0f, 0.25f, 0.5f));
-                        } else {
+                        }
+                        else
+                        {
                             // Draw the description below the object
-                            char* string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
+                            char *string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
                             PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         short inventoryItem = g_Inventory.GetRing(k)->objects[objectIndex].inventoryObject;
-                        char* string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
+                        char *string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // &AllStrings[AllStringsOffsets[InventoryObjectsList[inventoryItem].objectName]];
 
-                        if (/*g_Inventory->IsCurrentObjectWeapon() &&*/ ring->focusState == INV_FOCUS_STATE_FOCUSED) {
+                        if (/*g_Inventory->IsCurrentObjectWeapon() &&*/ ring->focusState == INV_FOCUS_STATE_FOCUSED)
+                        {
                             y = 100;
 
-                            for (int a = 0; a < ring->numActions; a++) {
+                            for (int a = 0; a < ring->numActions; a++)
+                            {
                                 int stringIndex = 0;
                                 if (ring->actions[a] == INV_ACTION_USE)
                                     stringIndex = STRING_USE;
@@ -924,7 +991,8 @@ namespace T5M::Renderer {
                         }
 
                         int quantity = -1;
-                        switch (objectNumber) {
+                        switch (objectNumber)
+                        {
                         case ID_BIGMEDI_ITEM:
                             quantity = Lara.NumLargeMedipacks;
                             break;
@@ -1011,7 +1079,8 @@ namespace T5M::Renderer {
 
                         if (quantity < 1)
                             PrintString(400, 550, string, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
-                        else {
+                        else
+                        {
                             sprintf(stringBuffer, "%d x %s", quantity, string);
                             PrintString(400, 550, stringBuffer, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
                         }
@@ -1026,7 +1095,8 @@ namespace T5M::Renderer {
             lastRing++;
         }
 
-        if (drawGuiRect) {
+        if (drawGuiRect)
+        {
             // Draw blu box
             drawColoredQuad(guiRect.left, guiRect.top, guiRect.right, guiRect.bottom, guiColor);
         }
@@ -1034,7 +1104,8 @@ namespace T5M::Renderer {
         drawLines2D();
         drawAllStrings();
 
-        if (g_Inventory.GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo) {
+        if (g_Inventory.GetType() == INV_TYPE_TITLE && g_GameFlow->TitleType == TITLE_FLYBY && drawLogo)
+        {
             // Draw main logo
             float factorX = (float)ScreenWidth / REFERENCE_RES_WIDTH;
             float factorY = (float)ScreenHeight / REFERENCE_RES_HEIGHT;
@@ -1053,10 +1124,12 @@ namespace T5M::Renderer {
         return 0;
     }
 
-    bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool cinematicBars) {
+    bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView *texture, Vector3 color, bool cinematicBars)
+    {
         RendererVertex vertices[4];
 
-        if (!cinematicBars) {
+        if (!cinematicBars)
+        {
             vertices[0].Position.x = -1.0f;
             vertices[0].Position.y = 1.0f;
             vertices[0].Position.z = 0.0f;
@@ -1084,7 +1157,9 @@ namespace T5M::Renderer {
             vertices[3].UV.x = 0.0f;
             vertices[3].UV.y = 1.0f;
             vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
-        } else {
+        }
+        else
+        {
             float cinematicFactor = 0.12f;
 
             vertices[0].Position.x = -1.0f;
@@ -1120,7 +1195,7 @@ namespace T5M::Renderer {
         m_context->PSSetShader(m_psFullScreenQuad, NULL, 0);
 
         m_context->PSSetShaderResources(0, 1, &texture);
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1133,11 +1208,14 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawRopes() {
-        for (int n = 0; n < NumRopes; n++) {
-            ROPE_STRUCT* rope = &Ropes[n];
+    bool Renderer11::drawRopes()
+    {
+        for (int n = 0; n < NumRopes; n++)
+        {
+            ROPE_STRUCT *rope = &Ropes[n];
 
-            if (rope->active) {
+            if (rope->active)
+            {
                 // Original algorithm:
                 // 1) Transform segment coordinates from 3D to 2D + depth
                 // 2) Get dx, dy and the segment length
@@ -1150,7 +1228,8 @@ namespace T5M::Renderer {
                 Vector3 projected[24];
                 Matrix world = Matrix::Identity;
 
-                for (int i = 0; i < 24; i++) {
+                for (int i = 0; i < 24; i++)
+                {
                     Vector3 absolutePosition = Vector3(rope->position.x + rope->segment[i].x / 65536.0f,
                                                        rope->position.y + rope->segment[i].y / 65536.0f,
                                                        rope->position.z + rope->segment[i].z / 65536.0f);
@@ -1166,13 +1245,15 @@ namespace T5M::Renderer {
                 float s = 0;
                 float c = 0;
 
-                if (length != 0) {
+                if (length != 0)
+                {
                     s = -dy / length;
                     c = dx / length;
                 }
 
                 float w = 6.0f;
-                if (projected[0].z) {
+                if (projected[0].z)
+                {
                     w = 6.0f * PhdPerspective / projected[0].z / 65536.0f;
                     if (w < 3)
                         w = 3;
@@ -1189,7 +1270,8 @@ namespace T5M::Renderer {
 
                 float depth = projected[0].z;
 
-                for (int j = 0; j < 24; j++) {
+                for (int j = 0; j < 24; j++)
+                {
                     Vector3 p1 = m_viewportToolkit->Unproject(Vector3(x1, y1, depth), Projection, View, world);
                     Vector3 p2 = m_viewportToolkit->Unproject(Vector3(x2, y2, depth), Projection, View, world);
 
@@ -1199,13 +1281,15 @@ namespace T5M::Renderer {
                     s = 0;
                     c = 0;
 
-                    if (length != 0) {
+                    if (length != 0)
+                    {
                         s = -dy / length;
                         c = dx / length;
                     }
 
                     w = 6.0f;
-                    if (projected[j].z) {
+                    if (projected[j].z)
+                    {
                         w = 6.0f * PhdPerspective / projected[j].z / 65536.0f;
                         if (w < 3)
                             w = 3;
@@ -1243,7 +1327,8 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawLines2D() {
+    bool Renderer11::drawLines2D()
+    {
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -1257,8 +1342,9 @@ namespace T5M::Renderer {
 
         m_primitiveBatch->Begin();
 
-        for (int i = 0; i < m_lines2DToDraw.size(); i++) {
-            RendererLine2D* line = m_lines2DToDraw[i];
+        for (int i = 0; i < m_lines2DToDraw.size(); i++)
+        {
+            RendererLine2D *line = m_lines2DToDraw[i];
 
             RendererVertex v1;
             v1.Position.x = line->Vertices[0].x;
@@ -1296,7 +1382,8 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawSpiders() {
+    bool Renderer11::drawSpiders()
+    {
         /*XMMATRIX world;
         UINT cPasses = 1;
 
@@ -1352,7 +1439,7 @@ namespace T5M::Renderer {
                         effect->BeginPass(iPass);
                         effect->CommitChanges();
 
-                        drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+                        drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->Indices.size() / 3);
 
                         effect->EndPass();
                     }
@@ -1363,7 +1450,8 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawRats() {
+    bool Renderer11::drawRats()
+    {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -1372,19 +1460,21 @@ namespace T5M::Renderer {
         m_context->IASetInputLayout(m_inputLayout);
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-        if (Objects[ID_RATS_EMITTER].loaded) {
-            ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
-            RendererObject& moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
+        if (Objects[ID_RATS_EMITTER].loaded)
+        {
+            ObjectInfo *obj = &Objects[ID_RATS_EMITTER];
+            RendererObject &moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int i = 0; i < NUM_RATS; i++) {
-                RAT_STRUCT* rat = &Rats[i];
+            for (int i = 0; i < NUM_RATS; i++)
+            {
+                RAT_STRUCT *rat = &Rats[i];
 
-                if (rat->on) {
-                    short* meshPtr = Meshes[Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8)];
-                    RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
+                if (rat->on)
+                {
+                    RendererMesh *mesh = getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
                     Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
                     Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
                     Matrix world = rotation * translation;
@@ -1394,13 +1484,14 @@ namespace T5M::Renderer {
                     m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
                     updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 
-                    for (int b = 0; b < 2; b++) {
-                        RendererBucket* bucket = &mesh->Buckets[b];
+                    for (int b = 0; b < 2; b++)
+                    {
+                        RendererBucket *bucket = &mesh->Buckets[b];
 
                         if (bucket->NumVertices == 0)
                             continue;
 
-                        m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                         m_numDrawCalls++;
                     }
                 }
@@ -1410,7 +1501,8 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawBats() {
+    bool Renderer11::drawBats()
+    {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -1419,25 +1511,28 @@ namespace T5M::Renderer {
         m_context->IASetInputLayout(m_inputLayout);
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-        if (Objects[ID_BATS_EMITTER].loaded) {
-            ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
+        if (Objects[ID_BATS_EMITTER].loaded)
+        {
+            ObjectInfo *obj = &Objects[ID_BATS_EMITTER];
             RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
-            short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3)];
-            RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
+            RendererMesh *mesh = getMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-            for (int b = 0; b < 2; b++) {
-                RendererBucket* bucket = &mesh->Buckets[b];
+            for (int b = 0; b < 2; b++)
+            {
+                RendererBucket *bucket = &mesh->Buckets[b];
 
                 if (bucket->NumVertices == 0)
                     continue;
 
-                for (int i = 0; i < NUM_BATS; i++) {
-                    BAT_STRUCT* bat = &Bats[i];
+                for (int i = 0; i < NUM_BATS; i++)
+                {
+                    BAT_STRUCT *bat = &Bats[i];
 
-                    if (bat->on) {
+                    if (bat->on)
+                    {
                         Matrix translation = Matrix::CreateTranslation(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
                         Matrix rotation = Matrix::CreateFromYawPitchRoll(bat->pos.yRot, bat->pos.xRot, bat->pos.zRot);
                         Matrix world = rotation * translation;
@@ -1447,7 +1542,7 @@ namespace T5M::Renderer {
                         m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
                         updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 
-                        m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                         m_numDrawCalls++;
                     }
                 }
@@ -1457,24 +1552,28 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::doSnow() {
-        if (m_firstWeather) {
+    bool Renderer11::doSnow()
+    {
+        if (m_firstWeather)
+        {
             for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
                 m_snow[i].Reset = true;
         }
 
-        for (int i = 0; i < NUM_SNOW_PARTICLES; i++) {
-            RendererWeatherParticle* snow = &m_snow[i];
+        for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
+        {
+            RendererWeatherParticle *snow = &m_snow[i];
 
-            if (snow->Reset) {
+            if (snow->Reset)
+            {
                 snow->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
                 snow->Y = LaraItem->pos.yPos - (m_firstWeather ? rand() % WEATHER_HEIGHT : WEATHER_HEIGHT) + (rand() % 512);
                 snow->Z = LaraItem->pos.zPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
 
                 // Check if in inside room
                 short roomNumber = Camera.pos.roomNumber;
-                FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-                ROOM_INFO* room = &Rooms[roomNumber];
+                FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
+                ROOM_INFO *room = &Rooms[roomNumber];
                 if (!(room->flags & ENV_FLAG_OUTSIDE))
                     continue;
 
@@ -1493,7 +1592,8 @@ namespace T5M::Renderer {
             snow->Y += SNOW_DELTA_Y;
             snow->Z += dz;
 
-            if (snow->X <= 0 || snow->Z <= 0 || snow->X >= 100 * 1024.0f || snow->Z >= 100 * 1024.0f) {
+            if (snow->X <= 0 || snow->Z <= 0 || snow->X >= 100 * 1024.0f || snow->Z >= 100 * 1024.0f)
+            {
                 snow->Reset = true;
                 continue;
             }
@@ -1503,8 +1603,8 @@ namespace T5M::Renderer {
                                BLENDMODE_ALPHABLEND);
 
             short roomNumber = Camera.pos.roomNumber;
-            FLOOR_INFO* floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-            ROOM_INFO* room = &Rooms[roomNumber];
+            FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
+            ROOM_INFO *room = &Rooms[roomNumber];
             if (snow->Y >= room->y + room->minfloor)
                 snow->Reset = true;
         }
@@ -1514,18 +1614,23 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::doRain() {
-        if (m_firstWeather) {
-            for (int i = 0; i < NUM_RAIN_DROPS; i++) {
+    bool Renderer11::doRain()
+    {
+        if (m_firstWeather)
+        {
+            for (int i = 0; i < NUM_RAIN_DROPS; i++)
+            {
                 m_rain[i].Reset = true;
                 m_rain[i].Draw = true;
             }
         }
 
-        for (int i = 0; i < NUM_RAIN_DROPS; i++) {
-            RendererWeatherParticle* drop = &m_rain[i];
+        for (int i = 0; i < NUM_RAIN_DROPS; i++)
+        {
+            RendererWeatherParticle *drop = &m_rain[i];
 
-            if (drop->Reset) {
+            if (drop->Reset)
+            {
                 drop->Draw = true;
 
                 drop->X = LaraItem->pos.xPos + rand() % WEATHER_RADIUS - WEATHER_RADIUS / 2.0f;
@@ -1534,9 +1639,10 @@ namespace T5M::Renderer {
 
                 // Check if in inside room
                 short roomNumber = Camera.pos.roomNumber;
-                FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-                ROOM_INFO* room = &Rooms[roomNumber];
-                if (!(room->flags & ENV_FLAG_OUTSIDE)) {
+                FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+                ROOM_INFO *room = &Rooms[roomNumber];
+                if (!(room->flags & ENV_FLAG_OUTSIDE))
+                {
                     drop->Reset = true;
                     continue;
                 }
@@ -1566,9 +1672,10 @@ namespace T5M::Renderer {
 
             // If rain drop has hit the ground, then reset it and add a little drip
             short roomNumber = Camera.pos.roomNumber;
-            FLOOR_INFO* floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-            ROOM_INFO* room = &Rooms[roomNumber];
-            if (drop->Y >= room->y + room->minfloor) {
+            FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
+            ROOM_INFO *room = &Rooms[roomNumber];
+            if (drop->Y >= room->y + room->minfloor)
+            {
                 drop->Reset = true;
                 AddWaterSparks(drop->X, room->y + room->minfloor, drop->Z, 1);
             }
@@ -1579,7 +1686,8 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawLines3D() {
+    bool Renderer11::drawLines3D()
+    {
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -1587,14 +1695,14 @@ namespace T5M::Renderer {
         m_context->VSSetShader(m_vsSolid, NULL, 0);
         m_context->PSSetShader(m_psSolid, NULL, 0);
 
-
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
         m_context->IASetInputLayout(m_inputLayout);
 
         m_primitiveBatch->Begin();
 
-        for (int i = 0; i < m_lines3DToDraw.size(); i++) {
-            RendererLine3D* line = m_lines3DToDraw[i];
+        for (int i = 0; i < m_lines3DToDraw.size(); i++)
+        {
+            RendererLine3D *line = m_lines3DToDraw[i];
 
             RendererVertex v1;
             v1.Position = line->start;
@@ -1615,11 +1723,12 @@ namespace T5M::Renderer {
         return true;
     }
 
-    void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color) {
+    void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
+    {
         if (m_nextLine3D >= MAX_LINES_3D)
             return;
 
-        RendererLine3D* line = &m_lines3DBuffer[m_nextLine3D++];
+        RendererLine3D *line = &m_lines3DBuffer[m_nextLine3D++];
 
         line->start = start;
         line->end = end;
@@ -1628,9 +1737,10 @@ namespace T5M::Renderer {
         m_lines3DToDraw.push_back(line);
     }
 
-    void Renderer11::DrawLoadingScreen(std::wstring& fileName) {
+    void Renderer11::DrawLoadingScreen(std::wstring &fileName)
+    {
         return;
-/*
+        /*
 
         Texture2D texture = Texture2D(m_device, fileName);
 
@@ -1680,11 +1790,12 @@ namespace T5M::Renderer {
         */
     }
 
-    void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b) {
+    void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
+    {
         if (m_nextLight >= MAX_LIGHTS)
             return;
 
-        RendererLight* dynamicLight = &m_lights[m_nextLight++];
+        RendererLight *dynamicLight = &m_lights[m_nextLight++];
 
         dynamicLight->Position = Vector3(float(x), float(y), float(z));
         dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
@@ -1697,11 +1808,13 @@ namespace T5M::Renderer {
         //NumDynamics++;
     }
 
-    void Renderer11::ClearDynamicLights() {
+    void Renderer11::ClearDynamicLights()
+    {
         m_dynamicLights.clear();
     }
 
-    int Renderer11::drawFinalPass() {
+    int Renderer11::drawFinalPass()
+    {
         return 0;
         /*
         // Update fade status
@@ -1741,7 +1854,8 @@ namespace T5M::Renderer {
         */
     }
 
-    bool Renderer11::drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade,ID3D11RenderTargetView* target,ID3D11DepthStencilView* depthTarget) {
+    bool Renderer11::drawFullScreenImage(ID3D11ShaderResourceView *texture, float fade, ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget)
+    {
         // Reset GPU state
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->RSSetState(m_states->CullCounterClockwise());
@@ -1752,27 +1866,30 @@ namespace T5M::Renderer {
         return true;
     }
 
-    int Renderer11::DrawInventory() {
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-		drawInventoryScene(m_backBufferRTV, m_depthStencilView,m_dumpScreenRenderTarget.ShaderResourceView.Get());
-		m_swapChain->Present(0, 0);
-		return 0;
-    }
-
-    int Renderer11::DrawTitle() {
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-		m_context->ClearRenderTargetView(m_backBufferRTV,Colors::Black);
-		
-		drawScene(m_backBufferRTV, m_depthStencilView,gameCamera);
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-		drawInventoryScene(m_backBufferRTV, m_depthStencilView,nullptr);
+    int Renderer11::DrawInventory()
+    {
+        m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+        m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+        drawInventoryScene(m_backBufferRTV, m_depthStencilView, m_dumpScreenRenderTarget.ShaderResourceView.Get());
         m_swapChain->Present(0, 0);
         return 0;
     }
 
-    bool Renderer11::drawScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view) {
+    int Renderer11::DrawTitle()
+    {
+        m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+        m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+
+        drawScene(m_backBufferRTV, m_depthStencilView, gameCamera);
+        m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+        drawInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
+        m_swapChain->Present(0, 0);
+        return 0;
+    }
+
+    bool Renderer11::drawScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, RenderView &view)
+    {
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
         m_timeUpdate = 0;
@@ -1789,7 +1906,7 @@ namespace T5M::Renderer {
 
         m_strings.clear();
 
-        GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
         m_stLights.CameraPosition = view.camera.WorldPosition;
 
@@ -1828,7 +1945,6 @@ namespace T5M::Renderer {
         m_context->OMSetRenderTargets(1, &target, depthTarget);
 
         m_context->RSSetViewports(1, &view.viewport);
-
 
         // Opaque geometry
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -1890,7 +2006,8 @@ namespace T5M::Renderer {
         drawShockwaves();
         drawEnergyArcs();
 
-        switch (level->Weather) {
+        switch (level->Weather)
+        {
         case WEATHER_NORMAL:
             // no weather in normal
             break;
@@ -1920,13 +2037,14 @@ namespace T5M::Renderer {
 
         drawLines2D();
 
-        if (CurrentLevel != 0) {
+        if (CurrentLevel != 0)
+        {
             // Draw binoculars or lasersight
             drawOverlays();
 
             m_currentY = 60;
 #ifdef _DEBUG
-            ROOM_INFO* r = &Rooms[LaraItem->roomNumber];
+            ROOM_INFO *r = &Rooms[LaraItem->roomNumber];
 
             printDebugMessage("Update time: %d", m_timeUpdate);
             printDebugMessage("Frame time: %d", m_timeFrame);
@@ -1960,9 +2078,9 @@ namespace T5M::Renderer {
         return true;
     }
 
-
-    bool Renderer11::drawSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view) {
-        GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+    bool Renderer11::drawSimpleScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, RenderView &view)
+    {
+        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
         collectRooms(view);
         // Draw shadow map
@@ -1986,19 +2104,21 @@ namespace T5M::Renderer {
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices,cameraConstantBuffer);
+        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
         return true;
     }
 
-    int Renderer11::DumpGameScene() {
-        drawScene(m_dumpScreenRenderTarget.RenderTargetView.Get(),m_dumpScreenRenderTarget.DepthStencilView.Get(), gameCamera);
+    int Renderer11::DumpGameScene()
+    {
+        drawScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(), gameCamera);
         return 0;
     }
 
-    bool Renderer11::drawItems(bool transparent, bool animated,RenderView& view) {
+    bool Renderer11::drawItems(bool transparent, bool animated, RenderView &view)
+    {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2010,7 +2130,7 @@ namespace T5M::Renderer {
         m_context->IASetInputLayout(m_inputLayout);
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-        RendererItem* item = &m_items[Lara.itemNumber];
+        RendererItem *item = &m_items[Lara.itemNumber];
 
         // Set shaders
         m_context->VSSetShader(m_vsItems, NULL, 0);
@@ -2019,28 +2139,36 @@ namespace T5M::Renderer {
         // Set texture
         m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
         m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
         m_stMisc.AlphaTest = !transparent;
         updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-        for (int i = 0; i < view.itemsToDraw.size(); i++) {
-            RendererItem* item = view.itemsToDraw[i];
-            RendererRoom& const room = m_rooms[item->Item->roomNumber];
-            RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
+        for (int i = 0; i < view.itemsToDraw.size(); i++)
+        {
+            RendererItem *item = view.itemsToDraw[i];
+            RendererRoom &const room = m_rooms[item->Item->roomNumber];
+            RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
 
             short objectNumber = item->Item->objectNumber;
-            if (moveableObj.DoNotDraw) {
+            if (moveableObj.DoNotDraw)
+            {
                 continue;
-            } else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2) {
+            }
+            else if (objectNumber == ID_TEETH_SPIKES || objectNumber == ID_RAISING_BLOCK1 || objectNumber == ID_RAISING_BLOCK2)
+            {
                 // Raising blocks and teeth spikes are normal animating objects but scaled on Y direction
                 drawScaledSpikes(item, transparent, animated);
-            } else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2) {
+            }
+            else if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
+            {
                 // We'll draw waterfalls later
                 continue;
-            } else {
+            }
+            else
+            {
                 drawAnimatingItem(item, transparent, animated);
             }
         }
@@ -2048,18 +2176,20 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool animated) {
+    bool Renderer11::drawAnimatingItem(RendererItem *item, bool transparent, bool animated)
+    {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
         int firstBucket = (transparent ? 2 : 0);
         int lastBucket = (transparent ? 4 : 2);
-        if (m_rooms.size() <= item->Item->roomNumber) {
+        if (m_rooms.size() <= item->Item->roomNumber)
+        {
             return true;
         }
-        RendererRoom& const room = m_rooms[item->Item->roomNumber];
-        RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
-        ObjectInfo* obj = &Objects[item->Item->objectNumber];
+        RendererRoom &const room = m_rooms[item->Item->roomNumber];
+        RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
+        ObjectInfo *obj = &Objects[item->Item->objectNumber];
 
         m_stItem.World = item->World;
         m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
@@ -2079,26 +2209,31 @@ namespace T5M::Renderer {
         updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-        for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
+        for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+        {
             if (!(item->Item->meshBits & (1 << k)))
                 continue;
 
-            RendererMesh* mesh;
-            if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1)) {
-                RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
+            RendererMesh *mesh;
+            if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1))
+            {
+                RendererObject &swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
                 mesh = swapMeshObj.ObjectMeshes[k];
-            } else {
+            }
+            else
+            {
                 mesh = moveableObj.ObjectMeshes[k];
             }
 
-            for (int j = firstBucket; j < lastBucket; j++) {
-                RendererBucket* bucket = &mesh->Buckets[j];
+            for (int j = firstBucket; j < lastBucket; j++)
+            {
+                RendererBucket *bucket = &mesh->Buckets[j];
 
                 if (bucket->Vertices.size() == 0)
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -2106,9 +2241,11 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawScaledSpikes(RendererItem* item, bool transparent, bool animated) {
+    bool Renderer11::drawScaledSpikes(RendererItem *item, bool transparent, bool animated)
+    {
         short objectNumber = item->Item->objectNumber;
-        if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1)) {
+        if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
+        {
             item->Scale = Matrix::CreateScale(1.0f, item->Item->itemFlags[1] / 4096.0f, 1.0f);
             item->World = item->Scale * item->Rotation * item->Translation;
 
@@ -2116,7 +2253,8 @@ namespace T5M::Renderer {
         }
     }
 
-    bool Renderer11::drawStatics(bool transparent,RenderView& view) {
+    bool Renderer11::drawStatics(bool transparent, RenderView &view)
+    {
         //return true;
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2135,33 +2273,35 @@ namespace T5M::Renderer {
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, m_staticsTextures[0].ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
-        for (int i = 0; i < view.staticsToDraw.size(); i++) {
-            MESH_INFO* msh = view.staticsToDraw[i]->Mesh;
+        for (int i = 0; i < view.staticsToDraw.size(); i++)
+        {
+            MESH_INFO *msh = view.staticsToDraw[i]->Mesh;
 
             if (!(msh->flags & 1))
                 continue;
 
-            RendererRoom& const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
+            RendererRoom &const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
 
-            RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
-            RendererMesh* mesh = staticObj.ObjectMeshes[0];
+            RendererObject &staticObj = *m_staticObjects[msh->staticNumber];
+            RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
             m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
             m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
             updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
             m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
-            for (int j = firstBucket; j < lastBucket; j++) {
-                RendererBucket* bucket = &mesh->Buckets[j];
+            for (int j = firstBucket; j < lastBucket; j++)
+            {
+                RendererBucket *bucket = &mesh->Buckets[j];
 
                 if (bucket->Vertices.size() == 0)
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -2169,14 +2309,16 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawRooms(bool transparent, bool animated,RenderView& view) {
+    bool Renderer11::drawRooms(bool transparent, bool animated, RenderView &view)
+    {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
         int firstBucket = (transparent ? 2 : 0);
         int lastBucket = (transparent ? 4 : 2);
 
-        if (!animated) {
+        if (!animated)
+        {
             // Set vertex buffer
             m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
             m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2190,19 +2332,22 @@ namespace T5M::Renderer {
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, m_roomTextures[0].ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
-        ID3D11SamplerState* shadowSampler = m_states->PointClamp();
+        ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
+        ID3D11SamplerState *shadowSampler = m_states->PointClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
         m_context->PSSetShaderResources(1, 1, m_caustics[m_currentCausticsFrame / 2].ShaderResourceView.GetAddressOf());
         m_context->PSSetSamplers(1, 1, &shadowSampler);
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
         // Set shadow map data
-        if (m_shadowLight != NULL) {
+        if (m_shadowLight != NULL)
+        {
             memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
             m_stShadowMap.CastShadows = true;
             //m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
-        } else {
+        }
+        else
+        {
             m_stShadowMap.CastShadows = false;
         }
 
@@ -2213,8 +2358,9 @@ namespace T5M::Renderer {
         if (animated)
             m_primitiveBatch->Begin();
 
-        for (int i = 0; i < view.roomsToDraw.size(); i++) {
-            RendererRoom* room = view.roomsToDraw[i];
+        for (int i = 0; i < view.roomsToDraw.size(); i++)
+        {
+            RendererRoom *room = view.roomsToDraw[i];
 
             m_stLights.NumLights = view.lightsToDraw.size();
             for (int j = 0; j < view.lightsToDraw.size(); j++)
@@ -2231,8 +2377,9 @@ namespace T5M::Renderer {
             updateConstantBuffer<CRoomBuffer>(m_cbRoom, m_stRoom);
             m_context->VSSetConstantBuffers(5, 1, &m_cbRoom);
             m_context->PSSetConstantBuffers(5, 1, &m_cbRoom);
-            for (int j = firstBucket; j < lastBucket; j++) {
-                RendererBucket* bucket;
+            for (int j = firstBucket; j < lastBucket; j++)
+            {
+                RendererBucket *bucket;
                 if (!animated)
                     bucket = &room->Buckets[j];
                 else
@@ -2241,17 +2388,24 @@ namespace T5M::Renderer {
                 if (bucket->Vertices.size() == 0)
                     continue;
 
-                if (!animated) {
+                if (!animated)
+                {
                     m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
-                } else {
-                    for (int k = 0; k < bucket->Polygons.size(); k++) {
-                        RendererPolygon* poly = &bucket->Polygons[k];
+                }
+                else
+                {
+                    for (int k = 0; k < bucket->Polygons.size(); k++)
+                    {
+                        RendererPolygon *poly = &bucket->Polygons[k];
 
-                        if (poly->Shape == SHAPE_RECTANGLE) {
+                        if (poly->Shape == SHAPE_RECTANGLE)
+                        {
                             m_primitiveBatch->DrawQuad(bucket->Vertices[poly->Indices[0]], bucket->Vertices[poly->Indices[1]],
                                                        bucket->Vertices[poly->Indices[2]], bucket->Vertices[poly->Indices[3]]);
-                        } else {
+                        }
+                        else
+                        {
                             m_primitiveBatch->DrawTriangle(bucket->Vertices[poly->Indices[0]], bucket->Vertices[poly->Indices[1]],
                                                            bucket->Vertices[poly->Indices[2]]);
                         }
@@ -2266,9 +2420,10 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawHorizonAndSky(ID3D11DepthStencilView* depthTarget) {
+    bool Renderer11::drawHorizonAndSky(ID3D11DepthStencilView *depthTarget)
+    {
         // Update the sky
-        GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
         Vector4 color = Vector4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
         if (!level->Horizon)
@@ -2278,14 +2433,18 @@ namespace T5M::Renderer {
             AlterFOV(14560 - BinocularRange);
 
         // Storm
-        if (level->Storm) {
-            if (LightningCount || LightningRand) {
+        if (level->Storm)
+        {
+            if (LightningCount || LightningRand)
+            {
                 UpdateStorm();
                 if (StormTimer > -1)
                     StormTimer--;
                 if (!StormTimer)
                     SoundEffect(SFX_THUNDER_RUMBLE, NULL, 0);
-            } else if (!(rand() & 0x7F)) {
+            }
+            else if (!(rand() & 0x7F))
+            {
                 LightningCount = (rand() & 0x1F) + 16;
                 dLightningRand = rand() + 256;
                 StormTimer = (rand() & 3) + 12;
@@ -2294,7 +2453,7 @@ namespace T5M::Renderer {
             color = Vector4((SkyStormColor[0]) / 255.0f, SkyStormColor[1] / 255.0f, SkyStormColor[2] / 255.0f, 1.0f);
         }
 
-        ID3D11SamplerState* sampler;
+        ID3D11SamplerState *sampler;
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2358,7 +2517,8 @@ namespace T5M::Renderer {
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++)
+        {
             Matrix translation = Matrix::CreateTranslation(Camera.pos.x + SkyPos1 - i * 9728.0f, Camera.pos.y - 1536.0f, Camera.pos.z);
             Matrix world = rotation * translation;
 
@@ -2374,7 +2534,8 @@ namespace T5M::Renderer {
         }
 
         // Draw horizon
-        if (m_moveableObjects[ID_HORIZON].has_value()) {
+        if (m_moveableObjects[ID_HORIZON].has_value())
+        {
             m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
             m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             m_context->IASetInputLayout(m_inputLayout);
@@ -2384,12 +2545,12 @@ namespace T5M::Renderer {
             sampler = m_states->AnisotropicClamp();
             m_context->PSSetSamplers(0, 1, &sampler);
 
-            RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
+            RendererObject &moveableObj = *m_moveableObjects[ID_HORIZON];
 
             m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
             m_stStatic.Position = Vector4::Zero;
             m_stStatic.Color = Vector4::One;
-            updateConstantBuffer<CStaticBuffer>(m_cbStatic,m_stStatic);
+            updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
             m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
             m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
 
@@ -2397,11 +2558,13 @@ namespace T5M::Renderer {
             updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
             m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-            for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
-                RendererMesh* mesh = moveableObj.ObjectMeshes[k];
+            for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+            {
+                RendererMesh *mesh = moveableObj.ObjectMeshes[k];
 
-                for (int j = 0; j < NUM_BUCKETS; j++) {
-                    RendererBucket* bucket = &mesh->Buckets[j];
+                for (int j = 0; j < NUM_BUCKETS; j++)
+                {
+                    RendererBucket *bucket = &mesh->Buckets[j];
 
                     if (bucket->Vertices.size() == 0)
                         continue;
@@ -2412,7 +2575,7 @@ namespace T5M::Renderer {
                         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
                     // Draw vertices
-                    m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
@@ -2424,17 +2587,19 @@ namespace T5M::Renderer {
         return true;
     }
 
-    bool Renderer11::drawAmbientCubeMap(short roomNumber) {
+    bool Renderer11::drawAmbientCubeMap(short roomNumber)
+    {
         return true;
     }
 
-    int Renderer11::Draw() {
+    int Renderer11::Draw()
+    {
 
-        renderToCubemap(m_reflectionCubemap,Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos-1024, LaraItem->pos.zPos ),LaraItem->roomNumber);
-        drawScene(m_backBufferRTV,m_depthStencilView,gameCamera);
+        renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
+        drawScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();
         //drawFinalPass();
         m_swapChain->Present(0, 0);
         return 0;
     }
-}
+} // namespace T5M::Renderer

@@ -11,7 +11,7 @@
 #include "GameFlowScript.h"
 using namespace T5M::Renderer;
 
-extern GameFlow* g_GameFlow;
+extern GameFlow *g_GameFlow;
 
 void Renderer11::UpdateLaraAnimations(bool force)
 {
@@ -22,14 +22,14 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	Matrix identity;
 	Matrix world;
 
-	RendererItem* item = &m_items[Lara.itemNumber];
+	RendererItem *item = &m_items[Lara.itemNumber];
 	item->Id = Lara.itemNumber;
 	item->Item = LaraItem;
 
 	if (!force && item->DoneAnimations)
 		return;
 
-	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
+	RendererObject &laraObj = *m_moveableObjects[ID_LARA];
 
 	// Clear extra rotations
 	for (int i = 0; i < laraObj.LinearizedBones.size(); i++)
@@ -48,7 +48,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
-	short* framePtr[2];
+	short *framePtr[2];
 	int rate, frac;
 
 	frac = GetFrame_D2(LaraItem, framePtr, &rate);
@@ -68,8 +68,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.zRot), TO_RAD(-Lara.leftArm.yRot));
 		laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.zRot), TO_RAD(-Lara.rightArm.yRot));
 
-		LARA_ARM * leftArm = &Lara.leftArm;
-		LARA_ARM * rightArm = &Lara.rightArm;
+		LARA_ARM *leftArm = &Lara.leftArm;
+		LARA_ARM *rightArm = &Lara.rightArm;
 
 		// HACK: backguns handles differently // TokyoSU: not really a hack since it's the original way to do that.
 		switch (Lara.gunType)
@@ -79,7 +79,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case WEAPON_CROSSBOW:
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_HARPOON_GUN:
-			short* shotgunFramePtr;
+			short *shotgunFramePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
@@ -97,7 +97,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case WEAPON_REVOLVER:
 		default:
 		{
-			short* pistolFramePtr;
+			short *pistolFramePtr;
 
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
@@ -136,7 +136,9 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		laraObj.AnimationTransforms[m] = item->AnimationTransforms[m];
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
-	if (m_moveableObjects[ID_LARA_HAIR].has_value())
+	// TODO: disabled for now
+	/*
+	if (m_moveableObjects[ID_LARA_HAIR] != NULL)
 	{
 		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
 
@@ -262,7 +264,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				}
 			}
 		}
-	}
+	}*/
 
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
@@ -284,7 +286,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_context->IASetInputLayout(m_inputLayout);
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	RendererItem * item = &m_items[Lara.itemNumber];
+	RendererItem *item = &m_items[Lara.itemNumber];
 
 	// Set shaders
 	if (shadowMap)
@@ -301,16 +303,16 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	// Set texture
 	m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
 	m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
-	ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+	ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	m_stMisc.AlphaTest = !transparent;
 	updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
 	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-	RendererRoom& const room = m_rooms[LaraItem->roomNumber];
+	RendererObject &laraObj = *m_moveableObjects[ID_LARA];
+	RendererObject &laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+	RendererRoom &const room = m_rooms[LaraItem->roomNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
@@ -331,38 +333,38 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
+		RendererMesh *mesh = getMesh(Lara.meshPtrs[k]);
 
 		for (int j = firstBucket; j < lastBucket; j++)
 		{
-			RendererBucket* bucket = &mesh->Buckets[j];
+			RendererBucket *bucket = &mesh->Buckets[j];
 
 			if (bucket->Vertices.size() == 0)
 				continue;
 
 			// Draw vertices
-			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 			m_numDrawCalls++;
 		}
 	}
 
 	if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 	{
-		RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
+		RendererObject &laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
 		for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
 		{
-			RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
+			RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
 
 			for (int j = firstBucket; j < lastBucket; j++)
 			{
-				RendererBucket* bucket = &mesh->Buckets[j];
+				RendererBucket *bucket = &mesh->Buckets[j];
 
 				if (bucket->Vertices.size() == 0)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 				m_numDrawCalls++;
 			}
 		}
@@ -370,7 +372,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	if (!transparent)
 	{
-		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+		/*for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = laraSkin.ObjectMeshes[k];
 
@@ -382,13 +384,13 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 				m_numDrawCalls++;
 			}
-		}
+		}*/
 
 		// Hairs are pre-transformed
-		Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
+		/*Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
 							   Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
 		m_stItem.World = Matrix::Identity;
@@ -399,7 +401,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, (const uint16_t*)m_hairIndices.data(), m_numHairIndices, m_hairVertices.data(), m_numHairVertices);
 			m_primitiveBatch->End();
-		}
+		}*/
 	}
 
 	return true;
