@@ -463,13 +463,8 @@ namespace T5M::Renderer {
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2) {
 													jointVertex->Bone = BonesToCheck[k];
-													jointVertex->Position.x = skinVertex->Position.x;
-													jointVertex->Position.y = skinVertex->Position.y;
-													jointVertex->Position.z = skinVertex->Position.z;
-													Vector3 n = (jointVertex->Normal + skinVertex->Normal) / 2.0f;
-													n.Normalize();
-													jointVertex->Normal = n;
-													skinVertex->Normal = n;
+													jointVertex->Position = skinVertex->Position;
+													jointVertex->Normal = skinVertex->Normal;
 
 													done = true;
 													break;
