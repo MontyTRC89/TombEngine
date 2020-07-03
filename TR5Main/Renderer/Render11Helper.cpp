@@ -147,7 +147,7 @@ namespace T5M::Renderer {
 	}
 
 	void Renderer11::updateAnimation(RendererItem * item, RendererObject * obj, short** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation) {
-		RendererBone* bones[32];
+		RendererBone* Bones[32];
 		int nextBone = 0;
 
 		Matrix rotation;
@@ -155,11 +155,11 @@ namespace T5M::Renderer {
 		Matrix* transforms = (item == NULL ? obj->AnimationTransforms.data() : &item->AnimationTransforms[0]);
 
 		// Push
-		bones[nextBone++] = obj->Skeleton;
+		Bones[nextBone++] = obj->Skeleton;
 
 		while (nextBone != 0) {
 			// Pop the last bone in the stack
-			RendererBone* bone = bones[--nextBone];
+			RendererBone* bone = Bones[--nextBone];
 
 			bool calculateMatrix = (mask >> bone->Index) & 1;
 
@@ -211,7 +211,7 @@ namespace T5M::Renderer {
 
 			for (int i = 0; i < bone->Children.size(); i++) {
 				// Push
-				bones[nextBone++] = bone->Children[i];
+				Bones[nextBone++] = bone->Children[i];
 			}
 		}
 	}
@@ -382,241 +382,64 @@ namespace T5M::Renderer {
 		}
 	}
 
-	RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject * obj, short* meshPtr, short boneIndex, int isJoints, int isHairs) {
+	RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject * obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs) {
 		RendererMesh* mesh = new RendererMesh();
 
-		short* basePtr = meshPtr;
+		mesh->Sphere = meshPtr->sphere;
 
-		short cx = *meshPtr++;
-		short cy = *meshPtr++;
-		short cz = *meshPtr++;
-		short r1 = *meshPtr++;
-		short r2 = *meshPtr++;
+		if (meshPtr->vertices.size() == 0)
+			return mesh;
 
-		mesh->Sphere = BoundingSphere(Vector3(cx, cy, cz), r1);
+		MESH_VERTEX * vertices = meshPtr->vertices.data();
 
-		short numVertices = *meshPtr++;
-
-		VECTOR* vertices = (VECTOR*)malloc(sizeof(VECTOR) * numVertices);
-		for (int v = 0; v < numVertices; v++) {
-			short x = *meshPtr++;
-			short y = *meshPtr++;
-			short z = *meshPtr++;
-
-			vertices[v].vx = x;
-			vertices[v].vy = y;
-			vertices[v].vz = z;
-
-			mesh->Positions.push_back(Vector3(x, y, z));
-		}
-
-		short numNormals = *meshPtr++;
-		VECTOR* normals = NULL;
-		short* colors = NULL;
-		if (numNormals > 0) {
-			normals = (VECTOR*)malloc(sizeof(VECTOR) * numNormals);
-			for (int v = 0; v < numNormals; v++) {
-				short x = *meshPtr++;
-				short y = *meshPtr++;
-				short z = *meshPtr++;
-
-				normals[v].vx = x;
-				normals[v].vy = y;
-				normals[v].vz = z;
-			}
-		}
-		else {
-			short numLights = -numNormals;
-			colors = (short*)malloc(sizeof(short) * numLights);
-			for (int v = 0; v < numLights; v++) {
-				colors[v] = *meshPtr++;
-			}
-		}
-
-		short numRectangles = *meshPtr++;
-
-		for (int r = 0; r < numRectangles; r++) {
-			short v1 = *meshPtr++;
-			short v2 = *meshPtr++;
-			short v3 = *meshPtr++;
-			short v4 = *meshPtr++;
-			short textureId = *meshPtr++;
-			short effects = *meshPtr++;
-
-			short indices[4] = { v1, v2, v3, v4 };
-
-			short textureIndex = textureId & 0x7FFF;
-			bool doubleSided = (textureId & 0x8000) >> 15;
-
-			// Get the object texture
-			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-			int tile = texture->tileAndFlag & 0x7FFF;
-
-			// Create vertices
-			RendererBucket* bucket;
-			int bucketIndex = RENDERER_BUCKET_SOLID;
-				if (texture->attribute == 2 || (effects & 1))
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			
-			// ColAddHorizon special handling
-			if (obj != NULL && obj->Id == ID_HORIZON && g_GameFlow->GetLevel(CurrentLevel)->ColAddHorizon) {
-				if (texture->attribute == 2 || (effects & 1))
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			}
-
-			bucket = &mesh->Buckets[bucketIndex];
-			if (obj != NULL)
-				obj->HasDataInBucket[bucketIndex] = true;
-
-			int baseVertices = bucket->NumVertices;
-			for (int v = 0; v < 4; v++) {
-				RendererVertex vertex;
-
-				vertex.Position.x = vertices[indices[v]].vx;
-				vertex.Position.y = vertices[indices[v]].vy;
-				vertex.Position.z = vertices[indices[v]].vz;
-
-				if (numNormals > 0) {
-					vertex.Normal.x = normals[indices[v]].vx / 16300.0f;
-					vertex.Normal.y = normals[indices[v]].vy / 16300.0f;
-					vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
-				}
-
-				vertex.UV.x = texture->vertices[v].x;
-				vertex.UV.y = texture->vertices[v].y;
-
-				vertex.Bone = boneIndex;
-				if (isHairs)
-					vertex.Bone = indices[v];
-
-				if (colors == NULL) {
-					vertex.Color = Vector4::One * 0.5f;
-				}
-				else {
-					short shade = colors[indices[v]];
-					shade = (255 - shade * 255 / 8191) & 0xFF;
-					vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
-				}
-
-				bucket->NumVertices++;
-				bucket->Vertices.push_back(vertex);
-			}
-
-			bucket->Indices.push_back(baseVertices);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->Indices.push_back(baseVertices + 3);
-			bucket->Indices.push_back(baseVertices + 2);
-			bucket->Indices.push_back(baseVertices + 3);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->NumIndices += 6;
-
-			RendererPolygon newPolygon;
-			newPolygon.Shape = SHAPE_RECTANGLE;
-			newPolygon.TextureId = textureId;
-			newPolygon.Indices[0] = baseVertices;
-			newPolygon.Indices[1] = baseVertices + 1;
-			newPolygon.Indices[2] = baseVertices + 2;
-			newPolygon.Indices[3] = baseVertices + 3;
-			bucket->Polygons.push_back(newPolygon);
-		}
-
-		short numTriangles = *meshPtr++;
-
-		for (int r = 0; r < numTriangles; r++) {
-			short v1 = *meshPtr++;
-			short v2 = *meshPtr++;
-			short v3 = *meshPtr++;
-			short textureId = *meshPtr++;
-			short effects = *meshPtr++;
-
-			short indices[3] = { v1, v2, v3 };
-
-			short textureIndex = textureId & 0x7FFF;
-			bool doubleSided = (textureId & 0x8000) >> 15;
-
-			// Get the object texture
-			OBJECT_TEXTURE* texture = &ObjectTextures[textureIndex];
-			int tile = texture->tileAndFlag & 0x7FFF;
-
-			// Create vertices
-			RendererBucket* bucket;
-			int bucketIndex = RENDERER_BUCKET_SOLID;
-				if (texture->attribute == 2 || (effects & 1))
-					bucketIndex = RENDERER_BUCKET_TRANSPARENT;
-				else
-					bucketIndex = RENDERER_BUCKET_SOLID;
-			
-			bucket = &mesh->Buckets[bucketIndex];
-			if (obj != NULL)
-				obj->HasDataInBucket[bucketIndex] = true;
-
-			int baseVertices = bucket->NumVertices;
-			for (int v = 0; v < 3; v++) {
-				RendererVertex vertex;
-
-				vertex.Position.x = vertices[indices[v]].vx;
-				vertex.Position.y = vertices[indices[v]].vy;
-				vertex.Position.z = vertices[indices[v]].vz;
-
-				if (numNormals > 0) {
-					vertex.Normal.x = normals[indices[v]].vx / 16300.0f;
-					vertex.Normal.y = normals[indices[v]].vy / 16300.0f;
-					vertex.Normal.z = normals[indices[v]].vz / 16300.0f;
-				}
-
-				vertex.UV.x = texture->vertices[v].x;
-				vertex.UV.y = texture->vertices[v].y;
-
-				vertex.Bone = boneIndex;
-				if (isHairs)
-					vertex.Bone = indices[v];
-
-				if (colors == NULL) {
-					vertex.Color = Vector4::One * 0.5f;
-				}
-				else {
-					short shade = colors[indices[v]];
-					shade = (255 - shade * 255 / 8191) & 0xFF;
-					vertex.Color = Vector4(shade / 255.0f, shade / 255.0f, shade / 255.0f, 1.0f);
-				}
-
-				bucket->NumVertices++;
-				bucket->Vertices.push_back(vertex);
-			}
-
-			bucket->Indices.push_back(baseVertices);
-			bucket->Indices.push_back(baseVertices + 1);
-			bucket->Indices.push_back(baseVertices + 2);
-			bucket->NumIndices += 3;
-
-			RendererPolygon newPolygon;
-			newPolygon.Shape = SHAPE_TRIANGLE;
-			newPolygon.TextureId = textureId;
-			newPolygon.Indices[0] = baseVertices;
-			newPolygon.Indices[1] = baseVertices + 1;
-			newPolygon.Indices[2] = baseVertices + 2;
-			bucket->Polygons.push_back(newPolygon);
-		}
-
-		free(vertices);
-		if (normals != NULL)
-			free(normals);
-		if (colors != NULL)
-			free(colors);
-
-		unsigned int castedMeshPtr = reinterpret_cast<unsigned int>(basePtr);
-
-		if (m_meshPointersToMesh.find(castedMeshPtr) == m_meshPointersToMesh.end()) {
-			m_meshPointersToMesh.insert(pair<unsigned int, RendererMesh*>(castedMeshPtr, mesh));
-		}
-		/*else if (m_meshPointersToMesh[castedMeshPtr] == NULL)
+		for (int n = 0; n < meshPtr->buckets.size(); n++)
 		{
-			m_meshPointersToMesh[castedMeshPtr] = mesh;
-		}*/
+			BUCKET* levelBucket = &meshPtr->buckets[n];
+			RendererBucket* bucket;
+			int bucketIndex;
+
+			if (levelBucket->blendMode != 0)
+				bucketIndex = RENDERER_BUCKET_TRANSPARENT;
+			else
+				bucketIndex = RENDERER_BUCKET_SOLID;
+
+			bucket = &mesh->Buckets[bucketIndex];
+			
+			for (int v = 0; v < levelBucket->indices.size(); v++)
+			{
+				int index = levelBucket->indices[v];
+				MESH_VERTEX* levelVertex = &vertices[index];
+
+				RendererVertex vertex;
+
+				vertex.Position.x = levelVertex->position.x;
+				vertex.Position.y = levelVertex->position.y;
+				vertex.Position.z = levelVertex->position.z;
+
+				vertex.Normal.x = levelVertex->normal.x;
+				vertex.Normal.y = levelVertex->normal.y;
+				vertex.Normal.z = levelVertex->normal.z;
+
+				vertex.UV.x = levelVertex->textureCoordinates.x;
+				vertex.UV.y = levelVertex->textureCoordinates.y;
+
+				vertex.Color.x = levelVertex->color.x;
+				vertex.Color.y = levelVertex->color.y;
+				vertex.Color.z = levelVertex->color.z;
+				vertex.Color.w = 1.0f;
+
+				vertex.Bone = boneIndex;
+				//vertex.Index = index;
+				if (isHairs)
+					vertex.Bone = index;
+
+				mesh->Positions.push_back(vertex.Position);
+				
+				bucket->Indices.push_back(bucket->NumVertices);
+				bucket->NumVertices++;
+				bucket->Vertices.push_back(vertex);
+			}
+		}
 
 		m_meshes.push_back(mesh);
 
@@ -924,8 +747,8 @@ namespace T5M::Renderer {
 		m_rooms[roomNumber2].Room = &Rooms[roomNumber2];
 	}
 
-	RendererMesh* Renderer11::getMeshFromMeshPtr(unsigned int meshp) {
-		return m_meshPointersToMesh[meshp];
+	RendererMesh* Renderer11::getMesh(int meshIndex) {
+		return m_meshes[meshIndex];
 	}
 
 	void Renderer11::GetLaraAbsBonePosition(Vector3 * pos, int joint) {

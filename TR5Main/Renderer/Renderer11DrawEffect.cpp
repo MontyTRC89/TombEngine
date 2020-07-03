@@ -536,7 +536,7 @@ namespace T5M::Renderer {
 						updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 						m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-						m_context->DrawIndexed(flashBucket->NumIndices, flashBucket->StartIndex, 0);
+						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
 						m_numDrawCalls++;
 					}
 
@@ -549,7 +549,7 @@ namespace T5M::Renderer {
 						updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 						m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-						m_context->DrawIndexed(flashBucket->NumIndices, flashBucket->StartIndex, 0);
+						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
 						m_numDrawCalls++;
 					}
 				}
@@ -624,7 +624,7 @@ namespace T5M::Renderer {
 						updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 						m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 
-						m_context->DrawIndexed(flashBucket->NumIndices, flashBucket->StartIndex, 0);
+						m_context->DrawIndexed(flashBucket->Indices.size(), flashBucket->StartIndex, 0);
 						m_numDrawCalls++;
 					}
 				}
@@ -967,7 +967,7 @@ namespace T5M::Renderer {
 				continue;
 
 			// Draw vertices
-			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 			m_numDrawCalls++;
 		}
 

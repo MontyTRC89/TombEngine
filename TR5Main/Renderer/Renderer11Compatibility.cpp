@@ -329,7 +329,7 @@ namespace T5M::Renderer {
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 					// and vertices have bone index 0 and not 10
 					RendererMesh* mesh = getRendererMeshFromTrMesh(moveable,
-						Meshes[obj->meshIndex + j],
+						&Meshes[obj->meshIndex + j],
 						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 						MoveablesIds[i] == ID_LARA_HAIR);
 					moveable->ObjectMeshes.push_back(mesh);
@@ -341,75 +341,78 @@ namespace T5M::Renderer {
 					obj->nmeshes = 0;
 				}
 				else {
-					int* bone = &Bones[obj->boneIndex];
-
-					stack<RendererBone*> stack;
-
 					for (int j = 0; j < obj->nmeshes; j++) {
 						moveable->LinearizedBones.push_back(new RendererBone(j));
 						moveable->AnimationTransforms.push_back(Matrix::Identity);
 						moveable->BindPoseTransforms.push_back(Matrix::Identity);
 					}
 
-					RendererBone* currentBone = moveable->LinearizedBones[0];
-					RendererBone* stackBone = moveable->LinearizedBones[0];
+					if (obj->nmeshes > 1)
+					{
+						int* bone = &Bones[obj->boneIndex];
 
-					for (int mi = 0; mi < obj->nmeshes - 1; mi++) {
-						int j = mi + 1;
+						stack<RendererBone*> stack;
 
-						int opcode = *(bone++);
-						int linkX = *(bone++);
-						int linkY = *(bone++);
-						int linkZ = *(bone++);
+						RendererBone* currentBone = moveable->LinearizedBones[0];
+						RendererBone* stackBone = moveable->LinearizedBones[0];
 
-						byte flags = opcode & 0x1C;
+						for (int mi = 0; mi < obj->nmeshes - 1; mi++) {
+							int j = mi + 1;
 
-						moveable->LinearizedBones[j]->ExtraRotationFlags = flags;
+							int opcode = *(bone++);
+							int linkX = *(bone++);
+							int linkY = *(bone++);
+							int linkZ = *(bone++);
 
-						switch (opcode & 0x03) {
-						case 0:
-							moveable->LinearizedBones[j]->Parent = currentBone;
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							currentBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
+							byte flags = opcode & 0x1C;
 
-							break;
-						case 1:
-							if (stack.empty())
-								continue;
-							currentBone = stack.top();
-							stack.pop();
+							moveable->LinearizedBones[j]->ExtraRotationFlags = flags;
 
-							moveable->LinearizedBones[j]->Parent = currentBone;
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							currentBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
+							switch (opcode & 0x03) {
+							case 0:
+								moveable->LinearizedBones[j]->Parent = currentBone;
+								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								currentBone->Children.push_back(moveable->LinearizedBones[j]);
+								currentBone = moveable->LinearizedBones[j];
 
-							break;
-						case 2:
-							stack.push(currentBone);
+								break;
+							case 1:
+								if (stack.empty())
+									continue;
+								currentBone = stack.top();
+								stack.pop();
 
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							moveable->LinearizedBones[j]->Parent = currentBone;
-							currentBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
+								moveable->LinearizedBones[j]->Parent = currentBone;
+								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								currentBone->Children.push_back(moveable->LinearizedBones[j]);
+								currentBone = moveable->LinearizedBones[j];
 
-							break;
-						case 3:
-							if (stack.empty())
-								continue;
-							RendererBone* theBone = stack.top();
-							stack.pop();
+								break;
+							case 2:
+								stack.push(currentBone);
 
-							moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
-							moveable->LinearizedBones[j]->Parent = theBone;
-							theBone->Children.push_back(moveable->LinearizedBones[j]);
-							currentBone = moveable->LinearizedBones[j];
-							stack.push(theBone);
+								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								moveable->LinearizedBones[j]->Parent = currentBone;
+								currentBone->Children.push_back(moveable->LinearizedBones[j]);
+								currentBone = moveable->LinearizedBones[j];
 
-							break;
+								break;
+							case 3:
+								if (stack.empty())
+									continue;
+								RendererBone* theBone = stack.top();
+								stack.pop();
+
+								moveable->LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
+								moveable->LinearizedBones[j]->Parent = theBone;
+								theBone->Children.push_back(moveable->LinearizedBones[j]);
+								currentBone = moveable->LinearizedBones[j];
+								stack.push(theBone);
+
+								break;
+							}
 						}
-					}
+					}					
 
 					for (int n = 0; n < obj->nmeshes; n++)
 						moveable->LinearizedBones[n]->Transform = Matrix::CreateTranslation(
@@ -422,7 +425,7 @@ namespace T5M::Renderer {
 
 					// Fix Lara skin joints and hairs
 					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS) {
-						int bonesToCheck[2] = { 0,0 };
+						int BonesToCheck[2] = { 0,0 };
 
 						RendererObject* objSkin = m_moveableObjects[ID_LARA_SKIN];
 
@@ -430,8 +433,8 @@ namespace T5M::Renderer {
 							RendererMesh* jointMesh = moveable->ObjectMeshes[j];
 							RendererBone* jointBone = moveable->LinearizedBones[j];
 
-							bonesToCheck[0] = jointBone->Parent->Index;
-							bonesToCheck[1] = j;
+							BonesToCheck[0] = jointBone->Parent->Index;
+							BonesToCheck[1] = j;
 
 							for (int b1 = 0; b1 < NUM_BUCKETS; b1++) {
 								RendererBucket* jointBucket = &jointMesh->Buckets[b1];
@@ -442,8 +445,8 @@ namespace T5M::Renderer {
 									bool done = false;
 
 									for (int k = 0; k < 2; k++) {
-										RendererMesh* skinMesh = objSkin->ObjectMeshes[bonesToCheck[k]];
-										RendererBone* skinBone = objSkin->LinearizedBones[bonesToCheck[k]];
+										RendererMesh* skinMesh = objSkin->ObjectMeshes[BonesToCheck[k]];
+										RendererBone* skinBone = objSkin->LinearizedBones[BonesToCheck[k]];
 
 										for (int b2 = 0; b2 < NUM_BUCKETS; b2++) {
 											RendererBucket* skinBucket = &skinMesh->Buckets[b2];
@@ -459,10 +462,15 @@ namespace T5M::Renderer {
 												int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2) {
-													jointVertex->Bone = bonesToCheck[k];
+													jointVertex->Bone = BonesToCheck[k];
 													jointVertex->Position.x = skinVertex->Position.x;
 													jointVertex->Position.y = skinVertex->Position.y;
 													jointVertex->Position.z = skinVertex->Position.z;
+													Vector3 n = (jointVertex->Normal + skinVertex->Normal) / 2.0f;
+													n.Normalize();
+													jointVertex->Normal = n;
+													skinVertex->Normal = n;
+
 													done = true;
 													break;
 												}
@@ -485,7 +493,7 @@ namespace T5M::Renderer {
 							RendererMesh* mesh = moveable->ObjectMeshes[j];
 							for (int n = 0; n < NUM_BUCKETS; n++) {
 								m_numHairVertices += mesh->Buckets[n].NumVertices;
-								m_numHairIndices += mesh->Buckets[n].NumIndices;
+								m_numHairIndices += mesh->Buckets[n].Indices.size();
 							}
 						}
 
@@ -540,8 +548,7 @@ namespace T5M::Renderer {
 			RendererObject* staticObject = new RendererObject();
 			staticObject->Id = StaticObjectsIds[i];
 
-			short* meshPtr = Meshes[obj->meshNumber];
-			RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, Meshes[obj->meshNumber], 0, false, false);
+			RendererMesh* mesh = getRendererMeshFromTrMesh(staticObject, &Meshes[obj->meshNumber], 0, false, false);
 
 			staticObject->ObjectMeshes.push_back(mesh);
 

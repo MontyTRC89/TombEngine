@@ -742,8 +742,9 @@ void LaraInitialiseMeshes() // (AF) (D)
 {
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		MESHES(ID_LARA, i) = MESHES(ID_LARA_SKIN, i);
-		LARA_MESHES(ID_LARA, i);
+		//Meshes[i] = Meshes[MESHES(ID_LARA_SKIN, i)];
+		//LARA_MESHES(ID_LARA, MESHES(ID_LARA_SKIN, i));
+		Lara.meshPtrs[i] = Objects[ID_LARA_SKIN].meshIndex + i;
 	}
 
 	/* Hardcoded code */

@@ -2625,7 +2625,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 	hitPos->z = collidedPoint.z - itemOrStaticPos->zPos;
 
 	// Now in the case of items we need to test single spheres
-	short *meshPtr = NULL;
+	MESH* meshPtr = NULL;
 	int bit = 0;
 	int sp = -2;
 	float minDistance = SECTOR(1024);
@@ -2651,7 +2651,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 		if (obj->nmeshes <= 0)
 			return 0;
 
-		meshPtr = Meshes[obj->meshIndex];
+		meshPtr = &Meshes[obj->meshIndex];
 
 		for (int i = 0; i < obj->nmeshes; i++)
 		{
@@ -2674,7 +2674,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 					if (newDist < minDistance)
 					{
 						minDistance = newDist;
-						meshPtr = Meshes[obj->meshIndex + i];
+						meshPtr = &Meshes[obj->meshIndex + i];
 						bit = 1 << i;
 						sp = i;
 					}
@@ -3070,7 +3070,7 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.bit = 1 << Node;
-		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + Node];
+		ShatterItem.meshp = &Meshes[Objects[item->objectNumber].meshIndex + Node];
 		ShatterItem.sphere.x = CreatureSpheres[Node].x;
 		ShatterItem.sphere.y = CreatureSpheres[Node].y;
 		ShatterItem.sphere.z = CreatureSpheres[Node].z;
