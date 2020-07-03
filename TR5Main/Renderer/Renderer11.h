@@ -23,6 +23,8 @@
 
 struct CAMERA_INFO;
 
+#include <level.h>
+
 namespace T5M::Renderer
 {
 	#define MESH_BITS(x) (1 << x)
@@ -32,7 +34,7 @@ namespace T5M::Renderer
 	constexpr auto MAX_LIGHTS_DRAW = 16384;
 	constexpr auto MAX_DYNAMIC_LIGHTS = 16384;
 	constexpr auto MAX_DRAW_STATICS = 16384;
-	constexpr auto MAX_BONES = 32;
+	constexpr auto MAX_Bones = 32;
 	constexpr auto MAX_SPRITES = 16384;
 	constexpr auto REFERENCE_RES_WIDTH = 800;
 	constexpr auto REFERENCE_RES_HEIGHT = 450;
@@ -60,6 +62,7 @@ namespace T5M::Renderer
 		DirectX::SimpleMath::Vector2 UV;
 		DirectX::SimpleMath::Vector4 Color;
 		float Bone;
+		//int Index;
 	};
 	
 	
@@ -481,7 +484,7 @@ namespace T5M::Renderer
 		int m_numSprites;
 		int m_numSpritesSequences;
 		std::vector<RendererSpriteSequence> m_spriteSequences;
-		std::unordered_map<unsigned int, RendererMesh*> m_meshPointersToMesh;
+		std::unordered_map<int, RendererMesh*> m_meshPointersToMesh;
 		DirectX::SimpleMath::Matrix m_LaraWorldMatrix;
 		std::vector<RendererAnimatedTextureSet> m_animatedTextureSets;
 		int m_numAnimatedTextureSets;
@@ -531,7 +534,7 @@ namespace T5M::Renderer
 		ID3D11Buffer*									createConstantBuffer(size_t size);
 		int												getAnimatedTextureInfo(short textureId);
 		void											initialiseHairRemaps();
-		RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, short* meshPtr, short boneIndex, int isJoints, int isHairs);
+		RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
 		void											fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
 		void											buildHierarchy(RendererObject* obj);
 		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
@@ -665,7 +668,7 @@ namespace T5M::Renderer
 		int GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);
 		void GetBoneMatrix(short itemNumber, int joint, DirectX::SimpleMath::Matrix* outMatrix);
 	
-		RendererMesh* getMeshFromMeshPtr(unsigned int meshp);
+		RendererMesh* getMesh(int meshIndex);
 	private:
 		void drawFootprints();
 

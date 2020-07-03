@@ -1,34 +1,6 @@
 #pragma once
 #include <framework.h>
-
-typedef struct tr5_room_layer
-{
-	unsigned int NumLayerVertices;   // Number of vertices in this layer (4 bytes)
-	unsigned short UnknownL1;
-	unsigned short NumLayerRectangles; // Number of rectangles in this layer (2 bytes)
-	unsigned short NumLayerTriangles;  // Number of triangles in this layer (2 bytes)
-	unsigned short UnknownL2;
-	unsigned short Filler;             // Always 0
-	unsigned short Filler2;            // Always 0
-	/// The following 6 floats define the bounding box for the layer
-	float LayerBoundingBoxX1;
-	float LayerBoundingBoxY1;
-	float LayerBoundingBoxZ1;
-	float LayerBoundingBoxX2;
-	float LayerBoundingBoxY2;
-	float LayerBoundingBoxZ2;
-	unsigned int Filler3;     // Always 0 (4 bytes)
-	void* VerticesOffset;
-	void* PolyOffset;
-	void* PolyOffset2;
-};
-
-typedef struct tr5_vertex
-{
-	float x;
-	float y;
-	float z;
-};
+#include <newtypes.h>
 
 struct ROOM_VERTEX
 {
@@ -37,6 +9,7 @@ struct ROOM_VERTEX
 	Vector2 textureCoordinates;
 	Vector3 color;
 	int effects;
+	int index;
 };
 
 struct ROOM_DOOR
@@ -46,43 +19,11 @@ struct ROOM_DOOR
 	Vector3 vertices[4];
 };
 
-typedef struct tr4_mesh_face3    // 10 bytes
-{
-	short Vertices[3];
-	short Texture;
-	short Effects;    // TR4-5 ONLY: alpha blending and environment mapping strength
-};
-
-typedef struct tr4_mesh_face4    // 12 bytes
-{
-	short Vertices[4];
-	short Texture;
-	short Effects;
-};
-
 struct POLYGON
 {
 	int shape;
 	int baseIndex;
 	int texture;
-};
-
-struct BUCKET 
-{
-	int texture;
-	byte blendMode;
-	bool animated;
-	std::vector<int> indices;
-};
-
-typedef struct tr_room_sector // 8 bytes
-{
-	unsigned short FDindex;    // Index into FloorData[]
-	unsigned short BoxIndex;   // Index into Boxes[] (-1 if none)
-	unsigned char RoomBelow;  // 255 is none
-	signed char Floor;      // Absolute height of floor
-	unsigned char RoomAbove;  // 255 if none
-	signed char Ceiling;    // Absolute height of ceiling
 };
 
 typedef struct ROOM_LIGHT
@@ -157,7 +98,7 @@ struct SECTOR_COLLISION_INFO
 	SECTOR_PLANE planes[2];
 };
 
-typedef struct FLOOR_INFO
+struct FLOOR_INFO
 {
 	int index;
 	int box;
@@ -171,7 +112,7 @@ typedef struct FLOOR_INFO
 	SECTOR_COLLISION_INFO ceilingCollision;
 };
 
-typedef enum RoomEnumFlag
+enum RoomEnumFlag
 {
 	ENV_FLAG_WATER = 0x0001,
 	ENV_FLAG_SWAMP = 0x0004,
@@ -185,7 +126,7 @@ typedef enum RoomEnumFlag
 	ENV_FLAG_UNKNOWN3 = 0x0400
 };
 
-typedef struct ROOM_INFO
+struct ROOM_INFO
 {
 	int x;
 	int y;
@@ -211,7 +152,7 @@ typedef struct ROOM_INFO
 	bool boundActive;
 };
 
-typedef struct ANIM_STRUCT
+struct ANIM_STRUCT
 {
 	short* framePtr;
 	short interpolation;

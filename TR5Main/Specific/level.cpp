@@ -12,11 +12,12 @@
 #include "door.h"
 #include "box.h"
 #include "sound.h"
-#include "levelloader.h"
 #include "GameFlowScript.h"
+
 using T5M::Renderer::g_Renderer;
 using std::vector;
 using std::string;
+
 ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
 ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
 ChunkId* ChunkLuaIds = ChunkId::FromString("Tr5LuaIds");
@@ -24,17 +25,13 @@ ChunkId* ChunkLuaId = ChunkId::FromString("Tr5LuaId");
 
 extern GameScript* g_GameScript;
 
-short* RawMeshData;
-int MeshDataSize;
-int* MeshTrees;
-int* RawMeshPointers;
+std::vector<int> Bones;
+std::vector<MESH> Meshes;
 int NumObjects;
 int NumStaticObjects;
 int NumMeshPointers;
 int NumObjectTextures;
 int NumTextureTiles;
-short* MeshBase;
-short** Meshes;
 int NumItems;
 FILE* LevelFilePtr;
 
@@ -57,7 +54,6 @@ ANIM_STRUCT* Anims;
 CHANGE_STRUCT* Changes;
 RANGE_STRUCT* Ranges;
 short* Commands;
-int* Bones;
 short* Frames;
 int AnimationsCount;
 short* FloorData;
@@ -75,8 +71,6 @@ int g_NumSprites;
 int g_NumSpritesSequences;
 
 ChunkReader* g_levelChunkIO;
-
-TrLevel g_Level;
 
 short ReadInt8()
 {
@@ -187,25 +181,56 @@ void LoadObjects()
 	memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
 	memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
-	int numMeshDataWords = ReadInt32();
-	int numMeshDataBytes = 2 * numMeshDataWords;
-
-	MeshBase = (short*)game_malloc(numMeshDataBytes);
-	ReadBytes(MeshBase, numMeshDataBytes);
-
-	MeshDataSize = numMeshDataBytes;
-
-	int numMeshPointers = ReadInt32();
-	Meshes = (short**)game_malloc(sizeof(short*) * numMeshPointers);
-	ReadBytes(Meshes, sizeof(short*) * numMeshPointers);
-
-	for (int i = 0; i < numMeshPointers; i++) 
+	int numMeshes = ReadInt32();
+	Meshes.reserve(numMeshes);
+	for (int i = 0; i < numMeshes; i++)
 	{
-		Meshes[i] = &MeshBase[(int)Meshes[i] / 2];
-	}
+		MESH mesh;
 
-	int numMeshes = numMeshPointers;
-	NumMeshPointers = numMeshes;
+		mesh.sphere = BoundingSphere(Vector3(ReadFloat(), ReadFloat(), ReadFloat()), ReadFloat());
+
+		int numVertices = ReadInt32();
+		mesh.vertices.reserve(numVertices);
+		for (int j = 0; j < numVertices; j++)
+		{
+			MESH_VERTEX vertex;
+			vertex.position.x = ReadFloat();
+			vertex.position.y = ReadFloat();
+			vertex.position.z = ReadFloat();
+			vertex.normal.x = ReadFloat();
+			vertex.normal.y = ReadFloat();
+			vertex.normal.z = ReadFloat();
+			vertex.textureCoordinates.x = ReadFloat();
+			vertex.textureCoordinates.y = ReadFloat();
+			vertex.color.x = ReadFloat();
+			vertex.color.y = ReadFloat();
+			vertex.color.z = ReadFloat();
+			ReadFloat();
+			vertex.bone = ReadInt32();
+			vertex.index = ReadInt32();
+			mesh.vertices.push_back(vertex);
+		}
+
+		int numBuckets = ReadInt32();
+		mesh.buckets.reserve(numBuckets);
+		for (int j = 0; j < numBuckets; j++)
+		{
+			BUCKET bucket;
+
+			bucket.texture = ReadInt32();
+			bucket.blendMode = ReadInt8();
+			bucket.animated = ReadInt8();
+
+			int numIndices = ReadInt32();
+			bucket.indices.reserve(numIndices);
+			for (int k = 0; k < numIndices; k++)
+				bucket.indices.push_back(ReadInt32());
+
+			mesh.buckets.push_back(bucket);
+		}
+
+		Meshes.push_back(mesh);
+	}
 
 	int numAnimations = ReadInt32();
 	Anims = (ANIM_STRUCT*)game_malloc(sizeof(ANIM_STRUCT) * numAnimations);
@@ -224,21 +249,11 @@ void LoadObjects()
 	ReadBytes(Commands, sizeof(short) * numCommands);
 
 	int numBones = ReadInt32();
-	Bones = (int*)game_malloc(sizeof(int) * numBones);
-	ReadBytes(Bones, sizeof(int) * numBones);
-
-	int* bone = Bones;
-	for (int i = 0; i < 15; i++)
+	Bones.reserve(numBones);
+	for (int i = 0; i < numBones; i++)
 	{
-		int opcode = *(bone++);
-		int linkX = *(bone++);
-		int linkY = *(bone++);
-		int linkZ = *(bone++);
+		Bones.push_back(ReadInt32());
 	}
-	
-	MeshTrees = (int*)game_malloc(sizeof(int) * numBones);
-
-	memcpy(MeshTrees, Bones, sizeof(int) * numBones);
 
 	int numFrames = ReadInt32();
 	Frames = (short*)game_malloc(sizeof(short) * numFrames);
@@ -260,11 +275,11 @@ void LoadObjects()
 		MoveablesIds.push_back(objNum);
 
 		Objects[objNum].loaded = true;
-		Objects[objNum].nmeshes = ReadInt16();
-		Objects[objNum].meshIndex = ReadInt16();
+		Objects[objNum].nmeshes = (short)ReadInt16();
+		Objects[objNum].meshIndex = (short)ReadInt16();
 		Objects[objNum].boneIndex = ReadInt32();
 		Objects[objNum].frameBase = (short*)(ReadInt32() + (int)Frames); 
-		Objects[objNum].animIndex = ReadInt16();
+		Objects[objNum].animIndex = (short)ReadInt16();
 
 		ReadInt16();
 
@@ -281,7 +296,7 @@ void LoadObjects()
 		int meshID = ReadInt32();
 		StaticObjectsIds.push_back(meshID);
 
-		StaticObjects[meshID].meshNumber = ReadInt16();
+		StaticObjects[meshID].meshNumber = (short)ReadInt16();
 
 		StaticObjects[meshID].yMinp = ReadInt16();
 		StaticObjects[meshID].xMaxp = ReadInt16();
@@ -297,7 +312,7 @@ void LoadObjects()
 		StaticObjects[meshID].zMinc = ReadInt16();
 		StaticObjects[meshID].zMaxc = ReadInt16();
 
-		StaticObjects[meshID].flags = ReadInt16();
+		StaticObjects[meshID].flags = (short)ReadInt16();
 	}
 
 	// HACK: to remove after decompiling LoadSprites
@@ -442,6 +457,7 @@ void ReadRooms()
 			vertex.color.y = ReadFloat();
 			vertex.color.z = ReadFloat();
 			vertex.effects = ReadInt32();
+			vertex.index = ReadInt32();
 			room.vertices.push_back(vertex);
 		}
 
@@ -736,6 +752,9 @@ void FreeLevel()
 	StaticsTextures.clear();
 	SpritesTextures.clear();
 	ObjectTextures.clear();
+	Bones.clear();
+	Meshes.clear();
+	MoveablesIds.clear();
 	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
