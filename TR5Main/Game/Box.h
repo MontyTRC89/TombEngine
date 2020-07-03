@@ -36,14 +36,14 @@ typedef enum ZoneType
 	ZONE_APE,       // only 2 click climb
 };
 
-typedef struct OBJECT_BONES
+typedef struct OBJECT_Bones
 {
 	short bone0;
 	short bone1;
 	short bone2;
 	short bone3;
 
-	OBJECT_BONES()
+	OBJECT_Bones()
 	{
 		this->bone0 = 0;
 		this->bone1 = 0;
@@ -51,7 +51,7 @@ typedef struct OBJECT_BONES
 		this->bone3 = 0;
 	}
 
-	OBJECT_BONES(short all)
+	OBJECT_Bones(short all)
 	{
 		this->bone0 = all;
 		this->bone1 = all;
@@ -59,7 +59,7 @@ typedef struct OBJECT_BONES
 		this->bone3 = all;
 	}
 
-	OBJECT_BONES(short angleY, short angleX)
+	OBJECT_Bones(short angleY, short angleX)
 	{
 		this->bone0 = angleY;
 		this->bone1 = angleX;
@@ -67,7 +67,7 @@ typedef struct OBJECT_BONES
 		this->bone3 = angleX;
 	}
 
-	OBJECT_BONES(short angleY, short angleX, bool total)
+	OBJECT_Bones(short angleY, short angleX, bool total)
 	{
 		this->bone0 = angleY;
 		this->bone1 = angleX;

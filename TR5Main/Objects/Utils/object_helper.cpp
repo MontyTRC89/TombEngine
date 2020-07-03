@@ -67,8 +67,8 @@ void InitAnimating(ObjectInfo* obj, int objectNumber)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex + (0 * 4)] |= ROT_Y;
-		Bones[obj->boneIndex + (1 * 4)] |= ROT_X;
+		//Bones[obj->boneIndex + (0 * 4)] |= ROT_Y;
+		//Bones[obj->boneIndex + (1 * 4)] |= ROT_X;
 	}
 }
 

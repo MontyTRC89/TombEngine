@@ -117,7 +117,7 @@ namespace T5M::Renderer {
                 updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
                 m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
             }
         }
 
@@ -258,7 +258,7 @@ namespace T5M::Renderer {
         m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
 
         for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++) {
-            RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
+            RendererMesh* mesh = getMesh(Lara.meshPtrs[k]);
 
             for (int j = 0; j < 2; j++) {
                 RendererBucket* bucket = &mesh->Buckets[j];
@@ -267,7 +267,7 @@ namespace T5M::Renderer {
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -285,7 +285,7 @@ namespace T5M::Renderer {
                         continue;
 
                     // Draw vertices
-                    m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
@@ -301,7 +301,7 @@ namespace T5M::Renderer {
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -394,7 +394,7 @@ namespace T5M::Renderer {
                     if (bucket->NumVertices == 0)
                         continue;
 
-                    m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
@@ -580,7 +580,7 @@ namespace T5M::Renderer {
                         updateConstantBuffer(m_cbMisc, &m_stMisc, sizeof(CMiscBuffer));
                         m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
 
-                        m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     }
                 }
 
@@ -1355,7 +1355,7 @@ namespace T5M::Renderer {
                         effect->BeginPass(iPass);
                         effect->CommitChanges();
 
-                        drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->NumIndices / 3);
+                        drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->Indices.size() / 3);
 
                         effect->EndPass();
                     }
@@ -1386,8 +1386,7 @@ namespace T5M::Renderer {
                 RAT_STRUCT* rat = &Rats[i];
 
                 if (rat->on) {
-                    short* meshPtr = Meshes[Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8)];
-                    RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
+                    RendererMesh* mesh = getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
                     Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
                     Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->pos.yRot, rat->pos.xRot, rat->pos.zRot);
                     Matrix world = rotation * translation;
@@ -1403,7 +1402,7 @@ namespace T5M::Renderer {
                         if (bucket->NumVertices == 0)
                             continue;
 
-                        m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                         m_numDrawCalls++;
                     }
                 }
@@ -1424,9 +1423,8 @@ namespace T5M::Renderer {
 
         if (Objects[ID_BATS_EMITTER].loaded) {
             ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
-            RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];
-            short* meshPtr = Meshes[Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3)];
-            RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(meshPtr)];
+            RendererObject* moveableObj = m_moveableObjects[ID_BATS_EMITTER];     
+			RendererMesh* mesh = getMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
             for (int m = 0; m < 32; m++)
                 memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
@@ -1450,7 +1448,7 @@ namespace T5M::Renderer {
                         m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
                         updateConstantBuffer(m_cbItem, &m_stItem, sizeof(CItemBuffer));
 
-                        m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                        m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                         m_numDrawCalls++;
                     }
                 }
@@ -2074,7 +2072,7 @@ namespace T5M::Renderer {
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -2141,7 +2139,7 @@ namespace T5M::Renderer {
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -2398,7 +2396,7 @@ namespace T5M::Renderer {
                         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
                     // Draw vertices
-                    m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }

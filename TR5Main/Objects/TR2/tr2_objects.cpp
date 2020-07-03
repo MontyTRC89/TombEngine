@@ -247,7 +247,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->savePosition = true;
 		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
 		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
 	}
 
 	obj = &Objects[ID_WORKER_MACHINEGUN];
@@ -267,7 +267,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->savePosition = true;
 		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
 		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
 	}
 
 	obj = &Objects[ID_SMALL_SPIDER];
@@ -377,7 +377,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->savePosition = true;
 		//Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 		//Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
-		// TODO: find the correct for bones (knifethrower).
+		// TODO: find the correct for Bones (knifethrower).
 	}
 
 	obj = &Objects[ID_KNIFETHROWER_KNIFE];
@@ -505,7 +505,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->savePosition = true;
 		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
-		// TODO: bones value is not correct (shiva) !
+		// TODO: Bones value is not correct (shiva) !
 		// need the correct one.
 	}
 
@@ -527,7 +527,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->savePosition = true;
 		//Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 		//Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct id for bones ! (spear)
+		// TODO: get the correct id for Bones ! (spear)
 	}
 
 	obj = &Objects[ID_DRAGON_FRONT];

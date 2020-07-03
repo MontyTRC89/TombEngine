@@ -1511,13 +1511,15 @@ void undraw_shotgun(int weapon)
 void undraw_shotgun_meshes(int weapon)
 {
 	Lara.backGun = WeaponObject(weapon);
-	LARA_MESHES(ID_LARA, LM_RHAND);
+	//LARA_MESHES(ID_LARA, LM_RHAND);
+	Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void draw_shotgun_meshes(int weaponType)
 {
 	Lara.backGun = WEAPON_NONE;
-	LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
+	//LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
+	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_RHAND;
 }
 
 void DoCrossbowDamage(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)

@@ -24,12 +24,12 @@ DebrisFragment* GetFreeDebrisFragment()
 
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber,int noZXVel)
 {
-	short* meshPtr = nullptr;
+	MESH* meshPtr = nullptr;
 	RendererMesh* fragmentsMesh;
 	short yRot = 0;
 	Vector3 pos;
 	if (mesh) {
-		meshPtr = Meshes[StaticObjects[mesh->staticNumber].meshNumber];
+		meshPtr = &Meshes[StaticObjects[mesh->staticNumber].meshNumber];
 		yRot = mesh->yRot;
 		pos = Vector3(mesh->x, mesh->y, mesh->z);
 	}
@@ -38,7 +38,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 		yRot = item->yRot;
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
-	fragmentsMesh = g_Renderer.getMeshFromMeshPtr(reinterpret_cast<unsigned int>(meshPtr));
+	fragmentsMesh = g_Renderer.getMesh(0);
 	for (int bucket = RENDERER_BUCKET_SOLID; bucket <= RENDERER_BUCKET_TRANSPARENT; bucket++) {
 		RendererBucket renderBucket = fragmentsMesh->Buckets[bucket];
 		vector<RendererVertex>* meshVertices = &renderBucket.Vertices;

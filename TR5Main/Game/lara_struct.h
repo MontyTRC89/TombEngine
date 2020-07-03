@@ -835,7 +835,7 @@ typedef struct LaraInfo
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;
 	int meshEffects;
-	short* meshPtrs[NUM_LARA_MESHES];
+	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
 	short targetAngles[2];
 	short turnRate;
