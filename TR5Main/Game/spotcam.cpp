@@ -570,7 +570,7 @@ void CalculateSpotCameras()
 			}
 		}
 
-		LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+		LookAt(&Camera, 0);
 
 		if (CheckTrigger)
 		{
@@ -874,7 +874,7 @@ void CalculateSpotCameras()
 
 					Camera.targetElevation = elevation;
 
-					LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, croll);
+					LookAt(&Camera, croll);
 
 					SplineToCamera = 1;
 				}

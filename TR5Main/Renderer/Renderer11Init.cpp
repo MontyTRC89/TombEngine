@@ -3,6 +3,7 @@
 #include "configuration.h"
 #include "winmain.h"
 #include "GameFlowScript.h"
+#include "Quad/RenderQuad.h"
 using namespace T5M::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
@@ -189,9 +190,10 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer(sizeof(CHUDBarBuffer));
 	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
+	m_cbSprite = createConstantBuffer(sizeof(CSpriteBuffer));
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
 	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
-	updateConstantBuffer(m_cbHUD, &m_stHUD, sizeof(CHUDBuffer));
+	updateConstantBuffer<CHUDBuffer>(m_cbHUD, m_stHUD);
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
@@ -230,6 +232,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_device->CreateBlendState(&blendStateDesc, &m_subtractiveBlendState);
 	initialiseBars();
+	initQuad(m_device);
 	return true;
 }
 
@@ -334,7 +337,7 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	m_renderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_shadowMap = RenderTarget2D(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
-
+	m_reflectionCubemap = RenderTargetCube(m_device, 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	// Shadow map
 	/*D3D11_TEXTURE2D_DESC depthTexDesc;
 	ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));

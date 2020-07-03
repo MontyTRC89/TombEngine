@@ -52,27 +52,31 @@ struct PixelShaderInput
 	float3 WorldPosition : POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
+	float3 ReflectionVector : TEXCOORD1;
 };
 
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
+TextureCube Reflection : register (t1);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
 	float4x4 world = mul(Bones[input.Bone], World);
-
+	float3 Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
+	float3 WorldPosition = (mul(float4(input.Position, 1.0f), world));
+	float3 ReflectionVector = reflect(normalize(-CamDirectionWS.xyz), normalize(Normal));
 	output.Position = mul(mul(float4(input.Position, 1.0f), world), ViewProjection);
-	output.Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
+	output.Normal = Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
-	output.WorldPosition = (mul(float4(input.Position, 1.0f), world));
+	output.WorldPosition = WorldPosition;
+	output.ReflectionVector = ReflectionVector;
 
 	return output;
 }
 
-[earlydepthstencil]
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
@@ -80,7 +84,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		clip(output.w - 0.5f);
 
 	float3 lighting = AmbientLight.xyz * 2.0f;
-
+	float4 reflectionColor = Reflection.Sample(Sampler,input.ReflectionVector.xyz);
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Position.w;
@@ -102,9 +106,12 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float attenuation = (radius - distance) / radius;
 
 			float d = dot(input.Normal, lightVec);
+			d *= 0.5;
+			d += 0.5f;
+			d *= d;
 			if (d < 0)
 				continue;
-
+			
 			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + lightVec);
 			float s = pow(saturate(dot(h, input.Normal)), 0.5f);
 
@@ -119,9 +126,12 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			direction = normalize(direction);
 
 			float d = dot(input.Normal, direction);
+			d *= 0.5;
+			d += 0.5f;
+			d *= d;
 			if (d < 0)
 				continue;
-
+			
 			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + direction);
 			float s = pow(saturate(dot(h, input.Normal)), 0.5f);
 			
@@ -151,6 +161,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float attenuation = (range - distance) / range * (inCone - outAngle) / (1.0f - outAngle);
 
 			float d = dot(input.Normal, lightVec);
+			d *= 0.5;
+			d += 0.5f;
+			d *= d;
 			if (d < 0)
 				continue;
 
@@ -161,7 +174,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		}
 	}
 
-	output.xyz *= lighting.xyz;
-
+	output.xyz *= lighting.xyz*2;
 	return output;
 }
