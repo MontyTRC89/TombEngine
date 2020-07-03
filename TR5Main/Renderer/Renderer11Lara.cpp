@@ -136,6 +136,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		laraObj->AnimationTransforms[m] = item->AnimationTransforms[m];
 
 	// At this point, Lara's matrices are ready. Now let's do ponytails...
+	// TODO: disabled for now
+	/*
 	if (m_moveableObjects[ID_LARA_HAIR] != NULL)
 	{
 		RendererObject* hairsObj = m_moveableObjects[ID_LARA_HAIR];
@@ -262,7 +264,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				}
 			}
 		}
-	}
+	}*/
 
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
@@ -334,7 +336,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 	{
-		RendererMesh* mesh = m_meshPointersToMesh[reinterpret_cast<unsigned int>(Lara.meshPtrs[k])];
+		RendererMesh* mesh = getMesh(Lara.meshPtrs[k]);
 
 		for (int j = firstBucket; j < lastBucket; j++)
 		{
@@ -344,7 +346,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 				continue;
 
 			// Draw vertices
-			m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 			m_numDrawCalls++;
 		}
 	}
@@ -365,7 +367,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 				m_numDrawCalls++;
 			}
 		}
@@ -373,7 +375,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 
 	if (!transparent)
 	{
-		for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
+		/*for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = laraSkin->ObjectMeshes[k];
 
@@ -385,13 +387,13 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket->NumIndices, bucket->StartIndex, 0);
+				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 				m_numDrawCalls++;
 			}
-		}
+		}*/
 
 		// Hairs are pre-transformed
-		Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
+		/*Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
 							   Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
 		m_stItem.World = Matrix::Identity;
@@ -402,7 +404,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, (const uint16_t*)m_hairIndices.data(), m_numHairIndices, m_hairVertices.data(), m_numHairVertices);
 			m_primitiveBatch->End();
-		}
+		}*/
 	}
 
 	return true;

@@ -699,9 +699,6 @@
     <ClInclude Include="Game\lara_struct.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Specific\levelloader.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Specific\newtypes.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1422,9 +1419,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\trmath.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Specific\levelloader.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Objects\TR5\Light\tr5_light.cpp">

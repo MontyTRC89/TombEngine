@@ -261,7 +261,7 @@ void MutantControl(short itemNumber)
     ITEM_INFO* item;
     CREATURE_INFO* mutant;
     AI_INFO info;
-    OBJECT_BONES mutant_joint;
+    OBJECT_Bones mutant_joint;
     short frameNumber;
     short headY;
     short angle;
@@ -337,9 +337,9 @@ void MutantControl(short itemNumber)
     }
 
     if (item->currentAnimState != MUTANT_LOCUST1)
-        mutant_joint = OBJECT_BONES(headY, info.xAngle, true);
+        mutant_joint = OBJECT_Bones(headY, info.xAngle, true);
     else
-        mutant_joint = OBJECT_BONES(0);
+        mutant_joint = OBJECT_Bones(0);
 
     CreatureJoint(item, 0, mutant_joint.bone0);
     CreatureJoint(item, 1, mutant_joint.bone1);

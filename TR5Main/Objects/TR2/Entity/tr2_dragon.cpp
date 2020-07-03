@@ -134,7 +134,7 @@ static void createExplosion(ITEM_INFO* item)
 
 static void createDragonBone(short front_number)
 {
-	/* Create the bones of the dragon */
+	/* Create the Bones of the dragon */
 	short bone_back, bone_front;
 	ITEM_INFO* back_dragon, *front_dragon, *item;
 
@@ -239,7 +239,8 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.hitDirection = -1;
 
-				LARA_MESHES(ID_LARA_EXTRA_ANIMS, LM_RHAND);
+				//LARA_MESHES(ID_LARA_EXTRA_ANIMS, LM_RHAND);
+				Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
 				/* Do cinematic camera */
 				Camera.type = CINEMATIC_CAMERA;
