@@ -1,43 +1,44 @@
 #include "framework.h"
 #include "malloc.h"
-
-
+#include "qmalloc.h"
+#if REPLACE_HEAP_MEMORY
+#include <new>
+#endif
 char* malloc_buffer;
 int malloc_size;
 char* malloc_ptr;
 int malloc_free;
 int malloc_used;
 
-char* game_malloc(int size)
+void* game_malloc(int size)
 {
-	char* ptr;
-
-	size = (size + 3) & 0xfffffffc;
-	if (size <= malloc_free)
-	{
-		ptr = malloc_ptr;
-		malloc_free -= size;
-		malloc_used += size;
-		malloc_ptr += size;
-		return ptr;
-	}
-
-	return 0;
+	return T5M::Memory::malloc(size);
 }
 
 void init_game_malloc()
 {
-	malloc_size = 1048576 * 128;
-	malloc_buffer = (char*)malloc(malloc_size);
-	malloc_ptr = malloc_buffer;
-	malloc_free = malloc_size;
-	malloc_used = 0;
 }
 
-void game_free(int size, int type)
+void game_free(void* ptr)
 {
-	size = (size + 3) & (~3); 
-	malloc_ptr -= size;
-	malloc_free += size;
-	malloc_used -= size;
+	T5M::Memory::free(ptr);
 }
+
+#if REPLACE_HEAP_MEMORY
+void* operator new(size_t sz) {
+#if _DEBUG_MEM
+	std::printf("global op new called, size = %zu\n", sz);
+#endif
+	void* ptr = game_malloc(sz);
+	if (ptr)
+		return ptr;
+	else
+		throw std::bad_alloc{};
+}
+void operator delete(void* ptr) noexcept {
+#if _DEBUG_MEM
+	std::puts("global op delete called");
+#endif
+	game_free(ptr);
+}
+#endif
