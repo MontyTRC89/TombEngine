@@ -81,7 +81,7 @@ void InitialiseMotorbike(short itemNumber)
     MOTORBIKE_INFO* motorbike;
 
     item = &Items[itemNumber];
-    motorbike = (MOTORBIKE_INFO*)game_malloc(sizeof(MOTORBIKE_INFO));
+    motorbike = game_malloc<MOTORBIKE_INFO>();
     item->data = (void*)motorbike;
     motorbike->velocity = 0;
     motorbike->bikeTurn = 0;

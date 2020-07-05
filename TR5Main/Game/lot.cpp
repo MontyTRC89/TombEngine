@@ -15,13 +15,13 @@ CREATURE_INFO* BaddieSlots;
 void InitialiseLOTarray(int allocMem)
 {
 	if (allocMem)
-		BaddieSlots = (CREATURE_INFO*)game_malloc(sizeof(CREATURE_INFO) * NUM_SLOTS);
+		BaddieSlots = game_malloc<CREATURE_INFO>(NUM_SLOTS);
 
 	CREATURE_INFO* creature = BaddieSlots;
 	for (int i = 0; i < NUM_SLOTS; i++, creature++)
 	{
 		creature->itemNum = NO_ITEM;
-		creature->LOT.node = (BOX_NODE*)game_malloc(sizeof(BOX_NODE) * NumberBoxes);
+		creature->LOT.node = game_malloc<BOX_NODE>(NumberBoxes);
 	}
 
 	SlotsUsed = 0;

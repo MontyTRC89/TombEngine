@@ -1244,11 +1244,11 @@ void InitialiseTR5Objects()
 void AllocTR5Objects()
 {
 	if (Objects[ID_BATS_EMITTER].loaded)
-		Bats = (BAT_STRUCT*)game_malloc(NUM_BATS * sizeof(BAT_STRUCT));
+		Bats = game_malloc<BAT_STRUCT>(NUM_BATS);
 
 	if (Objects[ID_SPIDERS_EMITTER].loaded)
-		Spiders = (SPIDER_STRUCT*)game_malloc(NUM_SPIDERS * sizeof(SPIDER_STRUCT));
+		Spiders = game_malloc<SPIDER_STRUCT>(NUM_SPIDERS);
 
 	if (Objects[ID_RATS_EMITTER].loaded)
-		Rats = (RAT_STRUCT*)game_malloc(NUM_RATS * sizeof(RAT_STRUCT));
+		Rats = game_malloc<RAT_STRUCT>(NUM_RATS);
 }
