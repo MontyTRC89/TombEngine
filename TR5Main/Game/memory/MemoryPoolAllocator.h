@@ -15,9 +15,9 @@ namespace T5M::Memory {
  */
     template <class T>
     class MemoryPoolAllocator {
-    private:
-        MemoryPool& pool;
+        
     public:
+        MemoryPool& pool;
         // type definitions
         using value_type = T;
         using pointer = T*;
@@ -29,7 +29,7 @@ namespace T5M::Memory {
         // rebind allocator to type U
         template <class U>
         struct rebind {
-            using other = MemoryPoolAllocator<U> ;
+            using other = MemoryPoolAllocator<U>;
         };
 
         // return address of values
@@ -43,15 +43,18 @@ namespace T5M::Memory {
         /* constructors and destructor
             * - nothing to do because the allocator has no state
             */
-        MemoryPoolAllocator(MemoryPool& pool) : pool(pool)  throw() {}
-        MemoryPoolAllocator(const MemoryPoolAllocator&) throw() {}
+        MemoryPoolAllocator(MemoryPool& pool) : pool(pool) {}
+        MemoryPoolAllocator(const MemoryPoolAllocator& arg) : pool(arg.pool) {};
         template <class U>
-        MemoryPoolAllocator(const MemoryPoolAllocator<U>&) throw() {}
-        ~MemoryPoolAllocator() throw() {}
+        MemoryPoolAllocator(const MemoryPoolAllocator<U>& arg) : pool(arg.pool) {};
+        ~MemoryPoolAllocator() = default;
 
         // return maximum number of elements that can be allocated
-        size_type max_size() const throw() {
+        size_type max_size() const {
+#pragma push_macro("max")
+#undef max
             return std::numeric_limits<std::size_t>::max() / sizeof(T);
+#pragma pop_macro("max")
         }
 
         // allocate but don't initialize num elements of type T
@@ -63,7 +66,7 @@ namespace T5M::Memory {
         // initialize elements of allocated storage p with value value
         void construct(pointer p, const T& value) {
             // initialize memory with placement new
-            new((void*)p)T(value);
+            new(p)T(value);
         }
 
         // destroy elements of initialized storage p
@@ -74,7 +77,7 @@ namespace T5M::Memory {
 
         // deallocate storage p of deleted elements
         void deallocate(pointer p, size_type num) {
-            this->pool.free((void*)p);
+           pool.free(p);
         }
     };
 }

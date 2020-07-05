@@ -8,8 +8,8 @@ namespace T5M::Memory {
 	};
 	class MemoryPool {
 	private:
-		size_t pageSize;
-		size_t size;
+		const size_t pageSize;
+		const size_t size;
 		uint8_t* arena;
 		int* _arena_metadata = 0;
 		unsigned char* _arena_data = 0;
@@ -18,7 +18,7 @@ namespace T5M::Memory {
 		static constexpr unsigned int MALLOC_MAGIC = 0xDEADBEEF;
 
 	public:
-		MemoryPool(MemoryUnit unit, size_t amount, size_t pageSize) : pageSize(pageSize), size(static_cast<size_t>(unit)* amount), arena(new uint8_t[size]{ 0 }) {
+		MemoryPool(MemoryUnit unit, size_t amount, size_t pageSize) : pageSize(pageSize), size(static_cast<size_t>(unit)* amount), arena(new uint8_t[size]{0}) {
 			init();
 		}
 		~MemoryPool() {
@@ -41,12 +41,13 @@ namespace T5M::Memory {
 
 			pages = 1 + ((sizeof(T)*count - 1) / pageSize);
 			n = findspot(pages);
-			if (n < 0) std::exception("Memory Pool is exhausted!");
-			retval = (T*)(_arena_data + (n * pageSize));
+			if (n < 0) [[unlikely]] {
+				std::exception("Memory Pool is exhausted!");
+			}
 #if _DEBUG
 			printf("malloc: for %d bytes -> %08X\n", size, retval);
 #endif
-			return retval;
+			return (T*)(_arena_data + (n * pageSize));
 		}
 		/*
 		 * Frees the occupied memory of ptr
