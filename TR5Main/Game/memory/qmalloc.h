@@ -34,18 +34,17 @@ namespace T5M::Memory {
 		 * Reserves Memory of type T with an additional count
 		 **/
 		template<typename T>
-		T* malloc(size_t count = 1) noexcept {
+		T* malloc(size_t count = 1) {
 			int pages;
 			int n;
-			T* retval;
 
 			pages = 1 + ((sizeof(T)*count - 1) / pageSize);
 			n = findspot(pages);
 			if (n < 0) [[unlikely]] {
-				std::exception("Memory Pool is exhausted!");
+				throw std::exception("Memory Pool is exhausted!");
 			}
 #if _DEBUG
-			printf("malloc: for %d bytes -> %08X\n", size, retval);
+			printf("malloc: for %d bytes -> %08X\n", size, (_arena_data + (n * pageSize)));
 #endif
 			return (T*)(_arena_data + (n * pageSize));
 		}

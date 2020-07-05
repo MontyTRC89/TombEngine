@@ -798,7 +798,7 @@ void InitialiseMineCart(short itemNum)
 	CART_INFO* cart;
 
 	v = &Items[itemNum];
-	cart = (CART_INFO*)game_malloc(sizeof(CART_INFO));
+	cart = game_malloc<CART_INFO>();
 	v->data = (void*)cart;
 	cart->Flags = NULL;
 	cart->Speed = 0;
