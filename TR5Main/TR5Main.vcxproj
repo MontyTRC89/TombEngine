@@ -134,8 +134,9 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
     <ClInclude Include="Game\lara_struct.h" />
+    <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Game\phd_global.h" />
-    <ClInclude Include="Game\qmalloc.h" />
+    <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Game\smoke.h" />
     <ClInclude Include="Game\spark.h" />
@@ -383,7 +384,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\tomb4fx.h" />
     <ClInclude Include="Game\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
-    <ClInclude Include="Game\malloc.h" />
+    <ClInclude Include="Game\memory\malloc.h" />
     <ClInclude Include="Game\trmath.h" />
     <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\init.h" />
@@ -408,7 +409,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\explosion.cpp" />
     <ClCompile Include="Game\footprint.cpp" />
     <ClCompile Include="Game\misc.cpp" />
-    <ClCompile Include="Game\qmalloc.cpp" />
+    <ClCompile Include="Game\memory\qmalloc.cpp" />
     <ClCompile Include="Game\trmath.cpp" />
     <ClCompile Include="Game\smoke.cpp" />
     <ClCompile Include="Game\spark.cpp" />
@@ -616,7 +617,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\text.cpp" />
     <ClCompile Include="Game\tomb4fx.cpp" />
     <ClCompile Include="Game\traps.cpp" />
-    <ClCompile Include="Game\malloc.cpp" />
+    <ClCompile Include="Game\memory\malloc.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
