@@ -10,11 +10,7 @@ char* malloc_ptr;
 int malloc_free;
 int malloc_used;
 using namespace T5M::Memory;
-MemoryPool* gameMemory = nullptr;
-void* game_malloc(int size)
-{
-	return gameMemory->malloc<uint8_t>(size);
-}
+MemoryPool* gameMemory;
 
 void init_game_malloc()
 {

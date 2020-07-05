@@ -63,7 +63,7 @@ void InitialiseSkidoo(short itemNum)
 	SKIDOO_INFO* skinfo;
 
 	skidoo = &Items[itemNum];
-	skinfo = (SKIDOO_INFO*)game_malloc(sizeof(SKIDOO_INFO));
+	skinfo = game_malloc<SKIDOO_INFO>();
 	skidoo->data = (void*)skinfo;
 	skinfo->already_cd_played = false;
 
