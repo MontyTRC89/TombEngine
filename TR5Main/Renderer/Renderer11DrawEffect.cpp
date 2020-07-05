@@ -545,7 +545,7 @@ namespace T5M::Renderer {
 			for (int b = 0; b < NUM_BUCKETS; b++) {
 				RendererBucket* flashBucket = &flashMesh->Buckets[b];
 
-				if (flashBucket->NumVertices != 0) {
+				if (flashBucket->Vertices.size() != 0) {
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
@@ -632,7 +632,7 @@ namespace T5M::Renderer {
 				for (int b = 0; b < NUM_BUCKETS; b++) {
 					RendererBucket* flashBucket = &flashMesh->Buckets[b];
 
-					if (flashBucket->NumVertices != 0) {
+					if (flashBucket->Vertices.size() != 0) {
 						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
 						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
 						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));

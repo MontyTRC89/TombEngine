@@ -113,7 +113,7 @@ namespace T5M::Renderer
             for (int m = 0; m < NUM_BUCKETS; m++)
             {
                 RendererBucket *bucket = &mesh->Buckets[m];
-                if (bucket->NumVertices == 0)
+                if (bucket->Vertices.size() == 0)
                     continue;
 
                 if (m < 2)
@@ -431,7 +431,7 @@ namespace T5M::Renderer
                 {
                     RendererBucket *bucket = &mesh->Buckets[b];
 
-                    if (bucket->NumVertices == 0)
+                    if (bucket->Vertices.size() == 0)
                         continue;
 
                     m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -613,7 +613,7 @@ namespace T5M::Renderer
                     for (int m = 0; m < NUM_BUCKETS; m++)
                     {
                         RendererBucket *bucket = &mesh->Buckets[m];
-                        if (bucket->NumVertices == 0)
+                        if (bucket->Vertices.size() == 0)
                             continue;
 
                         if (m < 2)
@@ -1488,7 +1488,7 @@ namespace T5M::Renderer
                     {
                         RendererBucket *bucket = &mesh->Buckets[b];
 
-                        if (bucket->NumVertices == 0)
+                        if (bucket->Vertices.size() == 0)
                             continue;
 
                         m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -1524,7 +1524,7 @@ namespace T5M::Renderer
             {
                 RendererBucket *bucket = &mesh->Buckets[b];
 
-                if (bucket->NumVertices == 0)
+                if (bucket->Vertices.size() == 0)
                     continue;
 
                 for (int i = 0; i < NUM_BATS; i++)

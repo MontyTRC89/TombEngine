@@ -5,6 +5,7 @@
 #include "setup.h"
 #include "control.h"
 #include "objects.h"
+#include <lara_struct.h>
 using std::optional;
 using std::stack;
 using std::vector;
@@ -150,10 +151,8 @@ namespace T5M::Renderer
 			//r.LightsToDraw = vector<RendererLight*>(MAX_LIGHTS);
 			r.Statics.resize(room->mesh.size());
 
-			if (room->vertices.size() == 0)
+			if (room->positions.size() == 0)
 				continue;
-
-			ROOM_VERTEX *vertices = room->vertices.data();
 
 			for (int n = 0; n < room->buckets.size(); n++)
 			{
@@ -166,43 +165,58 @@ namespace T5M::Renderer
 				else
 					bucketIndex = RENDERER_BUCKET_SOLID;
 
-				//if (!levelBucket->animated)
-				//{
 				bucket = &r.Buckets[bucketIndex];
-				/*}
-				else
+
+				bucket->Vertices.reserve(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+				bucket->Indices.reserve(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+
+				for (int p = 0; p < levelBucket->polygons.size(); p++)
 				{
-					bucket = &r.AnimatedBuckets[bucketIndex];
-				}*/
+					POLYGON* poly = &levelBucket->polygons[p];
 
-				for (int v = 0; v < levelBucket->indices.size(); v++)
-				{
-					int index = levelBucket->indices[v];
-					ROOM_VERTEX *levelVertex = &vertices[index];
+					int baseVertices = bucket->Vertices.size();
 
-					RendererVertex vertex;
+					for (int k = 0; k < poly->indices.size(); k++)
+					{
+						RendererVertex vertex;
+						int v = poly->indices[k];
 
-					vertex.Position.x = room->x + levelVertex->position.x;
-					vertex.Position.y = room->y + levelVertex->position.y;
-					vertex.Position.z = room->z + levelVertex->position.z;
+						vertex.Position.x = room->x + room->positions[v].x;
+						vertex.Position.y = room->y + room->positions[v].y;
+						vertex.Position.z = room->z + room->positions[v].z;
 
-					vertex.Normal.x = levelVertex->normal.x;
-					vertex.Normal.y = levelVertex->normal.y;
-					vertex.Normal.z = levelVertex->normal.z;
+						vertex.Normal.x = room->normals[v].x;
+						vertex.Normal.y = room->normals[v].y;
+						vertex.Normal.z = room->normals[v].z;
 
-					vertex.UV.x = levelVertex->textureCoordinates.x;
-					vertex.UV.y = levelVertex->textureCoordinates.y;
+						vertex.UV.x = poly->textureCoordinates[k].x;
+						vertex.UV.y = poly->textureCoordinates[k].y;
 
-					vertex.Color.x = levelVertex->color.x;
-					vertex.Color.y = levelVertex->color.y;
-					vertex.Color.z = levelVertex->color.z;
-					vertex.Color.w = 1.0f;
+						vertex.Color.x = room->colors[v].x;
+						vertex.Color.y = room->colors[v].y;
+						vertex.Color.z = room->colors[v].z;
+						vertex.Color.w = 1.0f;
 
-					vertex.Bone = 0;
+						vertex.Bone = 0;
 
-					bucket->Indices.push_back(bucket->NumVertices);
-					bucket->NumVertices++;
-					bucket->Vertices.push_back(vertex);
+						bucket->Vertices.push_back(vertex);
+					}
+
+					if (poly->shape == 0)
+					{
+						bucket->Indices.push_back(baseVertices);
+						bucket->Indices.push_back(baseVertices + 1);
+						bucket->Indices.push_back(baseVertices + 3);
+						bucket->Indices.push_back(baseVertices + 2);
+						bucket->Indices.push_back(baseVertices + 3);
+						bucket->Indices.push_back(baseVertices + 1);
+					}
+					else
+					{
+						bucket->Indices.push_back(baseVertices);
+						bucket->Indices.push_back(baseVertices + 1);
+						bucket->Indices.push_back(baseVertices + 2);
+					}
 				}
 			}
 
@@ -294,6 +308,9 @@ namespace T5M::Renderer
 		vector<int> moveablesIndices;
 		int baseMoveablesVertex = 0;
 		int baseMoveablesIndex = 0;
+
+		bool skinPresent = false;
+		bool hairsPresent = false;
 
 		// Step 3: prepare moveables
 		for (int i = 0; i < MoveablesIds.size(); i++)
@@ -434,6 +451,7 @@ namespace T5M::Renderer
 					// Fix Lara skin joints and hairs
 					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
 					{
+						skinPresent = true;
 						int BonesToCheck[2] = {0, 0};
 
 						RendererObject &objSkin = *m_moveableObjects[ID_LARA_SKIN];
@@ -501,12 +519,13 @@ namespace T5M::Renderer
 
 					if (MoveablesIds[i] == ID_LARA_HAIR)
 					{
+						hairsPresent = true;
 						for (int j = 0; j < moveable.ObjectMeshes.size(); j++)
 						{
 							RendererMesh *mesh = moveable.ObjectMeshes[j];
 							for (int n = 0; n < NUM_BUCKETS; n++)
 							{
-								m_numHairVertices += mesh->Buckets[n].NumVertices;
+								m_numHairVertices += mesh->Buckets[n].Vertices.size();
 								m_numHairIndices += mesh->Buckets[n].Indices.size();
 							}
 						}
