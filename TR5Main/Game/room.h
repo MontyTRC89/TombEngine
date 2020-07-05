@@ -19,13 +19,6 @@ struct ROOM_DOOR
 	Vector3 vertices[4];
 };
 
-struct POLYGON
-{
-	int shape;
-	int baseIndex;
-	int texture;
-};
-
 typedef struct ROOM_LIGHT
 {
 	float x, y, z;       // Position of light, in world coordinates
@@ -133,7 +126,9 @@ struct ROOM_INFO
 	int z;
 	int minfloor;
 	int maxceiling;
-	std::vector<ROOM_VERTEX> vertices;
+	std::vector<Vector3> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector3> colors;
 	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
 	int xSize;

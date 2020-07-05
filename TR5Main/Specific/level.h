@@ -84,13 +84,17 @@ struct MESH_VERTEX
 	Vector2 textureCoordinates;
 	Vector3 color;
 	int bone;
-	int index;
+	int indexInPoly;
+	int originalIndex;
 };
 
 struct MESH
 {
 	BoundingSphere sphere;
-	std::vector<MESH_VERTEX> vertices;
+	std::vector<Vector3> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector3> colors;
+	std::vector<int> bones;
 	std::vector<BUCKET> buckets;
 };
 

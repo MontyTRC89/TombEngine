@@ -107,6 +107,23 @@ float ReadFloat()
 	return value;
 }
 
+Vector2 ReadVector2()
+{
+	Vector2 value;
+	value.x = ReadFloat();
+	value.y = ReadFloat();
+	return value;
+}
+
+Vector3 ReadVector3()
+{
+	Vector3 value;
+	value.x = ReadFloat();
+	value.y = ReadFloat();
+	value.z = ReadFloat();
+	return value;
+}
+
 void ReadBytes(void* dest, int count)
 {
 	memcpy(dest, LevelDataPtr, count);
@@ -187,30 +204,25 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.sphere = BoundingSphere(Vector3(ReadFloat(), ReadFloat(), ReadFloat()), ReadFloat());
+		mesh.sphere.Center.x = ReadFloat();
+		mesh.sphere.Center.y = ReadFloat();
+		mesh.sphere.Center.z = ReadFloat();
+		mesh.sphere.Radius = ReadFloat();
 
 		int numVertices = ReadInt32();
-		mesh.vertices.reserve(numVertices);
-		for (int j = 0; j < numVertices; j++)
-		{
-			MESH_VERTEX vertex;
-			vertex.position.x = ReadFloat();
-			vertex.position.y = ReadFloat();
-			vertex.position.z = ReadFloat();
-			vertex.normal.x = ReadFloat();
-			vertex.normal.y = ReadFloat();
-			vertex.normal.z = ReadFloat();
-			vertex.textureCoordinates.x = ReadFloat();
-			vertex.textureCoordinates.y = ReadFloat();
-			vertex.color.x = ReadFloat();
-			vertex.color.y = ReadFloat();
-			vertex.color.z = ReadFloat();
-			ReadFloat();
-			vertex.bone = ReadInt32();
-			vertex.index = ReadInt32();
-			mesh.vertices.push_back(vertex);
-		}
 
+		mesh.positions.resize(numVertices);
+		ReadBytes(mesh.positions.data(), 12 * numVertices);
+
+		mesh.normals.resize(numVertices);
+		ReadBytes(mesh.normals.data(), 12 * numVertices);
+
+		mesh.colors.resize(numVertices);
+		ReadBytes(mesh.colors.data(), 12 * numVertices);
+
+		mesh.bones.resize(numVertices);
+		ReadBytes(mesh.bones.data(), 4 * numVertices);
+		
 		int numBuckets = ReadInt32();
 		mesh.buckets.reserve(numBuckets);
 		for (int j = 0; j < numBuckets; j++)
@@ -220,11 +232,31 @@ void LoadObjects()
 			bucket.texture = ReadInt32();
 			bucket.blendMode = ReadInt8();
 			bucket.animated = ReadInt8();
+			bucket.numQuads = 0;
+			bucket.numTriangles = 0;
 
-			int numIndices = ReadInt32();
-			bucket.indices.reserve(numIndices);
-			for (int k = 0; k < numIndices; k++)
-				bucket.indices.push_back(ReadInt32());
+			int numPolygons = ReadInt32();
+			bucket.polygons.reserve(numPolygons);
+			for (int k = 0; k < numPolygons; k++)
+			{
+				POLYGON poly;
+
+				poly.shape = ReadInt32();
+				int count = (poly.shape == 0 ? 4 : 3);
+				
+				poly.indices.resize(count);
+				ReadBytes(poly.indices.data(), 4 * count);
+
+				poly.textureCoordinates.resize(count);
+				ReadBytes(poly.textureCoordinates.data(), 8 * count);
+
+				bucket.polygons.push_back(poly);
+
+				if (poly.shape == 0)
+					bucket.numQuads++;
+				else
+					bucket.numTriangles++;
+			}
 
 			mesh.buckets.push_back(bucket);
 		}
@@ -249,11 +281,8 @@ void LoadObjects()
 	ReadBytes(Commands, sizeof(short) * numCommands);
 
 	int numBones = ReadInt32();
-	Bones.reserve(numBones);
-	for (int i = 0; i < numBones; i++)
-	{
-		Bones.push_back(ReadInt32());
-	}
+	Bones.resize(numBones);
+	ReadBytes(Bones.data(), 4 * numBones);
 
 	int numFrames = ReadInt32();
 	Frames = game_malloc<short>(numFrames);
@@ -342,6 +371,7 @@ void LoadTextures()
 
 	int numTextures;
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	RoomTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -359,6 +389,7 @@ void LoadTextures()
 	}
 
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	MoveablesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -366,16 +397,17 @@ void LoadTextures()
 		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
 		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
 		ReadFileEx(&texture.size, 1, 4, LevelFilePtr);
-		texture.data.reserve(texture.size);
-		byte* buffer = (byte*)malloc(texture.size);
-		ReadFileEx(buffer, 1, texture.size, LevelFilePtr);
-		std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
-		free(buffer);
+		texture.data.resize(texture.size);
+		//byte* buffer = (byte*)malloc(texture.size);
+		ReadFileEx(texture.data.data(), 1, texture.size, LevelFilePtr);
+		//std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+		//free(buffer);
 
 		MoveablesTextures.push_back(texture);
 	}
 
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	StaticsTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -383,16 +415,17 @@ void LoadTextures()
 		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
 		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
 		ReadFileEx(&texture.size, 1, 4, LevelFilePtr);
-		texture.data.reserve(texture.size);
-		byte* buffer = (byte*)malloc(texture.size);
-		ReadFileEx(buffer, 1, texture.size, LevelFilePtr);
-		std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
-		free(buffer);
+		texture.data.resize(texture.size);
+		//byte* buffer = (byte*)malloc(texture.size);
+		ReadFileEx(texture.data.data(), 1, texture.size, LevelFilePtr);
+		//std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+		//free(buffer);
 
 		StaticsTextures.push_back(texture);
 	}
 
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	SpritesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -400,11 +433,11 @@ void LoadTextures()
 		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
 		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
 		ReadFileEx(&texture.size, 1, 4, LevelFilePtr);
-		texture.data.reserve(texture.size);
-		byte* buffer = (byte*)malloc(texture.size);
-		ReadFileEx(buffer, 1, texture.size, LevelFilePtr);
-		std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
-		free(buffer);
+		texture.data.resize(texture.size);
+		//byte* buffer = (byte*)malloc(texture.size);
+		ReadFileEx(texture.data.data(), 1, texture.size, LevelFilePtr);
+		//std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+		//free(buffer);
 
 		SpritesTextures.push_back(texture);
 	}
@@ -412,11 +445,11 @@ void LoadTextures()
 	ReadFileEx(&MiscTextures.width, 1, 4, LevelFilePtr);
 	ReadFileEx(&MiscTextures.height, 1, 4, LevelFilePtr);
 	ReadFileEx(&MiscTextures.size, 1, 4, LevelFilePtr);
-	MiscTextures.data.reserve(MiscTextures.size);
-	byte* buffer = (byte*)malloc(MiscTextures.size);
-	ReadFileEx(buffer, 1, MiscTextures.size, LevelFilePtr);
-	std::copy(buffer, buffer + MiscTextures.size, std::back_inserter(MiscTextures.data));
-	free(buffer);
+	MiscTextures.data.resize(MiscTextures.size);
+	//byte* buffer = (byte*)malloc(texture.size);
+	ReadFileEx(MiscTextures.data.data(), 1, MiscTextures.size, LevelFilePtr);
+	//std::copy(buffer, buffer + texture.size, std::back_inserter(texture.data));
+	//free(buffer);
 }
 
 void ReadRooms()
@@ -441,25 +474,15 @@ void ReadRooms()
 		room.maxceiling = ReadInt32();
 
 		int numVertices = ReadInt32();
-		room.vertices.reserve(numVertices);
+		room.positions.reserve(numVertices);
 		for (int j = 0; j < numVertices; j++)
-		{
-			ROOM_VERTEX vertex;
-			vertex.position.x = ReadFloat();
-			vertex.position.y = ReadFloat();
-			vertex.position.z = ReadFloat();
-			vertex.normal.x = ReadFloat();
-			vertex.normal.y = ReadFloat();
-			vertex.normal.z = ReadFloat();
-			vertex.textureCoordinates.x = ReadFloat();
-			vertex.textureCoordinates.y = ReadFloat();
-			vertex.color.x = ReadFloat();
-			vertex.color.y = ReadFloat();
-			vertex.color.z = ReadFloat();
-			vertex.effects = ReadInt32();
-			vertex.index = ReadInt32();
-			room.vertices.push_back(vertex);
-		}
+			room.positions.push_back(ReadVector3());
+		room.normals.reserve(numVertices);
+		for (int j = 0; j < numVertices; j++)
+			room.normals.push_back(ReadVector3());
+		room.colors.reserve(numVertices);
+		for (int j = 0; j < numVertices; j++)
+			room.colors.push_back(ReadVector3());
 
 		int numBuckets = ReadInt32();
 		room.buckets.reserve(numBuckets);
@@ -470,11 +493,32 @@ void ReadRooms()
 			bucket.texture = ReadInt32();
 			bucket.blendMode = ReadInt8();
 			bucket.animated = ReadInt8();
+			bucket.numQuads = 0;
+			bucket.numTriangles = 0;
 
-			int numIndices = ReadInt32();
-			bucket.indices.reserve(numIndices);
-			for (int k = 0; k < numIndices; k++)
-				bucket.indices.push_back(ReadInt32());
+			int numPolygons = ReadInt32();
+			bucket.polygons.reserve(numPolygons);
+			for (int k = 0; k < numPolygons; k++)
+			{
+				POLYGON poly;
+
+				poly.shape = ReadInt32();
+				int count = (poly.shape == 0 ? 4 : 3);
+				poly.indices.reserve(count);
+				poly.textureCoordinates.reserve(count);
+
+				for (int n = 0; n < count; n++)
+					poly.indices.push_back(ReadInt32());
+				for (int n = 0; n < count; n++)
+					poly.textureCoordinates.push_back(ReadVector2());
+
+				bucket.polygons.push_back(poly);
+
+				if (poly.shape == 0)
+					bucket.numQuads++;
+				else
+					bucket.numTriangles++;
+			}
 
 			room.buckets.push_back(bucket);
 		}
