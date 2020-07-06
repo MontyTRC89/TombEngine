@@ -12,12 +12,12 @@ int malloc_used;
 using namespace T5M::Memory;
 MemoryPool* gameMemory;
 
-void init_game_malloc()
+void init_game_malloc() noexcept
 {
-	gameMemory = new MemoryPool(MemoryUnit::MebiByte, 512, 256);
+	gameMemory = new MemoryPool(MemoryUnit::MebiByte, 196, 128);
 }
 
-void game_free(void* ptr)
+void game_free(void* ptr) noexcept
 {
 	gameMemory->free(ptr);
 }
