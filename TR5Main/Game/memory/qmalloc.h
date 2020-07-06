@@ -18,6 +18,7 @@ namespace T5M::Memory {
 		static constexpr unsigned int MALLOC_MAGIC = 0xDEADBEEF;
 
 	public:
+		//Creates a Memory Pool with the specified memory and page size. The memory also contains the metadata and house keeping
 		MemoryPool(MemoryUnit unit, size_t amount, size_t pageSize) : pageSize(pageSize), size(static_cast<size_t>(unit)* amount), arena(new uint8_t[size]{0}) {
 			init();
 		}
@@ -34,7 +35,8 @@ namespace T5M::Memory {
 		 * Reserves Memory of type T with an additional count
 		 **/
 		template<typename T>
-		T* malloc(size_t count = 1) {
+		[[nodiscard]] T* malloc(size_t count = 1) noexcept {
+			if (count < 1) return nullptr;
 			int pages;
 			int n;
 
