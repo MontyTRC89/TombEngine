@@ -29,6 +29,7 @@ char LM[] =
 	LM_HEAD,
 };
 
+int hitSoundTimer;
 int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[1024];
@@ -625,8 +626,14 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) >> W2V_SHIFT;
 
-		if (!Lara.hitFrame)
-			SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
+		if ((!Lara.hitFrame) && (!hitSoundTimer > 0))
+		{
+				SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
+				hitSoundTimer = frandMinMax(5, 15);
+		}
+
+		if (hitSoundTimer > 0)
+			hitSoundTimer--;
 
 		Lara.hitFrame++;
 		if (Lara.hitFrame > 34) 
