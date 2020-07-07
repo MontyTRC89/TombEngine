@@ -130,7 +130,7 @@ void ControlMissile(short fxNumber)
 void ControlNatlaGun(short fx_number)
 {
 	FX_INFO* fx, *newfx;
-	ObjectInfo* object;
+	OBJECT_INFO* object;
 	FLOOR_INFO* floor;
 	short roomNumber;
 	int x, y, z;

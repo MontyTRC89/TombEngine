@@ -98,7 +98,7 @@ static void TriggerTonyFlame(short itemNum, int hand)
 		return;
 
 	sptr = &Sparks[GetFreeSpark()];
-	sptr->on = TRUE;
+	sptr->on = true;
 	sptr->sR = 255;
 	sptr->sG = 48 + (GetRandomControl() & 31);
 	sptr->sB = 48;
@@ -156,7 +156,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 		return;
 
 	sptr = &Sparks[GetFreeSpark()];
-	sptr->on = TRUE;
+	sptr->on = true;
 	sptr->sR = 255;
 	sptr->sG = 48 + (GetRandomControl() & 31);
 	sptr->sB = 48;
@@ -424,7 +424,7 @@ void ControlTonyFireBall(short fxNumber)
 	{
 		if (ItemNearLara(&fx->pos, 200))
 		{
-			LaraItem->hitStatus = TRUE;
+			LaraItem->hitStatus = true;
 			KillEffect(fxNumber);
 			LaraItem->hitPoints -= 200;
 			LaraBurn();
@@ -449,7 +449,7 @@ static void TonyBossDie(short itemNum)
 {
 	ITEM_INFO* item;
 	item = &Items[itemNum];
-	item->collidable = FALSE;
+	item->collidable = false;
 	item->hitPoints = -16384;
 	
 	KillItem(itemNum);

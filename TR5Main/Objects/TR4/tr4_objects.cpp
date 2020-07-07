@@ -57,7 +57,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void StartBaddy(ObjectInfo* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
@@ -558,12 +558,12 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->hitPoints = NOT_TARGETABLE;
 		obj->pivotLength = 50;
 		obj->radius = 128;
-		obj->intelligent = TRUE;
-		obj->saveAnim = TRUE;
-		obj->saveFlags = TRUE;
-		obj->saveMesh = TRUE;
-		obj->savePosition = TRUE;
-		obj->undead = TRUE;
+		obj->intelligent = true;
+		obj->saveAnim = true;
+		obj->saveFlags = true;
+		obj->saveMesh = true;
+		obj->savePosition = true;
+		obj->undead = true;
 		obj->hitEffect = HIT_SMOKE;
 		obj->zoneType = ZONE_WATER;
 		Bones[obj->boneIndex + 6 * 4] |= ROT_Y | ROT_X;
@@ -576,7 +576,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->initialise = InitialiseLocust;
 		obj->control = LocustControl;
 		obj->drawRoutine = NULL;
-		obj->saveFlags = TRUE;
+		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;
 	}
 
@@ -587,7 +587,7 @@ static void StartBaddy(ObjectInfo* obj)
 	}
 }
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SARCOPHAGUS];
 	if (obj->loaded)
@@ -599,7 +599,7 @@ static void StartObject(ObjectInfo* obj)
 	}
 }
 
-static void StartTrap(ObjectInfo* obj)
+static void StartTrap(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_CHAIN];
 	if (obj->loaded)
@@ -757,7 +757,7 @@ static void StartTrap(ObjectInfo* obj)
 	}
 }
 
-static void StartVehicles(ObjectInfo* obj)
+static void StartVehicles(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_JEEP];
 	if (obj->loaded)
@@ -782,12 +782,12 @@ static void StartVehicles(ObjectInfo* obj)
 	}
 }
 
-static void StartSwitch(ObjectInfo* obj)
+static void StartSwitch(OBJECT_INFO* obj)
 {
 	
 }
 
-static ObjectInfo* objToInit;
+static OBJECT_INFO* objToInit;
 void InitialiseTR4Objects()
 {
 	StartBaddy(objToInit);

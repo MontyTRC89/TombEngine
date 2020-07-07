@@ -316,7 +316,7 @@ namespace T5M::Renderer
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
-			ObjectInfo *obj = &Objects[objNum];
+			OBJECT_INFO *obj = &Objects[objNum];
 
 			if (obj->nmeshes > 0)
 			{
@@ -516,28 +516,86 @@ namespace T5M::Renderer
 							}
 						}
 					}
-
-					if (MoveablesIds[i] == ID_LARA_HAIR)
+					else if (MoveablesIds[i] == ID_LARA_HAIR && skinPresent)
 					{
 						hairsPresent = true;
-						for (int j = 0; j < moveable.ObjectMeshes.size(); j++)
+
+						for (int j = 0; j< obj->nmeshes;j++)
 						{
-							RendererMesh *mesh = moveable.ObjectMeshes[j];
-							for (int n = 0; n < NUM_BUCKETS; n++)
+							RendererMesh* currentMesh = moveable.ObjectMeshes[j];
+							RendererBone* currentBone = moveable.LinearizedBones[j];
+
+							for (int b1 = 0; b1 < NUM_BUCKETS; b1++)
 							{
-								m_numHairVertices += mesh->Buckets[n].Vertices.size();
-								m_numHairIndices += mesh->Buckets[n].Indices.size();
+								RendererBucket* currentBucket = &currentMesh->Buckets[b1];
+
+								for (int v1 = 0; v1 < currentBucket->Vertices.size(); v1++)
+								{
+									RendererVertex* currentVertex = &currentBucket->Vertices[v1];
+									currentVertex->Bone = j + 1;
+
+									if (j == 0)
+									{
+										// Mesh 0 must be linked with head
+										int parentVertices[] = { 37,39,40,38 };
+										
+										RendererObject& skinObj = *m_moveableObjects[ID_LARA_SKIN];
+										RendererMesh* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
+										RendererBone* parentBone = skinObj.LinearizedBones[LM_HEAD];
+
+										if (currentVertex->OriginalIndex < 4)
+										{
+											for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
+											{
+												RendererBucket* parentBucket = &parentMesh->Buckets[b2];
+												for (int v2 = 0; v2 < parentBucket->Vertices.size(); v2++)
+												{
+													RendererVertex* parentVertex = &parentBucket->Vertices[v2];
+
+													if (parentVertex->OriginalIndex == parentVertices[currentVertex->OriginalIndex])
+													{
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
+													}
+												}
+											}
+										}										
+									}
+									else
+									{
+										// Meshes > 0 must be linked with hair parent meshes
+										RendererMesh* parentMesh = moveable.ObjectMeshes[j - 1];
+										RendererBone* parentBone = moveable.LinearizedBones[j - 1];
+
+										for (int b2 = 0; b2 < NUM_BUCKETS; b2++)
+										{
+											RendererBucket* parentBucket = &parentMesh->Buckets[b2];
+											for (int v2 = 0; v2 < parentBucket->Vertices.size(); v2++)
+											{
+												RendererVertex* parentVertex = &parentBucket->Vertices[v2];
+
+												int x1 = currentBucket->Vertices[v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = currentBucket->Vertices[v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = currentBucket->Vertices[v1].Position.z + currentBone->GlobalTranslation.z;
+
+												int x2 = parentBucket->Vertices[v2].Position.x + parentBone->GlobalTranslation.x;
+												int y2 = parentBucket->Vertices[v2].Position.y + parentBone->GlobalTranslation.y;
+												int z2 = parentBucket->Vertices[v2].Position.z + parentBone->GlobalTranslation.z;
+
+												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+												{
+													currentVertex->Bone = j;
+													currentVertex->Position = parentVertex->Position;
+													currentVertex->Normal = parentVertex->Normal;
+													break;
+												}
+											}
+										}
+									}
+								}
 							}
 						}
-
-						m_hairVertices.clear();
-						m_hairIndices.clear();
-
-						RendererVertex vertex;
-						for (int m = 0; m < m_numHairVertices * 2; m++)
-							m_hairVertices.push_back(vertex);
-						for (int m = 0; m < m_numHairIndices * 2; m++)
-							m_hairIndices.push_back(0);
 					}
 				}
 
@@ -632,7 +690,7 @@ namespace T5M::Renderer
 
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
-			ObjectInfo *obj = &Objects[MoveablesIds[i]];
+			OBJECT_INFO *obj = &Objects[MoveablesIds[i]];
 
 			if (obj->nmeshes < 0)
 			{

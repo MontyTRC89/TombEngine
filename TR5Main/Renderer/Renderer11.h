@@ -63,7 +63,7 @@ namespace T5M::Renderer
 		DirectX::SimpleMath::Vector4 Color;
 		float Bone;
 		int IndexInPoly;
-		//int OriginalIndex;
+		int OriginalIndex;
 	};
 	
 	

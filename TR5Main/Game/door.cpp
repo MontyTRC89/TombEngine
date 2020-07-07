@@ -78,7 +78,7 @@ void SequenceDoorControl(short itemNumber)
 				OpenThatDoor(&door->d2, door);
 				OpenThatDoor(&door->d1flip, door);
 				OpenThatDoor(&door->d2flip, door);
-				door->opened = TRUE;
+				door->opened = true;
 				item->flags |= 0x3E;
 			}
 		}
@@ -90,7 +90,7 @@ void SequenceDoorControl(short itemNumber)
 				ShutThatDoor(&door->d2, door);
 				ShutThatDoor(&door->d1flip, door);
 				ShutThatDoor(&door->d2flip, door);
-				door->opened = FALSE;
+				door->opened = false;
 				item->flags &= 0xC1;
 			}
 		}
@@ -320,7 +320,7 @@ void PushPullKickDoorControl(short itemNumber)
 		OpenThatDoor(&door->d2, door);
 		OpenThatDoor(&door->d1flip, door);
 		OpenThatDoor(&door->d2flip, door);
-		door->opened = TRUE;
+		door->opened = true;
 	} 
 
 	AnimateItem(item);
@@ -440,7 +440,7 @@ void DoorControl(short itemNumber)
 				OpenThatDoor(&door->d2, door);
 				OpenThatDoor(&door->d1flip, door);
 				OpenThatDoor(&door->d2flip, door);
-				door->opened = TRUE;
+				door->opened = true;
 			}
 		}
 		else
@@ -456,7 +456,7 @@ void DoorControl(short itemNumber)
 					ShutThatDoor(&door->d2, door);
 					ShutThatDoor(&door->d1flip, door);
 					ShutThatDoor(&door->d2flip, door);
-					door->opened = FALSE;
+					door->opened = false;
 				}
 			}
 		}
@@ -479,7 +479,7 @@ void DoorControl(short itemNumber)
 				OpenThatDoor(&door->d2, door);
 				OpenThatDoor(&door->d1flip, door);
 				OpenThatDoor(&door->d2flip, door);
-				door->opened = TRUE;
+				door->opened = true;
 			}
 			/*if (item->frameNumber == Anims[item->animNumber].frameEnd)
 			{
@@ -536,7 +536,7 @@ void DoorControl(short itemNumber)
 				ShutThatDoor(&door->d2, door);
 				ShutThatDoor(&door->d1flip, door);
 				ShutThatDoor(&door->d2flip, door);
-				door->opened = FALSE;
+				door->opened = false;
 			}
 		}
 		else

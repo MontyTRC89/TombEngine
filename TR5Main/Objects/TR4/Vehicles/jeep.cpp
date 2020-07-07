@@ -537,7 +537,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 				}
 				else
 				{
-					ObjectInfo* object = &Objects[item->objectNumber];
+					OBJECT_INFO* object = &Objects[item->objectNumber];
 					if (object->collision && object->intelligent ||
 						item->objectNumber == ID_ROLLINGBALL)
 					{
