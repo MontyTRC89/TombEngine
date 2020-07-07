@@ -128,7 +128,7 @@ namespace T5M::Renderer
 
 		// Update waterfalls textures
 		/*for (int i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++) {
-			ObjectInfo* obj = &Objects[i];
+			OBJECT_INFO* obj = &Objects[i];
 
 			if (obj->loaded) {
 				RendererObject* waterfall = m_moveableObjects[i];
@@ -262,7 +262,7 @@ namespace T5M::Renderer
 		if (!force && itemToDraw->DoneAnimations)
 			return;
 
-		ObjectInfo *obj = &Objects[item->objectNumber];
+		OBJECT_INFO *obj = &Objects[item->objectNumber];
 		RendererObject &moveableObj = *m_moveableObjects[item->objectNumber];
 
 		// Update animation matrices
@@ -458,9 +458,10 @@ namespace T5M::Renderer
 					vertex.Color.w = 1.0f;
 
 					vertex.Bone = meshPtr->bones[v];
+					vertex.OriginalIndex = v;
 					//vertex.Bone = boneIndex;
-					if (isHairs)
-						vertex.Bone = v;
+					/*if (isHairs)
+						vertex.Bone = v;*/
 
 					bucket->Vertices.push_back(vertex);
 				}

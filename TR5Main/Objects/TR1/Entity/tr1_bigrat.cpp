@@ -113,7 +113,7 @@ void BigRatControl(short itemNumber)
         return;
 
     ITEM_INFO* item;
-    ObjectInfo* obj;
+    OBJECT_INFO* obj;
     CREATURE_INFO* big_rat;
     AI_INFO info;
     short head, angle;
@@ -171,7 +171,7 @@ void BigRatControl(short itemNumber)
         if ((item->hitStatus || info.distance < BIG_RAT_ALERT_RANGE) || (TargetVisible(item, &info) && info.distance < BIG_RAT_VISIBILITY_RANGE))
         {
             if (!big_rat->alerted)
-                big_rat->alerted = TRUE;
+                big_rat->alerted = true;
             AlertAllGuards(itemNumber);
         }
 
@@ -213,7 +213,7 @@ void BigRatControl(short itemNumber)
             {
                 CreatureEffect(item, &big_ratBite, DoBloodSplat);
                 LaraItem->hitPoints -= BIG_RAT_BITE_DAMAGE;
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 item->requiredAnimState = BIG_RAT_STOP;
             }
             break;
@@ -223,7 +223,7 @@ void BigRatControl(short itemNumber)
             {
                 CreatureEffect(item, &big_ratBite, DoBloodSplat);
                 LaraItem->hitPoints -= BIG_RAT_CHARGE_DAMAGE;
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 item->requiredAnimState = BIG_RAT_RUN;
             }
             break;
@@ -253,7 +253,7 @@ void BigRatControl(short itemNumber)
             {
                 CreatureEffect(item, &big_ratBite, DoBloodSplat);
                 LaraItem->hitPoints -= BIG_RAT_BITE_DAMAGE;
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
             }
 
             item->goalAnimState = BIG_RAT_SWIM;

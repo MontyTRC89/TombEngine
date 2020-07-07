@@ -152,7 +152,7 @@ void UpdateLocusts(void)
             locust->counter--;
             if (locust->counter == 0)
             {
-                locust->on = FALSE;
+                locust->on = false;
                 break;
             }
 

@@ -160,7 +160,7 @@ int Sync()
 void DrawAnimatingItem(ITEM_INFO* item)
 {
 	// TODO: to refactor
-	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in ObjectInfo
+	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
 }
 
 void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum)

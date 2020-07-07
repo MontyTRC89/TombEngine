@@ -11,7 +11,7 @@
 #include "level.h"
 using T5M::Renderer::g_Renderer;
 int FirstHair[HAIR_MAX];
-HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS];
+HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 int WindAngle;
 int DWindAngle;
 int Wind;
@@ -29,7 +29,7 @@ void InitialiseHair()
 		Hairs[h][0].pos.yRot = 0;
 		Hairs[h][0].pos.xRot = -0x4000;
 
-		for (int i = 1; i < HAIR_SEGMENTS; i++, bone += 4)
+		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
 			Hairs[h][i].pos.xPos = *(bone + 1);
 			Hairs[h][i].pos.yPos = *(bone + 2);
@@ -46,7 +46,7 @@ void InitialiseHair()
 void HairControl(int cutscene, int ponytail, short* framePtr)
 {
 	SPHERE sphere[HAIR_SPHERE];
-	ObjectInfo* object = &Objects[ID_LARA];
+	OBJECT_INFO* object = &Objects[ID_LARA];
 	short* frame;
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG;
@@ -179,7 +179,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		Hairs[ponytail][0].pos.yPos = pos.y;
 		Hairs[ponytail][0].pos.zPos = pos.z;
 
-		for (int i = 0; i < HAIR_SEGMENTS - 1; i++, bone += 4)
+		for (int i = 0; i < HAIR_SEGMENTS; i++, bone += 4)
 		{
 			world = Matrix::CreateTranslation(Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos);		
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;			
@@ -235,7 +235,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		SmokeWindX = (((rcossin_tbl[WindAngle]) * Wind) >> 12);
 		SmokeWindZ = (((rcossin_tbl[WindAngle + 1]) * Wind) >> 12);
 
-		for (int i = 1; i < HAIR_SEGMENTS; i++, bone += 4)
+		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
 			Hairs[ponytail][0].hvel.x = Hairs[ponytail][i].pos.xPos;
 			Hairs[ponytail][0].hvel.y = Hairs[ponytail][i].pos.yPos;
@@ -316,7 +316,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			world = Matrix::CreateTranslation(Hairs[ponytail][i - 1].pos.xPos, Hairs[ponytail][i - 1].pos.yPos, Hairs[ponytail][i - 1].pos.zPos);
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i - 1].pos.yRot), TO_RAD(Hairs[ponytail][i - 1].pos.xRot), 0) * world;
 
-			if (i == HAIR_SEGMENTS - 1)
+			if (i == HAIR_SEGMENTS)
 				world = Matrix::CreateTranslation(*(bone - 3), *(bone - 2), *(bone - 1)) * world;
 			else
 				world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;

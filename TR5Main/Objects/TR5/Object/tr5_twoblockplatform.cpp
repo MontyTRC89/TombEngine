@@ -17,7 +17,7 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 {
 	if (!item->meshBits)
-		return FALSE;
+		return false;
 
 	short angle = item->pos.yRot;
 	int xb = x >> WALL_SHIFT;
@@ -26,15 +26,15 @@ BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 	int itemzb = item->pos.zPos >> WALL_SHIFT;
 
 	if (!angle && (xb == itemxb || xb == itemxb - 1) && (zb == itemzb || zb == itemzb + 1))
-		return TRUE;
+		return true;
 	if (angle == -ANGLE(180) && (xb == itemxb || xb == itemxb + 1) && (zb == itemzb || zb == itemzb - 1))
-		return TRUE;
+		return true;
 	if (angle == ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb + 1))
-		return TRUE;
+		return true;
 	if (angle == -ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb - 1))
-		return TRUE;
+		return true;
 
-	return FALSE;
+	return false;
 }
 
 void TwoBlocksPlatformFloor(ITEM_INFO* item, int x, int y, int z, int* height)

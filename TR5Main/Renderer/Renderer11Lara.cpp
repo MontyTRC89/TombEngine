@@ -9,6 +9,7 @@
 #include "sphere.h"
 #include "level.h"
 #include "GameFlowScript.h"
+#include <Specific\setup.h>
 using namespace T5M::Renderer;
 
 extern GameFlow *g_GameFlow;
@@ -135,137 +136,6 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	for (int m = 0; m < 15; m++)
 		laraObj.AnimationTransforms[m] = item->AnimationTransforms[m];
 
-	// At this point, Lara's matrices are ready. Now let's do ponytails...
-	// TODO: disabled for now
-	
-	if (m_moveableObjects[ID_LARA_HAIR].has_value())
-	{
-		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
-
-		lastMatrix = Matrix::Identity;
-		identity = Matrix::Identity;
-
-		Vector3 parentVertices[6][4];
-		Matrix headMatrix;
-
-		RendererObject& objSkin = *m_moveableObjects[ID_LARA_SKIN];
-		RendererObject& objLara = *m_moveableObjects[ID_LARA];
-		RendererMesh* parentMesh = objSkin.ObjectMeshes[LM_HEAD];
-		RendererBone* parentBone = objSkin.LinearizedBones[LM_HEAD];
-
-		world = objLara.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
-
-		int lastVertex = 0;
-		int lastIndex = 0;
-
-		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
-
-		for (int p = 0; p < ((level->LaraType == LARA_YOUNG) ? 2 : 1); p++)
-		{
-			// We can't use hardware skinning here, however hairs have just a few vertices so 
-			// it's not so bad doing skinning in software
-			if (level->LaraType == LARA_YOUNG)
-			{
-				if (p == 1)
-				{
-					parentVertices[0][0] = Vector3::Transform(parentMesh->Positions[68], world);
-					parentVertices[0][1] = Vector3::Transform(parentMesh->Positions[69], world);
-					parentVertices[0][2] = Vector3::Transform(parentMesh->Positions[70], world);
-					parentVertices[0][3] = Vector3::Transform(parentMesh->Positions[71], world);
-				}
-				else
-				{
-					parentVertices[0][0] = Vector3::Transform(parentMesh->Positions[78], world);
-					parentVertices[0][1] = Vector3::Transform(parentMesh->Positions[78], world);
-					parentVertices[0][2] = Vector3::Transform(parentMesh->Positions[77], world);
-					parentVertices[0][3] = Vector3::Transform(parentMesh->Positions[76], world);
-				}
-			}
-			else
-			{
-				parentVertices[0][0] = Vector3::Transform(parentMesh->Positions[37], world);
-				parentVertices[0][1] = Vector3::Transform(parentMesh->Positions[39], world);
-				parentVertices[0][2] = Vector3::Transform(parentMesh->Positions[40], world);
-				parentVertices[0][3] = Vector3::Transform(parentMesh->Positions[38], world);
-			}
-
-			for (int i = 0; i < 6; i++)
-			{
-				RendererMesh* mesh = hairsObj.ObjectMeshes[i];
-				RendererBucket* bucket = &mesh->Buckets[RENDERER_BUCKET_SOLID];
-
-				translation = Matrix::CreateTranslation(Hairs[p][i + 1].pos.xPos, Hairs[p][i + 1].pos.yPos, Hairs[p][i + 1].pos.zPos);
-				rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[p][i + 1].pos.yRot), TO_RAD(Hairs[p][i + 1].pos.xRot), 0);
-				m_hairsMatrices[6 * p + i] = rotation * translation;
-
-				int baseVertex = lastVertex;
-
-				for (int j = 0; j < bucket->Vertices.size(); j++)
-				{
-					int oldVertexIndex = (int)bucket->Vertices[j].Bone;
-					if (oldVertexIndex < 4)
-					{
-						m_hairVertices[lastVertex].Position.x = parentVertices[i][oldVertexIndex].x;
-						m_hairVertices[lastVertex].Position.y = parentVertices[i][oldVertexIndex].y;
-						m_hairVertices[lastVertex].Position.z = parentVertices[i][oldVertexIndex].z;
-						m_hairVertices[lastVertex].UV.x = bucket->Vertices[j].UV.x;
-						m_hairVertices[lastVertex].UV.y = bucket->Vertices[j].UV.y;
-
-						Vector3 n = Vector3(bucket->Vertices[j].Normal.x, bucket->Vertices[j].Normal.y, bucket->Vertices[j].Normal.z);
-						n.Normalize();
-						n = Vector3::TransformNormal(n, m_hairsMatrices[6 * p + i]);
-						n.Normalize();
-
-						m_hairVertices[lastVertex].Normal.x = n.x;
-						m_hairVertices[lastVertex].Normal.y = n.y;
-						m_hairVertices[lastVertex].Normal.z = n.z;
-
-						m_hairVertices[lastVertex].Color = Vector4::One * 0.5f;
-
-						lastVertex++;
-					}
-					else
-					{
-						Vector3 in = Vector3(bucket->Vertices[j].Position.x, bucket->Vertices[j].Position.y, bucket->Vertices[j].Position.z);
-						Vector3 out = Vector3::Transform(in, m_hairsMatrices[6 * p + i]);
-
-						if (i < 5)
-						{
-							parentVertices[i + 1][oldVertexIndex - 4].x = out.x;
-							parentVertices[i + 1][oldVertexIndex - 4].y = out.y;
-							parentVertices[i + 1][oldVertexIndex - 4].z = out.z;
-						}
-
-						m_hairVertices[lastVertex].Position.x = out.x;
-						m_hairVertices[lastVertex].Position.y = out.y;
-						m_hairVertices[lastVertex].Position.z = out.z;
-						m_hairVertices[lastVertex].UV.x = bucket->Vertices[j].UV.x;
-						m_hairVertices[lastVertex].UV.y = bucket->Vertices[j].UV.y;
-
-						Vector3 n = Vector3(bucket->Vertices[j].Normal.x, bucket->Vertices[j].Normal.y, bucket->Vertices[j].Normal.z);
-						n.Normalize();
-						n = Vector3::TransformNormal(n, m_hairsMatrices[6 * p + i]);
-						n.Normalize();
-
-						m_hairVertices[lastVertex].Normal.x = n.x;
-						m_hairVertices[lastVertex].Normal.y = n.y;
-						m_hairVertices[lastVertex].Normal.z = n.z;
-
-						m_hairVertices[lastVertex].Color = Vector4::One * 0.5f;
-
-						lastVertex++;
-					}
-				}
-
-				for (int j = 0; j < bucket->Indices.size(); j++)
-				{
-					m_hairIndices[lastIndex] = baseVertex + bucket->Indices[j];
-					lastIndex++;
-				}
-			}
-		}
-	}
-
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
@@ -371,19 +241,21 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 		}
 	}
 
-	if (!transparent)
+	if (!transparent && Objects[ID_LARA_HAIR].loaded)
 	{
-		/*RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
+		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
 
-		Matrix matrices[8];
-		matrices[0] = (laraObj.AnimationTransforms.data())[LM_HEAD];
+		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+		m_stItem.World = Matrix::Identity;
+		Matrix matrices[7];
+		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
 			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.yRot), TO_RAD(hairs->pos.xRot), TO_RAD(hairs->pos.zRot))* Matrix::CreateTranslation(hairs->pos.xPos-LaraItem->pos.xPos, hairs->pos.yPos - LaraItem->pos.yPos, hairs->pos.zPos - LaraItem->pos.zPos);
-			matrices[i] = (laraObj.AnimationTransforms.data())[LM_HEAD] * world;
+			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.yRot), TO_RAD(hairs->pos.xRot), 0) * Matrix::CreateTranslation(hairs->pos.xPos, hairs->pos.yPos, hairs->pos.zPos);
+			matrices[i + 1] = world;
 		}
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
+		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
 		updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
 		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
 		m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
@@ -403,38 +275,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
 				m_numDrawCalls++;
 			}
-		}*/
-
-		/*for (int k = 0; k < laraSkin->ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = laraSkin.ObjectMeshes[k];
-
-			for (int j = 0; j < NUM_BUCKETS; j++)
-			{
-				RendererBucket* bucket = &mesh->Buckets[j];
-
-				if (bucket->Vertices.size() == 0)
-					continue;
-
-				// Draw vertices
-				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-				m_numDrawCalls++;
-			}
-		}*/
-
-		// Hairs are pre-transformed
-		Matrix matrices[8] = { Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
-							   Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity };
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
-		m_stItem.World = Matrix::Identity;
-		updateConstantBuffer<CItemBuffer>(m_cbItem,m_stItem);
-
-		if (m_moveableObjects[ID_LARA_HAIR].has_value())
-		{
-			m_primitiveBatch->Begin();
-			m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, (const uint16_t*)m_hairIndices.data(), m_numHairIndices, m_hairVertices.data(), m_numHairVertices);
-			m_primitiveBatch->End();
-		}
+		}	
 	}
 
 	return true;
