@@ -220,9 +220,9 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	}
 
 	D3D11_BLEND_DESC blendStateDesc{};
-	blendStateDesc.AlphaToCoverageEnable = FALSE;
-	blendStateDesc.IndependentBlendEnable = FALSE;
-	blendStateDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
 	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;

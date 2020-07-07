@@ -490,7 +490,7 @@ namespace T5M::Renderer {
 		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
-		ObjectInfo* obj = &Objects[0];
+		OBJECT_INFO* obj = &Objects[0];
 		RendererRoom& const room = m_rooms[LaraItem->roomNumber];
 		RendererItem* item = &m_items[Lara.itemNumber];
 
@@ -538,7 +538,7 @@ namespace T5M::Renderer {
 				break;
 			}
 
-			ObjectInfo* flashObj = &Objects[ID_GUN_FLASH];
+			OBJECT_INFO* flashObj = &Objects[ID_GUN_FLASH];
 			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
@@ -594,7 +594,7 @@ namespace T5M::Renderer {
 			RendererItem* item = m_itemsToDraw[i];
 
 			// Does the item need gunflash?
-			ObjectInfo* obj = &Objects[item->Item->objectNumber];
+			OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
 			if (obj->biteOffset == -1 || !item->Item->firedWeapon)
 				continue;
 
@@ -931,7 +931,7 @@ namespace T5M::Renderer {
 		for (int i = 0; i < m_effectsToDraw.size(); i++) {
 			RendererEffect* effect = m_effectsToDraw[i];
 			RendererRoom& const room = m_rooms[effect->Effect->roomNumber];
-			ObjectInfo* obj = &Objects[effect->Effect->objectNumber];
+			OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
 
 			if (obj->drawRoutine && obj->loaded)
 				drawEffect(effect, transparent);

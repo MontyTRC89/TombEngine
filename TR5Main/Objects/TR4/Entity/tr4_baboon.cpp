@@ -143,7 +143,7 @@ static bool CheckRespawnedBaboon(short itemNumber)
 static void UpdateRespawnedBaboon(short itemNumber)
 {
     ITEM_INFO* item;
-    ObjectInfo* obj;
+    OBJECT_INFO* obj;
     BaboonRespawnStruct* baboon;
 
     item = &Items[itemNumber];
@@ -177,11 +177,11 @@ static void UpdateRespawnedBaboon(short itemNumber)
         if (item->triggerFlags == 1)
             return;
         else
-            item->collidable = TRUE;
+            item->collidable = true;
     }
     else if (item->triggerFlags == 0)
     {
-        item->collidable = TRUE;
+        item->collidable = true;
     }
 }
 
@@ -560,7 +560,7 @@ void BaboonControl(short itemNumber)
             ||  (item->touchBits & BABOON_JUMP_TOUCHBITS)))
             {
                 LaraItem->hitPoints -= BABOON_DAMAGE;
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 CreatureEffect2(item, &baboonBite, 10, -1, DoBloodSplat);
                 baboon->flags = 1;
             }
