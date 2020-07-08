@@ -2054,6 +2054,7 @@ namespace T5M::Renderer
             printDebugMessage("Statics: %d", m_staticsToDraw.size());
             printDebugMessage("Lights: %d", m_lightsToDraw.size());
             printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
+			printDebugMessage("LaraItem.boxNumber: %d", LaraItem->boxNumber);
             printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
             printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
             printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);

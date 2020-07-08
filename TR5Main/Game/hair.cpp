@@ -100,47 +100,47 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	}
 
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
-	MESH* objptr = &Meshes[Lara.meshPtrs[LM_HIPS]];
-	PHD_VECTOR pos = { (int)objptr->sphere.Center.x, (int)objptr->sphere.Center.y, (int)objptr->sphere.Center.z };
+	MESH* mesh = &Meshes[Lara.meshPtrs[LM_HIPS]];
+	PHD_VECTOR pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HIPS);
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
-	sphere[0].r = (int)objptr->sphere.Radius;
+	sphere[0].r = (int)mesh->sphere.Radius;
 
-	objptr = &Meshes[Lara.meshPtrs[LM_TORSO]];
-	pos = { (int)objptr->sphere.Center.x, (int)objptr->sphere.Center.y, (int)objptr->sphere.Center.z };
+	mesh = &Meshes[Lara.meshPtrs[LM_TORSO]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_TORSO);
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
 	sphere[1].z = pos.z;
-	sphere[1].r = (int)objptr->sphere.Radius;
+	sphere[1].r = (int)mesh->sphere.Radius;
 	if (youngLara)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
-	objptr = &Meshes[Lara.meshPtrs[LM_HEAD]];
-	pos = { (int)objptr->sphere.Center.x, (int)objptr->sphere.Center.y, (int)objptr->sphere.Center.z };
+	mesh = &Meshes[Lara.meshPtrs[LM_HEAD]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HEAD);
 	sphere[2].x = pos.x;
 	sphere[2].y = pos.y;
 	sphere[2].z = pos.z;
-	sphere[2].r = (int)objptr->sphere.Radius;
+	sphere[2].r = (int)mesh->sphere.Radius;
 
-	objptr = &Meshes[Lara.meshPtrs[LM_RINARM]];
-	pos = { (int)objptr->sphere.Center.x, (int)objptr->sphere.Center.y, (int)objptr->sphere.Center.z };
+	mesh = &Meshes[Lara.meshPtrs[LM_RINARM]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_RINARM);
 	sphere[3].x = pos.x;
 	sphere[3].y = pos.y;
 	sphere[3].z = pos.z;
-	sphere[3].r = (int)objptr->sphere.Radius * 3 / 2;
+	sphere[3].r = (int)mesh->sphere.Radius * 3 / 2;
 
-	objptr = &Meshes[Lara.meshPtrs[LM_LINARM]];
-	pos = { (int)objptr->sphere.Center.x, (int)objptr->sphere.Center.y, (int)objptr->sphere.Center.z };
+	mesh = &Meshes[Lara.meshPtrs[LM_LINARM]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_LINARM);
 	sphere[4].x = pos.x;
 	sphere[4].y = pos.y;
 	sphere[4].z = pos.z;
-	sphere[4].r = (int)objptr->sphere.Radius * 3 / 2;
+	sphere[4].r = (int)mesh->sphere.Radius * 3 / 2;
 
 	if (youngLara)
 	{
