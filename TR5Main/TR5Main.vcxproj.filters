@@ -219,36 +219,6 @@
     <ClInclude Include="Game\footprint.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\RoomBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\MiscBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\ShaderLight.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\ShadowLightBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\LightBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\StaticBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\ItemBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\CameraMatrixBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\HUDBarBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\HUDBuffer.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer\Frustum.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -729,9 +699,6 @@
     <ClInclude Include="Game\lara_struct.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Specific\levelloader.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Specific\newtypes.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -804,13 +771,58 @@
     <ClInclude Include="Renderer\Utils.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\IndexBuffer.h">
+    <ClInclude Include="Renderer\Texture2D\Texture2D.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\VertexBuffer.h">
+    <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\RenderTarget2D.h">
+    <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\HUDBarBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\HUDBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\ItemBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\LightBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\MiscBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\RoomBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\ShaderLight.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\ShadowLightBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\StaticBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Quad\RenderQuad.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ConstantBuffers\SpriteBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderView\RenderView.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1415,9 +1427,6 @@
     <ClCompile Include="Game\trmath.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Specific\levelloader.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\TR5\Light\tr5_light.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1484,15 +1493,6 @@
     <ClCompile Include="Renderer\Utils.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\IndexBuffer.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\VertexBuffer.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\RenderTarget2D.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Specific\IO\Streams.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1500,6 +1500,27 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Specific\IO\ChunkReader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Texture2D\Texture2D.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Quad\RenderQuad.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderView\RenderView.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

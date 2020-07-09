@@ -40,7 +40,7 @@ static void TriggerMutantRocket(PHD_3DPOS* src, short roomNumber, short counter)
     fxNumber = CreateNewEffect(roomNumber);
     if (fxNumber != NO_ITEM)
     {
-        fx = &Effects[fxNumber];
+        fx = &EffectList[fxNumber];
         fx->pos.xPos = src->xPos;
         fx->pos.yPos = src->yPos - (GetRandomControl() & 0x3F) - 32;
         fx->pos.zPos = src->zPos;
@@ -66,9 +66,9 @@ void TriggerMutantRocketEffects(short fxNumber, short xVel, short yVel, short zV
     //z = LaraItem->pos.zPos - Effects[m_fxNumber].pos.zPos;
     //if (x >= -0x4000u && x <= 0x4000 && z >= -0x4000u && z <= 0x4000)
 
-    fx = &Effects[fxNumber];
+    fx = &EffectList[fxNumber];
     sptr = &Sparks[GetFreeSpark()];
-    sptr->on = TRUE;
+    sptr->on = true;
     color = (GetRandomControl() & 0x3F) - 128;
     sptr->sB = 0;
     sptr->sR = color;
@@ -261,7 +261,7 @@ void MutantControl(short itemNumber)
     ITEM_INFO* item;
     CREATURE_INFO* mutant;
     AI_INFO info;
-    OBJECT_BONES mutant_joint;
+    OBJECT_Bones mutant_joint;
     short frameNumber;
     short headY;
     short angle;
@@ -337,9 +337,9 @@ void MutantControl(short itemNumber)
     }
 
     if (item->currentAnimState != MUTANT_LOCUST1)
-        mutant_joint = OBJECT_BONES(headY, info.xAngle, true);
+        mutant_joint = OBJECT_Bones(headY, info.xAngle, true);
     else
-        mutant_joint = OBJECT_BONES(0);
+        mutant_joint = OBJECT_Bones(0);
 
     CreatureJoint(item, 0, mutant_joint.bone0);
     CreatureJoint(item, 1, mutant_joint.bone1);

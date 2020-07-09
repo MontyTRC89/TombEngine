@@ -20,7 +20,7 @@ static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags
 	short fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != -1)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
@@ -35,7 +35,7 @@ static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags
 			fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
 		}
 
-		ObjectInfo* obj = &Objects[ID_ENERGY_BUBBLES];
+		OBJECT_INFO* obj = &Objects[ID_ENERGY_BUBBLES];
 
 		fx->pos.zRot = 0;
 		fx->roomNumber = roomNumber;

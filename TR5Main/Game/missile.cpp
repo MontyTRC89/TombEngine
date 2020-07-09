@@ -45,7 +45,7 @@ void ControlMissile(short fxNumber)
 	short roomNumber;
 	int speed;
 
-	fx = &Effects[fxNumber];
+	fx = &EffectList[fxNumber];
 	printf("ControlMissile\n");
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON && !(Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
@@ -130,12 +130,12 @@ void ControlMissile(short fxNumber)
 void ControlNatlaGun(short fx_number)
 {
 	FX_INFO* fx, *newfx;
-	ObjectInfo* object;
+	OBJECT_INFO* object;
 	FLOOR_INFO* floor;
 	short roomNumber;
 	int x, y, z;
 
-	fx = &Effects[fx_number];
+	fx = &EffectList[fx_number];
 	object = &Objects[fx->objectNumber];
 	fx->frameNumber--;
 	if (fx->frameNumber <= Objects[fx->objectNumber].nmeshes)
@@ -157,7 +157,7 @@ void ControlNatlaGun(short fx_number)
 		fx_number = CreateNewEffect(roomNumber);
 		if (fx_number != NO_ITEM)
 		{
-			newfx = &Effects[fx_number];
+			newfx = &EffectList[fx_number];
 			newfx->pos.xPos = x;
 			newfx->pos.yPos = y;
 			newfx->pos.zPos = z;
@@ -178,7 +178,7 @@ short ShardGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &Effects[fx_number];
+		fx = &EffectList[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
@@ -203,7 +203,7 @@ short BombGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &Effects[fx_number];
+		fx = &EffectList[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
@@ -228,7 +228,7 @@ short NatlaGun(int x, int y, int z, short speed, short yrot, short roomNumber)
 	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &Effects[fx_number];
+		fx = &EffectList[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;

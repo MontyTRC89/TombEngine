@@ -21,7 +21,7 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 	short fxNum = CreateNewEffect(item->roomNumber);
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -78,7 +78,7 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 void InitialiseSkeleton(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[ID_SKELETON];
+	OBJECT_INFO* obj = &Objects[ID_SKELETON];
 
 	ClearItem(itemNumber);
 

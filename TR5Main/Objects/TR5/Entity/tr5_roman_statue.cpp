@@ -50,7 +50,7 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 		short fxNumber = CreateNewEffect(item->roomNumber);
 		if (fxNumber != -1)
 		{
-			FX_INFO* fx = &Effects[fxNumber];
+			FX_INFO* fx = &EffectList[fxNumber];
 
 			fx->pos.xPos = pos->x;
 			fx->pos.yPos = pos->y;
@@ -211,7 +211,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos;

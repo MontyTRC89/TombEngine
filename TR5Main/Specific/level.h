@@ -8,7 +8,7 @@
 #include "room.h"
 
 #define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
-#define MESHES(slot, mesh) Meshes[Objects[slot].meshIndex + mesh]
+#define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
 
 struct ChunkId;
 struct LEB128;
@@ -28,30 +28,15 @@ typedef struct OBJECT_TEXTURE
 	int destination;
 };
 
-#pragma pack(push, 1)
-struct tr_object_texture_vert
+struct TEXTURE
 {
-	byte Xcoordinate; // 1 if Xpixel is the low value, 255 if Xpixel is the high value in the object texture
-	byte Xpixel;
-	byte Ycoordinate; // 1 if Ypixel is the low value, 255 if Ypixel is the high value in the object texture
-	byte Ypixel;
+	int width;
+	int height;
+	int size;
+	std::vector<byte> data;
 };
 
-struct tr4_object_texture
-{
-	short Attribute;
-	short TileAndFlag;
-	short NewFlags;
-	tr_object_texture_vert Vertices[4]; // The four corners of the texture
-	int OriginalU;
-	int OriginalV;
-	int Width;     // Actually width-1
-	int Height;    // Actually height-1
-	short Padding;
-};
-#pragma pack(pop)
-
-typedef struct AIOBJECT
+struct AIOBJECT
 {
 	short objectNumber;
 	short roomNumber;
@@ -64,14 +49,14 @@ typedef struct AIOBJECT
 	short boxNumber;
 };
 
-typedef struct CHANGE_STRUCT
+struct CHANGE_STRUCT
 {
 	short goalAnimState;
 	short numberRanges;
 	short rangeIndex;
 };
 
-typedef struct RANGE_STRUCT
+struct RANGE_STRUCT
 {
 	short startFrame;
 	short endFrame;
@@ -79,7 +64,7 @@ typedef struct RANGE_STRUCT
 	short linkFrameNum;
 };
 
-typedef struct SPRITE
+struct SPRITE
 {
 	int tile;
 	float x1;
@@ -92,26 +77,41 @@ typedef struct SPRITE
 	float y4;
 };
 
-extern short* MeshData;
-extern int MeshDataSize;
+struct MESH_VERTEX
+{
+	Vector3 position;
+	Vector3 normal;
+	Vector2 textureCoordinates;
+	Vector3 color;
+	int bone;
+	int indexInPoly;
+	int originalIndex;
+};
+
+struct MESH
+{
+	BoundingSphere sphere;
+	std::vector<Vector3> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector3> colors;
+	std::vector<int> bones;
+	std::vector<BUCKET> buckets;
+};
+
 extern OBJECT_TEXTURE* NewObjectTextures;
 extern uintptr_t hLoadLevel;
-extern int NumMeshPointers;
-extern int* MeshTrees;
+extern std::vector<int> Bones;
 extern int NumObjects;
 extern int NumStaticObjects;
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
-extern int* RawMeshPointers;
-extern short* RawMeshData;
 extern int NumObjectTextures;
 extern char* LevelDataPtr;
 extern int IsLevelLoading;
 extern int NumTextureTiles;
 extern int g_NumSprites;
 extern int g_NumSpritesSequences;
-extern short* MeshBase;
-extern short** Meshes;
+extern std::vector<MESH> Meshes;
 extern int NumItems;
 extern std::vector<OBJECT_TEXTURE> ObjectTextures;
 extern ITEM_INFO* Items;
@@ -121,7 +121,6 @@ extern ANIM_STRUCT* Anims;
 extern CHANGE_STRUCT* Changes;
 extern RANGE_STRUCT* Ranges;
 extern short* Commands;
-extern int* Bones;
 extern short* Frames;
 extern int AnimationsCount;
 extern short* FloorData;
@@ -134,8 +133,6 @@ extern std::vector<TEXTURE> MoveablesTextures;
 extern std::vector<TEXTURE> StaticsTextures;
 extern std::vector<TEXTURE> SpritesTextures;
 extern TEXTURE MiscTextures;
-
-extern TrLevel g_Level;
 
 void LoadTextures();
 void LoadRooms();

@@ -47,6 +47,7 @@ using std::vector;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
+using T5M::Renderer::g_Renderer;
 short ShatterSounds[18][10] =
 	{
 		{SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS},
@@ -211,7 +212,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		// Does the player want to enter inventory?
 		SetDebounce = false;
-		if (CurrentLevel != 0 && !g_Renderer->IsFading())
+		if (CurrentLevel != 0 && !g_Renderer.IsFading())
 		{
 			if ((DbInput & IN_DESELECT || g_Inventory.GetEnterObject() != NO_ITEM) && !CutSeqTriggered && LaraItem->hitPoints > 0)
 			{
@@ -310,7 +311,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					LaserSight = true;
 
 					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = TRUE;
+						InfraRed = true;
 					else*
 						InfraRed = false;*/
 					Infrared = true;
@@ -323,7 +324,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				if (LaserSight)
 				{
 					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = TRUE;
+						InfraRed = true;
 					else
 						InfraRed = false;*/
 					Infrared = true;
@@ -331,7 +332,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				else
 				{
 					/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
-						InfraRed = TRUE;
+						InfraRed = true;
 					else
 						InfraRed = false;*/
 					Infrared = false;
@@ -342,7 +343,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Clear dynamic lights
 		ClearDynamicLights();
 		ClearFires();
-		g_Renderer->ClearDynamicLights();
+		g_Renderer.ClearDynamicLights();
 
 		GotLaraSpheres = false;
 
@@ -382,8 +383,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		short fxNum = NextFxActive;
 		while (fxNum != NO_ITEM)
 		{
-			short nextFx = Effects[fxNum].nextActive;
-			FX_INFO *fx = &Effects[fxNum];
+			short nextFx = EffectList[fxNum].nextActive;
+			FX_INFO *fx = &EffectList[fxNum];
 			if (Objects[fx->objectNumber].control)
 				Objects[fx->objectNumber].control(fxNum);
 			fxNum = nextFx;
@@ -446,6 +447,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			LaraControl(Lara.itemNumber);
 			InItemControlLoop = false;
 			KillMoveItems();
+
+			g_Renderer.UpdateLaraAnimations(true);
 
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
@@ -544,7 +547,7 @@ unsigned CALLBACK GameMain(void *)
 	TIME_Init();
 
 	// Do a fixed time title image
-	g_Renderer->DoTitleImage();
+	g_Renderer.DoTitleImage();
 
 	// Execute the LUA gameflow and play the game
 	g_GameFlow->DoGameflow();
@@ -555,7 +558,7 @@ unsigned CALLBACK GameMain(void *)
 	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
 	EndThread();
 
-	return TRUE;
+	return true;
 }
 
 GAME_STATUS DoTitle(int index)
@@ -707,18 +710,18 @@ GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame)
 	int nframes = 2;
 
 	// First control phase
-	g_Renderer->ResetAnimations();
+	g_Renderer.ResetAnimations();
 	GAME_STATUS result = ControlPhase(nframes, 0);
 
 	// Fade in screen
-	g_Renderer->FadeIn();
+	g_Renderer.FadeIn();
 
 	// The game loop, finally!
 	while (true)
 	{
 		nframes = DrawPhaseGame();
 
-		g_Renderer->ResetAnimations();
+		g_Renderer.ResetAnimations();
 		result = ControlPhase(nframes, 0);
 
 		if (result == GAME_STATUS_EXIT_TO_TITLE ||
@@ -1629,7 +1632,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 
 	int xOff, yOff, trigger;
 	ITEM_INFO *item;
-	ObjectInfo *obj;
+	OBJECT_INFO *obj;
 	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
 
 	do
@@ -2630,7 +2633,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 	hitPos->z = collidedPoint.z - itemOrStaticPos->zPos;
 
 	// Now in the case of items we need to test single spheres
-	short *meshPtr = NULL;
+	MESH* meshPtr = NULL;
 	int bit = 0;
 	int sp = -2;
 	float minDistance = SECTOR(1024);
@@ -2647,7 +2650,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 	{
 		// For items instead we need to test spheres
 		ITEM_INFO *item = &Items[closesItemNumber];
-		ObjectInfo *obj = &Objects[item->objectNumber];
+		OBJECT_INFO *obj = &Objects[item->objectNumber];
 
 		// Get the ransformed sphere of meshes
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -2656,7 +2659,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 		if (obj->nmeshes <= 0)
 			return 0;
 
-		meshPtr = Meshes[obj->meshIndex];
+		meshPtr = &Meshes[obj->meshIndex];
 
 		for (int i = 0; i < obj->nmeshes; i++)
 		{
@@ -2679,7 +2682,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 					if (newDist < minDistance)
 					{
 						minDistance = newDist;
-						meshPtr = Meshes[obj->meshIndex + i];
+						meshPtr = &Meshes[obj->meshIndex + i];
 						bit = 1 << i;
 						sp = i;
 					}
@@ -2896,7 +2899,7 @@ void AnimateItem(ITEM_INFO *item)
 
 	// Update matrices
 	short itemNumber = item - Items;
-	g_Renderer->UpdateItemAnimations(itemNumber, true);
+	g_Renderer.UpdateItemAnimations(itemNumber, true);
 }
 
 void DoFlipMap(short group)
@@ -2925,7 +2928,7 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(r);
 
-			g_Renderer->FlipRooms(i, r->flippedRoom);
+			g_Renderer.FlipRooms(i, r->flippedRoom);
 		}
 	}
 
@@ -3075,7 +3078,7 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.bit = 1 << Node;
-		ShatterItem.meshp = Meshes[Objects[item->objectNumber].meshIndex + Node];
+		ShatterItem.meshp = &Meshes[Objects[item->objectNumber].meshIndex + Node];
 		ShatterItem.sphere.x = CreatureSpheres[Node].x;
 		ShatterItem.sphere.y = CreatureSpheres[Node].y;
 		ShatterItem.sphere.z = CreatureSpheres[Node].z;

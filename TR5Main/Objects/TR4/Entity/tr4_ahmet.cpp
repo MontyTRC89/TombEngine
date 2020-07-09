@@ -125,7 +125,7 @@ void AhmetControl(short itemNumber)
             // dont clear it !
             if (item->frameNumber == Anims[item->animNumber].frameEnd)
             {
-                item->collidable = FALSE; // NOTE: not exist in the original game, avoid wreid collision with lara...
+                item->collidable = false; // NOTE: not exist in the original game, avoid wreid collision with lara...
                 item->frameNumber = (Anims[item->animNumber].frameEnd - 1);
             }
         }
@@ -269,14 +269,14 @@ void AhmetControl(short itemNumber)
 
             if (!(ahmet->flags & 1) && item->frameNumber > (Anims[item->animNumber].frameBase + 7) && (item->touchBits & AHMET_LEFT_TOUCH))
             {
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                 CreatureEffect2(item, &ahmetBiteLeft, 10, -1, DoBloodSplat);
                 ahmet->flags |= 1;
             }
             else if (!(ahmet->flags & 2) && item->frameNumber > (Anims[item->animNumber].frameBase + 32) && (item->touchBits & AHMET_RIGHT_TOUCH))
             {
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                 CreatureEffect2(item, &ahmetBiteRight, 10, -1, DoBloodSplat);
                 ahmet->flags |= 2;
@@ -305,7 +305,7 @@ void AhmetControl(short itemNumber)
                 {
                     if (item->frameNumber > (Anims[item->animNumber].frameBase + 11) && (item->touchBits & AHMET_LEFT_TOUCH))
                     {
-                        LaraItem->hitStatus = TRUE;
+                        LaraItem->hitStatus = true;
                         LaraItem->hitPoints -= AHMET_JAW_DAMAGE;
                         CreatureEffect2(item, &ahmetBiteJaw, 10, -1, DoBloodSplat);
                         ahmet->flags |= 1;
@@ -334,14 +334,14 @@ void AhmetControl(short itemNumber)
             {
                 if (!(ahmet->flags & 1) && item->frameNumber > (Anims[item->animNumber].frameBase + 14) && (item->touchBits & AHMET_LEFT_TOUCH))
                 {
-                    LaraItem->hitStatus = TRUE;
+                    LaraItem->hitStatus = true;
                     LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                     CreatureEffect2(item, &ahmetBiteLeft, 10, -1, DoBloodSplat);
                     ahmet->flags |= 1;
                 }
                 else if (!(ahmet->flags & 2) && item->frameNumber > (Anims[item->animNumber].frameBase + 22) && (item->touchBits & AHMET_RIGHT_TOUCH))
                 {
-                    LaraItem->hitStatus = TRUE;
+                    LaraItem->hitStatus = true;
                     LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                     CreatureEffect2(item, &ahmetBiteRight, 10, -1, DoBloodSplat);
                     ahmet->flags |= 2;
