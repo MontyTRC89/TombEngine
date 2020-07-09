@@ -101,10 +101,10 @@ void CrocodileControl(short itemNumber)
         return;
 
     ITEM_INFO* item;
-    ObjectInfo* obj;
+    OBJECT_INFO* obj;
     CREATURE_INFO* crocodile;
     AI_INFO info;
-    OBJECT_BONES boneRot;
+    OBJECT_Bones boneRot;
     short angle;
     short boneAngle;
 
@@ -158,7 +158,7 @@ void CrocodileControl(short itemNumber)
         if ((item->hitStatus || info.distance < CROC_ALERT_RANGE) || (TargetVisible(item, &info) && info.distance < CROC_VISIBILITY_RANGE))
         {
             if (!crocodile->alerted)
-                crocodile->alerted = TRUE;
+                crocodile->alerted = true;
             AlertAllGuards(itemNumber);
         }
 
@@ -242,7 +242,7 @@ void CrocodileControl(short itemNumber)
                 {
                     CreatureEffect2(item, &crocBite, 10, -1, DoBloodSplat);
                     LaraItem->hitPoints -= CROC_DAMAGE;
-                    LaraItem->hitStatus = TRUE;
+                    LaraItem->hitStatus = true;
                     item->requiredAnimState = CROC_IDLE;
                 }
             }
@@ -285,7 +285,7 @@ void CrocodileControl(short itemNumber)
                 {
                     CreatureEffect2(item, &crocBite, 10, -1, DoBloodSplat);
                     LaraItem->hitPoints -= CROC_DAMAGE;
-                    LaraItem->hitStatus = TRUE;
+                    LaraItem->hitStatus = true;
                     item->requiredAnimState = WCROC_SWIM;
                 }
             }

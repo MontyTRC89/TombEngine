@@ -7,7 +7,7 @@
 #include "tr5_smashobject.h"
 #include "tr5_pushableblock.h"
 using std::function;
-void InitSmashObject(ObjectInfo* obj, int objectNumber)
+void InitSmashObject(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -21,7 +21,7 @@ void InitSmashObject(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitKeyHole(ObjectInfo* obj, int objectNumber)
+void InitKeyHole(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -31,7 +31,7 @@ void InitKeyHole(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitPuzzleHole(ObjectInfo* obj, int objectNumber)
+void InitPuzzleHole(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -44,7 +44,7 @@ void InitPuzzleHole(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitPuzzleDone(ObjectInfo* obj, int objectNumber)
+void InitPuzzleDone(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -56,7 +56,7 @@ void InitPuzzleDone(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitAnimating(ObjectInfo* obj, int objectNumber)
+void InitAnimating(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -67,12 +67,12 @@ void InitAnimating(ObjectInfo* obj, int objectNumber)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex + (0 * 4)] |= ROT_Y;
-		Bones[obj->boneIndex + (1 * 4)] |= ROT_X;
+		//Bones[obj->boneIndex + (0 * 4)] |= ROT_Y;
+		//Bones[obj->boneIndex + (1 * 4)] |= ROT_X;
 	}
 }
 
-void InitPickup(ObjectInfo* obj, int objectNumber)
+void InitPickup(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -86,7 +86,7 @@ void InitPickup(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitPickupItem(ObjectInfo* obj, function<InitFunction> func, int objectNumber, bool useDrawAnimItem)
+void InitPickupItem(OBJECT_INFO* obj, function<InitFunction> func, int objectNumber, bool useDrawAnimItem)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -109,7 +109,7 @@ void InitPickupItem(ObjectInfo* obj, function<InitFunction> func, int objectNumb
 	}
 }
 
-void InitProjectile(ObjectInfo* obj, function<InitFunction> func, int objectNumber, bool noLoad)
+void InitProjectile(OBJECT_INFO* obj, function<InitFunction> func, int objectNumber, bool noLoad)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded || noLoad)
@@ -123,7 +123,7 @@ void InitProjectile(ObjectInfo* obj, function<InitFunction> func, int objectNumb
 	}
 }
 
-void InitSearchObject(ObjectInfo* obj, int objectNumber)
+void InitSearchObject(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)
@@ -135,7 +135,7 @@ void InitSearchObject(ObjectInfo* obj, int objectNumber)
 	}
 }
 
-void InitPushableObject(ObjectInfo* obj, int objectNumber)
+void InitPushableObject(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];
 	if (obj->loaded)

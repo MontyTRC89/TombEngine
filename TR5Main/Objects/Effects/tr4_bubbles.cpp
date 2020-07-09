@@ -13,7 +13,7 @@
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	int dx = LaraItem->pos.xPos - fx->pos.xPos;
 	int dz = LaraItem->pos.zPos - fx->pos.zPos;
@@ -68,7 +68,7 @@ void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 
 void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	int dx = LaraItem->pos.xPos - fx->pos.xPos;
 	int dz = LaraItem->pos.zPos - fx->pos.zPos;
@@ -115,7 +115,7 @@ void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 
 void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	int dx = LaraItem->pos.xPos - fx->pos.xPos;
 	int dz = LaraItem->pos.zPos - fx->pos.zPos;
@@ -176,7 +176,7 @@ void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 {
 	ShatterItem.yRot = fx->pos.yRot;
-	ShatterItem.meshp = Meshes[fx->frameNumber];
+	ShatterItem.meshp = &Meshes[fx->frameNumber];
 	ShatterItem.sphere.x = fx->pos.xPos;
 	ShatterItem.sphere.y = fx->pos.yPos;
 	ShatterItem.sphere.z = fx->pos.zPos;
@@ -187,7 +187,7 @@ void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 
 void BubblesControl(short fxNum)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	short angles[2];
 	phd_GetVectorAngles(

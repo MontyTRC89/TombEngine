@@ -36,7 +36,7 @@ void Tr5DogControl(short itemNumber)
 
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	if (item->hitPoints <= 0)
 	{

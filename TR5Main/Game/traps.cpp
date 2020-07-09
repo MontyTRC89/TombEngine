@@ -52,7 +52,7 @@ void LaraBurn()
 		short fxNum = CreateNewEffect(LaraItem->roomNumber);
 		if (fxNum != NO_ITEM)
 		{
-			Effects[fxNum].objectNumber = ID_FLAME;
+			EffectList[fxNum].objectNumber = ID_FLAME;
 			Lara.burn = true;
 		}
 	}
@@ -151,7 +151,8 @@ void FlameEmitterControl(short itemNumber)
 		if (!Lara.burn
 			&& item->triggerFlags != 33
 			&& ItemNearLara(&item->pos, 600)
-			&& (SQUARE(LaraItem->pos.xPos - item->pos.xPos) + SQUARE(LaraItem->pos.zPos - item->pos.zPos) < 0x40000))
+			&& (SQUARE(LaraItem->pos.xPos - item->pos.xPos) + SQUARE(LaraItem->pos.zPos - item->pos.zPos) < 0x40000)
+			&& Lara.waterStatus != LW_FLYCHEAT)
 		{
 			LaraBurn();
 		}
@@ -214,7 +215,7 @@ void FlameEmitter2Control(short itemNumber)//5A1BC, 5A638 (F)
 
 void FlameControl(short fxNumber)
 {
-	FX_INFO* fx = &Effects[fxNumber];
+	FX_INFO* fx = &EffectList[fxNumber];
 
 	for (int i = 0; i < 14; i++)
 	{
@@ -275,6 +276,12 @@ void FlameControl(short fxNumber)
 		LaraItem->hitStatus = true;
 	}
 	else
+	{
+		KillEffect(fxNumber);
+		Lara.burn = false;
+	}
+
+	if (Lara.waterStatus == LW_FLYCHEAT)
 	{
 		KillEffect(fxNumber);
 		Lara.burn = false;
@@ -1218,7 +1225,7 @@ void FlameEmitter3Control(short itemNumber)
 
 			if (ItemNearLara(&pos, 600))
 			{
-				if (!Lara.burn)
+				if ((!Lara.burn) && Lara.waterStatus != LW_FLYCHEAT)
 				{
 					LaraItem->hitPoints -= 5;
 					LaraItem->hitStatus = true;
