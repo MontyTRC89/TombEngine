@@ -49,7 +49,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 	short fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.zPos = pos->zPos;

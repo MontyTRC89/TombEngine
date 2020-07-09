@@ -122,7 +122,7 @@ void SaveGame::saveItems()
 void SaveGame::saveItem(int itemNumber, int runtimeItem)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	LEB128::Write(m_stream, itemNumber);
 	LEB128::Write(m_stream, runtimeItem);
@@ -214,9 +214,6 @@ void SaveGame::saveLara(int arg1, int arg2)
 	// LARA_INFO struct dumped to savegame
 	LaraInfo lara;
 	memcpy(&lara, &Lara, sizeof(Lara));
-
-	for (int i = 0; i < 15; i++)
-		lara.meshPtrs[i] = (short*)((char*)lara.meshPtrs[i] - (ptrdiff_t)MeshBase);
 
 	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
 	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
@@ -512,11 +509,6 @@ bool SaveGame::readLara()
 	memcpy(&Lara, lara, sizeof(LaraInfo));
 	free(buffer);
 
-	for (int i = 0; i < NUM_LARA_MESHES; i++)
-	{
-		Lara.meshPtrs[i] = AddPtr(Lara.meshPtrs[i], short, MeshBase);
-	}
-
 	Lara.leftArm.frameBase = AddPtr(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
 	Lara.rightArm.frameBase = AddPtr(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
 	
@@ -558,7 +550,7 @@ bool SaveGame::readItem()
 	ITEM_INFO* item = &Items[itemNumber];
 	item->objectNumber = LEB128::ReadInt16(m_stream);
 
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	// Runtime items must be initialised
 	// TODO: test test test!!!
@@ -1020,7 +1012,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 	{
 		EnableBaddieAI(itemNumber, 1);
 
-		ObjectInfo* obj = &Objects[item->objectNumber];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 		creature->jointRotation[0] = LEB128::ReadInt16(m_stream);
@@ -1124,7 +1116,7 @@ bool SaveGame::readStatistics()
 void SaveGame::saveItemFlags(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	LEB128::Write(m_stream, item->flags);
 	LEB128::Write(m_stream, item->active);
@@ -1148,7 +1140,7 @@ void SaveGame::saveItemFlags(int arg1, int arg2)
 void SaveGame::saveItemIntelligentData(int arg1, int arg2)
 {
 	ITEM_INFO* item = &Items[arg1];
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	ITEM_INFO* enemy = (ITEM_INFO*)((char*)creature->enemy - (ptrdiff_t)malloc_buffer);

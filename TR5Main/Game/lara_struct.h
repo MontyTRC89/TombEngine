@@ -835,7 +835,7 @@ typedef struct LaraInfo
 	PHD_VECTOR lastPos;
 	FX_INFO* spazEffect;
 	int meshEffects;
-	short* meshPtrs[NUM_LARA_MESHES];
+	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
 	short targetAngles[2];
 	short turnRate;
@@ -891,7 +891,7 @@ typedef struct LaraInfo
 	DiaryInfo Diary;
 	WaterskinInfo Waterskin1;
 	WaterskinInfo Waterskin2;
-	RendererMesh* MeshesPointers[NUM_LARA_MESHES];
+	T5M::Renderer::RendererMesh* MeshesPointers[NUM_LARA_MESHES];
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];

@@ -310,7 +310,7 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 		rotX -= speed;
 	arm->xRot = rotX;
 
-	// TODO: set arm rotations to inherit rotations of parent bones. -Sezz
+	// TODO: set arm rotations to inherit rotations of parent Bones. -Sezz
 	arm->zRot = 0;
 }
 
@@ -472,7 +472,8 @@ void LaraGun() // (F) (D)
 			break;
 
 		case LG_UNDRAW_GUNS:
-			LARA_MESHES(ID_LARA, LM_HEAD);
+			//LARA_MESHES(ID_LARA, LM_HEAD);
+			Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
 
 			switch (Lara.gunType)
 			{
@@ -504,9 +505,11 @@ void LaraGun() // (F) (D)
 
 		case LG_READY:
 			if (!(TrInput & IN_ACTION))
-				LARA_MESHES(ID_LARA, LM_HEAD);
+				//LARA_MESHES(ID_LARA, LM_HEAD);
+				Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
 			else
-				LARA_MESHES(ID_LARA_SCREAM, LM_HEAD);
+				//LARA_MESHES(ID_LARA_SCREAM, LM_HEAD);
+				Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
 		
 			if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
 				Camera.type = COMBAT_CAMERA;
@@ -580,7 +583,7 @@ void LaraGun() // (F) (D)
 		case LG_HANDS_BUSY:
 			if (Lara.gunType == WEAPON_FLARE)
 			{
-				if (CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND))
+				if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND  /*CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND)*/)
 				{
 #if 0
 					Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
@@ -689,7 +692,7 @@ int WeaponObjectMesh(int weaponType)
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	
 	item->hitStatus = true;
 	if (creature != nullptr && item != LaraItem)

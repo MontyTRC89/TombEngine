@@ -1,6 +1,8 @@
 #pragma once
-#include "sphere.h"
-#include "Renderer11.h"
+#include <sphere.h>
+#include <Renderer11.h>
+#include <newtypes.h>
+#include <level.h>
 
 #define MAX_DEBRIS 256
 
@@ -25,7 +27,7 @@ typedef struct SHATTER_ITEM
 {
 	SPHERE sphere;
 	ITEM_LIGHT* il;
-	short* meshp;
+	MESH* meshp;
 	int bit;
 	short yRot;
 	short flags;
@@ -40,7 +42,7 @@ typedef struct ShatterImpactInfo
 typedef struct DebrisMesh
 {
 	RENDERER_BUCKETS bucket;
-	std::array<RendererVertex, 3> vertices;
+	std::array<T5M::Renderer::RendererVertex, 3> vertices;
 };
 
 typedef struct DebrisFragment

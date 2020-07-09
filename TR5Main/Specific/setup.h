@@ -12,7 +12,7 @@ typedef enum HitEffectEnum
     MAX_HIT_EFFECT
 };
 
-typedef struct ObjectInfo
+typedef struct OBJECT_INFO
 {
 	short nmeshes; 
 	short meshIndex; 
@@ -75,7 +75,7 @@ typedef struct StaticInfo
 constexpr auto GRAVITY = 6;
 constexpr auto SWAMP_GRAVITY = 2;
 
-extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
+extern OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
 extern StaticInfo StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags();

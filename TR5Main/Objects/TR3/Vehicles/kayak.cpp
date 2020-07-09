@@ -954,11 +954,11 @@ static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 		/* --------------------- */
 		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 4) && (frame == 24) && (!(kinfo->Flags & 0x80)))
 		{
-			short* tmp;
-			tmp = Lara.meshPtrs[LM_RHAND];
+			/*MESH tmp = Meshes[Lara.meshPtrs[LM_RHAND]];
 
 			LARA_MESHES(ID_KAYAK_LARA_ANIMS, LM_RHAND);
-			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
+			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;*/
+			Lara.meshPtrs[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
 			
 			lara->meshBits &= ~LARA_LEG_BITS;
 			kinfo->Flags |= 0x80;
@@ -968,11 +968,11 @@ static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 	case KS_JUMPOUT:
 		if ((lara->animNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + 14) && (frame == 27) && (kinfo->Flags & 0x80))
 		{
-			short* tmp;
-			tmp = Lara.meshPtrs[LM_RHAND];
+			/*MESH tmp = Meshes[Lara.meshPtrs[LM_RHAND]];
 
-			Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND];
-			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
+			LARA_MESHES(ID_KAYAK_LARA_ANIMS, LM_RHAND);
+			Meshes[Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;*/
+			Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 
 			lara->meshBits |= LARA_LEG_BITS;
 			kinfo->Flags &= ~0x80;
@@ -1097,7 +1097,7 @@ static void KayakToBaddieCollision(ITEM_INFO* kayak)
 
 			if (item->collidable && item->status != ITEM_INVISIBLE)
 			{
-				ObjectInfo* object;
+				OBJECT_INFO* object;
 
 				object = &Objects[item->objectNumber];
 

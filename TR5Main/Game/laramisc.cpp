@@ -18,7 +18,7 @@
 #include "camera.h"
 #include "input.h"
 #include "sound.h"
-
+using T5M::Renderer::g_Renderer;
 extern GameFlow* g_GameFlow;
 extern short FXType;
 COLL_INFO lara_coll;
@@ -742,8 +742,9 @@ void LaraInitialiseMeshes() // (AF) (D)
 {
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
-		MESHES(ID_LARA, i) = MESHES(ID_LARA_SKIN, i);
-		LARA_MESHES(ID_LARA, i);
+		//Meshes[i] = Meshes[MESHES(ID_LARA_SKIN, i)];
+		//LARA_MESHES(ID_LARA, MESHES(ID_LARA_SKIN, i));
+		Lara.meshPtrs[i] = Objects[ID_LARA_SKIN].meshIndex + i;
 	}
 
 	/* Hardcoded code */
@@ -1033,7 +1034,7 @@ void AnimateLara(ITEM_INFO* item)
 	}
 
 	// Update matrices
-	g_Renderer->UpdateLaraAnimations(true);
+	g_Renderer.UpdateLaraAnimations(true);
 }
 
 void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)

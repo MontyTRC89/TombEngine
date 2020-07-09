@@ -91,26 +91,35 @@ namespace T5M {
 				s.affectedByWind = Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND;
 				s.sourceColor = Vector4(.4, .4, .4, 1);
 				s.destinationColor = Vector4(0, 0, 0, 0);
-				float size = (float)((GetRandomControl() & 0x0F) + 48); // -TriggerGunSmoke_SubFunction(weaponType);
 
 				if (initial)
 				{
-					s.sourceSize = size;
-					s.destinationSize = (size * 8) + 8;
+					float size = (frand() * 25) + 48;
+					s.sourceSize = size *2;
+					s.destinationSize = size * 8;
+					s.terminalVelocity = 0;
+					s.friction = 0.90f;
+					s.life = frand() * 30 + 60;
+										
 				}
 				else
 				{
+					float size = (float)((GetRandomControl() & 0x0F) + 48); // -TriggerGunSmoke_SubFunction(weaponType);
+
 					s.sourceSize = size / 2;
-					s.destinationSize = size * 2;
+					s.destinationSize = size * 4;
+					s.terminalVelocity = 0;
+					s.friction = 0.97f;
+					s.life = frand() * 20 + 42;
+					
 				}
-				s.terminalVelocity = 0;
-				s.friction = 0.89f;
-				s.life = frand() * 10 + 35;
 				s.position = Vector3(x, y, z);
 				s.position += Vector3(frandMinMax(-8, 8), frandMinMax(-8, 8), frandMinMax(-8, 8));
-				s.angularVelocity = frandMinMax(-PI, PI);
+				s.angularVelocity = frandMinMax(-PI / 4, PI / 4);
+
 				s.angularDrag = 0.8f;
 				s.room = LaraItem->roomNumber;
+				
 			}
 
 		}

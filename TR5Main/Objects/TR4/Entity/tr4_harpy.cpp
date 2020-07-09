@@ -23,7 +23,7 @@ static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
 	{
-		FX_INFO* fx = &Effects[fxNumber];
+		FX_INFO* fx = &EffectList[fxNumber];
 
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
@@ -260,7 +260,7 @@ void HarpyControl(short itemNumber)
 		return;
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	short angle = 0;
 	short joint0 = 0;

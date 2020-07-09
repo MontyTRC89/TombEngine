@@ -70,7 +70,7 @@ extern short CurrentFOV;
 extern int GetLaraOnLOS;
 extern int SniperOverlay;
 
-void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll);
+void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push);
 void InitialiseCamera();

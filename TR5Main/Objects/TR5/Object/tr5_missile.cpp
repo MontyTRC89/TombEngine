@@ -20,7 +20,7 @@ int DebrisFlags;
 
 void MissileControl(short itemNumber)
 {
-	FX_INFO* fx = &Effects[itemNumber];
+	FX_INFO* fx = &EffectList[itemNumber];
 	if (fx->flag1 == 2)
 	{
 		fx->pos.zRot += 16 * fx->speed;
@@ -221,10 +221,10 @@ void MissileControl(short itemNumber)
 
 void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 {
-	short** meshpp = &Meshes[fx->frameNumber];
+	MESH* meshpp = &Meshes[fx->frameNumber];
 
 	ShatterItem.yRot = fx->pos.yRot;
-	ShatterItem.meshp = *meshpp;
+	ShatterItem.meshp = meshpp;
 	ShatterItem.sphere.x = fx->pos.xPos;
 	ShatterItem.sphere.y = fx->pos.yPos;
 	ShatterItem.sphere.z = fx->pos.zPos;

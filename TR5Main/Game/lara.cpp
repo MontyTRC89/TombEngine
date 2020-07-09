@@ -483,7 +483,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	short selectedObject = g_Inventory.GetSelectedObject();
 
 	if (item->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus || selectedObject == NO_ITEM)
-		return FALSE;
+		return false;
 
 	if (selectedObject >= ID_WATERSKIN1_EMPTY && selectedObject <= ID_WATERSKIN2_5)
 	{
@@ -521,7 +521,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -531,7 +531,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	Lara.gunStatus = LG_HANDS_BUSY;
 	g_Inventory.SetSelectedObject(NO_ITEM);
 
-	return TRUE;
+	return true;
 }
 
 void lara_as_stop(ITEM_INFO* item, COLL_INFO* coll)

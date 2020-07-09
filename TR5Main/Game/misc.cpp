@@ -50,6 +50,8 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 
 void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 {
+	if (*numRooms <= 0)
+		return;
 	short numDoors, * door, adjoiningRoom;
 	int i, j;
 	bool adjoiningRoomFound;
