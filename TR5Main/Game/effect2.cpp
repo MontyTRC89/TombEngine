@@ -82,7 +82,7 @@ void DetatchSpark(int num, SpriteEnumFlag type)// (F) (D)
 				case SP_FX:
 					if (sptr->flags & SP_USEFXOBJPOS)
 					{
-						sptr->on = FALSE;
+						sptr->on = false;
 					}
 					else
 					{
@@ -96,7 +96,7 @@ void DetatchSpark(int num, SpriteEnumFlag type)// (F) (D)
 				case SP_ITEM:
 					if (sptr->flags & SP_USEFXOBJPOS)
 					{
-						sptr->on = FALSE;
+						sptr->on = false;
 					}
 					else
 					{

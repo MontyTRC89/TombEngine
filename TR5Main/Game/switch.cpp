@@ -650,7 +650,7 @@ void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.torsoXrot = 0;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				l->currentAnimState = ANIMATION_LARA_TRY_HANG_SOLID;
-				UseForcedFixedCamera = TRUE;
+				UseForcedFixedCamera = true;
 				ForcedFixedCamera.y = item->pos.yPos - 2048;
 				ForcedFixedCamera.roomNumber = item->roomNumber;
 				AddActiveItem(itemNum);

@@ -195,7 +195,7 @@ int LoadItems()
 
 void LoadObjects()
 {
-	memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
+	memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
 	memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
