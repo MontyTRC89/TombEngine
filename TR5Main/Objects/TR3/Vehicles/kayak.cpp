@@ -1097,7 +1097,7 @@ static void KayakToBaddieCollision(ITEM_INFO* kayak)
 
 			if (item->collidable && item->status != ITEM_INVISIBLE)
 			{
-				ObjectInfo* object;
+				OBJECT_INFO* object;
 
 				object = &Objects[item->objectNumber];
 

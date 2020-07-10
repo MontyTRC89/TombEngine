@@ -36,7 +36,7 @@ extern byte Sequences[3];
 extern byte CurrentSequence;
 extern int NumRPickups;
 
-ObjectInfo Objects[ID_NUMBER_OBJECTS];
+OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
 StaticInfo StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags()
@@ -52,7 +52,7 @@ void InitialiseGameFlags()
 
 void ObjectObjects()
 {
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 
 	obj = &Objects[ID_CAMERA_TARGET];
 	if (obj->loaded)
@@ -617,7 +617,7 @@ void ObjectObjects()
 
 void TrapObjects()
 {
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (obj->loaded)
 	{
@@ -795,7 +795,7 @@ void CustomObjects()
 
 void InitialiseObjects()
 {
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
