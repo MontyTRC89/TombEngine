@@ -68,7 +68,7 @@ void TriggerMutantRocketEffects(short fxNumber, short xVel, short yVel, short zV
 
     fx = &EffectList[fxNumber];
     sptr = &Sparks[GetFreeSpark()];
-    sptr->on = TRUE;
+    sptr->on = true;
     color = (GetRandomControl() & 0x3F) - 128;
     sptr->sB = 0;
     sptr->sR = color;

@@ -199,7 +199,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 			ITEM_INFO* item = &Items[itemNum];
 			if (item->collidable && item->status != ITEM_INVISIBLE && item != LaraItem && item != v)
 			{
-				ObjectInfo* object = &Objects[item->objectNumber];
+				OBJECT_INFO* object = &Objects[item->objectNumber];
 				if (object->collision && (object->intelligent || item->objectNumber == ID_ROLLINGBALL || item->objectNumber == ID_ANIMATING2))
 				{
 					int x = v->pos.xPos - item->pos.xPos;

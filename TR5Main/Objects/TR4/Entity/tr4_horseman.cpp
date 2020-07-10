@@ -92,7 +92,7 @@ static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 void InitialiseHorse(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[ID_HORSE];
+	OBJECT_INFO* obj = &Objects[ID_HORSE];
 
 	item->animNumber = obj->animIndex + 2;
 	item->frameNumber = Anims[item->animNumber].frameBase;
@@ -103,7 +103,7 @@ void InitialiseHorse(short itemNumber)
 void InitialiseHorseman(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[ID_HORSEMAN];
+	OBJECT_INFO* obj = &Objects[ID_HORSEMAN];
 
 	ClearItem(itemNumber);
 

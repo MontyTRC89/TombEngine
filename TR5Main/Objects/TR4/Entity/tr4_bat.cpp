@@ -65,7 +65,7 @@ void BatControl(short itemNumber)
         {
             item->goalAnimState = BAT_DEATH;
             item->pos.yPos = item->floor;
-            item->gravityStatus = FALSE;
+            item->gravityStatus = false;
         }
         else
         {
@@ -150,7 +150,7 @@ void BatControl(short itemNumber)
                 if (bat->enemy == LaraItem)
                 {
                     LaraItem->hitPoints -= BAT_DAMAGE;
-                    LaraItem->hitStatus = TRUE;
+                    LaraItem->hitStatus = true;
                 }
                 bat->flags = 1;
             }
