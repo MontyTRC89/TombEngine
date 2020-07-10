@@ -831,6 +831,12 @@
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\memory\pool.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\linearPool.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1524,9 +1530,6 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\RenderView\RenderView.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\memory\qmalloc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\memory\malloc.cpp">
