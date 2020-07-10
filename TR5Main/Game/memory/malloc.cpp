@@ -1,20 +1,15 @@
 #include "framework.h"
 #include "malloc.h"
-#include "qmalloc.h"
-#if REPLACE_HEAP_MEMORY
-#include <new>
-#endif
+using namespace std;
 char* malloc_buffer;
 int malloc_size;
 char* malloc_ptr;
 int malloc_free;
 int malloc_used;
-using namespace T5M::Memory;
-MemoryPool* gameMemory;
-
+Pool<BlockSize::Small>* gameMemory;
 void init_game_malloc() noexcept
 {
-	gameMemory = new MemoryPool(MemoryUnit::MebiByte, 196, 128);
+	gameMemory = new Pool<BlockSize::Small>(8*1024*1024);
 }
 
 void game_free(void* ptr) noexcept
