@@ -114,8 +114,8 @@ namespace T5M::Memory {
 			}
 		}
 	public:
-		template <typename T>
-		T* malloc(Size count = 1) {
+		template <typename T,typename ... Args>
+		T* malloc(Size count = 1,Args&&...args) {
 			//Forbid allocation of size 0
 			if (count < 1) return nullptr;
 			//assertm(count >= 1,"Allocation Size must be greater than 0!");
@@ -149,7 +149,7 @@ namespace T5M::Memory {
 			head->data.nextFreeBlock = currentNode->data.nextFreeBlock;
 			head->data.managedBlocks = numFreeBlocksAfterSplit;
 			Log("Malloc: New Free Blocks : " << numFreeBlocksAfterSplit)
-			return reinterpret_cast<T*>(blockToReturn);
+			return new(blockToReturn)T(std::forward<Args>(args)...);
 
 		}
 		void free(void* ptr) {

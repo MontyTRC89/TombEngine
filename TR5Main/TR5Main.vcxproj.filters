@@ -849,6 +849,9 @@
     <ClInclude Include="Game\memory\PoolAllocator.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\memory\memory.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
