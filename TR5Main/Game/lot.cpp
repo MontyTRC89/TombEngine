@@ -24,10 +24,10 @@ void InitialiseLOTarray(int allocMem)
 	for (int i = 0; i < NUM_SLOTS; i++, creature++)
 	{
 		creature->itemNum = NO_ITEM;
-		creature->LOT.node.resize(Boxes.size());
 		if (allocMem)
 		{
 			creature->LOT.node.clear();
+			creature->LOT.node.resize(Boxes.size());
 			for (int j = 0; j < Boxes.size(); j++)
 			{
 				creature->LOT.node.emplace_back(BOX_NODE());

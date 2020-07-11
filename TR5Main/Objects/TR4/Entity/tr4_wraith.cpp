@@ -30,7 +30,7 @@ void InitialiseWraith(short itemNumber)
 	WRAITH_INFO* wraithData;
 	
 
-	item->data = (WRAITH_INFO*)game_malloc(WRAITH_COUNT * sizeof(WRAITH_INFO));
+	item->data = game_malloc<WRAITH_INFO>(WRAITH_COUNT);
 	item->itemFlags[0] = 0;
 	item->hitPoints = 0;
 	item->speed = 0x40;
