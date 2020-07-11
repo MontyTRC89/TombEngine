@@ -1,8 +1,8 @@
-#ifndef POOL_H
-#define POOL_H
+#pragma once
 #include <stdint.h>
 #include <memory>
 #include <iostream>
+#include "Game/debug/assert.h"
 namespace T5M::Memory {
 	enum class BlockSize : size_t {
 		Minimal = 4,
@@ -56,10 +56,12 @@ namespace T5M::Memory {
 	private:
 		static constexpr Magic MAGIC = 0xDEADBEEF;
 		Size allocatedBlockCount;
+		Size allocatedBytesCount;
 		const std::unique_ptr<Block> allocatedBlocks;
 		BlockHeader* head;
 		BlockHeader* firstPhysicalBlock;
 		void initialize() {
+			std::memset(allocatedBlocks.get(), 0, allocatedBytesCount);
 			// Place initial BlockHeader at the beginning of all blocks
 			head = new(allocatedBlocks.get())BlockHeader();
 			head->data.nextFreeBlock = nullptr;
@@ -72,7 +74,7 @@ namespace T5M::Memory {
 
 
 	public:
-		Pool(Size numBlocks) : allocatedBlockCount(numBlocks), allocatedBlocks(new Block[numBlocks]{ 0 }) {
+		Pool(Size numBlocks) : allocatedBlockCount(numBlocks), allocatedBytesCount(sizeof(Block)* numBlocks) , allocatedBlocks(new Block[numBlocks]) {
 			initialize();
 		}
 	private:
@@ -107,21 +109,19 @@ namespace T5M::Memory {
 	public:
 		template <typename T>
 		T* malloc(Size count = 1) {
-
 			//Forbid allocation of size 0
 			if (count < 1) return nullptr;
+			//assertm(count >= 1,"Allocation Size must be greater than 0!");
 			// calculate the amount of blocks we want
 			Size requestedBlocks = 1 + (((sizeof(T) * count) - 1) / static_cast<Size>(BlkSz));
 			BlockHeader* currentNode = head;
 			//Make sure we have enough space for one Block Header and one free Block!
 			while (currentNode != nullptr && currentNode->data.managedBlocks < requestedBlocks) {
-				if (currentNode->data.magic != MAGIC)
-					throw std::runtime_error("Pool is corrupt!");
+				assertm(currentNode->data.magic == MAGIC, "Pool is corrupt");
 				currentNode = currentNode->data.nextFreeBlock;
 			}
 			//We could not find a block of suitable size
-			if (currentNode == nullptr)
-				return nullptr;
+			assertm(currentNode != nullptr, "Pool is full");
 			//Free Blocks are directly behind BlockHeader
 			Block* blockToReturn = reinterpret_cast<Block*>(currentNode + 1);
 			//The current node will be removed from Free List, so keep the number of Blocks that will be deallocated for later!
@@ -143,6 +143,7 @@ namespace T5M::Memory {
 		}
 
 		void free(void* ptr) {
+			assertm(ptr >= allocatedBlocks.get() && ptr < (allocatedBlocks.get() + allocatedBlockCount), "memory must be in Pool range!");
 			//Go to the point infront of the pointer to free, where an old header was before
 			BlockHeader* blockHead = (reinterpret_cast<BlockHeader*>(ptr)) - 1;
 			if (blockHead->data.magic == MAGIC) {
@@ -164,5 +165,3 @@ namespace T5M::Memory {
 		}
 	};
 }
-
-#endif
