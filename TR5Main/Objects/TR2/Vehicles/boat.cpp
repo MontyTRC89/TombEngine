@@ -809,7 +809,7 @@ void InitialiseBoat(short itemNum)
 	BOAT_INFO* binfo;
 
 	boat = &Items[itemNum];
-	binfo = (BOAT_INFO*)game_malloc(sizeof(BOAT_INFO));
+	binfo = game_malloc<BOAT_INFO>();
 	boat->data = (void*)binfo;
 	binfo->boat_turn = 0;
 	binfo->left_fallspeed = 0;

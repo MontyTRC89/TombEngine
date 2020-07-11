@@ -1424,7 +1424,7 @@ short* FindPlinth(ITEM_INFO* item)
     for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)
     {
         ITEM_INFO* current = &Items[itemNumber];
-        ObjectInfo* obj = &Objects[current->objectNumber];
+        OBJECT_INFO* obj = &Objects[current->objectNumber];
 
         if (!obj->isPickup
             && item->pos.xPos == current->pos.xPos

@@ -35,7 +35,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void StartBaddy(ObjectInfo* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded)
@@ -600,12 +600,12 @@ static void StartBaddy(ObjectInfo* obj)
 	}
 }
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(OBJECT_INFO* obj)
 {
 	
 }
 
-static void StartTrap(ObjectInfo* obj)
+static void StartTrap(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_ROLLING_SPINDLE];
 	if (obj->loaded)
@@ -628,7 +628,7 @@ static void StartTrap(ObjectInfo* obj)
 }
 
 // boat, snowmobile, snowmobile gun
-static void StartVehicles(ObjectInfo* obj)
+static void StartVehicles(OBJECT_INFO* obj)
 {
 	// TODO: fix BoatControl() not using int BoatControl(void)
 	obj = &Objects[ID_SPEEDBOAT];
@@ -654,7 +654,7 @@ static void StartVehicles(ObjectInfo* obj)
 	}
 }
 
-static ObjectInfo* objToInit;
+static OBJECT_INFO* objToInit;
 void InitialiseTR2Objects()
 {
 	StartBaddy(objToInit);

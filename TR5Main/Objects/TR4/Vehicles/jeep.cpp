@@ -336,7 +336,7 @@ void InitialiseJeep(short itemNum)
 {
 	ITEM_INFO* item = &Items[itemNum];
 	
-	JEEP_INFO* jeep = (JEEP_INFO*)game_malloc(sizeof(JEEP_INFO));
+	JEEP_INFO* jeep = game_malloc<JEEP_INFO>();
 	item->data = jeep;
 
 	jeep->velocity = 0;
@@ -537,7 +537,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 				}
 				else
 				{
-					ObjectInfo* object = &Objects[item->objectNumber];
+					OBJECT_INFO* object = &Objects[item->objectNumber];
 					if (object->collision && object->intelligent ||
 						item->objectNumber == ID_ROLLINGBALL)
 					{

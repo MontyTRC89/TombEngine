@@ -1097,7 +1097,7 @@ static void KayakToBaddieCollision(ITEM_INFO* kayak)
 
 			if (item->collidable && item->status != ITEM_INVISIBLE)
 			{
-				ObjectInfo* object;
+				OBJECT_INFO* object;
 
 				object = &Objects[item->objectNumber];
 
@@ -1166,7 +1166,7 @@ void InitialiseKayak(short itemNumber)
 	KAYAK_INFO* Kayak;
 
 	v = &Items[itemNumber];
-	Kayak = (KAYAK_INFO*)game_malloc(sizeof(KAYAK_INFO));
+	Kayak = game_malloc<KAYAK_INFO>();
 	v->data = (void*)Kayak;
 	Kayak->Vel = 0;
 	Kayak->Rot = 0;

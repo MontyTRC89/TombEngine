@@ -55,7 +55,7 @@ namespace T5M::Renderer
         view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f));
         projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
-        ObjectInfo *obj = &Objects[objectNum];
+        OBJECT_INFO *obj = &Objects[objectNum];
         RendererObject &moveableObj = *m_moveableObjects[objectNum];
 
         if (obj->animIndex != -1)
@@ -113,7 +113,7 @@ namespace T5M::Renderer
             for (int m = 0; m < NUM_BUCKETS; m++)
             {
                 RendererBucket *bucket = &mesh->Buckets[m];
-                if (bucket->NumVertices == 0)
+                if (bucket->Vertices.size() == 0)
                     continue;
 
                 if (m < 2)
@@ -414,7 +414,7 @@ namespace T5M::Renderer
 
             if (gunshell->counter > 0)
             {
-                ObjectInfo *obj = &Objects[gunshell->objectNumber];
+                OBJECT_INFO *obj = &Objects[gunshell->objectNumber];
                 RendererObject &moveableObj = *m_moveableObjects[gunshell->objectNumber];
 
                 Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos, gunshell->pos.zPos);
@@ -431,7 +431,7 @@ namespace T5M::Renderer
                 {
                     RendererBucket *bucket = &mesh->Buckets[b];
 
-                    if (bucket->NumVertices == 0)
+                    if (bucket->Vertices.size() == 0)
                         continue;
 
                     m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -569,7 +569,7 @@ namespace T5M::Renderer
                 Matrix rotation = Matrix::CreateRotationY(TO_RAD(ring->objects[objectIndex].rotation + 16384 + g_Inventory.GetInventoryObject(inventoryObject)->rotY));
                 Matrix transform = (scale * rotation) * translation;
 
-                ObjectInfo *obj = &Objects[objectNumber];
+                OBJECT_INFO *obj = &Objects[objectNumber];
                 if (!m_moveableObjects[objectNumber].has_value())
                     continue;
                 RendererObject &moveableObj = *m_moveableObjects[objectNumber];
@@ -613,7 +613,7 @@ namespace T5M::Renderer
                     for (int m = 0; m < NUM_BUCKETS; m++)
                     {
                         RendererBucket *bucket = &mesh->Buckets[m];
-                        if (bucket->NumVertices == 0)
+                        if (bucket->Vertices.size() == 0)
                             continue;
 
                         if (m < 2)
@@ -1389,7 +1389,7 @@ namespace T5M::Renderer
 
         if (Objects[ID_SPIDERS_EMITTER].loaded)
         {
-            ObjectInfo* obj = &Objects[ID_SPIDERS_EMITTER];
+            OBJECT_INFO* obj = &Objects[ID_SPIDERS_EMITTER];
             RendererObject* moveableObj = m_moveableObjects[ID_SPIDERS_EMITTER].get();
             short* meshPtr = Meshes[Objects[ID_SPIDERS_EMITTER].meshIndex + ((Wibble >> 2) & 2)];
             RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
@@ -1462,7 +1462,7 @@ namespace T5M::Renderer
 
         if (Objects[ID_RATS_EMITTER].loaded)
         {
-            ObjectInfo *obj = &Objects[ID_RATS_EMITTER];
+            OBJECT_INFO *obj = &Objects[ID_RATS_EMITTER];
             RendererObject &moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
             for (int m = 0; m < 32; m++)
@@ -1488,7 +1488,7 @@ namespace T5M::Renderer
                     {
                         RendererBucket *bucket = &mesh->Buckets[b];
 
-                        if (bucket->NumVertices == 0)
+                        if (bucket->Vertices.size() == 0)
                             continue;
 
                         m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -1513,7 +1513,7 @@ namespace T5M::Renderer
 
         if (Objects[ID_BATS_EMITTER].loaded)
         {
-            ObjectInfo *obj = &Objects[ID_BATS_EMITTER];
+            OBJECT_INFO *obj = &Objects[ID_BATS_EMITTER];
             RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
             RendererMesh *mesh = getMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
@@ -1524,7 +1524,7 @@ namespace T5M::Renderer
             {
                 RendererBucket *bucket = &mesh->Buckets[b];
 
-                if (bucket->NumVertices == 0)
+                if (bucket->Vertices.size() == 0)
                     continue;
 
                 for (int i = 0; i < NUM_BATS; i++)
@@ -2054,6 +2054,7 @@ namespace T5M::Renderer
             printDebugMessage("Statics: %d", m_staticsToDraw.size());
             printDebugMessage("Lights: %d", m_lightsToDraw.size());
             printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
+			printDebugMessage("LaraItem.boxNumber: %d", LaraItem->boxNumber);
             printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
             printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
             printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
@@ -2189,7 +2190,7 @@ namespace T5M::Renderer
         }
         RendererRoom &const room = m_rooms[item->Item->roomNumber];
         RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
-        ObjectInfo *obj = &Objects[item->Item->objectNumber];
+        OBJECT_INFO *obj = &Objects[item->Item->objectNumber];
 
         m_stItem.World = item->World;
         m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);

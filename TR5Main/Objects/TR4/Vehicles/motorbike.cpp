@@ -81,7 +81,7 @@ void InitialiseMotorbike(short itemNumber)
     MOTORBIKE_INFO* motorbike;
 
     item = &Items[itemNumber];
-    motorbike = (MOTORBIKE_INFO*)game_malloc(sizeof(MOTORBIKE_INFO));
+    motorbike = game_malloc<MOTORBIKE_INFO>();
     item->data = (void*)motorbike;
     motorbike->velocity = 0;
     motorbike->bikeTurn = 0;
@@ -231,7 +231,7 @@ static void DrawMotorbikeLight(ITEM_INFO* item)
     rnd = (2 * motorbike->lightPower) - (GetRandomControl() & 0xF);
     // TODO: Spot Light
     /*if (rnd <= 0)
-        SpotLightEnabled = FALSE;
+        SpotLightEnabled = false;
     else
         CreateSpotLight(&start, &target, item->pos.yRot, rnd);*/
 }
@@ -247,22 +247,22 @@ static BOOL GetOnMotorBike(short itemNumber)
 
     item = &Items[itemNumber];
     if (item->flags & ONESHOT || Lara.gunStatus == LG_HANDS_BUSY || LaraItem->gravityStatus)
-        return FALSE;
+        return false;
 
     if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Inventory.GetSelectedObject() != ID_PUZZLE_ITEM1)
-        return FALSE;
+        return false;
 
     dx = LaraItem->pos.xPos - item->pos.xPos;
     dz = LaraItem->pos.zPos - item->pos.zPos;
     distance = SQUARE(dx) + SQUARE(dz);
     if (distance > 170000)
-        return FALSE;
+        return false;
 
     room_number = item->roomNumber;
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
     if (height < -32000)
-        return FALSE;
+        return false;
 
     angle = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos) - item->pos.yRot;
     tempangle = angle - item->pos.yRot;
@@ -270,15 +270,15 @@ static BOOL GetOnMotorBike(short itemNumber)
     {
         // left
         if (tempangle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
-            return FALSE;
+            return false;
     }
     else
     {
         // right
         if (tempangle > ANGLE(225.0f) && tempangle < ANGLE(315.0f))
-            return FALSE;
+            return false;
     }
-    return TRUE;
+    return true;
 }
 
 void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
@@ -306,7 +306,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             {
                 CreateFlare(ID_FLARE_ITEM, FALSE);
                 undraw_flare_meshes();
-                Lara.flareControlLeft = FALSE;
+                Lara.flareControlLeft = false;
                 Lara.gunType = WEAPON_NONE;
                 Lara.requestGunType = WEAPON_NONE;
                 Lara.flareAge = 0;
@@ -343,7 +343,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             Lara.hitDirection = -1;
             AnimateItem(laraitem);
             motorbike->revs = 0;
-            item->collidable = TRUE;
+            item->collidable = true;
         }
         else
         {
@@ -500,11 +500,11 @@ static int MotorBikeCheckGetOff(void)
         Lara.Vehicle = NO_ITEM;
         Lara.gunStatus = LG_NO_ARMS;
         DashTimer = 120;
-        return TRUE;
+        return true;
     }
 
     if (LaraItem->frameNumber != Anims[LaraItem->animNumber].frameEnd)
-        return TRUE;
+        return true;
 
     // exit when falling
     // if (LaraItem->state_current == BIKE_EMPTY6) {
@@ -514,7 +514,7 @@ static int MotorBikeCheckGetOff(void)
     // lara death when falling too much
     // }
 
-    return FALSE;
+    return false;
 }
 
 static int DoMotorBikeDynamics(int height, int fallspeed, int* y, int flags)
@@ -705,7 +705,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             if (anglex < 0)
                 anglex2 = -anglex;
             if (anglex2 > 24)
-                NoGetOff = TRUE;
+                NoGetOff = true;
             anglex *= 16;
             motorbike->velocity -= anglex;
         }
@@ -714,7 +714,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
         if (abs(anglez) > 32)
         {
             short ang, angabs;
-            NoGetOff = TRUE;
+            NoGetOff = true;
             if (anglez >= 0)
                 ang = item->pos.yRot + 0x4000;
             else
@@ -814,7 +814,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
         if (&Items[Lara.Vehicle] == item && motorbike->velocity >= 0x8000 && newspeed < (motorbike->velocity - 10))
         {
             LaraItem->hitPoints -= (motorbike->velocity - newspeed) >> 7;
-            LaraItem->hitStatus = TRUE;
+            LaraItem->hitStatus = true;
         }
 
         if (motorbike->velocity > 0 && newspeed < motorbike->velocity)
@@ -847,17 +847,17 @@ static BOOL MotorbikeCanGetOff(void)
     floor = GetFloor(x, y, z, &room_number);
     height = GetFloorHeight(floor, x, y, z);
     if (HeightType == BIG_SLOPE || HeightType == DIAGONAL || height == -NO_HEIGHT)
-        return FALSE;
+        return false;
 
     if (abs(height - item->pos.yPos) > STEP_SIZE)
-        return FALSE;
+        return false;
     ceiling = GetCeiling(floor, x, y, z);
     if ((ceiling - item->pos.yPos) > -LARA_HITE)
-        return FALSE;
+        return false;
     if ((height - ceiling) < LARA_HITE)
-        return FALSE;
+        return false;
 
-    return TRUE;
+    return true;
 }
 
 static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
@@ -1239,7 +1239,7 @@ void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* laraitem)
     laraitem->goalAnimState = BIKE_IDLE;
     laraitem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BIKE_IDLE_ANIM;
     laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
-    laraitem->gravityStatus = FALSE;
+    laraitem->gravityStatus = false;
     item->animNumber = laraitem->animNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
     item->frameNumber = laraitem->frameNumber + (Anims[ID_MOTORBIKE].frameBase - Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
     item->hitPoints = 1;
@@ -1279,11 +1279,11 @@ int MotorbikeControl(void)
     if (LaraItem->hitPoints <= 0)
     {
         TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
-        dead = TRUE;
+        dead = true;
     }
     else
     {
-        dead = FALSE;
+        dead = false;
     }
 
     if (motorbike->flags)

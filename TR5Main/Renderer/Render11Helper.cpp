@@ -128,7 +128,7 @@ namespace T5M::Renderer
 
 		// Update waterfalls textures
 		/*for (int i = ID_WATERFALL1; i <= ID_WATERFALLSS2; i++) {
-			ObjectInfo* obj = &Objects[i];
+			OBJECT_INFO* obj = &Objects[i];
 
 			if (obj->loaded) {
 				RendererObject* waterfall = m_moveableObjects[i];
@@ -262,7 +262,7 @@ namespace T5M::Renderer
 		if (!force && itemToDraw->DoneAnimations)
 			return;
 
-		ObjectInfo *obj = &Objects[item->objectNumber];
+		OBJECT_INFO *obj = &Objects[item->objectNumber];
 		RendererObject &moveableObj = *m_moveableObjects[item->objectNumber];
 
 		// Update animation matrices
@@ -407,10 +407,12 @@ namespace T5M::Renderer
 
 		mesh->Sphere = meshPtr->sphere;
 
-		if (meshPtr->vertices.size() == 0)
+		if (meshPtr->positions.size() == 0)
 			return mesh;
 
-		MESH_VERTEX *vertices = meshPtr->vertices.data();
+		mesh->Positions.reserve(meshPtr->positions.size());
+		for (int i = 0; i < meshPtr->positions.size(); i++)
+			mesh->Positions.push_back(meshPtr->positions[i]);
 
 		for (int n = 0; n < meshPtr->buckets.size(); n++)
 		{
@@ -424,40 +426,61 @@ namespace T5M::Renderer
 				bucketIndex = RENDERER_BUCKET_SOLID;
 
 			bucket = &mesh->Buckets[bucketIndex];
+			
+			bucket->Vertices.reserve(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+			bucket->Indices.reserve(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
 
-			for (int v = 0; v < levelBucket->indices.size(); v++)
+			for (int p = 0; p < levelBucket->polygons.size(); p++)
 			{
-				int index = levelBucket->indices[v];
-				MESH_VERTEX *levelVertex = &vertices[index];
+				POLYGON* poly = &levelBucket->polygons[p];
 
-				RendererVertex vertex;
+				int baseVertices = bucket->Vertices.size();
 
-				vertex.Position.x = levelVertex->position.x;
-				vertex.Position.y = levelVertex->position.y;
-				vertex.Position.z = levelVertex->position.z;
+				for (int k = 0; k < poly->indices.size(); k++)
+				{
+					RendererVertex vertex;
+					int v = poly->indices[k];
 
-				vertex.Normal.x = levelVertex->normal.x;
-				vertex.Normal.y = levelVertex->normal.y;
-				vertex.Normal.z = levelVertex->normal.z;
+					vertex.Position.x = meshPtr->positions[v].x;
+					vertex.Position.y = meshPtr->positions[v].y;
+					vertex.Position.z = meshPtr->positions[v].z;
 
-				vertex.UV.x = levelVertex->textureCoordinates.x;
-				vertex.UV.y = levelVertex->textureCoordinates.y;
+					vertex.Normal.x = meshPtr->normals[v].x;
+					vertex.Normal.y = meshPtr->normals[v].y;
+					vertex.Normal.z = meshPtr->normals[v].z;
 
-				vertex.Color.x = levelVertex->color.x;
-				vertex.Color.y = levelVertex->color.y;
-				vertex.Color.z = levelVertex->color.z;
-				vertex.Color.w = 1.0f;
+					vertex.UV.x = poly->textureCoordinates[k].x;
+					vertex.UV.y = poly->textureCoordinates[k].y;
 
-				vertex.Bone = boneIndex;
-				//vertex.Index = index;
-				if (isHairs)
-					vertex.Bone = index;
+					vertex.Color.x = meshPtr->colors[v].x;
+					vertex.Color.y = meshPtr->colors[v].y;
+					vertex.Color.z = meshPtr->colors[v].z;
+					vertex.Color.w = 1.0f;
 
-				mesh->Positions.push_back(vertex.Position);
+					vertex.Bone = meshPtr->bones[v];
+					vertex.OriginalIndex = v;
+					//vertex.Bone = boneIndex;
+					/*if (isHairs)
+						vertex.Bone = v;*/
 
-				bucket->Indices.push_back(bucket->NumVertices);
-				bucket->NumVertices++;
-				bucket->Vertices.push_back(vertex);
+					bucket->Vertices.push_back(vertex);
+				}
+
+				if (poly->shape == 0)
+				{
+					bucket->Indices.push_back(baseVertices);
+					bucket->Indices.push_back(baseVertices + 1);
+					bucket->Indices.push_back(baseVertices + 3);
+					bucket->Indices.push_back(baseVertices + 2);
+					bucket->Indices.push_back(baseVertices + 3);
+					bucket->Indices.push_back(baseVertices + 1);
+				}
+				else
+				{
+					bucket->Indices.push_back(baseVertices);
+					bucket->Indices.push_back(baseVertices + 1);
+					bucket->Indices.push_back(baseVertices + 2);
+				}
 			}
 		}
 

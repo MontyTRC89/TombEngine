@@ -8,7 +8,7 @@
 void InitialiseJeanYves(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;

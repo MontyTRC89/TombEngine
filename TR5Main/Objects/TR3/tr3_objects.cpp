@@ -34,7 +34,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void StartBaddy(ObjectInfo* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];
 	if (obj->loaded)
@@ -350,17 +350,17 @@ static void StartBaddy(ObjectInfo* obj)
 	}
 }
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(OBJECT_INFO* obj)
 {
 	
 }
 
-static void StartTrap(ObjectInfo* obj)
+static void StartTrap(OBJECT_INFO* obj)
 {
 	
 }
 
-static void StartVehicles(ObjectInfo* obj)
+static void StartVehicles(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_QUAD];
 	if (obj->loaded)
@@ -394,14 +394,14 @@ static void StartVehicles(ObjectInfo* obj)
 	}
 }
 
-static void StartProjectiles(ObjectInfo* obj)
+static void StartProjectiles(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS_FLAME];
 	obj->control = ControlTonyFireBall;
 	obj->drawRoutine = NULL;
 }
 
-static ObjectInfo* objToInit;
+static OBJECT_INFO* objToInit;
 void InitialiseTR3Objects()
 {
 	StartBaddy(objToInit);

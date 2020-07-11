@@ -63,7 +63,7 @@ void InitialiseSkidoo(short itemNum)
 	SKIDOO_INFO* skinfo;
 
 	skidoo = &Items[itemNum];
-	skinfo = (SKIDOO_INFO*)game_malloc(sizeof(SKIDOO_INFO));
+	skinfo = game_malloc<SKIDOO_INFO>();
 	skidoo->data = (void*)skinfo;
 	skinfo->already_cd_played = false;
 
@@ -108,7 +108,7 @@ static void SkidooBaddieCollision(short itemNum, ITEM_INFO* skidoo)
 			ITEM_INFO* target = &Items[itemNum];
 			if (target->collidable && target->status != ITEM_INVISIBLE && target != LaraItem && target != skidoo)
 			{
-				ObjectInfo* object = &Objects[target->objectNumber];
+				OBJECT_INFO* object = &Objects[target->objectNumber];
 				if (object->collision && (object->intelligent || target->objectNumber == ID_ROLLINGBALL))
 				{
 					int x = skidoo->pos.xPos - target->pos.xPos;
