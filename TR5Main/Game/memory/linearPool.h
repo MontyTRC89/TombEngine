@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "Game/debug/assert.h"
+#include "Game/debug/log.h"
 
 namespace T5M::Memory {
 	enum class MemoryUnit : size_t {
@@ -21,18 +22,22 @@ namespace T5M::Memory {
 		template<typename T>
 		[[nodiscard]]T* malloc(size_t count = 1) noexcept {
 			assertm(sizeof(T) * count >= 1, "Requested memory needs to be greater than 0!");
-			
 			size_t requestedBytes = sizeof(T) * count;
-			
+			Log("LinearPool - Malloc :" << requestedBytes << " Bytes")
 			assertm(offset + requestedBytes > allocatedBytes, "Memory must not overflow linear pool!");
 			T* returnValue = reinterpret_cast<T*>(bytes.get()[offset]);
 			offset += requestedBytes;
+			Log("LinearPool - Malloc : New Offset at " << offset)
 			return returnValue;
 		}
 
 		void flush() noexcept {
 			std::memset(bytes.get(), 0, allocatedBytes);
 			offset = 0;
+		}
+	public:
+		size_t size() const {
+			return allocatedBytes;
 		}
 	};
 }

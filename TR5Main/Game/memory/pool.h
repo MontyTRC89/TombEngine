@@ -3,6 +3,8 @@
 #include <memory>
 #include <iostream>
 #include "Game/debug/assert.h"
+#include "Game/debug/log.h"
+#include <type_traits>
 namespace T5M::Memory {
 	enum class BlockSize : size_t {
 		Minimal = 4,
@@ -14,12 +16,15 @@ namespace T5M::Memory {
 	};
 
 	//A multi purpose Memory pool
-	template<BlockSize BlkSz>
+	template<unsigned BlkSz>
 	class Pool {
-
+		static_assert(BlkSz > 0 && (BlkSz & (BlkSz - 1)) == 0,"Block Size needs to be PoT!");
 		using Size = size_t;
 		using Byte = uint8_t;
 		using Magic = uint32_t;
+		static constexpr Size getBlockCount(Size bytes) {
+			return (bytes + (static_cast<Size>(BlkSz) - 1)) / static_cast<Size>(BlkSz);
+		}
 		//Block representation
 
 		struct Block {
@@ -43,13 +48,13 @@ namespace T5M::Memory {
 			//pointer to the previous physical block header
 			BlockHeader* previousPhysicalBlock;
 			//pointer to first physical block header
-			BlockHeaderData() : magic(MAGIC), nextFreeBlock(nullptr), previousFreeBlock(nullptr), managedBlocks(0), nextPhysicalBlock(nullptr), previousPhysicalBlock(nullptr) {}
+			BlockHeaderData() : magic(MAGIC), nextFreeBlock(nullptr), previousFreeBlock(nullptr), managedBlocks(0), nextPhysicalBlock(nullptr), previousPhysicalBlock(nullptr), isFree(false) {}
 		};
 		union BlockHeader {
 
 			BlockHeaderData data;
 			//Padding to ensure BlockHeader is always the next multiple of BlkSz blocks large
-			Block padding[(((static_cast<Size>(BlkSz) + sizeof(BlockHeaderData) - 1) / sizeof(BlockHeaderData)) * sizeof(BlockHeaderData)) / sizeof(Block)];
+			Block padding[getBlockCount(sizeof(BlockHeaderData))];
 			BlockHeader() : data(BlockHeaderData()) {};
 		};
 
@@ -76,12 +81,13 @@ namespace T5M::Memory {
 	public:
 		Pool(Size numBlocks) : allocatedBlockCount(numBlocks), allocatedBytesCount(sizeof(Block)* numBlocks) , allocatedBlocks(new Block[numBlocks]) {
 			initialize();
+			Log("Pool Init: Initialized Pool with " << numBlocks << " Blocks")
+			Log("Pool Init: Free Blocks :" << head->data.managedBlocks)
 		}
 	private:
-		Size blockHeaderBlockSize() const {
-			return sizeof(BlockHeader) / static_cast<Size>(BlkSz);
+		constexpr Size blockHeaderBlockSize() const {
+			return getBlockCount(sizeof(BlockHeader));
 		};
-
 
 		//try coalescing with the next block in the list
 		void tryCoalesce(BlockHeader* origin) {
@@ -94,6 +100,7 @@ namespace T5M::Memory {
 		}
 
 		void coalesce(BlockHeader* left, BlockHeader* right) {
+			Log("Coalescing BlockHeader at " << left << " & " << right )
 			//accumulate free blocks + now obsolete header data
 			left->data.managedBlocks += right->data.managedBlocks;
 			left->data.managedBlocks += blockHeaderBlockSize();
@@ -113,10 +120,11 @@ namespace T5M::Memory {
 			if (count < 1) return nullptr;
 			//assertm(count >= 1,"Allocation Size must be greater than 0!");
 			// calculate the amount of blocks we want
-			Size requestedBlocks = 1 + (((sizeof(T) * count) - 1) / static_cast<Size>(BlkSz));
+			Size requestedBlocks = getBlockCount(sizeof(T) * count);
+			Log("Malloc: Requested Blocks for " << typeid(T).name() << " x " << count << ": " << requestedBlocks)
 			BlockHeader* currentNode = head;
 			//Make sure we have enough space for one Block Header and one free Block!
-			while (currentNode != nullptr && currentNode->data.managedBlocks < requestedBlocks) {
+			while (currentNode != nullptr && currentNode->data.managedBlocks < requestedBlocks+blockHeaderBlockSize()) {
 				assertm(currentNode->data.magic == MAGIC, "Pool is corrupt");
 				currentNode = currentNode->data.nextFreeBlock;
 			}
@@ -124,6 +132,7 @@ namespace T5M::Memory {
 			assertm(currentNode != nullptr, "Pool is full");
 			//Free Blocks are directly behind BlockHeader
 			Block* blockToReturn = reinterpret_cast<Block*>(currentNode + 1);
+			Log("Malloc: Return block at " << blockToReturn)
 			//The current node will be removed from Free List, so keep the number of Blocks that will be deallocated for later!
 			Size numFreeBlocksAfterSplit = currentNode->data.managedBlocks - ((blockHeaderBlockSize()));
 			currentNode->data.managedBlocks = requestedBlocks;
@@ -131,6 +140,7 @@ namespace T5M::Memory {
 			Block* splitBlock = blockToReturn + requestedBlocks + 1;
 			//Place a new BlockHeader right after the Requested Block
 			BlockHeader* newHead = new(splitBlock)BlockHeader();
+			Log("Malloc: New Head at " << newHead)
 			newHead->data.previousPhysicalBlock = currentNode;
 			newHead->data.nextPhysicalBlock = currentNode->data.nextPhysicalBlock;
 			currentNode->data.nextPhysicalBlock = newHead;
@@ -138,15 +148,16 @@ namespace T5M::Memory {
 			head = newHead;
 			head->data.nextFreeBlock = currentNode->data.nextFreeBlock;
 			head->data.managedBlocks = numFreeBlocksAfterSplit;
+			Log("Malloc: New Free Blocks : " << numFreeBlocksAfterSplit)
 			return reinterpret_cast<T*>(blockToReturn);
 
 		}
-
 		void free(void* ptr) {
-			assertm(ptr >= allocatedBlocks.get() && ptr < (allocatedBlocks.get() + allocatedBlockCount), "memory must be in Pool range!");
+			assertm((ptr >= allocatedBlocks.get() && ptr < (allocatedBlocks.get() + allocatedBlockCount)), "memory must be in Pool range!");
 			//Go to the point infront of the pointer to free, where an old header was before
 			BlockHeader* blockHead = (reinterpret_cast<BlockHeader*>(ptr)) - 1;
 			if (blockHead->data.magic == MAGIC) {
+				Log("Free: BlockHeader at " << blockHead )
 				BlockHeader* oldHead = head;
 				BlockHeader* newHead = blockHead;
 				head = newHead;
