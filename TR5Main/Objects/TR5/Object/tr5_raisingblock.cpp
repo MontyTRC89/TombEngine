@@ -14,7 +14,7 @@ void InitialiseRaisingBlock(short itemNumber)
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	Boxes[floor->box].overlapIndex &= ~BLOCKED;
+	Boxes[floor->box].flags &= ~BLOCKED;
 
 	if (item->triggerFlags < 0)
 	{

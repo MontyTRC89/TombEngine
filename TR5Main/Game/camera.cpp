@@ -63,6 +63,7 @@ int PhdPerspective;
 short CurrentFOV;
 int GetLaraOnLOS;
 int SniperOverlay;
+std::vector<OBJECT_VECTOR> FixedCameras;
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
@@ -774,7 +775,7 @@ void FixedCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OBJECT_VECTOR* camera = &Camera.fixed[Camera.number];
+		OBJECT_VECTOR* camera = &FixedCameras[Camera.number];
 		
 		from.x = camera->x;
 		from.y = camera->y;
@@ -1690,7 +1691,7 @@ void CalculateCamera()
 
 		if (Camera.type
 			&& Camera.flags != CF_CHASE_OBJECT
-			&& (Camera.number != -1 &&(SniperCamActive = Camera.fixed[Camera.number].flags & 3, Camera.fixed[Camera.number].flags & 2)))
+			&& (Camera.number != -1 &&(SniperCamActive = FixedCameras[Camera.number].flags & 3, FixedCameras[Camera.number].flags & 2)))
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;

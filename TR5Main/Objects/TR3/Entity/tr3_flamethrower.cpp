@@ -260,7 +260,7 @@ void FlameThrowerControl(short itemNumber)
 			creature->enemy = NULL;
 
 			int minDistance = 0x7FFFFFFF;
-			CREATURE_INFO* currentCreature = BaddieSlots;
+			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
 
 			for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)

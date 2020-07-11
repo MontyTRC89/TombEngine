@@ -46,20 +46,17 @@ vector<int> StaticObjectsIds;
 extern GameFlow* g_GameFlow;
 
 char* LevelDataPtr;
-vector<OBJECT_TEXTURE> ObjectTextures;
-ITEM_INFO* Items;
-int LevelItems;
+std::vector<OBJECT_TEXTURE> ObjectTextures;
+std::vector<ITEM_INFO> Items;
 std::vector<ROOM_INFO> Rooms;
-ANIM_STRUCT* Anims;
-CHANGE_STRUCT* Changes;
-RANGE_STRUCT* Ranges;
-short* Commands;
-short* Frames;
-int AnimationsCount;
+std::vector <ANIM_STRUCT> Anims;
+std::vector <CHANGE_STRUCT> Changes;
+std::vector <RANGE_STRUCT> Ranges;
+std::vector<short> Commands;
+std::vector<short> Frames;
+std::vector <AIOBJECT> AIObjects;
+std::vector <SPRITE> Sprites;
 short* FloorData;
-int nAIObjects;
-AIOBJECT* AIObjects;
-SPRITE* Sprites;
 
 vector<TEXTURE> RoomTextures;
 vector<TEXTURE> MoveablesTextures;
@@ -67,9 +64,7 @@ vector<TEXTURE> StaticsTextures;
 vector<TEXTURE> SpritesTextures;
 TEXTURE MiscTextures;
 
-int g_NumSprites;
 int g_NumSpritesSequences;
-
 ChunkReader* g_levelChunkIO;
 
 short ReadInt8()
@@ -136,8 +131,7 @@ int LoadItems()
 	if (NumItems == 0)
 		return false;
 
-	Items = (ITEM_INFO*)game_malloc(sizeof(ITEM_INFO) * NUM_ITEMS);
-	LevelItems = NumItems;
+	Items.resize(NUM_ITEMS);
 
 	InitialiseClosedDoors();
 	InitialiseItemArray(NUM_ITEMS);
@@ -171,7 +165,7 @@ int LoadItems()
 		{
 			FLOOR_INFO* floor = &Rooms[r].floor[((mesh->z - Rooms[r].z) >> 10) + Rooms[r].xSize * ((mesh->x - Rooms[r].x) >> 10)];
 			 
-			if (!(Boxes[floor->box].overlapIndex & 0x4000)
+			if (!(Boxes[floor->box].flags & BLOCKED)
 				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
 			{
 				int fl = floor->floor << 2;
@@ -265,36 +259,31 @@ void LoadObjects()
 	}
 
 	int numAnimations = ReadInt32();
-	Anims = (ANIM_STRUCT*)game_malloc(sizeof(ANIM_STRUCT) * numAnimations);
-	ReadBytes(Anims, sizeof(ANIM_STRUCT) * numAnimations);
+	Anims.resize(numAnimations);
+	ReadBytes(Anims.data(), sizeof(ANIM_STRUCT) * numAnimations);
 
 	int numChanges = ReadInt32();
-	Changes = (CHANGE_STRUCT*)game_malloc(sizeof(CHANGE_STRUCT) * numChanges);
-	ReadBytes(Changes, sizeof(CHANGE_STRUCT) * numChanges);
+	Changes.resize(numChanges);
+	ReadBytes(Changes.data(), sizeof(CHANGE_STRUCT) * numChanges);
 
 	int numRanges = ReadInt32();
-	Ranges = (RANGE_STRUCT*)game_malloc(sizeof(RANGE_STRUCT) * numRanges);
-	ReadBytes(Ranges, sizeof(RANGE_STRUCT) * numRanges);
+	Ranges.resize(numRanges);
+	ReadBytes(Ranges.data(), sizeof(RANGE_STRUCT) * numRanges);
 
 	int numCommands = ReadInt32();
-	Commands = (short*)game_malloc(sizeof(short) * numCommands);
-	ReadBytes(Commands, sizeof(short) * numCommands);
+	Commands.resize(numCommands);
+	ReadBytes(Commands.data(), sizeof(short) * numCommands);
 
 	int numBones = ReadInt32();
 	Bones.resize(numBones);
 	ReadBytes(Bones.data(), 4 * numBones);
 
 	int numFrames = ReadInt32();
-	Frames = (short*)game_malloc(sizeof(short) * numFrames);
-	ReadBytes(Frames, sizeof(short) * numFrames);
+	Frames.resize(numFrames);
+	ReadBytes(Frames.data(), sizeof(short) * numFrames);
 
-	AnimationsCount = numAnimations;
-	if (AnimationsCount > 0)
-	{
-		int i = 0;
-		for (int i = 0; i < AnimationsCount; i++)
-			AddPtr(Anims[i].framePtr, short, Frames);
-	}
+	for (int i = 0; i < Anims.size(); i++)
+		AddPtr(Anims[i].framePtr, short, Frames.data());
 
 	int numModels = ReadInt32();
 	NumObjects = numModels;
@@ -307,7 +296,7 @@ void LoadObjects()
 		Objects[objNum].nmeshes = (short)ReadInt16();
 		Objects[objNum].meshIndex = (short)ReadInt16();
 		Objects[objNum].boneIndex = ReadInt32();
-		Objects[objNum].frameBase = (short*)(ReadInt32() + (int)Frames); 
+		Objects[objNum].frameBase = (short*)(ReadInt32() + (int)Frames.data()); 
 		Objects[objNum].animIndex = (short)ReadInt16();
 
 		ReadInt16();
@@ -350,12 +339,9 @@ void LoadObjects()
 
 void LoadCameras()
 {
-	NumberCameras = ReadInt32();
-	if (NumberCameras != 0)
-	{
-		Camera.fixed = (OBJECT_VECTOR*)game_malloc(NumberCameras * sizeof(OBJECT_VECTOR));
-		ReadBytes(Camera.fixed, NumberCameras * sizeof(OBJECT_VECTOR));
-	}
+	int numCameras = ReadInt32();
+	FixedCameras.resize(numCameras);
+	ReadBytes(FixedCameras.data(), numCameras * sizeof(OBJECT_VECTOR));
 
 	NumberSpotcams = ReadInt32();
 
@@ -799,6 +785,21 @@ void FreeLevel()
 	Bones.clear();
 	Meshes.clear();
 	MoveablesIds.clear();
+	Boxes.clear();
+	Overlaps.clear();
+	Anims.clear();
+	Changes.clear();
+	Ranges.clear();
+	Commands.clear();
+	Frames.clear();
+	Sprites.clear();
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			Zones[j][i].clear();
+		}
+	}
 	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
@@ -858,13 +859,9 @@ void LoadTextureInfos()
 
 void LoadAIObjects()
 {
-	nAIObjects = ReadInt32();
-	
-	if (nAIObjects != 0)
-	{
-		AIObjects = (AIOBJECT*)game_malloc(nAIObjects * sizeof(AIOBJECT));
-		ReadBytes(&AIObjects, nAIObjects * sizeof(AIOBJECT));
-	}
+	int nAIObjects = ReadInt32();
+	AIObjects.resize(nAIObjects);
+	ReadBytes(AIObjects.data(), nAIObjects * sizeof(AIOBJECT));
 }
 
 FILE* FileOpen(const char* fileName)
@@ -965,13 +962,15 @@ unsigned CALLBACK LoadLevel(void* data)
 		LoadObjects();
 		g_Renderer.UpdateProgress(50);
 
-		InitialiseLOTarray(true);
 		LoadSprites();
 		LoadCameras();
 		LoadSoundEffects();
 		g_Renderer.UpdateProgress(60);
 
 		LoadBoxes();
+
+		InitialiseLOTarray(true);
+
 		LoadAnimatedTextures();
 		LoadTextureInfos();
 		g_Renderer.UpdateProgress(70);
@@ -1090,14 +1089,14 @@ void LoadSamples()
 void LoadBoxes()
 {
 	// Read boxes
-	NumberBoxes = ReadInt32();
-	Boxes = (BOX_INFO*)game_malloc(NumberBoxes * sizeof(BOX_INFO));
-	ReadBytes(Boxes, NumberBoxes * sizeof(BOX_INFO));
+	int numBoxes = ReadInt32();
+	Boxes.resize(numBoxes);
+	ReadBytes(Boxes.data(), numBoxes * sizeof(BOX_INFO));
 
 	// Read overlaps
-	NumberOverlaps = ReadInt32();
-	Overlaps = (short*)game_malloc(NumberOverlaps * sizeof(short));
-	ReadBytes(Overlaps, NumberOverlaps * sizeof(short));
+	int numOverlaps = ReadInt32();
+	Overlaps.resize(numOverlaps);
+	ReadBytes(Overlaps.data(), numOverlaps * sizeof(OVERLAP));
 
 	// Read zones
 	for (int i = 0; i < 2; i++)
@@ -1105,23 +1104,21 @@ void LoadBoxes()
 		// Ground zones
 		for (int j = 0; j < 4; j++)
 		{
-			short* zone = (short*)game_malloc(NumberBoxes * sizeof(short));
-			ReadBytes(zone, NumberBoxes * sizeof(short));
-			Zones[j][i] = zone;
+			Zones[j][i].resize(numBoxes * sizeof(int));
+			ReadBytes(Zones[j][i].data(), numBoxes * sizeof(int));
 		}
 
 		// Fly zone
-		short* zone = (short*)game_malloc(NumberBoxes * sizeof(short));
-		ReadBytes(zone, NumberBoxes * sizeof(short));
-		Zones[4][i] = zone;
+		Zones[4][i].resize(numBoxes * sizeof(int));
+		ReadBytes(Zones[4][i].data(), numBoxes * sizeof(int));
 	}
 
 	// By default all blockable boxes are blocked
-	for (int i = 0; i < NumberBoxes; i++)
+	for (int i = 0; i < numBoxes; i++)
 	{
-		if (Boxes[i].overlapIndex & BLOCKABLE)
+		if (Boxes[i].flags & BLOCKABLE)
 		{
-			Boxes[i].overlapIndex |= BLOCKED;
+			Boxes[i].flags |= BLOCKED;
 		}
 	}
 }
@@ -1232,11 +1229,9 @@ void LoadSprites()
 
 	ReadInt32(); // SPR\0
 
-	g_NumSprites = ReadInt32();
-
-	Sprites = (SPRITE*)game_malloc(g_NumSprites * sizeof(SPRITE));
-
-	for (int i = 0; i < g_NumSprites; i++)
+	int numSprites = ReadInt32();
+	Sprites.resize(numSprites);
+	for (int i = 0; i < numSprites; i++)
 	{
 		Sprites[i].tile = ReadInt32();
 		Sprites[i].x1 = ReadFloat();
@@ -1250,7 +1245,6 @@ void LoadSprites()
 	}
 
 	g_NumSpritesSequences = ReadInt32();
-
 	for (int i = 0; i < g_NumSpritesSequences; i++)
 	{
 		int spriteID = ReadInt32();
@@ -1275,9 +1269,10 @@ void GetCarriedItems()
 	ITEM_INFO* item, *item2;
 	short linknum;
 
-	for (i = 0; i < LevelItems; ++i)
+	for (i = 0; i < NumItems; ++i)
 		Items[i].carriedItem = NO_ITEM;
-	for (i = 0; i < LevelItems; ++i)
+
+	for (i = 0; i < NumItems; ++i)
 	{
 		item = &Items[i];
 		if (Objects[item->objectNumber].intelligent || item->objectNumber >= ID_SEARCH_OBJECT1 && item->objectNumber <= ID_SEARCH_OBJECT3)
@@ -1306,13 +1301,13 @@ void GetAIPickups()
 	ITEM_INFO* item;
 	AIOBJECT* object;
 
-	for (i = 0; i < LevelItems; ++i)
+	for (i = 0; i < NumItems; ++i)
 	{
 		item = &Items[i];
 		if (Objects[item->objectNumber].intelligent)
 		{
 			item->aiBits = 0;
-			for (num = 0; num < nAIObjects; ++num)
+			for (num = 0; num < AIObjects.size(); ++num)
 			{
 				object = &AIObjects[num];
 				if (abs(object->x - item->pos.xPos) < 512

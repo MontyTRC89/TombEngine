@@ -1247,8 +1247,8 @@ void AllocTR5Objects()
 	ZeroMemory(Bats, NUM_BATS * sizeof(BAT_STRUCT));
 
 	Spiders = (SPIDER_STRUCT*)game_malloc(NUM_SPIDERS * sizeof(SPIDER_STRUCT));
-	ZeroMemory(Bats, NUM_SPIDERS * sizeof(SPIDER_STRUCT));
+	ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SPIDER_STRUCT));
 
 	Rats = (RAT_STRUCT*)game_malloc(NUM_RATS * sizeof(RAT_STRUCT));
-	ZeroMemory(Bats, NUM_RATS * sizeof(RAT_STRUCT));
+	ZeroMemory(Rats, NUM_RATS * sizeof(RAT_STRUCT));
 }

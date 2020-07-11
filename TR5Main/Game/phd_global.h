@@ -76,8 +76,8 @@ typedef struct GAME_VECTOR
 	int x;
 	int y;
 	int z;
+	int boxNumber;
 	short roomNumber;
-	short boxNumber;
 
 	GAME_VECTOR()
 	{
@@ -121,8 +121,8 @@ typedef struct OBJECT_VECTOR
 	int x;
 	int y;
 	int z;
-	short data;
-	short flags;
+	int data;
+	int flags;
 
 	OBJECT_VECTOR()
 	{
