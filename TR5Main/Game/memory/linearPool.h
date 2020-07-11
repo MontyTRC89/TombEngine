@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include "Game/debug/assert.h"
+
 namespace T5M::Memory {
 	enum class MemoryUnit : size_t {
 		Byte = 1,
@@ -18,16 +20,18 @@ namespace T5M::Memory {
 		}
 		template<typename T>
 		[[nodiscard]]T* malloc(size_t count = 1) noexcept {
-			if (count < 1) return nullptr;
+			assertm(sizeof(T) * count >= 1, "Requested memory needs to be greater than 0!");
 			
 			size_t requestedBytes = sizeof(T) * count;
-			if (offset + requestedBytes > allocatedBytes) throw std::runtime_error("Out of memory!");
+			
+			assertm(offset + requestedBytes > allocatedBytes, "Memory must not overflow linear pool!");
 			T* returnValue = reinterpret_cast<T*>(bytes.get()[offset]);
 			offset += requestedBytes;
 			return returnValue;
 		}
 
 		void flush() noexcept {
+			std::memset(bytes.get(), 0, allocatedBytes);
 			offset = 0;
 		}
 	};
