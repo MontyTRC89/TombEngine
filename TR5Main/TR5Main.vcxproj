@@ -142,6 +142,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\memory\pool.h" />
     <ClInclude Include="Game\memory\linearPoolAllocator.h" />
     <ClInclude Include="Game\memory\PoolAllocator.h" />
+    <ClInclude Include="Game\memory\memory.h" />
     <ClInclude Include="Game\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\room.h" />
