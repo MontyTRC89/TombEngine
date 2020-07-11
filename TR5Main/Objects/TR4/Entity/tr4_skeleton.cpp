@@ -78,7 +78,7 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 void InitialiseSkeleton(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[ID_SKELETON];
+	OBJECT_INFO* obj = &Objects[ID_SKELETON];
 
 	ClearItem(itemNumber);
 

@@ -29,6 +29,7 @@ char LM[] =
 	LM_HEAD,
 };
 
+int hitSoundTimer;
 int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[1024];
@@ -450,14 +451,14 @@ int FindGridShift(int x, int z)
 int TestBoundsCollideStatic(short* bounds, PHD_3DPOS* pos, int radius)
 {
 	if (!(bounds[5] | bounds[4] | bounds[0] | bounds[1] | bounds[2] | bounds[3]))
-		return FALSE;
+		return false;
 
 	short* frame = GetBestFrame(LaraItem);
 	if (pos->yPos + bounds[3] <= LaraItem->pos.yPos + frame[2])
-		return FALSE;
+		return false;
 
 	if (pos->yPos + bounds[2] >= LaraItem->pos.yPos + frame[3])
-		return FALSE;
+		return false;
 
 	int c, s;
 	int x, z, dx, dz;
@@ -474,11 +475,11 @@ int TestBoundsCollideStatic(short* bounds, PHD_3DPOS* pos, int radius)
 	&&  dz <= radius + bounds[5]
 	&&  dz >= bounds[4] - radius)
 	{
-		return TRUE;
+		return true;
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -506,7 +507,7 @@ int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO
 	||  rx >= maxX
 	||  rz <= minZ
 	||  rz >= maxZ)
-		return FALSE;
+		return false;
 
 	left = rx - minX;
 	top = maxZ - rz;
@@ -554,7 +555,7 @@ int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush)
@@ -596,7 +597,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	||  rx >= maxX
 	||  rz <= minZ
 	||  rz >= maxZ)
-		return FALSE;
+		return false;
 
 	left = rx - minX;
 	top = maxZ - rz;
@@ -625,8 +626,14 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) >> W2V_SHIFT;
 
-		if (!Lara.hitFrame)
-			SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
+		if ((!Lara.hitFrame) && (!hitSoundTimer > 0))
+		{
+				SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
+				hitSoundTimer = frandMinMax(5, 15);
+		}
+
+		if (hitSoundTimer > 0)
+			hitSoundTimer--;
 
 		Lara.hitFrame++;
 		if (Lara.hitFrame > 34) 
@@ -662,7 +669,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 
-	return TRUE;
+	return true;
 }
 
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
@@ -739,17 +746,17 @@ int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l)
 	zRotRel = l->pos.zRot - item->pos.zRot;
 
 	if (xRotRel < bounds[6])
-		return FALSE;
+		return false;
 	if (xRotRel > bounds[7])
-		return FALSE;
+		return false;
 	if (yRotRel < bounds[8])
-		return FALSE;
+		return false;
 	if (yRotRel > bounds[9])
-		return FALSE;
+		return false;
 	if (zRotRel < bounds[10])
-		return FALSE;
+		return false;
 	if (zRotRel > bounds[11])
-		return FALSE;
+		return false;
 	
 	Vector3 pos = Vector3(l->pos.xPos - item->pos.xPos, l->pos.yPos - item->pos.yPos, l->pos.zPos - item->pos.zPos);
 
@@ -766,9 +773,9 @@ int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l)
 	rz = pos.z;
 
 	if (rx < bounds[0] || rx > bounds[1] || ry < bounds[2] || ry > bounds[3] || rz < bounds[4] || rz > bounds[5])
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd)
@@ -923,7 +930,7 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	if (abs(height - l->pos.yPos) <= CLICK(2))
 	{
 		if (sqrt(SQUARE(dest.xPos - l->pos.xPos) + SQUARE(dest.yPos - l->pos.yPos) + SQUARE(dest.zPos - l->pos.zPos)) < (STEP_SIZE/2))
-			return TRUE;
+			return true;
 
 		return Move3DPosTo3DPos(&l->pos, &dest, LARA_VELOCITY, ANGLE(2));
 	}
@@ -934,7 +941,7 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 
-	return FALSE;
+	return false;
 }
 
 int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
@@ -964,12 +971,12 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 			&&  dz >= bounds[4] - radius
 			&&  dz <= radius + bounds[5])
 			{
-				return TRUE;
+				return true;
 			}
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
@@ -1372,7 +1379,7 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 
 	l->hitStatus = false;
 	Lara.hitDirection = -1;

@@ -514,7 +514,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	item = &Items[itemNumber];
 	if (item->data == NULL)
-		return FALSE;
+		return false;
 
 	creature = (CREATURE_INFO*)item->data;
 	LOT = &creature->LOT;
@@ -536,7 +536,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (item->status == ITEM_DEACTIVATED)
 	{
 		CreatureDie(itemNumber, FALSE);
-		return FALSE;
+		return false;
 	}
 
 	bounds = GetBoundsAccurate(item);
@@ -714,7 +714,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			item->pos.yRot -= BIFF_AVOID_TURN;
 		else
 			item->pos.yRot += BIFF_AVOID_TURN;
-		return TRUE;
+		return true;
 	}
 
 	if (LOT->fly != NO_FLYING && item->hitPoints > 0)
@@ -857,7 +857,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	return TRUE;
+	return true;
 }
 
 void CreatureDie(short itemNumber, int explode)
@@ -916,7 +916,7 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 int CreatureCreature(short itemNumber)  
 {
 	ITEM_INFO* item, *linked;
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 	ROOM_INFO* r;
 	int x, z, xDistance, zDistance, distance = 0;
 	short link, radius;
@@ -999,8 +999,6 @@ void TargetBox(LOT_INFO* LOT, short boxNumber)
 	boxNumber &= NO_BOX;
 	box = &Boxes[boxNumber];
 
-	//LOT->target.x = (((((box->bottom - box->top) - 1) * GetRandomControl()) / 32) + (box->top * 1024)) + 512;
-	//LOT->target.z = (((((box->right - box->left) - 1) * GetRandomControl()) / 32) + (box->left * 1024)) + 512;
 	LOT->target.x = ((box->top << WALL_SHIFT) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + WALL_SIZE / 2;
 	LOT->target.z = ((box->left << WALL_SHIFT) + GetRandomControl() * ((box->right - box->left) - 1) >> 5) + WALL_SIZE / 2;
 	LOT->requiredBox = boxNumber;
@@ -1048,14 +1046,14 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 	searchZone = zone[LOT->head];
 
 	if (depth <= 0)
-		return 1;
+		return true;
 
 	for (int i = 0; i < depth; i++)
 	{
 		if (LOT->head == NO_BOX)
 		{
 			LOT->tail = NO_BOX; 
-			return FALSE;
+			return false;
 		}
 
 		node = &LOT->node[LOT->head];
@@ -1068,7 +1066,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 			boxNumber = Overlaps[index++];
 			if (boxNumber & BOX_END_BIT)
 			{
-				done = TRUE;
+				done = true;
 				boxNumber &= BOX_NUMBER;
 			}
 
@@ -1117,21 +1115,22 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 		node->nextExpansion = NO_BOX;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int CreatureActive(short itemNumber) 
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	if (!(item->flags & IFLAG_KILLED) && item->status & ITEM_INVISIBLE)
+	if (!(item->flags & IFLAG_KILLED) 
+		&& item->status & ITEM_INVISIBLE)
 	{
-		if (!EnableBaddieAI(itemNumber, FALSE))
-			return FALSE;
+		if (!EnableBaddieAI(itemNumber, false))
+			return false;
 		item->status = ITEM_ACTIVE;
 	}
 
-	return TRUE;
+	return true;
 }
 
 void InitialiseCreature(short itemNumber) 
@@ -1142,7 +1141,7 @@ void InitialiseCreature(short itemNumber)
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
 {
 	if (enemy == NULL)
-		return FALSE;
+		return false;
 
 	BOX_INFO* box;
 	int x, z, xrange, zrange;
@@ -1156,7 +1155,7 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber)
 	z		= ((box->left + box->right) << (WALL_SHIFT - 1)) - enemy->pos.zPos;
 	
 	if (x > xrange || x < -xrange || z > zrange || z < -zrange)
-		return FALSE;
+		return false;
 
 	enemyQuad = (enemy->pos.yRot >> W2V_SHIFT) + 2;
 	
@@ -1167,7 +1166,7 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber)
 		boxQuad = (x > 0) ? 3 : 0;
 
 	if (enemyQuad == boxQuad)
-		return FALSE;
+		return false;
 
 	baddieQuad = 0;
 	if (item->pos.zPos > enemy->pos.zPos)
@@ -1176,9 +1175,9 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber)
 		baddieQuad = (item->pos.xPos > enemy->pos.xPos) ? 3 : 0;
 
 	if (enemyQuad == baddieQuad && abs(enemyQuad - boxQuad) == 2)
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 int CreatureVault(short itemNum, short angle, int vault, int shift)
@@ -1458,20 +1457,20 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	if (item->data == NULL)
 		return;
 
-	CREATURE_INFO* creature;
-	ITEM_INFO* enemy;
-	ObjectInfo* obj;
-	ROOM_INFO* r;
+	CREATURE_INFO * creature;
+	ITEM_INFO * enemy;
+	OBJECT_INFO * obj;
+	ROOM_INFO * r;
 	short* zone, angle;
 	int x, y, z;
-	
+
 	creature = (CREATURE_INFO*)item->data;
 	obj = &Objects[item->objectNumber];
 
 	enemy = creature->enemy;
 	if (!enemy)
 	{
-		enemy = LaraItem;  
+		enemy = LaraItem;
 		creature->enemy = LaraItem;
 	}
 
@@ -1480,11 +1479,11 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	r = &Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & BOX_NUMBER;
 	info->zoneNumber = zone[item->boxNumber];
-	
+
 	r = &Rooms[enemy->roomNumber];
 	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box & BOX_NUMBER;
 	info->enemyZone = zone[enemy->boxNumber];
-		
+
 	if (!obj->nonLot)
 	{
 		if (Boxes[enemy->boxNumber].overlapIndex & creature->LOT.blockMask)
@@ -1520,11 +1519,11 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	}
 
 	info->angle = angle - item->pos.yRot;
-	info->enemyFacing = ANGLE(180) + angle - enemy->pos.yRot;
+	info->enemyFacing = -ANGLE(180) + angle - enemy->pos.yRot;
 
 	x = abs(x);
 	z = abs(z);
-	
+
 	if (enemy == LaraItem)
 	{
 		short laraState = LaraItem->currentAnimState;
@@ -1545,7 +1544,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 		info->xAngle = phd_atan(z + (x >> 1), y);
 
 	info->ahead = (info->angle > -FRONT_ARC && info->angle < FRONT_ARC);
-	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= (STEP_SIZE*2));
+	info->bite = (info->ahead && enemy->hitPoints > 0 && abs(enemy->pos.yPos - item->pos.yPos) <= (STEP_SIZE * 2));
 }
 
 void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
@@ -1634,6 +1633,8 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	if (LOT->targetBox == NO_BOX)
 		TargetBox(LOT, item->boxNumber);
 
+	CalculateTarget(&creature->target, item, &creature->LOT);
+
 	creature->jumpAhead = false;
 	creature->monkeyAhead = false;
 
@@ -1656,8 +1657,6 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 				creature->monkeyAhead = true;
 		}
 	}
-
-	/*Unk_00EEFB6C =*/ CalculateTarget(&creature->target, item, &creature->LOT);
 }
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
@@ -1677,7 +1676,8 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
 	if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 		creature->LOT.requiredBox = NO_BOX;
 
-	if (creature->mood != ATTACK_MOOD && creature->LOT.requiredBox != NO_BOX)
+	if (creature->mood != ATTACK_MOOD 
+		&& creature->LOT.requiredBox != NO_BOX)
 	{
 		if (!ValidBox(item, info->zoneNumber, creature->LOT.targetBox))
 		{
@@ -1720,13 +1720,14 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
 				break;
 		}
 	}
-	else if (!isViolent)
+	else
 	{
 		switch (creature->mood)
 		{
 			case BORED_MOOD:
 			case STALK_MOOD:
-				if (creature->alerted && info->zoneNumber != info->enemyZone)
+				if (creature->alerted 
+					&& info->zoneNumber != info->enemyZone)
 				{
 					if (info->distance > 3072)
 						creature->mood = STALK_MOOD;
@@ -1735,7 +1736,9 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
 				}
 				else if (info->zoneNumber == info->enemyZone)
 				{
-					if (info->distance < ATTACK_RANGE || (creature->mood == STALK_MOOD && LOT->requiredBox == NO_BOX))
+					if (info->distance < ATTACK_RANGE 
+						|| (creature->mood == STALK_MOOD 
+							&& LOT->requiredBox == NO_BOX))
 						creature->mood = ATTACK_MOOD;
 					else
 						creature->mood = STALK_MOOD;
@@ -1743,14 +1746,17 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int isViolent)
 				break;
 
 			case ATTACK_MOOD:
-				if (item->hitStatus && (GetRandomControl() < ESCAPE_CHANCE || info->zoneNumber != info->enemyZone))
+				if (item->hitStatus 
+					&& (GetRandomControl() < ESCAPE_CHANCE 
+						|| info->zoneNumber != info->enemyZone))
 					creature->mood = STALK_MOOD;
 				else if (info->zoneNumber != info->enemyZone && info->distance > (WALL_SIZE*6))
 					creature->mood = BORED_MOOD;
 				break;
 
 			case ESCAPE_MOOD:
-				if (info->zoneNumber == info->enemyZone && GetRandomControl() < RECOVER_CHANCE)
+				if (info->zoneNumber == info->enemyZone 
+					&& GetRandomControl() < RECOVER_CHANCE)
 					creature->mood = STALK_MOOD;
 				break;
 		}

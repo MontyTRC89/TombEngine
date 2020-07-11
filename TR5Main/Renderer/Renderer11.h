@@ -62,7 +62,8 @@ namespace T5M::Renderer
 		DirectX::SimpleMath::Vector2 UV;
 		DirectX::SimpleMath::Vector4 Color;
 		float Bone;
-		//int Index;
+		int IndexInPoly;
+		int OriginalIndex;
 	};
 	
 	
@@ -163,8 +164,6 @@ namespace T5M::Renderer
 		int StartVertex;
 		int StartIndex;
 		int NumTriangles;
-		int NumVertices;
-		int NumIndices;
 	};
 	
 	struct RendererStatic

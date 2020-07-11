@@ -13,7 +13,7 @@ PHD_VECTOR DeathSlidePosition(0, 0, 371);
 void InitialiseDeathSlide(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
-	GAME_VECTOR* pos = (GAME_VECTOR*)game_malloc(sizeof(GAME_VECTOR));
+	GAME_VECTOR* pos = game_malloc<GAME_VECTOR>();
 	item->data = pos;
 	pos->x = item->pos.xPos;
 	pos->y = item->pos.yPos;

@@ -309,7 +309,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					LaserSight = true;
 
 					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = TRUE;
+						InfraRed = true;
 					else*
 						InfraRed = false;*/
 					Infrared = true;
@@ -322,7 +322,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				if (LaserSight)
 				{
 					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = TRUE;
+						InfraRed = true;
 					else
 						InfraRed = false;*/
 					Infrared = true;
@@ -330,7 +330,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				else
 				{
 					/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
-						InfraRed = TRUE;
+						InfraRed = true;
 					else
 						InfraRed = false;*/
 					Infrared = false;
@@ -446,6 +446,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			InItemControlLoop = false;
 			KillMoveItems();
 
+			g_Renderer.UpdateLaraAnimations(true);
+
 			// Update Lara's ponytails
 			HairControl(0, 0, 0);
 			if (level->LaraType == LARA_YOUNG)
@@ -554,7 +556,7 @@ unsigned CALLBACK GameMain(void *)
 	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
 	EndThread();
 
-	return TRUE;
+	return true;
 }
 
 GAME_STATUS DoTitle(int index)
@@ -1627,7 +1629,7 @@ int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
 
 	int xOff, yOff, trigger;
 	ITEM_INFO *item;
-	ObjectInfo *obj;
+	OBJECT_INFO *obj;
 	int tilts, t0, t1, t2, t3, t4, dx, dz, h1, h2;
 
 	do
@@ -2642,7 +2644,7 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 	{
 		// For items instead we need to test spheres
 		ITEM_INFO *item = &Items[closesItemNumber];
-		ObjectInfo *obj = &Objects[item->objectNumber];
+		OBJECT_INFO *obj = &Objects[item->objectNumber];
 
 		// Get the ransformed sphere of meshes
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
