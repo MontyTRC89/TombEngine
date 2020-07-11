@@ -74,7 +74,7 @@ void KillItem(short itemNum)
 		if (item == Lara.target)
 			Lara.target = NULL;
 
-		if (itemNum >= LevelItems)
+		if (itemNum >= NumItems)
 		{
 			item->nextItem = NextItemFree;
 			NextItemFree = itemNum;
@@ -435,14 +435,14 @@ short CreateItem()
 
 void InitialiseItemArray(int numitems) 
 {
-	ITEM_INFO* item = &Items[LevelItems];
+	ITEM_INFO* item = &Items[NumItems];
 
 	NextItemActive = NO_ITEM;
-	NextItemFree = LevelItems;
+	NextItemFree = NumItems;
 
-	if (LevelItems + 1 < numitems)
+	if (NumItems + 1 < numitems)
 	{
-		for (int i = LevelItems + 1; i < numitems; i++, item++)
+		for (int i = NumItems + 1; i < numitems; i++, item++)
 		{
 			item->nextItem = i;
 			item->active = false;
@@ -499,7 +499,7 @@ ITEM_INFO* find_a_fucking_item(short objectNum)
 
 int FindItemNumber(short objectNum)
 {
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < NumItems; i++)
 	{
 		ITEM_INFO* item = &Items[i];
 		if (item->objectNumber == objectNum)
@@ -515,9 +515,9 @@ ITEM_INFO* FindItem(short objectNumber)
 	printf("Called FindItem()\n");
 #endif
 
-	if (LevelItems > 0)
+	if (NumItems > 0)
 	{
-		for (int i = 0; i < LevelItems; i++)
+		for (int i = 0; i < NumItems; i++)
 		{
 			if (Items[i].objectNumber == objectNumber)
 				return &Items[i];

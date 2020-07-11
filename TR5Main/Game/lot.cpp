@@ -10,18 +10,29 @@
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 
 int SlotsUsed;
-CREATURE_INFO* BaddieSlots;
+std::vector<CREATURE_INFO> BaddieSlots;
 
 void InitialiseLOTarray(int allocMem)
 {
 	if (allocMem)
-		BaddieSlots = (CREATURE_INFO*)game_malloc(sizeof(CREATURE_INFO) * NUM_SLOTS);
+	{
+		BaddieSlots.clear();
+		BaddieSlots.resize(NUM_SLOTS);
+	}
 
-	CREATURE_INFO* creature = BaddieSlots;
+	CREATURE_INFO* creature = BaddieSlots.data();
 	for (int i = 0; i < NUM_SLOTS; i++, creature++)
 	{
 		creature->itemNum = NO_ITEM;
-		creature->LOT.node = (BOX_NODE*)game_malloc(sizeof(BOX_NODE) * NumberBoxes);
+		creature->LOT.node.resize(Boxes.size());
+		if (allocMem)
+		{
+			creature->LOT.node.clear();
+			for (int j = 0; j < Boxes.size(); j++)
+			{
+				creature->LOT.node.emplace_back(BOX_NODE());
+			}
+		}
 	}
 
 	SlotsUsed = 0;
@@ -46,7 +57,7 @@ int EnableBaddieAI(short itemNum, int always)
 		}
 
 		int slotToDisable = -1;
-		CREATURE_INFO* creature = BaddieSlots;
+		CREATURE_INFO* creature = BaddieSlots.data();
 		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
 		{
 			item = &Items[creature->itemNum];
@@ -76,7 +87,7 @@ int EnableBaddieAI(short itemNum, int always)
 	}
 	else
 	{
-		CREATURE_INFO* creature = BaddieSlots;
+		CREATURE_INFO* creature = BaddieSlots.data();
 		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
 		{
 			if (creature->itemNum == NO_ITEM)
@@ -261,8 +272,8 @@ void ClearLOT(LOT_INFO* LOT)
 	LOT->targetBox = NO_BOX;
 	LOT->requiredBox = NO_BOX;
 
-	BOX_NODE* node = LOT->node;
-	for (int i = 0; i < NumberBoxes; i++)
+	BOX_NODE* node = LOT->node.data();
+	for (int i = 0; i < Boxes.size(); i++)
 	{
 		node->exitBox = NO_BOX;
 		node->nextExpansion = NO_BOX;
@@ -280,10 +291,10 @@ void CreateZone(ITEM_INFO* item)
 
 	if (creature->LOT.fly)
 	{
-		BOX_NODE* node = creature->LOT.node;
+		BOX_NODE* node = creature->LOT.node.data();
 		creature->LOT.zoneCount = 0;
 
-		for (int i = 0; i < NumberBoxes; i++)
+		for (int i = 0; i < Boxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -292,16 +303,16 @@ void CreateZone(ITEM_INFO* item)
 	}
 	else
 	{
-		short* zone = Zones[creature->LOT.zone][FALSE];
-		short* flippedZone = Zones[creature->LOT.zone][TRUE];
+		int* zone = Zones[creature->LOT.zone][0].data();
+		int* flippedZone = Zones[creature->LOT.zone][1].data();
 
-		short zoneNumber = zone[item->boxNumber];
-		short flippedZoneNumber = flippedZone[item->boxNumber];
+		int zoneNumber = zone[item->boxNumber];
+		int flippedZoneNumber = flippedZone[item->boxNumber];
 
-		BOX_NODE* node = creature->LOT.node;
+		BOX_NODE* node = creature->LOT.node.data();
 		creature->LOT.zoneCount = 0;
 
-		for (int i = 0; i < NumberBoxes; i++)
+		for (int i = 0; i < Boxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

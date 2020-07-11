@@ -61,7 +61,7 @@ void MonkeyControl(short itemNumber)
 		{
 			int minDistance = 0x7FFFFFFF;
 			creature->enemy = NULL;
-			CREATURE_INFO* currentCreature = BaddieSlots;
+			CREATURE_INFO* currentCreature = BaddieSlots.data();
 
 			for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
 			{
@@ -286,13 +286,13 @@ void MonkeyControl(short itemNumber)
 				else
 				{
 					// Pickup the item!
-					item->carriedItem = creature->enemy - Items;
-					RemoveDrawnItem(creature->enemy - Items);
+					item->carriedItem = creature->enemy - Items.data();
+					RemoveDrawnItem(creature->enemy - Items.data());
 					creature->enemy->roomNumber = NO_ROOM;
 					creature->enemy->carriedItem = NO_ITEM;
 
 					// Stop other entities to interest to this item
-					CREATURE_INFO* currentCreature = BaddieSlots;
+					CREATURE_INFO* currentCreature = BaddieSlots.data();
 					for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
 					{
 						if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)

@@ -200,7 +200,7 @@ void SaveGame::saveGameStatus(int arg1, int arg2)
 		m_writer->WriteChunk(m_chunkCdFlags, &saveCdFlags, i, g_AudioTracks[i].Mask);
 
 	for (int i = 0; i < NumberCameras; i++)
-		m_writer->WriteChunk(m_chunkCamera, &saveCamera, i, Camera.fixed[i].flags);
+		m_writer->WriteChunk(m_chunkCamera, &saveCamera, i, FixedCameras[i].flags);
 
 	for (int i = 0; i < 255; i++)
 		m_writer->WriteChunk(m_chunkFlipStats, &saveFlipStats, i, FlipStats[i]);
@@ -887,7 +887,7 @@ bool SaveGame::readGameStatusChunks(ChunkId* chunkId, int maxSize, int arg)
 	{
 		short index = LEB128::ReadInt16(m_stream);
 		short value = LEB128::ReadInt16(m_stream);
-		Camera.fixed[index].flags = value;
+		FixedCameras[index].flags = value;
 		return true;
 	}
 	else if (chunkId->EqualsTo(m_chunkSequenceSwitch))

@@ -46,7 +46,7 @@ void InitialiseSkidman(short itemNum)
 		// The skidman remembers his skidoo
 		item->data = (void*)skidoo_item;
 
-		LevelItems++;
+		NumItems++;
 	}
 	else
 	{

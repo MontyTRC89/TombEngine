@@ -39,7 +39,7 @@ void RaptorControl(short itemNum)
 	{
 		if (creature->enemy == NULL || !(GetRandomControl() & 0x7F)) 													   // Decide on target - this can be Lara, another creature, or an ambush point
 		{
-			CREATURE_INFO* currentCreature = BaddieSlots;
+			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
 			for (int i = 0; i < NUM_SLOTS; i++)
 			{

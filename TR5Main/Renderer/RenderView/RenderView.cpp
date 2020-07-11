@@ -47,11 +47,12 @@ namespace T5M::Renderer {
 		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
 		WorldDirection = Vector3(cam->target.x, cam->target.y, cam->target.z) - WorldPosition;
 		WorldDirection.Normalize();
+		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 		Vector3 up = -Vector3::UnitY;
 		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 		up = Vector3::Transform(up, upRotation);
 		up.Normalize();
-		View = Matrix::CreateLookAt(WorldPosition, WorldPosition + WorldDirection, up);
+		View = Matrix::CreateLookAt(WorldPosition, WorldPosition + WorldDirection * 2048, up);
 		Projection = Matrix::CreatePerspectiveFieldOfView(fov, w / (float)h, n, f);
 		ViewProjection = View * Projection;
 		ViewSize = { (float)w,(float)h };

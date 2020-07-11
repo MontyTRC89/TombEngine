@@ -158,7 +158,7 @@ void InitialiseLaserHead(short itemNumber)
 	item->data = (LASER_HEAD_INFO*)game_malloc(sizeof(LASER_HEAD_INFO));
 	LASER_HEAD_INFO* info = (LASER_HEAD_INFO*)item->data;
 
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < NumItems; i++)
 	{
 		if (Items[i].objectNumber == ID_LASERHEAD_BASE)
 		{
@@ -169,7 +169,7 @@ void InitialiseLaserHead(short itemNumber)
 
 	short rotation = 0;
 	int j = 0;
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < NumItems; i++)
 	{
 		if (Items[i].objectNumber == ID_LASERHEAD_TENTACLE && j < 8)
 		{
@@ -179,7 +179,7 @@ void InitialiseLaserHead(short itemNumber)
 		}
 	}
 
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < NumItems; i++)
 	{
 		if (Items[i].objectNumber == ID_PUZZLE_ITEM4)
 		{
