@@ -18,7 +18,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void StartBaddy(ObjectInfo* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_WOLF];
 	if (obj->loaded)
@@ -150,17 +150,17 @@ static void StartBaddy(ObjectInfo* obj)
 	}
 }
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(OBJECT_INFO* obj)
 {
 
 }
 
-static void StartTrap(ObjectInfo* obj)
+static void StartTrap(OBJECT_INFO* obj)
 {
 
 }
 
-static ObjectInfo* objToInit;
+static OBJECT_INFO* objToInit;
 void InitialiseTR1Objects()
 {
 	StartBaddy(objToInit);

@@ -43,7 +43,7 @@
 #include "bass.h"
 #include "bass_fx.h"
 #include "sol.hpp"
-
+#include "memory/malloc.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 

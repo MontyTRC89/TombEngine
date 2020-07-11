@@ -83,7 +83,7 @@ void HitmanControl(short itemNumber)
 	{
 		ITEM_INFO* item = &Items[itemNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		ObjectInfo* obj = &Objects[item->objectNumber];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 		short angle = 0;
 		short joint2 = 0;

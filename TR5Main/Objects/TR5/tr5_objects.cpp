@@ -1,26 +1,26 @@
 #include "framework.h"
 #include "tr5_objects.h"
 /// entities
-#include "tr5_autoguns.h" // OK
-#include "tr5_brownbeast.h" // OK
-#include "tr5_chef.h" // OK
-#include "tr5_cyborg.h" // OK
-#include "tr5_doberman.h" // OK
-#include "tr5_dog.h" // OK
-#include "tr5_ghost.h" // OK
-#include "tr5_gladiator.h" // OK
-#include "tr5_guard.h" // OK
-#include "tr5_gunship.h" // OK
-#include "tr5_hydra.h" // OK
-#include "tr5_imp.h" // OK
+#include "tr5_autoguns.h"	  // OK
+#include "tr5_brownbeast.h"	  // OK
+#include "tr5_chef.h"		  // OK
+#include "tr5_cyborg.h"		  // OK
+#include "tr5_doberman.h"	  // OK
+#include "tr5_dog.h"		  // OK
+#include "tr5_ghost.h"		  // OK
+#include "tr5_gladiator.h"	  // OK
+#include "tr5_guard.h"		  // OK
+#include "tr5_gunship.h"	  // OK
+#include "tr5_hydra.h"		  // OK
+#include "tr5_imp.h"		  // OK
 #include "tr5_lagoon_witch.h" // OK
-#include "tr5_larson.h" // OK
-#include "tr5_laser_head.h" // OK
-#include "tr5_lion.h" // OK
-#include "tr5_reaper.h" // OK
+#include "tr5_larson.h"		  // OK
+#include "tr5_laser_head.h"	  // OK
+#include "tr5_lion.h"		  // OK
+#include "tr5_reaper.h"		  // OK
 #include "tr5_roman_statue.h" // OK
-#include "tr5_submarine.h" // OK
-#include "tr5_willowwisp.h" // OK
+#include "tr5_submarine.h"	  // OK
+#include "tr5_willowwisp.h"	  // OK
 /// emitter
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
@@ -65,7 +65,7 @@
 /// register objects
 #include "object_helper.h"
 
-static void StartBaddy(ObjectInfo* obj)
+static void StartBaddy(OBJECT_INFO *obj)
 {
 	obj = &Objects[ID_LARA];
 	if (obj->loaded)
@@ -663,7 +663,6 @@ static void StartBaddy(ObjectInfo* obj)
 		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
 
-
 	obj = &Objects[ID_BROWN_BEAST];
 	if (obj->loaded)
 	{
@@ -869,13 +868,12 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->zoneType = ZONE_BASIC;
 		obj->hitEffect = HIT_BLOOD;
-		obj->castShadows = TRUE;
+		obj->castShadows = true;
 		obj->hitPoints = 100;
 	}
-
 }
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(OBJECT_INFO *obj)
 {
 	InitPickupItem(obj, FlareControl, ID_FLARE_ITEM);
 	InitPickupItem(obj, TorchControl, ID_BURNING_TORCH_ITEM, true);
@@ -1024,7 +1022,7 @@ static void StartObject(ObjectInfo* obj)
 	}
 }
 
-static void StartTrap(ObjectInfo* obj)
+static void StartTrap(OBJECT_INFO *obj)
 {
 	obj = &Objects[ID_ZIPLINE_HANDLE];
 	if (obj->loaded)
@@ -1144,7 +1142,7 @@ static void StartTrap(ObjectInfo* obj)
 	}
 }
 
-static void StartSwitch(ObjectInfo* obj)
+static void StartSwitch(OBJECT_INFO *obj)
 {
 	obj = &Objects[ID_COG_SWITCH];
 	if (obj->loaded)
@@ -1166,13 +1164,13 @@ static void StartSwitch(ObjectInfo* obj)
 	}
 }
 
-static void StartShatter(ObjectInfo* obj)
+static void StartShatter(OBJECT_INFO *obj)
 {
 	for (int i = ID_SMASH_OBJECT1; i <= ID_SMASH_OBJECT16; i++)
 		InitSmashObject(obj, i);
 }
 
-static void StartProjectiles(ObjectInfo* obj)
+static void StartProjectiles(OBJECT_INFO *obj)
 {
 	InitProjectile(obj, BubblesControl, ID_ENERGY_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
@@ -1183,7 +1181,7 @@ static void StartProjectiles(ObjectInfo* obj)
 	InitProjectile(obj, ControlCrossbowBolt, ID_CROSSBOW_BOLT);
 }
 
-static void StartPickup(ObjectInfo* obj)
+static void StartPickup(OBJECT_INFO *obj)
 {
 	for (int objNumber = ID_PUZZLE_ITEM1; objNumber <= ID_EXAMINE8_COMBO2; objNumber++)
 	{
@@ -1229,7 +1227,7 @@ static void StartPickup(ObjectInfo* obj)
 	InitPickup(obj, ID_GOLDROSE_ITEM);
 }
 
-static ObjectInfo* objToInit;
+static OBJECT_INFO *objToInit;
 void InitialiseTR5Objects()
 {
 	StartBaddy(objToInit);
@@ -1243,12 +1241,7 @@ void InitialiseTR5Objects()
 
 void AllocTR5Objects()
 {
-	if (Objects[ID_BATS_EMITTER].loaded)
-		Bats = (BAT_STRUCT*)game_malloc(NUM_BATS * sizeof(BAT_STRUCT));
-
-	if (Objects[ID_SPIDERS_EMITTER].loaded)
-		Spiders = (SPIDER_STRUCT*)game_malloc(NUM_SPIDERS * sizeof(SPIDER_STRUCT));
-
-	if (Objects[ID_RATS_EMITTER].loaded)
-		Rats = (RAT_STRUCT*)game_malloc(NUM_RATS * sizeof(RAT_STRUCT));
+	Bats = game_malloc<BAT_STRUCT>(NUM_BATS);
+	Spiders = game_malloc<SPIDER_STRUCT>(NUM_SPIDERS);
+	Rats = game_malloc<RAT_STRUCT>(NUM_RATS);
 }

@@ -30,7 +30,7 @@ void SphinxControl(short itemNumber)
 
 	ITEM_INFO* item = &Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	int x = item->pos.xPos + 614 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
 	int y = item->pos.yPos;
