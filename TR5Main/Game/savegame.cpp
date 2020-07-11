@@ -1055,7 +1055,7 @@ bool SaveGame::readItemChunks(ChunkId* chunkId, int maxSize, int itemNumber)
 	}
 	else if (chunkId->EqualsTo(m_chunkItemQuadInfo))
 	{
-		QUAD_INFO* quadInfo = (QUAD_INFO*)game_malloc(sizeof(QUAD_INFO));
+		QUAD_INFO* quadInfo = game_malloc<QUAD_INFO>();
 		m_stream->ReadBytes(reinterpret_cast<byte*>(quadInfo), sizeof(QUAD_INFO));
 		if (item->objectNumber == ID_QUAD)
 			item->data = (void*)quadInfo;

@@ -155,7 +155,7 @@ void InitialiseLaserHead(short itemNumber)
 {
 	ITEM_INFO* item = &Items[itemNumber];
 
-	item->data = (LASER_HEAD_INFO*)game_malloc(sizeof(LASER_HEAD_INFO));
+	item->data = game_malloc<LASER_HEAD_INFO>();
 	LASER_HEAD_INFO* info = (LASER_HEAD_INFO*)item->data;
 
 	for (int i = 0; i < NumItems; i++)

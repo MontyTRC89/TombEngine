@@ -47,7 +47,7 @@ extern GameFlow* g_GameFlow;
 
 char* LevelDataPtr;
 std::vector<OBJECT_TEXTURE> ObjectTextures;
-std::vector<ITEM_INFO> Items;
+std::vector <ITEM_INFO> Items;
 std::vector<ROOM_INFO> Rooms;
 std::vector <ANIM_STRUCT> Anims;
 std::vector <CHANGE_STRUCT> Changes;
@@ -769,7 +769,7 @@ void LoadRooms()
 	BuildOutsideRoomsTable();
 
 	int numFloorData = ReadInt32(); 
-	FloorData = (short*)game_malloc(numFloorData * 2);
+	FloorData = game_malloc<short>(numFloorData * 2);
 	ReadBytes(FloorData, numFloorData * 2);
 }
 
@@ -817,7 +817,7 @@ void LoadSoundEffects()
 	NumberSoundSources = ReadInt32();
 	if (NumberSoundSources)
 	{
-		SoundSources = (OBJECT_VECTOR*)game_malloc(NumberSoundSources * sizeof(OBJECT_VECTOR));
+		SoundSources = game_malloc<OBJECT_VECTOR>(NumberSoundSources);
 		ReadBytes(SoundSources, NumberSoundSources * sizeof(OBJECT_VECTOR));
 	}
 }
@@ -826,7 +826,7 @@ void LoadAnimatedTextures()
 {
 	NumAnimatedTextures = ReadInt32();
 	
-	AnimTextureRanges = (short*)game_malloc(NumAnimatedTextures * sizeof(short));
+	AnimTextureRanges = game_malloc<short>(NumAnimatedTextures);
 	ReadBytes(AnimTextureRanges, NumAnimatedTextures * sizeof(short));
 	
 	nAnimUVRanges = ReadInt8();
@@ -1051,7 +1051,7 @@ void LoadSamples()
 	NumSamplesInfos = ReadInt32();
 	if (NumSamplesInfos)
 	{
-		SampleInfo = (SAMPLE_INFO*)game_malloc(NumSamplesInfos * sizeof(SAMPLE_INFO));
+		SampleInfo = game_malloc<SAMPLE_INFO>(NumSamplesInfos);
 		ReadBytes(SampleInfo, NumSamplesInfos * sizeof(SAMPLE_INFO));
 
 		int numSampleIndices = ReadInt32();
