@@ -840,6 +840,15 @@
     <ClInclude Include="Game\debug\assert.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Game\memory\linearPoolAllocator.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\debug\log.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\PoolAllocator.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
