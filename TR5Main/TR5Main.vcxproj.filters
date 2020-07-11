@@ -690,9 +690,6 @@
     <ClInclude Include="Renderer\RenderEnums.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\malloc.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\trmath.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -823,6 +820,33 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\RenderView\RenderView.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\qmalloc.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\malloc.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\MemoryPoolAllocator.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\pool.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\linearPool.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\debug\assert.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\linearPoolAllocator.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\debug\log.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\memory\PoolAllocator.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1421,9 +1445,6 @@
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game\malloc.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Game\trmath.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -1521,6 +1542,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\RenderView\RenderView.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\memory\malloc.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
