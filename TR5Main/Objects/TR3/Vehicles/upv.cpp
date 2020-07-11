@@ -768,7 +768,7 @@ void SubInitialise(short itemNum)
 	SUB_INFO* sub;
 
 	v = &Items[itemNum];
-	sub = (SUB_INFO*)game_malloc(sizeof(SUB_INFO));
+	sub = game_malloc<SUB_INFO>();
 	v->data = (void*)sub;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
