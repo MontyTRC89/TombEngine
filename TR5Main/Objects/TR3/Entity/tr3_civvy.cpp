@@ -66,7 +66,7 @@ void CivvyControl(short item_number)
 	civvy = (CREATURE_INFO*)item->data;
 	torso_y = torso_x = head = angle = tilt = 0;
 
-	if (Boxes[item->boxNumber].overlapIndex & BLOCKED)
+	if (Boxes[item->boxNumber].flags & BLOCKED)
 	{
 		// DoLotsOfBloodD
 		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);

@@ -3,7 +3,7 @@
 
 constexpr auto NUM_SLOTS = 32;
 extern int SlotsUsed;
-extern CREATURE_INFO* BaddieSlots;
+extern std::vector<CREATURE_INFO> BaddieSlots;
 
 void InitialiseLOTarray(int allocMem);
 int EnableBaddieAI(short itemNum, int always);

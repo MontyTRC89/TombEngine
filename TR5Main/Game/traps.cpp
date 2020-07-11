@@ -606,7 +606,7 @@ void InitialiseWreckingBall(short itemNumber)
 	short room;
 
 	item = &Items[itemNumber];
-	item->itemFlags[3] = find_a_fucking_item(ID_ANIMATING16) - Items;
+	item->itemFlags[3] = find_a_fucking_item(ID_ANIMATING16) - Items.data();
 	room = item->roomNumber;
 	item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1644;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);

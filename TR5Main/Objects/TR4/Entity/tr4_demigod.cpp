@@ -255,7 +255,7 @@ void InitialiseDemigod(short itemNumber)
 	item->frameNumber = Anims[item->animNumber].frameBase;
 	item->currentAnimState = 0;
 
-	/*if (LevelItems > 0)
+	/*if (NumItems > 0)
 	{
 		ITEM_INFO* currentItem = &Items[0];
 		int k = 0;
@@ -264,7 +264,7 @@ void InitialiseDemigod(short itemNumber)
 		{
 			k++;
 			currentItem++;
-			if (k >= LevelItems)
+			if (k >= NumItems)
 				return;
 		}
 

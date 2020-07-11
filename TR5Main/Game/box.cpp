@@ -12,11 +12,9 @@
 #include "trmath.h"
 #include "objectslist.h"
 
-int NumberBoxes;
-BOX_INFO* Boxes;
-int NumberOverlaps;
-short* Overlaps;
-short* Zones[ZONE_MAX][2];
+std::vector<BOX_INFO> Boxes;
+std::vector<OVERLAP> Overlaps;
+std::vector<int> Zones[ZONE_MAX][2];
 
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
@@ -114,7 +112,7 @@ short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 {
 	ITEM_INFO* item = &Items[creature->itemNum];
 	ROOM_INFO* r;
-	short* zone;
+	int* zone;
 
 	r = &Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
@@ -122,7 +120,7 @@ short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem)
 	r = &Rooms[targetItem->roomNumber];
 	targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->pos.xPos - r->x, targetItem->pos.zPos - r->z).box;
 
-	zone = Zones[creature->LOT.zone][FlipStatus];
+	zone = Zones[creature->LOT.zone][FlipStatus].data();
 	return zone[item->boxNumber] == zone[targetItem->boxNumber];
 }
 
@@ -509,8 +507,10 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	FLOOR_INFO* floor;
 	PHD_VECTOR old;
 	int xPos, zPos, x, y, z, ceiling, shiftX, shiftZ, dy;
-	short* zone, *bounds;
-	short roomNumber, boxHeight, height, nextHeight, nextBox, radius, biffAngle, top;
+	short* bounds;
+	int* zone;
+	short roomNumber, radius, biffAngle, top;
+	int boxHeight, height, nextHeight, nextBox;
 
 	item = &Items[itemNumber];
 	if (item->data == NULL)
@@ -518,7 +518,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	creature = (CREATURE_INFO*)item->data;
 	LOT = &creature->LOT;
-	zone = Zones[LOT->zone][FlipStatus];
+	zone = Zones[LOT->zone][FlipStatus].data();
 	boxHeight = Boxes[item->boxNumber].height;
 	old.x = item->pos.xPos;
 	old.y = item->pos.yPos;
@@ -897,7 +897,7 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 	if (LOT->isJumping)
 		return false;
 
-	if (Boxes[floor->box].overlapIndex & LOT->blockMask)
+	if (Boxes[floor->box].flags & LOT->blockMask)
 		return true;
 
 	height = Boxes[floor->box].height;
@@ -957,15 +957,15 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 {
 	CREATURE_INFO* creature;
 	BOX_INFO* box;
-	short* zone;
+	int* zone;
 
 	creature = (CREATURE_INFO*)item->data;
-	zone = Zones[creature->LOT.zone][FlipStatus];
+	zone = Zones[creature->LOT.zone][FlipStatus].data();
 	if (creature->LOT.fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
 	box = &Boxes[boxNumber];
-	if (box->overlapIndex & creature->LOT.blockMask)
+	if (box->flags & creature->LOT.blockMask)
 		return false;
 
 	if ((item->pos.zPos > (box->left << WALL_SHIFT)) && item->pos.zPos < ((box->right  << WALL_SHIFT)) &&
@@ -975,7 +975,7 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	return true;
 }
 
-int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
+int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber) 
 {
 	BOX_INFO* box = &Boxes[boxNumber];
 	int x, z;
@@ -992,7 +992,7 @@ int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber)
 	return true;
 }
 
-void TargetBox(LOT_INFO* LOT, short boxNumber)
+void TargetBox(LOT_INFO* LOT, int boxNumber)
 {
 	BOX_INFO* box;
 
@@ -1039,10 +1039,10 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 {
 	BOX_NODE* node, *expand;
 	BOX_INFO* box;
-	short* zone, index, searchZone, boxNumber, delta;
+	int* zone, index, searchZone, boxNumber, delta, flags;
 	bool done;
 	
-	zone = Zones[LOT->zone][FlipStatus];
+	zone = Zones[LOT->zone][FlipStatus].data();
 	searchZone = zone[LOT->head];
 
 	if (depth <= 0)
@@ -1059,57 +1059,61 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 		node = &LOT->node[LOT->head];
 		box = &Boxes[LOT->head];
 
-		index = box->overlapIndex & OVERLAP_INDEX;
+		index = box->overlapIndex;
 		done = false;
-		do
+		if (index >= 0)
 		{
-			boxNumber = Overlaps[index++];
-			if (boxNumber & BOX_END_BIT)
+			do
 			{
-				done = true;
-				boxNumber &= BOX_NUMBER;
-			}
+				boxNumber = Overlaps[index].box;
+				flags = Overlaps[index++].flags;
 
-			if (LOT->fly == NO_FLYING && searchZone != zone[boxNumber])
-				continue;
-
-			delta = Boxes[boxNumber].height - box->height;
-			if (delta > LOT->step || delta < LOT->drop)
-				continue;
-
-			expand = &LOT->node[boxNumber];
-			if ((node->searchNumber & SEARCH_NUMBER) < (expand->searchNumber & SEARCH_NUMBER))
-				continue;
-
-			if (node->searchNumber & BLOCKED_SEARCH)
-			{
-				if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER))
-					continue;
-
-				expand->searchNumber = node->searchNumber;
-			}
-			else
-			{
-				if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER) && !(expand->searchNumber & BLOCKED_SEARCH))
-					continue;
-
-				if (Boxes[boxNumber].overlapIndex & LOT->blockMask)
+				if (flags & BOX_END_BIT)
 				{
-					expand->searchNumber = node->searchNumber | BLOCKED_SEARCH;
+					done = true;
+				}
+
+				if (LOT->fly == NO_FLYING && searchZone != zone[boxNumber])
+					continue;
+
+				delta = Boxes[boxNumber].height - box->height;
+				if (delta > LOT->step || delta < LOT->drop)
+					continue;
+
+				expand = &LOT->node[boxNumber];
+				if ((node->searchNumber & SEARCH_NUMBER) < (expand->searchNumber & SEARCH_NUMBER))
+					continue;
+
+				if (node->searchNumber & BLOCKED_SEARCH)
+				{
+					if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER))
+						continue;
+
+					expand->searchNumber = node->searchNumber;
 				}
 				else
 				{
-					expand->searchNumber = node->searchNumber;
-					expand->exitBox = LOT->head;
-				}
-			}
+					if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER) && !(expand->searchNumber & BLOCKED_SEARCH))
+						continue;
 
-			if (expand->nextExpansion == NO_BOX && boxNumber != LOT->tail)
-			{
-				LOT->node[LOT->tail].nextExpansion = boxNumber;
-				LOT->tail = boxNumber;
-			}
-		} while (!done);
+					if (Boxes[boxNumber].flags & LOT->blockMask)
+					{
+						expand->searchNumber = node->searchNumber | BLOCKED_SEARCH;
+					}
+					else
+					{
+						expand->searchNumber = node->searchNumber;
+						expand->exitBox = LOT->head;
+					}
+				}
+
+				if (expand->nextExpansion == NO_BOX && boxNumber != LOT->tail)
+				{
+					LOT->node[LOT->tail].nextExpansion = boxNumber;
+					LOT->tail = boxNumber;
+				}
+			} while (!done);
+		}
 
 		LOT->head = node->nextExpansion;
 		node->nextExpansion = NO_BOX;
@@ -1138,7 +1142,7 @@ void InitialiseCreature(short itemNumber)
 	ClearItem(itemNumber);
 }
 
-int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber) 
+int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 {
 	if (enemy == NULL)
 		return false;
@@ -1384,7 +1388,7 @@ void FindAITarget(CREATURE_INFO* creature, short objectNumber)
 	ITEM_INFO* targetItem;
 	int i;
 
-	for (i = 0, targetItem = &Items[0]; i < LevelItems; i++, targetItem++)
+	for (i = 0, targetItem = &Items[0]; i < NumItems; i++, targetItem++)
 	{
 		if (targetItem->objectNumber == objectNumber && targetItem->roomNumber != NO_ROOM)
 		{
@@ -1401,23 +1405,23 @@ void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 {
 	ITEM_INFO* item = &Items[creature->itemNum];
 
-	if (nAIObjects > 0)
+	if (AIObjects.size() > 0)
 	{
 		AIOBJECT* foundObject = NULL;
 
-		for (int i = 0; i < nAIObjects; i++)
+		for (int i = 0; i < AIObjects.size(); i++)
 		{
 			AIOBJECT* aiObject = &AIObjects[i];
 
-			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->itemFlags[3] && aiObject->roomNumber != 255)
+			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->itemFlags[3] && aiObject->roomNumber != NO_ROOM)
 			{
-				short* zone = Zones[creature->LOT.zone][FlipStatus];
+				int* zone = Zones[creature->LOT.zone][FlipStatus].data();
 
 				ROOM_INFO* r = &Rooms[item->roomNumber];
-				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & 0x7FF;
+				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 
 				r = &Rooms[aiObject->roomNumber];
-				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z).box & 0x7FF;
+				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z).box;
 
 				if (zone[item->boxNumber] == zone[aiObject->boxNumber])
 				{
@@ -1461,7 +1465,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	ITEM_INFO * enemy;
 	OBJECT_INFO * obj;
 	ROOM_INFO * r;
-	short* zone, angle;
+	short angle;
+	int* zone;
 	int x, y, z;
 
 	creature = (CREATURE_INFO*)item->data;
@@ -1474,19 +1479,19 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 		creature->enemy = LaraItem;
 	}
 
-	zone = Zones[creature->LOT.zone][FlipStatus];
+	zone = Zones[creature->LOT.zone][FlipStatus].data();
 
 	r = &Rooms[item->roomNumber];
-	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box & BOX_NUMBER;
+	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 	info->zoneNumber = zone[item->boxNumber];
 
 	r = &Rooms[enemy->roomNumber];
-	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box & BOX_NUMBER;
+	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box;
 	info->enemyZone = zone[enemy->boxNumber];
 
 	if (!obj->nonLot)
 	{
-		if (Boxes[enemy->boxNumber].overlapIndex & creature->LOT.blockMask)
+		if (Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
 			info->enemyZone |= BLOCKED;
 		else if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 			info->enemyZone |= BLOCKED;
@@ -1555,7 +1560,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	CREATURE_INFO* creature;
 	ITEM_INFO* enemy;
 	LOT_INFO* LOT;
-	short boxNumber, startBox, overlapIndex, nextBox;
+	int boxNumber, startBox, overlapIndex, nextBox, flags;
 	short* bounds;
 
 	creature = (CREATURE_INFO*)item->data;
@@ -1641,19 +1646,24 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	startBox = LOT->node[item->boxNumber].exitBox;
 	if (startBox != NO_BOX)
 	{
-		overlapIndex = Boxes[startBox].overlapIndex & OVERLAP_INDEX;
+		overlapIndex = Boxes[startBox].overlapIndex;
 		nextBox = 0;
-		do
+		flags = 0;
+		if (overlapIndex >= 0)
 		{
-			overlapIndex++;
-			nextBox = Overlaps[overlapIndex];
-		} while (nextBox != NO_BOX && ((nextBox & BOX_END_BIT) == FALSE) && ((nextBox & BOX_NUMBER) != startBox));
+			do
+			{
+				overlapIndex++;
+				nextBox = Overlaps[overlapIndex].box;
+				flags = Overlaps[overlapIndex].flags;
+			} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == FALSE) && (nextBox != startBox));
+		}
 
-		if ((nextBox & BOX_NUMBER) == startBox)
+		if (nextBox == startBox)
 		{
-			if (nextBox & BOX_JUMP)
+			if (flags & BOX_JUMP)
 				creature->jumpAhead = true;
-			if (nextBox & BOX_MONKEY)
+			if (flags & BOX_MONKEY)
 				creature->monkeyAhead = true;
 		}
 	}
@@ -1776,7 +1786,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 	int boxLeft, boxRight, boxTop, boxBottom;
 	int left, top, right, bottom;
 	int direction;
-	short boxNumber;
+	int boxNumber;
 
 	UpdateLOT(LOT, 5);
 
@@ -1964,7 +1974,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 		}
 
 		boxNumber = LOT->node[boxNumber].exitBox;
-		if (boxNumber != NO_BOX && (Boxes[boxNumber].overlapIndex & LOT->blockMask))
+		if (boxNumber != NO_BOX && (Boxes[boxNumber].flags & LOT->blockMask))
 			break;
 	} while (boxNumber != NO_BOX);
 

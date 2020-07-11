@@ -18,7 +18,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, int worldSpace, Matrix local)
 		return 0;
 
 	BoundingSphere spheres[MAX_SPHERES];
-	short itemNumber = (item - Items);
+	short itemNumber = (item - Items.data());
 
 	int num = g_Renderer.GetSpheres(itemNumber, spheres, worldSpace, local);
 
@@ -164,7 +164,7 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
 void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 {
 	// Get the real item number
-	short itemNumber = item - Items;
+	short itemNumber = item - Items.data();
 
 	// Use matrices done in the renderer and transform the input vector
 	Vector3 p = Vector3(vec->x, vec->y, vec->z);

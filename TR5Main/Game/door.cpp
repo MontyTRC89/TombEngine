@@ -579,7 +579,7 @@ void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 		if (boxIndex != NO_BOX)
 		{
 			if (!DontUnlockBox)
-				Boxes[boxIndex].overlapIndex &= ~BLOCKED;
+				Boxes[boxIndex].flags &= ~BLOCKED;
 
 			for (int i = 0; i < NUM_SLOTS; i++)
 			{
@@ -670,7 +670,7 @@ void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 		short boxIndex = doorPos->block;
 		if (boxIndex != NO_BOX)
 		{
-			Boxes[boxIndex].overlapIndex |= BLOCKED;
+			Boxes[boxIndex].flags |= BLOCKED;
 			for (int i = 0; i < NUM_SLOTS; i++)
 			{
 				BaddieSlots[i].LOT.targetBox = NO_BOX;
@@ -750,7 +750,7 @@ void InitialiseDoor(short itemNumber)
 		b = &Rooms[roomNumber];
 		boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
 	}
-	door->d1.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+	door->d1.block = (Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 	memcpy(&door->d1.data, door->d1.floor, sizeof(FLOOR_INFO));
 
@@ -767,7 +767,7 @@ void InitialiseDoor(short itemNumber)
 			b = &Rooms[roomNumber];
 			boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
 		}
-		door->d1flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+		door->d1flip.block = (Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 		memcpy(&door->d1flip.data, door->d1flip.floor, sizeof(FLOOR_INFO));
 	}
@@ -797,7 +797,7 @@ void InitialiseDoor(short itemNumber)
 			b = &Rooms[roomNumber];
 			boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
 		}
-		door->d2.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+		door->d2.block = (Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 		memcpy(&door->d2.data, door->d2.floor, sizeof(FLOOR_INFO));
 
@@ -814,7 +814,7 @@ void InitialiseDoor(short itemNumber)
 				b = &Rooms[roomNumber];
 				boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
 			}
-			door->d2flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+			door->d2flip.block = (Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 			memcpy(&door->d2flip.data, door->d2flip.floor, sizeof(FLOOR_INFO));
 		}

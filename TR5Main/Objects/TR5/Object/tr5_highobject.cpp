@@ -15,7 +15,7 @@ void InitialiseHighObject1(short itemNumber)
 
 	ITEM_INFO* item = &Items[itemNumber];
 
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < NumItems; i++)
 	{
 		ITEM_INFO* currentItem = &Items[i];
 
@@ -52,7 +52,7 @@ void InitialiseHighObject1(short itemNumber)
 		}
 	}
 
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < NumItems; i++)
 	{
 		ITEM_INFO* currentItem = &Items[i];
 

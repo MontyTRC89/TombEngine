@@ -669,7 +669,7 @@ void ControlGrenade(short itemNumber)
 									ExplodeItemNode(currentItem, Objects[ID_SHOOT_SWITCH1].nmeshes - 1, 0, 64);
 								}
 
-								AddActiveItem((currentItem - Items));
+								AddActiveItem((currentItem - Items.data()));
 								currentItem->status = ITEM_ACTIVE;
 								currentItem->triggerFlags |= 0x3E40;
 							}
@@ -680,7 +680,7 @@ void ControlGrenade(short itemNumber)
 								//TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
-								short currentItemNumber = (currentItem - Items);
+								short currentItemNumber = (currentItem - Items.data());
 								SmashObject(currentItemNumber);
 								KillItem(currentItemNumber);
 							}
@@ -1435,7 +1435,7 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 						if (src->hitPoints <= 0)
 						{
 							++Savegame.Level.Kills;
-							CreatureDie((dest - Items), 1);
+							CreatureDie((dest - Items.data()), 1);
 						}
 					}
 				}
