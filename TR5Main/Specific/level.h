@@ -113,7 +113,7 @@ extern int g_NumSpritesSequences;
 extern std::vector<MESH> Meshes;
 extern int NumItems;
 extern std::vector<OBJECT_TEXTURE> ObjectTextures;
-extern std::vector<ITEM_INFO> Items;
+extern std::vector <ITEM_INFO> Items;
 extern std::vector<ROOM_INFO> Rooms;
 extern std::vector<ROOM_INFO> Rooms;
 extern std::vector <ANIM_STRUCT> Anims;
