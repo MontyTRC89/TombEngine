@@ -15,7 +15,7 @@ void InitialiseAutoGuns(short itemNumber)
 
     item = &Items[itemNumber];
     item->meshBits = 1024;
-    item->data = game_malloc<uint8_t[5702]>();
+    item->data = game_malloc<uint8_t>(5702);
 }
 
 static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
