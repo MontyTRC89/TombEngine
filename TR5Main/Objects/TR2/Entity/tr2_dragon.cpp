@@ -536,7 +536,7 @@ void InitialiseBartoli(short itemNum)
 
 		back->data = (void*)front_item; // back of dragon points at front
 
-		LevelItems += 2;
+		NumItems += 2;
 	}
 }
 

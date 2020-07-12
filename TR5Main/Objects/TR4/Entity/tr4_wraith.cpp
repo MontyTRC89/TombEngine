@@ -206,7 +206,7 @@ void KillWraith(ITEM_INFO* item)
 				return;
 			}
 		}
-		item2->hitPoints = item - Items;
+		item2->hitPoints = item - Items.data();
 	}
 	FlipEffect = -1;
 }

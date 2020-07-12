@@ -31,14 +31,14 @@ int DoPushPull = 0;
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	Boxes[floor->box].overlapIndex &= (~BLOCKED);
+	Boxes[floor->box].flags &= (~BLOCKED);
 	short height = Boxes[floor->box].height;
 	short baseRoomNumber = roomNumber;
 
 	floor = GetFloor(x + 1024, y, z, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (Boxes[floor->box].height == height && (Boxes[floor->box].flags & BLOCKABLE) && (Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x + 1024, y, z, roomNumber);
 	}
 
@@ -46,7 +46,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	floor = GetFloor(x - 1024, y, z, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (Boxes[floor->box].height == height && (Boxes[floor->box].flags & BLOCKABLE) && (Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x - 1024, y, z, roomNumber);
 	}
 
@@ -54,7 +54,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	floor = GetFloor(x, y, z + 1024, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (Boxes[floor->box].height == height && (Boxes[floor->box].flags & BLOCKABLE) && (Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z + 1024, roomNumber);
 	}
 
@@ -62,7 +62,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	floor = GetFloor(x, y, z - 1024, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (Boxes[floor->box].height == height && (Boxes[floor->box].flags & BLOCKABLE) && (Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z - 1024, roomNumber);
 	}
 }
