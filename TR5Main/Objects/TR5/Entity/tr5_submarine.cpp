@@ -468,7 +468,7 @@ void TorpedoControl(short itemNumber)
 	if (item->itemFlags[0] == NO_ITEM)
 	{
 		bool found = false;
-		for (int i = LevelItems; i < 256; i++)
+		for (int i = NumItems; i < 256; i++)
 		{
 			ITEM_INFO* searchItem = &Items[i];
 

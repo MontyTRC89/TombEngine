@@ -16,8 +16,8 @@ void InitialiseSmashObject(short itemNumber)
 	ROOM_INFO* r = &Rooms[item->roomNumber];
 	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	BOX_INFO* box = &Boxes[floor->box];
-	if (box->overlapIndex & END_BIT)
-		box->overlapIndex |= BLOCKED;
+	if (box->flags & 0x8000)
+		box->flags |= BLOCKED;
 }
 
 void SmashObject(short itemNumber)
@@ -27,8 +27,8 @@ void SmashObject(short itemNumber)
 	int sector = ((item->pos.zPos - r->z) >> 10) + r->xSize * ((item->pos.xPos - r->x) >> 10);
 
 	BOX_INFO* box = &Boxes[r->floor[sector].box];
-	if (box->overlapIndex & BOX_LAST)
-		box->overlapIndex &= ~BOX_BLOCKED;
+	if (box->flags & 0x8000)
+		box->flags &= ~BOX_BLOCKED;
 
 	SoundEffect(SFX_SMASH_GLASS, &item->pos, 0);
 

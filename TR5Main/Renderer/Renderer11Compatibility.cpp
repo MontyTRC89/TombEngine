@@ -673,9 +673,9 @@ namespace T5M::Renderer
 		m_staticsIndexBuffer = IndexBuffer(m_device, staticsIndices.size(), staticsIndices.data());
 
 		// Step 5: prepare sprites
-		m_sprites.resize(g_NumSprites);
+		m_sprites.resize(Sprites.size());
 
-		for (int i = 0; i < g_NumSprites; i++)
+		for (int i = 0; i < Sprites.size(); i++)
 		{
 			SPRITE *oldSprite = &Sprites[i];
 			m_sprites[i] = RendererSprite();
