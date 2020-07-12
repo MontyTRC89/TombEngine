@@ -32,7 +32,7 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 {
 	if (Lara.currentActive)
 	{
-		OBJECT_VECTOR* sink = &Camera.fixed[Lara.currentActive - 1];
+		OBJECT_VECTOR* sink = &FixedCameras[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
 		Lara.currentXvel += ((sink->data * (phd_sin(angle - ANGLE(90)) / 4) >> 2) - Lara.currentXvel) >> 4;

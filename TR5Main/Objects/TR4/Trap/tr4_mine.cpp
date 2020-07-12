@@ -118,7 +118,7 @@ void MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			for (int i = 0; i < LevelItems; i++)
+			for (int i = 0; i < NumItems; i++)
 			{
 				ITEM_INFO* currentItem = &Items[i];
 

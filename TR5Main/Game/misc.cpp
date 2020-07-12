@@ -28,7 +28,7 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 	int x, z;
 
 	bestdistance = MAXINT;
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < NumItems; i++)
 	{
 		target = &Items[i];
 		if (target != nullptr)

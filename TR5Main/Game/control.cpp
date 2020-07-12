@@ -1086,12 +1086,12 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 			if (keyResult == 1)
 				break;
 
-			if (Camera.fixed[value].flags & 0x100)
+			if (FixedCameras[value].flags & 0x100)
 				break;
 
 			Camera.number = value;
 
-			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA && !(Camera.fixed[value].flags & 3))
+			if (Camera.type == LOOK_CAMERA || Camera.type == COMBAT_CAMERA && !(FixedCameras[value].flags & 3))
 				break;
 
 			if (triggerType == TRIGGER_TYPES::COMBAT)
@@ -1105,7 +1105,7 @@ void TestTriggers(short *data, int heavy, int HeavyFlags)
 				Camera.timer = (trigger & 0xFF) * 30;
 
 				if (trigger & 0x100)
-					Camera.fixed[Camera.number].flags |= 0x100;
+					FixedCameras[Camera.number].flags |= 0x100;
 
 				Camera.speed = ((trigger & CODE_BITS) >> 6) + 1;
 				Camera.type = heavy ? HEAVY_CAMERA : FIXED_CAMERA;
@@ -1439,12 +1439,12 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 	}
 
 	box = &Boxes[floor->box];
-	if (box->overlapIndex & BLOCKABLE)
+	if (box->flags & BLOCKABLE)
 	{
 		if (height >= 0)
-			box->overlapIndex &= ~BLOCKED;
+			box->flags &= ~BLOCKED;
 		else
-			box->overlapIndex |= BLOCKED;
+			box->flags |= BLOCKED;
 	}
 }
 
@@ -2892,7 +2892,7 @@ void AnimateItem(ITEM_INFO *item)
 	item->pos.zPos += lateral * phd_cos(item->pos.yRot + ANGLE(90)) >> W2V_SHIFT;
 
 	// Update matrices
-	short itemNumber = item - Items;
+	short itemNumber = item - Items.data();
 	g_Renderer.UpdateItemAnimations(itemNumber, true);
 }
 
@@ -3076,7 +3076,6 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		ShatterItem.sphere.x = CreatureSpheres[Node].x;
 		ShatterItem.sphere.y = CreatureSpheres[Node].y;
 		ShatterItem.sphere.z = CreatureSpheres[Node].z;
-		ShatterItem.il = (ITEM_LIGHT *)&item->legacyLightData; // TODO: remove it or at last change it with the new renderer light...
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};

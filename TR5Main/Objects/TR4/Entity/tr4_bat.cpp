@@ -93,19 +93,22 @@ void BatControl(short itemNumber)
             slots = &BaddieSlots[0];
             for (int i = 0; i < NUM_SLOTS; i++, slots++)
             {
-                target = &Items[slots->itemNum];
-                if (target->objectNumber == ID_VON_CROY && target->status != ITEM_INVISIBLE)
-                {
-                    int x, z;
-                    x = target->pos.xPos - item->pos.xPos;
-                    z = target->pos.zPos - item->pos.zPos;
-                    distance = SQUARE(x) + SQUARE(z);
-                    if (distance < bestdistance)
-                    {
-                        bat->enemy = target;
-                        bestdistance = distance;
-                    }
-                }
+				if (slots->itemNum != NO_ITEM)
+				{
+					target = &Items[slots->itemNum];
+					if (target->objectNumber == ID_VON_CROY && target->status != ITEM_INVISIBLE)
+					{
+						int x, z;
+						x = target->pos.xPos - item->pos.xPos;
+						z = target->pos.zPos - item->pos.zPos;
+						distance = SQUARE(x) + SQUARE(z);
+						if (distance < bestdistance)
+						{
+							bat->enemy = target;
+							bestdistance = distance;
+						}
+					}
+				}
             }
         }
 

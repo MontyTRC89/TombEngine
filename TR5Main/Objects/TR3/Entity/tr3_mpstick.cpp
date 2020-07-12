@@ -56,7 +56,7 @@ void MPStickControl(short itemNumber)
 	short angle = 0;
 	short tilt = 0;
 
-	if (Boxes[item->boxNumber].overlapIndex & BLOCKED)
+	if (Boxes[item->boxNumber].flags & BLOCKED)
 	{
 		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);
 		item->hitPoints -= 20;
@@ -96,7 +96,7 @@ void MPStickControl(short itemNumber)
 			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
 
 			int bestDistance = 0x7fffffff;
-			CREATURE_INFO* currentCreature = BaddieSlots;
+			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			for (int slot = 0; slot < NUM_SLOTS; slot++, currentCreature++)
 			{
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
