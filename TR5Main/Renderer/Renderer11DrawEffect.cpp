@@ -17,6 +17,7 @@
 #include "drip.h"
 #include "explosion.h"
 #include "Quad/RenderQuad.h"
+
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
@@ -28,7 +29,7 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
-extern int g_NumSprites;
+
 namespace T5M::Renderer {
 	using namespace T5M::Effects::Footprints;
 	using std::vector;
@@ -661,7 +662,7 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawFootprints() {
 		const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
-		if (g_NumSprites > spriteIndex) {
+		if (Sprites.size() > spriteIndex) {
 			for (auto i = footprints.begin(); i != footprints.end(); i++) {
 				FOOTPRINT_STRUCT& footprint = *i;
 				if (footprint.active) {

@@ -86,26 +86,33 @@ typedef struct OBJECT_Bones
 
 typedef struct BOX_NODE
 {
-	short exitBox;
-	unsigned short searchNumber;
-	short nextExpansion;
-	short boxNumber;
+	int exitBox;
+	int searchNumber;
+	int nextExpansion;
+	int boxNumber;
 };
 
-typedef struct BOX_INFO
+struct BOX_INFO
 {
-	unsigned char left;
-	unsigned char right;
-	unsigned char top;
-	unsigned char bottom;
-	short height;
-	short overlapIndex;
+	unsigned int left;
+	unsigned int right;
+	unsigned int top;
+	unsigned int bottom;
+	int height;
+	int overlapIndex;
+	int flags;
+};
+
+struct OVERLAP
+{
+	int box;
+	int flags;
 };
 
 typedef struct AI_INFO
 {
-	short zoneNumber;
-	short enemyZone;
+	int zoneNumber;
+	int enemyZone;
 	int distance;
 	int ahead;
 	int bite;
@@ -140,16 +147,16 @@ typedef struct BITE_INFO
 
 typedef struct LOT_INFO
 {
-	BOX_NODE* node;
-	short head;
-	short tail;
-	unsigned short searchNumber;
-	unsigned short blockMask;
+	std::vector<BOX_NODE> node;
+	int head;
+	int tail;
+	int searchNumber;
+	int blockMask;
 	short step;
 	short drop;
 	short zoneCount;
-	short targetBox;
-	short requiredBox;
+	int targetBox;
+	int requiredBox;
 	short fly;
 	bool canJump;
 	bool canMonkey;
@@ -249,7 +256,7 @@ constexpr auto BLOCKED = 0x4000;
 constexpr auto OVERLAP_INDEX = 0x3FFF;
 constexpr auto SEARCH_NUMBER = 0x7FFF;
 constexpr auto BLOCKED_SEARCH = 0x8000;
-constexpr auto NO_BOX = 0x7FF;
+constexpr auto NO_BOX = -1;
 constexpr auto BOX_JUMP = 0x800;
 constexpr auto BOX_MONKEY = 0x2000;
 constexpr auto BOX_NUMBER = 0x7FF;
@@ -268,11 +275,9 @@ constexpr auto SECONDARY_CLIP = 0x10;
 constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 constexpr auto SLOPE_DIF = 60;
 
-extern int NumberBoxes;
-extern BOX_INFO* Boxes;
-extern int NumberOverlaps;
-extern short* Overlaps;
-extern short* Zones[ZONE_MAX][2];
+extern std::vector<BOX_INFO> Boxes;
+extern std::vector<OVERLAP> Overlaps;
+extern std::vector<int> Zones[ZONE_MAX][2];
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
 void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
@@ -299,13 +304,13 @@ void CreatureDie(short itemNumber, int explode);
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT);
 int CreatureCreature(short itemNumber);
 int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber);
-int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber);
-void TargetBox(LOT_INFO* LOT, short boxNumber);
+int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber);
+void TargetBox(LOT_INFO* LOT, int boxNumber);
 int UpdateLOT(LOT_INFO* LOT, int expansion);
 int SearchLOT(LOT_INFO* LOT, int expansion);
 int CreatureActive(short itemNumber);
 void InitialiseCreature(short itemNumber);
-int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, short boxNumber);
+int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber);
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info);
 TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);

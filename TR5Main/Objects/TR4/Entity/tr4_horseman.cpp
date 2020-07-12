@@ -127,7 +127,7 @@ void HorsemanControl(short itemNumber)
 	// Try to find the horse
 	if (item->itemFlags[0] == NO_ITEM)
 	{
-		for (int i = 0; i < LevelItems; i++)
+		for (int i = 0; i < NumItems; i++)
 		{
 			ITEM_INFO* currentItem = &Items[i];
 			if (item->objectNumber == ID_HORSE && item->triggerFlags == currentItem->triggerFlags)
