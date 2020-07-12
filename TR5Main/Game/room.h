@@ -167,5 +167,5 @@ struct ANIM_STRUCT
 };
 
 constexpr auto NUM_ROOMS = 1024;
-constexpr auto NO_ROOM = 0xFF;
+constexpr auto NO_ROOM = -1;
 constexpr auto NO_HEIGHT = (-0x7F00);

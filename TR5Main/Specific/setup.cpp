@@ -829,7 +829,7 @@ void InitialiseObjects()
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
-		obj->frameBase += (short)Frames;
+		obj->frameBase += (short)Frames.data();
 	}
 
 	InitialiseTR1Objects(); // Standard TR1 objects

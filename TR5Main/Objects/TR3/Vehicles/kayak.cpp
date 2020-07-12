@@ -323,15 +323,15 @@ static void DoKayakCurrent(ITEM_INFO* item)
 	else
 	{
 		sinkval = Lara.currentActive - 1;
-		target.x = Camera.fixed[sinkval].x;
-		target.y = Camera.fixed[sinkval].y;
-		target.z = Camera.fixed[sinkval].z;
+		target.x = FixedCameras[sinkval].x;
+		target.y = FixedCameras[sinkval].y;
+		target.z = FixedCameras[sinkval].z;
 		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - 0x4000) >> 4) & 4095;
 
 		dx = target.x - LaraItem->pos.xPos;
 		dz = target.z - LaraItem->pos.zPos;
 
-		speed = Camera.fixed[sinkval].data;
+		speed = FixedCameras[sinkval].data;
 		dx = (((rcossin_tbl[(angle << 1)] * speed))) >> 2;
 		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) >> 2;
 
