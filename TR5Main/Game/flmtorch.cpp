@@ -168,7 +168,7 @@ void DoFlameTorch() // (F) (D)
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 		
 		if (!(Wibble & 7))
-			TriggerTorchFlame(LaraItem - Items, 0);
+			TriggerTorchFlame(LaraItem - Items.data(), 0);
 		
 		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
 
@@ -237,7 +237,7 @@ void TorchControl(short itemNumber) // (F) (D)
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)
-				ObjectCollision(CollidedItems[0] - Items, item, &lara_coll);
+				ObjectCollision(CollidedItems[0] - Items.data(), item, &lara_coll);
 		}
 		else
 		{

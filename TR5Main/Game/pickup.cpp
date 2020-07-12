@@ -813,7 +813,7 @@ void do_pickup()
 					AddDisplayPickup(item->objectNumber);
 					if (item->triggerFlags & 0x100)
 					{
-						for (int i = 0; i < LevelItems; i++)
+						for (int i = 0; i < NumItems; i++)
 						{
 							if (Items[i].objectNumber == item->objectNumber)
 								KillItem(i);
@@ -1011,7 +1011,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 								   AddDisplayPickup(item->objectNumber);
 								   if (item->triggerFlags & 0x100)
 								   {
-									   for (int i = 0; i < LevelItems; i++)
+									   for (int i = 0; i < NumItems; i++)
 									   {
 										   if (Items[i].objectNumber == item->objectNumber)
 											   KillItem(i);
@@ -1456,7 +1456,7 @@ void PuzzleDone(ITEM_INFO* item, short itemNum)
     item->flags |= IFLAG_ACTIVATION_MASK;
     item->status = ITEM_ACTIVE;
 
-    /*if (item->triggerFlags == 0x3E6 && LevelItems > 0)
+    /*if (item->triggerFlags == 0x3E6 && NumItems > 0)
     {
         int i;
         for (i = 0; i < level_items; i++)
@@ -1523,7 +1523,7 @@ void InitialiseSearchObject(short itemNumber)
         item->itemFlags[1] = -1;
         item->meshBits = 9;
         
-        for (itemNumber2 = 0; itemNumber2 < LevelItems; ++itemNumber2)
+        for (itemNumber2 = 0; itemNumber2 < NumItems; ++itemNumber2)
         {
             item2 = &Items[itemNumber2];
 

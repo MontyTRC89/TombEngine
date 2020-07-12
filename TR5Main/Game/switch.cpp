@@ -1366,7 +1366,7 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					{
 						if (!door->opened)
 						{
-							AddActiveItem((target - Items));
+							AddActiveItem((target - Items.data()));
 							target->itemFlags[2] = target->pos.yPos;
 							target->status = ITEM_ACTIVE;
 						}
