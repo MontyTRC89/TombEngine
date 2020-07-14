@@ -4734,7 +4734,7 @@ void lara_col_crawlb(ITEM_INFO* item, COLL_INFO* coll)//15614, 15748 (F)
 
 	coll->radius = 250;
 	coll->badPos = 255;
-	coll->badNeg = -255;
+	coll->badNeg = -127;
 	coll->badCeiling = 400;
 	coll->slopesArePits = true;
 	coll->slopesAreWalls = true;
@@ -4870,7 +4870,7 @@ void lara_col_crawl(ITEM_INFO* item, COLL_INFO* coll)//1523C, 15370 (F)
 	coll->radius = 200;
 
 	coll->badPos = 255;
-	coll->badNeg = -255;
+	coll->badNeg = -127;
 	coll->badCeiling = 400;
 
 	coll->slopesArePits = true;
@@ -4960,7 +4960,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 
 		coll->radius = 200;
 		coll->badPos = 255;
-		coll->badNeg = -255;
+		coll->badNeg = -127;
 		coll->badCeiling = 400;
 
 		coll->slopesAreWalls = true;
@@ -4994,7 +4994,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 				{
 					if (TrInput & IN_FORWARD)
 					{
-						if (abs(LaraFloorFront(item, item->pos.yRot, 256)) < 255 && HeightType != BIG_SLOPE)
+						if (abs(LaraFloorFront(item, item->pos.yRot, 256)) < 127 && HeightType != BIG_SLOPE)
 							item->goalAnimState = STATE_LARA_CRAWL_FORWARD;
 					}
 					else if (TrInput & IN_BACK)
@@ -5078,7 +5078,7 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 									}
 								}
 							}
-							else
+							else if (!(abs(height) >= 127))
 							{
 								item->goalAnimState = STATE_LARA_CRAWL_BACK;
 							}
