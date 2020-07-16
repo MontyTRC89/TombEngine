@@ -2,10 +2,10 @@
 #include <stdint.h>
 #include <memory>
 #include <iostream>
-#include "Game/debug/assert.h"
-#include "Game/debug/log.h"
+#include "../debug/debug.h"
 #include <type_traits>
 namespace T5M::Memory {
+	//Block Size suggestions
 	enum class BlockSize : size_t {
 		Minimal = 4,
 		Tiny = 8,
@@ -22,9 +22,6 @@ namespace T5M::Memory {
 		using Size = size_t;
 		using Byte = uint8_t;
 		using Magic = uint32_t;
-		static constexpr Size getBlockCount(Size bytes) {
-			return (bytes + (static_cast<Size>(BlkSz) - 1)) / static_cast<Size>(BlkSz);
-		}
 		//Block representation
 
 		struct Block {
@@ -70,7 +67,7 @@ namespace T5M::Memory {
 			// Place initial BlockHeader at the beginning of all blocks
 			head = new(allocatedBlocks.get())BlockHeader();
 			head->data.nextFreeBlock = nullptr;
-			head->data.managedBlocks = allocatedBlockCount - blockHeaderBlockSize();
+			head->data.managedBlocks = allocatedBlockCount - getHeaderBlockCount();
 			head->data.previousFreeBlock = nullptr;
 			head->data.nextPhysicalBlock = nullptr;
 			head->data.previousPhysicalBlock = nullptr;
@@ -81,14 +78,21 @@ namespace T5M::Memory {
 	public:
 		Pool(Size numBlocks) : allocatedBlockCount(numBlocks), allocatedBytesCount(sizeof(Block)* numBlocks) , allocatedBlocks(new Block[numBlocks]) {
 			initialize();
-			Log("Pool Init: Initialized Pool with " << numBlocks << " Blocks")
-			Log("Pool Init: Free Blocks :" << head->data.managedBlocks)
+			logD("Pool Init: Initialized Pool with ", numBlocks ," Blocks");
+			logD("Pool Init: Free Blocks :" , head->data.managedBlocks);
 		}
 	private:
-		constexpr Size blockHeaderBlockSize() const {
+		//Returns the number of Blocks needed for the number of Bytes
+		static constexpr Size getBlockCount(Size bytes) {
+			return (bytes + (static_cast<Size>(BlkSz) - 1)) / static_cast<Size>(BlkSz);
+		}
+
+		constexpr Size getHeaderBlockCount() const {
 			return getBlockCount(sizeof(BlockHeader));
 		};
-
+		BlockHeader*& getFreeListHead() {
+			return head;
+		}
 		//try coalescing with the next block in the list
 		void tryCoalesce(BlockHeader* origin) {
 			BlockHeader* left = origin->data.previousPhysicalBlock;
@@ -100,75 +104,89 @@ namespace T5M::Memory {
 		}
 
 		void coalesce(BlockHeader* left, BlockHeader* right) {
-			Log("Coalescing BlockHeader at " << left << " & " << right )
-			//accumulate free blocks + now obsolete header data
+			logD("Coalescing BlockHeader at " , left , " & " , right);
 			left->data.managedBlocks += right->data.managedBlocks;
-			left->data.managedBlocks += blockHeaderBlockSize();
-			//relink so left points to right->next
+			left->data.managedBlocks += getHeaderBlockCount();
 			left->data.nextFreeBlock = right->data.nextFreeBlock;
 			left->data.nextPhysicalBlock = right->data.nextPhysicalBlock;
-
-			//relink so right->next->previous points to left
 			if (right->data.nextFreeBlock != nullptr) {
 				right->data.nextFreeBlock->data.previousFreeBlock = left;
+				right->data.nextPhysicalBlock->data.previousPhysicalBlock = left;
 			}
 		}
 	public:
-		template <typename T,typename ... Args>
-		T* malloc(Size count = 1,Args&&...args) {
-			//Forbid allocation of size 0
-			if (count < 1) return nullptr;
-			//assertm(count >= 1,"Allocation Size must be greater than 0!");
-			// calculate the amount of blocks we want
-			Size requestedBlocks = getBlockCount(sizeof(T) * count);
-			Log("Malloc: Requested Blocks for " << typeid(T).name() << " x " << count << ": " << requestedBlocks)
-			BlockHeader* currentNode = head;
-			//Make sure we have enough space for one Block Header and one free Block!
-			while (currentNode != nullptr && currentNode->data.managedBlocks < requestedBlocks+blockHeaderBlockSize()) {
-				assertm(currentNode->data.magic == MAGIC, "Pool is corrupt");
-				currentNode = currentNode->data.nextFreeBlock;
-			}
-			//We could not find a block of suitable size
-			assertm(currentNode != nullptr, "Pool is full");
-			//Free Blocks are directly behind BlockHeader
-			Block* blockToReturn = reinterpret_cast<Block*>(currentNode + 1);
-			Log("Malloc: Return block at " << blockToReturn)
-			//The current node will be removed from Free List, so keep the number of Blocks that will be deallocated for later!
-			Size numFreeBlocksAfterSplit = currentNode->data.managedBlocks - ((blockHeaderBlockSize()));
-			currentNode->data.managedBlocks = requestedBlocks;
-			currentNode->data.isFree = false;
-			Block* splitBlock = blockToReturn + requestedBlocks + 1;
-			//Place a new BlockHeader right after the Requested Block
-			BlockHeader* newHead = new(splitBlock)BlockHeader();
-			Log("Malloc: New Head at " << newHead)
-			newHead->data.previousPhysicalBlock = currentNode;
-			newHead->data.nextPhysicalBlock = currentNode->data.nextPhysicalBlock;
-			currentNode->data.nextPhysicalBlock = newHead;
-			newHead->data.isFree = true;
-			head = newHead;
-			head->data.nextFreeBlock = currentNode->data.nextFreeBlock;
-			head->data.managedBlocks = numFreeBlocksAfterSplit;
-			Log("Malloc: New Free Blocks : " << numFreeBlocksAfterSplit)
-			return new(blockToReturn)T(std::forward<Args>(args)...);
 
-		}
-		void free(void* ptr) {
-			assertm((ptr >= allocatedBlocks.get() && ptr < (allocatedBlocks.get() + allocatedBlockCount)), "memory must be in Pool range!");
-			//Go to the point infront of the pointer to free, where an old header was before
-			BlockHeader* blockHead = (reinterpret_cast<BlockHeader*>(ptr)) - 1;
+		template <typename T>
+		void free(T* ptr) noexcept {
+			assertion((static_cast<void*>(ptr) >= allocatedBlocks.get() && static_cast<void*>(ptr) < (allocatedBlocks.get() + allocatedBlockCount)), "memory must be in Pool range!");
+			ptr->~T();
+			Block* block = reinterpret_cast<Block*>(ptr);
+			BlockHeader* blockHead = getBlockHeaderFromBlock(block);
 			if (blockHead->data.magic == MAGIC) {
-				Log("Free: BlockHeader at " << blockHead )
+				logD("Free: BlockHeader at ", blockHead);
 				BlockHeader* oldHead = head;
 				BlockHeader* newHead = blockHead;
 				head = newHead;
 				head->data.isFree = true;
 				head->data.nextFreeBlock = oldHead;
 				oldHead->data.previousFreeBlock = head;
-				//Now try to coalesce with the next and previous block
-
+				//Now try to coalesce with the next and previous physical block
 				tryCoalesce(blockHead);
 				tryCoalesce(oldHead);
 			}
+		}
+
+		template <typename T,typename ... Args>
+		[[nodiscard]]T* malloc(Size count = 1,Args&&...args) noexcept {
+			if (count < 1) return nullptr;
+
+			Size requestedBlocks = getBlockCount(sizeof(T) * count);
+			logD("Malloc: Requested Blocks for " , typeid(T).name() , " x " , count , ": " , requestedBlocks);
+			BlockHeader* currentFreeNode = getFreeListHead();
+
+			while (currentFreeNode != nullptr && currentFreeNode->data.isFree && currentFreeNode->data.managedBlocks < requestedBlocks+getHeaderBlockCount()) {
+				assertion(currentFreeNode->data.magic == MAGIC, "Pool is corrupt");
+				currentFreeNode = currentFreeNode->data.nextFreeBlock;
+			}
+			assertion(currentFreeNode != nullptr, "Pool is full");
+			Block* blockToReturn = getFirstManagedBlock(currentFreeNode);
+			logD("Malloc: Return block at " , blockToReturn);
+			splitBlocks(currentFreeNode, requestedBlocks, blockToReturn + requestedBlocks + 1);
+			return new(blockToReturn)T(std::forward<Args>(args)...);
+		}
+		private:
+		void splitBlocks(BlockHeader*& currentFreeNode, size_t& requestedBlocks, Block* whereToSplit) {
+			Size numFreeBlocksAfterSplit = currentFreeNode->data.managedBlocks - getHeaderBlockCount();
+			currentFreeNode->data.managedBlocks = requestedBlocks;
+			currentFreeNode->data.isFree = false;
+
+			Block* splitBlock = whereToSplit;
+			placeNewFreeHead(splitBlock, currentFreeNode, numFreeBlocksAfterSplit);
+			logD("Malloc: New Free Blocks : " , numFreeBlocksAfterSplit);
+		}
+
+		void placeNewFreeHead(Block*& position,BlockHeader*& oldFreeBlock, size_t& numManagedBlocks) {
+			BlockHeader* newHead = new(position)BlockHeader();
+			logD("Malloc: New Head at " , newHead);
+				newHead->data.previousPhysicalBlock = oldFreeBlock;
+			BlockHeader* physicalRightBlock = oldFreeBlock->data.nextPhysicalBlock;
+			newHead->data.nextPhysicalBlock = physicalRightBlock;
+			if(physicalRightBlock != nullptr)
+				physicalRightBlock->data.previousPhysicalBlock = newHead;
+			oldFreeBlock->data.nextPhysicalBlock = newHead;
+			newHead->data.isFree = true;
+			head = newHead;
+			head->data.nextFreeBlock = oldFreeBlock->data.nextFreeBlock;
+			head->data.managedBlocks = numManagedBlocks;
+		}
+
+
+		Block* getFirstManagedBlock(BlockHeader * header) const {
+			return reinterpret_cast<Block*>(header + 1);
+		}
+
+		BlockHeader* getBlockHeaderFromBlock(Block* block) const {
+			return (reinterpret_cast<BlockHeader*>(block)) - 1;
 		}
 
 		void reset() {
