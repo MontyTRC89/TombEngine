@@ -171,7 +171,8 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	}
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+	m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+	m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
 	m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
 	ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
 	m_context->PSSetSamplers(0, 1, &sampler);
