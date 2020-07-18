@@ -6,7 +6,7 @@ constexpr bool DebugBuild = false;
 #endif
 #include <stdexcept>
 
-inline void assertion(const bool& expr,const char* msg) {
+inline void assertion(const bool& expr,const char* msg) noexcept {
 	if constexpr (DebugBuild) {
 		if (!expr) throw std::runtime_error(msg);
 	}

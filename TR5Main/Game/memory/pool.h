@@ -16,9 +16,9 @@ namespace T5M::Memory {
 	};
 
 	//A multi purpose Memory pool
-	template<unsigned BlkSz>
+	template<BlockSize BlkSz>
 	class Pool {
-		static_assert(BlkSz > 0 && (BlkSz & (BlkSz - 1)) == 0,"Block Size needs to be PoT!");
+		static constexpr char MAGIC[] = "Everything's okay";
 		using Size = size_t;
 		using Byte = uint8_t;
 		using Magic = uint32_t;
@@ -31,14 +31,14 @@ namespace T5M::Memory {
 		// Or Number of Blocks that were allocated in the case of Used
 		union BlockHeader;
 		struct BlockHeaderData {
-			Magic magic;
+			const char* magic;
 			//pointer to the next BlockHeader, nullptr if tail
 			BlockHeader* nextFreeBlock;
 			//pointer to the previous BlockHeader, nullptr if head
 			BlockHeader* previousFreeBlock;
-			//Number of Free Blocks / Used Blocks
+			//number of Free Blocks / Used Blocks
 			Size managedBlocks;
-			//Whether this Header is Free or Used
+			//whether this Header is Free or Used
 			bool isFree;
 			//pointer to the next physical block header
 			BlockHeader* nextPhysicalBlock;
@@ -46,6 +46,8 @@ namespace T5M::Memory {
 			BlockHeader* previousPhysicalBlock;
 			//pointer to first physical block header
 			BlockHeaderData() : magic(MAGIC), nextFreeBlock(nullptr), previousFreeBlock(nullptr), managedBlocks(0), nextPhysicalBlock(nullptr), previousPhysicalBlock(nullptr), isFree(false) {}
+			BlockHeaderData(BlockHeaderData&&) = default;
+			BlockHeaderData(const BlockHeaderData&) = default;
 		};
 		union BlockHeader {
 
@@ -53,10 +55,11 @@ namespace T5M::Memory {
 			//Padding to ensure BlockHeader is always the next multiple of BlkSz blocks large
 			Block padding[getBlockCount(sizeof(BlockHeaderData))];
 			BlockHeader() : data(BlockHeaderData()) {};
+			BlockHeader(BlockHeader&&) = default;
+			BlockHeader(const BlockHeader&) = default;
 		};
 
 	private:
-		static constexpr Magic MAGIC = 0xDEADBEEF;
 		Size allocatedBlockCount;
 		Size allocatedBytesCount;
 		const std::unique_ptr<Block> allocatedBlocks;
@@ -81,8 +84,10 @@ namespace T5M::Memory {
 			logD("Pool Init: Initialized Pool with ", numBlocks ," Blocks");
 			logD("Pool Init: Free Blocks :" , head->data.managedBlocks);
 		}
+		Pool(Pool&&) = delete;
+		Pool(const Pool&) = delete;
+		~Pool() = default;
 	private:
-		//Returns the number of Blocks needed for the number of Bytes
 		static constexpr Size getBlockCount(Size bytes) {
 			return (bytes + (static_cast<Size>(BlkSz) - 1)) / static_cast<Size>(BlkSz);
 		}
@@ -93,7 +98,7 @@ namespace T5M::Memory {
 		BlockHeader*& getFreeListHead() {
 			return head;
 		}
-		//try coalescing with the next block in the list
+
 		void tryCoalesce(BlockHeader* origin) {
 			BlockHeader* left = origin->data.previousPhysicalBlock;
 			BlockHeader* right = origin->data.nextPhysicalBlock;
@@ -114,6 +119,42 @@ namespace T5M::Memory {
 				right->data.nextPhysicalBlock->data.previousPhysicalBlock = left;
 			}
 		}
+
+
+		void splitBlocks(BlockHeader*& nodeToSplit, size_t& requestedBlocks, Block* whereToSplit) {
+			Size numFreeBlocksAfterSplit = nodeToSplit->data.managedBlocks - getHeaderBlockCount();
+			nodeToSplit->data.managedBlocks = requestedBlocks;
+			nodeToSplit->data.isFree = false;
+
+			Block* splitBlock = whereToSplit;
+			placeNewFreeHead(splitBlock, nodeToSplit, numFreeBlocksAfterSplit);
+			logD("Malloc: New Free Blocks : ", numFreeBlocksAfterSplit);
+		}
+
+		void placeNewFreeHead(Block*& position, BlockHeader*& oldFreeBlock, size_t& numManagedBlocks) {
+			BlockHeader* newHead = new(position)BlockHeader();
+			logD("Malloc: New Head at ", newHead);
+			newHead->data.previousPhysicalBlock = oldFreeBlock;
+			BlockHeader* physicalRightBlock = oldFreeBlock->data.nextPhysicalBlock;
+			newHead->data.nextPhysicalBlock = physicalRightBlock;
+			if (physicalRightBlock != nullptr)
+				physicalRightBlock->data.previousPhysicalBlock = newHead;
+			oldFreeBlock->data.nextPhysicalBlock = newHead;
+			newHead->data.isFree = true;
+			head = newHead;
+			head->data.nextFreeBlock = oldFreeBlock->data.nextFreeBlock;
+			head->data.managedBlocks = numManagedBlocks;
+		}
+
+
+		Block* getFirstManagedBlock(BlockHeader* header) const {
+			return reinterpret_cast<Block*>(header + 1);
+		}
+
+		BlockHeader* getBlockHeaderFromBlock(Block* block) const {
+			return (reinterpret_cast<BlockHeader*>(block)) - 1;
+		}
+
 	public:
 
 		template <typename T>
@@ -130,7 +171,6 @@ namespace T5M::Memory {
 				head->data.isFree = true;
 				head->data.nextFreeBlock = oldHead;
 				oldHead->data.previousFreeBlock = head;
-				//Now try to coalesce with the next and previous physical block
 				tryCoalesce(blockHead);
 				tryCoalesce(oldHead);
 			}
@@ -153,40 +193,6 @@ namespace T5M::Memory {
 			logD("Malloc: Return block at " , blockToReturn);
 			splitBlocks(currentFreeNode, requestedBlocks, blockToReturn + requestedBlocks + 1);
 			return new(blockToReturn)T(std::forward<Args>(args)...);
-		}
-		private:
-		void splitBlocks(BlockHeader*& currentFreeNode, size_t& requestedBlocks, Block* whereToSplit) {
-			Size numFreeBlocksAfterSplit = currentFreeNode->data.managedBlocks - getHeaderBlockCount();
-			currentFreeNode->data.managedBlocks = requestedBlocks;
-			currentFreeNode->data.isFree = false;
-
-			Block* splitBlock = whereToSplit;
-			placeNewFreeHead(splitBlock, currentFreeNode, numFreeBlocksAfterSplit);
-			logD("Malloc: New Free Blocks : " , numFreeBlocksAfterSplit);
-		}
-
-		void placeNewFreeHead(Block*& position,BlockHeader*& oldFreeBlock, size_t& numManagedBlocks) {
-			BlockHeader* newHead = new(position)BlockHeader();
-			logD("Malloc: New Head at " , newHead);
-				newHead->data.previousPhysicalBlock = oldFreeBlock;
-			BlockHeader* physicalRightBlock = oldFreeBlock->data.nextPhysicalBlock;
-			newHead->data.nextPhysicalBlock = physicalRightBlock;
-			if(physicalRightBlock != nullptr)
-				physicalRightBlock->data.previousPhysicalBlock = newHead;
-			oldFreeBlock->data.nextPhysicalBlock = newHead;
-			newHead->data.isFree = true;
-			head = newHead;
-			head->data.nextFreeBlock = oldFreeBlock->data.nextFreeBlock;
-			head->data.managedBlocks = numManagedBlocks;
-		}
-
-
-		Block* getFirstManagedBlock(BlockHeader * header) const {
-			return reinterpret_cast<Block*>(header + 1);
-		}
-
-		BlockHeader* getBlockHeaderFromBlock(Block* block) const {
-			return (reinterpret_cast<BlockHeader*>(block)) - 1;
 		}
 
 		void reset() {
