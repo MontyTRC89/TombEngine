@@ -1591,6 +1591,7 @@
     <None Include="Shaders\SSAO.fx" />
     <None Include="Shaders\Transparent.fx" />
     <None Include="Resources.aps" />
+    <None Include="Shaders\VertexInput.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">

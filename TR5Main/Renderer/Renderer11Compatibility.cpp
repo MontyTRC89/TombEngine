@@ -6,6 +6,7 @@
 #include "control.h"
 #include "objects.h"
 #include <lara_struct.h>
+#include <tuple>
 using std::optional;
 using std::stack;
 using std::vector;
@@ -109,19 +110,40 @@ namespace T5M::Renderer
 		for (int i = 0; i < RoomTextures.size(); i++)
 		{
 			TEXTURE *texture = &RoomTextures[i];
-			m_roomTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			} else {
+				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex =std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_roomTextures.push_back(tex);
 		}
 
 		for (int i = 0; i < MoveablesTextures.size(); i++)
 		{
 			TEXTURE *texture = &MoveablesTextures[i];
-			m_moveablesTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			} else {
+				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_moveablesTextures.push_back(tex);
 		}
 
 		for (int i = 0; i < StaticsTextures.size(); i++)
 		{
 			TEXTURE *texture = &StaticsTextures[i];
-			m_staticsTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			} else {
+				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_staticsTextures.push_back(tex);
 		}
 
 		for (int i = 0; i < SpritesTextures.size(); i++)
@@ -185,17 +207,11 @@ namespace T5M::Renderer
 						vertex.Position.y = room->y + room->positions[v].y;
 						vertex.Position.z = room->z + room->positions[v].z;
 
-						vertex.Normal.x = poly->normals[k].x;
-						vertex.Normal.y = poly->normals[k].y;
-						vertex.Normal.z = poly->normals[k].z;
-
-						vertex.UV.x = poly->textureCoordinates[k].x;
-						vertex.UV.y = poly->textureCoordinates[k].y;
-
-						vertex.Color.x = room->colors[v].x;
-						vertex.Color.y = room->colors[v].y;
-						vertex.Color.z = room->colors[v].z;
-						vertex.Color.w = 1.0f;
+						vertex.Normal = poly->normals[k];
+						vertex.UV = poly->textureCoordinates[k];
+						vertex.Color = Vector4(room->colors[v].x, room->colors[v].y, room->colors[v].z,1.0f);
+						vertex.Tangent = poly->tangents[k];
+						vertex.BiTangent = poly->bitangents[k];
 
 						vertex.Bone = 0;
 
@@ -494,6 +510,7 @@ namespace T5M::Renderer
 												int y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
 												int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
 
+
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
 													jointVertex->Bone = BonesToCheck[k];
@@ -588,6 +605,8 @@ namespace T5M::Renderer
 													currentVertex->Bone = j;
 													currentVertex->Position = parentVertex->Position;
 													currentVertex->Normal = parentVertex->Normal;
+													currentVertex->BiTangent = parentVertex->BiTangent;
+													currentVertex->Tangent = parentVertex->Tangent;
 													break;
 												}
 											}
