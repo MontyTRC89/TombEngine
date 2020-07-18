@@ -109,28 +109,28 @@ namespace T5M::Renderer
 		for (int i = 0; i < RoomTextures.size(); i++)
 		{
 			TEXTURE *texture = &RoomTextures[i];
-			m_roomTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			m_roomTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
 		}
 
 		for (int i = 0; i < MoveablesTextures.size(); i++)
 		{
 			TEXTURE *texture = &MoveablesTextures[i];
-			m_moveablesTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			m_moveablesTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
 		}
 
 		for (int i = 0; i < StaticsTextures.size(); i++)
 		{
 			TEXTURE *texture = &StaticsTextures[i];
-			m_staticsTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			m_staticsTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
 		}
 
 		for (int i = 0; i < SpritesTextures.size(); i++)
 		{
 			TEXTURE *texture = &SpritesTextures[i];
-			m_spritesTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			m_spritesTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
 		}
 
-		m_skyTexture = Texture2D(m_device, MiscTextures.data.data(), MiscTextures.size);
+		m_skyTexture = Texture2D(m_device, MiscTextures.colorMapData.data(), MiscTextures.colorMapData.size());
 
 		// Step 2: prepare rooms
 		vector<RendererVertex> roomVertices;
@@ -185,9 +185,9 @@ namespace T5M::Renderer
 						vertex.Position.y = room->y + room->positions[v].y;
 						vertex.Position.z = room->z + room->positions[v].z;
 
-						vertex.Normal.x = room->normals[v].x;
-						vertex.Normal.y = room->normals[v].y;
-						vertex.Normal.z = room->normals[v].z;
+						vertex.Normal.x = poly->normals[k].x;
+						vertex.Normal.y = poly->normals[k].y;
+						vertex.Normal.z = poly->normals[k].z;
 
 						vertex.UV.x = poly->textureCoordinates[k].x;
 						vertex.UV.y = poly->textureCoordinates[k].y;
