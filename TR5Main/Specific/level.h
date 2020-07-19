@@ -32,8 +32,8 @@ struct TEXTURE
 {
 	int width;
 	int height;
-	int size;
-	std::vector<byte> data;
+	std::vector<byte> colorMapData;
+	std::vector<byte> normalMapData;
 };
 
 struct AIOBJECT
