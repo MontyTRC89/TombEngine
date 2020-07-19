@@ -27,6 +27,7 @@ struct CAMERA_INFO;
 
 namespace T5M::Renderer
 {
+	using TexturePair = std::tuple<Texture2D, Texture2D>;
 	#define MESH_BITS(x) (1 << x)
 	#define DX11_RELEASE(x) if (x != NULL) x->Release()
 	#define DX11_DELETE(x) if (x != NULL) { delete x; x = NULL; }
@@ -61,6 +62,8 @@ namespace T5M::Renderer
 		DirectX::SimpleMath::Vector3 Normal;
 		DirectX::SimpleMath::Vector2 UV;
 		DirectX::SimpleMath::Vector4 Color;
+		DirectX::SimpleMath::Vector3 Tangent;
+		DirectX::SimpleMath::Vector3 BiTangent;
 		float Bone;
 		int IndexInPoly;
 		int OriginalIndex;
@@ -491,9 +494,9 @@ namespace T5M::Renderer
 		RendererUnderwaterDustParticle m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 		bool m_firstUnderwaterDustParticles = true;
 		std::vector<RendererMesh*> m_meshes;
-		std::vector<T5M::Renderer::Texture2D> m_roomTextures;
-		std::vector<T5M::Renderer::Texture2D> m_moveablesTextures;
-		std::vector<T5M::Renderer::Texture2D> m_staticsTextures;
+		std::vector<TexturePair> m_roomTextures;
+		std::vector<TexturePair> m_moveablesTextures;
+		std::vector<TexturePair> m_staticsTextures;
 		std::vector<T5M::Renderer::Texture2D> m_spritesTextures;
 	
 		// Debug variables
@@ -669,6 +672,7 @@ namespace T5M::Renderer
 	
 		RendererMesh* getMesh(int meshIndex);
 	private:
+		Texture2D CreateDefaultNormalTexture();
 		void drawFootprints();
 
 		template<typename CBuff>
