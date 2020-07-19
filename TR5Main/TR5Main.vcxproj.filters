@@ -837,19 +837,16 @@
     <ClInclude Include="Game\memory\linearPool.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game\debug\assert.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Game\memory\linearPoolAllocator.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\debug\log.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\memory\PoolAllocator.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game\memory\memory.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\debug\debug.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1591,6 +1588,7 @@
     <None Include="Shaders\SSAO.fx" />
     <None Include="Shaders\Transparent.fx" />
     <None Include="Resources.aps" />
+    <None Include="Shaders\VertexInput.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">
