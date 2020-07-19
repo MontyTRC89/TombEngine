@@ -81,12 +81,13 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0}/*,
-		{"TEXCOORD", 1, DXGI_FORMAT_R32_UINT, 0, 52, D3D11_INPUT_PER_VERTEX_DATA, 0},*/
+		{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 60, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, 72, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	m_inputLayout = NULL;
-	res = m_device->CreateInputLayout(inputLayout, 5, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout);
+	res = m_device->CreateInputLayout(inputLayout, 7, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout);
 	if (FAILED(res))
 		return false;
 

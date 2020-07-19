@@ -1,3 +1,4 @@
+#include "./../VertexInput.hlsli"
 cbuffer HUDBarBuffer : register(b0)
 {
 	float Percent;
