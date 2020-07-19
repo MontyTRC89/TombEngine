@@ -660,6 +660,11 @@ namespace T5M::Renderer {
 		return true;
 	}
 
+	Texture2D Renderer11::CreateDefaultNormalTexture() {
+		vector<byte> data = {128,128,255,1};
+		return Texture2D(m_device,1,1,data.data());
+	}
+
 	void Renderer11::drawFootprints() {
 		const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
 		if (Sprites.size() > spriteIndex) {
@@ -1139,7 +1144,7 @@ namespace T5M::Renderer {
 				m_primitiveBatch->Begin();
 				m_context->VSSetShader(m_vsStatics, NULL, 0);
 				m_context->PSSetShader(m_psStatics, NULL, 0);
-				m_context->PSSetShaderResources(0, 1, m_staticsTextures[0].ShaderResourceView.GetAddressOf());
+				m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
 				ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 				m_context->PSSetSamplers(0, 1, &sampler);
 				//m_stCameraMatrices.View = View.Transpose();

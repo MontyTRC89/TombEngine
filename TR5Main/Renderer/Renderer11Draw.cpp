@@ -79,7 +79,9 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psInventory, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -245,7 +247,9 @@ namespace T5M::Renderer
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -496,7 +500,9 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psInventory, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2138,7 +2144,8 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psItems, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
         m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
@@ -2273,7 +2280,8 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psStatics, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_staticsTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2332,7 +2340,8 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psRooms, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_roomTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
         ID3D11SamplerState *shadowSampler = m_states->PointClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
@@ -2542,7 +2551,8 @@ namespace T5M::Renderer
             m_context->IASetInputLayout(m_inputLayout);
             m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-            m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+            m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
             sampler = m_states->AnisotropicClamp();
             m_context->PSSetSamplers(0, 1, &sampler);
 

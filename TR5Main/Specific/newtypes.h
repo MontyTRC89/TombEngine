@@ -6,6 +6,9 @@ struct POLYGON
 	int shape;
 	std::vector<int> indices;
 	std::vector<Vector2> textureCoordinates;
+	std::vector<Vector3> normals;
+	std::vector<Vector3> tangents;
+	std::vector<Vector3> bitangents;
 };
 
 struct BUCKET
