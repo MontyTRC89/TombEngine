@@ -45,7 +45,7 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
 	float4 LightPosition: POSITION1;
-	float3x3 TBN : TBN;
+	linear float3x3 TBN : TBN;
 };
 Texture2D NormalTexture : register(t3);
 Texture2D Texture : register(t0);
@@ -75,7 +75,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.WorldPosition = input.Position.xyz;
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
-	output.TBN = (TBN);
+	output.TBN = TBN;
 	return output;
 }
 
@@ -95,8 +95,11 @@ float getShadowFactor(Texture2D shadowMap, SamplerState shadowMapSampler, float2
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
+	//Normal = float3(0.5, 0.5, 1);
+	Normal.g = 1 - Normal.g;
 	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(input.TBN,Normal));
+	Normal = normalize(mul(Normal,input.TBN));
+	//Normal = input.Normal;
 	float4 output = Texture.Sample(Sampler, input.UV);
 	if (AlphaTest)
 		clip(output.w - 0.5f);
@@ -142,10 +145,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			if (distance > radius)
 				continue;
 
-			float d = saturate(dot(Normal, lightVec));
-			d *= 0.5;
-			d += 0.5f;
-			d *= d;
+			float d = saturate(dot(Normal,-lightVec ));
 			if (d < 0)
 				continue;
 			
