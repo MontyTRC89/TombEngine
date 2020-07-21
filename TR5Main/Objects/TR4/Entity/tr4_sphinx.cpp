@@ -13,12 +13,12 @@ BITE_INFO sphinxBiteInfo = { 0, 0, 0, 6 };
 
 void InitialiseSphinx(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->animNumber].animIndex + 1;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 }
@@ -28,7 +28,7 @@ void SphinxControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
@@ -42,7 +42,7 @@ void SphinxControl(short itemNumber)
 
 	if (item->currentAnimState == 5 && floor->stopper)
 	{
-		ROOM_INFO* room = &Rooms[item->roomNumber];
+		ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
 		for (int i = 0; i < room->mesh.size(); i++)
 		{
@@ -193,7 +193,7 @@ void SphinxControl(short itemNumber)
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			TestTriggers(TriggerIndex, 1, 0);
 

@@ -11,14 +11,14 @@
 
 void InitialiseMine(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (item->triggerFlags)
 		item->meshBits = 0;
 }
 
 void MineControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	if (item->itemFlags[0] >= 150)
@@ -52,12 +52,12 @@ void MineControl(short itemNum)
 		FlashFadeB = 64;
 		FlashFader = 32;
 
-		short currentItemNumber = Rooms[item->roomNumber].itemNumber;
+		short currentItemNumber = g_Level.Rooms[item->roomNumber].itemNumber;
 
 		// Make the sentry gun explode?
 		while (currentItemNumber != NO_ITEM)
 		{
-			ITEM_INFO* currentItem = &Items[currentItemNumber];
+			ITEM_INFO* currentItem = &g_Level.Items[currentItemNumber];
 
 			if (currentItem->objectNumber == ID_SENTRY_GUN)
 				currentItem->meshBits &= ~0x40;
@@ -91,11 +91,11 @@ void MineControl(short itemNum)
 
 void MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->triggerFlags && !item->itemFlags[3])
 	{
-		if (l->animNumber != 432 || l->frameNumber < Anims[item->animNumber].frameBase + 57)
+		if (l->animNumber != 432 || l->frameNumber < g_Level.Anims[item->animNumber].frameBase + 57)
 		{
 			if (TestBoundsCollide(item, l, 512))
 			{
@@ -109,7 +109,7 @@ void MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				KillItem(itemNum);
 
 				l->animNumber = 438;
-				l->frameNumber = Anims[item->animNumber].frameBase;
+				l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				l->currentAnimState = 8;
 				l->speed = 0;
 
@@ -118,9 +118,9 @@ void MineCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			for (int i = 0; i < NumItems; i++)
+			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				ITEM_INFO* currentItem = &Items[i];
+				ITEM_INFO* currentItem = &g_Level.Items[i];
 
 				// Explode other mines
 				if (currentItem->objectNumber == ID_MINE && currentItem->status != ITEM_INVISIBLE && !currentItem->triggerFlags)

@@ -13,7 +13,7 @@ void BearControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short head = 0;
@@ -54,7 +54,7 @@ void BearControl(short itemNum)
 				}
 
 				item->animNumber = Objects[item->objectNumber].animIndex + 20;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->currentAnimState = 9;
 				break;
 			}

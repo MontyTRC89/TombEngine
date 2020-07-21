@@ -333,7 +333,7 @@ void KillActiveBaddies(ITEM_INFO* item)//39938(<), 39E38(<) (F)
 
 		do
 		{
-			targetItem = &Items[itemNum];
+			targetItem = &g_Level.Items[itemNum];
 
 			if (Objects[targetItem->objectNumber].intelligent)
 			{
@@ -408,7 +408,7 @@ void RubbleFX(ITEM_INFO* item)//39534(<), 39A34(<) (F)
 
 	if (itemNumber != NO_ITEM)
 	{
-		ITEM_INFO* eq = &Items[itemNumber];
+		ITEM_INFO* eq = &g_Level.Items[itemNumber];
 
 		AddActiveItem(itemNumber);
 		eq->status = ITEM_ACTIVE;
@@ -458,7 +458,7 @@ void void_effect(ITEM_INFO* item)//393CC(<), 398CC(<) (F)
 
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	int x, z;
 
 	if (item->pos.yRot == -ANGLE(180))
@@ -482,7 +482,7 @@ short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
 {
 	short roomNum = roomNumber;
 	GetFloor(x, y, z, &roomNum);
-	if (Rooms[roomNum].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
 		TriggerUnderwaterBlood(x, y, z, a4);
 	else
 		TriggerBlood(x, y, z, a5 >> 4, a4);

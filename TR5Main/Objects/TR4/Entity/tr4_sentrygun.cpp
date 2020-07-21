@@ -78,7 +78,7 @@ static void SentryGunThrowFire(ITEM_INFO* item)
 
 void InitialiseSentryGun(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	ClearItem(itemNum);
 
@@ -89,7 +89,7 @@ void InitialiseSentryGun(short itemNum)
 
 void SentryGunControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (!CreatureActive(itemNum))
 		return;

@@ -58,7 +58,7 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 (F)
 		|| item->animNumber != ANIMATION_LARA_LADDER_DOWN)
 		return;
 
-	int frame = item->frameNumber - Anims[ANIMATION_LARA_LADDER_DOWN].frameBase;
+	int frame = item->frameNumber - g_Level.Anims[ANIMATION_LARA_LADDER_DOWN].frameBase;
 	int xShift;
 	int yShift;
 
@@ -113,7 +113,7 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 (F)
 		if (resultRight == -1 || resultLeft == -1)
 		{
 			item->animNumber = ANIMATION_LARA_LADDER_IDLE;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = STATE_LARA_LADDER_IDLE;
 			item->goalAnimState = STATE_LARA_HANG;
 
@@ -146,7 +146,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 	if (!LaraCheckForLetGo(item, coll)
 		&& item->animNumber == ANIMATION_LARA_LADDER_UP)
 	{
-		int frame = item->frameNumber - Anims[ANIMATION_LARA_LADDER_UP].frameBase;
+		int frame = item->frameNumber - g_Level.Anims[ANIMATION_LARA_LADDER_UP].frameBase;
 		int yShift;
 		int resultRight, resultLeft;
 		int shiftRight, shiftLeft;
@@ -483,7 +483,7 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 	if (coll->oldAnimState != STATE_LARA_LADDER_IDLE)
 	{
 		item->animNumber = ANIMATION_LARA_LADDER_IDLE;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		return;
 	}
 
@@ -496,14 +496,14 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 			if (flag <= 0)
 			{
 				item->animNumber = ANIMATION_LARA_LADDER_AROUND_LEFT_INNER_BEGIN;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_INNER;
 				item->currentAnimState = STATE_LARA_CLIMB_CORNER_LEFT_INNER;
 			}
 			else
 			{
 				item->animNumber = ANIMATION_LARA_LADDER_AROUND_LEFT_OUTER_BEGIN;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_OUTER;
 				item->currentAnimState = STATE_LARA_CLIMB_CORNER_LEFT_OUTER;
 			}
@@ -520,14 +520,14 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 			if (flag <= 0)
 			{
 				item->animNumber = ANIMATION_LARA_LADDER_AROUND_RIGHT_INNER_BEGIN;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_INNER;
 				item->currentAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_INNER;
 			}
 			else
 			{
 				item->animNumber = ANIMATION_LARA_LADDER_AROUND_RIGHT_OUTER_BEGIN;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_OUTER;
 				item->currentAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_OUTER;
 			}
@@ -962,7 +962,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)//45434, 45898 (F)
 	item->goalAnimState = STATE_LARA_JUMP_FORWARD;
 	item->currentAnimState = STATE_LARA_JUMP_FORWARD;
 	item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 	item->speed = 2;
 	item->gravityStatus = true;

@@ -43,14 +43,14 @@ void GetLaraDeadlyBounds() // (F) (D)
 
 void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
 {
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		Lara.waterStatus = LW_UNDERWATER;
 		item->goalAnimState = STATE_LARA_UNDERWATER_STOP;
 		item->currentAnimState = STATE_LARA_UNDERWATER_STOP;
 		item->fallspeed = 0;
 		item->animNumber = ANIMATION_LARA_UNDERWATER_IDLE;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 	else
 	{
@@ -58,14 +58,14 @@ void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
 		item->goalAnimState = STATE_LARA_STOP;
 		item->currentAnimState = STATE_LARA_STOP;
 		item->animNumber = ANIMATION_LARA_STAY_SOLID;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 }
 
 void InitialiseLaraLoad(short itemNum) // (F) (D)
 {
 	Lara.itemNumber = itemNum;
-	LaraItem = &Items[itemNum];
+	LaraItem = &g_Level.Items[itemNum];
 }
 
 void DelsGiveLaraItemsCheat() // (AF) (D)
@@ -217,7 +217,7 @@ void LaraCheatyBits() // (F) (D)
 			{
 				Lara.waterStatus = LW_FLYCHEAT;
 				LaraItem->animNumber = ANIMATION_LARA_DOZY;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				LaraItem->currentAnimState = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM;
 				LaraItem->goalAnimState = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM;
 				LaraItem->gravityStatus = false;
@@ -273,9 +273,9 @@ void LaraControl(short itemNumber) // (AF) (D)
 	Lara.isDucked = false;
 
 #if 1
-	bool isWater = Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
+	bool isWater = g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER;
 #else
-	bool isWater = Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP);
+	bool isWater = g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP);
 #endif
 
 	int wd = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -359,7 +359,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 						{
 							item->pos.xRot = -ANGLE(45);
 							item->animNumber = ANIMATION_LARA_FREE_FALL_TO_UNDERWATER;
-							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->currentAnimState = STATE_LARA_UNDERWATER_DIVING;
 							item->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
 							item->fallspeed = 3 * item->fallspeed / 2;
@@ -385,28 +385,28 @@ void LaraControl(short itemNumber) // (AF) (D)
 							{
 							case STATE_LARA_WALK_BACK:
 								item->animNumber = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM_BACK;
-								item->frameNumber = Anims[item->animNumber].frameBase;
+								item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 								item->goalAnimState = STATE_LARA_ONWATER_BACK;
 								item->currentAnimState = STATE_LARA_ONWATER_BACK;
 								break;
 
 							case STATE_LARA_WALK_RIGHT:
 								item->animNumber = ANIMATION_LARA_ONWATER_SWIM_RIGHT;
-								item->frameNumber = Anims[item->animNumber].frameBase;
+								item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 								item->goalAnimState = STATE_LARA_ONWATER_RIGHT;
 								item->currentAnimState = STATE_LARA_ONWATER_RIGHT;
 								break;
 
 							case STATE_LARA_WALK_LEFT:
 								item->animNumber = ANIMATION_LARA_ONWATER_SWIM_LEFT;
-								item->frameNumber = Anims[item->animNumber].frameBase;
+								item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 								item->goalAnimState = STATE_LARA_ONWATER_LEFT;
 								item->currentAnimState = STATE_LARA_ONWATER_LEFT;
 								break;
 
 							default:
 								item->animNumber = ANIMATION_LARA_ONWATER_SWIM_FORWARD;
-								item->frameNumber = Anims[item->animNumber].frameBase;
+								item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 								item->goalAnimState = STATE_LARA_ONWATER_FORWARD;
 								item->currentAnimState = STATE_LARA_ONWATER_FORWARD;
 								break;
@@ -441,7 +441,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 
 				if (wd == NO_HEIGHT
 					|| abs(hfw) >= 256
-					|| Rooms[roomNumber].flags & ENV_FLAG_WATER
+					|| g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER
 					|| item->animNumber == ANIMATION_LARA_UNDERWATER_TO_ONWATER
 					|| item->animNumber == ANIMATION_LARA_FREE_FALL_TO_UNDERWATER_ALTERNATE)
 				{
@@ -451,7 +451,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 						{
 							Lara.waterStatus = LW_ABOVE_WATER;
 							item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
-							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->goalAnimState = STATE_LARA_JUMP_FORWARD;
 							item->currentAnimState = STATE_LARA_JUMP_FORWARD;
 							item->speed = item->fallspeed / 4;
@@ -470,7 +470,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 							Lara.waterStatus = LW_SURFACE;
 							item->pos.yPos = wh;
 							item->animNumber = ANIMATION_LARA_UNDERWATER_TO_ONWATER;
-							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->goalAnimState = STATE_LARA_ONWATER_STOP;
 							item->currentAnimState = STATE_LARA_ONWATER_STOP;
 							item->fallspeed = 0;
@@ -492,7 +492,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 					Lara.waterStatus = LW_SURFACE;
 					item->pos.yPos = wh + 1;
 					item->animNumber = ANIMATION_LARA_UNDERWATER_TO_ONWATER;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->goalAnimState = STATE_LARA_ONWATER_STOP;
 					item->currentAnimState = STATE_LARA_ONWATER_STOP;
 					item->fallspeed = 0;
@@ -516,7 +516,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 					{
 						Lara.waterStatus = LW_ABOVE_WATER;
 						item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
-						item->frameNumber = Anims[item->animNumber].frameBase;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						item->goalAnimState = STATE_LARA_JUMP_FORWARD;
 						item->currentAnimState = STATE_LARA_JUMP_FORWARD;
 						item->speed = item->fallspeed / 4;
@@ -526,7 +526,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 					{
 						Lara.waterStatus = LW_WADE; /* @DEAD_CODE: Lara has to reach a room without water while in the surface but then GetWaterHeight() return value never will make hfw > 256 */
 						item->animNumber = ANIMATION_LARA_STAY_IDLE;
-						item->frameNumber = Anims[item->animNumber].frameBase;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						item->goalAnimState = STATE_LARA_WADE_FORWARD;
 						item->currentAnimState = STATE_LARA_STOP;
 
@@ -560,28 +560,28 @@ void LaraControl(short itemNumber) // (AF) (D)
 						{
 						case STATE_LARA_WALK_BACK:
 							item->animNumber = ANIMATION_LARA_ONWATER_IDLE_TO_SWIM_BACK;
-							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->goalAnimState = STATE_LARA_ONWATER_BACK;
 							item->currentAnimState = STATE_LARA_ONWATER_BACK;
 							break;
 
 						case STATE_LARA_WALK_RIGHT:
 							item->animNumber = ANIMATION_LARA_ONWATER_SWIM_RIGHT;
-							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->goalAnimState = STATE_LARA_ONWATER_RIGHT;
 							item->currentAnimState = STATE_LARA_ONWATER_RIGHT;
 							break;
 
 						case STATE_LARA_WALK_LEFT:
 							item->animNumber = ANIMATION_LARA_ONWATER_SWIM_LEFT;
-							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->goalAnimState = STATE_LARA_ONWATER_LEFT;
 							item->currentAnimState = STATE_LARA_ONWATER_LEFT;
 							break;
 
 						default:
 							item->animNumber = ANIMATION_LARA_ONWATER_SWIM_FORWARD;
-							item->frameNumber = Anims[item->animNumber].frameBase;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 							item->goalAnimState = STATE_LARA_ONWATER_FORWARD;
 							item->currentAnimState = STATE_LARA_ONWATER_FORWARD;
 							break;
@@ -632,7 +632,7 @@ void LaraControl(short itemNumber) // (AF) (D)
 	case LW_ABOVE_WATER:
 	case LW_WADE:
 #if 0
-		if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -775)
+		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP && Lara.waterSurfaceDist < -775)
 		{
 			if (item->hitPoints >= 0)
 			{
@@ -724,7 +724,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	{
 		Lara.waterStatus = LW_ABOVE_WATER;
 		item->animNumber = ANIMATION_LARA_STAY_SOLID;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
 		Lara.torsoYrot = 0;
@@ -857,10 +857,10 @@ void AnimateLara(ITEM_INFO* item)
 {
 	item->frameNumber++;
 
-	ANIM_STRUCT* anim = &Anims[item->animNumber];
+	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
 	if (anim->numberChanges > 0 && GetChange(item, anim))
 	{
-		anim = &Anims[item->animNumber];
+		anim = &g_Level.Anims[item->animNumber];
 		item->currentAnimState = anim->currentAnimState;
 	}
 
@@ -868,7 +868,7 @@ void AnimateLara(ITEM_INFO* item)
 	{
 		if (anim->numberCommands > 0)
 		{
-			short* cmd = &Commands[anim->commandIndex];
+			short* cmd = &g_Level.Commands[anim->commandIndex];
 			for (int i = anim->numberCommands; i > 0; i--)
 			{
 				switch (*(cmd++))
@@ -909,13 +909,13 @@ void AnimateLara(ITEM_INFO* item)
 		item->animNumber = anim->jumpAnimNum;
 		item->frameNumber = anim->jumpFrameNum;
 		
-		anim = &Anims[item->animNumber];
+		anim = &g_Level.Anims[item->animNumber];
 		item->currentAnimState = anim->currentAnimState;
 	}
 
 	if (anim->numberCommands > 0)
 	{
-		short* cmd = &Commands[anim->commandIndex];
+		short* cmd = &g_Level.Commands[anim->commandIndex];
 		int flags;
 		int effectID = 0;
 
@@ -941,7 +941,7 @@ void AnimateLara(ITEM_INFO* item)
 				flags = cmd[1] & 0xC000;
 				if (flags == SFX_LANDANDWATER ||
 				   (flags == SFX_LANDONLY && (Lara.waterSurfaceDist >= 0 || Lara.waterSurfaceDist == NO_HEIGHT)) ||
-				   (flags == SFX_WATERONLY && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT && !(Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)))
+				   (flags == SFX_WATERONLY && Lara.waterSurfaceDist < 0 && Lara.waterSurfaceDist != NO_HEIGHT && !(g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)))
 				{
 					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 				}
@@ -977,7 +977,7 @@ void AnimateLara(ITEM_INFO* item)
 	
 	if (item->gravityStatus)             // If gravity ON (Do Up/Down movement)
 	{
-		if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
 			item->speed -= item->speed >> 3;
 			if (abs(item->speed) < 8)
@@ -1005,7 +1005,7 @@ void AnimateLara(ITEM_INFO* item)
 	{
 		int velocity;
 
-		if (Lara.waterStatus == LW_WADE && Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+		if (Lara.waterStatus == LW_WADE && g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 		{
 			velocity = (anim->velocity >> 1);
 			if (anim->acceleration)

@@ -7,12 +7,12 @@
 using std::vector;
 short GF(short animIndex, short frameToStart)
 {
-	return Anims[animIndex].frameBase + frameToStart;
+	return g_Level.Anims[animIndex].frameBase + frameToStart;
 }
 
 short GF2(short objectID, short animIndex, short frameToStart)
 {
-	return Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart;
+	return g_Level.Anims[Objects[objectID].animIndex + animIndex].frameBase + frameToStart;
 }
 
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
@@ -28,9 +28,9 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 	int x, z;
 
 	bestdistance = MAXINT;
-	for (int i = 0; i < NumItems; i++)
+	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		target = &Items[i];
+		target = &g_Level.Items[i];
 		if (target != nullptr)
 		{
 			if (target != item && target->hitPoints > 0 && target->status != ITEM_INVISIBLE)
@@ -57,7 +57,7 @@ void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 	bool adjoiningRoomFound;
 
 	roomArray[0] = roomNumber;
-	ROOM_INFO* room = &Rooms[roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 
 	for (i = 0; i < room->doors.size(); i++)
 	{
@@ -86,7 +86,7 @@ void GetRoomList(short roomNumber, vector<short>* destRoomList)
 	bool adjoiningRoomFound;
 
 	roomList.push_back(roomNumber);
-	ROOM_INFO* room = &Rooms[roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 
 	for (i = 0; i < room->doors.size(); i++)
 	{

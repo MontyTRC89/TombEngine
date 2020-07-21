@@ -48,7 +48,7 @@ void ControlMissile(short fxNumber)
 	fx = &EffectList[fxNumber];
 	printf("ControlMissile\n");
 
-	if (fx->objectNumber == ID_SCUBA_HARPOON && !(Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
+	if (fx->objectNumber == ID_SCUBA_HARPOON && !(g_Level.Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
 		fx->pos.xRot -= ONE_DEGREE;
 
 	fx->pos.yPos += (fx->speed * phd_sin(-fx->pos.xRot) >> W2V_SHIFT);
@@ -115,7 +115,7 @@ void ControlMissile(short fxNumber)
 	}
 
 	/* Create bubbles in wake of harpoon bolt */
-	//if (fx->objectNumber == ID_SCUBA_HARPOON && Rooms[fx->roomNumber].flags & 1)
+	//if (fx->objectNumber == ID_SCUBA_HARPOON && g_Level.Rooms[fx->roomNumber].flags & 1)
 	//	CreateBubble(&fx->pos, fx->roomNumber, 1, 0);
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
 	{

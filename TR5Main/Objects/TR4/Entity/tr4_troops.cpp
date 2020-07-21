@@ -16,7 +16,7 @@ BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
 void InitialiseTroops(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
@@ -31,7 +31,7 @@ void InitialiseTroops(short itemNumber)
 		item->animNumber = Objects[item->objectNumber].animIndex + 12;
 	}
 
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
 void TroopsControl(short itemNumber)
@@ -39,7 +39,7 @@ void TroopsControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	short angle = 0;
@@ -78,11 +78,11 @@ void TroopsControl(short itemNumber)
 					item->animNumber = Objects[item->objectNumber].animIndex + 23;
 					if (item->currentAnimState == 16)
 					{
-						item->frameNumber = Anims[item->animNumber].frameBase += 37;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase += 37;
 					}
 					else
 					{
-						item->frameNumber = Anims[item->animNumber].frameBase;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					}
 					item->goalAnimState = 15;
 					item->currentAnimState = 15;
@@ -108,7 +108,7 @@ void TroopsControl(short itemNumber)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 19;
 				item->currentAnimState = 7;
-				item->frameNumber = Anims[item->frameNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->frameNumber].frameBase;
 			}
 		}
 	}
@@ -129,7 +129,7 @@ void TroopsControl(short itemNumber)
 
 				if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 				{
-					ITEM_INFO* currentItem = &Items[baddy->itemNum];
+					ITEM_INFO* currentItem = &g_Level.Items[baddy->itemNum];
 
 					if (currentItem->objectNumber != ID_TROOPS &&
 						(currentItem != LaraItem || creature->hurtByLara))

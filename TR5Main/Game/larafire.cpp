@@ -316,7 +316,7 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 
 void SmashItem(short itemNum) // (F) (D)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
 		SmashObject(itemNum);
 }
@@ -649,8 +649,8 @@ void InitialiseNewWeapon()
 		break;
 
 	default:
-		Lara.rightArm.frameBase = Anims[LaraItem->animNumber].framePtr;
-		Lara.leftArm.frameBase = Anims[LaraItem->animNumber].framePtr;
+		Lara.rightArm.frameBase = g_Level.Anims[LaraItem->animNumber].framePtr;
+		Lara.leftArm.frameBase = g_Level.Anims[LaraItem->animNumber].framePtr;
 		break;
 	}
 }
@@ -985,7 +985,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon) // (F) (D)
 	{
 		if (BaddieSlots[slot].itemNum != NO_ITEM)
 		{
-			item = &Items[BaddieSlots[slot].itemNum];
+			item = &g_Level.Items[BaddieSlots[slot].itemNum];
 			if (item->hitPoints > 0)
 			{
 				x = item->pos.xPos - src.x;
@@ -1089,7 +1089,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 	int ceiling, height, oldonobj, oldheight;
 	int bs, yang;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);

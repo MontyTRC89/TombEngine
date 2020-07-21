@@ -30,8 +30,8 @@ void InitialiseSkidman(short itemNum)
 	skidoo_item = CreateItem();
 	if (skidoo_item != NO_ITEM)
 	{
-		item = &Items[itemNum];
-		skidoo = &Items[skidoo_item];
+		item = &g_Level.Items[itemNum];
+		skidoo = &g_Level.Items[skidoo_item];
 		skidoo->objectNumber = ID_SNOWMOBILE_GUN;
 		skidoo->pos.xPos = item->pos.xPos;
 		skidoo->pos.yPos = item->pos.yPos;
@@ -46,7 +46,7 @@ void InitialiseSkidman(short itemNum)
 		// The skidman remembers his skidoo
 		item->data = (void*)skidoo_item;
 
-		NumItems++;
+		g_Level.NumItems++;
 	}
 	else
 	{
@@ -58,7 +58,7 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	if (!TestBoundsCollide(item, laraitem, coll->radius))
 		return;
 	if (!TestCollision(item, laraitem))
@@ -88,7 +88,7 @@ void SkidManControl(short riderNum)
 	short angle, item_number;
 	int damage;
 
-	rider = &Items[riderNum];
+	rider = &g_Level.Items[riderNum];
 	if (rider->data == NULL)
 	{
 		printf("FATAL: rider data not contains the skidoo itemNumber !");
@@ -96,7 +96,7 @@ void SkidManControl(short riderNum)
 	}
 
 	item_number = (short)rider->data;
-	item = &Items[item_number];
+	item = &g_Level.Items[item_number];
 
 	/* Need to activate AI for skidoo (it's the skidoo that holds the brain) if not done yet */
 	if (!item->data)
@@ -120,7 +120,7 @@ void SkidManControl(short riderNum)
 			rider->roomNumber = item->roomNumber;
 
 			rider->animNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_DEATH_ANIM;
-			rider->frameNumber = Anims[rider->animNumber].frameBase;
+			rider->frameNumber = g_Level.Anims[rider->animNumber].frameBase;
 			rider->currentAnimState = SMAN_DEATH;
 
 			/* Break Lara's lock */
@@ -230,7 +230,7 @@ void SkidManControl(short riderNum)
 			ItemNewRoom(riderNum, item->roomNumber);
 
 		rider->animNumber = item->animNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
-		rider->frameNumber = item->frameNumber + (Anims[rider->animNumber].frameBase - Anims[item->animNumber].frameBase);
+		rider->frameNumber = item->frameNumber + (g_Level.Anims[rider->animNumber].frameBase - g_Level.Anims[item->animNumber].frameBase);
 	}
 	else if (rider->status == ITEM_DEACTIVATED && item->speed == 0 && item->fallspeed == 0)
 	{

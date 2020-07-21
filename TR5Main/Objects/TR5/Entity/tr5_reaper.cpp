@@ -12,9 +12,9 @@ void InitialiseReaper(short itemNum)
 
     ClearItem(itemNum);
 
-    item = &Items[itemNum];
+    item = &g_Level.Items[itemNum];
     item->animNumber = Objects[item->objectNumber].animIndex + 1;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = 2;
     item->currentAnimState = 2;
 }
@@ -23,7 +23,7 @@ void ReaperControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 		if (item->aiBits)

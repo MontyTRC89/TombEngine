@@ -28,7 +28,7 @@ void InitialiseTeethSpikes(short itemNumber)
 	ITEM_INFO* item;
 	int angle;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	item->status = ITEM_INVISIBLE;
 
 	short rotations[8] =
@@ -101,7 +101,7 @@ static int CollidedWithTeethSpikes(ITEM_INFO* item)
 
 void ControlTeethSpikes(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item) || item->itemFlags[2])
 	{
@@ -222,7 +222,7 @@ void ControlTeethSpikes(short itemNumber)
 				if (item->pos.yPos >= LaraItem->pos.yPos && height - LaraItem->pos.yPos < 50)
 				{
 					LaraItem->animNumber = ANIMATION_LARA_SPIKED;
-					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 					LaraItem->currentAnimState = STATE_LARA_DEATH;
 					LaraItem->goalAnimState = STATE_LARA_DEATH;
 					LaraItem->gravityStatus = false;

@@ -84,12 +84,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			shotgunFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber) * (g_Level.Anims[Lara.leftArm.animNumber].interpolation >> 8);
 			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			shotgunFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber) * (g_Level.Anims[Lara.rightArm.animNumber].interpolation >> 8);
 			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 			break;
 
@@ -103,14 +103,14 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber - Anims[Lara.leftArm.animNumber].frameBase) * (Anims[Lara.leftArm.animNumber].interpolation >> 8);
+			pistolFramePtr = Lara.leftArm.frameBase + (Lara.leftArm.frameNumber - g_Level.Anims[Lara.leftArm.animNumber].frameBase) * (g_Level.Anims[Lara.leftArm.animNumber].interpolation >> 8);
 			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
 			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber - Anims[Lara.rightArm.animNumber].frameBase) * (Anims[Lara.rightArm.animNumber].interpolation >> 8);
+			pistolFramePtr = Lara.rightArm.frameBase + (Lara.rightArm.frameNumber - g_Level.Anims[Lara.rightArm.animNumber].frameBase) * (g_Level.Anims[Lara.rightArm.animNumber].interpolation >> 8);
 			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
 			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 		}

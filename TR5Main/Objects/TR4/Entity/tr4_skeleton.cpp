@@ -77,7 +77,7 @@ static void WakeUpSkeleton(ITEM_INFO* item)
 
 void InitialiseSkeleton(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[ID_SKELETON];
 
 	ClearItem(itemNumber);
@@ -88,28 +88,28 @@ void InitialiseSkeleton(short itemNumber)
 		item->goalAnimState = 0;
 		item->currentAnimState = 0;
 		item->animNumber = obj->animIndex;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		break;
 
 	case 1:
 		item->goalAnimState = 20;
 		item->currentAnimState = 20;
 		item->animNumber = obj->animIndex + 37;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		break;
 
 	case 2:
 		item->goalAnimState = 19;
 		item->currentAnimState = 19;
 		item->animNumber = obj->animIndex + 34;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		break;
 
 	case 3:
 		item->goalAnimState = 25;
 		item->currentAnimState = 25;
 		item->animNumber = obj->animIndex;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->status = ITEM_DEACTIVATED;
 		break;
 
@@ -121,7 +121,7 @@ void SkeletonControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
 	bool someFlag1 = false;
@@ -215,7 +215,7 @@ void SkeletonControl(short itemNumber)
 			item->pos.yRot += info.angle;
 		}
 
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		creature->LOT.isJumping = true;
 		item->hitPoints = 25;
 	}
@@ -354,7 +354,7 @@ void SkeletonControl(short itemNumber)
 				{
 					creature->maximumTurn = 0;
 					item->animNumber = Objects[ID_SKELETON].animIndex + 40;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->currentAnimState = 21;
 					if (!canJump2sectors)
 					{
@@ -370,14 +370,14 @@ void SkeletonControl(short itemNumber)
 				else if (someFlag1)
 				{
 					item->animNumber = Objects[ID_SKELETON].animIndex + 34;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->goalAnimState = 19;
 					item->currentAnimState = 19;
 				}
 				else if (someFlag2)
 				{
 					item->animNumber = Objects[ID_SKELETON].animIndex + 37;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->goalAnimState = 20;
 					item->currentAnimState = 20;
 				}
@@ -535,7 +535,7 @@ void SkeletonControl(short itemNumber)
 					creature->maximumTurn = 0;
 					item->animNumber = Objects[ID_SKELETON].animIndex + 44;
 					item->currentAnimState = 23;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					creature->LOT.isJumping = false;
 					item->gravityStatus = true;
 				}
@@ -619,9 +619,9 @@ void SkeletonControl(short itemNumber)
 			{
 				item->pos.yRot += info.angle;
 			}
-			if (item->frameNumber > Anims[item->animNumber].frameBase + 15)
+			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 15)
 			{
-				ROOM_INFO* room = &Rooms[item->roomNumber];
+				ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 				PHD_VECTOR pos;
 				
 				GetJointAbsPosition(item, &pos, 16);
@@ -694,7 +694,7 @@ void SkeletonControl(short itemNumber)
 				{
 					creature->maximumTurn = 0;
 					item->animNumber = Objects[item->objectNumber].animIndex + 44;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->currentAnimState = 23;
 					creature->LOT.isJumping = false;
 					item->gravityStatus = true;
@@ -723,7 +723,7 @@ void SkeletonControl(short itemNumber)
 		case 12:
 		case 13:
 			if ((item->currentAnimState == 12 || item->currentAnimState == 13) && 
-				item->frameNumber < Anims[item->animNumber].frameBase + 20)
+				item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 20)
 			{
 				item->hitPoints = 25;
 				creature->maximumTurn = 0;
@@ -751,7 +751,7 @@ void SkeletonControl(short itemNumber)
 			{
 				creature->maximumTurn = 0;
 				item->animNumber = Objects[item->objectNumber].animIndex + 47;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->currentAnimState = 24;
 				item->gravityStatus = true;
 			}
@@ -765,7 +765,7 @@ void SkeletonControl(short itemNumber)
 			break;
 
 		case 0:
-			if (item->frameNumber - Anims[item->animNumber].frameBase < 32)
+			if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase < 32)
 			{
 				WakeUpSkeleton(item);
 			}

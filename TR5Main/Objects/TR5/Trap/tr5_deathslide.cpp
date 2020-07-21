@@ -12,7 +12,7 @@ PHD_VECTOR DeathSlidePosition(0, 0, 371);
 
 void InitialiseDeathSlide(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	GAME_VECTOR* pos = game_malloc<GAME_VECTOR>();
 	item->data = pos;
 	pos->x = item->pos.xPos;
@@ -26,7 +26,7 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_NO_ARMS || l->currentAnimState != STATE_LARA_STOP)
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (item->status != ITEM_NOT_ACTIVE)
 		return;
 
@@ -50,7 +50,7 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void ControlDeathSlide(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->status == ITEM_ACTIVE)
 	{
@@ -68,7 +68,7 @@ void ControlDeathSlide(short itemNumber)
 			item->status = ITEM_NOT_ACTIVE;
 			item->currentAnimState = item->goalAnimState = 1;
 			item->animNumber = Objects[item->objectNumber].animIndex;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 			RemoveActiveItem(itemNumber);
 

@@ -108,7 +108,7 @@ int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
 	int interp, rat;
 
 	frm = item->frameNumber;
-	anim = &Anims[item->animNumber];
+	anim = &g_Level.Anims[item->animNumber];
 	framePtr[0] = framePtr[1] = anim->framePtr;
 	rat = *rate = anim->interpolation & 0x00ff;
 	frame_size = anim->interpolation >> 8;

@@ -8,7 +8,7 @@
 
 void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->status == ITEM_INVISIBLE)
 		return;

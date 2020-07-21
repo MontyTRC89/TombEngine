@@ -23,49 +23,19 @@ ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
 ChunkId* ChunkLuaIds = ChunkId::FromString("Tr5LuaIds");
 ChunkId* ChunkLuaId = ChunkId::FromString("Tr5LuaId");
 
-extern GameScript* g_GameScript;
-
-std::vector<int> Bones;
-std::vector<MESH> Meshes;
-int NumObjects;
-int NumStaticObjects;
-int NumMeshPointers;
-int NumObjectTextures;
-int NumTextureTiles;
-int NumItems;
 FILE* LevelFilePtr;
-
 uintptr_t hLoadLevel;
 unsigned int ThreadId;
 int IsLevelLoading;
 bool g_FirstLevel = true;
-
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
+char* LevelDataPtr;
+ChunkReader* g_levelChunkIO;
+LEVEL g_Level;
 
 extern GameFlow* g_GameFlow;
-
-char* LevelDataPtr;
-std::vector<OBJECT_TEXTURE> ObjectTextures;
-std::vector <ITEM_INFO> Items;
-std::vector<ROOM_INFO> Rooms;
-std::vector <ANIM_STRUCT> Anims;
-std::vector <CHANGE_STRUCT> Changes;
-std::vector <RANGE_STRUCT> Ranges;
-std::vector<short> Commands;
-std::vector<short> Frames;
-std::vector <AIOBJECT> AIObjects;
-std::vector <SPRITE> Sprites;
-short* FloorData;
-
-vector<TEXTURE> RoomTextures;
-vector<TEXTURE> MoveablesTextures;
-vector<TEXTURE> StaticsTextures;
-vector<TEXTURE> SpritesTextures;
-TEXTURE MiscTextures;
-
-int g_NumSpritesSequences;
-ChunkReader* g_levelChunkIO;
+extern GameScript* g_GameScript;
 
 short ReadInt8()
 {
@@ -127,20 +97,20 @@ void ReadBytes(void* dest, int count)
 
 int LoadItems()
 {
-	NumItems = ReadInt32();
-	if (NumItems == 0)
+	g_Level.NumItems = ReadInt32();
+	if (g_Level.NumItems == 0)
 		return false;
 
-	Items.resize(NUM_ITEMS);
+	g_Level.Items.resize(NUM_ITEMS);
 
 	InitialiseClosedDoors();
 	InitialiseItemArray(NUM_ITEMS);
 
-	if (NumItems > 0)
+	if (g_Level.NumItems > 0)
 	{
-		for (int i = 0; i < NumItems; i++)
+		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			ITEM_INFO* item = &Items[i];
+			ITEM_INFO* item = &g_Level.Items[i];
 			
 			item->objectNumber = ReadInt16();
 			item->roomNumber = ReadInt16();
@@ -153,19 +123,19 @@ int LoadItems()
 			item->flags = ReadInt16();
 		}
 
-		for (int i = 0; i < NumItems; i++)
+		for (int i = 0; i < g_Level.NumItems; i++)
 			InitialiseItem(i);
 	}
 
-	for (int r = 0; r < Rooms.size(); r++)
+	for (int r = 0; r < g_Level.Rooms.size(); r++)
 	{
-		MESH_INFO* mesh = Rooms[r].mesh.data();
+		MESH_INFO* mesh = g_Level.Rooms[r].mesh.data();
 
-		for (int m = 0; m < Rooms[r].mesh.size(); m++)
+		for (int m = 0; m < g_Level.Rooms[r].mesh.size(); m++)
 		{
-			FLOOR_INFO* floor = &Rooms[r].floor[((mesh->z - Rooms[r].z) >> 10) + Rooms[r].xSize * ((mesh->x - Rooms[r].x) >> 10)];
+			FLOOR_INFO* floor = &g_Level.Rooms[r].floor[((mesh->z - g_Level.Rooms[r].z) >> 10) + g_Level.Rooms[r].xSize * ((mesh->x - g_Level.Rooms[r].x) >> 10)];
 			 
-			if (!(Boxes[floor->box].flags & BLOCKED)
+			if (!(g_Level.Boxes[floor->box].flags & BLOCKED)
 				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
 			{
 				int fl = floor->floor << 2;
@@ -193,7 +163,7 @@ void LoadObjects()
 	memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
-	Meshes.reserve(numMeshes);
+	g_Level.Meshes.reserve(numMeshes);
 	for (int i = 0; i < numMeshes; i++)
 	{
 		MESH mesh;
@@ -262,38 +232,37 @@ void LoadObjects()
 			mesh.buckets.push_back(bucket);
 		}
 
-		Meshes.push_back(mesh);
+		g_Level.Meshes.push_back(mesh);
 	}
 
 	int numAnimations = ReadInt32();
-	Anims.resize(numAnimations);
-	ReadBytes(Anims.data(), sizeof(ANIM_STRUCT) * numAnimations);
+	g_Level.Anims.resize(numAnimations);
+	ReadBytes(g_Level.Anims.data(), sizeof(ANIM_STRUCT) * numAnimations);
 
 	int numChanges = ReadInt32();
-	Changes.resize(numChanges);
-	ReadBytes(Changes.data(), sizeof(CHANGE_STRUCT) * numChanges);
+	g_Level.Changes.resize(numChanges);
+	ReadBytes(g_Level.Changes.data(), sizeof(CHANGE_STRUCT) * numChanges);
 
 	int numRanges = ReadInt32();
-	Ranges.resize(numRanges);
-	ReadBytes(Ranges.data(), sizeof(RANGE_STRUCT) * numRanges);
+	g_Level.Ranges.resize(numRanges);
+	ReadBytes(g_Level.Ranges.data(), sizeof(RANGE_STRUCT) * numRanges);
 
 	int numCommands = ReadInt32();
-	Commands.resize(numCommands);
-	ReadBytes(Commands.data(), sizeof(short) * numCommands);
+	g_Level.Commands.resize(numCommands);
+	ReadBytes(g_Level.Commands.data(), sizeof(short) * numCommands);
 
 	int numBones = ReadInt32();
-	Bones.resize(numBones);
-	ReadBytes(Bones.data(), 4 * numBones);
+	g_Level.Bones.resize(numBones);
+	ReadBytes(g_Level.Bones.data(), 4 * numBones);
 
 	int numFrames = ReadInt32();
-	Frames.resize(numFrames);
-	ReadBytes(Frames.data(), sizeof(short) * numFrames);
+	g_Level.Frames.resize(numFrames);
+	ReadBytes(g_Level.Frames.data(), sizeof(short) * numFrames);
 
-	for (int i = 0; i < Anims.size(); i++)
-		AddPtr(Anims[i].framePtr, short, Frames.data());
+	for (int i = 0; i < g_Level.Anims.size(); i++)
+		AddPtr(g_Level.Anims[i].framePtr, short, g_Level.Frames.data());
 
 	int numModels = ReadInt32();
-	NumObjects = numModels;
 	for (int i = 0; i < numModels; i++)
 	{
 		int objNum = ReadInt32();
@@ -303,7 +272,7 @@ void LoadObjects()
 		Objects[objNum].nmeshes = (short)ReadInt16();
 		Objects[objNum].meshIndex = (short)ReadInt16();
 		Objects[objNum].boneIndex = ReadInt32();
-		Objects[objNum].frameBase = (short*)(ReadInt32() + (int)Frames.data()); 
+		Objects[objNum].frameBase = (short*)(ReadInt32() + (int)g_Level.Frames.data());
 		Objects[objNum].animIndex = (short)ReadInt16();
 
 		ReadInt16();
@@ -315,7 +284,6 @@ void LoadObjects()
 	InitialiseClosedDoors();
 
 	int numStatics = ReadInt32();
-	NumStaticObjects = numStatics;
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
@@ -366,7 +334,7 @@ void LoadTextures()
 
 	int numTextures;
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
-	RoomTextures.reserve(numTextures);
+	g_Level.RoomTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -387,11 +355,11 @@ void LoadTextures()
 			ReadFileEx(texture.normalMapData.data(), 1, size, LevelFilePtr);
 		}
 
-		RoomTextures.push_back(texture);
+		g_Level.RoomTextures.push_back(texture);
 	}
 
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
-	MoveablesTextures.reserve(numTextures);
+	g_Level.MoveablesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -412,11 +380,11 @@ void LoadTextures()
 			ReadFileEx(texture.normalMapData.data(), 1, size, LevelFilePtr);
 		}
 
-		MoveablesTextures.push_back(texture);
+		g_Level.MoveablesTextures.push_back(texture);
 	}
 
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
-	StaticsTextures.reserve(numTextures);
+	g_Level.StaticsTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -437,11 +405,11 @@ void LoadTextures()
 			ReadFileEx(texture.normalMapData.data(), 1, size, LevelFilePtr);
 		}
 
-		StaticsTextures.push_back(texture);
+		g_Level.StaticsTextures.push_back(texture);
 	}
 
 	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
-	SpritesTextures.reserve(numTextures);
+	g_Level.SpritesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
@@ -453,14 +421,14 @@ void LoadTextures()
 		texture.colorMapData.resize(size);
 		ReadFileEx(texture.colorMapData.data(), 1, size, LevelFilePtr);
 
-		SpritesTextures.push_back(texture);
+		g_Level.SpritesTextures.push_back(texture);
 	}
 
-	ReadFileEx(&MiscTextures.width, 1, 4, LevelFilePtr);
-	ReadFileEx(&MiscTextures.height, 1, 4, LevelFilePtr);
+	ReadFileEx(&g_Level.MiscTextures.width, 1, 4, LevelFilePtr);
+	ReadFileEx(&g_Level.MiscTextures.height, 1, 4, LevelFilePtr);
 	ReadFileEx(&size, 1, 4, LevelFilePtr);
-	MiscTextures.colorMapData.resize(size);
-	ReadFileEx(MiscTextures.colorMapData.data(), 1, size, LevelFilePtr);
+	g_Level.MiscTextures.colorMapData.resize(size);
+	ReadFileEx(g_Level.MiscTextures.colorMapData.data(), 1, size, LevelFilePtr);
 }
 
 void ReadRooms()
@@ -468,10 +436,6 @@ void ReadRooms()
 	ReadInt32();
 
 	int numRooms = ReadInt32();
-	//NumberRooms = numRooms;
-	//Rooms = (ROOM_INFO*)game_malloc(NumberRooms * sizeof(ROOM_INFO));
-	Rooms.clear();
-	
 	printf("NumRooms: %d\n", numRooms);
 	
 	for (int i = 0; i < numRooms; i++)
@@ -649,7 +613,7 @@ void ReadRooms()
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;
 
-		Rooms.push_back(room);
+		g_Level.Rooms.push_back(room);
 	}
 }
 
@@ -800,35 +764,39 @@ void LoadRooms()
 	BuildOutsideRoomsTable();
 
 	int numFloorData = ReadInt32(); 
-	FloorData = game_malloc<short>(numFloorData * 2);
-	ReadBytes(FloorData, numFloorData * 2);
+	g_Level.FloorData.resize(numFloorData);
+	ReadBytes(g_Level.FloorData.data(), numFloorData * sizeof(short));
 }
 
 void FreeLevel()
 {
 	malloc_ptr = malloc_buffer;
 	malloc_free = malloc_size;
-	RoomTextures.clear();
-	MoveablesTextures.clear();
-	StaticsTextures.clear();
-	SpritesTextures.clear();
-	ObjectTextures.clear();
-	Bones.clear();
-	Meshes.clear();
+	g_Level.RoomTextures.clear();
+	g_Level.MoveablesTextures.clear();
+	g_Level.StaticsTextures.clear();
+	g_Level.SpritesTextures.clear();
+	g_Level.Rooms.clear(); 
+	g_Level.ObjectTextures.clear();
+	g_Level.Bones.clear();
+	g_Level.Meshes.clear();
 	MoveablesIds.clear();
-	Boxes.clear();
-	Overlaps.clear();
-	Anims.clear();
-	Changes.clear();
-	Ranges.clear();
-	Commands.clear();
-	Frames.clear();
-	Sprites.clear();
+	g_Level.Boxes.clear();
+	g_Level.Overlaps.clear();
+	g_Level.Anims.clear();
+	g_Level.Changes.clear();
+	g_Level.Ranges.clear();
+	g_Level.Commands.clear();
+	g_Level.Frames.clear();
+	g_Level.Sprites.clear();
+	g_Level.SoundDetails.clear();
+	g_Level.SoundMap.clear();
+	g_Level.FloorData.clear();
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			Zones[j][i].clear();
+			g_Level.Zones[j][i].clear();
 		}
 	}
 	g_Renderer.FreeRendererData();
@@ -866,33 +834,29 @@ void LoadAnimatedTextures()
 void LoadTextureInfos()
 {
 	ReadInt32(); // TEX/0
-	
-	NumObjectTextures = ReadInt32();
-	
-	if (NumObjectTextures > 0)
+
+	int numObjectTextures = ReadInt32();
+	for (int i = 0; i < numObjectTextures; i++)
 	{
-		for (int i = 0; i < NumObjectTextures; i++)
+		OBJECT_TEXTURE texture;
+		texture.attribute = ReadInt32();
+		texture.tileAndFlag = ReadInt32();
+		texture.newFlags = ReadInt32();
+		for (int j = 0; j < 4; j++)
 		{
-			OBJECT_TEXTURE texture;
-			texture.attribute = ReadInt32();
-			texture.tileAndFlag = ReadInt32();
-			texture.newFlags = ReadInt32();
-			for (int j = 0; j < 4; j++)
-			{
-				texture.vertices[j].x = ReadFloat();
-				texture.vertices[j].y = ReadFloat();
-			}
-			texture.destination = ReadInt32();
-			ObjectTextures.push_back(texture);
+			texture.vertices[j].x = ReadFloat();
+			texture.vertices[j].y = ReadFloat();
 		}
+		texture.destination = ReadInt32();
+		g_Level.ObjectTextures.push_back(texture);
 	}
 }
 
 void LoadAIObjects()
 {
 	int nAIObjects = ReadInt32();
-	AIObjects.resize(nAIObjects);
-	ReadBytes(AIObjects.data(), nAIObjects * sizeof(AIOBJECT));
+	g_Level.AIObjects.resize(nAIObjects);
+	ReadBytes(g_Level.AIObjects.data(), nAIObjects * sizeof(AIOBJECT));
 }
 
 FILE* FileOpen(const char* fileName)
@@ -1070,20 +1034,15 @@ unsigned CALLBACK LoadLevel(void* data)
 
 void LoadSamples()
 {
-	// Legacy soundmap size was 450, for now let's store new soundmap size into NumDemoData field
-	SoundMapSize = ReadInt16();
+	int SoundMapSize = ReadInt16();
+	g_Level.SoundMap.resize(SoundMapSize);
+	ReadBytes(g_Level.SoundMap.data(), SoundMapSize * sizeof(short));
 
-	if (SoundMapSize == 0)
-		SoundMapSize = SOUND_LEGACY_SOUNDMAP_SIZE;
-
-	for (int i = 0; i < SoundMapSize; i++)
-		SampleLUT[i] = ReadInt16();
-
-	NumSamplesInfos = ReadInt32();
-	if (NumSamplesInfos)
+	int numSamplesInfos = ReadInt32();
+	if (numSamplesInfos)
 	{
-		SampleInfo = game_malloc<SAMPLE_INFO>(NumSamplesInfos);
-		ReadBytes(SampleInfo, NumSamplesInfos * sizeof(SAMPLE_INFO));
+		g_Level.SoundDetails.resize(numSamplesInfos);
+		ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SAMPLE_INFO));
 
 		int numSampleIndices = ReadInt32();
 		if (numSampleIndices)
@@ -1113,7 +1072,7 @@ void LoadSamples()
 	}
 	else
 	{
-		//Log(1, aNoSampleInfos);
+		//Log(1, aNog_Level.SoundDetailss);
 	}
 }
 
@@ -1121,13 +1080,13 @@ void LoadBoxes()
 {
 	// Read boxes
 	int numBoxes = ReadInt32();
-	Boxes.resize(numBoxes);
-	ReadBytes(Boxes.data(), numBoxes * sizeof(BOX_INFO));
+	g_Level.Boxes.resize(numBoxes);
+	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
 
 	// Read overlaps
 	int numOverlaps = ReadInt32();
-	Overlaps.resize(numOverlaps);
-	ReadBytes(Overlaps.data(), numOverlaps * sizeof(OVERLAP));
+	g_Level.Overlaps.resize(numOverlaps);
+	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
 
 	// Read zones
 	for (int i = 0; i < 2; i++)
@@ -1135,21 +1094,21 @@ void LoadBoxes()
 		// Ground zones
 		for (int j = 0; j < 4; j++)
 		{
-			Zones[j][i].resize(numBoxes * sizeof(int));
-			ReadBytes(Zones[j][i].data(), numBoxes * sizeof(int));
+			g_Level.Zones[j][i].resize(numBoxes * sizeof(int));
+			ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
 		}
 
 		// Fly zone
-		Zones[4][i].resize(numBoxes * sizeof(int));
-		ReadBytes(Zones[4][i].data(), numBoxes * sizeof(int));
+		g_Level.Zones[4][i].resize(numBoxes * sizeof(int));
+		ReadBytes(g_Level.Zones[4][i].data(), numBoxes * sizeof(int));
 	}
 
 	// By default all blockable boxes are blocked
 	for (int i = 0; i < numBoxes; i++)
 	{
-		if (Boxes[i].flags & BLOCKABLE)
+		if (g_Level.Boxes[i].flags & BLOCKABLE)
 		{
-			Boxes[i].flags |= BLOCKED;
+			g_Level.Boxes[i].flags |= BLOCKED;
 		}
 	}
 }
@@ -1182,12 +1141,6 @@ int S_LoadLevelFile(int levelIndex)
 	while (IsLevelLoading);
 
 	return true;
-}
-
-void AdjustUV(int num)
-{
-	// Dummy function
-	NumObjectTextures = num;
 }
 
 bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg)
@@ -1261,22 +1214,23 @@ void LoadSprites()
 	ReadInt32(); // SPR\0
 
 	int numSprites = ReadInt32();
-	Sprites.resize(numSprites);
+	g_Level.Sprites.resize(numSprites);
 	for (int i = 0; i < numSprites; i++)
 	{
-		Sprites[i].tile = ReadInt32();
-		Sprites[i].x1 = ReadFloat();
-		Sprites[i].y1 = ReadFloat();
-		Sprites[i].x2 = ReadFloat();
-		Sprites[i].y2 = ReadFloat();
-		Sprites[i].x3 = ReadFloat();
-		Sprites[i].y3 = ReadFloat();
-		Sprites[i].x4 = ReadFloat();
-		Sprites[i].y4 = ReadFloat();
+		SPRITE* spr = &g_Level.Sprites[i];
+		spr->tile = ReadInt32();
+		spr->x1 = ReadFloat();
+		spr->y1 = ReadFloat();
+		spr->x2 = ReadFloat();
+		spr->y2 = ReadFloat();
+		spr->x3 = ReadFloat();
+		spr->y3 = ReadFloat();
+		spr->x4 = ReadFloat();
+		spr->y4 = ReadFloat();
 	}
 
-	g_NumSpritesSequences = ReadInt32();
-	for (int i = 0; i < g_NumSpritesSequences; i++)
+	g_Level.NumSpritesSequences = ReadInt32();
+	for (int i = 0; i < g_Level.NumSpritesSequences; i++)
 	{
 		int spriteID = ReadInt32();
 		short negLength = ReadInt16();
@@ -1300,17 +1254,17 @@ void GetCarriedItems()
 	ITEM_INFO* item, *item2;
 	short linknum;
 
-	for (i = 0; i < NumItems; ++i)
-		Items[i].carriedItem = NO_ITEM;
+	for (i = 0; i < g_Level.NumItems; ++i)
+		g_Level.Items[i].carriedItem = NO_ITEM;
 
-	for (i = 0; i < NumItems; ++i)
+	for (i = 0; i < g_Level.NumItems; ++i)
 	{
-		item = &Items[i];
+		item = &g_Level.Items[i];
 		if (Objects[item->objectNumber].intelligent || item->objectNumber >= ID_SEARCH_OBJECT1 && item->objectNumber <= ID_SEARCH_OBJECT3)
 		{
-			for (linknum = Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+			for (linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 			{
-				item2 = &Items[linknum];
+				item2 = &g_Level.Items[linknum];
 				if (abs(item2->pos.xPos - item->pos.xPos) < 512
 					&& abs(item2->pos.zPos - item->pos.zPos) < 512
 					&& abs(item2->pos.yPos - item->pos.yPos) < 256
@@ -1332,15 +1286,15 @@ void GetAIPickups()
 	ITEM_INFO* item;
 	AIOBJECT* object;
 
-	for (i = 0; i < NumItems; ++i)
+	for (i = 0; i < g_Level.NumItems; ++i)
 	{
-		item = &Items[i];
+		item = &g_Level.Items[i];
 		if (Objects[item->objectNumber].intelligent)
 		{
 			item->aiBits = 0;
-			for (num = 0; num < AIObjects.size(); ++num)
+			for (num = 0; num < g_Level.AIObjects.size(); ++num)
 			{
-				object = &AIObjects[num];
+				object = &g_Level.AIObjects[num];
 				if (abs(object->x - item->pos.xPos) < 512
 					&& abs(object->z - item->pos.zPos) < 512
 					&& object->roomNumber == item->roomNumber
