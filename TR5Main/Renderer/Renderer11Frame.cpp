@@ -15,7 +15,7 @@ namespace T5M::Renderer
 	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
-		for (int i = 0; i < Rooms.size(); i++)
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
 			m_rooms[i].Visited = false;
 		}
@@ -37,13 +37,13 @@ namespace T5M::Renderer
 		ROOM_INFO *r = room.Room;
 
 		short itemNum = NO_ITEM;
-		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
+		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].nextItem)
 		{
-			//printf("ItemNum: %d, NextItem: %d\n", itemNum, Items[itemNum].nextItem);
+			//printf("ItemNum: %d, NextItem: %d\n", itemNum, g_Level.Items[itemNum].nextItem);
 
-			ITEM_INFO *item = &Items[itemNum];
+			ITEM_INFO *item = &g_Level.Items[itemNum];
 
-			if (item->objectNumber == ID_LARA && itemNum == Items[itemNum].nextItem)
+			if (item->objectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].nextItem)
 				break;
 
 			if (item->objectNumber == ID_LARA)
@@ -336,7 +336,7 @@ namespace T5M::Renderer
 			return;
 		}
 		RendererRoom &const room = m_rooms[roomNumber];
-		ROOM_INFO *r = &Rooms[roomNumber];
+		ROOM_INFO *r = &g_Level.Rooms[roomNumber];
 
 		int numLights = room.Lights.size();
 

@@ -39,10 +39,10 @@ void InitialiseSpearGuardian(short itemNum)
 
 	ClearItem(itemNum);
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 48;
 
-	anim = &Anims[item->animNumber];
+	anim = &g_Level.Anims[item->animNumber];
 
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
@@ -62,7 +62,7 @@ void SpearGuardianControl(short itemNum)
 	int random, lara_alive;
 	AI_INFO info;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	xian = (CREATURE_INFO*)item->data;
 	head = neck = angle = tilt = 0;
 	lara_alive = (LaraItem->hitPoints > 0);

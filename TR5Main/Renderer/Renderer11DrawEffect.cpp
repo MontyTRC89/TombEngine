@@ -263,7 +263,7 @@ namespace T5M::Renderer {
 						pos.y = spark->y;
 						pos.z = spark->z;
 					} else {
-						ITEM_INFO* item = &Items[spark->fxObj];
+						ITEM_INFO* item = &g_Level.Items[spark->fxObj];
 
 						if (spark->flags & SP_NODEATTACH) {
 							if (NodeOffsets[spark->nodeNumber].gotIt) {
@@ -667,7 +667,7 @@ namespace T5M::Renderer {
 
 	void Renderer11::drawFootprints() {
 		const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
-		if (Sprites.size() > spriteIndex) {
+		if (g_Level.Sprites.size() > spriteIndex) {
 			for (auto i = footprints.begin(); i != footprints.end(); i++) {
 				FOOTPRINT_STRUCT& footprint = *i;
 				if (footprint.active) {
@@ -994,7 +994,7 @@ namespace T5M::Renderer {
 						for (int p = 0; p < bucket->Polygons.size(); p++) {
 							RendererPolygon* poly = &bucket->Polygons[p];
 
-							OBJECT_TEXTURE* texture = &ObjectTextures[poly->TextureId];
+							OBJECT_TEXTURE* texture = &g_Level.ObjectTextures[poly->TextureId];
 							int tile = texture->tileAndFlag & 0x7FFF;
 
 							if (poly->Shape == SHAPE_RECTANGLE) {

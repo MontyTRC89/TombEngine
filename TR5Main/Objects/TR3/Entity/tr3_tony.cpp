@@ -91,7 +91,7 @@ static void TriggerTonyFlame(short itemNum, int hand)
 	SPARKS* sptr;
 	int dx, dz;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	dx = LaraItem->pos.xPos - item->pos.xPos;
 	dz = LaraItem->pos.zPos - item->pos.zPos;
 	if (dx < -MAX_TONY_TRIGGER_RANGE || dx > MAX_TONY_TRIGGER_RANGE || dz < -MAX_TONY_TRIGGER_RANGE || dz > MAX_TONY_TRIGGER_RANGE)
@@ -414,7 +414,7 @@ void ControlTonyFireBall(short fxNumber)
 		return;
 	}
 
-	if (Rooms[room_number].flags & LW_UNDERWATER)
+	if (g_Level.Rooms[room_number].flags & LW_UNDERWATER)
 	{
 		KillEffect(fxNumber);
 		return;
@@ -448,7 +448,7 @@ void ControlTonyFireBall(short fxNumber)
 static void TonyBossDie(short itemNum)
 {
 	ITEM_INFO* item;
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	item->collidable = false;
 	item->hitPoints = -16384;
 	
@@ -461,7 +461,7 @@ static void TonyBossDie(short itemNum)
 void InitialiseTony(short itemNum)
 {
 	ITEM_INFO* item;
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	item->itemFlags[3] = 0;
 	BossData.ExplodeCount = 0;
 	BossData.RingCount = 0;
@@ -517,7 +517,7 @@ void TonyControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	tonyboss = (CREATURE_INFO*)item->data;
 	head = torso_y = torso_x = angle = tilt = 0;
 
@@ -526,11 +526,11 @@ void TonyControl(short itemNum)
 		if (item->currentAnimState != 6)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 6;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 6;
 		}
 
-		if ((item->frameNumber - Anims[item->animNumber].frameBase) > 110)
+		if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) > 110)
 		{
 			item->meshBits = 0;
 			if (!BossData.DroppedIcon)
@@ -585,7 +585,7 @@ void TonyControl(short itemNum)
 				break;
 
 			case TONYBOSS_RISE:		// Rising.
-				if ((item->frameNumber - Anims[item->animNumber].frameBase) > 16)
+				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) > 16)
 					tonyboss->maximumTurn = TONYBOSS_TURN;
 				else
 					tonyboss->maximumTurn = 0;
@@ -629,7 +629,7 @@ void TonyControl(short itemNum)
 				torso_x = info.xAngle;
 				tonyboss->maximumTurn = 0;
 
-				if (item->frameNumber - Anims[item->animNumber].frameBase == 40)
+				if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 40)
 				{
 					TriggerFireBall(item, T_ROCKZAPPL, NULL, item->roomNumber, 0, 0);
 					TriggerFireBall(item, T_ROCKZAPPR, NULL, item->roomNumber, 0, 0);
@@ -641,13 +641,13 @@ void TonyControl(short itemNum)
 				torso_x = info.xAngle;
 				tonyboss->maximumTurn = TONYBOSS_TURN >> 1;
 
-				if ((item->frameNumber - Anims[item->animNumber].frameBase) == 28)
+				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 28)
 					TriggerFireBall(item, T_ZAPP, NULL, item->roomNumber, item->pos.yRot, 0);
 				break;
 
 			case TONYBOSS_BIGBOOM:	// Changing room.
 				tonyboss->maximumTurn = 0;
-				if ((item->frameNumber - Anims[item->animNumber].frameBase) == 56)
+				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 56)
 				{
 					item->itemFlags[3] = 2;
 					BossData.DrawExplode = true; // EXPLOOOOOOOOOOSION (if you have the ref (O.~))
@@ -664,10 +664,10 @@ void TonyControl(short itemNum)
 		byte r, g, b;
 		int bright;
 
-		bright = item->frameNumber - Anims[item->animNumber].frameBase;
+		bright = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 		if (bright > 16)
 		{
-			bright = Anims[item->animNumber].frameEnd - item->frameNumber;
+			bright = g_Level.Anims[item->animNumber].frameEnd - item->frameNumber;
 			if (bright > 16)
 				bright = 16;
 		}

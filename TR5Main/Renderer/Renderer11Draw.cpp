@@ -60,7 +60,7 @@ namespace T5M::Renderer
 
         if (obj->animIndex != -1)
         {
-            updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
+            updateAnimation(NULL, moveableObj, &g_Level.Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
         }
 
         Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
@@ -592,7 +592,7 @@ namespace T5M::Renderer
                 else
                 {
                     if (obj->animIndex != -1)
-                        updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
+                        updateAnimation(NULL, moveableObj, &g_Level.Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
                 }
 
                 for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
@@ -1579,7 +1579,7 @@ namespace T5M::Renderer
                 // Check if in inside room
                 short roomNumber = Camera.pos.roomNumber;
                 FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-                ROOM_INFO *room = &Rooms[roomNumber];
+                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
                 if (!(room->flags & ENV_FLAG_OUTSIDE))
                     continue;
 
@@ -1610,7 +1610,7 @@ namespace T5M::Renderer
 
             short roomNumber = Camera.pos.roomNumber;
             FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-            ROOM_INFO *room = &Rooms[roomNumber];
+            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
             if (snow->Y >= room->y + room->minfloor)
                 snow->Reset = true;
         }
@@ -1646,7 +1646,7 @@ namespace T5M::Renderer
                 // Check if in inside room
                 short roomNumber = Camera.pos.roomNumber;
                 FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-                ROOM_INFO *room = &Rooms[roomNumber];
+                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
                 if (!(room->flags & ENV_FLAG_OUTSIDE))
                 {
                     drop->Reset = true;
@@ -1679,7 +1679,7 @@ namespace T5M::Renderer
             // If rain drop has hit the ground, then reset it and add a little drip
             short roomNumber = Camera.pos.roomNumber;
             FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-            ROOM_INFO *room = &Rooms[roomNumber];
+            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
             if (drop->Y >= room->y + room->minfloor)
             {
                 drop->Reset = true;
@@ -1957,7 +1957,7 @@ namespace T5M::Renderer
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
-        cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+        cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawHorizonAndSky(depthTarget);
@@ -2050,7 +2050,7 @@ namespace T5M::Renderer
 
             m_currentY = 60;
 #ifdef _DEBUG
-            ROOM_INFO *r = &Rooms[LaraItem->roomNumber];
+            ROOM_INFO *r = &g_Level.Rooms[LaraItem->roomNumber];
 
             printDebugMessage("Update time: %d", m_timeUpdate);
             printDebugMessage("Frame time: %d", m_timeFrame);
@@ -2110,7 +2110,7 @@ namespace T5M::Renderer
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
-        cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+        cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawHorizonAndSky(depthTarget);

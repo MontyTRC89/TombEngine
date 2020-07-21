@@ -29,12 +29,12 @@ BITE_INFO PierreGun2 = { -57, 200, 0, 14 };
 
 void InitialiseLarson(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	ClearItem(itemNum);
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = STATE_TR5_LARSON_STOP;
 	item->currentAnimState = STATE_TR5_LARSON_STOP;
 
@@ -73,7 +73,7 @@ void LarsonControl(short itemNumber)
 	short joint2 = 0;
 	short joint1 = 0;
 	
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
 	// In Streets of Rome when Larson HP are below 40 he runs way
@@ -338,7 +338,7 @@ void LarsonControl(short itemNumber)
 			{
 				item->pos.yRot += info.angle;
 			}
-			if (item->frameNumber == Anims[item->animNumber].frameBase)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 			{
 				if (item->objectNumber == ID_PIERRE)
 				{
@@ -364,11 +364,11 @@ void LarsonControl(short itemNumber)
 	{
 		// When Larson dies, it activates trigger at start position
 		if (item->objectNumber == ID_LARSON 
-			&& item->frameNumber == Anims[item->animNumber].frameEnd)
+			&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
 			short roomNumber= item->itemFlags[2] & 0xFF;
 			short floorHeight = item->itemFlags[2] & 0xFF00;
-			ROOM_INFO* r = &Rooms[roomNumber];
+			ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 			
 			int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
 			int y = r->minfloor + floorHeight;
@@ -389,7 +389,7 @@ void LarsonControl(short itemNumber)
 		else
 			item->animNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
 		item->currentAnimState = STATE_TR5_LARSON_DIE;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 
 	CreatureTilt(item, tilt);

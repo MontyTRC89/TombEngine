@@ -29,7 +29,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num,short roomNumber
 	short yRot = 0;
 	Vector3 pos;
 	if (mesh) {
-		meshPtr = &Meshes[StaticObjects[mesh->staticNumber].meshNumber];
+		meshPtr = &g_Level.Meshes[StaticObjects[mesh->staticNumber].meshNumber];
 		yRot = mesh->yRot;
 		pos = Vector3(mesh->x, mesh->y, mesh->z);
 	}

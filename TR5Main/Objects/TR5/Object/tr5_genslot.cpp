@@ -12,11 +12,11 @@
 
 void GenSlot1Control(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item) && !item->triggerFlags)
 	{
-		int df = item->frameNumber - Anims[item->animNumber].frameBase;
+		int df = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 		if (df == 10 || df == 11)
 		{
@@ -76,17 +76,17 @@ void GenSlot1Control(short itemNumber)
 
 void InitialiseGenSlot3(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (CurrentLevel != 7)
 		item->meshBits = item->triggerFlags;
 }
 
 void InitialiseGenSlot4(short itemNumber)
 {
-	/*ITEM_INFO* item = &Items[itemNumber];
+	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	HIWORD(v1) = HIWORD(items);
-	item = &items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	LOWORD(v1) = item->pos.yRot;
 	v3 = item->pos.xPos;
 	v4 = 2 * ((v1 >> 3) & 0x1FFE);

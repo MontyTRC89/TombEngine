@@ -81,7 +81,7 @@ namespace T5M::Renderer
 	void Renderer11::updateAnimatedTextures()
 	{
 		// Update room's animated textures
-		for (int i = 0; i < Rooms.size(); i++)
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
 			if (m_rooms.size() <= i)
 				continue;
@@ -249,7 +249,7 @@ namespace T5M::Renderer
 	{
 		RendererItem *itemToDraw = &m_items[itemNumber];
 		itemToDraw->Id = itemNumber;
-		itemToDraw->Item = &Items[itemNumber];
+		itemToDraw->Item = &g_Level.Items[itemNumber];
 
 		ITEM_INFO *item = itemToDraw->Item;
 		CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
@@ -653,7 +653,7 @@ namespace T5M::Renderer
 			if (m_rooms[node->To].Visited)
 				continue;
 
-			ROOM_INFO *room = &Rooms[node->To];
+			ROOM_INFO *room = &g_Level.Rooms[node->To];
 
 			Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f,
 										 (room->minfloor + room->maxceiling) / 2.0f,
@@ -663,7 +663,7 @@ namespace T5M::Renderer
 			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
 			m_rooms[node->To].Visited = true;
 			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
-			Rooms[node->To].boundActive = true;
+			g_Level.Rooms[node->To].boundActive = true;
 
 			collectLightsForRoom(node->To, renderView);
 			collectItems(node->To, renderView);
@@ -691,7 +691,7 @@ namespace T5M::Renderer
 
 	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR *portal, Vector4 *viewPort, Vector4 *clipPort, const Matrix &viewProjection)
 	{
-		ROOM_INFO *room = &Rooms[roomIndex];
+		ROOM_INFO *room = &g_Level.Rooms[roomIndex];
 
 		Vector3 n = portal->normal;
 		Vector3 v = Vector3(
@@ -803,8 +803,8 @@ namespace T5M::Renderer
 		temporary = m_rooms[roomNumber1];
 		m_rooms[roomNumber1] = m_rooms[roomNumber2];
 		m_rooms[roomNumber2] = temporary;
-		m_rooms[roomNumber1].Room = &Rooms[roomNumber1];
-		m_rooms[roomNumber2].Room = &Rooms[roomNumber2];
+		m_rooms[roomNumber1].Room = &g_Level.Rooms[roomNumber1];
+		m_rooms[roomNumber2].Room = &g_Level.Rooms[roomNumber2];
 	}
 
 	RendererMesh *Renderer11::getMesh(int meshIndex)
@@ -823,7 +823,7 @@ namespace T5M::Renderer
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
-		rendererItem->Item = &Items[itemNumber];
+		rendererItem->Item = &g_Level.Items[itemNumber];
 		ITEM_INFO *item = rendererItem->Item;
 
 		if (!item)
@@ -845,7 +845,7 @@ namespace T5M::Renderer
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
-		rendererItem->Item = &Items[itemNumber];
+		rendererItem->Item = &g_Level.Items[itemNumber];
 		ITEM_INFO *item = rendererItem->Item;
 
 		if (!item)

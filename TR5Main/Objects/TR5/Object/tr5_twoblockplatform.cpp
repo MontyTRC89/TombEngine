@@ -8,7 +8,7 @@
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->itemFlags[0] = item->pos.yPos;
 	item->itemFlags[1] = 1;
@@ -52,7 +52,7 @@ void TwoBlocksPlatformFloor(ITEM_INFO* item, int x, int y, int z, int* height)
 
 void TwoBlocksPlatformControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{

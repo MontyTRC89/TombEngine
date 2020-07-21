@@ -17,7 +17,7 @@ void InitialiseSwordGuardian(short itemNum)
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 
 	ClearItem(itemNum);
 
@@ -48,7 +48,7 @@ void SwordGuardianControl(short itemNum)
 	short angle, head, torso;
 	bool lara_alive;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	sword = (CREATURE_INFO*)item->data;
 	angle = head = torso = 0;
 	lara_alive = (LaraItem->hitPoints > 0);

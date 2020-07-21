@@ -127,7 +127,7 @@ static void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 
 void InitialiseVentilator(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->itemFlags[0] = item->triggerFlags << WALL_SHIFT;
 	if (item->itemFlags[0] < 2048)
@@ -136,7 +136,7 @@ void InitialiseVentilator(short itemNumber)
 
 void VentilatorControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	AnimateItem(item);
 
@@ -154,7 +154,7 @@ void VentilatorControl(short itemNumber)
 		if (item->currentAnimState == 1)
 		{
 			//result = 5 * item->animNumber;
-			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 				return;
 		}
 		else
@@ -166,7 +166,7 @@ void VentilatorControl(short itemNumber)
 	int speed = 0;
 	if (item->currentAnimState == 1)
 	{
-		speed = Anims[item->animNumber].frameEnd - item->frameNumber;
+		speed = g_Level.Anims[item->animNumber].frameEnd - item->frameNumber;
 	}
 	else
 	{

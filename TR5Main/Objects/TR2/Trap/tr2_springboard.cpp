@@ -6,7 +6,7 @@
 
 void SpringBoardControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->currentAnimState == 0 && LaraItem->pos.yPos == item->pos.yPos &&
 		(LaraItem->pos.xPos >> WALL_SHIFT) == (item->pos.xPos >> WALL_SHIFT) &&
@@ -21,7 +21,7 @@ void SpringBoardControl(short itemNumber)
 		LaraItem->fallspeed = -240;
 		LaraItem->gravityStatus = true;
 		LaraItem->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = STATE_LARA_JUMP_FORWARD;
 		LaraItem->goalAnimState = STATE_LARA_JUMP_FORWARD;
 

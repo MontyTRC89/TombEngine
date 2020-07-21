@@ -52,9 +52,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_TIGER];
@@ -71,7 +71,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_COBRA];
@@ -90,8 +90,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_RAPTOR];
@@ -109,10 +109,10 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 23 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 25 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 20 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 21 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 23 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 25 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_AX];
@@ -130,8 +130,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
 
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_DARTS];
@@ -149,8 +149,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
 
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_TYRANNOSAUR];
@@ -168,8 +168,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 11 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_SCUBA_DIVER];
@@ -189,8 +189,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->pivotLength = 50;
 		obj->zoneType = ZONE_WATER;
 
-		Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 14 * 4] |= ROT_Z;
 	}
 
 	obj = &Objects[ID_SCUBA_HARPOON];
@@ -216,9 +216,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
 
-		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 0 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_MONKEY];
@@ -240,9 +240,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
 
-		Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 0 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 0 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_MP_WITH_GUN];
@@ -261,9 +261,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->pivotLength = 0;
 		obj->biteOffset = 0;
 
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_MP_WITH_STICK];
@@ -283,9 +283,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->pivotLength = 0;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_SHIVA];
@@ -304,8 +304,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 25 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 25 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_SOPHIA_LEE_BOSS];
@@ -324,9 +324,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_CIVVIE];
@@ -344,9 +344,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->pivotLength = 0;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 }
 

@@ -476,8 +476,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_ANIMATING14];
@@ -489,8 +489,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_ANIMATING15];
@@ -502,8 +502,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_ANIMATING16];
@@ -515,8 +515,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_TIGHT_ROPE];
@@ -829,7 +829,7 @@ void InitialiseObjects()
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
-		obj->frameBase += (short)Frames.data();
+		obj->frameBase += (short)g_Level.Frames.data();
 	}
 
 	InitialiseTR1Objects(); // Standard TR1 objects

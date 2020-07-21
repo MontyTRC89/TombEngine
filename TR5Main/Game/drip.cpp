@@ -23,7 +23,7 @@ namespace T5M {
 					if (d.age > d.life)
 						d.active = false;
 					d.velocity.y += d.gravity;
-					if (Rooms[d.room].flags & ENV_FLAG_WIND) {
+					if (g_Level.Rooms[d.room].flags & ENV_FLAG_WIND) {
 						d.velocity.x = SmokeWindX / 2;
 						d.velocity.z = SmokeWindZ / 2;
 					}

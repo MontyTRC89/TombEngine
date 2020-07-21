@@ -84,12 +84,24 @@ typedef struct OBJECT_Bones
 	}
 };
 
-typedef struct BOX_NODE
+struct BOX_NODE
 {
 	int exitBox;
 	int searchNumber;
 	int nextExpansion;
 	int boxNumber;
+};
+
+struct AI_INFO
+{
+	int zoneNumber;
+	int enemyZone;
+	int distance;
+	int ahead;
+	int bite;
+	short angle;
+	short xAngle;
+	short enemyFacing;
 };
 
 struct BOX_INFO
@@ -109,19 +121,7 @@ struct OVERLAP
 	int flags;
 };
 
-typedef struct AI_INFO
-{
-	int zoneNumber;
-	int enemyZone;
-	int distance;
-	int ahead;
-	int bite;
-	short angle;
-	short xAngle;
-	short enemyFacing;
-};
-
-typedef struct BITE_INFO
+struct BITE_INFO
 {
 	int	x;
 	int	y;
@@ -145,7 +145,7 @@ typedef struct BITE_INFO
 	}
 };
 
-typedef struct LOT_INFO
+struct LOT_INFO
 {
 	std::vector<BOX_NODE> node;
 	int head;
@@ -167,7 +167,7 @@ typedef struct LOT_INFO
 	ZoneType zone;
 };
 
-typedef struct CREATURE_INFO
+struct CREATURE_INFO
 {
 	short jointRotation[4];
 	short maximumTurn;
@@ -274,10 +274,6 @@ constexpr auto CLIP_BOTTOM = 0x8;
 constexpr auto SECONDARY_CLIP = 0x10;
 constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 constexpr auto SLOPE_DIF = 60;
-
-extern std::vector<BOX_INFO> Boxes;
-extern std::vector<OVERLAP> Overlaps;
-extern std::vector<int> Zones[ZONE_MAX][2];
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);
 void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent);

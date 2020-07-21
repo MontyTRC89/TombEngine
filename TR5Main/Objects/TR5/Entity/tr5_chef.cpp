@@ -26,14 +26,14 @@ BITE_INFO ChefBite = { 0, 200, 0 ,13 };
 
 void InitialiseChef(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->goalAnimState = STATE_CHEF_COOKING;
 	item->currentAnimState = STATE_CHEF_COOKING;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->pos.xPos += 192 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
 	item->pos.zPos += 192 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 }
@@ -48,7 +48,7 @@ void ControlChef(short itemNumber)
 	short joint2 = 0;
 	short angle = 0;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	if (item->hitPoints <= 0)
@@ -58,7 +58,7 @@ void ControlChef(short itemNumber)
 			item->hitPoints = 0;
 			item->currentAnimState = STATE_CHEF_DEATH;
 			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_CHEF_DEATH;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 	}
 	else
@@ -129,7 +129,7 @@ void ControlChef(short itemNumber)
 				item->pos.yRot -= ANGLE(2);
 			else
 				item->pos.yRot += ANGLE(2);
-			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 				item->pos.yRot += -ANGLE(180);
 			break;
 
@@ -151,7 +151,7 @@ void ControlChef(short itemNumber)
 			{
 				if (item->touchBits & 0x2000)
 				{
-					if (item->frameNumber > Anims[item->animNumber].frameBase + 10)
+					if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 10)
 					{
 						LaraItem->hitPoints -= 80;
 						LaraItem->hitStatus = true;

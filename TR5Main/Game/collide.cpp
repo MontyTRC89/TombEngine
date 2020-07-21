@@ -60,7 +60,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 
 	for (int i = 0; i < numRooms; i++)
 	{
-		room = &Rooms[roomList[i]];
+		room = &g_Level.Rooms[roomList[i]];
 		for (int j = room->mesh.size(); j > 0; j--, mesh++)
 		{
 			mesh = &room->mesh[j];
@@ -135,7 +135,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 	{
 		for (int i = 0; i < numRooms; i++)
 		{
-			room = &Rooms[roomsArray[i]];
+			room = &g_Level.Rooms[roomsArray[i]];
 
 			for (int j = 0; j < room->mesh.size(); j++)
 			{
@@ -178,14 +178,14 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 	{
 		for (int i = 0; i < numRooms; i++)
 		{
-			ROOM_INFO* room = &Rooms[roomsArray[i]];
+			ROOM_INFO* room = &g_Level.Rooms[roomsArray[i]];
 
 			int itemNumber = room->itemNumber;
 			if (itemNumber != NO_ITEM)
 			{
 				do
 				{
-					ITEM_INFO* item = &Items[itemNumber];
+					ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 					if (item == collidingItem || !ignoreLara && item == LaraItem)
 					{
@@ -259,7 +259,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 		collidedItems[numItems] = NULL;
 	}
 
-	return (numItems | numMeshes);
+	return (numItems || numMeshes);
 }
 
 int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
@@ -292,7 +292,7 @@ int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* c
 
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->status == ITEM_ACTIVE)
 	{
@@ -374,7 +374,7 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 	{
 		if (CheckNoColFloorTriangle(floor, x, z) == TRUE)
 			break;
-		r = &Rooms[floor->pitRoom];
+		r = &g_Level.Rooms[floor->pitRoom];
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
@@ -384,7 +384,7 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 	if (!floor->index)
 		return FLOOR_TYPE;
 
-	data = &FloorData[floor->index];
+	data = &g_Level.FloorData[floor->index];
 	func = *data & DATA_TYPE;
 	
 	if (func == TILT_TYPE)
@@ -674,14 +674,14 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (item->objectNumber == ID_SHOOT_SWITCH1 && !(item->meshBits & 1))
 		item->status = ITEM_INVISIBLE;
 }
 
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TestBoundsCollide(item, l, c->radius))
 	{
@@ -981,7 +981,7 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	int c, s;
 	int x, z, rx, rz;
 	short* frame;
@@ -1386,24 +1386,23 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 
 	if (l->hitPoints > 0)
 	{
-		// Crash when using GetRoomList() with vector there but work without :x
-		vector<short> roomsList;
 		short* door, numDoors;
+		short roomsToCheck[128];
+		short numRoomsToCheck = 0;
+		roomsToCheck[numRoomsToCheck++] = l->roomNumber;
 
-		roomsList.push_back(l->roomNumber);
-
-		ROOM_INFO room = Rooms[l->roomNumber];
-		for (int i = 0; i < room.doors.size(); i++)
+		ROOM_INFO* room = &g_Level.Rooms[l->roomNumber];
+		for (int i = 0; i < room->doors.size(); i++)
 		{
-			roomsList.push_back(room.doors[i].room);
+			roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
 		}
 
-		for (int i = 0; i < roomsList.size(); i++)
+		for (int i = 0; i < numRoomsToCheck; i++)
 		{
-			short itemNumber = Rooms[roomsList[i]].itemNumber;
+			short itemNumber = g_Level.Rooms[roomsToCheck[i]].itemNumber;
 			while (itemNumber != NO_ITEM)
 			{
-				item = &Items[itemNumber];
+				item = &g_Level.Items[itemNumber];
 				if (item->collidable && item->status != ITEM_INVISIBLE)		 
 				{
 					obj = &Objects[item->objectNumber];
@@ -1422,9 +1421,9 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 
 			if (coll->enableSpaz)
 			{
-				for (int j = 0; j < Rooms[roomsList[i]].mesh.size(); j++)
+				for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
 				{
-					MESH_INFO* mesh = &Rooms[roomsList[i]].mesh[j];
+					MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
 
 					if (mesh->flags & 1)
 					{
@@ -1457,7 +1456,7 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->status != ITEM_INVISIBLE)
 	{
