@@ -51,13 +51,13 @@ static void DemigodThrowEnergyAttack(PHD_3DPOS* pos, short roomNumber, int flags
 
 static void DemigodEnergyAttack(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	short animIndex = item->animNumber - Objects[item->objectNumber].animIndex;
 
 	if (animIndex == 8)
 	{
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			PHD_VECTOR pos1;
 			PHD_VECTOR pos2;
@@ -103,7 +103,7 @@ static void DemigodEnergyAttack(short itemNumber)
 		if (animIndex != 19)
 			return;
 
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			PHD_VECTOR pos1;
 			PHD_VECTOR pos2;
@@ -145,7 +145,7 @@ static void DemigodEnergyAttack(short itemNumber)
 	}
 
 	// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
-	int frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 	if (frameNumber >= 8 && frameNumber <= 64)
 	{
@@ -225,7 +225,7 @@ static void DemigodHammerAttack(int x, int y, int z, int something)
 					spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
 				}
 			}
-			else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
+			else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 			{
 				spark->flags = 256;
 			}
@@ -246,25 +246,25 @@ static void DemigodHammerAttack(int x, int y, int z, int something)
 
 void InitialiseDemigod(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->goalAnimState = 0;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = 0;
 
-	/*if (NumItems > 0)
+	/*if (g_Level.NumItems > 0)
 	{
-		ITEM_INFO* currentItem = &Items[0];
+		ITEM_INFO* currentItem = &g_Level.Items[0];
 		int k = 0;
 
 		while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])
 		{
 			k++;
 			currentItem++;
-			if (k >= NumItems)
+			if (k >= g_Level.NumItems)
 				return;
 		}
 
@@ -277,9 +277,9 @@ void DemigodControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	int someitemNumber = item->itemFlags[0];
-	if (someitemNumber && Items[someitemNumber].status == ITEM_ACTIVE && Items[someitemNumber].active)
+	if (someitemNumber && g_Level.Items[someitemNumber].status == ITEM_ACTIVE && g_Level.Items[someitemNumber].active)
 	{
 		item->hitPoints = Objects[item->objectNumber].hitPoints;
 		return;
@@ -303,13 +303,13 @@ void DemigodControl(short itemNumber)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 27;
 				item->currentAnimState = 15;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 			else
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 12;
 				item->currentAnimState = 8;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
 	}
@@ -660,7 +660,7 @@ void DemigodControl(short itemNumber)
 
 		case 14:
 			// Hammer attack
-			if (item->frameNumber - Anims[item->animNumber].frameBase == 26)
+			if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 26)
 			{
 				PHD_VECTOR pos;
 
@@ -696,7 +696,7 @@ void DemigodControl(short itemNumber)
 					LaraItem->goalAnimState = 3;
 					LaraItem->currentAnimState = 3;
 					LaraItem->animNumber = 34;
-					LaraItem->frameNumber = Anims[item->animNumber].frameBase;
+					LaraItem->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					LaraItem->hitStatus = true;
 					LaraItem->speed = 2;
 					LaraItem->fallspeed = 1;

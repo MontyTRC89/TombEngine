@@ -153,7 +153,7 @@ void DoFlameTorch() // (F) (D)
 	if (Lara.flareControlLeft)
 		Lara.gunStatus = LG_READY;
 
-	Lara.leftArm.frameBase = Anims[Lara.leftArm.animNumber].framePtr;
+	Lara.leftArm.frameBase = g_Level.Anims[Lara.leftArm.animNumber].framePtr;
 
 	if (Lara.litTorch)
 	{
@@ -168,7 +168,7 @@ void DoFlameTorch() // (F) (D)
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 		
 		if (!(Wibble & 7))
-			TriggerTorchFlame(LaraItem - Items.data(), 0);
+			TriggerTorchFlame(LaraItem - g_Level.Items.data(), 0);
 		
 		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
 
@@ -188,7 +188,7 @@ void GetFlameTorch() // (F) (D)
 	Lara.gunStatus = LG_READY;
 	Lara.leftArm.lock = false;
 	Lara.leftArm.frameNumber = 0;
-	Lara.leftArm.frameBase = Anims[Lara.leftArm.animNumber].framePtr;
+	Lara.leftArm.frameBase = g_Level.Anims[Lara.leftArm.animNumber].framePtr;
 	
 	//LARA_MESHES(ID_LARA_TORCH_ANIM, LM_LHAND);
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
@@ -196,7 +196,7 @@ void GetFlameTorch() // (F) (D)
 
 void TorchControl(short itemNumber) // (F) (D)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
@@ -216,7 +216,7 @@ void TorchControl(short itemNumber) // (F) (D)
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
 
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		item->fallspeed += (5 - item->fallspeed) / 2;
 		item->speed += (5 - item->speed) / 2;
@@ -237,7 +237,7 @@ void TorchControl(short itemNumber) // (F) (D)
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)
-				ObjectCollision(CollidedItems[0] - Items.data(), item, &lara_coll);
+				ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &lara_coll);
 		}
 		else
 		{
@@ -263,7 +263,7 @@ void TorchControl(short itemNumber) // (F) (D)
 
 void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (Lara.gunType != WEAPON_TORCH
 		|| Lara.gunStatus != LG_READY
@@ -325,7 +325,7 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				l->animNumber = (dy >> 8) + ANIMATION_LARA_TORCH_LIGHT_1;
 			}
 			l->currentAnimState = STATE_LARA_MISC_CONTROL;
-			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
 			Lara.generalPtr = (void*)itemNumber;
@@ -337,7 +337,7 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (l->animNumber >= ANIMATION_LARA_TORCH_LIGHT_1 && l->animNumber <= ANIMATION_LARA_TORCH_LIGHT_5)
 		{
-			if (l->frameNumber - Anims[l->animNumber].frameBase == 40)
+			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{
 				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
 				item->flags |= 0x3E00;

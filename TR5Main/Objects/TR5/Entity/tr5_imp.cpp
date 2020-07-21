@@ -30,7 +30,7 @@ void InitialiseImp(short itemNum)
     ITEM_INFO* item;
     short stateid;
 
-    item = &Items[itemNum];
+    item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
 
     if (item->triggerFlags == 2 || item->triggerFlags == 12)
@@ -50,7 +50,7 @@ void InitialiseImp(short itemNum)
     }
     item->goalAnimState = stateid;
     item->currentAnimState = stateid;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
 static void ImpThrowStones(ITEM_INFO* item)
@@ -117,7 +117,7 @@ void ImpControl(short itemNumber)
 		short joint3 = 0;
 		short angle2 = 0;
 
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 		if (item->hitPoints > 0)
@@ -261,7 +261,7 @@ void ImpControl(short itemNumber)
 
 			case STATE_IMP_THROW_STONES:
 				creature->maximumTurn = -1;
-				if (item->frameNumber - Anims[item->animNumber].frameBase == 40)
+				if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 40)
 					ImpThrowStones(item);
 				break;
 
@@ -277,7 +277,7 @@ void ImpControl(short itemNumber)
 			{
 				item->animNumber = Objects[ID_IMP].animIndex + ANIMATION_IMP_DEATH;
 				item->currentAnimState = STATE_IMP_DEATH;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
 

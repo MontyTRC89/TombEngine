@@ -10,7 +10,7 @@
 
 void InitialiseRaisingCog(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	short itemNos[32];
 	int numSwitchItems = GetSwitchTrigger(item, itemNos, 1);
@@ -19,7 +19,7 @@ void InitialiseRaisingCog(short itemNumber)
 	{
 		for (int i = 0; i < numSwitchItems; i++)
 		{
-			ITEM_INFO* currentItem = &Items[itemNos[i]];
+			ITEM_INFO* currentItem = &g_Level.Items[itemNos[i]];
 
 			if (currentItem->objectNumber == ID_TRIGGER_TRIGGERER)
 			{
@@ -37,7 +37,7 @@ void InitialiseRaisingCog(short itemNumber)
 
 void RaisingCogControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -61,7 +61,7 @@ void RaisingCogControl(short itemNumber)
 					{
 						for (int i = 0; i < numItems; i++)
 						{
-							ITEM_INFO* currentItem = &Items[itemNos[i]];
+							ITEM_INFO* currentItem = &g_Level.Items[itemNos[i]];
 
 							if (item->objectNumber == ID_PULLEY)
 							{

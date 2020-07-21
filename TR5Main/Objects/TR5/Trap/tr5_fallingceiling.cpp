@@ -6,7 +6,7 @@
 
 void FallingCeilingControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->currentAnimState)
 	{

@@ -6,18 +6,18 @@
 
 void InitialiseSethBlade(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 1;
 	item->goalAnimState = 2;
 	item->currentAnimState = 2;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->itemFlags[2] = abs(item->triggerFlags);
 }
 
 void SethBladeControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	item->itemFlags[0] = 0;
 	if (TriggerActive(item))
@@ -43,9 +43,9 @@ void SethBladeControl(short itemNum)
 		}
 		else
 		{
-			short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+			short frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
-			if (item->frameNumber != Anims[item->animNumber].frameBase && frameNumber <= 6)
+			if (item->frameNumber != g_Level.Anims[item->animNumber].frameBase && frameNumber <= 6)
 			{
 				item->itemFlags[0] = -1;
 				item->itemFlags[3] = 1000;

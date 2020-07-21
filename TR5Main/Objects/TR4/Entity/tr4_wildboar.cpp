@@ -12,12 +12,12 @@ BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 
 void InitialiseWildBoar(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_WILD_BOAR].animIndex + 6;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 }
@@ -27,7 +27,7 @@ void WildBoarControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short angle = 0;
 	short head = 0;
@@ -61,7 +61,7 @@ void WildBoarControl(short itemNumber)
 				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 					continue;
 
-				ITEM_INFO* target = &Items[baddie->itemNum];
+				ITEM_INFO* target = &g_Level.Items[baddie->itemNum];
 				if (target->objectNumber != ID_WILD_BOAR)
 				{
 					int dx2 = target->pos.xPos - item->pos.xPos;
@@ -163,7 +163,7 @@ void WildBoarControl(short itemNumber)
 		{
 			item->animNumber = Objects[ID_WILD_BOAR].animIndex + 5;
 			item->currentAnimState = 5;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 	}
 

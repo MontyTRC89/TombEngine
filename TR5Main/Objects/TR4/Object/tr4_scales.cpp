@@ -19,9 +19,9 @@ static short ScalesBounds[12] =
 
 void ScalesControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (item->frameNumber != Anims[item->animNumber].frameEnd)
+	if (item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
 	{
 		AnimateItem(item);
 		return;
@@ -46,12 +46,12 @@ void ScalesControl(short itemNum)
 
 			if (sw > 0)
 			{
-				while (Items[itemNos[sw]].objectNumber == ID_FLAME_EMITTER2)
+				while (g_Level.Items[itemNos[sw]].objectNumber == ID_FLAME_EMITTER2)
 				{
 					if (--sw <= 0)
 						break;
 				}
-				Items[itemNos[sw]].flags = 1024;
+				g_Level.Items[itemNos[sw]].flags = 1024;
 			}
 
 			item->goalAnimState = 1;
@@ -84,7 +84,7 @@ void ScalesControl(short itemNum)
 
 void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (TestBoundsCollide(item, l, LARA_RAD))
 	{
@@ -122,15 +122,15 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (TestLaraPosition(ScalesBounds, item, l))
 			{
 				l->animNumber = ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE;
-				l->frameNumber = Anims[item->animNumber].frameBase;
+				l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->pos.yRot = rotY;
 			}
-			else if (l->frameNumber == Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 51)
+			else if (l->frameNumber == g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 51)
 			{
 				SoundEffect(SFX_TR4_POUR, &l->pos, 0);
 				item->pos.yRot = rotY;
 			}
-			else if (l->frameNumber == Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 74)
+			else if (l->frameNumber == g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 74)
 			{
 				AddActiveItem(itemNum);
 				item->status = ITEM_ACTIVE;
@@ -157,10 +157,10 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 	
-	if (l->frameNumber >= Anims[ANIMATION_LARA_WATERSKIN_EMPTY].frameBase + 44 &&
-		l->frameNumber <= Anims[ANIMATION_LARA_WATERSKIN_EMPTY].frameBase + 72 ||
-		l->frameNumber >= Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 51 &&
-		l->frameNumber <= Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 74)
+	if (l->frameNumber >= g_Level.Anims[ANIMATION_LARA_WATERSKIN_EMPTY].frameBase + 44 &&
+		l->frameNumber <= g_Level.Anims[ANIMATION_LARA_WATERSKIN_EMPTY].frameBase + 72 ||
+		l->frameNumber >= g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 51 &&
+		l->frameNumber <= g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 74)
 	{
 		PHD_VECTOR pos;
 		pos.x = 0;

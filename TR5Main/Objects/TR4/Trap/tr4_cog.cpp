@@ -7,7 +7,7 @@
 
 void CogControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (TriggerActive(item))
 	{
@@ -21,7 +21,7 @@ void CogControl(short itemNum)
 			GetJointAbsPosition(item, &pos, 0);
 			SoundEffect(65, (PHD_3DPOS*)&pos, 0);
 
-			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 				item->flags &= 0xC1;
 		}
 	}

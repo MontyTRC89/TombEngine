@@ -117,7 +117,7 @@ static void SubmarineAttack(ITEM_INFO* item)
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		ITEM_INFO* torpedoItem = &Items[itemNumber];
+		ITEM_INFO* torpedoItem = &g_Level.Items[itemNumber];
 
 		SoundEffect(SFX_UNDERWATER_TORPEDO, &torpedoItem->pos, 2);
 
@@ -166,10 +166,10 @@ void InitialiseSubmarine(short itemNum)
 {
     ITEM_INFO* item;
 
-    item = &Items[itemNum];
+    item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = 0;
     item->currentAnimState = 0;
     if (!item->triggerFlags)
@@ -181,7 +181,7 @@ void SubmarineControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	if (item->aiBits)
@@ -395,7 +395,7 @@ void SubmarineControl(short itemNumber)
 
 void ChaffFlareControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	if (item->fallspeed)
 	{
@@ -409,7 +409,7 @@ void ChaffFlareControl(short itemNumber)
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;
 	
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		item->fallspeed += (5 - item->fallspeed) >> 1;
 		item->speed += (5 - item->speed) >> 1;
@@ -459,7 +459,7 @@ void ChaffFlareControl(short itemNumber)
 
 void TorpedoControl(short itemNumber)
 {
-	ITEM_INFO*  item = &Items[itemNumber];
+	ITEM_INFO*  item = &g_Level.Items[itemNumber];
 
 	SoundEffect(SFX_SWIMSUIT_METAL_CLASH, &item->pos, 2);
 
@@ -468,9 +468,9 @@ void TorpedoControl(short itemNumber)
 	if (item->itemFlags[0] == NO_ITEM)
 	{
 		bool found = false;
-		for (int i = NumItems; i < 256; i++)
+		for (int i = g_Level.NumItems; i < 256; i++)
 		{
-			ITEM_INFO* searchItem = &Items[i];
+			ITEM_INFO* searchItem = &g_Level.Items[i];
 
 			if (searchItem->objectNumber == ID_CHAFF && searchItem->active)
 			{
@@ -492,7 +492,7 @@ void TorpedoControl(short itemNumber)
 	}
 	else
 	{
-		ITEM_INFO* chaffItem = &Items[item->itemFlags[0]];
+		ITEM_INFO* chaffItem = &g_Level.Items[item->itemFlags[0]];
 
 		if (chaffItem->active && chaffItem->objectNumber == ID_CHAFF)
 		{
@@ -580,7 +580,7 @@ void TorpedoControl(short itemNumber)
 	int floorHeight = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	int ceilingHeight = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-	if (item->pos.yPos < floorHeight && item->pos.yPos > ceilingHeight && Rooms[roomNumber].flags & ENV_FLAG_WATER)
+	if (item->pos.yPos < floorHeight && item->pos.yPos > ceilingHeight && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
 		if (ItemNearLara(&item->pos, 200))
 		{

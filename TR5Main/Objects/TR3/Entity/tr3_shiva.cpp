@@ -130,10 +130,10 @@ void InitialiseShiva(short itemNum)
 
 	ClearItem(itemNum);
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 14;
 
-	anim = &Anims[item->animNumber];
+	anim = &g_Level.Anims[item->animNumber];
 
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
@@ -156,7 +156,7 @@ void ShivaControl(short itemNum)
 	FLOOR_INFO* floor;
 	int effect_mesh = 0;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	shiva = (CREATURE_INFO*)item->data;
 	head_x = head_y = torso_x = torso_y = angle = tilt = 0;
 	lara_alive = (LaraItem->hitPoints > 0);
@@ -169,7 +169,7 @@ void ShivaControl(short itemNum)
 		if (item->currentAnimState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 22;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 9;
 		}
 	}
@@ -244,7 +244,7 @@ void ShivaControl(short itemNum)
 				z = item->pos.zPos + (WALL_SIZE * phd_cos(item->pos.yRot + 0x8000) >> W2V_SHIFT);
 				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
-				if (!shiva->flags && floor->box != NO_BOX && !(Boxes[floor->box].flags & BLOCKABLE))
+				if (!shiva->flags && floor->box != NO_BOX && !(g_Level.Boxes[floor->box].flags & BLOCKABLE))
 					item->goalAnimState = 8;
 				else
 					item->goalAnimState = 2;
@@ -284,7 +284,7 @@ void ShivaControl(short itemNum)
 			if (item->hitStatus || shiva->mood == ESCAPE_MOOD)
 				shiva->flags = 4;
 
-			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == Anims[item->animNumber].frameBase && !shiva->flags) || !info.ahead)
+			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags) || !info.ahead)
 			{
 				item->goalAnimState = 0;
 				shiva->flags = 0;
@@ -294,7 +294,7 @@ void ShivaControl(short itemNum)
 				item->goalAnimState = 2;
 			}
 
-			if (item->frameNumber == Anims[item->animNumber].frameBase && shiva->flags > 1)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && shiva->flags > 1)
 				shiva->flags -= 2;
 			break;
 
@@ -333,7 +333,7 @@ void ShivaControl(short itemNum)
 			if (item->hitStatus)
 				shiva->flags = 4;
 
-			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 5 / 4)) || (item->frameNumber == Anims[item->animNumber].frameBase && !shiva->flags))
+			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 5 / 4)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags))
 			{
 				item->goalAnimState = 1;
 				shiva->flags = 0;
@@ -343,7 +343,7 @@ void ShivaControl(short itemNum)
 				item->goalAnimState = 3;
 			}
 
-			if (item->frameNumber == Anims[item->animNumber].frameBase)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 			{
 				shiva->flags = 0;
 			}
@@ -354,7 +354,7 @@ void ShivaControl(short itemNum)
 				head_y = info.angle;
 
 			shiva->maximumTurn = ANGLE(4);
-			if ((info.ahead && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == Anims[item->animNumber].frameBase && !shiva->flags))
+			if ((info.ahead && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags))
 			{
 				item->goalAnimState = 0;
 			}
@@ -392,7 +392,7 @@ void ShivaControl(short itemNum)
 
 		case 6:
 			torso_y = torso_x = head_x = head_y = shiva->maximumTurn = 0;
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 10 || item->frameNumber == Anims[item->animNumber].frameBase + 21 || item->frameNumber == Anims[item->animNumber].frameBase + 33)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 10 || item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 21 || item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 33)
 			{
 				CreatureEffect(item, &shivaRightBite, DoBloodSplat);
 				CreatureEffect(item, &shivaLeftBite, DoBloodSplat);

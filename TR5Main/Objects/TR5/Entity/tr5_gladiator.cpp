@@ -18,10 +18,10 @@ void InitialiseGladiator(short itemNum)
 {
     ITEM_INFO* item;
 
-    item = &Items[itemNum];
+    item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = 1;
     item->currentAnimState = 1;
     if (item->triggerFlags == 1)
@@ -44,7 +44,7 @@ void ControlGladiator(short itemNumber)
 		FLOOR_INFO* floor;
 		int i;
 
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 		if (item->hitPoints <= 0)
@@ -54,7 +54,7 @@ void ControlGladiator(short itemNumber)
 			{
 				item->animNumber = Objects[ID_GLADIATOR].animIndex + 16;
 				item->currentAnimState = 6;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
 		else
@@ -306,9 +306,9 @@ void ControlGladiator(short itemNumber)
 					item->pos.yRot += info.angle;
 				}
 
-				if (item->frameNumber > Anims[item->animNumber].frameBase + 10)
+				if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 10)
 				{
-					r = &Rooms[item->roomNumber];
+					r = &g_Level.Rooms[item->roomNumber];
 					pos.x = 0;
 					pos.y = 0;
 					pos.z = 0;

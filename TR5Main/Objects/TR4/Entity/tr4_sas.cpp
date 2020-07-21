@@ -69,12 +69,12 @@ BITE_INFO sasGun = { 0, 300, 64, 7 };
 
 void InitialiseSas(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_STAND;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = STATE_SAS_STOP;
 	item->currentAnimState = STATE_SAS_STOP;
 }
@@ -84,7 +84,7 @@ void SasControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
 
@@ -448,7 +448,7 @@ void SasControl(short itemNumber)
 				}
 			}
 
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 20)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 20)
 			{
 				if (!creature->enemy->speed)
 				{
@@ -507,7 +507,7 @@ void SasControl(short itemNumber)
 		{
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_BLIND;
-			item->frameNumber = Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
 			item->currentAnimState = STATE_SAS_BLIND;
 		}
 
@@ -515,7 +515,7 @@ void SasControl(short itemNumber)
 	else if (item->currentAnimState != STATE_SAS_DEATH)
 	{
 		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_DEATH;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->currentAnimState = STATE_SAS_DEATH;
 	}
 
