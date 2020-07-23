@@ -372,6 +372,11 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 
 	Camera.targetElevation = -ANGLE(20);
 
+	if (item->animNumber == ANIMATION_LARA_LADDER_DISMOUNT_LEFT_BEGIN)
+		Camera.targetAngle = -ANGLE(60.0f);
+	if (item->animNumber == ANIMATION_LARA_LADDER_DISMOUNT_RIGHT_BEGIN)
+		Camera.targetAngle = ANGLE(60.0f);
+
 	if (TrInput & IN_LOOK)
 	{
 		LookUpDown();
@@ -396,6 +401,28 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 			Lara.moveAngle = item->pos.yRot - ANGLE(180);
 		}
 	}
+}
+
+void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->enableBaddiePush = false;
+	coll->enableSpaz = false;
+
+	Camera.targetAngle = -ANGLE(60.0f);
+	Camera.targetElevation = -ANGLE(15.0f);
+
+	item->pos.yRot -= ANGLE(90.0f);
+}
+
+void lara_as_stepoff_right(ITEM_INFO* item, COLL_INFO* coll)
+{
+	coll->enableBaddiePush = false;
+	coll->enableSpaz = false;
+
+	Camera.targetAngle = ANGLE(60.0f);
+	Camera.targetElevation = -ANGLE(15.0f);
+
+	item->pos.yRot += ANGLE(90.0f);
 }
 
 int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift) // (F) (D)
@@ -481,10 +508,37 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 	item->currentAnimState = STATE_LARA_LADDER_IDLE;
 
 	if (coll->oldAnimState != STATE_LARA_LADDER_IDLE)
-	{
+	{	
 		item->animNumber = ANIMATION_LARA_LADDER_IDLE;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		short troomnumber = item->roomNumber;
+		int dx = int(sin(TO_RAD(item->pos.yRot - ANGLE(90.0f))) * 10);
+		int dz = int(cos(TO_RAD(item->pos.yRot - ANGLE(90.0f))) * 10);
+		int height = GetFloorHeight(GetFloor(item->pos.xPos + dx, item->pos.yPos, item->pos.zPos + dz, &troomnumber),
+			item->pos.xPos, item->pos.yPos, item->pos.zPos) - item->pos.yPos;
+		if (height < 3 * STEP_SIZE / 2) // LADDER dismounts (left/right)
+		{
+			item->goalAnimState = STATE_LARA_LADDER_DISMOUNT_TURN_LEFT;
+			item->currentAnimState = STATE_LARA_MISC_CONTROL;
+		}
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		short troomnumber = item->roomNumber;
+		int dx = int(sin(TO_RAD(item->pos.yRot + ANGLE(90.0f))) * 10);
+		int dz = int(cos(TO_RAD(item->pos.yRot + ANGLE(90.0f))) * 10);
+		int height = GetFloorHeight(GetFloor(item->pos.xPos + dx, item->pos.yPos, item->pos.zPos + dz, &troomnumber),
+			item->pos.xPos, item->pos.yPos, item->pos.zPos) - item->pos.yPos;
+		if (height < 3 * STEP_SIZE / 2) // LADDER dismounts (left/right)
+		{
+			item->goalAnimState = STATE_LARA_LADDER_DISMOUNT_TURN_RIGHT;
+			item->currentAnimState = STATE_LARA_MISC_CONTROL;
+		}
 	}
 
 	if (TrInput & IN_LEFT)
