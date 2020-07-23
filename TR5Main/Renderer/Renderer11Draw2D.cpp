@@ -84,7 +84,7 @@ namespace T5M::Renderer {
 		m_context->IASetVertexBuffers(0, 1, bar->vertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
+		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
 		m_context->VSSetShader(m_vsHUD, NULL, 0);
 		m_context->PSSetShaderResources(0, 1, m_HUDBarBorderTexture.ShaderResourceView.GetAddressOf());
 		ID3D11SamplerState* sampler = m_states->LinearClamp();
@@ -102,9 +102,9 @@ namespace T5M::Renderer {
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_stHUDBar.Percent = percent;
-		updateConstantBuffer<CHUDBarBuffer>(m_cbHUDBar, m_stHUDBar);
-		m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
-		m_context->PSSetConstantBuffers(0, 1, &m_cbHUDBar);
+		m_cbHUDBar.updateData(m_stHUDBar, m_context);
+		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
+		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
 		m_context->VSSetShader(m_vsHUD, NULL, 0);
 		m_context->PSSetShader(m_psHUDBarColor, NULL, 0);
 		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
