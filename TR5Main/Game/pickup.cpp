@@ -1296,7 +1296,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         Lara.torsoYrot = 0;
         Lara.torsoXrot = 0;
         l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-        Lara.isMoving = true;
+        Lara.isMoving = false;
         Lara.gunStatus = LG_HANDS_BUSY;
     }
 

@@ -66,7 +66,9 @@ namespace T5M::Renderer
         Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
         // Clear just the Z-buffer so we can start drawing on top of the scene
-        m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		ID3D11DepthStencilView* dsv;
+		m_context->OMGetRenderTargets(1, NULL, &dsv);
+        m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
         // Set vertex buffer
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -2295,24 +2297,28 @@ namespace T5M::Renderer
             RendererRoom &const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
 
             RendererObject &staticObj = *m_staticObjects[msh->staticNumber];
-            RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
-            m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
-            m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
-            updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
-            m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
+			if (staticObj.ObjectMeshes.size() > 0)
+			{
+				RendererMesh* mesh = staticObj.ObjectMeshes[0];
 
-            for (int j = firstBucket; j < lastBucket; j++)
-            {
-                RendererBucket *bucket = &mesh->Buckets[j];
+				m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
+				m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
+				updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
+				m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
+				for (int j = firstBucket; j < lastBucket; j++)
+				{
+					RendererBucket* bucket = &mesh->Buckets[j];
 
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
-            }
+					if (bucket->Vertices.size() == 0)
+						continue;
+
+					// Draw vertices
+					m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+					m_numDrawCalls++;
+				}
+			}
         }
 
         return true;
