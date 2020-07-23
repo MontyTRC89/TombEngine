@@ -41,7 +41,7 @@ function<EffectFunction> effect_routines[59] =
 	SoundFlipEffect,
 	ExplosionFX,
 	lara_hands_free,
-	void_effect,
+	puzzle,
 	void_effect,
 	void_effect,
 	shoot_right_gun,
@@ -102,6 +102,11 @@ void TL_1(ITEM_INFO* item)
 void pickup(ITEM_INFO* item)
 {
 	do_pickup();
+}
+
+void puzzle(ITEM_INFO* item)
+{
+	do_puzzle();
 }
 
 // TODO: here are sound for lara footstep too !
