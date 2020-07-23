@@ -1250,6 +1250,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
         if (l->currentAnimState == STATE_LARA_CROUCH_IDLE)
         {
+			if (item->objectNumber == ID_BURNING_TORCH_ITEM)
+				break;
             AlignLaraPosition(&PickUpPosition, item, l);
             if (item->objectNumber == ID_FLARE_ITEM)
             {
@@ -1265,9 +1267,11 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         {
             if (l->currentAnimState == STATE_LARA_CRAWL_IDLE)
             {
+				if (item->objectNumber == ID_BURNING_TORCH_ITEM)
+					break;
                 l->goalAnimState = STATE_LARA_CROUCH_IDLE;
                 Lara.generalPtr = (void*)itemNum;
-                break;;
+                break;
             }
             if (!MoveLaraPosition(&PickUpPosition, item, l))
             {
