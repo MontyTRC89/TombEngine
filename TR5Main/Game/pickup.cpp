@@ -98,7 +98,7 @@ static short MSBounds[12] = // offset 0xA1488
 
 int NumRPickups;
 short RPickups[16];
-short pickupitem;
+short pickupitem, puzzleItem;
 PHD_VECTOR OldPickupPos;
 extern int KeyTriggerActive;
 extern Inventory g_Inventory;
@@ -445,6 +445,45 @@ int KeyTrigger(short itemNum)
     return oldkey;
 }
 
+void do_puzzle()
+{
+	puzzleItem = (short)Lara.generalPtr;
+	ITEM_INFO* item = &g_Level.Items[puzzleItem];
+	int flag = 0;
+	//idk
+	if (item->triggerFlags >= 0)
+	{
+		if (item->triggerFlags <= 1024)
+		{
+			if (item->triggerFlags && item->triggerFlags != 999 && item->triggerFlags != 998)
+				flag = 3;
+		}
+		else
+			flag = 2;
+	}
+	else
+		flag = 1;
+
+	if (LaraItem->currentAnimState == STATE_LARA_INSERT_PUZZLE)
+	{
+		if (item->itemFlags[0])
+		{
+			if (flag == 3)
+				LaraItem->itemFlags[0] = item->triggerFlags;
+			else
+			{
+				LaraItem->itemFlags[0] = 0;
+				PuzzleDone(item, puzzleItem);
+				item->itemFlags[0] = 0;
+			}
+		}
+		if (LaraItem->animNumber == ANIMATION_LARA_PUT_TRIDENT)
+		{
+			PuzzleDone(item, puzzleItem);
+		}
+	}
+}
+
 void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
     ITEM_INFO* item = &g_Level.Items[itemNum];
@@ -472,7 +511,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     {
         if (!Lara.isMoving && (short)Lara.generalPtr == itemNum || (short)Lara.generalPtr != itemNum)
         {
-            if ((short)Lara.generalPtr == itemNum && l->currentAnimState == STATE_LARA_INSERT_PUZZLE)
+/*          if ((short)Lara.generalPtr == itemNum && l->currentAnimState == STATE_LARA_INSERT_PUZZLE)
             {
                 if (l->frameNumber == g_Level.Anims[ANIMATION_LARA_USE_PUZZLE].frameBase + 80 && item->itemFlags[0])
                 {
@@ -484,7 +523,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                     item->itemFlags[0] = 0;
                     return;
                 }
-            }
+            }*/
 
             if ((short)Lara.generalPtr == itemNum)
             {
@@ -494,14 +533,14 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                         ObjectCollision(itemNum, l, coll);
                     return;
                 }
-                if (l->animNumber == ANIMATION_LARA_PUT_TRIDENT)
+/*              if (l->animNumber == ANIMATION_LARA_PUT_TRIDENT)
                 {
                     if (l->frameNumber == g_Level.Anims[l->animNumber].frameBase + 180)
                     {
                         PuzzleDone(item, itemNum);
                         return;
                     }
-                }
+                }*/
             }
             if (l->currentAnimState == STATE_LARA_MISC_CONTROL)
                 return;
@@ -529,20 +568,8 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
         item->pos.yRot = l->pos.yRot;
 
-        /*v13 = word_509C0E;
-        v12 = word_509C0C;
-        v11 = word_509C06;
-        v10 = word_509C04;*/
     }
 
-    /*if (v20 == 7 && gfCurrentLevel >= 0xBu && gfCurrentLevel <= 0xCu)
-    {
-        word_509C0C = v12 - 512;
-        word_509C04 = v10 - 512;
-        word_509C06 = v11 + 512;
-        word_509C0E = v13 + 512;
-        v19 = 0;
-    }*/
 
     if (TestLaraPosition(PuzzleBounds, item, l))
     {
@@ -550,26 +577,6 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         pos.x = 0;
         pos.y = 0;
         pos.z = 0;
-        
-        /*if (item->objectNumber == ID_PUZZLE_HOLE8 && gfCurrentLevel >= 0xBu && gfCurrentLevel <= 0xCu)
-        {
-            pos.z = coll->midType - 100;
-            if (MoveLaraPosition(&pos, item, l))
-            {
-                Lara.isMoving = false;
-                l->animNumber = ANIMATION_LARA_STAY_IDLE;
-                l->currentAnimState = STATE_LARA_STOP;
-                l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-                //GLOBAL_invkeypadcombination = item->triggerFlags;
-                //GLOBAL_enterinventory = -559038737;
-            }
-            else
-            {
-                Lara.generalPtr = (void*)itemNum;
-                InventoryItemChosen = NO_ITEM
-            }
-            return;
-        }*/
 
         if (!Lara.isMoving)
         {
