@@ -161,7 +161,12 @@ enum LARA_STATE
 	STATE_LARA_HANG_FEET_OUTCORNERR = 144,
 	STATE_LARA_HANG_FEET_OUTCORNERL = 145,
 	STATE_LARA_COGWHEEL_UNGRAB = 146,
-
+	STATE_LARA_STEPUP = 147,
+	STATE_LARA_STEPDOWN = 148,
+	STATE_LARA_BACK_STEPDOWN = 149,
+	STATE_LARA_LADDER_DISMOUNT_TURN_LEFT = 150,
+	STATE_LARA_LADDER_DISMOUNT_TURN_RIGHT = 151,
+	
 	NUM_LARA_STATES
 };
 
@@ -645,7 +650,7 @@ enum LARA_ANIM
 	ANIMATION_LARA_2CLICK_CRAWL_VAULT = 475,					// 2 click crawlspace vault
 	ANIMATION_LARA_3CLICK_CRAWL_VAULT = 476,					// 3 click crawlspace vault
 	ANIMATION_LARA_1CLICK_CRAWL_EXIT = 477,						// 1 click crawlspace exit
-	ANIMATION_LARA_2_3CLICK_CRAWL_EXIT = 478,						// 2 click crawlspace exit
+	ANIMATION_LARA_2_3CLICK_CRAWL_EXIT = 478,					// 2 click crawlspace exit
 	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL_UP = 479,				// maneuver up 1 click in crawlspace
 	ANIMATION_LARA_1CLICK_CRAWL_TO_CRAWL_DOWN = 480,			// maneuver down 1 click in crawlspace
 	ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK = 481,			// climb out of water to 2click crawlspace
@@ -663,6 +668,12 @@ enum LARA_ANIM
 	ANIMATION_LARA_HANG_FEET_OUT_LCORNER = 493,					// hang feet shimmy around outer left corner
 	ANIMATION_LARA_HANG_FEET_HANDSTAND = 494,					// reserving for later
 	ANIMATION_LARA_HANG_THIN_LEDGE = 495,						// TR1/2 hang on flat/1 click edges. in TR3+ it was replaced with monkeybar anim which is long and annoying, and some builders might want to customize.
+	ANIMATION_LARA_SWANDIVE_ROLL_TO_RUN = 496,					// transition from swandive roll to running
+	ANIMATION_LARA_LADDER_DISMOUNT_LEFT_BEGIN = 497,			// Dismount off ladder to the left, first part > ANIMATION_LARA_LADDER_DISMOUNT_LEFT_END
+	ANIMATION_LARA_LADDER_DISMOUNT_LEFT_END = 498,				// Dismount off ladder to the left, second part (from ANIMATION_LARA_LADDER_DISMOUNT_LEFT_BEGIN)
+	ANIMATION_LARA_LADDER_DISMOUNT_RIGHT_BEGIN = 499,			// Dismount off ladder to the right, first part > ANIMATION_LARA_LADDER_DISMOUNT_RIGHT_END
+	ANIMATION_LARA_LADDER_DISMOUNT_RIGHT_END = 500,				// Dismount off ladder to the right, second part (from ANIMATION_LARA_LADDER_DISMOUNT_RIGHT_BEGIN)
+	ANIMATION_LARA_WATER_TO_LADDER = 501,						// Move from water (surface) onto ladder in front
 
 	NUM_LARA_ANIMS
 };
