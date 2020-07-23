@@ -24,6 +24,7 @@
 struct CAMERA_INFO;
 
 #include <level.h>
+#include "ConstantBuffer/ConstantBuffer.h"
 
 namespace T5M::Renderer
 {
@@ -410,25 +411,25 @@ namespace T5M::Renderer
 	
 		// Constant buffers
 		RenderView gameCamera;
-		ID3D11Buffer* m_cbCameraMatrices;
+		ConstantBuffer<CCameraMatrixBuffer> m_cbCameraMatrices;
 		CItemBuffer m_stItem;
-		ID3D11Buffer* m_cbItem;
+		ConstantBuffer<CItemBuffer> m_cbItem;
 		CStaticBuffer m_stStatic;
-		ID3D11Buffer* m_cbStatic;
+		ConstantBuffer<CStaticBuffer> m_cbStatic;
 		CLightBuffer m_stLights;
-		ID3D11Buffer* m_cbLights;
+		ConstantBuffer<CLightBuffer> m_cbLights;
 		CMiscBuffer m_stMisc;
-		ID3D11Buffer* m_cbMisc;
+		ConstantBuffer<CMiscBuffer> m_cbMisc;
 		CRoomBuffer m_stRoom;
-		ID3D11Buffer* m_cbRoom;
+		ConstantBuffer<CRoomBuffer> m_cbRoom;
 		CShadowLightBuffer m_stShadowMap;
-		ID3D11Buffer* m_cbShadowMap;
+		ConstantBuffer<CShadowLightBuffer> m_cbShadowMap;
 		CHUDBuffer m_stHUD;
-		ID3D11Buffer* m_cbHUD;
+		ConstantBuffer<CHUDBuffer> m_cbHUD;
 		CHUDBarBuffer m_stHUDBar;
-		ID3D11Buffer* m_cbHUDBar;
+		ConstantBuffer<CHUDBarBuffer> m_cbHUDBar;
 		CSpriteBuffer m_stSprite;
-		ID3D11Buffer* m_cbSprite;
+		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		// Text and sprites
 		SpriteFont* m_gameFont;
 		SpriteBatch* m_spriteBatch;
@@ -533,7 +534,6 @@ namespace T5M::Renderer
 		ID3D11GeometryShader*							compileGeometryShader(const wchar_t * fileName);
 		ID3D11PixelShader*								compilePixelShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
 		ID3D11ComputeShader*							compileComputeShader(const wchar_t * fileName);
-		ID3D11Buffer*									createConstantBuffer(size_t size);
 		int												getAnimatedTextureInfo(short textureId);
 		void											initialiseHairRemaps();
 		RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
@@ -692,6 +692,11 @@ namespace T5M::Renderer
 			m_context->Unmap(buffer, 0);
 
 			return true;
+		}
+
+		template <typename C>
+		ConstantBuffer<C> createConstantBuffer() {
+			return ConstantBuffer<C>(m_device);
 		}
 
 };

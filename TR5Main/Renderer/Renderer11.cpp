@@ -64,17 +64,9 @@ namespace T5M::Renderer {
 		DX11_RELEASE(m_psInventory);
 		DX11_RELEASE(m_vsFullScreenQuad);
 		DX11_RELEASE(m_psFullScreenQuad);
-		DX11_RELEASE(m_cbCameraMatrices);
-		DX11_RELEASE(m_cbItem);
-		DX11_RELEASE(m_cbStatic);
-		DX11_RELEASE(m_cbLights);
-		DX11_RELEASE(m_cbMisc);
-		DX11_RELEASE(m_cbHUD);
-		DX11_RELEASE(m_cbHUDBar);
 		DX11_RELEASE(m_swapChain);
 		DX11_RELEASE(m_context);
 		DX11_RELEASE(m_device);
-		DX11_RELEASE(m_cbSprite);
 	}
 
 	void Renderer11::FreeRendererData() {
@@ -193,23 +185,6 @@ namespace T5M::Renderer {
 	}
 
 
-	ID3D11Buffer* Renderer11::createConstantBuffer(size_t size) {
-		ID3D11Buffer* buffer;
-
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
-
-		desc.ByteWidth = size; // Constant buffer must have a size multiple of 16 bytes
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-		HRESULT res = m_device->CreateBuffer(&desc, NULL, &buffer);
-		if (FAILED(res))
-			return NULL;
-
-		return buffer;
-	}
 
 	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
 		for (int i = 0; i < 6; i++) {
