@@ -181,20 +181,20 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 		return false;
 
 	// Initialise constant buffers
-	m_cbCameraMatrices = createConstantBuffer(sizeof(CCameraMatrixBuffer));
-	m_cbItem = createConstantBuffer(sizeof(CItemBuffer));
-	m_cbStatic = createConstantBuffer(sizeof(CStaticBuffer));
-	m_cbLights = createConstantBuffer(sizeof(CLightBuffer));
-	m_cbMisc = createConstantBuffer(sizeof(CMiscBuffer));
-	m_cbShadowMap = createConstantBuffer(sizeof(CShadowLightBuffer));
-	m_cbRoom = createConstantBuffer(sizeof(CRoomBuffer));
+	m_cbCameraMatrices = createConstantBuffer<CCameraMatrixBuffer>();
+	m_cbItem = createConstantBuffer<CItemBuffer>();
+	m_cbStatic = createConstantBuffer<CStaticBuffer>();
+	m_cbLights = createConstantBuffer<CLightBuffer>();
+	m_cbMisc = createConstantBuffer<CMiscBuffer>();
+	m_cbShadowMap = createConstantBuffer<CShadowLightBuffer>();
+	m_cbRoom = createConstantBuffer<CRoomBuffer>();
 	//Prepare HUD Constant buffer
-	m_cbHUDBar = createConstantBuffer(sizeof(CHUDBarBuffer));
-	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
-	m_cbSprite = createConstantBuffer(sizeof(CSpriteBuffer));
+	m_cbHUDBar = createConstantBuffer<CHUDBarBuffer>();
+	m_cbHUD = createConstantBuffer<CHUDBuffer>();
+	m_cbSprite = createConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
 	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
-	updateConstantBuffer<CHUDBuffer>(m_cbHUD, m_stHUD);
+	m_cbHUD.updateData(m_stHUD, m_context);
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
@@ -417,6 +417,7 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 
 bool Renderer11::Create()
 {
+
 	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_0 };
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT res;
