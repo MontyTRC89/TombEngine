@@ -1924,8 +1924,8 @@ namespace T5M::Renderer
         clearSceneItems();
         collectRooms(view);
         UpdateLaraAnimations(false);
-        updateItemsAnimations();
-        updateEffects();
+        updateItemsAnimations(view);
+        updateEffects(view);
         if (g_Configuration.EnableShadows)
             drawShadowMap();
         m_items[Lara.itemNumber].Item = LaraItem;
