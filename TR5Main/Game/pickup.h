@@ -21,3 +21,4 @@ void InitialiseSearchObject(short itemNumber);
 void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll);
 void SearchObjectControl(short itemNumber);
 void do_pickup();
+void do_puzzle();
