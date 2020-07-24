@@ -148,15 +148,15 @@ namespace T5M::Renderer
 		}*/
 	}
 
-	void Renderer11::updateEffects()
+	void Renderer11::updateEffects(RenderView& view)
 	{
-		for (int i = 0; i < m_effectsToDraw.size(); i++)
+		for (int i = 0; i < view.effectsToDraw.size(); i++)
 		{
 			RendererEffect *fx = m_effectsToDraw[i];
 
 			Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
-			m_effectsToDraw[i]->World = rotation * translation;
+			view.effectsToDraw[i]->World = rotation * translation;
 		}
 	}
 
@@ -310,16 +310,14 @@ namespace T5M::Renderer
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::updateItemsAnimations()
+	void Renderer11::updateItemsAnimations(RenderView& view)
 	{
 		Matrix translation;
 		Matrix rotation;
 
-		int numItems = m_itemsToDraw.size();
-
-		for (int i = 0; i < numItems; i++)
+		for (int i = 0; i < view.itemsToDraw.size(); i++)
 		{
-			RendererItem *itemToDraw = m_itemsToDraw[i];
+			RendererItem *itemToDraw = view.itemsToDraw[i];
 			ITEM_INFO *item = itemToDraw->Item;
 			CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
 
