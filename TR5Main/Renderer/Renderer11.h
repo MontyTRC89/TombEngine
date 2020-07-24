@@ -553,8 +553,8 @@ namespace T5M::Renderer
 		void											prepareLights();
 		void collectEffects(short roomNumber, RenderView& renderView);
 		void											clearSceneItems();
-		void											updateItemsAnimations();
-		void											updateEffects();
+		void											updateItemsAnimations(RenderView& view);
+		void											updateEffects(RenderView& view);
 		int												getFrame(short animation, short frame, short** framePtr, int* rate);
 		bool											drawAmbientCubeMap(short roomNumber);
 		bool											sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
