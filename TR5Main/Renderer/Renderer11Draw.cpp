@@ -20,6 +20,7 @@
 #include "tr5_spider_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "RenderView/RenderView.h"
+#include "hair.h"
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
 extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;
@@ -134,16 +135,16 @@ namespace T5M::Renderer
         return true;
     }
 
-    bool Renderer11::drawShadowMap()
+    bool Renderer11::drawShadowMap(RenderView& renderView)
     {
         m_shadowLight = NULL;
         RendererLight *brightestLight = NULL;
         float brightest = 0.0f;
         Vector3 itemPosition = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 
-        for (int k = 0; k < m_roomsToDraw.size(); k++)
+        for (int k = 0; k < renderView.roomsToDraw.size(); k++)
         {
-            RendererRoom *room = m_roomsToDraw[k];
+            RendererRoom *room = renderView.roomsToDraw[k];
             int numLights = room->Lights.size();
 
             for (int j = 0; j < numLights; j++)
@@ -340,21 +341,36 @@ namespace T5M::Renderer
 
         // Draw items
 
-        // Hairs are pre-transformed
-        Matrix matrices[8] = {Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
-                              Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity};
-        memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
-        m_stItem.World = Matrix::Identity;
-        m_cbItem.updateData(m_stItem, m_context);
+		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
 
-        if (m_moveableObjects[ID_LARA_HAIR].has_value())
-        {
-            m_primitiveBatch->Begin();
-            m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-                                          (const unsigned short *)m_hairIndices.data(), m_numHairIndices,
-                                          m_hairVertices.data(), m_numHairVertices);
-            m_primitiveBatch->End();
-        }
+		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+		m_stItem.World = Matrix::Identity;
+		Matrix matrices[7];
+		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++) {
+			HAIR_STRUCT* hairs = &Hairs[0][i];
+			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.yRot), TO_RAD(hairs->pos.xRot), 0) * Matrix::CreateTranslation(hairs->pos.xPos, hairs->pos.yPos, hairs->pos.zPos);
+			matrices[i + 1] = world;
+		}
+		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
+		m_cbItem.updateData(m_stItem, m_context);
+		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+
+		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++) {
+			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
+
+			for (int j = 0; j < 4; j++) {
+				RendererBucket* bucket = &mesh->Buckets[j];
+
+				if (bucket->Vertices.size() == 0)
+					continue;
+
+				// Draw vertices
+				m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+				m_numDrawCalls++;
+			}
+		}
 
         return true;
     }
@@ -1894,7 +1910,7 @@ namespace T5M::Renderer
         return 0;
     }
 
-    bool Renderer11::drawScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, RenderView &view)
+    bool Renderer11::drawScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
@@ -1925,7 +1941,7 @@ namespace T5M::Renderer
         updateItemsAnimations();
         updateEffects();
         if (g_Configuration.EnableShadows)
-            drawShadowMap();
+            drawShadowMap(view);
         m_items[Lara.itemNumber].Item = LaraItem;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
 
@@ -2342,10 +2358,9 @@ namespace T5M::Renderer
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
         m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
-        ID3D11SamplerState *shadowSampler = m_states->PointClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
         m_context->PSSetShaderResources(1, 1, m_caustics[m_currentCausticsFrame / 2].ShaderResourceView.GetAddressOf());
-        m_context->PSSetSamplers(1, 1, &shadowSampler);
+        m_context->PSSetSamplers(1, 1, &m_shadowSampler);
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
         // Set shadow map data

@@ -71,8 +71,6 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	ID3D10Blob * blob;
 
 	m_vsRooms = compileVertexShader(L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &blob);
-	if (m_vsRooms == NULL)
-		return false;
 
 	// Initialise input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
@@ -87,98 +85,30 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	};
 
 	m_inputLayout = NULL;
-	res = m_device->CreateInputLayout(inputLayout, 7, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout);
-	if (FAILED(res))
-		return false;
-
+	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 7, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
 	m_psRooms = compilePixelShader(L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_0", &blob);
-	if (m_psRooms == NULL)
-		return false;
-
 	m_vsItems = compileVertexShader(L"Shaders\\DX11_Items.fx", "VS", "vs_4_0", &blob);
-	if (m_vsItems == NULL)
-		return false;
-
 	m_psItems = compilePixelShader(L"Shaders\\DX11_Items.fx", "PS", "ps_4_0", &blob);
-	if (m_psItems == NULL)
-		return false;
-
 	m_vsStatics = compileVertexShader(L"Shaders\\DX11_Statics.fx", "VS", "vs_4_0", &blob);
-	if (m_vsStatics == NULL)
-		return false;
-
 	m_psStatics = compilePixelShader(L"Shaders\\DX11_Statics.fx", "PS", "ps_4_0", &blob);
-	if (m_psStatics == NULL)
-		return false;
-
 	m_vsHairs = compileVertexShader(L"Shaders\\DX11_Hairs.fx", "VS", "vs_4_0", &blob);
-	if (m_vsHairs == NULL)
-		return false;
-
 	m_psHairs = compilePixelShader(L"Shaders\\DX11_Hairs.fx", "PS", "ps_4_0", &blob);
-	if (m_psHairs == NULL)
-		return false;
-
 	m_vsSky = compileVertexShader(L"Shaders\\DX11_Sky.fx", "VS", "vs_4_0", &blob);
-	if (m_vsSky == NULL)
-		return false;
-
 	m_psSky = compilePixelShader(L"Shaders\\DX11_Sky.fx", "PS", "ps_4_0", &blob);
-	if (m_psSky == NULL)
-		return false;
-
 	m_vsSprites = compileVertexShader(L"Shaders\\DX11_Sprites.fx", "VS", "vs_4_0", &blob);
-	if (m_vsSprites == NULL)
-		return false;
-
 	m_psSprites = compilePixelShader(L"Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", &blob);
-	if (m_psSprites == NULL)
-		return false;
-
 	m_vsSolid = compileVertexShader(L"Shaders\\DX11_Solid.fx", "VS", "vs_4_0", &blob);
-	if (m_vsSolid == NULL)
-		return false;
-
 	m_psSolid = compilePixelShader(L"Shaders\\DX11_Solid.fx", "PS", "ps_4_0", &blob);
-	if (m_psSolid == NULL)
-		return false;
-
 	m_vsInventory = compileVertexShader(L"Shaders\\DX11_Inventory.fx", "VS", "vs_4_0", &blob);
-	if (m_vsInventory == NULL)
-		return false;
-
 	m_psInventory = compilePixelShader(L"Shaders\\DX11_Inventory.fx", "PS", "ps_4_0", &blob);
-	if (m_psInventory == NULL)
-		return false;
-
 	m_vsFullScreenQuad = compileVertexShader(L"Shaders\\DX11_FullScreenQuad.fx", "VS", "vs_4_0", &blob);
-	if (m_vsFullScreenQuad == NULL)
-		return false;
-
 	m_psFullScreenQuad = compilePixelShader(L"Shaders\\DX11_FullScreenQuad.fx", "PS", "ps_4_0", &blob);
-	if (m_psFullScreenQuad == NULL)
-		return false;
-
 	m_vsShadowMap = compileVertexShader(L"Shaders\\DX11_ShadowMap.fx", "VS", "vs_4_0", &blob);
-	if (m_vsShadowMap == NULL)
-		return false;
-
 	m_psShadowMap = compilePixelShader(L"Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", &blob);
-	if (m_psShadowMap == NULL)
-		return false;
-
 	m_vsHUD = compileVertexShader(L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", &blob);
-	if (m_vsHUD == NULL)
-		return false;
 	m_psHUDColor = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", &blob);
-	if (m_psHUDColor == NULL)
-		return false;
 	m_psHUDTexture = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", &blob);
-	if (m_psHUDTexture == NULL)
-		return false;
 	m_psHUDBarColor = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", &blob);
-	if (m_psHUDBarColor == NULL)
-		return false;
 
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer<CCameraMatrixBuffer>();
@@ -231,7 +161,14 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
 	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	m_device->CreateBlendState(&blendStateDesc, &m_subtractiveBlendState);
+	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, &m_subtractiveBlendState));
+	D3D11_SAMPLER_DESC shadowSamplerDesc = {};
+	shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	shadowSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	shadowSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+	shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	Utils::throwIfFailed(m_device->CreateSamplerState(&shadowSamplerDesc,&m_shadowSampler));
 	initialiseBars();
 	initQuad(m_device);
 	return true;

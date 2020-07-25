@@ -28,6 +28,7 @@ struct CAMERA_INFO;
 
 namespace T5M::Renderer
 {
+	constexpr size_t SHADOW_MAP_SIZE = 512;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 	#define MESH_BITS(x) (1 << x)
 	#define DX11_RELEASE(x) if (x != NULL) x->Release()
@@ -404,6 +405,9 @@ namespace T5M::Renderer
 		ID3D11PixelShader* m_psHUDTexture;
 		ID3D11PixelShader* m_psHUDBarColor;
 	
+
+		ID3D11SamplerState* m_shadowSampler;
+
 		ID3D11ShaderResourceView* m_shadowMapRV;
 		ID3D11Texture2D* m_shadowMapTexture;
 		ID3D11DepthStencilView* m_shadowMapDSV;
@@ -566,7 +570,7 @@ namespace T5M::Renderer
 		bool											drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
 		bool drawStatics(bool transparent, RenderView& view);
 		bool											drawWaterfalls();
-		bool											drawShadowMap();
+		bool											drawShadowMap(RenderView& view);
 		bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
 		bool											drawLara(bool transparent, bool shadowMap);
 		void											printDebugMessage(LPCSTR message, ...);
