@@ -22,17 +22,17 @@ PHD_VECTOR KickDoorPos(0, 0, -917);
 PHD_VECTOR UnderwaterDoorPos(-251, -540, -46);
 PHD_VECTOR CrowbarDoorPos(-412, 0, 256);
 
-static short PushPullKickDoorBounds[12] =
+OBJECT_COLLISION_BOUNDS PushPullKickDoorBounds =
 {
 	0xFE80, 0x0180, 0x0000, 0x0000, 0xFC00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
 
-static short UnderwaterDoorBounds[12] =
+OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
 {
 	0xFF00, 0x0100, 0xFC00, 0x0000, 0xFC00, 0x0000, 0xC720, 0x38E0, 0xC720, 0x38E0, 0xC720, 0x38E0
 };
 
-static short CrowbarDoorBounds[12] =
+OBJECT_COLLISION_BOUNDS CrowbarDoorBounds =
 {
 	0xFE00, 0x0200, 0xFC00, 0x0000, 0x0000, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0, 0xC720, 0x38E0
 };
@@ -112,7 +112,7 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		l->pos.yRot ^= ANGLE(180.0f);
 		
-		if (TestLaraPosition(UnderwaterDoorBounds, item, l))
+		if (TestLaraPosition(&UnderwaterDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&UnderwaterDoorPos, item, l))
 			{
@@ -162,7 +162,7 @@ void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
 		item->pos.yRot ^= ANGLE(180);
-		if (TestLaraPosition(PushPullKickDoorBounds, item, l))
+		if (TestLaraPosition(&PushPullKickDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&DoubleDoorPos, item, l))
 			{
@@ -217,7 +217,7 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			applyRot = true;
 		}
 
-		if (!TestLaraPosition(PushPullKickDoorBounds, item, l))
+		if (!TestLaraPosition(&PushPullKickDoorBounds, item, l))
 		{
 			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 			{
@@ -340,7 +340,7 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum))
 	{
 		item->pos.yRot ^= ANGLE(180);
-		if (TestLaraPosition(CrowbarDoorBounds, item, l))
+		if (TestLaraPosition(&CrowbarDoorBounds, item, l))
 		{
 			if (!Lara.isMoving)
 			{
@@ -425,10 +425,10 @@ void DoorControl(short itemNumber)
 	{
 		if (item->itemFlags[0])
 		{
-			short* bounds = GetBoundsAccurate(item);
+			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 			--item->itemFlags[0];
 			item->pos.yPos -= 12;
-			int y = bounds[2] + item->itemFlags[2] - STEP_SIZE;
+			int y = bounds->Y1 + item->itemFlags[2] - STEP_SIZE;
 			if (item->pos.yPos < y)
 			{
 				item->pos.yPos = y;

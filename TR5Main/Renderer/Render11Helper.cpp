@@ -160,7 +160,7 @@ namespace T5M::Renderer
 		}
 	}
 
-	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, short **frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		RendererBone *Bones[32];
 		int nextBone = 0;
@@ -181,17 +181,18 @@ namespace T5M::Renderer
 
 			if (calculateMatrix)
 			{
-				Vector3 p = Vector3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
+				Vector3 p = Vector3(frmptr[0]->offset.x, frmptr[0]->offset.y, frmptr[0]->offset.z);
 
-				fromTrAngle(&rotation, frmptr[0], bone->Index);
-
+				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
+				//fromTrAngle(&rotation, frmptr[0], bone->Index);
+				
 				if (frac)
 				{
-					Vector3 p2 = Vector3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
+					Vector3 p2 = Vector3(frmptr[1]->offset.x, frmptr[1]->offset.y, frmptr[1]->offset.z);
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
-					Matrix rotation2;
-					fromTrAngle(&rotation2, frmptr[1], bone->Index);
+					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
+					//fromTrAngle(&rotation2, frmptr[1], bone->Index);
 
 					Quaternion q1, q2, q3;
 
@@ -236,7 +237,8 @@ namespace T5M::Renderer
 			}
 		}
 	}
-	int Renderer11::getFrame(short animation, short frame, short **framePtr, int *rate)
+
+	int Renderer11::getFrame(short animation, short frame, ANIM_FRAME** framePtr, int *rate)
 	{
 		ITEM_INFO item;
 		item.animNumber = animation;
@@ -297,7 +299,7 @@ namespace T5M::Renderer
 				}
 			}
 
-			short *framePtr[2];
+			ANIM_FRAME* framePtr[2];
 			int rate;
 			int frac = GetFrame_D2(item, framePtr, &rate);
 

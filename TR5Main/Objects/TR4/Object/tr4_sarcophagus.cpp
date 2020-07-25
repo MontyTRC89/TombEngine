@@ -7,7 +7,7 @@
 #include "pickup.h"
 #include "setup.h"
 
-static short SarcophagusBounds[12] =
+OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {
 	0xFE00, 512, 0xFF9C, 100, 0xFE00, 0,
 	0xF8E4, 1820, 0xEAAC, 5460, 0, 0
@@ -30,7 +30,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		Lara.gunStatus == LG_NO_ARMS ||
 		Lara.isMoving && (short)Lara.generalPtr == itemNum)
 	{
-		if (TestLaraPosition(SarcophagusBounds, item, l))
+		if (TestLaraPosition(&SarcophagusBounds, item, l))
 		{
 			if (MoveLaraPosition(&SarcophagusPosition, item, l))
 			{

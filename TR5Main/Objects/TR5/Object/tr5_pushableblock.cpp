@@ -12,14 +12,14 @@
 #include "input.h"
 #include "sound.h"
 
-short MovingBlockBounds[12] = { 
+OBJECT_COLLISION_BOUNDS MovingBlockBounds = {
 	-300, 300, 0, 0, -692, -512,
 	-ANGLE(10.0f), ANGLE(10.0f),
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
 
-short PushableBlockBounds[12] = {
+OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
 	0x0000, 0x0000, 0xFF00, 0x0000,
 	0x0000, 0x0000, 0xF8E4, 0x071C,
 	0xEAAC, 0x1554, 0xF8E4, 0x071C
@@ -363,22 +363,22 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
 		if (roomNumber == item->roomNumber)
 		{
-			short* bounds = GetBoundsAccurate(item);
+			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
-			PushableBlockBounds[0] = (bounds[0] >> 1) - 100;
-			PushableBlockBounds[1] = (bounds[1] >> 1) + 100;
-			PushableBlockBounds[4] = bounds[4] - 200;
-			PushableBlockBounds[5] = 0;
+			PushableBlockBounds.boundingBox.X1 = (bounds->X1 / 2) - 100;
+			PushableBlockBounds.boundingBox.X2 = (bounds->X2 / 2) + 100;
+			PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
+			PushableBlockBounds.boundingBox.Z2 = 0;
 			
 			short rot = item->pos.yRot;
 			item->pos.yRot = (l->pos.yRot + ANGLE(45)) & 0xC000;
 			
-			if (TestLaraPosition(PushableBlockBounds, item, l))
+			if (TestLaraPosition(&PushableBlockBounds, item, l))
 			{
 				if (((item->pos.yRot / 0x4000) + ((rot + 0x2000) / 0x4000)) & 1)
-					PushableBlockPos.z = bounds[0] - 35;
+					PushableBlockPos.z = bounds->X1 - 35;
 				else
-					PushableBlockPos.z = bounds[4] - 35;
+					PushableBlockPos.z = bounds->Z1 - 35;
 
 				if (MoveLaraPosition(&PushableBlockPos, item, l))
 				{
@@ -442,7 +442,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 			item->pos.yRot = -ANGLE(90);
 			break;
 		}
-		if (!TestLaraPosition(MovingBlockBounds, item, l))
+		if (!TestLaraPosition(&MovingBlockBounds, item, l))
 			return;
 
 		short roomNumber = l->roomNumber;
@@ -482,7 +482,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 	{
 		if (l->frameNumber != g_Level.Anims[ANIMATION_LARA_START_OBJECT_MOVING].frameBase + 19)
 			return;
-		if (!TestLaraPosition(MovingBlockBounds, item, l))
+		if (!TestLaraPosition(&MovingBlockBounds, item, l))
 			return;
 		if (TrInput & IN_FORWARD)
 		{

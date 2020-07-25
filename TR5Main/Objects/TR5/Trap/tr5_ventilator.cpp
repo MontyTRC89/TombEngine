@@ -8,37 +8,37 @@
 #include "camera.h"
 #include "effect2.h"
 
-static void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
+static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
 {
 	int x, y, z;
 
 	if (abs(intensity) == 1)
 	{
-		x = (bounds[0] + bounds[1]) >> 1;
+		x = (bounds->X1 + bounds->X2) / 2;
 		if (intensity >= 0)
-			y = bounds[3];
+			y = bounds->Y2;
 		else
-			y = bounds[2];
-		z = (bounds[4] + bounds[5]) >> 1;
+			y = bounds->Y1;
+		z = (bounds->Z1 + bounds->Z2) / 2;
 	}
 	else
 	{
-		y = (bounds[2] + bounds[3]) >> 1;
+		y = (bounds->Y1 + bounds->Y2) / 2;
 		if (rot & 0x7FFF)
 		{
 			if (intensity >= 0)
-				z = bounds[5];
+				z = bounds->Z2;
 			else
-				z = bounds[4];
-			x = (bounds[0] + bounds[1]) >> 1;
+				z = bounds->Z1;
+			x = (bounds->X1 + bounds->X2) / 2;
 		}
 		else
 		{
 			if (intensity >= 0)
-				x = bounds[1];
+				x = bounds->X2;
 			else
-				x = bounds[0];
-			z = (bounds[4] + bounds[5]) >> 1;
+				x = bounds->X1;
+			z = (bounds->Z1 + bounds->Z2) / 2;
 		}
 	}
 
@@ -63,16 +63,16 @@ static void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 
 				if (abs(intensity) == 1)
 				{
-					int factor = 3 * (bounds[1] - bounds[0]) >> 3;
+					int factor = 3 * (bounds->X2 - bounds->X1) >> 3;
 					short angle = 2 * GetRandomControl();
 
-					spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT);
-					spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
+					spark->x = ((bounds->X1 + bounds->X2) / 2) + ((GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT);
+					spark->z = ((bounds->Z1 + bounds->Z2) / 2) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
 
 					if (intensity >= 0)
-						spark->y = bounds[3];
+						spark->y = bounds->Y2;
 					else
-						spark->y = bounds[2];
+						spark->y = bounds->Y1;
 
 					spark->zVel = 0;
 					spark->xVel = 0;
@@ -80,19 +80,19 @@ static void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 				}
 				else
 				{
-					int factor = 3 * (bounds[3] - bounds[2]) >> 3;
+					int factor = 3 * (bounds->Y2 - bounds->Y1) >> 3;
 					short angle = 2 * GetRandomControl();
 
-					spark->y = (bounds[2] + bounds[3]) >> 1;
+					spark->y = (bounds->Y1 + bounds->Y2) / 2;
 
 					if (rot & 0x7FFF)
 					{
 						if (intensity >= 0)
-							spark->z = bounds[5];
+							spark->z = bounds->Z2;
 						else
-							spark->z = bounds[4];
+							spark->z = bounds->Z1;
 
-						spark->x = ((bounds[0] + bounds[1]) >> 1) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
+						spark->x = ((bounds->X1 + bounds->X2) / 2) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
 						spark->y += (GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT;
 						spark->xVel = 0;
 						spark->zVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
@@ -100,12 +100,12 @@ static void VentilatorEffect(short* bounds, int intensity, short rot, int speed)
 					else
 					{
 						if (intensity >= 0)
-							spark->x = bounds[1];
+							spark->x = bounds->X2;
 						else
-							spark->x = bounds[0];
+							spark->x = bounds->X1;
 
 						spark->y += (GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT;
-						spark->z = ((bounds[4] + bounds[5]) >> 1) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
+						spark->z = ((bounds->Z1 + bounds->Z2) / 2) + ((GetRandomControl() % factor) * phd_cos(angle) >> W2V_SHIFT);
 						spark->zVel = 0;
 						spark->xVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
 					}
@@ -173,11 +173,11 @@ void VentilatorControl(short itemNumber)
 		speed = 128;
 	}
 
-	short* bounds = GetBoundsAccurate(item);
-	short effectBounds[6];
+	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+	BOUNDING_BOX effectBounds;
 
-	effectBounds[2] = item->pos.yPos + bounds[2];
-	effectBounds[3] = item->pos.yPos + bounds[3];
+	effectBounds.Y1 = item->pos.yPos + bounds->Y1;
+	effectBounds.Y2 = item->pos.yPos + bounds->Y2;
 
 	if (item->objectNumber != ID_PROPELLER_V) // TODO: check this ID
 	{
@@ -185,10 +185,10 @@ void VentilatorControl(short itemNumber)
 		{
 			if (item->pos.yRot == -ANGLE(90.0f))
 			{
-				effectBounds[0] = item->pos.xPos - bounds[5];
-				effectBounds[1] = item->pos.xPos - bounds[4];
-				effectBounds[4] = item->pos.zPos + bounds[0];
-				effectBounds[5] = item->pos.zPos + bounds[1];
+				effectBounds.X1 = item->pos.xPos - bounds->Z2;
+				effectBounds.X2 = item->pos.xPos - bounds->Z1;
+				effectBounds.Z1 = item->pos.zPos + bounds->X1;
+				effectBounds.Z2 = item->pos.zPos + bounds->X2;
 				xChange = 0;
 				zChange = 1;
 			}
@@ -196,18 +196,18 @@ void VentilatorControl(short itemNumber)
 			{
 				if (item->pos.yRot != ANGLE(90.0f))
 				{
-					effectBounds[0] = item->pos.xPos + bounds[0];
-					effectBounds[1] = item->pos.xPos + bounds[1];
-					effectBounds[4] = item->pos.zPos + bounds[4];
-					effectBounds[5] = item->pos.zPos + bounds[5];
+					effectBounds.X1 = item->pos.xPos + bounds->X1;
+					effectBounds.X2 = item->pos.xPos + bounds->X2;
+					effectBounds.Z1 = item->pos.zPos + bounds->Z1;
+					effectBounds.Z2 = item->pos.zPos + bounds->Z2;
 					zChange = 0;
 				}
 				else
 				{
-					effectBounds[0] = item->pos.xPos + bounds[4];
-					effectBounds[1] = item->pos.xPos + bounds[5];
-					effectBounds[4] = item->pos.zPos - bounds[1];
-					effectBounds[5] = item->pos.zPos - bounds[0];
+					effectBounds.X1 = item->pos.xPos + bounds->Z1;
+					effectBounds.X2 = item->pos.xPos + bounds->Z2;
+					effectBounds.Z1 = item->pos.zPos - bounds->X2;
+					effectBounds.Z2 = item->pos.zPos - bounds->X1;
 					xChange = 0;
 					zChange = 1;
 				}
@@ -215,24 +215,24 @@ void VentilatorControl(short itemNumber)
 		}
 		else
 		{
-			effectBounds[0] = item->pos.xPos - bounds[1];
-			effectBounds[1] = item->pos.xPos - bounds[0];
-			effectBounds[4] = item->pos.zPos - bounds[5];
-			effectBounds[5] = item->pos.zPos - bounds[4];
+			effectBounds.X1 = item->pos.xPos - bounds->X2;
+			effectBounds.X2 = item->pos.xPos - bounds->X1;
+			effectBounds.Z1 = item->pos.zPos - bounds->Z2;
+			effectBounds.Z2 = item->pos.zPos - bounds->Z1;
 			zChange = 0;
 		}
 
-		VentilatorEffect(effectBounds, 2, item->pos.yRot, speed);
-		VentilatorEffect(effectBounds, -2, item->pos.yRot, speed);
+		VentilatorEffect(&effectBounds, 2, item->pos.yRot, speed);
+		VentilatorEffect(&effectBounds, -2, item->pos.yRot, speed);
 
-		if (LaraItem->pos.yPos >= effectBounds[2] && LaraItem->pos.yPos <= effectBounds[3])
+		if (LaraItem->pos.yPos >= effectBounds.Y1 && LaraItem->pos.yPos <= effectBounds.Y2)
 		{
 			if (zChange)
 			{
-				if (LaraItem->pos.xPos >= effectBounds[0] && LaraItem->pos.xPos <= effectBounds[1])
+				if (LaraItem->pos.xPos >= effectBounds.X1 && LaraItem->pos.xPos <= effectBounds.X2)
 				{
-					int z1 = abs(LaraItem->pos.zPos - effectBounds[4]);
-					int z2 = abs(LaraItem->pos.zPos - effectBounds[5]);
+					int z1 = abs(LaraItem->pos.zPos - effectBounds.Z1);
+					int z2 = abs(LaraItem->pos.zPos - effectBounds.Z2);
 
 					if (z2 >= z1)
 						zChange = -zChange;
@@ -250,10 +250,10 @@ void VentilatorControl(short itemNumber)
 			}
 			else
 			{
-				if (LaraItem->pos.zPos >= effectBounds[4] && LaraItem->pos.zPos <= effectBounds[5])
+				if (LaraItem->pos.zPos >= effectBounds.Z1 && LaraItem->pos.zPos <= effectBounds.Z2)
 				{
-					int x1 = abs(LaraItem->pos.xPos - effectBounds[0]);
-					int x2 = abs(LaraItem->pos.xPos - effectBounds[0]);
+					int x1 = abs(LaraItem->pos.xPos - effectBounds.X1);
+					int x2 = abs(LaraItem->pos.xPos - effectBounds.X2);
 
 					if (x2 >= x1)
 						xChange = -xChange;
@@ -273,34 +273,34 @@ void VentilatorControl(short itemNumber)
 	}
 	else
 	{
-		short tbounds[6];
-		phd_RotBoundingBoxNoPersp(&item->pos, bounds, tbounds);
+		BOUNDING_BOX tbounds;
+		phd_RotBoundingBoxNoPersp(&item->pos, bounds, &tbounds);
 
-		effectBounds[0] = item->pos.xPos + tbounds[0];
-		effectBounds[1] = item->pos.xPos + tbounds[1];
-		effectBounds[4] = item->pos.zPos + tbounds[4];
-		effectBounds[5] = item->pos.zPos + tbounds[5];
+		effectBounds.X1 = item->pos.xPos + tbounds.X1;
+		effectBounds.X2 = item->pos.xPos + tbounds.X2;
+		effectBounds.Z1 = item->pos.zPos + tbounds.Z1;
+		effectBounds.Z2 = item->pos.zPos + tbounds.Z2;
 
-		VentilatorEffect(effectBounds, 1, 0, speed);
-		VentilatorEffect(effectBounds, -1, 0, speed);
+		VentilatorEffect(&effectBounds, 1, 0, speed);
+		VentilatorEffect(&effectBounds, -1, 0, speed);
 
-		if (LaraItem->pos.xPos >= effectBounds[0] && LaraItem->pos.xPos <= effectBounds[1])
+		if (LaraItem->pos.xPos >= effectBounds.X1 && LaraItem->pos.xPos <= effectBounds.X2)
 		{
-			if (LaraItem->pos.zPos >= effectBounds[4] && LaraItem->pos.zPos <= effectBounds[5])
+			if (LaraItem->pos.zPos >= effectBounds.Z1 && LaraItem->pos.zPos <= effectBounds.Z2)
 			{
-				int y = effectBounds[3];
+				int y = effectBounds.Y2;
 
-				if (LaraItem->pos.yPos <= effectBounds[3])
+				if (LaraItem->pos.yPos <= effectBounds.Y2)
 				{
-					if (effectBounds[2] - LaraItem->pos.yPos >= item->itemFlags[0])
+					if (effectBounds.Y1 - LaraItem->pos.yPos >= item->itemFlags[0])
 						return;
-					y = 96 * (effectBounds[3] - item->itemFlags[0]) / item->itemFlags[0];
+					y = 96 * (effectBounds.Y2 - item->itemFlags[0]) / item->itemFlags[0];
 				}
 				else
 				{
-					if (LaraItem->pos.yPos - effectBounds[3] >= item->itemFlags[0])
+					if (LaraItem->pos.yPos - effectBounds.Y2 >= item->itemFlags[0])
 						return;
-					y = 96 * (item->itemFlags[0] - (LaraItem->pos.yPos - effectBounds[3])) / item->itemFlags[0];
+					y = 96 * (item->itemFlags[0] - (LaraItem->pos.yPos - effectBounds.Y2)) / item->itemFlags[0];
 				}
 				if (item->currentAnimState == 1)
 					y = speed * y / 120;

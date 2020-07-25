@@ -655,7 +655,7 @@ namespace T5M::Renderer
 
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
-			StaticInfo *obj = &StaticObjects[StaticObjectsIds[i]];
+			STATIC_INFO *obj = &StaticObjects[StaticObjectsIds[i]];
 			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
 			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
 			staticObject.Id = StaticObjectsIds[i];

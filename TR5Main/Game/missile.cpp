@@ -20,14 +20,14 @@
 void ShootAtLara(FX_INFO *fx)
 {
 	int x, y, z, distance;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 
 	x = LaraItem->pos.xPos - fx->pos.xPos;
 	y = LaraItem->pos.yPos - fx->pos.yPos;
 	z = LaraItem->pos.zPos - fx->pos.zPos;
 
 	bounds = GetBoundsAccurate(LaraItem);
-	y += bounds[3] + (bounds[2] - bounds[3]) * 3 / 4;
+	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 3 / 4;
 
 	distance = sqrt(SQUARE(x) + SQUARE(z));
 	fx->pos.xRot = -phd_atan(distance, y);

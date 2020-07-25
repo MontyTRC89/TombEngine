@@ -25,54 +25,54 @@
 #include "sound.h"
 #include "savegame.h"
 
-static short PickUpBounds[12] = // offset 0xA1338
+OBJECT_COLLISION_BOUNDS PickUpBounds = // offset 0xA1338
 {
     0xFF00, 0x0100, 0xFF38, 0x00C8, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0x0000, 0x0000,
     0x0000, 0x0000
 };
 static PHD_VECTOR PickUpPosition(0, 0, -100); // offset 0xA1350
-static short HiddenPickUpBounds[12] = // offset 0xA135C
+OBJECT_COLLISION_BOUNDS HiddenPickUpBounds = // offset 0xA135C
 {
     0xFF00, 0x0100, 0xFF9C, 0x0064, 0xFCE0, 0xFF00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0x0000, 0x0000
 };
 static PHD_VECTOR HiddenPickUpPosition(0, 0, -690); // offset 0xA1374
-static short CrowbarPickUpBounds[12] = // offset 0xA1380
+OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds = // offset 0xA1380
 {
     0xFF00, 0x0100, 0xFF9C, 0x0064, 0x00C8, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0x0000, 0x0000
 };
 static PHD_VECTOR CrowbarPickUpPosition(0, 0, 215); // offset 0xA1398
-static short JobyCrowPickUpBounds[12] = // offset 0xA13A4
+OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds = // offset 0xA13A4
 {
     0xFE00, 0x0000, 0xFF9C, 0x0064, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0x0000, 0x0000
 };
 static PHD_VECTOR JobyCrowPickUpPosition(-224, 0, 240); // offset 0xA13BC
-static short PlinthPickUpBounds[12] = // offset 0xA13C8
+OBJECT_COLLISION_BOUNDS PlinthPickUpBounds = // offset 0xA13C8
 {
     0xFF00, 0x0100, 0xFD80, 0x0280, 0xFE01, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0x0000, 0x0000
 };
 static PHD_VECTOR PlinthPickUpPosition(0, 0, -460); // offset 0xA13E0
-static short PickUpBoundsUW[12] = // offset 0xA13EC
+OBJECT_COLLISION_BOUNDS PickUpBoundsUW = // offset 0xA13EC
 {
     0xFE00, 0x0200, 0xFE00, 0x0200, 0xFE00, 0x0200, 0xE002, 0x1FFE, 0xE002, 0x1FFE,
     0xE002, 0x1FFE
 };
 static PHD_VECTOR PickUpPositionUW(0, -200, -350); // offset 0xA1404
-static short KeyHoleBounds[12] = // offset 0xA1410
+OBJECT_COLLISION_BOUNDS KeyHoleBounds = // offset 0xA1410
 {
     0xFF00, 0x0100, 0x0000, 0x0000, 0x0000, 0x019C, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0xF8E4, 0x071C
 };
 static PHD_VECTOR KeyHolePosition(0, 0, 312); // offset 0xA1428
-static short PuzzleBounds[12] = // offset 0xA1434
+OBJECT_COLLISION_BOUNDS PuzzleBounds = // offset 0xA1434
 {
     0x0000, 0x0000, 0xFF00, 0x0100, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0xF8E4, 0x071C
 };
-static short SOBounds[12] = // offset 0xA144C
+OBJECT_COLLISION_BOUNDS SOBounds = // offset 0xA144C
 {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0xF8E4, 0x071C
@@ -90,7 +90,7 @@ short SearchOffsets[4] =
 {
     0x00A0, 0x0060, 0x00A0, 0x0070
 };
-static short MSBounds[12] = // offset 0xA1488
+OBJECT_COLLISION_BOUNDS MSBounds = // offset 0xA1488
 {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
     0xF8E4, 0x071C
@@ -552,26 +552,23 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     }
 
     short oldYrot = item->pos.yRot;
-    short* bounds = GetBoundsAccurate(item);
+    BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
-    PuzzleBounds[0] = bounds[0] - 256;
-    PuzzleBounds[1] = bounds[1] + 256;
-    PuzzleBounds[4] = bounds[4] - 256;
-    PuzzleBounds[5] = bounds[5] + 256;
+    PuzzleBounds.boundingBox.X1 = bounds->X1 - 256;
+    PuzzleBounds.boundingBox.X2 = bounds->X2 + 256;
+    PuzzleBounds.boundingBox.Z1 = bounds->Z1 - 256;
+    PuzzleBounds.boundingBox.Z2 = bounds->Z2 + 256;
 
     if (item->triggerFlags == 1058)
     {
-        PuzzleBounds[0] = bounds[0] - 256 - 300;
-        PuzzleBounds[1] = bounds[1] + 256 + 300;
-        PuzzleBounds[4] = bounds[4] - 256 - 300;
-        PuzzleBounds[5] = bounds[5] + 256 + 300;
-
+		PuzzleBounds.boundingBox.X1 = bounds->X1 - 256 - 300;
+		PuzzleBounds.boundingBox.X2 = bounds->X2 + 256 + 300;
+		PuzzleBounds.boundingBox.Z1 = bounds->Z1 - 256 - 300;
+		PuzzleBounds.boundingBox.Z2 = bounds->Z2 + 256 + 300;
         item->pos.yRot = l->pos.yRot;
-
     }
 
-
-    if (TestLaraPosition(PuzzleBounds, item, l))
+    if (TestLaraPosition(&PuzzleBounds, item, l))
     {
         PHD_VECTOR pos;
         pos.x = 0;
@@ -594,7 +591,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             }
         }
 
-        pos.z = bounds[4] - 100;
+        pos.z = bounds->Z1 - 100;
         if (flag != 2 || item->triggerFlags == 1036)
         {
             if (!MoveLaraPosition(&pos, item, l))
@@ -681,7 +678,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     }
     else
     {
-        if (TestLaraPosition(KeyHoleBounds, item, l))
+        if (TestLaraPosition(&KeyHoleBounds, item, l))
         {
             if (!Lara.isMoving)
             {
@@ -871,10 +868,10 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 && item->objectNumber != ID_BURNING_TORCH_ITEM
                 && l->currentAnimState == STATE_LARA_UNDERWATER_STOP
                 && !Lara.gunStatus
-                && TestLaraPosition(PickUpBoundsUW, item, l)
+                && TestLaraPosition(&PickUpBoundsUW, item, l)
                 || Lara.isMoving && (short)Lara.generalPtr == itemNum)
             {
-                if (TestLaraPosition(PickUpBoundsUW, item, l))
+                if (TestLaraPosition(&PickUpBoundsUW, item, l))
                 {
                     if (MoveLaraPosition(&PickUpPositionUW, item, l))
                     {
@@ -1062,12 +1059,12 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     }
     
     int flag = 0;
-    short* plinth = NULL;
+    BOUNDING_BOX* plinth = NULL;
     item->pos.xRot = 0;
     switch (triggerFlags)
     {
     case 1: // Pickup from wall hole
-        if (Lara.isDucked || !TestLaraPosition(HiddenPickUpBounds, item, l))
+        if (Lara.isDucked || !TestLaraPosition(&HiddenPickUpBounds, item, l))
         {
             if(Lara.isMoving)
             {
@@ -1094,7 +1091,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
     case 2: // Pickup with crowbar
         item->pos.yRot = oldYrot;
-        if (Lara.isDucked || !TestLaraPosition(CrowbarPickUpBounds, item, l))
+        if (Lara.isDucked || !TestLaraPosition(&CrowbarPickUpBounds, item, l))
         {
             if (!Lara.isMoving)
             {
@@ -1161,13 +1158,13 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             return;
         }
 
-        PlinthPickUpBounds[0] = plinth[0];
-        PlinthPickUpBounds[1] = plinth[1];
-        PlinthPickUpBounds[3] = l->pos.yPos - item->pos.yPos + 100;
-        PlinthPickUpBounds[5] = plinth[5] + 320;
-        PlinthPickUpPosition.z = -200 - plinth[5];
+        PlinthPickUpBounds.boundingBox.X1 = plinth->X1;
+        PlinthPickUpBounds.boundingBox.X2 = plinth->X2;
+        PlinthPickUpBounds.boundingBox.Y2 = l->pos.yPos - item->pos.yPos + 100;
+        PlinthPickUpBounds.boundingBox.Z1 = plinth->Z2 + 320;
+        PlinthPickUpPosition.z = -200 - plinth->Z2;
 
-        if (TestLaraPosition(PlinthPickUpBounds, item, l) && !Lara.isDucked)
+        if (TestLaraPosition(&PlinthPickUpBounds, item, l) && !Lara.isDucked)
         {
             if (item->pos.yPos == l->pos.yPos)
                 PlinthPickUpPosition.y = 0;
@@ -1212,7 +1209,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
     case 9: // Pickup object and conver it to crowbar (like submarine level)
         item->pos.yRot = oldYrot;
-        if (!TestLaraPosition(JobyCrowPickUpBounds, item, l))
+        if (!TestLaraPosition(&JobyCrowPickUpBounds, item, l))
         {
             item->pos.xRot = oldXrot;
             item->pos.yRot = oldYrot;
@@ -1231,7 +1228,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         break;
 
     default:
-        if (!TestLaraPosition(PickUpBounds, item, l))
+        if (!TestLaraPosition(&PickUpBounds, item, l))
         {
             if (!Lara.isMoving)
             {
@@ -1402,7 +1399,7 @@ void PickupControl(short itemNum)
     }
 }
 
-short* FindPlinth(ITEM_INFO* item)
+BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
 {
     ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
     
@@ -1414,9 +1411,13 @@ short* FindPlinth(ITEM_INFO* item)
         {
             if (item->pos.xPos == mesh->x && item->pos.zPos == mesh->z)
             {
-                short* frame = GetBestFrame(item);
-                StaticInfo* s = &StaticObjects[mesh->staticNumber];
-                if (frame[0] <= s->xMaxc && frame[1] >= s->xMinc && frame[4] <= s->zMaxc && frame[5] >= s->zMinc && (s->xMinc || s->xMaxc))
+                BOUNDING_BOX* frame = (BOUNDING_BOX*)GetBestFrame(item);
+                STATIC_INFO* s = &StaticObjects[mesh->staticNumber];
+                if (frame->X1 <= s->collisionBox.X2 
+					&& frame->X2 >= s->collisionBox.X1 
+					&& frame->Z1 <= s->collisionBox.Z2 
+					&& frame->Z2 >= s->collisionBox.Z1 
+					&& (s->collisionBox.X1 || s->collisionBox.X2))
                 {
                     found = mesh->staticNumber;
                     break;
@@ -1426,7 +1427,7 @@ short* FindPlinth(ITEM_INFO* item)
     }
 
     if (found != -1)
-        return &StaticObjects[found].xMinc;
+        return &StaticObjects[found].collisionBox;
 
     if (room->itemNumber == NO_ITEM)
         return NULL;
@@ -1450,7 +1451,7 @@ short* FindPlinth(ITEM_INFO* item)
     if (itemNumber == NO_ITEM)
         return NULL;
     else
-        return GetBestFrame(&g_Level.Items[itemNumber]);
+        return (BOUNDING_BOX*)GetBestFrame(&g_Level.Items[itemNumber]);
 }
 
 void PuzzleDone(ITEM_INFO* item, short itemNum)
@@ -1488,17 +1489,17 @@ void PuzzleDone(ITEM_INFO* item, short itemNum)
 void InitialisePickup(short itemNumber)
 {
     ITEM_INFO* item = &g_Level.Items[itemNumber];
-    short* bounds = GetBoundsAccurate(item);
+    BOUNDING_BOX* bounds = GetBoundsAccurate(item);
     short triggerFlags = item->triggerFlags & 0x3F;
     if (triggerFlags == 5)
     {
-        item->itemFlags[0] = item->pos.yPos - bounds[3];
+        item->itemFlags[0] = item->pos.yPos - bounds->Y2;
         item->status = ITEM_INVISIBLE;
     }
     else
     {
         if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
-            item->pos.yPos -= bounds[3];
+            item->pos.yPos -= bounds->Y2;
         
         if ((item->triggerFlags & 0x80) != 0)
         {
@@ -1566,30 +1567,35 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 {
     ITEM_INFO* item;
     int objNumber;
-    short* bounds;
+    BOUNDING_BOX* bounds;
 
     item = &g_Level.Items[itemNumber];
     objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
 
-    if (TrInput & IN_ACTION && laraitem->currentAnimState == STATE_LARA_STOP && laraitem->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS && (item->status == ITEM_NOT_ACTIVE && item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
+    if (TrInput & IN_ACTION
+		&& laraitem->currentAnimState == STATE_LARA_STOP
+		&& laraitem->animNumber == ANIMATION_LARA_STAY_IDLE 
+		&& Lara.gunStatus == LG_NO_ARMS 
+		&& (item->status == ITEM_NOT_ACTIVE 
+			&& item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
         || Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
     {
         bounds = GetBoundsAccurate(item);
         if (item->objectNumber != ID_SEARCH_OBJECT1)
         {
-            SOBounds[0] = bounds[0] - 128;
-            SOBounds[1] = bounds[1] + 128;
+            SOBounds.boundingBox.X1 = bounds->X1 - 128;
+            SOBounds.boundingBox.X2 = bounds->X2 + 128;
         }
         else
         {
-            SOBounds[0] = bounds[0] + 64;
-            SOBounds[1] = bounds[1] - 64;
+			SOBounds.boundingBox.X1 = bounds->X1 + 64;
+			SOBounds.boundingBox.X2 = bounds->X2 - 64;
         }
-        SOBounds[4] = bounds[4] - 200;
-        SOBounds[5] = bounds[5] + 200;
-        SOPos.z = bounds[4] - SearchOffsets[objNumber];
+		SOBounds.boundingBox.Z1 = bounds->Z1 - 200;
+		SOBounds.boundingBox.Z2 = bounds->Z2 + 200;
+        SOPos.z = bounds->Z1 - SearchOffsets[objNumber];
 
-        if (TestLaraPosition(SOBounds, item, laraitem))
+        if (TestLaraPosition(&SOBounds, item, laraitem))
         {
             if (MoveLaraPosition(&SOPos, item, laraitem))
             {

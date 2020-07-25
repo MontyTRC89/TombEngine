@@ -785,10 +785,10 @@ typedef struct WaterskinInfo
 
 typedef struct LARA_ARM
 {
-	short* frameBase;
+	int frameBase;
 	short frameNumber;
 	short animNumber;
-	bool lock;
+	byte lock;
 	short yRot;
 	short xRot;
 	short zRot;

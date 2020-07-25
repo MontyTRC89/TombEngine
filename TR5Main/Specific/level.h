@@ -101,6 +101,13 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
+struct ANIM_FRAME
+{
+	BOUNDING_BOX boundingBox;
+	Vector3 offset;
+	std::vector<Quaternion> angles;
+};
+
 struct LEVEL
 {
 	std::vector<TEXTURE> RoomTextures;
@@ -116,7 +123,7 @@ struct LEVEL
 	std::vector<CHANGE_STRUCT> Changes;
 	std::vector<RANGE_STRUCT> Ranges;
 	std::vector<short> Commands;
-	std::vector<short> Frames;
+	std::vector<ANIM_FRAME> Frames;
 	std::vector<OBJECT_TEXTURE> ObjectTextures;
 	std::vector<ITEM_INFO> Items;
 	std::vector<AIOBJECT> AIObjects;

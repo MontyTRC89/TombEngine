@@ -60,7 +60,8 @@ namespace T5M::Renderer
 
         if (obj->animIndex != -1)
         {
-            updateAnimation(NULL, moveableObj, &g_Level.Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
+			ANIM_FRAME* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr] };
+            updateAnimation(NULL, moveableObj, frame, 0, 0, 0xFFFFFFFF);
         }
 
         Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
@@ -586,15 +587,18 @@ namespace T5M::Renderer
                 if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
                     objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
                 {
-                    short *framePtr[2];
+					ANIM_FRAME* framePtr[2];
                     int rate = 0;
-                    getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
+                    getFrame(obj->animIndex, ring->framePtr, framePtr, &rate);
                     updateAnimation(NULL, moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
                 }
                 else
                 {
-                    if (obj->animIndex != -1)
-                        updateAnimation(NULL, moveableObj, &g_Level.Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
+					if (obj->animIndex != -1)
+					{
+						ANIM_FRAME* framePtr = &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr];
+						updateAnimation(NULL, moveableObj, &framePtr, 0, 1, 0xFFFFFFFF);
+					}
                 }
 
                 for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)

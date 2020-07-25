@@ -824,7 +824,7 @@ bool Inventory::IsCurrentObjectExamine()
 int Inventory::DoPuzzle()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 	ring->numActions = 0;
 
@@ -914,7 +914,7 @@ int Inventory::DoPuzzle()
 int Inventory::DoWeapon()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 	ring->numActions = 0;
 
@@ -1061,7 +1061,7 @@ void Inventory::AddCombination(short piece1, short piece2, short combinedObject,
 int Inventory::DoGenericObject()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 	return INV_RESULT_USE_ITEM;
 }
@@ -1069,14 +1069,14 @@ int Inventory::DoGenericObject()
 void Inventory::DoStatistics()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 }
 
 void Inventory::DoExamine()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 }
 
@@ -1948,7 +1948,7 @@ InventoryObjectDefinition* Inventory::GetInventoryObject(int index)
 int Inventory::DoPassport()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 	short choice = 0;
 	
@@ -1978,7 +1978,7 @@ int Inventory::DoPassport()
 	for (int i = 0; i < 14; i++)
 	{
 		UpdateSceneAndDrawInventory();
-		ring->frameIndex++;
+		ring->framePtr++;
 	}
 
 	bool moveLeft = false;
@@ -2016,11 +2016,11 @@ int Inventory::DoPassport()
 
 			if (choice > 0)
 			{
-				ring->frameIndex = 19;
+				ring->framePtr = 19;
 				for (int i = 0; i < 5; i++)
 				{
 					UpdateSceneAndDrawInventory();
-					ring->frameIndex--;
+					ring->framePtr--;
 				}
 
 				choice--;
@@ -2036,11 +2036,11 @@ int Inventory::DoPassport()
 			
 			if (choice < choices.size() - 1)
 			{
-				ring->frameIndex = 14;
+				ring->framePtr = 14;
 				for (int i = 0; i < 5; i++)
 				{
 					UpdateSceneAndDrawInventory();
-					ring->frameIndex++;
+					ring->framePtr++;
 				}
 
 				choice++;
@@ -2433,14 +2433,14 @@ int Inventory::DoPassport()
 	}
 
 	// Close the passport
-	ring->frameIndex = 24;
+	ring->framePtr = 24;
 	for (int i = 24; i < 30; i++)
 	{
 		UpdateSceneAndDrawInventory();
-		ring->frameIndex++;
+		ring->framePtr++;
 	}
 
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 	PopoverObject();
 
@@ -2505,7 +2505,7 @@ int Inventory::GetType()
 void Inventory::DoControlsSettings()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 	ring->waitingForKey = false;
 	
@@ -2642,7 +2642,7 @@ void Inventory::DoControlsSettings()
 void Inventory::DoGraphicsSettings()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 
 	PopupObject();
@@ -2810,7 +2810,7 @@ void Inventory::DoGraphicsSettings()
 void Inventory::DoSoundSettings()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 
 	PopupObject();

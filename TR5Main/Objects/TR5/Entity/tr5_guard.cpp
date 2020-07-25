@@ -347,10 +347,10 @@ void GuardControl(short itemNum)
 		src.y = item->pos.yPos - 384;
 		src.z = item->pos.zPos;
 		src.roomNumber = item->roomNumber;
-		short* frame = GetBestFrame(LaraItem);
+		ANIM_FRAME* frame = GetBestFrame(LaraItem);
 		GAME_VECTOR dest;
 		dest.x = LaraItem->pos.xPos;
-		dest.y = LaraItem->pos.yPos + ((frame[3] + 3 * frame[2]) >> 2);
+		dest.y = LaraItem->pos.yPos + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4);
 		dest.z = LaraItem->pos.zPos;
 		bool los = !LOS(&src, &dest) && item->triggerFlags != 10;
 		creature->maximumTurn = 0;

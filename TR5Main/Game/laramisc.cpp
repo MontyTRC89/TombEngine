@@ -27,18 +27,18 @@ short cheatHitPoints;
 
 void GetLaraDeadlyBounds() // (F) (D)
 {
-	short* bounds;
-	short tbounds[6];
+	BOUNDING_BOX* bounds;
+	BOUNDING_BOX tbounds;
 
 	bounds = GetBoundsAccurate(LaraItem);
-	phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, tbounds);
+	phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, &tbounds);
 
-	DeadlyBounds[0] = LaraItem->pos.xPos + tbounds[0];
-	DeadlyBounds[1] = LaraItem->pos.xPos + tbounds[1];
-	DeadlyBounds[2] = LaraItem->pos.yPos + tbounds[2];
-	DeadlyBounds[3] = LaraItem->pos.yPos + tbounds[3];
-	DeadlyBounds[4] = LaraItem->pos.zPos + tbounds[4];
-	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds[5];
+	DeadlyBounds[0] = LaraItem->pos.xPos + tbounds.X1;
+	DeadlyBounds[1] = LaraItem->pos.xPos + tbounds.X2;
+	DeadlyBounds[2] = LaraItem->pos.yPos + tbounds.Y1;
+	DeadlyBounds[3] = LaraItem->pos.yPos + tbounds.Y2;
+	DeadlyBounds[4] = LaraItem->pos.zPos + tbounds.Z1;
+	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds.Z2;
 }
 
 void InitialiseLaraAnims(ITEM_INFO* item) // (F) (D)
@@ -1052,8 +1052,8 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	frame = (ANIM_FRAME*) GetBestFrame(item);
 	ropeY = Lara.ropeY - ANGLE(90);
 	rope = &Ropes[Lara.ropePtr];
-	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->OffsetY, &pos.x, &pos.y, &pos.z);
-	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->OffsetY - 192, &pos2.x, &pos2.y, &pos2.z);
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offset.y, &pos.x, &pos.y, &pos.z);
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offset.y - 192, &pos2.x, &pos2.y, &pos2.z);
 	diff.x = pos.x - pos2.x << 16;
 	diff.y = pos.y - pos2.y << 16;
 	diff.z = pos.z - pos2.z << 16;

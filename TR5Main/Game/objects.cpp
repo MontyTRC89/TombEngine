@@ -19,29 +19,25 @@
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;
-short TightRopeBounds[12] = 
+OBJECT_COLLISION_BOUNDS TightRopeBounds =
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR TightRopePos = { 0, 0, 0 };
 
-short ParallelBarsBounds[12] =  
+OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
 {
 	0xFD80, 0x0280, 0x02C0, 0x0340, 0xFFA0, 0x0060, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
 
 PHD_VECTOR PolePos = { 0, 0, -208 }; 
 PHD_VECTOR PolePosR = { 0, 0, 0 }; 
-short PoleBounds[12] = // offset 0xA1250
+OBJECT_COLLISION_BOUNDS PoleBounds = // offset 0xA1250
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-
-
-
-
 
 void BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
@@ -144,7 +140,7 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		short rot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
-		if (TestLaraPosition(PoleBounds, item, l))
+		if (TestLaraPosition(&PoleBounds, item, l))
 		{
 			if (MoveLaraPosition(&PolePos, item, l))
 			{
@@ -335,7 +331,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 	{
 		item->pos.yRot += -ANGLE(180);
-		if (TestLaraPosition(TightRopeBounds, item, l))
+		if (TestLaraPosition(&TightRopeBounds, item, l))
 		{
 			if (MoveLaraPosition(&TightRopePos, item, l))
 			{
@@ -371,12 +367,12 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (TrInput & IN_ACTION && l->currentAnimState == STATE_LARA_REACH && l->animNumber == ANIMATION_LARA_TRY_HANG_SOLID)
 	{
-		int test1 = TestLaraPosition(ParallelBarsBounds, item, l);
+		int test1 = TestLaraPosition(&ParallelBarsBounds, item, l);
 		int test2 = 0;
 		if (!test1)
 		{
 			item->pos.yRot += -ANGLE(180);
-			test2 = TestLaraPosition(ParallelBarsBounds, item, l);
+			test2 = TestLaraPosition(&ParallelBarsBounds, item, l);
 			item->pos.yRot += -ANGLE(180);
 		}
 
