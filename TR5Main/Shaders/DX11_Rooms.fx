@@ -54,7 +54,7 @@ SamplerState Sampler : register(s0);
 Texture2D CausticsTexture : register(t1);
 
 Texture2D ShadowMap : register(t2);
-SamplerState ShadowMapSampler : register(s1);
+SamplerComparisonState ShadowMapSampler : register(s1);
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
@@ -79,17 +79,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
-float getShadowFactor(Texture2D shadowMap, SamplerState shadowMapSampler, float2 coords, float realDepth) {
-	const float texelSize = 1.0f / 1024;
-	float shadowFactor = 0.0f;
-	//doing 9 samples
-	for (float x = -1; x <= 1.0f; x++) {
-		for (float y = -1; y <= 1.0f; y++) {
-			float shadowMapDepth = ShadowMap.SampleLevel(ShadowMapSampler, coords + (float2(x, y)*texelSize),0).r;
-			shadowFactor += shadowMapDepth < realDepth ? 1.0f : 0.0f;
-		}
-	}
-	return shadowFactor / 9.0f;
+float2 texOffset(int u, int v) {
+	return float2(u * 1.0f / 512, v * 1.0f / 512);
 }
 
 float4 PS(PixelShaderInput input) : SV_TARGET
@@ -117,16 +108,22 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			input.LightPosition.y >= -1.0f && input.LightPosition.y <= 1.0f &&
 			input.LightPosition.z >= 0.0f && input.LightPosition.z <= 1.0f)
 		{
-			float2 coords = float2(input.LightPosition.x / 2.0f + 0.5f, -input.LightPosition.y / 2.0f + 0.5f);
+			input.LightPosition.x = input.LightPosition.x / 2 + 0.5;
+			input.LightPosition.y = input.LightPosition.y / -2 + 0.5;
 
-			// Sample shadow map - point sampler
-			float shadowMapDepth = ShadowMap.Sample(ShadowMapSampler, coords).r;
+			//PCF sampling for shadow map
+			float sum = 0;
+			float x, y;
 
-			float realDepth = input.LightPosition.z;
+			//perform PCF filtering on a 4 x 4 texel neighborhood
+			for (y = -1.5; y <= 1.5; y += 1.0) {
+				for (x = -1.5; x <= 1.5; x += 1.0) {
+					sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, input.LightPosition.xy + texOffset(x, y), input.LightPosition.z);
+				}
+			}
 
-			// If clip space z value greater than shadow map value then pixel is in shadow
-			float shadow = getShadowFactor(ShadowMap, ShadowMapSampler, coords, realDepth);
-			lighting = lerp(lighting, min(AmbientColor*2,lighting), saturate(shadow));
+			float shadowFactor = sum / 16.0;
+			lighting = lerp(lighting, min(AmbientColor*2,lighting), 1-saturate(shadowFactor));
 		}
 	}
 
