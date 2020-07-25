@@ -2335,10 +2335,11 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 {
 	int r, m;
 	ROOM_INFO *room;
-	short linknum, *box;
+	short linknum;
 	ITEM_INFO *item;
 	PHD_3DPOS pos;
 	MESH_INFO *meshp;
+	BOUNDING_BOX* box;
 
 	ClosestItem = 999;
 	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
@@ -2358,7 +2359,7 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 				pos.zPos = meshp->z;
 				pos.yRot = meshp->yRot;
 
-				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].xMinc, &pos, vec, -1 - meshp->staticNumber))
+				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].collisionBox, &pos, vec, -1 - meshp->staticNumber))
 				{
 					*mesh = meshp;
 					end->roomNumber = los_rooms[r];
@@ -2370,7 +2371,11 @@ int ObjectOnLOS2(GAME_VECTOR *start, GAME_VECTOR *end, PHD_VECTOR *vec, MESH_INF
 		{
 			item = &g_Level.Items[linknum];
 
-			if (item->status != ITEM_DEACTIVATED && item->status != ITEM_INVISIBLE && (item->objectNumber != ID_LARA && Objects[item->objectNumber].collision != NULL || item->objectNumber == ID_LARA && GetLaraOnLOS))
+			if (item->status != ITEM_DEACTIVATED && item->status != ITEM_INVISIBLE
+				&& (item->objectNumber != ID_LARA 
+					&& Objects[item->objectNumber].collision != NULL 
+					|| item->objectNumber == ID_LARA
+					&& GetLaraOnLOS))
 			{
 				box = GetBoundsAccurate(item);
 
@@ -2598,7 +2603,7 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z) // (F) (D)
 	return ceiling;
 }
 
-int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOrStaticPos, PHD_VECTOR *hitPos, short closesItemNumber)
+int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, BOUNDING_BOX *box, PHD_3DPOS *itemOrStaticPos, PHD_VECTOR *hitPos, short closesItemNumber)
 {
 	// Ray
 	FXMVECTOR rayStart = {start->x, start->y, start->z};
@@ -2607,8 +2612,8 @@ int DoRayBox(GAME_VECTOR *start, GAME_VECTOR *end, short *box, PHD_3DPOS *itemOr
 	XMVECTOR rayDirNormalized = XMVector3Normalize(rayDir);
 
 	// Create the bounding box for raw collision detection
-	Vector3 boxCentre = Vector3(itemOrStaticPos->xPos + (box[1] + box[0]) / 2.0f, itemOrStaticPos->yPos + (box[3] + box[2]) / 2.0f, itemOrStaticPos->zPos + (box[5] + box[4]) / 2.0f);
-	Vector3 boxExtent = Vector3((box[1] - box[0]) / 2.0f, (box[3] - box[2]) / 2.0f, (box[5] - box[4]) / 2.0f);
+	Vector3 boxCentre = Vector3(itemOrStaticPos->xPos + (box->X2 + box->X1) / 2.0f, itemOrStaticPos->yPos + (box->Y2 + box->Y1) / 2.0f, itemOrStaticPos->zPos + (box->Z2 + box->Z1) / 2.0f);
+	Vector3 boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
 	Quaternion rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY, TO_RAD(itemOrStaticPos->yRot));
 	BoundingOrientedBox obox = BoundingOrientedBox(boxCentre, boxExtent, rotation);
 

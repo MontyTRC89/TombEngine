@@ -15,10 +15,7 @@
 #include "sound.h"
 #include "snowmobile.h"
 
-short FireBounds[12] =
-{
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
-};
+extern OBJECT_COLLISION_BOUNDS FireBounds;
 
 void TriggerTorchFlame(char fxObj, char node)
 {
@@ -241,13 +238,13 @@ void TorchControl(short itemNumber) // (F) (D)
 		}
 		else
 		{
-			StaticInfo* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
+			STATIC_INFO* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
 			PHD_3DPOS pos;
 			pos.xPos = CollidedMeshes[0]->x;
 			pos.yPos = CollidedMeshes[0]->y;
 			pos.zPos = CollidedMeshes[0]->z;
 			pos.yRot = CollidedMeshes[0]->yRot;
-			ItemPushLaraStatic(item, &sobj->xMinc, &pos, &lara_coll);
+			ItemPushLaraStatic(item, &sobj->collisionBox, &pos, &lara_coll);
 		}
 		item->speed >>= 1;
 	}
@@ -285,34 +282,34 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		switch (item->objectNumber)
 		{
 		case ID_FLAME_EMITTER:
-			FireBounds[0] = -256;
-			FireBounds[1] = 256;
-			FireBounds[2] = 0;
-			FireBounds[3] = 1024;
-			FireBounds[4] = -800;
-			FireBounds[5] = 800;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -800;
+			FireBounds.boundingBox.Z2 = 800;
 			break;
 		case ID_FLAME_EMITTER2:
-			FireBounds[1] = -256;
-			FireBounds[2] = 256;
-			FireBounds[3] = 0;
-			FireBounds[4] = 1024;
-			FireBounds[5] = -600;
-			FireBounds[6] = 600;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -600;
+			FireBounds.boundingBox.Z2 = 600;
 			break;
 		case ID_BURNING_ROOTS:
-			FireBounds[0] = -384;
-			FireBounds[1] = 384;
-			FireBounds[2] = 0;
-			FireBounds[3] = 2048;
-			FireBounds[4] = -384;
-			FireBounds[5] = 384;
+			FireBounds.boundingBox.X1 = -384;
+			FireBounds.boundingBox.X2 = 384;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 2048;
+			FireBounds.boundingBox.Z1 = -384;
+			FireBounds.boundingBox.Z2 = 384;
 			break;
 		}
 
 		item->pos.yRot = l->pos.yRot;
 
-		if (TestLaraPosition(FireBounds, item, l))
+		if (TestLaraPosition(&FireBounds, item, l))
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 			{

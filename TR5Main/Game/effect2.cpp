@@ -165,14 +165,14 @@ int GetFreeSpark()
 
 void UpdateSparks()
 {
-	short* bounds = GetBoundsAccurate(LaraItem);
+	BOUNDING_BOX* bounds = GetBoundsAccurate(LaraItem);
 
-	DeadlyBounds[0] = LaraItem->pos.xPos + bounds[0];
-	DeadlyBounds[1] = LaraItem->pos.xPos + bounds[1];
-	DeadlyBounds[2] = LaraItem->pos.yPos + bounds[2];
-	DeadlyBounds[3] = LaraItem->pos.yPos + bounds[3];
-	DeadlyBounds[4] = LaraItem->pos.zPos + bounds[4];
-	DeadlyBounds[5] = LaraItem->pos.zPos + bounds[5];
+	DeadlyBounds[0] = LaraItem->pos.xPos + bounds->X1;
+	DeadlyBounds[1] = LaraItem->pos.xPos + bounds->X2;
+	DeadlyBounds[2] = LaraItem->pos.yPos + bounds->Y1;
+	DeadlyBounds[3] = LaraItem->pos.yPos + bounds->Y2;
+	DeadlyBounds[4] = LaraItem->pos.zPos + bounds->Z1;
+	DeadlyBounds[5] = LaraItem->pos.zPos + bounds->Z2;
 
 	for (int i = 0; i < MAX_SPARKS; i++)
 	{
@@ -1441,10 +1441,10 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 		ROOM_INFO* room2 = &g_Level.Rooms[roomNumber2];
 		if (!(room2->flags & ENV_FLAG_WATER))
 		{
-			short* frame = GetBestFrame(item);
-			if (item->pos.yPos + frame[2] <= wh)
+			ANIM_FRAME* frame = GetBestFrame(item);
+			if (item->pos.yPos + frame->boundingBox.Y1 <= wh)
 			{
-				if (item->pos.yPos + frame[3] >= wh)
+				if (item->pos.yPos + frame->boundingBox.Y2 >= wh)
 				{
 					if (item->fallspeed <= 0 || wd >= 474 || SplashCount != 0)
 					{

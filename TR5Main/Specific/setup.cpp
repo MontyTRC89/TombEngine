@@ -37,7 +37,7 @@ extern byte CurrentSequence;
 extern int NumRPickups;
 
 OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
-StaticInfo StaticObjects[MAX_STATICS];
+STATIC_INFO StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags()
 {
@@ -829,7 +829,7 @@ void InitialiseObjects()
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
-		obj->frameBase += (short)g_Level.Frames.data();
+		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
 	InitialiseTR1Objects(); // Standard TR1 objects

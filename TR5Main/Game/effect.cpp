@@ -74,30 +74,8 @@ function<EffectFunction> effect_routines[59] =
 	void_effect,
 	void_effect,
 	LaraLocationPad,
-	KillActiveBaddies,
-	TL_1,
-	TL_2,
-	TL_3,
-	TL_4,
-	TL_5,
-	TL_6,
-	TL_7,
-	TL_8,
-	TL_9,
-	TL_10,
-	TL_11,
-	TL_12,
+	KillActiveBaddies
 };
-
-void TL_1(ITEM_INFO* item)
-{
-	if (!Savegame.TLCount)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(9, 0);
-		Savegame.TLCount = 1;
-	}
-}
 
 void pickup(ITEM_INFO* item)
 {
@@ -147,116 +125,6 @@ void AddFootprint(ITEM_INFO* item)
 	}
 }
 
-void TL_2(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 1u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(7, 0);
-		Savegame.TLCount = 2;
-	}
-}
-
-void TL_3(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 2u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(23, 0);
-		Savegame.TLCount = 3;
-	}
-}
-
-void TL_4(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 3u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(39, 0);
-		Savegame.TLCount = 4;
-	}
-}
-
-void TL_5(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 4u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(2, 0);
-		Savegame.TLCount = 5;
-	}
-}
-
-void TL_6(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 5u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(22, 0);
-		Savegame.TLCount = 6;
-	}
-}
-
-void TL_7(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 6u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(51, 0);
-		Savegame.TLCount = 7;
-	}
-}
-
-void TL_8(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 7u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(3, 0);
-		Savegame.TLCount = 8;
-	}
-}
-
-void TL_9(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 8u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(4, 0);
-		Savegame.TLCount = 9;
-	}
-}
-
-void TL_10(ITEM_INFO* item)
-{
-	if (Savegame.TLCount == 9)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(13, 0);
-		Savegame.TLCount = 10;
-	}
-}
-
-void TL_11(ITEM_INFO* item)
-{
-	if (Savegame.TLCount == 10)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(0, 0);
-		Savegame.TLCount = 11;
-	}
-}
-
-void TL_12(ITEM_INFO* item)
-{
-	if (Savegame.TLCount == 11)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(35, 0);
-		Savegame.TLCount = 12;
-	}
-}
-
 void reset_hair(ITEM_INFO* item)
 {
 	InitialiseHair();
@@ -271,43 +139,6 @@ void invisibility_on(ITEM_INFO* item)
 {
 	item->status = ITEM_INVISIBLE;
 }
-
-/*void SetFog()
-{
-	FlipEffect = -1;
-
-	
-	unsigned __int16 v0; // si
-	int v1; // eax
-	int v2; // eax
-	char v3; // bl
-	char v4; // ST14_1
-	char v5; // ST18_1
-
-	dword_51CE04 = 0;
-	v0 = TriggerTimer;
-	v1 = CheckVolumetric();
-	if (!v1)
-		goto LABEL_5;
-	if (v0 == 100)
-	{
-		dword_51CE04 = 1;
-	LABEL_5:
-		FlipEffect = -1;
-		return v1;
-	}
-	v2 = FogTable[v0];
-	v3 = FogTable[v0] >> 16;
-	v4 = BYTE1(v2);
-	v5 = FogTable[v0];
-	SomeDxFunctionToRemove1(BYTE2(v2), BYTE1(v2), v2);
-	LOBYTE(v1) = v4;
-	byte_51CE32 = v3;
-	byte_51CE31 = v4;
-	byte_51CE30 = v5;
-	FlipEffect = -1;
-	return v1;
-}*/
 
 void SetFog(ITEM_INFO* item)//39A44(<), 39F44(<) (F)
 {
@@ -506,7 +337,7 @@ static bool ItemInRange(int x, int z, int radius)
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius)
 {
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	GAME_VECTOR target;
 	target.x = pos->xPos - LaraItem->pos.xPos;
 	target.y = pos->yPos - LaraItem->pos.yPos;
@@ -518,8 +349,8 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 	if (!ItemInRange(target.x, target.z, radius))
 		return false;
 
-	bounds = (ANIM_FRAME*)GetBoundsAccurate(LaraItem);
-	if (target.y >= bounds->MinY && target.y <= (bounds->MaxY + LARA_RAD))
+	bounds = GetBoundsAccurate(LaraItem);
+	if (target.y >= bounds->Y1 && target.y <= (bounds->Y2 + LARA_RAD))
 		return true;
 
 	return false;
@@ -527,7 +358,7 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 {
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	PHD_VECTOR pos;
 	pos.x = src->xPos - target->pos.xPos;
 	pos.y = src->yPos - target->pos.yPos;
@@ -539,8 +370,8 @@ bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 	if (!ItemInRange(pos.x, pos.z, radius))
 		return false;
 
-	bounds = (ANIM_FRAME*)GetBoundsAccurate(target);
-	if (pos.y >= bounds->MinY && pos.y <= bounds->MaxY)
+	bounds = GetBoundsAccurate(target);
+	if (pos.y >= bounds->Y1 && pos.y <= bounds->Y2)
 		return true;
 
 	return false;

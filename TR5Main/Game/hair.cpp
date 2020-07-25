@@ -43,11 +43,11 @@ void InitialiseHair()
 }
 
 
-void HairControl(int cutscene, int ponytail, short* framePtr)
+void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 {
 	SPHERE sphere[HAIR_SPHERE];
 	OBJECT_INFO* object = &Objects[ID_LARA];
-	short* frame;
+	ANIM_FRAME* frame;
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG;
 
@@ -86,10 +86,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 				break;
 			}
 
-			frame = g_Level.Anims[spaz].framePtr;
-			int size = g_Level.Anims[spaz].interpolation >> 8;
-
-			frame += (int)(Lara.hitFrame * size);
+			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + Lara.hitFrame];
 		}
 		else
 			frame = GetBestFrame(LaraItem);
@@ -208,9 +205,9 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		}
 		else
 		{
-			int x = LaraItem->pos.xPos + (frame[0] + frame[1]) / 2;
-			int y = LaraItem->pos.yPos + (frame[2] + frame[3]) / 2;
-			int z = LaraItem->pos.zPos + (frame[4] + frame[5]) / 2;
+			int x = LaraItem->pos.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+			int y = LaraItem->pos.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
+			int z = LaraItem->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
 			wh = GetWaterHeight(x, y, z, roomNumber);
 		}
 

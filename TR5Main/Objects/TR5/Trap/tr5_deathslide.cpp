@@ -7,7 +7,7 @@
 #include "laramisc.h"
 #include "sound.h"
 
-short DeathSlideBounds[12] = { -256, 256, -100, 100, 256, 512, 0, 0, -ANGLE(25.0f), ANGLE(25.0f), 0, 0 };
+OBJECT_COLLISION_BOUNDS DeathSlideBounds = { -256, 256, -100, 100, 256, 512, 0, 0, -ANGLE(25.0f), ANGLE(25.0f), 0, 0 };
 PHD_VECTOR DeathSlidePosition(0, 0, 371);
 
 void InitialiseDeathSlide(short itemNumber)
@@ -30,7 +30,7 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	if (item->status != ITEM_NOT_ACTIVE)
 		return;
 
-	if (TestLaraPosition(DeathSlideBounds, item, LaraItem))
+	if (TestLaraPosition(&DeathSlideBounds, item, LaraItem))
 	{
 		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
 		Lara.gunStatus = LG_HANDS_BUSY;

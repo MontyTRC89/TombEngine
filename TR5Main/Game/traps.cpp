@@ -16,9 +16,9 @@
 #include "input.h"
 #include "sound.h"
 
-static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
+OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
-static short FloorTrapDoorBounds[12] = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
+OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR FloorTrapDoorPos = {0, 0, -655};
 static short WreckingBallData[2] = {0, 0};
 ITEM_INFO* WBItem;
@@ -43,7 +43,7 @@ byte Flame3xzoffs[16][2] =
 	{ 0x28, 0x37 },
 	{ 0x37, 0x37 }
 };
-static short FireBounds[12] = {0, 0, 0, 0, 0, 0, -1820, 1820, -5460, 5460, -1820, 1820};
+OBJECT_COLLISION_BOUNDS FireBounds = {0, 0, 0, 0, 0, 0, -1820, 1820, -5460, 5460, -1820, 1820};
 
 void LaraBurn()
 {
@@ -326,9 +326,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 	int result, result2;
 
 	item = &g_Level.Items[itemNumber];
-	result = TestLaraPosition(CeilingTrapDoorBounds, item, l);
+	result = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
-	result2 = TestLaraPosition(CeilingTrapDoorBounds, item, l);
+	result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
 	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
 	{
@@ -373,7 +373,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_STOP && l->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS
 		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 	{
-		if (TestLaraPosition(FloorTrapDoorBounds, item, l))
+		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&FloorTrapDoorPos, item, l))
 			{
@@ -907,30 +907,30 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 		switch (item->objectNumber)
 		{
 		case ID_FLAME_EMITTER:
-			FireBounds[0] = -256;
-			FireBounds[1] = 256;
-			FireBounds[2] = 0;
-			FireBounds[3] = 1024;
-			FireBounds[4] = -800;
-			FireBounds[5] = 800;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -800;
+			FireBounds.boundingBox.Z2 = 800;
 			break;
 
 		case ID_FLAME_EMITTER2:
-			FireBounds[0] = -256;
-			FireBounds[1] = 256;
-			FireBounds[2] = 0;
-			FireBounds[3] = 1024;
-			FireBounds[4] = -600;
-			FireBounds[5] = 600;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -600;
+			FireBounds.boundingBox.Z2 = 600;
 			break;
 
 		case ID_BURNING_ROOTS:
-			FireBounds[0] = -384;
-			FireBounds[1] = 384;
-			FireBounds[2] = 0;
-			FireBounds[3] = 2048;
-			FireBounds[4] = -384;
-			FireBounds[5] = 384;
+			FireBounds.boundingBox.X1 = -384;
+			FireBounds.boundingBox.X2 = 384;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 2048;
+			FireBounds.boundingBox.Z1 = -384;
+			FireBounds.boundingBox.Z2 = 384;
 			break;
 
 		}
@@ -938,7 +938,7 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 		short oldYrot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
 
-		if (TestLaraPosition(FireBounds, item, l))
+		if (TestLaraPosition(&FireBounds, item, l))
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 			{

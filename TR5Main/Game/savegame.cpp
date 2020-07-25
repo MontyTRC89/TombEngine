@@ -215,8 +215,8 @@ void SaveGame::saveLara(int arg1, int arg2)
 	LaraInfo lara;
 	memcpy(&lara, &Lara, sizeof(Lara));
 
-	lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
-	lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
+	//lara.leftArm.frameBase = (short*)((char *)lara.leftArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
+	//lara.rightArm.frameBase = (short*)((char *)lara.rightArm.frameBase - (ptrdiff_t)Objects[ID_LARA].frameBase);
 	lara.generalPtr = (char *)lara.generalPtr - (ptrdiff_t)malloc_buffer;
 
 	m_stream->Write(reinterpret_cast<char*>(&lara), sizeof(Lara));
@@ -509,8 +509,8 @@ bool SaveGame::readLara()
 	memcpy(&Lara, lara, sizeof(LaraInfo));
 	free(buffer);
 
-	Lara.leftArm.frameBase = AddPtr(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
-	Lara.rightArm.frameBase = AddPtr(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
+	//Lara.leftArm.frameBase = AddPtr(Lara.leftArm.frameBase, short, Objects[ID_LARA].frameBase);
+	//Lara.rightArm.frameBase = AddPtr(Lara.rightArm.frameBase, short, Objects[ID_LARA].frameBase);
 	
 	Lara.target = NULL;
 	Lara.spazEffect = NULL;

@@ -139,13 +139,13 @@ int LoadItems()
 				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
 			{
 				int fl = floor->floor << 2;
-				StaticInfo* st = &StaticObjects[mesh->staticNumber];
-				if (fl <= mesh->y - st->yMaxc + 512 && fl < mesh->y - st->yMinc)
+				STATIC_INFO* st = &StaticObjects[mesh->staticNumber];
+				if (fl <= mesh->y - st->collisionBox.Y2 + 512 && fl < mesh->y - st->collisionBox.Y1)
 				{
-					if (st->xMaxc == 0 || st->xMinc == 0 ||
-						st->zMaxc == 0 || st->zMinc == 0 ||
-						(st->xMaxc ^ st->xMinc) & 0x8000 &&
-						(st->xMaxc ^ st->zMinc) & 0x8000)
+					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
+						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
+						(st->collisionBox.X1 ^ st->collisionBox.X2) & 0x8000 &&
+						(st->collisionBox.Z1 ^ st->collisionBox.Z2) & 0x8000)
 					{
 						floor->box |= 8; 
 					}
@@ -160,7 +160,7 @@ int LoadItems()
 void LoadObjects()
 {
 	memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
-	memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
+	memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
 	g_Level.Meshes.reserve(numMeshes);
@@ -237,7 +237,26 @@ void LoadObjects()
 
 	int numAnimations = ReadInt32();
 	g_Level.Anims.resize(numAnimations);
-	ReadBytes(g_Level.Anims.data(), sizeof(ANIM_STRUCT) * numAnimations);
+	for (int i = 0; i < numAnimations; i++)
+	{
+		ANIM_STRUCT* anim = &g_Level.Anims[i];;
+
+		anim->framePtr = ReadInt32();
+		anim->interpolation = ReadInt16();
+		anim->currentAnimState = ReadInt16();
+		anim->velocity = ReadInt32();
+		anim->acceleration = ReadInt32();
+		anim->Xvelocity = ReadInt32();
+		anim->Xacceleration = ReadInt32();
+		anim->frameBase = ReadInt16();
+		anim->frameEnd = ReadInt16();
+		anim->jumpAnimNum = ReadInt16();
+		anim->jumpFrameNum = ReadInt16();
+		anim->numberChanges = ReadInt16();
+		anim->changeIndex = ReadInt16();
+		anim->numberCommands = ReadInt16();
+		anim->commandIndex = ReadInt16();
+	}
 
 	int numChanges = ReadInt32();
 	g_Level.Changes.resize(numChanges);
@@ -257,10 +276,30 @@ void LoadObjects()
 
 	int numFrames = ReadInt32();
 	g_Level.Frames.resize(numFrames);
-	ReadBytes(g_Level.Frames.data(), sizeof(short) * numFrames);
-
-	for (int i = 0; i < g_Level.Anims.size(); i++)
-		AddPtr(g_Level.Anims[i].framePtr, short, g_Level.Frames.data());
+	for (int i = 0; i < numFrames; i++)
+	{
+		ANIM_FRAME* frame = &g_Level.Frames[i];
+		frame->boundingBox.X1 = ReadInt16();
+		frame->boundingBox.X2 = ReadInt16();
+		frame->boundingBox.Y1 = ReadInt16();
+		frame->boundingBox.Y2 = ReadInt16();
+		frame->boundingBox.Z1 = ReadInt16();
+		frame->boundingBox.Z2 = ReadInt16();
+		frame->offset.x = ReadInt16();
+		frame->offset.y = ReadInt16();
+		frame->offset.z = ReadInt16();
+		int numAngles = ReadInt16();
+		frame->angles.resize(numAngles);
+		for (int j = 0; j < numAngles; j++)
+		{
+			Quaternion* q = &frame->angles[j];
+			q->x = ReadFloat();
+			q->y = ReadFloat();
+			q->z = ReadFloat();
+			q->w = ReadFloat();
+		}
+	}
+	//ReadBytes(g_Level.Frames.data(), sizeof(ANIM_FRAME) * numFrames);
 
 	int numModels = ReadInt32();
 	for (int i = 0; i < numModels; i++)
@@ -272,7 +311,7 @@ void LoadObjects()
 		Objects[objNum].nmeshes = (short)ReadInt16();
 		Objects[objNum].meshIndex = (short)ReadInt16();
 		Objects[objNum].boneIndex = ReadInt32();
-		Objects[objNum].frameBase = (short*)(ReadInt32() + (int)g_Level.Frames.data());
+		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = (short)ReadInt16();
 
 		ReadInt16();
@@ -291,19 +330,19 @@ void LoadObjects()
 
 		StaticObjects[meshID].meshNumber = (short)ReadInt16();
 
-		StaticObjects[meshID].yMinp = ReadInt16();
-		StaticObjects[meshID].xMaxp = ReadInt16();
-		StaticObjects[meshID].yMinp = ReadInt16();
-		StaticObjects[meshID].yMaxp = ReadInt16();
-		StaticObjects[meshID].zMinp = ReadInt16();
-		StaticObjects[meshID].zMaxp = ReadInt16();
+		StaticObjects[meshID].visibilityBox.X1 = ReadInt16();
+		StaticObjects[meshID].visibilityBox.X2 = ReadInt16();
+		StaticObjects[meshID].visibilityBox.Y1 = ReadInt16();
+		StaticObjects[meshID].visibilityBox.Y2 = ReadInt16();
+		StaticObjects[meshID].visibilityBox.Z1 = ReadInt16();
+		StaticObjects[meshID].visibilityBox.Z2 = ReadInt16();
 
-		StaticObjects[meshID].xMinc = ReadInt16();
-		StaticObjects[meshID].xMaxc = ReadInt16();
-		StaticObjects[meshID].yMinc = ReadInt16();
-		StaticObjects[meshID].yMaxc = ReadInt16();
-		StaticObjects[meshID].zMinc = ReadInt16();
-		StaticObjects[meshID].zMaxc = ReadInt16();
+		StaticObjects[meshID].collisionBox.X1 = ReadInt16();
+		StaticObjects[meshID].collisionBox.X2 = ReadInt16();
+		StaticObjects[meshID].collisionBox.Y1 = ReadInt16();
+		StaticObjects[meshID].collisionBox.Y2 = ReadInt16();
+		StaticObjects[meshID].collisionBox.Z1 = ReadInt16();
+		StaticObjects[meshID].collisionBox.Z2 = ReadInt16();
 
 		StaticObjects[meshID].flags = (short)ReadInt16();
 	}

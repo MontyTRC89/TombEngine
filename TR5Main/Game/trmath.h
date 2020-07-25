@@ -38,4 +38,4 @@ const float lerp(float v0, float v1, float t);
 int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
 void phd_GetVectorAngles(int x, int y, int z, short* angles);
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds);
+void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
