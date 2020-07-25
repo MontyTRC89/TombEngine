@@ -1197,7 +1197,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	short* frame = GetBestFrame(item);
+	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->pos.yRot),
@@ -1464,14 +1464,14 @@ void UpdateShockwaves()
 				{
 					if (sw->flags & 3)
 					{
-						short* frame = GetBestFrame(LaraItem);
+						ANIM_FRAME* frame = GetBestFrame(LaraItem);
 
 						int dx = LaraItem->pos.xPos - sw->x;
 						int dz = LaraItem->pos.zPos - sw->z;
 						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
 						
-						if (sw->y <= LaraItem->pos.yPos + frame[2]
-							|| sw->y >= LaraItem->pos.yPos + frame[3] + 256
+						if (sw->y <= LaraItem->pos.yPos + frame->boundingBox.Y1
+							|| sw->y >= LaraItem->pos.yPos + frame->boundingBox.Y2 + 256
 							|| distance <= sw->innerRad
 							|| distance >= sw->outerRad)
 						{

@@ -28,7 +28,7 @@ void DropBaddyPickups(ITEM_INFO* item)
 	ITEM_INFO* pickup = NULL;
 	FLOOR_INFO* floor;
 	short roomNumber;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 
 	for (short pickupNumber = item->carriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->carriedItem)
 	{
@@ -40,7 +40,7 @@ void DropBaddyPickups(ITEM_INFO* item)
 		floor = GetFloor(pickup->pos.xPos, item->pos.yPos, pickup->pos.zPos, &roomNumber);
 		pickup->pos.yPos = GetFloorHeight(floor, pickup->pos.xPos, item->pos.yPos, pickup->pos.zPos);
 		bounds = GetBoundsAccurate(pickup);
-		pickup->pos.yPos -= bounds[3];
+		pickup->pos.yPos -= bounds->Y2;
 
 		ItemNewRoom(pickupNumber, item->roomNumber);
 		pickup->flags |= 32;
@@ -503,7 +503,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	FLOOR_INFO* floor;
 	PHD_VECTOR old;
 	int xPos, zPos, x, y, z, ceiling, shiftX, shiftZ, dy;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 	int* zone;
 	short roomNumber, radius, biffAngle, top;
 	int boxHeight, height, nextHeight, nextBox;
@@ -536,7 +536,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	bounds = GetBoundsAccurate(item);
-	y = item->pos.yPos + bounds[2];
+	y = item->pos.yPos + bounds->Y1;
 
 	roomNumber = item->roomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
@@ -731,7 +731,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				if (item->objectNumber == ID_WHALE)
 					top = STEP_SIZE / 2;
 				else
-					top = bounds[2];
+					top = bounds->Y1;
 
 				if (item->pos.yPos + top + dy < ceiling)
 				{
@@ -792,7 +792,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		if (LOT->isMonkeying)
 		{
 			ceiling = GetCeiling(floor, item->pos.xPos, y, item->pos.zPos);
-			item->pos.yPos = ceiling - bounds[2];
+			item->pos.yPos = ceiling - bounds->Y1;
 		}
 		else
 		{
@@ -819,7 +819,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		if (item->objectNumber == ID_TYRANNOSAUR || item->objectNumber == ID_SHIVA || item->objectNumber == ID_MUTANT2)
 			top = STEP_SIZE*3;
 		else
-			top = bounds[2];
+			top = bounds->Y1; // TODO: check if Y1 or Y2
 
 		if (item->pos.yPos + top < ceiling)
 		{
@@ -1557,7 +1557,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	ITEM_INFO* enemy;
 	LOT_INFO* LOT;
 	int boxNumber, startBox, overlapIndex, nextBox, flags;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 
 	creature = (CREATURE_INFO*)item->data;
 	enemy = creature->enemy;
@@ -1589,8 +1589,8 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 			if (LOT->fly != NO_FLYING && Lara.waterStatus == LW_ABOVE_WATER)
 			{
-				bounds = GetBestFrame(enemy);
-				LOT->target.y += bounds[2];
+				bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+				LOT->target.y += bounds->Y1;
 			}
 			break;
 

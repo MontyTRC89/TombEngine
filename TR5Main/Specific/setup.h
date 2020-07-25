@@ -17,7 +17,7 @@ typedef struct OBJECT_INFO
 	short nmeshes; 
 	short meshIndex; 
 	int boneIndex; 
-	short* frameBase; 
+	int frameBase;
 	std::function<void(short itemNumber)> initialise;
 	std::function<void(short itemNumber)> control;
 	std::function<void(ITEM_INFO* item, int x, int y, int z, int* height)> floor;
@@ -53,22 +53,12 @@ typedef struct OBJECT_INFO
 	DWORD explodableMeshbits;
 };
 
-typedef struct StaticInfo
+typedef struct STATIC_INFO
 {
 	short meshNumber;
 	short flags;
-	short xMinp;
-	short xMaxp;
-	short yMinp;
-	short yMaxp;
-	short zMinp;
-	short zMaxp;
-	short xMinc;
-	short xMaxc;
-	short yMinc;
-	short yMaxc;
-	short zMinc;
-	short zMaxc;
+	BOUNDING_BOX visibilityBox;
+	BOUNDING_BOX collisionBox;
 };
 
 #define MAX_STATICS 1000
@@ -76,7 +66,7 @@ constexpr auto GRAVITY = 6;
 constexpr auto SWAMP_GRAVITY = 2;
 
 extern OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
-extern StaticInfo StaticObjects[MAX_STATICS];
+extern STATIC_INFO StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags();
 void InitialiseSpecialEffects();

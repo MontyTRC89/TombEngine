@@ -85,13 +85,13 @@ static int CollidedWithTeethSpikes(ITEM_INFO* item)
 	delta = delta & 0xFF4C;
 	delta += 480;
 	int y = item->pos.yPos + SPDETyoffs[angle];
-	short* frames = GetBestFrame(LaraItem);
+	ANIM_FRAME* frames = GetBestFrame(LaraItem);
 
-	if (LaraItem->pos.yPos + frames[2] <= y && LaraItem->pos.yPos + frames[3] >= y - 900)
+	if (LaraItem->pos.yPos + frames->boundingBox.Y1 <= y && LaraItem->pos.yPos + frames->boundingBox.Y2 >= y - 900)
 	{
-		if (LaraItem->pos.xPos + frames[0] <= (x + delta) && LaraItem->pos.xPos + frames[1] >= (x - delta))
+		if (LaraItem->pos.xPos + frames->boundingBox.X1 <= (x + delta) && LaraItem->pos.xPos + frames->boundingBox.X2 >= (x - delta))
 		{
-			if (LaraItem->pos.zPos + frames[4] <= (z + delta) && LaraItem->pos.zPos + frames[5] >= (z - delta))
+			if (LaraItem->pos.zPos + frames->boundingBox.Z1 <= (z + delta) && LaraItem->pos.zPos + frames->boundingBox.Z2 >= (z - delta))
 				return 1;
 		}
 	}
@@ -150,8 +150,8 @@ void ControlTeethSpikes(short itemNumber)
 
 		if (LaraItem->hitPoints > 0 && CollidedWithTeethSpikes(item))
 		{
-			short* itemFrames = GetBestFrame(item);
-			short* laraFrames = GetBestFrame(LaraItem);
+			ANIM_FRAME* itemFrames = GetBestFrame(item);
+			ANIM_FRAME* laraFrames = GetBestFrame(LaraItem);
 
 			short angle = item->triggerFlags & 7;
 			int numBloods = 0;
@@ -174,8 +174,8 @@ void ControlTeethSpikes(short itemNumber)
 				numBloods = (GetRandomControl() & 3) + 2;
 			}
 
-			int laraY1 = LaraItem->pos.yPos + laraFrames[2];
-			int laraY2 = LaraItem->pos.yPos + laraFrames[3];
+			int laraY1 = LaraItem->pos.yPos + laraFrames->boundingBox.Y1;
+			int laraY2 = LaraItem->pos.yPos + laraFrames->boundingBox.Y2;
 
 			short triggerFlags = item->triggerFlags & 0xF;
 			int itemY1;
@@ -183,13 +183,13 @@ void ControlTeethSpikes(short itemNumber)
 
 			if (triggerFlags != 8 && triggerFlags)
 			{
-				itemY1 = itemFrames[2];
-				itemY2 = itemFrames[3];
+				itemY1 = itemFrames->boundingBox.Y1;
+				itemY2 = itemFrames->boundingBox.Y2;
 			}
 			else
 			{
-				itemY1 = -itemFrames[3];
-				itemY2 = -itemFrames[2];
+				itemY1 = -itemFrames->boundingBox.Y2;
+				itemY2 = -itemFrames->boundingBox.Y1;
 			}
 			if (laraY1 < item->pos.yPos + itemY1)
 				laraY1 = itemY1 + item->pos.yPos;

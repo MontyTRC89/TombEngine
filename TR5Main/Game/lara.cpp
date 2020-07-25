@@ -3013,15 +3013,15 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)//18D0C, 18E40 (F)
 			}
 		}
 
-		short* bounds = GetBoundsAccurate(item);
+		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
 		if (edgeCatch <= 0)
 		{
-			item->pos.yPos = edge - bounds[2] - 22;
+			item->pos.yPos = edge - bounds->Y1 - 22;
 		}
 		else
 		{
-			item->pos.yPos += coll->frontFloor - bounds[2];
+			item->pos.yPos += coll->frontFloor - bounds->Y1;
 
 			short dir = (unsigned short) (item->pos.yRot + ANGLE(45.0f)) / ANGLE(90.0f);
 			switch (dir)
@@ -3219,7 +3219,7 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 					if ((angle & 0x3FFF) == 0)
 					{
-						ANIM_FRAME* bounds;
+						BOUNDING_BOX* bounds;
 
 						if (TestHangSwingIn(item, angle))
 						{
@@ -3246,12 +3246,12 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 							}
 						}
 
-						bounds = (ANIM_FRAME*) GetBoundsAccurate(item);
+						bounds = GetBoundsAccurate(item);
 
 						if (edgeCatch <= 0)
-							item->pos.yPos = edge - bounds->MinY + 4;
+							item->pos.yPos = edge - bounds->Y1 + 4;
 						else
-							item->pos.yPos += coll->frontFloor - bounds->MinY;
+							item->pos.yPos += coll->frontFloor - bounds->Y1;
 
 						item->pos.xPos += coll->shift.x;
 						item->pos.zPos += coll->shift.z;
@@ -4575,7 +4575,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 
 				if ((angle & 0x3FFF) == 0)
 				{
-					short* bounds;
+					BOUNDING_BOX* bounds;
 
 					if (TestHangSwingIn(item, angle))
 					{
@@ -4611,7 +4611,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 
 					if (edgeCatch <= 0)
 					{
-						item->pos.yPos = edge - bounds[2];
+						item->pos.yPos = edge - bounds->Y1;
 					}
 					else
 					{
@@ -4640,7 +4640,7 @@ void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
 							break;
 						}
 					}
-					item->pos.yPos += coll->frontFloor - bounds[2];
+					item->pos.yPos += coll->frontFloor - bounds->Y1;
 					item->pos.yRot = angle;
 
 					item->gravityStatus = true;
@@ -5914,7 +5914,7 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F)
 
 int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	int shift, result;
 
 	if (Lara.climbStatus == 0)
@@ -5939,7 +5939,7 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		break;
 	}
 
-	bounds = (ANIM_FRAME*) GetBoundsAccurate(item);
+	bounds = GetBoundsAccurate(item);
 
 	if (Lara.moveAngle != item->pos.yRot)
 	{
@@ -5950,10 +5950,10 @@ int LaraTestHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			return 0;
 	}
 
-	if (LaraTestClimbPos(item, coll->radius, coll->radius, bounds->MinY, bounds->MaxY - bounds->MinY, &shift) &&
-		LaraTestClimbPos(item, coll->radius, -coll->radius, bounds->MinY, bounds->MaxY - bounds->MinY, &shift))
+	if (LaraTestClimbPos(item, coll->radius, coll->radius, bounds->Y1, bounds->Y2 - bounds->Y1, &shift) &&
+		LaraTestClimbPos(item, coll->radius, -coll->radius, bounds->Y1, bounds->Y2 - bounds->Y1, &shift))
 	{
-		result = LaraTestClimbPos(item, coll->radius, 0, bounds->MinY, bounds->MaxY - bounds->MinY, &shift);
+		result = LaraTestClimbPos(item, coll->radius, 0, bounds->Y1, bounds->Y2 - bounds->Y1, &shift);
 		if (result)
 		{
 			if (result != 1)
@@ -6253,12 +6253,12 @@ int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
 
 int LaraTestEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge) // (F) (D)
 {
-	ANIM_FRAME* bounds = (ANIM_FRAME*) GetBoundsAccurate(item);
-	int hdif = coll->frontFloor - bounds->MinY;
+	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+	int hdif = coll->frontFloor - bounds->Y1;
 
 	if (hdif < 0 == hdif + item->fallspeed < 0)
 	{
-		hdif = item->pos.yPos + bounds->MinY;
+		hdif = item->pos.yPos + bounds->Y1;
 
 		if ((hdif + item->fallspeed & 0xFFFFFF00) != (hdif & 0xFFFFFF00))
 		{
@@ -6939,7 +6939,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				flag = 0;
 			frame = (ANIM_FRAME*) GetBoundsAccurate(item);
 			front = coll->frontFloor;
-			dfront = coll->frontFloor - frame->MinY;
+			dfront = coll->frontFloor - frame->boundingBox.Y1;
 			flag2 = 0;
 			x = item->pos.xPos;
 			z = item->pos.zPos;
@@ -7015,7 +7015,7 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 9;
 			frame = (ANIM_FRAME*) GetBoundsAccurate(item);
 			item->pos.xPos += coll->shift.x;
-			item->pos.yPos += frame->MaxY;
+			item->pos.yPos += frame->boundingBox.Y2;
 			item->pos.zPos += coll->shift.z;
 			item->gravityStatus = true;
 			item->speed = 2;

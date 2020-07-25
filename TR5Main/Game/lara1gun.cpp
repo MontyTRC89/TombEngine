@@ -127,8 +127,8 @@ void ControlHarpoonBolt(short itemNumber)
 			(target->status != ITEM_INVISIBLE && Objects[target->objectNumber].collision))
 		{
 			// check against bounds of target for collision
-			short* bounds = GetBestFrame(target);
-			if (item->pos.yPos < target->pos.yPos + bounds[2] || item->pos.yPos > target->pos.yPos + bounds[3])
+			BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(target);
+			if (item->pos.yPos < target->pos.yPos + bounds->Y1 || item->pos.yPos > target->pos.yPos + bounds->Y2)
 				continue;
 
 			// get vector from target to bolt and check against x,z bounds
@@ -143,13 +143,13 @@ void ControlHarpoonBolt(short itemNumber)
 			int oz = oldZ - target->pos.zPos;
 			int sx = (c * ox - s * oz) >> W2V_SHIFT;
 
-			if ((rx < bounds[0] && sx < bounds[0]) || (rx > bounds[1] && sx > bounds[1]))
+			if ((rx < bounds->X1 && sx < bounds->X1) || (rx > bounds->X2 && sx > bounds->X2))
 				continue;
 
 			int rz = (c * z + s * x) >> W2V_SHIFT;
 			int sz = (c * oz + s * ox) >> W2V_SHIFT;
 
-			if ((rz < bounds[4] && sz < bounds[4]) || (rz > bounds[5] && sz > bounds[5]))
+			if ((rz < bounds->Z1 && sz < bounds->Z1) || (rz > bounds->Z2 && sz > bounds->Z2))
 				continue;
 
 			// TODO:

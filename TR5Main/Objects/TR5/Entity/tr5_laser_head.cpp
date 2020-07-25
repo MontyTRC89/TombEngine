@@ -518,21 +518,21 @@ void LaserHeadControl(short itemNumber)
 								{
 									int someIndex = 0;
 
-									short* bounds = GetBoundsAccurate(LaraItem);
-									short tbounds[6];
+									BOUNDING_BOX* bounds = GetBoundsAccurate(LaraItem);
+									BOUNDING_BOX tbounds;
 
-									phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, tbounds);
+									phd_RotBoundingBoxNoPersp(&LaraItem->pos, bounds, &tbounds);
 
-									int x1 = LaraItem->pos.xPos + tbounds[0];
-									int x2 = LaraItem->pos.xPos + tbounds[1];
-									int y1 = LaraItem->pos.yPos + tbounds[2];
-									int y2 = LaraItem->pos.yPos + tbounds[3];
-									int z1 = LaraItem->pos.zPos + tbounds[4];
-									int z2 = LaraItem->pos.zPos + tbounds[5];
+									int x1 = LaraItem->pos.xPos + tbounds.X1;
+									int x2 = LaraItem->pos.xPos + tbounds.X2;
+									int y1 = LaraItem->pos.yPos + tbounds.Y1;
+									int y2 = LaraItem->pos.yPos + tbounds.Y1;
+									int z1 = LaraItem->pos.zPos + tbounds.Z1;
+									int z2 = LaraItem->pos.zPos + tbounds.Z2;
 
-									int xc = LaraItem->pos.xPos + ((bounds[0] + bounds[1]) >> 1);
-									int yc = LaraItem->pos.yPos + ((bounds[2] + bounds[3]) >> 1);
-									int zc = LaraItem->pos.zPos + ((bounds[4] + bounds[5]) >> 1);
+									int xc = LaraItem->pos.xPos + ((bounds->X1 + bounds->X2) / 2);
+									int yc = LaraItem->pos.yPos + ((bounds->Y1 + bounds->Y2) / 2);
+									int zc = LaraItem->pos.zPos + ((bounds->Z1 + bounds->Z2) / 2);
 
 									int distance = sqrt(SQUARE(xc - src.x) + SQUARE(yc - src.y) + SQUARE(zc - src.z));
 

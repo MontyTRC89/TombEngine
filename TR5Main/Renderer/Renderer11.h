@@ -540,7 +540,7 @@ namespace T5M::Renderer
 		void											fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
 		void											buildHierarchy(RendererObject* obj);
 		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-		void											updateAnimation(RendererItem* item, RendererObject& obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
+		void											updateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 		void getVisibleObjects(int from, int to, Vector4* viewPort, bool water, int count, RenderView& renderView);
 		bool checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort,const Matrix& viewProjection);
@@ -555,7 +555,7 @@ namespace T5M::Renderer
 		void											clearSceneItems();
 		void											updateItemsAnimations(RenderView& view);
 		void											updateEffects(RenderView& view);
-		int												getFrame(short animation, short frame, short** framePtr, int* rate);
+		int												getFrame(short animation, short frame, ANIM_FRAME** framePtr, int* rate);
 		bool											drawAmbientCubeMap(short roomNumber);
 		bool											sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		bool											drawHorizonAndSky(ID3D11DepthStencilView* depthTarget);

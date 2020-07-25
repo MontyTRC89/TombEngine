@@ -11,7 +11,7 @@
 #include "tomb4fx.h"
 #include "tr4_ahmet.h"
 
-static short ScalesBounds[12] =
+OBJECT_COLLISION_BOUNDS ScalesBounds =
 {
 	0xFA80, 0xFA80, 0x0000, 0x0000, 0xFE00, 0x0200,
 	0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
@@ -114,12 +114,12 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			short rotY = item->pos.yRot;
 			item->pos.yRot = (short)(l->pos.yRot + ANGLE(45)) & 0xC000;
 
-			ScalesBounds[0] = -1408;
-			ScalesBounds[1] = -640;
-			ScalesBounds[4] = -512;
-			ScalesBounds[5] = 0;
+			ScalesBounds.boundingBox.X1 = -1408;
+			ScalesBounds.boundingBox.X2 = -640;
+			ScalesBounds.boundingBox.Z1 = -512;
+			ScalesBounds.boundingBox.Z2 = 0;
 
-			if (TestLaraPosition(ScalesBounds, item, l))
+			if (TestLaraPosition(&ScalesBounds, item, l))
 			{
 				l->animNumber = ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE;
 				l->frameNumber = g_Level.Anims[item->animNumber].frameBase;

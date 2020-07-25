@@ -170,15 +170,15 @@ void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 {
 	ITEM_INFO* item;
 	ROPE_STRUCT* rope;
-	ANIM_FRAME* frame;
+	BOUNDING_BOX* frame;
 	int segment;
 
 	item = &g_Level.Items[itemNumber];
 	rope = &Ropes[item->triggerFlags];
 	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && (l->currentAnimState == STATE_LARA_REACH || l->currentAnimState == STATE_LARA_JUMP_UP) && l->gravityStatus && l->fallspeed > 0 && rope->active)
 	{
-		frame = (ANIM_FRAME*) GetBoundsAccurate(l);
-		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->MinY + 512, l->pos.zPos + (frame->MaxZ * phd_cos(l->pos.yRot) >> W2V_SHIFT), l->currentAnimState == STATE_LARA_REACH ? 128 : 320);
+		frame = GetBoundsAccurate(l);
+		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->Y1 + 512, l->pos.zPos + (frame->Z2 * phd_cos(l->pos.yRot) >> W2V_SHIFT), l->currentAnimState == STATE_LARA_REACH ? 128 : 320);
 		if (segment >= 0)
 		{
 			if (l->currentAnimState == STATE_LARA_REACH)

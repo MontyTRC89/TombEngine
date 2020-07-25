@@ -25,85 +25,85 @@ extern PHD_VECTOR OldPickupPos;
 extern Inventory g_Inventory;
 
 static PHD_VECTOR CogSwitchPos(0, 0, -856);
-static short CogSwitchBounds[12] =
+OBJECT_COLLISION_BOUNDS CogSwitchBounds =
 {
 	0xFE00, 0x0200, 0x0000, 0x0000, 0xFA00, 0xFE00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-short Switch2Bounds[12] =  
+OBJECT_COLLISION_BOUNDS Switch2Bounds =
 {
 	0xFC00, 0x0400, 0xFC00, 0x0400, 0xFC00, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0,
 	0xC720, 0x38E0
 };
 PHD_VECTOR Switch2Position = { 0, 0, 108 };  
-short TurnSwitchBoundsA[12] = // offset 0xA14D8
+OBJECT_COLLISION_BOUNDS TurnSwitchBoundsA = // offset 0xA14D8
 {
 	0x0200, 0x0380, 0x0000, 0x0000, 0xFE00, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR TurnSwitchPos = { 650, 0, 138 }; // offset 0xA14F0
-short TurnSwitchBoundsC[12] = // offset 0xA14FC
+OBJECT_COLLISION_BOUNDS TurnSwitchBoundsC = // offset 0xA14FC
 {
 	0x0200, 0x0380, 0x0000, 0x0000, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR TurnSwitchPosA = { 650, 0, -138 }; // offset 0xA1514
 PHD_VECTOR RailSwitchPos = { 0, 0, -550 }; // offset 0xA1544
-short RailSwitchBounds[12] = // offset 0xA1550
+OBJECT_COLLISION_BOUNDS RailSwitchBounds = // offset 0xA1550
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFD00, 0xFE00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR RailSwitchPos2 = { 0, 0, 550 }; // offset 0xA1568
-short RailSwitchBounds2[12] = // offset 0xA1574
+OBJECT_COLLISION_BOUNDS RailSwitchBounds2 = // offset 0xA1574
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0x0200, 0x0300, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-short JumpSwitchBounds[12] = // offset 0xA158C
+OBJECT_COLLISION_BOUNDS JumpSwitchBounds = // offset 0xA158C
 {
 	0xFF80, 0x0080, 0xFF00, 0x0100, 0x0180, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR JumpSwitchPos = { 0, -208, 256 }; // offset 0xA15A4
 PHD_VECTOR CrowbarPos = { -89, 0, -328 }; // offset 0xA15B0
-short CrowbarBounds[12] = // offset 0xA15BC
+OBJECT_COLLISION_BOUNDS CrowbarBounds = // offset 0xA15BC
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0xFF00, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR CrowbarPos2 = { 89, 0, 328 }; // offset 0xA15D4
-short CrowbarBounds2[12] = // offset 0xA15E0
+OBJECT_COLLISION_BOUNDS CrowbarBounds2 = // offset 0xA15E0
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0x0100, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-short FullBlockSwitchBounds[12] = // offset 0xA15F8
+OBJECT_COLLISION_BOUNDS FullBlockSwitchBounds = // offset 0xA15F8
 {
 	0xFE80, 0x0180, 0x0000, 0x0100, 0x0000, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR FullBlockSwitchPos = { 0, 0, 0 }; // offset 0xA1610
-short PulleyBounds[12] = // offset 0xA161C
+OBJECT_COLLISION_BOUNDS PulleyBounds = // offset 0xA161C
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR PulleyPos = { 0, 0, -148 }; // offset 0xA1634
 PHD_VECTOR CrowDovePos = { 0, 0, -400 }; // offset 0xA1640
-short UnderwaterSwitchBounds[12] = // offset 0xA164C
+OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds = // offset 0xA164C
 {
 	0xFF00, 0x0100, 0xFB00, 0xFE00, 0xFE00, 0x0000, 0xC720, 0x38E0, 0xC720, 0x38E0,
 	0xC720, 0x38E0
 };
-short UnderwaterSwitchBounds2[12] = // offset 0xA1664
+OBJECT_COLLISION_BOUNDS UnderwaterSwitchBounds2 = // offset 0xA1664
 {
 	0xFF00, 0x0100, 0xFB00, 0xFE00, 0x0000, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0,
 	0xC720, 0x38E0
 };
 PHD_VECTOR UnderwaterSwitchPos = { 0, -736, -416 }; // offset 0xA167C
 PHD_VECTOR UnderwaterSwitchPos2 = { 0, -736, 416 }; // offset 0xA1688
-short SwitchBounds[12] = // offset 0xA1694
+OBJECT_COLLISION_BOUNDS SwitchBounds = // offset 0xA1694
 {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
@@ -142,7 +142,7 @@ void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		int oldYrot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
-		if (TestLaraPosition(PulleyBounds, item, l))
+		if (TestLaraPosition(&PulleyBounds, item, l))
 		{
 			if (MoveLaraPosition(&CrowDovePos, item, l))
 			{
@@ -222,7 +222,7 @@ void FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		return;
 	}
 	
-	if (TestLaraPosition(FullBlockSwitchBounds, item, l))
+	if (TestLaraPosition(&FullBlockSwitchBounds, item, l))
 	{
 		if (MoveLaraPosition(&FullBlockSwitchPos, item, l))
 		{
@@ -309,7 +309,7 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 
 		l->pos.yRot ^= (short)ANGLE(180);
-		if (TestLaraPosition(CrowbarBounds2, item, l))
+		if (TestLaraPosition(&CrowbarBounds2, item, l))
 		{
 			if (Lara.isMoving || g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM)
 			{
@@ -340,7 +340,7 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		if (!TestLaraPosition(CrowbarBounds, item, l))
+		if (!TestLaraPosition(&CrowbarBounds, item, l))
 		{
 			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 			{
@@ -435,7 +435,7 @@ void JumpSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				{
 					if (l->fallspeed > 0 && !item->currentAnimState)
 					{
-						if (TestLaraPosition(JumpSwitchBounds, item, l))
+						if (TestLaraPosition(&JumpSwitchBounds, item, l))
 						{
 							AlignLaraPosition(&JumpSwitchPos, item, l);
 
@@ -479,7 +479,7 @@ void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (item->currentAnimState == 1)
 		{
 			l->pos.yRot ^= (short)ANGLE(180);
-			if (TestLaraPosition(RailSwitchBounds2, item, l))
+			if (TestLaraPosition(&RailSwitchBounds2, item, l))
 			{
 				if (MoveLaraPosition(&RailSwitchPos2, item, l))
 				{
@@ -524,7 +524,7 @@ void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		if (TestLaraPosition(RailSwitchBounds, item, l))
+		if (TestLaraPosition(&RailSwitchBounds, item, l))
 		{
 			if (MoveLaraPosition(&RailSwitchPos, item, l))
 			{
@@ -576,7 +576,7 @@ void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
 		short ItemNos[8];
-		if (TestLaraPosition(TurnSwitchBoundsA, item, l))
+		if (TestLaraPosition(&TurnSwitchBoundsA, item, l))
 		{
 			if (MoveLaraPosition(&TurnSwitchPosA, item, l))
 			{
@@ -619,7 +619,7 @@ void TurnSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		else
 		{
 			l->pos.yRot ^= (short)ANGLE(180);
-			if (TestLaraPosition(TurnSwitchBoundsC, item, l))
+			if (TestLaraPosition(&TurnSwitchBoundsC, item, l))
 			{
 				if (MoveLaraPosition(&TurnSwitchPos, item, l))
 				{
@@ -783,7 +783,7 @@ void PulleyCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		short oldYrot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
-		if (TestLaraPosition(PulleyBounds, item, l))
+		if (TestLaraPosition(&PulleyBounds, item, l))
 		{
 			if (MoveLaraPosition(&PulleyPos, item, l))
 			{
@@ -836,7 +836,7 @@ void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
 		flag = 0;
-		if (TestLaraPosition(UnderwaterSwitchBounds, item, l))
+		if (TestLaraPosition(&UnderwaterSwitchBounds, item, l))
 		{
 			if (!MoveLaraPosition(&UnderwaterSwitchPos, item, l))
 			{
@@ -864,7 +864,7 @@ void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 
 		l->pos.yRot ^= (short)ANGLE(180);
-		if (TestLaraPosition(UnderwaterSwitchBounds2, item, l))
+		if (TestLaraPosition(&UnderwaterSwitchBounds2, item, l))
 		{
 			if (MoveLaraPosition(&UnderwaterSwitchPos2, item, l))
 				flag = 1;
@@ -902,7 +902,7 @@ void SwitchCollision2(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (item->status == ITEM_NOT_ACTIVE && Lara.waterStatus == LW_UNDERWATER && !Lara.gunStatus && l->currentAnimState == STATE_LARA_UNDERWATER_STOP)
 		{
-			if (TestLaraPosition(Switch2Bounds, item, l))
+			if (TestLaraPosition(&Switch2Bounds, item, l))
 			{
 				if (item->currentAnimState == 1 || !item->currentAnimState)
 				{
@@ -940,46 +940,46 @@ void SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& item->triggerFlags >= 0
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
-		short* bounds = GetBoundsAccurate(item);
+		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 		
 		if (item->triggerFlags == 3 && item->currentAnimState == 1 || item->triggerFlags >= 5 && item->triggerFlags <= 7 && !item->currentAnimState)
 			return;
 
-		SwitchBounds[0] = bounds[0] - 256;
-		SwitchBounds[1] = bounds[1] + 256;
+		SwitchBounds.boundingBox.X1 = bounds->X1 - 256;
+		SwitchBounds.boundingBox.X2 = bounds->X2 + 256;
 		if (item->triggerFlags)
 		{
-			SwitchBounds[4] = bounds[4] - 512;
-			SwitchBounds[5] = bounds[5] + 512;
+			SwitchBounds.boundingBox.Z1 = bounds->Z1 - 512;
+			SwitchBounds.boundingBox.Z2 = bounds->Z2 + 512;
 
 			if (item->triggerFlags == 3)
 			{
-				SwitchPos.z = bounds[4] - 256;
+				SwitchPos.z = bounds->Z1 - 256;
 			}
 			else if (item->triggerFlags == 4)
 			{
-				SwitchPos.z = bounds[4] - 88;
+				SwitchPos.z = bounds->Z1 - 88;
 			}
 			else if (item->triggerFlags < 5 || item->triggerFlags > 7)
 			{
 				if (item->triggerFlags < 8)
-					SwitchPos.z = bounds[4] - 128;
+					SwitchPos.z = bounds->Z1 - 128;
 				else
-					SwitchPos.z = bounds[4] - 96;
+					SwitchPos.z = bounds->Z1 - 96;
 			} 
 			else
 			{
-				SwitchPos.z = bounds[4] - 160;
+				SwitchPos.z = bounds->Z1 - 160;
 			}
 		}
 		else
 		{
-			SwitchBounds[4] = bounds[4] - 200;
-			SwitchBounds[5] = bounds[5] + 200;
-			SwitchPos.z = bounds[4] - 64;
+			SwitchBounds.boundingBox.Z1 = bounds->Z1 - 200;
+			SwitchBounds.boundingBox.Z2 = bounds->Z2 + 200;
+			SwitchPos.z = bounds->Z1 - 64;
 		}
 		
-		if (TestLaraPosition(SwitchBounds, item, l))
+		if (TestLaraPosition(&SwitchBounds, item, l))
 		{
 			if (MoveLaraPosition(&SwitchPos, item, l))
 			{
@@ -1343,7 +1343,7 @@ void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				&& l->animNumber == ANIMATION_LARA_STAY_IDLE
 				|| Lara.isMoving && Lara.generalPtr == (void*)itemNum))
 		{
-			if (TestLaraPosition(CogSwitchBounds, item, l))
+			if (TestLaraPosition(&CogSwitchBounds, item, l))
 			{
 				if (MoveLaraPosition(&CogSwitchPos, item, l))
 				{

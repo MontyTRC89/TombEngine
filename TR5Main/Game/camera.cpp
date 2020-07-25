@@ -1605,10 +1605,10 @@ void CalculateCamera()
 		fixedCamera = 0;
 	}
 
-	short* bounds = GetBoundsAccurate(item);
+	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	
 	int x;
-	int y = ((bounds[2] + bounds[3]) >> 1) + item->pos.yPos - 256;
+	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->pos.yPos - 256;
 	int z;
 
 	if (Camera.item)
@@ -1619,7 +1619,7 @@ void CalculateCamera()
 			int dz = Camera.item->pos.zPos - item->pos.zPos;
 			int shift = sqrt(SQUARE(dx) + SQUARE(dz));
 			short angle = phd_atan(dz, dx) - item->pos.yRot;
-			short tilt = phd_atan(shift, y - (bounds[2] + bounds[3]) / 2 - Camera.item->pos.yPos);
+			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->pos.yPos);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle >>= 1;
 			tilt >>= 1;
@@ -1709,7 +1709,7 @@ void CalculateCamera()
 		}
 		else
 		{
-			int shift = (bounds[0] + bounds[1] + bounds[4] + bounds[5]) >> 2;
+			int shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
 			x = item->pos.xPos + (shift * phd_sin(item->pos.yRot) >> W2V_SHIFT);
 			z = item->pos.zPos + (shift * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 
