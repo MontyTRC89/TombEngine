@@ -1599,9 +1599,15 @@ void lara_col_run(ITEM_INFO* item, COLL_INFO* coll)//1B64C, 1B780 (F)
 		{
 			item->pos.zRot = 0;
 
-			item->goalAnimState = STATE_LARA_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->animNumber]))
-				return;
+			if (TestWall(item, 256, 0, -640))
+			{
+				item->goalAnimState = STATE_LARA_SPLAT;
+				if (GetChange(item, &g_Level.Anims[item->animNumber]))
+				{
+					item->currentAnimState = STATE_LARA_SPLAT;
+					return;
+				}
+			}
 
 			LaraCollideStop(item, coll);
 		}
@@ -4421,7 +4427,10 @@ void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll)//15C50, 15D84 (F)
 			{
 				item->goalAnimState = STATE_LARA_SPLAT;
 				if (GetChange(item, &g_Level.Anims[item->animNumber]))
+				{
+					item->currentAnimState = STATE_LARA_SPLAT;
 					return;
+				}
 			}
 
 			LaraCollideStop(item, coll);
