@@ -815,7 +815,7 @@ void do_pickup()
 			}
 			else
 			{
-				if (LaraItem->currentAnimState == STATE_LARA_PICKUP || LaraItem->currentAnimState == STATE_LARA_PICKUP_FROM_CHEST)
+				if (LaraItem->currentAnimState == STATE_LARA_PICKUP || LaraItem->currentAnimState == STATE_LARA_PICKUP_FROM_CHEST || LaraItem->currentAnimState == STATE_LARA_HOLE)
 				{
 					AddDisplayPickup(item->objectNumber);
 					if (item->triggerFlags & 0x100)
