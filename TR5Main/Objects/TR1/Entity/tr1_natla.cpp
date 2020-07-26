@@ -42,7 +42,7 @@ void NatlaControl(short itemNum)
 	short facing = 0;
 	short fx_number, timer;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	natla = (CREATURE_INFO*)item->data;
 	head = angle = tilt = 0;
 	gun = natla->jointRotation[0] * 7 / 8;

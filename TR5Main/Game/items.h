@@ -98,7 +98,7 @@ void InitialiseFXArray(int allocmem);
 short CreateNewEffect(short roomNum);
 void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
-void InitialiseItemArray(int numitems);
+void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
 ITEM_INFO* find_a_fucking_item(short objectNum);
 int FindItemNumber(short objectNumber);

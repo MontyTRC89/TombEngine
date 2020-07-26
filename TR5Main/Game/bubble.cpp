@@ -21,7 +21,7 @@ void UpdateBubbles()
 
 		bubble->size = lerp(0, bubble->destinationSize, alpha);
 		bubble->color = Vector4::Lerp(bubble->sourceColor, bubble->destinationColor, alpha);
-		int ceilingHeight = Rooms[bubble->roomNumber].maxceiling;
+		int ceilingHeight = g_Level.Rooms[bubble->roomNumber].maxceiling;
 		short roomNumber = bubble->roomNumber;
 
 
@@ -34,9 +34,9 @@ void UpdateBubbles()
 			continue;
 		}
 
-		if (!(Rooms[roomNumber].flags & ENV_FLAG_WATER))
+		if (!(g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER))
 		{
-			SetupRipple(bubble->worldPosition.x, Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_LIFE + RIPPLE_FLAG_RAND_ROT);
+			SetupRipple(bubble->worldPosition.x, g_Level.Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_LIFE + RIPPLE_FLAG_RAND_ROT);
 			bubble->active = false;
 			continue;
 		}
@@ -77,7 +77,7 @@ int GetFreeBubble() //8BEAC(<), 8DEF0(<) (F)
 
 void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv) //8BF14(<), 8DF58(<) (F)
 {
-	if (Rooms[roomNum].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
 	{
 		BUBBLE_STRUCT* bubble = &Bubbles[GetFreeBubble()];
 		bubble->active = true;

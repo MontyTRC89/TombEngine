@@ -5,7 +5,7 @@
 
 void PloughControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	item->itemFlags[3] = 50;
 	if (TriggerActive(item))

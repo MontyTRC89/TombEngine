@@ -13,7 +13,7 @@ void SharkControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short angle = 0;
 	short head = 0;
@@ -23,7 +23,7 @@ void SharkControl(short itemNum)
 		if (item->currentAnimState != 5)
 		{
 			item->animNumber = Objects[ID_SHARK].animIndex + 4;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 5;
 		}
 		CreatureFloat(itemNum);

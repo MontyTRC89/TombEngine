@@ -531,7 +531,7 @@ void set_arm_info(LARA_ARM* arm, int frame)
 		arm->animNumber = animBase + 3;
 
 	arm->frameNumber = frame;
-	arm->frameBase = Anims[arm->animNumber].framePtr;
+	arm->frameBase = g_Level.Anims[arm->animNumber].framePtr;
 }
 
 void draw_pistols(int weaponType)

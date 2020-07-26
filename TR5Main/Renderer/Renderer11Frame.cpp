@@ -15,7 +15,7 @@ namespace T5M::Renderer
 	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
-		for (int i = 0; i < Rooms.size(); i++)
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
 			m_rooms[i].Visited = false;
 		}
@@ -37,13 +37,13 @@ namespace T5M::Renderer
 		ROOM_INFO *r = room.Room;
 
 		short itemNum = NO_ITEM;
-		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = Items[itemNum].nextItem)
+		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].nextItem)
 		{
-			//printf("ItemNum: %d, NextItem: %d\n", itemNum, Items[itemNum].nextItem);
+			//printf("ItemNum: %d, NextItem: %d\n", itemNum, g_Level.Items[itemNum].nextItem);
 
-			ITEM_INFO *item = &Items[itemNum];
+			ITEM_INFO *item = &g_Level.Items[itemNum];
 
-			if (item->objectNumber == ID_LARA && itemNum == Items[itemNum].nextItem)
+			if (item->objectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].nextItem)
 				break;
 
 			if (item->objectNumber == ID_LARA)
@@ -55,9 +55,9 @@ namespace T5M::Renderer
 			if (!m_moveableObjects[item->objectNumber].has_value())
 				continue;
 			RendererItem *newItem = &m_items[itemNum];
-			short *bounds = GetBoundsAccurate(item);
-			Vector3 min = (Vector3(bounds[0], bounds[2], bounds[4])) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			Vector3 max = (Vector3(bounds[1], bounds[3], bounds[5])) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+			Vector3 min = (Vector3(bounds->X1, bounds->Y1, bounds->Z1)) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			Vector3 max = (Vector3(bounds->X2, bounds->Y2, bounds->Z2)) + Vector3(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			if (!renderView.camera.frustum.AABBInFrustum(min, max))
 				continue;
 			newItem->Item = item;
@@ -89,9 +89,9 @@ namespace T5M::Renderer
 		{
 			MESH_INFO *mesh = &r->mesh[i];
 			RendererStatic *newStatic = &room.Statics[i];
-			StaticInfo *staticInfo = &StaticObjects[mesh->staticNumber];
-			Vector3 min = Vector3(staticInfo->xMinc, staticInfo->yMinc, staticInfo->zMinc);
-			Vector3 max = Vector3(staticInfo->xMaxc, staticInfo->yMaxc, staticInfo->zMaxc);
+			STATIC_INFO *sinfo = &StaticObjects[mesh->staticNumber];
+			Vector3 min = Vector3(sinfo->collisionBox.X1, sinfo->collisionBox.Y1, sinfo->collisionBox.Z1);
+			Vector3 max = Vector3(sinfo->collisionBox.X2, sinfo->collisionBox.Y2, sinfo->collisionBox.Z2);
 			min += Vector3(mesh->x, mesh->y, mesh->z);
 			max += Vector3(mesh->x, mesh->y, mesh->z);
 			if (!renderView.camera.frustum.AABBInFrustum(min, max))
@@ -336,7 +336,7 @@ namespace T5M::Renderer
 			return;
 		}
 		RendererRoom &const room = m_rooms[roomNumber];
-		ROOM_INFO *r = &Rooms[roomNumber];
+		ROOM_INFO *r = &g_Level.Rooms[roomNumber];
 
 		int numLights = room.Lights.size();
 

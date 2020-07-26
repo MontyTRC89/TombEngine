@@ -41,12 +41,12 @@ void InitialiseCivvy(short item_number)
 {
 	ITEM_INFO* item;
 
-	item = &Items[item_number];
+	item = &g_Level.Items[item_number];
 	InitialiseCreature(item_number);
 
 	/* Start Civvy in stop pose */
 	item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_STOP_ANIM;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = item->goalAnimState = CIVVY_STOP;
 }
 
@@ -62,11 +62,11 @@ void CivvyControl(short item_number)
 	int lara_dx, lara_dz;
 	AI_INFO info, lara_info;
 
-	item = &Items[item_number];
+	item = &g_Level.Items[item_number];
 	civvy = (CREATURE_INFO*)item->data;
 	torso_y = torso_x = head = angle = tilt = 0;
 
-	if (Boxes[item->boxNumber].flags & BLOCKED)
+	if (g_Level.Boxes[item->boxNumber].flags & BLOCKED)
 	{
 		// DoLotsOfBloodD
 		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);
@@ -78,7 +78,7 @@ void CivvyControl(short item_number)
 		if (item->currentAnimState != CIVVY_DEATH)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_DIE_ANIM;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = CIVVY_DEATH;
 			civvy->LOT.step = STEP_SIZE;
 		}
@@ -353,7 +353,7 @@ void CivvyControl(short item_number)
 			/* Half block jump */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB1_ANIM;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = CIVVY_CLIMB1;
 			break;
 
@@ -361,7 +361,7 @@ void CivvyControl(short item_number)
 			/* 3/4 block jump */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB2_ANIM;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = CIVVY_CLIMB2;
 			break;
 
@@ -369,14 +369,14 @@ void CivvyControl(short item_number)
 			/* Full block jump */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB3_ANIM;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = CIVVY_CLIMB3;
 			break;
 		case -4:
 			/* Full block fall */
 			civvy->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_FALL3_ANIM;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = CIVVY_FALL3;
 			break;
 		}
@@ -398,7 +398,7 @@ void ControlElectricFence(short item_number)
 	long x,z,xsize,zsize;
 	long dx,dz,tx,ty,tz,xand,zand;
 
-	item = &items[item_number];
+	item = &g_Level.Items[item_number];
 
 	if (!TriggerActive(item))
 		return;

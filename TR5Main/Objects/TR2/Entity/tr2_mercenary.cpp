@@ -20,7 +20,7 @@ void MercenaryUziControl(short itemNum)
 	AI_INFO info;
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	mc1 = (CREATURE_INFO*)item->data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
@@ -29,7 +29,7 @@ void MercenaryUziControl(short itemNum)
 		if (item->currentAnimState != 13)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 14;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 13;
 		}
 	}
@@ -209,7 +209,7 @@ void MercenaryAutoPistolControl(short itemNum)
 	AI_INFO info;
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	mc2 = (CREATURE_INFO*)item->data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
@@ -218,7 +218,7 @@ void MercenaryAutoPistolControl(short itemNum)
 		if (item->currentAnimState != 11)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 9;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 11;
 		}
 	}

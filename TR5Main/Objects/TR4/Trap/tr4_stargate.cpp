@@ -17,7 +17,7 @@ short StargateBounds[24] =
 
 void StargateControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	item->itemFlags[3] = 50;
 
 	if (TriggerActive(item))
@@ -34,7 +34,7 @@ void StargateControl(short itemNum)
 
 void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->status == ITEM_INVISIBLE)
 		return;

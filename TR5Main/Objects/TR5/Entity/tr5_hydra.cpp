@@ -27,10 +27,10 @@ void InitialiseHydra(short itemNum)
 {
     ITEM_INFO* item;
 
-    item = &Items[itemNum];
+    item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = 30 * item->triggerFlags + Anims[item->animNumber].frameBase;
+    item->frameNumber = 30 * item->triggerFlags + g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = STATE_HYDRA_STOP;
     item->currentAnimState = STATE_HYDRA_STOP;
 
@@ -155,7 +155,7 @@ void HydraControl(short itemNumber)
 	short joint1 = 0;
 	short joint0 = 0;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	if (item->hitPoints > 0)
@@ -316,7 +316,7 @@ void HydraControl(short itemNumber)
 
 			if (!(GlobalCounter & 3))
 			{
-				frame = ((Anims[item->animNumber].frameBase - item->frameNumber) >> 3) + 1;
+				frame = ((g_Level.Anims[item->animNumber].frameBase - item->frameNumber) >> 3) + 1;
 				if (frame > 16)
 					frame = 16;
 				TriggerHydraSparks(itemNumber, frame);
@@ -324,7 +324,7 @@ void HydraControl(short itemNumber)
 			break;
 
 		case 3:
-			if (item->frameNumber == Anims[item->animNumber].frameBase)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 			{
 				pos1.x = 0;
 				pos1.y = 1024;
@@ -399,10 +399,10 @@ void HydraControl(short itemNumber)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 15;
 			item->currentAnimState = STATE_HYDRA_DEATH;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 
-		if (!((item->frameNumber - Anims[item->animNumber].frameBase) & 7))
+		if (!((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) & 7))
 		{
 			if (item->itemFlags[3] < 12)
 			{
