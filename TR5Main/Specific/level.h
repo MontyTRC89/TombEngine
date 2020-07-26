@@ -104,7 +104,9 @@ struct MESH
 struct ANIM_FRAME
 {
 	BOUNDING_BOX boundingBox;
-	Vector3 offset;
+	short offsetX;
+	short offsetY;
+	short offsetZ;
 	std::vector<Quaternion> angles;
 };
 
@@ -163,12 +165,6 @@ void LoadTextureInfos();
 void LoadAIObjects();
 FILE* FileOpen(const char* fileName);
 void FileClose(FILE* ptr);
-void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
+bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
 
 unsigned CALLBACK LoadLevel(void* data);
-
-// New functions for loading data from TR5M footer
-bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg);
-bool ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg);
-bool ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg);
-void LoadNewData(int size);
