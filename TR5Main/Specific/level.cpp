@@ -18,11 +18,6 @@ using T5M::Renderer::g_Renderer;
 using std::vector;
 using std::string;
 
-ChunkId* ChunkTriggersList = ChunkId::FromString("Tr5Triggers");
-ChunkId* ChunkTrigger = ChunkId::FromString("Tr5Trigger");
-ChunkId* ChunkLuaIds = ChunkId::FromString("Tr5LuaIds");
-ChunkId* ChunkLuaId = ChunkId::FromString("Tr5LuaId");
-
 FILE* LevelFilePtr;
 uintptr_t hLoadLevel;
 unsigned int ThreadId;
@@ -144,8 +139,8 @@ int LoadItems()
 				{
 					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
 						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
-						(st->collisionBox.X1 ^ st->collisionBox.X2) & 0x8000 &&
-						(st->collisionBox.Z1 ^ st->collisionBox.Z2) & 0x8000)
+						(st->collisionBox.X1 < 0 ^ st->collisionBox.X2 < 0) &&
+						(st->collisionBox.Z1 < 0 ^ st->collisionBox.Z2 < 0))
 					{
 						floor->box |= 8; 
 					}
@@ -285,9 +280,9 @@ void LoadObjects()
 		frame->boundingBox.Y2 = ReadInt16();
 		frame->boundingBox.Z1 = ReadInt16();
 		frame->boundingBox.Z2 = ReadInt16();
-		frame->offset.x = ReadInt16();
-		frame->offset.y = ReadInt16();
-		frame->offset.z = ReadInt16();
+		frame->offsetX = ReadInt16();
+		frame->offsetY = ReadInt16();
+		frame->offsetZ = ReadInt16();
 		int numAngles = ReadInt16();
 		frame->angles.resize(numAngles);
 		for (int j = 0; j < numAngles; j++)
@@ -328,7 +323,7 @@ void LoadObjects()
 		int meshID = ReadInt32();
 		StaticObjectsIds.push_back(meshID);
 
-		StaticObjects[meshID].meshNumber = (short)ReadInt16();
+		StaticObjects[meshID].meshNumber = (short)ReadInt32();
 
 		StaticObjects[meshID].visibilityBox.X1 = ReadInt16();
 		StaticObjects[meshID].visibilityBox.X2 = ReadInt16();
@@ -371,109 +366,103 @@ void LoadTextures()
 
 	int size;
 
-	int numTextures;
-	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	int numTextures = ReadInt32();
 	g_Level.RoomTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
 
-		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
-		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
+		texture.width = ReadInt32();
+		texture.height = ReadInt32();
 
-		ReadFileEx(&size, 1, 4, LevelFilePtr);
+		size = ReadInt32();
 		texture.colorMapData.resize(size);
-		ReadFileEx(texture.colorMapData.data(), 1, size, LevelFilePtr);
+		ReadBytes(texture.colorMapData.data(), size);
 		
-		bool hasNormalMap;
-		ReadFileEx(&hasNormalMap, 1, 1, LevelFilePtr);
+		byte hasNormalMap = ReadInt8();
 		if (hasNormalMap)
 		{
-			ReadFileEx(&size, 1, 4, LevelFilePtr);
+			size = ReadInt32();
 			texture.normalMapData.resize(size);
-			ReadFileEx(texture.normalMapData.data(), 1, size, LevelFilePtr);
+			ReadBytes(texture.normalMapData.data(), size);
 		}
 
 		g_Level.RoomTextures.push_back(texture);
 	}
 
-	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	numTextures = ReadInt32();
 	g_Level.MoveablesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
 
-		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
-		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
+		texture.width = ReadInt32();
+		texture.height = ReadInt32();
 
-		ReadFileEx(&size, 1, 4, LevelFilePtr);
+		size = ReadInt32();
 		texture.colorMapData.resize(size);
-		ReadFileEx(texture.colorMapData.data(), 1, size, LevelFilePtr);
+		ReadBytes(texture.colorMapData.data(), size);
 
-		bool hasNormalMap;
-		ReadFileEx(&hasNormalMap, 1, 1, LevelFilePtr);
+		bool hasNormalMap = ReadInt8();
 		if (hasNormalMap)
 		{
-			ReadFileEx(&size, 1, 4, LevelFilePtr);
+			size = ReadInt32();
 			texture.normalMapData.resize(size);
-			ReadFileEx(texture.normalMapData.data(), 1, size, LevelFilePtr);
+			ReadBytes(texture.normalMapData.data(), size);
 		}
 
 		g_Level.MoveablesTextures.push_back(texture);
 	}
 
-	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	numTextures = ReadInt32();
 	g_Level.StaticsTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
 
-		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
-		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
-		
-		ReadFileEx(&size, 1, 4, LevelFilePtr);
-		texture.colorMapData.resize(size);
-		ReadFileEx(texture.colorMapData.data(), 1, size, LevelFilePtr);
+		texture.width = ReadInt32();
+		texture.height = ReadInt32();
 
-		bool hasNormalMap;
-		ReadFileEx(&hasNormalMap, 1, 1, LevelFilePtr);
+		size = ReadInt32();
+		texture.colorMapData.resize(size);
+		ReadBytes(texture.colorMapData.data(), size);
+
+		bool hasNormalMap = ReadInt8();
 		if (hasNormalMap)
 		{
-			ReadFileEx(&size, 1, 4, LevelFilePtr);
+			size = ReadInt32();
 			texture.normalMapData.resize(size);
-			ReadFileEx(texture.normalMapData.data(), 1, size, LevelFilePtr);
+			ReadBytes(texture.normalMapData.data(), size);
 		}
 
 		g_Level.StaticsTextures.push_back(texture);
 	}
 
-	ReadFileEx(&numTextures, 1, 4, LevelFilePtr);
+	numTextures = ReadInt32();
 	g_Level.SpritesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
 	{
 		TEXTURE texture;
 
-		ReadFileEx(&texture.width, 1, 4, LevelFilePtr);
-		ReadFileEx(&texture.height, 1, 4, LevelFilePtr);
-		
-		ReadFileEx(&size, 1, 4, LevelFilePtr);
+		texture.width = ReadInt32();
+		texture.height = ReadInt32();
+
+		size = ReadInt32();
 		texture.colorMapData.resize(size);
-		ReadFileEx(texture.colorMapData.data(), 1, size, LevelFilePtr);
+		ReadBytes(texture.colorMapData.data(), size);
 
 		g_Level.SpritesTextures.push_back(texture);
 	}
 
-	ReadFileEx(&g_Level.MiscTextures.width, 1, 4, LevelFilePtr);
-	ReadFileEx(&g_Level.MiscTextures.height, 1, 4, LevelFilePtr);
-	ReadFileEx(&size, 1, 4, LevelFilePtr);
+	g_Level.MiscTextures.width = ReadInt32();
+	g_Level.MiscTextures.height = ReadInt32();
+	size = ReadInt32();
 	g_Level.MiscTextures.colorMapData.resize(size);
-	ReadFileEx(g_Level.MiscTextures.colorMapData.data(), 1, size, LevelFilePtr);
+	ReadBytes(g_Level.MiscTextures.colorMapData.data(), size);
 }
 
 void ReadRooms()
 {
-	ReadInt32();
-
 	int numRooms = ReadInt32();
 	printf("NumRooms: %d\n", numRooms);
 	
@@ -909,37 +898,26 @@ void FileClose(FILE* ptr)
 	fclose(ptr);
 }
 
-void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize)
+bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize)
 {
-	int z_result = uncompress(
+	z_stream strm;
+	ZeroMemory(&strm, sizeof(z_stream));
+	strm.avail_in = compressedSize;
+	strm.avail_out = uncompressedSize;
+	strm.next_out = (BYTE*)dest;
+	strm.next_in = (BYTE*)src;
 
-		dest,       // destination for the uncompressed
-								// data.  This should be the size of
-								// the original data, which you should
-								// already know.
+	inflateInit(&strm);
+	inflate(&strm, Z_FULL_FLUSH);
 
-		&uncompressedSize,  // length of destination (uncompressed)
-								// buffer
-
-		src,   // source buffer - the compressed data
-
-		compressedSize);   // length of compressed data in bytes
-
-	switch (z_result)
+	if (strm.total_out == uncompressedSize)
 	{
-	case Z_OK:
-		printf("***** SUCCESS! *****\n");
-		break;
-
-	case Z_MEM_ERROR:
-		printf("out of memory\n");
-		exit(1);    // quit.
-		break;
-
-	case Z_BUF_ERROR:
-		printf("output buffer wasn't large enough!\n");
-		exit(1);    // quit.
-		break;
+		inflateEnd(&strm);
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -959,6 +937,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 	LevelDataPtr = NULL;
 	LevelFilePtr = NULL;
+	char* baseLevelDataPtr = NULL;
 
 	g_Renderer.UpdateProgress(0);
 
@@ -966,29 +945,32 @@ unsigned CALLBACK LoadLevel(void* data)
 	if (LevelFilePtr)
 	{
 		int version;
-		short numRoomTextureTiles;
-		short numObjectsTextureTiles;
-		short numBumpTextureTiles;
+		int uncompressedSize;
+		int compressedSize;
+		char* compressedBuffer;
 
+		// Read file header
 		ReadFileEx(&version, 1, 4, LevelFilePtr);
-		
+		ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
+		ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
+
+		// The entire level is ZLIB compressed
+		compressedBuffer = (char*)malloc(compressedSize);
+		LevelDataPtr = (char*)malloc(uncompressedSize);
+		baseLevelDataPtr = LevelDataPtr;
+
+		ReadFileEx(compressedBuffer, compressedSize, 1, LevelFilePtr);
+		Decompress((byte*)LevelDataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
+
+		// Now the entire level is decompressed
+		free(compressedBuffer);
+
 		LoadTextures();
 
 		g_Renderer.UpdateProgress(20);
 
-		short buffer[32];
-		ReadFileEx(&buffer, 2, 16, LevelFilePtr);
-		WeatherType = buffer[0];
-		LaraDrawType = buffer[1];
-
-		int uncompressedSize;
-		int compressedSize;
-
-		ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
-		ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
-
-		LevelDataPtr = (char*)malloc(uncompressedSize);
-		ReadFileEx(LevelDataPtr, uncompressedSize, 1, LevelFilePtr);
+		WeatherType = ReadInt8();
+		LaraDrawType = ReadInt8();
 
 		LoadRooms();
 		g_Renderer.UpdateProgress(40);
@@ -1011,21 +993,10 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadItems();
 		LoadAIObjects();
-		//LoadDemoData();
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);
 
-		int extraSize = 0;
-		ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
-		if (extraSize > 0)
-		{
-			ReadFileEx(&extraSize, 1, 4, LevelFilePtr);
-			LevelDataPtr = (char*)malloc(extraSize);
-			ReadFileEx(LevelDataPtr, extraSize, 1, LevelFilePtr);
-
-			LoadNewData(extraSize);
-		}
-
+		free(baseLevelDataPtr);
 		LevelDataPtr = NULL;
 		FileClose(LevelFilePtr);
 	}
@@ -1033,16 +1004,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	{
 		return false;
 	}
-	/*
-	// Load also the new file format
-	string t5mFileName = string(filename);
-	std::transform(t5mFileName.begin(), t5mFileName.end(), t5mFileName.begin(),
-		[](unsigned char c) { return std::tolower(c); });
-	replace(t5mFileName, ".trc", ".t5m");
-	LevelLoader* loader = new LevelLoader(t5mFileName);
-	loader->Load();
-	delete loader;
-	*/
+
 	g_Renderer.UpdateProgress(90);
 	g_Renderer.PrepareDataForTheRenderer();
 	
@@ -1086,23 +1048,19 @@ void LoadSamples()
 		int numSampleIndices = ReadInt32();
 		if (numSampleIndices)
 		{
-			int numSamples = 0;
-			ReadFileEx(&numSamples, 1, 4, LevelFilePtr);
-			//if (feof(LevelFilePtr))
-			//	return;
-
+			int numSamples = ReadInt32();
 			if (numSamples <= 0)
 				return;
 
 			int uncompressedSize;
 			int compressedSize;
-			char* buffer = (char*)malloc(1048576);
+			char* buffer = (char*)malloc(2 * 1048576);
 
 			for (int i = 0; i < numSamples; i++)
 			{
-				ReadFileEx(&uncompressedSize, 4, 1, LevelFilePtr);
-				ReadFileEx(&compressedSize, 4, 1, LevelFilePtr);
-				ReadFileEx(buffer, 1, compressedSize, LevelFilePtr);
+				uncompressedSize = ReadInt32();
+				compressedSize = ReadInt32();
+				ReadBytes(buffer, compressedSize);
 				Sound_LoadSample(buffer, compressedSize, uncompressedSize, i);
 			}
 
@@ -1180,70 +1138,6 @@ int S_LoadLevelFile(int levelIndex)
 	while (IsLevelLoading);
 
 	return true;
-}
-
-bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg)
-{
-	if (chunkId->EqualsTo(ChunkLuaId))
-	{
-		int luaId = 0;
-		g_levelChunkIO->GetRawStream()->ReadInt32(&luaId);
-		
-		int itemId = 0;
-		g_levelChunkIO->GetRawStream()->ReadInt32(&itemId);
-
-		g_GameScript->AddLuaId(luaId, itemId);
-
-		return true;
-	}
-	else
-		return false;
-}
-
-bool ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg)
-{
-	if (chunkId->EqualsTo(ChunkTrigger))
-	{
-		char* functionName = NULL;
-		g_levelChunkIO->GetRawStream()->ReadString(&functionName);
-		
-		char* functionCode = NULL;
-		g_levelChunkIO->GetRawStream()->ReadString(&functionCode);
-
-		LuaFunction* function = new LuaFunction();
-		function->Name = string(functionName);
-		function->Code = string(functionCode);
-		function->Executed = false;
-
-		g_GameScript->AddTrigger(function);
-
-		delete functionName;
-		delete functionCode;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-bool ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg)
-{
-	if (chunkId->EqualsTo(ChunkTriggersList))
-		return g_levelChunkIO->ReadChunks(ReadLuaTriggers, 0);
-	else if (chunkId->EqualsTo(ChunkLuaIds))
-		return g_levelChunkIO->ReadChunks(ReadLuaIds, 0);
-	return false;
-}
-
-void LoadNewData(int size)
-{
-	// Free old level scripts
-	MemoryStream stream(LevelDataPtr, size);
-	g_levelChunkIO = new ChunkReader(0x4D355254, &stream);
-	if (!g_levelChunkIO->IsValid())
-		return;
-
-	g_levelChunkIO->ReadChunks(ReadNewDataChunks, 0);
 }
 
 void LoadSprites()

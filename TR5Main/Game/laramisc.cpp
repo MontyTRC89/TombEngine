@@ -1052,8 +1052,8 @@ void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
 	frame = (ANIM_FRAME*) GetBestFrame(item);
 	ropeY = Lara.ropeY - ANGLE(90);
 	rope = &Ropes[Lara.ropePtr];
-	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offset.y, &pos.x, &pos.y, &pos.z);
-	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offset.y - 192, &pos2.x, &pos2.y, &pos2.z);
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offsetY, &pos.x, &pos.y, &pos.z);
+	_0x0046D130(rope, (Lara.ropeSegment - 1 << 7) + frame->offsetY - 192, &pos2.x, &pos2.y, &pos2.z);
 	diff.x = pos.x - pos2.x << 16;
 	diff.y = pos.y - pos2.y << 16;
 	diff.z = pos.z - pos2.z << 16;
