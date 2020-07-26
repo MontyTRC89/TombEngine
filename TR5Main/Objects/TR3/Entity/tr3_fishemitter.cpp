@@ -161,7 +161,7 @@ void ControlFish(short itemNumber)
 	int pirahnaAttack = 0;
 	int angle = 0;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	ITEM_INFO* enemy = item;
 
 	if (!TriggerActive(item))
@@ -196,7 +196,7 @@ void ControlFish(short itemNumber)
 		if (pirahnaAttack == 1)
 			enemy = LaraItem;
 		else
-			enemy = &Items[CarcassItem];
+			enemy = &g_Level.Items[CarcassItem];
 
 		LeaderInfo[leader].angle = fish->angle = (-(mGetAngle(fish->x + item->pos.xPos, fish->z + item->pos.zPos, enemy->pos.xPos, enemy->pos.zPos) + 0x4000) >> 4) & 4095;
 		LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;

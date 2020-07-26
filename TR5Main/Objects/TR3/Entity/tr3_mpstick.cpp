@@ -35,11 +35,11 @@ typedef enum MPSTICK_STATES {
 
 void InitialiseMPStick(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 6;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = item->goalAnimState = BATON_STOP;
 }
 
@@ -48,7 +48,7 @@ void MPStickControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short torsoY = 0;
 	short torsoX = 0;
@@ -56,7 +56,7 @@ void MPStickControl(short itemNumber)
 	short angle = 0;
 	short tilt = 0;
 
-	if (Boxes[item->boxNumber].flags & BLOCKED)
+	if (g_Level.Boxes[item->boxNumber].flags & BLOCKED)
 	{
 		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);
 		item->hitPoints -= 20;
@@ -77,7 +77,7 @@ void MPStickControl(short itemNumber)
 		if (item->currentAnimState != BATON_DEATH)
 		{
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 26;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = BATON_DEATH;
 			creature->LOT.step = 256;
 		}
@@ -102,7 +102,7 @@ void MPStickControl(short itemNumber)
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 
-				target = &Items[currentCreature->itemNum];
+				target = &g_Level.Items[currentCreature->itemNum];
 				if (target->objectNumber != ID_LARA /*&& target->objectNumber != ID_BOB*/)
 					continue;
 
@@ -433,7 +433,7 @@ void MPStickControl(short itemNumber)
 
 			if (enemy == LaraItem)
 			{
-				if (creature->flags != 1 && (item->touchBits & 0x60) && (item->frameNumber > Anims[item->animNumber].frameBase + 8))
+				if (creature->flags != 1 && (item->touchBits & 0x60) && (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 8))
 				{
 					LaraItem->hitPoints -= 150;
 					LaraItem->hitStatus = 1;
@@ -445,7 +445,7 @@ void MPStickControl(short itemNumber)
 			}
 			else
 			{
-				if (!creature->flags != 1 && enemy && (item->frameNumber > Anims[item->animNumber].frameBase + 8))
+				if (!creature->flags != 1 && enemy && (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 8))
 				{
 					if (abs(enemy->pos.xPos - item->pos.xPos) < 256 &&
 						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
@@ -476,27 +476,27 @@ void MPStickControl(short itemNumber)
 		case 2:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 28;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = BATON_CLIMB1;
 			break;
 
 		case 3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 29;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = BATON_CLIMB2;
 			break;
 
 		case 4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 27;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = BATON_CLIMB3;
 			break;
 		case -4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 30;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = BATON_FALL3;
 			break;
 		}

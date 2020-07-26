@@ -12,12 +12,12 @@ BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 
 void InitialiseMonkey(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_MONKEY].animIndex + 2;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = 6;
 	item->goalAnimState = 6;
 }
@@ -27,7 +27,7 @@ void MonkeyControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short headX = 0;
@@ -47,7 +47,7 @@ void MonkeyControl(short itemNumber)
 		{
 			item->meshBits = -1;
 			item->animNumber = Objects[ID_MONKEY].animIndex + 14;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 11;
 		}
 	}
@@ -68,7 +68,7 @@ void MonkeyControl(short itemNumber)
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 
-				ITEM_INFO* target = &Items[currentCreature->itemNum];
+				ITEM_INFO* target = &g_Level.Items[currentCreature->itemNum];
 				if (target->objectNumber == ID_LARA || target->objectNumber == ID_MONKEY)
 					continue;
 
@@ -277,7 +277,7 @@ void MonkeyControl(short itemNumber)
 				break;
 			else if ((creature->enemy->objectNumber == ID_SMALLMEDI_ITEM ||
 				creature->enemy->objectNumber == ID_KEY_ITEM4) &&
-				item->frameNumber == Anims[item->animNumber].frameBase + 12)
+				item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 12)
 			{
 				if (creature->enemy->roomNumber == NO_ROOM ||
 					creature->enemy->status == ITEM_INVISIBLE ||
@@ -286,8 +286,8 @@ void MonkeyControl(short itemNumber)
 				else
 				{
 					// Pickup the item!
-					item->carriedItem = creature->enemy - Items.data();
-					RemoveDrawnItem(creature->enemy - Items.data());
+					item->carriedItem = creature->enemy - g_Level.Items.data();
+					RemoveDrawnItem(creature->enemy - g_Level.Items.data());
 					creature->enemy->roomNumber = NO_ROOM;
 					creature->enemy->carriedItem = NO_ITEM;
 
@@ -298,7 +298,7 @@ void MonkeyControl(short itemNumber)
 						if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 							continue;
 
-						ITEM_INFO* target = &Items[currentCreature->itemNum];
+						ITEM_INFO* target = &g_Level.Items[currentCreature->itemNum];
 						if (currentCreature->enemy == creature->enemy)
 							currentCreature->enemy = NULL;
 					}
@@ -312,11 +312,11 @@ void MonkeyControl(short itemNumber)
 					}
 				}
 			}
-			else if (creature->enemy->objectNumber == ID_AI_AMBUSH && item->frameNumber == Anims[item->animNumber].frameBase + 12)
+			else if (creature->enemy->objectNumber == ID_AI_AMBUSH && item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 12)
 			{
 				item->aiBits = 0;
 
-				ITEM_INFO* carriedItem = &Items[item->carriedItem];
+				ITEM_INFO* carriedItem = &g_Level.Items[item->carriedItem];
 
 				carriedItem->pos.xPos = item->pos.xPos;
 				carriedItem->pos.yPos = item->pos.yPos;
@@ -537,42 +537,42 @@ void MonkeyControl(short itemNumber)
 		case 2:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MONKEY].animIndex + 19;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 17;
 			break;
 
 		case 3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MONKEY].animIndex + 18;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 16;
 			break;
 
 		case 4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MONKEY].animIndex + 17;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 15;
 			break;
 
 		case -2:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MONKEY].animIndex + 22;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 20;
 			break;
 
 		case -3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MONKEY].animIndex + 21;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 19;
 			break;
 
 		case -4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MONKEY].animIndex + 20;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 18;
 			break;
 		}

@@ -15,10 +15,7 @@
 #include "sound.h"
 #include "snowmobile.h"
 
-short FireBounds[12] =
-{
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
-};
+extern OBJECT_COLLISION_BOUNDS FireBounds;
 
 void TriggerTorchFlame(char fxObj, char node)
 {
@@ -153,7 +150,7 @@ void DoFlameTorch() // (F) (D)
 	if (Lara.flareControlLeft)
 		Lara.gunStatus = LG_READY;
 
-	Lara.leftArm.frameBase = Anims[Lara.leftArm.animNumber].framePtr;
+	Lara.leftArm.frameBase = g_Level.Anims[Lara.leftArm.animNumber].framePtr;
 
 	if (Lara.litTorch)
 	{
@@ -168,7 +165,7 @@ void DoFlameTorch() // (F) (D)
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 		
 		if (!(Wibble & 7))
-			TriggerTorchFlame(LaraItem - Items.data(), 0);
+			TriggerTorchFlame(LaraItem - g_Level.Items.data(), 0);
 		
 		SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
 
@@ -188,7 +185,7 @@ void GetFlameTorch() // (F) (D)
 	Lara.gunStatus = LG_READY;
 	Lara.leftArm.lock = false;
 	Lara.leftArm.frameNumber = 0;
-	Lara.leftArm.frameBase = Anims[Lara.leftArm.animNumber].framePtr;
+	Lara.leftArm.frameBase = g_Level.Anims[Lara.leftArm.animNumber].framePtr;
 	
 	//LARA_MESHES(ID_LARA_TORCH_ANIM, LM_LHAND);
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
@@ -196,7 +193,7 @@ void GetFlameTorch() // (F) (D)
 
 void TorchControl(short itemNumber) // (F) (D)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
@@ -216,7 +213,7 @@ void TorchControl(short itemNumber) // (F) (D)
 	item->pos.xPos += xv;
 	item->pos.zPos += zv;
 
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		item->fallspeed += (5 - item->fallspeed) / 2;
 		item->speed += (5 - item->speed) / 2;
@@ -237,17 +234,17 @@ void TorchControl(short itemNumber) // (F) (D)
 		if (CollidedItems)
 		{
 			if (!Objects[CollidedItems[0]->objectNumber].intelligent)
-				ObjectCollision(CollidedItems[0] - Items.data(), item, &lara_coll);
+				ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &lara_coll);
 		}
 		else
 		{
-			StaticInfo* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
+			STATIC_INFO* sobj = &StaticObjects[CollidedMeshes[0]->staticNumber];
 			PHD_3DPOS pos;
 			pos.xPos = CollidedMeshes[0]->x;
 			pos.yPos = CollidedMeshes[0]->y;
 			pos.zPos = CollidedMeshes[0]->z;
 			pos.yRot = CollidedMeshes[0]->yRot;
-			ItemPushLaraStatic(item, &sobj->xMinc, &pos, &lara_coll);
+			ItemPushLaraStatic(item, &sobj->collisionBox, &pos, &lara_coll);
 		}
 		item->speed >>= 1;
 	}
@@ -263,7 +260,7 @@ void TorchControl(short itemNumber) // (F) (D)
 
 void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (Lara.gunType != WEAPON_TORCH
 		|| Lara.gunStatus != LG_READY
@@ -285,34 +282,34 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		switch (item->objectNumber)
 		{
 		case ID_FLAME_EMITTER:
-			FireBounds[0] = -256;
-			FireBounds[1] = 256;
-			FireBounds[2] = 0;
-			FireBounds[3] = 1024;
-			FireBounds[4] = -800;
-			FireBounds[5] = 800;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -800;
+			FireBounds.boundingBox.Z2 = 800;
 			break;
 		case ID_FLAME_EMITTER2:
-			FireBounds[1] = -256;
-			FireBounds[2] = 256;
-			FireBounds[3] = 0;
-			FireBounds[4] = 1024;
-			FireBounds[5] = -600;
-			FireBounds[6] = 600;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -600;
+			FireBounds.boundingBox.Z2 = 600;
 			break;
 		case ID_BURNING_ROOTS:
-			FireBounds[0] = -384;
-			FireBounds[1] = 384;
-			FireBounds[2] = 0;
-			FireBounds[3] = 2048;
-			FireBounds[4] = -384;
-			FireBounds[5] = 384;
+			FireBounds.boundingBox.X1 = -384;
+			FireBounds.boundingBox.X2 = 384;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 2048;
+			FireBounds.boundingBox.Z1 = -384;
+			FireBounds.boundingBox.Z2 = 384;
 			break;
 		}
 
 		item->pos.yRot = l->pos.yRot;
 
-		if (TestLaraPosition(FireBounds, item, l))
+		if (TestLaraPosition(&FireBounds, item, l))
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 			{
@@ -325,7 +322,7 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				l->animNumber = (dy >> 8) + ANIMATION_LARA_TORCH_LIGHT_1;
 			}
 			l->currentAnimState = STATE_LARA_MISC_CONTROL;
-			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
 			Lara.generalPtr = (void*)itemNumber;
@@ -337,7 +334,7 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (l->animNumber >= ANIMATION_LARA_TORCH_LIGHT_1 && l->animNumber <= ANIMATION_LARA_TORCH_LIGHT_5)
 		{
-			if (l->frameNumber - Anims[l->animNumber].frameBase == 40)
+			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{
 				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
 				item->flags |= 0x3E00;

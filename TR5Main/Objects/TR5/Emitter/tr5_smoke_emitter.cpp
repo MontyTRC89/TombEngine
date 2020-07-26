@@ -7,7 +7,7 @@
 
 void InitialiseSmokeEmitter(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->triggerFlags == 111)
 	{
@@ -65,7 +65,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 			item->triggerFlags |= 4;
 		}
 	}
-	else if (Rooms[item->roomNumber].flags & 1 && item->triggerFlags == 1)
+	else if (g_Level.Rooms[item->roomNumber].flags & 1 && item->triggerFlags == 1)
 	{
 		item->itemFlags[0] = 20;
 		item->itemFlags[1] = 1;
@@ -74,7 +74,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 void SmokeEmitterControl(short itemNumber)
 {
-	/*ITEM_INFO* item = &Items[itemNumber];
+	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
@@ -82,7 +82,7 @@ void SmokeEmitterControl(short itemNumber)
 	if (item->objectNumber != ID_SMOKE_EMITTER)
 		goto LABEL_61;
 
-	if (Rooms[item->roomNumber].flags & 1)
+	if (g_Level.Rooms[item->roomNumber].flags & 1)
 	{
 		if (item->itemFlags[0] || !(GetRandomControl() & 0x1F) || item->triggerFlags == 1)
 		{

@@ -9,7 +9,7 @@
 
 void ControlSpikyCeiling(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{

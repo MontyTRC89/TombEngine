@@ -12,10 +12,6 @@
 #include "trmath.h"
 #include "objectslist.h"
 
-std::vector<BOX_INFO> Boxes;
-std::vector<OVERLAP> Overlaps;
-std::vector<int> Zones[ZONE_MAX][2];
-
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
 #define STALK_DIST SECTOR(3)
@@ -32,11 +28,11 @@ void DropBaddyPickups(ITEM_INFO* item)
 	ITEM_INFO* pickup = NULL;
 	FLOOR_INFO* floor;
 	short roomNumber;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 
 	for (short pickupNumber = item->carriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->carriedItem)
 	{
-		pickup = &Items[pickupNumber];
+		pickup = &g_Level.Items[pickupNumber];
 		pickup->pos.xPos = (item->pos.xPos & -CLICK(2)) | CLICK(2);
 		pickup->pos.zPos = (item->pos.zPos & -CLICK(2)) | CLICK(2);
 
@@ -44,7 +40,7 @@ void DropBaddyPickups(ITEM_INFO* item)
 		floor = GetFloor(pickup->pos.xPos, item->pos.yPos, pickup->pos.zPos, &roomNumber);
 		pickup->pos.yPos = GetFloorHeight(floor, pickup->pos.xPos, item->pos.yPos, pickup->pos.zPos);
 		bounds = GetBoundsAccurate(pickup);
-		pickup->pos.yPos -= bounds[3];
+		pickup->pos.yPos -= bounds->Y2;
 
 		ItemNewRoom(pickupNumber, item->roomNumber);
 		pickup->flags |= 32;
@@ -110,17 +106,17 @@ void CreatureYRot2(PHD_3DPOS* srcpos, short angle, short angadd)
 
 short SameZone(CREATURE_INFO* creature, ITEM_INFO* targetItem) 
 {
-	ITEM_INFO* item = &Items[creature->itemNum];
+	ITEM_INFO* item = &g_Level.Items[creature->itemNum];
 	ROOM_INFO* r;
 	int* zone;
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 
-	r = &Rooms[targetItem->roomNumber];
+	r = &g_Level.Rooms[targetItem->roomNumber];
 	targetItem->boxNumber = XZ_GET_SECTOR(r, targetItem->pos.xPos - r->x, targetItem->pos.zPos - r->z).box;
 
-	zone = Zones[creature->LOT.zone][FlipStatus].data();
+	zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 	return zone[item->boxNumber] == zone[targetItem->boxNumber];
 }
 
@@ -129,7 +125,7 @@ short AIGuard(CREATURE_INFO* creature)
 	ITEM_INFO* item;
 	int random;
 
-	item = &Items[creature->itemNum];
+	item = &g_Level.Items[creature->itemNum];
 	if (item->aiBits & (GUARD | PATROL1))
 		return 0;
 
@@ -173,7 +169,7 @@ void AlertNearbyGuards(ITEM_INFO* item)
 		if (creature->itemNum == NO_ITEM)
 			continue;
 
-		target = &Items[creature->itemNum + i];
+		target = &g_Level.Items[creature->itemNum + i];
 		if (item->roomNumber == target->roomNumber)
 		{
 			creature->alerted = true;
@@ -202,8 +198,8 @@ void AlertAllGuards(short itemNumber)
 		if (creature->itemNum == NO_ITEM)
 			continue;
 
-		target = &Items[creature->itemNum];
-		objNumber = Items[itemNumber].objectNumber;
+		target = &g_Level.Items[creature->itemNum];
+		objNumber = g_Level.Items[itemNumber].objectNumber;
 		if (objNumber == target->objectNumber)
 		{
 			if (target->status == ITEM_ACTIVE)
@@ -215,11 +211,11 @@ void AlertAllGuards(short itemNumber)
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillState)
 {
 	item->animNumber = Objects[item->objectNumber].animIndex + killAnim;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = killState;
 
 	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-	LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	LaraItem->currentAnimState = 0;
 	LaraItem->goalAnimState = laraKillState;
 
@@ -328,7 +324,7 @@ void CreatureFloat(short itemNumber)
 	int y;
 	short roomNumber;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	item->hitPoints = NOT_TARGETABLE;
 	item->pos.xRot = 0;
 
@@ -351,7 +347,7 @@ void CreatureFloat(short itemNumber)
 
 	if (item->pos.yPos <= waterLevel)
 	{
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			item->pos.yPos = waterLevel;
 			item->collidable = false;
@@ -441,7 +437,7 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 	int xDist, zDist;
 	unsigned short floorIndex1, floorIndex2, floorIndex3;
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 	creature = (CREATURE_INFO*)item->data;
 
 
@@ -507,19 +503,19 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	FLOOR_INFO* floor;
 	PHD_VECTOR old;
 	int xPos, zPos, x, y, z, ceiling, shiftX, shiftZ, dy;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 	int* zone;
 	short roomNumber, radius, biffAngle, top;
 	int boxHeight, height, nextHeight, nextBox;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	if (item->data == NULL)
 		return false;
 
 	creature = (CREATURE_INFO*)item->data;
 	LOT = &creature->LOT;
-	zone = Zones[LOT->zone][FlipStatus].data();
-	boxHeight = Boxes[item->boxNumber].height;
+	zone = g_Level.Zones[LOT->zone][FlipStatus].data();
+	boxHeight = g_Level.Boxes[item->boxNumber].height;
 	old.x = item->pos.xPos;
 	old.y = item->pos.yPos;
 	old.z = item->pos.zPos;
@@ -540,12 +536,12 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	bounds = GetBoundsAccurate(item);
-	y = item->pos.yPos + bounds[2];
+	y = item->pos.yPos + bounds->Y1;
 
 	roomNumber = item->roomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
 	floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
-	height = Boxes[floor->box].height;
+	height = g_Level.Boxes[floor->box].height;
 	nextHeight = 0;
 
 	if (!Objects[item->objectNumber].nonLot)
@@ -555,14 +551,14 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else
 	{
 		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		height = Boxes[floor->box].height;
+		height = g_Level.Boxes[floor->box].height;
 		nextBox = floor->box;
 	}
 
 	if (nextBox == NO_BOX)
 		nextHeight = height;
 	else
-		nextHeight = Boxes[nextBox].height;
+		nextHeight = g_Level.Boxes[nextBox].height;
 
 	if (floor->box == NO_BOX || !LOT->isJumping && (LOT->fly == NO_FLYING && zone[item->boxNumber] != zone[floor->box] ||  boxHeight - height > LOT->step ||  boxHeight - height < LOT->drop))
 	{
@@ -582,7 +578,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			item->pos.zPos = old.z | (WALL_SIZE - 1);
 
 		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
-		height = Boxes[floor->box].height;
+		height = g_Level.Boxes[floor->box].height;
 		if (!Objects[item->objectNumber].nonLot)
 		{
 			nextHeight = LOT->node[floor->box].exitBox;
@@ -590,14 +586,14 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		else
 		{
 			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			height = Boxes[floor->box].height;
+			height = g_Level.Boxes[floor->box].height;
 			nextBox = floor->box;
 		}
 
 		if (nextBox == NO_BOX)
 			nextHeight = height;
 		else
-			nextHeight = Boxes[nextBox].height;
+			nextHeight = g_Level.Boxes[nextBox].height;
 	}
 
 	x = item->pos.xPos;
@@ -735,7 +731,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				if (item->objectNumber == ID_WHALE)
 					top = STEP_SIZE / 2;
 				else
-					top = bounds[2];
+					top = bounds->Y1;
 
 				if (item->pos.yPos + top + dy < ceiling)
 				{
@@ -752,7 +748,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			else
 			{
 				floor = GetFloor(item->pos.xPos, y + STEP_SIZE, item->pos.zPos, &roomNumber);
-				if (Rooms[roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+				if (g_Level.Rooms[roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 				{
 					dy = -LOT->fly;
 				}
@@ -796,7 +792,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		if (LOT->isMonkeying)
 		{
 			ceiling = GetCeiling(floor, item->pos.xPos, y, item->pos.zPos);
-			item->pos.yPos = ceiling - bounds[2];
+			item->pos.yPos = ceiling - bounds->Y1;
 		}
 		else
 		{
@@ -823,7 +819,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		if (item->objectNumber == ID_TYRANNOSAUR || item->objectNumber == ID_SHIVA || item->objectNumber == ID_MUTANT2)
 			top = STEP_SIZE*3;
 		else
-			top = bounds[2];
+			top = bounds->Y1; // TODO: check if Y1 or Y2
 
 		if (item->pos.yPos + top < ceiling)
 		{
@@ -850,7 +846,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	{
 		GetFloor(item->pos.xPos, item->pos.yPos - STEP_SIZE*2, item->pos.zPos, &roomNumber);
 
-		if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
+		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 			item->hitPoints = 0;
 	}
 
@@ -862,7 +858,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 void CreatureDie(short itemNumber, int explode)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	item->hitPoints = -16384;
 	item->collidable = false;
 
@@ -897,10 +893,10 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 	if (LOT->isJumping)
 		return false;
 
-	if (Boxes[floor->box].flags & LOT->blockMask)
+	if (g_Level.Boxes[floor->box].flags & LOT->blockMask)
 		return true;
 
-	height = Boxes[floor->box].height;
+	height = g_Level.Boxes[floor->box].height;
 	if (boxHeight - height > LOT->step || boxHeight - height < LOT->drop)
 		return true;
 
@@ -921,17 +917,17 @@ int CreatureCreature(short itemNumber)
 	int x, z, xDistance, zDistance, distance = 0;
 	short link, radius;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	obj = &Objects[item->objectNumber];
 	x = item->pos.xPos;
 	z = item->pos.zPos;
 	radius = obj->radius;
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 	link = r->itemNumber;
 	do
 	{
-		linked = &Items[link];
+		linked = &g_Level.Items[link];
 		
 		if (link != itemNumber && linked != LaraItem && linked->status == ITEM_ACTIVE && linked->hitPoints > 0)
 		{
@@ -960,11 +956,11 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	int* zone;
 
 	creature = (CREATURE_INFO*)item->data;
-	zone = Zones[creature->LOT.zone][FlipStatus].data();
+	zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 	if (creature->LOT.fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
 
-	box = &Boxes[boxNumber];
+	box = &g_Level.Boxes[boxNumber];
 	if (box->flags & creature->LOT.blockMask)
 		return false;
 
@@ -977,7 +973,7 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 
 int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber) 
 {
-	BOX_INFO* box = &Boxes[boxNumber];
+	BOX_INFO* box = &g_Level.Boxes[boxNumber];
 	int x, z;
 
 	x = (int(box->top + box->bottom) << (WALL_SHIFT - 1)) - enemy->pos.xPos;
@@ -997,7 +993,7 @@ void TargetBox(LOT_INFO* LOT, int boxNumber)
 	BOX_INFO* box;
 
 	boxNumber &= NO_BOX;
-	box = &Boxes[boxNumber];
+	box = &g_Level.Boxes[boxNumber];
 
 	LOT->target.x = ((box->top << WALL_SHIFT) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + WALL_SIZE / 2;
 	LOT->target.z = ((box->left << WALL_SHIFT) + GetRandomControl() * ((box->right - box->left) - 1) >> 5) + WALL_SIZE / 2;
@@ -1042,7 +1038,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 	int* zone, index, searchZone, boxNumber, delta, flags;
 	bool done;
 	
-	zone = Zones[LOT->zone][FlipStatus].data();
+	zone = g_Level.Zones[LOT->zone][FlipStatus].data();
 	searchZone = zone[LOT->head];
 
 	if (depth <= 0)
@@ -1057,7 +1053,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 		}
 
 		node = &LOT->node[LOT->head];
-		box = &Boxes[LOT->head];
+		box = &g_Level.Boxes[LOT->head];
 
 		index = box->overlapIndex;
 		done = false;
@@ -1065,8 +1061,8 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 		{
 			do
 			{
-				boxNumber = Overlaps[index].box;
-				flags = Overlaps[index++].flags;
+				boxNumber = g_Level.Overlaps[index].box;
+				flags = g_Level.Overlaps[index++].flags;
 
 				if (flags & BOX_END_BIT)
 				{
@@ -1076,7 +1072,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 				if (LOT->fly == NO_FLYING && searchZone != zone[boxNumber])
 					continue;
 
-				delta = Boxes[boxNumber].height - box->height;
+				delta = g_Level.Boxes[boxNumber].height - box->height;
 				if (delta > LOT->step || delta < LOT->drop)
 					continue;
 
@@ -1096,7 +1092,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 					if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER) && !(expand->searchNumber & BLOCKED_SEARCH))
 						continue;
 
-					if (Boxes[boxNumber].flags & LOT->blockMask)
+					if (g_Level.Boxes[boxNumber].flags & LOT->blockMask)
 					{
 						expand->searchNumber = node->searchNumber | BLOCKED_SEARCH;
 					}
@@ -1124,7 +1120,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 
 int CreatureActive(short itemNumber) 
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!(item->flags & IFLAG_KILLED) 
 		&& item->status & ITEM_INVISIBLE)
@@ -1151,7 +1147,7 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 	int x, z, xrange, zrange;
 	int enemyQuad, boxQuad, baddieQuad;
 
-	box = &Boxes[boxNumber];
+	box = &g_Level.Boxes[boxNumber];
 
 	xrange	= STALK_DIST + ((box->bottom - box->top + 3) << WALL_SHIFT);
 	zrange	= STALK_DIST + ((box->right - box->left + 3) << WALL_SHIFT);
@@ -1186,7 +1182,7 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 
 int CreatureVault(short itemNum, short angle, int vault, int shift)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	int xBlock, zBlock, y, newXblock, newZblock;
 	short roomNumber;
 
@@ -1272,7 +1268,7 @@ void GetAITarget(CREATURE_INFO* creature)
 	else
 		enemyObjectNumber = NO_ITEM;
 
-	item = &Items[creature->itemNum];
+	item = &g_Level.Items[creature->itemNum];
 	
 	if (item->aiBits & GUARD)
 	{
@@ -1384,11 +1380,11 @@ void GetAITarget(CREATURE_INFO* creature)
 // tr3 old way..
 void FindAITarget(CREATURE_INFO* creature, short objectNumber)
 {
-	ITEM_INFO* item = &Items[creature->itemNum];
+	ITEM_INFO* item = &g_Level.Items[creature->itemNum];
 	ITEM_INFO* targetItem;
 	int i;
 
-	for (i = 0, targetItem = &Items[0]; i < NumItems; i++, targetItem++)
+	for (i = 0, targetItem = &g_Level.Items[0]; i < g_Level.NumItems; i++, targetItem++)
 	{
 		if (targetItem->objectNumber == objectNumber && targetItem->roomNumber != NO_ROOM)
 		{
@@ -1403,24 +1399,24 @@ void FindAITarget(CREATURE_INFO* creature, short objectNumber)
 
 void FindAITargetObject(CREATURE_INFO* creature, short objectNumber)
 {
-	ITEM_INFO* item = &Items[creature->itemNum];
+	ITEM_INFO* item = &g_Level.Items[creature->itemNum];
 
-	if (AIObjects.size() > 0)
+	if (g_Level.AIObjects.size() > 0)
 	{
 		AIOBJECT* foundObject = NULL;
 
-		for (int i = 0; i < AIObjects.size(); i++)
+		for (int i = 0; i < g_Level.AIObjects.size(); i++)
 		{
-			AIOBJECT* aiObject = &AIObjects[i];
+			AIOBJECT* aiObject = &g_Level.AIObjects[i];
 
 			if (aiObject->objectNumber == objectNumber && aiObject->triggerFlags == item->itemFlags[3] && aiObject->roomNumber != NO_ROOM)
 			{
-				int* zone = Zones[creature->LOT.zone][FlipStatus].data();
+				int* zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 
-				ROOM_INFO* r = &Rooms[item->roomNumber];
+				ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 				item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 
-				r = &Rooms[aiObject->roomNumber];
+				r = &g_Level.Rooms[aiObject->roomNumber];
 				aiObject->boxNumber = XZ_GET_SECTOR(r, aiObject->x - r->x, aiObject->z - r->z).box;
 
 				if (zone[item->boxNumber] == zone[aiObject->boxNumber])
@@ -1479,19 +1475,19 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 		creature->enemy = LaraItem;
 	}
 
-	zone = Zones[creature->LOT.zone][FlipStatus].data();
+	zone = g_Level.Zones[creature->LOT.zone][FlipStatus].data();
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 	info->zoneNumber = zone[item->boxNumber];
 
-	r = &Rooms[enemy->roomNumber];
+	r = &g_Level.Rooms[enemy->roomNumber];
 	enemy->boxNumber = XZ_GET_SECTOR(r, enemy->pos.xPos - r->x, enemy->pos.zPos - r->z).box;
 	info->enemyZone = zone[enemy->boxNumber];
 
 	if (!obj->nonLot)
 	{
-		if (Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
+		if (g_Level.Boxes[enemy->boxNumber].flags & creature->LOT.blockMask)
 			info->enemyZone |= BLOCKED;
 		else if (creature->LOT.node[item->boxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 			info->enemyZone |= BLOCKED;
@@ -1561,7 +1557,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	ITEM_INFO* enemy;
 	LOT_INFO* LOT;
 	int boxNumber, startBox, overlapIndex, nextBox, flags;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 
 	creature = (CREATURE_INFO*)item->data;
 	enemy = creature->enemy;
@@ -1593,8 +1589,8 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 			if (LOT->fly != NO_FLYING && Lara.waterStatus == LW_ABOVE_WATER)
 			{
-				bounds = GetBestFrame(enemy);
-				LOT->target.y += bounds[2];
+				bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+				LOT->target.y += bounds->Y1;
 			}
 			break;
 
@@ -1646,7 +1642,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	startBox = LOT->node[item->boxNumber].exitBox;
 	if (startBox != NO_BOX)
 	{
-		overlapIndex = Boxes[startBox].overlapIndex;
+		overlapIndex = g_Level.Boxes[startBox].overlapIndex;
 		nextBox = 0;
 		flags = 0;
 		if (overlapIndex >= 0)
@@ -1654,8 +1650,8 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 			do
 			{
 				overlapIndex++;
-				nextBox = Overlaps[overlapIndex].box;
-				flags = Overlaps[overlapIndex].flags;
+				nextBox = g_Level.Overlaps[overlapIndex].box;
+				flags = g_Level.Overlaps[overlapIndex].flags;
 			} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == FALSE) && (nextBox != startBox));
 		}
 
@@ -1798,7 +1794,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 	if (boxNumber == NO_BOX)
 		return TARGET_TYPE::NO_TARGET;
 
-	box = &Boxes[boxNumber];
+	box = &g_Level.Boxes[boxNumber];
 	boxLeft = ((int)box->left << WALL_SHIFT);
 	boxRight = ((int)box->right << WALL_SHIFT) - 1;
 	boxTop = ((int)box->top << WALL_SHIFT);
@@ -1811,7 +1807,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 
 	do
 	{
-		box = &Boxes[boxNumber];
+		box = &g_Level.Boxes[boxNumber];
 
 		if (LOT->fly == NO_FLYING)
 		{
@@ -1974,7 +1970,7 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 		}
 
 		boxNumber = LOT->node[boxNumber].exitBox;
-		if (boxNumber != NO_BOX && (Boxes[boxNumber].flags & LOT->blockMask))
+		if (boxNumber != NO_BOX && (g_Level.Boxes[boxNumber].flags & LOT->blockMask))
 			break;
 	} while (boxNumber != NO_BOX);
 
@@ -2015,7 +2011,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 	int x = item->pos.xPos;
 	int z = item->pos.zPos;
 
-	ROOM_INFO* r = &Rooms[item->roomNumber];
+	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
 	FLOOR_INFO* floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	floor->stopper = set;
@@ -2025,7 +2021,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int dir, int set)
 
 	short roomNumber = item->roomNumber;
 	GetFloor(x, item->pos.yPos, z, &roomNumber);
-	r = &Rooms[roomNumber];
+	r = &g_Level.Rooms[roomNumber];
 
 	floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	floor->stopper = set;

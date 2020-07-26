@@ -7,7 +7,7 @@
 #include "pickup.h"
 #include "setup.h"
 
-static short SarcophagusBounds[12] =
+OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {
 	0xFE00, 512, 0xFF9C, 100, 0xFE00, 0,
 	0xF8E4, 1820, 0xEAAC, 5460, 0, 0
@@ -21,7 +21,7 @@ void InitialiseSarcophagus(short itemNum)
 
 void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (TrInput & IN_ACTION &&
 		item->status != ITEM_ACTIVE &&
@@ -30,13 +30,13 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		Lara.gunStatus == LG_NO_ARMS ||
 		Lara.isMoving && (short)Lara.generalPtr == itemNum)
 	{
-		if (TestLaraPosition(SarcophagusBounds, item, l))
+		if (TestLaraPosition(&SarcophagusBounds, item, l))
 		{
 			if (MoveLaraPosition(&SarcophagusPosition, item, l))
 			{
 				l->animNumber = ANIMATION_LARA_PICKUP_SARCOPHAGUS;
 				l->currentAnimState = STATE_LARA_MISC_CONTROL;
-				l->frameNumber = Anims[l->animNumber].frameBase;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				item->flags |= IFLAG_ACTIVATION_MASK;
 
 				AddActiveItem(itemNum);
@@ -63,16 +63,16 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 	}
-	else if (l->animNumber != ANIMATION_LARA_PICKUP_SARCOPHAGUS || l->frameNumber != Anims[ANIMATION_LARA_PICKUP_SARCOPHAGUS].frameBase + 113)
+	else if (l->animNumber != ANIMATION_LARA_PICKUP_SARCOPHAGUS || l->frameNumber != g_Level.Anims[ANIMATION_LARA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
 		ObjectCollision(itemNum, l, coll);
 	}
 	else
 	{
 		short linknum;
-		for (linknum = Items[Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+		for (linknum = g_Level.Items[g_Level.Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 		{
-			ITEM_INFO* currentItem = &Items[linknum];
+			ITEM_INFO* currentItem = &g_Level.Items[linknum];
 
 			if (linknum != itemNum && currentItem->pos.xPos == item->pos.xPos && currentItem->pos.zPos == item->pos.zPos)
 			{

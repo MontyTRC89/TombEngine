@@ -98,10 +98,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_SWAT];
@@ -123,10 +123,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_GUARD1];
@@ -150,10 +150,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_SWAT_PLUS];
@@ -180,10 +180,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_MAFIA];
@@ -211,10 +211,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_SCIENTIST];
@@ -240,10 +240,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
-		Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
-		Bones[Objects[69].boneIndex + 13 * 4] |= ROT_Y;
-		Bones[Objects[69].boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[Objects[69].boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[Objects[69].boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[Objects[69].boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_GUARD2];
@@ -271,10 +271,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_GUARD3];
@@ -302,10 +302,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_ATTACK_SUB];
@@ -327,8 +327,8 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->zoneType = ZONE_FLYER;
 		obj->undead = true;
-		Bones[obj->boneIndex] |= ROT_X;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_CHEF];
@@ -350,10 +350,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 
-		Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
-		Bones[obj->boneIndex + 4 * 6] |= ROT_X;
-		Bones[obj->boneIndex + 4 * 13] |= ROT_Y;
-		Bones[obj->boneIndex + 4 * 13] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4 * 6] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 13] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4 * 13] |= ROT_X;
 	}
 
 	obj = &Objects[ID_LION];
@@ -373,8 +373,8 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_DOG];
@@ -394,7 +394,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
-		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_HUSKIE];
@@ -414,7 +414,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
-		Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 19 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_REAPER];
@@ -458,10 +458,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_PIERRE];
@@ -482,10 +482,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_LARSON];
@@ -506,10 +506,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 7 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 7 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_HITMAN];
@@ -533,10 +533,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
 
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_SNIPER];
@@ -557,10 +557,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveAnim = true;
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_GUARD_LASER];
@@ -583,10 +583,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->undead = true;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex] |= ROT_X;
-		Bones[obj->boneIndex + 4] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_HYDRA];
@@ -608,10 +608,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->hitEffect = HIT_FRAGMENT;
 		obj->undead = true;
 		obj->zoneType = ZONE_BASIC;
-		Bones[obj->boneIndex + 0] |= ROT_Y;
-		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 8 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 8 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Z;
 	}
 
 	obj = &Objects[ID_IMP];
@@ -634,10 +634,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->meshSwapSlot = ID_MESHSWAP_IMP;
 		obj->zoneType = ZONE_BASIC;
 
-		Bones[obj->meshIndex + 4 * 4] |= ROT_Z;
-		Bones[obj->meshIndex + 4 * 4] |= ROT_X;
-		Bones[obj->meshIndex + 9 * 4] |= ROT_Z;
-		Bones[obj->meshIndex + 9 * 4] |= ROT_X;
+		g_Level.Bones[obj->meshIndex + 4 * 4] |= ROT_Z;
+		g_Level.Bones[obj->meshIndex + 4 * 4] |= ROT_X;
+		g_Level.Bones[obj->meshIndex + 9 * 4] |= ROT_Z;
+		g_Level.Bones[obj->meshIndex + 9 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_WILLOWISP];
@@ -657,10 +657,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->zoneType = ZONE_FLYER;
-		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_BROWN_BEAST];
@@ -681,10 +681,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->savePosition = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_BASIC;
-		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_LAGOON_WITCH];
@@ -706,10 +706,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->waterCreature = true;
 		obj->zoneType = ZONE_BASIC;
 
-		Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 4 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
-		Bones[obj->boneIndex + 9 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 4 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_INVISIBLE_GHOST];
@@ -730,10 +730,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 8 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_RATS_EMITTER];
@@ -781,10 +781,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveHitpoints = true;
 		obj->hitEffect = HIT_BLOOD;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 13 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_X;
 	}
 
 	for (int i = 0; i < 2; i++)
@@ -810,10 +810,10 @@ static void StartBaddy(OBJECT_INFO *obj)
 			obj->zoneType = ZONE_HUMAN_CLASSIC;
 			obj->castShadows = true;
 
-			Bones[obj->boneIndex + 24] |= ROT_Y;
-			Bones[obj->boneIndex + 24] |= ROT_X;
-			Bones[obj->boneIndex + 52] |= ROT_Y;
-			Bones[obj->boneIndex + 52] |= ROT_X;
+			g_Level.Bones[obj->boneIndex + 24] |= ROT_Y;
+			g_Level.Bones[obj->boneIndex + 24] |= ROT_X;
+			g_Level.Bones[obj->boneIndex + 52] |= ROT_Y;
+			g_Level.Bones[obj->boneIndex + 52] |= ROT_X;
 		}
 	}
 
@@ -844,9 +844,9 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->hitEffect = HIT_BLOOD;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
-		Bones[obj->boneIndex + 6 * 4] |= ROT_X;
-		Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_GUNSHIP];
@@ -855,8 +855,8 @@ static void StartBaddy(OBJECT_INFO *obj)
 		obj->control = ControlGunShip;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
-		Bones[obj->boneIndex + 0] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 0] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	// TR5 SUBMARINE

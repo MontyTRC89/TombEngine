@@ -8,10 +8,10 @@
 
 void InitialiseKillerStatue(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 3;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = 1;
 }
 
@@ -21,7 +21,7 @@ void KillerStatueControl(short itemNumber)
 	int x, y, z;
 	short d;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item) && item->currentAnimState == 1)
 		item->goalAnimState = 2;

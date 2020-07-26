@@ -2,6 +2,8 @@
 #include <framework.h>
 #include <newtypes.h>
 
+struct ANIM_FRAME;
+
 struct ROOM_VERTEX
 {
 	Vector3 position;
@@ -149,7 +151,7 @@ struct ROOM_INFO
 
 struct ANIM_STRUCT
 {
-	short* framePtr;
+	int framePtr;
 	short interpolation;
 	short currentAnimState;
 	int velocity;

@@ -4,7 +4,7 @@
 
 void InitialiseBurningFloor(short itemNum)
 {
-	Items[itemNum].requiredAnimState = 127;
+	g_Level.Items[itemNum].requiredAnimState = 127;
 }
 
 void BurningFloorControl(short itemNum)

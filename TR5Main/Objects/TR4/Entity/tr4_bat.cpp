@@ -36,10 +36,10 @@ static bool isBatCollideTarget(ITEM_INFO* item)
 
 void InitialiseBat(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	InitialiseCreature(itemNumber);
 	item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_IDLE;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = BAT_IDLE;
 	item->currentAnimState = BAT_IDLE;
 }
@@ -55,7 +55,7 @@ void BatControl(short itemNumber)
 	int distance, bestdistance;
 	short angle;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	bat = GetCreatureInfo(item);
 	angle = 0;
 
@@ -70,7 +70,7 @@ void BatControl(short itemNumber)
         else
         {
             item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_FALLING;
-            item->frameNumber = Anims[item->animNumber].frameBase;
+            item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
             item->goalAnimState = BAT_FALLING;
             item->currentAnimState = BAT_FALLING;
             item->speed = 0;
@@ -95,7 +95,7 @@ void BatControl(short itemNumber)
             {
 				if (slots->itemNum != NO_ITEM)
 				{
-					target = &Items[slots->itemNum];
+					target = &g_Level.Items[slots->itemNum];
 					if (target->objectNumber == ID_VON_CROY && target->status != ITEM_INVISIBLE)
 					{
 						int x, z;
