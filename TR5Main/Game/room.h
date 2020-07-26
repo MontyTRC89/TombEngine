@@ -23,15 +23,16 @@ struct ROOM_DOOR
 
 typedef struct ROOM_LIGHT
 {
-	float x, y, z;       // Position of light, in world coordinates
+	int x, y, z;       // Position of light, in world coordinates
 	float r, g, b;       // Colour of the light
+	float intensity;
 	float in;            // Cosine of the IN value for light / size of IN value
 	float out;           // Cosine of the OUT value for light / size of OUT value
-	float radIn;         // (IN radians) * 2
-	float radOut;        // (OUT radians) * 2
-	float range;         // Range of light
+	float length;         // Range of light
+	float cutoff;         // Range of light
 	float dx, dy, dz;    // Direction - used only by sun and spot lights
 	byte type;
+	bool castShadows;
 };
 
 typedef struct MESH_INFO

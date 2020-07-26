@@ -283,7 +283,7 @@ namespace T5M::Renderer
 						light.Intensity = 1.0f;
 						light.In = oldLight->in;
 						light.Out = oldLight->out;
-						light.Range = oldLight->range;
+						light.Range = oldLight->length;
 						light.Type = LIGHT_TYPE_SPOT;
 
 						r.Lights.push_back(light);
