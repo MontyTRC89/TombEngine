@@ -80,7 +80,7 @@ void InitialiseMotorbike(short itemNumber)
     ITEM_INFO* item;
     MOTORBIKE_INFO* motorbike;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     motorbike = game_malloc<MOTORBIKE_INFO>();
     item->data = (void*)motorbike;
     motorbike->velocity = 0;
@@ -245,7 +245,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     short angle;
     short room_number;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     if (item->flags & ONESHOT || Lara.gunStatus == LG_HANDS_BUSY || LaraItem->gravityStatus)
         return false;
 
@@ -288,7 +288,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 
     if (laraitem->hitPoints >= 0 && Lara.Vehicle == NO_ITEM)
     {
-        item = &Items[itemNumber];
+        item = &g_Level.Items[itemNumber];
         motorbike = GetMotorbikeInfo(item);
 
         // update motorbike light
@@ -329,7 +329,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
                 laraitem->goalAnimState = BIKE_ENTER_ANIM;
                 laraitem->currentAnimState = BIKE_ENTER_ANIM;
             }
-            laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
+            laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
 
             item->hitPoints = 1;
             laraitem->pos.xPos = item->pos.xPos;
@@ -460,7 +460,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
 
 static void MotorBikeExplode(ITEM_INFO* item)
 {
-    if (Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
+    if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
     {
         TriggerUnderwaterExplosion(item);
     }
@@ -485,12 +485,12 @@ static int MotorBikeCheckGetOff(void)
 {
     ITEM_INFO* item;
 
-    item = &Items[Lara.Vehicle];
-    if (LaraItem->currentAnimState == BIKE_EXIT && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
+    item = &g_Level.Items[Lara.Vehicle];
+    if (LaraItem->currentAnimState == BIKE_EXIT && LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
     {
         LaraItem->pos.yRot -= 0x4000;
         LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
-        LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+        LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
         LaraItem->goalAnimState = STATE_LARA_STOP;
         LaraItem->currentAnimState = STATE_LARA_STOP;
         LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
@@ -503,7 +503,7 @@ static int MotorBikeCheckGetOff(void)
         return true;
     }
 
-    if (LaraItem->frameNumber != Anims[LaraItem->animNumber].frameEnd)
+    if (LaraItem->frameNumber != g_Level.Anims[LaraItem->animNumber].frameEnd)
         return true;
 
     // exit when falling
@@ -811,7 +811,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     if (collide)
     {
         newspeed = ((item->pos.zPos - oldpos.z) * phd_cos(motorbike->momentumAngle) + (item->pos.xPos - oldpos.x) * phd_sin(motorbike->momentumAngle)) >> 6;
-        if (&Items[Lara.Vehicle] == item && motorbike->velocity >= 0x8000 && newspeed < (motorbike->velocity - 10))
+        if (&g_Level.Items[Lara.Vehicle] == item && motorbike->velocity >= 0x8000 && newspeed < (motorbike->velocity - 10))
         {
             LaraItem->hitPoints -= (motorbike->velocity - newspeed) >> 7;
             LaraItem->hitStatus = true;
@@ -837,7 +837,7 @@ static BOOL MotorbikeCanGetOff(void)
     int height, ceiling;
     short room_number, angle;
 
-    item = &Items[Lara.Vehicle];
+    item = &g_Level.Items[Lara.Vehicle];
     angle = item->pos.yRot + 0x4000;
     x = item->pos.xPos + ((500 * phd_sin(angle)) >> W2V_SHIFT);
     y = item->pos.yPos;
@@ -1012,26 +1012,26 @@ static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
                 LaraItem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + 12;
                 LaraItem->currentAnimState = BIKE_HITBACK;
                 LaraItem->goalAnimState = BIKE_HITBACK;
-                LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+                LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
                 break;
             case 14:
                 LaraItem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + 11;
                 LaraItem->currentAnimState = BIKE_HITFRONT;
                 LaraItem->goalAnimState = BIKE_HITFRONT;
-                LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+                LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
                 break;
             case 11:
                 LaraItem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + 14;
                 LaraItem->currentAnimState = BIKE_HITRIGHT;
                 LaraItem->goalAnimState = BIKE_HITRIGHT;
-                LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+                LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
                 break;
             default:
             case 12:
                 LaraItem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + 13;
                 LaraItem->currentAnimState = BIKE_HITLEFT;
                 LaraItem->goalAnimState = BIKE_HITLEFT;
-                LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+                LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
                 break;
             }
         }
@@ -1042,12 +1042,12 @@ static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
             LaraItem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + 22;
         else
             LaraItem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + 6;
-        LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+        LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
         LaraItem->currentAnimState = BIKE_FALLING;
         LaraItem->goalAnimState = BIKE_FALLING;
     }
 
-    if (Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
+    if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
     {
         LaraItem->goalAnimState = BIKE_EMPTY6;
         LaraItem->hitPoints = 0;
@@ -1198,7 +1198,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
         if (LaraItem->currentAnimState == BIKE_MOVING_BACK)
         {
             short framenow = LaraItem->frameNumber;
-            short framebase = Anims[LaraItem->animNumber].frameBase;
+            short framebase = g_Level.Anims[LaraItem->animNumber].frameBase;
 
             if (framenow >= framebase + 24 && framenow <= framebase + 29)
             {
@@ -1238,10 +1238,10 @@ void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* laraitem)
     laraitem->currentAnimState = BIKE_IDLE;
     laraitem->goalAnimState = BIKE_IDLE;
     laraitem->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BIKE_IDLE_ANIM;
-    laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
+    laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
     laraitem->gravityStatus = false;
     item->animNumber = laraitem->animNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
-    item->frameNumber = laraitem->frameNumber + (Anims[ID_MOTORBIKE].frameBase - Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
+    item->frameNumber = laraitem->frameNumber + (g_Level.Anims[ID_MOTORBIKE].frameBase - g_Level.Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
     item->hitPoints = 1;
     item->flags = short(IFLAG_KILLED); // hmm... maybe wrong name (it can be IFLAG_CODEBITS) ?
     motorbike->revs = 0;
@@ -1256,7 +1256,7 @@ int MotorbikeControl(void)
     int drive, collide, pitch = 0, dead, height = 0, ceiling;
     short room_number;
 
-    item = &Items[Lara.Vehicle];
+    item = &g_Level.Items[Lara.Vehicle];
     motorbike = GetMotorbikeInfo(item);
     collide = MotorBikeDynamics(item);
     drive = -1;
@@ -1380,7 +1380,7 @@ int MotorbikeControl(void)
         AnimateMotorbike(item, collide, dead);
         AnimateItem(LaraItem);
         item->animNumber = LaraItem->animNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
-        item->frameNumber = LaraItem->frameNumber + (Anims[item->animNumber].frameBase - Anims[LaraItem->animNumber].frameBase);
+        item->frameNumber = LaraItem->frameNumber + (g_Level.Anims[item->animNumber].frameBase - g_Level.Anims[LaraItem->animNumber].frameBase);
         Camera.targetElevation = -5460;
 
         if (motorbike->flags & 0x40) // IS_FALLING

@@ -30,7 +30,7 @@ namespace T5M {
 					}
 					s.position += s.velocity;
 					if (s.affectedByWind) {
-						if (Rooms[s.room].flags & ENV_FLAG_WIND) {
+						if (g_Level.Rooms[s.room].flags & ENV_FLAG_WIND) {
 							s.position.x += SmokeWindX / 2;
 							s.position.z += SmokeWindZ / 2;
 						}
@@ -88,7 +88,7 @@ namespace T5M {
 				Vector3(xv, yv, zv).Normalize(s.velocity);
 				s.velocity *= frand() * 24 + 16;
 				s.gravity = -.1f;
-				s.affectedByWind = Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND;
+				s.affectedByWind = g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND;
 				s.sourceColor = Vector4(.4, .4, .4, 1);
 				s.destinationColor = Vector4(0, 0, 0, 0);
 

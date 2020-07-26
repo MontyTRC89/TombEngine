@@ -9,7 +9,7 @@
 
 void ControlSpikyWall(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	/* Move wall */
 	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)

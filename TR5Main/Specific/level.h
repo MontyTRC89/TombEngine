@@ -12,6 +12,9 @@
 
 struct ChunkId;
 struct LEB128;
+struct SAMPLE_INFO;
+struct BOX_INFO;
+struct OVERLAP;
 
 typedef struct OBJECT_TEXTURE_VERT
 {
@@ -98,37 +101,49 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
-extern OBJECT_TEXTURE* NewObjectTextures;
-extern uintptr_t hLoadLevel;
-extern std::vector<int> Bones;
-extern int NumObjects;
-extern int NumStaticObjects;
+struct ANIM_FRAME
+{
+	BOUNDING_BOX boundingBox;
+	short offsetX;
+	short offsetY;
+	short offsetZ;
+	std::vector<Quaternion> angles;
+};
+
+struct LEVEL
+{
+	std::vector<TEXTURE> RoomTextures;
+	std::vector<TEXTURE> MoveablesTextures;
+	std::vector<TEXTURE> StaticsTextures;
+	std::vector<TEXTURE> SpritesTextures;
+	TEXTURE MiscTextures;
+	std::vector<ROOM_INFO> Rooms;
+	std::vector<short> FloorData;
+	std::vector<MESH> Meshes;
+	std::vector<int> Bones;
+	std::vector<ANIM_STRUCT> Anims;
+	std::vector<CHANGE_STRUCT> Changes;
+	std::vector<RANGE_STRUCT> Ranges;
+	std::vector<short> Commands;
+	std::vector<ANIM_FRAME> Frames;
+	std::vector<OBJECT_TEXTURE> ObjectTextures;
+	std::vector<ITEM_INFO> Items;
+	std::vector<AIOBJECT> AIObjects;
+	std::vector<SPRITE> Sprites;
+	std::vector<BOX_INFO> Boxes;
+	std::vector<OVERLAP> Overlaps;
+	std::vector<int> Zones[5][2];
+	std::vector<short> SoundMap;
+	std::vector<SAMPLE_INFO> SoundDetails;
+	int NumItems;
+	int NumSpritesSequences;
+};
+
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
-extern int NumObjectTextures;
 extern char* LevelDataPtr;
 extern int IsLevelLoading;
-extern int NumTextureTiles;
-extern int g_NumSpritesSequences;
-extern std::vector<MESH> Meshes;
-extern int NumItems;
-extern std::vector<OBJECT_TEXTURE> ObjectTextures;
-extern std::vector <ITEM_INFO> Items;
-extern std::vector<ROOM_INFO> Rooms;
-extern std::vector<ROOM_INFO> Rooms;
-extern std::vector <ANIM_STRUCT> Anims;
-extern std::vector <CHANGE_STRUCT> Changes;
-extern std::vector <RANGE_STRUCT> Ranges;
-extern std::vector<short> Commands;
-extern std::vector<short> Frames;
-extern std::vector <AIOBJECT> AIObjects;
-extern std::vector <SPRITE> Sprites;
-extern short* FloorData;
-extern std::vector<TEXTURE> RoomTextures;
-extern std::vector<TEXTURE> MoveablesTextures;
-extern std::vector<TEXTURE> StaticsTextures;
-extern std::vector<TEXTURE> SpritesTextures;
-extern TEXTURE MiscTextures;
+extern LEVEL g_Level;
 
 void LoadTextures();
 void LoadRooms();
@@ -136,7 +151,6 @@ int LoadItems();
 void LoadObjects();
 int S_LoadLevelFile(int levelIndex);
 void FreeLevel();
-void AdjustUV(int num);
 void LoadCameras();
 void InitialiseLara(int restore);
 void LoadSprites();
@@ -151,12 +165,6 @@ void LoadTextureInfos();
 void LoadAIObjects();
 FILE* FileOpen(const char* fileName);
 void FileClose(FILE* ptr);
-void Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
+bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
 
 unsigned CALLBACK LoadLevel(void* data);
-
-// New functions for loading data from TR5M footer
-bool ReadLuaIds(ChunkId* chunkId, int maxSize, int arg);
-bool ReadLuaTriggers(ChunkId* chunkId, int maxSize, int arg);
-bool ReadNewDataChunks(ChunkId* chunkId, int maxSize, int arg);
-void LoadNewData(int size);

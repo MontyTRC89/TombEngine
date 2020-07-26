@@ -10,11 +10,11 @@
 
 void InitialiseRaisingBlock(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	Boxes[floor->box].flags &= ~BLOCKED;
+	g_Level.Boxes[floor->box].flags &= ~BLOCKED;
 
 	if (item->triggerFlags < 0)
 	{
@@ -26,7 +26,7 @@ void InitialiseRaisingBlock(short itemNumber)
 
 void ControlRaisingBlock(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{

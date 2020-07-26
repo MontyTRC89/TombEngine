@@ -4,7 +4,7 @@
 
 void InitialiseLittleBeetle(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->itemFlags[0] = (item->triggerFlags / 1000) & 1;
 	item->itemFlags[1] = (item->triggerFlags / 1000) & 2;

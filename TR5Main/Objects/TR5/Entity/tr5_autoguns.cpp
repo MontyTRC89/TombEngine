@@ -13,7 +13,7 @@ void InitialiseAutoGuns(short itemNumber)
 {
     ITEM_INFO* item;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     item->meshBits = 1024;
     item->data = game_malloc<uint8_t>(5702);
 }
@@ -49,11 +49,11 @@ static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 
 void AutoGunsControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
-		if (item->frameNumber >= Anims[item->animNumber].frameEnd)
+		if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 		{
 			short* data = (short*)item->data;
 

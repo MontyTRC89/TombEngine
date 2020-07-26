@@ -5,17 +5,17 @@
 
 void PlinthBladeControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (!TriggerActive(item))
 	{
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 	else
 	{
-		short frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		short frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
-		if (item->frameNumber == Anims[item->animNumber].frameEnd)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			item->itemFlags[3] = 0;
 		else
 			item->itemFlags[3] = 200;

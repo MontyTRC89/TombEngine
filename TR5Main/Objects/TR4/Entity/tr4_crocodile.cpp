@@ -74,14 +74,14 @@ static bool CrocodileIsInWater(ITEM_INFO* item, CREATURE_INFO* crocodile)
 
 void InitialiseCrocodile(short itemNumber)
 {
-    ITEM_INFO* item = &Items[itemNumber];
+    ITEM_INFO* item = &g_Level.Items[itemNumber];
     InitialiseCreature(itemNumber);
 
     // if the room is a "water room"
-    if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+    if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
     {
         item->animNumber = Objects[item->objectNumber].animIndex + CROC_ANIM_SWIM;
-        item->frameNumber = Anims[item->animNumber].frameBase;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
         item->currentAnimState = WCROC_SWIM;
         item->goalAnimState = WCROC_SWIM;
     }
@@ -89,7 +89,7 @@ void InitialiseCrocodile(short itemNumber)
     else
     {
         item->animNumber = Objects[item->objectNumber].animIndex + CROC_ANIM_IDLE;
-        item->frameNumber = Anims[item->animNumber].frameBase;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
         item->currentAnimState = CROC_IDLE;
         item->goalAnimState = CROC_IDLE;
     }
@@ -108,7 +108,7 @@ void CrocodileControl(short itemNumber)
     short angle;
     short boneAngle;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     obj = &Objects[item->objectNumber];
     crocodile = GetCreatureInfo(item);
     angle = 0;
@@ -122,10 +122,10 @@ void CrocodileControl(short itemNumber)
         if (item->currentAnimState != CROC_DIE && item->currentAnimState != WCROC_DIE)
         {
             // water
-            if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+            if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
             {
                 item->animNumber = obj->animIndex + CROC_ANIM_WDIE;
-                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->currentAnimState = WCROC_DIE;
                 item->goalAnimState = WCROC_DIE;
             }
@@ -133,14 +133,14 @@ void CrocodileControl(short itemNumber)
             else
             {
                 item->animNumber = obj->animIndex + CROC_ANIM_DIE;
-                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->currentAnimState = CROC_DIE;
                 item->goalAnimState = CROC_DIE;
             }
         }
 
         // creature in water are floating after death.
-        if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+        if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
             CreatureFloat(itemNumber);
     }
     else
@@ -233,7 +233,7 @@ void CrocodileControl(short itemNumber)
                 item->goalAnimState = CROC_WALK;
             break;
         case CROC_ATK:
-            if (item->frameNumber == Anims[item->animNumber].frameBase)
+            if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
                 item->requiredAnimState = 0;
 
             if (info.bite && (item->touchBits & CROC_TOUCHBITS))
@@ -258,7 +258,7 @@ void CrocodileControl(short itemNumber)
             if (!CrocodileIsInWater(item, crocodile))
             {
                 item->animNumber = obj->animIndex + CROC_ANIM_LAND_MODE;
-                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->requiredAnimState = CROC_WALK;
                 item->currentAnimState = CROC_WALK;
                 item->goalAnimState = CROC_WALK;
@@ -276,7 +276,7 @@ void CrocodileControl(short itemNumber)
             }
             break;
         case WCROC_ATK:
-            if (item->frameNumber == Anims[item->animNumber].frameBase)
+            if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
                 item->requiredAnimState = CROC_EMPTY;
 
             if (info.bite && (item->touchBits & CROC_TOUCHBITS))

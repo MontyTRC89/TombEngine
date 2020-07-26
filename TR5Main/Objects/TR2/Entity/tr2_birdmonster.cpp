@@ -19,7 +19,7 @@ void BirdMonsterControl(short itemNum)
 	AI_INFO info;
 	short angle, head;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	monster = (CREATURE_INFO*)item->data;
 	angle = head = 0;
 
@@ -28,7 +28,7 @@ void BirdMonsterControl(short itemNum)
 		if (item->currentAnimState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 20;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 9;
 		}
 	}

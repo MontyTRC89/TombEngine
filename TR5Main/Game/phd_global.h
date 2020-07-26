@@ -225,3 +225,13 @@ typedef struct MATRIX3D
 	int ty;
 	int tz;
 };
+
+struct BOUNDING_BOX
+{
+	short X1;
+	short X2;
+	short Y1;
+	short Y2;
+	short Z1;
+	short Z2;
+};

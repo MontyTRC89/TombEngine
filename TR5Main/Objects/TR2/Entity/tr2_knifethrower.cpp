@@ -107,7 +107,7 @@ void KnifethrowerControl(short itemNum)
 	AI_INFO info;
 	short angle, torso, head, tilt;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	knife = (CREATURE_INFO*)item->data;
 	angle = torso = head = tilt = 0;
 
@@ -116,7 +116,7 @@ void KnifethrowerControl(short itemNum)
 		if (item->currentAnimState != 10)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 23;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 10;
 		}
 	}

@@ -5,7 +5,7 @@
 
 void ChainControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->triggerFlags)
 	{
