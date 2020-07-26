@@ -128,21 +128,22 @@ int LoadItems()
 
 		for (int m = 0; m < g_Level.Rooms[r].mesh.size(); m++)
 		{
-			FLOOR_INFO* floor = &g_Level.Rooms[r].floor[((mesh->z - g_Level.Rooms[r].z) >> 10) + g_Level.Rooms[r].xSize * ((mesh->x - g_Level.Rooms[r].x) >> 10)];
+			FLOOR_INFO* floor = &g_Level.Rooms[r].floor[((mesh->z - g_Level.Rooms[r].z) / 1024) +
+				g_Level.Rooms[r].xSize * ((mesh->x - g_Level.Rooms[r].x) / 1024)];
 			 
 			if (!(g_Level.Boxes[floor->box].flags & BLOCKED)
 				&& !(CurrentLevel == 5 && (r == 19 || r == 23 || r == 16)))
 			{
-				int fl = floor->floor << 2;
+				int fl = floor->floor * 4;
 				STATIC_INFO* st = &StaticObjects[mesh->staticNumber];
 				if (fl <= mesh->y - st->collisionBox.Y2 + 512 && fl < mesh->y - st->collisionBox.Y1)
 				{
 					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
 						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
-						(st->collisionBox.X1 < 0 ^ st->collisionBox.X2 < 0) &&
-						(st->collisionBox.Z1 < 0 ^ st->collisionBox.Z2 < 0))
+						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
+						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
 					{
-						floor->box |= 8; 
+						floor->stopper = true;
 					}
 				}
 			}
@@ -596,21 +597,22 @@ void ReadRooms()
 		{
 			ROOM_LIGHT light;
 
-			light.x = ReadFloat();
-			light.y = ReadFloat();
-			light.z = ReadFloat();
-			light.r = ReadFloat();
-			light.g = ReadFloat();
-			light.b = ReadFloat();
-			light.in = ReadFloat();
-			light.out = ReadFloat();
-			light.radIn = ReadFloat();
-			light.radOut = ReadFloat();
-			light.range = ReadFloat();
+			light.x = ReadInt32();
+			light.y = ReadInt32();
+			light.z = ReadInt32();
 			light.dx = ReadFloat();
 			light.dy = ReadFloat();
 			light.dz = ReadFloat();
+			light.r = ReadFloat();
+			light.g = ReadFloat();
+			light.b = ReadFloat();
+			light.intensity = ReadFloat();
+			light.in = ReadFloat();
+			light.out = ReadFloat();
+			light.length = ReadFloat();
+			light.cutoff = ReadFloat();
 			light.type = ReadInt8();
+			light.castShadows = ReadInt8();
 
 			room.lights.push_back(light);
 		}
