@@ -12,12 +12,12 @@ BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 
 void InitialiseSmallScorpion(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 }
@@ -36,7 +36,7 @@ void SmallScorpionControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	if (item->hitPoints > 0)
@@ -130,8 +130,8 @@ void SmallScorpionControl(short itemNumber)
 			{
 				if (item->touchBits & 0x1B00100)
 				{
-					if (item->frameNumber > Anims[item->animNumber].frameBase + 20 &&
-						item->frameNumber < Anims[item->animNumber].frameBase + 32)
+					if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 20 &&
+						item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 32)
 					{
 						LaraItem->hitPoints -= 20;
 						LaraItem->hitStatus = true;
@@ -163,7 +163,7 @@ void SmallScorpionControl(short itemNumber)
 		if (item->currentAnimState != 6 && item->currentAnimState != 7)
 		{
 			item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 6;
 		}
 	}

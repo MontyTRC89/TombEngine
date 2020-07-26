@@ -11,10 +11,10 @@ BITE_INFO cobraBite = { 0, 0, 0, 13 };
 
 void InitialiseCobra(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
 	item->animNumber = Objects[item->objectNumber].animIndex + 2;
-	item->frameNumber = Anims[item->animNumber].frameBase + 45;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 45;
 	item->currentAnimState = item->goalAnimState = 3;
 	item->itemFlags[2] = item->hitStatus;
 }
@@ -24,7 +24,7 @@ void CobraControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short head = 0;
 	short angle = 0;
@@ -35,7 +35,7 @@ void CobraControl(short itemNum)
 		if (item->currentAnimState != 4)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 4;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 4;
 		}
 	}

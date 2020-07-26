@@ -17,12 +17,12 @@ BITE_INFO guideBiteInfo2 = { 30, 80, 50, 15 };
 
 void InitialiseGuide(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 4;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 	item->swapMeshFlags = 0x40000;
@@ -33,7 +33,7 @@ void GuideControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
@@ -62,8 +62,8 @@ void GuideControl(short itemNumber)
 
 		if (item->animNumber == obj->animIndex + 61)
 		{
-			if (item->frameNumber > Anims[item->animNumber].frameBase + 32 &&
-				item->frameNumber < Anims[item->animNumber].frameBase + 42)
+			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 32 &&
+				item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 42)
 			{
 				GrenadeLauncherSpecialEffect1(
 					(random & 0x3F) + pos.x - 32,
@@ -122,7 +122,7 @@ void GuideControl(short itemNumber)
 			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 				continue;
 
-			ITEM_INFO* currentItem = &Items[baddie->itemNum];
+			ITEM_INFO* currentItem = &g_Level.Items[baddie->itemNum];
 			if (currentItem->objectNumber != ID_GUIDE &&
 				abs(currentItem->pos.yPos - item->pos.yPos) <= 512)
 			{
@@ -430,7 +430,7 @@ void GuideControl(short itemNumber)
 
 		GetJointAbsPosition(item, &pos1, guideBiteInfo2.meshNum);
 
-		frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 		random = GetRandomControl();
 
 		if (frameNumber == 32)
@@ -534,8 +534,8 @@ void GuideControl(short itemNumber)
 		{
 			if (enemy)
 			{
-				if (item->frameNumber > Anims[item->animNumber].frameBase + 15 &&
-					item->frameNumber < Anims[item->animNumber].frameBase + 26)
+				if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 15 &&
+					item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 26)
 				{
 					dx = abs(enemy->pos.xPos - item->pos.xPos);
 					dy = abs(enemy->pos.yPos - item->pos.yPos);
@@ -599,7 +599,7 @@ void GuideControl(short itemNumber)
 		else
 		{
 			if (item->animNumber != obj->animIndex + 57
-				&& item->frameNumber == Anims[item->animNumber].frameEnd - 20)
+				&& item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 20)
 			{
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 				GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
@@ -617,7 +617,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case 37:
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			someFlag = true;
 
@@ -628,17 +628,17 @@ void GuideControl(short itemNumber)
 			item->pos.yRot = enemy->pos.yRot;
 			item->pos.zRot = enemy->pos.zRot;
 		}
-		else if (item->frameNumber == Anims[item->animNumber].frameBase + 35)
+		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 35)
 		{
 			item->swapMeshFlags &= 0xFFFBFFFF;
 
-			ROOM_INFO* room = &Rooms[item->roomNumber];
+			ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 			ITEM_INFO* currentItem = NULL;
 
 			short currentitemNumber = room->itemNumber;
 			while (currentitemNumber != NO_ITEM)
 			{
-				currentItem = &Items[currentitemNumber];
+				currentItem = &g_Level.Items[currentitemNumber];
 
 				if (currentItem->objectNumber >= ID_ANIMATING1
 					&& currentItem->objectNumber <= ID_ANIMATING15
@@ -667,7 +667,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case 38:
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			item->pos.xPos = enemy->pos.xPos;
 			item->pos.yPos = enemy->pos.yPos;
@@ -675,7 +675,7 @@ void GuideControl(short itemNumber)
 		}
 		else
 		{
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 42)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 42)
 			{
 
 				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
@@ -692,7 +692,7 @@ void GuideControl(short itemNumber)
 
 				break;
 			}
-			if (item->frameNumber < Anims[item->animNumber].frameBase + 42)
+			if (item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 42)
 			{
 				if (enemy->pos.yRot - item->pos.yRot <= ANGLE(2))
 				{
@@ -711,9 +711,9 @@ void GuideControl(short itemNumber)
 		break;
 
 	case 39:
-		if (item->frameNumber >= Anims[item->animNumber].frameBase + 20)
+		if (item->frameNumber >= g_Level.Anims[item->animNumber].frameBase + 20)
 		{
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 20)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 20)
 			{
 				item->goalAnimState = 1;
 
@@ -730,7 +730,7 @@ void GuideControl(short itemNumber)
 				break;
 			}
 
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 70 && item->roomNumber == 70)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 70 && item->roomNumber == 70)
 			{
 				item->requiredAnimState = 3;
 				item->swapMeshFlags |= 0x200000;

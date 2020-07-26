@@ -10,16 +10,16 @@
 
 void InitialiseSpinningBlade(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 3;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = 1;
 }
 
 void SpinningBladeControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	bool spinning = false;
 
 	if (item->currentAnimState == 2)

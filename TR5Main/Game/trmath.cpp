@@ -1464,7 +1464,7 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles)
 	angles[1] = angle;
 }
 
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds)
+void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	Matrix world = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(pos->yRot),
@@ -1472,16 +1472,16 @@ void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, short* bounds, short* tbounds)
 		TO_RAD(pos->zRot)
 	);
 
-	Vector3 bMin = Vector3(bounds[0], bounds[2], bounds[4]);
-	Vector3 bMax = Vector3(bounds[1], bounds[3], bounds[5]);
+	Vector3 bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
+	Vector3 bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
 
 	bMin = Vector3::Transform(bMin, world);
 	bMax = Vector3::Transform(bMax, world);
 
-	tbounds[0] = bMin.x;
-	tbounds[1] = bMax.x;
-	tbounds[2] = bMin.y;
-	tbounds[3] = bMax.y;
-	tbounds[4] = bMin.z;
-	tbounds[5] = bMax.z;
+	tbounds->X1 = bMin.x;
+	tbounds->X2 = bMax.x;
+	tbounds->Y1 = bMin.y;
+	tbounds->Y2 = bMax.y;
+	tbounds->Z1 = bMin.z;
+	tbounds->Z2 = bMax.z;
 }

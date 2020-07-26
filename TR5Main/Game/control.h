@@ -3,6 +3,8 @@
 #include "items.h"
 #include "room.h"
 
+struct BOUNDING_BOX;
+
 enum GAME_STATUS
 {
 	GAME_STATUS_NONE,
@@ -173,7 +175,7 @@ void SeedRandomControl(int seed);
 int GetRandomDraw();
 void SeedRandomDraw(int seed);
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
-int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, short* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
+int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);
 void AnimateItem(ITEM_INFO* item);
 void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* r);

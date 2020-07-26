@@ -81,7 +81,7 @@ namespace T5M::Renderer
 	void Renderer11::updateAnimatedTextures()
 	{
 		// Update room's animated textures
-		for (int i = 0; i < Rooms.size(); i++)
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
 			if (m_rooms.size() <= i)
 				continue;
@@ -148,19 +148,19 @@ namespace T5M::Renderer
 		}*/
 	}
 
-	void Renderer11::updateEffects()
+	void Renderer11::updateEffects(RenderView& view)
 	{
-		for (int i = 0; i < m_effectsToDraw.size(); i++)
+		for (int i = 0; i < view.effectsToDraw.size(); i++)
 		{
 			RendererEffect *fx = m_effectsToDraw[i];
 
 			Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.xPos, fx->Effect->pos.yPos, fx->Effect->pos.zPos);
 			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.yRot), TO_RAD(fx->Effect->pos.xRot), TO_RAD(fx->Effect->pos.zRot));
-			m_effectsToDraw[i]->World = rotation * translation;
+			view.effectsToDraw[i]->World = rotation * translation;
 		}
 	}
 
-	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, short **frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		RendererBone *Bones[32];
 		int nextBone = 0;
@@ -181,17 +181,18 @@ namespace T5M::Renderer
 
 			if (calculateMatrix)
 			{
-				Vector3 p = Vector3((int)*(frmptr[0] + 6), (int)*(frmptr[0] + 7), (int)*(frmptr[0] + 8));
+				Vector3 p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
 
-				fromTrAngle(&rotation, frmptr[0], bone->Index);
-
+				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
+				//fromTrAngle(&rotation, frmptr[0], bone->Index);
+				
 				if (frac)
 				{
-					Vector3 p2 = Vector3((int)*(frmptr[1] + 6), (int)*(frmptr[1] + 7), (int)*(frmptr[1] + 8));
+					Vector3 p2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
-					Matrix rotation2;
-					fromTrAngle(&rotation2, frmptr[1], bone->Index);
+					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
+					//fromTrAngle(&rotation2, frmptr[1], bone->Index);
 
 					Quaternion q1, q2, q3;
 
@@ -236,7 +237,8 @@ namespace T5M::Renderer
 			}
 		}
 	}
-	int Renderer11::getFrame(short animation, short frame, short **framePtr, int *rate)
+
+	int Renderer11::getFrame(short animation, short frame, ANIM_FRAME** framePtr, int *rate)
 	{
 		ITEM_INFO item;
 		item.animNumber = animation;
@@ -249,7 +251,7 @@ namespace T5M::Renderer
 	{
 		RendererItem *itemToDraw = &m_items[itemNumber];
 		itemToDraw->Id = itemNumber;
-		itemToDraw->Item = &Items[itemNumber];
+		itemToDraw->Item = &g_Level.Items[itemNumber];
 
 		ITEM_INFO *item = itemToDraw->Item;
 		CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
@@ -297,7 +299,7 @@ namespace T5M::Renderer
 				}
 			}
 
-			short *framePtr[2];
+			ANIM_FRAME* framePtr[2];
 			int rate;
 			int frac = GetFrame_D2(item, framePtr, &rate);
 
@@ -310,16 +312,14 @@ namespace T5M::Renderer
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::updateItemsAnimations()
+	void Renderer11::updateItemsAnimations(RenderView& view)
 	{
 		Matrix translation;
 		Matrix rotation;
 
-		int numItems = m_itemsToDraw.size();
-
-		for (int i = 0; i < numItems; i++)
+		for (int i = 0; i < view.itemsToDraw.size(); i++)
 		{
-			RendererItem *itemToDraw = m_itemsToDraw[i];
+			RendererItem *itemToDraw = view.itemsToDraw[i];
 			ITEM_INFO *item = itemToDraw->Item;
 			CREATURE_INFO *creature = (CREATURE_INFO *)item->data;
 
@@ -445,9 +445,9 @@ namespace T5M::Renderer
 					vertex.Position.y = meshPtr->positions[v].y;
 					vertex.Position.z = meshPtr->positions[v].z;
 
-					vertex.Normal.x = meshPtr->normals[v].x;
-					vertex.Normal.y = meshPtr->normals[v].y;
-					vertex.Normal.z = meshPtr->normals[v].z;
+					vertex.Normal.x = poly->normals[k].x;
+					vertex.Normal.y = poly->normals[k].y;
+					vertex.Normal.z = poly->normals[k].z;
 
 					vertex.UV.x = poly->textureCoordinates[k].x;
 					vertex.UV.y = poly->textureCoordinates[k].y;
@@ -653,7 +653,7 @@ namespace T5M::Renderer
 			if (m_rooms[node->To].Visited)
 				continue;
 
-			ROOM_INFO *room = &Rooms[node->To];
+			ROOM_INFO *room = &g_Level.Rooms[node->To];
 
 			Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f,
 										 (room->minfloor + room->maxceiling) / 2.0f,
@@ -663,7 +663,7 @@ namespace T5M::Renderer
 			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
 			m_rooms[node->To].Visited = true;
 			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
-			Rooms[node->To].boundActive = true;
+			g_Level.Rooms[node->To].boundActive = true;
 
 			collectLightsForRoom(node->To, renderView);
 			collectItems(node->To, renderView);
@@ -691,7 +691,7 @@ namespace T5M::Renderer
 
 	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR *portal, Vector4 *viewPort, Vector4 *clipPort, const Matrix &viewProjection)
 	{
-		ROOM_INFO *room = &Rooms[roomIndex];
+		ROOM_INFO *room = &g_Level.Rooms[roomIndex];
 
 		Vector3 n = portal->normal;
 		Vector3 v = Vector3(
@@ -803,8 +803,8 @@ namespace T5M::Renderer
 		temporary = m_rooms[roomNumber1];
 		m_rooms[roomNumber1] = m_rooms[roomNumber2];
 		m_rooms[roomNumber2] = temporary;
-		m_rooms[roomNumber1].Room = &Rooms[roomNumber1];
-		m_rooms[roomNumber2].Room = &Rooms[roomNumber2];
+		m_rooms[roomNumber1].Room = &g_Level.Rooms[roomNumber1];
+		m_rooms[roomNumber2].Room = &g_Level.Rooms[roomNumber2];
 	}
 
 	RendererMesh *Renderer11::getMesh(int meshIndex)
@@ -823,7 +823,7 @@ namespace T5M::Renderer
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
-		rendererItem->Item = &Items[itemNumber];
+		rendererItem->Item = &g_Level.Items[itemNumber];
 		ITEM_INFO *item = rendererItem->Item;
 
 		if (!item)
@@ -845,7 +845,7 @@ namespace T5M::Renderer
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
-		rendererItem->Item = &Items[itemNumber];
+		rendererItem->Item = &g_Level.Items[itemNumber];
 		ITEM_INFO *item = rendererItem->Item;
 
 		if (!item)

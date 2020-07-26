@@ -264,14 +264,14 @@ void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
 
 void InitialiseRomanStatue(short itemNum)
 {
-    ITEM_INFO* item = &Items[itemNum];
+    ITEM_INFO* item = &g_Level.Items[itemNum];
     
 	ClearItem(itemNum);
     
     item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_START_JUMP_DOWN;
     item->goalAnimState = 13;
     item->currentAnimState = 13;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->status = ITEM_NOT_ACTIVE;
 	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
     item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90.0f)) >> W2V_SHIFT;
@@ -289,7 +289,7 @@ void RomanStatueControl(short itemNumber)
 	short joint1 = 0;
 	short joint0 = 0;
 	
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
 	int oldSwapMeshFlags = item->swapMeshFlags;
@@ -327,7 +327,7 @@ void RomanStatueControl(short itemNumber)
 		item->goalAnimState = STATE_ROMAN_STATUE_HIT;
 		item->currentAnimState = STATE_ROMAN_STATUE_HIT;
 		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_HIT;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 
 	if (item->hitPoints > 0)
@@ -453,7 +453,7 @@ void RomanStatueControl(short itemNumber)
 			pos.y = (pos1.y + pos2.y) >> 1;
 			pos.z = (pos1.z + pos2.z) >> 1;
 
-			deltaFrame = item->frameNumber - Anims[item->animNumber].frameBase;
+			deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 			if (deltaFrame > 68 && deltaFrame < 130)
 			{
@@ -591,7 +591,7 @@ void RomanStatueControl(short itemNumber)
 				item->pos.yRot += info.angle;
 			}
 
-			if (item->frameNumber > Anims[item->animNumber].frameBase + 10)
+			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 10)
 			{
 				pos.x = 0;
 				pos.y = 0;
@@ -599,7 +599,7 @@ void RomanStatueControl(short itemNumber)
 				
 				GetJointAbsPosition(item, &pos, 16);
 
-				room = &Rooms[item->roomNumber];
+				room = &g_Level.Rooms[item->roomNumber];
 				floor = &XZ_GET_SECTOR(room, pos.x - room->x, pos.z - room->z);
 
 				// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
@@ -650,7 +650,7 @@ void RomanStatueControl(short itemNumber)
 
 					pos1.y = item->pos.yPos - 64;
 					
-					if (item->frameNumber == Anims[item->animNumber].frameBase + 34 && item->currentAnimState == 3)
+					if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 34 && item->currentAnimState == 3)
 					{
 						if (item->itemFlags[0])
 							item->itemFlags[0]--;
@@ -661,8 +661,8 @@ void RomanStatueControl(short itemNumber)
 						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 					}
 
-					deltaFrame = item->frameNumber - Anims[item->animNumber].frameBase;
-					deltaFrame2 = Anims[item->animNumber].frameEnd - item->frameNumber;
+					deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+					deltaFrame2 = g_Level.Anims[item->animNumber].frameEnd - item->frameNumber;
 					
 					if (deltaFrame2 >= 16)
 					{
@@ -740,7 +740,7 @@ void RomanStatueControl(short itemNumber)
 			else
 				item->pos.yRot += ANGLE(2);
 
-			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 				item->pos.yRot += -ANGLE(180);
 		
 			break;
@@ -756,7 +756,7 @@ void RomanStatueControl(short itemNumber)
 				TriggerDynamicLight(RomanStatueData.pos.x, RomanStatueData.pos.y, RomanStatueData.pos.z, 16, 0, color, color >> 1);
 			}
 			
-			deltaFrame = item->frameNumber - Anims[item->animNumber].frameBase;
+			deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 			if (deltaFrame == 34)
 			{
@@ -895,19 +895,19 @@ void RomanStatueControl(short itemNumber)
 
 		if (item->currentAnimState == STATE_ROMAN_STATUE_DEATH)
 		{
-			if (item->frameNumber > Anims[item->animNumber].frameBase + 54
-				&& item->frameNumber < Anims[item->animNumber].frameBase + 74
+			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 54
+				&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 74
 				&& item->touchBits)
 			{
 				LaraItem->hitPoints -= 40;
 				LaraItem->hitStatus = true;
 			}
-			else if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			{
 				// Activate trigger on death
 				short roomNumber = item->itemFlags[2] & 0xFF;
 				short floorHeight = item->itemFlags[2] & 0xFF00;
-				ROOM_INFO* r = &Rooms[roomNumber];
+				ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 				int x = r->x + (((item->TOSSPAD >> 8) & 0xFF) << WALL_SHIFT) + 512;
 				int y = r->minfloor + floorHeight;
@@ -922,7 +922,7 @@ void RomanStatueControl(short itemNumber)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_DEATH;
 			item->currentAnimState = STATE_ROMAN_STATUE_DEATH;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 	}
 

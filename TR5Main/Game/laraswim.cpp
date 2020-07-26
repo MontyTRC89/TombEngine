@@ -32,7 +32,7 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 {
 	if (Lara.currentActive)
 	{
-		OBJECT_VECTOR* sink = &Camera.fixed[Lara.currentActive - 1];
+		OBJECT_VECTOR* sink = &FixedCameras[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
 		Lara.currentXvel += ((sink->data * (phd_sin(angle - ANGLE(90)) / 4) >> 2) - Lara.currentXvel) >> 4;
@@ -113,7 +113,7 @@ void LaraWaterCurrent(COLL_INFO* coll) // (F) (D)
 int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 {
 	FLOOR_INFO* floor;
-	ROOM_INFO* r = &Rooms[roomNumber];
+	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 	
 	short roomIndex = NO_ROOM;
 	do
@@ -147,7 +147,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 		if (roomIndex != NO_ROOM)
 		{
 			roomNumber = roomIndex;
-			r = &Rooms[roomIndex];
+			r = &g_Level.Rooms[roomIndex];
 		}
 	} while (roomIndex != NO_ROOM);
 
@@ -155,7 +155,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 	{
 		while (floor->skyRoom != NO_ROOM)
 		{
-			r = &Rooms[floor->skyRoom];
+			r = &g_Level.Rooms[floor->skyRoom];
 			if (!(r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP)))
 			{
 				int wh = floor->ceiling << 8;
@@ -170,7 +170,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)//4CA38, 4CE9C
 	{
 		while (floor->pitRoom != NO_ROOM)
 		{
-			r = &Rooms[floor->pitRoom];
+			r = &g_Level.Rooms[floor->pitRoom];
 			if (r->flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 			{
 				int wh = floor->floor << 8;
@@ -268,7 +268,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)//4C730, 4CB94 (F)
 	{
 		item->currentAnimState = STATE_LARA_UNDERWATER_TURNAROUND;
 		item->animNumber = ANIMATION_LARA_UNDERWATER_ROLL_BEGIN;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 	else
 	{
@@ -307,7 +307,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
 		{
 			item->currentAnimState = STATE_LARA_UNDERWATER_TURNAROUND;
 			item->animNumber = ANIMATION_LARA_UNDERWATER_ROLL_BEGIN;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			return;
 		}
 	}
@@ -345,7 +345,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
 		{
 			item->currentAnimState = STATE_LARA_UNDERWATER_TURNAROUND;
 			item->animNumber = ANIMATION_LARA_UNDERWATER_ROLL_BEGIN;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			return;
 		}
 	}
@@ -854,7 +854,7 @@ void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)//4B4F8(<), 4B95C(<) (F
 		item->speed = 0;
 		item->fallspeed = 0;
 		item->gravityStatus = false;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		Lara.waterStatus = LW_WADE;
 		item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	}

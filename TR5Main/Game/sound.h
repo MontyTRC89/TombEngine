@@ -2042,10 +2042,6 @@ typedef struct AudioTrack
 };
 
 extern std::vector<AudioTrack> g_AudioTracks;
-extern short SampleLUT[SOUND_NEW_SOUNDMAP_MAX_SIZE];
-extern short SoundMapSize;
-extern int NumSamplesInfos;
-extern SAMPLE_INFO* SampleInfo;
 extern int GlobalMusicVolume;
 extern int GlobalFXVolume;
 

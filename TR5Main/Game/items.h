@@ -47,7 +47,7 @@ typedef struct ITEM_INFO
 	short speed;
 	short fallspeed;
 	short hitPoints;
-	unsigned short boxNumber;
+	int boxNumber;
 	short timer;
 	unsigned short flags; // ItemFlags enum
 	short shade;
@@ -58,7 +58,6 @@ typedef struct ITEM_INFO
 	short itemFlags[4];
 	void* data;
 	PHD_3DPOS pos;
-	byte legacyLightData[5528];
 	bool active;
 	short status; // ItemStatus enum
 	bool gravityStatus;
@@ -99,7 +98,7 @@ void InitialiseFXArray(int allocmem);
 short CreateNewEffect(short roomNum);
 void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
-void InitialiseItemArray(int numitems);
+void InitialiseItemArray(int numItems);
 void KillItem(short itemNum);
 ITEM_INFO* find_a_fucking_item(short objectNum);
 int FindItemNumber(short objectNumber);

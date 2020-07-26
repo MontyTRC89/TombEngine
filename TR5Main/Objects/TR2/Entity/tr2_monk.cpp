@@ -22,7 +22,7 @@ void MonkControl(short itemNum)
 	AI_INFO info;
 	int random;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	monk = (CREATURE_INFO*)item->data;
 	torso = angle = tilt = 0;
 
@@ -31,7 +31,7 @@ void MonkControl(short itemNum)
 		if (item->currentAnimState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 9;
 		}
 	}

@@ -10,18 +10,29 @@
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 
 int SlotsUsed;
-CREATURE_INFO* BaddieSlots;
+std::vector<CREATURE_INFO> BaddieSlots;
 
 void InitialiseLOTarray(int allocMem)
 {
 	if (allocMem)
-		BaddieSlots = (CREATURE_INFO*)game_malloc(sizeof(CREATURE_INFO) * NUM_SLOTS);
+	{
+		BaddieSlots.clear();
+		BaddieSlots.resize(NUM_SLOTS);
+	}
 
-	CREATURE_INFO* creature = BaddieSlots;
+	CREATURE_INFO* creature = BaddieSlots.data();
 	for (int i = 0; i < NUM_SLOTS; i++, creature++)
 	{
 		creature->itemNum = NO_ITEM;
-		creature->LOT.node = (BOX_NODE*)game_malloc(sizeof(BOX_NODE) * NumberBoxes);
+		if (allocMem)
+		{
+			creature->LOT.node.clear();
+			creature->LOT.node.resize(g_Level.Boxes.size());
+			for (int j = 0; j < g_Level.Boxes.size(); j++)
+			{
+				creature->LOT.node.emplace_back(BOX_NODE());
+			}
+		}
 	}
 
 	SlotsUsed = 0;
@@ -29,7 +40,7 @@ void InitialiseLOTarray(int allocMem)
 
 int EnableBaddieAI(short itemNum, int always)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->data != NULL)
 		return true;
@@ -46,10 +57,10 @@ int EnableBaddieAI(short itemNum, int always)
 		}
 
 		int slotToDisable = -1;
-		CREATURE_INFO* creature = BaddieSlots;
+		CREATURE_INFO* creature = BaddieSlots.data();
 		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
 		{
-			item = &Items[creature->itemNum];
+			item = &g_Level.Items[creature->itemNum];
 
 			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
 			int deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
@@ -66,7 +77,7 @@ int EnableBaddieAI(short itemNum, int always)
 		if (slotToDisable < 0 || slotToDisable > NUM_SLOTS)
 			return false;
 
-		ITEM_INFO* itemToDisable = &Items[BaddieSlots[slotToDisable].itemNum];
+		ITEM_INFO* itemToDisable = &g_Level.Items[BaddieSlots[slotToDisable].itemNum];
 		CREATURE_INFO* creatureToDisable = &BaddieSlots[slotToDisable];
 
 		itemToDisable->status = ITEM_INVISIBLE;
@@ -76,7 +87,7 @@ int EnableBaddieAI(short itemNum, int always)
 	}
 	else
 	{
-		CREATURE_INFO* creature = BaddieSlots;
+		CREATURE_INFO* creature = BaddieSlots.data();
 		for (int slot = 0; slot < NUM_SLOTS; slot++, creature++)
 		{
 			if (creature->itemNum == NO_ITEM)
@@ -92,7 +103,7 @@ int EnableBaddieAI(short itemNum, int always)
 
 void DisableBaddieAI(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	
 	item->data = NULL;
@@ -105,7 +116,7 @@ void DisableBaddieAI(short itemNumber)
 
 void InitialiseSlot(short itemNum, short slot)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	CREATURE_INFO* creature = &BaddieSlots[slot];
 
@@ -261,8 +272,8 @@ void ClearLOT(LOT_INFO* LOT)
 	LOT->targetBox = NO_BOX;
 	LOT->requiredBox = NO_BOX;
 
-	BOX_NODE* node = LOT->node;
-	for (int i = 0; i < NumberBoxes; i++)
+	BOX_NODE* node = LOT->node.data();
+	for (int i = 0; i < g_Level.Boxes.size(); i++)
 	{
 		node->exitBox = NO_BOX;
 		node->nextExpansion = NO_BOX;
@@ -274,16 +285,16 @@ void ClearLOT(LOT_INFO* LOT)
 void CreateZone(ITEM_INFO* item)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ROOM_INFO* r = &Rooms[item->roomNumber];
+	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
 	item->boxNumber = XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z).box;
 
 	if (creature->LOT.fly)
 	{
-		BOX_NODE* node = creature->LOT.node;
+		BOX_NODE* node = creature->LOT.node.data();
 		creature->LOT.zoneCount = 0;
 
-		for (int i = 0; i < NumberBoxes; i++)
+		for (int i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -292,16 +303,16 @@ void CreateZone(ITEM_INFO* item)
 	}
 	else
 	{
-		short* zone = Zones[creature->LOT.zone][FALSE];
-		short* flippedZone = Zones[creature->LOT.zone][TRUE];
+		int* zone = g_Level.Zones[creature->LOT.zone][0].data();
+		int* flippedZone = g_Level.Zones[creature->LOT.zone][1].data();
 
-		short zoneNumber = zone[item->boxNumber];
-		short flippedZoneNumber = flippedZone[item->boxNumber];
+		int zoneNumber = zone[item->boxNumber];
+		int flippedZoneNumber = flippedZone[item->boxNumber];
 
-		BOX_NODE* node = creature->LOT.node;
+		BOX_NODE* node = creature->LOT.node.data();
 		creature->LOT.zoneCount = 0;
 
-		for (int i = 0; i < NumberBoxes; i++)
+		for (int i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

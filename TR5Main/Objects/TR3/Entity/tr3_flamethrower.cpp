@@ -17,8 +17,8 @@ BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
 static void TriggerPilotFlame(int itemnum)
 {
-	int dx = LaraItem->pos.xPos - Items[itemnum].pos.xPos;
-	int dz = LaraItem->pos.zPos - Items[itemnum].pos.zPos;
+	int dx = LaraItem->pos.xPos - g_Level.Items[itemnum].pos.xPos;
+	int dz = LaraItem->pos.zPos - g_Level.Items[itemnum].pos.zPos;
 
 	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 		return;
@@ -215,7 +215,7 @@ void FlameThrowerControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short angle = 0;
@@ -244,7 +244,7 @@ void FlameThrowerControl(short itemNumber)
 		if (item->currentAnimState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 19;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 7;
 		}
 	}
@@ -260,7 +260,7 @@ void FlameThrowerControl(short itemNumber)
 			creature->enemy = NULL;
 
 			int minDistance = 0x7FFFFFFF;
-			CREATURE_INFO* currentCreature = BaddieSlots;
+			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
 
 			for (int i = 0; i < NUM_SLOTS; i++, currentCreature++)
@@ -268,7 +268,7 @@ void FlameThrowerControl(short itemNumber)
 				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 
-				target = &Items[currentCreature->itemNum];
+				target = &g_Level.Items[currentCreature->itemNum];
 				if (target->objectNumber == ID_LARA /*|| target->objectNumber == WHITE_SOLDIER || target->objectNumber == FLAMETHROWER_BLOKE*/ || target->hitPoints <= 0)
 					continue;
 
@@ -384,7 +384,7 @@ void FlameThrowerControl(short itemNumber)
 			if (item->aiBits & GUARD)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 12;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->currentAnimState = 1;
 				item->goalAnimState = 1;
 			}

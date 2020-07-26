@@ -26,11 +26,11 @@ void InitialiseWraith(short itemNumber)
 {
 	ITEM_INFO* item;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	WRAITH_INFO* wraithData;
 	
 
-	item->data = (WRAITH_INFO*)game_malloc(WRAITH_COUNT * sizeof(WRAITH_INFO));
+	item->data = game_malloc<WRAITH_INFO>(WRAITH_COUNT);
 	item->itemFlags[0] = 0;
 	item->hitPoints = 0;
 	item->speed = 0x40;
@@ -195,7 +195,7 @@ void KillWraith(ITEM_INFO* item)
 	{
 		for (;NextItemActive != NO_ITEM;)
 		{
-			item2 = &Items[NextItemActive];
+			item2 = &g_Level.Items[NextItemActive];
 			if (item2->objectNumber == ID_WRAITH3 && !item2->hitPoints)
 			{
 				break;
@@ -206,7 +206,7 @@ void KillWraith(ITEM_INFO* item)
 				return;
 			}
 		}
-		item2->hitPoints = item - Items;
+		item2->hitPoints = item - g_Level.Items.data();
 	}
 	FlipEffect = -1;
 }

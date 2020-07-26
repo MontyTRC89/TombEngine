@@ -45,13 +45,14 @@ namespace T5M::Renderer {
 	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h) {
 		RoomNumber = cam->pos.roomNumber;
 		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
+		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 		WorldDirection = Vector3(cam->target.x, cam->target.y, cam->target.z) - WorldPosition;
 		WorldDirection.Normalize();
 		Vector3 up = -Vector3::UnitY;
 		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 		up = Vector3::Transform(up, upRotation);
 		up.Normalize();
-		View = Matrix::CreateLookAt(WorldPosition, WorldPosition + WorldDirection, up);
+		View = Matrix::CreateLookAt(WorldPosition, target, up);
 		Projection = Matrix::CreatePerspectiveFieldOfView(fov, w / (float)h, n, f);
 		ViewProjection = View * Projection;
 		ViewSize = { (float)w,(float)h };
@@ -63,7 +64,7 @@ namespace T5M::Renderer {
 		RoomNumber = room;
 		WorldPosition = pos;
 		WorldDirection = dir;
-		View = Matrix::CreateLookAt(pos, pos + dir, up);
+		View = Matrix::CreateLookAt(pos, pos + dir*10240, up);
 		float aspect = (float)width / (float)height;
 		Projection = Matrix::CreatePerspectiveFieldOfView(fov, aspect, n, f);
 		ViewProjection = View * Projection;

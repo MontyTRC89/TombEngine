@@ -239,7 +239,7 @@ static int DoJeepDynamics(int height, int speed, int* y, int flags)
 
 static int JeepCanGetOff()
 {
-	ITEM_INFO* item = &Items[Lara.Vehicle];
+	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 
 	short angle = item->pos.yRot + 0x4000;
 
@@ -334,9 +334,9 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 
 void InitialiseJeep(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
-	JEEP_INFO* jeep = (JEEP_INFO*)game_malloc(sizeof(JEEP_INFO));
+	JEEP_INFO* jeep = game_malloc<JEEP_INFO>();
 	item->data = jeep;
 
 	jeep->velocity = 0;
@@ -360,11 +360,11 @@ static int JeepCheckGetOff()
 {
 	if (LaraItem->currentAnimState == 10)
 	{
-		if (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
 			LaraItem->pos.yRot += ANGLE(90);
 			LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->goalAnimState = STATE_LARA_STOP;
 			LaraItem->currentAnimState = STATE_LARA_STOP;
 			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
@@ -386,7 +386,7 @@ static int JeepCheckGetOff()
 
 static int GetOnJeep(int itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!(TrInput & IN_ACTION) && g_Inventory.GetSelectedObject() != ID_PUZZLE_ITEM1)
 	{
@@ -512,7 +512,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 
 	roomsList.push_back(jeep->roomNumber);
 
-	ROOM_INFO* room = &Rooms[jeep->roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[jeep->roomNumber];
 	for (int i = 0; i < room->doors.size(); i++)
 	{
 		roomsList.push_back(room->doors[i].room);
@@ -520,11 +520,11 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 
 	for (int i = 0; i < roomsList.size(); i++)
 	{
-		short itemNum = Rooms[roomsList[i]].itemNumber;
+		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
 
 		while (itemNum != NO_ITEM)
 		{
-			ITEM_INFO* item = &Items[itemNum];
+			ITEM_INFO* item = &g_Level.Items[itemNum];
 			if (item->collidable && item->status != ITEM_INVISIBLE && item != LaraItem && item != jeep)
 			{
 				if (item->objectNumber == ID_ENEMY_JEEP)
@@ -588,7 +588,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 
 static void JeepExplode(ITEM_INFO* item)
 {
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		TriggerUnderwaterExplosion(item);
 	}
@@ -835,7 +835,7 @@ static int JeepDynamics(ITEM_INFO* item)
 		newspeed = ((item->pos.zPos - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->pos.xPos - oldPos.x) * phd_sin(jeep->momentumAngle)) >> W2V_SHIFT;
 		newspeed <<= 8;
 
-		if ((&Items[Lara.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
+		if ((&g_Level.Items[Lara.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
 		{
 			LaraItem->hitPoints -= (JEEP_MAX_SPEED - newspeed) >> 7;
 			LaraItem->hitStatus = true;
@@ -1029,7 +1029,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 
 		LaraItem->currentAnimState = 11;
 		LaraItem->goalAnimState = 11;
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	}
 	else if (collide)
 	{
@@ -1065,7 +1065,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 
 			}
 
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		}
 	}
 	else
@@ -1211,7 +1211,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 							LaraItem->goalAnimState = 15;
 							LaraItem->currentAnimState = 15;
 							LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 40;
-							LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+							LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 							break;
 						}
 					}
@@ -1245,14 +1245,14 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 				!jeep->velocity)
 			{
 				LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 32;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase + 14;
 			}
 			if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 32)
 			{
 				if (jeep->velocity)
 				{
 					LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 4;
-					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				}
 			}
 
@@ -1275,7 +1275,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 							LaraItem->goalAnimState = 14;
 							LaraItem->currentAnimState = 14;
 							LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 41;
-							LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+							LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 							break;
 						}
 					}
@@ -1308,14 +1308,14 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 			if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 16 && !jeep->velocity)
 			{
 				LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 33;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase + 14;
 			}
 			if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 33)
 			{
 				if (jeep->velocity)
 				{
 					LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 16;
-					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				}
 			}
 
@@ -1389,7 +1389,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 						LaraItem->goalAnimState = 8;
 						LaraItem->currentAnimState = 8;
 						LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 44;
-						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+						LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 						break;
 					}
 				}
@@ -1398,14 +1398,14 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 			if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 30 && !jeep->velocity)
 			{
 				LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 37;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase + 14;
 			}
 			if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 37)
 			{
 				if (jeep->velocity)
 				{
 					LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 30;
-					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				}
 			}
 
@@ -1437,14 +1437,14 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 				if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 27 && !jeep->velocity)
 				{
 					LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 36;
-					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase + 14;
 				}
 				if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 36)
 				{
 					if (jeep->velocity)
 					{
 						LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 27;
-						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+						LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 					}
 				}
 				break;
@@ -1454,14 +1454,14 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 				if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 27 && !jeep->velocity)
 				{
 					LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 36;
-					LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase + 14;
+					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase + 14;
 				}
 				if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + 36)
 				{
 					if (jeep->velocity)
 					{
 						LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 27;
-						LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+						LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 					}
 				}
 				break;
@@ -1470,7 +1470,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 			LaraItem->goalAnimState = 7;
 			LaraItem->currentAnimState = 7;
 			LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 44;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 
 			break;
 
@@ -1532,7 +1532,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 		}
 	}
 
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		LaraItem->goalAnimState = 11;
 		LaraItem->hitPoints = 0;
@@ -1544,7 +1544,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	if (l->hitPoints > 0 && Lara.Vehicle == NO_ITEM)
 	{
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		if (GetOnJeep(itemNumber))
 		{
@@ -1597,7 +1597,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 			LaraItem->goalAnimState = 9;
 			LaraItem->currentAnimState = 9;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 
 			item->hitPoints = 1;
 			LaraItem->pos.xPos = item->pos.xPos;
@@ -1632,7 +1632,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 int JeepControl(void)
 {
-	ITEM_INFO* item = &Items[Lara.Vehicle];
+	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
 
 	int drive = -1;
@@ -1770,7 +1770,7 @@ int JeepControl(void)
 		AnimateItem(LaraItem);
 
 		item->animNumber = Objects[ID_JEEP].animIndex + LaraItem->animNumber - Objects[ID_JEEP_LARA_ANIMS].animIndex;
-		item->frameNumber = Anims[item->animNumber].frameBase + (LaraItem->frameNumber - Anims[LaraItem->animNumber].frameBase);
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + (LaraItem->frameNumber - g_Level.Anims[LaraItem->animNumber].frameBase);
 
 		jeepAnim = Objects[ID_JEEP].animIndex;
 		laraAnim = LaraItem->animNumber;

@@ -60,13 +60,16 @@ namespace T5M::Renderer
 
         if (obj->animIndex != -1)
         {
-            updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 0, 0xFFFFFFFF);
+			ANIM_FRAME* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr] };
+            updateAnimation(NULL, moveableObj, frame, 0, 0, 0xFFFFFFFF);
         }
 
         Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
         // Clear just the Z-buffer so we can start drawing on top of the scene
-        m_context->ClearDepthStencilView(m_currentRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		ID3D11DepthStencilView* dsv;
+		m_context->OMGetRenderTargets(1, NULL, &dsv);
+        m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
         // Set vertex buffer
         m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -79,7 +82,9 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psInventory, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -245,7 +250,9 @@ namespace T5M::Renderer
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -496,7 +503,9 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psInventory, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -578,15 +587,18 @@ namespace T5M::Renderer
                 if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
                     objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
                 {
-                    short *framePtr[2];
+					ANIM_FRAME* framePtr[2];
                     int rate = 0;
-                    getFrame(obj->animIndex, ring->frameIndex, framePtr, &rate);
+                    getFrame(obj->animIndex, ring->framePtr, framePtr, &rate);
                     updateAnimation(NULL, moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
                 }
                 else
                 {
-                    if (obj->animIndex != -1)
-                        updateAnimation(NULL, moveableObj, &Anims[obj->animIndex].framePtr, 0, 1, 0xFFFFFFFF);
+					if (obj->animIndex != -1)
+					{
+						ANIM_FRAME* framePtr = &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr];
+						updateAnimation(NULL, moveableObj, &framePtr, 0, 1, 0xFFFFFFFF);
+					}
                 }
 
                 for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
@@ -1573,7 +1585,7 @@ namespace T5M::Renderer
                 // Check if in inside room
                 short roomNumber = Camera.pos.roomNumber;
                 FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-                ROOM_INFO *room = &Rooms[roomNumber];
+                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
                 if (!(room->flags & ENV_FLAG_OUTSIDE))
                     continue;
 
@@ -1604,7 +1616,7 @@ namespace T5M::Renderer
 
             short roomNumber = Camera.pos.roomNumber;
             FLOOR_INFO *floor = GetFloor(snow->X, snow->Y, snow->Z, &roomNumber);
-            ROOM_INFO *room = &Rooms[roomNumber];
+            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
             if (snow->Y >= room->y + room->minfloor)
                 snow->Reset = true;
         }
@@ -1640,7 +1652,7 @@ namespace T5M::Renderer
                 // Check if in inside room
                 short roomNumber = Camera.pos.roomNumber;
                 FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-                ROOM_INFO *room = &Rooms[roomNumber];
+                ROOM_INFO *room = &g_Level.Rooms[roomNumber];
                 if (!(room->flags & ENV_FLAG_OUTSIDE))
                 {
                     drop->Reset = true;
@@ -1673,7 +1685,7 @@ namespace T5M::Renderer
             // If rain drop has hit the ground, then reset it and add a little drip
             short roomNumber = Camera.pos.roomNumber;
             FLOOR_INFO *floor = GetFloor(drop->X, drop->Y, drop->Z, &roomNumber);
-            ROOM_INFO *room = &Rooms[roomNumber];
+            ROOM_INFO *room = &g_Level.Rooms[roomNumber];
             if (drop->Y >= room->y + room->minfloor)
             {
                 drop->Reset = true;
@@ -1916,8 +1928,8 @@ namespace T5M::Renderer
         clearSceneItems();
         collectRooms(view);
         UpdateLaraAnimations(false);
-        updateItemsAnimations();
-        updateEffects();
+        updateItemsAnimations(view);
+        updateEffects(view);
         if (g_Configuration.EnableShadows)
             drawShadowMap();
         m_items[Lara.itemNumber].Item = LaraItem;
@@ -1951,7 +1963,7 @@ namespace T5M::Renderer
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
-        cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+        cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawHorizonAndSky(depthTarget);
@@ -2044,7 +2056,7 @@ namespace T5M::Renderer
 
             m_currentY = 60;
 #ifdef _DEBUG
-            ROOM_INFO *r = &Rooms[LaraItem->roomNumber];
+            ROOM_INFO *r = &g_Level.Rooms[LaraItem->roomNumber];
 
             printDebugMessage("Update time: %d", m_timeUpdate);
             printDebugMessage("Frame time: %d", m_timeFrame);
@@ -2104,7 +2116,7 @@ namespace T5M::Renderer
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
-        cameraConstantBuffer.CameraUnderwater = Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+        cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
         updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
         m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawHorizonAndSky(depthTarget);
@@ -2138,7 +2150,8 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psItems, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
         m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
@@ -2273,7 +2286,8 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psStatics, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_staticsTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
 
@@ -2287,24 +2301,28 @@ namespace T5M::Renderer
             RendererRoom &const room = m_rooms[view.staticsToDraw[i]->RoomIndex];
 
             RendererObject &staticObj = *m_staticObjects[msh->staticNumber];
-            RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
-            m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
-            m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
-            updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
-            m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
+			if (staticObj.ObjectMeshes.size() > 0)
+			{
+				RendererMesh* mesh = staticObj.ObjectMeshes[0];
 
-            for (int j = firstBucket; j < lastBucket; j++)
-            {
-                RendererBucket *bucket = &mesh->Buckets[j];
+				m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
+				m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
+				updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
+				m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
 
-                if (bucket->Vertices.size() == 0)
-                    continue;
+				for (int j = firstBucket; j < lastBucket; j++)
+				{
+					RendererBucket* bucket = &mesh->Buckets[j];
 
-                // Draw vertices
-                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-                m_numDrawCalls++;
-            }
+					if (bucket->Vertices.size() == 0)
+						continue;
+
+					// Draw vertices
+					m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+					m_numDrawCalls++;
+				}
+			}
         }
 
         return true;
@@ -2332,7 +2350,8 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psRooms, NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, m_roomTextures[0].ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
         ID3D11SamplerState *shadowSampler = m_states->PointClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
@@ -2542,7 +2561,8 @@ namespace T5M::Renderer
             m_context->IASetInputLayout(m_inputLayout);
             m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-            m_context->PSSetShaderResources(0, 1, m_moveablesTextures[0].ShaderResourceView.GetAddressOf());
+            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+            m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
             sampler = m_states->AnisotropicClamp();
             m_context->PSSetSamplers(0, 1, &sampler);
 
