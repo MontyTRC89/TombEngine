@@ -450,7 +450,7 @@ int FindGridShift(int x, int z)
 
 int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 {
-	if (!(bounds->Z2 | bounds->Z1 | bounds->X1 | bounds->X2 | bounds->Y1 | bounds->Y2))
+	if (!(bounds->Z2 != 0 || bounds->Z1 != 0 || bounds->X1 != 0 || bounds->X2 != 0 || bounds->Y1 != 0 || bounds->Y2 != 0))
 		return false;
 
 	ANIM_FRAME* frame = GetBestFrame(LaraItem);

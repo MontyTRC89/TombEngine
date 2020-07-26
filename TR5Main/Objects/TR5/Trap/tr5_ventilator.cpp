@@ -63,7 +63,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 
 				if (abs(intensity) == 1)
 				{
-					int factor = 3 * (bounds->X2 - bounds->X1) >> 3;
+					int factor = 3 * (bounds->X2 - bounds->X1) / 8;
 					short angle = 2 * GetRandomControl();
 
 					spark->x = ((bounds->X1 + bounds->X2) / 2) + ((GetRandomControl() % factor) * phd_sin(angle) >> W2V_SHIFT);
@@ -80,7 +80,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				}
 				else
 				{
-					int factor = 3 * (bounds->Y2 - bounds->Y1) >> 3;
+					int factor = 3 * (bounds->Y2 - bounds->Y1) / 8;
 					short angle = 2 * GetRandomControl();
 
 					spark->y = (bounds->Y1 + bounds->Y2) / 2;

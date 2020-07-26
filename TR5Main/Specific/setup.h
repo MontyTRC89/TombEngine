@@ -3,7 +3,7 @@
 #include "collide.h"
 #include "objectslist.h"
 
-typedef enum HitEffectEnum
+enum HitEffectEnum
 {
     HIT_NONE,
     HIT_BLOOD,
@@ -12,7 +12,7 @@ typedef enum HitEffectEnum
     MAX_HIT_EFFECT
 };
 
-typedef struct OBJECT_INFO
+struct OBJECT_INFO
 {
 	short nmeshes; 
 	short meshIndex; 
@@ -53,10 +53,10 @@ typedef struct OBJECT_INFO
 	DWORD explodableMeshbits;
 };
 
-typedef struct STATIC_INFO
+struct STATIC_INFO
 {
-	short meshNumber;
-	short flags;
+	int meshNumber;
+	int flags;
 	BOUNDING_BOX visibilityBox;
 	BOUNDING_BOX collisionBox;
 };
