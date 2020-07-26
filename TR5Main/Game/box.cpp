@@ -1009,6 +1009,8 @@ int UpdateLOT(LOT_INFO* LOT, int depth)
 {
 	BOX_NODE* node;
 
+	printf("LOT->head: %d, LOT->tail: %d\n", LOT->head, LOT->tail);
+
 	if (LOT->requiredBox != NO_BOX && LOT->requiredBox != LOT->targetBox)
 	{
 		LOT->targetBox = LOT->requiredBox;
@@ -1567,7 +1569,8 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	{
 		case BORED_MOOD:
 			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
-			if (ValidBox(item, info->zoneNumber, boxNumber))
+			if (ValidBox(item, info->zoneNumber, boxNumber)
+				&& !(GetRandomControl() & 0x0F))
 			{
 				if (StalkBox(item, enemy, boxNumber) && enemy->hitPoints > 0 && creature->enemy)
 				{
@@ -1596,7 +1599,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 		case ESCAPE_MOOD:
 			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> NODE_SHIFT].boxNumber;
-			if (ValidBox(item, info->zoneNumber, boxNumber))
+			if (ValidBox(item, info->zoneNumber, boxNumber) && LOT->requiredBox == NO_BOX)
 			{
 				if (EscapeBox(item, enemy, boxNumber))
 				{
