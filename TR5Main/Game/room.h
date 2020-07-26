@@ -2,6 +2,8 @@
 #include <framework.h>
 #include <newtypes.h>
 
+struct ANIM_FRAME;
+
 struct ROOM_VERTEX
 {
 	Vector3 position;
@@ -149,7 +151,7 @@ struct ROOM_INFO
 
 struct ANIM_STRUCT
 {
-	short* framePtr;
+	int framePtr;
 	short interpolation;
 	short currentAnimState;
 	int velocity;
@@ -167,5 +169,5 @@ struct ANIM_STRUCT
 };
 
 constexpr auto NUM_ROOMS = 1024;
-constexpr auto NO_ROOM = 0xFF;
+constexpr auto NO_ROOM = -1;
 constexpr auto NO_HEIGHT = (-0x7F00);

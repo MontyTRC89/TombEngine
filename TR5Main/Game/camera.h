@@ -1,6 +1,7 @@
 #pragma once
 #include "phd_global.h"
 #include "items.h"
+#include <Specific\setup.h>
 
 typedef enum CAMERA_TYPE
 {
@@ -38,7 +39,6 @@ typedef struct CAMERA_INFO
 	short targetspeed; // size=0, offset=88
 	ITEM_INFO* item; // size=144, offset=92
 	ITEM_INFO* lastItem; // size=144, offset=96
-	OBJECT_VECTOR* fixed; // size=16, offset=100
 	int mikeAtLara; // size=0, offset=104
 	PHD_VECTOR mikePos; // size=12, offset=108
 };
@@ -69,6 +69,7 @@ extern int PhdPerspective;
 extern short CurrentFOV;
 extern int GetLaraOnLOS;
 extern int SniperOverlay;
+extern std::vector<OBJECT_VECTOR> FixedCameras;
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);

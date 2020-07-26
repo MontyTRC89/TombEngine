@@ -29,7 +29,7 @@ void DoppelgangerControl(short itemNum)
 	int x, y, z;
 	short room_num;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 
 	if (item->hitPoints < 1000)                   			// If Evil Lara being Injured
 	{                                                       // then take the hits off Lara instead...

@@ -24,7 +24,7 @@ int StormTimer;
 int dLightningRand;
 byte SkyStormColor[3];
 byte SkyStormColor2[3];
-short InterpolatedBounds[6];
+BOUNDING_BOX InterpolatedBounds;
 LARGE_INTEGER PerformanceCount;
 double LdFreq;
 double LdSync;
@@ -66,30 +66,31 @@ void UpdateStorm()
 	}
 }
 
-short* GetBoundsAccurate(ITEM_INFO* item)
+BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item)
 {
 	int rate = 0;
-	short* framePtr[2];
+	ANIM_FRAME* framePtr[2];
 	
 	int frac = GetFrame_D2(item, framePtr, &rate);
 	if (frac == 0)
-		return framePtr[0];
+		return &framePtr[0]->boundingBox;
 	else
 	{
-		for (int i = 0; i < 6; i++)
-		{
-			InterpolatedBounds[i] = *(framePtr[0]) + ((*(framePtr[1]) - *(framePtr[0])) * frac) / rate;
-			framePtr[0]++;
-			framePtr[1]++;
-		}
-		return InterpolatedBounds;
+		InterpolatedBounds.X1 = framePtr[0]->boundingBox.X1 + (framePtr[1]->boundingBox.X1 - framePtr[0]->boundingBox.X1) / rate;
+		InterpolatedBounds.X2 = framePtr[0]->boundingBox.X2 + (framePtr[1]->boundingBox.X2 - framePtr[0]->boundingBox.X2) / rate;
+		InterpolatedBounds.Y1 = framePtr[0]->boundingBox.Y1 + (framePtr[1]->boundingBox.Y1 - framePtr[0]->boundingBox.Y1) / rate;
+		InterpolatedBounds.Y2 = framePtr[0]->boundingBox.Y2 + (framePtr[1]->boundingBox.Y2 - framePtr[0]->boundingBox.Y2) / rate;
+		InterpolatedBounds.Z1 = framePtr[0]->boundingBox.Z1 + (framePtr[1]->boundingBox.Z1 - framePtr[0]->boundingBox.Z1) / rate;
+		InterpolatedBounds.Z2 = framePtr[0]->boundingBox.Z2 + (framePtr[1]->boundingBox.Z2 - framePtr[0]->boundingBox.Z2) / rate;
+
+		return &InterpolatedBounds;
 	}
 }
 
-short* GetBestFrame(ITEM_INFO* item)
+ANIM_FRAME* GetBestFrame(ITEM_INFO* item)
 {
 	int rate = 0;
-	short* framePtr[2];
+	ANIM_FRAME* framePtr[2];
 
 	int frac = GetFrame_D2(item, framePtr, &rate);
 
@@ -99,24 +100,22 @@ short* GetBestFrame(ITEM_INFO* item)
 		return framePtr[1];
 }
 
-int GetFrame_D2(ITEM_INFO* item, short* framePtr[], int* rate)
+int GetFrame_D2(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 {
 	ANIM_STRUCT *anim;
 	int frm;
 	int first, second;
-	int frame_size;
 	int interp, rat;
 
 	frm = item->frameNumber;
-	anim = &Anims[item->animNumber];
-	framePtr[0] = framePtr[1] = anim->framePtr;
+	anim = &g_Level.Anims[item->animNumber];
+	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->framePtr];
 	rat = *rate = anim->interpolation & 0x00ff;
-	frame_size = anim->interpolation >> 8;
-	frm -= anim->frameBase;
+	frm -= anim->frameBase; 
 	first = frm / rat;
 	interp = frm % rat;
-	framePtr[0] += first * frame_size;				  // Get Frame pointers
-	framePtr[1] = framePtr[0] + frame_size;               // and store away
+	framePtr[0] += first;				  // Get Frame pointers
+	framePtr[1] = framePtr[0] + 1;               // and store away
 	if (interp == 0)
 		return(0);
 	second = first * rat + rat;

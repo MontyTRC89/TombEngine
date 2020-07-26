@@ -98,7 +98,7 @@ static void FireSubHarpoon(ITEM_INFO* v)
 		ITEM_INFO* item;
 		static char lr = 0;
 
-		item = &Items[itemNum];
+		item = &g_Level.Items[itemNum];
 
 		item->objectNumber = ID_HARPOON;
 		item->shade = 0x4210 | 0x8000;
@@ -195,7 +195,7 @@ static void SubEffects(short item_number)
 	PHD_VECTOR pos;
 	long lp;
 
-	v = &Items[item_number];
+	v = &g_Level.Items[item_number];
 	sub = (SUB_INFO*)v->data;
 
 	/* -------- Lara is using this vehicle */
@@ -310,7 +310,7 @@ static int GetOnSub(short item_number, COLL_INFO* coll)
 	unsigned short tempang;
 
 	l = LaraItem;
-	v = &Items[item_number];
+	v = &g_Level.Items[item_number];
 
 	if ((!(TrInput & IN_ACTION)) || (Lara.gunStatus != LG_NO_ARMS) || (l->gravityStatus))
 		return 0;
@@ -377,15 +377,15 @@ static void DoCurrent(ITEM_INFO* item)
 		long angle, dx, dz, speed, sinkval;
 
 		sinkval = Lara.currentActive - 1;
-		target.x = Camera.fixed[sinkval].x;
-		target.y = Camera.fixed[sinkval].y;
-		target.z = Camera.fixed[sinkval].z;
+		target.x = FixedCameras[sinkval].x;
+		target.y = FixedCameras[sinkval].y;
+		target.z = FixedCameras[sinkval].z;
 		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - 0x4000) >> 4) & 4095;
 
 		dx = target.x - LaraItem->pos.xPos;
 		dz = target.z - LaraItem->pos.zPos;
 
-		speed = Camera.fixed[sinkval].data;
+		speed = FixedCameras[sinkval].data;
 		dx = (((rcossin_tbl[(angle << 1)] * speed))) >> 2;
 		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) >> 2;
 
@@ -479,7 +479,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 	CanGetOff(v);
 
 	anim = l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
-	frame = l->frameNumber - Anims[l->animNumber].frameBase;
+	frame = l->frameNumber - g_Level.Anims[l->animNumber].frameBase;
 
 	switch (l->currentAnimState)
 	{
@@ -620,7 +620,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.yPos = LPos.y;
 			l->pos.zPos = LPos.z;
 			l->animNumber = 108;
-			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->currentAnimState = 13;
 
 			l->fallspeed = 0;
@@ -659,7 +659,7 @@ static void UserInput(ITEM_INFO* v, ITEM_INFO* l, SUB_INFO* sub)
 			l->pos.yPos = vec.y;
 			l->pos.zPos = vec.z;
 			l->animNumber = 114;
-			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->currentAnimState = l->goalAnimState = 34;
 
 			l->fallspeed = 0;
@@ -767,8 +767,8 @@ void SubInitialise(short itemNum)
 	ITEM_INFO* v;
 	SUB_INFO* sub;
 
-	v = &Items[itemNum];
-	sub = (SUB_INFO*)game_malloc(sizeof(SUB_INFO));
+	v = &g_Level.Items[itemNum];
+	sub = game_malloc<SUB_INFO>();
 	v->data = (void*)sub;
 	sub->Vel = sub->Rot = 0;
 	sub->Flags = UPV_SURFACE; 
@@ -783,7 +783,7 @@ void SubCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if ((l->hitPoints <= 0) || (Lara.Vehicle != NO_ITEM))
 		return;
 
-	v = &Items[itemNum];
+	v = &g_Level.Items[itemNum];
 
 	geton = GetOnSub(itemNum, coll);
 	if (geton)
@@ -847,7 +847,7 @@ int SubControl(void)
 	short roomNumber;
 
 	l = LaraItem;
-	v = &Items[Lara.Vehicle];
+	v = &g_Level.Items[Lara.Vehicle];
 	sub = (SUB_INFO*)v->data;
 
 	/* -------- update dynamics */
@@ -880,7 +880,7 @@ int SubControl(void)
 	{
 		h = GetWaterHeight(v->pos.xPos, v->pos.yPos, v->pos.zPos, roomNumber);
 
-		if ((h != NO_HEIGHT) && (!(Rooms[v->roomNumber].flags & ENV_FLAG_WATER)))
+		if ((h != NO_HEIGHT) && (!(g_Level.Rooms[v->roomNumber].flags & ENV_FLAG_WATER)))
 		{
 			if ((h - v->pos.yPos) >= -SURFACE_DIST)
 				v->pos.yPos = h + SURFACE_DIST;
@@ -970,7 +970,7 @@ int SubControl(void)
 			SoundEffect(346, (PHD_3DPOS*)&v->pos.xPos, 2 | 4 | 0x1000000 | (v->speed << 16));
 
 		v->animNumber = Objects[ID_UPV].animIndex + (l->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
-		v->frameNumber = Anims[v->animNumber].frameBase + (l->frameNumber - Anims[l->animNumber].frameBase);
+		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);
 
 		if (sub->Flags & UPV_SURFACE)
 			Camera.targetElevation = -ANGLE(60);

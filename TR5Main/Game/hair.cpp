@@ -24,7 +24,7 @@ void InitialiseHair()
 	{
 		FirstHair[h] = 1;
 
-		int* bone = &Bones[Objects[ID_LARA_HAIR].boneIndex];
+		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 		Hairs[h][0].pos.yRot = 0;
 		Hairs[h][0].pos.xRot = -0x4000;
@@ -43,11 +43,11 @@ void InitialiseHair()
 }
 
 
-void HairControl(int cutscene, int ponytail, short* framePtr)
+void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 {
 	SPHERE sphere[HAIR_SPHERE];
 	OBJECT_INFO* object = &Objects[ID_LARA];
-	short* frame;
+	ANIM_FRAME* frame;
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG;
 
@@ -86,10 +86,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 				break;
 			}
 
-			frame = Anims[spaz].framePtr;
-			int size = Anims[spaz].interpolation >> 8;
-
-			frame += (int)(Lara.hitFrame * size);
+			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + Lara.hitFrame];
 		}
 		else
 			frame = GetBestFrame(LaraItem);
@@ -100,7 +97,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	}
 
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
-	MESH* mesh = &Meshes[Lara.meshPtrs[LM_HIPS]];
+	MESH* mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HIPS]];
 	PHD_VECTOR pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HIPS);
 	sphere[0].x = pos.x;
@@ -108,7 +105,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	sphere[0].z = pos.z;
 	sphere[0].r = (int)mesh->sphere.Radius;
 
-	mesh = &Meshes[Lara.meshPtrs[LM_TORSO]];
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_TORSO]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_TORSO);
 	sphere[1].x = pos.x;
@@ -118,7 +115,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	if (youngLara)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
-	mesh = &Meshes[Lara.meshPtrs[LM_HEAD]];
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HEAD]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HEAD);
 	sphere[2].x = pos.x;
@@ -126,7 +123,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	sphere[2].z = pos.z;
 	sphere[2].r = (int)mesh->sphere.Radius;
 
-	mesh = &Meshes[Lara.meshPtrs[LM_RINARM]];
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_RINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_RINARM);
 	sphere[3].x = pos.x;
@@ -134,7 +131,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	sphere[3].z = pos.z;
 	sphere[3].r = (int)mesh->sphere.Radius * 3 / 2;
 
-	mesh = &Meshes[Lara.meshPtrs[LM_LINARM]];
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_LINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_LINARM);
 	sphere[4].x = pos.x;
@@ -169,7 +166,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	pos.y = world.Translation().y; 
 	pos.z = world.Translation().z;
 
-	int* bone = &Bones[Objects[ID_LARA_HAIR].boneIndex];
+	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 	if (FirstHair[ponytail])
 	{
@@ -208,9 +205,9 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		}
 		else
 		{
-			int x = LaraItem->pos.xPos + (frame[0] + frame[1]) / 2;
-			int y = LaraItem->pos.yPos + (frame[2] + frame[3]) / 2;
-			int z = LaraItem->pos.zPos + (frame[4] + frame[5]) / 2;
+			int x = LaraItem->pos.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+			int y = LaraItem->pos.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
+			int z = LaraItem->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
 			wh = GetWaterHeight(x, y, z, roomNumber);
 		}
 
@@ -257,7 +254,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			Hairs[ponytail][i].pos.yPos += Hairs[ponytail][i].hvel.y * 3 / 4;
 			Hairs[ponytail][i].pos.zPos += Hairs[ponytail][i].hvel.z * 3 / 4;
 
-			if (Lara.waterStatus == LW_ABOVE_WATER && Rooms[roomNumber].flags & ENV_FLAG_WIND)
+			if (Lara.waterStatus == LW_ABOVE_WATER && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
 			{
 				Hairs[ponytail][i].pos.xPos += SmokeWindX;
 				Hairs[ponytail][i].pos.zPos += SmokeWindZ;

@@ -27,6 +27,7 @@ struct CAMERA_INFO;
 
 namespace T5M::Renderer
 {
+	using TexturePair = std::tuple<Texture2D, Texture2D>;
 	#define MESH_BITS(x) (1 << x)
 	#define DX11_RELEASE(x) if (x != NULL) x->Release()
 	#define DX11_DELETE(x) if (x != NULL) { delete x; x = NULL; }
@@ -61,6 +62,8 @@ namespace T5M::Renderer
 		DirectX::SimpleMath::Vector3 Normal;
 		DirectX::SimpleMath::Vector2 UV;
 		DirectX::SimpleMath::Vector4 Color;
+		DirectX::SimpleMath::Vector3 Tangent;
+		DirectX::SimpleMath::Vector3 BiTangent;
 		float Bone;
 		int IndexInPoly;
 		int OriginalIndex;
@@ -491,9 +494,9 @@ namespace T5M::Renderer
 		RendererUnderwaterDustParticle m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 		bool m_firstUnderwaterDustParticles = true;
 		std::vector<RendererMesh*> m_meshes;
-		std::vector<T5M::Renderer::Texture2D> m_roomTextures;
-		std::vector<T5M::Renderer::Texture2D> m_moveablesTextures;
-		std::vector<T5M::Renderer::Texture2D> m_staticsTextures;
+		std::vector<TexturePair> m_roomTextures;
+		std::vector<TexturePair> m_moveablesTextures;
+		std::vector<TexturePair> m_staticsTextures;
 		std::vector<T5M::Renderer::Texture2D> m_spritesTextures;
 	
 		// Debug variables
@@ -537,7 +540,7 @@ namespace T5M::Renderer
 		void											fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
 		void											buildHierarchy(RendererObject* obj);
 		void											buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-		void											updateAnimation(RendererItem* item, RendererObject& obj, short** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
+		void											updateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool											printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 		void getVisibleObjects(int from, int to, Vector4* viewPort, bool water, int count, RenderView& renderView);
 		bool checkPortal(short roomIndex, ROOM_DOOR* portal, Vector4* viewPort, Vector4* clipPort,const Matrix& viewProjection);
@@ -550,9 +553,9 @@ namespace T5M::Renderer
 		void											prepareLights();
 		void collectEffects(short roomNumber, RenderView& renderView);
 		void											clearSceneItems();
-		void											updateItemsAnimations();
-		void											updateEffects();
-		int												getFrame(short animation, short frame, short** framePtr, int* rate);
+		void											updateItemsAnimations(RenderView& view);
+		void											updateEffects(RenderView& view);
+		int												getFrame(short animation, short frame, ANIM_FRAME** framePtr, int* rate);
 		bool											drawAmbientCubeMap(short roomNumber);
 		bool											sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
 		bool											drawHorizonAndSky(ID3D11DepthStencilView* depthTarget);
@@ -669,6 +672,7 @@ namespace T5M::Renderer
 	
 		RendererMesh* getMesh(int meshIndex);
 	private:
+		Texture2D CreateDefaultNormalTexture();
 		void drawFootprints();
 
 		template<typename CBuff>

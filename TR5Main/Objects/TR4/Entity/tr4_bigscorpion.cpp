@@ -13,7 +13,7 @@ BITE_INFO scorpionBite2 = { 0, 0, 0, 23 };
 
 void InitialiseScorpion(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
@@ -30,7 +30,7 @@ void InitialiseScorpion(short itemNumber)
 		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
 	}
 
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
 void ScorpionControl(short itemNumber)
@@ -38,7 +38,7 @@ void ScorpionControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short angle = 0;
 	short head = 0;
@@ -93,7 +93,7 @@ void ScorpionControl(short itemNumber)
 		if (item->currentAnimState != 6 && item->currentAnimState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 5;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 6;
 		}
 	}
@@ -117,7 +117,7 @@ void ScorpionControl(short itemNumber)
 
 					if (baddy->itemNum != NO_ITEM && baddy->itemNum != itemNumber)
 					{
-						ITEM_INFO* currentItem = &Items[baddy->itemNum];
+						ITEM_INFO* currentItem = &g_Level.Items[baddy->itemNum];
 
 						if (currentItem->objectNumber != ID_BIG_SCORPION &&
 							(currentItem != LaraItem || creature->hurtByLara))
@@ -291,7 +291,7 @@ void ScorpionControl(short itemNumber)
 
 		case 8:
 			creature->maximumTurn = 0;
-			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			{
 				item->triggerFlags++;
 			}

@@ -168,7 +168,7 @@ static int GetInKayak(short itemNumber, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
 		return 0;
 
-	kayak = &Items[itemNumber];
+	kayak = &g_Level.Items[itemNumber];
 
 	/* -------- is Lara close enough to use the vehicle */
 
@@ -286,7 +286,7 @@ static void DoKayakCurrent(ITEM_INFO* item)
 	PHD_VECTOR target;
 	long angle, dx, dz, speed, sinkval;
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 
 	if (!Lara.currentActive)
 	{
@@ -323,15 +323,15 @@ static void DoKayakCurrent(ITEM_INFO* item)
 	else
 	{
 		sinkval = Lara.currentActive - 1;
-		target.x = Camera.fixed[sinkval].x;
-		target.y = Camera.fixed[sinkval].y;
-		target.z = Camera.fixed[sinkval].z;
+		target.x = FixedCameras[sinkval].x;
+		target.y = FixedCameras[sinkval].y;
+		target.z = FixedCameras[sinkval].z;
 		angle = ((mGetAngle(target.x, target.z, LaraItem->pos.xPos, LaraItem->pos.zPos) - 0x4000) >> 4) & 4095;
 
 		dx = target.x - LaraItem->pos.xPos;
 		dz = target.z - LaraItem->pos.zPos;
 
-		speed = Camera.fixed[sinkval].data;
+		speed = FixedCameras[sinkval].data;
 		dx = (((rcossin_tbl[(angle << 1)] * speed))) >> 2;
 		dz = (((rcossin_tbl[(angle << 1) + 1] * speed))) >> 2;
 
@@ -682,12 +682,12 @@ static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 	if ((lara->hitPoints <= 0) && (lara->currentAnimState != KS_DEATHIN))
 	{
 		lara->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + 5;
-		lara->frameNumber = Anims[lara->animNumber].frameBase;
+		lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
 		lara->currentAnimState = lara->goalAnimState = KS_DEATHIN;
 	}
 
 	/* -------- control Kayak */
-	frame = lara->frameNumber - Anims[lara->animNumber].frameBase;
+	frame = lara->frameNumber - g_Level.Anims[lara->animNumber].frameBase;
 
 	switch (lara->currentAnimState)
 	{
@@ -996,7 +996,7 @@ static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 			lara->pos.zRot = 0;
 
 			lara->animNumber = 23;
-			lara->frameNumber = Anims[lara->animNumber].frameBase;
+			lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
 			lara->currentAnimState = lara->goalAnimState = 9;
 
 			lara->fallspeed = 0;
@@ -1021,7 +1021,7 @@ static void KayakUserInput(ITEM_INFO* kayak, ITEM_INFO* lara, KAYAK_INFO* kinfo)
 			lara->pos.zRot = 0;
 
 			lara->animNumber = 23;
-			lara->frameNumber = Anims[lara->animNumber].frameBase;
+			lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
 			lara->currentAnimState = lara->goalAnimState = 9;
 
 			lara->fallspeed = 0;
@@ -1073,7 +1073,7 @@ static void KayakToBaddieCollision(ITEM_INFO* kayak)
 
 	roomsList.push_back(kayak->roomNumber);
 
-	ROOM_INFO* room = &Rooms[kayak->roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[kayak->roomNumber];
 	for (int i = 0; i < room->doors.size(); i++)
 	{
 		roomsList.push_back(room->doors[i].room);
@@ -1085,14 +1085,14 @@ static void KayakToBaddieCollision(ITEM_INFO* kayak)
 	{
 		short item_num;
 
-		item_num = Rooms[roomsList[i]].itemNumber;	// Only do collision with Items on Draw list
+		item_num = g_Level.Rooms[roomsList[i]].itemNumber;	// Only do collision with Items on Draw list
 
 		while (item_num != NO_ITEM)
 		{
 			short nex;
 			ITEM_INFO* item;
 
-			item = &Items[item_num];
+			item = &g_Level.Items[item_num];
 			nex = item->nextItem;				// Store next Item in list as Current may be deleted!!!
 
 			if (item->collidable && item->status != ITEM_INVISIBLE)
@@ -1143,7 +1143,7 @@ static void LaraRapidsDrown()
 	ITEM_INFO* l = LaraItem;
 
 	l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + 25;
-	l->frameNumber = Anims[l->animNumber].frameBase;
+	l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 	l->currentAnimState = 12;
 	l->goalAnimState = 12;
 	l->hitPoints = 0;
@@ -1165,8 +1165,8 @@ void InitialiseKayak(short itemNumber)
 	ITEM_INFO* v;
 	KAYAK_INFO* Kayak;
 
-	v = &Items[itemNumber];
-	Kayak = (KAYAK_INFO*)game_malloc(sizeof(KAYAK_INFO));
+	v = &g_Level.Items[itemNumber];
+	Kayak = game_malloc<KAYAK_INFO>();
 	v->data = (void*)Kayak;
 	Kayak->Vel = 0;
 	Kayak->Rot = 0;
@@ -1194,7 +1194,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	if ((geton = GetInKayak(itemNumber, coll)))
 	{
 		KAYAK_INFO* Kayak;
-		ITEM_INFO* v = &Items[itemNumber];
+		ITEM_INFO* v = &g_Level.Items[itemNumber];
 
 		Lara.Vehicle = itemNumber;
 
@@ -1213,7 +1213,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		else
 			l->animNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + 28;
 
-		l->frameNumber = Anims[l->animNumber].frameBase;
+		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 		l->currentAnimState = l->goalAnimState = KS_CLIMBIN;
 
 		Lara.waterStatus = LW_UNDERWATER;
@@ -1252,7 +1252,7 @@ int KayakControl(void)
 	short roomNumber;
 
 	l = LaraItem;
-	v = &Items[Lara.Vehicle];
+	v = &g_Level.Items[Lara.Vehicle];
 	Kayak = (KAYAK_INFO*)v->data;
 
 	if (TrInput & IN_LOOK)
@@ -1311,7 +1311,7 @@ int KayakControl(void)
 		AnimateItem(l);
 
 		v->animNumber = Objects[ID_KAYAK].animIndex + (l->animNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
-		v->frameNumber = Anims[v->animNumber].frameBase + (l->frameNumber - Anims[l->animNumber].frameBase);
+		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);
 		
 		Camera.targetElevation = -ANGLE(30);
 		Camera.targetDistance = WALL_SIZE * 2;

@@ -7,7 +7,7 @@
 
 void InitialiseSlicerDicer(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	int dx = phd_sin(item->pos.yRot + ANGLE(90.0f)) >> 5;
 	int dz = phd_cos(item->pos.yRot + ANGLE(90.0f)) >> 5;
@@ -23,7 +23,7 @@ void InitialiseSlicerDicer(short itemNum)
 
 void SlicerDicerControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP, &item->pos, 0);

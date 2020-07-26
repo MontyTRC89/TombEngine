@@ -105,7 +105,7 @@ void BaboonDieEffect(ITEM_INFO* item)
 static void KillRespawnedBaboon(short itemNumber, bool remove = false)
 {
     ITEM_INFO* item;
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     item->hitPoints = 0;
     RemoveActiveItem(itemNumber); // remove it from the active item list
     item->flags = IFLAG_CLEAR_BODY;
@@ -121,7 +121,7 @@ static bool CheckRespawnedBaboon(short itemNumber)
     ITEM_INFO* item;
     BaboonRespawnStruct* baboon;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     if (item->itemFlags[0] == NO_BABOON) // NORMAL/INV for now
     {
         KillRespawnedBaboon(itemNumber);
@@ -146,7 +146,7 @@ static void UpdateRespawnedBaboon(short itemNumber)
     OBJECT_INFO* obj;
     BaboonRespawnStruct* baboon;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     obj = &Objects[item->objectNumber];
     baboon = BaboonRespawn.GetBaboonRespawn(item->itemFlags[0]);
     if (baboon == nullptr)
@@ -161,7 +161,7 @@ static void UpdateRespawnedBaboon(short itemNumber)
         baboon->count++;
 
     item->animNumber = obj->animIndex + BABOON_SIT_IDLE_ANIM;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->currentAnimState = BABOON_SIT_IDLE;
     item->goalAnimState = BABOON_SIT_IDLE;
     item->hitPoints = obj->hitPoints;
@@ -188,7 +188,7 @@ static void UpdateRespawnedBaboon(short itemNumber)
 void BaboonRespawnFunction(short itemNumber)
 {
     ITEM_INFO* item;
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     BaboonDieEffect(item);
 
     if (!CheckRespawnedBaboon(itemNumber))
@@ -201,9 +201,9 @@ void InitialiseBaboon(short itemNumber)
     ITEM_INFO* item;
     InitialiseCreature(itemNumber);
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     item->animNumber = Objects[item->objectNumber].animIndex + BABOON_SIT_IDLE_ANIM;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = BABOON_SIT_IDLE;
     item->currentAnimState = BABOON_SIT_IDLE;
 
@@ -224,7 +224,7 @@ void BaboonControl(short itemNumber)
     AI_INFO info, Lara_info;
     short tilt, angle, head_y;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     baboon = GetCreatureInfo(item);
     head_y = 0;
     tilt = 0;
@@ -234,13 +234,13 @@ void BaboonControl(short itemNumber)
     {
         if (item->currentAnimState == BABOON_DEATH)
         {
-            if (item->frameNumber == Anims[item->animNumber].frameEnd)
+            if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
                 BaboonRespawnFunction(itemNumber);
         }
         else if (item->currentAnimState != BABOON_ACTIVATE_SWITCH)
         {
             item->animNumber = Objects[item->objectNumber].animIndex + BABOON_DEATH_ANIM;
-            item->frameNumber = Anims[item->animNumber].frameBase;
+            item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
             item->currentAnimState = BABOON_DEATH;
             item->goalAnimState = BABOON_DEATH;
         }
@@ -283,7 +283,7 @@ void BaboonControl(short itemNumber)
                 item->pos.zPos = baboon->enemy->pos.zPos;
                 item->pos.yRot = baboon->enemy->pos.yRot;
                 item->animNumber = Objects[item->objectNumber].animIndex + BABOON_SWITCH_ANIM;
-                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->goalAnimState = BABOON_ACTIVATE_SWITCH;
                 item->currentAnimState = BABOON_ACTIVATE_SWITCH;
                 item->aiBits &= ~(FOLLOW);
@@ -497,7 +497,7 @@ void BaboonControl(short itemNumber)
             baboon->maximumTurn = 0;
             item->hitPoints = NOT_TARGETABLE;
 
-            if (item->frameNumber == Anims[item->animNumber].frameBase + 212)
+            if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 212)
             {
                 GAME_VECTOR pos;
                 pos.x = 0;

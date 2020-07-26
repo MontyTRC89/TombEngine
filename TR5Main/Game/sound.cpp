@@ -24,10 +24,6 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[NUM_REVERB_TYPES] =    // Reverb preset
 }; 
 
 vector<AudioTrack> g_AudioTracks;
-short SampleLUT[SOUND_NEW_SOUNDMAP_MAX_SIZE];
-short SoundMapSize;
-int NumSamplesInfos;
-SAMPLE_INFO* SampleInfo;
 int GlobalMusicVolume;
 int GlobalFXVolume;
 
@@ -112,7 +108,7 @@ bool Sound_LoadSample(char *pointer, int compSize, int uncompSize, int index)	//
 
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 {
-	if (effectID >= SoundMapSize)
+	if (effectID >= g_Level.SoundMap.size())
 		return 0;
 
 	if (BASS_GetDevice() == -1)
@@ -121,25 +117,25 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	if (!(env_flags & SFX_ALWAYS))
 	{
 		// Don't play effect if effect's environment isn't the same as camera position's environment
-		if ((env_flags & ENV_FLAG_WATER) != (Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+		if ((env_flags & ENV_FLAG_WATER) != (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 			return 0;
 	}
 
 	// Get actual sample index from SoundMap
-	int sampleIndex = SampleLUT[effectID];
+	int sampleIndex = g_Level.SoundMap[effectID];
 
 	// -1 means no such effect exists in level file.
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
 		printf("Non present effect %d \n", effectID);
-		SampleLUT[effectID] = -2;
+		g_Level.SoundMap[effectID] = -2;
 		return 0;
 	}
 	else if (sampleIndex == -2)
 		return 0;
 
-	SAMPLE_INFO *sampleInfo = &SampleInfo[sampleIndex];
+	SAMPLE_INFO *sampleInfo = &g_Level.SoundDetails[sampleIndex];
 
 	if (sampleInfo->number < 0)
 	{
@@ -184,7 +180,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags)
 	float distance = Sound_DistanceToListener(position);
 
 	// Don't play sound if it's too far from listener's position.
-	if (distance > radius)
+	if (distance > radius && false)
 		return 0;
 
 	// Set and randomize volume (if needed)
@@ -561,9 +557,9 @@ void Sound_UpdateScene()
 
 	static int currentReverb = -1;
 
-	if (currentReverb == -1 || Rooms[Camera.pos.roomNumber].reverbType != currentReverb)
+	if (currentReverb == -1 || g_Level.Rooms[Camera.pos.roomNumber].reverbType != currentReverb)
 	{
-		currentReverb = Rooms[Camera.pos.roomNumber].reverbType;
+		currentReverb = g_Level.Rooms[Camera.pos.roomNumber].reverbType;
 		if (currentReverb < NUM_REVERB_TYPES)
 			BASS_FXSetParameters(BASS_FXHandler[SOUND_FILTER_REVERB], &BASS_ReverbTypes[currentReverb]);
 	}
@@ -572,7 +568,7 @@ void Sound_UpdateScene()
 	{
 		if ((SoundSlot[i].channel != NULL) && (BASS_ChannelIsActive(SoundSlot[i].channel) == BASS_ACTIVE_PLAYING))
 		{
-			SAMPLE_INFO *sampleInfo = &SampleInfo[SampleLUT[SoundSlot[i].effectID]];
+			SAMPLE_INFO *sampleInfo = &g_Level.SoundDetails[g_Level.SoundMap[SoundSlot[i].effectID]];
 
 			// Stop and clean up sounds which were in ending state in previous frame.
 			// In case sound is looping, make it ending unless they are re-fired in next frame.

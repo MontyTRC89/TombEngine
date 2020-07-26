@@ -91,24 +91,24 @@ static void HorsemanSparks(PHD_3DPOS* pos, int param1, int num)
 
 void InitialiseHorse(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[ID_HORSE];
 
 	item->animNumber = obj->animIndex + 2;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 }
 
 void InitialiseHorseman(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[ID_HORSEMAN];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = obj->animIndex + 8;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 9;
 	item->currentAnimState = 9;
 	item->itemFlags[0] = NO_ITEM; // No horse yet
@@ -121,15 +121,15 @@ void HorsemanControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	// Try to find the horse
 	if (item->itemFlags[0] == NO_ITEM)
 	{
-		for (int i = 0; i < LevelItems; i++)
+		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			ITEM_INFO* currentItem = &Items[i];
+			ITEM_INFO* currentItem = &g_Level.Items[i];
 			if (item->objectNumber == ID_HORSE && item->triggerFlags == currentItem->triggerFlags)
 			{
 				item->itemFlags[0] = i;
@@ -145,7 +145,7 @@ void HorsemanControl(short itemNumber)
 	// The horse
 	ITEM_INFO * horseItem = NULL;
 	if (item->itemFlags[0] != 0)
-		horseItem = &Items[item->itemFlags[0]];
+		horseItem = &g_Level.Items[item->itemFlags[0]];
 
 	int x;
 	int y;
@@ -193,7 +193,7 @@ void HorsemanControl(short itemNumber)
 			{
 				item->animNumber = Objects[ID_HORSEMAN].animIndex + 21;
 				item->currentAnimState = 16;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 				if (item->itemFlags[0])
 				{
@@ -208,7 +208,7 @@ void HorsemanControl(short itemNumber)
 			item->itemFlags[1] = 0;
 			item->animNumber = Objects[ID_HORSEMAN].animIndex + 3;
 			item->currentAnimState = 8;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 			creature->enemy = NULL;
 
@@ -519,11 +519,11 @@ void HorsemanControl(short itemNumber)
 
 	case 4:
 		creature->maximumTurn = 0;
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			horseItem->animNumber = Objects[ID_HORSE].animIndex + 1;
 			horseItem->currentAnimState = 4;
-			horseItem->frameNumber = Anims[item->animNumber].frameBase;
+			horseItem->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 		if (!horseItem->flags)
 		{
@@ -650,7 +650,7 @@ void HorsemanControl(short itemNumber)
 
 			item->animNumber = Objects[ID_HORSEMAN].animIndex + 14;
 			item->currentAnimState = 5;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 			creature->maximumTurn = 0;
 
@@ -817,10 +817,10 @@ void HorsemanControl(short itemNumber)
 		}
 
 		if (item->animNumber == Objects[ID_HORSEMAN].animIndex + 29 &&
-			item->frameNumber == Anims[item->animNumber].frameBase)
+			item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			horseItem->animNumber = Objects[ID_HORSE].animIndex + 10;
-			horseItem->frameNumber = Anims[horseItem->animNumber].frameBase;
+			horseItem->frameNumber = g_Level.Anims[horseItem->animNumber].frameBase;
 		}
 
 		if (laraInfo.distance > SQUARE(4096) || creature->reachedGoal)

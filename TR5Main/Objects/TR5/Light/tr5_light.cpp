@@ -10,7 +10,7 @@
 
 void PulseLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -52,7 +52,7 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int rot, short 
 
 void StrobeLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -82,7 +82,7 @@ void StrobeLightControl(short itemNumber)
 
 void ColorLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -99,7 +99,7 @@ void ColorLightControl(short itemNumber)
 
 void ElectricalLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 	{
@@ -186,7 +186,7 @@ void ElectricalLightControl(short itemNumber)
 
 void BlinkingLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{

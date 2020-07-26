@@ -15,10 +15,10 @@ void InitialiseInvisibleGhost(short itemNum)
 {
     ITEM_INFO* item;
 
-    item = &Items[itemNum];
+    item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = 1;
     item->currentAnimState = 1;
     item->pos.yPos += CLICK(2);
@@ -33,7 +33,7 @@ void InvisibleGhostControl(short itemNumber)
 		short joint1 = 0;
 		short angle = 0;
 
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 		
 		if (item->aiBits)
@@ -85,7 +85,7 @@ void InvisibleGhostControl(short itemNumber)
 			&& item->currentAnimState <= 3
 			&& !creature->flags
 			&& item->touchBits & 0x9470
-			&& item->frameNumber > Anims[item->animNumber].frameBase + 18)
+			&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 18)
 		{
 			LaraItem->hitPoints -= 400;
 			LaraItem->hitStatus = true;

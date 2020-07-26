@@ -91,7 +91,7 @@ static void ExplodeLondonBoss(ITEM_INFO* item)
 static void LondonBossDie(short item_number)
 {
 	ITEM_INFO* item;
-	item = &Items[item_number];
+	item = &g_Level.Items[item_number];
 	item->collidable = false;
 	item->hitPoints = -16384;
 

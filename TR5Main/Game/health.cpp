@@ -116,11 +116,11 @@ void UpdateAirBar(int flash)
 		return;
 
 	if ((Lara.Vehicle == NO_ITEM)
-		|| (Items[Lara.Vehicle].objectNumber != ID_UPV))
+		|| (g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV))
 	{
 		if ((Lara.waterStatus != LW_UNDERWATER)
 			&& (Lara.waterStatus != LW_SURFACE)
-			&& (!((Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)
+			&& (!((g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_SWAMP)
 				&& (Lara.waterSurfaceDist < -775))))
 			return;
 	}

@@ -12,7 +12,7 @@ void InitialiseDoberman(short itemNum)
 {
     ITEM_INFO* item;
 
-    item = &Items[itemNum];
+    item = &g_Level.Items[itemNum];
     if (item->triggerFlags)
     {
         item->currentAnimState = 5;
@@ -24,7 +24,7 @@ void InitialiseDoberman(short itemNum)
         item->currentAnimState = 6;
         item->animNumber = Objects[item->objectNumber].animIndex + 10;
     }
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
 void DobermanControl(short itemNumber)
@@ -35,7 +35,7 @@ void DobermanControl(short itemNumber)
 		short tilt = 0;
 		short joint = 0;
 		
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 		
 		if (item->hitPoints > 0)
@@ -214,7 +214,7 @@ void DobermanControl(short itemNumber)
 		{
 			item->animNumber = Objects[ID_DOG].animIndex + 13;
 			item->currentAnimState = 10;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 
 		CreatureTilt(item, tilt);

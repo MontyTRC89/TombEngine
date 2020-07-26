@@ -127,7 +127,7 @@ static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotation, short ro
 
 static bool ShootFrame(ITEM_INFO* item)
 {
-    short frameNumber = (item->frameNumber - Anims[item->objectNumber].frameBase);
+    short frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
     if (frameNumber == 45
     //||  frameNumber == 50
     //||  frameNumber == 55
@@ -246,9 +246,9 @@ void InitialiseMutant(short itemNumber)
     ITEM_INFO* item;
     InitialiseCreature(itemNumber);
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     item->animNumber = Objects[item->objectNumber].animIndex + MUTANT_ANIM_APPEAR;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->currentAnimState = MUTANT_APPEAR;
     item->goalAnimState = MUTANT_APPEAR;
 }
@@ -266,7 +266,7 @@ void MutantControl(short itemNumber)
     short headY;
     short angle;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     mutant = GetCreatureInfo(item);
     angle = 0;
     headY = 0;
@@ -300,7 +300,7 @@ void MutantControl(short itemNumber)
         }
         break;
     case MUTANT_SHOOT:
-        frameNumber = (item->frameNumber - Anims[item->objectNumber].frameBase);
+        frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
         if (frameNumber >= 94 && frameNumber <= 96)
         {
             PHD_3DPOS src;
@@ -322,7 +322,7 @@ void MutantControl(short itemNumber)
         }
         break;
     case MUTANT_LOCUST1:
-        frameNumber = (item->frameNumber - Anims[item->objectNumber].frameBase);
+        frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
         if (frameNumber >= 60 && frameNumber <= 120)
             SpawnLocust(item);
         break;

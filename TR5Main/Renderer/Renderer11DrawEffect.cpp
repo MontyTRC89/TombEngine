@@ -17,6 +17,7 @@
 #include "drip.h"
 #include "explosion.h"
 #include "Quad/RenderQuad.h"
+
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
@@ -28,7 +29,7 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern ENERGY_ARC EnergyArcs[MAX_ENERGYARCS];
-extern int g_NumSprites;
+
 namespace T5M::Renderer {
 	using namespace T5M::Effects::Footprints;
 	using std::vector;
@@ -262,7 +263,7 @@ namespace T5M::Renderer {
 						pos.y = spark->y;
 						pos.z = spark->z;
 					} else {
-						ITEM_INFO* item = &Items[spark->fxObj];
+						ITEM_INFO* item = &g_Level.Items[spark->fxObj];
 
 						if (spark->flags & SP_NODEATTACH) {
 							if (NodeOffsets[spark->nodeNumber].gotIt) {
@@ -659,9 +660,14 @@ namespace T5M::Renderer {
 		return true;
 	}
 
+	Texture2D Renderer11::CreateDefaultNormalTexture() {
+		vector<byte> data = {128,128,255,1};
+		return Texture2D(m_device,1,1,data.data());
+	}
+
 	void Renderer11::drawFootprints() {
 		const int spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1;
-		if (g_NumSprites > spriteIndex) {
+		if (g_Level.Sprites.size() > spriteIndex) {
 			for (auto i = footprints.begin(); i != footprints.end(); i++) {
 				FOOTPRINT_STRUCT& footprint = *i;
 				if (footprint.active) {
@@ -988,7 +994,7 @@ namespace T5M::Renderer {
 						for (int p = 0; p < bucket->Polygons.size(); p++) {
 							RendererPolygon* poly = &bucket->Polygons[p];
 
-							OBJECT_TEXTURE* texture = &ObjectTextures[poly->TextureId];
+							OBJECT_TEXTURE* texture = &g_Level.ObjectTextures[poly->TextureId];
 							int tile = texture->tileAndFlag & 0x7FFF;
 
 							if (poly->Shape == SHAPE_RECTANGLE) {
@@ -1138,7 +1144,7 @@ namespace T5M::Renderer {
 				m_primitiveBatch->Begin();
 				m_context->VSSetShader(m_vsStatics, NULL, 0);
 				m_context->PSSetShader(m_psStatics, NULL, 0);
-				m_context->PSSetShaderResources(0, 1, m_staticsTextures[0].ShaderResourceView.GetAddressOf());
+				m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
 				ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
 				m_context->PSSetSamplers(0, 1, &sampler);
 				//m_stCameraMatrices.View = View.Transpose();

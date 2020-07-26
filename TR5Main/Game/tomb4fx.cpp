@@ -528,7 +528,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 
 	if (GetRandomControl() & 1)
 	{
-		if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
+		if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 			spark->flags = SP_ROTATE | SP_WIND;
 		else
 			spark->flags = SP_ROTATE;
@@ -540,7 +540,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 		else
 			spark->rotAdd = (GetRandomControl() & 0x0F) + 16;
 	}
-	else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
+	else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 	{
 		spark->flags = SP_WIND;
 	}
@@ -607,7 +607,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 		else
 			spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
 	}
-	else if (Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
+	else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 	{
 		spark->flags = SP_WIND;
 	}
@@ -920,7 +920,7 @@ void UpdateGunShells()
 
 			short oldRoomNumber = gs->roomNumber;
 
-			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER)
+			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER)
 			{
 				gs->fallspeed++;
 
@@ -949,13 +949,13 @@ void UpdateGunShells()
 			gs->pos.zPos += gs->speed * phd_cos(gs->dirXrot) >> W2V_SHIFT;
 
 			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
-			if (Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
-				&& !(Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
+			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
+				&& !(g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
 
-				T5M::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
-				//AddWaterSparks(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
-				SetupRipple(gs->pos.xPos, Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2);
+				T5M::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
+				//AddWaterSparks(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
+				SetupRipple(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2);
 				gs->fallspeed >>= 5;
 				continue;
 			}
@@ -1132,7 +1132,7 @@ void UpdateDrips()
 
 			drip->yVel += drip->gravity;
 			
-			if (Rooms[drip->roomNumber].flags & ENV_FLAG_WIND)
+			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WIND)
 			{
 				drip->x += SmokeWindX >> 1;
 				drip->z += SmokeWindZ >> 1;
@@ -1141,7 +1141,7 @@ void UpdateDrips()
 			drip->y += drip->yVel >> 5;
 			
 			FLOOR_INFO* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
-			if (Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
+			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
 				drip->on = false;
 
 			int height = GetFloorHeight(floor, drip->x, drip->y, drip->z);
@@ -1194,10 +1194,10 @@ void TriggerLaraDrips()// (F)
 
 int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	short* frame = GetBestFrame(item);
+	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(item->pos.yRot),
@@ -1464,14 +1464,14 @@ void UpdateShockwaves()
 				{
 					if (sw->flags & 3)
 					{
-						short* frame = GetBestFrame(LaraItem);
+						ANIM_FRAME* frame = GetBestFrame(LaraItem);
 
 						int dx = LaraItem->pos.xPos - sw->x;
 						int dz = LaraItem->pos.zPos - sw->z;
 						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
 						
-						if (sw->y <= LaraItem->pos.yPos + frame[2]
-							|| sw->y >= LaraItem->pos.yPos + frame[3] + 256
+						if (sw->y <= LaraItem->pos.yPos + frame->boundingBox.Y1
+							|| sw->y >= LaraItem->pos.yPos + frame->boundingBox.Y2 + 256
 							|| distance <= sw->innerRad
 							|| distance >= sw->outerRad)
 						{
