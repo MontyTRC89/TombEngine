@@ -13,11 +13,11 @@ void InitialiseHighObject1(short itemNumber)
 	int y = 0;
 	int z = 0;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		ITEM_INFO* currentItem = &Items[i];
+		ITEM_INFO* currentItem = &g_Level.Items[i];
 
 		if (currentItem->objectNumber != ID_TRIGGER_TRIGGERER)
 		{
@@ -52,9 +52,9 @@ void InitialiseHighObject1(short itemNumber)
 		}
 	}
 
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		ITEM_INFO* currentItem = &Items[i];
+		ITEM_INFO* currentItem = &g_Level.Items[i];
 
 		if (currentItem->objectNumber == ID_PULLEY
 			&& currentItem->pos.xPos == x
@@ -69,7 +69,7 @@ void InitialiseHighObject1(short itemNumber)
 
 void ControlHighObject1(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 	{
@@ -79,7 +79,7 @@ void ControlHighObject1(short itemNumber)
 
 			if (!item->itemFlags[1])
 			{
-				ITEM_INFO* targetItem = &Items[item->itemFlags[3] & 0xFF];
+				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[3] & 0xFF];
 				targetItem->flags = (item->flags & 0xC1FF) | 0x20;
 				item->itemFlags[0] = 6;
 				item->itemFlags[1] = 768;
@@ -113,14 +113,14 @@ void ControlHighObject1(short itemNumber)
 
 				item->pos.yPos += 8;
 
-				ITEM_INFO* targetItem = &Items[(item->itemFlags[3] >> 8) & 0xFF];
+				ITEM_INFO* targetItem = &g_Level.Items[(item->itemFlags[3] >> 8) & 0xFF];
 				targetItem->flags |= 0x20u;
 				targetItem->pos.yPos = item->pos.yPos - 560;
 			}
 
 			if (item->itemFlags[1] < -60)
 			{
-				ITEM_INFO* targetItem = &Items[item->itemFlags[2] & 0xFF];
+				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[2] & 0xFF];
 				targetItem->itemFlags[1] = 0;
 				targetItem->flags |= 0x20u;
 				item->itemFlags[0] = 0;
@@ -142,7 +142,7 @@ void ControlHighObject1(short itemNumber)
 			item->itemFlags[0] = 5;
 			item->itemFlags[1] = 0;
 		}
-		else if (item->itemFlags[0] == 5 && !item->itemFlags[1] && Items[(item->itemFlags[3] >> 8) & 0xFF].flags < 0)
+		else if (item->itemFlags[0] == 5 && !item->itemFlags[1] && g_Level.Items[(item->itemFlags[3] >> 8) & 0xFF].flags < 0)
 		{
 			DoFlipMap(3);
 			FlipMap[3] ^= 0x3E00u;
@@ -162,7 +162,7 @@ void ControlHighObject1(short itemNumber)
 				item->itemFlags[0] = 4;
 
 				short targetItemNumber = item->itemFlags[3] & 0xFF;
-				ITEM_INFO* targetItem = &Items[targetItemNumber];
+				ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
 
 				AddActiveItem(targetItemNumber);
 
@@ -170,7 +170,7 @@ void ControlHighObject1(short itemNumber)
 				targetItem->status = ITEM_ACTIVE;
 
 				targetItemNumber = item->itemFlags[2] & 0xFF;
-				targetItem = &Items[targetItemNumber];
+				targetItem = &g_Level.Items[targetItemNumber];
 
 				targetItem->itemFlags[1] = 1;
 				targetItem->flags |= 0x20;
@@ -207,7 +207,7 @@ void ControlHighObject1(short itemNumber)
 		item->pos.yPos -= 16;
 
 		short targetItemNumber = (item->itemFlags[3] >> 8) & 0xFF;
-		ITEM_INFO* targetItem = &Items[targetItemNumber];
+		ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
 		targetItem->flags |= 0x20;
 		targetItem->pos.yPos = item->pos.yPos - 560;
 	}

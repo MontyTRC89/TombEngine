@@ -6,6 +6,7 @@
 #include "control.h"
 #include "objects.h"
 #include <lara_struct.h>
+#include <tuple>
 using std::optional;
 using std::stack;
 using std::vector;
@@ -43,7 +44,7 @@ namespace T5M::Renderer
 				short textureId = *animatedPtr;
 				animatedPtr++;
 
-				OBJECT_TEXTURE *texture = &ObjectTextures[textureId];
+				OBJECT_TEXTURE *texture = &g_Level.ObjectTextures[textureId];
 				int tile = texture->tileAndFlag & 0x7FFF;
 				set.Textures[j] = RendererAnimatedTexture();
 				RendererAnimatedTexture &const newTexture = set.Textures[j];
@@ -106,31 +107,52 @@ namespace T5M::Renderer
 		//free(buffer);
 
 		// Upload textures to GPU memory
-		for (int i = 0; i < RoomTextures.size(); i++)
+		for (int i = 0; i < g_Level.RoomTextures.size(); i++)
 		{
-			TEXTURE *texture = &RoomTextures[i];
-			m_roomTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			TEXTURE *texture = &g_Level.RoomTextures[i];
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			} else {
+				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex =std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_roomTextures.push_back(tex);
 		}
 
-		for (int i = 0; i < MoveablesTextures.size(); i++)
+		for (int i = 0; i < g_Level.MoveablesTextures.size(); i++)
 		{
-			TEXTURE *texture = &MoveablesTextures[i];
-			m_moveablesTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			TEXTURE *texture = &g_Level.MoveablesTextures[i];
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			} else {
+				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_moveablesTextures.push_back(tex);
 		}
 
-		for (int i = 0; i < StaticsTextures.size(); i++)
+		for (int i = 0; i < g_Level.StaticsTextures.size(); i++)
 		{
-			TEXTURE *texture = &StaticsTextures[i];
-			m_staticsTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			TEXTURE *texture = &g_Level.StaticsTextures[i];
+			Texture2D normal;
+			if (texture->normalMapData.size() < 1) {
+				normal = CreateDefaultNormalTexture();
+			} else {
+				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+			}
+			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			m_staticsTextures.push_back(tex);
 		}
 
-		for (int i = 0; i < SpritesTextures.size(); i++)
+		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
-			TEXTURE *texture = &SpritesTextures[i];
-			m_spritesTextures.push_back(Texture2D(m_device, texture->data.data(), texture->size));
+			TEXTURE *texture = &g_Level.SpritesTextures[i];
+			m_spritesTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
 		}
 
-		m_skyTexture = Texture2D(m_device, MiscTextures.data.data(), MiscTextures.size);
+		m_skyTexture = Texture2D(m_device, g_Level.MiscTextures.colorMapData.data(), g_Level.MiscTextures.colorMapData.size());
 
 		// Step 2: prepare rooms
 		vector<RendererVertex> roomVertices;
@@ -139,9 +161,9 @@ namespace T5M::Renderer
 		int baseRoomVertex = 0;
 		int baseRoomIndex = 0;
 
-		for (int i = 0; i < Rooms.size(); i++)
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
-			ROOM_INFO *room = &Rooms[i];
+			ROOM_INFO *room = &g_Level.Rooms[i];
 
 			m_rooms[i] = RendererRoom();
 			RendererRoom &r = m_rooms[i];
@@ -185,17 +207,11 @@ namespace T5M::Renderer
 						vertex.Position.y = room->y + room->positions[v].y;
 						vertex.Position.z = room->z + room->positions[v].z;
 
-						vertex.Normal.x = room->normals[v].x;
-						vertex.Normal.y = room->normals[v].y;
-						vertex.Normal.z = room->normals[v].z;
-
-						vertex.UV.x = poly->textureCoordinates[k].x;
-						vertex.UV.y = poly->textureCoordinates[k].y;
-
-						vertex.Color.x = room->colors[v].x;
-						vertex.Color.y = room->colors[v].y;
-						vertex.Color.z = room->colors[v].z;
-						vertex.Color.w = 1.0f;
+						vertex.Normal = poly->normals[k];
+						vertex.UV = poly->textureCoordinates[k];
+						vertex.Color = Vector4(room->colors[v].x, room->colors[v].y, room->colors[v].z,1.0f);
+						vertex.Tangent = poly->tangents[k];
+						vertex.BiTangent = poly->bitangents[k];
 
 						vertex.Bone = 0;
 
@@ -349,7 +365,7 @@ namespace T5M::Renderer
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 					// and vertices have bone index 0 and not 10
 					RendererMesh *mesh = getRendererMeshFromTrMesh(&moveable,
-																   &Meshes[obj->meshIndex + j],
+																   &g_Level.Meshes[obj->meshIndex + j],
 																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 																   MoveablesIds[i] == ID_LARA_HAIR);
 					moveable.ObjectMeshes.push_back(mesh);
@@ -372,7 +388,7 @@ namespace T5M::Renderer
 
 					if (obj->nmeshes > 1)
 					{
-						int *bone = &Bones[obj->boneIndex];
+						int *bone = &g_Level.Bones[obj->boneIndex];
 
 						stack<RendererBone *> stack;
 
@@ -494,6 +510,7 @@ namespace T5M::Renderer
 												int y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
 												int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
 
+
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
 													jointVertex->Bone = BonesToCheck[k];
@@ -588,6 +605,8 @@ namespace T5M::Renderer
 													currentVertex->Bone = j;
 													currentVertex->Position = parentVertex->Position;
 													currentVertex->Normal = parentVertex->Normal;
+													currentVertex->BiTangent = parentVertex->BiTangent;
+													currentVertex->Tangent = parentVertex->Tangent;
 													break;
 												}
 											}
@@ -636,12 +655,12 @@ namespace T5M::Renderer
 
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
-			StaticInfo *obj = &StaticObjects[StaticObjectsIds[i]];
+			STATIC_INFO *obj = &StaticObjects[StaticObjectsIds[i]];
 			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
 			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
 			staticObject.Id = StaticObjectsIds[i];
 
-			RendererMesh *mesh = getRendererMeshFromTrMesh(&staticObject, &Meshes[obj->meshNumber], 0, false, false);
+			RendererMesh *mesh = getRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false);
 
 			staticObject.ObjectMeshes.push_back(mesh);
 
@@ -673,11 +692,11 @@ namespace T5M::Renderer
 		m_staticsIndexBuffer = IndexBuffer(m_device, staticsIndices.size(), staticsIndices.data());
 
 		// Step 5: prepare sprites
-		m_sprites.resize(g_NumSprites);
+		m_sprites.resize(g_Level.Sprites.size());
 
-		for (int i = 0; i < g_NumSprites; i++)
+		for (int i = 0; i < g_Level.Sprites.size(); i++)
 		{
-			SPRITE *oldSprite = &Sprites[i];
+			SPRITE *oldSprite = &g_Level.Sprites[i];
 			m_sprites[i] = RendererSprite();
 			RendererSprite &sprite = m_sprites[i];
 
@@ -721,7 +740,7 @@ namespace T5M::Renderer
 				if (bucket == NULL)
 					continue;
 
-				OBJECT_TEXTURE *texture = &ObjectTextures[bucket->Polygons[0].TextureId];
+				OBJECT_TEXTURE *texture = &g_Level.ObjectTextures[bucket->Polygons[0].TextureId];
 				WaterfallTextures[i] = texture;
 				WaterfallY[i] = texture->vertices[0].y;
 			}

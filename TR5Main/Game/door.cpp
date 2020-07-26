@@ -22,17 +22,17 @@ PHD_VECTOR KickDoorPos(0, 0, -917);
 PHD_VECTOR UnderwaterDoorPos(-251, -540, -46);
 PHD_VECTOR CrowbarDoorPos(-412, 0, 256);
 
-static short PushPullKickDoorBounds[12] =
+OBJECT_COLLISION_BOUNDS PushPullKickDoorBounds =
 {
 	0xFE80, 0x0180, 0x0000, 0x0000, 0xFC00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
 
-static short UnderwaterDoorBounds[12] =
+OBJECT_COLLISION_BOUNDS UnderwaterDoorBounds =
 {
 	0xFF00, 0x0100, 0xFC00, 0x0000, 0xFC00, 0x0000, 0xC720, 0x38E0, 0xC720, 0x38E0, 0xC720, 0x38E0
 };
 
-static short CrowbarDoorBounds[12] =
+OBJECT_COLLISION_BOUNDS CrowbarDoorBounds =
 {
 	0xFE00, 0x0200, 0xFC00, 0x0000, 0x0000, 0x0200, 0xC720, 0x38E0, 0xC720, 0x38E0, 0xC720, 0x38E0
 };
@@ -50,7 +50,7 @@ extern Inventory g_Inventory;
 
 void SequenceDoorControl(short itemNumber) 
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
 
 	if (CurrentSequence == 3)
@@ -101,7 +101,7 @@ void SequenceDoorControl(short itemNumber)
 
 void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	if (TrInput & IN_ACTION
 	&&  l->currentAnimState == STATE_LARA_UNDERWATER_STOP
@@ -112,7 +112,7 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		l->pos.yRot ^= ANGLE(180.0f);
 		
-		if (TestLaraPosition(UnderwaterDoorBounds, item, l))
+		if (TestLaraPosition(&UnderwaterDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&UnderwaterDoorPos, item, l))
 			{
@@ -151,7 +151,7 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (TrInput & IN_ACTION
 	&&  l->currentAnimState == STATE_LARA_STOP
@@ -162,7 +162,7 @@ void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 	{
 		item->pos.yRot ^= ANGLE(180);
-		if (TestLaraPosition(PushPullKickDoorBounds, item, l))
+		if (TestLaraPosition(&PushPullKickDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&DoubleDoorPos, item, l))
 			{
@@ -200,7 +200,7 @@ void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (TrInput & IN_ACTION
 	&&  l->currentAnimState == STATE_LARA_STOP
 	&&  l->animNumber == ANIMATION_LARA_STAY_IDLE
@@ -217,7 +217,7 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			applyRot = true;
 		}
 
-		if (!TestLaraPosition(PushPullKickDoorBounds, item, l))
+		if (!TestLaraPosition(&PushPullKickDoorBounds, item, l))
 		{
 			if (Lara.isMoving && Lara.generalPtr == (void*)itemNum)
 			{
@@ -311,7 +311,7 @@ void PushPullKickDoorControl(short itemNumber)
 	ITEM_INFO* item;
 	DOOR_DATA* door;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	door = (DOOR_DATA*)item->data;
 
 	if (!door->opened)
@@ -328,7 +328,7 @@ void PushPullKickDoorControl(short itemNumber)
 
 void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll) 
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->triggerFlags == 2
 	&&  item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
@@ -340,7 +340,7 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum))
 	{
 		item->pos.yRot ^= ANGLE(180);
-		if (TestLaraPosition(CrowbarDoorBounds, item, l))
+		if (TestLaraPosition(&CrowbarDoorBounds, item, l))
 		{
 			if (!Lara.isMoving)
 			{
@@ -418,17 +418,17 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void DoorControl(short itemNumber) 
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	DOOR_DATA* door = (DOOR_DATA*)item->data;
 	
 	if (item->triggerFlags == 1)
 	{
 		if (item->itemFlags[0])
 		{
-			short* bounds = GetBoundsAccurate(item);
+			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 			--item->itemFlags[0];
 			item->pos.yPos -= 12;
-			int y = bounds[2] + item->itemFlags[2] - STEP_SIZE;
+			int y = bounds->Y1 + item->itemFlags[2] - STEP_SIZE;
 			if (item->pos.yPos < y)
 			{
 				item->pos.yPos = y;
@@ -481,7 +481,7 @@ void DoorControl(short itemNumber)
 				OpenThatDoor(&door->d2flip, door);
 				door->opened = true;
 			}
-			/*if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			/*if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			{
 				if (gfCurrentLevel == 11)
 				{
@@ -579,7 +579,7 @@ void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 		if (boxIndex != NO_BOX)
 		{
 			if (!DontUnlockBox)
-				Boxes[boxIndex].overlapIndex &= ~BLOCKED;
+				g_Level.Boxes[boxIndex].flags &= ~BLOCKED;
 
 			for (int i = 0; i < NUM_SLOTS; i++)
 			{
@@ -670,7 +670,7 @@ void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 		short boxIndex = doorPos->block;
 		if (boxIndex != NO_BOX)
 		{
-			Boxes[boxIndex].overlapIndex |= BLOCKED;
+			g_Level.Boxes[boxIndex].flags |= BLOCKED;
 			for (int i = 0; i < NUM_SLOTS; i++)
 			{
 				BaddieSlots[i].LOT.targetBox = NO_BOX;
@@ -706,7 +706,7 @@ void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 
 void InitialiseDoor(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->objectNumber == ID_SEQUENCE_DOOR1)
 		item->flags &= 0xBFFFu;
@@ -714,7 +714,7 @@ void InitialiseDoor(short itemNumber)
 	if (item->objectNumber == ID_LIFT_DOORS1 || item->objectNumber == ID_LIFT_DOORS2)
 		item->itemFlags[0] = 4096;
 
-	DOOR_DATA * door = (DOOR_DATA*)game_malloc(sizeof(DOOR_DATA));
+	DOOR_DATA * door = game_malloc<DOOR_DATA>();
 
 	item->data = door;
 	door->opened = false;
@@ -739,7 +739,7 @@ void InitialiseDoor(short itemNumber)
 	else
 		dx++;
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 
 	door->d1.floor = &r->floor[(((item->pos.zPos - r->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - r->x) >> WALL_SHIFT) + dx) * r->xSize];
 	roomNumber = GetDoor(door->d1.floor);
@@ -747,16 +747,16 @@ void InitialiseDoor(short itemNumber)
 		boxNumber = door->d1.floor->box;
 	else
 	{
-		b = &Rooms[roomNumber];
+		b = &g_Level.Rooms[roomNumber];
 		boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
 	}
-	door->d1.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+	door->d1.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 	memcpy(&door->d1.data, door->d1.floor, sizeof(FLOOR_INFO));
 
 	if (r->flippedRoom != -1)
 	{
-		r = &Rooms[r->flippedRoom];
+		r = &g_Level.Rooms[r->flippedRoom];
 
 		door->d1flip.floor = &r->floor[(((item->pos.zPos - r->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - r->x) >> WALL_SHIFT) + dx) * r->xSize];
 		roomNumber = GetDoor(door->d1flip.floor);
@@ -764,10 +764,10 @@ void InitialiseDoor(short itemNumber)
 			boxNumber = door->d1flip.floor->box;
 		else
 		{
-			b = &Rooms[roomNumber];
+			b = &g_Level.Rooms[roomNumber];
 			boxNumber = b->floor[(((item->pos.zPos - b->z) >> WALL_SHIFT) + dz) + (((item->pos.xPos - b->x) >> WALL_SHIFT) + dx) * b->xSize].box;
 		}
-		door->d1flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+		door->d1flip.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 		memcpy(&door->d1flip.data, door->d1flip.floor, sizeof(FLOOR_INFO));
 	}
@@ -786,7 +786,7 @@ void InitialiseDoor(short itemNumber)
 	}
 	else
 	{
-		r = &Rooms[twoRoom];
+		r = &g_Level.Rooms[twoRoom];
 
 		door->d2.floor = &r->floor[((item->pos.zPos - r->z) >> WALL_SHIFT) + ((item->pos.xPos - r->x) >> WALL_SHIFT) * r->xSize];
 		roomNumber = GetDoor(door->d2.floor);
@@ -794,16 +794,16 @@ void InitialiseDoor(short itemNumber)
 			boxNumber = door->d2.floor->box;
 		else
 		{
-			b = &Rooms[roomNumber];
+			b = &g_Level.Rooms[roomNumber];
 			boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
 		}
-		door->d2.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+		door->d2.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 		memcpy(&door->d2.data, door->d2.floor, sizeof(FLOOR_INFO));
 
 		if (r->flippedRoom != -1)
 		{
-			r = &Rooms[r->flippedRoom];
+			r = &g_Level.Rooms[r->flippedRoom];
 
 			door->d2flip.floor = &r->floor[((item->pos.zPos - r->z) >> WALL_SHIFT) + ((item->pos.xPos - r->x) >> WALL_SHIFT) * r->xSize];
 			roomNumber = GetDoor(door->d2flip.floor);
@@ -811,10 +811,10 @@ void InitialiseDoor(short itemNumber)
 				boxNumber = door->d2flip.floor->box;
 			else
 			{
-				b = &Rooms[roomNumber];
+				b = &g_Level.Rooms[roomNumber];
 				boxNumber = b->floor[((item->pos.zPos - b->z) >> WALL_SHIFT) + ((item->pos.xPos - b->x) >> WALL_SHIFT) * b->xSize].box;
 			}
-			door->d2flip.block = (Boxes[boxNumber].overlapIndex & BLOCKABLE) ? boxNumber : NO_BOX;
+			door->d2flip.block = (g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
 
 			memcpy(&door->d2flip.data, door->d2flip.floor, sizeof(FLOOR_INFO));
 		}
@@ -842,7 +842,7 @@ void InitialiseDoor(short itemNumber)
 		door->dptr3[1] = 0;
 		door->dptr3[2] = 0;
 
-		if (Rooms[item->roomNumber].flippedRoom != -1)
+		if (g_Level.Rooms[item->roomNumber].flippedRoom != -1)
 		{
 			//if (!door->dptr2)
 			//	MEMORY[1] = 1;
@@ -852,7 +852,7 @@ void InitialiseDoor(short itemNumber)
 			door->dptr2[2] = 0;
 		}
 
-		if (Rooms[item->drawRoom].flippedRoom != -1)
+		if (g_Level.Rooms[item->drawRoom].flippedRoom != -1)
 		{
 			//if (!door->dptr4)
 			//	MEMORY[1] = 1;
@@ -881,17 +881,17 @@ void FillDoorPointers(DOOR_DATA* doorData, ITEM_INFO* item, short roomNumber, in
 	dx <<= WALL_SHIFT;
 	dz <<= WALL_SHIFT;
 
-	ROOM_INFO* r = &Rooms[item->roomNumber];
+	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 	GetClosedDoorNormal(r, &doorData->dptr1, &doorData->dn1, dz, dx, absX, absZ);
 
 	if (r->flippedRoom != -1)
-		GetClosedDoorNormal(&Rooms[r->flippedRoom], &doorData->dptr2, &doorData->dn2, dz, dx, absX, absZ);
+		GetClosedDoorNormal(&g_Level.Rooms[r->flippedRoom], &doorData->dptr2, &doorData->dn2, dz, dx, absX, absZ);
 	
-	r = &Rooms[roomNumber];
+	r = &g_Level.Rooms[roomNumber];
 	GetClosedDoorNormal(r, &doorData->dptr3, &doorData->dn3, dz, dx, absX, absZ);
 
 	if (r->flippedRoom != -1)
-		GetClosedDoorNormal(&Rooms[r->flippedRoom], &doorData->dptr4, &doorData->dn4, dz, dx, absX, absZ);
+		GetClosedDoorNormal(&g_Level.Rooms[r->flippedRoom], &doorData->dptr4, &doorData->dn4, dz, dx, absX, absZ);
 }
 
 void GetClosedDoorNormal(ROOM_INFO* room, short** dptr, byte* n, int z, int x, int absX, int absZ)
@@ -955,10 +955,10 @@ void ProcessClosedDoors()
 			break;
 
 		short roomNumber = item->roomNumber;
-		if (!Rooms[roomNumber].boundActive && !Rooms[item->drawRoom].boundActive)
+		if (!g_Level.Rooms[roomNumber].boundActive && !g_Level.Rooms[item->drawRoom].boundActive)
 			continue;
 
-		if (Rooms[item->drawRoom].boundActive)
+		if (g_Level.Rooms[item->drawRoom].boundActive)
 		{
 			if (!(item->inDrawRoom))
 			{
@@ -990,7 +990,7 @@ void AssignClosedDoor(ITEM_INFO* item)
 
 void InitialiseSteelDoor(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->meshBits = 1;
 	item->pos.yPos -= 1024;
@@ -998,7 +998,7 @@ void InitialiseSteelDoor(short itemNumber)
 
 void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	if (item->itemFlags[0] != 3)
 	{

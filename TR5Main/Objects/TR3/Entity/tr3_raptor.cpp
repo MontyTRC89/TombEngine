@@ -14,7 +14,7 @@ void RaptorControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ITEM_INFO* nearestItem = NULL;
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short head = 0;
@@ -31,7 +31,7 @@ void RaptorControl(short itemNum)
 				item->animNumber = Objects[item->objectNumber].animIndex + 9;
 			else
 				item->animNumber = Objects[item->objectNumber].animIndex + 10;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 5;
 		}
 	}
@@ -39,7 +39,7 @@ void RaptorControl(short itemNum)
 	{
 		if (creature->enemy == NULL || !(GetRandomControl() & 0x7F)) 													   // Decide on target - this can be Lara, another creature, or an ambush point
 		{
-			CREATURE_INFO* currentCreature = BaddieSlots;
+			CREATURE_INFO* currentCreature = BaddieSlots.data();
 			ITEM_INFO* target = NULL;
 			for (int i = 0; i < NUM_SLOTS; i++)
 			{
@@ -49,7 +49,7 @@ void RaptorControl(short itemNum)
 					continue;
 				}
 
-				target = &Items[currentCreature->itemNum];
+				target = &g_Level.Items[currentCreature->itemNum];
 
 				int x = (target->pos.xPos - item->pos.xPos) >> 6;
 				int y = (target->pos.yPos - item->pos.yPos) >> 6;

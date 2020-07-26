@@ -12,11 +12,11 @@ BITE_INFO yetiBiteL = { 12, 101, 19, 13 };
 
 void InitialiseYeti(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
 	item->animNumber = Objects[item->objectNumber].animIndex + 19;
-	item->frameNumber = Anims[item->animNumber].frameBase;
-	item->currentAnimState = Anims[item->animNumber].currentAnimState;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->currentAnimState = g_Level.Anims[item->animNumber].currentAnimState;
 }
 
 void YetiControl(short itemNum)
@@ -24,7 +24,7 @@ void YetiControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* yeti = (CREATURE_INFO*)item->data;
 	AI_INFO info;
 	short angle = 0, torso = 0, head = 0, tilt = 0;
@@ -37,7 +37,7 @@ void YetiControl(short itemNum)
 		if (item->currentAnimState != 8)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 31;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 8;
 		}
 	}
@@ -293,22 +293,22 @@ void YetiControl(short itemNum)
 		{
 		case 2:
 			item->animNumber = Objects[item->objectNumber].animIndex + 34;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 10;
 			break;
 		case 3:
 			item->animNumber = Objects[item->objectNumber].animIndex + 33;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 11;
 			break;
 		case 4:
 			item->animNumber = Objects[item->objectNumber].animIndex + 32;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 12;
 			break;
 		case -4:
 			item->animNumber = Objects[item->objectNumber].animIndex + 35;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 13;
 			break;
 		}

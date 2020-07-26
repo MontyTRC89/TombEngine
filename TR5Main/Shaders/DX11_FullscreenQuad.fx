@@ -1,11 +1,4 @@
-struct VertexShaderInput
-{
-	float3 Position: POSITION;
-	float3 Normal: NORMAL;
-	float2 UV: TEXCOORD;
-	float4 Color: COLOR;
-	float Bone : BLENDINDICES;
-};
+#include "./VertexInput.hlsli"
 
 struct PixelShaderInput
 {

@@ -13,7 +13,7 @@ void ApeControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short head = 0;
@@ -25,7 +25,7 @@ void ApeControl(short itemNum)
 		if (item->currentAnimState != 5)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 7 + (short)(GetRandomControl() / 0x4000);
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 5;
 		}
 	}
@@ -174,7 +174,7 @@ void ApeControl(short itemNum)
 				creature->maximumTurn = 0;
 				item->animNumber = Objects[item->objectNumber].animIndex + 19;
 				item->currentAnimState = 11;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				break;
 
 			default:

@@ -12,14 +12,14 @@
 #include "input.h"
 #include "sound.h"
 
-short MovingBlockBounds[12] = { 
+OBJECT_COLLISION_BOUNDS MovingBlockBounds = {
 	-300, 300, 0, 0, -692, -512,
 	-ANGLE(10.0f), ANGLE(10.0f),
 	-ANGLE(30.0f), ANGLE(30.0f),
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
 
-short PushableBlockBounds[12] = {
+OBJECT_COLLISION_BOUNDS PushableBlockBounds = {
 	0x0000, 0x0000, 0xFF00, 0x0000,
 	0x0000, 0x0000, 0xF8E4, 0x071C,
 	0xEAAC, 0x1554, 0xF8E4, 0x071C
@@ -31,14 +31,14 @@ int DoPushPull = 0;
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	Boxes[floor->box].overlapIndex &= (~BLOCKED);
-	short height = Boxes[floor->box].height;
+	g_Level.Boxes[floor->box].flags &= (~BLOCKED);
+	short height = g_Level.Boxes[floor->box].height;
 	short baseRoomNumber = roomNumber;
 
 	floor = GetFloor(x + 1024, y, z, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x + 1024, y, z, roomNumber);
 	}
 
@@ -46,7 +46,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	floor = GetFloor(x - 1024, y, z, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x - 1024, y, z, roomNumber);
 	}
 
@@ -54,7 +54,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	floor = GetFloor(x, y, z + 1024, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z + 1024, roomNumber);
 	}
 
@@ -62,14 +62,14 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	floor = GetFloor(x, y, z - 1024, &roomNumber);
 	if (floor->box != NO_BOX)
 	{
-		if (Boxes[floor->box].height == height && (Boxes[floor->box].overlapIndex & BLOCKABLE) && (Boxes[floor->box].overlapIndex & BLOCKED))
+		if (g_Level.Boxes[floor->box].height == height && (g_Level.Boxes[floor->box].flags & BLOCKABLE) && (g_Level.Boxes[floor->box].flags & BLOCKED))
 			ClearMovableBlockSplitters(x, y, z - 1024, roomNumber);
 	}
 }
 
 void InitialisePushableBlock(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	ClearMovableBlockSplitters(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
@@ -79,7 +79,7 @@ void InitialisePushableBlock(short itemNum)
 
 void PushableBlockControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	PHD_VECTOR pos;
 	pos.x = 0;
@@ -97,12 +97,12 @@ void PushableBlockControl(short itemNumber)
 	switch (LaraItem->animNumber)
 	{
 	case ANIMATION_LARA_OBJECT_PUSH:
-		if ((LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 30
-		||   LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 67)
-		&&  (LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 78
-		||   LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 125)
-		&&  (LaraItem->frameNumber < Anims[LaraItem->animNumber].frameBase + 140
-		||   LaraItem->frameNumber > Anims[LaraItem->animNumber].frameBase + 160))
+		if ((LaraItem->frameNumber < g_Level.Anims[LaraItem->animNumber].frameBase + 30
+		||   LaraItem->frameNumber > g_Level.Anims[LaraItem->animNumber].frameBase + 67)
+		&&  (LaraItem->frameNumber < g_Level.Anims[LaraItem->animNumber].frameBase + 78
+		||   LaraItem->frameNumber > g_Level.Anims[LaraItem->animNumber].frameBase + 125)
+		&&  (LaraItem->frameNumber < g_Level.Anims[LaraItem->animNumber].frameBase + 140
+		||   LaraItem->frameNumber > g_Level.Anims[LaraItem->animNumber].frameBase + 160))
 		{
 			if (DoPushPull)
 			{
@@ -148,7 +148,7 @@ void PushableBlockControl(short itemNumber)
 			break;
 		}
 
-		if (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd - 1)
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
 		{
 			if (TrInput & IN_ACTION)
 			{
@@ -163,10 +163,10 @@ void PushableBlockControl(short itemNumber)
 		break;
 
 	case ANIMATION_LARA_OBJECT_PULL:
-		if ((LaraItem->frameNumber <  Anims[LaraItem->animNumber].frameBase + 40
-			|| LaraItem->frameNumber >  Anims[LaraItem->animNumber].frameBase + 122)
-			&& (LaraItem->frameNumber <  Anims[LaraItem->animNumber].frameBase + 130
-				|| LaraItem->frameNumber >  Anims[LaraItem->animNumber].frameBase + 170))
+		if ((LaraItem->frameNumber <  g_Level.Anims[LaraItem->animNumber].frameBase + 40
+			|| LaraItem->frameNumber >  g_Level.Anims[LaraItem->animNumber].frameBase + 122)
+			&& (LaraItem->frameNumber <  g_Level.Anims[LaraItem->animNumber].frameBase + 130
+				|| LaraItem->frameNumber >  g_Level.Anims[LaraItem->animNumber].frameBase + 170))
 		{
 			if (DoPushPull)
 			{
@@ -212,7 +212,7 @@ void PushableBlockControl(short itemNumber)
 			break;
 		}
 
-		if (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd - 1)
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd - 1)
 		{
 			if (TrInput & IN_ACTION)
 			{
@@ -227,14 +227,14 @@ void PushableBlockControl(short itemNumber)
 		break;
 	case ANIMATION_LARA_PUSHABLE_PUSH_TO_STAND:
 	case ANIMATION_LARA_PUSHABLE_PULL_TO_STAND:
-		if (LaraItem->frameNumber == Anims[ANIMATION_LARA_PUSHABLE_PUSH_TO_STAND].frameBase
-			|| LaraItem->frameNumber == Anims[ANIMATION_LARA_PUSHABLE_PULL_TO_STAND].frameBase)
+		if (LaraItem->frameNumber == g_Level.Anims[ANIMATION_LARA_PUSHABLE_PUSH_TO_STAND].frameBase
+			|| LaraItem->frameNumber == g_Level.Anims[ANIMATION_LARA_PUSHABLE_PULL_TO_STAND].frameBase)
 		{
 			item->pos.xPos = item->pos.xPos & 0xFFFFFE00 | 0x200;
 			item->pos.zPos = item->pos.zPos & 0xFFFFFE00 | 0x200;
 		}
 
-		if (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
+		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
 			roomNumber = item->roomNumber;
 			floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
@@ -293,7 +293,7 @@ void PushableBlockControl(short itemNumber)
 
 void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
@@ -311,7 +311,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 		&& (!Lara.isMoving || Lara.generalPtr != item))
 	{
 		if (l->currentAnimState != STATE_LARA_PUSHABLE_GRAB 
-			|| (l->frameNumber != Anims[ANIMATION_LARA_START_OBJECT_MOVING].frameBase + 19)
+			|| (l->frameNumber != g_Level.Anims[ANIMATION_LARA_START_OBJECT_MOVING].frameBase + 19)
 			|| Lara.cornerX != (int)item)
 		{
 			ObjectCollision(itemNum, l, coll);
@@ -363,27 +363,27 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
 		if (roomNumber == item->roomNumber)
 		{
-			short* bounds = GetBoundsAccurate(item);
+			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
-			PushableBlockBounds[0] = (bounds[0] >> 1) - 100;
-			PushableBlockBounds[1] = (bounds[1] >> 1) + 100;
-			PushableBlockBounds[4] = bounds[4] - 200;
-			PushableBlockBounds[5] = 0;
+			PushableBlockBounds.boundingBox.X1 = (bounds->X1 / 2) - 100;
+			PushableBlockBounds.boundingBox.X2 = (bounds->X2 / 2) + 100;
+			PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
+			PushableBlockBounds.boundingBox.Z2 = 0;
 			
 			short rot = item->pos.yRot;
 			item->pos.yRot = (l->pos.yRot + ANGLE(45)) & 0xC000;
 			
-			if (TestLaraPosition(PushableBlockBounds, item, l))
+			if (TestLaraPosition(&PushableBlockBounds, item, l))
 			{
 				if (((item->pos.yRot / 0x4000) + ((rot + 0x2000) / 0x4000)) & 1)
-					PushableBlockPos.z = bounds[0] - 35;
+					PushableBlockPos.z = bounds->X1 - 35;
 				else
-					PushableBlockPos.z = bounds[4] - 35;
+					PushableBlockPos.z = bounds->Z1 - 35;
 
 				if (MoveLaraPosition(&PushableBlockPos, item, l))
 				{
 					l->animNumber = ANIMATION_LARA_START_OBJECT_MOVING;
-					l->frameNumber = Anims[l->animNumber].frameBase;
+					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					l->currentAnimState = STATE_LARA_PUSHABLE_GRAB;
 					l->goalAnimState = STATE_LARA_PUSHABLE_GRAB;
 					Lara.isMoving = false;
@@ -442,7 +442,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 			item->pos.yRot = -ANGLE(90);
 			break;
 		}
-		if (!TestLaraPosition(MovingBlockBounds, item, l))
+		if (!TestLaraPosition(&MovingBlockBounds, item, l))
 			return;
 
 		short roomNumber = l->roomNumber;
@@ -480,9 +480,9 @@ void PushableBlockCollision(short itemNum, ITEM_INFO * l, COLL_INFO * coll)
 	}
 	else if (l->currentAnimState == STATE_LARA_PUSHABLE_GRAB)
 	{
-		if (l->frameNumber != Anims[ANIMATION_LARA_START_OBJECT_MOVING].frameBase + 19)
+		if (l->frameNumber != g_Level.Anims[ANIMATION_LARA_START_OBJECT_MOVING].frameBase + 19)
 			return;
-		if (!TestLaraPosition(MovingBlockBounds, item, l))
+		if (!TestLaraPosition(&MovingBlockBounds, item, l))
 			return;
 		if (TrInput & IN_FORWARD)
 		{
@@ -557,7 +557,7 @@ int TestBlockPush(ITEM_INFO * item, int blockhite, unsigned short quadrant)
 	}
 
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNum);  
-	ROOM_INFO* r = &Rooms[roomNum];
+	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
@@ -639,7 +639,7 @@ int TestBlockPull(ITEM_INFO * item, int blockhite, short quadrant)
 	short roomNum = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y - 256, z, &roomNum);  
 
-	ROOM_INFO* r = &Rooms[roomNum];
+	ROOM_INFO* r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 
@@ -677,7 +677,7 @@ int TestBlockPull(ITEM_INFO * item, int blockhite, short quadrant)
 	roomNum = LaraItem->roomNumber;
 	GetFloor(x, y, z, &roomNum);
 
-	r = &Rooms[roomNum];
+	r = &g_Level.Rooms[roomNum];
 	if (XZ_GET_SECTOR(r, x - r->x, z - r->z).stopper)
 		return 0;
 

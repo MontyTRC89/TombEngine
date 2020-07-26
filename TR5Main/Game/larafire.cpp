@@ -316,7 +316,7 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 
 void SmashItem(short itemNum) // (F) (D)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
 		SmashObject(itemNum);
 }
@@ -649,8 +649,8 @@ void InitialiseNewWeapon()
 		break;
 
 	default:
-		Lara.rightArm.frameBase = Anims[LaraItem->animNumber].framePtr;
-		Lara.leftArm.frameBase = Anims[LaraItem->animNumber].framePtr;
+		Lara.rightArm.frameBase = g_Level.Anims[LaraItem->animNumber].framePtr;
+		Lara.leftArm.frameBase = g_Level.Anims[LaraItem->animNumber].framePtr;
 		break;
 	}
 }
@@ -853,13 +853,13 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 {
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	int x, y, z, c, s;
 
-	bounds = (ANIM_FRAME*)GetBestFrame(item);
-	x = (int)(bounds->MinX + bounds->MaxX) / 2;
-	y = (int) bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
-	z = (int)(bounds->MinZ + bounds->MaxZ) / 2;
+	bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	x = (int)(bounds->X1 + bounds->X2) / 2;
+	y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
+	z = (int)(bounds->Z1 + bounds->Z2) / 2;
 	c = phd_cos(item->pos.yRot);
 	s = phd_sin(item->pos.yRot);
 
@@ -985,7 +985,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon) // (F) (D)
 	{
 		if (BaddieSlots[slot].itemNum != NO_ITEM)
 		{
-			item = &Items[BaddieSlots[slot].itemNum];
+			item = &g_Level.Items[BaddieSlots[slot].itemNum];
 			if (item->hitPoints > 0)
 			{
 				x = item->pos.xPos - src.x;
@@ -1089,7 +1089,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 	int ceiling, height, oldonobj, oldheight;
 	int bs, yang;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);

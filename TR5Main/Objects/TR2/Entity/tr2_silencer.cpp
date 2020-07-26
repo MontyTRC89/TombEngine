@@ -13,7 +13,7 @@ void SilencerControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* silencer = (CREATURE_INFO*)item->data;
 	AI_INFO info;
 	short angle = 0, torso_y = 0, torso_x = 0, head_y = 0, tilt = 0;
@@ -23,7 +23,7 @@ void SilencerControl(short itemNum)
 		if (item->currentAnimState != 12 && item->currentAnimState != 13)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 20; // die 21 is for heavy weapon.
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 13;
 		}
 	}

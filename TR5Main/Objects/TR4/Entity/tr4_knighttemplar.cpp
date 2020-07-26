@@ -15,14 +15,14 @@ BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
 void InitialiseKnightTemplar(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->meshBits &= 0xF7FF;
 }
 
@@ -31,7 +31,7 @@ void KnightTemplarControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	if (item->animNumber == obj->animIndex ||
@@ -153,7 +153,7 @@ void KnightTemplarControl(short itemNumber)
 		}
 
 		frameNumber = item->frameNumber;
-		frameBase = Anims[item->animNumber].frameBase;
+		frameBase = g_Level.Anims[item->animNumber].frameBase;
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{
@@ -164,7 +164,7 @@ void KnightTemplarControl(short itemNumber)
 
 			GetJointAbsPosition(item, &pos, 11);
 
-			ROOM_INFO* room = &Rooms[item->roomNumber];
+			ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
 			FLOOR_INFO* currentFloor = &room->floor[((pos.z - room->z) >> WALL_SHIFT) +
 				((pos.z - room->x) >> WALL_SHIFT) * room->xSize];

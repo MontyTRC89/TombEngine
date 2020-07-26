@@ -1,16 +1,8 @@
+#include "./../VertexInput.hlsli"
 cbuffer HUDBuffer : register(b0)
 {
 	float4x4 View;
 	float4x4 Projection;
-};
-
-struct VertexShaderInput
-{
-	float3 Position: POSITION;
-	float3 Normal: NORMAL;
-	float2 UV: TEXCOORD;
-	float4 Color: COLOR;
-	float Bone : BLENDINDICES;
 };
 
 struct PixelShaderInput
