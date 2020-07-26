@@ -66,7 +66,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_whiteTexture = Texture2D(m_device, L"WhiteSprite.png");
 
 	m_logo = Texture2D(m_device, L"Logo.png");
-
+	m_shadowMaps = RenderTargetCubeArray(m_device, SHADOW_MAP_SIZE, MAX_DYNAMIC_SHADOWS, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_D16_UNORM);
 	// Load shaders
 	ID3D10Blob * blob;
 
@@ -355,7 +355,7 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 bool Renderer11::Create()
 {
 
-	D3D_FEATURE_LEVEL levels[1] = { D3D_FEATURE_LEVEL_10_0 };
+	D3D_FEATURE_LEVEL levels[] = {D3D_FEATURE_LEVEL_11_0,D3D_FEATURE_LEVEL_11_1};
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT res;
 
@@ -364,9 +364,7 @@ bool Renderer11::Create()
 #else
 	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
 #endif
-
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(res);
 
 	return true;
 }

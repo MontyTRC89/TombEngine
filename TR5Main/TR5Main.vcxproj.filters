@@ -852,6 +852,9 @@
     <ClInclude Include="Renderer\ConstantBuffer\ConstantBuffer.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1548,6 +1551,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\memory\malloc.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

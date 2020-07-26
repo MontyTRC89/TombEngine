@@ -25,10 +25,12 @@ struct CAMERA_INFO;
 
 #include <level.h>
 #include "ConstantBuffer/ConstantBuffer.h"
+#include "RenderTargetCubeArray/RenderTargetCubeArray.h"
 
 namespace T5M::Renderer
 {
-	constexpr size_t SHADOW_MAP_SIZE = 512;
+	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
+	constexpr size_t SHADOW_MAP_SIZE = 256;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 	#define MESH_BITS(x) (1 << x)
 	#define DX11_RELEASE(x) if (x != NULL) x->Release()
@@ -447,6 +449,7 @@ namespace T5M::Renderer
 		T5M::Renderer::Texture2D m_caustics[NUM_CAUSTICS_TEXTURES];
 		T5M::Renderer::Texture2D m_binocularsTexture;
 		T5M::Renderer::Texture2D m_whiteTexture;
+		T5M::Renderer::RenderTargetCubeArray m_shadowMaps;
 	
 		// Level data
 		T5M::Renderer::Texture2D m_titleScreen;
