@@ -760,8 +760,10 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 	
 	Vector3 pos = Vector3(l->pos.xPos - item->pos.xPos, l->pos.yPos - item->pos.yPos, l->pos.zPos - item->pos.zPos);
 
+	// HACK: it seems that a minus sign is required here. I don't know why, but it just works (tm) but we must 
+	// do more tests
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->pos.yRot),
+		TO_RAD(-(item->pos.yRot)),
 		TO_RAD(item->pos.xRot),
 		TO_RAD(item->pos.zRot)
 	);
@@ -771,6 +773,14 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 	rx = pos.x;
 	ry = pos.y;
 	rz = pos.z;
+
+	/*Vector3 boxMin = Vector3(bounds->boundingBox.X1, bounds->boundingBox.Y1, bounds->boundingBox.Z1);
+	Vector3 boxMax = Vector3(bounds->boundingBox.X2, bounds->boundingBox.Y2, bounds->boundingBox.Z2);
+	Vector3 centre = (boxMin + boxMax) / 2.0f;
+	Vector3 extens = boxMax - centre;
+	BoundingBox box = BoundingBox(centre, extens);
+
+	return box.Contains(pos);*/
 
 	if (rx < bounds->boundingBox.X1 || rx > bounds->boundingBox.X2 
 		|| ry < bounds->boundingBox.Y1 || ry > bounds->boundingBox.Y2
