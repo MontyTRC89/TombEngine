@@ -5,9 +5,12 @@
 #include "control.h"
 #include "objectslist.h"
 #include "trmath.h"
+#include <sound.h>
+#include <lara.h>
 
 constexpr auto WRAITH_COUNT = 8;
 
+short WraithSpeed = 64;
 
 struct WRAITH_INFO
 {
@@ -29,15 +32,14 @@ void InitialiseWraith(short itemNumber)
 	item = &g_Level.Items[itemNumber];
 	WRAITH_INFO* wraithData;
 	
-
-	item->data = game_malloc<WRAITH_INFO>(WRAITH_COUNT);
+	wraithData = game_malloc<WRAITH_INFO>(WRAITH_COUNT);
+	item->data = wraithData;
 	item->itemFlags[0] = 0;
 	item->hitPoints = 0;
-	item->speed = 0x40;
+	item->speed = WraithSpeed;
 
 	for (int i = 0; i < WRAITH_COUNT; i++)
 	{
-		wraithData = (WRAITH_INFO*)item->data;
 		wraithData->xPos = item->pos.xPos;
 		wraithData->yPos = item->pos.yPos;
 		wraithData->zPos = item->pos.zPos;
@@ -48,13 +50,156 @@ void InitialiseWraith(short itemNumber)
 		wraithData->unknown02 = 0;
 		wraithData->unknown03 = 0;
 
+		wraithData++;
 	}
-
 }
 
 void WraithControl(short itemNumber)
 {
-	// TODO;
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->pos, 0);
+
+	ITEM_INFO* target;
+	if (item->hitPoints)
+		target = &g_Level.Items[item->hitPoints];
+	else
+		target = LaraItem;
+
+	int x, y, z, distance, dx, dy, dz;
+
+	if (target == LaraItem || target->objectNumber == 445)
+	{
+		x = target->pos.xPos - item->pos.xPos;
+		y = target->pos.yPos;
+		z = target->pos.zPos - item->pos.zPos;
+		distance = SQUARE(x) + SQUARE(z);
+		dy = abs((distance >> 13) - 512);
+	}
+	else
+	{
+		ROOM_INFO* room = &g_Level.Rooms[LaraItem->roomNumber];
+
+		x = room->x + room->ySize * 1024 / 2 - item->pos.xPos;
+		z = room->z + room->xSize * 1024 / 2 - item->pos.zPos;
+
+		distance = SQUARE(x) + SQUARE(z);
+		dy = abs((distance >> 13) - 768);
+		y = room->y + ((room->minfloor - room->maxceiling) / 2);
+	}
+
+	dy = y - item->pos.yPos - dy - 128;
+	short angleH = phd_atan(z, x) - item->pos.yRot;
+
+	short angleV = 0;
+	if (abs(x) <= abs(z))
+		angleV = phd_atan(abs(x) + (abs(z) / 2), dy);
+	else
+		angleV = phd_atan(abs(z) + (abs(x) / 2), dy);
+
+	angleV -= item->pos.xRot;
+
+	int speed = 8 * WraithSpeed / item->speed;
+
+	if (abs(angleH) >= item->itemFlags[2] || angleH > 0 != item->itemFlags[2] > 0)
+	{
+		if (angleH >= 0)
+		{
+			if (item->itemFlags[2] <= 0)
+			{
+				item->itemFlags[2] = 1;
+			}
+			else
+			{
+				item->itemFlags[2] += speed;
+				item->pos.yRot += item->itemFlags[2];
+			}
+		}
+		else if (item->itemFlags[2] >= 0)
+		{
+			item->itemFlags[2] = -1;
+		}
+		else
+		{
+			item->itemFlags[2] -= speed;
+			item->pos.yRot += item->itemFlags[2];
+		}
+	}
+	else
+	{
+		item->pos.yRot += angleH;
+	}
+
+	if (abs(angleV) >= item->itemFlags[3] || angleV > 0 != item->itemFlags[3] > 0)
+	{
+		if (angleV >= 0)
+		{
+			if (item->itemFlags[3] <= 0)
+			{
+				item->itemFlags[3] = 1;
+			}
+			else
+			{
+				item->itemFlags[3] += speed;
+				item->pos.xRot += item->itemFlags[3];
+			}
+		}
+		else if (item->itemFlags[3] >= 0)
+		{
+			item->itemFlags[3] = -1;
+		}
+		else
+		{
+			item->itemFlags[3] -= speed;
+			item->pos.xRot += item->itemFlags[3];
+		}
+	}
+	else
+	{
+		item->pos.xRot += angleV;
+	}
+
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	int ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	int doEffect = 0;
+	if (height < item->pos.yPos || ceiling > item->pos.yPos)
+	{
+		doEffect = 1;
+	}
+
+	item->pos.xPos += item->speed * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	item->pos.yPos += item->speed * phd_sin(item->pos.xRot) >> W2V_SHIFT;
+	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
+
+	IsRoomOutsideNo = NO_ROOM;
+	if (item->roomNumber != IsRoomOutsideNo && IsRoomOutsideNo != NO_ROOM)
+	{
+		ItemNewRoom(itemNumber, IsRoomOutsideNo);
+
+		ROOM_INFO* r = &g_Level.Rooms[IsRoomOutsideNo];
+		short linkNum = NO_ITEM;
+		for (linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].nextItem)
+		{
+			ITEM_INFO* target = &g_Level.Items[linkNum];
+
+			if (target->active)
+			{
+				if (item->objectNumber == ID_WRAITH1 && target->objectNumber == ID_WRAITH2 || 
+					item->objectNumber == ID_WRAITH2 && target->objectNumber == ID_WRAITH1 || 
+					item->objectNumber == ID_WRAITH3 && target->objectNumber == ID_ANIMATING10)
+				{
+					break;
+				}
+			}
+		}
+
+		if (linkNum != NO_ITEM)
+		{
+			item->hitPoints = linkNum;
+		}
+	}
 }
 
 void WraithEffects(int x, int y, int z, short xVel, short yVel, short zVel, int objNumber)
