@@ -580,11 +580,38 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->zoneType = ZONE_BASIC;
 	}
 
+	obj = &Objects[ID_WRAITH1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWraith;
+		obj->control = WraithControl;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_WRAITH2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWraith;
+		obj->control = WraithControl;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
 	obj = &Objects[ID_WRAITH3];
 	if (obj->loaded)
 	{
-		//not decompiled yet and multiple versions of wraiths exist
-	}
+		obj->initialise = InitialiseWraith;
+		obj->control = WraithControl;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}	
 }
 
 static void StartObject(OBJECT_INFO* obj)
