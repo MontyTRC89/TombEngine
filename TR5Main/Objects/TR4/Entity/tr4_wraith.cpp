@@ -49,6 +49,7 @@ void WraithControl(short itemNumber)
 
 	SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->pos, 0);
 
+	// hitPoints stores the target of wraith
 	ITEM_INFO* target;
 	if (item->hitPoints)
 		target = &g_Level.Items[item->hitPoints];
@@ -57,7 +58,7 @@ void WraithControl(short itemNumber)
 
 	int x, y, z, distance, dx, dy, dz, oldX, oldY, oldZ;
 
-	if (target == LaraItem || target->objectNumber == 445)
+	if (target == LaraItem || target->objectNumber == ID_ANIMATING10)
 	{
 		x = target->pos.xPos - item->pos.xPos;
 		y = target->pos.yPos;
@@ -165,6 +166,7 @@ void WraithControl(short itemNumber)
 	item->pos.zPos += item->speed * phd_cos(item->pos.yRot) >> W2V_SHIFT;
 
 	IsRoomOutsideNo = NO_ROOM;
+	IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	if (item->roomNumber != IsRoomOutsideNo && IsRoomOutsideNo != NO_ROOM)
 	{
 		ItemNewRoom(itemNumber, IsRoomOutsideNo);
@@ -243,9 +245,9 @@ void WraithControl(short itemNumber)
 			}
 			if (item->hitPoints)
 			{
-				if (item->TOSSPAD & 0x3E00)
+				if (item->TOSSPAD /*& 0x3E00*/)
 				{
-					item->TOSSPAD = ((item->TOSSPAD & 0xFE00) - 1) & 0x3E00;
+					item->TOSSPAD--; // = ((item->TOSSPAD & 0xFE00) - 1) & 0x3E00;
 				}
 			}
 		}
@@ -273,8 +275,8 @@ void WraithControl(short itemNumber)
 		else if (target->objectNumber == ID_ANIMATING10)
 		{
 			// ANIMATING10 is the sacred pedistal that can kill WRAITH
-			item->TOSSPAD = ((item->TOSSPAD & 0xFE00) + 512) & 0x3E00; // HACK: maybe create new var for this 
-			if (item->TOSSPAD & 0x3E00 > 12800)
+			item->TOSSPAD++; // ((item->TOSSPAD & 0xFE00) + 512) & 0x3E00; // HACK: maybe create new var for this 
+			if (item->TOSSPAD > 25 /* (item->TOSSPAD & 0x3E00) > 12800*/)
 			{
 				item->pos.xPos = target->pos.xPos;
 				item->pos.yPos = target->pos.yPos - 384;
@@ -293,8 +295,8 @@ void WraithControl(short itemNumber)
 		else
 		{
 			// Target is another WRAITH (fire vs ice), they kill both themselves
-			item->TOSSPAD = item->TOSSPAD & 0xD5FF | 0x1400;
-			if (item->TOSSPAD & 0x3E00)
+			item->TOSSPAD = item->TOSSPAD & 0xD5 | 0x14;
+			if (item->TOSSPAD /*& 0x3E00*/)
 			{
 				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
 				target->hitPoints = 0;
@@ -325,13 +327,13 @@ void WraithControl(short itemNumber)
 	int j = 0;
 	for (int i = WRAITH_COUNT - 1; i > 0; i--)
 	{
-		creature[i - 1].xPos += (creature[i - 1].xRot / 16);
-		creature[i - 1].yPos += (creature[i - 1].yRot / 16);
-		creature[i - 1].zPos += (creature[i - 1].zRot / 16);
+		creature[i - 1].xPos += (creature[i - 1].xRot >> 4);
+		creature[i - 1].yPos += (creature[i - 1].yRot >> 4);
+		creature[i - 1].zPos += (creature[i - 1].zRot >> 4);
 
-		creature[i - 1].xRot -= (creature[i - 1].xRot / 16);
-		creature[i - 1].yRot -= (creature[i - 1].yRot / 16);
-		creature[i - 1].zRot -= (creature[i - 1].zRot / 16);
+		creature[i - 1].xRot -= (creature[i - 1].xRot >> 4);
+		creature[i - 1].yRot -= (creature[i - 1].yRot >> 4);
+		creature[i - 1].zRot -= (creature[i - 1].zRot >> 4);
 
 		creature[i].xPos = creature[i - 1].xPos;
 		creature[i].yPos = creature[i - 1].yPos;
@@ -367,9 +369,9 @@ void WraithControl(short itemNumber)
 	creature[0].yPos = item->pos.yPos;
 	creature[0].zPos = item->pos.zPos;
 
-	creature[0].xRot = (item->pos.xPos - oldX);
-	creature[0].yRot = (item->pos.yPos - oldY);
-	creature[0].zRot = (item->pos.zPos - oldZ);
+	creature[0].xRot = 4 * (item->pos.xPos - oldX);
+	creature[0].yRot = 4 * (item->pos.yPos - oldY);
+	creature[0].zRot = 4 * (item->pos.zPos - oldZ);
 
 	// Standard WRAITH drawing code
 	DrawWraith(

@@ -566,6 +566,7 @@ namespace T5M::Renderer
 		bool											drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
 		bool drawStatics(bool transparent, RenderView& view);
 		bool											drawWaterfalls();
+		bool											drawWraithExtra(RendererItem* item, bool transparent, bool animated);
 		bool											drawShadowMap();
 		bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
 		bool											drawLara(bool transparent, bool shadowMap);

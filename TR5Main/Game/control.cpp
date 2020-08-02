@@ -43,11 +43,13 @@
 #include "spark.h"
 #include "explosion.h"
 #include "drip.h"
+
 using std::vector;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
 using T5M::Renderer::g_Renderer;
+
 short ShatterSounds[18][10] =
 	{
 		{SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS},
@@ -147,11 +149,13 @@ short FlashFadeR;
 short FlashFadeG;
 short FlashFadeB;
 short FlashFader;
-short IsRoomOutsideNo;
 
 int TiltXOffset;
 int TiltYOffset;
 int FramesCount;
+
+std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
+short IsRoomOutsideNo;
 
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
@@ -3239,21 +3243,18 @@ void InterpolateAngle(short angle, short *rotation, short *outAngle, int shift)
 
 int IsRoomOutside(int x, int y, int z)
 {
-	return 0;
-	/*
-	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
-	if (offset == -1)
-		return -2;
+	int xTable = x / 4 / 1024;
+	int zTable = z / 4 / 1024;
 
-	if (offset < 0)
+	for (int i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
-		ROOM_INFO* r = &g_Level.Rooms[(offset & 0x7FFF)];
+		short roomNumber = OutsideRoomTable[xTable][zTable][i];
+		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 		if ((y > r->maxceiling) && (y < r->minfloor)
 			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
 			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
 		{
-			short roomNumber = offset & 0x7fff;
 			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 			int height = GetFloorHeight(floor, x, y, z);
 			if (height == NO_HEIGHT || y > height)
@@ -3265,41 +3266,10 @@ int IsRoomOutside(int x, int y, int z)
 			if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
 				return -3;
 
-			IsRoomOutsideNo = offset & 0x7FFF;
+			IsRoomOutsideNo = roomNumber;
 			return 1;
 		}
-		else
-			return -2;
 	}
-	else
-	{
-		unsigned char* s = &OutsideRoomTable[offset];
 
-		while (*s != 0xFF)
-		{
-			ROOM_INFO* r = &g_Level.Rooms[*s];
-
-			if ((y > r->maxceiling && y < r->minfloor)
-				&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
-				&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
-			{
-				short roomNumber = *s;
-				FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-				int height = GetFloorHeight(floor, x, y, z);
-				if (height == NO_HEIGHT || y > height)
-					return -2;
-				height = GetCeiling(floor, x, y, z);
-				if (y < height)
-					return -2;
-
-				if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
-					return -3;
-
-				IsRoomOutsideNo = *s;
-				return 1;
-			}
-			s++;
-		}
-		return -2;
-	}*/
+	return -2;
 }

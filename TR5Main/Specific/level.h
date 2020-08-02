@@ -166,5 +166,6 @@ void LoadAIObjects();
 FILE* FileOpen(const char* fileName);
 void FileClose(FILE* ptr);
 bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
+void BuildOutsideRoomsTable();
 
 unsigned CALLBACK LoadLevel(void* data);
