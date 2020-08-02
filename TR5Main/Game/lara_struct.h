@@ -726,14 +726,14 @@ typedef enum LARA_MESHES
 	NUM_LARA_MESHES
 };
 
-typedef enum LARA_WEAPON_TYPE
+enum LARA_WEAPON_TYPE
 {
 	WEAPON_NONE,
 	WEAPON_PISTOLS,
 	WEAPON_REVOLVER,
 	WEAPON_UZI,
 	WEAPON_SHOTGUN,
-	WEAPON_HK,
+	WEAPON_HK = 5,
 	WEAPON_CROSSBOW,
 	WEAPON_FLARE,
 	WEAPON_TORCH,
@@ -756,11 +756,30 @@ typedef enum LARA_WEAPON_TYPE_CARRIED
 	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
 };
 
+
 typedef enum LARA_CLOTH_TYPES
 {
 	CLOTH_MISSING,
 	CLOTH_DRY,
 	CLOTH_WET
+};
+enum class HOLSTER_SLOT : int {
+	Empty = ID_LARA_HOLSTERS,
+	Pistols = ID_LARA_HOLSTERS_PISTOLS,
+	Uzis = ID_LARA_HOLSTERS_UZIS,
+	Revolver = ID_LARA_HOLSTERS_REVOLVER,
+	Shotgun = ID_SHOTGUN_ANIM,
+	HK = ID_HK_ANIM,
+	Harpoon = ID_HARPOON_ANIM,
+	Crowssbow = ID_CROSSBOW_ANIM,
+	GrenadeLauncher = ID_GRENADE_ANIM,
+	RocketLauncher = ID_ROCKET_ANIM,
+
+};
+struct HolsterInfo {
+	HOLSTER_SLOT leftHoster;
+	HOLSTER_SLOT rightHolster;
+	HOLSTER_SLOT backHolster;
 };
 
 typedef struct CarriedWeaponInfo
@@ -819,7 +838,7 @@ typedef struct LaraInfo
 	short flareAge;
 	short burnCount;
 	short weaponItem;
-	short backGun;
+	HolsterInfo holsterInfo;
 	short flareFrame;
 	short poisoned;
 	short dpoisoned;
@@ -859,9 +878,6 @@ typedef struct LaraInfo
 	short torsoZrot;
 	LARA_ARM leftArm;
 	LARA_ARM rightArm;
-	// changing it to holster_left/holster_right will be good instead of doing the 2 at the same time !
-	// note: no need 65535 for holster, just 255 is fine...
-	byte holster;
 	CREATURE_INFO* creature;
 	int cornerX;
 	int cornerZ;
@@ -898,7 +914,7 @@ typedef struct LaraInfo
 	short ExtraAnim;
 	bool mineL;
 	bool mineR;
-	CarriedWeaponInfo Weapons[NUM_WEAPONS];
+	CarriedWeaponInfo Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 	DiaryInfo Diary;
 	WaterskinInfo Waterskin1;
 	WaterskinInfo Waterskin2;

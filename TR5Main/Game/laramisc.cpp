@@ -751,16 +751,16 @@ void LaraInitialiseMeshes() // (AF) (D)
 
 	if (Lara.gunType == WEAPON_HK)
 	{
-		Lara.backGun = WEAPON_HK;
+		Lara.holsterInfo.backHolster = HOLSTER_SLOT::HK;
 	}
 	else if (!Lara.Weapons[WEAPON_SHOTGUN].Present)
 	{
 		if (Lara.Weapons[WEAPON_HK].Present)
-			Lara.backGun = WEAPON_HK;
+			Lara.holsterInfo.backHolster = HOLSTER_SLOT::HK;
 	}
 	else
 	{
-		Lara.backGun = WEAPON_UZI;
+		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Uzis;
 	}
 
 	Lara.gunStatus = LG_NO_ARMS;
@@ -803,7 +803,8 @@ void InitialiseLara(int restore)
 	Lara.dpoisoned = 0;
 	Lara.poisoned = 0;
 	Lara.waterSurfaceDist = 100;
-	Lara.holster = ID_LARA_HOLSTERS_PISTOLS;
+	Lara.holsterInfo.leftHoster = HOLSTER_SLOT::Pistols;
+	Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Pistols;
 	Lara.location = -1;
 	Lara.highestLocation = -1;
 	Lara.ropePtr = -1;
