@@ -4,6 +4,7 @@
 #include "winmain.h"
 #include "GameFlowScript.h"
 #include "Quad/RenderQuad.h"
+#include <string>
 using namespace T5M::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
@@ -66,11 +67,14 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	m_whiteTexture = Texture2D(m_device, L"WhiteSprite.png");
 
 	m_logo = Texture2D(m_device, L"Logo.png");
-	m_shadowMaps = RenderTargetCubeArray(m_device, SHADOW_MAP_SIZE, MAX_DYNAMIC_SHADOWS, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_D16_UNORM);
+	m_shadowMaps = RenderTargetCubeArray(m_device, g_Configuration.shadowMapSize, MAX_DYNAMIC_SHADOWS, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_D16_UNORM);
 	// Load shaders
 	ID3D10Blob * blob;
-
-	m_vsRooms = compileVertexShader(L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &blob);
+	//char shadowMapStringBuff[4];
+	//_itoa(g_Configuration.shadowMapSize, shadowMapStringBuff,10);
+	std::string shadowSizeString = std::to_string(g_Configuration.shadowMapSize);
+	const D3D_SHADER_MACRO roomDefines[] = {"SHADOW_MAP_SIZE",shadowSizeString.c_str(),nullptr,nullptr};
+	m_vsRooms = Utils::compileVertexShader(m_device,L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefines[0], &blob);
 
 	// Initialise input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
@@ -86,29 +90,31 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	m_inputLayout = NULL;
 	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 7, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
-	m_psRooms = compilePixelShader(L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_0", &blob);
-	m_vsItems = compileVertexShader(L"Shaders\\DX11_Items.fx", "VS", "vs_4_0", &blob);
-	m_psItems = compilePixelShader(L"Shaders\\DX11_Items.fx", "PS", "ps_4_0", &blob);
-	m_vsStatics = compileVertexShader(L"Shaders\\DX11_Statics.fx", "VS", "vs_4_0", &blob);
-	m_psStatics = compilePixelShader(L"Shaders\\DX11_Statics.fx", "PS", "ps_4_0", &blob);
-	m_vsHairs = compileVertexShader(L"Shaders\\DX11_Hairs.fx", "VS", "vs_4_0", &blob);
-	m_psHairs = compilePixelShader(L"Shaders\\DX11_Hairs.fx", "PS", "ps_4_0", &blob);
-	m_vsSky = compileVertexShader(L"Shaders\\DX11_Sky.fx", "VS", "vs_4_0", &blob);
-	m_psSky = compilePixelShader(L"Shaders\\DX11_Sky.fx", "PS", "ps_4_0", &blob);
-	m_vsSprites = compileVertexShader(L"Shaders\\DX11_Sprites.fx", "VS", "vs_4_0", &blob);
-	m_psSprites = compilePixelShader(L"Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", &blob);
-	m_vsSolid = compileVertexShader(L"Shaders\\DX11_Solid.fx", "VS", "vs_4_0", &blob);
-	m_psSolid = compilePixelShader(L"Shaders\\DX11_Solid.fx", "PS", "ps_4_0", &blob);
-	m_vsInventory = compileVertexShader(L"Shaders\\DX11_Inventory.fx", "VS", "vs_4_0", &blob);
-	m_psInventory = compilePixelShader(L"Shaders\\DX11_Inventory.fx", "PS", "ps_4_0", &blob);
-	m_vsFullScreenQuad = compileVertexShader(L"Shaders\\DX11_FullScreenQuad.fx", "VS", "vs_4_0", &blob);
-	m_psFullScreenQuad = compilePixelShader(L"Shaders\\DX11_FullScreenQuad.fx", "PS", "ps_4_0", &blob);
-	m_vsShadowMap = compileVertexShader(L"Shaders\\DX11_ShadowMap.fx", "VS", "vs_4_0", &blob);
-	m_psShadowMap = compilePixelShader(L"Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", &blob);
-	m_vsHUD = compileVertexShader(L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", &blob);
-	m_psHUDColor = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", &blob);
-	m_psHUDTexture = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", &blob);
-	m_psHUDBarColor = compilePixelShader(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", &blob);
+	
+	m_psRooms = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_0", &roomDefines[0], &blob);
+	m_vsItems = Utils::compileVertexShader(m_device, L"Shaders\\DX11_Items.fx", "VS", "vs_4_0", nullptr, &blob);
+	m_psItems = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Items.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsStatics = Utils::compileVertexShader(m_device, L"Shaders\\DX11_Statics.fx", "VS", "vs_4_0", nullptr, &blob);
+	m_psStatics = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Statics.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsHairs = Utils::compileVertexShader(m_device, L"Shaders\\DX11_Hairs.fx", "VS", "vs_4_0", nullptr, &blob);
+	m_psHairs = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Hairs.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsSky = Utils::compileVertexShader(m_device, L"Shaders\\DX11_Sky.fx", "VS", "vs_4_0", nullptr, &blob);
+	m_psSky = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Sky.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsSprites = Utils::compileVertexShader(m_device, L"Shaders\\DX11_Sprites.fx", "VS", "vs_4_0", nullptr, &blob);
+	m_psSprites = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Sprites.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsSolid = Utils::compileVertexShader(m_device, L"Shaders\\DX11_Solid.fx", "VS", "vs_4_0", nullptr, &blob);
+	m_psSolid = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Solid.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsInventory = Utils::compileVertexShader(m_device, L"Shaders\\DX11_Inventory.fx", "VS", "vs_4_0",nullptr, &blob);
+	m_psInventory = Utils::compilePixelShader(m_device, L"Shaders\\DX11_Inventory.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsFullScreenQuad = Utils::compileVertexShader(m_device, L"Shaders\\DX11_FullScreenQuad.fx", "VS", "vs_4_0",nullptr, &blob);
+	m_psFullScreenQuad = Utils::compilePixelShader(m_device, L"Shaders\\DX11_FullScreenQuad.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsShadowMap = Utils::compileVertexShader(m_device, L"Shaders\\DX11_ShadowMap.fx", "VS", "vs_4_0", nullptr, &blob);
+	m_psShadowMap = Utils::compilePixelShader(m_device, L"Shaders\\DX11_ShadowMap.fx", "PS", "ps_4_0", nullptr, &blob);
+	m_vsHUD = Utils::compileVertexShader(m_device, L"Shaders\\HUD\\DX11_VS_HUD.hlsl", "VS", "vs_4_0", nullptr, &blob);
+	m_psHUDColor = Utils::compilePixelShader(m_device, L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", nullptr, &blob);
+	m_psHUDTexture = Utils::compilePixelShader(m_device,L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, &blob);
+	m_psHUDBarColor = Utils::compilePixelShader(m_device,L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSColored", "ps_4_0", nullptr, &blob);
+	m_shadowMap = RenderTarget2D(m_device, g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers
 	m_cbCameraMatrices = createConstantBuffer<CCameraMatrixBuffer>();
@@ -274,7 +280,6 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	// Initialise buffers
 	m_renderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
-	m_shadowMap = RenderTarget2D(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
 	m_reflectionCubemap = RenderTargetCube(m_device, 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	// Shadow map
 	/*D3D11_TEXTURE2D_DESC depthTexDesc;
@@ -326,8 +331,8 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 
 	m_shadowMapViewport.TopLeftX = 0;
 	m_shadowMapViewport.TopLeftY = 0;
-	m_shadowMapViewport.Width = SHADOW_MAP_SIZE;
-	m_shadowMapViewport.Height = SHADOW_MAP_SIZE;
+	m_shadowMapViewport.Width = g_Configuration.shadowMapSize;
+	m_shadowMapViewport.Height = g_Configuration.shadowMapSize;
 	m_shadowMapViewport.MinDepth = 0.0f;
 	m_shadowMapViewport.MaxDepth = 1.0f;
 

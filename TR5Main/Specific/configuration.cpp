@@ -285,8 +285,12 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, g_Configuration.RefreshRate) != ERROR_SUCCESS)
-	{
+	if(SetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, g_Configuration.RefreshRate) != ERROR_SUCCESS){
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if(SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.shadowMapSize) != ERROR_SUCCESS){
 		RegCloseKey(rootKey);
 		return false;
 	}
@@ -327,6 +331,7 @@ void InitDefaultConfiguration()
 	g_Configuration.SfxVolume = 100;
 	g_Configuration.Width = 1366;
 	g_Configuration.Height = 768;
+	g_Configuration.shadowMapSize = 512;
 }
 
 bool LoadConfiguration()
@@ -462,7 +467,7 @@ bool LoadConfiguration()
 	g_Configuration.SfxVolume = sfxVolume;
 	g_Configuration.RefreshRate = refreshRate;
 	g_Configuration.SoundDevice = soundDevice;
-
+	g_Configuration.shadowMapSize = 512;
 	// Set legacy variables
 	//OptionAutoTarget = autoTarget;
 	GlobalMusicVolume = musicVolume;

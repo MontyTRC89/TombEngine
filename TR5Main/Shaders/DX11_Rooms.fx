@@ -80,7 +80,7 @@ PixelShaderInput VS(VertexShaderInput input)
 }
 
 float2 texOffset(int u, int v) {
-	return float2(u * 1.0f / 256, v * 1.0f / 256);
+	return float2(u * 1.0f / SHADOW_MAP_SIZE, v * 1.0f / SHADOW_MAP_SIZE);
 }
 
 float4 PS(PixelShaderInput input) : SV_TARGET
@@ -123,7 +123,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			}
 
 			float shadowFactor = sum / 16.0;
-			lighting = lerp(lighting, min(AmbientColor*2,lighting), 1-saturate(shadowFactor));
+			lighting = lerp(lighting, min(AmbientColor,lighting), 1-saturate(shadowFactor));
 		}
 	}
 
