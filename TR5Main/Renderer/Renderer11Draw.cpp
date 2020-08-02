@@ -19,6 +19,7 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
+#include <Objects\TR4\Entity\tr4_wraith.h>
 #include "RenderView/RenderView.h"
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
@@ -2181,6 +2182,12 @@ namespace T5M::Renderer
                 // We'll draw waterfalls later
                 continue;
             }
+			else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
+			{
+				// Wraiths have some additional special effects
+				drawAnimatingItem(item, transparent, animated);
+				drawWraithExtra(item, transparent, animated);
+			}
             else
             {
                 drawAnimatingItem(item, transparent, animated);
@@ -2266,6 +2273,62 @@ namespace T5M::Renderer
             return drawAnimatingItem(item, transparent, animated);
         }
     }
+
+	bool Renderer11::drawWraithExtra(RendererItem* item, bool transparent, bool animated)
+	{
+		ITEM_INFO* nativeItem = item->Item;
+		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
+		
+		if (transparent || animated)
+			return true;
+
+		for (int j = 0; j <= 4; j++)
+		{
+			Matrix rotation;
+
+			switch (j)
+			{
+			case 0:
+				rotation = Matrix::CreateRotationY(TO_RAD(-1092));
+				break;
+			case 1:
+				rotation = Matrix::CreateRotationY(TO_RAD(1092));
+				break;
+			case 2:
+				rotation = Matrix::CreateRotationZ(TO_RAD(-1092));
+				break;
+			case 3:
+				rotation = Matrix::CreateRotationZ(TO_RAD(1092));
+				break;
+			default:
+				rotation = Matrix::Identity;
+				break;
+			}
+
+			Matrix world = rotation * item->World;
+
+			/*for (int i = 0; i < 7; i++)
+			{
+				Vector3 p1 = Vector3(info[i].xPos - nativeItem->pos.xPos, info[i].yPos - nativeItem->pos.yPos, info[i].zPos - nativeItem->pos.zPos);
+				Vector3 p2 = Vector3(info[i+1].xPos - info[i  ].xPos, info[i + 1].yPos - info[i  ].yPos, info[i + 1].zPos - info[i ].zPos);
+
+				p1 = Vector3::Transform(p1, world);
+				p2 = Vector3::Transform(p2, world);
+
+				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
+			}*/
+
+			for (int i = 0; i < 7; i++)
+			{
+				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
+				Vector3 p2 = Vector3(info[i + 1].xPos , info[i + 1].yPos, info[i + 1].zPos);
+
+				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
+			}
+		}
+
+		return true;
+	}
 
     bool Renderer11::drawStatics(bool transparent, RenderView &view)
     {
