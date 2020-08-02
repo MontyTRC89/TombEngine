@@ -30,7 +30,6 @@ struct CAMERA_INFO;
 namespace T5M::Renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
-	constexpr size_t SHADOW_MAP_SIZE = 256;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 	#define MESH_BITS(x) (1 << x)
 	#define DX11_RELEASE(x) if (x != NULL) x->Release()
@@ -535,12 +534,7 @@ namespace T5M::Renderer
 		int m_pickupRotation;
 	
 		// Private functions
-		bool											drawScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, CCameraMatrixBuffer& camera);
 		bool											drawAllStrings();
-		ID3D11VertexShader*								compileVertexShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
-		ID3D11GeometryShader*							compileGeometryShader(const wchar_t * fileName);
-		ID3D11PixelShader*								compilePixelShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
-		ID3D11ComputeShader*							compileComputeShader(const wchar_t * fileName);
 		int												getAnimatedTextureInfo(short textureId);
 		void											initialiseHairRemaps();
 		RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
@@ -628,7 +622,12 @@ namespace T5M::Renderer
 		int ScreenHeight;
 		bool Windowed;
 		int NumTexturePages;
-	
+		ID3D11Device* getDevice() const {
+			return m_device;
+		}
+		ID3D11DeviceContext* getContext() const {
+			return m_context;
+		};
 		Renderer11();
 		~Renderer11();
 	
