@@ -3862,7 +3862,7 @@ void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)//16DB8(<), 16EEC(<) (F)
 {
 	coll->enableBaddiePush = false;
 	coll->enableSpaz = false;
-	item->goalAnimState = STATE_LARA_MONKEYSWING_TURNAROUND;
+	item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
 }
 
 void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)//16D64(<), 16E98(<) (F)
@@ -4154,10 +4154,7 @@ void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll)//163DC, 16510 (F)
 		}
 		else if ((TrInput & IN_ROLL) && EnableMonkeyRoll == true)
 			{
-				item->currentAnimState = STATE_LARA_MONKEYSWING_TURNAROUND;
-				item->goalAnimState = STATE_LARA_MONKEYSWING_IDLE;
-				item->animNumber = ANIMATION_LARA_MONKEY_TURN_AROUND;
-				item->frameNumber = g_Level.Anims[ANIMATION_LARA_MONKEY_TURN_AROUND].frameBase;
+			item->goalAnimState = STATE_LARA_MONKEYSWING_TURNAROUND;
 			}
 
 		MonkeySwingSnap(item, coll);
