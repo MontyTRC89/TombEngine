@@ -1009,7 +1009,7 @@ int UpdateLOT(LOT_INFO* LOT, int depth)
 {
 	BOX_NODE* node;
 
-	printf("LOT->head: %d, LOT->tail: %d\n", LOT->head, LOT->tail);
+	//printf("LOT->head: %d, LOT->tail: %d\n", LOT->head, LOT->tail);
 
 	if (LOT->requiredBox != NO_BOX && LOT->requiredBox != LOT->targetBox)
 	{
