@@ -812,7 +812,13 @@ void do_pickup()
 			}
 			else
 			{
-				if (LaraItem->currentAnimState == STATE_LARA_PICKUP || LaraItem->currentAnimState == STATE_LARA_PICKUP_FROM_CHEST || LaraItem->currentAnimState == STATE_LARA_HOLE)
+				if (LaraItem->animNumber == ANIMATION_LARA_CROWBAR_USE_ON_WALL2)
+				{ 
+					AddDisplayPickup(ID_CROWBAR_ITEM);
+					Lara.Crowbar = true;
+					KillItem(pickupitem);
+				}
+				else if (LaraItem->currentAnimState == STATE_LARA_PICKUP || LaraItem->currentAnimState == STATE_LARA_PICKUP_FROM_CHEST || LaraItem->currentAnimState == STATE_LARA_HOLE)
 				{
 					AddDisplayPickup(item->objectNumber);
 					if (item->triggerFlags & 0x100)
