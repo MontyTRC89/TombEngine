@@ -18,6 +18,8 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "pickup.h"
+#include "larafire.h"
+
 using std::function;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 int wf = 256;
@@ -42,8 +44,8 @@ function<EffectFunction> effect_routines[59] =
 	ExplosionFX,
 	lara_hands_free,
 	puzzle,
-	void_effect,
-	void_effect,
+	draw_right_pistol,
+	draw_left_pistol,
 	shoot_right_gun,
 	shoot_left_gun,
 	void_effect,
@@ -143,6 +145,34 @@ void invisibility_on(ITEM_INFO* item)
 void SetFog(ITEM_INFO* item)//39A44(<), 39F44(<) (F)
 {
 	FlipEffect = -1;
+}
+
+void draw_left_pistol(ITEM_INFO* item)
+{
+	if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
+	{
+		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(WEAPON_PISTOLS)].meshIndex + LM_LHAND;
+		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Empty;
+	}
+	else
+	{
+		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+		Lara.holsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+	}
+}
+
+void draw_right_pistol(ITEM_INFO* item)
+{
+	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
+	{
+		Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(WEAPON_PISTOLS)].meshIndex + LM_RHAND;
+		Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
+	}
+	else
+	{
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+		Lara.holsterInfo.rightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+	}
 }
 
 void shoot_left_gun(ITEM_INFO* item)//39A34(<), 39F34(<) (F)

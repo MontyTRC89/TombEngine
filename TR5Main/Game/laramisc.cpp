@@ -803,7 +803,7 @@ void InitialiseLara(int restore)
 	Lara.dpoisoned = 0;
 	Lara.poisoned = 0;
 	Lara.waterSurfaceDist = 100;
-	Lara.holsterInfo.leftHoster = HOLSTER_SLOT::Pistols;
+	Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Pistols;
 	Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Pistols;
 	Lara.location = -1;
 	Lara.highestLocation = -1;
