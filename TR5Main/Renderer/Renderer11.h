@@ -613,6 +613,7 @@ namespace T5M::Renderer
 		bool                                            drawDripParticles();
 		bool											drawExplosionParticles();
 		void renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumber);
+		void drawLaraHolsters(bool transparent);
 	public:
 		DirectX::SimpleMath::Matrix View;
 		DirectX::SimpleMath::Matrix Projection;

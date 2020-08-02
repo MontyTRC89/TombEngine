@@ -1510,14 +1510,14 @@ void undraw_shotgun(int weapon)
 
 void undraw_shotgun_meshes(int weapon)
 {
-	Lara.backGun = WeaponObject(weapon);
+	Lara.holsterInfo.backHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weapon));
 	//LARA_MESHES(ID_LARA, LM_RHAND);
 	Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void draw_shotgun_meshes(int weaponType)
 {
-	Lara.backGun = WEAPON_NONE;
+	Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
 	//LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
 	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_RHAND;
 }
