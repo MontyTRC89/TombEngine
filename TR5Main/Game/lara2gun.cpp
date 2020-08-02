@@ -364,21 +364,19 @@ void undraw_pistol_mesh_left(int weaponType)
 		//LARA_MESHES(ID_LARA, LM_LHAND);
 		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 		
-		Lara.holsterInfo.leftHoster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
+		Lara.holsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
 	}
 }
 
 void draw_pistol_meshes(int weaponType)
 {
 	if(static_cast<LARA_WEAPON_TYPE>(weaponType) != LARA_WEAPON_TYPE::WEAPON_REVOLVER){
-		Lara.holsterInfo.leftHoster = HOLSTER_SLOT::Empty;
+		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Empty;
 	}
 	Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
 
-	//LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
 	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_RHAND;
 	if (static_cast<LARA_WEAPON_TYPE>(weaponType) != LARA_WEAPON_TYPE::WEAPON_REVOLVER)
-		//LARA_MESHES(WeaponObjectMesh(weaponType), LM_LHAND);
 		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_LHAND;
 }
 
