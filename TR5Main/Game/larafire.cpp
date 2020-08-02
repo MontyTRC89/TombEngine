@@ -18,6 +18,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "GameFlowScript.h"
+#include "lara_struct.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -1580,4 +1581,30 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	if (roomNumber != item->roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
+}
+
+HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon)
+{
+	switch(weapon){
+		case WEAPON_PISTOLS:
+			return HOLSTER_SLOT::Pistols;
+		case WEAPON_UZI:
+			return HOLSTER_SLOT::Uzis;
+		case WEAPON_REVOLVER:
+			return HOLSTER_SLOT::Revolver;
+		case WEAPON_SHOTGUN:
+			return HOLSTER_SLOT::Shotgun;
+		case WEAPON_HK:
+			return HOLSTER_SLOT::HK;
+		case WEAPON_HARPOON_GUN:
+			return HOLSTER_SLOT::Harpoon;
+		case WEAPON_CROSSBOW:
+			return HOLSTER_SLOT::Crowssbow;
+		case WEAPON_GRENADE_LAUNCHER:
+			return HOLSTER_SLOT::GrenadeLauncher;
+		case WEAPON_ROCKET_LAUNCHER:
+			return HOLSTER_SLOT::RocketLauncher;
+		default:
+			return HOLSTER_SLOT::Empty;
+	}
 }
