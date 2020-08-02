@@ -855,6 +855,9 @@
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1554,6 +1557,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderPipelineState\RenderPipelineState.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
