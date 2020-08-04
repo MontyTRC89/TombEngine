@@ -3243,8 +3243,14 @@ void InterpolateAngle(short angle, short *rotation, short *outAngle, int shift)
 
 int IsRoomOutside(int x, int y, int z)
 {
+	if (x < 0 || z < 0)
+		return -2;
+
 	int xTable = x / 4 / 1024;
 	int zTable = z / 4 / 1024;
+
+	if (OutsideRoomTable[xTable][zTable].size() == 0)
+		return -2;
 
 	for (int i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
@@ -3255,6 +3261,8 @@ int IsRoomOutside(int x, int y, int z)
 			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
 			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
 		{
+			IsRoomOutsideNo = roomNumber;
+
 			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 			int height = GetFloorHeight(floor, x, y, z);
 			if (height == NO_HEIGHT || y > height)
@@ -3263,11 +3271,7 @@ int IsRoomOutside(int x, int y, int z)
 			if (y < height)
 				return -2;
 
-			if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
-				return -3;
-
-			IsRoomOutsideNo = roomNumber;
-			return 1;
+			return ((r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? 1 : -3);
 		}
 	}
 
