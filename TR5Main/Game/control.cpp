@@ -532,7 +532,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		//SoundEffects();
 
-		HealtBarTimer--;
+		HealthBarTimer--;
 
 		GameTimer++;
 	}
