@@ -5289,7 +5289,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 	GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &roomNum);
 
 	// FOR DEBUG PURPOSES UNTIL SCRIPTING IS FINISHED-
-		EnableCrouchRoll = true;
+	EnableCrouchRoll = true;
 
 
 	if ((TrInput & IN_FORWARD || TrInput & IN_BACK)
@@ -5297,8 +5297,7 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 		&& Lara.gunStatus == LG_NO_ARMS
 		&& Lara.waterStatus != LW_WADE
 		|| Lara.waterSurfaceDist == 256
-		&& !(Lara.waterSurfaceDist > 256)
-		/*&& !(g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)*/)
+		&& !(Lara.waterSurfaceDist > 256))
 	{
 
 		if ((item->animNumber == LA_CROUCH_IDLE
@@ -5308,78 +5307,55 @@ void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
 		{
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
-
 			item->goalAnimState = LS_CRAWL_IDLE;
 		}
 
 	}
-		else 
+	else if ((TrInput & IN_SPRINT) /*crouch roll*/
+		&& (TrInput & IN_DUCK || Lara.keepDucked)
+		&& Lara.gunStatus == LG_NO_ARMS
+		&& Lara.waterStatus != LW_WADE
+		|| Lara.waterSurfaceDist == 256
+		&& !(Lara.waterSurfaceDist > 256)
+		&& EnableCrouchRoll == true)
+	{
+		if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor
+			TestWall(item, 1024, 0, -256))			//4 clicks away from walls 
+			return;
 
-			/*crouch roll*/
-			if ((TrInput & IN_SPRINT) //maybe change this roll? or jump?
-				&& (TrInput & IN_DUCK || Lara.keepDucked)
-				&& Lara.gunStatus == LG_NO_ARMS
-				&& Lara.waterStatus != LW_WADE
-				|| Lara.waterSurfaceDist == 256
-				&& !(Lara.waterSurfaceDist > 256)
-				&& EnableCrouchRoll == true)
-				//&& !(g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)) //is this necessary?- update: nope, it's not
-			{   
-				lara_as_crouch_roll(item, coll);
-			}
-	
+		if (!(TrInput & IN_FLARE || TrInput & IN_DRAW) //avoids some flare spawning/wep stuff
+			&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
+
+		{
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			item->goalAnimState = LS_CROUCH_ROLL;
+		}
+	}
 }
 
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-
-	/*stop Lara from doing it in these conditions to avoid trouble*/
-	if (LaraFloorFront(item, item->pos.yRot, 1024) >= 384 ||  //4 clicks away from holes in the floor	
-		TestWall(item, 1024, 0, -256))			//4 clicks away from walls		 
-	{
-		return;
-	}
-
-	/*do actual anim*/
-	if ((item->animNumber == LA_CROUCH_IDLE //)
-		|| item->animNumber == LA_STAND_TO_CROUCH_END) // not exactly necessary but makes gameplay much faster, make optional in the future.
-		&& !(TrInput & IN_FLARE || TrInput & IN_DRAW) //avoids some flare spawning/wep stuff
-		&& (Lara.gunType != WEAPON_FLARE || Lara.flareAge < 900 && Lara.flareAge != 0))
-
-	{
-		Lara.torsoYrot = 0;
-		Lara.torsoXrot = 0;
-
-		lara_col_crouch_roll(item, coll);
-		item->currentAnimState = LS_CROUCH_ROLL;
-		item->goalAnimState = LS_CROUCH_IDLE;
-		item->animNumber = LA_CROUCH_ROLL_FORWARD_START_ALTERNATE;
-		item->frameNumber = g_Level.Anims[LA_CROUCH_ROLL_FORWARD_START_ALTERNATE].frameBase; //fix it being slow
-
-	}
+	Camera.targetElevation = -ANGLE(20.0f);
+	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
 
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_CROUCH_IDLE;
-		return;
-	}
-	
-		Lara.isDucked = true;
-		item->gravityStatus = false;
-		item->fallspeed = 0;
-		Lara.moveAngle = item->pos.yRot;
-		coll->facing = item->pos.yRot;
-		coll->badPos = STEPUP_HEIGHT;
-		coll->badNeg = -STEPUP_HEIGHT;
-		coll->badCeiling = 0;
-		coll->slopesAreWalls = true;
-		GetLaraCollisionInfo(item, coll);
+	Lara.isDucked = true;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	Lara.moveAngle = item->pos.yRot;
+	coll->facing = item->pos.yRot;
+	coll->badPos = STEPUP_HEIGHT;
+	coll->badNeg = -STEPUP_HEIGHT;
+	coll->badCeiling = 0;
+	coll->slopesAreWalls = true;
+	GetLaraCollisionInfo(item, coll);
 
-		ShiftItem(item, coll);
+	ShiftItem(item, coll);
+	if (coll->midFloor != NO_HEIGHT)
 		item->pos.yPos += coll->midFloor;
 }
 
