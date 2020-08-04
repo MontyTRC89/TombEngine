@@ -55,7 +55,7 @@ typedef struct ITEM_INFO
 	short carriedItem;
 	short afterDeath;
 	short firedWeapon;
-	short itemFlags[4];
+	short itemFlags[8];
 	void* data;
 	PHD_3DPOS pos;
 	bool active;
@@ -72,6 +72,7 @@ typedef struct ITEM_INFO
 	int swapMeshFlags;
 	short drawRoom;
 	short TOSSPAD;
+	PHD_3DPOS startPos;
 };
 
 // used by fx->shade !
