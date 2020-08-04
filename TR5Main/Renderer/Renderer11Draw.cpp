@@ -2044,7 +2044,7 @@ namespace T5M::Renderer
         int flash = FlashIt();
         if (DashTimer < 120)
             DrawBar(DashTimer / 120.0f, g_DashBar);
-        UpdateHealtBar(flash);
+        UpdateHealthBar(flash);
         UpdateAirBar(flash);
         DrawAllPickups();
 
