@@ -285,7 +285,7 @@ void Renderer11::drawLaraHolsters(bool transparent)
 {
 	int firstBucket = (transparent ? 2 : 0);
 	int lastBucket = (transparent ? 4 : 2);
-	HOLSTER_SLOT leftHolsterID = Lara.holsterInfo.leftHoster;
+	HOLSTER_SLOT leftHolsterID = Lara.holsterInfo.leftHolster;
 	HOLSTER_SLOT rightHolsterID = Lara.holsterInfo.rightHolster;
 	HOLSTER_SLOT backHolsterID = Lara.holsterInfo.backHolster;
 
