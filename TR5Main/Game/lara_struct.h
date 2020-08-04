@@ -777,7 +777,7 @@ enum class HOLSTER_SLOT : int {
 
 };
 struct HolsterInfo {
-	HOLSTER_SLOT leftHoster;
+	HOLSTER_SLOT leftHolster;
 	HOLSTER_SLOT rightHolster;
 	HOLSTER_SLOT backHolster;
 };
