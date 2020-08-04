@@ -116,6 +116,7 @@ int LoadItems()
 			item->shade = ReadInt16();
 			item->triggerFlags = ReadInt16();
 			item->flags = ReadInt16();
+			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)
@@ -1113,42 +1114,23 @@ void GetAIPickups()
 
 void BuildOutsideRoomsTable()
 {
-	int	maxSlots = 0;
-
-	// Clear the tabel
 	for (int x = 0; x < OUTSIDE_SIZE; x++)
 		for (int z = 0; z < OUTSIDE_SIZE; z++)
 			OutsideRoomTable[x][z].clear();
 
-	for (int x = 0; x < OUTSIDE_SIZE * 4; x += 4)
+	for (int x = 0; x < OUTSIDE_SIZE; x++)
 	{
-		for (int z = 0; z < OUTSIDE_SIZE * 4; z += 4)
+		for (int z = 0; z < OUTSIDE_SIZE; z++)
 		{
 			for (int i = 0; i < g_Level.Rooms.size(); i++)
 			{
 				ROOM_INFO* r = &g_Level.Rooms[i];
 
-				int rx = (r->x / 1024) + 1;
-				int rz = (r->z / 1024) + 1;
+				int rx = (r->x / 1024);
+				int rz = (r->z / 1024);
 
-				bool found = false;
-				for (int xl = 0; xl < 4; xl++)
-				{
-					for (int zl = 0; zl < 4; zl++)
-					{
-						if ((x + xl) >= rx && (x + xl) < (rx + r->ySize - 2) &&
-							(z + zl) >= rz && (z + zl) < (rz + r->xSize - 2))
-						{
-							found = true;
-							break;
-						}
-					}
-				}
-
-				if (!found)
-					continue;	
-
-				OutsideRoomTable[x][z].push_back(i);
+				if (x >= rx + 1 && z >= rz + 1 && x <= (rx + r->ySize - 2) && z <= (rz + r->xSize - 2))
+					OutsideRoomTable[x][z].push_back(i);
 			}
 		}
 	}

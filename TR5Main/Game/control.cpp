@@ -3246,8 +3246,8 @@ int IsRoomOutside(int x, int y, int z)
 	if (x < 0 || z < 0)
 		return -2;
 
-	int xTable = x / 4 / 1024;
-	int zTable = z / 4 / 1024;
+	int xTable = x/* / 4*/ / 1024;
+	int zTable = z /*/ 4*/ / 1024;
 
 	if (OutsideRoomTable[xTable][zTable].size() == 0)
 		return -2;
