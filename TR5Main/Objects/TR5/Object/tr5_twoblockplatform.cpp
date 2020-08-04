@@ -77,7 +77,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			int height = LaraItem->pos.yPos + 1;
 			TwoBlocksPlatformFloor(item, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &height);
 
-			if (OnFloor && LaraItem->animNumber != ANIMATION_LARA_RUN_BACK)
+			if (OnFloor && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
 				item->itemFlags[1] = 1;
 			else
 				item->itemFlags[1] = -1;

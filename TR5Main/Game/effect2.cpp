@@ -1450,9 +1450,9 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 					{
 						if (!(Wibble & 0xF))
 						{
-							if (!(GetRandomControl() & 0xF) || item->currentAnimState != STATE_LARA_STOP)
+							if (!(GetRandomControl() & 0xF) || item->currentAnimState != LS_STOP)
 							{
-								if (item->currentAnimState == STATE_LARA_STOP)
+								if (item->currentAnimState == LS_STOP)
 								{
 									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS);
 								}

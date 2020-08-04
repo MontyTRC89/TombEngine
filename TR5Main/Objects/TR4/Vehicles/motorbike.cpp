@@ -489,10 +489,10 @@ static int MotorBikeCheckGetOff(void)
     if (LaraItem->currentAnimState == BIKE_EXIT && LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
     {
         LaraItem->pos.yRot -= 0x4000;
-        LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+        LaraItem->animNumber = LA_STAND_SOLID;
         LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-        LaraItem->goalAnimState = STATE_LARA_STOP;
-        LaraItem->currentAnimState = STATE_LARA_STOP;
+        LaraItem->goalAnimState = LS_STOP;
+        LaraItem->currentAnimState = LS_STOP;
         LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
         LaraItem->pos.zPos -= 2 * phd_cos(item->pos.yRot) >> W2V_SHIFT;
         LaraItem->pos.xRot = 0;

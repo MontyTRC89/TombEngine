@@ -122,21 +122,21 @@ void undraw_flare() // (F) (D)
 	short frame2 = Lara.leftArm.frameNumber;
 
 #if 0
-	if (LaraItem->goalAnimState == STATE_LARA_STOP &&
+	if (LaraItem->goalAnimState == LS_STOP &&
 		Lara.Vehicle == NO_ITEM)
 #else
-	if (LaraItem->goalAnimState == STATE_LARA_STOP)
+	if (LaraItem->goalAnimState == LS_STOP)
 #endif
 	{
-		if (LaraItem->animNumber == ANIMATION_LARA_STAY_IDLE)
+		if (LaraItem->animNumber == LA_STAND_IDLE)
 		{
-			LaraItem->animNumber = ANIMATION_LARA_FLARE_THROW;
+			LaraItem->animNumber = LA_DISCARD_FLARE;
 			frame1 = frame2 + g_Level.Anims[LaraItem->animNumber].frameBase;
 			Lara.flareFrame = frame1;
 			LaraItem->frameNumber = frame1;
 		}
 
-		if (LaraItem->animNumber == ANIMATION_LARA_FLARE_THROW)
+		if (LaraItem->animNumber == LA_DISCARD_FLARE)
 		{
 			Lara.flareControlLeft = false;
 
@@ -151,20 +151,20 @@ void undraw_flare() // (F) (D)
 				Lara.target = NULL;
 				Lara.rightArm.lock = false;
 				Lara.leftArm.lock = false;
-				LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+				LaraItem->animNumber = LA_STAND_SOLID;
 				Lara.flareFrame = g_Level.Anims[LaraItem->animNumber].frameBase;
 				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->currentAnimState = STATE_LARA_STOP;
-				LaraItem->goalAnimState = STATE_LARA_STOP;
+				LaraItem->currentAnimState = LS_STOP;
+				LaraItem->goalAnimState = LS_STOP;
 				return;
 			}
 
 			Lara.flareFrame++;
 		}
 	}
-	else if (LaraItem->currentAnimState == STATE_LARA_STOP) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
+	else if (LaraItem->currentAnimState == LS_STOP) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
 	{
-		LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+		LaraItem->animNumber = LA_STAND_SOLID;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	}
 
@@ -234,8 +234,8 @@ void draw_flare() // (F) (D)
 {
 	short frame;
 
-	if (LaraItem->currentAnimState == STATE_LARA_FLARE_PICKUP ||
-		LaraItem->currentAnimState == STATE_LARA_PICKUP)
+	if (LaraItem->currentAnimState == LS_PICKUP_FLARE ||
+		LaraItem->currentAnimState == LS_PICKUP)
 	{
 		DoFlareInHand(Lara.flareAge);
 		Lara.flareControlLeft = false;
