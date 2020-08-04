@@ -9,7 +9,7 @@ typedef struct DISPLAY_PICKUP
 
 void DrawHealthBarOverlay(int value);
 void DrawHealthBar(float value);
-void UpdateHealtBar(int flash);
+void UpdateHealthBar(int flash);
 void DrawAirBar(float value);
 void UpdateAirBar(int flash);
 void DrawDashBar(int value);
@@ -24,7 +24,11 @@ extern short CurrentPickup;
 extern DISPLAY_PICKUP Pickups[MAX_COLLECTED_PICKUPS];
 extern short PickupVel;
 extern int OldHitPoints;
-extern int HealtBarTimer;
+extern int HealthBarTimer;
+extern float HealthBar;
+extern float MutateAmount;
 extern int FlashState;
 extern int PoisonFlag;
 extern int DashTimer;
+
+extern bool EnableSmoothHealthBar;
