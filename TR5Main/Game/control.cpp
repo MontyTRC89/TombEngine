@@ -265,7 +265,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || SniperCameraActive || UseSpotCam || TrackCameraInit ||
-				((LaraItem->currentAnimState != STATE_LARA_STOP || LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE) && (!Lara.isDucked || TrInput & IN_DUCK || LaraItem->animNumber != ANIMATION_LARA_CROUCH_IDLE || LaraItem->goalAnimState != STATE_LARA_CROUCH_IDLE)))
+				((LaraItem->currentAnimState != LS_STOP || LaraItem->animNumber != LA_STAND_IDLE) && (!Lara.isDucked || TrInput & IN_DUCK || LaraItem->animNumber != LA_CROUCH_IDLE || LaraItem->goalAnimState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{

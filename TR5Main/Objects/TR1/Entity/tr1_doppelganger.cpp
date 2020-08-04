@@ -62,10 +62,10 @@ void DoppelgangerControl(short itemNum)
 
 		if (h >= lh + WALL_SIZE && !LaraItem->gravityStatus)
 		{
-			item->goalAnimState = STATE_LARA_FREEFALL;      	// Make Player Stop Immediately
-			item->currentAnimState = STATE_LARA_FREEFALL;   	// and Skip directly into fastfall
-			item->frameNumber = GF(ANIMATION_LARA_SMASH_JUMP, 0);
-			item->animNumber = ANIMATION_LARA_SMASH_JUMP;
+			item->goalAnimState = LS_FREEFALL;      	// Make Player Stop Immediately
+			item->currentAnimState = LS_FREEFALL;   	// and Skip directly into fastfall
+			item->frameNumber = GF(LA_JUMP_WALL_SMASH_START, 0);
+			item->animNumber = LA_JUMP_WALL_SMASH_START;
 			item->gravityStatus = true;
 			item->fallspeed = 0;
 			item->speed = 0;
@@ -93,8 +93,8 @@ void DoppelgangerControl(short itemNum)
 			TestTriggers(TriggerIndex, TRUE, 0);
 			item->gravityStatus = false;
 			item->fallspeed = 0;
-			item->goalAnimState = STATE_LARA_DEATH;
-			item->requiredAnimState = STATE_LARA_DEATH;
+			item->goalAnimState = LS_DEATH;
+			item->requiredAnimState = LS_DEATH;
 		}
 	}
 }

@@ -1530,12 +1530,12 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	if (enemy == LaraItem)
 	{
 		short laraState = LaraItem->currentAnimState;
-		if (laraState == STATE_LARA_CROUCH_IDLE ||
-			laraState == STATE_LARA_CROUCH_TURN_LEFT ||
-			laraState == STATE_LARA_CROUCH_TURN_RIGHT ||
-			laraState == STATE_LARA_CROUCH_ROLL ||
-			laraState <= STATE_LARA_MONKEYSWING_TURNAROUND ||
-			laraState >= STATE_LARA_CLIMB_TO_CRAWL)
+		if (laraState == LS_CROUCH_IDLE ||
+			laraState == LS_CROUCH_TURN_LEFT ||
+			laraState == LS_CROUCH_TURN_RIGHT ||
+			laraState == LS_CROUCH_ROLL ||
+			laraState <= LS_MONKEYSWING_TURN_180 ||
+			laraState >= LS_HANG_TO_CRAWL)
 		{
 			y -= STEPUP_HEIGHT;
 		}

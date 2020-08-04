@@ -24,8 +24,8 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 
 	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
 	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-	LaraItem->currentAnimState = STATE_LARA_DEATH;
-	LaraItem->goalAnimState = STATE_LARA_DEATH;
+	LaraItem->currentAnimState = LS_DEATH;
+	LaraItem->goalAnimState = LS_DEATH;
 	//LaraSwapMeshExtra();
 
 	LaraItem->hitPoints = -16384;
