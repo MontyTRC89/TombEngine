@@ -5468,7 +5468,7 @@ int TestHangSwingIn(ITEM_INFO* item, short angle)//14104, 141B4 (F)
 
 int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_TO_HANG_FEET)
+	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
 		return 0;
 
 	if (coll->hitStatic)
@@ -5623,7 +5623,7 @@ int LaraHangLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 int LaraHangRightCornerTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
-	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_TO_HANG_FEET)
+	if (item->animNumber != LA_REACH_TO_HANG && item->animNumber != LA_HANG_FEET_IDLE)
 		return 0;
 
 	if (coll->hitStatic)
@@ -7013,21 +7013,19 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 /**********************
 
 Current problems with with the feet hanging:
--lara doesn't want to shimmy on uneven surfaces at all
 -going around corners isn't working. code is commented for now.
--obviously, not all animations were made yet- we still need crouch pull up (works well, tested with placeholder anim) and corner anims (doesn't work) and handstand (not tested)
--I'm *not* sure how Lara will react will react if the animations don't exist, but probably not good. This will be a problem until scrpting is done to enable/disable the entire system.
+-obviously, not all animations were made yet- we still need crouch pull up (works well, tested with placeholder anim) and corner anims and handstand (not tested)
 
 ***********************/
 int TestHangFeet(ITEM_INFO* item, short angle)
 {
-	if (Lara.climbStatus == 1)
+	if (Lara.climbStatus)
 		return 0;
 
 //	EnableFeetHang = true;
 
 
-	if (EnableFeetHang == false)
+	if (!EnableFeetHang)
 		return 0;
 
 	int x = item->pos.xPos;
@@ -7126,15 +7124,15 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 				item->goalAnimState = LS_SHIMMY_FEET_LEFT;
 				return;
 			}
-		/*	flag = LaraHangLeftCornerTest(item, coll);
+			flag = LaraHangLeftCornerTest(item, coll);
 			if (flag != 0)
 			{
 				if (flag <= 0)
-					item->goalAnimState = LS_HANG_FEET_INCORNERL;
+					item->goalAnimState = LS_SHIMMY_FEET_INNER_LEFT;
 				else
-					item->goalAnimState = LS_HANG_FEET_OUTCORNERL;
+					item->goalAnimState = LS_SHIMMY_FEET_OUTER_LEFT;
 				return;
-			}*/
+			}
 
 		}
 
@@ -7147,15 +7145,15 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 
 				return;
 			}
-		/*	flag = LaraHangRightCornerTest(item, coll);
+			flag = LaraHangRightCornerTest(item, coll);
 			if (flag != 0)
 			{
 				if (flag <= 0)
-					item->goalAnimState = LS_HANG_FEET_INCORNERR;
+					item->goalAnimState = LS_SHIMMY_FEET_INNER_RIGHT;
 				else
-					item->goalAnimState = LS_HANG_FEET_OUTCORNERR;
+					item->goalAnimState = LS_SHIMMY_FEET_OUTER_RIGHT;
 				return;
-			}*/
+			}
 		}
 
 
@@ -7227,7 +7225,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 
-	void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 		coll->enableBaddiePush = false;
 		coll->enableSpaz = false;
@@ -7241,7 +7239,7 @@ void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_hang_feet_shimmyr(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
-	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
+	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot + ANGLE(90.0f);
 }
@@ -7260,7 +7258,7 @@ void lara_as_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_hang_feet_shimmyl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
-	coll->radius = 102; /* @ORIGINAL_BUG: this value (instead of LARA_RAD) can make Lara glitch if coll->frontType is DIAGONAL or SPLIT_TRI */
+	coll->radius = LARA_RAD;
 	LaraHangTest(item, coll);
 	Lara.moveAngle = item->pos.yRot - ANGLE(90.0f);
 }
