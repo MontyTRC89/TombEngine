@@ -69,12 +69,12 @@ void DoFlameTorch() // (F) (D)
 		if (TrInput & IN_DRAW
 			&& !(LaraItem->gravityStatus)
 			&& !LaraItem->fallspeed
-			&& LaraItem->currentAnimState != STATE_LARA_JUMP_PREPARE
-			&& LaraItem->currentAnimState != STATE_LARA_JUMP_UP
-			&& LaraItem->currentAnimState != STATE_LARA_JUMP_FORWARD
-			&& LaraItem->currentAnimState != STATE_LARA_JUMP_BACK
-			&& LaraItem->currentAnimState != STATE_LARA_JUMP_LEFT
-			&& LaraItem->currentAnimState != STATE_LARA_JUMP_RIGHT
+			&& LaraItem->currentAnimState != LS_JUMP_PREPARE
+			&& LaraItem->currentAnimState != LS_JUMP_UP
+			&& LaraItem->currentAnimState != LS_JUMP_FORWARD
+			&& LaraItem->currentAnimState != LS_JUMP_BACK
+			&& LaraItem->currentAnimState != LS_JUMP_LEFT
+			&& LaraItem->currentAnimState != LS_JUMP_RIGHT
 			|| Lara.waterStatus == LW_UNDERWATER)
 		{
 			Lara.leftArm.lock = true;
@@ -134,7 +134,7 @@ void DoFlameTorch() // (F) (D)
 		}
 		break;
 	case 3:
-		if (LaraItem->currentAnimState != STATE_LARA_MISC_CONTROL)
+		if (LaraItem->currentAnimState != LS_MISC_CONTROL)
 		{
 			Lara.leftArm.lock = false;
 			Lara.leftArm.frameNumber = 0;
@@ -268,8 +268,8 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		|| Lara.litTorch == (item->status == ITEM_ACTIVE)
 		|| item->timer == -1
 		|| !(TrInput & IN_ACTION)
-		|| l->currentAnimState != STATE_LARA_STOP
-		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
+		|| l->currentAnimState != LS_STOP
+		|| l->animNumber != LA_STAND_IDLE
 		|| l->gravityStatus)
 	{
 		if (item->objectNumber == ID_BURNING_ROOTS)
@@ -313,15 +313,15 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 			{
-				l->animNumber = ANIMATION_LARA_TORCH_LIGHT_5;
+				l->animNumber = LA_TORCH_LIGHT_5;
 			}
 			else
 			{
 				int dy = abs(l->pos.yPos - item->pos.yPos);
 				l->itemFlags[3] = 1;
-				l->animNumber = (dy >> 8) + ANIMATION_LARA_TORCH_LIGHT_1;
+				l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 			}
-			l->currentAnimState = STATE_LARA_MISC_CONTROL;
+			l->currentAnimState = LS_MISC_CONTROL;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
@@ -330,9 +330,9 @@ void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		
 		item->pos.yRot = rot;
 	}
-	if ((short)Lara.generalPtr == itemNumber && item->status != ITEM_ACTIVE && l->currentAnimState == STATE_LARA_MISC_CONTROL)
+	if ((short)Lara.generalPtr == itemNumber && item->status != ITEM_ACTIVE && l->currentAnimState == LS_MISC_CONTROL)
 	{
-		if (l->animNumber >= ANIMATION_LARA_TORCH_LIGHT_1 && l->animNumber <= ANIMATION_LARA_TORCH_LIGHT_5)
+		if (l->animNumber >= LA_TORCH_LIGHT_1 && l->animNumber <= LA_TORCH_LIGHT_5)
 		{
 			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{

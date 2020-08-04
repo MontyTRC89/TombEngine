@@ -23,7 +23,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_NO_ARMS || l->currentAnimState != STATE_LARA_STOP)
+	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_NO_ARMS || l->currentAnimState != LS_STOP)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -35,10 +35,10 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
 		Lara.gunStatus = LG_HANDS_BUSY;
 
-		l->goalAnimState = STATE_LARA_ZIPLINE_RIDE;
+		l->goalAnimState = LS_ZIPLINE_RIDE;
 		do
 			AnimateItem(l);
-		while (l->currentAnimState != STATE_LARA_GRABBING);
+		while (l->currentAnimState != LS_GRABBING);
 
 		if (!item->active)
 			AddActiveItem(itemNumber);
@@ -98,7 +98,7 @@ void ControlDeathSlide(short itemNumber)
 		if (roomNumber != item->roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
-		if (LaraItem->currentAnimState == STATE_LARA_ZIPLINE_RIDE)
+		if (LaraItem->currentAnimState == LS_ZIPLINE_RIDE)
 		{
 			LaraItem->pos.xPos = item->pos.xPos;
 			LaraItem->pos.yPos = item->pos.yPos;
@@ -113,9 +113,9 @@ void ControlDeathSlide(short itemNumber)
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{
-			if (LaraItem->currentAnimState == STATE_LARA_ZIPLINE_RIDE)
+			if (LaraItem->currentAnimState == LS_ZIPLINE_RIDE)
 			{
-				LaraItem->goalAnimState = STATE_LARA_JUMP_FORWARD;
+				LaraItem->goalAnimState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
 				LaraItem->gravityStatus = true;
 				LaraItem->speed = item->fallspeed;
