@@ -608,10 +608,10 @@ void InitialiseTightRope(short itemNumber)
 
 void InitialiseAnimating(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
 	item->currentAnimState = 0;
 	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
 }
 
 void AnimatingControl(short itemNumber)
@@ -622,16 +622,16 @@ void AnimatingControl(short itemNumber)
 		return;
 
 	item->status = ITEM_ACTIVE;
-
 	AnimateItem(item);
 
-	if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
+	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
+	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 	{
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		RemoveActiveItem(itemNumber);
 		item->aiBits = 0;
 		item->status = ITEM_NOT_ACTIVE;
-	}
+	}*/
 }
 
 void HighObject2Control(short itemNumber)
