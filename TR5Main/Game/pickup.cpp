@@ -812,7 +812,7 @@ void do_pickup()
 			}
 			else
 			{
-				if (LaraItem->animNumber == LA_CROWBAR_PRY_WALL_FAST)   // _FAST or _SLOW?
+				if (LaraItem->animNumber == LA_CROWBAR_PRY_WALL_SLOW)   // _FAST or _SLOW? // it's the slow one - Woops
 				{ 
 					AddDisplayPickup(ID_CROWBAR_ITEM);
 					Lara.Crowbar = true;
