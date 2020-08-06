@@ -312,11 +312,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 					Lara.busy = true;
 					LaserSight = true;
-
-					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = true;
-					else*
-						InfraRed = false;*/
 					Infrared = true;
 				}
 				else
@@ -326,18 +321,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (LaserSight)
 				{
-					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = true;
-					else
-						InfraRed = false;*/
 					Infrared = true;
 				}
 				else
 				{
-					/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
-						InfraRed = true;
-					else
-						InfraRed = false;*/
 					Infrared = false;
 				}
 			}
@@ -428,7 +415,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				{
 					Lara.poisoned = 4096;
 				}
-				if (/*(gfLevelFlags & 0x80u) != 0 &&*/ !Lara.gassed)
+				if (!Lara.gassed)
 				{
 					if (Lara.dpoisoned)
 					{
@@ -3249,8 +3236,8 @@ int IsRoomOutside(int x, int y, int z)
 	if (x < 0 || z < 0)
 		return -2;
 
-	int xTable = x/* / 4*/ / 1024;
-	int zTable = z /*/ 4*/ / 1024;
+	int xTable = x / 1024;
+	int zTable = z / 1024;
 
 	if (OutsideRoomTable[xTable][zTable].size() == 0)
 		return -2;

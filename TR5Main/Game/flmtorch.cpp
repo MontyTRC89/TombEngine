@@ -107,7 +107,6 @@ void DoFlameTorch() // (F) (D)
 			}
 			else if (Lara.leftArm.frameNumber == 12)
 			{
-				//LARA_MESHES(ID_LARA, LM_LHAND);
 				Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 				CreateFlare(ID_BURNING_TORCH_ITEM, 1);
 			}
@@ -128,7 +127,6 @@ void DoFlameTorch() // (F) (D)
 		}
 		else if (Lara.leftArm.frameNumber == 36)
 		{
-			//LARA_MESHES(ID_LARA, LM_LHAND);
 			Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 			CreateFlare(ID_BURNING_TORCH_ITEM, 0);
 		}
@@ -187,7 +185,6 @@ void GetFlameTorch() // (F) (D)
 	Lara.leftArm.frameNumber = 0;
 	Lara.leftArm.frameBase = g_Level.Anims[Lara.leftArm.animNumber].framePtr;
 	
-	//LARA_MESHES(ID_LARA_TORCH_ANIM, LM_LHAND);
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
 }
 
