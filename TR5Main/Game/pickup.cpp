@@ -464,7 +464,7 @@ void do_puzzle()
 	else
 		flag = 1;
 
-	if (LaraItem->currentAnimState == STATE_LARA_INSERT_PUZZLE)
+	if (LaraItem->currentAnimState == LS_INSERT_PUZZLE)
 	{
 		if (item->itemFlags[0])
 		{
@@ -477,7 +477,7 @@ void do_puzzle()
 				item->itemFlags[0] = 0;
 			}
 		}
-		if (LaraItem->animNumber == ANIMATION_LARA_PUT_TRIDENT)
+		if (LaraItem->animNumber == LA_TRIDENT_SET)
 		{
 			PuzzleDone(item, puzzleItem);
 		}
@@ -505,15 +505,15 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     if (!((TrInput & IN_ACTION || g_Inventory.GetSelectedObject() != NO_ITEM)
         && !BinocularRange
         && !Lara.gunStatus
-        && l->currentAnimState == STATE_LARA_STOP
-        && l->animNumber == ANIMATION_LARA_STAY_IDLE
+        && l->currentAnimState == LS_STOP
+        && l->animNumber == LA_STAND_IDLE
         && GetKeyTrigger(&g_Level.Items[itemNum])))
     {
         if (!Lara.isMoving && (short)Lara.generalPtr == itemNum || (short)Lara.generalPtr != itemNum)
         {
-/*          if ((short)Lara.generalPtr == itemNum && l->currentAnimState == STATE_LARA_INSERT_PUZZLE)
+/*          if ((short)Lara.generalPtr == itemNum && l->currentAnimState == LS_INSERT_PUZZLE)
             {
-                if (l->frameNumber == g_Level.Anims[ANIMATION_LARA_USE_PUZZLE].frameBase + 80 && item->itemFlags[0])
+                if (l->frameNumber == g_Level.Anims[LA_USE_PUZZLE].frameBase + 80 && item->itemFlags[0])
                 {
                     if (flag == 3)
                         l->itemFlags[0] = item->triggerFlags;
@@ -527,13 +527,13 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
             if ((short)Lara.generalPtr == itemNum)
             {
-                if (l->currentAnimState != STATE_LARA_MISC_CONTROL)
+                if (l->currentAnimState != LS_MISC_CONTROL)
                 {
                     if (flag != 2)
                         ObjectCollision(itemNum, l, coll);
                     return;
                 }
-/*              if (l->animNumber == ANIMATION_LARA_PUT_TRIDENT)
+/*              if (l->animNumber == LA_PUT_TRIDENT)
                 {
                     if (l->frameNumber == g_Level.Anims[l->animNumber].frameBase + 180)
                     {
@@ -542,7 +542,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                     }
                 }*/
             }
-            if (l->currentAnimState == STATE_LARA_MISC_CONTROL)
+            if (l->currentAnimState == LS_MISC_CONTROL)
                 return;
 
             if (flag != 2)
@@ -607,15 +607,15 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
         if (flag == 1)
         {
-            l->currentAnimState = STATE_LARA_MISC_CONTROL;
+            l->currentAnimState = LS_MISC_CONTROL;
             l->animNumber = -item->triggerFlags;
-            if (l->animNumber != ANIMATION_LARA_PUT_TRIDENT)
+            if (l->animNumber != LA_TRIDENT_SET)
                 PuzzleDone(item, itemNum);
         }
         else
         {
-            l->animNumber = ANIMATION_LARA_USE_PUZZLE;
-            l->currentAnimState = STATE_LARA_INSERT_PUZZLE;
+            l->animNumber = LA_USE_PUZZLE;
+            l->currentAnimState = LS_INSERT_PUZZLE;
             item->itemFlags[0] = 1;
         }
 
@@ -669,8 +669,8 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     if ((!(TrInput & IN_ACTION) && g_Inventory.GetSelectedObject() == NO_ITEM
         || BinocularRange
         || Lara.gunStatus
-        || l->currentAnimState != STATE_LARA_STOP
-        || l->animNumber != ANIMATION_LARA_STAY_IDLE)
+        || l->currentAnimState != LS_STOP
+        || l->animNumber != LA_STAND_IDLE)
         && (!Lara.isMoving || (short)Lara.generalPtr != itemNum))
     {
         if (item->objectNumber < ID_KEY_HOLE6)
@@ -697,13 +697,13 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             if (MoveLaraPosition(&KeyHolePosition, item, l))
             {
                 if (item->objectNumber == ID_KEY_HOLE8)
-                    l->animNumber = ANIMATION_LARA_USE_KEYCARD;
+                    l->animNumber = LA_KEYCARD_USE;
                 else
                 {
                     RemoveObjectFromInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1), 1);
-                    l->animNumber = ANIMATION_LARA_USE_KEY;
+                    l->animNumber = LA_USE_KEY;
                 }
-                l->currentAnimState = STATE_LARA_INSERT_KEY;
+                l->currentAnimState = LS_INSERT_KEY;
                 l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
                 Lara.isMoving = false;
                 Lara.headYrot = 0;
@@ -763,7 +763,7 @@ void do_pickup()
 	else
 		if (item->objectNumber == ID_FLARE_ITEM)
 		{
-			if (LaraItem->currentAnimState == ANIMATION_LARA_UNDERWATER_FLARE_PICKUP)
+			if (LaraItem->currentAnimState == LA_UNDERWATER_PICKUP_FLARE)
 			{
 				Lara.requestGunType = WEAPON_FLARE;
 				Lara.gunType = WEAPON_FLARE;
@@ -779,7 +779,7 @@ void do_pickup()
 				return;
 			}
 			else
-				if (LaraItem->currentAnimState == STATE_LARA_FLARE_PICKUP)
+				if (LaraItem->currentAnimState == LS_PICKUP_FLARE)
 				{
 					Lara.requestGunType = WEAPON_FLARE;
 					Lara.gunType = WEAPON_FLARE;
@@ -792,7 +792,7 @@ void do_pickup()
 		}
 		else
 		{
-			if (LaraItem->animNumber == ANIMATION_LARA_UNDERWATER_PICKUP)//dirty but what can I do, it uses the same state
+			if (LaraItem->animNumber == LA_UNDERWATER_PICKUP)//dirty but what can I do, it uses the same state
 			{
 				AddDisplayPickup(item->objectNumber);
 				if (!(item->triggerFlags & 0xC0))
@@ -812,13 +812,13 @@ void do_pickup()
 			}
 			else
 			{
-				if (LaraItem->animNumber == ANIMATION_LARA_CROWBAR_USE_ON_WALL2)
+				if (LaraItem->animNumber == LA_CROWBAR_PRY_WALL_SLOW)   // _FAST or _SLOW? // it's the slow one - Woops
 				{ 
 					AddDisplayPickup(ID_CROWBAR_ITEM);
 					Lara.Crowbar = true;
 					KillItem(pickupitem);
 				}
-				else if (LaraItem->currentAnimState == STATE_LARA_PICKUP || LaraItem->currentAnimState == STATE_LARA_PICKUP_FROM_CHEST || LaraItem->currentAnimState == STATE_LARA_HOLE)
+				else if (LaraItem->currentAnimState == LS_PICKUP || LaraItem->currentAnimState == LS_PICKUP_FROM_CHEST || LaraItem->currentAnimState == LS_HOLE)
 				{
 					AddDisplayPickup(item->objectNumber);
 					if (item->triggerFlags & 0x100)
@@ -872,7 +872,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             item->pos.xRot = -ANGLE(25);
             if (TrInput & IN_ACTION
                 && item->objectNumber != ID_BURNING_TORCH_ITEM
-                && l->currentAnimState == STATE_LARA_UNDERWATER_STOP
+                && l->currentAnimState == LS_UNDERWATER_STOP
                 && !Lara.gunStatus
                 && TestLaraPosition(&PickUpBoundsUW, item, l)
                 || Lara.isMoving && (short)Lara.generalPtr == itemNum)
@@ -883,16 +883,16 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                     {
                         if (item->objectNumber == ID_FLARE_ITEM)
                         {
-                            l->animNumber = ANIMATION_LARA_UNDERWATER_FLARE_PICKUP;
-                            l->currentAnimState = STATE_LARA_FLARE_PICKUP;
+                            l->animNumber = LA_UNDERWATER_PICKUP_FLARE;
+                            l->currentAnimState = LS_PICKUP_FLARE;
                             l->fallspeed = 0;
                         }
                         else
                         {
-                            l->animNumber = ANIMATION_LARA_UNDERWATER_PICKUP;
-                            l->currentAnimState = STATE_LARA_PICKUP;
+                            l->animNumber = LA_UNDERWATER_PICKUP;
+                            l->currentAnimState = LS_PICKUP;
                         }
-                        l->goalAnimState = STATE_LARA_UNDERWATER_STOP;
+                        l->goalAnimState = LS_UNDERWATER_STOP;
                         l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
                         Lara.isMoving = false;
                         Lara.gunStatus = LG_HANDS_BUSY;
@@ -918,12 +918,12 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             }
             
          /*   if ((short)Lara.generalPtr != itemNum
-                || l->currentAnimState != STATE_LARA_PICKUP
-                || l->frameNumber != g_Level.Anims[ANIMATION_LARA_UNDERWATER_PICKUP].frameBase + 18)
+                || l->currentAnimState != LS_PICKUP
+                || l->frameNumber != g_Level.Anims[LA_UNDERWATER_PICKUP].frameBase + 18)
             {
                 if ((short)Lara.generalPtr == itemNum
-                    && l->currentAnimState == STATE_LARA_FLARE_PICKUP
-                    && l->frameNumber == g_Level.Anims[ANIMATION_LARA_UNDERWATER_FLARE_PICKUP].frameBase + 20)
+                    && l->currentAnimState == LS_PICKUP_FLARE
+                    && l->frameNumber == g_Level.Anims[LA_UNDERWATER_FLARE_PICKUP].frameBase + 20)
                 {
                     Lara.requestGunType = WEAPON_FLARE;
                     Lara.gunType = WEAPON_FLARE;
@@ -961,21 +961,21 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     
     if (!(TrInput & IN_ACTION) && (g_Inventory.GetSelectedObject() == NO_ITEM || triggerFlags != 2)
         || BinocularRange
-        || (l->currentAnimState != STATE_LARA_STOP || l->animNumber != ANIMATION_LARA_STAY_IDLE || Lara.gunStatus)
-        && (l->currentAnimState != STATE_LARA_CROUCH_IDLE || l->animNumber != ANIMATION_LARA_CROUCH_IDLE || Lara.gunStatus)
-        && (l->currentAnimState != STATE_LARA_CRAWL_IDLE || l->animNumber != ANIMATION_LARA_CRAWL_IDLE))
+        || (l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || Lara.gunStatus)
+        && (l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || Lara.gunStatus)
+        && (l->currentAnimState != LS_CRAWL_IDLE || l->animNumber != LA_CRAWL_IDLE))
     {
         if (!Lara.isMoving)
         {
             if ((short)Lara.generalPtr == itemNum)
             {
-                if (l->currentAnimState != STATE_LARA_PICKUP && l->currentAnimState != STATE_LARA_HOLE)
+                if (l->currentAnimState != LS_PICKUP && l->currentAnimState != LS_HOLE)
                 {
                 /*    if ((short)Lara.generalPtr == itemNum
-                        && l->currentAnimState == STATE_LARA_FLARE_PICKUP
-                        && (l->animNumber == ANIMATION_LARA_CROUCH_PICKUP_FLARE &&
-                            l->frameNumber == g_Level.Anims[ANIMATION_LARA_CROUCH_PICKUP_FLARE].frameBase + 22)
-                        || l->frameNumber == g_Level.Anims[ANIMATION_LARA_FLARE_PICKUP].frameBase + 58)
+                        && l->currentAnimState == LS_PICKUP_FLARE
+                        && (l->animNumber == LA_CROUCH_PICKUP_FLARE &&
+                            l->frameNumber == g_Level.Anims[LA_CROUCH_PICKUP_FLARE].frameBase + 22)
+                        || l->frameNumber == g_Level.Anims[LA_FLARE_PICKUP].frameBase + 58)
                     {
                         Lara.requestGunType = WEAPON_FLARE;
                         Lara.gunType = WEAPON_FLARE;
@@ -993,14 +993,14 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 }
 				else
 				{
-					/*   if (l->frameNumber == g_Level.Anims[ANIMATION_LARA_PICKUP].frameBase + 15
-						   || l->frameNumber == g_Level.Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 22
-						   || l->frameNumber == g_Level.Anims[ANIMATION_LARA_CROUCH_PICKUP].frameBase + 20
-						   || l->frameNumber == g_Level.Anims[ANIMATION_LARA_PICKUP_PEDESTAL_LOW].frameBase + 29
-						   || l->frameNumber == g_Level.Anims[ANIMATION_LARA_PICKUP_PEDESTAL_HIGH].frameBase + 45
-						   || l->frameNumber == g_Level.Anims[ANIMATION_LARA_HOLE_GRAB].frameBase + 42
-						   || l->frameNumber == g_Level.Anims[ANIMATION_LARA_CROWBAR_USE_ON_WALL2].frameBase + 183
-						   || (l->animNumber == ANIMATION_LARA_CROWBAR_USE_ON_WALL && l->frameNumber != g_Level.Anims[ANIMATION_LARA_CROWBAR_USE_ON_WALL].frameBase + 123))
+					/*   if (l->frameNumber == g_Level.Anims[LA_PICKUP].frameBase + 15
+						   || l->frameNumber == g_Level.Anims[LA_CROUCH_PICKUP].frameBase + 22
+						   || l->frameNumber == g_Level.Anims[LA_CROUCH_PICKUP].frameBase + 20
+						   || l->frameNumber == g_Level.Anims[LA_PICKUP_PEDESTAL_LOW].frameBase + 29
+						   || l->frameNumber == g_Level.Anims[LA_PICKUP_PEDESTAL_HIGH].frameBase + 45
+						   || l->frameNumber == g_Level.Anims[LA_HOLE_GRAB].frameBase + 42
+						   || l->frameNumber == g_Level.Anims[LA_CROWBAR_USE_ON_WALL2].frameBase + 183
+						   || (l->animNumber == LA_CROWBAR_USE_ON_WALL && l->frameNumber != g_Level.Anims[LA_CROWBAR_USE_ON_WALL].frameBase + 123))
 					   {
 						   if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 						   {
@@ -1088,8 +1088,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         }
         else if (MoveLaraPosition(&HiddenPickUpPosition, item, l))
         {
-            l->animNumber = ANIMATION_LARA_HOLE_GRAB;
-            l->currentAnimState = STATE_LARA_HOLE;
+            l->animNumber = LA_HOLESWITCH_ACTIVATE;
+            l->currentAnimState = LS_HOLE;
             flag = 1;
         }
         Lara.generalPtr = (void*)itemNum;
@@ -1140,8 +1140,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         }
         if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
         {
-            l->animNumber = ANIMATION_LARA_CROWBAR_USE_ON_WALL;
-            l->currentAnimState = STATE_LARA_PICKUP;
+            l->animNumber = LA_CROWBAR_PRY_WALL_FAST;
+            l->currentAnimState = LS_PICKUP;
             item->status = ITEM_ACTIVE;
             AddActiveItem(itemNum);
             AnimateItem(item);
@@ -1180,13 +1180,13 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             {
                 if (triggerFlags == 3 || triggerFlags == 7)
                 {
-                    l->animNumber = ANIMATION_LARA_PICKUP_PEDESTAL_HIGH;
-                    l->currentAnimState = STATE_LARA_PICKUP;
+                    l->animNumber = LA_PICKUP_PEDESTAL_HIGH;
+                    l->currentAnimState = LS_PICKUP;
                 }
                 else
                 {
-                    l->animNumber = ANIMATION_LARA_PICKUP_PEDESTAL_LOW;
-                    l->currentAnimState = STATE_LARA_PICKUP;
+                    l->animNumber = LA_PICKUP_PEDESTAL_LOW;
+                    l->currentAnimState = LS_PICKUP;
                 }
                 flag = 1;
             }
@@ -1224,8 +1224,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
         }
         if (MoveLaraPosition(&JobyCrowPickUpPosition, item, l))
         {
-            l->animNumber = ANIMATION_LARA_CROWBAR_USE_ON_WALL2;
-            l->currentAnimState = STATE_LARA_PICKUP;
+            l->animNumber = LA_CROWBAR_PRY_WALL_SLOW;
+            l->currentAnimState = LS_PICKUP;
             item->status = ITEM_ACTIVE;
             AddActiveItem(itemNum);
             flag = 1;
@@ -1258,28 +1258,28 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
         PickUpPosition.y = l->pos.yPos - item->pos.yPos;
 
-        if (l->currentAnimState == STATE_LARA_CROUCH_IDLE)
+        if (l->currentAnimState == LS_CROUCH_IDLE)
         {
 			if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 				break;
             AlignLaraPosition(&PickUpPosition, item, l);
             if (item->objectNumber == ID_FLARE_ITEM)
             {
-                l->animNumber = ANIMATION_LARA_CROUCH_PICKUP_FLARE;
-                l->currentAnimState = STATE_LARA_FLARE_PICKUP;
+                l->animNumber = LA_CROUCH_PICKUP_FLARE;
+                l->currentAnimState = LS_PICKUP_FLARE;
                 flag = 1;
                 Lara.generalPtr = (void*)itemNum;
                 break;
             }
-            l->animNumber = ANIMATION_LARA_CROUCH_PICKUP;
+            l->animNumber = LA_CROUCH_PICKUP;
         }
         else
         {
-            if (l->currentAnimState == STATE_LARA_CRAWL_IDLE)
+            if (l->currentAnimState == LS_CRAWL_IDLE)
             {
 				if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 					break;
-                l->goalAnimState = STATE_LARA_CROUCH_IDLE;
+                l->goalAnimState = LS_CROUCH_IDLE;
                 Lara.generalPtr = (void*)itemNum;
                 break;
             }
@@ -1290,15 +1290,15 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             }
             if (item->objectNumber == ID_FLARE_ITEM)
             {
-                l->animNumber = ANIMATION_LARA_FLARE_PICKUP;
-                l->currentAnimState = STATE_LARA_FLARE_PICKUP;
+                l->animNumber = LA_PICKUP_FLARE;
+                l->currentAnimState = LS_PICKUP_FLARE;
                 flag = 1;
                 Lara.generalPtr = (void*)itemNum;
                 break;
             }
-            l->animNumber = ANIMATION_LARA_PICKUP;
+            l->animNumber = LA_PICKUP;
         }
-        l->currentAnimState = STATE_LARA_PICKUP;
+        l->currentAnimState = LS_PICKUP;
         flag = 1;
         Lara.generalPtr = (void*)itemNum;
     }
@@ -1579,8 +1579,8 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
     objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
 
     if (TrInput & IN_ACTION
-		&& laraitem->currentAnimState == STATE_LARA_STOP
-		&& laraitem->animNumber == ANIMATION_LARA_STAY_IDLE 
+		&& laraitem->currentAnimState == LS_STOP
+		&& laraitem->animNumber == LA_STAND_IDLE 
 		&& Lara.gunStatus == LG_NO_ARMS 
 		&& (item->status == ITEM_NOT_ACTIVE 
 			&& item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
@@ -1605,7 +1605,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
         {
             if (MoveLaraPosition(&SOPos, item, laraitem))
             {
-                laraitem->currentAnimState = STATE_LARA_MISC_CONTROL;
+                laraitem->currentAnimState = LS_MISC_CONTROL;
                 laraitem->animNumber = SearchAnims[objNumber];
                 laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
                 Lara.isMoving = false;
@@ -1640,7 +1640,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
             Lara.gunStatus = LG_NO_ARMS;
         }
     }
-    else if (laraitem->currentAnimState != STATE_LARA_MISC_CONTROL)
+    else if (laraitem->currentAnimState != LS_MISC_CONTROL)
     {
         ObjectCollision(itemNumber, laraitem, laracoll);
     }

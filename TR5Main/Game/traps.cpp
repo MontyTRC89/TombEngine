@@ -330,7 +330,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 	l->pos.yRot += ANGLE(180);
 	result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
+	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
@@ -342,9 +342,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 		Lara.gunStatus = LG_HANDS_BUSY;
 		l->gravityStatus = false;
 		l->fallspeed = 0;
-		l->animNumber = ANIMATION_LARA_CEILING_TRAPDOOR_OPEN;
+		l->animNumber = LA_TRAPDOOR_CEILING_OPEN;
 		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-		l->currentAnimState = STATE_LARA_FREEFALL_BIS;
+		l->currentAnimState = LS_FREEFALL_BIS;
 		AddActiveItem(itemNumber);
 		item->status = ITEM_ACTIVE;
 		item->goalAnimState = 1;
@@ -370,16 +370,16 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_STOP && l->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS
+	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == LS_STOP && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS
 		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&FloorTrapDoorPos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_FLOOR_TRAPDOOR_OPEN;
+				l->animNumber = LA_TRAPDOOR_FLOOR_OPEN;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->currentAnimState = STATE_LARA_TRAPDOOR_FLOOR_OPEN;
+				l->currentAnimState = LS_TRAPDOOR_FLOOR_OPEN;
 				Lara.isMoving = false;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
@@ -895,8 +895,8 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 		|| Lara.litTorch == (item->status & 1)
 		|| item->timer == -1
 		|| !(TrInput & IN_ACTION)
-		|| l->currentAnimState != STATE_LARA_STOP
-		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
+		|| l->currentAnimState != LS_STOP
+		|| l->animNumber != LA_STAND_IDLE
 		|| l->gravityStatus)
 	{
 		if (item->objectNumber == ID_BURNING_ROOTS)
@@ -942,16 +942,16 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 			{
-				l->animNumber = ANIMATION_LARA_TORCH_LIGHT_5;
+				l->animNumber = LA_TORCH_LIGHT_5;
 			}
 			else
 			{
 				int dy = abs(l->pos.yPos - item->pos.yPos);
 				l->itemFlags[3] = 1;
-				l->animNumber = (dy >> 8) + ANIMATION_LARA_TORCH_LIGHT_1;
+				l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 			}
 			
-			l->currentAnimState = STATE_LARA_MISC_CONTROL;
+			l->currentAnimState = LS_MISC_CONTROL;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
@@ -963,9 +963,9 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 
 	if (Lara.generalPtr == (void*)itemNumber 
 		&& item->status != ITEM_ACTIVE 
-		&& l->currentAnimState == STATE_LARA_MISC_CONTROL)
+		&& l->currentAnimState == LS_MISC_CONTROL)
 	{
-		if (l->animNumber >= ANIMATION_LARA_TORCH_LIGHT_1 && l->animNumber <= ANIMATION_LARA_TORCH_LIGHT_5)
+		if (l->animNumber >= LA_TORCH_LIGHT_1 && l->animNumber <= LA_TORCH_LIGHT_5)
 		{
 			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{

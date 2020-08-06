@@ -260,14 +260,14 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)//4C730, 4CB94 (F)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
 	if (TrInput & IN_ROLL && LaraDrawType != LARA_DIVESUIT)
 	{
-		item->currentAnimState = STATE_LARA_UNDERWATER_TURNAROUND;
-		item->animNumber = ANIMATION_LARA_UNDERWATER_ROLL_BEGIN;
+		item->currentAnimState = LS_UNDERWATER_ROLL;
+		item->animNumber = LA_UNDERWATER_ROLL_180_START;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 	else
@@ -281,7 +281,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)//4C730, 4CB94 (F)
 			SwimTurn(item);
 
 		if (TrInput & IN_JUMP)
-			item->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
+			item->goalAnimState = LS_UNDERWATER_FORWARD;
 
 		item->fallspeed -= 6;
 
@@ -297,7 +297,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -305,8 +305,8 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
 	{
 		if (LaraDrawType != LARA_DIVESUIT)
 		{
-			item->currentAnimState = STATE_LARA_UNDERWATER_TURNAROUND;
-			item->animNumber = ANIMATION_LARA_UNDERWATER_ROLL_BEGIN;
+			item->currentAnimState = LS_UNDERWATER_ROLL;
+			item->animNumber = LA_UNDERWATER_ROLL_180_START;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			return;
 		}
@@ -321,21 +321,21 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)//4C634(<), 4CA98(<) (F)
 	}
 
 	if (TrInput & IN_JUMP)
-		item->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
+		item->goalAnimState = LS_UNDERWATER_FORWARD;
 
 	item->fallspeed -= 6;
 	if (item->fallspeed < 0)
 		item->fallspeed = 0;
 
 	if (item->fallspeed <= 133)
-		item->goalAnimState = STATE_LARA_UNDERWATER_STOP;
+		item->goalAnimState = LS_UNDERWATER_STOP;
 }
 
 void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -343,8 +343,8 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
 	{
 		if (LaraDrawType != LARA_DIVESUIT)
 		{
-			item->currentAnimState = STATE_LARA_UNDERWATER_TURNAROUND;
-			item->animNumber = ANIMATION_LARA_UNDERWATER_ROLL_BEGIN;
+			item->currentAnimState = LS_UNDERWATER_ROLL;
+			item->animNumber = LA_UNDERWATER_ROLL_180_START;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			return;
 		}
@@ -364,7 +364,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)//4C548(<), 4C9AC(<) (F)
 		item->fallspeed = 200;
 
 	if (!(TrInput & IN_JUMP))
-		item->goalAnimState = STATE_LARA_UNDERWATER_INERTIA;
+		item->goalAnimState = LS_UNDERWATER_INERTIA;
 }
 
 void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)//4C3A8, 4C80C (F)
@@ -846,9 +846,9 @@ void LaraTestWaterDepth(ITEM_INFO* item, COLL_INFO* coll)//4B4F8(<), 4B95C(<) (F
 	}
 	else if (wd <= 512)
 	{
-		item->animNumber = ANIMATION_LARA_UNDERWATER_TO_WADE;
-		item->currentAnimState = STATE_LARA_ONWATER_EXIT;
-		item->goalAnimState = STATE_LARA_STOP;
+		item->animNumber = LA_UNDERWATER_TO_STAND;
+		item->currentAnimState = LS_ONWATER_EXIT;
+		item->goalAnimState = LS_STOP;
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
 		item->speed = 0;
