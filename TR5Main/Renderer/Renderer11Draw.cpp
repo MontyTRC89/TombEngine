@@ -20,6 +20,7 @@
 #include "tr5_spider_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include <Objects\TR4\Entity\tr4_wraith.h>
+#include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
@@ -1565,6 +1566,58 @@ namespace T5M::Renderer
         return true;
     }
 
+	bool Renderer11::drawLittleBeetles()
+	{
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
+
+		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		if (Objects[ID_LITTLE_BEETLE].loaded)
+		{
+			OBJECT_INFO* obj = &Objects[ID_LITTLE_BEETLE];
+			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
+
+			for (int m = 0; m < 32; m++)
+				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+
+			for (int i = 0; i < NUM_LITTLE_BETTLES; i++)
+			{
+				BEETLE_INFO* beetle = &LittleBeetles[i];
+
+				if (beetle->on)
+				{
+					RendererMesh* mesh = getMesh(Objects[ID_LITTLE_BEETLE].meshIndex);
+					Matrix translation = Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->pos.yRot, beetle->pos.xRot, beetle->pos.zRot);
+					Matrix world = rotation * translation;
+
+					m_stItem.World = world;
+					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
+					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
+					updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
+
+					for (int b = 0; b < 2; b++)
+					{
+						RendererBucket* bucket = &mesh->Buckets[b];
+
+						if (bucket->Vertices.size() == 0)
+							continue;
+
+						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+						m_numDrawCalls++;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+
     bool Renderer11::doSnow()
     {
         if (m_firstWeather)
@@ -1983,6 +2036,7 @@ namespace T5M::Renderer
         drawBats();
         drawRats();
         drawSpiders();
+		drawLittleBeetles();
 
         // Transparent geometry
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);

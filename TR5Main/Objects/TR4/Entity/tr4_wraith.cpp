@@ -247,7 +247,7 @@ void WraithControl(short itemNumber)
 			{
 				if (item->itemFlags[7])
 				{
-					item->itemFlags[7]--; // = ((item->TOSSPAD & 0xFE00) - 1) & 0x3E00;
+					item->itemFlags[7]--;
 				}
 			}
 		}
@@ -554,11 +554,6 @@ void WraithWallsEffect(int x, int y, int z, short yrot, short objNumber)
 		spark->size = size;
 		spark->dSize = size >> 2;
 	}
-}
-
-void DrawWraith(ITEM_INFO* item)
-{
-
 }
 
 void KillWraith(ITEM_INFO* item)

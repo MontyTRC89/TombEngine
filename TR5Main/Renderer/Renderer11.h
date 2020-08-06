@@ -588,6 +588,7 @@ namespace T5M::Renderer
 		bool											drawRopes();
 		bool											drawBats();
 		bool											drawRats();
+		bool											drawLittleBeetles();
 		bool											drawSpiders();
 		bool											drawGunFlashes();
 		bool											drawGunShells();

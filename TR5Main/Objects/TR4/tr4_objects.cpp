@@ -612,6 +612,16 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 	}	
+
+	obj = &Objects[ID_LITTLE_BEETLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLittleBeetle;
+		obj->control = LittleBeetleControl;
+		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
+	}
 }
 
 static void StartObject(OBJECT_INFO* obj)
@@ -822,4 +832,10 @@ void InitialiseTR4Objects()
 	StartSwitch(objToInit);
 	StartTrap(objToInit);
 	StartVehicles(objToInit);
+}
+
+void AllocTR4Objects()
+{
+	LittleBeetles = game_malloc<BEETLE_INFO>(NUM_LITTLE_BETTLES);
+	ZeroMemory(LittleBeetles, NUM_LITTLE_BETTLES * sizeof(BEETLE_INFO));
 }
