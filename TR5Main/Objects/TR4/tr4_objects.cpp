@@ -622,6 +622,29 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;
 	}
+
+	obj = &Objects[ID_SAS_DYING];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSasDying;
+		obj->control = SasDyingControl;
+		obj->collision = ObjectCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_SAS_DRAG_BLOKE];
+	if (obj->loaded)
+	{
+		obj->control = AnimatingControl;
+		obj->collision = SasDragBlokeCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
+	}
 }
 
 static void StartObject(OBJECT_INFO* obj)
