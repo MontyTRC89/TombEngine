@@ -363,9 +363,6 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_default_col,
 	lara_default_col
 };
-/*function<LaraRoutineFunction> lara_camera_routines[NUM_LARA_STATES + 1] = {
-
-};*/
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -4980,8 +4977,6 @@ void lara_col_all4s(ITEM_INFO* item, COLL_INFO* coll)//14B40, 14C74 (F)
 										item->pos.xPos -= 100 * phd_sin(coll->facing) >> W2V_SHIFT;
 										item->pos.zPos -= 100 * phd_cos(coll->facing) >> W2V_SHIFT;
 
-										//tmp = GetCollidedObjects(item, 100, 1, wat, wat, 0);
-										//S_Warn("[lara_col_all4s] - Warning: Core Design function call shittery\n");
 										tmp = GetCollidedObjects(item, 100, 1, &tmp1, &tmp2, 0);
 
 										item->pos.xPos = x;
@@ -6218,8 +6213,6 @@ int LaraTestClimbStance(ITEM_INFO* item, COLL_INFO* coll)//11F78, 12028
 
 			if ((shift_r < 0 && shift_l < shift_r) ||
 				(shift_r > 0 && shift_l > shift_r))
-				/*if (SIGN(shift_r) == SIGN(shift_l) &&
-					abs(shift_l) > abs(shift_r))*/
 			{
 				item->pos.yPos += shift_l;
 				return true;
@@ -6671,122 +6664,6 @@ void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	}
 }
 
-/*int GetLaraJointPos(PHD_VECTOR* vec, int mat)
-{
-#if !PSXPC_TEST///@FIXME excuse me but this doesn't work.
-	MatrixPtr[0] = lara_joint_matrices[mat].m00;
-	MatrixPtr[1] = lara_joint_matrices[mat].m01;
-	MatrixPtr[2] = lara_joint_matrices[mat].m02;
-	MatrixPtr[3] = lara_joint_matrices[mat].m10;
-	MatrixPtr[4] = lara_joint_matrices[mat].m11;
-	MatrixPtr[5] = lara_joint_matrices[mat].m12;
-	MatrixPtr[6] = lara_joint_matrices[mat].m20;
-	MatrixPtr[7] = lara_joint_matrices[mat].m21;
-	MatrixPtr[8] = lara_joint_matrices[mat].m22;
-	MatrixPtr[9] = lara_joint_matrices[mat].tx;
-	MatrixPtr[10] = lara_joint_matrices[mat].ty;
-	MatrixPtr[11] = lara_joint_matrices[mat].tz;
-
-	mTranslateXYZ(vec->x, vec->y, vec->z);
-
-	vec->x = phd_mxptr[3] >> W2V_SHIFT;
-	vec->y = phd_mxptr[7] >> W2V_SHIFT; // todo this is wrong // todo actually not
-	vec->z = phd_mxptr[11] >> W2V_SHIFT;
-
-	vec->x += LaraItem->pos.xPos;
-	vec->y += LaraItem->pos.yPos;
-	vec->z += LaraItem->pos.zPos;
-
-	mPopMatrix();
-#endif
-	return 48;
-}*/
-
-/*
-void SetLaraUnderwaterNodes()//8596C(<), 879B0(<) (F) 
-{
-	return;//not used yet
-	PHD_VECTOR joint;
-	short roomNumber;//_18
-	room_info* r;//$a1
-	int flags;//$s1
-	int current_joint;//$s0
-
-	joint.x = 0;
-	joint.y = 0;
-	joint.z = 0;
-
-	flags = 0;
-
-	//loc_85988
-	for (current_joint = 14; current_joint >= 0; current_joint--)
-	{
-		GetLaraJointPos(&joint, current_joint);
-
-		roomNumber = LaraItem->roomNumber;
-		GetFloor(joint.x, joint.y, joint.z, &roomNumber);
-
-		r = &room[roomNumber];
-		LaraNodeUnderwater[current_joint] = r->flags & RF_FILL_WATER;
-
-		if (r->flags & RF_FILL_WATER)
-		{
-			Lara.wet[current_joint] = 0xFC;
-
-			if (!(flags & 1))
-			{
-				flags |= 1;
-				((int*)SRhandPtr)[3] = ((int*)& r->ambient)[0];
-			}
-		}
-		else
-		{
-			//loc_85A1C
-			if (!(flags & 2))
-			{
-				flags |= 2;
-				((int*)SRhandPtr)[2] = ((int*)& r->ambient)[0];
-			}
-		}
-	}
-}
-
-void SetPendulumVelocity(int x, int y, int z)// (F)
-{
-	if ((CurrentPendulum.node & 0xFFFFFFFE) < 24)
-	{
-		int val = 4096 / ((12 - (CurrentPendulum.node >> 1)) << 9 >> 8) << 8; // todo make this more beautiful
-
-		x = (x * val) >> 16;
-		y = (y * val) >> 16;
-		z = (z * val) >> 16;
-	}
-
-	CurrentPendulum.Velocity.x += x;
-	CurrentPendulum.Velocity.y += y;
-	CurrentPendulum.Velocity.z += z;
-}
-
-void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll)
-{
-	UNIMPLEMENTED();
-}
-
-void FireChaff()
-{
-	UNIMPLEMENTED();
-}
-
-void GetLaraJointPosRot(PHD_VECTOR* a1, int a2, int a3, SVECTOR * a4)
-{
-	UNIMPLEMENTED();
-}
-
-void DoSubsuitStuff()
-{
-	UNIMPLEMENTED();
-}*/
-
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (abs(coll->tiltX) <= 2 && abs(coll->tiltZ) <= 2)
@@ -7011,11 +6888,11 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return result;
 }
 /**********************
-
-Current problems with with the feet hanging:
--going around corners isn't working. code is commented for now.
--obviously, not all animations were made yet- we still need crouch pull up (works well, tested with placeholder anim) and corner anims and handstand (not tested)
-
+NEW FEET HANGING STUFF
+////obviously, not all animations were made yet, we still need: 
+-crouch pull up (works well, tested with placeholder anim)
+-corner anims (works well, tested with placeholder anim)
+-handstand (not tested)
 ***********************/
 int TestHangFeet(ITEM_INFO* item, short angle)
 {
@@ -7267,6 +7144,7 @@ void lara_as_hang_feet_inRcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_INNER].frameEnd) // I don't like this either but it's better than adding 4 new 1 frame anims?
 	SetCornerAnimFeet(item, coll, ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_RIGHT_CORNER_INNER);
 }
@@ -7274,6 +7152,7 @@ void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_INNER].frameEnd)
 	SetCornerAnimFeet(item, coll, -ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_LEFT_CORNER_INNER);
 }
@@ -7281,6 +7160,7 @@ void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_OUTER].frameEnd)
 	SetCornerAnimFeet(item, coll, -ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_RIGHT_CORNER_OUTER);
 }
@@ -7288,6 +7168,7 @@ void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_OUTER].frameEnd)
 	SetCornerAnimFeet(item, coll, ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_LEFT_CORNER_OUTER);
 }
@@ -7313,10 +7194,10 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	else if (flip)
 	{
 
-			item->animNumber = LA_HANG_TO_HANG_FEET;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 24;
-			item->goalAnimState = LS_HANG_FEET;
-			item->currentAnimState = LS_HANG_FEET;
+		item->animNumber = LA_HANG_FEET_IDLE;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->goalAnimState = LS_HANG_FEET;
+		item->currentAnimState = LS_HANG_FEET;
 
 		coll->old.x = Lara.cornerX;
 		item->pos.xPos = Lara.cornerX;

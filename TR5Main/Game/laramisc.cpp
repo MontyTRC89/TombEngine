@@ -803,8 +803,20 @@ void InitialiseLara(int restore)
 	Lara.dpoisoned = 0;
 	Lara.poisoned = 0;
 	Lara.waterSurfaceDist = 100;
-	Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Pistols;
-	Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Pistols;
+	if(Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_PISTOLS)].Present){
+		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Pistols;
+		Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Pistols;
+	} else{
+		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Empty;
+		Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
+	}
+	if(Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_SHOTGUN)].Present){
+		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Shotgun;
+	} else{
+		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
+	}
+
+
 	Lara.location = -1;
 	Lara.highestLocation = -1;
 	Lara.ropePtr = -1;

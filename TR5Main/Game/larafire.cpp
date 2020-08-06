@@ -584,7 +584,7 @@ void LaraGun() // (F) (D)
 		case LG_HANDS_BUSY:
 			if (Lara.gunType == WEAPON_FLARE)
 			{
-				if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND  /*CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND)*/)
+				if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 				{
 #if 0
 					Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
