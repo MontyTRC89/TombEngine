@@ -806,7 +806,6 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 		&& oldZ == item->pos.zPos 
 		&& oldXrot == item->pos.xRot
 		&& oldYrot == item->pos.yRot
-		/*|| (LOBYTE(v21) = byte_51CEE4) != 0*/
 		|| flag != 1)
 	{
 		if (flag == 2)
@@ -819,8 +818,6 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)//4B608, 4BA6C
 			SoundEffect(SFX_SWIMSUIT_METAL_CLASH, &LaraItem->pos, ((2 * GetRandomControl() + 0x8000) << 8) | 6);
 		}
 
-		// CHECK related to cutscene?
-		//byte_51CEE4 = 30;
 		if (Lara.anxiety < 96)
 		{
 			Lara.anxiety += 16;

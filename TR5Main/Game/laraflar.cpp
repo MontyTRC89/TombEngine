@@ -104,13 +104,11 @@ void ready_flare() // (F) (D)
 
 void undraw_flare_meshes() // (F) (D)
 {
-	//LARA_MESHES(ID_LARA, LM_LHAND);
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void draw_flare_meshes() // (F) (D)
 {
-	//LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND);
 	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
