@@ -7011,11 +7011,11 @@ int LaraHangTest(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	return result;
 }
 /**********************
-
-Current problems with with the feet hanging:
--going around corners isn't working. code is commented for now.
--obviously, not all animations were made yet- we still need crouch pull up (works well, tested with placeholder anim) and corner anims and handstand (not tested)
-
+NEW FEET HANGING STUFF
+////obviously, not all animations were made yet, we still need: 
+-crouch pull up (works well, tested with placeholder anim)
+-corner anims (works well, tested with placeholder anim)
+-handstand (not tested)
 ***********************/
 int TestHangFeet(ITEM_INFO* item, short angle)
 {
@@ -7267,6 +7267,7 @@ void lara_as_hang_feet_inRcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_INNER].frameEnd) // I don't like this either but it's better than adding 4 new 1 frame anims?
 	SetCornerAnimFeet(item, coll, ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_RIGHT_CORNER_INNER);
 }
@@ -7274,6 +7275,7 @@ void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_INNER].frameEnd)
 	SetCornerAnimFeet(item, coll, -ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_LEFT_CORNER_INNER);
 }
@@ -7281,6 +7283,7 @@ void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_RIGHT_CORNER_OUTER].frameEnd)
 	SetCornerAnimFeet(item, coll, -ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_RIGHT_CORNER_OUTER);
 }
@@ -7288,6 +7291,7 @@ void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Camera.laraNode = 8;
 	Camera.targetElevation = ANGLE(33.0f);
+	if (item->frameNumber == g_Level.Anims[LA_SHIMMY_FEET_LEFT_CORNER_OUTER].frameEnd)
 	SetCornerAnimFeet(item, coll, ANGLE(90.0f),
 		item->animNumber = LA_SHIMMY_FEET_LEFT_CORNER_OUTER);
 }
@@ -7313,10 +7317,10 @@ void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip)
 	else if (flip)
 	{
 
-			item->animNumber = LA_HANG_TO_HANG_FEET;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 24;
-			item->goalAnimState = LS_HANG_FEET;
-			item->currentAnimState = LS_HANG_FEET;
+		item->animNumber = LA_HANG_FEET_IDLE;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->goalAnimState = LS_HANG_FEET;
+		item->currentAnimState = LS_HANG_FEET;
 
 		coll->old.x = Lara.cornerX;
 		item->pos.xPos = Lara.cornerX;
