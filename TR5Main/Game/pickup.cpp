@@ -511,20 +511,6 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
     {
         if (!Lara.isMoving && (short)Lara.generalPtr == itemNum || (short)Lara.generalPtr != itemNum)
         {
-/*          if ((short)Lara.generalPtr == itemNum && l->currentAnimState == LS_INSERT_PUZZLE)
-            {
-                if (l->frameNumber == g_Level.Anims[LA_USE_PUZZLE].frameBase + 80 && item->itemFlags[0])
-                {
-                    if (flag == 3)
-                        l->itemFlags[0] = item->triggerFlags;
-                    else
-                        l->itemFlags[0] = 0;
-                    PuzzleDone(item, itemNum);
-                    item->itemFlags[0] = 0;
-                    return;
-                }
-            }*/
-
             if ((short)Lara.generalPtr == itemNum)
             {
                 if (l->currentAnimState != LS_MISC_CONTROL)
@@ -533,14 +519,6 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                         ObjectCollision(itemNum, l, coll);
                     return;
                 }
-/*              if (l->animNumber == LA_PUT_TRIDENT)
-                {
-                    if (l->frameNumber == g_Level.Anims[l->animNumber].frameBase + 180)
-                    {
-                        PuzzleDone(item, itemNum);
-                        return;
-                    }
-                }*/
             }
             if (l->currentAnimState == LS_MISC_CONTROL)
                 return;
@@ -916,41 +894,6 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 item->pos.zRot = oldZrot;
                 return;
             }
-            
-         /*   if ((short)Lara.generalPtr != itemNum
-                || l->currentAnimState != LS_PICKUP
-                || l->frameNumber != g_Level.Anims[LA_UNDERWATER_PICKUP].frameBase + 18)
-            {
-                if ((short)Lara.generalPtr == itemNum
-                    && l->currentAnimState == LS_PICKUP_FLARE
-                    && l->frameNumber == g_Level.Anims[LA_UNDERWATER_FLARE_PICKUP].frameBase + 20)
-                {
-                    Lara.requestGunType = WEAPON_FLARE;
-                    Lara.gunType = WEAPON_FLARE;
-                    InitialiseNewWeapon();
-                    Lara.gunStatus = LG_SPECIAL;
-                    Lara.flareAge = (int)(item->data) & 0x7FFF;
-                    draw_flare_meshes();
-                    KillItem(itemNum);
-                }
-
-                item->pos.xRot = oldXrot;
-                item->pos.yRot = oldYrot;
-                item->pos.zRot = oldZrot;
-                return;
-            }
-
-            AddDisplayPickup(item->objectNumber);
-            if (!(item->triggerFlags & 0xC0))
-            {
-                KillItem(itemNum);
-            }
-            else
-            {
-                item->itemFlags[3] = 1;
-                item->flags |= 0x20;
-                item->status = ITEM_INVISIBLE;
-            }*/
         }
 
         item->pos.xRot = oldXrot;
@@ -971,19 +914,6 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
             {
                 if (l->currentAnimState != LS_PICKUP && l->currentAnimState != LS_HOLE)
                 {
-                /*    if ((short)Lara.generalPtr == itemNum
-                        && l->currentAnimState == LS_PICKUP_FLARE
-                        && (l->animNumber == LA_CROUCH_PICKUP_FLARE &&
-                            l->frameNumber == g_Level.Anims[LA_CROUCH_PICKUP_FLARE].frameBase + 22)
-                        || l->frameNumber == g_Level.Anims[LA_FLARE_PICKUP].frameBase + 58)
-                    {
-                        Lara.requestGunType = WEAPON_FLARE;
-                        Lara.gunType = WEAPON_FLARE;
-                        InitialiseNewWeapon();
-                        Lara.gunStatus = LG_SPECIAL;
-                        Lara.flareAge = (short)(item->data) & 0x7FFF;
-                    }
-                    else*/
                     {
                         item->pos.xRot = oldXrot;
                         item->pos.yRot = oldYrot;
@@ -993,60 +923,6 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
                 }
 				else
 				{
-					/*   if (l->frameNumber == g_Level.Anims[LA_PICKUP].frameBase + 15
-						   || l->frameNumber == g_Level.Anims[LA_CROUCH_PICKUP].frameBase + 22
-						   || l->frameNumber == g_Level.Anims[LA_CROUCH_PICKUP].frameBase + 20
-						   || l->frameNumber == g_Level.Anims[LA_PICKUP_PEDESTAL_LOW].frameBase + 29
-						   || l->frameNumber == g_Level.Anims[LA_PICKUP_PEDESTAL_HIGH].frameBase + 45
-						   || l->frameNumber == g_Level.Anims[LA_HOLE_GRAB].frameBase + 42
-						   || l->frameNumber == g_Level.Anims[LA_CROWBAR_USE_ON_WALL2].frameBase + 183
-						   || (l->animNumber == LA_CROWBAR_USE_ON_WALL && l->frameNumber != g_Level.Anims[LA_CROWBAR_USE_ON_WALL].frameBase + 123))
-					   {
-						   if (item->objectNumber == ID_BURNING_TORCH_ITEM)
-						   {
-							   AddDisplayPickup(ID_BURNING_TORCH_ITEM);
-							   GetFlameTorch();
-							   Lara.litTorch = (item->itemFlags[3] & 1);
-
-							   KillItem(itemNum);
-							   item->pos.xRot = oldXrot;
-							   item->pos.yRot = oldYrot;
-							   item->pos.zRot = oldZrot;
-							   return;
-						   }
-						   else
-						   {
-							   if (item->objectNumber != ID_FLARE_ITEM)
-							   {
-								   AddDisplayPickup(item->objectNumber);
-								   if (item->triggerFlags & 0x100)
-								   {
-									   for (int i = 0; i < g_Level.NumItems; i++)
-									   {
-										   if (g_Level.Items[i].objectNumber == item->objectNumber)
-											   KillItem(i);
-									   }
-								   }
-							   }
-							   if (item->triggerFlags & 0xC0)
-							   {
-								   item->itemFlags[3] = 1;
-								   item->flags |= 0x20;
-								   item->status = ITEM_INVISIBLE;
-							   }
-						   }
-					   }
-					   else
-					   {
-						   item->pos.xRot = oldXrot;
-						   item->pos.yRot = oldYrot;
-						   item->pos.zRot = oldZrot;
-						   return;
-					   }
-				   }
-
-				   KillItem(itemNum);*/
-
 					item->pos.xRot = oldXrot;
 					item->pos.yRot = oldYrot;
 					item->pos.zRot = oldZrot;
@@ -1473,23 +1349,6 @@ void PuzzleDone(ITEM_INFO* item, short itemNum)
 
     item->flags |= IFLAG_ACTIVATION_MASK;
     item->status = ITEM_ACTIVE;
-
-    /*if (item->triggerFlags == 0x3E6 && g_Level.NumItems > 0)
-    {
-        int i;
-        for (i = 0; i < level_items; i++)
-        {
-            if (g_Level.Items[i].objectNumber == AIRLOCK_SWITCH
-                && g_Level.Items[i].pos.xPos == item->pos.xPos
-                && g_Level.Items[i].pos.zPos == item->pos.zPos)
-            {
-                FlipMap(g_Level.Items[i].triggerFlags - 7);
-                flipmap[Items[i].triggerFlags - 7] ^= IFLAG_ACTIVATION_MASK;
-                g_Level.Items[i].status = ITEM_NOT_ACTIVE;
-                g_Level.Items[i].flags |= 0x20;
-            }
-        }
-    }*/
 }
 
 void InitialisePickup(short itemNumber)

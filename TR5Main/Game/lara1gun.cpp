@@ -118,13 +118,7 @@ void ControlHarpoonBolt(short itemNumber)
 		if (target == LaraItem || !target->collidable)
 			continue;
 
-		if (/*target->objectNumber == SMASH_WINDOW ||
-			target->objectNumber == SMASH_OBJECT1 ||
-			target->objectNumber == SMASH_OBJECT2 ||
-			target->objectNumber == SMASH_OBJECT3 ||
-			target->objectNumber == CARCASS ||
-			target->objectNumber == EXTRAFX6 ||*/
-			(target->status != ITEM_INVISIBLE && Objects[target->objectNumber].collision))
+		if (target->status != ITEM_INVISIBLE && Objects[target->objectNumber].collision)
 		{
 			// check against bounds of target for collision
 			BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(target);
@@ -370,12 +364,6 @@ void ControlGrenade(short itemNumber)
 
 				FlashFader = 32;
 
-				// if Volumetric then FlashFader = 0?
-				/*if (sub_47F960())
-				{
-					FlashFader = 0;
-				}*/
-
 				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 			}
@@ -475,42 +463,8 @@ void ControlGrenade(short itemNumber)
 		int wy = world.Translation().y;
 		int wz = world.Translation().z;
 
-		// For now keep this legacy math
-		// PHD_MATH
-		/*phd_PushUnitMatrix();
-
-		MatrixPtr[M03] = 0;
-		MatrixPtr[M13] = 0;
-		MatrixPtr[M23] = 0;
-
-		phd_RotYXZ(item->pos.yRot - ANGLE(180), item->pos.xRot, item->pos.zRot);
-		phd_TranslateRel(0, 0, -64);
-
-		int wx = (MatrixPtr[M03] >> W2V_SHIFT);
-		int wy = (MatrixPtr[M13] >> W2V_SHIFT);
-		int wz = (MatrixPtr[M23] >> W2V_SHIFT);
-
-		phd_PopMatrix();*/
-
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 	}
-
-	/*XMMATRIX transform;
-	XMMATRIX translation;
-	XMMATRIX rotation;
-
-	XMMATRIXRotationYawPitchRoll(&rotation, TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot),
-		TO_RAD(item->pos.zRot));
-	XMMATRIXTranslation(&translation, 0, 0, -64);
-	XMMATRIXMultiply(&transform, &rotation, &translation);
-
-	int wx = transform._14;
-	int wy = transform._24;
-	int wz = transform._34;
-
-	if (item->speed && aboveWater)
-		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
-*/
 
 	xv = ((item->speed * phd_sin(item->goalAnimState)) >> W2V_SHIFT);
 	yv = item->fallspeed;
@@ -574,6 +528,7 @@ void ControlGrenade(short itemNumber)
       goto LABEL_35;
     }
     item->hitPoints = 1;*/
+		// what is this lol
 	}
 
 	if (item->itemFlags[0] == GRENADE_ULTRA)
@@ -733,14 +688,6 @@ void ControlGrenade(short itemNumber)
 			FlashFadeR = 255;
 			FlashFadeG = 255;
 			FlashFadeB = 255;
-
-			/*
-			if ( sub_47F960() )
-      {
-        FlashFader = 0;
-        sub_47F880(item->pos.xPos, item->pos.yPos, item->pos.zPos, 4096, 255, 255, 255, 255, item->roomNumber);
-      }
-			*/
 
 			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -1299,11 +1246,6 @@ void RifleHandler(int weaponType)
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
 			PHD_VECTOR pos = {};
-			/*
-			pos.x = GetRandomControl() - 128;
-			pos.y = (GetRandomControl() & 0x7F) - 63;
-			pos.z = GetRandomControl() - 128;
-			*/
 			pos.y = -64;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
@@ -1319,11 +1261,6 @@ void RifleHandler(int weaponType)
 		else if (weaponType == WEAPON_REVOLVER)
 		{
 			PHD_VECTOR pos = {};
-			/*
-			pos.x = GetRandomControl() - 128;
-			pos.y = (GetRandomControl() & 0x7F) - 63;
-			pos.z = GetRandomControl() - 128;
-			*/
 			pos.y = -32;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
@@ -1614,6 +1551,7 @@ void DoCrossbowDamage(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
 			item2->status = ITEM_ACTIVE;
 		}
 	}*/
+	// what is this 2.0
 }
 
 void FireHK(int mode)

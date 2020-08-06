@@ -300,9 +300,6 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 			return;
 
 		TestCollision(item, LaraItem);    
-
-		/*if (item->object_number == FAN && item->currentAnimState == 1)	// Is the fan moving slow ?
-			ObjectCollision(item_num, laraitem, coll);*/
 	}
 	else if (item->status != ITEM_INVISIBLE)
 		ObjectCollision(itemNumber, l, c);
@@ -774,13 +771,6 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 	ry = pos.y;
 	rz = pos.z;
 
-	/*Vector3 boxMin = Vector3(bounds->boundingBox.X1, bounds->boundingBox.Y1, bounds->boundingBox.Z1);
-	Vector3 boxMax = Vector3(bounds->boundingBox.X2, bounds->boundingBox.Y2, bounds->boundingBox.Z2);
-	Vector3 centre = (boxMin + boxMax) / 2.0f;
-	Vector3 extens = boxMax - centre;
-	BoundingBox box = BoundingBox(centre, extens);
-
-	return box.Contains(pos);*/
 
 	if (rx < bounds->boundingBox.X1 || rx > bounds->boundingBox.X2 
 		|| ry < bounds->boundingBox.Y1 || ry > bounds->boundingBox.Y2

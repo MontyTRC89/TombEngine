@@ -334,23 +334,12 @@ void PistolHandler(int weaponType)
 		pos.z = (byte)GetRandomControl() - 128;
 
 		GetLaraJointPosition(&pos, Lara.leftArm.flash_gun != 0 ? LM_LHAND : LM_RHAND);
-		/*if (gfLevelFlags & 0x2000 && LaraItem->roomNumber == gfMirrorRoom)
-		{
-			v8 = GetRandomControl() & 0x3F;
-			v9 = (GetRandomControl() & 0x1F) + 128;
-			v10 = GetRandomControl();
-			sub_4015A5(v14, v15, v16, 10, (v10 & 0x3F) + 192, v9, v8); // TODO: TriggerDynamicLightMirror !
-		}
-		else
-		{*/
 			TriggerDynamicLight(pos.x+frandMinMax(-128,128), pos.y + frandMinMax(-128, 128), pos.z + frandMinMax(-128, 128), frandMinMax(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
-		//}
 	}
 }
 
 void undraw_pistol_mesh_right(int weaponType)
 {
-	//LARA_MESHES(ID_LARA, LM_RHAND);
 	Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 	
 	Lara.holsterInfo.rightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
@@ -361,7 +350,6 @@ void undraw_pistol_mesh_left(int weaponType)
 {
 	if (static_cast<LARA_WEAPON_TYPE>(weaponType) != LARA_WEAPON_TYPE::WEAPON_REVOLVER)
 	{
-		//LARA_MESHES(ID_LARA, LM_LHAND);
 		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 		
 		Lara.holsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
