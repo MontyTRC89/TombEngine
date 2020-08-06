@@ -294,7 +294,7 @@ void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| l->animNumber != LA_STAND_IDLE
 		|| Lara.gunStatus
 		|| item->itemFlags[0])
-		&& (!Lara.isMoving|| Lara.generalPtr != (void*)itemNum))
+		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
 	{
 		ObjectCollision(itemNum, l, coll);
 		return;
