@@ -41,6 +41,7 @@
 #include "tr4_locusts.h"
 #include "smoke.h"
 #include "spark.h"
+#include <tr4_littlebeetle.h>
 #include "explosion.h"
 #include "drip.h"
 
@@ -518,12 +519,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
+		UpdateLittleBeetles();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		T5M::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateLocusts();
+		UpdateLittleBeetles();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
