@@ -188,10 +188,10 @@ void ControlTeleporter(short itemNumber)
 			SoundEffect(SFX_LIFT_HIT_FLOOR2, 0, 0);
 		}
 
-		LaraItem->animNumber = ANIMATION_LARA_ELEVATOR_RECOVER;
+		LaraItem->animNumber = LA_ELEVATOR_RECOVER;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->goalAnimState = STATE_LARA_MISC_CONTROL;
-		LaraItem->currentAnimState = STATE_LARA_MISC_CONTROL;
+		LaraItem->goalAnimState = LS_MISC_CONTROL;
+		LaraItem->currentAnimState = LS_MISC_CONTROL;
 
 		item->itemFlags[0]++;
 		if (item->itemFlags[0] >= 150)

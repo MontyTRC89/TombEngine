@@ -205,9 +205,9 @@ static int QuadCheckGetOff()
 		else
 			LaraItem->pos.yRot -= ANGLE(90);
 
-		LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+		LaraItem->animNumber = LA_STAND_SOLID;
 		LaraItem->frameNumber = GF(LaraItem->animNumber, 0);
-		LaraItem->currentAnimState = LaraItem->goalAnimState = STATE_LARA_STOP;
+		LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
 		LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
@@ -223,9 +223,9 @@ static int QuadCheckGetOff()
 		{
 			PHD_VECTOR pos = { 0, 0, 0 };
 
-			LaraItem->animNumber = ANIMATION_LARA_FREE_FALL_LONG;
-			LaraItem->frameNumber = GF(ANIMATION_LARA_FREE_FALL_LONG, 0);
-			LaraItem->currentAnimState = STATE_LARA_FREEFALL;
+			LaraItem->animNumber = LA_FREEFALL;
+			LaraItem->frameNumber = GF(LA_FREEFALL, 0);
+			LaraItem->currentAnimState = LS_FREEFALL;
 
 			GetJointAbsPosition(LaraItem, &pos, LM_HIPS);
 
@@ -244,7 +244,7 @@ static int QuadCheckGetOff()
 		}
 		else if (LaraItem->currentAnimState == QUAD_STATE_FALLDEATH)
 		{
-			LaraItem->goalAnimState = STATE_LARA_DEATH;
+			LaraItem->goalAnimState = LS_DEATH;
 			LaraItem->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
 			LaraItem->speed = 0;
 			quad->flags |= QUAD_FLAGS_DEAD;
