@@ -1176,7 +1176,6 @@ void BinocularCamera(ITEM_INFO* item)
 			Lara.headXrot = 0;
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
-			//dword_87B0F8 = 0;
 			Camera.type = BinocularOldCamera;
 			return;
 		}
@@ -1440,7 +1439,6 @@ void BinocularCamera(ITEM_INFO* item)
 
 		if (!(InputBusy & IN_ACTION) || Infrared)
 		{
-			//dword_87B0F8 = 0;
 		}
 		else
 		{
@@ -1555,20 +1553,12 @@ void CalculateCamera()
 		Camera.underwater = 0;
 	}
 	TLFlag = 0;
-
-	//if (gfCurrentLevel != LVL5_DEEPSEA_DIVE)
-	//{
 		//Camera is in a water room, play water sound effect.
 		if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 		{
 			SoundEffect(SFX_UNDERWATER, NULL, SFX_ALWAYS);
 			if (Camera.underwater == 0)
 			{
-				/*if (GLOBAL_playing_cutseq == 0 && TLFlag == 0)
-				{
-					CDDA_SetMasterVolume(savegame.VolumeCD >> 2);
-				}*/
-
 				Camera.underwater = 1;
 			}
 		}
@@ -1576,15 +1566,9 @@ void CalculateCamera()
 		{
 			if (Camera.underwater != 0)
 			{
-				/*if (GLOBAL_playing_cutseq == 0 && TLFlag == 0 && savegame.VolumeCD > 0)
-				{
-					CDDA_SetMasterVolume(savegame.VolumeCD);
-				}*/
-
 				Camera.underwater = 0;
 			}
 		}
-	//}
 
 	if (Camera.type == CINEMATIC_CAMERA)
 	{

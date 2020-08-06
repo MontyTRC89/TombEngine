@@ -1104,32 +1104,7 @@ void SwitchControl(short itemNumber)
 		}
 	}
 	else
-	{
-		/*if (item->animNumber == Objects[ID_AIRLOCK_SWITCH].animIndex + 1 && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
-		{
-			if (GetSwitchTrigger(&item, &ItemNos, 1) > 0)
-			{
-				v4 = (short*)((char*)& v15 + 2 * v3 + 2);
-				v11 = v3;
-				do
-				{
-					v5 = *v4;
-					v6 = items;
-					v6[v5].flags ^= 0x3E00u;
-					v7 = & v6[v5];
-					if ((v6[v5].flags & 0x3E00) == 15872 && (*(_BYTE*)(v7 + 5610) & 6) != 2)
-					{
-						AddActiveItem(*v4);
-						v8 = *(_DWORD*)(v7 + 5610);
-						LOBYTE(v8) = v8 & 0xFB | 2;
-						*(_DWORD*)(v7 + 5610) = v8;
-					}
-					--v4;
-					--v11;
-				} while (v11);
-			}
-		}*/
-		
+	{	
 		if (item->triggerFlags == 8)
 		{
 			PHD_VECTOR pos;

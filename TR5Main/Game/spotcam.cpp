@@ -162,7 +162,7 @@ void InitialiseSpotCam(short Sequence)
 	LastCamera = CurrentSplineCamera + (CameraCnt[SpotCamRemap[Sequence]] - 1);
 	CurrentCameraCnt = CameraCnt[SpotCamRemap[Sequence]];
 
-	if ((s->flags & SCF_DISABLE_LARA_CONTROLS) /*|| gfGameMode == 1*/)
+	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
 		DisableLaraControl = 1;
 		g_Renderer.EnableCinematicBars(true);
@@ -266,14 +266,7 @@ void InitialiseSpotCam(short Sequence)
 
 			if (s->flags & SCF_VIGNETTE)
 			{
-				/*if (s->timer < 0)
-				{
-					SCOverlay = 1;
-				}//loc_37C8C
-				else if (SlowMotion == 0)
-				{
-					SlowMotion = s->timer;
-				}*/
+				/*Hardcoded code*/
 			}
 
 			if (s->flags & SCF_HIDE_LARA)
@@ -421,28 +414,12 @@ void CalculateSpotCameras()
 		&& CameraFade != CurrentSplineCamera)
 	{
 		CameraFade = CurrentSplineCamera;
-
-		/*if (gfCurrentLevel != LVL5_TITLE)
-		{
-			ScreenFadedOut = 0;
-			ScreenFade = 255;
-			dScreenFade = 0;
-			SetScreenFadeIn(16);
-		}*/
 	}
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT)
 		&& CameraFade != CurrentSplineCamera)
 	{
 		CameraFade = CurrentSplineCamera;
-
-		/*if (gfCurrentLevel != LVL5_TITLE)
-		{
-			ScreenFadedOut = 0;
-			ScreenFade = 0;
-			dScreenFade = 255;
-			SetScreenFadeOut(16, 0);
-		}*/
 	}
 
 	sp = 0;
@@ -516,7 +493,7 @@ void CalculateSpotCameras()
 	}
 
 	if (s->flags & SCF_DISABLE_BREAKOUT
-		|| !(TrInput & IN_LOOK) /*&& gfGameMode != 1*/)
+		|| !(TrInput & IN_LOOK))
 	{
 		Camera.pos.x = cpx;
 		Camera.pos.y = cpy;

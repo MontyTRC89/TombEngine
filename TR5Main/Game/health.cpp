@@ -44,11 +44,6 @@ void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
-		//int color2;
-		//if (Lara.poisoned || Lara.gassed)
-		//	color2 = 0xA0A000;
-		//else
-		//	color2 = 0xA00000;
 		g_Renderer.DrawBar(value, ::g_HealthBar);
 	}
 }

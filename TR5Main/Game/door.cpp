@@ -481,26 +481,6 @@ void DoorControl(short itemNumber)
 				OpenThatDoor(&door->d2flip, door);
 				door->opened = true;
 			}
-			/*if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-			{
-				if (gfCurrentLevel == 11)
-				{
-					v9 = item->object_number;
-					if (v9 != 302 && v9 != 304)
-					{
-						LOBYTE(v5) = AnimateItem((int)item);
-						return v5;
-					}
-				LABEL_40:
-					v10 = item->_bf15ea;
-					LOBYTE(v10) = v10 | 6;
-					item->_bf15ea = v10;
-					LOBYTE(v5) = AnimateItem((int)item);
-					return v5;
-				}
-				if (gfCurrentLevel >= 0xCu && gfCurrentLevel <= 0xEu && item->object_number == 300)
-					goto LABEL_40;
-			}*/
 		}
 		else
 		{
@@ -829,43 +809,6 @@ void InitialiseDoor(short itemNumber)
 		item->roomNumber = roomNumber;
 		item->inDrawRoom = true;
 	}
-
-	/*if (twoRoom != NO_ROOM && item->objectNumber >= ID_CLOSED_DOOR1 && item->objectNumber <= ID_LIFT_DOORS2)
-	{
-		FillDoorPointers(door, item, twoRoom, dz, dx);
-		
-		door->dptr1[0] = 0;
-		door->dptr1[1] = 0;
-		door->dptr1[2] = 0;
-
-		door->dptr3[0] = 0;
-		door->dptr3[1] = 0;
-		door->dptr3[2] = 0;
-
-		if (g_Level.Rooms[item->roomNumber].flippedRoom != -1)
-		{
-			//if (!door->dptr2)
-			//	MEMORY[1] = 1;
-			
-			door->dptr2[0] = 0;
-			door->dptr2[1] = 0;
-			door->dptr2[2] = 0;
-		}
-
-		if (g_Level.Rooms[item->drawRoom].flippedRoom != -1)
-		{
-			//if (!door->dptr4)
-			//	MEMORY[1] = 1;
-
-			door->dptr4[0] = 0;
-			door->dptr4[1] = 0;
-			door->dptr4[2] = 0;
-		}
-
-		door->item = item;
-
-		AssignClosedDoor(item);
-	}*/
 }
 
 void InitialiseClosedDoors()
@@ -975,6 +918,7 @@ void ProcessClosedDoors()
 		}
 	}*/
 }
+// keeping these cocmments for now in case they're actually needed?
 
 void AssignClosedDoor(ITEM_INFO* item)
 {
