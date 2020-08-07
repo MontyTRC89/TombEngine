@@ -55,7 +55,7 @@ void ClearSpidersPatch(ITEM_INFO* item)
 
 void InitialiseSpiders(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	short flags = item->triggerFlags / -24;
 
@@ -94,7 +94,7 @@ void InitialiseSpiders(short itemNumber)
 
 void SpidersEmitterControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->triggerFlags)
 	{
@@ -245,11 +245,11 @@ void UpdateSpiders()
 					spider->fallspeed = 0;
 				}
 
-				if (spider->pos.yPos < Rooms[spider->roomNumber].maxceiling + 50)
+				if (spider->pos.yPos < g_Level.Rooms[spider->roomNumber].maxceiling + 50)
 				{
 					spider->fallspeed = 1;
 					spider->pos.yRot += -32768;
-					spider->pos.yPos = Rooms[spider->roomNumber].maxceiling + 50;
+					spider->pos.yPos = g_Level.Rooms[spider->roomNumber].maxceiling + 50;
 				}
 
 				if (!i && !(GetRandomControl() & 4))

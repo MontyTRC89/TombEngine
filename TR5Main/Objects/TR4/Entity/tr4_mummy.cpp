@@ -51,14 +51,14 @@ BITE_INFO mummyBite2 = { 0, 0, 0, 14 };
 
 void InitialiseMummy(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	if (item->triggerFlags == 2)
 	{
 		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_LYING_DOWN;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_MUMMY_LYING_DOWN;
 		item->currentAnimState = STATE_MUMMY_LYING_DOWN;
 		item->status = ITEM_INVISIBLE;
@@ -66,7 +66,7 @@ void InitialiseMummy(short itemNumber)
 	else
 	{
 		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_ARMS_CROSSED;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_MUMMY_ARMS_CROSSED;
 		item->currentAnimState = STATE_MUMMY_ARMS_CROSSED;
 	}
@@ -77,7 +77,7 @@ void MummyControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short tilt = 0;
@@ -114,14 +114,14 @@ void MummyControl(short itemNumber)
 							item->currentAnimState = STATE_MUMMY_PUSHED_BACK;
 							item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_PUSHED_BACK;
 						}
-						item->frameNumber = Anims[item->animNumber].frameBase;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						item->pos.yRot += info.angle;
 					}
 				}
 				else
 				{
 					item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_COLLAPSE_START;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->currentAnimState = STATE_MUMMY_COLLAPSE;
 					item->pos.yRot += info.angle;
 					creature->maximumTurn = 0;
@@ -179,7 +179,7 @@ void MummyControl(short itemNumber)
 		if (item->triggerFlags == 1)
 		{
 			creature->maximumTurn = 0;
-			if (item->frameNumber == Anims[item->animNumber].frameEnd)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 				item->triggerFlags = 0;
 		}
 		else
@@ -260,7 +260,7 @@ void MummyControl(short itemNumber)
 
 			if (item->touchBits & 0x4800)
 			{
-				if (item->frameNumber > Anims[item->animNumber].frameEnd + 13 && item->frameNumber < Anims[item->animNumber].frameEnd + 22)
+				if (item->frameNumber > g_Level.Anims[item->animNumber].frameEnd + 13 && item->frameNumber < g_Level.Anims[item->animNumber].frameEnd + 22)
 				{
 					LaraItem->hitPoints -= 100;
 					LaraItem->hitStatus = true;

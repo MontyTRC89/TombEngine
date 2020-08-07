@@ -61,7 +61,7 @@ enum DRAGON_STATE {
 static void createBartoliLight(short ItemIndex, int type)
 {
 	ITEM_INFO* item;
-	item = &Items[ItemIndex];
+	item = &g_Level.Items[ItemIndex];
 
 	if (type == 0)
 		TriggerDynamicLight(item->pos.xPos, item->pos.yPos - STEP_SIZE, item->pos.zPos, (GetRandomControl() & 150) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 200, (GetRandomControl() & 20) + 200);
@@ -106,7 +106,7 @@ static void createExplosion(ITEM_INFO* item)
 	ExplIndex = CreateItem();
 	if (ExplIndex != NO_ITEM)
 	{
-		itemExplo = &Items[ExplIndex];
+		itemExplo = &g_Level.Items[ExplIndex];
 
 		if (item->timer == BOOM_TIME)
 			itemExplo->objectNumber = ID_SPHERE_OF_DOOM;
@@ -134,7 +134,7 @@ static void createExplosion(ITEM_INFO* item)
 
 static void createDragonBone(short front_number)
 {
-	/* Create the bones of the dragon */
+	/* Create the Bones of the dragon */
 	short bone_back, bone_front;
 	ITEM_INFO* back_dragon, *front_dragon, *item;
 
@@ -143,9 +143,9 @@ static void createDragonBone(short front_number)
 
 	if (bone_back != NO_ITEM && bone_front != NO_ITEM)
 	{
-		item = &Items[front_number];
+		item = &g_Level.Items[front_number];
 
-		back_dragon = &Items[bone_back];
+		back_dragon = &g_Level.Items[bone_back];
 		back_dragon->objectNumber = ID_DRAGON_BONE_BACK;
 		back_dragon->pos.xPos = item->pos.xPos;
 		back_dragon->pos.yPos = item->pos.yPos;
@@ -156,7 +156,7 @@ static void createDragonBone(short front_number)
 
 		InitialiseItem(bone_back);
 
-		front_dragon = &Items[bone_front];
+		front_dragon = &g_Level.Items[bone_front];
 		front_dragon->objectNumber = ID_DRAGON_BONE_FRONT;
 		front_dragon->pos.xPos = item->pos.xPos;
 		front_dragon->pos.yPos = item->pos.yPos;
@@ -178,7 +178,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	int anim, frame;
 
 	/* If Lara has collided with correct bit of dragon, then start him up */
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 
 	if (!TestBoundsCollide(item, laraitem, coll->radius))
 		return;
@@ -205,7 +205,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 			/* Check if in a position to pull dagger from dragon */
 			anim = item->animNumber - Objects[ID_DRAGON_BACK].animIndex;
-			frame = item->frameNumber - Anims[item->animNumber].frameBase;
+			frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 			if ((anim == DRAGON_DEAD_ANIM || (anim == DRAGON_DEAD_ANIM + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 				(TrInput & IN_ACTION) && item->objectNumber == ID_DRAGON_BACK && !laraitem->gravityStatus &&
 				shift <= DRAGON_MID && shift > DRAGON_CLOSE - 350 && side_shift > -350 && side_shift < 350 &&
@@ -213,7 +213,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			{
 				/* Jump to animation state in LARA_EXTRA */
 				laraitem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				laraitem->frameNumber = Anims[laraitem->animNumber].frameBase;
+				laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
 				laraitem->currentAnimState = 0;
 				laraitem->goalAnimState = 7;
 
@@ -239,7 +239,8 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.hitDirection = -1;
 
-				LARA_MESHES(ID_LARA_EXTRA_ANIMS, LM_RHAND);
+				//LARA_MESHES(ID_LARA_EXTRA_ANIMS, LM_RHAND);
+				Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
 				/* Do cinematic camera */
 				Camera.type = CINEMATIC_CAMERA;
@@ -247,7 +248,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				//memcpy(&CinematicPos, &laraitem->pos, sizeof(PHD_3DPOS));
 
 				/* Flag dragon is dead forever */
-				((CREATURE_INFO*)Items[(short)item->data].data)->flags = -1;
+				((CREATURE_INFO*)g_Level.Items[(short)item->data].data)->flags = -1;
 
 				return;
 			}
@@ -277,7 +278,7 @@ void DragonControl(short backNum)
 	short head, angle;
 	short itemNum;
 
-	back = &Items[backNum];
+	back = &g_Level.Items[backNum];
 	if (back->data != NULL && back->objectNumber == ID_DRAGON_FRONT) // check if data is not null and back is front
 		return;
 
@@ -285,7 +286,7 @@ void DragonControl(short backNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	dragon = (CREATURE_INFO*)item->data;
 	head = angle = 0;
 
@@ -294,7 +295,7 @@ void DragonControl(short backNum)
 		if (item->currentAnimState != DRAGON_DEATH)
 		{
 			item->animNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = item->goalAnimState = DRAGON_DEATH;
 			dragon->flags = 0;
 		}
@@ -481,7 +482,7 @@ void DragonControl(short backNum)
 	/* Set back end to same frame */
 	back->currentAnimState = item->currentAnimState;
 	back->animNumber = Objects[ID_DRAGON_BACK].animIndex + (item->animNumber - Objects[ID_DRAGON_FRONT].animIndex);
-	back->frameNumber = Anims[back->animNumber].frameBase + (item->frameNumber - Anims[item->animNumber].frameBase);
+	back->frameNumber = g_Level.Anims[back->animNumber].frameBase + (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
 	back->pos.xPos = item->pos.xPos;
 	back->pos.yPos = item->pos.yPos;
 	back->pos.zPos = item->pos.zPos;
@@ -497,7 +498,7 @@ void InitialiseBartoli(short itemNum)
 	ITEM_INFO* item, *back, *front;
 	short back_item, front_item;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	item->pos.xPos -= STEP_SIZE * 2;
 	item->pos.zPos -= STEP_SIZE * 2;
 
@@ -506,7 +507,7 @@ void InitialiseBartoli(short itemNum)
 	front_item = CreateItem();
 	if (back_item != NO_ITEM && front_item != NO_ITEM)
 	{
-		back = &Items[back_item];
+		back = &g_Level.Items[back_item];
 		back->objectNumber = ID_DRAGON_BACK;
 		back->pos.xPos = item->pos.xPos;
 		back->pos.yPos = item->pos.yPos;
@@ -521,7 +522,7 @@ void InitialiseBartoli(short itemNum)
 
 		item->data = (void*)back_item; // Bartoli points at back of dragon
 
-		front = &Items[front_item];
+		front = &g_Level.Items[front_item];
 		front->objectNumber = ID_DRAGON_FRONT;
 		front->pos.xPos = item->pos.xPos;
 		front->pos.yPos = item->pos.yPos;
@@ -535,7 +536,7 @@ void InitialiseBartoli(short itemNum)
 
 		back->data = (void*)front_item; // back of dragon points at front
 
-		LevelItems += 2;
+		g_Level.NumItems += 2;
 	}
 }
 
@@ -544,7 +545,7 @@ void BartoliControl(short itemNum)
 	ITEM_INFO* item, *back, *front;
 	short front_item, back_item;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 
 	if (item->timer)
 	{
@@ -561,7 +562,7 @@ void BartoliControl(short itemNum)
 			front_item = CreateItem();
 			if (front_item != NO_ITEM)
 			{
-				front = &Items[front_item];
+				front = &g_Level.Items[front_item];
 				if (item->timer == BOOM_TIME)
 					front->objectNumber = ID_SPHERE_OF_DOOM;
 				else if (item->timer == BOOM_TIME + 10)
@@ -582,10 +583,10 @@ void BartoliControl(short itemNum)
 		{
 			/* Convert Bartoli into a dragon */
 			back_item = (short)item->data;
-			back = &Items[back_item];
+			back = &g_Level.Items[back_item];
 
 			front_item = (short)back->data;
-			front = &Items[front_item];
+			front = &g_Level.Items[front_item];
 
 			front->touchBits = back->touchBits = 0;
 			EnableBaddieAI(front_item, 1);

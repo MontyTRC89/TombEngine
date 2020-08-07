@@ -271,7 +271,7 @@ struct InventoryRing
 	int rotation;
 	int distance;
 	int focusState;
-	int frameIndex;
+	int framePtr;
 	bool draw;
 	int y;
 	int titleStringIndex;

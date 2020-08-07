@@ -9,7 +9,7 @@
 
 void DartControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->touchBits)
 	{
@@ -48,7 +48,7 @@ void DartControl(short itemNumber)
 
 void DartEmitterControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->active)
 	{
@@ -67,7 +67,7 @@ void DartEmitterControl(short itemNumber)
 
 	if (dartItemNumber != NO_ITEM)
 	{
-		ITEM_INFO* dartItem = &Items[dartItemNumber];
+		ITEM_INFO* dartItem = &g_Level.Items[dartItemNumber];
 
 		dartItem->objectNumber = ID_DARTS;
 		dartItem->roomNumber = item->roomNumber;

@@ -47,7 +47,7 @@ static void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
 		ItemNewRoom(item->roomNumber, vec.roomNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 2;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->currentAnimState = 5;
 
 	CreatureAnimation(itemNum, angle, 0);
@@ -63,7 +63,7 @@ void SmallSpiderControl(short itemNum)
 	AI_INFO info;
 	short angle;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	spider = (CREATURE_INFO*)item->data;
 	angle = 0;
 
@@ -168,7 +168,7 @@ void BigSpiderControl(short itemNum)
 	AI_INFO info;
 	short angle;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	spider = (CREATURE_INFO*)item->data;
 	angle = 0;
 
@@ -177,7 +177,7 @@ void BigSpiderControl(short itemNum)
 		if (item->currentAnimState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 2;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 7;
 		}
 	}

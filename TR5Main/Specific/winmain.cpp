@@ -11,6 +11,7 @@
 #include "level.h"
 #include "configuration.h"
 #include "Renderer11.h"
+using namespace T5M::Renderer;
 using std::exception;
 using std::string;
 using std::cout;
@@ -68,10 +69,10 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 		if (!IsLevelLoading)
 		{
 			SuspendThread((HANDLE)ThreadHandle);
-			g_Renderer->ToggleFullScreen();
+			g_Renderer.ToggleFullScreen();
 			ResumeThread((HANDLE)ThreadHandle);
 
-			if (g_Renderer->IsFullsScreen())
+			if (g_Renderer.IsFullsScreen())
 			{
 				SetCursor(0);
 				ShowCursor(false);
@@ -256,9 +257,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	// Create the renderer and enumerate adapters and video modes
-	g_Renderer = new Renderer11();
-	g_Renderer->Create();
-	g_Renderer->EnumerateVideoModes();
+	g_Renderer.Create();
+	g_Renderer.EnumerateVideoModes();
 
 	// Load configuration and optionally show the setup dialog
 	InitDefaultConfiguration();
@@ -303,7 +303,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	WindowsHandle = App.WindowHandle;
 	// Initialise the renderer
-	g_Renderer->Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, g_Configuration.Windowed, App.WindowHandle);
+	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, g_Configuration.Windowed, App.WindowHandle);
 
 	// Initialize audio
 	if (g_Configuration.EnableSound)	
@@ -383,7 +383,6 @@ void WinClose()
 	if (g_Configuration.EnableSound)
 		Sound_DeInit();
 	
-	delete g_Renderer;
 	delete g_GameScript;
 	delete g_GameFlow;
 

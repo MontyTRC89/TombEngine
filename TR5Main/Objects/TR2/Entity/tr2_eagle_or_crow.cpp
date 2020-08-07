@@ -12,19 +12,19 @@ BITE_INFO crowBite = { 2, 10, 60, 14 };
 
 void InitialiseEagle(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
 
 	if (item->objectNumber == ID_CROW)
 	{
 		item->animNumber = Objects[ID_CROW].animIndex + 14;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->currentAnimState = item->goalAnimState = 7;
 	}
 	else
 	{
 		item->animNumber = Objects[ID_EAGLE].animIndex + 5;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->currentAnimState = item->goalAnimState = 2;
 	}
 }
@@ -34,7 +34,7 @@ void EagleControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short angle = 0;
@@ -63,7 +63,7 @@ void EagleControl(short itemNum)
 			else
 				item->animNumber = Objects[ID_EAGLE].animIndex + 8;
 
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 4;
 			item->gravityStatus = 1;
 			item->speed = 0;

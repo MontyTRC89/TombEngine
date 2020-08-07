@@ -14,7 +14,7 @@ static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, s
 	short harpoonItemNum = CreateItem();
 	if (harpoonItemNum != NO_ITEM)
 	{
-		ITEM_INFO* harpoon = &Items[harpoonItemNum];
+		ITEM_INFO* harpoon = &g_Level.Items[harpoonItemNum];
 
 		harpoon->objectNumber = ID_SCUBA_HARPOON;
 		harpoon->roomNumber = frogman->roomNumber;
@@ -38,7 +38,7 @@ static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, s
 
 void ScubaHarpoonControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->touchBits)
 	{
@@ -77,7 +77,7 @@ void ScubaControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
 	int waterHeight;
 	short angle = 0;
@@ -89,7 +89,7 @@ void ScubaControl(short itemNumber)
 		if (item->currentAnimState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 16;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 9;
 		}
 

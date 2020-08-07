@@ -13,7 +13,7 @@ void RatControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short head = 0;
 	short angle = 0;
@@ -24,7 +24,7 @@ void RatControl(short itemNum)
 		if (item->currentAnimState != 6)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 9;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 6;
 		}
 	}

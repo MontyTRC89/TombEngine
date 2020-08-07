@@ -13,7 +13,7 @@
 
 void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	int dx = LaraItem->pos.xPos - fx->pos.xPos;
 	int dz = LaraItem->pos.zPos - fx->pos.zPos;
@@ -68,7 +68,7 @@ void BubblesEffect1(short fxNum, short xVel, short yVel, short zVel)
 
 void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	int dx = LaraItem->pos.xPos - fx->pos.xPos;
 	int dz = LaraItem->pos.zPos - fx->pos.zPos;
@@ -115,7 +115,7 @@ void BubblesEffect2(short fxNum, short xVel, short yVel, short zVel)
 
 void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	int dx = LaraItem->pos.xPos - fx->pos.xPos;
 	int dz = LaraItem->pos.zPos - fx->pos.zPos;
@@ -176,7 +176,7 @@ void BubblesEffect4(short fxNum, short xVel, short yVel, short zVel)
 void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 {
 	ShatterItem.yRot = fx->pos.yRot;
-	ShatterItem.meshp = Meshes[fx->frameNumber];
+	ShatterItem.meshp = &g_Level.Meshes[fx->frameNumber];
 	ShatterItem.sphere.x = fx->pos.xPos;
 	ShatterItem.sphere.y = fx->pos.yPos;
 	ShatterItem.sphere.z = fx->pos.zPos;
@@ -187,7 +187,7 @@ void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 
 void BubblesControl(short fxNum)
 {
-	FX_INFO* fx = &Effects[fxNum];
+	FX_INFO* fx = &EffectList[fxNum];
 
 	short angles[2];
 	phd_GetVectorAngles(
@@ -291,7 +291,7 @@ void BubblesControl(short fxNum)
 		
 		if (fx->flag1 == 1)
 		{
-			TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
+			TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
 			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
 		}
 		else
@@ -400,7 +400,7 @@ void BubblesControl(short fxNum)
 		}
 		else
 		{
-			TriggerShockwave( &fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
+			TriggerShockwave( &fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) >> 4) & 2) << 16, 0);
 		}
 	}
 	else

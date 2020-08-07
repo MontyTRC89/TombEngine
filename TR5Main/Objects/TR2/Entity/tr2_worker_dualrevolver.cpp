@@ -19,7 +19,7 @@ void WorkerDualGunControl(short itemNum)
 	AI_INFO info;
 	short angle, head_x, head_y, torso_x, torso_y, tilt;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	dual = (CREATURE_INFO*)item->data;
 	angle = head_x = head_y = torso_x = torso_y = tilt = 0;
 
@@ -28,7 +28,7 @@ void WorkerDualGunControl(short itemNum)
 		if (item->currentAnimState != 11)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 32;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 11;
 		}
 	}

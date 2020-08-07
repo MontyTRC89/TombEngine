@@ -13,7 +13,7 @@ void InitialiseLaraDouble(short itemNum)
 
 void LaraDoubleControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP, &item->pos, 0);
 

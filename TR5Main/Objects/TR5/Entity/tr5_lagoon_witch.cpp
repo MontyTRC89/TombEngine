@@ -23,14 +23,14 @@ BITE_INFO LagoonWitchBite = { 0, 0, 0, 7 };
 
 void InitialiseLagoonWitch(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 1;
 	item->goalAnimState = STATE_LAGOON_WITCH_STOP;
 	item->currentAnimState = STATE_LAGOON_WITCH_STOP;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->pos.yPos += 512;
 }
 
@@ -44,9 +44,9 @@ void LagoonWitchControl(short itemNumber)
 	short joint2 = 0;
 	short angle = 0;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	if (item->hitPoints <= 0)
 	{
@@ -55,7 +55,7 @@ void LagoonWitchControl(short itemNumber)
 			item->hitPoints = 0;
 			item->currentAnimState = STATE_LAGOON_WITCH_DEATH;
 			item->animNumber = obj->animIndex + ANIMATION_LAGOON_WITCH_DEATH;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 	}
 	else
@@ -118,7 +118,7 @@ void LagoonWitchControl(short itemNumber)
 			creature->maximumTurn = ANGLE(2);
 			if (!creature->flags
 				&& item->touchBits & 0x3C3C0
-				&& item->frameNumber > Anims[item->animNumber].frameBase + 29)
+				&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 29)
 			{
 				LaraItem->hitPoints -= 100;
 				LaraItem->hitStatus = true;

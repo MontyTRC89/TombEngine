@@ -18,7 +18,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void StartBaddy(ObjectInfo* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_WOLF];
 	if (obj->loaded)
@@ -36,7 +36,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 2 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 2 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_BEAR];
@@ -55,7 +55,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 
-		Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 13 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_APE];
@@ -92,7 +92,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->waterCreature = true; // dont want the rat to be killed when going in water !
 		obj->zoneType = ZONE_WATER;
-		Bones[obj->boneIndex + 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_NATLA];
@@ -109,7 +109,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
-		Bones[obj->boneIndex + 2 * 4] |= (ROT_Z | ROT_X);
+		g_Level.Bones[obj->boneIndex + 2 * 4] |= (ROT_Z | ROT_X);
 	}
 
 	obj = &Objects[ID_WINGED_NATLA];
@@ -126,7 +126,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->saveHitpoints = true;
-		Bones[obj->boneIndex + 1 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 1 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_LARA_DOPPELGANGER];
@@ -150,17 +150,17 @@ static void StartBaddy(ObjectInfo* obj)
 	}
 }
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(OBJECT_INFO* obj)
 {
 
 }
 
-static void StartTrap(ObjectInfo* obj)
+static void StartTrap(OBJECT_INFO* obj)
 {
 
 }
 
-static ObjectInfo* objToInit;
+static OBJECT_INFO* objToInit;
 void InitialiseTR1Objects()
 {
 	StartBaddy(objToInit);
