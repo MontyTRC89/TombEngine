@@ -70,6 +70,9 @@ enum COMMAND_TYPES
 
 #define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 
+#define OUTSIDE_Z 64
+#define OUTSIDE_SIZE 108
+
 extern int KeyTriggerActive;
 extern byte IsAtmospherePlaying;
 extern byte FlipStatus;
@@ -142,9 +145,10 @@ extern short FlashFadeR;
 extern short FlashFadeG;
 extern short FlashFadeB;
 extern short FlashFader;
-extern short IsRoomOutsideNo;
 extern int TiltXOffset;
 extern int TiltYOffset;
+extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
+extern short IsRoomOutsideNo;
 
 GAME_STATUS DoTitle(int index);
 GAME_STATUS DoLevel(int index, int ambient, bool loadFromSavegame);

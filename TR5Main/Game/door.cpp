@@ -104,7 +104,7 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	if (TrInput & IN_ACTION
-	&&  l->currentAnimState == STATE_LARA_UNDERWATER_STOP
+	&&  l->currentAnimState == LS_UNDERWATER_STOP
 	&&  !(item->status && item->gravityStatus)
 	&&  Lara.waterStatus == LW_UNDERWATER
 	&&  !Lara.gunStatus
@@ -116,13 +116,13 @@ void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&UnderwaterDoorPos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_UNDERWATER_DOOR_OPEN;
-				l->frameNumber = GF(ANIMATION_LARA_UNDERWATER_DOOR_OPEN, 0);
-				l->currentAnimState = STATE_LARA_MISC_CONTROL;
+				l->animNumber = LA_UNDERWATER_DOOR_OPEN;
+				l->frameNumber = GF(LA_UNDERWATER_DOOR_OPEN, 0);
+				l->currentAnimState = LS_MISC_CONTROL;
 				l->fallspeed = 0;
 				item->status = ITEM_ACTIVE;
 				AddActiveItem(itemNum);
-				item->goalAnimState = STATE_LARA_RUN_FORWARD;
+				item->goalAnimState = LS_RUN_FORWARD;
 				AnimateItem(item);
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
@@ -154,8 +154,8 @@ void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (TrInput & IN_ACTION
-	&&  l->currentAnimState == STATE_LARA_STOP
-	&&  l->animNumber == ANIMATION_LARA_STAY_IDLE
+	&&  l->currentAnimState == LS_STOP
+	&&  l->animNumber == LA_STAND_IDLE
 	&&  !(item->status && item->gravityStatus)
 	&&  !(l->hitStatus)
 	&&  !Lara.gunStatus
@@ -166,9 +166,9 @@ void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&DoubleDoorPos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_DOUBLEDOORS_PUSH;
-				l->frameNumber = GF(ANIMATION_LARA_DOUBLEDOORS_PUSH, 0);
-				l->currentAnimState = STATE_LARA_DOUBLEDOORS_PUSH;
+				l->animNumber = LA_DOUBLEDOOR_OPEN_PUSH;
+				l->frameNumber = GF(LA_DOUBLEDOOR_OPEN_PUSH, 0);
+				l->currentAnimState = LS_DOUBLEDOOR_PUSH;
 				
 				AddActiveItem(itemNum);
 
@@ -202,8 +202,8 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (TrInput & IN_ACTION
-	&&  l->currentAnimState == STATE_LARA_STOP
-	&&  l->animNumber == ANIMATION_LARA_STAY_IDLE
+	&&  l->currentAnimState == LS_STOP
+	&&  l->animNumber == LA_STAND_IDLE
 	&&  item->status != ITEM_ACTIVE
 	&&  !(l->hitStatus)
 	&&  !Lara.gunStatus
@@ -238,15 +238,15 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			l->animNumber = ANIMATION_LARA_DOOR_OPEN_BACK;
-			l->frameNumber = GF(ANIMATION_LARA_DOOR_OPEN_BACK, 0);
+			l->animNumber = LA_DOOR_OPEN_PULL;
+			l->frameNumber = GF(LA_DOOR_OPEN_PULL, 0);
 			item->goalAnimState = 3;
 
 			AddActiveItem(itemNum);
 
 			item->status = ITEM_ACTIVE;
-			l->currentAnimState = STATE_LARA_MISC_CONTROL;
-			l->goalAnimState = STATE_LARA_STOP;
+			l->currentAnimState = LS_MISC_CONTROL;
+			l->goalAnimState = LS_STOP;
 			Lara.isMoving = false;
 			Lara.gunStatus = LG_HANDS_BUSY;
 
@@ -259,15 +259,15 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&KickDoorPos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_DOOR_KICK;
-				l->frameNumber = GF(ANIMATION_LARA_DOOR_KICK, 0);
+				l->animNumber = LA_DOOR_OPEN_KICK;
+				l->frameNumber = GF(LA_DOOR_OPEN_KICK, 0);
 				item->goalAnimState = 2;
 
 				AddActiveItem(itemNum);
 
 				item->status = ITEM_ACTIVE;
-				l->currentAnimState = STATE_LARA_MISC_CONTROL;
-				l->goalAnimState = STATE_LARA_STOP;
+				l->currentAnimState = LS_MISC_CONTROL;
+				l->goalAnimState = LS_STOP;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
@@ -280,15 +280,15 @@ void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&PushDoorPos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_DOOR_OPEN_FORWARD;
-				l->frameNumber = GF(ANIMATION_LARA_DOOR_OPEN_FORWARD, 0);
+				l->animNumber = LA_DOOR_OPEN_PUSH;
+				l->frameNumber = GF(LA_DOOR_OPEN_PUSH, 0);
 				item->goalAnimState = 2;
 
 				AddActiveItem(itemNum);
 
 				item->status = ITEM_ACTIVE;
-				l->currentAnimState = STATE_LARA_MISC_CONTROL;
-				l->goalAnimState = STATE_LARA_STOP;
+				l->currentAnimState = LS_MISC_CONTROL;
+				l->goalAnimState = LS_STOP;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
@@ -333,8 +333,8 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (item->triggerFlags == 2
 	&&  item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
 	&&  ((TrInput & IN_ACTION || g_Inventory.GetSelectedObject() == ID_CROWBAR_ITEM)
-	&&  l->currentAnimState == STATE_LARA_STOP
-	&&  l->animNumber == ANIMATION_LARA_STAY_IDLE
+	&&  l->currentAnimState == LS_STOP
+	&&  l->animNumber == LA_STAND_IDLE
 	&&  !l->hitStatus
 	&&  Lara.gunStatus == LG_NO_ARMS
 	||  Lara.isMoving && Lara.generalPtr == (void*)itemNum))
@@ -374,16 +374,16 @@ void DoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			g_Inventory.SetSelectedObject(NO_ITEM);
 			if (MoveLaraPosition(&CrowbarDoorPos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_DOOR_OPEN_CROWBAR;
-				l->frameNumber = GF(ANIMATION_LARA_DOOR_OPEN_CROWBAR, 0);
-				l->currentAnimState = STATE_LARA_MISC_CONTROL;
+				l->animNumber = LA_DOOR_OPEN_CROWBAR;
+				l->frameNumber = GF(LA_DOOR_OPEN_CROWBAR, 0);
+				l->currentAnimState = LS_MISC_CONTROL;
 				item->pos.yRot ^= ANGLE(180);
 
 				AddActiveItem(itemNum);
 
 				item->flags |= IFLAG_ACTIVATION_MASK;
 				item->status = ITEM_ACTIVE;
-				item->goalAnimState = STATE_LARA_RUN_FORWARD;
+				item->goalAnimState = LS_RUN_FORWARD;
 				Lara.isMoving = 0;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
@@ -481,26 +481,6 @@ void DoorControl(short itemNumber)
 				OpenThatDoor(&door->d2flip, door);
 				door->opened = true;
 			}
-			/*if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-			{
-				if (gfCurrentLevel == 11)
-				{
-					v9 = item->object_number;
-					if (v9 != 302 && v9 != 304)
-					{
-						LOBYTE(v5) = AnimateItem((int)item);
-						return v5;
-					}
-				LABEL_40:
-					v10 = item->_bf15ea;
-					LOBYTE(v10) = v10 | 6;
-					item->_bf15ea = v10;
-					LOBYTE(v5) = AnimateItem((int)item);
-					return v5;
-				}
-				if (gfCurrentLevel >= 0xCu && gfCurrentLevel <= 0xEu && item->object_number == 300)
-					goto LABEL_40;
-			}*/
 		}
 		else
 		{
@@ -829,43 +809,6 @@ void InitialiseDoor(short itemNumber)
 		item->roomNumber = roomNumber;
 		item->inDrawRoom = true;
 	}
-
-	/*if (twoRoom != NO_ROOM && item->objectNumber >= ID_CLOSED_DOOR1 && item->objectNumber <= ID_LIFT_DOORS2)
-	{
-		FillDoorPointers(door, item, twoRoom, dz, dx);
-		
-		door->dptr1[0] = 0;
-		door->dptr1[1] = 0;
-		door->dptr1[2] = 0;
-
-		door->dptr3[0] = 0;
-		door->dptr3[1] = 0;
-		door->dptr3[2] = 0;
-
-		if (g_Level.Rooms[item->roomNumber].flippedRoom != -1)
-		{
-			//if (!door->dptr2)
-			//	MEMORY[1] = 1;
-			
-			door->dptr2[0] = 0;
-			door->dptr2[1] = 0;
-			door->dptr2[2] = 0;
-		}
-
-		if (g_Level.Rooms[item->drawRoom].flippedRoom != -1)
-		{
-			//if (!door->dptr4)
-			//	MEMORY[1] = 1;
-
-			door->dptr4[0] = 0;
-			door->dptr4[1] = 0;
-			door->dptr4[2] = 0;
-		}
-
-		door->item = item;
-
-		AssignClosedDoor(item);
-	}*/
 }
 
 void InitialiseClosedDoors()
@@ -975,6 +918,7 @@ void ProcessClosedDoors()
 		}
 	}*/
 }
+// keeping these cocmments for now in case they're actually needed?
 
 void AssignClosedDoor(ITEM_INFO* item)
 {

@@ -55,3 +55,5 @@ void Richochet(PHD_3DPOS* pos);
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
 void pickup(ITEM_INFO* item);
 void puzzle(ITEM_INFO* item);
+void draw_right_pistol(ITEM_INFO* item);
+void draw_left_pistol(ITEM_INFO* item);

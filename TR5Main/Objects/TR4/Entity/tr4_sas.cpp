@@ -8,6 +8,7 @@
 #include "lara.h"
 #include "setup.h"
 #include "level.h"
+#include <Specific\input.h>
 
 enum SAS_STATES
 {
@@ -66,6 +67,9 @@ enum SAS_ANIM
 };
 
 BITE_INFO sasGun = { 0, 300, 64, 7 };
+
+OBJECT_COLLISION_BOUNDS SasDragBlokeBounds = { 0xFF00, 0x100, 0xFF9C, 0x0064, 0xFE00, 0xFE34, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0x0000, 0x0000 };
+PHD_VECTOR SasDragBlokePosition = { 0, 0, -460 };
 
 void InitialiseSas(short itemNumber)
 {
@@ -525,4 +529,110 @@ void SasControl(short itemNumber)
 	CreatureJoint(item, 2, joint2);
 
 	CreatureAnimation(itemNumber, angle, 0);
+}
+
+void InitialiseSasDying(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (item->triggerFlags)
+	{
+		item->animNumber = Objects[item->objectNumber].animIndex;
+		item->goalAnimState = item->currentAnimState = 1;
+	}
+	else
+	{
+		item->animNumber = Objects[item->objectNumber].animIndex + 3;
+		item->goalAnimState = item->currentAnimState = 4;
+	}
+
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+}
+
+void SasDyingControl(short itemNumber)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if (item->currentAnimState == 1)
+	{
+		if (!(GetRandomControl() & 0x7F))
+		{
+			item->goalAnimState = 2;
+			AnimateItem(item);
+		}
+		else if (!(byte)GetRandomControl())
+		{
+			item->goalAnimState = 3;
+		}
+	}
+	else if (item->currentAnimState == 4 && !(GetRandomControl() & 0x7F))
+	{
+		item->goalAnimState = 5;
+		AnimateItem(item);
+	}
+	else
+	{
+		AnimateItem(item);
+	}
+}
+
+void SasDragBlokeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+{
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+	if ((!(TrInput & IN_ACTION)
+		|| l->currentAnimState != LS_STOP 
+		|| l->animNumber != LA_STAND_IDLE
+		|| Lara.gunStatus
+		|| l->gravityStatus
+		|| item->flags & 0x3E00)
+		&& (!(Lara.isMoving) || (short)Lara.generalPtr != itemNumber))
+	{
+		if (item->status == ITEM_ACTIVE)
+		{
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			{
+				int x = l->pos.xPos - (512 * phd_sin(l->pos.yRot) >> W2V_SHIFT);
+				int y = l->pos.yPos;
+				int z = l->pos.xPos - (512 * phd_cos(l->pos.yRot) >> W2V_SHIFT);
+
+				short roomNumber = l->roomNumber;
+				FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+				GetFloorHeight(floor, x, y, z);
+				
+				TestTriggers(TriggerIndex, 1, 0);
+
+				RemoveActiveItem(itemNumber);
+				item->status = ITEM_NOT_ACTIVE;
+			}
+		}
+		
+		ObjectCollision(itemNumber, l, c);
+	}
+	else
+	{
+		if (TestLaraPosition(&SasDragBlokeBounds, item, l))
+		{
+			if (MoveLaraPosition(&SasDragBlokePosition, item, l))
+			{
+				l->animNumber = LA_DRAG_BODY;
+				l->currentAnimState = LS_MISC_CONTROL;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+				l->pos.yRot = item->pos.yRot;
+				Lara.isMoving = false;
+				Lara.headXrot = 0;
+				Lara.headYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
+				item->flags |= 0x3E00;
+				item->status = ITEM_ACTIVE;
+				AddActiveItem(itemNumber);
+			}
+			else
+			{
+				Lara.generalPtr = (void*)itemNumber;
+			}
+		}
+	}
 }

@@ -19,6 +19,8 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
+#include <Objects\TR4\Entity\tr4_wraith.h>
+#include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
@@ -1564,6 +1566,58 @@ namespace T5M::Renderer
         return true;
     }
 
+	bool Renderer11::drawLittleBeetles()
+	{
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0;
+
+		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		if (Objects[ID_LITTLE_BEETLE].loaded)
+		{
+			OBJECT_INFO* obj = &Objects[ID_LITTLE_BEETLE];
+			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
+
+			for (int m = 0; m < 32; m++)
+				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+
+			for (int i = 0; i < NUM_LITTLE_BETTLES; i++)
+			{
+				BEETLE_INFO* beetle = &LittleBeetles[i];
+
+				if (beetle->on)
+				{
+					RendererMesh* mesh = getMesh(Objects[ID_LITTLE_BEETLE].meshIndex);
+					Matrix translation = Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->pos.yRot, beetle->pos.xRot, beetle->pos.zRot);
+					Matrix world = rotation * translation;
+
+					m_stItem.World = world;
+					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
+					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
+					updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
+
+					for (int b = 0; b < 2; b++)
+					{
+						RendererBucket* bucket = &mesh->Buckets[b];
+
+						if (bucket->Vertices.size() == 0)
+							continue;
+
+						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+						m_numDrawCalls++;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+
     bool Renderer11::doSnow()
     {
         if (m_firstWeather)
@@ -1982,6 +2036,7 @@ namespace T5M::Renderer
         drawBats();
         drawRats();
         drawSpiders();
+		drawLittleBeetles();
 
         // Transparent geometry
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
@@ -2043,7 +2098,7 @@ namespace T5M::Renderer
         int flash = FlashIt();
         if (DashTimer < 120)
             DrawBar(DashTimer / 120.0f, g_DashBar);
-        UpdateHealtBar(flash);
+        UpdateHealthBar(flash);
         UpdateAirBar(flash);
         DrawAllPickups();
 
@@ -2181,6 +2236,12 @@ namespace T5M::Renderer
                 // We'll draw waterfalls later
                 continue;
             }
+			else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
+			{
+				// Wraiths have some additional special effects
+				drawAnimatingItem(item, transparent, animated);
+				drawWraithExtra(item, transparent, animated);
+			}
             else
             {
                 drawAnimatingItem(item, transparent, animated);
@@ -2266,6 +2327,62 @@ namespace T5M::Renderer
             return drawAnimatingItem(item, transparent, animated);
         }
     }
+
+	bool Renderer11::drawWraithExtra(RendererItem* item, bool transparent, bool animated)
+	{
+		ITEM_INFO* nativeItem = item->Item;
+		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
+		
+		if (transparent || animated)
+			return true;
+
+		for (int j = 0; j <= 4; j++)
+		{
+			Matrix rotation;
+
+			switch (j)
+			{
+			case 0:
+				rotation = Matrix::CreateRotationY(TO_RAD(-1092));
+				break;
+			case 1:
+				rotation = Matrix::CreateRotationY(TO_RAD(1092));
+				break;
+			case 2:
+				rotation = Matrix::CreateRotationZ(TO_RAD(-1092));
+				break;
+			case 3:
+				rotation = Matrix::CreateRotationZ(TO_RAD(1092));
+				break;
+			default:
+				rotation = Matrix::Identity;
+				break;
+			}
+
+			Matrix world = rotation * item->World;
+
+			/*for (int i = 0; i < 7; i++)
+			{
+				Vector3 p1 = Vector3(info[i].xPos - nativeItem->pos.xPos, info[i].yPos - nativeItem->pos.yPos, info[i].zPos - nativeItem->pos.zPos);
+				Vector3 p2 = Vector3(info[i+1].xPos - info[i  ].xPos, info[i + 1].yPos - info[i  ].yPos, info[i + 1].zPos - info[i ].zPos);
+
+				p1 = Vector3::Transform(p1, world);
+				p2 = Vector3::Transform(p2, world);
+
+				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
+			}*/
+
+			for (int i = 0; i < 7; i++)
+			{
+				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
+				Vector3 p2 = Vector3(info[i + 1].xPos , info[i + 1].yPos, info[i + 1].zPos);
+
+				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
+			}
+		}
+
+		return true;
+	}
 
     bool Renderer11::drawStatics(bool transparent, RenderView &view)
     {

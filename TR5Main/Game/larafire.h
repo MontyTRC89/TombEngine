@@ -23,7 +23,7 @@ typedef struct WEAPON_INFO
 	byte drawFrame;
 	short sampleNum;
 };
-extern WEAPON_INFO Weapons[NUM_WEAPONS];
+extern WEAPON_INFO Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 
 void SmashItem(short itemNum);
 int WeaponObject(int weaponType);
@@ -39,3 +39,4 @@ void LaraTargetInfo(WEAPON_INFO* weapon);
 bool CheckForHoldingState(int state);
 void LaraGetNewTarget(WEAPON_INFO* weapon);
 void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
+HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon);

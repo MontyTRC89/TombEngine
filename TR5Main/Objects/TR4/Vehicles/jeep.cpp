@@ -47,11 +47,11 @@ typedef struct JEEP_INFO
 #define JEEP_MAX_SPEED				0x8000
 #define JEEP_MAX_BACK				0x4000
 
-#define JEEP_STATE_LARA_STOP		0
+#define JEEP_LS_STOP		0
 
-#define JEEP_STATE_LARA_GETON		9
-#define JEEP_STATE_LARA_GETOFF		10
-#define JEEP_STATE_LARA_JEEPDEATH	16
+#define JEEP_LS_GETON		9
+#define JEEP_LS_GETOFF		10
+#define JEEP_LS_JEEPDEATH	16
 
 #define JEEP_IN_ACCELERATE	(IN_ACTION)
 #define JEEP_IN_BRAKE		(IN_JUMP)
@@ -363,10 +363,10 @@ static int JeepCheckGetOff()
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
 			LaraItem->pos.yRot += ANGLE(90);
-			LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = STATE_LARA_STOP;
-			LaraItem->currentAnimState = STATE_LARA_STOP;
+			LaraItem->goalAnimState = LS_STOP;
+			LaraItem->currentAnimState = LS_STOP;
 			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
 			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 			LaraItem->pos.xRot = 0;
@@ -403,12 +403,12 @@ static int GetOnJeep(int itemNumber)
 		return 0;
 	}
 
-	if (LaraItem->currentAnimState != STATE_LARA_STOP)
+	if (LaraItem->currentAnimState != LS_STOP)
 	{
 		return 0;
 	}
 
-	if (LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE)
+	if (LaraItem->animNumber != LA_STAND_IDLE)
 	{
 		return 0;
 	}
