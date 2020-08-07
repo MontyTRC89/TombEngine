@@ -8,8 +8,8 @@
 
 void ClearItem(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
-	ROOM_INFO* room = &Rooms[item->roomNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
 	item->collidable = true;
 	item->data = NULL;
@@ -27,7 +27,7 @@ void KillItem(short itemNum)
 	}
 	else
 	{
-		ITEM_INFO* item = &Items[itemNum];
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		DetatchSpark(itemNum, SP_ITEM);
 
@@ -41,11 +41,11 @@ void KillItem(short itemNum)
 		else
 		{
 			short linknum;
-			for (linknum = NextItemActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
+			for (linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextActive)
 			{
-				if (Items[linknum].nextActive == itemNum)
+				if (g_Level.Items[linknum].nextActive == itemNum)
 				{
-					Items[linknum].nextActive = item->nextActive;
+					g_Level.Items[linknum].nextActive = item->nextActive;
 					break;
 				}
 			}
@@ -53,18 +53,18 @@ void KillItem(short itemNum)
 
 		if (item->roomNumber != NO_ROOM)
 		{
-			if (Rooms[item->roomNumber].itemNumber == itemNum)
+			if (g_Level.Rooms[item->roomNumber].itemNumber == itemNum)
 			{
-				Rooms[item->roomNumber].itemNumber = item->nextItem;
+				g_Level.Rooms[item->roomNumber].itemNumber = item->nextItem;
 			}
 			else
 			{
 				short linknum;
-				for (linknum = Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+				for (linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 				{
-					if (Items[linknum].nextItem == itemNum)
+					if (g_Level.Items[linknum].nextItem == itemNum)
 					{
-						Items[linknum].nextItem = item->nextItem;
+						g_Level.Items[linknum].nextItem = item->nextItem;
 						break;
 					}
 				}
@@ -74,7 +74,7 @@ void KillItem(short itemNum)
 		if (item == Lara.target)
 			Lara.target = NULL;
 
-		if (itemNum >= LevelItems)
+		if (itemNum >= g_Level.NumItems)
 		{
 			item->nextItem = NextItemFree;
 			NextItemFree = itemNum;
@@ -88,12 +88,12 @@ void KillItem(short itemNum)
 
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 {
-	ROOM_INFO* room = &Rooms[roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 	short currentItemNum = room->itemNumber;
 
 	while (currentItemNum != NO_ITEM)
 	{
-		ITEM_INFO* item = &Items[currentItemNum];
+		ITEM_INFO* item = &g_Level.Items[currentItemNum];
 
 		if (item->objectNumber == objectNumber)
 		{
@@ -108,7 +108,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 
 void AddActiveItem(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->flags |= 0x20;
 
@@ -136,11 +136,11 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	}
 	else
 	{
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		if (item->roomNumber != 255)
 		{
-			ROOM_INFO* r = &Rooms[item->roomNumber];
+			ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
 			if (r->itemNumber == itemNumber)
 			{
@@ -148,11 +148,11 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 			}
 			else
 			{
-				for (short linknum = r->itemNumber; linknum != -1; linknum = Items[linknum].nextItem)
+				for (short linknum = r->itemNumber; linknum != -1; linknum = g_Level.Items[linknum].nextItem)
 				{
-					if (Items[linknum].nextItem == itemNumber)
+					if (g_Level.Items[linknum].nextItem == itemNumber)
 					{
-						Items[linknum].nextItem = item->nextItem;
+						g_Level.Items[linknum].nextItem = item->nextItem;
 						break;
 					}
 				}
@@ -160,8 +160,8 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 		}
 
 		item->roomNumber = roomNumber;
-		item->nextItem = Rooms[roomNumber].itemNumber;
-		Rooms[roomNumber].itemNumber = itemNumber;
+		item->nextItem = g_Level.Rooms[roomNumber].itemNumber;
+		g_Level.Rooms[roomNumber].itemNumber = itemNumber;
 	}
 }
 
@@ -175,8 +175,8 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 	}
 	else
 	{
-		FX_INFO* fx = &Effects[fxNumber];
-		ROOM_INFO* r = &Rooms[fx->roomNumber];
+		FX_INFO* fx = &EffectList[fxNumber];
+		ROOM_INFO* r = &g_Level.Rooms[fx->roomNumber];
 
 		if (r->fxNumber == fxNumber)
 		{
@@ -185,19 +185,19 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 		else
 		{
 			short linknum;
-			for (linknum = r->fxNumber; linknum != -1; linknum = Effects[linknum].nextFx)
+			for (linknum = r->fxNumber; linknum != -1; linknum = EffectList[linknum].nextFx)
 			{
-				if (Effects[linknum].nextFx == fxNumber)
+				if (EffectList[linknum].nextFx == fxNumber)
 				{
-					Effects[linknum].nextFx = fx->nextFx;
+					EffectList[linknum].nextFx = fx->nextFx;
 					break;
 				}
 			}
 		}
 
 		fx->roomNumber = roomNumber;
-		fx->nextFx = Rooms[roomNumber].fxNumber;
-		Rooms[roomNumber].fxNumber = fxNumber;
+		fx->nextFx = g_Level.Rooms[roomNumber].fxNumber;
+		g_Level.Rooms[roomNumber].fxNumber = fxNumber;
 	}
 }
 
@@ -210,7 +210,7 @@ void KillEffect(short fxNumber)
 	}
 	else
 	{
-		FX_INFO* fx = &Effects[fxNumber];
+		FX_INFO* fx = &EffectList[fxNumber];
 		DetatchSpark(fxNumber, SP_FX);
 
 		if (NextFxActive == fxNumber)
@@ -219,27 +219,27 @@ void KillEffect(short fxNumber)
 		}
 		else
 		{
-			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = Effects[linknum].nextActive)
+			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = EffectList[linknum].nextActive)
 			{
-				if (Effects[linknum].nextActive == fxNumber)
+				if (EffectList[linknum].nextActive == fxNumber)
 				{
-					Effects[linknum].nextActive = fx->nextActive;
+					EffectList[linknum].nextActive = fx->nextActive;
 					break;
 				}
 			}
 		}
 
-		if (Rooms[fx->roomNumber].fxNumber == fxNumber)
+		if (g_Level.Rooms[fx->roomNumber].fxNumber == fxNumber)
 		{
-			Rooms[fx->roomNumber].fxNumber = fx->nextFx;
+			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
 		}
 		else
 		{
-			for (short linknum = Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = Effects[linknum].nextFx)
+			for (short linknum = g_Level.Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = EffectList[linknum].nextFx)
 			{
-				if (Effects[linknum].nextFx == fxNumber)
+				if (EffectList[linknum].nextFx == fxNumber)
 				{
-					Effects[linknum].nextFx = fx->nextFx;
+					EffectList[linknum].nextFx = fx->nextFx;
 					break;
 				}
 			}
@@ -256,9 +256,9 @@ short CreateNewEffect(short roomNum)
 
 	if (NextFxFree != NO_ITEM)
 	{
-		FX_INFO* fx = &Effects[NextFxFree];
+		FX_INFO* fx = &EffectList[NextFxFree];
 		NextFxFree = fx->nextFx;
-		ROOM_INFO* r = &Rooms[roomNum];
+		ROOM_INFO* r = &g_Level.Rooms[roomNum];
 		fx->roomNumber = roomNum;
 		fx->nextFx = r->fxNumber;
 		r->fxNumber = fxNumber;
@@ -273,13 +273,15 @@ short CreateNewEffect(short roomNum)
 void InitialiseFXArray(int allocmem)
 {
 	if (allocmem)
-		Effects = (FX_INFO*)game_malloc(NUM_EFFECTS * sizeof(FX_INFO));
+		EffectList = game_malloc<FX_INFO>(NUM_EFFECTS);
 
-	FX_INFO* fx = Effects;
+	FX_INFO* fx;
+
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
 	for (int i = 1; i < NUM_EFFECTS; i++, fx++)
 	{
+		fx = &EffectList[i];
 		fx->nextFx = i;
 	}
 	fx->nextFx = -1;
@@ -287,19 +289,19 @@ void InitialiseFXArray(int allocmem)
 
 void RemoveDrawnItem(short itemNum) 
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (Rooms[item->roomNumber].itemNumber == itemNum)
+	if (g_Level.Rooms[item->roomNumber].itemNumber == itemNum)
 	{
-		Rooms[item->roomNumber].itemNumber = item->nextItem;
+		g_Level.Rooms[item->roomNumber].itemNumber = item->nextItem;
 	}
 	else
 	{
-		for (short linknum = Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = Items[linknum].nextItem)
+		for (short linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 		{
-			if (Items[linknum].nextItem == itemNum)
+			if (g_Level.Items[linknum].nextItem == itemNum)
 			{
-				Items[linknum].nextItem = item->nextItem;
+				g_Level.Items[linknum].nextItem = item->nextItem;
 				break;
 			}
 		}
@@ -308,21 +310,21 @@ void RemoveDrawnItem(short itemNum)
 
 void RemoveActiveItem(short itemNum) 
 {
-	if (Items[itemNum].active)
+	if (g_Level.Items[itemNum].active)
 	{
-		Items[itemNum].active = false;
+		g_Level.Items[itemNum].active = false;
 
 		if (NextItemActive == itemNum)
 		{
-			NextItemActive = Items[itemNum].nextActive;
+			NextItemActive = g_Level.Items[itemNum].nextActive;
 		}
 		else
 		{
-			for (short linknum = NextItemActive; linknum != NO_ITEM; linknum = Items[linknum].nextActive)
+			for (short linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextActive)
 			{
-				if (Items[linknum].nextActive == itemNum)
+				if (g_Level.Items[linknum].nextActive == itemNum)
 				{
-					Items[linknum].nextActive = Items[itemNum].nextActive;
+					g_Level.Items[linknum].nextActive = g_Level.Items[itemNum].nextActive;
 					break;
 				}
 			}
@@ -332,14 +334,14 @@ void RemoveActiveItem(short itemNum)
 
 void InitialiseItem(short itemNum) 
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 	item->requiredAnimState = 0;
-	item->goalAnimState = Anims[item->animNumber].currentAnimState;
-	item->currentAnimState = Anims[item->animNumber].currentAnimState;
+	item->goalAnimState = g_Level.Anims[item->animNumber].currentAnimState;
+	item->currentAnimState = g_Level.Anims[item->animNumber].currentAnimState;
 
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
@@ -403,7 +405,7 @@ void InitialiseItem(short itemNum)
 		item->status = ITEM_ACTIVE;
 	}
 
-	ROOM_INFO* r = &Rooms[item->roomNumber];
+	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 
 	item->nextItem = r->itemNumber;
 	r->itemNumber = itemNum;
@@ -416,8 +418,6 @@ void InitialiseItem(short itemNum)
 	{
 		Objects[item->objectNumber].initialise(itemNum);
 	}
-
-	//item->unk_thing = 0;
 }
 
 short CreateItem()
@@ -427,22 +427,22 @@ short CreateItem()
 	if (NextItemFree == -1) return NO_ITEM;
 
 	itemNum = NextItemFree;
-	Items[NextItemFree].flags = 0;
-	NextItemFree = Items[NextItemFree].nextItem;
+	g_Level.Items[NextItemFree].flags = 0;
+	NextItemFree = g_Level.Items[NextItemFree].nextItem;
 
 	return itemNum;
 }
 
-void InitialiseItemArray(int numitems) 
+void InitialiseItemArray(int numitems)
 {
-	ITEM_INFO* item = &Items[LevelItems];
+	ITEM_INFO* item = &g_Level.Items[g_Level.NumItems];
 
 	NextItemActive = NO_ITEM;
-	NextItemFree = LevelItems;
+	NextItemFree = g_Level.NumItems;
 
-	if (LevelItems + 1 < numitems)
+	if (g_Level.NumItems + 1 < numitems)
 	{
-		for (int i = LevelItems + 1; i < numitems; i++, item++)
+		for (int i = g_Level.NumItems + 1; i < numitems; i++, item++)
 		{
 			item->nextItem = i;
 			item->active = false;
@@ -457,7 +457,7 @@ short SpawnItem(ITEM_INFO* item, short objectNumber)
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		ITEM_INFO* spawn = &Items[itemNumber];
+		ITEM_INFO* spawn = &g_Level.Items[itemNumber];
 
 		spawn->objectNumber = objectNumber;
 		spawn->roomNumber = item->roomNumber;
@@ -475,14 +475,14 @@ short SpawnItem(ITEM_INFO* item, short objectNumber)
 int GlobalItemReplace(short search, short replace)
 {
 	int changed = 0;
-	for (int i = 0; i < Rooms.size(); i++)
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		ROOM_INFO* room = &Rooms[i];
-		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = Items[itemNumber].nextItem)
+		ROOM_INFO* room = &g_Level.Rooms[i];
+		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
 		{
-			if (Items[itemNumber].objectNumber == search)
+			if (g_Level.Items[itemNumber].objectNumber == search)
 			{
-				Items[itemNumber].objectNumber = replace;
+				g_Level.Items[itemNumber].objectNumber = replace;
 				changed++;
 			}
 		}
@@ -494,14 +494,14 @@ int GlobalItemReplace(short search, short replace)
 ITEM_INFO* find_a_fucking_item(short objectNum)
 {
 	int itemNumber = FindItemNumber(objectNum);
-	return (itemNumber != NO_ITEM ? &Items[itemNumber] : NULL);
+	return (itemNumber != NO_ITEM ? &g_Level.Items[itemNumber] : NULL);
 }
 
 int FindItemNumber(short objectNum)
 {
-	for (int i = 0; i < LevelItems; i++)
+	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		ITEM_INFO* item = &Items[i];
+		ITEM_INFO* item = &g_Level.Items[i];
 		if (item->objectNumber == objectNum)
 			return i;
 	}
@@ -515,12 +515,12 @@ ITEM_INFO* FindItem(short objectNumber)
 	printf("Called FindItem()\n");
 #endif
 
-	if (LevelItems > 0)
+	if (g_Level.NumItems > 0)
 	{
-		for (int i = 0; i < LevelItems; i++)
+		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			if (Items[i].objectNumber == objectNumber)
-				return &Items[i];
+			if (g_Level.Items[i].objectNumber == objectNumber)
+				return &g_Level.Items[i];
 		}
 	}
 

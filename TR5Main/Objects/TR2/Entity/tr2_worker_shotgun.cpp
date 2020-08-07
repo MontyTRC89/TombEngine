@@ -23,12 +23,12 @@ void InitialiseWorkerShotgun(short itemNum)
 {
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 5;
 
 	ClearItem(itemNum);
 
-	anim = &Anims[item->animNumber];
+	anim = &g_Level.Anims[item->animNumber];
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
 }
@@ -43,7 +43,7 @@ void WorkerShotgunControl(short itemNum)
 	AI_INFO info;
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	shotgun = (CREATURE_INFO*)item->data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
@@ -52,7 +52,7 @@ void WorkerShotgunControl(short itemNum)
 		if (item->currentAnimState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 18;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 7;
 		}
 	}

@@ -13,7 +13,7 @@ void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void RegeneratePickups();
-short* FindPlinth(ITEM_INFO* item);
+BOUNDING_BOX* FindPlinth(ITEM_INFO* item);
 void PuzzleDone(ITEM_INFO* item, short itemNum);
 void PickupControl(short itemNum);
 
@@ -21,3 +21,4 @@ void InitialiseSearchObject(short itemNumber);
 void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll);
 void SearchObjectControl(short itemNumber);
 void do_pickup();
+void do_puzzle();

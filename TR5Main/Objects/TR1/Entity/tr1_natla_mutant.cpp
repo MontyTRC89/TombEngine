@@ -40,7 +40,7 @@ void NatlaEvilControl(short itemNum)
 	FLOOR_INFO* floor;
 	short head, angle;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	abort = (CREATURE_INFO*)item->data;
 	head = angle = 0;
 
@@ -50,7 +50,7 @@ void NatlaEvilControl(short itemNum)
 		if (item->currentAnimState != ABORT_DEATH)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + ABORT_DIE_ANIM;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = ABORT_DEATH;
 		}
 	}
@@ -169,7 +169,7 @@ void NatlaEvilControl(short itemNum)
 				item->goalAnimState = ABORT_KILL;
 
 				LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				LaraItem->currentAnimState = LaraItem->goalAnimState = 46;
 				LaraItem->roomNumber = item->roomNumber;
 				LaraItem->pos.xPos = item->pos.xPos;

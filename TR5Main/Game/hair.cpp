@@ -9,9 +9,9 @@
 #include "setup.h"
 #include "sphere.h"
 #include "level.h"
-
+using T5M::Renderer::g_Renderer;
 int FirstHair[HAIR_MAX];
-HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS];
+HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 int WindAngle;
 int DWindAngle;
 int Wind;
@@ -24,12 +24,12 @@ void InitialiseHair()
 	{
 		FirstHair[h] = 1;
 
-		int* bone = &Bones[Objects[ID_LARA_HAIR].boneIndex];
+		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 		Hairs[h][0].pos.yRot = 0;
 		Hairs[h][0].pos.xRot = -0x4000;
 
-		for (int i = 1; i < HAIR_SEGMENTS; i++, bone += 4)
+		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
 			Hairs[h][i].pos.xPos = *(bone + 1);
 			Hairs[h][i].pos.yPos = *(bone + 2);
@@ -43,11 +43,11 @@ void InitialiseHair()
 }
 
 
-void HairControl(int cutscene, int ponytail, short* framePtr)
+void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 {
 	SPHERE sphere[HAIR_SPHERE];
-	ObjectInfo* object = &Objects[ID_LARA];
-	short* frame;
+	OBJECT_INFO* object = &Objects[ID_LARA];
+	ANIM_FRAME* frame;
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LARA_YOUNG;
 
@@ -86,10 +86,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 				break;
 			}
 
-			frame = Anims[spaz].framePtr;
-			int size = Anims[spaz].interpolation >> 8;
-
-			frame += (int)(Lara.hitFrame * size);
+			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + Lara.hitFrame];
 		}
 		else
 			frame = GetBestFrame(LaraItem);
@@ -100,47 +97,47 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	}
 
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
-	short* objptr = Lara.meshPtrs[LM_HIPS];
-	PHD_VECTOR pos = { objptr[0], objptr[1], objptr[2] };
+	MESH* mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HIPS]];
+	PHD_VECTOR pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HIPS);
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
-	sphere[0].r = (int) * (objptr + 3);
+	sphere[0].r = (int)mesh->sphere.Radius;
 
-	objptr = Lara.meshPtrs[LM_TORSO];
-	pos = { objptr[0], objptr[1], objptr[2] };
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_TORSO]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_TORSO);
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
 	sphere[1].z = pos.z;
-	sphere[1].r = (int) * (objptr + 3);
+	sphere[1].r = (int)mesh->sphere.Radius;
 	if (youngLara)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
-	objptr = Lara.meshPtrs[LM_HEAD];
-	pos = { objptr[0], objptr[1], objptr[2] };
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HEAD]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HEAD);
 	sphere[2].x = pos.x;
 	sphere[2].y = pos.y;
 	sphere[2].z = pos.z;
-	sphere[2].r = (int) * (objptr + 3);
+	sphere[2].r = (int)mesh->sphere.Radius;
 
-	objptr = Lara.meshPtrs[LM_RINARM];
-	pos = { objptr[0], objptr[1], objptr[2] };
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_RINARM]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_RINARM);
 	sphere[3].x = pos.x;
 	sphere[3].y = pos.y;
 	sphere[3].z = pos.z;
-	sphere[3].r = (int) * (objptr + 3) * 3 / 2;
+	sphere[3].r = (int)mesh->sphere.Radius * 3 / 2;
 
-	objptr = Lara.meshPtrs[LM_LINARM];
-	pos = { objptr[0], objptr[1], objptr[2] };
+	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_LINARM]];
+	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_LINARM);
 	sphere[4].x = pos.x;
 	sphere[4].y = pos.y;
 	sphere[4].z = pos.z;
-	sphere[4].r = (int) * (objptr + 3) * 3 / 2;
+	sphere[4].r = (int)mesh->sphere.Radius * 3 / 2;
 
 	if (youngLara)
 	{
@@ -150,7 +147,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	}
 	
 	Matrix world;
-	g_Renderer->GetBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
+	g_Renderer.GetBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
 
 	if (ponytail)
 	{
@@ -169,7 +166,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 	pos.y = world.Translation().y; 
 	pos.z = world.Translation().z;
 
-	int* bone = &Bones[Objects[ID_LARA_HAIR].boneIndex];
+	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 	if (FirstHair[ponytail])
 	{
@@ -179,7 +176,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		Hairs[ponytail][0].pos.yPos = pos.y;
 		Hairs[ponytail][0].pos.zPos = pos.z;
 
-		for (int i = 0; i < HAIR_SEGMENTS - 1; i++, bone += 4)
+		for (int i = 0; i < HAIR_SEGMENTS; i++, bone += 4)
 		{
 			world = Matrix::CreateTranslation(Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos);		
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.yRot), TO_RAD(Hairs[ponytail][i].pos.xRot), 0) * world;			
@@ -208,9 +205,9 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		}
 		else
 		{
-			int x = LaraItem->pos.xPos + (frame[0] + frame[1]) / 2;
-			int y = LaraItem->pos.yPos + (frame[2] + frame[3]) / 2;
-			int z = LaraItem->pos.zPos + (frame[4] + frame[5]) / 2;
+			int x = LaraItem->pos.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+			int y = LaraItem->pos.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
+			int z = LaraItem->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
 			wh = GetWaterHeight(x, y, z, roomNumber);
 		}
 
@@ -235,7 +232,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 		SmokeWindX = (((rcossin_tbl[WindAngle]) * Wind) >> 12);
 		SmokeWindZ = (((rcossin_tbl[WindAngle + 1]) * Wind) >> 12);
 
-		for (int i = 1; i < HAIR_SEGMENTS; i++, bone += 4)
+		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
 			Hairs[ponytail][0].hvel.x = Hairs[ponytail][i].pos.xPos;
 			Hairs[ponytail][0].hvel.y = Hairs[ponytail][i].pos.yPos;
@@ -257,7 +254,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			Hairs[ponytail][i].pos.yPos += Hairs[ponytail][i].hvel.y * 3 / 4;
 			Hairs[ponytail][i].pos.zPos += Hairs[ponytail][i].hvel.z * 3 / 4;
 
-			if (Lara.waterStatus == LW_ABOVE_WATER && Rooms[roomNumber].flags & ENV_FLAG_WIND)
+			if (Lara.waterStatus == LW_ABOVE_WATER && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
 			{
 				Hairs[ponytail][i].pos.xPos += SmokeWindX;
 				Hairs[ponytail][i].pos.zPos += SmokeWindZ;
@@ -316,7 +313,7 @@ void HairControl(int cutscene, int ponytail, short* framePtr)
 			world = Matrix::CreateTranslation(Hairs[ponytail][i - 1].pos.xPos, Hairs[ponytail][i - 1].pos.yPos, Hairs[ponytail][i - 1].pos.zPos);
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i - 1].pos.yRot), TO_RAD(Hairs[ponytail][i - 1].pos.xRot), 0) * world;
 
-			if (i == HAIR_SEGMENTS - 1)
+			if (i == HAIR_SEGMENTS)
 				world = Matrix::CreateTranslation(*(bone - 3), *(bone - 2), *(bone - 1)) * world;
 			else
 				world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;

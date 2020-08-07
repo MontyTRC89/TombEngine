@@ -40,7 +40,7 @@ static void TriggerMutantRocket(PHD_3DPOS* src, short roomNumber, short counter)
     fxNumber = CreateNewEffect(roomNumber);
     if (fxNumber != NO_ITEM)
     {
-        fx = &Effects[fxNumber];
+        fx = &EffectList[fxNumber];
         fx->pos.xPos = src->xPos;
         fx->pos.yPos = src->yPos - (GetRandomControl() & 0x3F) - 32;
         fx->pos.zPos = src->zPos;
@@ -66,9 +66,9 @@ void TriggerMutantRocketEffects(short fxNumber, short xVel, short yVel, short zV
     //z = LaraItem->pos.zPos - Effects[m_fxNumber].pos.zPos;
     //if (x >= -0x4000u && x <= 0x4000 && z >= -0x4000u && z <= 0x4000)
 
-    fx = &Effects[fxNumber];
+    fx = &EffectList[fxNumber];
     sptr = &Sparks[GetFreeSpark()];
-    sptr->on = TRUE;
+    sptr->on = true;
     color = (GetRandomControl() & 0x3F) - 128;
     sptr->sB = 0;
     sptr->sR = color;
@@ -127,7 +127,7 @@ static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotation, short ro
 
 static bool ShootFrame(ITEM_INFO* item)
 {
-    short frameNumber = (item->frameNumber - Anims[item->objectNumber].frameBase);
+    short frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
     if (frameNumber == 45
     //||  frameNumber == 50
     //||  frameNumber == 55
@@ -246,9 +246,9 @@ void InitialiseMutant(short itemNumber)
     ITEM_INFO* item;
     InitialiseCreature(itemNumber);
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     item->animNumber = Objects[item->objectNumber].animIndex + MUTANT_ANIM_APPEAR;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->currentAnimState = MUTANT_APPEAR;
     item->goalAnimState = MUTANT_APPEAR;
 }
@@ -261,12 +261,12 @@ void MutantControl(short itemNumber)
     ITEM_INFO* item;
     CREATURE_INFO* mutant;
     AI_INFO info;
-    OBJECT_BONES mutant_joint;
+    OBJECT_Bones mutant_joint;
     short frameNumber;
     short headY;
     short angle;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     mutant = GetCreatureInfo(item);
     angle = 0;
     headY = 0;
@@ -300,7 +300,7 @@ void MutantControl(short itemNumber)
         }
         break;
     case MUTANT_SHOOT:
-        frameNumber = (item->frameNumber - Anims[item->objectNumber].frameBase);
+        frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
         if (frameNumber >= 94 && frameNumber <= 96)
         {
             PHD_3DPOS src;
@@ -322,7 +322,7 @@ void MutantControl(short itemNumber)
         }
         break;
     case MUTANT_LOCUST1:
-        frameNumber = (item->frameNumber - Anims[item->objectNumber].frameBase);
+        frameNumber = (item->frameNumber - g_Level.Anims[item->objectNumber].frameBase);
         if (frameNumber >= 60 && frameNumber <= 120)
             SpawnLocust(item);
         break;
@@ -337,9 +337,9 @@ void MutantControl(short itemNumber)
     }
 
     if (item->currentAnimState != MUTANT_LOCUST1)
-        mutant_joint = OBJECT_BONES(headY, info.xAngle, true);
+        mutant_joint = OBJECT_Bones(headY, info.xAngle, true);
     else
-        mutant_joint = OBJECT_BONES(0);
+        mutant_joint = OBJECT_Bones(0);
 
     CreatureJoint(item, 0, mutant_joint.bone0);
     CreatureJoint(item, 1, mutant_joint.bone1);

@@ -8,7 +8,7 @@
 
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TestBoundsCollide(item, l, coll->radius))
 	{
@@ -16,10 +16,10 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (TriggerActive(item) && (item->itemFlags[0] || item->fallspeed))
 			{
-				LaraItem->animNumber = ANIMATION_LARA_SQUASH_BOULDER;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-				LaraItem->goalAnimState = STATE_LARA_DEATH;
-				LaraItem->currentAnimState = STATE_LARA_DEATH;
+				LaraItem->animNumber = LA_BOULDER_DEATH;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+				LaraItem->goalAnimState = LS_DEATH;
+				LaraItem->currentAnimState = LS_DEATH;
 				LaraItem->gravityStatus = false;
 			}
 			else
@@ -32,7 +32,7 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void RollingBallControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;

@@ -129,7 +129,7 @@ void ElectricityWiresControl(short itemNumber)
 	bool flag = false;
 	int counter = 3;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->itemFlags[0] > 2)
 	{
@@ -224,7 +224,7 @@ void ElectricityWiresControl(short itemNumber)
 
 		roomNumber = item->roomNumber;
 		GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-		ROOM_INFO* r = &Rooms[roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 		if (r->flags & ENV_FLAG_WATER)
 		{
@@ -241,7 +241,7 @@ void ElectricityWiresControl(short itemNumber)
 	{
 		if (water)
 		{
-			int flipNumber = Rooms[roomNumber].flipNumber;
+			int flipNumber = g_Level.Rooms[roomNumber].flipNumber;
 
 			PHD_VECTOR pos1;
 			pos1.x = 0;
@@ -261,7 +261,7 @@ void ElectricityWiresControl(short itemNumber)
 			short roomNumber2 = LaraItem->roomNumber;
 			GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber2);
 
-			if (Rooms[roomNumber1].flipNumber == flipNumber || Rooms[roomNumber2].flipNumber == flipNumber)
+			if (g_Level.Rooms[roomNumber1].flipNumber == flipNumber || g_Level.Rooms[roomNumber2].flipNumber == flipNumber)
 			{
 				if (LaraItem->hitPoints > 32)
 				{

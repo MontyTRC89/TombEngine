@@ -82,11 +82,11 @@ static void TriggerAhmetDeathEffect(ITEM_INFO* item)
 void InitialiseAhmet(short itemNumber)
 {
     ITEM_INFO* item;
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
 
     InitialiseCreature(itemNumber);
     item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->goalAnimState = AHMET_IDLE;
     item->currentAnimState = AHMET_IDLE;
     item->itemFlags[0] = item->pos.xPos >> (WALL_SHIFT);
@@ -104,7 +104,7 @@ void AhmetControl(short itemNumber)
     AI_INFO lara_info, info;
     short angle, head_y;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     if (item->triggerFlags == 1)
     {
         item->triggerFlags = 0;
@@ -123,16 +123,16 @@ void AhmetControl(short itemNumber)
         if (item->currentAnimState == AHMET_DIE)
         {
             // dont clear it !
-            if (item->frameNumber == Anims[item->animNumber].frameEnd)
+            if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
             {
-                item->collidable = FALSE; // NOTE: not exist in the original game, avoid wreid collision with lara...
-                item->frameNumber = (Anims[item->animNumber].frameEnd - 1);
+                item->collidable = false; // NOTE: not exist in the original game, avoid wreid collision with lara...
+                item->frameNumber = (g_Level.Anims[item->animNumber].frameEnd - 1);
             }
         }
         else
         {
             item->animNumber = Objects[item->objectNumber].animIndex + AHMET_DIE_ANIM;
-            item->frameNumber = Anims[item->animNumber].frameBase;
+            item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
             item->currentAnimState = AHMET_DIE;
             item->goalAnimState = AHMET_DIE;
             Lara.generalPtr = (void*)itemNumber;
@@ -267,16 +267,16 @@ void AhmetControl(short itemNumber)
                 item->pos.yRot += info.angle;
             }
 
-            if (!(ahmet->flags & 1) && item->frameNumber > (Anims[item->animNumber].frameBase + 7) && (item->touchBits & AHMET_LEFT_TOUCH))
+            if (!(ahmet->flags & 1) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 7) && (item->touchBits & AHMET_LEFT_TOUCH))
             {
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                 CreatureEffect2(item, &ahmetBiteLeft, 10, -1, DoBloodSplat);
                 ahmet->flags |= 1;
             }
-            else if (!(ahmet->flags & 2) && item->frameNumber > (Anims[item->animNumber].frameBase + 32) && (item->touchBits & AHMET_RIGHT_TOUCH))
+            else if (!(ahmet->flags & 2) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 32) && (item->touchBits & AHMET_RIGHT_TOUCH))
             {
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                 CreatureEffect2(item, &ahmetBiteRight, 10, -1, DoBloodSplat);
                 ahmet->flags |= 2;
@@ -303,9 +303,9 @@ void AhmetControl(short itemNumber)
             {
                 if (!(ahmet->flags & 1) && item->animNumber == Objects[item->objectNumber].animIndex + AHMET_JUMP_ATK_ANIM)
                 {
-                    if (item->frameNumber > (Anims[item->animNumber].frameBase + 11) && (item->touchBits & AHMET_LEFT_TOUCH))
+                    if (item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 11) && (item->touchBits & AHMET_LEFT_TOUCH))
                     {
-                        LaraItem->hitStatus = TRUE;
+                        LaraItem->hitStatus = true;
                         LaraItem->hitPoints -= AHMET_JAW_DAMAGE;
                         CreatureEffect2(item, &ahmetBiteJaw, 10, -1, DoBloodSplat);
                         ahmet->flags |= 1;
@@ -332,16 +332,16 @@ void AhmetControl(short itemNumber)
             }
             else
             {
-                if (!(ahmet->flags & 1) && item->frameNumber > (Anims[item->animNumber].frameBase + 14) && (item->touchBits & AHMET_LEFT_TOUCH))
+                if (!(ahmet->flags & 1) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 14) && (item->touchBits & AHMET_LEFT_TOUCH))
                 {
-                    LaraItem->hitStatus = TRUE;
+                    LaraItem->hitStatus = true;
                     LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                     CreatureEffect2(item, &ahmetBiteLeft, 10, -1, DoBloodSplat);
                     ahmet->flags |= 1;
                 }
-                else if (!(ahmet->flags & 2) && item->frameNumber > (Anims[item->animNumber].frameBase + 22) && (item->touchBits & AHMET_RIGHT_TOUCH))
+                else if (!(ahmet->flags & 2) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 22) && (item->touchBits & AHMET_RIGHT_TOUCH))
                 {
-                    LaraItem->hitStatus = TRUE;
+                    LaraItem->hitStatus = true;
                     LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
                     CreatureEffect2(item, &ahmetBiteRight, 10, -1, DoBloodSplat);
                     ahmet->flags |= 2;
@@ -359,9 +359,9 @@ void AhmetControl(short itemNumber)
 
 bool RespawnAhmet(short itemNumber)
 {
-    ITEM_INFO* item = &Items[itemNumber];
+    ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-    if (item->currentAnimState != 7 || item->frameNumber != Anims[item->animNumber].frameEnd)
+    if (item->currentAnimState != 7 || item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
         return false;
 
     FlashFadeR = 255;
@@ -380,7 +380,7 @@ bool RespawnAhmet(short itemNumber)
 
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->goalAnimState = 1;
-    item->frameNumber = Anims[item->animNumber].frameBase;
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
     item->currentAnimState = 1;
     item->hitPoints = Objects[item->objectNumber].hitPoints;
 

@@ -16,12 +16,12 @@ BITE_INFO LionBite2 = { -2, -10, 132, 21 };
 
 void InitialiseLion(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	ClearItem(itemNum);
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 }
@@ -33,7 +33,7 @@ void LionControl(short itemNum)
 	short tilt = 0;
 	short joint1 = 0;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (CreatureActive(itemNum))
 	{
@@ -46,7 +46,7 @@ void LionControl(short itemNum)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + (GetRandomControl() & 1) + 7;
 				item->currentAnimState = 5;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
 		else

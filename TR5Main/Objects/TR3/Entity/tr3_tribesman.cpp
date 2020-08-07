@@ -37,7 +37,7 @@ void TribemanAxeControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*) item->data;
 
 	short head = 0;
@@ -53,7 +53,7 @@ void TribemanAxeControl(short itemNum)
 				item->animNumber = Objects[item->objectNumber].animIndex + 21;
 			else
 				item->animNumber = Objects[item->objectNumber].animIndex + 20;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 9;
 		}
 	}
@@ -218,7 +218,7 @@ void TribemanAxeControl(short itemNum)
 		case 12:
 			item->itemFlags[0] = 1;
 			creature->maximumTurn = ANGLE(4);
-			creature->flags = item->frameNumber - Anims[item->animNumber].frameBase;
+			creature->flags = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 			if (creature->enemy == LaraItem)
 			{
@@ -271,7 +271,7 @@ static void TribesmanShotDart(ITEM_INFO* item)
 	short dartItemNumber = CreateItem();
 	if (dartItemNumber != NO_ITEM)
 	{
-		ITEM_INFO* dartItem = &Items[dartItemNumber];
+		ITEM_INFO* dartItem = &g_Level.Items[dartItemNumber];
 		dartItem->objectNumber = ID_DARTS;
 		dartItem->roomNumber = item->roomNumber;
 
@@ -320,7 +320,7 @@ void TribemanDartsControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO *)item->data;
 	
 	short headX = 0;
@@ -338,7 +338,7 @@ void TribemanDartsControl(short itemNum)
 				item->animNumber = Objects[item->objectNumber].animIndex + 21;
 			else
 				item->animNumber = Objects[item->objectNumber].animIndex + 20;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 9;
 		}
 	}
@@ -508,7 +508,7 @@ void TribemanDartsControl(short itemNum)
 				item->pos.yRot += ANGLE(2);
 
 
-			if (item->frameNumber == Anims[item->animNumber].frameBase + 15)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 15)
 			{
 				TribesmanShotDart(item);
 				item->goalAnimState = 1;

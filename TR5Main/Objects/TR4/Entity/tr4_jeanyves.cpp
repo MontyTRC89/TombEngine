@@ -7,18 +7,18 @@
 
 void InitialiseJeanYves(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 	item->animNumber = obj->animIndex;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
 void JeanYvesControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->triggerFlags >= Lara.highestLocation)
 	{
@@ -43,7 +43,7 @@ void JeanYvesControl(short itemNumber)
 
 		item->goalAnimState = item->currentAnimState = state;
 		item->animNumber = animNumber;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->triggerFlags = Lara.highestLocation;
 
 		AnimateItem(item);

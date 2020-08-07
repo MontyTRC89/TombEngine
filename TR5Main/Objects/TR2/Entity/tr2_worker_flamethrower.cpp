@@ -23,7 +23,7 @@ static void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber
 	fx_number = CreateNewEffect(roomNumber);
 	if (fx_number != NO_ITEM)
 	{
-		fx = &Effects[fx_number];
+		fx = &EffectList[fx_number];
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
@@ -46,12 +46,12 @@ void InitialiseWorkerFlamethrower(short itemNum)
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	item->animNumber = Objects[item->objectNumber].animIndex + 12;
 
 	ClearItem(itemNum);
 
-	anim = &Anims[item->animNumber];
+	anim = &g_Level.Anims[item->animNumber];
 	item->frameNumber = anim->frameBase;
 	item->currentAnimState = anim->currentAnimState;
 }
@@ -67,7 +67,7 @@ void WorkerFlamethrower(short itemNum)
 	PHD_VECTOR pos;
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 	flame = (CREATURE_INFO*)item->data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
@@ -82,7 +82,7 @@ void WorkerFlamethrower(short itemNum)
 		if (item->currentAnimState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 19;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 7;
 		}
 	}

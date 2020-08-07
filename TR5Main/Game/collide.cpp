@@ -31,6 +31,7 @@ char LM[] =
 };
 
 extern int SplitFloor, SplitCeiling;
+int hitSoundTimer;
 int XFront, ZFront;
 BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[1024];
@@ -58,17 +59,18 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 
 	for (int i = 0; i < numRooms; i++)
 	{
-		room = &Rooms[roomList[i]];
+		room = &g_Level.Rooms[roomList[i]];
 		for (int j = room->mesh.size(); j > 0; j--, mesh++)
 		{
 			mesh = &room->mesh[j];
-			StaticInfo* sInfo = &StaticObjects[mesh->staticNumber];
+			STATIC_INFO* sInfo = &StaticObjects[mesh->staticNumber];
 
 			if ((sInfo->flags & 1)) // No collision
 				continue;
 
 			int yMin = mesh->y + sInfo->xMinc;
 			int yMax = mesh->y + sInfo->yMaxc;
+			short yRot = mesh->yRot;
 
 			std::array<float, 4> box{sInfo->xMinc, sInfo->zMinc, sInfo->xMaxc, sInfo->zMaxc};
 			RotateBoundingBox(box, mesh->yRot);
@@ -77,6 +79,37 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 			zMin = box[1];
 			xMax = box[2];
 			zMax = box[3];
+			
+
+			if (yRot == ANGLE(180))
+			{
+				xMin = mesh->x - sInfo->collisionBox.X2;
+				xMax = mesh->x - sInfo->collisionBox.X1;
+				zMin = mesh->z - sInfo->collisionBox.Z2;
+				zMax = mesh->z - sInfo->collisionBox.Z1;
+			}
+			else if (yRot == -ANGLE(90))
+			{
+				xMin = mesh->x - sInfo->collisionBox.Z2;
+				xMax = mesh->x - sInfo->collisionBox.Z1;
+				zMin = mesh->z + sInfo->collisionBox.X1;
+				zMax = mesh->z + sInfo->collisionBox.X2;
+			}
+			else if (yRot == ANGLE(90))
+			{
+
+				xMin = mesh->x + sInfo->collisionBox.Z1;
+				xMax = mesh->x + sInfo->collisionBox.Z2;
+				zMin = mesh->z - sInfo->collisionBox.X2;
+				zMax = mesh->z - sInfo->collisionBox.X1;
+			}
+			else
+			{
+				xMin = mesh->x + sInfo->collisionBox.X1;
+				xMax = mesh->x + sInfo->collisionBox.X2;
+				zMin = mesh->z + sInfo->collisionBox.Z1;
+				zMax = mesh->z + sInfo->collisionBox.Z2;
+			}
 
 			if (inXmax <= xMin
 			||  inXmin >= xMax
@@ -110,27 +143,27 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 	{
 		for (int i = 0; i < numRooms; i++)
 		{
-			room = &Rooms[roomsArray[i]];
+			room = &g_Level.Rooms[roomsArray[i]];
 
 			for (int j = 0; j < room->mesh.size(); j++)
 			{
 				MESH_INFO* mesh = &room->mesh[j];
-				StaticInfo* staticMesh = &StaticObjects[mesh->staticNumber];
+				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
 
 				if (mesh->flags & 1)
 				{
-					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->y + staticMesh->yMinc)
+					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->y + staticMesh->collisionBox.Y1)
 					{
-						if (collidingItem->pos.yPos <= mesh->y + staticMesh->yMaxc)
+						if (collidingItem->pos.yPos <= mesh->y + staticMesh->collisionBox.Y2)
 						{
 							s = phd_sin(mesh->yRot);
 							c = phd_cos(mesh->yRot);
 							rx = ((collidingItem->pos.xPos - mesh->x) * c - s * (collidingItem->pos.zPos - mesh->z)) >> W2V_SHIFT;
 							rz = ((collidingItem->pos.zPos - mesh->z) * c + s * (collidingItem->pos.xPos - mesh->x)) >> W2V_SHIFT;
 
-							if (radius + rx + STEP_SIZE/2 >= staticMesh->xMinc && rx - radius - STEP_SIZE/2 <= staticMesh->xMaxc)
+							if (radius + rx + STEP_SIZE/2 >= staticMesh->collisionBox.X1 && rx - radius - STEP_SIZE/2 <= staticMesh->collisionBox.X2)
 							{
-								if (radius + rz + STEP_SIZE/2 >= staticMesh->zMinc && rz - radius - STEP_SIZE/2 <= staticMesh->zMaxc)
+								if (radius + rz + STEP_SIZE/2 >= staticMesh->collisionBox.Z1 && rz - radius - STEP_SIZE/2 <= staticMesh->collisionBox.Z2)
 								{
 									collidedMeshes[numMeshes++] = mesh;
 									if (!radius)
@@ -153,14 +186,14 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 	{
 		for (int i = 0; i < numRooms; i++)
 		{
-			ROOM_INFO* room = &Rooms[roomsArray[i]];
+			ROOM_INFO* room = &g_Level.Rooms[roomsArray[i]];
 
 			int itemNumber = room->itemNumber;
 			if (itemNumber != NO_ITEM)
 			{
 				do
 				{
-					ITEM_INFO* item = &Items[itemNumber];
+					ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 					if (item == collidingItem || !ignoreLara && item == LaraItem)
 					{
@@ -184,7 +217,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 					int dy = collidingItem->pos.yPos - item->pos.yPos;
 					int dz = collidingItem->pos.zPos - item->pos.zPos;
 
-					short* framePtr = GetBestFrame(item);
+					ANIM_FRAME* framePtr = GetBestFrame(item);
 
 					if (Objects[item->objectNumber].drawRoutine
 						&& item->meshBits
@@ -195,8 +228,8 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 						&& dy <= 2048
 						&& dz >= -2048
 						&& dz <= 2048
-						&& collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr[2]
-						&& collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr[3])
+						&& collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1
+						&& collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2)
 					{
 						int s = phd_sin(item->pos.yRot);
 						int c = phd_cos(item->pos.yRot);
@@ -214,9 +247,9 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 							  bounds = &v57;*/
 						}
 
-						if (radius + rx + 128 >= framePtr[0] && rx - radius - 128 <= framePtr[1])
+						if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
 						{
-							if (radius + rz + 128 >= framePtr[4] && rz - radius - 128 <= framePtr[5])
+							if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
 							{
 								collidedItems[numItems++] = item;
 								if (!radius)
@@ -234,17 +267,17 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 		collidedItems[numItems] = NULL;
 	}
 
-	return (numItems | numMeshes);
+	return (numItems || numMeshes);
 }
 
 int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
 {
-	short* framePtr = GetBestFrame(lara);
+	ANIM_FRAME* framePtr = GetBestFrame(lara);
 
-	if (item->pos.yPos + GlobalCollisionBounds.Y2 <= lara->pos.yPos + framePtr[3])
+	if (item->pos.yPos + GlobalCollisionBounds.Y2 <= lara->pos.yPos + framePtr->boundingBox.Y1)
 		return false;
 
-	if (item->pos.yPos + GlobalCollisionBounds.Y1 >= framePtr[4])
+	if (item->pos.yPos + GlobalCollisionBounds.Y1 >= framePtr->boundingBox.Y2)
 		return false;
 
 	int s = phd_sin(item->pos.yRot);
@@ -267,7 +300,7 @@ int TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* c
 
 void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->status == ITEM_ACTIVE)
 	{
@@ -275,9 +308,6 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 			return;
 
 		TestCollision(item, LaraItem);    
-
-		/*if (item->object_number == FAN && item->currentAnimState == 1)	// Is the fan moving slow ?
-			ObjectCollision(item_num, laraitem, coll);*/
 	}
 	else if (item->status != ITEM_INVISIBLE)
 		ObjectCollision(itemNumber, l, c);
@@ -349,7 +379,7 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 	{
 		if (CheckNoColFloorTriangle(floor, x, z) == TRUE)
 			break;
-		r = &Rooms[floor->pitRoom];
+		r = &g_Level.Rooms[floor->pitRoom];
 		floor = &XZ_GET_SECTOR(r, x - r->x, z - r->z);
 	}
 
@@ -359,7 +389,7 @@ short GetTiltType(FLOOR_INFO* floor, int x, int y, int z)
 	if (!floor->index)
 		return FLOOR_TYPE;
 
-	data = &FloorData[floor->index];
+	data = &g_Level.FloorData[floor->index];
 	func = *data & DATA_TYPE;
 	
 	if (func == TILT_TYPE)
@@ -423,17 +453,17 @@ int FindGridShift(int x, int z)
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));
 }
 
-int TestBoundsCollideStatic(short* bounds, PHD_3DPOS* pos, int radius)
+int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 {
-	if (!(bounds[5] | bounds[4] | bounds[0] | bounds[1] | bounds[2] | bounds[3]))
-		return FALSE;
+	if (!(bounds->Z2 != 0 || bounds->Z1 != 0 || bounds->X1 != 0 || bounds->X2 != 0 || bounds->Y1 != 0 || bounds->Y2 != 0))
+		return false;
 
-	short* frame = GetBestFrame(LaraItem);
-	if (pos->yPos + bounds[3] <= LaraItem->pos.yPos + frame[2])
-		return FALSE;
+	ANIM_FRAME* frame = GetBestFrame(LaraItem);
+	if (pos->yPos + bounds->Y2 <= LaraItem->pos.yPos + frame->boundingBox.Y1)
+		return false;
 
-	if (pos->yPos + bounds[2] >= LaraItem->pos.yPos + frame[3])
-		return FALSE;
+	if (pos->yPos + bounds->Y1 >= LaraItem->pos.yPos + frame->boundingBox.Y2)
+		return false;
 
 	int c, s;
 	int x, z, dx, dz;
@@ -445,20 +475,20 @@ int TestBoundsCollideStatic(short* bounds, PHD_3DPOS* pos, int radius)
 	dx = (c * x - s * z) >> W2V_SHIFT;
 	dz = (c * z + s * x) >> W2V_SHIFT;
 	
-	if (dx <= radius + bounds[1]
-	&&  dx >= bounds[0] - radius
-	&&  dz <= radius + bounds[5]
-	&&  dz >= bounds[4] - radius)
+	if (dx <= radius + bounds->X2
+	&&  dx >= bounds->X1 - radius
+	&&  dz <= radius + bounds->Z2
+	&&  dz >= bounds->Z1 - radius)
 	{
-		return TRUE;
+		return true;
 	}
 	else
 	{
-		return FALSE;
+		return false;
 	}
 }
 
-int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO* coll)
+int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll)
 {
 	int c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
@@ -471,10 +501,10 @@ int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO
 	dz = LaraItem->pos.zPos - pos->zPos;
 	rx = (c * dx - s * dz) >> W2V_SHIFT;
 	rz = (c * dz + s * dx) >> W2V_SHIFT;
-	minX = bounds[0] - coll->radius;
-	maxX = bounds[1] + coll->radius;
-	minZ = bounds[4] - coll->radius;
-	maxZ = bounds[5] + coll->radius;
+	minX = bounds->X1 - coll->radius;
+	maxX = bounds->X2 + coll->radius;
+	minZ = bounds->Z1 - coll->radius;
+	maxZ = bounds->Z2 + coll->radius;
 	
 	if (abs(dx) > 4608
 	||  abs(dz) > 4608
@@ -482,7 +512,7 @@ int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO
 	||  rx >= maxX
 	||  rz <= minZ
 	||  rz >= maxZ)
-		return FALSE;
+		return false;
 
 	left = rx - minX;
 	top = maxZ - rz;
@@ -530,7 +560,7 @@ int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush)
@@ -538,7 +568,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	int c, s;
 	int dx, dz, rx, rz, minX, maxX, minZ, maxZ;
 	int left, right, bottom, top;
-	short* bounds;
+	BOUNDING_BOX* bounds;
 	short facing;
 
 	c = phd_cos(item->pos.yRot);
@@ -549,14 +579,14 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	rz = (c * dz + s * dx) >> W2V_SHIFT;
 
 	if (bigpush & 2)
-		bounds = (short*)&GlobalCollisionBounds;
+		bounds = &GlobalCollisionBounds;
 	else
-		bounds = GetBestFrame(item);
+		bounds = (BOUNDING_BOX*)GetBestFrame(item);
 
-	minX = bounds[0];
-	maxX = bounds[1];
-	minZ = bounds[4];
-	maxZ = bounds[5];
+	minX = bounds->X1;
+	maxX = bounds->X2;
+	minZ = bounds->Z1;
+	maxZ = bounds->Z2;
 
 	if (bigpush & 1)
 	{
@@ -572,7 +602,7 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	||  rx >= maxX
 	||  rz <= minZ
 	||  rz >= maxZ)
-		return FALSE;
+		return false;
 
 	left = rx - minX;
 	top = maxZ - rz;
@@ -591,18 +621,24 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 	l->pos.xPos = item->pos.xPos + ((c * rx + s * rz) >> W2V_SHIFT);
 	l->pos.zPos = item->pos.zPos + ((c * rz - s * rx) >> W2V_SHIFT);
 
-	if (spazon && bounds[3] - bounds[2] > STEP_SIZE)
+	if (spazon && bounds->Y2 - bounds->Y1 > STEP_SIZE)
 	{
-		rx = (bounds[0] + bounds[1]) / 2;	 
-		rz = (bounds[4] + bounds[5]) / 2;
+		rx = (bounds->X1 + bounds->X2) / 2;	 
+		rz = (bounds->Z1 + bounds->Z2) / 2;
 
 		dx -= (c * rx + s * rz) >> W2V_SHIFT;  
 		dz -= (c * rz - s * rx) >> W2V_SHIFT;
 
 		Lara.hitDirection = (l->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) >> W2V_SHIFT;
 
-		if (!Lara.hitFrame)
-			SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
+		if ((!Lara.hitFrame) && (!hitSoundTimer > 0))
+		{
+				SoundEffect(SFX_LARA_INJURY_RND, &l->pos, 0);
+				hitSoundTimer = frandMinMax(5, 15);
+		}
+
+		if (hitSoundTimer > 0)
+			hitSoundTimer--;
 
 		Lara.hitFrame++;
 		if (Lara.hitFrame > 34) 
@@ -638,19 +674,19 @@ int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, cha
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 
-	return TRUE;
+	return true;
 }
 
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (item->objectNumber == ID_SHOOT_SWITCH1 && !(item->meshBits & 1))
 		item->status = ITEM_INVISIBLE;
 }
 
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TestBoundsCollide(item, l, c->radius))
 	{
@@ -705,7 +741,7 @@ void TriggerLaraBlood()
 	}
 }
 
-int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l)
+int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l)
 {
 	int x, y, z, rx, ry, rz;
 	short xRotRel, yRotRel, zRotRel;
@@ -714,23 +750,25 @@ int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l)
 	yRotRel = l->pos.yRot - item->pos.yRot;
 	zRotRel = l->pos.zRot - item->pos.zRot;
 
-	if (xRotRel < bounds[6])
-		return FALSE;
-	if (xRotRel > bounds[7])
-		return FALSE;
-	if (yRotRel < bounds[8])
-		return FALSE;
-	if (yRotRel > bounds[9])
-		return FALSE;
-	if (zRotRel < bounds[10])
-		return FALSE;
-	if (zRotRel > bounds[11])
-		return FALSE;
+	if (xRotRel < bounds->rotX1)
+		return false;
+	if (xRotRel > bounds->rotX2)
+		return false;
+	if (yRotRel < bounds->rotY1)
+		return false;
+	if (yRotRel > bounds->rotY2)
+		return false;
+	if (zRotRel < bounds->rotZ1)
+		return false;
+	if (zRotRel > bounds->rotX2)
+		return false;
 	
 	Vector3 pos = Vector3(l->pos.xPos - item->pos.xPos, l->pos.yPos - item->pos.yPos, l->pos.zPos - item->pos.zPos);
 
+	// HACK: it seems that a minus sign is required here. I don't know why, but it just works (tm) but we must 
+	// do more tests
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->pos.yRot),
+		TO_RAD(-(item->pos.yRot)),
 		TO_RAD(item->pos.xRot),
 		TO_RAD(item->pos.zRot)
 	);
@@ -741,10 +779,13 @@ int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l)
 	ry = pos.y;
 	rz = pos.z;
 
-	if (rx < bounds[0] || rx > bounds[1] || ry < bounds[2] || ry > bounds[3] || rz < bounds[4] || rz > bounds[5])
-		return FALSE;
 
-	return TRUE;
+	if (rx < bounds->boundingBox.X1 || rx > bounds->boundingBox.X2 
+		|| ry < bounds->boundingBox.Y1 || ry > bounds->boundingBox.Y2
+		|| rz < bounds->boundingBox.Z1 || rz > bounds->boundingBox.Z2)
+		return false;
+
+	return true;
 }
 
 int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd)
@@ -781,35 +822,35 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 			switch (direction)
 			{
 			case 0:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_LEFT;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_LEFT, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_LEFT;
-				LaraItem->currentAnimState = STATE_LARA_WALK_LEFT;
+				LaraItem->animNumber = LA_SIDESTEP_LEFT;
+				LaraItem->frameNumber = GF(LA_SIDESTEP_LEFT, 0);
+				LaraItem->goalAnimState = LS_STEP_LEFT;
+				LaraItem->currentAnimState = LS_STEP_LEFT;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
 			case 1:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_FORWARD;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_FORWARD, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_FORWARD;
-				LaraItem->currentAnimState = STATE_LARA_WALK_FORWARD;
+				LaraItem->animNumber = LA_WALK;
+				LaraItem->frameNumber = GF(LA_WALK, 0);
+				LaraItem->goalAnimState = LS_WALK_FORWARD;
+				LaraItem->currentAnimState = LS_WALK_FORWARD;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
 			case 2:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_RIGHT;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_RIGHT, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_RIGHT;
-				LaraItem->currentAnimState = STATE_LARA_WALK_RIGHT;
+				LaraItem->animNumber = LA_WALK;
+				LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
+				LaraItem->goalAnimState = LS_STEP_RIGHT;
+				LaraItem->currentAnimState = LS_STEP_RIGHT;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
 			case 3:
 			default:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_BACK;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_BACK, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_BACK;
-				LaraItem->currentAnimState = STATE_LARA_WALK_BACK;
+				LaraItem->animNumber = LA_WALK_BACK;
+				LaraItem->frameNumber = GF(LA_WALK_BACK, 0);
+				LaraItem->goalAnimState = LS_WALK_BACK;
+				LaraItem->currentAnimState = LS_WALK_BACK;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
@@ -899,7 +940,7 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	if (abs(height - l->pos.yPos) <= CLICK(2))
 	{
 		if (sqrt(SQUARE(dest.xPos - l->pos.xPos) + SQUARE(dest.yPos - l->pos.yPos) + SQUARE(dest.zPos - l->pos.zPos)) < (STEP_SIZE/2))
-			return TRUE;
+			return true;
 
 		return Move3DPosTo3DPos(&l->pos, &dest, LARA_VELOCITY, ANGLE(2));
 	}
@@ -910,23 +951,23 @@ int MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 		Lara.gunStatus = LG_NO_ARMS;
 	}
 
-	return FALSE;
+	return false;
 }
 
 int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 {
-	short* bounds;
-	short* laraBounds;
+	BOUNDING_BOX* bounds;
+	BOUNDING_BOX* laraBounds;
 	int c, s;
 	int x, z;
 	int dx, dz;
 
-	bounds = GetBestFrame(item);
-	laraBounds = GetBestFrame(l);
+	bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	laraBounds = (BOUNDING_BOX*)GetBestFrame(l);
 
-	if (item->pos.yPos + bounds[3] > l->pos.yPos + laraBounds[2])
+	if (item->pos.yPos + bounds->Y2 > l->pos.yPos + laraBounds->Y1)
 	{
-		if (item->pos.yPos + bounds[2] < l->pos.yPos + laraBounds[3])
+		if (item->pos.yPos + bounds->Y1 < l->pos.yPos + laraBounds->Y2)
 		{
 			c = phd_cos(item->pos.yRot);
 			s = phd_sin(item->pos.yRot);
@@ -935,27 +976,27 @@ int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius)
 			dx = (c * x - s * z) >> W2V_SHIFT;
 			dz = (c * z + s * x) >> W2V_SHIFT;
 
-			if (dx >= bounds[0] - radius
-			&&  dx <= radius + bounds[1]
-			&&  dz >= bounds[4] - radius
-			&&  dz <= radius + bounds[5])
+			if (dx >= bounds->X1 - radius
+			&&  dx <= radius + bounds->X2
+			&&  dz >= bounds->Z1 - radius
+			&&  dz <= radius + bounds->Z2)
 			{
-				return TRUE;
+				return true;
 			}
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	int c, s;
 	int x, z, rx, rz;
-	short* frame;
+	ANIM_FRAME* frame;
 
-	if (item->objectNumber != ID_HITMAN || item->currentAnimState != STATE_LARA_INSERT_PUZZLE)
+	if (item->objectNumber != ID_HITMAN || item->currentAnimState != LS_INSERT_PUZZLE)
 	{
 		if (TestBoundsCollide(item, l, coll->radius))
 		{
@@ -972,10 +1013,10 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					c = phd_cos(item->pos.yRot);
 					s = phd_sin(item->pos.yRot);
 					frame = GetBestFrame(item);
-					rx = (frame[0] + frame[1]) / 2;
-					rz = (frame[4] + frame[5]) / 2;
+					rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+					rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
 					
-					if (frame[3] - frame[2] > STEP_SIZE)
+					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 					{
 						int angle = (l->pos.yRot - phd_atan(z - ((c * rx - s * rz) >> W2V_SHIFT), x - ((c * rx + s * rz) >> W2V_SHIFT)) - ANGLE(135)) >> W2V_SHIFT;
 						Lara.hitDirection = (short)angle;
@@ -1419,31 +1460,30 @@ void GetCollisionInfo(COLL_INFO* coll, int xPos, int yPos, int zPos, int roomNum
 void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 
 	l->hitStatus = false;
 	Lara.hitDirection = -1;
 
 	if (l->hitPoints > 0)
 	{
-		// Crash when using GetRoomList() with vector there but work without :x
-		vector<short> roomsList;
 		short* door, numDoors;
+		short roomsToCheck[128];
+		short numRoomsToCheck = 0;
+		roomsToCheck[numRoomsToCheck++] = l->roomNumber;
 
-		roomsList.push_back(l->roomNumber);
-
-		ROOM_INFO room = Rooms[l->roomNumber];
-		for (int i = 0; i < room.doors.size(); i++)
+		ROOM_INFO* room = &g_Level.Rooms[l->roomNumber];
+		for (int i = 0; i < room->doors.size(); i++)
 		{
-			roomsList.push_back(room.doors[i].room);
+			roomsToCheck[numRoomsToCheck++] = room->doors[i].room;
 		}
 
-		for (int i = 0; i < roomsList.size(); i++)
+		for (int i = 0; i < numRoomsToCheck; i++)
 		{
-			short itemNumber = Rooms[roomsList[i]].itemNumber;
+			short itemNumber = g_Level.Rooms[roomsToCheck[i]].itemNumber;
 			while (itemNumber != NO_ITEM)
 			{
-				item = &Items[itemNumber];
+				item = &g_Level.Items[itemNumber];
 				if (item->collidable && item->status != ITEM_INVISIBLE)		 
 				{
 					obj = &Objects[item->objectNumber];
@@ -1462,9 +1502,9 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 
 			if (coll->enableSpaz)
 			{
-				for (int j = 0; j < Rooms[roomsList[i]].mesh.size(); j++)
+				for (int j = 0; j < g_Level.Rooms[roomsToCheck[i]].mesh.size(); j++)
 				{
-					MESH_INFO* mesh = &Rooms[roomsList[i]].mesh[j];
+					MESH_INFO* mesh = &g_Level.Rooms[roomsToCheck[i]].mesh[j];
 
 					if (mesh->flags & 1)
 					{
@@ -1480,8 +1520,8 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 							pos.zPos = mesh->z;
 							pos.yRot = mesh->yRot;
 
-							if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].xMinc, &pos, coll->radius))
-								ItemPushLaraStatic(l, &StaticObjects[mesh->staticNumber].xMinc, &pos, coll);
+							if (TestBoundsCollideStatic(&StaticObjects[mesh->staticNumber].collisionBox, &pos, coll->radius))
+								ItemPushLaraStatic(l, &StaticObjects[mesh->staticNumber].collisionBox, &pos, coll);
 						}
 					}
 
@@ -1497,7 +1537,7 @@ void LaraBaddieCollision(ITEM_INFO* l, COLL_INFO* coll)
 
 void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->status != ITEM_INVISIBLE)
 	{
@@ -1562,20 +1602,20 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 {
 	FLOOR_INFO* floor;
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	GAME_VECTOR pos;
 	int ratioXZ, frontHDif, sideHDif;
 	int frontX, frontZ, leftX, leftZ, rightX, rightZ;
 	int frontHeight, backHeight, leftHeight, rightHeight;
 	int radiusZ, radiusX;
 
-	bounds = (ANIM_FRAME*)GetBoundsAccurate(item);
+	bounds = GetBoundsAccurate(item);
 	pos.x = item->pos.xPos;
 	pos.y = item->pos.yPos;
 	pos.z = item->pos.zPos;
 	pos.roomNumber = item->roomNumber;
-	radiusX = bounds->MaxX;
-	radiusZ = bounds->MaxZ / radiusDivide; // need divide in any case else it's too much !
+	radiusX = bounds->X2;
+	radiusZ = bounds->Z2 / radiusDivide; // need divide in any case else it's too much !
 
 	ratioXZ = radiusZ / radiusX;
 	frontX = (phd_sin(item->pos.yRot) * radiusZ) >> W2V_SHIFT;

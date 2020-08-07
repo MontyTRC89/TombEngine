@@ -35,7 +35,7 @@
 #include "setup.h"
 #include "level.h"
 
-static void StartBaddy(ObjectInfo* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded)
@@ -54,7 +54,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_WATER;
 
-		Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_BARRACUDA];
@@ -74,7 +74,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_WATER;
 
-		Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_Y;
 	}
 
 	obj = &Objects[ID_EAGLE];
@@ -145,8 +145,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
 		obj->zoneType = ZONE_HUMAN_CLASSIC;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
-		Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_Y);
+		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
 	}
 
 	obj = &Objects[ID_GOON_SILENCER1];
@@ -165,8 +165,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_GOON_SILENCER2];
@@ -195,8 +195,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_GOON_SILENCER3];
@@ -225,8 +225,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 0] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_WORKER_SHOTGUN];
@@ -245,9 +245,9 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+		//g_Level.Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
+		//g_Level.Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
+		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
 	}
 
 	obj = &Objects[ID_WORKER_MACHINEGUN];
@@ -265,9 +265,9 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct torso and head bones value and assign ROT_X and ROT_Y to it !
+		//g_Level.Bones[obj->boneIndex + 5*4] |= (ROT_X | ROT_Y);
+		//g_Level.Bones[obj->boneIndex + 14*4] |= (ROT_X | ROT_Y);
+		// TODO: get the correct torso and head Bones value and assign ROT_X and ROT_Y to it !
 	}
 
 	obj = &Objects[ID_SMALL_SPIDER];
@@ -319,8 +319,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 11 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 11 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_BIRDMONSTER];
@@ -338,7 +338,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_WORKER_FLAMETHROWER];
@@ -356,8 +356,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 4 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 4 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_KNIFETHROWER];
@@ -375,9 +375,9 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
-		// TODO: find the correct for bones (knifethrower).
+		//g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		//g_Level.Bones[obj->boneIndex + 0 * 4] |= (ROT_X | ROT_Y);
+		// TODO: find the correct for Bones (knifethrower).
 	}
 
 	obj = &Objects[ID_KNIFETHROWER_KNIFE];
@@ -399,8 +399,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS1];
@@ -418,8 +418,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
@@ -447,8 +447,8 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 8 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_MONK1];
@@ -466,7 +466,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_MONK2];
@@ -484,7 +484,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
 	}
 
 	obj = &Objects[ID_SWORD_GUARDIAN];
@@ -503,9 +503,9 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
-		// TODO: bones value is not correct (shiva) !
+		g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		g_Level.Bones[obj->boneIndex + 16 * 4] |= (ROT_X | ROT_Y);
+		// TODO: Bones value is not correct (shiva) !
 		// need the correct one.
 	}
 
@@ -525,9 +525,9 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		//Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
-		//Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
-		// TODO: get the correct id for bones ! (spear)
+		//g_Level.Bones[obj->boneIndex + 6 * 4] |= (ROT_X | ROT_Y);
+		//g_Level.Bones[obj->boneIndex + 12 * 4] |= (ROT_X | ROT_Y);
+		// TODO: get the correct id for Bones ! (spear)
 	}
 
 	obj = &Objects[ID_DRAGON_FRONT];
@@ -546,7 +546,7 @@ static void StartBaddy(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
 		obj->savePosition = true;
-		Bones[obj->boneIndex + 10 * 4] |= ROT_Z;
+		g_Level.Bones[obj->boneIndex + 10 * 4] |= ROT_Z;
 	}
 
 	obj = &Objects[ID_DRAGON_BACK];
@@ -600,12 +600,12 @@ static void StartBaddy(ObjectInfo* obj)
 	}
 }
 
-static void StartObject(ObjectInfo* obj)
+static void StartObject(OBJECT_INFO* obj)
 {
 	
 }
 
-static void StartTrap(ObjectInfo* obj)
+static void StartTrap(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_ROLLING_SPINDLE];
 	if (obj->loaded)
@@ -628,7 +628,7 @@ static void StartTrap(ObjectInfo* obj)
 }
 
 // boat, snowmobile, snowmobile gun
-static void StartVehicles(ObjectInfo* obj)
+static void StartVehicles(OBJECT_INFO* obj)
 {
 	// TODO: fix BoatControl() not using int BoatControl(void)
 	obj = &Objects[ID_SPEEDBOAT];
@@ -654,7 +654,7 @@ static void StartVehicles(ObjectInfo* obj)
 	}
 }
 
-static ObjectInfo* objToInit;
+static OBJECT_INFO* objToInit;
 void InitialiseTR2Objects()
 {
 	StartBaddy(objToInit);

@@ -82,7 +82,7 @@ enum BOAT_STATE
 static void GetBoatGetOff(ITEM_INFO* boat)
 {
 	/* Wait for last frame of getoff anims before returning to normal Lara control */
-	if ((LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
+	if ((LaraItem->currentAnimState == BOAT_JUMPR || LaraItem->currentAnimState == BOAT_JUMPL) && LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 	{
 		short roomNumber;
 		int x, y, z;
@@ -94,7 +94,7 @@ static void GetBoatGetOff(ITEM_INFO* boat)
 			LaraItem->pos.yRot += 0x4000;
 
 		LaraItem->animNumber = 77;
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = LaraItem->goalAnimState = 3;
 		LaraItem->gravityStatus = true;
 		LaraItem->fallspeed = -40;
@@ -118,7 +118,7 @@ static void GetBoatGetOff(ITEM_INFO* boat)
 
 		/* Set boat to still anim */
 		boat->animNumber = Objects[ID_SPEEDBOAT].animIndex;
-		boat->frameNumber = Anims[boat->animNumber].frameBase;
+		boat->frameNumber = g_Level.Anims[boat->animNumber].frameBase;
 	}
 }
 
@@ -129,7 +129,7 @@ static int CanGetOff(int direction)
 	short roomNumber, angle;
 	int x, y, z, height, ceiling;
 
-	v = &Items[Lara.Vehicle];
+	v = &g_Level.Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = v->pos.yRot - 0x4000;
@@ -167,7 +167,7 @@ static int BoatCheckGetOn(short itemNum, COLL_INFO* coll)
 	if (Lara.gunStatus != LG_NO_ARMS)
 		return 0;
 
-	boat = &Items[itemNum];
+	boat = &g_Level.Items[itemNum];
 
 	dist = ((LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) - (LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot)) >> W2V_SHIFT;
 	if (dist > 200)
@@ -255,13 +255,13 @@ static void DoBoatCollision(int itemNum)
 	ITEM_INFO* item, * boat;
 	int item_number, distance, x, z, radius;
 
-	boat = &Items[itemNum];
+	boat = &g_Level.Items[itemNum];
 
 	/* Check if hit something in the water */
-	item_number = Rooms[boat->roomNumber].itemNumber;
+	item_number = g_Level.Rooms[boat->roomNumber].itemNumber;
 	while (item_number != NO_ITEM)
 	{
-		item = &Items[item_number];
+		item = &g_Level.Items[item_number];
 
 		if (item->objectNumber == ID_SPEEDBOAT && item_number != itemNum && Lara.Vehicle != item_number)
 		{
@@ -473,7 +473,7 @@ static int BoatDynamics(short itemNum)
 	short roomNumber, rot;
 	int newspeed;
 
-	boat = &Items[itemNum];
+	boat = &g_Level.Items[itemNum];
 	binfo = (BOAT_INFO*)boat->data;
 
 	/* Remove tilt angle (and add again at the end) as effects control */
@@ -707,7 +707,7 @@ static void BoatAnimation(ITEM_INFO* boat, int collide)
 		if (LaraItem->currentAnimState != BOAT_DEATH)
 		{
 			LaraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_DEATH_ANIM;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = BOAT_DEATH;
 		}
 	}
@@ -716,7 +716,7 @@ static void BoatAnimation(ITEM_INFO* boat, int collide)
 		if (LaraItem->currentAnimState != BOAT_FALL)
 		{
 			LaraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_FALL_ANIM;
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = BOAT_FALL;
 		}
 	}
@@ -725,7 +725,7 @@ static void BoatAnimation(ITEM_INFO* boat, int collide)
 		if (LaraItem->currentAnimState != BOAT_HIT)
 		{
 			LaraItem->animNumber = (short)(Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide);
-			LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->currentAnimState = LaraItem->goalAnimState = BOAT_HIT;
 		}
 	}
@@ -808,8 +808,8 @@ void InitialiseBoat(short itemNum)
 	ITEM_INFO* boat;
 	BOAT_INFO* binfo;
 
-	boat = &Items[itemNum];
-	binfo = (BOAT_INFO*)game_malloc(sizeof(BOAT_INFO));
+	boat = &g_Level.Items[itemNum];
+	binfo = game_malloc<BOAT_INFO>();
 	boat->data = (void*)binfo;
 	binfo->boat_turn = 0;
 	binfo->left_fallspeed = 0;
@@ -830,7 +830,7 @@ void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
-	boat = &Items[itemNum];
+	boat = &g_Level.Items[itemNum];
 
 	/* If player isn't pressing control or Lara is busy, then do normal object collision */
 	geton = BoatCheckGetOn(itemNum, coll);
@@ -859,7 +859,7 @@ void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	litem->gravityStatus = false;
 	litem->speed = 0;
 	litem->fallspeed = 0;
-	litem->frameNumber = Anims[litem->animNumber].frameBase;
+	litem->frameNumber = g_Level.Anims[litem->animNumber].frameBase;
 	litem->currentAnimState = litem->goalAnimState = BOAT_GETON;
 
 	if (litem->roomNumber != boat->roomNumber)
@@ -868,10 +868,10 @@ void BoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 	AnimateItem(litem);
 
 	/* Add to active item list from this point onward */
-	if (Items[itemNum].status != ITEM_ACTIVE)
+	if (g_Level.Items[itemNum].status != ITEM_ACTIVE)
 	{
 		AddActiveItem(itemNum);
-		Items[itemNum].status = ITEM_ACTIVE;
+		g_Level.Items[itemNum].status = ITEM_ACTIVE;
 	}
 
 	// TODO: play a cd when starting ! (boat)
@@ -891,7 +891,7 @@ void BoatControl(short itemNumber)
 	int height, collide, water, ceiling, pitch, h, ofs, nowake;
 	short roomNumber, x_rot, z_rot;
 
-	boat = &Items[itemNumber];
+	boat = &g_Level.Items[itemNumber];
 	binfo = (BOAT_INFO*)boat->data;
 	collide = BoatDynamics(itemNumber);
 
@@ -1009,7 +1009,7 @@ void BoatControl(short itemNumber)
 		if (LaraItem->hitPoints > 0)
 		{
 			boat->animNumber = Objects[ID_SPEEDBOAT].animIndex + (LaraItem->animNumber - Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex);
-			boat->frameNumber = Anims[boat->animNumber].frameBase + (LaraItem->frameNumber - Anims[LaraItem->animNumber].frameBase);
+			boat->frameNumber = g_Level.Anims[boat->animNumber].frameBase + (LaraItem->frameNumber - g_Level.Anims[LaraItem->animNumber].frameBase);
 		}
 
 		/* Set camera */

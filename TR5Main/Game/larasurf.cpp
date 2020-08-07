@@ -16,12 +16,12 @@ bool EnableCrawlFlexWaterPullUp, EnableCrawlFlexSubmerged;
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
-	if (item->goalAnimState == STATE_LARA_UNDERWATER_FORWARD)
+	if (item->goalAnimState == LS_UNDERWATER_FORWARD)
 	{
-		item->currentAnimState = STATE_LARA_UNDERWATER_DIVING;
-		item->animNumber = ANIMATION_LARA_FREE_FALL_TO_UNDERWATER_ALTERNATE;
+		item->currentAnimState = LS_DIVE;
+		item->animNumber = LA_ONWATER_DIVE;
 		item->pos.xRot = -8190;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->fallspeed = 80;
 		Lara.waterStatus = LW_UNDERWATER;
 	}
@@ -53,6 +53,7 @@ void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4DCE8(<), 4E14C(<) (F)
 	Lara.moveAngle = 0;
 	LaraSurfaceCollision(item, coll);
 	LaraTestWaterClimbOut(item, coll);
+	LaraTestLadderClimbOut(item, coll);
 }
 
 void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
@@ -63,7 +64,7 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -84,27 +85,27 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)//4DBA0, 4E004 (F)
 
 	if (TrInput & IN_FORWARD)
 	{
-		item->goalAnimState = STATE_LARA_ONWATER_FORWARD;
+		item->goalAnimState = LS_ONWATER_FORWARD;
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->goalAnimState = STATE_LARA_ONWATER_BACK;
+		item->goalAnimState = LS_ONWATER_BACK;
 	}
 
 	if (TrInput & IN_LSTEP)
 	{
-		item->goalAnimState = STATE_LARA_ONWATER_LEFT;
+		item->goalAnimState = LS_ONWATER_LEFT;
 	}
 	else if (TrInput & IN_RSTEP)
 	{
-		item->goalAnimState = STATE_LARA_ONWATER_RIGHT;
+		item->goalAnimState = LS_ONWATER_RIGHT;
 	}
 
 	if (TrInput & IN_JUMP)
 	{
 		Lara.diveCount++;
 		if (Lara.diveCount == 10)
-			item->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
+			item->goalAnimState = LS_UNDERWATER_FORWARD;
 	}
 	else
 	{
@@ -116,7 +117,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -133,7 +134,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)//4DAF8, 4DF5C (F)
 
 	if (!(TrInput & IN_RSTEP))
 	{
-		item->goalAnimState = STATE_LARA_ONWATER_STOP;
+		item->goalAnimState = LS_ONWATER_STOP;
 	}
 
 	item->fallspeed += 8;
@@ -145,7 +146,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -162,7 +163,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)//4DA50(<), 4DEB4(<) (F)
 
 	if (!(TrInput & IN_LSTEP))
 	{
-		item->goalAnimState = STATE_LARA_ONWATER_STOP;
+		item->goalAnimState = LS_ONWATER_STOP;
 	}
 
 	item->fallspeed += 8;
@@ -174,7 +175,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -191,7 +192,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)//4D9A8(<), 4DE0C(<) (F)
 
 	if (!(TrInput & IN_BACK))
 	{
-		item->goalAnimState = STATE_LARA_ONWATER_STOP;
+		item->goalAnimState = LS_ONWATER_STOP;
 	}
 
 	item->fallspeed += 8;
@@ -203,7 +204,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = STATE_LARA_WATER_DEATH;
+		item->goalAnimState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -219,9 +220,9 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)//4D8E4(<), 4DD48(<) (F)
 	}
 
 	if (!(TrInput & IN_FORWARD))
-		item->goalAnimState = STATE_LARA_ONWATER_STOP;
+		item->goalAnimState = LS_ONWATER_STOP;
 	if (TrInput & IN_JUMP)
-		item->goalAnimState = STATE_LARA_ONWATER_STOP;
+		item->goalAnimState = LS_ONWATER_STOP;
 
 	item->fallspeed += 8;
 	if (item->fallspeed > 60)
@@ -314,11 +315,11 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)//4D4F0(<), 4D954(<) 
 	}
 	else
 	{
-		item->goalAnimState = STATE_LARA_UNDERWATER_FORWARD;
-		item->currentAnimState = STATE_LARA_UNDERWATER_DIVING;
-		item->animNumber = ANIMATION_LARA_FREE_FALL_TO_UNDERWATER_ALTERNATE;
+		item->goalAnimState = LS_UNDERWATER_FORWARD;
+		item->currentAnimState = LS_DIVE;
+		item->animNumber = LA_ONWATER_DIVE;
 		item->pos.xRot = -8190;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->fallspeed = 80;
 		Lara.waterStatus = LW_UNDERWATER;
 	}
@@ -388,49 +389,49 @@ int LaraTestWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)//4D22C, 4D690
 	{
 		if ((LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
 		{
-			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER_TO_2CLICK;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+			item->animNumber = LA_ONWATER_TO_CROUCH_1CLICK;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LA_CROUCH_IDLE;
 		}
 		else
 		{
-			item->animNumber = ANIMATION_LARA_CLIMB_OUT_OF_WATER;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->goalAnimState = STATE_LARA_STOP;
+			item->animNumber = LA_ONWATER_TO_STAND_1CLICK;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LS_STOP;
 		}
 	}
 	else if (frontFloor > 128)
 	{
 		if ((LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512) && EnableCrawlFlexSubmerged == true)
 		{
-			item->animNumber = ANIMATION_LARA_WATER_TO_SUBMERGED_CRAWL;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+			item->animNumber = LA_ONWATER_TO_CROUCH_M1CLICK;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LA_CROUCH_IDLE;
 		}
 		else
-			item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+			item->animNumber = LA_ONWATER_TO_STAND_M1CLICK;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
 
 	else
 	{
 		if ((LaraCeilingFront(item, item->pos.yRot, 384, 512) >= -512) && EnableCrawlFlexWaterPullUp == true)
 		{
-			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW_TO_2CLICK;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->goalAnimState = ANIMATION_LARA_CROUCH_IDLE;
+			item->animNumber = LA_ONWATER_TO_CROUCH_0CLICK;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LA_CROUCH_IDLE;
 		}
 		else
 		{
-			item->animNumber = ANIMATION_LARA_ONWATER_TO_LAND_LOW;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->goalAnimState = STATE_LARA_STOP;
+			item->animNumber = LA_ONWATER_TO_STAND_0CLICK;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LS_STOP;
 		}
 
 
 	}
-
-	item->currentAnimState = STATE_LARA_ONWATER_EXIT;
+	
+	item->currentAnimState = LS_ONWATER_EXIT;
 	item->pos.yRot = rot;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	item->pos.zRot = 0;
@@ -455,28 +456,28 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
 
 	if (coll->midFloor >= -128)
 	{
-		if (item->goalAnimState == STATE_LARA_ONWATER_LEFT)
+		if (item->goalAnimState == LS_ONWATER_LEFT)
 		{
-			item->goalAnimState = STATE_LARA_WALK_LEFT;
+			item->goalAnimState = LS_STEP_LEFT;
 		}
-		else if (item->goalAnimState == STATE_LARA_ONWATER_RIGHT)
+		else if (item->goalAnimState == LS_ONWATER_RIGHT)
 		{
-			item->goalAnimState = STATE_LARA_WALK_RIGHT;
+			item->goalAnimState = LS_STEP_RIGHT;
 		}
 		else
 		{
-			item->animNumber = ANIMATION_LARA_WADE;
-			item->frameNumber = Anims[item->animNumber].frameBase;
-			item->goalAnimState = STATE_LARA_WADE_FORWARD;
-			item->currentAnimState = STATE_LARA_WADE_FORWARD;
+			item->animNumber = LA_WADE;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LS_WADE_FORWARD;
+			item->currentAnimState = LS_WADE_FORWARD;
 		}
 	}
 	else
 	{
-		item->animNumber = ANIMATION_LARA_ONWATER_TO_WADE_DEEP;
-		item->frameNumber = Anims[item->animNumber].frameBase;
-		item->currentAnimState = STATE_LARA_ONWATER_EXIT;
-		item->goalAnimState = STATE_LARA_STOP;
+		item->animNumber = LA_ONWATER_TO_WADE_1CLICK;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->currentAnimState = LS_ONWATER_EXIT;
+		item->goalAnimState = LS_STOP;
 	}
 
 	item->pos.yPos += coll->frontFloor + 695;
@@ -491,5 +492,67 @@ int LaraTestWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)//4D100, 4D564 (F)
 
 	Lara.waterStatus = LW_WADE;
 
+	return 1;
+}
+
+int LaraTestLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for water to ladder move
+{
+	if (!Lara.climbStatus || coll->collType != CT_FRONT || !(TrInput & IN_ACTION))
+		return 0;
+
+	if (Lara.gunStatus && (Lara.gunStatus != LG_READY || Lara.gunType != WEAPON_FLARE))
+		return 0;
+
+	if (!LaraTestClimbStance(item, coll))
+		return 0;
+	
+	short rot = item->pos.yRot;
+
+	if (rot >= -ANGLE(35.0f) && rot <= ANGLE(35.0f))
+		rot = 0;
+	else if (rot >= ANGLE(55.0f) && rot <= ANGLE(125.0f))
+		rot = ANGLE(90.0f);
+	else if (rot >= ANGLE(145.0f) || rot <= -ANGLE(145.0f))
+		rot = ANGLE(180.0f);
+	else if (rot >= -ANGLE(125.0f) && rot <= -ANGLE(55.0f))
+		rot = -ANGLE(90.0f);
+
+	if (rot & 0x3FFF)
+		return 0;
+
+	switch ((unsigned short)rot / ANGLE(90.0f))
+	{
+	case NORTH:
+		item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD - 1;
+		break;
+
+	case EAST:
+		item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - LARA_RAD - 1;
+		break;
+
+	case SOUTH:
+		item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + LARA_RAD + 1;
+		break;
+
+	case WEST:
+		item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD + 1;
+		break;
+	}
+
+	item->animNumber = LA_ONWATER_IDLE;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->currentAnimState = LS_ONWATER_STOP;
+	item->goalAnimState = LS_LADDER_IDLE;
+	AnimateLara(item);
+
+	item->pos.yRot = rot;
+	Lara.gunStatus = LG_HANDS_BUSY;
+	item->pos.zRot = 0;
+	item->pos.xRot = 0;
+	item->gravityStatus = false;
+	item->speed = 0;
+	item->fallspeed = 0;
+	Lara.waterStatus = LW_ABOVE_WATER;
+	
 	return 1;
 }
