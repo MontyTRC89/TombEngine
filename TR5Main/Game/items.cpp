@@ -418,8 +418,6 @@ void InitialiseItem(short itemNum)
 	{
 		Objects[item->objectNumber].initialise(itemNum);
 	}
-
-	//item->unk_thing = 0;
 }
 
 short CreateItem()
