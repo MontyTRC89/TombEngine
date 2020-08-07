@@ -13,7 +13,6 @@
 using namespace T5M::Renderer;
 
 extern GameFlow *g_GameFlow;
-
 void Renderer11::UpdateLaraAnimations(bool force)
 {
 	Matrix translation;
@@ -218,7 +217,7 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 			m_numDrawCalls++;
 		}
 	}
-
+	drawLaraHolsters(transparent);
 	if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 	{
 		RendererObject &laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
@@ -280,4 +279,51 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	}
 
 	return true;
+}
+
+void Renderer11::drawLaraHolsters(bool transparent)
+{
+	int firstBucket = (transparent ? 2 : 0);
+	int lastBucket = (transparent ? 4 : 2);
+	HOLSTER_SLOT leftHolsterID = Lara.holsterInfo.leftHolster;
+	HOLSTER_SLOT rightHolsterID = Lara.holsterInfo.rightHolster;
+	HOLSTER_SLOT backHolsterID = Lara.holsterInfo.backHolster;
+
+	
+	if(m_moveableObjects[static_cast<int>(leftHolsterID)]){
+		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(leftHolsterID)];
+		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
+		for(int j = firstBucket; j < lastBucket; j++){
+			RendererBucket* bucket = &mesh->Buckets[j];
+			if(bucket->Vertices.size() == 0)
+				continue;
+			// Draw vertices
+			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
+	if(m_moveableObjects[static_cast<int>(rightHolsterID)]){
+		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(rightHolsterID)];
+		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
+		for(int j = firstBucket; j < lastBucket; j++){
+			RendererBucket* bucket = &mesh->Buckets[j];
+			if(bucket->Vertices.size() == 0)
+				continue;
+			// Draw vertices
+			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
+	if(backHolsterID != HOLSTER_SLOT::Empty && m_moveableObjects[static_cast<int>(backHolsterID)]){
+		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(backHolsterID)];
+		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
+		for(int j = firstBucket; j < lastBucket; j++){
+			RendererBucket* bucket = &mesh->Buckets[j];
+			if(bucket->Vertices.size() == 0)
+				continue;
+			// Draw vertices
+			m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+			m_numDrawCalls++;
+		}
+	}
 }

@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "level.h"
 #include "control.h"
+
 using namespace T5M::Renderer;
 short PickupX;
 short PickupY;
@@ -13,7 +14,9 @@ short CurrentPickup;
 DISPLAY_PICKUP Pickups[MAX_COLLECTED_PICKUPS];
 short PickupVel;
 int OldHitPoints = 1000;
-int HealtBarTimer = 40;
+int HealthBarTimer = 40;
+float HealthBar = OldHitPoints;
+float MutateAmount = 0;
 int FlashState = 0;
 int FlashCount = 0;
 int PoisonFlag = 0;
@@ -21,6 +24,8 @@ int DashTimer = 0;
 extern RendererHUDBar* g_HealthBar;
 extern RendererHUDBar* g_DashBar;
 extern RendererHUDBar* g_AirBar;
+
+bool EnableSmoothHealthBar = true;
 
 void DrawHealthBarOverlay(int value)
 {
@@ -39,16 +44,11 @@ void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
-		//int color2;
-		//if (Lara.poisoned || Lara.gassed)
-		//	color2 = 0xA0A000;
-		//else
-		//	color2 = 0xA00000;
-		g_Renderer.DrawBar(value,::g_HealthBar);
+		g_Renderer.DrawBar(value, ::g_HealthBar);
 	}
 }
 
-void UpdateHealtBar(int flash)
+void UpdateHealthBar(int flash)
 {
 	int hitPoints = LaraItem->hitPoints;
 
@@ -57,44 +57,75 @@ void UpdateHealtBar(int flash)
 	else if (hitPoints > 1000)
 		hitPoints = 1000;
 
-	if (OldHitPoints != hitPoints)
+	// OPT: smoothly transition health bar display.
+	if (EnableSmoothHealthBar)
 	{
-		OldHitPoints = hitPoints;
-		HealtBarTimer = 40;
+		if (OldHitPoints != hitPoints)
+		{
+			MutateAmount += OldHitPoints - hitPoints;
+			OldHitPoints = hitPoints;
+			HealthBarTimer = 40;
+		}
+
+		if (HealthBar - MutateAmount < 0)
+			MutateAmount = HealthBar;
+		else if (HealthBar - MutateAmount > 1000)
+			MutateAmount = HealthBar - 1000;
+
+		HealthBar -= MutateAmount / 3;
+		MutateAmount -= MutateAmount / 3;
+
+		if (MutateAmount > -0.5f && MutateAmount < 0.5f)
+		{
+			MutateAmount = 0;
+			HealthBar = hitPoints;
+		}
 	}
 
-	if (HealtBarTimer < 0)
-		HealtBarTimer = 0;
+	// OG: discretely transition health bar display.
+	else
+	{
+		if (OldHitPoints != hitPoints)
+		{
+			OldHitPoints = hitPoints;
+			HealthBar = hitPoints;
+			HealthBarTimer = 40;
+		}
+	}
 
-	if (hitPoints <= 1000 / 4)
+	if (HealthBarTimer < 0)
+		HealthBarTimer = 0;
+
+	// Flash when at 1/4 capacity AND HP bar is not transitioning.
+	if (HealthBar <= 1000 / 4 && MutateAmount == 0)
 	{
 		if (!BinocularRange)
 		{
 			if (flash)
-				DrawHealthBar(hitPoints / 1000.0f);
+				DrawHealthBar(HealthBar / 1000.0f);
 			else
 				DrawHealthBar(0);
 		}
-		else 
+		else
 		{
 			if (flash)
-				DrawHealthBarOverlay(hitPoints / 1000.0f);
+				DrawHealthBarOverlay(HealthBar / 1000.0f);
 			else
 				DrawHealthBarOverlay(0);
 		}
 	}
-	else if ((HealtBarTimer > 0)
-		|| (hitPoints <= 0)
+	else if ((HealthBarTimer > 0)
+		|| (HealthBar <= 0)
 		|| (Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH)
 		|| (Lara.poisoned >= 256))
 	{
 		if (!BinocularRange && !SniperOverlay)
 		{
-			DrawHealthBar(hitPoints / 1000.0f);
+			DrawHealthBar(HealthBar / 1000.0f);
 		}
 		else
 		{
-			DrawHealthBarOverlay(hitPoints / 1000.0f);
+			DrawHealthBarOverlay(HealthBar / 1000.0f);
 		}
 	}
 
@@ -133,7 +164,7 @@ void UpdateAirBar(int flash)
 	if (air <= 450)
 	{
 		if (flash)
-			DrawAirBar(air/ 1800.0f);
+			DrawAirBar(air / 1800.0f);
 		else
 			DrawAirBar(0);
 	}

@@ -580,10 +580,70 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->zoneType = ZONE_BASIC;
 	}
 
+	obj = &Objects[ID_WRAITH1];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWraith;
+		obj->control = WraithControl;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
+	obj = &Objects[ID_WRAITH2];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseWraith;
+		obj->control = WraithControl;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}
+
 	obj = &Objects[ID_WRAITH3];
 	if (obj->loaded)
 	{
-		//not decompiled yet and multiple versions of wraiths exist
+		obj->initialise = InitialiseWraith;
+		obj->control = WraithControl;
+		obj->savePosition = true;
+		obj->saveHitpoints = true;
+		obj->saveFlags = true;
+		obj->saveAnim = true;
+	}	
+
+	obj = &Objects[ID_LITTLE_BEETLE];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseLittleBeetle;
+		obj->control = LittleBeetleControl;
+		obj->drawRoutine = NULL;
+		obj->saveFlags = true;
+		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_SAS_DYING];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseSasDying;
+		obj->control = SasDyingControl;
+		obj->collision = ObjectCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_SAS_DRAG_BLOKE];
+	if (obj->loaded)
+	{
+		obj->control = AnimatingControl;
+		obj->collision = SasDragBlokeCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->zoneType = ZONE_BASIC;
 	}
 }
 
@@ -795,4 +855,10 @@ void InitialiseTR4Objects()
 	StartSwitch(objToInit);
 	StartTrap(objToInit);
 	StartVehicles(objToInit);
+}
+
+void AllocTR4Objects()
+{
+	LittleBeetles = game_malloc<BEETLE_INFO>(NUM_LITTLE_BETTLES);
+	ZeroMemory(LittleBeetles, NUM_LITTLE_BETTLES * sizeof(BEETLE_INFO));
 }
