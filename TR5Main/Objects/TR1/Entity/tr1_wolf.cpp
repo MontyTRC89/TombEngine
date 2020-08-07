@@ -11,7 +11,7 @@ BITE_INFO wolfBite = { 0, -14, 174, 6 };
 
 void InitialiseWolf(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
 	item->frameNumber = 96;
 }
@@ -21,7 +21,7 @@ void WolfControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short head = 0;
@@ -33,7 +33,7 @@ void WolfControl(short itemNum)
 		if (item->currentAnimState != 11)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (short)(GetRandomControl() / 11000);
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 11;
 		}
 	}

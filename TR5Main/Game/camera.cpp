@@ -14,7 +14,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "input.h"
-
+using T5M::Renderer::g_Renderer;
 struct OLD_CAMERA
 {
 	short currentAnimState;
@@ -63,26 +63,23 @@ int PhdPerspective;
 short CurrentFOV;
 int GetLaraOnLOS;
 int SniperOverlay;
+std::vector<OBJECT_VECTOR> FixedCameras;
 
-void LookAt(int posX, int posY, int posZ, int targetX, int targetY, int targetZ, short roll)
+void LookAt(CAMERA_INFO* cam, short roll)
 {
-	Vector3 position = Vector3(posX, posY, posZ);
-	Vector3 target = Vector3(targetX, targetY, targetZ);
+	Vector3 position = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
+	Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = TO_RAD(roll);
+	float r = 0; TO_RAD(roll);
 
-	// This should not be needed but it seems to solve our issues
-	if (posX == targetX && posY == targetY && posZ == targetZ)
-		return;
-
-	g_Renderer->UpdateCameraMatrices(posX, posY, posZ, targetX, targetY, targetZ, r, fov);
+	g_Renderer.UpdateCameraMatrices(cam, r, fov);
 }
 
 void AlterFOV(int value)
 { 
 	CurrentFOV = value;
-	PhdPerspective = g_Renderer->ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+	PhdPerspective = g_Renderer.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
 
 int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
@@ -331,7 +328,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	}
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	LookAt(&Camera, 0);
 	
 	if (Camera.mikeAtLara)
 	{
@@ -369,8 +366,8 @@ void ChaseCamera(ITEM_INFO* item)
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation) >> W2V_SHIFT;
 
 	GetFloor(Camera.target.x, Camera.target.y, Camera.target.z, &Camera.target.roomNumber);
-	if (Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
-		Camera.target.y = Rooms[Camera.target.roomNumber].y - 256;
+	if (g_Level.Rooms[Camera.target.roomNumber].flags & ENV_FLAG_SWAMP)
+		Camera.target.y = g_Level.Rooms[Camera.target.roomNumber].y - 256;
 
 	int x = Camera.target.x;
 	int y = Camera.target.y;
@@ -779,7 +776,7 @@ void FixedCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OBJECT_VECTOR* camera = &Camera.fixed[Camera.number];
+		OBJECT_VECTOR* camera = &FixedCameras[Camera.number];
 		
 		from.x = camera->x;
 		from.y = camera->y;
@@ -814,7 +811,7 @@ void FixedCamera(ITEM_INFO* item)
 
 				PHD_VECTOR pos;
 				int objLos = ObjectOnLOS2(&from, &to, &pos, &CollidedMeshes[0]);
-				objLos = (objLos != 999 && objLos >= 0 && Items[objLos].objectNumber != ID_LARA);
+				objLos = (objLos != 999 && objLos >= 0 && g_Level.Items[objLos].objectNumber != ID_LARA);
 
 				if (!(GetRandomControl() & 0x3F)
 					|| !(GlobalCounter & 0x3F)
@@ -920,9 +917,9 @@ void LookCamera(ITEM_INFO* item)
 		
 		roomNumber = LaraItem->roomNumber;
 		floor = GetFloor(pos.x, pos.y + 256, pos.z, &roomNumber);
-		if (Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
+		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP)
 		{
-			pos.y = Rooms[roomNumber].y - 256;
+			pos.y = g_Level.Rooms[roomNumber].y - 256;
 			floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 		}
 		else
@@ -964,9 +961,9 @@ void LookCamera(ITEM_INFO* item)
 	{
 		roomNumber = roomNumber2;
 		floor = GetFloor(x, y + 256, z, &roomNumber2);
-		if (Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
+		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
 		{
-			y = Rooms[roomNumber2].y - 256;
+			y = g_Level.Rooms[roomNumber2].y - 256;
 			break;
 		}
 		else
@@ -1090,8 +1087,8 @@ void LookCamera(ITEM_INFO* item)
 	floor = GetFloor(x, y, z, &roomNumber);
 	h = GetFloorHeight(floor, x, y, z);
 	c = GetCeiling(floor, x, y, z);
-	if ((Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
-		Camera.pos.y = Rooms[roomNumber].y - 256;
+	if ((g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
+		Camera.pos.y = g_Level.Rooms[roomNumber].y - 256;
 	else if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT)
 		mgLOS(&Camera.target, &Camera.pos, 0);
 
@@ -1102,7 +1099,7 @@ void LookCamera(ITEM_INFO* item)
 	floor = GetFloor(x, y, z, &roomNumber);
 	h = GetFloorHeight(floor, x, y, z);
 	c = GetCeiling(floor, x, y, z);
-	if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT || (Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
+	if (y < c || y > h || c >= h || h == NO_HEIGHT || c == NO_HEIGHT || (g_Level.Rooms[roomNumber].flags & ENV_FLAG_SWAMP))
 	{
 		Camera.pos.x = pos.x;
 		Camera.pos.y = pos.y;
@@ -1111,7 +1108,7 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	LookAt(&Camera, 0);
 
 	if (Camera.mikeAtLara)
 	{
@@ -1180,7 +1177,6 @@ void BinocularCamera(ITEM_INFO* item)
 			Lara.headXrot = 0;
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
-			//dword_87B0F8 = 0;
 			Camera.type = BinocularOldCamera;
 			return;
 		}
@@ -1257,7 +1253,7 @@ void BinocularCamera(ITEM_INFO* item)
 	}
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	LookAt(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.x, Camera.target.y, Camera.target.z, 0);
+	LookAt(&Camera, 0);
 
 	if (Camera.mikeAtLara)
 	{
@@ -1444,7 +1440,6 @@ void BinocularCamera(ITEM_INFO* item)
 
 		if (!(InputBusy & IN_ACTION) || Infrared)
 		{
-			//dword_87B0F8 = 0;
 		}
 		else
 		{
@@ -1559,20 +1554,12 @@ void CalculateCamera()
 		Camera.underwater = 0;
 	}
 	TLFlag = 0;
-
-	//if (gfCurrentLevel != LVL5_DEEPSEA_DIVE)
-	//{
 		//Camera is in a water room, play water sound effect.
-		if ((Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+		if ((g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
 		{
 			SoundEffect(SFX_UNDERWATER, NULL, SFX_ALWAYS);
 			if (Camera.underwater == 0)
 			{
-				/*if (GLOBAL_playing_cutseq == 0 && TLFlag == 0)
-				{
-					CDDA_SetMasterVolume(savegame.VolumeCD >> 2);
-				}*/
-
 				Camera.underwater = 1;
 			}
 		}
@@ -1580,15 +1567,9 @@ void CalculateCamera()
 		{
 			if (Camera.underwater != 0)
 			{
-				/*if (GLOBAL_playing_cutseq == 0 && TLFlag == 0 && savegame.VolumeCD > 0)
-				{
-					CDDA_SetMasterVolume(savegame.VolumeCD);
-				}*/
-
 				Camera.underwater = 0;
 			}
 		}
-	//}
 
 	if (Camera.type == CINEMATIC_CAMERA)
 	{
@@ -1609,10 +1590,10 @@ void CalculateCamera()
 		fixedCamera = 0;
 	}
 
-	short* bounds = GetBoundsAccurate(item);
+	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	
 	int x;
-	int y = ((bounds[2] + bounds[3]) >> 1) + item->pos.yPos - 256;
+	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->pos.yPos - 256;
 	int z;
 
 	if (Camera.item)
@@ -1623,7 +1604,7 @@ void CalculateCamera()
 			int dz = Camera.item->pos.zPos - item->pos.zPos;
 			int shift = sqrt(SQUARE(dx) + SQUARE(dz));
 			short angle = phd_atan(dz, dx) - item->pos.yRot;
-			short tilt = phd_atan(shift, y - (bounds[2] + bounds[3]) / 2 - Camera.item->pos.yPos);
+			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->pos.yPos);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle >>= 1;
 			tilt >>= 1;
@@ -1695,7 +1676,7 @@ void CalculateCamera()
 
 		if (Camera.type
 			&& Camera.flags != CF_CHASE_OBJECT
-			&& (Camera.number != -1 &&(SniperCamActive = Camera.fixed[Camera.number].flags & 3, Camera.fixed[Camera.number].flags & 2)))
+			&& (Camera.number != -1 &&(SniperCamActive = FixedCameras[Camera.number].flags & 3, FixedCameras[Camera.number].flags & 2)))
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;
@@ -1713,7 +1694,7 @@ void CalculateCamera()
 		}
 		else
 		{
-			int shift = (bounds[0] + bounds[1] + bounds[4] + bounds[5]) >> 2;
+			int shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
 			x = item->pos.xPos + (shift * phd_sin(item->pos.yRot) >> W2V_SHIFT);
 			z = item->pos.zPos + (shift * phd_cos(item->pos.yRot) >> W2V_SHIFT);
 

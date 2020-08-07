@@ -3,6 +3,7 @@
 #include "configuration.h"
 #include "winmain.h"
 #include "GameFlowScript.h"
+#include "Quad/RenderQuad.h"
 using namespace T5M::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
@@ -49,28 +50,22 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 
 	for (int i = 0; i < NUM_CAUSTICS_TEXTURES; i++)
 	{
-		m_caustics[i] = Texture2D::LoadFromFile(m_device, causticsNames[i]);
-		if (m_caustics[i] == NULL)
-			return false;
+		wchar_t causticsFile[255];
+		std::mbstowcs(causticsFile, causticsNames[i], 255);
+		std::wstring causticsFilename = std::wstring(causticsFile);
+		m_caustics[i] = Texture2D(m_device, causticsFilename);
 	}
-	m_HUDBarBorderTexture = Texture2D::LoadFromFile(m_device, "bar_border.png");
-	if (!m_HUDBarBorderTexture)
-		return false;
-	m_titleScreen = Texture2D::LoadFromFile(m_device, (char*)g_GameFlow->GetLevel(0)->Background.c_str());
-	if (m_titleScreen == NULL)
-		return false;
+	m_HUDBarBorderTexture = Texture2D(m_device, L"bar_border.png");
+	wchar_t titleScreenFile[255];
+	std::wstring titleFile = std::wstring(titleScreenFile);
+	std::mbstowcs(titleScreenFile, g_GameFlow->GetLevel(0)->Background.c_str(),255);
 
-	m_binocularsTexture = Texture2D::LoadFromFile(m_device, "Binoculars.png");
-	if (m_binocularsTexture == NULL)
-		return false;
+	m_titleScreen = Texture2D(m_device, titleScreenFile);
 
-	m_whiteTexture = Texture2D::LoadFromFile(m_device, "WhiteSprite.png");
-	if (m_whiteTexture == NULL)
-		return false;
+	m_binocularsTexture = Texture2D(m_device, L"Binoculars.png");
+	m_whiteTexture = Texture2D(m_device, L"WhiteSprite.png");
 
-	m_logo = Texture2D::LoadFromFile(m_device, "Logo.png");
-	if (m_logo == NULL)
-		return false;
+	m_logo = Texture2D(m_device, L"Logo.png");
 
 	// Load shaders
 	ID3D10Blob * blob;
@@ -86,11 +81,13 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 60, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, 72, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	m_inputLayout = NULL;
-	res = m_device->CreateInputLayout(inputLayout, 5, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout);
+	res = m_device->CreateInputLayout(inputLayout, 7, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout);
 	if (FAILED(res))
 		return false;
 
@@ -194,9 +191,10 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer(sizeof(CHUDBarBuffer));
 	m_cbHUD = createConstantBuffer(sizeof(CHUDBuffer));
+	m_cbSprite = createConstantBuffer(sizeof(CSpriteBuffer));
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
 	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
-	updateConstantBuffer(m_cbHUD, &m_stHUD, sizeof(CHUDBuffer));
+	updateConstantBuffer<CHUDBuffer>(m_cbHUD, m_stHUD);
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
@@ -222,12 +220,10 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 		m_effects[i].Lights = vector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
-	m_textureAtlas = NULL;
-	m_skyTexture = NULL;
 	D3D11_BLEND_DESC blendStateDesc{};
-	blendStateDesc.AlphaToCoverageEnable = FALSE;
-	blendStateDesc.IndependentBlendEnable = FALSE;
-	blendStateDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
 	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
@@ -237,6 +233,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_device->CreateBlendState(&blendStateDesc, &m_subtractiveBlendState);
 	initialiseBars();
+	initQuad(m_device);
 	return true;
 }
 
@@ -341,7 +338,7 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	m_renderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_shadowMap = RenderTarget2D(m_device, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, DXGI_FORMAT_R32_FLOAT);
-
+	m_reflectionCubemap = RenderTargetCube(m_device, 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	// Shadow map
 	/*D3D11_TEXTURE2D_DESC depthTexDesc;
 	ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));

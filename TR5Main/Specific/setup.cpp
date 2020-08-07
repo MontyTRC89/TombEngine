@@ -27,6 +27,7 @@
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
+#include <tr4_littlebeetle.h>
 /// register objects
 #include "object_helper.h"
 
@@ -36,8 +37,8 @@ extern byte Sequences[3];
 extern byte CurrentSequence;
 extern int NumRPickups;
 
-ObjectInfo Objects[ID_NUMBER_OBJECTS];
-StaticInfo StaticObjects[MAX_STATICS];
+OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+STATIC_INFO StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags()
 {
@@ -52,7 +53,7 @@ void InitialiseGameFlags()
 
 void ObjectObjects()
 {
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 
 	obj = &Objects[ID_CAMERA_TARGET];
 	if (obj->loaded)
@@ -476,8 +477,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_ANIMATING14];
@@ -489,8 +490,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_ANIMATING15];
@@ -502,8 +503,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_ANIMATING16];
@@ -515,8 +516,8 @@ void ObjectObjects()
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->saveMesh = true;
-		Bones[obj->boneIndex] |= ROT_Y;
-		Bones[obj->boneIndex + 4] |= ROT_X;
+		g_Level.Bones[obj->boneIndex] |= ROT_Y;
+		g_Level.Bones[obj->boneIndex + 4] |= ROT_X;
 	}
 
 	obj = &Objects[ID_TIGHT_ROPE];
@@ -617,7 +618,7 @@ void ObjectObjects()
 
 void TrapObjects()
 {
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (obj->loaded)
 	{
@@ -786,6 +787,7 @@ void InitialiseSpecialEffects()
 	NextDrip = 0;
 	NextBlood = 0;
 	WBRoom = -1;
+	ClearLittleBeetles();
 }
 
 void CustomObjects()
@@ -795,7 +797,7 @@ void CustomObjects()
 
 void InitialiseObjects()
 {
-	ObjectInfo* obj;
+	OBJECT_INFO* obj;
 
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{
@@ -829,7 +831,7 @@ void InitialiseObjects()
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
-		obj->frameBase += (short)Frames;
+		//obj->frameBase += (short)g_Level.Frames.data();
 	}
 
 	InitialiseTR1Objects(); // Standard TR1 objects
@@ -861,5 +863,6 @@ void InitialiseObjects()
 	SequenceUsed[4] = 0;
 	SequenceUsed[5] = 0;
 
+	AllocTR4Objects();
 	AllocTR5Objects();
 }

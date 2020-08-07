@@ -14,6 +14,7 @@
 #include "spark.h"
 #include "explosion.h"
 #include <Game\drip.h>
+using T5M::Renderer::g_Renderer;
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
 
@@ -81,11 +82,11 @@ void DetatchSpark(int num, SpriteEnumFlag type)// (F) (D)
 				case SP_FX:
 					if (sptr->flags & SP_USEFXOBJPOS)
 					{
-						sptr->on = FALSE;
+						sptr->on = false;
 					}
 					else
 					{
-						fx = &Effects[num];
+						fx = &EffectList[num];
 						sptr->x += fx->pos.xPos;
 						sptr->y += fx->pos.yPos;
 						sptr->z += fx->pos.zPos;
@@ -95,11 +96,11 @@ void DetatchSpark(int num, SpriteEnumFlag type)// (F) (D)
 				case SP_ITEM:
 					if (sptr->flags & SP_USEFXOBJPOS)
 					{
-						sptr->on = FALSE;
+						sptr->on = false;
 					}
 					else
 					{
-						item = &Items[num];
+						item = &g_Level.Items[num];
 						sptr->x += item->pos.xPos;
 						sptr->y += item->pos.yPos;
 						sptr->z += item->pos.zPos;
@@ -164,14 +165,14 @@ int GetFreeSpark()
 
 void UpdateSparks()
 {
-	short* bounds = GetBoundsAccurate(LaraItem);
+	BOUNDING_BOX* bounds = GetBoundsAccurate(LaraItem);
 
-	DeadlyBounds[0] = LaraItem->pos.xPos + bounds[0];
-	DeadlyBounds[1] = LaraItem->pos.xPos + bounds[1];
-	DeadlyBounds[2] = LaraItem->pos.yPos + bounds[2];
-	DeadlyBounds[3] = LaraItem->pos.yPos + bounds[3];
-	DeadlyBounds[4] = LaraItem->pos.zPos + bounds[4];
-	DeadlyBounds[5] = LaraItem->pos.zPos + bounds[5];
+	DeadlyBounds[0] = LaraItem->pos.xPos + bounds->X1;
+	DeadlyBounds[1] = LaraItem->pos.xPos + bounds->X2;
+	DeadlyBounds[2] = LaraItem->pos.yPos + bounds->Y1;
+	DeadlyBounds[3] = LaraItem->pos.yPos + bounds->Y2;
+	DeadlyBounds[4] = LaraItem->pos.zPos + bounds->Z1;
+	DeadlyBounds[5] = LaraItem->pos.zPos + bounds->Z2;
 
 	for (int i = 0; i < MAX_SPARKS; i++)
 	{
@@ -387,128 +388,6 @@ void UpdateSparks()
 
 void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 {
-	/*int random;
-	SPARKS* spark;
-
-	if (!unk)
-	{
-		for (int i = 0; i < num; i++)
-		{
-			spark = &Sparks[GetFreeSpark()];
-			random = GetRandomControl();
-
-			spark->on = true;
-			spark->sR = -128;
-			spark->sG = (random & 0xF) + 16;
-			spark->sB = 0;
-			spark->dR = 96;
-			spark->dG = ((random >> 4) & 0x1F) + 48;
-			spark->dB = 0;
-			spark->colFadeSpeed = 2;
-			spark->fadeToBlack = 4;
-			spark->life = 9;
-			spark->sLife = 9;
-			spark->transType = COLADD;
-			spark->x = pos->x;
-			spark->y = pos->y;
-			spark->z = pos->z;
-			short ang = (((random >> 3) & 0x7FF) + angle - WALL_SIZE) & 0xFFF;
-			spark->xVel = -rcossin_tbl[2 * ang] >> 2;
-			spark->yVel = (random & 0xFFF) - 2048;
-			spark->zVel = rcossin_tbl[2 * ang + 1] >> 2;
-			spark->gravity = (random >> 7) & 0x1F;
-			spark->friction = 34;
-			spark->flags = SP_NONE;
-			spark->maxYvel = 0;
-		}
-		
-		spark = &Sparks[GetFreeSpark()];
-		random = GetRandomControl();
-
-		spark->on = true;
-		spark->sR = 48;
-		spark->sG = (random & 0xF) + 32;
-		spark->sB = 0;
-		spark->dR = 0;
-		spark->dG = 0;
-		spark->dB = 0;
-		spark->colFadeSpeed = 4;
-		spark->fadeToBlack = 0;
-		spark->life = 4;
-		spark->sLife = 4;
-		spark->transType = COLADD;
-		spark->x = pos->x;
-		spark->y = pos->y;
-		spark->z = pos->z;
-		spark->xVel = 0;
-		spark->yVel = 0;
-		spark->zVel = 0;
-		spark->flags = 26;
-		spark->rotAng = (random >> 2) & 0xFFF;
-		if (random & 1)
-			spark->rotAdd = -64 - ((random >> 1) & 0x3F);
-		else
-			spark->rotAdd = ((random >> 1) & 0x3F) + 64;
-		spark->scalar = 3;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 12;
-		spark->sSize = spark->size = ((random >> 10) & 7) + 8;
-		spark->dSize = 1;
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-	}
-	
-	if (1 - unk > 0)
-	{
-		num = (1 - unk);
-		for (int i = 0; i < num; i++)
-		{
-			spark = &Sparks[GetFreeSpark()];
-			int random = GetRandomControl();
-			
-			spark->on = true;
-			spark->sR = 0;
-			spark->sG = 0;
-			spark->sB = 0;
-			spark->dR = 40;
-			spark->dG = 40;
-			spark->dB = 40;
-			spark->colFadeSpeed = (random & 3) + 4;
-			spark->fadeToBlack = 8;
-			spark->life =spark->sLife= ((random >> 2) & 7) + 16;
-			spark->x = pos->x;
-			spark->y = pos->y;
-			spark->z = pos->z;
-			if (unk)
-			{
-				spark->colFadeSpeed >>= 1;
-				spark->fadeToBlack = 4;
-				spark->sLife >>= 1;
-				spark->life >>= 1;
-				spark->xVel = (random & 0x1FF) - 256;
-				spark->yVel = ((random >> 2) & 0x1FF) - 256;
-				spark->zVel = ((random >> 4) & 0x1FF) - 256;
-			}
-			else
-			{
-				spark->yVel = 0;
-				spark->xVel = 0;
-				spark->zVel = 0;
-			}
-			spark->transType = COLADD;
-			spark->friction = 0;
-			spark->flags = 26;
-			spark->rotAng = random >> 3;
-			if (random & 1)
-				spark->rotAdd = -random - (random & 0xF);
-			else
-				spark->rotAdd = (random & 0xF) + 16;
-			spark->scalar = 2;
-			spark->gravity = -4 - ((random >> 9) & 3);
-			spark->sSize = spark->size= ((random >> 5) & 7) + 4;
-			spark->maxYvel = -4 - ((random >> 6) & 3);
-			spark->dSize = spark->size;
-		}
-	}*/
 	TriggerRicochetSpark(pos, angle, num);
 }
 
@@ -552,137 +431,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber)
 {
-
-	/*int shift = 0;
-	if ((roomNumber & 0x8000) != 0)
-	{
-		//v7 = -roomNumber;
-		roomNumber = -roomNumber;
-		shift = 1;
-	}
-	/ *if (v7 == gfMirrorRoom && gfLevelFlags & 0x2000)
-		v27 = 1;
-	z_bis = z;
-	do
-	{* /
-	SPARKS* spark = &Sparks[GetFreeSpark()];
-	spark->on = 1;
-	spark->sR = -1;
-	if (uw == 1)
-	{
-		spark->sB = 32;
-		spark->dR = -64;
-		spark->sG = (GetRandomControl() & 0x3F) + -128;
-		spark->dB = 0;
-		spark->colFadeSpeed = 7;
-		spark->dG = (GetRandomControl() & 0x1F) + 64;
-		spark->fadeToBlack = 8;
-		spark->transType = COLADD;
-		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
-		spark->roomNumber = roomNumber;
-	}
-	else
-	{
-		spark->sB = 0;
-		spark->sG = (GetRandomControl() & 0xF) + 32;
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
-		spark->dB = 32;
-		spark->colFadeSpeed = 8;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
-		spark->fadeToBlack = 16;
-		spark->transType = COLADD;
-		spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
-	}
-	spark->extras = extraTrig | 8 * (TES_extra_tab[extraTrig] + (GetRandomControl() & 7) + 28);
-	spark->dynamic = dynamic;
-	if (dynamic == -2)
-	{
-		int j;
-		for (j = 0; j < 8; j++)
-		{
-			SP_DYNAMIC* spdyn = &SparkDynamics[j];
-			if (!spdyn->On)
-			{
-				spdyn->On = 1;
-				spdyn->Falloff = 4;
-				if (uw == 1)
-					spdyn->Flags = SD_UWEXPLOSION;
-				else
-					spdyn->Flags = SD_EXPLOSION;
-				spark->dynamic = j;
-				break;
-			}
-		}
-
-		if (j == 8)
-		{
-			spark->dynamic = -1;
-		}
-	}
-	spark->xVel = (GetRandomControl() & 0xFFF) - 2048;
-	spark->yVel = (GetRandomControl() & 0xFFF) - 2048;
-	spark->zVel = (GetRandomControl() & 0xFFF) - 2048;
-	if (dynamic != -2 || uw == 1)
-	{
-		spark->x = (GetRandomControl() & 0x1F) + x - 16;
-		spark->y = (GetRandomControl() & 0x1F) + y - 16;
-		spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	}
-	else
-	{
-		spark->x = (GetRandomControl() & 0x1FF) + x - 256;
-		spark->y = (GetRandomControl() & 0x1FF) + y - 256;
-		spark->z = (GetRandomControl() & 0x1FF) + z - 256;
-	}
-	if (uw == 1)
-		spark->friction = 17;
-	else
-		spark->friction = 51;
-	if (GetRandomControl() & 1)
-	{
-		if (uw == 1)
-			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
-		else
-			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->rotAdd = GetRandomControl() + -128;
-	}
-	else if (uw == 1)
-	{
-		spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
-	}
-	else
-	{
-		spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-	}
-	spark->scalar = 3;
-	spark->gravity = 0;
-	int size = (GetRandomControl() & 0xF) + 40;
-	spark->maxYvel = 0;
-	spark->sSize = size << shift;
-	spark->size = size << shift;
-	spark->dSize = size << (shift + 1);
-
-	if (uw == 2)
-	{
-		spark->sG = spark->sR;
-		spark->sB = spark->sG;
-		spark->flags |= SP_PLASMAEXP;
-		spark->sR = spark->sB;
-		spark->dR = spark->dB;
-		spark->dG = spark->dR;
-		spark->dB = spark->dG;
-	}
-	else if (extraTrig)
-	{
-		TriggerExplosionSmoke(x, y, z, uw);
-	}
-	else
-	{
-		TriggerExplosionSmokeEnd(x, y, z, uw);
-	}*/
 	TriggerExplosion(Vector3(x, y, z), 512, true, false, true, roomNumber);
-	//} while (!v24);
 }
 
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
@@ -1414,7 +1163,7 @@ void KillAllCurrentItems(short itemNumber)
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
-	g_Renderer->AddDynamicLight(x, y, z, falloff, r, g, b);
+	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
 // Really needed?
@@ -1431,27 +1180,27 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	short roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-	ROOM_INFO* room = &Rooms[roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 	if (room->flags & ENV_FLAG_WATER)
 	{
 		short roomNumber2 = item->roomNumber;
 		GetFloor(item->pos.xPos, room->y - 128, item->pos.zPos, &roomNumber2);
 
-		ROOM_INFO* room2 = &Rooms[roomNumber2];
+		ROOM_INFO* room2 = &g_Level.Rooms[roomNumber2];
 		if (!(room2->flags & ENV_FLAG_WATER))
 		{
-			short* frame = GetBestFrame(item);
-			if (item->pos.yPos + frame[2] <= wh)
+			ANIM_FRAME* frame = GetBestFrame(item);
+			if (item->pos.yPos + frame->boundingBox.Y1 <= wh)
 			{
-				if (item->pos.yPos + frame[3] >= wh)
+				if (item->pos.yPos + frame->boundingBox.Y2 >= wh)
 				{
 					if (item->fallspeed <= 0 || wd >= 474 || SplashCount != 0)
 					{
 						if (!(Wibble & 0xF))
 						{
-							if (!(GetRandomControl() & 0xF) || item->currentAnimState != STATE_LARA_STOP)
+							if (!(GetRandomControl() & 0xF) || item->currentAnimState != LS_STOP)
 							{
-								if (item->currentAnimState == STATE_LARA_STOP)
+								if (item->currentAnimState == LS_STOP)
 								{
 									SetupRipple(item->pos.xPos, wh, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS);
 								}
@@ -1483,7 +1232,7 @@ void Splash(ITEM_INFO* item)
 	short roomNumber = item->roomNumber;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-	ROOM_INFO* room = &Rooms[roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 	if (room->flags & ENV_FLAG_WATER)
 	{
 		int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
@@ -1604,7 +1353,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 
 void GrenadeExplosionEffects(int x, int y, int z, short roomNumber)
 {
-	ROOM_INFO* room = &Rooms[roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 
 	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->Mirror.Room);
 
@@ -1867,30 +1616,6 @@ void GrenadeLauncherSpecialEffect1(int x, int y, int z, int flag1, int flag2)
 
 			return;
 		}
-
-		/*if (flag2 && flag2 != 1)
-		{
-			if (flag2 < -2)
-			{
-				spark->y = y;
-				spark->x = (GetRandomControl() & 0xF) + x - 8;
-				spark->z = (GetRandomControl() & 0xF) + z - 8;
-			}
-			else
-			{
-				spark->x = (GetRandomControl() & 0x3F) + x - 32;
-				spark->y = y;
-				spark->z = (GetRandomControl() & 0x3F) + z - 32;
-			}
-		}
-		else
-		{
-			spark->y = y;
-			spark->x = (GetRandomControl() & 0x1F) + x - 16;
-			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-		}
-
-		goto LABEL_POS_1;*/
 	}
 }
 

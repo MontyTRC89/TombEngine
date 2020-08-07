@@ -18,13 +18,15 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "pickup.h"
+#include "larafire.h"
+
 using std::function;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 int wf = 256;
 using namespace T5M::Effects::Footprints;
 
 short FXType;
-FX_INFO* Effects;
+FX_INFO* EffectList;
 
 function<EffectFunction> effect_routines[59] =
 {
@@ -41,9 +43,9 @@ function<EffectFunction> effect_routines[59] =
 	SoundFlipEffect,
 	ExplosionFX,
 	lara_hands_free,
-	void_effect,
-	void_effect,
-	void_effect,
+	puzzle,
+	draw_right_pistol,
+	draw_left_pistol,
 	shoot_right_gun,
 	shoot_left_gun,
 	void_effect,
@@ -74,34 +76,17 @@ function<EffectFunction> effect_routines[59] =
 	void_effect,
 	void_effect,
 	LaraLocationPad,
-	KillActiveBaddies,
-	TL_1,
-	TL_2,
-	TL_3,
-	TL_4,
-	TL_5,
-	TL_6,
-	TL_7,
-	TL_8,
-	TL_9,
-	TL_10,
-	TL_11,
-	TL_12,
+	KillActiveBaddies
 };
-
-void TL_1(ITEM_INFO* item)
-{
-	if (!Savegame.TLCount)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(9, 0);
-		Savegame.TLCount = 1;
-	}
-}
 
 void pickup(ITEM_INFO* item)
 {
 	do_pickup();
+}
+
+void puzzle(ITEM_INFO* item)
+{
+	do_puzzle();
 }
 
 // TODO: here are sound for lara footstep too !
@@ -142,116 +127,6 @@ void AddFootprint(ITEM_INFO* item)
 	}
 }
 
-void TL_2(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 1u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(7, 0);
-		Savegame.TLCount = 2;
-	}
-}
-
-void TL_3(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 2u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(23, 0);
-		Savegame.TLCount = 3;
-	}
-}
-
-void TL_4(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 3u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(39, 0);
-		Savegame.TLCount = 4;
-	}
-}
-
-void TL_5(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 4u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(2, 0);
-		Savegame.TLCount = 5;
-	}
-}
-
-void TL_6(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 5u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(22, 0);
-		Savegame.TLCount = 6;
-	}
-}
-
-void TL_7(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 6u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(51, 0);
-		Savegame.TLCount = 7;
-	}
-}
-
-void TL_8(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 7u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(3, 0);
-		Savegame.TLCount = 8;
-	}
-}
-
-void TL_9(ITEM_INFO* item)
-{
-	if (Savegame.TLCount <= 8u)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(4, 0);
-		Savegame.TLCount = 9;
-	}
-}
-
-void TL_10(ITEM_INFO* item)
-{
-	if (Savegame.TLCount == 9)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(13, 0);
-		Savegame.TLCount = 10;
-	}
-}
-
-void TL_11(ITEM_INFO* item)
-{
-	if (Savegame.TLCount == 10)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(0, 0);
-		Savegame.TLCount = 11;
-	}
-}
-
-void TL_12(ITEM_INFO* item)
-{
-	if (Savegame.TLCount == 11)
-	{
-		IsAtmospherePlaying = 0;
-		S_CDPlay(35, 0);
-		Savegame.TLCount = 12;
-	}
-}
-
 void reset_hair(ITEM_INFO* item)
 {
 	InitialiseHair();
@@ -267,46 +142,37 @@ void invisibility_on(ITEM_INFO* item)
 	item->status = ITEM_INVISIBLE;
 }
 
-/*void SetFog()
-{
-	FlipEffect = -1;
-
-	
-	unsigned __int16 v0; // si
-	int v1; // eax
-	int v2; // eax
-	char v3; // bl
-	char v4; // ST14_1
-	char v5; // ST18_1
-
-	dword_51CE04 = 0;
-	v0 = TriggerTimer;
-	v1 = CheckVolumetric();
-	if (!v1)
-		goto LABEL_5;
-	if (v0 == 100)
-	{
-		dword_51CE04 = 1;
-	LABEL_5:
-		FlipEffect = -1;
-		return v1;
-	}
-	v2 = FogTable[v0];
-	v3 = FogTable[v0] >> 16;
-	v4 = BYTE1(v2);
-	v5 = FogTable[v0];
-	SomeDxFunctionToRemove1(BYTE2(v2), BYTE1(v2), v2);
-	LOBYTE(v1) = v4;
-	byte_51CE32 = v3;
-	byte_51CE31 = v4;
-	byte_51CE30 = v5;
-	FlipEffect = -1;
-	return v1;
-}*/
-
 void SetFog(ITEM_INFO* item)//39A44(<), 39F44(<) (F)
 {
 	FlipEffect = -1;
+}
+
+void draw_left_pistol(ITEM_INFO* item)
+{
+	if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
+	{
+		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(WEAPON_PISTOLS)].meshIndex + LM_LHAND;
+		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Empty;
+	}
+	else
+	{
+		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+		Lara.holsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+	}
+}
+
+void draw_right_pistol(ITEM_INFO* item)
+{
+	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
+	{
+		Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(WEAPON_PISTOLS)].meshIndex + LM_RHAND;
+		Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
+	}
+	else
+	{
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+		Lara.holsterInfo.rightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+	}
 }
 
 void shoot_left_gun(ITEM_INFO* item)//39A34(<), 39F34(<) (F)
@@ -333,7 +199,7 @@ void KillActiveBaddies(ITEM_INFO* item)//39938(<), 39E38(<) (F)
 
 		do
 		{
-			targetItem = &Items[itemNum];
+			targetItem = &g_Level.Items[itemNum];
 
 			if (Objects[targetItem->objectNumber].intelligent)
 			{
@@ -380,12 +246,10 @@ void ExplosionFX(ITEM_INFO* item)//39694(<), 39B94(<) (F)
 
 void SwapCrowbar(ITEM_INFO* item)//39638(<), 39B38(<) (F)
 {
-	short* tmp = Meshes[Objects[ID_LARA].meshIndex + LM_RHAND];
-
-	if (Lara.meshPtrs[LM_RHAND] == tmp)
-		Lara.meshPtrs[LM_RHAND] = Meshes[Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND];
+	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA].meshIndex + LM_RHAND)
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
 	else 
-		Lara.meshPtrs[LM_RHAND] = tmp;
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA].meshIndex + LM_RHAND;
 }
 
 void ActivateKey(ITEM_INFO* item)//39624(<), 39B24(<) (F)
@@ -410,7 +274,7 @@ void RubbleFX(ITEM_INFO* item)//39534(<), 39A34(<) (F)
 
 	if (itemNumber != NO_ITEM)
 	{
-		ITEM_INFO* eq = &Items[itemNumber];
+		ITEM_INFO* eq = &g_Level.Items[itemNumber];
 
 		AddActiveItem(itemNumber);
 		eq->status = ITEM_ACTIVE;
@@ -460,7 +324,7 @@ void void_effect(ITEM_INFO* item)//393CC(<), 398CC(<) (F)
 
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	int x, z;
 
 	if (item->pos.yRot == -ANGLE(180))
@@ -484,7 +348,7 @@ short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
 {
 	short roomNum = roomNumber;
 	GetFloor(x, y, z, &roomNum);
-	if (Rooms[roomNum].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[roomNum].flags & ENV_FLAG_WATER)
 		TriggerUnderwaterBlood(x, y, z, a4);
 	else
 		TriggerBlood(x, y, z, a5 >> 4, a4);
@@ -503,7 +367,7 @@ static bool ItemInRange(int x, int z, int radius)
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius)
 {
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	GAME_VECTOR target;
 	target.x = pos->xPos - LaraItem->pos.xPos;
 	target.y = pos->yPos - LaraItem->pos.yPos;
@@ -515,8 +379,8 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 	if (!ItemInRange(target.x, target.z, radius))
 		return false;
 
-	bounds = (ANIM_FRAME*)GetBoundsAccurate(LaraItem);
-	if (target.y >= bounds->MinY && target.y <= (bounds->MaxY + LARA_RAD))
+	bounds = GetBoundsAccurate(LaraItem);
+	if (target.y >= bounds->Y1 && target.y <= (bounds->Y2 + LARA_RAD))
 		return true;
 
 	return false;
@@ -524,7 +388,7 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 {
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	PHD_VECTOR pos;
 	pos.x = src->xPos - target->pos.xPos;
 	pos.y = src->yPos - target->pos.yPos;
@@ -536,8 +400,8 @@ bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 	if (!ItemInRange(pos.x, pos.z, radius))
 		return false;
 
-	bounds = (ANIM_FRAME*)GetBoundsAccurate(target);
-	if (pos.y >= bounds->MinY && pos.y <= bounds->MaxY)
+	bounds = GetBoundsAccurate(target);
+	if (pos.y >= bounds->Y1 && pos.y <= bounds->Y2)
 		return true;
 
 	return false;

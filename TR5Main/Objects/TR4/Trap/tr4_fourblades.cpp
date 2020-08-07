@@ -5,17 +5,17 @@
 
 void FourBladesControl(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	short frameNumber;
 
 	if (!TriggerActive(item))
 	{
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->itemFlags[0] = 0;
 	}
 	else
 	{
-		frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+		frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 		if (frameNumber <= 5 || frameNumber >= 58 || frameNumber >= 8 && frameNumber <= 54)
 		{
 			item->itemFlags[0] = 0;

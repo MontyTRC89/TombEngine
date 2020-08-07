@@ -16,9 +16,9 @@
 #include "input.h"
 #include "sound.h"
 
-static short CeilingTrapDoorBounds[12] = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
+OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
-static short FloorTrapDoorBounds[12] = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
+OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
 static PHD_VECTOR FloorTrapDoorPos = {0, 0, -655};
 static short WreckingBallData[2] = {0, 0};
 ITEM_INFO* WBItem;
@@ -43,7 +43,7 @@ byte Flame3xzoffs[16][2] =
 	{ 0x28, 0x37 },
 	{ 0x37, 0x37 }
 };
-static short FireBounds[12] = {0, 0, 0, 0, 0, 0, -1820, 1820, -5460, 5460, -1820, 1820};
+OBJECT_COLLISION_BOUNDS FireBounds = {0, 0, 0, 0, 0, 0, -1820, 1820, -5460, 5460, -1820, 1820};
 
 void LaraBurn()
 {
@@ -52,7 +52,7 @@ void LaraBurn()
 		short fxNum = CreateNewEffect(LaraItem->roomNumber);
 		if (fxNum != NO_ITEM)
 		{
-			Effects[fxNum].objectNumber = ID_FLAME;
+			EffectList[fxNum].objectNumber = ID_FLAME;
 			Lara.burn = true;
 		}
 	}
@@ -63,7 +63,7 @@ void FlameEmitterControl(short itemNumber)
 	byte r, g, b;
 	int falloff;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (TriggerActive(item))
 	{
 		if (item->triggerFlags < 0)
@@ -151,7 +151,8 @@ void FlameEmitterControl(short itemNumber)
 		if (!Lara.burn
 			&& item->triggerFlags != 33
 			&& ItemNearLara(&item->pos, 600)
-			&& (SQUARE(LaraItem->pos.xPos - item->pos.xPos) + SQUARE(LaraItem->pos.zPos - item->pos.zPos) < 0x40000))
+			&& (SQUARE(LaraItem->pos.xPos - item->pos.xPos) + SQUARE(LaraItem->pos.zPos - item->pos.zPos) < 0x40000)
+			&& Lara.waterStatus != LW_FLYCHEAT)
 		{
 			LaraBurn();
 		}
@@ -160,7 +161,7 @@ void FlameEmitterControl(short itemNumber)
 
 void FlameEmitter2Control(short itemNumber)//5A1BC, 5A638 (F)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -214,7 +215,7 @@ void FlameEmitter2Control(short itemNumber)//5A1BC, 5A638 (F)
 
 void FlameControl(short fxNumber)
 {
-	FX_INFO* fx = &Effects[fxNumber];
+	FX_INFO* fx = &EffectList[fxNumber];
 
 	for (int i = 0; i < 14; i++)
 	{
@@ -279,6 +280,12 @@ void FlameControl(short fxNumber)
 		KillEffect(fxNumber);
 		Lara.burn = false;
 	}
+
+	if (Lara.waterStatus == LW_FLYCHEAT)
+	{
+		KillEffect(fxNumber);
+		Lara.burn = false;
+	}
 }
 
 void LavaBurn(ITEM_INFO* item)
@@ -300,7 +307,7 @@ void InitialiseTrapDoor(short itemNumber) // (F) (D)
 {
 	ITEM_INFO* item;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	CloseTrapDoor(item);
 }
 
@@ -308,8 +315,8 @@ void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (
 {
 	ITEM_INFO* item;
 
-	item = &Items[itemNumber];
-	if (item->currentAnimState == 1 && item->frameNumber == Anims[item->animNumber].frameEnd)
+	item = &g_Level.Items[itemNumber];
+	if (item->currentAnimState == 1 && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		ObjectCollision(itemNumber, l, coll);
 }
 
@@ -318,12 +325,12 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 	ITEM_INFO* item;
 	int result, result2;
 
-	item = &Items[itemNumber];
-	result = TestLaraPosition(CeilingTrapDoorBounds, item, l);
+	item = &g_Level.Items[itemNumber];
+	result = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
-	result2 = TestLaraPosition(CeilingTrapDoorBounds, item, l);
+	result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
+	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
@@ -335,9 +342,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 		Lara.gunStatus = LG_HANDS_BUSY;
 		l->gravityStatus = false;
 		l->fallspeed = 0;
-		l->animNumber = ANIMATION_LARA_CEILING_TRAPDOOR_OPEN;
-		l->frameNumber = Anims[l->animNumber].frameBase;
-		l->currentAnimState = STATE_LARA_FREEFALL_BIS;
+		l->animNumber = LA_TRAPDOOR_CEILING_OPEN;
+		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+		l->currentAnimState = LS_FREEFALL_BIS;
 		AddActiveItem(itemNumber);
 		item->status = ITEM_ACTIVE;
 		item->goalAnimState = 1;
@@ -354,7 +361,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) /
 			UseForcedFixedCamera = 0;
 	}
 
-	if (item->currentAnimState == 1 && item->frameNumber == Anims[item->animNumber].frameEnd)
+	if (item->currentAnimState == 1 && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		ObjectCollision(itemNumber, l, coll);
 }
 
@@ -362,17 +369,17 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 {
 	ITEM_INFO* item;
 
-	item = &Items[itemNumber];
-	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == STATE_LARA_STOP && l->animNumber == ANIMATION_LARA_STAY_IDLE && Lara.gunStatus == LG_NO_ARMS
+	item = &g_Level.Items[itemNumber];
+	if (TrInput & IN_ACTION && item->status != ITEM_DEACTIVATED && l->currentAnimState == LS_STOP && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS
 		|| Lara.isMoving && Lara.generalPtr == (void *) itemNumber)
 	{
-		if (TestLaraPosition(FloorTrapDoorBounds, item, l))
+		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
 		{
 			if (MoveLaraPosition(&FloorTrapDoorPos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_FLOOR_TRAPDOOR_OPEN;
-				l->frameNumber = Anims[l->animNumber].frameBase;
-				l->currentAnimState = STATE_LARA_TRAPDOOR_FLOOR_OPEN;
+				l->animNumber = LA_TRAPDOOR_FLOOR_OPEN;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+				l->currentAnimState = LS_TRAPDOOR_FLOOR_OPEN;
 				Lara.isMoving = false;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
@@ -386,8 +393,8 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 				UseForcedFixedCamera = 1;
 				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) / 8;
 				ForcedFixedCamera.y = item->pos.yPos - 2048;
-				if (ForcedFixedCamera.y < Rooms[item->roomNumber].maxceiling)
-					ForcedFixedCamera.y = Rooms[item->roomNumber].maxceiling;
+				if (ForcedFixedCamera.y < g_Level.Rooms[item->roomNumber].maxceiling)
+					ForcedFixedCamera.y = g_Level.Rooms[item->roomNumber].maxceiling;
 				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) / 8;
 				ForcedFixedCamera.roomNumber = item->roomNumber;
 			}
@@ -403,7 +410,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // 
 			UseForcedFixedCamera = 0;
 	}
 
-	if (item->currentAnimState == 1 && item->frameNumber == Anims[item->animNumber].frameEnd)
+	if (item->currentAnimState == 1 && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		ObjectCollision(itemNumber, l, coll);
 }
 
@@ -411,14 +418,14 @@ void TrapDoorControl(short itemNumber) // (F) (D)
 {
 	ITEM_INFO* item;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	if (TriggerActive(item))
 	{
 		if (!item->currentAnimState && item->triggerFlags >= 0)
 		{
 			item->goalAnimState = 1;
 		}
-		else if (item->frameNumber == Anims[item->animNumber].frameEnd && CurrentLevel == 14 && item->objectNumber == ID_TRAPDOOR1)
+		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd && CurrentLevel == 14 && item->objectNumber == ID_TRAPDOOR1)
 		{
 			item->status = ITEM_INVISIBLE;
 		}
@@ -451,7 +458,7 @@ void CloseTrapDoor(ITEM_INFO* item) // (F) (D)
 	FLOOR_INFO* floor;
 	unsigned short pitsky;
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 	floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	pitsky = 0;
 
@@ -459,7 +466,7 @@ void CloseTrapDoor(ITEM_INFO* item) // (F) (D)
 	{
 		pitsky = floor->pitRoom;
 		floor->pitRoom = NO_ROOM;
-		r = &Rooms[pitsky];
+		r = &g_Level.Rooms[pitsky];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 		pitsky |= floor->skyRoom << 8;
 		floor->skyRoom = NO_ROOM;
@@ -468,7 +475,7 @@ void CloseTrapDoor(ITEM_INFO* item) // (F) (D)
 	{
 		pitsky = floor->skyRoom;
 		floor->skyRoom = NO_ROOM;
-		r = &Rooms[pitsky];
+		r = &g_Level.Rooms[pitsky];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 		pitsky = pitsky << 8 | floor->pitRoom;
 		floor->pitRoom = NO_ROOM;
@@ -484,21 +491,21 @@ void OpenTrapDoor(ITEM_INFO* item) // (F) (D)
 	FLOOR_INFO* floor;
 	unsigned short pitsky;
 
-	r = &Rooms[item->roomNumber];
+	r = &g_Level.Rooms[item->roomNumber];
 	floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 	pitsky = item->itemFlags[3];
 
 	if (item->pos.yPos == r->minfloor)
 	{
 		floor->pitRoom = (unsigned char) pitsky;
-		r = &Rooms[floor->pitRoom];
+		r = &g_Level.Rooms[floor->pitRoom];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 		floor->skyRoom = pitsky >> 8;
 	}
 	else
 	{
 		floor->skyRoom = pitsky >> 8;
-		r = &Rooms[floor->skyRoom];
+		r = &g_Level.Rooms[floor->skyRoom];
 		floor = &XZ_GET_SECTOR(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
 		floor->pitRoom = (unsigned char) pitsky;
 	}
@@ -508,12 +515,12 @@ void OpenTrapDoor(ITEM_INFO* item) // (F) (D)
 
 void InitialiseFallingBlock(short itemNumber)
 {
-	Items[itemNumber].meshBits = 1;
+	g_Level.Items[itemNumber].meshBits = 1;
 }
 
 void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (!item->itemFlags[0] && !item->triggerFlags && item->pos.yPos == l->pos.yPos)
 	{
 		if (!((item->pos.xPos ^ l->pos.xPos) & 0xFFFFFC00) && !((l->pos.zPos ^ item->pos.zPos) & 0xFFFFFC00))
@@ -530,7 +537,7 @@ void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void FallingBlockControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->triggerFlags)
 	{
@@ -598,8 +605,8 @@ void InitialiseWreckingBall(short itemNumber)
 	ITEM_INFO* item;
 	short room;
 
-	item = &Items[itemNumber];
-	item->itemFlags[3] = find_a_fucking_item(ID_ANIMATING16) - Items;
+	item = &g_Level.Items[itemNumber];
+	item->itemFlags[3] = find_a_fucking_item(ID_ANIMATING16) - g_Level.Items.data();
 	room = item->roomNumber;
 	item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1644;
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
@@ -613,7 +620,7 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	int x, y, z, test;
 	short damage;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	if (TestBoundsCollide(item, l, coll->radius))
 	{
 		x = l->pos.xPos;
@@ -654,9 +661,9 @@ void WreckingBallControl(short itemNumber)
 	int test, x, z, oldX, oldZ, wx, wz, flagX, flagZ, height, dx, dz, ceilingX, ceilingZ, adx, adz;
 	short room;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	test = 1;
-	item2 = &Items[item->itemFlags[3]];
+	item2 = &g_Level.Items[item->itemFlags[3]];
 	if (LaraItem->pos.xPos >= 45056 && LaraItem->pos.xPos <= 57344 && LaraItem->pos.zPos >= 26624 && LaraItem->pos.zPos <= 43008
 		|| item->itemFlags[2] < 900)
 	{
@@ -800,7 +807,7 @@ void WreckingBallControl(short itemNumber)
 		{
 			item->goalAnimState = 1;
 		}
-		else if (item->frameNumber == Anims[item->animNumber].frameEnd)
+		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
 			SoundEffect(SFX_GRAB_DROP, &item->pos, 0);
 			++item->itemFlags[1];
@@ -880,7 +887,7 @@ void WreckingBallControl(short itemNumber)
 
 void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	if (Lara.gunType != WEAPON_TORCH
 		|| Lara.gunStatus != LG_READY
@@ -888,8 +895,8 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 		|| Lara.litTorch == (item->status & 1)
 		|| item->timer == -1
 		|| !(TrInput & IN_ACTION)
-		|| l->currentAnimState != STATE_LARA_STOP
-		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
+		|| l->currentAnimState != LS_STOP
+		|| l->animNumber != LA_STAND_IDLE
 		|| l->gravityStatus)
 	{
 		if (item->objectNumber == ID_BURNING_ROOTS)
@@ -900,30 +907,30 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 		switch (item->objectNumber)
 		{
 		case ID_FLAME_EMITTER:
-			FireBounds[0] = -256;
-			FireBounds[1] = 256;
-			FireBounds[2] = 0;
-			FireBounds[3] = 1024;
-			FireBounds[4] = -800;
-			FireBounds[5] = 800;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -800;
+			FireBounds.boundingBox.Z2 = 800;
 			break;
 
 		case ID_FLAME_EMITTER2:
-			FireBounds[0] = -256;
-			FireBounds[1] = 256;
-			FireBounds[2] = 0;
-			FireBounds[3] = 1024;
-			FireBounds[4] = -600;
-			FireBounds[5] = 600;
+			FireBounds.boundingBox.X1 = -256;
+			FireBounds.boundingBox.X2 = 256;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 1024;
+			FireBounds.boundingBox.Z1 = -600;
+			FireBounds.boundingBox.Z2 = 600;
 			break;
 
 		case ID_BURNING_ROOTS:
-			FireBounds[0] = -384;
-			FireBounds[1] = 384;
-			FireBounds[2] = 0;
-			FireBounds[3] = 2048;
-			FireBounds[4] = -384;
-			FireBounds[5] = 384;
+			FireBounds.boundingBox.X1 = -384;
+			FireBounds.boundingBox.X2 = 384;
+			FireBounds.boundingBox.Y1 = 0;
+			FireBounds.boundingBox.Y2 = 2048;
+			FireBounds.boundingBox.Z1 = -384;
+			FireBounds.boundingBox.Z2 = 384;
 			break;
 
 		}
@@ -931,21 +938,21 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 		short oldYrot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
 
-		if (TestLaraPosition(FireBounds, item, l))
+		if (TestLaraPosition(&FireBounds, item, l))
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 			{
-				l->animNumber = ANIMATION_LARA_TORCH_LIGHT_5;
+				l->animNumber = LA_TORCH_LIGHT_5;
 			}
 			else
 			{
 				int dy = abs(l->pos.yPos - item->pos.yPos);
 				l->itemFlags[3] = 1;
-				l->animNumber = (dy >> 8) + ANIMATION_LARA_TORCH_LIGHT_1;
+				l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 			}
 			
-			l->currentAnimState = STATE_LARA_MISC_CONTROL;
-			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->currentAnimState = LS_MISC_CONTROL;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.flareControlLeft = false;
 			Lara.leftArm.lock = 3;
 			Lara.generalPtr = (void*)itemNumber;
@@ -956,11 +963,11 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 
 	if (Lara.generalPtr == (void*)itemNumber 
 		&& item->status != ITEM_ACTIVE 
-		&& l->currentAnimState == STATE_LARA_MISC_CONTROL)
+		&& l->currentAnimState == LS_MISC_CONTROL)
 	{
-		if (l->animNumber >= ANIMATION_LARA_TORCH_LIGHT_1 && l->animNumber <= ANIMATION_LARA_TORCH_LIGHT_5)
+		if (l->animNumber >= LA_TORCH_LIGHT_1 && l->animNumber <= LA_TORCH_LIGHT_5)
 		{
-			if (l->frameNumber - Anims[l->animNumber].frameBase == 40)
+			if (l->frameNumber - g_Level.Anims[l->animNumber].frameBase == 40)
 			{
 				TestTriggersAtXYZ(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 1, item->flags & 0x3E00);
 				
@@ -976,7 +983,7 @@ void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (
 
 void InitialiseFlameEmitter2(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	item->pos.yPos -= 64;
 	
@@ -1021,7 +1028,7 @@ void InitialiseFlameEmitter2(short itemNumber)
 
 void InitialiseFlameEmitter(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	if (item->triggerFlags > 0)
 	{
@@ -1093,7 +1100,7 @@ void InitialiseFlameEmitter(short itemNumber)
 
 void FlameEmitter3Control(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -1137,7 +1144,7 @@ void FlameEmitter3Control(short itemNumber)
 			if (item->triggerFlags >= 3 && !(GlobalCounter & 1))
 			{
 				short targetItemNumber = item->itemFlags[((GlobalCounter >> 2) & 1) + 2];
-				ITEM_INFO* targetItem = &Items[targetItemNumber];
+				ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
 
 				dest.x = 0;
 				dest.y = -64;
@@ -1218,7 +1225,7 @@ void FlameEmitter3Control(short itemNumber)
 
 			if (ItemNearLara(&pos, 600))
 			{
-				if (!Lara.burn)
+				if ((!Lara.burn) && Lara.waterStatus != LW_FLYCHEAT)
 				{
 					LaraItem->hitPoints -= 5;
 					LaraItem->hitStatus = true;

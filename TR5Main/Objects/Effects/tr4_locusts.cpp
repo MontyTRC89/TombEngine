@@ -92,7 +92,7 @@ void SpawnLocust(ITEM_INFO* item)
 
 void InitialiseLocust(short itemNumber)
 {
-    ITEM_INFO* item = &Items[itemNumber];
+    ITEM_INFO* item = &g_Level.Items[itemNumber];
 
     if (item->pos.yRot > 0)
     {
@@ -114,7 +114,7 @@ void InitialiseLocust(short itemNumber)
 
 void LocustControl(short itemNumber)
 {
-    ITEM_INFO* item = &Items[itemNumber];
+    ITEM_INFO* item = &g_Level.Items[itemNumber];
 
     if (TriggerActive(item))
     {
@@ -152,7 +152,7 @@ void UpdateLocusts(void)
             locust->counter--;
             if (locust->counter == 0)
             {
-                locust->on = FALSE;
+                locust->on = false;
                 break;
             }
 

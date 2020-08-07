@@ -1,40 +1,17 @@
 #pragma once
 #include <framework.h>
+#include <newtypes.h>
 
-typedef struct tr5_room_layer
-{
-	unsigned int NumLayerVertices;   // Number of vertices in this layer (4 bytes)
-	unsigned short UnknownL1;
-	unsigned short NumLayerRectangles; // Number of rectangles in this layer (2 bytes)
-	unsigned short NumLayerTriangles;  // Number of triangles in this layer (2 bytes)
-	unsigned short UnknownL2;
-	unsigned short Filler;             // Always 0
-	unsigned short Filler2;            // Always 0
-	/// The following 6 floats define the bounding box for the layer
-	float LayerBoundingBoxX1;
-	float LayerBoundingBoxY1;
-	float LayerBoundingBoxZ1;
-	float LayerBoundingBoxX2;
-	float LayerBoundingBoxY2;
-	float LayerBoundingBoxZ2;
-	unsigned int Filler3;     // Always 0 (4 bytes)
-	void* VerticesOffset;
-	void* PolyOffset;
-	void* PolyOffset2;
-};
+struct ANIM_FRAME;
 
-typedef struct tr5_vertex
+struct ROOM_VERTEX
 {
-	float x;
-	float y;
-	float z;
-};
-
-typedef struct tr5_room_vertex
-{
-	tr5_vertex Vertex;		// Vertex is now floating-point
-	tr5_vertex Normal;
-	DWORD Colour;			// 32-bit colour
+	Vector3 position;
+	Vector3 normal;
+	Vector2 textureCoordinates;
+	Vector3 color;
+	int effects;
+	int index;
 };
 
 struct ROOM_DOOR
@@ -44,48 +21,18 @@ struct ROOM_DOOR
 	Vector3 vertices[4];
 };
 
-typedef struct tr4_mesh_face3    // 10 bytes
-{
-	short Vertices[3];
-	short Texture;
-	short Effects;    // TR4-5 ONLY: alpha blending and environment mapping strength
-};
-
-typedef struct tr4_mesh_face4    // 12 bytes
-{
-	short Vertices[4];
-	short Texture;
-	short Effects;
-};
-
-typedef struct tr_ROOM_DOOR  // 32 bytes
-{
-	short AdjoiningRoom; // Which room this portal leads to
-	TR_VERTEX Normal;
-	TR_VERTEX Vertices[4];
-};
-
-typedef struct tr_room_sector // 8 bytes
-{
-	unsigned short FDindex;    // Index into FloorData[]
-	unsigned short BoxIndex;   // Index into Boxes[] (-1 if none)
-	unsigned char RoomBelow;  // 255 is none
-	signed char Floor;      // Absolute height of floor
-	unsigned char RoomAbove;  // 255 if none
-	signed char Ceiling;    // Absolute height of ceiling
-};
-
 typedef struct ROOM_LIGHT
 {
-	float x, y, z;       // Position of light, in world coordinates
+	int x, y, z;       // Position of light, in world coordinates
 	float r, g, b;       // Colour of the light
+	float intensity;
 	float in;            // Cosine of the IN value for light / size of IN value
 	float out;           // Cosine of the OUT value for light / size of OUT value
-	float radIn;         // (IN radians) * 2
-	float radOut;        // (OUT radians) * 2
-	float range;         // Range of light
+	float length;         // Range of light
+	float cutoff;         // Range of light
 	float dx, dy, dz;    // Direction - used only by sun and spot lights
 	byte type;
+	bool castShadows;
 };
 
 typedef struct MESH_INFO
@@ -147,7 +94,7 @@ struct SECTOR_COLLISION_INFO
 	SECTOR_PLANE planes[2];
 };
 
-typedef struct FLOOR_INFO
+struct FLOOR_INFO
 {
 	int index;
 	int box;
@@ -161,7 +108,7 @@ typedef struct FLOOR_INFO
 	SECTOR_COLLISION_INFO ceilingCollision;
 };
 
-typedef enum RoomEnumFlag
+enum RoomEnumFlag
 {
 	ENV_FLAG_WATER = 0x0001,
 	ENV_FLAG_SWAMP = 0x0004,
@@ -175,36 +122,37 @@ typedef enum RoomEnumFlag
 	ENV_FLAG_UNKNOWN3 = 0x0400
 };
 
-typedef struct ROOM_INFO
+struct ROOM_INFO
 {
 	int x;
 	int y;
 	int z;
 	int minfloor;
 	int maxceiling;
-	std::vector<tr5_room_vertex> vertices;
-	std::vector<tr4_mesh_face4> quads;
-	std::vector<tr4_mesh_face3> triangles;
+	std::vector<Vector3> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector3> colors;
+	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
-	short xSize;
-	short ySize;
+	int xSize;
+	int ySize;
 	std::vector<FLOOR_INFO> floor;
 	Vector3 ambient;
 	std::vector<ROOM_LIGHT> lights;
 	std::vector<MESH_INFO> mesh;
-	short flippedRoom;
-	unsigned short flags;
-	byte meshEffect;
-	unsigned char reverbType;
-	unsigned char flipNumber;
+	int flippedRoom;
+	int flags;
+	int meshEffect;
+	int reverbType;
+	int flipNumber;
 	short itemNumber;
 	short fxNumber;
 	bool boundActive;
 };
 
-typedef struct ANIM_STRUCT
+struct ANIM_STRUCT
 {
-	short* framePtr;
+	int framePtr;
 	short interpolation;
 	short currentAnimState;
 	int velocity;
@@ -222,5 +170,5 @@ typedef struct ANIM_STRUCT
 };
 
 constexpr auto NUM_ROOMS = 1024;
-constexpr auto NO_ROOM = 0xFF;
+constexpr auto NO_ROOM = -1;
 constexpr auto NO_HEIGHT = (-0x7F00);

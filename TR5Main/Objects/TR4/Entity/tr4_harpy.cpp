@@ -23,7 +23,7 @@ static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
 	{
-		FX_INFO* fx = &Effects[fxNumber];
+		FX_INFO* fx = &EffectList[fxNumber];
 
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
@@ -42,7 +42,7 @@ static void HarpyBubbles(PHD_3DPOS* pos, short roomNumber, int count)
 
 static void HarpySparks1(short itemNumber, byte num, int size)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	int dx = LaraItem->pos.xPos - item->pos.xPos;
 	int dz = LaraItem->pos.zPos - item->pos.zPos;
@@ -242,25 +242,25 @@ static void HarpyAttack(ITEM_INFO* item, short itemNumber)
 
 void InitialiseHarpy(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_HARPY].animIndex + 4;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->goalAnimState = 1;
 	item->currentAnimState = 1;
 }
 
 void HarpyControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!CreatureActive(itemNumber))
 		return;
 
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	short angle = 0;
 	short joint0 = 0;
@@ -285,7 +285,7 @@ void HarpyControl(short itemNumber)
 				else
 				{
 					item->animNumber = obj->animIndex + 5;
-					item->frameNumber = Anims[item->animNumber].frameBase;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->currentAnimState = 9;
 					item->speed = 0;
 					item->gravityStatus = true;
@@ -332,7 +332,7 @@ void HarpyControl(short itemNumber)
 			if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
 				continue;
 
-			ITEM_INFO* target = &Items[baddie->itemNum];
+			ITEM_INFO* target = &g_Level.Items[baddie->itemNum];
 
 			if (target->objectNumber == ID_LARA_DOUBLE)
 			{

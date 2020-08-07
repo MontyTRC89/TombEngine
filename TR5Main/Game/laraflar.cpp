@@ -21,9 +21,9 @@ constexpr std::array<float, 28> FlareFlickerTableLow = { 0.7590,0.1880,0.0790,0.
 
 void FlareControl(short itemNumber) // (AF) (D)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP)
 	{
 		KillItem(itemNumber);
 		return;
@@ -51,7 +51,7 @@ void FlareControl(short itemNumber) // (AF) (D)
 	item->pos.zPos += zv;
 
 
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		item->fallspeed += (5 - item->fallspeed) / 2;
 		item->speed += (5 - item->speed) / 2;
@@ -104,12 +104,12 @@ void ready_flare() // (F) (D)
 
 void undraw_flare_meshes() // (F) (D)
 {
-	LARA_MESHES(ID_LARA, LM_LHAND);
+	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void draw_flare_meshes() // (F) (D)
 {
-	LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND);
+	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
 void undraw_flare() // (F) (D)
@@ -120,25 +120,25 @@ void undraw_flare() // (F) (D)
 	short frame2 = Lara.leftArm.frameNumber;
 
 #if 0
-	if (LaraItem->goalAnimState == STATE_LARA_STOP &&
+	if (LaraItem->goalAnimState == LS_STOP &&
 		Lara.Vehicle == NO_ITEM)
 #else
-	if (LaraItem->goalAnimState == STATE_LARA_STOP)
+	if (LaraItem->goalAnimState == LS_STOP)
 #endif
 	{
-		if (LaraItem->animNumber == ANIMATION_LARA_STAY_IDLE)
+		if (LaraItem->animNumber == LA_STAND_IDLE)
 		{
-			LaraItem->animNumber = ANIMATION_LARA_FLARE_THROW;
-			frame1 = frame2 + Anims[LaraItem->animNumber].frameBase;
+			LaraItem->animNumber = LA_DISCARD_FLARE;
+			frame1 = frame2 + g_Level.Anims[LaraItem->animNumber].frameBase;
 			Lara.flareFrame = frame1;
 			LaraItem->frameNumber = frame1;
 		}
 
-		if (LaraItem->animNumber == ANIMATION_LARA_FLARE_THROW)
+		if (LaraItem->animNumber == LA_DISCARD_FLARE)
 		{
 			Lara.flareControlLeft = false;
 
-			if (frame1 >= Anims[LaraItem->animNumber].frameBase + 31)
+			if (frame1 >= g_Level.Anims[LaraItem->animNumber].frameBase + 31)
 			{
 				Lara.requestGunType = Lara.lastGunType;
 				Lara.gunType = Lara.lastGunType;
@@ -149,21 +149,21 @@ void undraw_flare() // (F) (D)
 				Lara.target = NULL;
 				Lara.rightArm.lock = false;
 				Lara.leftArm.lock = false;
-				LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
-				Lara.flareFrame = Anims[LaraItem->animNumber].frameBase;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-				LaraItem->currentAnimState = STATE_LARA_STOP;
-				LaraItem->goalAnimState = STATE_LARA_STOP;
+				LaraItem->animNumber = LA_STAND_SOLID;
+				Lara.flareFrame = g_Level.Anims[LaraItem->animNumber].frameBase;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+				LaraItem->currentAnimState = LS_STOP;
+				LaraItem->goalAnimState = LS_STOP;
 				return;
 			}
 
 			Lara.flareFrame++;
 		}
 	}
-	else if (LaraItem->currentAnimState == STATE_LARA_STOP) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
+	else if (LaraItem->currentAnimState == LS_STOP) /* @ORIGINAL_BUG: this code block makes flare cancels possible */
 	{
-		LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->animNumber = LA_STAND_SOLID;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	}
 
 	if (frame2 >= 33 && frame2 < 72)
@@ -232,8 +232,8 @@ void draw_flare() // (F) (D)
 {
 	short frame;
 
-	if (LaraItem->currentAnimState == STATE_LARA_FLARE_PICKUP ||
-		LaraItem->currentAnimState == STATE_LARA_PICKUP)
+	if (LaraItem->currentAnimState == LS_PICKUP_FLARE ||
+		LaraItem->currentAnimState == LS_PICKUP)
 	{
 		DoFlareInHand(Lara.flareAge);
 		Lara.flareControlLeft = false;
@@ -257,7 +257,7 @@ void draw_flare() // (F) (D)
 		{
 			if (frame == 72)
 			{
-				SoundEffect(SFX_RAVESTICK, &LaraItem->pos, Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WATER);
+				SoundEffect(SFX_RAVESTICK, &LaraItem->pos, g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WATER);
 				Lara.flareAge = 1;
 			}
 
@@ -300,7 +300,7 @@ void set_flare_arm(int frame) // (F) (D)
 	}
 
 	Lara.leftArm.animNumber = anim;
-	Lara.leftArm.frameBase = Anims[anim].framePtr;
+	Lara.leftArm.frameBase = g_Level.Anims[anim].framePtr;
 }
 
 void CreateFlare(short objectNum, int thrown) // (F) (D)
@@ -309,7 +309,7 @@ void CreateFlare(short objectNum, int thrown) // (F) (D)
 	if (itemNum != NO_ITEM)
 	{
 		bool flag = false;
-		ITEM_INFO* item = &Items[itemNum];
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 		item->objectNumber = objectNum;
 		item->roomNumber = LaraItem->roomNumber;
 

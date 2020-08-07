@@ -174,7 +174,7 @@ void ClampRotation(PHD_3DPOS *pos, short angle, short rot)
 
 void InitialiseBaddy(short itemNum)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	ClearItem(itemNum);
 
@@ -207,7 +207,7 @@ void InitialiseBaddy(short itemNum)
 	if (!ocb || ocb > 4 && ocb < 7)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_IDLE;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_STOP;
 		item->currentAnimState = STATE_BADDY_STOP;
 
@@ -217,7 +217,7 @@ void InitialiseBaddy(short itemNum)
 	if (ocb == 1)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_RIGHT;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_JUMP_RIGHT;
 		item->currentAnimState = STATE_BADDY_JUMP_RIGHT;
 
@@ -227,7 +227,7 @@ void InitialiseBaddy(short itemNum)
 	if (ocb == 2)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_ROLL_LEFT;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_ROLL_LEFT;
 		item->currentAnimState = STATE_BADDY_ROLL_LEFT;
 
@@ -237,7 +237,7 @@ void InitialiseBaddy(short itemNum)
 	if (ocb == 3)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_CROUCH;
 		item->currentAnimState = STATE_BADDY_CROUCH;
 
@@ -247,7 +247,7 @@ void InitialiseBaddy(short itemNum)
 	if (ocb == 4)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_CLIMB_4_CLICKS;
 		item->currentAnimState = STATE_BADDY_CLIMB_4_CLICKS;
 		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
@@ -259,7 +259,7 @@ void InitialiseBaddy(short itemNum)
 	if (ocb > 100)
 	{
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = STATE_BADDY_CROUCH;
 		item->currentAnimState = STATE_BADDY_CROUCH;
 		item->pos.xPos += phd_sin(item->pos.yRot) * (STEP_SIZE * 4) >> W2V_SHIFT;
@@ -269,7 +269,7 @@ void InitialiseBaddy(short itemNum)
 		return;
 	}
 	
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
 void BaddyControl(short itemNum)
@@ -277,10 +277,10 @@ void BaddyControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	ITEM_INFO* enemyItem = creature->enemy;
-	ObjectInfo* obj = &Objects[ID_BADDY1];
+	OBJECT_INFO* obj = &Objects[ID_BADDY1];
 
 	short tilt = 0;
 	short angle = 0;
@@ -360,7 +360,7 @@ void BaddyControl(short itemNum)
 	CREATURE_INFO* currentCreature;
 
 	if (item->itemFlags[1] == item->roomNumber
-		|| Rooms[item->roomNumber].flippedRoom == -1)
+		|| g_Level.Rooms[item->roomNumber].flippedRoom == -1)
 	{
 		currentCreature = creature;
 	}
@@ -433,7 +433,7 @@ void BaddyControl(short itemNum)
 		case STATE_BADDY_MONKEY_IDLE:
 		case STATE_BADDY_MONKEY_FORWARD:
 			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_MONKEY_TO_FREEFALL;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = STATE_BADDY_MONKEY_TO_FREEFALL;
 			item->speed = 0;
 			break;
@@ -441,7 +441,7 @@ void BaddyControl(short itemNum)
 		default:
 			currentCreature->LOT.isJumping = true;
 			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_DEATH;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = STATE_BADDY_DEATH;
 
 			// TODO: baddy respawn setup with OCB
@@ -629,7 +629,7 @@ void BaddyControl(short itemNum)
 			{
 				currentCreature->maximumTurn = 0;
 				item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_FORWARD;
-				item->frameNumber = Anims[item->animNumber].frameBase;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->currentAnimState = STATE_BADDY_JUMP_FORWARD_1_BLOCK;
 				currentCreature->LOT.isJumping = true;
 
@@ -799,7 +799,7 @@ void BaddyControl(short itemNum)
 			currentCreature->maximumTurn = ANGLE(11);
 			tilt = abs(angle) / 2;
 			if (objectNumber == ID_BADDY2
-				&& item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT
+				&& item->frameNumber == g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT
 				&& height3 == height1
 				&& abs(height1 - item->pos.yPos) < STEP_SIZE * 1.5f
 				&& (info.angle > -ANGLE(22.5f) && info.angle < ANGLE(22.5f) &&
@@ -845,7 +845,7 @@ void BaddyControl(short itemNum)
 			}
 			currentCreature->maximumTurn = 0;
 			if (item->currentAnimState != STATE_BADDY_SWORD_HIT_FRONT ||
-				item->frameNumber < Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
+				item->frameNumber < g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
 			{
 				if (abs(info.angle) >= ANGLE(7))
 				{
@@ -867,8 +867,8 @@ void BaddyControl(short itemNum)
 			{
 				if (item->touchBits & 0x1C000)
 				{
-					if (item->frameNumber > Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
-						item->frameNumber < Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
+					if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
+						item->frameNumber < g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
 					{
 						LaraItem->hitPoints -= 120;
 						LaraItem->hitStatus = true;
@@ -882,7 +882,7 @@ void BaddyControl(short itemNum)
 					}
 				}
 			}
-			if (item->frameNumber == Anims[item->animNumber].frameEnd - 1)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 			{
 				currentCreature->flags = 0;
 			}
@@ -899,13 +899,13 @@ void BaddyControl(short itemNum)
 
 			if (laraInfo.ahead
 				&& laraInfo.distance < SQUARE(682)
-				&& (LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_IDLE
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_FORWARD
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_LEFT
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_RIGHT
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURNAROUND
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_LEFT
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_RIGHT))
+				&& (LaraItem->currentAnimState == LS_MONKEYSWING_IDLE
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_FORWARD
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_LEFT
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_RIGHT
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_180
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT))
 			{
 				item->goalAnimState = STATE_BADDY_MONKEY_PUSH_OFF;
 			}
@@ -945,13 +945,13 @@ void BaddyControl(short itemNum)
 				if (laraInfo.distance < SQUARE(682))
 				{
 
-					if (LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_IDLE
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_FORWARD
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_LEFT
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_RIGHT
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURNAROUND
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_LEFT
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_RIGHT)
+					if (LaraItem->currentAnimState == LS_MONKEYSWING_IDLE
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_FORWARD
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_LEFT
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_RIGHT
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_180
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT)
 					{
 						item->goalAnimState = STATE_BADDY_MONKEY_IDLE;
 					}
@@ -965,10 +965,10 @@ void BaddyControl(short itemNum)
 			{
 				if (item->touchBits)
 				{
-					LaraItem->currentAnimState = STATE_LARA_JUMP_UP;
-					LaraItem->goalAnimState = STATE_LARA_JUMP_UP;
-					LaraItem->animNumber = ANIMATION_LARA_TRY_HANG_VERTICAL;
-					LaraItem->frameNumber = Anims[LaraItem->frameNumber].frameBase + 9;
+					LaraItem->currentAnimState = LS_JUMP_UP;
+					LaraItem->goalAnimState = LS_JUMP_UP;
+					LaraItem->animNumber = LA_JUMP_UP;
+					LaraItem->frameNumber = g_Level.Anims[LaraItem->frameNumber].frameBase + 9;
 					LaraItem->gravityStatus = true;
 					LaraItem->speed = 2;
 					LaraItem->fallspeed = 1;
@@ -1017,7 +1017,7 @@ void BaddyControl(short itemNum)
 
 		case STATE_BADDY_CROUCH_PICKUP:
 			ClampRotation(&item->pos, info.angle, ANGLE(11));
-			if (item->frameNumber != Anims[item->animNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
+			if (item->frameNumber != g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
 			{
 				break;
 			}
@@ -1093,8 +1093,8 @@ void BaddyControl(short itemNum)
 				joint2 = info.xAngle;
 			}
 			ClampRotation(&item->pos, info.angle, ANGLE(7));
-			if (item->frameNumber >= Anims[item->animNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
-				item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_FIRE_MIN)
+			if (item->frameNumber >= g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
+				item->frameNumber == g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_FIRE_MIN)
 			{
 				break;
 			}
@@ -1111,28 +1111,28 @@ void BaddyControl(short itemNum)
 			break;
 
 		case STATE_BADDY_HOLSTER_GUN:
-			if (item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
 			{
 				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_EMPTY;
 			}
 			break;
 
 		case STATE_BADDY_DRAW_GUN:
-			if (item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_DRAW_GUN)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_DRAW_GUN)
 			{
 				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_GUN;
 			}
 			break;
 
 		case STATE_BADDY_HOLSTER_SWORD:
-			if (item->frameNumber == Anims[item->animNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
 			{
 				item->swapMeshFlags = SWAPMESHFLAGS_BADDY_EMPTY;
 			}
 			break;
 
 		case STATE_BADDY_DRAW_SWORD:
-			if (item->frameNumber != Anims[item->animNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
+			if (item->frameNumber != g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
 			{
 				break;
 			}
@@ -1172,7 +1172,7 @@ void BaddyControl(short itemNum)
 				ClampRotation(&item->pos, info.angle, ANGLE(7));
 				break;
 			}
-			if (item->frameNumber != Anims[item->animNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
+			if (item->frameNumber != g_Level.Anims[item->animNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
 			{
 				break;
 			}
@@ -1217,35 +1217,35 @@ void BaddyControl(short itemNum)
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_2_CLICKS;
 			item->currentAnimState = STATE_BADDY_CLIMB_2_CLICKS;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_3_CLICKS;
 			item->currentAnimState = STATE_BADDY_CLIMB_3_CLICKS;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
 			item->currentAnimState = STATE_BADDY_CLIMB_4_CLICKS;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_3_CLICKS;
 			item->currentAnimState = STATE_BADDY_JUMP_OFF_3_CLICKS;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_4_CLICKS;
 			item->currentAnimState = STATE_BADDY_JUMP_OFF_4_CLICKS;
-			item->frameNumber = Anims[item->animNumber].frameBase;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		default:
@@ -1256,7 +1256,7 @@ void BaddyControl(short itemNum)
 	{
 		creature->maximumTurn = 0;
 		item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_BLIND;
-		item->frameNumber = Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
 		item->currentAnimState = STATE_BADDY_BLIND;
 	}
 

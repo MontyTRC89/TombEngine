@@ -16,6 +16,7 @@
 #include "lara2gun.h"
 #include "level.h"
 #include "input.h"
+using namespace T5M::Renderer;
 using std::vector;
 Inventory g_Inventory;
 extern GameFlow* g_GameFlow;
@@ -571,18 +572,18 @@ int Inventory::DoInventory()
 		m_activeRing = INV_RING_OPTIONS;
 		m_rings[m_activeRing].currentObject = 0;
 
-		g_Renderer->DumpGameScene();
+		g_Renderer.DumpGameScene();
 
 		OpenRing(m_activeRing, true);
 
 		int passportResult = DoPassport();
 
 		// Fade out
-		g_Renderer->FadeOut();
-		for (int i = 0; i < FADE_FRAMES_COUNT; i++)
-		{
+		//g_Renderer.FadeOut();
+		//for (int i = 0; i < FADE_FRAMES_COUNT; i++)
+		//{
 			UpdateSceneAndDrawInventory();
-		}
+		//}
 
 		return passportResult;
 	}
@@ -614,7 +615,7 @@ int Inventory::DoInventory()
 
 	int result = INV_RESULT_NONE;
 
-	g_Renderer->DumpGameScene();
+	g_Renderer.DumpGameScene();
 
 	SoundEffect(SFX_TR3_MENU_SPININ, NULL, 0);
 
@@ -725,7 +726,7 @@ int Inventory::DoInventory()
 						passportResult == INV_RESULT_LOAD_GAME)
 					{
 						// Fade out
-						g_Renderer->FadeOut();
+						g_Renderer.FadeOut();
 						for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 						{
 							UpdateSceneAndDrawInventory();
@@ -823,7 +824,7 @@ bool Inventory::IsCurrentObjectExamine()
 int Inventory::DoPuzzle()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 	ring->numActions = 0;
 
@@ -913,7 +914,7 @@ int Inventory::DoPuzzle()
 int Inventory::DoWeapon()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 	ring->numActions = 0;
 
@@ -1060,7 +1061,7 @@ void Inventory::AddCombination(short piece1, short piece2, short combinedObject,
 int Inventory::DoGenericObject()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 	return INV_RESULT_USE_ITEM;
 }
@@ -1068,14 +1069,14 @@ int Inventory::DoGenericObject()
 void Inventory::DoStatistics()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 }
 
 void Inventory::DoExamine()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 }
 
@@ -1501,7 +1502,7 @@ void Inventory::UseCurrentItem()
 	// Binoculars
 	if (objectNumber == ID_BINOCULARS_ITEM)
 	{
-		if (LaraItem->currentAnimState == STATE_LARA_STOP && LaraItem->animNumber == ANIMATION_LARA_STAY_IDLE || Lara.isDucked && !(TrInput & 0x20000000))
+		if (LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE || Lara.isDucked && !(TrInput & 0x20000000))
 		{
 			if (!SniperCameraActive && !UseSpotCam && !TrackCameraInit)
 			{
@@ -1564,15 +1565,15 @@ void Inventory::UseCurrentItem()
 	}
 
 	// TODO: can cause problem with harpoongun in underwater and wading !
-	bool canUseWeapons = !(LaraItem->currentAnimState == STATE_LARA_CRAWL_IDLE || 
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_FORWARD ||
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TURN_LEFT || 
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TURN_RIGHT ||
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_BACK || 
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TO_CLIMB ||
-						   LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE || 
-						   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT ||
-						   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT || 
+	bool canUseWeapons = !(LaraItem->currentAnimState == LS_CRAWL_IDLE || 
+						   LaraItem->currentAnimState == LS_CRAWL_FORWARD ||
+						   LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT || 
+						   LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
+						   LaraItem->currentAnimState == LS_CRAWL_BACK || 
+						   LaraItem->currentAnimState == LS_CRAWL_TO_HANG ||
+						   LaraItem->currentAnimState == LS_CROUCH_IDLE || 
+						   LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
+						   LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT || 
 						   Lara.waterStatus != LW_ABOVE_WATER);
 
 	// Pistols
@@ -1732,12 +1733,12 @@ void Inventory::UseCurrentItem()
 	{
 		if (!Lara.gunStatus)
 		{
-			if (LaraItem->currentAnimState != STATE_LARA_CRAWL_IDLE &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_FORWARD &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_TURN_LEFT &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_TURN_RIGHT &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_BACK &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_TO_CLIMB && 
+			if (LaraItem->currentAnimState != LS_CRAWL_IDLE &&
+				LaraItem->currentAnimState != LS_CRAWL_FORWARD &&
+				LaraItem->currentAnimState != LS_CRAWL_TURN_LEFT &&
+				LaraItem->currentAnimState != LS_CRAWL_TURN_RIGHT &&
+				LaraItem->currentAnimState != LS_CRAWL_BACK &&
+				LaraItem->currentAnimState != LS_CRAWL_TO_HANG && 
 				Lara.waterStatus == LW_ABOVE_WATER)
 			{
 				if (Lara.gunType != WEAPON_FLARE)
@@ -1803,17 +1804,16 @@ bool Inventory::UpdateSceneAndDrawInventory()
 
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 	{
-		g_Renderer->DumpGameScene();
-		g_Renderer->DrawInventory();
-		Camera.numberFrames = g_Renderer->SyncRenderer();
+		g_Renderer.DrawTitle();
+		Camera.numberFrames = g_Renderer.SyncRenderer();
 
 		nframes = Camera.numberFrames;
 		ControlPhase(nframes, 0);
 	}
 	else
 	{
-		g_Renderer->DrawInventory();
-		g_Renderer->SyncRenderer();
+		g_Renderer.DrawInventory();
+		g_Renderer.SyncRenderer();
 	}
 
 	return true;
@@ -1831,7 +1831,7 @@ int Inventory::DoTitleInventory()
 	m_activeRing = INV_RING_OPTIONS;
 
 	// Fade in
-	g_Renderer->FadeIn();
+	g_Renderer.FadeIn();
 	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
@@ -1931,7 +1931,7 @@ int Inventory::DoTitleInventory()
 	CloseRing(INV_RING_OPTIONS, true);
 
 	// Fade out
-	g_Renderer->FadeOut();
+	g_Renderer.FadeOut();
 	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
@@ -1948,7 +1948,7 @@ InventoryObjectDefinition* Inventory::GetInventoryObject(int index)
 int Inventory::DoPassport()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 	short choice = 0;
 	
@@ -1978,7 +1978,7 @@ int Inventory::DoPassport()
 	for (int i = 0; i < 14; i++)
 	{
 		UpdateSceneAndDrawInventory();
-		ring->frameIndex++;
+		ring->framePtr++;
 	}
 
 	bool moveLeft = false;
@@ -2016,11 +2016,11 @@ int Inventory::DoPassport()
 
 			if (choice > 0)
 			{
-				ring->frameIndex = 19;
+				ring->framePtr = 19;
 				for (int i = 0; i < 5; i++)
 				{
 					UpdateSceneAndDrawInventory();
-					ring->frameIndex--;
+					ring->framePtr--;
 				}
 
 				choice--;
@@ -2036,11 +2036,11 @@ int Inventory::DoPassport()
 			
 			if (choice < choices.size() - 1)
 			{
-				ring->frameIndex = 14;
+				ring->framePtr = 14;
 				for (int i = 0; i < 5; i++)
 				{
 					UpdateSceneAndDrawInventory();
-					ring->frameIndex++;
+					ring->framePtr++;
 				}
 
 				choice++;
@@ -2433,14 +2433,14 @@ int Inventory::DoPassport()
 	}
 
 	// Close the passport
-	ring->frameIndex = 24;
+	ring->framePtr = 24;
 	for (int i = 24; i < 30; i++)
 	{
 		UpdateSceneAndDrawInventory();
-		ring->frameIndex++;
+		ring->framePtr++;
 	}
 
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 
 	PopoverObject();
 
@@ -2505,7 +2505,7 @@ int Inventory::GetType()
 void Inventory::DoControlsSettings()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 	ring->waitingForKey = false;
 	
@@ -2642,7 +2642,7 @@ void Inventory::DoControlsSettings()
 void Inventory::DoGraphicsSettings()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 
 	PopupObject();
@@ -2651,7 +2651,7 @@ void Inventory::DoGraphicsSettings()
 	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
 
 	// Get current display mode
-	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[ring->Configuration.Adapter];
 	ring->SelectedVideoMode = 0;
 	for (int i = 0; i < adapter->DisplayModes.size(); i++)
@@ -2782,7 +2782,7 @@ void Inventory::DoGraphicsSettings()
 				SaveConfiguration();
 
 				// Reset screen and go back
-				g_Renderer->ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 
+				g_Renderer.ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 
 												   ring->Configuration.RefreshRate, ring->Configuration.Windowed);
 				closeObject = true;
 
@@ -2810,7 +2810,7 @@ void Inventory::DoGraphicsSettings()
 void Inventory::DoSoundSettings()
 {
 	InventoryRing* ring = &m_rings[m_activeRing];
-	ring->frameIndex = 0;
+	ring->framePtr = 0;
 	ring->selectedIndex = 0;
 
 	PopupObject();

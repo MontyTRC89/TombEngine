@@ -125,20 +125,20 @@ int Targetable(ITEM_INFO* item, AI_INFO* info)
 	{
 		GAME_VECTOR start, target;
 
-		short* bounds = GetBestFrame(item);
+		BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 
 		start.x = item->pos.xPos;
 		if (item->objectNumber == ID_SNIPER)
 			start.y = item->pos.yPos - 768;
 		else
-			start.y = item->pos.yPos + ((bounds[3] + 3 * bounds[2]) >> 2);
+			start.y = item->pos.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
 		start.z = item->pos.zPos;
 		start.roomNumber = item->roomNumber;
 
-		bounds = GetBestFrame(enemy);
+		bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
 
 		target.x = enemy->pos.xPos;
-		target.y = enemy->pos.yPos + ((bounds[3] + 3 * bounds[2]) >> 2);
+		target.y = enemy->pos.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
 		target.z = enemy->pos.zPos;
 
 		return LOS(&start, &target);
@@ -165,8 +165,8 @@ int TargetVisible(ITEM_INFO* item, AI_INFO* info)
 
 			GAME_VECTOR target;
 			target.x = enemy->pos.xPos;
-			short* bounds = GetBestFrame(enemy);
-			target.y = enemy->pos.yPos + ((((bounds[2] << 1) + bounds[2]) + bounds[3]) >> 2);
+			BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+			target.y = enemy->pos.yPos + ((((bounds->Y1 * 2) + bounds->Y1) + bounds->Y2) / 4);
 			target.z = enemy->pos.zPos;
 
 			return LOS(&start, &target);

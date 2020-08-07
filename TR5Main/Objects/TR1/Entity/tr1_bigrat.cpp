@@ -85,14 +85,14 @@ static bool RatIsInWater(ITEM_INFO* item, CREATURE_INFO* big_rat)
 // initialised at loading level
 void InitialiseBigRat(short itemNumber)
 {
-    ITEM_INFO* item = &Items[itemNumber];
+    ITEM_INFO* item = &g_Level.Items[itemNumber];
     InitialiseCreature(itemNumber);
 
     // if the room is a "water room"
-    if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+    if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
     {
         item->animNumber = Objects[item->objectNumber].animIndex + BIG_RAT_ANIM_SWIM;
-        item->frameNumber = Anims[item->animNumber].frameBase;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
         item->currentAnimState = BIG_RAT_SWIM;
         item->goalAnimState = BIG_RAT_SWIM;
     }
@@ -100,7 +100,7 @@ void InitialiseBigRat(short itemNumber)
     else
     {
         item->animNumber = Objects[item->objectNumber].animIndex + BIG_RAT_ANIM_EMPTY;
-        item->frameNumber = Anims[item->animNumber].frameBase;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
         item->currentAnimState = BIG_RAT_STOP;
         item->goalAnimState = BIG_RAT_STOP;
     }
@@ -113,13 +113,13 @@ void BigRatControl(short itemNumber)
         return;
 
     ITEM_INFO* item;
-    ObjectInfo* obj;
+    OBJECT_INFO* obj;
     CREATURE_INFO* big_rat;
     AI_INFO info;
     short head, angle;
     int WaterHeight;
 
-    item = &Items[itemNumber];
+    item = &g_Level.Items[itemNumber];
     obj = &Objects[item->objectNumber];
     big_rat = GetCreatureInfo(item);
     head = angle = 0;
@@ -130,10 +130,10 @@ void BigRatControl(short itemNumber)
         if (item->currentAnimState != BIG_RAT_LAND_DEATH && item->currentAnimState != BIG_RAT_WATER_DEATH)
         {
             // water
-            if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+            if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
             {
                 item->animNumber = obj->animIndex + BIG_RAT_ANIM_WATER_DEATH;
-                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->currentAnimState = BIG_RAT_WATER_DEATH;
                 item->goalAnimState = BIG_RAT_WATER_DEATH;
             }
@@ -141,14 +141,14 @@ void BigRatControl(short itemNumber)
             else
             {
                 item->animNumber = obj->animIndex + BIG_RAT_ANIM_LAND_DEATH;
-                item->frameNumber = Anims[item->animNumber].frameBase;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->currentAnimState = BIG_RAT_LAND_DEATH;
                 item->goalAnimState = BIG_RAT_LAND_DEATH;
             }
         }
 
         // creatures in water are floating after death.
-        if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+        if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
             CreatureFloat(itemNumber);
     }
     else
@@ -171,7 +171,7 @@ void BigRatControl(short itemNumber)
         if ((item->hitStatus || info.distance < BIG_RAT_ALERT_RANGE) || (TargetVisible(item, &info) && info.distance < BIG_RAT_VISIBILITY_RANGE))
         {
             if (!big_rat->alerted)
-                big_rat->alerted = TRUE;
+                big_rat->alerted = true;
             AlertAllGuards(itemNumber);
         }
 
@@ -213,7 +213,7 @@ void BigRatControl(short itemNumber)
             {
                 CreatureEffect(item, &big_ratBite, DoBloodSplat);
                 LaraItem->hitPoints -= BIG_RAT_BITE_DAMAGE;
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 item->requiredAnimState = BIG_RAT_STOP;
             }
             break;
@@ -223,7 +223,7 @@ void BigRatControl(short itemNumber)
             {
                 CreatureEffect(item, &big_ratBite, DoBloodSplat);
                 LaraItem->hitPoints -= BIG_RAT_CHARGE_DAMAGE;
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
                 item->requiredAnimState = BIG_RAT_RUN;
             }
             break;
@@ -253,7 +253,7 @@ void BigRatControl(short itemNumber)
             {
                 CreatureEffect(item, &big_ratBite, DoBloodSplat);
                 LaraItem->hitPoints -= BIG_RAT_BITE_DAMAGE;
-                LaraItem->hitStatus = TRUE;
+                LaraItem->hitStatus = true;
             }
 
             item->goalAnimState = BIG_RAT_SWIM;

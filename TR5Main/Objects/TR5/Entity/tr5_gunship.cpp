@@ -17,7 +17,7 @@ int GunShipCounter = 0;
 
 void ControlGunShip(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -121,7 +121,7 @@ void ControlGunShip(short itemNumber)
 		}
 		else
 		{
-			ITEM_INFO* hitItem = &Items[objOnLos];
+			ITEM_INFO* hitItem = &g_Level.Items[objOnLos];
 
 			if (hitItem->objectNumber != ID_LARA)
 			{

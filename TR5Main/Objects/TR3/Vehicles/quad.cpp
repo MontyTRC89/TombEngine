@@ -140,7 +140,7 @@ bool QuadNoGetOff;
 
 static void QuadbikeExplode(ITEM_INFO* item)
 {
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		TriggerUnderwaterExplosion(item);
 	}
@@ -165,7 +165,7 @@ static int CanQuadbikeGetOff(int direction)
 {
 	short angle;
 
-	ITEM_INFO* item = &Items[Lara.Vehicle];
+	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 
 	if (direction < 0)
 		angle = item->pos.yRot - ANGLE(90);
@@ -196,25 +196,25 @@ static int CanQuadbikeGetOff(int direction)
 
 static int QuadCheckGetOff()
 {
-	ITEM_INFO* item = &Items[Lara.Vehicle];
+	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 
-	if (((LaraItem->currentAnimState == 10) || (LaraItem->currentAnimState == 24)) && (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd))
+	if (((LaraItem->currentAnimState == 10) || (LaraItem->currentAnimState == 24)) && (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd))
 	{
 		if (LaraItem->currentAnimState == QUAD_STATE_GETOFFL)
 			LaraItem->pos.yRot += ANGLE(90);
 		else
 			LaraItem->pos.yRot -= ANGLE(90);
 
-		LaraItem->animNumber = ANIMATION_LARA_STAY_SOLID;
+		LaraItem->animNumber = LA_STAND_SOLID;
 		LaraItem->frameNumber = GF(LaraItem->animNumber, 0);
-		LaraItem->currentAnimState = LaraItem->goalAnimState = STATE_LARA_STOP;
+		LaraItem->currentAnimState = LaraItem->goalAnimState = LS_STOP;
 		LaraItem->pos.xPos -= GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.zPos -= GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot) >> W2V_SHIFT;
 		LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
 		Lara.Vehicle = NO_ITEM;
 		Lara.gunStatus = LG_NO_ARMS;
 	}
-	else if (LaraItem->frameNumber == Anims[LaraItem->animNumber].frameEnd)
+	else if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 	{
 		QUAD_INFO* quad;
 
@@ -223,9 +223,9 @@ static int QuadCheckGetOff()
 		{
 			PHD_VECTOR pos = { 0, 0, 0 };
 
-			LaraItem->animNumber = ANIMATION_LARA_FREE_FALL_LONG;
-			LaraItem->frameNumber = GF(ANIMATION_LARA_FREE_FALL_LONG, 0);
-			LaraItem->currentAnimState = STATE_LARA_FREEFALL;
+			LaraItem->animNumber = LA_FREEFALL;
+			LaraItem->frameNumber = GF(LA_FREEFALL, 0);
+			LaraItem->currentAnimState = LS_FREEFALL;
 
 			GetJointAbsPosition(LaraItem, &pos, LM_HIPS);
 
@@ -244,7 +244,7 @@ static int QuadCheckGetOff()
 		}
 		else if (LaraItem->currentAnimState == QUAD_STATE_FALLDEATH)
 		{
-			LaraItem->goalAnimState = STATE_LARA_DEATH;
+			LaraItem->goalAnimState = LS_DEATH;
 			LaraItem->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
 			LaraItem->speed = 0;
 			quad->flags |= QUAD_FLAGS_DEAD;
@@ -258,7 +258,7 @@ static int QuadCheckGetOff()
 
 static int GetOnQuadBike(short itemNumber, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if ((!(TrInput & IN_ACTION)) || (item->flags & ONESHOT) || (Lara.gunStatus != LG_NO_ARMS) || (LaraItem->gravityStatus)
 		|| ((abs(item->pos.yPos - LaraItem->pos.yPos)) > 256))
@@ -308,7 +308,7 @@ static void QuadBaddieCollision(ITEM_INFO* quad)
 
 	roomsList.push_back(quad->roomNumber);
 
-	ROOM_INFO* room = &Rooms[quad->roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[quad->roomNumber];
 	for (int i = 0; i < room->doors.size(); i++)
 	{
 		roomsList.push_back(room->doors[i].room);
@@ -316,14 +316,14 @@ static void QuadBaddieCollision(ITEM_INFO* quad)
 
 	for (int i = 0; i < roomsList.size(); i++)
 	{
-		short itemNum = Rooms[roomsList[i]].itemNumber;
+		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
 
 		while (itemNum != NO_ITEM)
 		{
-			ITEM_INFO* item = &Items[itemNum];
+			ITEM_INFO* item = &g_Level.Items[itemNum];
 			if (item->collidable && item->status != ITEM_INVISIBLE && item != LaraItem && item != quad) 
 			{
-				ObjectInfo* object = &Objects[item->objectNumber];
+				OBJECT_INFO* object = &Objects[item->objectNumber];
 				if (object->collision && object->intelligent)
 				{
 					int x = quad->pos.xPos - item->pos.xPos;
@@ -731,7 +731,7 @@ static int QuadDynamics(ITEM_INFO* item)
 
 		newspeed <<= 8;
 
-		if ((&Items[Lara.Vehicle] == item)
+		if ((&g_Level.Items[Lara.Vehicle] == item)
 			&& (quad->velocity == MAX_VELOCITY)
 			&& (newspeed < (quad->velocity - 10)))
 		{
@@ -767,7 +767,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 		else
 			LaraItem->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUADBIKE_FALLSTART2_A;
 
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_FALL;
 	}
 	else if ((collide)
@@ -800,7 +800,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_HITRIGHT;
 		}
 
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		SoundEffect(202, &item->pos, 0);
 	}
 	else
@@ -873,7 +873,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			else if (TrInput & IN_RIGHT)
 			{
 				LaraItem->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUADBIKE_TURNR_A;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_TURNR;
 			}
 			else if (!(TrInput & IN_LEFT))
@@ -889,7 +889,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			else if (TrInput & IN_LEFT)
 			{
 				LaraItem->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUADBIKE_TURNL_A;
-				LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_TURNL;
 			}
 			else if (!(TrInput & IN_RIGHT))
@@ -919,7 +919,7 @@ static void AnimateQuadBike(ITEM_INFO* item, int collide, int dead)
 			break;
 		}
 
-		if (Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+		if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 		{
 			LaraItem->goalAnimState = QUAD_STATE_FALLOFF;
 			LaraItem->hitPoints = 0;
@@ -1119,9 +1119,9 @@ static int QuadUserControl(ITEM_INFO* item, int height, int* pitch)
 
 void InitialiseQuadBike(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
-	item->data = (QUAD_INFO *)game_malloc(sizeof(QUAD_INFO));
+	item->data = game_malloc<QUAD_INFO>();
 	QUAD_INFO* quad = (QUAD_INFO *)item->data;
 
 	quad->velocity = 0;
@@ -1159,7 +1159,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 		Lara.gunStatus = LG_HANDS_BUSY;
 
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		ang = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
 		ang -= item->pos.yRot;
@@ -1175,7 +1175,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			LaraItem->currentAnimState = LaraItem->goalAnimState = QUAD_STATE_GETONR;
 		}
 
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 
 		item->hitPoints = 1;
 		LaraItem->pos.xPos = item->pos.xPos;
@@ -1260,7 +1260,7 @@ int QuadBikeControl(void)
 	short xRot, zRot, rotadd;
 	int pitch, dead = 0;
 
-	ITEM_INFO* item = &Items[Lara.Vehicle];
+	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 	QUAD_INFO* quad = (QUAD_INFO *)item->data;
 
 	GAME_VECTOR	oldpos;
@@ -1369,7 +1369,7 @@ int QuadBikeControl(void)
 		AnimateItem(LaraItem);
 
 		item->animNumber = Objects[ID_QUAD].animIndex + (LaraItem->animNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
-		item->frameNumber = Anims[item->animNumber].frameBase + (LaraItem->frameNumber - Anims[LaraItem->animNumber].frameBase);
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase + (LaraItem->frameNumber - g_Level.Anims[LaraItem->animNumber].frameBase);
 
 		Camera.targetElevation = -30 * ONE_DEGREE;
 

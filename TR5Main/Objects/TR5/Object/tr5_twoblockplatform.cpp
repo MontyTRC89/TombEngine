@@ -8,7 +8,7 @@
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	item->itemFlags[0] = item->pos.yPos;
 	item->itemFlags[1] = 1;
@@ -17,7 +17,7 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 {
 	if (!item->meshBits)
-		return FALSE;
+		return false;
 
 	short angle = item->pos.yRot;
 	int xb = x >> WALL_SHIFT;
@@ -26,15 +26,15 @@ BOOL IsOnTwoBlocksPlatform(ITEM_INFO* item, int x, int z)
 	int itemzb = item->pos.zPos >> WALL_SHIFT;
 
 	if (!angle && (xb == itemxb || xb == itemxb - 1) && (zb == itemzb || zb == itemzb + 1))
-		return TRUE;
+		return true;
 	if (angle == -ANGLE(180) && (xb == itemxb || xb == itemxb + 1) && (zb == itemzb || zb == itemzb - 1))
-		return TRUE;
+		return true;
 	if (angle == ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb + 1))
-		return TRUE;
+		return true;
 	if (angle == -ANGLE(90) && (zb == itemzb || zb == itemzb - 1) && (xb == itemxb || xb == itemxb - 1))
-		return TRUE;
+		return true;
 
-	return FALSE;
+	return false;
 }
 
 void TwoBlocksPlatformFloor(ITEM_INFO* item, int x, int y, int z, int* height)
@@ -52,7 +52,7 @@ void TwoBlocksPlatformFloor(ITEM_INFO* item, int x, int y, int z, int* height)
 
 void TwoBlocksPlatformControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -77,7 +77,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			int height = LaraItem->pos.yPos + 1;
 			TwoBlocksPlatformFloor(item, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &height);
 
-			if (OnFloor && LaraItem->animNumber != ANIMATION_LARA_RUN_BACK)
+			if (OnFloor && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
 				item->itemFlags[1] = 1;
 			else
 				item->itemFlags[1] = -1;

@@ -19,29 +19,25 @@
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;
-short TightRopeBounds[12] = 
+OBJECT_COLLISION_BOUNDS TightRopeBounds =
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFF00, 0x0100, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
 PHD_VECTOR TightRopePos = { 0, 0, 0 };
 
-short ParallelBarsBounds[12] =  
+OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
 {
 	0xFD80, 0x0280, 0x02C0, 0x0340, 0xFFA0, 0x0060, 0xF8E4, 0x071C, 0xEAAC, 0x1554, 0xF8E4, 0x071C
 };
 
 PHD_VECTOR PolePos = { 0, 0, -208 }; 
 PHD_VECTOR PolePosR = { 0, 0, 0 }; 
-short PoleBounds[12] = // offset 0xA1250
+OBJECT_COLLISION_BOUNDS PoleBounds = // offset 0xA1250
 {
 	0xFF00, 0x0100, 0x0000, 0x0000, 0xFE00, 0x0200, 0xF8E4, 0x071C, 0xEAAC, 0x1554,
 	0xF8E4, 0x071C
 };
-
-
-
-
 
 void BridgeFlatFloor(ITEM_INFO* item, int x, int y, int z, int* height) 
 {
@@ -128,7 +124,7 @@ void BridgeTilt2Ceiling(ITEM_INFO* item, int x, int y, int z, int* height)
 void ControlAnimatingSlots(short itemNumber)
 {
 	// TODO: TR5 has here a series of hardcoded OCB codes, this function actually is just a placeholder
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 		AnimateItem(item);
@@ -136,21 +132,21 @@ void ControlAnimatingSlots(short itemNumber)
 
 void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if ((TrInput & IN_ACTION) && !Lara.gunStatus && l->currentAnimState == STATE_LARA_STOP && 
-		l->animNumber == ANIMATION_LARA_STAY_IDLE
+	if ((TrInput & IN_ACTION) && !Lara.gunStatus && l->currentAnimState == LS_STOP && 
+		l->animNumber == LA_STAND_IDLE
 		|| Lara.isMoving && Lara.generalPtr == (void*)itemNumber)
 	{
 		short rot = item->pos.yRot;
 		item->pos.yRot = l->pos.yRot;
-		if (TestLaraPosition(PoleBounds, item, l))
+		if (TestLaraPosition(&PoleBounds, item, l))
 		{
 			if (MoveLaraPosition(&PolePos, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_STAY_TO_POLE_GRAB;
-				l->currentAnimState = STATE_LARA_POLE_IDLE;
-				l->frameNumber = Anims[l->animNumber].frameBase;
+				l->animNumber = LA_STAND_TO_POLE;
+				l->currentAnimState = LS_POLE_IDLE;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
@@ -174,7 +170,7 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		&& !Lara.gunStatus
 		&& l->gravityStatus
 		&& l->fallspeed > Lara.gunStatus
-		&& (l->currentAnimState == STATE_LARA_REACH || l->currentAnimState == STATE_LARA_JUMP_UP))
+		&& (l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP))
 	{
 		if (TestBoundsCollide(item, l, 100))
 		{
@@ -182,23 +178,23 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				short rot = item->pos.yRot;
 				item->pos.yRot = l->pos.yRot;
-				if (l->currentAnimState == STATE_LARA_REACH)
+				if (l->currentAnimState == LS_REACH)
 				{
 					PolePosR.y = l->pos.yPos - item->pos.yPos + 10;
 					AlignLaraPosition(&PolePosR, item, l);
-					l->animNumber = ANIMATION_LARA_JUMP_FORWARD_TO_POLE_GRAB;
-					l->frameNumber = Anims[l->animNumber].frameBase;
+					l->animNumber = LA_REACH_TO_POLE;
+					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				}
 				else
 				{
 					PolePosR.y = l->pos.yPos - item->pos.yPos + 66;
 					AlignLaraPosition(&PolePosR, item, l);
-					l->animNumber = ANIMATION_LARA_JUMP_UP_TO_POLE_GRAB;
-					l->frameNumber = Anims[l->animNumber].frameBase;
+					l->animNumber = LA_JUMP_UP_TO_POLE;
+					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				}
 				l->gravityStatus = false;
 				l->fallspeed = false;
-				l->currentAnimState = STATE_LARA_POLE_IDLE;
+				l->currentAnimState = LS_POLE_IDLE;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->pos.yRot = rot;
 			}
@@ -206,15 +202,15 @@ void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		if ((l->currentAnimState < STATE_LARA_POLE_IDLE || l->currentAnimState > STATE_LARA_POLE_TURN_RIGHT) && 
-			l->currentAnimState != STATE_LARA_JUMP_BACK)
+		if ((l->currentAnimState < LS_POLE_IDLE || l->currentAnimState > LS_POLE_TURN_COUNTER_CLOCKWISE) && 
+			l->currentAnimState != LS_JUMP_BACK)
 			ObjectCollision(itemNumber, l, coll);
 	}
 }
 
 void ControlTriggerTriggerer(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
 	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	
@@ -285,7 +281,7 @@ void AnimateWaterfalls()
 
 void ControlWaterfall(short itemNumber) 
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	TriggerActive(item);
 
 	if (itemNumber != 0)
@@ -312,17 +308,17 @@ void ControlWaterfall(short itemNumber)
 
 void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	if (((TrInput & IN_ACTION) == 0
-		|| l->currentAnimState != STATE_LARA_STOP
-		|| l->animNumber != ANIMATION_LARA_STAY_IDLE
+		|| l->currentAnimState != LS_STOP
+		|| l->animNumber != LA_STAND_IDLE
 		|| l->status == ITEM_INVISIBLE
 		|| Lara.gunStatus)
 		&& (!Lara.isMoving || Lara.generalPtr != (void*)itemNum))
 	{
-		if (l->currentAnimState == STATE_LARA_TIGHTROPE_FORWARD && 
-			l->goalAnimState != STATE_LARA_TIGHTROPE_EXIT && 
+		if (l->currentAnimState == LS_TIGHTROPE_FORWARD && 
+			l->goalAnimState != LS_TIGHTROPE_EXIT && 
 			!Lara.tightRopeOff)
 		{
 			if (item->pos.yRot == l->pos.yRot)
@@ -335,13 +331,13 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	else
 	{
 		item->pos.yRot += -ANGLE(180);
-		if (TestLaraPosition(TightRopeBounds, item, l))
+		if (TestLaraPosition(&TightRopeBounds, item, l))
 		{
 			if (MoveLaraPosition(&TightRopePos, item, l))
 			{
-				l->currentAnimState = STATE_LARA_TIGHTROPE_ENTER;
-				l->animNumber = ANIMATION_LARA_TIGHTROPE_START;
-				l->frameNumber = Anims[l->animNumber].frameBase;
+				l->currentAnimState = LS_TIGHTROPE_ENTER;
+				l->animNumber = LA_TIGHTROPE_START;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.isMoving = false;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;
@@ -368,23 +364,23 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &Items[itemNumber];
-	if (TrInput & IN_ACTION && l->currentAnimState == STATE_LARA_REACH && l->animNumber == ANIMATION_LARA_TRY_HANG_SOLID)
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	if (TrInput & IN_ACTION && l->currentAnimState == LS_REACH && l->animNumber == LA_REACH)
 	{
-		int test1 = TestLaraPosition(ParallelBarsBounds, item, l);
+		int test1 = TestLaraPosition(&ParallelBarsBounds, item, l);
 		int test2 = 0;
 		if (!test1)
 		{
 			item->pos.yRot += -ANGLE(180);
-			test2 = TestLaraPosition(ParallelBarsBounds, item, l);
+			test2 = TestLaraPosition(&ParallelBarsBounds, item, l);
 			item->pos.yRot += -ANGLE(180);
 		}
 
 		if (test1 || test2)
 		{
-			l->currentAnimState = STATE_LARA_MISC_CONTROL;
-			l->animNumber = ANIMATION_LARA_BARS_GRAB;
-			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->currentAnimState = LS_MISC_CONTROL;
+			l->animNumber = LA_SWINGBAR_GRAB;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->fallspeed = false;
 			l->gravityStatus = false;
 
@@ -424,7 +420,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			ObjectCollision(itemNumber, l, coll);
 		}
 	}
-	else if (l->currentAnimState != STATE_LARA_BARS_SWING)
+	else if (l->currentAnimState != LS_BARS_SWING)
 	{
 		ObjectCollision(itemNumber, l, coll);
 	}
@@ -432,7 +428,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 void ControlXRayMachine(short itemNumber) 
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
@@ -497,7 +493,7 @@ void ControlXRayMachine(short itemNumber)
 		if (item->itemFlags[1] < 128)
 		{
 			SoundEffect(SFX_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
-			TriggerFontFire(&Items[item->itemFlags[0]], item->itemFlags[1], item->itemFlags[1] == 0 ? 16 : 1);
+			TriggerFontFire(&g_Level.Items[item->itemFlags[0]], item->itemFlags[1], item->itemFlags[1] == 0 ? 16 : 1);
 		}
 
 		++item->itemFlags[1];
@@ -505,7 +501,7 @@ void ControlXRayMachine(short itemNumber)
 
 	case 333:
 	{
-		ROOM_INFO* r = &Rooms[item->roomNumber];
+		ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
 		MESH_INFO* mesh = r->mesh;
 		int j;
 
@@ -545,17 +541,17 @@ void CutsceneRopeControl(short itemNumber)
 	int dy;
 	int dz;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 
 	pos1.x = -128;
 	pos1.y = -72;
 	pos1.z = -16;
-	GetJointAbsPosition(&Items[item->itemFlags[2]], &pos1, 0);
+	GetJointAbsPosition(&g_Level.Items[item->itemFlags[2]], &pos1, 0);
 
 	pos2.x = 830;
 	pos2.z = -12;
 	pos2.y = 0;
-	GetJointAbsPosition(&Items[item->itemFlags[3]], &pos2, 0);
+	GetJointAbsPosition(&g_Level.Items[item->itemFlags[3]], &pos2, 0);
 
 	item->pos.xPos = pos2.x;
 	item->pos.yPos = pos2.y;
@@ -573,11 +569,11 @@ void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 
-	item = &Items[itemNum];
+	item = &g_Level.Items[itemNum];
 
 	/*if (gfCurrentLevel == LVL5_SINKING_SUBMARINE)
 	{
-		if (item->frameNumber < Anims[item->animNumber].frame_end)
+		if (item->frameNumber < g_Level.Anims[item->animNumber].frame_end)
 		{
 			ObjectCollision(itemNum, laraitem, coll);
 		}
@@ -586,7 +582,7 @@ void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 void InitialiseTightRope(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->pos.yRot > 0)
 	{
@@ -612,35 +608,35 @@ void InitialiseTightRope(short itemNumber)
 
 void InitialiseAnimating(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
 	item->currentAnimState = 0;
 	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = Anims[item->animNumber].frameBase;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
 }
 
 void AnimatingControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
 
 	item->status = ITEM_ACTIVE;
-
 	AnimateItem(item);
 
-	if (item->frameNumber >= Anims[item->animNumber].frameEnd)
+	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
+	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 	{
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		RemoveActiveItem(itemNumber);
 		item->aiBits = 0;
 		item->status = ITEM_NOT_ACTIVE;
-	}
+	}*/
 }
 
 void HighObject2Control(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;

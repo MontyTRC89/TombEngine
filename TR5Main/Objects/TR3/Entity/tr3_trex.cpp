@@ -23,9 +23,9 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 	LaraItem->gravityStatus = false;
 
 	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
-	LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-	LaraItem->currentAnimState = STATE_LARA_DEATH;
-	LaraItem->goalAnimState = STATE_LARA_DEATH;
+	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+	LaraItem->currentAnimState = LS_DEATH;
+	LaraItem->goalAnimState = LS_DEATH;
 	//LaraSwapMeshExtra();
 
 	LaraItem->hitPoints = -16384;
@@ -43,7 +43,7 @@ void TyrannosaurControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short head = 0;

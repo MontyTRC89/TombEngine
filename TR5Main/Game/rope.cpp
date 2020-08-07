@@ -16,7 +16,7 @@ void InitialiseRope(short itemNumber) // (F) (D)
 {
 	PHD_VECTOR itemPos;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	short roomNumber = item->roomNumber;
 
 	itemPos.x = item->pos.xPos;
@@ -153,7 +153,7 @@ void RopeControl(short itemNumber) // (F) (D)
 	ITEM_INFO* item;
 	ROPE_STRUCT* rope;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	rope = &Ropes[item->triggerFlags];
 	if (TriggerActive(item))
 	{
@@ -170,30 +170,30 @@ void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll) // (F) (D)
 {
 	ITEM_INFO* item;
 	ROPE_STRUCT* rope;
-	ANIM_FRAME* frame;
+	BOUNDING_BOX* frame;
 	int segment;
 
-	item = &Items[itemNumber];
+	item = &g_Level.Items[itemNumber];
 	rope = &Ropes[item->triggerFlags];
-	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && (l->currentAnimState == STATE_LARA_REACH || l->currentAnimState == STATE_LARA_JUMP_UP) && l->gravityStatus && l->fallspeed > 0 && rope->active)
+	if (TrInput & IN_ACTION && Lara.gunStatus == LG_NO_ARMS && (l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP) && l->gravityStatus && l->fallspeed > 0 && rope->active)
 	{
-		frame = (ANIM_FRAME*) GetBoundsAccurate(l);
-		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->MinY + 512, l->pos.zPos + (frame->MaxZ * phd_cos(l->pos.yRot) >> W2V_SHIFT), l->currentAnimState == STATE_LARA_REACH ? 128 : 320);
+		frame = GetBoundsAccurate(l);
+		segment = _0x0046D200(rope, l->pos.xPos, l->pos.yPos + frame->Y1 + 512, l->pos.zPos + ((int)(frame->Z2 * phd_cos(l->pos.yRot)) >> W2V_SHIFT), l->currentAnimState == LS_REACH ? 128 : 320);
 		if (segment >= 0)
 		{
-			if (l->currentAnimState == STATE_LARA_REACH)
+			if (l->currentAnimState == LS_REACH)
 			{
-				l->animNumber = ANIMATION_LARA_ROPE_JUMP_TO_GRAB;
-				l->currentAnimState = STATE_LARA_ROPE_SWING;
-				Lara.ropeFrame = Anims[ANIMATION_LARA_ROPE_SWING_FORWARD_SEMIHARD].frameBase + 32 << 8;
-				Lara.ropeDFrame = Anims[ANIMATION_LARA_ROPE_SWING_FORWARD_SEMIHARD].frameBase + 60 << 8;
+				l->animNumber = LA_REACH_TO_ROPE_SWING;
+				l->currentAnimState = LS_ROPE_SWING;
+				Lara.ropeFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 32 << 8;
+				Lara.ropeDFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 60 << 8;
 			}
 			else
 			{
-				l->animNumber = ANIMATION_LARA_MONKEY_TO_ROPE_BEGIN;
-				l->currentAnimState = STATE_LARA_ROPE_IDLE;
+				l->animNumber = LA_JUMP_UP_TO_ROPE_START;
+				l->currentAnimState = LS_ROPE_IDLE;
 			}
-			l->frameNumber = Anims[l->animNumber].frameBase;
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->gravityStatus = false;
 			l->fallspeed = 0;
 			Lara.gunStatus = LG_HANDS_BUSY;

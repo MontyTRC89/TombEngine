@@ -42,7 +42,7 @@ short GetNextRat()
 
 void LittleRatsControl(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->triggerFlags)
 	{
@@ -96,7 +96,7 @@ void ClearRats()
 
 void InitialiseLittleRats(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	char flags = item->triggerFlags / 1000;
 
@@ -268,14 +268,14 @@ void UpdateRats()
 				if (!(Wibble & 60))
 					rat->flags += 2;
 
-				ROOM_INFO* r = &Rooms[rat->roomNumber];
+				ROOM_INFO* r = &g_Level.Rooms[rat->roomNumber];
 				if (r->flags & ENV_FLAG_WATER)
 				{
 					rat->fallspeed = 0;
 					rat->speed = 16;
 					rat->pos.yPos = r->maxceiling + 50;
 
-					if (Rooms[oldRoomNumber].flags & ENV_FLAG_WATER)
+					if (g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER)
 					{
 						if (!(GetRandomControl() & 0xF))
 						{

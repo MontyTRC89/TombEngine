@@ -18,6 +18,7 @@
 #include "sound.h"
 #include "savegame.h"
 #include "GameFlowScript.h"
+#include "lara_struct.h"
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
 {
@@ -219,23 +220,23 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 };
 
 short HoldStates[] = {
-	STATE_LARA_WALK_FORWARD,
-	STATE_LARA_RUN_FORWARD,
-	STATE_LARA_STOP,
-	STATE_LARA_POSE,
-	STATE_LARA_TURN_RIGHT_SLOW,
-	STATE_LARA_TURN_LEFT_SLOW,
-	STATE_LARA_WALK_BACK,
-	STATE_LARA_TURN_FAST,
-	STATE_LARA_WALK_RIGHT,
-	STATE_LARA_WALK_LEFT,
-	STATE_LARA_PICKUP,
-	STATE_LARA_SWITCH_DOWN,
-	STATE_LARA_SWITCH_UP,
-	STATE_LARA_WADE_FORWARD,
-	STATE_LARA_CROUCH_IDLE,
-	STATE_LARA_CROUCH_TURN_LEFT,
-	STATE_LARA_CROUCH_TURN_RIGHT,
+	LS_WALK_FORWARD,
+	LS_RUN_FORWARD,
+	LS_STOP,
+	LS_POSE,
+	LS_TURN_RIGHT_SLOW,
+	LS_TURN_LEFT_SLOW,
+	LS_WALK_BACK,
+	LS_TURN_FAST,
+	LS_STEP_RIGHT,
+	LS_STEP_LEFT,
+	LS_PICKUP,
+	LS_SWITCH_DOWN,
+	LS_SWITCH_UP,
+	LS_WADE_FORWARD,
+	LS_CROUCH_IDLE,
+	LS_CROUCH_TURN_LEFT,
+	LS_CROUCH_TURN_RIGHT,
 	-1
 };
 
@@ -310,13 +311,13 @@ void AimWeapon(WEAPON_INFO* winfo, LARA_ARM* arm) // (F) (D)
 		rotX -= speed;
 	arm->xRot = rotX;
 
-	// TODO: set arm rotations to inherit rotations of parent bones. -Sezz
+	// TODO: set arm rotations to inherit rotations of parent Bones. -Sezz
 	arm->zRot = 0;
 }
 
 void SmashItem(short itemNum) // (F) (D)
 {
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
 		SmashObject(itemNum);
 }
@@ -346,7 +347,7 @@ void LaraGun() // (F) (D)
 		}
 		else if (TrInput & IN_FLARE && (g_GameFlow->GetLevel(CurrentLevel)->LaraType != LARA_YOUNG))
 		{
-			if (LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE && LaraItem->animNumber != ANIMATION_LARA_CROUCH_IDLE)
+			if (LaraItem->currentAnimState == LS_CROUCH_IDLE && LaraItem->animNumber != LA_CROUCH_IDLE)
 				return;
 
 			if (Lara.gunType == WEAPON_FLARE)
@@ -366,9 +367,9 @@ void LaraGun() // (F) (D)
 
 		if ((Lara.requestGunType != Lara.gunType) || (TrInput & IN_DRAW))
 		{
-			if ((LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE
-				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT
-				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT)
+			if ((LaraItem->currentAnimState == LS_CROUCH_IDLE
+				|| LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT
+				|| LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
 				&& (Lara.requestGunType == WEAPON_HK
 				|| Lara.requestGunType == WEAPON_CROSSBOW
 #if 1
@@ -423,7 +424,7 @@ void LaraGun() // (F) (D)
 #endif
 			Lara.gunStatus = LG_UNDRAW_GUNS;
 	}
-	else if (Lara.gunStatus == LG_HANDS_BUSY && (TrInput & IN_FLARE) && LaraItem->currentAnimState == STATE_LARA_CRAWL_IDLE && LaraItem->animNumber == ANIMATION_LARA_CRAWL_IDLE)
+	else if (Lara.gunStatus == LG_HANDS_BUSY && (TrInput & IN_FLARE) && LaraItem->currentAnimState == LS_CRAWL_IDLE && LaraItem->animNumber == LA_CRAWL_IDLE)
 	{
 		Lara.requestGunType = WEAPON_FLARE;
 	}
@@ -472,7 +473,8 @@ void LaraGun() // (F) (D)
 			break;
 
 		case LG_UNDRAW_GUNS:
-			LARA_MESHES(ID_LARA, LM_HEAD);
+			//LARA_MESHES(ID_LARA, LM_HEAD);
+			Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
 
 			switch (Lara.gunType)
 			{
@@ -504,9 +506,11 @@ void LaraGun() // (F) (D)
 
 		case LG_READY:
 			if (!(TrInput & IN_ACTION))
-				LARA_MESHES(ID_LARA, LM_HEAD);
+				//LARA_MESHES(ID_LARA, LM_HEAD);
+				Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
 			else
-				LARA_MESHES(ID_LARA_SCREAM, LM_HEAD);
+				//LARA_MESHES(ID_LARA_SCREAM, LM_HEAD);
+				Lara.meshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
 		
 			if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
 				Camera.type = COMBAT_CAMERA;
@@ -580,7 +584,7 @@ void LaraGun() // (F) (D)
 		case LG_HANDS_BUSY:
 			if (Lara.gunType == WEAPON_FLARE)
 			{
-				if (CHECK_LARA_MESHES(ID_LARA_FLARE_ANIM, LM_LHAND))
+				if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 				{
 #if 0
 					Lara.flareControlLeft = (Lara.Vehicle != NO_ITEM || CheckForHoldingState(LaraItem->currentAnimState));
@@ -646,8 +650,8 @@ void InitialiseNewWeapon()
 		break;
 
 	default:
-		Lara.rightArm.frameBase = Anims[LaraItem->animNumber].framePtr;
-		Lara.leftArm.frameBase = Anims[LaraItem->animNumber].framePtr;
+		Lara.rightArm.frameBase = g_Level.Anims[LaraItem->animNumber].framePtr;
+		Lara.leftArm.frameBase = g_Level.Anims[LaraItem->animNumber].framePtr;
 		break;
 	}
 }
@@ -689,7 +693,7 @@ int WeaponObjectMesh(int weaponType)
 void HitTarget(ITEM_INFO* item, GAME_VECTOR* hitPos, int damage, int flag)
 {
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ObjectInfo* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 	
 	item->hitStatus = true;
 	if (creature != nullptr && item != LaraItem)
@@ -850,13 +854,13 @@ FireWeaponType FireWeapon(int weaponType, ITEM_INFO* target, ITEM_INFO* src, sho
 
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target) // (F) (D)
 {
-	ANIM_FRAME* bounds;
+	BOUNDING_BOX* bounds;
 	int x, y, z, c, s;
 
-	bounds = (ANIM_FRAME*)GetBestFrame(item);
-	x = (int)(bounds->MinX + bounds->MaxX) / 2;
-	y = (int) bounds->MinY + (bounds->MaxY - bounds->MinY) / 3;
-	z = (int)(bounds->MinZ + bounds->MaxZ) / 2;
+	bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	x = (int)(bounds->X1 + bounds->X2) / 2;
+	y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
+	z = (int)(bounds->Z1 + bounds->Z2) / 2;
 	c = phd_cos(item->pos.yRot);
 	s = phd_sin(item->pos.yRot);
 
@@ -982,7 +986,7 @@ void LaraGetNewTarget(WEAPON_INFO* weapon) // (F) (D)
 	{
 		if (BaddieSlots[slot].itemNum != NO_ITEM)
 		{
-			item = &Items[BaddieSlots[slot].itemNum];
+			item = &g_Level.Items[BaddieSlots[slot].itemNum];
 			if (item->hitPoints > 0)
 			{
 				x = item->pos.xPos - src.x;
@@ -1086,7 +1090,7 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 	int ceiling, height, oldonobj, oldheight;
 	int bs, yang;
 
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -1577,4 +1581,30 @@ void DoProperDetection(short itemNumber, int x, int y, int z, int xv, int yv, in
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 	if (roomNumber != item->roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
+}
+
+HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon)
+{
+	switch(weapon){
+		case WEAPON_PISTOLS:
+			return HOLSTER_SLOT::Pistols;
+		case WEAPON_UZI:
+			return HOLSTER_SLOT::Uzis;
+		case WEAPON_REVOLVER:
+			return HOLSTER_SLOT::Revolver;
+		case WEAPON_SHOTGUN:
+			return HOLSTER_SLOT::Shotgun;
+		case WEAPON_HK:
+			return HOLSTER_SLOT::HK;
+		case WEAPON_HARPOON_GUN:
+			return HOLSTER_SLOT::Harpoon;
+		case WEAPON_CROSSBOW:
+			return HOLSTER_SLOT::Crowssbow;
+		case WEAPON_GRENADE_LAUNCHER:
+			return HOLSTER_SLOT::GrenadeLauncher;
+		case WEAPON_ROCKET_LAUNCHER:
+			return HOLSTER_SLOT::RocketLauncher;
+		default:
+			return HOLSTER_SLOT::Empty;
+	}
 }

@@ -7,16 +7,6 @@
 // used by coll->badNeg
 #define NO_BAD_NEG NO_HEIGHT
 
-struct BOUNDING_BOX
-{
-	short X1;
-	short X2;
-	short Y1;
-	short Y2;
-	short Z1;
-	short Z2;
-};
-
 struct COLL_FLOOR
 {
 	int floor;
@@ -98,6 +88,17 @@ struct COLL_INFO
 	bool hitCeiling;
 };
 
+struct OBJECT_COLLISION_BOUNDS
+{
+	BOUNDING_BOX boundingBox;
+	short rotX1;
+	short rotX2;
+	short rotY1;
+	short rotY2;
+	short rotZ1;
+	short rotZ2;
+};
+
 extern BOUNDING_BOX GlobalCollisionBounds;
 constexpr auto MAX_ITEMS = 1024;
 extern ITEM_INFO* CollidedItems[MAX_ITEMS];
@@ -113,14 +114,14 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 void UpdateLaraRoom(ITEM_INFO* item, int height);
 short GetTiltType(FLOOR_INFO* floor, int x, int y, int z);
 int FindGridShift(int x, int z);
-int TestBoundsCollideStatic(short* bounds, PHD_3DPOS* pos, int radius);
-int ItemPushLaraStatic(ITEM_INFO* item, short* bounds, PHD_3DPOS* pos, COLL_INFO* coll);
+int TestBoundsCollideStatic(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
+int ItemPushLaraStatic(ITEM_INFO* item, BOUNDING_BOX* bounds, PHD_3DPOS* pos, COLL_INFO* coll);
 void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
 void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l);
 void TriggerLaraBlood();
 int ItemPushLara(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, int spazon, char bigpush);
-int TestLaraPosition(short* bounds, ITEM_INFO* item, ITEM_INFO* l);
+int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l);
 int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd);
 int MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
 int TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);

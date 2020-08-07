@@ -45,7 +45,7 @@ void FireHarpoon()
 	{
 		GAME_VECTOR pos;
 		PHD_VECTOR handr;
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		item->shade = 0x4210 | 0x8000;
 		item->objectNumber = ID_HARPOON;
@@ -92,7 +92,7 @@ void FireHarpoon()
 
 void ControlHarpoonBolt(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
@@ -112,23 +112,17 @@ void ControlHarpoonBolt(short itemNumber)
 	//  First check if the harpoon has it an item
 	short targetItemNumber = 0;
 	ITEM_INFO* target;
-	for (targetItemNumber = Rooms[item->roomNumber].itemNumber; targetItemNumber != NO_ITEM; targetItemNumber = target->nextItem)
+	for (targetItemNumber = g_Level.Rooms[item->roomNumber].itemNumber; targetItemNumber != NO_ITEM; targetItemNumber = target->nextItem)
 	{
-		target = &Items[targetItemNumber];
+		target = &g_Level.Items[targetItemNumber];
 		if (target == LaraItem || !target->collidable)
 			continue;
 
-		if (/*target->objectNumber == SMASH_WINDOW ||
-			target->objectNumber == SMASH_OBJECT1 ||
-			target->objectNumber == SMASH_OBJECT2 ||
-			target->objectNumber == SMASH_OBJECT3 ||
-			target->objectNumber == CARCASS ||
-			target->objectNumber == EXTRAFX6 ||*/
-			(target->status != ITEM_INVISIBLE && Objects[target->objectNumber].collision))
+		if (target->status != ITEM_INVISIBLE && Objects[target->objectNumber].collision)
 		{
 			// check against bounds of target for collision
-			short* bounds = GetBestFrame(target);
-			if (item->pos.yPos < target->pos.yPos + bounds[2] || item->pos.yPos > target->pos.yPos + bounds[3])
+			BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(target);
+			if (item->pos.yPos < target->pos.yPos + bounds->Y1 || item->pos.yPos > target->pos.yPos + bounds->Y2)
 				continue;
 
 			// get vector from target to bolt and check against x,z bounds
@@ -143,13 +137,13 @@ void ControlHarpoonBolt(short itemNumber)
 			int oz = oldZ - target->pos.zPos;
 			int sx = (c * ox - s * oz) >> W2V_SHIFT;
 
-			if ((rx < bounds[0] && sx < bounds[0]) || (rx > bounds[1] && sx > bounds[1]))
+			if ((rx < bounds->X1 && sx < bounds->X1) || (rx > bounds->X2 && sx > bounds->X2))
 				continue;
 
 			int rz = (c * z + s * x) >> W2V_SHIFT;
 			int sz = (c * oz + s * ox) >> W2V_SHIFT;
 
-			if ((rz < bounds[4] && sz < bounds[4]) || (rz > bounds[5] && sz > bounds[5]))
+			if ((rz < bounds->Z1 && sz < bounds->Z1) || (rz > bounds->Z2 && sz > bounds->Z2))
 				continue;
 
 			// TODO:
@@ -213,7 +207,7 @@ void ControlHarpoonBolt(short itemNumber)
 	else
 	{
 		item->pos.zRot += ANGLE(35);
-		if (!(Rooms[item->roomNumber].flags & 1))
+		if (!(g_Level.Rooms[item->roomNumber].flags & 1))
 		{
 			item->pos.xRot -= ANGLE(1);
 			if (item->pos.xRot < -16384)
@@ -256,7 +250,7 @@ void FireGrenade()
 		short itemNumber = CreateItem();
 		if (itemNumber != NO_ITEM)
 		{
-			ITEM_INFO* item = &Items[itemNumber];
+			ITEM_INFO* item = &g_Level.Items[itemNumber];
 			
 			item->shade = 0xC210;
 			item->objectNumber = ID_GRENADE;
@@ -343,7 +337,7 @@ enum GRENADE_TYPE
 
 void ControlGrenade(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->itemFlags[1])
 	{
@@ -370,12 +364,6 @@ void ControlGrenade(short itemNumber)
 
 				FlashFader = 32;
 
-				// if Volumetric then FlashFader = 0?
-				/*if (sub_47F960())
-				{
-					FlashFader = 0;
-				}*/
-
 				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 				GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 			}
@@ -385,7 +373,7 @@ void ControlGrenade(short itemNumber)
 
 				if (newGrenadeItemNumber != NO_ITEM)
 				{
-					ITEM_INFO* newGrenade = &Items[newGrenadeItemNumber];
+					ITEM_INFO* newGrenade = &g_Level.Items[newGrenadeItemNumber];
 
 					newGrenade->shade = 0xC210;
 					newGrenade->objectNumber = ID_GRENADE;
@@ -411,7 +399,7 @@ void ControlGrenade(short itemNumber)
 					newGrenade->itemFlags[2] = item->itemFlags[2];
 					newGrenade->hitPoints = 3000;
 	
-					if (Rooms[newGrenade->roomNumber].flags & ENV_FLAG_WATER)
+					if (g_Level.Rooms[newGrenade->roomNumber].flags & ENV_FLAG_WATER)
 						newGrenade->hitPoints = 1;
 				}
 			}
@@ -434,7 +422,7 @@ void ControlGrenade(short itemNumber)
 	item->shade = 0xC210;
 
 	bool aboveWater = false;
-	if (Rooms[item->roomNumber].flags & 1)
+	if (g_Level.Rooms[item->roomNumber].flags & 1)
 	{
 		aboveWater = false;
 		item->fallspeed += (5 - item->fallspeed) >> 1;
@@ -475,42 +463,8 @@ void ControlGrenade(short itemNumber)
 		int wy = world.Translation().y;
 		int wz = world.Translation().z;
 
-		// For now keep this legacy math
-		// PHD_MATH
-		/*phd_PushUnitMatrix();
-
-		MatrixPtr[M03] = 0;
-		MatrixPtr[M13] = 0;
-		MatrixPtr[M23] = 0;
-
-		phd_RotYXZ(item->pos.yRot - ANGLE(180), item->pos.xRot, item->pos.zRot);
-		phd_TranslateRel(0, 0, -64);
-
-		int wx = (MatrixPtr[M03] >> W2V_SHIFT);
-		int wy = (MatrixPtr[M13] >> W2V_SHIFT);
-		int wz = (MatrixPtr[M23] >> W2V_SHIFT);
-
-		phd_PopMatrix();*/
-
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
 	}
-
-	/*XMMATRIX transform;
-	XMMATRIX translation;
-	XMMATRIX rotation;
-
-	XMMATRIXRotationYawPitchRoll(&rotation, TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot),
-		TO_RAD(item->pos.zRot));
-	XMMATRIXTranslation(&translation, 0, 0, -64);
-	XMMATRIXMultiply(&transform, &rotation, &translation);
-
-	int wx = transform._14;
-	int wy = transform._24;
-	int wz = transform._34;
-
-	if (item->speed && aboveWater)
-		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
-*/
 
 	xv = ((item->speed * phd_sin(item->goalAnimState)) >> W2V_SHIFT);
 	yv = item->fallspeed;
@@ -550,7 +504,7 @@ void ControlGrenade(short itemNumber)
 	roomNumber = item->roomNumber;
 	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-	if ((Rooms[roomNumber].flags & ENV_FLAG_WATER) && aboveWater)
+	if ((g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER) && aboveWater)
 	{
 		// Setup splash
 		/*dword_804E20 = item->pos.xPos;
@@ -574,6 +528,7 @@ void ControlGrenade(short itemNumber)
       goto LABEL_35;
     }
     item->hitPoints = 1;*/
+		// what is this lol
 	}
 
 	if (item->itemFlags[0] == GRENADE_ULTRA)
@@ -657,8 +612,8 @@ void ControlGrenade(short itemNumber)
 											for (int i = 0; i < sw; i++)
 											{
 												AddActiveItem(itemNos[i]);
-												Items[itemNos[i]].status = ITEM_ACTIVE;
-												Items[itemNos[i]].triggerFlags |= 0x3E00;
+												g_Level.Items[itemNos[i]].status = ITEM_ACTIVE;
+												g_Level.Items[itemNos[i]].triggerFlags |= 0x3E00;
 											}
 										}
 									}
@@ -669,7 +624,7 @@ void ControlGrenade(short itemNumber)
 									ExplodeItemNode(currentItem, Objects[ID_SHOOT_SWITCH1].nmeshes - 1, 0, 64);
 								}
 
-								AddActiveItem((currentItem - Items));
+								AddActiveItem((currentItem - g_Level.Items.data()));
 								currentItem->status = ITEM_ACTIVE;
 								currentItem->triggerFlags |= 0x3E40;
 							}
@@ -680,7 +635,7 @@ void ControlGrenade(short itemNumber)
 								//TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
-								short currentItemNumber = (currentItem - Items);
+								short currentItemNumber = (currentItem - g_Level.Items.data());
 								SmashObject(currentItemNumber);
 								KillItem(currentItemNumber);
 							}
@@ -734,18 +689,10 @@ void ControlGrenade(short itemNumber)
 			FlashFadeG = 255;
 			FlashFadeB = 255;
 
-			/*
-			if ( sub_47F960() )
-      {
-        FlashFader = 0;
-        sub_47F880(item->pos.xPos, item->pos.yPos, item->pos.zPos, 4096, 255, 255, 255, 255, item->roomNumber);
-      }
-			*/
-
 			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 			GrenadeExplosionEffects(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 		}
-		else if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 		{
 			TriggerUnderwaterExplosion(item);
 		}
@@ -783,7 +730,7 @@ void draw_shotgun(int weaponType)
 	{
 		Lara.weaponItem = CreateItem();
 		
-		item = &Items[Lara.weaponItem];
+		item = &g_Level.Items[Lara.weaponItem];
 
 		item->objectNumber = WeaponObject(weaponType);
 
@@ -794,7 +741,7 @@ void draw_shotgun(int weaponType)
 		else
 			item->animNumber = Objects[item->objectNumber].animIndex + HARPOON_DRAW_ANIM; // M16 too
 		
-		item->frameNumber = Anims[item->animNumber].frameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->goalAnimState = 1;
 		item->currentAnimState = 1;
 		item->status = ITEM_ACTIVE;
@@ -805,14 +752,14 @@ void draw_shotgun(int weaponType)
 	}
 	else
 	{
-		item = &Items[Lara.weaponItem];
+		item = &g_Level.Items[Lara.weaponItem];
 	}
 
 	AnimateItem(item);
 
 	if (item->currentAnimState != 0 && item->currentAnimState != 6)
 	{
-		if (item->frameNumber - Anims[item->animNumber].frameBase == Weapons[weaponType].drawFrame)
+		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == Weapons[weaponType].drawFrame)
 			draw_shotgun_meshes(weaponType);
 		else if (Lara.waterStatus == 1)
 			item->goalAnimState = 6;
@@ -822,8 +769,8 @@ void draw_shotgun(int weaponType)
 		ready_shotgun(weaponType);
 	}
 
-	Lara.leftArm.frameBase = Lara.rightArm.frameBase = Anims[item->animNumber].framePtr;
-	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.leftArm.frameBase = Lara.rightArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
+	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
 }
 
@@ -870,7 +817,7 @@ void AnimateShotgun(int weaponType)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
 	}
 
-	ITEM_INFO* item = &Items[Lara.weaponItem];
+	ITEM_INFO* item = &g_Level.Items[Lara.weaponItem];
 	bool running = (weaponType == WEAPON_HK && LaraItem->speed != 0);
 	bool harpoonFired = false;
 
@@ -908,7 +855,7 @@ void AnimateShotgun(int weaponType)
 		break;
 
 	case 2:
-		if (item->frameNumber == Anims[item->animNumber].frameBase)
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			item->goalAnimState = 4;
 			
@@ -982,12 +929,12 @@ void AnimateShotgun(int weaponType)
 			item->goalAnimState = 4;
 		}
 
-		if (item->frameNumber - Anims[item->animNumber].frameBase == 12 && weaponType == WEAPON_SHOTGUN)
+		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 12 && weaponType == WEAPON_SHOTGUN)
 			TriggerGunShell(1, ID_SHOTGUNSHELL, 4);
 		break;
 
 	case 8:
-		if (item->frameNumber - Anims[item->animNumber].frameBase == 0)
+		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 0)
 		{
 			item->goalAnimState = 7;
 
@@ -1054,8 +1001,8 @@ void AnimateShotgun(int weaponType)
 
 	AnimateItem(item);
 
-	Lara.leftArm.frameBase = Lara.rightArm.frameBase = Anims[item->animNumber].framePtr;
-	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.leftArm.frameBase = Lara.rightArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
+	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
 }
 
@@ -1068,7 +1015,7 @@ enum CROSSBOW_TYPE
 
 void ControlCrossbowBolt(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	int oldX = item->pos.xPos;
 	int oldY = item->pos.yPos;
@@ -1078,7 +1025,7 @@ void ControlCrossbowBolt(short itemNumber)
 	bool land = false;
 	bool explode = false;
 
-	if (Rooms[roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
 		PHD_VECTOR bubblePos(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->speed > 64)
@@ -1125,9 +1072,9 @@ void ControlCrossbowBolt(short itemNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
 	// If now in water and before in land, add a ripple
-	if ((Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && land)
+	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && land)
 	{
-		SetupRipple(item->pos.xPos, Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0);
+		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0);
 	}
 
 	int radius = (explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS);
@@ -1242,7 +1189,7 @@ void ControlCrossbowBolt(short itemNumber)
 	}
 
 	// At this point, for sure bolt must explode
-	if (Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
 		TriggerUnderwaterExplosion(item);
 	}
@@ -1299,11 +1246,6 @@ void RifleHandler(int weaponType)
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
 			PHD_VECTOR pos = {};
-			/*
-			pos.x = GetRandomControl() - 128;
-			pos.y = (GetRandomControl() & 0x7F) - 63;
-			pos.z = GetRandomControl() - 128;
-			*/
 			pos.y = -64;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
@@ -1319,11 +1261,6 @@ void RifleHandler(int weaponType)
 		else if (weaponType == WEAPON_REVOLVER)
 		{
 			PHD_VECTOR pos = {};
-			/*
-			pos.x = GetRandomControl() - 128;
-			pos.y = (GetRandomControl() & 0x7F) - 63;
-			pos.z = GetRandomControl() - 128;
-			*/
 			pos.y = -32;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
@@ -1342,7 +1279,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		ITEM_INFO* item = &Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		item->objectNumber = ID_CROSSBOW_BOLT;
 		item->shade = 0xC210;
 		if (pos)
@@ -1425,7 +1362,7 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 			{
 				dest->hitStatus = true;
 
-				ObjectInfo* obj = &Objects[dest->objectNumber];
+				OBJECT_INFO* obj = &Objects[dest->objectNumber];
 				if (!obj->undead)
 				{
 					HitTarget(dest, 0, 30, 1);
@@ -1435,7 +1372,7 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 						if (src->hitPoints <= 0)
 						{
 							++Savegame.Level.Kills;
-							CreatureDie((dest - Items), 1);
+							CreatureDie((dest - g_Level.Items.data()), 1);
 						}
 					}
 				}
@@ -1444,7 +1381,7 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 		else
 		{
 			LaraItem->hitPoints -= 50;
-			if (!(Rooms[dest->roomNumber].flags & ENV_FLAG_WATER) && LaraItem->hitPoints <= 50)
+			if (!(g_Level.Rooms[dest->roomNumber].flags & ENV_FLAG_WATER) && LaraItem->hitPoints <= 50)
 				LaraBurn();
 		}
 	}
@@ -1479,7 +1416,7 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item)
 
 void undraw_shotgun(int weapon)
 {
-	ITEM_INFO* item = &Items[Lara.weaponItem];
+	ITEM_INFO* item = &g_Level.Items[Lara.weaponItem];
 	item->goalAnimState = 3;
 	
 	AnimateItem(item);
@@ -1495,29 +1432,31 @@ void undraw_shotgun(int weapon)
 		Lara.rightArm.frameNumber = 0;
 		Lara.leftArm.frameNumber = 0;
 	}
-	else if (item->currentAnimState == 3 && item->frameNumber - Anims[item->animNumber].frameBase == 21)
+	else if (item->currentAnimState == 3 && item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 21)
 	{
 		undraw_shotgun_meshes(weapon);
 	}
 	
-	Lara.rightArm.frameBase = Anims[item->animNumber].framePtr;
-	Lara.leftArm.frameBase = Anims[item->animNumber].framePtr;
-	Lara.rightArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
-	Lara.leftArm.frameNumber = item->frameNumber - Anims[item->animNumber].frameBase;
+	Lara.rightArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
+	Lara.leftArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
+	Lara.rightArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+	Lara.leftArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 	Lara.rightArm.animNumber = item->animNumber;
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
 }
 
 void undraw_shotgun_meshes(int weapon)
 {
-	Lara.backGun = WeaponObject(weapon);
-	LARA_MESHES(ID_LARA, LM_RHAND);
+	Lara.holsterInfo.backHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weapon));
+	//LARA_MESHES(ID_LARA, LM_RHAND);
+	Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void draw_shotgun_meshes(int weaponType)
 {
-	Lara.backGun = WEAPON_NONE;
-	LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
+	Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
+	//LARA_MESHES(WeaponObjectMesh(weaponType), LM_RHAND);
+	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(weaponType)].meshIndex + LM_RHAND;
 }
 
 void DoCrossbowDamage(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
@@ -1597,8 +1536,8 @@ void DoCrossbowDamage(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
 						AddActiveItem(*v16);
 						v17 = *v16;
 						--v16;
-						Items[v17]._bf15ea = Items[v17]._bf15ea & 0xFFFFFFFB | 2;
-						HIBYTE(Items[v16[1]].flags) |= 0x3Eu;
+						Items[v17]._bf15ea = g_Level.Items[v17]._bf15ea & 0xFFFFFFFB | 2;
+						HIBYTE(g_Level.Items[v16[1]].flags) |= 0x3Eu;
 						--v15;
 					} while (v15);
 				}
@@ -1612,6 +1551,7 @@ void DoCrossbowDamage(ITEM_INFO* item1, ITEM_INFO* item2, signed int search)
 			item2->status = ITEM_ACTIVE;
 		}
 	}*/
+	// what is this 2.0
 }
 
 void FireHK(int mode)

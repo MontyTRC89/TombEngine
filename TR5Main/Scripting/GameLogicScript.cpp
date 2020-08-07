@@ -1150,7 +1150,7 @@ void GameScript::MakeItemInvisible(short id)
 
 	short itemNum = m_itemsMap[id];
 
-	ITEM_INFO* item = &Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (item->active)
 	{
@@ -1426,7 +1426,7 @@ void GameScriptRotation::SetZRot(float z)
 GameScriptItem::GameScriptItem(short itemNumber)
 	:
 	NativeItemNumber(itemNumber),
-	NativeItem(&Items[itemNumber])
+	NativeItem(&g_Level.Items[itemNumber])
 {
 
 }
@@ -1485,7 +1485,7 @@ short GameScriptItem::GetRoom()
 
 void GameScriptItem::SetRoom(short room)
 {
-	if (room < 0 || room >= Rooms.size())
+	if (room < 0 || room >= g_Level.Rooms.size())
 	{
 		if (WarningsAsErrors)
 			throw runtime_error("invalid room number");

@@ -1,5 +1,5 @@
 #include "CameraMatrixBuffer.hlsli"
-
+#include "./VertexInput.hlsli"
 struct RendererLight {
 	float4 Position;
 	float4 Color;
@@ -37,15 +37,6 @@ cbuffer RoomBuffer : register(b5)
 	int water;
 };
 
-struct VertexShaderInput
-{
-	float3 Position: POSITION;
-	float3 Normal: NORMAL;
-	float2 UV: TEXCOORD;
-	float4 Color: COLOR;
-	float Bone : BLENDINDICES;
-};
-
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
@@ -54,8 +45,9 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
 	float4 LightPosition: POSITION1;
+	linear float3x3 TBN : TBN;
 };
-
+Texture2D NormalTexture : register(t3);
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
@@ -82,7 +74,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.UV = input.UV;
 	output.WorldPosition = input.Position.xyz;
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
-
+	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
+	output.TBN = TBN;
 	return output;
 }
 
@@ -101,6 +94,12 @@ float getShadowFactor(Texture2D shadowMap, SamplerState shadowMapSampler, float2
 
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
+	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
+	//Normal = float3(0.5, 0.5, 1);
+	Normal.g = 1 - Normal.g;
+	Normal = Normal * 2 - 1;
+	Normal = normalize(mul(Normal,input.TBN));
+	//Normal = input.Normal;
 	float4 output = Texture.Sample(Sampler, input.UV);
 	if (AlphaTest)
 		clip(output.w - 0.5f);
@@ -142,21 +141,24 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);
-
+			lightVec = normalize(lightVec);
 			if (distance > radius)
 				continue;
 
-			lightVec = normalize(lightVec);
+			float d = saturate(dot(Normal,-lightVec ));
+			if (d < 0)
+				continue;
+			
 			float attenuation = pow(((radius - distance) / radius), 2);
 
-			lighting += color * intensity * attenuation;
+			lighting += color * intensity * attenuation * d;
 		}
 	}
 
 	if (Caustics)
 	{
 		float3 position = input.WorldPosition.xyz;
-		float3 normal = input.Normal.xyz;
+		float3 normal = Normal;
 
 		float fracX = position.x - floor(position.x / 2048.0f) * 2048.0f;
 		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;

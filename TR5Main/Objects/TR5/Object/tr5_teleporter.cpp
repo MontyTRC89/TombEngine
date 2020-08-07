@@ -9,7 +9,7 @@
 
 void InitialiseTeleporter(short itemNumber)
 {
-	/*ITEM_INFO* item = &Items[itemNumber];
+	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->triggerFlags == 512)
 	{
@@ -22,7 +22,7 @@ void InitialiseTeleporter(short itemNumber)
 
 void ControlTeleporter(short itemNumber)
 {
-	ITEM_INFO* item = &Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
@@ -52,7 +52,7 @@ void ControlTeleporter(short itemNumber)
 					flags = 4;
 				}
 
-				ITEM_INFO* targetItem = &Items[item->itemFlags[1]];
+				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[1]];
 				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
 
 				if (FlashFader > 4)
@@ -117,7 +117,7 @@ void ControlTeleporter(short itemNumber)
 						v29 = -512;
 					}
 					v30 = item->itemFlags[0];
-					v31 = &items[item->itemFlags[1]];
+					v31 = &g_Level.Items[item->itemFlags[1]];
 					src.xPos = v29 + v31->pos.xPos;
 					src.yPos = v31->pos.yPos - 2328;
 					src.zPos = v27 + v31->pos.zPos;
@@ -188,10 +188,10 @@ void ControlTeleporter(short itemNumber)
 			SoundEffect(SFX_LIFT_HIT_FLOOR2, 0, 0);
 		}
 
-		LaraItem->animNumber = ANIMATION_LARA_ELEVATOR_RECOVER;
-		LaraItem->frameNumber = Anims[LaraItem->animNumber].frameBase;
-		LaraItem->goalAnimState = STATE_LARA_MISC_CONTROL;
-		LaraItem->currentAnimState = STATE_LARA_MISC_CONTROL;
+		LaraItem->animNumber = LA_ELEVATOR_RECOVER;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+		LaraItem->goalAnimState = LS_MISC_CONTROL;
+		LaraItem->currentAnimState = LS_MISC_CONTROL;
 
 		item->itemFlags[0]++;
 		if (item->itemFlags[0] >= 150)

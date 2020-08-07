@@ -7,6 +7,7 @@
 #include "GameFlowScript.h"
 #include "configuration.h"
 #include "sound.h"
+using namespace T5M::Renderer;
 using std::vector;
 extern GameFlow* g_GameFlow;
 GameConfiguration g_Configuration;
@@ -17,7 +18,7 @@ void LoadResolutionsInCombobox(HWND handle, int index)
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
-	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[index];
 
 	for (int i = 0; i < adapter->DisplayModes.size(); i++)
@@ -43,7 +44,7 @@ void LoadAdaptersInCombobox(HWND handle)
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
-	vector<RendererVideoAdapter>* adapters = g_Renderer->GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
 	for (int i = 0; i < adapters->size(); i++)
 	{
 		RendererVideoAdapter* adapter = &(*adapters)[i];
@@ -139,7 +140,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
 				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
 				selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
-				adapter = &(*g_Renderer->GetAdapters())[g_Configuration.Adapter];
+				adapter = &(*g_Renderer.GetAdapters())[g_Configuration.Adapter];
 				mode = &(adapter->DisplayModes[selectedMode]);
 				g_Configuration.Width = mode->Width;
 				g_Configuration.Height = mode->Height;
