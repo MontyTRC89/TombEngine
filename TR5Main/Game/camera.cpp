@@ -184,6 +184,7 @@ void InitialiseCamera()
 	
 	UseForcedFixedCamera = 0;
 	CalculateCamera();
+	LookAt(&Camera, 0);
 }
 
 void MoveCamera(GAME_VECTOR* ideal, int speed)
