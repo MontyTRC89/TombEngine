@@ -849,6 +849,9 @@
     <ClInclude Include="Game\debug\debug.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\TR4\Entity\tr4_enemy_jeep.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\box.cpp">
@@ -1545,6 +1548,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="Game\memory\malloc.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Objects\TR4\Entity\tr4_enemy_jeep.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

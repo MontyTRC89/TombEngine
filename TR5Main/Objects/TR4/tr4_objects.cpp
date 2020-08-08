@@ -56,6 +56,7 @@
 #include "objects.h"
 #include "setup.h"
 #include "level.h"
+#include "tr4_enemy_jeep.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
 {
@@ -644,6 +645,29 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->zoneType = ZONE_BASIC;
+	}
+
+	obj = &Objects[ID_ENEMY_JEEP];
+	if (obj->loaded)
+	{
+		obj->initialise = InitialiseEnemyJeep;
+		obj->control = EnemyJeepControl;
+		obj->collision = CreatureCollision;
+		obj->saveFlags = true;
+		obj->savePosition = true;
+		obj->saveAnim = true;
+		obj->intelligent = true;
+		obj->saveHitpoints = true; 
+		obj->pivotLength = 500;
+		obj->shadowSize = 128;
+		obj->radius = 512;
+		obj->hitPoints = 40;
+		obj->zoneType = ZONE_BASIC;
+
+		g_Level.Bones[obj->boneIndex + 4 * 8] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 9] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 11] |= ROT_X;
+		g_Level.Bones[obj->boneIndex + 4 * 12] |= ROT_X;
 	}
 }
 

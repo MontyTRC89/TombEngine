@@ -174,3 +174,18 @@ void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum)
 	pos->y = p.y;
 	pos->z = p.z;
 }
+
+void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
+{
+	if (angle <= rot)
+	{
+		if (angle >= -rot)
+			pos->yRot += angle;
+		else
+			pos->yRot -= rot;
+	}
+	else
+	{
+		pos->yRot += rot;
+	}
+}
