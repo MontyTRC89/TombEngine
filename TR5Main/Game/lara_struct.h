@@ -79,7 +79,7 @@ enum LARA_STATE
 	LS_LADDER_STOP = 59,
 	LS_LADDER_RIGHT = 60,
 	LS_LADDER_DOWN = 61,
-	LS_TEST_1 = 62,
+	LS_TEST_1 = 62,	// Used for auto monkey up jump.
 	LS_TEST_2 = 63,
 	LS_TEST_3 = 64,
 	LS_WADE_FORWARD = 65,
@@ -621,8 +621,7 @@ enum LARA_ANIM
 	LA_ROPE_HANG_IDLE_UNUSED = 408,							// Rope hang (looped)
 	LA_ROPE_SWING_TO_REACH_UNUSED_3 = 409,					// Rope swing > reach, 3rd unused opportunity
 	LA_ROPE_SWING_TO_REACH_UNUSED_2 = 410,					// Rope swing > reach, 2nd unused opportunity
-																// TODO: confirm dispatch.
-	LA_ROPE_SWING_TO_REACH_UNUSED_1 = 411,					// Rope swing > reach, 1stunused opportunity
+	LA_ROPE_SWING_TO_REACH_UNUSED_1 = 411,					// Rope swing > reach, 1st unused opportunity
 	LA_DOUBLEDOOR_OPEN_PUSH = 412,							// Push double doors 
 	LA_BUTTON_LARGE_PUSH = 413,								// Push big button 
 	LA_JUMPSWITCH_PULL = 414,								// Pull jumpswitch
@@ -643,7 +642,7 @@ enum LARA_ANIM
 	LA_TORCH_LIGHT_2 = 428,									// Light torch with flame 2-3 clicks high
 	LA_TORCH_LIGHT_3 = 429,									// Light torch with flame 4-5 clicks high
 	LA_TORCH_LIGHT_4 = 430,									// Light torch with flame 6-7 clicks high
-	LA_TORCH_LIGHT_5 = 431,									// Light torch with flame greater than 7 clicks
+	LA_TORCH_LIGHT_5 = 431,									// Light torch with flame higher than 7 clicks
 	LA_DETONATOR_USE = 432,									// Use mine detonator
 	LA_CORRECT_POSITION_FRONT = 433,						// Adjust position forward
 	LA_CORRECT_POSITION_LEFT = 434,							// Adjust position left
