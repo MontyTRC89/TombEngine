@@ -6,11 +6,12 @@
 #include "level.h"
 #include "input.h"
 #include "control.h"
+#include "sound.h"
 
 PENDULUM CurrentPendulum;
 PENDULUM AlternatePendulum;
 ROPE_STRUCT Ropes[12];
-int NumRopes;
+int NumRopes, RopeSwing = 0;
 
 void InitialiseRope(short itemNumber) // (F) (D)
 {
@@ -463,4 +464,204 @@ void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* veloc
 	nextVelocity->x -= vec.x;
 	nextVelocity->y -= vec.y;
 	nextVelocity->z -= vec.z;
+}
+
+void UpdateRopeSwing(ITEM_INFO* item) // (F) (D)
+{
+	if (Lara.ropeMaxXForward > 9000)
+	{
+		Lara.ropeMaxXForward = 9000;
+	}
+
+	if (Lara.ropeMaxXBackward > 9000)
+	{
+		Lara.ropeMaxXBackward = 9000;
+	}
+
+	if (Lara.ropeDirection)
+	{
+		if (item->pos.xRot > 0 && item->pos.xRot - Lara.ropeLastX < -100)
+		{
+			Lara.ropeArcFront = Lara.ropeLastX;
+			Lara.ropeDirection = 0;
+			Lara.ropeMaxXBackward = 0;
+			int frame = 15 * Lara.ropeMaxXForward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+			if (frame > Lara.ropeDFrame)
+			{
+				Lara.ropeDFrame = frame;
+				RopeSwing = 1;
+			}
+			else
+			{
+				RopeSwing = 0;
+			}
+
+			SoundEffect(SFX_LARA_ROPE_CREAK, &item->pos, 0);
+		}
+		else if (Lara.ropeLastX < 0 && Lara.ropeFrame == Lara.ropeDFrame)
+		{
+			RopeSwing = 0;
+			Lara.ropeDFrame = 15 * Lara.ropeMaxXBackward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+			Lara.ropeFrameRate = 15 * Lara.ropeMaxXBackward / 9000 + 1;
+		}
+		else if (Lara.ropeFrameRate < 512)
+		{
+			int num = RopeSwing ? 31 : 7;
+
+			Lara.ropeFrameRate += num * Lara.ropeMaxXBackward / 9000 + 1;
+		}
+	}
+	else
+	{
+		if (item->pos.xRot < 0 && item->pos.xRot - Lara.ropeLastX > 100)
+		{
+			Lara.ropeArcBack = Lara.ropeLastX;
+			Lara.ropeDirection = 1;
+			Lara.ropeMaxXForward = 0;
+			int frame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.ropeMaxXBackward / 18000 + 17 << 8;
+			if (frame < Lara.ropeDFrame)
+			{
+				Lara.ropeDFrame = frame;
+				RopeSwing = 1;
+			}
+			else
+			{
+				RopeSwing = 0;
+			}
+
+			SoundEffect(SFX_LARA_ROPE_CREAK, &item->pos, 0);
+		}
+		else if (Lara.ropeLastX > 0 && Lara.ropeFrame == Lara.ropeDFrame)
+		{
+			RopeSwing = 0;
+
+			Lara.ropeDFrame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.ropeMaxXForward / 18000 + 17 << 8;
+			Lara.ropeFrameRate = 15 * Lara.ropeMaxXForward / 9000 + 1;
+		}
+		else if (Lara.ropeFrameRate < 512)
+		{
+			int num = RopeSwing ? 31 : 7;
+
+			Lara.ropeFrameRate += num * Lara.ropeMaxXForward / 9000 + 1;
+		}
+	}
+
+	Lara.ropeLastX = item->pos.xRot;
+	if (Lara.ropeDirection)
+	{
+		if (item->pos.xRot > Lara.ropeMaxXForward)
+			Lara.ropeMaxXForward = item->pos.xRot;
+	}
+	else
+	{
+		if (item->pos.xRot < -Lara.ropeMaxXBackward)
+			Lara.ropeMaxXBackward = abs(item->pos.xRot);
+	}
+}
+
+void JumpOffRope(ITEM_INFO* item) // (F) (D)
+{
+	if (Lara.ropePtr != -1)
+	{
+		if (item->pos.xRot >= 0)
+		{
+			item->fallspeed = -112;
+			item->speed = item->pos.xRot / 128;
+		}
+		else
+		{
+			item->speed = 0;
+			item->fallspeed = -20;
+		}
+
+		item->pos.xRot = 0;
+		item->gravityStatus = true;
+
+		Lara.gunStatus = LG_NO_ARMS;
+
+		if (item->frameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
+		{
+			item->animNumber = LA_ROPE_SWING_TO_REACH_1;
+		}
+		else if (item->frameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 21)
+		{
+			item->animNumber = LA_ROPE_SWING_TO_REACH_2;
+		}
+		else
+		{
+			item->animNumber = LA_ROPE_SWING_TO_REACH_3;
+		}
+
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->currentAnimState = LS_REACH;
+		item->goalAnimState = LS_REACH;
+
+		Lara.ropePtr = -1;
+	}
+}
+
+void FallFromRope(ITEM_INFO* item) // (F) (D)
+{
+	item->speed = abs(CurrentPendulum.Velocity.x >> 16) + abs(CurrentPendulum.Velocity.z >> 16) >> 1;
+	item->pos.xRot = 0;
+	item->pos.yPos += 320;
+
+	item->animNumber = LA_FALL_START;
+	item->frameNumber = g_Level.Anims[LA_FALL_START].frameBase;
+	item->currentAnimState = LS_JUMP_FORWARD;
+	item->goalAnimState = LS_JUMP_FORWARD;
+
+	item->fallspeed = 0;
+	item->gravityStatus = true;
+
+	Lara.gunStatus = LG_NO_ARMS;
+	Lara.ropePtr = -1;
+}
+
+void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+{
+	if (!(TrInput & IN_ACTION))
+	{
+		FallFromRope(item);
+	}
+	else
+	{
+		Camera.targetAngle = ANGLE(30.0f);
+		if (Lara.ropeCount)
+		{
+			if (!Lara.ropeFlag)
+			{
+				--Lara.ropeCount;
+				Lara.ropeOffset += Lara.ropeDownVel;
+				if (!Lara.ropeCount)
+					Lara.ropeFlag = 1;
+				return;
+			}
+		}
+		else
+		{
+			if (!Lara.ropeFlag)
+			{
+				ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
+				Lara.ropeOffset = 0;
+				Lara.ropeDownVel = (unsigned int)(rope->meshSegment[Lara.ropeSegment + 1].y - rope->meshSegment[Lara.ropeSegment].y) >> 17;
+				Lara.ropeCount = 0;
+				Lara.ropeOffset += Lara.ropeDownVel;
+				Lara.ropeFlag = 1;
+				return;
+			}
+		}
+
+		if (item->animNumber == LA_ROPE_DOWN && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+		{
+			SoundEffect(SFX_LARA_ROPEDOWN_LOOP, &LaraItem->pos, 0);
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			Lara.ropeFlag = 0;
+			++Lara.ropeSegment;
+			Lara.ropeOffset = 0;
+		}
+
+		if (!(TrInput & IN_BACK) || Lara.ropeSegment >= 21)
+			item->goalAnimState = LS_ROPE_IDLE;
+	}
 }

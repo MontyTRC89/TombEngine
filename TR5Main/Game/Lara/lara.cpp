@@ -38,7 +38,6 @@ extern Inventory g_Inventory;
 
 short elevation = 57346;
 bool doJump = false;
-int RopeSwing = 0;
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
@@ -3429,7 +3428,7 @@ void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		LookUpDown();
 }
 
-void UpdateRopeSwing(ITEM_INFO* item) // (F) (D)
+/*void UpdateRopeSwing(ITEM_INFO* item) // (F) (D)
 {
 	if (Lara.ropeMaxXForward > 9000)
 	{
@@ -3520,9 +3519,9 @@ void UpdateRopeSwing(ITEM_INFO* item) // (F) (D)
 		if (item->pos.xRot < -Lara.ropeMaxXBackward)
 			Lara.ropeMaxXBackward = abs(item->pos.xRot);
 	}
-}
+}*/
 
-void JumpOffRope(ITEM_INFO* item) // (F) (D)
+/*void JumpOffRope(ITEM_INFO* item) // (F) (D)
 {
 	if (Lara.ropePtr != -1)
 	{
@@ -3561,9 +3560,9 @@ void JumpOffRope(ITEM_INFO* item) // (F) (D)
 
 		Lara.ropePtr = -1;
 	}
-}
+}*/
 
-void FallFromRope(ITEM_INFO* item) // (F) (D)
+/*void FallFromRope(ITEM_INFO* item) // (F) (D)
 {
 	item->speed = abs(CurrentPendulum.Velocity.x >> 16) + abs(CurrentPendulum.Velocity.z >> 16) >> 1;
 	item->pos.xRot = 0;
@@ -3579,7 +3578,7 @@ void FallFromRope(ITEM_INFO* item) // (F) (D)
 
 	Lara.gunStatus = LG_NO_ARMS;
 	Lara.ropePtr = -1;
-}
+}*/
 
 void lara_col_poledown(ITEM_INFO* item, COLL_INFO* coll)//171A0, 172D4 (F)
 {
@@ -5426,7 +5425,7 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
 	}
 }
 
-void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
+/*void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 {
 	if (!(TrInput & IN_ACTION))
 	{
@@ -5472,7 +5471,7 @@ void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		if (!(TrInput & IN_BACK) || Lara.ropeSegment >= 21)
 			item->goalAnimState = LS_ROPE_IDLE;
 	}
-}
+}*/
 /**********************
 NEW FEET HANGING STUFF
 ////obviously, not all animations were made yet, we still need: 

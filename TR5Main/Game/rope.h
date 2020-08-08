@@ -44,3 +44,7 @@ void SetPendulumVelocity(int x, int y, int z);
 void _0x0046E1C0(ROPE_STRUCT* rope, int node);
 void _0x0046E080(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value);
 void _0x0046DF00(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length);
+void UpdateRopeSwing(ITEM_INFO* item);
+void JumpOffRope(ITEM_INFO* item);
+void FallFromRope(ITEM_INFO* item);
+void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
