@@ -65,7 +65,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main\Libs\boost;$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -101,7 +101,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_RELEASE;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Global;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -135,7 +135,7 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\explosion.h" />
     <ClInclude Include="Game\footprint.h" />
     <ClInclude Include="Game\groundfx.h" />
-    <ClInclude Include="Game\lara_struct.h" />
+    <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\memory\linearPool.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Game\memory\pool.h" />
@@ -363,15 +363,15 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClInclude Include="Game\health.h" />
     <ClInclude Include="Game\inventory.h" />
     <ClInclude Include="Game\items.h" />
-    <ClInclude Include="Game\lara.h" />
-    <ClInclude Include="Game\lara1gun.h" />
-    <ClInclude Include="Game\lara2gun.h" />
-    <ClInclude Include="Game\laraclmb.h" />
-    <ClInclude Include="Game\larafire.h" />
-    <ClInclude Include="Game\laraflar.h" />
-    <ClInclude Include="Game\laramisc.h" />
-    <ClInclude Include="Game\larasurf.h" />
-    <ClInclude Include="Game\laraswim.h" />
+    <ClInclude Include="Game\Lara\lara.h" />
+    <ClInclude Include="Game\Lara\lara1gun.h" />
+    <ClInclude Include="Game\Lara\lara2gun.h" />
+    <ClInclude Include="Game\Lara\laraclmb.h" />
+    <ClInclude Include="Game\Lara\larafire.h" />
+    <ClInclude Include="Game\Lara\laraflar.h" />
+    <ClInclude Include="Game\Lara\laramisc.h" />
+    <ClInclude Include="Game\Lara\larasurf.h" />
+    <ClInclude Include="Game\Lara\laraswim.h" />
     <ClInclude Include="Game\lot.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
@@ -598,15 +598,15 @@ xcopy /Y "$(ProjectDir)Scripting\Scripts\*.lua" "$(TargetDir)\Scripts"</Command>
     <ClCompile Include="Game\health.cpp" />
     <ClCompile Include="Game\inventory.cpp" />
     <ClCompile Include="Game\items.cpp" />
-    <ClCompile Include="Game\lara.cpp" />
-    <ClCompile Include="Game\lara1gun.cpp" />
-    <ClCompile Include="Game\lara2gun.cpp" />
-    <ClCompile Include="Game\laraclmb.cpp" />
-    <ClCompile Include="Game\larafire.cpp" />
-    <ClCompile Include="Game\laraflar.cpp" />
-    <ClCompile Include="Game\laramisc.cpp" />
-    <ClCompile Include="Game\larasurf.cpp" />
-    <ClCompile Include="Game\laraswim.cpp" />
+    <ClCompile Include="Game\Lara\lara.cpp" />
+    <ClCompile Include="Game\Lara\lara1gun.cpp" />
+    <ClCompile Include="Game\Lara\lara2gun.cpp" />
+    <ClCompile Include="Game\Lara\laraclmb.cpp" />
+    <ClCompile Include="Game\Lara\larafire.cpp" />
+    <ClCompile Include="Game\Lara\laraflar.cpp" />
+    <ClCompile Include="Game\Lara\laramisc.cpp" />
+    <ClCompile Include="Game\Lara\larasurf.cpp" />
+    <ClCompile Include="Game\Lara\laraswim.cpp" />
     <ClCompile Include="Game\lot.cpp" />
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\newinv2.cpp" />
