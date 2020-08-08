@@ -132,7 +132,7 @@ bool SnapToQuadrant(short& angle, int interval);
 int GetQuadrant(short angle);
 bool SnapToDiagonal(short& angle, int interval);
 int GetOctant(short angle);
-void RotateBoundingBox(array<float, 4>& box, short angle);
+void RotateBoundingBox(std::array<float, 4>& box, short angle);
 // New function for rotating item along XZ slopes.
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
 // Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).
