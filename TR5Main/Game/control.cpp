@@ -3267,3 +3267,10 @@ int IsRoomOutside(int x, int y, int z)
 
 	return -2;
 }
+
+void GetFloorAndTestTriggers(int x, int y, int z, short roomNumber, int heavy, int heavyFlags)
+{
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	GetFloorHeight(floor, x, y, z);
+	TestTriggers(TriggerIndex, heavy, heavyFlags);
+}
