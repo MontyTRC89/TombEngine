@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Lara.h"
 #include "lara_tests.h"
+#include "lara_collide.h"
 #include "control.h"
 #include "items.h"
 #include "inventory.h"
@@ -5238,38 +5239,6 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)//127BC, 1286C (F)
 			item->gravityStatus = true;
 			item->fallspeed = 0;
 		}
-	}
-}
-
-void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
-{
-	switch (coll->oldAnimState)
-	{
-	case LS_STOP:
-	case LS_TURN_RIGHT_SLOW:
-	case LS_TURN_LEFT_SLOW:
-	case LS_TURN_FAST:
-		item->currentAnimState = coll->oldAnimState;
-		item->animNumber = coll->oldAnimNumber;
-		item->frameNumber = coll->oldFrameNumber;
-		if (TrInput & IN_LEFT)
-		{
-			item->goalAnimState = LS_TURN_LEFT_SLOW;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
-		}
-		else
-		{
-			item->goalAnimState = LS_STOP;
-		}
-		AnimateLara(item);
-		break;
-	default:
-		item->animNumber = LA_STAND_SOLID;
-		item->frameNumber = g_Level.Anims[LA_STAND_SOLID].frameBase;
-		break;
 	}
 }
 
