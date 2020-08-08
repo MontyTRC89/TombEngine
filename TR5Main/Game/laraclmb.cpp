@@ -143,8 +143,7 @@ void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BA4(<), 47008(<) (F)
 
 void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 {
-	if (!LaraCheckForLetGo(item, coll)
-		&& item->animNumber == LA_LADDER_UP)
+	if (!LaraCheckForLetGo(item, coll) && item->animNumber == LA_LADDER_UP)
 	{
 		int frame = item->frameNumber - g_Level.Anims[LA_LADDER_UP].frameBase;
 		int yShift;
@@ -273,8 +272,7 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	int shiftRight, shiftLeft;
 	int ledgeRight, ledgeLeft;
 
-	if (LaraCheckForLetGo(item, coll) 
-		|| item->animNumber != LA_LADDER_IDLE)
+	if (LaraCheckForLetGo(item, coll) || item->animNumber != LA_LADDER_IDLE)
 		return;
 
 	if (!(TrInput & IN_FORWARD))
@@ -430,38 +428,38 @@ int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int heig
 	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
 	int x;
 	int z;
-	int xfront = 0;
-	int zfront = 0;
+	int xFront = 0;
+	int zFront = 0;
 
 	switch (angle)
 	{
 	case NORTH:
 		x = item->pos.xPos + right;
 		z = item->pos.zPos + front;
-		zfront = 256;
+		zFront = 256;
 		break;
 
 	case EAST:
 		x = item->pos.xPos + front;
 		z = item->pos.zPos - right;
-		xfront = 256;
+		xFront = 256;
 		break;
 
 	case SOUTH:
 		x = item->pos.xPos - right;
 		z = item->pos.zPos - front;
-		zfront = -256;
+		zFront = -256;
 		break;
 
 	case WEST:
 	default:
 		x = item->pos.xPos - front;
 		z = item->pos.zPos + right;
-		xfront = -256;
+		xFront = -256;
 		break;
 	}
 
-	return LaraTestClimb(x, item->pos.yPos + origin, z, xfront, zfront, height, item->roomNumber, shift);
+	return LaraTestClimb(x, item->pos.yPos + origin, z, xFront, zFront, height, item->roomNumber, shift);
 }
 
 void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shift)//46100, 46564 (F)
