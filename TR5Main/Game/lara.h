@@ -220,3 +220,5 @@ void lara_as_hang_feet_inLcorner(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_hang_feet_outRcorner(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_hang_feet_outLcorner(ITEM_INFO* item, COLL_INFO* coll);
 void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
+
+bool TestLaraLean(ITEM_INFO* item, COLL_INFO* coll);
