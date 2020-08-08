@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "tr4_littlebeetle.h"
 #include "level.h"
-#include <control.h>
-#include <trmath.h>
-#include <Game\lara.h>
+#include "control.h"
+#include "trmath.h"
+#include "lara.h"
 
 BEETLE_INFO* LittleBeetles;
 int NextLittleBeetle;
