@@ -68,11 +68,11 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 			if ((sInfo->flags & 1)) // No collision
 				continue;
 
-			int yMin = mesh->y + sInfo->xMinc;
-			int yMax = mesh->y + sInfo->yMaxc;
+			int yMin = mesh->y + sInfo->collisionBox.Y1;
+			int yMax = mesh->y + sInfo->collisionBox.Y2;
 			short yRot = mesh->yRot;
 
-			std::array<float, 4> box{sInfo->xMinc, sInfo->zMinc, sInfo->xMaxc, sInfo->zMaxc};
+			std::array<float, 4> box{sInfo->collisionBox.X1, sInfo->collisionBox.Z1, sInfo->collisionBox.X2, sInfo->collisionBox.Z2};
 			RotateBoundingBox(box, mesh->yRot);
 
 			xMin = box[0];
