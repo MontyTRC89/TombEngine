@@ -22,7 +22,4 @@ short LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 int LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 int LaraLandedBad(ITEM_INFO* l, COLL_INFO* coll);
-int LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll);
-int LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll);
-void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
-int LaraDeflectEdgeDuck(ITEM_INFO* item, COLL_INFO* coll);
+
