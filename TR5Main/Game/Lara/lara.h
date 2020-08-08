@@ -179,7 +179,6 @@ void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle);
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 void LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll);
-void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll);
 int TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_hang_feet(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_hang_feet(ITEM_INFO* item, COLL_INFO* coll);
