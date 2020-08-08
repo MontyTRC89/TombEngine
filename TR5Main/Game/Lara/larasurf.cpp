@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "larasurf.h"
+#include "lara_tests.h"
 #include "control.h"
 #include "camera.h"
 #include "collide.h"
