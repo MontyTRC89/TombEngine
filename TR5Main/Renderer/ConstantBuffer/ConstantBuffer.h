@@ -16,6 +16,7 @@ namespace T5M::Renderer {
 			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			Utils::throwIfFailed(device->CreateBuffer(&desc, NULL, buffer.GetAddressOf()));
+			buffer->SetPrivateData(WKPDID_D3DDebugObjectName, 32, typeid(CBuff).name());
 		}
 		ID3D11Buffer** get() {
 			return buffer.GetAddressOf();

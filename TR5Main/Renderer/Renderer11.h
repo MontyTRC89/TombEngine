@@ -20,20 +20,16 @@
 #include "ConstantBuffers\SpriteBuffer.h"
 #include "RenderTargetCube\RenderTargetCube.h"
 #include "RenderView/RenderView.h"
-
-struct CAMERA_INFO;
-
 #include <level.h>
 #include "ConstantBuffer/ConstantBuffer.h"
 #include "RenderTargetCubeArray/RenderTargetCubeArray.h"
-
+struct CAMERA_INFO;
+#include <wrl/client.h>
 namespace T5M::Renderer
 {
 	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
-	#define MESH_BITS(x) (1 << x)
-	#define DX11_RELEASE(x) if (x != NULL) x->Release()
-	#define DX11_DELETE(x) if (x != NULL) { delete x; x = NULL; }
+
 	constexpr auto NUM_ANIMATED_SETS = 1024;
 	constexpr auto MAX_LIGHTS_DRAW = 16384;
 	constexpr auto MAX_DYNAMIC_LIGHTS = 16384;
@@ -143,10 +139,6 @@ namespace T5M::Renderer
 		float In;
 		float Out;
 		float Range;
-	
-		RendererLight()
-		{
-		}
 	};
 	
 	struct RendererAnimatedTexture 
@@ -355,13 +347,12 @@ namespace T5M::Renderer
 	{
 	private:
 		// Core DX11 objects
-		ID3D11Device* m_device = nullptr;
-		ID3D11DeviceContext* m_context = nullptr;
-		IDXGISwapChain* m_swapChain = nullptr;
-		IDXGIDevice* m_dxgiDevice = nullptr;
-		CommonStates* m_states = nullptr;
-		ID3D11BlendState* m_subtractiveBlendState = nullptr;
-		ID3D11InputLayout* m_inputLayout = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_device = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context = nullptr;
+		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain = nullptr;
+		std::unique_ptr<CommonStates> m_states = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11BlendState> m_subtractiveBlendState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
 		D3D11_VIEWPORT m_viewport;
 		D3D11_VIEWPORT m_shadowMapViewport;
 		Viewport* m_viewportToolkit;
@@ -381,37 +372,31 @@ namespace T5M::Renderer
 		T5M::Renderer::RenderTarget2D m_shadowMap;
 		T5M::Renderer::RenderTargetCube m_reflectionCubemap;
 		// Shaders
-		ID3D11VertexShader* m_vsRooms;
-		ID3D11PixelShader* m_psRooms;
-		ID3D11VertexShader* m_vsItems;
-		ID3D11PixelShader* m_psItems;
-		ID3D11VertexShader* m_vsHairs;
-		ID3D11PixelShader* m_psHairs;
-		ID3D11VertexShader* m_vsStatics;
-		ID3D11PixelShader* m_psStatics;
-		ID3D11VertexShader* m_vsSky;
-		ID3D11PixelShader* m_psSky;
-		ID3D11VertexShader* m_vsSprites;
-		ID3D11PixelShader* m_psSprites;
-		ID3D11VertexShader* m_vsSolid;
-		ID3D11PixelShader* m_psSolid;
-		ID3D11VertexShader* m_vsInventory;
-		ID3D11PixelShader* m_psInventory;
-		ID3D11VertexShader* m_vsFullScreenQuad;
-		ID3D11PixelShader* m_psFullScreenQuad;
-		ID3D11VertexShader* m_vsShadowMap;
-		ID3D11PixelShader* m_psShadowMap;
-		ID3D11VertexShader* m_vsHUD;
-		ID3D11PixelShader* m_psHUDColor;
-		ID3D11PixelShader* m_psHUDTexture;
-		ID3D11PixelShader* m_psHUDBarColor;
-	
-
-		ID3D11SamplerState* m_shadowSampler;
-
-		ID3D11ShaderResourceView* m_shadowMapRV;
-		ID3D11Texture2D* m_shadowMapTexture;
-		ID3D11DepthStencilView* m_shadowMapDSV;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psRooms;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsItems;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psItems;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsHairs;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psHairs;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsStatics;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psStatics;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsSky;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psSky;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsSprites;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psSprites;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsSolid;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psSolid;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsInventory;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psInventory;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsFullScreenQuad;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psFullScreenQuad;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsShadowMap;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psShadowMap;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsHUD;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psHUDColor;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psHUDTexture;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psHUDBarColor;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_shadowSampler;
 	
 	
 		// Constant buffers
@@ -436,12 +421,12 @@ namespace T5M::Renderer
 		CSpriteBuffer m_stSprite;
 		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		// Text and sprites
-		SpriteFont* m_gameFont;
-		SpriteBatch* m_spriteBatch;
+		std::unique_ptr<SpriteFont> m_gameFont;
+		std::unique_ptr<SpriteBatch> m_spriteBatch;
 		std::vector<RendererStringToDraw> m_strings;
 		int m_blinkColorValue;
 		int m_blinkColorDirection;
-		PrimitiveBatch<RendererVertex>* m_primitiveBatch;
+		std::unique_ptr<PrimitiveBatch<RendererVertex>> m_primitiveBatch;
 	
 		// System resources
 		T5M::Renderer::Texture2D m_HUDBarBorderTexture;
@@ -624,12 +609,6 @@ namespace T5M::Renderer
 		int ScreenHeight;
 		bool Windowed;
 		int NumTexturePages;
-		ID3D11Device* getDevice() const {
-			return m_device;
-		}
-		ID3D11DeviceContext* getContext() const {
-			return m_context;
-		};
 		Renderer11();
 		~Renderer11();
 	
@@ -685,7 +664,7 @@ namespace T5M::Renderer
 
 		template <typename C>
 		ConstantBuffer<C> createConstantBuffer() {
-			return ConstantBuffer<C>(m_device);
+			return ConstantBuffer<C>(m_device.Get());
 		}
 
 };
