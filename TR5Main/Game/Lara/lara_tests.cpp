@@ -5,6 +5,7 @@
 #include "laramisc.h"
 #include "draw.h"
 #include "laraclmb.h"
+#include "lara_collide.h"
 
 static short LeftClimbTab[4] = // offset 0xA0638
 {
@@ -1364,4 +1365,17 @@ int LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 	return 0;
 }
-/************************************/
+
+void GetTighRopeFallOff(int regularity)
+{
+	if (LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
+	{
+		LaraItem->goalAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
+		LaraItem->currentAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
+		LaraItem->animNumber = LA_TIGHTROPE_FALL_LEFT;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+	}
+
+	if (!Lara.tightRopeFall && !(GetRandomControl() & regularity))
+		Lara.tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
+}

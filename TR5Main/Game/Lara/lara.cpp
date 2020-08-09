@@ -352,7 +352,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_default_col
 };
 
-void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
+void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll) //hmmmm
 {
 	coll->old.x = item->pos.xPos;
 	coll->old.y = item->pos.yPos;
@@ -473,7 +473,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	TestTriggers(coll->trigger, FALSE, 0);
 }
 
-int UseSpecialItem(ITEM_INFO* item)
+int UseSpecialItem(ITEM_INFO* item) // to pickup.cpp?
 {
 	
 	short selectedObject = g_Inventory.GetSelectedObject();
@@ -918,107 +918,6 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 					GetTighRopeFallOff(1);
 				}
 			}
-		}
-	}
-}
-
-void GetTighRopeFallOff(int regularity)
-{
-	if (LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
-	{
-		LaraItem->goalAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
-		LaraItem->currentAnimState = LS_TIGHTROPE_UNBALANCE_LEFT;
-		LaraItem->animNumber = LA_TIGHTROPE_FALL_LEFT;
-		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-	}
-
-	if (!Lara.tightRopeFall && !(GetRandomControl() & regularity))
-		Lara.tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
-}
-
-void LookLeftRight()
-{
-	Camera.type = LOOK_CAMERA;
-	if (TrInput & IN_LEFT)
-	{
-		TrInput &= ~IN_LEFT;
-		if (Lara.headYrot > -ANGLE(44.0f))
-		{
-			if (BinocularRange)
-				Lara.headYrot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
-			else
-				Lara.headYrot -= ANGLE(2.0f);
-		}
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		TrInput &= ~IN_RIGHT;
-		if (Lara.headYrot < ANGLE(44.0f))
-		{
-			if (BinocularRange)
-				Lara.headYrot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
-			else
-				Lara.headYrot += ANGLE(2.0f);
-		}
-	}
-	if (Lara.gunStatus != LG_HANDS_BUSY && !Lara.leftArm.lock && !Lara.rightArm.lock)
-		Lara.torsoYrot = Lara.headYrot;
-}
-
-void LookUpDown()
-{
-	Camera.type = LOOK_CAMERA;
-	if (TrInput & IN_FORWARD)
-	{
-		TrInput &= ~IN_FORWARD;
-		if (Lara.headXrot > -ANGLE(35.0f))
-		{
-			if (BinocularRange)
-				Lara.headXrot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
-			else
-				Lara.headXrot -= ANGLE(2.0f);
-		}
-	}
-	else if (TrInput & IN_BACK)
-	{
-		TrInput &= ~IN_BACK;
-		if (Lara.headXrot < ANGLE(30.0f))
-		{
-			if (BinocularRange)
-				Lara.headXrot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
-			else
-				Lara.headXrot += ANGLE(2.0f);
-		}
-	}
-	if (Lara.gunStatus != LG_HANDS_BUSY && !Lara.leftArm.lock && !Lara.rightArm.lock)
-		Lara.torsoXrot = Lara.headXrot;
-}
-
-void ResetLook()
-{
-	if (Camera.type != 2)
-	{
-		if (Lara.headXrot <= -ANGLE(2.0f) || Lara.headXrot >= ANGLE(2.0f))
-			Lara.headXrot = Lara.headXrot / -8 + Lara.headXrot;
-		else
-			Lara.headXrot = 0;
-
-		if (Lara.headYrot <= -ANGLE(2.0f) || Lara.headYrot >= ANGLE(2.0f))
-			Lara.headYrot = Lara.headYrot / -8 + Lara.headYrot;
-		else
-			Lara.headYrot = 0;
-
-		if (Lara.gunStatus == LG_HANDS_BUSY || Lara.leftArm.lock || Lara.rightArm.lock)
-		{
-			if (!Lara.headXrot)
-				Lara.torsoXrot = 0;
-			if (!Lara.headYrot)
-				Lara.torsoYrot = 0;
-		}
-		else
-		{
-			Lara.torsoYrot = Lara.headYrot;
-			Lara.torsoXrot = Lara.headXrot;
 		}
 	}
 }
@@ -3994,11 +3893,6 @@ void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll)//1630C(<), 16440(<) (F)
 		LookUpDown();
 }
 
-short GetDirOctant(int rot)//160B4(<), 161E8(<) (F)
-{
-	return abs(rot) >= ANGLE(45) && abs(rot) <= ANGLE(135.0f);
-}
-
 void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)//1605C(<), 16190(<) (F)
 {
 	short roomNum = item->roomNumber;
@@ -5065,89 +4959,6 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	if ((TrInput & (IN_DUCK | IN_LEFT)) != (IN_DUCK | IN_LEFT) || item->hitPoints <= 0)
 		item->goalAnimState = LS_CROUCH_IDLE;
 	item->pos.yRot -= ANGLE(1.5f);
-}
-
-void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F) (D)
-{
-	if (item->currentAnimState == LS_SHIMMY_RIGHT)
-	{
-		switch (angle)
-		{
-		case NORTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x390;
-			return;
-		case EAST:
-			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0x70;
-			return;
-		case SOUTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0x70;
-			return;
-		case WEST:
-		default:
-			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x390;
-			return;
-		}
-	}
-
-	if (item->currentAnimState == LS_SHIMMY_LEFT)
-	{
-		switch (angle)
-		{
-		case NORTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0x70;
-			return;
-		case EAST:
-			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x390;
-			return;
-		case SOUTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x390;
-			return;
-		case WEST:
-		default:
-			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0x70;
-			return;
-		}
-	}
-
-	if (item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
-	{
-		switch (angle)
-		{
-		case NORTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x720;
-			return;
-		case EAST:
-			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0xE0;
-			return;
-		case SOUTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0xE0;
-			return;
-		case WEST:
-		default:
-			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x720;
-			return;
-		}
-	}
-
-	if (item->currentAnimState == LS_SHIMMY_FEET_LEFT)
-	{
-		switch (angle)
-		{
-		case NORTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0xE0;
-			return;
-		case EAST:
-			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x720;
-			return;
-		case SOUTH:
-			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x720;
-			return;
-		case WEST:
-		default:
-			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0xE0;
-			return;
-		}
-	}
 }
 
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)//12B18, 12BC8 (F)
