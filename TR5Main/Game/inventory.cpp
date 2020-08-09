@@ -726,7 +726,7 @@ int Inventory::DoInventory()
 						passportResult == INV_RESULT_LOAD_GAME)
 					{
 						// Fade out
-						g_Renderer.FadeOut();
+						g_Renderer.fadeOut();
 						for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 						{
 							UpdateSceneAndDrawInventory();
@@ -1804,7 +1804,7 @@ bool Inventory::UpdateSceneAndDrawInventory()
 
 	if (CurrentLevel == 0 && g_GameFlow->TitleType == TITLE_FLYBY)
 	{
-		g_Renderer.DrawTitle();
+		g_Renderer.renderTitle();
 		Camera.numberFrames = g_Renderer.SyncRenderer();
 
 		nframes = Camera.numberFrames;
@@ -1812,7 +1812,7 @@ bool Inventory::UpdateSceneAndDrawInventory()
 	}
 	else
 	{
-		g_Renderer.DrawInventory();
+		g_Renderer.renderInventory();
 		g_Renderer.SyncRenderer();
 	}
 
@@ -1831,7 +1831,7 @@ int Inventory::DoTitleInventory()
 	m_activeRing = INV_RING_OPTIONS;
 
 	// Fade in
-	g_Renderer.FadeIn();
+	g_Renderer.fadeIn();
 	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
@@ -1931,7 +1931,7 @@ int Inventory::DoTitleInventory()
 	CloseRing(INV_RING_OPTIONS, true);
 
 	// Fade out
-	g_Renderer.FadeOut();
+	g_Renderer.fadeOut();
 	for (int i = 0; i < FADE_FRAMES_COUNT; i++)
 	{
 		UpdateSceneAndDrawInventory();
@@ -2651,7 +2651,7 @@ void Inventory::DoGraphicsSettings()
 	memcpy(&ring->Configuration, &g_Configuration, sizeof(GameConfiguration));
 
 	// Get current display mode
-	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[ring->Configuration.Adapter];
 	ring->SelectedVideoMode = 0;
 	for (int i = 0; i < adapter->DisplayModes.size(); i++)
@@ -2782,7 +2782,7 @@ void Inventory::DoGraphicsSettings()
 				SaveConfiguration();
 
 				// Reset screen and go back
-				g_Renderer.ChangeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 
+				g_Renderer.changeScreenResolution(ring->Configuration.Width, ring->Configuration.Height, 
 												   ring->Configuration.RefreshRate, ring->Configuration.Windowed);
 				closeObject = true;
 

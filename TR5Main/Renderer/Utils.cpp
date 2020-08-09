@@ -1,12 +1,17 @@
 #include "framework.h"
 #include "Utils.h"
 #include <winerror.h>
+#include <iostream>
 namespace T5M::Renderer::Utils {
 	using std::wstring;
 	using std::string;
 	void Utils::throwIfFailed(const HRESULT& res) noexcept {
-		if(FAILED(res))
-			throw std::exception("An error occured!");
+		if(FAILED(res)){
+			std::string message = std::system_category().message(res);
+			std::cout << message << std::endl;
+			throw std::runtime_error("An error occured!");
+		}
+			
 	}
 
 	ID3D11VertexShader* compileVertexShader(ID3D11Device* device, const wstring& fileName, const string& function, const string& model, const D3D_SHADER_MACRO* defines, ID3D10Blob** bytecode) {

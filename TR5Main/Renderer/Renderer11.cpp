@@ -33,7 +33,7 @@ namespace T5M::Renderer {
 	}
 
 	Renderer11::~Renderer11() {
-		FreeRendererData();
+		freeRendererData();
 
 		DX11_RELEASE(m_backBufferRTV);
 		DX11_RELEASE(m_backBufferTexture);
@@ -69,7 +69,8 @@ namespace T5M::Renderer {
 		DX11_RELEASE(m_device);
 	}
 
-	void Renderer11::FreeRendererData() {
+	void Renderer11::freeRendererData()
+{
 		m_meshPointersToMesh.clear();
 		m_moveableObjects.clear();
 		m_staticObjects.clear();
@@ -110,7 +111,7 @@ namespace T5M::Renderer {
 		return nf;
 	}
 
-	void Renderer11::UpdateProgress(float value) {
+	void Renderer11::updateProgress(float value) {
 		m_progress = value;
 	}
 
@@ -119,7 +120,7 @@ namespace T5M::Renderer {
 	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
 		for (int i = 0; i < 6; i++) {
 			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,Camera.pos.roomNumber,10,20480, 90* RADIAN);
-			drawSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
+			renderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
 		}
 	}
