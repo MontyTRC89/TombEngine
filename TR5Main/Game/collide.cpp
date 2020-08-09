@@ -61,7 +61,7 @@ int CollideStaticObjects(COLL_INFO* coll, int x, int y, int z, short roomNumber,
 	for (int i = 0; i < numRooms; i++)
 	{
 		room = &g_Level.Rooms[roomList[i]];
-		for (int j = room->mesh.size(); j > 0; j--, mesh++)
+		for (int j = 0; j < room->mesh.size(); j++, mesh++)
 		{
 			mesh = &room->mesh[j];
 			STATIC_INFO* sInfo = &StaticObjects[mesh->staticNumber];
