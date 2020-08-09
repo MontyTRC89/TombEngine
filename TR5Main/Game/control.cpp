@@ -2,6 +2,7 @@
 #include "collide.h"
 #include "control.h"
 #include "pickup.h"
+#include "puzzles_keys.h"
 #include "camera.h"
 #include "Lara.h"
 #include "hair.h"
