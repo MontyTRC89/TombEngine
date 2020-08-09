@@ -1163,7 +1163,7 @@ void KillAllCurrentItems(short itemNumber)
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
-	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
+	g_Renderer.addDynamicLight(x, y, z, falloff, r, g, b);
 }
 
 // Really needed?

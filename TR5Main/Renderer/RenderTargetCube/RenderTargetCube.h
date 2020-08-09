@@ -36,6 +36,6 @@ namespace T5M::Renderer {
 		int resolution;
 		D3D11_VIEWPORT viewport;
 		RenderTargetCube() : resolution(0), viewport({}) {};
-		RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT format);
+		RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT format, DXGI_FORMAT depthFormat = DXGI_FORMAT_D32_FLOAT);
 	};
 }

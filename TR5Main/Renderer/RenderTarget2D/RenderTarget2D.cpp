@@ -3,14 +3,14 @@
 #include "Utils.h"
 namespace T5M::Renderer {
 	using T5M::Renderer::Utils::throwIfFailed;
-	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT format) {
+	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) {
 
 		D3D11_TEXTURE2D_DESC desc = {};
 		desc.Width = w;
 		desc.Height = h;
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
-		desc.Format = format;
+		desc.Format = colorFormat;
 		desc.SampleDesc.Count = 1;
 		desc.SampleDesc.Quality = 0;
 		desc.Usage = D3D11_USAGE_DEFAULT;
@@ -46,7 +46,7 @@ namespace T5M::Renderer {
 		depthTexDesc.ArraySize = 1;
 		depthTexDesc.SampleDesc.Count = 1;
 		depthTexDesc.SampleDesc.Quality = 0;
-		depthTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthTexDesc.Format = depthFormat;
 		depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
 		depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		depthTexDesc.CPUAccessFlags = 0;

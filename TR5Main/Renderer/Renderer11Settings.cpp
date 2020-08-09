@@ -2,11 +2,12 @@
 #include "Renderer11.h"
 #include "winmain.h"
 namespace T5M::Renderer {
-	bool Renderer11::ToggleFullScreen() {
-		return true;
+	void Renderer11::toggleFullScreen()
+{
+		
 	}
 
-	bool Renderer11::ChangeScreenResolution(int width, int height, int frequency, bool windowed) {
+	void Renderer11::changeScreenResolution(int width, int height, int frequency, bool windowed) {
 		HRESULT res;
 
 		/*if (windowed && !Windowed)
@@ -150,20 +151,14 @@ namespace T5M::Renderer {
 			return false;*/
 
 		IDXGIOutput* output;
-		res = m_swapChain->GetContainingOutput(&output);
-		if (FAILED(res))
-			return false;
+		Utils::throwIfFailed(m_swapChain->GetContainingOutput(&output));
 
 		DXGI_SWAP_CHAIN_DESC scd;
-		res = m_swapChain->GetDesc(&scd);
-		if (FAILED(res))
-			return false;
+		Utils::throwIfFailed(m_swapChain->GetDesc(&scd));
 
 		UINT numModes = 1024;
 		DXGI_MODE_DESC modes[1024];
-		res = output->GetDisplayModeList(scd.BufferDesc.Format, 0, &numModes, modes);
-		if (FAILED(res))
-			return false;
+		Utils::throwIfFailed(output->GetDisplayModeList(scd.BufferDesc.Format, 0, &numModes, modes));
 
 		DXGI_MODE_DESC* mode = &modes[0];
 		for (int i = 0; i < numModes; i++) {
@@ -172,17 +167,12 @@ namespace T5M::Renderer {
 				break;
 		}
 
-		res = m_swapChain->ResizeTarget(mode);
-		if (FAILED(res))
-			return false;
+		Utils::throwIfFailed( m_swapChain->ResizeTarget(mode));
 
-		if (!initialiseScreen(width, height, frequency, windowed, WindowsHandle, true))
-			return false;
+		initialiseScreen(width, height, frequency, windowed, WindowsHandle, true);
 
 		ScreenWidth = width;
 		ScreenHeight = height;
 		Windowed = windowed;
-
-		return true;
 	}
 }

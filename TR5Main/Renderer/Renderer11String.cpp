@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer11.h"
 namespace T5M::Renderer {
-	bool Renderer11::PrintString(int x, int y, char* string, D3DCOLOR color, int flags) {
+	void Renderer11::drawString(int x, int y, char* string, D3DCOLOR color, int flags) {
 		int realX = x;
 		int realY = y;
 		float factorX = ScreenWidth / 800.0f;
@@ -59,10 +59,10 @@ namespace T5M::Renderer {
 
 		m_strings.push_back(str);
 
-		return true;
 	}
 
-	bool Renderer11::drawAllStrings() {
+	void Renderer11::drawAllStrings()
+{
 		m_spriteBatch->Begin();
 
 		for (int i = 0; i < m_strings.size(); i++) {
@@ -80,7 +80,6 @@ namespace T5M::Renderer {
 
 		m_spriteBatch->End();
 
-		return true;
 	}
 
 }
