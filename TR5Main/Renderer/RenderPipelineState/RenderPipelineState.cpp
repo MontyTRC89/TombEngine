@@ -5,8 +5,9 @@ namespace T5M::Renderer {
 	using namespace Utils;
 	RenderPipelineState::RenderPipelineState(ID3D11Device* device, const ShaderCompileOptions& vertexShader, const ShaderCompileOptions& pixelShader, const BlendStateOptions& blendingOptions)
 	{
-		this->vertexShader = compileVertexShader(device, vertexShader.fileName.c_str(), vertexShader.functionName.c_str(), vertexShader.profile.c_str(),nullptr, nullptr);
-		this->pixelShader = compilePixelShader(device, pixelShader.fileName.c_str(), pixelShader.functionName.c_str(), pixelShader.profile.c_str(), nullptr, nullptr);
+		ComPtr<ID3D10Blob> blob;
+		this->vertexShader = compileVertexShader(device, vertexShader.fileName.c_str(), vertexShader.functionName.c_str(), vertexShader.profile.c_str(),nullptr, blob);
+		this->pixelShader = compilePixelShader(device, pixelShader.fileName.c_str(), pixelShader.functionName.c_str(), pixelShader.profile.c_str(), nullptr, blob);
 		D3D11_BLEND_DESC blndDesc = {};
 		blndDesc.IndependentBlendEnable = blendingOptions.blendingEnabled;
 		blndDesc.AlphaToCoverageEnable = false;
