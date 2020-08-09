@@ -448,11 +448,9 @@ void LaraGun() // (F) (D)
 			case WEAPON_SHOTGUN:
 			case WEAPON_CROSSBOW:
 			case WEAPON_HK:
-#if 0
 			case WEAPON_GRENADE_LAUNCHER:
 			case WEAPON_ROCKET_LAUNCHER:
 			case WEAPON_HARPOON_GUN:
-#endif
 				if (Camera.type != CINEMATIC_CAMERA && Camera.type != LOOK_CAMERA && Camera.type != HEAVY_CAMERA)
 					Camera.type = COMBAT_CAMERA;
 				draw_shotgun(Lara.gunType);
@@ -487,11 +485,9 @@ void LaraGun() // (F) (D)
 				case WEAPON_SHOTGUN:
 				case WEAPON_CROSSBOW:
 				case WEAPON_HK:
-#if 0
 				case WEAPON_GRENADE_LAUNCHER:
 				case WEAPON_ROCKET_LAUNCHER:
 				case WEAPON_HARPOON_GUN:
-#endif
 					undraw_shotgun(Lara.gunType);
 					break;
 
@@ -534,11 +530,9 @@ void LaraGun() // (F) (D)
 				case WEAPON_SHOTGUN:
 				case WEAPON_CROSSBOW:
 				case WEAPON_HK:
-#if 0
 				case WEAPON_GRENADE_LAUNCHER:
 				case WEAPON_ROCKET_LAUNCHER:
 				case WEAPON_HARPOON_GUN:
-#endif
 				case WEAPON_REVOLVER:
 					RifleHandler(Lara.gunType);
 					break;
