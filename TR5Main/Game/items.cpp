@@ -279,12 +279,12 @@ void InitialiseFXArray(int allocmem)
 
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
-	for (int i = 1; i < NUM_EFFECTS; i++, fx++)
+	for (int i = 0; i < NUM_EFFECTS; i++)
 	{
 		fx = &EffectList[i];
-		fx->nextFx = i;
+		fx->nextFx = i + 1;
 	}
-	fx->nextFx = -1;
+	EffectList[NUM_EFFECTS - 1].nextFx = NO_ITEM;
 }
 
 void RemoveDrawnItem(short itemNum) 
