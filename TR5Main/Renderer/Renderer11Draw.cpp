@@ -33,14 +33,13 @@ namespace T5M::Renderer
     using namespace T5M::Renderer;
     using namespace std::chrono;
 
-    int Renderer11::DrawPickup(short objectNum)
+    void Renderer11::drawPickup(short objectNum)
     {
         drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
         m_pickupRotation += 45 * 360 / 30;
-        return 0;
     }
 
-    bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)
+    void Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)
     {
         Matrix translation;
         Matrix rotation;
@@ -137,10 +136,9 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawShadowMap(RenderView &renderView)
+    void Renderer11::renderShadowMap(RenderView& renderView)
     {
         m_shadowLight = NULL;
         RendererLight *brightestLight = NULL;
@@ -219,7 +217,7 @@ namespace T5M::Renderer
         m_shadowLight = brightestLight;
 
         if (m_shadowLight == NULL)
-            return true;
+            return;
 
         // Reset GPU state
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -238,7 +236,7 @@ namespace T5M::Renderer
         Vector3 lightPos = Vector3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
         Vector3 itemPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
         if (lightPos == itemPos)
-            return true;
+            return;
 
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -380,11 +378,10 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::DoTitleImage()
-    {
+    void Renderer11::renderTitleImage()
+{
         wchar_t introFileChars[255];
 
         std::mbstowcs(introFileChars, g_GameFlow->Intro, 255);
@@ -415,11 +412,10 @@ namespace T5M::Renderer
             currentFade -= FADE_FACTOR;
             m_swapChain->Present(0, 0);
         }
-        return true;
     }
 
-    bool Renderer11::drawGunShells()
-    {
+    void Renderer11::drawGunShells()
+{
         RendererRoom &const room = m_rooms[LaraItem->roomNumber];
         RendererItem *item = &m_items[Lara.itemNumber];
 
@@ -468,10 +464,9 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    int Renderer11::drawInventoryScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, ID3D11ShaderResourceView *background)
+    void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
     {
         char stringBuffer[255];
 
@@ -558,7 +553,7 @@ namespace T5M::Renderer
 
             // Yellow title
             if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory.GetType() != INV_TYPE_TITLE)
-                PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+                drawString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
             for (int i = 0; i < numObjects; i++)
             {
@@ -680,17 +675,17 @@ namespace T5M::Renderer
                                 for (int n = 0; n < MAX_SAVEGAMES; n++)
                                 {
                                     if (!g_NewSavegameInfos[n].Present)
-                                        PrintString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
+                                        drawString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
                                                     PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
                                     else
                                     {
                                         sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n].Count);
-                                        PrintString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                                        drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                                        PrintString(250, y, (char *)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                                        drawString(250, y, (char *)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
                                         sprintf(stringBuffer, g_GameFlow->GetString(44), g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
-                                        PrintString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+                                        drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
                                                     PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
                                     }
 
@@ -725,7 +720,7 @@ namespace T5M::Renderer
                                 for (int n = 1; n < g_GameFlow->GetNumLevels(); n++)
                                 {
                                     GameScriptLevel *levelScript = g_GameFlow->GetLevel(n);
-                                    PrintString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
+                                    drawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
                                                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n - 1 ? PRINTSTRING_BLINK : 0));
 
                                     lastY += 24;
@@ -754,7 +749,7 @@ namespace T5M::Renderer
                                 break;
                             }
 
-                            PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+                            drawString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
                         }
                         /* **************** GRAPHICS SETTINGS ************* */
                         else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
@@ -764,13 +759,13 @@ namespace T5M::Renderer
 
                             int y = 200;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
                                         PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
                             y += 25;
 
                             // Screen resolution
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
@@ -779,59 +774,59 @@ namespace T5M::Renderer
                             ZeroMemory(buffer, 255);
                             sprintf(buffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
 
-                            PrintString(400, y, buffer, PRINTSTRING_COLOR_WHITE,
+                            drawString(400, y, buffer, PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Windowed mode
-                            PrintString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
+                            drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.Windowed ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.Windowed ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable dynamic shadows
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable caustics
-                            PrintString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
+                            drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable volumetric fog
-                            PrintString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
+                            drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Apply and cancel
-                            PrintString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 6 ? PRINTSTRING_BLINK : 0));
 
@@ -854,56 +849,56 @@ namespace T5M::Renderer
 
                             y = 200;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_SOUND),
+                            drawString(400, y, g_GameFlow->GetString(STRING_SOUND),
                                         PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
                             y += 25;
 
                             // Enable sound
-                            PrintString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
+                            drawString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable sound special effects
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Music volume
-                            PrintString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
+                            drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
                             //DrawBar(400, y + 4, 150, 18, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
-                            DrawBar(ring->Configuration.MusicVolume / 100.0f, g_MusicVolumeBar);
+                            drawBar(ring->Configuration.MusicVolume / 100.0f, g_MusicVolumeBar);
 
                             y += 25;
 
                             // Sound FX volume
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
                             //DrawBar(400, y + 4, 150, 18, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
-                            DrawBar(ring->Configuration.SfxVolume / 100.0f, g_SFXVolumeBar);
+                            drawBar(ring->Configuration.SfxVolume / 100.0f, g_SFXVolumeBar);
                             y += 25;
 
                             // Apply and cancel
-                            PrintString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 
@@ -925,27 +920,27 @@ namespace T5M::Renderer
                             // Draw sound menu
                             y = 40;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
                                         PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
                             y += 25;
 
                             for (int k = 0; k < 18; k++)
                             {
-                                PrintString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
+                                drawString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
                                             PRINTSTRING_COLOR_WHITE,
                                             PRINTSTRING_OUTLINE | (ring->selectedIndex == k ? PRINTSTRING_BLINK : 0) |
                                                 (ring->waitingForKey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
                                 if (ring->waitingForKey && k == ring->selectedIndex)
                                 {
-                                    PrintString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
+                                    drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
                                                 PRINTSTRING_COLOR_YELLOW,
                                                 PRINTSTRING_OUTLINE | PRINTSTRING_BLINK);
                                 }
                                 else
                                 {
-                                    PrintString(400, y, (char *)g_KeyNames[KeyboardLayout[1][k]],
+                                    drawString(400, y, (char *)g_KeyNames[KeyboardLayout[1][k]],
                                                 PRINTSTRING_COLOR_ORANGE,
                                                 PRINTSTRING_OUTLINE);
                                 }
@@ -954,13 +949,13 @@ namespace T5M::Renderer
                             }
 
                             // Apply and cancel
-                            PrintString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == NUM_CONTROLS + 0 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == NUM_CONTROLS + 1 ? PRINTSTRING_BLINK : 0));
 
@@ -980,7 +975,7 @@ namespace T5M::Renderer
                         {
                             // Draw the description below the object
                             char *string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
-                            PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+                            drawString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
                         }
                     }
                     else
@@ -1005,7 +1000,7 @@ namespace T5M::Renderer
                                     stringIndex = STRING_CHOOSE_AMMO;
 
                                 // Apply and cancel
-                                PrintString(400, y, g_GameFlow->GetString(stringIndex),
+                                drawString(400, y, g_GameFlow->GetString(stringIndex),
                                             PRINTSTRING_COLOR_WHITE,
                                             PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == a ? PRINTSTRING_BLINK : 0));
 
@@ -1111,11 +1106,11 @@ namespace T5M::Renderer
                         }
 
                         if (quantity < 1)
-                            PrintString(400, 550, string, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
+                            drawString(400, 550, string, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
                         else
                         {
                             sprintf(stringBuffer, "%d x %s", quantity, string);
-                            PrintString(400, 550, stringBuffer, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
+                            drawString(400, 550, stringBuffer, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
                         }
                     }
                 }
@@ -1154,10 +1149,9 @@ namespace T5M::Renderer
             m_spriteBatch->End();
         }
 
-        return 0;
     }
 
-    bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView *texture, Vector3 color, bool cinematicBars)
+    void Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool cinematicBars)
     {
         RendererVertex vertices[4];
 
@@ -1238,11 +1232,10 @@ namespace T5M::Renderer
         m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
         m_primitiveBatch->End();
 
-        return true;
     }
 
-    bool Renderer11::drawRopes()
-    {
+    void Renderer11::drawRopes()
+{
         for (int n = 0; n < NumRopes; n++)
         {
             ROPE_STRUCT *rope = &Ropes[n];
@@ -1342,7 +1335,7 @@ namespace T5M::Renderer
                     Vector3 p3 = m_viewportToolkit->Unproject(Vector3(x3, y3, depth), Projection, View, world);
                     Vector3 p4 = m_viewportToolkit->Unproject(Vector3(x4, y4, depth), Projection, View, world);
 
-                    AddSprite3D(&m_sprites[20],
+                    addSprite3D(&m_sprites[20],
                                 Vector3(p1.x, p1.y, p1.z),
                                 Vector3(p2.x, p2.y, p2.z),
                                 Vector3(p3.x, p3.y, p3.z),
@@ -1357,11 +1350,10 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawLines2D()
-    {
+    void Renderer11::drawLines2D()
+{
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -1412,11 +1404,10 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-        return true;
     }
 
-    bool Renderer11::drawSpiders()
-    {
+    void Renderer11::drawSpiders()
+{
         /*XMMATRIX world;
         UINT cPasses = 1;
 
@@ -1479,12 +1470,10 @@ namespace T5M::Renderer
                 }
             }
         }*/
-
-        return true;
     }
 
-    bool Renderer11::drawRats()
-    {
+    void Renderer11::drawRats()
+{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -1531,11 +1520,10 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawBats()
-    {
+    void Renderer11::drawBats()
+{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -1582,11 +1570,10 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-	bool Renderer11::drawLittleBeetles()
-	{
+	void Renderer11::drawLittleBeetles()
+{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -1632,13 +1619,11 @@ namespace T5M::Renderer
 				}
 			}
 		}
-
-		return true;
 	}
 
 
-    bool Renderer11::doSnow()
-    {
+    void Renderer11::doSnow()
+{
         if (m_firstWeather)
         {
             for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
@@ -1683,7 +1668,7 @@ namespace T5M::Renderer
                 continue;
             }
 
-            AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
+            addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
                                0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
                                BLENDMODE_ALPHABLEND);
 
@@ -1696,11 +1681,10 @@ namespace T5M::Renderer
 
         m_firstWeather = false;
 
-        return true;
     }
 
-    bool Renderer11::doRain()
-    {
+    void Renderer11::doRain()
+{
         if (m_firstWeather)
         {
             for (int i = 0; i < NUM_RAIN_DROPS; i++)
@@ -1753,7 +1737,7 @@ namespace T5M::Renderer
             drop->Z += dz;
 
             if (drop->Draw)
-                AddLine3D(Vector3(x1, y1, z1), Vector3(drop->X, drop->Y, drop->Z), Vector4(RAIN_COLOR, RAIN_COLOR, RAIN_COLOR, 1.0f));
+                addLine3D(Vector3(x1, y1, z1), Vector3(drop->X, drop->Y, drop->Z), Vector4(RAIN_COLOR, RAIN_COLOR, RAIN_COLOR, 1.0f));
 
             // If rain drop has hit the ground, then reset it and add a little drip
             short roomNumber = Camera.pos.roomNumber;
@@ -1767,12 +1751,10 @@ namespace T5M::Renderer
         }
 
         m_firstWeather = false;
-
-        return true;
     }
 
-    bool Renderer11::drawLines3D()
-    {
+    void Renderer11::drawLines3D()
+{
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -1805,10 +1787,9 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-        return true;
     }
 
-    void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
+    void Renderer11::addLine3D(Vector3 start, Vector3 end, Vector4 color)
     {
         if (m_nextLine3D >= MAX_LINES_3D)
             return;
@@ -1822,7 +1803,7 @@ namespace T5M::Renderer
         m_lines3DToDraw.push_back(line);
     }
 
-    void Renderer11::DrawLoadingScreen(std::wstring &fileName)
+    void Renderer11::renderLoadingScreen(std::wstring& fileName)
     {
         return;
         /*
@@ -1875,7 +1856,7 @@ namespace T5M::Renderer
         */
     }
 
-    void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
+    void Renderer11::addDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
     {
         if (m_nextLight >= MAX_LIGHTS)
             return;
@@ -1893,53 +1874,12 @@ namespace T5M::Renderer
         //NumDynamics++;
     }
 
-    void Renderer11::ClearDynamicLights()
-    {
+    void Renderer11::clearDynamicLights()
+{
         m_dynamicLights.clear();
     }
 
-    int Renderer11::drawFinalPass()
-    {
-        return 0;
-        /*
-        // Update fade status
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor > 0.99f)
-            m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
-
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor <= 0.01f)
-            m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
-
-        // Reset GPU state
-        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-        m_context->RSSetState(m_states->CullCounterClockwise());
-        m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
-        m_context->ClearRenderTargetView(target, Colors::Black);
-        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        m_context->OMSetRenderTargets(1, &target, depthTarget);
-
-        drawFullScreenQuad(m_renderTarget.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
-
-        m_swapChain->Present(0, 0);
-
-        // Update fade status
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor < 1.0f) {
-            m_fadeFactor += FADE_FACTOR;
-            if (m_fadeFactor >= 0.9f)
-                m_fadeFactor = 1.0f;
-        }
-
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeStatus > 0.0f) {
-            m_fadeFactor -= FADE_FACTOR;
-            if (m_fadeFactor <= 0.1f)
-                m_fadeFactor = 0.0f;
-        }
-
-        return 0;
-        */
-    }
-
-    bool Renderer11::drawFullScreenImage(ID3D11ShaderResourceView *texture, float fade, ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget)
+    void Renderer11::drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget)
     {
         // Reset GPU state
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -1948,32 +1888,29 @@ namespace T5M::Renderer
         m_context->OMSetRenderTargets(1, &target, depthTarget);
         m_context->RSSetViewports(1, &m_viewport);
         drawFullScreenQuad(texture, Vector3(fade, fade, fade), false);
-        return true;
     }
 
-    int Renderer11::DrawInventory()
-    {
+    void Renderer11::renderInventory()
+{
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
         m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-        drawInventoryScene(m_backBufferRTV, m_depthStencilView, m_dumpScreenRenderTarget.ShaderResourceView.Get());
+        renderInventoryScene(m_backBufferRTV, m_depthStencilView, m_dumpScreenRenderTarget.ShaderResourceView.Get());
         m_swapChain->Present(0, 0);
-        return 0;
     }
 
-    int Renderer11::DrawTitle()
-    {
+    void Renderer11::renderTitle()
+{
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
         m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
 
-        drawScene(m_backBufferRTV, m_depthStencilView, gameCamera);
+        renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-        drawInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
+        renderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
         m_swapChain->Present(0, 0);
-        return 0;
     }
 
-    bool Renderer11::drawScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, RenderView &view)
+    void Renderer11::renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
@@ -2000,11 +1937,11 @@ namespace T5M::Renderer
         //prepareCameraForFrame();
         clearSceneItems();
         collectRooms(view);
-        UpdateLaraAnimations(false);
+        updateLaraAnimations(false);
         updateItemsAnimations(view);
         updateEffects(view);
         if (g_Configuration.EnableShadows)
-            drawShadowMap(view);
+            renderShadowMap(view);
         m_items[Lara.itemNumber].Item = LaraItem;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
 
@@ -2115,7 +2052,7 @@ namespace T5M::Renderer
         // Bars
         int flash = FlashIt();
         if (DashTimer < 120)
-            DrawBar(DashTimer / 120.0f, g_DashBar);
+            drawBar(DashTimer / 120.0f, g_DashBar);
         UpdateHealthBar(flash);
         UpdateAirBar(flash);
         DrawAllPickups();
@@ -2161,10 +2098,9 @@ namespace T5M::Renderer
 
         drawAllStrings();
 
-        return true;
     }
 
-    bool Renderer11::drawSimpleScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, RenderView &view)
+    void Renderer11::renderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
         GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -2194,16 +2130,14 @@ namespace T5M::Renderer
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
-        return true;
     }
 
-    int Renderer11::DumpGameScene()
-    {
-        drawScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(), gameCamera);
-        return 0;
+    void Renderer11::DumpGameScene()
+{
+        renderScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(), gameCamera);
     }
 
-    bool Renderer11::drawItems(bool transparent, bool animated, RenderView &view)
+    void Renderer11::drawItems(bool transparent, bool animated, RenderView& view)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2266,10 +2200,9 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawAnimatingItem(RendererItem *item, bool transparent, bool animated)
+    void Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool animated)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2278,7 +2211,7 @@ namespace T5M::Renderer
         int lastBucket = (transparent ? 4 : 2);
         if (m_rooms.size() <= item->Item->roomNumber)
         {
-            return true;
+            return;
         }
         RendererRoom &const room = m_rooms[item->Item->roomNumber];
         RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
@@ -2331,10 +2264,9 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawScaledSpikes(RendererItem *item, bool transparent, bool animated)
+    void Renderer11::drawScaledSpikes(RendererItem* item, bool transparent, bool animated)
     {
         short objectNumber = item->Item->objectNumber;
         if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
@@ -2346,13 +2278,13 @@ namespace T5M::Renderer
         }
     }
 
-	bool Renderer11::drawWraithExtra(RendererItem* item, bool transparent, bool animated)
+	void Renderer11::drawWraithExtra(RendererItem* item, bool transparent, bool animated)
 	{
 		ITEM_INFO* nativeItem = item->Item;
 		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
 		
 		if (transparent || animated)
-			return true;
+			return ;
 
 		for (int j = 0; j <= 4; j++)
 		{
@@ -2395,14 +2327,13 @@ namespace T5M::Renderer
 				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
 				Vector3 p2 = Vector3(info[i + 1].xPos , info[i + 1].yPos, info[i + 1].zPos);
 
-				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
+				addLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}
 		}
 
-		return true;
 	}
 
-    bool Renderer11::drawStatics(bool transparent, RenderView &view)
+    void Renderer11::drawStatics(bool transparent, RenderView& view)
     {
         //return true;
         UINT stride = sizeof(RendererVertex);
@@ -2459,11 +2390,9 @@ namespace T5M::Renderer
                 }
             }
         }
-
-        return true;
     }
 
-    bool Renderer11::drawRooms(bool transparent, bool animated, RenderView &view)
+    void Renderer11::drawRooms(bool transparent, bool animated, RenderView& view)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2570,18 +2499,16 @@ namespace T5M::Renderer
 
         if (animated)
             m_primitiveBatch->End();
-
-        return true;
     }
 
-    bool Renderer11::drawHorizonAndSky(ID3D11DepthStencilView *depthTarget)
+    void Renderer11::drawHorizonAndSky(ID3D11DepthStencilView* depthTarget)
     {
         // Update the sky
         GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
         Vector4 color = Vector4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
         if (!level->Horizon)
-            return true;
+            return ;
 
         if (BinocularRange)
             AlterFOV(14560 - BinocularRange);
@@ -2739,22 +2666,15 @@ namespace T5M::Renderer
         // Clear just the Z-buffer so we can start drawing on top of the horizon
         m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-        return true;
     }
 
-    bool Renderer11::drawAmbientCubeMap(short roomNumber)
-    {
-        return true;
-    }
-
-    int Renderer11::Draw()
-    {
+    void Renderer11::Draw()
+{
 
         renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
-        drawScene(m_backBufferRTV, m_depthStencilView, gameCamera);
+        renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();
         //drawFinalPass();
         m_swapChain->Present(0, 0);
-        return 0;
     }
 } // namespace T5M::Renderer

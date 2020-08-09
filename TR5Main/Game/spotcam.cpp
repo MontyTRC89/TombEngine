@@ -165,7 +165,7 @@ void InitialiseSpotCam(short Sequence)
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
 		DisableLaraControl = 1;
-		g_Renderer.EnableCinematicBars(true);
+		g_Renderer.enableCinematicBars(true);
 		//SetFadeClip(16, 1);
 	}
 
@@ -659,7 +659,7 @@ void CalculateSpotCameras()
 					{
 						//SetFadeClip(16, 1);
 						if (CurrentLevel)
-							g_Renderer.EnableCinematicBars(true);
+							g_Renderer.enableCinematicBars(true);
 						DisableLaraControl = true;
 					}
 
@@ -760,7 +760,7 @@ void CalculateSpotCameras()
 					}
 
 					//SetFadeClip(0, 1);
-					g_Renderer.EnableCinematicBars(false);
+					g_Renderer.enableCinematicBars(false);
 
 					UseSpotCam = 0;
 					DisableLaraControl = 0;
@@ -870,7 +870,7 @@ void CalculateSpotCameras()
 	}
 	else
 	{
-		g_Renderer.EnableCinematicBars(false);
+		g_Renderer.enableCinematicBars(false);
 		UseSpotCam = false;
 		DisableLaraControl = false;
 		Camera.speed = 1;

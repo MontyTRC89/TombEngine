@@ -13,7 +13,7 @@
 using namespace T5M::Renderer;
 
 extern GameFlow *g_GameFlow;
-void Renderer11::UpdateLaraAnimations(bool force)
+void Renderer11::updateLaraAnimations(bool force)
 {
 	Matrix translation;
 	Matrix rotation;
@@ -138,11 +138,11 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
-bool Renderer11::drawLara(bool transparent, bool shadowMap)
+void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
-		return true;
+		return;
 
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
@@ -277,8 +277,6 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 			}
 		}	
 	}
-
-	return true;
 }
 
 void Renderer11::drawLaraHolsters(bool transparent)
