@@ -211,7 +211,7 @@ int GetCollidedObjects(ITEM_INFO* collidingItem, int radius, int onlyVisible, IT
 
 					ANIM_FRAME* framePtr = GetBestFrame(item);
 
-					if (Objects[item->objectNumber].drawRoutine
+					if ((Objects[item->objectNumber].drawRoutine || item->objectNumber == ID_LARA)
 						&& item->meshBits
 						&& (!onlyVisible || item->status != ITEM_INVISIBLE)
 						&& dx >= -2048
