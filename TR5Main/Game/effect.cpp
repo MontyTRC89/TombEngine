@@ -18,6 +18,7 @@
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
 #include "pickup.h"
+#include "puzzles_keys.h"
 #include "larafire.h"
 
 using std::function;
