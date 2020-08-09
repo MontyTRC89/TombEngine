@@ -138,7 +138,7 @@ void LaraCheatGetStuff() // (F) (D)
 		Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1] = -1;
 	}
 
-/*	if (Objects[ID_HARPOON_ITEM].loaded)
+	if (Objects[ID_HARPOON_ITEM].loaded)
 	{
 		Lara.Weapons[WEAPON_HARPOON_GUN].Present = true;
 		Lara.Weapons[WEAPON_HARPOON_GUN].SelectedAmmo = WEAPON_AMMO1;
@@ -164,7 +164,7 @@ void LaraCheatGetStuff() // (F) (D)
 		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].HasLasersight = false;
 		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].HasSilencer = false;
 		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1] = -1;
-	}*/
+	}
 
 	if (Objects[ID_HK_ITEM].loaded)
 	{
@@ -175,7 +175,7 @@ void LaraCheatGetStuff() // (F) (D)
 		Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] = -1;
 	}
 
-/*	if (Objects[ID_CROSSBOW_ITEM].loaded)
+	if (Objects[ID_CROSSBOW_ITEM].loaded)
 	{
 		Lara.Weapons[ID_CROSSBOW_ITEM].Present = true;
 		Lara.Weapons[ID_CROSSBOW_ITEM].SelectedAmmo = WEAPON_AMMO1;
@@ -184,9 +184,7 @@ void LaraCheatGetStuff() // (F) (D)
 		Lara.Weapons[ID_CROSSBOW_ITEM].Ammo[WEAPON_AMMO1] = -1;
 		Lara.Weapons[ID_CROSSBOW_ITEM].Ammo[WEAPON_AMMO2] = -1;
 		Lara.Weapons[ID_CROSSBOW_ITEM].Ammo[WEAPON_AMMO3] = -1;
-	}*/
-
-	/*Commented out the blocks for weapons that don't work ingame, after they're fixed, it'll be okay to uncomment*/
+	}
 
 	g_Inventory.LoadObjects(false);
 }
