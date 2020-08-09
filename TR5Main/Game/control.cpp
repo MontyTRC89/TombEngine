@@ -41,13 +41,16 @@
 #include "tr4_locusts.h"
 #include "smoke.h"
 #include "spark.h"
+#include <tr4_littlebeetle.h>
 #include "explosion.h"
 #include "drip.h"
+
 using std::vector;
 using namespace T5M::Effects::Explosion;
 using namespace T5M::Effects::Spark;
 using namespace T5M::Effects::Smoke;
 using T5M::Renderer::g_Renderer;
+
 short ShatterSounds[18][10] =
 	{
 		{SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS, SFX_SMASH_GLASS},
@@ -147,11 +150,13 @@ short FlashFadeR;
 short FlashFadeG;
 short FlashFadeB;
 short FlashFader;
-short IsRoomOutsideNo;
 
 int TiltXOffset;
 int TiltYOffset;
 int FramesCount;
+
+std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
+short IsRoomOutsideNo;
 
 extern GameFlow *g_GameFlow;
 extern GameScript *g_GameScript;
@@ -261,7 +266,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || SniperCameraActive || UseSpotCam || TrackCameraInit ||
-				((LaraItem->currentAnimState != STATE_LARA_STOP || LaraItem->animNumber != ANIMATION_LARA_STAY_IDLE) && (!Lara.isDucked || TrInput & IN_DUCK || LaraItem->animNumber != ANIMATION_LARA_CROUCH_IDLE || LaraItem->goalAnimState != STATE_LARA_CROUCH_IDLE)))
+				((LaraItem->currentAnimState != LS_STOP || LaraItem->animNumber != LA_STAND_IDLE) && (!Lara.isDucked || TrInput & IN_DUCK || LaraItem->animNumber != LA_CROUCH_IDLE || LaraItem->goalAnimState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
@@ -307,11 +312,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 					Lara.busy = true;
 					LaserSight = true;
-
-					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = true;
-					else*
-						InfraRed = false;*/
 					Infrared = true;
 				}
 				else
@@ -321,18 +321,10 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (LaserSight)
 				{
-					/*if (!(gfLevelFlags & GF_LVOP_TRAIN))
-						InfraRed = true;
-					else
-						InfraRed = false;*/
 					Infrared = true;
 				}
 				else
 				{
-					/*if ((gfLevelFlags & GF_LVOP_TRAIN) && (inputBusy & IN_ACTION))
-						InfraRed = true;
-					else
-						InfraRed = false;*/
 					Infrared = false;
 				}
 			}
@@ -423,7 +415,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				{
 					Lara.poisoned = 4096;
 				}
-				if (/*(gfLevelFlags & 0x80u) != 0 &&*/ !Lara.gassed)
+				if (!Lara.gassed)
 				{
 					if (Lara.dpoisoned)
 					{
@@ -514,12 +506,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateRats();
 		UpdateBats();
 		UpdateSpiders();
+		UpdateLittleBeetles();
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		T5M::Effects::Drip::UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateLocusts();
+		UpdateLittleBeetles();
 		//Legacy_UpdateLightning();
 		AnimateWaterfalls();
 
@@ -528,7 +522,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		//SoundEffects();
 
-		HealtBarTimer--;
+		HealthBarTimer--;
 
 		GameTimer++;
 	}
@@ -2131,7 +2125,7 @@ int GetTargetOnLOS(GAME_VECTOR *src, GAME_VECTOR *dest, int DrawTarget, int firi
 
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
-		if (itemNumber >= 0)
+		if ((itemNumber >= 0) && (BaddieSlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
 			Lara.target = &g_Level.Items[itemNumber];
 
 		if (firing)
@@ -3239,21 +3233,26 @@ void InterpolateAngle(short angle, short *rotation, short *outAngle, int shift)
 
 int IsRoomOutside(int x, int y, int z)
 {
-	return 0;
-	/*
-	short offset = OutsideRoomOffsets[((x >> 12) * 27) + (z >> 12)];
-	if (offset == -1)
+	if (x < 0 || z < 0)
 		return -2;
 
-	if (offset < 0)
+	int xTable = x / 1024;
+	int zTable = z / 1024;
+
+	if (OutsideRoomTable[xTable][zTable].size() == 0)
+		return -2;
+
+	for (int i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
-		ROOM_INFO* r = &g_Level.Rooms[(offset & 0x7FFF)];
+		short roomNumber = OutsideRoomTable[xTable][zTable][i];
+		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
 		if ((y > r->maxceiling) && (y < r->minfloor)
 			&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
 			&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
 		{
-			short roomNumber = offset & 0x7fff;
+			IsRoomOutsideNo = roomNumber;
+
 			FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 			int height = GetFloorHeight(floor, x, y, z);
 			if (height == NO_HEIGHT || y > height)
@@ -3262,44 +3261,16 @@ int IsRoomOutside(int x, int y, int z)
 			if (y < height)
 				return -2;
 
-			if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
-				return -3;
-
-			IsRoomOutsideNo = offset & 0x7FFF;
-			return 1;
+			return ((r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)) != 0 ? 1 : -3);
 		}
-		else
-			return -2;
 	}
-	else
-	{
-		unsigned char* s = &OutsideRoomTable[offset];
 
-		while (*s != 0xFF)
-		{
-			ROOM_INFO* r = &g_Level.Rooms[*s];
+	return -2;
+}
 
-			if ((y > r->maxceiling && y < r->minfloor)
-				&& ((z > (r->z + 1024)) && (z < (r->z + ((r->xSize - 1) * 1024))))
-				&& ((x > (r->x + 1024)) && (x < (r->x + ((r->ySize - 1) * 1024)))))
-			{
-				short roomNumber = *s;
-				FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-				int height = GetFloorHeight(floor, x, y, z);
-				if (height == NO_HEIGHT || y > height)
-					return -2;
-				height = GetCeiling(floor, x, y, z);
-				if (y < height)
-					return -2;
-
-				if (!(r->flags & (ENV_FLAG_WIND | ENV_FLAG_WATER)))
-					return -3;
-
-				IsRoomOutsideNo = *s;
-				return 1;
-			}
-			s++;
-		}
-		return -2;
-	}*/
+void GetFloorAndTestTriggers(int x, int y, int z, short roomNumber, int heavy, int heavyFlags)
+{
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	GetFloorHeight(floor, x, y, z);
+	TestTriggers(TriggerIndex, heavy, heavyFlags);
 }

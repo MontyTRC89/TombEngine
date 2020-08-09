@@ -15,15 +15,15 @@ void SpringBoardControl(short itemNumber)
 		if (LaraItem->hitPoints <= 0)
 			return;
 
-		if (LaraItem->currentAnimState == STATE_LARA_WALK_BACK || LaraItem->currentAnimState == STATE_LARA_RUN_BACK)
+		if (LaraItem->currentAnimState == LS_WALK_BACK || LaraItem->currentAnimState == LS_HOP_BACK)
 			LaraItem->speed = -LaraItem->speed;
 
 		LaraItem->fallspeed = -240;
 		LaraItem->gravityStatus = true;
-		LaraItem->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
+		LaraItem->animNumber = LA_FALL_START;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->currentAnimState = STATE_LARA_JUMP_FORWARD;
-		LaraItem->goalAnimState = STATE_LARA_JUMP_FORWARD;
+		LaraItem->currentAnimState = LS_JUMP_FORWARD;
+		LaraItem->goalAnimState = LS_JUMP_FORWARD;
 
 		item->goalAnimState = 1;
 	}

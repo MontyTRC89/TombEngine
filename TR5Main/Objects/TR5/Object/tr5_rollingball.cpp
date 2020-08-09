@@ -16,10 +16,10 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (TriggerActive(item) && (item->itemFlags[0] || item->fallspeed))
 			{
-				LaraItem->animNumber = ANIMATION_LARA_SQUASH_BOULDER;
+				LaraItem->animNumber = LA_BOULDER_DEATH;
 				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->goalAnimState = STATE_LARA_DEATH;
-				LaraItem->currentAnimState = STATE_LARA_DEATH;
+				LaraItem->goalAnimState = LS_DEATH;
+				LaraItem->currentAnimState = LS_DEATH;
 				LaraItem->gravityStatus = false;
 			}
 			else

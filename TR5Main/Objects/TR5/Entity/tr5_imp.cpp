@@ -145,12 +145,12 @@ void ImpControl(short itemNumber)
 
 			int d1 = item->pos.yPos - LaraItem->pos.yPos + 384;
 
-			if (LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE
-				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_ROLL
-				|| LaraItem->currentAnimState > STATE_LARA_MONKEYSWING_TURNAROUND
-				&& LaraItem->currentAnimState < STATE_LARA_CLIMB_TO_CRAWL
-				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT
-				|| LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT)
+			if (LaraItem->currentAnimState == LS_CROUCH_IDLE
+				|| LaraItem->currentAnimState == LS_CROUCH_ROLL
+				|| LaraItem->currentAnimState > LS_MONKEYSWING_TURN_180
+				&& LaraItem->currentAnimState < LS_HANG_TO_CRAWL
+				|| LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT
+				|| LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
 			{
 				d1 = item->pos.yPos - LaraItem->pos.yPos;
 			}
