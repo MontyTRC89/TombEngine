@@ -632,7 +632,7 @@ void ControlGrenade(short itemNumber)
 							{
 								TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
 								currentItem->pos.yPos -= 128; 
-								//TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
+								TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0);
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
 								short currentItemNumber = (currentItem - g_Level.Items.data());
@@ -1368,10 +1368,10 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 					HitTarget(dest, 0, 30, 1);
 					if (dest != LaraItem)
 					{
-						++Savegame.Game.AmmoHits;
-						if (src->hitPoints <= 0)
+						Savegame.Game.AmmoHits++;
+						if (dest->hitPoints <= 0)
 						{
-							++Savegame.Level.Kills;
+							Savegame.Level.Kills++;
 							CreatureDie((dest - g_Level.Items.data()), 1);
 						}
 					}
