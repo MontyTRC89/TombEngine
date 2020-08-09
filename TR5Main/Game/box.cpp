@@ -426,72 +426,6 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 
 	item->pos.yRot += angle;
 
-	/*
-	ROOM_INFO* r;
-	CREATURE_INFO* creature;
-	int range, distance;
-	short angle;
-	short xAngle1, zAngle1;
-	short xAngle2, zAngle2;
-	short xAngle3, zAngle3;
-	int xDist, zDist;
-	unsigned short floorIndex1, floorIndex2, floorIndex3;
-
-	r = &g_Level.Rooms[item->roomNumber];
-	creature = (CREATURE_INFO*)item->data;
-
-
-	// "<< 11" is really needed ? it can cause problem i think since it TR3 code the "<< 11" is not there !
-	xAngle1 = item->pos.xPos + phd_sin(item->pos.yRot + ANGLE(45)) << 11 >> W2V_SHIFT;
-	zAngle1 = item->pos.zPos + phd_cos(item->pos.yRot + ANGLE(45)) << 11 >> W2V_SHIFT;
-	floorIndex1 = XZ_GET_SECTOR(r, xAngle1 - r->x, zAngle1 - r->z).index;
-
-	xAngle2 = item->pos.xPos + phd_sin(item->pos.yRot - ANGLE(45)) << 11 >> W2V_SHIFT;
-	zAngle2 = item->pos.zPos + phd_cos(item->pos.yRot - ANGLE(45)) << 11 >> W2V_SHIFT;
-	floorIndex2 = XZ_GET_SECTOR(r, xAngle2 - r->x, zAngle2 - r->z).index;
-
-	xAngle3 = item->pos.xPos + phd_sin(item->pos.yRot) << 11 >> W2V_SHIFT;
-	zAngle3 = item->pos.zPos + phd_cos(item->pos.yRot) << 11 >> W2V_SHIFT;
-	floorIndex3 = XZ_GET_SECTOR(r, xAngle3 - r->x, zAngle3 - r->z).index;
-
-	if (floorIndex1 && !floorIndex2 && !floorIndex3)
-	{
-		creature = (CREATURE_INFO*)item->data;
-		creature->target.x = xAngle1;
-		creature->target.z = zAngle1;
-	}
-	else if (floorIndex2 && !floorIndex1 && !floorIndex3)
-	{
-		creature = (CREATURE_INFO*)item->data;
-		creature->target.x = xAngle2;
-		creature->target.z = zAngle2;
-	}
-	else if (floorIndex3 && !floorIndex1 && !floorIndex2)
-	{
-		creature = (CREATURE_INFO*)item->data;
-		creature->target.x = xAngle3;
-		creature->target.z = zAngle3;
-	}
-
-	xDist = creature->target.x - item->pos.xPos;
-	zDist = creature->target.z - item->pos.zPos;
-	angle = phd_atan(zDist, xDist) - item->pos.yRot;
-
-	if (angle > FRONT_ARC || angle < -FRONT_ARC)
-	{
-		range = (item->speed << W2V_SHIFT) / maximumTurn;
-		distance = SQUARE(zDist) + SQUARE(xDist);
-		if (distance < SQUARE(range))
-			maximumTurn >>= 1;
-	}
-
-	if (angle > maximumTurn)
-		angle = maximumTurn;
-	else if (angle < -maximumTurn)
-		angle = -maximumTurn;
-
-	item->pos.yRot += (angle + maximumTurn);
-	*/
 	return angle;
 }
 
@@ -1009,7 +943,7 @@ int UpdateLOT(LOT_INFO* LOT, int depth)
 {
 	BOX_NODE* node;
 
-	printf("LOT->head: %d, LOT->tail: %d\n", LOT->head, LOT->tail);
+	//printf("LOT->head: %d, LOT->tail: %d\n", LOT->head, LOT->tail);
 
 	if (LOT->requiredBox != NO_BOX && LOT->requiredBox != LOT->targetBox)
 	{
@@ -1530,12 +1464,12 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	if (enemy == LaraItem)
 	{
 		short laraState = LaraItem->currentAnimState;
-		if (laraState == STATE_LARA_CROUCH_IDLE ||
-			laraState == STATE_LARA_CROUCH_TURN_LEFT ||
-			laraState == STATE_LARA_CROUCH_TURN_RIGHT ||
-			laraState == STATE_LARA_CROUCH_ROLL ||
-			laraState <= STATE_LARA_MONKEYSWING_TURNAROUND ||
-			laraState >= STATE_LARA_CLIMB_TO_CRAWL)
+		if (laraState == LS_CROUCH_IDLE ||
+			laraState == LS_CROUCH_TURN_LEFT ||
+			laraState == LS_CROUCH_TURN_RIGHT ||
+			laraState == LS_CROUCH_ROLL ||
+			laraState <= LS_MONKEYSWING_TURN_180 ||
+			laraState >= LS_HANG_TO_CRAWL)
 		{
 			y -= STEPUP_HEIGHT;
 		}

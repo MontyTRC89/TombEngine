@@ -55,10 +55,10 @@ void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)//46DF8(<), 4725C(<) (F)
 void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 (F)
 {
 	if (LaraCheckForLetGo(item, coll) 
-		|| item->animNumber != ANIMATION_LARA_LADDER_DOWN)
+		|| item->animNumber != LA_LADDER_DOWN)
 		return;
 
-	int frame = item->frameNumber - g_Level.Anims[ANIMATION_LARA_LADDER_DOWN].frameBase;
+	int frame = item->frameNumber - g_Level.Anims[LA_LADDER_DOWN].frameBase;
 	int xShift;
 	int yShift;
 
@@ -98,7 +98,7 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 (F)
 		{
 			if (shiftRight < 0 != shiftLeft < 0)
 			{
-				item->goalAnimState = STATE_LARA_LADDER_IDLE;
+				item->goalAnimState = LS_LADDER_IDLE;
 				AnimateLara(item);
 				return;
 			}
@@ -112,22 +112,22 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BD0, 47034 (F)
 
 		if (resultRight == -1 || resultLeft == -1)
 		{
-			item->animNumber = ANIMATION_LARA_LADDER_IDLE;
+			item->animNumber = LA_LADDER_IDLE;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = STATE_LARA_LADDER_IDLE;
-			item->goalAnimState = STATE_LARA_HANG;
+			item->currentAnimState = LS_LADDER_IDLE;
+			item->goalAnimState = LS_HANG;
 
 			AnimateLara(item);
 		}
 		else
 		{
-			item->goalAnimState = STATE_LARA_LADDER_DOWN;
+			item->goalAnimState = LS_LADDER_DOWN;
 			item->pos.yPos -= yShift;
 		}
 		return;
 	}
 
-	item->goalAnimState = STATE_LARA_LADDER_IDLE;
+	item->goalAnimState = LS_LADDER_IDLE;
 
 	if (yShift != 0)
 		AnimateLara(item);
@@ -143,10 +143,9 @@ void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)//46BA4(<), 47008(<) (F)
 
 void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 {
-	if (!LaraCheckForLetGo(item, coll)
-		&& item->animNumber == ANIMATION_LARA_LADDER_UP)
+	if (!LaraCheckForLetGo(item, coll) && item->animNumber == LA_LADDER_UP)
 	{
-		int frame = item->frameNumber - g_Level.Anims[ANIMATION_LARA_LADDER_UP].frameBase;
+		int frame = item->frameNumber - g_Level.Anims[LA_LADDER_UP].frameBase;
 		int yShift;
 		int resultRight, resultLeft;
 		int shiftRight, shiftLeft;
@@ -180,7 +179,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 		{
 			if (resultRight < 0 || resultLeft < 0)
 			{
-				item->goalAnimState = STATE_LARA_LADDER_IDLE;
+				item->goalAnimState = LS_LADDER_IDLE;
 
 				AnimateLara(item);
 
@@ -188,25 +187,25 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)//469B0, 46E14 (F)
 				{
 					if (resultRight != -1 || resultLeft != -1)
 					{
-						item->goalAnimState = STATE_LARA_UNKNOWN_138;
-						item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
+						item->goalAnimState = LS_UNKNOWN_6;
+						item->requiredAnimState = LS_CROUCH_IDLE;
 					}
 					else
 					{
-						item->goalAnimState = STATE_LARA_GRABBING;
+						item->goalAnimState = LS_GRABBING;
 						item->pos.yPos += (ledgeRight + ledgeLeft) / 2 - 256;
 					}
 				}
 			}
 			else
 			{
-				item->goalAnimState = STATE_LARA_LADDER_UP;
+				item->goalAnimState = LS_LADDER_UP;
 				item->pos.yPos -= yShift;
 			}
 		}
 		else
 		{
-			item->goalAnimState = STATE_LARA_LADDER_IDLE;
+			item->goalAnimState = LS_LADDER_IDLE;
 
 			if (yShift != 0)
 				AnimateLara(item);
@@ -241,7 +240,7 @@ void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)//468B8(<), 46D1C(<) (F
 	Camera.targetElevation = -ANGLE(15);
 
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
-		item->goalAnimState = STATE_LARA_LADDER_IDLE;
+		item->goalAnimState = LS_LADDER_IDLE;
 }
 
 void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)//46834(<), 46C98(<) (F)
@@ -263,7 +262,7 @@ void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)//467E4(<), 46C48(<) (F)
 	Camera.targetElevation = -ANGLE(15);
 
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
-		item->goalAnimState = STATE_LARA_LADDER_IDLE;
+		item->goalAnimState = LS_LADDER_IDLE;
 }
 
 void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
@@ -273,8 +272,7 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 	int shiftRight, shiftLeft;
 	int ledgeRight, ledgeLeft;
 
-	if (LaraCheckForLetGo(item, coll) 
-		|| item->animNumber != ANIMATION_LARA_LADDER_IDLE)
+	if (LaraCheckForLetGo(item, coll) || item->animNumber != LA_LADDER_IDLE)
 		return;
 
 	if (!(TrInput & IN_FORWARD))
@@ -282,10 +280,10 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 		if (!(TrInput & IN_BACK))
 			return;
 
-		if (item->goalAnimState == STATE_LARA_HANG)
+		if (item->goalAnimState == LS_HANG)
 			return;
 
-		item->goalAnimState = STATE_LARA_LADDER_IDLE;
+		item->goalAnimState = LS_LADDER_IDLE;
 		item->pos.yPos += 256;
 		
 		resultRight = LaraTestClimbPos(item, coll->radius, coll->radius + 120, -512, 512, &ledgeRight);
@@ -308,17 +306,17 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 
 		if (resultRight == 1 && resultLeft == 1)
 		{
-			item->goalAnimState = STATE_LARA_LADDER_DOWN;
+			item->goalAnimState = LS_LADDER_DOWN;
 			item->pos.yPos += yShift;
 		}
 		else
 		{
-			item->goalAnimState = STATE_LARA_HANG;
+			item->goalAnimState = LS_HANG;
 		}
 	}
-	else if (item->goalAnimState != STATE_LARA_GRABBING)
+	else if (item->goalAnimState != LS_GRABBING)
 	{
-		item->goalAnimState = STATE_LARA_LADDER_IDLE;
+		item->goalAnimState = LS_LADDER_IDLE;
 		resultRight = LaraTestClimbUpPos(item, coll->radius, coll->radius + 120, &shiftRight, &ledgeRight);
 		resultLeft = LaraTestClimbUpPos(item, coll->radius, -120 - coll->radius, &shiftLeft, &ledgeLeft);
 
@@ -344,20 +342,20 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll) // (F) (D)
 				}
 			}
 
-			item->goalAnimState = STATE_LARA_LADDER_UP;
+			item->goalAnimState = LS_LADDER_UP;
 			item->pos.yPos += yShift;
 		}
 		else if (abs(ledgeLeft - ledgeRight) <= 120)
 		{
 			if (resultRight == -1 && resultLeft == -1)
 			{
-				item->goalAnimState = STATE_LARA_GRABBING;
+				item->goalAnimState = LS_GRABBING;
 				item->pos.yPos += (ledgeRight + ledgeLeft) / 2 - 256;
 			}
 			else
 			{
-				item->goalAnimState = STATE_LARA_UNKNOWN_138;
-				item->requiredAnimState = STATE_LARA_CROUCH_IDLE;
+				item->goalAnimState = LS_UNKNOWN_6;
+				item->requiredAnimState = LS_CROUCH_IDLE;
 			}
 		}
 	}
@@ -372,9 +370,9 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 
 	Camera.targetElevation = -ANGLE(20);
 
-	if (item->animNumber == ANIMATION_LARA_LADDER_DISMOUNT_LEFT_BEGIN)
+	if (item->animNumber == LA_LADDER_DISMOUNT_LEFT_START)
 		Camera.targetAngle = -ANGLE(60.0f);
-	if (item->animNumber == ANIMATION_LARA_LADDER_DISMOUNT_RIGHT_BEGIN)
+	if (item->animNumber == LA_LADDER_DISMOUNT_RIGHT_START)
 		Camera.targetAngle = ANGLE(60.0f);
 
 	if (TrInput & IN_LOOK)
@@ -384,19 +382,19 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)//463F0, 46854 (F)
 
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
-		item->goalAnimState = STATE_LARA_LADDER_LEFT;
+		item->goalAnimState = LS_LADDER_LEFT;
 		Lara.moveAngle = item->pos.yRot - ANGLE(90);
 	}
 	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 	{
-		item->goalAnimState = STATE_LARA_LADDER_RIGHT;
+		item->goalAnimState = LS_LADDER_RIGHT;
 		Lara.moveAngle = item->pos.yRot + ANGLE(90);
 	}
 	else if (TrInput & IN_JUMP)
 	{
-		if (item->animNumber == ANIMATION_LARA_LADDER_IDLE)
+		if (item->animNumber == LA_LADDER_IDLE)
 		{
-			item->goalAnimState = STATE_LARA_JUMP_BACK;
+			item->goalAnimState = LS_JUMP_BACK;
 			Lara.gunStatus = LG_NO_ARMS;
 			Lara.moveAngle = item->pos.yRot - ANGLE(180);
 		}
@@ -430,38 +428,38 @@ int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int heig
 	short angle = (unsigned short) (item->pos.yRot + ANGLE(45)) >> W2V_SHIFT;
 	int x;
 	int z;
-	int xfront = 0;
-	int zfront = 0;
+	int xFront = 0;
+	int zFront = 0;
 
 	switch (angle)
 	{
 	case NORTH:
 		x = item->pos.xPos + right;
 		z = item->pos.zPos + front;
-		zfront = 256;
+		zFront = 256;
 		break;
 
 	case EAST:
 		x = item->pos.xPos + front;
 		z = item->pos.zPos - right;
-		xfront = 256;
+		xFront = 256;
 		break;
 
 	case SOUTH:
 		x = item->pos.xPos - right;
 		z = item->pos.zPos - front;
-		zfront = -256;
+		zFront = -256;
 		break;
 
 	case WEST:
 	default:
 		x = item->pos.xPos - front;
 		z = item->pos.zPos + right;
-		xfront = -256;
+		xFront = -256;
 		break;
 	}
 
-	return LaraTestClimb(x, item->pos.yPos + origin, z, xfront, zfront, height, item->roomNumber, shift);
+	return LaraTestClimb(x, item->pos.yPos + origin, z, xFront, zFront, height, item->roomNumber, shift);
 }
 
 void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shift)//46100, 46564 (F)
@@ -470,15 +468,15 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 	{
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = STATE_LARA_LADDER_LEFT;
+			item->goalAnimState = LS_LADDER_LEFT;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = STATE_LARA_LADDER_RIGHT;
+			item->goalAnimState = LS_LADDER_RIGHT;
 		}
 		else
 		{
-			item->goalAnimState = STATE_LARA_LADDER_IDLE;
+			item->goalAnimState = LS_LADDER_IDLE;
 		}
 
 		item->pos.yPos += shift;
@@ -488,12 +486,12 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 
 	if (result != 0)
 	{
-		item->goalAnimState = STATE_LARA_HANG;
+		item->goalAnimState = LS_HANG;
 
 		do
 		{
 			AnimateItem(item);
-		} while (item->currentAnimState != STATE_LARA_HANG);
+		} while (item->currentAnimState != LS_HANG);
 
 		item->pos.xPos = coll->old.x;
 		item->pos.zPos = coll->old.z;
@@ -504,12 +502,12 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 	item->pos.xPos = coll->old.x;
 	item->pos.zPos = coll->old.z;
 
-	item->goalAnimState = STATE_LARA_LADDER_IDLE;
-	item->currentAnimState = STATE_LARA_LADDER_IDLE;
+	item->goalAnimState = LS_LADDER_IDLE;
+	item->currentAnimState = LS_LADDER_IDLE;
 
-	if (coll->oldAnimState != STATE_LARA_LADDER_IDLE)
+	if (coll->oldAnimState != LS_LADDER_IDLE)
 	{	
-		item->animNumber = ANIMATION_LARA_LADDER_IDLE;
+		item->animNumber = LA_LADDER_IDLE;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		return;
 	}
@@ -523,8 +521,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 			item->pos.xPos, item->pos.yPos, item->pos.zPos) - item->pos.yPos;
 		if (height < 3 * STEP_SIZE / 2) // LADDER dismounts (left/right)
 		{
-			item->goalAnimState = STATE_LARA_LADDER_DISMOUNT_TURN_LEFT;
-			item->currentAnimState = STATE_LARA_MISC_CONTROL;
+			item->goalAnimState = LS_LADDER_DISMOUNT_LEFT;
+			item->currentAnimState = LS_MISC_CONTROL;
 		}
 	}
 	else if (TrInput & IN_RIGHT)
@@ -536,8 +534,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 			item->pos.xPos, item->pos.yPos, item->pos.zPos) - item->pos.yPos;
 		if (height < 3 * STEP_SIZE / 2) // LADDER dismounts (left/right)
 		{
-			item->goalAnimState = STATE_LARA_LADDER_DISMOUNT_TURN_RIGHT;
-			item->currentAnimState = STATE_LARA_MISC_CONTROL;
+			item->goalAnimState = LS_LADDER_DISMOUNT_RIGHT;
+			item->currentAnimState = LS_MISC_CONTROL;
 		}
 	}
 
@@ -549,17 +547,17 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 		{
 			if (flag <= 0)
 			{
-				item->animNumber = ANIMATION_LARA_LADDER_AROUND_LEFT_INNER_BEGIN;
+				item->animNumber = LA_LADDER_LEFT_CORNER_INNER_START;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_INNER;
-				item->currentAnimState = STATE_LARA_CLIMB_CORNER_LEFT_INNER;
+				item->goalAnimState = LS_SHIMMY_INNER_LEFT;
+				item->currentAnimState = LS_SHIMMY_INNER_LEFT;
 			}
 			else
 			{
-				item->animNumber = ANIMATION_LARA_LADDER_AROUND_LEFT_OUTER_BEGIN;
+				item->animNumber = LA_LADDER_LEFT_CORNER_OUTER_START;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = STATE_LARA_CLIMB_CORNER_LEFT_OUTER;
-				item->currentAnimState = STATE_LARA_CLIMB_CORNER_LEFT_OUTER;
+				item->goalAnimState = LS_SHIMMY_OUTER_LEFT;
+				item->currentAnimState = LS_SHIMMY_OUTER_LEFT;
 			}
 
 			return;
@@ -573,17 +571,17 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 		{
 			if (flag <= 0)
 			{
-				item->animNumber = ANIMATION_LARA_LADDER_AROUND_RIGHT_INNER_BEGIN;
+				item->animNumber = LA_LADDER_RIGHT_CORNER_INNER_START;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_INNER;
-				item->currentAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_INNER;
+				item->goalAnimState = LS_SHIMMY_INNER_RIGHT;
+				item->currentAnimState = LS_SHIMMY_INNER_RIGHT;
 			}
 			else
 			{
-				item->animNumber = ANIMATION_LARA_LADDER_AROUND_RIGHT_OUTER_BEGIN;
+				item->animNumber = LA_LADDER_RIGHT_CORNER_OUTER_START;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_OUTER;
-				item->currentAnimState = STATE_LARA_CLIMB_CORNER_RIGHT_OUTER;
+				item->goalAnimState = LS_SHIMMY_OUTER_RIGHT;
+				item->currentAnimState = LS_SHIMMY_OUTER_RIGHT;
 			}
 
 			return;
@@ -600,7 +598,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45DE4, 46248
 {
 	int result = 0;
 
-	if (item->animNumber != ANIMATION_LARA_LADDER_RIGHT)
+	if (item->animNumber != LA_LADDER_RIGHT)
 		return 0;
 
 	int oldYrot = item->pos.yRot;
@@ -698,7 +696,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)//45ABC, 45F20
 {
 	int result = 0;
 
-	if (item->animNumber != ANIMATION_LARA_LADDER_LEFT)
+	if (item->animNumber != LA_LADDER_LEFT)
 		return 0;
 
 	int oldYrot = item->pos.yRot;
@@ -1013,9 +1011,9 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)//45434, 45898 (F)
 	Lara.headYrot = 0;
 	Lara.headXrot = 0;
 
-	item->goalAnimState = STATE_LARA_JUMP_FORWARD;
-	item->currentAnimState = STATE_LARA_JUMP_FORWARD;
-	item->animNumber = ANIMATION_LARA_FREE_FALL_FORWARD;
+	item->goalAnimState = LS_JUMP_FORWARD;
+	item->currentAnimState = LS_JUMP_FORWARD;
+	item->animNumber = LA_FALL_START;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 	item->speed = 2;

@@ -88,7 +88,7 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (TestBoundsCollide(item, l, LARA_RAD))
 	{
-		if (l->animNumber != ANIMATION_LARA_WATERSKIN_EMPTY && l->animNumber != ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE || item->currentAnimState != 1)
+		if (l->animNumber != LA_WATERSKIN_POUR_LOW && l->animNumber != LA_WATERSKIN_POUR_HIGH || item->currentAnimState != 1)
 		{
 			GlobalCollisionBounds.X1 = 640;
 			GlobalCollisionBounds.X2 = 1280;
@@ -121,16 +121,16 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			if (TestLaraPosition(&ScalesBounds, item, l))
 			{
-				l->animNumber = ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE;
+				l->animNumber = LA_WATERSKIN_POUR_HIGH;
 				l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->pos.yRot = rotY;
 			}
-			else if (l->frameNumber == g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 51)
+			else if (l->frameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
 			{
 				SoundEffect(SFX_TR4_POUR, &l->pos, 0);
 				item->pos.yRot = rotY;
 			}
-			else if (l->frameNumber == g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 74)
+			else if (l->frameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 			{
 				AddActiveItem(itemNum);
 				item->status = ITEM_ACTIVE;
@@ -157,10 +157,10 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 	}
 	
-	if (l->frameNumber >= g_Level.Anims[ANIMATION_LARA_WATERSKIN_EMPTY].frameBase + 44 &&
-		l->frameNumber <= g_Level.Anims[ANIMATION_LARA_WATERSKIN_EMPTY].frameBase + 72 ||
-		l->frameNumber >= g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 51 &&
-		l->frameNumber <= g_Level.Anims[ANIMATION_LARA_WATERSKIN_POUR_ON_SCALE].frameBase + 74)
+	if (l->frameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 44 &&
+		l->frameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 72 ||
+		l->frameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
+		l->frameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 	{
 		PHD_VECTOR pos;
 		pos.x = 0;

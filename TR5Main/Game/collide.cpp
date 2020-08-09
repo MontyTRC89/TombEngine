@@ -300,9 +300,6 @@ void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 			return;
 
 		TestCollision(item, LaraItem);    
-
-		/*if (item->object_number == FAN && item->currentAnimState == 1)	// Is the fan moving slow ?
-			ObjectCollision(item_num, laraitem, coll);*/
 	}
 	else if (item->status != ITEM_INVISIBLE)
 		ObjectCollision(itemNumber, l, c);
@@ -774,13 +771,6 @@ int TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO
 	ry = pos.y;
 	rz = pos.z;
 
-	/*Vector3 boxMin = Vector3(bounds->boundingBox.X1, bounds->boundingBox.Y1, bounds->boundingBox.Z1);
-	Vector3 boxMax = Vector3(bounds->boundingBox.X2, bounds->boundingBox.Y2, bounds->boundingBox.Z2);
-	Vector3 centre = (boxMin + boxMax) / 2.0f;
-	Vector3 extens = boxMax - centre;
-	BoundingBox box = BoundingBox(centre, extens);
-
-	return box.Contains(pos);*/
 
 	if (rx < bounds->boundingBox.X1 || rx > bounds->boundingBox.X2 
 		|| ry < bounds->boundingBox.Y1 || ry > bounds->boundingBox.Y2
@@ -824,35 +814,35 @@ int Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd
 			switch (direction)
 			{
 			case 0:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_LEFT;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_LEFT, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_LEFT;
-				LaraItem->currentAnimState = STATE_LARA_WALK_LEFT;
+				LaraItem->animNumber = LA_SIDESTEP_LEFT;
+				LaraItem->frameNumber = GF(LA_SIDESTEP_LEFT, 0);
+				LaraItem->goalAnimState = LS_STEP_LEFT;
+				LaraItem->currentAnimState = LS_STEP_LEFT;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
 			case 1:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_FORWARD;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_FORWARD, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_FORWARD;
-				LaraItem->currentAnimState = STATE_LARA_WALK_FORWARD;
+				LaraItem->animNumber = LA_WALK;
+				LaraItem->frameNumber = GF(LA_WALK, 0);
+				LaraItem->goalAnimState = LS_WALK_FORWARD;
+				LaraItem->currentAnimState = LS_WALK_FORWARD;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
 			case 2:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_RIGHT;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_RIGHT, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_RIGHT;
-				LaraItem->currentAnimState = STATE_LARA_WALK_RIGHT;
+				LaraItem->animNumber = LA_WALK;
+				LaraItem->frameNumber = GF(LA_SIDESTEP_RIGHT, 0);
+				LaraItem->goalAnimState = LS_STEP_RIGHT;
+				LaraItem->currentAnimState = LS_STEP_RIGHT;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
 			case 3:
 			default:
-				LaraItem->animNumber = ANIMATION_LARA_WALK_BACK;
-				LaraItem->frameNumber = GF(ANIMATION_LARA_WALK_BACK, 0);
-				LaraItem->goalAnimState = STATE_LARA_WALK_BACK;
-				LaraItem->currentAnimState = STATE_LARA_WALK_BACK;
+				LaraItem->animNumber = LA_WALK_BACK;
+				LaraItem->frameNumber = GF(LA_WALK_BACK, 0);
+				LaraItem->goalAnimState = LS_WALK_BACK;
+				LaraItem->currentAnimState = LS_WALK_BACK;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				break;
 
@@ -998,7 +988,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int x, z, rx, rz;
 	ANIM_FRAME* frame;
 
-	if (item->objectNumber != ID_HITMAN || item->currentAnimState != STATE_LARA_INSERT_PUZZLE)
+	if (item->objectNumber != ID_HITMAN || item->currentAnimState != LS_INSERT_PUZZLE)
 	{
 		if (TestBoundsCollide(item, l, coll->radius))
 		{

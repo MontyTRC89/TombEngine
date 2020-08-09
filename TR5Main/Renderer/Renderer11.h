@@ -568,6 +568,8 @@ namespace T5M::Renderer
 		bool drawStatics(bool transparent, RenderView& view);
 		bool											drawWaterfalls();
 		bool											drawShadowMap(RenderView& view);
+		bool											drawWraithExtra(RendererItem* item, bool transparent, bool animated);
+		bool											drawShadowMap();
 		bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
 		bool											drawLara(bool transparent, bool shadowMap);
 		void											printDebugMessage(LPCSTR message, ...);
@@ -588,6 +590,7 @@ namespace T5M::Renderer
 		bool											drawRopes();
 		bool											drawBats();
 		bool											drawRats();
+		bool											drawLittleBeetles();
 		bool											drawSpiders();
 		bool											drawGunFlashes();
 		bool											drawGunShells();
@@ -613,6 +616,7 @@ namespace T5M::Renderer
 		bool                                            drawDripParticles();
 		bool											drawExplosionParticles();
 		void renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumber);
+		void drawLaraHolsters(bool transparent);
 	public:
 		DirectX::SimpleMath::Matrix View;
 		DirectX::SimpleMath::Matrix Projection;
