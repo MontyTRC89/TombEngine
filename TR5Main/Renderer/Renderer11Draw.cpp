@@ -22,6 +22,7 @@
 #include <Objects\TR4\Entity\tr4_wraith.h>
 #include <Objects\TR4\Entity\tr4_littlebeetle.h>
 #include "RenderView/RenderView.h"
+#include "hair.h"
 extern T5M::Renderer::RendererHUDBar *g_DashBar;
 extern T5M::Renderer::RendererHUDBar *g_SFXVolumeBar;
 extern T5M::Renderer::RendererHUDBar *g_MusicVolumeBar;
@@ -32,14 +33,13 @@ namespace T5M::Renderer
     using namespace T5M::Renderer;
     using namespace std::chrono;
 
-    int Renderer11::DrawPickup(short objectNum)
+    void Renderer11::drawPickup(short objectNum)
     {
         drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0); // TODO: + PickupY
         m_pickupRotation += 45 * 360 / 30;
-        return 0;
     }
 
-    bool Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)
+    void Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ)
     {
         Matrix translation;
         Matrix rotation;
@@ -62,15 +62,15 @@ namespace T5M::Renderer
 
         if (obj->animIndex != -1)
         {
-			ANIM_FRAME* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr] };
+            ANIM_FRAME *frame[] = {&g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr]};
             updateAnimation(NULL, moveableObj, frame, 0, 0, 0xFFFFFFFF);
         }
 
         Vector3 pos = m_viewportToolkit->Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
         // Clear just the Z-buffer so we can start drawing on top of the scene
-		ID3D11DepthStencilView* dsv;
-		m_context->OMGetRenderTargets(1, NULL, &dsv);
+        ID3D11DepthStencilView *dsv;
+        m_context->OMGetRenderTargets(1, NULL, &dsv);
         m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
         // Set vertex buffer
@@ -93,8 +93,8 @@ namespace T5M::Renderer
         // Set matrices
         CCameraMatrixBuffer HudCamera;
         HudCamera.ViewProjection = view * projection;
-        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, HudCamera);
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+        m_cbCameraMatrices.updateData(HudCamera, m_context);
+        m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
         for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
         {
@@ -113,9 +113,9 @@ namespace T5M::Renderer
             else
                 m_stItem.World = (moveableObj.BindPoseTransforms[n] * world);
             m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-            updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
-            m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-            m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+            m_cbItem.updateData(m_stItem, m_context);
+            m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+            m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
             for (int m = 0; m < NUM_BUCKETS; m++)
             {
@@ -129,26 +129,25 @@ namespace T5M::Renderer
                     m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
                 m_stMisc.AlphaTest = (m < 2);
-                updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-                m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+                m_cbMisc.updateData(m_stMisc, m_context);
+                m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
                 m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawShadowMap()
+    void Renderer11::renderShadowMap(RenderView& renderView)
     {
         m_shadowLight = NULL;
         RendererLight *brightestLight = NULL;
         float brightest = 0.0f;
         Vector3 itemPosition = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
 
-        for (int k = 0; k < m_roomsToDraw.size(); k++)
+        for (int k = 0; k < renderView.roomsToDraw.size(); k++)
         {
-            RendererRoom *room = m_roomsToDraw[k];
+            RendererRoom *room = renderView.roomsToDraw[k];
             int numLights = room->Lights.size();
 
             for (int j = 0; j < numLights; j++)
@@ -218,7 +217,7 @@ namespace T5M::Renderer
         m_shadowLight = brightestLight;
 
         if (m_shadowLight == NULL)
-            return true;
+            return;
 
         // Reset GPU state
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -237,7 +236,7 @@ namespace T5M::Renderer
         Vector3 lightPos = Vector3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
         Vector3 itemPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
         if (lightPos == itemPos)
-            return true;
+            return;
 
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -266,14 +265,14 @@ namespace T5M::Renderer
                                                                  (m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
         CCameraMatrixBuffer shadowProjection;
         shadowProjection.ViewProjection = view * projection;
-        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, shadowProjection);
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+        m_cbCameraMatrices.updateData(shadowProjection, m_context);
+        m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
         m_stShadowMap.LightViewProjection = (view * projection);
 
         m_stMisc.AlphaTest = true;
-        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-        m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+        m_cbMisc.updateData(m_stMisc, m_context);
+        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         RendererObject &laraObj = *m_moveableObjects[ID_LARA];
         RendererObject &laraSkin = *m_moveableObjects[ID_LARA_SKIN];
@@ -283,9 +282,9 @@ namespace T5M::Renderer
         m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
-        m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-        m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+        m_cbItem.updateData(m_stItem, m_context);
+        m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+        m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
         for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
         {
@@ -345,27 +344,44 @@ namespace T5M::Renderer
 
         // Draw items
 
-        // Hairs are pre-transformed
-        Matrix matrices[8] = {Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity,
-                              Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity};
-        memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 8);
-        m_stItem.World = Matrix::Identity;
-        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
+        RendererObject &hairsObj = *m_moveableObjects[ID_LARA_HAIR];
 
-        if (m_moveableObjects[ID_LARA_HAIR].has_value())
+        // First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+        m_stItem.World = Matrix::Identity;
+        Matrix matrices[7];
+        matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+        for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
         {
-            m_primitiveBatch->Begin();
-            m_primitiveBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-                                          (const unsigned short *)m_hairIndices.data(), m_numHairIndices,
-                                          m_hairVertices.data(), m_numHairVertices);
-            m_primitiveBatch->End();
+            HAIR_STRUCT *hairs = &Hairs[0][i];
+            Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.yRot), TO_RAD(hairs->pos.xRot), 0) * Matrix::CreateTranslation(hairs->pos.xPos, hairs->pos.yPos, hairs->pos.zPos);
+            matrices[i + 1] = world;
+        }
+        memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
+        m_cbItem.updateData(m_stItem, m_context);
+        m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+        m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+
+        for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
+        {
+            RendererMesh *mesh = hairsObj.ObjectMeshes[k];
+
+            for (int j = 0; j < 4; j++)
+            {
+                RendererBucket *bucket = &mesh->Buckets[j];
+
+                if (bucket->Vertices.size() == 0)
+                    continue;
+
+                // Draw vertices
+                m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                m_numDrawCalls++;
+            }
         }
 
-        return true;
     }
 
-    bool Renderer11::DoTitleImage()
-    {
+    void Renderer11::renderTitleImage()
+{
         wchar_t introFileChars[255];
 
         std::mbstowcs(introFileChars, g_GameFlow->Intro, 255);
@@ -396,11 +412,10 @@ namespace T5M::Renderer
             currentFade -= FADE_FACTOR;
             m_swapChain->Present(0, 0);
         }
-        return true;
     }
 
-    bool Renderer11::drawGunShells()
-    {
+    void Renderer11::drawGunShells()
+{
         RendererRoom &const room = m_rooms[LaraItem->roomNumber];
         RendererItem *item = &m_items[Lara.itemNumber];
 
@@ -410,12 +425,12 @@ namespace T5M::Renderer
         m_stLights.NumLights = item->Lights.size();
         for (int j = 0; j < item->Lights.size(); j++)
             memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-        updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
-        m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+        m_cbLights.updateData(m_stLights, m_context);
+        m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
         m_stMisc.AlphaTest = true;
-        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-        m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+        m_cbMisc.updateData(m_stMisc, m_context);
+        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         for (int i = 0; i < 24; i++)
         {
@@ -431,8 +446,8 @@ namespace T5M::Renderer
                 Matrix world = rotation * translation;
 
                 m_stItem.World = world;
-                updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
-                m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
+                m_cbItem.updateData(m_stItem, m_context);
+                m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
                 RendererMesh *mesh = moveableObj.ObjectMeshes[0];
 
@@ -449,10 +464,9 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    int Renderer11::drawInventoryScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, ID3D11ShaderResourceView *background)
+    void Renderer11::renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
     {
         char stringBuffer[255];
 
@@ -506,7 +520,7 @@ namespace T5M::Renderer
 
         // Set texture
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-		m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
+        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
 
         ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
@@ -523,8 +537,8 @@ namespace T5M::Renderer
                                       Matrix::CreatePerspectiveFieldOfView(80.0f * RADIAN,
                                                                            g_Renderer.ScreenWidth / (float)g_Renderer.ScreenHeight, 1.0f, 200000.0f);
 
-        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, inventoryCam);
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+        m_cbCameraMatrices.updateData(inventoryCam, m_context);
+        m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
         for (int k = 0; k < NUM_INVENTORY_RINGS; k++)
         {
@@ -539,7 +553,7 @@ namespace T5M::Renderer
 
             // Yellow title
             if (ring->focusState == INV_FOCUS_STATE_NONE && g_Inventory.GetType() != INV_TYPE_TITLE)
-                PrintString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+                drawString(400, 20, g_GameFlow->GetString(activeRing->titleStringIndex), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
             for (int i = 0; i < numObjects; i++)
             {
@@ -589,18 +603,18 @@ namespace T5M::Renderer
                 if (ring->focusState == INV_FOCUS_STATE_FOCUSED && obj->animIndex != -1 &&
                     objectIndex == ring->currentObject && k == g_Inventory.GetActiveRing())
                 {
-					ANIM_FRAME* framePtr[2];
+                    ANIM_FRAME *framePtr[2];
                     int rate = 0;
                     getFrame(obj->animIndex, ring->framePtr, framePtr, &rate);
                     updateAnimation(NULL, moveableObj, framePtr, 0, 1, 0xFFFFFFFF);
                 }
                 else
                 {
-					if (obj->animIndex != -1)
-					{
-						ANIM_FRAME* framePtr = &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr];
-						updateAnimation(NULL, moveableObj, &framePtr, 0, 1, 0xFFFFFFFF);
-					}
+                    if (obj->animIndex != -1)
+                    {
+                        ANIM_FRAME *framePtr = &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr];
+                        updateAnimation(NULL, moveableObj, &framePtr, 0, 1, 0xFFFFFFFF);
+                    }
                 }
 
                 for (int n = 0; n < moveableObj.ObjectMeshes.size(); n++)
@@ -620,9 +634,9 @@ namespace T5M::Renderer
                     else
                         m_stItem.World = (moveableObj.BindPoseTransforms[n] * transform);
                     m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-                    updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
-                    m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-                    m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+                    m_cbItem.updateData(m_stItem, m_context);
+                    m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+                    m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
                     for (int m = 0; m < NUM_BUCKETS; m++)
                     {
@@ -636,8 +650,8 @@ namespace T5M::Renderer
                             m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 
                         m_stMisc.AlphaTest = (m < 2);
-                        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-                        m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+                        m_cbMisc.updateData(m_stMisc, m_context);
+                        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
                         m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                     }
@@ -661,17 +675,17 @@ namespace T5M::Renderer
                                 for (int n = 0; n < MAX_SAVEGAMES; n++)
                                 {
                                     if (!g_NewSavegameInfos[n].Present)
-                                        PrintString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
+                                        drawString(400, y, g_GameFlow->GetString(45), D3DCOLOR_ARGB(255, 255, 255, 255),
                                                     PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
                                     else
                                     {
                                         sprintf(stringBuffer, "%05d", g_NewSavegameInfos[n].Count);
-                                        PrintString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                                        drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
-                                        PrintString(250, y, (char *)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
+                                        drawString(250, y, (char *)g_NewSavegameInfos[n].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
                                         sprintf(stringBuffer, g_GameFlow->GetString(44), g_NewSavegameInfos[n].Days, g_NewSavegameInfos[n].Hours, g_NewSavegameInfos[n].Minutes, g_NewSavegameInfos[n].Seconds);
-                                        PrintString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+                                        drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
                                                     PRINTSTRING_OUTLINE | (ring->selectedIndex == n ? PRINTSTRING_BLINK : 0));
                                     }
 
@@ -706,7 +720,7 @@ namespace T5M::Renderer
                                 for (int n = 1; n < g_GameFlow->GetNumLevels(); n++)
                                 {
                                     GameScriptLevel *levelScript = g_GameFlow->GetLevel(n);
-                                    PrintString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
+                                    drawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringIndex), D3DCOLOR_ARGB(255, 255, 255, 255),
                                                 PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == n - 1 ? PRINTSTRING_BLINK : 0));
 
                                     lastY += 24;
@@ -735,7 +749,7 @@ namespace T5M::Renderer
                                 break;
                             }
 
-                            PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+                            drawString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
                         }
                         /* **************** GRAPHICS SETTINGS ************* */
                         else if (inventoryItem == INV_OBJECT_SUNGLASSES && ring->focusState == INV_FOCUS_STATE_FOCUSED)
@@ -745,13 +759,13 @@ namespace T5M::Renderer
 
                             int y = 200;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
                                         PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
                             y += 25;
 
                             // Screen resolution
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
@@ -760,59 +774,59 @@ namespace T5M::Renderer
                             ZeroMemory(buffer, 255);
                             sprintf(buffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
 
-                            PrintString(400, y, buffer, PRINTSTRING_COLOR_WHITE,
+                            drawString(400, y, buffer, PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Windowed mode
-                            PrintString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
+                            drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.Windowed ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.Windowed ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable dynamic shadows
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableShadows ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable caustics
-                            PrintString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
+                            drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableCaustics ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable volumetric fog
-                            PrintString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
+                            drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableVolumetricFog ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Apply and cancel
-                            PrintString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 6 ? PRINTSTRING_BLINK : 0));
 
@@ -835,56 +849,56 @@ namespace T5M::Renderer
 
                             y = 200;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_SOUND),
+                            drawString(400, y, g_GameFlow->GetString(STRING_SOUND),
                                         PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
                             y += 25;
 
                             // Enable sound
-                            PrintString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
+                            drawString(200, y, g_GameFlow->GetString(STRING_ENABLE_SOUND),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableSound ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 0 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Enable sound special effects
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
-                            PrintString(400, y, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
+                            drawString(400, y, g_GameFlow->GetString(ring->Configuration.EnableAudioSpecialEffects ? STRING_ENABLED : STRING_DISABLED),
                                         PRINTSTRING_COLOR_WHITE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 1 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
                             // Music volume
-                            PrintString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
+                            drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 2 ? PRINTSTRING_BLINK : 0));
                             //DrawBar(400, y + 4, 150, 18, ring->Configuration.MusicVolume, 0x0000FF, 0x0000FF);
-                            DrawBar(ring->Configuration.MusicVolume / 100.0f, g_MusicVolumeBar);
+                            drawBar(ring->Configuration.MusicVolume / 100.0f, g_MusicVolumeBar);
 
                             y += 25;
 
                             // Sound FX volume
-                            PrintString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
+                            drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_OUTLINE | (ring->selectedIndex == 3 ? PRINTSTRING_BLINK : 0));
                             //DrawBar(400, y + 4, 150, 18, ring->Configuration.SfxVolume, 0x0000FF, 0x0000FF);
-                            DrawBar(ring->Configuration.SfxVolume / 100.0f, g_SFXVolumeBar);
+                            drawBar(ring->Configuration.SfxVolume / 100.0f, g_SFXVolumeBar);
                             y += 25;
 
                             // Apply and cancel
-                            PrintString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 4 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == 5 ? PRINTSTRING_BLINK : 0));
 
@@ -906,27 +920,27 @@ namespace T5M::Renderer
                             // Draw sound menu
                             y = 40;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
                                         PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
                             y += 25;
 
                             for (int k = 0; k < 18; k++)
                             {
-                                PrintString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
+                                drawString(200, y, g_GameFlow->GetString(STRING_CONTROLS_MOVE_FORWARD + k),
                                             PRINTSTRING_COLOR_WHITE,
                                             PRINTSTRING_OUTLINE | (ring->selectedIndex == k ? PRINTSTRING_BLINK : 0) |
                                                 (ring->waitingForKey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
                                 if (ring->waitingForKey && k == ring->selectedIndex)
                                 {
-                                    PrintString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
+                                    drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
                                                 PRINTSTRING_COLOR_YELLOW,
                                                 PRINTSTRING_OUTLINE | PRINTSTRING_BLINK);
                                 }
                                 else
                                 {
-                                    PrintString(400, y, (char *)g_KeyNames[KeyboardLayout[1][k]],
+                                    drawString(400, y, (char *)g_KeyNames[KeyboardLayout[1][k]],
                                                 PRINTSTRING_COLOR_ORANGE,
                                                 PRINTSTRING_OUTLINE);
                                 }
@@ -935,13 +949,13 @@ namespace T5M::Renderer
                             }
 
                             // Apply and cancel
-                            PrintString(400, y, g_GameFlow->GetString(STRING_APPLY),
+                            drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == NUM_CONTROLS + 0 ? PRINTSTRING_BLINK : 0));
 
                             y += 25;
 
-                            PrintString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+                            drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
                                         PRINTSTRING_COLOR_ORANGE,
                                         PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == NUM_CONTROLS + 1 ? PRINTSTRING_BLINK : 0));
 
@@ -961,7 +975,7 @@ namespace T5M::Renderer
                         {
                             // Draw the description below the object
                             char *string = g_GameFlow->GetString(g_Inventory.GetInventoryObject(inventoryItem)->objectName); // (char*)g_NewStrings[g_Inventory->GetInventoryObject(inventoryItem)->objectName].c_str(); // &AllStrings[AllStringsOffsets[g_Inventory->GetInventoryObject(inventoryItem)->objectName]];
-                            PrintString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+                            drawString(400, 550, string, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
                         }
                     }
                     else
@@ -986,7 +1000,7 @@ namespace T5M::Renderer
                                     stringIndex = STRING_CHOOSE_AMMO;
 
                                 // Apply and cancel
-                                PrintString(400, y, g_GameFlow->GetString(stringIndex),
+                                drawString(400, y, g_GameFlow->GetString(stringIndex),
                                             PRINTSTRING_COLOR_WHITE,
                                             PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (ring->selectedIndex == a ? PRINTSTRING_BLINK : 0));
 
@@ -1092,11 +1106,11 @@ namespace T5M::Renderer
                         }
 
                         if (quantity < 1)
-                            PrintString(400, 550, string, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
+                            drawString(400, 550, string, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
                         else
                         {
                             sprintf(stringBuffer, "%d x %s", quantity, string);
-                            PrintString(400, 550, stringBuffer, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
+                            drawString(400, 550, stringBuffer, D3DCOLOR_ARGB(255, 216, 117, 49), PRINTSTRING_CENTER);
                         }
                     }
                 }
@@ -1135,10 +1149,9 @@ namespace T5M::Renderer
             m_spriteBatch->End();
         }
 
-        return 0;
     }
 
-    bool Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView *texture, Vector3 color, bool cinematicBars)
+    void Renderer11::drawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool cinematicBars)
     {
         RendererVertex vertices[4];
 
@@ -1219,11 +1232,10 @@ namespace T5M::Renderer
         m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
         m_primitiveBatch->End();
 
-        return true;
     }
 
-    bool Renderer11::drawRopes()
-    {
+    void Renderer11::drawRopes()
+{
         for (int n = 0; n < NumRopes; n++)
         {
             ROPE_STRUCT *rope = &Ropes[n];
@@ -1323,7 +1335,7 @@ namespace T5M::Renderer
                     Vector3 p3 = m_viewportToolkit->Unproject(Vector3(x3, y3, depth), Projection, View, world);
                     Vector3 p4 = m_viewportToolkit->Unproject(Vector3(x4, y4, depth), Projection, View, world);
 
-                    AddSprite3D(&m_sprites[20],
+                    addSprite3D(&m_sprites[20],
                                 Vector3(p1.x, p1.y, p1.z),
                                 Vector3(p2.x, p2.y, p2.z),
                                 Vector3(p3.x, p3.y, p3.z),
@@ -1338,11 +1350,10 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawLines2D()
-    {
+    void Renderer11::drawLines2D()
+{
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -1393,11 +1404,10 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-        return true;
     }
 
-    bool Renderer11::drawSpiders()
-    {
+    void Renderer11::drawSpiders()
+{
         /*XMMATRIX world;
         UINT cPasses = 1;
 
@@ -1460,12 +1470,10 @@ namespace T5M::Renderer
                 }
             }
         }*/
-
-        return true;
     }
 
-    bool Renderer11::drawRats()
-    {
+    void Renderer11::drawRats()
+{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -1496,7 +1504,7 @@ namespace T5M::Renderer
                     m_stItem.World = world;
                     m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
                     m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
-                    updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
+                    m_cbItem.updateData(m_stItem, m_context);
 
                     for (int b = 0; b < 2; b++)
                     {
@@ -1512,11 +1520,10 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawBats()
-    {
+    void Renderer11::drawBats()
+{
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -1528,7 +1535,7 @@ namespace T5M::Renderer
         if (Objects[ID_BATS_EMITTER].loaded)
         {
             OBJECT_INFO *obj = &Objects[ID_BATS_EMITTER];
-            RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
+            RendererObject &moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
             RendererMesh *mesh = getMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
             for (int m = 0; m < 32; m++)
@@ -1554,7 +1561,7 @@ namespace T5M::Renderer
                         m_stItem.World = world;
                         m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
                         m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
-                        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
+                        m_cbItem.updateData(m_stItem, m_context);
 
                         m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
                         m_numDrawCalls++;
@@ -1563,11 +1570,10 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-	bool Renderer11::drawLittleBeetles()
-	{
+	void Renderer11::drawLittleBeetles()
+{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -1598,7 +1604,7 @@ namespace T5M::Renderer
 					m_stItem.World = world;
 					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
 					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
-					updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
+                    m_cbItem.updateData(m_stItem,m_context);
 
 					for (int b = 0; b < 2; b++)
 					{
@@ -1613,13 +1619,11 @@ namespace T5M::Renderer
 				}
 			}
 		}
-
-		return true;
 	}
 
 
-    bool Renderer11::doSnow()
-    {
+    void Renderer11::doSnow()
+{
         if (m_firstWeather)
         {
             for (int i = 0; i < NUM_SNOW_PARTICLES; i++)
@@ -1664,7 +1668,7 @@ namespace T5M::Renderer
                 continue;
             }
 
-            AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
+            addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(snow->X, snow->Y, snow->Z), Vector4(1, 1, 1, 1),
                                0.0f, 1.0f, SNOW_SIZE, SNOW_SIZE,
                                BLENDMODE_ALPHABLEND);
 
@@ -1677,11 +1681,10 @@ namespace T5M::Renderer
 
         m_firstWeather = false;
 
-        return true;
     }
 
-    bool Renderer11::doRain()
-    {
+    void Renderer11::doRain()
+{
         if (m_firstWeather)
         {
             for (int i = 0; i < NUM_RAIN_DROPS; i++)
@@ -1734,7 +1737,7 @@ namespace T5M::Renderer
             drop->Z += dz;
 
             if (drop->Draw)
-                AddLine3D(Vector3(x1, y1, z1), Vector3(drop->X, drop->Y, drop->Z), Vector4(RAIN_COLOR, RAIN_COLOR, RAIN_COLOR, 1.0f));
+                addLine3D(Vector3(x1, y1, z1), Vector3(drop->X, drop->Y, drop->Z), Vector4(RAIN_COLOR, RAIN_COLOR, RAIN_COLOR, 1.0f));
 
             // If rain drop has hit the ground, then reset it and add a little drip
             short roomNumber = Camera.pos.roomNumber;
@@ -1748,12 +1751,10 @@ namespace T5M::Renderer
         }
 
         m_firstWeather = false;
-
-        return true;
     }
 
-    bool Renderer11::drawLines3D()
-    {
+    void Renderer11::drawLines3D()
+{
         m_context->RSSetState(m_states->CullNone());
         m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -1786,10 +1787,9 @@ namespace T5M::Renderer
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
         m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-        return true;
     }
 
-    void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
+    void Renderer11::addLine3D(Vector3 start, Vector3 end, Vector4 color)
     {
         if (m_nextLine3D >= MAX_LINES_3D)
             return;
@@ -1803,7 +1803,7 @@ namespace T5M::Renderer
         m_lines3DToDraw.push_back(line);
     }
 
-    void Renderer11::DrawLoadingScreen(std::wstring &fileName)
+    void Renderer11::renderLoadingScreen(std::wstring& fileName)
     {
         return;
         /*
@@ -1856,7 +1856,7 @@ namespace T5M::Renderer
         */
     }
 
-    void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
+    void Renderer11::addDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
     {
         if (m_nextLight >= MAX_LIGHTS)
             return;
@@ -1874,53 +1874,12 @@ namespace T5M::Renderer
         //NumDynamics++;
     }
 
-    void Renderer11::ClearDynamicLights()
-    {
+    void Renderer11::clearDynamicLights()
+{
         m_dynamicLights.clear();
     }
 
-    int Renderer11::drawFinalPass()
-    {
-        return 0;
-        /*
-        // Update fade status
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor > 0.99f)
-            m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
-
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor <= 0.01f)
-            m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
-
-        // Reset GPU state
-        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-        m_context->RSSetState(m_states->CullCounterClockwise());
-        m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-
-        m_context->ClearRenderTargetView(target, Colors::Black);
-        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        m_context->OMSetRenderTargets(1, &target, depthTarget);
-
-        drawFullScreenQuad(m_renderTarget.ShaderResourceView.Get(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), m_enableCinematicBars);
-
-        m_swapChain->Present(0, 0);
-
-        // Update fade status
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor < 1.0f) {
-            m_fadeFactor += FADE_FACTOR;
-            if (m_fadeFactor >= 0.9f)
-                m_fadeFactor = 1.0f;
-        }
-
-        if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeStatus > 0.0f) {
-            m_fadeFactor -= FADE_FACTOR;
-            if (m_fadeFactor <= 0.1f)
-                m_fadeFactor = 0.0f;
-        }
-
-        return 0;
-        */
-    }
-
-    bool Renderer11::drawFullScreenImage(ID3D11ShaderResourceView *texture, float fade, ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget)
+    void Renderer11::drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget)
     {
         // Reset GPU state
         m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
@@ -1929,32 +1888,29 @@ namespace T5M::Renderer
         m_context->OMSetRenderTargets(1, &target, depthTarget);
         m_context->RSSetViewports(1, &m_viewport);
         drawFullScreenQuad(texture, Vector3(fade, fade, fade), false);
-        return true;
     }
 
-    int Renderer11::DrawInventory()
-    {
+    void Renderer11::renderInventory()
+{
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
         m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-        drawInventoryScene(m_backBufferRTV, m_depthStencilView, m_dumpScreenRenderTarget.ShaderResourceView.Get());
+        renderInventoryScene(m_backBufferRTV, m_depthStencilView, m_dumpScreenRenderTarget.ShaderResourceView.Get());
         m_swapChain->Present(0, 0);
-        return 0;
     }
 
-    int Renderer11::DrawTitle()
-    {
+    void Renderer11::renderTitle()
+{
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
         m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
 
-        drawScene(m_backBufferRTV, m_depthStencilView, gameCamera);
+        renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-        drawInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
+        renderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
         m_swapChain->Present(0, 0);
-        return 0;
     }
 
-    bool Renderer11::drawScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, RenderView &view)
+    void Renderer11::renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
@@ -1981,11 +1937,11 @@ namespace T5M::Renderer
         //prepareCameraForFrame();
         clearSceneItems();
         collectRooms(view);
-        UpdateLaraAnimations(false);
+        updateLaraAnimations(false);
         updateItemsAnimations(view);
         updateEffects(view);
         if (g_Configuration.EnableShadows)
-            drawShadowMap();
+            renderShadowMap(view);
         m_items[Lara.itemNumber].Item = LaraItem;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
 
@@ -2018,13 +1974,12 @@ namespace T5M::Renderer
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+        m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context);
+        m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
         drawRooms(false, true, view);
         drawStatics(false, view);
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
         drawLara(false, false);
         drawItems(false, false, view);
         drawItems(false, true, view);
@@ -2097,7 +2052,7 @@ namespace T5M::Renderer
         // Bars
         int flash = FlashIt();
         if (DashTimer < 120)
-            DrawBar(DashTimer / 120.0f, g_DashBar);
+            drawBar(DashTimer / 120.0f, g_DashBar);
         UpdateHealthBar(flash);
         UpdateAirBar(flash);
         DrawAllPickups();
@@ -2121,7 +2076,7 @@ namespace T5M::Renderer
             printDebugMessage("Statics: %d", m_staticsToDraw.size());
             printDebugMessage("Lights: %d", m_lightsToDraw.size());
             printDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
-			printDebugMessage("LaraItem.boxNumber: %d", LaraItem->boxNumber);
+            printDebugMessage("LaraItem.boxNumber: %d", LaraItem->boxNumber);
             printDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
             printDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
             printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
@@ -2143,10 +2098,9 @@ namespace T5M::Renderer
 
         drawAllStrings();
 
-        return true;
     }
 
-    bool Renderer11::drawSimpleScene(ID3D11RenderTargetView *target, ID3D11DepthStencilView *depthTarget, RenderView &view)
+    void Renderer11::renderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
         GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -2172,20 +2126,18 @@ namespace T5M::Renderer
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GnFrameCounter;
         cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-        updateConstantBuffer<CCameraMatrixBuffer>(m_cbCameraMatrices, cameraConstantBuffer);
-        m_context->VSSetConstantBuffers(0, 1, &m_cbCameraMatrices);
+        m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context);
+        m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
         drawHorizonAndSky(depthTarget);
         drawRooms(false, false, view);
-        return true;
     }
 
-    int Renderer11::DumpGameScene()
-    {
-        drawScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(), gameCamera);
-        return 0;
+    void Renderer11::DumpGameScene()
+{
+        renderScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(), gameCamera);
     }
 
-    bool Renderer11::drawItems(bool transparent, bool animated, RenderView &view)
+    void Renderer11::drawItems(bool transparent, bool animated, RenderView& view)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2212,8 +2164,8 @@ namespace T5M::Renderer
         m_context->PSSetSamplers(0, 1, &sampler);
 
         m_stMisc.AlphaTest = !transparent;
-        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-        m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+        m_cbMisc.updateData(m_stMisc, m_context);
+        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         for (int i = 0; i < view.itemsToDraw.size(); i++)
         {
@@ -2248,10 +2200,9 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawAnimatingItem(RendererItem *item, bool transparent, bool animated)
+    void Renderer11::drawAnimatingItem(RendererItem* item, bool transparent, bool animated)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2260,7 +2211,7 @@ namespace T5M::Renderer
         int lastBucket = (transparent ? 4 : 2);
         if (m_rooms.size() <= item->Item->roomNumber)
         {
-            return true;
+            return;
         }
         RendererRoom &const room = m_rooms[item->Item->roomNumber];
         RendererObject &moveableObj = *m_moveableObjects[item->Item->objectNumber];
@@ -2270,19 +2221,19 @@ namespace T5M::Renderer
         m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
-        updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
-        m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-        m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+        m_cbItem.updateData(m_stItem, m_context);
+        m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+        m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
         m_stLights.NumLights = item->Lights.size();
         for (int j = 0; j < item->Lights.size(); j++)
             memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-        updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
-        m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+        m_cbLights.updateData(m_stLights, m_context);
+        m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
         m_stMisc.AlphaTest = !transparent;
-        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-        m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+        m_cbMisc.updateData(m_stMisc, m_context);
+        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
         {
@@ -2313,10 +2264,9 @@ namespace T5M::Renderer
             }
         }
 
-        return true;
     }
 
-    bool Renderer11::drawScaledSpikes(RendererItem *item, bool transparent, bool animated)
+    void Renderer11::drawScaledSpikes(RendererItem* item, bool transparent, bool animated)
     {
         short objectNumber = item->Item->objectNumber;
         if ((item->Item->objectNumber != ID_TEETH_SPIKES || item->Item->itemFlags[1]) && (item->Item->objectNumber != ID_RAISING_BLOCK1 || item->Item->triggerFlags > -1))
@@ -2328,13 +2278,13 @@ namespace T5M::Renderer
         }
     }
 
-	bool Renderer11::drawWraithExtra(RendererItem* item, bool transparent, bool animated)
+	void Renderer11::drawWraithExtra(RendererItem* item, bool transparent, bool animated)
 	{
 		ITEM_INFO* nativeItem = item->Item;
 		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
 		
 		if (transparent || animated)
-			return true;
+			return ;
 
 		for (int j = 0; j <= 4; j++)
 		{
@@ -2377,14 +2327,13 @@ namespace T5M::Renderer
 				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
 				Vector3 p2 = Vector3(info[i + 1].xPos , info[i + 1].yPos, info[i + 1].zPos);
 
-				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
+				addLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}
 		}
 
-		return true;
 	}
 
-    bool Renderer11::drawStatics(bool transparent, RenderView &view)
+    void Renderer11::drawStatics(bool transparent, RenderView& view)
     {
         //return true;
         UINT stride = sizeof(RendererVertex);
@@ -2419,33 +2368,31 @@ namespace T5M::Renderer
 
             RendererObject &staticObj = *m_staticObjects[msh->staticNumber];
 
-			if (staticObj.ObjectMeshes.size() > 0)
-			{
-				RendererMesh* mesh = staticObj.ObjectMeshes[0];
+            if (staticObj.ObjectMeshes.size() > 0)
+            {
+                RendererMesh *mesh = staticObj.ObjectMeshes[0];
 
-				m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
-				m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
-				updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
-				m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
+                m_stStatic.World = (Matrix::CreateRotationY(TO_RAD(msh->yRot)) * Matrix::CreateTranslation(msh->x, msh->y, msh->z));
+                m_stStatic.Color = Vector4(((msh->shade >> 10) & 0xFF) / 255.0f, ((msh->shade >> 5) & 0xFF) / 255.0f, ((msh->shade >> 0) & 0xFF) / 255.0f, 1.0f);
+                m_cbStatic.updateData(m_stStatic, m_context);
+                m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
 
-				for (int j = firstBucket; j < lastBucket; j++)
-				{
-					RendererBucket* bucket = &mesh->Buckets[j];
+                for (int j = firstBucket; j < lastBucket; j++)
+                {
+                    RendererBucket *bucket = &mesh->Buckets[j];
 
-					if (bucket->Vertices.size() == 0)
-						continue;
+                    if (bucket->Vertices.size() == 0)
+                        continue;
 
-					// Draw vertices
-					m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-					m_numDrawCalls++;
-				}
-			}
+                    // Draw vertices
+                    m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
+                    m_numDrawCalls++;
+                }
+            }
         }
-
-        return true;
     }
 
-    bool Renderer11::drawRooms(bool transparent, bool animated, RenderView &view)
+    void Renderer11::drawRooms(bool transparent, bool animated, RenderView& view)
     {
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
@@ -2470,15 +2417,15 @@ namespace T5M::Renderer
         m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
         m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[0])).ShaderResourceView.GetAddressOf());
         ID3D11SamplerState *sampler = m_states->AnisotropicWrap();
-        ID3D11SamplerState *shadowSampler = m_states->PointClamp();
         m_context->PSSetSamplers(0, 1, &sampler);
         m_context->PSSetShaderResources(1, 1, m_caustics[m_currentCausticsFrame / 2].ShaderResourceView.GetAddressOf());
-        m_context->PSSetSamplers(1, 1, &shadowSampler);
+        m_context->PSSetSamplers(1, 1, &m_shadowSampler);
         m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
 
         // Set shadow map data
         if (m_shadowLight != NULL)
         {
+
             memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
             m_stShadowMap.CastShadows = true;
             //m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
@@ -2487,10 +2434,9 @@ namespace T5M::Renderer
         {
             m_stShadowMap.CastShadows = false;
         }
-
-        updateConstantBuffer<CShadowLightBuffer>(m_cbShadowMap, m_stShadowMap);
-        m_context->VSSetConstantBuffers(4, 1, &m_cbShadowMap);
-        m_context->PSSetConstantBuffers(4, 1, &m_cbShadowMap);
+        m_cbShadowMap.updateData(m_stShadowMap, m_context);
+        m_context->VSSetConstantBuffers(4, 1, m_cbShadowMap.get());
+        m_context->PSSetConstantBuffers(4, 1, m_cbShadowMap.get());
 
         if (animated)
             m_primitiveBatch->Begin();
@@ -2502,18 +2448,18 @@ namespace T5M::Renderer
             m_stLights.NumLights = view.lightsToDraw.size();
             for (int j = 0; j < view.lightsToDraw.size(); j++)
                 memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
-            updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
-            m_context->PSSetConstantBuffers(1, 1, &m_cbLights);
+            m_cbLights.updateData(m_stLights, m_context);
+            m_context->PSSetConstantBuffers(1, 1, m_cbLights.get());
 
             m_stMisc.Caustics = (room->Room->flags & ENV_FLAG_WATER);
             m_stMisc.AlphaTest = !transparent;
-            updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-            m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+            m_cbMisc.updateData(m_stMisc, m_context);
+            m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
             m_stRoom.AmbientColor = room->AmbientLight;
             m_stRoom.water = (room->Room->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-            updateConstantBuffer<CRoomBuffer>(m_cbRoom, m_stRoom);
-            m_context->VSSetConstantBuffers(5, 1, &m_cbRoom);
-            m_context->PSSetConstantBuffers(5, 1, &m_cbRoom);
+            m_cbRoom.updateData(m_stRoom, m_context);
+            m_context->VSSetConstantBuffers(5, 1, m_cbRoom.get());
+            m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
             for (int j = firstBucket; j < lastBucket; j++)
             {
                 RendererBucket *bucket;
@@ -2553,18 +2499,16 @@ namespace T5M::Renderer
 
         if (animated)
             m_primitiveBatch->End();
-
-        return true;
     }
 
-    bool Renderer11::drawHorizonAndSky(ID3D11DepthStencilView *depthTarget)
+    void Renderer11::drawHorizonAndSky(ID3D11DepthStencilView* depthTarget)
     {
         // Update the sky
         GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
         Vector4 color = Vector4(SkyColor1.r / 255.0f, SkyColor1.g / 255.0f, SkyColor1.b / 255.0f, 1.0f);
 
         if (!level->Horizon)
-            return true;
+            return ;
 
         if (BinocularRange)
             AlterFOV(14560 - BinocularRange);
@@ -2644,8 +2588,8 @@ namespace T5M::Renderer
         m_context->PSSetShader(m_psSky, NULL, 0);
 
         m_stMisc.AlphaTest = true;
-        updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-        m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+        m_cbMisc.updateData(m_stMisc, m_context);
+        m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         m_context->PSSetShaderResources(0, 1, m_skyTexture.ShaderResourceView.GetAddressOf());
         sampler = m_states->AnisotropicClamp();
@@ -2661,9 +2605,9 @@ namespace T5M::Renderer
 
             m_stStatic.World = (rotation * translation);
             m_stStatic.Color = color;
-            updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
-            m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
-            m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
+            m_cbStatic.updateData(m_stStatic, m_context);
+            m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+            m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
 
             m_primitiveBatch->Begin();
             m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -2688,13 +2632,13 @@ namespace T5M::Renderer
             m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
             m_stStatic.Position = Vector4::Zero;
             m_stStatic.Color = Vector4::One;
-            updateConstantBuffer<CStaticBuffer>(m_cbStatic, m_stStatic);
-            m_context->VSSetConstantBuffers(1, 1, &m_cbStatic);
-            m_context->PSSetConstantBuffers(1, 1, &m_cbStatic);
+            m_cbStatic.updateData(m_stStatic, m_context);
+            m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+            m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
 
             m_stMisc.AlphaTest = true;
-            updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-            m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+            m_cbMisc.updateData(m_stMisc, m_context);
+            m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
             for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
             {
@@ -2722,22 +2666,15 @@ namespace T5M::Renderer
         // Clear just the Z-buffer so we can start drawing on top of the horizon
         m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-        return true;
     }
 
-    bool Renderer11::drawAmbientCubeMap(short roomNumber)
-    {
-        return true;
-    }
-
-    int Renderer11::Draw()
-    {
+    void Renderer11::Draw()
+{
 
         renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
-        drawScene(m_backBufferRTV, m_depthStencilView, gameCamera);
+        renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();
         //drawFinalPass();
         m_swapChain->Present(0, 0);
-        return 0;
     }
 } // namespace T5M::Renderer

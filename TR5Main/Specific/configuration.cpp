@@ -18,7 +18,7 @@ void LoadResolutionsInCombobox(HWND handle, int index)
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
-	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
 	RendererVideoAdapter* adapter = &(*adapters)[index];
 
 	for (int i = 0; i < adapter->DisplayModes.size(); i++)
@@ -44,7 +44,7 @@ void LoadAdaptersInCombobox(HWND handle)
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
-	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
+	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
 	for (int i = 0; i < adapters->size(); i++)
 	{
 		RendererVideoAdapter* adapter = &(*adapters)[i];
@@ -140,7 +140,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
 				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
 				selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
-				adapter = &(*g_Renderer.GetAdapters())[g_Configuration.Adapter];
+				adapter = &(*g_Renderer.getAdapters())[g_Configuration.Adapter];
 				mode = &(adapter->DisplayModes[selectedMode]);
 				g_Configuration.Width = mode->Width;
 				g_Configuration.Height = mode->Height;
@@ -285,8 +285,12 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, g_Configuration.RefreshRate) != ERROR_SUCCESS)
-	{
+	if(SetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, g_Configuration.RefreshRate) != ERROR_SUCCESS){
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if(SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.shadowMapSize) != ERROR_SUCCESS){
 		RegCloseKey(rootKey);
 		return false;
 	}
@@ -327,6 +331,7 @@ void InitDefaultConfiguration()
 	g_Configuration.SfxVolume = 100;
 	g_Configuration.Width = 1366;
 	g_Configuration.Height = 768;
+	g_Configuration.shadowMapSize = 512;
 }
 
 bool LoadConfiguration()
@@ -462,7 +467,7 @@ bool LoadConfiguration()
 	g_Configuration.SfxVolume = sfxVolume;
 	g_Configuration.RefreshRate = refreshRate;
 	g_Configuration.SoundDevice = soundDevice;
-
+	g_Configuration.shadowMapSize = 512;
 	// Set legacy variables
 	//OptionAutoTarget = autoTarget;
 	GlobalMusicVolume = musicVolume;

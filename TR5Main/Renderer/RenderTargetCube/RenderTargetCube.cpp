@@ -2,14 +2,14 @@
 #include "RenderTargetCube.h"
 #include "Utils.h"
 using T5M::Renderer::Utils::throwIfFailed;
-T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT format) : resolution(resolution) {
+T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) : resolution(resolution) {
 
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = resolution;
 	desc.Height = resolution;
 	desc.MipLevels = 1;
 	desc.ArraySize = 6;
-	desc.Format = format;
+	desc.Format = colorFormat;
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
@@ -17,7 +17,7 @@ T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int reso
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-	HRESULT res = device->CreateTexture2D(&desc, NULL, &Texture);
+	HRESULT res = device->CreateTexture2D(&desc, NULL, Texture.GetAddressOf());
 	throwIfFailed(res);
 
 	D3D11_RENDER_TARGET_VIEW_DESC viewDesc = {};
@@ -49,7 +49,7 @@ T5M::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int reso
 	depthTexDesc.ArraySize = 6;
 	depthTexDesc.SampleDesc.Count = 1;
 	depthTexDesc.SampleDesc.Quality = 0;
-	depthTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthTexDesc.Format = depthFormat;
 	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	depthTexDesc.CPUAccessFlags = 0;

@@ -48,6 +48,7 @@
 #define REGKEY_JWLK				"JWlk"
 #define REGKEY_REFRESH_RATE		"RefreshRate"
 #define REGKEY_SOUND_DEVICE		"SoundDevice"
+#define REGKEY_SHADOW_MAP       "ShadowMap"
 
 typedef struct GameConfiguration {
 	int Width;
@@ -77,6 +78,7 @@ typedef struct GameConfiguration {
 	int JoyLook;
 	int JoyRoll;
 	int JoyWalk;
+	int shadowMapSize = 1024;
 };
 
 void LoadResolutionsInCombobox(HWND handle, int index);

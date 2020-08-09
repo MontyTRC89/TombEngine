@@ -1047,7 +1047,7 @@ void AnimateLara(ITEM_INFO* item)
 	}
 
 	// Update matrices
-	g_Renderer.UpdateLaraAnimations(true);
+	g_Renderer.updateLaraAnimations(true);
 }
 
 void DelAlignLaraToRope(ITEM_INFO* item) // (F) (D)
