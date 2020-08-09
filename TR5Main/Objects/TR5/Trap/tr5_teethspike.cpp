@@ -221,10 +221,10 @@ void ControlTeethSpikes(short itemNumber)
 
 				if (item->pos.yPos >= LaraItem->pos.yPos && height - LaraItem->pos.yPos < 50)
 				{
-					LaraItem->animNumber = ANIMATION_LARA_SPIKED;
+					LaraItem->animNumber = LA_SPIKE_DEATH;
 					LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-					LaraItem->currentAnimState = STATE_LARA_DEATH;
-					LaraItem->goalAnimState = STATE_LARA_DEATH;
+					LaraItem->currentAnimState = LS_DEATH;
+					LaraItem->goalAnimState = LS_DEATH;
 					LaraItem->gravityStatus = false;
 				}
 			}

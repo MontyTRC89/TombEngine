@@ -1502,7 +1502,7 @@ void Inventory::UseCurrentItem()
 	// Binoculars
 	if (objectNumber == ID_BINOCULARS_ITEM)
 	{
-		if (LaraItem->currentAnimState == STATE_LARA_STOP && LaraItem->animNumber == ANIMATION_LARA_STAY_IDLE || Lara.isDucked && !(TrInput & 0x20000000))
+		if (LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE || Lara.isDucked && !(TrInput & 0x20000000))
 		{
 			if (!SniperCameraActive && !UseSpotCam && !TrackCameraInit)
 			{
@@ -1565,15 +1565,15 @@ void Inventory::UseCurrentItem()
 	}
 
 	// TODO: can cause problem with harpoongun in underwater and wading !
-	bool canUseWeapons = !(LaraItem->currentAnimState == STATE_LARA_CRAWL_IDLE || 
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_FORWARD ||
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TURN_LEFT || 
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TURN_RIGHT ||
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_BACK || 
-						   LaraItem->currentAnimState == STATE_LARA_CRAWL_TO_CLIMB ||
-						   LaraItem->currentAnimState == STATE_LARA_CROUCH_IDLE || 
-						   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_LEFT ||
-						   LaraItem->currentAnimState == STATE_LARA_CROUCH_TURN_RIGHT || 
+	bool canUseWeapons = !(LaraItem->currentAnimState == LS_CRAWL_IDLE || 
+						   LaraItem->currentAnimState == LS_CRAWL_FORWARD ||
+						   LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT || 
+						   LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
+						   LaraItem->currentAnimState == LS_CRAWL_BACK || 
+						   LaraItem->currentAnimState == LS_CRAWL_TO_HANG ||
+						   LaraItem->currentAnimState == LS_CROUCH_IDLE || 
+						   LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
+						   LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT || 
 						   Lara.waterStatus != LW_ABOVE_WATER);
 
 	// Pistols
@@ -1733,12 +1733,12 @@ void Inventory::UseCurrentItem()
 	{
 		if (!Lara.gunStatus)
 		{
-			if (LaraItem->currentAnimState != STATE_LARA_CRAWL_IDLE &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_FORWARD &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_TURN_LEFT &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_TURN_RIGHT &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_BACK &&
-				LaraItem->currentAnimState != STATE_LARA_CRAWL_TO_CLIMB && 
+			if (LaraItem->currentAnimState != LS_CRAWL_IDLE &&
+				LaraItem->currentAnimState != LS_CRAWL_FORWARD &&
+				LaraItem->currentAnimState != LS_CRAWL_TURN_LEFT &&
+				LaraItem->currentAnimState != LS_CRAWL_TURN_RIGHT &&
+				LaraItem->currentAnimState != LS_CRAWL_BACK &&
+				LaraItem->currentAnimState != LS_CRAWL_TO_HANG && 
 				Lara.waterStatus == LW_ABOVE_WATER)
 			{
 				if (Lara.gunType != WEAPON_FLARE)

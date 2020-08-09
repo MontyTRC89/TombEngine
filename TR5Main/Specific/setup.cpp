@@ -27,6 +27,7 @@
 #include "tr3_objects.h"
 #include "tr4_objects.h"
 #include "tr5_objects.h"
+#include <tr4_littlebeetle.h>
 /// register objects
 #include "object_helper.h"
 
@@ -786,6 +787,7 @@ void InitialiseSpecialEffects()
 	NextDrip = 0;
 	NextBlood = 0;
 	WBRoom = -1;
+	ClearLittleBeetles();
 }
 
 void CustomObjects()
@@ -861,5 +863,6 @@ void InitialiseObjects()
 	SequenceUsed[4] = 0;
 	SequenceUsed[5] = 0;
 
+	AllocTR4Objects();
 	AllocTR5Objects();
 }

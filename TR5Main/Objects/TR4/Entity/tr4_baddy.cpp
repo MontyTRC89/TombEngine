@@ -9,6 +9,7 @@
 #include "effect.h"
 #include "setup.h"
 #include "level.h"
+#include <draw.h>
 
 enum BADDY_STATES {
 	STATE_BADDY_STOP = 0,
@@ -156,21 +157,6 @@ enum BADDY_SWAP_MESH_FLAGS {
 
 BITE_INFO baddyGun = { 0, -16, 200, 11 };
 BITE_INFO baddySword = { 0, 0, 0, 15 };
-
-void ClampRotation(PHD_3DPOS *pos, short angle, short rot)
-{
-	if (angle <= rot)
-	{
-		if (angle >= -rot)
-			pos->yRot += angle;
-		else
-			pos->yRot -= rot;
-	}
-	else
-	{
-		pos->yRot += rot;
-	}
-}
 
 void InitialiseBaddy(short itemNum)
 {
@@ -899,13 +885,13 @@ void BaddyControl(short itemNum)
 
 			if (laraInfo.ahead
 				&& laraInfo.distance < SQUARE(682)
-				&& (LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_IDLE
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_FORWARD
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_LEFT
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_RIGHT
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURNAROUND
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_LEFT
-					|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_RIGHT))
+				&& (LaraItem->currentAnimState == LS_MONKEYSWING_IDLE
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_FORWARD
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_LEFT
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_RIGHT
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_180
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT
+					|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT))
 			{
 				item->goalAnimState = STATE_BADDY_MONKEY_PUSH_OFF;
 			}
@@ -945,13 +931,13 @@ void BaddyControl(short itemNum)
 				if (laraInfo.distance < SQUARE(682))
 				{
 
-					if (LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_IDLE
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_FORWARD
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_LEFT
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_RIGHT
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURNAROUND
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_LEFT
-						|| LaraItem->currentAnimState == STATE_LARA_MONKEYSWING_TURN_RIGHT)
+					if (LaraItem->currentAnimState == LS_MONKEYSWING_IDLE
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_FORWARD
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_LEFT
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_RIGHT
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_180
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT
+						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT)
 					{
 						item->goalAnimState = STATE_BADDY_MONKEY_IDLE;
 					}
@@ -965,9 +951,9 @@ void BaddyControl(short itemNum)
 			{
 				if (item->touchBits)
 				{
-					LaraItem->currentAnimState = STATE_LARA_JUMP_UP;
-					LaraItem->goalAnimState = STATE_LARA_JUMP_UP;
-					LaraItem->animNumber = ANIMATION_LARA_TRY_HANG_VERTICAL;
+					LaraItem->currentAnimState = LS_JUMP_UP;
+					LaraItem->goalAnimState = LS_JUMP_UP;
+					LaraItem->animNumber = LA_JUMP_UP;
 					LaraItem->frameNumber = g_Level.Anims[LaraItem->frameNumber].frameBase + 9;
 					LaraItem->gravityStatus = true;
 					LaraItem->speed = 2;
