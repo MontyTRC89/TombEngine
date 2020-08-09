@@ -32,8 +32,8 @@ namespace T5M::Renderer
 				z >= r->z && z <= r->z + r->ySize * 1024.0f);
 	}
 
-	vector<RendererVideoAdapter> *Renderer11::GetAdapters()
-	{
+	std::vector<T5M::Renderer::RendererVideoAdapter>* Renderer11::getAdapters()
+{
 		return &m_adapters;
 	}
 
@@ -247,7 +247,7 @@ namespace T5M::Renderer
 		return GetFrame_D2(&item, framePtr, rate);
 	}
 
-	void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
+	void Renderer11::updateItemAnimations(int itemNumber, bool force)
 	{
 		RendererItem *itemToDraw = &m_items[itemNumber];
 		itemToDraw->Id = itemNumber;
@@ -327,7 +327,7 @@ namespace T5M::Renderer
 			if (item->objectNumber == ID_LARA)
 				continue;
 
-			UpdateItemAnimations(itemToDraw->Id, false);
+			updateItemAnimations(itemToDraw->Id, false);
 		}
 	}
 
@@ -503,11 +503,11 @@ namespace T5M::Renderer
 
 		return -1;
 	}
-	bool Renderer11::IsFullsScreen()
-	{
+	bool Renderer11::isFullsScreen()
+{
 		return (!Windowed);
 	}
-	bool Renderer11::IsFading()
+	bool Renderer11::isFading()
 	{
 		return false;
 		return (m_fadeStatus != FADEMODE_NONE);
@@ -518,14 +518,12 @@ namespace T5M::Renderer
 		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width, g_Configuration.Height);
 	}
 
-	bool Renderer11::EnumerateVideoModes()
-	{
+	void Renderer11::EnumerateVideoModes()
+{
 		HRESULT res;
 
 		IDXGIFactory *dxgiFactory = NULL;
-		res = CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)&dxgiFactory);
-		if (FAILED(res))
-			return false;
+		Utils::throwIfFailed(CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)&dxgiFactory));
 
 		IDXGIAdapter *dxgiAdapter = NULL;
 
@@ -542,32 +540,22 @@ namespace T5M::Renderer
 
 			adapter.Index = i;
 			adapter.Name = videoCardDescription;
-
-			printf("Adapter %d\n", i);
-			printf("\t Device Name: %s\n", videoCardDescription);
-
-			IDXGIOutput *output = NULL;
-			res = dxgiAdapter->EnumOutputs(0, &output);
-			if (FAILED(res))
-				return false;
+			logD("Adapter %d", i);
+			logD("Device Name : ", videoCardDescription);
+			ComPtr<IDXGIOutput> output;
+			if(FAILED(dxgiAdapter->EnumOutputs(0, output.GetAddressOf())))
+				continue;
 
 			UINT numModes = 0;
-			DXGI_MODE_DESC *displayModes = NULL;
+			std::vector<DXGI_MODE_DESC> displayModes;
 			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 			// Get the number of elements
-			res = output->GetDisplayModeList(format, 0, &numModes, NULL);
-			if (FAILED(res))
-				return false;
+			Utils::throwIfFailed(output->GetDisplayModeList(format, 0, &numModes, NULL));
 
 			// Get the list
-			displayModes = new DXGI_MODE_DESC[numModes];
-			res = output->GetDisplayModeList(format, 0, &numModes, displayModes);
-			if (FAILED(res))
-			{
-				delete displayModes;
-				return false;
-			}
+			displayModes.resize(numModes);
+			Utils::throwIfFailed(output->GetDisplayModeList(format, 0, &numModes, displayModes.data()));
 
 			for (int j = 0; j < numModes; j++)
 			{
@@ -598,17 +586,14 @@ namespace T5M::Renderer
 					continue;
 
 				adapter.DisplayModes.push_back(newMode);
-				printf("\t\t %d x %d %d Hz\n", newMode.Width, newMode.Height, newMode.RefreshRate);
+				logD("W: ", newMode.Width,"H: ", newMode.Height," ", newMode.RefreshRate, "Hz");
 			}
 
 			m_adapters.push_back(adapter);
 
-			delete displayModes;
 		}
 
 		dxgiFactory->Release();
-
-		return true;
 	}
 
 	int SortLightsFunction(RendererLight *a, RendererLight *b)
@@ -794,9 +779,9 @@ namespace T5M::Renderer
 		return box.Intersects(sphere);
 	}
 
-	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone) {}
+	void Renderer11::getLaraBonePosition(Vector3 *pos, int bone) {}
 
-	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
+	void Renderer11::flipRooms(short roomNumber1, short roomNumber2)
 	{
 		RendererRoom temporary;
 
@@ -812,14 +797,14 @@ namespace T5M::Renderer
 		return m_meshes[meshIndex];
 	}
 
-	void Renderer11::GetLaraAbsBonePosition(Vector3 *pos, int joint)
+	void Renderer11::getLaraAbsBonePosition(Vector3 *pos, int joint)
 	{
 		Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
 		world = world * m_LaraWorldMatrix;
 		*pos = Vector3::Transform(*pos, world);
 	}
 
-	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
+	void Renderer11::getItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
@@ -832,16 +817,16 @@ namespace T5M::Renderer
 		if (!rendererItem->DoneAnimations)
 		{
 			if (itemNumber == Lara.itemNumber)
-				UpdateLaraAnimations(false);
+				updateLaraAnimations(false);
 			else
-				UpdateItemAnimations(itemNumber, false);
+				updateItemAnimations(itemNumber, false);
 		}
 
 		Matrix world = rendererItem->AnimationTransforms[joint] * rendererItem->World;
 		*pos = Vector3::Transform(*pos, world);
 	}
 
-	int Renderer11::GetSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
+	int Renderer11::getSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		rendererItem->Id = itemNumber;
@@ -854,9 +839,9 @@ namespace T5M::Renderer
 		if (!rendererItem->DoneAnimations)
 		{
 			if (itemNumber == Lara.itemNumber)
-				UpdateLaraAnimations(false);
+				updateLaraAnimations(false);
 			else
-				UpdateItemAnimations(itemNumber, false);
+				updateItemAnimations(itemNumber, false);
 		}
 
 		int x, y, z;
@@ -898,7 +883,7 @@ namespace T5M::Renderer
 		return moveable.ObjectMeshes.size();
 	}
 
-	void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
+	void Renderer11::getBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
 	{
 		RendererObject &obj = *m_moveableObjects[ID_LARA];
 		*outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;

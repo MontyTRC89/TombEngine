@@ -83,7 +83,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	if (AlphaTest)
 		clip(output.w - 0.5f);
 
-	float3 lighting = AmbientLight.xyz * 2.0f;
+	float3 lighting = AmbientLight.xyz;
 	float4 reflectionColor = Reflection.Sample(Sampler,input.ReflectionVector.xyz);
 	for (int i = 0; i < NumLights; i++)
 	{

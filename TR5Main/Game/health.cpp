@@ -36,7 +36,7 @@ void DrawHealthBarOverlay(int value)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
-		g_Renderer.DrawBar(value, ::g_HealthBar);
+		g_Renderer.drawBar(value, ::g_HealthBar);
 	}
 }
 
@@ -44,7 +44,7 @@ void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.DrawBar(value, ::g_HealthBar);
+		g_Renderer.drawBar(value, ::g_HealthBar);
 	}
 }
 
@@ -137,7 +137,7 @@ void DrawAirBar(float value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.DrawBar(value, ::g_AirBar);
+		g_Renderer.drawBar(value, ::g_AirBar);
 	}
 }
 
@@ -183,7 +183,7 @@ void DrawDashBar(int value)
 {
 	if (CurrentLevel)
 	{
-		g_Renderer.DrawBar(value, ::g_DashBar);
+		g_Renderer.drawBar(value, ::g_DashBar);
 	}
 }
 
@@ -194,12 +194,12 @@ int DrawAllPickups()
 		if (PickupX > 0)
 		{
 			PickupX += -PickupX >> 5;
-			return g_Renderer.DrawPickup(Pickups[CurrentPickup].objectNumber);
+			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 		}
 		else
 		{
 			Pickups[CurrentPickup].life--;
-			return g_Renderer.DrawPickup(Pickups[CurrentPickup].objectNumber);
+			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 		}
 	}
 	else if (Pickups[CurrentPickup].life == 0)
@@ -209,13 +209,13 @@ int DrawAllPickups()
 			if (PickupVel < 16)
 				PickupVel++;
 			PickupX += PickupVel >> 2;
-			return g_Renderer.DrawPickup(Pickups[CurrentPickup].objectNumber);
+			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 		}
 		else
 		{
 			Pickups[CurrentPickup].life = -1;
 			PickupVel = 0;
-			return g_Renderer.DrawPickup(Pickups[CurrentPickup].objectNumber);
+			g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 		}
 	}
 
@@ -230,7 +230,7 @@ int DrawAllPickups()
 
 	CurrentPickup = pickupIndex;
 	if (i != MAX_COLLECTED_PICKUPS)
-		return g_Renderer.DrawPickup(Pickups[CurrentPickup].objectNumber);
+		g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
 
 	CurrentPickup = 0;
 

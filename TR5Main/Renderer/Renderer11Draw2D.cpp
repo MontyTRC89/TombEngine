@@ -9,7 +9,8 @@ T5M::Renderer::RendererHUDBar* g_MusicVolumeBar;
 T5M::Renderer::RendererHUDBar* g_SFXVolumeBar;
 namespace T5M::Renderer {
 
-	bool Renderer11::initialiseBars() {
+	void Renderer11::initialiseBars()
+{
 		std::array<Vector4, 9> healthColors = {
 			//top
 			Vector4(82 / 255.0f,0,0,1),
@@ -73,9 +74,8 @@ namespace T5M::Renderer {
 		g_DashBar = new RendererHUDBar(m_device, 630, 32 + 8 + 4, 150, 8, 1, dashColors);
 		g_MusicVolumeBar = new RendererHUDBar(m_device, 400, 212, 150, 8, 1, soundSettingColors);
 		g_SFXVolumeBar = new RendererHUDBar(m_device, 400, 230, 150, 8, 1, soundSettingColors);
-		return true;
 	}
-	bool Renderer11::DrawBar(float percent, const RendererHUDBar* const bar) {
+	void Renderer11::drawBar(float percent, const RendererHUDBar* const bar) {
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
@@ -84,7 +84,7 @@ namespace T5M::Renderer {
 		m_context->IASetVertexBuffers(0, 1, bar->vertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
+		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
 		m_context->VSSetShader(m_vsHUD, NULL, 0);
 		m_context->PSSetShaderResources(0, 1, m_HUDBarBorderTexture.ShaderResourceView.GetAddressOf());
 		ID3D11SamplerState* sampler = m_states->LinearClamp();
@@ -102,21 +102,18 @@ namespace T5M::Renderer {
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_stHUDBar.Percent = percent;
-		updateConstantBuffer<CHUDBarBuffer>(m_cbHUDBar, m_stHUDBar);
-		m_context->VSSetConstantBuffers(0, 1, &m_cbHUD);
-		m_context->PSSetConstantBuffers(0, 1, &m_cbHUDBar);
+		m_cbHUDBar.updateData(m_stHUDBar, m_context);
+		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
+		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
 		m_context->VSSetShader(m_vsHUD, NULL, 0);
 		m_context->PSSetShader(m_psHUDBarColor, NULL, 0);
 		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
 		m_context->RSSetState(m_states->CullNone());
 		m_context->DrawIndexed(24, 0, 0);
-
-
-		return true;
 	}
 
-	void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
+	void Renderer11::addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
 		RendererLine2D* line = &m_lines2DBuffer[m_nextLine2D++];
 
 		line->Vertices[0] = Vector2(x1, y1);
@@ -126,9 +123,10 @@ namespace T5M::Renderer {
 		m_lines2DToDraw.push_back(line);
 	}
 
-	bool Renderer11::drawOverlays() {
+	void Renderer11::drawOverlays()
+{
 		if (!BinocularRange && !SpotcamOverlay)
-			return true;
+			return;
 
 		m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
 		drawFullScreenQuad(m_binocularsTexture.ShaderResourceView.Get(), Vector3::One, false);
@@ -176,11 +174,9 @@ namespace T5M::Renderer {
 			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
 			m_primitiveBatch->End();
 		}
-
-		return true;
 	}
 
-	bool Renderer11::drawColoredQuad(int x, int y, int w, int h, Vector4 color) {
+	void Renderer11::drawColoredQuad(int x, int y, int w, int h, DirectX::SimpleMath::Vector4 color) {
 		float factorW = ScreenWidth / 800.0f;
 		float factorH = ScreenHeight / 600.0f;
 
@@ -197,14 +193,13 @@ namespace T5M::Renderer {
 		int shiftW = 4 * factorW;
 		int shiftH = 4 * factorH;
 
-		AddLine2D(rect.left + shiftW, rect.top + shiftH, rect.right - shiftW, rect.top + shiftH, 128, 128, 128, 128);
-		AddLine2D(rect.right - shiftW, rect.top + shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
-		AddLine2D(rect.left + shiftW, rect.bottom - shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
-		AddLine2D(rect.left + shiftW, rect.top + shiftH, rect.left + shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
+		addLine2D(rect.left + shiftW, rect.top + shiftH, rect.right - shiftW, rect.top + shiftH, 128, 128, 128, 128);
+		addLine2D(rect.right - shiftW, rect.top + shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
+		addLine2D(rect.left + shiftW, rect.bottom - shiftH, rect.right - shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
+		addLine2D(rect.left + shiftW, rect.top + shiftH, rect.left + shiftW, rect.bottom - shiftH, 128, 128, 128, 128);
 
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
-		return true;
 	}
 
 }

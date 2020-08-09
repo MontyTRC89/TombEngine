@@ -11,7 +11,7 @@ namespace T5M::Renderer {
 		ComPtr<ID3D11Texture2D> DepthStencilTexture;
 		ComPtr<ID3D11ShaderResourceView> DepthShaderResourceView;
 		RenderTarget2D() {};
-		RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT format);
+		RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat = DXGI_FORMAT_D32_FLOAT);
 	};
 
 }

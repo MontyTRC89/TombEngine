@@ -14,7 +14,7 @@ namespace  T5M::Renderer {
 		_vsprintf_l(buffer, message, NULL, args);
 		va_end(args);
 
-		PrintString(10, m_currentY, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+		drawString(10, m_currentY, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
 
 		m_currentY += 20;
 	}

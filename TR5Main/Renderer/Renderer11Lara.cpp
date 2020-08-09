@@ -13,7 +13,7 @@
 using namespace T5M::Renderer;
 
 extern GameFlow *g_GameFlow;
-void Renderer11::UpdateLaraAnimations(bool force)
+void Renderer11::updateLaraAnimations(bool force)
 {
 	Matrix translation;
 	Matrix rotation;
@@ -138,11 +138,11 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
-bool Renderer11::drawLara(bool transparent, bool shadowMap)
+void T5M::Renderer::Renderer11::drawLara(bool transparent, bool shadowMap)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
-		return true;
+		return;
 
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
@@ -177,8 +177,8 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_context->PSSetSamplers(0, 1, &sampler);
 
 	m_stMisc.AlphaTest = !transparent;
-	updateConstantBuffer<CMiscBuffer>(m_cbMisc, m_stMisc);
-	m_context->PSSetConstantBuffers(3, 1, &m_cbMisc);
+	m_cbMisc.updateData(m_stMisc, m_context);
+	m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
 	RendererObject &laraObj = *m_moveableObjects[ID_LARA];
 	RendererObject &laraSkin = *m_moveableObjects[ID_LARA_SKIN];
@@ -188,17 +188,17 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
 	m_stItem.AmbientLight = room.AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-	updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
-	m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-	m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+	m_cbItem.updateData(m_stItem, m_context);
+	m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+	m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
 	if (!shadowMap)
 	{
 		m_stLights.NumLights = item->Lights.size();
 		for (int j = 0; j < item->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-		updateConstantBuffer<CLightBuffer>(m_cbLights, m_stLights);
-		m_context->PSSetConstantBuffers(2, 1, &m_cbLights);
+		m_cbLights.updateData(m_stLights, m_context);
+		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 	}
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -256,9 +256,9 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 			matrices[i + 1] = world;
 		}
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
-		updateConstantBuffer<CItemBuffer>(m_cbItem, m_stItem);
-		m_context->VSSetConstantBuffers(1, 1, &m_cbItem);
-		m_context->PSSetConstantBuffers(1, 1, &m_cbItem);
+		m_cbItem.updateData(m_stItem,m_context);
+		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
 		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 		{
@@ -277,8 +277,6 @@ bool Renderer11::drawLara(bool transparent, bool shadowMap)
 			}
 		}	
 	}
-
-	return true;
 }
 
 void Renderer11::drawLaraHolsters(bool transparent)

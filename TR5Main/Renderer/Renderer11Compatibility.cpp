@@ -112,7 +112,7 @@ namespace T5M::Renderer
 			TEXTURE *texture = &g_Level.RoomTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
+				normal = createDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
 			}
@@ -125,7 +125,7 @@ namespace T5M::Renderer
 			TEXTURE *texture = &g_Level.MoveablesTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
+				normal = createDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
 			}
@@ -138,7 +138,7 @@ namespace T5M::Renderer
 			TEXTURE *texture = &g_Level.StaticsTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = CreateDefaultNormalTexture();
+				normal = createDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
 			}

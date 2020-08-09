@@ -24,9 +24,12 @@
 struct CAMERA_INFO;
 
 #include <level.h>
+#include "ConstantBuffer/ConstantBuffer.h"
+#include "RenderTargetCubeArray/RenderTargetCubeArray.h"
 
 namespace T5M::Renderer
 {
+	constexpr size_t MAX_DYNAMIC_SHADOWS = 1;
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 	#define MESH_BITS(x) (1 << x)
 	#define DX11_RELEASE(x) if (x != NULL) x->Release()
@@ -403,6 +406,9 @@ namespace T5M::Renderer
 		ID3D11PixelShader* m_psHUDTexture;
 		ID3D11PixelShader* m_psHUDBarColor;
 	
+
+		ID3D11SamplerState* m_shadowSampler;
+
 		ID3D11ShaderResourceView* m_shadowMapRV;
 		ID3D11Texture2D* m_shadowMapTexture;
 		ID3D11DepthStencilView* m_shadowMapDSV;
@@ -410,25 +416,25 @@ namespace T5M::Renderer
 	
 		// Constant buffers
 		RenderView gameCamera;
-		ID3D11Buffer* m_cbCameraMatrices;
+		ConstantBuffer<CCameraMatrixBuffer> m_cbCameraMatrices;
 		CItemBuffer m_stItem;
-		ID3D11Buffer* m_cbItem;
+		ConstantBuffer<CItemBuffer> m_cbItem;
 		CStaticBuffer m_stStatic;
-		ID3D11Buffer* m_cbStatic;
+		ConstantBuffer<CStaticBuffer> m_cbStatic;
 		CLightBuffer m_stLights;
-		ID3D11Buffer* m_cbLights;
+		ConstantBuffer<CLightBuffer> m_cbLights;
 		CMiscBuffer m_stMisc;
-		ID3D11Buffer* m_cbMisc;
+		ConstantBuffer<CMiscBuffer> m_cbMisc;
 		CRoomBuffer m_stRoom;
-		ID3D11Buffer* m_cbRoom;
+		ConstantBuffer<CRoomBuffer> m_cbRoom;
 		CShadowLightBuffer m_stShadowMap;
-		ID3D11Buffer* m_cbShadowMap;
+		ConstantBuffer<CShadowLightBuffer> m_cbShadowMap;
 		CHUDBuffer m_stHUD;
-		ID3D11Buffer* m_cbHUD;
+		ConstantBuffer<CHUDBuffer> m_cbHUD;
 		CHUDBarBuffer m_stHUDBar;
-		ID3D11Buffer* m_cbHUDBar;
+		ConstantBuffer<CHUDBarBuffer> m_cbHUDBar;
 		CSpriteBuffer m_stSprite;
-		ID3D11Buffer* m_cbSprite;
+		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		// Text and sprites
 		SpriteFont* m_gameFont;
 		SpriteBatch* m_spriteBatch;
@@ -442,6 +448,7 @@ namespace T5M::Renderer
 		T5M::Renderer::Texture2D m_caustics[NUM_CAUSTICS_TEXTURES];
 		T5M::Renderer::Texture2D m_binocularsTexture;
 		T5M::Renderer::Texture2D m_whiteTexture;
+		T5M::Renderer::RenderTargetCubeArray m_shadowMaps;
 	
 		// Level data
 		T5M::Renderer::Texture2D m_titleScreen;
@@ -527,13 +534,7 @@ namespace T5M::Renderer
 		int m_pickupRotation;
 	
 		// Private functions
-		bool											drawScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, CCameraMatrixBuffer& camera);
-		bool											drawAllStrings();
-		ID3D11VertexShader*								compileVertexShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
-		ID3D11GeometryShader*							compileGeometryShader(const wchar_t * fileName);
-		ID3D11PixelShader*								compilePixelShader(const wchar_t * fileName, const char* function, const char* model, ID3D10Blob** bytecode);
-		ID3D11ComputeShader*							compileComputeShader(const wchar_t * fileName);
-		ID3D11Buffer*									createConstantBuffer(size_t size);
+		void drawAllStrings();
 		int												getAnimatedTextureInfo(short textureId);
 		void											initialiseHairRemaps();
 		RendererMesh*									getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
@@ -558,18 +559,18 @@ namespace T5M::Renderer
 		int												getFrame(short animation, short frame, ANIM_FRAME** framePtr, int* rate);
 		bool											drawAmbientCubeMap(short roomNumber);
 		bool											sphereBoxIntersection(DirectX::SimpleMath::Vector3 boxMin, DirectX::SimpleMath::Vector3 boxMax, DirectX::SimpleMath::Vector3 sphereCentre, float sphereRadius);
-		bool											drawHorizonAndSky(ID3D11DepthStencilView* depthTarget);
-		bool drawRooms(bool transparent, bool animated, RenderView& view);
-		bool											drawItems(bool transparent, bool animated,RenderView& view);
-		bool											drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
-		bool											drawBaddieGunflashes();
-		bool											drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
-		bool drawStatics(bool transparent, RenderView& view);
-		bool											drawWaterfalls();
-		bool											drawWraithExtra(RendererItem* item, bool transparent, bool animated);
-		bool											drawShadowMap();
-		bool											drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
-		bool											drawLara(bool transparent, bool shadowMap);
+		void drawHorizonAndSky(ID3D11DepthStencilView* depthTarget);
+		void drawRooms(bool transparent, bool animated, RenderView& view);
+		void drawItems(bool transparent, bool animated,RenderView& view);
+		void drawAnimatingItem(RendererItem* item, bool transparent, bool animated);
+		void drawBaddieGunflashes();
+		void drawScaledSpikes(RendererItem* item, bool transparent, bool animated);
+		void drawStatics(bool transparent, RenderView& view);
+		void drawWaterfalls();
+		void renderShadowMap(RenderView& view);
+		void drawWraithExtra(RendererItem* item, bool transparent, bool animated);
+		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ);
+		void drawLara(bool transparent, bool shadowMap);
 		void											printDebugMessage(LPCSTR message, ...);
 		void											drawFires();
 		void											drawSparks();
@@ -578,41 +579,40 @@ namespace T5M::Renderer
 		void											drawBlood();
 		void											drawDrips();
 		void											drawBubbles();
-		bool											drawEffects(bool transparent);
-		bool											drawEffect(RendererEffect* effect, bool transparent);
+		void drawEffects(bool transparent);
+		void drawEffect(RendererEffect* effect, bool transparent);
 		void											drawSplahes();
-		bool											drawSprites();
-		bool											drawLines3D();
-		bool											drawLines2D();
-		bool											drawOverlays();
-		bool											drawRopes();
-		bool											drawBats();
-		bool											drawRats();
-		bool											drawLittleBeetles();
-		bool											drawSpiders();
+		void drawSprites();
+		void drawLines3D();
+		void drawLines2D();
+		void drawOverlays();
+		void drawRopes();
+		void drawBats();
+		void drawRats();
+		void drawLittleBeetles();
+		void drawSpiders();
 		bool											drawGunFlashes();
-		bool											drawGunShells();
-		int drawInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
-		bool											drawDebris(bool transparent);
-		int												drawFinalPass();
-		bool drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
+		void drawGunShells();
+		void renderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background);
+		void drawDebris(bool transparent);
+		void drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget);
 		void											updateAnimatedTextures();
 		void											createBillboardMatrix(DirectX::SimpleMath::Matrix* out, DirectX::SimpleMath::Vector3* particlePos, DirectX::SimpleMath::Vector3* cameraPos, float rotation);
 		void											drawShockwaves();
 		void											drawRipples();
 		void											drawUnderwaterDust();	
-		bool											doRain();
-		bool											doSnow();
-		bool											drawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool cinematicBars);
+		void doRain();
+		void doSnow();
+		void drawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool cinematicBars);
 		bool											isRoomUnderwater(short roomNumber);
 		bool											isInRoom(int x, int y, int z, short roomNumber);
-		bool											drawColoredQuad(int x, int y, int w, int h, DirectX::SimpleMath::Vector4 color);
-		bool											initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
-		bool											initialiseBars();
-		bool											drawSmokeParticles();
-		bool											drawSparkParticles();
-		bool                                            drawDripParticles();
-		bool											drawExplosionParticles();
+		void drawColoredQuad(int x, int y, int w, int h, DirectX::SimpleMath::Vector4 color);
+		void initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
+		void initialiseBars();
+		void drawSmokeParticles();
+		void drawSparkParticles();
+		void drawDripParticles();
+		void drawExplosionParticles();
 		void renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumber);
 		void drawLaraHolsters(bool transparent);
 	public:
@@ -624,77 +624,68 @@ namespace T5M::Renderer
 		int ScreenHeight;
 		bool Windowed;
 		int NumTexturePages;
-	
+		ID3D11Device* getDevice() const {
+			return m_device;
+		}
+		ID3D11DeviceContext* getContext() const {
+			return m_context;
+		};
 		Renderer11();
 		~Renderer11();
 	
-		bool Create();
-		bool EnumerateVideoModes();
-		bool Initialise(int w, int h, int refreshRate, bool windowed, HWND handle);
-		int Draw();
+		void Create();
+		void EnumerateVideoModes();
+		void Initialise(int w, int h, int refreshRate, bool windowed, HWND handle);
+		void Draw();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov);
-		bool drawSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
-		int DumpGameScene();
-		int DrawInventory();
-		int DrawTitle();
-		bool drawScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
-		int DrawPickup(short objectNum);
+		void renderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		void DumpGameScene();
+		void renderInventory();
+		void renderTitle();
+		void renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		void drawPickup(short objectNum);
 		int SyncRenderer();
-		bool PrintString(int x, int y, char* string, D3DCOLOR color, int flags);
-		void ClearDynamicLights();
-		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
-		void FreeRendererData();
-		void EnableCinematicBars(bool value);
-		void FadeIn();
-		void FadeOut();
-		void DrawLoadingScreen(std::wstring& fileName);
-		void UpdateProgress(float value);
-		bool IsFading();
-		void GetLaraBonePosition(DirectX::SimpleMath::Vector3* pos, int bone);
-		bool ToggleFullScreen();
-		bool IsFullsScreen();
-		std::vector<RendererVideoAdapter>*					GetAdapters();
-		bool DoTitleImage();
-		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
-		void AddSpriteBillboard(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos,DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
-		void AddSpriteBillboardConstrained(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 constrainAxis);
-		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 lookAtAxis);
-		void AddSprite3D(RendererSprite* sprite, DirectX::SimpleMath::Vector3 vtx1, DirectX::SimpleMath::Vector3 vtx2, DirectX::SimpleMath::Vector3 vtx3, DirectX::SimpleMath::Vector3 vtx4, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
-		void AddLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
-		bool ChangeScreenResolution(int width, int height, int frequency, bool windowed);
-		bool DrawBar(float percent, const RendererHUDBar* const bar);
-		void FlipRooms(short roomNumber1, short roomNumber2);
-		void ResetAnimations();
-		void UpdateLaraAnimations(bool force);
-		void UpdateItemAnimations(int itemNumber, bool force);
-		void GetLaraAbsBonePosition(DirectX::SimpleMath::Vector3* pos, int joint);
-		void GetItemAbsBonePosition(int itemNumber, DirectX::SimpleMath::Vector3* pos, int joint);
-		int GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);
-		void GetBoneMatrix(short itemNumber, int joint, DirectX::SimpleMath::Matrix* outMatrix);
+		void drawString(int x, int y, char* string, D3DCOLOR color, int flags);
+		void clearDynamicLights();
+		void addDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+		void freeRendererData();
+		void enableCinematicBars(bool value);
+		void fadeIn();
+		void fadeOut();
+		void renderLoadingScreen(std::wstring& fileName);
+		void updateProgress(float value);
+		bool isFading();
+		void getLaraBonePosition(DirectX::SimpleMath::Vector3* pos, int bone);
+		void toggleFullScreen();
+		bool isFullsScreen();
+		std::vector<RendererVideoAdapter>* getAdapters();
+		void renderTitleImage();
+		void addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
+		void addSpriteBillboard(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos,DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
+		void addSpriteBillboardConstrained(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 constrainAxis);
+		void addSpriteBillboardConstrainedLookAt(RendererSprite* sprite, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode, DirectX::SimpleMath::Vector3 lookAtAxis);
+		void addSprite3D(RendererSprite* sprite, DirectX::SimpleMath::Vector3 vtx1, DirectX::SimpleMath::Vector3 vtx2, DirectX::SimpleMath::Vector3 vtx3, DirectX::SimpleMath::Vector3 vtx4, DirectX::SimpleMath::Vector4 color, float rotation, float scale, float width, float height, BLEND_MODES blendMode);
+		void addLine3D(DirectX::SimpleMath::Vector3 start, DirectX::SimpleMath::Vector3 end, DirectX::SimpleMath::Vector4 color);
+		void changeScreenResolution(int width, int height, int frequency, bool windowed);
+		void drawBar(float percent, const RendererHUDBar* const bar);
+		void flipRooms(short roomNumber1, short roomNumber2);
+		void resetAnimations();
+		void updateLaraAnimations(bool force);
+		void updateItemAnimations(int itemNumber, bool force);
+		void getLaraAbsBonePosition(DirectX::SimpleMath::Vector3* pos, int joint);
+		void getItemAbsBonePosition(int itemNumber, DirectX::SimpleMath::Vector3* pos, int joint);
+		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, DirectX::SimpleMath::Matrix local);
+		void getBoneMatrix(short itemNumber, int joint, DirectX::SimpleMath::Matrix* outMatrix);
 	
 		RendererMesh* getMesh(int meshIndex);
 	private:
-		Texture2D CreateDefaultNormalTexture();
+		Texture2D createDefaultNormalTexture();
 		void drawFootprints();
 
-		template<typename CBuff>
-		bool updateConstantBuffer(ID3D11Buffer* buffer, CBuff& data) {
-			HRESULT res;
-			D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-			// Lock the constant buffer so it can be written to.
-			res = m_context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-			if (FAILED(res))
-				return false;
-
-			// Get a pointer to the data in the constant buffer.
-			void* dataPtr = (mappedResource.pData);
-			memcpy(dataPtr, &data, sizeof(CBuff));
-			// Unlock the constant buffer.
-			m_context->Unmap(buffer, 0);
-
-			return true;
+		template <typename C>
+		ConstantBuffer<C> createConstantBuffer() {
+			return ConstantBuffer<C>(m_device);
 		}
 
 };
