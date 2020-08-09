@@ -147,7 +147,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	}
 	
 	Matrix world;
-	g_Renderer.GetBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
+	g_Renderer.getBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
 
 	if (ponytail)
 	{

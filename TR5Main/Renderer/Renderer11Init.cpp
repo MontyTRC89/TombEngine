@@ -10,7 +10,7 @@ using std::vector;
 extern GameConfiguration g_Configuration;
 extern GameFlow* g_GameFlow;
 
-bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
+void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
 {
 	HRESULT res;
 
@@ -22,9 +22,7 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
-
-	if (!initialiseScreen(w, h, refreshRate, windowed, handle, false))
-		return false;
+	initialiseScreen(w, h, refreshRate, windowed, handle, false);
 
 	// Initialise render states
 	m_states = new CommonStates(m_device);
@@ -177,10 +175,9 @@ bool Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND h
 	Utils::throwIfFailed(m_device->CreateSamplerState(&shadowSamplerDesc,&m_shadowSampler));
 	initialiseBars();
 	initQuad(m_device);
-	return true;
 }
 
-bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
+void T5M::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
 
@@ -202,19 +199,13 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
 	IDXGIDevice* dxgiDevice = NULL;
-	res = m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)& dxgiDevice);
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)& dxgiDevice));
 
 	IDXGIAdapter* dxgiAdapter = NULL;
-	res = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)& dxgiAdapter);
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)& dxgiAdapter));
 
 	IDXGIFactory* dxgiFactory = NULL;
-	res = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)& dxgiFactory);
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)& dxgiFactory));
 
 	if (reset)
 	{
@@ -224,9 +215,8 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	}
 
 	m_swapChain = NULL;
-	res = dxgiFactory->CreateSwapChain(m_device, &sd, &m_swapChain);
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(dxgiFactory->CreateSwapChain(m_device, &sd, &m_swapChain));
+
 
 	dxgiFactory->MakeWindowAssociation(handle, 0);
 	res = m_swapChain->SetFullscreenState(!windowed, NULL);
@@ -237,14 +227,12 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 
 	// Initialise the back buffer
 	m_backBufferTexture = NULL;
-	res = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast <void**>(&m_backBufferTexture));
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast <void**>(&m_backBufferTexture)));
+
 
 	m_backBufferRTV = NULL;
-	res = m_device->CreateRenderTargetView(m_backBufferTexture, NULL, &m_backBufferRTV);
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(m_device->CreateRenderTargetView(m_backBufferTexture, NULL, &m_backBufferRTV));
+
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	depthStencilDesc.Width = w;
@@ -260,14 +248,12 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 	depthStencilDesc.MiscFlags = 0;
 
 	m_depthStencilTexture = NULL;
-	res = m_device->CreateTexture2D(&depthStencilDesc, NULL, &m_depthStencilTexture);
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(m_device->CreateTexture2D(&depthStencilDesc, NULL, &m_depthStencilTexture));
+
 
 	m_depthStencilView = NULL;
-	res = m_device->CreateDepthStencilView(m_depthStencilTexture, NULL, &m_depthStencilView);
-	if (FAILED(res))
-		return false;
+	Utils::throwIfFailed(m_device->CreateDepthStencilView(m_depthStencilTexture, NULL, &m_depthStencilView));
+
 
 	// Bind the back buffer and the depth stencil
 	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
@@ -354,10 +340,9 @@ bool Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, 
 
 	UpdateWindow(handle);
 
-	return true;
 }
 
-bool Renderer11::Create()
+void T5M::Renderer::Renderer11::Create()
 {
 
 	D3D_FEATURE_LEVEL levels[] = {D3D_FEATURE_LEVEL_11_0,D3D_FEATURE_LEVEL_11_1};
@@ -371,7 +356,6 @@ bool Renderer11::Create()
 #endif
 	Utils::throwIfFailed(res);
 
-	return true;
 }
 
 void Renderer11::initialiseHairRemaps()
