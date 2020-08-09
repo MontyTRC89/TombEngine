@@ -173,3 +173,91 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)//126F0(<), 127A0(<) (F)
 		break;
 	}
 }
+
+void SnapLaraToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle) // (F) (D)
+{
+	if (item->currentAnimState == LS_SHIMMY_RIGHT)
+	{
+		switch (angle)
+		{
+		case NORTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x390;
+			return;
+		case EAST:
+			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0x70;
+			return;
+		case SOUTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0x70;
+			return;
+		case WEST:
+		default:
+			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x390;
+			return;
+		}
+	}
+
+	if (item->currentAnimState == LS_SHIMMY_LEFT)
+	{
+		switch (angle)
+		{
+		case NORTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0x70;
+			return;
+		case EAST:
+			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x390;
+			return;
+		case SOUTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x390;
+			return;
+		case WEST:
+		default:
+			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0x70;
+			return;
+		}
+	}
+
+	if (item->currentAnimState == LS_SHIMMY_FEET_RIGHT)
+	{
+		switch (angle)
+		{
+		case NORTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x720;
+			return;
+		case EAST:
+			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0xE0;
+			return;
+		case SOUTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0xE0;
+			return;
+		case WEST:
+		default:
+			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x720;
+			return;
+		}
+	}
+
+	if (item->currentAnimState == LS_SHIMMY_FEET_LEFT)
+	{
+		switch (angle)
+		{
+		case NORTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFC70 | 0xE0;
+			return;
+		case EAST:
+			item->pos.zPos = coll->old.z & 0xFFFFFF90 | 0x720;
+			return;
+		case SOUTH:
+			item->pos.xPos = coll->old.x & 0xFFFFFF90 | 0x720;
+			return;
+		case WEST:
+		default:
+			item->pos.zPos = coll->old.z & 0xFFFFFC70 | 0xE0;
+			return;
+		}
+	}
+}
+
+short GetDirOctant(int rot)//160B4(<), 161E8(<) (F)
+{
+	return abs(rot) >= ANGLE(45) && abs(rot) <= ANGLE(135.0f);
+}
