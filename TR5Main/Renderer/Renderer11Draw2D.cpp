@@ -69,27 +69,27 @@ namespace T5M::Renderer {
 			Vector4(0.18f,0.3f,0.72f,1),
 			Vector4(0.18f,0.3f,0.72f,1),
 		};
-		g_HealthBar = new RendererHUDBar(m_device, 20, 32, 150, 8, 1, healthColors);
-		g_AirBar = new RendererHUDBar(m_device, 630, 32, 150, 8, 1, airColors);
-		g_DashBar = new RendererHUDBar(m_device, 630, 32 + 8 + 4, 150, 8, 1, dashColors);
-		g_MusicVolumeBar = new RendererHUDBar(m_device, 400, 212, 150, 8, 1, soundSettingColors);
-		g_SFXVolumeBar = new RendererHUDBar(m_device, 400, 230, 150, 8, 1, soundSettingColors);
+		g_HealthBar = new RendererHUDBar(m_device.Get(), 20, 32, 150, 8, 1, healthColors);
+		g_AirBar = new RendererHUDBar(m_device.Get(), 630, 32, 150, 8, 1, airColors);
+		g_DashBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, dashColors);
+		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), 400, 212, 150, 8, 1, soundSettingColors);
+		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), 400, 230, 150, 8, 1, soundSettingColors);
 	}
 	void Renderer11::drawBar(float percent, const RendererHUDBar* const bar) {
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
-		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetVertexBuffers(0, 1, bar->vertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
-		m_context->VSSetShader(m_vsHUD, NULL, 0);
+		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
 		m_context->PSSetShaderResources(0, 1, m_HUDBarBorderTexture.ShaderResourceView.GetAddressOf());
 		ID3D11SamplerState* sampler = m_states->LinearClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
-		m_context->PSSetShader(m_psHUDTexture, NULL, 0);
+		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
 		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
 		m_context->RSSetState(m_states->CullNone());
@@ -97,16 +97,16 @@ namespace T5M::Renderer {
 
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
-		m_context->IASetInputLayout(m_inputLayout);
+		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetVertexBuffers(0, 1, bar->vertexBuffer.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->indexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_stHUDBar.Percent = percent;
-		m_cbHUDBar.updateData(m_stHUDBar, m_context);
+		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
 		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
 		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
-		m_context->VSSetShader(m_vsHUD, NULL, 0);
-		m_context->PSSetShader(m_psHUDBarColor, NULL, 0);
+		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
+		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
 		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
 		m_context->RSSetState(m_states->CullNone());
@@ -164,11 +164,11 @@ namespace T5M::Renderer {
 			vertices[3].UV.y = 1.0f;
 			vertices[3].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
-			m_context->VSSetShader(m_vsFullScreenQuad, NULL, 0);
-			m_context->PSSetShader(m_psFullScreenQuad, NULL, 0);
+			m_context->VSSetShader(m_vsFullScreenQuad.Get(), NULL, 0);
+			m_context->PSSetShader(m_psFullScreenQuad.Get(), NULL, 0);
 
 			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_context->IASetInputLayout(m_inputLayout);
+			m_context->IASetInputLayout(m_inputLayout.Get());
 
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);

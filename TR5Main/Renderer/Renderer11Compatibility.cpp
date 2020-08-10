@@ -114,9 +114,9 @@ namespace T5M::Renderer
 			if (texture->normalMapData.size() < 1) {
 				normal = createDefaultNormalTexture();
 			} else {
-				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex =std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			TexturePair tex =std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
 			m_roomTextures.push_back(tex);
 		}
 
@@ -127,9 +127,9 @@ namespace T5M::Renderer
 			if (texture->normalMapData.size() < 1) {
 				normal = createDefaultNormalTexture();
 			} else {
-				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
 			m_moveablesTextures.push_back(tex);
 		}
 
@@ -140,19 +140,19 @@ namespace T5M::Renderer
 			if (texture->normalMapData.size() < 1) {
 				normal = createDefaultNormalTexture();
 			} else {
-				normal = Texture2D(m_device, texture->normalMapData.data(), texture->normalMapData.size());
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
 			m_staticsTextures.push_back(tex);
 		}
 
 		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.SpritesTextures[i];
-			m_spritesTextures.push_back(Texture2D(m_device, texture->colorMapData.data(), texture->colorMapData.size()));
+			m_spritesTextures.push_back(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()));
 		}
 
-		m_skyTexture = Texture2D(m_device, g_Level.MiscTextures.colorMapData.data(), g_Level.MiscTextures.colorMapData.size());
+		m_skyTexture = Texture2D(m_device.Get(), g_Level.MiscTextures.colorMapData.data(), g_Level.MiscTextures.colorMapData.size());
 
 		// Step 2: prepare rooms
 		vector<RendererVertex> roomVertices;
@@ -314,8 +314,8 @@ namespace T5M::Renderer
 
 		// Create a single vertex buffer and a single index buffer for all rooms
 		// NOTICE: in theory, a 1,000,000 vertices scene should have a VB of 52 MB and an IB of 4 MB
-		m_roomsVertexBuffer = VertexBuffer(m_device, roomVertices.size(), roomVertices.data());
-		m_roomsIndexBuffer = IndexBuffer(m_device, roomIndices.size(), roomIndices.data());
+		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), roomVertices.size(), roomVertices.data());
+		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), roomIndices.size(), roomIndices.data());
 
 		m_numHairVertices = 0;
 		m_numHairIndices = 0;
@@ -644,8 +644,8 @@ namespace T5M::Renderer
 		}
 
 		// Create a single vertex buffer and a single index buffer for all moveables
-		m_moveablesVertexBuffer = VertexBuffer(m_device, moveablesVertices.size(), moveablesVertices.data());
-		m_moveablesIndexBuffer = IndexBuffer(m_device, moveablesIndices.size(), moveablesIndices.data());
+		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), moveablesVertices.size(), moveablesVertices.data());
+		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), moveablesIndices.size(), moveablesIndices.data());
 
 		// Step 4: prepare static meshes
 		vector<RendererVertex> staticsVertices;
@@ -688,8 +688,8 @@ namespace T5M::Renderer
 		}
 
 		// Create a single vertex buffer and a single index buffer for all statics
-		m_staticsVertexBuffer = VertexBuffer(m_device, staticsVertices.size(), staticsVertices.data());
-		m_staticsIndexBuffer = IndexBuffer(m_device, staticsIndices.size(), staticsIndices.data());
+		m_staticsVertexBuffer = VertexBuffer(m_device.Get(), staticsVertices.size(), staticsVertices.data());
+		m_staticsIndexBuffer = IndexBuffer(m_device.Get(), staticsIndices.size(), staticsIndices.data());
 
 		// Step 5: prepare sprites
 		m_sprites.resize(g_Level.Sprites.size());

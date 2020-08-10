@@ -134,10 +134,6 @@ namespace T5M::Renderer {
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
 		m_context->OMSetRenderTargets(0, nullViews, NULL);
 
-		DX11_DELETE(m_gameFont);
-		DX11_DELETE(m_spriteBatch);
-		DX11_DELETE(m_primitiveBatch);
-
 		m_backBufferTexture->Release();
 		m_backBufferRTV->Release();
 		m_depthStencilView->Release();
