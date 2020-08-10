@@ -4,7 +4,7 @@
 #include "input.h"
 #include "laramisc.h"
 #include "draw.h"
-#include "laraclmb.h"
+#include "lara_climb.h"
 #include "lara_collide.h"
 
 static short LeftClimbTab[4] = // offset 0xA0638

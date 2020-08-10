@@ -5,7 +5,7 @@
 #include "effect.h"
 #include "effect2.h"
 #include "debris.h"
-#include "larafire.h"
+#include "lara_fire.h"
 #include "lara.h"
 #include "flmtorch.h"
 #include "sphere.h"

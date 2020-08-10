@@ -28,7 +28,7 @@
 #include "effect.h"
 #include "sphere.h"
 #include "debris.h"
-#include "larafire.h"
+#include "lara_fire.h"
 #include "footprint.h"
 #include "level.h"
 #include "input.h"
