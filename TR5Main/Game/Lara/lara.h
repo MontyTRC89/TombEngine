@@ -74,8 +74,6 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll);
@@ -132,28 +130,11 @@ void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll);
 
-
-
-
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dash(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);

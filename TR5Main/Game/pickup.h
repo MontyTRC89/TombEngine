@@ -17,4 +17,5 @@ void InitialiseSearchObject(short itemNumber);
 void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll);
 void SearchObjectControl(short itemNumber);
 void do_pickup();
-
+void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll);
