@@ -15,8 +15,7 @@ namespace T5M::Renderer {
 			static_cast<FLOAT>(resolution),
 			static_cast<FLOAT>(resolution),
 			0,
-			1,
-			
+			1
 			};
 		}
 	public:
