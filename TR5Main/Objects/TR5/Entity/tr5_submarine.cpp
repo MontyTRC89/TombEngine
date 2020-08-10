@@ -586,7 +586,7 @@ void TorpedoControl(short itemNumber)
 		{
 			LaraItem->hitStatus = true;
 			KillItem(itemNumber);
-			TriggerUnderwaterExplosion(item);
+			TriggerUnderwaterExplosion(item, 1);
 			SoundEffect(SFX_UNDERWATER_EXPLOSION, &item->pos, 2);
 			SoundEffect(SFX_LARA_UNDERWATER_HIT, &LaraItem->pos, 2);
 			LaraItem->hitPoints -= 200;
@@ -623,7 +623,7 @@ void TorpedoControl(short itemNumber)
 		item->pos.xPos = x;
 		item->pos.yPos = y;
 		item->pos.zPos = z;
-		TriggerUnderwaterExplosion(item);
+		TriggerUnderwaterExplosion(item, 1);
 		SoundEffect(SFX_UNDERWATER_EXPLOSION, &item->pos, 2);
 		KillItem(itemNumber);
 	}

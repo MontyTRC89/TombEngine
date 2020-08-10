@@ -885,7 +885,17 @@ namespace T5M::Renderer
 
 	void Renderer11::getBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
 	{
-		RendererObject &obj = *m_moveableObjects[ID_LARA];
-		*outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;
+		if (itemNumber == Lara.itemNumber)
+		{
+			RendererObject& obj = *m_moveableObjects[ID_LARA];
+			*outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;
+		}
+		else
+		{
+			updateItemAnimations(itemNumber, true);
+			RendererItem& item = m_items[itemNumber];
+			RendererObject& obj = *m_moveableObjects[item.Item->objectNumber];
+			*outMatrix = obj.AnimationTransforms[joint] * item.World;
+		}
 	}
 } // namespace T5M::Renderer

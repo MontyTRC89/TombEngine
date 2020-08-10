@@ -462,7 +462,7 @@ static void MotorBikeExplode(ITEM_INFO* item)
 {
     if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
     {
-        TriggerUnderwaterExplosion(item);
+        TriggerUnderwaterExplosion(item, 1);
     }
     else
     {

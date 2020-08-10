@@ -11,6 +11,13 @@
 #include "GameFlowScript.h"
 #include "smoke.h"
 #include "drip.h"
+#include <effects.h>
+#include "Renderer11.h"
+#include <effects.h>
+#include <draw.h>
+
+using std::vector;
+using T5M::Renderer::g_Renderer;
 
 char FlareTable[121] =
 {
@@ -1205,151 +1212,110 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 		TO_RAD(item->pos.zRot)
 	);
 
-	// PHD_MATH:
-	/*phd_PushUnitMatrix();
-	
-	MatrixPtr[M03] = 0;
-	MatrixPtr[M13] = 0;
-	MatrixPtr[M23] = 0;
+	int bit = 1;
 
-	phd_RotYXZ(item->pos.yRot, item->pos.xRot, item->pos.zRot);
-	phd_TranslateRel(frame[6], frame[7], frame[8]);
-	
-	short* rotation = &frame[9];
-	gar_RotYXZsuperpack(&rotation, 0);
-	
-	short* extraRotation = (short*)item->data;
-	
-	int* bone = &Bones[obj->boneIndex];
-	
-	int bits = 1;
-	if (meshBits & 1 && item->meshBits & 1)
+	if ((bit & meshBits) && (bit & item->meshBits))
 	{
-		if (flags & 0x100 || !(GetRandomControl() & 3))
+		if ((GetRandomControl() & 3) == 0)
 		{
-			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, 0);
-			
-			int fxNumber = CreateNewEffect(item->roomNumber);
+			short fxNumber = CreateNewEffect(item->roomNumber);
 			if (fxNumber != NO_ITEM)
 			{
-				FX_INFO* fx = &Effects[fxNumber];
-				fx->pos.xPos = item->pos.xPos + boneMatrix.Translation().x; // (MatrixPtr[M03] >> W2V_SHIFT);
-				fx->pos.yPos = item->pos.yPos + boneMatrix.Translation().y; // (MatrixPtr[M13] >> W2V_SHIFT);
-				fx->pos.zPos = item->pos.zPos + boneMatrix.Translation().z; // (MatrixPtr[M23] >> W2V_SHIFT);
-				fx->roomNumber = item->roomNumber;
-				fx->pos.yRot = 0;
-				fx->pos.zRot = 0;
-				fx->pos.xRot = 0;
+				FX_INFO* fx = &EffectList[fxNumber];
 
-				if (flags & 0x10)
-				{
-					fx->speed = 0;
-				}
-				else
+				Matrix boneMatrix;
+				g_Renderer.getBoneMatrix(itemNumber, 0, &boneMatrix);
+				boneMatrix = world * boneMatrix;
+
+				fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
+				fx->pos.yPos = boneMatrix.Translation().y + item->pos.yPos;
+				fx->pos.zPos = boneMatrix.Translation().z + item->pos.zPos;
+
+				fx->roomNumber = item->roomNumber;
+				fx->pos.xRot = 0;
+				fx->pos.yRot = GetRandomControl() * 2;
+
+				if (!(flags & 0x10))
 				{
 					if (flags & 0x20)
 						fx->speed = GetRandomControl() >> 12;
 					else
 						fx->speed = GetRandomControl() >> 8;
 				}
+
 				if (flags & 0x40)
-				{
 					fx->fallspeed = 0;
-				}
 				else
 				{
-					if ((flags & 0x80u) == 0)
+					if ((flags & 0x80) == 0)
 						fx->fallspeed = -(GetRandomControl() >> 8);
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);
 				}
-				fx->frameNumber = obj->meshIndex;
 				fx->objectNumber = ID_BODY_PART;
+				fx->frameNumber = obj->meshIndex;
 				fx->shade = 16912;
-				fx->flag2 = damage;
-
-				if (item->objectNumber == ID_CRUMBLING_FLOOR)
-				{
-					fx->speed = 0;
-					fx->fallspeed = 0;
-					fx->counter = 61;
-				}
-				else
-				{
-					fx->counter = 0;
-				}
-				fx->flag1 = 0;
+				fx->flag2 = flags;
 			}
-			
-			item->meshBits--;
+
+			item->meshBits -= bit;
 		}
 	}
 
-	for (int i = 1; i < obj->nmeshes; i++, bone += 3)
+	for (int i = 1; i < obj->nmeshes; i++)
 	{
-		bits <<= 1;
+		Matrix boneMatrix;
+		g_Renderer.getBoneMatrix(itemNumber, i, &boneMatrix);
+		boneMatrix = world * boneMatrix;
 
-		if (bits & meshBits && bits & item->meshBits && (damage & 0x100 || !(GetRandomControl() & 3)))
+		bit <<= 1;
+		if ((bit & meshBits) && (bit & item->meshBits))
 		{
-			Matrix boneMatrix = g_Renderer->GetBoneMatrix(item, i);
-			Matrix matrix = boneMatrix * world;
-
-			int fxNumber = CreateNewEffect(item->roomNumber);
-			if (fxNumber != NO_ITEM)
+			if ((GetRandomControl() & 3) == 0 && (flags & 0x100))
 			{
-				FX_INFO* fx = &Effects[fxNumber];
-				fx->pos.xPos = item->pos.xPos + matrix.Translation().x; // (MatrixPtr[3] >> 14);
-				fx->pos.yPos = item->pos.yPos + matrix.Translation().y; // (MatrixPtr[7] >> 14);
-				fx->pos.zPos = item->pos.zPos + matrix.Translation().z; // (MatrixPtr[11] >> 14);
-				fx->roomNumber = item->roomNumber;
-				fx->pos.yRot = 0;
-				fx->pos.zRot = 0;
-				fx->pos.xRot = 0;
-				if (damage & 0x10)
+				short fxNumber = CreateNewEffect(item->roomNumber);
+				if (fxNumber != NO_ITEM)
 				{
-					fx->speed = 0;
-				}
-				else
-				{
-					if (damage & 0x20)
-						fx->speed = GetRandomControl() >> 12;
+					FX_INFO* fx = &EffectList[fxNumber];
+
+					fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
+					fx->pos.yPos = boneMatrix.Translation().y + item->pos.yPos;
+					fx->pos.zPos = boneMatrix.Translation().z + item->pos.zPos;
+
+					fx->roomNumber = item->roomNumber;
+					fx->pos.xRot = 0;
+					fx->pos.yRot = GetRandomControl() * 2;
+
+					if (!(flags & 0x10))
+					{
+						if (flags & 0x20)
+							fx->speed = GetRandomControl() >> 12;
+						else
+							fx->speed = GetRandomControl() >> 8;
+					}
+
+					if (flags & 0x40)
+						fx->fallspeed = 0;
 					else
-						fx->speed = GetRandomControl() >> 8;
+					{
+						if ((flags & 0x80) == 0)
+							fx->fallspeed = -(GetRandomControl() >> 8);
+						else
+							fx->fallspeed = -(GetRandomControl() >> 12);
+					}
+
+					fx->objectNumber = ID_BODY_PART;
+					fx->shade = 16912;
+					fx->flag2 = flags;
+					fx->frameNumber = obj->meshIndex + i;
 				}
-				if (damage & 0x40)
-				{
-					fx->fallspeed = 0;
-				}
-				else
-				{
-					if ((damage & 0x80u) == 0)
-						fx->fallspeed = -(GetRandomControl() >> 8);
-					else
-						fx->fallspeed = -(GetRandomControl() >> 12);
-				}
-				fx->objectNumber = ID_BODY_PART;
-				fx->shade = 16912;
-				fx->flag2 = damage;
-				fx->frameNumber = obj->meshIndex + 2 * i;
-				
-				if (item->objectNumber == ID_CRUMBLING_FLOOR)
-				{
-					fx->speed = 0;
-					fx->fallspeed = 0;
-					fx->counter = 61;
-				}
-				else
-				{
-					fx->counter = 0;
-				}
-				fx->flag1 = 0;
+
+				item->meshBits -= bit;
 			}
-
-			item->meshBits -= bits;
 		}
-	}*/
+	}
 
-	return (item->meshBits == 0);
+	return item->meshBits == 0;
 }
 
 int GetFreeShockwave()// (F)
@@ -1617,9 +1583,9 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)// (F)
 {
 	GAME_VECTOR pos;
 
-	pos.x = item->pos.x_pos;
-	pos.y = item->pos.y_pos;
-	pos.z = item->pos.z_pos;
+	pos.x = item->pos.xPos;
+	pos.y = item->pos.yPos;
+	pos.z = item->pos.zPos;
 	pos.roomNumber = item->roomNumber;
 
 	SetUpLensFlare(0, 0, 0, &pos);
