@@ -345,7 +345,7 @@ void ControlGrenade(short itemNumber)
 
 		if (item->itemFlags[1])
 		{
-			if (item->itemFlags[0] == WEAPON_AMMO3)
+			if (item->itemFlags[0] == GRENADE_FLASH)
 			{
 				// Flash grenades
 
@@ -384,7 +384,7 @@ void ControlGrenade(short itemNumber)
 					
 					InitialiseItem(newGrenadeItemNumber);
 					
-					newGrenade->pos.xRot = (GetRandomControl() & 0x3FFF) + 0x2000;
+					newGrenade->pos.xRot = (GetRandomControl() & 0x3FFF) + ANGLE(45);
 					newGrenade->pos.yRot = GetRandomControl() * 2;
 					newGrenade->pos.zRot = 0;
 					newGrenade->speed = 64;
@@ -397,8 +397,9 @@ void ControlGrenade(short itemNumber)
 					
 					newGrenade->status = ITEM_INVISIBLE;
 					newGrenade->itemFlags[2] = item->itemFlags[2];
-					newGrenade->hitPoints = 3000;
-	
+					newGrenade->hitPoints = 60; // 3000;
+					newGrenade->itemFlags[0] = GRENADE_NORMAL;
+
 					if (g_Level.Rooms[newGrenade->roomNumber].flags & ENV_FLAG_WATER)
 						newGrenade->hitPoints = 1;
 				}
@@ -464,6 +465,7 @@ void ControlGrenade(short itemNumber)
 		int wz = world.Translation().z;
 
 		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
+		TriggerRocketFire(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos);
 	}
 
 	xv = ((item->speed * phd_sin(item->goalAnimState)) >> W2V_SHIFT);
@@ -632,7 +634,7 @@ void ControlGrenade(short itemNumber)
 							{
 								TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
 								currentItem->pos.yPos -= 128; 
-								//TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0); // CHECK
+								TriggerShockwave(&currentItem->pos, 48, 304, 64, 0, 96, 128, 24, 0, 0);
 								currentItem->pos.yPos += 128;
 								ExplodeItemNode(currentItem, 0, 0, 128);
 								short currentItemNumber = (currentItem - g_Level.Items.data());
@@ -694,7 +696,7 @@ void ControlGrenade(short itemNumber)
 		}
 		else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 		{
-			TriggerUnderwaterExplosion(item);
+			TriggerUnderwaterExplosion(item, 0);
 		}
 		else
 		{
@@ -1048,7 +1050,7 @@ void ControlCrossbowBolt(short itemNumber)
 	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos ||
 		GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos)
 	{
-		// I have hit the room, this is the end for the bolt
+		// I have hit a solid wall, this is the end for the bolt
 		item->pos.xPos = oldX;
 		item->pos.yPos = oldY;
 		item->pos.zPos = oldZ;
@@ -1074,6 +1076,7 @@ void ControlCrossbowBolt(short itemNumber)
 	// If now in water and before in land, add a ripple
 	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && land)
 	{
+
 		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0);
 	}
 
@@ -1191,7 +1194,7 @@ void ControlCrossbowBolt(short itemNumber)
 	// At this point, for sure bolt must explode
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
-		TriggerUnderwaterExplosion(item);
+		TriggerUnderwaterExplosion(item, 0);
 	}
 	else
 	{
@@ -1345,7 +1348,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 		
 		item->itemFlags[0] = Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
 
-		SoundEffect(235, 0, 0);
+		SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
 
 		Savegame.Level.AmmoUsed++;
 		Savegame.Game.AmmoUsed++;
@@ -1368,10 +1371,10 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 					HitTarget(dest, 0, 30, 1);
 					if (dest != LaraItem)
 					{
-						++Savegame.Game.AmmoHits;
-						if (src->hitPoints <= 0)
+						Savegame.Game.AmmoHits++;
+						if (dest->hitPoints <= 0)
 						{
-							++Savegame.Level.Kills;
+							Savegame.Level.Kills++;
 							CreatureDie((dest - g_Level.Items.data()), 1);
 						}
 					}
@@ -1387,29 +1390,75 @@ void DoGrenadeDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src)
 	}
 }
 
-void TriggerUnderwaterExplosion(ITEM_INFO* item)
+void SomeSparkEffect(int x, int y, int z, int count)
 {
-	TriggerExplosionBubble(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
-	
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < count; i++)
 	{
-		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -1, 1, item->roomNumber);
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+		spark->on = 1;
+		spark->sR = 112;
+		spark->sG = (GetRandomControl() & 0x1F) + -128;
+		spark->sB = (GetRandomControl() & 0x1F) + -128;
+		spark->colFadeSpeed = 4;
+		spark->fadeToBlack = 8;
+		spark->life = 24;
+		spark->dR = spark->sR >> 1;
+		spark->dG = spark->sG >> 1;
+		spark->dB = spark->sB >> 1;
+		spark->sLife = 24;
+		spark->transType = COLADD;
+		spark->friction = 5;
+		spark->xVel = -128 * phd_sin(GetRandomControl());
+		spark->yVel = -640 - (byte)GetRandomControl();
+		spark->zVel = -128 * phd_cos(GetRandomControl());
+		spark->flags = 0;
+		spark->x = x + (spark->xVel >> 3);
+		spark->y = y - (spark->yVel >> 5);
+		spark->z = z + (spark->zVel >> 3);
+		spark->maxYvel = 0;
+		spark->gravity = (GetRandomControl() & 0xF) + 64;
 	}
-	
-	int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	if (wh != NO_HEIGHT)
-	{
-		int dy = item->pos.yPos - wh;
-		if (dy < 2048)
-		{
-			SplashSetup.y = wh;
-			SplashSetup.x = item->pos.xPos;
-			SplashSetup.z = item->pos.zPos;
-			SplashSetup.innerRadius = 160;
-			SplashSetup.splashPower = 2048 - dy;
+}
 
-			SetupSplash(&SplashSetup,item->roomNumber);
+void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag)
+{
+	if (flag)
+	{
+		int x = (GetRandomControl() & 0x1FF) + item->pos.xPos - 256;
+		int y = item->pos.yPos;
+		int z = (GetRandomControl() & 0x1FF) + item->pos.zPos - 256;
+		
+		TriggerExplosionBubbles(x, y, z, item->roomNumber);
+		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->roomNumber);
+		
+		int wh = GetWaterHeight(x, y, z, item->roomNumber);
+		if (wh != NO_HEIGHT)
+			SomeSparkEffect(x, wh, z, 8);
+	}
+	else
+	{
+		TriggerExplosionBubble(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
+
+		for (int i = 0; i < 3; i++)
+		{
+			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -1, 1, item->roomNumber);
+		}
+
+		int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+		if (wh != NO_HEIGHT)
+		{
+			int dy = item->pos.yPos - wh;
+			if (dy < 2048)
+			{
+				SplashSetup.y = wh;
+				SplashSetup.x = item->pos.xPos;
+				SplashSetup.z = item->pos.zPos;
+				SplashSetup.innerRadius = 160;
+				SplashSetup.splashPower = 2048 - dy;
+
+				SetupSplash(&SplashSetup, item->roomNumber);
+			}
 		}
 	}
 }

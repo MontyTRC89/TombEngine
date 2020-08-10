@@ -14,6 +14,7 @@
 #include "spark.h"
 #include "explosion.h"
 #include <Game\drip.h>
+#include <Game\bubble.h>
 using T5M::Renderer::g_Renderer;
 using T5M::Effects::Explosion::TriggerExplosion;
 using namespace T5M::Effects::Spark;
@@ -434,6 +435,55 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	TriggerExplosion(Vector3(x, y, z), 512, true, false, true, roomNumber);
 }
 
+void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
+{
+	int dx = LaraItem->pos.xPos - x;
+	int dz = LaraItem->pos.zPos - z;
+
+	if (dx >= -ANGLE(90) && dx <= ANGLE(90) && dz >= -ANGLE(90) && dz <= ANGLE(90))
+	{
+		SPARKS* spark = &Sparks[GetFreeSpark()];
+
+		spark->sR = -128;
+		spark->dR = -128;
+		spark->dG = -128;
+		spark->dB = -128;
+		spark->on = 1;
+		spark->life = 24;
+		spark->sLife = 24;
+		spark->sG = 64;
+		spark->sB = 0;
+		spark->colFadeSpeed = 8;
+		spark->fadeToBlack = 12;
+		spark->transType = COLADD;
+		spark->x = x;
+		spark->y = y;
+		spark->z = z;
+		spark->xVel = 0;
+		spark->yVel = 0;
+		spark->zVel = 0;
+		spark->friction = 0;
+		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
+		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->scalar = 3;
+		spark->gravity = 0;
+		spark->maxYvel = 0;
+		int size = (GetRandomControl() & 7) + 63;
+		spark->sSize = size >> 1;
+		spark->size = size >> 1;
+		spark->dSize = 2 * size;
+
+		for (int i = 0; i < 8; i++)
+		{
+			PHD_VECTOR pos;
+			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
+			pos.y = (GetRandomControl() & 0x7F) + y - 64;
+			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
+			CreateBubble(&pos, roomNumber, 6, 15, 0, 0, 0, 0);
+		}
+	}
+}
+
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
@@ -761,9 +811,9 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)//32EAC, 333AC (
 		sptr->z = (GetRandomControl() & 0x1F) + item->pos.zPos - 16;
 		sptr->friction = 51;
 		sptr->maxYvel = 0;
-		sptr->flags = 538;
+		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 		if (deadly)
-			sptr->flags = 539;
+			sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE | SP_FLAT;
 		sptr->scalar = 2;
 		sptr->dSize = (GetRandomControl() & 0xF) + (size >> 6) + 16;
 		sptr->sSize = sptr->size = sptr->dSize >> 1;
@@ -1300,6 +1350,56 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	int size = (GetRandomControl() & 7) + 32;
 	sptr->size = sptr->sSize = size;
 }
+
+void TriggerRocketFire(int x, int y, int z)
+{
+	SPARKS* sptr = &Sparks[GetFreeSpark()];
+
+	sptr->on = true;
+
+	sptr->sR = sptr->sG = (GetRandomControl() & 0x1F) + 48;
+	sptr->sB = (GetRandomControl() & 0x3F) - 64;
+	sptr->dR = (GetRandomControl() & 0x3F) - 64;
+	sptr->dG = (GetRandomControl() & 0x3F) - 128;
+	sptr->dB = 32;
+
+	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
+	sptr->fadeToBlack = 12;
+	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
+	sptr->transType = COLADD;
+	sptr->extras = 0;
+	sptr->dynamic = -1;
+
+	sptr->x = x + ((GetRandomControl() & 15) - 8);
+	sptr->y = y + ((GetRandomControl() & 15) - 8);
+	sptr->z = z + ((GetRandomControl() & 15) - 8);
+	sptr->xVel = ((GetRandomControl() & 255) - 128);
+	sptr->yVel = -(GetRandomControl() & 3) - 4;
+	sptr->zVel = ((GetRandomControl() & 255) - 128);
+	sptr->friction = 4;
+
+	if (GetRandomControl() & 1)
+	{
+		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		sptr->rotAng = GetRandomControl() & 4095;
+		if (GetRandomControl() & 1)
+			sptr->rotAdd = -(GetRandomControl() & 15) - 16;
+		else
+			sptr->rotAdd = (GetRandomControl() & 15) + 16;
+	}
+	else
+		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+
+	// TODO: right sprite
+	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->scalar = 3;
+	sptr->gravity = -(GetRandomControl() & 3) - 4;
+	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
+
+	int size = (GetRandomControl() & 7) + 32;
+	sptr->size = sptr->sSize = size >> 2;
+}
+
 
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 {
