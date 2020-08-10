@@ -7,7 +7,7 @@
 #include "effect.h"
 #include "collide.h"
 #include "box.h"
-#include "laraflar.h"
+#include "lara_flare.h"
 #include "draw.h"
 #include "tomb4fx.h"
 #include "misc.h"

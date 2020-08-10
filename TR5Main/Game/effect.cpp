@@ -19,7 +19,7 @@
 #include "tr5_spider_emitter.h"
 #include "pickup.h"
 #include "puzzles_keys.h"
-#include "larafire.h"
+#include "lara_fire.h"
 
 using std::function;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
