@@ -17,26 +17,36 @@ namespace T5M::Renderer::Utils {
 			
 	}
 
-	ComPtr<ID3D11VertexShader> compileVertexShader(ID3D11Device* device, const std::wstring& fileName, const std::string& function, const std::string& model, const D3D_SHADER_MACRO * defines, ComPtr<ID3D10Blob>& bytecode) noexcept {
+	ComPtr<ID3D11VertexShader> compileVertexShader(ID3D11Device* device, const std::wstring& fileName, const std::string& function, const std::string& model, const D3D_SHADER_MACRO * defines, ComPtr<ID3D10Blob>& bytecode) {
 		ComPtr<ID3D10Blob> errors;
 		logD("Compiling vertex shader");
 		throwIfFailed(D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(),errors.GetAddressOf()));
-		ID3D11VertexShader* shader = nullptr;
-		throwIfFailed(device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &shader));
+		ComPtr<ID3D11VertexShader> shader;
+		throwIfFailed(device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
+		if constexpr(DebugBuild){
+			char buffer[100];
+			size_t sz = std::wcstombs(buffer, fileName.c_str(), 100);
+			shader->SetPrivateData(WKPDID_D3DDebugObjectName, sz, buffer);
+		}
 		return shader;
 	}
-	ComPtr<ID3D11PixelShader> compilePixelShader(ID3D11Device* device, const wstring& fileName, const string& function, const string& model, const D3D_SHADER_MACRO* defines, ComPtr<ID3D10Blob>& bytecode) noexcept {
+	ComPtr<ID3D11PixelShader> compilePixelShader(ID3D11Device* device, const wstring& fileName, const string& function, const string& model, const D3D_SHADER_MACRO* defines, ComPtr<ID3D10Blob>& bytecode) {
 		ComPtr<ID3D10Blob> errors;
 		logD("Compiling pixel shader");
 		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
 		throwIfFailed(D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(), errors.GetAddressOf()));
-		ID3D11PixelShader* shader = nullptr;
-		throwIfFailed(device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &shader));
+		ComPtr<ID3D11PixelShader> shader;
+		throwIfFailed(device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
+		if constexpr(DebugBuild){
+			char buffer[100];
+			size_t sz = std::wcstombs(buffer, fileName.c_str(), 100);
+			shader->SetPrivateData(WKPDID_D3DDebugObjectName, sz, buffer);
+		}
 		return shader;
 	}
 	
 
-	UINT Utils::GetShaderFlags() noexcept
+	constexpr UINT Utils::GetShaderFlags()
 	{
 		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
 		if constexpr(DebugBuild){

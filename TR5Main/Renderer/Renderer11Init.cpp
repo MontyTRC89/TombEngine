@@ -172,7 +172,7 @@ void T5M::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	shadowSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
 	shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 	Utils::throwIfFailed(m_device->CreateSamplerState(&shadowSamplerDesc,m_shadowSampler.GetAddressOf()));
-	Utils::setName(m_shadowSampler.Get(), "ShadowSampler");
+	m_shadowSampler->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof("ShadowSampler") + 1, "ShadowSampler");
 	initialiseBars();
 	initQuad(m_device.Get());
 }
