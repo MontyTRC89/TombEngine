@@ -179,7 +179,7 @@ static  void SkidooExplode(ITEM_INFO* skidoo)
 {
 	if (g_Level.Rooms[skidoo->roomNumber].flags & ENV_FLAG_WATER)
 	{
-		TriggerUnderwaterExplosion(skidoo);
+		TriggerUnderwaterExplosion(skidoo, 1);
 	}
 	else
 	{
