@@ -50,13 +50,13 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 
 void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 {
-	if (*numRooms <= 0)
-		return;
 	short numDoors, * door, adjoiningRoom;
 	int i, j;
 	bool adjoiningRoomFound;
 
 	roomArray[0] = roomNumber;
+	*numRooms = 1;
+
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 
 	for (i = 0; i < room->doors.size(); i++)
@@ -74,7 +74,10 @@ void GetRoomList(short roomNumber, short* roomArray, short* numRooms)
 		}
 
 		if (!adjoiningRoomFound)
-			roomArray[*(numRooms++)] = adjoiningRoom;
+		{
+			roomArray[*numRooms] = adjoiningRoom;
+			*numRooms = *numRooms + 1;
+		}
 	}
 }
 
