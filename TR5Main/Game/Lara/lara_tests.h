@@ -16,8 +16,6 @@ int TestHangFeet(ITEM_INFO* item, short angle);
 int CanLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
 void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
 void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
-short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll);
-short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll);
 short LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 short LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 int LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
