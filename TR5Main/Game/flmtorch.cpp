@@ -2,9 +2,9 @@
 #include "flmtorch.h"
 
 #include "effect2.h"
-#include "laraflar.h"
+#include "lara_flare.h"
 #include "lara.h"
-#include "larafire.h"
+#include "lara_fire.h"
 #include "laramisc.h"
 #include "switch.h"
 #include "draw.h"

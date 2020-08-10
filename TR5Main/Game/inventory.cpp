@@ -2,7 +2,7 @@
 #include "inventory.h"
 #include "draw.h"
 #include "control.h"
-#include "larafire.h"
+#include "lara_fire.h"
 #include "gameflow.h"
 #include "sound.h"
 #include "savegame.h"
@@ -12,8 +12,8 @@
 
 #include "input.h"
 #include "configuration.h"
-#include "lara1gun.h"
-#include "lara2gun.h"
+#include "lara_one_gun.h"
+#include "lara_two_guns.h"
 #include "level.h"
 #include "input.h"
 using namespace T5M::Renderer;

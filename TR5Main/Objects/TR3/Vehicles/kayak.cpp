@@ -6,7 +6,7 @@
 #include "camera.h"
 #include "lara.h"
 #include "collide.h"
-#include "laraflar.h"
+#include "lara_flare.h"
 #include "items.h"
 #include "level.h"
 #include "setup.h"
