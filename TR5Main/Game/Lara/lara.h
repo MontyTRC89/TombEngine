@@ -131,19 +131,10 @@ void lara_col_poleup(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_poleright(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_poleleft(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_polestat(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_monkey180(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_hang2(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_hang2(ITEM_INFO* item, COLL_INFO* coll);
+
+
+
+
 void lara_col_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_dashdive(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_dash(ITEM_INFO* item, COLL_INFO* coll);
@@ -166,8 +157,6 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll);
 
-void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll);
-void MonkeySwingFall(ITEM_INFO* item);
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll);
