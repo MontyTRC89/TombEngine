@@ -1,9 +1,9 @@
 #pragma once
 #include "LEB128.h"
 #include "Streams.h"
+#include <memory>
 
-
-typedef struct ChunkId
+struct ChunkId
 {
 private:
 	byte*		m_chunkBytes;
@@ -14,11 +14,11 @@ public:
 
 	~ChunkId();
 
-	static ChunkId* FromString(const char* str);
+	static std::unique_ptr<ChunkId> FromString(const char* str);
 
-	static ChunkId* FromString(std::string* str);
+	static std::unique_ptr<ChunkId> FromString(std::string* str);
 
-	static ChunkId* FromStream(BaseStream* stream);
+	static std::unique_ptr<ChunkId> FromStream(BaseStream* stream);
 
 	void ToStream(BaseStream* stream);
 

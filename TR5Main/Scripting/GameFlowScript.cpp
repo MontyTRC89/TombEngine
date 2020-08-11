@@ -8,23 +8,23 @@
 #include "draw.h"
 using std::string;
 using std::vector;
-ChunkId* ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
-ChunkId* ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");
-ChunkId* ChunkGameFlowLevelFlags = ChunkId::FromString("Tr5MainLevelFlags");
-ChunkId* ChunkGameFlowLevelInfo = ChunkId::FromString("Tr5MainLevelInfo");
-ChunkId* ChunkGameFlowLevelPuzzle = ChunkId::FromString("Tr5MainLevelPuzzle");
-ChunkId* ChunkGameFlowLevelKey = ChunkId::FromString("Tr5MainLevelKey");
-ChunkId* ChunkGameFlowLevelPuzzleCombo = ChunkId::FromString("Tr5MainLevelPuzzleCombo");
-ChunkId* ChunkGameFlowLevelKeyCombo = ChunkId::FromString("Tr5MainLevelKeyCombo");
-ChunkId* ChunkGameFlowLevelPickup = ChunkId::FromString("Tr5MainLevelPickup");
-ChunkId* ChunkGameFlowLevelPickupCombo = ChunkId::FromString("Tr5MainLevelPickupCombo");
-ChunkId* ChunkGameFlowLevelExamine = ChunkId::FromString("Tr5MainLevelExamine");
-ChunkId* ChunkGameFlowLevelLayer = ChunkId::FromString("Tr5MainLevelLayer");
-ChunkId* ChunkGameFlowLevelLuaEvent = ChunkId::FromString("Tr5MainLevelLuaEvent");
-ChunkId* ChunkGameFlowLevelLegend = ChunkId::FromString("Tr5MainLevelLegend");
-ChunkId* ChunkGameFlowStrings = ChunkId::FromString("Tr5MainStrings");
-ChunkId* ChunkGameFlowAudioTracks = ChunkId::FromString("Tr5MainAudioTracks");
-ChunkId* ChunkGameFlowTitleBackground = ChunkId::FromString("Tr5MainTitleBackground");
+std::unique_ptr<ChunkId> ChunkGameFlowFlags = ChunkId::FromString("Tr5MainFlags");
+std::unique_ptr<ChunkId> ChunkGameFlowLevel = ChunkId::FromString("Tr5MainLevel");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelFlags = ChunkId::FromString("Tr5MainLevelFlags");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelInfo = ChunkId::FromString("Tr5MainLevelInfo");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelPuzzle = ChunkId::FromString("Tr5MainLevelPuzzle");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelKey = ChunkId::FromString("Tr5MainLevelKey");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelPuzzleCombo = ChunkId::FromString("Tr5MainLevelPuzzleCombo");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelKeyCombo = ChunkId::FromString("Tr5MainLevelKeyCombo");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelPickup = ChunkId::FromString("Tr5MainLevelPickup");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelPickupCombo = ChunkId::FromString("Tr5MainLevelPickupCombo");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelExamine = ChunkId::FromString("Tr5MainLevelExamine");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelLayer = ChunkId::FromString("Tr5MainLevelLayer");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelLuaEvent = ChunkId::FromString("Tr5MainLevelLuaEvent");
+std::unique_ptr<ChunkId> ChunkGameFlowLevelLegend = ChunkId::FromString("Tr5MainLevelLegend");
+std::unique_ptr<ChunkId> ChunkGameFlowStrings = ChunkId::FromString("Tr5MainStrings");
+std::unique_ptr<ChunkId> ChunkGameFlowAudioTracks = ChunkId::FromString("Tr5MainAudioTracks");
+std::unique_ptr<ChunkId> ChunkGameFlowTitleBackground = ChunkId::FromString("Tr5MainTitleBackground");
 
 ChunkReader* g_ScriptChunkIO;
 
@@ -163,7 +163,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 {
 	GameScriptLevel* level = g_GameFlow->Levels[arg];
 
-	if (chunkId->EqualsTo(ChunkGameFlowLevelInfo))
+	if (chunkId->EqualsTo(ChunkGameFlowLevelInfo.get()))
 	{
 		char* str;
 
@@ -184,7 +184,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelFlags))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelFlags.get()))
 	{
 		level->Horizon = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		level->Sky = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
@@ -200,7 +200,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 		
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzle))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzle.get()))
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
@@ -209,7 +209,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelKey))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelKey.get()))
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
@@ -218,7 +218,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickup))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickup.get()))
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
@@ -227,7 +227,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelExamine))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelExamine.get()))
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
@@ -236,17 +236,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzleCombo))
-	{
-		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
-		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
-		for (int i = 0; i < 6; i++)
-			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
-
-		return true;
-	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelKeyCombo))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPuzzleCombo.get()))
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
@@ -256,7 +246,7 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickupCombo))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelKeyCombo.get()))
 	{
 		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
@@ -266,7 +256,17 @@ bool __cdecl readGameFlowLevelChunks(ChunkId* chunkId, int maxSize, int arg)
 
 		return true;
 	}
-	else if (chunkId->EqualsTo(ChunkGameFlowLevelLayer))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelPickupCombo.get()))
+	{
+		int itemIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int piece = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
+		int itemStringIndex = LEB128::ReadUInt32(g_ScriptChunkIO->GetRawStream());
+		for (int i = 0; i < 6; i++)
+			LEB128::ReadInt16(g_ScriptChunkIO->GetRawStream());
+
+		return true;
+	}
+	else if (chunkId->EqualsTo(ChunkGameFlowLevelLayer.get()))
 	{
 		int layerIndex = LEB128::ReadByte(g_ScriptChunkIO->GetRawStream());
 
@@ -301,13 +301,13 @@ bool __cdecl readGameFlowLevel()
 
 bool __cdecl readGameFlowChunks(ChunkId* chunkId, int maxSize, int arg)
 {
-	if (chunkId->EqualsTo(ChunkGameFlowFlags))
+	if (chunkId->EqualsTo(ChunkGameFlowFlags.get()))
 		return readGameFlowFlags();
-	else if (chunkId->EqualsTo(ChunkGameFlowStrings))
+	else if (chunkId->EqualsTo(ChunkGameFlowStrings.get()))
 		return readGameFlowStrings();
-	else if (chunkId->EqualsTo(ChunkGameFlowAudioTracks))
+	else if (chunkId->EqualsTo(ChunkGameFlowAudioTracks.get()))
 		return readGameFlowTracks();
-	else if (chunkId->EqualsTo(ChunkGameFlowLevel))
+	else if (chunkId->EqualsTo(ChunkGameFlowLevel.get()))
 		return readGameFlowLevel();
 	return false;
 }
