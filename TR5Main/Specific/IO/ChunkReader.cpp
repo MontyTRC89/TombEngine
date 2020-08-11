@@ -42,7 +42,7 @@ bool ChunkReader::IsValid() {
 
 bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, int arg), int arg) {
 	do {
-		ChunkId* chunkId = ChunkId::FromStream(m_stream);
+		std::unique_ptr<ChunkId> chunkId = ChunkId::FromStream(m_stream);
 		if (chunkId->EqualsTo(m_emptyChunk)) // End reached
 			break;
 
@@ -53,7 +53,7 @@ bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, in
 		bool chunkRecognized = false;
 		int startPos = m_stream->GetCurrentPosition();
 
-		chunkRecognized = func(chunkId, chunkSize, arg);
+		chunkRecognized = func(chunkId.get(), chunkSize, arg);
 		int readDataCount = m_stream->GetCurrentPosition() - startPos;
 
 		// Adjust _stream position if necessary
@@ -66,7 +66,7 @@ bool ChunkReader::ReadChunks(bool(*func)(ChunkId* parentChunkId, int maxSize, in
 
 bool ChunkReader::ReadChunks(std::function<bool(ChunkId*, long, int)> func, int arg) {
 	do {
-		ChunkId* chunkId = ChunkId::FromStream(m_stream);
+		std::unique_ptr<ChunkId> chunkId = ChunkId::FromStream(m_stream);
 		if (chunkId->EqualsTo(m_emptyChunk)) // End reached
 			break;
 
@@ -77,7 +77,7 @@ bool ChunkReader::ReadChunks(std::function<bool(ChunkId*, long, int)> func, int 
 		bool chunkRecognized = false;
 		int startPos = m_stream->GetCurrentPosition();
 
-		chunkRecognized = func(chunkId, chunkSize, arg);
+		chunkRecognized = func(chunkId.get(), chunkSize, arg);
 		int readDataCount = m_stream->GetCurrentPosition() - startPos;
 
 		// Adjust _stream position if necessary
