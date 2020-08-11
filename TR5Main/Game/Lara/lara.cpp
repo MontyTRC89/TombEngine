@@ -4,6 +4,7 @@
 #include "lara_collide.h"
 #include "lara_monkey.h"
 #include "lara_crawl.h"
+#include "lara_pickup.h"
 #include "control.h"
 #include "items.h"
 #include "inventory.h"
@@ -25,7 +26,6 @@
 #include "input.h"
 #include "sound.h"
 #include "setup.h"
-#include "pickup.h"
 
 #include "motorbike.h"
 #include "cannon.h"
