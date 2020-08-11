@@ -3,6 +3,7 @@
 #include "input.h"
 #include "lara_tests.h"
 #include "lara_collide.h"
+#include "draw.h"
 
 /*crouch/duck start*/
 void lara_as_duck(ITEM_INFO* item, COLL_INFO* coll)//14688, 14738 (F)
@@ -787,3 +788,115 @@ void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll)//14534, 145E4 (F)
 	}
 }
 /*crawling end*/
+
+void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll)//15770, 158A4 (F)
+{
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(45.0f);
+
+	coll->enableSpaz = false;
+	coll->enableBaddiePush = false;
+
+	if (item->animNumber == LA_CRAWL_TO_HANG_END)
+	{
+		int edgeCatch;
+		int edge;
+
+		item->fallspeed = 512;
+		item->pos.yPos += 255;
+
+		coll->badPos = NO_BAD_POS;
+		coll->badNeg = -STEPUP_HEIGHT;
+		coll->badCeiling = BAD_JUMP_CEILING;
+
+		Lara.moveAngle = 0;
+		coll->facing = Lara.moveAngle;
+
+		GetCollisionInfo(coll, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, 870);
+		edgeCatch = LaraTestEdgeCatch(item, coll, &edge);
+
+		if (edgeCatch)
+		{
+			if (edgeCatch >= 0 || LaraTestHangOnClimbWall(item, coll))
+			{
+				short angle = item->pos.yRot;
+				if (SnapToQuadrant(angle, 35))
+				{
+					BOUNDING_BOX* bounds;
+
+					if (TestHangSwingIn(item, angle))
+					{
+
+						Lara.headYrot = 0;
+						Lara.headXrot = 0;
+						Lara.torsoYrot = 0;
+						Lara.torsoXrot = 0;
+						item->animNumber = LA_JUMP_UP_TO_MONKEYSWING;
+						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+						item->currentAnimState = LS_MONKEYSWING_IDLE;
+						item->goalAnimState = LS_MONKEYSWING_IDLE;
+					}
+					else
+					{
+						if (TestHangFeet(item, angle))
+						{
+							item->animNumber = LA_REACH_TO_HANG;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+							item->currentAnimState = LS_HANG;
+							item->goalAnimState = LS_HANG_FEET;
+						}
+						else
+						{
+							item->animNumber = LA_REACH_TO_HANG;
+							item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+							item->currentAnimState = LS_HANG;
+							item->goalAnimState = LS_HANG;
+						}
+					}
+
+					bounds = GetBoundsAccurate(item);
+
+					if (edgeCatch <= 0)
+					{
+						item->pos.yPos = edge - bounds->Y1;
+					}
+					else
+					{
+
+						/*						item->pos.xPos += coll->shift.x;
+												item->pos.zPos += coll->shift.z;
+												@ORIGINAL_BUG: these two caused teleportation when Lara performed crawl2hang on triangulated geometry. replacing with shifts to the edges of blocks solved it*/
+
+						short angl = (unsigned short)(item->pos.yRot + ANGLE(45.0f)) / ANGLE(90.0f);
+						switch (angl)
+						{
+						case NORTH:
+							item->pos.zPos = (item->pos.zPos | (WALL_SIZE - 1)) - LARA_RAD;
+							break;
+
+						case EAST:
+							item->pos.xPos = (item->pos.xPos | (WALL_SIZE - 1)) - LARA_RAD;
+							break;
+
+						case SOUTH:
+							item->pos.zPos = (item->pos.zPos & -WALL_SIZE) + LARA_RAD;
+							break;
+
+						case WEST:
+							item->pos.xPos = (item->pos.xPos & -WALL_SIZE) + LARA_RAD;
+							break;
+						}
+					}
+					item->pos.yPos += coll->frontFloor - bounds->Y1;
+					item->pos.yRot = angle;
+
+					item->gravityStatus = true;
+					item->speed = 2;
+					item->fallspeed = 1;
+
+					Lara.gunStatus = LG_HANDS_BUSY;
+				}
+			}
+		}
+	}
+}
