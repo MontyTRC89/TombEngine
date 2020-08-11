@@ -22,3 +22,4 @@ void lara_as_duckl(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_duckr(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_ducklr(ITEM_INFO* item, COLL_INFO* coll);
 /*crawl end*/
+void lara_col_crawl2hang(ITEM_INFO* item, COLL_INFO* coll);
